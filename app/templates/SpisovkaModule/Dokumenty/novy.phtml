@@ -1,0 +1,256 @@
+@{block title}Nový dokument{/block}
+@{block javascript}
+	<script type="text/javascript" src="{$baseUri}js/webtoolkit.aim.js"></script>
+	<script type="text/javascript">
+		function startCallback() {
+			return true;
+		}
+
+		function completeCallback(response) {
+
+                        if ( response.indexOf('###vybrano###') != -1 ) {
+                            alert('Příloha byl nahrána.');
+                            $('#dialog').dialog('close');
+                            renderPrilohy({$Dok->dokument_id});
+                        } else if ( response.indexOf('###zmemeno###') != -1 ) {
+                            alert('Příloha byla upravena.');
+                            $('#dialog').dialog('close');
+                            renderPrilohy({$Dok->dokument_id});
+                        } else {
+                            $('#dialog').html(response);
+                        }
+		}
+	</script>
+@{/block}
+@{block debug}
+<?php echo "\n\nDokument: "; print_r($Dok); ?>
+<?php echo "\n\nPrideleno: "; print_r($Prideleno); ?>
+<?php echo "\n\nSpisy: "; print_r($Spisy); ?>
+<?php echo "\n\nSubjekty: "; print_r($Subjekty); ?>
+<?php echo "\n\nPrilohy: "; print_r($Prilohy); ?>
+
+@{/block}
+@{block content}
+
+    <div class="navigate">
+    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> - Nový dokument
+    </div>
+
+    {$novyForm->render('begin')}
+    <div id="dokument_blok_hlavni">
+        <dl class="detail_item">
+            <dt>JID:</dt>
+            <dd>{$cjednaci->app_id}-ESS-{$Dok->dokument_id}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Číslo jednací:</dt>
+            <dd>{$cjednaci->cislo_jednaci}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Typ dokumentu:</dt>
+            <dd>{$novyForm['typ_dokumentu']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spisová značka:</dt>
+            <dd>
+                <span id="dok_spis">
+                {if count($Dok->spisy)>0 }
+                    {foreach $Dok->spisy as $s}
+                    {$s->nazev}<br />
+                    {/foreach}
+                {else}
+                    nepřidělen k žádnemu spisu
+                {/if}
+                </span>
+
+                <a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->dokument_id}" id="dialog-spis">Připojit spisovou značku</a>
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Věc:</dt>
+            <dd>{$novyForm['nazev']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Popis:</dt>
+            <dd>{$novyForm['popis']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$novyForm['datum_vzniku']->label}</dt>
+            <dd>{$novyForm['datum_vzniku']->control} {$novyForm['datum_vzniku_cas']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Číslo jednací odesilatele:</dt>
+            <dd>{$novyForm['cislo_jednaci_odesilatele']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Zmocnění:</dt>
+            <dd><span id="dok_zmocneni"></span>&nbsp;<a href="{link :Spisovka:Dokumenty:zmocneni, 'id'=>$Dok->dokument_id}" id="dialog-zmocneni">Připojit zmocnění</a></dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka:</dt>
+            <dd>{$novyForm['poznamka']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spojit s dokumentem:</dt>
+            <dd>
+                <span id="dok_spojit">
+                {if count($SouvisejiciDokumenty)>0 }
+                    {foreach $SouvisejiciDokumenty as $s}
+                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->dokument_id}">{$s->cislo_jednaci} ({$s->jid})</a>
+                    &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->dokument_id, 'spojeny'=>$s->dokument_id}">odebrat spojení</a>]
+                    {/foreach}
+                {/if}
+                </span>
+                &nbsp;[<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->dokument_id}" id="dialog-spojit">spojit s dokumentem</a>]
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Počet listů:</dt>
+            <dd>{$novyForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$novyForm['pocet_priloh']->control}</dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_poznamka">
+        <div>Předání / vyřízení</div>
+        <dl class="detail_item">
+            <dt>Přiděleno:</dt>
+            <dd>
+                {$Prideleno}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Lhůta k vyřízení:</dt>
+            <dd>{$novyForm['lhuta']->control} dní</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka:</dt>
+            <dd>{$novyForm['predani_poznamka']->control}</dd>
+        </dl>
+
+    </div>
+    
+    <div id="dokument_blok_subjekty">
+        <div class="h2">
+            Adresáti / odesílatelé
+        </div>
+        <div class="blok_akce">
+            <a href="{link :Spisovka:Subjekty:vyber, 'id'=>0, 'dok_id'=>$Dok->dokument_id}" id="dialog-subjekt">Připojit subjekt</a>
+            &nbsp;&nbsp;&nbsp;
+            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->dokument_id}" onclick="renderSubjekty({!$Dok->dokument_id}); return false;">Obnovit seznam subjektu</a>
+        </div>
+        <div id="dok-subjekty">
+        {if count($Subjekty)>0}
+        <table class="seznam">
+            {foreach $Subjekty as $subjekt}
+            <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
+                <div class="info">
+                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
+                <br />
+                <span>
+                    {if $subjekt->rezim_subjektu == 'O'}
+                    odesílatel
+                    {elseif $subjekt->rezim_subjektu == 'A'}
+                    adresát
+                    {elseif $subjekt->rezim_subjektu == 'AO'}
+                    odesílatel i adresát
+                    {else}
+                    nespecifikováno
+                    {/if}
+                </span>
+
+                <br />
+                {=Subjekt::displayName($subjekt,'adresa')}
+                </div>
+                <div class="vyber">
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" onclick="return confirm('Opravdu chcete odebrat subjekt z dokumentu?');">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" id="dialog-subjektzmenit">změnit</a>&nbsp;&nbsp;
+                </div>
+            </td>
+            <td class="meta_plus">
+                &nbsp;
+                <div class="info">
+                <dl>
+                    <dt>email:</dt>
+                    <dd>{$subjekt->email}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>telefon:</dt>
+                    <dd>{$subjekt->telefon}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>isds:</dt>
+                    <dd>{$subjekt->id_isds}&nbsp;</dd>
+                </dl>
+
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+        </table>
+        {else}
+        <div class="prazdno">K tomuto dokumentu nejsou připojeni žádní odesilatelé nebo adresáti.</div>
+        {/if}
+        </div>
+    </div>
+
+    <div id="dokument_blok_prilohy">
+    <div class="h2">
+        Přílohy
+    </div>
+    <div class="blok_akce">
+        <a href="{link :Spisovka:Prilohy:pridat, 'id'=>0, 'dok_id'=>$Dok->dokument_id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->dokument_id}" onclick="renderPrilohy({!$Dok->dokument_id}); return false;">Obnovit seznam příloh</a>
+    </div>
+    <div id="dok-prilohy">
+    {if count($Prilohy)>0}
+    <table class="seznam">
+        {foreach $Prilohy as $file}
+        <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/mimetypes/{$file->mime_type|webalize}.png" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->dokument_id, 'file'=>$file->file_id}">{$file->nazev}</a>
+                <div class="info">
+                {$file->real_name}
+                <br />
+                <span>
+                    {$file->typ_name}, {$file->size|bytes}, {$file->mime_type}
+                    <br />
+                    MD5 hash: {$file->md5_hash}
+                </span>
+                </div>
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+                <div class="vyber">
+                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return confirm('Opravdu chcete odebrat přílohu z dokumentu?');">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;
+                </div>
+            </td>
+            <td class="user">
+                nahráno {$file->date_created|edate}
+                <br />
+                {$file->user_name}
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    {else}
+        <div class="prazdno">K tomuto dokumentu nejsou připojené žádné elektronické přílohy.</div>
+    {/if}
+    </div>
+    </div>
+
+    <div id="dokument_blok_akce">
+        {$novyForm['novy']->control}
+        &nbsp;&nbsp;
+        {$novyForm['storno']->control}
+    </div>
+    {$novyForm->render('end')}
+
+    <div id="dialog"></div>

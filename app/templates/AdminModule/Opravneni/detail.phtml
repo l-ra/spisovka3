@@ -1,0 +1,76 @@
+{block title}detail role {$Role->name}{/block}
+{block content}
+    <div class="navigate">
+    <a href="{link :Admin:Opravneni:seznam}">Seznam roli</a> - Detail role
+    </div>
+    <h2>{$Role->name}</h2>
+
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+        {if ($FormUpravit=='info')}
+        {control upravitForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Kódové označení role:</dt>
+            <dd>{$Role->code}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Dědí z role:</dt>
+            <dd>{$Role->parent_name}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Popis role:</dt>
+            <dd>{!$Role->note|enl2br}&nbsp;</dd>
+        </dl>
+        {access :Admin:Opravneni:detail}<a href="{link :Admin:Opravneni:detail, 'id'=>$Role->role_id, 'upravit'=>'info'}">Upravit</a>{/access}
+        {/if}
+    </div>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Oprávnění</div>
+        <br />
+        {$opravneniForm->render('begin')}
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd class="pravidlo">
+                <span class="opravneni_volba_head">
+                    povolit / zakázat
+                </span>
+                &nbsp;
+            </dd>
+        </dl>
+
+        {foreach $seznamPravidel as $blok}
+        <div class="detail_subhlavicka">{$blok['name']}</div>
+        {foreach $blok['pravidla'] as $rule_id => $pravidlo}
+        <dl class="detail_item">
+            <dt class="ikona_{$pravidlo['opravneni']}">&nbsp;</dt>
+            <dd class="pravidlo">
+                <span class="opravneni_volba">
+                    {$opravneniForm['perm'.$rule_id.'-opravneni_allow']->control}
+                    {$opravneniForm['perm'.$rule_id.'-opravneni_deny']->control}
+                </span>
+                {$pravidlo['name']}
+            </dd>
+        </dl>
+        {/foreach}
+        {/foreach}
+        <div style="text-align: right">
+        {$opravneniForm['upravit']->control}
+        </div>
+        
+        {$opravneniForm->render('end')}
+    </div>
+
+    {accessrole programator}
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Vytvoření pravidla</div>
+        {control novePravidloForm}
+    </div>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Vytvoření zdroje</div>
+        {control novyResourceForm}
+    </div>
+    {/accessrole}

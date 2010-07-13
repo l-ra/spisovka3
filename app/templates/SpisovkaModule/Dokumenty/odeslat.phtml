@@ -1,0 +1,218 @@
+@{block title}Dokument{/block}
+@{block debug}
+<?php echo "\n\nDokument: "; print_r($Dok); ?>
+@{/block}
+@{block content}
+
+    <div class="navigate">
+    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> -
+    <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->dokument_id }">Seznam dokumentů</a> -
+    Odeslání dokumentu
+    </div>
+
+    <h2>Odeslat dokument</h2>
+
+    {$odeslatForm->render('begin')}
+
+    <div id="dokument_blok_hlavni">
+        <div class="h2">Zpráva přes email</div>
+        <dl class="detail_item">
+            <dt>Odesílatel:</dt>
+            <dd>{$odeslatForm['email_from']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Předmět zprávy:</dt>
+            <dd>{$odeslatForm['email_predmet']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Text zprávy:</dt>
+            <dd>{$odeslatForm['email_text']->control}&nbsp;</dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_hlavni">
+        <div class="h2">Zpráva přes datovou schránkou</div>
+        <dl class="detail_item">
+            <dt>Předmět zprávy:</dt>
+            <dd>{$odeslatForm['isds_predmet']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>číslo jednací odesílatele:</dt>
+            <dd>{$odeslatForm['isds_cjednaci_odes']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spisová značka odesílatele:</dt>
+            <dd>{$odeslatForm['isds_spis_odes']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Číslo jednací adresáta:</dt>
+            <dd>{$odeslatForm['isds_cjednaci_adres']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spisová značka adresáta:</dt>
+            <dd>{$odeslatForm['isds_spis_adres']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Do vlastních rukou? :</dt>
+            <dd>{$odeslatForm['isds_dvr']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Doručit fikcí? :</dt>
+            <dd>{$odeslatForm['isds_fikce']->control}&nbsp;</dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_subjekty">
+        <div class="h2">
+            Adresáti
+        </div>
+        <div id="dok-subjekty">
+        {if count($Dok->subjekty)>0}
+        <table class="seznam">
+            {foreach $Dok->subjekty as $subjekt}
+            <?php if ( $subjekt->rezim_subjektu == 'O' ) { continue; } ?>
+            <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
+                <div class="info">
+                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
+                <br />
+                <span>
+                    {if $subjekt->rezim_subjektu == 'O'}
+                    odesílatel
+                    {elseif $subjekt->rezim_subjektu == 'A'}
+                    adresát
+                    {elseif $subjekt->rezim_subjektu == 'AO'}
+                    odesílatel i adresát
+                    {else}
+                    nespecifikováno
+                    {/if}
+                </span>
+                <br />
+                {=Subjekt::displayName($subjekt,'adresa')}
+                </div>
+                {if count($Dok->odeslani)>0}
+                    {foreach $Dok->odeslani as $dokodes}
+                        {if $dokodes->subjekt_id == $subjekt->subjekt_id  }
+                <div class="vyber" style="color:#008800;">
+                    Tomuto adresátovi byl dokument již odeslán
+                </div>
+                        {?break}
+                        {/if}
+                    {/foreach}
+                {/if}
+            </td>
+            <td class="meta_plus">
+                &nbsp;
+                <div class="info">
+                <dl>
+                    <dt>email:</dt>
+                    <dd>{$subjekt->email}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>telefon:</dt>
+                    <dd>{$subjekt->telefon}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>isds:</dt>
+                    <dd>{$subjekt->id_isds}&nbsp;</dd>
+                </dl>
+
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="icon">&nbsp;</td>
+            <td colspan="2">
+                    Jak odeslat:
+                    <select name="subjekt[{$subjekt->subjekt_id}]">
+                        <option value="0">neodesílat</option>
+                        <option value="1">odeslat emailem</option>
+                        <option value="2">odeslat datovou schránkou</option>
+                        <option value="3">odeslat poštou</option>
+                        <option value="4">odeslat faxem</option>
+                        <option value="5">předáno osobně</option>
+                        <option value="6">předáno telefonicky</option>
+                    </select>
+                    &nbsp;&nbsp;&nbsp;
+                    Datum odeslání *: <input type="text" class="datepicker" name="datum_odeslani[{$subjekt->subjekt_id}]" value="{=date('d.m.Y')}"> (* neplatí pro e-podatelnu)
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+        </table>
+        {else}
+        <div class="prazdno">K tomuto dokumentu nejsou připojeni žádní adresáti.</div>
+        {/if}
+        </div>
+    </div>
+
+    <div id="dokument_blok_prilohy">
+    <div class="h2">
+        Přílohy
+    </div>
+    <div id="dok-prilohy">
+    {accessview}
+    {if count($Dok->prilohy)>0}
+    <table class="seznam">
+        {foreach $Dok->prilohy as $file}
+        <tr>
+            <td class="icon">
+                <input type="checkbox" name="prilohy[{$file->file_id}]" />
+            </td>
+            <td class="icon">
+                <img src="{$baseUri}images/mimetypes/{$file->mime_type|webalize}.png" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->dokument_id, 'file'=>$file->file_id}">{$file->nazev}</a>
+                <div class="info">
+                {$file->real_name}
+                <br />
+                <span>{$file->typ_name}, {$file->size|bytes}, {$file->mime_type}</span>
+                </div>
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+            </td>
+            <td class="user">
+                nahráno {$file->date_created|edate}
+                <br />
+                {$file->user_name}
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+        <dl class="detail_item">
+            <dt>Celková velikost příloh :</dt>
+            <dd>{$PrilohyCelkovaVelikost|bytes}&nbsp;</dd>
+            <dd>
+                {if $PrilohyCelkovaVelikost > 10485760 }
+                <span style="color: #ff0000;">Celková velikost příloh překročila povolený limit k odeslání 10MB. Odesílejte přílohy po kouscích.</span>
+                {elseif $PrilohyCelkovaVelikost > 2097152 }
+                <span style="color: #008888;">Celková velikost příloh překročila limit 2MB. Zprávu je možné odeslat. Pouze v případě odeslání přes email může dojít k limitu ze strany poštovního serveru. Zjistěte si, zda můžete takto velkou přílohu odeslat emailem.</span>
+                {/if}
+            </dd>
+        </dl>
+    {else}
+        <div class="prazdno">
+            K tomuto dokumentu nejsou připojené žádné přílohy.
+            <br />
+            Zprávu lze odeslat i bez příloh.
+        </div>
+    {/if}
+    {/accessview}
+    {noaccessview}
+        <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
+    {/noaccessview}
+    </div>
+    </div>
+
+    <div id="dokument_blok_akce">
+        {$odeslatForm['odeslat']->control}
+        &nbsp;&nbsp;
+        {$odeslatForm['storno']->control}
+    </div>
+    {$odeslatForm->render('end')}
+
+    <div id="dialog"></div>

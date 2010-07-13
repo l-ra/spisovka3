@@ -1,0 +1,116 @@
+body {
+    background: #f0f0f0 url() repeat-x;
+}
+
+/* ***************************************************************** */
+/* *** TOP LAYOUT *** */
+#layout_top {
+    background: #D89B8F url() repeat-x;
+}
+
+#top {
+    background: #CE533D url() repeat-x;
+}
+
+#top h1 {
+    color: #681203;
+}
+
+#top h1 a {
+    color: #681203;
+}
+
+#top_menu {
+    color: #681203;
+}
+
+#top_menu a {
+    color: #681203;
+}
+
+#top_menu a:hover {
+    color: #FFC273;
+}
+
+#top_jmeno {
+    color: #681203;
+}
+
+/* ***************************************************************** */
+/* *** CONTENT LAYOUT *** */
+#layout {
+    width: 980px;
+    margin: 0 auto 0 auto;
+    padding: 0px;
+}
+
+#menu {
+    background: #681203 url() repeat-x;
+    padding: 10px 10px;
+}
+
+#menu a {
+    color: #FFC273;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    margin: 0px 10px;
+}
+
+#content {
+    background: #ffffff url() repeat-x;
+    min-height: 500px;
+}
+
+#dialog table th,
+#content table th {
+    background-color: #681203;
+    padding: 5px 5px;
+    text-align: left;
+    color: #ffffff;
+    border: 1px #681203 solid;
+}
+
+
+/* ***************************************************************** */
+/* *** BOTTOM LAYOUT *** */
+#layout_bottom {
+    margin: 0px;
+    padding: 0px;
+}
+
+#bottom {
+    width: 970px;
+    margin: 0 auto 0 auto;
+    padding: 5px 5px 5px 5px;
+    text-align: right;
+    color: #681203;
+    font-size: 8pt;
+    background: #CE533D url() repeat-x;
+}
+
+#bottom a {
+    color: #681203;
+    text-decoration: none;
+}
+
+#bottom a:hover {
+    color: #FFC273;
+    text-decoration: underline;
+}
+
+/* ***************************************************************** */
+/* *** DEBUG LAYOUT *** */
+
+#debug {
+    width: 970px;
+    margin: 0 auto 0 auto;
+    padding: 5px 5px 5px 5px;
+    color: #FFC273;
+    font-size: 10pt;
+    background: #681203 url() repeat-x;
+    white-space: pre;
+    font-family: monospace;
+}
+
+

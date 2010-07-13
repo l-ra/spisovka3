@@ -1,0 +1,44 @@
+{block title}Seznam dokumentů{/block}
+{block content}
+    <div class="navigate">
+    Seznam příloh
+    </div>
+
+    <h2>Seznam příloh</h2>
+
+    {if count($seznam)>0}
+
+    <table class="seznam">
+        {foreach $seznam as $file}
+        <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/mimetypes/{$file->mime_type|webalize}.png" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <a href="{link :Admin:Prilohy:download, 'id'=>$file->file_id}">{$file->nazev}</a>
+                <div class="info">
+                {$file->real_name}
+                <br />
+                <span>{$file->typ_name}, {$file->size|bytes}, {$file->mime_type}</span>
+                </div>
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+            </td>
+            <td class="user">
+                nahráno {$file->date_created|date:'%d.%m.%Y'}
+                <br />
+                {$file->user_name}
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    {widget vp}
+    {else}
+    <div class="prazdno">Nebyly zjištěny žádné soubory.</div>
+    {/if}
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Přidat přílohu</div>
+        {control uploadForm}
+    </div>
+
+

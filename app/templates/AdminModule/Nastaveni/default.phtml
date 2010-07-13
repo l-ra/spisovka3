@@ -1,0 +1,181 @@
+{block title}Nastavení{/block}
+{block debug}
+<?php echo "Urad: "; Debug::dump($Urad); ?>
+<?php echo "CisloJednaci: "; Debug::dump($CisloJednaci); ?>
+<?php echo "Ukazka: "; print_r($Ukazka); ?>
+{/block}
+{block content}
+    <div class="navigate">
+    Nastavení
+    </div>
+    <h2>Nastavení</h2>
+
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Informace o sobě</div>
+        {if ($FormUpravit=='info')}
+        {control nastaveniUraduForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Název:</dt>
+            <dd>{$Urad->nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Plný název:</dt>
+            <dd>{$Urad->plny_nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Zkratka:</dt>
+            <dd>{$Urad->zkratka}&nbsp;</dd>
+        </dl>
+
+
+
+        <dl class="detail_item">
+            <dt>Adresa:</dt>
+            <dd>
+                {$Urad->adresa->ulice}&nbsp;<br />
+                {$Urad->adresa->psc} {$Urad->adresa->mesto}&nbsp;<br />
+                {$Urad->adresa->stat}&nbsp;<br />
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Telefon:</dt>
+            <dd>{$Urad->kontakt->telefon}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Email:</dt>
+            <dd>{$Urad->kontakt->email}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>URL:</dt>
+            <dd>{$Urad->kontakt->www}&nbsp;</dd>
+        </dl>
+
+
+        {access :Admin:Nastaveni:default}<a href="{link :Admin:Nastaveni:default, 'upravit'=>'info'}">Upravit</a>{/access}
+        {/if}
+    </div>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Číslo jednací</div>
+        {if ($FormUpravit=='cjednaci')}
+        {control nastaveniCJForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Maska čísla jednacího:</dt>
+            <dd>{$CisloJednaci->maska}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Ukázka podoby:</dt>
+            <dd>{$Ukazka->cislo_jednaci}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Typ evidence:</dt>
+            <dd>{$CisloJednaci->typ_evidence}&nbsp;</dd>
+        </dl>
+        {access :Admin:Nastaveni:default}<a href="{link :Admin:Nastaveni:default, 'upravit'=>'cjednaci'}">Upravit</a>{/access}
+        {/if}
+        <dl class="detail_item">
+            <dt>Masky:</dt>
+            <dd class="normal">
+                <table>
+                    <tr>
+                        <th><strong>maska</strong></th>
+                        <th>ukázka</th>
+                        <th>popis</th>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;evidence&#125;</strong></td>
+                        <td>{$Ukazka->podaci_denik}</td>
+                        <td>evidence / podací deník</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;poradove_cislo&#125;</strong></td>
+                        <td>{$Ukazka->poradove_cislo}</td>
+                        <td>pořadové číslo evidence</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;poradove_cislo|n&#125;</strong></td>
+                        <td>{=sprintf('%06d',$Ukazka->poradove_cislo)}</td>
+                        <td>pořadové číslo evidence s počátečními nulami (ukázka &#123;poradove_cislo|6&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;rok&#125;</strong></td>
+                        <td>{$Ukazka->rok}</td>
+                        <td>rok</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;urad&#125;</strong></td>
+                        <td>{$Ukazka->urad}</td>
+                        <td>zkratka úřadu</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;urad_poradi&#125;</strong></td>
+                        <td>{$Ukazka->urad_poradi}</td>
+                        <td>pořadové číslo úřadu</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;urad_poradi|n&#125;</strong></td>
+                        <td>{=sprintf('%03d',$Ukazka->urad_poradi)}</td>
+                        <td>pořadové číslo úřadu s počátečními nulami (ukázka &#123;urad_poradi|3&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org&#125;</strong></td>
+                        <td>{$Ukazka->orgjednotka}</td>
+                        <td>zkratka organizační jednotky / útvaru</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org_id&#125;</strong></td>
+                        <td>{$Ukazka->orgjednotka_id}</td>
+                        <td>vnitřní identifikátor organizační jednotky</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org_id|n&#125;</strong></td>
+                        <td>{=sprintf('%03d',$Ukazka->orgjednotka_id)}</td>
+                        <td>vnitřní identifikátor organizační jednotky s počátečními nulami (ukázka &#123;org_id|3&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org_poradi&#125;</strong></td>
+                        <td>{$Ukazka->orgjednotka_poradi}</td>
+                        <td>pořadové číslo organizační jednotky</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org_poradi|n&#125;</strong></td>
+                        <td>{=sprintf('%06d',$Ukazka->orgjednotka_poradi)}</td>
+                        <td>pořadové číslo organizační jednotky s počátečními nulami (ukázka &#123;org_poradi|6&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user_id&#125;</strong></td>
+                        <td>{$Ukazka->user_id}</td>
+                        <td>vnitřní identifikátor uživatele</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user_id|n&#125;</strong></td>
+                        <td>{=sprintf('%01d',$Ukazka->user_id)}</td>
+                        <td>vnitřní identifikátor uživatele s počátečními nulami (ukázka &#123;user_id|1&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user&#125;</strong></td>
+                        <td>{$Ukazka->user}</td>
+                        <td>přihlašovací jméno uživatele</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;prijmeni&#125;</strong></td>
+                        <td>{$Ukazka->prijmeni}</td>
+                        <td>příjmení uživatele</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user_poradi&#125;</strong></td>
+                        <td>{$Ukazka->user_poradi}</td>
+                        <td>pořadové číslo uživatele</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user_poradi|n&#125;</strong></td>
+                        <td>{=sprintf('%06d',$Ukazka->user_poradi)}</td>
+                        <td>pořadové číslo uživatele s počátečními nulami (ukázka &#123;user_poradi|6&#125;)</td>
+                    </tr>
+                </table>
+            </dd>
+        </dl>
+    </div>

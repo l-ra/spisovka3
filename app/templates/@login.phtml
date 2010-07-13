@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <title>Spisová služba</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/site.css" />
+</head>
+<body>
+<div id="layout_top">
+    <div id="top">
+        <h1><a href="{link :Spisovka:Default:}">Spisová služba</a> <span id="top_urad">{$Urad->nazev}</span></h1>
+        <div id="top_menu">
+            &nbsp;
+        </div>
+        <div id="top_jmeno">
+            &nbsp;
+        </div>
+    </div>
+</div>
+<div id="layout">
+    <div id="menu">
+    &nbsp;
+    </div>
+    <div n:if="count($flashes)>0" id="flash">
+        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{$flash->message}</div>{/foreach}
+    </div>
+    <div id="content">
+        {include #content}
+    </div>
+</div>
+<div id="layout_bottom">
+    <div id="bottom">
+        <strong>{$AppInfo[2]}</strong><br/>
+        Na toto dílo se vztahuje <a href="http://ec.europa.eu/idabc/eupl">licence EUPL V.1.1</a>
+    </div>
+</div>
+
+
+</body>
+</html>

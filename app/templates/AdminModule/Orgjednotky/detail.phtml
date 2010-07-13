@@ -1,0 +1,69 @@
+{block title}Seznam dokumentů{/block}
+{block content}
+    <div class="navigate">
+    <a href="{link :Admin:Orgjednotky:seznam}">Seznam organizačních jednotek</a> - Detail organizační jednotky
+    </div>
+    <h2>{$OrgJednotka->zkraceny_nazev}</h2>
+
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+        {if ($FormUpravit=='info')}
+        {control upravitForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Zkrácený název:</dt>
+            <dd>{$OrgJednotka->zkraceny_nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Plný název:</dt>
+            <dd>{$OrgJednotka->plny_nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Zkratka / číselná řada:</dt>
+            <dd>{$OrgJednotka->ciselna_rada}&nbsp;</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>Informace:</dt>
+            <dd>{!$OrgJednotka->note|enl2br}&nbsp;</dd>
+        </dl>
+        <a href="{link :Admin:Orgjednotky:detail, 'id'=>$OrgJednotka->orgjednotka_id, 'upravit'=>'info'}">Upravit</a>
+        {/if}
+    </div>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Role</div>
+        {if ($FormUpravit=='role')}
+        {$roleForm->render('begin')}
+        {foreach $SeznamRole as $role}
+        <dl class="detail_item">
+            <dt>{$role->name}</dt>
+            <dd>{$roleForm['role'.$role->role_id.'-org_role']->control}</dd>
+        </dl>
+        {/foreach}
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                {$roleForm['upravit']->control}
+                {$roleForm['storno']->control}
+            </dd>
+        </dl>
+
+        {$roleForm->render('end')}
+        {else}
+
+        {if count($SeznamOrgRole)>0 }
+        {foreach $SeznamOrgRole as $role}
+        <dl class="detail_item">
+            <dt>{$role->parent_name}</dt>
+            <dd>&nbsp;</dd>
+        </dl>
+        {/foreach}
+        {else}
+        <div class="prazdno">Tato organizační jednotka nemá předělené žádné své role.</div>
+        {/if}
+        <a href="{link :Admin:Orgjednotky:detail, 'id'=>$OrgJednotka->orgjednotka_id, 'upravit'=>'role'}">Upravit organizační strukturu</a>
+
+        {/if}
+    </div>

@@ -1,0 +1,41 @@
+    {snippet dokosoby}
+    {if isset($chyba)}
+    <div class="flash_message flash_warning">Zaměstnanci se nepodařilo předat domument. Zkuste to znovu.</div>
+    {/if}
+
+    <h2>Předat dokument</h2>
+
+    <div class="detail_blok">
+        <form id="frm-predani" action="#" onsubmit="return false;">
+            Poznámka k předání:<br/>
+            <textarea id="frmpred-poznamka" name="poznamka_predani" rows="4" style="width:100%"></textarea>
+        </form>
+    </div>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Zaměstnanci</div>
+        <br />
+    {if count($seznam)>0}
+    <table class="seznam">
+        {foreach $seznam as $osoba}
+        <tr>
+            <td>
+                <a href="{link :Spisovka:Uzivatel:vybrano, 'id'=>$osoba->osoba_id, 'user'=>$osoba->user_id, 'role'=>$osoba->role_id, 'orgjednotka'=>$osoba->orgjednotka_id, 'dok_id'=>$dokument_id }" onclick="osobaVybrana(this); return false;">
+                   {=Osoba::displayName($osoba,'full_item')}
+               </a>&nbsp;&nbsp;
+            </td>
+            <td>
+               {=$osoba->name}
+            </td>
+
+        </tr>
+        {/foreach}
+    </table>
+    {else}
+    <div class="prazdno">Nebyli zjištěni žádní zaměstnanci.</div>
+    {/if}
+    </div>
+
+    {/snippet}
+
+    <?php //Debug::dump($seznam); ?>

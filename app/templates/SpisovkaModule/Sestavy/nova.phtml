@@ -1,0 +1,178 @@
+@{block title}Nová sestava{/block}
+@{block content}
+
+    <div class="navigate">
+    <a href="{link :Spisovka:Sestavy:default}">Sestavy</a> - Nová sestava
+    </div>
+
+    <h2>Nová sestava</h2>
+
+    {$newForm->render('begin')}
+    <div id="dokument_blok_hlavni">
+        <div class="h2">
+            Sestava
+        </div>
+        <dl class="detail_item">
+            <dt>Název sestavy:</dt>
+            <dd>{$newForm['sestava_nazev']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Popis sestavy:</dt>
+            <dd>{$newForm['sestava_popis']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Typ sestavy:</dt>
+            <dd>{$newForm['sestava_typ']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Filtrovat? </dt>
+            <dd>{$newForm['sestava_filtr']->control} (zobrazit výběr rozsahu podle pořadového čísla nebo data)</dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_vyrizeni">
+        <div class="h2">
+            Filtr dokumentu
+        </div>
+        <dl class="detail_item">
+            <dt>Typ dokumentu:</dt>
+            <dd>{$newForm['typ_dokumentu']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Stav dokumentu:</dt>
+            <dd>{$newForm['stav_dokumentu']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Číslo jednací:</dt>
+            <dd>{$newForm['cislo_jednaci']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spisová značka:</dt>
+            <dd>{$newForm['spisova_znacka']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Věc:</dt>
+            <dd>{$newForm['nazev']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Popis:</dt>
+            <dd>{$newForm['popis']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum doručení/vzniku</dt>
+            <dd>{$newForm['datum_vzniku']->control} {$newForm['datum_vzniku_cas']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Číslo jednací odesilatele:</dt>
+            <dd>{$newForm['cislo_jednaci_odesilatele']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka:</dt>
+            <dd>{$newForm['poznamka']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Počet listů:</dt>
+            <dd>{$newForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$newForm['pocet_priloh']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Způsob vyžízení:</dt>
+            <dd>{$newForm['zpusob_vyrizeni']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum vyžízení:</dt>
+            <dd>{$newForm['datum_vyrizeni']->control} {$newForm['datum_vyrizeni_cas']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum odeslání:</dt>
+            <dd>{$newForm['datum_odeslani']->control} {$newForm['datum_odeslani_cas']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spisový znak:</dt>
+            <dd>{$newForm['spisovy_znak']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační znak:</dt>
+            <dd>{$newForm['skartacni_znak']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační lhůta:</dt>
+            <dd>{$newForm['skartacni_lhuta']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spouštěcí událost:</dt>
+            <dd>{$newForm['spousteci_udalost']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Počet listů:</dt>
+            <dd>{$newForm['vyrizeni_pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$newForm['vyrizeni_pocet_priloh']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Uložení dokumentu:</dt>
+            <dd>{$newForm['ulozeni_dokumentu']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka k vyřízení:</dt>
+            <dd>{$newForm['poznamka_vyrizeni']->control}&nbsp;</dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_poznamka">
+        <div class="h2">
+            Adresáti / odesílatelé
+        </div>
+        <dl class="detail_item">
+            <dt>Typ subjektu</dt>
+            <dd>{$newForm['subjekt_type']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>Název subjektu</dt>
+            <dd>{$newForm['subjekt_nazev']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>IČ</dt>
+            <dd>{$newForm['subjekt_ic']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Ulice</dt>
+            <dd>
+                {$newForm['adresa_ulice']->control}
+                č.p. {$newForm['adresa_cp']->control}
+                č.o. {$newForm['adresa_co']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>PSČ a město</dt>
+            <dd>
+                {$newForm['adresa_psc']->control}
+                {$newForm['adresa_mesto']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$newForm['adresa_stat']->label}</dt>
+            <dd>{$newForm['adresa_stat']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$newForm['subjekt_email']->label}</dt>
+            <dd>{$newForm['subjekt_email']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$newForm['subjekt_telefon']->label}</dt>
+            <dd>{$newForm['subjekt_telefon']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$newForm['subjekt_isds']->label}</dt>
+            <dd>{$newForm['subjekt_isds']->control}</dd>
+        </dl>
+
+    </div>
+
+    <div id="dokument_blok_akce">
+        {$newForm['novy']->control}
+        &nbsp;&nbsp;
+        {$newForm['storno']->control}
+    </div>
+    {$newForm->render('end')}
+
+    <div id="dialog"></div>

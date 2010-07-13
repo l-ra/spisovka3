@@ -1,0 +1,155 @@
+{block title}Nastavení e-podatelny{/block}
+{block debug}
+<?php echo "Nastaveni: "; Debug::dump($Info); ?>
+{/block}
+{block content}
+
+    <div class="navigate">
+    <a href="{link :Admin:Epodatelna:default}">E-podatelna</a> - Detail položky
+    </div>
+
+    {if $Typ == 'i'}
+    <h2>{$Info['ucet']} - datová schránka</h2>
+    {elseif $Typ == 'e'}
+    <h2>{$Info['ucet']} - emailová schránka</h2>
+    {elseif $Typ == 'o'}
+    <h2>{$Info['ucet']} - odeslání přes email</h2>
+    {else}
+    <h2>{$Info['ucet']}</h2>
+    {/if}
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Nastavení účtu</div>
+        {if $Typ == 'i'}
+        {if ($FormUpravit=='1')}
+        {control nastavitISDSForm}
+        <dl class="detail_item">
+            <dt>Certifikát:</dt>
+            <dd>
+                {if $Info['certifikat']['stav']==0}
+                Certifikát není nahrán nebo není potřeba.
+                {elseif $Info['certifikat']['stav']==1}
+                Certifikát je nahrán.
+                {elseif $Info['certifikat']['stav']==2}
+                Certifikát je nahrán a je platný.
+                {else}
+                Nelze zjístit stav certifikátu.
+                {/if}
+            </dd>
+        </dl>
+        {else}
+        <dl class="detail_item">
+            <dt>ID datové schránky:</dt>
+            <dd>{$Info['idbox']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Vlastník DS:</dt>
+            <dd>{$Info['vlastnik']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Stav DS:</dt>
+            <dd>{$Info['stav']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Přihlašovací jméno do ISDS:</dt>
+            <dd>{$Info['login']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Režim:</dt>
+            <dd>{if $Info['test']==1}Testovací režim (czebox.cz){else}Realný provoz (mojedatovaschranka.cz){/if}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Podatelna pro příjem:</dt>
+            <dd>{$Info['podatelna']}</dd>
+        </dl>
+        <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+        {/if}
+        {elseif $Typ == 'e'}
+        {if ($FormUpravit=='1')}
+        {control nastavitEmailForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Protokol:</dt>
+            <dd>{$Info['protokol']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Server:</dt>
+            <dd>{$Info['server']}:{$Info['port']} / {$Info['inbox']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Přihlašovací jméno:</dt>
+            <dd>{$Info['login']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Příjem:</dt>
+            <dd>
+                {if $Info['only_signature']==1}
+                    {if $Info['qual_signature']==1}
+                    pouze zprávy s ověřeným kvalifikovaným podpisem
+                    {else}
+                    pouze zprávy obsahující e-podpis (jakákoli certifikační autorita)
+                    {/if}
+                {else}
+                jakékoli emailové zprávy
+                {/if}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Podatelna pro příjem této schránky:</dt>
+            <dd>{$Info['podatelna']}&nbsp;</dd>
+        </dl>
+        <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+        {/if}
+        {elseif $Typ == 'o'}
+        {if ($FormUpravit=='1')}
+        {control nastavitOdesForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Způsob odeslání:</dt>
+            <dd>{$Info['typ']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Emailová adresa odesilatele:</dt>
+            <dd>{$Info['email']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Elektronický podpis/značka:</dt>
+            <dd>
+                {if $Info['certifikat']['stav']==0}
+                Elektornický podpis/značka není nahrán nebo není potřeba.
+                {elseif $Info['certifikat']['stav']==1}
+                <span style="color:red;">Uložený certifikát není certifikát nebo je neplatný</span>
+                {elseif $Info['certifikat']['stav']==2}
+                Certifikát je nahrán ale není ověřen.
+                {elseif $Info['certifikat']['stav']==3}
+                <span style="color:red;">Certifikát je neplatný! Vypršela jeho platnost.</span>
+                {elseif $Info['certifikat']['stav']==4}
+                Certifikát je nahrán a je ověřen.
+                {else}
+                Nelze zjístit stav e-podpisu.
+                {/if}
+            </dd>
+        </dl>
+        {if !empty($Info['certifikat']['info'])}
+        <dl class="detail_item">
+            <dt>Informace o podpisu/značce:</dt>
+            <dd>
+                {$Info['certifikat']['info']['email']} <br />
+                {if !empty($Info['certifikat']['info']['jmeno'])}{$Info['certifikat']['info']['jmeno']}<br />{/if}
+                {if !empty($Info['certifikat']['info']['organizace'])}{$Info['certifikat']['info']['organizace']}<br />{/if}
+                {if !empty($Info['certifikat']['info']['jednotka'])}{$Info['certifikat']['info']['jednotka']}<br />{/if}
+                Platnost: {$Info['certifikat']['info']['platnost_od']|date} - {$Info['certifikat']['info']['platnost_do']|date} <br />
+                CA: {$Info['certifikat']['info']['CA']}
+            </dd>
+        </dl>
+        {/if}
+        <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+        {/if}
+        {else}
+        {/if}
+        
+    </div>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Test</div>
+    </div>

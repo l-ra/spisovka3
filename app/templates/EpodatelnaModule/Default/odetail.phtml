@@ -1,0 +1,80 @@
+@{block title}Detail zprávy{/block}
+@{block debug}
+<?php echo "Zprava: "; print_r($Zprava); ?>
+<?php echo "Prilohy: "; print_r($Prilohy); ?>
+<?php echo "Original: "; print_r($Original); ?>
+@{/block}
+@{block content}
+
+    <div class="navigate">
+    <a href="{link :Epodatelna:Default:odchozi}">Seznam zpráv</a> - Detail zprávy
+    </div>
+
+    <div id="dokument_blok_hlavni">
+        <dl class="detail_item">
+            <dt>Pořadí DZ v e-podatelně:</dt>
+            <dd>{$Zprava->poradi}-{$Zprava->rok}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Typ zprávy:</dt>
+            <dd>
+            {if !empty($Zprava->email_signature) }
+                Emailová zpráva
+            {elseif !empty($Zprava->isds_signature) }
+                Datová zpráva z ISDS
+            {else}
+                Typ nezjištěn
+            {/if}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Schránka:</dt>
+            <dd>{$Zprava->adresat}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Věc:</dt>
+            <dd class="nadpis"><u>{$Zprava->predmet}</u>&nbsp;</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>Adresát:</dt>
+            <dd>{$Zprava->odesilatel}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Odesláno:</dt>
+            <dd>{$Zprava->doruceno_dne|date:'%d.%m.%Y %H:%M:%S'}&nbsp;</dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_poznamka">
+        <div class="h2">Obsah zprávy</div>
+        <pre>{!$Zprava->popis}</pre>
+    </div>
+
+    <div id="dokument_blok_prilohy">
+    <div class="h2">
+        Přílohy
+    </div>
+    <div id="dok-prilohy">
+    {if count($Prilohy)>0}
+    <table class="seznam">
+        {foreach $Prilohy as $priloha}
+        <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->epodatelna_id, 'file'=>$priloha['id']}">{$priloha['name']}</a>
+                <div class="info">
+                <span>{$priloha['size']|bytes}, {$priloha['mimetype']}</span>
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    {else}
+        <div class="prazdno">Zpráva neobsahuje žádné přílohy.</div>
+    {/if}
+    </div>
+    </div>
+    <div id="dialog"></div>

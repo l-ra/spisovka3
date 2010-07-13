@@ -1,0 +1,131 @@
+{block title}Nastavení e-podatelny{/block}
+{block debug}
+<?php echo "XX: "; Debug::dump($n_ca); ?>
+{/block}
+{block content}
+
+<h2>Datové schránky</h2>
+
+    {if count($n_isds)>0}
+    {foreach $n_isds as $index => $isds}
+    <div class="detail_blok">
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                {access :Admin:Epodatelna:detail}<a href="{link :Admin:Epodatelna:detail, 'id'=>'i'.$index}">
+                {$isds['ucet']}
+            </a>{/access}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>ID datové schránky:</dt>
+            <dd>{$isds['idbox']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Vlastník DS:</dt>
+            <dd>{$isds['vlastnik']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Stav DS:</dt>
+            <dd>{$isds['stav']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Podatelna pro příjem této DS:</dt>
+            <dd>{$isds['podatelna']}&nbsp;</dd>
+        </dl>
+    </div>
+    {/foreach}
+    {else}
+    <div class="prazdno">Nebyly nalezeny žádné účty datových schránek</div>
+    {/if}
+
+
+<h2>Emailové schránky</h2>
+
+    {if count($n_email)>0}
+    {foreach $n_email as $index => $email}
+    <div class="detail_blok">
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                {access :Admin:Epodatelna:detail}<a href="{link :Admin:Epodatelna:detail, 'id'=>'e'.$index}">
+                {$email['ucet']}
+            </a>{/access}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Server:</dt>
+            <dd>{$email['protokol']} - {$email['server']}:{$email['port']} / {$email['inbox']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Příjem:</dt>
+            <dd>
+                {if $email['only_signature']==1}
+                    {if $email['qual_signature']==1}
+                    pouze zprávy s ověřeným kvalifikovaným podpisem
+                    {else}
+                    pouze zprávy obsahující e-podpis (jakákoli certifikační autorita)
+                    {/if}
+                {else}
+                jakékoli emailové zprávy
+                {/if}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Podatelna pro příjem této schránky:</dt>
+            <dd>{$email['podatelna']}&nbsp;</dd>
+        </dl>
+    </div>
+    {/foreach}
+    {else}
+    <div class="prazdno">Nebyly nalezeny žádné účty datových schránek</div>
+    {/if}
+
+<h2>Odesilání přes email</h2>
+
+    {if count($n_odeslani)>0}
+    {foreach $n_odeslani as $index => $odes}
+    <div class="detail_blok">
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                {access :Admin:Epodatelna:detail}<a href="{link :Admin:Epodatelna:detail, 'id'=>'o'.$index}">
+                {$odes['ucet']}
+            </a>{/access}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Způsob odeslání:</dt>
+            <dd>{$odes['zpusob_odeslani']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>E-mailová adresa odesilatele:</dt>
+            <dd>{$odes['email']}&nbsp;</dd>
+        </dl>
+    </div>
+    {/foreach}
+    {else}
+    <div class="prazdno">Nebyly nalezeny žádné účty datových schránek</div>
+    {/if}
+
+<h2>Kvalifikované certifikační autority</h2>
+
+    {if count($n_ca)>0}
+    <div class="detail_blok">
+    {foreach $n_ca as $index => $ca}
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                {$ca['name']}<br />
+                <span style="font-weight: normal;">
+                    {$ca['info']}<br />
+                    platnost: {$ca['platnost_od']} - {$ca['platnost_do']}
+                </span>
+
+            </dd>
+        </dl>
+    {/foreach}
+    </div>
+    {else}
+    <div class="prazdno">Nebyly nalezeny žádné kvalifikované certifikační autority</div>
+    {/if}

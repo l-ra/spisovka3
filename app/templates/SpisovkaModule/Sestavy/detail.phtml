@@ -1,0 +1,80 @@
+{block title}{$Sestava->nazev}{/block}
+{block content}
+
+    <div id="top">
+        <div class="nazev">{$Sestava->nazev}</div>
+        <div class="urad">
+            {$Urad->nazev}, {$rok}
+        </div>
+    </div>
+    <br style="clear: both;" />
+    {if count($seznam)>0}
+    <table>
+        <tr>
+            {foreach $sloupce as $sl}
+            <th>{$sloupce_nazvy[$sl]}</th>
+            {/foreach}
+        </tr>
+        {foreach $seznam as $dok}
+        <tr>
+            {foreach $sloupce as $sl}
+            <td>
+            {if $sl=='spis'}
+                {if count($dok->spisy)>0}
+                {foreach $dok->spisy as $spis}
+            {$spis->nazev}
+                {/foreach}
+                {else}
+            &nbsp;
+                {/if}
+            {elseif $sl=='subjekty'}
+                {if count($dok->subjekty)>0}
+                {foreach $dok->subjekty as $subjekt}
+            {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
+                {/foreach}
+                {else}
+            &nbsp;
+                {/if}
+            {elseif $sl=='pocet_nelistu'}
+                {=count($dok->prilohy)}
+            {elseif $sl=='vyridil'}
+                {if empty($dok->prideleno->prideleno_jmeno)}
+            &nbsp;
+                {else}
+            {$dok->prideleno->prideleno_jmeno}
+                {/if}
+            {elseif $sl=='datum_odeslani'}
+                {if count($dok->odeslani)}
+                {foreach $dok->odeslani as $odes}
+            {$odes->datum_odeslani|edate}<br />
+                {/foreach}
+                {else}
+            &nbsp;
+                {/if}
+            {elseif $sl=='zaznam_vyrazeni'}
+            &nbsp;
+            {elseif $sl=='datum_vzniku'}
+            {$dok->datum_vzniku|edate}
+
+
+
+                
+            {else}
+            {$dok->$sl}
+            {/if}
+            </td>
+            {/foreach}
+        </tr>
+        {/foreach}
+
+
+    </table>
+    {else}
+    <div style="text-align: center; margin-top: 15px;">
+        Tato sestava neobsahuje žádné dokumenty.
+    </div>
+    {/if}
+
+<pre>
+<?php //print_r($seznam); ?>
+</pre>

@@ -1,0 +1,15 @@
+{block title}Seznam dokumentů{/block}
+{block content}
+    <div class="navigate">
+    <a href="{link :Admin:Protokol:default}">Transakční protokoly</a> - Přístupy uživatelů
+    </div>
+
+    <h2>Přístupy uživatelů</h2>
+
+    <pre>
+    {foreach $seznam as $pristup}
+    {$pristup->date} - {$pristup->username} z {$pristup->ip} - {=($pristup->stav==1)?'úspěšné':'neúspěšné'}
+    {/foreach}
+    </pre>
+
+    <?php //Debug::dump($seznam); ?>

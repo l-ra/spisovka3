@@ -1,0 +1,149 @@
+body {
+    background: #f0f0f0 url() repeat-x;
+}
+
+/* ***************************************************************** */
+/* *** TOP LAYOUT *** */
+#layout_top {
+    background: #D8C38F url() repeat-x;
+}
+
+#top {
+    background: #CEA33D url() repeat-x;
+}
+
+#top h1 {
+    color: #684A03;
+}
+
+#top h1 a {
+    color: #684A03;
+}
+
+#top_menu {
+    color: #684A03;
+}
+
+#top_menu a {
+    color: #684A03;
+}
+
+#top_menu a:hover {
+    color: #FFC273;
+}
+
+#top_jmeno {
+    color: #684A03;
+}
+
+/* ***************************************************************** */
+/* *** CONTENT LAYOUT *** */
+#layout {
+    width: 980px;
+    margin: 0 auto 0 auto;
+    padding: 0px;
+}
+
+#menu {
+    background: #684A03 url() repeat-x;
+    padding: 10px 10px;
+}
+
+#menu a {
+    color: #FFC273;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    margin: 0px 10px;
+}
+
+#content {
+    background: #ffffff url() repeat-x;
+    min-height: 500px;
+}
+
+#dokument_blok_hlavni {
+    border: 1px #CEA33D solid;
+    background: #D8C38F url() repeat-x;
+}
+
+#dokument_blok_poznamka {
+    border: 1px #f0f0f0 solid;
+    background: #f0f0f0 url() repeat-x;
+}
+
+#dokument_blok_poznamka .h2 {
+    border-bottom: 1px #e0e0e0 solid;
+}
+
+#dokument_blok_subjekty .h2 {
+    border-bottom: 1px #e0e0e0 solid;
+}
+
+
+#dokument_blok_prilohy {
+    background: #f0f0f0 url() repeat-x;
+}
+#dokument_blok_prilohy .h2 {
+    border-bottom: 1px #e0e0e0 solid;
+}
+
+#dokument_blok_akce {
+    border: 1px #e0e0e0 solid;
+    background: #8FBAD9 url() repeat-x;
+}
+
+#dokument_blok_volby {
+    background: #f0f0f0 url() repeat-x;
+}
+
+#dokument_blok_volby a {
+    color: #000088;
+}
+
+#dokument_blok_volby a:hover {
+    color: #ff0000;
+}
+
+/* ***************************************************************** */
+/* *** BOTTOM LAYOUT *** */
+#layout_bottom {
+    margin: 0px;
+    padding: 0px;
+}
+
+#bottom {
+    width: 970px;
+    margin: 0 auto 0 auto;
+    padding: 5px 5px 5px 5px;
+    text-align: right;
+    color: #684A03;
+    font-size: 8pt;
+    background: #CEA33D url() repeat-x;
+}
+
+#bottom a {
+    color: #684A03;
+    text-decoration: none;
+}
+
+#bottom a:hover {
+    color: #FFC273;
+    text-decoration: underline;
+}
+
+/* ***************************************************************** */
+/* *** DEBUG LAYOUT *** */
+
+#debug {
+    width: 970px;
+    margin: 0 auto 0 auto;
+    padding: 5px 5px 5px 5px;
+    color: #FFC273;
+    font-size: 10pt;
+    background: #684A03 url() repeat-x;
+    white-space: pre;
+    font-family: monospace;
+}
+
+

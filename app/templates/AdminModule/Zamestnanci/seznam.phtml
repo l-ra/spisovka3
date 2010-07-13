@@ -1,0 +1,45 @@
+{block title}Seznam dokumentů{/block}
+{block content}
+    <div class="navigate">
+    Seznam zaměstnanců
+    </div>
+
+    <h2>Seznam zaměstnanců</h2>
+
+    <div class="blok_menu">
+        <a href="{link :Admin:Zamestnanci:novy}">Nový zaměstnanec</a>
+    </div>
+
+    {if count($seznam)>0}
+    <table class="seznam">
+        {foreach $seznam as $osoba}
+        <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/subjekt/personal.png" alt="personal.png" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <a href="{link :Admin:Zamestnanci:detail, id => $osoba->osoba_id}">{=Osoba::displayName($osoba,'full_item')}</a>&nbsp;
+                <div class="info">
+                    {$osoba->pozice}
+                </div>
+            </td>
+            <td class="meta_plus">
+                &nbsp;
+                <div class="info">
+                <dl>
+                    <dt>email:</dt>
+                    <dd>{$osoba->email}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>telefon:</dt>
+                    <dd>{$osoba->telefon}&nbsp;</dd>
+                </dl>
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    {widget vp}
+    {else}
+    <div class="prazdno">Nebyli zjištěni žádné subjekty.</div>
+    {/if}

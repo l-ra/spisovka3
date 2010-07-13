@@ -1,0 +1,139 @@
+@{block title}Seznam spisů{/block}
+@{block debug}
+<?php print_r($seznam); ?>
+@{/block}
+@{block content}
+    <div class="navigate">
+    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> -
+    <a href="{link :Spisovka:Spisy:default}">Seznam spisů</a> -
+    Detail spisu
+    </div>
+
+    <h2>{$Spis->nazev}</h2>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Informace o spisu</div>
+        <dl class="detail_item">
+            <dt>Spisová značka:</dt>
+            <dd>{$Spis->nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Popis:</dt>
+            <dd>{$Spis->popis}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Stav:</dt>
+            <dd>{=Spis::stav($Spis->stav)}&nbsp;</dd>
+        </dl>
+    </div>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Seznam dokumentů</div>
+    </div>
+    <div id="dokumenty">
+    {if count($seznam)>0}
+    <table>
+
+        <tr>
+            <th class="typ">Typ dokumentu</th>
+            <th class="prijato">Přijato</th>
+            <th class="cislo_jadnaci">Číslo jednací<br />Spisová značka</th>
+            <th class="vec">Věc<br />Adresáti/odesilatelé</th>
+            <th class="prideleno">Přiděleno</th>
+            <th class="stav">Stav</th>
+        </tr>
+
+        {foreach $seznam as $dok}
+        <tr>
+            <td class="typ">
+                <img src="{$baseUri}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
+                <img src="{$baseUri}images/icons/typdok{$dok->typ_dokumentu->typ}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="24" height="16" />
+            </td>
+            <td class="prijato">
+                {$dok->datum_vzniku|date:%d.%m.%Y}
+            </td>
+            <td class="cislo_jadnaci">
+                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
+                   {$dok->cislo_jednaci}
+                </a></strong>
+                <br />
+                {if count($dok->spisy)>0}
+                {foreach $dok->spisy as $spis}
+                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->spis_id}">{$spis->nazev}</a><br />
+                {/foreach}
+                {/if}
+            </td>
+            <td class="vec">
+                <strong title="{$dok->popis}"><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
+                    {$dok->nazev}
+                </a></strong>
+                <br />
+                {if count($dok->subjekty)>0}
+                {foreach $dok->subjekty as $subjekt}
+                {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
+                {/foreach}
+                {else}
+                nejsou přiděleny žádné subjekty!
+                {/if}
+            </td>
+
+
+
+            {if $dok->stav_dokumentu == 1}
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+            </td>
+            <td class="stav">
+                nový
+                <br />
+                {$dok->prideleno->date|date}
+            </td>
+            {elseif $dok->stav_dokumentu == 2 && !empty($dok->predano) }
+            <td class="prideleno">
+                {$dok->predano->prideleno_jmeno}
+            </td>
+            <td class="stav">
+                předáno
+                <br />
+                {$dok->predano->date_predani|date}
+            </td>
+            {elseif $dok->stav_dokumentu == 2 && !empty($dok->prideleno) }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+            </td>
+            <td class="stav">
+                přiděleno
+                <br />
+                {$dok->prideleno->date|date}
+            </td>
+            {elseif $dok->stav_dokumentu == 3 }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+            </td>
+            <td class="stav">
+                vyřizuje se
+                <br />
+                {$dok->prideleno->date|date}
+            </td>
+            {else}
+            <td class="prideleno">
+                &nbsp;
+            </td>
+            <td class="stav">
+                nepřiřazeno!
+                <br />
+                lhůta {$dok->lhuta} dní
+            </td>
+            {/if}
+
+
+
+        </tr>
+        {/foreach}
+
+
+    </table>
+    {else}
+    <div class="prazdno">K tomuto spisu nejsou přiděleny žádné dokumenty.</div>
+    {/if}
+    </div>

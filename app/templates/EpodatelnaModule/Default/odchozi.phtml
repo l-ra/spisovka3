@@ -1,0 +1,65 @@
+{block title}Seznam odchozích zpráv{/block}
+@{block debug}
+<?php print_r($seznam); ?>
+@{/block}
+{block content}
+
+<h2>Seznam odchozích zpráv</h2>
+
+    <div id="dokumenty">
+    {if count(@$seznam)>0}
+    <table>
+
+        <tr>
+            <th class="typ">Typ zprávy</th>
+            <th class="prijato">Odesláno</th>
+            <th class="cislo_jadnaci">ID</th>
+            <th class="vec">Věc<br />Adresát</th>
+            <th class="prideleno">Schránka</th>
+            <th class="stav">Stav</th>
+        </tr>
+
+        {foreach $seznam as $ep}
+        <tr>
+            <td class="typ">
+                {if !empty($ep->email_signature)}
+                <img src="{$baseUri}images/icons/typdok0.png" alt="Email" title="Email" width="24" height="16" />
+                {else if !empty($ep->isds_signature)}
+                <img src="{$baseUri}images/icons/typdok1.png" alt="ISDS" title="ISDS" width="24" height="16" />
+                {/if}
+            </td>
+            <td class="prijato">
+                {$ep->doruceno_dne|date:%d.%m.%Y}
+            </td>
+            <td class="cislo_jadnaci">
+                &nbsp;<strong><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->epodatelna_id}">
+                   {$ep->poradi}-{$ep->rok}
+                </a></strong>
+            </td>
+            <td class="vec">
+                <strong title="{$ep->popis}"><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->epodatelna_id}">
+                    {$ep->predmet}
+                </a></strong>
+                <br />
+                {$ep->odesilatel}
+            </td>
+            <td class="prideleno">
+                {$ep->adresat}
+            </td>
+            <td class="stav" title="{$ep->stav_info}">
+                {if ($ep->stav==0)}
+                neodesláno
+                {elseif ($ep->stav==1)}
+                odesláno
+                {else}
+                nelze zjístit stav
+                {/if}
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    {widget vp}
+    {else}
+        <div class="prazdno">Nejsou žádné odchozí zprávy.</div>
+    {/if}
+    </div>

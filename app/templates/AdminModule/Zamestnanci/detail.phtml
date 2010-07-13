@@ -1,0 +1,104 @@
+{block title}Seznam dokumentů{/block}
+{block content}
+    <div class="navigate">
+    <a href="{link :Admin:Zamestnanci:seznam}">Seznam zaměstnanců</a> - Detail zaměstnance
+    </div>
+    <h2>{=Osoba::displayName($Osoba)}</h2>
+
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+        {if ($FormUpravit=='info')}
+        {control upravitForm}
+        {else}
+        <dl class="detail_item">
+            <dt>email:</dt>
+            <dd>{$Osoba->email}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>telefon:</dt>
+            <dd>{$Osoba->telefon}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>funkce:</dt>
+            <dd>{$Osoba->pozice}&nbsp;</dd>
+        </dl>
+        <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'upravit'=>'info'}">Upravit</a>
+        {/if}
+    </div>
+
+
+    <div id="zamestnanec_role">
+
+
+    </div>
+    
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Uživatelské účty</div>
+        <br />
+        <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'new_user'=>'1'}">Přidat účet</a>
+
+        {if isset($vytvoritUcet)}
+        {control newUserForm}
+        {/if}
+
+        {if count($Uzivatel)>0}
+        {foreach $Uzivatel as $u}
+        <dl class="detail_item">
+            <dt>Uživatelské jméno:</dt>
+            <dd>{$u->username}&nbsp;</dd>
+        </dl>
+        {if ($ZmenaHesla==$u->user_id)}
+        {control userForm}
+        {/if}
+        <dl class="detail_item">
+            <dt>Poslední přihlášení:</dt>
+            <dd>{if $u->last_login}{$u->last_login|date}  z  {$u->last_ip}{/if}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Role:</dt>
+            <dd>
+                {if count($Role[$u->user_id])>0}
+                {if $RoleUpravit == $u->user_id}
+                    {$roleForm->render('begin')}
+
+                    {foreach $Role[$u->user_id] as $r}
+                        {$roleForm['role'.$r->role_id.'-user_role']->control} {$r->name}<br />
+                    {/foreach}
+                    {$roleForm['add_role']->control} přidat roli: {$roleForm['role']->control}
+                    <br /> <br />
+                    {$roleForm['zmenitRole']->control} {$roleForm['storno']->control}
+                    {$roleForm->render('end')}
+                {else}
+                    {foreach $Role[$u->user_id] as $r}
+                        {$r->name}<br />
+                    {/foreach}
+                {/if}
+                {else}
+                Tento uživatel není přiřazen k žádné roli
+                {/if}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'user'=>$u->user_id}">Změnit heslo</a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'odebrat'=>$u->user_id}">Odebrat účet</a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'role'=>$u->user_id}">Změnit role</a>
+
+            </dd>
+        </dl>
+
+
+        <br />
+        {/foreach}
+        {else}
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>Zaměstnanec nemá uživatelský účet</dd>
+        </dl>
+        <br />
+        {/if}
+    </div>

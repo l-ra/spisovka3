@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <title>Spisová služba - Administrace{$title}</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/site.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/admin_site.css" />
+    <link type="text/css" href="{$baseUri}css/blitzer/jquery-ui-custom.css" rel="stylesheet" />
+    <script type="text/javascript" src="{$baseUri}js/jquery-min.js"></script>
+    <script type="text/javascript" src="{$baseUri}js/jquery-ui-custom.min.js"></script>
+    <script type="text/javascript">
+        var baseUri = '{!$klientUri}';
+    </script>
+    <script type="text/javascript" src="{$baseUri}js/jquery.nette.js"></script>
+    <script type="text/javascript" src="{$baseUri}js/script.js"></script>
+</head>
+<body>
+<div id="layout_top">
+    <div id="top">
+        <h1><a href="{link :Admin:Default:}">Administrace</a> <span id="top_urad">{$Urad->nazev}</span></h1>
+        <div id="top_menu">
+            {access :Spisovka:Default:}<a href="{vlink :Spisovka:Default:}">Spisová služba</a>&nbsp;&nbsp;{/access}
+            {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:}">E-podatelna</a>&nbsp;&nbsp;{/access}
+            {access :Admin:Default:}<a href="{vlink :Admin:Default:}">Administrace</a>&nbsp;&nbsp;{/access}
+            {access :Spisovka:Uzivatel:}<a href="{vlink :Spisovka:Uzivatel:}">Nastavení</a>&nbsp;&nbsp;{/access}
+            {access :Spisovka:Uzivatel:logout}<a href="{vlink :Spisovka:Uzivatel:logout}">Odhlásit</a>{/access}
+        </div>
+        <div id="top_jmeno">
+            <strong>{$user->name}</strong>
+            <br />
+            {foreach $user->user_roles as $role}
+                {$role->name}<br />
+            {/foreach}
+        </div>
+    </div>
+</div>
+<div id="layout">
+    <div id="menu">
+        {access :Admin:Nastaveni:}<a href="{vlink :Admin:Nastaveni:}">Nastavení</a>{/access}
+        {access :Admin:Epodatelna:}<a href="{vlink :Admin:Epodatelna:}">E-podatelna</a>{/access}
+        {access :Admin:Spisy:seznam}<a href="{vlink :Admin:Spisy:seznam}">Spisy</a>{/access}
+        {access :Admin:Subjekty:seznam}<a href="{vlink :Admin:Subjekty:seznam}">Odesílatelé/Adresáti</a>{/access}
+        {access :Admin:Zamestnanci:seznam}<a href="{vlink :Admin:Zamestnanci:seznam}">Zaměstnanci</a>{/access}
+        {access :Admin:Orgjednotky:seznam}<a href="{vlink :Admin:Orgjednotky:seznam}">Org. jednotky</a>{/access}
+        {access :Admin:Opravneni:seznam}<a href="{vlink :Admin:Opravneni:seznam}">Oprávnění</a>{/access}
+        {access :Admin:Prilohy:default}<a href="{vlink :Admin:Prilohy:default}">Soubory</a>{/access}
+        {access :Admin:Spisznak:seznam}<a href="{vlink :Admin:Spisznak:seznam}">Spisové znaky</a>{/access}
+        {access :Admin:Ciselniky:default}<a href="{vlink :Admin:Ciselniky:default}">Číselníky</a>{/access}
+        {access :Admin:Protokol:default}<a href="{vlink :Admin:Protokol:default}">Protokoly</a>{/access}
+    </div>
+    <div n:if="count($flashes)>0" id="flash">
+        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{$flash->message}</div>{/foreach}
+    </div>
+    <div id="content">
+        {include #content}
+    </div>
+    {if $debuger }
+    <div id="debug">
+        Module:    {$module}
+        Presenter: {$presenter}
+        View:      {$view}
+        SQL:       <?php echo dibi::$numOfQueries ." : ". dibi::$totalTime; ?>
+
+        {block debug}{/block}
+    </div>
+    {/if}
+</div>
+<div id="layout_bottom">
+    <div id="bottom">
+        <strong>{$AppInfo[2]}</strong><br/>
+        Na toto dílo se vztahuje <a href="http://ec.europa.eu/idabc/eupl">licence EUPL V.1.1</a>
+    </div>
+</div>
+
+
+</body>
+</html>

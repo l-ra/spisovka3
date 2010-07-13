@@ -1,0 +1,15 @@
+    <div id="microblog">
+        <h2>Rychlovky</h2>
+
+        {if count($mblog)>0 }
+        {foreach $mblog as $mess}
+        <dl>
+            <dt>{$mess->date|date}</dt>
+            <dd>{$mess->comment}</dd>
+        </dl>
+        {/foreach}
+        {else}
+        <div>Žádné komentáře</div>
+        {/if}
+
+    </div>

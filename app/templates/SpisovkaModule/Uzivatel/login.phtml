@@ -1,0 +1,12 @@
+{block title}Přihlášení do systému{/block}
+{block content}
+    <h2>Přihlášení do systému</h2>
+        <div id="form_login">
+            <?php $form->render('begin') ?>
+            {$form['username']->label} {$form['username']->control}
+            <br />
+            {$form['password']->label} {$form['password']->control}
+            <br />
+            <label>&nbsp;</label> {$form['login']->control}
+            <?php $form->render('end') ?>
+        </div>

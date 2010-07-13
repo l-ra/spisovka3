@@ -1,0 +1,31 @@
+@{block title}Seznam spisů{/block}
+@{block debug}
+<?php print_r($seznam); ?>
+@{/block}
+@{block content}
+
+    <h2>Seznam spisů</h2>
+
+    {if count($seznam)>0}
+    <table>
+        {foreach $seznam as $spis}
+        <tr class="{$spis->class}" id="sitem{$spis->spis_id}">
+            <td>
+                {!=str_repeat("&nbsp;", 5*$spis->uroven)}
+                {if $spis->typ=='VS'}
+                <img src="{$baseUri}images/icons/folder_yellow.png" alt="Věcná skupina" title="Věcná skupna" width="16" height="16" onclick="return toggle('item{!$spis->spis_id}');" />
+                &nbsp;&nbsp;
+                {$spis->nazev}
+                {else}
+                <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
+                &nbsp;&nbsp;
+                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->spis_id }">{$spis->nazev}</a>
+                {/if}
+            </td>
+        </tr>
+        {/foreach}
+
+    </table>
+    {else}
+    <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
+    {/if}

@@ -1,0 +1,56 @@
+{block title}Detail spisu{/block}
+{block content}
+    <div class="navigate">
+    <a href="{link :Admin:Spisy:seznam}">Spisy</a> - Detail
+    </div>
+    <h2>{$Spis->nazev}</h2>
+
+        {if ($FormUpravit=='info')}
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+        {control $upravitForm}
+    </div>
+        {else}
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+        <dl class="detail_item">
+            <dt>Typ spisu:</dt>
+            <dd>{=Spis::typSpisu($Spis->typ)}&nbsp;</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>Název:</dt>
+            <dd>{$Spis->nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Popis:</dt>
+            <dd>{$Spis->popis}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Stav:</dt>
+            <dd>{=Spis::stav($Spis->stav)}&nbsp;</dd>
+        </dl>
+        <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->spis_id, 'upravit'=>'info'}">Upravit</a>
+    </div>
+    {if count($SpisyNad)>0}
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Nadřazené spisy</div>
+        <p>
+        {foreach $SpisyNad as $sn}
+        > {$sn->nazev}
+        {/foreach}
+        </p>
+    </div>
+    {/if}
+    {if count($SpisyPod)>0}
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Podřízené spisy</div>
+        <p>
+        {foreach $SpisyPod as $sp}
+        {$sp->nazev}, 
+        {/foreach}
+        </p>
+    </div>
+    {/if}
+    
+        {/if}

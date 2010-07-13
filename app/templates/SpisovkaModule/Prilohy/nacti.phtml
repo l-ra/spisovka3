@@ -1,0 +1,37 @@
+    {if count($seznamPriloh)>0}
+
+    <table class="seznam">
+        {foreach $seznamPriloh as $file}
+        <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/mimetypes/{$file->mime_type|webalize}.png" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$dokument_id, 'file'=>$file->file_id}">{$file->nazev}</a>
+                <div class="info">
+                {$file->real_name}
+                <br />
+                <span>
+                    {$file->typ_name}, {$file->size|bytes}, {$file->mime_type}
+                    <br />
+                    MD5 hash: {$file->md5_hash}
+                </span>
+                </div>
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+                <div class="vyber">
+                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->file_id, 'dok_id'=>$dokument_id }" onclick="return confirm('Opravdu chcete odebrat přílohu z dokumentu?');">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->file_id, 'dok_id'=>$dokument_id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;
+                </div>
+            </td>
+            <td class="user">
+                nahráno {$file->date_created|date:'%d.%m.%Y'}
+                <br />
+                {$file->user_name}
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    <?php //Debug::dump($seznam); ?>
+    {else}
+     <div class="prazdno">Nebyly zjištěny žádné soubory.</div>
+    {/if}

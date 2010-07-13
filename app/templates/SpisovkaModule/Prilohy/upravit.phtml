@@ -1,0 +1,20 @@
+    {snippet dokpriloha}
+    {if isset($chyba)}
+
+    {if $chyba==1}
+    <div class="flash_message flash_warning">Přílohu se nepodařilo připojit k domumentu. Zkuste to znovu.</div>
+    {elseif $chyba==2}
+    <div class="flash_message flash_warning">Přílohu se nepodařilo nahrát. Zkuste to znovu.</div>
+    <div class="flash_message flash_warning">{$error_message}</div>
+    {elseif $chyba==3}
+    <div class="flash_message flash_warning">Nejak se to zaseklo</div>
+    {/if}
+
+    {/if}
+
+
+
+    <h2>Upravit přílohu</h2>
+    {control reUploadForm}
+
+    {/snippet}

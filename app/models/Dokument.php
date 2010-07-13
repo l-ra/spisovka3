@@ -1,0 +1,1089 @@
+<?php
+
+class Dokument extends BaseModel
+{
+
+    protected $name = 'dokument';
+    protected $primary = 'dokument_id';
+
+    protected $tb_dokumenttyp = 'dokument_typ';
+    protected $tb_workflow = 'workflow';
+    protected $tb_dokspis = 'dokument_to_spis';
+    protected $tb_spis = 'spis';
+    protected $tb_dok_subjekt = 'dokument_to_subjekt';
+    protected $tb_subjekt = 'subjekt';
+    protected $tb_dok_file = 'dokument_to_file';
+
+    public function  __construct() {
+
+        $prefix = Environment::getConfig('database')->prefix;
+        $this->name = $prefix . $this->name;
+        $this->tb_dokumenttyp = $prefix . $this->tb_dokumenttyp;
+        $this->tb_workflow = $prefix . $this->tb_workflow;
+        $this->tb_dokspis = $prefix . $this->tb_dokspis;
+        $this->tb_spis = $prefix . $this->tb_spis;
+        $this->tb_dok_subjekt = $prefix . $this->tb_dok_subjekt;
+        $this->tb_subjekt = $prefix . $this->tb_subjekt;
+        $this->tb_dok_file = $prefix . $this->tb_dok_file;
+
+    }
+
+
+    /**
+     * Seznam dokumentu s zivotnim cyklem
+     * 
+     * @param <type> $args 
+     */
+    public function seznam($args = array(), $detail = 0) {
+
+        if ( isset($args['where']) ) {
+            $where = $args['where'];
+        } else {
+            $where = null;
+        }
+        if ( isset($args['where_or']) ) {
+            $where_or = $args['where_or'];
+        } else {
+            $where_or = null;
+        }
+        
+        if ( isset($args['order']) ) {
+            $order = $args['order'];
+        } else {
+            //$order = array('dokument_id'=>'DESC');
+            $order = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
+        } 
+        if ( isset($args['limit']) ) {
+            $limit = $args['limit'];
+        } else {
+            $limit = null;
+        }
+        if ( isset($args['offset']) ) {
+            $offset = $args['offset'];
+        } else {
+            $offset = null;
+        }
+        
+        $sql = array(
+        
+            'distinct'=>1,
+            'from' => array($this->tb_workflow => 'wf'),
+            'cols' => array('wf.dokument_id'),
+            'where' => $where,
+            'where_or' => $where_or,
+            'order' => $order,
+            'limit' => $limit,
+            'offset' => $offset,
+            'leftJoin' => array(
+                'dokument' => array(
+                    'from' => array($this->name => 'd'),
+                    'on' => array('d.dokument_id=wf.dokument_id'),
+                    'cols' => null
+                ),
+                'dokspisy' => array(
+                    'from' => array($this->tb_dokspis => 'sp'),
+                    'on' => array('sp.dokument_id=wf.dokument_id'),
+                    'cols' => null
+                ),
+                'spisy' => array(
+                    'from' => array($this->tb_spis => 'spis'),
+                    'on' => array('spis.spis_id=sp.spis_id'),
+                    'cols' => null
+                ),
+                'typ_dokumentu' => array(
+                    'from' => array($this->tb_dokumenttyp => 'dtyp'),
+                    'on' => array('dtyp.dokument_typ_id=d.typ_dokumentu'),
+                    'cols' => null
+                )                
+                
+            )
+        
+        );
+
+        if ( isset($args['leftJoin']) ) {
+            $sql['leftJoin'] = array_merge($sql['leftJoin'],$args['leftJoin']);
+        }
+
+        //echo "<pre>";
+        //print_r($sql);
+        //exit;
+        //echo "</pre>";
+
+        $select = $this->fetchAllComplet($sql);
+        
+        if ( $detail == 1 ) {
+            // return array(DibiRow)
+            $result = $select->fetchAll();
+            if ( count($result)>0 ) {
+                $tmp = array();
+                $DokumentySpis = new DokumentSpis();
+                $DokumentySubjekt = new DokumentSubjekt();
+                $DokumentyPrilohy = new DokumentPrilohy();
+                $Workflow = new Workflow();
+                $Osoba = new UserModel();                
+                
+                foreach ($result as $index => $row) {
+
+                    $dok = $this->getInfo($row->dokument_id,null,1);
+                    
+                    $dok->typ_dokumentu = Dokument::typDokumentu($dok->typ_dokumentu);
+                    $dok->subjekty = $DokumentySubjekt->subjekty($dok->dokument_id);
+                    $dok->prilohy = $DokumentyPrilohy->prilohy($dok->dokument_id);
+                    $dok->spisy = $DokumentySpis->spisy($dok->dokument_id);
+
+                    $dok->workflow = $Workflow->dokument($dok->dokument_id);
+                    $dok->prideleno = null;
+                    $dok->predano = null;
+                    $prideleno = $predano = $stav = 0;
+                    if ( count($dok->workflow)>0 ) {
+                        foreach ($dok->workflow as $wf) {
+
+                            // Pridelen
+                            if ( $wf->stav_osoby == 1 && $prideleno==0 ) {
+                                $dok->prideleno = $wf;
+                                $prideleno=1;
+                                }
+                            // Predan
+                            if ( $wf->stav_osoby == 0 && $predano==0 ) {
+                                $dok->predano = $wf;
+                                $predano=1;
+                            }
+                            // Stav
+                            if ( $stav <= $wf->stav_dokumentu ) {
+                                $stav = $wf->stav_dokumentu;
+                            }
+                        }
+                    }
+                    $dok->stav_dokumentu = $stav;
+
+
+                    if ( !empty($dok->lhuta) ) {
+                        $datum_vzniku = strtotime($dok->date_created);
+                        $dok->lhuta_do = $datum_vzniku + ($dok->lhuta * 86400);
+                    } else {
+                        $dok->lhuta_do = 'neurčeno';
+                    }
+
+                    $tmp[ $dok->dokument_id ] = $dok;
+
+
+                
+                }
+                return $tmp;
+            } else {
+                return null;
+            }
+            
+        } else {
+            // return DibiResult
+            return $select;
+        }
+        
+        
+        
+
+    }
+
+    /**
+     * Seznam dokumentu bez zivotniho cyklu
+     *
+     * @param <type> $args
+     * @return <type>
+     */
+    public function seznamKlasicky($args = null)
+    {
+
+        if ( isset($args['where']) ) {
+            $where = $args['where'];
+        } else {
+            $where = array(array('stav<100'));
+        }
+
+        if ( isset($args['order']) ) {
+            $order = $args['order'];
+        } else {
+            $order = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
+        }
+
+        if ( isset($args['offset']) ) {
+            $offset = $args['offset'];
+        } else {
+            $offset = null;
+        }
+
+        if ( isset($args['limit']) ) {
+            $limit = $args['limit'];
+        } else {
+            $limit = null;
+        }
+
+
+        $select = $this->fetchAll($order,$where,$offset,$limit);
+
+        $rows = $select->fetchAll();
+
+        return ($rows) ? $rows : NULL;
+
+    }
+
+    public function hledat($query, $typ = 'zakladni') {
+
+        $args = array(
+            'where_or' => array(
+                array('d.nazev LIKE %s','%'.$query.'%'),
+                array('d.popis LIKE %s','%'.$query.'%'),
+                array('d.cislo_jednaci LIKE %s','%'.$query.'%'),
+                array('d.jid LIKE %s','%'.$query.'%')
+            )
+        );
+        return $args;
+
+    }
+
+    public function filtr($nazev = null, $params = null) {
+
+        if ( is_null($nazev) && is_null($params) ) {
+            return null;
+        } else if ( is_null($nazev) ) {
+            return $this->paramsFiltr($params);
+        } else {
+            return $this->fixedFiltr($nazev, $params);
+        }
+    }
+
+    private function paramsFiltr($params) {
+
+        $args = array();
+
+        if ( isset($params['nazev']) ) {
+            if ( !empty($params['nazev']) ) {
+                $args['where'][] = array('d.nazev LIKE %s','%'.$params['nazev'].'%');
+            }
+        }
+        if ( isset($params['popis']) ) {
+            if ( !empty($params['popis']) ) {
+                $args['where'][] = array('d.popis LIKE %s','%'.$params['popis'].'%');
+            }
+        }
+        if ( isset($params['cislo_jednaci']) ) {
+            if ( !empty($params['cislo_jednaci']) ) {
+                $args['where'][] = array('d.cislo_jednaci LIKE %s','%'.$params['cislo_jednaci'].'%');
+            }
+        }
+        if ( isset($params['spisova_znacka']) ) {
+            if ( !empty($params['spisova_znacka']) ) {
+                $args['where'][] = array('spis.nazev LIKE %s','%'.$params['spisova_znacka'].'%');
+            }
+        }
+        if ( isset($params['typ_dokumentu']) ) {
+            if ( $params['typ_dokumentu'] != '0' ) {
+                $args['where'][] = array('d.typ_dokumentu = %i',$params['typ_dokumentu']);
+            }
+        }
+        if ( isset($params['cislo_jednaci_odesilatele']) ) {
+            if ( !empty($params['cislo_jednaci_odesilatele']) ) {
+                $args['where'][] = array('d.cislo_jednaci_odesilatele LIKE %s','%'.$params['cislo_jednaci_odesilatele'].'%');
+            }
+        }
+        if ( isset($params['datum_vzniku']) ) {
+            if ( !empty($params['datum_vzniku']) ) {
+
+                $cas = '';
+                if ( isset($params['datum_vzniku_cas']) ) {
+                    if ( !empty($params['datum_vzniku_cas']) ) {
+                        $cas = ' '. $params['datum_vzniku_cas'];
+                    }
+                }
+
+                $args['where'][] = array('d.datum_vzniku = %d',$params['datum_vzniku'].$cas);
+            }
+        }
+        if ( isset($params['pocet_listu']) ) {
+            if ( !empty($params['pocet_listu']) ) {
+                $args['where'][] = array('d.pocet_listu = %i',$params['pocet_listu']);
+            }
+        }
+        if ( isset($params['pocet_priloh']) ) {
+            if ( !empty($params['pocet_priloh']) ) {
+                $args['where'][] = array('d.pocet_priloh = %i',$params['pocet_priloh']);
+            }
+        }
+        if ( isset($params['stav_dokumentu']) ) {
+            if ( !empty($params['stav_dokumentu']) ) {
+                $args['where'][] = array('wf.stav_dokumentu = %i',$params['stav_dokumentu']);
+            }
+        }
+        if ( isset($params['lhuta']) ) {
+            if ( !empty($params['lhuta']) ) {
+                $args['where'][] = array('d.lhuta = %i',$params['lhuta']);
+            }
+        }
+        if ( isset($params['poznamka']) ) {
+            if ( !empty($params['poznamka']) ) {
+                $args['where'][] = array('d.poznamka LIKE %s','%'.$params['poznamka'].'%');
+            }
+        }
+        if ( isset($params['zpusob_vyrizeni']) ) {
+            if ( !empty($params['zpusob_vyrizeni']) || $params['zpusob_vyrizeni'] != '0' ) {
+                $args['where'][] = array('d.zpusob_vyrizeni = %i',$params['zpusob_vyrizeni']);
+            }
+        }
+        if ( isset($params['datum_vyrizeni']) ) {
+            if ( !empty($params['datum_vyrizeni']) ) {
+
+                $cas = '';
+                if ( isset($params['datum_vyrizeni_cas']) ) {
+                    if ( !empty($params['datum_vyrizeni_cas']) ) {
+                        $cas = ' '. $params['datum_vyrizeni_cas'];
+                    }
+                }
+
+                $args['where'][] = array('d.datum_vyrizeni = %d',$params['datum_vyrizeni'].$cas);
+            }
+        }
+        if ( isset($params['datum_odeslani']) ) {
+            if ( !empty($params['datum_odeslani']) ) {
+
+                $cas = '';
+                if ( isset($params['datum_odeslani_cas']) ) {
+                    if ( !empty($params['datum_odeslani_cas']) ) {
+                        $cas = ' '. $params['datum_odeslani_cas'];
+                    }
+                }
+
+                //$args['where'][] = array('d.datum_odeslani = %d',$params['datum_odeslani'].$cas);
+            }
+        }
+        if ( isset($params['spisovy_znak']) ) {
+            if ( !empty($params['spisovy_znak']) ) {
+                //$args['where'][] = array();
+            }
+        }
+        if ( isset($params['ulozeni_dokumentu']) ) {
+            if ( !empty($params['ulozeni_dokumentu']) ) {
+                $args['where'][] = array('d.ulozeni_dokumentu LIKE %s','%'.$params['ulozeni_dokumentu'].'%');
+            }
+        }
+        if ( isset($params['poznamka_vyrizeni']) ) {
+            if ( !empty($params['poznamka_vyrizeni']) ) {
+                $args['where'][] = array('d.poznamka_vyrizeni LIKE %s','%'.$params['poznamka_vyrizeni'].'%');
+            }
+        }
+        if ( isset($params['skartacni_znak']) ) {
+            if ( !empty($params['skartacni_znak']) ) {
+                $args['where'][] = array('d.skartacni_znak = %s',$params['skartacni_znak']);
+            }
+        }
+        if ( isset($params['spousteci_udalost']) ) {
+            if ( !empty($params['spousteci_udalost']) || $params['spousteci_udalost'] != '0' ) {
+                $args['where'][] = array('d.spousteci_udalost = %i',$params['spousteci_udalost']);
+            }
+        }
+        if ( isset($params['vyrizeni_pocet_listu']) ) {
+            if ( !empty($params['vyrizeni_pocet_listu']) ) {
+                $args['where'][] = array('d.vyrizeni_pocet_listu = %i',$params['vyrizeni_pocet_listu']);
+            }
+        }
+        if ( isset($params['vyrizeni_pocet_priloh']) ) {
+            if ( !empty($params['vyrizeni_pocet_priloh']) ) {
+                $args['where'][] = array('d.vyrizeni_pocet_priloh = %i',$params['vyrizeni_pocet_priloh']);
+            }
+        }
+        if ( isset($params['subjekt_type']) ) {
+            if ( !empty($params['subjekt_type']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.type = %s',$params['subjekt_type']);
+            }
+        }
+        if ( isset($params['subjekt_nazev']) ) {
+            if ( !empty($params['subjekt_nazev']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.nazev_subjektu LIKE %s','%'.$params['subjekt_nazev'].'%');
+            }
+        }
+        if ( isset($params['subjekt_ic']) ) {
+            if ( !empty($params['subjekt_ic']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.ic LIKE %s','%'.$params['ic'].'%');
+            }
+        }
+        if ( isset($params['adresa_ulice']) ) {
+            if ( !empty($params['adresa_ulice']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.adresa_ulice LIKE %s','%'.$params['adresa_ulice'].'%');
+            }
+        }
+        if ( isset($params['adresa_cp']) ) {
+            if ( !empty($params['adresa_cp']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.adresa_cp LIKE %s','%'.$params['adresa_cp'].'%');
+            }
+        }
+        if ( isset($params['adresa_co']) ) {
+            if ( !empty($params['adresa_co']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.adresa_co LIKE %s','%'.$params['adresa_co'].'%');
+            }
+        }
+        if ( isset($params['adresa_mesto']) ) {
+            if ( !empty($params['adresa_mesto']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.adresa_mesto LIKE %s','%'.$params['adresa_mesto'].'%');
+            }
+        }
+        if ( isset($params['adresa_psc']) ) {
+            if ( !empty($params['adresa_psc']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.adresa_psc LIKE %s','%'.$params['adresa_psc'].'%');
+            }
+        }
+        if ( isset($params['adresa_stat']) ) {
+            if ( !empty($params['adresa_stat']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.adresa_stat = %s',$params['adresa_stat']);
+            }
+        }
+        if ( isset($params['subjekt_email']) ) {
+            if ( !empty($params['subjekt_email']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.email LIKE %s','%'.$params['subjekt_email'].'%');
+            }
+        }
+        if ( isset($params['subjekt_telefon']) ) {
+            if ( !empty($params['subjekt_telefon']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.telefon LIKE %s','%'.$params['subjekt_telefon'].'%');
+            }
+        }
+        if ( isset($params['subjekt_isds']) ) {
+            if ( !empty($params['subjekt_isds']) ) {
+
+                $args['leftJoin']['dok_subjekt'] = array(
+                    'from'=> array($this->tb_dok_subjekt => 'ds'),
+                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['subjekt'] = array(
+                    'from'=> array($this->tb_subjekt => 's'),
+                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('s.id_isds LIKE %s','%'.$params['subjekt_isds'].'%');
+            }
+        }
+
+        //Debug::dump($args);
+        //exit;
+
+        return $args;
+
+    }
+
+    private function fixedFiltr($nazev, $params = null) {
+
+        $user = Environment::getUser()->getIdentity();
+
+        switch ($nazev) {
+            case 'moje':
+                $args = array(
+                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'), array('wf.aktivni=1') )
+                );
+                break;
+            case 'predane':
+                $args = array(
+                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby=0'), array('wf.aktivni=1') )
+                );
+                break;
+            case 'pracoval':
+                $args = array(
+                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby < 100') )
+                );
+                break;
+            case 'moje_nove':
+                $args = array(
+                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby = 1'), array('wf.stav_dokumentu = 1'), array('wf.aktivni=1') )
+                );
+                break;
+            case 'vsichni_nove':
+                $args = array(
+                    'where' => array( array('wf.stav_dokumentu = 1'), array('wf.aktivni=1') )
+                );
+                break;
+            case 'moje_vyrizuje':
+                $args = array(
+                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby = 1'), array('wf.stav_dokumentu = 3'), array('wf.aktivni=1') )
+                );
+                break;
+            case 'vsichni_vyrizuji':
+                $args = array(
+                    'where' => array( array('wf.stav_dokumentu = 3'), array('wf.aktivni=1') )
+                );
+                break;
+            case 'vse':
+                $args = array(
+                    'where' => array( array('1') )
+                );
+                break;
+            default:
+                $args = array(
+                    'where' => array( array('0') )
+                );
+                break;
+        }
+
+        return $args;
+
+    }
+
+    public function getInfo($dokument_id,$dokument_version = null, $detail = 0) {
+     
+        $sql = array(
+        
+            'distinct'=>null,
+            'from' => array($this->name => 'dok'),
+            'cols' => array('*'),
+            'leftJoin' => array(
+                'dokspisy' => array(
+                    'from' => array($this->tb_dokspis => 'sp'),
+                    'on' => array('sp.dokument_id=dok.dokument_id'),
+                    'cols' => array('poradi'=>'poradi_spisu','stav'=>'stav_spisu')
+                ),
+                'typ_dokumentu' => array(
+                    'from' => array($this->tb_dokumenttyp => 'dtyp'),
+                    'on' => array('dtyp.dokument_typ_id=dok.typ_dokumentu'),
+                    'cols' => array('nazev'=>'typ_nazev','popis'=>'typ_popis','smer'=>'typ_smer','typ'=>'typ_typ')
+                ),
+                'workflow' => array(
+                    'from' => array($this->tb_workflow => 'wf'),
+                    'on' => array('wf.dokument_id=dok.dokument_id'),
+                    'cols' => array('workflow_id','stav_dokumentu','prideleno','prideleno_info','orgjednotka_id','orgjednotka_info',
+                                    'stav_osoby','date'=>'date_prideleni','date_predani','poznamka'=>'poznamka_predani','aktivni'=>'wf_aktivni')
+                ),
+                'spisy' => array(
+                    'from' => array($this->tb_spis => 'spis'),
+                    'on' => array('spis.spis_id=sp.spis_id'),
+                    'cols' => array('spis_id','nazev'=>'nazev_spisu','popis'=>'popis_spisu')
+                )
+                
+            ),
+            'order_by' => array('dok.dokument_id'=>'DESC','dok.dokument_version'=>'DESC')
+        
+        );
+        
+        if ( !is_null($dokument_version) ) {
+            $sql['where'] = array( array('dok.dokument_id=%i',$dokument_id),array('dok.dokument_version=%i',$dokument_version) );
+        } else {
+            $sql['where'] = array( array('dok.dokument_id=%i',$dokument_id) );
+        }
+        
+        $select = $this->fetchAllComplet($sql);
+        $result = $select->fetchAll();
+        if ( count($result)>0 ) {
+
+            $tmp = array();
+            $dokument_id = $dokument_version = 0;
+            foreach ($result as $index => $row) {
+                $id = $row->dokument_id;
+                $v = $row->dokument_version;
+
+                $spis = new stdClass();
+                $spis->spis_id = $row->spis_id; unset($row->spis_id);
+                $spis->nazev = $row->nazev_spisu; unset($row->nazev_spisu);
+                $spis->popis = $row->popis_spisu; unset($row->popis_spisu);
+                $spis->stav = $row->stav_spisu; unset($row->stav_spisu);
+                $spis->poradi = $row->poradi_spisu; unset($row->poradi_spisu);
+                $tmp[$id][$v]['spisy'][ $spis->spis_id ] = $spis;
+
+                $typ = new stdClass();
+                $typ->id = $row->typ_dokumentu; unset($row->typ_dokumentu);
+                $typ->nazev = $row->typ_nazev; unset($row->typ_nazev);
+                $typ->popis = $row->typ_popis; unset($row->typ_popis);
+                $typ->smer = $row->typ_smer; unset($row->typ_smer);
+                $typ->typ = $row->typ_typ; unset($row->typ_typ);
+                $tmp[$id][$v]['typ_dokumentu'] = $typ;
+
+                $tmp[$id][$v]['typ_dokumentu'] = $typ;
+                $workflow = new stdClass();
+                $workflow->workflow_id = $row->workflow_id; unset($row->workflow_id);
+                $workflow->stav_dokumentu = $row->stav_dokumentu; unset($row->stav_dokumentu);
+                $workflow->prideleno = $row->prideleno; unset($row->prideleno);
+                $workflow->prideleno_info = unserialize($row->prideleno_info); unset($row->prideleno_info);
+                $workflow->prideleno_jmeno = Osoba::displayName($workflow->prideleno_info);
+                $workflow->stav_osoby = $row->stav_osoby; unset($row->stav_osoby);
+                $workflow->orgjednotka_id = $row->orgjednotka_id; unset($row->orgjednotka_id);
+                $workflow->orgjednotka_info = unserialize($row->orgjednotka_info); unset($row->orgjednotka_info);
+                $workflow->date_predani = $row->date_predani; unset($row->date_predani);
+                $workflow->date = $row->date_prideleni; unset($row->date_prideleni);
+                $workflow->poznamka = $row->poznamka_predani; unset($row->poznamka_predani);
+                $workflow->aktivni = $row->wf_aktivni; unset($row->wf_aktivni);
+                $tmp[$id][$v]['workflow'][ $workflow->workflow_id ] = $workflow;
+
+                $tmp[$id][$v]['raw'] = $row;
+                
+                
+
+                if ( $row->dokument_id >= $dokument_id ) $dokument_id = $row->dokument_id;
+                if ( $row->dokument_version >= $dokument_version ) $dokument_version = $row->dokument_version;
+
+            }
+
+            $dokument = $tmp[ $dokument_id ][$dokument_version]['raw'];
+            $dokument->typ_dokumentu = $tmp[ $dokument_id ][$dokument_version]['typ_dokumentu'];
+            $dokument->spisy = $tmp[ $dokument_id ][$dokument_version]['spisy'];
+            $dokument->workflow = $tmp[ $dokument_id ][$dokument_version]['workflow'];
+
+            $DokSubjekty = new DokumentSubjekt();
+            $dokument->subjekty = $DokSubjekty->subjekty($dokument_id);
+            $Dokrilohy = new DokumentPrilohy();
+            $dokument->prilohy = $Dokrilohy->prilohy($dokument_id,null,$detail);
+
+            $DokOdeslani = new DokumentOdeslani();
+            $dokument->odeslani = $DokOdeslani->odeslaneZpravy($dokument_id);
+
+            $dokument->prideleno = null;
+            $dokument->predano = null;
+            $prideleno = $predano = $stav = 0;
+            if ( count($dokument->workflow)>0 ) {
+                foreach ($dokument->workflow as $wf) {
+                    // Pridelen
+                    if ( ($wf->stav_osoby == 1 && $wf->aktivni == 1 ) && $prideleno==0 ) {
+                        $dokument->prideleno = $wf;
+                        $prideleno=1;
+                    }
+                    // Predan
+                    if ( ($wf->stav_osoby == 0 && $wf->aktivni == 1 ) && $predano==0 ) {
+                        $dokument->predano = $wf;
+                        $predano=1;
+                    }
+                    // Stav
+                    if ( $stav <= $wf->stav_dokumentu ) {
+                        $stav = $wf->stav_dokumentu;
+                    }
+                }
+            }
+            $dokument->stav_dokumentu = $stav;
+
+
+            // lhuta
+            if ( !empty($dokument->lhuta) ) {
+                $datum_vzniku = strtotime($dokument->date_created);
+                $dokument->lhuta_do = $datum_vzniku + ($dokument->lhuta * 86400);
+            } else {
+                $dokument->lhuta_do = 'neurčeno';
+            }
+
+            // spisovy znak
+            if ( !empty($dokument->spisovy_znak) ) {
+                $SpisZnak = new SpisovyZnak();
+                $sznak = $SpisZnak->getInfo($dokument->spisovy_znak);
+                if ( $sznak ) {
+                    $dokument->spisovy_znak_id = $dokument->spisovy_znak;
+                    $dokument->spisovy_znak = $sznak->nazev;
+                    $dokument->spisovy_znak_popis = $sznak->popis;
+                    $dokument->spisovy_znak_skart_znak = $sznak->skartacni_znak;
+                    $dokument->spisovy_znak_skart_lhuta = $sznak->skartacni_lhuta;
+                    $dokument->spisovy_znak_skart_udalost = $sznak->spousteci_udalost;
+                } else {
+                    $dokument->spisovy_znak_id = $dokument->spisovy_znak;
+                    $dokument->spisovy_znak = '';
+                    $dokument->spisovy_znak_popis = '';
+                    $dokument->spisovy_znak_skart_znak = '';
+                    $dokument->spisovy_znak_skart_lhuta = '';
+                    $dokument->spisovy_znak_skart_udalost = '';
+                }
+            } else {
+                $dokument->spisovy_znak_id = $dokument->spisovy_znak;
+                $dokument->spisovy_znak = '';
+                $dokument->spisovy_znak_popis = '';
+                $dokument->spisovy_znak_skart_znak = '';
+                $dokument->spisovy_znak_skart_lhuta = '';
+                $dokument->spisovy_znak_skart_udalost = '';
+            }
+
+            //vyrizeni
+            if ( !empty($dokument->zpusob_vyrizeni) ) {
+                $zpvyrizeni = Dokument::zpusobVyrizeni($dokument->zpusob_vyrizeni);
+                $dokument->zpusob_vyrizeni_id = $dokument->zpusob_vyrizeni;
+                $dokument->zpusob_vyrizeni = $zpvyrizeni->nazev;
+            } else {
+                $dokument->zpusob_vyrizeni_id = $dokument->zpusob_vyrizeni;
+                $dokument->zpusob_vyrizeni = '';
+            }
+
+            return $dokument;
+
+
+        } else {
+            return null;
+        }
+        
+        
+    }
+
+    public function getBasicInfo($dokument_id,$dokument_version = null) {
+
+        if ( !is_null($dokument_version) ) {
+            $where = array( array('dokument_id=%i',$dokument_id),array('dokument_version=%i',$dokument_version) );
+        } else {
+            $where = array( array('dokument_id=%i',$dokument_id) );
+        }
+        $order_by = array('dokument_id'=>'DESC','dokument_version'=>'DESC');
+        $limit = 1;
+
+        $select = $this->fetchAll($order_by, $where, null, $limit);
+        $result = $select->fetch();
+
+        return $result;
+
+    }
+
+
+    public function getMax() {
+
+        $result = $this->fetchAll(array('dokument_id'=>'DESC'),null,null,1);
+        $row = $result->fetch();
+        return ($row) ? ($row->dokument_id+1) : 1;
+
+    }
+
+    public function ulozit($data, $dokument_id = null, $dokument_version = null) {
+
+
+        if ( is_null($data) ) {
+            return false;
+        } else if ( is_null($dokument_id) ) {
+            // novy dokument
+
+            $data['dokument_id'] = $this->getMax();
+            $data['dokument_version'] = 1;
+            $data['date_created'] = new DateTime();
+            $data['user_created'] = Environment::getUser()->getIdentity()->user_id;
+            $data['stav'] = isset($data['stav'])?$data['stav']:1;
+            $data['md5_hash'] = $this->generujHash($data);
+            $this->insert_basic($data);
+            $new_row = $this->getInfo($data['dokument_id']);
+
+            if ( $new_row ) {
+                return $new_row;// array( 'dokument_id'=> $new_row->dokument_id, 'dokument_version'=>$new_row->dokument_version );
+            } else {
+                return false;
+            }
+        } else {
+            // uprava existujiciho dokumentu
+
+            $old_dokument = $this->getBasicInfo($dokument_id,$dokument_version);
+
+            if ( $old_dokument ) {
+
+                //Debug::dump($data);
+
+                // sestaveni upravenych dat
+                $update_data = array();
+                foreach ( $old_dokument as $key => $value ) {
+                    $update_data[ $key ] = $value;
+                    if ( array_key_exists($key, $data) ) {
+                        $update_data[ $key ] = $data[ $key ];
+                    }
+                }
+                $md5_hash = $this->generujHash($update_data);
+
+                //Debug::dump($update_data);
+                //Debug::dump($md5_hash);
+                //exit;
+
+                if ( !is_null($dokument_version) ) {
+                    // update na stavajici verzi
+
+                    $update_data['date_modified'] = new DateTime();
+                    $update_data['user_modified'] = Environment::getUser()->getIdentity()->user_id;
+                    $update_data['md5_hash'] = $md5_hash;
+                    unset($update_data['dokument_id'],$update_data['dokument_version']);
+                    $updateres = $this->update($update_data, array(
+                                                    array('dokument_id=%i',$dokument_id),
+                                                    array('dokument_version=%i',$dokument_version)
+                                                    )
+                                               );
+                    if ( $updateres ) {
+                        $new_row = $this->getInfo($dokument_id,$dokument_version);
+                        return $new_row;// array( 'dokument_id'=> $dokument_id, 'dokument_version'=>$dokument_version );
+                    } else {
+                        return false;
+                    }
+                } else {
+
+                    if ( $md5_hash == $old_dokument->md5_hash  ) {
+
+                        // shodny hash - zadna zmena - pouze update
+                        $update_data['date_modified'] = new DateTime();
+                        $update_data['user_modified'] = Environment::getUser()->getIdentity()->user_id;
+                        unset($update_data['dokument_id'],$update_data['dokument_version']);
+                        $updateres = $this->update($update_data, array(
+                                                    array('dokument_id=%i',$old_dokument->dokument_id),
+                                                    array('dokument_version=%i',$old_dokument->dokument_version)
+                                                    )
+                                               );
+                        if ( $updateres ) {
+                            $new_row = $this->getInfo($old_dokument->dokument_id,$old_dokument->dokument_version);
+                            return $new_row;// array( 'dokument_id'=> $old_dokument->dokument_id, 'dokument_version'=>$old_dokument->dokument_version );
+                        } else {
+                            return false;
+                        }
+                    } else {
+
+                        // zjistena zmena - nova verze
+                        $update = array('stav%sql'=>'stav+100');
+                        $this->update($update, array('dokument_id=%i',$dokument_id));
+
+                        $update_data['dokument_version'] = $old_dokument->dokument_version + 1;
+                        $update_data['date_created'] = new DateTime();
+                        $update_data['user_created'] = Environment::getUser()->getIdentity()->user_id;
+                        $update_data['md5_hash'] = $md5_hash;
+
+                        $this->insert_basic($update_data);
+                        $new_row = $this->getBasicInfo($update_data['dokument_id'],$update_data['dokument_version']);
+
+                        if ( $new_row ) {
+                            return $new_row; //array( 'dokument_id'=> $new_row->dokument_id, 'dokument_version'=>$new_row->dokument_version );
+                        } else {
+                            return false;
+                        }
+
+
+                    }
+                }
+            } else {
+                return false; // id dokumentu neexistuje
+            }
+        }
+    }
+
+    public function zmenitStav($data) {
+
+        if ( is_array($data) ) {
+            
+            $dokument_id = $data['dokument_id'];
+            $dokument_version = $data['dokument_version'];
+            unset($data['dokument_id'],$data['dokument_version']);
+            $data['date_modified'] = new DateTime();
+
+            //$transaction = (! dibi::inTransaction());
+            //if ($transaction)
+            //dibi::begin('stavdok');
+
+            // aktualni verze
+            $this->update($data, array(array('stav<100'), array('dokument_id=%i',$dokument_id)) );
+
+            // ostatni verze
+            $data['stav'] = $data['stav'] + 100;
+            $this->update($data, array(array('stav>=100'), array('dokument_id=%i',$dokument_id)) );
+
+            //if ($transaction)
+            //dibi::commit('stavdok');
+
+            return true;
+            
+        } else {
+            return false;
+        }
+    }
+
+    protected function generujHash($data) {
+
+        $data = Dokument::obj2array($data);
+
+        unset( $data['dokument_id'],$data['dokument_version'],$data['md5_hash'],
+               $data['date_created'],$data['user_created'],$data['date_modified'],$data['user_modified']
+             );
+
+        $data_implode = implode('#', $data);
+
+        // věc#popis#1##2010-05-23#30##0#9#OUV-9/2010#denik#9#2010
+        // věc#popis#1##2010-05-23#věc#popis#1##2010-05-23#
+        //echo $data_implode;
+        return md5($data_implode);
+
+    }
+
+    public static function typDokumentu( $kod = null, $select = 0 ) {
+
+        $prefix = Environment::getConfig('database')->prefix;
+        $tb_dokument_typ = $prefix .'dokument_typ';
+
+        $result = dibi::query('SELECT * FROM %n', $tb_dokument_typ )->fetchAssoc('dokument_typ_id');
+
+        if ( is_null($kod) ) {
+            if ( $select == 1 ) {
+                $tmp = array();
+                foreach ($result as $dt) {
+                    $tmp[ $dt->dokument_typ_id ] = $dt->nazev;
+                }
+                return $tmp;
+            } else {
+                return $result;
+            }
+        } else {
+            return ( array_key_exists($kod, $result) )?$result[ $kod ]:null;
+        }
+        
+    }
+
+    public static function zpusobVyrizeni( $kod = null, $select = 0 ) {
+
+        $prefix = Environment::getConfig('database')->prefix;
+        $tb_zpusob_vyrizeni = $prefix .'zpvyrizeni';
+
+        $result = dibi::query('SELECT * FROM %n', $tb_zpusob_vyrizeni )->fetchAssoc('zpvyrizeni_id');
+
+        if ( is_null($kod) ) {
+            if ( $select == 1 ) {
+                $tmp = array();
+                foreach ($result as $dt) {
+                    $tmp[ $dt->zpvyrizeni_id ] = $dt->nazev;
+                }
+                return $tmp;
+            } else {
+                return $result;
+            }
+        } else {
+            return ( array_key_exists($kod, $result) )?$result[ $kod ]:null;
+        }
+
+    }
+
+    public static function stav($dokument = null) {
+
+        $stavy = array('1'=>'aktivný',
+                       '2'=>'neaktivný',
+                       '3'=>'zrušený'
+            );
+
+        if ( is_null( $dokument ) ) {
+            return $stavy;
+        } else if ( !is_numeric($dokument) ) {
+            return null;
+        }
+
+        $index = ($dokument>=100)?$dokument-100:$dokument;
+        if ( array_key_exists($index, $stavy) ) {
+         return $stavy[ $index ];
+        } else {
+            return null;
+        }
+
+
+
+    }
+
+
+
+}

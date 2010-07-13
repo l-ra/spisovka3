@@ -1,0 +1,37 @@
+         <tr>
+            <td class="icon">
+                <input type="checkbox" name="subjekt[{$subjekt->subjekt_id}]" />
+            </td>
+            <td class="icon">
+                <img src="{$baseUri}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
+                <div class="info">
+                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
+                <br />
+                {=Subjekt::displayName($subjekt,'adresa')}
+                </div>
+                <div class="vyber">
+                    <a href="{link :Spisovka:Subjekty:zmenit, 'id'=>$subjekt->subjekt_id }" >upravit</a>&nbsp;&nbsp;
+                </div>
+            </td>
+            <td class="meta_plus">
+                &nbsp;
+                <div class="info">
+                <dl>
+                    <dt>email:</dt>
+                    <dd>{$subjekt->email}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>telefon:</dt>
+                    <dd>{$subjekt->telefon}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>isds:</dt>
+                    <dd>{$subjekt->id_isds}&nbsp;</dd>
+                </dl>
+
+                </div>
+            </td>
+        </tr>    

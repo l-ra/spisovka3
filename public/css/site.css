@@ -1,0 +1,754 @@
+body {
+    background: #f0f0f0 url() repeat-x;
+    margin: 0px;
+    padding: 0px;
+    text-align: left;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+}
+
+/* ***************************************************************** */
+/* *** TOP LAYOUT *** */
+#layout_top {
+    background: #8FBAD9 url() repeat-x;
+    margin: 0px;
+    padding-top: 20px;
+}
+
+#top {
+    width: 980px;
+    margin: 0 auto 0 auto;
+    padding: 0px;
+    /*height: 120px;*/
+    position: relative;
+    background: #3E94D1 url() repeat-x;
+}
+
+#top h1 {
+    color: #03406A;
+    font-size: 25px;
+    padding: 20px 20px 5px 20px;
+    margin: 0px;
+}
+
+#top h1 a {
+    color: #03406A;
+    text-decoration: none;
+}
+
+#top_urad {
+    display: block;
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+#top_menu {
+    color: #03406A;
+    text-align: right;
+    padding-right: 20px;
+    position: absolute;
+    top: 20px;
+    right: 0px;
+}
+
+#top_menu a {
+    color: #03406A;
+    font-weight: bold;
+    font-size: 10pt;
+    text-decoration: none;
+}
+
+#top_menu a:hover {
+    color: #FFC273;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+#top_jmeno {
+    color: #03406A;
+    text-align: right;
+    padding-right: 20px;
+    padding-bottom: 10px;
+}
+
+/* ***************************************************************** */
+/* *** CONTENT LAYOUT *** */
+#layout {
+    width: 980px;
+    margin: 0 auto 0 auto;
+    padding: 0px;
+}
+
+#menu {
+    background: #03406A url() repeat-x;
+    padding: 10px 10px;
+}
+
+#menu a {
+    color: #FFC273;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    margin: 0px 10px;
+}
+
+#dialog {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+}
+
+#content {
+    background: #ffffff url() repeat-x;
+    min-height: 500px;
+    padding: 10px;
+    margin: 0px;
+}
+
+#content h2 {
+    margin: 0px 20px 20px 20px;
+
+}
+
+#content .navigate {
+    margin: 0px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dotted #c0c0c0;
+    
+}
+
+#dialog .blok_menu,
+#content .blok_menu {
+    padding: 20px;
+    border-top: 1px dotted #c0c0c0;
+}
+
+#dialog .blok_akce,
+#content .blok_akce {
+    padding: 0px 0px 10px 10px;
+}
+
+#content .ikona_ano {
+    background: url('../images/icons/status_ano.png') no-repeat right;
+}
+#content .ikona_ne {
+    background: url('../images/icons/status_ne.png') no-repeat right;
+}
+#content .ikona_nejiste {
+    background: url('../images/icons/status_nejiste.png') no-repeat right;
+}
+
+
+/* Tabulka */
+
+#dialog table,
+#content table {
+    border-collapse: collapse;
+    border: 1px #e0e0e0 solid;
+    width: 100%;
+}
+
+#dialog table th,
+#content table th {
+    background-color: #03406A;
+    padding: 5px 5px;
+    text-align: left;
+    color: #ffffff;
+    border: 1px #3E94D1 solid;
+}
+
+#dialog table td,
+#content table td {
+    padding: 5px 5px;
+    border: 1px #e0e0e0 solid;
+}
+
+/* Polozky */
+#dialog .prazdno,
+#content .prazdno {
+    text-align: center;
+    padding: 30px;
+}
+
+#dialog  .detail_blok,
+#content .detail_blok {
+    padding: 20px;
+    border-top: 1px dotted #c0c0c0;
+}
+
+#dialog .detail_hlavicka,
+#content .detail_hlavicka {
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+#dialog .detail_subhlavicka,
+#content .detail_subhlavicka {
+    font-weight: bold;
+    margin-left: 40px;
+}
+
+#dialog .detail_item,
+#content .detail_item {
+}
+
+
+#dialog dl,
+#content dl {
+    clear: both;
+}
+
+#dialog dt,
+#content dt {
+    float: left;
+    width: 200px;
+    text-align: right;
+    /*padding-right: 20px;*/
+    margin-right: 20px;
+}
+
+#dialog dd,
+#content dd {
+    margin-left: 220px;
+    font-weight: bold;
+}
+
+#dialog dd.normal,
+#content dd.normal {
+    margin-left: 220px;
+    font-weight: normal;
+}
+
+#content dd.pravidlo {
+    margin-left: 220px;
+    font-weight: normal;
+    position: relative;
+    padding-bottom: 5px;
+    border-bottom: 1px #c0c0c0 dashed;
+}
+
+#content dd.pravidlo .opravneni_volba_head {
+    float: right;
+    width: 150px;
+    text-align: right;
+}
+#content dd.pravidlo .opravneni_volba {
+    float: right;
+    width: 50px;
+    text-align: right;
+}
+
+/* ***************************************************************** */
+/* *** DOKUMENTY *** */
+
+#dokumenty table {
+    border-collapse: collapse;
+    border: 0px;
+    width: 100%;
+}
+
+#dokumenty table a {
+    color: #000088;
+}
+
+#dokumenty table a:hover {
+    color: #ff0000;
+}
+
+
+#dokumenty table th {
+    background-color: #03406A;
+    vertical-align: top;
+    padding: 5px 5px;
+    text-align: left;
+    font-size: 7pt;
+    color: #ffffff;
+    border: 1px #03406A solid;
+}
+
+#dokumenty table td {
+    padding: 5px 5px;
+    border: 0px;
+    border-bottom: 1px #e0e0e0 solid;
+    vertical-align: top;
+}
+
+#dokumenty .typ {
+    width: 50px;
+}
+#dokumenty .prijato {
+    width: 80px;
+    text-align: right;
+}
+#dokumenty .cislo_jadnaci {
+    width: 100px;
+    text-align: right;
+}
+#dokumenty .vec {
+
+}
+#dokumenty .prideleno {
+    width: 150px;
+}
+#dokumenty .stav {
+    width: 100px;
+    text-align: right;
+}
+
+
+#dokumenty .stav_red {
+    background-color: #ffd4d4;
+}
+/* ***************************************************************** */
+/* *** DOKUMENT DETAIL *** */
+
+.dokument_blok2 {
+    border: 1px #f0f0f0 solid;
+    padding: 5px; margin-bottom: 10px;
+    background: #f0f0f0 url() repeat-x;
+}
+
+.dokument_blok2 .h2 {
+    margin: 0px; padding: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-bottom: 1px #e0e0e0 solid;
+}
+
+.dokument_blok2 p {
+    padding: 5px 20px;
+}
+
+.dokument_blok2 pre {
+    padding: 5px 20px 0px 20px;
+    overflow: auto;
+}
+
+
+#dokument_blok_hlavni {
+    border: 1px #e0e0e0 solid;
+    padding: 5px; margin-bottom: 10px;
+    background: #8FBAD9 url() repeat-x;
+}
+
+#dokument_blok_hlavni .nadpis {
+    text-decoration: underline;
+    font-size: 12pt;
+}
+
+#dokument_blok_hlavni .h2 {
+    margin: 0px; padding: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-bottom: 1px #03406A solid;
+}
+
+#dokument_blok_poznamka {
+    border: 1px #f0f0f0 solid;
+    padding: 5px; margin-bottom: 10px;
+    background: #f0f0f0 url() repeat-x;
+}
+
+#dokument_blok_poznamka .h2 {
+    margin: 0px; padding: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-bottom: 1px #e0e0e0 solid;
+}
+
+#dokument_blok_poznamka p {
+    padding: 5px 20px;
+}
+
+#dokument_blok_poznamka pre {
+    padding: 5px 20px 0px 20px;
+    overflow: auto;
+}
+
+#dokument_blok_vyrizeni {
+    border: 1px #f0f0f0 solid;
+    padding: 5px; margin-bottom: 10px;
+    background: #f0f0f0 url() repeat-x;
+}
+
+#dokument_blok_vyrizeni .h2 {
+    margin: 0px; padding: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-bottom: 1px #e0e0e0 solid;
+}
+
+#dokument_blok_vyrizeni p {
+    padding: 5px 20px;
+}
+
+#dokument_blok_vyrizeni pre {
+    padding: 5px 20px 0px 20px;
+    overflow: auto;
+}
+
+#dokument_blok_subjekty {
+    padding: 5px; margin-bottom: 10px;
+}
+#dokument_blok_subjekty .h2 {
+    margin: 0px; padding: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-bottom: 1px #e0e0e0 solid;
+}
+
+
+#dokument_blok_prilohy {
+    padding: 5px; margin-bottom: 10px;
+    background: #f0f0f0 url() repeat-x;
+}
+#dokument_blok_prilohy .h2 {
+    margin: 0px; padding: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-bottom: 1px #e0e0e0 solid;
+}
+
+#dokument_blok_akce {
+    border: 1px #e0e0e0 solid;
+    padding: 15px; margin-bottom: 0px;
+    background: #8FBAD9 url() repeat-x;
+}
+
+#dokument_blok_volby {
+    padding: 10px 10px;
+    margin: 0px; margin-bottom: 10px;
+    background: #f0f0f0 url() repeat-x;
+}
+
+#dokument_blok_volby a {
+    color: #000088;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    margin: 0px 10px;
+}
+
+#dokument_blok_volby a:hover {
+    color: #ff0000;
+    text-decoration: underline;
+}
+
+/* ***************************************************************** */
+/* *** BOTTOM LAYOUT *** */
+#layout_bottom {
+    margin: 0px;
+    padding: 0px;
+}
+
+#bottom {
+    width: 970px;
+    margin: 0 auto 0 auto;
+    padding: 5px 5px 5px 5px;
+    text-align: right;
+    color: #03406A;
+    font-size: 8pt;
+    background: #3E94D1 url() repeat-x;
+}
+
+#bottom a {
+    color: #03406A;
+    text-decoration: none;
+}
+
+#bottom a:hover {
+    color: #FFC273;
+    text-decoration: underline;
+}
+
+/* ***************************************************************** */
+/* *** FLASH LAYOUT *** */
+
+#flash {
+    width: 960px;
+    margin: 0 auto 0 auto;
+    padding: 10px;
+    text-align: center;
+    background: #ffffff url() repeat-x;
+}
+
+.flash_message {
+    margin-bottom: 5px;
+    padding: 15px 50px;
+    text-align: left;
+    color: #666600;
+    border: 1px #666600 solid;
+    background: #ffffcc url() repeat-x;
+}
+
+.flash_info {
+    color: #666600;
+    border: 1px #666600 solid;
+    background: #ffffcc url('../images/icons/dialog-information.png') 10px 5px no-repeat;
+}
+.flash_warning {
+    color: #681203;
+    border: 1px #681203 solid;
+    background: #ffcccc url('../images/icons/dialog-warning.png') 10px 5px no-repeat;
+}
+.flash_error {
+    color: #666600;
+    border: 1px #666600 solid;
+    background: #ffffcc url('../images/icons/dialog-error.png') 10px 5px no-repeat;
+}
+
+/* ***************************************************************** */
+/* *** LOGIN *** */
+
+#form_login {
+    text-align: center;
+}
+
+#form_login form {
+    border: 1px solid;
+    text-align: left;
+    width: 400px;
+    margin: 0 auto 0 auto;
+    padding: 10px;
+    background: #f0f0f0 url() repeat-x;
+}
+
+#form_login label {
+    text-align: right;
+    display: inline-block;
+    position: relative;
+    width: 150px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
+/* ***************************************************************** */
+/* *** SEZNAM *** */
+
+#dialog .seznam,
+#content .seznam {
+    border-collapse: collapse;
+    border: 0px;
+    width: 100%;
+}
+
+#content .seznam tr {
+}
+
+#dialog .seznam td,
+#content .seznam td {
+    vertical-align: top;
+    border: 0px;
+    border-bottom: 1px #e0e0e0 solid;
+}
+
+#dialog .seznam td.icon,
+#content .seznam td.icon {
+    text-align: center;
+    width: 38px;
+}
+
+#dialog .seznam td.icon-view,
+#content .seznam td.icon-view {
+    text-align: right;
+    width: 150px;
+}
+
+#dialog .seznam td.icon-view a,
+#content .seznam td.icon-view a {
+    border: 0px;
+    text-decoration: none;
+}
+
+#dialog .seznam td.meta,
+#content .seznam td.meta {
+    
+}
+
+#dialog .seznam td.meta a,
+#content .seznam td.meta a {
+    font-weight: bold;
+}
+
+#dialog .seznam td.meta div.info,
+#content .seznam td.meta div.info {
+    font-size: 8pt;
+}
+
+#dialog .seznam td.meta span,
+#content .seznam td.meta span {
+    color: #808080;
+}
+
+#dialog .seznam td.meta div.popis,
+#content .seznam td.meta div.popis {
+    padding: 2px 5px;
+}
+
+#dialog .seznam td.meta .vyber,
+#content .seznam td.meta .vyber {
+    font-size: 8pt;
+    padding-top: 10px;
+}
+
+#dialog .seznam td.meta .vyber a,
+#content .seznam td.meta .vyber a {
+    font-size: 8pt;
+    color: #000088;
+}
+
+#dialog .seznam td.meta .vyber a:hover,
+#content .seznam td.meta .vyber a:hover {
+    font-size: 8pt;
+    color: #ff0000;
+}
+
+#dialog .seznam td.meta_plus,
+#content .seznam td.meta_plus {
+    text-align: left;
+    width: 50%;
+}
+
+#dialog .seznam td.meta_plus div.info,
+#content .seznam td.meta_plus div.info {
+    font-size: 8pt;
+}
+
+#dialog .seznam td.meta_plus span,
+#content .seznam td.meta_plus span {
+    color: #808080;
+}
+
+#dialog .seznam td.meta_plus div.popis,
+#content .seznam td.meta_plus div.popis {
+    padding: 2px 5px;
+}
+
+#dialog .seznam td.meta_plus dl,
+#content .seznam td.meta_plus dl {
+    clear: both;
+    margin: 0px; padding: 0px;
+}
+
+#dialog .seznam td.meta_plus dt,
+#content .seznam td.meta_plus dt {
+    float: left;
+    width: 40px;
+    text-align: right;
+    /*padding-right: 20px;*/
+    color: #808080;
+    margin: 0px; padding: 0px;
+    margin-right: 5px;
+}
+
+#dialog .seznam td.meta_plus dd,
+#content .seznam td.meta_plus dd {
+    margin: 0px; padding: 0px;
+    margin-left: 45px;
+    font-weight: normal;
+}
+
+
+#dialog .seznam td.user,
+#content .seznam td.user {
+    border: 0px;
+    border-bottom: 1px #e0e0e0 solid;
+    text-align: right;
+    width: 120px;
+}
+
+#vysledek-spinner,
+#ajax-spinner {
+    position:fixed;
+    left: 50%;
+    top: 50%;
+    margin: -15px 0 0 -15px;
+    background: white url('../images/spinner.gif') no-repeat 50% 50%;
+    padding: 13px;
+    border: 2px solid #CCC;
+    font-size: 0;
+}
+
+/* ******************************************************************* */
+/* *** FILTR cONTROL *** */
+#filtr {
+    float: left;
+    margin: 20px 0px;
+    text-align: left;
+}
+#filtr #frmfiltrForm-filtr {
+    border: 1px solid #03406A;
+    color: #03406A;
+}
+#filtr #frmfiltrForm-go_filtr {
+    display: none;
+    background: #03406A;
+    border: 1px solid #03406A;
+    color: white; font-weight: bold;
+}
+
+
+/* ******************************************************************* */
+/* *** SEARCH cONTROL *** */
+#search {
+    float: right;
+    margin: 20px 0px;
+    text-align: right;
+}
+#search #frmsearchForm-dotaz {
+    border: 1px solid #03406A;
+    color: #03406A;
+}
+#search #frmsearchForm-hledat {
+    background: #03406A;
+    border: 1px solid #03406A;
+    color: white; font-weight: bold;
+}
+
+
+/* ******************************************************************* */
+/* *** PAGINATOR *** */
+
+.paginator {
+    margin: 20px 0px;
+    text-align: center;
+    /*font-size: 90%;*/
+}
+.paginator_info {
+    margin-bottom: 10px;
+    color: #03406A;
+}
+.paginator a,
+.paginator span { 
+    margin-right: 0.1em;
+    padding: 0.2em 0.5em;
+    color: #999999;
+}
+.paginator a { 
+    border: 1px solid #03406A;
+    text-decoration: none;
+    color: #03406A;
+}
+.paginator span.button { 
+    border: 1px solid #DDDDDD;
+}
+.paginator .current { 
+    background: #03406A;
+    border: 1px solid #03406A;
+    color: white; font-weight: bold;
+}
+
+
+/* ***************************************************************** */
+/* *** DEBUG LAYOUT *** */
+
+#debug {
+    width: 970px;
+    margin: 0 auto 0 auto;
+    padding: 5px 5px 5px 5px;
+    color: #FFC273;
+    font-size: 10pt;
+    background: #03406A url() repeat-x;
+    white-space: pre;
+    font-family: monospace;
+}

@@ -1,0 +1,53 @@
+    {snippet doksubjekt}
+    {if isset($chyba)}
+    <div class="flash_message flash_warning">Subjekt se nepodařilo připojit k domumentu. Zkuste to znovu.</div>
+    {/if}
+
+    <h2>Seznam subjektů</h2>
+
+    <div class="blok_menu">
+        <a href="{link :Epodatelna:Subjekty:novy}" onclick="return novySubjekt(this);">Nový subjekt</a>
+    </div>
+
+    {if count($seznam)>0}
+    <table class="seznam">
+        {foreach $seznam as $subjekt}
+        <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <strong>
+                    <a href="{link :Epodatelna:Subjekty:vybrano, 'id'=>$subjekt->subjekt_id, 'epod_id'=>$epodatelna_id, 'typ'=>'OA' }" onclick="epodSubjektVybran(this); return false;">{=Subjekt::displayName($subjekt,'jmeno_item')}</a>
+                </strong>&nbsp;
+                <div class="info">
+                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
+                <br />
+                {=Subjekt::displayName($subjekt,'adresa')}
+                </div>
+            </td>
+            <td class="meta_plus">
+                &nbsp;
+                <div class="info">
+                <dl>
+                    <dt>email:</dt>
+                    <dd>{$subjekt->email}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>telefon:</dt>
+                    <dd>{$subjekt->telefon}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>isds:</dt>
+                    <dd>{$subjekt->id_isds}&nbsp;</dd>
+                </dl>
+
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    {else}
+    <div class="prazdno">Nebyli zjištěni žádné subjekty.</div>
+    {/if}
+    {/snippet}

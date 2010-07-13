@@ -1,0 +1,25 @@
+{snippet dokspojit}
+{if isset($chyba)}
+    <div class="flash_message flash_warning">Sovisející dokument se nepodařilo spojit s domumentem. Zkuste to znovu.</div>
+{/if}
+
+    <div class="detail_blok">
+        Zadejte sekvencí minimálně dvou znaků čísla jednacího nebo JID nebo věci, aby se zobrazil seznam odpovidajících dokumentů.
+        <br />
+        Pote potvrďte kliknutím na odkaz daného dokumentu.
+        <form action="" method="get" onsubmit="return false;">
+            <input type="hidden" name="dokument_id" value="{$dokument_id}" id="dokumentid">
+        <dl class="detail_item">
+            <dt>Sekvence znaků:</dt>
+            <dd><input type="text" name="query" value="" size="60" onkeyup="return hledejDokument(this);" /></dd>
+        </dl>
+        </form>
+    </div>
+        
+    <div id="vysledek-spinner" style="display: none;"></div>
+
+    <div class="detail_blok">
+        <div id="vysledek"></div>
+    </div>
+
+{/snippet}

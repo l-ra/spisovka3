@@ -1,0 +1,91 @@
+{capture $html_out}
+    {if count($seznam)>0}
+    <table cellspacing="0" cellpadding="1" border="1">
+        <tr>
+            {foreach $sloupce as $sl}
+            <th>{$sloupce_nazvy[$sl]}</th>
+            {/foreach}
+        </tr>
+        {foreach $seznam as $dok}
+        <tr>
+            {foreach $sloupce as $sl}
+            <td>
+            {if $sl=='spis'}
+                {if count($dok->spisy)>0}
+                {foreach $dok->spisy as $spis}
+            {$spis->nazev}
+                {/foreach}
+                {else}
+            &nbsp;
+                {/if}
+            {elseif $sl=='subjekty'}
+                {if count($dok->subjekty)>0}
+                {foreach $dok->subjekty as $subjekt}
+            {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
+                {/foreach}
+                {else}
+            &nbsp;
+                {/if}
+            {elseif $sl=='pocet_nelistu'}
+                {=count($dok->prilohy)}
+            {elseif $sl=='vyridil'}
+                {if empty($dok->prideleno->prideleno_jmeno)}
+            &nbsp;
+                {else}
+            {$dok->prideleno->prideleno_jmeno}
+                {/if}
+            {elseif $sl=='datum_odeslani'}
+                {if count($dok->odeslani)}
+                {foreach $dok->odeslani as $odes}
+            {$odes->datum_odeslani|edate}<br />
+                {/foreach}
+                {else}
+            &nbsp;
+                {/if}
+            {elseif $sl=='zaznam_vyrazeni'}
+            &nbsp;
+            {elseif $sl=='datum_vzniku'}
+            {$dok->datum_vzniku|edate}
+
+
+
+                
+            {else}
+            {$dok->$sl}
+            {/if}
+            </td>
+            {/foreach}
+        </tr>
+        {/foreach}
+
+
+    </table>
+    {else}
+    <div style="text-align: center; margin-top: 15px;">
+        Tato sestava neobsahuje žádné dokumenty.
+    </div>
+    {/if}
+{/capture}<?php
+
+            $app_info = Environment::getVariable('app_info');
+            $app_info = explode("#",$app_info);
+            $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
+
+            $pdf = new SestavaPDF('L',PDF_UNIT, PDF_PAGE_FORMAT, true, 'utf-8', false);
+            $pdf->SetCreator($app_name);
+            $pdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+            $pdf->SetTitle('Sestava');
+
+            $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+            $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+            $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+            $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+            $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+            //$pdf->setLanguageArray($l);
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->AddPage();
+
+            $pdf->writeHTML($html_out, true, false, false, false, '');
+
+            $pdf->Output('sestava.pdf', 'I');
+?>

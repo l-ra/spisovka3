@@ -1,0 +1,223 @@
+@{block title}Zaevidovat dokument{/block}
+@{block debug}
+<?php print_r($Subjekt); ?>
+<?php print_r($Prilohy); ?>
+@{/block}
+@{block content}
+
+    <div class="navigate">
+    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> - Nový dokument
+    </div>
+
+    {$novyForm->render('begin')}
+    <div id="dokument_blok_hlavni">
+        <dl class="detail_item">
+            <dt>Číslo jednací:</dt>
+            <dd>{$cjednaci->cislo_jednaci}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Typ dokumentu:</dt>
+            <dd>{$novyForm['typ_dokumentu']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>Spisová značka:</dt>
+            <dd><span id="dok_spis"></span>&nbsp;<a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->dokument_id}" id="dialog-spis">Připojit spisovou značku</a></dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Věc:</dt>
+            <dd>{$novyForm['nazev']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Popis:</dt>
+            <dd>{$novyForm['popis']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum a čas doručení:</dt>
+            <dd>{$novyForm['datum_vzniku']->control} {$novyForm['datum_vzniku_cas']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Číslo jednací odesilatele:</dt>
+            <dd>{$novyForm['cislo_jednaci_odesilatele']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Zmocnění:</dt>
+            <dd><span id="dok_zmocneni"></span>&nbsp;<a href="{link :Spisovka:Dokumenty:zmocneni, 'id'=>$Dok->dokument_id}" id="dialog-zmocneni">Připojit zmocnění</a></dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka:</dt>
+            <dd>{$novyForm['poznamka']->control}</dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_poznamka">
+        <div>Předání / vyřízení</div>
+        <dl class="detail_item">
+            <dt>Přiděleno:</dt>
+            <dd>
+                {$Prideleno}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Lhůta k vyřízení:</dt>
+            <dd>{$novyForm['lhuta']->control} dní</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka:</dt>
+            <dd>{$novyForm['predani_poznamka']->control}</dd>
+        </dl>
+
+    </div>
+    
+    <div id="dokument_blok_subjekty">
+        <div class="h2">
+            Odesílatel zprávy
+        </div>
+        <div id="dok-subjekty1">
+        <table class="seznam">
+            <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/subjekt/ovm.png" alt="obrazek" title="obrazek" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <strong>
+                    {if !empty($Subjekt['original']->nazev_subjektu)}{$Subjekt['original']->nazev_subjektu}<br />{/if}
+                    {if !empty($Subjekt['original']->prijmeni)}{$Subjekt['original']->prijmeni}<br />{/if}
+                    &nbsp;
+                </strong>
+                <div class="info">
+                    <span>{if !empty($Subjekt['original']->type)}{$Subjekt['original']->type} - {=Subjekt::typ_subjektu($Subjekt['original']->type)}{/if}&nbsp;</span>
+                <br />
+                {=Subjekt::displayName($Subjekt['original'],'adresa')}
+                </div>
+            </td>
+            <td class="meta_plus">
+                &nbsp;
+                <div class="info">
+                <dl>
+                    <dt>email:</dt>
+                    <dd>{if !empty($Subjekt['original']->email)}{$Subjekt['original']->email}{/if}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>isds:</dt>
+                    <dd>{if !empty($Subjekt['original']->id_isds)}{$Subjekt['original']->id_isds}{/if}&nbsp;</dd>
+                </dl>
+
+                </div>
+            </td>
+        </tr>
+        </table>
+        </div>
+
+        <br />
+        <div class="h2">
+            Nalezené shody s odesilatelem zprávy
+        </div>
+        <div class="blok_akce">
+            <a href="{link :Epodatelna:Subjekty:novy, 'id'=>0, 'epod_id'=>$Zprava->epodatelna_id}" id="dialog-novysubjekt">Vytvořit nový subjekt z odesílatele</a>
+            &nbsp;&nbsp;&nbsp;
+            <a href="{link :Epodatelna:Subjekty:vyber, 'id'=>0, 'epod_id'=>$Zprava->epodatelna_id}" id="dialog-subjekt">Vyhledat subjekt</a>
+        </div>
+        <div id="dok-subjekty">
+        {if count($Subjekt['databaze'])>0}
+        <table class="seznam" id="subjekty-table">
+            <tr>
+            <td class="icon">
+                Použít
+            </td>
+            <td class="icon">
+                &nbsp;
+            </td>
+            <td class="meta">
+                &nbsp;
+            </td>
+            <td class="meta_plus">
+                &nbsp;
+            </td>
+            </tr>
+            {foreach $Subjekt['databaze'] as $subjekt}
+            <tr>
+            <td class="icon">
+                <input type="checkbox" name="subjekt[{$subjekt->subjekt_id}]" />
+            </td>
+            <td class="icon">
+                <img src="{$baseUri}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
+                <div class="info">
+                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
+                <br />
+                {=Subjekt::displayName($subjekt,'adresa')}
+                </div>
+                <div class="vyber">
+                    <a href="{link :Spisovka:Subjekty:zmenit, 'id'=>$subjekt->subjekt_id }" >upravit</a>&nbsp;&nbsp;
+                </div>
+            </td>
+            <td class="meta_plus">
+                &nbsp;
+                <div class="info">
+                <dl>
+                    <dt>email:</dt>
+                    <dd>{$subjekt->email}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>telefon:</dt>
+                    <dd>{$subjekt->telefon}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>isds:</dt>
+                    <dd>{$subjekt->id_isds}&nbsp;</dd>
+                </dl>
+
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+        </table>
+        {else}
+        <div class="prazdno">
+            Nebyly nalezeny žádné shody s odesílatelem.
+            <br />
+            Odesilatel není v databázi nebo se nepodařilo jeho záznam nalézt.
+        </div>
+        {/if}
+        </div>
+        
+    </div>
+
+    <div id="dokument_blok_prilohy">
+    <div class="h2">
+        Přílohy
+    </div>
+    <div id="dok-prilohy">
+    {if count($Prilohy)>0}
+    <table class="seznam">
+        {foreach $Prilohy as $priloha}
+        <tr>
+            <td class="icon">
+                <img src="{$baseUri}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->epodatelna_id, 'file'=>$priloha['id']}">{$priloha['name']}</a>
+                <div class="info">
+                <span>{$priloha['size']|bytes}, {$priloha['mimetype']}</span>
+                </div>
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+    {else}
+        <div class="prazdno">Zpráva neobsahuje žádné přílohy.</div>
+    {/if}
+    </div>
+    </div>
+
+    <div id="dokument_blok_akce">
+        {$novyForm['novy']->control}
+        &nbsp;&nbsp;
+        {$novyForm['storno']->control}
+    </div>
+    {$novyForm->render('end')}
+
+    <div id="dialog"></div>

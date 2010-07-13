@@ -1,0 +1,33 @@
+{block title}Seznam dokumentů{/block}
+{block content}
+    <div class="navigate">
+    Seznam spisových znaků
+    </div>
+
+    <h2>Seznam spisových znaků</h2>
+
+    <div class="blok_menu">
+        <a href="{link :Admin:Spisznak:novy}">Nový spisový znak</a>
+    </div>
+
+    {if count($seznam)>0}
+    <table>
+        {foreach $seznam as $spisznak}
+        <tr class="{$spisznak->class}" id="sitem{$spisznak->spisznak_id}">
+            <td>
+                {!=str_repeat("&nbsp;", 5*$spisznak->uroven)}
+                <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
+                &nbsp;&nbsp;
+                <a href="{link :Admin:Spisznak:detail, id => $spisznak->spisznak_id}">{$spisznak->nazev}</a>
+            </td>
+        </tr>
+        {/foreach}
+        
+    </table>
+    {else}
+    <div class="prazdno">Nebyly zjištěny žádné spisové znaky.</div>
+    {/if}
+
+    <pre><?php //print_r($seznam); ?></pre>
+    <?php //Debug::dump($seznam); ?>
+

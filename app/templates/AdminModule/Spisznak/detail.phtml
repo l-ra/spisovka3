@@ -1,0 +1,43 @@
+{block title}Seznam dokumentů{/block}
+{block content}
+    <div class="navigate">
+    <a href="{link :Admin:Spisznak:seznam}">Seznam spisových znaků</a> - Detail
+    </div>
+    <h2>{$SpisZnak->nazev}{if !empty($SpisZnak->popis)} - {$SpisZnak->popis}{/if}</h2>
+
+        {if ($FormUpravit=='info')}
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+        {control $upravitForm}
+    </div>
+        {else}
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+
+        <dl class="detail_item">
+            <dt>Spisový znak:</dt>
+            <dd>{$SpisZnak->nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Popis:</dt>
+            <dd>{$SpisZnak->popis}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační znak:</dt>
+            <dd>{$SpisZnak->skartacni_znak}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační lhůta:</dt>
+            <dd>{$SpisZnak->skartacni_lhuta}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spouštěcí událost:</dt>
+            <dd>{=SpisovyZnak::spousteci_udalost($SpisZnak->spousteci_udalost)}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Stav:</dt>
+            <dd>{=SpisovyZnak::stav($SpisZnak->stav)}&nbsp;</dd>
+        </dl>
+        <a href="{link :Admin:Spisznak:detail, 'id'=>$SpisZnak->spisznak_id, 'upravit'=>'info'}">Upravit</a>
+    </div>
+        {/if}

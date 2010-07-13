@@ -1,0 +1,28 @@
+{block title}Seznam dokumentů{/block}
+{block content}
+    <div class="navigate">
+    Seznam organizačních jednotek
+    </div>
+
+    <h2>Seznam organizačních jednotek</h2>
+
+    <div class="blok_menu">
+        <a href="{link :Admin:Orgjednotky:novy}">Nová organizační jednotka</a>
+    </div>
+    {if count($seznam)>0}
+    <table class="seznam">
+        <tr>
+            <th>Zkratka / číselná řada</th>
+            <th>Název organizační jednotky</th>
+        </tr>
+        {foreach $seznam as $org}
+        <tr>
+            <td style="width:100px;">{$org->ciselna_rada}</td>
+            <td><a href="{link :Admin:Orgjednotky:detail, 'id'=>$org->orgjednotka_id}">{$org->zkraceny_nazev}</a></td>
+        </tr>
+        {/foreach}
+    </table>
+    {widget vp}
+    {else}
+    <div class="prazdno">Nebyly zjištěny žádné organizační jednotky.</div>
+    {/if}

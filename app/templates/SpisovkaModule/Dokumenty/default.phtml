@@ -1,0 +1,150 @@
+@{block title}Seznam dokumentů{/block}
+@{block debug}
+<?php print_r($seznam); ?>
+@{/block}
+@{block content}
+    <h2>Seznam dokumentů</h2>
+
+    <div id="filtr">
+        {control filtrForm}
+    </div>
+    <div id="search">
+        {control searchForm}
+    </div>
+    
+    <div style="clear:both;">&nbsp;</div>
+
+
+    <div id="dokumenty">
+    {if count($seznam)>0}
+    <table>
+
+        <tr>
+            <th class="typ">Typ dokumentu</th>
+            <th class="prijato">Přijato</th>
+            <th class="cislo_jadnaci">Číslo jednací<br />Spisová značka</th>
+            <th class="vec">Věc<br />Adresáti/odesilatelé<br />počet listů a příloh</th>
+            <th class="prideleno">Přiděleno</th>
+            <th class="stav">Stav</th>
+        </tr>
+
+        {foreach $seznam as $dok}
+        <tr>
+            <td class="typ">
+                <img src="{$baseUri}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
+                <img src="{$baseUri}images/icons/typdok{$dok->typ_dokumentu->typ}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="24" height="16" />
+            </td>
+            <td class="prijato">
+                {$dok->datum_vzniku|edate}
+            </td>
+            <td class="cislo_jadnaci">
+                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
+                   {$dok->cislo_jednaci}
+                </a></strong>
+                <br />
+                {if count($dok->spisy)>0}
+                {foreach $dok->spisy as $spis}
+                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->spis_id}">{$spis->nazev}</a><br />
+                {/foreach}
+                {/if}
+            </td>
+            <td class="vec">
+                <strong title="{$dok->popis}"><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
+                    {$dok->nazev}
+                </a></strong>
+                <br />
+                {if count($dok->subjekty)>0}
+                {foreach $dok->subjekty as $subjekt}
+                {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
+                {/foreach}
+                {else}
+                nejsou přiděleny žádné subjekty!<br />
+                {/if}
+                přílohy:
+                {=($dok->pocet_listu)+0} listů,
+                {=($dok->pocet_priloh)+0} list. příloh,
+                {=(count($dok->prilohy)+0)} příloh,
+            </td>
+
+
+
+            {if $dok->stav_dokumentu == 1}
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+            </td>
+            <td class="stav">
+                nový
+                <br />
+                {$dok->prideleno->date|edate}
+            </td>
+            {elseif $dok->stav_dokumentu == 2 && !empty($dok->predano) }
+            <td class="prideleno">
+                {$dok->predano->prideleno_jmeno}
+            </td>
+            <td class="stav">
+                předáno
+                <br />
+                {$dok->predano->date_predani|edate}
+            </td>
+            {elseif $dok->stav_dokumentu == 2 && !empty($dok->prideleno) }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+            </td>
+            <td class="stav">
+                přiděleno
+                <br />
+                {$dok->prideleno->date|edate}
+            </td>
+            {elseif $dok->stav_dokumentu == 3 }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+            </td>
+            <td class="stav">
+                vyřizuje se
+                <br />
+                {$dok->prideleno->date|edate}
+            </td>
+            {elseif $dok->stav_dokumentu == 4 }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+            </td>
+            <td class="stav">
+                vyřízeno
+                <br />
+                {$dok->datum_vyrizeni|edate}
+            </td>
+            {else}
+            <td class="prideleno">
+                &nbsp;
+            </td>
+            <td class="stav">
+                nepřiřazeno!
+                <br />
+                lhůta {$dok->lhuta} dní
+            </td>
+            {/if}
+
+
+
+        </tr>
+        {/foreach}
+
+
+    </table>
+    {widget vp}
+    {else}
+        <div>&nbsp;</div>
+        {if isset($no_items)}
+        {if $no_items==1}
+        <div class="prazdno">Nemáte k dispozici žádné dokumenty.</div>
+        {elseif $no_items==2}
+        <div class="prazdno">K danému filtru nemáte k dispozici žádné dokumenty.</div>
+        {elseif $no_items==3}
+        <div class="prazdno">Dokument odpovidající hledanému výrazu nebyl nalezen.</div>
+        {/if}
+        {else}
+    <div class="prazdno">Nebyly zjištěny žádné dokumenty.</div>
+        {/if}
+    {/if}
+    </div>
+

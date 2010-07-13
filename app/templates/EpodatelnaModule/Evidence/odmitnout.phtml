@@ -1,0 +1,17 @@
+    {snippet epododmitnout}
+    {if isset($chyba)}
+    <div class="flash_message flash_warning">Zpravu se nepodařilo odmítnou.</div>
+    {/if}
+
+    <h2>Odmítnout zprávu</h2>
+    
+    {if !empty($Zprava->email_signature)}
+    {control odmitnoutEmailForm}
+    {elseif !empty($Zprava->isds_signature)}
+    {control odmitnoutISDSForm}
+    {/if}
+
+
+
+
+    {/snippet}

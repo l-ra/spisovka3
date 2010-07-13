@@ -1,0 +1,61 @@
+{block title}Informace o uživateli{/block}
+{block content}
+    <h2>{=Osoba::displayName($Osoba)}</h2>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Informace o uživateli</div>
+        {if ($FormUpravit=='info')}
+        {control upravitForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Jméno:</dt>
+            <dd>{=Osoba::displayName($Osoba)}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>email:</dt>
+            <dd>{$Osoba->email}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>telefon:</dt>
+            <dd>{$Osoba->telefon}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>funkce:</dt>
+            <dd>{$Osoba->pozice}&nbsp;</dd>
+        </dl>
+        <a href="{link :Spisovka:Uzivatel:default, 'id'=>$Osoba->osoba_id, 'upravit'=>'info'}">Upravit osobní údaje</a>
+        {/if}
+    </div>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Uživatelský účet</div>
+        <dl class="detail_item">
+            <dt>Uživatelské jméno:</dt>
+            <dd>{$Uzivatel->username}&nbsp;</dd>
+        </dl>
+        {if ($ZmenaHesla==1)}
+        {control userForm}
+        {/if}
+        <dl class="detail_item">
+            <dt>Poslední přihlášení:</dt>
+            <dd>{if $Uzivatel->last_login}{$Uzivatel->last_login|edate}  z  {$Uzivatel->last_ip}{/if}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Role:</dt>
+            <dd>
+                {if count($Role)>0}
+                    {foreach $Role as $r}
+                        {$r->name}<br />
+                    {/foreach}
+                {else}
+                Tento uživatel není přiřazen k žádné roli
+                {/if}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                <a href="{link :Spisovka:Uzivatel:default, 'zmenitheslo'=>1}">Změnit heslo</a>
+            </dd>
+        </dl>
+    </div>
