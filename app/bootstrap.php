@@ -5,10 +5,11 @@ require LIBS_DIR . '/Nette/loader.php';
 
 // Step 2: Configure environment
 // 2a) enable Nette\Debug for better exception and error visualisation
-
 //if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1') {
+    Environment::setMode(Environment::DEVELOPMENT);
     Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error.log');
 //} else {
+//    Environment::setMode(Environment::PRODUCTION);
 //    Debug::enable(Debug::PRODUCTION, '%logDir%/php_error.log');
 //}
 
@@ -83,7 +84,7 @@ Mail::$defaultMailer = 'ESSMailer'; // nebo new MyMailer
 dibi::connect(Environment::getConfig('database'));
 dibi::addSubst('PREFIX', Environment::getConfig('database')->prefix);
 if ( !Environment::isProduction() ) {
-    dibi::getProfiler()->setFile(APP_DIR .'/log/mysql.log');
+    dibi::getProfiler()->setFile(APP_DIR .'/log/mysql_'. KLIENT .'.log');
 }
 define('DB_PREFIX', Environment::getConfig('database')->prefix);
 
@@ -113,7 +114,7 @@ if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_
 	));
 	// Error
         $router[] = new Route('error/<action>/<id>', array(
-                'module'    => 'Spisovka',
+                /*'module'    => 'Spisovka',*/
                 'presenter' => 'Error',
 		'action' => 'default',
 		'id' => NULL,

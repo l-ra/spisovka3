@@ -39,6 +39,10 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $param = array( array('file_id=%i',$file_id),array('dokument_id=%i',$dokument_id) );
 
         if ( $DokumentPrilohy->odebrat($param) ) {
+            $Log = new LogModel();
+            $FileModel = new FileModel();
+            $file_info = $FileModel->getInfo($file_id);
+            $Log->logDokument($dokument_id, LogModel::PRILOHA_ODEBRANA,'Odebrána příloha "'. $file_info->nazev .' ('. $file_info->real_name .')"');
             $this->flashMessage('Příloha byla úspěšně odebrána.');
         } else {
             $this->flashMessage('Přílohu se nepodařilo odebrat. Zkuste to znovu.','warning');
@@ -108,6 +112,12 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             $this->template->chyba = $file;
             $DokumentPrilohy = new DokumentPrilohy();
             if ($DokumentPrilohy->pripojit($dokument_id, $file->file_id)) {
+
+                $Log = new LogModel();
+                $FileModel = new FileModel();
+                $file_info = $FileModel->getInfo($file->file_id);
+                $Log->logDokument($dokument_id, LogModel::PRILOHA_PRIDANA,'Přidána příloha "'. $file_info->nazev .' ('. $file_info->real_name .')"');
+
                 echo '###vybrano###'. $dokument_id;
                 $this->terminate();
             } else {
@@ -193,6 +203,13 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                 $DokumentPrilohy = new DokumentPrilohy();
                 if ($DokumentPrilohy->pripojit($dokument_id, $file->file_id)) {
                     $DokumentPrilohy->deaktivovat($dokument_id, $file_id); // deaktivujeme puvodni prilohu
+
+                    $Log = new LogModel();
+                    $FileModel = new FileModel();
+                    $file_info1 = $FileModel->getInfo($file_id);
+                    $file_info2 = $FileModel->getInfo($file->file_id);
+                    $Log->logDokument($dokument_id, LogModel::PRILOHA_ZMENENA,'Změněna příloha z "'. $file_info1->nazev .' ('. $file_info1->real_name .')" na "'. $file_info2->nazev .' ('. $file_info2->real_name .')"');
+
                     echo '###vybrano###'. $dokument_id;
                     $this->terminate();
                 } else {

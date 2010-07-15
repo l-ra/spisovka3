@@ -261,6 +261,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( $Workflow->prirazeny($dokument_id) ) {
             if ( $Workflow->vyrizuje($dokument_id, $user_id) ) {
                $Workflow->zrusit_prevzeti($dokument_id);
+
                $this->flashMessage('Převzal jste tento dokument k vyřízení.');
             } else {
                 $this->flashMessage('Označení dokumentu k vyřízení se nepodařilo. Zkuste to znovu.','warning');
@@ -281,8 +282,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
             if ( $Workflow->vyrizeno($dokument_id, $user_id) ) {
-               $Workflow->zrusit_prevzeti($dokument_id);
-               $this->flashMessage('Označil jste tento dokument za vyřízený!');
+                $Workflow->zrusit_prevzeti($dokument_id);
+                $this->flashMessage('Označil jste tento dokument za vyřízený!');
             } else {
                 $this->flashMessage('Označení dokumentu za vyřízený se nepodařilo. Zkuste to znovu.','warning');
             }
@@ -558,6 +559,20 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
     }
 
+    public function renderHistorie()
+    {
+
+        $dokument_id = $this->getParam('id',null);
+
+        $Log = new LogModel();
+        $historie = $Log->historieDokumentu($dokument_id);
+        $this->template->historie = $historie;
+
+        //$Workflow = new Workflow();
+        //$this->template->workflow = $Workflow->dokument($dokument_id);
+
+    }
+
     public function actionOdeslat()
     {
 
@@ -753,6 +768,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $Workflow = new Workflow();
                 $Workflow->vytvorit($dokument_id,$predani_poznamka);
 
+                $Log = new LogModel();
+                $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
+
                 $this->flashMessage('Dokument byl vytvořen.');
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             } else {
@@ -860,6 +878,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         try {
 
             $dokument = $Dokument->ulozit($data,$dokument_id);
+
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN, 'Upravena metadata dokumentu.');
 
             $this->flashMessage('Dokument "'. $dok->cislo_jednaci .'"  byl upraven.');
             $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
@@ -971,6 +992,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         try {
 
             $dokument = $Dokument->ulozit($data,$dokument_id);
+
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN, 'Upravena data vyřízení.');
 
             $this->flashMessage('Dokument "'. $dok->cislo_jednaci .'"  byl upraven.');
             $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
@@ -1130,14 +1154,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         //echo "  => emailem";
                         if ( !empty($adresat->email) ) {
                             if ( $zprava = $this->odeslatEmailem($adresat, $data, $prilohy) ) {
-                                $this->flashMessage('Zpráva na emailovou adresu "" byla úspěšně odeslána.');
-
+                                $Log = new LogModel();
+                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
+                                $this->flashMessage('Zpráva na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" byla úspěšně odeslána.');
                             } else {
-                                $this->flashMessage('Zprávu na emailovou adresu "" se nepodařilo odeslat!','warning');
+                                $this->flashMessage('Zprávu na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" se nepodařilo odeslat!','warning');
                                 continue;
                             }
                         } else {
-                            $this->flashMessage('Subjekt "" nemá emailovou adresu. Zprávu tomuto adresátovi nelze poslat přes email!','warning');
+                            $this->flashMessage('Subjekt "'. Subjekt::displayName($adresat,'email') .'" nemá emailovou adresu. Zprávu tomuto adresátovi nelze poslat přes email!','warning');
                             continue;
                         }
                     } elseif ( $metoda_odeslani == 2 ) {
@@ -1145,24 +1170,48 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         //echo "  => isds";
                         if ( !empty($adresat->id_isds) ) {
                             if ( $zprava = $this->odeslatISDS($adresat, $data, $prilohy) ) {
-                                $this->flashMessage('Datová zpráva pro "" byla úspěšně odeslána do systému ISDS.');
-
+                                $Log = new LogModel();
+                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
+                                $this->flashMessage('Datová zpráva pro "'. Subjekt::displayName($adresat,'isds') .'" byla úspěšně odeslána do systému ISDS.');
                             } else {
-                                $this->flashMessage('Datoovu zprávu pro "" se nepodařilo odeslat do systému ISDS!','warning');
+                                $this->flashMessage('Datoovu zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo odeslat do systému ISDS!','warning');
                                 continue;
                             }
                         } else {
-                            $this->flashMessage('Subjekt "" nemá ID datové schránky. Zprávu tomuto adresátovi nelze poslat přes datovou schránku!','warning');
+                            $this->flashMessage('Subjekt "'. Subjekt::displayName($adresat,'jmeno') .'" nemá ID datové schránky. Zprávu tomuto adresátovi nelze poslat přes datovou schránku!','warning');
                             continue;
                         }
 
                     } else {
                         // jinak - externe (posta, fax, osobne, ...)
                         //echo "  => jinak";
+
                         if ( isset($post_data['datum_odeslani'][$subjekt_id]) ) {
                             $datum_odeslani = new DateTime( $post_data['datum_odeslani'][$subjekt_id] );
                         }
 
+                        $Log = new LogModel();
+                        switch ($metoda_odeslani) {
+                            case 1:
+                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
+                                break;
+                            case 2:
+                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
+                                break;
+                            case 3:
+                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán poštou na adresu "'. Subjekt::displayName($adresat) .'".');
+                                break;
+                            case 4:
+                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán faxem na číslo "'. Subjekt::displayName($adresat,'telefon') .'".');
+                                break;
+                            case 5:
+                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán osobně "'. Subjekt::displayName($adresat,'jmeno') .'".');
+                                break;
+                            case 6:
+                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán telefonicky na číslo "'. Subjekt::displayName($adresat,'telefon') .'".');
+                                break;
+                            default: break;
+                        }
 
                     }
 
@@ -1188,8 +1237,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         'zprava' => $zprava_odes
                     );
                     $DokumentOdeslani->ulozit($row);
-
-
                     
                 }
 

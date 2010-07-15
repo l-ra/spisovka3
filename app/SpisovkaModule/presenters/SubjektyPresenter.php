@@ -41,6 +41,9 @@ class Spisovka_SubjektyPresenter extends BasePresenter
             $DokumentSubjekt = new DokumentSubjekt();
             $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, $typ);
 
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::SUBJEKT_PRIDAN,'Přidán subjekt "'. Subjekt::displayName($subjekt,'jmeno') .'"');
+
             echo '###vybrano###'. $dokument_id;//. $spis->nazev;
             $this->terminate();
 
@@ -69,6 +72,12 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $param = array( array('subjekt_id=%i',$subjekt_id),array('dokument_id=%i',$dokument_id) );
 
         if ( $seznam = $DokumentSubjekt->odebrat($param) ) {
+
+            $Log = new LogModel();
+            $Subjekt = new Subjekt();
+            $subjekt_info = $Subjekt->getInfo($subjekt_id);
+            $Log->logDokument($dokument_id, LogModel::SUBJEKT_ODEBRAN,'Odebrán subjekt "'. Subjekt::displayName($subjekt_info,'jmeno') .'"');
+
             $this->flashMessage('Subjekt byl úspěšně odebrán.');
         } else {
             $this->flashMessage('Subjekt se nepodařilo odebrat. Zkuste to znovu.','warning');
@@ -276,6 +285,10 @@ class Spisovka_SubjektyPresenter extends BasePresenter
             $DokumentSubjekt = new DokumentSubjekt();
             $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, $smer);
 
+            $subjekt_info = $Subjekt->getInfo($subjekt_id);
+            //$Log = new LogModel();
+            //$Log->logDokument($dokument_id, LogModel::SUBJEKT_ZMENEN,'Změněn subjekt "'. Subjekt::displayName($subjekt_info) .'"');
+
             if (!$this->isAjax()) {
                 //$this->redirect('this');
                 echo "###zmeneno###".$dokument_id; exit;
@@ -392,6 +405,10 @@ class Spisovka_SubjektyPresenter extends BasePresenter
             } else {
                 $this->invalidateControl('doksubjekt');
             }
+
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::SUBJEKT_VYTVOREN,'Vytvořen nový subjekt "'. Subjekt::displayName($subjekt,'jmeno') .'"');
+
 
             $this->flashMessage('Subjekt  "'. Subjekt::displayName($data,'jmeno') .'"  byl vytvořen.');
             //$this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id));

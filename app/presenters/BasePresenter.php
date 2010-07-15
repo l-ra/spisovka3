@@ -13,6 +13,30 @@ abstract class BasePresenter extends Presenter
         $user->setNamespace(KLIENT);
         // Nema uzivatel pristup na tuto stranku?
 
+        if (!$user->isAllowed($this->reflection->name, $this->getAction())) {
+            // Nema volne opravneni zobrazit stranku
+            if (!$user->isAuthenticated()) {
+                if ($user->getSignOutReason() === User::INACTIVITY) {
+                    $this->flashMessage('Uplynula doba neaktivity! Systém vás z bezpečnostných důvodu odhlásil.', 'warning');
+                }
+                if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
+                    $backlink = $this->getApplication()->storeRequest();
+                    $this->redirect(':Spisovka:Uzivatel:login', array('backlink' => $backlink));
+                }
+            } else {
+                // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku
+                if (!( $this->name == "Error" && $this->view == "noaccess" )) {
+                    //$this->forward(':Error:noaccess',array('param'=>array('resource'=>$this->reflection->name,'privilege'=>$this->getAction())));
+                    $this->forward(':Error:noaccess');
+                } else if (!( $this->name == "Spisovka:Error" && $this->view == "noaccess" )) {
+                    //$this->forward(':Error:noaccess',array('param'=>array('resource'=>$this->reflection->name,'privilege'=>$this->getAction())));
+                    $this->forward(':Spisovka:Error:noaccess');
+                }
+            }
+        }
+
+
+/*
         // Je uzivatel prihlasen?
             if (!$user->isAuthenticated()) {
                 if ($user->getSignOutReason() === User::INACTIVITY) {
@@ -39,7 +63,7 @@ abstract class BasePresenter extends Presenter
                     }
                 }
             }
-
+*/
 
         parent::startup();
     }
@@ -49,29 +73,37 @@ abstract class BasePresenter extends Presenter
         //$this->template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
 
         // Helper escapovaný nl2br
-        function enl2br($string) {
-            return nl2br(htmlspecialchars($string));
+        if (!function_exists('enl2br') ) {
+            function enl2br($string) {
+                return nl2br(htmlspecialchars($string));
+            }
         }
         $this->template->registerHelper('enl2br', 'enl2br');
         // Helper vlastni datovy format
-        function edate($string,$format = null) {
-            $unixtime = strtotime($string);
-            if ( empty($unixtime) ) return "";
-            if ( !is_null($format) ) {
-                return date($format,$unixtime);
-            } else {
-                return date('j.n.Y',$unixtime);
+        if (!function_exists('edate') ) {
+            function edate($string,$format = null) {
+                $unixtime = strtotime($string);
+                if ( empty($unixtime) ) return "";
+                if ( !is_null($format) ) {
+                    return date($format,$unixtime);
+                } else {
+                    return date('j.n.Y',$unixtime);
+                }
             }
         }
         $this->template->registerHelper('edate', 'edate');
-        function edatetime($string) {
-            $unixtime = strtotime($string);
-            if ( empty($unixtime) ) return "";
-            return date('j.n.Y G:i:s',$unixtime);
+        if (!function_exists('edatetime') ) {
+            function edatetime($string) {
+                $unixtime = strtotime($string);
+                if ( empty($unixtime) ) return "";
+                return date('j.n.Y G:i:s',$unixtime);
+            }
         }
         $this->template->registerHelper('edatetime', 'edatetime');
-        function num($string) {
-            return (int) $string;
+        if (!function_exists('num') ) {
+            function num($string) {
+                return (int) $string;
+            }
         }
         $this->template->registerHelper('num', 'num');
 
@@ -93,6 +125,7 @@ abstract class BasePresenter extends Presenter
             $this->template->presenter = substr($this->name, $a + 1);
 	}
 
+
         if (in_array('programator', Environment::getUser()->getRoles())) {
             $this->template->debuger = TRUE;
         } else {
@@ -109,9 +142,12 @@ abstract class BasePresenter extends Presenter
         /**
          * Nastaveni layoutu podle modulu
          */
+
         if ( $service_mode == 1 && $_SERVER['REMOTE_ADDR'] != '62.177.76.50' ) {
             $this->setLayout('offline');
         } else if ( $this->name == "Spisovka:Uzivatel" && $this->view == "login" ) {
+            $this->setLayout('login');
+        } else if ( ($this->name == "Error") && (!Environment::getUser()->isAuthenticated()) ) {
             $this->setLayout('login');
         } else if ( $this->template->module == "Admin" ) {
             $this->setLayout('admin');

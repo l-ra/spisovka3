@@ -8,6 +8,7 @@ class ErrorPresenter extends BasePresenter
 	 */
 	public function renderDefault($exception)
 	{
+
 		if ($this->isAjax()) {
 			$this->getAjaxDriver()->events[] = array('error', $exception->getMessage());
 			$this->terminate();
@@ -19,7 +20,6 @@ class ErrorPresenter extends BasePresenter
 				Environment::getHttpResponse()->setCode($exception->getCode());
 				$this->template->title = '404 Not Found';
 				$this->setView('404');
-
 			} else {
 				Environment::getHttpResponse()->setCode(500);
 				$this->template->title = '500 Internal Server Error';

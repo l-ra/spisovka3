@@ -178,7 +178,13 @@ $(function() {
     $('#dialog-spojit').click(function(event){
         event.preventDefault();
         return dialog(this,'Spojit s dokumentem');
-    });    
+    });
+
+    // Dialog - Historie
+    $('#dialog-historie').click(function(event){
+        event.preventDefault();
+        return dialog(this,'Historie - Transakční protokol');
+    });
 
 });
 

@@ -187,6 +187,11 @@ object(Identity) (4) {
             //dibi::commit();
 
             if ( $result_insert ) {
+
+                $Log = new LogModel();
+                $Log->logDokument($dokument_id, LogModel::DOK_PREDAN, 'Dokument předán zaměstnanci '. Osoba::displayName($user_info->identity) .'.');
+                
+
                 return true;
             } else {
                 return false;
@@ -260,6 +265,11 @@ object(Identity) (4) {
                     //dibi::commit();
 
                     if ( $result_update ) {
+
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_PRIJAT, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument.');
+
+
                         return true;
                     } else {
                         return false;
@@ -338,6 +348,10 @@ object(Identity) (4) {
                     //dibi::commit();
 
                     if ( $result_insert ) {
+
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_KVYRIZENI, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' převzal dokument k vyřízení.');
+
                         return true;
                     } else {
                         return false;
@@ -416,6 +430,10 @@ object(Identity) (4) {
                     //dibi::commit();
 
                     if ( $result_insert ) {
+
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_VYRIZEN, 'Dokument označen za vyřízený.');
+
                         return true;
                     } else {
                         return false;

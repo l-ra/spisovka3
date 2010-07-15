@@ -140,9 +140,19 @@ class DokumentSpis extends BaseModel
 
     public function pripojit($dokument_id, $spis_id, $stav = 1, $dokument_version = null) {
 
+        $Log = new LogModel();
+
         $odebrat = array(
                         array('dokument_id=%i',$dokument_id)
                    );
+
+        $spisy = $this->dokumenty($dokument_id,$dokument_version);
+        if ( count($spisy)>0 ) {
+            foreach( $spisy as $s ) {
+                $Log->logDokument($dokument_id, LogModel::SPIS_DOK_ODEBRAN,'Dokument odebrán ze spisu "'. $s->nazev .'"');
+            }
+        }
+
         $this->odebrat($odebrat);
 
         $poradi = $this->pocetDokumentu($spis_id);
@@ -155,6 +165,8 @@ class DokumentSpis extends BaseModel
         $row['stav'] = $stav;
         $row['date_added'] = new DateTime();
         $row['user_added'] = Environment::getUser()->getIdentity()->user_id;
+
+        $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis->nazev .'"');
 
         return $this->insert_basic($row);
 

@@ -19,6 +19,9 @@ class Acl extends Permission {
 
         // permission
         $this->allow(Permission::ALL, 'Default');
+        $this->allow(Permission::ALL, 'ErrorPresenter');
+        $this->allow(Permission::ALL, 'Spisovka_ErrorPresenter');
+        
         foreach($model->getPermission() as $perm) {
             if ( !empty($perm->role) && !empty($perm->resource) && !empty($perm->privilege) ) {
                 // role + resource + privilege
