@@ -54,8 +54,8 @@
             <dt>Spisová značka:</dt>
             <dd>
                 <span id="dok_spis">
-                {if count($Dok->spisy)>0 }
-                    {foreach $Dok->spisy as $s}
+                {if count($Spisy)>0 }
+                    {foreach $Spisy as $s}
                     {$s->nazev}<br />
                     {/foreach}
                 {else}

@@ -29,8 +29,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
             $user = Environment::getUser();
             $user->setNamespace(KLIENT);
             $user->authenticate($form['username']->value, $form['password']->value);
-            $this->getApplication()->restoreRequest($this->backlink);
-            //$this->redirect(':Spisovka:Default:default');
+            //$this->getApplication()->restoreRequest($this->backlink);
+            $this->redirect(':Spisovka:Default:default');
 
         } catch (AuthenticationException $e) {
             $this->flashMessage($e->getMessage(), 'warning');

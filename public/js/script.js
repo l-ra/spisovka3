@@ -232,7 +232,7 @@ aresSubjekt = function ( formName ) {
     baseUri = baseUri.replace('/public','');
     //var url = baseUri + '/subjekty/ares/' + frmIC.value;
     var url = baseUri + 'subjekty/' + frmIC.value +'/ares';
-    alert( url );
+    //alert( url );
 
     $.getJSON(url, function(data) {
 

@@ -332,6 +332,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         );
         $args_rozd['order'] = array('date_created'=>'DESC');
 
+        $this->template->Typ_evidence = '';
+        $user_config = Environment::getVariable('user_config');
+
+
         $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
         if ( count($rozdelany_dokument)>0 ) {
             $dokument = $rozdelany_dokument[0];
@@ -348,6 +352,17 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $prilohy  = $DokumentPrilohy->prilohy($dokument->dokument_id,null,1);
             $this->template->Prilohy = $prilohy;
+
+            $this->template->Typ_evidence = '';
+            $user_config = Environment::getVariable('user_config');
+            if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
+                if ( $user_config->cislo_jednaci->typ_evidence == 'priorace' ) {
+                    // Nacteni souvisejicicho dokumentu
+                    $this->template->Typ_evidence = $user_config->cislo_jednaci->typ_evidence;
+                    $Souvisejici = new SouvisejiciDokument();
+                    $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument->dokument_id);
+                }
+            }
 
         } else {
             $pred_priprava = array(
@@ -367,6 +382,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Spisy = null;
             $this->template->Subjekty = null;
             $this->template->Prilohy = null;
+            $this->template->SouvisejiciDokumenty = null;
+            $this->template->Typ_evidence = $user_config->cislo_jednaci->typ_evidence;
 
         }
 
