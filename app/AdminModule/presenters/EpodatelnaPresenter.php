@@ -398,6 +398,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                     $vlastnik = $info->firmName ." [".$info->dbType."]";
                 }
                 $stav = ISDS_Spisovka::stavDS($info->dbState) ." (kontrolováno dne ". date("j.n.Y G:i") .")";
+                $stav_hesla = $ISDS->GetPasswordInfo();
 
             }
 
@@ -414,6 +415,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $config_data['isds'][$index]['idbox'] = $idbox;
         $config_data['isds'][$index]['vlastnik'] = $vlastnik;
         $config_data['isds'][$index]['stav'] = $stav;
+        $config_data['isds'][$index]['stav_hesla'] = (is_null($stav_hesla))?"(bez omezení)":$stav_hesla;
         $config_data['isds'][$index]['typ_pripojeni'] = $data['typ_pripojeni'];
         $config_data['isds'][$index]['login'] = $data['login'];
         $config_data['isds'][$index]['password'] = $data['password'];

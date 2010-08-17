@@ -5,9 +5,26 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     private $filtr;
     private $hledat;
+    private $odpoved = null;
+    private $typ_evidence = null;
+
+    public function startup()
+    {
+        $user_config = Environment::getVariable('user_config');
+        $this->typ_evidence = 0;
+        if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
+            $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
+        } else {
+            $this->typ_evidence = 'priorace';
+        }
+
+        parent::startup();
+    }
 
     public function renderDefault($filtr = null, $hledat = null)
     {
+
+        $this->template->Typ_evidence = $this->typ_evidence;
 
         $user_config = Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
@@ -126,7 +143,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function actionDetail()
     {
-        
+
         $Dokument = new Dokument();
 
         // Nacteni parametru
@@ -203,18 +220,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
 
-            $this->template->Typ_evidence = '';
-            $user_config = Environment::getVariable('user_config');
-            if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
-                if ( $user_config->cislo_jednaci->typ_evidence == 'priorace' ) {
-                    // Nacteni souvisejicicho dokumentu
-                    $this->template->Typ_evidence = $user_config->cislo_jednaci->typ_evidence;
-                    $Souvisejici = new SouvisejiciDokument();
-                    $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument_id);
-                }
+            $this->template->Typ_evidence = $this->typ_evidence;
+            if ( $this->typ_evidence == 'priorace' ) {
+                // Nacteni souvisejicicho dokumentu
+                $Souvisejici = new SouvisejiciDokument();
+                $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument_id);
             }
-
-
 
             $this->invalidateControl('dokspis');
         } else {
@@ -262,6 +273,23 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ( $Workflow->vyrizuje($dokument_id, $user_id) ) {
                $Workflow->zrusit_prevzeti($dokument_id);
 
+               $DokumentSpis = new DokumentSpis();
+               $spisy = $DokumentSpis->spisy($dokument_id);
+               if ( count($spisy)>0 ) {
+                   $Dokument = new Dokument();
+                   foreach ( $spisy as $spis ) {
+                       $data = array(
+                            "spisovy_znak" => $spis->spisovy_znak,
+                            "skartacni_znak" => $spis->skartacni_znak,
+                            "skartacni_lhuta" => $spis->skartacni_lhuta,
+                            "spousteci_udalost" => $spis->spousteci_udalost
+                       );
+                       $dokument = $Dokument->ulozit($data,$dokument_id);
+                       unset($data);
+                   }
+               }
+
+
                $this->flashMessage('Převzal jste tento dokument k vyřízení.');
             } else {
                 $this->flashMessage('Označení dokumentu k vyřízení se nepodařilo. Zkuste to znovu.','warning');
@@ -294,6 +322,37 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
 
+    public function renderCjednaci()
+    {
+        $this->template->dokument_id = $this->getParam('id',null);
+    }
+
+    public function renderCjednaciadd()
+    {
+        $dokument_id = $this->getParam('id',null);
+        $dokument_spojit = $this->getParam('spojit_s',null);
+
+        $Dokument = new Dokument();
+
+        $dok_in = $Dokument->getBasicInfo($dokument_id);
+        
+        $dok_out = $Dokument->getBasicInfo($dokument_spojit);
+
+        if ( $dok_in && $dok_out ) {
+
+            // spojit s dokumentem
+            $poradi = $Dokument->getMaxPoradi($dok_out->cislojednaci_id);
+
+            echo '###vybrano###'. $dok_out->cislo_jednaci .'#'. $poradi .'#'. $dok_out->cislojednaci_id;//. $spis->nazev;
+            $this->terminate();
+
+        } else {
+            // chyba
+            $this->template->chyba = 1;
+            $this->template->render('cjednaci');
+        }
+    }
+
     public function renderPridelitcj()
     {
 
@@ -308,6 +367,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $data = array();
         $data['cislojednaci_id'] = $cjednaci->cjednaci_id;
         $data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
+        $data['poradi'] = 1;
         $data['podaci_denik'] = $cjednaci->podaci_denik;
         $data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
         $data['podaci_denik_rok'] = $cjednaci->rok;
@@ -328,15 +388,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = array(
                 array('stav=%i',0),
+                array('typ_dokumentu<>%i',4),
                 array('user_created=%i',Environment::getUser()->getIdentity()->user_id)
         );
         $args_rozd['order'] = array('date_created'=>'DESC');
 
-        $this->template->Typ_evidence = '';
-        $user_config = Environment::getVariable('user_config');
-
+        $this->template->Typ_evidence = $this->typ_evidence;
 
         $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
+
         if ( count($rozdelany_dokument)>0 ) {
             $dokument = $rozdelany_dokument[0];
 
@@ -353,15 +413,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $prilohy  = $DokumentPrilohy->prilohy($dokument->dokument_id,null,1);
             $this->template->Prilohy = $prilohy;
 
-            $this->template->Typ_evidence = '';
-            $user_config = Environment::getVariable('user_config');
-            if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
-                if ( $user_config->cislo_jednaci->typ_evidence == 'priorace' ) {
-                    // Nacteni souvisejicicho dokumentu
-                    $this->template->Typ_evidence = $user_config->cislo_jednaci->typ_evidence;
-                    $Souvisejici = new SouvisejiciDokument();
-                    $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument->dokument_id);
-                }
+            if ( $this->typ_evidence == 'priorace' ) {
+                // Nacteni souvisejicicho dokumentu
+                $Souvisejici = new SouvisejiciDokument();
+                $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument->dokument_id);
             }
 
         } else {
@@ -383,7 +438,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Subjekty = null;
             $this->template->Prilohy = null;
             $this->template->SouvisejiciDokumenty = null;
-            $this->template->Typ_evidence = $user_config->cislo_jednaci->typ_evidence;
+            $this->template->Typ_evidence = $this->typ_evidence;
 
         }
 
@@ -421,97 +476,146 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         if ( $dok ) {
 
-            $pred_priprava = array(
-                "nazev" => $dok->nazev,
-                "popis" => $dok->popis,
-                "stav" => 0,
-                "typ_dokumentu" => "4",
-                "zpusob_doruceni" => "",
-                "cislo_jednaci_odesilatele" => $dok->cislo_jednaci_odesilatele,
-                "datum_vzniku" => '',
-                "lhuta" => "30",
-                "poznamka" => $dok->poznamka,
-                "zmocneni" => "0"
+            $args_rozd = array();
+            $args_rozd['where'] = array(
+                array('stav=%i',0),
+                array('typ_dokumentu=%i',4),
+                array('cislo_jednaci=%s',"odpoved_". $dok->dokument_id),
+                array('user_created=%i',Environment::getUser()->getIdentity()->user_id)
             );
-            $dok_odpoved = $Dokumenty->ulozit($pred_priprava);
+            $args_rozd['order'] = array('date_created'=>'DESC');
 
-            if ( $dok_odpoved ) {
-                
+            $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
+
+            if ( count($rozdelany_dokument)>0 ) {
+                $dok_odpoved = $rozdelany_dokument[0];
+                // odpoved jiz existuje, tak ji nacteme
                 $DokumentSpis = new DokumentSpis();
                 $DokumentSubjekt = new DokumentSubjekt();
                 $DokumentPrilohy = new DokumentPrilohy();
 
-                // kopirovani spisu
-                $spisy_old = $DokumentSpis->spisy($dokument_id);
-                if ( count($spisy_old)>0 ) {
-                    foreach ( $spisy_old as $spis ) {
-                        $DokumentSpis->pripojit($dok_odpoved->dokument_id, $spis->spis_id, $stav = 1, $dok_odpoved->dokument_version);
-                    }
-                }
-                $spisy_new = $DokumentSpis->spisy($dok_odpoved->dokument_id);
-                $this->template->Spisy = $spisy_new;
+                $spisy = $DokumentSpis->spisy($dok_odpoved->dokument_id);
+                $this->template->Spisy = $spisy;
 
-                // kopirovani subjektu
-                $subjekty_old = $DokumentSubjekt->subjekty($dokument_id);
-                if ( count($subjekty_old)>0 ) {
-                    foreach ( $subjekty_old as $subjekt ) {
-                        if ( $subjekt->type != 'O' ) {
-                            $DokumentSubjekt->pripojit($dok_odpoved->dokument_id, $subjekt->subjekt_id, $subjekt->rezim_subjektu, $dok_odpoved->dokument_version, $subjekt->subjekt_version);
-                        }
-                    }
-                }
-                $subjekty_new = $DokumentSubjekt->subjekty($dokument_id);
-                $this->template->Subjekty = $subjekty_new;
+                $subjekty = $DokumentSubjekt->subjekty($dok_odpoved->dokument_id);
+                $this->template->Subjekty = $subjekty;
 
-                // kopirovani prilohy
-                $prilohy_old  = $DokumentPrilohy->prilohy($dokument_id,null,1);
-
-                if ( count($prilohy_old)>0 ) {
-                    foreach ( $prilohy_old as $priloha ) {
-                        if ( $priloha->typ == 1 || $priloha->typ == 2 || $priloha->typ == 3 ) {
-                            $DokumentPrilohy->pripojit($dok_odpoved->dokument_id, $priloha->file_id, $dok_odpoved->dokument_version, $priloha->file_version);
-                        }
-                    }
-                }
-                $prilohy_new  = $DokumentPrilohy->prilohy($dok_odpoved->dokument_id,$dok_odpoved->dokument_version,1);
-                $this->template->Prilohy = $prilohy_new;
+                $prilohy  = $DokumentPrilohy->prilohy($dok_odpoved->dokument_id,null,1);
+                $this->template->Prilohy = $prilohy;
 
                 $UserModel = new UserModel();
                 $user = $UserModel->getUser(Environment::getUser()->getIdentity()->user_id, 1);
                 $this->template->Prideleno = Osoba::displayName($user->identity);
 
                 $CJ = new CisloJednaci();
-                $this->template->Typ_evidence = '';
-                $this->template->SouvisejiciDokumenty = null;
-                $user_config = Environment::getVariable('user_config');
-                if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
-                    $this->template->Typ_evidence = $user_config->cislo_jednaci->typ_evidence;
-                    if ( $user_config->cislo_jednaci->typ_evidence == 'priorace' ) {
+                $this->template->Typ_evidence = $this->typ_evidence;
+                if ( $this->typ_evidence == 'priorace' ) {
+                    // Nacteni souvisejicicho dokumentu
+                    $Souvisejici = new SouvisejiciDokument();
+                    $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dok_odpoved->dokument_id);
+
+                    $this->template->cjednaci = $CJ->nacti($dok->cislojednaci_id);
+                } else if ( $this->typ_evidence == 'sberny_arch' ) {
+                    // sberny arch
+                    $dok_odpoved->poradi = $dok_odpoved->poradi;
+                    $this->template->cjednaci = $CJ->nacti($dok->cislojednaci_id);
+                } else {
+                    $this->template->cjednaci = $CJ->nacti($dok->cislojednaci_id);
+                }
+
+                $this->template->Dok = $dok_odpoved;
+
+
+            } else {
+                // totozna odpoved neexistuje
+                $pred_priprava = array(
+                    "nazev" => $dok->nazev,
+                    "popis" => $dok->popis,
+                    "stav" => 0,
+                    "typ_dokumentu" => "4",
+                    "zpusob_doruceni" => "",
+                    "cislo_jednaci" => ("odpoved_". $dok->dokument_id),
+                    "poradi" => ($dok->poradi + 1),
+                    "cislo_jednaci_odesilatele" => $dok->cislo_jednaci_odesilatele,
+                    "datum_vzniku" => '',
+                    "lhuta" => "30",
+                    "poznamka" => $dok->poznamka,
+                    "zmocneni" => "0"
+                );
+                $dok_odpoved = $Dokumenty->ulozit($pred_priprava);
+
+                if ( $dok_odpoved ) {
+                
+                    $DokumentSpis = new DokumentSpis();
+                    $DokumentSubjekt = new DokumentSubjekt();
+                    $DokumentPrilohy = new DokumentPrilohy();
+
+                    // kopirovani spisu
+                    $spisy_old = $DokumentSpis->spisy($dokument_id);
+                    if ( count($spisy_old)>0 ) {
+                        foreach ( $spisy_old as $spis ) {
+                            $DokumentSpis->pripojit($dok_odpoved->dokument_id, $spis->spis_id, $stav = 1, $dok_odpoved->dokument_version);
+                        }
+                    }
+                    $spisy_new = $DokumentSpis->spisy($dok_odpoved->dokument_id);
+                    $this->template->Spisy = $spisy_new;
+
+                    // kopirovani subjektu
+                    $subjekty_old = $DokumentSubjekt->subjekty($dokument_id);
+                    if ( count($subjekty_old)>0 ) {
+                        foreach ( $subjekty_old as $subjekt ) {
+                            if ( $subjekt->type != 'O' ) {
+                                $DokumentSubjekt->pripojit($dok_odpoved->dokument_id, $subjekt->subjekt_id, $subjekt->rezim_subjektu, $dok_odpoved->dokument_version, $subjekt->subjekt_version);
+                            }
+                        }
+                    }
+                    $subjekty_new = $DokumentSubjekt->subjekty($dokument_id);
+                    $this->template->Subjekty = $subjekty_new;
+
+                    // kopirovani prilohy
+                    $prilohy_old  = $DokumentPrilohy->prilohy($dokument_id,null,1);
+
+                    if ( count($prilohy_old)>0 ) {
+                        foreach ( $prilohy_old as $priloha ) {
+                            if ( $priloha->typ == 1 || $priloha->typ == 2 || $priloha->typ == 3 ) {
+                                $DokumentPrilohy->pripojit($dok_odpoved->dokument_id, $priloha->file_id, $dok_odpoved->dokument_version, $priloha->file_version);
+                            }
+                        }
+                    }
+                    $prilohy_new  = $DokumentPrilohy->prilohy($dok_odpoved->dokument_id,$dok_odpoved->dokument_version,1);
+                    $this->template->Prilohy = $prilohy_new;
+
+                    $UserModel = new UserModel();
+                    $user = $UserModel->getUser(Environment::getUser()->getIdentity()->user_id, 1);
+                    $this->template->Prideleno = Osoba::displayName($user->identity);
+
+                    $CJ = new CisloJednaci();
+                    $this->template->Typ_evidence = $this->typ_evidence;
+                    $this->template->SouvisejiciDokumenty = null;
+                    if ( $this->typ_evidence == 'priorace' ) {
                         // priorace - Nacteni souvisejicicho dokumentu
                         $Souvisejici = new SouvisejiciDokument();
                         $Souvisejici->spojit($dok_odpoved->dokument_id,$dokument_id);
                         $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dok_odpoved->dokument_id);
                         
-                        $this->template->cjednaci = $CJ->generuj();
-                    } else if ( $user_config->cislo_jednaci->typ_evidence == 'priorace' ) {
+                        $this->template->cjednaci = $CJ->nacti($dok->cislojednaci_id);
+                    } else if ( $this->typ_evidence == 'sberny_arch' ) {
                         // sberny arch
+                        //$dok_odpoved->poradi = $dok_odpoved->poradi;
+                        $this->template->cjednaci = $CJ->nacti($dok->cislojednaci_id);
 
-                        $this->template->cjednaci = $CJ->generuj();
+                    } else {
+                        $this->template->cjednaci = $CJ->nacti($dok->cislojednaci_id);
                     }
+
+                    $this->template->Dok = $dok_odpoved;
                 } else {
-                    $this->template->cjednaci = $CJ->generuj();
+                    $this->template->Dok = null;
+                    $this->flashMessage('Dokument není připraven k vytvoření','warning');
                 }
-
-                
-                
-                
-
-
-                $this->template->Dok = $dok_odpoved;
-            } else {
-                $this->template->Dok = null;
-                $this->flashMessage('Dokument není připraven k vytvoření','warning');
             }
+
+            $this->odpoved = $dok->cislojednaci_id;
 
             $this->template->novyForm = $this['novyForm'];
             $this->setView('novy');
@@ -694,9 +798,17 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $typ_dokumentu = Dokument::typDokumentu(null,1);
 
         $form = new AppForm();
-        $form->setAction('fdfdsfdf');
         $form->addHidden('dokument_id')
                 ->setValue($dokument_id);
+        $form->addHidden('odpoved')
+                ->setValue($this->odpoved);
+
+        if ( $this->typ_evidence == 'sberny_arch' ) {
+            $form->addText('poradi', 'Pořadí dokumentu ve sberném archu:', 4, 4)
+                    ->setValue(@$dok->poradi)
+                    ->controlPrototype->readonly = TRUE;
+        }
+
         $form->addText('nazev', 'Věc:', 80, 100)
                 ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!')
                 ->setValue(@$dok->nazev);
@@ -770,7 +882,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             //Debug::dump($data); exit;
             $CJ = new CisloJednaci();
-            $cjednaci = $CJ->generuj(1);
+
+            if ( !empty($data['odpoved']) ) {
+                $cjednaci = $CJ->nacti($data['odpoved']);
+                unset($data['odpoved']);
+            } else {
+                $cjednaci = $CJ->generuj(1);
+            }
 
             $data['jid'] = $cjednaci->app_id.'-ESS-'.$dokument_id;
             $data['cislojednaci_id'] = $cjednaci->cjednaci_id;
@@ -1000,7 +1118,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // spisovy znak
 
 
-        //Debug::dump($data); exit;
+        Debug::dump($data); exit;
 
         $Dokument = new Dokument();
 

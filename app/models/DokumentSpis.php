@@ -56,64 +56,11 @@ class DokumentSpis extends BaseModel
         $result = $this->fetchAllComplet($param)->fetchAll();
         if ( count($result)>0 ) {
             $Dokument = new Dokument();
-            if ( $detail == 1 ) {
-                $DokumentySubjekt = new DokumentSubjekt();
-                $DokumentyPrilohy = new DokumentPrilohy();
-                $Workflow = new Workflow();
-                $Osoba = new UserModel();
-            }
-
             foreach ($result as $joinDok) {
-
                 $dok = $Dokument->getInfo($joinDok->dokument_id, $joinDok->dokument_version);
                 $dok->poradi = $joinDok->poradi;
                 $dok->stav_zarazeni = $joinDok->stav;
-
-                if ( $detail == 1 ) {
-
-                    $dok->typ_dokumentu = Dokument::typDokumentu($dok->typ_dokumentu);
-                    $dok->subjekty = $DokumentySubjekt->subjekty($dok->dokument_id);
-                    $dok->prilohy = $DokumentyPrilohy->prilohy($dok->dokument_id);
-                    $dok->spisy = $this->spisy($dok->dokument_id);
-
-                    $dok->workflow = $Workflow->dokument($dok->dokument_id);
-                    $dok->prideleno = null;
-                    $dok->predano = null;
-                    $prideleno = $predano = $stav = 0;
-                    if ( count($dok->workflow)>0 ) {
-                        foreach ($dok->workflow as $wf) {
-
-                            // Pridelen
-                            if ( $wf->stav_osoby == 1 && $prideleno==0 ) {
-                                $dok->prideleno = $wf;
-                                $prideleno=1;
-                            }
-                            // Predan
-                            if ( $wf->stav_osoby == 0 && $predano==0 ) {
-                                $dok->predano = $wf;
-                                $predano=1;
-                            }
-                            // Stav
-                            if ( $stav <= $wf->stav_dokumentu ) {
-                                $stav = $wf->stav_dokumentu;
-                            }
-                        }
-                    }
-                    $dok->stav_dokumentu = $stav;
-
-
-                    if ( !empty($dok->lhuta) ) {
-                        $datum_vzniku = strtotime($dok->date_created);
-                        $dok->lhuta_do = $datum_vzniku + ($dok->lhuta * 86400);
-                    } else {
-                        $dok->lhuta_do = 'neurčeno';
-                    }
-
-                }
-
-
                 $dokumenty[ $joinDok->poradi ] = $dok;
-
             }
             return $dokumenty;
         } else {
@@ -166,7 +113,10 @@ class DokumentSpis extends BaseModel
         $row['date_added'] = new DateTime();
         $row['user_added'] = Environment::getUser()->getIdentity()->user_id;
 
-        $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis->nazev .'"');
+        $Spis = new Spis();
+        $spis_info = $Spis->getInfo($spis_id);
+
+        $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis_info->nazev .'"');
 
         return $this->insert_basic($row);
 

@@ -43,8 +43,11 @@
             <dd>{$cjednaci->app_id}-ESS-{$Dok->dokument_id}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Číslo jednací:</dt>
-            <dd>{$cjednaci->cislo_jednaci}&nbsp;</dd>
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
+            <dd>
+                <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;
+                {if $Typ_evidence == 'sberny_arch'} / {$novyForm['poradi']->control} &nbsp; <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->dokument_id}" id="dialog-cjednaci">Připojit k dokumentu</a> {/if}
+            </dd>
         </dl>
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
@@ -90,6 +93,7 @@
             <dt>Poznámka:</dt>
             <dd>{$novyForm['poznamka']->control}</dd>
         </dl>
+        {if $Typ_evidence == 'priorace'}
         <dl class="detail_item">
             <dt>Spojit s dokumentem:</dt>
             <dd>
@@ -104,6 +108,7 @@
                 &nbsp;[<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->dokument_id}" id="dialog-spojit">spojit s dokumentem</a>]
             </dd>
         </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Počet listů:</dt>
             <dd>{$novyForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$novyForm['pocet_priloh']->control}</dd>

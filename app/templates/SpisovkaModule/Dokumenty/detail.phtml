@@ -105,9 +105,9 @@
             <dd>{$metadataForm['typ_dokumentu']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Číslo jednací:</dt>
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
             <dd class="nadpis">
-                {$Dok->cislo_jednaci}&nbsp;
+                {$Dok->cislo_jednaci}&nbsp;{if $Typ_evidence == 'sberny_arch'} / {$Dok->poradi}{/if}
             </dd>
         </dl>
         <dl class="detail_item">
@@ -150,6 +150,7 @@
             <dt>Poznámka:</dt>
             <dd>{$metadataForm['poznamka']->control}</dd>
         </dl>
+        {if $Typ_evidence == 'priorace'}
         <dl class="detail_item">
             <dt>Spojit s dokumentem:</dt>
             <dd>
@@ -164,6 +165,7 @@
                 &nbsp;[<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->dokument_id}" id="dialog-spojit">spojit s dokumentem</a>]
             </dd>
         </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Počet listů:</dt>
             <dd>{$metadataForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$metadataForm['pocet_priloh']->control}</dd>
@@ -181,8 +183,8 @@
             <dd>{$Dok->jid}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Číslo jednací:</dt>
-            <dd class="nadpis">{$Dok->cislo_jednaci}&nbsp;</dd>
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
+            <dd class="nadpis">{$Dok->cislo_jednaci}&nbsp;{if $Typ_evidence == 'sberny_arch'} / {$Dok->poradi}{/if}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spisová značka:</dt>

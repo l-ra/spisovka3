@@ -11,6 +11,12 @@
 
     <h2>{$Spis->nazev}</h2>
 
+        {if ($FormUpravit=='info')}
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+        {control $upravitForm}
+    </div>
+        {else}
     <div class="detail_blok">
         <div class="detail_hlavicka">Informace o spisu</div>
         <dl class="detail_item">
@@ -22,10 +28,28 @@
             <dd>{$Spis->popis}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
+            <dt>Spisový znak:</dt>
+            <dd title="{$SpisZnak_popis}">{$SpisZnak_nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační znak:</dt>
+            <dd>{$Spis->skartacni_znak}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační lhůta:</dt>
+            <dd>{$Spis->skartacni_lhuta}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spouštěcí událost:</dt>
+            <dd>{$Spis->spousteci_udalost}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
             <dt>Stav:</dt>
             <dd>{=Spis::stav($Spis->stav)}&nbsp;</dd>
         </dl>
+        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->spis_id, 'upravit'=>'info'}">Upravit</a>
     </div>
+        {/if}
 
     <div class="detail_blok">
         <div class="detail_hlavicka">Seznam dokumentů</div>
@@ -37,8 +61,8 @@
         <tr>
             <th class="typ">Typ dokumentu</th>
             <th class="prijato">Přijato</th>
-            <th class="cislo_jadnaci">Číslo jednací<br />Spisová značka</th>
-            <th class="vec">Věc<br />Adresáti/odesilatelé</th>
+            <th class="cislo_jadnaci">JID<br />Číslo jednací<br />Spisová značka</th>
+            <th class="vec">Věc<br />Adresáti/odesilatelé<br />počet listů a příloh</th>
             <th class="prideleno">Přiděleno</th>
             <th class="stav">Stav</th>
         </tr>
@@ -50,9 +74,11 @@
                 <img src="{$baseUri}images/icons/typdok{$dok->typ_dokumentu->typ}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="24" height="16" />
             </td>
             <td class="prijato">
-                {$dok->datum_vzniku|date:%d.%m.%Y}
+                {$dok->datum_vzniku|edate}
             </td>
             <td class="cislo_jadnaci">
+                <span style="font-size: 8pt;">&nbsp;{$dok->jid}</span>
+                <br />
                 &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
                    {$dok->cislo_jednaci}
                 </a></strong>
@@ -73,47 +99,72 @@
                 {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
                 {/foreach}
                 {else}
-                nejsou přiděleny žádné subjekty!
+                nejsou přiděleny žádné subjekty!<br />
                 {/if}
+                <span style="font-size: 8pt;">přílohy:
+                {=($dok->pocet_listu)+0} listů,
+                {=($dok->pocet_priloh)+0} list. příloh,
+                {=(count($dok->prilohy)+0)} příloh</span>
             </td>
 
 
 
             {if $dok->stav_dokumentu == 1}
             <td class="prideleno">
+                {if !empty($dok->prideleno->prideleno_jmeno)}
                 {$dok->prideleno->prideleno_jmeno}
+                {/if}&nbsp;
             </td>
             <td class="stav">
                 nový
                 <br />
-                {$dok->prideleno->date|date}
+                {$dok->prideleno->date|edate}
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->predano) }
             <td class="prideleno">
+                {if !empty($dok->predano->prideleno_jmeno)}
                 {$dok->predano->prideleno_jmeno}
+                {/if}&nbsp;
             </td>
             <td class="stav">
                 předáno
                 <br />
-                {$dok->predano->date_predani|date}
+                {$dok->predano->date_predani|edate}
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->prideleno) }
             <td class="prideleno">
+                {if !empty($dok->prideleno->prideleno_jmeno)}
                 {$dok->prideleno->prideleno_jmeno}
+                {/if}&nbsp;
             </td>
             <td class="stav">
                 přiděleno
                 <br />
-                {$dok->prideleno->date|date}
+                {$dok->prideleno->date|edate}
             </td>
             {elseif $dok->stav_dokumentu == 3 }
             <td class="prideleno">
+                {if !empty($dok->prideleno->prideleno_jmeno)}
                 {$dok->prideleno->prideleno_jmeno}
+                {/if}&nbsp;
             </td>
             <td class="stav">
                 vyřizuje se
                 <br />
-                {$dok->prideleno->date|date}
+                {if !empty($dok->prideleno->date)}
+                {$dok->prideleno->date|edate}
+                {/if}
+            </td>
+            {elseif $dok->stav_dokumentu == 4 }
+            <td class="prideleno">
+                {if !empty($dok->prideleno->prideleno_jmeno)}
+                {$dok->prideleno->prideleno_jmeno}
+                {/if}&nbsp;
+            </td>
+            <td class="stav">
+                vyřízeno
+                <br />
+                {$dok->datum_vyrizeni|edate}
             </td>
             {else}
             <td class="prideleno">
@@ -134,6 +185,17 @@
 
     </table>
     {else}
-    <div class="prazdno">K tomuto spisu nejsou přiděleny žádné dokumenty.</div>
+        <div>&nbsp;</div>
+        {if isset($no_items)}
+        {if $no_items==1}
+        <div class="prazdno">Nemáte k dispozici žádné dokumenty.</div>
+        {elseif $no_items==2}
+        <div class="prazdno">K danému filtru nemáte k dispozici žádné dokumenty.</div>
+        {elseif $no_items==3}
+        <div class="prazdno">Dokument odpovidající hledanému výrazu nebyl nalezen.</div>
+        {/if}
+        {else}
+    <div class="prazdno">K tomuto spisu nebyly zjištěny žádné dokumenty.</div>
+        {/if}
     {/if}
     </div>

@@ -245,8 +245,8 @@ class Spis extends BaseModel
 
     public static function stav($stav = null) {
 
-        $stav_array = array('1'=>'aktivní',
-                            '0'=>'neaktivní'
+        $stav_array = array('1'=>'otevřený',
+                            '0'=>'uzavřený'
                      );
 
         if ( is_null($stav) ) {

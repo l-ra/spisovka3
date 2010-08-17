@@ -42,28 +42,31 @@ class CisloJednaci extends BaseModel
      * Vygeneruje cislo jednaci
      * @return string
      */
-    public function generuj($ulozit = 0) {
+    public function generuj($ulozit = 0, $info = null) {
 
         $maska = $this->info->maska;
         $cislo_jednaci = $maska;
 
-        $info = array();
+        if ( is_null($info) ) {
+            $info = array();
 
-        $info['podaci_denik'] = $this->info->podaci_denik;
-        $info['rok'] = date('Y');
-        $info['poradove_cislo'] = $this->max('poradove_cislo');
-        
-        $info['urad_zkratka'] = $this->urad->zkratka;
-        $info['urad_poradi'] = $this->max('urad');
+            $info['podaci_denik'] = $this->info->podaci_denik;
+            $info['rok'] = date('Y');
+            $info['poradove_cislo'] = $this->max('poradove_cislo');
 
-        $info['orgjednotka_id'] = $this->org->orgjednotka_id;
-        $info['org'] = @$this->org->zkratka;
-        $info['org_poradi'] = $this->max('org');
+            $info['urad_zkratka'] = $this->urad->zkratka;
+            $info['urad_poradi'] = $this->max('urad');
 
-        $info['user_id'] = $this->user_info->user_id;
-        $info['user'] = $this->user_info->username;
-        $info['prijmeni'] = String::webalize($this->user_info->identity->prijmeni);
-        $info['user_poradi'] = $this->max('user');
+            $info['orgjednotka_id'] = $this->org->orgjednotka_id;
+            $info['org'] = @$this->org->zkratka;
+            $info['org_poradi'] = $this->max('org');
+
+            $info['user_id'] = $this->user_info->user_id;
+            $info['user'] = $this->user_info->username;
+            $info['prijmeni'] = String::webalize($this->user_info->identity->prijmeni);
+            $info['user_poradi'] = $this->max('user');
+        }
+
 
         $cislo_jednaci = str_replace("{podaci_denik}", $info['podaci_denik'], $cislo_jednaci);
         $cislo_jednaci = str_replace("{evidence}", $info['podaci_denik'], $cislo_jednaci);
@@ -151,6 +154,7 @@ class CisloJednaci extends BaseModel
         } else {
 
             $tmp = new stdClass();
+            $tmp->cjednaci_id = isset($info['cjednaci_id'])?$info['cjednaci_id']:null;
             $tmp->cislo_jednaci = $cislo_jednaci;
             $tmp->rok = $info['rok'];
             $tmp->poradove_cislo = $info['poradove_cislo'];
@@ -171,6 +175,38 @@ class CisloJednaci extends BaseModel
             return $tmp;
         }
         
+    }
+
+    public function nacti($cjednaci_id) {
+
+            $row = $this->fetchRow(array(array('cjednaci_id=%i',$cjednaci_id)))->fetch();
+
+            $info = array();
+            $info['cjednaci_id'] = $cjednaci_id;
+
+            $info['podaci_denik'] = $row->podaci_denik;
+            $info['rok'] = $row->rok;
+            $info['poradove_cislo'] = $row->poradove_cislo;
+
+            $info['urad_zkratka'] = $row->urad_zkratka;
+            $info['urad_poradi'] = $row->urad_poradi;
+
+            $info['orgjednotka_id'] = $row->orgjednotka_id;
+            $OrgJednotka = new Orgjednotka();
+            $org_info = $OrgJednotka->getInfo($row->orgjednotka_id);
+            $info['org'] = @$org_info->ciselna_rada;
+            $info['org_poradi'] = $row->org_poradi;
+
+            $info['user_id'] = $row->user_id;
+            $User = new UserModel();
+            $user_info = $User->getUser($row->user_id,true);
+
+            $info['user'] = $user_info->username;
+            $info['prijmeni'] = String::webalize($user_info->identity->prijmeni);
+            $info['user_poradi'] = $row->user_poradi;
+
+            return $this->generuj(0, $info);
+
     }
 
     private function max($typ) {

@@ -7,6 +7,14 @@ body {
     font-size: 9pt;
 }
 
+.small {
+    font-size: 8pt;
+    margin-top: 3px; margin-bottom: 3px;
+}
+.mezera {
+    margin-top: 3px; margin-bottom: 7px;
+}
+
 /* ***************************************************************** */
 /* *** TOP LAYOUT *** */
 #layout_top {
@@ -281,7 +289,7 @@ body {
     text-align: right;
 }
 #dokumenty .cislo_jadnaci {
-    width: 100px;
+    width: 150px;
     text-align: right;
 }
 #dokumenty .vec {

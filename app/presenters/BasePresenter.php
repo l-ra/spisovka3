@@ -9,34 +9,13 @@ abstract class BasePresenter extends Presenter
     public function startup()
     {
 
+        if ( !defined('APPLICATION_INSTALL') ):
+
         $user = Environment::getUser();
         $user->setNamespace(KLIENT);
         // Nema uzivatel pristup na tuto stranku?
 
-        if (!$user->isAllowed($this->reflection->name, $this->getAction())) {
-            // Nema volne opravneni zobrazit stranku
-            if (!$user->isAuthenticated()) {
-                if ($user->getSignOutReason() === User::INACTIVITY) {
-                    $this->flashMessage('Uplynula doba neaktivity! Systém vás z bezpečnostných důvodu odhlásil.', 'warning');
-                }
-                if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
-                    $backlink = $this->getApplication()->storeRequest();
-                    $this->redirect(':Spisovka:Uzivatel:login', array('backlink' => $backlink));
-                }
-            } else {
-                // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku
-                if (!( $this->name == "Error" && $this->view == "noaccess" )) {
-                    //$this->forward(':Error:noaccess',array('param'=>array('resource'=>$this->reflection->name,'privilege'=>$this->getAction())));
-                    $this->forward(':Error:noaccess');
-                } else if (!( $this->name == "Spisovka:Error" && $this->view == "noaccess" )) {
-                    //$this->forward(':Error:noaccess',array('param'=>array('resource'=>$this->reflection->name,'privilege'=>$this->getAction())));
-                    $this->forward(':Spisovka:Error:noaccess');
-                }
-            }
-        }
 
-
-/*
         // Je uzivatel prihlasen?
             if (!$user->isAuthenticated()) {
                 if ($user->getSignOutReason() === User::INACTIVITY) {
@@ -63,7 +42,16 @@ abstract class BasePresenter extends Presenter
                     }
                 }
             }
-*/
+
+        else:
+
+            if ( $this->name == "Spisovka:Default" && $this->view == "default" ) {
+                $this->forward(':Install:Default:default');
+            }
+
+            //echo $this->reflection->name ." - ". $this->getAction();
+
+        endif; // application_install
 
         parent::startup();
     }
@@ -145,6 +133,10 @@ abstract class BasePresenter extends Presenter
 
         if ( $service_mode == 1 && $_SERVER['REMOTE_ADDR'] != '62.177.76.50' ) {
             $this->setLayout('offline');
+        } else if ( defined('APPLICATION_INSTALL') ) {
+            $this->setLayout('install');
+        } else if ( defined('DB_ERROR') ) {
+            $this->setLayout('db');
         } else if ( $this->name == "Spisovka:Uzivatel" && $this->view == "login" ) {
             $this->setLayout('login');
         } else if ( ($this->name == "Error") && (!Environment::getUser()->isAuthenticated()) ) {

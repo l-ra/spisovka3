@@ -847,12 +847,19 @@ class Dokument extends BaseModel
 
     }
 
-
     public function getMax() {
 
         $result = $this->fetchAll(array('dokument_id'=>'DESC'),null,null,1);
         $row = $result->fetch();
         return ($row) ? ($row->dokument_id+1) : 1;
+
+    }
+
+    public function getMaxPoradi($cjednaci) {
+
+        $result = $this->fetchAll(array('poradi'=>'DESC'),array(array('cislojednaci_id=%i',$cjednaci)),null,1);
+        $row = $result->fetch();
+        return ($row) ? ($row->poradi+1) : 1;
 
     }
 

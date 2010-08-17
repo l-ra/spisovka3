@@ -6,6 +6,21 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     private $filtr;
     private $hledat;
     private $Epodatelna;
+    private $typ_evidence = null;
+    private $odpoved = null;
+
+    public function startup()
+    {
+        $user_config = Environment::getVariable('user_config');
+        $this->typ_evidence = 0;
+        if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
+            $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
+        } else {
+            $this->typ_evidence = 'priorace';
+        }
+
+        parent::startup();
+    }
 
     public function renderPridelitcj()
     {
@@ -33,7 +48,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     }
 
-
     public function renderNovy()
     {
 
@@ -42,6 +56,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $epodatelna_id = $this->getParam('id',null);
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
+
+        $this->template->Typ_evidence = $this->typ_evidence;
 
         if ( $zprava ) {
 
@@ -121,6 +137,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = array(
                 array('stav=%i',0),
+                array('typ_dokumentu<>%i',4),
                 array('user_created=%i',Environment::getUser()->getIdentity()->user_id)
         );
         $args_rozd['order'] = array('date_created'=>'DESC');
@@ -139,6 +156,12 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $subjekty = $DokumentSubjekt->subjekty($dokument->dokument_id);
             $this->template->Subjekty = $subjekty;
 
+            if ( $this->typ_evidence == 'priorace' ) {
+                // Nacteni souvisejicicho dokumentu
+                $Souvisejici = new SouvisejiciDokument();
+                $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument->dokument_id);
+            }
+
         } else {
             $pred_priprava = array(
                 "nazev" => '',
@@ -156,6 +179,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->template->Spisy = null;
             $this->template->Subjekty = null;
             $this->template->Prilohy = null;
+            $this->template->SouvisejiciDokumenty = null;
+            $this->template->Typ_evidence = $this->typ_evidence;
 
         }
 
@@ -239,6 +264,16 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 ->setValue($dokument_id);
         $form->addHidden('epodatelna_id')
                 ->setValue(@$zprava->epodatelna_id);
+
+        $form->addHidden('odpoved')
+                ->setValue($this->odpoved);
+        if ( $this->typ_evidence == 'sberny_arch' ) {
+            $form->addText('poradi', 'Pořadí dokumentu ve sberném archu:', 4, 4)
+                    ->setValue(1)
+                    ->controlPrototype->readonly = TRUE;
+        }
+
+
         $form->addText('nazev', 'Věc:', 80, 100)
                 ->setValue(@$zprava->predmet)
                 ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
@@ -292,6 +327,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         
         $form->addHidden('zmocneni')->setValue(0);
 
+        $form->addText('pocet_listu', 'Počet listů:', 5, 10);
+        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10);
+
 
         $form->addSubmit('novy', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
@@ -342,7 +380,12 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             //Debug::dump($data); exit;
             
             $CJ = new CisloJednaci();
-            $cjednaci = $CJ->generuj(1);
+            if ( !empty($data['odpoved']) ) {
+                $cjednaci = $CJ->nacti($data['odpoved']);
+                unset($data['odpoved']);
+            } else {
+                $cjednaci = $CJ->generuj(1);
+            }
 
             $data['jid'] = $cjednaci->app_id.'-ESS-'.$dokument_id;
             $data['cislojednaci_id'] = $cjednaci->cjednaci_id;
@@ -386,6 +429,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 // Vytvoreni cyklu
                 $Workflow = new Workflow();
                 $Workflow->vytvorit($dokument_id,$predani_poznamka);
+
+                $Log = new LogModel();
+                $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
                 $this->flashMessage('Dokument byl vytvořen a zaevidován.');
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));

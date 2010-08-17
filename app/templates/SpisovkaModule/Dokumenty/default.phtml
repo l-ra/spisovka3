@@ -22,7 +22,7 @@
         <tr>
             <th class="typ">Typ dokumentu</th>
             <th class="prijato">Přijato</th>
-            <th class="cislo_jadnaci">Číslo jednací<br />Spisová značka</th>
+            <th class="cislo_jadnaci">Číslo jednací<br />JID<br />Spisová značka</th>
             <th class="vec">Věc<br />Adresáti/odesilatelé<br />počet listů a příloh</th>
             <th class="prideleno">Přiděleno</th>
             <th class="stav">Stav</th>
@@ -39,9 +39,9 @@
             </td>
             <td class="cislo_jadnaci">
                 &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
-                   {$dok->cislo_jednaci}
+                   {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'} / {$dok->poradi}{/if}
                 </a></strong>
-                <br />
+                <div class="small">&nbsp;{$dok->jid}</div>
                 {if count($dok->spisy)>0}
                 {foreach $dok->spisy as $spis}
                 <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->spis_id}">{$spis->nazev}</a><br />
@@ -53,17 +53,21 @@
                     {$dok->nazev}
                 </a></strong>
                 <br />
+                <div class="mezera">
                 {if count($dok->subjekty)>0}
+
                 {foreach $dok->subjekty as $subjekt}
                 {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
                 {/foreach}
                 {else}
-                nejsou přiděleny žádné subjekty!<br />
+                nejsou přiděleny žádné subjekty!
+                <br />
                 {/if}
-                přílohy:
+                </div>
+                <span class="small">přílohy:
                 {=($dok->pocet_listu)+0} listů,
                 {=($dok->pocet_priloh)+0} list. příloh,
-                {=(count($dok->prilohy)+0)} příloh,
+                {=(count($dok->prilohy)+0)} příloh</span>
             </td>
 
 

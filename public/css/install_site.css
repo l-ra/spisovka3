@@ -1,0 +1,76 @@
+
+	#kontrola .result {
+		font-size: 10pt;
+		margin: 1.5em 0;
+		padding: 1em 1em;
+		border: 2px solid white;
+	}
+
+	#kontrola .passed h2 {
+		color: #091;
+	}
+
+	#kontrola .failed h2 {
+		color: #A30;
+	}
+
+	#kontrola table {
+		font: 9pt/1.5 Verdana, sans-serif;
+		padding: 0;
+		margin: 0;
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	#kontrola table td {
+		text-align: left;
+		padding: 10px;
+		vertical-align: top;
+		border-style: solid;
+		border-width: 1px 0 0;
+		border-color: inherit;
+		background: white none no-repeat 12px 8px;
+		background-color: inherit;
+	}
+
+	#kontrola table td.th {
+		font-weight: bold;
+		padding-left: 50px;
+	}
+
+	#kontrola .passed, .info {
+		background-color: #DFD;
+		border-color: #BEB;
+	}
+
+	#kontrola .passed td.th {
+		background-image: url('../images/assets/passed.gif');
+	}
+
+	#kontrola .info td.th {
+		background-image: url('../images/assets/info.gif');
+	}
+
+	#kontrola .warning {
+		background-color: #FCF9CF;
+		border-color: #EE9;
+	}
+
+	#kontrola .warning td.th {
+		background-image: url('../images/assets/warning.gif');
+	}
+
+	#kontrola .failed {
+		background-color: #F4D2D2;
+		border-color: #EAA;
+	}
+
+	#kontrola .failed td.th {
+		background-image: url('../images/assets/failed.gif');
+	}
+
+	#kontrola .description td {
+		border-top: none !important;
+		padding: 0 10px 10px 50px;
+		color: #555;
+	}

@@ -5,21 +5,11 @@ class Admin_SpisyPresenter extends BasePresenter
 
     public function renderSeznam()
     {
-        $this->template->title = " - Spisový plán";
 
         $Spisy = new Spis();
-
         $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
-
         $seznam = $Spisy->seznam($args);
-
         $this->template->seznam = $seznam;
-
-    }
-
-    public function actionNovy()
-    {
-        $this->template->title = " - Nový subjekt";
 
     }
 
@@ -39,10 +29,17 @@ class Admin_SpisyPresenter extends BasePresenter
         $this->template->SpisyNad = $Spisy->seznam_nad($spis_id,1);
         $this->template->SpisyPod = $Spisy->seznam_pod($spis_id,1);
 
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->seznam(null);
+        $this->template->SpisoveZnaky = $spisove_znaky;
 
-        $typ = Spis::typSpisu(@$spis->typ,1);
-
-        $this->template->title = " - Detail $typ";
+        if ( isset($spisove_znaky[ @$spis->spisovy_znak ]) ) {
+            $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak ]->popis;
+            $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak ]->nazev;
+        } else {
+            $this->template->SpisZnak_popis = "";
+            $this->template->SpisZnak_nazev = "";
+        }
 
     }
 
@@ -53,6 +50,7 @@ class Admin_SpisyPresenter extends BasePresenter
 
     public function renderNovy()
     {
+
         $this->template->novyForm = $this['novyForm'];
     }
 /**
@@ -69,6 +67,11 @@ class Admin_SpisyPresenter extends BasePresenter
         $spis = $this->template->Spis;
         $typ_spisu = Spis::typSpisu();
         $stav_select = Spis::stav();
+
+        $SpisovyZnak = new SpisovyZnak();
+        $spisznak_seznam = array();
+        $spisznak_seznam[0] = 'vyberte z nabídky ...';
+        $spisznak_seznam = @array_merge($spisznak_seznam, $SpisovyZnak->seznam(null,1));
 
 
         $spisy = $Spisy->seznam(null,1);
@@ -97,6 +100,19 @@ class Admin_SpisyPresenter extends BasePresenter
                 ->setValue(@$spis->spis_parent);
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
                 ->setValue(@$spis->stav);
+
+        $form1->addSelect('spisovy_znak', 'Spisový znak:', $spisznak_seznam)
+                ->setValue(@$spis->spisovy_znak)
+                ->controlPrototype->onchange("vybratSpisovyZnak();");
+        $form1->addText('skartacni_znak','Skartační znak: ', 3, 3)
+                ->setValue(@$spis->skartacni_znak)
+                ->controlPrototype->readonly = TRUE;
+        $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
+                ->setValue(@$spis->skartacni_lhuta)
+                ->controlPrototype->readonly = TRUE;
+        $form1->addTextArea('spousteci_udalost','Spouštěcí událost: ', 80, 3)
+                ->setValue(@$spis->spousteci_udalost)
+                ->controlPrototype->readonly = TRUE;
 
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
@@ -159,12 +175,30 @@ class Admin_SpisyPresenter extends BasePresenter
         $typ_spisu = Spis::typSpisu();
         $spisy = $Spisy->seznam(null,1);
 
+        $SpisovyZnak = new SpisovyZnak();
+        $spisznak_seznam = array();
+        $spisznak_seznam[0] = 'vyberte z nabídky ...';
+        $spisznak_seznam = @array_merge($spisznak_seznam, $SpisovyZnak->seznam(null,1));
+
         $form1 = new AppForm();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
         $form1->addText('nazev', 'Spisová značka / název:', 50, 80)
                 ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
         $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('spis_parent', 'Připojit k:', $spisy);
+
+        $form1->addSelect('spisovy_znak', 'Spisový znak:', $spisznak_seznam)
+                ->setValue(@$spis->spisovy_znak)
+                ->controlPrototype->onchange("vybratSpisovyZnak();");
+        $form1->addText('skartacni_znak','Skartační znak: ', 3, 3)
+                ->setValue(@$spis->skartacni_znak)
+                ->controlPrototype->readonly = TRUE;
+        $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
+                ->setValue(@$spis->skartacni_lhuta)
+                ->controlPrototype->readonly = TRUE;
+        $form1->addTextArea('spousteci_udalost','Spouštěcí událost: ', 80, 3)
+                ->setValue(@$spis->spousteci_udalost)
+                ->controlPrototype->readonly = TRUE;
 
         $form1->addSubmit('vytvorit', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');

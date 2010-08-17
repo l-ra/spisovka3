@@ -34,8 +34,14 @@ $epodatelna_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna
 Environment::setVariable('user_config', $user_config);
 Environment::setVariable('epodatelna_config', $epodatelna_config);
 
+
 $unique_info = @file_get_contents(APP_DIR .'/configs/'. KLIENT .'_install');
-Environment::setVariable('unique_info', $unique_info);
+if ( $unique_info === FALSE ) {
+    define('APPLICATION_INSTALL',1);
+} else {
+    Environment::setVariable('unique_info', $unique_info);
+}
+
 
 //Environment::setMode(Environment::DEVELOPMENT);
 //Environment::setMode(Environment::PRODUCTION);
@@ -81,12 +87,21 @@ Form::extensionMethod('Form::addDateTimePicker', 'Form_addDateTimePicker');
 Mail::$defaultMailer = 'ESSMailer'; // nebo new MyMailer
 
 // 3b) Load database
-dibi::connect(Environment::getConfig('database'));
-dibi::addSubst('PREFIX', Environment::getConfig('database')->prefix);
-if ( !Environment::isProduction() ) {
-    dibi::getProfiler()->setFile(APP_DIR .'/log/mysql_'. KLIENT .'.log');
+try {
+    dibi::connect(Environment::getConfig('database'));
+    dibi::addSubst('PREFIX', Environment::getConfig('database')->prefix);
+    if ( !Environment::isProduction() ) {
+        dibi::getProfiler()->setFile(APP_DIR .'/log/mysql_'. KLIENT .'.log');
+    }
+    define('DB_PREFIX', Environment::getConfig('database')->prefix);
+} catch (DibiDriverException $e) {
+    if ( !Environment::isProduction() ) {
+        define('DB_ERROR', $e->getMessage());
+    } else {
+        define('DB_ERROR', 1);
+    }
 }
-define('DB_PREFIX', Environment::getConfig('database')->prefix);
+
 
 $autoLogin = Environment::getConfig('autoLogin');
 if ( $autoLogin['enable'] == 1 ) {
@@ -134,6 +149,14 @@ if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_
                 'presenter' => 'Default',
                 'action'    => 'default',
                 'id'        => null
+        ));
+        // Install module
+        $router[] = new Route('install/<action>/<id>/<params>', array(
+                'module'    => 'Install',
+                'presenter' => 'Default',
+                'action'    => 'default',
+                'id'        => null,
+                'params'    => null
         ));
 
         $router[] = new Route('<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved>', array(

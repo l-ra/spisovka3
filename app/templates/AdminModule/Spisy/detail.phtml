@@ -1,4 +1,40 @@
 {block title}Detail spisu{/block}
+@{block javascript}
+	<script type="text/javascript" src="{$baseUri}js/webtoolkit.aim.js"></script>
+	<script type="text/javascript">
+
+                function vybratSpisovyZnak() {
+
+                    var spisz_skart = new Array();
+                    var spisz_lhuta = new Array();
+                    var spisz_udalost = new Array();
+                    spisz_skart['0'] = '';
+                    spisz_lhuta['0'] = '';
+                    spisz_udalost['0'] = '';
+                {if count($SpisoveZnaky)>0}
+                {foreach $SpisoveZnaky as $sznak}
+                    spisz_skart[{$sznak->spisznak_id}] = {$sznak->skartacni_znak};
+                    spisz_lhuta[{$sznak->spisznak_id}] = {$sznak->skartacni_lhuta};
+                    spisz_udalost[{$sznak->spisznak_id}] = {=SpisovyZnak::spousteci_udalost($sznak->spousteci_udalost)};
+                {/foreach}
+                {/if}
+
+                    var frm_spis  = document.forms['frm-upravitForm'].spisovy_znak;
+                    var frm_skart  = document.forms['frm-upravitForm'].skartacni_znak;
+                    var frm_lhuta  = document.forms['frm-upravitForm'].skartacni_lhuta;
+                    var frm_udalost  = document.forms['frm-upravitForm'].spousteci_udalost;
+
+                    var key  = document.forms['frm-upravitForm'].spisovy_znak.selectedIndex;
+                    var value = document.forms['frm-upravitForm'].spisovy_znak.options[key].value;
+                    document.forms['frm-upravitForm'].skartacni_znak.value = spisz_skart[value];
+                    document.forms['frm-upravitForm'].skartacni_lhuta.value = spisz_lhuta[value];
+                    document.forms['frm-upravitForm'].spousteci_udalost.value = spisz_udalost[value];
+                    return true;
+                }
+
+
+	</script>
+@{/block}
 {block content}
     <div class="navigate">
     <a href="{link :Admin:Spisy:seznam}">Spisy</a> - Detail
@@ -25,6 +61,23 @@
         <dl class="detail_item">
             <dt>Popis:</dt>
             <dd>{$Spis->popis}&nbsp;</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>Spisový znak:</dt>
+            <dd title="{$SpisZnak_popis}">{$SpisZnak_nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační znak:</dt>
+            <dd>{$Spis->skartacni_znak}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační lhůta:</dt>
+            <dd>{$Spis->skartacni_lhuta}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spouštěcí událost:</dt>
+            <dd>{$Spis->spousteci_udalost}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Stav:</dt>

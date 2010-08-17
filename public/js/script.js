@@ -186,6 +186,12 @@ $(function() {
         return dialog(this,'Historie - Transakční protokol');
     });
 
+    // Dialog - pripojit k archu
+    $('#dialog-cjednaci').click(function(event){
+        event.preventDefault();
+        return dialog(this,'Připojit k dokumentu');
+    });
+
 });
 
 
@@ -232,7 +238,7 @@ aresSubjekt = function ( formName ) {
     baseUri = baseUri.replace('/public','');
     //var url = baseUri + '/subjekty/ares/' + frmIC.value;
     var url = baseUri + 'subjekty/' + frmIC.value +'/ares';
-    //alert( url );
+    alert( url );
 
     $.getJSON(url, function(data) {
 
@@ -510,7 +516,7 @@ prilohazmenit = function(elm){
         return false;
 }
 
-hledejDokument = function (input) {
+hledejDokument = function (input, typ) {
 	
     // nacteme hodnotu
     var vyraz = input.value;
@@ -524,20 +530,20 @@ hledejDokument = function (input) {
             nalezeno = 1;
             var seznam = eval('(' + cache[index] + ')');
             vysledek = document.getElementById('vysledek');
-            vysledek.innerHTML = nastylovat(seznam);
+            vysledek.innerHTML = nastylovat(seznam, typ);
             break;
         }
     }
 
     if(nalezeno==0) {
-        hledejDokumentAjax(vyraz);
+        hledejDokumentAjax(vyraz, typ);
     }
 
     return false;
 
 }
 
-hledejDokumentAjax = function (vyraz) {
+hledejDokumentAjax = function (vyraz, typ) {
 
     if (document.getElementById) {
         var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
@@ -554,7 +560,7 @@ hledejDokumentAjax = function (vyraz) {
                 } else {
                     var seznam = eval('(' + seznam_json + ')');
                     cache[vyraz] = seznam_json;
-                    vysledek.innerHTML = nastylovat(seznam);
+                    vysledek.innerHTML = nastylovat(seznam, typ);
                 }
             	
             }
@@ -598,7 +604,45 @@ spojitDokument = function (elm) {
     return false;
 }
 
-function nastylovat(data,dok_id) {
+pripojitDokument = function (elm) {
+
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                stav = x.responseText;
+
+                if ( stav.indexOf('###vybrano###') != -1 ) {
+                    stav = stav.replace('###vybrano###','');
+
+                    part = stav.split('#');
+
+                    alert(stav +' - '+ part[1]);
+
+                    $('#dok_cjednaci').html(part[0]);
+                    document.getElementById('frmnovyForm-poradi').value = part[1];
+                    document.getElementById('frmnovyForm-odpoved').value = part[2];
+                    
+
+                    $('#dialog').dialog('close');
+                } else {
+                    $('#dialog').html(stav);
+                }
+            }
+        }
+        x.open("GET", elm.href, true);
+        x.send(null);
+    }
+
+    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
+
+
+    return false;
+}
+
+function nastylovat(data,typ) {
 
     var html = "<table class='seznam' border='1'>";
         html = html + "<tr>";
@@ -609,10 +653,17 @@ function nastylovat(data,dok_id) {
 
     baseUri = baseUri.replace('/public','');
     dokument_id = document.getElementById('dokumentid').value;
-    var url = baseUri + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
+
+    if ( typ == 1 ) {
+        var url = baseUri + 'dokumenty/'+ dokument_id +'/cjednaciadd?spojit_s=';
+        var fnc = "pripojitDokument(this)";
+    } else {
+        var url = baseUri + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
+        var fnc = "spojitDokument(this)";
+    }
 
     for (var zaznam in data){
-        a = '<a href="'+ url + data[zaznam]['dokument_id'] +'" onclick="spojitDokument(this); return false;">';
+        a = '<a href="'+ url + data[zaznam]['dokument_id'] +'" onclick="'+fnc+'; return false;">';
         html = html + "<tr>";
         html = html + "<td>"+ a + data[zaznam]['cislo_jednaci'] +"</a></td>";
         html = html + "<td>"+ a + data[zaznam]['jid'] +"</a></td>";
