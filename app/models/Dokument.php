@@ -255,6 +255,8 @@ class Dokument extends BaseModel
 
         $args = array();
 
+        //Debug::dump($params);
+
         if ( isset($params['nazev']) ) {
             if ( !empty($params['nazev']) ) {
                 $args['where'][] = array('d.nazev LIKE %s','%'.$params['nazev'].'%');
@@ -375,7 +377,7 @@ class Dokument extends BaseModel
             }
         }
         if ( isset($params['spousteci_udalost']) ) {
-            if ( !empty($params['spousteci_udalost']) || $params['spousteci_udalost'] != '0' ) {
+            if ( !empty($params['spousteci_udalost']) ) {
                 $args['where'][] = array('d.spousteci_udalost = %i',$params['spousteci_udalost']);
             }
         }
@@ -418,7 +420,11 @@ class Dokument extends BaseModel
                     'on' => array('s.subjekt_id=ds.subjekt_id'),
                     'cols' => null
                 );
-                $args['where'][] = array('s.nazev_subjektu LIKE %s','%'.$params['subjekt_nazev'].'%');
+                $args['where'][] = array(
+                    's.nazev_subjektu LIKE %s OR','%'.$params['subjekt_nazev'].'%',
+                    "CONCAT(s.jmeno,' ',s.prijmeni) LIKE %s OR",'%'.$params['subjekt_nazev'].'%',
+                    "CONCAT(s.prijmeni,' ',s.jmeno) LIKE %s",'%'.$params['subjekt_nazev'].'%'
+                );
             }
         }
         if ( isset($params['subjekt_ic']) ) {
@@ -581,9 +587,28 @@ class Dokument extends BaseModel
                 $args['where'][] = array('s.id_isds LIKE %s','%'.$params['subjekt_isds'].'%');
             }
         }
+        if ( isset($params['prideleno']) ) {
+            if ( count($params['prideleno'])>0 && is_array($params['prideleno']) ) {
+                $args['where'][] = array('wf.prideleno IN (%in) AND wf.stav_osoby=1 AND wf.aktivni=1',$params['prideleno']);
+            }
+        }
+        if ( isset($params['predano']) ) {
+            if ( count($params['predano'])>0 && is_array($params['predano']) ) {
+                $args['where'][] = array('wf.prideleno IN (%in) AND wf.stav_osoby=0 AND wf.aktivni=1',$params['predano']);
+            }
+        }
+        if ( isset($params['prideleno_org']) ) {
+            if ( count($params['prideleno_org'])>0 && is_array($params['prideleno_org']) ) {
+                $args['where'][] = array('wf.orgjednotka_id IN (%in) AND wf.stav_osoby=1 AND wf.aktivni=1',$params['prideleno_org']);
+            }
+        }
+        if ( isset($params['predano_org']) ) {
+            if ( count($params['predano_org'])>0 && is_array($params['predano_org']) ) {
+                $args['where'][] = array('wf.orgjednotka_id IN (%in) AND wf.stav_osoby=0 AND wf.aktivni=1',$params['predano_org']);
+            }
+        }
 
-        //Debug::dump($args);
-        //exit;
+        //Debug::dump($args); exit;
 
         return $args;
 

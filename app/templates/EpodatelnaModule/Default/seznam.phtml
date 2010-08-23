@@ -23,9 +23,9 @@
         <tr>
             <td class="typ">
                 {if !empty($ep->email_signature)}
-                <img src="{$baseUri}images/icons/typdok0.png" alt="Email" title="Email" width="24" height="16" />
+                <img src="{$baseUri}images/icons/typdok1.png" alt="Email" title="Email" width="24" height="16" />
                 {else if !empty($ep->isds_signature)}
-                <img src="{$baseUri}images/icons/typdok1.png" alt="ISDS" title="ISDS" width="24" height="16" />
+                <img src="{$baseUri}images/icons/typdok2.png" alt="ISDS" title="ISDS" width="24" height="16" />
                 {/if}
             </td>
             <td class="prijato">
@@ -35,7 +35,7 @@
             </td>
             <td class="cislo_jadnaci">
                 &nbsp;<strong><a href="{link :Epodatelna:Default:detail, 'id'=>$ep->epodatelna_id}">
-                   {$ep->poradi}-{$ep->rok}
+                   OSS-EP-I-{$ep->poradi}-{$ep->rok}
                 </a></strong>
             </td>
             <td class="vec">

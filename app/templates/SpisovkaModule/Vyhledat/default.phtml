@@ -1,0 +1,247 @@
+@{block title}Vyhledat dokumenty{/block}
+@{block content}
+
+    <h2>Vyhledat dokumenty</h2>
+
+    {$searchForm->render('begin')}
+    <div id="dokument_blok_vyrizeni">
+        <div class="h2">
+            Dokument
+        </div>
+        <dl class="detail_item">
+            <dt>Typ dokumentu:</dt>
+            <dd>{$searchForm['typ_dokumentu']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Stav dokumentu:</dt>
+            <dd>{$searchForm['stav_dokumentu']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Číslo jednací:</dt>
+            <dd>{$searchForm['cislo_jednaci']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spisová značka:</dt>
+            <dd>{$searchForm['spisova_znacka']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Věc:</dt>
+            <dd>{$searchForm['nazev']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Popis:</dt>
+            <dd>{$searchForm['popis']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum doručení/vzniku</dt>
+            <dd>{$searchForm['datum_vzniku']->control} {$searchForm['datum_vzniku_cas']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Číslo jednací odesilatele:</dt>
+            <dd>{$searchForm['cislo_jednaci_odesilatele']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka:</dt>
+            <dd>{$searchForm['poznamka']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Počet listů:</dt>
+            <dd>{$searchForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$searchForm['pocet_priloh']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Způsob vyžízení:</dt>
+            <dd>{$searchForm['zpusob_vyrizeni']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum vyžízení:</dt>
+            <dd>{$searchForm['datum_vyrizeni']->control} {$searchForm['datum_vyrizeni_cas']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum odeslání:</dt>
+            <dd>{$searchForm['datum_odeslani']->control} {$searchForm['datum_odeslani_cas']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spisový znak:</dt>
+            <dd>{$searchForm['spisovy_znak']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační znak:</dt>
+            <dd>{$searchForm['skartacni_znak']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační lhůta:</dt>
+            <dd>{$searchForm['skartacni_lhuta']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Spouštěcí událost:</dt>
+            <dd>{$searchForm['spousteci_udalost']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Počet listů:</dt>
+            <dd>{$searchForm['vyrizeni_pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$searchForm['vyrizeni_pocet_priloh']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Uložení dokumentu:</dt>
+            <dd>{$searchForm['ulozeni_dokumentu']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka k vyřízení:</dt>
+            <dd>{$searchForm['poznamka_vyrizeni']->control}&nbsp;</dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_poznamka">
+        <div class="h2">
+            Zaměstnanci
+        </div>
+        <dl class="detail_item">
+            <dt>Přiděleno:</dt>
+            <dd>
+            {$searchForm['prideleno']->control}
+            <script type="text/javascript">
+            <!--
+		$('#frmsearchForm-prideleno').focus().keyup(function(event) {
+			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmsearchForm-prideleno').val()}, function(payload) {
+				$('#uprideleno').remove();
+
+				var list = $('<ul id="uprideleno"></ul>').insertAfter('#frmsearchForm-prideleno');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});
+		});
+            -->
+            </script>
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Předáno:</dt>
+            <dd>
+            {$searchForm['predano']->control}
+            <script type="text/javascript">
+            <!--
+		$('#frmsearchForm-predano').focus().keyup(function(event) {
+			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmsearchForm-predano').val()}, function(payload) {
+				$('#upredano').remove();
+
+				var list = $('<ul id="upredano"></ul>').insertAfter('#frmsearchForm-predano');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});
+		});
+            -->
+            </script>
+            </dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_poznamka">
+        <div class="h2">
+            Organizační jednotka
+        </div>
+        <dl class="detail_item">
+            <dt>Přiděleno:</dt>
+            <dd>
+            {$searchForm['prideleno_org']->control}
+            <script type="text/javascript">
+            <!--
+		$('#frmsearchForm-prideleno_org').focus().keyup(function(event) {
+			$.getJSON({link autoCompleteOrg!}, { typ: 1, text: $('#frmsearchForm-prideleno_org').val()}, function(payload) {
+				$('#oprideleno').remove();
+
+				var list = $('<ul id="oprideleno"></ul>').insertAfter('#frmsearchForm-prideleno_org');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});
+		});
+            -->
+            </script>
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Předáno:</dt>
+            <dd>
+            {$searchForm['predano_org']->control}
+            <script type="text/javascript">
+            <!--
+		$('#frmsearchForm-predano_org').focus().keyup(function(event) {
+			$.getJSON({link autoCompleteOrg!}, { typ: 2, text: $('#frmsearchForm-predano_org').val()}, function(payload) {
+				$('#opredano').remove();
+
+				var list = $('<ul id="opredano"></ul>').insertAfter('#frmsearchForm-predano_org');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});
+		});
+            -->
+            </script>
+            </dd>
+        </dl>
+    </div>
+
+
+    <div id="dokument_blok_poznamka">
+        <div class="h2">
+            Adresáti / odesílatelé
+        </div>
+        <dl class="detail_item">
+            <dt>Typ subjektu</dt>
+            <dd>{$searchForm['subjekt_type']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>Název subjektu</dt>
+            <dd>{$searchForm['subjekt_nazev']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>IČ</dt>
+            <dd>{$searchForm['subjekt_ic']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Ulice</dt>
+            <dd>
+                {$searchForm['adresa_ulice']->control}
+                č.p. {$searchForm['adresa_cp']->control}
+                č.o. {$searchForm['adresa_co']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>PSČ a město</dt>
+            <dd>
+                {$searchForm['adresa_psc']->control}
+                {$searchForm['adresa_mesto']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$searchForm['adresa_stat']->label}</dt>
+            <dd>{$searchForm['adresa_stat']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$searchForm['subjekt_email']->label}</dt>
+            <dd>{$searchForm['subjekt_email']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$searchForm['subjekt_telefon']->label}</dt>
+            <dd>{$searchForm['subjekt_telefon']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$searchForm['subjekt_isds']->label}</dt>
+            <dd>{$searchForm['subjekt_isds']->control}</dd>
+        </dl>
+
+    </div>
+
+    <div id="dokument_blok_akce">
+        {$searchForm['vyhledat']->control}
+    </div>
+    {$searchForm->render('end')}
+
+    <div id="dialog"></div>

@@ -41,6 +41,7 @@
         {access :Spisovka:Dokumenty:novy}<a href="{link :Spisovka:Dokumenty:novy}">Nový dokument</a>{/access}
         {access :Spisovka:Spisy:default}<a href="{link :Spisovka:Spisy:default}">Spisy</a>{/access}
         {access :Spisovka:Sestavy:default}<a href="{link :Spisovka:Sestavy:default}">Sestavy</a>{/access}
+        {access :Spisovka:Vyhledat:default}<a href="{link :Spisovka:Vyhledat:default}">Vyhledat</a>{/access}
     </div>
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{$flash->message}</div>{/foreach}
@@ -56,6 +57,8 @@
         Presenter: {$presenter}
         View:      {$view}
         SQL:       <?php echo dibi::$numOfQueries ." : ". dibi::$totalTime; ?>
+        
+        Memory:    <?php echo TemplateHelpers::bytes(memory_get_usage()) . ' | ' . TemplateHelpers::bytes(memory_get_peak_usage()) . ' [peak]'; ?>
 
         {block debug}{/block}
 

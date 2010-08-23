@@ -20,12 +20,14 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
 
     public function renderNacti()
     {
-        $subjekt_id = $this->getParam('id',null); // tady jako dokument_id
+        $subjekt_id = $this->getParam('id',null);
+        $epodatelna_id = $this->getParam('epod_id',null);
 
         $Subjekt = new Subjekt();
         $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
         $subjekt = $Subjekt->getInfo($subjekt_id);
         $this->template->subjekt = $subjekt;
+        $this->template->epodatelna_id = $epodatelna_id;
 
     }
 
@@ -39,10 +41,7 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
 
         $subjekt = $Subjekt->getInfo($subjekt_id);
         if ( $subjekt ) {
-
-            // Propojit s dokumentem
-
-            echo '###vybrano###'. $subjekt_id;//. $spis->nazev;
+            echo '###vybrano###'. $subjekt_id ."#". $epod_id;
             $this->terminate();
 
         } else {
@@ -103,6 +102,27 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         }
     }
 
+    public function actionUpravit()
+    {
+        $subjekt_id = $this->getParam('id',null);
+        //$dokument_id = $this->getParam('dok_id',null);
+        $epodatelna_id = $this->getParam('epod_id',null);
+
+        $this->template->FormUpravit = $this->getParam('upravit',null);
+        if ( strpos($subjekt_id, '-')!==false ) {
+            list($subjekt_id, $subjekt_version) = explode('-',$subjekt_id);
+        } else {
+            $subjekt_version = null;
+        }
+        $Subjekt = new Subjekt();
+
+        $subjekt = $Subjekt->getInfo($subjekt_id, $subjekt_version);
+        $this->template->Subjekt = $subjekt;
+        //$this->template->dokument_id = $dokument_id;
+        $this->template->epodatelna_id = $epodatelna_id;
+
+
+    }
 
     public function actionDetail()
     {
@@ -129,6 +149,11 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
     {
         $this->template->novyForm = $this['novyForm'];
     }
+
+    public function renderUpravit()
+    {
+        $this->template->upravitForm = $this['upravitForm'];
+    }
 /**
  *
  * Formular a zpracovani pro udaju osoby
@@ -152,10 +177,14 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         $stat_select = Subjekt::stat();
 
         $form1 = new AppForm();
+        $form1->getElementPrototype()->id('epodsubjekt-vytvorit');
+
         $form1->addHidden('subjekt_id')
                 ->setValue(@$subjekt->subjekt_id);
         $form1->addHidden('subjekt_version')
                 ->setValue(@$subjekt->subjekt_version);
+        $form1->addHidden('epodatelna_id')
+                ->setValue(@$this->template->epodatelna_id);
 
         $form1->addSelect('type', 'Typ subjektu:', $typ_select)
                 ->setValue(@$subjekt->type);
@@ -215,11 +244,10 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
 
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
-        $form1->addSubmit('modifikovat', 'Pouze opravit')
-                 ->onClick[] = array($this, 'modifikovatClicked');
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+                 ->controlPrototype->onclick("subjektUpravitStorno();");
+                 //->onClick[] = array($this, 'stornoClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
 
@@ -239,7 +267,10 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
 
         $subjekt_id = $data['subjekt_id'];
         $subjekt_version = $data['subjekt_version'];
-        unset($data['subjekt_id'],$data['subjekt_version']);
+        //$dokument_id = $data['dokument_id'];
+        $epodatelna_id = $data['epodatelna_id'];
+        $smer = 0;
+        unset($data['subjekt_id'],$data['subjekt_version'],$data['epodatelna_id']);
 
         $Subjekt = new Subjekt();
         $data['stav'] = 1;
@@ -247,30 +278,26 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         $data['user_added'] = Environment::getUser()->getIdentity()->user_id;
 
         try {
-            $subjekt_id = $Subjekt->insert_version($data,$subjekt_id);
-            $this->flashMessage('Subjekt  "'. Subjekt::displayName($data,'jmeno') .'"  byl vytvořen.');
-            $this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id));
+            $subjekt_id = $Subjekt->insert_version($data, $subjekt_id);
+
+            $subjekt_info = $Subjekt->getInfo($subjekt_id);
+            //$Log = new LogModel();
+            //$Log->logDokument($dokument_id, LogModel::SUBJEKT_ZMENEN,'Změněn subjekt "'. Subjekt::displayName($subjekt_info) .'"');
+
+            if (!$this->isAjax()) {
+                //$this->redirect('this');
+                echo "###zmeneno###".$subjekt_id ."#".$epodatelna_id; exit;
+                $this->terminate();
+            } else {
+                $this->invalidateControl('doksubjekt');
+            }
+
+            $this->flashMessage('Subjekt  "'. Subjekt::displayName($data,'jmeno') .'"  byl upraven.');
+            //$this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Subjekt "'. Subjekt::displayName($data,'jmeno') .'" se nepodařilo vytvořit.','warning');
-            Debug::dump($e);
+            $this->flashMessage('Subjekt "'. Subjekt::displayName($data,'jmeno') .'" se nepodařilo upravit.','warning');
         }
 
-    }
-
-    public function modifikovatClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-        $subjekt_id = $data['subjekt_id'];
-        $subjekt_version = $data['subjekt_version'];
-
-        $Subjekt = new Subjekt();
-        $data['date_modified'] = new DateTime();
-        unset($data['subjekt_id'],$data['subjekt_version']);
-
-        $Subjekt->update($data,array(array('subjekt_id = %i',$subjekt_id),array('subjekt_version = %i',$subjekt_version)));
-
-        $this->flashMessage('Subjekt  "'. Subjekt::displayName($data,'jmeno') .'"  byl upraven.');
-        $this->redirect('this',array('id'=>$subjekt_id ."-". $subjekt_version));
     }
 
     public function stornoClicked(SubmitButton $button)

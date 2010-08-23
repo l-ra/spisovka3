@@ -1,0 +1,110 @@
+    <h2>Upravit subjekt</h2>
+
+    {$upravitForm->render('begin')}
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+        <dl class="detail_item">
+            <dt>{$upravitForm['type']->label}</dt>
+            <dd>{$upravitForm['type']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$upravitForm['nazev_subjektu']->label}</dt>
+            <dd>{$upravitForm['nazev_subjektu']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['ic']->label}</dt>
+            <dd>{$upravitForm['ic']->control} <a href="#" onclick="return aresSubjekt('upravitForm');">Vyhledat pomoci systému ARES</a></dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['dic']->label}</dt>
+            <dd>{$upravitForm['dic']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$upravitForm['titul_pred']->label}</dt>
+            <dd>{$upravitForm['titul_pred']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['jmeno']->label}</dt>
+            <dd>{$upravitForm['jmeno']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['prostredni_jmeno']->label}</dt>
+            <dd>{$upravitForm['prostredni_jmeno']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['prijmeni']->label}</dt>
+            <dd>{$upravitForm['prijmeni']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['titul_za']->label}</dt>
+            <dd>{$upravitForm['titul_za']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['rodne_jmeno']->label}</dt>
+            <dd>{$upravitForm['rodne_jmeno']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$upravitForm['datum_narozeni']->label}</dt>
+            <dd>{$upravitForm['datum_narozeni']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['misto_narozeni']->label}</dt>
+            <dd>{$upravitForm['misto_narozeni']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['okres_narozeni']->label}</dt>
+            <dd>{$upravitForm['okres_narozeni']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['stat_narozeni']->label}</dt>
+            <dd>{$upravitForm['stat_narozeni']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$upravitForm['adresa_ulice']->label}</dt>
+            <dd>
+                {$upravitForm['adresa_ulice']->control}
+                č.p. {$upravitForm['adresa_cp']->control}
+                č.o. {$upravitForm['adresa_co']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>PSČ a město</dt>
+            <dd>
+                {$upravitForm['adresa_psc']->control}
+                {$upravitForm['adresa_mesto']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['adresa_stat']->label}</dt>
+            <dd>{$upravitForm['adresa_stat']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$upravitForm['email']->label}</dt>
+            <dd>{$upravitForm['email']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['telefon']->label}</dt>
+            <dd>{$upravitForm['telefon']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$upravitForm['id_isds']->label}</dt>
+            <dd>{$upravitForm['id_isds']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$upravitForm['poznamka']->label}</dt>
+            <dd>{$upravitForm['poznamka']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>{$upravitForm['upravit']->control} {$upravitForm['storno']->control}</dd>
+        </dl>
+
+    </div>
+    {$upravitForm->render('end')}

@@ -172,6 +172,8 @@ abstract class BasePresenter extends Presenter
         $user = Environment::getUser();
         if ( $user->isAuthenticated() ) {
             $this->template->user = $user->getIdentity();
+            $UserModel = new UserModel();
+            $this->template->orgjednotka = $UserModel->getOrg($this->template->user);
         } else {
             $ident = new stdClass();
             $ident->name = "Nepřihlášen";

@@ -18,14 +18,16 @@ class Orgjednotka extends BaseModel
 
     public function seznam($args = null)
     {
-        $args = func_get_args();
 
-        $select = $this->fetchAll(array('zkraceny_nazev'));
+        if ( !is_null($args) ) {
+            $result = $this->fetchAll(array('zkraceny_nazev'),$args);
+        } else {
+            $result = $this->fetchAll(array('zkraceny_nazev'));
+        }
 
-        return $select;
+        $rows = $result->fetchAll();
 
-        //$rows = $select->fetchAll();
-        //return ($rows) ? $rows : NULL;
+        return ($rows) ? $rows : NULL;
 
     }
 
@@ -137,5 +139,30 @@ class Orgjednotka extends BaseModel
         
     }
 
+    public static function isInOrg($orgjednotka_id, $role = null, $user_id = null) {
+        $is = false;
+
+        if ( !is_null($user_id) ) {
+            $UserModel = new UserModel();
+            $user = $UserModel->getUser($user_id, true);
+        } else {
+            $user = Environment::getUser()->getIdentity();
+        }
+        
+        if ( count( $user->user_roles )>0 ) {
+            foreach ( $user->user_roles as $r ) {
+                if ( $r->orgjednotka_id == $orgjednotka_id ) {
+                    if ( is_null($r) ) {
+                        $is = true;
+                    } else {
+                        if (strpos($r->code, $role) !== false ) {
+                            $is = true;
+                        }
+                    }
+                }
+            }
+        }
+        return $is;
+    }
 
 }

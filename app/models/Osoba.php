@@ -137,7 +137,7 @@ class Osoba2User extends BaseModel
         $this->tbl_role = $prefix . $this->tbl_role;
     }
     
-    public function seznam($aktivni = 1) {
+    public function seznam($aktivni = 1, $filtr = null) {
 
 
         $result = dibi::query('SELECT ou.osoba_id, ou.user_id, r.role_id, o.*, r.code, r.name, r.orgjednotka_id
@@ -146,6 +146,27 @@ class Osoba2User extends BaseModel
                               ' LEFT JOIN %n o',$this->osoba,'ON o.osoba_id=ou.osoba_id'.
                               ' LEFT JOIN %n r',$this->tbl_role,'ON r.role_id=ur.role_id'.
                               ' WHERE ou.active=1'.
+                              ' ORDER BY o.prijmeni, o.jmeno, r.name'
+                );
+
+        return $result->fetchAll();
+
+
+    }
+
+    public function hledat($text) {
+
+
+
+
+        $result = dibi::query('SELECT ou.osoba_id, ou.user_id, r.role_id, o.*, r.code, r.name, r.orgjednotka_id
+                               FROM %n ou',$this->name,
+                              ' LEFT JOIN %n ur',$this->user_to_role,'ON ur.user_id=ou.user_id'.
+                              ' LEFT JOIN %n o',$this->osoba,'ON o.osoba_id=ou.osoba_id'.
+                              ' LEFT JOIN %n r',$this->tbl_role,'ON r.role_id=ur.role_id'.
+                              " WHERE (ou.active=1) AND".
+                              " ( CONCAT(o.jmeno,' ',o.prijmeni) LIKE %s","%".$text."%",
+                              " OR CONCAT(o.prijmeni,' ',o.jmeno) LIKE %s","%".$text."%"," ) ".
                               ' ORDER BY o.prijmeni, o.jmeno, r.name'
                 );
 

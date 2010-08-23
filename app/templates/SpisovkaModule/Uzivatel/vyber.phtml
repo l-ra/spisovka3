@@ -13,6 +13,31 @@
     </div>
 
     <div class="detail_blok">
+        <div class="detail_hlavicka">Organizační jednotky</div>
+        <br />
+    {if count($org_seznam)>0}
+    <table class="seznam">
+        {foreach $org_seznam as $org}
+        <tr>
+            <td>
+                <a href="{link :Spisovka:Uzivatel:vybrano, 'orgjednotka'=>$org->orgjednotka_id, 'dok_id'=>$dokument_id }" onclick="osobaVybrana(this); return false;">
+                   {$org->zkraceny_nazev}
+               </a>&nbsp;&nbsp;
+            </td>
+            <td>
+                {$org->plny_nazev}&nbsp;
+            </td>
+
+        </tr>
+        {/foreach}
+    </table>
+    {else}
+    <div class="prazdno">Nebyli zjištěni žádní zaměstnanci.</div>
+    {/if}
+    </div>
+
+
+    <div class="detail_blok">
         <div class="detail_hlavicka">Zaměstnanci</div>
         <br />
     {if count($seznam)>0}

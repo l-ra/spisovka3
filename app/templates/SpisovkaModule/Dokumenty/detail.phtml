@@ -74,17 +74,17 @@
        {/if}
        <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>0, 'dok_id'=>$Dok->dokument_id}" id="dialog-uzivatel">Předat dokument</a>
        {if $Predan==1 }
-       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id}" id="prevzitdokument">Převzít dokument</a>
+       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id, 'org'=>$orgjednotka->orgjednotka_id}" id="prevzitdokument">Převzít dokument</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 0 ) }
-       <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id}" id="kvyrizenidokument">Označit k vyřízení</a>
+       <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id, 'org'=>$orgjednotka->orgjednotka_id}" id="kvyrizenidokument">Označit k vyřízení</a>
        <a href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->dokument_id}" >Vytvořit odpověď</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
        <a href="{link :Spisovka:Dokumenty:odeslat , 'id'=>$Dok->dokument_id }">Odeslat dokument</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
-       <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
+       <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id, 'org'=>$orgjednotka->orgjednotka_id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
        {/if}
 
 
@@ -346,9 +346,15 @@
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
+            {if empty($Dok->prideleno->prideleno) }
+                organizační jednotce
+                <br />
+                {$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {else}
                 {$Dok->prideleno->prideleno_jmeno}
                 <br />
-                IT
+                {=@$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {/if}
             </dd>
         </dl>
         <dl class="detail_item">
@@ -365,9 +371,15 @@
         <dl class="detail_item">
             <dt>Předáno:</dt>
             <dd>
+            {if empty($Dok->predano->prideleno) }
+                organizační jednotce
+                <br />
+                {$Dok->predano->orgjednotka_info->zkraceny_nazev}
+            {else}
                 {$Dok->predano->prideleno_jmeno}
                 <br />
-                IT
+                {=@$Dok->predano->orgjednotka_info->zkraceny_nazev}
+            {/if}
             </dd>
         </dl>
         <dl class="detail_item">
@@ -573,13 +585,23 @@
             <dd class="normal">vytvořil a přiděleno {$wf->prideleno_jmeno}</dd>
             {elseif $wf->stav_dokumentu == 2}
             <dd>dokument předán</dd>
-            
+            <?php
+
+                if ( empty($wf->prideleno) ) {
+                    $wf_jmeno = $wf->orgjednotka_info->zkraceny_nazev;
+                    $wf_neprijato = 'předáno organizační jednotce '. $wf_jmeno .'. Ta dokument zatím nepřijala.';
+                } else {
+                    $wf_jmeno = $wf->prideleno_jmeno;
+                    $wf_neprijato = 'předáno '. $wf_jmeno .', ale zaměstnanec dokument zatím nepřijal';
+                }
+
+            ?>
             {if $wf->stav_osoby == 0}
-            <dd class="normal">předáno {$wf->prideleno_jmeno}, ale zaměstnanec dokument zatím nepřijal</dd>
+            <dd class="normal">{$wf_neprijato}</dd>
             {elseif $wf->stav_osoby >= 100}
-            <dd class="normal">předáno {$wf->prideleno_jmeno}, ale převzetí bylo zrušeno</dd>
+            <dd class="normal">předáno {$wf_jmeno}, ale převzetí bylo zrušeno</dd>
             {else}
-            <dd class="normal">předáno {$wf->prideleno_jmeno}</dd>
+            <dd class="normal">předáno {$wf_jmeno}</dd>
             {/if}
 
 

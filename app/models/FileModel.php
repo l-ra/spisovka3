@@ -228,6 +228,7 @@ class FileModel extends BaseModel
             'bcpio' => 'application/x-bcpio',
             'bin' => 'application/octet-stream',
             'bmp' => 'image/bmp',
+            'bsr' => 'application/x-bsr',
             'c' => 'text/plain',
             'cat' => 'application/vnd.ms-pkiseccat',
             'cdf' => 'application/x-cdf',
@@ -400,6 +401,8 @@ class FileModel extends BaseModel
             'xpm' => 'image/x-xpixmap',
             'xwd' => 'image/x-xwindowdump',
             'z' => 'application/x-compress',
+            'fo' => 'application/vnd.software602.filler.form+xml',
+            'zfo' => 'application/vnd.software602.filler.form-xml-zip',
             'zip' => 'application/zip'
 
         );
@@ -418,7 +421,7 @@ class FileModel extends BaseModel
         //    finfo_close($finfo);
         //    return $mimetype;
         } else if(function_exists("mime_content_type")) {
-            $fileSuffix = mime_content_type($filename);
+            $fileSuffix = @mime_content_type($filename);
             return ( $fileSuffix )?trim($fileSuffix[0]):'application/octet-stream';
         } else {
             return 'application/octet-stream';

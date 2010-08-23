@@ -35,18 +35,28 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
         if ( isset($filtr) ) {
+            // podrobne hledani = array
             $args = $Dokument->filtr($filtr);
             $this->filtr = $filtr;
             $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
         } else {
+            // rychle hledani = string
             $args = $Dokument->filtr('moje');
             $this->filtr = 'moje';
         }
 
         if ( isset($hledat) ) {
-            $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
-            $args = $Dokument->hledat($hledat);
-            $this->hledat = $hledat;
+            
+
+            if (is_array($hledat) ) {
+                $args = $hledat;
+                $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
+            } else {
+                $args = $Dokument->hledat($hledat);
+                $this->hledat = $hledat;
+                $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
+            }
+
         }
 
         $result = $Dokument->seznam($args);
@@ -163,6 +173,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             //Debug::dump($user);
 
             $user_id = $user->getIdentity()->user_id;
+
             $this->template->Pridelen = 0;
             $this->template->Predan = 0;
             $formUpravit = null;
@@ -175,6 +186,20 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $formUpravit = $this->getParam('upravit',null);
             } else if ( @$dokument->predano->prideleno == $user_id ) {
                 // predany
+                $this->template->AccessEdit = 1;
+                $this->template->AccessView = 1;
+                $this->template->Predan = 1;
+                $formUpravit = $this->getParam('upravit',null);
+            } else if ( empty($dokument->prideleno->prideleno)
+                        && Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id, 'vedouci') ) {
+                // prideleno organizacni jednotce
+                $this->template->AccessEdit = 1;
+                $this->template->AccessView = 1;
+                $this->template->Pridelen = 1;
+                $formUpravit = $this->getParam('upravit',null);
+            } else if ( empty($dokument->predano->prideleno)
+                        && Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id, 'vedouci') ) {
+                // predano organizacni jednotce
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;
@@ -246,10 +271,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParam('id',null);
         $user_id = $this->getParam('user',null);
+        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->predany($dokument_id) ) {
-            if ( $Workflow->prevzit($dokument_id, $user_id) ) {
+            if ( $Workflow->prevzit($dokument_id, $user_id, $orgjednotka_id) ) {
                 $this->flashMessage('Úspěšně jste si převzal tento dokument.');
             } else {
                 $this->flashMessage('Převzetí dokumentu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
@@ -267,10 +293,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParam('id',null);
         $user_id = $this->getParam('user',null);
+        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
-            if ( $Workflow->vyrizuje($dokument_id, $user_id) ) {
+            if ( $Workflow->vyrizuje($dokument_id, $user_id, $orgjednotka_id) ) {
                $Workflow->zrusit_prevzeti($dokument_id);
 
                $DokumentSpis = new DokumentSpis();
@@ -306,10 +333,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParam('id',null);
         $user_id = $this->getParam('user',null);
+        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
-            if ( $Workflow->vyrizeno($dokument_id, $user_id) ) {
+            if ( $Workflow->vyrizeno($dokument_id, $user_id, $orgjednotka_id) ) {
                 $Workflow->zrusit_prevzeti($dokument_id);
                 $this->flashMessage('Označil jste tento dokument za vyřízený!');
             } else {
@@ -1118,7 +1146,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // spisovy znak
 
 
-        Debug::dump($data); exit;
+        //Debug::dump($data); exit;
 
         $Dokument = new Dokument();
 
@@ -1783,6 +1811,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form = new AppForm();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
+        $form['dotaz']->getControlPrototype()->title = "Hledat lze dle věci, popisu, čísla jednacího a JID";
 
         $form->addSubmit('hledat', 'Hledat')
                  ->onClick[] = array($this, 'hledatSimpleClicked');

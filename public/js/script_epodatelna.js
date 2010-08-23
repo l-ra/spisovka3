@@ -69,11 +69,47 @@ $(function() {
         return false;
     });
 
+    $("#epodsubjekt-vytvorit").live("submit", function () {
+
+        if (document.getElementById) {
+            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+        }
+        if (x) {
+            x.onreadystatechange = function() {
+                if (x.readyState == 4 && x.status == 200) {
+
+                    stav = x.responseText;
+                    if ( stav.indexOf('###zmeneno###') != -1 ) {
+                        stav = stav.replace('###zmeneno###','');
+                        stav_a = stav.split("#");
+
+                        $('#dialog').dialog('close');
+                        renderEpodSubjekty(stav_a[0],stav_a[1]);
+                    } else {
+                        text = '';// '<div class="flash_message flash_info">Subjekt byl úspěšně vytvořen.</div>';
+                        text = text + x.responseText;
+                        $('#dialog').html(text);
+                    }
+
+                }
+            }
+            var formdata = $(this).serialize();
+
+            x.open("POST", $(this).attr('action'), true);
+            x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            x.setRequestHeader("Content-length", formdata.length);
+            x.setRequestHeader("Connection", "close");
+            x.send(formdata);
+        }
+
+        return false;
+    });
+
 
 });
 
 
-renderEpodSubjekty = function (subjekt_id) {
+renderEpodSubjekty = function (subjekt_id, epodatelna_id) {
 
     if (document.getElementById) {
         var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
@@ -96,12 +132,22 @@ renderEpodSubjekty = function (subjekt_id) {
                     html = html + '        </table>';
                     $('#dok-subjekty').html(html);
                 } else {
-                    $('#subjekty-table').append(x.responseText);
+
+                    subjekt_tr = document.getElementById('epodsubjekt-'+subjekt_id);
+                    if ( subjekt_tr != null ) {
+                        // replace
+                        $(subjekt_tr).replaceWith(x.responseText);
+                    } else {
+                        // append
+                        $('#subjekty-table').append(x.responseText);
+                    }
+
+                    
                 }
             }
         }
         baseUri = baseUri.replace('/public','');
-        x.open("GET", baseUri + 'epodatelna/subjekty/nacti/'+ subjekt_id, true);
+        x.open("GET", baseUri + 'epodatelna/subjekty/nacti/'+ subjekt_id + '/?epod_id='+epodatelna_id, true);
         x.send(null);
     }
 
@@ -123,8 +169,9 @@ epodSubjektVybran = function (elm) {
 
                 if ( stav.indexOf('###vybrano###') != -1 ) {
                     stav = stav.replace('###vybrano###','');
+                    stav_a = stav.split("#");
                     $('#dialog').dialog('close');
-                    renderEpodSubjekty(stav);
+                    renderEpodSubjekty(stav_a[0],stav_a[1]);
                 } else {
                     $('#dialog').html(stav);
                 }

@@ -1,4 +1,4 @@
-         <tr>
+         <tr id="epodsubjekt-{$subjekt->subjekt_id}">
             <td class="icon">
                 <input type="checkbox" name="subjekt[{$subjekt->subjekt_id}]" />
             </td>
@@ -13,7 +13,7 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:zmenit, 'id'=>$subjekt->subjekt_id }" >upravit</a>&nbsp;&nbsp;
+                    <a href="{link :Epodatelna:Subjekty:upravit, 'id'=>$subjekt->subjekt_id, 'epod_id'=>$epodatelna_id}" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
             <td class="meta_plus">

@@ -163,16 +163,12 @@ class Subjekt extends BaseModel
                 $result = array_merge($result, $fetch);
             }
 
-
-
-
-
         }
 
         $tmp = array();
         if ( count($result)>0 ) {
             foreach ($result as $subjekt) {
-                $tmp[] = $this->getInfo($subjekt->subjekt_id);
+                $tmp[ $subjekt->subjekt_id ] = $this->getInfo($subjekt->subjekt_id);
             }
             return $tmp;
         } else {

@@ -206,6 +206,12 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $Zamestnanci = new Osoba2User();
         $seznam = $Zamestnanci->seznam(1);
         $this->template->seznam = $seznam;
+
+        $OrgJednotky = new Orgjednotka();
+        $oseznam = $OrgJednotky->seznam();
+        $this->template->org_seznam = $oseznam;
+
+
     }
 
     public function renderVybrano()

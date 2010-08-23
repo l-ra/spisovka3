@@ -83,7 +83,13 @@
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->predano) }
             <td class="prideleno">
-                {$dok->predano->prideleno_jmeno}
+            {if empty($dok->prideleno->prideleno) }
+                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {else}
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {/if}
             </td>
             <td class="stav">
                 předáno
@@ -92,7 +98,13 @@
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->prideleno) }
             <td class="prideleno">
+            {if empty($dok->prideleno->prideleno) }
+                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {else}
                 {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {/if}
             </td>
             <td class="stav">
                 přiděleno
@@ -102,6 +114,8 @@
             {elseif $dok->stav_dokumentu == 3 }
             <td class="prideleno">
                 {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
                 vyřizuje se
@@ -111,6 +125,8 @@
             {elseif $dok->stav_dokumentu == 4 }
             <td class="prideleno">
                 {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
                 vyřízeno
@@ -144,7 +160,9 @@
         {elseif $no_items==2}
         <div class="prazdno">K danému filtru nemáte k dispozici žádné dokumenty.</div>
         {elseif $no_items==3}
-        <div class="prazdno">Dokument odpovidající hledanému výrazu nebyl nalezen.</div>
+        <div class="prazdno">Dokumenty odpovidající hledanému výrazu nebyly nalezeny.</div>
+        {elseif $no_items==4}
+        <div class="prazdno">Dokumenty odpovidající daným požadavkům nebyly nalezeny.</div>
         {/if}
         {else}
     <div class="prazdno">Nebyly zjištěny žádné dokumenty.</div>

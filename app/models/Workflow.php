@@ -59,44 +59,10 @@ class Workflow extends BaseModel
 
             $UserModel = new UserModel();
             $user_info = $UserModel->getUser($user->user_id, 1);
-
-
-/*
-object(Identity) (4) {
-   "name" private => string(21) "Ing. Tomáš Vančura"
-   "roles" private => array(1) {
-      0 => string(11) "programator"
-   }
-   "data" private => array(10) {
-      "user_id" => string(2) "25"
-      "active" => string(1) "1"
-      "date_created" => string(19) "2010-04-16 11:55:23"
-      "last_modified" => NULL
-      "last_login" => string(19) "2010-05-14 11:05:27"
-      "username" => string(5) "tomik"
-      "last_ip" => string(9) "127.0.0.1"
-      "identity" => object(DibiRow) (11) {
-         "osoba_id" => string(1) "1"
-         "prijmeni" => string(8) "Vančura"
-         "jmeno" => string(7) "Tomáš"
-         "titul_pred" => string(4) "Ing."
-         "titul_za" => string(0) ""
-         "email" => string(16) "tomas@vancura.eu"
-         "telefon" => string(11) "776 722 189"
-         "pozice" => string(12) "programátor"
-         "stav" => string(1) "1"
-         "date_created" => string(19) "2010-04-02 10:24:14"
-         "date_modified" => string(19) "2010-04-07 15:31:26"
-      }
-      "display_name" => string(21) "Ing. Tomáš Vančura"
-      "user_roles" => array(1) {
-         0 => object(DibiRow) (11) {
-            ...
-         }
-      }
-   }
-*/
-
+            $org_info = $UserModel->getOrg($user->user_id);
+            if ( is_array($org_info) ) {
+                $org_info = current($org_info);
+            }
 
             $data = array();
             $data['dokument_id'] = $dokument_id;
@@ -105,8 +71,8 @@ object(Identity) (4) {
             $data['aktivni'] = 1;
             $data['prideleno'] = $user->user_id;
             $data['prideleno_info'] = serialize($user_info->identity);
-            $data['orgjednotka_id'] = null;
-            $data['orgjednotka_info'] = '';
+            $data['orgjednotka_id'] = @$org_info->orgjednotka_id;
+            $data['orgjednotka_info'] = @serialize($org_info);
             $data['stav_osoby'] = 1;
             $data['date'] = new DateTime();
             $data['user_id'] = $user->user_id;
@@ -160,6 +126,9 @@ object(Identity) (4) {
                 $prideleno_info = $UserModel->getUser($user_id, 1);
                 $data['prideleno'] = $prideleno_info->user_id;
                 $data['prideleno_info'] = serialize($prideleno_info->identity);
+
+                $log = 'Dokument předán zaměstnanci '. Osoba::displayName($prideleno_info->identity) .'.';
+
             } else {
                 $data['prideleno'] = null;
                 $data['prideleno_info'] = '';
@@ -170,6 +139,9 @@ object(Identity) (4) {
                 $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                 $data['orgjednotka_id'] = $orgjednotka_id;
                 $data['orgjednotka_info'] = serialize($org_info);
+
+                $log = 'Dokument předán organizační jednotce '. $org_info->zkraceny_nazev .'.';
+
             } else {
                 $data['orgjednotka_id'] = null;
                 $data['orgjednotka_info'] = '';
@@ -189,7 +161,7 @@ object(Identity) (4) {
             if ( $result_insert ) {
 
                 $Log = new LogModel();
-                $Log->logDokument($dokument_id, LogModel::DOK_PREDAN, 'Dokument předán zaměstnanci '. Osoba::displayName($user_info->identity) .'.');
+                $Log->logDokument($dokument_id, LogModel::DOK_PREDAN, $log);
                 
 
                 return true;
@@ -223,7 +195,7 @@ object(Identity) (4) {
     }
 
 
-    public function prevzit($dokument_id, $user_id)
+    public function prevzit($dokument_id, $user_id, $orgjednotka_id = null)
     {
         if ( is_numeric($dokument_id) ) {
 
@@ -231,7 +203,22 @@ object(Identity) (4) {
             $predan = is_array($predan_array)?$predan_array[0]:null;
 
             if ( $predan ) {
-                if ( $predan->prideleno == $user_id ) {
+
+                // test predaneho
+                // pokud neni predana osoba, tak test na vedouciho org.jednotky
+                $access = 0; $log_plus = ".";
+                if ( empty($predan->prideleno) ) {
+                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id, 'vedouci', $user_id) ) {
+                        $access = 1;
+                        $log_plus = " určený organizační jednotce ". $predan->orgjednotka_info->zkraceny_nazev. ".";
+                    }
+                } else {
+                    if ( $predan->prideleno == $user_id ) {
+                        $access = 1;
+                    }
+                }
+
+                if ( $access == 1 ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -267,7 +254,7 @@ object(Identity) (4) {
                     if ( $result_update ) {
 
                         $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_PRIJAT, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument.');
+                        $Log->logDokument($dokument_id, LogModel::DOK_PRIJAT, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument'.$log_plus);
 
 
                         return true;
@@ -286,7 +273,7 @@ object(Identity) (4) {
         }
     }
 
-    public function vyrizuje($dokument_id, $user_id)
+    public function vyrizuje($dokument_id, $user_id, $orgjednotka_id = null)
     {
         if ( is_numeric($dokument_id) ) {
 
@@ -294,7 +281,19 @@ object(Identity) (4) {
             $predan = is_array($predan_array)?$predan_array[0]:null;
 
             if ( $predan ) {
-                if ( $predan->prideleno == $user_id ) {
+
+                $access = 0;
+                if ( empty($predan->prideleno) ) {
+                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id, 'vedouci', $user_id) ) {
+                        $access = 1;
+                    }
+                } else {
+                    if ( $predan->prideleno == $user_id ) {
+                        $access = 1;
+                    }
+                }
+
+                if ( $access == 1 ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -327,7 +326,7 @@ object(Identity) (4) {
                         $data['prideleno_info'] = '';
                     }
 
-                    /*if ( $orgjednotka_id ) {
+                    if ( $orgjednotka_id ) {
                         $OrgJednotka = new Orgjednotka();
                         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                         $data['orgjednotka_id'] = $orgjednotka_id;
@@ -335,7 +334,7 @@ object(Identity) (4) {
                     } else {
                         $data['orgjednotka_id'] = null;
                         $data['orgjednotka_info'] = '';
-                    }*/
+                    }
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->user_id;
@@ -368,7 +367,7 @@ object(Identity) (4) {
         }
     }
 
-    public function vyrizeno($dokument_id, $user_id)
+    public function vyrizeno($dokument_id, $user_id, $orgjednotka_id = null)
     {
         if ( is_numeric($dokument_id) ) {
 
@@ -409,7 +408,7 @@ object(Identity) (4) {
                         $data['prideleno_info'] = '';
                     }
 
-                    /*if ( $orgjednotka_id ) {
+                    if ( $orgjednotka_id ) {
                         $OrgJednotka = new Orgjednotka();
                         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                         $data['orgjednotka_id'] = $orgjednotka_id;
@@ -417,7 +416,7 @@ object(Identity) (4) {
                     } else {
                         $data['orgjednotka_id'] = null;
                         $data['orgjednotka_info'] = '';
-                    }*/
+                    }
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->user_id;
@@ -468,15 +467,27 @@ object(Identity) (4) {
         $param['where'] = array( 
                 array('dokument_id=%i', $dokument_id),
                 array('stav_osoby=%i', 1),
-                array('aktivni=%i', 1),
-                array('prideleno=%i', $user_id),
+                array('aktivni=%i', 1)
             );
         $param['limit'] = 1;
 
         $rows = $this->fetchAllComplet($param);
         $row = $rows->fetch();
 
-        return ($row)?true:false;
+        if ( $row ) {
+            if ( empty($row->prideleno) ) {
+                if ( Orgjednotka::isInOrg($row->orgjednotka_id, 'vedouci', $user_id) ) {
+                    return true;
+                }
+            } else {
+                if ( $row->prideleno == $user_id ) {
+                    return true;
+                }
+            }
+
+        }
+
+        return false;
     }
 
     /**
@@ -497,15 +508,28 @@ object(Identity) (4) {
         $param['where'] = array(
                 array('dokument_id=%i', $dokument_id),
                 array('stav_osoby=%i', 0),
-                array('aktivni=%i', 1),
-                array('prideleno=%i', $user_id),
+                array('aktivni=%i', 1)
             );
+        //array('prideleno=%i', $user_id),
         $param['limit'] = 1;
 
         $rows = $this->fetchAllComplet($param);
         $row = $rows->fetch();
 
-        return ($row)?true:false;
+        if ( $row ) {
+            if ( empty($row->prideleno) ) {
+                if ( Orgjednotka::isInOrg($row->orgjednotka_id, 'vedouci', $user_id) ) {
+                    return true;
+                }
+            } else {
+                if ( $row->prideleno == $user_id ) {
+                    return true;
+                }
+            }
+
+        }
+        
+        return false;
     }
 
     protected function deaktivovat($dokument_id, $dokument_version = null) {
