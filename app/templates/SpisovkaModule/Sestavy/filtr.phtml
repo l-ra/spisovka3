@@ -1,0 +1,33 @@
+    <form action="" method="get" onsubmit="return zobrazSestavu(this);">
+        <input type="hidden" name="url" value="<?php echo $_GET['url'] ?>">
+        <dl class="detail_item">
+            <dt>Pořadové číslo:</dt>
+            <dd>
+                od: <input type="text" name="pc_od" size="10" />
+                do: <input type="text" name="pc_do" size="10" />
+                <span class="normal">(celočíselná kladná hodnota)</span>
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum:</dt>
+            <dd>
+                od: <input type="text" name="d_od" size="10" class="datepicker" />
+                do: <input type="text" name="d_do" size="10" class="datepicker" />
+                <span class="normal">(platný formát data včetně dne, měsíce a roku)</span>
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Rok:</dt>
+            <dd>
+                <input type="text" name="rok" size="5" value="{=date('Y')}" />
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                <input type="submit" name="filtrovat" value="Zobrazit" />
+                <input type="button" name="storno" value="Zrušit" onclick="return zrusitFiltrSestavy();" />
+            </dd>
+        </dl>
+
+    </form>

@@ -114,6 +114,57 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $args['order'] = array('d.podaci_denik_poradi','d.nazev');
         }
 
+        // vstup
+        $pc_od = $this->getParam('pc_od',null);
+        $pc_do = $this->getParam('pc_do',null);
+        
+        if ( $this->getParam('d_od',null) ) {
+            try {
+                $d_od = date("Y-m-d", strtotime($this->getParam('d_od',null)));
+                //$d_od = new DateTime($this->getParam('d_od',null));
+            } catch (Exception $e) {
+                $d_od = null;
+            }
+        }
+        if ( $this->getParam('d_do',null) ) {
+            try {
+                $d_do = date("Y-m-d", strtotime($this->getParam('d_do',null)));
+                //$d_do = new DateTime($this->getParam('d_do',null));
+            } catch (Exception $e) {
+                $d_do = null;
+            }
+        }
+        $rok   = $this->getParam('rok',null);
+
+        // rok
+        if ( !empty($rok) ) {
+            $args['where'][] = array('d.podaci_denik_rok = %i',$rok);
+        }
+
+        // rozsah poradoveho cisla
+        if ( !empty($pc_od) && !empty($pc_do) ) {
+            $args['where'][] = array(
+                                'd.podaci_denik_poradi >= %i AND ',$pc_od,
+                                'd.podaci_denik_poradi <= %i',$pc_do
+                               );
+        } else if ( !empty($pc_od) && empty($pc_do) ) {
+            $args['where'][] = array('d.podaci_denik_poradi >= %i',$pc_od);
+        } else if ( empty($pc_od) && !empty($pc_do) ) {
+            $args['where'][] = array('d.podaci_denik_poradi <= %i',$pc_do);
+        }
+
+        // rozsah datumu
+        if ( !empty($d_od) && !empty($d_do) ) {
+            $args['where'][] = array(
+                                'd.datum_vzniku >= %s AND ',$d_od,
+                                'd.datum_vzniku <= %s',$d_do
+                               );
+        } else if ( !empty($d_od) && empty($d_do) ) {
+            $args['where'][] = array('d.datum_vzniku >= %s',$d_od);
+        } else if ( empty($d_od) && !empty($d_do) ) {
+            $args['where'][] = array('d.datum_vzniku <= %s',$d_do);
+        }
+
         // vystup
         //$user_config = Environment::getVariable('user_config');
         //$vp = new VisualPaginator($this, 'vp');

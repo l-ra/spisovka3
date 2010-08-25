@@ -357,7 +357,6 @@ renderSubjekty = function (dokument_id) {
     return false;
 }
 
-    // Dialog - Vyber spisu
 novySubjekt = function (elm) {
 
     if (document.getElementById) {
@@ -639,6 +638,50 @@ pripojitDokument = function (elm) {
     $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
 
 
+    return false;
+}
+
+filtrSestavy = function (elm) {
+
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                $('#dialog').html(x.responseText);
+            }
+        }
+
+        baseUri = baseUri.replace('/public','');
+        var url = baseUri + 'sestavy/0/filtr/?url='+elm.href;
+        x.open("GET", url, true);
+        x.send(null);
+    }
+
+    $('#ui-dialog-title-dialog').html('Filtr');
+    $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
+    $('#dialog').dialog('open');
+
+    return false;
+}
+
+zobrazSestavu = function (elm) {
+
+    var param = '?';
+    if ( elm.pc_od.value != '' ) { param = param + 'pc_od=' + elm.pc_od.value + '&' }
+    if ( elm.pc_do.value != '' ) { param = param + 'pc_do=' + elm.pc_do.value + '&' }
+    if ( elm.d_od.value != '' )  { param = param + 'd_od=' + elm.d_od.value + '&' }
+    if ( elm.d_do.value != '' )  { param = param + 'd_do=' + elm.d_do.value + '&' }
+    if ( elm.rok.value != '' )   { param = param + 'rok=' + elm.rok.value }
+
+    window.location.href = elm.url.value + param;
+
+    return false;
+}
+
+zrusitFiltrSestavy = function () {
+    $('#dialog').dialog('close');
     return false;
 }
 

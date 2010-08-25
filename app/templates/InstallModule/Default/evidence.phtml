@@ -1,0 +1,114 @@
+{block title}Instalace - nastavení evidence{/block}
+{block menu}
+Úvod - Kontrola - Nahrání databáze - Nastavení klienta - Nastavení e-podatelny - Nastavení autorizované konverze - Konec
+{/block}
+{block content}
+<h1>Instalace - nastavení evidence</h1>
+
+<p>Vítejte...</p>
+
+    <div class="detail_blok">
+        {control nastaveniCJForm}
+        <dl class="detail_item">
+            <dt>Masky:</dt>
+            <dd class="normal">
+                <table>
+                    <tr>
+                        <th><strong>maska</strong></th>
+                        <th>ukázka</th>
+                        <th>popis</th>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;evidence&#125;</strong></td>
+                        <td>denik</td>
+                        <td>evidence / podací deník</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;poradove_cislo&#125;</strong></td>
+                        <td>64</td>
+                        <td>pořadové číslo evidence</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;poradove_cislo|n&#125;</strong></td>
+                        <td>000064</td>
+                        <td>pořadové číslo evidence s počátečními nulami (ukázka &#123;poradove_cislo|6&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;rok&#125;</strong></td>
+                        <td>{=date("Y")}</td>
+                        <td>rok</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;urad&#125;</strong></td>
+                        <td>MEVs</td>
+                        <td>zkratka úřadu</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;urad_poradi&#125;</strong></td>
+                        <td>64</td>
+                        <td>pořadové číslo úřadu</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;urad_poradi|n&#125;</strong></td>
+                        <td>064</td>
+                        <td>pořadové číslo úřadu s počátečními nulami (ukázka &#123;urad_poradi|3&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org&#125;</strong></td>
+                        <td>UIT</td>
+                        <td>zkratka organizační jednotky / útvaru</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org_id&#125;</strong></td>
+                        <td>1</td>
+                        <td>vnitřní identifikátor organizační jednotky</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org_id|n&#125;</strong></td>
+                        <td>001</td>
+                        <td>vnitřní identifikátor organizační jednotky s počátečními nulami (ukázka &#123;org_id|3&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org_poradi&#125;</strong></td>
+                        <td>64</td>
+                        <td>pořadové číslo organizační jednotky</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;org_poradi|n&#125;</strong></td>
+                        <td>00064</td>
+                        <td>pořadové číslo organizační jednotky s počátečními nulami (ukázka &#123;org_poradi|6&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user_id&#125;</strong></td>
+                        <td>21</td>
+                        <td>vnitřní identifikátor uživatele</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user_id|n&#125;</strong></td>
+                        <td>21</td>
+                        <td>vnitřní identifikátor uživatele s počátečními nulami (ukázka &#123;user_id|1&#125;)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user&#125;</strong></td>
+                        <td>novak</td>
+                        <td>přihlašovací jméno uživatele</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;prijmeni&#125;</strong></td>
+                        <td>novak</td>
+                        <td>příjmení uživatele</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user_poradi&#125;</strong></td>
+                        <td>5</td>
+                        <td>pořadové číslo uživatele</td>
+                    </tr>
+                    <tr>
+                        <td><strong>&#123;user_poradi|n&#125;</strong></td>
+                        <td>000005</td>
+                        <td>pořadové číslo uživatele s počátečními nulami (ukázka &#123;user_poradi|6&#125;)</td>
+                    </tr>
+                </table>
+            </dd>
+        </dl>
+    </div>

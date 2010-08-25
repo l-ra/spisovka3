@@ -7,6 +7,10 @@ body {
     font-size: 9pt;
 }
 
+img {
+    border: 0px;
+}
+
 .small {
     font-size: 8pt;
     margin-top: 3px; margin-bottom: 3px;
@@ -90,10 +94,28 @@ body {
 #menu {
     background: #03406A url() repeat-x;
     padding: 10px 10px;
+    color: #DDDDDD;
+    font-weight: bold;
 }
 
 #menu a {
     color: #FFC273;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    margin: 0px 10px;
+}
+
+#menu strong {
+    color: #00cc00;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    margin: 0px 10px;
+}
+
+#menu span {
+    color: #dddddd;
     font-weight: bold;
     font-size: 12px;
     text-decoration: none;
