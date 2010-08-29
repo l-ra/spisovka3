@@ -1,0 +1,43 @@
+{block title}Instalace - Konec{/block}
+{block menu}
+<a href="{link :Install:Default:uvod}">Úvod</a> >
+<a href="{link :Install:Default:kontrola}">Kontrola</a> >
+<a href="{link :Install:Default:databaze}">Nahrání databáze</a> >
+<a href="{link :Install:Default:urad}">Nastavení klienta</a> >
+<a href="{link :Install:Default:evidence}">Nastavení evidence</a> >
+<strong>Nastavení správce</strong> >
+<span>Konec</span>
+{/block}
+{block content}
+<h1>Instalace - Dokončení</h1>
+
+<div id="kontrola">
+    {if $dokonceno}
+    <div class="passed result">
+        <h2>Blahopřeji! Instalace spisové služby byla úspěšně dokončena.</h2>
+        <p>Nyní můžete začít používat aplikaci.</p>
+        <p>
+            Další tipy po instalaci:
+            <ul>
+                <li>Vytvořte si organizační jednotky, které ve Vašém úřadu existují a budou využívat spisovou službu.</li>
+                <li>Vytvořte si zaměstnance, kteří budou využívat spisovou službu.</li>
+                <li>Všem nebo vybraným zaměstnancům vytvořte uživatelské účty a přiřaďte jim odpovídající role.</li>
+                <li>Budete-li používat e-podatelnu, nastavte potřebné hodnoty pro přístup k datové schránce nebo pro příjem emailových zpráv.</li>
+            </ul>
+            
+        </p>
+        <p><a href="{link :Spisovka:Default:default}">Přejít k aplikaci</a></p>
+    </div>
+    {else}
+    <div class="failed result">
+        <h2>Proces instalace spisové služby nebyl úspěšně dokončen!</h2>
+        <p>Byly zjištěny tyto nesrovnalosti:
+            <ul>
+            {foreach $errors as $e}
+                <li>{$e}</li>
+            {/foreach}
+            </ul>
+        </p>
+    </div>
+    {/if}
+</div>

@@ -1,36 +1,48 @@
 <?php
 
-
-
-/* use only DefaultPresenter in PHP 5.3 */
-
 class Install_DefaultPresenter extends BasePresenter
 {
+
+    public function startup() {
+
+        if ( file_exists(APP_DIR .'configs/'. KLIENT .'_install') ) {
+            // instalovano
+            $this->setView('instalovano');
+        }
+        $session = Environment::getSession('s3_install');
+
+        parent::startup();
+
+        //Debug::dump($session->step);
+        $this->template->step = $session->step;
+
+    }
 
     public function renderDefault()
     {
 
+        $session = Environment::getSession('s3_install');
+        unset($session->step);
+
+        //$this->redirect('uvod');
     }
 
     public function renderUvod()
     {
-
-        if ( !$this->accepted() ) {
-            $this->forward(':Install:Default:noaccess');
+        $session = Environment::getSession('s3_install');
+        if ( !isset($session->step) ) {
+            $session->step = array();
         }
-        
-
-
-
-
     }
 
     public function renderKontrola()
     {
 
-        //if ( !$this->accepted() ) {
-        //    $this->forward(':Install:Default:noaccess');
-        //}
+        $session = Environment::getSession('s3_install');
+        if ( !isset($session->step) ) {
+            $session->step = array();
+        }
+        @$session->step['uvod'] = 1;
 
         $this->template->errors = FALSE;
         $this->template->warnings = FALSE;
@@ -157,7 +169,7 @@ class Install_DefaultPresenter extends BasePresenter
         if ( !empty($app_info) ) {
             $app_info = explode("#",$app_info);
         } else {
-            $app_info = array('3.x','rev.X','OSS Spisová služba v3','1270716764');
+            $app_info = array('3.x','rev.X','OSS Spisová služba v3','1283292000');
         }
 
         define('CHECKER_VERSION', '1.4');
@@ -166,8 +178,8 @@ class Install_DefaultPresenter extends BasePresenter
         $requirements_ess = $this->paint( array(
             array(
 		'title' => 'Aplikace',
-		/*'message' => ( @$app_info[2] .' ('. @$app_info[1] .', vydáno '. date('j.n.Y',@$app_info[3]) .')')*/
-                'message' => $app_info[2]
+		'message' => ( @$app_info[2] .' (#'. @$app_info[1] .', vydáno '. @date('j.n.Y',@$app_info[3]) .')')
+                /*'message' => $app_info[2]*/
             ),
             array(
 		'title' => 'Web server',
@@ -179,7 +191,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'required' => TRUE,
 		'passed' => version_compare(PHP_VERSION, '5.2.0', '>='),
 		'message' => PHP_VERSION,
-		'description' => 'Your PHP version is too old. Nette Framework requires at least PHP 5.2.0 or higher.',
+		'description' => 'Použiváte starší verzi PHP. Aplikace pro správny chod vyžaduje PHP verzi 5.2.0 nebo výš.',
             ),
 
             array(
@@ -532,20 +544,534 @@ class Install_DefaultPresenter extends BasePresenter
         $this->template->requirements = $requirements_nette;
         $this->template->requirements_ess = $requirements_ess;
 
+        if ( !$this->template->errors ){
+            @$session->step['kontrola'] = 1;
+        }
+        
+
+
     }
 
     public function renderDatabaze()
     {
+
+        $session = Environment::getSession('s3_install');
+        if ( !isset($session->step) ) {
+            $session->step = array();
+        }
+        if ( @$session->step['databaze'] == 1 ) {
+            $this->template->provedeno = 1;
+        }
+
+        $this->template->errors = FALSE;
+        $this->template->warnings = FALSE;
+        
         try {
-            $db_info = Environment::getConfig('database');
-            dibi::connect($db_info);
+            $db_config = Environment::getConfig('database');
+            dibi::connect($db_config);
+
+            $db_tables = dibi::getDatabaseInfo()->getTableNames();
+
+            $sql_template_source = file_get_contents(APP_DIR .'/InstallModule/mysql.sql');
+            $sql_query = explode(";",$sql_template_source);
+
+            $database_a = array(
+                array(
+                    'title' => 'DB driver',
+                    'message' => $db_config->driver
+                ),
+                array(
+                    'title' => 'DB server',
+                    'message' => $db_config->host
+                ),
+                array(
+                    'title' => 'DB přihlašovací jméno',
+                    'message' => $db_config->username,
+                ),
+                array(
+                    'title' => 'DB databáze',
+                    'message' => $db_config->database,
+                ),
+                array(
+                    'title' => 'DB prefix tabulek',
+                    'message' => $db_config->prefix,
+                )
+            );
+
+            foreach ( $sql_query as $query ) {
+
+                $query = str_replace("\r", "", $query);
+                $query = str_replace("\n", "", $query);
+                $query = str_replace("\t", " ", $query);
+                $query = str_replace("{tbls3}", $db_config->prefix, $query);
+                $query = trim($query);
+
+                if ( empty($query) ) continue;
+
+                if ( $this->getParam('install', null) ) {
+                    // instalace
+                    $this->template->db_install = 1;
+                    $query_part = explode("`",$query);
+                    // provedeni prikazu
+                    try {
+
+                        dibi::query($query);
+                        
+                        $passed = true;
+                        $sql_error = "";
+                    } catch ( DibiException $e ) {
+                        $passed = false;
+                        $sql_error = $e->getMessage();
+                    }
+
+
+                    if ( strpos($query, "CREATE")!==false ) {
+                        $message = "Tabulka byla úspěšně vytvořena";
+                        $error_message = "Tabulku se nepodařilo vytvořit!";
+                    } else if ( strpos($query, "INSERT")!==false ) {
+                        $message = "Data do tabulky byly úspěšně nahrány.";
+                        $error_message = "Data do tabulky se nepodařilo nahrát!";
+                    }
+
+                    $query = "<p>SQL Chyba: ". $sql_error ." </p><p>QUERY: $query</p>";
+
+                    $database_a[] = array(
+                        'title' => @$query_part[1],
+                        'required' => TRUE,
+                        'passed' => $passed,
+                        'message' => $message,
+                        'errorMessage' => $error_message,
+                        'description' => $query,
+                    );
+                } else {
+                    // predkontrola
+                    $query_part = explode("`",$query);
+                    if ( ( strpos($query, "CREATE")!==false ) && isset($query_part[1]) ) {
+                        if ( in_array($query_part[1], $db_tables) ) {
+                            $database_a[] = array(
+                                'title' => @$query_part[1],
+                                'required' => TRUE,
+                                'passed' => false,
+                                'message' => ' ',
+                                'errorMessage' => 'Tabulka již v databázi existuje.',
+                                'description' => '',
+                            );
+                        }
+                    }
+                }
+
+
+
+            }
+
+            $database = $this->paint( $database_a );
+            $this->template->database = $database;
+
+            if ( !($this->template->errors) && isset($this->template->db_install) ) {
+                @$session->step['databaze'] = 1;
+            }
+
         } catch (DibiDriverException $e) {
-
-
-
             $database_info = $e->getMessage();
+            $this->template->errors = $database_info;
         }
     }
+
+    public function renderUrad()
+    {
+        $session = Environment::getSession('s3_install');
+        if ( !isset($session->step) ) {
+            $session->step = array();
+        }
+
+        $user_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $this->template->Urad = $user_config->urad;
+    }
+
+    public function renderEvidence()
+    {
+        $session = Environment::getSession('s3_install');
+        if ( !isset($session->step) ) {
+            $session->step = array();
+        }
+        @$session->step['evidence'] = 0;
+
+        $user_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $this->template->CisloJednaci = $user_config->cislo_jednaci;
+    }
+
+    public function renderSpravce()
+    {
+        $session = Environment::getSession('s3_install');
+        if ( !isset($session->step) ) {
+            $session->step = array();
+        }
+        if ( @$session->step['spravce'] == 1 ) {
+            $this->flashMessage('Správce byl již vytvořen.','warning');
+            $this->template->provedeno = 1;
+        }
+        
+    }
+
+    public function renderKonec()
+    {
+
+        $session = Environment::getSession('s3_install');
+
+        $dokonceno = 1; $errors = array();
+        
+        if ( !isset($session->step) ) {
+            $errors[] = "Nebyly provedeny žádné kroky ke správné instalaci. Proveďte instalaci podle od začátku a postupně!";
+            $dokonceno = 0;
+        }
+        if ( @$session->step['kontrola'] != 1 ) {
+            $errors[] = "Instalace neprošla vstupní kontrolou na minimální požadavky aplikace!";
+            $dokonceno = 0;
+        }
+        if ( @$session->step['databaze'] != 1 ) {
+            $errors[] = "Instalace neprošla procesem nahrání tabulek a dat do databáze!";
+            $dokonceno = 0;
+        }
+        if ( @$session->step['urad'] != 1 ) {
+            $errors[] = "Instalace neprošla procesem uložení informace o úřadu/firmy!";
+            $dokonceno = 0;
+        }
+        if ( @$session->step['evidence'] != 1 ) {
+            $errors[] = "Instalace neprošla procesem nastavení evidence!";
+            $dokonceno = 0;
+        }
+        if ( @$session->step['spravce'] != 1 ) {
+            $errors[] = "Instalace neprošla procesem přidání správce systému!";
+            $dokonceno = 0;
+        }
+
+        if ( @$session->step['konec'] == 1 ) {
+            $dokonceno = 1;
+        }
+
+        if ( $dokonceno == 1 ) {
+
+            $Urad = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini')->urad;
+            $zerotime = mktime(0,0,0,8,20,2008);
+            $diff = time() - $zerotime;
+            $diff = round($diff / 3600);
+            $unique_signature = $diff ."#". time();
+
+            if ( $fp = fopen( APP_DIR .'/configs/'.KLIENT.'_install','wb') ) {
+                if ( fwrite($fp, $unique_signature, strlen($unique_signature)) ) {
+                    $dokonceno = 2;
+                    if ( !isset($session->step) ) {
+                        $session->step = array();
+                    }
+                    @$session->step['konec'] = 1;
+                }
+                @fclose($fp);
+            }
+        }
+        
+        $this->template->dokonceno = $dokonceno;
+        $this->template->errors = $errors;
+
+
+    }
+
+    public function renderEpodatelna()
+    {
+        // Klientske nastaveni
+        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep = $ep_config->toArray();
+
+        // ISDS
+        $this->template->n_isds = $ep['isds'];
+
+        // Email
+        if ( count($ep['email'])>0 ) {
+            $e_mail = array();
+
+            $typ_serveru = array(
+                            ''=>'',
+                            '/pop3/novalidate-cert'=>'POP3',
+                            '/pop3/ssl/novalidate-cert'=>'POP3-SSL',
+                            '/imap/novalidate-cert'=>'IMAP',
+                            '/imap/ssl/novalidate-cert'=>'IMAP+SSL',
+                            '/nntp'=>'NNTP'
+                );
+            foreach ($ep['email'] as $ei => $email) {
+                $email['protokol'] = $typ_serveru[ $email['typ'] ];
+                $e_mail[$ei] = $email;
+            }
+
+            $this->template->n_email = $e_mail;
+        } else {
+            $this->template->n_email = null;
+        }
+
+        // Odeslani
+        if ( count($ep['odeslani'])>0 ) {
+            $e_odes = array();
+            $typ_odes = array(
+                          '0'=>'klasicky bez kvalifikovaného podpisu/značky',
+                          '1'=>'s kvalifikovaným podpisem/značky'
+                );
+            foreach ($ep['odeslani'] as $eo => $odes) {
+
+                $odes['zpusob_odeslani'] = $typ_odes[ $odes['typ_odeslani'] ];
+                $e_odes[$eo] = $odes;
+            }
+
+            $this->template->n_odeslani = $e_odes;
+        } else {
+            $this->template->n_odeslani = null;
+        }
+
+        // CA
+        $esign = new esignature();
+        $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
+        $this->template->n_ca = $esign->getCA();
+
+    }
+
+
+    /***/
+
+    protected function createComponentNastaveniUraduForm()
+    {
+
+        $user_config = Environment::getVariable('user_config');
+        $Urad = $user_config->urad;
+        $stat_select = Subjekt::stat();
+
+
+        $form1 = new AppForm();
+        $form1->addText('nazev', 'Název:', 50, 100)
+                ->setValue($Urad->nazev)
+                ->addRule(Form::FILLED, 'Název úřadu musí být vyplněn.');
+        $form1->addText('plny_nazev', 'Plný název:', 50, 200)
+                ->setValue($Urad->plny_nazev);
+        $form1->addText('zkratka', 'Zkratka:', 15, 30)
+                ->setValue($Urad->zkratka)
+                ->addRule(Form::FILLED, 'Zkratka úřadu musí být vyplněna.');
+
+        $form1->addText('ulice', 'Ulice:', 50, 100)
+                ->setValue($Urad->adresa->ulice);
+        $form1->addText('mesto', 'Město:', 50, 100)
+                ->setValue($Urad->adresa->mesto);
+        $form1->addText('psc', 'PSČ:', 12, 50)
+                ->setValue($Urad->adresa->psc);
+        $form1->addSelect('stat', 'Stát:', $stat_select)
+                ->setValue($Urad->adresa->stat);
+
+
+        $form1->addText('ic', 'IČ:', 20, 50)
+                ->setValue($Urad->firma->ico);
+        $form1->addText('dic', 'DIČ:', 20, 50)
+                ->setValue($Urad->firma->dic);
+
+        $form1->addText('telefon', 'Telefon:', 50, 100)
+                ->setValue($Urad->kontakt->telefon);
+        $form1->addText('email', 'Email:', 50, 100)
+                ->setValue($Urad->kontakt->email);
+        $form1->addText('www', 'URL:', 50, 150)
+                ->setValue($Urad->kontakt->www);
+
+
+        $form1->addSubmit('upravit', 'Uložit a pokračovat v instalaci')
+                 ->onClick[] = array($this, 'nastavitUradClicked');
+
+        $renderer = $form1->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form1;
+    }
+
+    public function nastavitUradClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $config_data = $config->toArray();
+        //Debug::dump($config_data); exit;
+
+        $config_data['urad']['nazev'] = $data['nazev'];
+        $config_data['urad']['plny_nazev'] = $data['plny_nazev'];
+        $config_data['urad']['zkratka'] = $data['zkratka'];
+
+        $config_data['urad']['adresa']['ulice'] = $data['ulice'];
+        $config_data['urad']['adresa']['mesto'] = $data['mesto'];
+        $config_data['urad']['adresa']['psc'] = $data['psc'];
+        $config_data['urad']['adresa']['stat'] = $data['stat'];
+
+        $config_data['urad']['firma']['ico'] = $data['ic'];
+        $config_data['urad']['firma']['dic'] = $data['dic'];
+
+        $config_data['urad']['kontakt']['telefon'] = $data['telefon'];
+        $config_data['urad']['kontakt']['email'] = $data['email'];
+        $config_data['urad']['kontakt']['www'] = $data['www'];
+
+        try {
+
+            $config_modify = new Config();
+            $config_modify->import($config_data);
+            @$config_modify->save(APP_DIR .'/configs/'. KLIENT .'.ini');
+            Environment::setVariable('user_config', $config_modify);
+
+            $session = Environment::getSession('s3_install');
+            if ( !isset($session->step) ) {
+                $session->step = array();
+            }
+            @$session->step['urad'] = 1;
+            $this->redirect('evidence');
+            
+        } catch ( IOException $e ) {
+
+            $this->flashMessage('Informace o sobě se nepodařilo uložit!','warning');
+            $this->flashMessage('Zkuste pokus o uložení provést znovu. V případě, že to nepomáha, zkontolujte existenci konfiguračného souboru a možnost jeho zápisu.','warning');
+            $this->flashMessage('Exception: '. $e->getMessage(),'warning');
+        }
+
+        
+        
+    }
+
+    protected function createComponentNastaveniCJForm()
+    {
+
+        $user_config = Environment::getVariable('user_config');
+        $CJ = $user_config->cislo_jednaci;
+
+        $evidence = array("priorace"=>"Priorace","sberny_arch"=>"Sběrný arch");
+
+        $form1 = new AppForm();
+        $form1->addRadioList('typ_evidence', 'Typ evidence:', $evidence)
+                ->setValue($CJ->typ_evidence)
+                ->addRule(Form::FILLED, 'Volba evidence musí být vybrána.');
+        $form1->addText('maska', 'Maska:', 50, 100)
+                ->setValue($CJ->maska)
+                ->addRule(Form::FILLED, 'Maska čísla jednacího musí být vyplněna.');
+        $form1->addText('pocatek_cisla', 'Nastavit počáteční pořadové číslo:', 10, 15)
+                ->setValue($CJ->pocatek_cisla);
+
+        $form1->addSubmit('upravit', 'Uložit a pokračovat v instalaci')
+                 ->onClick[] = array($this, 'nastavitCJClicked');
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+
+        $renderer = $form1->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form1;
+    }
+
+    public function nastavitCJClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $config_data = $config->toArray();
+        $config_data['cislo_jednaci']['maska'] = $data['maska'];
+        $config_data['cislo_jednaci']['typ_evidence'] = $data['typ_evidence'];
+        $config_data['cislo_jednaci']['pocatek_cisla'] = $data['pocatek_cisla'];
+
+        try {
+
+            $config_modify = new Config();
+            $config_modify->import($config_data);
+            @$config_modify->save(APP_DIR .'/configs/'. KLIENT .'.ini');
+            Environment::setVariable('user_config', $config_modify);
+
+            $session = Environment::getSession('s3_install');
+            if ( !isset($session->step) ) {
+                $session->step = array();
+            }
+            @$session->step['evidence'] = 1;
+            $this->redirect('spravce');
+        } catch ( IOException $e) {
+            $this->flashMessage('Nastavení evidence se nepodařilo uložit!','warning');
+            $this->flashMessage('Zkuste pokus o uložení provést znovu. V případě, že to nepomáha, zkontolujte existenci konfiguračného souboru a možnost jeho zápisu.','warning');
+            $this->flashMessage('Exception: '. $e->getMessage(),'warning');
+        }
+    }
+
+    protected function createComponentSpravceForm()
+    {
+
+        $form1 = new AppForm();
+        $form1->addText('jmeno', 'Jméno:', 50, 150);
+        $form1->addText('prijmeni', 'Příjmení:', 50, 150)
+                ->addRule(Form::FILLED, 'Alespoň příjmení správce musí být vyplněno.');
+        $form1->addText('titul_pred', 'Titul před:', 50, 150);
+        $form1->addText('titul_za', 'Titul za:', 50, 150);
+        $form1->addText('email', 'Email:', 50, 150);
+        $form1->addText('telefon', 'Telefon:', 50, 150);
+        $form1->addText('pozice', 'Funkce:', 50, 150);
+
+        $form1->addText('username', 'Uživatelské jméno:', 30, 150)
+                ->addRule(Form::FILLED, 'Uživatelské jméno správce musí být vyplněno.');
+        $form1->addPassword('heslo', 'Heslo:', 30, 30)
+                ->addRule(Form::FILLED, 'Heslo musí být vyplněné.');
+        $form1->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
+                ->addRule(Form::FILLED, 'Kontrolní heslo musí být vyplněné pro vyloučení překlepu hesla.')
+                ->addConditionOn($form1["heslo"], Form::FILLED)
+                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form1["heslo"]);
+
+        $form1->addSubmit('novy', 'Vytvořit správce')
+                 ->onClick[] = array($this, 'spravceClicked');
+
+        $renderer = $form1->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form1;
+    }
+
+    public function spravceClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $Osoba = new Osoba();
+        $data['stav'] = 1;
+        $data['date_created'] = new DateTime();
+
+        $user_data = array(
+            'username'=>$data['username'],
+            'heslo'=>$data['heslo'],
+            'role'=>1
+        );
+        unset($data['username'], $data['heslo'], $data['heslo_potvrzeni']);
+
+        try {
+            $osoba_id = $Osoba->insert($data);
+
+            if ( $osoba_id ) {
+
+                $User = new UserModel();
+                $User->pridatUcet($osoba_id, $user_data);
+
+            }
+
+            $session = Environment::getSession('s3_install');
+            if ( !isset($session->step) ) {
+                $session->step = array();
+            }
+            @$session->step['spravce'] = 1;
+
+            $this->redirect('konec');
+        } catch (DibiException $e) {
+            $this->flashMessage('Správce se nepodařilo vytvořit.','warning');
+            $this->flashMessage($e->getMessage(),'warning');
+        }
+
+    }
+
+    /***/
 
     private function iniFlag($var)
     {
@@ -577,24 +1103,6 @@ class Install_DefaultPresenter extends BasePresenter
 
         return  $requirements;
 
-    }
-
-    private function accepted()
-    {
-        $code = $dokument_id = $this->getParam('code',null);
-        $namespace = Environment::getSession('s3_install');
-        if (isset($namespace->code)  ) {
-            return true;
-        } else if (is_null($code) ) {
-            return false;
-        } else {
-            if ( $code != KLIENT ) {
-                return false;
-            } else {
-                $namespace->code = KLIENT;
-                return true;
-            }
-        }
     }
 
     private function phpinfo_array($return=false){

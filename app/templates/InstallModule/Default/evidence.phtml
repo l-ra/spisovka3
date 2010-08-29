@@ -1,11 +1,32 @@
 {block title}Instalace - nastavení evidence{/block}
 {block menu}
-Úvod - Kontrola - Nahrání databáze - Nastavení klienta - Nastavení e-podatelny - Nastavení autorizované konverze - Konec
+<a href="{link :Install:Default:uvod}">Úvod</a> >
+<a href="{link :Install:Default:kontrola}">Kontrola</a> >
+<a href="{link :Install:Default:databaze}">Nahrání databáze</a> >
+<a href="{link :Install:Default:urad}">Nastavení klienta</a> >
+<strong>Nastavení evidence</strong> >
+<span>Nastavení správce</span> >
+<span>Konec</span>
 {/block}
 {block content}
 <h1>Instalace - nastavení evidence</h1>
 
-<p>Vítejte...</p>
+<p>
+V tomto kroku vyberte typ evidence a podobu čísla jednacího. V případě navázání na předchozí evidenci,
+můžete zadat počáteční pořadové číslo, které bude pokračovat z původní evidence.
+</p>
+<p>
+Každý úřad volí vlastní podobu čísla jednacího, proto je zde možnost si číslo jednací přizpůsobit podle
+spisového řádu úřadu. V tabulce jsou uvedeny možné volby, které lze zakomponovat do čísla jednacího.
+Držte se přesného zápisu masky. Přípustné masky jsou pouze ty, které jsou uvedeny v tabulce.
+Jakékoli další masky nejsou k dispozici. Jakékoli další znaky, které nejsou masky, jsou považovány
+za neměnné.
+</p>
+
+<p style="color: red; font-weight: bold;">
+Důležité upozornění! Důkladně zvažte volbu evidence. Tato volba se nastavuje pouze zde a po uvedení
+do provozu již nelze tuto volbu změnit.
+</p>
 
     <div class="detail_blok">
         {control nastaveniCJForm}

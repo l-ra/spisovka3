@@ -1,11 +1,22 @@
 {block title}Instalace - kontrola{/block}
 {block menu}
-Úvod - Kontrola - Nahrání databáze - Nastavení klienta - Nastavení e-podatelny - Nastavení autorizované konverze - Konec
+<a href="{link :Install:Default:uvod}">Úvod</a> >
+<strong>Kontrola</strong> >
+<span>Nahrání databáze</span> >
+<span>Nastavení klienta</span> >
+<span>Nastavení evidence</span> >
+<span>Nastavení správce</span> >
+<span>Konec</span>
 {/block}
 {block content}
-<h1>Instalace - kontrola</h1>
+<h1>Instalace - Kontrola serveru na minimální požadavek aplikace</h1>
 
-<p>Vítejte...</p>
+<p>
+V tomto kroku se zkontroluji minimální požadavky na provoz spisové služby. Jedná se především o kontrolu
+provozuschopnosti jádra aplikace, která je založena na Nette Framework. Dále kontrola na dostupnost
+potřebných komponent pro použití určitých funkcí, jako třeba obsluha datových schránek,
+příjem a odesíláni emailů, ověření pravosti apod. V neposlední řadě také kontrola na zapisovatelnost
+pro některé konfigurační soubory a zápisu pro dočasné soubory.</p>
 
 <div id="kontrola">
 <?php if ($errors): ?>
@@ -18,8 +29,8 @@
     <div class="passed result">
         <h2>Blahopřeji! Konfigurace serveru splňuje minimální požadavky pro použití aplikace.</h2>
         <p>Můžete pokračovat v instalaci.</p>
-	<?php if ($warnings):?><p>Byly zjistěny nesrovnalosti, které mohou ovlivnit chod aplikace. Podívejte se do detailu a u vyznačených bodech se rozhodněte,
-            zda je daná položka nutná pro běch aplikace nebo ne.</p><?php endif ?>
+	<?php if ($warnings):?><p>Byly zjištěny nesrovnalosti, které mohou ovlivnit chod aplikace. Podívejte se do detailu a u vyznačených bodech se rozhodněte,
+            zda je daná položka nutná pro běh aplikace nebo ne.</p><?php endif ?>
 
         <p><a href="{link :Install:Default:databaze}">Pokračovat v instalaci</a></p>
 

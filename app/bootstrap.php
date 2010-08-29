@@ -28,19 +28,18 @@ if ( defined('KLIENT') ) {
     define('KLIENT', 'default');
 }
 
-Environment::loadConfig(APP_DIR .'/configs/'. KLIENT .'_system.ini');
-$user_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
-$epodatelna_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
-Environment::setVariable('user_config', $user_config);
-Environment::setVariable('epodatelna_config', $epodatelna_config);
-
-
 $unique_info = @file_get_contents(APP_DIR .'/configs/'. KLIENT .'_install');
 if ( $unique_info === FALSE ) {
     define('APPLICATION_INSTALL',1);
 } else {
     Environment::setVariable('unique_info', $unique_info);
 }
+
+Environment::loadConfig(APP_DIR .'/configs/'. KLIENT .'_system.ini');
+$user_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+$epodatelna_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+Environment::setVariable('user_config', $user_config);
+Environment::setVariable('epodatelna_config', $epodatelna_config);
 
 
 //Environment::setMode(Environment::DEVELOPMENT);

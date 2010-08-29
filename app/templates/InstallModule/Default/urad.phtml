@@ -1,11 +1,22 @@
 {block title}Instalace - nastavení informace o úřadu{/block}
 {block menu}
-Úvod - Kontrola - Nahrání databáze - Nastavení klienta - Nastavení e-podatelny - Nastavení autorizované konverze - Konec
+<a href="{link :Install:Default:uvod}">Úvod</a> >
+<a href="{link :Install:Default:kontrola}">Kontrola</a> >
+<a href="{link :Install:Default:databaze}">Nahrání databáze</a> >
+<strong>Nastavení klienta</strong> >
+<span>Nastavení evidence</span> >
+<span>Nastavení správce</span> >
+<span>Konec</span>
 {/block}
 {block content}
-<h1>Instalace - nastavení informace o úřadu</h1>
+<h1>Instalace - Nastavení informace o úřadu</h1>
 
-<p>Vítejte...</p>
+<p>
+Zde vyplňujete informace o sobě. Povinné jsou pouze položky název a zkratka.
+Název slouží jako identifikace klienta. Zobrazuje se v záhlaví pod nadpisem Spisová služba a jako
+součást záhlaví při tisku sestavy. Zkratka se uvádí jakou součást čísla jednacího.
+Ostatní položky vyplňte dle vlastního uvážení.
+</p>
 
     <div class="detail_blok">
         {control nastaveniUraduForm}
