@@ -16,13 +16,21 @@ class Osoba extends BaseModel
 
     }
 
-    public function getUser($osoba_id)
+    public function getUser($osoba_id, $active = 0)
     {
 
-        $rows = dibi::fetchAll('SELECT u.*
-                            FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
-                            LEFT JOIN [:PREFIX:'. self::USER_TABLE .'] u ON (u.user_id = ou.user_id)
-                            WHERE ou.osoba_id=%i',$osoba_id);
+        if ( $active == 1 ) {
+            $rows = dibi::fetchAll('SELECT u.*
+                               FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
+                                LEFT JOIN [:PREFIX:'. self::USER_TABLE .'] u ON (u.user_id = ou.user_id)
+                                WHERE ou.osoba_id=%i',$osoba_id,' AND ou.active=1');
+        } else {
+            $rows = dibi::fetchAll('SELECT u.*
+                                FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
+                                LEFT JOIN [:PREFIX:'. self::USER_TABLE .'] u ON (u.user_id = ou.user_id)
+                                WHERE ou.osoba_id=%i',$osoba_id);
+        }
+
 
         $tmp = array();
         foreach ($rows as $row) {

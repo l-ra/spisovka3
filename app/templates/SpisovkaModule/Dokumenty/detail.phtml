@@ -74,17 +74,17 @@
        {/if}
        <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>0, 'dok_id'=>$Dok->dokument_id}" id="dialog-uzivatel">Předat dokument</a>
        {if $Predan==1 }
-       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id, 'org'=>$orgjednotka->orgjednotka_id}" id="prevzitdokument">Převzít dokument</a>
+       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id, 'org'=>@$orgjednotka->orgjednotka_id}" id="prevzitdokument">Převzít dokument</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 0 ) }
-       <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id, 'org'=>$orgjednotka->orgjednotka_id}" id="kvyrizenidokument">Označit k vyřízení</a>
+       <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id, 'org'=>@$orgjednotka->orgjednotka_id}" id="kvyrizenidokument">Označit k vyřízení</a>
        <a href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->dokument_id}" >Vytvořit odpověď</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
        <a href="{link :Spisovka:Dokumenty:odeslat , 'id'=>$Dok->dokument_id }">Odeslat dokument</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
-       <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id, 'org'=>$orgjednotka->orgjednotka_id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
+       <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->dokument_id, 'user'=>$user->user_id, 'org'=>@$orgjednotka->orgjednotka_id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
        {/if}
 
 
@@ -127,7 +127,7 @@
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>Věc:</dt>
+            <dt>{$metadataForm['nazev']->label}</dt>
             <dd>{$metadataForm['nazev']->control}</dd>
         </dl>
         <dl class="detail_item">
@@ -142,10 +142,10 @@
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$metadataForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <!--<dl class="detail_item">
             <dt>Zmocnění:</dt>
             <dd><span id="dok_zmocneni"></span>&nbsp;<a href="{link :Spisovka:Dokumenty:zmocneni, 'id'=>$Dok->dokument_id}" id="dialog-zmocneni">Připojit zmocnění</a></dd>
-        </dl>
+        </dl>-->
         <dl class="detail_item">
             <dt>Poznámka:</dt>
             <dd>{$metadataForm['poznamka']->control}</dd>
@@ -224,7 +224,7 @@
         {/if}
         {if !empty($Dok->poznamka)}
         <dl class="detail_item">
-            <dt>Poznamka:</dt>
+            <dt>Poznámka:</dt>
             <dd>{!$Dok->poznamka|enl2br}&nbsp;</dd>
         </dl>
         {/if}
@@ -434,7 +434,7 @@
                 </div>
                 {if $Pridelen==1 }
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" onclick="return confirm('Opravdu chcete odebrat subjekt z dokumentu?');">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" onclick="return odebratSubjekt(this, {!$Dok->dokument_id});">odebrat</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" id="dialog-subjektzmenit">změnit</a>&nbsp;&nbsp;
                 </div>
                 {/if}
@@ -500,7 +500,7 @@
                 {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
                 {if $Pridelen==1 }
                 <div class="vyber">
-                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return confirm('Opravdu chcete odebrat přílohu z dokumentu?');">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return odebratPrilohu(this, {!$Dok->dokument_id});">odebrat</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;
                 </div>
                 {/if}

@@ -16,7 +16,7 @@ class Orgjednotka extends BaseModel
 
     }
 
-    public function seznam($args = null)
+    public function seznam($args = null, $no_result = 0)
     {
 
         if ( !is_null($args) ) {
@@ -25,9 +25,12 @@ class Orgjednotka extends BaseModel
             $result = $this->fetchAll(array('zkraceny_nazev'));
         }
 
-        $rows = $result->fetchAll();
-
-        return ($rows) ? $rows : NULL;
+        if ( $no_result == 1 ) {
+            return $result;
+        } else {
+            $rows = $result->fetchAll();
+            return ($rows) ? $rows : NULL;
+        }
 
     }
 

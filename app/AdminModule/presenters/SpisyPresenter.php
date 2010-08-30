@@ -50,7 +50,9 @@ class Admin_SpisyPresenter extends BasePresenter
 
     public function renderNovy()
     {
-
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->seznam(null);
+        $this->template->SpisoveZnaky = $spisove_znaky;
         $this->template->novyForm = $this['novyForm'];
     }
 /**

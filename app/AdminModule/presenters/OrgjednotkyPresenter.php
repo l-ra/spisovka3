@@ -11,7 +11,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
 
         $OrgJednotka = new Orgjednotka();
-        $result = $OrgJednotka->seznam();
+        $result = $OrgJednotka->seznam(null,1);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
 

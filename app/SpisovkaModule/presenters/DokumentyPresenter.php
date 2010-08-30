@@ -858,6 +858,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         //$form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10);
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
+                ->addRule(Form::FILLED, 'Lhůta k vyřízení musí být vyplněna!')
                 ->setValue('30');
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
                 ->setValue(@$dok->poznamka);

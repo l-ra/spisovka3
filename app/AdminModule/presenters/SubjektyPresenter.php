@@ -91,6 +91,7 @@ class Admin_SubjektyPresenter extends BasePresenter
                 ->setValue(@$subjekt->type);
         $form1->addText('nazev_subjektu', 'Název subjektu:', 50, 255)
                 ->setValue(@$subjekt->nazev_subjektu);
+                
         $form1->addText('ic', 'IČ:', 12, 8)
                 ->setValue(@$subjekt->ic);
         $form1->addText('dic', 'DIČ:', 12, 12)
@@ -102,6 +103,9 @@ class Admin_SubjektyPresenter extends BasePresenter
                 ->setValue(@$subjekt->prostredni_jmeno);
         $form1->addText('prijmeni', 'Příjmení:', 50, 35)
                 ->setValue(@$subjekt->prijmeni);
+
+
+
         $form1->addText('rodne_jmeno', 'Rodné jméno:', 50, 35)
                 ->setValue(@$subjekt->rodne_jmeno);
         $form1->addText('titul_pred', 'Titul před:', 20, 35)

@@ -45,7 +45,7 @@ class LogModel extends BaseModel {
         '16' => 'Dokument označen k vyřízení',
         '17' => 'Dokument vyřízen',
         '18' => 'Dokument přijat e-podatelnou',
-        '19' => 'Dokument odeslan',
+        '19' => 'Dokument odeslán',
         '21' => 'Vytvořen nový subjekt',
         '22' => 'Subjekt změněn',
         '23' => 'Subjekt smazán',
@@ -59,7 +59,7 @@ class LogModel extends BaseModel {
         '41' => 'Vytvořen nový spis',
         '42' => 'Spis změněn',
         '43' => 'Spis smazán',
-        '44' => 'Dokument připjen ke spisu',
+        '44' => 'Dokument připojen ke spisu',
         '45' => 'Dokument odebrán ze spisu'
 
     );

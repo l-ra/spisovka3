@@ -5,6 +5,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     private $Epodatelna;
 
+    public function actionDefault()
+    {
+        $this->redirect('nove');
+    }
+
     public function renderNove()
     {
 

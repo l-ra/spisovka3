@@ -70,11 +70,15 @@ $(function() {
         return false;
     });
 
+    // Povinne polozky
+    $('.required').attr('title','Povinná položka');
+
     // Dialog
     $('#dialog').dialog({
         autoOpen: false,
 	width: 700,
-        height: 500
+        height: 500,
+        modal: true
     });
 
     // Dialog - Vyber spisu
@@ -513,6 +517,50 @@ prilohazmenit = function(elm){
         $('#dialog').dialog('open');
 
         return false;
+}
+
+odebratPrilohu = function(elm, dok_id){
+
+    if ( confirm('Opravdu chcete odebrat přílohu z dokumentu?') ) {
+
+        if (document.getElementById) {
+            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+        }
+        if (x) {
+            x.onreadystatechange = function() {
+                if (x.readyState == 4 && x.status == 200) {
+                    renderPrilohy(dok_id);
+                }
+            }
+            x.open("GET", elm.href, true);
+            x.send(null);
+        }
+
+    }
+
+    return false;
+}
+
+odebratSubjekt = function(elm, dok_id){
+
+    if ( confirm('Opravdu chcete odebrat subjekt z dokumentu?') ) {
+        if (document.getElementById) {
+            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+        }
+        if (x) {
+            x.onreadystatechange = function() {
+                if (x.readyState == 4 && x.status == 200) {
+                    renderSubjekty(dok_id);
+                    return false;
+                }
+            }
+            x.open("GET", elm.href, true);
+            x.send(null);
+        }
+
+    }
+
+    return false;
 }
 
 hledejDokument = function (input, typ) {

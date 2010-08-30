@@ -48,7 +48,7 @@
             <dt>Uživatelské jméno:</dt>
             <dd>{$u->username}&nbsp;</dd>
         </dl>
-        {if ($ZmenaHesla==$u->user_id)}
+        {if ($ZmenaHesla==$u->user_id && !is_null($ZmenaHesla))}
         {control userForm}
         {/if}
         <dl class="detail_item">
@@ -75,7 +75,17 @@
                     {/foreach}
                 {/if}
                 {else}
-                Tento uživatel není přiřazen k žádné roli
+                {if $RoleUpravit == $u->user_id}
+                    {$roleForm->render('begin')}
+                    {$roleForm['add_role']->control} přidat roli: {$roleForm['role']->control}
+                    <br /> <br />
+                    {$roleForm['zmenitRole']->control} {$roleForm['storno']->control}
+                    {$roleForm->render('end')}
+                {else}
+                    Tento uživatel není přiřazen k žádné roli
+                {/if}
+
+                
                 {/if}
             </dd>
         </dl>

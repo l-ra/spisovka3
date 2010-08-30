@@ -44,7 +44,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
 
         $uzivatel = $Osoba->getUser($osoba_id);
-
         $this->template->Uzivatel = $uzivatel;
 
         // Zmena hesla
@@ -70,7 +69,9 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             }
         }
 
-        
+        $uzivatel = $Osoba->getUser($osoba_id,1);
+        $this->template->Uzivatel = $uzivatel;
+
         if ( count($uzivatel)>0 ) {
             $role = array();
             foreach ($uzivatel as $uziv) {
@@ -107,7 +108,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $form1->addText('jmeno', 'Jméno:', 50, 150)
                 ->setValue(@$osoba->jmeno);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
-                ->setValue(@$osoba->prijmeni);
+                ->setValue(@$osoba->prijmeni)
+                ->addRule(Form::FILLED, 'Příjmení musí být vyplněno!');
         $form1->addText('titul_pred', 'Titul před:', 50, 150)
                 ->setValue(@$osoba->titul_pred);
         $form1->addText('titul_za', 'Titul za:', 50, 150)
@@ -174,7 +176,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->addText('jmeno', 'Jméno:', 50, 150);
-        $form1->addText('prijmeni', 'Příjmení:', 50, 150);
+        $form1->addText('prijmeni', 'Příjmení:', 50, 150)
+                ->addRule(Form::FILLED, 'Příjmení musí být vyplněno!');
         $form1->addText('titul_pred', 'Titul před:', 50, 150);
         $form1->addText('titul_za', 'Titul za:', 50, 150);
         $form1->addText('email', 'Email:', 50, 150);
@@ -305,6 +308,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $role_seznam = $Role->seznam();
         $role_select = array();
         foreach ($role_seznam as $key => $value) {
+            if ( $value->fixed == 1 ) continue;
             $role_select[ $value->role_id ] = $value->name;
         }
 
@@ -312,7 +316,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $form1->addHidden('osoba_id')
                 ->setValue(@$osoba->osoba_id);
 
-        $form1->addText('username', 'Uživatelské jméno:', 30, 150);
+        $form1->addText('username', 'Uživatelské jméno:', 30, 150)
+                ->addRule(Form::FILLED, 'Uživatelské jméno musí být vyplněno!');
         $form1->addPassword('heslo', 'Heslo:', 30, 30)
                 ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
         $form1->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
@@ -391,6 +396,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $role_seznam = $Role->seznam();
         $role_select = array();
         foreach ($role_seznam as $key => $value) {
+            if ( $value->fixed == 1 ) continue;
             $role_select[ $value->role_id ] = $value->name;
         }
 

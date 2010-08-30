@@ -69,9 +69,11 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1->addHidden('role_id')
                 ->setValue(@$role->role_id);
         $form1->addText('name', 'Název role:', 50, 100)
-                ->setValue(@$role->name);
+                ->setValue(@$role->name)
+                ->addRule(Form::FILLED, 'Název role musí být vyplněno!');
         $form1->addText('code', 'Kódové označení role:', 50, 150)
-                ->setValue(@$role->code);
+                ->setValue(@$role->code)
+                ->addRule(Form::FILLED, 'Kódové označení musí být vyplněno!');
         $form1->addTextArea('note', 'Popis role:', 50, 5)
                 ->setValue(@$role->note);
         $form1->addSelect('parent_id', 'Dědí z role:', $role_select)
@@ -134,8 +136,10 @@ class Admin_OpravneniPresenter extends BasePresenter
 
 
         $form1 = new AppForm();
-        $form1->addText('name', 'Název role:', 50, 100);
-        $form1->addText('code', 'Kódové označení role:', 50, 150);
+        $form1->addText('name', 'Název role:', 50, 100)
+                ->addRule(Form::FILLED, 'Název role musí být vyplněno!');
+        $form1->addText('code', 'Kódové označení role:', 50, 150)
+                ->addRule(Form::FILLED, 'Kódové označení role musí být vyplněno!');
         $form1->addTextArea('note', 'Popis role:', 50, 5);
         $form1->addSelect('parent_id', 'Dědí z role:', $role_select);
         $form1->addSubmit('novy', 'Vytvořit')
@@ -295,8 +299,10 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1 = new AppForm();
         $form1->addHidden('role_id')
                 ->setValue(@$role->role_id);
-        $form1->addText('name', 'Název zdroje:', 50, 100);
-        $form1->addText('code', 'Systémové označení zdroje:', 50, 150);
+        $form1->addText('name', 'Název zdroje:', 50, 100)
+                ->addRule(Form::FILLED, 'Název zdroje musí být vyplněno!');
+        $form1->addText('code', 'Systémové označení zdroje:', 50, 150)
+                ->addRule(Form::FILLED, 'Systémové označení zdroje musí být vyplněno!');
         $form1->addTextArea('note', 'Popis zdroje:', 50, 5);
 
         $form1->addSubmit('novyresource', 'Vytvořit')
@@ -349,7 +355,8 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1 = new AppForm();
         $form1->addHidden('role_id')
                 ->setValue(@$role->role_id);
-        $form1->addText('name', 'Název pravidla:', 50, 100);
+        $form1->addText('name', 'Název pravidla:', 50, 100)
+                ->addRule(Form::FILLED, 'Název pravidla musí být vyplněno!');
         $form1->addTextArea('note', 'Popis pravidla:', 50, 5);
         $form1->addSelect('resource_id', 'Resource:', $resource);
         $form1->addText('privilege', 'Privilege:', 50, 100);

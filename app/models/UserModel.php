@@ -157,14 +157,28 @@ class UserModel extends BaseModel
         //dibi::begin();
 
         $Osoba2User = new Osoba2User();
-        $Osoba2User->delete(array(
+        $Osoba2User->update(array('active'=>0),
+                            array(
+                               array('user_id=%i',$user_id),
+                               array('osoba_id=%i',$osoba_id)
+                            ));
+
+        /*$Osoba2User->delete(array(
                                array('user_id=%i',$user_id),
                                array('osoba_id=%i',$osoba_id)
                             ));
         $User2Role = new User2Role();
         $User2Role->delete(array('user_id=%i',$user_id));
+        */
 
-        $ret = $this->delete(array('user_id=%i',$user_id));
+        $ret = $this->update(array(
+                        'active'=>0,
+                        'username%sql'=>"CONCAT(username,'_',".time().")"
+                      ),
+                      array('user_id=%i',$user_id)
+                );
+
+        //$ret = $this->delete(array('user_id=%i',$user_id));
 
         //if ($transaction)
         //dibi::commit();

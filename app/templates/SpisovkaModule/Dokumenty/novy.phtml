@@ -70,7 +70,7 @@
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>Věc:</dt>
+            <dt>{$novyForm['nazev']->label}</dt>
             <dd>{$novyForm['nazev']->control}</dd>
         </dl>
         <dl class="detail_item">
@@ -85,10 +85,10 @@
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$novyForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <!--<dl class="detail_item">
             <dt>Zmocnění:</dt>
             <dd><span id="dok_zmocneni"></span>&nbsp;<a href="{link :Spisovka:Dokumenty:zmocneni, 'id'=>$Dok->dokument_id}" id="dialog-zmocneni">Připojit zmocnění</a></dd>
-        </dl>
+        </dl>-->
         <dl class="detail_item">
             <dt>Poznámka:</dt>
             <dd>{$novyForm['poznamka']->control}</dd>
@@ -124,7 +124,7 @@
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>Lhůta k vyřízení:</dt>
+            <dt>{$novyForm['lhuta']->label}</dt>
             <dd>{$novyForm['lhuta']->control} dní</dd>
         </dl>
         <dl class="detail_item">
@@ -172,7 +172,7 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" onclick="return confirm('Opravdu chcete odebrat subjekt z dokumentu?');">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" onclick="return odebratSubjekt(this, {!$Dok->dokument_id});">odebrat</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" id="dialog-subjektzmenit">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
@@ -233,7 +233,7 @@
                 </div>
                 {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
                 <div class="vyber">
-                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return confirm('Opravdu chcete odebrat přílohu z dokumentu?');">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return odebratPrilohu(this, {!$Dok->dokument_id});">odebrat</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>

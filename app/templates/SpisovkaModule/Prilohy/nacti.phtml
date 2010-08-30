@@ -19,7 +19,7 @@
                 </div>
                 {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
                 <div class="vyber">
-                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->file_id, 'dok_id'=>$dokument_id }" onclick="return confirm('Opravdu chcete odebrat přílohu z dokumentu?');">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->file_id, 'dok_id'=>$dokument_id }" onclick="return odebratPrilohu(this, {!$dokument_id});">odebrat</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->file_id, 'dok_id'=>$dokument_id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
