@@ -1,307 +1,323 @@
-CREATE TABLE  `{tbls3}cislo_jednaci` (
-  `cjednaci_id` int(11) NOT NULL auto_increment,
-  `podaci_denik` varchar(80) NOT NULL default 'default',
+CREATE TABLE `{tbls3}cislo_jednaci` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `podaci_denik` varchar(80) NOT NULL DEFAULT 'default',
   `rok` year(4) NOT NULL,
-  `poradove_cislo` int(11) default NULL,
-  `urad_zkratka` varchar(50) default NULL,
-  `urad_poradi` int(11) default NULL,
-  `orgjednotka_id` int(11) default NULL,
-  `org_poradi` int(11) default NULL,
-  `user_id` int(11) default NULL,
-  `user_poradi` int(11) default NULL,
-  PRIMARY KEY  (`cjednaci_id`),
+  `poradove_cislo` int(11) DEFAULT NULL,
+  `urad_zkratka` varchar(50) DEFAULT '',
+  `urad_poradi` int(11) DEFAULT NULL,
+  `orgjednotka_id` int(11) DEFAULT NULL,
+  `org_poradi` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `user_poradi` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   KEY `search` (`urad_zkratka`,`orgjednotka_id`,`user_id`,`podaci_denik`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}dokument` (
-  `dokument_id` int(11) NOT NULL,
-  `dokument_version` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `version` int(11) NOT NULL,
   `jid` varchar(100) NOT NULL,
   `nazev` varchar(100) NOT NULL,
-  `popis` varchar(255) default NULL,
-  `cislojednaci_id` int(11) default NULL,
-  `cislo_jednaci` varchar(50) default NULL,
-  `poradi` smallint(6) default '1',
-  `cislo_jednaci_odesilatele` varchar(50) default NULL,
-  `podaci_denik` varchar(45) default NULL,
-  `podaci_denik_poradi` int(11) default NULL,
-  `podaci_denik_rok` year(4) default NULL,
-  `typ_dokumentu` int(11) default NULL,
-  `spisovy_plan` varchar(45) default NULL,
-  `spisovy_znak` int(11) default NULL,
-  `skartacni_znak` enum('A','S','V') default NULL,
-  `skartacni_lhuta` int(11) default NULL,
+  `popis` varchar(255) DEFAULT '',
+  `cislojednaci_id` int(11) DEFAULT NULL,
+  `cislo_jednaci` varchar(50) DEFAULT '',
+  `poradi` smallint(6) DEFAULT '1',
+  `cislo_jednaci_odesilatele` varchar(50) DEFAULT '',
+  `podaci_denik` varchar(45) DEFAULT '',
+  `podaci_denik_poradi` int(11) DEFAULT NULL,
+  `podaci_denik_rok` year(4) DEFAULT NULL,
+  `typ_dokumentu_id` int(11) DEFAULT NULL,
+  `spisovy_plan` varchar(45) DEFAULT '',
+  `spisovy_znak_id` int(11) DEFAULT NULL,
+  `skartacni_znak` enum('A','S','V') DEFAULT NULL,
+  `skartacni_lhuta` int(11) DEFAULT NULL,
   `poznamka` text,
-  `zmocneni` int(11) default NULL,
-  `lhuta` tinyint(4) NOT NULL default '30',
-  `epodatelna_id` int(11) default NULL,
-  `stav` tinyint(4) NOT NULL default '1',
+  `zmocneni_id` int(11) DEFAULT NULL,
+  `lhuta` tinyint(4) NOT NULL DEFAULT '30',
+  `epodatelna_id` int(11) DEFAULT NULL,
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
   `md5_hash` varchar(45) NOT NULL,
-  `date_created` datetime default NULL,
-  `user_created` int(11) default NULL,
-  `date_modified` datetime default NULL,
-  `user_modified` int(11) default NULL,
+  `date_created` datetime DEFAULT NULL,
+  `user_created` int(11) DEFAULT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `user_modified` int(11) DEFAULT NULL,
   `datum_vzniku` datetime NOT NULL,
-  `pocet_listu` int(11) default NULL,
-  `pocet_priloh` int(11) default NULL,
-  `zpusob_doruceni` int(11) default NULL,
-  `zpusob_vyrizeni` int(11) default NULL,
-  `vyrizeni_pocet_listu` int(11) default NULL,
-  `vyrizeni_pocet_priloh` int(11) default NULL,
+  `pocet_listu` int(11) DEFAULT NULL,
+  `pocet_priloh` int(11) DEFAULT NULL,
+  `zpusob_doruceni_id` int(11) DEFAULT NULL,
+  `zpusob_vyrizeni_id` int(11) DEFAULT NULL,
+  `vyrizeni_pocet_listu` int(11) DEFAULT NULL,
+  `vyrizeni_pocet_priloh` int(11) DEFAULT NULL,
   `ulozeni_dokumentu` text,
-  `datum_vyrizeni` datetime default NULL,
+  `datum_vyrizeni` datetime DEFAULT NULL,
   `poznamka_vyrizeni` text,
-  `spousteci_udalost` varchar(250) default NULL,
-  PRIMARY KEY  (`dokument_id`,`dokument_version`)
+  `spousteci_udalost` varchar(250) DEFAULT '',
+  PRIMARY KEY (`id`,`version`),
+  KEY `cislojednaci_id` (`cislojednaci_id`,`typ_dokumentu_id`,`spisovy_znak_id`,`zmocneni_id`,`epodatelna_id`,`zpusob_doruceni_id`,`zpusob_vyrizeni_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}dokument_odeslani` (
-  `dokument_odeslani_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `dokument_id` int(11) NOT NULL,
-  `dokument_version` int(11) default NULL,
+  `dokument_version` int(11) DEFAULT NULL,
   `subjekt_id` int(11) NOT NULL,
-  `subjekt_version` int(11) default NULL,
+  `subjekt_version` int(11) DEFAULT NULL,
   `zpusob_odeslani` int(11) NOT NULL,
-  `epodatelna_id` int(11) default NULL,
+  `epodatelna_id` int(11) DEFAULT NULL,
   `datum_odeslani` datetime NOT NULL,
   `user_id` int(11) NOT NULL,
   `user_info` text,
   `zprava` text,
-  `date_created` datetime default NULL,
-  PRIMARY KEY  (`dokument_odeslani_id`)
+  `date_created` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `dokument_id` (`dokument_id`,`subjekt_id`,`dokument_version`,`subjekt_version`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}dokument_to_file` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `dokument_id` int(11) NOT NULL,
-  `dokument_version` int(11) default '0',
+  `dokument_version` int(11) DEFAULT NULL,
   `file_id` int(11) NOT NULL,
-  `file_version` int(11) default '0',
-  `date_added` datetime default NULL,
-  `user_added` int(11) default NULL,
-  `active` tinyint(4) NOT NULL default '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `file_version` int(11) DEFAULT NULL,
+  `date_added` datetime DEFAULT NULL,
+  `user_added` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `dokument_id` (`dokument_id`,`file_id`,`dokument_version`,`file_version`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}dokument_to_spis` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `dokument_id` int(11) NOT NULL,
-  `dokument_version` int(11) default NULL,
+  `dokument_version` int(11) DEFAULT NULL,
   `spis_id` int(11) NOT NULL,
-  `date_added` datetime default NULL,
-  `user_added` int(11) default NULL,
-  `poradi` int(11) NOT NULL default '1',
-  `stav` tinyint(4) NOT NULL default '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `date_added` datetime DEFAULT NULL,
+  `user_added` int(11) DEFAULT NULL,
+  `poradi` int(11) NOT NULL DEFAULT '1',
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `dokument_id` (`dokument_id`,`spis_id`,`dokument_version`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}dokument_to_subjekt` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `dokument_id` int(11) NOT NULL,
-  `dokument_version` int(11) default NULL,
+  `dokument_version` int(11) DEFAULT NULL,
   `subjekt_id` int(11) NOT NULL,
-  `subjekt_version` int(11) default NULL,
-  `typ` enum('A','O','AO') NOT NULL default 'AO',
-  `date_added` datetime default NULL,
-  `user_added` int(11) default NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `subjekt_version` int(11) DEFAULT NULL,
+  `typ` enum('A','O','AO') NOT NULL DEFAULT 'AO',
+  `date_added` datetime DEFAULT NULL,
+  `user_added` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `dokument_id` (`dokument_id`,`subjekt_id`,`dokument_version`,`subjekt_version`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `{tbls3}dokument_typ` (
-  `dokument_typ_id` int(11) NOT NULL auto_increment,
+CREATE TABLE `{tbls3}dokument_typ` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nazev` varchar(100) NOT NULL,
-  `popis` varchar(255) default NULL,
-  `stav` tinyint(4) NOT NULL default '1',
-  `smer` tinyint(4) NOT NULL default '0' COMMENT '0-prichozi, 1-odchozi',
-  `typ` tinyint(4) NOT NULL default '0',
-  PRIMARY KEY  (`dokument_typ_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
+  `popis` varchar(255) DEFAULT NULL,
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  `smer` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0-prichozi, 1-odchozi',
+  `typ` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
-INSERT INTO `{tbls3}dokument_typ` (`dokument_typ_id`, `nazev`, `popis`, `stav`, `smer`, `typ`) VALUES
+INSERT INTO `{tbls3}dokument_typ` (`id`, `nazev`, `popis`, `stav`, `smer`, `typ`) VALUES
 (1, 'příchozí', NULL, 1, 0, 0),
 (2, 'vlastní', NULL, 1, 1, 0),
-(4, 'odpověď', NULL, 1, 1, 0),
-(5, 'příchozí - doručeno emailem', NULL, 1, 0, 1),
-(6, 'příchozí - doručeno datovou schránkou', NULL, 1, 0, 2),
-(7, 'příchozí - doručeno datovým nosičem', NULL, 1, 0, 3),
-(8, 'příchozí - doručeno faxem', NULL, 1, 0, 4),
-(9, 'příchozí - doručeno v listinné podobě', NULL, 1, 0, 0);
+(3, 'odpověď', NULL, 1, 1, 0),
+(4, 'příchozí - doručeno emailem', NULL, 1, 0, 1),
+(5, 'příchozí - doručeno datovou schránkou', NULL, 1, 0, 2),
+(6, 'příchozí - doručeno datovým nosičem', NULL, 1, 0, 3),
+(7, 'příchozí - doručeno faxem', NULL, 1, 0, 4),
+(8, 'příchozí - doručeno v listinné podobě', NULL, 1, 0, 0);
 
 CREATE TABLE `{tbls3}epodatelna` (
-  `epodatelna_id` int(11) NOT NULL auto_increment,
-  `epodatelna_typ` tinyint(4) NOT NULL default '0',
-  `poradi` int(11) default NULL,
-  `rok` year(4) default NULL,
-  `email_signature` varchar(200) default NULL,
-  `isds_signature` varchar(45) default NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `poradi` int(11) DEFAULT NULL,
+  `rok` year(4) DEFAULT NULL,
+  `email_signature` varchar(200) DEFAULT NULL,
+  `isds_signature` varchar(45) DEFAULT NULL,
   `predmet` varchar(200) NOT NULL,
   `popis` text,
   `odesilatel` varchar(200) NOT NULL,
-  `odesilatel_id` int(11) default NULL,
+  `odesilatel_id` int(11) DEFAULT NULL,
   `adresat` varchar(100) NOT NULL,
-  `prijato_dne` datetime default NULL,
-  `doruceno_dne` datetime default NULL,
-  `prijal_kdo` int(11) default NULL,
+  `prijato_dne` datetime DEFAULT NULL,
+  `doruceno_dne` datetime DEFAULT NULL,
+  `prijal_kdo` int(11) DEFAULT NULL,
   `prijal_info` text,
   `sha1_hash` varchar(50) NOT NULL,
   `prilohy` text,
-  `evidence` varchar(100) default NULL,
-  `dokument_id` int(11) default NULL,
-  `stav` tinyint(4) NOT NULL default '0',
-  `stav_info` varchar(255) default NULL,
-  `source_id` varchar(40) default NULL,
-  PRIMARY KEY  (`epodatelna_id`),
+  `evidence` varchar(100) DEFAULT NULL,
+  `dokument_id` int(11) DEFAULT NULL,
+  `stav` tinyint(4) NOT NULL DEFAULT '0',
+  `stav_info` varchar(255) DEFAULT NULL,
+  `source_id` varchar(30) DEFAULT NULL,
+  `epodatelna_typ` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
   KEY `hledat` (`email_signature`,`isds_signature`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}file` (
-  `file_id` int(11) NOT NULL,
-  `file_version` tinyint(4) NOT NULL,
-  `stav` tinyint(4) NOT NULL default '1',
-  `typ` tinyint(4) NOT NULL default '1' COMMENT 'typ prilohy. Defaultne: (1)main, (2)enclosure, (3)signature, (4)meta, (5)source',
+  `id` int(11) NOT NULL,
+  `version` tinyint(4) NOT NULL,
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  `typ` tinyint(4) NOT NULL DEFAULT '1' COMMENT 'typ prilohy. Defaultne: (1)main, (2)enclosure, (3)signature, (4)meta, (5)source',
   `nazev` varchar(255) NOT NULL COMMENT 'jmeno souboru nebo nazev',
-  `popis` varchar(45) default NULL,
-  `mime_type` varchar(60) default NULL COMMENT 'mime typ souboru',
+  `popis` varchar(45) DEFAULT NULL,
+  `mime_type` varchar(60) DEFAULT NULL COMMENT 'mime typ souboru',
   `real_name` varchar(255) NOT NULL COMMENT 'skutečné jmeno souboru file.ext',
   `real_path` varchar(255) NOT NULL COMMENT 'realna cesta k souboru ',
-  `real_type` varchar(45) NOT NULL default 'FILE' COMMENT 'typ fyzickeho mista. Default FILE - lokalni fyzicke misto',
-  `date_created` datetime default NULL,
-  `user_created` int(11) default NULL,
-  `date_modified` datetime default NULL,
-  `user_modified` int(11) default NULL,
+  `real_type` varchar(45) NOT NULL DEFAULT 'FILE' COMMENT 'typ fyzickeho mista. Default FILE - lokalni fyzicke misto',
+  `date_created` datetime DEFAULT NULL,
+  `user_created` int(11) DEFAULT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `user_modified` int(11) DEFAULT NULL,
   `guid` varchar(45) NOT NULL COMMENT 'jednoznacny identifikator',
   `md5_hash` varchar(45) NOT NULL COMMENT 'otisk souboru pro overeni pravosti',
-  `size` int(11) default NULL,
-  PRIMARY KEY  (`file_id`,`file_version`)
+  `size` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`,`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}log_access` (
-  `logaccess_id` int(10) unsigned NOT NULL auto_increment,
-  `date` datetime default NULL,
-  `user_id` int(11) default NULL,
-  `ip` varchar(15) default NULL,
-  `user_agent` varchar(200) default NULL,
-  `stav` tinyint(4) default NULL,
-  PRIMARY KEY  (`logaccess_id`)
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `date` datetime DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `ip` varchar(15) DEFAULT NULL,
+  `user_agent` varchar(200) DEFAULT NULL,
+  `stav` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}log_dokument` (
-  `logdokument_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `typ` tinyint(4) NOT NULL,
   `poznamka` text,
   `user_id` int(11) NOT NULL,
   `date` datetime NOT NULL,
   `dokument_id` int(11) NOT NULL,
   `user_info` text,
-  PRIMARY KEY  (`logdokument_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `dokument_id` (`dokument_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}orgjednotka` (
-  `orgjednotka_id` int(10) unsigned NOT NULL auto_increment,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `plny_nazev` varchar(200) NOT NULL,
-  `zkraceny_nazev` varchar(100) default NULL,
+  `zkraceny_nazev` varchar(100) DEFAULT '',
   `ciselna_rada` varchar(30) NOT NULL,
   `note` text,
-  `stav` tinyint(4) NOT NULL default '0',
-  `date_created` datetime default NULL,
-  `date_modified` datetime default NULL,
-  PRIMARY KEY  (`orgjednotka_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3;
+  `stav` tinyint(4) NOT NULL DEFAULT '0',
+  `date_created` datetime DEFAULT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `{tbls3}orgjednotka` (`orgjednotka_id`, `plny_nazev`, `zkraceny_nazev`, `ciselna_rada`, `note`, `stav`, `date_created`, `date_modified`) VALUES
+INSERT INTO `{tbls3}orgjednotka` (`id`, `plny_nazev`, `zkraceny_nazev`, `ciselna_rada`, `note`, `stav`, `date_created`, `date_modified`) VALUES
 (1, 'Centrální podatelna', 'Centrální podatelna', 'POD', '', 1, NOW(), NULL);
 
 CREATE TABLE `{tbls3}osoba` (
-  `osoba_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `prijmeni` varchar(255) NOT NULL,
-  `jmeno` varchar(150) default NULL,
-  `titul_pred` varchar(50) default NULL,
-  `titul_za` varchar(50) default NULL,
-  `email` varchar(200) default NULL,
-  `telefon` varchar(20) default NULL,
-  `pozice` varchar(50) default NULL,
+  `jmeno` varchar(150) DEFAULT '',
+  `titul_pred` varchar(50) DEFAULT '',
+  `titul_za` varchar(50) DEFAULT '',
+  `email` varchar(200) DEFAULT '',
+  `telefon` varchar(20) DEFAULT '',
+  `pozice` varchar(50) DEFAULT '',
   `stav` tinyint(4) NOT NULL,
   `date_created` datetime NOT NULL,
-  `date_modified` datetime default NULL,
-  PRIMARY KEY  (`osoba_id`),
+  `date_modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `prijmeni` (`prijmeni`,`jmeno`,`stav`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}osoba_to_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `osoba_id` int(10) unsigned NOT NULL,
   `user_id` int(10) unsigned NOT NULL,
   `date_added` datetime NOT NULL,
-  `active` tinyint(4) NOT NULL default '1',
-  UNIQUE KEY `osoba_id` (`osoba_id`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `active` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `osoba_id` (`osoba_id`,`user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}sestava` (
-  `sestava_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nazev` varchar(60) NOT NULL,
-  `popis` varchar(150) default NULL,
+  `popis` varchar(150) DEFAULT NULL,
   `parametry` text,
   `sloupce` text,
-  `typ` tinyint(4) NOT NULL default '1',
-  `filtr` tinyint(4) default '0',
-  PRIMARY KEY  (`sestava_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  `typ` tinyint(4) NOT NULL DEFAULT '1',
+  `filtr` tinyint(4) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `{tbls3}sestava` (`sestava_id`, `nazev`, `popis`, `parametry`, `sloupce`, `typ`, `filtr`) VALUES
+INSERT INTO `{tbls3}sestava` (`id`, `nazev`, `popis`, `parametry`, `sloupce`, `typ`, `filtr`) VALUES
 (1, 'Podací deník', NULL, NULL, NULL, 2, 1);
 
 CREATE TABLE `{tbls3}souvisejici_dokument` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `dokument_id` int(11) NOT NULL,
   `spojit_s` int(11) NOT NULL,
   `date_added` datetime NOT NULL,
   `user_added` int(11) NOT NULL,
-  `type` tinyint(4) NOT NULL default '1',
-  PRIMARY KEY  (`dokument_id`,`spojit_s`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `type` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `dokument_id` (`dokument_id`,`spojit_s`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}spis` (
-  `spis_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nazev` varchar(80) NOT NULL,
   `popis` varchar(200) NOT NULL,
-  `spisovy_znak` int(11) default NULL,
-  `typ` varchar(5) NOT NULL default 'S',
-  `spis_parent` int(11) default NULL,
-  `uroven` tinyint(4) default '0',
-  `sekvence` varchar(200) default NULL,
-  `stav` tinyint(4) NOT NULL default '1',
-  `date_created` datetime default NULL,
-  `user_created` int(11) default NULL,
-  `date_modified` datetime default NULL,
-  `user_modified` int(11) default NULL,
-  `skartacni_znak` enum('A','S','V') default NULL,
-  `skartacni_lhuta` int(11) default NULL,
-  `spousteci_udalost` varchar(250) default NULL,
-  PRIMARY KEY  (`spis_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  `spisovy_znak` int(11) DEFAULT NULL,
+  `typ` varchar(5) NOT NULL DEFAULT 'S',
+  `spis_parent` int(11) DEFAULT NULL,
+  `uroven` tinyint(4) DEFAULT '0',
+  `sekvence` varchar(200) DEFAULT NULL,
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  `date_created` datetime DEFAULT NULL,
+  `user_created` int(11) DEFAULT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `user_modified` int(11) DEFAULT NULL,
+  `skartacni_znak` enum('A','S','V') DEFAULT NULL,
+  `skartacni_lhuta` int(11) DEFAULT NULL,
+  `spousteci_udalost` varchar(250) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
-INSERT INTO `{tbls3}spis` (`spis_id`, `nazev`, `popis`, `spisovy_znak`, `typ`, `spis_parent`, `uroven`, `sekvence`, `stav`, `date_created`, `user_created`, `date_modified`, `user_modified`, `skartacni_znak`, `skartacni_lhuta`, `spousteci_udalost`) VALUES
-(1, 'Spisy', 'Nejvyšší větev spisové hierarchie', NULL, 'VS', NULL, 0, '', 1, NULL, NULL, NOW(), 25, NULL, NULL, NULL);
+INSERT INTO `{tbls3}spis` (`id`, `nazev`, `popis`, `spisovy_znak`, `typ`, `spis_parent`, `uroven`, `sekvence`, `stav`, `date_created`, `user_created`, `date_modified`, `user_modified`, `skartacni_znak`, `skartacni_lhuta`, `spousteci_udalost`) VALUES
+(1, 'Spisy', 'Nejvyšší větev spisové hierarchie', NULL, 'VS', NULL, 0, '', 1, NULL, NULL, NOW(), 1, NULL, NULL, NULL);
 
 CREATE TABLE `{tbls3}spisovy_znak` (
-  `spisznak_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nazev` varchar(80) NOT NULL,
   `popis` varchar(200) NOT NULL,
-  `spisznak_parent` int(11) default NULL,
-  `uroven` tinyint(4) default '0',
-  `sekvence` varchar(200) default NULL,
-  `stav` tinyint(4) NOT NULL default '1',
-  `date_created` datetime default NULL,
-  `user_created` int(11) default NULL,
-  `date_modified` datetime default NULL,
-  `user_modified` int(11) default NULL,
-  `skartacni_znak` enum('A','S','V') default NULL,
-  `skartacni_lhuta` int(11) default NULL,
-  `spousteci_udalost` int(11) default NULL,
-  PRIMARY KEY  (`spisznak_id`)
+  `spisznak_parent` int(11) DEFAULT NULL,
+  `uroven` tinyint(4) DEFAULT '0',
+  `sekvence` varchar(200) DEFAULT NULL,
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  `date_created` datetime DEFAULT NULL,
+  `user_created` int(11) DEFAULT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `user_modified` int(11) DEFAULT NULL,
+  `skartacni_znak` enum('A','S','V') DEFAULT NULL,
+  `skartacni_lhuta` int(11) DEFAULT NULL,
+  `spousteci_udalost` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}spousteci_udalost` (
-  `spousteci_udalost_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nazev` text NOT NULL,
   `poznamka` text,
-  `stav` tinyint(4) NOT NULL default '1',
-  PRIMARY KEY  (`spousteci_udalost_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `{tbls3}spousteci_udalost` (`spousteci_udalost_id`, `nazev`, `poznamka`, `stav`) VALUES
+INSERT INTO `{tbls3}spousteci_udalost` (`id`, `nazev`, `poznamka`, `stav`) VALUES
 (1, 'Skartační lhůta začíná plynout po ztrátě platnosti dokumentu.', NULL, 1),
 (2, 'Skartační lhůta začíná plynout  po ukončení záruky.', NULL, 1),
 (3, 'Skartační lhůta začíná plynout po uzavření dokumentu.', NULL, 1),
@@ -320,65 +336,65 @@ INSERT INTO `{tbls3}spousteci_udalost` (`spousteci_udalost_id`, `nazev`, `poznam
 (16, 'Skartační lhůta u dokumentů krajského referenda začíná plynout po vyhlášení výsledků referenda s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu.', NULL, 1);
 
 CREATE TABLE `{tbls3}subjekt` (
-  `subjekt_id` int(11) NOT NULL,
-  `subjekt_version` int(11) NOT NULL default '1',
-  `stav` tinyint(4) NOT NULL default '1',
+  `id` int(11) NOT NULL,
+  `version` int(11) NOT NULL DEFAULT '1',
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
   `type` varchar(15) NOT NULL,
-  `ic` varchar(8) default NULL,
-  `dic` varchar(12) default NULL,
-  `nazev_subjektu` varchar(255) default NULL,
-  `jmeno` varchar(24) default NULL,
-  `prijmeni` varchar(35) default NULL,
-  `prostredni_jmeno` varchar(35) default NULL,
-  `titul_pred` varchar(35) default NULL,
-  `titul_za` varchar(10) default NULL,
-  `rodne_jmeno` varchar(35) default NULL,
-  `datum_narozeni` date default NULL,
-  `misto_narozeni` varchar(48) default NULL,
-  `okres_narozeni` varchar(48) default NULL,
-  `stat_narozeni` varchar(3) default NULL,
-  `adresa_mesto` varchar(48) default NULL,
-  `adresa_ulice` varchar(48) default NULL,
-  `adresa_cp` varchar(10) default NULL,
-  `adresa_co` varchar(10) default NULL,
-  `adresa_psc` varchar(10) default NULL,
-  `adresa_stat` varchar(3) default NULL,
-  `narodnost` varchar(80) default NULL,
-  `email` varchar(250) default NULL,
-  `telefon` varchar(150) default NULL,
-  `id_isds` varchar(50) default NULL,
+  `ic` varchar(8) DEFAULT '',
+  `dic` varchar(12) DEFAULT '',
+  `nazev_subjektu` varchar(255) DEFAULT '',
+  `jmeno` varchar(24) DEFAULT '',
+  `prijmeni` varchar(35) DEFAULT '',
+  `prostredni_jmeno` varchar(35) DEFAULT '',
+  `titul_pred` varchar(35) DEFAULT '',
+  `titul_za` varchar(10) DEFAULT '',
+  `rodne_jmeno` varchar(35) DEFAULT '',
+  `datum_narozeni` date DEFAULT NULL,
+  `misto_narozeni` varchar(48) DEFAULT '',
+  `okres_narozeni` varchar(48) DEFAULT '',
+  `stat_narozeni` varchar(3) DEFAULT '',
+  `adresa_mesto` varchar(48) DEFAULT '',
+  `adresa_ulice` varchar(48) DEFAULT '',
+  `adresa_cp` varchar(10) DEFAULT '',
+  `adresa_co` varchar(10) DEFAULT '',
+  `adresa_psc` varchar(10) DEFAULT '',
+  `adresa_stat` varchar(3) DEFAULT '',
+  `narodnost` varchar(80) DEFAULT '',
+  `email` varchar(250) DEFAULT '',
+  `telefon` varchar(150) DEFAULT '',
+  `id_isds` varchar(50) DEFAULT '',
   `poznamka` text,
-  `date_created` datetime default NULL,
-  `date_modified` datetime default NULL,
-  `user_added` int(11) default NULL,
-  PRIMARY KEY  (`subjekt_id`,`subjekt_version`),
+  `date_created` datetime DEFAULT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `user_added` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`,`version`),
   KEY `jmeno` (`nazev_subjektu`,`prijmeni`,`jmeno`),
   KEY `hledat` (`adresa_ulice`,`email`,`id_isds`,`telefon`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}user` (
-  `user_id` int(10) unsigned NOT NULL auto_increment,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `active` tinyint(4) NOT NULL,
-  `date_created` datetime default NULL,
-  `last_modified` datetime default NULL,
-  `last_login` datetime default NULL,
+  `date_created` datetime DEFAULT NULL,
+  `last_modified` datetime DEFAULT NULL,
+  `last_login` datetime DEFAULT NULL,
   `username` varchar(150) NOT NULL,
-  `password` varchar(50) default NULL,
-  `last_ip` varchar(15) default NULL,
-  PRIMARY KEY  (`user_id`),
+  `password` varchar(50) DEFAULT NULL,
+  `last_ip` varchar(15) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `USERNAME` (`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=COMPACT;
 
 CREATE TABLE `{tbls3}user_acl` (
-  `acl_id` int(10) unsigned NOT NULL auto_increment,
-  `role_id` int(10) unsigned default NULL,
-  `rule_id` int(10) unsigned default NULL,
-  `allowed` enum('Y','N') NOT NULL default 'Y',
-  PRIMARY KEY  (`acl_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC ;
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `role_id` int(10) unsigned DEFAULT NULL,
+  `rule_id` int(10) unsigned DEFAULT NULL,
+  `allowed` enum('Y','N') NOT NULL DEFAULT 'Y',
+  PRIMARY KEY (`id`),
+  KEY `role_id` (`role_id`,`rule_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
-
-INSERT INTO `{tbls3}user_acl` (`acl_id`,`role_id`,`rule_id`,`allowed`) VALUES
+INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
 (1,1,1,'Y'),
 (2,2,1,'N'),
 (3,2,2,'Y'),
@@ -402,15 +418,16 @@ INSERT INTO `{tbls3}user_acl` (`acl_id`,`role_id`,`rule_id`,`allowed`) VALUES
 (21,9,17,'Y'),
 (22,8,17,'Y');
 
-CREATE TABLE `{tbls3}user_resource` (
-  `resource_id` int(10) unsigned NOT NULL auto_increment,
-  `code` varchar(150) NOT NULL,
-  `note` varchar(255) default NULL,
-  `name` varchar(100) NOT NULL,
-  PRIMARY KEY  (`resource_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=31 ;
 
-INSERT INTO `{tbls3}user_resource` (`resource_id`, `code`, `note`, `name`) VALUES
+CREATE TABLE `{tbls3}user_resource` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `code` varchar(150) NOT NULL,
+  `note` varchar(255) DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=COMPACT;
+
+INSERT INTO `{tbls3}user_resource` (`id`, `code`, `note`, `name`) VALUES
 (1, 'Spisovka_DokumentyPresenter', NULL, 'Seznam dokumentů'),
 (2, 'Epodatelna_DefaultPresenter', NULL, 'E-podatelna - úvodní obrazovka'),
 (3, 'Admin_DefaultPresenter', NULL, 'Administrace - úvodní obrazovka'),
@@ -431,52 +448,53 @@ INSERT INTO `{tbls3}user_resource` (`resource_id`, `code`, `note`, `name`) VALUE
 (18, 'Spisovka_SpisyPresenter', NULL, 'Spisy'),
 (19, 'Spisovka_SubjektyPresenter', NULL, 'Subjekty'),
 (20, 'Spisovka_PrilohyPresenter', NULL, 'Prilohy'),
-(21, 'Admin_EpodatelnaPresenter', NULL, 'Administrace - Nastaveni epodatelny'),
-(22, 'Epodatelna_EvidencePresenter', NULL, 'Epodatalne - evidence'),
-(23, 'Epodatelna_SubjektyPresenter', NULL, 'Epodatelna - subjekty'),
-(24, 'Epodatelna_PrilohyPresenter', NULL, 'Epodatelna - prilohy'),
+(21, 'Admin_EpodatelnaPresenter', NULL, 'Administrace - nastavení e-podatelny'),
+(22, 'Epodatelna_PrilohyPresenter', NULL, 'Epodatelna - zobrazeni prilohy'),
+(23, 'Epodatelna_EvidencePresenter', NULL, 'Epodatelna - evidence'),
+(24, 'Epodatelna_SubjektyPresenter', NULL, 'Epodatelna - subjekt'),
 (25, 'Spisovka_SestavyPresenter', NULL, 'Sestavy'),
-(26, 'Spisovka_SpojitPresenter', NULL, 'Spojování dokumentu'),
+(26, 'Spisovka_SpojitPresenter', NULL, 'Spisovka - spojeni dokumentu'),
 (27, 'Spisovka_ErrorPresenter', NULL, 'Error'),
-(28, 'Install_DefaultPresenter', NULL, 'Instalační procedura'),
+(28, 'Install_DefaultPresenter', NULL, 'Instalace'),
 (29, 'Spisovka_VyhledatPresenter', NULL, 'Vyhledavani');
 
 CREATE TABLE `{tbls3}user_role` (
-  `role_id` int(10) unsigned NOT NULL auto_increment,
-  `parent_id` int(10) unsigned default NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned DEFAULT NULL,
   `code` varchar(50) NOT NULL,
   `name` varchar(150) NOT NULL,
-  `active` tinyint(4) NOT NULL default '0',
-  `date_created` datetime default NULL,
-  `date_modified` datetime default NULL,
-  `note` varchar(250) default NULL,
-  `orgjednotka_id` int(11) default NULL,
-  `fixed` tinyint(4) default '0',
-  `order` int(11) default NULL,
-  PRIMARY KEY  (`role_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=32 ;
+  `active` tinyint(4) NOT NULL DEFAULT '0',
+  `date_created` datetime DEFAULT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `note` varchar(250) DEFAULT NULL,
+  `orgjednotka_id` int(11) DEFAULT NULL,
+  `fixed` tinyint(4) DEFAULT '0',
+  `order` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=COMPACT;
 
-INSERT INTO `{tbls3}user_role` (`role_id`, `parent_id`, `code`, `name`, `active`, `date_created`, `date_modified`, `note`, `orgjednotka_id`, `fixed`, `order`) VALUES
+INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `code`, `name`, `active`, `date_created`, `date_modified`, `note`, `orgjednotka_id`, `fixed`, `order`) VALUES
 (1, 0, 'admin', 'administrátor', 1, NOW(), NOW(), 'Má absolutní moc provádět všechno možné', NULL, 2, 100),
 (2, 0, 'guest', 'host', 1, NOW(), NOW(), 'Role představující nepřihlášeného uživatele.\r\nTedy nastavení oprávnění v době, kdy k aplikaci není nikdo přihlášen.', NULL, 2, 0),
 (3, 1, 'superadmin', 'SuperAdmin', 1, NOW(), NOW(), 'Administrátor se super právy.\r\nTo znamená, že může manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', NULL, 2, 100),
 (4, 0, 'referent', 'referent', 1, NOW(), NOW(), 'Základní role pracovníka spisové služby', NULL, 1, 10),
-(5, 4, 'vedouci', 'vedoucí', 1, NOW(), NOW(), 'vedoucí organizační jednotky umožňující přijímat dokumenty', NULL, 1, 30),
-(6, 0, 'podatelna', 'pracovník podatelny', 1, NOW(), NOW(), 'pracovník podatelny, který může přijímat nebo odesílat dokumenty', NULL, 1, 20),
+(5, 4, 'vedouci', 'vedoucí', 1, NOW(), NOW(), 'Vedoucí organizační jednotky umožňující přijímat dokumenty', NULL, 1, 30),
+(6, 0, 'podatelna', 'pracovník podatelny', 1, NOW(), NOW(), 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', NULL, 1, 20),
 (7, 5, 'vedouci_1', 'vedoucí POD', 1, NOW(), NULL, NULL, 1, 0, 30),
 (8, 4, 'referent_1', 'referent POD', 1, NOW(), NULL, NULL, 1, 0, 10),
 (9, 6, 'podatelna_1', 'podatelna POD', 1, NOW(), NULL, NULL, 1, 0, 20);
 
 CREATE TABLE `{tbls3}user_rule` (
-  `rule_id` int(10) unsigned NOT NULL auto_increment,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `note` varchar(250) default NULL,
-  `resource_id` int(11) default NULL,
-  `privilege` varchar(100) default NULL,
-  PRIMARY KEY  (`rule_id`)
+  `note` varchar(250) DEFAULT NULL,
+  `resource_id` int(11) DEFAULT NULL,
+  `privilege` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `resource_id` (`resource_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `{tbls3}user_rule` (`rule_id`, `name`, `note`, `resource_id`, `privilege`) VALUES
+INSERT INTO `{tbls3}user_rule` (`id`, `name`, `note`, `resource_id`, `privilege`) VALUES
 (1, 'Bez omezení', NULL, NULL, NULL),
 (2, 'Přihlášení uživatele', NULL, 4, 'login'),
 (3, 'Zobrazeni uvodní obrazovky', NULL, 4, NULL),
@@ -496,52 +514,54 @@ INSERT INTO `{tbls3}user_rule` (`rule_id`, `name`, `note`, `resource_id`, `privi
 (17, 'Oprávnění pro org. jednotku Centrální podatelna', 'Oprávnění platné pouze pro organizační jednotku Centrální podatelna', NULL, 'orgjednotka_1');
 
 CREATE TABLE `{tbls3}user_to_role` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
   `role_id` int(10) unsigned NOT NULL,
   `date_added` datetime NOT NULL,
-  KEY `user_id` (`user_id`,`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`,`role_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}workflow` (
-  `workflow_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `dokument_id` int(11) NOT NULL,
-  `dokument_version` int(11) default NULL,
-  `stav_dokumentu` int(11) NOT NULL default '0',
-  `prideleno` int(11) default NULL,
+  `dokument_version` int(11) DEFAULT NULL,
+  `stav_dokumentu` int(11) NOT NULL DEFAULT '0',
+  `prideleno` int(11) DEFAULT NULL,
   `prideleno_info` text,
-  `orgjednotka_id` int(11) default NULL,
+  `orgjednotka_id` int(11) DEFAULT NULL,
   `orgjednotka_info` text,
-  `stav_osoby` tinyint(4) NOT NULL default '0' COMMENT '0=neprirazen,1=prirazen,2=dokoncen,100>storno',
+  `stav_osoby` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0=neprirazen,1=prirazen,2=dokoncen,100>storno',
   `date` datetime NOT NULL,
   `user_id` int(11) NOT NULL,
   `user_info` text,
   `poznamka` text,
-  `date_predani` datetime default NULL,
-  `aktivni` tinyint(4) NOT NULL default '1',
-  PRIMARY KEY  (`workflow_id`),
+  `date_predani` datetime DEFAULT NULL,
+  `aktivni` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
   KEY `dokument` (`dokument_id`,`dokument_version`,`stav_dokumentu`),
   KEY `osoba` (`prideleno`,`orgjednotka_id`,`stav_osoby`,`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE `{tbls3}zmocneni` (
-  `zmocneni_id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `cislo_zakona` int(11) NOT NULL COMMENT 'LegalTitleLaw',
   `rok_vydani` year(4) NOT NULL COMMENT 'LegaltitleYear',
   `paragraf` varchar(50) NOT NULL COMMENT 'LegalTitleSect',
   `odstavec` varchar(50) NOT NULL COMMENT 'LegalTitlePar',
   `pismeno` varchar(10) NOT NULL COMMENT 'LegaltitlePoint',
   `stav` tinyint(4) NOT NULL,
-  PRIMARY KEY  (`zmocneni_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `{tbls3}zpvyrizeni` (
-  `zpvyrizeni_id` int(10) unsigned NOT NULL auto_increment,
+CREATE TABLE `{tbls3}zpusob_vyrizeni` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `nazev` varchar(80) NOT NULL,
-  `stav` tinyint(4) NOT NULL default '1',
-  PRIMARY KEY  (`zpvyrizeni_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-INSERT INTO `{tbls3}zpvyrizeni` (`zpvyrizeni_id`, `nazev`, `stav`) VALUES
+INSERT INTO `{tbls3}zpusob_vyrizeni` (`id`, `nazev`, `stav`) VALUES
 (1, 'vyřízení prvopisem', 1),
 (2, 'postoupení', 1),
 (3, 'vzetí na vědomí', 1),
