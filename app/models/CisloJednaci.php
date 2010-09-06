@@ -4,7 +4,7 @@ class CisloJednaci extends BaseModel
 {
 
     protected $name = 'cislo_jednaci';
-    protected $primary = 'cjednaci_id';
+    protected $primary = 'id';
 
     protected $tb_dokument = 'dokument';
 
@@ -28,7 +28,7 @@ class CisloJednaci extends BaseModel
         $unique_part = explode('#',$unique_info);
         $this->unique = 'OSS-'. $unique_part[0];
 
-        $user = Environment::getUser()->getIdentity()->user_id;
+        $user = Environment::getUser()->getIdentity()->id;
         $UserModel = new UserModel();
         $this->user_info = $UserModel->getUser($user, 1);
 
@@ -57,11 +57,11 @@ class CisloJednaci extends BaseModel
             $info['urad_zkratka'] = $this->urad->zkratka;
             $info['urad_poradi'] = $this->max('urad');
 
-            $info['orgjednotka_id'] = $this->org->orgjednotka_id;
+            $info['orgjednotka_id'] = $this->org->id;
             $info['org'] = @$this->org->zkratka;
             $info['org_poradi'] = $this->max('org');
 
-            $info['user_id'] = $this->user_info->user_id;
+            $info['user_id'] = $this->user_info->id;
             $info['user'] = $this->user_info->username;
             $info['prijmeni'] = String::webalize($this->user_info->identity->prijmeni);
             $info['user_poradi'] = $this->max('user');
@@ -133,7 +133,7 @@ class CisloJednaci extends BaseModel
             $cjednaci_id = $this->insert($info);
 
             $tmp = new stdClass();
-            $tmp->cjednaci_id = $cjednaci_id;
+            $tmp->id = $cjednaci_id;
             $tmp->cislo_jednaci = $cislo_jednaci;
             $tmp->rok = $info['rok'];
             $tmp->poradove_cislo = $info['poradove_cislo'];
@@ -142,10 +142,10 @@ class CisloJednaci extends BaseModel
             $tmp->urad = $this->urad->zkratka;
             $tmp->urad_nazev = $this->urad->nazev;
             $tmp->urad_poradi = $info['urad_poradi'];
-            $tmp->orgjednotka_id = @$this->org->orgjednotka_id;
+            $tmp->orgjednotka_id = @$this->org->id;
             $tmp->orgjednotka = @$this->org->zkratka;
             $tmp->orgjednotka_poradi = $info['org_poradi'];
-            $tmp->user_id = $this->user_info->user_id;
+            $tmp->user_id = $this->user_info->id;
             $tmp->user = $this->user_info->username;
             $tmp->user_poradi = $info['user_poradi'];
             $tmp->prijmeni = String::webalize($this->user_info->identity->prijmeni);
@@ -154,7 +154,7 @@ class CisloJednaci extends BaseModel
         } else {
 
             $tmp = new stdClass();
-            $tmp->cjednaci_id = isset($info['cjednaci_id'])?$info['cjednaci_id']:null;
+            $tmp->id = isset($info['id'])?$info['id']:null;
             $tmp->cislo_jednaci = $cislo_jednaci;
             $tmp->rok = $info['rok'];
             $tmp->poradove_cislo = $info['poradove_cislo'];
@@ -163,10 +163,10 @@ class CisloJednaci extends BaseModel
             $tmp->urad = $this->urad->zkratka;
             $tmp->urad_nazev = $this->urad->nazev;
             $tmp->urad_poradi = $info['urad_poradi'];
-            $tmp->orgjednotka_id = @$this->org->orgjednotka_id;
+            $tmp->orgjednotka_id = @$this->org->id;
             $tmp->orgjednotka = @$this->org->zkratka;
             $tmp->orgjednotka_poradi = $info['org_poradi'];
-            $tmp->user_id = $this->user_info->user_id;
+            $tmp->user_id = $this->user_info->id;
             $tmp->user = $this->user_info->username;
             $tmp->user_poradi = $info['user_poradi'];
             $tmp->prijmeni = String::webalize($this->user_info->identity->prijmeni);
@@ -179,10 +179,10 @@ class CisloJednaci extends BaseModel
 
     public function nacti($cjednaci_id) {
 
-            $row = $this->fetchRow(array(array('cjednaci_id=%i',$cjednaci_id)))->fetch();
+            $row = $this->fetchRow(array(array('id=%i',$cjednaci_id)))->fetch();
 
             $info = array();
-            $info['cjednaci_id'] = $cjednaci_id;
+            $info['id'] = $cjednaci_id;
 
             $info['podaci_denik'] = $row->podaci_denik;
             $info['rok'] = $row->rok;
@@ -229,13 +229,13 @@ class CisloJednaci extends BaseModel
                 $cislo = (@$row->urad_poradi)?($row->urad_poradi)+1 : 1;
                 break;
             case "org":
-                $where[] = array('orgjednotka_id=%i',$this->org->orgjednotka_id);
+                $where[] = array('orgjednotka_id=%i',$this->org->id);
                 $result = $this->fetchAll(array('org_poradi'=>'DESC'),$where,null,1);
                 $row = $result->fetch();
                 $cislo = (@$row->org_poradi)?($row->org_poradi)+1 : 1;
                 break;
             case "user":
-                $where[] = array('user_id=%i',$this->user_info->user_id);
+                $where[] = array('user_id=%i',$this->user_info->id);
                 $result = $this->fetchAll(array('user_poradi'=>'DESC'),$where,null,1);
                 $row = $result->fetch();
                 $cislo = (@$row->user_poradi)?($row->user_poradi)+1 : 1;

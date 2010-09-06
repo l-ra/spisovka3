@@ -6,7 +6,7 @@
 
     <div class="navigate">
     <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> -
-    <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->dokument_id }">Seznam dokumentů</a> -
+    <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id }">Seznam dokumentů</a> -
     Odeslání dokumentu
     </div>
 
@@ -96,7 +96,7 @@
                 </div>
                 {if count($Dok->odeslani)>0}
                     {foreach $Dok->odeslani as $dokodes}
-                        {if $dokodes->subjekt_id == $subjekt->subjekt_id  }
+                        {if $dokodes->subjekt_id == $subjekt->id  }
                 <div class="vyber" style="color:#008800;">
                     Tomuto adresátovi byl dokument již odeslán
                 </div>
@@ -128,7 +128,7 @@
             <td class="icon">&nbsp;</td>
             <td colspan="2">
                     Jak odeslat:
-                    <select name="subjekt[{$subjekt->subjekt_id}]">
+                    <select name="subjekt[{$subjekt->id}]">
                         <option value="0">neodesílat</option>
                         <option value="1">odeslat emailem</option>
                         <option value="2">odeslat datovou schránkou</option>
@@ -138,7 +138,7 @@
                         <option value="6">předáno telefonicky</option>
                     </select>
                     &nbsp;&nbsp;&nbsp;
-                    Datum odeslání *: <input type="text" class="datepicker" name="datum_odeslani[{$subjekt->subjekt_id}]" value="{=date('d.m.Y')}"> (* neplatí pro e-podatelnu)
+                    Datum odeslání *: <input type="text" class="datepicker" name="datum_odeslani[{$subjekt->id}]" value="{=date('d.m.Y')}"> (* neplatí pro e-podatelnu)
                 </div>
             </td>
         </tr>
@@ -161,13 +161,13 @@
         {foreach $Dok->prilohy as $file}
         <tr>
             <td class="icon">
-                <input type="checkbox" name="prilohy[{$file->file_id}]" />
+                <input type="checkbox" name="prilohy[{$file->id}]" />
             </td>
             <td class="icon">
                 <img src="{$baseUri}images/mimetypes/{$file->mime_type|webalize}.png" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->dokument_id, 'file'=>$file->file_id}">{$file->nazev}</a>
+                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->id, 'file'=>$file->id}">{$file->nazev}</a>
                 <div class="info">
                 {$file->real_name}
                 <br />

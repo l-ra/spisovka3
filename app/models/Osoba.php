@@ -4,13 +4,13 @@ class Osoba extends BaseModel
 {
 
     protected $name = 'osoba';
-    protected $primary = 'osoba_id';
+    protected $primary = 'id';
     
     
     public function getInfo($osoba_id)
     {
 
-        $result = $this->fetchRow(array('osoba_id=%i',$osoba_id));
+        $result = $this->fetchRow(array('id=%i',$osoba_id));
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 
@@ -22,19 +22,19 @@ class Osoba extends BaseModel
         if ( $active == 1 ) {
             $rows = dibi::fetchAll('SELECT u.*
                                FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
-                                LEFT JOIN [:PREFIX:'. self::USER_TABLE .'] u ON (u.user_id = ou.user_id)
+                                LEFT JOIN [:PREFIX:'. self::USER_TABLE .'] u ON (u.id = ou.user_id)
                                 WHERE ou.osoba_id=%i',$osoba_id,' AND ou.active=1');
         } else {
             $rows = dibi::fetchAll('SELECT u.*
                                 FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
-                                LEFT JOIN [:PREFIX:'. self::USER_TABLE .'] u ON (u.user_id = ou.user_id)
+                                LEFT JOIN [:PREFIX:'. self::USER_TABLE .'] u ON (u.id = ou.user_id)
                                 WHERE ou.osoba_id=%i',$osoba_id);
         }
 
 
         $tmp = array();
         foreach ($rows as $row) {
-            $tmp[ $row->user_id ] = $row;
+            $tmp[ $row->id ] = $row;
         }
         $rows = $tmp;
 
@@ -148,11 +148,11 @@ class Osoba2User extends BaseModel
     public function seznam($aktivni = 1, $filtr = null) {
 
 
-        $result = dibi::query('SELECT ou.osoba_id, ou.user_id, r.role_id, o.*, r.code, r.name, r.orgjednotka_id
+        $result = dibi::query('SELECT ou.osoba_id, ou.user_id, r.id role_id, o.*, r.code, r.name, r.orgjednotka_id
                                FROM %n ou',$this->name,
                               ' LEFT JOIN %n ur',$this->user_to_role,'ON ur.user_id=ou.user_id'.
-                              ' LEFT JOIN %n o',$this->osoba,'ON o.osoba_id=ou.osoba_id'.
-                              ' LEFT JOIN %n r',$this->tbl_role,'ON r.role_id=ur.role_id'.
+                              ' LEFT JOIN %n o',$this->osoba,'ON o.id=ou.osoba_id'.
+                              ' LEFT JOIN %n r',$this->tbl_role,'ON r.id=ur.role_id'.
                               ' WHERE ou.active=1'.
                               ' ORDER BY o.prijmeni, o.jmeno, r.name'
                 );
@@ -170,8 +170,8 @@ class Osoba2User extends BaseModel
         $result = dibi::query('SELECT ou.osoba_id, ou.user_id, r.role_id, o.*, r.code, r.name, r.orgjednotka_id
                                FROM %n ou',$this->name,
                               ' LEFT JOIN %n ur',$this->user_to_role,'ON ur.user_id=ou.user_id'.
-                              ' LEFT JOIN %n o',$this->osoba,'ON o.osoba_id=ou.osoba_id'.
-                              ' LEFT JOIN %n r',$this->tbl_role,'ON r.role_id=ur.role_id'.
+                              ' LEFT JOIN %n o',$this->osoba,'ON o.id=ou.osoba_id'.
+                              ' LEFT JOIN %n r',$this->tbl_role,'ON r.id=ur.role_id'.
                               " WHERE (ou.active=1) AND".
                               " ( CONCAT(o.jmeno,' ',o.prijmeni) LIKE %s","%".$text."%",
                               " OR CONCAT(o.prijmeni,' ',o.jmeno) LIKE %s","%".$text."%"," ) ".

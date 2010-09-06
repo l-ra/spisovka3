@@ -21,10 +21,10 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 foreach( $seznam as $user ) {
                     if ( $typ == 2 ) {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano[]' value='". $user->user_id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='predano[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
                     } else {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno[]' value='". $user->user_id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='prideleno[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
 
                     }
                     
@@ -56,10 +56,10 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 foreach( $seznam as $org ) {
                     if ( $typ == 2 ) {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano_org[]' value='". $org->orgjednotka_id ."' /> ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
+                            "<input type='checkbox' name='predano_org[]' value='". $org->id ."' /> ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
                     } else {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno_org[]' value='". $org->orgjednotka_id ."' /> ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
+                            "<input type='checkbox' name='prideleno_org[]' value='". $org->id ."' /> ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
 
                     }
 
@@ -118,7 +118,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50);
         $form->addText('spisova_znacka', 'Spisová značka:', 50, 50);
-        $form->addSelect('typ_dokumentu', 'Typ Dokumentu:', $typ_dokumentu);
+        $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
         $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10);
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
@@ -135,7 +135,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $form->addText('datum_vyrizeni_cas', 'Čas vyřízení:', 10, 15);
         $form->addDatePicker('datum_odeslani', 'Datum odeslání:', 10);
         $form->addText('datum_odeslani_cas', 'Čas odeslání:', 10, 15);
-        $form->addSelect('spisovy_znak', 'spisový znak:', $spisznak_seznam);
+        $form->addSelect('spisovy_znak_id', 'spisový znak:', $spisznak_seznam);
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6);
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 6);
 

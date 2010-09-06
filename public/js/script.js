@@ -71,7 +71,7 @@ $(function() {
     });
 
     // Povinne polozky
-    $('.required').attr('title','Povinná položka');
+    $('label.required').attr('title','Povinná položka').append(' <span class="star">*</span>');
 
     // Dialog
     $('#dialog').dialog({

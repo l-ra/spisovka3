@@ -67,12 +67,12 @@ class Acl extends Permission {
         $user_role = Environment::getUser()->getRoles();
         $allow = 0;
 
-        Debug::dump($user_role);
+        //Debug::dump($user_role);
 
         foreach ($user_role as $role) {
             echo $role ." - ". $resource ." - ". $privilege;
             $opravneni = $this->allowedByRole($role, $resource, $privilege);
-            Debug::dump($opravneni);
+            //Debug::dump($opravneni);
             if ( count($opravneni)>0 ) {
                 if ( $allow == 0 ) $allow = 1;
             }

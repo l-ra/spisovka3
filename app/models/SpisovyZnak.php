@@ -4,7 +4,7 @@ class SpisovyZnak extends BaseModel
 {
 
     protected $name = 'spisovy_znak';
-    protected $primary = 'spisznak_id';
+    protected $primary = 'id';
     protected $tb_spoudalost = 'spousteci_udalost';
 
 
@@ -21,7 +21,7 @@ class SpisovyZnak extends BaseModel
    public function getInfo($spisznak_id)
     {
 
-        $result = $this->fetchRow(array('spisznak_id=%i',$spisznak_id));
+        $result = $this->fetchRow(array('id=%i',$spisznak_id));
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 
@@ -87,7 +87,7 @@ class SpisovyZnak extends BaseModel
             $tmp = array();
             if ( count($ret)>0 ) {
                 foreach ($ret as $r) {
-                    $tmp[] = $r->spisznak_id;
+                    $tmp[] = $r->id;
                 }
                 return $tmp;
             } else {
@@ -106,7 +106,7 @@ class SpisovyZnak extends BaseModel
             if ( $full == 1 ) {
                 $where_numbers = implode(",",$casti);
                 if ( !empty($where_numbers) ) {
-                    $args = array('where'=>array('spisznak_id IN ('.$where_numbers.')'));
+                    $args = array('where'=>array('id IN ('.$where_numbers.')'));
                     return $this->seznam($args);
                 } else {
                     return null;
@@ -138,9 +138,9 @@ class SpisovyZnak extends BaseModel
 
             if ( $simple == 1 ) {
                 $nazev = str_repeat(".", 2*$d->uroven) .' '. $d->nazev;
-                $string = '$tmp'.$sekvence_array.'['.$d->spisznak_id.']["spisznak"] = array("id"=>$d->spisznak_id,"nazev"=>"'.$nazev.'");';
+                $string = '$tmp'.$sekvence_array.'['.$d->id.']["spisznak"] = array("id"=>$d->id,"nazev"=>"'.$nazev.'");';
             } else {
-                $string = '$tmp'.$sekvence_array.'['.$d->spisznak_id.']["spisznak"] = $d;';
+                $string = '$tmp'.$sekvence_array.'['.$d->id.']["spisznak"] = $d;';
             }
             eval($string);
         }
@@ -158,7 +158,7 @@ class SpisovyZnak extends BaseModel
                 if ( is_array($data['spisznak']) ) {
                     $tmp[ $data['spisznak']['id'] ] = $data['spisznak']['nazev'];
                 } else {
-                    $tmp[ $data['spisznak']->spisznak_id ] = $data['spisznak'];
+                    $tmp[ $data['spisznak']->id ] = $data['spisznak'];
                 }
             } else if ( is_numeric($index) ) {
                 $tmp = $this->sestav($data[$index], $tmp);
@@ -221,7 +221,7 @@ class SpisovyZnak extends BaseModel
                     $data_pod['sekvence'] = $data['sekvence'] .'.'. $spisznakyPod->spisznak_parent;
                     $data_pod['uroven'] = $data['uroven'] + 1;
                     //Debug::dump($data_pod);
-                    $this->update($data_pod,array('spisznak_id=%i',$spisznakyPod->spisznak_id));
+                    $this->update($data_pod,array('id=%i',$spisznakyPod->id));
                     unset($data_pod);
                 }
             }
@@ -230,7 +230,7 @@ class SpisovyZnak extends BaseModel
         }
 
         unset($data['spisznak_parent_old']);
-        $ret = $this->update($data,array('spisznak_id=%i',$spisznak_id));
+        $ret = $this->update($data,array('id=%i',$spisznak_id));
 
         //if ($transaction)
         //dibi::commit();
@@ -244,10 +244,10 @@ class SpisovyZnak extends BaseModel
         $prefix = Environment::getConfig('database')->prefix;
         $tb_spoudalost = $prefix .'spousteci_udalost';
         
-        $result = dibi::query('SELECT * FROM %n', $tb_spoudalost)->fetchAssoc('spousteci_udalost_id');
+        $result = dibi::query('SELECT * FROM %n', $tb_spoudalost)->fetchAssoc('id');
 
         $tmp = new stdClass();
-            $tmp->spousteci_udalost_id = 0;
+            $tmp->id = 0;
             $tmp->nazev = 'Žádná';
             $tmp->poznamka = '';
             $tmp->stav = 1;
@@ -259,7 +259,7 @@ class SpisovyZnak extends BaseModel
                 $tmp = array();
                 $tmp[''] = 'Žádná';
                 foreach ($result as $dt) {
-                    $tmp[ $dt->spousteci_udalost_id ] = String::truncate($dt->nazev,90);
+                    $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
                 }
                 return $tmp;
             } else {

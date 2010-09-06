@@ -29,15 +29,15 @@
                 {/if}
             </td>
             <td class="prijato">
-                {$ep->doruceno_dne|date:%d.%m.%Y}
+                <span title="{$ep->doruceno_dne|edatetime}">{$ep->doruceno_dne|edate}</span>
             </td>
             <td class="cislo_jadnaci">
-                &nbsp;<strong><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->epodatelna_id}">
+                &nbsp;<strong><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->id}">
                    OSS-EP-O-{$ep->poradi}-{$ep->rok}
                 </a></strong>
             </td>
             <td class="vec">
-                <strong title="{$ep->popis}"><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->epodatelna_id}">
+                <strong title="{$ep->popis}"><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->id}">
                     {$ep->predmet}
                 </a></strong>
                 <br />

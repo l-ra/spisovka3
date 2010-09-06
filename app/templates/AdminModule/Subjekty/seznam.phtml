@@ -18,7 +18,7 @@
                 <img src="{$baseUri}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Admin:Subjekty:detail, id => $subjekt->subjekt_id}">{=Subjekt::displayName($subjekt,'jmeno_item')}&nbsp;</a>
+                <a href="{link :Admin:Subjekty:detail, id => $subjekt->id}">{=Subjekt::displayName($subjekt,'jmeno_item')}&nbsp;</a>
                 <div class="info">
                 <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
                 <br />
@@ -48,6 +48,6 @@
     </table>
     {widget vp}
     {else}
-    <div class="prazdno">Nebyli zjištěni žádné subjekty.</div>
+    <div class="prazdno">Nebyly zjištěny žádné subjekty.</div>
     {/if}
     

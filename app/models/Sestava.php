@@ -4,13 +4,13 @@ class Sestava extends BaseModel
 {
 
     protected $name = 'sestava';
-    protected $primary = 'sestava_id';
+    protected $primary = 'id';
     
     
     public function getInfo($sestava_id)
     {
 
-        $result = $this->fetchRow(array('sestava_id=%i',$sestava_id));
+        $result = $this->fetchRow(array('id=%i',$sestava_id));
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 
@@ -49,7 +49,7 @@ class Sestava extends BaseModel
         //if ($transaction)
         //dibi::begin();
 
-        $ret = $this->update($data,array('sestava_id=%i',$sestava_id));
+        $ret = $this->update($data,array('id=%i',$sestava_id));
 
         //if ($transaction)
         //dibi::commit();

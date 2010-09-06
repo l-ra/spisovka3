@@ -1,6 +1,6 @@
     {snippet dokosoby}
     {if isset($chyba)}
-    <div class="flash_message flash_warning">Zaměstnanci se nepodařilo předat domument. Zkuste to znovu.</div>
+    <div class="flash_message flash_warning">Zaměstnanci nebo organizační jednotce se nepodařilo předat domument. Zkuste to znovu.</div>
     {/if}
 
     <h2>Předat dokument</h2>
@@ -20,7 +20,7 @@
         {foreach $org_seznam as $org}
         <tr>
             <td>
-                <a href="{link :Spisovka:Uzivatel:vybrano, 'orgjednotka'=>$org->orgjednotka_id, 'dok_id'=>$dokument_id }" onclick="osobaVybrana(this); return false;">
+                <a href="{link :Spisovka:Uzivatel:vybrano, 'orgjednotka'=>$org->id, 'dok_id'=>$dokument_id }" onclick="osobaVybrana(this); return false;">
                    {$org->zkraceny_nazev}
                </a>&nbsp;&nbsp;
             </td>
@@ -32,7 +32,7 @@
         {/foreach}
     </table>
     {else}
-    <div class="prazdno">Nebyli zjištěni žádní zaměstnanci.</div>
+    <div class="prazdno">Nebyly zjištěny žádné organizační jednotky.</div>
     {/if}
     </div>
 
@@ -45,7 +45,7 @@
         {foreach $seznam as $osoba}
         <tr>
             <td>
-                <a href="{link :Spisovka:Uzivatel:vybrano, 'id'=>$osoba->osoba_id, 'user'=>$osoba->user_id, 'role'=>$osoba->role_id, 'orgjednotka'=>$osoba->orgjednotka_id, 'dok_id'=>$dokument_id }" onclick="osobaVybrana(this); return false;">
+                <a href="{link :Spisovka:Uzivatel:vybrano, 'id'=>$osoba->id, 'user'=>$osoba->user_id, 'role'=>$osoba->role_id, 'orgjednotka'=>$osoba->orgjednotka_id, 'dok_id'=>$dokument_id }" onclick="osobaVybrana(this); return false;">
                    {=Osoba::displayName($osoba,'full_item')}
                </a>&nbsp;&nbsp;
             </td>

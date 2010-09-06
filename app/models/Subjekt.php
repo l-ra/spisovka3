@@ -4,7 +4,7 @@ class Subjekt extends BaseModel
 {
 
     protected $name = 'subjekt';
-    protected $primary = 'subjekt_id';
+    protected $primary = 'id';
 
     private $staty = array();
     
@@ -14,12 +14,12 @@ class Subjekt extends BaseModel
 
         if ( !is_null($subjekt_version) ) {
             $result = $this->fetchRow(array(
-                                         array('subjekt_id=%i',$subjekt_id),
-                                         array('subjekt_version=%i',$subjekt_version)
+                                         array('id=%i',$subjekt_id),
+                                         array('version=%i',$subjekt_version)
                                            )
                                      );
         } else {
-            $result = $this->fetchAll(array('subjekt_version'=>'DESC'),array(array('subjekt_id=%i',$subjekt_id)),null,1);
+            $result = $this->fetchAll(array('version'=>'DESC'),array(array('id=%i',$subjekt_id)),null,1);
         }
         $row = $result->fetch();
         return ($row) ? $row : NULL;
@@ -29,9 +29,9 @@ class Subjekt extends BaseModel
     public function getMax()
     {
 
-        $result = $this->fetchAll(array('subjekt_id'=>'DESC'),null,null,1);
+        $result = $this->fetchAll(array('id'=>'DESC'),null,null,1);
         $row = $result->fetch();
-        return ($row) ? ($row->subjekt_id+1) : 1;
+        return ($row) ? ($row->id+1) : 1;
 
     }
 
@@ -44,15 +44,15 @@ class Subjekt extends BaseModel
         if ( !is_null($subjekt_id) ) {
             // vytvoreni nove verze
             $update = array('stav%sql'=>'stav+100');
-            $this->update($update, array('subjekt_id=%i',$subjekt_id));
+            $this->update($update, array('id=%i',$subjekt_id));
             $last_row = $this->getInfo($subjekt_id);
 
-            $data['subjekt_id'] = $last_row->subjekt_id;
-            $data['subjekt_version'] = $last_row->subjekt_version + 1;
+            $data['id'] = $last_row->id;
+            $data['version'] = $last_row->version + 1;
         } else {
             // vytvoreni noveho zaznamu
-            $data['subjekt_id'] = $this->getMax();
-            $data['subjekt_version'] = 1;
+            $data['id'] = $this->getMax();
+            $data['version'] = 1;
         }
 
         $this->insert_basic($data);
@@ -60,9 +60,9 @@ class Subjekt extends BaseModel
         //if ($transaction)
         //dibi::commit();
 
-        $new_row = $this->getInfo($data['subjekt_id']);
+        $new_row = $this->getInfo($data['id']);
         if ( $new_row ) {
-            return $data['subjekt_id'];
+            return $data['id'];
         } else {
             return false;
         }
@@ -72,9 +72,9 @@ class Subjekt extends BaseModel
 
         if ( is_array($data) ) {
             
-            $subjekt_id = $data['subjekt_id'];
-            $subjekt_version = $data['subjekt_version'];
-            unset($data['subjekt_id'],$data['subjekt_version']);
+            $subjekt_id = $data['id'];
+            $subjekt_version = $data['version'];
+            unset($data['id'],$data['version']);
             $data['date_modified'] = new DateTime();
 
             //$transaction = (! dibi::inTransaction());
@@ -82,11 +82,11 @@ class Subjekt extends BaseModel
             //dibi::begin();
 
             // aktualni verze
-            $this->update($data, array(array('stav<100'), array('subjekt_id=%i',$subjekt_id)) );
+            $this->update($data, array(array('stav<100'), array('id=%i',$subjekt_id)) );
 
             // ostatni verze
             $data['stav'] = $data['stav'] + 100;
-            $this->update($data, array(array('stav>=100'), array('subjekt_id=%i',$subjekt_id)) );
+            $this->update($data, array(array('stav>=100'), array('id=%i',$subjekt_id)) );
 
             //if ($transaction)
             //dibi::commit();
@@ -101,7 +101,7 @@ class Subjekt extends BaseModel
     public function hledat($data, $typ = 'all') {
 
         $result = array();
-        $cols = array('subjekt_id');
+        $cols = array('id');
         if ( $typ == 'email' ) {
 
             // hledani podle emailu
@@ -110,7 +110,7 @@ class Subjekt extends BaseModel
                     'distinct'=>1,
                     'cols'=>$cols,
                     'where'=> array( array('email LIKE %s','%'.$data->email.'%') ),
-                    'order'=> array('subjekt_version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
+                    'order'=> array('version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
                 );
                 $fetch = $this->fetchAllComplet($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
@@ -126,7 +126,7 @@ class Subjekt extends BaseModel
                         array("CONCAT(prijmeni,' ',jmeno) LIKE %s",'%'.$data->nazev_subjektu.'%'),
                         array("CONCAT(jmeno,' ',prijmeni) LIKE %s",'%'.$data->nazev_subjektu.'%')
                     ),
-                    'order'=> array('subjekt_version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
+                    'order'=> array('version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
                 );
                 $fetch = $this->fetchAllComplet($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
@@ -141,7 +141,7 @@ class Subjekt extends BaseModel
                     'distinct'=>1,
                     'cols'=>$cols,
                     'where'=> array( array('id_isds LIKE %s','%'.$data->id_isds.'%') ),
-                    'order'=> array('subjekt_version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
+                    'order'=> array('version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
                 );
                 $fetch = $this->fetchAllComplet($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
@@ -157,7 +157,7 @@ class Subjekt extends BaseModel
                         array("CONCAT(prijmeni,' ',jmeno) LIKE %s",'%'.$data->nazev_subjektu.'%'),
                         array("CONCAT(jmeno,' ',prijmeni) LIKE %s",'%'.$data->nazev_subjektu.'%')
                     ),
-                    'order'=> array('subjekt_version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
+                    'order'=> array('version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
                 );
                 $fetch = $this->fetchAllComplet($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
@@ -168,7 +168,7 @@ class Subjekt extends BaseModel
         $tmp = array();
         if ( count($result)>0 ) {
             foreach ($result as $subjekt) {
-                $tmp[ $subjekt->subjekt_id ] = $this->getInfo($subjekt->subjekt_id);
+                $tmp[ $subjekt->id ] = $this->getInfo($subjekt->id);
             }
             return $tmp;
         } else {
@@ -402,8 +402,8 @@ class Subjekt extends BaseModel
 
     public static function stav($subjekt = null) {
 
-        $stavy = array('1'=>'aktivný',
-                       '2'=>'neaktivný',
+        $stavy = array('1'=>'aktivní',
+                       '2'=>'neaktivní',
                        '3'=>'zrušený'
             );
 

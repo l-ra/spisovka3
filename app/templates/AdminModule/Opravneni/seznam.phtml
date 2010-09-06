@@ -19,7 +19,7 @@
         </tr>
         {foreach $seznam as $role}
         <tr>
-            <td><a href="{vlink :Admin:Opravneni:detail, 'id'=>$role->role_id}">{$role->name}</a></td>
+            <td><a href="{vlink :Admin:Opravneni:detail, 'id'=>$role->id}">{$role->name}</a></td>
             <td>{!$role->note|enl2br}</td>
             <td>{$role->code}</td>
             <td>{$role->parent_name}</td>

@@ -7,17 +7,17 @@
 @{block content}
 
     <div class="navigate">
-    <a href="{link :Epodatelna:Default:default}">Seznam zpráv</a> - Detail zprávy
+    <a href="{link :Epodatelna:Default:default}">Seznam příchozích zpráv</a> - Detail zprávy
     </div>
 
     <div id="dokument_blok_volby">
        {if $Zprava->stav >=10}
        {$Zprava->stav_info}
        {else}
-       <a href="{link :Epodatelna:Evidence:novy, 'id'=>$Zprava->epodatelna_id }">Zaevidovat do spisové služby</a>
-       <a href="{link :Epodatelna:Evidence:jiny, 'id'=>$Zprava->epodatelna_id}" id="dialog-evidence">Zaevidovat v jiné evidenci</a>
-       <a href="{link :Epodatelna:Evidence:odmitnout, 'id'=>$Zprava->epodatelna_id }" id="dialog-odmitnout">Odmítnout</a>
-       <!--<a href="{link :Epodatelna:Evidence:odpoved, 'id'=>$Zprava->epodatelna_id }">Odpovědět</a>-->
+       <a href="{link :Epodatelna:Evidence:novy, 'id'=>$Zprava->id}">Zaevidovat do spisové služby</a>
+       <a href="{link :Epodatelna:Evidence:jiny, 'id'=>$Zprava->id}" id="dialog-evidence">Zaevidovat v jiné evidenci</a>
+       <a href="{link :Epodatelna:Evidence:odmitnout, 'id'=>$Zprava->id }" id="dialog-odmitnout">Odmítnout</a>
+       <!--<a href="{link :Epodatelna:Evidence:odpoved, 'id'=>$Zprava->id }">Odpovědět</a>-->
        {/if}
     </div>
 
@@ -79,11 +79,11 @@
         {/if}
         <dl class="detail_item">
             <dt>Doručeno:</dt>
-            <dd>{$Zprava->doruceno_dne|date:'%d.%m.%Y %H:%M:%S'}&nbsp;</dd>
+            <dd>{$Zprava->doruceno_dne|edatetime}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Přijato epodatelnou:</dt>
-            <dd>{$Zprava->prijato_dne|date:'%d.%m.%Y %H:%M:%S'}&nbsp;</dd>
+            <dd>{$Zprava->prijato_dne|edatetime}&nbsp;</dd>
         </dl>
     </div>
 
@@ -105,7 +105,7 @@
                 <img src="{$baseUri}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->epodatelna_id, 'file'=>$priloha['id']}">{$priloha['name']}</a>
+                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>$priloha['id']}">{$priloha['name']}</a>
                 <div class="info">
                 <span>{$priloha['size']|bytes}, {$priloha['mimetype']}</span>
                 </div>

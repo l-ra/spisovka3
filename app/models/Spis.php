@@ -4,13 +4,13 @@ class Spis extends BaseModel
 {
 
     protected $name = 'spis';
-    protected $primary = 'spis_id';
+    protected $primary = 'id';
     
     
     public function getInfo($spis_id)
     {
 
-        $result = $this->fetchRow(array('spis_id=%i',$spis_id));
+        $result = $this->fetchRow(array('id=%i',$spis_id));
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 
@@ -77,7 +77,7 @@ class Spis extends BaseModel
             $tmp = array();
             if ( count($ret)>0 ) {
                 foreach ($ret as $r) {
-                    $tmp[] = $r->spis_id;
+                    $tmp[] = $r->id;
                 }
                 return $tmp;
             } else {
@@ -96,7 +96,7 @@ class Spis extends BaseModel
             if ( $full == 1 ) {
                 $where_numbers = implode(",",$casti);
                 if ( !empty($where_numbers) ) {
-                    $args = array('where'=>array('spis_id IN ('.$where_numbers.')'));
+                    $args = array('where'=>array('id IN ('.$where_numbers.')'));
                     return $this->seznam($args);
                 } else {
                     return null;
@@ -128,9 +128,9 @@ class Spis extends BaseModel
 
             if ( $simple == 1 ) {
                 $nazev = str_repeat(".", 2*$d->uroven) .' '. $d->nazev;
-                $string = '$tmp'.$sekvence_array.'['.$d->spis_id.']["spis"] = array("id"=>$d->spis_id,"nazev"=>"'.$nazev.'");';
+                $string = '$tmp'.$sekvence_array.'['.$d->id.']["spis"] = array("id"=>$d->id,"nazev"=>"'.$nazev.'");';
             } else {
-                $string = '$tmp'.$sekvence_array.'['.$d->spis_id.']["spis"] = $d;';
+                $string = '$tmp'.$sekvence_array.'['.$d->id.']["spis"] = $d;';
             }
             eval($string);
         }
@@ -147,7 +147,7 @@ class Spis extends BaseModel
                 if ( is_array($data['spis']) ) {
                     $tmp[ $data['spis']['id'] ] = $data['spis']['nazev'];
                 } else {
-                    $tmp[ $data['spis']->spis_id ] = $data['spis'];
+                    $tmp[ $data['spis']->id ] = $data['spis'];
                 }
             } else if ( is_numeric($index) ) {
                 $tmp = $this->sestav($data[$index], $tmp);
@@ -205,7 +205,7 @@ class Spis extends BaseModel
                     $data_pod['sekvence'] = $data['sekvence'] .'-'. $spisyPod->spis_parent;
                     $data_pod['uroven'] = $data['uroven'] + 1;
                     //Debug::dump($data_pod);
-                    $this->update($data_pod,array('spis_id=%i',$spisyPod->spis_id));
+                    $this->update($data_pod,array('id=%i',$spisyPod->id));
                     unset($data_pod);
                 }
             }
@@ -214,7 +214,7 @@ class Spis extends BaseModel
         }
 
         unset($data['spis_parent_old']);
-        $ret = $this->update($data,array('spis_id=%i',$spis_id));
+        $ret = $this->update($data,array('id=%i',$spis_id));
 
         //if ($transaction)
         //dibi::commit();

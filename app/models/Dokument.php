@@ -4,7 +4,7 @@ class Dokument extends BaseModel
 {
 
     protected $name = 'dokument';
-    protected $primary = 'dokument_id';
+    protected $primary = 'id';
 
     protected $tb_dokumenttyp = 'dokument_typ';
     protected $tb_workflow = 'workflow';
@@ -68,7 +68,7 @@ class Dokument extends BaseModel
         
             'distinct'=>1,
             'from' => array($this->tb_workflow => 'wf'),
-            'cols' => array('wf.dokument_id'),
+            'cols' => array('wf.dokument_id','wf.dokument_id'=>'id'),
             'where' => $where,
             'where_or' => $where_or,
             'order' => $order,
@@ -77,7 +77,7 @@ class Dokument extends BaseModel
             'leftJoin' => array(
                 'dokument' => array(
                     'from' => array($this->name => 'd'),
-                    'on' => array('d.dokument_id=wf.dokument_id'),
+                    'on' => array('d.id=wf.dokument_id'),
                     'cols' => null
                 ),
                 'dokspisy' => array(
@@ -87,12 +87,12 @@ class Dokument extends BaseModel
                 ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
-                    'on' => array('spis.spis_id=sp.spis_id'),
+                    'on' => array('spis.id=sp.spis_id'),
                     'cols' => null
                 ),
                 'typ_dokumentu' => array(
                     'from' => array($this->tb_dokumenttyp => 'dtyp'),
-                    'on' => array('dtyp.dokument_typ_id=d.typ_dokumentu'),
+                    'on' => array('dtyp.id=d.typ_dokumentu_id'),
                     'cols' => null
                 )                
                 
@@ -124,14 +124,14 @@ class Dokument extends BaseModel
                 
                 foreach ($result as $index => $row) {
 
-                    $dok = $this->getInfo($row->dokument_id,null,1);
+                    $dok = $this->getInfo($row->id,null,1);
                     
-                    $dok->typ_dokumentu = Dokument::typDokumentu($dok->typ_dokumentu);
-                    $dok->subjekty = $DokumentySubjekt->subjekty($dok->dokument_id);
-                    $dok->prilohy = $DokumentyPrilohy->prilohy($dok->dokument_id);
-                    $dok->spisy = $DokumentySpis->spisy($dok->dokument_id);
+                    $dok->typ_dokumentu = Dokument::typDokumentu($dok->typ_dokumentu_id);
+                    $dok->subjekty = $DokumentySubjekt->subjekty($dok->id);
+                    $dok->prilohy = $DokumentyPrilohy->prilohy($dok->id);
+                    $dok->spisy = $DokumentySpis->spisy($dok->id);
 
-                    $dok->workflow = $Workflow->dokument($dok->dokument_id);
+                    $dok->workflow = $Workflow->dokument($dok->id);
                     $dok->prideleno = null;
                     $dok->predano = null;
                     $prideleno = $predano = $stav = 0;
@@ -164,7 +164,7 @@ class Dokument extends BaseModel
                         $dok->lhuta_do = 'neurčeno';
                     }
 
-                    $tmp[ $dok->dokument_id ] = $dok;
+                    $tmp[ $dok->id ] = $dok;
 
 
                 
@@ -277,9 +277,9 @@ class Dokument extends BaseModel
                 $args['where'][] = array('spis.nazev LIKE %s','%'.$params['spisova_znacka'].'%');
             }
         }
-        if ( isset($params['typ_dokumentu']) ) {
-            if ( $params['typ_dokumentu'] != '0' ) {
-                $args['where'][] = array('d.typ_dokumentu = %i',$params['typ_dokumentu']);
+        if ( isset($params['typ_dokumentu_id']) ) {
+            if ( $params['typ_dokumentu_id'] != '0' ) {
+                $args['where'][] = array('d.typ_dokumentu_id = %i',$params['typ_dokumentu_id']);
             }
         }
         if ( isset($params['cislo_jednaci_odesilatele']) ) {
@@ -325,9 +325,9 @@ class Dokument extends BaseModel
                 $args['where'][] = array('d.poznamka LIKE %s','%'.$params['poznamka'].'%');
             }
         }
-        if ( isset($params['zpusob_vyrizeni']) ) {
-            if ( !empty($params['zpusob_vyrizeni']) || $params['zpusob_vyrizeni'] != '0' ) {
-                $args['where'][] = array('d.zpusob_vyrizeni = %i',$params['zpusob_vyrizeni']);
+        if ( isset($params['zpusob_vyrizeni_id']) ) {
+            if ( !empty($params['zpusob_vyrizeni_id']) || $params['zpusob_vyrizeni_id'] != '0' ) {
+                $args['where'][] = array('d.zpusob_vyrizeni_id = %i',$params['zpusob_vyrizeni_id']);
             }
         }
         if ( isset($params['datum_vyrizeni']) ) {
@@ -356,8 +356,8 @@ class Dokument extends BaseModel
                 //$args['where'][] = array('d.datum_odeslani = %d',$params['datum_odeslani'].$cas);
             }
         }
-        if ( isset($params['spisovy_znak']) ) {
-            if ( !empty($params['spisovy_znak']) ) {
+        if ( isset($params['spisovy_znak_id']) ) {
+            if ( !empty($params['spisovy_znak_id']) ) {
                 //$args['where'][] = array();
             }
         }
@@ -378,7 +378,7 @@ class Dokument extends BaseModel
         }
         if ( isset($params['spousteci_udalost']) ) {
             if ( !empty($params['spousteci_udalost']) ) {
-                $args['where'][] = array('d.spousteci_udalost = %i',$params['spousteci_udalost']);
+                $args['where'][] = array('d.spousteci_udalost = %s',$params['spousteci_udalost']);
             }
         }
         if ( isset($params['vyrizeni_pocet_listu']) ) {
@@ -396,12 +396,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.type = %s',$params['subjekt_type']);
@@ -412,12 +412,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array(
@@ -432,12 +432,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.ic LIKE %s','%'.$params['ic'].'%');
@@ -448,12 +448,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.adresa_ulice LIKE %s','%'.$params['adresa_ulice'].'%');
@@ -464,12 +464,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.adresa_cp LIKE %s','%'.$params['adresa_cp'].'%');
@@ -480,12 +480,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.adresa_co LIKE %s','%'.$params['adresa_co'].'%');
@@ -496,12 +496,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.adresa_mesto LIKE %s','%'.$params['adresa_mesto'].'%');
@@ -512,12 +512,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.adresa_psc LIKE %s','%'.$params['adresa_psc'].'%');
@@ -528,12 +528,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.adresa_stat = %s',$params['adresa_stat']);
@@ -544,12 +544,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.email LIKE %s','%'.$params['subjekt_email'].'%');
@@ -560,12 +560,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.telefon LIKE %s','%'.$params['subjekt_telefon'].'%');
@@ -576,12 +576,12 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['dok_subjekt'] = array(
                     'from'=> array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.dokument_id'),
+                    'on' => array('ds.dokument_id=d.id'),
                     'cols' => null
                 );
                 $args['leftJoin']['subjekt'] = array(
                     'from'=> array($this->tb_subjekt => 's'),
-                    'on' => array('s.subjekt_id=ds.subjekt_id'),
+                    'on' => array('s.id=ds.subjekt_id'),
                     'cols' => null
                 );
                 $args['where'][] = array('s.id_isds LIKE %s','%'.$params['subjekt_isds'].'%');
@@ -621,22 +621,22 @@ class Dokument extends BaseModel
         switch ($nazev) {
             case 'moje':
                 $args = array(
-                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'), array('wf.aktivni=1') )
+                    'where' => array( array('wf.prideleno=%i',$user->id),array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'), array('wf.aktivni=1') )
                 );
                 break;
             case 'predane':
                 $args = array(
-                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby=0'), array('wf.aktivni=1') )
+                    'where' => array( array('wf.prideleno=%i',$user->id),array('wf.stav_osoby=0'), array('wf.aktivni=1') )
                 );
                 break;
             case 'pracoval':
                 $args = array(
-                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby < 100') )
+                    'where' => array( array('wf.prideleno=%i',$user->id),array('wf.stav_osoby < 100') )
                 );
                 break;
             case 'moje_nove':
                 $args = array(
-                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby = 1'), array('wf.stav_dokumentu = 1'), array('wf.aktivni=1') )
+                    'where' => array( array('wf.prideleno=%i',$user->id),array('wf.stav_osoby = 1'), array('wf.stav_dokumentu = 1'), array('wf.aktivni=1') )
                 );
                 break;
             case 'vsichni_nove':
@@ -646,7 +646,7 @@ class Dokument extends BaseModel
                 break;
             case 'moje_vyrizuje':
                 $args = array(
-                    'where' => array( array('wf.prideleno=%i',$user->user_id),array('wf.stav_osoby = 1'), array('wf.stav_dokumentu = 3'), array('wf.aktivni=1') )
+                    'where' => array( array('wf.prideleno=%i',$user->id),array('wf.stav_osoby = 1'), array('wf.stav_dokumentu = 3'), array('wf.aktivni=1') )
                 );
                 break;
             case 'vsichni_vyrizuji':
@@ -676,39 +676,39 @@ class Dokument extends BaseModel
         
             'distinct'=>null,
             'from' => array($this->name => 'dok'),
-            'cols' => array('*'),
+            'cols' => array('*','id'=>'dokument_id','version'=>'dokument_version'),
             'leftJoin' => array(
                 'dokspisy' => array(
                     'from' => array($this->tb_dokspis => 'sp'),
-                    'on' => array('sp.dokument_id=dok.dokument_id'),
+                    'on' => array('sp.dokument_id=dok.id'),
                     'cols' => array('poradi'=>'poradi_spisu','stav'=>'stav_spisu')
                 ),
                 'typ_dokumentu' => array(
                     'from' => array($this->tb_dokumenttyp => 'dtyp'),
-                    'on' => array('dtyp.dokument_typ_id=dok.typ_dokumentu'),
+                    'on' => array('dtyp.id=dok.typ_dokumentu_id'),
                     'cols' => array('nazev'=>'typ_nazev','popis'=>'typ_popis','smer'=>'typ_smer','typ'=>'typ_typ')
                 ),
                 'workflow' => array(
                     'from' => array($this->tb_workflow => 'wf'),
-                    'on' => array('wf.dokument_id=dok.dokument_id'),
-                    'cols' => array('workflow_id','stav_dokumentu','prideleno','prideleno_info','orgjednotka_id','orgjednotka_info',
+                    'on' => array('wf.dokument_id=dok.id'),
+                    'cols' => array('id'=>'workflow_id','stav_dokumentu','prideleno','prideleno_info','orgjednotka_id','orgjednotka_info',
                                     'stav_osoby','date'=>'date_prideleni','date_predani','poznamka'=>'poznamka_predani','aktivni'=>'wf_aktivni')
                 ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
-                    'on' => array('spis.spis_id=sp.spis_id'),
-                    'cols' => array('spis_id','nazev'=>'nazev_spisu','popis'=>'popis_spisu')
+                    'on' => array('spis.id=sp.spis_id'),
+                    'cols' => array('id'=>'spis_id','nazev'=>'nazev_spisu','popis'=>'popis_spisu')
                 )
                 
             ),
-            'order_by' => array('dok.dokument_id'=>'DESC','dok.dokument_version'=>'DESC')
+            'order_by' => array('dok.id'=>'DESC','dok.version'=>'DESC')
         
         );
         
         if ( !is_null($dokument_version) ) {
-            $sql['where'] = array( array('dok.dokument_id=%i',$dokument_id),array('dok.dokument_version=%i',$dokument_version) );
+            $sql['where'] = array( array('dok.id=%i',$dokument_id),array('dok.version=%i',$dokument_version) );
         } else {
-            $sql['where'] = array( array('dok.dokument_id=%i',$dokument_id) );
+            $sql['where'] = array( array('dok.id=%i',$dokument_id) );
         }
         
         $select = $this->fetchAllComplet($sql);
@@ -718,19 +718,19 @@ class Dokument extends BaseModel
             $tmp = array();
             $dokument_id = $dokument_version = 0;
             foreach ($result as $index => $row) {
-                $id = $row->dokument_id;
-                $v = $row->dokument_version;
+                $id = $row->id;
+                $v = $row->version;
 
                 $spis = new stdClass();
-                $spis->spis_id = $row->spis_id; unset($row->spis_id);
+                $spis->id = $row->spis_id; unset($row->spis_id);
                 $spis->nazev = $row->nazev_spisu; unset($row->nazev_spisu);
                 $spis->popis = $row->popis_spisu; unset($row->popis_spisu);
                 $spis->stav = $row->stav_spisu; unset($row->stav_spisu);
                 $spis->poradi = $row->poradi_spisu; unset($row->poradi_spisu);
-                $tmp[$id][$v]['spisy'][ $spis->spis_id ] = $spis;
+                $tmp[$id][$v]['spisy'][ $spis->id ] = $spis;
 
                 $typ = new stdClass();
-                $typ->id = $row->typ_dokumentu; unset($row->typ_dokumentu);
+                $typ->id = $row->typ_dokumentu_id; unset($row->typ_dokumentu_id);
                 $typ->nazev = $row->typ_nazev; unset($row->typ_nazev);
                 $typ->popis = $row->typ_popis; unset($row->typ_popis);
                 $typ->smer = $row->typ_smer; unset($row->typ_smer);
@@ -739,7 +739,7 @@ class Dokument extends BaseModel
 
                 $tmp[$id][$v]['typ_dokumentu'] = $typ;
                 $workflow = new stdClass();
-                $workflow->workflow_id = $row->workflow_id; unset($row->workflow_id);
+                $workflow->id = $row->workflow_id; unset($row->workflow_id);
                 $workflow->stav_dokumentu = $row->stav_dokumentu; unset($row->stav_dokumentu);
                 $workflow->prideleno = $row->prideleno; unset($row->prideleno);
                 $workflow->prideleno_info = unserialize($row->prideleno_info); unset($row->prideleno_info);
@@ -751,14 +751,14 @@ class Dokument extends BaseModel
                 $workflow->date = $row->date_prideleni; unset($row->date_prideleni);
                 $workflow->poznamka = $row->poznamka_predani; unset($row->poznamka_predani);
                 $workflow->aktivni = $row->wf_aktivni; unset($row->wf_aktivni);
-                $tmp[$id][$v]['workflow'][ $workflow->workflow_id ] = $workflow;
+                $tmp[$id][$v]['workflow'][ $workflow->id ] = $workflow;
 
                 $tmp[$id][$v]['raw'] = $row;
                 
                 
 
-                if ( $row->dokument_id >= $dokument_id ) $dokument_id = $row->dokument_id;
-                if ( $row->dokument_version >= $dokument_version ) $dokument_version = $row->dokument_version;
+                if ( $row->id >= $dokument_id ) $dokument_id = $row->id;
+                if ( $row->version >= $dokument_version ) $dokument_version = $row->version;
 
             }
 
@@ -808,18 +808,16 @@ class Dokument extends BaseModel
             }
 
             // spisovy znak
-            if ( !empty($dokument->spisovy_znak) ) {
+            if ( !empty($dokument->spisovy_znak_id) ) {
                 $SpisZnak = new SpisovyZnak();
-                $sznak = $SpisZnak->getInfo($dokument->spisovy_znak);
+                $sznak = $SpisZnak->getInfo($dokument->spisovy_znak_id);
                 if ( $sznak ) {
-                    $dokument->spisovy_znak_id = $dokument->spisovy_znak;
                     $dokument->spisovy_znak = $sznak->nazev;
                     $dokument->spisovy_znak_popis = $sznak->popis;
                     $dokument->spisovy_znak_skart_znak = $sznak->skartacni_znak;
                     $dokument->spisovy_znak_skart_lhuta = $sznak->skartacni_lhuta;
                     $dokument->spisovy_znak_skart_udalost = $sznak->spousteci_udalost;
                 } else {
-                    $dokument->spisovy_znak_id = $dokument->spisovy_znak;
                     $dokument->spisovy_znak = '';
                     $dokument->spisovy_znak_popis = '';
                     $dokument->spisovy_znak_skart_znak = '';
@@ -827,7 +825,6 @@ class Dokument extends BaseModel
                     $dokument->spisovy_znak_skart_udalost = '';
                 }
             } else {
-                $dokument->spisovy_znak_id = $dokument->spisovy_znak;
                 $dokument->spisovy_znak = '';
                 $dokument->spisovy_znak_popis = '';
                 $dokument->spisovy_znak_skart_znak = '';
@@ -836,12 +833,10 @@ class Dokument extends BaseModel
             }
 
             //vyrizeni
-            if ( !empty($dokument->zpusob_vyrizeni) ) {
-                $zpvyrizeni = Dokument::zpusobVyrizeni($dokument->zpusob_vyrizeni);
-                $dokument->zpusob_vyrizeni_id = $dokument->zpusob_vyrizeni;
+            if ( !empty($dokument->zpusob_vyrizeni_id) ) {
+                $zpvyrizeni = Dokument::zpusobVyrizeni($dokument->zpusob_vyrizeni_id);
                 $dokument->zpusob_vyrizeni = $zpvyrizeni->nazev;
             } else {
-                $dokument->zpusob_vyrizeni_id = $dokument->zpusob_vyrizeni;
                 $dokument->zpusob_vyrizeni = '';
             }
 
@@ -858,11 +853,11 @@ class Dokument extends BaseModel
     public function getBasicInfo($dokument_id,$dokument_version = null) {
 
         if ( !is_null($dokument_version) ) {
-            $where = array( array('dokument_id=%i',$dokument_id),array('dokument_version=%i',$dokument_version) );
+            $where = array( array('id=%i',$dokument_id),array('version=%i',$dokument_version) );
         } else {
-            $where = array( array('dokument_id=%i',$dokument_id) );
+            $where = array( array('id=%i',$dokument_id) );
         }
-        $order_by = array('dokument_id'=>'DESC','dokument_version'=>'DESC');
+        $order_by = array('id'=>'DESC','version'=>'DESC');
         $limit = 1;
 
         $select = $this->fetchAll($order_by, $where, null, $limit);
@@ -874,9 +869,9 @@ class Dokument extends BaseModel
 
     public function getMax() {
 
-        $result = $this->fetchAll(array('dokument_id'=>'DESC'),null,null,1);
+        $result = $this->fetchAll(array('id'=>'DESC'),null,null,1);
         $row = $result->fetch();
-        return ($row) ? ($row->dokument_id+1) : 1;
+        return ($row) ? ($row->id+1) : 1;
 
     }
 
@@ -896,17 +891,17 @@ class Dokument extends BaseModel
         } else if ( is_null($dokument_id) ) {
             // novy dokument
 
-            $data['dokument_id'] = $this->getMax();
-            $data['dokument_version'] = 1;
+            $data['id'] = $this->getMax();
+            $data['version'] = 1;
             $data['date_created'] = new DateTime();
-            $data['user_created'] = Environment::getUser()->getIdentity()->user_id;
+            $data['user_created'] = Environment::getUser()->getIdentity()->id;
             $data['stav'] = isset($data['stav'])?$data['stav']:1;
             $data['md5_hash'] = $this->generujHash($data);
             $this->insert_basic($data);
-            $new_row = $this->getInfo($data['dokument_id']);
+            $new_row = $this->getInfo($data['id']);
 
             if ( $new_row ) {
-                return $new_row;// array( 'dokument_id'=> $new_row->dokument_id, 'dokument_version'=>$new_row->dokument_version );
+                return $new_row;
             } else {
                 return false;
             }
@@ -937,17 +932,17 @@ class Dokument extends BaseModel
                     // update na stavajici verzi
 
                     $update_data['date_modified'] = new DateTime();
-                    $update_data['user_modified'] = Environment::getUser()->getIdentity()->user_id;
+                    $update_data['user_modified'] = Environment::getUser()->getIdentity()->id;
                     $update_data['md5_hash'] = $md5_hash;
-                    unset($update_data['dokument_id'],$update_data['dokument_version']);
+                    unset($update_data['id'],$update_data['version']);
                     $updateres = $this->update($update_data, array(
-                                                    array('dokument_id=%i',$dokument_id),
-                                                    array('dokument_version=%i',$dokument_version)
+                                                    array('id=%i',$dokument_id),
+                                                    array('version=%i',$dokument_version)
                                                     )
                                                );
                     if ( $updateres ) {
                         $new_row = $this->getInfo($dokument_id,$dokument_version);
-                        return $new_row;// array( 'dokument_id'=> $dokument_id, 'dokument_version'=>$dokument_version );
+                        return $new_row;
                     } else {
                         return false;
                     }
@@ -957,16 +952,16 @@ class Dokument extends BaseModel
 
                         // shodny hash - zadna zmena - pouze update
                         $update_data['date_modified'] = new DateTime();
-                        $update_data['user_modified'] = Environment::getUser()->getIdentity()->user_id;
-                        unset($update_data['dokument_id'],$update_data['dokument_version']);
+                        $update_data['user_modified'] = Environment::getUser()->getIdentity()->id;
+                        unset($update_data['id'],$update_data['version']);
                         $updateres = $this->update($update_data, array(
-                                                    array('dokument_id=%i',$old_dokument->dokument_id),
-                                                    array('dokument_version=%i',$old_dokument->dokument_version)
+                                                    array('id=%i',$old_dokument->id),
+                                                    array('version=%i',$old_dokument->version)
                                                     )
                                                );
                         if ( $updateres ) {
-                            $new_row = $this->getInfo($old_dokument->dokument_id,$old_dokument->dokument_version);
-                            return $new_row;// array( 'dokument_id'=> $old_dokument->dokument_id, 'dokument_version'=>$old_dokument->dokument_version );
+                            $new_row = $this->getInfo($old_dokument->id,$old_dokument->version);
+                            return $new_row;
                         } else {
                             return false;
                         }
@@ -974,18 +969,18 @@ class Dokument extends BaseModel
 
                         // zjistena zmena - nova verze
                         $update = array('stav%sql'=>'stav+100');
-                        $this->update($update, array('dokument_id=%i',$dokument_id));
+                        $this->update($update, array('id=%i',$dokument_id));
 
-                        $update_data['dokument_version'] = $old_dokument->dokument_version + 1;
+                        $update_data['version'] = $old_dokument->version + 1;
                         $update_data['date_created'] = new DateTime();
-                        $update_data['user_created'] = Environment::getUser()->getIdentity()->user_id;
+                        $update_data['user_created'] = Environment::getUser()->getIdentity()->id;
                         $update_data['md5_hash'] = $md5_hash;
 
                         $this->insert_basic($update_data);
-                        $new_row = $this->getBasicInfo($update_data['dokument_id'],$update_data['dokument_version']);
+                        $new_row = $this->getBasicInfo($update_data['id'],$update_data['version']);
 
                         if ( $new_row ) {
-                            return $new_row; //array( 'dokument_id'=> $new_row->dokument_id, 'dokument_version'=>$new_row->dokument_version );
+                            return $new_row;
                         } else {
                             return false;
                         }
@@ -1003,9 +998,9 @@ class Dokument extends BaseModel
 
         if ( is_array($data) ) {
             
-            $dokument_id = $data['dokument_id'];
-            $dokument_version = $data['dokument_version'];
-            unset($data['dokument_id'],$data['dokument_version']);
+            $dokument_id = $data['id'];
+            $dokument_version = $data['version'];
+            unset($data['id'],$data['version']);
             $data['date_modified'] = new DateTime();
 
             //$transaction = (! dibi::inTransaction());
@@ -1013,11 +1008,11 @@ class Dokument extends BaseModel
             //dibi::begin('stavdok');
 
             // aktualni verze
-            $this->update($data, array(array('stav<100'), array('dokument_id=%i',$dokument_id)) );
+            $this->update($data, array(array('stav<100'), array('id=%i',$dokument_id)) );
 
             // ostatni verze
             $data['stav'] = $data['stav'] + 100;
-            $this->update($data, array(array('stav>=100'), array('dokument_id=%i',$dokument_id)) );
+            $this->update($data, array(array('stav>=100'), array('id=%i',$dokument_id)) );
 
             //if ($transaction)
             //dibi::commit('stavdok');
@@ -1033,7 +1028,7 @@ class Dokument extends BaseModel
 
         $data = Dokument::obj2array($data);
 
-        unset( $data['dokument_id'],$data['dokument_version'],$data['md5_hash'],
+        unset( $data['id'],$data['version'],$data['md5_hash'],
                $data['date_created'],$data['user_created'],$data['date_modified'],$data['user_modified']
              );
 
@@ -1051,13 +1046,13 @@ class Dokument extends BaseModel
         $prefix = Environment::getConfig('database')->prefix;
         $tb_dokument_typ = $prefix .'dokument_typ';
 
-        $result = dibi::query('SELECT * FROM %n', $tb_dokument_typ )->fetchAssoc('dokument_typ_id');
+        $result = dibi::query('SELECT * FROM %n', $tb_dokument_typ )->fetchAssoc('id');
 
         if ( is_null($kod) ) {
             if ( $select == 1 ) {
                 $tmp = array();
                 foreach ($result as $dt) {
-                    $tmp[ $dt->dokument_typ_id ] = $dt->nazev;
+                    $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
             } else {
@@ -1072,15 +1067,15 @@ class Dokument extends BaseModel
     public static function zpusobVyrizeni( $kod = null, $select = 0 ) {
 
         $prefix = Environment::getConfig('database')->prefix;
-        $tb_zpusob_vyrizeni = $prefix .'zpvyrizeni';
+        $tb_zpusob_vyrizeni = $prefix .'zpusob_vyrizeni';
 
-        $result = dibi::query('SELECT * FROM %n', $tb_zpusob_vyrizeni )->fetchAssoc('zpvyrizeni_id');
+        $result = dibi::query('SELECT * FROM %n', $tb_zpusob_vyrizeni )->fetchAssoc('id');
 
         if ( is_null($kod) ) {
             if ( $select == 1 ) {
                 $tmp = array();
                 foreach ($result as $dt) {
-                    $tmp[ $dt->zpvyrizeni_id ] = $dt->nazev;
+                    $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
             } else {

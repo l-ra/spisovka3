@@ -47,7 +47,7 @@ class SouvisejiciDokument extends BaseModel
         $row['spojit_s'] = $spojit_s;
         $row['type'] = 1;
         $row['date_added'] = new DateTime();
-        $row['user_added'] = Environment::getUser()->getIdentity()->user_id;
+        $row['user_added'] = Environment::getUser()->getIdentity()->id;
 
         return $this->insert_basic($row);
 

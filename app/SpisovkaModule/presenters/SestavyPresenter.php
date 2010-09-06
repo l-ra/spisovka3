@@ -272,7 +272,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('datum_vyrizeni_cas', 'Čas vyřízení:', 10, 15);
         $form->addDatePicker('datum_odeslani', 'Datum odeslání:', 10);
         $form->addText('datum_odeslani_cas', 'Čas odeslání:', 10, 15);
-        $form->addSelect('spisovy_znak', 'spisový znak:', $spisznak_seznam);
+        $form->addSelect('spisovy_znak_id', 'spisový znak:', $spisznak_seznam);
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6);
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 6);
 
@@ -416,8 +416,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $pridelen = array('0'=>'kdokoli','2'=>'přidělen','1'=>'předán');
 
         $form = new AppForm();
-        $form->addHidden('sestava_id')
-                ->setValue(@$sestava->sestava_id);
+        $form->addHidden('id')
+                ->setValue(@$sestava->id);
         $form->addText('sestava_nazev', 'Název sestavy:', 80, 100)
                 ->setValue(@$sestava->nazev);
         $form->addTextArea('sestava_popis', 'Popis sestavy:', 80, 3)
@@ -466,8 +466,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 ->setValue(@$params['datum_odeslani']);
         $form->addText('datum_odeslani_cas', 'Čas odeslání:', 10, 15)
                 ->setValue(@$params['datum_odeslani_cas']);
-        $form->addSelect('spisovy_znak', 'spisový znak:', $spisznak_seznam)
-                ->setValue(@$params['spisovy_znak']);
+        $form->addSelect('spisovy_znak_id', 'spisový znak:', $spisznak_seznam)
+                ->setValue(@$params['spisovy_znak_id']);
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
                 ->setValue(@$params['ulozeni_dokumentu']);
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 6)
@@ -536,7 +536,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         // Pro sestavu
-        $sestava_id = $data['sestava_id'];
+        $sestava_id = $data['id'];
 
         $sestava = array();
         $sestava['nazev'] = $data['sestava_nazev'];
@@ -544,7 +544,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $sestava['typ'] = $data['sestava_typ'];
         $sestava['filtr'] = ($data['sestava_filtr'])?1:0;
 
-        unset($data['sestava_id'],$data['sestava_nazev'],$data['sestava_popis'],
+        unset($data['id'],$data['sestava_nazev'],$data['sestava_popis'],
               $data['sestava_typ'],$data['sestava_filtr']);
 
         //Debug::dump($data);

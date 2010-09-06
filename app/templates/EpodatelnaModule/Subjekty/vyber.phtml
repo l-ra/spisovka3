@@ -18,7 +18,7 @@
             </td>
             <td class="meta">
                 <strong>
-                    <a href="{link :Epodatelna:Subjekty:vybrano, 'id'=>$subjekt->subjekt_id, 'epod_id'=>$epodatelna_id, 'typ'=>'OA' }" onclick="epodSubjektVybran(this); return false;">{=Subjekt::displayName($subjekt,'jmeno_item')}</a>
+                    <a href="{link :Epodatelna:Subjekty:vybrano, 'id'=>$subjekt->id, 'epod_id'=>$epodatelna_id, 'typ'=>'OA' }" onclick="epodSubjektVybran(this); return false;">{=Subjekt::displayName($subjekt,'jmeno_item')}</a>
                 </strong>&nbsp;
                 <div class="info">
                 <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
@@ -48,6 +48,6 @@
         {/foreach}
     </table>
     {else}
-    <div class="prazdno">Nebyli zjištěni žádné subjekty.</div>
+    <div class="prazdno">Nebyly zjištěny žádné subjekty.</div>
     {/if}
     {/snippet}

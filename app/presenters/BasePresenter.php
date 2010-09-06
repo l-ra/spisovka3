@@ -215,8 +215,6 @@ abstract class BasePresenter extends Presenter
                 '<?php echo MyMacros::vlink("%%",%:macroLink%); ?>';
         $filter->handler->macros['alink'] =
                 '<?php echo %:macroEscape%(MyMacros::alink("%%")); ?>';
-
-
         
     }
 

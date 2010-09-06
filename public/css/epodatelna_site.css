@@ -62,6 +62,15 @@ body {
     min-height: 500px;
 }
 
+#dialog table th,
+#content table th {
+    background-color: #684A03;
+    padding: 5px 5px;
+    text-align: left;
+    color: #ffffff;
+    border: 1px #684A03 solid;
+}
+
 #dokument_blok_hlavni {
     border: 1px #CEA33D solid;
     background: #D8C38F url() repeat-x;

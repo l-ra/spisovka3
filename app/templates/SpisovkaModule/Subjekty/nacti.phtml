@@ -26,8 +26,8 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$dokument_id }" onclick="return odebratSubjekt(this, {!$dokument_id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$dokument_id }" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id }" onclick="return odebratSubjekt(this, {!$dokument_id});">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id }" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
             <td class="meta_plus">
@@ -52,6 +52,6 @@
         {/foreach}
     </table>
     {else}
-    <div class="prazdno">Nebyly zjištěni žádné subjekty.</div>
+    <div class="prazdno">Nebyly zjištěny žádné subjekty.</div>
     {/if}
     

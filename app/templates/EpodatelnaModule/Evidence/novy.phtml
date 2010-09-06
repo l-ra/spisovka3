@@ -15,17 +15,17 @@
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
             <dd>
                 <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;
-                {if $Typ_evidence == 'sberny_arch'} / {$novyForm['poradi']->control} &nbsp; <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->dokument_id}" id="dialog-cjednaci">Připojit k dokumentu</a> {/if}
+                {if $Typ_evidence == 'sberny_arch'} / {$novyForm['poradi']->control} &nbsp; <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">Připojit k dokumentu</a> {/if}
             </dd>
         </dl>
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
-            <dd>{$novyForm['typ_dokumentu']->control}</dd>
+            <dd>{$novyForm['typ_dokumentu_id']->control}</dd>
         </dl>
 
         <dl class="detail_item">
             <dt>Spisová značka:</dt>
-            <dd><span id="dok_spis"></span>&nbsp;<a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->dokument_id}" id="dialog-spis">Připojit spisovou značku</a></dd>
+            <dd><span id="dok_spis"></span>&nbsp;<a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}" id="dialog-spis">Připojit spisovou značku</a></dd>
         </dl>
         <dl class="detail_item">
             <dt>Věc:</dt>
@@ -43,10 +43,10 @@
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$novyForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <!--<dl class="detail_item">
             <dt>Zmocnění:</dt>
             <dd><span id="dok_zmocneni"></span>&nbsp;<a href="{link :Spisovka:Dokumenty:zmocneni, 'id'=>$Dok->dokument_id}" id="dialog-zmocneni">Připojit zmocnění</a></dd>
-        </dl>
+        </dl>-->
         <dl class="detail_item">
             <dt>Poznámka:</dt>
             <dd>{$novyForm['poznamka']->control}</dd>
@@ -59,11 +59,11 @@
                 {if count($SouvisejiciDokumenty)>0 }
                     {foreach $SouvisejiciDokumenty as $s}
                     <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->dokument_id}">{$s->cislo_jednaci} ({$s->jid})</a>
-                    &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->dokument_id, 'spojeny'=>$s->dokument_id}">odebrat spojení</a>]
+                    &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->dokument_id}">odebrat spojení</a>]
                     {/foreach}
                 {/if}
                 </span>
-                &nbsp;[<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->dokument_id}" id="dialog-spojit">spojit s dokumentem</a>]
+                &nbsp;[<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->id}" id="dialog-spojit">spojit s dokumentem</a>]
             </dd>
         </dl>
         {/if}
@@ -137,9 +137,9 @@
             Nalezené shody s odesilatelem zprávy
         </div>
         <div class="blok_akce">
-            <a href="{link :Epodatelna:Subjekty:novy, 'id'=>0, 'epod_id'=>$Zprava->epodatelna_id}" id="dialog-novysubjekt">Vytvořit nový subjekt z odesílatele</a>
+            <a href="{link :Epodatelna:Subjekty:novy, 'id'=>0, 'epod_id'=>$Zprava->id}" id="dialog-novysubjekt">Vytvořit nový subjekt z odesílatele</a>
             &nbsp;&nbsp;&nbsp;
-            <a href="{link :Epodatelna:Subjekty:vyber, 'id'=>0, 'epod_id'=>$Zprava->epodatelna_id}" id="dialog-subjekt">Vyhledat subjekt</a>
+            <a href="{link :Epodatelna:Subjekty:vyber, 'id'=>0, 'epod_id'=>$Zprava->id}" id="dialog-subjekt">Vyhledat subjekt</a>
         </div>
         <div id="dok-subjekty">
         {if count($Subjekt['databaze'])>0}
@@ -161,7 +161,7 @@
             {foreach $Subjekt['databaze'] as $subjekt}
             <tr id="epodsubjekt-{$subjekt->subjekt_id}">
             <td class="icon">
-                <input type="checkbox" name="subjekt[{$subjekt->subjekt_id}]" />
+                <input type="checkbox" name="subjekt[{$subjekt->id}]" />
             </td>
             <td class="icon">
                 <img src="{$baseUri}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
@@ -174,7 +174,7 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber">
-                    <a href="{link :Epodatelna:Subjekty:upravit, 'id'=>$subjekt->subjekt_id, 'epod_id'=>$Zprava->epodatelna_id}" id="dialog-subjektzmenit">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Epodatelna:Subjekty:upravit, 'id'=>$subjekt->id, 'epod_id'=>$Zprava->id}" id="dialog-subjektzmenit">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
             <td class="meta_plus">
@@ -202,7 +202,7 @@
         <div class="prazdno">
             Nebyly nalezeny žádné shody s odesílatelem.
             <br />
-            Odesilatel není v databázi nebo se nepodařilo jeho záznam nalézt.
+            Odesílatel není v databázi nebo se nepodařilo jeho záznam nalézt.
         </div>
         {/if}
         </div>
@@ -222,7 +222,7 @@
                 <img src="{$baseUri}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->epodatelna_id, 'file'=>$priloha['id']}">{$priloha['name']}</a>
+                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>$priloha['id']}">{$priloha['name']}</a>
                 <div class="info">
                 <span>{$priloha['size']|bytes}, {$priloha['mimetype']}</span>
                 </div>

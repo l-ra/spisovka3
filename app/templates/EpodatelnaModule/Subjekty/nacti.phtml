@@ -1,6 +1,6 @@
          <tr id="epodsubjekt-{$subjekt->subjekt_id}">
             <td class="icon">
-                <input type="checkbox" name="subjekt[{$subjekt->subjekt_id}]" />
+                <input type="checkbox" name="subjekt[{$subjekt->id}]" />
             </td>
             <td class="icon">
                 <img src="{$baseUri}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
@@ -13,7 +13,7 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber">
-                    <a href="{link :Epodatelna:Subjekty:upravit, 'id'=>$subjekt->subjekt_id, 'epod_id'=>$epodatelna_id}" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Epodatelna:Subjekty:upravit, 'id'=>$subjekt->id, 'epod_id'=>$epodatelna_id}" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
             <td class="meta_plus">

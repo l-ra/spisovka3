@@ -18,7 +18,7 @@
                 <img src="{$baseUri}images/subjekt/personal.png" alt="personal.png" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Admin:Zamestnanci:detail, id => $osoba->osoba_id}">{=Osoba::displayName($osoba,'full_item')}</a>&nbsp;
+                <a href="{link :Admin:Zamestnanci:detail, id => $osoba->id}">{=Osoba::displayName($osoba,'full_item')}</a>&nbsp;
                 <div class="info">
                     {$osoba->pozice}
                 </div>
@@ -41,5 +41,5 @@
     </table>
     {widget vp}
     {else}
-    <div class="prazdno">Nebyli zjištěni žádné subjekty.</div>
+    <div class="prazdno">Nebyli zjištěni žádní zaměstnanci.</div>
     {/if}

@@ -26,7 +26,7 @@ class DokumentSubjekt extends BaseModel
             'cols' => array('ds.typ'=>'rezim_subjektu'),
             'leftJoin' => array(
                  'from' => array($this->tb_subjekt => 's'),
-                 'on' => array('s.subjekt_id=ds.subjekt_id'),
+                 'on' => array('s.id=ds.subjekt_id'),
                  'cols' => array('*')
             ),
             'order_by' => array('s.nazev_subjektu','s.prijmeni','s.jmeno'),
@@ -38,7 +38,7 @@ class DokumentSubjekt extends BaseModel
         $result = $this->fetchAllComplet($sql)->fetchAll();
         if ( count($result)>0 ) {
             foreach ($result as $subjekt) {
-                $subjekty[ $subjekt->subjekt_id ] = $subjekt;
+                $subjekty[ $subjekt->id ] = $subjekt;
             }
             return $subjekty;
         } else {

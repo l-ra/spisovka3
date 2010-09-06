@@ -347,7 +347,7 @@ dmFiles = objekt
                         $zprava['adresat'] = $config['ucet'] .' ['. $config['idbox'] .']';
                         $zprava['prijato_dne'] = new DateTime();
                         $zprava['doruceno_dne'] = new DateTime($z->dmAcceptanceTime);
-                        $zprava['prijal_kdo'] = $user->user_id;
+                        $zprava['prijal_kdo'] = $user->id;
                         $zprava['prijal_info'] = serialize($user->identity);
 
                         $zprava['sha1_hash'] = '';
@@ -407,20 +407,20 @@ dmFormat =
                                 'filename'=>'ep_isds_'.$epod_id .'.bsr',
                                 'dir'=>'EP-I-'. sprintf('%06d',$zprava['poradi']).'-'.$zprava['rok'],
                                 'typ'=>'5',
-                                'popis'=>' Byte-stream reprezentace ISDS zprávy z epodatelny '.$zprava['poradi'].'-'.$zprava['rok']
+                                'popis'=>'Byte-stream reprezentace ISDS zprávy z epodatelny '.$zprava['poradi'].'-'.$zprava['rok']
                                 //'popis'=>'Emailová zpráva'
                             );
 
                             if ( $file = $UploadFile->uploadEpodatelna(serialize($mess), $data) ) {
                                 // ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['source_id'] = $file->file_id ."-". $file_o->file_id;
+                                $zprava['source_id'] = $file->id ."-". $file_o->id;
                                 $this->Epodatelna->update(
                                         array('stav'=>1,
                                               'stav_info'=>$zprava['stav_info'],
-                                              'source_id'=>$file->file_id ."-". $file_o->file_id
+                                              'source_id'=>$file->id ."-". $file_o->id
                                             ),
-                                        array(array('epodatelna_id=%i',$epod_id))
+                                        array(array('id=%i',$epod_id))
                                 );
                             } else {
                                 $zprava['stav_info'] = 'Reprezentace zprávy se nepodařilo uložit';
@@ -499,7 +499,7 @@ dmFormat =
                         $zprava['adresat'] = $config['ucet'] .' ['. $config['login'] .']';
                         $zprava['prijato_dne'] = new DateTime();
                         $zprava['doruceno_dne'] = new DateTime( date('Y-m-d H:i:s',$z->udate) );
-                        $zprava['prijal_kdo'] = $user->user_id;
+                        $zprava['prijal_kdo'] = $user->id;
                         $zprava['prijal_info'] = serialize($user->identity);
 
                         $zprava['sha1_hash'] = sha1($mess->source);
@@ -539,13 +539,13 @@ dmFormat =
                             if ( $file = $UploadFile->uploadEpodatelna($mess->source, $data) ) {
                                 // ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['source_id'] = $file->file_id;
+                                $zprava['source_id'] = $file->id;
                                 $this->Epodatelna->update(
                                         array('stav'=>1,
                                               'stav_info'=>$zprava['stav_info'],
-                                              'source_id'=>$file->file_id
+                                              'source_id'=>$file->id
                                             ),
-                                        array(array('epodatelna_id=%i',$epod_id))
+                                        array(array('id=%i',$epod_id))
                                 );
                             } else {
                                 $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
@@ -640,11 +640,11 @@ dmFormat =
 
             //$zpravy = $isds->seznamPrichozichZprav();
             //$zpravy = $isds->seznamOdeslanychZprav();
-            $zpravy = $isds->seznamOdeslanychZprav( time()-3600 , time() );
+            //$zpravy = $isds->seznamOdeslanychZprav( time()-3600 , time() );
 
-            echo "<pre>";
-            print_r($zpravy);
-            echo "</pre>";
+            //echo "<pre>";
+            //print_r($zpravy);
+            //echo "</pre>";
 
 
 

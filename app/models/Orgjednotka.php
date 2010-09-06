@@ -4,13 +4,13 @@ class Orgjednotka extends BaseModel
 {
 
     protected $name = 'orgjednotka';
-    protected $primary = 'orgjednotka_id';
+    protected $primary = 'id';
     
     
     public function getInfo($orgjednotka_id)
     {
 
-        $result = $this->fetchRow(array('orgjednotka_id=%i',$orgjednotka_id));
+        $result = $this->fetchRow(array('id=%i',$orgjednotka_id));
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 
@@ -49,11 +49,11 @@ class Orgjednotka extends BaseModel
 
         $role = array();
         foreach( $role_data as $r ) {
-            $role[ $r->role_id ] = $r;
+            $role[ $r->id ] = $r;
         }
         $role_org = array();
         foreach( $role_org_data as $ro ) {
-            $role_org[ $ro->role_id ] = $ro;
+            $role_org[ $ro->id ] = $ro;
         }
 
         return array('role'=>$role, 'role_org'=>$role_org);
@@ -96,7 +96,7 @@ class Orgjednotka extends BaseModel
                 $row1['privilege'] = "orgjednotka_". $orgjednotka_id;
                 $rule_id = $AclModel->insertRule($row1);
             } else {
-                $rule_id = $pravidlo[0]->rule_id;
+                $rule_id = $pravidlo[0]->id;
             }
 
 
@@ -133,7 +133,7 @@ class Orgjednotka extends BaseModel
         // obebrani pravidel
         //$AclModel->deleteRule(array('privilege=%s',"orgjednotka_". $orgjednotka_id));
         // odebrani role
-        $RoleModel->delete(array('role_id=%i',$role_id));
+        $RoleModel->delete(array('id=%i',$role_id));
         
         //if ($transaction)
         //dibi::commit();

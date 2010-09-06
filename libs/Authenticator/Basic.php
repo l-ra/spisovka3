@@ -23,11 +23,11 @@ class Authenticator_Basic extends Object implements IAuthenticator
 
         // Overeni hesla
         if ($row->password !== $password) {
-            $log->logAccess($row->user_id, 0);
+            $log->logAccess($row->id, 0);
             throw new AuthenticationException("Neplatné heslo.", self::INVALID_CREDENTIAL);
         } else {
-            $user->zalogovan($row->user_id);
-            $log->logAccess($row->user_id, 1);
+            $user->zalogovan($row->id);
+            $log->logAccess($row->id, 1);
         }
 
         // Odstraneni hesla ve vypisu

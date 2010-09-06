@@ -29,7 +29,7 @@ class AclModel extends BaseModel {
 
             $res = dibi::fetchAll('SELECT r1.code, r2.code as parent_code
                                    FROM ['. $this->tb_role . '] r1
-                                   LEFT JOIN ['. $this->tb_role . '] r2 ON (r1.parent_id = r2.role_id)
+                                   LEFT JOIN ['. $this->tb_role . '] r2 ON (r1.parent_id = r2.id)
                                    ORDER BY r1.parent_id ASC
                                   ');
             $cache['s3_Role'] = $res;
@@ -75,9 +75,9 @@ class AclModel extends BaseModel {
                     re.code as resource,
                     ru.privilege as privilege
                     FROM ['. $this->name . '] a
-                    JOIN ['. $this->tb_role . '] ro ON (a.role_id = ro.role_id)
-                    LEFT JOIN ['. $this->tb_rule . '] ru ON (a.rule_id = ru.rule_id)
-                    LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.resource_id)
+                    JOIN ['. $this->tb_role . '] ro ON (a.role_id = ro.id)
+                    LEFT JOIN ['. $this->tb_rule . '] ru ON (a.rule_id = ru.id)
+                    LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.id)
 
                     ORDER BY ro.fixed DESC, a.allowed DESC, ro.code, ru.privilege
             ');
@@ -102,7 +102,7 @@ class AclModel extends BaseModel {
                 re.name resource_name,
                 re.note resource_note
                 FROM ['. $this->tb_rule . '] ru
-                LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.resource_id)
+                LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.id)
                 %ex', (!empty($where) ? array('WHERE %and', $where) : NULL),
                 'ORDER BY re.code ASC'
            );
@@ -121,7 +121,7 @@ class AclModel extends BaseModel {
                 re.name resource_name,
                 re.note resource_note
                 FROM ['. $this->tb_rule . '] ru
-                LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.resource_id)
+                LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.id)
                 ORDER BY re.code ASC
         ');
 
@@ -142,10 +142,10 @@ class AclModel extends BaseModel {
             }
 
             //$tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ] = $pravidlo;
-            $tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ]['name'] = $pravidlo->name;
-            $tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ]['note'] = $pravidlo->note;
-            $tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ]['resource'] = $pravidlo->resource_code;
-            $tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ]['privilege'] = $pravidlo->privilege;
+            $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['name'] = $pravidlo->name;
+            $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['note'] = $pravidlo->note;
+            $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['resource'] = $pravidlo->resource_code;
+            $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['privilege'] = $pravidlo->privilege;
 
             if ( !is_null($role) ) {
 
@@ -157,11 +157,11 @@ class AclModel extends BaseModel {
                     $povoleno = "ne";
                 }
 
-                $tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ]['opravneni'] = $povoleno;
-                $tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ]['role_id'] = null;
+                $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['opravneni'] = $povoleno;
+                $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['role_id'] = null;
             } else {
-                $tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ]['opravneni'] = "nejiste";
-                $tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ]['role_id'] = null;
+                $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['opravneni'] = "nejiste";
+                $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['role_id'] = null;
             }
 
 
@@ -180,19 +180,19 @@ class AclModel extends BaseModel {
             SELECT
                 a.allowed allowed,
                 ro.code role,
-                ro.role_id role_id,
+                ro.id role_id,
                 
                 re.code resource,
-                re.resource_id resource_id,
+                re.id resource_id,
 
                 ru.privilege privilege,
-                ru.rule_id rule_id
+                ru.id rule_id
 
 
                 FROM ['. $this->name . '] a
-                JOIN ['. $this->tb_role . '] ro ON (a.role_id = ro.role_id)
-                LEFT JOIN ['. $this->tb_rule . '] ru ON (a.rule_id = ru.rule_id)
-                LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.resource_id)
+                JOIN ['. $this->tb_role . '] ro ON (a.role_id = ro.id)
+                LEFT JOIN ['. $this->tb_rule . '] ru ON (a.rule_id = ru.id)
+                LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.id)
                 %if', !is_null($role), 'WHERE ro.code=%s', $role,'
                 ORDER BY re.code ASC
         ');

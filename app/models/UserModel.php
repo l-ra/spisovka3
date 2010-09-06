@@ -4,7 +4,7 @@ class UserModel extends BaseModel
 {
 
     protected $name = 'user';
-    protected $primary = 'user_id';
+    protected $primary = 'id';
 
     /**
      * Zjisti informace o uzivateli na základe ID nebo username
@@ -21,7 +21,7 @@ class UserModel extends BaseModel
          */
         if ( is_numeric($mixed) ) {
             // $mixed is numeric -> ID
-            $row = $this->fetchRow(array('user_id=%i',$mixed))->fetch();
+            $row = $this->fetchRow(array('id=%i',$mixed))->fetch();
         } else {
             // $mixed is string -> username
             $row = $this->fetchRow(array('username=%s',$mixed))->fetch();
@@ -34,7 +34,7 @@ class UserModel extends BaseModel
          * Nacteni identity uzivatele
          */
         if ( $identity == TRUE ) {
-            $row->identity = $this->getIdentity($row->user_id);
+            $row->identity = $this->getIdentity($row->id);
             $row->display_name = Osoba::displayName($row->identity);
         } else {
             $row->display_name = $row->username;
@@ -44,7 +44,7 @@ class UserModel extends BaseModel
          * Nacteni roli uzivatele
          */
         $user = new UserModel();
-        $row->user_roles = $user->getRoles($row->user_id);
+        $row->user_roles = $user->getRoles($row->id);
 
         return ($row) ? $row : NULL;
     }
@@ -62,7 +62,7 @@ class UserModel extends BaseModel
 
         $row = dibi::fetch('SELECT o.*
                             FROM [:PREFIX:'. self::OSOBA2USER_TABLE . '] ou
-                            LEFT JOIN [:PREFIX:'. self::OSOBA_TABLE .'] o ON (o.osoba_id = ou.osoba_id)
+                            LEFT JOIN [:PREFIX:'. self::OSOBA_TABLE .'] o ON (o.id = ou.osoba_id)
                             WHERE ou.user_id=%i AND o.stav<10',$user_id);
 
         return ($row) ? $row : NULL;
@@ -74,7 +74,7 @@ class UserModel extends BaseModel
 
         $rows = dibi::fetchAll('SELECT r.*
                                  FROM [:PREFIX:'. self::USER2ROLE_TABLE . '] ur
-                                 LEFT JOIN [:PREFIX:'. self::ROLE_TABLE .'] r ON (r.role_id = ur.role_id)
+                                 LEFT JOIN [:PREFIX:'. self::ROLE_TABLE .'] r ON (r.id = ur.role_id)
                                  WHERE ur.user_id=%i',$user_id);
 
         return ($rows) ? $rows : NULL;
@@ -175,7 +175,7 @@ class UserModel extends BaseModel
                         'active'=>0,
                         'username%sql'=>"CONCAT(username,'_',".time().")"
                       ),
-                      array('user_id=%i',$user_id)
+                      array('id=%i',$user_id)
                 );
 
         //$ret = $this->delete(array('user_id=%i',$user_id));
@@ -188,13 +188,13 @@ class UserModel extends BaseModel
 
     public function zmenitHeslo($user_id, $password) {
 
-        $user = $this->fetchRow(array('user_id=%i',$user_id))->fetch();
+        $user = $this->fetchRow(array('id=%i',$user_id))->fetch();
 
         $row = array( 'password'=>sha1($user->username . $password),
                       'last_modified'=> new DateTime()
                 );
 
-        return $this->update($row,array('user_id=%i',$user_id));
+        return $this->update($row,array('id=%i',$user_id));
 
     }
 
@@ -203,7 +203,7 @@ class UserModel extends BaseModel
         $row = array('last_login' => new DateTime(),
                      'last_ip' => Environment::getHttpRequest()->getRemoteAddress()
                 );
-        return $this->update($row,array('user_id=%i',$user_id));
+        return $this->update($row,array('id=%i',$user_id));
 
     }
 

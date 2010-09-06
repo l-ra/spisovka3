@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Pouziti vyhradne pro instalacni skript
+--
+-- V pripade rucni instalace nahradte {tbls3} za odpovidajici hodnotu - prefix nebo nic
+-- -----------------------------------------------------------------------------
+
 CREATE TABLE `{tbls3}cislo_jednaci` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `podaci_denik` varchar(80) NOT NULL DEFAULT 'default',
@@ -9,9 +15,9 @@ CREATE TABLE `{tbls3}cislo_jednaci` (
   `org_poradi` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `user_poradi` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `search` (`urad_zkratka`,`orgjednotka_id`,`user_id`,`podaci_denik`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}dokument` (
   `id` int(11) NOT NULL,
@@ -52,9 +58,9 @@ CREATE TABLE `{tbls3}dokument` (
   `datum_vyrizeni` datetime DEFAULT NULL,
   `poznamka_vyrizeni` text,
   `spousteci_udalost` varchar(250) DEFAULT '',
-  PRIMARY KEY (`id`,`version`),
-  KEY `cislojednaci_id` (`cislojednaci_id`,`typ_dokumentu_id`,`spisovy_znak_id`,`zmocneni_id`,`epodatelna_id`,`zpusob_doruceni_id`,`zpusob_vyrizeni_id`)
+  PRIMARY KEY (`id`,`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}dokument_odeslani` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -70,8 +76,10 @@ CREATE TABLE `{tbls3}dokument_odeslani` (
   `zprava` text,
   `date_created` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `dokument_id` (`dokument_id`,`subjekt_id`,`dokument_version`,`subjekt_version`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  KEY `dokument` (`dokument_id`,`dokument_version`),
+  KEY `subjekt` (`subjekt_id`,`subjekt_version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}dokument_to_file` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -83,8 +91,10 @@ CREATE TABLE `{tbls3}dokument_to_file` (
   `user_added` int(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `dokument_id` (`dokument_id`,`file_id`,`dokument_version`,`file_version`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  KEY `dokument` (`dokument_id`,`dokument_version`),
+  KEY `file` (`file_id`,`file_version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}dokument_to_spis` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -96,8 +106,10 @@ CREATE TABLE `{tbls3}dokument_to_spis` (
   `poradi` int(11) NOT NULL DEFAULT '1',
   `stav` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `dokument_id` (`dokument_id`,`spis_id`,`dokument_version`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  KEY `dokument` (`dokument_id`,`dokument_version`),
+  KEY `spis` (`spis_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}dokument_to_subjekt` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -109,13 +121,15 @@ CREATE TABLE `{tbls3}dokument_to_subjekt` (
   `date_added` datetime DEFAULT NULL,
   `user_added` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `dokument_id` (`dokument_id`,`subjekt_id`,`dokument_version`,`subjekt_version`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  KEY `dokument` (`dokument_id`,`dokument_version`),
+  KEY `subjekt` (`subjekt_id`,`subjekt_version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}dokument_typ` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nazev` varchar(100) NOT NULL,
-  `popis` varchar(255) DEFAULT NULL,
+  `popis` varchar(255) DEFAULT '',
   `stav` tinyint(4) NOT NULL DEFAULT '1',
   `smer` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0-prichozi, 1-odchozi',
   `typ` tinyint(4) NOT NULL DEFAULT '0',
@@ -134,30 +148,30 @@ INSERT INTO `{tbls3}dokument_typ` (`id`, `nazev`, `popis`, `stav`, `smer`, `typ`
 
 CREATE TABLE `{tbls3}epodatelna` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `epodatelna_typ` tinyint(4) NOT NULL DEFAULT '0',
   `poradi` int(11) DEFAULT NULL,
   `rok` year(4) DEFAULT NULL,
   `email_signature` varchar(200) DEFAULT NULL,
   `isds_signature` varchar(45) DEFAULT NULL,
-  `predmet` varchar(200) NOT NULL,
+  `predmet` varchar(200) NOT NULL DEFAULT '',
   `popis` text,
-  `odesilatel` varchar(200) NOT NULL,
+  `odesilatel` varchar(200) NOT NULL DEFAULT '',
   `odesilatel_id` int(11) DEFAULT NULL,
-  `adresat` varchar(100) NOT NULL,
+  `adresat` varchar(100) NOT NULL DEFAULT '',
   `prijato_dne` datetime DEFAULT NULL,
   `doruceno_dne` datetime DEFAULT NULL,
   `prijal_kdo` int(11) DEFAULT NULL,
   `prijal_info` text,
   `sha1_hash` varchar(50) NOT NULL,
   `prilohy` text,
-  `evidence` varchar(100) DEFAULT NULL,
+  `evidence` varchar(100) DEFAULT '',
   `dokument_id` int(11) DEFAULT NULL,
   `stav` tinyint(4) NOT NULL DEFAULT '0',
   `stav_info` varchar(255) DEFAULT NULL,
-  `source_id` varchar(30) DEFAULT NULL,
-  `epodatelna_typ` tinyint(4) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `hledat` (`email_signature`,`isds_signature`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  `source_id` varchar(40) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}file` (
   `id` int(11) NOT NULL,
@@ -165,8 +179,8 @@ CREATE TABLE `{tbls3}file` (
   `stav` tinyint(4) NOT NULL DEFAULT '1',
   `typ` tinyint(4) NOT NULL DEFAULT '1' COMMENT 'typ prilohy. Defaultne: (1)main, (2)enclosure, (3)signature, (4)meta, (5)source',
   `nazev` varchar(255) NOT NULL COMMENT 'jmeno souboru nebo nazev',
-  `popis` varchar(45) DEFAULT NULL,
-  `mime_type` varchar(60) DEFAULT NULL COMMENT 'mime typ souboru',
+  `popis` varchar(45) DEFAULT '',
+  `mime_type` varchar(60) DEFAULT '' COMMENT 'mime typ souboru',
   `real_name` varchar(255) NOT NULL COMMENT 'skutečné jmeno souboru file.ext',
   `real_path` varchar(255) NOT NULL COMMENT 'realna cesta k souboru ',
   `real_type` varchar(45) NOT NULL DEFAULT 'FILE' COMMENT 'typ fyzickeho mista. Default FILE - lokalni fyzicke misto',
@@ -180,15 +194,17 @@ CREATE TABLE `{tbls3}file` (
   PRIMARY KEY (`id`,`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
 CREATE TABLE `{tbls3}log_access` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `date` datetime DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
-  `ip` varchar(15) DEFAULT NULL,
-  `user_agent` varchar(200) DEFAULT NULL,
+  `ip` varchar(15) DEFAULT '',
+  `user_agent` varchar(200) DEFAULT '',
   `stav` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}log_dokument` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -199,8 +215,9 @@ CREATE TABLE `{tbls3}log_dokument` (
   `dokument_id` int(11) NOT NULL,
   `user_info` text,
   PRIMARY KEY (`id`),
-  KEY `dokument_id` (`dokument_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+  KEY `dokument` (`dokument_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}orgjednotka` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -212,7 +229,7 @@ CREATE TABLE `{tbls3}orgjednotka` (
   `date_created` datetime DEFAULT NULL,
   `date_modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}orgjednotka` (`id`, `plny_nazev`, `zkraceny_nazev`, `ciselna_rada`, `note`, `stav`, `date_created`, `date_modified`) VALUES
 (1, 'Centrální podatelna', 'Centrální podatelna', 'POD', '', 1, NOW(), NULL);
@@ -229,9 +246,9 @@ CREATE TABLE `{tbls3}osoba` (
   `stav` tinyint(4) NOT NULL,
   `date_created` datetime NOT NULL,
   `date_modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `prijmeni` (`prijmeni`,`jmeno`,`stav`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}osoba_to_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -240,19 +257,21 @@ CREATE TABLE `{tbls3}osoba_to_user` (
   `date_added` datetime NOT NULL,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `osoba_id` (`osoba_id`,`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  KEY `osoba` (`osoba_id`),
+  KEY `user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}sestava` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nazev` varchar(60) NOT NULL,
-  `popis` varchar(150) DEFAULT NULL,
+  `popis` varchar(150) DEFAULT '',
   `parametry` text,
   `sloupce` text,
   `typ` tinyint(4) NOT NULL DEFAULT '1',
   `filtr` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}sestava` (`id`, `nazev`, `popis`, `parametry`, `sloupce`, `typ`, `filtr`) VALUES
 (1, 'Podací deník', NULL, NULL, NULL, 2, 1);
@@ -265,8 +284,10 @@ CREATE TABLE `{tbls3}souvisejici_dokument` (
   `user_added` int(11) NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `dokument_id` (`dokument_id`,`spojit_s`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+  KEY `dokument` (`dokument_id`),
+  KEY `spojit` (`spojit_s`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}spis` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -284,7 +305,7 @@ CREATE TABLE `{tbls3}spis` (
   `user_modified` int(11) DEFAULT NULL,
   `skartacni_znak` enum('A','S','V') DEFAULT NULL,
   `skartacni_lhuta` int(11) DEFAULT NULL,
-  `spousteci_udalost` varchar(250) DEFAULT NULL,
+  `spousteci_udalost` varchar(250) DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -294,7 +315,7 @@ INSERT INTO `{tbls3}spis` (`id`, `nazev`, `popis`, `spisovy_znak`, `typ`, `spis_
 CREATE TABLE `{tbls3}spisovy_znak` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nazev` varchar(80) NOT NULL,
-  `popis` varchar(200) NOT NULL,
+  `popis` varchar(200) NOT NULL DEFAULT '',
   `spisznak_parent` int(11) DEFAULT NULL,
   `uroven` tinyint(4) DEFAULT '0',
   `sekvence` varchar(200) DEFAULT NULL,
@@ -307,7 +328,8 @@ CREATE TABLE `{tbls3}spisovy_znak` (
   `skartacni_lhuta` int(11) DEFAULT NULL,
   `spousteci_udalost` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}spousteci_udalost` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -315,7 +337,7 @@ CREATE TABLE `{tbls3}spousteci_udalost` (
   `poznamka` text,
   `stav` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}spousteci_udalost` (`id`, `nazev`, `poznamka`, `stav`) VALUES
 (1, 'Skartační lhůta začíná plynout po ztrátě platnosti dokumentu.', NULL, 1),
@@ -334,6 +356,7 @@ INSERT INTO `{tbls3}spousteci_udalost` (`id`, `nazev`, `poznamka`, `stav`) VALUE
 (14, 'Ukončení pracovního/služebního poměru.', NULL, 1),
 (15, 'Skartační lhůta u dokumentů celostátně vyhlášeného referenda začíná plynout po vyhlášení výsledků referenda prezidentem republiky ve Sbírce zákonů, popřípadě po vyhlášení nálezu Ústavního soudu, kterým rozhodl, že postup při provádění referenda nebyl v souladu s ústavním zákonem o referendu o přistoupení České republiky k Evropské unii nebo zákonem vydaným k jeho provedení s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu. ', NULL, 1),
 (16, 'Skartační lhůta u dokumentů krajského referenda začíná plynout po vyhlášení výsledků referenda s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu.', NULL, 1);
+
 
 CREATE TABLE `{tbls3}subjekt` (
   `id` int(11) NOT NULL,
@@ -367,10 +390,9 @@ CREATE TABLE `{tbls3}subjekt` (
   `date_created` datetime DEFAULT NULL,
   `date_modified` datetime DEFAULT NULL,
   `user_added` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`,`version`),
-  KEY `jmeno` (`nazev_subjektu`,`prijmeni`,`jmeno`),
-  KEY `hledat` (`adresa_ulice`,`email`,`id_isds`,`telefon`)
+  PRIMARY KEY (`id`,`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}user` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -380,10 +402,11 @@ CREATE TABLE `{tbls3}user` (
   `last_login` datetime DEFAULT NULL,
   `username` varchar(150) NOT NULL,
   `password` varchar(50) DEFAULT NULL,
-  `last_ip` varchar(15) DEFAULT NULL,
+  `last_ip` varchar(15) DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `USERNAME` (`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
+
 
 CREATE TABLE `{tbls3}user_acl` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -391,7 +414,8 @@ CREATE TABLE `{tbls3}user_acl` (
   `rule_id` int(10) unsigned DEFAULT NULL,
   `allowed` enum('Y','N') NOT NULL DEFAULT 'Y',
   PRIMARY KEY (`id`),
-  KEY `role_id` (`role_id`,`rule_id`)
+  KEY `role` (`role_id`),
+  KEY `rule` (`rule_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
 INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
@@ -418,14 +442,13 @@ INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
 (21,9,17,'Y'),
 (22,8,17,'Y');
 
-
 CREATE TABLE `{tbls3}user_resource` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(150) NOT NULL,
-  `note` varchar(255) DEFAULT NULL,
+  `note` varchar(255) DEFAULT '',
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
 INSERT INTO `{tbls3}user_resource` (`id`, `code`, `note`, `name`) VALUES
 (1, 'Spisovka_DokumentyPresenter', NULL, 'Seznam dokumentů'),
@@ -466,12 +489,12 @@ CREATE TABLE `{tbls3}user_role` (
   `active` tinyint(4) NOT NULL DEFAULT '0',
   `date_created` datetime DEFAULT NULL,
   `date_modified` datetime DEFAULT NULL,
-  `note` varchar(250) DEFAULT NULL,
+  `note` varchar(250) DEFAULT '',
   `orgjednotka_id` int(11) DEFAULT NULL,
   `fixed` tinyint(4) DEFAULT '0',
   `order` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
 INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `code`, `name`, `active`, `date_created`, `date_modified`, `note`, `orgjednotka_id`, `fixed`, `order`) VALUES
 (1, 0, 'admin', 'administrátor', 1, NOW(), NOW(), 'Má absolutní moc provádět všechno možné', NULL, 2, 100),
@@ -479,7 +502,7 @@ INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `code`, `name`, `active`, `da
 (3, 1, 'superadmin', 'SuperAdmin', 1, NOW(), NOW(), 'Administrátor se super právy.\r\nTo znamená, že může manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', NULL, 2, 100),
 (4, 0, 'referent', 'referent', 1, NOW(), NOW(), 'Základní role pracovníka spisové služby', NULL, 1, 10),
 (5, 4, 'vedouci', 'vedoucí', 1, NOW(), NOW(), 'Vedoucí organizační jednotky umožňující přijímat dokumenty', NULL, 1, 30),
-(6, 0, 'podatelna', 'pracovník podatelny', 1, NOW(), NOW(), 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', NULL, 1, 20),
+(6, 4, 'podatelna', 'pracovník podatelny', 1, NOW(), NOW(), 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', NULL, 1, 20),
 (7, 5, 'vedouci_1', 'vedoucí POD', 1, NOW(), NULL, NULL, 1, 0, 30),
 (8, 4, 'referent_1', 'referent POD', 1, NOW(), NULL, NULL, 1, 0, 10),
 (9, 6, 'podatelna_1', 'podatelna POD', 1, NOW(), NULL, NULL, 1, 0, 20);
@@ -487,11 +510,10 @@ INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `code`, `name`, `active`, `da
 CREATE TABLE `{tbls3}user_rule` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `note` varchar(250) DEFAULT NULL,
+  `note` varchar(250) DEFAULT '',
   `resource_id` int(11) DEFAULT NULL,
   `privilege` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `resource_id` (`resource_id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}user_rule` (`id`, `name`, `note`, `resource_id`, `privilege`) VALUES
@@ -519,8 +541,10 @@ CREATE TABLE `{tbls3}user_to_role` (
   `role_id` int(10) unsigned NOT NULL,
   `date_added` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_id` (`user_id`,`role_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  KEY `user` (`user_id`),
+  KEY `role` (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}workflow` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -539,9 +563,10 @@ CREATE TABLE `{tbls3}workflow` (
   `date_predani` datetime DEFAULT NULL,
   `aktivni` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `dokument` (`dokument_id`,`dokument_version`,`stav_dokumentu`),
-  KEY `osoba` (`prideleno`,`orgjednotka_id`,`stav_osoby`,`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+  KEY `dokument` (`dokument_id`,`dokument_version`),
+  KEY `prideleno` (`prideleno`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}zmocneni` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -553,6 +578,7 @@ CREATE TABLE `{tbls3}zmocneni` (
   `stav` tinyint(4) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `{tbls3}zpusob_vyrizeni` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

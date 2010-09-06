@@ -25,9 +25,9 @@
                 </div>
                 <div class="vyber">
                     <span>připojit jako: {$dokument_id} </span><br />
-                    <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$dokument_id, 'typ'=>'A' }" onclick="subjektVybran(this); return false;">adresát</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$dokument_id, 'typ'=>'O' }" onclick="subjektVybran(this); return false;">odesilatel</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$dokument_id, 'typ'=>'AO' }" onclick="subjektVybran(this); return false;">adresát i odesilatel</a>
+                    <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id, 'typ'=>'A' }" onclick="subjektVybran(this); return false;">adresát</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id, 'typ'=>'O' }" onclick="subjektVybran(this); return false;">odesilatel</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id, 'typ'=>'AO' }" onclick="subjektVybran(this); return false;">adresát i odesilatel</a>
                 </div>
             </td>
             <td class="meta_plus">
@@ -52,6 +52,6 @@
         {/foreach}
     </table>
     {else}
-    <div class="prazdno">Nebyli zjištěni žádné subjekty.</div>
+    <div class="prazdno">Nebyly zjištěny žádné subjekty.</div>
     {/if}
     {/snippet}

@@ -67,7 +67,7 @@ class Admin_PrilohyPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->addText('nazev', 'Název přílohy:', 50, 150);
-        $form1->addTextArea('popis', 'Příjmení:', 80, 5);
+        $form1->addTextArea('popis', 'Popis:', 80, 5);
         $form1->addSelect('typ', 'Typ souboru', FileModel::typPrilohy());
         $form1->addFile('file', 'Soubor:');
         $form1->addSubmit('upload', 'Upload')
@@ -95,7 +95,7 @@ class Admin_PrilohyPresenter extends BasePresenter
         eval("\$UploadFile = new ".$storage_conf->type."();");
 
         if ( $file = $UploadFile->uploadDokument($data) ) {
-            $this->flashMessage('Soubor "'. $file->name .'" úspěšně nahrán.');
+            $this->flashMessage('Soubor "'. $file->nazev .'" úspěšně nahrán.');
             $this->redirect('this');
         } else {
             $this->flashMessage( $UploadFile->errorMessage(),'warning');

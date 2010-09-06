@@ -11,11 +11,11 @@
                         if ( response.indexOf('###vybrano###') != -1 ) {
                             alert('Příloha byl nahrána.');
                             $('#dialog').dialog('close');
-                            renderPrilohy({$Dok->dokument_id});
+                            renderPrilohy({$Dok->id});
                         } else if ( response.indexOf('###zmemeno###') != -1 ) {
                             alert('Příloha byla upravena.');
                             $('#dialog').dialog('close');
-                            renderPrilohy({$Dok->dokument_id});
+                            renderPrilohy({$Dok->id});
                         } else {
                             $('#dialog').html(response);
                         }
@@ -40,7 +40,7 @@
     <div id="dokument_blok_hlavni">
         <dl class="detail_item">
             <dt>JID:</dt>
-            <dd>{$cjednaci->app_id}-ESS-{$Dok->dokument_id}&nbsp;</dd>
+            <dd>{$cjednaci->app_id}-ESS-{$Dok->id}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
@@ -51,7 +51,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
-            <dd>{$novyForm['typ_dokumentu']->control}</dd>
+            <dd>{$novyForm['typ_dokumentu_id']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spisová značka:</dt>
@@ -66,7 +66,7 @@
                 {/if}
                 </span>
 
-                <a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->dokument_id}" id="dialog-spis">Připojit spisovou značku</a>
+                <a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}" id="dialog-spis">Připojit spisovou značku</a>
             </dd>
         </dl>
         <dl class="detail_item">
@@ -101,11 +101,11 @@
                 {if count($SouvisejiciDokumenty)>0 }
                     {foreach $SouvisejiciDokumenty as $s}
                     <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->dokument_id}">{$s->cislo_jednaci} ({$s->jid})</a>
-                    &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->dokument_id, 'spojeny'=>$s->dokument_id}">odebrat spojení</a>]
+                    &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->dokument_id}">odebrat spojení</a>]
                     {/foreach}
                 {/if}
                 </span>
-                &nbsp;[<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->dokument_id}" id="dialog-spojit">spojit s dokumentem</a>]
+                &nbsp;[<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->id}" id="dialog-spojit">spojit s dokumentem</a>]
             </dd>
         </dl>
         {/if}
@@ -139,9 +139,9 @@
             Adresáti / odesílatelé
         </div>
         <div class="blok_akce">
-            <a href="{link :Spisovka:Subjekty:vyber, 'id'=>0, 'dok_id'=>$Dok->dokument_id}" id="dialog-subjekt">Připojit subjekt</a>
+            <a href="{link :Spisovka:Subjekty:vyber, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Připojit subjekt</a>
             &nbsp;&nbsp;&nbsp;
-            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->dokument_id}" onclick="renderSubjekty({!$Dok->dokument_id}); return false;">Obnovit seznam subjektu</a>
+            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id}); return false;">Obnovit seznam subjektu</a>
         </div>
         <div id="dok-subjekty">
         {if count($Subjekty)>0}
@@ -172,8 +172,8 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" onclick="return odebratSubjekt(this, {!$Dok->dokument_id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->subjekt_id, 'dok_id'=>$Dok->dokument_id }" id="dialog-subjektzmenit">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" id="dialog-subjektzmenit">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
             <td class="meta_plus">
@@ -208,9 +208,9 @@
         Přílohy
     </div>
     <div class="blok_akce">
-        <a href="{link :Spisovka:Prilohy:pridat, 'id'=>0, 'dok_id'=>$Dok->dokument_id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+        <a href="{link :Spisovka:Prilohy:pridat, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
         &nbsp;&nbsp;&nbsp;
-        <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->dokument_id}" onclick="renderPrilohy({!$Dok->dokument_id}); return false;">Obnovit seznam příloh</a>
+        <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
     </div>
     <div id="dok-prilohy">
     {if count($Prilohy)>0}
@@ -221,7 +221,7 @@
                 <img src="{$baseUri}images/mimetypes/{$file->mime_type|webalize}.png" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->dokument_id, 'file'=>$file->file_id}">{$file->nazev}</a>
+                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->id, 'file'=>$file->id}">{$file->nazev}</a>
                 <div class="info">
                 {$file->real_name}
                 <br />
@@ -233,8 +233,8 @@
                 </div>
                 {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
                 <div class="vyber">
-                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return odebratPrilohu(this, {!$Dok->dokument_id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->file_id, 'dok_id'=>$Dok->dokument_id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return odebratPrilohu(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
             <td class="user">

@@ -111,11 +111,11 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             // pripojit k dokumentu
             $this->template->chyba = $file;
             $DokumentPrilohy = new DokumentPrilohy();
-            if ($DokumentPrilohy->pripojit($dokument_id, $file->file_id)) {
+            if ($DokumentPrilohy->pripojit($dokument_id, $file->id)) {
 
                 $Log = new LogModel();
                 $FileModel = new FileModel();
-                $file_info = $FileModel->getInfo($file->file_id);
+                $file_info = $FileModel->getInfo($file->id);
                 $Log->logDokument($dokument_id, LogModel::PRILOHA_PRIDANA,'Přidána příloha "'. $file_info->nazev .' ('. $file_info->real_name .')"');
 
                 echo '###vybrano###'. $dokument_id;
@@ -201,13 +201,13 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                 // pripojit k dokumentu
                 $this->template->chyba = $file;
                 $DokumentPrilohy = new DokumentPrilohy();
-                if ($DokumentPrilohy->pripojit($dokument_id, $file->file_id)) {
+                if ($DokumentPrilohy->pripojit($dokument_id, $file->id)) {
                     $DokumentPrilohy->deaktivovat($dokument_id, $file_id); // deaktivujeme puvodni prilohu
 
                     $Log = new LogModel();
                     $FileModel = new FileModel();
                     $file_info1 = $FileModel->getInfo($file_id);
-                    $file_info2 = $FileModel->getInfo($file->file_id);
+                    $file_info2 = $FileModel->getInfo($file->id);
                     $Log->logDokument($dokument_id, LogModel::PRILOHA_ZMENENA,'Změněna příloha z "'. $file_info1->nazev .' ('. $file_info1->real_name .')" na "'. $file_info2->nazev .' ('. $file_info2->real_name .')"');
 
                     echo '###vybrano###'. $dokument_id;

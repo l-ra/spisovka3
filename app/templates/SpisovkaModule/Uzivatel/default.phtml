@@ -23,7 +23,7 @@
             <dt>funkce:</dt>
             <dd>{$Osoba->pozice}&nbsp;</dd>
         </dl>
-        <a href="{link :Spisovka:Uzivatel:default, 'id'=>$Osoba->osoba_id, 'upravit'=>'info'}">Upravit osobní údaje</a>
+        <a href="{link :Spisovka:Uzivatel:default, 'id'=>$Osoba->id, 'upravit'=>'info'}">Upravit osobní údaje</a>
         {/if}
     </div>
 
@@ -38,7 +38,7 @@
         {/if}
         <dl class="detail_item">
             <dt>Poslední přihlášení:</dt>
-            <dd>{if $Uzivatel->last_login}{$Uzivatel->last_login|edate}  z  {$Uzivatel->last_ip}{/if}&nbsp;</dd>
+            <dd>{if $Uzivatel->last_login}{$Uzivatel->last_login|edatetime}  z  {$Uzivatel->last_ip}{/if}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Role:</dt>

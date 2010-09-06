@@ -10,7 +10,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $this->template->dokument_id = $this->getParam('dok_id',null);
 
         $Subjekt = new Subjekt();
-        $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
+        $args = array( 'where'=>array("stav=1") );
         $seznam = $Subjekt->seznam($args);
         $this->template->seznam = $seznam;
     }
@@ -167,8 +167,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
         $DokumentSubjekt = new DokumentSubjekt();
         $seznam = $DokumentSubjekt->subjekty($dokument_id);
-        if ( isset($seznam[@$subjekt->subjekt_id]) ) {
-            $smer_default = $seznam[@$subjekt->subjekt_id]->rezim_subjektu;
+        if ( isset($seznam[@$subjekt->id]) ) {
+            $smer_default = $seznam[@$subjekt->id]->rezim_subjektu;
         } else {
             $smer_default = null;
         }
@@ -180,9 +180,9 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $form1->getElementPrototype()->id('subjekt-vytvorit');
         
         $form1->addHidden('subjekt_id')
-                ->setValue(@$subjekt->subjekt_id);
+                ->setValue(@$subjekt->id);
         $form1->addHidden('subjekt_version')
-                ->setValue(@$subjekt->subjekt_version);
+                ->setValue(@$subjekt->version);
         $form1->addHidden('dokument_id')
                 ->setValue(@$dokument_id);
         
@@ -277,7 +277,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $Subjekt = new Subjekt();
         $data['stav'] = 1;
         $data['date_created'] = new DateTime();
-        $data['user_added'] = Environment::getUser()->getIdentity()->user_id;
+        $data['user_added'] = Environment::getUser()->getIdentity()->id;
 
         try {
             $subjekt_id = $Subjekt->insert_version($data, $subjekt_id);
@@ -424,10 +424,10 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $stav_select = Subjekt::stav();
 
         $form1 = new AppForm();
-        $form1->addHidden('subjekt_id')
-                ->setValue(@$subjekt->subjekt_id);
-        $form1->addHidden('subjekt_version')
-                ->setValue(@$subjekt->subjekt_version);
+        $form1->addHidden('id')
+                ->setValue(@$subjekt->id);
+        $form1->addHidden('version')
+                ->setValue(@$subjekt->version);
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select);
         $form1->addSubmit('zmenit_stav', 'Změnit stav')
                  ->onClick[] = array($this, 'zmenitStavClicked');
@@ -450,8 +450,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $subjekt_id = $data['subjekt_id'];
-        $subjekt_version = $data['subjekt_version'];
+        $subjekt_id = $data['id'];
+        $subjekt_version = $data['version'];
 
         $Subjekt = new Subjekt();
 

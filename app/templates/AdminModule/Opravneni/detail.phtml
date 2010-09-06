@@ -23,7 +23,7 @@
             <dt>Popis role:</dt>
             <dd>{!$Role->note|enl2br}&nbsp;</dd>
         </dl>
-        {access :Admin:Opravneni:detail}<a href="{link :Admin:Opravneni:detail, 'id'=>$Role->role_id, 'upravit'=>'info'}">Upravit</a>{/access}
+        {access :Admin:Opravneni:detail}<a href="{link :Admin:Opravneni:detail, 'id'=>$Role->id, 'upravit'=>'info'}">Upravit</a>{/access}
         {/if}
     </div>
 

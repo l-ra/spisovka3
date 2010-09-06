@@ -25,7 +25,7 @@ class DokumentOdeslani extends BaseModel
 
         $res = $this->fetchAll(array('datum_odeslani'),
                                array( array('dokument_id=%i',$dokument_id) ))
-                        ->fetchAssoc('dokument_odeslani_id');
+                        ->fetchAssoc('id');
 
         if ( count($res)>0 ) {
             $Subjekt = new Subjekt();
@@ -53,7 +53,7 @@ class DokumentOdeslani extends BaseModel
         //$row['zpusob_odeslani'] = $typ;
         //row['epodatelna_id'] = $typ;
         //$row['datum_odeslani'] = $typ;
-        $row['user_id'] = Environment::getUser()->getIdentity()->user_id;
+        $row['user_id'] = Environment::getUser()->getIdentity()->id;
         $row['user_info'] = serialize(Environment::getUser()->getIdentity()->identity);
         $row['date_created'] = new DateTime();
 

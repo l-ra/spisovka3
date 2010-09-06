@@ -55,19 +55,19 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         //Debug::dump($user);
 
 
-        $osoba_id = $user->identity->osoba_id;
+        $osoba_id = $user->identity->id;
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
 
         // Zmena osobnich udaju
         $this->template->FormUpravit = $this->getParam('upravit',null);
 
-        $uzivatel = $User->getUser($user->user_id);
+        $uzivatel = $User->getUser($user->id);
         $this->template->Uzivatel = $uzivatel;
 
         // Zmena hesla
         $this->template->ZmenaHesla = $this->getParam('zmenitheslo',null);
 
-        $role = $User->getRoles($uzivatel->user_id);
+        $role = $User->getRoles($uzivatel->id);
         $this->template->Role = $role;
 
     }
@@ -85,7 +85,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
         $form1 = new AppForm();
         $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->osoba_id);
+                ->setValue(@$osoba->id);
         $form1->addText('jmeno', 'Jméno:', 50, 150)
                 ->setValue(@$osoba->jmeno);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
@@ -130,7 +130,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $data['date_modified'] = new DateTime();
         unset($data['osoba_id']);
 
-        $Osoba->update($data,array('osoba_id = %i',$osoba_id));
+        $Osoba->update($data,array('id = %i',$osoba_id));
 
         $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl upraven.');
         $this->redirect('this');
@@ -184,7 +184,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $User = new UserModel();
         $user = Environment::getUser()->getIdentity();
 
-        if ( $User->zmenitHeslo($user->user_id, $data['heslo']) ) {
+        if ( $User->zmenitHeslo($user->id, $data['heslo']) ) {
             $zmeneno = 1;
         }
 

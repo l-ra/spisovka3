@@ -47,7 +47,7 @@
             <dt>Stav:</dt>
             <dd>{=Spis::stav($Spis->stav)}&nbsp;</dd>
         </dl>
-        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->spis_id, 'upravit'=>'info'}">Upravit</a>
+        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit</a>
     </div>
         {/if}
 
@@ -79,18 +79,18 @@
             <td class="cislo_jadnaci">
                 <span style="font-size: 8pt;">&nbsp;{$dok->jid}</span>
                 <br />
-                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
+                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
                    {$dok->cislo_jednaci}
                 </a></strong>
                 <br />
                 {if count($dok->spisy)>0}
                 {foreach $dok->spisy as $spis}
-                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->spis_id}">{$spis->nazev}</a><br />
+                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
                 {/foreach}
                 {/if}
             </td>
             <td class="vec">
-                <strong title="{$dok->popis}"><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
+                <strong title="{$dok->popis}"><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
                     {$dok->nazev}
                 </a></strong>
                 <br />

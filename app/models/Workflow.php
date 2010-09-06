@@ -4,7 +4,7 @@ class Workflow extends BaseModel
 {
 
     protected $name = 'workflow';
-    protected $primary = 'workflow_id';
+    protected $primary = 'id';
 
 
     public function dokument($dokument_id, $stav=null)
@@ -58,8 +58,8 @@ class Workflow extends BaseModel
             $user = Environment::getUser()->getIdentity();
 
             $UserModel = new UserModel();
-            $user_info = $UserModel->getUser($user->user_id, 1);
-            $org_info = $UserModel->getOrg($user->user_id);
+            $user_info = $UserModel->getUser($user->id, 1);
+            $org_info = $UserModel->getOrg($user->id);
             if ( is_array($org_info) ) {
                 $org_info = current($org_info);
             }
@@ -69,13 +69,13 @@ class Workflow extends BaseModel
             $data['dokument_version'] = 1;
             $data['stav_dokumentu'] = 1;
             $data['aktivni'] = 1;
-            $data['prideleno'] = $user->user_id;
+            $data['prideleno'] = $user->id;
             $data['prideleno_info'] = serialize($user_info->identity);
             $data['orgjednotka_id'] = @$org_info->orgjednotka_id;
             $data['orgjednotka_info'] = @serialize($org_info);
             $data['stav_osoby'] = 1;
             $data['date'] = new DateTime();
-            $data['user_id'] = $user->user_id;
+            $data['user_id'] = $user->id;
             $data['user_info'] = serialize($user_info->identity);
             $data['poznamka'] = $poznamka;
 
@@ -112,11 +112,11 @@ class Workflow extends BaseModel
 
             $UserModel = new UserModel();
             $user = Environment::getUser()->getIdentity();
-            $user_info = $UserModel->getUser($user->user_id, 1);
+            $user_info = $UserModel->getUser($user->id, 1);
 
             $data = array();
-            $data['dokument_id'] = $dokument_info->dokument_id;
-            $data['dokument_version'] = $dokument_info->dokument_version;
+            $data['dokument_id'] = $dokument_info->id;
+            $data['dokument_version'] = $dokument_info->version;
             $data['stav_dokumentu'] = 2;
             $data['aktivni'] = 1;
 
@@ -124,7 +124,7 @@ class Workflow extends BaseModel
 
             if ( $user_id ) {
                 $prideleno_info = $UserModel->getUser($user_id, 1);
-                $data['prideleno'] = $prideleno_info->user_id;
+                $data['prideleno'] = $prideleno_info->id;
                 $data['prideleno_info'] = serialize($prideleno_info->identity);
 
                 $log = 'Dokument předán zaměstnanci '. Osoba::displayName($prideleno_info->identity) .'.';
@@ -149,7 +149,7 @@ class Workflow extends BaseModel
 
             $data['date'] = new DateTime();
             $data['date_predani'] = new DateTime();
-            $data['user_id'] = $user->user_id;
+            $data['user_id'] = $user->id;
             $data['user_info'] = serialize($user_info->identity);
             $data['poznamka'] = $poznamka;
 
@@ -236,16 +236,16 @@ class Workflow extends BaseModel
 
                     $UserModel = new UserModel();
                     $user = Environment::getUser()->getIdentity();
-                    $user_info = $UserModel->getUser($user->user_id, 1);
+                    $user_info = $UserModel->getUser($user->id, 1);
 
                     $data = array();
                     $data['stav_osoby'] = 1;
                     $data['date'] = new DateTime();
-                    $data['user_id'] = $user->user_id;
+                    $data['user_id'] = $user->id;
                     $data['user_info'] = serialize($user_info->identity);
                     $data['aktivni'] = 1;
 
-                    $where = array('workflow_id=%i',$predan->workflow_id);
+                    $where = array('id=%i',$predan->id);
                     $result_update = $this->update($data,$where);
 
                     //if ($transaction)
@@ -307,11 +307,11 @@ class Workflow extends BaseModel
 
                     $UserModel = new UserModel();
                     $user = Environment::getUser()->getIdentity();
-                    $user_info = $UserModel->getUser($user->user_id, 1);
+                    $user_info = $UserModel->getUser($user->id, 1);
 
                     $data = array();
-                    $data['dokument_id'] = $dokument_info->dokument_id;
-                    $data['dokument_version'] = $dokument_info->dokument_version;
+                    $data['dokument_id'] = $dokument_info->id;
+                    $data['dokument_version'] = $dokument_info->version;
                     $data['stav_dokumentu'] = 3;
                     $data['aktivni'] = 1;
 
@@ -319,7 +319,7 @@ class Workflow extends BaseModel
 
                     if ( $user_id ) {
                         $prideleno_info = $UserModel->getUser($user_id, 1);
-                        $data['prideleno'] = $prideleno_info->user_id;
+                        $data['prideleno'] = $prideleno_info->id;
                         $data['prideleno_info'] = serialize($prideleno_info->identity);
                     } else {
                         $data['prideleno'] = null;
@@ -337,7 +337,7 @@ class Workflow extends BaseModel
                     }
 
                     $data['date'] = new DateTime();
-                    $data['user_id'] = $user->user_id;
+                    $data['user_id'] = $user->id;
                     $data['user_info'] = serialize($user_info->identity);
                     $data['poznamka'] = $predan->poznamka;
 
@@ -389,11 +389,11 @@ class Workflow extends BaseModel
 
                     $UserModel = new UserModel();
                     $user = Environment::getUser()->getIdentity();
-                    $user_info = $UserModel->getUser($user->user_id, 1);
+                    $user_info = $UserModel->getUser($user->id, 1);
 
                     $data = array();
-                    $data['dokument_id'] = $dokument_info->dokument_id;
-                    $data['dokument_version'] = $dokument_info->dokument_version;
+                    $data['dokument_id'] = $dokument_info->id;
+                    $data['dokument_version'] = $dokument_info->version;
                     $data['stav_dokumentu'] = 4;
 
                     $data['stav_osoby'] = 1;
@@ -401,7 +401,7 @@ class Workflow extends BaseModel
 
                     if ( $user_id ) {
                         $prideleno_info = $UserModel->getUser($user_id, 1);
-                        $data['prideleno'] = $prideleno_info->user_id;
+                        $data['prideleno'] = $prideleno_info->id;
                         $data['prideleno_info'] = serialize($prideleno_info->identity);
                     } else {
                         $data['prideleno'] = null;
@@ -419,7 +419,7 @@ class Workflow extends BaseModel
                     }
 
                     $data['date'] = new DateTime();
-                    $data['user_id'] = $user->user_id;
+                    $data['user_id'] = $user->id;
                     $data['user_info'] = serialize($user_info->identity);
                     $data['poznamka'] = $predan->poznamka;
 
@@ -461,7 +461,7 @@ class Workflow extends BaseModel
         $param = array();
 
         if ( is_null($user_id) ) {
-            $user_id = Environment::getUser()->getIdentity()->user_id;
+            $user_id = Environment::getUser()->getIdentity()->id;
         }
 
         $param['where'] = array( 
@@ -501,7 +501,7 @@ class Workflow extends BaseModel
         $param = array();
 
         if ( is_null($user_id) ) {
-            $user_id = Environment::getUser()->getIdentity()->user_id;
+            $user_id = Environment::getUser()->getIdentity()->id;
         }
 
 

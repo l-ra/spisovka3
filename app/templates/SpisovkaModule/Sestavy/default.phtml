@@ -11,20 +11,20 @@
                 <img src="{$baseUri}images/icons/book.png" alt="book.png" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Spisovka:Sestavy:detail, id => $sestava->sestava_id}" onclick="return filtrSestavy(this);">{$sestava->nazev}</a>&nbsp;
+                <a href="{link :Spisovka:Sestavy:detail, id => $sestava->id}" onclick="return filtrSestavy(this);">{$sestava->nazev}</a>&nbsp;
                 <div class="info">
                     {$sestava->popis}
                 </div>
             </td>
             <td class="icon-view">
-                <a href="{link :Spisovka:Sestavy:detail, id => $sestava->sestava_id}" onclick="return filtrSestavy(this);" title="Zobrazit sestavu">
+                <a href="{link :Spisovka:Sestavy:detail, id => $sestava->id}" onclick="return filtrSestavy(this);" title="Zobrazit sestavu">
                     <img src="{$baseUri}images/icons/list.png" alt="list.png" width="32" height="32" />
                 </a>
-                <a href="{link :Spisovka:Sestavy:tisk, id => $sestava->sestava_id}" onclick="return filtrSestavy(this);" title="Zobrazit a vytisknout sestavu">
+                <a href="{link :Spisovka:Sestavy:tisk, id => $sestava->id}" onclick="return filtrSestavy(this);" title="Zobrazit a vytisknout sestavu">
                     <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
                 </a>
                 {if 0}
-                <a href="{link :Spisovka:Sestavy:pdf, id => $sestava->sestava_id}" onclick="return filtrSestavy(this);" title="Vytisknout sestavu do PDF" >
+                <a href="{link :Spisovka:Sestavy:pdf, id => $sestava->id}" onclick="return filtrSestavy(this);" title="Vytisknout sestavu do PDF" >
                     <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
                 </a>
                 {/if}
@@ -53,23 +53,23 @@
                 <img src="{$baseUri}images/icons/book.png" alt="book.png" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Spisovka:Sestavy:detail, id => $sestava->sestava_id}" {!$filtr}>{$sestava->nazev}</a>&nbsp;
+                <a href="{link :Spisovka:Sestavy:detail, id => $sestava->id}" {!$filtr}>{$sestava->nazev}</a>&nbsp;
                 <div class="info">
                     {$sestava->popis}
                 </div>
             </td>
             <td class="icon-view">
-                <a href="{link :Spisovka:Sestavy:detail, id => $sestava->sestava_id}" {!$filtr} title="Zobrazit sestavu">
+                <a href="{link :Spisovka:Sestavy:detail, id => $sestava->id}" {!$filtr} title="Zobrazit sestavu">
                     <img src="{$baseUri}images/icons/list.png" alt="list.png" width="32" height="32" />
                 </a>
-                <a href="{link :Spisovka:Sestavy:tisk, id => $sestava->sestava_id}" {!$filtr} title="Zobrazit a vytisknout sestavu">
+                <a href="{link :Spisovka:Sestavy:tisk, id => $sestava->id}" {!$filtr} title="Zobrazit a vytisknout sestavu">
                     <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
                 </a>
                 {if 0}
-                <a href="{link :Spisovka:Sestavy:pdf, id => $sestava->sestava_id}" {!$filtr} title="Vytisknout sestavu do PDF">
+                <a href="{link :Spisovka:Sestavy:pdf, id => $sestava->id}" {!$filtr} title="Vytisknout sestavu do PDF">
                     <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
                 </a>{/if}
-                <a href="{link :Spisovka:Sestavy:upravit, id => $sestava->sestava_id}" title="Upravit vlastnosti sestavy">
+                <a href="{link :Spisovka:Sestavy:upravit, id => $sestava->id}" title="Upravit vlastnosti sestavy">
                     <img src="{$baseUri}images/icons/edit.png" alt="edit.png" width="32" height="32" />
                 </a>
             </td>

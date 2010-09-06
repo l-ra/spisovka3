@@ -4,7 +4,7 @@ class RoleModel extends BaseModel
 {
 
     protected $name = 'user_role';
-    protected $primary = 'role_id';
+    protected $primary = 'id';
 
 
     public function seznam($simple=0,$sql=null) {
@@ -29,7 +29,7 @@ class RoleModel extends BaseModel
 
         $query = dibi::query(
             'SELECT r.*,pr.name parent_name FROM %n r', $this->name,
-            'LEFT JOIN '. $this->name .' pr ON pr.role_id=r.parent_id',
+            'LEFT JOIN '. $this->name .' pr ON pr.id=r.parent_id',
             '%ex', (isset($where) ? array('WHERE %and', $where) : NULL),
             'ORDER BY r.fixed DESC, r.order DESC, r.name'
         );
@@ -39,7 +39,7 @@ class RoleModel extends BaseModel
             $tmp = array();
             $tmp[0] = '(nedědí)';
             foreach ($rows as $r) {
-                $tmp[ $r->role_id ] = $r->name;
+                $tmp[ $r->id ] = $r->name;
             }
             return $tmp;
         } else {
@@ -51,8 +51,8 @@ class RoleModel extends BaseModel
 
         $query = dibi::query(
             'SELECT r.*,pr.name parent_name FROM %n r', $this->name,
-            'LEFT JOIN '. $this->name .' pr ON pr.role_id=r.parent_id',
-            'WHERE r.role_id=%i', $role_id
+            'LEFT JOIN '. $this->name .' pr ON pr.id=r.parent_id',
+            'WHERE r.id=%i', $role_id
         );
 
         return $query->fetch();

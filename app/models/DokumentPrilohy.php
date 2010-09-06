@@ -25,11 +25,11 @@ class DokumentPrilohy extends BaseModel
 
         $sql = array(
             'distinct'=>null,
-            'from' => array($this->name => 'ds'),
+            'from' => array($this->name => 'df'),
             'cols' => null,
             'leftJoin' => array(
                 'from' => array($this->tb_file => 'f'),
-                'on' => array('f.file_id=ds.file_id'),
+                'on' => array('f.id=df.file_id'),
                 'cols' => array('*')
             ),
             'order_by' => array('s.nazev')
@@ -37,7 +37,7 @@ class DokumentPrilohy extends BaseModel
 
         $sql['where'] = array();
         $sql['where'][] = array('dokument_id=%i',$dokument_id);
-        $sql['where'][] = array('ds.active=1');
+        $sql['where'][] = array('df.active=1');
         if ( !is_null($dokument_version) ) {
             $param['where'][] = array('dokument_version=%i',$dokument_version);
         }

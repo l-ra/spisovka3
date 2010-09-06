@@ -269,8 +269,9 @@ img {
 }
 
 label.required {
-    color: #03406A;
+    color: #080808;
     font-weight: bold;
+    text-decoration: underline;
 }
 
 /* ***************************************************************** */

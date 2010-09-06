@@ -23,7 +23,7 @@
             <dt>funkce:</dt>
             <dd>{$Osoba->pozice}&nbsp;</dd>
         </dl>
-        <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'upravit'=>'info'}">Upravit</a>
+        <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'upravit'=>'info'}">Upravit</a>
         {/if}
     </div>
 
@@ -36,7 +36,7 @@
     <div class="detail_blok">
         <div class="detail_hlavicka">Uživatelské účty</div>
         <br />
-        <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'new_user'=>'1'}">Přidat účet</a>
+        <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'new_user'=>'1'}">Přidat účet</a>
 
         {if isset($vytvoritUcet)}
         {control newUserForm}
@@ -48,34 +48,34 @@
             <dt>Uživatelské jméno:</dt>
             <dd>{$u->username}&nbsp;</dd>
         </dl>
-        {if ($ZmenaHesla==$u->user_id && !is_null($ZmenaHesla))}
+        {if ($ZmenaHesla==$u->id && !is_null($ZmenaHesla))}
         {control userForm}
         {/if}
         <dl class="detail_item">
             <dt>Poslední přihlášení:</dt>
-            <dd>{if $u->last_login}{$u->last_login|date}  z  {$u->last_ip}{/if}&nbsp;</dd>
+            <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Role:</dt>
             <dd>
-                {if count($Role[$u->user_id])>0}
-                {if $RoleUpravit == $u->user_id}
+                {if count($Role[$u->id])>0}
+                {if $RoleUpravit == $u->id}
                     {$roleForm->render('begin')}
 
-                    {foreach $Role[$u->user_id] as $r}
-                        {$roleForm['role'.$r->role_id.'-user_role']->control} {$r->name}<br />
+                    {foreach $Role[$u->id] as $r}
+                        {$roleForm['role'.$r->id.'-user_role']->control} {$r->name}<br />
                     {/foreach}
                     {$roleForm['add_role']->control} přidat roli: {$roleForm['role']->control}
                     <br /> <br />
                     {$roleForm['zmenitRole']->control} {$roleForm['storno']->control}
                     {$roleForm->render('end')}
                 {else}
-                    {foreach $Role[$u->user_id] as $r}
+                    {foreach $Role[$u->id] as $r}
                         {$r->name}<br />
                     {/foreach}
                 {/if}
                 {else}
-                {if $RoleUpravit == $u->user_id}
+                {if $RoleUpravit == $u->id}
                     {$roleForm->render('begin')}
                     {$roleForm['add_role']->control} přidat roli: {$roleForm['role']->control}
                     <br /> <br />
@@ -92,11 +92,11 @@
         <dl class="detail_item">
             <dt>&nbsp;</dt>
             <dd>
-                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'user'=>$u->user_id}">Změnit heslo</a>
+                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'user'=>$u->id}">Změnit heslo</a>
                 &nbsp;&nbsp;&nbsp;
-                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'odebrat'=>$u->user_id}">Odebrat účet</a>
+                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'odebrat'=>$u->id}">Odebrat účet</a>
                 &nbsp;&nbsp;&nbsp;
-                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->osoba_id, 'role'=>$u->user_id}">Změnit role</a>
+                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'role'=>$u->id}">Změnit role</a>
 
             </dd>
         </dl>

@@ -28,7 +28,7 @@
             <dt>Informace:</dt>
             <dd>{!$OrgJednotka->note|enl2br}&nbsp;</dd>
         </dl>
-        <a href="{link :Admin:Orgjednotky:detail, 'id'=>$OrgJednotka->orgjednotka_id, 'upravit'=>'info'}">Upravit</a>
+        <a href="{link :Admin:Orgjednotky:detail, 'id'=>$OrgJednotka->id, 'upravit'=>'info'}">Upravit</a>
         {/if}
     </div>
 
@@ -39,7 +39,7 @@
         {foreach $SeznamRole as $role}
         <dl class="detail_item">
             <dt>{$role->name}</dt>
-            <dd>{$roleForm['role'.$role->role_id.'-org_role']->control}</dd>
+            <dd>{$roleForm['role'.$role->id.'-org_role']->control}</dd>
         </dl>
         {/foreach}
         <dl class="detail_item">
@@ -63,7 +63,7 @@
         {else}
         <div class="prazdno">Tato organizační jednotka nemá předělené žádné své role.</div>
         {/if}
-        <a href="{link :Admin:Orgjednotky:detail, 'id'=>$OrgJednotka->orgjednotka_id, 'upravit'=>'role'}">Upravit organizační strukturu</a>
+        <a href="{link :Admin:Orgjednotky:detail, 'id'=>$OrgJednotka->id, 'upravit'=>'role'}">Upravit organizační strukturu</a>
 
         {/if}
     </div>

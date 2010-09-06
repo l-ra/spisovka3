@@ -1,6 +1,5 @@
 {block title}Nový spis / věcná skupina{/block}
 @{block javascript}
-	<script type="text/javascript" src="{$baseUri}js/webtoolkit.aim.js"></script>
 	<script type="text/javascript">
 
                 function vybratSpisovyZnak() {
@@ -13,9 +12,9 @@
                     spisz_udalost['0'] = '';
                 {if count($SpisoveZnaky)>0}
                 {foreach $SpisoveZnaky as $sznak}
-                    spisz_skart[{$sznak->spisznak_id}] = {$sznak->skartacni_znak};
-                    spisz_lhuta[{$sznak->spisznak_id}] = {$sznak->skartacni_lhuta};
-                    spisz_udalost[{$sznak->spisznak_id}] = {=SpisovyZnak::spousteci_udalost($sznak->spousteci_udalost)};
+                    spisz_skart[{$sznak->id}] = {$sznak->skartacni_znak};
+                    spisz_lhuta[{$sznak->id}] = {$sznak->skartacni_lhuta};
+                    spisz_udalost[{$sznak->id}] = {=SpisovyZnak::spousteci_udalost($sznak->spousteci_udalost)};
                 {/foreach}
                 {/if}
 

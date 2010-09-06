@@ -77,8 +77,8 @@ class Admin_SpisyPresenter extends BasePresenter
 
 
         $spisy = $Spisy->seznam(null,1);
-        $spisy_pod = $Spisy->seznam_pod(@$spis->spis_id);
-        $spisy_pod[] = @$spis->spis_id;
+        $spisy_pod = $Spisy->seznam_pod(@$spis->id);
+        $spisy_pod[] = @$spis->id;
         foreach ($spisy_pod as $sp) {
             if ( array_key_exists($sp, $spisy) ) {
                 unset( $spisy[ $sp ] );
@@ -86,8 +86,8 @@ class Admin_SpisyPresenter extends BasePresenter
         }
 
         $form1 = new AppForm();
-        $form1->addHidden('spis_id')
-                ->setValue(@$spis->spis_id);
+        $form1->addHidden('id')
+                ->setValue(@$spis->id);
         $form1->addHidden('spis_parent_old')
                 ->setValue(@$spis->spis_parent);
 
@@ -138,10 +138,10 @@ class Admin_SpisyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $spis_id = $data['spis_id'];
-        unset($data['spis_id']);
+        $spis_id = $data['id'];
+        unset($data['id']);
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Environment::getUser()->getIdentity()->user_id;
+        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
 
 
         $Spisy = new Spis();
@@ -160,7 +160,7 @@ class Admin_SpisyPresenter extends BasePresenter
     public function stornoClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $spis_id = $data['spis_id'];
+        $spis_id = $data['id'];
         $this->redirect('this',array('id'=>$spis_id));
     }
 

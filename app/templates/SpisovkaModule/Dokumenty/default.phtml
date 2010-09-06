@@ -34,22 +34,22 @@
                 <img src="{$baseUri}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
                 <img src="{$baseUri}images/icons/typdok{$dok->typ_dokumentu->typ}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="24" height="16" />
             </td>
-            <td class="prijato">
+            <td class="prijato" title="{$dok->datum_vzniku|edatetime}">
                 {$dok->datum_vzniku|edate}
             </td>
             <td class="cislo_jadnaci">
-                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
+                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
                    {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'} / {$dok->poradi}{/if}
                 </a></strong>
                 <div class="small">&nbsp;{$dok->jid}</div>
                 {if count($dok->spisy)>0}
                 {foreach $dok->spisy as $spis}
-                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->spis_id}">{$spis->nazev}</a><br />
+                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
                 {/foreach}
                 {/if}
             </td>
             <td class="vec">
-                <strong title="{$dok->popis}"><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">
+                <strong title="{$dok->popis}"><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
                     {$dok->nazev}
                 </a></strong>
                 <br />
@@ -79,7 +79,7 @@
             <td class="stav">
                 nový
                 <br />
-                {$dok->prideleno->date|edate}
+                <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->predano) }
             <td class="prideleno">
@@ -94,7 +94,7 @@
             <td class="stav">
                 předáno
                 <br />
-                {$dok->predano->date_predani|edate}
+                <span title="{$dok->predano->date_predani|edatetime}">{$dok->predano->date_predani|edate}</span>
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->prideleno) }
             <td class="prideleno">
@@ -109,7 +109,7 @@
             <td class="stav">
                 přiděleno
                 <br />
-                {$dok->prideleno->date|edate}
+                <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
             </td>
             {elseif $dok->stav_dokumentu == 3 }
             <td class="prideleno">
@@ -120,7 +120,7 @@
             <td class="stav">
                 vyřizuje se
                 <br />
-                {$dok->prideleno->date|edate}
+                <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
             </td>
             {elseif $dok->stav_dokumentu == 4 }
             <td class="prideleno">
@@ -131,7 +131,7 @@
             <td class="stav">
                 vyřízeno
                 <br />
-                {$dok->datum_vyrizeni|edate}
+                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
             {else}
             <td class="prideleno">

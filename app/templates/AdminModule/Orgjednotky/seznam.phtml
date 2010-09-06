@@ -18,7 +18,7 @@
         {foreach $seznam as $org}
         <tr>
             <td style="width:100px;">{$org->ciselna_rada}</td>
-            <td><a href="{link :Admin:Orgjednotky:detail, 'id'=>$org->orgjednotka_id}">{$org->zkraceny_nazev}</a></td>
+            <td><a href="{link :Admin:Orgjednotky:detail, 'id'=>$org->id}">{$org->zkraceny_nazev}</a></td>
         </tr>
         {/foreach}
     </table>

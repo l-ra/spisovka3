@@ -71,8 +71,8 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         $spisznak_seznam = $SpisovyZnak->seznam(null,1);
         $spisznak_seznam[0] = '(hlavní větev)';
-        $spisznak_seznam_pod = $SpisovyZnak->seznam_pod(@$spisznak->spisznak_id);
-        $spisznak_seznam_pod[] = @$spisznak->spisznak_id;
+        $spisznak_seznam_pod = $SpisovyZnak->seznam_pod(@$spisznak->id);
+        $spisznak_seznam_pod[] = @$spisznak->id;
         foreach ($spisznak_seznam_pod as $sp) {
             if ( array_key_exists($sp, $spisznak_seznam) ) {
                 unset( $spisznak_seznam[ $sp ] );
@@ -80,8 +80,8 @@ class Admin_SpisznakPresenter extends BasePresenter
         }
 
         $form1 = new AppForm();
-        $form1->addHidden('spisznak_id')
-                ->setValue(@$spisznak->spisznak_id);
+        $form1->addHidden('id')
+                ->setValue(@$spisznak->id);
         $form1->addHidden('spisznak_parent_old')
                 ->setValue(@$spisznak->spisznak_parent);
 
@@ -124,10 +124,10 @@ class Admin_SpisznakPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $spisznak_id = $data['spisznak_id'];
-        unset($data['spisznak_id']);
+        $spisznak_id = $data['id'];
+        unset($data['id']);
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Environment::getUser()->getIdentity()->user_id;
+        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
 
 
         $SpisovyZnak = new SpisovyZnak();

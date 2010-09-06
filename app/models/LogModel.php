@@ -86,7 +86,7 @@ class LogModel extends BaseModel {
         $row['poznamka'] = $poznamka;
         
         $user = Environment::getUser()->getIdentity();
-        $row['user_id'] = $user->user_id;
+        $row['user_id'] = $user->id;
         $row['user_info'] = serialize($user->identity);
         $row['date'] = new DateTime();
 
@@ -100,7 +100,7 @@ class LogModel extends BaseModel {
         $res = dibi::query(
             'SELECT * FROM %n ld', $this->tb_logdokument,
             '%if', !is_null($dokument_id), 'WHERE %and', !is_null($dokument_id) ? array(array('ld.dokument_id=%i',$dokument_id)) : array(), '%end',
-            'ORDER BY ld.logdokument_id'
+            'ORDER BY ld.id'
         );
         return $res->fetchAll($offset, $limit);
 
@@ -128,9 +128,9 @@ class LogModel extends BaseModel {
 
         $res = dibi::query(
             'SELECT * FROM %n la', $this->tb_logaccess,
-            'LEFT JOIN %n',$this->tb_user,' u ON (u.user_id=la.user_id)',
+            'LEFT JOIN %n',$this->tb_user,' u ON (u.id=la.user_id)',
             '%if', !is_null($user_id), 'WHERE %and', !is_null($user_id) ? array('la.user_id=%i',$user_id) : array(), '%end',
-            'ORDER BY la.logaccess_id DESC'
+            'ORDER BY la.id DESC'
         );
         return $res->fetchAll($offset, $limit);
 

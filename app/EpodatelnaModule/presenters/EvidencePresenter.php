@@ -34,14 +34,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $cjednaci = $CJ->generuj(1);
 
         $data = array();
-        $data['cislojednaci_id'] = $cjednaci->cjednaci_id;
+        $data['cislojednaci_id'] = $cjednaci->id;
         $data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
         $data['podaci_denik'] = $cjednaci->podaci_denik;
         $data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
         $data['podaci_denik_rok'] = $cjednaci->rok;
 
 
-        $dokument = $Dokument->update($data, array(array('dokument_id=%i',$dokument_id)));//   array('dokument_id'=>0);// $Dokument->ulozit($data);
+        $dokument = $Dokument->update($data, array(array('id=%i',$dokument_id)));//   array('dokument_id'=>0);// $Dokument->ulozit($data);
         $this->flashMessage('číslo jednací přiděleno');
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
 
@@ -137,8 +137,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = array(
                 array('stav=%i',0),
-                array('typ_dokumentu<>%i',4),
-                array('user_created=%i',Environment::getUser()->getIdentity()->user_id)
+                array('typ_dokumentu_id<>%i',4),
+                array('user_created=%i',Environment::getUser()->getIdentity()->id)
         );
         $args_rozd['order'] = array('date_created'=>'DESC');
 
@@ -150,16 +150,16 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $DokumentSubjekt = new DokumentSubjekt();
             $DokumentPrilohy = new DokumentPrilohy();
 
-            $spisy = $DokumentSpis->spisy($dokument->dokument_id);
+            $spisy = $DokumentSpis->spisy($dokument->id);
             $this->template->Spisy = $spisy;
 
-            $subjekty = $DokumentSubjekt->subjekty($dokument->dokument_id);
+            $subjekty = $DokumentSubjekt->subjekty($dokument->id);
             $this->template->Subjekty = $subjekty;
 
             if ( $this->typ_evidence == 'priorace' ) {
                 // Nacteni souvisejicicho dokumentu
                 $Souvisejici = new SouvisejiciDokument();
-                $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument->dokument_id);
+                $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument->id);
             }
 
         } else {
@@ -167,12 +167,12 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 "nazev" => '',
                 "popis" => "",
                 "stav" => 0,
-                "typ_dokumentu" => "1",
+                "typ_dokumentu_id" => "1",
                 "cislo_jednaci_odesilatele" => "",
                 "datum_vzniku" => '',
                 "lhuta" => "30",
                 "poznamka" => "",
-                "zmocneni" => "0"
+                "zmocneni_id" => "0"
             );
             $dokument = $Dokumenty->ulozit($pred_priprava);
 
@@ -185,7 +185,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         }
 
         $UserModel = new UserModel();
-        $user = $UserModel->getUser(Environment::getUser()->getIdentity()->user_id, 1);
+        $user = $UserModel->getUser(Environment::getUser()->getIdentity()->id, 1);
         $this->template->Prideleno = Osoba::displayName($user->identity);
 
         $CJ = new CisloJednaci();
@@ -240,7 +240,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
 
         if( isset($this->template->Dok) ) {
-            $dokument_id = isset($this->template->Dok->dokument_id)?$this->template->Dok->dokument_id:0;
+            $dokument_id = isset($this->template->Dok->id)?$this->template->Dok->id:0;
         } else {
             $dokument_id = 0;
         }
@@ -263,7 +263,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addHidden('dokument_id')
                 ->setValue($dokument_id);
         $form->addHidden('epodatelna_id')
-                ->setValue(@$zprava->epodatelna_id);
+                ->setValue(@$zprava->id);
 
         $form->addHidden('odpoved')
                 ->setValue($this->odpoved);
@@ -282,29 +282,25 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         if ( !empty($zprava->email_signature) ) {
             foreach ($typ_dokumentu_extra as $tde) {
                 if ( $tde->typ == 1 && $tde->smer == 0 ) {
-                    $id_tde = $tde->dokument_typ_id;
+                    $id_tde = $tde->id;
                     break;
                 }
             }
-            $form->addSelect('typ_dokumentu', 'Typ Dokumentu:', $typ_dokumentu)
+            $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu)
                     ->setValue($id_tde);
         } else if ( !empty($zprava->isds_signature) ) {
             foreach ($typ_dokumentu_extra as $tde) {
                 if ( $tde->typ == 2 && $tde->smer == 0 ) {
-                    $id_tde = $tde->dokument_typ_id;
+                    $id_tde = $tde->id;
                     break;
                 }
             }
-            $form->addSelect('typ_dokumentu', 'Typ Dokumentu:', $typ_dokumentu)
+            $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu)
                     ->setValue($id_tde);
         } else {
-            $form->addSelect('typ_dokumentu', 'Typ Dokumentu:', $typ_dokumentu)
+            $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu)
                     ->setValue(1);
         }
-
-
-
-
 
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$original->zprava['cislo_jednaci_odesilatele']);
@@ -388,7 +384,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
 
             $data['jid'] = $cjednaci->app_id.'-ESS-'.$dokument_id;
-            $data['cislojednaci_id'] = $cjednaci->cjednaci_id;
+            $data['cislojednaci_id'] = $cjednaci->id;
             $data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
             $data['podaci_denik'] = $cjednaci->podaci_denik;
             $data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
@@ -423,7 +419,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         'stav'=>'10',
                         'stav_info'=>'Zpráva zaevidována ve spisové službě jako '.$dokument->cislo_jednaci
                     );
-                $this->Epodatelna->update($info, array( array('epodatelna_id=%i',$epodatelna_id) ));
+                $this->Epodatelna->update($info, array( array('id=%i',$epodatelna_id) ));
 
 
                 // Vytvoreni cyklu
@@ -478,7 +474,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             if ( $filep = $UploadFile->uploadDokumentSource($res_data, $data) ) {
                 // zapiseme i do
-                $DokumentFile->pripojit($dokument_id, $filep->file_id);
+                $DokumentFile->pripojit($dokument_id, $filep->id);
             } else {
                 // false
             }
@@ -503,7 +499,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $source = fread($fp, filesize($file['file']) );
                     if ( $file = $UploadFile->uploadDokumentSource($source, $data) ) {
                         // zapiseme i do
-                        $DokumentFile->pripojit($dokument_id, $file->file_id);
+                        $DokumentFile->pripojit($dokument_id, $file->id);
 
                     } else {
                         // false
@@ -548,7 +544,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             if ( $filep = $UploadFile->uploadDokumentSource($res, $data) ) {
                 // zapiseme i do
-                $DokumentFile->pripojit($dokument_id, $filep->file_id);
+                $DokumentFile->pripojit($dokument_id, $filep->id);
             } else {
                 // false
             }
@@ -572,7 +568,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                 if ( $filep = $UploadFile->uploadDokumentSource($file['file'], $data) ) {
                      // zapiseme i do
-                     $DokumentFile->pripojit($dokument_id, $filep->file_id);
+                     $DokumentFile->pripojit($dokument_id, $filep->id);
                 } else {
                         // false
                 }
@@ -588,7 +584,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
         $dokument_id = $data['dokument_id'];
-        $dokument_version = $data['dokument_version'];
+        //$dokument_version = $data['dokument_version'];
         $this->redirect('this',array('id'=>$dokument_id));
     }
 
@@ -597,97 +593,13 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $this->redirect(':Epodatelna:Default:nove');
     }
 
-
-    protected function createComponentSearchForm()
-    {
-
-        $hledat =  !is_null($this->hledat)?$this->hledat:'';
-
-        $form = new AppForm();
-        $form->addText('dotaz', 'Hledat:', 20, 100)
-                 ->setValue($hledat);
-
-        $form->addSubmit('hledat', 'Hledat')
-                 ->onClick[] = array($this, 'hledatSimpleClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
-
-    public function hledatSimpleClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $this->forward('this', array('hledat'=>$data['dotaz']));
-
-    }
-
-    protected function createComponentFiltrForm()
-    {
-
-        //$args = $Dokument->filtr('moje');
-        //$args = $Dokument->filtr('predane');
-        //$args = $Dokument->filtr('pracoval');
-        //$args = $Dokument->filtr('moje_nove');
-        //$args = $Dokument->filtr('vsichni_nove');
-        //$args = $Dokument->filtr('moje_vyrizuje');
-        //$args = $Dokument->filtr('vsichni_vyrizuji');
-
-        $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
-
-        $select = array(
-                    'Základní' => array(
-                        'moje'=>'Dokumenty na mé jméno',
-                        'predane'=>'Dokumenty, které mi byly předány',
-                        'pracoval'=>'Dokumenty, nakterých jsem kdy pracoval',
-                        'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
-                        'moje_vyrizuje'=>'Dokumenty, které vyřízuji',
-                        'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
-                        'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizuji',
-                        'vse'=>'Zobrazit všechny dokumenty'
-                    )
-                  );
-
-        $form = new AppForm();
-        $form->addSelect('filtr', 'Filtr:', $select)
-                ->setValue($filtr)
-                ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
-        $form->addSubmit('go_filtr', 'Filtrovat')
-                 ->setRendered(TRUE)
-                 ->onClick[] = array($this, 'filtrClicked');
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
-
-    public function filtrClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $this->forward('this', array('filtr'=>$data['filtr']));
-
-    }
-
     protected function createComponentEvidenceForm()
     {
 
         $epodatelna_id = $this->getParam('id',null);
 
         $form = new AppForm();
-        $form->addHidden('epodatelna_id')
+        $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addText('evidence', 'Evidence:', 50, 100)
                 ->addRule(Form::FILLED, 'Název evidence musí být vyplněno!');
@@ -718,11 +630,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     'stav'=>'11',
                     'stav_info'=>'Zpráva zaevidována v evidenci '.$data['evidence']
             );
-            $this->Epodatelna->update($info, array( array('epodatelna_id=%i',$data['epodatelna_id']) ));
+            $this->Epodatelna->update($info, array( array('id=%i',$data['id']) ));
             
 
             $this->flashMessage('Zpráva byla zaevidována v evidenci "'.$data['evidence'].'".');
-            $this->redirect(':Epodatelna:Default:detail',array('id'=>$data['epodatelna_id']));
+            $this->redirect(':Epodatelna:Default:detail',array('id'=>$data['id']));
             if (!$this->isAjax()) {
                 //$this->redirect('this');
             } else {
@@ -747,7 +659,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
 
         $form = new AppForm();
-        $form->addHidden('epodatelna_id')
+        $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
                 ->addRule(Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
@@ -791,7 +703,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     'stav'=>'100',
                     'stav_info'=>$data['stav_info']
             );
-            $this->Epodatelna->update($info, array( array('epodatelna_id=%i',$data['epodatelna_id']) ));
+            $this->Epodatelna->update($info, array( array('id=%i',$data['id']) ));
 
             // odeslat email odesilateli?
             if ( $data['upozornit'] == true ) {
@@ -821,7 +733,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
 
             $this->flashMessage('Zpráva byla odmítnuta.');
-            $this->redirect(':Epodatelna:Default:detail',array('id'=>$data['epodatelna_id']));
+            $this->redirect(':Epodatelna:Default:detail',array('id'=>$data['id']));
             if (!$this->isAjax()) {
                 //$this->redirect('this');
             } else {
@@ -844,7 +756,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
 
         $form = new AppForm();
-        $form->addHidden('epodatelna_id')
+        $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
                 ->addRule(Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
@@ -885,7 +797,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     'stav'=>'100',
                     'stav_info'=>$data['stav_info']
             );
-            $this->Epodatelna->update($info, array( array('epodatelna_id=%i',$data['epodatelna_id']) ));
+            $this->Epodatelna->update($info, array( array('id=%i',$data['id']) ));
 
             // odeslat email odesilateli?
             if ( $data['upozornit'] == true ) {
@@ -913,7 +825,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
 
             $this->flashMessage('Zpráva byla odmítnuta.');
-            $this->redirect(':Epodatelna:Default:detail',array('id'=>$data['epodatelna_id']));
+            $this->redirect(':Epodatelna:Default:detail',array('id'=>$data['id']));
             if (!$this->isAjax()) {
                 //$this->redirect('this');
             } else {

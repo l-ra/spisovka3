@@ -179,10 +179,10 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         $form1 = new AppForm();
         $form1->getElementPrototype()->id('epodsubjekt-vytvorit');
 
-        $form1->addHidden('subjekt_id')
-                ->setValue(@$subjekt->subjekt_id);
-        $form1->addHidden('subjekt_version')
-                ->setValue(@$subjekt->subjekt_version);
+        $form1->addHidden('id')
+                ->setValue(@$subjekt->id);
+        $form1->addHidden('version')
+                ->setValue(@$subjekt->version);
         $form1->addHidden('epodatelna_id')
                 ->setValue(@$this->template->epodatelna_id);
 
@@ -265,17 +265,17 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $subjekt_id = $data['subjekt_id'];
-        $subjekt_version = $data['subjekt_version'];
+        $subjekt_id = $data['id'];
+        $subjekt_version = $data['version'];
         //$dokument_id = $data['dokument_id'];
         $epodatelna_id = $data['epodatelna_id'];
         $smer = 0;
-        unset($data['subjekt_id'],$data['subjekt_version'],$data['epodatelna_id']);
+        unset($data['id'],$data['version'],$data['epodatelna_id']);
 
         $Subjekt = new Subjekt();
         $data['stav'] = 1;
         $data['date_created'] = new DateTime();
-        $data['user_added'] = Environment::getUser()->getIdentity()->user_id;
+        $data['user_added'] = Environment::getUser()->getIdentity()->id;
 
         try {
             $subjekt_id = $Subjekt->insert_version($data, $subjekt_id);
@@ -303,7 +303,7 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
     public function stornoClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $subjekt_id = $data['subjekt_id'];
+        $subjekt_id = $data['id'];
         $this->redirect('this',array('id'=>$subjekt_id));
     }
 
@@ -419,10 +419,10 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         $stav_select = Subjekt::stav();
 
         $form1 = new AppForm();
-        $form1->addHidden('subjekt_id')
-                ->setValue(@$subjekt->subjekt_id);
-        $form1->addHidden('subjekt_version')
-                ->setValue(@$subjekt->subjekt_version);
+        $form1->addHidden('id')
+                ->setValue(@$subjekt->id);
+        $form1->addHidden('version')
+                ->setValue(@$subjekt->version);
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select);
         $form1->addSubmit('zmenit_stav', 'Změnit stav')
                  ->onClick[] = array($this, 'zmenitStavClicked');
@@ -445,8 +445,8 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $subjekt_id = $data['subjekt_id'];
-        $subjekt_version = $data['subjekt_version'];
+        $subjekt_id = $data['id'];
+        $subjekt_version = $data['version'];
 
         $Subjekt = new Subjekt();
 

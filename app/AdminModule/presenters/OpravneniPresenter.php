@@ -66,8 +66,8 @@ class Admin_OpravneniPresenter extends BasePresenter
         
 
         $form1 = new AppForm();
-        $form1->addHidden('role_id')
-                ->setValue(@$role->role_id);
+        $form1->addHidden('id')
+                ->setValue(@$role->id);
         $form1->addText('name', 'Název role:', 50, 100)
                 ->setValue(@$role->name)
                 ->addRule(Form::FILLED, 'Název role musí být vyplněno!');
@@ -104,11 +104,11 @@ class Admin_OpravneniPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $RoleModel = new RoleModel();
-        $role_id = $data['role_id'];
+        $role_id = $data['id'];
         $data['date_modified'] = new DateTime();
-        unset($data['role_id']);
+        unset($data['id']);
 
-        $RoleModel->upravit($data,array('role_id = %i',$role_id));
+        $RoleModel->upravit($data,array('id=%i',$role_id));
 
         $this->flashMessage('Role  "'. $data['name'] .'"  byla upravena.');
         $this->redirect('this',array('id'=>$role_id));
@@ -117,7 +117,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     public function stornoClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $role_id = $data['role_id'];
+        $role_id = $data['id'];
         $this->redirect('this',array('id'=>$role_id));
     }
 
@@ -190,8 +190,8 @@ class Admin_OpravneniPresenter extends BasePresenter
         $role = $this->template->Role;
 
         $form1 = new AppForm();
-        $form1->addHidden('role_id')
-                ->setValue(@$role->role_id);
+        $form1->addHidden('id')
+                ->setValue(@$role->id);
 
         $opravneni = $this->template->seznamOpravneni;
         $pravidla = $this->template->seznamPravidel;
@@ -221,8 +221,8 @@ class Admin_OpravneniPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $AclModel = new AclModel();
-        $role_id = $data['role_id'];
-        unset($data['role_id']);
+        $role_id = $data['id'];
+        unset($data['id']);
         $RoleModel = new RoleModel();
         $role = $RoleModel->getInfo($role_id);
         $opravneni = $AclModel->seznamOpravneni($role->code);
@@ -297,8 +297,8 @@ class Admin_OpravneniPresenter extends BasePresenter
         $role = $this->template->Role;
 
         $form1 = new AppForm();
-        $form1->addHidden('role_id')
-                ->setValue(@$role->role_id);
+        $form1->addHidden('id')
+                ->setValue(@$role->id);
         $form1->addText('name', 'Název zdroje:', 50, 100)
                 ->addRule(Form::FILLED, 'Název zdroje musí být vyplněno!');
         $form1->addText('code', 'Systémové označení zdroje:', 50, 150)
@@ -326,8 +326,8 @@ class Admin_OpravneniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $role_id = $data['role_id'];
-        unset($data['role_id']);
+        $role_id = $data['id'];
+        unset($data['id']);
         $AclModel = new AclModel();
 
         try {
@@ -349,12 +349,12 @@ class Admin_OpravneniPresenter extends BasePresenter
         $resource_data = $AclModel->getResources(1);
         $resource = array();
         foreach ($resource_data as $r) {
-            $resource[ $r->resource_id ] = $r->code;
+            $resource[ $r->id ] = $r->code;
         }
 
         $form1 = new AppForm();
-        $form1->addHidden('role_id')
-                ->setValue(@$role->role_id);
+        $form1->addHidden('id')
+                ->setValue(@$role->id);
         $form1->addText('name', 'Název pravidla:', 50, 100)
                 ->addRule(Form::FILLED, 'Název pravidla musí být vyplněno!');
         $form1->addTextArea('note', 'Popis pravidla:', 50, 5);
@@ -381,8 +381,8 @@ class Admin_OpravneniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $role_id = $data['role_id'];
-        unset($data['role_id']);
+        $role_id = $data['id'];
+        unset($data['id']);
         $AclModel = new AclModel();
 
         try {

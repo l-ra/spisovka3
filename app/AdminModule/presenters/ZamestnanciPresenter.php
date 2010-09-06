@@ -75,7 +75,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ( count($uzivatel)>0 ) {
             $role = array();
             foreach ($uzivatel as $uziv) {
-                $role[ $uziv->user_id ] = $User->getRoles($uziv->user_id);
+                $role[ $uziv->id ] = $User->getRoles($uziv->id);
             }
 
             $this->template->Role = $role;
@@ -103,8 +103,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $osoba = $this->template->Osoba;
 
         $form1 = new AppForm();
-        $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->osoba_id);
+        $form1->addHidden('id')
+                ->setValue(@$osoba->id);
         $form1->addText('jmeno', 'Jméno:', 50, 150)
                 ->setValue(@$osoba->jmeno);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
@@ -146,11 +146,11 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $Osoba = new Osoba();
-        $osoba_id = $data['osoba_id'];
+        $osoba_id = $data['id'];
         $data['date_modified'] = new DateTime();
-        unset($data['osoba_id']);
+        unset($data['id']);
 
-        $Osoba->update($data,array('osoba_id = %i',$osoba_id));
+        $Osoba->update($data,array('id = %i',$osoba_id));
 
         $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl upraven.');
         $this->redirect('this',array('id'=>$osoba_id));
@@ -162,7 +162,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
         //$osoba = $this->template->Osoba;
         //$osoba_id = $osoba->osoba_id;
-        $osoba_id = $data['osoba_id'];
+        $osoba_id = !empty($data['id'])?$data['id']:$data['osoba_id'];
         $this->redirect('this',array('id'=>$osoba_id));
     }
 
@@ -237,7 +237,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->osoba_id);
+                ->setValue(@$osoba->id);
         $form1->addHidden('user_id')
                 ->setValue($user_id);
 
@@ -278,8 +278,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $zmeneno = 0;
         
         foreach ($uzivatel as $u) {
-            if ( $u->user_id == $data['user_id'] ) {
-                if ( $User->zmenitHeslo($u->user_id, $data['heslo']) ) {
+            if ( $u->id == $data['user_id'] ) {
+                if ( $User->zmenitHeslo($u->id, $data['heslo']) ) {
                     $zmeneno = 1;
                 }
                 break;
@@ -309,12 +309,12 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $role_select = array();
         foreach ($role_seznam as $key => $value) {
             if ( $value->fixed == 1 ) continue;
-            $role_select[ $value->role_id ] = $value->name;
+            $role_select[ $value->id ] = $value->name;
         }
 
         $form1 = new AppForm();
         $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->osoba_id);
+                ->setValue(@$osoba->id);
 
         $form1->addText('username', 'Uživatelské jméno:', 30, 150)
                 ->addRule(Form::FILLED, 'Uživatelské jméno musí být vyplněno!');
@@ -397,19 +397,19 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $role_select = array();
         foreach ($role_seznam as $key => $value) {
             if ( $value->fixed == 1 ) continue;
-            $role_select[ $value->role_id ] = $value->name;
+            $role_select[ $value->id ] = $value->name;
         }
 
         $form1 = new AppForm();
         $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->osoba_id);
+                ->setValue(@$osoba->id);
         $form1->addHidden('user_id')
                 ->setValue($user_id);
 
         if ( isset($user_role) ) {
             foreach ($user_role as $ur) {
-                $form1->addGroup('role_id_' . $ur->role_id);
-                $subForm = $form1->addContainer('role'.$ur->role_id);
+                $form1->addGroup('role_id_' . $ur->id);
+                $subForm = $form1->addContainer('role'.$ur->id);
                 $subForm->addCheckbox("user_role", 'povolit')
                         ->setValue(1);
             }

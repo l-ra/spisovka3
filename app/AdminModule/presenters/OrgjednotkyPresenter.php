@@ -65,8 +65,8 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $OrgJednotka = new Orgjednotka();
 
         $form1 = new AppForm();
-        $form1->addHidden('orgjednotka_id')
-                ->setValue(@$org->orgjednotka_id);
+        $form1->addHidden('id')
+                ->setValue(@$org->id);
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)
                 ->setValue(@$org->zkraceny_nazev)
                 ->addRule(Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
@@ -103,11 +103,11 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $OrgJednotka = new Orgjednotka();
-        $orgjednotka_id = $data['orgjednotka_id'];
+        $orgjednotka_id = $data['id'];
         $data['date_modified'] = new DateTime();
-        unset($data['orgjednotka_id']);
+        unset($data['id']);
 
-        $OrgJednotka->update($data,array('orgjednotka_id = %i',$orgjednotka_id));
+        $OrgJednotka->update($data,array('id = %i',$orgjednotka_id));
 
         $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'"  byla upravena.');
         $this->redirect('this',array('id'=>$orgjednotka_id));
@@ -116,7 +116,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     public function stornoClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $orgjednotka_id = $data['orgjednotka_id'];
+        $orgjednotka_id = $data['id'];
         $this->redirect('this',array('id'=>$orgjednotka_id));
     }
 
@@ -183,21 +183,21 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $role = $OrgJednotka->seznamRoli($orgjednotka_id);
 
         $form1 = new AppForm();
-        $form1->addHidden('orgjednotka_id')
+        $form1->addHidden('id')
                 ->setValue($orgjednotka_id);
 
         foreach ($role['role'] as $r) {
 
                 $role_available = 0;
                 foreach ($role['role_org'] as $role_org) {
-                    if ( $role_org->parent_id == $r->role_id ) {
+                    if ( $role_org->parent_id == $r->id ) {
                         $role_available = 1;
                         break;
                     }
                 }
 
-                $form1->addGroup('role_id_' . $r->role_id);
-                $subForm = $form1->addContainer('role'.$r->role_id);
+                $form1->addGroup('role_id_' . $r->id);
+                $subForm = $form1->addContainer('role'.$r->id);
                 $subForm->addCheckbox("org_role", 'povolit')
                         ->setValue( $role_available );
 
@@ -216,9 +216,9 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $orgjednotka_id = $data['orgjednotka_id'];
+        $orgjednotka_id = $data['id'];
         $OrgJednotka = new Orgjednotka();
-        unset($data['orgjednotka_id']);
+        unset($data['id']);
 
         $role = $OrgJednotka->seznamRoli($orgjednotka_id);
 
