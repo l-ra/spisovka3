@@ -560,7 +560,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     "nazev" => $dok->nazev,
                     "popis" => $dok->popis,
                     "stav" => 0,
-                    "typ_dokumentu" => "4",
+                    "typ_dokumentu_id" => "4",
                     "zpusob_doruceni" => "",
                     "cislo_jednaci" => ("odpoved_". $dok->id),
                     "poradi" => ($dok->poradi + 1),
