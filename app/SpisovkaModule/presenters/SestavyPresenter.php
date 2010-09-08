@@ -255,7 +255,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50);
         $form->addText('spisova_znacka', 'Spisová značka:', 50, 50);
-        $form->addSelect('typ_dokumentu', 'Typ Dokumentu:', $typ_dokumentu);
+        $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
         $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10);
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
@@ -267,7 +267,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 ->setValue('30');
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
 
-        $form->addSelect('zpusob_vyrizeni', 'Způsob vyřízení:', $zpusob_vyrizeni);
+        $form->addSelect('zpusob_vyrizeni_id', 'Způsob vyřízení:', $zpusob_vyrizeni);
         $form->addDatePicker('datum_vyrizeni', 'Datum vyřízení:', 10);
         $form->addText('datum_vyrizeni_cas', 'Čas vyřízení:', 10, 15);
         $form->addDatePicker('datum_odeslani', 'Datum odeslání:', 10);
@@ -436,7 +436,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 ->setValue(@$params['cislo_jendaci']);
         $form->addText('spisova_znacka', 'Spisová značka:', 50, 50)
                 ->setValue(@$params['spisova_znacka']);
-        $form->addSelect('typ_dokumentu', 'Typ Dokumentu:', $typ_dokumentu)
+        $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu)
                 ->setValue(@$params['typ_dokumenty']);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$params['cislo_jednaci_odesilatele']);
@@ -456,7 +456,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
                 ->setValue(@$params['poznamka']);
 
-        $form->addSelect('zpusob_vyrizeni', 'Způsob vyřízení:', $zpusob_vyrizeni)
+        $form->addSelect('zpusob_vyrizeni_id', 'Způsob vyřízení:', $zpusob_vyrizeni)
                 ->setValue(@$params['zpusob_vyrizeni']);
         $form->addDatePicker('datum_vyrizeni', 'Datum vyřízení:', 10)
                 ->setValue(@$params['datum_vyrizeni']);

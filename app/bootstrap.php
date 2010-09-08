@@ -6,12 +6,13 @@ require LIBS_DIR . '/Nette/loader.php';
 // Step 2: Configure environment
 // 2a) enable Nette\Debug for better exception and error visualisation
 //if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1') {
-    Environment::setMode(Environment::DEVELOPMENT);
-    Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error.log');
+//    Environment::setMode(Environment::DEVELOPMENT);
+//    Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error.log');
 //} else {
 //    Environment::setMode(Environment::PRODUCTION);
 //    Debug::enable(Debug::PRODUCTION, '%logDir%/php_error.log');
 //}
+Debug::enable(Debug::DETECT, '%logDir%/php_error.log');
 
 // 2b) load configuration from config.ini file
 $basePath = Environment::getHttpRequest()->getUri()->basePath;
@@ -40,7 +41,6 @@ $user_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
 $epodatelna_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
 Environment::setVariable('user_config', $user_config);
 Environment::setVariable('epodatelna_config', $epodatelna_config);
-
 
 //Environment::setMode(Environment::DEVELOPMENT);
 //Environment::setMode(Environment::PRODUCTION);
@@ -99,13 +99,6 @@ try {
     } else {
         define('DB_ERROR', 1);
     }
-}
-
-
-$autoLogin = Environment::getConfig('autoLogin');
-if ( $autoLogin['enable'] == 1 ) {
-    $user = Environment::getUser();
-    $user->authenticate($autoLogin['username'], $autoLogin['password']);
 }
 
 // Step 4: Setup application router

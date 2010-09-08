@@ -5,7 +5,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function startup() {
 
-        if ( file_exists(APP_DIR .'configs/'. KLIENT .'_install') ) {
+        if ( file_exists(APP_DIR .'/configs/'. KLIENT .'_install') ) {
             // instalovano
             $this->setView('instalovano');
         }

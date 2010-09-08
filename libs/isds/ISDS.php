@@ -314,7 +314,7 @@ class ISDS {
         
 	$messageCreateInput = array(
             'dmEnvelope' => $envelope,
-            'dmFiles' => $outFiles->FileInfos);
+            'dmFiles' => $outFiles->fileInfos());
 	
         try {
             $messageCreateOutput = $this->OperationsWS()->CreateMessage($messageCreateInput);
@@ -399,7 +399,7 @@ class ISDS {
         $MultipleMessageCreateInput = array(
             'dmRecipients' => $Recipients,
             'dmEnvelope' => $Envelope,
-            'dmFiles' => $OutFiles->FileInfos
+            'dmFiles' => $OutFiles->fileInfos()
         );
 	
         try {
@@ -1529,6 +1529,12 @@ class ISDSSentOutFiles {
     public function  __construct() {
         ;
     }
+
+    public function fileInfos()
+    {
+        return $this->FileInfos;
+    }
+
 
     /**
      * Prida soubor

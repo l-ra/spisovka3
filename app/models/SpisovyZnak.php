@@ -153,12 +153,14 @@ class SpisovyZnak extends BaseModel
 
     private function sestav($data,$tmp = array()) {
 
+        // TODO zjistit chybu na undefined $data['spisznak']
+
         foreach ( $data as $index => $d ) {
             if ( $index == "spisznak" ) {
-                if ( is_array($data['spisznak']) ) {
-                    $tmp[ $data['spisznak']['id'] ] = $data['spisznak']['nazev'];
+                if ( @is_array($data['spisznak']) ) {
+                    $tmp[ @$data['spisznak']['id'] ] = @$data['spisznak']['nazev'];
                 } else {
-                    $tmp[ $data['spisznak']->id ] = $data['spisznak'];
+                    $tmp[ @$data['spisznak']->id ] = @$data['spisznak'];
                 }
             } else if ( is_numeric($index) ) {
                 $tmp = $this->sestav($data[$index], $tmp);

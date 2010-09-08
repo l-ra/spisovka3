@@ -1,0 +1,64 @@
+================================================================================
+Instalace OSS Spisove sluzby v3
+================================================================================
+
+1. Nahrejte vsechny soubory uvedene v tomto archivu na server.
+
+2. Pro nasledujici adresare nastavte plne pravo zapisu (vcetne podadresaru):
+- /files/           = slozka pro prilohy dokumentu
+- /app/configs/     = slozka konfiguracnich souboru
+- /app/logs/        = slozka pro logovani chyb
+- /app/sessions/    = slozka pro ukladani session
+- /app/temp/        = slozka pro ukladani docasnych souboru a souboru aplikace (cache)
+
+V ostatnych adresarich by se zapisovat nemelo.
+Jediny adresar, ktery by mel byt viditelny z venku, je /public. Ostatni adresare by mely byt neviditelne a nepristupne.
+
+
+3. V souboru /app/configs/default_system.ini nastavte spravne hodnoty pro pristup k databazi:
+
+database.driver = mysql          ; databazovy zdroj (aktualne pouze mysql)
+database.host = localhost        ; adresa serveru
+database.username =              ; prihlasovaci jmeno k databazi
+database.password =              ; prihlasovaci heslo k databazi
+database.database =              ; databaze (musi existovat !!!)
+database.charset  = utf8         ; kodovani databaze
+database.prefix  =               ; prefix tabulek ( priklad: "s3_". Pouzijte, pokud v databazi jiz existuje aplikace spisovky nebo jakekoli jine tabulky)
+database.profiler = TRUE         ; povolije profilovani - zaznamenani pouzitych SQL dotazu
+
+
+4. Provedte instalacni proceduru aplikace.
+
+Spustte internetovy prohlizec a zadejte adresu aplikace + parametr pro start instalace /install/uvod.
+Priklad: http://demo.spisovka3.cz/install/uvod
+
+Ridte se nyni pokyn uvedenych na strankach instalace.
+
+4a Kontrola serveru na minimalni pozadavek aplikace
+- provede kontrolu na dostupnost komponent a minimalnich pozadavku na provoz
+
+4b Nahrani databaze
+- provede predkontrolu na existenci tabulek a nasledne nahrani vsech tabulek a dat
+
+4c Nastaveni klienta
+- zde nastavite informace o svem uradu
+
+4d Nastaveni evidence
+- zde nastavite typ evidence a podobu cisla jednaciho
+
+4e Nastaveni spracve systemu
+- zde vytvorite administratora/spravce, ktery bude spravovat aplikaci
+
+Po uspesnem dokonceni, je aplikace pripravena k pouziti.
+
+
+================================================================================
+
+Jakekoli chyby behem instalace je oznameno chybovou hlaskou.
+Pokud je to ve Vasich silach, muzete chybu opravit. Jinak kontaktujte
+odpovidajici osoby nebo navstivte stranku http://www.spisovka3.cz.
+
+================================================================================
+UPOZORNENI:
+Ve vlastnim zajmu se doporucuje pred instalaci spisove sluzby provest na serveru zalohu.
+Jak souboru, tak i databaze. Neni to nutne, ale clovek nikdy nevi.

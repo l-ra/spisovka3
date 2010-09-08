@@ -1,0 +1,22 @@
+================================================================================
+ Historie uprav OSS Spisove sluzby v3
+================================================================================
+=== Ver. 3.0.0 =================================================================
+Released: 06.09.2010
+
+- nove vykonne jadro zalozene na Nette Framework
+- novy datovy model s ohledem na NSESSS a individualnim potrebam
+- moderni design se snadnou obsluhu (SEO, AJAX)
+- volba typu evidence - priorace / sberny arch
+- verzovani dokumentu, subjektu a priloh
+- spousteci udalost
+- sprava e-podatelany (seznam prijatych a odeslanych zprav)
+- vylepsene generovani cisla jednaciho
+- hierarchie spisu
+- moznost zvolit jiny zpusob prihlasovani (LDAP apod)
+- moznost zvolit jine datove uloziste (FTP, TC, CMS, apod)
+- subjekt (adresát / odesílatel) obsahuje více položek
+- vice uzivatelskych uctu pro jednoho zamestanace
+- vice roli pro jednoho uzivatele
+- vytvareni vlastnich roli s nastavenim pristupovych prav
+

@@ -125,13 +125,18 @@ abstract class BasePresenter extends Presenter
          *     - aplikace verejne odstavena
          *     - provadi se udrzba
          */
-        $service_mode = 0;
+        if (file_exists(APP_DIR ."/configs/servicemode") ) {
+            $service_mode = 1;    
+        } else {
+            $service_mode = 0;
+        }
+
 
         /**
          * Nastaveni layoutu podle modulu
          */
 
-        if ( $service_mode == 1 && $_SERVER['REMOTE_ADDR'] != '62.177.76.50' ) {
+        if ( $service_mode == 1) {
             $this->setLayout('offline');
         } else if ( defined('APPLICATION_INSTALL') ) {
             $this->setLayout('install');
