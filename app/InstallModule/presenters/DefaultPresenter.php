@@ -639,8 +639,8 @@ class Install_DefaultPresenter extends BasePresenter
                         'title' => @$query_part[1],
                         'required' => TRUE,
                         'passed' => $passed,
-                        'message' => $message,
-                        'errorMessage' => $error_message,
+                        'message' => @$message,
+                        'errorMessage' => @$error_message,
                         'description' => $query,
                     );
                 } else {

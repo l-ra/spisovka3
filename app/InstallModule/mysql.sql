@@ -2,7 +2,7 @@
 -- Pouziti vyhradne pro instalacni skript
 --
 -- V pripade rucni instalace nahradte {tbls3} za odpovidajici hodnotu - prefix nebo nic
--- -----------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------;
 
 CREATE TABLE `{tbls3}cislo_jednaci` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
