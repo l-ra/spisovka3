@@ -267,7 +267,7 @@ class Storage_Basic extends FileModel {
     {
         try {
 
-            $file_path = WWW_DIR ."". $file->real_path;
+            $file_path = WWW_DIR ."". @$file->real_path;
 
             if ( file_exists($file_path) ) {
 
