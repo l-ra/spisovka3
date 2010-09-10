@@ -105,7 +105,7 @@
                 <img src="{$baseUri}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>$priloha['id']}">{$priloha['name']}</a>
+                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>trim($priloha['id'])}">{$priloha['name']}</a>
                 <div class="info">
                 <span>{$priloha['size']|bytes}, {$priloha['mimetype']}</span>
                 </div>

@@ -178,7 +178,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             $this->template->Spisy = null;
             $this->template->Subjekty = null;
-            $this->template->Prilohy = null;
+            //$this->template->Prilohy = null;
             $this->template->SouvisejiciDokumenty = null;
             $this->template->Typ_evidence = $this->typ_evidence;
 

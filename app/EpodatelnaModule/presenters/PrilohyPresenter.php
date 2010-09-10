@@ -25,7 +25,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         $FileModel = new FileModel();
 
         $epod = $Epod->getInfo($epodatelna_id);
-        $source_id = explode("-",$epod->source_id);
+        $source_id = @explode("-",$epod->source_id);
         $file = $FileModel->getInfo($source_id[0]);
         $res = $DownloadFile->download($file,$typ);
 
@@ -153,10 +153,16 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
             } else {
 
                 $zprava = $imap->decode_message();
-                //echo "<pre>"; print_r($zprava); exit;
+                //echo "<pre>$part :"; print_r($zprava); exit;
+                if ( strpos($part,".")!==false ) {
+                    $part_i = str_replace(".","]['Parts'][",$part);
+                    eval("\$part_info = \$zprava[0]['Parts'][".$part_i."];");
+                    eval("\$tmp_file = \$zprava[0]['Parts'][".$part_i."]['BodyFile'];");
+                } else {
+                    $part_info = @$zprava[0]['Parts'][$part];
+                    $tmp_file = @$zprava[0]['Parts'][$part]['BodyFile'];
+                }
 
-                $part_info = $zprava[0]['Parts'][$part];
-                $tmp_file = $zprava[0]['Parts'][$part]['BodyFile'];
 
                 if ( $output == 1 ) {
                     if ( $fp = fopen($tmp_file,'rb') ) {
@@ -165,8 +171,8 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                         return null;
                     }
                 } else {
-                    $file_name = String::webalize($zprava[0]['Parts'][$part]['FileName'],".",false);
-                    $file_size = $zprava[0]['Parts'][$part]['BodyLength'];
+                    $file_name = @$part_info['FileName'];
+                    $file_size = @$part_info['BodyLength'];
                     $mime_type = FileModel::mimeType($tmp_file);
                     return array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
                 }
@@ -214,20 +220,23 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
             $tmp_file = $this->downloadEmailPrilohu($res, $part);
 
-            $httpResponse = Environment::getHttpResponse();
-            $httpResponse->setContentType($tmp_file['mime-type']);
-            $httpResponse->setHeader('Content-Description', 'File Transfer');
-            $httpResponse->setHeader('Content-Disposition', 'attachment; filename="' . $tmp_file['file_name'] . '"');
-            //$httpResponse->setHeader('Content-Disposition', 'inline; filename="' . $file_name . '"');
-            $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
-            $httpResponse->setHeader('Expires', '0');
-            $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
-            $httpResponse->setHeader('Pragma', 'public');
-            $httpResponse->setHeader('Content-Length', $tmp_file['size']);
+            if ( !empty($tmp_file['file']) ) {
 
-            readfile($tmp_file['file']);
+                $httpResponse = Environment::getHttpResponse();
+                $httpResponse->setContentType($tmp_file['mime-type']);
+                $httpResponse->setHeader('Content-Description', 'File Transfer');
+                $httpResponse->setHeader('Content-Disposition', 'attachment; filename="' . $tmp_file['file_name'] . '"');
+                //$httpResponse->setHeader('Content-Disposition', 'inline; filename="' . $file_name . '"');
+                $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
+                $httpResponse->setHeader('Expires', '0');
+                $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+                $httpResponse->setHeader('Pragma', 'public');
+                $httpResponse->setHeader('Content-Length', $tmp_file['size']);
 
-            $this->terminate();
+                readfile($tmp_file['file']);
+
+                $this->terminate();
+            }
                 
         } elseif ( strpos($filename,'.bsr')!==false ) {
             // jde o ds
