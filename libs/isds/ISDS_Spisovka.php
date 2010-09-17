@@ -30,7 +30,7 @@ class ISDS_Spisovka extends ISDS {
             }
         } else {
             
-            $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+            $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
             $ep_config = $ep_config->toArray();
             $ep_config = $ep_config['isds'];
             

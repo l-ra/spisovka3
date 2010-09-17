@@ -26,24 +26,24 @@ class Storage_Basic extends FileModel {
 
         if ( isset($data['dir']) ) {
 
-            if ( !file_exists(WWW_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
+            if ( !file_exists(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
                 $old = umask(0);
-                mkdir(WWW_DIR .''. $this->dokument_dir . "/" .$data['dir'], 0777, true);
+                mkdir(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir'], 0777, true);
                 umask($old);
             }
-            if ( is_writeable(WWW_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
-                $file_dir = WWW_DIR .''. $this->dokument_dir . "/" .$data['dir'];
+            if ( is_writeable(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
+                $file_dir = CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir'];
             } else {
-                $file_dir = WWW_DIR .''. $this->dokument_dir;
+                $file_dir = CLIENT_DIR .''. $this->dokument_dir;
             }
         } else {
-            if ( !file_exists(WWW_DIR .''. $this->dokument_dir . "") ) {
+            if ( !file_exists(CLIENT_DIR .''. $this->dokument_dir . "") ) {
                 $old = umask(0);
-                mkdir(WWW_DIR .''. $this->dokument_dir . "", 0777, true);
+                mkdir(CLIENT_DIR .''. $this->dokument_dir . "", 0777, true);
                 umask($old);
             }
-            if ( is_writeable(WWW_DIR .''. $this->dokument_dir) ) {
-                $file_dir = WWW_DIR .''. $this->dokument_dir;
+            if ( is_writeable(CLIENT_DIR .''. $this->dokument_dir) ) {
+                $file_dir = CLIENT_DIR .''. $this->dokument_dir;
             } else {
                 $this->error_code = '0';
                 $this->error_message = 'Soubor nelze uložit do adresáře.';
@@ -53,7 +53,7 @@ class Storage_Basic extends FileModel {
 
         $file = String::webalize($upload->getName(),'.');
         $fileName = $file_dir . "/" . $file;
-        //$fileName = WWW_DIR .''. $this->dokument_dir . "/" . String::webalize($upload->getName(),'.');
+        //$fileName = CLIENT_DIR .''. $this->dokument_dir . "/" . String::webalize($upload->getName(),'.');
 
         // test existence souboru
         $fileName = $this->fileExists($fileName);
@@ -68,7 +68,7 @@ class Storage_Basic extends FileModel {
             $file = new stdClass();
             $file->type = $this->getReflection()->getName();
             $file->real_name = String::webalize($upload->getName(),'.');
-            $file->real_path = str_replace(WWW_DIR, '', $dest->getTemporaryFile());
+            $file->real_path = str_replace(CLIENT_DIR, '', $dest->getTemporaryFile());
             $file->size = $dest->getSize();
             $file->content_type = $dest->getContentType();
             $file->md5_hash = md5_file($dest->getTemporaryFile());
@@ -115,24 +115,24 @@ class Storage_Basic extends FileModel {
 
         if ( isset($data['dir']) ) {
 
-            if ( !file_exists(WWW_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
+            if ( !file_exists(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
                 $old = umask(0);
-                mkdir(WWW_DIR .''. $this->dokument_dir . "/" .$data['dir'], 0777, true);
+                mkdir(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir'], 0777, true);
                 umask($old);
             }
-            if ( is_writeable(WWW_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
-                $file_dir = WWW_DIR .''. $this->dokument_dir . "/" .$data['dir'];
+            if ( is_writeable(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
+                $file_dir = CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir'];
             } else {
-                $file_dir = WWW_DIR .''. $this->dokument_dir;
+                $file_dir = CLIENT_DIR .''. $this->dokument_dir;
             }
         } else {
-            if ( !file_exists(WWW_DIR .''. $this->dokument_dir . "") ) {
+            if ( !file_exists(CLIENT_DIR .''. $this->dokument_dir . "") ) {
                 $old = umask(0);
-                mkdir(WWW_DIR .''. $this->dokument_dir . "", 0777, true);
+                mkdir(CLIENT_DIR .''. $this->dokument_dir . "", 0777, true);
                 umask($old);
             }
-            if ( is_writeable(WWW_DIR .''. $this->dokument_dir) ) {
-                $file_dir = WWW_DIR .''. $this->dokument_dir;
+            if ( is_writeable(CLIENT_DIR .''. $this->dokument_dir) ) {
+                $file_dir = CLIENT_DIR .''. $this->dokument_dir;
             } else {
                 $this->error_code = '0';
                 $this->error_message = 'Soubor nelze uložit do adresáře.';
@@ -162,7 +162,7 @@ class Storage_Basic extends FileModel {
         $file = new stdClass();
         $file->type = $this->getReflection()->getName();
         $file->real_name = $filename;
-        $file->real_path = str_replace(WWW_DIR, '', $filepath);
+        $file->real_path = str_replace(CLIENT_DIR, '', $filepath);
         $file->size = filesize($filepath);
         $file->content_type = FileModel::mimeType($filename);
         $file->md5_hash = md5_file($filepath);
@@ -193,24 +193,24 @@ class Storage_Basic extends FileModel {
     public function uploadEpodatelna($source, $data) {
 
         if ( isset($data['dir']) ) {
-            if ( !file_exists(WWW_DIR .''. $this->epodatelna_dir . "/" .$data['dir']) ) {
+            if ( !file_exists(CLIENT_DIR .''. $this->epodatelna_dir . "/" .$data['dir']) ) {
                 $old = umask(0);
-                mkdir(WWW_DIR .''. $this->epodatelna_dir . "/" .$data['dir'], 0777, true);
+                mkdir(CLIENT_DIR .''. $this->epodatelna_dir . "/" .$data['dir'], 0777, true);
                 umask($old);
             }
-            if ( is_writeable(WWW_DIR .''. $this->epodatelna_dir . "/" .$data['dir']) ) {
-                $file_dir = WWW_DIR .''. $this->epodatelna_dir . "/" .$data['dir'];
+            if ( is_writeable(CLIENT_DIR .''. $this->epodatelna_dir . "/" .$data['dir']) ) {
+                $file_dir = CLIENT_DIR .''. $this->epodatelna_dir . "/" .$data['dir'];
             } else {
-                $file_dir = WWW_DIR .''. $this->epodatelna_dir;
+                $file_dir = CLIENT_DIR .''. $this->epodatelna_dir;
             }
         } else {
-            if ( !file_exist(WWW_DIR .''. $this->epodatelna_dir . "") ) {
+            if ( !file_exist(CLIENT_DIR .''. $this->epodatelna_dir . "") ) {
                 $old = umask(0);
-                mkdir(WWW_DIR .''. $this->epodatelna_dir . "", 0777, true);
+                mkdir(CLIENT_DIR .''. $this->epodatelna_dir . "", 0777, true);
                 umask($old);                
             }
-            if ( is_writeable(WWW_DIR .''. $this->epodatelna_dir) ) {
-                $file_dir = WWW_DIR .''. $this->epodatelna_dir;
+            if ( is_writeable(CLIENT_DIR .''. $this->epodatelna_dir) ) {
+                $file_dir = CLIENT_DIR .''. $this->epodatelna_dir;
             } else {
                 $this->error_code = '0';
                 $this->error_message = 'Soubor nelze uložit do adresáře.';
@@ -236,7 +236,7 @@ class Storage_Basic extends FileModel {
         $file = new stdClass();
         $file->type = $this->getReflection()->getName();
         $file->real_name = $filename;
-        $file->real_path = str_replace(WWW_DIR, '', $filepath);
+        $file->real_path = str_replace(CLIENT_DIR, '', $filepath);
         $file->size = filesize($filepath);
         $file->content_type = FileModel::mimeType($filename);
         $file->md5_hash = md5_file($filepath);
@@ -267,7 +267,7 @@ class Storage_Basic extends FileModel {
     {
         try {
 
-            $file_path = WWW_DIR ."". @$file->real_path;
+            $file_path = CLIENT_DIR ."". @$file->real_path;
 
             if ( file_exists($file_path) ) {
 

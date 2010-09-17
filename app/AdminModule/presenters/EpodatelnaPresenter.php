@@ -8,7 +8,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     public function renderDefault()
     {
         // Klientske nastaveni
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
 
         // ISDS
@@ -65,7 +65,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
 
         // Klientske nastaveni
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
 
         $id = $this->getParam('id',null);
@@ -157,7 +157,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
 
         // Klientske nastaveni
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
 
         $id = $this->getParam('id',null);
@@ -260,7 +260,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     protected function createComponentNastavitISDSForm()
     {
 
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
 
         $id = $this->getParam('id',null);
@@ -338,19 +338,19 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $index = $data['index'];
 
-        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $config_data = $config->toArray();
 
         $data['certifikat'] = "";
         if ( $data['typ_pripojeni'] == 1 || $data['typ_pripojeni'] == 2 ) {
             //nahrani certifikatu
             $upload = $data['certifikat_file'];
-            if ( !file_exists(APP_DIR ."/configs/". KLIENT) ) {
-                mkdir(APP_DIR ."/configs/". KLIENT);
+            if ( !file_exists(CLIENT_DIR ."/configs/files") ) {
+                mkdir(CLIENT_DIR ."/configs/files");
             }
 
-            if ( is_writeable(APP_DIR ."/configs/". KLIENT) ) {
-                $fileName = APP_DIR ."/configs/". KLIENT ."/certifikat_isds". $index .".crt";
+            if ( is_writeable(CLIENT_DIR ."/configs/files") ) {
+                $fileName = CLIENT_DIR ."/configs/files/certifikat_isds". $index .".crt";
                 if (!$upload instanceof HttpUploadedFile) {
                     $this->flashMessage('Certifikát se nepodařilo nahrát.','warning');
                 } else if ( $upload->isOk() ) {
@@ -429,7 +429,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         //Debug::dump($config_data); exit;
         $config_modify = new Config();
         $config_modify->import($config_data);
-        $config_modify->save(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
         
         Environment::setVariable('epodatelna_config', $config_modify);
 
@@ -440,7 +440,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     protected function createComponentNastavitEmailForm()
     {
 
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
 
         $id = $this->getParam('id',null);
@@ -525,7 +525,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $index = $data['index'];
 
-        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $config_data = $config->toArray();
 
         $config_data['email'][$index]['ucet'] = $data['ucet'];
@@ -543,7 +543,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         //Debug::dump($config_data); exit;
         $config_modify = new Config();
         $config_modify->import($config_data);
-        $config_modify->save(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
 
         Environment::setVariable('epodatelna_config', $config_modify);
 
@@ -554,7 +554,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     protected function createComponentNastavitOdesForm()
     {
 
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
 
         $id = $this->getParam('id',null);
@@ -609,18 +609,18 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $index = $data['index'];
 
-        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $config_data = $config->toArray();
 
         $data['cert'] = "";
         //nahrani certifikatu
         $upload = $data['cert_file'];
-        if ( !file_exists(APP_DIR ."/configs/". KLIENT) ) {
-            mkdir(APP_DIR ."/configs/". KLIENT);
+        if ( !file_exists(CLIENT_DIR .'/configs/files') ) {
+            mkdir(CLIENT_DIR .'/configs/files');
         }
 
-        if ( is_writeable(APP_DIR ."/configs/". KLIENT) ) {
-            $fileName = APP_DIR ."/configs/". KLIENT ."/certifikat_email_". $index .".crt";
+        if ( is_writeable(CLIENT_DIR .'/configs/files') ) {
+            $fileName = CLIENT_DIR ."/configs/files/certifikat_email_". $index .".crt";
             if (!$upload instanceof HttpUploadedFile) {
                 $this->flashMessage('Certifikát se nepodařilo nahrát.','warning');
             } else if ( $upload->isOk() ) {
@@ -652,8 +652,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         //nahrani privatniho klice
         $upload = $data['cert_key_file'];
 
-        if ( is_writeable(APP_DIR ."/configs/". KLIENT) ) {
-            $fileName = APP_DIR ."/configs/". KLIENT ."/certifikat_email_". $index .".key";
+        if ( is_writeable(CLIENT_DIR .'/configs/files') ) {
+            $fileName = CLIENT_DIR ."/configs/files/certifikat_email_". $index .".key";
             if (!$upload instanceof HttpUploadedFile) {
                 $this->flashMessage('Soubor privátního klíče se nepodařilo nahrát.','warning');
             } else if ( $upload->isOk() ) {
@@ -695,7 +695,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         //Debug::dump($config_data); exit;
         $config_modify = new Config();
         $config_modify->import($config_data);
-        $config_modify->save(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
 
         Environment::setVariable('epodatelna_config', $config_modify);
 

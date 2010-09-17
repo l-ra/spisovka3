@@ -28,6 +28,7 @@ class ErrorPresenter extends BasePresenter
 				Debug::processException($exception);
 			}
 		}
+
 	}
 
 

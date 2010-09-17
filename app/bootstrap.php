@@ -18,27 +18,26 @@ Debug::enable(Debug::DETECT, '%logDir%/php_error.log');
 $basePath = Environment::getHttpRequest()->getUri()->basePath;
 
 
-if ( defined('KLIENT') ) {
-    Environment::setVariable('klientUri', $basePath );
-    Environment::setVariable('baseUri', '/spisovka3/public/');
-    Environment::setVariable('baseApp', '/spisovka3/');
-} else {
-    Environment::setVariable('klientUri', $basePath );
-    Environment::setVariable('baseUri', '/spisovka3/public/');
-    Environment::setVariable('baseApp', '/spisovka3/');
-    define('KLIENT', 'default');
+if ( !defined('KLIENT') ) {
+    echo "<h1>Chyba aplikace. Nebyl zjisten klient!</h1>";
+    exit;
 }
 
-$unique_info = @file_get_contents(APP_DIR .'/configs/'. KLIENT .'_install');
+Environment::setVariable('klientUri', $basePath );
+Environment::setVariable('baseUri', BASE_URI);
+Environment::setVariable('baseApp', BASE_APP);
+
+
+$unique_info = @file_get_contents(CLIENT_DIR .'/configs/install');
 if ( $unique_info === FALSE ) {
     define('APPLICATION_INSTALL',1);
 } else {
     Environment::setVariable('unique_info', $unique_info);
 }
 
-Environment::loadConfig(APP_DIR .'/configs/'. KLIENT .'_system.ini');
-$user_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
-$epodatelna_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+Environment::loadConfig(CLIENT_DIR .'/configs/system.ini');
+$user_config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
+$epodatelna_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
 Environment::setVariable('user_config', $user_config);
 Environment::setVariable('epodatelna_config', $epodatelna_config);
 
@@ -50,6 +49,7 @@ $app_info = @file_get_contents(APP_DIR .'/configs/version');
 Environment::setVariable('app_info', $app_info);
 
 // 2c) check if directory /app/temp is writable
+Environment::setVariable('tempDir',CLIENT_DIR .'/temp/');
 if (@file_put_contents(Environment::expand('%tempDir%/_check'), '') === FALSE) {
 	throw new Exception("Make directory '" . Environment::getVariable('tempDir') . "' writable!");
 }
@@ -62,7 +62,7 @@ $loader->register();
 
 // 2e) setup sessions
 $session = Environment::getSession();
-$session->setSavePath(APP_DIR . '/sessions/');
+$session->setSavePath(CLIENT_DIR . '/sessions/');
 
 // Step 3: Configure application
 $application = Environment::getApplication();

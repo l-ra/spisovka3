@@ -139,7 +139,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $typ = substr($id,0,1);
         $index = substr($id,1);
 
-        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $config_data = $config->toArray();
         $result = array();
 
@@ -231,7 +231,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         // nova zprava, ktera neni nahrana v epodatelne
 
                         // rozparsovat do jednotne podoby
-                        $storage = new FileStorage(APP_DIR .'/app/temp/cache');
+                        $storage = new FileStorage(CLIENT_DIR .'/temp');
                         $cache = new Cache($storage); // nebo $cache = Environment::getCache()
                         if (isset($cache['zkontrolovat_isds_'.$z->dmID])):
                             $mess = $cache['zkontrolovat_isds_'.$z->dmID];

@@ -91,7 +91,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $config_data = $config->toArray();
         //Debug::dump($config_data); exit;
 
@@ -114,7 +114,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         //Debug::dump($config_data); exit;
         $config_modify = new Config();
         $config_modify->import($config_data);
-        $config_modify->save(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
         
         Environment::setVariable('user_config', $config_modify);
 
@@ -162,13 +162,13 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $config_data = $config->toArray();
         $config_data['cislo_jednaci']['maska'] = $data['maska'];
 
         $config_modify = new Config();
         $config_modify->import($config_data);
-        $config_modify->save(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
 
         Environment::setVariable('user_config', $config_modify);
 

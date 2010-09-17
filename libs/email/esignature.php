@@ -460,9 +460,9 @@ class esignature {
     private function tempnam($dir, $prefix) {
 
         if (empty($dir)) {
-            $file = APP_DIR .'/temp/esign_'.$prefix.'.tmp';
+            $file = CLIENT_DIR .'/temp/esign_'.$prefix.'.tmp';
         } else {
-            $file = APP_DIR .'/temp/'.$dir.'/esign_'.$prefix.'.tmp';
+            $file = CLIENT_DIR .'/temp/'.$dir.'/esign_'.$prefix.'.tmp';
         }
 
 
