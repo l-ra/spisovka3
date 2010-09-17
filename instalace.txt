@@ -2,20 +2,41 @@
 Instalace OSS Spisove sluzby v3
 ================================================================================
 
+Predtim, nez zacnete s instalaci, si overte zakladni pozadavky pro spusteni aplikace:
+
+Apache 2
+PHP 5.2 a vyssi
+MySQL 5 a vyssi
+povolen .htaccess (AllowOverride All)
+povolen mod_rewrite
+
+
 1. Nahrejte vsechny soubory uvedene v tomto archivu na server.
 
-2. Pro nasledujici adresare nastavte plne pravo zapisu (vcetne podadresaru):
-- /files/           = slozka pro prilohy dokumentu
-- /app/configs/     = slozka konfiguracnich souboru
-- /app/logs/        = slozka pro logovani chyb
-- /app/sessions/    = slozka pro ukladani session
-- /app/temp/        = slozka pro ukladani docasnych souboru a souboru aplikace (cache)
+2. Pro adresare /client a /log nastavte plne pravo zapisu (vcetne podadresaru):
+/client/
+    /files/       = slozka pro prilohy dokumentu
+    /configs/     = slozka konfiguracnich souboru
+    /sessions/    = slozka pro ukladani session
+    /temp/        = slozka pro ukladani docasnych souboru
+/log/        = slozka pro logovani chyb
 
 V ostatnych adresarich by se zapisovat nemelo.
 Jediny adresar, ktery by mel byt viditelny z venku, je /public. Ostatni adresare by mely byt neviditelne a nepristupne.
 
+3. V souboru index.php upravte cesty, pokud jsou odlisne od skutecnosti:
 
-3. V souboru /app/configs/default_system.ini nastavte spravne hodnoty pro pristup k databazi:
+WWW_DIR    = absolutni cesta k souboru index.php. Nemenit!
+APP_DIR    = absolutni cesta k aplikacnim souborum (adresar /app). Vetsinou nemenit!
+LIBS_DIR   = absolutni cesta ke knihovnam aplikace (adresar /libs). Vetsinou nemenit!
+BASE_URI   = absolutni nebo relativni url cesta k adresari /public
+BASE_APP   = absolutni nebo relativni url cesta k index.php (WWW_DIR)
+
+KLIENT     = identifikator klienta. Vetsinou nemenit!
+CLIENT_DIR = absolutni cesta k uzivatelskym souborum (adresar /client). Vetsinou nemenit!
+
+
+4. V souboru /client/configs/system.ini nastavte spravne hodnoty pro pristup k databazi:
 
 database.driver = mysql          ; databazovy zdroj (aktualne pouze mysql)
 database.host = localhost        ; adresa serveru
@@ -27,26 +48,26 @@ database.prefix  =               ; prefix tabulek ( priklad: "s3_". Pouzijte, po
 database.profiler = TRUE         ; povolije profilovani - zaznamenani pouzitych SQL dotazu
 
 
-4. Provedte instalacni proceduru aplikace.
+5. Provedte instalacni proceduru aplikace.
 
 Spustte internetovy prohlizec a zadejte adresu aplikace + parametr pro start instalace /install/uvod.
 Priklad: http://demo.spisovka3.cz/install/uvod
 
 Ridte se nyni pokyn uvedenych na strankach instalace.
 
-4a Kontrola serveru na minimalni pozadavek aplikace
+5a Kontrola serveru na minimalni pozadavek aplikace
 - provede kontrolu na dostupnost komponent a minimalnich pozadavku na provoz
 
-4b Nahrani databaze
+5b Nahrani databaze
 - provede predkontrolu na existenci tabulek a nasledne nahrani vsech tabulek a dat
 
-4c Nastaveni klienta
+5c Nastaveni klienta
 - zde nastavite informace o svem uradu
 
-4d Nastaveni evidence
+5d Nastaveni evidence
 - zde nastavite typ evidence a podobu cisla jednaciho
 
-4e Nastaveni spracve systemu
+5e Nastaveni spracve systemu
 - zde vytvorite administratora/spravce, ktery bude spravovat aplikaci
 
 Po uspesnem dokonceni, je aplikace pripravena k pouziti.
