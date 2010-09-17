@@ -12,6 +12,7 @@ require LIBS_DIR . '/Nette/loader.php';
 //    Environment::setMode(Environment::PRODUCTION);
 //    Debug::enable(Debug::PRODUCTION, '%logDir%/php_error.log');
 //}
+Environment::setVariable('logDir',APP_DIR .'/../log/');
 Debug::enable(Debug::DETECT, '%logDir%/php_error.log');
 
 // 2b) load configuration from config.ini file
@@ -90,7 +91,7 @@ try {
     dibi::connect(Environment::getConfig('database'));
     dibi::addSubst('PREFIX', Environment::getConfig('database')->prefix);
     if ( !Environment::isProduction() ) {
-        dibi::getProfiler()->setFile(APP_DIR .'/log/mysql_'. KLIENT .'.log');
+        dibi::getProfiler()->setFile(APP_DIR .'/../log/mysql_'. KLIENT .'.log');
     }
     define('DB_PREFIX', Environment::getConfig('database')->prefix);
 } catch (DibiDriverException $e) {
