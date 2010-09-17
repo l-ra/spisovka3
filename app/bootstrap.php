@@ -50,7 +50,7 @@ $app_info = @file_get_contents(APP_DIR .'/configs/version');
 Environment::setVariable('app_info', $app_info);
 
 // 2c) check if directory /app/temp is writable
-Environment::setVariable('tempDir',CLIENT_DIR .'/temp/');
+Environment::setVariable('tempDir',CLIENT_DIR .'/temp');
 if (@file_put_contents(Environment::expand('%tempDir%/_check'), '') === FALSE) {
 	throw new Exception("Make directory '" . Environment::getVariable('tempDir') . "' writable!");
 }

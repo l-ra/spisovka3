@@ -5,7 +5,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function startup() {
 
-        if ( file_exists(APP_DIR .'/configs/'. KLIENT .'_install') ) {
+        if ( file_exists(CLIENT_DIR .'/configs/install') ) {
             // instalovano
             $this->setView('instalovano');
         }
@@ -290,7 +290,7 @@ class Install_DefaultPresenter extends BasePresenter
             array(
 		'title' => 'Zápis do dočasné složky',
 		'required' => TRUE,
-		'passed' => is_writable(APP_DIR .'/temp/'),
+		'passed' => is_writable(CLIENT_DIR .'/temp/'),
 		'message' => 'Povoleno',
 		'errorMessage' => 'Není možné zapisovat do dočasné složky.',
 		'description' => 'Povolte zápis do složky /app/temp/',
@@ -298,7 +298,7 @@ class Install_DefaultPresenter extends BasePresenter
             array(
 		'title' => 'Zápis do konfigurační složky',
 		'required' => FALSE,
-		'passed' => is_writable(APP_DIR .'/configs/'),
+		'passed' => is_writable(CLIENT_DIR .'/configs/'),
 		'message' => 'Povoleno',
 		'errorMessage' => 'Není možné zapisovat do konfigurační složky.',
 		'description' => 'Povolte zápis do složky /app/configs/. Tato složka slouží k uživateskému ukládání nastavení klienta, e-podatelny apod.',
@@ -306,7 +306,7 @@ class Install_DefaultPresenter extends BasePresenter
             array(
 		'title' => 'Zápis do složky sessions',
 		'required' => TRUE,
-		'passed' => is_writable(APP_DIR .'/sessions/'),
+		'passed' => is_writable(CLIENT_DIR .'/sessions/'),
 		'message' => 'Povoleno',
 		'errorMessage' => 'Není možné zapisovat do složky sessions.',
 		'description' => 'Povolte zápis do složky /app/sessions/. Tato složka slouží k ukládání různých stavů aplikace.',
@@ -314,7 +314,7 @@ class Install_DefaultPresenter extends BasePresenter
             array(
 		'title' => 'Zápis do logovací složky',
 		'required' => FALSE,
-		'passed' => is_writable(APP_DIR .'/log/'),
+		'passed' => is_writable(APP_DIR .'/../log/'),
 		'message' => 'Povoleno',
 		'errorMessage' => 'Není možné zapisovat do logovací složky.',
 		'description' => 'Povolte zápis do složky /app/log/. Tato složka slouží k ukládání různých logovacích a chybových hlášek.<br / >
@@ -684,7 +684,7 @@ class Install_DefaultPresenter extends BasePresenter
             $session->step = array();
         }
 
-        $user_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $user_config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $this->template->Urad = $user_config->urad;
     }
 
@@ -696,7 +696,7 @@ class Install_DefaultPresenter extends BasePresenter
         }
         @$session->step['evidence'] = 0;
 
-        $user_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $user_config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $this->template->CisloJednaci = $user_config->cislo_jednaci;
     }
 
@@ -751,13 +751,13 @@ class Install_DefaultPresenter extends BasePresenter
 
         if ( $dokonceno == 1 ) {
 
-            $Urad = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini')->urad;
+            $Urad = Config::fromFile(CLIENT_DIR .'/configs/klient.ini')->urad;
             $zerotime = mktime(0,0,0,8,20,2008);
             $diff = time() - $zerotime;
             $diff = round($diff / 3600);
             $unique_signature = $diff ."#". time();
 
-            if ( $fp = fopen( APP_DIR .'/configs/'.KLIENT.'_install','wb') ) {
+            if ( $fp = fopen( CLIENT_DIR .'/configs/install','wb') ) {
                 if ( fwrite($fp, $unique_signature, strlen($unique_signature)) ) {
                     $dokonceno = 2;
                     if ( !isset($session->step) ) {
@@ -778,7 +778,7 @@ class Install_DefaultPresenter extends BasePresenter
     public function renderEpodatelna()
     {
         // Klientske nastaveni
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
 
         // ISDS
@@ -891,7 +891,7 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $config_data = $config->toArray();
         //Debug::dump($config_data); exit;
 
@@ -915,7 +915,7 @@ class Install_DefaultPresenter extends BasePresenter
 
             $config_modify = new Config();
             $config_modify->import($config_data);
-            @$config_modify->save(APP_DIR .'/configs/'. KLIENT .'.ini');
+            @$config_modify->save(CLIENT_DIR .'/configs/klient.ini');
             Environment::setVariable('user_config', $config_modify);
 
             $session = Environment::getSession('s3_install');
@@ -972,7 +972,7 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'.ini');
+        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $config_data = $config->toArray();
         $config_data['cislo_jednaci']['maska'] = $data['maska'];
         $config_data['cislo_jednaci']['typ_evidence'] = $data['typ_evidence'];
@@ -982,7 +982,7 @@ class Install_DefaultPresenter extends BasePresenter
 
             $config_modify = new Config();
             $config_modify->import($config_data);
-            @$config_modify->save(APP_DIR .'/configs/'. KLIENT .'.ini');
+            @$config_modify->save(CLIENT_DIR .'/configs/klient.ini');
             Environment::setVariable('user_config', $config_modify);
 
             $session = Environment::getSession('s3_install');
