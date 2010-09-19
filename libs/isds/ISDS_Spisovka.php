@@ -86,7 +86,13 @@ class ISDS_Spisovka extends ISDS {
         if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == "")) {
             return $this->ISDSBox;
         } else {
-            throw new Exception("Chyba ISDS: ".$this->StatusCode." - ".$this->ErrorInfo);
+            if ( $this->ErrorInfo == "Služba ISDS je momentálně nedostupná" ) {
+                return false;
+            } else if ( $this->ErrorInfo == "Neplatné přihlašovací údaje!" ) {
+                return false;
+            } else {
+                throw new Exception("Chyba ISDS: ".$this->StatusCode." - ".$this->ErrorInfo);
+            }
             return false;
         }
     }

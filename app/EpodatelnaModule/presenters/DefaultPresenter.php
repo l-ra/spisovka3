@@ -444,8 +444,7 @@ dmFormat =
             }
         } else {
             $this->flashMessage('Nepodařilo se připojit k ISDS schránce "'. $config['ucet'] .'"!
-                                 <br />
-                                 ISDS chyba: '. $isds->StatusCode .' - '. $isds->StatusMessage .'','warning');
+                                  ISDS chyba: '. $isds->error(),'warning');
             return null;
         }
     }

@@ -94,7 +94,13 @@ class ISDS {
         if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
             return true;
         } else {
-            throw new Exception("Chyba připojení k ISDS! - ".$this->ErrorInfo,$this->ErrorCode);
+            if ( $this->ErrorInfo == "looks like we got no XML document" ) {
+                $this->ErrorInfo = "Služba ISDS je momentálně nedostupná";
+            } else if ( $this->ErrorInfo == "Unauthorized" ) {
+                $this->ErrorInfo = "Neplatné přihlašovací údaje!";
+            } else {
+                throw new Exception("Chyba připojení k ISDS! - ".$this->ErrorInfo,$this->ErrorCode);
+            }
             return false;
         }
 
@@ -1319,6 +1325,24 @@ class ISDS {
             case 3:
 		return LIBS_DIR ."/isds/db_access.wsdl";
 	endswitch;
+    }
+
+    /**
+     * Vypise posledni chybovy stav
+     * 
+     * @return string
+     */
+    public function error()
+    {
+        if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
+            return false;
+        } else {
+            if ( empty($this->StatusCode) ) {
+                return $this->ErrorInfo;
+            } else {
+                return $this->StatusCode ." - ". $this->StatusMessage;
+            }
+        }
     }
 
     /**
