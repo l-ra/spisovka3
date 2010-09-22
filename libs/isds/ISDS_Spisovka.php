@@ -62,7 +62,7 @@ class ISDS_Spisovka extends ISDS {
             $this->ISDSBox = $this->ISDSBox($isds_portaltype, 0,$config['login'],$config['password'],"","");
         } else if ( $config['typ_pripojeni'] == 1 ) {
             // certifikatem
-            if ( file_exist($config['certifikat']) ) {
+            if ( file_exists($config['certifikat']) ) {
                 $this->ISDSBox = $this->ISDSBox($isds_portaltype, 1,"","",$config['certifikat'],$config['cert_pass']);
             } else {
                 // certifikat nenalezen
@@ -71,7 +71,7 @@ class ISDS_Spisovka extends ISDS {
             }
         } else if ( $config['typ_pripojeni'] == 2 ) {
             // certifikatem + jmenem a heslem
-            if ( file_exist($config['certifikat']) ) {
+            if ( file_exists($config['certifikat']) ) {
                 $this->ISDSBox = $this->ISDSBox($isds_portaltype, 2,$config['login'],$config['password'],$config['certifikat'],$config['cert_pass']);
             } else {
                 // certifikat nenalezen

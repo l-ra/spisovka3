@@ -90,19 +90,27 @@ class ISDS {
         $this->debug("LoginType",$type);
         $this->debug("SOAP Params",$params);
 
-        $this->GetOwnerInfoFromLogin();
-        if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
-            return true;
-        } else {
-            if ( $this->ErrorInfo == "looks like we got no XML document" ) {
-                $this->ErrorInfo = "Služba ISDS je momentálně nedostupná";
-            } else if ( $this->ErrorInfo == "Unauthorized" ) {
-                $this->ErrorInfo = "Neplatné přihlašovací údaje!";
+        if ( $this->InitCurl($type, $params) ) {
+            $this->GetOwnerInfoFromLogin();
+            if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
+                return true;
             } else {
-                throw new Exception("Chyba připojení k ISDS! - ".$this->ErrorInfo,$this->ErrorCode);
+                if ( $this->ErrorInfo == "looks like we got no XML document" ) {
+                    $this->ErrorInfo = "Služba ISDS je momentálně nedostupná";
+                } else if ( $this->ErrorInfo == "Unauthorized" ) {
+                    $this->ErrorInfo = "Neplatné přihlašovací údaje!";
+                }
+                //echo $this->ErrorInfo;
+                //throw new Exception("Chyba připojení k ISDS! - ".$this->ErrorInfo,$this->ErrorCode);
+                return false;
+            }
+        } else {
+            if ( $this->ErrorInfo == "The requested URL returned error: 401" ) {
+                $this->ErrorInfo = "Neplatné přihlašovací údaje!";
             }
             return false;
         }
+
 
     }
 
@@ -1386,13 +1394,9 @@ class ISDS {
     /**
      *
      * @param string $logintype         zpusob prihlaseni. 0=jmeno heslo, 1=spisovka (certifikat), 2=hostovana spisovka (jmeno, heslo, certifikat)
-     * @param string $loginname         prihlasovaci jmeno
-     * @param string $password          prihlasovaci heslo
-     * @param string $certifilename     cesta k certifikatu
-     * @param string $passphrase        heslo k soukromemu klici v certifikatu
+     * @param string $params            parametry prihlaseni
      *
      */
-    //public function InitCurl($logintype, $loginname, $password, $certfilename, $passphrase)
     public function InitCurl($logintype, $params)
     {
 
@@ -1406,13 +1410,13 @@ class ISDS {
 	curl_setopt($this->ch, CURLOPT_POST, true);
 	curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($this->ch, CURLOPT_FAILONERROR, true);
-	curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+	//curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
 	curl_setopt($this->ch, CURLINFO_HEADER_OUT, true);
 	curl_setopt($this->ch, CURLOPT_UNRESTRICTED_AUTH,false);
 	curl_setopt($this->ch, CURLOPT_NOBODY,false);
 
 	if (!empty($params['login'])) {
-            $this->debug("   CURLOPT_USERPWD: ". $params['login'].":".$params['password']);
+            //$this->debug("   CURLOPT_USERPWD: ". $params['login'].":".$params['password']);
             curl_setopt($this->ch, CURLOPT_USERPWD,$params['login'].":".$params['password']);
 	}
 
@@ -1451,8 +1455,14 @@ class ISDS {
         $this->debug(">>>>    CurlErrNo: ". curl_errno($this->ch));
         $this->debug(">>>>    CurlError: ". curl_error($this->ch));
         $this->debug(">>>>    response: ". $response);
-       
 
+        if ( curl_errno($this->ch) != 0 ) {
+            $this->ErrorInfo = curl_error($this->ch);
+            $this->ErrorCode = curl_errno($this->ch);
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public function __destruct()
