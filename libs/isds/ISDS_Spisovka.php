@@ -229,7 +229,7 @@ class ISDS_Spisovka extends ISDS {
                             $priloha->real_name,
                             "");
                 } // foreach
-                $dmFiles = $SentOutFiles->FileInfos;
+                $dmFiles = $SentOutFiles->fileInfos();
             } else {
                 $dmFiles = null;
             }
@@ -247,7 +247,7 @@ class ISDS_Spisovka extends ISDS {
 	try {
 
             // odeslani zpravy a ziskani ID zpravy
-            $MessageCreateOutput = $this->OperationsWS->CreateMessage($MessageCreateInput);
+            $MessageCreateOutput = $this->OperationsWS()->CreateMessage($MessageCreateInput);
             if ( isset($MessageCreateOutput->dmID) ) {
                 $MessageID = $MessageCreateOutput->dmID;
                 //$MessageStatus=$MessageCreateOutput->dmStatus;

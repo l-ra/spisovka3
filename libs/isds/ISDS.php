@@ -1585,12 +1585,6 @@ class ISDSSentOutFiles {
      */
     public function AddFileSpecFromMemory($file, $MimeType, $MetaType, $Guid, $UpFileGuid, $FileDescr, $Format, $FullFileName)
     {
-        QX("MimeType: ".$MimeType);
-	QX("MetaType: ".$MetaType);
-	QX("Guid: ".$Guid);
-	QX("UpFileGuid: ".$UpFileGuid);
-	QX("FileDescr: ".$FileDescr);
-	QX("Format: ".$Format);
 
         $dmFile=array(
             'dmMimeType'=>$MimeType,
