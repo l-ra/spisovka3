@@ -561,14 +561,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     "popis" => $dok->popis,
                     "stav" => 0,
                     "typ_dokumentu_id" => "4",
-                    "zpusob_doruceni" => "",
+                    "zpusob_doruceni_id" => "",
                     "cislo_jednaci" => ("odpoved_". $dok->id),
                     "poradi" => ($dok->poradi + 1),
                     "cislo_jednaci_odesilatele" => $dok->cislo_jednaci_odesilatele,
                     "datum_vzniku" => '',
                     "lhuta" => "30",
                     "poznamka" => $dok->poznamka,
-                    "zmocneni" => "0"
+                    "zmocneni_id" => "0"
                 );
                 $dok_odpoved = $Dokumenty->ulozit($pred_priprava);
 
