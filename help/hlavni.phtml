@@ -1,0 +1,47 @@
+    <h2>Spisová služba</h2>
+    {foreach $Napovedy['spisovka'] as $presenters_i => $presenters}
+    <h3>{=isset($HelpName['spisovka/'.$presenters_i])?$HelpName['spisovka/'.$presenters_i]:$presenters_i}</h3>
+    {if count($presenters)>0}
+        <ul>
+        {foreach $presenters as $actions}
+            {if isset($HelpName[$actions->code])}
+            <li><a href="{$klientUri}napoveda/{$actions->url}">{$HelpName[$actions->code]}</a></li>
+            {else}
+            <li>{$actions->name}</li>
+            {/if}
+        {/foreach}
+        </ul>
+    {/if}
+    {/foreach}
+
+    <h2 class="seznam">E-podatelna</h2>
+    {foreach $Napovedy['epodatelna'] as $presenters_i => $presenters}
+    <h3>{=isset($HelpName['epodatelna/'.$presenters_i])?$HelpName['epodatelna/'.$presenters_i]:$presenters_i}</h3>
+    {if count($presenters)>0}
+        <ul>
+        {foreach $presenters as $actions}
+            {if isset($HelpName[$actions->url])}
+            <li><a href="{$klientUri}napoveda/{$actions->url}">{$HelpName[$actions->url]}</a></li>
+            {else}
+            <li>{$actions->name}</li>
+            {/if}
+        {/foreach}
+        </ul>
+    {/if}
+    {/foreach}
+
+    <h2 class="seznam">Administrace</h2>
+    {foreach $Napovedy['admin'] as $presenters_i => $presenters}
+    <h3>{=isset($HelpName['admin/'.$presenters_i])?$HelpName['admin/'.$presenters_i]:$presenters_i}</h3>
+    {if count($presenters)>0}
+        <ul>
+        {foreach $presenters as $actions}
+            {if isset($HelpName[$actions->url])}
+            <li><a href="{$klientUri}napoveda/{$actions->url}">{$HelpName[$actions->url]}</a></li>
+            {else}
+            <li>{$actions->name}</li>
+            {/if}
+        {/foreach}
+        </ul>
+    {/if}
+    {/foreach}

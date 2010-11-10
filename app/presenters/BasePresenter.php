@@ -70,7 +70,7 @@ abstract class BasePresenter extends Presenter
         // Helper vlastni datovy format
         if (!function_exists('edate') ) {
             function edate($string,$format = null) {
-                $unixtime = strtotime($string);
+                $unixtime = is_numeric($string)?$string:strtotime($string);
                 if ( empty($unixtime) ) return "";
                 if ( !is_null($format) ) {
                     return date($format,$unixtime);
@@ -82,7 +82,7 @@ abstract class BasePresenter extends Presenter
         $this->template->registerHelper('edate', 'edate');
         if (!function_exists('edatetime') ) {
             function edatetime($string) {
-                $unixtime = strtotime($string);
+                $unixtime = is_numeric($string)?$string:strtotime($string);
                 if ( empty($unixtime) ) return "";
                 return date('j.n.Y G:i:s',$unixtime);
             }
@@ -150,6 +150,12 @@ abstract class BasePresenter extends Presenter
             $this->setLayout('admin');
         } else if ( $this->template->module == "Epodatelna" ) {
             $this->setLayout('epodatelna');
+        }
+
+        if ( $this->template->module == "" || $this->template->module == "Spisovka" ) {
+            $this->template->currentUri = "napoveda/". strtolower($this->template->presenter) ."/". strtolower($this->view);
+        } else {
+            $this->template->currentUri = "napoveda/". strtolower($this->template->module) ."/". strtolower($this->template->presenter) ."/". strtolower($this->view);
         }
 
         /**

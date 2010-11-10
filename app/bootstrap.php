@@ -120,6 +120,15 @@ if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_
 		'action' => 'default',
 		'id' => NULL,
 	));
+	// Help
+        $router[] = new Route('napoveda/<param1>/<param2>/<param3>', array(
+                'module'    => 'Spisovka',
+                'presenter' => 'Napoveda',
+		'action' => 'default',
+		'param1' => 'param1',
+                'param2' => 'param2',
+                'param3' => 'param3'
+	));
 	// Error
         $router[] = new Route('error/<action>/<id>', array(
                 /*'module'    => 'Spisovka',*/

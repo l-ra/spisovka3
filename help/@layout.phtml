@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <title>Spisová služba - Nápověda - {block #title}{/block}</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/site.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/help_site.css" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+</head>
+<body>
+<div id="layout_top">
+    <div id="top">
+        <h1>Spisová služba - Nápověda</h1>
+        <br />
+    </div>
+</div>
+<div id="layout">
+    <div id="menu">
+        <a href="{$klientUri}{$setUri}">&lt;&lt; zpět na stránku</a>&nbsp;&nbsp;
+        <a href="{$klientUri}napoveda">Hlavní stránka nápovědy</a>
+    </div>
+    <div id="help_content">
+{if file_exists($setFile)}
+    {include $setFile}
+{else}
+    <h2>Bez nápovědy</h2>
+    <p>
+        Pro uvedenou stránku "<a href="{$klientUri}{$setUri}"><strong>http://{$klientUri}{$setUri}</strong></a>" není k dispozici nápověda. Případně nápověda není potřeba.
+    </p>
+{/if}
+    </div>
+</div>
+<div id="layout_bottom">
+    <div id="bottom">
+        <strong>{$AppInfo[2]}</strong><br/>
+        Na toto dílo se vztahuje <a href="http://ec.europa.eu/idabc/eupl">licence EUPL V.1.1</a>
+    </div>
+</div>
+
+
+</body>
+</html>
