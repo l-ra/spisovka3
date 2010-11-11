@@ -21,7 +21,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         parent::startup();
     }
 
-    public function renderDefault($filtr = null, $hledat = null)
+    public function renderDefault($filtr = null, $hledat = null, $seradit = null)
     {
 
         $this->template->Typ_evidence = $this->typ_evidence;
@@ -46,7 +46,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         if ( isset($hledat) ) {
-            
 
             if (is_array($hledat) ) {
                 $args = $hledat;
@@ -57,6 +56,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
             }
 
+        }
+
+        if ( isset($seradit) ) {
+            $Dokument->seradit($args, $seradit);
         }
 
         $result = $Dokument->seznam($args);
@@ -219,17 +222,45 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             // Dokument se vyrizuje
-            if ( $dokument->stav_dokumentu == 3 || $dokument->stav_dokumentu == 4 ) {
+            if ( $dokument->stav_dokumentu >= 3 ) {
                 $this->template->Vyrizovani = 1;
             } else {
                 $this->template->Vyrizovani = 0;
             }
-            // Dokument je vyrizeny
-            if ( $dokument->stav_dokumentu == 4 ) {
+            // Dokument je vyrizeny, ale nespusten
+            if ( $dokument->stav_dokumentu == 4 || $dokument->stav_dokumentu == 5) {
                 $this->template->AccessEdit = 0;
                 $this->template->Pridelen = 0;
                 $this->template->Predan = 0;
+                $this->template->SpousteciUdalost = 1;
                 $formUpravit = null;
+            }
+            // Dokument je vyrizeny a spusteny
+            if ( $dokument->stav_dokumentu == 5) {
+                $this->template->AccessEdit = 0;
+                $this->template->Pridelen = 0;
+                $this->template->Predan = 0;
+                $this->template->SpousteciUdalost = 0;
+                $formUpravit = null;
+            }
+
+            $this->template->Skartacni_dohled = 0;
+            $this->template->Skartacni_komise = 0;
+            // Dokument je ve skartacnim obodbi
+            if ( $dokument->datum_skartace <= time() && $dokument->stav_dokumentu == 5
+                    && ($user->isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
+                $this->template->AccessView = 1;
+                $this->template->AccessEdit = 0;
+                $this->template->Pridelen = 1;
+                $this->template->Skartacni_dohled = 1;
+            }
+            // Dokument je ve skartacnim rezimu
+            if ( $dokument->stav_dokumentu == 6
+                    && ($user->isInRole('skartacni_komise') || $user->isInRole('superadmin')) ) {
+                $this->template->AccessView = 1;
+                $this->template->AccessEdit = 0;
+                $this->template->Pridelen = 1;
+                $this->template->Skartacni_komise = 1;
             }
 
             // SuperAdmin - moznost zasahovat do dokumentu
@@ -242,6 +273,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->template->FormUpravit = $formUpravit;
 
+            if ( $this->getParam('udalost1',false) && $dokument->stav_dokumentu == 4) {
+                $this->template->FormUdalost = 3;
+            } else if ( $this->getParam('udalost',false) && $dokument->stav_dokumentu <= 3 ) {
+                $this->template->FormUdalost = 2;
+            } else if ( $dokument->stav_dokumentu == 4 ) {
+                $this->template->FormUdalost = 1;
+            } else {
+                $this->template->FormUdalost = 0;
+            }
+
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
 
@@ -250,6 +291,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 // Nacteni souvisejicicho dokumentu
                 $Souvisejici = new SouvisejiciDokument();
                 $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument_id);
+            }
+
+            // Kontrola lhuty a skartace
+            if ( $dokument->lhuta_stav==2 && $dokument->stav_dokumentu < 4 ) {
+                $this->flashMessage('Vypršela lhůta k vyřízení! Vyříďte neprodleně tento dokument.','warning');
+            } else if ( $dokument->lhuta_stav==1 && $dokument->stav_dokumentu < 4 ) {
+                $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyříďte co nejrychleji tento dokument.');
             }
 
             $this->invalidateControl('dokspis');
@@ -264,6 +312,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $this->template->metadataForm = $this['metadataForm'];
         $this->template->vyrizovaniForm = $this['vyrizovaniForm'];
+        $this->template->udalostForm = $this['udalostForm'];
     }
 
     public function renderPrevzit()
@@ -328,6 +377,74 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
 
+    public function renderKeskartaci()
+    {
+
+        $dokument_id = $this->getParam('id',null);
+        $user = Environment::getUser();
+        $user_id = $this->getParam('user',null);
+        $orgjednotka_id = $this->getParam('org',null);
+
+        $Workflow = new Workflow();
+        if ( $user->isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+            if ( $Workflow->keskartaci($dokument_id, $user_id, $orgjednotka_id) ) {
+               $this->flashMessage('Dokument byl přidán do skartačního řízení.');
+            } else {
+               $this->flashMessage('Dokument se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
+            }
+        } else {
+            $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
+        }
+        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+
+    }
+
+    public function renderArchivovat()
+    {
+
+        $dokument_id = $this->getParam('id',null);
+        $user = Environment::getUser();
+        $user_id = $this->getParam('user',null);
+        $orgjednotka_id = $this->getParam('org',null);
+
+        $Workflow = new Workflow();
+        if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+            if ( $Workflow->archivovat($dokument_id, $user_id, $orgjednotka_id) ) {
+               $this->flashMessage('Dokument byl archivován.');
+            } else {
+               $this->flashMessage('Dokument se nepodařilo zařadit do archivu. Zkuste to znovu.','warning');
+            }
+        } else {
+            $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
+        }
+        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+
+    }
+
+    public function renderSkartovat()
+    {
+
+        $dokument_id = $this->getParam('id',null);
+        $user = Environment::getUser();
+        $user_id = $this->getParam('user',null);
+        $orgjednotka_id = $this->getParam('org',null);
+
+        $Workflow = new Workflow();
+        if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+            if ( $Workflow->skartovat($dokument_id, $user_id, $orgjednotka_id) ) {
+               $this->flashMessage('Dokument byl skartován.');
+            } else {
+               $this->flashMessage('Dokument se nepodařilo skartovat. Zkuste to znovu.','warning');
+            }
+        } else {
+            $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
+        }
+        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+
+    }
+
+
+
     public function renderVyrizeno()
     {
 
@@ -337,11 +454,17 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
-            if ( $Workflow->vyrizeno($dokument_id, $user_id, $orgjednotka_id) ) {
+            $ret = $Workflow->vyrizeno($dokument_id, $user_id, $orgjednotka_id);
+            if ( $ret === "udalost" ) {
+                // manualni vyrizeni
+                $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id,'udalost'=>1));
+            } else if ( $ret === true ) {
+                // automaticke vyrizeni
                 $Workflow->zrusit_prevzeti($dokument_id);
                 $this->flashMessage('Označil jste tento dokument za vyřízený!');
             } else {
                 $this->flashMessage('Označení dokumentu za vyřízený se nepodařilo. Zkuste to znovu.','warning');
+                
             }
         } else {
             $this->flashMessage('Nemáte oprávnění označit dokument za vyřízený.','warning');
@@ -1169,6 +1292,88 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
 
+    protected function createComponentUdalostForm()
+    {
+
+        $Dok = @$this->template->Dok;
+
+        $form = new AppForm();
+        $form->addHidden('id')
+                ->setValue(@$Dok->id);
+        $form->addHidden('version')
+                ->setValue(@$Dok->version);
+
+        $options = array(
+            '1'=>'Spustit událost od data (vyplňte datum '. @$Dok->spisovy_znak_udalost_dtext .')',
+            '2'=>'Spustit událost ručně (událost se spustí v pozdějším čase ručně)',
+            '3'=>'Spustit událost okamžitě (po odeslání se událost spustí)'
+        );
+        $form->addRadioList('udalost_typ', 'Jak spustit událost:', $options);
+
+        $form->addDatePicker('datum_spousteci_udalosti', 'Datum spuštění události:');
+
+        $form->addSubmit('vyridit', 'Vyřídit dokument')
+                 ->onClick[] = array($this, 'udalostClicked');
+        $form->addSubmit('storno', 'Zrušit vyřízení')
+                 ->setValidationScope(FALSE)
+                 ->onClick[] = array($this, 'stornoClicked');
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form;
+    }
+
+    public function udalostClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+        //Debug::dump($data); exit;
+
+        $dokument_id = $data['id'];
+        $UserModel = new UserModel();
+        $user_id = Environment::getUser()->getIdentity()->id;
+        $orgjednotka_id = @$UserModel->getOrg(Environment::getUser()->getIdentity())->id;
+        if ( $data['udalost_typ'] == 1 && !empty($data['datum_spousteci_udalosti']) ) {
+            // spusteni udalosti dle datumu
+            $add = array('stav'=>5, 'datum'=>$data['datum_spousteci_udalosti']);
+        } else if ( $data['udalost_typ'] == 2 ) {
+            // rucni spusteni udalosti
+            $add = array('stav'=>4);
+        } else if ( $data['udalost_typ'] == 3 ) {
+            // okamzite spusteni
+            $add = array('stav'=>5, 'datum'=>date('Y-m-d'));
+        } else {
+            $this->flashMessage('Nebyla vybrána spouštěcí událost. Vyberte událost nebo zrušte vyřízení.','warning');
+            $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id, 'udalost'=>1));
+        }
+
+        $Workflow = new Workflow();
+        if ( $Workflow->prirazeny($dokument_id) ) {
+            $ret = $Workflow->vyrizeno($dokument_id, $user_id, $orgjednotka_id, $add);
+            if ( $ret == "udalost" ) {
+                // manualni vyrizeni
+                $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id,'udalost'=>1));
+            } else if ( $ret == true ) {
+                // automaticke vyrizeni
+                $Workflow->zrusit_prevzeti($dokument_id);
+                $this->flashMessage('Označil jste tento dokument za vyřízený!');
+            } else {
+                $this->flashMessage('Označení dokumentu za vyřízený se nepodařilo. Zkuste to znovu.','warning');
+
+            }
+        } else {
+            $this->flashMessage('Nemáte oprávnění označit dokument za vyřízený.','warning');
+        }
+        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+
+
+    }
+
+
     protected function createComponentOdeslatForm()
     {
 
@@ -1425,7 +1630,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             if ( strpos($data['email_from'],"epod")!==false ) {
                 $id_odes = substr($data['email_from'],4);
-                $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+                $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
                 $ep = $ep_config->toArray();
                 if ( isset( $ep['odeslani'][$id_odes] ) ) {
                     $mail->setFromConfig($ep['odeslani'][$id_odes]);
@@ -1473,12 +1678,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $mail->send();
 
             $source = "";
-            if ( file_exists(WWW_DIR .'/files/tmp_email.eml') ) {
+            if ( file_exists(CLIENT_DIR .'/temp/tmp_email.eml') ) {
                 //if ( $fp = @fopen(WWW_DIR .'/files/tmp_email.eml','rb') ) {
                 //    $source = fread($fp, filesize(WWW_DIR .'/files/tmp_email.eml') );
                 //    @fclose($fp);
                 //}
-                $source = WWW_DIR .'/files/tmp_email.eml';
+                $source = CLIENT_DIR .'/temp/tmp_email.eml';
             }
 
             // Do epodatelny

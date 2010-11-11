@@ -16,6 +16,10 @@ class LogModel extends BaseModel {
     const DOK_VYRIZEN   = 17;
     const DOK_PRIJATEP  = 18;
     const DOK_ODESLAN   = 19;
+    const DOK_SPUSTEN   = 101;
+    const DOK_KESKARTACI = 102;
+    const DOK_SKARTOVAN  = 103;
+    const DOK_ARCHIVOVAN = 103;
 
     const SUBJEKT_VYTVOREN = 21;
     const SUBJEKT_ZMENEN   = 22;
@@ -46,6 +50,11 @@ class LogModel extends BaseModel {
         '17' => 'Dokument vyřízen',
         '18' => 'Dokument přijat e-podatelnou',
         '19' => 'Dokument odeslán',
+        '101' => 'Spuštěna událost',
+        '102' => 'Dokument připraven ke skartaci',
+        '103' => 'Dokument skartován',
+        '104' => 'Dokument archivován',
+
         '21' => 'Vytvořen nový subjekt',
         '22' => 'Subjekt změněn',
         '23' => 'Subjekt smazán',

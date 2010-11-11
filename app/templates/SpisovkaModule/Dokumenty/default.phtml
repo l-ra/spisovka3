@@ -14,11 +14,18 @@
     
     <div style="clear:both;">&nbsp;</div>
 
+    <div style="margin: 3px 0px;">
+    seřadit podle:
+        <a href="{link this, 'seradit'=>'stav'}" title="Seřadit podle stavu dokumentu (nový, předaný, vyřizuje se, vyřízený, ...)">stavu</a> &nbsp;
+        <a href="{link this, 'seradit'=>'cj'}" title="Seřadit podle čísla jednacího">čísla jednacího</a> &nbsp;
+        <a href="{link this, 'seradit'=>'dvzniku'}" title="Seřadit podle data přijetí/vzniku">data přijeti/vzniku</a> &nbsp;
+        <a href="{link this, 'seradit'=>'vec'}" title="Seřadit podle věci">věci</a> &nbsp;
+        <a href="{link this, 'seradit'=>'prideleno'}" title="Seřadit podle přijmení osoby přidělené k dokumentu">přidělené osoby</a> &nbsp;
+    </div>
 
     <div id="dokumenty">
     {if count($seznam)>0}
     <table>
-
         <tr>
             <th class="typ">Typ dokumentu</th>
             <th class="prijato">Přijato</th>
@@ -27,9 +34,8 @@
             <th class="prideleno">Přiděleno</th>
             <th class="stav">Stav</th>
         </tr>
-
         {foreach $seznam as $dok}
-        <tr>
+        <tr{if $dok->lhuta_stav==2} class="red"{elseif $dok->lhuta_stav==1} class="yellow"{/if}">
             <td class="typ">
                 <img src="{$baseUri}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
                 <img src="{$baseUri}images/icons/typdok{$dok->typ_dokumentu->typ}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="24" height="16" />
@@ -76,7 +82,7 @@
             <td class="prideleno">
                 {$dok->prideleno->prideleno_jmeno}
             </td>
-            <td class="stav">
+            <td class="stav {if $dok->lhuta_stav==2}stav_red" title="Vypršela lhůta k vyřízení! Vyříďte neprodleně tento dokument."{elseif $dok->lhuta_stav==1}stav_yellow" title="Za pár dní vyprší lhůta k vyřízení! Vyříďte co nejrychleji tento dokument."{else}stav"{/if}>
                 nový
                 <br />
                 <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
@@ -91,7 +97,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             {/if}
             </td>
-            <td class="stav">
+            <td class="stav {if $dok->lhuta_stav==2}stav_red{elseif $dok->lhuta_stav==1}stav_yellow{else}stav{/if}">
                 předáno
                 <br />
                 <span title="{$dok->predano->date_predani|edatetime}">{$dok->predano->date_predani|edate}</span>
@@ -106,7 +112,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             {/if}
             </td>
-            <td class="stav">
+            <td class="stav {if $dok->lhuta_stav==2}stav_red{elseif $dok->lhuta_stav==1}stav_yellow{else}stav{/if}">
                 přiděleno
                 <br />
                 <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
@@ -117,7 +123,7 @@
                 <br />
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
-            <td class="stav">
+            <td class="stav {if $dok->lhuta_stav==2}stav_red{elseif $dok->lhuta_stav==1}stav_yellow{else}stav{/if}">
                 vyřizuje se
                 <br />
                 <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
@@ -133,6 +139,18 @@
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
+            {elseif $dok->stav_dokumentu == 5 }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            </td>
+            <td class="stav">
+                vyřízeno
+                <br />
+                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+            </td>
+
             {else}
             <td class="prideleno">
                 &nbsp;

@@ -461,7 +461,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $role_id = (int) substr($id, 4); // role4
             // porovnat s puvodnim daty = role, ktere se nemenily, vyradime
             foreach ($user_role as $urole_id => $urole) {
-                if ( ($urole->role_id == $role_id) && ($stav['user_role']==TRUE) ) {
+                if ( ($urole->id == $role_id) && ($stav['user_role']==TRUE) ) {
                     unset($data[$id]);
                     unset($user_role[ $urole_id ]);
                     continue;

@@ -156,12 +156,21 @@ class Dokument extends BaseModel
                     }
                     $dok->stav_dokumentu = $stav;
 
-
+                    $dok->lhuta_stav = 0;
                     if ( !empty($dok->lhuta) ) {
                         $datum_vzniku = strtotime($dok->date_created);
                         $dok->lhuta_do = $datum_vzniku + ($dok->lhuta * 86400);
+                        $rozdil = $dokument->lhuta_do - time();
+                        if ( $rozdil < 0 ) {
+                            $dok->lhuta_stav = 2;
+                        } else if ( $rozdil <= 432000 ) {
+                            $dok->lhuta_stav = 1;
+                        }
                     } else {
                         $dok->lhuta_do = 'neurčeno';
+                    }
+                    if ( $stav > 3 ) {
+                        $dok->lhuta_stav = 0;
                     }
 
                     $tmp[ $dok->id ] = $dok;
@@ -236,6 +245,31 @@ class Dokument extends BaseModel
                 array('d.jid LIKE %s','%'.$query.'%')
             )
         );
+        return $args;
+
+    }
+
+    public function seradit(&$args, $typ = null) {
+
+        switch ($typ) {
+            case 'stav':
+                $args['order'] = array('wf.stav_dokumentu');
+                break;
+            case 'cj':
+                $args['order'] = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
+                break;
+            case 'vec':
+                $args['order'] = array('d.nazev');
+                break;
+            case 'dvzniku':
+                $args['order'] = array('d.datum_vzniku');
+                break;
+            case 'prideleno':
+                //$args['order'] = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
+                break;
+            default:
+                break;
+        }
         return $args;
 
     }
@@ -800,11 +834,41 @@ class Dokument extends BaseModel
 
 
             // lhuta
+            $dokument->lhuta_stav = 0;
             if ( !empty($dokument->lhuta) ) {
-                $datum_vzniku = strtotime($dokument->date_created);
+                $datum_vzniku = strtotime($dokument->datum_vzniku);
                 $dokument->lhuta_do = $datum_vzniku + ($dokument->lhuta * 86400);
+                $rozdil = $dokument->lhuta_do - time();
+
+                if ( $rozdil < 0 ) {
+                    $dokument->lhuta_stav = 2;
+                } else if ( $rozdil <= 432000 ) {
+                    $dokument->lhuta_stav = 1;
+                }
             } else {
                 $dokument->lhuta_do = 'neurčeno';
+                $dokument->lhuta_stav = 0;
+            }
+            if ( $stav > 3 ) {
+                $dokument->lhuta_stav = 0;
+            }
+
+            // datum skartace
+            if ( !empty($dokument->datum_spousteci_udalosti) ) {
+                $datum_spusteni = strtotime($dokument->datum_spousteci_udalosti);
+                if ( empty($dokument->skartacni_lhuta) ) {
+                    // neurceno
+                    $dokument->datum_skartace = 'neurčeno';
+                } else if ( $dokument->skartacni_lhuta > 1900 ) {
+                    // jde o rok 1.1.rok
+                    $dokument->datum_skartace = mktime(0,0,0,1,1,(int)$dokument->skartacni_lhuta);
+                } else {
+                    // jde o roky
+                    //$datum_skartace =
+                    $dokument->datum_skartace = DateDiff::add($dokument->datum_spousteci_udalosti, $dokument->skartacni_lhuta);
+                }
+            } else {
+                $dokument->datum_skartace = 'neurčeno';
             }
 
             // spisovy znak
@@ -816,20 +880,29 @@ class Dokument extends BaseModel
                     $dokument->spisovy_znak_popis = $sznak->popis;
                     $dokument->spisovy_znak_skart_znak = $sznak->skartacni_znak;
                     $dokument->spisovy_znak_skart_lhuta = $sznak->skartacni_lhuta;
-                    $dokument->spisovy_znak_skart_udalost = $sznak->spousteci_udalost;
+                    $dokument->spisovy_znak_udalost = $sznak->spousteci_udalost;
+                    $dokument->spisovy_znak_udalost_nazev = $sznak->spousteci_udalost_nazev;
+                    $dokument->spisovy_znak_udalost_stav = $sznak->spousteci_udalost_stav;
+                    $dokument->spisovy_znak_udalost_dtext = $sznak->spousteci_udalost_dtext;
                 } else {
                     $dokument->spisovy_znak = '';
                     $dokument->spisovy_znak_popis = '';
                     $dokument->spisovy_znak_skart_znak = '';
                     $dokument->spisovy_znak_skart_lhuta = '';
-                    $dokument->spisovy_znak_skart_udalost = '';
+                    $dokument->spisovy_znak_udalost = '';
+                    $dokument->spisovy_znak_udalost_nazev = '';
+                    $dokument->spisovy_znak_udalost_stav = '';
+                    $dokument->spisovy_znak_udalost_dtext = '';
                 }
             } else {
                 $dokument->spisovy_znak = '';
                 $dokument->spisovy_znak_popis = '';
                 $dokument->spisovy_znak_skart_znak = '';
                 $dokument->spisovy_znak_skart_lhuta = '';
-                $dokument->spisovy_znak_skart_udalost = '';
+                $dokument->spisovy_znak_udalost = '';
+                $dokument->spisovy_znak_udalost_nazev = '';
+                $dokument->spisovy_znak_udalost_stav = '';
+                $dokument->spisovy_znak_udalost_dtext = '';
             }
 
             //vyrizeni
@@ -1038,6 +1111,38 @@ class Dokument extends BaseModel
         // věc#popis#1##2010-05-23#věc#popis#1##2010-05-23#
         //echo $data_implode;
         return md5($data_implode);
+
+    }
+
+    public function kontrola($data, $typ = "komplet") {
+
+        $mess = array();
+        if ( empty($data->nazev) ) $mess[] = "Věc dokumentu nemůže být prázdné!";
+        if ( empty($data->cislo_jednaci) ) $mess[] = "Číslo jednací dokumentu nemůže být prázdné!";
+        if ( empty($data->datum_vzniku) || $data->datum_vzniku == "0000-00-00 00:00:00" ) $mess[] = "Datum přijetí/vytvoření nemůže být prázdné!";
+
+        if ( $typ == "komplet" ) {
+
+            //if ( empty($data->datum_vyrizeni) || $data->datum_vyrizeni == "0000-00-00 00:00:00" ) $mess[] = "Datum vyřízení nemůže být prázdné!";
+            if ( empty($data->zpusob_vyrizeni_id) || $data->zpusob_vyrizeni_id == 0 ) $mess[] = "Není zvolen způsob vyřízení dokumentu!";
+            if ( empty($data->spisovy_znak) ) $mess[] = "Není zvolen spisový znak!";
+            if ( empty($data->skartacni_znak) ) $mess[] = "Není vyplněn skartační znak!";
+            if ( empty($data->skartacni_lhuta) ) $mess[] = "Není vyplněna skartační lhůta!";
+            if ( empty($data->spousteci_udalost) ) $mess[] = "Není zvolena spouštěcí událost!";
+
+            if ( count($data->subjekty)==0 ) {
+                $mess[] = "Dokument musí obsahovat aspoň jeden subjekt!";
+            }
+            if ( count($data->prilohy)==0 ) {
+                $mess[] = "Dokument musí obsahovat aspoň jednu přílohu!";
+            }
+        }
+
+        if ( count($mess)>0 ) {
+            return $mess;
+        } else {
+            return null;
+        }
 
     }
 

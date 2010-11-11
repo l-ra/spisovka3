@@ -134,7 +134,13 @@ class ESSMailer extends Object implements IMailer
 
         //$tmp_mail .= $mail_source;
 
-        file_put_contents(WWW_DIR .'/files/tmp_email.eml', $tmp_mail);
+        file_put_contents(CLIENT_DIR .'/temp/tmp_email.eml', $tmp_mail);
+
+        /*echo "<pre>";
+        echo CLIENT_DIR .'/temp/tmp_email.eml';
+        echo "\n\n-----------------------------\n\n";
+        echo $tmp_mail;
+        exit;*/
 
         //$res = 1;
 	$res = mail(

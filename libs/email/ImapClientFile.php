@@ -36,7 +36,7 @@ class ImapClientFile {
                 }
 
                 // temp
-                $tmp_dir = APP_DIR .'/temp/mime_email';
+                $tmp_dir = CLIENT_DIR .'/temp/mime_email';
                 if ( !file_exists($tmp_dir) ) {
                     mkdir($tmp_dir,0777);
                 }

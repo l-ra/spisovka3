@@ -91,6 +91,98 @@
     </div>
     {/accessedit}
 
+    {if ($FormUdalost==2 || $FormUdalost==3 )}
+    <div class="dokument_blok2">
+        {if $FormUdalost==2}
+        <div class="h2">K dokončení vyřízení vyberte způsob spuštění události</div>
+        {else}
+        <div class="h2">Ke spuštění události vyberte způsob</div>
+        {/if}
+        <dl class="detail_item">
+            <dt>Spouštěcí událost:</dt>
+            <dd>{$Dok->spousteci_udalost}&nbsp;</dd>
+        </dl>
+        {$udalostForm->render('begin')}
+        <dl class="detail_item">
+            <dt>Jak spustit událost?</dt>
+            <dd>
+                {$udalostForm['udalost_typ']->control} (vyplňte {$Dok->spisovy_znak_udalost_dtext})
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum spuštění události:</dt>
+            <dd>
+                {$udalostForm['datum_spousteci_udalosti']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                {$udalostForm['vyridit']->control} {$udalostForm['storno']->control}
+            </dd>
+        </dl>
+        {$udalostForm->render('end')}
+    </div>
+    {elseif $FormUdalost==1}
+    <div class="dokument_blok2">
+        <div class="h2">Dokument je vyřízen, ale není spuštěna událost</div>
+        <dl class="detail_item">
+            <dt>Spouštěcí událost:</dt>
+            <dd>{$Dok->spousteci_udalost}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt></dt>
+            <dd>
+               <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'udalost1'=>1}">Změnit spouštěcí událost</a>
+            </dd>
+        </dl>
+    </div>
+    {/if}
+
+    {if $Skartacni_dohled==1}
+    <div class="dokument_blok2">
+        <div class="h2">Připojit dokument do skartačního řízení k posuzení</div>
+        <dl class="detail_item">
+            <dt>Spisový znak:</dt>
+            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační znak:</dt>
+            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                <a href="{link :Spisovka:Dokumenty:keskartaci, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="keskartacidokument">Přidat do skartačního řízení</a>
+            </dd>
+        </dl>
+    </div>
+    {/if}
+
+    {if $Skartacni_komise==1}
+    <div class="dokument_blok2">
+        <div class="h2">Rozhodnutí o skartaci dokumentu</div>
+        <dl class="detail_item">
+            <dt>Spisový znak:</dt>
+            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Skartační znak:</dt>
+            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Rozhodnutí:</dt>
+            <dd>
+                <a href="{link :Spisovka:Dokumenty:archivovat, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="archivovatdokument">Archivovat</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="{link :Spisovka:Dokumenty:skartovat, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="skartovatdokument">Skartovat</a>
+            </dd>
+        </dl>
+    </div>
+    {/if}
+
+
+
     <div id="dokument_blok_hlavni">
         {if ($FormUpravit=='metadata')}
         {$metadataForm->render('begin')}
@@ -316,12 +408,18 @@
         </dl>
         <dl class="detail_item">
             <dt>Skartační lhůta:</dt>
-            <dd>{$Dok->skartacni_lhuta}&nbsp;</dd>
+            <dd class="normal"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(datum skartace {$Dok->datum_skartace|edate}){/if}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>
             <dd>{$Dok->spousteci_udalost}&nbsp;</dd>
         </dl>
+        {if $Dok->stav_dokumentu>=5}
+        <dl class="detail_item">
+            <dt>Datum spuštění události:</dt>
+            <dd>{$Dok->datum_spousteci_udalosti|edate}&nbsp;</dd>
+        </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Počet listů / příloh:</dt>
             <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num}</dd>
@@ -391,6 +489,10 @@
             <dd>{!$Dok->predano->poznamka|enl2br}&nbsp;</dd>
         </dl>
         {/if}
+        <dl class="detail_item">
+            <dt>Lhůta k vyřízení:</dt>
+            <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd>
+        </dl>
     </div>
 
     <div id="dokument_blok_subjekty">
@@ -609,8 +711,20 @@
             <dd>dokument předán k vyřízení</dd>
             <dd class="normal">vyřizuje {$wf->prideleno_jmeno}</dd>
             {elseif $wf->stav_dokumentu == 4}
-            <dd>dokument vyřízen</dd>
+            <dd>dokument vyřízen, ale není spuštěna událost</dd>
             <dd class="normal">vyřídil {$wf->prideleno_jmeno}</dd>
+            {elseif $wf->stav_dokumentu == 5}
+            <dd>dokument vyřízen a běží skartační lhůta</dd>
+            <dd class="normal">vyřídil {$wf->prideleno_jmeno}</dd>
+            {elseif $wf->stav_dokumentu == 6}
+            <dd>dokument přidán ke skartačnímu řízení</dd>
+            <dd class="normal">přidal {$wf->prideleno_jmeno}</dd>
+            {elseif $wf->stav_dokumentu == 7}
+            <dd>dokument přidán do archivu</dd>
+            <dd class="normal">rozhodl {$wf->prideleno_jmeno}</dd>
+            {elseif $wf->stav_dokumentu == 8}
+            <dd>dokument byl skartován</dd>
+            <dd class="normal">rozhodl {$wf->prideleno_jmeno}</dd>
             {else}
             {/if}
             {if !empty($wf->poznamka)}

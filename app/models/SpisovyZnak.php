@@ -21,7 +21,21 @@ class SpisovyZnak extends BaseModel
    public function getInfo($spisznak_id)
     {
 
-        $result = $this->fetchRow(array('id=%i',$spisznak_id));
+        $sql = array(
+            'from' => array($this->name => 'sz'),
+            'cols' => array('*'),
+            'leftJoin' => array(
+                'spousteci_udalost' => array(
+                    'from' => array($this->tb_spoudalost => 'udalost'),
+                    'on' => array('udalost.id=sz.spousteci_udalost'),
+                    'cols' => array('nazev'=>'spousteci_udalost_nazev','stav'=>'spousteci_udalost_stav','poznamka_k_datumu'=>'spousteci_udalost_dtext')
+                ),
+            ),
+            'where' => array(array('sz.id=%i',$spisznak_id))
+        );
+
+        $result = $this->fetchAllComplet($sql);
+        //$result = $this->fetchRow(array('id=%i',$spisznak_id));
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 

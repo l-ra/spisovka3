@@ -399,11 +399,11 @@ class esignature {
      */
     public function signMessage($message,$header=array()) {
 
-        $tmp_mess = APP_DIR .'/temp/send_message_plain.txt';
+        $tmp_mess = CLIENT_DIR .'/temp/send_message_plain.txt';
             $fp = fopen($tmp_mess,"w");
             fwrite($fp,$message);
             fclose($fp);
-        $tmp_signed = APP_DIR .'/temp/send_message_signed.txt';
+        $tmp_signed = CLIENT_DIR .'/temp/send_message_signed.txt';
             $fp = fopen($tmp_signed,"w");
             fwrite($fp,"");
             fclose($fp);

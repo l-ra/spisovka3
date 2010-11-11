@@ -195,6 +195,66 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         echo "<pre>";
         $isds_debug = 1;
         $isds = new ISDS_Spisovka();
+
+        Debug::dump($config); //exit;
+
+	$ch = curl_init();
+
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_FAILONERROR, true);
+	curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+	curl_setopt($ch, CURLOPT_UNRESTRICTED_AUTH,false);
+	curl_setopt($ch, CURLOPT_NOBODY,false);
+
+	if (!empty($config['login'])) {
+            curl_setopt($ch, CURLOPT_USERPWD,$config['login'].":".$config['password']);
+	}
+
+	// na Linuxu nastavit verzi 3, na Windows ne !
+	if (stristr(PHP_OS,'WIN') === false) {
+            curl_setopt($ch, CURLOPT_SSLVERSION,3);
+	}
+
+        $cert_data = file_get_contents($config['certifikat']);
+        openssl_pkcs12_read($cert_data,$tmp_cert,$config['cert_pass']);
+        file_put_contents(CLIENT_DIR ."/temp/cert_use.crt", $tmp_cert['cert']);
+        file_put_contents(CLIENT_DIR ."/temp/cert_key.crt", $tmp_cert['pkey']);
+
+        curl_setopt($ch, CURLOPT_SSLCERT, realpath(CLIENT_DIR ."/temp/cert_use.crt"));
+        curl_setopt($ch, CURLOPT_SSLKEY, realpath(CLIENT_DIR ."/temp/cert_key.crt"));
+
+
+        //curl_setopt($ch, CURLOPT_SSLCERT,$params['local_cert']);
+        //curl_setopt($ch, CURLOPT_SSLCERTPASSWD,$params['passphrase']);
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // kasle se na https certy
+
+        $url = "https://ws1c.czebox.cz/certds/DS/dz";
+        //$url = "https://bp/ssl/index.php";
+
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_POSTFIELDS,
+            "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
+            "    <soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n".
+            "  <soap:Body>\n".
+            "    <DummyOperation xmlns=\"http://isds.czechpoint.cz\">\n".
+            "    </DummyOperation>\n".
+            "  </soap:Body>\n".
+            "</soap:Envelope>\n");
+
+        echo ">>>> CURL_EXEC \n";
+        $response = curl_exec($ch);
+        echo ">>>>    CurlErrNo: ". curl_errno($ch) ."\n";
+        echo ">>>>    CurlError: ". curl_error($ch) ."\n";
+        echo ">>>>    response: ". $response ."\n";
+
+
+        /* ********** */
+
+
+
+/*
         if ( $ISDSBox = $isds->pripojit($config) ) {
 
             echo "Připojeno k ISDS \n\n";
@@ -207,8 +267,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         } else {
 
             echo "Připojení k ISDS selhalo <br />";
-            echo $isds->ErrorInfo;
-        }
+            echo $isds->error();
+        }*/
         echo "</pre>";
 
     }
@@ -336,6 +396,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
+        $chyba = 0;
+
         $index = $data['index'];
 
         $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
@@ -381,60 +443,68 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
         unset($data['certifikat_file']);
 
-        $idbox = "";
-        $vlastnik = "";
-        $stav = "";
-        $ISDS = new ISDS_Spisovka();
-        if ( $ISDS->pripojit($data) ) {
-            $info = $ISDS->informaceDS();
-            if ( !empty($info) ) {
+        if ( $chyba == 0 ) {
 
-                $idbox = $info->dbID;
-                if ( empty($info->firmName) ) {
-                    // jmeno prijmeni
-                    $vlastnik = $info->pnFirstName ." ". $info->pnLastName ." [".$info->dbType."]";
+            $config_data['isds'][$index]['ucet'] = $data['ucet'];
+            $config_data['isds'][$index]['aktivni'] = $data['aktivni'];
+            $config_data['isds'][$index]['typ_pripojeni'] = $data['typ_pripojeni'];
+            $config_data['isds'][$index]['login'] = $data['login'];
+            $config_data['isds'][$index]['password'] = $data['password'];
+            if ( !empty($data['certifikat']) ) {
+                $config_data['isds'][$index]['certifikat'] = $data['certifikat'];
+            }
+            $config_data['isds'][$index]['cert_pass'] = $data['cert_pass'];
+            $config_data['isds'][$index]['test'] = $data['test'];
+            $config_data['isds'][$index]['podatelna'] = $data['podatelna'];
+
+            $idbox = "";
+            $vlastnik = "";
+            $stav = "";
+            $chyba = 0;
+            try {
+                $ISDS = new ISDS_Spisovka();
+                if ( $ISDS->pripojit($config_data['isds'][$index]) ) {
+                    $info = $ISDS->informaceDS();
+                    if ( !empty($info) ) {
+
+                        $idbox = $info->dbID;
+                        if ( empty($info->firmName) ) {
+                            // jmeno prijmeni
+                            $vlastnik = $info->pnFirstName ." ". $info->pnLastName ." [".$info->dbType."]";
+                        } else {
+                            // firma urad
+                            $vlastnik = $info->firmName ." [".$info->dbType."]";
+                        }
+                        $stav = ISDS_Spisovka::stavDS($info->dbState) ." (kontrolováno dne ". date("j.n.Y G:i") .")";
+                        $stav_hesla = $ISDS->GetPasswordInfo();
+                    }
                 } else {
-                    // firma urad
-                    $vlastnik = $info->firmName ." [".$info->dbType."]";
+                    $this->flashMessage('Nelze se připojit k ISDS! Chyba: '. $ISDS->error(),"warning");
+                    //$this->redirect('this',array('id'=>('i' . $data['index']),'upravit'=>1));
+                    $chyba = 1;
                 }
-                $stav = ISDS_Spisovka::stavDS($info->dbState) ." (kontrolováno dne ". date("j.n.Y G:i") .")";
-                $stav_hesla = $ISDS->GetPasswordInfo();
-
+            } catch (Exception $e) {
+                $this->flashMessage('Nelze se připojit k ISDS! '. $e->getMessage(),"warning");
+                //$this->redirect('this',array('id'=>('i' . $data['index']),'upravit'=>1));
+                //$chyba = 1;
             }
 
-        } else {
+            $config_data['isds'][$index]['idbox'] = $idbox;
+            $config_data['isds'][$index]['vlastnik'] = $vlastnik;
+            $config_data['isds'][$index]['stav'] = $stav;
+            $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla))?"(bez omezení)":$stav_hesla;
 
+            $config_modify = new Config();
+            $config_modify->import($config_data);
+            $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
+
+            Environment::setVariable('epodatelna_config', $config_modify);
+
+            //if ( $chyba == 0 ) {
+                $this->flashMessage('Nastavení datové schránky bylo upraveno.');
+                $this->redirect('this',array('id'=>('i' . $data['index']) ));
+            //}
         }
-
-
-
-
-
-        $config_data['isds'][$index]['ucet'] = $data['ucet'];
-        $config_data['isds'][$index]['aktivni'] = $data['aktivni'];
-        $config_data['isds'][$index]['idbox'] = $idbox;
-        $config_data['isds'][$index]['vlastnik'] = $vlastnik;
-        $config_data['isds'][$index]['stav'] = $stav;
-        $config_data['isds'][$index]['stav_hesla'] = (is_null($stav_hesla))?"(bez omezení)":$stav_hesla;
-        $config_data['isds'][$index]['typ_pripojeni'] = $data['typ_pripojeni'];
-        $config_data['isds'][$index]['login'] = $data['login'];
-        $config_data['isds'][$index]['password'] = $data['password'];
-        if ( !empty($data['certifikat']) ) {
-            $config_data['isds'][$index]['certifikat'] = $data['certifikat'];
-        }
-        $config_data['isds'][$index]['cert_pass'] = $data['cert_pass'];
-        $config_data['isds'][$index]['test'] = $data['test'];
-        $config_data['isds'][$index]['podatelna'] = $data['podatelna'];
-
-        //Debug::dump($config_data); exit;
-        $config_modify = new Config();
-        $config_modify->import($config_data);
-        $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
-        
-        Environment::setVariable('epodatelna_config', $config_modify);
-
-        $this->flashMessage('Nastavení datové schránky bylo upraveno.');
-        $this->redirect('this',array('id'=>('i' . $data['index']) ));
     }
 
     protected function createComponentNastavitEmailForm()

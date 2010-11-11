@@ -331,10 +331,22 @@ label.required {
     text-align: right;
 }
 
-
-#dokumenty .stav_red {
+#dokumenty .red {
     background-color: #ffd4d4;
 }
+
+#dokumenty .yellow {
+    background-color: #ffffcc;
+}
+
+#dokumenty .stav_red {
+    background: #ffd4d4 url('../images/icons/warning.png') no-repeat left center;
+}
+
+#dokumenty .stav_yellow {
+    background: #ffffcc url('../images/icons/warning.png') no-repeat left center;
+}
+
 /* ***************************************************************** */
 /* *** DOKUMENT DETAIL *** */
 
@@ -528,9 +540,9 @@ label.required {
     background: #ffcccc url('../images/icons/dialog-warning.png') 10px 5px no-repeat;
 }
 .flash_error {
-    color: #666600;
-    border: 1px #666600 solid;
-    background: #ffffcc url('../images/icons/dialog-error.png') 10px 5px no-repeat;
+    color: #681203;
+    border: 1px #681203 solid;
+    background: #ffcccc url('../images/icons/dialog-error.png') 10px 5px no-repeat;
 }
 
 /* ***************************************************************** */

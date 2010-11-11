@@ -367,7 +367,7 @@ class Workflow extends BaseModel
         }
     }
 
-    public function vyrizeno($dokument_id, $user_id, $orgjednotka_id = null)
+    public function vyrizeno($dokument_id, $user_id, $orgjednotka_id = null, $accepted = null)
     {
         if ( is_numeric($dokument_id) ) {
 
@@ -381,11 +381,34 @@ class Workflow extends BaseModel
                     //if ($transaction)
                     //dibi::begin();
 
-                    // Deaktivujeme starsi zaznamy
-                    $this->deaktivovat($dokument_id);
-
                     $Dokument = new Dokument();
                     $dokument_info = $Dokument->getInfo($dokument_id);
+
+                    // Test na uplnost dat
+                    if ( $kontrola = $Dokument->kontrola($dokument_info) ) {
+                        foreach ($kontrola as $kmess) {
+                            Environment::getApplication()->getPresenter()->flashMessage($kmess,'warning');
+                        }
+                        return false;
+                    }
+
+                    // spouteci udalost - manualni nebo automativky
+                    if ( $dokument_info->spisovy_znak_udalost_stav == 2 && is_null($accepted) ) {
+                        $stav = 5;
+                        $datum_spusteni = date("Y-m-d");
+                    } else if ( !is_null($accepted) ) {
+                        $stav = $accepted['stav'];
+                        if ( !empty($accepted['datum']) ) {
+                            $datum_spusteni = $accepted['datum'];
+                        } else {
+                            $datum_spusteni = null;
+                        }
+                    } else {
+                        return "udalost";
+                    }
+
+                    // Deaktivujeme starsi zaznamy
+                    $this->deaktivovat($dokument_id);
 
                     $UserModel = new UserModel();
                     $user = Environment::getUser()->getIdentity();
@@ -394,7 +417,7 @@ class Workflow extends BaseModel
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
                     $data['dokument_version'] = $dokument_info->version;
-                    $data['stav_dokumentu'] = 4;
+                    $data['stav_dokumentu'] = $stav;
 
                     $data['stav_osoby'] = 1;
                     $data['aktivni'] = 1;
@@ -433,6 +456,12 @@ class Workflow extends BaseModel
                         $Log = new LogModel();
                         $Log->logDokument($dokument_id, LogModel::DOK_VYRIZEN, 'Dokument označen za vyřízený.');
 
+                        if ( $stav == 5 ) {
+                            $data = array('datum_spousteci_udalosti'=>$datum_spusteni);
+                            $Dokument->ulozit($data, $dokument_id);
+                            $Log->logDokument($dokument_id, LogModel::DOK_SPUSTEN, 'Byla spuštěna událost. Začíná běžet skartační lhůta.');
+                        }
+
                         return true;
                     } else {
                         return false;
@@ -444,6 +473,180 @@ class Workflow extends BaseModel
                 return false;
             }
 
+        } else {
+            return false;
+        }
+    }
+
+    public function keskartaci($dokument_id, $user_id, $orgjednotka_id = null)
+    {
+        if ( is_numeric($dokument_id) ) {
+
+                $user = Environment::getUser();
+                if ( $user->isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+
+                    //$transaction = (! dibi::inTransaction());
+                    //if ($transaction)
+                    //dibi::begin();
+
+                    $Dokument = new Dokument();
+                    $dokument_info = $Dokument->getInfo($dokument_id);
+
+                    // Deaktivujeme starsi zaznamy
+                    $this->deaktivovat($dokument_id);
+
+                    $UserModel = new UserModel();
+                    $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
+
+                    $data = array();
+                    $data['dokument_id'] = $dokument_info->id;
+                    $data['dokument_version'] = $dokument_info->version;
+                    $data['stav_dokumentu'] = 6;
+                    $data['stav_osoby'] = 1;
+                    $data['aktivni'] = 1;
+                    $data['prideleno'] = $dokument_info->prideleno->prideleno;
+                    $data['prideleno_info'] = serialize($dokument_info->prideleno->prideleno_info);
+                    $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
+                    $data['orgjednotka_info'] = serialize($dokument_info->prideleno->orgjednotka_info);
+
+                    $data['date'] = new DateTime();
+                    $data['user_id'] = $user->getIdentity()->id;
+                    $data['user_info'] = serialize($user_info->identity);
+                    $data['poznamka'] = $dokument_info->prideleno->poznamka;
+
+                    $result_insert = $this->insert($data);
+
+                    //if ($transaction)
+                    //dibi::commit();
+
+                    if ( $result_insert ) {
+
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_KESKARTACI, 'Dokument přidán do skartačního řízení.');
+
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+        } else {
+            return false;
+        }
+    }
+
+    public function archivovat($dokument_id, $user_id, $orgjednotka_id = null)
+    {
+        if ( is_numeric($dokument_id) ) {
+
+                $user = Environment::getUser();
+                if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+
+                    //$transaction = (! dibi::inTransaction());
+                    //if ($transaction)
+                    //dibi::begin();
+
+                    $Dokument = new Dokument();
+                    $dokument_info = $Dokument->getInfo($dokument_id);
+
+                    // Deaktivujeme starsi zaznamy
+                    $this->deaktivovat($dokument_id);
+
+                    $UserModel = new UserModel();
+                    $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
+
+                    $data = array();
+                    $data['dokument_id'] = $dokument_info->id;
+                    $data['dokument_version'] = $dokument_info->version;
+                    $data['stav_dokumentu'] = 7;
+                    $data['stav_osoby'] = 1;
+                    $data['aktivni'] = 1;
+                    $data['prideleno'] = $dokument_info->prideleno->prideleno;
+                    $data['prideleno_info'] = serialize($dokument_info->prideleno->prideleno_info);
+                    $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
+                    $data['orgjednotka_info'] = serialize($dokument_info->prideleno->orgjednotka_info);
+
+                    $data['date'] = new DateTime();
+                    $data['user_id'] = $user->getIdentity()->id;
+                    $data['user_info'] = serialize($user_info->identity);
+                    $data['poznamka'] = $dokument_info->prideleno->poznamka;
+
+                    $result_insert = $this->insert($data);
+
+                    //if ($transaction)
+                    //dibi::commit();
+
+                    if ( $result_insert ) {
+
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_ARCHIVOVAN, 'Dokument uložen do archivu.');
+
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+        } else {
+            return false;
+        }
+    }
+
+    public function skartovat($dokument_id, $user_id, $orgjednotka_id = null)
+    {
+        if ( is_numeric($dokument_id) ) {
+
+                $user = Environment::getUser();
+                if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+
+                    //$transaction = (! dibi::inTransaction());
+                    //if ($transaction)
+                    //dibi::begin();
+
+                    $Dokument = new Dokument();
+                    $dokument_info = $Dokument->getInfo($dokument_id);
+
+                    // Deaktivujeme starsi zaznamy
+                    $this->deaktivovat($dokument_id);
+
+                    $UserModel = new UserModel();
+                    $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
+
+                    $data = array();
+                    $data['dokument_id'] = $dokument_info->id;
+                    $data['dokument_version'] = $dokument_info->version;
+                    $data['stav_dokumentu'] = 8;
+                    $data['stav_osoby'] = 1;
+                    $data['aktivni'] = 1;
+                    $data['prideleno'] = $dokument_info->prideleno->prideleno;
+                    $data['prideleno_info'] = serialize($dokument_info->prideleno->prideleno_info);
+                    $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
+                    $data['orgjednotka_info'] = serialize($dokument_info->prideleno->orgjednotka_info);
+
+                    $data['date'] = new DateTime();
+                    $data['user_id'] = $user->getIdentity()->id;
+                    $data['user_info'] = serialize($user_info->identity);
+                    $data['poznamka'] = $dokument_info->prideleno->poznamka;
+
+                    $result_insert = $this->insert($data);
+
+                    //if ($transaction)
+                    //dibi::commit();
+
+                    if ( $result_insert ) {
+
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_SKARTOVAN, 'Dokument byl skartován.');
+
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
         } else {
             return false;
         }

@@ -17,7 +17,7 @@ class ESSMail extends Mail {
         } else {
             $app_info = array('3.x','rev.X','OSS Spisová služba v3','1270716764');
         }
-        $this->setHeader('X-Mailer', String::webalize($app_info[2], ' ', 0));
+        $this->setHeader('X-Mailer', String::webalize($app_info[2], '. ', 0));
 
         return $ret;
     }
