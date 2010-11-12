@@ -478,11 +478,13 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ( count($data) > 0 ) {
             foreach ($data as $id => $stav) {
                 $role_id = (int) substr($id, 4);
-                $UserRole->delete( array(
+                if ( !empty($role_id) && !empty($user_id) ) {
+                    $UserRole->delete( array(
                                         array('role_id=%i',$role_id),
                                         array('user_id=%i',$user_id)
                                     )
                                  );
+                }
             }
         }
 
