@@ -1394,7 +1394,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         // odesilatele
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
         $odesilatele = array();
 
