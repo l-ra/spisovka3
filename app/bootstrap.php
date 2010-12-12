@@ -32,6 +32,7 @@ Environment::setVariable('baseApp', BASE_APP);
 $unique_info = @file_get_contents(CLIENT_DIR .'/configs/install');
 if ( $unique_info === FALSE ) {
     define('APPLICATION_INSTALL',1);
+    @ini_set('memory_limit','128M');
 } else {
     Environment::setVariable('unique_info', $unique_info);
 }

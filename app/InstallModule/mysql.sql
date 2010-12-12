@@ -15,7 +15,10 @@ CREATE TABLE `{tbls3}cislo_jednaci` (
   `org_poradi` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `user_poradi` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `orgjednotka_id` (`orgjednotka_id`),
+  KEY `user_id` (`user_id`),
+  KEY `urad_zkratka` (`urad_zkratka`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -27,7 +30,7 @@ CREATE TABLE `{tbls3}dokument` (
   `popis` varchar(255) DEFAULT '',
   `cislojednaci_id` int(11) DEFAULT NULL,
   `cislo_jednaci` varchar(50) DEFAULT '',
-  `poradi` smallint(6) DEFAULT '1',
+  `poradi` smallint(6) NOT NULL DEFAULT '1',
   `cislo_jednaci_odesilatele` varchar(50) DEFAULT '',
   `podaci_denik` varchar(45) DEFAULT '',
   `podaci_denik_poradi` int(11) DEFAULT NULL,
@@ -58,7 +61,14 @@ CREATE TABLE `{tbls3}dokument` (
   `datum_vyrizeni` datetime DEFAULT NULL,
   `poznamka_vyrizeni` text,
   `spousteci_udalost` varchar(250) DEFAULT '',
-  PRIMARY KEY (`id`,`version`)
+  `datum_spousteci_udalosti` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`,`version`),
+  KEY `cislojednaci_id` (`cislojednaci_id`),
+  KEY `typ_dokumentu_id` (`typ_dokumentu_id`),
+  KEY `spisovy_znak_id` (`spisovy_znak_id`),
+  KEY `zmocneni_id` (`zmocneni_id`),
+  KEY `zpusob_doruceni_id` (`zpusob_doruceni_id`),
+  KEY `zpusob_vyrizeni_id` (`zpusob_vyrizeni_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -336,26 +346,27 @@ CREATE TABLE `{tbls3}spousteci_udalost` (
   `nazev` text NOT NULL,
   `poznamka` text,
   `stav` tinyint(4) NOT NULL DEFAULT '1',
+  `poznamka_k_datumu` varchar(150) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
-INSERT INTO `{tbls3}spousteci_udalost` (`id`, `nazev`, `poznamka`, `stav`) VALUES
-(1, 'Skartační lhůta začíná plynout po ztrátě platnosti dokumentu.', NULL, 1),
-(2, 'Skartační lhůta začíná plynout  po ukončení záruky.', NULL, 1),
-(3, 'Skartační lhůta začíná plynout po uzavření dokumentu.', NULL, 1),
-(4, 'Skartační lhůta počíná plynout po zařazení dokumentů z předávacích protokolů do skartačního řízení (předávací protokoly).', NULL, 1),
-(5, 'Skartační lhůta začíná plynout po vyhodnocení dokumentu (Podkladový materiál k výkazům).', NULL, 1),
-(6, 'Skartační lhůta začíná běžet po roce, v němž byla výpočetní a jiná technika naposledy použita, nebo po ukončení používání příslušného software (Provozní dokumentace, licence).', NULL, 1),
-(7, 'Skartační lhůta začíná plynout po vyhlášení výsledků voleb.', NULL, 1),
-(8, 'Skartační lhůta začíná plynout po zrušení zařízení.', NULL, 1),
-(9, 'Nabytí účinnosti.', NULL, 1),
-(10, 'Rozhodnutí, nabytí právní moci.', NULL, 1),
-(11, 'Uvedení objektu do provozu.', NULL, 1),
-(12, 'Ukončení studia.', NULL, 1),
-(13, 'Ukončení pobytu.', NULL, 1),
-(14, 'Ukončení pracovního/služebního poměru.', NULL, 1),
-(15, 'Skartační lhůta u dokumentů celostátně vyhlášeného referenda začíná plynout po vyhlášení výsledků referenda prezidentem republiky ve Sbírce zákonů, popřípadě po vyhlášení nálezu Ústavního soudu, kterým rozhodl, že postup při provádění referenda nebyl v souladu s ústavním zákonem o referendu o přistoupení České republiky k Evropské unii nebo zákonem vydaným k jeho provedení s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu. ', NULL, 1),
-(16, 'Skartační lhůta u dokumentů krajského referenda začíná plynout po vyhlášení výsledků referenda s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu.', NULL, 1);
+INSERT INTO `{tbls3}spousteci_udalost` (`id`, `nazev`, `poznamka`, `stav`, `poznamka_k_datumu`) VALUES
+(1, 'Skartační lhůta začíná plynout po ztrátě platnosti dokumentu.', NULL, 1,'ukončení platnosti dokumentu'),
+(2, 'Skartační lhůta začíná plynout po ukončení záruky.', NULL, 1,'ukončení záruky'),
+(3, 'Skartační lhůta začíná plynout po uzavření dokumentu.', NULL, 1,'uzavření/vyřízení dokumentu'),
+(4, 'Skartační lhůta počíná plynout po zařazení dokumentů z předávacích protokolů do skartačního řízení (předávací protokoly).', NULL, 1, 'zařazení dokumentů'),
+(5, 'Skartační lhůta začíná plynout po vyhodnocení dokumentu (Podkladový materiál k výkazům).', NULL, 1, 'vyhotovení dokumentu'),
+(6, 'Skartační lhůta začíná běžet po roce, v němž byla výpočetní a jiná technika naposledy použita, nebo po ukončení používání příslušného software (Provozní dokumentace, licence).', NULL, 1,'posledního použití nebo ukončení použití'),
+(7, 'Skartační lhůta začíná plynout po vyhlášení výsledků voleb.', NULL, 1,'vyhlášení výsledku voleb'),
+(8, 'Skartační lhůta začíná plynout po zrušení zařízení.', NULL, 1,'zrušení zařízení'),
+(9, 'Nabytí účinnosti.', NULL, 1,'nabytí účinnosti'),
+(10, 'Rozhodnutí, nabytí právní moci.', NULL, 1,'rozhodnutí'),
+(11, 'Uvedení objektu do provozu.', NULL, 1,'udevení objektu do provozu'),
+(12, 'Ukončení studia.', NULL, 1,'ukončení studia'),
+(13, 'Ukončení pobytu.', NULL, 1,'ukončení pobytu'),
+(14, 'Ukončení pracovního/služebního poměru.', NULL, 1,'ukončení pracovního/služebního poměru'),
+(15, 'Skartační lhůta u dokumentů celostátně vyhlášeného referenda začíná plynout po vyhlášení výsledků referenda prezidentem republiky ve Sbírce zákonů, popřípadě po vyhlášení nálezu Ústavního soudu, kterým rozhodl, že postup při provádění referenda nebyl v souladu s ústavním zákonem o referendu o přistoupení České republiky k Evropské unii nebo zákonem vydaným k jeho provedení s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu.', NULL, 1,'vyhlášení výsledků referenda'),
+(16, 'Skartační lhůta u dokumentů krajského referenda začíná plynout po vyhlášení výsledků referenda s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu.', NULL, 1,'vyhlášení výsledků referenda');
 
 
 CREATE TABLE `{tbls3}subjekt` (
@@ -440,7 +451,8 @@ INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
 (19,6,12,'Y'),
 (20,7,17,'Y'),
 (21,9,17,'Y'),
-(22,8,17,'Y');
+(22,8,17,'Y'),
+(23,4,18,'Y');
 
 CREATE TABLE `{tbls3}user_resource` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -479,7 +491,9 @@ INSERT INTO `{tbls3}user_resource` (`id`, `code`, `note`, `name`) VALUES
 (26, 'Spisovka_SpojitPresenter', NULL, 'Spisovka - spojeni dokumentu'),
 (27, 'Spisovka_ErrorPresenter', NULL, 'Error'),
 (28, 'Install_DefaultPresenter', NULL, 'Instalace'),
-(29, 'Spisovka_VyhledatPresenter', NULL, 'Vyhledavani');
+(29, 'Spisovka_VyhledatPresenter', NULL, 'Vyhledavani'),
+(30, 'Admin_AkonverzePresenter', NULL, 'Administrace - Autorizovaná konverze'),
+(31, 'Spisovka_NapovedaPresenter', NULL, 'Nápověda');
 
 CREATE TABLE `{tbls3}user_role` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -513,7 +527,8 @@ CREATE TABLE `{tbls3}user_rule` (
   `note` varchar(250) DEFAULT '',
   `resource_id` int(11) DEFAULT NULL,
   `privilege` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `resource_id` (`resource_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}user_rule` (`id`, `name`, `note`, `resource_id`, `privilege`) VALUES
@@ -533,7 +548,9 @@ INSERT INTO `{tbls3}user_rule` (`id`, `name`, `note`, `resource_id`, `privilege`
 (14, 'Sestavy', '', 25, ''),
 (15, 'Vyhledávání', '', 29, ''),
 (16, 'Je vedoucí', 'Určuje, zda daná role je vedoucí role. Umožňuje přistupovat k dokumentům předané orgaizační jednotce', NULL, 'is_vedouci'),
-(17, 'Oprávnění pro org. jednotku Centrální podatelna', 'Oprávnění platné pouze pro organizační jednotku Centrální podatelna', NULL, 'orgjednotka_1');
+(17, 'Oprávnění pro org. jednotku Centrální podatelna', 'Oprávnění platné pouze pro organizační jednotku Centrální podatelna', NULL, 'orgjednotka_1'),
+(18, 'Nápověda', 'Zobrazení nápovědy', 31, '');
+
 
 CREATE TABLE `{tbls3}user_to_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

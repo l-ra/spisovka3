@@ -9,6 +9,7 @@ PHP 5.2 a vyssi
 MySQL 5 a vyssi
 povolen .htaccess (AllowOverride All)
 povolen mod_rewrite
+dostupne PHP knihovny iconv, curl, open_ssl, soap, mail,
 
 
 1. Nahrejte vsechny soubory uvedene v tomto archivu na server.
