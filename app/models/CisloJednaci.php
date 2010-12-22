@@ -13,6 +13,7 @@ class CisloJednaci extends BaseModel
     protected $urad;
     protected $user_info;
     protected $org;
+    protected $pocatek_cisla;
 
     public function  __construct() {
 
@@ -23,6 +24,15 @@ class CisloJednaci extends BaseModel
         $user_config = Environment::getVariable('user_config');
         $this->info = $user_config->cislo_jednaci;
         $this->urad = $user_config->urad;
+
+        // pocatek cisla
+        $this->pocatek_cisla = 1;
+        if ( @$this->info->pocatek_cisla > 1 ) {
+             $count = $this->fetchAll()->count();
+             if ( $count == 0 ) {
+                 $this->pocatek_cisla = isset($this->info->pocatek_cisla)?$this->info->pocatek_cisla:1;
+             }
+        }
 
         $unique_info = Environment::getVariable('unique_info');
         $unique_part = explode('#',$unique_info);
@@ -214,7 +224,7 @@ class CisloJednaci extends BaseModel
         $where = array();
         $where[] = array('rok=%i',date('Y'));
 
-        $pocatek_cisla = isset($this->info->pocatek_cisla)?$this->info->pocatek_cisla:1;
+        $pocatek_cisla = $this->pocatek_cisla;
         $cislo = null;
         switch ($typ) {
             case "poradove_cislo":
