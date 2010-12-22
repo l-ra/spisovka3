@@ -214,31 +214,32 @@ class CisloJednaci extends BaseModel
         $where = array();
         $where[] = array('rok=%i',date('Y'));
 
+        $pocatek_cisla = isset($this->info->pocatek_cisla)?$this->info->pocatek_cisla:1;
         $cislo = null;
         switch ($typ) {
             case "poradove_cislo":
                 $where[] = array('podaci_denik=%s',$this->info->podaci_denik);
                 $result = $this->fetchAll(array('poradove_cislo'=>'DESC'),$where,null,1);
                 $row = $result->fetch();
-                $cislo = (@$row->poradove_cislo)?($row->poradove_cislo)+1 : 1;
+                $cislo = (@$row->poradove_cislo)?($row->poradove_cislo)+1 : $pocatek_cisla;
                 break;
             case "urad":
                 $where[] = array('urad_zkratka=%s',$this->urad->zkratka);
                 $result = $this->fetchAll(array('urad_poradi'=>'DESC'),$where,null,1);
                 $row = $result->fetch();
-                $cislo = (@$row->urad_poradi)?($row->urad_poradi)+1 : 1;
+                $cislo = (@$row->urad_poradi)?($row->urad_poradi)+1 : $pocatek_cisla;
                 break;
             case "org":
                 $where[] = array('orgjednotka_id=%i',$this->org->id);
                 $result = $this->fetchAll(array('org_poradi'=>'DESC'),$where,null,1);
                 $row = $result->fetch();
-                $cislo = (@$row->org_poradi)?($row->org_poradi)+1 : 1;
+                $cislo = (@$row->org_poradi)?($row->org_poradi)+1 : $pocatek_cisla;
                 break;
             case "user":
                 $where[] = array('user_id=%i',$this->user_info->id);
                 $result = $this->fetchAll(array('user_poradi'=>'DESC'),$where,null,1);
                 $row = $result->fetch();
-                $cislo = (@$row->user_poradi)?($row->user_poradi)+1 : 1;
+                $cislo = (@$row->user_poradi)?($row->user_poradi)+1 : $pocatek_cisla;
                 break;
                 
             default: break;
