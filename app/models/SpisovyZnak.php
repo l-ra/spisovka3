@@ -118,8 +118,9 @@ class SpisovyZnak extends BaseModel
         if ( $spis ) {
             $casti = explode(".",$spis->sekvence);
             if ( $full == 1 ) {
-                $where_numbers = implode(",",$casti);
-                if ( !empty($where_numbers) ) {
+                if ( count($casti)>0 ) {
+                    $where_numbers = implode(",",$casti);
+                    if ( $where_numbers == "," ) return null;
                     $args = array('where'=>array('id IN ('.$where_numbers.')'));
                     return $this->seznam($args);
                 } else {
@@ -140,7 +141,7 @@ class SpisovyZnak extends BaseModel
 
         foreach ($data as $index => $d) {
 
-            $sekvence = explode("-",$d->sekvence);
+            $sekvence = explode(".",$d->sekvence);
             if ( $sekvence[0] == '' ) {
                 $sekvence_array = '';
                 $sekvence_class = '';
@@ -156,6 +157,7 @@ class SpisovyZnak extends BaseModel
             } else {
                 $string = '$tmp'.$sekvence_array.'['.$d->id.']["spisznak"] = $d;';
             }
+
             eval($string);
         }
 
@@ -171,10 +173,10 @@ class SpisovyZnak extends BaseModel
 
         foreach ( $data as $index => $d ) {
             if ( $index == "spisznak" ) {
-                if ( @is_array($data['spisznak']) ) {
-                    $tmp[ @$data['spisznak']['id'] ] = @$data['spisznak']['nazev'];
+                if ( is_array($data['spisznak']) ) {
+                    $tmp[ $data['spisznak']['id'] ] = $data['spisznak']['nazev'];
                 } else {
-                    $tmp[ @$data['spisznak']->id ] = @$data['spisznak'];
+                    $tmp[ $data['spisznak']->id ] = $data['spisznak'];
                 }
             } else if ( is_numeric($index) ) {
                 $tmp = $this->sestav($data[$index], $tmp);

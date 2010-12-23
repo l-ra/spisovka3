@@ -189,7 +189,7 @@ class Subjekt extends BaseModel
         if ( isset($args['order']) ) {
             $order = $args['order'];
         } else {
-            $order = array('prijmeni','jmeno');
+            $order = array('nazev_subjektu','prijmeni','jmeno');
         }
 
         if ( isset($args['offset']) ) {

@@ -94,8 +94,10 @@ class Spis extends BaseModel
         if ( $spis ) {
             $casti = explode("-",$spis->sekvence);
             if ( $full == 1 ) {
-                $where_numbers = implode(",",$casti);
-                if ( !empty($where_numbers) ) {
+                if ( count($casti)>0 ) {
+                    $where_numbers = implode(",",$casti);
+                    if ( $where_numbers == "," ) return null;
+
                     $args = array('where'=>array('id IN ('.$where_numbers.')'));
                     return $this->seznam($args);
                 } else {
