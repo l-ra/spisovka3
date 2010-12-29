@@ -708,7 +708,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             // odeslat email odesilateli?
             if ( $data['upozornit'] == true ) {
 
-                $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+                $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
                 $ep = $ep_config->toArray();
                 if ( isset($ep['odeslani'][0]) ) {
                     if ( $ep['odeslani'][0]['aktivni'] == '1' ) {
@@ -802,7 +802,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             // odeslat email odesilateli?
             if ( $data['upozornit'] == true ) {
 
-                $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+                $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
+
                 $ep = $ep_config->toArray();
                 if ( isset($ep['isds'][0]) ) {
                     if ( $ep['isds'][0]['aktivni'] == '1' ) {

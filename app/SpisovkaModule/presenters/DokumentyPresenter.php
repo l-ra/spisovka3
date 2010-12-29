@@ -81,7 +81,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function renderPDF()
     {
 
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
         if ( isset($ep['odeslani'][0]) ) {
             if ( $ep['odeslani'][0]['aktivni'] == '1' ) {
@@ -127,7 +127,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         echo "<pre>";
 
-        $ep_config = Config::fromFile(APP_DIR .'/configs/'. KLIENT .'_epodatelna.ini');
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
         if ( isset($ep['odeslani'][0]) ) {
             if ( $ep['odeslani'][0]['aktivni'] == '1' ) {
