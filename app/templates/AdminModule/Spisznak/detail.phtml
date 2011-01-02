@@ -39,5 +39,9 @@
             <dd>{=SpisovyZnak::stav($SpisZnak->stav)}&nbsp;</dd>
         </dl>
         <a href="{link :Admin:Spisznak:detail, 'id'=>$SpisZnak->id, 'upravit'=>'info'}">Upravit</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{link :Admin:Spisznak:odebrat2, 'id'=>$SpisZnak->id}" title="Odstraní tento spisový znak. Všechny jeho podřízené spisové znaky odstraněny nebudou, ale budou přiřazeny nadřazenému spisovému znaku." onclick="return confirm('Opravdu chcete odstranit tento spisový znak? Všechny podřízené spisové znaky odstraněny nebudou, ale budou přiřazeny nadřazenému spisovému znaku.');">Odebrat</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{link :Admin:Spisznak:odebrat1, 'id'=>$SpisZnak->id}" title="Odstraní tento spisový znak včetně všech jeho podřízených spisových znaků." onclick="return confirm('Opravdu chcete odstranit tento spisový znak včetně všech podřízených spisových znaků?');">Odebrat včetně podřízených spisových znaků</a>
     </div>
         {/if}

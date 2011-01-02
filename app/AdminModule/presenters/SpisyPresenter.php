@@ -71,25 +71,20 @@ class Admin_SpisyPresenter extends BasePresenter
         $stav_select = Spis::stav();
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = array();
-        $spisznak_seznam[0] = 'vyberte z nabídky ...';
-        $spisznak_seznam = @array_merge($spisznak_seznam, $SpisovyZnak->seznam(null,1));
-
+        $spisznak_seznam = $SpisovyZnak->seznam(null,1);
 
         $spisy = $Spisy->seznam(null,1);
         $spisy_pod = $Spisy->seznam_pod(@$spis->id);
-        $spisy_pod[] = @$spis->id;
-        foreach ($spisy_pod as $sp) {
-            if ( array_key_exists($sp, $spisy) ) {
-                unset( $spisy[ $sp ] );
+        $spisy_pod[ @$spis->id ] = @$spis->id;
+        foreach ($spisy_pod as $spi => $sp) {
+            if ( array_key_exists($spi, $spisy) ) {
+                unset( $spisy[ $spi ] );
             }
         }
 
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$spis->id);
-        $form1->addHidden('spis_parent_old')
-                ->setValue(@$spis->spis_parent);
 
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu)
                 ->setValue(@$spis->typ);
@@ -178,9 +173,7 @@ class Admin_SpisyPresenter extends BasePresenter
         $spisy = $Spisy->seznam(null,1);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = array();
-        $spisznak_seznam[0] = 'vyberte z nabídky ...';
-        $spisznak_seznam = @array_merge($spisznak_seznam, $SpisovyZnak->seznam(null,1));
+        $spisznak_seznam = $SpisovyZnak->seznam(null,1);
 
         $form1 = new AppForm();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);

@@ -16,7 +16,7 @@ class Spis extends BaseModel
 
     }
 
-    public function seznam($args = null,$select = 0)
+    public function seznam($args = null, $select = 0, $spis_parent = array(0))
     {
 
         if ( isset($args['where']) ) {
@@ -45,182 +45,130 @@ class Spis extends BaseModel
 
 
         $query = $this->fetchAll($order,$where,$offset,$limit);
-
         $rows = $query->fetchAll();
-
-        if ( $select == 1 ) {
-            $rows = $this->setridit($rows,1);
-        } else {
-            $rows = $this->setridit($rows);
-        }
+        $rows = $this->setridit($rows, $select, $spis_parent);
 
         return ($rows) ? $rows : NULL;
 
     }
 
-    public function seznam_pod($spis_id, $full = 0) {
+    public function seznam_pod($spis_id, $full = 0, &$tmp = array()) {
 
 
-        if ( $spis_id == 1 ) {
-            $args = array('where'=>
-                            array('sekvence like %s',"%".$spis_id."%")
-                    );
-        } else {
-            $args = array('where'=>
-                            array('sekvence like %s',"%-".$spis_id."%")
-                    );
-        }
-        $ret = $this->seznam($args);
-        if ( $full == 1 ) {
-            return $ret;
-        } else {
-            $tmp = array();
-            if ( count($ret)>0 ) {
-                foreach ($ret as $r) {
-                    $tmp[] = $r->id;
-                }
-                return $tmp;
-            } else {
-                return null;
+        $args = array(
+            'where' => array(
+                'spis_parent = %i',$spis_id
+            )
+        );
+
+        $ret = $this->seznam($args, ($full==0)?3:0, array($spis_id) );
+
+        if ( count($ret)>0 ) {
+            foreach ( $ret as $id => $s ) {
+                $tmp[ $id ] = $s;
+                $this->seznam_pod($id, $full, $tmp);
             }
-            
-        }
-
-    }
-
-    public function seznam_nad($spis_id, $full = 0) {
-
-        $spis = $this->getInfo($spis_id);
-        if ( $spis ) {
-            $casti = explode("-",$spis->sekvence);
-            if ( $full == 1 ) {
-                if ( count($casti)>0 ) {
-                    $where_numbers = implode(",",$casti);
-                    if ( $where_numbers == "," ) return null;
-
-                    $args = array('where'=>array('id IN ('.$where_numbers.')'));
-                    return $this->seznam($args);
-                } else {
-                    return null;
-                }
-            } else {
-                return $casti;
-            }
+            return $tmp;
         } else {
             return null;
         }
 
     }
 
-    private function setridit($data, $simple=0) {
-        
-        $tmp = array();
+    public function seznam_nad($spis_id, $full = 0, &$tmp = array()) {
 
-        foreach ($data as $index => $d) {
-
-            $sekvence = explode("-",$d->sekvence);
-            if ( $sekvence[0] == '' ) {
-                $sekvence_array = '';
-                $sekvence_class = '';
-            } else {
-                $sekvence_array = '['. implode('][',$sekvence) .']';
-                $sekvence_class = ' item'. implode(' item',$sekvence) .'';
-            }
-            $d->class = $sekvence_class;
-
-            if ( $simple == 1 ) {
-                $nazev = str_repeat(".", 2*$d->uroven) .' '. $d->nazev;
-                $string = '$tmp'.$sekvence_array.'['.$d->id.']["spis"] = array("id"=>$d->id,"nazev"=>"'.$nazev.'");';
-            } else {
-                $string = '$tmp'.$sekvence_array.'['.$d->id.']["spis"] = $d;';
-            }
-            eval($string);
+        $result = $this->_seznam_nad($spis_id, $full, $tmp);
+        if ( isset($result[ $spis_id ]) ) {
+            unset( $result[ $spis_id ] );
         }
 
-        $tmp1 = $this->sestav($tmp);
+        return ( count($result)>0 )? $result : null;
 
-        return $tmp1;
-        //return array ( $tmp , $tmp1 ); // pro porovnani vstupu a vystupu
+
     }
 
-    private function sestav($data,$tmp = array()) {
-        foreach ( $data as $index => $d ) {
-            if ( $index == "spis" ) {
-                if ( is_array($data['spis']) ) {
-                    $tmp[ $data['spis']['id'] ] = $data['spis']['nazev'];
-                } else {
-                    $tmp[ $data['spis']->id ] = $data['spis'];
-                }
-            } else if ( is_numeric($index) ) {
-                $tmp = $this->sestav($data[$index], $tmp);
-            }
-        }
-        return $tmp;
+    public function _seznam_nad($spis_id, $full = 0, &$tmp = array() )
+    {
 
+        $spis = $this->getInfo($spis_id);
+        if ( $spis ) {
+
+            if ( $full == 1 ) {
+                $tmp[ $spis->id ] = $spis;
+            } else {
+                $tmp[ $spis->id ] = $spis->nazev;
+            }
+
+            if ( $spis->spis_parent != 0 ) {
+                $this->seznam_nad($spis->spis_parent, $full, $tmp);
+            }
+
+            return $tmp;
+        } else {
+            return null;
+        }
+
+    }
+
+    private function setridit($data, $simple=0, $spis_parent = array(0), &$tmp = array() )
+    {
+        if ( count($data)>0 ) {
+            if ( $simple == 1 ) {
+                $tmp[0] = 'vyberte z nabídky ...';
+            } else if ( $simple == 2 ) {
+                $tmp[0] = '(hlavní větev)';
+            }
+            $spis_parent_id = end($spis_parent);
+            foreach ( $data as $index => $d ) {
+                if ( $d->spis_parent == $spis_parent_id ) {
+
+                    $d->parent = $spis_parent;
+                    $d->uroven = count($spis_parent);
+                    $d->class = ' item'. implode(' item',$spis_parent) .'';
+
+                    if ( $simple == 1 || $simple == 2 ) {
+                        $nazev = str_repeat(".", 2*$d->uroven) .' '. $d->nazev;
+                        $tmp[ $d->id ] = $nazev;
+                    } else if ( $simple == 3 ) {
+                        $tmp[ $d->id ] = $d->nazev;
+                    } else {
+                        $tmp[ $d->id ] = $d;
+                    }
+
+                    $spis_parent[] = $d->id;
+
+                    if ( isset($tmp[ $spis_parent_id ] ) ) {
+                        @$tmp[ $spis_parent_id ]->potomky = 1;
+                    }
+
+                    $this->setridit($data, $simple, $spis_parent, $tmp);
+                    end($spis_parent);
+                    unset( $spis_parent[ key($spis_parent) ] );
+
+                }
+            }
+
+            return $tmp;
+        } else {
+            return null;
+        }
     }
 
     public function vytvorit($data) {
 
-        if ( $data['spis_parent'] == 1 ) {
-            $data['uroven'] = 1;
-            $data['sekvence'] = '1';
-        } else {
-            $spis_parent = $this->getInfo($data['spis_parent']);
-            $data['uroven'] = $spis_parent->uroven + 1;
-            $data['sekvence'] = $spis_parent->sekvence .'-'. $data['spis_parent'];
-        }
-
-
         $spis_id = $this->insert($data);
-
         return $spis_id;
 
     }
 
     public function upravit($data,$spis_id) {
 
-        //$transaction = (! dibi::inTransaction());
-        //if ($transaction)
-        //dibi::begin();
-
-        
-
-        if ( $data['spis_parent'] != $data['spis_parent_old'] ) {
-            // nove postaveni ve strukture
-            $spis = $this->getInfo($spis_id);
-            $spis_parent = $this->getInfo($data['spis_parent']);
-            $data['uroven'] = $spis_parent->uroven + 1;
-
-            if ( $data['spis_parent'] == '1' ) {
-                $data['sekvence'] = $data['spis_parent'];
-            } else {
-                $data['sekvence'] = $spis_parent->sekvence .'-'. $data['spis_parent'];
-            }
-            //Debug::dump($data);
-            
-            // aplikace postaveni i na vsechny podrizene
-            $pod_spisy = $this->seznam_pod($spis_id,1);
-            if ( count($pod_spisy)>0 ) {
-                foreach( $pod_spisy as $spisyPod ) {
-                    $data_pod = array();
-                    $data_pod['nazev'] = $spisyPod->nazev;
-                    $data_pod['sekvence'] = $data['sekvence'] .'-'. $spisyPod->spis_parent;
-                    $data_pod['uroven'] = $data['uroven'] + 1;
-                    //Debug::dump($data_pod);
-                    $this->update($data_pod,array('id=%i',$spisyPod->id));
-                    unset($data_pod);
-                }
-            }
-
-            //exit;
-        }
+        $data_pod['sekvence'] = null;
+        $data_pod['uroven'] = 1;
 
         unset($data['spis_parent_old']);
         $ret = $this->update($data,array('id=%i',$spis_id));
-
-        //if ($transaction)
-        //dibi::commit();
-
+        
         return $ret;
 
     }

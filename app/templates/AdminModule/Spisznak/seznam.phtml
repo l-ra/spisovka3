@@ -18,7 +18,7 @@
                 {!=str_repeat("&nbsp;", 5*$spisznak->uroven)}
                 <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 &nbsp;&nbsp;
-                <a href="{link :Admin:Spisznak:detail, id => $spisznak->id}">{$spisznak->nazev}</a>
+                <a href="{link :Admin:Spisznak:detail, id => $spisznak->id}">{$spisznak->nazev}</a>{if !empty($spisznak->popis)} - {$spisznak->popis}{/if}
             </td>
         </tr>
         {/foreach}

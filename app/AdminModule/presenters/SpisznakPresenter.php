@@ -43,6 +43,30 @@ class Admin_SpisznakPresenter extends BasePresenter
 
     }
 
+    public function actionOdebrat1()
+    {
+
+        $spisznak_id = $this->getParam('id',null);
+        $SpisovyZnak = new SpisovyZnak();
+        if ( is_numeric($spisznak_id) ) {
+            $SpisovyZnak->odstranit($spisznak_id, 1);
+        }
+        $this->redirect(':Admin:Spisznak:seznam');
+
+    }
+
+    public function actionOdebrat2()
+    {
+
+        $spisznak_id = $this->getParam('id',null);
+        $SpisovyZnak = new SpisovyZnak();
+        if ( is_numeric($spisznak_id) ) {
+            $SpisovyZnak->odstranit($spisznak_id, 2);
+        }
+        $this->redirect(':Admin:Spisznak:seznam');
+
+    }
+
     public function renderDetail()
     {
         $this->template->upravitForm = $this['upravitForm'];
@@ -68,22 +92,18 @@ class Admin_SpisznakPresenter extends BasePresenter
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
-
-        $spisznak_seznam = $SpisovyZnak->seznam(null,1);
-        $spisznak_seznam[0] = '(hlavní větev)';
+        $spisznak_seznam = $SpisovyZnak->seznam(null,2);
         $spisznak_seznam_pod = $SpisovyZnak->seznam_pod(@$spisznak->id);
-        $spisznak_seznam_pod[] = @$spisznak->id;
-        foreach ($spisznak_seznam_pod as $sp) {
-            if ( array_key_exists($sp, $spisznak_seznam) ) {
-                unset( $spisznak_seznam[ $sp ] );
+        $spisznak_seznam_pod[ @$spisznak->id ] = @$spisznak->id;
+        foreach ($spisznak_seznam_pod as $spi => $sp) {
+            if ( array_key_exists($spi, $spisznak_seznam) ) {
+                unset( $spisznak_seznam[ $spi ] );
             }
         }
 
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$spisznak->id);
-        $form1->addHidden('spisznak_parent_old')
-                ->setValue(@$spisznak->spisznak_parent);
 
         $form1->addText('nazev', 'Spisový znak:', 50, 80)
                 ->setValue(@$spisznak->nazev)
@@ -159,8 +179,7 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         $SpisovyZnak = new SpisovyZnak();
 
-        $spisznak_seznam = $SpisovyZnak->seznam(null,1);
-        $spisznak_seznam[''] = '(hlavní větev)';
+        $spisznak_seznam = $SpisovyZnak->seznam(null,2);
 
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');

@@ -1184,9 +1184,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 1);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = array();
-        $spisznak_seznam[0] = 'vyberte z nabídky ...';
-        $spisznak_seznam = @array_merge($spisznak_seznam, $SpisovyZnak->seznam(null,1));
+        $spisznak_seznam = $SpisovyZnak->seznam(null,1);
 
         $Dok = @$this->template->Dok;
 

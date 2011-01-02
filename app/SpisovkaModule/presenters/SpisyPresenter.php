@@ -7,6 +7,11 @@ class Spisovka_SpisyPresenter extends BasePresenter
     {
 
         $this->template->dokument_id = $this->getParam('id',null);
+        if ( empty($this->template->dokument_id) ) {
+            if ( isset($_POST['dokument_id']) ) {
+                $this->template->dokument_id = $_POST['dokument_id'];
+            }
+        }
 
         $Spisy = new Spis();
         $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
@@ -43,6 +48,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
             $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
             $seznam = $Spisy->seznam($args);
             $this->template->seznam = $seznam;
+            $this->template->dokument_id = $dokument_id;
 
             $this->template->chyba = 1;
             
@@ -111,26 +117,20 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $stav_select = Spis::stav();
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = array();
-        $spisznak_seznam[0] = 'vyberte z nabídky ...';
-        $spisznak_seznam = @array_merge($spisznak_seznam, $SpisovyZnak->seznam(null,1));
-
+        $spisznak_seznam = $SpisovyZnak->seznam(null,1);
 
         $spisy = $Spisy->seznam(null,1);
         $spisy_pod = $Spisy->seznam_pod(@$spis->id);
-        $spisy_pod[] = @$spis->id;
-        foreach ($spisy_pod as $sp) {
-            if ( array_key_exists($sp, $spisy) ) {
-                unset( $spisy[ $sp ] );
+        $spisy_pod[ @$spis->id ] = @$spis->id;
+        foreach ($spisy_pod as $spi => $sp) {
+            if ( array_key_exists($spi, $spisy) ) {
+                unset( $spisy[ $spi ] );
             }
         }
 
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$spis->id);
-        $form1->addHidden('spis_parent_old')
-                ->setValue(@$spis->spis_parent);
-
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu)
                 ->setValue(@$spis->typ);
         $form1->addText('nazev', 'Spisová značka / název:', 50, 80)
@@ -215,6 +215,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->getElementPrototype()->id('spis-vytvorit');
+        $form1->addHidden('dokument_id',$this->template->dokument_id);
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
         $form1->addText('nazev', 'Spisová značka / název:', 50, 80)
                 ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
@@ -247,6 +248,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
         try {
             $spis_id = $Spisy->vytvorit($data);
             $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
+            unset($data['dokument_id']);
             if (!$this->isAjax()) {
                 //$this->redirect('this');
             } else {
