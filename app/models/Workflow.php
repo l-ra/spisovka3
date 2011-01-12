@@ -27,13 +27,26 @@ class Workflow extends BaseModel
         if ( count($rows)>0 ) {
 
             $UserModel = new UserModel();
-            foreach ($rows as $index => $wf) {
-               
-                $osoba = $UserModel->getUser($wf->prideleno, 1);
-                $rows[$index]->prideleno_jmeno = Osoba::displayName($osoba->identity);
+            foreach ($rows as $index => &$wf) {
+                if ( !empty($wf->prideleno) ) {
+                    $osoba = $UserModel->getUser($wf->prideleno, 1);
+                    if ( $osoba ) {
+                        $rows[$index]->prideleno_jmeno = Osoba::displayName($osoba->identity);
+                    }
+                }
+                if ( !empty($wf->prideleno_info) ) {
+                    if ( $prideleno_info = unserialize($wf->prideleno_info) ) {
+                        $wf->prideleno_info = $prideleno_info;
+                    }
+                }
+                if ( !empty($wf->orgjednotka_info) ) {
+                    if ( $orgjednotka_info = unserialize($wf->orgjednotka_info) ) {
+                        $wf->orgjednotka_info = $orgjednotka_info;
+                    }
+                }
+
 
             }
-
 
             return $rows;
         } else {

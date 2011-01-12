@@ -651,12 +651,50 @@ class Dokument extends BaseModel
     private function fixedFiltr($nazev, $params = null) {
 
         $user = Environment::getUser()->getIdentity();
+        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
+        $org_jednotka = null;
 
         switch ($nazev) {
-            case 'moje':
+            case 'org':
+                if ( $isVedouci ) {
+                    if ( @count( $user->user_roles )>0 ) {
+                        foreach ( $user->user_roles as $role ) {
+                            if (preg_match('/^vedouci/', $role->code) ) {
+                                $org_jednotka = $role->orgjednotka_id;
+                            }
+                        }
+                    }
+                }
                 $args = array(
-                    'where' => array( array('wf.prideleno=%i',$user->id),array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'), array('wf.aktivni=1') )
+                    'where' => array( array('wf.orgjednotka_id=%i',$org_jednotka),array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'), array('wf.aktivni=1') )
                 );
+                break;
+            case 'moje':
+                if ( $isVedouci ) {
+                    if ( @count( $user->user_roles )>0 ) {
+                        foreach ( $user->user_roles as $role ) {
+                            if (preg_match('/^vedouci/', $role->code) ) {
+                                $org_jednotka = $role->orgjednotka_id;
+                            }
+                        }
+                    }
+                }
+                if ( $org_jednotka ) {
+                    $args = array(
+                        'where' => array(
+                            array('(wf.prideleno=%i',$user->id, ') OR (wf.prideleno IS NULL AND wf.orgjednotka_id=%i)',$org_jednotka),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );
+                } else {
+                    $args = array(
+                        'where' => array(
+                            array('wf.prideleno=%i',$user->id,),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );
+                }
+
                 break;
             case 'predane':
                 $args = array(

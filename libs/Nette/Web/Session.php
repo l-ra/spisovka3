@@ -298,11 +298,11 @@ class Session extends Object
 		$httpRequest = $this->getHttpRequest();
 		$key[] = $httpRequest->getHeader('Accept-Charset');
 		$key[] = $httpRequest->getHeader('Accept-Encoding');
-		$key[] = $httpRequest->getHeader('Accept-Language');
+		//$key[] = $httpRequest->getHeader('Accept-Language');
 		$key[] = $httpRequest->getHeader('User-Agent');
-		if (strpos($key[3], 'MSIE 8.0')) { // IE 8 AJAX bug
-			$key[2] = substr($key[2], 0, 2);
-		}
+		//if (strpos($key[3], 'MSIE 8.0')) { // IE 8 AJAX bug
+		//	$key[2] = substr($key[2], 0, 2);
+		//}
 		return md5(implode("\0", $key));
 	}
 

@@ -2049,20 +2049,39 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         //$args = $Dokument->filtr('moje_vyrizuje');
         //$args = $Dokument->filtr('vsichni_vyrizuji');
 
-        $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
+        if ( Environment::getUser()->isAllowed(null, 'is_vedouci') ) {
+            $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
+            $select = array(
+                'Základní' => array(
+                    'org'=>'Všechny dokumenty, které má na starost organizační jednotka',
+                    'moje'=>'Dokumenty na mé jméno nebo přidelené na organizační jednotku',
+                    'predane'=>'Dokumenty, které mi byly předány',
+                    'pracoval'=>'Dokumenty, nakterých jsem kdy pracoval',
+                    'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
+                    'moje_vyrizuje'=>'Dokumenty, které vyřízuji',
+                    'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
+                    'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizuji',
+                    'vse'=>'Zobrazit všechny dokumenty'
+                )
+            );
+        } else {
+            $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
+            $select = array(
+                'Základní' => array(
+                    'moje'=>'Dokumenty na mé jméno',
+                    'predane'=>'Dokumenty, které mi byly předány',
+                    'pracoval'=>'Dokumenty, nakterých jsem kdy pracoval',
+                    'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
+                    'moje_vyrizuje'=>'Dokumenty, které vyřízuji',
+                    'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
+                    'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizuji',
+                    'vse'=>'Zobrazit všechny dokumenty'
+                )
+            );
+        }
 
-        $select = array(
-                    'Základní' => array(
-                        'moje'=>'Dokumenty na mé jméno',
-                        'predane'=>'Dokumenty, které mi byly předány',
-                        'pracoval'=>'Dokumenty, nakterých jsem kdy pracoval',
-                        'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
-                        'moje_vyrizuje'=>'Dokumenty, které vyřízuji',
-                        'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
-                        'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizuji',
-                        'vse'=>'Zobrazit všechny dokumenty'
-                    )
-                  );
+
+
 
         $form = new AppForm();
         $form->addSelect('filtr', 'Filtr:', $select)
