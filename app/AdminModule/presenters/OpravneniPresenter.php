@@ -5,7 +5,7 @@ class Admin_OpravneniPresenter extends BasePresenter
 
     public function renderSeznam()
     {
-        $this->template->title = " - Seznam roli";
+        $this->template->title = " - Seznam rolí";
 
         $RoleModel = new RoleModel();
         $seznam = $RoleModel->seznam();

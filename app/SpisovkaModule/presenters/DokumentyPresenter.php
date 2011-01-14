@@ -2056,11 +2056,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'org'=>'Všechny dokumenty, které má na starost organizační jednotka',
                     'moje'=>'Dokumenty na mé jméno nebo přidelené na organizační jednotku',
                     'predane'=>'Dokumenty, které mi byly předány',
-                    'pracoval'=>'Dokumenty, nakterých jsem kdy pracoval',
+                    'pracoval'=>'Dokumenty, na kterých jsem kdy pracoval',
                     'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
-                    'moje_vyrizuje'=>'Dokumenty, které vyřízuji',
+                    'moje_vyrizuje'=>'Dokumenty, které vyřizuji',
                     'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
-                    'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizuji',
+                    'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
                     'vse'=>'Zobrazit všechny dokumenty'
                 )
             );
@@ -2070,11 +2070,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 'Základní' => array(
                     'moje'=>'Dokumenty na mé jméno',
                     'predane'=>'Dokumenty, které mi byly předány',
-                    'pracoval'=>'Dokumenty, nakterých jsem kdy pracoval',
+                    'pracoval'=>'Dokumenty, na kterých jsem kdy pracoval',
                     'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
-                    'moje_vyrizuje'=>'Dokumenty, které vyřízuji',
+                    'moje_vyrizuje'=>'Dokumenty, které vyřizuji',
                     'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
-                    'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizuji',
+                    'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
                     'vse'=>'Zobrazit všechny dokumenty'
                 )
             );
