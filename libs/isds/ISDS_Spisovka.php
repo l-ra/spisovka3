@@ -263,7 +263,7 @@ class ISDS_Spisovka extends ISDS {
     }
 
     public function getConfig() {
-        return $this->params;
+        return $this->config;
     }
 
 
