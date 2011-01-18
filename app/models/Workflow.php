@@ -480,10 +480,10 @@ class Workflow extends BaseModel
                         return false;
                     }
                 } else {
-                    return false;
+                    return 'neprideleno';
                 }
             } else {
-                return false;
+                return 'neprideleno';
             }
 
         } else {

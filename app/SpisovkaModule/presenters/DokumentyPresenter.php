@@ -458,6 +458,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ( $ret === "udalost" ) {
                 // manualni vyrizeni
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id,'udalost'=>1));
+            } else if ( $ret === "neprideleno" ) {
+                // neprideleno
+                $this->flashMessage('Nemáte oprávnění označit dokument za vyřízený.','warning');
             } else if ( $ret === true ) {
                 // automaticke vyrizeni
                 $Workflow->zrusit_prevzeti($dokument_id);
