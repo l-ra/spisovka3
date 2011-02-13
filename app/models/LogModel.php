@@ -7,6 +7,8 @@ class LogModel extends BaseModel {
     protected $tb_logdokument = 'log_dokument';
     protected $tb_user = 'user';
 
+    const DOK_UNDEFINED = 00;
+
     const DOK_NOVY      = 11;
     const DOK_ZMENEN    = 12;
     const DOK_SMAZAN    = 13;
@@ -41,6 +43,7 @@ class LogModel extends BaseModel {
 
 
     protected static $typy = array(
+        '00' => 'Nedefinovaná činnost',
         '11' => 'Vytvořen nový dokument',
         '12' => 'Dokument změněn',
         '13' => 'Dokument smazán',
@@ -109,7 +112,7 @@ class LogModel extends BaseModel {
         $res = dibi::query(
             'SELECT * FROM %n ld', $this->tb_logdokument,
             '%if', !is_null($dokument_id), 'WHERE %and', !is_null($dokument_id) ? array(array('ld.dokument_id=%i',$dokument_id)) : array(), '%end',
-            'ORDER BY ld.id'
+            'ORDER BY ld.date'
         );
         return $res->fetchAll($offset, $limit);
 

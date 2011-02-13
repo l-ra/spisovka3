@@ -16,11 +16,31 @@
 
     <div style="margin: 3px 0px;">
     seřadit podle:
+    {if $seradit == "stav"}
+        <a href="{link this, 'seradit'=>'stav_desc'}" title="Seřadit podle stavu dokumentu (nový, předaný, vyřizuje se, vyřízený, ...)">stavu</a> &nbsp;
+    {else}
         <a href="{link this, 'seradit'=>'stav'}" title="Seřadit podle stavu dokumentu (nový, předaný, vyřizuje se, vyřízený, ...)">stavu</a> &nbsp;
+    {/if}
+    {if $seradit == "cj"}
+        <a href="{link this, 'seradit'=>'cj_desc'}" title="Seřadit podle čísla jednacího">čísla jednacího</a> &nbsp;
+    {else}
         <a href="{link this, 'seradit'=>'cj'}" title="Seřadit podle čísla jednacího">čísla jednacího</a> &nbsp;
+    {/if}
+    {if $seradit == "dvzniku"}
+        <a href="{link this, 'seradit'=>'dvzniku_desc'}" title="Seřadit podle data přijetí/vzniku">data přijeti/vzniku</a> &nbsp;
+    {else}
         <a href="{link this, 'seradit'=>'dvzniku'}" title="Seřadit podle data přijetí/vzniku">data přijeti/vzniku</a> &nbsp;
+    {/if}
+    {if $seradit == "vec"}
+        <a href="{link this, 'seradit'=>'vec_desc'}" title="Seřadit podle věci">věci</a> &nbsp;
+    {else}
         <a href="{link this, 'seradit'=>'vec'}" title="Seřadit podle věci">věci</a> &nbsp;
+    {/if}
+    {if $seradit == "prideleno"}
+        <a href="{link this, 'seradit'=>'prideleno_desc'}" title="Seřadit podle přijmení osoby přidělené k dokumentu">přidělené osoby</a> &nbsp;
+    {else}
         <a href="{link this, 'seradit'=>'prideleno'}" title="Seřadit podle přijmení osoby přidělené k dokumentu">přidělené osoby</a> &nbsp;
+    {/if}
     </div>
 
     <div id="dokumenty">

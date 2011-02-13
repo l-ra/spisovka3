@@ -255,14 +255,26 @@ class Dokument extends BaseModel
             case 'stav':
                 $args['order'] = array('wf.stav_dokumentu');
                 break;
+            case 'stav_desc':
+                $args['order'] = array('wf.stav_dokumentu'=>'DESC');
+                break;
             case 'cj':
+                $args['order'] = array('podaci_denik_rok','podaci_denik_poradi');
+                break;
+            case 'cj_desc':
                 $args['order'] = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
                 break;
             case 'vec':
                 $args['order'] = array('d.nazev');
                 break;
+            case 'vec_desc':
+                $args['order'] = array('d.nazev'=>'DESC');
+                break;
             case 'dvzniku':
-                $args['order'] = array('d.datum_vzniku');
+                $args['order'] = array('d.datum_vzniku','podaci_denik_rok','podaci_denik_poradi');
+                break;
+            case 'dvzniku_desc':
+                $args['order'] = array('d.datum_vzniku'=>'DESC','podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
                 break;
             case 'prideleno':
                 //$args['order'] = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');

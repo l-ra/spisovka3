@@ -50,9 +50,11 @@ class DokumentPrilohy extends BaseModel
         if ( count($result)>0 ) {
             foreach ($result as $joinFile) {
 
-                if ( $detail == 1 ) {
+                if ( $detail == 1 && !empty($joinFile->user_created) ) {
                     $user = $UserModel->getUser($joinFile->user_created, 1);
                     $joinFile->user_name = Osoba::displayName($user->identity);
+                } else {
+                    $joinFile->user_name = '';
                 }
                 $joinFile->typ_name = FileModel::typPrilohy($joinFile->typ);
 

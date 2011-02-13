@@ -61,6 +61,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( isset($seradit) ) {
             $Dokument->seradit($args, $seradit);
         }
+        $this->template->seradit = $seradit;
 
         $result = $Dokument->seznam($args);
         $paginator->itemCount = count($result);
