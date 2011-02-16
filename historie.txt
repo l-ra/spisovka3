@@ -20,3 +20,29 @@ Released: 06.09.2010
 - vice roli pro jednoho uzivatele
 - vytvareni vlastnich roli s nastavenim pristupovych prav
 
+=== Ver. 3.0.1 =================================================================
+Released: 14.02.2011
+
+- kontrola pred vyrizenim dokumentu
+- spousteci udalost
+- skartacni rizeni
+- zvyrazneni dokumentu s proslou lhutou zpracovani
+- moznost seradit sloupce
+- aplikace pocatku poradoveho cisla v cisle jednaci pri instalaci
+- vytvoreni odpovedi i ve stavu vyrizeni
+- oprava manipulace se spisovymi znaky a spisy (stromova struktura, upravy, mazani, zobrazeni)
+- oprava odeslani datovych zprav
+- opravy chybnych SQL dotazu
+- oprava generovani vystupu spisovych znaku
+- oprava razeni subjektu
+- oprava chybove hlasky na neplatnost prihlasovacich udaju nebo nedostupnost ISDS
+- uprava rychlych filtru
+- uprava historie dokumentu
+- uprava jmena uzivatele, ktery vytvoril prilohu
+- uprava hlasky pri vyrizeni. Detekce neprideleni
+- uprava prevzeti dokumentu
+- Nette fix - bezduvodne odhlasovani v IE
+
+
+
+
