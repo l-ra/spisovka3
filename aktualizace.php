@@ -90,7 +90,9 @@
                 }
             }
 
-            file_put_contents(WWW_DIR ."clients/".$file."/configs/_aktualizace",$arev);
+            if ( isset($_GET['go']) ) {
+                file_put_contents(WWW_DIR ."clients/".$file."/configs/_aktualizace",$arev);
+            }
 
             dibi::disconnect();
 
@@ -161,7 +163,9 @@
                 }
             }
 
-            file_put_contents(WWW_DIR ."client/configs/_aktualizace",$arev);
+            if ( isset($_GET['go']) ) {
+                file_put_contents(WWW_DIR ."client/configs/_aktualizace",$arev);
+            }
             dibi::disconnect();
 
             echo "\n\n";
