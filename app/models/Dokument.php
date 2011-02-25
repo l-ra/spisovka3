@@ -1,4 +1,4 @@
-<?php
+<?php //netteloader=Dokument
 
 class Dokument extends BaseModel
 {
@@ -13,6 +13,7 @@ class Dokument extends BaseModel
     protected $tb_dok_subjekt = 'dokument_to_subjekt';
     protected $tb_subjekt = 'subjekt';
     protected $tb_dok_file = 'dokument_to_file';
+    protected $tb_epodatelna = 'epodatelna';
 
     public function  __construct() {
 
@@ -25,6 +26,7 @@ class Dokument extends BaseModel
         $this->tb_dok_subjekt = $prefix . $this->tb_dok_subjekt;
         $this->tb_subjekt = $prefix . $this->tb_subjekt;
         $this->tb_dok_file = $prefix . $this->tb_dok_file;
+        $this->tb_epodatelna = $prefix . $this->tb_epodatelna;
 
     }
 
@@ -782,6 +784,11 @@ class Dokument extends BaseModel
                     'from' => array($this->tb_spis => 'spis'),
                     'on' => array('spis.id=sp.spis_id'),
                     'cols' => array('id'=>'spis_id','nazev'=>'nazev_spisu','popis'=>'popis_spisu')
+                ),
+                'epod' => array(
+                    'from' => array($this->tb_epodatelna => 'epod'),
+                    'on' => array('epod.dokument_id=dok.id'),
+                    'cols' => array('identifikator')
                 )
                 
             ),
@@ -961,6 +968,11 @@ class Dokument extends BaseModel
                 $dokument->zpusob_vyrizeni = $zpvyrizeni->nazev;
             } else {
                 $dokument->zpusob_vyrizeni = '';
+            }
+
+            if ( !empty($dokument->identifikator) ) {
+                $Epodatelna = new Epodatelna();
+                $dokument->identifikator = $Epodatelna->identifikator(unserialize($dokument->identifikator));
             }
 
             return $dokument;

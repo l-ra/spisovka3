@@ -1,7 +1,9 @@
 @{block title}Zaevidovat dokument{/block}
 @{block debug}
-<?php print_r($Subjekt); ?>
-<?php print_r($Prilohy); ?>
+<?php /*print_r($Subjekt);*/ ?>
+<?php /*print_r($Prilohy);*/ ?>
+<?php print_r($Identifikator); ?>
+<?php print_r($Original); ?>
 @{/block}
 @{block content}
 
@@ -71,6 +73,42 @@
             <dt>Počet listů:</dt>
             <dd>{$novyForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$novyForm['pocet_priloh']->control}</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Identifikátor epodatelny:</dt>
+            <dd><pre>{$Identifikator['popis']}</pre></dd>
+        </dl>
+        {if $Identifikator['typ'] == "email" }
+        <dl class="detail_item">
+            <dt>Ověření identifikátoru:</dt>
+            <dd>
+            {if $Identifikator['cert_signed'] >= 0 }
+                {$Identifikator['cert_log']['aktualne']['date']} &nbsp;
+                {if $Identifikator['cert_log']['aktualne']['status']==1 }
+                <span style="color:#009900;">{$Identifikator['cert_log']['aktualne']['message']}</span>
+                {else}
+                <span style="color:#990000;">{$Identifikator['cert_log']['aktualne']['message']}</span>
+                {/if}
+                <br />
+                {$Identifikator['cert_log']['prijato']['date']} &nbsp;
+                {if $Identifikator['cert_log']['prijato']['status']==1 }
+                <span style="color:#009900;">{$Identifikator['cert_log']['prijato']['message']}</span>
+                {else}
+                <span style="color:#990000;">{$Identifikator['cert_log']['prijato']['message']}</span>
+                {/if}
+                <br />
+                {$Identifikator['cert_log']['doruceno']['date']} &nbsp;
+                {if $Identifikator['cert_log']['doruceno']['status']==1 }
+                <span style="color:#009900;">{$Identifikator['cert_log']['doruceno']['message']}</span>
+                {else}
+                <span style="color:#990000;">{$Identifikator['cert_log']['doruceno']['message']}</span>
+                {/if}
+            {else}
+                <span style="color:#990000;">{$Identifikator['cert_status']}</span>
+            {/if}
+            </dd>
+        </dl>
+        {/if}
+
     </div>
 
     <div id="dokument_blok_poznamka">

@@ -1,4 +1,4 @@
-<?php
+<?php //netteloader=ImapClientFile
 
 /**
  * Description of imap
@@ -56,7 +56,7 @@ class ImapClientFile {
 
                 if(!$imap_mime->Decode($parameters, $decoded))
                 {
-                    throw new InvalidArgumentException('Chyba při dekódování MIME zprávy: '.$imap_mime->error.' na pozici '.$imap_mime->error_position);
+                    //throw new InvalidArgumentException('Chyba při dekódování MIME zprávy: '.$imap_mime->error.' na pozici '.$imap_mime->error_position);
                     return null;
                 }
                 else
@@ -67,11 +67,11 @@ class ImapClientFile {
                 }
 
             } else {
-                throw new InvalidArgumentException('Soubor "'.$file.'" neexistuje nebo se nenachází na požadovaném místě!');
+                //throw new InvalidArgumentException('Soubor "'.$file.'" neexistuje nebo se nenachází na požadovaném místě!');
                 return null;
             }
         } else {
-            throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
+            //throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
             return null;
         }
     }

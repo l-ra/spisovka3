@@ -341,7 +341,44 @@
             <dt>Počet listů / příloh:</dt>
             <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num}</dd>
         </dl>
+        {if !empty($Dok->identifikator)}
+        <dl class="detail_item">
+            <dt>Identifikátor epodatelny:</dt>
+            <dd><pre>{$Dok->identifikator['popis']}</pre></dd>
+        </dl>
+        {if $Dok->identifikator['typ'] == "email" }
+        <dl class="detail_item">
+            <dt>Ověření identifikátoru:</dt>
+            <dd>
+            {if $Dok->identifikator['cert_signed'] >= 0 }
+                {$Dok->identifikator['cert_log']['aktualne']['date']} &nbsp;
+                {if $Dok->identifikator['cert_log']['aktualne']['status']==1 }
+                <span style="color:#009900;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
+                {else}
+                <span style="color:#990000;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
+                {/if}
+                <br />
+                {$Dok->identifikator['cert_log']['prijato']['date']} &nbsp;
+                {if $Dok->identifikator['cert_log']['prijato']['status']==1 }
+                <span style="color:#009900;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
+                {else}
+                <span style="color:#990000;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
+                {/if}
+                <br />
+                {$Dok->identifikator['cert_log']['doruceno']['date']} &nbsp;
+                {if $Dok->identifikator['cert_log']['doruceno']['status']==1 }
+                <span style="color:#009900;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
+                {else}
+                <span style="color:#990000;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
+                {/if}
+            {else}
+                <span style="color:#990000;">{$Dok->identifikator['cert_status']}</span>
+            {/if}
+            </dd>
+        </dl>
+        {/if}
 
+        {/if}
         {/if}
     </div>
     {if $Vyrizovani == 1 }
@@ -539,7 +576,7 @@
                 {if $Pridelen==1 }
                 <div class="vyber">
                     <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" id="dialog-subjektzmenit">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
                 </div>
                 {/if}
             </td>

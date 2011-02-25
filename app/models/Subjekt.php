@@ -1,4 +1,4 @@
-<?php
+<?php //netteloader=Subjekt
 
 class Subjekt extends BaseModel
 {
@@ -106,12 +106,45 @@ class Subjekt extends BaseModel
 
             // hledani podle emailu
             if ( !empty($data->email) ) {
+
                 $sql = array(
                     'distinct'=>1,
                     'cols'=>$cols,
-                    'where'=> array( array('email LIKE %s','%'.$data->email.'%') ),
                     'order'=> array('version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
                 );
+
+                if ( strpos($data->email,";")!==false ) {
+                    $email_a = explode(";",$data->email);
+                    if ( $count($email_a)>0 ) {
+                        $where_or = array();
+                        foreach ( $email_a as $ea ) {
+                            $ea = trim($ea);
+                            if ( !empty($ea) ) {
+                                $where_or[] = array('email LIKE %s','%'.$ea.'%');
+                            }
+                        }
+                        $sql['where_or'] = $where_or;
+                    } else {
+                        $sql['where'] = array( array('email LIKE %s','%'.$data->email.'%') );
+                    }
+                } else if ( strpos($data->email,",")!==false ) {
+                    $email_a = explode(",",$data->email);
+                    if ( $count($email_a)>0 ) {
+                        $where_or = array();
+                        foreach ( $email_a as $ea ) {
+                            $ea = trim($ea);
+                            if ( !empty($ea) ) {
+                                $where_or[] = array('email LIKE %s','%'.$ea.'%');
+                            }
+                        }
+                        $sql['where_or'] = $where_or;
+                    } else {
+                        $sql['where'] = array( array('email LIKE %s','%'.$data->email.'%') );
+                    }
+                } else {
+                    $sql['where'] = array( array('email LIKE %s','%'.$data->email.'%') );
+                }
+
                 $fetch = $this->fetchAllComplet($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
             }

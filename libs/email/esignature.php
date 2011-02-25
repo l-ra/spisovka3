@@ -1,4 +1,4 @@
-<?php
+<?php //netteloader=esignature
 
 /**
  * eSignature - trida pro praci s elektronickym podpisem
@@ -221,10 +221,12 @@ class esignature {
             $lCertT[] = $ca['cert_path_real'];
         }
 
+        $Cert = new Cert();
+
         $tmp_cert = $this->tempnam("", "crt");
         $res = openssl_pkcs7_verify($filename, 0, $tmp_cert, $lCertT);
 
-        if ($res==1) {
+        if ( $res==1 ) {
             // email overen
             $cert = openssl_x509_parse("file://$tmp_cert");
 
@@ -236,31 +238,62 @@ class esignature {
             }
 
             @unlink($tmp_cert);
-            return 1;
+            return array(
+                'return'=>$res,
+                'status'=>$status,
+                'cert'=>$cert,
+                'cert_info'=>$this->getInfo($cert)
+            );
         } else {
             // email neprosel overenim
-
             $status = openssl_error_string();
 
             if($res == -1) {
+                // Chyba
                 if( strpos($status,"invalid mime type")!==false ) {
                     $status = "Email není podepsán!";
                 } else {
                     $status = "Email nelze ověřit! Email je buď poškozený nebo není kompletní nebo nelze ověřit podpis.";
                     //$status = "Email nelze ověřit! Chyba aplikace! ". openssl_error_string();
                 }
+                return array(
+                    'return'=>$res,
+                    'status'=>$status,
+                );
             } else {
+                // Certifikat neprosel kontrolou
+                $Cert = new Cert();
+                $email_data = file_get_contents($filename);
+                $cert_info = $Cert->fromEmail($email_data);
+
                 if( strpos($status,"digest failure")!==false ) {
                     $status = "Email je podepsán, ale je poškozený!";
+                    $res = 0;
                 } else if( strpos($status,"certificate verify error")!==false ) {
-                    $status = "Email je podepsán, ale není ověřen kvalifikovanou CA!";
+
+                    if ( $cert_info->error > 0 ) {
+                        $status = "Podpis je neplatný! ". $cert_info->error_message;
+                        $res = 3;
+                    } else {
+                        $status = "Email je podepsán, ale není ověřen kvalifikovanou CA!";
+                        $res = 2;
+                    }
+
+
                 } else {
                     $status = "Email je neplatný!";
+                    $res = 0;
                 }
-            }
 
-            @unlink($tmp_cert);
-            return $res;
+                @unlink($tmp_cert);
+                return array(
+                    'return'=>$res,
+                    'status'=>$status,
+                    'cert'=>$cert_info,
+                    'cert_info'=>$this->getInfoCert($cert_info)
+                );
+
+            }
         }
 
     }
@@ -317,7 +350,9 @@ class esignature {
 
         $info['adresa'] = @@$cert['subject']['L'];
         $info['email'] = null;
-        if(isset( $cert['extensions']['subjectAltName'])) {
+        if ( !empty($cert['subject']['emailAddress']) ) {
+            $info['email'] = $cert['subject']['emailAddress'];
+        } else if(isset( $cert['extensions']['subjectAltName'])) {
             if( preg_match("/email:(.*?),/", $cert['extensions']['subjectAltName'],$mathes) ) {
                 $info['email'] = trim($mathes[1]);
             }
@@ -325,6 +360,47 @@ class esignature {
         $info['platnost_od'] = @$cert['validFrom_time_t'];
         $info['platnost_do'] = @$cert['validTo_time_t'];
         $info['CA'] = @$cert['issuer']['CN'];
+        $info['CA_org'] = @$cert['issuer']['O'];
+
+        if ( !empty($cert['extensions']['crlDistributionPoints']) ) {
+            $crl_d = str_replace("URI:","",$cert['extensions']['crlDistributionPoints']);
+            $info['CRL'] = explode("\n",$crl_d);
+        } else {
+            $info['CRL'] = null;
+        }
+
+
+        return $info;
+    }
+
+    public function getInfoCert($cert=null) {
+
+        if(is_null($cert) || !is_object($cert)) {
+            return null;
+        }
+
+        $info = array();
+
+        $info['serial_number'] = sprintf("%X",$cert->id);
+        $info['id'] = @$cert->id_name;
+        $info['jmeno'] = @$cert->name;
+
+        if(!empty($cert->org)) {
+            $info['organizace'] = $cert->org;
+            $info['jednotka'] = @$cert->subjekt->organizationUnitName;
+        } else {
+            $info['organizace'] = "";
+            $info['jednotka'] = "";
+        }
+
+        $info['adresa'] = @$cert->locality;
+        $info['email'] = @$cert->email;
+        $info['platnost_od'] = @$cert->subjekt->platnost_od_unix;
+        $info['platnost_do'] = @$cert->subjekt->platnost_do_unix;
+        $info['CA'] = @$cert->CA_name;
+        $info['CA_org'] = @$cert->CA_org;
+        $info['CRL'] = @$cert->CRL;
+        $info['error'] = @$cert->error_message;
 
         return $info;
     }

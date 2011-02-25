@@ -1,4 +1,4 @@
-<?php
+<?php //netteloader=Epodatelna_DefaultPresenter
 
 class Epodatelna_DefaultPresenter extends BasePresenter
 {
@@ -104,16 +104,57 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 // Nacteni originalu emailu
                 if ( !empty( $zprava->source_id ) ) {
                     $original = $this->nactiEmail($zprava->source_id);
+
+                    if ( $original['signature']['signed'] == 3 ) {
+
+                        $od = $original['signature']['cert_info']['platnost_od'];
+                        $do = $original['signature']['cert_info']['platnost_do'];
+
+                        $original['signature']['log']['aktualne']['date'] = date("d.m.Y H:i:s");
+                        $original['signature']['log']['aktualne']['message'] = $original['signature']['status'];
+                        $original['signature']['log']['aktualne']['status'] = 0;
+
+
+                        $doruceno = strtotime($zprava->doruceno_dne);
+                        $original['signature']['log']['doruceno']['date'] = date("d.m.Y H:i:s",$doruceno);
+                        if ( $od <= $doruceno && $doruceno <= $do ) {
+                            $original['signature']['log']['doruceno']['message'] = "Podpis byl v době doručení platný";
+                            $original['signature']['log']['doruceno']['status'] = 1;
+                        } else {
+                            $original['signature']['log']['doruceno']['message'] = "Podpis nebyl v době doručení platný!";
+                            $original['signature']['log']['doruceno']['status'] = 0;
+                        }
+
+                        $prijato = strtotime($zprava->prijato_dne);
+                        $original['signature']['log']['prijato']['date'] = date("d.m.Y H:i:s",$prijato);
+                        if ( $od <= $prijato && $prijato <= $do ) {
+                            $original['signature']['log']['prijato']['message'] = "Podpis byl v době přijetí platný";
+                            $original['signature']['log']['prijato']['status'] = 1;
+                        } else {
+                            $original['signature']['log']['prijato']['message'] = "Podpis nebyl v době přijetí platný!";
+                            $original['signature']['log']['prijato']['status'] = 0;
+                        }
+
+                    }
+
+
                 }
             } else if ( !empty($zprava->isds_signature) ) {
                 // Nacteni originalu DS
                 if ( !empty( $zprava->source_id ) ) {
-                    $original = null;// $this->nactiISDS($zprava->source_id);
+                    $source = $this->nactiISDS($zprava->source_id);
+                    if ( $source ) {
+                        $original = unserialize($source);
+                    } else {
+                        $original = null;
+                    }
+                    
                 }
             } else {
                 // zrejme odchozi zprava ven
             }
             $this->template->Original = $original;
+            $this->template->Identifikator = $this->Epodatelna->identifikator($zprava, $original);
 
         } else {
             $this->flashMessage('Požadovaná zpráva neexistuje!','warning');
@@ -130,7 +171,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     public function renderZkontrolovat()
     {
 
-        @set_time_limit(300); // z moznych dusletku vetsich poctu polozek je nastaven timeout na 5 minut
+        @set_time_limit(600); // z moznych dusledku vetsich poctu polozek je nastaven timeout na 10 minut
 
         //$storage = new FileStorage(APP_DIR .'/app/temp/cache');
         //$cache = new Cache($storage); // nebo $cache = Environment::getCache()
@@ -578,10 +619,19 @@ dmFormat =
         $storage_conf = Environment::getConfig('storage');
         eval("\$DownloadFile = new ".$storage_conf->type."();");
 
+        if ( strpos($source_id,"-") !== false ) {
+            list($source_id, $part) = explode("-",$source_id);
+        }
+
         $FileModel = new FileModel();
         $file = $FileModel->getInfo($source_id);
         $res = $DownloadFile->download($file,1);
-        return $res;
+        if ( $res >= 1 ) {
+            return null;
+        } else {
+            return $res;
+        }
+        
 
     }
 
@@ -590,6 +640,10 @@ dmFormat =
 
         $storage_conf = Environment::getConfig('storage');
         eval("\$DownloadFile = new ".$storage_conf->type."();");
+
+        if ( strpos($source_id,"-") !== false ) {
+            list($source_id,$part) = explode("-",$source_id);
+        }
 
         $FileModel = new FileModel();
         $file = $FileModel->getInfo($source_id);
@@ -603,18 +657,13 @@ dmFormat =
         // Kontrola epodpisu
         $esign = new esignature();
         $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
-        if ( $esigned = $esign->verifySignature($res, $esign_cert, $esign_status) ) {
-            $tmp['signature']['cert'] = $esign_cert;
-            $tmp['signature']['cert_info'] = $esign->getInfo($esign_cert);
-            $tmp['signature']['status'] = $esign_status;
-            $tmp['signature']['signed'] = $esigned;
-        } else {
-            $tmp['signature']['cert'] = null;
-            $tmp['signature']['cert_info'] = null;
-            $tmp['signature']['status'] = $esign_status;
-            $tmp['signature']['signed'] = $esigned;
-        }
+        $esigned = $esign->verifySignature($res, $esign_cert, $esign_status);
 
+        //Debug::dump($esigned); exit;
+        $tmp['signature']['cert'] = @$esigned['cert'];
+        $tmp['signature']['cert_info'] = @$esigned['cert_info'];
+        $tmp['signature']['status'] = @$esigned['status'];
+        $tmp['signature']['signed'] = @$esigned['return'];
 
         //$imap = new ImapClient();
         $imap = new ImapClientFile();

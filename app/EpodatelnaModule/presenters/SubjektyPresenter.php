@@ -1,4 +1,4 @@
-<?php
+<?php //netteloader=Epodatelna_SubjektyPresenter
 
 class Epodatelna_SubjektyPresenter extends BasePresenter
 {

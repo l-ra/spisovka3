@@ -1,7 +1,7 @@
 @{block title}Detail zprávy{/block}
 @{block debug}
 <?php echo "Zprava: "; print_r($Zprava); ?>
-<?php echo "Prilohy: "; print_r($Prilohy); ?>
+<?php /*echo "Prilohy: "; print_r($Prilohy);*/ ?>
 <?php echo "Original: "; print_r($Original); ?>
 @{/block}
 @{block content}
@@ -52,31 +52,6 @@
             <dt>Odesílatel:</dt>
             <dd>{$Zprava->odesilatel}&nbsp;</dd>
         </dl>
-        {if !empty($Zprava->email_signature) }
-        <dl class="detail_item">
-            <dt>Ověření:</dt>
-            <dd>
-            {if isset($Original['signature'])}
-                {if $Original['signature']['signed'] == 1 }
-                <span style="color:#009900;">{$Original['signature']['status']}</span>
-                <br /><br />
-                {if isset($Original['signature']['cert_info']['organizace'])}{$Original['signature']['cert_info']['organizace']}<br />{/if}
-                {if isset($Original['signature']['cert_info']['jmeno'])}{$Original['signature']['cert_info']['jmeno']}<br />{/if}
-                {$Original['signature']['cert_info']['email']}<br />
-                {if isset($Original['signature']['cert_info']['adresa'])}{$Original['signature']['cert_info']['adresa']}<br />{/if}
-                Platnost: {=date('j.n.Y',$Original['signature']['cert_info']['platnost_od'])} - {=date('j.n.Y',$Original['signature']['cert_info']['platnost_do'])}<br />
-                CA: {$Original['signature']['cert_info']['CA']}
-                {elseif $Original['signature']['signed'] == -1}
-                <span style="color:#990000;">{$Original['signature']['status']}</span>
-                {else}
-                <span style="color:#684A03;">{$Original['signature']['status']}</span>
-                {/if}
-            {else}
-                <span style="color:#990000;">Nepodařilo se zjístit důvěryhodnost zprávy</span>
-            {/if}
-            </dd>
-        </dl>
-        {/if}
         <dl class="detail_item">
             <dt>Doručeno:</dt>
             <dd>{$Zprava->doruceno_dne|edatetime}&nbsp;</dd>
@@ -85,6 +60,42 @@
             <dt>Přijato epodatelnou:</dt>
             <dd>{$Zprava->prijato_dne|edatetime}&nbsp;</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Identifikátor epodatelny:</dt>
+            <dd><pre>{$Identifikator['popis']}</pre></dd>
+        </dl>
+        {if $Identifikator['typ'] == "email" }
+        <dl class="detail_item">
+            <dt>Ověření identifikátoru:</dt>
+            <dd>
+            {if $Identifikator['cert_signed'] >= 0 }
+                {$Identifikator['cert_log']['aktualne']['date']} &nbsp;
+                {if $Identifikator['cert_log']['aktualne']['status']==1 }
+                <span style="color:#009900;">{$Identifikator['cert_log']['aktualne']['message']}</span>
+                {else}
+                <span style="color:#990000;">{$Identifikator['cert_log']['aktualne']['message']}</span>
+                {/if}
+                <br />
+                {$Identifikator['cert_log']['prijato']['date']} &nbsp;
+                {if $Identifikator['cert_log']['prijato']['status']==1 }
+                <span style="color:#009900;">{$Identifikator['cert_log']['prijato']['message']}</span>
+                {else}
+                <span style="color:#990000;">{$Identifikator['cert_log']['prijato']['message']}</span>
+                {/if}
+                <br />
+                {$Identifikator['cert_log']['doruceno']['date']} &nbsp;
+                {if $Identifikator['cert_log']['doruceno']['status']==1 }
+                <span style="color:#009900;">{$Identifikator['cert_log']['doruceno']['message']}</span>
+                {else}
+                <span style="color:#990000;">{$Identifikator['cert_log']['doruceno']['message']}</span>
+                {/if}
+            {else}
+                <span style="color:#990000;">{$Identifikator['cert_status']}</span>
+            {/if}
+            </dd>
+        </dl>
+        {/if}
+
     </div>
 
     <div id="dokument_blok_poznamka">

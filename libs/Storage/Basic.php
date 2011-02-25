@@ -1,4 +1,4 @@
-<?php
+<?php //netteloader=Storage_Basic
 
 
 class Storage_Basic extends FileModel {
@@ -326,11 +326,16 @@ class Storage_Basic extends FileModel {
 
         if ( file_exists($file) ) {
             $path_parts = pathinfo($file);
-            $ext = $path_parts['extension'];
+            if ( !isset($path_parts['extension']) ) {
+                $ext = "";
+            } else {
+                $ext = ".". $path_parts['extension'];
+            }
+            
             $filename = str_replace('.'.$ext, '', $path_parts['basename']);
             $filename = $filename .'_'. $postfix;
 
-            $file_new = $path_parts['dirname'] .'/'. $filename .'.'. $path_parts['extension'];
+            $file_new = $path_parts['dirname'] .'/'. $filename . $ext;
             if ( file_exists($file_new) ) {
                 return $this->fileExists($file, $postfix++);
             } else {

@@ -1,4 +1,4 @@
-<?php
+<?php //netteloader=Epodatelna_EvidencePresenter
 
 class Epodatelna_EvidencePresenter extends BasePresenter
 {
@@ -79,13 +79,16 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 }
 
                 $subjekt->nazev_subjektu = $zprava->odesilatel;
-                $subjekt->prijmeni = $original['zprava']->from->personal;
-                $subjekt->email = $original['zprava']->from->email;
+                $subjekt->prijmeni = @$original['zprava']->from->personal;
+                $subjekt->email = @$original['zprava']->from->email;
 
-                if ( $original['signature']['signed'] == 1 ) {
+                if ( $original['signature']['signed'] >= 0 ) {
+
                     $subjekt->nazev_subjektu = $original['signature']['cert_info']['organizace'];
                     $subjekt->prijmeni = $original['signature']['cert_info']['jmeno'];
-                    $subjekt->email = $original['signature']['cert_info']['email'];
+                    if ( !empty($original['signature']['cert_info']['email']) && $subjekt->email != $original['signature']['cert_info']['email'] ) {
+                        $subjekt->email = $subjekt->email ."; ". $original['signature']['cert_info']['email'];
+                    }
                     $subjekt->adresa_ulice = $original['signature']['cert_info']['adresa'];
                 }
 
@@ -122,6 +125,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 // zrejme odchozi zprava ven
             }
             $this->template->Original = $original;
+
+            $this->template->Identifikator = $this->Epodatelna->identifikator($zprava,$original);
+            
 
         } else {
             $this->flashMessage('Požadovaná zpráva neexistuje!','warning');
@@ -315,8 +321,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->setValue('30');
-        $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
-                ->setValue(@$zprava->popis);
+        
+        if ( !empty($zprava->isds_signature) ) {
+            $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
+        } else {
+            $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
+                ->setValue(@html_entity_decode($zprava->popis));
+        }
+
 
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3)
                 ->setValue('Předáno z e-podatelny');
