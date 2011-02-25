@@ -88,27 +88,7 @@ $(function() {
     });
 
     $("#spis-vytvorit").live("submit", function () {
-
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    text = '<div class="flash_message flash_info">Spis byl úspěšně vytvořen.</div>';
-                    text = text + x.responseText;
-                    $('#dialog').html(text);
-                }
-            }
-            var formdata = $(this).serialize();
-
-            x.open("POST", $(this).attr('action'), true);
-            x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            x.setRequestHeader("Content-length", formdata.length);
-            x.setRequestHeader("Connection", "close");            
-            x.send(formdata);
-        }
-
+        spisVytvorit($(this));
         return false;
     });
 
@@ -125,44 +105,8 @@ $(function() {
         return dialog(this,'Subjekt');
     });
 
-    // Dialog - Vyber subjektu
-    $('#dialog-subjektzmenit').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Subjekt');
-    });
-
-
     $("#subjekt-vytvorit").live("submit", function () {
-
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-
-                    stav = x.responseText;
-                    if ( stav.indexOf('###zmeneno###') != -1 ) {
-                        stav = stav.replace('###zmeneno###','');
-                        $('#dialog').dialog('close');
-                        renderSubjekty(stav);
-                    } else {
-                        text = '';// '<div class="flash_message flash_info">Subjekt byl úspěšně vytvořen.</div>';
-                        text = text + x.responseText;
-                        $('#dialog').html(text);
-                    }
-
-                }
-            }
-            var formdata = $(this).serialize();
-
-            x.open("POST", $(this).attr('action'), true);
-            x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            x.setRequestHeader("Content-length", formdata.length);
-            x.setRequestHeader("Connection", "close");
-            x.send(formdata);
-        }
-
+        subjektVytvorit($(this));
         return false;
     });
 
@@ -215,7 +159,9 @@ dialog = function ( elm, title ) {
                 $('#dialog').html(x.responseText);
             }
         }
-        x.open("GET", elm.href, true);
+        url = elm.href;
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        x.open("GET", url, true);
         x.send(null);
     }
 
@@ -242,7 +188,7 @@ aresSubjekt = function ( formName ) {
     baseUri = baseUri.replace('/public','');
     //var url = baseUri + '/subjekty/ares/' + frmIC.value;
     var url = baseUri + 'subjekty/' + frmIC.value +'/ares';
-    alert( url );
+    //alert( url );
 
     $.getJSON(url, function(data) {
 
@@ -305,7 +251,9 @@ spisVybran = function (elm) {
                 }
             }
         }
-        x.open("GET", elm.href, true);
+        url = elm.href;
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        x.open("GET", url, true);
         x.send(null);
     }
 
@@ -372,13 +320,49 @@ novySubjekt = function (elm) {
                 $('#dialog').html(x.responseText);
             }
         }
-        x.open("GET", elm.href, true);
+        url = elm.href;
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        x.open("GET", url, true);
         x.send(null);
     }
 
     $('#ui-dialog-title-dialog').html('Nový subjekt');
     $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
     //$('#dialog').dialog('open');
+
+    return false;
+}
+
+subjektVytvorit = function (elm) {
+
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+
+                stav = x.responseText;
+                if ( stav.indexOf('###zmeneno###') != -1 ) {
+                    stav = stav.replace('###zmeneno###','');
+                    $('#dialog').dialog('close');
+                    renderSubjekty(stav);
+                } else {
+                    text = '';// '<div class="flash_message flash_info">Subjekt byl úspěšně vytvořen.</div>';
+                    text = text + x.responseText;
+                    $('#dialog').html(text);
+                }
+            }
+        }
+
+        var formdata = $(elm).serialize();
+        
+        x.open("POST", $(elm).attr('action'), true);
+        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        x.setRequestHeader("Content-length", formdata.length);
+        x.setRequestHeader("Connection", "close");
+        x.send(formdata);
+    }
 
     return false;
 }
@@ -402,7 +386,9 @@ subjektVybran = function (elm) {
                 }
             }
         }
-        x.open("GET", elm.href, true);
+        url = elm.href;
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        x.open("GET", url, true);
         x.send(null);
     }
 
@@ -413,26 +399,27 @@ subjektVybran = function (elm) {
 }
 
 subjektzmenit = function(elm){
-        
 
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    $('#dialog').html(x.responseText);
-                }
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                $('#dialog').html(x.responseText);
             }
-            x.open("GET", elm.href, true);
-            x.send(null);
         }
+        url = elm.href;
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        x.open("GET", url, true);
+        x.send(null);
+    }
 
-        $('#ui-dialog-title-dialog').html('Subjekt');
-        $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
-        $('#dialog').dialog('open');
+    $('#ui-dialog-title-dialog').html('Subjekt');
+    $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
+    $('#dialog').dialog('open');
 
-        return false;
+    return false;
 }
 
 subjektUpravitStorno = function () {
@@ -486,7 +473,7 @@ osobaVybrana = function (elm) {
 
         poznamka = document.getElementById('frmpred-poznamka').value;
         url = elm.href + '&poznamka='+ poznamka;
-
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }
@@ -499,24 +486,26 @@ osobaVybrana = function (elm) {
 
 prilohazmenit = function(elm){
 
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    $('#dialog').html(x.responseText);
-                }
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                $('#dialog').html(x.responseText);
             }
-            x.open("GET", elm.href, true);
-            x.send(null);
         }
+        url = elm.href;
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        x.open("GET", url, true);
+        x.send(null);
+    }
 
-        $('#ui-dialog-title-dialog').html('Upravit přílohu');
-        $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
-        $('#dialog').dialog('open');
+    $('#ui-dialog-title-dialog').html('Upravit přílohu');
+    $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
+    $('#dialog').dialog('open');
 
-        return false;
+    return false;
 }
 
 odebratPrilohu = function(elm, dok_id){
@@ -532,7 +521,9 @@ odebratPrilohu = function(elm, dok_id){
                     renderPrilohy(dok_id);
                 }
             }
-            x.open("GET", elm.href, true);
+            url = elm.href;
+            elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+            x.open("GET", url, true);
             x.send(null);
         }
 
@@ -554,7 +545,9 @@ odebratSubjekt = function(elm, dok_id){
                     return false;
                 }
             }
-            x.open("GET", elm.href, true);
+            url = elm.href;
+            elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+            x.open("GET", url, true);
             x.send(null);
         }
 
@@ -641,7 +634,9 @@ spojitDokument = function (elm) {
                 }
             }
         }
-        x.open("GET", elm.href, true);
+        url = elm.href;
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        x.open("GET", url, true);
         x.send(null);
     }
 
@@ -679,12 +674,40 @@ pripojitDokument = function (elm) {
                 }
             }
         }
-        x.open("GET", elm.href, true);
+        url = elm.href;
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        x.open("GET", url, true);
         x.send(null);
     }
 
     $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
 
+
+    return false;
+}
+
+spisVytvorit = function (elm) {
+
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                text = '<div class="flash_message flash_info">Spis byl úspěšně vytvořen.</div>';
+                text = text + x.responseText;
+                $('#dialog').html(text);
+            }
+        }
+
+        var formdata = $(elm).serialize();
+
+        x.open("POST", $(elm).attr('action'), true);
+        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        x.setRequestHeader("Content-length", formdata.length);
+        x.setRequestHeader("Connection", "close");
+        x.send(formdata);
+    }
 
     return false;
 }
@@ -717,11 +740,11 @@ filtrSestavy = function (elm) {
 zobrazSestavu = function (elm) {
 
     var param = '?';
-    if ( elm.pc_od.value != '' ) { param = param + 'pc_od=' + elm.pc_od.value + '&' }
-    if ( elm.pc_do.value != '' ) { param = param + 'pc_do=' + elm.pc_do.value + '&' }
-    if ( elm.d_od.value != '' )  { param = param + 'd_od=' + elm.d_od.value + '&' }
-    if ( elm.d_do.value != '' )  { param = param + 'd_do=' + elm.d_do.value + '&' }
-    if ( elm.rok.value != '' )   { param = param + 'rok=' + elm.rok.value }
+    if ( elm.pc_od.value != '' ) {param = param + 'pc_od=' + elm.pc_od.value + '&'}
+    if ( elm.pc_do.value != '' ) {param = param + 'pc_do=' + elm.pc_do.value + '&'}
+    if ( elm.d_od.value != '' )  {param = param + 'd_od=' + elm.d_od.value + '&'}
+    if ( elm.d_do.value != '' )  {param = param + 'd_do=' + elm.d_do.value + '&'}
+    if ( elm.rok.value != '' )   {param = param + 'rok=' + elm.rok.value}
 
     window.location.href = elm.url.value + param;
 
