@@ -4,6 +4,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 {
 
     private $filtr;
+    private $filtr_bezvyrizenych;
     private $hledat;
     private $odpoved = null;
     private $typ_evidence = null;
@@ -36,13 +37,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
         if ( isset($filtr) ) {
             // podrobne hledani = array
-            $args = $Dokument->filtr($filtr);
-            $this->filtr = $filtr;
+            $args = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
+            $this->filtr = $filtr['filtr'];
+            $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
             $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
         } else {
             // rychle hledani = string
             $args = $Dokument->filtr('moje');
             $this->filtr = 'moje';
+            $this->filtr_bezvyrizenych = false;
         }
 
         if ( isset($hledat) ) {
@@ -75,6 +78,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } 
 
         $this->template->seznam = $seznam;
+
+        $this->template->filtrForm = $this['filtrForm'];
+
 
     }
 
@@ -2094,12 +2100,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             );
         }
 
-
-
+        $filtr_bezvyrizenych =  !is_null($this->filtr_bezvyrizenych)?$this->filtr_bezvyrizenych:false;
 
         $form = new AppForm();
         $form->addSelect('filtr', 'Filtr:', $select)
                 ->setValue($filtr)
+                ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
+        $form->addCheckbox('bez_vyrizenych','Nezobrazovat vyřízené nebo archivované dokumenty')
+                ->setValue($filtr_bezvyrizenych)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
         $form->addSubmit('go_filtr', 'Filtrovat')
                  ->setRendered(TRUE)
@@ -2120,7 +2128,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $this->forward('this', array('filtr'=>$data['filtr']));
+        $this->forward('this', array('filtr'=>array('filtr'=>$data['filtr'],'bez_vyrizenych'=>$data['bez_vyrizenych']) ));
 
     }
 

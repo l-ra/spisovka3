@@ -721,6 +721,7 @@ label.required {
 /* *** FILTR cONTROL *** */
 #filtr {
     float: left;
+    width: 45%;
     margin: 20px 0px;
     text-align: left;
 }

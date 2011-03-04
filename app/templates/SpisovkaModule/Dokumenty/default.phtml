@@ -6,7 +6,12 @@
     <h2>Seznam dokumentů</h2>
 
     <div id="filtr">
-        {control filtrForm}
+        {$filtrForm->render('begin')}
+        {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
+        {$filtrForm['go_filtr']->control}
+        <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        {$filtrForm['bez_vyrizenych']->control}{$filtrForm['bez_vyrizenych']->label}
+        {$filtrForm->render('end')}
     </div>
     <div id="search">
         {control searchForm}

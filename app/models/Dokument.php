@@ -288,14 +288,14 @@ class Dokument extends BaseModel
 
     }
 
-    public function filtr($nazev = null, $params = null) {
+    public function filtr($nazev = null, $params = null, $bez_vyrizenych = false) {
 
         if ( is_null($nazev) && is_null($params) ) {
             return null;
         } else if ( is_null($nazev) ) {
             return $this->paramsFiltr($params);
         } else {
-            return $this->fixedFiltr($nazev, $params);
+            return $this->fixedFiltr($nazev, $params, $bez_vyrizenych);
         }
     }
 
@@ -662,10 +662,11 @@ class Dokument extends BaseModel
 
     }
 
-    private function fixedFiltr($nazev, $params = null) {
+    private function fixedFiltr($nazev, $params = null, $bez_vyrizenych = null) {
 
         $user = Environment::getUser()->getIdentity();
         $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
+        $vyrusit_bezvyrizeni = false;
         $org_jednotka = null;
 
         switch ($nazev) {
@@ -716,6 +717,7 @@ class Dokument extends BaseModel
                 );
                 break;
             case 'pracoval':
+                $vyrusit_bezvyrizeni = true;
                 $args = array(
                     'where' => array( array('wf.prideleno=%i',$user->id),array('wf.stav_osoby < 100') )
                 );
@@ -741,12 +743,14 @@ class Dokument extends BaseModel
                 );
                 break;
             case 'moje_vyrizene':
+                $vyrusit_bezvyrizeni = true;
                 $args = array(
                     'where' => array( array('wf.prideleno=%i',$user->id),array('wf.stav_osoby = 1'), 
                                       array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)') )
                 );
                 break;
             case 'vsichni_vyrizene':
+                $vyrusit_bezvyrizeni = true;
                 $args = array(
                     'where' => array( array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)') )
                 );
@@ -762,6 +766,15 @@ class Dokument extends BaseModel
                 );
                 break;
         }
+
+        if ( $bez_vyrizenych && !$vyrusit_bezvyrizeni ) {
+
+            // TODO vyresit jeste variantu na kterych jsem pracoval -> aktivni=0
+
+            $args['where'] = array( array('wf.aktivni=1'), array('!((wf.stav_dokumentu = 4) OR (wf.stav_dokumentu = 5))') );
+
+        }
+
 
         return $args;
 
