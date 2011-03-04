@@ -336,9 +336,11 @@ dmAllowSubstDelivery =
 dmFiles = objekt
  */
 
+                        $annotation = empty($mess->dmDm->dmAnnotation)?"(Datová zpráva č. ".$mess->dmDm->dmID.")":$mess->dmDm->dmAnnotation;
+
                         $popis  = '';
                         $popis .= "ID datové zprávy    : ". $mess->dmDm->dmID ."\n";// = 342682
-                        $popis .= "Věc, předmět zprávy : ". $mess->dmDm->dmAnnotation ."\n";//  = Vaše datová zpráva byla přijata
+                        $popis .= "Věc, předmět zprávy : ". $annotation ."\n";//  = Vaše datová zpráva byla přijata
                         $popis .= "\n";
                         $popis .= "Číslo jednací odeslatele   : ". $mess->dmDm->dmSenderRefNumber ."\n";//  = AB-44656
                         $popis .= "Spisová značka odesílatele : ". $mess->dmDm->dmSenderIdent ."\n";//  = ZN-161
@@ -381,7 +383,7 @@ dmFiles = objekt
                         $zprava['poradi'] = $this->Epodatelna->getMax();
                         $zprava['rok'] = date('Y');
                         $zprava['isds_signature'] = $z->dmID;
-                        $zprava['predmet'] = $z->dmAnnotation;
+                        $zprava['predmet'] = $annotation;
                         $zprava['popis'] = $popis;
                         $zprava['odesilatel'] = $z->dmSender .', '. $z->dmSenderAddress;
                         //$zprava['odesilatel_id'] = $z->dmAnnotation;
@@ -526,13 +528,18 @@ dmFormat =
                             $popis .= "\n\n";
                         }
 
-                        
+                        if ( empty($z->from_address) ) {
+                            $predmet = empty($z->subject)?"[Bez předmětu] Emailová zpráva":$z->subject;
+                        } else {
+                            $predmet = empty($z->subject)?"[Bez předmětu] Emailová zpráva od ".$z->from_address:$z->subject;
+                        }
+
 
                         $zprava = array();
                         $zprava['poradi'] = $this->Epodatelna->getMax();
                         $zprava['rok'] = date('Y');
                         $zprava['email_signature'] = $z->message_id;
-                        $zprava['predmet'] = $z->subject;
+                        $zprava['predmet'] = $predmet;
                         $zprava['popis'] = $popis;
                         $zprava['odesilatel'] = $z->from_address;
                         //$zprava['odesilatel_id'] = $z->dmAnnotation;
