@@ -222,7 +222,8 @@ class Subjekt extends BaseModel
         if ( isset($args['order']) ) {
             $order = $args['order'];
         } else {
-            $order = array('nazev_subjektu','prijmeni','jmeno');
+            //$order = array('nazev_subjektu','prijmeni','jmeno');
+            $order = "CONCAT(nazev_subjektu,prijmeni,jmeno)";
         }
 
         if ( isset($args['offset']) ) {
@@ -238,7 +239,7 @@ class Subjekt extends BaseModel
         }
 
 
-        $select = $this->fetchAll($order,$where,$offset,$limit);
+        $select = $this->fetchAllSpecialOrder($order,$where,$offset,$limit);
         return ($select) ? $select : NULL;
 
         //$rows = $select->fetchAll();

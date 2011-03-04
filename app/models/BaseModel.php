@@ -54,6 +54,18 @@ abstract class BaseModel extends Object
         );
     }
 
+    public function fetchAllSpecialOrder($order = NULL, $where = NULL, $offset = NULL, $limit = NULL)
+    {
+
+        return dibi::query(
+            'SELECT * FROM %n', $this->name,
+            '%if', isset($where), 'WHERE %and', isset($where) ? $where : array(), '%end',
+            '%if', isset($order), 'ORDER BY %sql', $order, '%end',
+            '%if', isset($limit), 'LIMIT %i %end', $limit,
+            '%if', isset($offset), 'OFFSET %i %end', $offset
+        );
+    }
+
     /**
      * Selects rows from the table in specified order
      * @param array $order
