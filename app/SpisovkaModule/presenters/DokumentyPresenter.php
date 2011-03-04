@@ -594,11 +594,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
         } else {
+
+            if ( $this->getUser()->isInRole('podatelna') ) {
+                $typ_dokumentu_id = 1;
+            } else {
+                $typ_dokumentu_id = 2;
+            }
+
             $pred_priprava = array(
                 "nazev" => "",
                 "popis" => "",
                 "stav" => 0,
-                "typ_dokumentu_id" => "1",
+                "typ_dokumentu_id" => $typ_dokumentu_id,
                 "zpusob_doruceni_id" => "",
                 "cislo_jednaci_odesilatele" => "",
                 "datum_vzniku" => '',
