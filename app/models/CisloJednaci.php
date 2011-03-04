@@ -42,8 +42,18 @@ class CisloJednaci extends BaseModel
         $UserModel = new UserModel();
         $this->user_info = $UserModel->getUser($user, 1);
 
+        $orgjednotka_id = null;
+        if ( count($this->user_info->user_roles)>0 ) {
+            foreach ( $this->user_info->user_roles as $user_role ) {
+                if ( !empty( $user_role->orgjednotka_id ) ) {
+                    $orgjednotka_id = $user_role->orgjednotka_id;
+                    break;
+                }
+            }
+        }
+
         $Org = new Orgjednotka();
-        $this->org = $Org->getInfo(1);
+        $this->org = $Org->getInfo($orgjednotka_id);
 
 
     }
@@ -67,8 +77,8 @@ class CisloJednaci extends BaseModel
             $info['urad_zkratka'] = $this->urad->zkratka;
             $info['urad_poradi'] = $this->max('urad');
 
-            $info['orgjednotka_id'] = $this->org->id;
-            $info['org'] = @$this->org->zkratka;
+            $info['orgjednotka_id'] = !is_null($this->org)?$this->org->id:null;
+            $info['org'] = !is_null($this->org)?$this->org->ciselna_rada:"";
             $info['org_poradi'] = $this->max('org');
 
             $info['user_id'] = $this->user_info->id;
@@ -152,8 +162,8 @@ class CisloJednaci extends BaseModel
             $tmp->urad = $this->urad->zkratka;
             $tmp->urad_nazev = $this->urad->nazev;
             $tmp->urad_poradi = $info['urad_poradi'];
-            $tmp->orgjednotka_id = @$this->org->id;
-            $tmp->orgjednotka = @$this->org->zkratka;
+            $tmp->orgjednotka_id = !is_null($this->org)?$this->org->id:null;
+            $tmp->orgjednotka = !is_null($this->org)?$this->org->ciselna_rada:"";
             $tmp->orgjednotka_poradi = $info['org_poradi'];
             $tmp->user_id = $this->user_info->id;
             $tmp->user = $this->user_info->username;
@@ -173,8 +183,8 @@ class CisloJednaci extends BaseModel
             $tmp->urad = $this->urad->zkratka;
             $tmp->urad_nazev = $this->urad->nazev;
             $tmp->urad_poradi = $info['urad_poradi'];
-            $tmp->orgjednotka_id = @$this->org->id;
-            $tmp->orgjednotka = @$this->org->zkratka;
+            $tmp->orgjednotka_id = !is_null($this->org)?$this->org->id:null;
+            $tmp->orgjednotka = !is_null($this->org)?$this->org->ciselna_rada:"";
             $tmp->orgjednotka_poradi = $info['org_poradi'];
             $tmp->user_id = $this->user_info->id;
             $tmp->user = $this->user_info->username;
@@ -240,7 +250,11 @@ class CisloJednaci extends BaseModel
                 $cislo = (@$row->urad_poradi)?($row->urad_poradi)+1 : $pocatek_cisla;
                 break;
             case "org":
-                $where[] = array('orgjednotka_id=%i',$this->org->id);
+                if ( is_null($this->org) ) {
+                    $where[] = array('orgjednotka_id IS NULL');
+                } else {
+                    $where[] = array('orgjednotka_id=%i',$this->org->id);
+                }
                 $result = $this->fetchAll(array('org_poradi'=>'DESC'),$where,null,1);
                 $row = $result->fetch();
                 $cislo = (@$row->org_poradi)?($row->org_poradi)+1 : $pocatek_cisla;
