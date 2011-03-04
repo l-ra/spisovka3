@@ -2056,29 +2056,39 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( Environment::getUser()->isAllowed(null, 'is_vedouci') ) {
             $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
             $select = array(
-                'Základní' => array(
+                'Vlastní' => array(
                     'org'=>'Všechny dokumenty, které má na starost organizační jednotka',
                     'moje'=>'Dokumenty na mé jméno nebo přidelené na organizační jednotku',
                     'predane'=>'Dokumenty, které mi byly předány',
                     'pracoval'=>'Dokumenty, na kterých jsem kdy pracoval',
                     'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
                     'moje_vyrizuje'=>'Dokumenty, které vyřizuji',
+                    'moje_vyrizene'=>'Dokumenty, které jsem vyřídil',
+                ),
+                'Společné' => array(
                     'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
                     'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
+                    'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízene',
                     'vse'=>'Zobrazit všechny dokumenty'
-                )
+                ),
+                
+                
             );
         } else {
             $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
             $select = array(
-                'Základní' => array(
+                'Vlastní' => array(
                     'moje'=>'Dokumenty na mé jméno',
                     'predane'=>'Dokumenty, které mi byly předány',
                     'pracoval'=>'Dokumenty, na kterých jsem kdy pracoval',
                     'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
                     'moje_vyrizuje'=>'Dokumenty, které vyřizuji',
+                    'moje_vyrizene'=>'Dokumenty, které jsem vyřídil',
+                ),
+                'Společné' => array(
                     'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
                     'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
+                    'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízene',
                     'vse'=>'Zobrazit všechny dokumenty'
                 )
             );

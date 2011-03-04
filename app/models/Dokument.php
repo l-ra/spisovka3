@@ -740,6 +740,17 @@ class Dokument extends BaseModel
                     'where' => array( array('wf.stav_dokumentu = 3'), array('wf.aktivni=1') )
                 );
                 break;
+            case 'moje_vyrizene':
+                $args = array(
+                    'where' => array( array('wf.prideleno=%i',$user->id),array('wf.stav_osoby = 1'), 
+                                      array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)') )
+                );
+                break;
+            case 'vsichni_vyrizene':
+                $args = array(
+                    'where' => array( array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)') )
+                );
+                break;
             case 'vse':
                 $args = array(
                     'where' => array( array('1') )
