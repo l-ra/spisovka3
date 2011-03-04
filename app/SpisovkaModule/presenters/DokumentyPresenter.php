@@ -36,24 +36,37 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
         if ( isset($filtr) ) {
-            // podrobne hledani = array
+            // zjisten filtr
             $args = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
             $this->filtr = $filtr['filtr'];
             $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
             $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
         } else {
-            // rychle hledani = string
-            $args = $Dokument->filtr('moje');
-            $this->filtr = 'moje';
-            $this->filtr_bezvyrizenych = false;
+            // filtr nezjisten - pouzijeme default
+            $cookie_filtr = $this->getHttpRequest()->getCookie('s3_filtr');
+            if ( $cookie_filtr ) {
+                // zjisten filtr v cookie, tak vezmeme z nej
+                $filtr = unserialize($cookie_filtr);
+                $args = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
+                $this->filtr = $filtr['filtr'];
+                $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
+                $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
+            } else {
+                $args = $Dokument->filtr('moje');
+                $this->filtr = 'moje';
+                $this->filtr_bezvyrizenych = false;
+            }
+
         }
 
         if ( isset($hledat) ) {
 
             if (is_array($hledat) ) {
+                // podrobne hledani = array
                 $args = $hledat;
                 $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
             } else {
+                // rychle hledani = string
                 $args = $Dokument->hledat($hledat);
                 $this->hledat = $hledat;
                 $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
@@ -2126,9 +2139,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function filtrClicked(SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
+        $form_data = $button->getForm()->getValues();
 
-        $this->forward('this', array('filtr'=>array('filtr'=>$data['filtr'],'bez_vyrizenych'=>$data['bez_vyrizenych']) ));
+        $data = array('filtr'=>$form_data['filtr'],'bez_vyrizenych'=>$form_data['bez_vyrizenych']);
+
+        $this->getHttpResponse()->setCookie('s3_filtr', serialize($data), strtotime('90 day'));
+
+        $this->forward('this', array('filtr'=>$data) );
 
     }
 
