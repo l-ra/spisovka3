@@ -153,7 +153,12 @@ class Workflow extends BaseModel
                 $data['orgjednotka_id'] = $orgjednotka_id;
                 $data['orgjednotka_info'] = serialize($org_info);
 
-                $log = 'Dokument předán organizační jednotce '. $org_info->zkraceny_nazev .'.';
+                if ( $org_info ) {
+                    $log = 'Dokument předán organizační jednotce '. $org_info->zkraceny_nazev .'.';
+                } else {
+                    $log = 'Dokument předán organizační jednotce.';
+                }
+                
 
             } else {
                 $data['orgjednotka_id'] = null;
