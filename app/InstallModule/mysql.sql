@@ -163,6 +163,7 @@ CREATE TABLE `{tbls3}epodatelna` (
   `rok` year(4) DEFAULT NULL,
   `email_signature` varchar(200) DEFAULT NULL,
   `isds_signature` varchar(45) DEFAULT NULL,
+  `identifikator` text,
   `predmet` varchar(200) NOT NULL DEFAULT '',
   `popis` text,
   `odesilatel` varchar(200) NOT NULL DEFAULT '',

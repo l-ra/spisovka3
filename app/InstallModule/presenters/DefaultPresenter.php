@@ -707,7 +707,7 @@ class Install_DefaultPresenter extends BasePresenter
             $session->step = array();
         }
         if ( @$session->step['spravce'] == 1 ) {
-            $this->flashMessage('Správce byl již vytvořen.','warning');
+            $this->flashMessage('Správce již byl vytvořen.','warning');
             $this->template->provedeno = 1;
         }
         
@@ -733,7 +733,7 @@ class Install_DefaultPresenter extends BasePresenter
             $dokonceno = 0;
         }
         if ( @$session->step['urad'] != 1 ) {
-            $errors[] = "Instalace neprošla procesem uložení informace o úřadu/firmy!";
+            $errors[] = "Instalace neprošla procesem uložení informace o úřadu/firmě!";
             $dokonceno = 0;
         }
         if ( @$session->step['evidence'] != 1 ) {
@@ -928,7 +928,7 @@ class Install_DefaultPresenter extends BasePresenter
         } catch ( IOException $e ) {
 
             $this->flashMessage('Informace o sobě se nepodařilo uložit!','warning');
-            $this->flashMessage('Zkuste pokus o uložení provést znovu. V případě, že to nepomáha, zkontolujte existenci konfiguračného souboru a možnost jeho zápisu.','warning');
+            $this->flashMessage('Zkuste pokus o uložení provést znovu. V případě, že to nepomáhá, zkontrolujte existenci konfiguračního souboru a možnost zápisu do něj.','warning');
             $this->flashMessage('Exception: '. $e->getMessage(),'warning');
         }
 
@@ -993,7 +993,7 @@ class Install_DefaultPresenter extends BasePresenter
             $this->redirect('spravce');
         } catch ( IOException $e) {
             $this->flashMessage('Nastavení evidence se nepodařilo uložit!','warning');
-            $this->flashMessage('Zkuste pokus o uložení provést znovu. V případě, že to nepomáha, zkontolujte existenci konfiguračného souboru a možnost jeho zápisu.','warning');
+            $this->flashMessage('Zkuste pokus o uložení provést znovu. V případě, že to nepomáhá, zkontrolujte existenci konfiguračního souboru a možnost zápisu do něj.','warning');
             $this->flashMessage('Exception: '. $e->getMessage(),'warning');
         }
     }

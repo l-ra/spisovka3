@@ -733,12 +733,12 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         $mail->setBodySign($data['zprava']);
                         $mail->send();                        
 
-                        $this->flashMessage('Upozornění odesilateli na adresu "'. $data['email'] .'" bylo úspěšně odesláno.');
+                        $this->flashMessage('Upozornění odesílateli na adresu "'. $data['email'] .'" bylo úspěšně odesláno.');
                     } else {
-                        $this->flashMessage('Upozornění odesilateli se nepodařilo odeslat. Nebyl zjištěn aktivní účet pro odesilání emailových zpráv ze spisové služby.','warning');
+                        $this->flashMessage('Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn aktivní účet pro odesílání emailových zpráv ze spisové služby.','warning');
                     }
                 } else {
-                    $this->flashMessage('Upozornění odesilateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesilání emailových zpráv ze spisové služby.','warning');
+                    $this->flashMessage('Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání emailových zpráv ze spisové služby.','warning');
                 }
 
             }
@@ -826,12 +826,12 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         //$mail->generateMessage();
                         //$mail->send();
 
-                        $this->flashMessage('Upozornění odesilateli bylo úspěšně odesláno.');
+                        $this->flashMessage('Upozornění odesílateli bylo úspěšně odesláno.');
                     } else {
-                        $this->flashMessage('Upozornění odesilateli se nepodařilo odeslat. Nebyl zjištěn aktivní účet pro odesilání datové zprávy ze spisové služby.','warning');
+                        $this->flashMessage('Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn aktivní účet pro odesilání datové zprávy ze spisové služby.','warning');
                     }
                 } else {
-                    $this->flashMessage('Upozornění odesilateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesilání datových zpráv ze spisové služby.','warning');
+                    $this->flashMessage('Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání datových zpráv ze spisové služby.','warning');
                 }
 
             }

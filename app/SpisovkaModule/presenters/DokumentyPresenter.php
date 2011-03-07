@@ -315,9 +315,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             // Kontrola lhuty a skartace
             if ( $dokument->lhuta_stav==2 && $dokument->stav_dokumentu < 4 ) {
-                $this->flashMessage('Vypršela lhůta k vyřízení! Vyříďte neprodleně tento dokument.','warning');
+                $this->flashMessage('Vypršela lhůta k vyřízení! Vyřiďte neprodleně tento dokument.','warning');
             } else if ( $dokument->lhuta_stav==1 && $dokument->stav_dokumentu < 4 ) {
-                $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyříďte co nejrychleji tento dokument.');
+                $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyřiďte co nejrychleji tento dokument.');
             }
 
             $this->invalidateControl('dokspis');
@@ -846,11 +846,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->flashMessage('Chyba při stahování!','warning');
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             } else if ( $res == 3 ) {
-                $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnut zmíněný soubor!','warning');
+                $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnout zmíněný soubor!','warning');
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             }
         } else {
-            $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnut cizí soubor!','warning');
+            $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnout cizí soubor!','warning');
             $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
         }
         
@@ -2084,7 +2084,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $select = array(
                 'Vlastní' => array(
                     'org'=>'Všechny dokumenty, které má na starost organizační jednotka',
-                    'moje'=>'Dokumenty na mé jméno nebo přidelené na organizační jednotku',
+                    'moje'=>'Dokumenty na mé jméno nebo přidělené na organizační jednotku',
                     'predane'=>'Dokumenty, které mi byly předány',
                     'pracoval'=>'Dokumenty, na kterých jsem kdy pracoval',
                     'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
@@ -2094,7 +2094,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 'Společné' => array(
                     'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
                     'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
-                    'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízene',
+                    'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízené',
                     'vse'=>'Zobrazit všechny dokumenty'
                 ),
                 
@@ -2114,7 +2114,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 'Společné' => array(
                     'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
                     'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
-                    'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízene',
+                    'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízené',
                     'vse'=>'Zobrazit všechny dokumenty'
                 )
             );

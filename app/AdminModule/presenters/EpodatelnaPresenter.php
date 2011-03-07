@@ -425,7 +425,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 } else {
                     switch ($upload->error) {
                         case UPLOAD_ERR_INI_SIZE:
-                            $this->flashMessage('Překročena velikost pro nahráni certifikátu.','warning');
+                            $this->flashMessage('Překročena velikost pro nahrání certifikátu.','warning');
                             break;
                         case UPLOAD_ERR_NO_FILE:
                             //$this->flashMessage('Nebyl vybrán žádný soubor.','warning');
@@ -702,7 +702,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             } else {
                 switch ($upload->error) {
                     case UPLOAD_ERR_INI_SIZE:
-                        $this->flashMessage('Překročena velikost pro nahráni certifikátu.','warning');
+                        $this->flashMessage('Překročena velikost pro nahrání certifikátu.','warning');
                         break;
                     case UPLOAD_ERR_NO_FILE:
                         //$this->flashMessage('Nebyl vybrán žádný soubor.','warning');
@@ -735,7 +735,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             } else {
                 switch ($upload->error) {
                     case UPLOAD_ERR_INI_SIZE:
-                        $this->flashMessage('Překročena velikost pro nahráni souboru privátního klíče.','warning');
+                        $this->flashMessage('Překročena velikost pro nahrání souboru privátního klíče.','warning');
                         break;
                     case UPLOAD_ERR_NO_FILE:
                         //$this->flashMessage('Nebyl vybrán žádný soubor.','warning');
