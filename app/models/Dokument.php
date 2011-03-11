@@ -1219,8 +1219,11 @@ class Dokument extends BaseModel
             if ( count($data->subjekty)==0 ) {
                 $mess[] = "Dokument musí obsahovat aspoň jeden subjekt!";
             }
-            if ( count($data->prilohy)==0 ) {
-                $mess[] = "Dokument musí obsahovat aspoň jednu přílohu!";
+
+            if ( $data->typ_dokumentu->typ != 0 ) {
+                if ( count($data->prilohy)==0 ) {
+                    $mess[] = "Dokument musí obsahovat aspoň jednu přílohu!";
+                }
             }
         }
 
