@@ -315,17 +315,38 @@ class Subjekt extends BaseModel
             }
         }
 
-        if ( strpos(@$data->type,'OVM')!==false || strpos(@$data->type,'PO')!==false ) {
-            // nazev subjektu
-            $d_nazev = $data->nazev_subjektu;
-            $d_nazev_item = $data->nazev_subjektu;
-        } else {
-            // jmeno a prijmeni
-            $d_nazev = $titul_pred . $jmeno ." ". $prostredni_jmeno . $prijmeni . $titul_za;
-            $d_nazev_item = $prijmeni ." ". $jmeno .' '. $prostredni_jmeno . $titul_pred_item . $titul_za;
-            $d_osoba = $titul_pred . $jmeno ." ". $prostredni_jmeno . $prijmeni . $titul_za;
-            $d_osoba_item = $titul_pred . $jmeno ." ". $prostredni_jmeno . $prijmeni . $titul_za;
-        }
+            $nazev = trim($data->nazev_subjektu);
+            $nazev_item = trim($data->nazev_subjektu);
+            $osoba = trim($titul_pred . $jmeno ." ". $prostredni_jmeno . $prijmeni . $titul_za);
+            $osoba_item = trim($titul_pred . $jmeno ." ". $prostredni_jmeno . $prijmeni . $titul_za);
+
+            if ( !empty($nazev) && !empty($osoba) ) {
+                $d_nazev = $nazev .", ". $osoba;
+                $d_nazev_item = $nazev_item .", ". $osoba_item;
+                $d_osoba = $osoba;
+                $d_osoba_item = $osoba_item;
+            } else if ( !empty($nazev) && empty($osoba) ) {
+                $d_nazev = $nazev;
+                $d_nazev_item = $nazev_item;
+                $d_osoba = "";
+                $d_osoba_item = "";
+            } else if ( empty($nazev) && !empty($osoba) ) {
+                $d_nazev = $osoba;
+                $d_nazev_item = $osoba_item;
+                $d_osoba = $osoba;
+                $d_osoba_item = $osoba_item;
+            } else {
+                $d_nazev = "";
+                $d_nazev_item = "";
+                $d_osoba = "";
+                $d_osoba_item = "";
+            }
+
+            if ( strpos(@$data->type,'OVM')!==false || strpos(@$data->type,'PO')!==false ) {
+                // nazev subjektu
+                $d_nazev = $nazev;
+                $d_nazev_item = $nazev;
+            }
 
 
         // sestaveni adresy
