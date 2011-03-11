@@ -3,6 +3,22 @@
 class Spisovka_SpisyPresenter extends BasePresenter
 {
 
+    private $typ_evidence = null;
+
+    public function startup()
+    {
+        $user_config = Environment::getVariable('user_config');
+        $this->typ_evidence = 0;
+        if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
+            $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
+        } else {
+            $this->typ_evidence = 'priorace';
+        }
+        $this->template->Typ_evidence = $this->typ_evidence;
+
+        parent::startup();
+    }
+
     public function renderVyber()
     {
 

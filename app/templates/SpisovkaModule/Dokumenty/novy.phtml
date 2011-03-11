@@ -46,7 +46,7 @@
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
             <dd>
                 <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;
-                {if $Typ_evidence == 'sberny_arch'} / {$novyForm['poradi']->control} &nbsp; <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->dokument_id}" id="dialog-cjednaci">Připojit k dokumentu</a> {/if}
+                {if $Typ_evidence == 'sberny_arch'} / {$novyForm['poradi']->control} &nbsp; <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">Vložit do existujícího spisu</a> {/if}
             </dd>
         </dl>
         <dl class="detail_item">
@@ -56,17 +56,22 @@
         <dl class="detail_item">
             <dt>Spisová značka:</dt>
             <dd>
+                {if $Typ_evidence == 'sberny_arch'}
+                &nbsp;
+                {else}
                 <span id="dok_spis">
                 {if count($Spisy)>0 }
                     {foreach $Spisy as $s}
                     {$s->nazev}<br />
                     {/foreach}
                 {else}
-                    nepřidělen k žádnemu spisu
+                    nepřidělen k žádnému spisu
                 {/if}
+
                 </span>
 
                 <a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}" id="dialog-spis">Připojit spisovou značku</a>
+                {/if}
             </dd>
         </dl>
         <dl class="detail_item">

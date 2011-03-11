@@ -3,6 +3,21 @@
 class Spisovka_SpojitPresenter extends BasePresenter
 {
 
+    private $typ_evidence = 'priorace';
+
+    public function startup()
+    {
+        $user_config = Environment::getVariable('user_config');
+        $this->typ_evidence = 0;
+        if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
+            $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
+        } else {
+            $this->typ_evidence = 'priorace';
+        }
+
+        parent::startup();
+    }
+
     public function renderVyber()
     {
         $this->template->dokument_id = $this->getParam('id',null);
@@ -15,7 +30,7 @@ class Spisovka_SpojitPresenter extends BasePresenter
 
         $Dokument = new Dokument();
         $args = $Dokument->hledat($query,'dokument');
-        $args['order'] = array('podaci_denik_rok','podaci_denik_poradi');
+        $args['order'] = array('d.podaci_denik_rok','d.podaci_denik_poradi','d.poradi');
 
         $seznam = $Dokument->seznam($args);
 
@@ -26,6 +41,11 @@ class Spisovka_SpojitPresenter extends BasePresenter
                 if (is_object($dokument_id) ) { $dokument_id = $dokument_id->dokument_id; }
 
                 $dok = $Dokument->getBasicInfo($dokument_id);
+
+                if ( $this->typ_evidence == "sberny_arch" ) {
+                    if ( $dok->poradi != 1 ) continue;
+                }
+
                 $tmp[ $dok->id ]['dokument_id'] = $dok->id;
                 $tmp[ $dok->id ]['cislo_jednaci'] = $dok->cislo_jednaci;
                 $tmp[ $dok->id ]['jid'] = $dok->jid;

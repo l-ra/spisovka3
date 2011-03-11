@@ -10,7 +10,14 @@ class Spis extends BaseModel
     public function getInfo($spis_id)
     {
 
-        $result = $this->fetchRow(array('id=%i',$spis_id));
+        if ( !is_numeric($spis_id) ) {
+            // string - nazev
+            $result = $this->fetchRow(array('nazev=%s',$spis_id));
+        } else {
+            // int - id
+            $result = $this->fetchRow(array('id=%i',$spis_id));
+        }
+        
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 

@@ -1,4 +1,5 @@
 var stop_timer = 0;
+var url;
 var cache = Array();
 
 // Datepicker
@@ -137,7 +138,7 @@ $(function() {
     // Dialog - pripojit k archu
     $('#dialog-cjednaci').click(function(event){
         event.preventDefault();
-        return dialog(this,'Připojit k dokumentu');
+        return dialog(this,'Vložit do spisu');
     });
 
 });
@@ -661,13 +662,13 @@ pripojitDokument = function (elm) {
 
                     part = stav.split('#');
 
-                    alert(stav +' - '+ part[1]);
+                    //alert(stav +' - '+ part[1]);
 
                     $('#dok_cjednaci').html(part[0]);
                     document.getElementById('frmnovyForm-poradi').value = part[1];
                     document.getElementById('frmnovyForm-odpoved').value = part[2];
-                    
 
+                    //elm.href = url;
                     $('#dialog').dialog('close');
                 } else {
                     $('#dialog').html(stav);

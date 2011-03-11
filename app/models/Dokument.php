@@ -53,7 +53,7 @@ class Dokument extends BaseModel
             $order = $args['order'];
         } else {
             //$order = array('dokument_id'=>'DESC');
-            $order = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
+            $order = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC','d.poradi'=>'DESC');
         } 
         if ( isset($args['limit']) ) {
             $limit = $args['limit'];
@@ -261,10 +261,10 @@ class Dokument extends BaseModel
                 $args['order'] = array('wf.stav_dokumentu'=>'DESC');
                 break;
             case 'cj':
-                $args['order'] = array('podaci_denik_rok','podaci_denik_poradi');
+                $args['order'] = array('podaci_denik_rok','podaci_denik_poradi','d.poradi');
                 break;
             case 'cj_desc':
-                $args['order'] = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
+                $args['order'] = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC','d.poradi'=>'DESC');
                 break;
             case 'vec':
                 $args['order'] = array('d.nazev');

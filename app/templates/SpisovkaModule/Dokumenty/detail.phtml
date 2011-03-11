@@ -72,7 +72,7 @@
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }">Upravit vyřízení</a>
        {/if}
-       <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
+       <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>$user->id, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
        {if $Predan==1 }
        <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít dokument</a>
        {/if}
@@ -213,11 +213,12 @@
                     {$s->nazev}<br />
                     {/foreach}
                 {else}
-                    nepřidělen k žádnemu spisu
+                    nepřidělen k žádnému spisu
                 {/if}
                 </span>
-                
+                {if $Typ_evidence != 'sberny_arch'}
                 <a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}" id="dialog-spis">Připojit spisovou značku</a>
+                {/if}
             </dd>
         </dl>
         <dl class="detail_item">

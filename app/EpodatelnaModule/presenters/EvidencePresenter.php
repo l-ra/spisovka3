@@ -441,6 +441,33 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $Log = new LogModel();
                 $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
+                // Vytvoreni spisu noveho archu
+                if ( $this->typ_evidence == 'sberny_arch' ) {
+
+                    $Spis = new Spis();
+                    $spis = $Spis->getInfo($data['cislo_jednaci']);
+                    if ( !$spis ) {
+                        // vytvorime spis
+                        $spis_new = array(
+                            'nazev' => $data['cislo_jednaci'],
+                            'popis' => $data['popis'],
+                            'typ' => 'S',
+                            'stav' => 1
+                        );
+                        $spis_id = $Spis->vytvorit($spis_new);
+                        $spis = $Spis->getInfo($spis_id);
+                    }
+
+                    // pripojime
+                    if ( $spis ) {
+                        $DokumentSpis = new DokumentSpis();
+                        $DokumentSpis->pripojit($dokument_id, $spis->id);
+                    }
+
+                }
+
+
+
                 $this->flashMessage('Dokument byl vytvořen a zaevidován.');
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             } else {

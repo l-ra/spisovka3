@@ -96,7 +96,7 @@
         <tr>
             <th class="typ">Typ dokumentu</th>
             <th class="prijato">Přijato</th>
-            <th class="cislo_jadnaci">JID<br />Číslo jednací<br />Spisová značka</th>
+            <th class="cislo_jadnaci">Číslo jednací<br />JID<br />Spisová značka</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
             <th class="prideleno">Přiděleno</th>
             <th class="stav">Stav</th>
@@ -112,12 +112,10 @@
                 {$dok->datum_vzniku|edate}
             </td>
             <td class="cislo_jadnaci">
-                <span style="font-size: 8pt;">&nbsp;{$dok->jid}</span>
-                <br />
                 &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
-                   {$dok->cislo_jednaci}
+                   {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'} / {$dok->poradi}{/if}
                 </a></strong>
-                <br />
+                <div class="small">&nbsp;{$dok->jid}</div>
                 {if count($dok->spisy)>0}
                 {foreach $dok->spisy as $spis}
                 <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />

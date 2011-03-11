@@ -660,7 +660,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $args_rozd = array();
             $args_rozd['where'] = array(
                 array('stav=%i',0),
-                array('typ_dokumentu_id=%i',4),
+                array('typ_dokumentu_id=%i',3),
                 array('cislo_jednaci=%s',"odpoved_". $dok->id),
                 array('user_created=%i',Environment::getUser()->getIdentity()->id)
             );
@@ -713,7 +713,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     "nazev" => $dok->nazev,
                     "popis" => $dok->popis,
                     "stav" => 0,
-                    "typ_dokumentu_id" => "4",
+                    "typ_dokumentu_id" => "3",
                     "zpusob_doruceni_id" => "",
                     "cislo_jednaci" => ("odpoved_". $dok->id),
                     "poradi" => ($dok->poradi + 1),
@@ -735,7 +735,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $spisy_old = $DokumentSpis->spisy($dokument_id);
                     if ( count($spisy_old)>0 ) {
                         foreach ( $spisy_old as $spis ) {
-                            $DokumentSpis->pripojit($dok_odpoved->id, $spis->spis_id, $stav = 1, $dok_odpoved->version);
+                            $DokumentSpis->pripojit($dok_odpoved->id, $spis->id, $stav = 1, $dok_odpoved->version);
                         }
                     }
                     $spisy_new = $DokumentSpis->spisy($dok_odpoved->id);
@@ -1087,6 +1087,31 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 $Log = new LogModel();
                 $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
+
+                // Vytvoreni spisu noveho archu
+                if ( $this->typ_evidence == 'sberny_arch' ) {
+
+                    $Spis = new Spis();
+                    $spis = $Spis->getInfo($data['cislo_jednaci']);
+                    if ( !$spis ) {
+                        // vytvorime spis
+                        $spis_new = array(
+                            'nazev' => $data['cislo_jednaci'],
+                            'popis' => $data['popis'],
+                            'typ' => 'S',
+                            'stav' => 1
+                        );
+                        $spis_id = $Spis->vytvorit($spis_new);
+                        $spis = $Spis->getInfo($spis_id);
+                    }
+
+                    // pripojime
+                    if ( $spis ) {
+                        $DokumentSpis = new DokumentSpis();
+                        $DokumentSpis->pripojit($dokument_id, $spis->id);
+                    }
+
+                }
 
                 $this->flashMessage('Dokument byl vytvořen.');
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
