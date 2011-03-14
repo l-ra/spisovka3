@@ -131,6 +131,10 @@
             echo "\nPosledni revize klienta: ". $revision ."\n\n";
 
             if ( count($alter)>0 ) {
+
+		// setridit pole, aby se alter skripty spoustely ve spravnem poradi
+		asort( $alter, SORT_NUMERIC );
+
                 foreach( $alter as $arev => $asql ) {
                     if ( $revision < $arev ) {
                         echo "\nAplikace revize #". $arev ."\n\n";
