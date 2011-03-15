@@ -562,7 +562,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = array(
                 array('stav=%i',0),
-                array('typ_dokumentu_id<>%i',4),
+                array('typ_dokumentu_id<>%i',3),
                 array('user_created=%i',Environment::getUser()->getIdentity()->id)
         );
         $args_rozd['order'] = array('date_created'=>'DESC');
@@ -698,7 +698,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $this->template->cjednaci = $CJ->nacti($dok->cislojednaci_id);
                 } else if ( $this->typ_evidence == 'sberny_arch' ) {
                     // sberny arch
-                    $dok_odpoved->poradi = $dok_odpoved->poradi;
+                    //$dok_odpoved->poradi = $dok_odpoved->poradi;
                     $this->template->cjednaci = $CJ->nacti($dok->cislojednaci_id);
                 } else {
                     $this->template->cjednaci = $CJ->nacti($dok->cislojednaci_id);
