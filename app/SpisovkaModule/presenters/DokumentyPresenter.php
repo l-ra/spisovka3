@@ -709,6 +709,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             } else {
                 // totozna odpoved neexistuje
+    
+		// nalezeni nejvyssiho cisla poradi v ramci spisu
+		$poradi = $Dokumenty->getMaxPoradi($dok->cislojednaci_id);
+
                 $pred_priprava = array(
                     "nazev" => $dok->nazev,
                     "popis" => $dok->popis,
@@ -716,7 +720,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     "typ_dokumentu_id" => "3",
                     "zpusob_doruceni_id" => "",
                     "cislo_jednaci" => ("odpoved_". $dok->id),
-                    "poradi" => ($dok->poradi + 1),
+                    "poradi" => ($poradi),
                     "cislo_jednaci_odesilatele" => $dok->cislo_jednaci_odesilatele,
                     "datum_vzniku" => '',
                     "lhuta" => "30",
