@@ -317,7 +317,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'passed' => is_writable(APP_DIR .'/../log/'),
 		'message' => 'Povoleno',
 		'errorMessage' => 'Není možné zapisovat do logovací složky.',
-		'description' => 'Povolte zápis do složky /app/log/. Tato složka slouží k ukládání různých logovacích a chybových hlášek.<br / >
+		'description' => 'Povolte zápis do složky /log/. Tato složka slouží k ukládání různých logovacích a chybových hlášek.<br / >
                                   Není nutná. Pokud však chcete zaznamenávat chybové hlášky, je potřeba tuto složku k zápisu povolit.',
             ),
 
