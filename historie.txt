@@ -43,6 +43,29 @@ Released: 14.02.2011
 - uprava prevzeti dokumentu
 - Nette fix - bezduvodne odhlasovani v IE
 
+=== Ver. 3.0.2 =================================================================
+Released: 16.03.2011
+
+- zrusena kontrola prilohy u listinneho dokumentu
+- uprava - sberny arch - upraveni systu tvorby JC
+- uprava - sberny arch - zobrazení spisove znacky
+- uprava - sberny arch - pridana moznost vkladat dokumenty do spisu
+- oprava - sberny arch - poradove cislo se vytvarelo spatne, vznikaly duplicitni JC
+- oprava subjektu - nezobrazoval se nazev subjektu mimo typ OVM
+- oprava hlavniho SQL skriptu pro vytvareni databaze
+- oprava preklepu, chybejicich hacku, carek
+- oprava trideni subjektu, aby zohlednoval nazev subjektu a v pripade jeho nevyplneni nebyl seznam "napreskacku"
+- oprava chyby pri prazdnem predmetu v emailu nebo ISDS
+- uprava nastaveni defaultniho typu noveho dokumentu v zavislosti na roli prichozi - vlastni
+- uprava zachovani filtru pri dalsim prihlaseni
+- pridan rychly filtr - nezobrazovani vyrizenych dokumentu
+- oprava nefunkcni masky JC - org. jednotka a ID org. jednotky
+- pridan identifikator e-podatelny (zobrazeni a kontrola certifikatu) - [zmena v DB - viz alter_109.sql]
+- oprava bugu pri pouziti IE a dialogovych oken
+- oprava aktualizacniho skriptu - spravne poradi aplikace .sql skriptu 
+- oprava aktualizacniho skriptu - zapisovalo se cislo nove revize i v pripade, ze aktualizace neprobehla
+- uprava aktualizacniho skriptu - (standalone/multisite)
+
 
 
 

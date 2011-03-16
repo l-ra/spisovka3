@@ -46,7 +46,7 @@ database.password =              ; prihlasovaci heslo k databazi
 database.database =              ; databaze (musi existovat !!!)
 database.charset  = utf8         ; kodovani databaze
 database.prefix  =               ; prefix tabulek ( priklad: "s3_". Pouzijte, pokud v databazi jiz existuje aplikace spisovky nebo jakekoli jine tabulky)
-database.profiler = TRUE         ; povolije profilovani - zaznamenani pouzitych SQL dotazu
+database.profiler = TRUE         ; povoluje profilovani - zaznamenani pouzitych SQL dotazu
 
 
 5. Provedte instalacni proceduru aplikace.
@@ -54,9 +54,9 @@ database.profiler = TRUE         ; povolije profilovani - zaznamenani pouzitych 
 Spustte internetovy prohlizec a zadejte adresu aplikace + parametr pro start instalace /install/uvod.
 Priklad: http://demo.spisovka3.cz/install/uvod
 
-Ridte se nyni pokyn uvedenych na strankach instalace.
+Ridte se nyni pokyny uvedenymi na strankach instalace.
 
-5a Kontrola serveru na minimalni pozadavek aplikace
+5a Kontrola serveru na minimalni pozadavky aplikace
 - provede kontrolu na dostupnost komponent a minimalnich pozadavku na provoz
 
 5b Nahrani databaze
@@ -71,12 +71,12 @@ Ridte se nyni pokyn uvedenych na strankach instalace.
 5e Nastaveni spracve systemu
 - zde vytvorite administratora/spravce, ktery bude spravovat aplikaci
 
-Po uspesnem dokonceni, je aplikace pripravena k pouziti.
+Po uspesnem dokonceni je aplikace pripravena k pouziti.
 
 
 ================================================================================
 
-Jakekoli chyby behem instalace je oznameno chybovou hlaskou.
+Jakekoli chyby behem instalace jsou oznameny chybovou hlaskou.
 Pokud je to ve Vasich silach, muzete chybu opravit. Jinak kontaktujte
 odpovidajici osoby nebo navstivte stranku http://www.spisovka3.cz.
 

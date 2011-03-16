@@ -1,0 +1,26 @@
+1) Upgrade z verze 3.0.0
+
+Detailni postup je popsan v samostatnem dokumentu Spisovka3-upgrade.pdf, ktery je soucasti specialniho balicku pro update spisovka_v3.0.x_aktualizace.zip - obsahuje aktualizacni skript - aktualizace.php a pro zmenu neobsahuje veskere konfiguracni adresare, aby v pripade rozbaleni primo v hlavnim adresari spisovky nedoslo k prepsani Vasich konfiguracnich souboru
+
+
+2) Upgrade z verzi 3.0.x
+
+Zde nedochazi ke zmenam adresarove struktury, upgrade je velmi jednoduchy:
+
+- zaloha celeho adresare se Spisovkou
+- zaloha databaze
+- rozbaleni aktualizacniho balicku spisovka_v3.0.x_aktualizace.zip do Vaseho adresare se spisovkou, pri dotazu na prepsani existujicich souboru potvrdit Ano
+- dle navodu ve Spisovka3-upgrade.pdf upravit skript aktualizace.php (standalone, multisite, cesty apod.)
+- spustit skript aktualizace.php - napr: http://10.0.0.10/spisovka3/aktualizace.php
+- zkontrolovat zda skript nabizi nejake zmeny, upravy v databazi (je mozne, ze konkretni upgrade balik zadne zmeny v DB nemusi nabizet, ale pro jistotu  zkontrolujte)
+- v pripade zmeny v databazi musi dojit ke zmene v souboru _aktualizace - viz. dokument Spisovka3-upgrade.pdf
+
+
+Pro upgrade jde pouzit i tento balicek, ale nutno dat pozor na prepsani konfiguracnich souboru!
+
+
+
+3) Upgrade z verze 2.1.x na 3.0.x
+
+Upgrade je jiz mozny, ale v soucasne dobe jeste nebyl migracni nastroj uvolnen jako OpenSource
+
