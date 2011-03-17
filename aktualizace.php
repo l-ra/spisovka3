@@ -15,7 +15,10 @@
             $sql_query = explode(";",$sql_source);
             $sql_revision = trim(str_replace(".sql", "", str_replace("alter_", "", $af)));
             unset($sql_query[0]);
-            $alter[$sql_revision] = $sql_query;
+	    // odfiltrovani ruznych nesmyslnych sql skriptu se slovem 'alter' v nazvu
+	    if (intval( $sql_revision ) > 0 ) {
+        	$alter[$sql_revision] = $sql_query;
+    	    }
             unset($sql_source, $sql_query);
         }
     }
@@ -58,6 +61,10 @@
             echo "\nPosledni revize klienta: ". $revision ."\n\n";
 
             if ( count($alter)>0 ) {
+
+		// setridit pole, aby se alter skripty spoustely ve spravnem poradi
+		ksort( $alter, SORT_NUMERIC );
+
                 foreach( $alter as $arev => $asql ) {
                     if ( $revision < $arev ) {
                         echo "\nAplikace revize #". $arev ."\n\n";
@@ -133,7 +140,7 @@
             if ( count($alter)>0 ) {
 
 		// setridit pole, aby se alter skripty spoustely ve spravnem poradi
-		asort( $alter, SORT_NUMERIC );
+		ksort( $alter, SORT_NUMERIC );
 
                 foreach( $alter as $arev => $asql ) {
                     if ( $revision < $arev ) {
