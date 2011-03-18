@@ -131,7 +131,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         } else {
             $this->flashMessage('Požadovaná zpráva neexistuje!','warning');
-            $this->redirect('nove');
+            $this->redirect(':Epodatelna:Default:nove');
         }
 
 
