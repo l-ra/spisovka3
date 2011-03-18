@@ -143,7 +143,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = array(
                 array('stav=%i',0),
-                array('typ_dokumentu_id<>%i',4),
+                array('typ_dokumentu_id<>%i',3),
                 array('user_created=%i',Environment::getUser()->getIdentity()->id)
         );
         $args_rozd['order'] = array('date_created'=>'DESC');
@@ -388,13 +388,13 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             //Debug::dump($data); exit;
             
             $CJ = new CisloJednaci();
-            if ( !empty($data['odpoved']) ) {
-                $cjednaci = $CJ->nacti($data['odpoved']);
-                unset($data['odpoved']);
-            } else {
+            //if ( !empty($data['odpoved']) ) {
+            //    $cjednaci = $CJ->nacti($data['odpoved']);
+            //    unset($data['odpoved']);
+            //} else {
                 //$cjednaci = $CJ->generuj(1); - z epodatelny
                 $cjednaci = $CJ->generuj(); // ve spisovkce
-            }
+            //}
 
             $data['jid'] = $cjednaci->app_id.'-ESS-'.$dokument_id;
             //$data['cislojednaci_id'] = $cjednaci->id;
