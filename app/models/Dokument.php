@@ -1036,6 +1036,8 @@ class Dokument extends BaseModel
 
     public function getMaxPoradi($cjednaci) {
 
+        if ( empty($cjednaci) ) return 1;
+
         $result = $this->fetchAll(array('poradi'=>'DESC'),array(array('cislojednaci_id=%i',$cjednaci)),null,1);
         $row = $result->fetch();
         return ($row) ? ($row->poradi+1) : 1;

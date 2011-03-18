@@ -499,17 +499,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function renderCjednaci()
     {
         $this->template->dokument_id = $this->getParam('id',null);
+        $this->template->evidence = $this->getParam('evidence',0);
     }
 
     public function renderCjednaciadd()
     {
         $dokument_id = $this->getParam('id',null);
         $dokument_spojit = $this->getParam('spojit_s',null);
+        $evidence = $this->getParam('evidence',null);
 
         $Dokument = new Dokument();
 
         $dok_in = $Dokument->getBasicInfo($dokument_id);
-        
         $dok_out = $Dokument->getBasicInfo($dokument_spojit);
 
         if ( $dok_in && $dok_out ) {
@@ -517,8 +518,62 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             // spojit s dokumentem
             $poradi = $Dokument->getMaxPoradi($dok_out->cislojednaci_id);
 
-            echo '###vybrano###'. $dok_out->cislo_jednaci .'#'. $poradi .'#'. $dok_out->cislojednaci_id;//. $spis->nazev;
-            $this->terminate();
+            if ( $evidence == 1 ) {
+
+                $CJ = new CisloJednaci();
+
+                if ( !empty($dok_out->cislojednaci_id) ) {
+                    $cjednaci = $CJ->nacti($dok_out->cislojednaci_id);
+                } else {
+                    $cjednaci = $CJ->generuj(1);
+                }
+
+                $poradi = $Dokument->getMaxPoradi($dok_out->cislojednaci_id);
+
+                $data = array();
+                $data['cislojednaci_id'] = $cjednaci->id;
+                $data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
+                $data['poradi'] = $poradi;
+                $data['podaci_denik'] = $cjednaci->podaci_denik;
+                $data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
+                $data['podaci_denik_rok'] = $cjednaci->rok;
+
+                $dokument = $Dokument->update($data, array(array('id=%i',$dokument_id)));//   array('dokument_id'=>0);// $Dokument->ulozit($data);
+                if ( $dokument ) {
+
+                    $this->flashMessage('Dokument připojen do evidence.');
+
+                    $Log = new LogModel();
+                    $Log->logDokument($dokument_id, LogModel::DOK_UNDEFINED,'Dokument připojen do evidence. Přiděleno číslo jednací: '.$cjednaci->cislo_jednaci);
+
+                    $Spis = new Spis();
+                    $spis = $Spis->getInfo($cjednaci->cislo_jednaci);
+                    if ( !$spis ) {
+                        // vytvorime spis
+                        $spis_new = array(
+                            'nazev' => $cjednaci->cislo_jednaci,
+                            'popis' => "",
+                            'typ' => 'S',
+                            'stav' => 1
+                        );
+                        $spis_id = $Spis->vytvorit($spis_new);
+                        $spis = $Spis->getInfo($spis_id);
+                    }
+
+                    // pripojime
+                    if ( $spis ) {
+                        $DokumentSpis = new DokumentSpis();
+                        $DokumentSpis->pripojit($dokument_id, $spis->id);
+                    }
+                }
+
+                echo '###zaevidovano###'. $this->link('detail',array('id'=>$dokument_id));
+                $this->terminate();
+
+            } else {
+                echo '###vybrano###'. $dok_out->cislo_jednaci .'#'. $poradi .'#'. $dok_out->cislojednaci_id;//. $spis->nazev;
+                $this->terminate();
+            }
 
         } else {
             // chyba
@@ -531,24 +586,64 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
 
         $dokument_id = $this->getParam('id',null);
+        $cjednaci_id = $this->getParam('cislojednaci_id',null);
         $user_id = $this->getParam('user',null);
 
         $Dokument = new Dokument();
+        //$dokument_info = $Dokument->getInfo($dokument_id);
 
         $CJ = new CisloJednaci();
-        $cjednaci = $CJ->generuj(1);
+
+        if ( !empty($cjednaci_id) ) {
+            $cjednaci = $CJ->nacti($cjednaci_id);
+            unset($cjednaci_id);
+        } else {
+            $cjednaci = $CJ->generuj(1);
+        }
+
+        $poradi = $Dokument->getMaxPoradi($cjednaci_id);
 
         $data = array();
         $data['cislojednaci_id'] = $cjednaci->id;
         $data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
-        $data['poradi'] = 1;
+        $data['poradi'] = $poradi;
         $data['podaci_denik'] = $cjednaci->podaci_denik;
         $data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
         $data['podaci_denik_rok'] = $cjednaci->rok;
 
-
         $dokument = $Dokument->update($data, array(array('id=%i',$dokument_id)));//   array('dokument_id'=>0);// $Dokument->ulozit($data);
-        $this->flashMessage('číslo jednací přiděleno');
+        if ( $dokument ) {
+
+            $this->flashMessage('Dokument připojen do evidence.');
+
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_UNDEFINED,'Dokument připojen do evidence. Přiděleno číslo jednací: '.$cjednaci->cislo_jednaci);
+
+            if ( $this->typ_evidence == 'sberny_arch' ) {
+
+                $Spis = new Spis();
+                $spis = $Spis->getInfo($cjednaci->cislo_jednaci);
+                if ( !$spis ) {
+                    // vytvorime spis
+                    $spis_new = array(
+                        'nazev' => $cjednaci->cislo_jednaci,
+                        'popis' => "",
+                        'typ' => 'S',
+                        'stav' => 1
+                    );
+                    $spis_id = $Spis->vytvorit($spis_new);
+                    $spis = $Spis->getInfo($spis_id);
+                }
+
+                // pripojime
+                if ( $spis ) {
+                    $DokumentSpis = new DokumentSpis();
+                    $DokumentSpis->pripojit($dokument_id, $spis->id);
+                }
+
+            }
+        }
+
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
 
 

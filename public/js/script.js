@@ -670,6 +670,12 @@ pripojitDokument = function (elm) {
 
                     //elm.href = url;
                     $('#dialog').dialog('close');
+                } else if ( stav.indexOf('###zaevidovano###') != -1 ) {
+                    stav = stav.replace('###zaevidovano###','');
+                    window.location = stav;
+                    //elm.href = url;
+                    $('#dialog').dialog('close');
+
                 } else {
                     $('#dialog').html(stav);
                 }
@@ -768,8 +774,10 @@ function nastylovat(data,typ) {
 
     baseUri = baseUri.replace('/public','');
     dokument_id = document.getElementById('dokumentid').value;
+    evidence = document.getElementById('evidence').value;
 
     if ( typ == 1 ) {
+
         var url = baseUri + 'dokumenty/'+ dokument_id +'/cjednaciadd?spojit_s=';
         var fnc = "pripojitDokument(this)";
     } else {
@@ -778,7 +786,13 @@ function nastylovat(data,typ) {
     }
 
     for (var zaznam in data){
-        a = '<a href="'+ url + data[zaznam]['dokument_id'] +'" onclick="'+fnc+'; return false;">';
+        if ( evidence == 1 ) {
+            uevidence = '&evidence=1';
+        } else {
+            uevidence = '';
+        }
+
+        a = '<a href="'+ url + data[zaznam]['dokument_id'] + uevidence +'" onclick="'+fnc+'; return false;">';
         html = html + "<tr>";
         html = html + "<td>"+ a + data[zaznam]['cislo_jednaci'] +"</a></td>";
         html = html + "<td>"+ a + data[zaznam]['jid'] +"</a></td>";

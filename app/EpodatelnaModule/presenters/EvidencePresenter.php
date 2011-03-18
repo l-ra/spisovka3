@@ -392,15 +392,16 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $cjednaci = $CJ->nacti($data['odpoved']);
                 unset($data['odpoved']);
             } else {
-                $cjednaci = $CJ->generuj(1);
+                //$cjednaci = $CJ->generuj(1); - z epodatelny
+                $cjednaci = $CJ->generuj(); // ve spisovkce
             }
 
             $data['jid'] = $cjednaci->app_id.'-ESS-'.$dokument_id;
-            $data['cislojednaci_id'] = $cjednaci->id;
-            $data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
-            $data['podaci_denik'] = $cjednaci->podaci_denik;
-            $data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
-            $data['podaci_denik_rok'] = $cjednaci->rok;
+            //$data['cislojednaci_id'] = $cjednaci->id;
+            //$data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
+            //$data['podaci_denik'] = $cjednaci->podaci_denik;
+            //$data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
+            //$data['podaci_denik_rok'] = $cjednaci->rok;
 
             $dokument = $Dokument->ulozit($data, $dokument_id, 1);//   array('dokument_id'=>0);// $Dokument->ulozit($data);
 
@@ -429,7 +430,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         'dokument_id'=>$dokument_id,
                         'evidence'=>'spisovka',
                         'stav'=>'10',
-                        'stav_info'=>'Zpráva zaevidována ve spisové službě jako '.$dokument->cislo_jednaci
+                        'stav_info'=>'Zpráva přidána do spisové služby jako '.$dokument->jid
                     );
                 $this->Epodatelna->update($info, array( array('id=%i',$epodatelna_id) ));
 
@@ -442,33 +443,31 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
                 // Vytvoreni spisu noveho archu
-                if ( $this->typ_evidence == 'sberny_arch' ) {
+                /*if ( $this->typ_evidence == 'sberny_arch' ) {
+                    if ( !empty($data['cislo_jednaci']) || strpos($data['cislo_jednaci'],"odpoved") === false ) {
+                        $Spis = new Spis();
+                        $spis = $Spis->getInfo($data['cislo_jednaci']);
+                        if ( !$spis ) {
+                            // vytvorime spis
+                            $spis_new = array(
+                                'nazev' => $data['cislo_jednaci'],
+                                'popis' => $data['popis'],
+                                'typ' => 'S',
+                                'stav' => 1
+                            );
+                            $spis_id = $Spis->vytvorit($spis_new);
+                            $spis = $Spis->getInfo($spis_id);
+                        }
 
-                    $Spis = new Spis();
-                    $spis = $Spis->getInfo($data['cislo_jednaci']);
-                    if ( !$spis ) {
-                        // vytvorime spis
-                        $spis_new = array(
-                            'nazev' => $data['cislo_jednaci'],
-                            'popis' => $data['popis'],
-                            'typ' => 'S',
-                            'stav' => 1
-                        );
-                        $spis_id = $Spis->vytvorit($spis_new);
-                        $spis = $Spis->getInfo($spis_id);
+                        // pripojime
+                        if ( $spis ) {
+                            $DokumentSpis = new DokumentSpis();
+                            $DokumentSpis->pripojit($dokument_id, $spis->id);
+                        }
                     }
+                }*/
 
-                    // pripojime
-                    if ( $spis ) {
-                        $DokumentSpis = new DokumentSpis();
-                        $DokumentSpis->pripojit($dokument_id, $spis->id);
-                    }
-
-                }
-
-
-
-                $this->flashMessage('Dokument byl vytvořen a zaevidován.');
+                $this->flashMessage('Dokument byl vytvořen.');
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             } else {
                 $this->flashMessage('Dokument se nepodařilo vytvořit.','warning');

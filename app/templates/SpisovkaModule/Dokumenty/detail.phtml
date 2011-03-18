@@ -198,12 +198,24 @@
             <dt>Typ dokumentu:</dt>
             <dd>{$metadataForm['typ_dokumentu_id']->control}</dd>
         </dl>
+        {if empty($Dok->cislo_jednaci)}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
-            <dd class="nadpis">
-                {$Dok->cislo_jednaci}&nbsp;{if $Typ_evidence == 'sberny_arch'} / {$Dok->poradi}{/if}
+            <dd>Dokument není evidován!
+                {if $Typ_evidence == 'sberny_arch'}
+                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
+                <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do dokumentu/spisu</a>
+                {else}
+                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spis. služby</a>
+                {/if}
             </dd>
         </dl>
+        {else}
+        <dl class="detail_item">
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
+            <dd class="nadpis">{$Dok->cislo_jednaci}&nbsp;{if $Typ_evidence == 'sberny_arch'} / {$Dok->poradi}{/if}</dd>
+        </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Spisová značka:</dt>
             <dd>
@@ -277,10 +289,24 @@
             <dt>JID:</dt>
             <dd>{$Dok->jid}&nbsp;</dd>
         </dl>
+        {if empty($Dok->cislo_jednaci)}
+        <dl class="detail_item">
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
+            <dd>Dokument není evidován!
+                {if $Typ_evidence == 'sberny_arch'}
+                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
+                <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do dokumentu/spisu</a>
+                {else}
+                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spis. služby</a>
+                {/if}
+            </dd>
+        </dl>
+        {else}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
             <dd class="nadpis">{$Dok->cislo_jednaci}&nbsp;{if $Typ_evidence == 'sberny_arch'} / {$Dok->poradi}{/if}</dd>
         </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Spisová značka:</dt>
             <dd>

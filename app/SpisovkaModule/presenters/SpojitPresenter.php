@@ -26,6 +26,7 @@ class Spisovka_SpojitPresenter extends BasePresenter
     public function renderNacti()
     {
         $dokument_id = $this->getParam('id',null);
+        $evidence = $this->getParam('evidence',0);
         $query = $this->getParam('q',null);
 
         $Dokument = new Dokument();

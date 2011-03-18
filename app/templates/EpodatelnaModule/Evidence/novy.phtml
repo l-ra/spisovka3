@@ -2,8 +2,9 @@
 @{block debug}
 <?php /*print_r($Subjekt);*/ ?>
 <?php /*print_r($Prilohy);*/ ?>
-<?php print_r($Identifikator); ?>
-<?php print_r($Original); ?>
+<?php print_r($Dok); ?>
+<?php /*print_r($Identifikator);*/ ?>
+<?php /*print_r($Original);*/ ?>
 @{/block}
 @{block content}
 
@@ -13,6 +14,7 @@
 
     {$novyForm->render('begin')}
     <div id="dokument_blok_hlavni">
+        {if 0}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
             <dd>
@@ -20,11 +22,12 @@
                 {if $Typ_evidence == 'sberny_arch'} / {$novyForm['poradi']->control} &nbsp; <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">Vložit do existujícího spisu</a> {/if}
             </dd>
         </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
             <dd>{$novyForm['typ_dokumentu_id']->control}</dd>
         </dl>
-
+        {if 0}
         <dl class="detail_item">
             <dt>Spisová značka:</dt>
             <dd>
@@ -46,6 +49,7 @@
                 {/if}
             </dd>
         </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Věc:</dt>
             <dd>{$novyForm['nazev']->control}</dd>
@@ -144,7 +148,6 @@
             <dt>Poznámka:</dt>
             <dd>{$novyForm['predani_poznamka']->control}</dd>
         </dl>
-
     </div>
     
     <div id="dokument_blok_subjekty">
