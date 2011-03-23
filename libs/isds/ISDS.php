@@ -22,6 +22,8 @@ class ISDS {
     protected $params_soap = array();
 
     protected $debug = 0;
+    protected $debug_file = 1;
+    protected $debug_file_text = "";
     protected $proxy = 0;
 
     protected $StatusCode;	// statuscode posledni akce
@@ -1389,6 +1391,22 @@ class ISDS {
             echo "</pre>";
         }
 
+        if ( $this->debug_file == 1 ) {
+            $tmp = "\n\n===========================================\n";
+            $tmp .= ">>> ". date("d.m.y H:i:s") ."\n";
+            $tmp .= ">>> ". $message ."\n";
+            if ( !is_null($variable) ) {
+                $tmp .= var_export($variable, true);
+            }
+            $tmp .= "\n";
+            $tmp .= ">>> Error  : ". $this->ErrorCode ." - ". $this->ErrorInfo ."\n";
+            $tmp .= ">>> Status : ". $this->StatusCode ." - ". $this->StatusMessage ."\n";
+            $tmp .= "\n";
+
+            $this->debug_file_text .= $tmp;
+            unset($tmp);
+        }
+
     }
 
     /**
@@ -1475,6 +1493,12 @@ class ISDS {
                 }
             }
         }
+
+        if ( $this->debug_file == 1 ) {
+            $filename = APP_DIR .'/../log/isds_'. KLIENT ."_". date("Y-m-d H-i-s") ." ". md5(microtime()) .".log";
+            file_put_contents($filename, $this->debug_file_text);
+        }
+
     }
 
 }
