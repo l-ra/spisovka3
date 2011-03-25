@@ -46,7 +46,7 @@
         {access :Spisovka:Vyhledat:default}<a href="{link :Spisovka:Vyhledat:default}">Vyhledat</a>{/access}
     </div>
     <div n:if="count($flashes)>0" id="flash">
-        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{$flash->message}</div>{/foreach}
+        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}
     </div>
     <div id="content">
         {snippet main}
@@ -62,7 +62,13 @@
         
         Memory:    <?php echo TemplateHelpers::bytes(memory_get_usage()) . ' | ' . TemplateHelpers::bytes(memory_get_peak_usage()) . ' [peak]'; ?>
 
+        SQL dotazy:
+        {foreach dibi::getProfiler()->tickets as $dblog }
+            {$dblog[2]}
+        {/foreach}
+
         {block debug}{/block}
+        
 
     </div>
     {/if}

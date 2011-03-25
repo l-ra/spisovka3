@@ -137,18 +137,19 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
 
         /* Priprava dokumentu */
-
         $Dokumenty = new Dokument();
 
-        $args_rozd = array();
-        $args_rozd['where'] = array(
-                array('stav=%i',0),
-                array('typ_dokumentu_id<>%i',3),
-                array('user_created=%i',Environment::getUser()->getIdentity()->id)
-        );
-        $args_rozd['order'] = array('date_created'=>'DESC');
+        $rozdelany = Environment::getSession('s3_rozdelany');
+        $rozdelany_dokument = null;
 
-        $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
+        if ( isset($rozdelany->is) ) {
+            $args_rozd = array();
+            $args_rozd['where'] = array(
+                    array('id=%i',$rozdelany->dokument_id)
+            );
+            $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
+        }
+
         if ( count($rozdelany_dokument)>0 ) {
             $dokument = $rozdelany_dokument[0];
 
@@ -181,6 +182,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 "zmocneni_id" => "0"
             );
             $dokument = $Dokumenty->ulozit($pred_priprava);
+
+            $rozdelany->is = 1;
+            $rozdelany->dokument_id = $dokument->id;
 
             $this->template->Spisy = null;
             $this->template->Subjekty = null;

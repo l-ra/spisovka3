@@ -61,6 +61,11 @@
         View:      {$view}
         SQL:       <?php echo dibi::$numOfQueries ." : ". dibi::$totalTime; ?>
 
+        SQL dotazy:
+        {foreach dibi::getProfiler()->tickets as $dblog }
+            {$dblog[2]}
+        {/foreach}
+
         {block debug}{/block}
 
     </div>

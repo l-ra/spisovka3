@@ -664,10 +664,20 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->template->Typ_evidence = $this->typ_evidence;
 
-        $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
+        $cisty = $this->getParam('cisty',0);
+
+        if ( $cisty == 1 ) {
+            $Dokumenty->odstranit_rozepsane();
+            $this->redirect(':Spisovka:Dokumenty:novy');
+            //$rozdelany_dokument = null;
+        } else {
+            $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
+        }
 
         if ( count($rozdelany_dokument)>0 ) {
             $dokument = $rozdelany_dokument[0];
+
+            $this->flashMessage('Byl detekován a načten rozepsaný dokument.<p>Pokud chcete založit úplně nový dokument, klikněte na následující odkaz. <a href="'. $this->link(':Spisovka:Dokumenty:novy',array('cisty'=>1)) .'">Vytvořit nový nerozepsaný dokument.</a>','info_ext');
 
             $DokumentSpis = new DokumentSpis();
             $DokumentSubjekt = new DokumentSubjekt();

@@ -1237,6 +1237,30 @@ class Dokument extends BaseModel
 
     }
 
+    public function odstranit_rozepsane()
+    {
+
+        $where = array('stav=0');
+
+        $seznam = $this->seznamKlasicky(array('where'=>$where));
+        if ( count($seznam)>0 ) {
+            foreach ( $seznam as $dokument ) {
+                $dokument_id = $dokument->id;
+                $this->delete(array('id=%i',$dokument_id));
+
+                $DokumentSubjekt = new DokumentSubjekt();
+                $DokumentSubjekt->delete(array(array('dokument_id=%i',$dokument_id)));
+
+                $DokumentPrilohy = new DokumentPrilohy();
+                $DokumentPrilohy->delete(array(array('dokument_id=%i',$dokument_id)));
+
+            }
+        }
+        
+        return true;
+    }
+
+
     public static function typDokumentu( $kod = null, $select = 0 ) {
 
         $prefix = Environment::getConfig('database')->prefix;
