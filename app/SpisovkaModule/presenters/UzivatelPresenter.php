@@ -202,6 +202,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
         $this->template->uzivatel_id = $this->getParam('id',null);
         $this->template->dokument_id = $this->getParam('dok_id',null);
+        $this->template->novy = $this->getParam('novy',0);
 
         $Zamestnanci = new Osoba2User();
         $seznam = $Zamestnanci->seznam(1);
@@ -223,31 +224,39 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $role_id = $this->getParam('role',null);
         $orgjednotka_id = $this->getParam('orgjednotka',null);
         $poznamka = $this->getParam('poznamka',null);
+        $novy = $this->getParam('novy',0);
 
-        $Workflow = new Workflow();
 
-        if ( $Workflow->priradit($dokument_id, $user_id, $orgjednotka_id, $poznamka) ) {
+        if ( $novy == 1 ) {
+          echo '###predano###'. $dokument_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
 
-            $link = $this->link(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+          $UserModel = new UserModel();
+          $osoba = $UserModel->getIdentity($user_id);
+          $Orgjednotka = new Orgjednotka();
+          $org = $Orgjednotka->getInfo($orgjednotka_id);
 
-            echo '###vybrano###'. $link;
-            $this->terminate();
-            //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-            
+          echo '#'. Osoba::displayName($osoba) .'#'. @$org->zkraceny_nazev;
+
+          $this->terminate();
         } else {
-            // chyba
-            $this->template->uzivatel_id = 0;
-            $this->template->dokument_id = $dokument_id;
-
-            $Zamestnanci = new Osoba2User();
-            $seznam = $Zamestnanci->seznam(1);
-            $this->template->seznam = $seznam;
-
-            $this->template->chyba = 1;
-
-            $this->template->render('vyber');
-
+            $Workflow = new Workflow();
+            if ( $Workflow->priradit($dokument_id, $user_id, $orgjednotka_id, $poznamka) ) {
+                $link = $this->link(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+                echo '###vybrano###'. $link;
+                $this->terminate();
+                //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+            } else {
+                // chyba
+                $this->template->uzivatel_id = 0;
+                $this->template->dokument_id = $dokument_id;
+                $Zamestnanci = new Osoba2User();
+                $seznam = $Zamestnanci->seznam(1);
+                $this->template->seznam = $seznam;
+                $this->template->chyba = 1;
+                $this->template->render('vyber');
+            }
         }
+
     }
 
 

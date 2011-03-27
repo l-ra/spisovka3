@@ -161,7 +161,7 @@ dialog = function ( elm, title ) {
             }
         }
         url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        //elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }
@@ -322,7 +322,7 @@ novySubjekt = function (elm) {
             }
         }
         url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        //elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }
@@ -411,7 +411,7 @@ subjektzmenit = function(elm){
             }
         }
         url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        elm.href = "javascript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }
@@ -464,8 +464,14 @@ osobaVybrana = function (elm) {
                     stav = stav.replace('###vybrano###','');
                     $('#dialog').dialog('close');
                     location.href = stav;
-
-                    //renderSubjekty(stav);
+                } else if ( stav.indexOf('###predano###') != -1 ) {
+                    stav = stav.replace('###predano###','');
+                    part = stav.split('#');
+                    $('#frmnovyForm-predano_user').val(part[1]);
+                    $('#frmnovyForm-predano_org').val(part[2]);
+                    $('#frmnovyForm-predano_poznamka').val(part[3]);
+                    $('#predano').html("<dl class=\"detail_item\"><dt>Předáno:</dt><dd>"+part[5]+"<br />"+part[4]+"</dd></dl><dl class=\"detail_item\"><dt>Poznámka pro předávajícího:</dt><dd>"+part[3]+"&nbsp;</dd></dl>");
+                    $('#dialog').dialog('close');
                 } else {
                     $('#dialog').html(stav);
                 }
@@ -636,7 +642,7 @@ spojitDokument = function (elm) {
             }
         }
         url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        //elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }
@@ -682,7 +688,7 @@ pripojitDokument = function (elm) {
             }
         }
         url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        //elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }

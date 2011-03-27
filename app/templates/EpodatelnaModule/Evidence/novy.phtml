@@ -148,6 +148,9 @@
             <dt>Poznámka:</dt>
             <dd>{$novyForm['predani_poznamka']->control}</dd>
         </dl>
+        <div id="predano"></div>
+        <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>$user->id, 'dok_id'=>$Dok->id, 'novy'=>1}" id="dialog-uzivatel">Předat dokument</a>
+
     </div>
     
     <div id="dokument_blok_subjekty">

@@ -1092,6 +1092,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue($dokument_id);
         $form->addHidden('odpoved')
                 ->setValue($this->odpoved);
+        $form->addHidden('predano_user');
+        $form->addHidden('predano_org');
+        $form->addHidden('predano_poznamka');
 
         if ( $this->typ_evidence == 'sberny_arch' ) {
             $form->addText('poradi', 'Pořadí dokumentu ve sberném archu:', 4, 4)
@@ -1223,6 +1226,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
 
                 $this->flashMessage('Dokument byl vytvořen.');
+
+                if ( !empty($data['predano_user']) || !empty($data['predano_org']) ) {
+                    /* Dokument predan */
+                    $Workflow->priradit($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
+                    $this->flashMessage('Dokument předán zaměstnanci nebo organizační jendotce.');
+                }
+
+                
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             } else {
                 $this->flashMessage('Dokument se nepodařilo vytvořit.','warning');

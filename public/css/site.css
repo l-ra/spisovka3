@@ -529,17 +529,24 @@ label.required {
     background: #ffffcc url() repeat-x;
 }
 
-.flash_info {
+.flash_info, .flash_info_ext {
     color: #666600;
     border: 1px #666600 solid;
     background: #ffffcc url('../images/icons/dialog-information.png') 10px 5px no-repeat;
 }
-.flash_warning {
+
+.flash_notice, .flash_notice_ext {
+    color: #666600;
+    border: 1px #666600 solid;
+    background: #ffffcc url('../images/icons/dialog-warning.png') 10px 5px no-repeat;
+}
+
+.flash_warning, .flash_warning_ext {
     color: #681203;
     border: 1px #681203 solid;
     background: #ffcccc url('../images/icons/dialog-warning.png') 10px 5px no-repeat;
 }
-.flash_error {
+.flash_error, .flash_error_ext {
     color: #681203;
     border: 1px #681203 solid;
     background: #ffcccc url('../images/icons/dialog-error.png') 10px 5px no-repeat;

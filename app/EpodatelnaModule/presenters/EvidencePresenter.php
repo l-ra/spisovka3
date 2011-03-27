@@ -274,6 +274,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 ->setValue($dokument_id);
         $form->addHidden('epodatelna_id')
                 ->setValue(@$zprava->id);
+        $form->addHidden('predano_user');
+        $form->addHidden('predano_org');
+        $form->addHidden('predano_poznamka');
 
         $form->addHidden('odpoved')
                 ->setValue($this->odpoved);
@@ -472,6 +475,16 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 }*/
 
                 $this->flashMessage('Dokument byl vytvořen.');
+
+                $rozdelany = Environment::getSession('s3_rozdelany');
+                unset($rozdelany->is, $rozdelany->dokument_id, $rozdelany);
+
+                if ( !empty($data['predano_user']) || !empty($data['predano_org']) ) {
+                    /* Dokument predan */
+                    $Workflow->priradit($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
+                    $this->flashMessage('Dokument předán zaměstnanci nebo organizační jendotce.');
+                }
+
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             } else {
                 $this->flashMessage('Dokument se nepodařilo vytvořit.','warning');
