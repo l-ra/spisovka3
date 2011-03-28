@@ -770,8 +770,8 @@ class Dokument extends BaseModel
         if ( $bez_vyrizenych && !$vyrusit_bezvyrizeni ) {
 
             // TODO vyresit jeste variantu na kterych jsem pracoval -> aktivni=0
-
-            $args['where'] = array( array('wf.aktivni=1'), array('!((wf.stav_dokumentu = 4) OR (wf.stav_dokumentu = 5))') );
+            $args['where'][] = array('wf.aktivni=1');
+            $args['where'][] = array('!((wf.stav_dokumentu = 4) OR (wf.stav_dokumentu = 5))');
 
         }
 
