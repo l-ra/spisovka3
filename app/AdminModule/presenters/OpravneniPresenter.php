@@ -63,6 +63,9 @@ class Admin_OpravneniPresenter extends BasePresenter
         $RoleModel = new RoleModel();
 
         $role_select = $RoleModel->seznam(1);
+        if ( isset($role->id) ) {
+            unset($role_select[$role->id]);
+        }
         
 
         $form1 = new AppForm();
