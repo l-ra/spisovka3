@@ -47,7 +47,7 @@
         {access :Epodatelna:Default:odchozi}<a href="{vlink :Epodatelna:Default:odchozi}">Odchozí zprávy</a>{/access}
     </div>
     <div n:if="count($flashes)>0" id="flash">
-        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{$flash->message}</div>{/foreach}
+        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}
     </div>
     <div id="content">
         {snippet main}

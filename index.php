@@ -18,6 +18,8 @@ define('KLIENT', 'default');
 // absolute filesystem path to the client files
 define('CLIENT_DIR', WWW_DIR . '/client');
 
+// manual debug - 1 = enable, 0 = disable, commented out line = automatic
+//define('DEBUG_ENABLE', 1);
 
 // load bootstrap file
 require APP_DIR . '/bootstrap.php';

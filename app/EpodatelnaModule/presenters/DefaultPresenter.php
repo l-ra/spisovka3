@@ -616,7 +616,7 @@ dmFormat =
         } else {
             $this->flashMessage('Nepodařilo se připojit k emailové schránce "'. $config['ucet'] .'"!
                                  <br />
-                                 IMAP chyba: '. $imap->error() .'','warning');
+                                 IMAP chyba: '. $imap->error() .'','warning_ext');
             return null;
         }
     }

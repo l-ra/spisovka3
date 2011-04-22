@@ -4,16 +4,21 @@
 require LIBS_DIR . '/Nette/loader.php';
 
 // Step 2: Configure environment
+
 // 2a) enable Nette\Debug for better exception and error visualisation
-//if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1') {
-//    Environment::setMode(Environment::DEVELOPMENT);
-//    Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error.log');
-//} else {
-//    Environment::setMode(Environment::PRODUCTION);
-//    Debug::enable(Debug::PRODUCTION, '%logDir%/php_error.log');
-//}
 Environment::setVariable('logDir',APP_DIR .'/../log/');
-Debug::enable(Debug::DETECT, '%logDir%/php_error.log');
+if ( defined('DEBUG_ENABLE') ) {
+    if ( DEBUG_ENABLE ) {
+        Environment::setMode(Environment::DEVELOPMENT);
+        Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error.log');
+    } else {
+        Environment::setMode(Environment::PRODUCTION);
+        Debug::enable(Debug::PRODUCTION, '%logDir%/php_error.log');
+    }
+} else {
+    Debug::enable(Debug::DETECT, '%logDir%/php_error.log');
+}
+
 
 // 2b) load configuration from config.ini file
 $basePath = Environment::getHttpRequest()->getUri()->basePath;
