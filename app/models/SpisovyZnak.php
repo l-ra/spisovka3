@@ -140,6 +140,8 @@ class SpisovyZnak extends BaseModel
                 $tmp[0] = 'vyberte z nabídky ...';
             } else if ( $simple == 2 ) {
                 $tmp[0] = '(hlavní větev)';
+            } else if ( $simple == 3 ) {
+                $tmp[0] = 'jakýkoli spisový znak';
             }
             $spisznak_parent_id = end($spisznak_parent);
             foreach ( $data as $index => $d ) {
@@ -149,8 +151,8 @@ class SpisovyZnak extends BaseModel
                     $d->uroven = count($spisznak_parent);
                     $d->class = ' item'. implode(' item',$spisznak_parent) .'';
 
-                    if ( $simple == 1 || $simple == 2 ) {
-                        $nazev = str_repeat(".", 2*$d->uroven) .' '. $d->nazev;
+                    if ( $simple == 1 || $simple == 2 || $simple == 3 ) {
+                        $nazev = str_repeat(".", 3*$d->uroven) .' '. $d->nazev;
                         $tmp[ $d->id ] = $nazev;
                     } else if ( $simple == 3 ) {
                         $tmp[ $d->id ] = $d->nazev;
@@ -243,6 +245,13 @@ class SpisovyZnak extends BaseModel
                 $tmp[''] = 'Žádná';
                 foreach ($result as $dt) {
                     $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
+                }
+                return $tmp;
+            } else if ( $select == 3 ) {
+               $tmp = array();
+                $tmp[''] = 'všechny spouštěcí události';
+                foreach ($result as $dt) {
+                    $tmp[ $dt->nazev ] = String::truncate($dt->nazev,90);
                 }
                 return $tmp;
             } else {

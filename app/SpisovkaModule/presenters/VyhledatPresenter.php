@@ -74,29 +74,22 @@ class Spisovka_VyhledatPresenter extends BasePresenter
     {
 
         $typ_dokumentu = array();
-        $typ_dokumentu[0] = 'jakýkoli typ dokumentu';
-        $typ_dokumentu = @array_merge($typ_dokumentu, Dokument::typDokumentu(null,1));
+        $typ_dokumentu = Dokument::typDokumentu(null,3);
 
         $typ_select = array();
-        $typ_select[0] = 'jakýkoli typ subjektu';
-        $typ_select = @array_merge($typ_select, Subjekt::typ_subjektu());
+        $typ_select = Subjekt::typ_subjektu(null,3);
 
         $stat_select = array();
-        $stat_select[0] = 'v jakémkoli státě';
-        $stat_select = @array_merge($stat_select, Subjekt::stat());
+        $stat_select = Subjekt::stat(null,3);
 
         $zpusob_vyrizeni = array();
-        $zpusob_vyrizeni[0] = 'jakýkoli způsob vyřízení';
-        $zpusob_vyrizeni = @array_merge($zpusob_vyrizeni, Dokument::zpusobVyrizeni(null, 1));
+        $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 3);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = array();
-        $spisznak_seznam[0] = 'všechny spisové znaky ...';
-        $spisznak_seznam = @array_merge($spisznak_seznam, $SpisovyZnak->seznam(null,1));
+        $spisznak_seznam = $SpisovyZnak->seznam(null,3);
 
         $spudalost_seznam = array();
-        $spudalost_seznam[0] = 'všechny spouštěcí události ...';
-        $spudalost_seznam = @array_merge($spudalost_seznam, SpisovyZnak::spousteci_udalost(null, 1));
+        $spudalost_seznam = SpisovyZnak::spousteci_udalost(null, 3);
 
 
         $skartacni_znak = array('0'=>'jakýkoli znak','A'=>'A','V'=>'V','S'=>'S');
@@ -200,7 +193,6 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $args = $Dokument->filtr(null,$data);
 
         $this->forward(':Spisovka:Dokumenty:default',array('hledat'=>$args));
-        //$this->redirect(':Spisovka:Dokumenty:default',array('hledat'=>$args));
 
 
     }

@@ -417,21 +417,30 @@ class Subjekt extends BaseModel
         }
     }
 
-    public static function stat($kod = null) {
+    public static function stat($kod = null, $select = 0) {
 
         $stat = array('CZE'=>'Česká republika',
                       'SVK'=>'Slovenská republika'
                      );
 
         if ( is_null($kod) ) {
-            return $stat;
+            if ( $select == 3 ) {
+                $tmp = array();
+                $tmp[''] = 'v jakémkoli státě';
+                foreach ($stat as $i => $s) {
+                    $tmp[ $i ] = $s;
+                }
+                return $tmp;
+            } else {
+                return $stat;
+            }
         } else {
             return ( key_exists($kod, $stat) )?$stat[ $kod ]:null;
         }
 
     }
 
-    public static function typ_subjektu( $kod = null ) {
+    public static function typ_subjektu( $kod = null, $select = 0 ) {
 
         $typ = array('OVM'=>'Orgán veřejné moci',
                       'FO'=>'Fyzická osoba',
@@ -448,7 +457,16 @@ class Subjekt extends BaseModel
                      );
 
         if ( is_null($kod) ) {
-            return $typ;
+            if ( $select == 3 ) {
+                $tmp = array();
+                $tmp[''] = 'jakýkoli typ subjektu';
+                foreach ($typ as $i => $s) {
+                    $tmp[ $i ] = $s;
+                }
+                return $tmp;
+            } else {
+                return $typ;
+            }
         } else {
             return ( key_exists($kod, $typ) )?$typ[ $kod ]:null;
         }

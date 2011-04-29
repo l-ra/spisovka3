@@ -2297,7 +2297,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->getHttpResponse()->setCookie('s3_filtr', serialize($data), strtotime('90 day'));
 
-        $this->forward('this', array('filtr'=>$data) );
+        //$this->forward('this', array('filtr'=>$data) );
+        $this->forward(':Spisovka:Dokumenty:default', array('filtr'=>$data) );
 
     }
 

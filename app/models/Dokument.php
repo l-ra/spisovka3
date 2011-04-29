@@ -360,7 +360,7 @@ class Dokument extends BaseModel
         }
         if ( isset($params['stav_dokumentu']) ) {
             if ( !empty($params['stav_dokumentu']) ) {
-                $args['where'][] = array('wf.stav_dokumentu = %i',$params['stav_dokumentu']);
+                $args['where'][] = array('wf.stav_dokumentu = %i AND wf.aktivni=1',$params['stav_dokumentu']);
             }
         }
         if ( isset($params['lhuta']) ) {
@@ -404,9 +404,14 @@ class Dokument extends BaseModel
                 //$args['where'][] = array('d.datum_odeslani = %d',$params['datum_odeslani'].$cas);
             }
         }
+        if ( isset($params['spisovy_znak']) ) {
+            if ( !empty($params['spisovy_znak']) ) {
+                $args['where'][] = array('d.spisovy_znak LIKE %s','%'.$params['spisovy_znak'] .'%');
+            }
+        }
         if ( isset($params['spisovy_znak_id']) ) {
             if ( !empty($params['spisovy_znak_id']) ) {
-                //$args['where'][] = array();
+                $args['where'][] = array('d.spisovy_znak_id = %i',$params['spisovy_znak_id']);
             }
         }
         if ( isset($params['ulozeni_dokumentu']) ) {
@@ -1275,6 +1280,13 @@ class Dokument extends BaseModel
                     $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
+            } else if ( $select == 3 ) {
+                $tmp = array();
+                $tmp[0] = 'jakýkoli typ dokumentu';
+                foreach ($result as $dt) {
+                    $tmp[ $dt->id ] = $dt->nazev;
+                }
+                return $tmp;
             } else {
                 return $result;
             }
@@ -1296,6 +1308,13 @@ class Dokument extends BaseModel
                 $tmp = array();
                 foreach ($result as $dt) {
                     $tmp[ $dt->id ] = $dt->nazev;
+                }
+                return $tmp;
+            } else if ( $select == 3 ) {
+               $tmp = array();
+                $tmp[0] = 'jakýkoli způsob vyřízení';
+                foreach ($result as $dt) {
+                    $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
                 }
                 return $tmp;
             } else {
