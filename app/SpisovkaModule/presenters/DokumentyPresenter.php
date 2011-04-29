@@ -8,6 +8,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     private $hledat;
     private $odpoved = null;
     private $typ_evidence = null;
+    private $oddelovac_poradi = null;
 
     public function startup()
     {
@@ -18,6 +19,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } else {
             $this->typ_evidence = 'priorace';
         }
+        if ( isset($user_config->cislo_jednaci->oddelovac) ) {
+            $this->oddelovac_poradi = $user_config->cislo_jednaci->oddelovac;
+        } else {
+            $this->oddelovac_poradi = '/';
+        }
+        $this->template->Oddelovac_poradi = $this->oddelovac_poradi;
 
         parent::startup();
     }

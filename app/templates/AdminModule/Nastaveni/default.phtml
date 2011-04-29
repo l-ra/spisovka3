@@ -66,13 +66,19 @@
             <dt>Maska čísla jednacího:</dt>
             <dd>{$CisloJednaci->maska}&nbsp;</dd>
         </dl>
+        {if $CisloJednaci->typ_evidence == 'sberny_arch'}
+        <dl class="detail_item">
+            <dt>Znak oddělovače pořadového čísla:</dt>
+            <dd>{if isset($CisloJednaci->oddelovac)}{$CisloJednaci->oddelovac}{else}/{/if}&nbsp;</dd>
+        </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Ukázka podoby:</dt>
-            <dd>{$Ukazka->cislo_jednaci}&nbsp;</dd>
+            <dd>{$Ukazka->cislo_jednaci}{if $CisloJednaci->typ_evidence == 'sberny_arch'}{if isset($CisloJednaci->oddelovac)}{$CisloJednaci->oddelovac}{else}/{/if}1{/if}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Typ evidence:</dt>
-            <dd>{$CisloJednaci->typ_evidence}&nbsp;</dd>
+            <dd>{if $CisloJednaci->typ_evidence == 'sberny_arch'}sběrný arch{else}{$CisloJednaci->typ_evidence}{/if}&nbsp;</dd>
         </dl>
         {access :Admin:Nastaveni:default}<a href="{link :Admin:Nastaveni:default, 'upravit'=>'cjednaci'}">Upravit</a>{/access}
         {/if}

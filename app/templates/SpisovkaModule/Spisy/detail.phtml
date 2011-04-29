@@ -113,7 +113,7 @@
             </td>
             <td class="cislo_jadnaci">
                 &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
-                   {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'} / {$dok->poradi}{/if}
+                   {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
                 </a></strong>
                 <div class="small">&nbsp;{$dok->jid}</div>
                 {if count($dok->spisy)>0}

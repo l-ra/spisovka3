@@ -4,6 +4,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
 {
 
     private $typ_evidence = null;
+    private $oddelovac_poradi = null;
 
     public function startup()
     {
@@ -15,7 +16,13 @@ class Spisovka_SpisyPresenter extends BasePresenter
             $this->typ_evidence = 'priorace';
         }
         $this->template->Typ_evidence = $this->typ_evidence;
-
+        
+        if ( isset($user_config->cislo_jednaci->oddelovac) ) {
+            $this->oddelovac_poradi = $user_config->cislo_jednaci->oddelovac;
+        } else {
+            $this->oddelovac_poradi = '/';
+        }
+        $this->template->Oddelovac_poradi = $this->oddelovac_poradi;
         parent::startup();
     }
 

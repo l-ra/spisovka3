@@ -200,7 +200,7 @@
         </dl>
         {if empty($Dok->cislo_jednaci)}
         <dl class="detail_item">
-            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
             <dd>Dokument není evidován!
                 {if $Typ_evidence == 'sberny_arch'}
                 <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
@@ -212,8 +212,8 @@
         </dl>
         {else}
         <dl class="detail_item">
-            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
-            <dd class="nadpis">{$Dok->cislo_jednaci}&nbsp;{if $Typ_evidence == 'sberny_arch'} / {$Dok->poradi}{/if}</dd>
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
+            <dd class="nadpis">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
         {/if}
         <dl class="detail_item">
@@ -303,8 +303,8 @@
         </dl>
         {else}
         <dl class="detail_item">
-            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
-            <dd class="nadpis">{$Dok->cislo_jednaci}&nbsp;{if $Typ_evidence == 'sberny_arch'} / {$Dok->poradi}{/if}</dd>
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
+            <dd class="nadpis">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
         {/if}
         <dl class="detail_item">

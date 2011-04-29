@@ -137,6 +137,12 @@ class Admin_NastaveniPresenter extends BasePresenter
         $form1->addText('maska', 'Maska:', 50, 100)
                 ->setValue($CJ->maska)
                 ->addRule(Form::FILLED, 'Maska čísla jednacího musí být vyplněna.');
+
+        if ( $CJ->typ_evidence != 'priorace' ) {
+            $form1->addText('oddelovac', 'Znak oddělovače pořadového čísla:', 3, 1)
+                    ->setValue( !isset($CJ->oddelovac)?'/':$CJ->oddelovac );
+        }
+
         //$form1->addText('typ', 'Metoda přičítání:', 50, 200)
         //        ->setValue($CJ->typ);
 
@@ -165,6 +171,10 @@ class Admin_NastaveniPresenter extends BasePresenter
         $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $config_data = $config->toArray();
         $config_data['cislo_jednaci']['maska'] = $data['maska'];
+        
+        if ( $config_data['cislo_jednaci']['typ_evidence'] != "priorace" ) {
+            $config_data['cislo_jednaci']['oddelovac'] = $data['oddelovac'];
+        }
 
         $config_modify = new Config();
         $config_modify->import($config_data);
