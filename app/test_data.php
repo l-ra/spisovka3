@@ -31,7 +31,9 @@ $application->catchExceptions = Environment::isProduction();
 
 // 3b) Load database
 try {
-    dibi::connect(Environment::getConfig('database'));
+    $db_config = (array) Environment::getConfig('database');
+    $db_config['profiler'] = FALSE;
+    dibi::connect($db_config);
     dibi::addSubst('PREFIX', Environment::getConfig('database')->prefix);
     define('DB_PREFIX', Environment::getConfig('database')->prefix);
 } catch (DibiDriverException $e) {
@@ -95,7 +97,7 @@ mt_srand(make_seed());
 
 debug_head('Info', 2);
 
-debug(Environment::getConfig('database'),'databaze');
+debug($db_config,'databaze');
 
 
 /* **************************************************************************
