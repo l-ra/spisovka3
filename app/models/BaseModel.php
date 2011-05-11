@@ -384,6 +384,15 @@ abstract class BaseModel extends Object
         return dibi::delete($this->name)->where($where)->execute();
     }
 
+    /**
+     * Delete all rows
+     * @return
+     */
+    public function deleteAll()
+    {
+       return dibi::query('TRUNCATE ['.$this->name.'];');
+    }
+
     public static function array2obj($data) {
 
         if ( is_object($data) ) {

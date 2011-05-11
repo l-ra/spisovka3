@@ -168,4 +168,18 @@ class Orgjednotka extends BaseModel
         return $is;
     }
 
+
+    public function  deleteAllOrg() {
+        parent::deleteAll();
+
+        $AclModel = new AclModel();
+        $UserModel = new User2Role();
+        $RoleModel = new RoleModel();
+
+        $UserModel->delete(array('role_id > 6'));
+        $AclModel->delete(array('role_id > 6'));
+        $AclModel->deleteRule(array("privilege LIKE 'orgjednotka_%'"));
+        $RoleModel->delete(array('fixed=0'));
+
+    }
 }

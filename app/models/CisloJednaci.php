@@ -38,7 +38,11 @@ class CisloJednaci extends BaseModel
         $unique_part = explode('#',$unique_info);
         $this->unique = 'OSS-'. $unique_part[0];
 
-        $user = Environment::getUser()->getIdentity()->id;
+        try {
+            $user = Environment::getUser()->getIdentity()->id;
+        } catch ( Exception $e ) {
+            $user = 1;
+        }
         $UserModel = new UserModel();
         $this->user_info = $UserModel->getUser($user, 1);
 

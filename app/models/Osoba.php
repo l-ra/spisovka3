@@ -127,7 +127,12 @@ class Osoba extends BaseModel
 
     }
 
-    
+    public function  deleteAll() {
+        parent::deleteAll();
+        $Osoba2User = new Osoba2User();
+        $Osoba2User->deleteAll();
+    }
+
 }
 
 class Osoba2User extends BaseModel

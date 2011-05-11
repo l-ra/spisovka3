@@ -155,5 +155,9 @@ class LogModel extends BaseModel {
         
     }
 
+    public function  deleteAllDokument() {
+        return dibi::query('TRUNCATE ['.$this->tb_logdokument.'];');
+    }
+
 
 }

@@ -1265,6 +1265,23 @@ class Dokument extends BaseModel
         return true;
     }
 
+    public function deleteAll()
+    {
+
+        $Dokument2Subjekt = new DokumentSubjekt();
+        $Dokument2Subjekt->deleteAll();
+        $Dokument2Prilohy = new DokumentPrilohy();
+        $Dokument2Prilohy->deleteAll();
+        $Dokument2Odeslani = new DokumentOdeslani();
+        $Dokument2Odeslani->deleteAll();
+        $Dokument2Spis = new DokumentSpis();
+        $Dokument2Spis->deleteAll();
+        $CisloJednaci = new CisloJednaci();
+        $CisloJednaci->deleteAll();
+
+        parent::deleteAll();
+        
+    }
 
     public static function typDokumentu( $kod = null, $select = 0 ) {
 

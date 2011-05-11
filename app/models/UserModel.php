@@ -207,6 +207,11 @@ class UserModel extends BaseModel
 
     }
 
+    public function  deleteAll() {
+        parent::deleteAll();
+        $User2Role = new User2Role();
+        $User2Role->deleteAll();
+    }
 }
 
 class User2Role extends BaseModel
