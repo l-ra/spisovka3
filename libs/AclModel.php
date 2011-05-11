@@ -23,20 +23,20 @@ class AclModel extends BaseModel {
         //$storage = new FileStorage('tmp');
         //$cache = new Cache($storage);
 
-        if (isset($cache['s3_Role'])) {
-            return $cache['s3_Role'];
-        } else {
+        //if (isset($cache['s3_Role'])) {
+        //    return $cache['s3_Role'];
+        //} else {
 
             $res = dibi::fetchAll('SELECT r1.code, r2.code as parent_code
                                    FROM ['. $this->tb_role . '] r1
                                    LEFT JOIN ['. $this->tb_role . '] r2 ON (r1.parent_id = r2.id)
                                    ORDER BY r1.parent_id ASC
                                   ');
-            $cache['s3_Role'] = $res;
+            //$cache['s3_Role'] = $res;
             return $res;
 
 
-        }
+        //}
 
 
 
@@ -50,13 +50,13 @@ class AclModel extends BaseModel {
         //$storage = new FileStorage('tmp');
         //$cache = new Cache($storage);
 
-        if (isset($cache['s3_Resource_'.$cols])) {
-            return $cache['s3_Resource_'.$cols];
-        } else {        
+        //if (isset($cache['s3_Resource_'.$cols])) {
+        //    return $cache['s3_Resource_'.$cols];
+        //} else {
             $res = dibi::fetchAll('SELECT '.$cols.' FROM ['. $this->tb_resource . '] ORDER BY code ASC');
-            $cache['s3_Resource_'.$cols] = $res;
+            //$cache['s3_Resource_'.$cols] = $res;
             return $res;
-        }
+        //}
     }
 
     public function getPermission() {
@@ -81,7 +81,7 @@ class AclModel extends BaseModel {
 
                     ORDER BY ro.fixed DESC, a.allowed DESC, ro.code, ru.privilege
             ');
-            $cache['s3_Permission'] = $res;
+            //$cache['s3_Permission'] = $res;
             return $res;
         }
 
@@ -201,25 +201,25 @@ class AclModel extends BaseModel {
     }
 
     public function insertAcl($data) {
-        $storage = new FileStorage('tmp');
-        $cache = new Cache($storage);
-        unset($cache['s3_Permission']);
+        //$storage = new FileStorage('tmp');
+        //$cache = new Cache($storage);
+        //unset($cache['s3_Permission']);
         return dibi::insert($this->name, $data)
             ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
     }
 
     public function insertResource($data) {
-        $storage = new FileStorage('tmp');
-        $cache = new Cache($storage);
-        unset($cache['s3_Resource_*'],$cache['s3_Resource_code'],$cache['s3_Permission']);
+        //$storage = new FileStorage('tmp');
+        //$cache = new Cache($storage);
+        //unset($cache['s3_Resource_*'],$cache['s3_Resource_code'],$cache['s3_Permission']);
         return dibi::insert($this->tb_resource, $data)
             ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
     }
 
     public function insertRule($data) {
-        $storage = new FileStorage('tmp');
-        $cache = new Cache($storage);
-        unset($cache['s3_Rule'],$cache['s3_Permission']);
+        //$storage = new FileStorage('tmp');
+        //$cache = new Cache($storage);
+        //unset($cache['s3_Rule'],$cache['s3_Permission']);
         return dibi::insert($this->tb_rule, $data)
             ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
     }
@@ -234,9 +234,9 @@ class AclModel extends BaseModel {
                 $where = array($where);
             }
         }
-        $storage = new FileStorage('tmp');
-        $cache = new Cache($storage);
-        unset($cache['s3_Permission']);
+        //$storage = new FileStorage('tmp');
+        //$cache = new Cache($storage);
+        //unset($cache['s3_Permission']);
         return dibi::delete($this->name)->where($where)->execute();
     }
 
@@ -250,9 +250,9 @@ class AclModel extends BaseModel {
                 $where = array($where);
             }
         }
-        $storage = new FileStorage('tmp');
-        $cache = new Cache($storage);
-        unset($cache['s3_Resource_*'],$cache['s3_Resource_code'],$cache['s3_Permission']);
+        //$storage = new FileStorage('tmp');
+        //$cache = new Cache($storage);
+        //unset($cache['s3_Resource_*'],$cache['s3_Resource_code'],$cache['s3_Permission']);
         return dibi::delete($this->tb_resource)->where($where)->execute();
     }
 
@@ -266,9 +266,9 @@ class AclModel extends BaseModel {
                 $where = array($where);
             }
         }
-        $storage = new FileStorage('tmp');
-        $cache = new Cache($storage);
-        unset($cache['s3_Rule'],$cache['s3_Permission']);
+        //$storage = new FileStorage('tmp');
+        //$cache = new Cache($storage);
+        //unset($cache['s3_Rule'],$cache['s3_Permission']);
         return dibi::delete($this->tb_rule)->where($where)->execute();
     }
     
