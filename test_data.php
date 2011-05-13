@@ -25,6 +25,7 @@ define('GENEROVAT_SUBJEKTY', 1);
 define('GENEROVAT_ORGJEDNOTKY', 1);
 define('GENEROVAT_ZAMESTNANCE', 1);
 define('GENEROVAT_DOKUMENTY', 1);
+define('GENEROVAT_PRILOHY', 1);
 
 // pocet zaznamu
 define('POCET_SPISOVYCH_ZNAKU', 200);
@@ -32,7 +33,8 @@ define('POCET_SPISU', 1500);
 define('POCET_SUBJEKTU', 3000);
 define('POCET_ORGJEDNOTEK', 300);
 define('POCET_ZAMESTNANCU', 600);
-define('POCET_DOKUMENTU', 10000);
+define('POCET_DOKUMENTU', 50000);
+define('POCET_PRILOH', 1000);
 
 define('ADMIN_LOGIN', 'admin');
 define('ADMIN_PASSWORD', 'admin');

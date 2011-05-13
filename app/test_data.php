@@ -245,6 +245,51 @@ for ( $i = 1; $i <= POCET_SUBJEKTU; $i++ ) {
      }
 }
 } //GENEROVAT_SUBJEKTY
+
+/* **************************************************************************
+ *
+ * Prilohy
+ *
+ ************************************************************************** */
+if ( GENEROVAT_PRILOHY ) {
+debug_head('Generování priloh', 2);
+
+
+$File = new FileModel();
+
+if (TRUNCATE) $File->deleteAll();
+
+for ( $i = 1; $i <= POCET_PRILOH; $i++ ) {
+    try {
+
+        $mesto = mt_rand(0,count($subj)-1);
+        
+	    $File->insert_basic( array(
+			'id' => $i,
+			'version' => 1,
+			'typ' => 1,
+			'nazev' => String::webalize($mesto) .'.doc',
+			'popis' => 'testovaci soubor',
+			'real_name' => String::webalize($mesto) .'.doc',   
+			'real_path' => 'nekde/',
+			'mime_type' => 'text/plain',
+			'md5_hash' => md5($mesto . $i),
+			'size' => mt_rand(10, 99999),
+			'stav' => 1,
+			'date_created' => date('Y-m-d H:i:s'),
+			'user_created' => 1,
+			'guid' => UUID::v4()
+	    
+	    ));
+	    
+        echo "<br> ". String::webalize($mesto) .'.doc';
+     } catch ( DibiException $e ) {
+        echo "<br>   => <span style='color:red'>nevytvořeno $i!</span>";
+        echo "<br>   <span style='color:red'>Chyba: ".htmlspecialchars($e->getMessage())."</span>";
+        echo "<br>   <span style='color:red'>SQL: ".htmlspecialchars($e->getSql())."</span>";
+     }
+}
+} // GENEROVAT PRILOHY
 /* **************************************************************************
  *
  * Migrace organizacni jednotky
@@ -474,6 +519,24 @@ for ( $i =0; $i <= POCET_DOKUMENTU; $i++ ) {
             $DokumentSubjekt = new DokumentSubjekt();
             $DokumentSubjekt->pripojit($dokument->id, $subjekt_id, $subjekt_type_a[$subjekt_type_id]);
 
+            // Prilohy
+            $priloha_id = mt_rand(1, POCET_PRILOH );
+            $DokumentPrilohy = new DokumentPrilohy();
+            $DokumentPrilohy->pripojit($dokument->id, $priloha_id);
+
+            // Odesilani
+            $subjekt_o_id = mt_rand(1, POCET_SUBJEKTU );
+            $DokumentOdeslani = new DokumentOdeslani();
+            $DokumentOdeslani->ulozit( array(
+				'dokument_id' => $dokument->id,
+				'dokument_version' => 1,
+				'subjekt_id' => $subjekt_o_id,
+				'subjekt_version' => 1,
+				'zpusob_odeslani' => mt_rand(1,3),
+				'epodatelna_id' => null,
+				'datum_odeslani' => date('Y-m-d H:i:s')
+			));			
+			
             // Predani
             $user_predani = mt_rand(1, POCET_ZAMESTNANCU-1);
             $UserOrg = $User->getOrg($user_predani);
