@@ -1591,8 +1591,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
         $user_info = Environment::getUser()->getIdentity();
         if ( !empty($user_info->identity->email) ) {
-            $key = "user#". Subjekt::displayName($user_info->identity, 'jmeno') ."#". $user_info->identity->email;
-            $odesilatele[$key] = Subjekt::displayName($user_info->identity, 'jmeno') ." <". $user_info->identity->email ."> [zaměstnanec]";
+            $key = "user#". Osoba::displayName($user_info->identity, 'jmeno') ."#". $user_info->identity->email;
+            $odesilatele[$key] = Osoba::displayName($user_info->identity, 'jmeno') ." <". $user_info->identity->email ."> [zaměstnanec]";
         }
 
         $form = new AppForm();
@@ -1995,6 +1995,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
 
         //$isds_debug = 1;
+        try {
+
+
         $isds = new ISDS_Spisovka();
         if ( $ISDSBox = $isds->pripojit() ) {
 
@@ -2186,6 +2189,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
         } else {
             return false;
+        }
+
+        } catch (Exception $e) {
+            $this->flashMessage('Chyba ISDS: '. $e->getMessage(),'warning_ext');
         }
     }
 
