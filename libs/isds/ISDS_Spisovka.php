@@ -87,8 +87,10 @@ class ISDS_Spisovka extends ISDS {
             return $this->ISDSBox;
         } else {
             if ( $this->ErrorInfo == "Služba ISDS je momentálně nedostupná" ) {
+                throw new Exception("Server ISDS je dočasně nedostupný.<br />Omlouváme se všem uživatelům datových schránek za dočasné omezení přístupu do systému datových schránek z důvodu plánované údržby systému. Děkujeme za pochopení.");
                 return false;
             } else if ( $this->ErrorInfo == "Neplatné přihlašovací údaje!" ) {
+                throw new Exception("Neplatné přihlašovací údaje!");
                 return false;
             } else {
                 throw new Exception("Chyba ISDS: ".$this->StatusCode." - ".$this->ErrorInfo);
@@ -167,8 +169,12 @@ class ISDS_Spisovka extends ISDS {
 
     public function odeslatZpravu($zprava, $prilohy) {
 
+        $this->debug_function('odeslatZpravu');
+
         // je parametr platny
         if ( empty($zprava) ) {
+            $this->debug_return('error','Prázdný či neplatný parametr!');
+            $this->debug_return('return',false);
             throw new InvalidArgumentException("Prázdný či neplatný parametr!");
             return false;
         }
@@ -176,6 +182,8 @@ class ISDS_Spisovka extends ISDS {
         // Komu
         $komu = $zprava['dbIDRecipient'];// Identifikace adresata
         if ( empty($komu) ) {
+            $this->debug_return('error','Není k dispozici adresát!');
+            $this->debug_return('return',false);
             throw new InvalidArgumentException("Není k dispozici adresát!");
             return false;
         }
@@ -244,19 +252,42 @@ class ISDS_Spisovka extends ISDS {
                     'dmFiles' => $dmFiles
                 );
 
+        $this->debug_param('dmEnvelope', $MessageCreateInput['dmEnvelope']);
+        $this->debug_param('dmFiles', $MessageCreateInput['dmFiles']);
+
 	try {
 
             // odeslani zpravy a ziskani ID zpravy
             $MessageCreateOutput = $this->OperationsWS()->CreateMessage($MessageCreateInput);
+
             if ( isset($MessageCreateOutput->dmID) ) {
                 $MessageID = $MessageCreateOutput->dmID;
-                //$MessageStatus=$MessageCreateOutput->dmStatus;
+                $messageStatus = $MessageCreateOutput->dmStatus;
+                $this->StatusCode    = $messageStatus->dmStatusCode;
+                $this->StatusMessage = $messageStatus->dmStatusMessage;
+                $this->debug_return('return',$messageID,1);
                 return $MessageID;
             } else {
+                $messageStatus = @$MessageCreateOutput->dmStatus;
+                $this->StatusCode    = @$messageStatus->dmStatusCode;
+                $this->StatusMessage = @$messageStatus->dmStatusMessage;
+                $this->ErrorCode     = null;
+                $this->ErrorInfo     = "";
+                $this->debug_return('error',"Datovou zprávu se nepodařilo odeslat");
+                $this->debug_return('return',false,1);
+                throw new InvalidStateException($this->StatusMessage);
                 return false;
             }
 	} catch (Exception $e) {
-            throw new InvalidStateException('Datovou zprávu se nepodařilo odeslat. ISDS: '. $e->getMessage());
+            $messageStatus = @$MessageCreateOutput->dmStatus;
+            $this->StatusCode    = @$messageStatus->dmStatusCode;
+            $this->StatusMessage = @$messageStatus->dmStatusMessage;
+            $this->ErrorCode     = $e->getCode();
+            $this->ErrorInfo     = $e->getMessage();
+            $this->debug_return('error',"Datovou zprávu se nepodařilo odeslat");
+            $this->debug_return('return',false,1);
+
+            throw new InvalidStateException($e->getMessage());
             return false;
 	}
 

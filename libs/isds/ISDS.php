@@ -22,8 +22,10 @@ class ISDS {
     protected $params_soap = array();
 
     protected $debug = 0;
+    protected $debug_log = array();
     protected $debug_file = 1;
     protected $debug_file_text = "";
+    
     protected $proxy = 0;
 
     protected $StatusCode;	// statuscode posledni akce
@@ -46,7 +48,8 @@ class ISDS {
         $this->ValidLogin = false;
         $this->NullRetInfo();
 
-        $this->debug("===========================\nISDSBox\n=================");
+        $this->debug("===========================\nISDSBox\n===========================");
+        $this->debug_function('ISDSBox');
 
         $this->portal = $portalType;
 
@@ -91,25 +94,38 @@ class ISDS {
         $this->debug("PortalType",$portalType);
         $this->debug("LoginType",$type);
         $this->debug("SOAP Params",$params);
+        $this->debug_param("PortalType", $portalType);
+        $this->debug_param("LoginType", $type);
+        $this->debug_param("SOAP Params", $params);
+
 
         if ( $this->InitCurl($type, $params) ) {
             $this->GetOwnerInfoFromLogin();
             if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
+                $this->debug_return('return',1);
                 return true;
             } else {
                 if ( $this->ErrorInfo == "looks like we got no XML document" ) {
                     $this->ErrorInfo = "Služba ISDS je momentálně nedostupná";
+                    $this->ErrorCode = 503;
                 } else if ( $this->ErrorInfo == "Unauthorized" ) {
                     $this->ErrorInfo = "Neplatné přihlašovací údaje!";
+                    $this->ErrorCode = 401;
                 }
                 //echo $this->ErrorInfo;
                 //throw new Exception("Chyba připojení k ISDS! - ".$this->ErrorInfo,$this->ErrorCode);
+                $this->debug_return('return',0,1);
                 return false;
             }
         } else {
             if ( $this->ErrorInfo == "The requested URL returned error: 401" ) {
                 $this->ErrorInfo = "Neplatné přihlašovací údaje!";
+                $this->ErrorCode = 401;
+            } else if ( $this->ErrorInfo == "The requested URL returned error: 503" ) {
+                $this->ErrorInfo = "Služba ISDS je momentálně nedostupná";
+                $this->ErrorCode = 503;
             }
+            $this->debug_return('return',0,1);
             return false;
         }
 
@@ -135,7 +151,8 @@ class ISDS {
      */
     protected function OperationsWS($params = null) {
 
-        $this->debug("===========================\nOperationsWS\n=================");
+        $this->debug("=================\nOperationsWS\n=================");
+        $this->debug_function('OperationWS');
 
         if ( is_null($params) ) {
             $params = $this->params_soap;
@@ -145,9 +162,12 @@ class ISDS {
         $this->debug(">> Volam SoapClient");
         $this->debug(">>       type:",$this->GetServiceWSDL(0));
         $this->debug(">>       params:",$params);
+        //$this->debug_function('SoapClient');
+        $this->debug_param('type', $this->GetServiceWSDL(0));
+        $this->debug_param('params', $params);
 
         $operationsWS = new SoapClient($this->GetServiceWSDL(0),$params);
-
+        $this->debug_return('return operationsWS', $operationsWS);
         return $operationsWS;
     }
 
@@ -169,7 +189,8 @@ class ISDS {
      */
     protected function InfoWS($params = null) {
 
-        $this->debug("===========================\nInfoWS\n=================");
+        $this->debug("=================\nInfoWS\n=================");
+        $this->debug_function('InfoWS');
 
         if ( is_null($params) ) {
             $params = $this->params_soap;
@@ -179,9 +200,12 @@ class ISDS {
         $this->debug(">> Volam SoapClient");
         $this->debug(">>       type:",$this->GetServiceWSDL(1));
         $this->debug(">>       params:",$params);
+        //$this->debug_function('SoapClient');
+        $this->debug_param('type', $this->GetServiceWSDL(1));
+        $this->debug_param('params', $params);
 
         $infoWS = new SoapClient($this->GetServiceWSDL(1),$params);
-
+        $this->debug_return('return infoWS', $infoWS);
         return $infoWS;
     }
 
@@ -194,7 +218,8 @@ class ISDS {
      */
     protected function ManipulationsWS($params = null) {
 
-        $this->debug("===========================\nManipulationsWS\n=================");
+        $this->debug("=================\nManipulationsWS\n=================");
+        $this->debug_function('ManipulationWS');
 
         if ( is_null($params) ) {
             $params = $this->params_soap;
@@ -202,10 +227,14 @@ class ISDS {
         }
 
         $this->debug(">> Volam SoapClient");
-        $this->debug(">>       type:",$this->GetServiceWSDL(0));
+        $this->debug(">>       type:",$this->GetServiceWSDL(2));
         $this->debug(">>       params:",$params);
+        //$this->debug_function('SoapClient');
+        $this->debug_param('type', $this->GetServiceWSDL(2));
+        $this->debug_param('params', $params);
 
         $manipulationsWS = new SoapClient($this->GetServiceWSDL(2),$params);
+        $this->debug_return('return manipulationsWS', $manipulationsWS);
         return $manipulationsWS;
     }
 
@@ -218,7 +247,8 @@ class ISDS {
      */
     protected function AccessWS($params = null) {
 
-        $this->debug("===========================\nAccessWS\n=================");
+        $this->debug("=================\nAccessWS\n=================");
+        $this->debug_function('AccessWS');
 
         if ( is_null($params) ) {
             $params = $this->params_soap;
@@ -228,9 +258,12 @@ class ISDS {
         $this->debug(">> Volam SoapClient");
         $this->debug(">>       type:",$this->GetServiceWSDL(3));
         $this->debug(">>       params:",$params);
+        //$this->debug_function('SoapClient');
+        $this->debug_param('type', $this->GetServiceWSDL(3));
+        $this->debug_param('params', $params);
 
         $accessWS = new SoapClient($this->GetServiceWSDL(3),$params);
-
+        $this->debug_return('return accessWS', $accessWS);
         return $accessWS;
     }
 
@@ -246,8 +279,8 @@ class ISDS {
     public function GetOwnerInfoFromLogin()
     {
 
-        $this->debug("===========================\nGetOwnerInfoFromLogin\n=================");
-
+        $this->debug("=================\nGetOwnerInfoFromLogin\n=================");
+        $this->debug_function('GetOwnerInfoFromLogin');
 
         $this->NullRetInfo();
 	$Input = array('dbDummy'=>"");
@@ -261,12 +294,18 @@ class ISDS {
             $this->debug("result: ", $output);
             $this->StatusCode = $output->dbStatus->dbStatusCode;
             $this->StatusMessage = $output->dbStatus->dbStatusMessage;
+
+            $this->debug_return('return',$output->dbOwnerInfo,1);
+
             return $output->dbOwnerInfo;
 	} catch (Exception $e) {
             $this->ErrorCode = $e->getCode();
             $this->ErrorInfo = $e->getMessage();
             $this->StatusCode = @$output->dbStatus->dbStatusCode;
             $this->StatusMessage = @$output->dbStatus->dbStatusMessage;
+
+            $this->debug_return('return',false,1);
+
             return false;
 	}
     }
@@ -331,19 +370,29 @@ class ISDS {
 	$messageCreateInput = array(
             'dmEnvelope' => $envelope,
             'dmFiles' => $outFiles->fileInfos());
-	
+
+        $this->debug_function('CreateMessage');
+        $this->debug_param('dmEnvelope', $messageCreateInput['dmEnvelope']);
+        $this->debug_param('dmFiles', $messageCreateInput['dmFiles']);
+
         try {
             $messageCreateOutput = $this->OperationsWS()->CreateMessage($messageCreateInput);
             $messageID = $messageCreateOutput->dmID;
             $messageStatus = $MessageCreateOutput->dmStatus;
             $this->StatusCode    = $messageStatus->dmStatusCode;
             $this->StatusMessage = $messageStatus->dmStatusMessage;
+
+            $this->debug_return('return',$messageID,1);
+
             return $messageID;
 	} catch (Exception $e) {
             $this->StatusCode    = $messageStatus->dmStatusCode;
             $this->StatusMessage = $messageStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
+
+            $this->debug_return('return',false,1);
+
             return false;
         }
     }
@@ -393,6 +442,8 @@ class ISDS {
 		$PersonalDelivery, $OVM, $OutFiles)
     {
 
+        $this->debug_function('CreateMultipleMessage');
+
         $this->NullRetInfo();
 	$Envelope = array(
             'dmSenderOrgUnit' => $SenderOrgUnit,
@@ -417,14 +468,20 @@ class ISDS {
             'dmEnvelope' => $Envelope,
             'dmFiles' => $OutFiles->fileInfos()
         );
-	
+
+        $this->debug_param('dmRecipients', $MultipleMessageCreateInput['dmRecipients']);
+        $this->debug_param('dmEnvelope', $MultipleMessageCreateInput['dmEnvelope']);
+        $this->debug_param('dmFiles', $MultipleMessageCreateInput['dmFiles']);
+
         try {
 
             $MultipleMessageCreateOutput = $this->OperationsWS()->CreateMultipleMessage($MultipleMessageCreateInput);
             $MessageStatus = $MultipleMessageCreateOutput->dmStatus;
             $this->StatusCode = $MessageStatus->dmStatusCode;
             $this->StatusMessage = $MessageStatus->dmStatusMessage;
-            return $this->PrepareArray($MultipleMessageCreateOutput->dmMultipleStatus->dmSingleStatus);
+            $return = $this->PrepareArray($MultipleMessageCreateOutput->dmMultipleStatus->dmSingleStatus);
+            $this->debug_return('return', $return, 1);
+            return $return;
 
 	} catch (Exception $e) {
             
@@ -432,6 +489,7 @@ class ISDS {
             $this->StatusMessage = $MessageStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
+            $this->debug_return('return', false, 1);
             return false;
 
         }
@@ -1378,6 +1436,67 @@ class ISDS {
 
     }
 
+    protected function debug_function($name)
+    {
+        if ( $this->debug_file == 1 ) {
+            $this->debug_log[] = array(
+                'time' => date("d.m.y H:i:s"),
+                'timer' => microtime(true),
+                'message' => $name,
+                'value' => null,
+                'type' => 1 /* function */
+            );
+        }
+    }
+
+    protected function debug_param($name, $variable = null)
+    {
+        if ( $this->debug_file == 1 ) {
+            $this->debug_log[] = array(
+                'time' => date("d.m.y H:i:s"),
+                'timer' => microtime(true),
+                'message' => $name,
+                'value' => $variable,
+                'type' => 2 /* params */
+            );
+        }
+    }
+
+    protected function debug_return($name, $variable = null, $plus = 0)
+    {
+        if ( $this->debug_file == 1 ) {
+
+            if ( $plus == 1 ) {
+                $this->debug_return('ErrorInfo',$this->ErrorInfo);
+                $this->debug_return('ErrorCode',$this->ErrorCode);
+                $this->debug_return('StatusMessage',$this->StatusMessage);
+                $this->debug_return('StatusCode',$this->StatusCode);
+            }
+
+            $this->debug_log[] = array(
+                'time' => date("d.m.y H:i:s"),
+                'timer' => microtime(true),
+                'message' => $name,
+                'value' => $variable,
+                'type' => 3 /* return */
+            );
+        }
+    }
+
+    protected function debug_message($message, $variable = null)
+    {
+        if ( $this->debug_file == 1 ) {
+            $this->debug_log[] = array(
+                'time' => date("d.m.y H:i:s"),
+                'timer' => microtime(true),
+                'message' => $message,
+                'value' => $variable,
+                'type' => 4 /* message */
+            );
+        }
+    }
+
+
     protected function debug($message, $variable = null)
     {
         if ( $this->debug == 1 ) {
@@ -1385,22 +1504,24 @@ class ISDS {
             echo "<pre>";
             echo $message;
             if ( !is_null($variable) ) {
-                echo "\n";
+                echo " : \n";
                 print_r($variable);
             }
             echo "</pre>";
         }
 
         if ( $this->debug_file == 1 ) {
-            $tmp = "\n\n===========================================\n";
+            $tmp = "\n===========================================\n";
             $tmp .= ">>> ". date("d.m.y H:i:s") ."\n";
-            $tmp .= ">>> ". $message ."\n";
+            $tmp .= "". $message;
             if ( !is_null($variable) ) {
-                $tmp .= var_export($variable, true);
+                $tmp .= " : ". var_export($variable, true);
+            } else {
+                $tmp .= "\n";
             }
             $tmp .= "\n";
-            $tmp .= ">>> Error  : ". $this->ErrorCode ." - ". $this->ErrorInfo ."\n";
-            $tmp .= ">>> Status : ". $this->StatusCode ." - ". $this->StatusMessage ."\n";
+            $tmp .= "Error  : ". $this->ErrorCode ." - ". $this->ErrorInfo ."\n";
+            $tmp .= "Status : ". $this->StatusCode ." - ". $this->StatusMessage ."\n";
             $tmp .= "\n";
 
             $this->debug_file_text .= $tmp;
@@ -1495,8 +1616,46 @@ class ISDS {
         }
 
         if ( $this->debug_file == 1 ) {
+
+            if ( count( $this->debug_log )>0 ) {
+
+                $tmp_file  = "=================================================\n";
+                $tmp_file .= "  ISDS log \n";
+                $tmp_file .= "\n";
+                $tmp_file .= "  Datum: ". date("j.n.Y G:i:s") ." \n";
+                $tmp_file .= "=================================================\n";
+
+                //$tmp_file .= var_export($this->debug_log, true);
+
+                foreach ( $this->debug_log as $log ) {
+
+                    if ( $log['type'] == 1 ) {
+
+                        $tmp_file .= "\n### ". $log['message'] ."()\n";
+
+                    } else if ( $log['type'] == 2 ) {
+
+                        $tmp_file .= ">>> ". $log['message'] ." = ". var_export($log['value'],true) ."\n";
+
+                    } else if ( $log['type'] == 3 ) {
+
+                        $tmp_file .= "<<< ". $log['message'] ." = ". var_export($log['value'],true) ."\n";
+
+                    } else {
+
+                        if ( !empty( $log['value'] ) ) {
+                            $tmp_file .= "    ". $log['message'] ." = ". var_export($log['value'],true) ."\n";
+                        } else {
+                            $tmp_file .= "    ". $log['message'] ."\n";
+                        }
+
+                    }
+                }
+            }
+
             $filename = APP_DIR .'/../log/isds_'. KLIENT ."_". date("Y-m-d H-i-s") ." ". md5(microtime()) .".log";
-            file_put_contents($filename, $this->debug_file_text);
+            //file_put_contents($filename, $this->debug_file_text);
+            file_put_contents($filename, $tmp_file);
         }
 
     }
