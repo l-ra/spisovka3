@@ -3,6 +3,7 @@
 class Spisovka_SpisyPresenter extends BasePresenter
 {
 
+    private $dokument_id;
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
 
@@ -26,20 +27,24 @@ class Spisovka_SpisyPresenter extends BasePresenter
         parent::startup();
     }
 
-    public function renderVyber()
+    public function actionVyber()
     {
-
-        $this->template->dokument_id = $this->getParam('id',null);
-        if ( empty($this->template->dokument_id) ) {
+        $this->dokument_id = $this->getParam('id',null);
+        if ( empty($this->dokument_iddokument_id) ) {
             if ( isset($_POST['dokument_id']) ) {
-                $this->template->dokument_id = $_POST['dokument_id'];
+                $this->dokument_id = $_POST['dokument_id'];
             }
         }
+    }
+
+    public function renderVyber()
+    {
 
         $Spisy = new Spis();
         $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
         $seznam = $Spisy->seznam($args);
         $this->template->seznam = $seznam;
+        $this->template->dokument_id = $this->dokument_id;
 
     }
 
@@ -238,7 +243,8 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->getElementPrototype()->id('spis-vytvorit');
-        $form1->addHidden('dokument_id',$this->template->dokument_id);
+        $form1->addHidden('dokument_id')
+                ->setValue($this->dokument_id);
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
         $form1->addText('nazev', 'Spisová značka / název:', 50, 80)
                 ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
@@ -266,16 +272,22 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $Spisy = new Spis();
         $data['stav'] = 1;
         $data['date_created'] = new DateTime();
-        $data['user_created'] = Environment::getUser()->getIdentity()->user_id;
-
+        $data['user_created'] = Environment::getUser()->getIdentity()->id;
+        unset($data['dokument_id']);
+        
         try {
             $spis_id = $Spisy->vytvorit($data);
-            $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
-            unset($data['dokument_id']);
-            if (!$this->isAjax()) {
-                //$this->redirect('this');
+
+            if ( $spis_id ) {
+                $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
+                
+                if (!$this->isAjax()) {
+                    //$this->redirect('this');
+                } else {
+                    $this->invalidateControl('dokspis');
+                }
             } else {
-                $this->invalidateControl('dokspis');
+                throw new Exception;
             }
             
             //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
