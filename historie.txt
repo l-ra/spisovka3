@@ -1,47 +1,32 @@
-================================================================================
+﻿================================================================================
  Historie uprav OSS Spisove sluzby v3
 ================================================================================
-=== Ver. 3.0.0 =================================================================
-Released: 06.09.2010
+=== Ver. 3.0.3 =================================================================
+Released: 20.05.2011
 
-- nove vykonne jadro zalozene na Nette Framework
-- novy datovy model s ohledem na NSESSS a individualnim potrebam
-- moderni design se snadnou obsluhu (SEO, AJAX)
-- volba typu evidence - priorace / sberny arch
-- verzovani dokumentu, subjektu a priloh
-- spousteci udalost
-- sprava e-podatelany (seznam prijatych a odeslanych zprav)
-- vylepsene generovani cisla jednaciho
-- hierarchie spisu
-- moznost zvolit jiny zpusob prihlasovani (LDAP apod)
-- moznost zvolit jine datove uloziste (FTP, TC, CMS, apod)
-- subjekt (adresát / odesílatel) obsahuje více položek
-- vice uzivatelskych uctu pro jednoho zamestanace
-- vice roli pro jednoho uzivatele
-- vytvareni vlastnich roli s nastavenim pristupovych prav
+- oprava - chyba pri vytvareni spisu v dokumentu
+- uprava - ISDS - vylepsene logovani ISDS
+- oprava - chyba pri odesilani ISDS + zobrazeni pripadneho duvodu neodeslani
+- uprava modelu - vypnutí DB cache u ACL
+- uprava modelu - možnost smazani vsech dat
+- uprava - Moznost nastavit oddelovac poradoveho cisla archu
+- Uprava - vyhledavani a tvorby sestavy
+- oprava - ePodatelna - osetrení chyboveho stavu pri nedostupnosti IMAP/POP3 serveru
+   + vyladeni debuggeru (moznost manualni volby, prijatelna hlaska pri chybe 500 )
+- oprava - Role - zamezení volby rodiče na sebe sama. Možné zacyklení a vyvolání chyby.
+- oprava globalniho filtru - zobrazit vsechny dokumenty, beznemu referentovi 
+  to ukazovalo vic dokumentu, nez mel dle sve role narok
+- uprava - moznost predani dokumentu v okamziku evidence
+- oprava rozepsaneho dokumentu v epodatelna
+- oprava volani ajaxovych odkazu
+- Oprava rozepsaných dokumentu (možnost vytvoření čistého dokumentu)
+- systemove logovani ISDS
+- oprava - ePodatelna evidence - spatny redirect.
+- oprava - Evidence z epodatelny - mensi opravy - mozna kolize s odpovedi
+- uprava - Evidence dokumentu az ve spisove sluzbe misto epodatelny
+- uprava aktualizacniho skriptu - odolnost proti nesmyslne pojmenovanym 
+  SQL skriptum, uprava nacitani SQL skriptu ve spravnem poradi
 
-=== Ver. 3.0.1 =================================================================
-Released: 14.02.2011
-
-- kontrola pred vyrizenim dokumentu
-- spousteci udalost
-- skartacni rizeni
-- zvyrazneni dokumentu s proslou lhutou zpracovani
-- moznost seradit sloupce
-- aplikace pocatku poradoveho cisla v cisle jednaci pri instalaci
-- vytvoreni odpovedi i ve stavu vyrizeni
-- oprava manipulace se spisovymi znaky a spisy (stromova struktura, upravy, mazani, zobrazeni)
-- oprava odeslani datovych zprav
-- opravy chybnych SQL dotazu
-- oprava generovani vystupu spisovych znaku
-- oprava razeni subjektu
-- oprava chybove hlasky na neplatnost prihlasovacich udaju nebo nedostupnost ISDS
-- uprava rychlych filtru
-- uprava historie dokumentu
-- uprava jmena uzivatele, ktery vytvoril prilohu
-- uprava hlasky pri vyrizeni. Detekce neprideleni
-- uprava prevzeti dokumentu
-- Nette fix - bezduvodne odhlasovani v IE
 
 === Ver. 3.0.2 =================================================================
 Released: 16.03.2011
@@ -66,6 +51,48 @@ Released: 16.03.2011
 - oprava aktualizacniho skriptu - zapisovalo se cislo nove revize i v pripade, ze aktualizace neprobehla
 - uprava aktualizacniho skriptu - (standalone/multisite)
 
+=== Ver. 3.0.1 =================================================================
+Released: 14.02.2011
+
+- kontrola pred vyrizenim dokumentu
+- spousteci udalost
+- skartacni rizeni
+- zvyrazneni dokumentu s proslou lhutou zpracovani
+- moznost seradit sloupce
+- aplikace pocatku poradoveho cisla v cisle jednaci pri instalaci
+- vytvoreni odpovedi i ve stavu vyrizeni
+- oprava manipulace se spisovymi znaky a spisy (stromova struktura, upravy, mazani, zobrazeni)
+- oprava odeslani datovych zprav
+- opravy chybnych SQL dotazu
+- oprava generovani vystupu spisovych znaku
+- oprava razeni subjektu
+- oprava chybove hlasky na neplatnost prihlasovacich udaju nebo nedostupnost ISDS
+- uprava rychlych filtru
+- uprava historie dokumentu
+- uprava jmena uzivatele, ktery vytvoril prilohu
+- uprava hlasky pri vyrizeni. Detekce neprideleni
+- uprava prevzeti dokumentu
+- Nette fix - bezduvodne odhlasovani v IE
+
+
+=== Ver. 3.0.0 =================================================================
+Released: 06.09.2010
+
+- nove vykonne jadro zalozene na Nette Framework
+- novy datovy model s ohledem na NSESSS a individualnim potrebam
+- moderni design se snadnou obsluhu (SEO, AJAX)
+- volba typu evidence - priorace / sberny arch
+- verzovani dokumentu, subjektu a priloh
+- spousteci udalost
+- sprava e-podatelany (seznam prijatych a odeslanych zprav)
+- vylepsene generovani cisla jednaciho
+- hierarchie spisu
+- moznost zvolit jiny zpusob prihlasovani (LDAP apod)
+- moznost zvolit jine datove uloziste (FTP, TC, CMS, apod)
+- subjekt (adresát / odesílatel) obsahuje více položek
+- vice uzivatelskych uctu pro jednoho zamestanace
+- vice roli pro jednoho uzivatele
+- vytvareni vlastnich roli s nastavenim pristupovych prav
 
 
 

@@ -19,8 +19,12 @@ Zde nedochazi ke zmenam adresarove struktury, upgrade je velmi jednoduchy:
 Pro upgrade jde pouzit i tento balicek, ale nutno dat pozor na prepsani konfiguracnich souboru!
 
 
-
 3) Upgrade z verze 2.1.x na 3.0.x
 
 Upgrade je jiz mozny, ale v soucasne dobe jeste nebyl migracni nastroj uvolnen jako OpenSource
 
+
+Dulezite upozorneni!
+
+Pri aktualizaci vzdy prepiste stare soubory novymi, tyka se hlavne adresaru app a libs. Radsi si vse odzalohujte nekam na stranu, nedelejte zadne soubory typu SpisyPresenter.php.bak apod. Muze potom dojit ke znefunkcneni cele aplikace, framework Nette prohlizi obsahy vsech souboru v aplikacni casti, ty zpracuje a pak teprve vykonava. Mohou tak vznikat duplicity v definicich apod., pruvodnim jevem je okno debuggeru se znamou cervenou radkou.
+ 
