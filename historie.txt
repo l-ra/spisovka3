@@ -2,7 +2,7 @@
  Historie uprav OSS Spisove sluzby v3
 ================================================================================
 === Ver. 3.0.3 =================================================================
-Released: 20.05.2011
+Released: 24.05.2011
 
 - oprava - chyba pri vytvareni spisu v dokumentu
 - uprava - ISDS - vylepsene logovani ISDS
