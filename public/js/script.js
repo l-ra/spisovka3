@@ -603,7 +603,7 @@ hledejDokumentAjax = function (vyraz, typ) {
             	var seznam_json = x.responseText;
                 
                 if ( seznam_json == '' ) {
-                    vysledek.innerHTML = '<div class="prazdno">Nebyli nalezeny žádné dokumenty odpovidající dané sekvenci.</div>';
+                    vysledek.innerHTML = '<div class="prazdno">Nebyly nalezeny žádné dokumenty odpovídající dané sekvenci.</div>';
                 } else {
                     var seznam = eval('(' + seznam_json + ')');
                     cache[vyraz] = seznam_json;
