@@ -780,7 +780,13 @@ function nastylovat(data,typ) {
 
     baseUri = baseUri.replace('/public','');
     dokument_id = document.getElementById('dokumentid').value;
-    evidence = document.getElementById('evidence').value;
+
+    evidence = document.getElementById('evidence');
+    if ( evidence == null ) {
+        evidence = 0;
+    } else {
+        evidence = evidence.value;
+    }
 
     if ( typ == 1 ) {
 
