@@ -141,6 +141,15 @@ class Storage_Basic extends FileModel {
         }
 
         $filename = String::webalize($data['filename'],'.');
+        if (strlen($filename) != strlen($data['filename']) ) {
+            if ( isset($data['charset']) && strtolower($data['charset']) != 'UTF-8' ) {
+                $filename = iconv($data['charset']."//TRANSLIT",'utf-8',$data['filename']);
+                $filename = String::webalize($filename,'.');
+                if ( isset($data['nazev']) ) {
+                    $data['nazev'] = iconv($data['charset']."//TRANSLIT",'utf-8',$data['nazev']);
+                }
+            }
+        }
         $filepath = $file_dir . "/" . $filename;
 
         // test existence souboru
@@ -325,19 +334,24 @@ class Storage_Basic extends FileModel {
     protected function fileExists($file, $postfix = 1) {
 
         if ( file_exists($file) ) {
+            
             $path_parts = pathinfo($file);
+
             if ( !isset($path_parts['extension']) ) {
                 $ext = "";
             } else {
                 $ext = ".". $path_parts['extension'];
             }
             
-            $filename = str_replace('.'.$ext, '', $path_parts['basename']);
+            //$filename = str_replace('.'.$ext, '', $path_parts['basename']);
+            $filename = $path_parts['filename'];
             $filename = $filename .'_'. $postfix;
+
+            //echo "<pre>$postfix = "; print_r($filename); echo "</pre>";
 
             $file_new = $path_parts['dirname'] .'/'. $filename . $ext;
             if ( file_exists($file_new) ) {
-                return $this->fileExists($file, $postfix++);
+                return $this->fileExists($file_new, $postfix++);
             } else {
                 return $file_new;
             }

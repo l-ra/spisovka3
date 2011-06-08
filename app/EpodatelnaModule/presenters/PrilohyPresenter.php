@@ -94,7 +94,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
             if ( is_null($part) ) {
 
                 $zprava = $imap->analyze_message();
-                //Debug::dump($zprava); exit;
+                //echo "<pre>"; print_r($zprava); echo "</pre>";// exit;
 
                 $files = array();
                 // Hlavni zprava
@@ -107,7 +107,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                     $file_name = 'zprava.txt';
                     $mime_type = 'text/plain';
                 }
-                $files[] = array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
+                $files[] = array('file'=>$tmp_file, 'file_name'=>$file_name, 'size'=>$file_size, 'mime-type'=>$mime_type,'charset'=>$zprava['Encoding'] );
 
                 // Alternativni Zpravy
                 if ( isset($zprava['Alternative']) ) {
@@ -126,7 +126,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                             $file_name = 'zprava_'.$fid.'.txt';
                             $mime_type = 'text/plain';
                         }
-                        $files[] = array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
+                        $files[] = array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type,'charset'=>$zprava['Encoding']);
                     }
                 }
                 // Prilohy
@@ -142,10 +142,23 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                             $file_name = 'soubor_'.$fid.'.html';
                             $mime_type = 'text/html';
                         } else {
+
+                            //if ( strtolower($zprava['Encoding']) != 'UTF-8' ) {
+                            //    $file['FileName'] = iconv($zprava['Encoding']."//TRANSLIT",'utf-8',$file['FileName']);
+                            ///}
+
+                            //$file_name = String::webalize($file['FileName'],'.');
                             $file_name = $file['FileName'];
-                            $mime_type = FileModel::mimeType($tmp_file);
+                            //$mime_type = FileModel::mimeType($tmp_file);
+                            $mime_type = FileModel::mimeType($file_name);
                         }
-                        $files[] = array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
+                        $files[] = array(
+                                    'file'=>$tmp_file,
+                                    'file_name'=>$file_name,
+                                    'size'=>$file_size,
+                                    'mime-type'=>$mime_type,
+                                    'charset'=>$zprava['Encoding'],
+                                   );
                     }
                 }
                 return $files;

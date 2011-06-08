@@ -420,7 +420,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 } else if ( !empty($zprava->isds_signature) ) {
                     $this->isdsPrilohy($epodatelna_id, $dokument_id);
                 }
-
                 // Ulozeni adresy
                 if ( $subjekty ) {
                     $DokumentSubjekt = new DokumentSubjekt();
@@ -500,7 +499,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $EvidencePrilohy = new Epodatelna_PrilohyPresenter();
         $prilohy = $EvidencePrilohy->emailPrilohy($epodatelna_id);
-        
+
+        //echo "<pre>"; print_r($prilohy); echo "</pre>"; //exit;
+
         $storage_conf = Environment::getConfig('storage');
         eval("\$UploadFile = new ".$storage_conf->type."();");
 
@@ -523,7 +524,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                'filename'=>'emailova_zprava.eml',
                'dir'=> date('Y') .'/DOK-'. sprintf('%06d',$dokument_id) .'-'.date('Y'),
                'typ'=>'5',
-               'popis'=>'Originální emailová zpráva'
+               'popis'=>'Originální emailová zpráva',
+               'charset'=>$file['charset'],
                //'popis'=>'Emailová zpráva'
             );
 
@@ -531,11 +533,10 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 // zapiseme i do
                 $DokumentFile->pripojit($dokument_id, $filep->id);
             } else {
-                // false
+               // false
             }
 
         }
-
 
         // nahrani prilohy
         if ( count($prilohy)>0 ) {
@@ -543,10 +544,12 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                 // prekopirovani na pozadovane misto
                 $data = array(
-                    'filename'=>$file['file_name'],
+                    'filename'=> $file['file_name'],
+                    'nazev'=> $file['file_name'],
                     'dir'=> date('Y') .'/DOK-'. sprintf('%06d',$dokument_id) .'-'.date('Y'),
                     'typ'=>'2',
-                    'popis'=>''
+                    'popis'=>'',
+                    'charset'=>$file['charset'],
                     //'popis'=>'Emailová zpráva'
                 );
 
