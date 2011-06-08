@@ -57,31 +57,39 @@ set_time_limit(0);
 $User = new UserModel();
 $Osoba = new Osoba();
 
+$POCET_ZAMESTNANCU_START = ($Osoba->fetchAll()->count()) + 1;
+$POCET_ZAMESTNANCU = $POCET_ZAMESTNANCU_START - 1;
+
 if ( GENEROVAT_ZAMESTNANCE ) {
-    if (TRUNCATE) $Osoba->deleteAll();
-    if (TRUNCATE) $User->deleteAll();
-}
+    $POCET_ZAMESTNANCU = POCET_ZAMESTNANCU + $POCET_ZAMESTNANCU + 1;
+    if (TRUNCATE) {
+        $Osoba->deleteAll();
+        $User->deleteAll();
+        $POCET_ZAMESTNANCU_START = 2;
+        $POCET_ZAMESTNANCU = POCET_ZAMESTNANCU;
 
-try {
-$osoba_id = $Osoba->insert( array(
-    'prijmeni' => 'Administrátorský',
-    'jmeno' => 'Admin',
-    'titul_pred' => '',
-    'titul_za' => '',
-    'email' => 'admin@admin.admin',
-    'pozice' => 'admin',
-    'stav' => (int) 1,
-    'date_created' => new DateTime()
-));
-if ( $osoba_id ) {
-    $User->pridatUcet($osoba_id, array(
-        'username' => ADMIN_LOGIN,
-        'heslo' => ADMIN_PASSWORD,
-        'role' => 1
-    ));
-}
-} catch ( Exception $e ) {
+        try {
+            $osoba_id = $Osoba->insert( array(
+                'prijmeni' => 'Administrátorský',
+                'jmeno' => 'Admin',
+                'titul_pred' => '',
+                'titul_za' => '',
+                'email' => 'admin@admin.admin',
+                'pozice' => 'admin',
+                'stav' => (int) 1,
+                'date_created' => new DateTime()
+            ));
+            if ( $osoba_id ) {
+                $User->pridatUcet($osoba_id, array(
+                    'username' => ADMIN_LOGIN,
+                    'heslo' => ADMIN_PASSWORD,
+                    'role' => 1
+                ));
+            }
+        } catch ( Exception $e ) {
 
+        }
+    }
 }
 
 $user_auth = Environment::getUser();
@@ -105,16 +113,25 @@ debug($db_config,'databaze');
  * Spisove znaky
  *
  ************************************************************************** */
+$SpisZnak = new SpisovyZnak();
+$POCET_SPISOVYCH_ZNAKU_START = $SpisZnak->fetchAll()->count() + 1;
+$POCET_SPISOVYCH_ZNAKU = $POCET_SPISOVYCH_ZNAKU_START - 1;
+
 if ( GENEROVAT_SPISOVE_ZNAKY ) {
+
+$POCET_SPISOVYCH_ZNAKU = POCET_SPISOVYCH_ZNAKU + $POCET_SPISOVYCH_ZNAKU + 1;
 debug_head('Generování spisových znaků', 2);
 
 $sz_skartacni_znak = array('A','S','V');
 $sz_skartacni_lhuta = range(5,100,5);
 
-$SpisZnak = new SpisovyZnak();
-if (TRUNCATE) $SpisZnak->deleteAll();
+if (TRUNCATE) {
+    $SpisZnak->deleteAll();
+    $POCET_SPISOVYCH_ZNAKU_START = 1;
+    $POCET_SPISOVYCH_ZNAKU = POCET_SPISOVYCH_ZNAKU;
+}
 
-for ( $i =0; $i <= POCET_SPISOVYCH_ZNAKU; $i++ ) {
+for ( $i = $POCET_SPISOVYCH_ZNAKU_START; $i <= $POCET_SPISOVYCH_ZNAKU; $i++ ) {
     try {
         $SpisZnak->vytvorit(array(
             'nazev' => sprintf('%03d',$i),
@@ -140,14 +157,22 @@ for ( $i =0; $i <= POCET_SPISOVYCH_ZNAKU; $i++ ) {
  * Spisy
  *
  ************************************************************************** */
+$Spis = new Spis();
+$POCET_SPISU_START = $Spis->fetchAll()->count() + 1;
+$POCET_SPISU = $POCET_SPISU_START - 1;
+
 if ( GENEROVAT_SPISY ) {
+$POCET_SPISU = POCET_SPISU + $POCET_SPISU;
+
 debug_head('Generování spisů', 2);
 
-$Spis = new Spis();
+if (TRUNCATE) {
+    $Spis->deleteAll();
+    $POCET_SPISU_START = 1;
+    $POCET_SPISU = POCET_SPISU;
+}
 
-if (TRUNCATE) $Spis->deleteAll();
-
-for ( $i =0; $i <= POCET_SPISU; $i++ ) {
+for ( $i = $POCET_SPISU_START; $i <= $POCET_SPISU; $i++ ) {
     try {
 
         $nazev = "SPIS_". make_string(4) ."_". $i;
@@ -179,16 +204,24 @@ for ( $i =0; $i <= POCET_SPISU; $i++ ) {
  ************************************************************************** */
 include APP_DIR .'/test_data.dat';
 
+$Subjekt = new Subjekt();
+$POCET_SUBJEKTU_START = ($Subjekt->fetchAll()->count()) + 1;
+$POCET_SUBJEKTU = $POCET_SUBJEKTU_START - 1;
+
 if ( GENEROVAT_SUBJEKTY ) {
+$POCET_SUBJEKTU = POCET_SUBJEKTU + $POCET_SUBJEKTU + 1;
+
 debug_head('Generování subjektů', 2);
 
 $subjekt_type = array('OVM','FO','PO','PFO','FO','FO');
 
-$Subjekt = new Subjekt();
+if (TRUNCATE) {
+    $Subjekt->deleteAll();
+    $POCET_SUBJEKTU_START = 1;
+    $POCET_SUBJEKTU = POCET_SUBJEKTU;
+}
 
-if (TRUNCATE) $Subjekt->deleteAll();
-
-for ( $i = 1; $i <= POCET_SUBJEKTU; $i++ ) {
+for ( $i = $POCET_SUBJEKTU_START; $i <= $POCET_SUBJEKTU; $i++ ) {
     try {
 
         $mesto = mt_rand(0,count($subj)-1);
@@ -251,15 +284,22 @@ for ( $i = 1; $i <= POCET_SUBJEKTU; $i++ ) {
  * Prilohy
  *
  ************************************************************************** */
+$File = new FileModel();
+$POCET_PRILOH_START = ($File->fetchAll()->count()) + 1;
+$POCET_PRILOH = $POCET_PRILOH_START - 1;
+
 if ( GENEROVAT_PRILOHY ) {
+$POCET_PRILOH = POCET_PRILOH + $POCET_PRILOH + 1;
+
 debug_head('Generování priloh', 2);
 
+if (TRUNCATE) {
+    $File->deleteAll();
+    $POCET_PRILOH_START = 1;
+    $POCET_PRILOH = POCET_PRILOH;
+}
 
-$File = new FileModel();
-
-if (TRUNCATE) $File->deleteAll();
-
-for ( $i = 1; $i <= POCET_PRILOH; $i++ ) {
+for ( $i = $POCET_PRILOH_START; $i <= $POCET_PRILOH; $i++ ) {
     try {
 
         $mesto = mt_rand(0,count($subj)-1);
@@ -295,14 +335,22 @@ for ( $i = 1; $i <= POCET_PRILOH; $i++ ) {
  * Migrace organizacni jednotky
  *
  ************************************************************************** */
+$OrgJednotka = new Orgjednotka();
+$POCET_ORGJEDNOTEK_START = ($OrgJednotka->fetchAll()->count()) + 1;
+$POCET_ORGJEDNOTEK = $POCET_ORGJEDNOTEK_START - 1;
+
 if ( GENEROVAT_ORGJEDNOTKY ) {
+$POCET_ORGJEDNOTEK = POCET_ORGJEDNOTEK + $POCET_ORGJEDNOTEK + 1;
+
 debug_head('Organizační jednotky', 2);
 
-$OrgJednotka = new Orgjednotka();
+if (TRUNCATE) {
+    $OrgJednotka->deleteAllOrg();
+    $POCET_ORGJEDNOTEK_START = 1;
+    $POCET_ORGJEDNOTEK = POCET_ORGJEDNOTEK;
+}
 
-if (TRUNCATE) $OrgJednotka->deleteAllOrg();
-
-for ( $i =0; $i <= POCET_ORGJEDNOTEK; $i++ ) {
+for ( $i = $POCET_ORGJEDNOTEK_START; $i <= $POCET_ORGJEDNOTEK; $i++ ) {
     try {
 
             // Pridani organizacni jednotky
@@ -361,7 +409,7 @@ foreach ($role_seznam as $key => $value) {
 
 echo "<br> Administrátor => ". ADMIN_LOGIN ." / ". ADMIN_PASSWORD ."<br>&nbsp;";
 
-for ( $i =0; $i <= POCET_ZAMESTNANCU; $i++ ) {
+for ( $i = $POCET_ZAMESTNANCU_START; $i <= $POCET_ZAMESTNANCU; $i++ ) {
     try {
 
         $aprijmeni = mt_rand(0,count($subj_prijmeni)-1);
@@ -423,11 +471,18 @@ $Workflow = new Workflow();
 $LogDokument = new LogModel();
 $File = new FileModel();
 $CJ = new CisloJednaci();
+$DokumentSpis = new DokumentSpis();
 
-if (TRUNCATE) $Workflow->deleteAll();
-if (TRUNCATE) $Dokument->deleteAll();
-if (TRUNCATE) $File->deleteAll();
-if (TRUNCATE) $LogDokument->deleteAllDokument();
+if (TRUNCATE) {
+    $Workflow->deleteAll();
+    $Dokument->deleteAll();
+    $LogDokument->deleteAllDokument();
+    $POCET_DOKUMENTU_START = 0;
+    $POCET_DOKUMENTU = POCET_DOKUMENTU;
+} else {
+    $POCET_DOKUMENTU_START = ($Dokument->fetchAll()->count()) + 1;
+    $POCET_DOKUMENTU = POCET_DOKUMENTU + $POCET_DOKUMENTU_START;
+}
 
 $typ_dokumentu_a = range(1,5);
 $typ_dokumentu_a[] = 1;
@@ -436,7 +491,7 @@ $typ_dokumentu_a[] = 1;
 $typ_dokumentu_a[] = 2;
 $typ_dokumentu_a[] = 2;
 
-for ( $i =0; $i <= POCET_DOKUMENTU; $i++ ) {
+for ( $i = $POCET_DOKUMENTU_START; $i < $POCET_DOKUMENTU; $i++ ) {
     try {
 
         $cjednaci = $CJ->generuj(1);
@@ -486,7 +541,6 @@ for ( $i =0; $i <= POCET_DOKUMENTU; $i++ ) {
             $LogDokument->logDokument($dokument->id, LogModel::DOK_NOVY);
 
             // Spis
-            $DokumentSpis = new DokumentSpis();
             if ( $user_config->cislo_jednaci->typ_evidence == 'sberny_arch' ) {
 
                 $spis = $Spis->getInfo($dok['cislo_jednaci']);
@@ -508,24 +562,24 @@ for ( $i =0; $i <= POCET_DOKUMENTU; $i++ ) {
                 }
             } else {
                 // nahodne pridani ke spisu
-                $spis_id = mt_rand(1, POCET_SPISU-1 );
+                $spis_id = mt_rand(1, $POCET_SPISU - 1 );
                 $DokumentSpis->pripojit($dokument->id, $spis_id);
             }
 
             // Subjekty
-            $subjekt_id = mt_rand(1, POCET_SUBJEKTU );
+            $subjekt_id = mt_rand(1, $POCET_SUBJEKTU );
             $subjekt_type_a = array('AO','A','O');
             $subjekt_type_id = mt_rand(0, count($subjekt_type_a)-1 );
             $DokumentSubjekt = new DokumentSubjekt();
             $DokumentSubjekt->pripojit($dokument->id, $subjekt_id, $subjekt_type_a[$subjekt_type_id]);
 
             // Prilohy
-            $priloha_id = mt_rand(1, POCET_PRILOH );
+            $priloha_id = mt_rand(1, $POCET_PRILOH );
             $DokumentPrilohy = new DokumentPrilohy();
             $DokumentPrilohy->pripojit($dokument->id, $priloha_id);
 
             // Odesilani
-            $subjekt_o_id = mt_rand(1, POCET_SUBJEKTU );
+            $subjekt_o_id = mt_rand(1, $POCET_SUBJEKTU );
             $DokumentOdeslani = new DokumentOdeslani();
             $DokumentOdeslani->ulozit( array(
 				'dokument_id' => $dokument->id,
@@ -538,7 +592,7 @@ for ( $i =0; $i <= POCET_DOKUMENTU; $i++ ) {
 			));			
 			
             // Predani
-            $user_predani = mt_rand(1, POCET_ZAMESTNANCU-1);
+            $user_predani = mt_rand(2, $POCET_ZAMESTNANCU);
             $UserOrg = $User->getOrg($user_predani);
             $Workflow->priradit($dokument->id, $user_predani, @$UserOrg->id);
             $Workflow->prevzit($dokument->id, $user_predani);
