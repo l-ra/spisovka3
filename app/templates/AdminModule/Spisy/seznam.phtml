@@ -1,23 +1,61 @@
-{block title}Seznam spisů{/block}
+{block title}Spisový plán{/block}
 {block content}
-    <div class="navigate">
-    Spisy
+
+    <div id="dokument_blok_volby">
+        {$spisplanForm->render('begin')}
+        {$spisplanForm['spisplan']->label} {$spisplanForm['spisplan']->control}
+        {$spisplanForm['go_spisplan']->control}
+        <a href="{link :Admin:Spisy:novyplan}">Založit nový spisový plán</a>
+        {$spisplanForm->render('end')}
     </div>
 
-    <h2>Spisy</h2>
+    {if isset($SpisovyPlan) }
 
-    <div class="blok_menu">
+    <h2>{$SpisovyPlan->nazev}</h2>
+
+    <div class="dokument_blok">
+        <dl class="detail_item">
+            <dt>Spisový znak: </dt>
+            <dd>
+                {=Spis::spisovyZnak($SpisovyPlan)}&nbsp;
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Otevřeno dne: </dt>
+            <dd>
+                {$SpisovyPlan->datum_otevreni|edate}&nbsp;
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Uzavřeno dne:</dt>
+            <dd>
+                {$SpisovyPlan->datum_uzavreni|edate}&nbsp;
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznamka:</dt>
+            <dd>
+                {!$SpisovyPlan->popis|enl2br}&nbsp;
+            </dd>
+        </dl>
+    </div>
+    <br />
+    <div class="dokument_blok2">
         <a href="{link :Admin:Spisy:novy}">Nový spis / věcná skupina</a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="{link :Admin:Spisy:upravit}">Upravit hodnoty spisového plánu</a>
     </div>
 
     {if count($seznam)>0}
     <table>
         {foreach $seznam as $spis}
-        <tr class="{$spis->class}" id="sitem{$spis->id}">
+        <tr class="item{=str_replace("."," item",$spis->sekvence)}" id="sitem{$spis->id}">
             <td>
-                {!=str_repeat("&nbsp;", 5*$spis->uroven)}
+                {!=str_repeat("&nbsp;", 10*$spis->uroven)}
                 {if $spis->typ=='VS'}
-                <img src="{$baseUri}images/icons/folder_yellow.png" alt="Věcná skupina" title="Věcná skupna" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                <img src="{$baseUri}images/icons/folder_yellow.png" alt="Věcná skupina" title="Věcná skupina" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                {elseif $spis->typ=='SP'}
+                <img src="{$baseUri}images/icons/folder_green.png" alt="Spisový plán" title="Spisový plán" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 {else}
                 <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 {/if}
@@ -26,12 +64,13 @@
             </td>
         </tr>
         {/foreach}
-        
+
     </table>
+    {widget vp}
     {else}
     <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
     {/if}
 
-    <pre><?php //print_r($seznam); ?></pre>
-    <?php //Debug::dump($seznam); ?>
-
+    {else}
+    <div class="prazdno">Nebyl zjištěn žádný spisový plán.</div>
+    {/if}

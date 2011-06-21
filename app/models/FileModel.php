@@ -12,15 +12,7 @@ class FileModel extends BaseModel
     public function getInfo($file_id, $file_version = null)
     {
 
-        if ( !is_null($file_version) ) {
-            $result = $this->fetchRow(array(
-                                         array('id=%i',$file_id),
-                                         array('version=%i',$file_version)
-                                           )
-                                     );
-        } else {
-            $result = $this->fetchAll(array('version'=>'DESC'),array(array('id=%i',$file_id)),null,1);
-        }
+        $result = $this->fetchRow(array('id=%i',$file_id));
         $row = $result->fetch();
 
         if ( $row ) {
@@ -93,17 +85,20 @@ class FileModel extends BaseModel
 
         $row['date_created'] = new DateTime();
         $row['user_created'] = Environment::getUser()->getIdentity()->id;
+        $row['date_modified'] = new DateTime();
+        $row['user_modified'] = Environment::getUser()->getIdentity()->id;
+
         $row['guid'] = UUID::v4();
 
         // ulozeni
-        $row['id'] = $this->max();
-        $row['version'] = 1;
         $row['stav'] = 1;
 
         //Debug::dump($row); exit;
 
-        if ( $this->insert_basic($row) ) {
-            return $this->getInfo($row['id'], $row['version']);
+        $file_id = $this->insert($row);
+
+        if ( $file_id ) {
+            return $this->getInfo($file_id);
         } else {
             return false;
         }
@@ -113,7 +108,7 @@ class FileModel extends BaseModel
     public function upravitMetadata($data, $file_id) {
 
 
-        $file_info = $this->fetchAll(array('version'=>'DESC'),array(array('id=%i',$file_id)),null,1)->fetch();
+        $file_info = $this->fetchRow(array('id=%i',$file_id))->fetch();
         if ( !$file_info ) return false;
 
         $file_info = $this->obj2array($file_info);
@@ -124,13 +119,10 @@ class FileModel extends BaseModel
         $row['popis'] = isset($data['popis'])?$data['popis']:'';
 
         $row['date_modified'] = new DateTime();
-        $row['user_modified'] = Environment::getUser()->getIdentity()->user_id;
+        $row['user_modified'] = Environment::getUser()->getIdentity()->id;
 
-        // ulozeni
-        $row['version'] = $row['version'] + 1;
-
-        if ( $this->insert_basic($row) ) {
-            return $this->getInfo($row['id'], $row['version']);
+        if ( $this->update($row, array('id=%i',$file_id)) ) {
+            return $this->getInfo($file_id);
         } else {
             return false;
         }
@@ -142,10 +134,15 @@ class FileModel extends BaseModel
         
     }
 
-    protected function max() {
-        $result = $this->fetchAll(array('id'=>'DESC'),null,null,1);
-        $row = $result->fetch();
-        return ($row) ? ($row->id+1) : 1;
+    public function  deleteAll() {
+
+        $DokumentPrilohy = new DokumentPrilohy();
+        $DokumentPrilohy->deleteAll();
+
+        //$FileHistorie = new FileHistorie();
+        //$FileHistorie->deleteAll();
+
+        parent::deleteAll();
     }
 
     public static function typPrilohy($typ=null , $out=0) {

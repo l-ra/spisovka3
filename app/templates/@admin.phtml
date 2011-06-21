@@ -25,12 +25,11 @@
             {access :Spisovka:Default:}<a href="{vlink :Spisovka:Default:}">Spisová služba</a>&nbsp;&nbsp;{/access}
             {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:}">E-podatelna</a>&nbsp;&nbsp;{/access}
             {access :Admin:Default:}<a href="{vlink :Admin:Default:}">Administrace</a>&nbsp;&nbsp;{/access}
-            {access :Spisovka:Uzivatel:}<a href="{vlink :Spisovka:Uzivatel:}">Nastavení</a>&nbsp;&nbsp;{/access}
             <a href="{$klientUri}{$currentUri}">Nápověda</a>&nbsp;&nbsp;
             {access :Spisovka:Uzivatel:logout}<a href="{vlink :Spisovka:Uzivatel:logout}">Odhlásit</a>{/access}
         </div>
         <div id="top_jmeno">
-            <strong>{$user->name}</strong>
+            <a href="{vlink :Spisovka:Uzivatel:}" title="nastavení uživatele"><strong>{$user->name}</strong></a>
             <br />
             {foreach $user->user_roles as $role}
                 {$role->name}<br />
@@ -47,9 +46,9 @@
         {access :Admin:Zamestnanci:seznam}<a href="{vlink :Admin:Zamestnanci:seznam}">Zaměstnanci</a>{/access}
         {access :Admin:Orgjednotky:seznam}<a href="{vlink :Admin:Orgjednotky:seznam}">Org. jednotky</a>{/access}
         {access :Admin:Opravneni:seznam}<a href="{vlink :Admin:Opravneni:seznam}">Oprávnění</a>{/access}
-        {access :Admin:Prilohy:default}<a href="{vlink :Admin:Prilohy:default}">Soubory</a>{/access}
+        <!--{access :Admin:Prilohy:default}<a href="{vlink :Admin:Prilohy:default}">Soubory</a>{/access}-->
         {access :Admin:Spisznak:seznam}<a href="{vlink :Admin:Spisznak:seznam}">Spisové znaky</a>{/access}
-        <!--{access :Admin:Ciselniky:default}<a href="{vlink :Admin:Ciselniky:default}">Číselníky</a>{/access}-->
+        {access :Admin:Ciselniky:default}<a href="{vlink :Admin:Ciselniky:default}">Číselníky</a>{/access}
         {access :Admin:Protokol:default}<a href="{vlink :Admin:Protokol:default}">Protokoly</a>{/access}
     </div>
     <div n:if="count($flashes)>0" id="flash">
@@ -60,14 +59,43 @@
     </div>
     {if $debuger }
     <div id="debug">
+        <div id="debug_head">
+            <div id="debug_info">Debug Info</div>
+            <div id="debug_route"><strong>{$module}:{$presenter}:{$view}</strong></div>
+            <div id="debug_time">Čas: <strong><?php echo sprintf('%0.3f', (microtime(TRUE) - Debug::$time) * 1000); ?> ms</strong></div>
+            <div id="debug_memory">Paměť: <strong title="špička: <?php echo TemplateHelpers::bytes(memory_get_peak_usage());  ?>"><?php echo TemplateHelpers::bytes(memory_get_usage()); ?></strong></div>
+            <div id="debug_sql">SQL: <strong><?php echo dibi::$numOfQueries ." / ". number_format( (dibi::$totalTime)*1000,3,'.',' '); ?> ms</strong></div>
+            <br class="clear" />
+        </div>
+        <div id="debug_body">
+            <div id="debug_body_route">
         Module:    {$module}
         Presenter: {$presenter}
         View:      {$view}
-        SQL:       <?php echo dibi::$numOfQueries ." : ". dibi::$totalTime; ?>
 
-        {block debug}{/block}
+        Server:
+        {foreach $_SERVER as $sname => $svalue}
+        <span style="color:#0000ff">{$sname}</span> = <span style="color:#008800">{if is_array($svalue)}Array(){else}{$svalue}{/if}</span>
+        {/foreach}
+            </div>
+            <div id="debug_body_sql">
+            {foreach dibi::getProfiler()->tickets as $dblog }
+                {if $dblog[1] == 4}
+                <div class="debug_body_sql_item">
+                <?php dibi::test($dblog[2]); ?>
+                </div>
+                {/if}
+            {/foreach}
+            </div>
+            <div id="debug_body_info">
+            {block debug}{/block}
+            </div>
+
+        </div>
     </div>
+    <script type="text/javascript" src="{$baseUri}js/script_debug.js"></script>
     {/if}
+
 </div>
 <div id="layout_bottom">
     <div id="bottom">

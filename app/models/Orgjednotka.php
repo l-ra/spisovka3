@@ -1,9 +1,11 @@
 <?php
 
-class Orgjednotka extends BaseModel
+class Orgjednotka extends TreeModel
 {
 
     protected $name = 'orgjednotka';
+    protected $nazev = 'zkraceny_nazev';
+    protected $nazev_sekvence = 'ciselna_rada';
     protected $primary = 'id';
     
     
@@ -19,18 +21,16 @@ class Orgjednotka extends BaseModel
     public function seznam($args = null, $no_result = 0)
     {
 
+        $params = null;
         if ( !is_null($args) ) {
-            $result = $this->fetchAll(array('zkraceny_nazev'),$args);
-        } else {
-            $result = $this->fetchAll(array('zkraceny_nazev'));
+            $params['where'] = $args;
+        }
+        if ( $no_result == 1 ) {
+            $params['paginator'] = 1;
         }
 
-        if ( $no_result == 1 ) {
-            return $result;
-        } else {
-            $rows = $result->fetchAll();
-            return ($rows) ? $rows : NULL;
-        }
+        $params['order'] = array('zkraceny_nazev');
+        return $this->nacti(null, true, true, $params);
 
     }
 
@@ -60,28 +60,61 @@ class Orgjednotka extends BaseModel
 
     }
 
+    public function ulozit($data, $orgjednotka_id = null)
+    {
+
+        if ( !empty($orgjednotka_id) ) {
+            // aktualizovat
+            $data['date_modified'] = new DateTime();
+            $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
+            $this->upravitH($data, $orgjednotka_id);
+            //$this->update($data, array(array('id = %i',$orgjednotka_id)));
+        } else {
+            // insert
+            $data['date_created'] = new DateTime();
+            $data['user_created'] = (int) Environment::getUser()->getIdentity()->id;
+            $data['date_modified'] = new DateTime();
+            $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
+            $data['stav'] = (int) 1;
+            //$orgjednotka_id = $this->insert($data);
+            $orgjednotka_id = $this->vlozitH($data);
+        }
+
+        if ( $orgjednotka_id ) {
+            return $orgjednotka_id;
+        } else {
+            return false;
+        }
+    }
+
     public function pridatOrganizacniStrukturu($orgjednotka_id, $parent_role_id) {
 
         // vytvoreni role ze zakladu
         $RoleModel = new RoleModel();
 
-        $role_parent = $RoleModel->getInfo($parent_role_id);
+        $role_fixed = $RoleModel->getInfo($parent_role_id);
         $orgjednotka = $this->getInfo($orgjednotka_id);
-        
-        //$transaction = (! dibi::inTransaction());
-        //if ($transaction)
-        //dibi::begin();
+
+        //dibi::begin('org_struct');
 
         $row = array();
         $row['parent_id'] = $parent_role_id;
-        $row['code'] = $role_parent->code ."_". $orgjednotka_id;
-        $row['name'] = $role_parent->name ." ". $orgjednotka->ciselna_rada;
+        $row['code'] = $role_fixed->code ."_". $orgjednotka_id;
+        $row['name'] = $role_fixed->name ." ". $orgjednotka->ciselna_rada;
         $row['active'] = 1;
         $row['date_created'] = new DateTime();
         $row['orgjednotka_id'] = $orgjednotka_id;
         $row['fixed'] = 0;
-        $row['order'] = $role_parent->order;
-        $role_id = $RoleModel->insert($row);
+        $row['order'] = $role_fixed->order;
+
+        //Debug::dump($row);
+        //exit;
+
+        $role_id = $RoleModel->vlozit($row);
+
+        //echo dibi::$sql;
+
+        //Debug::dump($role_id);
 
         if ( $role_id ) {
             // pridani pravidla pro tuto konkretni org. jednotku
@@ -95,6 +128,7 @@ class Orgjednotka extends BaseModel
                 $row1['note'] = "Oprávnění platné pouze pro organizační jednotku ". $orgjednotka->zkraceny_nazev;
                 $row1['privilege'] = "orgjednotka_". $orgjednotka_id;
                 $rule_id = $AclModel->insertRule($row1);
+                //echo dibi::$sql;
             } else {
                 $rule_id = $pravidlo[0]->id;
             }
@@ -102,15 +136,21 @@ class Orgjednotka extends BaseModel
 
             // Aplikace pravidla na roli
             $row2 = array();
-            $row2['role_id'] = $role_id;
-            $row2['rule_id'] = $rule_id;
+            $row2['role_id'] = (int) $role_id;
+            $row2['rule_id'] = (int) $rule_id;
             $row2['allowed'] = 'Y';
+
+            //Debug::dump($row2);
+
             $AclModel->insert($row2);
-                
-            //if ($transaction)
-            //dibi::commit();
+
+
+            //echo dibi::$sql;
+
+            //dibi::commit('org_struct');
             
         } else {
+            //dibi::rollback('org_struct');
             return false;
         }
 
@@ -168,18 +208,50 @@ class Orgjednotka extends BaseModel
         return $is;
     }
 
+    public static function childOrg($orgjednotka_id) {
+
+        if ( empty($orgjednotka_id) ) return null;
+
+        $org = array();
+        $org[] = $orgjednotka_id;
+
+        $OrgJednotka = new Orgjednotka();
+        $org_info = $OrgJednotka->getInfo($orgjednotka_id);
+        if ( $org_info ) {
+            $fetch = $OrgJednotka->fetchAll(array('sekvence'),
+                                array( array('sekvence LIKE %s', $org_info->sekvence .'.%')  )
+                            );
+            $result = $fetch->fetchAll();
+            if ( count($result)>0 ) {
+                foreach ( $result as $res ) {
+                    $org[] = $res->id;
+                }
+                
+            }
+        }
+
+        return $org;
+    }
 
     public function  deleteAllOrg() {
-        parent::deleteAll();
+
+        $Workflow = new Workflow();
+        $Workflow->update(array('orgjednotka_id'=>null),array('orgjednotka_id IS NOT NULL'));
+
+        $CJ = new CisloJednaci();
+        $CJ->update(array('orgjednotka_id'=>null),array('orgjednotka_id IS NOT NULL'));
+
+
+        $UserModel = new User2Role();
+        $UserModel->delete(array('role_id > 6'));
 
         $AclModel = new AclModel();
-        $UserModel = new User2Role();
-        $RoleModel = new RoleModel();
-
-        $UserModel->delete(array('role_id > 6'));
         $AclModel->delete(array('role_id > 6'));
         $AclModel->deleteRule(array("privilege LIKE 'orgjednotka_%'"));
-        $RoleModel->delete(array('fixed=0'));
 
+        $RoleModel = new RoleModel();
+        $RoleModel->delete(array('fixed=0'));
+        
+        parent::deleteAll();
     }
 }

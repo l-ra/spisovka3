@@ -34,14 +34,14 @@
                 {foreach $SpisoveZnaky as $sznak}
                     spisz_skart[{$sznak->id}] = {$sznak->skartacni_znak};
                     spisz_lhuta[{$sznak->id}] = {$sznak->skartacni_lhuta};
-                    spisz_udalost[{$sznak->id}] = {=SpisovyZnak::spousteci_udalost($sznak->spousteci_udalost)};
+                    spisz_udalost[{$sznak->id}] = {=SpisovyZnak::spousteci_udalost($sznak->spousteci_udalost_id)};
                 {/foreach}
                 {/if}
 
                     var frm_spis  = document.forms['frm-vyrizovaniForm'].spisovy_znak_id;
                     var frm_skart  = document.forms['frm-vyrizovaniForm'].skartacni_znak;
                     var frm_lhuta  = document.forms['frm-vyrizovaniForm'].skartacni_lhuta;
-                    var frm_udalost  = document.forms['frm-vyrizovaniForm'].spousteci_udalost;
+                    var frm_udalost  = document.forms['frm-vyrizovaniForm'].spousteci_udalost_id;
 
                     var key  = document.forms['frm-vyrizovaniForm'].spisovy_znak_id.selectedIndex;
                     var value = document.forms['frm-vyrizovaniForm'].spisovy_znak_id.options[key].value;
@@ -102,7 +102,7 @@
         {/if}
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>
-            <dd>{$Dok->spousteci_udalost}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         {$udalostForm->render('begin')}
         <dl class="detail_item">
@@ -130,7 +130,7 @@
         <div class="h2">Dokument je vyřízen, ale není spuštěna událost</div>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>
-            <dd>{$Dok->spousteci_udalost}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt></dt>
@@ -196,7 +196,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
-            <dd>{$metadataForm['typ_dokumentu_id']->control}</dd>
+            <dd>{$metadataForm['dokument_typ_id']->control}</dd>
         </dl>
         {if empty($Dok->cislo_jednaci)}
         <dl class="detail_item">
@@ -410,7 +410,8 @@
     </div>
     {if $Vyrizovani == 1 }
     <div id="dokument_blok_vyrizeni">
-        <div class="h2">Vyřízení</div>
+        <div class="h2">Vyřízení <span class='toggler' onclick='toggleWindow(this);'>&nbsp;</span></div>
+        <div class="dokument_blok">
         {if ($FormUpravit=='vyrizeni')}
         {$vyrizovaniForm->render('begin')}
         <dl class="detail_item">
@@ -435,7 +436,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>
-            <dd>{$vyrizovaniForm['spousteci_udalost']->control}</dd>
+            <dd>{$vyrizovaniForm['spousteci_udalost_id']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Počet listů:</dt>
@@ -478,7 +479,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>
-            <dd>{$Dok->spousteci_udalost}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         {if $Dok->stav_dokumentu>=5}
         <dl class="detail_item">
@@ -499,6 +500,7 @@
             <dd>{!$Dok->poznamka_vyrizeni|enl2br}&nbsp;</dd>
         </dl>
         {/if}
+        </div>
     </div>
     {/if}
 
@@ -510,7 +512,7 @@
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
-            {if empty($Dok->prideleno->prideleno) }
+            {if empty($Dok->prideleno->prideleno_id) }
                 organizační jednotce
                 <br />
                 {$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
@@ -535,7 +537,7 @@
         <dl class="detail_item">
             <dt>Předáno:</dt>
             <dd>
-            {if empty($Dok->predano->prideleno) }
+            {if empty($Dok->predano->prideleno_id) }
                 organizační jednotce
                 <br />
                 {$Dok->predano->orgjednotka_info->zkraceny_nazev}
@@ -567,9 +569,24 @@
         </div>
         {if $Pridelen==1 }
         <div class="blok_akce">
-            <a href="{link :Spisovka:Subjekty:vyber, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Připojit subjekt</a>
-            &nbsp;&nbsp;&nbsp;
-            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id}); return false;">Obnovit seznam subjektu</a>
+            <input type="hidden" name="subjekt_dokument_id" id="subjekt_dokument_id" value="{$Dok->id}" />
+            <a href="" id="subjekt_pripojit_click">Připojit subjekt</a>
+            <div id="subjekt_pripojit">
+            <dl class="detail_item">
+                <dt>Připojit subjekt:</dt>
+                <dd>
+                    <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
+                    <a href="{link :Spisovka:Subjekty:vyber, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
+                </dd>
+            </dl>
+            <dl class="detail_item_adress" id="subjekt_novy">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <a href="#" id="novysubjekt_click">Vytvořit nový subjekt</a>
+                </dd>
+            </dl>
+            </div>
+            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id}); return false;">Obnovit seznam subjektu</a><span id="reload_spinner"></span>
         </div>
         {/if}
         <div id="dok-subjekty">
@@ -638,10 +655,20 @@
     <div class="h2">
         Přílohy
     </div>
-    {if $Pridelen==1 }
+    {if 0 }
     <div class="blok_akce">
         <a href="{link :Spisovka:Prilohy:pridat, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
         &nbsp;&nbsp;&nbsp;
+        <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
+    </div>
+    {/if}
+    {if $Pridelen==1 }
+    <div id="dok-prilohy-form">
+        <div class="blok_akce">
+            <a href="{link :Spisovka:Prilohy:pridat, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+        </div>
+    </div>
+    <div class="blok_akce">
         <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
     </div>
     {/if}
@@ -697,39 +724,39 @@
         {foreach $Dok->odeslani as $odes}
         <dl class="detail_item">
             <dt>
-            {if $odes->zpusob_odeslani <= 2}
+            {if $odes->zpusob_odeslani_id <= 2}
                 {$odes->datum_odeslani|edatetime}
             {else}
                 {$odes->datum_odeslani|edate}
             {/if}
             </dt>
             <dd>
-            {if $odes->zpusob_odeslani == 1}
-                {=Subjekt::displayName($odes->subjekt_info,'email')}
+            {if $odes->zpusob_odeslani_id == 1}
+                {=Subjekt::displayName($odes,'email')}
                 <br />
                 <span style="font-weight:normal;">odesláno emailem</span>
-            {elseif $odes->zpusob_odeslani == 2}
-                {=Subjekt::displayName($odes->subjekt_info,'isds')}
+            {elseif $odes->zpusob_odeslani_id == 2}
+                {=Subjekt::displayName($odes,'isds')}
                 <br />
                 <span style="font-weight:normal;">odesláno datovou schránkou</span>
-            {elseif $odes->zpusob_odeslani == 3}
-                {=Subjekt::displayName($odes->subjekt_info,'plna_adresa')}
+            {elseif $odes->zpusob_odeslani_id == 3}
+                {=Subjekt::displayName($odes,'plna_adresa')}
                 <br />
                 <span style="font-weight:normal;">odesláno poštou</span>
-            {elseif $odes->zpusob_odeslani == 4}
-                {=Subjekt::displayName($odes->subjekt_info,'telefon')}
+            {elseif $odes->zpusob_odeslani_id == 4}
+                {=Subjekt::displayName($odes,'telefon')}
                 <br />
                 <span style="font-weight:normal;">odesláno faxem</span>
-            {elseif $odes->zpusob_odeslani == 5}
-                {=Subjekt::displayName($odes->subjekt_info,'jmeno')}
+            {elseif $odes->zpusob_odeslani_id == 5}
+                {=Subjekt::displayName($odes,'jmeno')}
                 <br />
                 <span style="font-weight:normal;">předáno osobně</span>
-            {elseif $odes->zpusob_odeslani == 6}
-                {=Subjekt::displayName($odes->subjekt_info,'telefon')}
+            {elseif $odes->zpusob_odeslani_id == 6}
+                {=Subjekt::displayName($odes,'telefon')}
                 <br />
                 <span style="font-weight:normal;">předáno telefonicky</span>
             {else}
-                {=Subjekt::displayName($odes->subjekt_info)}
+                {=Subjekt::displayName($odes)}
                 <br />
                 <span style="font-weight:normal;">způsob odeslání nespecifikováno</span>
             {/if}
@@ -755,7 +782,7 @@
             <dd>dokument předán</dd>
             <?php
 
-                if ( empty($wf->prideleno) ) {
+                if ( empty($wf->prideleno_id) ) {
                     $wf_jmeno = $wf->orgjednotka_info->zkraceny_nazev;
                     $wf_neprijato = 'předáno organizační jednotce '. $wf_jmeno .'. Ta dokument zatím nepřijala.';
                 } else {

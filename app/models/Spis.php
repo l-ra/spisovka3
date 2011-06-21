@@ -1,6 +1,6 @@
 <?php
 
-class Spis extends BaseModel
+class Spis extends TreeModel
 {
 
     protected $name = 'spis';
@@ -10,7 +10,9 @@ class Spis extends BaseModel
     public function getInfo($spis_id)
     {
 
-        if ( !is_numeric($spis_id) ) {
+        if ( empty($spis_id) ) {
+            return null;
+        } else if ( !is_numeric($spis_id) ) {
             // string - nazev
             $result = $this->fetchRow(array('nazev=%s',$spis_id));
         } else {
@@ -23,162 +25,249 @@ class Spis extends BaseModel
 
     }
 
-    public function seznam($args = null, $select = 0, $spis_parent = array(0))
+    public function seznamSpisovychPlanu($pouze_aktivni = 0)
     {
 
-        if ( isset($args['where']) ) {
-            $where = array($args['where']);
+        if ( $pouze_aktivni ) {
+            $where = array("typ='SP'","stav=1");
         } else {
-            $where = null;// array(array('stav=1'));
+            $where = array(array("typ='SP'"));
         }
 
-        if ( isset($args['order']) ) {
-            $order = $args['order'];
-        } else {
-            $order = array('sekvence','nazev');
-        }
-
-        if ( isset($args['offset']) ) {
-            $offset = $args['offset'];
-        } else {
-            $offset = null;
-        }
-
-        if ( isset($args['limit']) ) {
-            $limit = $args['limit'];
-        } else {
-            $limit = null;
-        }
-
-
-        $query = $this->fetchAll($order,$where,$offset,$limit);
+        $order = array('stav'=>'DESC','date_created'=>'DESC');
+        $query = $this->fetchAll($order,$where);
         $rows = $query->fetchAll();
-        $rows = $this->setridit($rows, $select, $spis_parent);
-
-        return ($rows) ? $rows : NULL;
-
-    }
-
-    public function seznam_pod($spis_id, $full = 0, &$tmp = array()) {
-
-
-        $args = array(
-            'where' => array(
-                'spis_parent = %i',$spis_id
-            )
-        );
-
-        $ret = $this->seznam($args, ($full==0)?3:0, array($spis_id) );
-
-        if ( count($ret)>0 ) {
-            foreach ( $ret as $id => $s ) {
-                $tmp[ $id ] = $s;
-                $this->seznam_pod($id, $full, $tmp);
+        if ( count($rows)>0 ) {
+            $spis_plan = array();
+            foreach( $rows as $row ) {
+                $spis_plan[ $row->id ] = $row->nazev;
             }
-            return $tmp;
+            return $spis_plan;
         } else {
             return null;
         }
-
     }
 
-    public function seznam_nad($spis_id, $full = 0, &$tmp = array()) {
-
-        $result = $this->_seznam_nad($spis_id, $full, $tmp);
-        if ( isset($result[ $spis_id ]) ) {
-            unset( $result[ $spis_id ] );
-        }
-
-        return ( count($result)>0 )? $result : null;
-
-
-    }
-
-    public function _seznam_nad($spis_id, $full = 0, &$tmp = array() )
+    public function getSpisovyPlan()
     {
 
-        $spis = $this->getInfo($spis_id);
-        if ( $spis ) {
-
-            if ( $full == 1 ) {
-                $tmp[ $spis->id ] = $spis;
-            } else {
-                $tmp[ $spis->id ] = $spis->nazev;
-            }
-
-            if ( $spis->spis_parent != 0 ) {
-                $this->seznam_nad($spis->spis_parent, $full, $tmp);
-            }
-
-            return $tmp;
+        $where = array("typ='SP'","stav=1");
+        $order = array('stav'=>'DESC','date_created'=>'DESC');
+        $query = $this->fetchAll($order,$where,null,1);
+        $rows = $query->fetch();
+        if ( $rows ) {
+            return $rows->id;
         } else {
             return null;
         }
-
     }
 
-    private function setridit($data, $simple=0, $spis_parent = array(0), &$tmp = array() )
+    public function seznam($args = null, $select = 0, $parent_id = null)
     {
-        if ( count($data)>0 ) {
-            if ( $simple == 1 ) {
-                $tmp[0] = 'vyberte z nabídky ...';
-            } else if ( $simple == 2 ) {
-                $tmp[0] = '(hlavní větev)';
-            }
-            $spis_parent_id = end($spis_parent);
-            foreach ( $data as $index => $d ) {
-                if ( $d->spis_parent == $spis_parent_id ) {
 
-                    $d->parent = $spis_parent;
-                    $d->uroven = count($spis_parent);
-                    $d->class = ' item'. implode(' item',$spis_parent) .'';
-
-                    if ( $simple == 1 || $simple == 2 ) {
-                        $nazev = str_repeat(".", 2*$d->uroven) .' '. $d->nazev;
-                        $tmp[ $d->id ] = $nazev;
-                    } else if ( $simple == 3 ) {
-                        $tmp[ $d->id ] = $d->nazev;
-                    } else {
-                        $tmp[ $d->id ] = $d;
-                    }
-
-                    $spis_parent[] = $d->id;
-
-                    if ( isset($tmp[ $spis_parent_id ] ) ) {
-                        @$tmp[ $spis_parent_id ]->potomky = 1;
-                    }
-
-                    $this->setridit($data, $simple, $spis_parent, $tmp);
-                    end($spis_parent);
-                    unset( $spis_parent[ key($spis_parent) ] );
-
-                }
-            }
-
-            return $tmp;
-        } else {
-            return null;
+        $params = null;
+        if ( !is_null($args) ) {
+            $params['where'] = $args['where'];
         }
+        if ( $select == 5 ) {
+            $params['paginator'] = 1;
+        }
+
+        $params['order'] = array('tb.nazev');
+        return $this->nacti($parent_id, true, true, $params);
+
     }
 
     public function vytvorit($data) {
 
-        $spis_id = $this->insert($data);
+        $data['date_created'] = new DateTime();
+        $data['user_created'] = Environment::getUser()->getIdentity()->id;
+        $data['date_modified'] = new DateTime();
+        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+
+        if ( $data['typ'] == 'SP' ) {
+            $data['spisovy_znak_plneurceny'] = $data['spisovy_znak'];
+        }
+
+        if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
+        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+        if ( empty($data['spisovy_znak']) ) $data['spisovy_znak'] = '';
+
+        $SpisParent = $this->getInfo($data['parent_id']);
+        if ( $SpisParent ) {
+            $spis_znak_parent = self::spisovyZnak($SpisParent, 2);
+            $data['spisovy_znak_plneurceny'] = $spis_znak_parent . $data['spisovy_znak'];
+        } else {
+            $data['spisovy_znak_plneurceny'] = $data['spisovy_znak'];
+        }
+
+        if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = null;
+
+        $data['stav'] = isset($data['stav'])?$data['stav']:1;
+        $spis_id = $this->vlozitH($data);
         return $spis_id;
 
     }
 
     public function upravit($data,$spis_id) {
 
-        $data_pod['sekvence'] = null;
-        $data_pod['uroven'] = 1;
+        $data['date_modified'] = new DateTime();
+        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
 
-        unset($data['spis_parent_old']);
-        $ret = $this->update($data,array('id=%i',$spis_id));
+
+        // Vyplnění plneurceneho spisoveho znaku
+        $spis = $this->getInfo($spis_id);
+        if ( !empty($spis->parent_id) ) {
+            $spis_parent = $this->getInfo($spis->parent_id);
+            $spis_znak_parent = self::spisovyZnak($spis_parent, 2);
+            $data['spisovy_znak_plneurceny'] = $spis_znak_parent . $data['spisovy_znak'];
+        } else {
+            $data['spisovy_znak_plneurceny'] = $data['spisovy_znak'];
+        }
+
+        if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = null;
+        if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
+        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+        if ( !isset($data['parent_id_old']) ) $data['parent_id_old'] = null;
+        if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = null;
+
+        $ret = $this->upravitH($data, $spis_id);
         
         return $ret;
 
     }
+
+    public static function spisovyZnak( $spis, $simple = 0 )
+    {
+
+        $user_config = Environment::getVariable('user_config');
+        if ( !isset($user_config->spisovy_znak) ) {
+            $maska = ".";
+            $cifernik = 3;
+        } else {
+            $maska = $user_config->spisovy_znak->oddelovac;
+            if ( $user_config->spisovy_znak->pocatecni_nuly == 1 ) {
+                $cifernik = $user_config->spisovy_znak->pocet_znaku;
+            } else {
+                $cifernik = 0;
+            }
+        }
+
+        if ( is_string($spis) ) {
+            $simple = 0;
+            $spis_tmp = $spis;
+            $spis = new stdClass();
+            $spis->spisovy_znak_plneurceny = $spis_tmp;
+        }
+
+        if ( $simple == 1 ) {
+            // spisovy znak
+            return sprintf('%0'.$cifernik.'d', $spis->spisovy_znak);
+        } else if ( $simple == 2 ) {
+            if ( empty($spis->spisovy_znak_plneurceny) ) {
+                return "";
+            } else {
+                return $spis->spisovy_znak_plneurceny .".";
+            }
+
+        } else {
+            // plneurceny spisovy znak
+            if ( empty($spis->spisovy_znak_plneurceny) ) {
+                return "";
+            } else {
+                $part_in = explode(".",$spis->spisovy_znak_plneurceny);
+                $part_out = array();
+                foreach ( $part_in as $part_index => $part_value ) {
+                    $part_out[ $part_index ] = sprintf('%0'.$cifernik.'d', $part_value);
+                }
+                return implode($maska,$part_out);
+            }
+        }
+
+    }
+
+    public function maxSpisovyZnak( $spis_id = null )
+    {
+
+        if ( is_null($spis_id) ) {
+            $spisovy_znak = $this->fetchAll( array('spisovy_znak'=>'DESC'), array("typ='SP'"), null, 1);
+            $spisovy_znak_max = $spisovy_znak->fetch();
+
+            if ( $spisovy_znak_max ) {
+                return ($spisovy_znak_max->spisovy_znak + 1);
+            } else {
+                return 1;
+            }
+        } else {
+            $Spis = $this->getInfo($spis_id);
+            if ( $Spis ) {
+                $spisovy_znak = $this->fetchAll( array('spisovy_znak'=>'DESC'), array(array("parent_id=%i",$Spis->id)), null, 1);
+                $spisovy_znak_max = $spisovy_znak->fetch();
+                if ( $spisovy_znak_max ) {
+                    return ($spisovy_znak_max->spisovy_znak + 1);
+                } else {
+                    return 1;
+                }
+            } else {
+                return 1;
+            }
+        }
+
+
+    }
+
+    public function kontrolaSpisovyZnak( $spisovy_znak, $spis_parent_id )
+    {
+
+        // zjistime rodice
+        $spis_parent = $this->getInfo($spis_parent_id);
+
+        // sestavime plneurceny spisovy znak
+        $spisovy_znak_plneurceny = $spis_parent->spisovy_znak_plneurceny .'.'. $spisovy_znak;
+
+        // vyhledame, zda existuje
+        $spis_exist = $this->fetchAll(null, array(array("spisovy_znak_plneurceny=%s",$spisovy_znak_plneurceny)), null, 1);
+        $spis_exist_fetch = $spis_exist->fetch();
+
+        if ( !$spis_exist_fetch ) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public function kontrolaSpisovyZnakPublic( $spisovy_znak, $spis_id )
+    {
+
+        // zjistime rodice
+        $spis = $this->getInfo($spis_id);
+        if ( $spis ) {
+            $spis_parent = $this->getInfo($spis->parent_id);
+            if ( $spis_parent ) {
+                // sestavime plneurceny spisovy znak
+                $spisovy_znak_plneurceny = $spis_parent->spisovy_znak_plneurceny .'.'. $spisovy_znak;
+
+                // vyhledame, zda existuje
+                $spis_exist = $this->fetchAll(null, array(array("spisovy_znak_plneurceny=%s",$spisovy_znak_plneurceny)), null, 1);
+                $spis_exist_fetch = $spis_exist->fetch();
+
+                if ( !$spis_exist_fetch ) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            } else {
+                return true;
+            }
+
+        } else {
+            return false;
+        }
+
+    }
+
 
     public static function typSpisu($typ = null, $sklonovat = 0) {
 
@@ -213,6 +302,14 @@ class Spis extends BaseModel
         }
 
 
+    }
+
+    public function  deleteAll() {
+
+        $DokumentSpis = new DokumentSpis();
+        $DokumentSpis->deleteAll();
+
+        parent::deleteAll();
     }
 
 }

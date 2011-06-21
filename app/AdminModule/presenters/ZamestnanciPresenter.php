@@ -30,6 +30,10 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     public function actionDetail()
     {
         $this->template->title = " - Detail zaměstnance";
+
+        $authenticator = (array) Environment::getConfig('service');
+        $authenticator = $authenticator['Nette-Security-IAuthenticator'];
+
         $Osoba = new Osoba();
         $User = new UserModel();
 
@@ -54,12 +58,21 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                 $this->template->ZmenaHesla = $zmena_hesla;
             }
         }
+        $Auth1 = new $authenticator();
+        $Auth1->setAction('change_password');
+        Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$zmena_hesla, 'admin'=>1));
+        $this->addComponent($Auth1, 'changePasswordForm');
+
 
         // Vytvoreni uctu
         $vytvorit_ucet = $this->getParam('new_user',null);
         if ( !is_null($vytvorit_ucet) ) {
             $this->template->vytvoritUcet = 1;
         }
+        $Auth2 = new $authenticator();
+        $Auth2->setAction('new_user');
+        Environment::setVariable('auth_params_new', array('osoba_id'=>$osoba_id));
+        $this->addComponent($Auth2, 'newUserForm');
 
         // Odebrani uctu
         $odebrat_ucet = $this->getParam('odebrat',null);
@@ -90,6 +103,16 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->template->roleForm = $this['roleForm'];
     }
 
+    public function actionSync()
+    {
+
+        $authenticator = (array) Environment::getConfig('service');
+        $authenticator = $authenticator['Nette-Security-IAuthenticator'];
+        $Auth = new $authenticator();
+        $Auth->setAction('sync');
+        $this->addComponent($Auth, 'syncForm');
+
+    }
 
 /**
  *
@@ -147,21 +170,23 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         $Osoba = new Osoba();
         $osoba_id = $data['id'];
-        $data['date_modified'] = new DateTime();
         unset($data['id']);
 
-        $Osoba->update($data,array('id = %i',$osoba_id));
+        try {
+            $osoba_id = $Osoba->ulozit($data, $osoba_id);
+            $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl upraven.');
+            $this->redirect(':Admin:Zamestnanci:detail',array('id'=>$subjekt_id));
+        } catch (DibiException $e) {
+            $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  se nepodařilo upravit.','warning');
+            Debug::dump($e);
+        }
 
-        $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl upraven.');
-        $this->redirect('this',array('id'=>$osoba_id));
     }
 
     public function stornoClicked(SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $data = $button->getForm()->getValues();
-        //$osoba = $this->template->Osoba;
-        //$osoba_id = $osoba->osoba_id;
         $osoba_id = !empty($data['id'])?$data['id']:$data['osoba_id'];
         $this->redirect('this',array('id'=>$osoba_id));
     }
@@ -208,11 +233,9 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $Osoba = new Osoba();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
 
         try {
-            $osoba_id = $Osoba->insert($data);
+            $osoba_id = $Osoba->ulozit($data);
             $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl vytvořen.');
             $this->redirect(':Admin:Zamestnanci:detail',array('id'=>$osoba_id));
         } catch (DibiException $e) {
@@ -221,155 +244,11 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         
     }
 
-
 /**
  *
  * Formular a zpracovani pro zmenu hesla
  *
  */
-
-    protected function createComponentUserForm()
-    {
-
-        $osoba = $this->template->Osoba;
-        $user_id = $this->template->ZmenaHesla;
-
-
-        $form1 = new AppForm();
-        $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->id);
-        $form1->addHidden('user_id')
-                ->setValue($user_id);
-
-        $form1->addPassword('heslo', 'Heslo:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
-        $form1->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addConditionOn($form1["heslo"], Form::FILLED)
-                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form1["heslo"]);
-
-        $form1->addSubmit('upravit', 'Změnit heslo')
-                 ->onClick[] = array($this, 'zmenitHesloClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
-    }
-
-
-    public function zmenitHesloClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $User = new UserModel();
-        $Osoba = new Osoba();
-
-        $osoba_id = $data['osoba_id'];
-        $uzivatel = $Osoba->getUser($osoba_id);
-        $zmeneno = 0;
-        
-        foreach ($uzivatel as $u) {
-            if ( $u->id == $data['user_id'] ) {
-                if ( $User->zmenitHeslo($u->id, $data['heslo']) ) {
-                    $zmeneno = 1;
-                }
-                break;
-            }
-        }
-
-        if ( $zmeneno == 1 ) {
-            $this->flashMessage('Heslo uživatele "'. $u->username .'"  bylo úspěšně změněno.');
-        } else {
-            $this->flashMessage('Nedošlo k žádné změně.');
-        }
-        $this->redirect('this',array('id'=>$osoba_id));
-    }
-
-/**
- *
- * Formular pro vytvoreni uctu
- *
- */
-
-    protected function createComponentNewUserForm()
-    {
-
-        $osoba = $this->template->Osoba;
-        $Role = new RoleModel();
-        $role_seznam = $Role->seznam();
-        $role_select = array();
-        foreach ($role_seznam as $key => $value) {
-            if ( $value->fixed == 1 ) continue;
-            $role_select[ $value->id ] = $value->name;
-        }
-
-        $form1 = new AppForm();
-        $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->id);
-
-        $form1->addText('username', 'Uživatelské jméno:', 30, 150)
-                ->addRule(Form::FILLED, 'Uživatelské jméno musí být vyplněno!');
-        $form1->addPassword('heslo', 'Heslo:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
-        $form1->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addConditionOn($form1["heslo"], Form::FILLED)
-                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form1["heslo"]);
-        $form1->addSelect('role', 'Role:', $role_select);
-
-
-        $form1->addSubmit('vytvoritUcet', 'Vytvořit účet')
-                 ->onClick[] = array($this, 'vytvoritUcetClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
-    }
-
-    public function vytvoritUcetClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-        $osoba_id = $data['osoba_id'];
-
-        $User = new UserModel();
-        try {
-            $User->pridatUcet($osoba_id, $data);
-            $this->flashMessage('Účet uživatele "'. $data['username'] .'" byl úspěšně vytvořen.');
-            $this->redirect('this',array('id'=>$osoba_id));
-        } catch (DibiException $e) {
-            if ( $e->getCode() == 1062 ) {
-                $this->flashMessage('Uživatel "'. $data['username'] .'" již existuje. Zvolte jiný.','warning');
-
-                if ( !isset($this->template->Osoba) ) {
-                    $Osoba = new Osoba();
-                    $this->template->Osoba = $Osoba->getInfo($osoba_id);
-                }
-
-            } else {
-                $this->flashMessage('Účet uživatele se nepodařilo vytvořit.','warning');
-            }
-            $this->template->vytvoritUcet = 1;
-        }
-    }
-
 
 /*
  * Zmena roli
@@ -494,7 +373,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                             'user_id'=>$user_id,
                             'date_added'=>new DateTime()
                     );
-            $UserRole->insert_basic($rowur);
+            $UserRole->insert($rowur);
         }
 
         $this->flashMessage('Role uživatele byly upraveny.');
@@ -502,5 +381,10 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     }
 
+    public function changePasswordFormHandler(SubmitButton $button)
+    {
+	$form = $button->getParent();
+	$changePasswordForm = $this->getComponent('changePasswordForm');
+    }
 
 }

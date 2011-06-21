@@ -6,47 +6,31 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function actionLogin($backlink)
     {
-        $form = new AppForm($this, 'form');
-        $form->addText('username', 'Uživatelské jméno:')
-            ->addRule(Form::FILLED, 'Zadejte uživatelské jméno, nebo e-mail.');
 
-        $form->addPassword('password', 'Heslo:')
-            ->addRule(Form::FILLED, 'Zadejte přihlašovací heslo.');
-
-        $form->addSubmit('login', 'Přihlásit');
-        $form->onSubmit[] = array($this, 'loginFormSubmitted');
-
-        $form->addProtection('Prosím přihlašte se znovu.');
+        $authenticator = (array) Environment::getConfig('service');
+        $authenticator = $authenticator['Nette-Security-IAuthenticator'];
+        $Auth = new $authenticator();
+        $Auth->setAction('login');
+        $this->addComponent($Auth, 'auth');
 
         $this->backlink = $backlink;
-        $this->template->form = $form;
         $this->template->title = "Přihlásit se";
     }
 
-    public function loginFormSubmitted($form)
+
+    public function renderLogout()
     {
-        try {
-            $user = Environment::getUser();
-            $user->setNamespace(KLIENT);
-            $user->authenticate($form['username']->value, $form['password']->value);
-            //$this->getApplication()->restoreRequest($this->backlink);
-            $this->redirect(':Spisovka:Default:default');
-
-        } catch (AuthenticationException $e) {
-            $this->flashMessage($e->getMessage(), 'warning');
-            //$form->addError($e->getMessage());
-        }
+        Environment::getUser()->signOut();
+        $this->flashMessage('Byl jste úspěšně odhlášen.');
+        $this->redirect(':Default:default');
     }
-
-        public function renderLogout()
-        {
-                Environment::getUser()->signOut();
-                $this->flashMessage('Byl jste úspěšně odhlášen.');
-                $this->redirect(':Default:default');
-        }
 
     public function actionDefault()
     {
+
+        $authenticator = (array) Environment::getConfig('service');
+        $authenticator = $authenticator['Nette-Security-IAuthenticator'];
+
         $Osoba = new Osoba();
         $User = new UserModel();
 
@@ -66,6 +50,11 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
         // Zmena hesla
         $this->template->ZmenaHesla = $this->getParam('zmenitheslo',null);
+        Environment::setVariable('auth_params', array('osoba_id'=>$osoba_id,'user_id'=>$user->id));
+        $Auth1 = new $authenticator();
+        $Auth1->setAction('change_password');
+        $this->addComponent($Auth1, 'auth_change_password');
+
 
         $role = $User->getRoles($uzivatel->id);
         $this->template->Role = $role;
@@ -127,12 +116,14 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
         $Osoba = new Osoba();
         $osoba_id = $data['osoba_id'];
-        $data['date_modified'] = new DateTime();
         unset($data['osoba_id']);
 
-        $Osoba->update($data,array('id = %i',$osoba_id));
-
-        $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl upraven.');
+        try {
+            $osoba_id = $Osoba->ulozit($data, $osoba_id);
+            $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl upraven.');
+        } catch (DibiException $e) {
+            $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  se nepodařilo upravit.','warning');
+        }
         $this->redirect('this');
     }
 
@@ -141,61 +132,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         // Ulozi hodnoty a vytvori dalsi verzi
         $this->redirect('this');
     }
-
-/**
- *
- * Formular a zpracovani pro zmenu hesla
- *
- */
-
-    protected function createComponentUserForm()
-    {
-        $form1 = new AppForm();
-        $form1->addPassword('heslo', 'Heslo:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
-        $form1->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addConditionOn($form1["heslo"], Form::FILLED)
-                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form1["heslo"]);
-
-        $form1->addSubmit('upravit', 'Změnit heslo')
-                 ->onClick[] = array($this, 'zmenitHesloClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
-    }
-
-
-    public function zmenitHesloClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $zmeneno = 0;
-        $User = new UserModel();
-        $user = Environment::getUser()->getIdentity();
-
-        if ( $User->zmenitHeslo($user->id, $data['heslo']) ) {
-            $zmeneno = 1;
-        }
-
-        if ( $zmeneno == 1 ) {
-            $this->flashMessage('Heslo uživatele "'. $user->username .'"  bylo úspěšně změněno.');
-        } else {
-            $this->flashMessage('Nedošlo k žádné změně.');
-        }
-        $this->redirect('this');
-    }
-
 
     public function renderVyber()
     {
@@ -213,6 +149,60 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->template->org_seznam = $oseznam;
 
 
+    }
+
+    public function actionSeznamAjax()
+    {
+        
+        $Zamestnanci = new Osoba2User();
+        $OrgJednotky = new Orgjednotka();
+
+        $seznam = array();
+
+        $term = $this->getParam('term');
+
+        if ( !empty($term) ) {
+            $seznam_zamestnancu = $Zamestnanci->hledat($term);
+            $seznam_orgjednotek = $OrgJednotky->nacti(null, true, true, 
+                    array('where'=>array( array('LOWER(tb.ciselna_rada) LIKE LOWER(%s)','%'.$term.'%',' OR LOWER(tb.zkraceny_nazev) LIKE LOWER(%s)','%'.$term.'%') )));
+        } else {
+            $seznam_zamestnancu = $Zamestnanci->seznam(1);
+            $seznam_orgjednotek = $OrgJednotky->nacti();
+        }
+
+        if ( count($seznam_orgjednotek)>0 ) {
+            //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat organizační jednotce');
+            foreach( $seznam_orgjednotek as $org ) {
+                $seznam[ ] = array(
+                    "id"=> 'o'. $org->id,
+                    "type" => 'item',
+                    "value"=> '<strong style="color:blue;">'.$org->ciselna_rada.'</strong> - '.$org->zkraceny_nazev,
+                    "nazev"=> $org->ciselna_rada ." - ". $org->zkraceny_nazev
+                );
+            }
+        }
+
+
+        if ( count($seznam_zamestnancu)>0 ) {
+            //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat zaměstnanci');
+            foreach( $seznam_zamestnancu as $user ) {
+                if ( !empty($user->name) ) {
+                    $role = " ( ".$user->name." )";
+                } else {
+                    $role = "";
+                }
+                $seznam[ ] = array(
+                    "id"=> 'u'. $user->user_id,
+                    "type" => 'item',
+                    "value"=> ('<strong>'.Osoba::displayName($user, 'full_item')."</strong>". $role),
+                    "nazev"=> (Osoba::displayName($user, 'full_item') . $role)
+                );
+            }
+        }
+
+        echo json_encode($seznam);
+
+        exit;
     }
 
     public function renderVybrano()

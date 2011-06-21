@@ -6,6 +6,11 @@ class Spisovka_VyhledatPresenter extends BasePresenter
     public function renderDefault()
     {
         $this->template->searchForm = $this['searchForm'];
+
+        if ( $this->getParam('is_ajax') ) {
+            $this->layout = false;
+        }
+
     }
 
     public function handleAutoComplete($text, $typ)
@@ -86,7 +91,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 3);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->seznam(null,3);
+        $spisznak_seznam = $SpisovyZnak->select(3);
 
         $spudalost_seznam = array();
         $spudalost_seznam = SpisovyZnak::spousteci_udalost(null, 3);

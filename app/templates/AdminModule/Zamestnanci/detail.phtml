@@ -39,7 +39,7 @@
         <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'new_user'=>'1'}">Přidat účet</a>
 
         {if isset($vytvoritUcet)}
-        {control newUserForm}
+        {widget newUserForm}
         {/if}
 
         {if count($Uzivatel)>0}
@@ -49,7 +49,7 @@
             <dd>{$u->username}&nbsp;</dd>
         </dl>
         {if ($ZmenaHesla==$u->id && !is_null($ZmenaHesla))}
-        {control userForm}
+        {widget changePasswordForm}
         {/if}
         <dl class="detail_item">
             <dt>Poslední přihlášení:</dt>

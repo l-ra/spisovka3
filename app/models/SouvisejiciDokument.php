@@ -4,15 +4,6 @@ class SouvisejiciDokument extends BaseModel
 {
 
     protected $name = 'souvisejici_dokument';
-    protected $tb_dokument = 'dokument';
-
-    public function  __construct() {
-
-        $prefix = Environment::getConfig('database')->prefix;
-        $this->name = $prefix . $this->name;
-        $this->tb_dokument = $prefix . $this->tb_dokument;
-
-    }
 
     public function souvisejici($dokument_id) {
 
@@ -25,7 +16,7 @@ class SouvisejiciDokument extends BaseModel
         if ( count($result)>0 ) {
             $Dokument = new Dokument();
             foreach ($result as $joinDok) {
-                $dok = $Dokument->getBasicInfo($joinDok->spojit_s);
+                $dok = $Dokument->getBasicInfo($joinDok->spojit_s_id);
                 $dokumenty[ $joinDok->dokument_id ] = $dok;
             }
             return $dokumenty;
@@ -44,10 +35,10 @@ class SouvisejiciDokument extends BaseModel
 
         $row = array();
         $row['dokument_id'] = $dokument_id;
-        $row['spojit_s'] = $spojit_s;
+        $row['spojit_s_id'] = $spojit_s;
         $row['type'] = 1;
         $row['date_added'] = new DateTime();
-        $row['user_added'] = Environment::getUser()->getIdentity()->id;
+        $row['user_id'] = Environment::getUser()->getIdentity()->id;
 
         return $this->insert_basic($row);
 

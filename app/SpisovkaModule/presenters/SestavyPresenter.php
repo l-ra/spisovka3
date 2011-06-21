@@ -176,10 +176,26 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $seznam = $result->fetchAll();
 
         if ( count($seznam)>0 ) {
+
+            $dataplus = array();
+
+            $dokument_ids = array();
+            foreach ($seznam as $row) {
+                $dokument_ids[] = $row->id;
+            }
+
+            $DokSubjekty = new DokumentSubjekt();
+            $dataplus['subjekty'] = $DokSubjekty->subjekty($dokument_ids);
+            $Dokrilohy = new DokumentPrilohy();
+            $dataplus['prilohy'] = $Dokrilohy->prilohy($dokument_ids);
+            $DokOdeslani = new DokumentOdeslani();
+            $dataplus['odeslani'] = array( '0'=> null );//$DokOdeslani->odeslaneZpravy($dokument_ids);
+
             foreach ($seznam as $index => $row) {
-                $dok = $Dokument->getInfo($row->dokument_id);
+                $dok = $Dokument->getInfo($row->id,null, $dataplus);
                 $seznam[$index] = $dok;
             }
+
         } 
 
         $this->template->seznam = $seznam;
@@ -248,7 +264,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50);
         $form->addText('spisova_znacka', 'Spisová značka:', 50, 50);
-        $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu);
+        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
         $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10);
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
@@ -271,7 +287,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         $form->addSelect('skartacni_znak','Skartační znak: ', $skartacni_znak);
         $form->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
-        $form->addSelect('spousteci_udalost','Spouštěcí událost: ', $spudalost_seznam);
+        $form->addSelect('spousteci_udalost_id','Spouštěcí událost: ', $spudalost_seznam);
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10);
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10);
 

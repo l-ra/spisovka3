@@ -51,7 +51,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
-            <dd>{$novyForm['typ_dokumentu_id']->control}</dd>
+            <dd>{$novyForm['dokument_typ_id']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spisová značka:</dt>
@@ -136,8 +136,15 @@
             <dt>Poznámka:</dt>
             <dd>{$novyForm['predani_poznamka']->control}</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Předat:</dt>
+            <dd>
+                <input type="text" name="predano_autocomplete" id="predat_autocomplete" size="40" />
+                &nbsp;&nbsp;&nbsp;
+                <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>$user->id, 'dok_id'=>$Dok->id, 'novy'=>1}" id="dialog-uzivatel">Vyhledat ze seznamu</a>
+            </dd>
+        </dl>
         <div id="predano"></div>
-        <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>$user->id, 'dok_id'=>$Dok->id, 'novy'=>1}" id="dialog-uzivatel">Předat dokument</a>
     </div>
     
     <div id="dokument_blok_subjekty">
@@ -145,9 +152,21 @@
             Adresáti / odesílatelé
         </div>
         <div class="blok_akce">
-            <a href="{link :Spisovka:Subjekty:vyber, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Připojit subjekt</a>
-            &nbsp;&nbsp;&nbsp;
-            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id}); return false;">Obnovit seznam subjektu</a>
+            <input type="hidden" name="subjekt_dokument_id" id="subjekt_dokument_id" value="{$Dok->id}" />
+            <dl class="detail_item">
+                <dt>Připojit subjekt:</dt>
+                <dd>
+                    <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
+                    <a href="{link :Spisovka:Subjekty:vyber, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
+                </dd>
+            </dl>
+            <dl class="detail_item_adress" id="subjekt_novy">
+                <dt>&nbsp;</dt>
+                <dd>
+                    <a href="" id="novysubjekt_click">Vytvořit nový subjekt</a>
+                </dd>
+            </dl>
+            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id}); return false;">Obnovit seznam subjektu</a><span id="reload_spinner"></span>
         </div>
         <div id="dok-subjekty">
         {if count($Subjekty)>0}
@@ -213,12 +232,17 @@
     <div class="h2">
         Přílohy
     </div>
+    <div id="dok-prilohy-form">
+        <div class="blok_akce">
+            <a href="{link :Spisovka:Prilohy:pridat, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+        </div>
+    </div>
     <div class="blok_akce">
-        <a href="{link :Spisovka:Prilohy:pridat, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
-        &nbsp;&nbsp;&nbsp;
         <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
     </div>
     <div id="dok-prilohy">
+
+    
     {if count($Prilohy)>0}
     <table class="seznam">
         {foreach $Prilohy as $file}
@@ -259,6 +283,8 @@
 
     <div id="dokument_blok_akce">
         {$novyForm['novy']->control}
+        &nbsp;&nbsp;
+        {$novyForm['novy_pridat']->control}
         &nbsp;&nbsp;
         {$novyForm['storno']->control}
     </div>

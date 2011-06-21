@@ -56,8 +56,12 @@ class CisloJednaci extends BaseModel
             }
         }
 
-        $Org = new Orgjednotka();
-        $this->org = $Org->getInfo($orgjednotka_id);
+        if ( empty($orgjednotka_id) ) {
+            $this->org = null;
+        } else {
+            $Org = new Orgjednotka();
+            $this->org = $Org->getInfo($orgjednotka_id);
+        }
 
 
     }
@@ -81,13 +85,13 @@ class CisloJednaci extends BaseModel
             $info['urad_zkratka'] = $this->urad->zkratka;
             $info['urad_poradi'] = $this->max('urad');
 
-            $info['orgjednotka_id'] = !is_null($this->org)?$this->org->id:null;
-            $info['org'] = !is_null($this->org)?$this->org->ciselna_rada:"";
+            $info['orgjednotka_id'] = !empty($this->org)?$this->org->id:null;
+            $info['org'] = !empty($this->org)?$this->org->ciselna_rada:"";
             $info['org_poradi'] = $this->max('org');
 
             $info['user_id'] = $this->user_info->id;
             $info['user'] = $this->user_info->username;
-            $info['prijmeni'] = String::webalize($this->user_info->identity->prijmeni);
+            $info['prijmeni'] = String::webalize(@$this->user_info->identity->prijmeni);
             $info['user_poradi'] = $this->max('user');
         }
 
@@ -172,7 +176,7 @@ class CisloJednaci extends BaseModel
             $tmp->user_id = $this->user_info->id;
             $tmp->user = $this->user_info->username;
             $tmp->user_poradi = $info['user_poradi'];
-            $tmp->prijmeni = String::webalize($this->user_info->identity->prijmeni);
+            $tmp->prijmeni = String::webalize(@$this->user_info->identity->prijmeni);
 
             return $tmp;
         } else {
@@ -201,7 +205,7 @@ class CisloJednaci extends BaseModel
         
     }
 
-    public function nacti($cjednaci_id) {
+    public function nacti($cjednaci_id, $generuj = 0) {
 
             $row = $this->fetchRow(array(array('id=%i',$cjednaci_id)))->fetch();
 
@@ -229,7 +233,7 @@ class CisloJednaci extends BaseModel
             $info['prijmeni'] = String::webalize($user_info->identity->prijmeni);
             $info['user_poradi'] = $row->user_poradi;
 
-            return $this->generuj(0, $info);
+            return $this->generuj($generuj, $info);
 
     }
 

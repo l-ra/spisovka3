@@ -19,6 +19,10 @@ img {
     margin-top: 3px; margin-bottom: 7px;
 }
 
+.clear {
+    clear: both;
+}
+
 /* ***************************************************************** */
 /* *** TOP LAYOUT *** */
 #layout_top {
@@ -81,6 +85,19 @@ img {
     text-align: right;
     padding-right: 20px;
     padding-bottom: 10px;
+}
+
+#top_jmeno a {
+    color: #03406A;
+    font-weight: bold;
+    font-size: 10pt;
+    text-decoration: none;
+}
+
+#top_jmeno a:hover {
+    color: #FFC273;
+    font-weight: bold;
+    text-decoration: underline;
 }
 
 /* ***************************************************************** */
@@ -222,7 +239,6 @@ img {
 #content .detail_item {
 }
 
-
 #dialog dl,
 #content dl {
     clear: both;
@@ -273,6 +289,7 @@ label.required {
     font-weight: bold;
     text-decoration: underline;
 }
+
 
 /* ***************************************************************** */
 /* *** DOKUMENTY *** */
@@ -351,6 +368,7 @@ label.required {
 /* *** DOKUMENT DETAIL *** */
 
 .dokument_blok2 {
+    position: relative;
     border: 1px #f0f0f0 solid;
     padding: 5px; margin-bottom: 10px;
     background: #f0f0f0 url() repeat-x;
@@ -374,6 +392,7 @@ label.required {
 
 
 #dokument_blok_hlavni {
+    position: relative;
     border: 1px #e0e0e0 solid;
     padding: 5px; margin-bottom: 10px;
     background: #8FBAD9 url() repeat-x;
@@ -392,6 +411,7 @@ label.required {
 }
 
 #dokument_blok_poznamka {
+    position: relative;
     border: 1px #f0f0f0 solid;
     padding: 5px; margin-bottom: 10px;
     background: #f0f0f0 url() repeat-x;
@@ -414,6 +434,7 @@ label.required {
 }
 
 #dokument_blok_vyrizeni {
+    position: relative;
     border: 1px #f0f0f0 solid;
     padding: 5px; margin-bottom: 10px;
     background: #f0f0f0 url() repeat-x;
@@ -436,6 +457,7 @@ label.required {
 }
 
 #dokument_blok_subjekty {
+    position: relative;
     padding: 5px; margin-bottom: 10px;
 }
 #dokument_blok_subjekty .h2 {
@@ -447,6 +469,7 @@ label.required {
 
 
 #dokument_blok_prilohy {
+    position: relative;
     padding: 5px; margin-bottom: 10px;
     background: #f0f0f0 url() repeat-x;
 }
@@ -464,6 +487,7 @@ label.required {
 }
 
 #dokument_blok_volby {
+    position: relative;
     padding: 10px 10px;
     margin: 0px; margin-bottom: 10px;
     background: #f0f0f0 url() repeat-x;
@@ -480,6 +504,26 @@ label.required {
 #dokument_blok_volby a:hover {
     color: #ff0000;
     text-decoration: underline;
+}
+
+/* tlacitko na ovladani okna */
+/* Opravovano pro IE6 v externim .css */
+.toggler, .toogler_max {
+  position: absolute;
+  right: 10px; /* posunuto pro IE6 kvuli okrajum */
+  top: 6px;
+  width: 15px;
+  height: 15px;
+  background: transparent none no-repeat center center;
+  font-size: 0px;
+}
+
+/* tlacitko minimalizovat */
+.toggler {
+  background-image: url('../images/icons/window-minimize.png');
+}
+.toggler_max {
+  background-image: url('../images/icons/window-maximize.png');
 }
 
 /* ***************************************************************** */
@@ -724,6 +768,18 @@ label.required {
     font-size: 0;
 }
 
+#ajax-spinner-hor {
+    position:fixed;
+    left: 50%;
+    top: 50%;
+    margin: -15px 0 0 -15px;
+    background: white url('../images/spinner_horizontal.gif') no-repeat 50% 50%;
+    padding: 13px 70px;
+    border: 2px solid #CCC;
+    font-size: 0;
+}
+
+
 /* ******************************************************************* */
 /* *** FILTR cONTROL *** */
 #filtr {
@@ -759,6 +815,9 @@ label.required {
     background: #03406A;
     border: 1px solid #03406A;
     color: white; font-weight: bold;
+}
+#search_advanced {
+    margin: 5px;
 }
 
 
@@ -805,6 +864,75 @@ label.required {
     color: #FFC273;
     font-size: 10pt;
     background: #03406A url() repeat-x;
+}
+
+#debug_head {
+    color: #ffffff;
+}
+
+#debug_head strong {
+    color: #FFC273;
+}
+
+#debug_info {
+    float:left;
+    margin-right: 10px;
+    cursor: pointer;
+}
+#debug_route {
+    float:left;
+    margin-right: 10px;
+    cursor: pointer;
+}
+#debug_time {
+    float:left;
+    margin-right: 10px;
+}
+#debug_memory {
+    float:left;
+    margin-right: 10px;
+}
+#debug_sql {
+    float:left;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+#debug_close {
+    float:right;
+    margin-right: 10px;
+    color: #ff0000;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#debug_body {
+    background-color: #03406A;
+}
+
+#debug_body_info {
     white-space: pre;
     font-family: monospace;
+    background-color: #ffffff;
+    color: #000000;
+    margin: 10px; padding: 10px;
+}
+
+#debug_body_route {
+    white-space: pre;
+    font-family: monospace;
+    background-color: #ffffff;
+    color: #000000;
+    margin: 10px; padding: 10px;
+}
+
+#debug_body_sql {
+    background-color: #ffffff;
+    color: #000000;
+    margin: 10px; padding: 10px;
+}
+
+.debug_body_sql_item {
+    padding: 10px;
+    border-bottom: 1px #c0c0c0 solid;
 }

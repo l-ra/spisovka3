@@ -25,8 +25,8 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         $FileModel = new FileModel();
 
         $epod = $Epod->getInfo($epodatelna_id);
-        $source_id = @explode("-",$epod->source_id);
-        $file = $FileModel->getInfo($source_id[0]);
+        $file_id = @explode("-",$epod->file_id);
+        $file = $FileModel->getInfo($file_id[0]);
         $res = $DownloadFile->download($file,$typ);
 
         return $res;
@@ -94,7 +94,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
             if ( is_null($part) ) {
 
                 $zprava = $imap->analyze_message();
-                //echo "<pre>"; print_r($zprava); echo "</pre>";// exit;
+                //Debug::dump($zprava); exit;
 
                 $files = array();
                 // Hlavni zprava
@@ -107,7 +107,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                     $file_name = 'zprava.txt';
                     $mime_type = 'text/plain';
                 }
-                $files[] = array('file'=>$tmp_file, 'file_name'=>$file_name, 'size'=>$file_size, 'mime-type'=>$mime_type,'charset'=>$zprava['Encoding'] );
+                $files[] = array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
 
                 // Alternativni Zpravy
                 if ( isset($zprava['Alternative']) ) {
@@ -126,7 +126,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                             $file_name = 'zprava_'.$fid.'.txt';
                             $mime_type = 'text/plain';
                         }
-                        $files[] = array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type,'charset'=>$zprava['Encoding']);
+                        $files[] = array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
                     }
                 }
                 // Prilohy
@@ -142,23 +142,10 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                             $file_name = 'soubor_'.$fid.'.html';
                             $mime_type = 'text/html';
                         } else {
-
-                            //if ( strtolower($zprava['Encoding']) != 'UTF-8' ) {
-                            //    $file['FileName'] = iconv($zprava['Encoding']."//TRANSLIT",'utf-8',$file['FileName']);
-                            ///}
-
-                            //$file_name = String::webalize($file['FileName'],'.');
                             $file_name = $file['FileName'];
-                            //$mime_type = FileModel::mimeType($tmp_file);
-                            $mime_type = FileModel::mimeType($file_name);
+                            $mime_type = FileModel::mimeType($tmp_file);
                         }
-                        $files[] = array(
-                                    'file'=>$tmp_file,
-                                    'file_name'=>$file_name,
-                                    'size'=>$file_size,
-                                    'mime-type'=>$mime_type,
-                                    'charset'=>$zprava['Encoding'],
-                                   );
+                        $files[] = array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
                     }
                 }
                 return $files;

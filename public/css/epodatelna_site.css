@@ -36,6 +36,14 @@ body {
     color: #684A03;
 }
 
+#top_jmeno a {
+    color: #684A03;
+}
+
+#top_jmeno a:hover {
+    color: #FFC273;
+}
+
 /* ***************************************************************** */
 /* *** CONTENT LAYOUT *** */
 #layout {
@@ -142,6 +150,89 @@ body {
 }
 
 /* ***************************************************************** */
+/* *** HROMADNA EVIDENCE *** */
+
+#zkontrolovat_status {
+    margin-bottom: 5px;
+    padding: 15px 50px;
+    text-align: left;
+    color: #666600;
+    border: 1px #666600 solid;
+    background: #ffffcc url() repeat-x;
+}
+
+#h_evidence {
+
+}
+
+#h_evidence .evidence_item {
+    margin: 3px 0px;
+    border: 1px #e0e0e0 solid;
+}
+
+#h_evidence .evidence_item_header {
+    border: 1px #CEA33D solid;
+    background: #D8C38F url() repeat-x;
+    padding: 5px;
+}
+
+#h_evidence .evidence_item_header img {
+    float: left;
+    margin-right: 5px;
+}
+
+#h_evidence .evidence_item_cas {
+    float: left;
+    text-align: right;
+    width: 60px;
+    margin-right: 10px;
+}
+
+#h_evidence .evidence_info {
+}
+
+#h_evidence .evidence_info span {
+    display: block;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+#h_evidence .evidence_volba {
+    float: left;
+    width: 170px;
+    margin-left: 5px;
+}
+
+#h_evidence .evidence_form {
+    margin-left: 250px;
+    margin-top: 10px;
+}
+
+#h_evidence .evidence_form span {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+#h_evidence .evidence_zprava_toogle {
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#h_evidence .evidence_zprava{
+    padding: 10px 0px;
+    white-space: pre-line;
+}
+
+#h_evidence .evidence_report {
+    padding: 15px;
+}
+
+.ui-button { margin-left: -1px; }
+.ui-button-icon-only .ui-button-text { padding: 0.35em; }
+.ui-autocomplete-input { margin: 0; padding: 0.48em 0 0.47em 0.45em; }
+
+/* ***************************************************************** */
 /* *** DEBUG LAYOUT *** */
 
 #debug {
@@ -151,8 +242,65 @@ body {
     color: #FFC273;
     font-size: 10pt;
     background: #684A03 url() repeat-x;
-    white-space: pre;
-    font-family: monospace;
 }
 
+#debug_head {
+    color: #ffffff;
+}
+
+#debug_head strong {
+    color: #FFC273;
+}
+
+#debug_info {
+    float:left;
+    margin-right: 10px;
+}
+#debug_route {
+    float:left;
+    margin-right: 10px;
+}
+#debug_time {
+    float:left;
+    margin-right: 10px;
+}
+#debug_memory {
+    float:left;
+    margin-right: 10px;
+}
+#debug_sql {
+    float:left;
+    margin-right: 10px;
+}
+
+#debug_body {
+    background-color: #684A03;
+}
+
+#debug_body_info {
+    white-space: pre;
+    font-family: monospace;
+    background-color: #ffffff;
+    color: #000000;
+    margin: 10px; padding: 10px;
+}
+
+#debug_body_route {
+    white-space: pre;
+    font-family: monospace;
+    background-color: #ffffff;
+    color: #000000;
+    margin: 10px; padding: 10px;
+}
+
+#debug_body_sql {
+    background-color: #ffffff;
+    color: #000000;
+    margin: 10px; padding: 10px;
+}
+
+.debug_body_sql_item {
+    padding: 10px;
+    border-bottom: 1px #c0c0c0 solid;
+}
 

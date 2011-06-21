@@ -108,7 +108,7 @@
         </dl>
         <dl class="detail_item">
             <dt>&nbsp;</dt>
-            <dd>{$upravitForm['upravit']->control} {$upravitForm['modifikovat']->control} {$upravitForm['storno']->control}</dd>
+            <dd>{$upravitForm['upravit']->control} {$upravitForm['storno']->control}</dd>
         </dl>
         {$upravitForm->render('end')}
     </div>
@@ -185,7 +185,7 @@
             <dt>&nbsp;</dt>
             <dd>{$Subjekt->poznamka|enl2br}&nbsp;</dd>
         </dl>
-        <a href="{link :Admin:Subjekty:detail, 'id'=>($Subjekt->id .'-'.$Subjekt->version), 'upravit'=>'info'}">Upravit</a>
+        <a href="{link :Admin:Subjekty:detail, 'id'=>$Subjekt->id, 'upravit'=>'info'}">Upravit</a>
     </div>
     <div class="detail_blok">
         <div class="detail_hlavicka">Stav</div>
@@ -197,7 +197,7 @@
             <dd>{=Subjekt::stav($Subjekt->stav)}&nbsp;</dd>
         </dl>
         {/if}
-        <a href="{link :Admin:Subjekty:detail, 'id'=>($Subjekt->id .'-'.$Subjekt->version), 'upravit'=>'stav'}">Změnit stav</a>
+        <a href="{link :Admin:Subjekty:detail, 'id'=>$Subjekt->id, 'upravit'=>'stav'}">Změnit stav</a>
 
     </div>
         {/if}

@@ -1,4 +1,4 @@
-<?php
+<?php //netteloader=BaseModel
 
 abstract class BaseModel extends Object
 {
@@ -19,10 +19,68 @@ abstract class BaseModel extends Object
     /** @var bool autoincrement? */
     protected $autoIncrement = TRUE;
 
+    protected $tb_dokument = 'dokument';
+    protected $tb_file = 'file';
+    protected $tb_user = 'user';
+    protected $tb_osoba = 'osoba';
+    protected $tb_orgjednotka = 'orgjednotka';
+    protected $tb_spis = 'spis';
+    protected $tb_subjekt = 'subjekt';
+    protected $tb_subjekt_historie = 'subjekt';
+    protected $tb_epodatelna = 'epodatelna';
+
+    protected $tb_logaccess = 'log_access';
+    protected $tb_logdokument = 'log_dokument';
+
+    protected $tb_dokumenttyp = 'dokument_typ';
+
+    protected $tb_workflow = 'workflow';
+    protected $tb_dokspis = 'dokument_to_spis';
+    protected $tb_dok_subjekt = 'dokument_to_subjekt';
+    protected $tb_dok_file = 'dokument_to_file';
+    
+    protected $tb_spousteci_udalost = 'spousteci_udalost';
+    protected $user_to_role = 'user_to_role';
+    protected $osoba = 'osoba';
+    protected $tb_osoba_to_user = 'osoba_to_user';
+    protected $tbl_role = 'user_role';
+
+    protected $tb_zpusob_doruceni = 'zpusob_doruceni';
+    protected $tb_zpusob_vyrizeni = 'zpusob_vyrizeni';
+    protected $tb_zpusob_odeslani = 'zpusob_odeslani';
+
+
     public function  __construct() {
 
         $prefix = Environment::getConfig('database')->prefix;
         $this->name = $prefix . $this->name;
+
+        $this->tb_dokument = $prefix . $this->tb_dokument;
+        $this->tb_file = $prefix . $this->tb_file;
+        $this->tb_user = $prefix . $this->tb_user;
+        $this->tb_osoba = $prefix . $this->tb_osoba;
+        $this->tb_orgjednotka = $prefix . $this->tb_orgjednotka;
+        $this->tb_workflow = $prefix . $this->tb_workflow;
+        $this->tb_epodatelna = $prefix . $this->tb_epodatelna;
+        $this->tb_spis = $prefix . $this->tb_spis;
+        $this->tb_subjekt = $prefix . $this->tb_subjekt;
+        $this->tb_subjekt_historie = $prefix . $this->tb_subjekt_historie;
+        $this->tb_spousteci_udalost = $prefix . $this->tb_spousteci_udalost;
+
+        $this->tb_dokumenttyp = $prefix . $this->tb_dokumenttyp;
+        $this->tb_dokspis = $prefix . $this->tb_dokspis;
+        $this->tb_dok_subjekt = $prefix . $this->tb_dok_subjekt;
+        $this->tb_dok_file = $prefix . $this->tb_dok_file;
+        $this->user_to_role = $prefix . $this->user_to_role;
+        $this->osoba = $prefix . $this->osoba;
+        $this->tb_osoba_to_user = $prefix . $this->tb_osoba_to_user;
+        $this->tbl_role = $prefix . $this->tbl_role;
+        $this->tb_logaccess = $prefix . $this->tb_logaccess;
+        $this->tb_logdokument = $prefix . $this->tb_logdokument;
+
+        $this->tb_zpusob_doruceni = $prefix . $this->tb_zpusob_doruceni;
+        $this->tb_zpusob_vyrizeni = $prefix . $this->tb_zpusob_vyrizeni;
+        $this->tb_zpusob_odeslani = $prefix . $this->tb_zpusob_odeslani;
 
     }
 
@@ -269,7 +327,7 @@ abstract class BaseModel extends Object
         }
 
         //Debug::dump($query);
-        //dibi::test($query);
+        //dibi::test($query); exit;
         // a nyní předáme pole
         return dibi::query($query);
 
@@ -316,6 +374,17 @@ abstract class BaseModel extends Object
             'SELECT * FROM %n', $this->name,
             '%ex', (!empty($where) ? array('WHERE %and', $where) : NULL)
         );
+    }
+
+    public function getDataSource($table = null)
+    {
+        if ( !is_null($table) ) {
+            //$prefix = Environment::getConfig('database')->prefix;
+            return dibi::dataSource('SELECT * FROM %n', $table);    
+        } else {
+            return dibi::dataSource('SELECT * FROM %n', $this->name);
+        }
+
     }
 
     /**

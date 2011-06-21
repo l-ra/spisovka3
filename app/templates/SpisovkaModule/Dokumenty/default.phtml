@@ -9,12 +9,15 @@
         {$filtrForm->render('begin')}
         {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
         {$filtrForm['go_filtr']->control}
-        <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <br/>
         {$filtrForm['bez_vyrizenych']->control}{$filtrForm['bez_vyrizenych']->label}
         {$filtrForm->render('end')}
     </div>
     <div id="search">
         {control searchForm}
+        <div id="search_advanced">
+        {access :Spisovka:Vyhledat:default}<a href="{link :Spisovka:Vyhledat:default}" id="dialog-search">Pokročilé vyhledávání</a>{/access}
+        </div>
     </div>
     
     <div style="clear:both;">&nbsp;</div>
@@ -63,7 +66,7 @@
         <tr{if $dok->lhuta_stav==2} class="red"{elseif $dok->lhuta_stav==1} class="yellow"{/if}">
             <td class="typ">
                 <img src="{$baseUri}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
-                <img src="{$baseUri}images/icons/typdok{$dok->typ_dokumentu->typ}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="24" height="16" />
+                <!--<img src="{$baseUri}images/icons/typdok{$dok->typ_dokumentu->typ}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="24" height="16" />-->
             </td>
             <td class="prijato" title="{$dok->datum_vzniku|edatetime}">
                 {$dok->datum_vzniku|edate}
@@ -114,7 +117,7 @@
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->predano) }
             <td class="prideleno">
-            {if empty($dok->prideleno->prideleno) }
+            {if empty($dok->prideleno->prideleno_id) }
                 {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             {else}
                 {$dok->prideleno->prideleno_jmeno}
@@ -129,7 +132,7 @@
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->prideleno) }
             <td class="prideleno">
-            {if empty($dok->prideleno->prideleno) }
+            {if empty($dok->prideleno->prideleno_id) }
                 {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             {else}
                 {$dok->prideleno->prideleno_jmeno}
@@ -213,3 +216,4 @@
     {/if}
     </div>
 
+    <div id="dialog"></div>

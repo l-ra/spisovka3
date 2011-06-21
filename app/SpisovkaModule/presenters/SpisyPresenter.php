@@ -3,7 +3,6 @@
 class Spisovka_SpisyPresenter extends BasePresenter
 {
 
-    private $dokument_id;
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
 
@@ -27,24 +26,20 @@ class Spisovka_SpisyPresenter extends BasePresenter
         parent::startup();
     }
 
-    public function actionVyber()
-    {
-        $this->dokument_id = $this->getParam('id',null);
-        if ( empty($this->dokument_iddokument_id) ) {
-            if ( isset($_POST['dokument_id']) ) {
-                $this->dokument_id = $_POST['dokument_id'];
-            }
-        }
-    }
-
     public function renderVyber()
     {
+
+        $this->template->dokument_id = $this->getParam('id',null);
+        if ( empty($this->template->dokument_id) ) {
+            if ( isset($_POST['dokument_id']) ) {
+                $this->template->dokument_id = $_POST['dokument_id'];
+            }
+        }
 
         $Spisy = new Spis();
         $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
         $seznam = $Spisy->seznam($args);
         $this->template->seznam = $seznam;
-        $this->template->dokument_id = $this->dokument_id;
 
     }
 
@@ -90,7 +85,15 @@ class Spisovka_SpisyPresenter extends BasePresenter
     {
         $Spisy = new Spis();
         $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
-        $seznam = $Spisy->seznam($args);
+
+        $user_config = Environment::getVariable('user_config');
+        $vp = new VisualPaginator($this, 'vp');
+        $paginator = $vp->getPaginator();
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+
+        $result = $Spisy->seznam($args,5);
+        $paginator->itemCount = count($result);
+        $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         $this->template->seznam = $seznam;
 
     }
@@ -147,14 +150,9 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->seznam(null,1);
 
-        $spisy = $Spisy->seznam(null,1);
-        $spisy_pod = $Spisy->seznam_pod(@$spis->id);
-        $spisy_pod[ @$spis->id ] = @$spis->id;
-        foreach ($spisy_pod as $spi => $sp) {
-            if ( array_key_exists($spi, $spisy) ) {
-                unset( $spisy[ $spi ] );
-            }
-        }
+        $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null,1);
+
+        $spisy = $Spisy->select(1,@$spis->id);
 
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -166,8 +164,8 @@ class Spisovka_SpisyPresenter extends BasePresenter
                 ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
         $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spis->popis);
-        $form1->addSelect('spis_parent', 'Připojit k:', $spisy)
-                ->setValue(@$spis->spis_parent);
+        $form1->addSelect('spis_parent_id', 'Připojit k:', $spisy)
+                ->setValue(@$spis->spis_parent_id);
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
                 ->setValue(@$spis->stav);
 
@@ -175,14 +173,14 @@ class Spisovka_SpisyPresenter extends BasePresenter
                 ->setValue(@$spis->spisovy_znak)
                 ->controlPrototype->onchange("vybratSpisovyZnak();");
         $form1->addText('skartacni_znak','Skartační znak: ', 3, 3)
-                ->setValue(@$spis->skartacni_znak)
-                ->controlPrototype->readonly = TRUE;
+                ->setValue(@$spis->skartacni_znak);
+                //->controlPrototype->readonly = TRUE;
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
-                ->setValue(@$spis->skartacni_lhuta)
-                ->controlPrototype->readonly = TRUE;
-        $form1->addTextArea('spousteci_udalost','Spouštěcí událost: ', 80, 3)
-                ->setValue(@$spis->spousteci_udalost)
-                ->controlPrototype->readonly = TRUE;
+                ->setValue(@$spis->skartacni_lhuta);
+                //->controlPrototype->readonly = TRUE;
+        $form1->addSelect('spousteci_udalost_id','Spouštěcí událost: ', $spousteci_udalost)
+                ->setValue(@$spis->spousteci_udalost_id);
+                //->controlPrototype->readonly = TRUE;
 
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
@@ -243,13 +241,12 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->getElementPrototype()->id('spis-vytvorit');
-        $form1->addHidden('dokument_id')
-                ->setValue($this->dokument_id);
+        $form1->addHidden('dokument_id',$this->template->dokument_id);
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
         $form1->addText('nazev', 'Spisová značka / název:', 50, 80)
                 ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
         $form1->addText('popis', 'Popis:', 50, 200);
-        $form1->addSelect('spis_parent', 'Připojit k:', $spisy);
+        $form1->addSelect('spis_parent_id', 'Připojit k:', $spisy);
 
         $form1->addSubmit('vytvorit', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
@@ -272,22 +269,16 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $Spisy = new Spis();
         $data['stav'] = 1;
         $data['date_created'] = new DateTime();
-        $data['user_created'] = Environment::getUser()->getIdentity()->id;
-        unset($data['dokument_id']);
-        
+        $data['user_created'] = Environment::getUser()->getIdentity()->user_id;
+
         try {
             $spis_id = $Spisy->vytvorit($data);
-
-            if ( $spis_id ) {
-                $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
-                
-                if (!$this->isAjax()) {
-                    //$this->redirect('this');
-                } else {
-                    $this->invalidateControl('dokspis');
-                }
+            $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
+            unset($data['dokument_id']);
+            if (!$this->isAjax()) {
+                //$this->redirect('this');
             } else {
-                throw new Exception;
+                $this->invalidateControl('dokspis');
             }
             
             //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));

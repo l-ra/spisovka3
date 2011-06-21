@@ -6,7 +6,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
     public function renderVyber()
     {
 
-        $this->template->spis_id = $this->getParam('id',null);
+        $this->template->subjekt_id = $this->getParam('id',null);
         $this->template->dokument_id = $this->getParam('dok_id',null);
 
         $Subjekt = new Subjekt();
@@ -52,12 +52,11 @@ class Spisovka_SubjektyPresenter extends BasePresenter
             $this->template->dokument_id = $this->getParam('id',null);
 
             $Spisy = new Spis();
-            $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
+            $args = null;
             $seznam = $Spisy->seznam($args);
             $this->template->seznam = $seznam;
 
             $this->template->chyba = 1;
-
             $this->template->render('vyber');
 
         }
@@ -87,23 +86,112 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
     }
 
+    public function actionSeznamAjax()
+    {
+
+        $Subjekt = new Subjekt();
+
+        $seznam = array();
+
+        $term = $this->getParam('term');
+
+        if ( !empty($term) ) {
+            $args = array('where'=>array('LOWER(CONCAT(nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)','%'.$term.'%'));
+            $seznam_subjektu = $Subjekt->seznam($args);
+        } else {
+            $seznam_subjektu = $Subjekt->seznam();
+        }
+
+        if ( count($seznam_subjektu)>0 ) {
+            foreach( $seznam_subjektu as $subjekt ) {
+                $seznam[ ] = array(
+                    "id"=> $subjekt->id,
+                    "value"=> Subjekt::displayName($subjekt,'full'),
+                    "nazev"=> Subjekt::displayName($subjekt,'full'),
+                    "full"=> Subjekt::displayName($subjekt,'full'),
+                    "item"=>$subjekt
+                );
+            }
+        }
+
+        echo json_encode($seznam);
+
+        exit;
+    }
+
+    public function actionVytvoritAjax()
+    {
+
+        $data = $this->getHttpRequest()->getPost();
+
+        //echo "<pre>"; print_r($data); exit;
+
+        if ( isset($data['id']) ) {
+            // pouze jedno
+
+            if ( empty($data['subjekt_nazev'][$data['id']]) ) {
+                $typ = 'FO';
+            } else {
+                $typ = 'OVM';
+            }
+
+            $vytvorit = array(
+                'type'=>$typ,
+                'ic'=>'',
+                'nazev_subjektu' => ( !empty($data['subjekt_nazev'][$data['id']])?$data['subjekt_nazev'][$data['id']]:"" ),
+                'jmeno' => ( !empty($data['subjekt_prijmeni'][$data['id']])?$data['subjekt_prijmeni'][$data['id']]:"" ),
+                'prijmeni' => ( !empty($data['subjekt_jmeno'][$data['id']])?$data['subjekt_jmeno'][$data['id']]:"" ),
+                'adresa_ulice' => ( !empty($data['subjekt_ulice'][$data['id']])?$data['subjekt_ulice'][$data['id']]:"" ),
+                'adresa_cp' => ( !empty($data['subjekt_cp'][$data['id']])?$data['subjekt_cp'][$data['id']]:"" ),
+                'adresa_mesto' => ( !empty($data['subjekt_mesto'][$data['id']])?$data['subjekt_mesto'][$data['id']]:"" ),
+                'adresa_psc' => ( !empty($data['subjekt_psc'][$data['id']])?$data['subjekt_psc'][$data['id']]:"" ),
+                'email' => ( !empty($data['subjekt_email'][$data['id']])?$data['subjekt_email'][$data['id']]:"" ),
+                'id_isds' => ( !empty($data['subjekt_isds'][$data['id']])?$data['subjekt_isds'][$data['id']]:"" ),
+                'adresa_stat' => "CZE",
+                'telefon'=>'',
+            );
+
+            //echo "<pre>"; print_r($vytvorit); exit;
+
+            $Subjekt = new Subjekt();
+
+            try {
+                $subjekt_id = $Subjekt->ulozit($vytvorit);
+                $subjekt_info = $Subjekt->getInfo($subjekt_id);
+
+                if ( $subjekt_info ) {
+
+                    $DokumentSubjekt = new DokumentSubjekt();
+                    $DokumentSubjekt->pripojit($data['id'], $subjekt_id, 'AO');
+
+                    echo $subjekt_info->id ."#". Subjekt::displayName($subjekt_info, 'full');
+                } else {
+                    echo "#Subjekt se nepodařil vytvořit.";
+                }
+
+            } catch (DibiException $e) {
+                echo "#Subjekt se nepodařil vytvořit.";
+            }
+        } else {
+            echo "#Subjekt nebyl přidán! Nepodařilo se zjístit ID zprávy.";
+        }
+
+        exit;
+
+    }
+
+
     public function actionUpravit()
     {
         $subjekt_id = $this->getParam('id',null);
         $dokument_id = $this->getParam('dok_id',null);
 
-        $this->template->FormUpravit = $this->getParam('upravit',null);
-        if ( strpos($subjekt_id, '-')!==false ) {
-            list($subjekt_id, $subjekt_version) = explode('-',$subjekt_id);
-        } else {
-            $subjekt_version = null;
-        }
         $Subjekt = new Subjekt();
+        $subjekt = $Subjekt->getInfo($subjekt_id);
 
-        $subjekt = $Subjekt->getInfo($subjekt_id, $subjekt_version);
         $this->template->Subjekt = $subjekt;
         $this->template->dokument_id = $dokument_id;
-
+        $this->template->FormUpravit = $this->getParam('upravit',null);
 
     }
 
@@ -116,14 +204,10 @@ class Spisovka_SubjektyPresenter extends BasePresenter
     {
         $this->template->FormUpravit = $this->getParam('upravit',null);
         $subjekt_id = $this->getParam('id',null);
-        if ( strpos($subjekt_id, '-')!==false ) {
-            list($subjekt_id, $subjekt_version) = explode('-',$subjekt_id);
-        } else {
-            $subjekt_version = null;
-        }
-        $Subjekt = new Subjekt();
 
-        $subjekt = $Subjekt->getInfo($subjekt_id, $subjekt_version);
+        $Subjekt = new Subjekt();
+        $subjekt = $Subjekt->getInfo($subjekt_id);
+
         $this->template->Subjekt = $subjekt;
 
     }
@@ -181,8 +265,6 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         
         $form1->addHidden('subjekt_id')
                 ->setValue(@$subjekt->id);
-        $form1->addHidden('subjekt_version')
-                ->setValue(@$subjekt->version);
         $form1->addHidden('dokument_id')
                 ->setValue(@$dokument_id);
         
@@ -269,18 +351,13 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $subjekt_id = $data['subjekt_id'];
-        $subjekt_version = $data['subjekt_version'];
         $dokument_id = $data['dokument_id'];
         $smer = $data['smer'];
-        unset($data['subjekt_id'],$data['subjekt_version'],$data['dokument_id'], $data['smer']);
+        unset($data['subjekt_id'],$data['dokument_id'], $data['smer']);
 
         $Subjekt = new Subjekt();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
-        $data['user_added'] = Environment::getUser()->getIdentity()->id;
-
         try {
-            $subjekt_id = $Subjekt->insert_version($data, $subjekt_id);
+            $subjekt_id = $Subjekt->ulozit($data, $subjekt_id);
 
             $DokumentSubjekt = new DokumentSubjekt();
             $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, $smer);
@@ -386,17 +463,10 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $dokument_id = $data['dokument_id'];
         unset($data['dokument_id']);
 
-
         $Subjekt = new Subjekt();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
-        $data['user_added'] = Environment::getUser()->getIdentity()->user_id;
-
-        //Debug::dump($data);
-        //exit;
 
         try {
-            $subjekt_id = $Subjekt->insert_version($data);
+            $subjekt_id = $Subjekt->ulozit($data);
 
             if (!$this->isAjax()) {
                 //$this->redirect('this');
@@ -426,9 +496,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$subjekt->id);
-        $form1->addHidden('version')
-                ->setValue(@$subjekt->version);
-        $form1->addSelect('stav', 'Změnit stav na:', $stav_select);
+        $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
+                ->setValue(@$subjekt->stav);
         $form1->addSubmit('zmenit_stav', 'Změnit stav')
                  ->onClick[] = array($this, 'zmenitStavClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -449,13 +518,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
     public function zmenitStavClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-
         $subjekt_id = $data['id'];
-        $subjekt_version = $data['version'];
-
         $Subjekt = new Subjekt();
-
-        //Debug::dump($data); exit;
 
         try {
             $Subjekt->zmenitStav($data);

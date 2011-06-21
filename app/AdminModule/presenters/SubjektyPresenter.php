@@ -36,16 +36,9 @@ class Admin_SubjektyPresenter extends BasePresenter
         $this->template->FormUpravit = $this->getParam('upravit',null);
 
         $subjekt_id = $this->getParam('id',null);
-        if ( strpos($subjekt_id, '-')!==false ) {
-            list($subjekt_id, $subjekt_version) = explode('-',$subjekt_id);
-        } else {
-            $subjekt_version = null;
-        }
-
 
         $Subjekt = new Subjekt();
-
-        $subjekt = $Subjekt->getInfo($subjekt_id, $subjekt_version);
+        $subjekt = $Subjekt->getInfo($subjekt_id);
         $this->template->Subjekt = $subjekt;
 
     }
@@ -84,8 +77,6 @@ class Admin_SubjektyPresenter extends BasePresenter
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$subjekt->id);
-        $form1->addHidden('version')
-                ->setValue(@$subjekt->version);
 
         $form1->addSelect('type', 'Typ subjektu:', $typ_select)
                 ->setValue(@$subjekt->type);
@@ -149,8 +140,6 @@ class Admin_SubjektyPresenter extends BasePresenter
 
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
-        $form1->addSubmit('modifikovat', 'Pouze opravit')
-                 ->onClick[] = array($this, 'modifikovatClicked');
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoClicked');
@@ -172,39 +161,19 @@ class Admin_SubjektyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $subjekt_id = $data['id'];
-        $subjekt_version = $data['version'];
-        unset($data['id'],$data['version']);
+        unset($data['id']);
 
         $Subjekt = new Subjekt();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
-        $data['user_added'] = Environment::getUser()->getIdentity()->id;
 
         try {
-            $subjekt_id = $Subjekt->insert_version($data,$subjekt_id);
-            $this->flashMessage('Subjekt  "'. Subjekt::displayName($data,'jmeno') .'"  byl vytvořen.');
+            $subjekt_id = $Subjekt->ulozit($data, $subjekt_id);
+            $this->flashMessage('Subjekt  "'. Subjekt::displayName($data,'jmeno') .'"  byl upraven.');
             $this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Subjekt "'. Subjekt::displayName($data,'jmeno') .'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage('Subjekt "'. Subjekt::displayName($data,'jmeno') .'" se nepodařilo upravit.','warning');
             Debug::dump($e);
         }
 
-    }
-
-    public function modifikovatClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-        $subjekt_id = $data['id'];
-        $subjekt_version = $data['version'];
-
-        $Subjekt = new Subjekt();
-        $data['date_modified'] = new DateTime();
-        unset($data['id'],$data['version']);
-
-        $Subjekt->update($data,array(array('id = %i',$subjekt_id),array('version = %i',$subjekt_version)));
-
-        $this->flashMessage('Subjekt  "'. Subjekt::displayName($data,'jmeno') .'"  byl upraven.');
-        $this->redirect('this',array('id'=>$subjekt_id ."-". $subjekt_version));
     }
 
     public function stornoClicked(SubmitButton $button)
@@ -280,19 +249,14 @@ class Admin_SubjektyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $Subjekt = new Subjekt();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
-        $data['user_added'] = Environment::getUser()->getIdentity()->user_id;
-
-        //Debug::dump($data);
-        //exit;
 
         try {
-            $subjekt_id = $Subjekt->insert_version($data);
+            $subjekt_id = $Subjekt->ulozit($data);
             $this->flashMessage('Subjekt  "'. Subjekt::displayName($data,'jmeno') .'"  byl vytvořen.');
             $this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id));
         } catch (DibiException $e) {
             $this->flashMessage('Subjekt "'. Subjekt::displayName($data,'jmeno') .'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage($e->getMessage(),'warning');
         }
     }
 
@@ -305,9 +269,8 @@ class Admin_SubjektyPresenter extends BasePresenter
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$subjekt->id);
-        $form1->addHidden('version')
-                ->setValue(@$subjekt->version);
-        $form1->addSelect('stav', 'Změnit stav na:', $stav_select);
+        $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
+                ->setValue(@$subjekt->stav);
         $form1->addSubmit('zmenit_stav', 'Změnit stav')
                  ->onClick[] = array($this, 'zmenitStavClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -330,16 +293,12 @@ class Admin_SubjektyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $subjekt_id = $data['id'];
-        $subjekt_version = $data['version'];
-
         $Subjekt = new Subjekt();
-
-        //Debug::dump($data); exit;
 
         try {
             $Subjekt->zmenitStav($data);
             $this->flashMessage('Stav subjektu byl změněn.');
-            $this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id .'-'. $subjekt_version));
+            $this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id));
         } catch (DibiException $e) {
             $this->flashMessage('Stav subjektu se nepodařilo změnit.','warning');
         }

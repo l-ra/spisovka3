@@ -102,8 +102,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $original = null;
             if ( !empty($zprava->email_signature) ) {
                 // Nacteni originalu emailu
-                if ( !empty( $zprava->source_id ) ) {
-                    $original = $this->nactiEmail($zprava->source_id);
+                if ( !empty( $zprava->file_id ) ) {
+                    $original = $this->nactiEmail($zprava->file_id);
 
                     if ( $original['signature']['signed'] == 3 ) {
 
@@ -141,8 +141,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 }
             } else if ( !empty($zprava->isds_signature) ) {
                 // Nacteni originalu DS
-                if ( !empty( $zprava->source_id ) ) {
-                    $source = $this->nactiISDS($zprava->source_id);
+                if ( !empty( $zprava->file_id ) ) {
+                    $source = $this->nactiISDS($zprava->file_id);
                     if ( $source ) {
                         $original = unserialize($source);
                     } else {
@@ -153,6 +153,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             } else {
                 // zrejme odchozi zprava ven
             }
+
             $this->template->Original = $original;
             $this->template->Identifikator = $this->Epodatelna->identifikator($zprava, $original);
 
@@ -168,13 +169,18 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->actionDetail();
     }
 
-    public function renderZkontrolovat()
+    public function actionZkrontrolovat()
     {
 
-        @set_time_limit(600); // z moznych dusledku vetsich poctu polozek je nastaven timeout na 10 minut
 
-        //$storage = new FileStorage(APP_DIR .'/app/temp/cache');
-        //$cache = new Cache($storage); // nebo $cache = Environment::getCache()
+
+    }
+
+    public function renderZkontrolovatAjax()
+    {
+
+
+        @set_time_limit(600); // z moznych dusledku vetsich poctu polozek je nastaven timeout na 10 minut
 
         $id = $this->getParam('id',null);
         $typ = substr($id,0,1);
@@ -194,20 +200,20 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     if ( $typ == 'isds' ) {
                         $result[$typ .'_'. $index] = $this->zkontrolujISDS($config);
                         if ( count($result[$typ .'_'. $index])>0 ) {
-                            $this->flashMessage('Z ISDS schránky "'.$config['ucet'].'" bylo přijato '.(count($result[$typ .'_'. $index])).' nových zpráv.');
+                            echo 'Z ISDS schránky "'.$config['ucet'].'" bylo přijato '.(count($result[$typ .'_'. $index])).' nových zpráv.<br/>';
                         } else {
-                            $this->flashMessage('Z ISDS schránky "'.$config['ucet'].'" nebyly zjištěny žádné nové zprávy.');
+                            echo 'Z ISDS schránky "'.$config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
                         }
                     } else if ( $typ == 'email' ) {
                         $result[$typ .'_'. $index] = $this->zkontrolujEmail($config);
                         if ( count($result[$typ .'_'. $index])>0 ) {
-                            $this->flashMessage('Z emailové schránky "'.$config['ucet'].'" bylo přijato '.(count($result[$typ .'_'. $index])).' nových zpráv.');
+                            echo 'Z emailové schránky "'.$config['ucet'].'" bylo přijato '.(count($result[$typ .'_'. $index])).' nových zpráv.<br />';
                         } else {
-                            $this->flashMessage('Z emailové schránky "'.$config['ucet'].'" nebyly zjištěny žádné nové zprávy.');
+                            echo 'Z emailové schránky "'.$config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
                         }
                     }
                 } else {
-                    $this->flashMessage('Není možné zkontrolovat schránku. Neexistuje dané nastavení!','warning');
+                    echo '<span style="color:red">Není možné zkontrolovat schránku. Neexistuje dané nastavení!</span><br />';
                 }
             }
         } else {
@@ -220,9 +226,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     if ( $isds_config['aktivni'] == 1 ) {
                         $result['isds_'.$index] = $this->zkontrolujISDS($isds_config);
                         if ( count($result['isds_'.$index])>0 ) {
-                            $this->flashMessage('Z ISDS schránky "'.$isds_config['ucet'].'" bylo přijato '.(count($result['isds_'.$index])).' nových zpráv.');   
+                            echo 'Z ISDS schránky "'.$isds_config['ucet'].'" bylo přijato '.(count($result['isds_'.$index])).' nových zpráv.<br />';
                         } else {
-                            $this->flashMessage('Z ISDS schránky "'.$isds_config['ucet'].'" nebyly zjištěny žádné nové zprávy.');                                    
+                            echo 'Z ISDS schránky "'.$isds_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
                         }
                     }
                 }
@@ -234,19 +240,122 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     if ( $email_config['aktivni'] == 1 ) {
                         $result['email_'.$index] = $this->zkontrolujEmail($email_config);
                         if ( count($result['email_'.$index])>0 ) {
-                            $this->flashMessage('Z emailové schránky "'.$email_config['ucet'].'" bylo přijato '.(count($result['email_'.$index])).' nových zpráv.');
+                            echo 'Z emailové schránky "'.$email_config['ucet'].'" bylo přijato '.(count($result['email_'.$index])).' nových zpráv.<br />';
                         } else {
-                            $this->flashMessage('Z emailové schránky "'.$email_config['ucet'].'" nebyly zjištěny žádné nové zprávy.');
+                            echo 'Z emailové schránky "'.$email_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
                         }
                     }
                 }
             }
         }
 
+        exit;
 
-        $this->redirect('nove');
-        $this->template->seznam = $result;
 
+    }
+
+    public function actionNactiNoveAjax()
+    {
+        
+        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
+
+        //$user_config = Environment::getVariable('user_config');
+        //$vp = new VisualPaginator($this, 'vp');
+        //$paginator = $vp->getPaginator();
+        //$paginator->itemsPerPage = 2;// isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+
+        $args = array(
+            'where' => array('(ep.stav=0 OR ep.stav=1) AND (ep.epodatelna_typ=0)')
+        );
+        $result = $this->Epodatelna->seznam($args);
+        //$paginator->itemCount = count($result);
+        $seznam = $result->fetchAll();//$paginator->offset, $paginator->itemsPerPage);
+
+        if ( $seznam ) {
+            $zpravy = array();
+            foreach ( $seznam as $zprava ) {
+
+                $zpravy[ $zprava->id ] = $zprava;
+                $prilohy = unserialize($zprava->prilohy);
+                if ( $prilohy ) {
+                    $zpravy[ $zprava->id ]->prilohy = $prilohy;
+                    $prilohy = null;
+                } else if ( $zprava->prilohy == 'a:0:{}' ) {
+                    $zpravy[ $zprava->id ]->prilohy = array();
+                    $prilohy = null;
+                }
+                $identifikator = unserialize($zprava->identifikator);
+                if ( $identifikator ) {
+                    $zpravy[ $zprava->id ]->identifikator = $identifikator;
+                    $identifikator = null;
+                }
+                $doruceno_dne = strtotime($zprava->doruceno_dne);
+                $zpravy[ $zprava->id ]->doruceno_dne_datum = date("j.n.Y", $doruceno_dne);
+                $zpravy[ $zprava->id ]->doruceno_dne_cas = date("G:i:s", $doruceno_dne);
+                $zpravy[ $zprava->id ]->odesilatel = htmlspecialchars($zprava->odesilatel);
+
+                $subjekt = new stdClass();
+                $original = null;
+                if ( !empty($zprava->email_signature) ) {
+                    // Nacteni originalu emailu
+                    if ( !empty( $zprava->file_id ) ) {
+                        $DefaultPresenter = new Epodatelna_DefaultPresenter();
+                        $original = $DefaultPresenter->nactiEmail($zprava->file_id);
+                    }
+
+                    $subjekt->nazev_subjektu = $zprava->odesilatel;
+                    $subjekt->prijmeni = @$original['zprava']->from->personal;
+                    $subjekt->email = @$original['zprava']->from->email;
+
+                    if ( $original['signature']['signed'] >= 0 ) {
+
+                        $subjekt->nazev_subjektu = $original['signature']['cert_info']['organizace'];
+                        $subjekt->prijmeni = $original['signature']['cert_info']['jmeno'];
+                        if ( !empty($original['signature']['cert_info']['email']) && $subjekt->email != $original['signature']['cert_info']['email'] ) {
+                            $subjekt->email = $subjekt->email ."; ". $original['signature']['cert_info']['email'];
+                        }
+                        $subjekt->adresa_ulice = $original['signature']['cert_info']['adresa'];
+                    }
+
+                    $SubjektModel = new Subjekt();
+                    $subjekt_databaze = $SubjektModel->hledat($subjekt,'email');
+                    $zpravy[ $zprava->id ]->subjekt = array('original'=>$subjekt,'databaze'=>$subjekt_databaze);
+
+                } else if ( !empty($zprava->isds_signature) ) {
+                    // Nacteni originalu DS
+                    if ( !empty( $zprava->file_id ) ) {
+                        $DefaultPresenter = new Epodatelna_DefaultPresenter();
+                        $file_id = explode("-",$zprava->file_id);
+                        $original = $DefaultPresenter->nactiISDS($file_id[0]);
+                        $original = unserialize($original);
+
+                        // odebrat obsah priloh, aby to neotravovalo
+                        unset($original->dmDm->dmFiles);
+
+                        //echo "<pre>"; print_r($original); exit;
+
+                    }
+
+                    $subjekt->id_isds = $original->dmDm->dbIDSender;
+                    $subjekt->nazev_subjektu = $original->dmDm->dmSender;
+                    $subjekt->type = ISDS_Spisovka::typDS($original->dmDm->dmSenderType);
+                    $subjekt->adresa_ulice = $original->dmDm->dmSenderAddress;
+
+                    $SubjektModel = new Subjekt();
+                    $subjekt_databaze = $SubjektModel->hledat($subjekt,'isds');
+                    $zpravy[ $zprava->id ]->subjekt = array('original'=>$subjekt,'databaze'=>$subjekt_databaze);
+
+                }
+
+            }
+        } else {
+            $zpravy = null;
+        }
+
+        //echo "<pre>"; print_r($zpravy); echo "</pre>"; exit;
+
+        echo json_encode($zpravy);
+        exit;
 
     }
 
@@ -391,7 +500,7 @@ dmFiles = objekt
                         $zprava['prijato_dne'] = new DateTime();
                         $zprava['doruceno_dne'] = new DateTime($z->dmAcceptanceTime);
                         $zprava['prijal_kdo'] = $user->id;
-                        $zprava['prijal_info'] = serialize($user->identity);
+                        //$zprava['prijal_info'] = serialize($user->identity);
 
                         $zprava['sha1_hash'] = '';
 
@@ -457,11 +566,11 @@ dmFormat =
                             if ( $file = $UploadFile->uploadEpodatelna(serialize($mess), $data) ) {
                                 // ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['source_id'] = $file->id ."-". $file_o->id;
+                                $zprava['file_id'] = $file->id ."-". $file_o->id;
                                 $this->Epodatelna->update(
                                         array('stav'=>1,
                                               'stav_info'=>$zprava['stav_info'],
-                                              'source_id'=>$file->id ."-". $file_o->id
+                                              'file_id'=>$file->id ."-". $file_o->id
                                             ),
                                         array(array('id=%i',$epod_id))
                                 );
@@ -547,7 +656,7 @@ dmFormat =
                         $zprava['prijato_dne'] = new DateTime();
                         $zprava['doruceno_dne'] = new DateTime( date('Y-m-d H:i:s',$z->udate) );
                         $zprava['prijal_kdo'] = $user->id;
-                        $zprava['prijal_info'] = serialize($user->identity);
+                        //$zprava['prijal_info'] = serialize($user->identity);
 
                         $zprava['sha1_hash'] = sha1($mess->source);
 
@@ -571,7 +680,7 @@ dmFormat =
                         //$zprava['source'] = $z;
                         //unset($mess->source);
                         //$zprava['source'] = $mess;
-                        $zprava['source_id'] = null;
+                        $zprava['file_id'] = null;
 
                         if ( $epod_id = $this->Epodatelna->insert($zprava) ) {
 
@@ -586,11 +695,11 @@ dmFormat =
                             if ( $file = $UploadFile->uploadEpodatelna($mess->source, $data) ) {
                                 // ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['source_id'] = $file->id;
+                                $zprava['file_id'] = $file->id;
                                 $this->Epodatelna->update(
                                         array('stav'=>1,
                                               'stav_info'=>$zprava['stav_info'],
-                                              'source_id'=>$file->id
+                                              'file_id'=>$file->id
                                             ),
                                         array(array('id=%i',$epod_id))
                                 );
@@ -621,17 +730,17 @@ dmFormat =
         }
     }
 
-    public function nactiISDS($source_id)
+    public function nactiISDS($file_id)
     {
         $storage_conf = Environment::getConfig('storage');
         eval("\$DownloadFile = new ".$storage_conf->type."();");
 
-        if ( strpos($source_id,"-") !== false ) {
-            list($source_id, $part) = explode("-",$source_id);
+        if ( strpos($file_id,"-") !== false ) {
+            list($file_id, $part) = explode("-",$file_id);
         }
 
         $FileModel = new FileModel();
-        $file = $FileModel->getInfo($source_id);
+        $file = $FileModel->getInfo($file_id);
         $res = $DownloadFile->download($file,1);
         if ( $res >= 1 ) {
             return null;
@@ -642,18 +751,18 @@ dmFormat =
 
     }
 
-    public function nactiEmail($source_id, $output = 0)
+    public function nactiEmail($file_id, $output = 0)
     {
 
         $storage_conf = Environment::getConfig('storage');
         eval("\$DownloadFile = new ".$storage_conf->type."();");
 
-        if ( strpos($source_id,"-") !== false ) {
-            list($source_id,$part) = explode("-",$source_id);
+        if ( strpos($file_id,"-") !== false ) {
+            list($file_id,$part) = explode("-",$file_id);
         }
 
         $FileModel = new FileModel();
-        $file = $FileModel->getInfo($source_id);
+        $file = $FileModel->getInfo($file_id);
         $res = $DownloadFile->download($file,2);
 
         if ( $output == 1 ) {

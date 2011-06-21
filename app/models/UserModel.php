@@ -112,20 +112,24 @@ class UserModel extends BaseModel
         }
     }
 
-    public function pridatUcet($osoba_id, $data) {
-
-        //$transaction = (! dibi::inTransaction());
-        //if ($transaction)
-        //dibi::begin();
-
+    public function insert(array $data)
+    {
+        
         $rown = array('username'=>$data['username'],
                       'password'=>sha1($data['username'] . $data['heslo']),
                       'date_created'=> new DateTime(),
+                      'local' => (isset($data['local'])?$data['local']:0),
                       'active'=>1
                 );
-        $user_id = $this->insert($rown);
 
-        if ( $user_id ) {
+        return parent::insert($rown);
+
+    }
+
+    public function pridatUcet($user_id, $osoba_id, $role_id) {
+
+        if ( !empty($user_id) && !empty($osoba_id) && !empty($role_id) ) {
+            
             $Osoba2User = new Osoba2User();
             $rowou = array( 'osoba_id'=>$osoba_id, 
                             'user_id'=>$user_id,
@@ -134,14 +138,12 @@ class UserModel extends BaseModel
             $Osoba2User->insert_basic($rowou);
 
             $User2Role = new User2Role();
-            $rowur = array( 'role_id'=>$data['role'],
+            $rowur = array( 'role_id'=>$role_id,
                             'user_id'=>$user_id,
                             'date_added'=>new DateTime()
                     );
             $User2Role->insert_basic($rowur);
 
-            //if ($transaction)
-            //dibi::commit();
 
             return true;
         } else {
@@ -186,13 +188,19 @@ class UserModel extends BaseModel
         return $ret;
     }
 
-    public function zmenitHeslo($user_id, $password) {
+    public function zmenitHeslo($user_id, $password, $local = null) {
 
         $user = $this->fetchRow(array('id=%i',$user_id))->fetch();
 
         $row = array( 'password'=>sha1($user->username . $password),
                       'last_modified'=> new DateTime()
                 );
+
+        if ( !is_null($local) ) {
+            $row['local'] = $local;
+        }
+
+        //Debug::dump($row); exit;
 
         return $this->update($row,array('id=%i',$user_id));
 
@@ -208,9 +216,33 @@ class UserModel extends BaseModel
     }
 
     public function  deleteAll() {
-        parent::deleteAll();
+
+        $Workflow = new Workflow();
+        $Workflow->update(
+                array('user_id'=>null,'prideleno_id'=>null),
+                array('1')
+        );
+
+        $CJ = new CisloJednaci();
+        $CJ->update(array('user_id'=>null),array('user_id IS NOT NULL'));
+
+        $Dokument = new Dokument();
+        $Dokument->update(
+                array('user_created'=>null,'user_modified'=>null),
+                array('1')
+        );
+        $DokumentH = new DokumentHistorie();
+        $DokumentH->update(
+                array('user_created'=>null,'user_modified'=>null),
+                array('1')
+        );
+
+
         $User2Role = new User2Role();
         $User2Role->deleteAll();
+
+
+        parent::deleteAll();
     }
 }
 

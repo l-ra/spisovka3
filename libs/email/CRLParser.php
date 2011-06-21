@@ -77,6 +77,7 @@ class CRLParser extends DERParser {
 
         $data = $this->sourceCRL($url);
         $der = $this->parse($data);
+
         $out = $this->decode($der);
         if ( $this->cached ) {
             $hash = md5($url);

@@ -9,60 +9,47 @@ class Subjekt extends BaseModel
     private $staty = array();
     
     
-    public function getInfo($subjekt_id, $subjekt_version=null)
+    public function getInfo($subjekt_id)
     {
 
-        if ( !is_null($subjekt_version) ) {
-            $result = $this->fetchRow(array(
-                                         array('id=%i',$subjekt_id),
-                                         array('version=%i',$subjekt_version)
-                                           )
-                                     );
-        } else {
-            $result = $this->fetchAll(array('version'=>'DESC'),array(array('id=%i',$subjekt_id)),null,1);
-        }
+        $result = $this->fetchRow(array('id=%i',$subjekt_id));
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 
     }
 
-    public function getMax()
+    public function ulozit($data, $subjekt_id = null)
     {
 
-        $result = $this->fetchAll(array('id'=>'DESC'),null,null,1);
-        $row = $result->fetch();
-        return ($row) ? ($row->id+1) : 1;
-
-    }
-
-    public function insert_version($data,$subjekt_id=null) {
-
-        //$transaction = (! dibi::inTransaction());
-        //if ($transaction)
-        //dibi::begin();
-
         if ( !is_null($subjekt_id) ) {
-            // vytvoreni nove verze
-            $update = array('stav%sql'=>'stav+100');
-            $this->update($update, array('id=%i',$subjekt_id));
-            $last_row = $this->getInfo($subjekt_id);
 
-            $data['id'] = $last_row->id;
-            $data['version'] = $last_row->version + 1;
+            // ulozit do historie
+            $old_data = (array) $this->getInfo($subjekt_id);
+            $old_data['subjekt_id'] = $subjekt_id;
+            $old_data['user_created'] = Environment::getUser()->getIdentity()->id;
+            $old_data['date_created'] = new DateTime();
+            unset($old_data['id'],$old_data['user_modified'],$old_data['date_modified']);
+            $SubjektHistorie = new SubjektHistorie();
+            $SubjektHistorie->insert($old_data);
+
+            // aktualizovat
+            $data['date_modified'] = new DateTime();
+            $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+            $this->update($data, array(array('id = %i',$subjekt_id)));
+
         } else {
-            // vytvoreni noveho zaznamu
-            $data['id'] = $this->getMax();
-            $data['version'] = 1;
+
+            // insert
+            $data['date_created'] = new DateTime();
+            $data['user_created'] = Environment::getUser()->getIdentity()->id;
+            $data['date_modified'] = new DateTime();
+            $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+            $subjekt_id = $this->insert($data);
+            
         }
 
-        $this->insert_basic($data);
-
-        //if ($transaction)
-        //dibi::commit();
-
-        $new_row = $this->getInfo($data['id']);
-        if ( $new_row ) {
-            return $data['id'];
+        if ( $subjekt_id ) {
+            return $subjekt_id;
         } else {
             return false;
         }
@@ -73,23 +60,11 @@ class Subjekt extends BaseModel
         if ( is_array($data) ) {
             
             $subjekt_id = $data['id'];
-            $subjekt_version = $data['version'];
-            unset($data['id'],$data['version']);
+            unset($data['id']);
             $data['date_modified'] = new DateTime();
+            $data['user_modified'] = Environment::getUser()->getIdentity()->id;
 
-            //$transaction = (! dibi::inTransaction());
-            //if ($transaction)
-            //dibi::begin();
-
-            // aktualni verze
-            $this->update($data, array(array('stav<100'), array('id=%i',$subjekt_id)) );
-
-            // ostatni verze
-            $data['stav'] = $data['stav'] + 100;
-            $this->update($data, array(array('stav>=100'), array('id=%i',$subjekt_id)) );
-
-            //if ($transaction)
-            //dibi::commit();
+            $this->update($data, array(array('id=%i',$subjekt_id)) );
 
             return true;
             
@@ -110,7 +85,7 @@ class Subjekt extends BaseModel
                 $sql = array(
                     'distinct'=>1,
                     'cols'=>$cols,
-                    'order'=> array('version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
+                    'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
 
                 if ( strpos($data->email,";")!==false ) {
@@ -159,7 +134,7 @@ class Subjekt extends BaseModel
                         array("CONCAT(prijmeni,' ',jmeno) LIKE %s",'%'.$data->nazev_subjektu.'%'),
                         array("CONCAT(jmeno,' ',prijmeni) LIKE %s",'%'.$data->nazev_subjektu.'%')
                     ),
-                    'order'=> array('version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
+                    'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
                 $fetch = $this->fetchAllComplet($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
@@ -174,7 +149,7 @@ class Subjekt extends BaseModel
                     'distinct'=>1,
                     'cols'=>$cols,
                     'where'=> array( array('id_isds LIKE %s','%'.$data->id_isds.'%') ),
-                    'order'=> array('version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
+                    'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
                 $fetch = $this->fetchAllComplet($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
@@ -190,7 +165,7 @@ class Subjekt extends BaseModel
                         array("CONCAT(prijmeni,' ',jmeno) LIKE %s",'%'.$data->nazev_subjektu.'%'),
                         array("CONCAT(jmeno,' ',prijmeni) LIKE %s",'%'.$data->nazev_subjektu.'%')
                     ),
-                    'order'=> array('version'=>'DESC','nazev_subjektu','prijmeni','jmeno')
+                    'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
                 $fetch = $this->fetchAllComplet($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
@@ -202,6 +177,7 @@ class Subjekt extends BaseModel
         if ( count($result)>0 ) {
             foreach ($result as $subjekt) {
                 $tmp[ $subjekt->id ] = $this->getInfo($subjekt->id);
+                $tmp[ $subjekt->id ]->full_name = Subjekt::displayName($tmp[ $subjekt->id ],'full');
             }
             return $tmp;
         } else {
@@ -216,7 +192,7 @@ class Subjekt extends BaseModel
         if ( isset($args['where']) ) {
             $where = array($args['where']);
         } else {
-            $where = array(array('stav<100'));
+            $where = null;
         }
 
         if ( isset($args['order']) ) {
@@ -492,9 +468,25 @@ class Subjekt extends BaseModel
         } else {
             return null;
         }
-
-
-
     }
+
+    public function  deleteAll() {
+
+        $DokumentSubjekt = new DokumentSubjekt();
+        $DokumentSubjekt->deleteAll();
+
+        $SubjektHistorie = new SubjektHistorie();
+        $SubjektHistorie->deleteAll();
+
+        parent::deleteAll();
+    }
+
+}
+
+class SubjektHistorie extends BaseModel
+{
+
+    protected $name = 'subjekt_historie';
+    protected $primary = 'id';
 
 }

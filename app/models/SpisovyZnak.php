@@ -1,11 +1,13 @@
 <?php
 
-class SpisovyZnak extends BaseModel
+class SpisovyZnak extends TreeModel
 {
 
     protected $name = 'spisovy_znak';
     protected $primary = 'id';
     protected $tb_spoudalost = 'spousteci_udalost';
+
+    protected static $spousteci_udalost;
 
 
     public function __construct() {
@@ -13,12 +15,28 @@ class SpisovyZnak extends BaseModel
         $prefix = Environment::getConfig('database')->prefix;
         $this->name = $prefix . $this->name;
         $this->tb_spoudalost = $prefix . $this->tb_spoudalost;
-
         
     }
 
+    public function seznam($args = null, $select = 0, $spisznak_parent = null )
+    {
 
-   public function getInfo($spisznak_id)
+        $params = null;
+        if ( !is_null($args) ) {
+            $params['where'] = $args['where'];
+        }
+        if ( $select == 5 ) {
+            $params['paginator'] = 1;
+        }
+
+        $params['order'] = array('tb.nazev');
+        return $this->nacti($spisznak_parent, true, true, $params);
+
+        //$result = $this->nacti($spisznak_parent, true, true, $args );
+    }
+
+
+    public function getInfo($spisznak_id)
     {
 
         $sql = array(
@@ -27,7 +45,7 @@ class SpisovyZnak extends BaseModel
             'leftJoin' => array(
                 'spousteci_udalost' => array(
                     'from' => array($this->tb_spoudalost => 'udalost'),
-                    'on' => array('udalost.id=sz.spousteci_udalost'),
+                    'on' => array('udalost.id=sz.spousteci_udalost_id'),
                     'cols' => array('nazev'=>'spousteci_udalost_nazev','stav'=>'spousteci_udalost_stav','poznamka_k_datumu'=>'spousteci_udalost_dtext')
                 ),
             ),
@@ -35,162 +53,35 @@ class SpisovyZnak extends BaseModel
         );
 
         $result = $this->fetchAllComplet($sql);
-        //$result = $this->fetchRow(array('id=%i',$spisznak_id));
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 
     }
 
-    public function seznam($args = null, $select = 0, $spisznak_parent = array(0) )
-    {
-
-        if ( isset($args['where']) ) {
-            $where = array($args['where']);
-        } else {
-            $where = null;// array(array('stav=1'));
-        }
-
-        if ( isset($args['order']) ) {
-            $order = $args['order'];
-        } else {
-            $order = array('sekvence','nazev');
-        }
-
-        if ( isset($args['offset']) ) {
-            $offset = $args['offset'];
-        } else {
-            $offset = null;
-        }
-
-        if ( isset($args['limit']) ) {
-            $limit = $args['limit'];
-        } else {
-            $limit = null;
-        }
-
-
-        $query = $this->fetchAll($order,$where,$offset,$limit);
-        $rows = $query->fetchAll();
-        $rows = $this->setridit($rows, $select, $spisznak_parent);
-
-        return ($rows) ? $rows : NULL;
-
-    }
-
-    public function seznam_pod($spisznak_id, $full = 0, &$tmp = array()) {
-
-        $args = array(
-            'where' => array(
-                'spisznak_parent = %i',$spisznak_id
-            )
-        );
-
-        $ret = $this->seznam($args, ($full==0)?3:0, array($spisznak_id) );
-
-        if ( count($ret)>0 ) {
-            foreach ( $ret as $id => $s ) {
-                $tmp[ $id ] = $s;
-                $this->seznam_pod($id, $full, $tmp);
-            }
-            return $tmp;
-        } else {
-            return null;
-        }
-
-    }
-
-    public function seznam_nad($spisznak_id, $full = 0, &$tmp = array() )
-    {
-
-        $result = $this->_seznam_nad($spisznak_id, $full, $tmp);
-        if ( isset($result[ $spisznak_id ]) ) {
-            unset( $result[ $spisznak_id ] );
-        }
-        
-        return ( count($result)>0 )? $result : null;
-    }
-
-    public function _seznam_nad($spisznak_id, $full = 0, &$tmp = array() )
-    {
-
-        $spisznak = $this->getInfo($spisznak_id);
-        if ( $spisznak ) {
-
-            if ( $full == 1 ) {
-                $tmp[ $spisznak->id ] = $spisznak;
-            } else {
-                $tmp[ $spisznak->id ] = $spisznak->nazev;
-            }
-
-            if ( $spisznak->spisznak_parent != 0 ) {
-                $this->seznam_nad($spisznak->spisznak_parent, $full, $tmp);
-            }
-
-            return $tmp;
-        } else {
-            return null;
-        }
-
-    }
-
-    private function setridit($data, $simple=0, $spisznak_parent = array(0), &$tmp = array() )
-    {
-        if ( count($data)>0 ) {
-            if ( $simple == 1 ) {
-                $tmp[0] = 'vyberte z nabídky ...';
-            } else if ( $simple == 2 ) {
-                $tmp[0] = '(hlavní větev)';
-            } else if ( $simple == 3 ) {
-                $tmp[0] = 'jakýkoli spisový znak';
-            }
-            $spisznak_parent_id = end($spisznak_parent);
-            foreach ( $data as $index => $d ) {
-                if ( $d->spisznak_parent == $spisznak_parent_id ) {
-
-                    $d->parent = $spisznak_parent;
-                    $d->uroven = count($spisznak_parent);
-                    $d->class = ' item'. implode(' item',$spisznak_parent) .'';
-
-                    if ( $simple == 1 || $simple == 2 || $simple == 3 ) {
-                        $nazev = str_repeat(".", 3*$d->uroven) .' '. $d->nazev;
-                        $tmp[ $d->id ] = $nazev;
-                    } else if ( $simple == 3 ) {
-                        $tmp[ $d->id ] = $d->nazev;
-                    } else {
-                        $tmp[ $d->id ] = $d;
-                    }
-
-                    $spisznak_parent[] = $d->id;
-
-                    if ( isset($tmp[ $spisznak_parent_id ] ) ) {
-                        @$tmp[ $spisznak_parent_id ]->potomky = 1;
-                    }
-
-                    $this->setridit($data, $simple, $spisznak_parent, $tmp);
-                    end($spisznak_parent);
-                    unset( $spisznak_parent[ key($spisznak_parent) ] );
-
-                }
-            }
-
-            return $tmp;
-        } else {
-            return null;
-        }
-    }
-
     public function vytvorit($data) {
-        $spisznak_id = $this->insert($data);
+
+        $data['stav'] = 1;
+        $data['date_created'] = new DateTime();
+        $data['user_created'] = Environment::getUser()->getIdentity()->id;
+        $data['date_modified'] = new DateTime();
+        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+
+        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+        if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = 3;
+
+        $spisznak_id = $this->vlozitH($data);
         return $spisznak_id;
     }
 
-    public function upravit($data,$spisznak_id) {
+    public function upravit($data, $spisznak_id) {
 
-        $data['uroven'] = 1;
-        $data['sekvence'] = null;
+        $data['date_modified'] = new DateTime();
+        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
 
-        unset($data['spisznak_parent_old']);
-        $ret = $this->update($data,array('id=%i',$spisznak_id));
+        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+        if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = 3;
+
+        $ret = $this->upravitH($data, $spisznak_id);
 
         return $ret;
 
@@ -203,33 +94,32 @@ class SpisovyZnak extends BaseModel
 
         if ( $potomky == 1 ) {
             // odstranit i potomky
-            $potomci = $this->seznam_pod($spisznak_id);
-            if ( count($potomci)>0 ) {
-                foreach ( $potomci as $id => $sz ) {
-                    if ( is_int($id) ) {
-                        $this->delete(array('id=%i',$id));
-                    }
-                }
-            }
+            return $this->odstranitH($spisznak_id, true);
         } else if ( $potomky == 2 ) {
             // potomky maji noveho rodice
-            $rodic = $this->getInfo($spisznak_id);
-            $this->update(
-                    array('spisznak_parent'=>$rodic->spisznak_parent),
-                    array( array('spisznak_parent=%i',$spisznak_id) )
-            );
+            return $this->odstranitH($spisznak_id);
         }
-
-        return $this->delete(array('id=%i',$spisznak_id));
 
     }
 
     public static function spousteci_udalost( $kod = null, $select = 0 ) {
 
-        $prefix = Environment::getConfig('database')->prefix;
-        $tb_spoudalost = $prefix .'spousteci_udalost';
-        
-        $result = dibi::query('SELECT * FROM %n', $tb_spoudalost)->fetchAssoc('id');
+        if ( empty( self::$spousteci_udalost ) ) {
+
+            $cache = Environment::getCache('db_cache');
+            if (isset($cache['s3_Spousteci_udalost'])) {
+                $result = $cache['s3_Spousteci_udalost'];
+            } else {
+                $prefix = Environment::getConfig('database')->prefix;
+                $tb_spoudalost = $prefix .'spousteci_udalost';
+                $result = dibi::query('SELECT * FROM %n', $tb_spoudalost)->fetchAssoc('id');
+                $cache['s3_Spousteci_udalost'] = $result;
+            }
+
+            self::$spousteci_udalost = $result;
+        } else {
+            $result = self::$spousteci_udalost;
+        }
 
         $tmp = new stdClass();
             $tmp->id = 0;
@@ -254,11 +144,13 @@ class SpisovyZnak extends BaseModel
                     $tmp[ $dt->nazev ] = String::truncate($dt->nazev,90);
                 }
                 return $tmp;
+            } else if ( $select == 10 ) {
+                return '';
             } else {
                 return $result;
             }
         } else {
-            return ( array_key_exists($kod, $result) )?$result[ $kod ]->nazev:'';
+            return ( isset($result[$kod]) )?$result[ $kod ]->nazev:'';
         }
 
     }
@@ -272,7 +164,7 @@ class SpisovyZnak extends BaseModel
         if ( is_null($stav) ) {
             return $stav_array;
         } else {
-            return array_key_exists($stav, $stav_array)?$stav_array[$stav]:null;
+            return isset($stav_array[$stav])?$stav_array[$stav]:null;
         }
 
 

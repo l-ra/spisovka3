@@ -3,9 +3,7 @@
 class LogModel extends BaseModel {
 
     protected $name = 'log_system';
-    protected $tb_logaccess = 'log_access';
-    protected $tb_logdokument = 'log_dokument';
-    protected $tb_user = 'user';
+
 
     const DOK_UNDEFINED = 00;
 
@@ -76,16 +74,6 @@ class LogModel extends BaseModel {
 
     );
 
-    public function  __construct() {
-
-        $prefix = Environment::getConfig('database')->prefix;
-        $this->name = $prefix . $this->name;
-        $this->tb_logaccess = $prefix . $this->tb_logaccess;
-        $this->tb_logdokument = $prefix . $this->tb_logdokument;
-        $this->tb_user = $prefix . $this->tb_user;
- 
-    }
-
     /* ***********************************************************************
      * Logovani aktivity dokumentu
      */
@@ -99,7 +87,6 @@ class LogModel extends BaseModel {
         
         $user = Environment::getUser()->getIdentity();
         $row['user_id'] = $user->id;
-        $row['user_info'] = serialize($user->identity);
         $row['date'] = new DateTime();
 
         return dibi::insert($this->tb_logdokument, $row)
@@ -111,6 +98,8 @@ class LogModel extends BaseModel {
 
         $res = dibi::query(
             'SELECT * FROM %n ld', $this->tb_logdokument,
+            'LEFT JOIN %n ou', $this->tb_osoba_to_user ,'ON ou.user_id=ld.user_id',
+            'LEFT JOIN %n o', $this->tb_osoba ,'ON o.id=ou.osoba_id',
             '%if', !is_null($dokument_id), 'WHERE %and', !is_null($dokument_id) ? array(array('ld.dokument_id=%i',$dokument_id)) : array(), '%end',
             'ORDER BY ld.date'
         );
@@ -157,6 +146,10 @@ class LogModel extends BaseModel {
 
     public function  deleteAllDokument() {
         return dibi::query('TRUNCATE ['.$this->tb_logdokument.'];');
+    }
+
+    public function  deleteDokument( $dokument_id ) {
+        return dibi::delete($this->tb_logdokument)->where(array(array('dokument_id=%i',$dokument_id)))->execute();
     }
 
 

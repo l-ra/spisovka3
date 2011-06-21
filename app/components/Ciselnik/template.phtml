@@ -1,0 +1,35 @@
+<div class="ciselnik">
+
+    <div class="blok_menu">
+        <a href="{$link}?ciselnik_new=1">Nový záznam</a>
+    </div>
+
+{if count($data)>0}
+    <table>
+        <tr>
+    {foreach $cols as $col_name => $col_params}
+            <th>{$col_params['title']}</th>
+    {/foreach}
+        </tr>
+    {foreach $data as $row}
+        <tr>
+    {foreach $cols as $col_name => $col_params}
+            <td>
+                {if $col_params['link']}
+                <a href="{$link}?primary={$row->$primary}">{if empty($row->$col_name)}(bez názvu){else}{$row->$col_name}{/if}</a>
+                {else}
+                {$row->$col_name}
+                {/if}
+
+            </td>
+    {/foreach}
+        </tr>
+    {/foreach}
+
+        
+        
+    </table>
+{else}    
+<div class="ciselnik_noresult">Nenalezeny žádné data.</div>    
+{/if}
+</div>

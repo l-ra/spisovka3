@@ -14,18 +14,15 @@
         <tr>
             <th>Název role</th>
             <th>Popis</th>
-            <th>Kódové označení</th>
-            <th>Dědí z role</th>
         </tr>
         {foreach $seznam as $role}
-        <tr>
-            <td><a href="{vlink :Admin:Opravneni:detail, 'id'=>$role->id}">{$role->name}</a></td>
+        <tr class="item{=str_replace("."," item",$role->sekvence)}" id="sitem{$role->id}">
+            <td>{!=str_repeat("&nbsp;", 5*$role->uroven)}<a href="{vlink :Admin:Opravneni:detail, 'id'=>$role->id}">{$role->name}</a></td>
             <td>{!$role->note|enl2br}</td>
-            <td>{$role->code}</td>
-            <td>{$role->parent_name}</td>
         </tr>
         {/foreach}
     </table>
+    {widget vp}
     {else}
     <div class="prazdno">Nebyly zjištěny žádné role.</div>
     {/if}

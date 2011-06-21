@@ -36,6 +36,14 @@ body {
     color: #681203;
 }
 
+#top_jmeno a {
+    color: #681203;
+}
+
+#top_jmeno a:hover {
+    color: #FFC273;
+}
+
 /* ***************************************************************** */
 /* *** CONTENT LAYOUT *** */
 #layout {
@@ -69,6 +77,33 @@ body {
     text-align: left;
     color: #ffffff;
     border: 1px #681203 solid;
+}
+
+
+#content table.ciselnik_seznam {
+    border: 0px;
+    margin: 20px;
+}
+
+#content table.ciselnik_seznam td {
+    border: 0px;
+}
+
+#content table.ciselnik_seznam .icon {
+    width: 42px;
+}
+
+#content table.ciselnik_seznam .meta {
+    padding: 10px;
+}
+
+#content table.ciselnik_seznam .meta a {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+#content table.ciselnik_seznam .meta div {
+    margin: 5px 0px;
 }
 
 
@@ -109,8 +144,64 @@ body {
     color: #FFC273;
     font-size: 10pt;
     background: #681203 url() repeat-x;
-    white-space: pre;
-    font-family: monospace;
 }
 
+#debug_head {
+    color: #ffffff;
+}
 
+#debug_head strong {
+    color: #FFC273;
+}
+
+#debug_info {
+    float:left;
+    margin-right: 10px;
+}
+#debug_route {
+    float:left;
+    margin-right: 10px;
+}
+#debug_time {
+    float:left;
+    margin-right: 10px;
+}
+#debug_memory {
+    float:left;
+    margin-right: 10px;
+}
+#debug_sql {
+    float:left;
+    margin-right: 10px;
+}
+
+#debug_body {
+    background-color: #681203;
+}
+
+#debug_body_info {
+    white-space: pre;
+    font-family: monospace;
+    background-color: #ffffff;
+    color: #000000;
+    margin: 10px; padding: 10px;
+}
+
+#debug_body_route {
+    white-space: pre;
+    font-family: monospace;
+    background-color: #ffffff;
+    color: #000000;
+    margin: 10px; padding: 10px;
+}
+
+#debug_body_sql {
+    background-color: #ffffff;
+    color: #000000;
+    margin: 10px; padding: 10px;
+}
+
+.debug_body_sql_item {
+    padding: 10px;
+    border-bottom: 1px #c0c0c0 solid;
+}

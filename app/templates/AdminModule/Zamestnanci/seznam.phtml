@@ -1,4 +1,4 @@
-{block title}Seznam dokumentů{/block}
+{block title}Seznam zaměstnanaců{/block}
 {block content}
     <div class="navigate">
     Seznam zaměstnanců
@@ -8,6 +8,8 @@
 
     <div class="blok_menu">
         <a href="{link :Admin:Zamestnanci:novy}">Nový zaměstnanec</a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="{link :Admin:Zamestnanci:sync}">Přidat zaměstnance přes externí zdroj</a>
     </div>
 
     {if count($seznam)>0}

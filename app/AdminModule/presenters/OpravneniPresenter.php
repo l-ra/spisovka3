@@ -7,8 +7,20 @@ class Admin_OpravneniPresenter extends BasePresenter
     {
         $this->template->title = " - Seznam rolí";
 
+        $user_config = Environment::getVariable('user_config');
+        $vp = new VisualPaginator($this, 'vp');
+        $paginator = $vp->getPaginator();
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+
         $RoleModel = new RoleModel();
-        $seznam = $RoleModel->seznam();
+        $params = array(
+            'paginator' => 1,
+            'order' => array('name')
+        );
+        //$result = $RoleModel->seznam(2);
+        $result = $RoleModel->nacti(null, true, true, $params);
+        $paginator->itemCount = count($result);
+        $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         $this->template->seznam = $seznam;
 
     }
@@ -170,15 +182,17 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         $RoleModel = new RoleModel();
         $data['active'] = 1;
+        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
         $data['date_created'] = new DateTime();
 
-        try {
+        //try {
             $role_id = $RoleModel->vlozit($data);
             $this->flashMessage('Role  "'. $data['name'] .'" byla vytvořena.');
             $this->redirect(':Admin:Opravneni:detail',array('id'=>$role_id));
-        } catch (DibiException $e) {
-            $this->flashMessage('Roli "'. $data['name'] .'" se nepodařilo vytvořit.','warning');
-        }
+        //} catch (DibiException $e) {
+        //    $this->flashMessage('Roli "'. $data['name'] .'" se nepodařilo vytvořit.','warning');
+        //    $this->flashMessage($e->getMessage(),'warning');
+       // }
     }
 
 /**
@@ -224,7 +238,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $AclModel = new AclModel();
-        $role_id = $data['id'];
+        $role_id = (int) $data['id'];
         unset($data['id']);
         $RoleModel = new RoleModel();
         $role = $RoleModel->getInfo($role_id);
@@ -282,6 +296,7 @@ class Admin_OpravneniPresenter extends BasePresenter
                 $new = array('role_id'=>$role_id,
                              'rule_id'=>$rule_id,
                              'allowed'=>$allowed);
+
                 $AclModel->insertAcl($new);
 
             }

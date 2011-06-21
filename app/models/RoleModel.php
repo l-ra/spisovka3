@@ -1,10 +1,27 @@
 <?php
 
-class RoleModel extends BaseModel
+class RoleModel extends TreeModel
 {
 
     protected $name = 'user_role';
+    protected $nazev = 'name';
+    protected $nazev_sekvence = 'code';
     protected $primary = 'id';
+
+    protected $cache;
+
+    public function  __construct() {
+
+        parent::__construct();
+
+        if ( defined('DB_CACHE') ) {
+            $this->cache = DB_CACHE;
+        } else {
+            $this->cache = Environment::getConfig('database')->cache;
+        }
+
+    }
+
 
 
     public function seznam($simple=0,$sql=null) {
@@ -21,9 +38,6 @@ class RoleModel extends BaseModel
                     }
                 }
             }
-
-
-
         }
 
 
@@ -42,6 +56,8 @@ class RoleModel extends BaseModel
                 $tmp[ $r->id ] = $r->name;
             }
             return $tmp;
+        } else if ( $simple == 2 ) {
+            return $query;
         } else {
             return $query->fetchAll();
         }
@@ -59,22 +75,46 @@ class RoleModel extends BaseModel
 
     }
 
+    public function getRoleByOrg($orgjednotka_id, $role_id) {
+
+        $query = dibi::query(
+            'SELECT r.*,pr.name parent_name FROM %n r', $this->name,
+            'LEFT JOIN '. $this->name .' pr ON pr.id=r.parent_id',
+            'WHERE r.parent_id=%i', $role_id, ' AND r.orgjednotka_id=%i', $orgjednotka_id
+        );
+
+        return $query->fetch();
+
+    }
+
+
     public function vlozit($data) {
-        $storage = new FileStorage('tmp');
-        $cache = new Cache($storage);
-        unset($cache['s3_Role'],$cache['s3_Permission']);
-        return parent::insert($data);
+
+        if ( $this->cache ) {
+            $cache = Environment::getCache('db_cache');
+            unset($cache['s3_Role'], $cache['s3_Permission']);
+        }
+
+        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+
+        return $this->vlozitH($data);
     }
     public function upravit($data,$where) {
-        $storage = new FileStorage('tmp');
-        $cache = new Cache($storage);
-        unset($cache['s3_Role'],$cache['s3_Permission']);
-        return parent::update($data, $where);
+
+        if ( $this->cache ) {
+            $cache = Environment::getCache('db_cache');
+            unset($cache['s3_Role'], $cache['s3_Permission']);
+        }
+
+        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+
+        return $this->upravitH($data, $where);
     }
     public function smazat($where) {
-        $storage = new FileStorage('tmp');
-        $cache = new Cache($storage);
-        unset($cache['s3_Role'],$cache['s3_Permission']);
+        if ( $this->cache ) {
+            $cache = Environment::getCache('db_cache');
+            unset($cache['s3_Role'], $cache['s3_Permission']);
+        }
         return parent::delete($where);
     }
 

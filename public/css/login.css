@@ -1,0 +1,24 @@
+/* ***************************************************************** */
+/* *** LOGIN CONTENT *** */
+
+#dialog table,
+#content table {
+    border-collapse: collapse;
+    border: 0px;
+    width: 100%;
+}
+
+#dialog table th,
+#content table th {
+    background-color: #f0f0f0;
+    padding: 5px 5px;
+    text-align: left;
+    color: #ffffff;
+    border: 0px;
+}
+
+#dialog table td,
+#content table td {
+    padding: 5px 5px;
+    border: 0px;
+}

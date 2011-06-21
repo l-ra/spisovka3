@@ -1,7 +1,12 @@
 <?php
 
-class Authenticator_BasicS2 extends Object implements IAuthenticator
+class Authenticator_BasicS2 extends Control implements IAuthenticator
 {
+
+    protected $receivedSignal;
+    protected $action;
+    protected $wasRendered = FALSE;
+
     public function authenticate(array $credentials)
     {
 

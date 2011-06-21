@@ -3,16 +3,23 @@
 class Admin_SpisznakPresenter extends BasePresenter
 {
 
+    private $spisznak;
+
     public function renderSeznam()
     {
         $this->template->title = " - Seznam spisových znaků";
 
+        $user_config = Environment::getVariable('user_config');
+        $vp = new VisualPaginator($this, 'vp');
+        $paginator = $vp->getPaginator();
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+
+        $where = null;// array( array('ciselna_rada LIKE %s','ORG_12%') );
+
         $SpisovyZnak = new SpisovyZnak();
-
-        $args = null;// array( 'where'=>array("nazev like %s",'%blue%') );
-
-        $seznam = $SpisovyZnak->seznam($args);
-
+        $result = $SpisovyZnak->seznam($where,5);
+        $paginator->itemCount = count($result);
+        $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         $this->template->seznam = $seznam;
 
     }
@@ -29,15 +36,11 @@ class Admin_SpisznakPresenter extends BasePresenter
         
 
         $this->template->FormUpravit = $this->getParam('upravit',null);
+        $id = $this->getParam('id',null);
 
-        $spisznak_id = $this->getParam('id',null);
         $SpisovyZnak = new SpisovyZnak();
-
-        $spisznak = $SpisovyZnak->getInfo($spisznak_id);
-        $this->template->SpisZnak = $spisznak;
-
-        //$this->template->SpisovyZnakNad = $SpisovyZnak->seznam_nad($spisznak_id,1);
-        //$this->template->SpisovyZnakPod = $SpisovyZnak->seznam_pod($spisznak_id,1);
+        $this->spisznak = $SpisovyZnak->getInfo($id);
+        $this->template->SpisZnak = $this->spisznak;
 
         $this->template->title = " - Detail spisového znaku";
 
@@ -49,7 +52,23 @@ class Admin_SpisznakPresenter extends BasePresenter
         $spisznak_id = $this->getParam('id',null);
         $SpisovyZnak = new SpisovyZnak();
         if ( is_numeric($spisznak_id) ) {
-            $SpisovyZnak->odstranit($spisznak_id, 1);
+            try {
+                $res = $SpisovyZnak->odstranit($spisznak_id, 1);
+                if ( $res == 0 ) {
+                    $this->flashMessage('Spisový znak byl úspěšně odstraněn.');
+                } else if ( $res == -1 ) {
+                    $this->flashMessage('Některý ze spisových znaků je využíván v aplikaci.<br>Z toho důvodu není možné spisové znaky odstranit.','warning_ext');
+                } else {
+                    $this->flashMessage('Spisový znak se nepodařilo odstranit.','warning');
+                }
+            } catch (Exception $e) {
+                if ( $e->getCode() == 1451 ) {
+                    $this->flashMessage('Některý ze spisových znaků je využíván v aplikaci.<br>Z toho důvodu není možné spisové znaky odstranit.','warning_ext');
+                } else {
+                    $this->flashMessage('Spisový znak se nepodařilo odstranit.','warning');
+                    $this->flashMessage($e->getMessage(),'warning');
+                }
+            }
         }
         $this->redirect(':Admin:Spisznak:seznam');
 
@@ -61,7 +80,23 @@ class Admin_SpisznakPresenter extends BasePresenter
         $spisznak_id = $this->getParam('id',null);
         $SpisovyZnak = new SpisovyZnak();
         if ( is_numeric($spisznak_id) ) {
-            $SpisovyZnak->odstranit($spisznak_id, 2);
+            try {
+                $res = $SpisovyZnak->odstranit($spisznak_id, 2);
+                if ( $res !== false ) {
+                    $this->flashMessage('Spisový znak byl úspěšně odstraněn.');
+                } else if ( $res == -1 ) {
+                    $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.','warning_ext');
+                } else {
+                    $this->flashMessage('Spisový znak se nepodařilo odstranit.','warning');
+                }
+            } catch (Exception $e) {
+                if ( $e->getCode() == 1451 ) {
+                    $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.','warning_ext');
+                } else {
+                    $this->flashMessage('Spisový znak se nepodařilo odstranit.','warning');
+                    $this->flashMessage($e->getMessage(),'warning');
+                }
+            }
         }
         $this->redirect(':Admin:Spisznak:seznam');
 
@@ -86,20 +121,16 @@ class Admin_SpisznakPresenter extends BasePresenter
     {
 
         $SpisovyZnak = new SpisovyZnak();
-
-        $spisznak = $this->template->SpisZnak;
+        if ( empty($this->spisznak) ) {
+            $spisznak = $SpisovyZnak->getInfo($this->getParam('id',null));
+        } else {
+            $spisznak = $this->spisznak;
+        }
+        $spisznak_seznam = $SpisovyZnak->select(1, @$spisznak->id);
         $stav_select = SpisovyZnak::stav();
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
-        $spisznak_seznam = $SpisovyZnak->seznam(null,2);
-        $spisznak_seznam_pod = $SpisovyZnak->seznam_pod(@$spisznak->id);
-        $spisznak_seznam_pod[ @$spisznak->id ] = @$spisznak->id;
-        foreach ($spisznak_seznam_pod as $spi => $sp) {
-            if ( array_key_exists($spi, $spisznak_seznam) ) {
-                unset( $spisznak_seznam[ $spi ] );
-            }
-        }
 
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -114,11 +145,13 @@ class Admin_SpisznakPresenter extends BasePresenter
                 ->setValue(@$spisznak->skartacni_znak);
         $form1->addText('skartacni_lhuta', 'Skartační lhůta:', 5, 5)
                 ->setValue(@$spisznak->skartacni_lhuta);
-        $form1->addSelect('spousteci_udalost', 'Spouštěcí událost:', $spousteci)
-                ->setValue(@$spisznak->spousteci_udalost);
+        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci)
+                ->setValue(@$spisznak->spousteci_udalost_id);
 
-        $form1->addSelect('spisznak_parent', 'Připojit k:', $spisznak_seznam)
-                ->setValue(@$spisznak->spisznak_parent);
+        $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam)
+                ->setValue(@$spisznak->parent_id);
+        $form1->addHidden('parent_id_old')
+                ->setValue(@$spisznak->parent_id);
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
                 ->setValue(@$spisznak->stav);
 
@@ -146,8 +179,6 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         $spisznak_id = $data['id'];
         unset($data['id']);
-        $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
 
 
         $SpisovyZnak = new SpisovyZnak();
@@ -166,7 +197,7 @@ class Admin_SpisznakPresenter extends BasePresenter
     public function stornoClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $this->redirect('this',array('id'=>$data['spisznak_id']));
+        $this->redirect('this',array('id'=>$data['id']));
     }
 
     public function stornoSeznamClicked(SubmitButton $button)
@@ -178,11 +209,10 @@ class Admin_SpisznakPresenter extends BasePresenter
     {
 
         $SpisovyZnak = new SpisovyZnak();
-
-        $spisznak_seznam = $SpisovyZnak->seznam(null,2);
-
+        $spisznak_seznam = $SpisovyZnak->select(1);
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
+        //$spisznak_seznam = array();
 
         $form1 = new AppForm();
         $form1->addText('nazev', 'Spisový znak:', 50, 80)
@@ -190,10 +220,8 @@ class Admin_SpisznakPresenter extends BasePresenter
         $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta', 'Skartační lhůta:', 5, 5);
-        $form1->addSelect('spousteci_udalost', 'Spouštěcí událost:', $spousteci);
-
-        $form1->addSelect('spisznak_parent', 'Připojit k:', $spisznak_seznam);
-
+        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
+        $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
         $form1->addSubmit('vytvorit', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -216,9 +244,6 @@ class Admin_SpisznakPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $SpisovyZnak = new SpisovyZnak();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
-        $data['user_created'] = Environment::getUser()->getIdentity()->user_id;
 
         try {
             $spisznak_id = $SpisovyZnak->vytvorit($data);
@@ -226,8 +251,8 @@ class Admin_SpisznakPresenter extends BasePresenter
             $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
         } catch (DibiException $e) {
             $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage($e->getMessage(),'warning');
         }
     }
-
 
 }

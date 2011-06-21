@@ -19,7 +19,6 @@ if ( defined('DEBUG_ENABLE') ) {
     Debug::enable(Debug::DETECT, '%logDir%/php_error.log');
 }
 
-
 // 2b) load configuration from config.ini file
 $basePath = Environment::getHttpRequest()->getUri()->basePath;
 

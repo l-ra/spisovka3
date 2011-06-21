@@ -93,7 +93,7 @@ class Spisovka_SpojitPresenter extends BasePresenter
         $spojit_s = $this->getParam('spojeny',null);
 
         $Souvisejici = new SouvisejiciDokument();
-        $param = array( array('dokument_id=%i',$dokument_id),array('spojit_s=%i',$spojit_s) );
+        $param = array( array('dokument_id=%i',$dokument_id),array('spojit_s_id=%i',$spojit_s) );
 
         if ( $Souvisejici->odebrat($param) ) {
             $this->flashMessage('Spojený dokument byl odebrán z dokumentu.');

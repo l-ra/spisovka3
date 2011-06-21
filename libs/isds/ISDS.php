@@ -948,7 +948,7 @@ class ISDS {
             $ListOfRecOutput = $this->InfoWS()->GetListOfReceivedMessages($ListOfReceivedInput);
             $this->StatusCode = $ListOfRecOutput->dmStatus->dmStatusCode;
             $this->StatusMessage = $ListOfRecOutput->dmStatus->dmStatusMessage;
-            $ListOfRecOutput->dmRecords->dmRecord = $this->PrepareArray($ListOfRecOutput->dmRecords->dmRecord);
+            $ListOfRecOutput->dmRecords->dmRecord = @$this->PrepareArray(@$ListOfRecOutput->dmRecords->dmRecord);
             return $ListOfRecOutput->dmRecords;
             
         } catch (Exception $e) {

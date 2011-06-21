@@ -44,7 +44,7 @@
             <dt>{$h->date|edatetime}</dt>
             <dd>{!=LogModel::typ($h->typ)}</dd>
             {if !empty($h->poznamka)}<dd class="normal">{$h->poznamka}</dd>{/if}
-            <dd class="normal">provedl: <?php $user = unserialize($h->user_info); echo Osoba::displayName($user); ?></dd>
+            <dd class="normal">provedl: <?php echo Osoba::displayName($h); ?></dd>
         </dl>
         {/foreach}
     </div>

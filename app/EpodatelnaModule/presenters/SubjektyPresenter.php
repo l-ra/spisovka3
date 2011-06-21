@@ -9,7 +9,7 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
     public function renderVyber()
     {
 
-        $this->template->spis_id = $this->getParam('id',null);
+        $this->template->subjekt_id = $this->getParam('id',null);
         $this->template->epodatelna_id = $this->getParam('epod_id',null);
         
         $Subjekt = new Subjekt();
@@ -60,6 +60,63 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         }
     }
 
+    public function actionVytvoritAjax()
+    {
+
+        $data = $this->getHttpRequest()->getPost();
+
+        //echo "<pre>"; print_r($data); exit;
+
+        if ( isset($data['id']) ) {
+            // pouze jedno
+
+            if ( empty($data['subjekt_nazev'][$data['id']]) ) {
+                $typ = 'FO';
+            } else {
+                $typ = 'OVM';
+            }
+
+            $vytvorit = array(
+                'type'=>$typ,
+                'ic'=>'',
+                'nazev_subjektu' => ( !empty($data['subjekt_nazev'][$data['id']])?$data['subjekt_nazev'][$data['id']]:"" ),
+                'jmeno' => ( !empty($data['subjekt_prijmeni'][$data['id']])?$data['subjekt_prijmeni'][$data['id']]:"" ),
+                'prijmeni' => ( !empty($data['subjekt_jmeno'][$data['id']])?$data['subjekt_jmeno'][$data['id']]:"" ),
+                'adresa_ulice' => ( !empty($data['subjekt_ulice'][$data['id']])?$data['subjekt_ulice'][$data['id']]:"" ),
+                'adresa_cp' => ( !empty($data['subjekt_cp'][$data['id']])?$data['subjekt_cp'][$data['id']]:"" ),
+                'adresa_mesto' => ( !empty($data['subjekt_mesto'][$data['id']])?$data['subjekt_mesto'][$data['id']]:"" ),
+                'adresa_psc' => ( !empty($data['subjekt_psc'][$data['id']])?$data['subjekt_psc'][$data['id']]:"" ),
+                'email' => ( !empty($data['subjekt_email'][$data['id']])?$data['subjekt_email'][$data['id']]:"" ),
+                'id_isds' => ( !empty($data['subjekt_isds'][$data['id']])?$data['subjekt_isds'][$data['id']]:"" ),
+                'adresa_stat' => "CZE",
+                'telefon'=>'',
+            );
+
+            //echo "<pre>"; print_r($vytvorit); exit;
+
+            $Subjekt = new Subjekt();
+
+            try {
+                $subjekt_id = $Subjekt->ulozit($vytvorit);
+                $subjekt_info = $Subjekt->getInfo($subjekt_id);
+
+                if ( $subjekt_info ) {
+                    echo $subjekt_info->id ."#". Subjekt::displayName($subjekt_info, 'full');
+                } else {
+                    echo "#Subjekt se nepodařil vytvořit.";
+                }
+
+            } catch (DibiException $e) {
+                echo "#Subjekt se nepodařil vytvořit.";
+            }
+        } else {
+            echo "#Subjekt nebyl přidán! Nepodařilo se zjístit ID zprávy.";
+        }
+
+        exit;
+
+    }
+
     public function actionNovy()
     {
         /* Nacteni zpravy */
@@ -76,9 +133,9 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
                 $original = null;
                 if ( !empty($zprava->email_signature) ) {
                     // Nacteni originalu emailu
-                    if ( !empty( $zprava->source_id ) ) {
+                    if ( !empty( $zprava->file_id ) ) {
                         $DefaultPresenter = new Epodatelna_DefaultPresenter();
-                        $original = $DefaultPresenter->nactiEmail($zprava->source_id);
+                        $original = $DefaultPresenter->nactiEmail($zprava->file_id);
                     }
 
                     $subjekt->nazev = $zprava->odesilatel;
@@ -105,20 +162,14 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
     public function actionUpravit()
     {
         $subjekt_id = $this->getParam('id',null);
-        //$dokument_id = $this->getParam('dok_id',null);
         $epodatelna_id = $this->getParam('epod_id',null);
 
         $this->template->FormUpravit = $this->getParam('upravit',null);
-        if ( strpos($subjekt_id, '-')!==false ) {
-            list($subjekt_id, $subjekt_version) = explode('-',$subjekt_id);
-        } else {
-            $subjekt_version = null;
-        }
-        $Subjekt = new Subjekt();
 
-        $subjekt = $Subjekt->getInfo($subjekt_id, $subjekt_version);
+        $Subjekt = new Subjekt();
+        $subjekt = $Subjekt->getInfo($subjekt_id);
+        
         $this->template->Subjekt = $subjekt;
-        //$this->template->dokument_id = $dokument_id;
         $this->template->epodatelna_id = $epodatelna_id;
 
 
@@ -128,14 +179,9 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
     {
         $this->template->FormUpravit = $this->getParam('upravit',null);
         $subjekt_id = $this->getParam('id',null);
-        if ( strpos($subjekt_id, '-')!==false ) {
-            list($subjekt_id, $subjekt_version) = explode('-',$subjekt_id);
-        } else {
-            $subjekt_version = null;
-        }
-        $Subjekt = new Subjekt();
 
-        $subjekt = $Subjekt->getInfo($subjekt_id, $subjekt_version);
+        $Subjekt = new Subjekt();
+        $subjekt = $Subjekt->getInfo($subjekt_id);
         $this->template->Subjekt = $subjekt;
 
     }
@@ -181,8 +227,6 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
 
         $form1->addHidden('id')
                 ->setValue(@$subjekt->id);
-        $form1->addHidden('version')
-                ->setValue(@$subjekt->version);
         $form1->addHidden('epodatelna_id')
                 ->setValue(@$this->template->epodatelna_id);
 
@@ -266,19 +310,14 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $subjekt_id = $data['id'];
-        $subjekt_version = $data['version'];
-        //$dokument_id = $data['dokument_id'];
         $epodatelna_id = $data['epodatelna_id'];
         $smer = 0;
-        unset($data['id'],$data['version'],$data['epodatelna_id']);
+        unset($data['id'],$data['epodatelna_id']);
 
         $Subjekt = new Subjekt();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
-        $data['user_added'] = Environment::getUser()->getIdentity()->id;
 
         try {
-            $subjekt_id = $Subjekt->insert_version($data, $subjekt_id);
+            $subjekt_id = $Subjekt->ulozit($data, $subjekt_id);
 
             $subjekt_info = $Subjekt->getInfo($subjekt_id);
             //$Log = new LogModel();
@@ -387,15 +426,9 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $Subjekt = new Subjekt();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
-        $data['user_added'] = Environment::getUser()->getIdentity()->user_id;
-
-        //Debug::dump($data);
-        //exit;
 
         try {
-            $subjekt_id = $Subjekt->insert_version($data);
+            $subjekt_id = $Subjekt->ulozit($data);
 
             if (!$this->isAjax()) {
                 //$this->redirect('this');
@@ -421,9 +454,8 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$subjekt->id);
-        $form1->addHidden('version')
-                ->setValue(@$subjekt->version);
-        $form1->addSelect('stav', 'Změnit stav na:', $stav_select);
+        $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
+                ->setValue(@$subjekt->stav);
         $form1->addSubmit('zmenit_stav', 'Změnit stav')
                  ->onClick[] = array($this, 'zmenitStavClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -446,16 +478,12 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $subjekt_id = $data['id'];
-        $subjekt_version = $data['version'];
-
         $Subjekt = new Subjekt();
-
-        //Debug::dump($data); exit;
 
         try {
             $Subjekt->zmenitStav($data);
             $this->flashMessage('Stav subjektu byl změněn.');
-            $this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id .'-'. $subjekt_version));
+            $this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id));
         } catch (DibiException $e) {
             $this->flashMessage('Stav subjektu se nepodařilo změnit.','warning');
         }

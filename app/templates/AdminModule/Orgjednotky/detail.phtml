@@ -28,6 +28,10 @@
             <dt>Informace:</dt>
             <dd>{!$OrgJednotka->note|enl2br}&nbsp;</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Stav:</dt>
+            <dd>{if $OrgJednotka->stav!=1}neaktvní{else}aktivní{/if}&nbsp;</dd>
+        </dl>
         <a href="{link :Admin:Orgjednotky:detail, 'id'=>$OrgJednotka->id, 'upravit'=>'info'}">Upravit</a>
         {/if}
     </div>

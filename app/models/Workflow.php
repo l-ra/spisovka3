@@ -28,23 +28,13 @@ class Workflow extends BaseModel
 
             $UserModel = new UserModel();
             foreach ($rows as $index => &$wf) {
-                if ( !empty($wf->prideleno) ) {
-                    $osoba = $UserModel->getUser($wf->prideleno, 1);
+                if ( !empty($wf->prideleno_id) ) {
+                    $osoba = $UserModel->getUser($wf->prideleno_id, 1);
                     if ( $osoba ) {
                         $rows[$index]->prideleno_jmeno = Osoba::displayName($osoba->identity);
+                        $wf->prideleno_info = $osoba->identity;
                     }
                 }
-                if ( !empty($wf->prideleno_info) ) {
-                    if ( $prideleno_info = unserialize($wf->prideleno_info) ) {
-                        $wf->prideleno_info = $prideleno_info;
-                    }
-                }
-                if ( !empty($wf->orgjednotka_info) ) {
-                    if ( $orgjednotka_info = unserialize($wf->orgjednotka_info) ) {
-                        $wf->orgjednotka_info = $orgjednotka_info;
-                    }
-                }
-
 
             }
 
@@ -71,7 +61,6 @@ class Workflow extends BaseModel
             $user = Environment::getUser()->getIdentity();
 
             $UserModel = new UserModel();
-            $user_info = $UserModel->getUser($user->id, 1);
             $org_info = $UserModel->getOrg($user->id);
             if ( is_array($org_info) ) {
                 $org_info = current($org_info);
@@ -79,19 +68,14 @@ class Workflow extends BaseModel
 
             $data = array();
             $data['dokument_id'] = $dokument_id;
-            $data['dokument_version'] = 1;
             $data['stav_dokumentu'] = 1;
             $data['aktivni'] = 1;
-            $data['prideleno'] = $user->id;
-            $data['prideleno_info'] = serialize($user_info->identity);
-            $data['orgjednotka_id'] = @$org_info->orgjednotka_id;
-            $data['orgjednotka_info'] = @serialize($org_info);
+            $data['prideleno_id'] = $user->id;
+            $data['orgjednotka_id'] = empty($org_info->orgjednotka_id)?null:$org_info->orgjednotka_id;
             $data['stav_osoby'] = 1;
             $data['date'] = new DateTime();
             $data['user_id'] = $user->id;
-            $data['user_info'] = serialize($user_info->identity);
             $data['poznamka'] = $poznamka;
-
             if ( $this->insert($data) ) {
                 return true;
             } else {
@@ -125,11 +109,9 @@ class Workflow extends BaseModel
 
             $UserModel = new UserModel();
             $user = Environment::getUser()->getIdentity();
-            $user_info = $UserModel->getUser($user->id, 1);
 
             $data = array();
             $data['dokument_id'] = $dokument_info->id;
-            $data['dokument_version'] = $dokument_info->version;
             $data['stav_dokumentu'] = 2;
             $data['aktivni'] = 1;
 
@@ -137,38 +119,28 @@ class Workflow extends BaseModel
 
             if ( $user_id ) {
                 $prideleno_info = $UserModel->getUser($user_id, 1);
-                $data['prideleno'] = $prideleno_info->id;
-                $data['prideleno_info'] = serialize($prideleno_info->identity);
-
+                $data['prideleno_id'] = $prideleno_info->id;
                 $log = 'Dokument předán zaměstnanci '. Osoba::displayName($prideleno_info->identity) .'.';
-
             } else {
-                $data['prideleno'] = null;
-                $data['prideleno_info'] = '';
+                $data['prideleno_id'] = null;
             }
 
             if ( $orgjednotka_id ) {
                 $OrgJednotka = new Orgjednotka();
                 $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                 $data['orgjednotka_id'] = $orgjednotka_id;
-                $data['orgjednotka_info'] = serialize($org_info);
-
                 if ( $org_info ) {
                     $log = 'Dokument předán organizační jednotce '. $org_info->zkraceny_nazev .'.';
                 } else {
                     $log = 'Dokument předán organizační jednotce.';
                 }
-                
-
             } else {
                 $data['orgjednotka_id'] = null;
-                $data['orgjednotka_info'] = '';
             }
 
             $data['date'] = new DateTime();
             $data['date_predani'] = new DateTime();
             $data['user_id'] = $user->id;
-            $data['user_info'] = serialize($user_info->identity);
             $data['poznamka'] = $poznamka;
 
             $result_insert = $this->insert($data);
@@ -225,13 +197,13 @@ class Workflow extends BaseModel
                 // test predaneho
                 // pokud neni predana osoba, tak test na vedouciho org.jednotky
                 $access = 0; $log_plus = ".";
-                if ( empty($predan->prideleno) ) {
+                if ( empty($predan->prideleno_id) ) {
                     if ( Orgjednotka::isInOrg($predan->orgjednotka_id, 'vedouci', $user_id) ) {
                         $access = 1;
                         $log_plus = " určený organizační jednotce ". $predan->orgjednotka_info->zkraceny_nazev. ".";
                     }
                 } else {
-                    if ( $predan->prideleno == $user_id ) {
+                    if ( $predan->prideleno_id == $user_id ) {
                         $access = 1;
                     }
                 }
@@ -260,7 +232,6 @@ class Workflow extends BaseModel
                     $data['stav_osoby'] = 1;
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->id;
-                    $data['user_info'] = serialize($user_info->identity);
                     $data['aktivni'] = 1;
 
                     $where = array('id=%i',$predan->id);
@@ -301,12 +272,12 @@ class Workflow extends BaseModel
             if ( $predan ) {
 
                 $access = 0;
-                if ( empty($predan->prideleno) ) {
+                if ( empty($predan->prideleno_id) ) {
                     if ( Orgjednotka::isInOrg($predan->orgjednotka_id, 'vedouci', $user_id) ) {
                         $access = 1;
                     }
                 } else {
-                    if ( $predan->prideleno == $user_id ) {
+                    if ( $predan->prideleno_id == $user_id ) {
                         $access = 1;
                     }
                 }
@@ -329,7 +300,6 @@ class Workflow extends BaseModel
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
-                    $data['dokument_version'] = $dokument_info->version;
                     $data['stav_dokumentu'] = 3;
                     $data['aktivni'] = 1;
 
@@ -337,26 +307,21 @@ class Workflow extends BaseModel
 
                     if ( $user_id ) {
                         $prideleno_info = $UserModel->getUser($user_id, 1);
-                        $data['prideleno'] = $prideleno_info->id;
-                        $data['prideleno_info'] = serialize($prideleno_info->identity);
+                        $data['prideleno_id'] = $prideleno_info->id;
                     } else {
-                        $data['prideleno'] = null;
-                        $data['prideleno_info'] = '';
+                        $data['prideleno_id'] = null;
                     }
 
                     if ( $orgjednotka_id ) {
                         $OrgJednotka = new Orgjednotka();
                         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                         $data['orgjednotka_id'] = $orgjednotka_id;
-                        $data['orgjednotka_info'] = serialize($org_info);
                     } else {
                         $data['orgjednotka_id'] = null;
-                        $data['orgjednotka_info'] = '';
                     }
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->id;
-                    $data['user_info'] = serialize($user_info->identity);
                     $data['poznamka'] = $predan->poznamka;
 
                     $result_insert = $this->insert($data);
@@ -393,7 +358,7 @@ class Workflow extends BaseModel
             $predan = is_array($predan_array)?$predan_array[0]:null;
 
             if ( $predan ) {
-                if ( $predan->prideleno == $user_id ) {
+                if ( $predan->prideleno_id == $user_id ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -434,7 +399,6 @@ class Workflow extends BaseModel
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
-                    $data['dokument_version'] = $dokument_info->version;
                     $data['stav_dokumentu'] = $stav;
 
                     $data['stav_osoby'] = 1;
@@ -442,26 +406,21 @@ class Workflow extends BaseModel
 
                     if ( $user_id ) {
                         $prideleno_info = $UserModel->getUser($user_id, 1);
-                        $data['prideleno'] = $prideleno_info->id;
-                        $data['prideleno_info'] = serialize($prideleno_info->identity);
+                        $data['prideleno_id'] = $prideleno_info->id;
                     } else {
-                        $data['prideleno'] = null;
-                        $data['prideleno_info'] = '';
+                        $data['prideleno_id'] = null;
                     }
 
                     if ( $orgjednotka_id ) {
                         $OrgJednotka = new Orgjednotka();
                         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                         $data['orgjednotka_id'] = $orgjednotka_id;
-                        $data['orgjednotka_info'] = serialize($org_info);
                     } else {
                         $data['orgjednotka_id'] = null;
-                        $data['orgjednotka_info'] = '';
                     }
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->id;
-                    $data['user_info'] = serialize($user_info->identity);
                     $data['poznamka'] = $predan->poznamka;
 
                     $result_insert = $this->insert($data);
@@ -518,18 +477,14 @@ class Workflow extends BaseModel
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
-                    $data['dokument_version'] = $dokument_info->version;
                     $data['stav_dokumentu'] = 6;
                     $data['stav_osoby'] = 1;
                     $data['aktivni'] = 1;
-                    $data['prideleno'] = $dokument_info->prideleno->prideleno;
-                    $data['prideleno_info'] = serialize($dokument_info->prideleno->prideleno_info);
+                    $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
                     $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
-                    $data['orgjednotka_info'] = serialize($dokument_info->prideleno->orgjednotka_info);
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->getIdentity()->id;
-                    $data['user_info'] = serialize($user_info->identity);
                     $data['poznamka'] = $dokument_info->prideleno->poznamka;
 
                     $result_insert = $this->insert($data);
@@ -576,18 +531,14 @@ class Workflow extends BaseModel
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
-                    $data['dokument_version'] = $dokument_info->version;
                     $data['stav_dokumentu'] = 7;
                     $data['stav_osoby'] = 1;
                     $data['aktivni'] = 1;
-                    $data['prideleno'] = $dokument_info->prideleno->prideleno;
-                    $data['prideleno_info'] = serialize($dokument_info->prideleno->prideleno_info);
+                    $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
                     $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
-                    $data['orgjednotka_info'] = serialize($dokument_info->prideleno->orgjednotka_info);
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->getIdentity()->id;
-                    $data['user_info'] = serialize($user_info->identity);
                     $data['poznamka'] = $dokument_info->prideleno->poznamka;
 
                     $result_insert = $this->insert($data);
@@ -634,18 +585,14 @@ class Workflow extends BaseModel
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
-                    $data['dokument_version'] = $dokument_info->version;
                     $data['stav_dokumentu'] = 8;
                     $data['stav_osoby'] = 1;
                     $data['aktivni'] = 1;
-                    $data['prideleno'] = $dokument_info->prideleno->prideleno;
-                    $data['prideleno_info'] = serialize($dokument_info->prideleno->prideleno_info);
+                    $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
                     $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
-                    $data['orgjednotka_info'] = serialize($dokument_info->prideleno->orgjednotka_info);
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->getIdentity()->id;
-                    $data['user_info'] = serialize($user_info->identity);
                     $data['poznamka'] = $dokument_info->prideleno->poznamka;
 
                     $result_insert = $this->insert($data);
@@ -696,12 +643,12 @@ class Workflow extends BaseModel
         $row = $rows->fetch();
 
         if ( $row ) {
-            if ( empty($row->prideleno) ) {
+            if ( empty($row->prideleno_id) ) {
                 if ( Orgjednotka::isInOrg($row->orgjednotka_id, 'vedouci', $user_id) ) {
                     return true;
                 }
             } else {
-                if ( $row->prideleno == $user_id ) {
+                if ( $row->prideleno_id == $user_id ) {
                     return true;
                 }
             }
@@ -738,12 +685,12 @@ class Workflow extends BaseModel
         $row = $rows->fetch();
 
         if ( $row ) {
-            if ( empty($row->prideleno) ) {
+            if ( empty($row->prideleno_id) ) {
                 if ( Orgjednotka::isInOrg($row->orgjednotka_id, 'vedouci', $user_id) ) {
                     return true;
                 }
             } else {
-                if ( $row->prideleno == $user_id ) {
+                if ( $row->prideleno_id == $user_id ) {
                     return true;
                 }
             }

@@ -62,7 +62,7 @@ class Epodatelna extends BaseModel
             'leftJoin' => array(
                 'dokument' => array(
                     'from' => array($this->tb_file => 'f'),
-                    'on' => array('f.id=ep.source_id'),
+                    'on' => array('f.id=ep.file_id'),
                     'cols' => array('real_path')
                 )
             )

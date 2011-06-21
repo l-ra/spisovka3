@@ -107,10 +107,14 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $storage_conf = Environment::getConfig('storage');
         eval("\$UploadFile = new ".$storage_conf->type."();");
 
+        try {
+
+
         if ( $file = $UploadFile->uploadDokument($data) ) {
             // pripojit k dokumentu
             $this->template->chyba = $file;
             $DokumentPrilohy = new DokumentPrilohy();
+
             if ($DokumentPrilohy->pripojit($dokument_id, $file->id)) {
 
                 $Log = new LogModel();
@@ -126,6 +130,11 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         } else {
             $this->template->chyba = 2;
             $this->template->error_message = $UploadFile->errorMessage();
+        }
+
+        } catch (Exception $e) {
+            $this->template->chyba = 2;
+            $this->template->error_message = $e->getMessage();
         }
         
     }

@@ -11,7 +11,10 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
 
         $OrgJednotka = new Orgjednotka();
-        $result = $OrgJednotka->seznam(null,1);
+
+        $where = null;// array( array('ciselna_rada LIKE %s','ORG_12%') );
+        
+        $result = $OrgJednotka->seznam($where,1);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
 
@@ -63,6 +66,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         $org = $this->template->OrgJednotka;
         $OrgJednotka = new Orgjednotka();
+        $org_seznam = $OrgJednotka->select(1, @$org->id);
 
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -77,6 +81,12 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
                 ->addRule(Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
         $form1->addTextArea('note', 'Informace:', 50, 5)
                 ->setValue(@$org->note);
+        $form1->addSelect('stav', 'Stav:', array(0=>'neaktivní',1=>'aktivní'))
+                ->setValue(@$org->stav);
+        $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam)
+                ->setValue(@$org->parent_id);
+        $form1->addHidden('parent_id_old')
+                ->setValue(@$org->parent_id);
 
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
@@ -104,12 +114,15 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         $OrgJednotka = new Orgjednotka();
         $orgjednotka_id = $data['id'];
-        $data['date_modified'] = new DateTime();
         unset($data['id']);
 
-        $OrgJednotka->update($data,array('id = %i',$orgjednotka_id));
-
-        $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'"  byla upravena.');
+        try {
+            $orgjednotka_id = $OrgJednotka->ulozit($data, $orgjednotka_id);
+            $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'"  byla upravena.');
+        } catch (DibiException $e) {
+            $this->flashMessage('Organizační jednotku  "'. $data['zkraceny_nazev'] .'" se nepodařilo upravit.','warning');
+            $this->flashMessage($e->getMessage(),'warning');
+        }
         $this->redirect('this',array('id'=>$orgjednotka_id));
     }
 
@@ -128,6 +141,9 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     protected function createComponentNovyForm()
     {
 
+        $OrgJednotka = new Orgjednotka();
+        $org_seznam = $OrgJednotka->select(1);
+
         $form1 = new AppForm();
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)
                 ->addRule(Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
@@ -135,6 +151,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $form1->addText('ciselna_rada', 'Zkratka / číselná řada:', 15, 30)
                 ->addRule(Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
         $form1->addTextArea('note', 'Informace:', 50, 5);
+        $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam);
         $form1->addSubmit('novy', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -159,15 +176,14 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $OrgJednotka = new Orgjednotka();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
 
         try {
-            $orgjednotka_id = $OrgJednotka->insert($data);
+            $orgjednotka_id = $OrgJednotka->ulozit($data);
             $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'" byla vytvořena.');
             $this->redirect(':Admin:Orgjednotky:detail',array('id'=>$orgjednotka_id));
         } catch (DibiException $e) {
             $this->flashMessage('Organizační jednotku "'. $data['zkraceny_nazev'] .'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage($e->getMessage(),'warning');
         }
     }
 
@@ -224,6 +240,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         //Debug::dump($data);
         //Debug::dump($role['role_org']);
+        //exit;
 
         // Predkontrola - vyrazeni nemenici opravneni a nedefinovanych opravneni
         foreach ($data as $id => $stav) {
@@ -238,8 +255,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
                     continue;
                 }
             }
-
-            
 
             // Vyradime FALSE data - nebyly vybrany
             if ( $stav['org_role']==FALSE ) {
@@ -280,5 +295,46 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $this->redirect('this',array('id'=>$orgjednotka_id));
     }
 
+    public function actionTruncate()
+    {
+
+        set_time_limit(600);
+
+        $Org = new Orgjednotka();
+        $Org->deleteAllOrg();
+
+        echo "smnazano";
+        exit;
+    }
+
+    public function actionObnovit()
+    {
+
+        set_time_limit(600);
+
+        $Org = new Orgjednotka();
+        $seznam = $Org->nacti();
+
+        echo "<pre>";
+
+        foreach ( $seznam as $org ) {
+
+            //Debug::dump($org);
+            if ( empty($org->sekvence) ) {
+                echo $org->zkraceny_nazev ."\n";
+                $obnovit = array(
+                    'sekvence' => $org->id,
+                    'sekvence_string' => $org->ciselna_rada .".". $org->id,
+                    'uroven' => 0
+                );
+                $Org->update($obnovit, array( array('id=%i',$org->id) ));
+                unset($obnovit);
+            }
+
+
+        }
+
+        exit;
+    }
 
 }

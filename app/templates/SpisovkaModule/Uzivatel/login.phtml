@@ -2,12 +2,6 @@
 {block content}
     <h2>Přihlášení do systému</h2>
         <div id="form_login">
-            <?php $form->render('begin') ?>
-            <label>Uživatelské jméno:</label> {$form['username']->control}
-            <br />
-            <label>Heslo:</label> {$form['password']->control}
-            <br />
-            <label>&nbsp;</label> {$form['login']->control}
-            <?php $form->render('end') ?>
+            {widget auth}
         </div>
 

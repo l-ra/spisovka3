@@ -4,38 +4,71 @@ class DokumentOdeslani extends BaseModel
 {
 
     protected $name = 'dokument_odeslani';
-    protected $tb_dokument = 'dokument';
-    protected $tb_file = 'file';
-    protected $tb_user = 'user';
-    protected $tb_osoba = 'osoba';
 
-    public function  __construct() {
+    public function odeslaneZpravy($dokument_id) {
 
-        $prefix = Environment::getConfig('database')->prefix;
-        $this->name = $prefix . $this->name;
-        $this->tb_dokument = $prefix . $this->tb_dokument;
-        $this->tb_file = $prefix . $this->tb_file;
-        $this->tb_user = $prefix . $this->tb_user;
-        $this->tb_osoba = $prefix . $this->tb_osoba;
+        $sql = array(
+            'distinct'=>null,
+            'from' => array($this->name => 'ds'),
+            'cols' => array('dokument_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava'),
+            'leftJoin' => array(
+                'subjekt' => array(
+                    'from' => array($this->tb_subjekt => 's'),
+                    'on' => array('s.id=ds.subjekt_id'),
+                    'cols' => array('*')
+                 ),
+                'zpusob_odeslani' => array(
+                    'from' => array($this->tb_zpusob_odeslani => 'odes'),
+                    'on' => array('odes.id=ds.zpusob_odeslani_id'),
+                    'cols' => array('nazev'=>'zpusob_odeslani_nazev')
+                 ),
+            ),
+            'order_by' => array('ds.datum_odeslani','s.nazev_subjektu','s.prijmeni','s.jmeno')
+        );
 
-    }
 
-    public function odeslaneZpravy($dokument_id, $dokument_version = null) {
+        if ( is_array($dokument_id) ) {
+            $sql['where'] = array( array('dokument_id IN (%in)', $dokument_id) );
+        } else {
+            $sql['where'] = array( array('dokument_id=%i',$dokument_id) );
+        }
+        
+        $subjekty = array();
+        $result = $this->fetchAllComplet($sql)->fetchAll();
+        if ( count($result)>0 ) {
+            foreach ($result as $subjekt) {
+                $subjekty[ $subjekt->dokument_id ][ $subjekt->id ] = $subjekt;
+            }
+
+            if ( !is_array($dokument_id) ) {
+                return $subjekty[ $dokument_id ];
+            } else {
+                return $subjekty;
+            }
+        } else {
+            return null;
+        }
 
 
-        $res = $this->fetchAll(array('datum_odeslani'),
-                               array( array('dokument_id=%i',$dokument_id) ))
+        /*if ( is_array($dokument_id) ) {
+            $res = $this->fetchAll(array('datum_odeslani'),
+                                   array( array('dokument_id IN (%in)',$dokument_id) ))
                         ->fetchAssoc('id');
+        } else {
+            $res = $this->fetchAll(array('datum_odeslani'),
+                                   array( array('dokument_id=%i',$dokument_id) ))
+                        ->fetchAssoc('id');
+        }
 
         if ( count($res)>0 ) {
             $Subjekt = new Subjekt();
             foreach ($res as &$row) {
-                $row->subjekt_info = $Subjekt->getInfo($row->subjekt_id, $row->subjekt_version);
+                $row->subjekt_info = $Subjekt->getInfo($row->subjekt_id);
             }
             return $res;
         } else {
             return null;
-        }
+        }*/
 
     }
 
@@ -47,14 +80,13 @@ class DokumentOdeslani extends BaseModel
 
         //$row = array();
         //$row['dokument_id'] = $dokument_id;
-        //$row['dokument_version'] = $dokument_version;
         //$row['subjekt_id'] = $subjekt_id;
-        //$row['subjekt_version'] = $subjekt_version;
-        //$row['zpusob_odeslani'] = $typ;
-        //row['epodatelna_id'] = $typ;
+        //$row['zpusob_odeslani_id'] = $typ;
+        //$row['epodatelna_id'] = $typ;
         //$row['datum_odeslani'] = $typ;
+        if ( empty($row['zpusob_odeslani_id']) ) $row['zpusob_odeslani_id'] = null;
+        if ( empty($row['epodatelna_id']) ) $row['epodatelna_id'] = null;
         $row['user_id'] = Environment::getUser()->getIdentity()->id;
-        $row['user_info'] = serialize(Environment::getUser()->getIdentity()->identity);
         $row['date_created'] = new DateTime();
 
 

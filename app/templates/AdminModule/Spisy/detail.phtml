@@ -1,49 +1,14 @@
 {block title}Detail spisu{/block}
-@{block javascript}
-	<script type="text/javascript">
-
-                function vybratSpisovyZnak() {
-
-                    var spisz_skart = new Array();
-                    var spisz_lhuta = new Array();
-                    var spisz_udalost = new Array();
-                    spisz_skart['0'] = '';
-                    spisz_lhuta['0'] = '';
-                    spisz_udalost['0'] = '';
-                {if count($SpisoveZnaky)>0}
-                {foreach $SpisoveZnaky as $sznak}
-                    spisz_skart[{$sznak->id}] = {$sznak->skartacni_znak};
-                    spisz_lhuta[{$sznak->id}] = {$sznak->skartacni_lhuta};
-                    spisz_udalost[{$sznak->id}] = {=SpisovyZnak::spousteci_udalost($sznak->spousteci_udalost)};
-                {/foreach}
-                {/if}
-
-                    var frm_spis  = document.forms['frm-upravitForm'].spisovy_znak;
-                    var frm_skart  = document.forms['frm-upravitForm'].skartacni_znak;
-                    var frm_lhuta  = document.forms['frm-upravitForm'].skartacni_lhuta;
-                    var frm_udalost  = document.forms['frm-upravitForm'].spousteci_udalost;
-
-                    var key  = document.forms['frm-upravitForm'].spisovy_znak.selectedIndex;
-                    var value = document.forms['frm-upravitForm'].spisovy_znak.options[key].value;
-                    document.forms['frm-upravitForm'].skartacni_znak.value = spisz_skart[value];
-                    document.forms['frm-upravitForm'].skartacni_lhuta.value = spisz_lhuta[value];
-                    document.forms['frm-upravitForm'].spousteci_udalost.value = spisz_udalost[value];
-                    return true;
-                }
-
-
-	</script>
-@{/block}
 {block content}
     <div class="navigate">
-    <a href="{link :Admin:Spisy:seznam}">Spisy</a> - Detail
+    <a href="{link :Admin:Spisy:seznam}">Spisový plán</a> - Detail
     </div>
     <h2>{$Spis->nazev}</h2>
 
         {if ($FormUpravit=='info')}
     <div class="detail_blok">
         <div class="detail_hlavicka">Info</div>
-        {control $upravitForm}
+        {control $spisForm}
     </div>
         {else}
     <div class="detail_blok">
@@ -59,12 +24,16 @@
         </dl>
         <dl class="detail_item">
             <dt>Popis:</dt>
-            <dd>{$Spis->popis}&nbsp;</dd>
+            <dd>{!$Spis->popis|enl2br}&nbsp;</dd>
         </dl>
 
         <dl class="detail_item">
             <dt>Spisový znak:</dt>
-            <dd title="{$SpisZnak_popis}">{$SpisZnak_nazev}&nbsp;</dd>
+            <dd>{=Spis::spisovyZnak($Spis,1)}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Plněurčený spisový znak:</dt>
+            <dd>{=Spis::spisovyZnak($Spis)}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Skartační znak:</dt>
@@ -76,7 +45,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>
-            <dd>{$Spis->spousteci_udalost}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Stav:</dt>
@@ -84,25 +53,4 @@
         </dl>
         <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit</a>
     </div>
-    {if count($SpisyNad)>0}
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Nadřazené spisy</div>
-        <p>
-        {foreach $SpisyNad as $sn}
-        > {$sn->nazev}
-        {/foreach}
-        </p>
-    </div>
-    {/if}
-    {if count($SpisyPod)>0}
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Podřízené spisy</div>
-        <p>
-        {foreach $SpisyPod as $sp}
-        {$sp->nazev}, 
-        {/foreach}
-        </p>
-    </div>
-    {/if}
-    
         {/if}
