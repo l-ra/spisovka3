@@ -3,30 +3,36 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}user` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `active` TINYINT(4) NOT NULL ,
-  `date_created` DATETIME NULL DEFAULT NULL ,
-  `last_modified` DATETIME NULL DEFAULT NULL ,
-  `last_login` DATETIME NULL DEFAULT NULL ,
-  `username` VARCHAR(150) NOT NULL ,
-  `password` VARCHAR(50) NULL DEFAULT NULL ,
-  `last_ip` VARCHAR(15) NULL DEFAULT NULL ,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `active` tinyint(4) NOT NULL,
+  `date_created` datetime DEFAULT NULL,
+  `last_modified` datetime DEFAULT NULL,
+  `last_login` datetime DEFAULT NULL,
+  `username` varchar(150) NOT NULL,
+  `password` varchar(50) DEFAULT NULL,
+  `last_ip` varchar(15) DEFAULT NULL,
+  `local` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) ,
   UNIQUE INDEX `USERNAME` (`username` ASC) )
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 CHECKSUM = 1 DELAY_KEY_WRITE = 1 ROW_FORMAT = DYNAMIC;
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}orgjednotka` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `plny_nazev` VARCHAR(200) NOT NULL ,
-  `zkraceny_nazev` VARCHAR(100) NULL DEFAULT NULL ,
-  `ciselna_rada` VARCHAR(30) NOT NULL ,
-  `note` TEXT NULL DEFAULT NULL ,
-  `stav` TINYINT(4) NOT NULL DEFAULT '0' ,
-  `date_created` DATETIME NULL DEFAULT NULL ,
-  `user_created` INT(10) UNSIGNED NOT NULL ,
-  `date_modified` DATETIME NULL DEFAULT NULL ,
-  `user_modified` INT(10) UNSIGNED NULL DEFAULT NULL ,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned DEFAULT NULL,
+  `plny_nazev` varchar(200) NOT NULL,
+  `zkraceny_nazev` varchar(100) DEFAULT NULL,
+  `ciselna_rada` varchar(30) NOT NULL,
+  `note` text,
+  `stav` tinyint(4) NOT NULL DEFAULT '0',
+  `date_created` datetime DEFAULT NULL,
+  `user_created` int(10) unsigned NOT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `user_modified` int(10) unsigned NOT NULL,
+  `sekvence` varchar(300) DEFAULT NULL,
+  `sekvence_string` varchar(1000) DEFAULT NULL,
+  `uroven` tinyint(3) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`) ,
+  INDEX `parent_id` (`parent_id` ASC),
   INDEX `fk_orgjednotka_user1` (`user_created` ASC) ,
   INDEX `fk_orgjednotka_user2` (`user_modified` ASC) ,
   CONSTRAINT `fk_orgjednotka_user1`
@@ -89,7 +95,7 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}zpusob_vyrizeni` (
   `fixed` TINYINT(1) NOT NULL DEFAULT 0 ,
   `note` VARCHAR(200) NULL ,
   PRIMARY KEY (`id`) )
-ENGINE = MyISAM DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
 INSERT INTO `{tbls3}zpusob_vyrizeni` (`id`, `nazev`, `stav`) VALUES
 (1, 'vyřízení prvopisem', 1),
@@ -145,7 +151,7 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}zpusob_doruceni` (
   `note` VARCHAR(255) NULL ,
   `epodatelna` TINYINT(1) NULL DEFAULT 0 ,
   PRIMARY KEY (`id`) )
-ENGINE = MyISAM AUTO_INCREMENT = 6 DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
 INSERT INTO `{tbls3}zpusob_doruceni` (`id`, `nazev`, `stav`, `fixed`, `note`, `epodatelna`) VALUES
 (1, 'emailem', 1, 1, NULL, 1),
@@ -297,7 +303,7 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}zpusob_odeslani` (
   `stav` TINYINT(4) NOT NULL DEFAULT '1' ,
   `note` VARCHAR(200) NULL ,
   PRIMARY KEY (`id`) )
-ENGINE = MyISAM DEFAULT CHARACTER SET = utf8;
+ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
 INSERT INTO `{tbls3}zpusob_odeslani` (`id`, `nazev`, `stav`, `note`) VALUES
 (1, 'emailem', 1, NULL),
@@ -456,27 +462,29 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}dokument_to_file` (
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}spis` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
-  `spis_parent_id` INT(11) NULL ,
-  `spousteci_udalost_id` INT(11) NOT NULL ,
-  `nazev` VARCHAR(80) NOT NULL ,
-  `popis` VARCHAR(200) NOT NULL ,
-  `typ` VARCHAR(5) NOT NULL DEFAULT 'S' ,
-  `sekvence` VARCHAR(200) NULL DEFAULT NULL ,
-  `stav` TINYINT(4) NOT NULL DEFAULT '1' ,
-  `date_created` DATETIME NOT NULL ,
-  `user_created` INT(10) UNSIGNED NOT NULL ,
-  `date_modified` DATETIME NULL ,
-  `user_modified` INT(10) UNSIGNED NULL ,
-  `spisovy_znak` VARCHAR(45) NOT NULL ,
-  `spisovy_znak_plneurceny` VARCHAR(200) NOT NULL ,
-  `skartacni_znak` ENUM('A','S','V') NOT NULL DEFAULT 'A' ,
-  `skartacni_lhuta` INT(11) NOT NULL DEFAULT 10 ,
-  `datum_otevreni` DATETIME NOT NULL ,
-  `datum_uzavreni` DATETIME NOT NULL ,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `parent_id` int(11) DEFAULT NULL,
+  `spousteci_udalost_id` int(11) DEFAULT NULL,
+  `nazev` varchar(80) NOT NULL,
+  `popis` varchar(200) NOT NULL,
+  `typ` varchar(5) NOT NULL DEFAULT 'S',
+  `sekvence` varchar(200) DEFAULT NULL,
+  `sekvence_string` varchar(1000) DEFAULT NULL,
+  `uroven` tinyint(4) DEFAULT NULL,
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  `date_created` datetime NOT NULL,
+  `user_created` int(10) unsigned NOT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `user_modified` int(10) unsigned DEFAULT NULL,
+  `spisovy_znak` varchar(45) NOT NULL,
+  `spisovy_znak_plneurceny` varchar(200) NOT NULL,
+  `skartacni_znak` enum('A','S','V') NOT NULL DEFAULT 'A',
+  `skartacni_lhuta` int(11) NOT NULL DEFAULT '10',
+  `datum_otevreni` datetime NOT NULL,
+  `datum_uzavreni` datetime NOT NULL,
   PRIMARY KEY (`id`) ,
   INDEX `fk_spis_spousteci_udalost1` (`spousteci_udalost_id` ASC) ,
-  INDEX `fk_spis_spis1` (`spis_parent_id` ASC) ,
+  INDEX `fk_spis_spis1` (`parent_id` ASC) ,
   INDEX `fk_spis_user1` (`user_created` ASC) ,
   INDEX `fk_spis_user2` (`user_modified` ASC) ,
   CONSTRAINT `fk_spis_spousteci_udalost1`
@@ -485,7 +493,7 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}spis` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_spis_spis1`
-    FOREIGN KEY (`spis_parent_id` )
+    FOREIGN KEY (`parent_id` )
     REFERENCES `{tbls3}spis` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
@@ -689,47 +697,52 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}souvisejici_dokument` (
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}spisovy_znak` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
-  `nazev` VARCHAR(80) NOT NULL ,
-  `popis` VARCHAR(200) NOT NULL ,
-  `uroven` TINYINT(4) NULL DEFAULT '0' ,
-  `sekvence` VARCHAR(200) NULL DEFAULT NULL ,
-  `stav` TINYINT(4) NOT NULL DEFAULT '1' ,
-  `date_created` DATETIME NULL ,
-  `user_created` INT(11) NULL ,
-  `date_modified` DATETIME NULL DEFAULT NULL ,
-  `user_modified` INT(11) NULL DEFAULT NULL ,
-  `skartacni_znak` ENUM('A','S','V') NULL DEFAULT NULL ,
-  `skartacni_lhuta` INT(11) NULL DEFAULT NULL ,
-  `spousteci_udalost_id` INT(11) NOT NULL ,
-  `spisovy_znak_parent_id` INT(11) NULL ,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `parent_id` int(11) DEFAULT NULL,
+  `nazev` varchar(80) NOT NULL,
+  `popis` varchar(200) NOT NULL,
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  `sekvence` varchar(300) DEFAULT NULL,
+  `sekvence_string` varchar(1000) DEFAULT NULL,
+  `uroven` tinyint(4) DEFAULT '0',
+  `date_created` datetime DEFAULT NULL,
+  `user_created` int(11) DEFAULT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `user_modified` int(11) DEFAULT NULL,
+  `skartacni_znak` enum('A','S','V') DEFAULT NULL,
+  `skartacni_lhuta` int(11) DEFAULT NULL,
+  `spousteci_udalost_id` int(11) NOT NULL,
   PRIMARY KEY (`id`) ,
   INDEX `fk_spisovy_znak_spousteci_udalost1` (`spousteci_udalost_id` ASC) ,
-  INDEX `fk_spisovy_znak_spisovy_znak1` (`spisovy_znak_parent_id` ASC) ,
+  INDEX `fk_spisovy_znak_spisovy_znak1` (`parent_id` ASC) ,
   CONSTRAINT `fk_spisovy_znak_spousteci_udalost1`
     FOREIGN KEY (`spousteci_udalost_id` )
     REFERENCES `{tbls3}spousteci_udalost` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_spisovy_znak_spisovy_znak1`
-    FOREIGN KEY (`spisovy_znak_parent_id` )
+    FOREIGN KEY (`parent_id` )
     REFERENCES `{tbls3}spisovy_znak` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}user_role` (
-  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
-  `parent_id` INT(10) UNSIGNED NULL ,
-  `orgjednotka_id` INT(10) UNSIGNED NULL ,
-  `code` VARCHAR(50) NOT NULL ,
-  `name` VARCHAR(150) NOT NULL ,
-  `note` VARCHAR(250) NULL DEFAULT NULL ,
-  `fixed` TINYINT(4) NULL DEFAULT '0' ,
-  `order` INT(11) NULL DEFAULT NULL ,
-  `active` TINYINT(4) NOT NULL DEFAULT '0' ,
-  `date_created` DATETIME NULL DEFAULT NULL ,
-  `date_modified` DATETIME NULL DEFAULT NULL ,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int(10) unsigned DEFAULT NULL,
+  `fixed_id` int(10) unsigned DEFAULT NULL,
+  `orgjednotka_id` int(10) unsigned DEFAULT NULL,
+  `code` varchar(50) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `note` varchar(250) DEFAULT NULL,
+  `fixed` tinyint(4) DEFAULT '0',
+  `order` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT '0',
+  `date_created` datetime DEFAULT NULL,
+  `date_modified` datetime DEFAULT NULL,
+  `sekvence` varchar(300) DEFAULT NULL,
+  `sekvence_string` varchar(1000) DEFAULT NULL,
+  `uroven` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`) ,
   INDEX `fk_user_role_user_role1` (`parent_id` ASC) ,
   INDEX `fk_user_role_orgjednotka1` (`orgjednotka_id` ASC) ,
@@ -745,16 +758,13 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}user_role` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 CHECKSUM = 1 DELAY_KEY_WRITE = 1 ROW_FORMAT = DYNAMIC;
 
-INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `code`, `name`, `active`, `date_created`, `date_modified`, `note`, `orgjednotka_id`, `fixed`, `order`) VALUES
-(1, 0, 'admin', 'administrátor', 1, NOW(), NOW(), 'Má absolutní moc provádět všechno možné', NULL, 2, 100),
-(2, 0, 'guest', 'host', 1, NOW(), NOW(), 'Role představující nepřihlášeného uživatele.\r\nTedy nastavení oprávnění v době, kdy k aplikaci není nikdo přihlášen.', NULL, 2, 0),
-(3, 1, 'superadmin', 'SuperAdmin', 1, NOW(), NOW(), 'Administrátor se super právy.\r\nTo znamená, že může manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', NULL, 2, 100),
-(4, 0, 'referent', 'referent', 1, NOW(), NOW(), 'Základní role pracovníka spisové služby', NULL, 1, 10),
-(5, 4, 'vedouci', 'vedoucí', 1, NOW(), NOW(), 'Vedoucí organizační jednotky umožňující přijímat dokumenty', NULL, 1, 30),
-(6, 4, 'podatelna', 'pracovník podatelny', 1, NOW(), NOW(), 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', NULL, 1, 20),
-(7, 5, 'vedouci_1', 'vedoucí POD', 1, NOW(), NULL, NULL, 1, 0, 30),
-(8, 4, 'referent_1', 'referent POD', 1, NOW(), NULL, NULL, 1, 0, 10),
-(9, 6, 'podatelna_1', 'podatelna POD', 1, NOW(), NULL, NULL, 1, 0, 20);
+INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `fixed_id`, `orgjednotka_id`, `code`, `name`, `note`, `fixed`, `order`, `active`, `date_created`, `date_modified`, `sekvence`, `sekvence_string`, `uroven`) VALUES
+(1,	NULL,	NULL,	NULL,	'admin',	'administrátor',	'Má absolutní moc provádět všechno možné',	2,	100,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'1',	'admin.1',	NULL),
+(2,	NULL,	NULL,	NULL,	'guest',	'host',	'Role představující nepřihlášeného uživatele.\\r\\nTedy nastavení oprávnění v době, kdy k aplikaci není nikdo přihlášen.',	2,	0,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'2',	'guest.2',	NULL),
+(3,	1,	NULL,	NULL,	'superadmin',	'SuperAdmin',	'Administrátor se super právy.\\r\\nTo znamená, že může manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ',	2,	100,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'3',	'superadmin.3',	NULL),
+(4,	NULL,	NULL,	NULL,	'referent',	'referent',	'Základní role pracovníka spisové služby',	1,	10,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'4',	'referent.4',	NULL),
+(5,	4,	NULL,	NULL,	'vedouci',	'vedoucí',	'Vedoucí organizační jednotky umožňující přijímat dokumenty',	1,	30,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'5',	'vedouci.5',	NULL),
+(6,	4,	NULL,	NULL,	'podatelna',	'pracovník podatelny',	'Pracovník podatelny, který může přijímat nebo odesílat dokumenty',	1,	20,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'6',	'podatelna.6',	NULL);
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}user_resource` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -898,17 +908,17 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}user_to_role` (
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}workflow` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
-  `dokument_id` INT(11) NOT NULL ,
-  `prideleno_id` INT(10) UNSIGNED NULL ,
-  `orgjednotka_id` INT(10) UNSIGNED NULL ,
-  `user_id` INT(10) UNSIGNED NOT NULL ,
-  `stav_dokumentu` INT(11) NOT NULL DEFAULT '0' ,
-  `stav_osoby` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '0=neprirazen,1=prirazen,2=dokoncen,100>storno' ,
-  `date` DATETIME NOT NULL ,
-  `poznamka` TEXT NULL DEFAULT NULL ,
-  `date_predani` DATETIME NULL DEFAULT NULL ,
-  `aktivni` TINYINT(4) NOT NULL DEFAULT '1' ,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dokument_id` int(11) NOT NULL,
+  `prideleno_id` int(10) unsigned DEFAULT NULL,
+  `orgjednotka_id` int(10) unsigned DEFAULT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `stav_dokumentu` int(11) NOT NULL DEFAULT '0',
+  `stav_osoby` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0=neprirazen,1=prirazen,2=dokoncen,100>storno',
+  `date` datetime NOT NULL,
+  `poznamka` text,
+  `date_predani` datetime DEFAULT NULL,
+  `aktivni` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`) ,
   INDEX `fk_workflow_dokument1` (`dokument_id` ASC) ,
   INDEX `fk_workflow_user1` (`prideleno_id` ASC) ,
