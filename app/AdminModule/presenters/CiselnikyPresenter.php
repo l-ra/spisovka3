@@ -25,7 +25,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
                         'title' => 'ID',
                         'link' => false,
                         'form' => 'hidden',
-                        'view' => true
+                        'view' => false
                     )
                 );
         $ciselnik->addColumn('nazev',
@@ -38,7 +38,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
                 );
         $ciselnik->addColumn('popis',
                     array(
-                        'title' => 'Popopis',
+                        'title' => 'Popis',
                         'link' => false,
                         'form' => 'textArea',
                         'view' => true
@@ -98,7 +98,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
                         'title' => 'ID',
                         'link' => false,
                         'form' => 'hidden',
-                        'view' => true
+                        'view' => false
                     )
                 );
         $ciselnik->addColumn('nazev',
@@ -154,7 +154,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
                         'title' => 'ID',
                         'link' => false,
                         'form' => 'hidden',
-                        'view' => true
+                        'view' => false
                     )
                 );
         $ciselnik->addColumn('nazev',
@@ -197,12 +197,13 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik->setParams($this->getParam());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:zpusobdoruceni'));
 
+        $ciselnik->addParam('no_delete', 'fixed');
         $ciselnik->addColumn('id',
                     array(
                         'title' => 'ID',
                         'link' => false,
                         'form' => 'hidden',
-                        'view' => true
+                        'view' => false
                     )
                 );
         $ciselnik->addColumn('nazev',
@@ -226,7 +227,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
                         'title' => 'Pevný záznam?',
                         'link' => false,
                         'form' => 'none',
-                        'view' => true
+                        'view' => true,
                     )
                 );
         $ciselnik->addColumn('epodatelna',
@@ -266,7 +267,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
                         'title' => 'ID',
                         'link' => false,
                         'form' => 'hidden',
-                        'view' => true
+                        'view' => false
                     )
                 );
         $ciselnik->addColumn('nazev',

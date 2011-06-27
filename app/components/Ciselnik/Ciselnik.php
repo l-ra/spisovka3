@@ -47,7 +47,19 @@ class Ciselnik extends Control {
 
     public function setParams($params)
     {
-        $this->_params = $params;
+        if ( empty($this->_params) ) {
+            $this->_params = $params;
+        } else {
+            $this->_params = array_merge($this->_params, $params);
+        }
+    }
+    public function addParam($name,$value)
+    {
+        if ( empty($this->_params) ) {
+            $this->_params = array($name => $value);
+        } else {
+            $this->_params[ $name ] = $value;
+        }
     }
 
     public function addColumn($col, $params)
@@ -70,6 +82,8 @@ class Ciselnik extends Control {
     {
 
         $model = new Model($this->table);
+
+        $this->template->params = $this->_params;
 
         if ( isset($this->_params['primary']) ) {
             // form - uprava

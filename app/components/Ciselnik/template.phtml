@@ -15,12 +15,25 @@
         <tr>
     {foreach $cols as $col_name => $col_params}
             <td>
-                {if $col_params['link']}
-                <a href="{$link}?primary={$row->$primary}">{if empty($row->$col_name)}(bez názvu){else}{$row->$col_name}{/if}</a>
-                {else}
+            {if $col_params['link']}
+                <a href="{$link}?primary={$row->$primary}">
+            {/if}
+            {if $col_params['form'] == "checkbox" }
+                {if $row->$col_name == 1}ano{else}ne{/if}
+            {elseif $col_params['form'] == "select" }
+                {if isset($col_params['form_select'][$row->$col_name])}{$col_params['form_select'][$row->$col_name]}{else}{$row->$col_name}{/if}
+            {elseif $col_params['form'] == "selectStav" }
+                {if $row->$col_name == 1}Aktivní{else}Neaktivní{/if}
+            {elseif $col_name == "fixed" }
+                {if $row->$col_name == 1}ano{else}ne{/if}
+            {elseif empty($row->$col_name) && $col_params['link']}
+                (bez názvu)
+            {else}
                 {$row->$col_name}
-                {/if}
-
+            {/if}
+            {if $col_params['link']}
+                </a>
+            {/if}
             </td>
     {/foreach}
         </tr>
