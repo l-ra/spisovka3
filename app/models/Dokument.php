@@ -216,107 +216,298 @@ class Dokument extends BaseModel
 
         $args = array();
 
-        //Debug::dump($params);
+        //Debug::dump($params); exit;
 
         if ( isset($params['nazev']) ) {
             if ( !empty($params['nazev']) ) {
                 $args['where'][] = array('d.nazev LIKE %s','%'.$params['nazev'].'%');
             }
         }
+
+        // popis
         if ( isset($params['popis']) ) {
             if ( !empty($params['popis']) ) {
                 $args['where'][] = array('d.popis LIKE %s','%'.$params['popis'].'%');
             }
         }
+
+        // cislo jednaci
         if ( isset($params['cislo_jednaci']) ) {
             if ( !empty($params['cislo_jednaci']) ) {
                 $args['where'][] = array('d.cislo_jednaci LIKE %s','%'.$params['cislo_jednaci'].'%');
             }
         }
+
+        // spisova znacka - nazev spisu
         if ( isset($params['spisova_znacka']) ) {
             if ( !empty($params['spisova_znacka']) ) {
                 $args['where'][] = array('spis.nazev LIKE %s','%'.$params['spisova_znacka'].'%');
             }
         }
+
+        // typ dokumentu
         if ( isset($params['dokument_typ_id']) ) {
             if ( $params['dokument_typ_id'] != '0' ) {
                 $args['where'][] = array('d.dokument_typ_id = %i',$params['dokument_typ_id']);
             }
         }
+
+        // zpusob doruceni
+        if ( isset($params['zpusob_doruceni_id']) ) {
+            if ( $params['zpusob_doruceni_id'] != '0' ) {
+                $args['where'][] = array('d.zpusob_doruceni_id = %i',$params['zpusob_doruceni_id']);
+            }
+        }
+        
+        if ( isset($params['typ_doruceni']) ) {
+            if ( $params['typ_doruceni'] != '0' ) {
+
+                $args['leftJoin']['zpusob_doruceni'] = array(
+                    'from'=> array($this->tb_epodatelna => 'epod'),
+                    'on' => array('epod.dokument_id=d.id'),
+                    'cols' => null
+                );
+                switch ($params['typ_doruceni']) {
+                    case 1: // epod
+                        $args['where'][] = array('epod.id IS NOT NULL');
+                        break;
+                    case 2: // email
+                        $args['where'][] = array('epod.email_signature IS NOT NULL');
+                        break;
+                    case 3: // isds
+                        $args['where'][] = array('epod.isds_signature IS NOT NULL');
+                        break;
+                    case 4: // mimo epod
+                        $args['where'][] = array('epod.id IS NULL');
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        // CJ odesilatele
         if ( isset($params['cislo_jednaci_odesilatele']) ) {
             if ( !empty($params['cislo_jednaci_odesilatele']) ) {
                 $args['where'][] = array('d.cislo_jednaci_odesilatele LIKE %s','%'.$params['cislo_jednaci_odesilatele'].'%');
             }
         }
+
+        // Datum vzniku
         if ( isset($params['datum_vzniku']) ) {
             if ( !empty($params['datum_vzniku']) ) {
-
                 $cas = '';
                 if ( isset($params['datum_vzniku_cas']) ) {
                     if ( !empty($params['datum_vzniku_cas']) ) {
                         $cas = ' '. $params['datum_vzniku_cas'];
                     }
                 }
-
                 $args['where'][] = array('d.datum_vzniku = %d',$params['datum_vzniku'].$cas);
             }
         }
+
+        // Datum vzniku - rozmezi
+        if ( isset($params['datum_vzniku_od']) || isset($params['datum_vzniku_do']) ) {
+            if ( !empty($params['datum_vzniku_od']) && !empty($params['datum_vzniku_do']) ) {
+                if ( !empty($params['datum_vzniku_cas_od']) ) {
+                    $params['datum_vzniku_od'] = $params['datum_vzniku_od'] .' '. $params['datum_vzniku_cas_od'];
+                }
+                if ( !empty($params['datum_vzniku_cas_do']) ) {
+                    $params['datum_vzniku_do'] = $params['datum_vzniku_do'] .' '. $params['datum_vzniku_cas_do'];
+                } else {
+                    $unix_do = strtotime($params['datum_vzniku_do']);
+                    if ( $unix_do ) {
+                        $params['datum_vzniku_do'] = date("Y-m-d",$unix_do+86400);
+                    }
+                }
+
+                $args['where'][] = array('d.datum_vzniku BETWEEN %d AND %d',$params['datum_vzniku_od'],$params['datum_vzniku_do']);
+            } else if ( !empty($params['datum_vzniku_od']) ) {
+                if ( !empty($params['datum_vzniku_cas_od']) ) {
+                    $params['datum_vzniku_od'] = $params['datum_vzniku_od'] .' '. $params['datum_vzniku_cas_od'];
+                }
+                $args['where'][] = array('d.datum_vzniku >= %d',$params['datum_vzniku_od']);
+            } else if ( !empty($params['datum_vzniku_do']) ) {
+                if ( !empty($params['datum_vzniku_cas_do']) ) {
+                    $params['datum_vzniku_do'] = $params['datum_vzniku_do'] .' '. $params['datum_vzniku_cas_do'];
+                } else {
+                    $unix_do = strtotime($params['datum_vzniku_do']);
+                    if ( $unix_do ) {
+                        $params['datum_vzniku_do'] = date("Y-m-d",$unix_do+86400);
+                    }
+                }
+                $args['where'][] = array('d.datum_vzniku < %d',$params['datum_vzniku_do']);
+            }
+        }
+
+        // pocet listu
         if ( isset($params['pocet_listu']) ) {
             if ( !empty($params['pocet_listu']) ) {
                 $args['where'][] = array('d.pocet_listu = %i',$params['pocet_listu']);
             }
         }
+
+        //
         if ( isset($params['pocet_priloh']) ) {
             if ( !empty($params['pocet_priloh']) ) {
                 $args['where'][] = array('d.pocet_priloh = %i',$params['pocet_priloh']);
             }
         }
+
+        // stav dokumentu
         if ( isset($params['stav_dokumentu']) ) {
             if ( !empty($params['stav_dokumentu']) ) {
-                $args['where'][] = array('wf.stav_dokumentu = %i AND wf.aktivni=1',$params['stav_dokumentu']);
+
+                if ( $params['stav_dokumentu'] == 4 ) {
+                    // vyrizene - 4,5,6
+                    $args['where'][] = array('wf.stav_dokumentu IN (4,5,6) AND wf.aktivni=1');
+                } else {
+                    $args['where'][] = array('wf.stav_dokumentu = %i AND wf.aktivni=1',$params['stav_dokumentu']);
+                }
+                
             }
         }
+
+        // lhuta
         if ( isset($params['lhuta']) ) {
             if ( !empty($params['lhuta']) ) {
                 $args['where'][] = array('d.lhuta = %i',$params['lhuta']);
             }
         }
+
+        // poznamka k dokumentu
         if ( isset($params['poznamka']) ) {
             if ( !empty($params['poznamka']) ) {
                 $args['where'][] = array('d.poznamka LIKE %s','%'.$params['poznamka'].'%');
             }
         }
+
+        // zpusob vyrizeni
         if ( isset($params['zpusob_vyrizeni_id']) ) {
             if ( !empty($params['zpusob_vyrizeni_id']) || $params['zpusob_vyrizeni_id'] != '0' ) {
                 $args['where'][] = array('d.zpusob_vyrizeni_id = %i',$params['zpusob_vyrizeni_id']);
             }
         }
+
+        // datum vyrizeni
         if ( isset($params['datum_vyrizeni']) ) {
             if ( !empty($params['datum_vyrizeni']) ) {
-
                 $cas = '';
-                if ( isset($params['datum_vyrizeni_cas']) ) {
-                    if ( !empty($params['datum_vyrizeni_cas']) ) {
-                        $cas = ' '. $params['datum_vyrizeni_cas'];
-                    }
+                if ( !empty($params['datum_vyrizeni_cas']) ) {
+                    $cas = ' '. $params['datum_vyrizeni_cas'];
                 }
-
                 $args['where'][] = array('d.datum_vyrizeni = %d',$params['datum_vyrizeni'].$cas);
             }
         }
-        if ( isset($params['datum_odeslani']) ) {
-            if ( !empty($params['datum_odeslani']) ) {
-
-                $cas = '';
-                if ( isset($params['datum_odeslani_cas']) ) {
-                    if ( !empty($params['datum_odeslani_cas']) ) {
-                        $cas = ' '. $params['datum_odeslani_cas'];
+        
+        // datum vyrizeni - rozmezi
+        if ( isset($params['datum_vyrizeni_od']) || isset($params['datum_vyrizeni_do']) ) {
+            if ( !empty($params['datum_vyrizeni_od']) && !empty($params['datum_vyrizeni_do']) ) {
+                if ( !empty($params['datum_vyrizeni_cas_od']) ) {
+                    $params['datum_vyrizeni_od'] = $params['datum_vyrizeni_od'] .' '. $params['datum_vyrizeni_cas_od'];
+                }
+                if ( !empty($params['datum_vyrizeni_cas_do']) ) {
+                    $params['datum_vyrizeni_do'] = $params['datum_vyrizeni_do'] .' '. $params['datum_vyrizeni_cas_do'];
+                } else {
+                    $unix_do = strtotime($params['datum_vyrizeni_do']);
+                    if ( $unix_do ) {
+                        $params['datum_vyrizeni_do'] = date("Y-m-d",$unix_do+86400);
                     }
                 }
 
-                //$args['where'][] = array('d.datum_odeslani = %d',$params['datum_odeslani'].$cas);
+                $args['where'][] = array('d.datum_vyrizeni BETWEEN %d AND %d',$params['datum_vyrizeni_od'],$params['datum_vyrizeni_do']);
+            } else if ( !empty($params['datum_vyrizeni_od']) ) {
+                if ( !empty($params['datum_vyrizeni_cas_od']) ) {
+                    $params['datum_vyrizeni_od'] = $params['datum_vyrizeni_od'] .' '. $params['datum_vyrizeni_cas_od'];
+                }
+                $args['where'][] = array('d.datum_vyrizeni >= %d',$params['datum_vyrizeni_od']);
+            } else if ( !empty($params['datum_vyrizeni_do']) ) {
+                if ( !empty($params['datum_vyrizeni_cas_do']) ) {
+                    $params['datum_vyrizeni_do'] = $params['datum_vyrizeni_do'] .' '. $params['datum_vyrizeni_cas_do'];
+                } else {
+                    $unix_do = strtotime($params['datum_vyrizeni_do']);
+                    if ( $unix_do ) {
+                        $params['datum_vyrizeni_do'] = date("Y-m-d",$unix_do+86400);
+                    }
+                }
+                $args['where'][] = array('d.datum_vyrizeni < %d',$params['datum_vyrizeni_do']);
             }
         }
+
+        // zpusob odeslani
+        if ( isset($params['zpusob_odeslani']) ) {
+            if ( !empty($params['zpusob_odeslani']) || $params['zpusob_odeslani'] != '0' ) {
+
+                $args['leftJoin']['zpusob_odeslani'] = array(
+                    'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                    'on' => array('dok_odeslani.dokument_id=d.id'),
+                    'cols' => null
+                );
+
+                $args['where'][] = array('dok_odeslani.zpusob_odeslani_id = %i',$params['zpusob_odeslani']);
+            }
+        }
+
+        // datum odeslani
+        if ( isset($params['datum_odeslani']) ) {
+            if ( !empty($params['datum_odeslani']) ) {
+
+                $args['leftJoin']['zpusob_odeslani'] = array(
+                    'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                    'on' => array('dok_odeslani.dokument_id=d.id'),
+                    'cols' => null
+                );
+
+                $cas = '';
+                if ( !empty($params['datum_odeslani_cas']) ) {
+                    $cas = ' '. $params['datum_odeslani_cas'];
+                }
+                $args['where'][] = array('dok_odeslani.datum_odeslani = %d',$params['datum_odeslani'].$cas);
+            }
+        }
+
+        // datum odeslani - rozmezi
+        if ( isset($params['datum_odeslani_od']) || isset($params['datum_odeslani_do']) ) {
+
+            $args['leftJoin']['zpusob_odeslani'] = array(
+                'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                'on' => array('dok_odeslani.dokument_id=d.id'),
+                'cols' => null
+            );
+
+            if ( !empty($params['datum_odeslani_od']) && !empty($params['datum_odeslani_do']) ) {
+                if ( !empty($params['datum_odeslani_cas_od']) ) {
+                    $params['datum_odeslani_od'] = $params['datum_odeslani_od'] .' '. $params['datum_odeslani_cas_od'];
+                }
+                if ( !empty($params['datum_odeslani_cas_do']) ) {
+                    $params['datum_odeslani_do'] = $params['datum_odeslani_do'] .' '. $params['datum_odeslani_cas_do'];
+                } else {
+                    $unix_do = strtotime($params['datum_odeslani_do']);
+                    if ( $unix_do ) {
+                        $params['datum_odeslani_do'] = date("Y-m-d",$unix_do+86400);
+                    }
+                }
+
+                $args['where'][] = array('dok_odeslani.datum_odeslani BETWEEN %d AND %d',$params['datum_odeslani_od'],$params['datum_odeslani_do']);
+            } else if ( !empty($params['datum_odeslani_od']) ) {
+                if ( !empty($params['datum_odeslani_cas_od']) ) {
+                    $params['datum_odeslani_od'] = $params['datum_odeslani_od'] .' '. $params['datum_odeslani_cas_od'];
+                }
+                $args['where'][] = array('dok_odeslani.datum_odeslani >= %d',$params['datum_odeslani_od']);
+            } else if ( !empty($params['datum_odeslani_do']) ) {
+                if ( !empty($params['datum_odeslani_cas_do']) ) {
+                    $params['datum_odeslani_do'] = $params['datum_odeslani_do'] .' '. $params['datum_odeslani_cas_do'];
+                } else {
+                    $unix_do = strtotime($params['datum_odeslani_do']);
+                    if ( $unix_do ) {
+                        $params['datum_odeslani_do'] = date("Y-m-d",$unix_do+86400);
+                    }
+                }
+                $args['where'][] = array('dok_odeslani.datum_odeslani < %d',$params['datum_odeslani_do']);
+            }
+        }
+
+
         if ( isset($params['spisovy_znak']) ) {
             if ( !empty($params['spisovy_znak']) ) {
                 $args['where'][] = array('d.spisovy_znak LIKE %s','%'.$params['spisovy_znak'] .'%');
@@ -394,6 +585,7 @@ class Dokument extends BaseModel
                 );
                 $args['where'][] = array(
                     's.nazev_subjektu LIKE %s OR','%'.$params['subjekt_nazev'].'%',
+                    's.ic LIKE %s OR','%'.$params['subjekt_nazev'].'%',
                     "CONCAT(s.jmeno,' ',s.prijmeni) LIKE %s OR",'%'.$params['subjekt_nazev'].'%',
                     "CONCAT(s.prijmeni,' ',s.jmeno) LIKE %s",'%'.$params['subjekt_nazev'].'%'
                 );
@@ -559,16 +751,58 @@ class Dokument extends BaseModel
                 $args['where'][] = array('s.id_isds LIKE %s','%'.$params['subjekt_isds'].'%');
             }
         }
+
+
+        if ( isset($params['prideleno_osobne']) && $params['prideleno_osobne'] ) {
+            $user_id = Environment::getUser()->getIdentity()->id;
+            if ( !isset($params['prideleno']) ) {
+                $params['prideleno'] = array();
+            }
+            $params['prideleno'][] = $user_id;
+        }
+        if ( isset($params['predano_osobne']) && $params['predano_osobne'] ) {
+            $user_id = Environment::getUser()->getIdentity()->id;
+            if ( !isset($params['predano']) ) {
+                $params['predano'] = array();
+            }
+            $params['predano'][] = $user_id;
+        }
         if ( isset($params['prideleno']) ) {
             if ( count($params['prideleno'])>0 && is_array($params['prideleno']) ) {
-                $args['where'][] = array('wf.prideleno IN (%in) AND wf.stav_osoby=1 AND wf.aktivni=1',$params['prideleno']);
+                $args['where'][] = array('wf.prideleno_id IN (%in) AND wf.stav_osoby=1 AND wf.aktivni=1',$params['prideleno']);
             }
         }
         if ( isset($params['predano']) ) {
             if ( count($params['predano'])>0 && is_array($params['predano']) ) {
-                $args['where'][] = array('wf.prideleno IN (%in) AND wf.stav_osoby=0 AND wf.aktivni=1',$params['predano']);
+                $args['where'][] = array('wf.prideleno_id IN (%in) AND wf.stav_osoby=0 AND wf.aktivni=1',$params['predano']);
             }
         }
+
+        if ( isset($params['prideleno_na_organizacni_jednotku']) && $params['prideleno_na_organizacni_jednotku'] ) {
+            $user = Environment::getUser()->getIdentity();
+            if ( !isset($params['prideleno_org']) ) {
+                $params['prideleno_org'] = array();
+            }
+            $org = array();
+            foreach( $user->user_roles as $roles ) {
+                if ( !empty($roles->orgjednotka_id) ) {
+                    $params['prideleno_org'][] = $roles->orgjednotka_id;
+                }
+            }
+        }
+        if ( isset($params['predano_na_organizacni_jednotku']) && $params['predano_na_organizacni_jednotku'] ) {
+            $user = Environment::getUser()->getIdentity();
+            if ( !isset($params['predano_org']) ) {
+                $params['predano_org'] = array();
+            }
+            $org = array();
+            foreach( $user->user_roles as $roles ) {
+                if ( !empty($roles->orgjednotka_id) ) {
+                    $params['predano_org'][] = $roles->orgjednotka_id;
+                }
+            }
+        }
+
         if ( isset($params['prideleno_org']) ) {
             if ( count($params['prideleno_org'])>0 && is_array($params['prideleno_org']) ) {
                 $args['where'][] = array('wf.orgjednotka_id IN (%in) AND wf.stav_osoby=1 AND wf.aktivni=1',$params['prideleno_org']);
@@ -1373,6 +1607,67 @@ class Dokument extends BaseModel
         }
 
     }
+
+    public static function zpusobDoruceni( $kod = null, $select = 0 ) {
+
+        $prefix = Environment::getConfig('database')->prefix;
+        $tb_zpusob_doruceni = $prefix .'zpusob_doruceni';
+
+        $result = dibi::query('SELECT * FROM %n', $tb_zpusob_doruceni )->fetchAssoc('id');
+
+        if ( is_null($kod) ) {
+            if ( $select == 1 ) {
+                $tmp = array();
+                foreach ($result as $dt) {
+                    $tmp[ $dt->id ] = $dt->nazev;
+                }
+                return $tmp;
+            } else if ( $select == 3 ) {
+               $tmp = array();
+                $tmp[0] = 'jakýkoli způsob doručení';
+                foreach ($result as $dt) {
+                    $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
+                }
+                return $tmp;
+            } else {
+                return $result;
+            }
+        } else {
+            return ( array_key_exists($kod, $result) )?$result[ $kod ]:null;
+        }
+
+    }
+
+    public static function zpusobOdeslani( $kod = null, $select = 0 ) {
+
+        $prefix = Environment::getConfig('database')->prefix;
+        $tb_zpusob_odeslani = $prefix .'zpusob_odeslani';
+
+        $result = dibi::query('SELECT * FROM %n', $tb_zpusob_odeslani )->fetchAssoc('id');
+
+        if ( is_null($kod) ) {
+            if ( $select == 1 ) {
+                $tmp = array();
+                foreach ($result as $dt) {
+                    $tmp[ $dt->id ] = $dt->nazev;
+                }
+                return $tmp;
+            } else if ( $select == 3 ) {
+               $tmp = array();
+                $tmp[0] = 'jakýkoli způsob odeslani';
+                foreach ($result as $dt) {
+                    $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
+                }
+                return $tmp;
+            } else {
+                return $result;
+            }
+        } else {
+            return ( array_key_exists($kod, $result) )?$result[ $kod ]:null;
+        }
+
+    }
+
 
     public static function stav($dokument = null) {
 

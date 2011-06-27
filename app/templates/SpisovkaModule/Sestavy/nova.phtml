@@ -36,7 +36,7 @@
         </div>
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
-            <dd>{$newForm['typ_dokumentu_id']->control}</dd>
+            <dd>{$newForm['dokument_typ_id']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Stav dokumentu:</dt>
@@ -59,8 +59,13 @@
             <dd>{$newForm['popis']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Datum doručení/vzniku</dt>
-            <dd>{$newForm['datum_vzniku']->control} {$newForm['datum_vzniku_cas']->control}</dd>
+            <dt>Způsob doručení:</dt>
+            <dd>{$newForm['typ_doruceni']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum doručení/vzniku </dt>
+            <dd>od: {$newForm['datum_vzniku_od']->control} {$newForm['datum_vzniku_cas_od']->control}</dd>
+            <dd>do: {$newForm['datum_vzniku_do']->control} {$newForm['datum_vzniku_cas_do']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Číslo jednací odesilatele:</dt>
@@ -71,20 +76,22 @@
             <dd>{$newForm['poznamka']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Počet listů:</dt>
-            <dd>{$newForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$newForm['pocet_priloh']->control}</dd>
-        </dl>
-        <dl class="detail_item">
             <dt>Způsob vyžízení:</dt>
-            <dd>{$newForm['zpusob_vyrizeni_id']->control}</dd>
+            <dd>{$newForm['zpusob_vyrizeni']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Datum vyžízení:</dt>
-            <dd>{$newForm['datum_vyrizeni']->control} {$newForm['datum_vyrizeni_cas']->control}&nbsp;</dd>
+            <dt>Datum vyřízení:</dt>
+            <dd>od: {$newForm['datum_vyrizeni_od']->control} {$newForm['datum_vyrizeni_cas_od']->control}&nbsp;</dd>
+            <dd>do: {$newForm['datum_vyrizeni_do']->control} {$newForm['datum_vyrizeni_cas_do']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Způsob odeslání:</dt>
+            <dd>{$newForm['zpusob_odeslani']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Datum odeslání:</dt>
-            <dd>{$newForm['datum_odeslani']->control} {$newForm['datum_odeslani_cas']->control}&nbsp;</dd>
+            <dd>od: {$newForm['datum_odeslani_od']->control} {$newForm['datum_odeslani_cas_od']->control}&nbsp;</dd>
+            <dd>do: {$newForm['datum_odeslani_do']->control} {$newForm['datum_odeslani_cas_do']->control}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spisový znak:</dt>
@@ -103,16 +110,68 @@
             <dd>{$newForm['spousteci_udalost']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Počet listů:</dt>
-            <dd>{$newForm['vyrizeni_pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$newForm['vyrizeni_pocet_priloh']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Uložení dokumentu:</dt>
-            <dd>{$newForm['ulozeni_dokumentu']->control}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
             <dt>Poznámka k vyřízení:</dt>
             <dd>{$newForm['poznamka_vyrizeni']->control}&nbsp;</dd>
+        </dl>
+    </div>
+
+    <div id="dokument_blok_poznamka">
+        <div class="h2">
+            Přidělěno / předáno
+        </div>
+        <dl class="detail_item">
+            <dt>Přiděleno:</dt>
+            <dd>
+            {$newForm['prideleno']->control}
+            <br />{$newForm['prideleno_osobne']->control} Přidělěno na mé jméno
+            <br />{$newForm['prideleno_na_organizacni_jednotku']->control} Přidělěno na mou organizační jednotku
+            <script type="text/javascript">
+            <!--
+		$('#frmsearchForm-prideleno').focus().keyup(function(event) {
+                    if ( $('#frmsearchForm-prideleno').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmsearchForm-prideleno').val()}, function(payload) {
+				$('#prideleno').remove();
+
+				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmsearchForm-prideleno');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});
+                    } else {
+                        $('#prideleno').remove();
+                    }
+		});
+            -->
+            </script>
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Předáno:</dt>
+            <dd>
+            {$newForm['predano']->control}
+            <br />{$newForm['predano_osobne']->control} Předáno na mé jméno
+            <br />{$newForm['predano_na_organizacni_jednotku']->control} Předáno na mou organizační jednotku
+            <script type="text/javascript">
+            <!--
+		$('#frmsearchForm-predano').focus().keyup(function(event) {
+                    if ( $('#frmsearchForm-predano').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmsearchForm-predano').val()}, function(payload) {
+				$('#predano').remove();
+
+				var list = $('<ul id="predano"></ul>').insertAfter('#frmsearchForm-predano');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});
+                    } else {
+                        $('#predano').remove();
+                    }
+		});
+            -->
+            </script>
+            </dd>
         </dl>
     </div>
 
@@ -121,48 +180,37 @@
             Adresáti / odesílatelé
         </div>
         <dl class="detail_item">
-            <dt>Typ subjektu</dt>
+            <dt>Typ subjektu:</dt>
             <dd>{$newForm['subjekt_type']->control}</dd>
         </dl>
 
         <dl class="detail_item">
-            <dt>Název subjektu</dt>
+            <dt>Název subjektu, jméno, IČ:</dt>
             <dd>{$newForm['subjekt_nazev']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>IČ</dt>
-            <dd>{$newForm['subjekt_ic']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Ulice</dt>
             <dd>
                 {$newForm['adresa_ulice']->control}
-                č.p. {$newForm['adresa_cp']->control}
-                č.o. {$newForm['adresa_co']->control}
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>PSČ a město</dt>
+            <dt>PSČ a město:</dt>
             <dd>
                 {$newForm['adresa_psc']->control}
                 {$newForm['adresa_mesto']->control}
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>{$newForm['adresa_stat']->label}</dt>
-            <dd>{$newForm['adresa_stat']->control}</dd>
-        </dl>
-
-        <dl class="detail_item">
-            <dt>{$newForm['subjekt_email']->label}</dt>
+            <dt>{$newForm['subjekt_email']->label}:</dt>
             <dd>{$newForm['subjekt_email']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>{$newForm['subjekt_telefon']->label}</dt>
+            <dt>{$newForm['subjekt_telefon']->label}:</dt>
             <dd>{$newForm['subjekt_telefon']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>{$newForm['subjekt_isds']->label}</dt>
+            <dt>{$newForm['subjekt_isds']->label}:</dt>
             <dd>{$newForm['subjekt_isds']->control}</dd>
         </dl>
 

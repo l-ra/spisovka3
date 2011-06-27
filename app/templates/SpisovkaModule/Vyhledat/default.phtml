@@ -1,8 +1,3 @@
-@{block title}Vyhledat dokumenty{/block}
-@{block content}
-
-    <h2>Vyhledat dokumenty</h2>
-
     {$searchForm->render('begin')}
     <div id="dokument_blok_vyrizeni">
         <div class="h2">
@@ -10,7 +5,7 @@
         </div>
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
-            <dd>{$searchForm['typ_dokumentu_id']->control}</dd>
+            <dd>{$searchForm['dokument_typ_id']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Stav dokumentu:</dt>
@@ -33,8 +28,13 @@
             <dd>{$searchForm['popis']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Datum doručení/vzniku</dt>
-            <dd>{$searchForm['datum_vzniku']->control} {$searchForm['datum_vzniku_cas']->control}</dd>
+            <dt>Způsob doručení:</dt>
+            <dd>{$searchForm['typ_doruceni']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum doručení/vzniku </dt>
+            <dd>od: {$searchForm['datum_vzniku_od']->control} {$searchForm['datum_vzniku_cas_od']->control}</dd>
+            <dd>do: {$searchForm['datum_vzniku_do']->control} {$searchForm['datum_vzniku_cas_do']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Číslo jednací odesilatele:</dt>
@@ -45,20 +45,22 @@
             <dd>{$searchForm['poznamka']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Počet listů:</dt>
-            <dd>{$searchForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$searchForm['pocet_priloh']->control}</dd>
-        </dl>
-        <dl class="detail_item">
             <dt>Způsob vyžízení:</dt>
             <dd>{$searchForm['zpusob_vyrizeni']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Datum vyžízení:</dt>
-            <dd>{$searchForm['datum_vyrizeni']->control} {$searchForm['datum_vyrizeni_cas']->control}&nbsp;</dd>
+            <dt>Datum vyřízení:</dt>
+            <dd>od: {$searchForm['datum_vyrizeni_od']->control} {$searchForm['datum_vyrizeni_cas_od']->control}&nbsp;</dd>
+            <dd>do: {$searchForm['datum_vyrizeni_do']->control} {$searchForm['datum_vyrizeni_cas_do']->control}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Způsob odeslání:</dt>
+            <dd>{$searchForm['zpusob_odeslani']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Datum odeslání:</dt>
-            <dd>{$searchForm['datum_odeslani']->control} {$searchForm['datum_odeslani_cas']->control}&nbsp;</dd>
+            <dd>od: {$searchForm['datum_odeslani_od']->control} {$searchForm['datum_odeslani_cas_od']->control}&nbsp;</dd>
+            <dd>do: {$searchForm['datum_odeslani_do']->control} {$searchForm['datum_odeslani_cas_do']->control}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spisový znak:</dt>
@@ -77,14 +79,6 @@
             <dd>{$searchForm['spousteci_udalost']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Počet listů:</dt>
-            <dd>{$searchForm['vyrizeni_pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$searchForm['vyrizeni_pocet_priloh']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Uložení dokumentu:</dt>
-            <dd>{$searchForm['ulozeni_dokumentu']->control}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
             <dt>Poznámka k vyřízení:</dt>
             <dd>{$searchForm['poznamka_vyrizeni']->control}&nbsp;</dd>
         </dl>
@@ -92,24 +86,30 @@
 
     <div id="dokument_blok_poznamka">
         <div class="h2">
-            Zaměstnanci
+            Přidělěno / předáno
         </div>
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
             {$searchForm['prideleno']->control}
+            <br />{$searchForm['prideleno_osobne']->control} Přidělěno na mé jméno
+            <br />{$searchForm['prideleno_na_organizacni_jednotku']->control} Přidělěno na mou organizační jednotku
             <script type="text/javascript">
             <!--
 		$('#frmsearchForm-prideleno').focus().keyup(function(event) {
+                    if ( $('#frmsearchForm-prideleno').val().length > 2 ) {
 			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmsearchForm-prideleno').val()}, function(payload) {
-				$('#uprideleno').remove();
+				$('#prideleno').remove();
 
-				var list = $('<ul id="uprideleno"></ul>').insertAfter('#frmsearchForm-prideleno');
+				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmsearchForm-prideleno');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
 				}
 			});
+                    } else {
+                        $('#prideleno').remove();
+                    }
 		});
             -->
             </script>
@@ -119,121 +119,67 @@
             <dt>Předáno:</dt>
             <dd>
             {$searchForm['predano']->control}
+            <br />{$searchForm['predano_osobne']->control} Předáno na mé jméno
+            <br />{$searchForm['predano_na_organizacni_jednotku']->control} Předáno na mou organizační jednotku
             <script type="text/javascript">
             <!--
 		$('#frmsearchForm-predano').focus().keyup(function(event) {
+                    if ( $('#frmsearchForm-predano').val().length > 2 ) {
 			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmsearchForm-predano').val()}, function(payload) {
-				$('#upredano').remove();
+				$('#predano').remove();
 
-				var list = $('<ul id="upredano"></ul>').insertAfter('#frmsearchForm-predano');
+				var list = $('<ul id="predano"></ul>').insertAfter('#frmsearchForm-predano');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
 				}
 			});
+                    } else {
+                        $('#predano').remove();
+                    }
 		});
             -->
             </script>
             </dd>
         </dl>
     </div>
-
-    <div id="dokument_blok_poznamka">
-        <div class="h2">
-            Organizační jednotka
-        </div>
-        <dl class="detail_item">
-            <dt>Přiděleno:</dt>
-            <dd>
-            {$searchForm['prideleno_org']->control}
-            <script type="text/javascript">
-            <!--
-		$('#frmsearchForm-prideleno_org').focus().keyup(function(event) {
-			$.getJSON({link autoCompleteOrg!}, { typ: 1, text: $('#frmsearchForm-prideleno_org').val()}, function(payload) {
-				$('#oprideleno').remove();
-
-				var list = $('<ul id="oprideleno"></ul>').insertAfter('#frmsearchForm-prideleno_org');
-
-				for (var i in payload.autoComplete) {
-					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
-				}
-			});
-		});
-            -->
-            </script>
-            </dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Předáno:</dt>
-            <dd>
-            {$searchForm['predano_org']->control}
-            <script type="text/javascript">
-            <!--
-		$('#frmsearchForm-predano_org').focus().keyup(function(event) {
-			$.getJSON({link autoCompleteOrg!}, { typ: 2, text: $('#frmsearchForm-predano_org').val()}, function(payload) {
-				$('#opredano').remove();
-
-				var list = $('<ul id="opredano"></ul>').insertAfter('#frmsearchForm-predano_org');
-
-				for (var i in payload.autoComplete) {
-					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
-				}
-			});
-		});
-            -->
-            </script>
-            </dd>
-        </dl>
-    </div>
-
 
     <div id="dokument_blok_poznamka">
         <div class="h2">
             Adresáti / odesílatelé
         </div>
         <dl class="detail_item">
-            <dt>Typ subjektu</dt>
+            <dt>Typ subjektu:</dt>
             <dd>{$searchForm['subjekt_type']->control}</dd>
         </dl>
 
         <dl class="detail_item">
-            <dt>Název subjektu</dt>
+            <dt>Název subjektu, jméno, IČ:</dt>
             <dd>{$searchForm['subjekt_nazev']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>IČ</dt>
-            <dd>{$searchForm['subjekt_ic']->control}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Ulice</dt>
             <dd>
                 {$searchForm['adresa_ulice']->control}
-                č.p. {$searchForm['adresa_cp']->control}
-                č.o. {$searchForm['adresa_co']->control}
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>PSČ a město</dt>
+            <dt>PSČ a město:</dt>
             <dd>
                 {$searchForm['adresa_psc']->control}
                 {$searchForm['adresa_mesto']->control}
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>{$searchForm['adresa_stat']->label}</dt>
-            <dd>{$searchForm['adresa_stat']->control}</dd>
-        </dl>
-
-        <dl class="detail_item">
-            <dt>{$searchForm['subjekt_email']->label}</dt>
+            <dt>{$searchForm['subjekt_email']->label}:</dt>
             <dd>{$searchForm['subjekt_email']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>{$searchForm['subjekt_telefon']->label}</dt>
+            <dt>{$searchForm['subjekt_telefon']->label}:</dt>
             <dd>{$searchForm['subjekt_telefon']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>{$searchForm['subjekt_isds']->label}</dt>
+            <dt>{$searchForm['subjekt_isds']->label}:</dt>
             <dd>{$searchForm['subjekt_isds']->control}</dd>
         </dl>
 
@@ -245,3 +191,39 @@
     {$searchForm->render('end')}
 
     <div id="dialog"></div>
+
+    <script type="text/javascript">
+        $(function() {
+            var date = new Date();
+            var year = date.getYear() + 1900;
+            var year_before = year - 15;
+            var year_after = year + 2;
+            $("input.datepicker").datepicker(
+            {
+                showButtonPanel: true,
+                changeMonth: true,
+                changeYear: true,
+                yearRange: year_before+':'+year_after,
+                dateFormat : "dd.mm.yy",
+                closeText:"Zrušit",
+                prevText:"Předchozí",
+                nextText:"Další",
+                currentText:"Dnes",
+                monthNames:["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"],
+                monthNamesShort:["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"],
+                dayNames:["Neděle","Pondělí","Úterý","Středa","Čtvrtek","Pátek","Sobota"],
+                dayNamesMin:["Ne","Po","Út","St","Čt","Pá","So"]
+            });
+            $('input.datetimepicker').datepicker(
+            {
+                duration: '',
+                changeMonth: true,
+                changeYear: true,
+                yearRange: '2007:2020',
+                showTime: true,
+                time24h: true,
+                currentText: 'Dnes',
+                closeText: 'OK'
+            });
+        });
+    </script>

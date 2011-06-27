@@ -69,6 +69,17 @@
 
 
     </table>
+    {elseif isset($prilis_mnoho)}
+    <div style="text-align: center; margin-top: 15px; color: red;">
+        Tato sestava obsahuje příliš mnoho dokumentů pro zobrazení na této obrazovce. Jejich zobrazení by trvalo hodně dlouho.
+        <p>
+        Chcete-li přesto zobrazit všech {$pocet_dokumentu} dokumentů, klikněte na odkaz pokračovat a vyčkejte dokud se sestava celá nenačte. Jinak zvolte jiné parametry.
+
+        <div>
+            <a href="{$reload_url}">Pokračovat</a>
+        </div>
+
+    </div>
     {else}
     <div style="text-align: center; margin-top: 15px;">
         Tato sestava neobsahuje žádné dokumenty.

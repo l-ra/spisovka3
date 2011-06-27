@@ -177,23 +177,42 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         if ( count($seznam)>0 ) {
 
-            $dataplus = array();
+            $pokracovat = $this->getParam('pokracovat',null);
 
-            $dokument_ids = array();
-            foreach ($seznam as $row) {
-                $dokument_ids[] = $row->id;
-            }
+            if ( count($seznam) > 200 && !$pokracovat ) {
 
-            $DokSubjekty = new DokumentSubjekt();
-            $dataplus['subjekty'] = $DokSubjekty->subjekty($dokument_ids);
-            $Dokrilohy = new DokumentPrilohy();
-            $dataplus['prilohy'] = $Dokrilohy->prilohy($dokument_ids);
-            $DokOdeslani = new DokumentOdeslani();
-            $dataplus['odeslani'] = array( '0'=> null );//$DokOdeslani->odeslaneZpravy($dokument_ids);
+                $this->template->prilis_mnoho = 1;
+                $this->template->pocet_dokumentu = count($seznam);
+                $seznam = array();
+                
+                $reload_url = Environment::getHttpRequest()->getOriginalUri()->getAbsoluteUri();
+                if ( strpos($reload_url,'?') !== false ) {
+                    $reload_url .= "&pokracovat=1";
+                } else {
+                    $reload_url .= "?pokracovat=1";
+                }
+                $this->template->reload_url = $reload_url;
 
-            foreach ($seznam as $index => $row) {
-                $dok = $Dokument->getInfo($row->id,null, $dataplus);
-                $seznam[$index] = $dok;
+            } else {
+
+                $dataplus = array();
+
+                $dokument_ids = array();
+                foreach ($seznam as $row) {
+                    $dokument_ids[] = $row->id;
+                }
+
+                $DokSubjekty = new DokumentSubjekt();
+                $dataplus['subjekty'] = $DokSubjekty->subjekty($dokument_ids);
+                $Dokrilohy = new DokumentPrilohy();
+                $dataplus['prilohy'] = $Dokrilohy->prilohy($dokument_ids);
+                $DokOdeslani = new DokumentOdeslani();
+                $dataplus['odeslani'] = array( '0'=> null );//$DokOdeslani->odeslaneZpravy($dokument_ids);
+
+                foreach ($seznam as $index => $row) {
+                    $dok = $Dokument->getInfo($row->id,null, $dataplus);
+                    $seznam[$index] = $dok;
+                }
             }
 
         } 
@@ -221,23 +240,33 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
 
         $typ_dokumentu = array();
-        $typ_dokumentu = Dokument::typDokumentu(null, 3);
+        $typ_dokumentu = Dokument::typDokumentu(null,3);
+
+        $typ_doruceni = array(
+            '0'=>'všechny',
+            '1'=>'pouze doručené přes elektronickou podatelnu',
+            '2'=>'pouze doručené přes email',
+            '3'=>'pouze doručené přes datovou schránkou',
+            '4'=>'doručené mimo epodatelnu',
+        );
 
         $typ_select = array();
-        $typ_select = Subjekt::typ_subjektu(null, 3);
+        $typ_select = Subjekt::typ_subjektu(null,3);
 
         $stat_select = array();
-        $stat_select = Subjekt::stat(null, 3);
+        $stat_select = Subjekt::stat(null,3);
+
+        $zpusob_doruceni = array();
+        $zpusob_doruceni = Dokument::zpusobDoruceni(null, 3);
+
+        $zpusob_odeslani = array();
+        $zpusob_odeslani = Dokument::zpusobOdeslani(null, 3);
 
         $zpusob_vyrizeni = array();
         $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 3);
 
-        $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->seznam(null, 3);
-
         $spudalost_seznam = array();
         $spudalost_seznam = SpisovyZnak::spousteci_udalost(null, 3);
-
 
         $skartacni_znak = array('0'=>'jakýkoli znak','A'=>'A','V'=>'V','S'=>'S');
 
@@ -252,6 +281,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         $pridelen = array('0'=>'kdokoli','2'=>'přidělen','1'=>'předán');
 
+
         $form = new AppForm();
 
         $form->addText('sestava_nazev', 'Název sestavy:', 80, 100);
@@ -265,50 +295,61 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50);
         $form->addText('spisova_znacka', 'Spisová značka:', 50, 50);
         $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu);
+        $form->addSelect('typ_doruceni', 'Způsob doručení:', $typ_doruceni);
+        $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
-        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10);
-        $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
+        $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):', 10);
+        $form->addText('datum_vzniku_cas_od', 'Čas doručení (od):', 10, 15);
+        $form->addDatePicker('datum_vzniku_do', 'Datum doručení/vzniku do:', 10);
+        $form->addText('datum_vzniku_cas_do', 'Čas doručení do:', 10, 15);
+
         $form->addText('pocet_listu', 'Počet listů:', 5, 10);
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10);
         $form->addSelect('stav_dokumentu', 'Stav dokumentu:', $stav_dokumentu);
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->setValue('30');
-        $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
+        $form->addTextArea('poznamka', 'Poznámka:', 80, 4);
 
-        $form->addSelect('zpusob_vyrizeni_id', 'Způsob vyřízení:', $zpusob_vyrizeni);
-        $form->addDatePicker('datum_vyrizeni', 'Datum vyřízení:', 10);
-        $form->addText('datum_vyrizeni_cas', 'Čas vyřízení:', 10, 15);
-        $form->addDatePicker('datum_odeslani', 'Datum odeslání:', 10);
-        $form->addText('datum_odeslani_cas', 'Čas odeslání:', 10, 15);
-        $form->addSelect('spisovy_znak_id', 'spisový znak:', $spisznak_seznam);
-        $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6);
-        $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 6);
+        $form->addSelect('zpusob_vyrizeni', 'Způsob vyřízení:', $zpusob_vyrizeni);
+        $form->addDatePicker('datum_vyrizeni_od', 'Datum vyřízení od:', 10);
+        $form->addText('datum_vyrizeni_cas_od', 'Čas vyřízení od:', 10, 15);
+        $form->addDatePicker('datum_vyrizeni_do', 'Datum vyřízení do:', 10);
+        $form->addText('datum_vyrizeni_cas_do', 'Čas vyřízení do:', 10, 15);
 
+        $form->addSelect('zpusob_odeslani', 'Způsob odeslání:', $zpusob_odeslani);
+        $form->addDatePicker('datum_odeslani_od', 'Datum odeslání (od):', 10);
+        $form->addText('datum_odeslani_cas_od', 'Čas odeslání (od):', 10, 15);
+        $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:', 10);
+        $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15);
+
+        $form->addText('spisovy_znak_id', 'spisový znak:');
+        $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 4);
+        $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 4);
         $form->addSelect('skartacni_znak','Skartační znak: ', $skartacni_znak);
         $form->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
-        $form->addSelect('spousteci_udalost_id','Spouštěcí událost: ', $spudalost_seznam);
+        $form->addSelect('spousteci_udalost','Spouštěcí událost: ', $spudalost_seznam);
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10);
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10);
 
+        $form->addText('prideleno', 'Přiděleno:', 50, 255);
+        $form->addText('predano', 'Předáno:', 50, 255);
+
+        $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno');
+        $form->addCheckbox('prideleno_na_organizacni_jednotku', 'Přiděleno na mou organizační jednotku');
+        $form->addCheckbox('predano_osobne', 'Předáno na mé jméno');
+        $form->addCheckbox('predano_na_organizacni_jednotku', 'Předáno na mou organizační jednotku');
+
 
         $form->addSelect('subjekt_type', 'Typ subjektu:', $typ_select);
-        $form->addText('subjekt_nazev', 'Název subjektu:', 50, 255);
-        $form->addText('subjekt_ic', 'IČ:', 12, 8);
+        $form->addText('subjekt_nazev', 'Název subjektu, jméno, IČ:', 50, 255);
         $form->addText('adresa_ulice', 'Ulice / část obce:', 50, 48);
-        $form->addText('adresa_cp', 'číslo popisné:', 10, 10);
-        $form->addText('adresa_co', 'Číslo orientační:', 10, 10);
         $form->addText('adresa_mesto', 'Obec:', 50, 48);
         $form->addText('adresa_psc', 'PSČ:', 10, 10);
-        $form->addSelect('adresa_stat', 'Stát:', $stat_select);
 
         $form->addText('subjekt_email', 'Email:', 50, 250);
         $form->addText('subjekt_telefon', 'Telefon:', 50, 150);
         $form->addText('subjekt_isds', 'ID datové schránky:', 10, 50);
-
-
-
-
 
         $form->addSubmit('novy', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
@@ -383,23 +424,32 @@ class Spisovka_SestavyPresenter extends BasePresenter
         } else {
             $params = null;
         }
-        
-
 
         $typ_dokumentu = array();
-        $typ_dokumentu = Dokument::typDokumentu(null, 3);
+        $typ_dokumentu = Dokument::typDokumentu(null,3);
+
+        $typ_doruceni = array(
+            '0'=>'všechny',
+            '1'=>'pouze doručené přes elektronickou podatelnu',
+            '2'=>'pouze doručené přes email',
+            '3'=>'pouze doručené přes datovou schránkou',
+            '4'=>'doručené mimo epodatelnu',
+        );
 
         $typ_select = array();
-        $typ_select = Subjekt::typ_subjektu(null, 3);
+        $typ_select = Subjekt::typ_subjektu(null,3);
 
         $stat_select = array();
-        $stat_select = Subjekt::stat(null, 3);
+        $stat_select = Subjekt::stat(null,3);
+
+        $zpusob_doruceni = array();
+        $zpusob_doruceni = Dokument::zpusobDoruceni(null, 3);
+
+        $zpusob_odeslani = array();
+        $zpusob_odeslani = Dokument::zpusobOdeslani(null, 3);
 
         $zpusob_vyrizeni = array();
         $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 3);
-
-        $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->seznam(null, 3);
 
         $spudalost_seznam = array();
         $spudalost_seznam = SpisovyZnak::spousteci_udalost(null, 3);
@@ -416,6 +466,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             );
 
         $pridelen = array('0'=>'kdokoli','2'=>'přidělen','1'=>'předán');
+
 
         $form = new AppForm();
         $form->addHidden('id')
@@ -435,17 +486,26 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$params['popis']);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50)
-                ->setValue(@$params['cislo_jendaci']);
+                ->setValue(@$params['cislo_jednaci']);
         $form->addText('spisova_znacka', 'Spisová značka:', 50, 50)
                 ->setValue(@$params['spisova_znacka']);
-        $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu)
-                ->setValue(@$params['typ_dokumenty']);
+        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
+                ->setValue(@$params['dokument_typ_id']);
+        $form->addSelect('typ_doruceni', 'Způsob doručení:', $typ_doruceni)
+                ->setValue(@$params['typ_doruceni']);
+        $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni)
+                ->setValue(@$params['zpusob_doruceni_id']);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$params['cislo_jednaci_odesilatele']);
-        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10)
-                ->setValue(@$params['datum_vzniku']);
-        $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
-                ->setValue(@$params['datum_vzniku_cas']);
+        $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):', 10)
+                ->setValue(@$params['datum_vzniku_od']);
+        $form->addText('datum_vzniku_cas_od', 'Čas doručení (od):', 10, 15)
+                ->setValue(@$params['datum_vzniku_cas_od']);
+        $form->addDatePicker('datum_vzniku_do', 'Datum doručení/vzniku do:', 10)
+                ->setValue(@$params['datum_vzniku_do']);
+        $form->addText('datum_vzniku_cas_do', 'Čas doručení do:', 10, 15)
+                ->setValue(@$params['datum_vzniku_cas_do']);
+
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
                 ->setValue(@$params['pocet_listu']);
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
@@ -455,26 +515,37 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->setValue(@$params['lhuta']);
-        $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
+        $form->addTextArea('poznamka', 'Poznámka:', 80, 4)
                 ->setValue(@$params['poznamka']);
 
-        $form->addSelect('zpusob_vyrizeni_id', 'Způsob vyřízení:', $zpusob_vyrizeni)
+        $form->addSelect('zpusob_vyrizeni', 'Způsob vyřízení:', $zpusob_vyrizeni)
                 ->setValue(@$params['zpusob_vyrizeni']);
-        $form->addDatePicker('datum_vyrizeni', 'Datum vyřízení:', 10)
-                ->setValue(@$params['datum_vyrizeni']);
-        $form->addText('datum_vyrizeni_cas', 'Čas vyřízení:', 10, 15)
-                ->setValue(@$params['datum_vyrizeni_cas']);
-        $form->addDatePicker('datum_odeslani', 'Datum odeslání:', 10)
-                ->setValue(@$params['datum_odeslani']);
-        $form->addText('datum_odeslani_cas', 'Čas odeslání:', 10, 15)
-                ->setValue(@$params['datum_odeslani_cas']);
-        $form->addSelect('spisovy_znak_id', 'spisový znak:', $spisznak_seznam)
-                ->setValue(@$params['spisovy_znak_id']);
-        $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
-                ->setValue(@$params['ulozeni_dokumentu']);
-        $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 6)
-                ->setValue(@$params['poznamka_vyrizeni']);
+        $form->addDatePicker('datum_vyrizeni_od', 'Datum vyřízení od:', 10)
+                ->setValue(@$params['datum_vyrizeni_od']);
+        $form->addText('datum_vyrizeni_cas_od', 'Čas vyřízení od:', 10, 15)
+                ->setValue(@$params['datum_vyrizeni_cas_od']);
+        $form->addDatePicker('datum_vyrizeni_do', 'Datum vyřízení do:', 10)
+                ->setValue(@$params['datum_vyrizeni_do']);
+        $form->addText('datum_vyrizeni_cas_do', 'Čas vyřízení do:', 10, 15)
+                ->setValue(@$params['datum_vyrizeni_cas_do']);
 
+        $form->addSelect('zpusob_odeslani', 'Způsob odeslání:', $zpusob_odeslani)
+                ->setValue(@$params['zpusob_odeslani']);
+        $form->addDatePicker('datum_odeslani_od', 'Datum odeslání (od):', 10)
+                ->setValue(@$params['datum_odeslani_od']);
+        $form->addText('datum_odeslani_cas_od', 'Čas odeslání (od):', 10, 15)
+                ->setValue(@$params['datum_odeslani_cas_od']);
+        $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:', 10)
+                ->setValue(@$params['datum_odeslani_do']);
+        $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15)
+                ->setValue(@$params['datum_odeslani_cas_do']);
+
+        $form->addText('spisovy_znak_id', 'spisový znak:')
+                ->setValue(@$params['spisovy_znak_id']);
+        $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 4)
+                ->setValue(@$params['ulozeni_dokumentu']);
+        $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 4)
+                ->setValue(@$params['poznamka_vyrizeni']);
         $form->addSelect('skartacni_znak','Skartační znak: ', $skartacni_znak)
                 ->setValue(@$params['skartacni_znak']);
         $form->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
@@ -486,25 +557,29 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$params['vyrizeni_pocet_priloh']);
 
+        $form->addText('prideleno', 'Přiděleno:', 50, 255);
+        $form->addText('predano', 'Předáno:', 50, 255);
+
+        $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno')
+                ->setValue(@$params['prideleno_osobne']);
+        $form->addCheckbox('prideleno_na_organizacni_jednotku', 'Přiděleno na mou organizační jednotku')
+                ->setValue(@$params['prideleno_na_organizacni_jednotku']);
+        $form->addCheckbox('predano_osobne', 'Předáno na mé jméno')
+                ->setValue(@$params['predano_osobne']);
+        $form->addCheckbox('predano_na_organizacni_jednotku', 'Předáno na mou organizační jednotku')
+                ->setValue(@$params['predano_na_organizacni_jednotku']);
+
 
         $form->addSelect('subjekt_type', 'Typ subjektu:', $typ_select)
                 ->setValue(@$params['subjekt_type']);
-        $form->addText('subjekt_nazev', 'Název subjektu:', 50, 255)
+        $form->addText('subjekt_nazev', 'Název subjektu, jméno, IČ:', 50, 255)
                 ->setValue(@$params['subjekt_nazev']);
-        $form->addText('subjekt_ic', 'IČ:', 12, 8)
-                ->setValue(@$params['subjekt_ic']);
         $form->addText('adresa_ulice', 'Ulice / část obce:', 50, 48)
                 ->setValue(@$params['adresa_ulice']);
-        $form->addText('adresa_cp', 'číslo popisné:', 10, 10)
-                ->setValue(@$params['adresa_cp']);
-        $form->addText('adresa_co', 'Číslo orientační:', 10, 10)
-                ->setValue(@$params['adresa_co']);
         $form->addText('adresa_mesto', 'Obec:', 50, 48)
                 ->setValue(@$params['adresa_mesto']);
         $form->addText('adresa_psc', 'PSČ:', 10, 10)
-                ->setValue(@$params['adresa_psc']);
-        $form->addSelect('adresa_stat', 'Stát:', $stat_select)
-                ->setValue(@$params['adresa_stat']);
+                ->setValue(@$params['adrea_psc']);
 
         $form->addText('subjekt_email', 'Email:', 50, 250)
                 ->setValue(@$params['subjekt_email']);
@@ -512,7 +587,6 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 ->setValue(@$params['subjekt_telefon']);
         $form->addText('subjekt_isds', 'ID datové schránky:', 10, 50)
                 ->setValue(@$params['subjekt_isds']);
-
 
 
         $form->addSubmit('upravit', 'Upravit')
@@ -549,7 +623,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         unset($data['id'],$data['sestava_nazev'],$data['sestava_popis'],
               $data['sestava_typ'],$data['sestava_filtr']);
 
-        //Debug::dump($data);
+        //Debug::dump($data); exit;
 
         // pro sestaveni sloupce
         $sloupce = '';

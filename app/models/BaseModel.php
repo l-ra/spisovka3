@@ -38,6 +38,7 @@ abstract class BaseModel extends Object
     protected $tb_dokspis = 'dokument_to_spis';
     protected $tb_dok_subjekt = 'dokument_to_subjekt';
     protected $tb_dok_file = 'dokument_to_file';
+    protected $tb_dok_odeslani = 'dokument_odeslani';
     
     protected $tb_spousteci_udalost = 'spousteci_udalost';
     protected $user_to_role = 'user_to_role';
@@ -71,6 +72,7 @@ abstract class BaseModel extends Object
         $this->tb_dokspis = $prefix . $this->tb_dokspis;
         $this->tb_dok_subjekt = $prefix . $this->tb_dok_subjekt;
         $this->tb_dok_file = $prefix . $this->tb_dok_file;
+        $this->tb_dok_odeslani = $prefix . $this->tb_dok_odeslani;
         $this->user_to_role = $prefix . $this->user_to_role;
         $this->osoba = $prefix . $this->osoba;
         $this->tb_osoba_to_user = $prefix . $this->tb_osoba_to_user;

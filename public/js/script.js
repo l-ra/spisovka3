@@ -8,11 +8,17 @@ $(function() {
     /*
      * DatePicter - volba datumu z kalendare
      */
+    var date = new Date();
+    var year = date.getYear() + 1900;
+    var year_before = year - 15;
+    var year_after = year + 2;
+
     $("input.datepicker").datepicker(
     {
         showButtonPanel: true,
         changeMonth: true,
 	changeYear: true,
+        yearRange: year_before+':'+year_after,
         dateFormat : "dd.mm.yy",
         closeText:"Zrušit",
         prevText:"Předchozí",
@@ -230,7 +236,6 @@ $(function() {
     });
 
     $('#novysubjekt_click').click( subjektNovy );
-
 
 });
 
