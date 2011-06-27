@@ -3,18 +3,34 @@
 class Admin_OrgjednotkyPresenter extends BasePresenter
 {
 
-    public function renderSeznam()
+    private $hledat;
+
+    public function renderSeznam($hledat = null)
     {
         $user_config = Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
 
-        $OrgJednotka = new Orgjednotka();
+        // hledani
+        $this->hledat = "";
+        $this->template->no_items = 0;
+        $args = null;
+        if ( isset($hledat) ) {
+            $args = array(array(
+                    'plny_nazev LIKE %s OR','%'.$hledat.'%',
+                    'zkraceny_nazev LIKE %s OR','%'.$hledat.'%',
+                    'ciselna_rada LIKE %s','%'.$hledat.'%'
+                )
+            );
 
-        $where = null;// array( array('ciselna_rada LIKE %s','ORG_12%') );
-        
-        $result = $OrgJednotka->seznam($where,1);
+            $this->hledat = $hledat;
+            $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
+        }
+
+        $OrgJednotka = new Orgjednotka();
+       
+        $result = $OrgJednotka->seznam($args,1);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
 
@@ -335,6 +351,37 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         }
 
         exit;
+    }
+
+    protected function createComponentSearchForm()
+    {
+
+        $hledat =  !is_null($this->hledat)?$this->hledat:'';
+
+        $form = new AppForm();
+        $form->addText('dotaz', 'Hledat:', 20, 100)
+                 ->setValue($hledat);
+        $form['dotaz']->getControlPrototype()->title = "Hledat lze názvu organizační jednotky (plný, zkrácený, zkratka)";
+
+        $form->addSubmit('hledat', 'Hledat')
+                 ->onClick[] = array($this, 'hledatSimpleClicked');
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = null;
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
+
+        return $form;
+    }
+
+    public function hledatSimpleClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $this->forward('this', array('hledat'=>$data['dotaz']));
+
     }
 
 }

@@ -190,7 +190,7 @@ class Subjekt extends BaseModel
     {
 
         if ( isset($args['where']) ) {
-            $where = array($args['where']);
+            $where = $args['where'];
         } else {
             $where = null;
         }
@@ -271,9 +271,11 @@ class Subjekt extends BaseModel
         }
 
         $prostredni_jmeno = "";
+        $prostredni_jmeno_item = "";
         if ( isset( $data->prostredni_jmeno ) ) {
             if ( !empty( $data->prostredni_jmeno ) ) {
                 $prostredni_jmeno = $data->prostredni_jmeno ." ";
+                $prostredni_jmeno_item = " ". $data->prostredni_jmeno;
             }
         }
 
@@ -294,7 +296,7 @@ class Subjekt extends BaseModel
             $nazev = trim($data->nazev_subjektu);
             $nazev_item = trim($data->nazev_subjektu);
             $osoba = trim($titul_pred . $jmeno ." ". $prostredni_jmeno . $prijmeni . $titul_za);
-            $osoba_item = trim($titul_pred . $jmeno ." ". $prostredni_jmeno . $prijmeni . $titul_za);
+            $osoba_item = trim($prijmeni." ". $jmeno. $prostredni_jmeno_item . $titul_pred_item . $titul_za);
 
             if ( !empty($nazev) && !empty($osoba) ) {
                 $d_nazev = $nazev .", ". $osoba;

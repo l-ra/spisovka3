@@ -3,15 +3,56 @@
 class Admin_ZamestnanciPresenter extends BasePresenter
 {
 
-    public function renderSeznam()
+    private $hledat;
+
+    public function renderSeznam($hledat = null)
     {
+
+        // paginator
+        $abcPaginator = new AbcPaginator($this, 'abc');
         $user_config = Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
 
+        // hledani
+        $this->hledat = "";
+        $this->template->no_items = 0;
+        $args = null;
+        if ( isset($hledat) ) {
+            $args = array(array(
+                    "CONCAT(jmeno,' ',prijmeni) LIKE %s OR",'%'.$hledat.'%',
+                    "CONCAT(prijmeni,' ',jmeno) LIKE %s OR",'%'.$hledat.'%',
+                    'email LIKE %s OR','%'.$hledat.'%',
+                    'telefon LIKE %s','%'.$hledat.'%'
+                )
+            );
+
+            $this->hledat = $hledat;
+            $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
+        }
+
+        // zobrazit podle pismena
+        $abc = $abcPaginator->getParam('abc');
+        if ( !empty($abc) ) {
+            if ( is_array($args) ) {
+                $args[] = array("prijmeni LIKE %s",$abc.'%');
+            } else {
+                $args = array(array("prijmeni LIKE %s",$abc.'%'));
+            }
+        }
+
+        // pouze aktivni
+        if ( is_array($args) ) {
+            $args[] = array('stav=0');
+        } else {
+            $args = array('stav=0');
+        }
+
+
+        // nacteni
         $Osoba = new Osoba();
-        $result = $Osoba->seznam();
+        $result = $Osoba->seznam($args);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
 
@@ -385,6 +426,37 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
 	$form = $button->getParent();
 	$changePasswordForm = $this->getComponent('changePasswordForm');
+    }
+
+    protected function createComponentSearchForm()
+    {
+
+        $hledat =  !is_null($this->hledat)?$this->hledat:'';
+
+        $form = new AppForm();
+        $form->addText('dotaz', 'Hledat:', 20, 100)
+                 ->setValue($hledat);
+        $form['dotaz']->getControlPrototype()->title = "Hledat lze dle jména, emailu, telefonu";
+
+        $form->addSubmit('hledat', 'Hledat')
+                 ->onClick[] = array($this, 'hledatSimpleClicked');
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = null;
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
+
+        return $form;
+    }
+
+    public function hledatSimpleClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $this->forward('this', array('hledat'=>$data['dotaz']));
+
     }
 
 }

@@ -44,14 +44,9 @@ class Osoba extends BaseModel
 
     public function seznam($args = null)
     {
-        $args = func_get_args();
 
-        $select = $this->fetchAll(array('prijmeni','jmeno'));
-
+        $select = $this->fetchAll(array('prijmeni','jmeno'),$args);
         return $select;
-
-        //$rows = $select->fetchAll();
-        //return ($rows) ? $rows : NULL;
 
     }
 

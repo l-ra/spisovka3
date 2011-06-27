@@ -12,6 +12,12 @@
         <a href="{link :Admin:Zamestnanci:sync}">Přidat zaměstnance přes externí zdroj</a>
     </div>
 
+    <div id="search">
+        {control searchForm}
+    </div>
+
+    {widget abc}
+
     {if count($seznam)>0}
     <table class="seznam">
         {foreach $seznam as $osoba}

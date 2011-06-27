@@ -4,6 +4,7 @@ class Admin_SpisyPresenter extends BasePresenter
 {
 
     private $spis_plan;
+    private $hledat;
 
     public function actionSeznam()
     {
@@ -11,7 +12,7 @@ class Admin_SpisyPresenter extends BasePresenter
         $this->spis_plan = $Spisy->seznamSpisovychPlanu();
     }
 
-    public function renderSeznam()
+    public function renderSeznam($hledat = null)
     {
 
         $Spisy = new Spis();
@@ -33,7 +34,11 @@ class Admin_SpisyPresenter extends BasePresenter
         if ( !empty($spis_id) ) {
 
             $this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
-            $args = null;// array( 'where'=>array("id=%i",$spis_id) );
+
+            $args = null;
+            if ( !empty($hledat) ) {
+                $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+            }
 
             $user_config = Environment::getVariable('user_config');
             $vp = new VisualPaginator($this, 'vp');
@@ -508,6 +513,35 @@ class Admin_SpisyPresenter extends BasePresenter
         exit;
     }
 
+    protected function createComponentSearchForm()
+    {
 
+        $hledat =  !is_null($this->hledat)?$this->hledat:'';
+
+        $form = new AppForm();
+        $form->addText('dotaz', 'Hledat:', 20, 100)
+                 ->setValue($hledat);
+        $form['dotaz']->getControlPrototype()->title = "Hledat lze dle názvu spisu";
+
+        $form->addSubmit('hledat', 'Hledat')
+                 ->onClick[] = array($this, 'hledatSimpleClicked');
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = null;
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
+
+        return $form;
+    }
+
+    public function hledatSimpleClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $this->forward('this', array('hledat'=>$data['dotaz']));
+
+    }
 
 }

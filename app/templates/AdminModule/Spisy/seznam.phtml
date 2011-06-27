@@ -46,6 +46,10 @@
         <a href="{link :Admin:Spisy:upravit}">Upravit hodnoty spisového plánu</a>
     </div>
 
+    <div id="search">
+        {control searchForm}
+    </div>
+
     {if count($seznam)>0}
     <table>
         {foreach $seznam as $spis}
