@@ -67,7 +67,9 @@
         Module:    {$module}
         Presenter: {$presenter}
         View:      {$view}
-        
+
+        User:      {=print_r(Environment::getUser()->getIdentity())}
+
         Server:
         {foreach $_SERVER as $sname => $svalue}
         <span style="color:#0000ff">{$sname}</span> = <span style="color:#008800">{if is_array($svalue)}Array(){else}{$svalue}{/if}</span>
