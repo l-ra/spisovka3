@@ -96,7 +96,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $term = $this->getParam('term');
 
         if ( !empty($term) ) {
-            $args = array('where'=>array('LOWER(CONCAT(nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)','%'.$term.'%'));
+            $args = array('where'=>array(array('LOWER(CONCAT(nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)','%'.$term.'%')));
             $seznam_subjektu = $Subjekt->seznam($args);
         } else {
             $seznam_subjektu = $Subjekt->seznam();
