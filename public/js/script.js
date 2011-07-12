@@ -237,6 +237,17 @@ $(function() {
 
     $('#novysubjekt_click').click( subjektNovy );
 
+    $('#checkbox_all_on').click(function(event) {
+        $('input[name^=dokument_vyber]').attr('checked',true);
+        $('input[name^=spis_vyber]').attr('checked',true);
+        $('input[name^=zapujcka_vyber]').attr('checked',true);
+    });
+    $('#checkbox_all_off').click(function(event) {
+        $('input[name^=dokument_vyber]').attr('checked',false);
+        $('input[name^=spis_vyber]').attr('checked',false);
+        $('input[name^=zapujcka_vyber]').attr('checked',false);
+    });
+
 });
 
 

@@ -191,6 +191,18 @@ class Dokument extends BaseModel
             case 'dvzniku_desc':
                 $args['order'] = array('d.datum_vzniku'=>'DESC','d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC');
                 break;
+            case 'skartacni_znak':
+                $args['order'] = array('d.skartacni_znak','d.podaci_denik_rok','d.podaci_denik_poradi');
+                break;
+            case 'skartacni_znak_desc':
+                $args['order'] = array('d.skartacni_znak'=>'DESC','d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC');
+                break;
+            case 'spisovy_znak':
+                $args['order'] = array('d.skartacni_znak','d.podaci_denik_rok','d.podaci_denik_poradi');
+                break;
+            case 'spisovy_znak_desc':
+                $args['order'] = array('d.skartacni_znak'=>'DESC','d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC');
+                break;
             case 'prideleno':
                 //$args['order'] = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
                 break;
@@ -205,6 +217,8 @@ class Dokument extends BaseModel
 
         if ( is_null($nazev) && is_null($params) ) {
             return null;
+        } else if ( $nazev == 'spisovna' ) {
+            return $this->spisovnaFiltr($params);
         } else if ( is_null($nazev) ) {
             return $this->paramsFiltr($params);
         } else {
@@ -361,6 +375,8 @@ class Dokument extends BaseModel
                 if ( $params['stav_dokumentu'] == 4 ) {
                     // vyrizene - 4,5,6
                     $args['where'][] = array('wf.stav_dokumentu IN (4,5,6) AND wf.aktivni=1');
+                } else if ( $params['stav_dokumentu'] == 77 ) {
+                    $args['where'][] = array('wf.stav_dokumentu IN (6,7,8) AND wf.aktivni=1');
                 } else {
                     $args['where'][] = array('wf.stav_dokumentu = %i AND wf.aktivni=1',$params['stav_dokumentu']);
                 }
@@ -974,6 +990,87 @@ class Dokument extends BaseModel
 
     }
 
+    private function spisovnaFiltr($params = null)
+    {
+
+        if ( strpos($params,'stav_') !== false ) {
+            $stav = substr($params, 5);
+            return $this->paramsFiltr(array('stav_dokumentu'=>$stav));
+        } else if ( $params == 'vlastni' ) {
+            return $this->paramsFiltr(array('stav_dokumentu'=>77,'prideleno_osobne'=>1));
+        } else if ( strpos($params,'skartacni_znak_') !== false ) {
+            $skartacni_znak = substr($params, 15);
+            return $this->paramsFiltr(array('skartacni_znak'=>$skartacni_znak));
+        } else if ( strpos($params,'zpusob_vyrizeni_') !== false ) {
+            $zpusob_vyrizeni = substr($params, 16);
+            return $this->paramsFiltr(array('zpusob_vyrizeni_id'=>$zpusob_vyrizeni));
+        } else {
+            return $this->paramsFiltr(array('stav_dokumentu'=>77));
+        }
+
+    }
+
+    public function spisovka($args) {
+
+        if ( isset($args['where']) ) {
+            $args['where'][] = array('d.stav < 2');
+        } else {
+            $args['where'] = array(array('d.stav < 2'));
+        }
+
+        return $args;
+    }
+
+    public function spisovna($args) {
+
+        if ( isset($args['where']) ) {
+            $args['where'][] = array('d.stav > 1');
+        } else {
+            $args['where'] = array(array('d.stav > 1'));
+        }
+        
+        return $args;
+    }
+
+    public function spisovna_prijem($args) {
+
+        if ( isset($args['where']) ) {
+            $args['where'][] = array('wf.stav_dokumentu = 6 AND wf.aktivni = 1');
+        } else {
+            $args['where'] = array(array('wf.stav_dokumentu = 6 AND wf.aktivni = 1'));
+        }
+
+        return $args;
+    }
+
+    public function spisovna_keskartaci($args) {
+
+        if ( isset($args['where']) ) {
+            $args['where'][] = array('d.stav > 1');
+            $args['where'][] = array('wf.stav_dokumentu < 8 AND wf.aktivni=1');
+            $args['where'][] = array('NOW() > CASE WHEN d.skartacni_lhuta > 1900 THEN MAKEDATE(d.skartacni_lhuta,1) ELSE DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR) END');
+        } else {
+            $args['where'] = array(
+                                array('d.stav > 1'),
+                                array('wf.stav_dokumentu < 8 AND wf.aktivni=1'),
+                                array('NOW() > CASE WHEN d.skartacni_lhuta > 1900 THEN MAKEDATE(d.skartacni_lhuta,1) ELSE DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR) END')
+                             );
+        }
+
+        return $args;
+    }
+
+    public function spisovna_skartace($args) {
+
+        if ( isset($args['where']) ) {
+            $args['where'][] = array('wf.stav_dokumentu = 8 AND wf.aktivni = 1');
+        } else {
+            $args['where'] = array(array('wf.stav_dokumentu = 8 AND wf.aktivni = 1'));
+        }
+
+        return $args;
+    }
+
     public function getInfo($dokument_id, $detail = 0, $dataplus = null) {
 
         $UserModel = new UserModel();
@@ -982,7 +1079,7 @@ class Dokument extends BaseModel
         
             'distinct'=>null,
             'from' => array($this->name => 'dok'),
-            'cols' => array('*','id'=>'dokument_id'),
+            'cols' => array('*','id'=>'dokument_id','%sqlCASE WHEN dok.skartacni_lhuta > 1900 THEN MAKEDATE(dok.skartacni_lhuta,1) ELSE DATE_ADD(dok.datum_spousteci_udalosti, INTERVAL dok.skartacni_lhuta YEAR) END'=>'skartacni_rok'),
             'leftJoin' => array(
                 'dokspisy' => array(
                     'from' => array($this->tb_dokspis => 'sp'),
@@ -1018,8 +1115,18 @@ class Dokument extends BaseModel
                     'cols' => array('id'=>'org_id',
                                     'plny_nazev'=>'org_plny_nazev','zkraceny_nazev'=>'org_zkraceny_nazev','ciselna_rada'=>'org_ciselna_rada')
                 ),
-
-
+                'workflow_user' => array(
+                    'from' => array($this->tb_osoba_to_user => 'wf_o2user'),
+                    'on' => array('wf_o2user.user_id=wf.user_id'),
+                    'cols' => array('osoba_id'=>'user_osoba_id','user_id'=>'wf_user_id')
+                ),
+                'workflow_user_osoba' => array(
+                    'from' => array($this->tb_osoba => 'wf_user_osoba'),
+                    'on' => array('wf_user_osoba.id=wf_o2user.osoba_id'),
+                    'cols' => array('id'=>'user_osoba_id',
+                                    'prijmeni'=>'user_prijmeni','jmeno'=>'user_jmeno','titul_pred'=>'user_titul_pred','titul_za'=>'user_titul_za'
+                                   )
+                ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
                     'on' => array('spis.id=sp.spis_id'),
@@ -1072,6 +1179,13 @@ class Dokument extends BaseModel
                     $workflow->prideleno_jmeno = "";
                 }
                 $workflow->stav_osoby = $row->stav_osoby; unset($row->stav_osoby);
+                
+                $workflow->user_id = $row->wf_user_id; unset($row->wf_user_id);
+                if ( !empty($workflow->user_id) ) {
+                    $workflow->user_jmeno = Osoba::displayName($row,'user');
+                } else {
+                    $workflow->user_jmeno = "";
+                }
 
                 $workflow->orgjednotka_id = $row->orgjednotka_id; unset($row->orgjednotka_id);
                 if ( !empty($workflow->orgjednotka_id) ) {
@@ -1188,6 +1302,11 @@ class Dokument extends BaseModel
                     //$datum_skartace =
                     $dokument->datum_skartace = DateDiff::add($dokument->datum_spousteci_udalosti, $dokument->skartacni_lhuta);
                 }
+
+                //$dokument->datum_skartace = $dokument->skartacni_rok;
+                //= new DateTime($dokument->skartacni_rok);
+                //Debug::dump($datum_skartace);
+
             } else {
                 $dokument->datum_skartace = 'neurčeno';
             }
@@ -1597,6 +1716,12 @@ class Dokument extends BaseModel
                 $tmp[0] = 'jakýkoli způsob vyřízení';
                 foreach ($result as $dt) {
                     $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
+                }
+                return $tmp;
+            } else if ( $select == 4 ) {
+               $tmp = array();
+                foreach ($result as $dt) {
+                    $tmp[ 'zpusob_vyrizeni_'. $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
             } else {

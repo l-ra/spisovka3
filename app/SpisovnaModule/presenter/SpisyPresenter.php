@@ -1,6 +1,6 @@
 <?php
 
-class Spisovka_SpisyPresenter extends BasePresenter
+class Spisovna_SpisyPresenter extends BasePresenter
 {
 
     private $typ_evidence = null;
@@ -82,14 +82,13 @@ class Spisovka_SpisyPresenter extends BasePresenter
         
     }
 
-
     public function actionDefault()
     {
         $Spisy = new Spis();
         $this->spis_plan = $Spisy->seznamSpisovychPlanu();
     }
 
-    public function renderDefault($hledat = null)
+    public function renderDefault()
     {
 
         $post = $this->getRequest()->getPost();
@@ -126,7 +125,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
             $paginator = $vp->getPaginator();
             $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
 
-            $args = $Spisy->spisovka($args);
+            $args = $Spisy->spisovna($args);
             $result = $Spisy->seznam($args, 5, $spis_id);
             $paginator->itemCount = count($result);
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -143,33 +142,73 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
         $this->template->spisplanForm = $this['spisplanForm'];
 
-        /*
-        $args = null;
-        if ( !empty($hledat) ) {
-            $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+    }
+
+    public function actionPrijem()
+    {
+        $Spisy = new Spis();
+        $this->spis_plan = $Spisy->seznamSpisovychPlanu();
+    }
+
+    public function renderPrijem()
+    {
+
+        $post = $this->getRequest()->getPost();
+        if ( isset($post['hromadna_submit']) ) {
+            $this->actionAkce($post);
         }
 
         $Spisy = new Spis();
+        $session_spisplan = Environment::getSession('s3_spisplan');
+        $spis_id = $this->getParam('id',null);
 
-        $user_config = Environment::getVariable('user_config');
-        $vp = new VisualPaginator($this, 'vp');
-        $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+        if ( !is_null($spis_id) ) {
+            // spis_id
+        } else if ( !empty($session_spisplan->spis_id) ) {
+            $spis_id = $session_spisplan->spis_id;
+        } else if ( count($this->spis_plan)>0 ) {
+            reset($this->spis_plan);
+            $spis_id = key($this->spis_plan);
+        } else {
+            $spis_id = null;
+        }
 
-        $result = $Spisy->seznam($args,5);
-        $paginator->itemCount = count($result);
-        $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        $this->template->seznam = $seznam;*/
+        if ( !empty($spis_id) ) {
+
+            $this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
+
+            $args = null;
+            if ( !empty($hledat) ) {
+                $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+            }
+
+            $user_config = Environment::getVariable('user_config');
+            $vp = new VisualPaginator($this, 'vp');
+            $paginator = $vp->getPaginator();
+            $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+
+            $args = $Spisy->spisovna_prijem($args);
+            $result = $Spisy->seznam($args, 5, $spis_id);
+            $paginator->itemCount = count($result);
+            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $this->template->seznam = $seznam;
+            $session_spisplan->spis_id = $spis_id;
+        } else {
+            $this->template->seznam = null;
+        }
+
+        $this->template->spisplanForm = $this['spisplanForm'];
 
     }
 
     public function actionDetail()
     {
-        
+
         $spis_id = $this->getParam('id',null);
         // Info o spisu
         $Spisy = new Spis();
         $this->template->Spis = $spis = $Spisy->getInfo($spis_id);
+
 
         $DokumentSpis = new DokumentSpis();
         //$user_config = Environment::getVariable('user_config');
@@ -182,9 +221,8 @@ class Spisovka_SpisyPresenter extends BasePresenter
         //$this->template->seznam = $seznam;
         $this->template->seznam = $result;
 
-        $this->template->FormUpravit = $this->getParam('upravit',null);
-
     }
+
 
     public function renderDetail()
     {
@@ -201,11 +239,11 @@ class Spisovka_SpisyPresenter extends BasePresenter
             $user = Environment::getUser()->getIdentity();
             switch ($data['hromadna_akce']) {
                 /* Predani vybranych spisu do spisovny  */
-                case 'predat_spisovna':
+                case 'prevzit_spisovna':
                     if ( isset($data['spis_vyber']) ) {
                         $count_ok = $count_failed = 0;
                         foreach ( $data['spis_vyber'] as $spis_id ) {
-                            $stav = $Spis->predatDoSpisovny($spis_id);
+                            $stav = $Spis->pripojitDoSpisovny($spis_id);
                             if ( $stav === true ) {
                                 $count_ok++;
                             } else {
@@ -216,10 +254,10 @@ class Spisovka_SpisyPresenter extends BasePresenter
                             }
                         }
                         if ( $count_ok > 0 ) {
-                            $this->flashMessage('Úspěšně jste předal '.$count_ok.' spisů do spisovny.');
+                            $this->flashMessage('Úspěšně jste přijal '.$count_ok.' spisů do spisovny.');
                         }
                         if ( $count_failed > 0 ) {
-                            $this->flashMessage($count_failed.' spisů se nepodařilo předat do spisovny!','warning');
+                            $this->flashMessage($count_failed.' spisů se nepodařilo příjmout do spisovny!','warning');
                         }
                         if ( $count_ok > 0 && $count_failed > 0 ) {
                             $this->redirect('this');
@@ -292,13 +330,14 @@ class Spisovka_SpisyPresenter extends BasePresenter
                 ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
         $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spis->popis);
-        $form1->addSelect('parent_id', 'Připojit k:', $spisy)
-                ->setValue(@$spis->parent_id);
-        //$form1->addSelect('stav', 'Změnit stav na:', $stav_select)
-        //             ->setValue(@$spis->stav);
+        $form1->addSelect('spis_parent_id', 'Připojit k:', $spisy)
+                ->setValue(@$spis->spis_parent_id);
+        $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
+                ->setValue(@$spis->stav);
 
-        $form1->addText('spisovy_znak', 'Spisový znak:')
-                ->setValue(@$spis->spisovy_znak);
+        $form1->addSelect('spisovy_znak', 'Spisový znak:', $spisznak_seznam)
+                ->setValue(@$spis->spisovy_znak)
+                ->controlPrototype->onchange("vybratSpisovyZnak();");
         $form1->addText('skartacni_znak','Skartační znak: ', 3, 3)
                 ->setValue(@$spis->skartacni_znak);
                 //->controlPrototype->readonly = TRUE;
@@ -333,6 +372,9 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
         $spis_id = $data['id'];
         unset($data['id']);
+        $data['date_modified'] = new DateTime();
+        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+
 
         $Spisy = new Spis();
 
@@ -451,15 +493,6 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $this->forward('default', array('id'=>$form_data['spisplan']) );
     }
 
-
-    public function actionZmenitspisovyznak()
-    {
-        $Spis = new Spis();
-        $spisovy_znak_max = $Spis->maxSpisovyZnak( $this->getParam('id',null) );
-        echo $spisovy_znak_max;
-        exit;
-    }
-
     protected function createComponentSearchForm()
     {
 
@@ -490,7 +523,6 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $this->forward('this', array('hledat'=>$data['dotaz']));
 
     }
-
 
 }
 

@@ -90,7 +90,11 @@ class ImapClient {
             $message = array();
             $count = $this->count_messages();
             for ($i=1;$i<=$count;$i++) {
-                $message[$i] = $this->get_message($i);
+                $mess = $this->get_message($i);
+                if ( $mess ) {
+                    $message[$i] = $mess;
+                }
+                unset($mess);                
             }
             $this->add_message($message);
             return $message;
@@ -108,7 +112,11 @@ class ImapClient {
             $message = array();
             $count = $this->count_messages();
             for ($i=1;$i<=$count;$i++) {
-                $message[$i] = $this->get_head_message($i);
+                $mess = $this->get_head_message($i);
+                if ( $mess ) {
+                    $message[$i] = $mess;
+                }
+                unset($mess);
             }
             //$this->add_message($message);
             return $message;
@@ -123,7 +131,9 @@ class ImapClient {
             /* Header */
             $mail_header = @imap_header($this->_stream,$id_message);
             $mail = $this->parse_message_header($mail_header);
-
+            
+            if ( is_null($mail) ) return null;
+            
             /* Body */
             $mail_body = @imap_fetchstructure($this->_stream, $id_message);
             $mail->body = $this->parse_message_body($id_message,$mail_body);
@@ -148,14 +158,16 @@ class ImapClient {
         if (!is_null($this->_stream)) {
 
             /* Header */
-            $mail_header = imap_header($this->_stream,$id_message);
+            $mail_header = @imap_header($this->_stream,$id_message);
             $mail = $this->parse_message_header($mail_header);
 
+            if ( is_null($mail) ) return null;
+            
             $mail->body = null;
             $this->texts = array();
             $this->attachments = array();
             $this->signatures = array();
-
+            //$mail->source = $this->source_message($id_message);            
             return $mail;
         } else {
             return null;
@@ -485,19 +497,42 @@ class ImapClient {
 
     private function parse_message_header($message) {
 
+        if ( is_null($message) ) { return null; }
+        //if ( empty($message->toaddress) ) { return null; }
+
+        if ( empty($message->message_id) ) {
+            // neobsahuje message_id - vygenerujeme vlastni
+            $mid = sha1(@$message->subject ."#". $message->udate ."#". @$message->fromaddress ."#". @$message->toaddress ."#". @$message->size);
+            $message->message_id = "<$mid@mail>";
+        }        
+        
         $tmp = new stdClass();
         /* subject */
-        $tmp->subject = $this->decode_header($message->subject);
+        if ( empty($message->subject) ) {
+            $tmp->subject = "(bez předmětu)";
+        } else {
+            $tmp->subject = $this->decode_header($message->subject);
+        }        
 
         $tmp->message_id = $message->message_id;
-        $tmp->id_part = $message->Msgno;
+        $tmp->id_part = trim($message->Msgno);
 
         /* Address */
-        $tmp->to = $this->get_address($message->to);
-        $tmp->to_address = $this->decode_header($message->toaddress);
+        if(isset($message->to)) {
+            $tmp->to = $this->get_address($message->to);
+            $tmp->to_address = $this->decode_header($message->toaddress);
+        } else {
+            $tmp->to = null;
+            $tmp->to_address = "";
+        }
 
-        $tmp->from = $this->get_address($message->from);
-        $tmp->from_address = $this->decode_header($message->fromaddress);
+        if(isset($message->from)) {
+            $tmp->from = $this->get_address($message->from);
+            $tmp->from_address = $this->decode_header($message->fromaddress);
+        } else {
+            $tmp->from = null;
+            $tmp->from_address = "";
+        }
 
         if(isset($message->cc)) {
             $tmp->cc = $this->get_address($message->cc);
@@ -532,7 +567,16 @@ class ImapClient {
         foreach ($address as $item) {
             $tmp = new stdClass();
             $tmp->personal = (isset($item->personal))?$this->decode_header($item->personal):"";
-            $tmp->email = $item->mailbox ."@". $item->host;
+            
+            if (!empty($item->host) && !empty($item->mailbox)) {
+                $tmp->email = $item->mailbox ."@". $item->host;
+            } else if ( empty($item->host) && !empty($item->mailbox) ) {
+                $tmp->email = $item->mailbox;
+            } else {
+                $tmp->email = "";
+                //continue;
+            }
+            
             if(!empty($tmp->personal)) {
                 $tmp->string = $tmp->personal ." <". $tmp->email .">";
             } else {

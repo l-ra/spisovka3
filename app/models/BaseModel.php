@@ -28,6 +28,7 @@ abstract class BaseModel extends Object
     protected $tb_subjekt = 'subjekt';
     protected $tb_subjekt_historie = 'subjekt';
     protected $tb_epodatelna = 'epodatelna';
+    protected $tb_zapujcka = 'zapujcka';
 
     protected $tb_logaccess = 'log_access';
     protected $tb_logdokument = 'log_dokument';
@@ -63,6 +64,7 @@ abstract class BaseModel extends Object
         $this->tb_orgjednotka = $prefix . $this->tb_orgjednotka;
         $this->tb_workflow = $prefix . $this->tb_workflow;
         $this->tb_epodatelna = $prefix . $this->tb_epodatelna;
+        $this->tb_zapujcka = $prefix . $this->tb_zapujcka;
         $this->tb_spis = $prefix . $this->tb_spis;
         $this->tb_subjekt = $prefix . $this->tb_subjekt;
         $this->tb_subjekt_historie = $prefix . $this->tb_subjekt_historie;
@@ -275,6 +277,9 @@ abstract class BaseModel extends Object
                     } else {
                         $cols_string_a[] = "`".$from_index[0]."`.`$value`";
                     }
+                } else if ( strpos($key,'%sql') !== false ) {
+                    $key = str_replace('%sql', '', $key);
+                    $cols_string_a[] = $key .' AS '.$value;
                 } else {
                     // $key as $value = [key2] AS alias
                     if ( strpos($key,'.')!==false ) {
@@ -309,11 +314,16 @@ abstract class BaseModel extends Object
                 array_push($query,'%sql', $lf);
             }
         }
+
+        if ( isset($where_or) ){
+            if ( isset($where) ) {
+                $where[] = array(array('%or',$where_or));
+            } else {
+                array_push($query, 'WHERE %or', $where_or);
+            }
+        }
         if ( isset($where) ){
             array_push($query, 'WHERE %and', $where);
-        }
-        if ( isset($where_or) ){
-            array_push($query, 'WHERE %or', $where_or);
         }
         if ( isset($order) ){
             array_push($query, 'ORDER BY %by', $order);

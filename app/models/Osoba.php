@@ -111,6 +111,16 @@ class Osoba extends BaseModel
             $data = $tmp;
             unset($tmp);
         }
+        
+        if ( isset($data->user_prijmeni) && $display == 'user' ) {
+            $tmp = new stdClass();
+            $tmp->jmeno = $data->user_jmeno;
+            $tmp->prijmeni = $data->user_prijmeni;
+            $tmp->titul_pred = $data->user_titul_pred;
+            $tmp->titul_za = $data->user_titul_za;
+            $data = $tmp;
+            unset($tmp);
+        }        
 
         // Sestaveni prvku z jmena
 

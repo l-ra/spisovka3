@@ -6,6 +6,23 @@ class Workflow extends BaseModel
     protected $name = 'workflow';
     protected $primary = 'id';
 
+/*
+ * 0 - mimo evidenci
+ * 1 - novy
+ * 2 - predan / pridelen
+ * 3 - vyrizuje se 
+ * 4 - vyrizeno, ale neni spustena spousteci udalost
+ * 5 - vyrizeno a spousteci udalost spustena
+ * 6 - predan do spisovny
+ * 7 - ve spisovne
+ * 8 - ke skartaci
+ * 9 - archivovan
+ * 10 - skartovan
+ * 
+ * 
+ * 
+ */
+
 
     public function dokument($dokument_id, $stav=null)
     {
@@ -455,6 +472,111 @@ class Workflow extends BaseModel
         }
     }
 
+    public function predatDoSpisovny($dokument_id)
+    {
+
+        // kontrola uzivatele
+
+        $Dokument = new Dokument();
+        $dokument_info = $Dokument->getInfo($dokument_id);
+
+        //echo "<pre>"; print_r($dokument_info); echo "</pre>"; exit;
+
+        // Test na uplnost dat
+        if ( $kontrola = $Dokument->kontrola($dokument_info) ) {
+            // nejsou kompletni data - neprenasim
+            return 'Dokument '.$dokument_info->jid.' nelze přenést do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
+        }
+
+        // Kontrola stavu - vyrizen a spusten 5 <
+        if ( $dokument_info->stav_dokumentu < 4 ) {
+            return 'Dokument '.$dokument_info->jid.' nelze přenést do spisovny! Není označen jako vyřízený.';
+        } else if ( $dokument_info->stav_dokumentu < 5 ) {
+            return 'Dokument '.$dokument_info->jid.' nelze přenést do spisovny! Není spuštěna událost.';
+        }
+
+        // Predat do spisovny
+        $workflow_data = $this->fetchRow(array('id=%i',$dokument_info['prideleno']->id))->fetch();
+        if ( $workflow_data ) {
+
+            $workflow_data = (array) $workflow_data;
+            unset($workflow_data['id']);
+            $workflow_data['stav_dokumentu'] = 6;
+            $workflow_data['date'] = new DateTime();
+            $workflow_data['user_id'] = Environment::getUser()->getIdentity()->id;
+
+            $this->deaktivovat($dokument_id);
+            $result_insert = $this->insert($workflow_data);
+            if ( $result_insert ) {
+                $Log = new LogModel();
+                $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN, 'Dokument předán do spisovny.');
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+
+        
+    }
+
+    public function pripojitDoSpisovny($dokument_id)
+    {
+
+        // kontrola uzivatele
+
+        $Dokument = new Dokument();
+        $dokument_info = $Dokument->getInfo($dokument_id);
+
+        // Test na uplnost dat
+        if ( $kontrola = $Dokument->kontrola($dokument_info) ) {
+            // nejsou kompletni data - neprenasim
+            return 'Dokument '.$dokument_info->jid.' nelze příjmout do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
+        }
+
+        // Kontrola stavu - vyrizen a spusten 5 <
+        if ( $dokument_info->stav_dokumentu < 4 ) {
+            return 'Dokument '.$dokument_info->jid.' nelze příjmout do spisovny! Není označen jako vyřízený.';
+        } else if ( $dokument_info->stav_dokumentu < 5 ) {
+            return 'Dokument '.$dokument_info->jid.' nelze příjmout do spisovny! Není spuštěna událost.';
+        }
+
+        // Pripojit do spisovny
+        $workflow_data = $this->fetchRow(array('id=%i',$dokument_info['prideleno']->id))->fetch();
+        if ( $workflow_data ) {
+
+            $dokument_update = array(
+                'stav' => 2
+            );
+            if ( $Dokument->ulozit($dokument_update, $dokument_id) ) {
+
+                $workflow_data = (array) $workflow_data;
+                unset($workflow_data['id']);
+                $workflow_data['stav_dokumentu'] = 7;
+                $workflow_data['date'] = new DateTime();
+                $workflow_data['user_id'] = Environment::getUser()->getIdentity()->id;
+
+                $this->deaktivovat($dokument_id);
+                $result_insert = $this->insert($workflow_data);
+                if ( $result_insert ) {
+                    $Log = new LogModel();
+                    $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN, 'Dokument předán do spisovny.');
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+
+
+
+    }
+
+
     public function keskartaci($dokument_id, $user_id, $orgjednotka_id = null)
     {
         if ( is_numeric($dokument_id) ) {
@@ -477,7 +599,7 @@ class Workflow extends BaseModel
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
-                    $data['stav_dokumentu'] = 6;
+                    $data['stav_dokumentu'] = 8;
                     $data['stav_osoby'] = 1;
                     $data['aktivni'] = 1;
                     $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
@@ -531,7 +653,7 @@ class Workflow extends BaseModel
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
-                    $data['stav_dokumentu'] = 7;
+                    $data['stav_dokumentu'] = 9;
                     $data['stav_osoby'] = 1;
                     $data['aktivni'] = 1;
                     $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
@@ -585,7 +707,7 @@ class Workflow extends BaseModel
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
-                    $data['stav_dokumentu'] = 8;
+                    $data['stav_dokumentu'] = 10;
                     $data['stav_osoby'] = 1;
                     $data['aktivni'] = 1;
                     $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
@@ -617,7 +739,103 @@ class Workflow extends BaseModel
         }
     }
 
+    public function zapujcka_pridelit($dokument_id, $user_id)
+    {
+        if ( is_numeric($dokument_id) ) {
 
+                $user = Environment::getUser();
+                if ( $user->isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+
+                    //$transaction = (! dibi::inTransaction());
+                    //if ($transaction)
+                    //dibi::begin();
+
+                    $Dokument = new Dokument();
+                    $dokument_info = $Dokument->getInfo($dokument_id);
+
+                    // Deaktivujeme starsi zaznamy
+                    $this->deaktivovat($dokument_id);
+
+                    $UserModel = new UserModel();
+                    $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
+
+                    $data = array();
+                    $data['dokument_id'] = $dokument_info->id;
+                    $data['stav_dokumentu'] = 10;
+                    $data['stav_osoby'] = 1;
+                    $data['aktivni'] = 1;
+                    $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
+                    $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
+
+                    $data['date'] = new DateTime();
+                    $data['user_id'] = $user->getIdentity()->id;
+                    $data['poznamka'] = $dokument_info->prideleno->poznamka;
+
+                    $result_insert = $this->insert($data);
+
+                    //if ($transaction)
+                    //dibi::commit();
+
+                    if ( $result_insert ) {
+
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::ZAPUJCKA_PRIDELENA, 'Dokument byl přidělen k zapůjčení.');
+
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+        } else {
+            return false;
+        }
+    }
+    
+    public function zapujcka_vratit($dokument_id, $user_id)
+    {
+        if ( is_numeric($dokument_id) ) {
+
+            $user = Environment::getUser();
+
+            $Dokument = new Dokument();
+            $dokument_info = $Dokument->getInfo($dokument_id);
+
+            // Deaktivujeme starsi zaznamy
+            $this->deaktivovat($dokument_id);
+
+            $UserModel = new UserModel();
+            $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
+
+            $data = array();
+            $data['dokument_id'] = $dokument_info->id;
+            $data['stav_dokumentu'] = 10;
+            $data['stav_osoby'] = 1;
+            $data['aktivni'] = 1;
+            $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
+            $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
+
+            $data['date'] = new DateTime();
+            $data['user_id'] = $user->getIdentity()->id;
+            $data['poznamka'] = $dokument_info->prideleno->poznamka;
+
+            $result_insert = $this->insert($data);
+            if ( $result_insert ) {
+
+                $Log = new LogModel();
+                $Log->logDokument($dokument_id, LogModel::ZAPUJCKA_VRACENA, 'Dokument byl navrácen do spisovny.');
+
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    
     /**
      * Je uzivatel vlastnikem dokumentu
      * @param int $dokument_id

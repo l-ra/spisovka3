@@ -1,0 +1,46 @@
+@{block title}Nová zápůjčka{/block}
+@{block content}
+    <div class="navigate">
+    <a href="{link :Spisovna:Zapujcky:default}">Zápůjčky</a> - Nová zápůjčka
+    </div>
+
+    <h2>Žádanka o zápůjčku</h2>
+    
+    {$novyForm->render('begin')}
+    <div id="dokument_blok_hlavni">
+        <dl class="detail_item">
+            <dt><strong>{$novyForm['dokument_text']->label} *</strong></dt>
+            <dd>
+                {$novyForm['dokument_text']->control}{$novyForm['dokument_id']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt><strong>{$novyForm['user_text']->label} *</strong></dt>
+            <dd>
+                {$novyForm['user_text']->control}{$novyForm['user_id']->control}
+            </dd>
+        </dl>        
+        <dl class="detail_item">
+            <dt>{$novyForm['duvod']->label}</dt>
+            <dd>{$novyForm['duvod']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt><strong>{$novyForm['date_od']->label} *</strong></dt>
+            <dd>{$novyForm['date_od']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$novyForm['date_do']->label}</dt>
+            <dd>{$novyForm['date_do']->control}</dd>
+        </dl>
+        
+    </div>
+    
+    <div id="dokument_blok_akce">
+        {$novyForm['novy']->control}
+        &nbsp;&nbsp;
+        {$novyForm['storno']->control}
+    </div>
+    {$novyForm->render('end')}
+
+    <div id="dialog"></div>    
+        

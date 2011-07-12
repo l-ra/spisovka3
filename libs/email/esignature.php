@@ -18,6 +18,7 @@ class esignature {
 
     protected $ca_cert = array();
     protected $ca_cert_real = array();
+    protected $ca_info = array();
 
     public $error_string;
 
@@ -137,14 +138,18 @@ class esignature {
             $cacert_path = realpath($mixed);
             $cacert_data = file_get_contents($cacert_path);
             if ($res = @openssl_x509_read($cacert_data)) {
+                $data = openssl_x509_parse($res);
                 $this->ca_cert[] = $mixed;
                 $this->ca_cert_real[] = $cacert_path;
+                $this->ca_info[ $data['issuer']['CN'] ] = $data['issuer']['O'];                
                 return $res;
             } else {
                 $cacert_data = $this->der2pem($cacert_data);
                 if ($res = @openssl_x509_read($cacert_data)) {
+                    $data = openssl_x509_parse($res);
                     $this->ca_cert[] = $mixed;
                     $this->ca_cert_real[] = $cacert_path;
+                    $this->ca_info[ $data['issuer']['CN'] ] = $data['issuer']['O'];
                     return $res;
                 } else {
                     $this->error_string = openssl_error_string();
@@ -361,6 +366,7 @@ class esignature {
         $info['platnost_do'] = @$cert['validTo_time_t'];
         $info['CA'] = @$cert['issuer']['CN'];
         $info['CA_org'] = @$cert['issuer']['O'];
+        $info['CA_is_qualified'] = $this->is_qualified(@$cert['issuer']['CN']);
 
         if ( !empty($cert['extensions']['crlDistributionPoints']) ) {
             $crl_d = str_replace("URI:","",$cert['extensions']['crlDistributionPoints']);
@@ -381,7 +387,7 @@ class esignature {
 
         $info = array();
 
-        $info['serial_number'] = sprintf("%X",$cert->id);
+        $info['serial_number'] = sprintf("%X",@$cert->id);
         $info['id'] = @$cert->id_name;
         $info['jmeno'] = @$cert->name;
 
@@ -399,13 +405,22 @@ class esignature {
         $info['platnost_do'] = @$cert->subjekt->platnost_do_unix;
         $info['CA'] = @$cert->CA_name;
         $info['CA_org'] = @$cert->CA_org;
+        $info['CA_is_qualified'] = $this->is_qualified(@$cert->CA_name);
         $info['CRL'] = @$cert->CRL;
         $info['error'] = @$cert->error_message;
 
         return $info;
     }
 
-
+    public function is_qualified($ca_name)
+    {
+        if ( isset($this->ca_info[$ca_name]) ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     /**
      * Vypise informaci o certifikatu
      *

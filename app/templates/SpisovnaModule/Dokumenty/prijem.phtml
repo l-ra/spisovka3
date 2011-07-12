@@ -1,22 +1,20 @@
-@{block title}Seznam dokumentů{/block}
+@{block title}Seznam dokumentů pro příjem do spisovny{/block}
 @{block debug}
 <?php print_r($seznam); ?>
 @{/block}
 @{block content}
-    <h2>Seznam dokumentů</h2>
+    <h2>Seznam dokumentů pro příjem do spisovny</h2>
 
     <div id="filtr">
         {$filtrForm->render('begin')}
         {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
         {$filtrForm['go_filtr']->control}
-        <br/>
-        {$filtrForm['bez_vyrizenych']->control}{$filtrForm['bez_vyrizenych']->label}
         {$filtrForm->render('end')}
     </div>
     <div id="search">
         {control searchForm}
         <div id="search_advanced">
-        {access :Spisovka:Vyhledat:default}<a href="{link :Spisovka:Vyhledat:default}" id="dialog-search">Pokročilé vyhledávání</a>{/access}
+        {access :Spisovna:Vyhledat:default}<a href="{link :Spisovna:Vyhledat:default}" id="dialog-search">Pokročilé vyhledávání</a>{/access}
         </div>
     </div>
     
@@ -24,11 +22,6 @@
 
     <div style="margin: 3px 0px;">
     seřadit podle:
-    {if $seradit == "stav"}
-        <a href="{link this, 'seradit'=>'stav_desc'}" title="Seřadit podle stavu dokumentu (nový, předaný, vyřizuje se, vyřízený, ...)">stavu</a> &nbsp;
-    {else}
-        <a href="{link this, 'seradit'=>'stav'}" title="Seřadit podle stavu dokumentu (nový, předaný, vyřizuje se, vyřízený, ...)">stavu</a> &nbsp;
-    {/if}
     {if $seradit == "cj"}
         <a href="{link this, 'seradit'=>'cj_desc'}" title="Seřadit podle čísla jednacího">čísla jednacího</a> &nbsp;
     {else}
@@ -49,6 +42,16 @@
     {else}
         <a href="{link this, 'seradit'=>'prideleno'}" title="Seřadit podle příjmení osoby přidělené k dokumentu">přidělené osoby</a> &nbsp;
     {/if}
+    {if $seradit == "skartacni_znak"}
+        <a href="{link this, 'seradit'=>'skartacni_znak_desc'}" title="Seřadit podle skartačního znaku">skartačního znaku</a> &nbsp;
+    {else}
+        <a href="{link this, 'seradit'=>'skartacni_znak'}" title="Seřadit podle skartačního znaku">skartačního znaku</a> &nbsp;
+    {/if}
+    {if $seradit == "spisovy_znak"}
+        <a href="{link this, 'seradit'=>'spisovy_znak_desc'}" title="Seřadit podle spisové značky">spisové značky</a> &nbsp;
+    {else}
+        <a href="{link this, 'seradit'=>'spisovy_znak'}" title="Seřadit podle spisové značky">spisové značky</a> &nbsp;
+    {/if}
     </div>
 
     <div id="dokumenty">
@@ -59,11 +62,11 @@
         <tr>
             <th class="akce">&nbsp;</th>
             <th class="typ">Typ dokumentu</th>
-            <th class="prijato">Přijato</th>
+            <th class="prijato">Přijato<br />Vyřízeno</th>
             <th class="cislo_jadnaci">Číslo jednací<br />JID<br />Spisová značka</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
             <th class="prideleno">Přiděleno</th>
-            <th class="stav">Stav</th>
+            <th class="stav">Spisový znak<br/>Skartační znak<br/>Skartační lhůta</th>
         </tr>
         {foreach $seznam as $dok}
         <tr{if $dok->lhuta_stav==2} class="red"{elseif $dok->lhuta_stav==1} class="yellow"{/if}">
@@ -72,23 +75,26 @@
             </td>
             <td class="typ">
                 <img src="{$baseUri}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
+                <!--<img src="{$baseUri}images/icons/typdok{$dok->typ_dokumentu->typ}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="24" height="16" />-->
             </td>
-            <td class="prijato" title="{$dok->datum_vzniku|edatetime}">
-                {$dok->datum_vzniku|edate}
+            <td class="prijato">
+                <span title="{$dok->datum_vzniku|edatetime}">{$dok->datum_vzniku|edate}</span>
+                <br />
+                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
             <td class="cislo_jadnaci">
-                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
+                &nbsp;<strong><a href="{link :Spisovna:Dokumenty:detail, 'id'=>$dok->id}">
                    {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
                 </a></strong>
                 <div class="small">&nbsp;{$dok->jid}</div>
                 {if count($dok->spisy)>0}
                 {foreach $dok->spisy as $spis}
-                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
+                <a href="{link :Spisovna:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
                 {/foreach}
                 {/if}
             </td>
             <td class="vec">
-                <strong title="{$dok->popis}"><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
+                <strong title="{$dok->popis}"><a href="{link :Spisovna:Dokumenty:detail, 'id'=>$dok->id}">
                     {$dok->nazev}
                 </a></strong>
                 <br />
@@ -107,96 +113,21 @@
                 {=($dok->pocet_listu)+0} listů,
                 {=($dok->pocet_priloh)+0} list. příloh,
                 {=(count($dok->prilohy)+0)} příloh</span>
-            </td>
+                <br/>
+                <span class="small">způsob vyřízení:
+                {$dok->zpusob_vyrizeni}</span>
 
-
-
-            {if $dok->stav_dokumentu == 1}
-            <td class="prideleno">
-                {$dok->prideleno->prideleno_jmeno}
             </td>
-            <td class="stav {if $dok->lhuta_stav==2}stav_red" title="Vypršela lhůta k vyřízení! Vyříďte neprodleně tento dokument."{elseif $dok->lhuta_stav==1}stav_yellow" title="Za pár dní vyprší lhůta k vyřízení! Vyříďte co nejrychleji tento dokument."{else}stav"{/if}>
-                nový
-                <br />
-                <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
-            </td>
-            {elseif $dok->stav_dokumentu == 2 && !empty($dok->predano) }
-            <td class="prideleno">
-            {if empty($dok->prideleno->prideleno_id) }
-                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            {else}
-                {$dok->prideleno->prideleno_jmeno}
-                <br />
-                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            {/if}
-            </td>
-            <td class="stav {if $dok->lhuta_stav==2}stav_red{elseif $dok->lhuta_stav==1}stav_yellow{else}stav{/if}">
-                předáno
-                <br />
-                <span title="{$dok->predano->date_predani|edatetime}">{$dok->predano->date_predani|edate}</span>
-            </td>
-            {elseif $dok->stav_dokumentu == 2 && !empty($dok->prideleno) }
-            <td class="prideleno">
-            {if empty($dok->prideleno->prideleno_id) }
-                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            {else}
-                {$dok->prideleno->prideleno_jmeno}
-                <br />
-                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            {/if}
-            </td>
-            <td class="stav {if $dok->lhuta_stav==2}stav_red{elseif $dok->lhuta_stav==1}stav_yellow{else}stav{/if}">
-                přiděleno
-                <br />
-                <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
-            </td>
-            {elseif $dok->stav_dokumentu == 3 }
-            <td class="prideleno">
-                {$dok->prideleno->prideleno_jmeno}
-                <br />
-                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            </td>
-            <td class="stav {if $dok->lhuta_stav==2}stav_red{elseif $dok->lhuta_stav==1}stav_yellow{else}stav{/if}">
-                vyřizuje se
-                <br />
-                <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
-            </td>
-            {elseif $dok->stav_dokumentu == 4 }
             <td class="prideleno">
                 {$dok->prideleno->prideleno_jmeno}
                 <br />
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                vyřízeno
+                {$dok->spisovy_znak_id}
                 <br />
-                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+                {$dok->skartacni_znak} / {$dok->skartacni_lhuta}
             </td>
-            {elseif $dok->stav_dokumentu == 5 }
-            <td class="prideleno">
-                {$dok->prideleno->prideleno_jmeno}
-                <br />
-                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            </td>
-            <td class="stav">
-                vyřízeno
-                <br />
-                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
-            </td>
-
-            {else}
-            <td class="prideleno">
-                &nbsp;
-            </td>
-            <td class="stav">
-                nepřiřazeno!
-                <br />
-                lhůta {$dok->lhuta} dní
-            </td>
-            {/if}
-
-
-
         </tr>
         {/foreach}
 
@@ -207,8 +138,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         Vybrané položky:&nbsp;&nbsp;
         <select name="hromadna_akce">
-            <option value="prevzit">převzít</option>
-            <option value="predat_spisovna">předat do spisovny</option>
+            <option value="prevzit_spisovna">převzetí seznamu dokumentů do spisovny</option>
         </select>
         <input type="submit" name="hromadna_submit" value="Provést" />
     </div>

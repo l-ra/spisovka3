@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Spisová služba - {block #title}{/block}</title>
     <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/site.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/spisovna_site.css" />
     <link type="text/css" href="{$baseUri}css/redmond/jquery-ui-custom.css" rel="stylesheet" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <script type="text/javascript" src="{$baseUri}js/jquery-min.js"></script>
@@ -15,11 +16,12 @@
     {block #javascript}{/block}
     <script type="text/javascript" src="{$baseUri}js/jquery.nette.js"></script>
     <script type="text/javascript" src="{$baseUri}js/script.js"></script>
+    <script type="text/javascript" src="{$baseUri}js/script_spisovna.js"></script>
 </head>
 <body>
 <div id="layout_top">
     <div id="top">
-        <h1><a href="{vlink :Spisovka:Default:}">Spisová služba</a> <span id="top_urad">{$Urad->nazev}</span></h1>
+        <h1><a href="{vlink :Spisovna:Default:}">Spisovna</a> <span id="top_urad">{$Urad->nazev}</span></h1>
         <div id="top_menu">
             {access :Spisovka:Default:}<a href="{vlink :Spisovka:Default:}">Spisová služba</a>&nbsp;&nbsp;{/access}
             {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:}">E-podatelna</a>&nbsp;&nbsp;{/access}
@@ -39,10 +41,23 @@
 </div>
 <div id="layout">
     <div id="menu">
-        {access :Spisovka:Dokumenty:default}<a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a>{/access}
-        {access :Spisovka:Dokumenty:novy}<a href="{link :Spisovka:Dokumenty:novy}">Nový dokument</a>{/access}
-        {access :Spisovka:Spisy:default}<a href="{link :Spisovka:Spisy:default}">Spisy</a>{/access}
-        {access :Spisovka:Sestavy:default}<a href="{link :Spisovka:Sestavy:default}">Sestavy</a>{/access}
+        {accessrole skartacni_dohled,superadmin}
+        Příjem
+        <a href="{link :Spisovna:Dokumenty:prijem}">dokumentů</a>/
+        <a href="{link :Spisovna:Spisy:prijem}">spisů</a>
+        {/accessrole}
+        &nbsp;&nbsp;&nbsp;
+        {access :Spisovna:Dokumenty:default}
+        Seznam
+        <a href="{link :Spisovna:Dokumenty:default}">dokumentů</a>/
+        <a href="{link :Spisovna:Spisy:default}">spisů</a>
+        {/access}
+        &nbsp;&nbsp;&nbsp;
+        {access :Spisovna:Zapujcky:default}<a href="{link :Spisovna:Zapujcky:default}">Zápůjčky</a>{/access}
+        &nbsp;&nbsp;&nbsp;
+        {accessrole skartacni_dohled,superadmin}<a href="{link :Spisovna:Dokumenty:keskartaciseznam}">Ke skartaci</a>{/accessrole}
+        {accessrole skartacni_dohled,skartacni_rizeni,superadmin}<a href="{link :Spisovna:Dokumenty:skartace}">Skartační řízení</a>{/accessrole}
+
     </div>
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}

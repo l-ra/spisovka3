@@ -326,15 +326,18 @@ label.required {
     vertical-align: top;
 }
 
+#dokumenty .akce {
+    width: 12px;
+}
 #dokumenty .typ {
-    width: 50px;
+    width: 32px;
 }
 #dokumenty .prijato {
-    width: 80px;
+    width: 70px;
     text-align: right;
 }
 #dokumenty .cislo_jadnaci {
-    width: 150px;
+    width: 160px;
     text-align: right;
 }
 #dokumenty .vec {
@@ -506,6 +509,24 @@ label.required {
     text-decoration: underline;
 }
 
+#hromadna_akce {
+    position: relative;
+    padding: 10px 10px;
+    margin: 0px; margin-bottom: 10px;
+    background-color: #03406A;
+    color: #ffffff;
+}
+#checkbox_all_on {
+    color: #FFC273;
+    text-decoration: underline;
+    cursor: pointer;
+}
+#checkbox_all_off {
+    color: #FFC273;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 /* tlacitko na ovladani okna */
 /* Opravovano pro IE6 v externim .css */
 .toggler, .toogler_max {
@@ -595,6 +616,15 @@ label.required {
     border: 1px #681203 solid;
     background: #ffcccc url('../images/icons/dialog-error.png') 10px 5px no-repeat;
 }
+
+#error {
+    color: #880000;
+}
+
+#error p {
+    margin: 20px;
+}
+
 
 /* ***************************************************************** */
 /* *** LOGIN *** */

@@ -32,6 +32,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function renderDefault($filtr = null, $hledat = null, $seradit = null)
     {
 
+        $post = $this->getRequest()->getPost();
+        if ( isset($post['hromadna_submit']) ) {
+            $this->actionAkce($post);
+        }
+
         $this->template->Typ_evidence = $this->typ_evidence;
 
         $user_config = Environment::getVariable('user_config');
@@ -86,6 +91,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
         $this->template->seradit = $seradit;
 
+        $args = $Dokument->spisovka($args);
         $result = $Dokument->seznam($args);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -273,6 +279,74 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->metadataForm = $this['metadataForm'];
         $this->template->vyrizovaniForm = $this['vyrizovaniForm'];
         $this->template->udalostForm = $this['udalostForm'];
+    }
+
+    public function actionAkce($data)
+    {
+
+        //echo "<pre>"; print_r($data); echo "</pre>"; exit;
+
+        if ( isset($data['hromadna_akce']) ) {
+            $Workflow = new Workflow();
+            $user = Environment::getUser()->getIdentity();
+            switch ($data['hromadna_akce']) {
+                /* Prevzeti vybranych dokumentu */
+                case 'prevzit':
+                    if ( isset($data['dokument_vyber']) ) {
+                        $count_ok = $count_failed = 0;
+                        foreach ( $data['dokument_vyber'] as $dokument_id ) {
+                            if ( $Workflow->predany($dokument_id) ) {
+                                if ( $Workflow->prevzit($dokument_id, $user->id) ) {
+                                    $count_ok++;
+                                } else {
+                                    $count_failed++;
+                                }
+                            }
+                        }
+                        if ( $count_ok > 0 ) {
+                            $this->flashMessage('Úspěšně jste převzal '.$count_ok.' dokumentů.');
+                        }
+                        if ( $count_failed > 0 ) {
+                            $this->flashMessage('U '.$count_failed.' dokumentů se nepodařilo převzít dokument!','warning');
+                        }
+                        if ( $count_ok > 0 && $count_failed > 0 ) {
+                            $this->redirect('this');
+                        }
+                    }
+                    break;
+                /* Predani vybranych dokumentu do spisovny  */
+                case 'predat_spisovna':
+                    if ( isset($data['dokument_vyber']) ) {
+                        $count_ok = $count_failed = 0;
+                        foreach ( $data['dokument_vyber'] as $dokument_id ) {
+                            $stav = $Workflow->predatDoSpisovny($dokument_id);
+                            if ( $stav === true ) {
+                                $count_ok++;
+                            } else {
+                                if ( is_string($stav) ) {
+                                    $this->flashMessage($stav,'warning');
+                                }
+                                $count_failed++;
+                            }
+                        }
+                        if ( $count_ok > 0 ) {
+                            $this->flashMessage('Úspěšně jste předal '.$count_ok.' dokumentů do spisovny.');
+                        }
+                        if ( $count_failed > 0 ) {
+                            $this->flashMessage($count_failed.' dokumentů se nepodařilo předat do spisovny!','warning');
+                        }
+                        if ( $count_ok > 0 && $count_failed > 0 ) {
+                            $this->redirect('this');
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+            
+            
+        }
+       
     }
 
     public function renderPrevzit()
@@ -2242,7 +2316,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->forward(':Spisovka:Dokumenty:default', array('filtr'=>$data) );
 
     }
-
 
 }
 

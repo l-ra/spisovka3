@@ -32,7 +32,6 @@ Environment::setVariable('klientUri', $basePath );
 Environment::setVariable('baseUri', BASE_URI);
 Environment::setVariable('baseApp', BASE_APP);
 
-
 $unique_info = @file_get_contents(CLIENT_DIR .'/configs/install');
 if ( $unique_info === FALSE ) {
     define('APPLICATION_INSTALL',1);
@@ -155,6 +154,19 @@ if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_
                 'module'    => 'Epodatelna',
                 'presenter' => 'Default',
                 'action'    => 'default',
+                'id'        => null
+        ));
+        // Spisovna module
+        $router[] = new Route('spisovna/<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|prijem|keskartaciseznam|skartace>', array(
+                'module'    => 'Spisovna',
+                'presenter' => 'Default',
+		'action' => 'default',
+		'id' => NULL,
+	));
+        $router[] = new Route('spisovna/<presenter>/<id>/<action>', array(
+                'module'    => 'Spisovna',
+                'presenter' => 'Default',
+                'action'    => 'detail',
                 'id'        => null
         ));
         // Install module

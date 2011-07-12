@@ -205,6 +205,44 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         exit;
     }
 
+    public function actionUserSeznamAjax()
+    {
+        
+        $Zamestnanci = new Osoba2User();
+
+        $seznam = array();
+
+        $term = $this->getParam('term');
+
+        if ( !empty($term) ) {
+            $seznam_zamestnancu = $Zamestnanci->hledat($term);
+        } else {
+            $seznam_zamestnancu = $Zamestnanci->seznam(1);
+        }
+
+        if ( count($seznam_zamestnancu)>0 ) {
+            //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat zaměstnanci');
+            foreach( $seznam_zamestnancu as $user ) {
+                if ( !empty($user->name) ) {
+                    $role = " ( ".$user->name." )";
+                } else {
+                    $role = "";
+                }
+                $seznam[ ] = array(
+                    "id"=> $user->user_id,
+                    "type" => 'item',
+                    "value"=> ('<strong>'.Osoba::displayName($user, 'full_item')."</strong>". $role),
+                    "nazev"=> (Osoba::displayName($user, 'full_item') . $role)
+                );
+            }
+        }
+
+        echo json_encode($seznam);
+
+        exit;
+    }
+    
+    
     public function renderVybrano()
     {
 

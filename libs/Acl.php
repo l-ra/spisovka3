@@ -132,5 +132,22 @@ class Acl extends Permission {
        }
     }
 
-
+    public static function isInRole($roles)
+    {
+        if ( strpos($roles,",") !== false ) {
+            $role_part = explode(",",$roles);
+            if ( count($role_part)>0 ) {
+                foreach ( $role_part as $role ) {
+                    $is = Environment::getUser()->isInRole($role);
+                    if ( $is ) return true;
+                }
+                return false;
+            } else {
+                return Environment::getUser()->isInRole($roles);
+            }
+        } else {
+            return Environment::getUser()->isInRole($roles);
+        }
+    }
+    
 }

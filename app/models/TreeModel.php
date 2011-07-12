@@ -193,7 +193,7 @@ class TreeModel extends BaseModel
 
             if ( $data['parent_id'] == 0 ) $data['parent_id'] = null;
 
-            $this->update( $data , array( array('id=%i',$id) ) );
+            $this->update( $data , array(array('id=%i',$id)) );
 
             // 2. update tree
             $parent_id = $data['parent_id'];

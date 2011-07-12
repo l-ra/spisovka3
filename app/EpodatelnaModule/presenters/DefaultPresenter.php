@@ -22,7 +22,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
 
         $args = array(
-            'where' => array('(ep.stav=0 OR ep.stav=1) AND (ep.epodatelna_typ=0)')
+            'where' => array('(ep.stav=1) AND (ep.epodatelna_typ=0)')
         );
         $result = $this->Epodatelna->seznam($args);
         $paginator->itemCount = count($result);
@@ -46,7 +46,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         $args = null;
         $args = array(
-            'where' => array('ep.epodatelna_typ=0')
+            'where' => array('(ep.stav=1) AND (ep.epodatelna_typ=0)')
         );
         $result = $this->Epodatelna->seznam($args);
         $paginator->itemCount = count($result);
@@ -625,6 +625,7 @@ dmFormat =
 
                         // Nacteni kompletni zpravy
                         $mess = $imap->get_message($z->id_part);
+                        
                         $popis = '';
                         foreach ($mess->texts as $zpr) {
                             if($zpr->subtype == "HTML") {
@@ -682,6 +683,34 @@ dmFormat =
                         //$zprava['source'] = $mess;
                         $zprava['file_id'] = null;
 
+                        // Test na dostupnost epodpisu
+                        if ( $config['only_signature'] == true ) {
+                            // pouze podepsane - obsahuje el.podpis
+                            if ( count($mess->signature)>0 ) {
+                                if ( $config['qual_signature'] == true ) {
+                                    // pouze kvalifikovane
+                                    $esign = new esignature();
+                                    $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
+                                    $tmp_email = CLIENT_DIR .'/temp/emailtest_'. sha1($mess->message_id).'.tmp';
+                                    file_put_contents($tmp_email,$mess->source);
+                                    $esigned = $esign->verifySignature($tmp_email, $esign_cert, $esign_status);
+                                    if ( @$esigned['cert_info']['CA_is_qualified'] == 1 ) {
+                                        // obsahuje - pokracujeme
+                                    } else {
+                                        // neobsahuje kvalifikovany epodpis
+                                        $zprava['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje kvalifikovaný elektronický podpis';
+                                        $this->Epodatelna->insert($zprava);
+                                        continue;
+                                    }
+                                }
+                            } else {
+                                // email neobsahuje epodpis
+                                $zprava['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje elektronický podpis';
+                                $this->Epodatelna->insert($zprava);
+                                continue;
+                            }
+                        }                        
+                        
                         if ( $epod_id = $this->Epodatelna->insert($zprava) ) {
 
                             $data = array(

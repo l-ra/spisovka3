@@ -1,0 +1,125 @@
+@{block title}Zápůjčky{/block}
+@{block debug}
+<?php print_r($seznam); ?>
+@{/block}
+@{block content}
+    <h2>Zápůjčky</h2>
+
+    <div id="dokument_blok_volby">
+        <a href="{link :Spisovna:Zapujcky:nova}">Žádanka o zápůjčku</a>
+    </div>
+
+    {if $zobrazit_filtr==1}
+    <div id="filtr">
+        {$filtrForm->render('begin')}
+        {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
+        {$filtrForm['go_filtr']->control}
+        {$filtrForm->render('end')}
+    </div>
+    {/if}
+    <div id="search">
+        {control searchForm}
+    </div>
+    
+    <div style="clear:both;">&nbsp;</div>    
+
+    <div id="dokumenty">
+    {if count($seznam)>0}
+    <form action="{link this}" method="post">
+        <input type="hidden" name="url_referer" value="">
+    <table>
+        <tr>
+            <th class="akce">&nbsp;</th>
+            <th class="prijato">Od</th>
+            <th class="prijato">Do</th>
+            <th class="cislo_jednaci">Číslo jednací<br />JID<br />Spisová značka</th>
+            <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
+            <th class="vec">Důvod</th>
+            <th class="prideleno">Přiděleno</th>
+            <th class="stav">Stav</th>
+        </tr>
+        {foreach $seznam as $zapujcka}
+        <tr>
+            <td class="akce">
+                {if $zapujcka->stav < 3}
+                <input type="checkbox" class="checkbox" name="zapujcka_vyber[]" value="{$zapujcka->id}" title="Vybrat tuto zápůjčku" />
+                {/if}
+            </td>
+            <td class="prijato">
+                {$zapujcka->date_od|edate}
+            </td>
+            <td class="prijato">
+                {if !empty($zapujcka->date_do_skut)}
+                <span title="">{$zapujcka->date_do_skut|edate}</span>
+                {else}
+                {$zapujcka->date_do|edate}
+                {/if}
+            </td>
+            <td class="cislo_jadnaci">
+                &nbsp;<strong><a href="{link :Spisovna:Zapujcky:detail, 'id'=>$zapujcka->id}">
+                   {$zapujcka->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$zapujcka->poradi}{/if}
+                </a></strong>
+                <div class="small">&nbsp;{$zapujcka->jid}</div>
+            </td>
+            <td class="vec">
+                <strong title="{$zapujcka->popis}"><a href="{link :Spisovna:Zapujcky:detail, 'id'=>$zapujcka->id}">
+                    {$zapujcka->nazev}
+                </a></strong>
+            </td>
+            <td class="vec">
+                {$zapujcka->duvod}
+            </td>            
+            <td class="prideleno">
+                {=Osoba::displayName($zapujcka)}
+                <br />
+                {=@$zapujcka->prideleno->orgjednotka_info->zkraceny_nazev}
+            </td>
+            <td class="stav">
+                {if $zapujcka->stav==1}
+                čeká na schválení
+                {elseif $zapujcka->stav==2}
+                zapůjčena
+                {elseif $zapujcka->stav==3}
+                vracena
+                {elseif $zapujcka->stav==4}
+                odmítnuta
+                {/if}
+            </td>
+        </tr>
+        {/foreach}
+
+
+    </table>
+    <div id="hromadna_akce">
+        <span id="checkbox_all_on">Zaškrtnout vše</span> / <span id="checkbox_all_off">Odškrtnout vše</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Vybrané položky:&nbsp;&nbsp;
+        <select name="hromadna_akce">
+            <option value="">(žádná akce)</option>
+            {if isset($akce_select)}{foreach $akce_select as $as_index => $as_value}
+            <option value="{$as_index}">{$as_value}</option>
+            {/foreach}{/if}
+        </select>
+        <input type="submit" name="hromadna_submit" value="Provést" />
+    </div>
+    </form>
+    {widget vp}
+    {else}
+        <div>&nbsp;</div>
+        {if isset($no_items)}
+        {if $no_items==1}
+        <div class="prazdno">Nemáte k dispozici žádné zápůjčky.</div>
+        {elseif $no_items==2}
+        <div class="prazdno">K danému filtru nemáte k dispozici žádné zápůjčky.</div>
+        {elseif $no_items==3}
+        <div class="prazdno">Zápůjčky odpovidající hledanému výrazu nebyly nalezeny.</div>
+        {elseif $no_items==4}
+        <div class="prazdno">Zápůjčky odpovidající daným požadavkům nebyly nalezeny.</div>
+        {/if}
+        {else}
+    <div class="prazdno">Nebyly zjištěny žádné zápůjčky.</div>
+        {/if}
+    {/if}
+    </div>
+
+    <div id="dialog"></div>

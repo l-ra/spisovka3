@@ -1,0 +1,50 @@
+    {if 0}
+    <div class="dokument_blok2">
+        <div class="h2">Aktivita dokumentu</div>
+        
+        {foreach $workflow as $wf}
+        <dl class="detail_item">
+            <dt>{$wf->date|edatetime}</dt>
+            {if $wf->stav_dokumentu == 1}
+            <dd>dokument vytvořen</dd>
+            <dd class="normal">vytvořil a přiděleno {$wf->prideleno_jmeno}</dd>
+            {elseif $wf->stav_dokumentu == 2}
+            <dd>dokument předán</dd>
+            
+            {if $wf->stav_osoby == 0}
+            <dd class="normal">předáno {$wf->prideleno_jmeno}, ale zaměstnanec dokument zatím nepřijal</dd>
+            {elseif $wf->stav_osoby >= 100}
+            <dd class="normal">předáno {$wf->prideleno_jmeno}, ale převzetí bylo zrušeno</dd>
+            {else}
+            <dd class="normal">předáno {$wf->prideleno_jmeno}</dd>
+            {/if}
+
+
+            {elseif $wf->stav_dokumentu == 3}
+            <dd>dokument předán k vyřízení</dd>
+            <dd class="normal">vyřizuje {$wf->prideleno_jmeno}</dd>
+            {elseif $wf->stav_dokumentu == 4}
+            <dd>dokument vyřízen</dd>
+            <dd class="normal">vyřídil {$wf->prideleno_jmeno}</dd>
+            {else}
+            {/if}
+            {if !empty($wf->poznamka)}
+            <dd class="normal">poznámka: {$wf->poznamka}</dd>
+            {/if}
+        </dl>
+        {/foreach}
+    </div>
+    {/if}
+
+    <div class="dokument_blok2">
+        <div class="h2">Transakční protokol</div>
+
+        {foreach $historie as $h}
+        <dl class="detail_item2">
+            <dt>{$h->date|edatetime}</dt>
+            <dd>{!=LogModel::typ($h->typ)}</dd>
+            {if !empty($h->poznamka)}<dd class="normal">{$h->poznamka}</dd>{/if}
+            <dd class="normal">provedl: <?php echo Osoba::displayName($h); ?></dd>
+        </dl>
+        {/foreach}
+    </div>

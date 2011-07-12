@@ -378,7 +378,7 @@ class Cert extends DERParser {
         }
 
         // Parametry certifikatu
-        if ( ($data[7]['data'][0]['data'])>0 ) {
+        if ( (@$data[7]['data'][0]['data'])>0 ) {
             $param_a = array();
             foreach ( $data[7]['data'][0]['data'] as $param ) {
 

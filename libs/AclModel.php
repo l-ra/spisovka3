@@ -141,6 +141,10 @@ class AclModel extends BaseModel {
 
         foreach ($rows as $pravidlo) {
 
+            if ( strpos($pravidlo->privilege,'orgjednotka_') !== false ) {
+                continue;
+            }
+
             $resource_id = is_null($pravidlo->resource_id)?0:$pravidlo->resource_id;
 
             if ( is_null($pravidlo->resource_name) ) {

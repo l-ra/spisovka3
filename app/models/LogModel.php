@@ -19,7 +19,9 @@ class LogModel extends BaseModel {
     const DOK_SPUSTEN   = 101;
     const DOK_KESKARTACI = 102;
     const DOK_SKARTOVAN  = 103;
-    const DOK_ARCHIVOVAN = 103;
+    const DOK_ARCHIVOVAN = 104;
+    const DOK_SPISOVNA_PREDAN = 105;
+    const DOK_SPISOVNA_PRIPOJEN = 106;
 
     const SUBJEKT_VYTVOREN = 21;
     const SUBJEKT_ZMENEN   = 22;
@@ -38,6 +40,12 @@ class LogModel extends BaseModel {
     const SPIS_SMAZAN       = 43;
     const SPIS_DOK_PRIPOJEN = 44;
     const SPIS_DOK_ODEBRAN  = 45;
+    
+    const ZAPUJCKA_VYTVORENA = 51;
+    const ZAPUJCKA_SCHVALENA = 52;
+    const ZAPUJCKA_PRIDELENA = 53;
+    const ZAPUJCKA_VRACENA   = 54;
+    const ZAPUJCKA_ODMITNUTA = 55;    
 
 
     protected static $typy = array(
@@ -55,6 +63,8 @@ class LogModel extends BaseModel {
         '102' => 'Dokument připraven ke skartaci',
         '103' => 'Dokument skartován',
         '104' => 'Dokument archivován',
+        '105' => 'Dokument předán do spisovny',
+        '106' => 'Dokument umístěn ve spisovně',
 
         '21' => 'Vytvořen nový subjekt',
         '22' => 'Subjekt změněn',
@@ -70,7 +80,12 @@ class LogModel extends BaseModel {
         '42' => 'Spis změněn',
         '43' => 'Spis smazán',
         '44' => 'Dokument připojen ke spisu',
-        '45' => 'Dokument odebrán ze spisu'
+        '45' => 'Dokument odebrán ze spisu',
+        '51' => 'Zápůjčka vytvořena',
+        '52' => 'Zápůjčka schválena',
+        '53' => 'Dokument zapůjčen',
+        '54' => 'Zapůjčený dokument vracen',
+        '55' => 'Zápůjčka odmítnuta'        
 
     );
 

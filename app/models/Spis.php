@@ -78,6 +78,40 @@ class Spis extends TreeModel
 
     }
 
+    public function spisovka($args) {
+
+        if ( isset($args['where']) ) {
+            $args['where'][] = array("NOT (tb.typ = 'S' AND tb.stav > 2)");
+        } else {
+            $args['where'] = array(array("NOT (tb.typ = 'S' AND tb.stav > 2)"));
+        }
+
+        return $args;
+    }
+
+    public function spisovna($args) {
+
+        if ( isset($args['where']) ) {
+            $args['where'][] = array("NOT (tb.typ = 'S' AND tb.stav < 3)");
+        } else {
+            $args['where'] = array(array("NOT (tb.typ = 'S' AND tb.stav < 3)"));
+        }
+
+        return $args;
+    }
+
+    public function spisovna_prijem($args) {
+
+        if ( isset($args['where']) ) {
+            $args['where'][] = array("NOT (tb.typ = 'S' AND tb.stav <> 2)");
+        } else {
+            $args['where'] = array(array("NOT (tb.typ = 'S' AND tb.stav <> 2)"));
+        }
+
+        return $args;
+    }
+
+
     public function vytvorit($data) {
 
         $data['date_created'] = new DateTime();
@@ -131,11 +165,31 @@ class Spis extends TreeModel
         if ( !isset($data['parent_id_old']) ) $data['parent_id_old'] = null;
         if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = null;
 
+        if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
+
+        //Debug::dump($data); exit;
+
         $ret = $this->upravitH($data, $spis_id);
         
         return $ret;
 
     }
+
+    public function zmenitStav($spis_id, $stav) {
+
+        if ( !is_numeric($spis_id) || !is_numeric($stav) ) return null;
+
+        $data = array();
+        $data['date_modified'] = new DateTime();
+        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+        $data['stav'] = $stav;
+
+        $ret = $this->update($data, array('id=%i',$spis_id));
+
+        return $ret;
+
+    }
+
 
     public static function spisovyZnak( $spis, $simple = 0 )
     {
@@ -268,6 +322,90 @@ class Spis extends TreeModel
 
     }
 
+    public function predatDoSpisovny($spis_id)
+    {
+
+        // kontrola uzivatele
+        $spis_info = $this->getInfo($spis_id);
+
+        //echo "<pre>"; print_r($dokument_info); echo "</pre>"; exit;
+
+        // Test na uplnost dat
+        if ( $kontrola = $this->kontrola($spis_info) ) {
+            // nejsou kompletni data - neprenasim
+            foreach ($kontrola as $kmess) {
+                Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
+            }
+
+            return 'Spis '.$spis_info->nazev.' nelze přenést do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
+        }
+
+        // Kontrola stavu - uzavren = krome 1
+        if ( $spis_info->stav == 1 ) {
+            return 'Spis '.$spis_info->nazev .' nelze přenést do spisovny! Spis není uzavřen.';
+        }
+
+        // Predat do spisovny
+        $result = $this->zmenitStav($spis_id, 2);
+        if ( $result ) {
+            //$Log = new LogModel();
+            //$Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN, 'Dokument předán do spisovny.');
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public function pripojitDoSpisovny($spis_id)
+    {
+
+        // kontrola uzivatele
+        $spis_info = $this->getInfo($spis_id);
+
+        //echo "<pre>"; print_r($dokument_info); echo "</pre>"; exit;
+
+        // Test na uplnost dat
+        if ( $kontrola = $this->kontrola($spis_info) ) {
+            // nejsou kompletni data - neprenasim
+            return 'Spis '.$spis_info->nazev.' nelze připojit do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
+        }
+
+        // Kontrola stavu - uzavren = krome 1
+        if ( $spis_info->stav != 2 ) {
+            return 'Spis '.$spis_info->nazev .' nelze připojit do spisovny! Spis nebyl předán do spisovny.';
+        }
+
+
+        // Pripojit do spisovny
+        $result = $this->zmenitStav($spis_id, 3);
+        if ( $result ) {
+            //$Log = new LogModel();
+            //$Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN, 'Dokument předán do spisovny.');
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public function kontrola($data) {
+        
+        $mess = array();
+        if ( empty($data->nazev) ) $mess[] = "Spisová značka (název spisu) nemůže být prázdná!";
+        if ( empty($data->spisovy_znak) ) $mess[] = "Spisový znak nemůže být prázdný!";
+        if ( empty($data->skartacni_znak) ) $mess[] = "Skartační znak nemůže být prázdný!";
+        if ( $data->skartacni_lhuta === "" ) $mess[] = "Skartační lhůta musí obsahovat hodnotu!";
+        //if ( empty($data->datum_otevreni) ) $mess[] = "Spis nemá uveden datum otevření spisu!";
+        //if ( empty($data->datum_uzavreni) ) $mess[] = "Spis nemá uveden datum uzavření spisu!";
+        
+        if ( count($mess)>0 ) {
+            return $mess;
+        } else {
+            return null;
+        }        
+        
+    }
 
     public static function typSpisu($typ = null, $sklonovat = 0) {
 
@@ -291,8 +429,13 @@ class Spis extends TreeModel
 
     public static function stav($stav = null) {
 
-        $stav_array = array('1'=>'otevřený',
-                            '0'=>'uzavřený'
+        $stav_array = array('1'=>'otevřen',
+                            '0'=>'uzavřen'/*spisovka*/,
+                            '2'=>'uzavřen a předán do spisovny'/*spisovna*/,
+                            '3'=>'uzavřen ve spisovně',
+                            '4'=>'zápůjčka',
+                            '5'=>'archivován',
+                            '6'=>'skartován'
                      );
 
         if ( is_null($stav) ) {

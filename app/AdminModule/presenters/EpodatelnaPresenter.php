@@ -275,6 +275,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     private function testEmail($config)
     {
+        
         $imap = new ImapClient();
         $email_mailbox = '{'. $config['server'] .':'. $config['port'] .''. $config['typ'] .'}'. $config['inbox'];
 
@@ -288,18 +289,47 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 echo "Nalezeno ". $pocet ." emailových zpráv.\n\n";
 
                 $seznam = $imap->get_head_messages();
+                $i=0;
                 foreach ($seznam as $mess) {
-                    echo "<strong>". htmlspecialchars($mess->subject) ."</strong>\n";
+                    
+                    echo "\n\n==============================================\n\n";
+                    echo "<strong>". $mess->id_part ." - ". htmlspecialchars($mess->subject) ."</strong>\n";
                     echo "   od ". htmlspecialchars($mess->from_address) ."\n";
+                    echo "   pro ". htmlspecialchars($mess->to_address) ."\n";
                     echo "   ze dne ". date("j.n.Y G:i:s", $mess->udate) ."\n";
                     echo "   velikost ". number_format($mess->size,2,',',' ') ." bytů\n";
                     echo "\n";
+                    
+                    if ( $config['only_signature'] == true ) {
+                        $mess = $imap->get_message($mess->id_part);
+                        // pouze podepsane - obsahuje el.podpis
+                        if ( count($mess->signature)>0 ) {
+                            echo "   >> obsahuje epodpis\n";
+                            if ( $config['qual_signature'] == true ) {
+                                // pouze kvalifikovane
+                                $esign = new esignature();
+                                $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
+                                
+                                $tmp_email = CLIENT_DIR .'/temp/emailtest_'. sha1($mess->message_id).'.tmp';
+                                file_put_contents($tmp_email,$mess->source);
+                                $esigned = $esign->verifySignature($tmp_email, $esign_cert, $esign_status);
+                                if ( @$esigned['cert_info']['CA_is_qualified'] == 1 ) {
+                                    echo "   >> email obsahuje kvalifikovaný podpis\n";
+                                } else {
+                                    echo "   >> email neobsahuje kvalifikovaný epodpis\n";
+                                }
+                            }
+                        } else {
+                            echo "   >> email není podepsaný\n";
+                        }
+                    }
+                    
+                    //print_r($mess);
+                    
+                    //if ( $i == 10 ) break;
+                    $i++;
                 }
-
                 //print_r($seznam);
-
-
-
             } else {
                 echo " Ve schránce nejsou žádné zprávy k přijetí.\n\n";
             }

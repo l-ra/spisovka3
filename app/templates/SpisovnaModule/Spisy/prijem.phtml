@@ -1,8 +1,10 @@
-@{block title}Seznam spisů{/block}
+@{block title}Seznam spisů pro příjem do spisovny{/block}
 @{block debug}
 <?php print_r($seznam); ?>
 @{/block}
 @{block content}
+
+    <h2>Seznam spisů pro příjem do spisovny</h2>
 
     <div id="dokument_blok_volby">
         {$spisplanForm->render('begin')}
@@ -57,26 +59,22 @@
             <th>Spis / Věcná skupina</th>
         </tr>
         {foreach $seznam as $spis}
-        <tr class="item{=str_replace("."," item",$spis->sekvence)}" id="sitem{$spis->id}">
+        <tr class="{$spis->class}" id="sitem{$spis->spis_id}">
             <td class="akce">
                 {if $spis->typ=='S'}
                 <input type="checkbox" class="checkbox" name="spis_vyber[]" value="{$spis->id}" title="Vybrat tento spis" />
                 {/if}&nbsp;
             </td>
             <td>
-                {!=str_repeat("&nbsp;", 10*$spis->uroven)}
+                {!=str_repeat("&nbsp;", 5*$spis->uroven)}
                 {if $spis->typ=='VS'}
-                <img src="{$baseUri}images/icons/folder_yellow.png" alt="Věcná skupina" title="Věcná skupina" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
-                &nbsp;&nbsp;
-                {$spis->nazev}
-                {elseif $spis->typ=='SP'}
-                <img src="{$baseUri}images/icons/folder_green.png" alt="Spisový plán" title="Spisový plán" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                <img src="{$baseUri}images/icons/folder_yellow.png" alt="Věcná skupina" title="Věcná skupna" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
                 {$spis->nazev}
                 {else}
                 <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 &nbsp;&nbsp;
-                <a href="{link :Spisovka:Spisy:detail, id => $spis->id}">{$spis->nazev}</a>
+                <a href="{link :Spisovna:Spisy:detail, 'id'=>$spis->id }">{$spis->nazev}</a>
                 {/if}
             </td>
         </tr>
@@ -89,16 +87,18 @@
         Vybrané položky:&nbsp;&nbsp;
         <select name="hromadna_akce">
             <option value="">(žádná akce)</option>
-            <option value="predat_spisovna">předat do spisovny</option>
+            <option value="prevzit_spisovna">převzetí vybraných spisů do spisovny</option>
         </select>
         <input type="submit" name="hromadna_submit" value="Provést" />
     </div>
     </form>
     {widget vp}
     {else}
+    <br class="clear">
     <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
     {/if}
     </div>
     {else}
+    <br class="clear">
     <div class="prazdno">Nebyl zjištěn žádný spisový plán.</div>
     {/if}

@@ -70,24 +70,43 @@ abstract class BasePresenter extends Presenter
         // Helper vlastni datovy format
         if (!function_exists('edate') ) {
             function edate($string,$format = null) {
-                $unixtime = is_numeric($string)?$string:strtotime($string);
-                if ( empty($unixtime) ) return "";
-                if ( !is_null($format) ) {
-                    return date($format,$unixtime);
-                } else {
-                    return date('j.n.Y',$unixtime);
+                if ( empty($string) ) return "";
+                if ( is_numeric($string) ) {
+                    if ( !is_null($format) ) {
+                        return date($format,$string);
+                    } else {
+                        return date('j.n.Y',$string);
+                    }
                 }
+                $datetime = new DateTime($string);
+                if ( !is_null($format) ) {
+                    return $datetime->format($format);
+                } else {
+                    return $datetime->format('j.n.Y');
+                }                
+                return $datetime->format('j.n.Y G:i:s');                
             }
         }
         $this->template->registerHelper('edate', 'edate');
         if (!function_exists('edatetime') ) {
             function edatetime($string) {
-                $unixtime = is_numeric($string)?$string:strtotime($string);
-                if ( empty($unixtime) ) return "";
-                return date('j.n.Y G:i:s',$unixtime);
+                if ( empty($string) ) return "";
+                if ( is_numeric($string) ) {
+                    return date('j.n.Y G:i:s',$unixtime);
+                }
+                $datetime = new DateTime($string);
+                return $datetime->format('j.n.Y G:i:s');
             }
         }
         $this->template->registerHelper('edatetime', 'edatetime');
+        if (!function_exists('eyear') ) {
+            function eyear($string) {
+                if ( empty($string) ) return "";
+                $datetime = new DateTime($string);
+                return $datetime->format('Y');
+            }
+        }
+        $this->template->registerHelper('eyear', 'eyear');
         if (!function_exists('num') ) {
             function num($string) {
                 return (int) $string;
@@ -148,6 +167,8 @@ abstract class BasePresenter extends Presenter
             $this->setLayout('login');
         } else if ( $this->template->module == "Admin" ) {
             $this->setLayout('admin');
+        } else if ( $this->template->module == "Spisovna" ) {
+            $this->setLayout('spisovna');
         } else if ( $this->template->module == "Epodatelna" ) {
             $this->setLayout('epodatelna');
         }
@@ -203,10 +224,9 @@ abstract class BasePresenter extends Presenter
         $filter->handler->macros['/access'] =
                 '<?php } ?>';
         $filter->handler->macros['accessrole'] =
-                '<?php if (in_array("%%", Environment::getUser()->getRoles())) { ?>';
+                '<?php if ( @Acl::isInRole("%%")) { ?>';
         $filter->handler->macros['/accessrole'] =
                 '<?php } ?>';
-
         $filter->handler->macros['accessview'] =
                 '<?php if (@$AccessView==1): ?>';
         $filter->handler->macros['/accessview'] =
