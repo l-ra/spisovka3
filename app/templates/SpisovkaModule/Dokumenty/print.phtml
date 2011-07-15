@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <title>Spisová služba</title>
+    <style type="text/css" media="screen, print">
+        <?php echo file_get_contents(APP_DIR .'/../public/css/print_site.css'); ?>
+    </style>
+</head>
+<body>
+    <table id="table_top">
+        <tr>
+            <td align="left" valign="top">Seznam dokumentů</td>
+            <td align="right" valign="top">{$Urad->nazev}</td>
+        </tr>
+    </table>
+    <div id="dokumenty">
+    {if count($seznam)>0}
+    <table>
+        <tr>
+            <th class="typ">Typ</th>
+            <th class="prijato">Přijato</th>
+            <th class="cislo_jednaci">Číslo jednací<br />JID<br />Spisová značka</th>
+            <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
+            <th class="prideleno">Přiděleno</th>
+            <th class="stav">Stav</th>
+        </tr>
+        {foreach $seznam as $dok}
+        <tr>
+            <td class="typ">
+                {if $dok->typ_dokumentu->smer == 1}
+                vlastní
+                {else}
+                příchozí
+                {/if}
+            </td>
+            <td class="prijato" title="{$dok->datum_vzniku|edatetime}">
+                {$dok->datum_vzniku|edate}
+            </td>
+            <td class="cislo_jednaci">
+                <strong>
+                   {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
+                </strong>
+                <div class="small">{$dok->jid}</div>
+                {if count($dok->spisy)>0}
+                {foreach $dok->spisy as $spis}
+                {$spis->nazev}<br />
+                {/foreach}
+                {/if}
+            </td>
+            <td class="vec">
+                <strong title="{$dok->popis}">
+                    {$dok->nazev}
+                </strong>
+                <br />
+                <div class="mezera">
+                {if count($dok->subjekty)>0}
+
+                {foreach $dok->subjekty as $subjekt}
+                {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
+                {/foreach}
+                {else}
+                nejsou přiděleny žádné subjekty!
+                <br />
+                {/if}
+                </div>
+                <span class="small">přílohy:
+                {=($dok->pocet_listu)+0} listů,
+                {=($dok->pocet_priloh)+0} list. příloh,
+                {=(count($dok->prilohy)+0)} příloh</span>
+            </td>
+
+
+
+            {if $dok->stav_dokumentu == 1}
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+            </td>
+            <td>
+                nový
+                <br />
+                <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
+            </td>
+            {elseif $dok->stav_dokumentu == 2 && !empty($dok->predano) }
+            <td class="prideleno">
+            {if empty($dok->prideleno->prideleno_id) }
+                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {else}
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {/if}
+            </td>
+            <td>
+                předáno
+                <br />
+                <span title="{$dok->predano->date_predani|edatetime}">{$dok->predano->date_predani|edate}</span>
+            </td>
+            {elseif $dok->stav_dokumentu == 2 && !empty($dok->prideleno) }
+            <td class="prideleno">
+            {if empty($dok->prideleno->prideleno_id) }
+                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {else}
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {/if}
+            </td>
+            <td>
+                přiděleno
+                <br />
+                <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
+            </td>
+            {elseif $dok->stav_dokumentu == 3 }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            </td>
+            <td>
+                vyřizuje se
+                <br />
+                <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
+            </td>
+            {elseif $dok->stav_dokumentu == 4 }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            </td>
+            <td class="stav">
+                vyřízeno
+                <br />
+                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+            </td>
+            {elseif $dok->stav_dokumentu == 5 }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            </td>
+            <td class="stav">
+                vyřízeno
+                <br />
+                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+            </td>
+
+            {else}
+            <td class="prideleno">
+                &nbsp;
+            </td>
+            <td class="stav">
+                nepřiřazeno!
+                <br />
+                lhůta {$dok->lhuta} dní
+            </td>
+            {/if}
+
+
+
+        </tr>
+        {/foreach}
+
+
+    </table>
+    <div id="tisk_podpis">
+        &nbsp;<br />
+        Vytištěno dne: {=date("j.n.Y G:i")}
+        <br />
+        Vytiskl: {=Environment::getUser()->getIdentity()->name}
+    </div>
+    {else}
+        <div>&nbsp;</div>
+        {if isset($no_items)}
+        {if $no_items==1}
+        <div class="prazdno">Nemáte k dispozici žádné dokumenty.</div>
+        {elseif $no_items==2}
+        <div class="prazdno">K danému filtru nemáte k dispozici žádné dokumenty.</div>
+        {elseif $no_items==3}
+        <div class="prazdno">Dokumenty odpovidající hledanému výrazu nebyly nalezeny.</div>
+        {elseif $no_items==4}
+        <div class="prazdno">Dokumenty odpovidající daným požadavkům nebyly nalezeny.</div>
+        {/if}
+        {else}
+    <div class="prazdno">Nebyly zjištěny žádné dokumenty.</div>
+        {/if}
+    {/if}
+    </div>
+</body>
+</html>    

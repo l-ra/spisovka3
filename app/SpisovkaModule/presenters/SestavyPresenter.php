@@ -30,6 +30,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function actionPdf()
     {
+        @ini_set("memory_limit","128M");
         $sestava_id = $this->getParam('id',null);
         $this->forward('detail', array('view'=>'pdf','id'=>$sestava_id));
     }

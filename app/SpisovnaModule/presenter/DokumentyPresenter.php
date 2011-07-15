@@ -9,6 +9,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     private $odpoved = null;
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
+    private $pdf_output = 0;
 
     public function startup()
     {
@@ -30,6 +31,68 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         parent::startup();
     }
 
+    protected function shutdown($response) {
+        
+        if ($this->pdf_output == 1) {
+            
+            function handlePDFError($errno, $errstr, $errfile, $errline, array $errcontext)
+            {
+                if (0 === error_reporting()) {
+                    return;
+                }
+                if ( strpos($errstr,'Undefined') === false ) {    
+                    throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
+                }
+            }
+            set_error_handler('handlePDFError');
+            
+            try {                
+            
+            ob_start();
+            $response->send();
+            $content = ob_get_clean();
+            if ($content) {
+                $content = str_replace("<td", "<td valign='top'", $content);
+                $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
+                $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
+                $content = preg_replace('#<div id="tisk_podpis">.*?</div>#s','', $content);
+                $content = preg_replace('#<table id="table_top">.*?</table>#s','', $content);
+                
+                $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
+                
+                $app_info = Environment::getVariable('app_info');
+                $app_info = explode("#",$app_info);
+                $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
+                $mpdf->SetCreator($app_name);
+                $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                $mpdf->SetTitle('Spisová služba - Spisovna - Tisk');                
+                
+                $mpdf->defaultheaderfontsize = 10;	/* in pts */
+                $mpdf->defaultheaderfontstyle = 'B';	/* blank, B, I, or BI */
+                $mpdf->defaultheaderline = 1; 	/* 1 to include line below header/above footer */
+                $mpdf->defaultfooterfontsize = 9;	/* in pts */
+                $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
+                $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
+                $mpdf->SetHeader($this->template->title .'||'.$this->template->Urad->nazev);
+                $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                
+                $mpdf->WriteHTML($content);
+                $mpdf->Output('spisovna.pdf', 'I');
+            }
+            
+            } catch (Exception $e) {
+                $location = str_replace("pdfprint=1","",Environment::getHttpRequest()->getUri());
+
+                echo "<h1>Nelze vygenerovat PDF výstup.</h1>";
+                echo "<p>Generovaný obsah obsahuje příliš mnoho dat, které není možné zpracovat.<br />Zkuste omezit celkový počet dokumentů.</p>";
+                echo "<p><a href=".$location.">Přejít na předchozí stránku.</a></p>";
+                exit;
+            }            
+        }
+        
+    }    
+    
+    
     protected function seznam($typ = 0, $filtr = null, $hledat = null, $seradit = null)
     {
 
@@ -95,12 +158,29 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             // seznam
             $args = $Dokument->spisovna($args);
         }
-
         
-
         $result = $Dokument->seznam($args);
         $paginator->itemCount = count($result);
-        $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+
+        // Volba vystupu - web/tisk/pdf
+        $tisk = $this->getParam('print');
+        $pdf = $this->getParam('pdfprint');
+        if ( $tisk ) {
+            @ini_set("memory_limit","128M");
+            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $seznam = $result->fetchAll();
+            $this->setLayout(false);
+            $this->setView('print');
+        } elseif ( $pdf ) {
+            @ini_set("memory_limit","128M");
+            $this->pdf_output = 1;
+            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $seznam = $result->fetchAll();
+            $this->setLayout(false);
+            $this->setView('print');
+        } else {
+            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        }        
 
         if ( count($seznam)>0 ) {
 
@@ -172,6 +252,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             'prevzit_spisovna'=>'převzetí seznamu dokumentů do spisovny'
         );
         $this->template->title = "Seznam dokumentů pro příjem do spisovny";
+        $this->template->is_prijem = 1;
         $this->setView('default');
         $this->seznam(1, $filtr, $hledat, $seradit);
     }

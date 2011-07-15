@@ -9,6 +9,15 @@
         <a href="{link :Spisovna:Zapujcky:nova}">Žádanka o zápůjčku</a>
     </div>
 
+    <div id="tisk">
+        <a href="{link this, 'print' => 1}" title="vytisknout tuto stránku">
+            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+        </a>
+        <a href="{link this, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" >
+            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+        </a>        
+    </div>    
+    
     {if $zobrazit_filtr==1}
     <div id="filtr">
         {$filtrForm->render('begin')}
@@ -32,8 +41,8 @@
             <th class="akce">&nbsp;</th>
             <th class="prijato">Od</th>
             <th class="prijato">Do</th>
-            <th class="cislo_jednaci">Číslo jednací<br />JID<br />Spisová značka</th>
-            <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
+            <th class="cislo_jednaci">Číslo jednací<br />JID</th>
+            <th class="vec">Věc</th>
             <th class="vec">Důvod</th>
             <th class="prideleno">Přiděleno</th>
             <th class="stav">Stav</th>

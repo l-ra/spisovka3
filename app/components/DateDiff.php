@@ -19,10 +19,13 @@ class DateDiff {
         if( function_exists('date_diff') ) {
             $interval = date_diff($date1, $date2, $absolute);
         } else {
-            $inteval = $this->date_diff($date1, $date2);
+            $DateDiff = new DateDiff();
+            $inteval = $DateDiff->date_diff($date1, $date2);
         }
 
-        if ( $interval->invert ) {
+        if ( empty($interval) ) {
+            return 0;
+        } else if ( $interval->invert ) {
             return (-1)*(($interval->d * 86400) + ($interval->h * 3600) + ($interval->m * 60) + $interval->s);
         } else {
             return ($interval->d * 86400) + ($interval->h * 3600) + ($interval->m * 60) + $interval->s;
@@ -66,7 +69,7 @@ class DateDiff {
         return $format;
     }
 
-    private function date_diff(DateTime $date1, DateTime $date2) {
+    public function date_diff(DateTime $date1, DateTime $date2) {
         
         if($date1 > $date2) {
             $tmp = $date1;

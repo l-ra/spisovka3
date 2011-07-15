@@ -71,21 +71,27 @@
             $app_info = explode("#",$app_info);
             $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
 
-            $pdf = new SestavaPDF('L',PDF_UNIT, PDF_PAGE_FORMAT, true, 'utf-8', false);
+            //$pdf = new mPDF();
+            $pdf = new mPDF('', 'A4-L',9,'Helvetica');
+            //$pdf = new SestavaPDF('', 'A4-L',9,'Helvetica');
             $pdf->SetCreator($app_name);
             $pdf->SetAuthor(Environment::getUser()->getIdentity()->name);
             $pdf->SetTitle('Sestava');
+            
+            $pdf->defaultheaderfontsize = 10;	/* in pts */
+            $pdf->defaultheaderfontstyle = B;	/* blank, B, I, or BI */
+            $pdf->defaultheaderline = 1; 	/* 1 to include line below header/above footer */
 
-            $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-            $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-            $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
-            $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-            $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-            //$pdf->setLanguageArray($l);
-            $pdf->SetFont('helvetica', '', 8);
-            $pdf->AddPage();
+            $pdf->defaultfooterfontsize = 9;	/* in pts */
+            $pdf->defaultfooterfontstyle = B;	/* blank, B, I, or BI */
+            $pdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
 
-            $pdf->writeHTML($html_out, true, false, false, false, '');
 
+            $pdf->SetHeader($Sestava->nazev.'||'.$Urad->nazev .', '. $rok);
+            $pdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+            
+            
+            $pdf->WriteHTML($html_out);
             $pdf->Output('sestava.pdf', 'I');
+            
 ?>

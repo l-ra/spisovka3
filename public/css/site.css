@@ -145,6 +145,7 @@ img {
 }
 
 #content {
+    position: relative;
     background: #ffffff url() repeat-x;
     min-height: 500px;
     padding: 10px;
@@ -336,7 +337,11 @@ label.required {
     width: 70px;
     text-align: right;
 }
-#dokumenty .cislo_jadnaci {
+#dokumenty .cislo_jednaci {
+    width: 160px;
+    text-align: right;
+}
+#dokumenty .cislo_jadnaci {/*docasny fix*/
     width: 160px;
     text-align: right;
 }
@@ -850,6 +855,16 @@ label.required {
     margin: 5px;
 }
 
+#tisk {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+#tisk a {
+    text-decoration: none;
+    margin-right: 10px;
+}
 
 /* ******************************************************************* */
 /* *** PAGINATOR *** */

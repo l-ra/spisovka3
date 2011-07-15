@@ -569,7 +569,7 @@ ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 CREATE  TABLE IF NOT EXISTS `{tbls3}log_access` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
   `date` DATETIME NULL DEFAULT NULL ,
-  `ip` VARCHAR(15) NULL DEFAULT NULL ,
+  `ip` VARCHAR(50) NULL DEFAULT NULL ,
   `user_agent` VARCHAR(200) NULL DEFAULT NULL ,
   `stav` TINYINT(4) NULL DEFAULT NULL ,
   `user_id` INT(10) UNSIGNED NOT NULL ,
@@ -764,7 +764,9 @@ INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `fixed_id`, `orgjednotka_id`,
 (3,	1,	NULL,	NULL,	'superadmin',	'SuperAdmin',	'Administrátor se super právy.\\r\\nTo znamená, že může manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ',	2,	100,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'3',	'superadmin.3',	NULL),
 (4,	NULL,	NULL,	NULL,	'referent',	'referent',	'Základní role pracovníka spisové služby',	1,	10,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'4',	'referent.4',	NULL),
 (5,	4,	NULL,	NULL,	'vedouci',	'vedoucí',	'Vedoucí organizační jednotky umožňující přijímat dokumenty',	1,	30,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'5',	'vedouci.5',	NULL),
-(6,	4,	NULL,	NULL,	'podatelna',	'pracovník podatelny',	'Pracovník podatelny, který může přijímat nebo odesílat dokumenty',	1,	20,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'6',	'podatelna.6',	NULL);
+(6,	4,	NULL,	NULL,	'podatelna',	'pracovník podatelny',	'Pracovník podatelny, který může přijímat nebo odesílat dokumenty',	1,	20,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'6',	'podatelna.6',	NULL),
+(7,	4,	NULL,	NULL,	'skartacni_dohled',	'pracovník spisovny',	'Pracovník spisovny, který spravuje dokumenty ve spisovně',	1,	20,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'7',	'skartacni_dohled.7',	NULL),
+(8,	4,	NULL,	NULL,	'skartacni_komise',	'pracovník podatelny',	'Pracovník podatelny, který může přijímat nebo odesílat dokumenty',	1,	20,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'8',	'skartacni_komise.8',	NULL);
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}user_resource` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -805,7 +807,12 @@ INSERT INTO `{tbls3}user_resource` (`id`, `code`, `note`, `name`) VALUES
 (28, 'Install_DefaultPresenter', NULL, 'Instalace'),
 (29, 'Spisovka_VyhledatPresenter', NULL, 'Vyhledavani'),
 (30, 'Admin_AkonverzePresenter', NULL, 'Administrace - Autorizovaná konverze'),
-(31, 'Spisovka_NapovedaPresenter', NULL, 'Nápověda');
+(31, 'Spisovka_NapovedaPresenter', NULL, 'Nápověda'),
+(32, 'Spisovna_DefaultPresenter', NULL,	'Spisovna'),
+(33, 'Spisovna_DokumentyPresenter', NULL, 'Spisovna - dokumenty'),
+(34, 'Spisovna_SpisyPresenter', NULL, 'Spisovna - spisy'),
+(35, 'Spisovna_VyhledatPresenter', NULL, 'Spisovna - vyhledávani'),
+(36, 'Spisovna_ZapujckyPresenter', NULL, 'Spisovna - zápůjčky');
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}user_rule` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -840,7 +847,12 @@ INSERT INTO `{tbls3}user_rule` (`id`, `name`, `note`, `resource_id`, `privilege`
 (15, 'Vyhledávání', '', 29, ''),
 (16, 'Je vedoucí', 'Určuje, zda daná role je vedoucí role. Umožňuje přistupovat k dokumentům předané orgaizační jednotce', NULL, 'is_vedouci'),
 (17, 'Oprávnění pro org. jednotku Centrální podatelna', 'Oprávnění platné pouze pro organizační jednotku Centrální podatelna', NULL, 'orgjednotka_1'),
-(18, 'Nápověda', 'Zobrazení nápovědy', 31, '');
+(18, 'Nápověda', 'Zobrazení nápovědy', 31, ''),
+(19, 'Přístup do spisovny',	'', 32, ''),
+(20, 'Přístup k dokumentům ve spisovně', '', 33, ''),
+(21, 'Přístup ke spisům ve spisovně', '', 34, ''),
+(22, 'Vyhledávání dokumentů ve spisovně', '', 35, ''),
+(23, 'Spisovna - zápůjčky', '', 36, '');
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}user_acl` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -885,7 +897,12 @@ INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
 (20,7,17,'Y'),
 (21,9,17,'Y'),
 (22,8,17,'Y'),
-(23,4,18,'Y');
+(23,4,18,'Y'),
+(24,4,19,'Y'),
+(25,4,20,'Y'),
+(26,4,21,'Y'),
+(27,4,22,'Y'),
+(28,4,23,'Y');
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}user_to_role` (
   `id` INT NOT NULL AUTO_INCREMENT ,
@@ -1139,6 +1156,29 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}osoba_historie` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `{tbls3}zapujcka` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `dokument_id` int(10) unsigned NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `user_vytvoril_id` int(10) unsigned NOT NULL,
+  `user_prijal_id` int(10) unsigned DEFAULT NULL,
+  `user_schvalil_id` int(10) unsigned DEFAULT NULL,
+  `duvod` text,
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  `date_od` date NOT NULL,
+  `date_do` date DEFAULT NULL,
+  `date_do_skut` date DEFAULT NULL,
+  `date_created` datetime NOT NULL,
+  `date_schvaleni` datetime DEFAULT NULL,
+  `date_prijeti` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `dokument_id` (`dokument_id`),
+  KEY `user_id` (`user_id`),
+  KEY `user_vytvoril_id` (`user_vytvoril_id`),
+  KEY `user_prijal_id` (`user_prijal_id`),
+  KEY `user_schvalil_id` (`user_schvalil_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

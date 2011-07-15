@@ -6,6 +6,15 @@
 @{block content}
     <h2>{$title}</h2>
 
+    <div id="tisk">
+        <a href="{link this, 'print' => 1}" title="vytisknout tuto stránku">
+            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+        </a>
+        <a href="{link this, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" >
+            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+        </a>        
+    </div>    
+    
     <div id="filtr">
         {$filtrForm->render('begin')}
         {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
@@ -21,7 +30,7 @@
     
     <div style="clear:both;">&nbsp;</div>
 
-    <div style="margin: 3px 0px;">
+    <div style="margin: 3px 0px;" id="seradit">
     seřadit podle:
     {if $seradit == "cj"}
         <a href="{link this, 'seradit'=>'cj_desc'}" title="Seřadit podle čísla jednacího">čísla jednacího</a> &nbsp;
@@ -73,6 +82,9 @@
         <tr>
             <td class="akce">
                 {if $dok->stav_dokumentu==7 && !isset($zapujcky[$dok->id])}
+                <input type="checkbox" class="checkbox" name="dokument_vyber[]" value="{$dok->id}" title="Vybrat tento dokument" />
+                {/if}
+                {if isset($is_prijem)}
                 <input type="checkbox" class="checkbox" name="dokument_vyber[]" value="{$dok->id}" title="Vybrat tento dokument" />
                 {/if}
             </td>

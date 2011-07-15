@@ -37,41 +37,48 @@ th {
     text-align: left;
     color: #ffffff;
     border: 1px #808080 solid;
+    vertical-align: top;
 }
 
 td {
     padding: 5px 5px;
     border: 1px #e0e0e0 solid;
+    vertical-align: top;
 }
 
-/* ******************************************************************* */
-/* *** PAGINATOR *** */
+#table_top {
+    padding: 10px 5px;
+    text-align: left;
+    color: #000000;
+    font-size: 13pt;
+    font-weight: bold;
+    border: 0px;
+    border-collapse: collapse;
+    
+}
+#table_top th {
+    border: 0px;
+}
+#table_top td {
+    border: 0px;
+}
 
-.paginator {
-    margin: 20px 0px;
-    text-align: center;
-    /*font-size: 90%;*/
-}
-.paginator_info {
-    margin-bottom: 10px;
-    color: #03406A;
-}
-.paginator a,
-.paginator span { 
-    margin-right: 0.1em;
-    padding: 0.2em 0.5em;
-    color: #999999;
-}
-.paginator a { 
-    border: 1px solid #03406A;
-    text-decoration: none;
-    color: #03406A;
-}
-.paginator span.button { 
-    border: 1px solid #DDDDDD;
-}
-.paginator .current { 
-    background: #03406A;
-    border: 1px solid #03406A;
-    color: white; font-weight: bold;
-}
+#layout_top { display:none; }
+#menu { display:none; }
+#flash { display:none; }
+#debug { display:none; }
+#filtr { display:none; }
+#search { display:none; }
+#seradit { display:none; }
+#tisk { display:none; }
+#hromadna_akce { display:none; }
+#dokument_blok_volby { display: none; }
+#layout_bottom { display:none; }
+.paginator { display: none; }
+.checkbox { display: none; }
+td.akce { display: none; }
+th.akce { display: none; }
+td.typ { width: 10px; }
+th.typ { width: 10px; }
+td.cislo_jednaci { text-align: right; }
+th.cislo_jednaci { text-align: right; }

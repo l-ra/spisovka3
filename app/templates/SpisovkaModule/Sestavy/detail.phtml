@@ -1,13 +1,11 @@
 {block title}{$Sestava->nazev}{/block}
 {block content}
-
-    <div id="top">
-        <div class="nazev">{$Sestava->nazev}</div>
-        <div class="urad">
-            {$Urad->nazev}, {$rok}
-        </div>
-    </div>
-    <br style="clear: both;" />
+    <table id="table_top">
+        <tr>
+            <td align="left" valign="top">{$Sestava->nazev}</td>
+            <td align="right" valign="top">{$Urad->nazev}, {=date('Y')}</td>
+        </tr>
+    </table>
     {if count($seznam)>0}
     <table>
         <tr>
@@ -69,6 +67,12 @@
 
 
     </table>
+    <div>
+        &nbsp;<br />
+        Vytištěno dne: {=date("j.n.Y G:i")}
+        <br />
+        Vytiskl: {=Environment::getUser()->getIdentity()->name}
+    </div>    
     {elseif isset($prilis_mnoho)}
     <div style="text-align: center; margin-top: 15px; color: red;">
         Tato sestava obsahuje příliš mnoho dokumentů pro zobrazení na této obrazovce. Jejich zobrazení by trvalo hodně dlouho.

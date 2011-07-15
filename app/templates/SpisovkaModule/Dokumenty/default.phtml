@@ -5,6 +5,15 @@
 @{block content}
     <h2>Seznam dokumentů</h2>
 
+    <div id="tisk">
+        <a href="{link this, 'print' => 1}" title="vytisknout tuto stránku">
+            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+        </a>
+        <a href="{link this, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" >
+            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+        </a>        
+    </div>
+    
     <div id="filtr">
         {$filtrForm->render('begin')}
         {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
@@ -22,7 +31,7 @@
     
     <div style="clear:both;">&nbsp;</div>
 
-    <div style="margin: 3px 0px;">
+    <div style="margin: 3px 0px;" id="seradit">
     seřadit podle:
     {if $seradit == "stav"}
         <a href="{link this, 'seradit'=>'stav_desc'}" title="Seřadit podle stavu dokumentu (nový, předaný, vyřizuje se, vyřízený, ...)">stavu</a> &nbsp;
@@ -60,7 +69,7 @@
             <th class="akce">&nbsp;</th>
             <th class="typ">Typ dokumentu</th>
             <th class="prijato">Přijato</th>
-            <th class="cislo_jadnaci">Číslo jednací<br />JID<br />Spisová značka</th>
+            <th class="cislo_jednaci">Číslo jednací<br />JID<br />Spisová značka</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
             <th class="prideleno">Přiděleno</th>
             <th class="stav">Stav</th>
@@ -76,7 +85,7 @@
             <td class="prijato" title="{$dok->datum_vzniku|edatetime}">
                 {$dok->datum_vzniku|edate}
             </td>
-            <td class="cislo_jadnaci">
+            <td class="cislo_jednaci">
                 &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
                    {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
                 </a></strong>
