@@ -475,7 +475,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                    $Dokument = new Dokument();
                    foreach ( $spisy as $spis ) {
                        $data = array(
-                            "spisovy_znak_id" => $spis->spisovy_znak,
+                            /*"spisovy_znak" => $spis->spisovy_znak,*/
+                            /*"spisovy_znak_id" => $spis->id,*/
                             "skartacni_znak" => $spis->skartacni_znak,
                             "skartacni_lhuta" => $spis->skartacni_lhuta,
                             "spousteci_udalost_id" => $spis->spousteci_udalost_id

@@ -114,6 +114,7 @@ class Spis extends TreeModel
 
     public function vytvorit($data) {
 
+        $data['datum_otevreni'] = new DateTime();
         $data['date_created'] = new DateTime();
         $data['user_created'] = Environment::getUser()->getIdentity()->id;
         $data['date_modified'] = new DateTime();

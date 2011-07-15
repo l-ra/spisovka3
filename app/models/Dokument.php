@@ -1428,6 +1428,21 @@ class Dokument extends BaseModel
             } else {
                 $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
             }
+            if ( empty($data['datum_vzniku']) ) {
+                $data['datum_vzniku'] = null;
+            } 
+            if ( empty($data['pocet_listu']) ) {
+                $data['pocet_listu'] = 0;
+            }             
+            if ( empty($data['pocet_priloh']) ) {
+                $data['pocet_priloh'] = 0;
+            }             
+            if ( empty($data['jid']) ) {
+                $unique_info = Environment::getVariable('unique_info');
+                $unique_part = explode('#',$unique_info);
+                $app_id = 'OSS-'. $unique_part[0];
+                $data['jid'] = $app_id.'-ESS-'.$dokument_id;
+            }                
 
             $data['date_created'] = new DateTime();
             $data['user_created'] = Environment::getUser()->getIdentity()->id;
@@ -1469,7 +1484,23 @@ class Dokument extends BaseModel
             } else {
                 $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
             }
-
+            
+            if ( empty($data['datum_vzniku']) ) {
+                $data['datum_vzniku'] = null;
+            } 
+            if ( empty($data['pocet_listu']) ) {
+                $data['pocet_listu'] = 0;
+            }             
+            if ( empty($data['pocet_priloh']) ) {
+                $data['pocet_priloh'] = 0;
+            }             
+            
+            if ( empty($data['jid']) ) {
+                $unique_info = Environment::getVariable('unique_info');
+                $unique_part = explode('#',$unique_info);
+                $app_id = 'OSS-'. $unique_part[0];
+                $data['jid'] = $app_id.'-ESS-'.$dokument_id;
+            }  
 
             $old_dokument = $this->getBasicInfo($dokument_id);
 
@@ -1506,6 +1537,7 @@ class Dokument extends BaseModel
                     $old_dokument['user_created'] = Environment::getUser()->getIdentity()->id;
                     $old_dokument['date_created'] = new DateTime();
                     unset($old_dokument['id'],$old_dokument['user_modified'],$old_dokument['date_modified']);
+                    //Debug::dump($old_dokument);
                     $DokumentHistorie = new DokumentHistorie();
                     $DokumentHistorie->insert($old_dokument);
                 }

@@ -439,6 +439,9 @@ abstract class BaseModel extends Object
             }
         }
 
+        //dibi::update($this->name, $values)->where($where)
+        //    ->test();        
+        
         return dibi::update($this->name, $values)->where($where)
                     ->execute();
     }
