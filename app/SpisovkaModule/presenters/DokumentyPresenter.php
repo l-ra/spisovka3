@@ -154,7 +154,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     return;
                 }
                 //if ( $errno == 8 ) {
-                if ( strpos($errstr,'Undefined index') === false ) {    
+                if ( strpos($errstr,'Undefined') === false ) {    
                     throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
                 }
             }
