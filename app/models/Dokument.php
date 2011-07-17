@@ -1136,7 +1136,12 @@ class Dokument extends BaseModel
                     'from' => array($this->tb_epodatelna => 'epod'),
                     'on' => array('epod.dokument_id=dok.id'),
                     'cols' => array('identifikator')
-                )
+                ),
+                'spisovy_znak' => array(
+                    'from' => array($this->tb_spisovy_znak => 'spisznak'),
+                    'on' => array('spisznak.id=dok.spisovy_znak_id'),
+                    'cols' => array('id'=>'spisznak_id','nazev'=>'spisznak_nazev','popis'=>'spisznak_popis','skartacni_znak'=>'spisznak_skartacni_znak','skartacni_lhuta'=>'spisznak_skartacni_lhuta','spousteci_udalost_id'=>'spisznak_spousteci_udalost_id')
+                ),                
                 
             ),
             'order_by' => array('dok.id'=>'DESC')
@@ -1312,7 +1317,15 @@ class Dokument extends BaseModel
             }
 
             // spisovy znak
-            if ( !empty($dokument->spisovy_znak_id) && $detail == 1 ) {
+            $dokument->spisovy_znak = $row->spisznak_nazev;
+            $dokument->spisovy_znak_popis = $row->spisznak_popis;
+            $dokument->spisovy_znak_skart_znak = $row->spisznak_skartacni_znak;
+            $dokument->spisovy_znak_skart_lhuta = $row->spisznak_skartacni_lhuta;
+            $dokument->spisovy_znak_udalost = $row->spisznak_spousteci_udalost_id;
+            $dokument->spisovy_znak_udalost_nazev = SpisovyZnak::spousteci_udalost($row->spisznak_spousteci_udalost_id);
+            $dokument->spisovy_znak_udalost_stav = '';
+            $dokument->spisovy_znak_udalost_dtext = '';            
+            /*if ( !empty($dokument->spisovy_znak_id) && $detail == 1 ) {
                 $SpisZnak = new SpisovyZnak();
                 $sznak = $SpisZnak->getInfo($dokument->spisovy_znak_id);
                 if ( $sznak ) {
@@ -1343,7 +1356,7 @@ class Dokument extends BaseModel
                 $dokument->spisovy_znak_udalost_nazev = '';
                 $dokument->spisovy_znak_udalost_stav = '';
                 $dokument->spisovy_znak_udalost_dtext = '';
-            }
+            }*/
 
             //vyrizeni
             if ( !empty($dokument->zpusob_vyrizeni_id) ) {
@@ -1428,15 +1441,34 @@ class Dokument extends BaseModel
             } else {
                 $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
             }
+            if ( empty($data['spisovy_znak_id']) ) {
+                $data['spisovy_znak_id'] = null;
+            } else {
+                $data['spisovy_znak_id'] = (int) $data['spisovy_znak_id'];
+            }            
             if ( empty($data['datum_vzniku']) ) {
                 $data['datum_vzniku'] = null;
             } 
             if ( empty($data['pocet_listu']) ) {
                 $data['pocet_listu'] = 0;
+            } else {
+                $data['pocet_listu'] = (int) $data['pocet_listu'];
             }             
             if ( empty($data['pocet_priloh']) ) {
                 $data['pocet_priloh'] = 0;
+            } else {
+                $data['pocet_priloh'] = (int) $data['pocet_priloh'];
+            }     
+            if ( empty($data['vyrizeni_pocet_listu']) ) {
+                $data['vyrizeni_pocet_listu'] = 0;
+            } else {
+                $data['vyrizeni_pocet_listu'] = (int) $data['vyrizeni_pocet_listu'];
             }             
+            if ( empty($data['vyrizeni_pocet_priloh']) ) {
+                $data['vyrizeni_pocet_priloh'] = 0;
+            } else {
+                $data['vyrizeni_pocet_priloh'] = (int) $data['vyrizeni_pocet_priloh'];
+            }       
             if ( empty($data['jid']) ) {
                 $unique_info = Environment::getVariable('unique_info');
                 $unique_part = explode('#',$unique_info);
@@ -1484,16 +1516,35 @@ class Dokument extends BaseModel
             } else {
                 $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
             }
+            if ( empty($data['spisovy_znak_id']) ) {
+                $data['spisovy_znak_id'] = null;
+            } else {
+                $data['spisovy_znak_id'] = (int) $data['spisovy_znak_id'];
+            }               
             
             if ( empty($data['datum_vzniku']) ) {
                 $data['datum_vzniku'] = null;
             } 
             if ( empty($data['pocet_listu']) ) {
                 $data['pocet_listu'] = 0;
+            } else {
+                $data['pocet_listu'] = (int) $data['pocet_listu'];
             }             
             if ( empty($data['pocet_priloh']) ) {
                 $data['pocet_priloh'] = 0;
+            } else {
+                $data['pocet_priloh'] = (int) $data['pocet_priloh'];
+            }     
+            if ( empty($data['vyrizeni_pocet_listu']) ) {
+                $data['vyrizeni_pocet_listu'] = 0;
+            } else {
+                $data['vyrizeni_pocet_listu'] = (int) $data['vyrizeni_pocet_listu'];
             }             
+            if ( empty($data['vyrizeni_pocet_priloh']) ) {
+                $data['vyrizeni_pocet_priloh'] = 0;
+            } else {
+                $data['vyrizeni_pocet_priloh'] = (int) $data['vyrizeni_pocet_priloh'];
+            }            
             
             if ( empty($data['jid']) ) {
                 $unique_info = Environment::getVariable('unique_info');

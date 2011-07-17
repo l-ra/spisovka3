@@ -17,12 +17,6 @@
 
     <div class="dokument_blok">
         <dl class="detail_item">
-            <dt>Spisový znak: </dt>
-            <dd>
-                {=Spis::spisovyZnak($SpisovyPlan)}&nbsp;
-            </dd>
-        </dl>
-        <dl class="detail_item">
             <dt>Otevřeno dne: </dt>
             <dd>
                 {$SpisovyPlan->datum_otevreni|edate}&nbsp;
@@ -59,7 +53,7 @@
         {foreach $seznam as $spis}
         <tr class="item{=str_replace("."," item",$spis->sekvence)}" id="sitem{$spis->id}">
             <td class="akce">
-                {if $spis->typ=='S'}
+                {if $spis->typ=='S' && $spis->stav==0}
                 <input type="checkbox" class="checkbox" name="spis_vyber[]" value="{$spis->id}" title="Vybrat tento spis" />
                 {/if}&nbsp;
             </td>

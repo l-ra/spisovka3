@@ -127,18 +127,30 @@ class Spis extends TreeModel
         if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
         if ( empty($data['parent_id']) ) $data['parent_id'] = null;
         if ( empty($data['spisovy_znak']) ) $data['spisovy_znak'] = '';
+        if ( empty($data['datum_uzavreni']) ) $data['datum_uzavreni'] = null;
 
-        $SpisParent = $this->getInfo($data['parent_id']);
+        /*$SpisParent = $this->getInfo($data['parent_id']);
         if ( $SpisParent ) {
             $spis_znak_parent = self::spisovyZnak($SpisParent, 2);
             $data['spisovy_znak_plneurceny'] = $spis_znak_parent . $data['spisovy_znak'];
         } else {
             $data['spisovy_znak_plneurceny'] = $data['spisovy_znak'];
+        }*/
+
+        if ( empty($data['spisovy_znak_id']) ) {
+            $data['spisovy_znak_id'] = null;
+        } else {
+            $data['spisovy_znak_id'] = (int) $data['spisovy_znak_id'];
+        }
+        if ( empty($data['spousteci_udalost_id']) ) {
+            $data['spousteci_udalost_id'] = null;
+        } else {
+            $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
         }
 
-        if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = null;
-
         $data['stav'] = isset($data['stav'])?$data['stav']:1;
+        //Debug::dump($data); exit;
+        
         $spis_id = $this->vlozitH($data);
         return $spis_id;
 
@@ -151,22 +163,24 @@ class Spis extends TreeModel
 
 
         // Vyplnění plneurceneho spisoveho znaku
-        $spis = $this->getInfo($spis_id);
+        /*$spis = $this->getInfo($spis_id);
         if ( !empty($spis->parent_id) ) {
             $spis_parent = $this->getInfo($spis->parent_id);
             $spis_znak_parent = self::spisovyZnak($spis_parent, 2);
             $data['spisovy_znak_plneurceny'] = $spis_znak_parent . $data['spisovy_znak'];
         } else {
             $data['spisovy_znak_plneurceny'] = $data['spisovy_znak'];
-        }
+        }*/
 
         if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = null;
+        if ( empty($data['spisovy_znak_id']) ) $data['spisovy_znak_id'] = null;
         if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
         if ( empty($data['parent_id']) ) $data['parent_id'] = null;
         if ( !isset($data['parent_id_old']) ) $data['parent_id_old'] = null;
         if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = null;
 
         if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
+        if ( empty($data['datum_uzavreni']) ) $data['datum_uzavreni'] = null;
 
         //Debug::dump($data); exit;
 

@@ -170,6 +170,18 @@ class Spisovka_SpisyPresenter extends BasePresenter
         // Info o spisu
         $Spisy = new Spis();
         $this->template->Spis = $spis = $Spisy->getInfo($spis_id);
+        
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->select(11);
+        $this->template->SpisoveZnaky = $spisove_znaky;
+        
+        if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
+            $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak_id ]->popis;
+            $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak_id ]->nazev;
+        } else {
+            $this->template->SpisZnak_popis = "";
+            $this->template->SpisZnak_nazev = "";
+        }        
 
         $DokumentSpis = new DokumentSpis();
         //$user_config = Environment::getVariable('user_config');
@@ -274,9 +286,11 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $spis = @$this->template->Spis;
         $typ_spisu = Spis::typSpisu();
         $stav_select = Spis::stav();
+        $spousteci = SpisovyZnak::spousteci_udalost(null,1);
+        $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->seznam(null,1);
+        $spisznak_seznam = $SpisovyZnak->select(2);
 
         $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null,1);
 
@@ -292,23 +306,45 @@ class Spisovka_SpisyPresenter extends BasePresenter
                 ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
         $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spis->popis);
-        $form1->addSelect('parent_id', 'Připojit k:', $spisy)
-                ->setValue(@$spis->parent_id);
+        //$form1->addSelect('parent_id', 'Připojit k:', $spisy)
+        //        ->setValue(@$spis->parent_id);
         //$form1->addSelect('stav', 'Změnit stav na:', $stav_select)
         //             ->setValue(@$spis->stav);
 
-        $form1->addText('spisovy_znak', 'Spisový znak:')
-                ->setValue(@$spis->spisovy_znak);
-        $form1->addText('skartacni_znak','Skartační znak: ', 3, 3)
-                ->setValue(@$spis->skartacni_znak);
-                //->controlPrototype->readonly = TRUE;
-        $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
-                ->setValue(@$spis->skartacni_lhuta);
-                //->controlPrototype->readonly = TRUE;
-        $form1->addSelect('spousteci_udalost_id','Spouštěcí událost: ', $spousteci_udalost)
-                ->setValue(@$spis->spousteci_udalost_id);
-                //->controlPrototype->readonly = TRUE;
+        $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
+                ->setValue(@$spis->spisovy_znak_id)
+                ->controlPrototype->onchange("vybratSpisovyZnak();");
+        
+        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
+        //        ->setValue($spisovy_znak_max)
+        //        ->getControlPrototype()->onblur("return kontrolaSpisovyZnak('upravit');");
 
+        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
+                ->setValue(@$spis->skartacni_znak)
+                ->controlPrototype->readonly = TRUE;
+        $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
+                ->setValue(@$spis->skartacni_lhuta)
+                ->controlPrototype->readonly = TRUE;
+        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci)
+                ->setValue(@$spis->spousteci_udalost_id)
+                ->controlPrototype->readonly = TRUE;
+
+        $unixtime = strtotime(@$spis->datum_otevreni);
+        if ( $unixtime == 0 ) {
+            $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10);
+        } else {
+            $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10)
+                ->setValue( date('d.m.Y',$unixtime) );
+        }
+
+        $unixtime = strtotime(@$spis->datum_uzavreni);
+        if ( $unixtime == 0 ) {
+            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10);
+        } else {
+            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10)
+                ->setValue( date('d.m.Y',$unixtime) );
+        }        
+        
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -337,12 +373,18 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $Spisy = new Spis();
 
         try {
-            $Spisy->upravit($data, $spis_id);
-            $this->flashMessage('Spis  "'. $data['nazev'] .'"  byl upraven.');
-            $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
+            $res = $Spisy->upravit($data, $spis_id);
+            if ( is_object($res) ) {
+                $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
+                $this->flashMessage($res->getMessage(),'warning');
+                $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
+            } else {
+                $this->flashMessage('Spis  "'. $data['nazev'] .'"  byl upraven.');
+                $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
+            }
         } catch (DibiException $e) {
             $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-            Debug::dump($e);
+            $this->flashMessage($e->getMessage(),'warning');
         }
 
     }

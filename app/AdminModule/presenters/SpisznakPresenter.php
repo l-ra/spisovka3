@@ -212,7 +212,6 @@ class Admin_SpisznakPresenter extends BasePresenter
         $spisznak_seznam = $SpisovyZnak->select(1);
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
-        //$spisznak_seznam = array();
 
         $form1 = new AppForm();
         $form1->addText('nazev', 'Spisový znak:', 50, 80)
@@ -224,6 +223,8 @@ class Admin_SpisznakPresenter extends BasePresenter
         $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
         $form1->addSubmit('vytvorit', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
+        $form1->addSubmit('vytvorit_a_novy', 'Vytvořit spisový znak a založit nový')
+                 ->onClick[] = array($this, 'vytvoritanovyClicked');
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoClicked');
@@ -254,5 +255,21 @@ class Admin_SpisznakPresenter extends BasePresenter
             $this->flashMessage($e->getMessage(),'warning');
         }
     }
+    
+    public function vytvoritanovyClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $SpisovyZnak = new SpisovyZnak();
+
+        try {
+            $spisznak_id = $SpisovyZnak->vytvorit($data);
+            $this->flashMessage('Spisový znak "'. $data['nazev'] .'"  byl vytvořen.');
+            $this->redirect(':Admin:Spisznak:novy');
+        } catch (DibiException $e) {
+            $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage($e->getMessage(),'warning');
+        }
+    }    
 
 }

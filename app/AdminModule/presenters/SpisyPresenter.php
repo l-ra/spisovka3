@@ -80,12 +80,12 @@ class Admin_SpisyPresenter extends BasePresenter
         $this->template->SpisyPod = null;//$Spisy->seznam_pod($spis_id,1);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->seznam(null);
+        $spisove_znaky = $SpisovyZnak->select(11);
         $this->template->SpisoveZnaky = $spisove_znaky;
-
-        if ( isset($spisove_znaky[ @$spis->spisovy_znak ]) ) {
-            $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak ]->popis;
-            $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak ]->nazev;
+        
+        if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
+            $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak_id ]->popis;
+            $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak_id ]->nazev;
         } else {
             $this->template->SpisZnak_popis = "";
             $this->template->SpisZnak_nazev = "";
@@ -116,14 +116,17 @@ class Admin_SpisyPresenter extends BasePresenter
 
     public function renderUpravit()
     {
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->seznam(null);
+        $this->template->SpisoveZnaky = $spisove_znaky;
         $this->template->spisForm = $this['upravitSpisovyPlanForm'];
     }
 
     public function renderNovy()
     {
-        //$SpisovyZnak = new SpisovyZnak();
-        //$spisove_znaky = $SpisovyZnak->seznam(null);
-        //$this->template->SpisoveZnaky = $spisove_znaky;
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->seznam(null);
+        $this->template->SpisoveZnaky = $spisove_znaky;
         $this->template->spisForm = $this['novyForm'];
     }
 
@@ -188,12 +191,14 @@ class Admin_SpisyPresenter extends BasePresenter
         $stav_select = Spis::stav();
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
-
-        if ( empty($spis->spisovy_znak_index) ) {
-            $spisovy_znak_max = $Spisy->maxSpisovyZnak( @$spis->id );
-        } else {
-            $spisovy_znak_max = $spis->spisovy_znak_index;
-        }
+        
+        $SpisovyZnak = new SpisovyZnak();
+        $spisznak_seznam = $SpisovyZnak->select(2);
+        //if ( empty($spis->spisovy_znak_index) ) {
+        //    $spisovy_znak_max = $Spisy->maxSpisovyZnak( @$spis->id );
+        //} else {
+        //    $spisovy_znak_max = $spis->spisovy_znak_index;
+        //}
 
         //$spisy = $Spisy->select(1,@$spis->id);
 
@@ -208,17 +213,23 @@ class Admin_SpisyPresenter extends BasePresenter
         $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spis->popis);
 
-        $form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
-                ->setValue($spisovy_znak_max)
-                ->getControlPrototype()->onblur("return kontrolaSpisovyZnak('upravit');");
+        $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
+                ->setValue(@$spis->spisovy_znak_id)
+                ->controlPrototype->onchange("vybratSpisovyZnak();");
+        
+        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
+        //        ->setValue($spisovy_znak_max)
+        //        ->getControlPrototype()->onblur("return kontrolaSpisovyZnak('upravit');");
 
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
-                ->setValue(@$spis->skartacni_znak);
-
+                ->setValue(@$spis->skartacni_znak)
+                ->controlPrototype->readonly = TRUE;
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
-                ->setValue(@$spis->skartacni_lhuta);
+                ->setValue(@$spis->skartacni_lhuta)
+                ->controlPrototype->readonly = TRUE;
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci)
-                ->setValue(@$spis->spousteci_udalost_id);
+                ->setValue(@$spis->spousteci_udalost_id)
+                ->controlPrototype->readonly = TRUE;
 
         $unixtime = strtotime(@$spis->datum_otevreni);
         if ( $unixtime == 0 ) {
@@ -307,7 +318,9 @@ class Admin_SpisyPresenter extends BasePresenter
 
         $spisy = $Spisy->select(11, null, $session_spisplan->spis_id);
 
-        $spisovy_znak_max = $Spisy->maxSpisovyZnak( $session_spisplan->spis_id );
+        $SpisovyZnak = new SpisovyZnak();
+        $spisznak_seznam = $SpisovyZnak->select(2);
+        //$spisovy_znak_max = $Spisy->maxSpisovyZnak( $session_spisplan->spis_id );
 
         $form1 = new AppForm();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
@@ -317,9 +330,11 @@ class Admin_SpisyPresenter extends BasePresenter
         $form1->addSelect('parent_id', 'Mateřská entita:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
 
-        $form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
-                ->setValue($spisovy_znak_max)
-                ->getControlPrototype()->onblur("return kontrolaSpisovyZnak('novy');");
+        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
+        //        ->setValue($spisovy_znak_max)
+        //        ->getControlPrototype()->onblur("return kontrolaSpisovyZnak('novy');");
+        $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
+                ->controlPrototype->onchange("vybratSpisovyZnak();");
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
@@ -354,8 +369,13 @@ class Admin_SpisyPresenter extends BasePresenter
 
         try {
             $spis_id = $Spisy->vytvorit($data);
-            $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
-            $this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
+            if ( is_object($spis_id) ) {
+                $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','error');
+                $this->flashMessage('Error: '. $spis_id->getMessage(),'error');
+            } else {
+                $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
+                $this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
+            }
         } catch (DibiException $e) {
             $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
         }
@@ -373,9 +393,9 @@ class Admin_SpisyPresenter extends BasePresenter
         $form1->addText('nazev', 'Název:', 50, 80)
                 ->addRule(Form::FILLED, 'Název spisového plánu musí být vyplněn!');
         $form1->addTextArea('popis', 'Popis:', 80, 5);
-        $form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
-                ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!')
-                ->setValue($spisovy_znak_max);
+        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
+        //        ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!')
+        //        ->setValue($spisovy_znak_max);
                 //->getControlPrototype()->onblur("return kontrolaSpisovyZnak('novyplan');");
         $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10)
                 ->setValue( date('d.m.Y') );
@@ -434,9 +454,9 @@ class Admin_SpisyPresenter extends BasePresenter
                 ->setValue($SpisovyPlan->nazev);
         $form1->addTextArea('popis', 'Popis:', 80, 5)
                 ->setValue($SpisovyPlan->popis);
-        $form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
-                ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!')
-                ->setValue($spisovy_znak_max);
+        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
+        //        ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!')
+        //        ->setValue($spisovy_znak_max);
                 //->getControlPrototype()->onblur("return kontrolaSpisovyZnak('upravitSpisovyPlan');");
 
         $unixtime = strtotime($SpisovyPlan->datum_otevreni);

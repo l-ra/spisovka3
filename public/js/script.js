@@ -1009,3 +1009,12 @@ function nastylovat(data,typ) {
     return html;
 
 }
+
+function select_set_value(SelectObject, Value) {
+  for(index = 0; 
+    index < SelectObject.length; 
+    index++) {
+   if(SelectObject[index].value == Value)
+     SelectObject.selectedIndex = index;
+   }
+}

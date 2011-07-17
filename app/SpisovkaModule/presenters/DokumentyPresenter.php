@@ -298,8 +298,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->template->Skartacni_dohled = 0;
             $this->template->Skartacni_komise = 0;
+            
+            $datum_skartace = new DateTime($dokument->skartacni_rok);
+            $datum_aktualni = new DateTime();
+            $DateDiff = new DateDiff();
+            $skartacni_rozdil = $DateDiff->diff($datum_skartace);            
+            
             // Dokument je ve skartacnim obodbi
-            if ( $dokument->datum_skartace <= time() && $dokument->stav_dokumentu == 5
+            if ( $skartacni_rozdil > 0 && $dokument->stav_dokumentu == 7
                     && ($user->isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
                 $this->template->AccessEdit = 0;
@@ -307,7 +313,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->Skartacni_dohled = 1;
             }
             // Dokument je ve skartacnim rezimu
-            if ( $dokument->stav_dokumentu == 6
+            if ( $dokument->stav_dokumentu == 8
                     && ($user->isInRole('skartacni_komise') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
                 $this->template->AccessEdit = 0;
@@ -475,8 +481,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                    $Dokument = new Dokument();
                    foreach ( $spisy as $spis ) {
                        $data = array(
-                            /*"spisovy_znak" => $spis->spisovy_znak,*/
-                            /*"spisovy_znak_id" => $spis->id,*/
+                            "spisovy_znak_id" => $spis->spisovy_znak_id,
                             "skartacni_znak" => $spis->skartacni_znak,
                             "skartacni_lhuta" => $spis->skartacni_lhuta,
                             "spousteci_udalost_id" => $spis->spousteci_udalost_id
@@ -1461,6 +1466,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->select(2);
         $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null, 1);
+        $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $Dok = @$this->template->Dok;
 
@@ -1492,9 +1498,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 6)
                 ->setValue(@$Dok->poznamka_vyrizeni);
 
-        $form->addText('skartacni_znak','Skartační znak: ', 3, 3)
+        //$form->addText('skartacni_znak','Skartační znak: ', 3, 3)
+        //        ->setValue(@$Dok->skartacni_znak)
+        //        ->controlPrototype->readonly = TRUE;
+        $form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$Dok->skartacni_znak)
-                ->controlPrototype->readonly = TRUE;
+                ->controlPrototype->readonly = TRUE;        
         $form->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
                 ->setValue(@$Dok->skartacni_lhuta)
                 ->controlPrototype->readonly = TRUE;

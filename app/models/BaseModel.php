@@ -25,6 +25,7 @@ abstract class BaseModel extends Object
     protected $tb_osoba = 'osoba';
     protected $tb_orgjednotka = 'orgjednotka';
     protected $tb_spis = 'spis';
+    protected $tb_spisovy_znak = 'spisovy_znak';
     protected $tb_subjekt = 'subjekt';
     protected $tb_subjekt_historie = 'subjekt';
     protected $tb_epodatelna = 'epodatelna';
@@ -66,6 +67,7 @@ abstract class BaseModel extends Object
         $this->tb_epodatelna = $prefix . $this->tb_epodatelna;
         $this->tb_zapujcka = $prefix . $this->tb_zapujcka;
         $this->tb_spis = $prefix . $this->tb_spis;
+        $this->tb_spisovy_znak = $prefix . $this->tb_spisovy_znak;
         $this->tb_subjekt = $prefix . $this->tb_subjekt;
         $this->tb_subjekt_historie = $prefix . $this->tb_subjekt_historie;
         $this->tb_spousteci_udalost = $prefix . $this->tb_spousteci_udalost;

@@ -34,7 +34,7 @@
                 {foreach $SpisoveZnaky as $sznak}
                     spisz_skart[{$sznak->id}] = {$sznak->skartacni_znak};
                     spisz_lhuta[{$sznak->id}] = {$sznak->skartacni_lhuta};
-                    spisz_udalost[{$sznak->id}] = {=SpisovyZnak::spousteci_udalost($sznak->spousteci_udalost_id)};
+                    spisz_udalost[{$sznak->id}] = {$sznak->spousteci_udalost_id};
                 {/foreach}
                 {/if}
 
@@ -47,7 +47,8 @@
                     var value = document.forms['frm-vyrizovaniForm'].spisovy_znak_id.options[key].value;
                     document.forms['frm-vyrizovaniForm'].skartacni_znak.value = spisz_skart[value];
                     document.forms['frm-vyrizovaniForm'].skartacni_lhuta.value = spisz_lhuta[value];
-                    document.forms['frm-vyrizovaniForm'].spousteci_udalost.value = spisz_udalost[value];
+                    //document.forms['frm-vyrizovaniForm'].spousteci_udalost.value = spisz_udalost[value];
+                    select_set_value(document.forms['frm-vyrizovaniForm'].spousteci_udalost_id,spisz_udalost[value]);
                     return true;
                 }
 
@@ -475,7 +476,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Skartační lhůta:</dt>
-            <dd class="normal"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(datum skartace {$Dok->datum_skartace|edate}){/if}</dd>
+            <dd class="normal"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(datum skartace {$Dok->skartacni_rok|edate}){/if}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>

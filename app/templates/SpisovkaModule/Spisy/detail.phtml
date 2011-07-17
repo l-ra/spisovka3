@@ -1,4 +1,39 @@
-@{block title}Seznam spisů{/block}
+@{block title}Detail spisu / věcné skupiny{/block}
+@{block javascript}
+	<script type="text/javascript">
+
+                function vybratSpisovyZnak() {
+
+                    var spisz_skart = new Array();
+                    var spisz_lhuta = new Array();
+                    var spisz_udalost = new Array();
+                    spisz_skart['0'] = '';
+                    spisz_lhuta['0'] = '';
+                    spisz_udalost['0'] = '';
+                {if count($SpisoveZnaky)>0}
+                {foreach $SpisoveZnaky as $sznak}
+                    spisz_skart[{$sznak->id}] = {$sznak->skartacni_znak};
+                    spisz_lhuta[{$sznak->id}] = {$sznak->skartacni_lhuta};
+                    spisz_udalost[{$sznak->id}] = {$sznak->spousteci_udalost_id};
+                {/foreach}
+                {/if}
+
+                    var frm_spis  = document.forms['frm-upravitForm'].spisovy_znak_id;
+                    var frm_skart  = document.forms['frm-upravitForm'].skartacni_znak;
+                    var frm_lhuta  = document.forms['frm-upravitForm'].skartacni_lhuta;
+                    var frm_udalost  = document.forms['frm-upravitForm'].spousteci_udalost_id;
+
+                    var key  = document.forms['frm-upravitForm'].spisovy_znak_id.selectedIndex;
+                    var value = document.forms['frm-upravitForm'].spisovy_znak_id.options[key].value;
+                    document.forms['frm-upravitForm'].skartacni_znak.value = spisz_skart[value];
+                    document.forms['frm-upravitForm'].skartacni_lhuta.value = spisz_lhuta[value];
+                    //document.forms['frm-novyForm'].spousteci_udalost.value = spisz_udalost[value];
+                    select_set_value(document.forms['frm-upravitForm'].spousteci_udalost_id,spisz_udalost[value]);
+                    return true;
+                }
+
+	</script>
+@{/block}
 @{block debug}
 <?php print_r($seznam); ?>
 @{/block}
@@ -29,7 +64,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Spisový znak:</dt>
-            <dd>{=Spis::spisovyZnak($Spis,1)}&nbsp;</dd>
+            <dd>{$SpisZnak_nazev}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Skartační znak:</dt>
@@ -73,16 +108,15 @@
         </tr>
 
         {foreach $seznam as $dok}
-        <tr>
+        <tr {if $dok->stav==2} style="background-color: #d0d0d0;"{/if}">
             <td class="typ">
                 <img src="{$baseUri}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
-                <img src="{$baseUri}images/icons/typdok{$dok->typ_dokumentu->typ}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="24" height="16" />
             </td>
             <td class="prijato">
                 {$dok->datum_vzniku|edate}
             </td>
             <td class="cislo_jadnaci">
-                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
+                &nbsp;<strong><a href="{if $dok->stav==2}{link :Spisovna:Dokumenty:detail, 'id'=>$dok->id}{else}{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}{/if}">
                    {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
                 </a></strong>
                 <div class="small">&nbsp;{$dok->jid}</div>
@@ -93,7 +127,7 @@
                 {/if}
             </td>
             <td class="vec">
-                <strong title="{$dok->popis}"><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
+                <strong title="{$dok->popis}"><a href="{if $dok->stav==2}{link :Spisovna:Dokumenty:detail, 'id'=>$dok->id}{else}{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}{/if}">
                     {$dok->nazev}
                 </a></strong>
                 <br />
@@ -169,6 +203,17 @@
                 <br />
                 {$dok->datum_vyrizeni|edate}
             </td>
+            {elseif $dok->stav == 2}
+            <td class="prideleno">
+                {if !empty($dok->prideleno->prideleno_jmeno)}
+                {$dok->prideleno->prideleno_jmeno}
+                {/if}&nbsp;
+            </td>
+            <td class="stav">
+                ve spisovně
+                <br />
+                {$dok->datum_vyrizeni|edate}
+            </td>            
             {else}
             <td class="prideleno">
                 &nbsp;

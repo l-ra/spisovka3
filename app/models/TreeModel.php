@@ -121,7 +121,14 @@ class TreeModel extends BaseModel
                     continue;
                 }
 
-                $result[ $row->id ] = str_repeat("...", $row->uroven) .' '. $row->{$this->nazev};
+                if ( $type == 10 ) {
+                    $result[ $row->id ] = $row->{$this->nazev};
+                } else if ( $type == 11 ) {
+                    $result[ $row->id ] = $row;
+                } else {
+                    $result[ $row->id ] = str_repeat("...", $row->uroven) .' '. $row->{$this->nazev};
+                }
+                
             }
         }
 

@@ -465,6 +465,7 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}spis` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_id` int(11) DEFAULT NULL,
   `spousteci_udalost_id` int(11) DEFAULT NULL,
+  `spisovy_znak_id` int(11) DEFAULT NULL,
   `nazev` varchar(80) NOT NULL,
   `popis` varchar(200) NOT NULL,
   `typ` varchar(5) NOT NULL DEFAULT 'S',
@@ -476,20 +477,26 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}spis` (
   `user_created` int(10) unsigned NOT NULL,
   `date_modified` datetime DEFAULT NULL,
   `user_modified` int(10) unsigned DEFAULT NULL,
-  `spisovy_znak` varchar(45) NOT NULL,
-  `spisovy_znak_plneurceny` varchar(200) NOT NULL,
+  `spisovy_znak` varchar(45) DEFAULT NULL,
+  `spisovy_znak_plneurceny` varchar(200) DEFAULT NULL,
   `skartacni_znak` enum('A','S','V') NOT NULL DEFAULT 'A',
   `skartacni_lhuta` int(11) NOT NULL DEFAULT '10',
   `datum_otevreni` datetime DEFAULT NULL,
   `datum_uzavreni` datetime DEFAULT NULL,
   PRIMARY KEY (`id`) ,
   INDEX `fk_spis_spousteci_udalost1` (`spousteci_udalost_id` ASC) ,
+  INDEX `fk_spis_spisovy_znak1` (`spisovy_znak_id` ASC) ,
   INDEX `fk_spis_spis1` (`parent_id` ASC) ,
   INDEX `fk_spis_user1` (`user_created` ASC) ,
   INDEX `fk_spis_user2` (`user_modified` ASC) ,
   CONSTRAINT `fk_spis_spousteci_udalost1`
     FOREIGN KEY (`spousteci_udalost_id` )
     REFERENCES `{tbls3}spousteci_udalost` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_spis_spisovy_znak1`
+    FOREIGN KEY (`spisovy_znak_id` )
+    REFERENCES `{tbls3}spisovy_znak` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_spis_spis1`
