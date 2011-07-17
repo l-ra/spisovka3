@@ -1025,8 +1025,12 @@ class Dokument extends BaseModel
 
         if ( isset($args['where']) ) {
             $args['where'][] = array('d.stav > 1');
+            $args['where'][] = array('NOT (wf.stav_dokumentu = 6 AND wf.aktivni = 1)');
         } else {
-            $args['where'] = array(array('d.stav > 1'));
+            $args['where'] = array(
+                    array('d.stav > 1'),
+                    array('NOT (wf.stav_dokumentu = 6 AND wf.aktivni = 1)')
+                );
         }
         
         return $args;
