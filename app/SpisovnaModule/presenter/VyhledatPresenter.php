@@ -116,6 +116,8 @@ class Spisovna_VyhledatPresenter extends BasePresenter
         $form->addSelect('typ_doruceni', 'Způsob doručení:', $typ_doruceni);
         $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
+        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50);
+        $form->addCheckbox('cislo_doporuceneho_dopisu_pouze', 'Pouze doporučené dopisy');
         $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):', 10);
         $form->addText('datum_vzniku_cas_od', 'Čas doručení (od):', 10, 15);
         $form->addDatePicker('datum_vzniku_do', 'Datum doručení/vzniku do:', 10);
@@ -203,7 +205,7 @@ class Spisovna_VyhledatPresenter extends BasePresenter
 
         $args = $Dokument->filtr(null,$data);
 
-        $this->forward(':Spisovka:Dokumenty:default',array('hledat'=>$args));
+        $this->forward(':Spisovna:Dokumenty:default',array('hledat'=>$args));
 
 
     }

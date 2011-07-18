@@ -28,9 +28,13 @@
             <dd>{$searchForm['popis']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Způsob doručení:</dt>
+            <dt>Způsob doručení přes epodatelnu:</dt>
             <dd>{$searchForm['typ_doruceni']->control}</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Způsob doručení:</dt>
+            <dd>{$searchForm['zpusob_doruceni_id']->control}</dd>
+        </dl>        
         <dl class="detail_item">
             <dt>Datum doručení/vzniku </dt>
             <dd>od: {$searchForm['datum_vzniku_od']->control} {$searchForm['datum_vzniku_cas_od']->control}</dd>
@@ -40,6 +44,11 @@
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$searchForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Číslo doporučeného dopisu:</dt>
+            <dd>{$searchForm['cislo_doporuceneho_dopisu']->control}</dd>
+            <dd>{$searchForm['cislo_doporuceneho_dopisu_pouze']->control} pouze doporučené</dd>
+        </dl>        
         <dl class="detail_item">
             <dt>Poznámka:</dt>
             <dd>{$searchForm['poznamka']->control}</dd>

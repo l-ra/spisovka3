@@ -90,15 +90,27 @@
             <dd>{!$Dok->popis|enl2br}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Datum vytvoření:</dt>
+            <dt>Datum doručení/vzniku:</dt>
             <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
         </dl>
+        {if !empty($Dok->zpusob_doruceni)}
+        <dl class="detail_item">
+            <dt>Způsob doručení:</dt>
+            <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
+        </dl>        
+        {/if}        
         {if !empty($Dok->cislo_jednaci_odesilatele)}
         <dl class="detail_item">
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$Dok->cislo_jednaci_odesilatele}&nbsp;</dd>
         </dl>
         {/if}
+        {if !empty($Dok->cislo_doporuceneho_dopisu)}
+        <dl class="detail_item">
+            <dt>Číslo doporučeného dopisu:</dt>
+            <dd>{$Dok->cislo_doporuceneho_dopisu}&nbsp;</dd>
+        </dl>
+        {/if}        
         {if !empty($Dok->zmocneni)}
         <dl class="detail_item">
             <dt>Zmocnění:</dt>

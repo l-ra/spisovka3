@@ -821,10 +821,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 "zpusob_vyrizeni_id" => null,
                 "spousteci_udalost_id" => null,
                 "cislo_jednaci_odesilatele" => "",
-                "datum_vzniku" => '',
+                "datum_vzniku" => date('Y-m-d H:i:s'),
                 "lhuta" => "30",
                 "poznamka" => "",
-                "zmocneni_id" => "0"
             );
             $dokument = $Dokumenty->ulozit($pred_priprava);
 
@@ -1175,6 +1174,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $typ_dokumentu = Dokument::typDokumentu(null,1);
         }
 
+        $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
+        
         $form = new AppForm();
         $form->addHidden('id')
                 ->setValue($dokument_id);
@@ -1208,8 +1209,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
                 ->setValue($cas);
 
-        //$form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10);
-
+        $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:',$zpusob_doruceni);
+        
+        $form->addText('cislo_doporuceneho_dopisu', 'Číslo jdoporučeného dopisu:', 50, 50)
+                ->setValue(@$dok->cislo_doporuceneho_dopisu);        
+        
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->addRule(Form::FILLED, 'Lhůta k vyřízení musí být vyplněna!')
                 ->setValue('30');
@@ -1369,6 +1373,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } else {
             $typ_dokumentu = Dokument::typDokumentu(null,1);
         }
+        $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
 
         $form = new AppForm();
         $form->addHidden('id')
@@ -1399,6 +1404,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
                 ->setValue($cas);
 
+        $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:',$zpusob_doruceni)
+                ->setValue(@$dok->zpusob_doruceni_id);
+        
+        $form->addText('cislo_doporuceneho_dopisu', 'Číslo jdoporučeného dopisu:', 50, 50)
+                ->setValue(@$dok->cislo_doporuceneho_dopisu);          
+        
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
                 ->setValue(@$Dok->poznamka);
 

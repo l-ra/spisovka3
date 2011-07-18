@@ -55,8 +55,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $result = $Osoba->seznam($args);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-
-
+        
         $this->template->seznam = $seznam;
 
     }

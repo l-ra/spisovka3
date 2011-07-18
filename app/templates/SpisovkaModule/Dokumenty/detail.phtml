@@ -247,6 +247,14 @@
             <dd>{$metadataForm['datum_vzniku']->control} {$metadataForm['datum_vzniku_cas']->control}</dd>
         </dl>
         <dl class="detail_item">
+            <dt>{$metadataForm['zpusob_doruceni_id']->label}</dt>
+            <dd>{$metadataForm['zpusob_doruceni_id']->control}</dd>
+        </dl> 
+        <dl class="detail_item">
+            <dt>Číslo doporučeného dopisu:</dt>
+            <dd>{$metadataForm['cislo_doporuceneho_dopisu']->control}</dd>
+        </dl>          
+        <dl class="detail_item">
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$metadataForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
@@ -329,15 +337,28 @@
             <dd>{!$Dok->popis|enl2br}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Datum vytvoření:</dt>
+            <dt>Datum doručení/vzniku:</dt>
             <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
         </dl>
+        {if !empty($Dok->zpusob_doruceni)}
+        <dl class="detail_item">
+            <dt>Způsob doručení:</dt>
+            <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
+        </dl>        
+        {/if}
         {if !empty($Dok->cislo_jednaci_odesilatele)}
         <dl class="detail_item">
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$Dok->cislo_jednaci_odesilatele}&nbsp;</dd>
         </dl>
         {/if}
+        {if !empty($Dok->cislo_doporuceneho_dopisu)}
+        <dl class="detail_item">
+            <dt>Číslo doporučeného dopisu:</dt>
+            <dd>{$Dok->cislo_doporuceneho_dopisu}&nbsp;</dd>
+        </dl>
+        {/if}
+        
         {if !empty($Dok->zmocneni)}
         <dl class="detail_item">
             <dt>Zmocnění:</dt>

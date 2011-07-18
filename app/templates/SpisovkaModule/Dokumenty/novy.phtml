@@ -87,9 +87,17 @@
             <dd>{$novyForm['datum_vzniku']->control} {$novyForm['datum_vzniku_cas']->control}</dd>
         </dl>
         <dl class="detail_item">
+            <dt>{$novyForm['zpusob_doruceni_id']->label}</dt>
+            <dd>{$novyForm['zpusob_doruceni_id']->control}</dd>
+        </dl>        
+        <dl class="detail_item">
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$novyForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Číslo doporučeného dopisu:</dt>
+            <dd>{$novyForm['cislo_doporuceneho_dopisu']->control}</dd>
+        </dl>        
         <!--<dl class="detail_item">
             <dt>Zmocnění:</dt>
             <dd><span id="dok_zmocneni"></span>&nbsp;<a href="{link :Spisovka:Dokumenty:zmocneni, 'id'=>$Dok->dokument_id}" id="dialog-zmocneni">Připojit zmocnění</a></dd>

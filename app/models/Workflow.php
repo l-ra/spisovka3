@@ -508,6 +508,7 @@ class Workflow extends BaseModel
             $this->deaktivovat($dokument_id);
             $result_insert = $this->insert($workflow_data);
             if ( $result_insert ) {
+                //$Dokument->ulozit(array('stav'=>2), $dokument_id);
                 $Log = new LogModel();
                 $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN, 'Dokument předán do spisovny.');
                 return true;

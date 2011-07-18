@@ -306,6 +306,19 @@ class Dokument extends BaseModel
                 $args['where'][] = array('d.cislo_jednaci_odesilatele LIKE %s','%'.$params['cislo_jednaci_odesilatele'].'%');
             }
         }
+        
+        // cislo doporuceneho dopisu
+        if ( isset($params['cislo_doporuceneho_dopisu']) ) {
+            if ( !empty($params['cislo_doporuceneho_dopisu']) ) {
+                $args['where'][] = array('d.cislo_doporuceneho_dopisu LIKE %s','%'.$params['cislo_doporuceneho_dopisu'].'%');
+            }
+        }   
+        // pouze doporucene
+        if ( isset($params['cislo_doporuceneho_dopisu_pouze']) ) {
+            if ( $params['cislo_doporuceneho_dopisu_pouze'] ) {
+                $args['where'][] = array("d.cislo_doporuceneho_dopisu <> ''");
+            }
+        }             
 
         // Datum vzniku
         if ( isset($params['datum_vzniku']) ) {
@@ -1561,7 +1574,7 @@ class Dokument extends BaseModel
 
             if ( $old_dokument ) {
 
-                //Debug::dump($data);
+                //Debug::dump($data); //exit;
 
                 // sestaveni upravenych dat
                 $update_data = array();
@@ -1834,11 +1847,18 @@ class Dokument extends BaseModel
                     $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
+            } else if ( $select == 2 ) {
+               $tmp = array();
+                $tmp[0] = '(vlastní)';
+                foreach ($result as $dt) {
+                    $tmp[ $dt->id ] = $dt->nazev;
+                }
+                return $tmp;                
             } else if ( $select == 3 ) {
                $tmp = array();
                 $tmp[0] = 'jakýkoli způsob doručení';
                 foreach ($result as $dt) {
-                    $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
+                    $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
             } else {
