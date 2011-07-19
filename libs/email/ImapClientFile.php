@@ -27,7 +27,7 @@ class ImapClientFile {
      */
     function open($file) {
 
-        if ( function_exists('imap_open') ) {
+        //if ( function_exists('imap_open') ) {
             if ( file_exists($file) ) {
 
                 if ( !class_exists('mime_parser_class') ) {
@@ -70,10 +70,10 @@ class ImapClientFile {
                 //throw new InvalidArgumentException('Soubor "'.$file.'" neexistuje nebo se nenachází na požadovaném místě!');
                 return null;
             }
-        } else {
+        //} else {
             //throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
-            return null;
-        }
+        //    return null;
+        //}
     }
 
 

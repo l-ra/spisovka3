@@ -1962,8 +1962,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
         }
 
-        //if ( $mail->send() ) { /* TODO opravit detekci odeslani */
+        try {
             $mail->send();
+        } catch (Exception $e) {
+            $this->flashMessage('Chyba při odesilání emailu! '. $e->getMessage(),'error_ext');
+            return false;
+        }
 
             $source = "";
             if ( file_exists(CLIENT_DIR .'/temp/tmp_email.eml') ) {
@@ -1983,10 +1987,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ( $imap->open($source) ) {
                 $email_mess = $imap->get_head_message(0);
             } else {
-                $email_mess = null;
+                $email_mess = new stdClass();
+                $email_mess->from_address = @$user_part[2];
+                $mid = sha1(@$data['email_predmet'] ."#". time() ."#". @$user_part[2] ."#". @$adresat->email);
+                $email_mess->message_id =  "<$mid@mail>";
+                $email_mess->subject = $data['email_predmet'];
+                $email_mess->to_address = $adresat->email;
             }
 
-
+            //echo $source;
             //Debug::dump($email_mess);
             //exit;
 
@@ -2012,7 +2021,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['poradi'] = $Epodatelna->getMax(1);
             $zprava['rok'] = date('Y');
             $zprava['email_signature'] = $email_mess->message_id;
-            $zprava['predmet'] = $email_mess->subject;
+            $zprava['predmet'] = empty($email_mess->subject)?$data['email_predmet']:$email_mess->subject;
+            if ( empty($zprava['predmet']) ) $zprava['predmet'] = "(bez předmětu)";
             $zprava['popis'] = $data['email_text'];
             $zprava['odesilatel'] = $email_mess->to_address;
             $zprava['odesilatel_id'] = $adresat->id;
@@ -2048,7 +2058,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             //$zprava['source'] = $z;
             //unset($mess->source);
             //$zprava['source'] = $mess;
-            $zprava['source_id'] = null;
+            $zprava['file_id'] = null;
 
                         if ( $epod_id = $Epodatelna->insert($zprava) ) {
 
@@ -2069,11 +2079,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             if ( $file = $UploadFile->uploadEpodatelna($mess_source, $data_file) ) {
                                 // ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['source_id'] = $file->id;
+                                $zprava['file_id'] = $file->id;
                                 $Epodatelna->update(
                                         array('stav'=>1,
                                               'stav_info'=>$zprava['stav_info'],
-                                              'source_id'=>$file->id
+                                              'file_id'=>$file->id
                                             ),
                                         array(array('id=%i',$epod_id))
                                 );
@@ -2269,11 +2279,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             if ( $file = $UploadFile->uploadEpodatelna(serialize($mess), $data) ) {
                                 // ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['source_id'] = $file->id ."-". $file_o->id;
+                                $zprava['file_id'] = $file->id ."-". $file_o->id;
                                 $Epodatelna->update(
                                         array('stav'=>1,
                                               'stav_info'=>$zprava['stav_info'],
-                                              'source_id'=>$file->id ."-". $file_o->id
+                                              'file_id'=>$file->id ."-". $file_o->id
                                             ),
                                         array(array('id=%i',$epod_id))
                                 );
