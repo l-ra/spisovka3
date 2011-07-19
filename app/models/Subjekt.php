@@ -409,6 +409,9 @@ class Subjekt extends BaseModel
                     $tmp[ $i ] = $s;
                 }
                 return $tmp;
+            } else if ( $select == 10 ) {
+                // prazdna hodnota
+                return "";
             } else {
                 return $stat;
             }

@@ -36,8 +36,8 @@ class DokumentOdeslani extends BaseModel
         $subjekty = array();
         $result = $this->fetchAllComplet($sql)->fetchAll();
         if ( count($result)>0 ) {
-            foreach ($result as $subjekt) {
-                $subjekty[ $subjekt->dokument_id ][ $subjekt->id ] = $subjekt;
+            foreach ($result as $subjekt_index => $subjekt) {
+                $subjekty[ $subjekt->dokument_id ][ $subjekt_index ] = $subjekt;
             }
 
             if ( !is_array($dokument_id) ) {

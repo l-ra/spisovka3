@@ -231,7 +231,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->template->Pridelen = 0;
             $this->template->Predan = 0;
+            $this->template->AccessEdit = 0;
+            $this->template->AccessView = 0;
             $formUpravit = null;
+            if ( count($dokument->workflow)>0 ) {
+                // uzivatel na dokumentu nekdy pracoval, tak mu dame moznost aspon nahlizet
+                foreach ($dokument->workflow as $wf) {
+                    if ( ($wf->prideleno_id == $user_id) && ($wf->stav_osoby < 100 || $wf->stav_osoby !=0) ) {
+                        $this->template->AccessView = 1;
+                    }
+                }
+            }      
+            
             // Prideleny nebo predany uzivatel
             if ( @$dokument->prideleno->prideleno_id == $user_id ) {
                 // prideleny
@@ -239,38 +250,29 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
                 $formUpravit = $this->getParam('upravit',null);
-            } else if ( @$dokument->predano->prideleno_id == $user_id ) {
+            }
+            if ( @$dokument->predano->prideleno_id == $user_id ) {
                 // predany
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;
                 $formUpravit = $this->getParam('upravit',null);
-            } else if ( empty($dokument->prideleno->prideleno_id)
+            }
+            if ( empty($dokument->prideleno->prideleno_id)
                         && Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id, 'vedouci') ) {
                 // prideleno organizacni jednotce
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
                 $formUpravit = $this->getParam('upravit',null);
-            } else if ( empty($dokument->predano->prideleno_id)
+            }
+            if ( empty($dokument->predano->prideleno_id)
                         && Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id, 'vedouci') ) {
                 // predano organizacni jednotce
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;
                 $formUpravit = $this->getParam('upravit',null);
-            } else {
-                // byvaly muze aspon prohlednout
-                $this->template->AccessEdit = 0;
-                $this->template->AccessView = 0;
-                $formUpravit = null;
-                if ( count($dokument->workflow)>0 ) {
-                    foreach ($dokument->workflow as $wf) {
-                        if ( ($wf->prideleno_id == $user_id) && ($wf->stav_osoby < 100 || $wf->stav_osoby !=0) ) {
-                            $this->template->AccessView = 1;
-                        }
-                    }
-                }
             }
 
             // Dokument se vyrizuje
@@ -463,6 +465,28 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
 
+    public function renderZrusitprevzeti()
+    {
+
+        $dokument_id = $this->getParam('id',null);
+        $user_id = $this->getParam('user',null);
+        $orgjednotka_id = $this->getParam('org',null);
+
+        $Workflow = new Workflow();
+        if ( $Workflow->prirazeny($dokument_id) ) {
+            if ( $Workflow->zrusit_prevzeti($dokument_id) ) {
+               $this->flashMessage('Zrušil jste převzetí dokumentu.');
+            } else {
+                $this->flashMessage('Zrušení převzetí se nepodařilo. Zkuste to znovu.','warning');
+            }
+        } else {
+            $this->flashMessage('Nemáte oprávnění ke zrušení převzetí dokumentu.','warning');
+        }
+        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+
+    }
+    
+    
     public function renderKvyrizeni()
     {
 
@@ -656,12 +680,25 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $spis = $Spis->getInfo($cjednaci->cislo_jednaci);
                     if ( !$spis ) {
                         // vytvorime spis
+                        //$session_spisplan = Environment::getSession('s3_spisplan');
+                        //if ( !empty($session_spisplan->spis_id) ) {
+                        //    $spisplan_id = $session_spisplan->spis_id;
+                        //} else {
+                            $spisplan_id = $Spis->getSpisovyPlan();
+                        //}                    
+                    
                         $spis_new = array(
                             'nazev' => $cjednaci->cislo_jednaci,
                             'popis' => "",
+                            'spousteci_udalost_id' => 3,
+                            'skartacni_znak' => 'S',                            
+                            'skartacni_lhuta' => '10',                            
                             'typ' => 'S',
                             'stav' => 1
                         );
+                        if ( !empty($spisplan_id) ) {
+                            $spis_new['parent_id'] = (int) $spisplan_id;
+                        }
                         $spis_id = $Spis->vytvorit($spis_new);
                         $spis = $Spis->getInfo($spis_id);
                     }
@@ -731,12 +768,26 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $spis = $Spis->getInfo($cjednaci->cislo_jednaci);
                 if ( !$spis ) {
                     // vytvorime spis
+                    
+                    //$session_spisplan = Environment::getSession('s3_spisplan');
+                    //if ( !empty($session_spisplan->spis_id) ) {
+                    //    $spisplan_id = $session_spisplan->spis_id;
+                    //} else {
+                        $spisplan_id = $Spis->getSpisovyPlan();
+                    //}                    
+                    
                     $spis_new = array(
                         'nazev' => $cjednaci->cislo_jednaci,
                         'popis' => "",
+                        'spousteci_udalost_id' => 3,
+                        'skartacni_znak' => 'S',                            
+                        'skartacni_lhuta' => '10',                          
                         'typ' => 'S',
                         'stav' => 1
                     );
+                    if ( !empty($spisplan_id) ) {
+                        $spis_new['parent_id'] = (int) $spisplan_id;
+                    }
                     $spis_id = $Spis->vytvorit($spis_new);
                     $spis = $Spis->getInfo($spis_id);
                 }
@@ -928,7 +979,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     "cislo_jednaci" => ("odpoved_". $dok->id),
                     "poradi" => ($poradi),
                     "cislo_jednaci_odesilatele" => $dok->cislo_jednaci_odesilatele,
-                    "datum_vzniku" => '',
+                    "datum_vzniku" => date('Y-m-d H:i:s'),
                     "lhuta" => "30",
                     "poznamka" => $dok->poznamka,
                     "zmocneni_id" => null
@@ -1309,7 +1360,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             'parent_id' => $spisovy_plan,
                             'nazev' => $data['cislo_jednaci'],
                             'popis' => $data['popis'],
-                            'spousteci_udalost_id' => 1,
+                            'spousteci_udalost_id' => 3,
+                            'skartacni_znak' => 'S',                            
+                            'skartacni_lhuta' => '10',                              
                             'typ' => 'S',
                             'stav' => 1
                         );

@@ -77,6 +77,9 @@
        {if $Predan==1 }
        <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít dokument</a>
        {/if}
+       {if ($Pridelen==1 && !empty($Dok->predano) ) }
+       <a href="{link :Spisovka:Dokumenty:zrusitprevzeti, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="zrusitprevzetidokument">Zrušit převzeti dokumentu</a>
+       {/if}
        {if ($Pridelen==1 && $Vyrizovani == 0 ) }
        <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="kvyrizenidokument">Označit k vyřízení</a>
        {/if}
@@ -203,11 +206,13 @@
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
             <dd>Dokument není evidován!
+                {if $Pridelen==1}
                 {if $Typ_evidence == 'sberny_arch'}
                 <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
                 <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do dokumentu/spisu</a>
                 {else}
                 <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spis. služby</a>
+                {/if}
                 {/if}
             </dd>
         </dl>
@@ -302,11 +307,13 @@
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
             <dd>Dokument není evidován!
+                {if $Pridelen==1}
                 {if $Typ_evidence == 'sberny_arch'}
                 <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
                 <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do dokumentu/spisu</a>
                 {else}
                 <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spis. služby</a>
+                {/if}
                 {/if}
             </dd>
         </dl>
@@ -591,11 +598,13 @@
         </div>
         {if $Pridelen==1 }
         <div class="blok_akce">
+            <a href="#" id="subjekt_pripojit_click">Připojit subjekt</a>
+        </div>        
+        <div class="blok_akce">
             <input type="hidden" name="subjekt_dokument_id" id="subjekt_dokument_id" value="{$Dok->id}" />
-            <a href="" id="subjekt_pripojit_click">Připojit subjekt</a>
-            <div id="subjekt_pripojit">
+            <div id="subjekt_pripojit" style="display:none;">
             <dl class="detail_item">
-                <dt>Připojit subjekt:</dt>
+                <dt>Vyhledat a připojit subjekt:</dt>
                 <dd>
                     <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
                     <a href="{link :Spisovka:Subjekty:vyber, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>

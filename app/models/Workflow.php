@@ -187,11 +187,11 @@ class Workflow extends BaseModel
         if ( is_numeric($dokument_id) ) {
 
             // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
-            $update = array('stav_osoby%sql'=>'stav_osoby+100');
+            $update = array('stav_osoby%sql'=>'stav_osoby+100','aktivni'=>0);
             $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_osoby=0')));
 
 
-            // TODO upravit aktiitu dokumentu - reaktivovat posledni dokument
+            // TODO upravit aktivitu dokumentu - reaktivovat posledni dokument
 
             return true;
 

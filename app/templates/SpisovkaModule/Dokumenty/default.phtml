@@ -43,6 +43,11 @@
     {else}
         <a href="{link this, 'seradit'=>'cj'}" title="Seřadit podle čísla jednacího">čísla jednacího</a> &nbsp;
     {/if}
+    {if $seradit == "jid"}
+        <a href="{link this, 'seradit'=>'jid_desc'}" title="Seřadit podle JID (jednoznačného identifikátoru)">JID</a> &nbsp;
+    {else}
+        <a href="{link this, 'seradit'=>'jid'}" title="Seřadit podle JID (jednoznačného identifikátoru)">JID</a> &nbsp;
+    {/if}
     {if $seradit == "dvzniku"}
         <a href="{link this, 'seradit'=>'dvzniku_desc'}" title="Seřadit podle data přijetí/vzniku">data přijetí/vzniku</a> &nbsp;
     {else}
@@ -87,7 +92,11 @@
             </td>
             <td class="cislo_jednaci">
                 &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
+                   {if empty($dok->cislo_jednaci)}
+                   (není evidován)
+                   {else}
                    {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
+                   {/if}
                 </a></strong>
                 <div class="small">&nbsp;{$dok->jid}</div>
                 {if count($dok->spisy)>0}
