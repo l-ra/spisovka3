@@ -133,17 +133,17 @@ $(function() {
 
         novy_subjekt = ''+
 '                        <dt>Název subjektu</dt>'+
-'                        <dd><input type="text" name="subjekt_nazev['+id+']" value="'+ ((typeof subjekt_original['nazev_subjektu'] != 'undefined')?subjekt_original['nazev_subjektu']:"") +'" size="60" /></dd>'+
+'                        <dd><input type="text" name="subjekt_nazev['+id+']" value="'+ ((typeof subjekt_original['nazev_subjektu'] != 'undefined')?htmlspecialchars(subjekt_original['nazev_subjektu']):"") +'" size="60" /></dd>'+
 '                        <dt>Jméno Příjmení</dt>'+
-'                        <dd><input type="text" name="subjekt_jmeno['+id+']" value="" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="'+ ((typeof subjekt_original['prijmeni'] != 'undefined')?subjekt_original['prijmeni']:"") +'" size="40" /></dd>'+
+'                        <dd><input type="text" name="subjekt_jmeno['+id+']" value="" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="'+ ((typeof subjekt_original['prijmeni'] != 'undefined')?htmlspecialchars(subjekt_original['prijmeni']):"") +'" size="40" /></dd>'+
 '                        <dt>Ulice a číslo popisné</dt>'+
-'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="'+ ((typeof subjekt_original['adresa_ulice'] != 'undefined')?subjekt_original['adresa_ulice']:"") +'" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="10" /></dd>'+
+'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="'+ ((typeof subjekt_original['adresa_ulice'] != 'undefined')?htmlspecialchars(subjekt_original['adresa_ulice']):"") +'" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="10" /></dd>'+
 '                        <dt>PSČ a Město</dt>'+
 '                        <dd><input type="text" name="subjekt_psc['+id+']" value="" size="6" /><input type="text" name="subjekt_mesto['+id+']" value="" size="50" /></dd>'+
 '                        <dt>Email</dt>'+
-'                        <dd><input type="text" name="subjekt_email['+id+']" value="'+ ((typeof subjekt_original['email'] != 'undefined')?subjekt_original['email']:"") +'" size="60" /></dd>'+
+'                        <dd><input type="text" name="subjekt_email['+id+']" value="'+ ((typeof subjekt_original['email'] != 'undefined')?htmlspecialchars(subjekt_original['email']):"") +'" size="60" /></dd>'+
 '                        <dt>ID datové schránky</dt>'+
-'                        <dd><input type="text" name="subjekt_isds['+id+']" value="'+ ((typeof subjekt_original['id_isds'] != 'undefined')?subjekt_original['id_isds']:"") +'" size="30" /></dd>'+
+'                        <dd><input type="text" name="subjekt_isds['+id+']" value="'+ ((typeof subjekt_original['id_isds'] != 'undefined')?htmlspecialchars(subjekt_original['id_isds']):"") +'" size="30" /></dd>'+
 '                        <dt>&nbsp;</dt>'+
 '                        <dd><input type="submit" name="subjekt_pridat['+id+']" value="Vytvořit a přidat" id="subjekt_pridat" /></dd>';
 

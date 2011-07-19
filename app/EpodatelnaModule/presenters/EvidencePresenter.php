@@ -176,7 +176,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 "stav" => 0,
                 "dokument_typ_id" => "1",
                 "cislo_jednaci_odesilatele" => "",
-                "datum_vzniku" => '',
+                "datum_vzniku" => $zprava->doruceno_dne,
                 "lhuta" => "30",
                 "poznamka" => "",
             );
@@ -507,8 +507,10 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 //$cjednaci = $CJ->generuj(1); - z epodatelny
                 $cjednaci = $CJ->generuj(); // ve spisovkce
             //}
-
+            //Debug::dump($cjednaci); exit;
+                
             $data['jid'] = $cjednaci->app_id.'-ESS-'.$dokument_id;
+            $data['poradi'] = 1;
             //$data['cislojednaci_id'] = $cjednaci->id;
             //$data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
             //$data['podaci_denik'] = $cjednaci->podaci_denik;
