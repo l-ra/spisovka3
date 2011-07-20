@@ -31,7 +31,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Podatelna pro příjem této DS:</dt>
-            <dd>{$isds['podatelna']}&nbsp;</dd>
+            <dd>{if empty($isds['podatelna'])}kterákoli{else}{$isds['podatelna']}{/if}&nbsp;</dd>
         </dl>
     </div>
     {/foreach}
@@ -73,7 +73,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Podatelna pro příjem této schránky:</dt>
-            <dd>{$email['podatelna']}&nbsp;</dd>
+            <dd>{if empty($email['podatelna'])}kterákoli{else}{$email['podatelna']}{/if}&nbsp;</dd>
         </dl>
     </div>
     {/foreach}
@@ -116,6 +116,25 @@
         <dl class="detail_item">
             <dt>&nbsp;</dt>
             <dd>
+                {$index}<br />
+                <span style="font-weight: normal;">
+                    {$ca}
+                </span>
+
+            </dd>
+        </dl>
+    {/foreach}
+    </div>
+    {else}
+    <div class="prazdno">Nebyly nalezeny žádné kvalifikované certifikační autority</div>
+    {/if}
+
+    {if 0 /* count($n_ca)>0*/}
+    <div class="detail_blok">
+    {foreach $n_ca as $index => $ca}
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
                 {$ca['name']}<br />
                 <span style="font-weight: normal;">
                     {$ca['info']}<br />
@@ -126,6 +145,6 @@
         </dl>
     {/foreach}
     </div>
-    {else}
+    
     <div class="prazdno">Nebyly nalezeny žádné kvalifikované certifikační autority</div>
     {/if}

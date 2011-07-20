@@ -202,6 +202,14 @@ class esignature {
 
     }
 
+    public function getCASimple()
+    {
+        if ( count($this->ca_info)>0 ) {
+            return $this->ca_info;
+        } else {
+            return null;
+        }
+    }
 
     public function verifySignature_source($message,&$cert=null,&$status="") {
         $tmp_mess = $this->tempnam("", "mess");

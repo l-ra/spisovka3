@@ -57,7 +57,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         // CA
         $esign = new esignature();
         $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
-        $this->template->n_ca = $esign->getCA();
+        //$this->template->n_ca = $esign->getCA();
+        $this->template->n_ca = $esign->getCASimple();
 
     }
 
@@ -555,11 +556,12 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
 
         $typ_serveru = array(
-            '/pop3/novalidate-cert'=>'POP3',
-            '/pop3/ssl/novalidate-cert'=>'POP3-SSL',
-            '/imap/novalidate-cert'=>'IMAP',
-            '/imap/ssl/novalidate-cert'=>'IMAP+SSL',
-            '/nntp'=>'NNTP'
+            ''=>'',
+            '/pop3/novalidate-cert'=>'POP3 (standardní port 110)',
+            '/pop3/ssl/novalidate-cert'=>'POP3-SSL (standardní port 995)',
+            '/imap/novalidate-cert'=>'IMAP (standardní port 143)',
+            '/imap/ssl/novalidate-cert'=>'IMAP+SSL (standardní port 993)',
+            '/nntp'=>'NNTP (standardní port 119)'
         );
 
         $form1 = new AppForm();
@@ -579,7 +581,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addText('server', 'Adresa serveru:', 50, 100)
                 ->setValue($email['server'])
                 ->addRule(Form::FILLED, 'Adresa poštovního serveru musí být vyplněna.');
-        $form1->addText('port', 'Port:', 50, 100)
+        $form1->addText('port', 'Port:', 5, 50)
                 ->setValue($email['port'])
                 ->addRule(Form::FILLED, 'Port serveru musí být vyplněno.');
         $form1->addText('inbox', 'Složka:', 50, 100)

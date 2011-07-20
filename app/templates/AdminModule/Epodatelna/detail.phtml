@@ -64,7 +64,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Podatelna pro příjem:</dt>
-            <dd>{$Info['podatelna']}</dd>
+            <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}</dd>
         </dl>
         <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
         {/if}
@@ -100,7 +100,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Podatelna pro příjem této schránky:</dt>
-            <dd>{$Info['podatelna']}&nbsp;</dd>
+            <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}&nbsp;</dd>
         </dl>
         <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
         {/if}
@@ -152,8 +152,4 @@
         {else}
         {/if}
         
-    </div>
-
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Test</div>
     </div>
