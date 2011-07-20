@@ -138,6 +138,14 @@ class Ciselnik extends Control {
                 $model = new Model($this->table);
                 $id = !empty($this->primary)?$this->primary:'id';
                 $this->data = $model->fetchRow(array('%and', array($id => $this->_params['primary'] )))->fetch();
+                
+                $is_fixed = 0;
+                if ( isset($this->data->fixed) ) {
+                    if ( $this->data->fixed == 1 ) {
+                        $is_fixed = 1;
+                    }
+                }
+                
             }
 
             foreach( $this->cols as $col_name => $col_params ) {
@@ -238,8 +246,10 @@ class Ciselnik extends Control {
             } else if ( $this->action == 'edit' ) {
                 $form->addHidden('primary')->setValue( $this->data->$id );
                 $form->addSubmit('upravitCiselnik', 'Upravit');
-                $form->addSubmit('odstranitCiselnik', 'Odstranit')
-                        ->getControlPrototype()->onclick = "return confirm('Opravdu chcete smazat tento záznam?');";
+                if ( !$is_fixed ) {
+                    $form->addSubmit('odstranitCiselnik', 'Odstranit')
+                            ->getControlPrototype()->onclick = "return confirm('Opravdu chcete smazat tento záznam?');";
+                }
             }
 
         }
@@ -287,6 +297,12 @@ class Ciselnik extends Control {
             $values = $form->getValues();
             $data = $form->getHttpData();
 
+            // stav fixed
+            if ( isset($values['stav']) && isset($data['stav']) ) {
+                if ( $values['stav'] != $data['stav'] ) {
+                    $values['stav'] = $data['stav'];
+                }
+            }
 
             if ( isset($data['novyCiselnik']) ) {
                 $this->handleNew($values);
@@ -300,16 +316,6 @@ class Ciselnik extends Control {
                 throw new InvalidStateException("Unknown submit button.");
             }
 
-
-            /*if ( $form['upravitCiselnik']->isSubmittedBy() ) {
-                $this->handleNew($values);
-            } else if ( $data['ciselnik_action'] == 'edit' && $form['submitCiselnik']->isSubmittedBy() ) {
-                $this->handleEdit($values);
-            } else if ( $form['stornoCiselnik']->isSubmittedBy() ) {
-                $this->handleStorno();
-            } else {
-                throw new InvalidStateException("Unknown submit button.");
-            }*/
 	}
 	if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
     }
