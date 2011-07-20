@@ -1774,6 +1774,7 @@ class Dokument extends BaseModel
             if ( $select == 1 ) { // referent
                 $tmp = array();
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     if ( $dt->referent == 1 ) {
                         $tmp[ $dt->id ] = $dt->nazev;
                     }
@@ -1782,6 +1783,7 @@ class Dokument extends BaseModel
             } else if ( $select == 2 ) { // podatelna
                 $tmp = array();
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     if ( $dt->podatelna == 1 ) {
                         $tmp[ $dt->id ] = $dt->nazev;
                     }
@@ -1791,6 +1793,7 @@ class Dokument extends BaseModel
                 $tmp = array();
                 $tmp[0] = 'jakýkoli typ dokumentu';
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
@@ -1814,6 +1817,7 @@ class Dokument extends BaseModel
             if ( $select == 1 ) {
                 $tmp = array();
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
@@ -1821,12 +1825,14 @@ class Dokument extends BaseModel
                $tmp = array();
                 $tmp[0] = 'jakýkoli způsob vyřízení';
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
                 }
                 return $tmp;
             } else if ( $select == 4 ) {
                $tmp = array();
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     $tmp[ 'zpusob_vyrizeni_'. $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
@@ -1850,6 +1856,7 @@ class Dokument extends BaseModel
             if ( $select == 1 ) {
                 $tmp = array();
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
@@ -1857,6 +1864,7 @@ class Dokument extends BaseModel
                $tmp = array();
                 $tmp[0] = '(vlastní)';
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;                
@@ -1864,6 +1872,7 @@ class Dokument extends BaseModel
                $tmp = array();
                 $tmp[0] = 'jakýkoli způsob doručení';
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;
@@ -1887,6 +1896,7 @@ class Dokument extends BaseModel
             if ( $select == 1 ) {
                 $tmp = array();
                 foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
                     $tmp[ $dt->id ] = $dt->nazev;
                 }
                 return $tmp;

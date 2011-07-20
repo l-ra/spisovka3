@@ -1039,7 +1039,7 @@ class Install_DefaultPresenter extends BasePresenter
         $Osoba = new Osoba();
         $User = new UserModel();
 
-        $data['stav'] = 1;
+        $data['stav'] = 0;
         $data['user_created'] = 1;
         $data['date_created'] = new DateTime();
         $data['user_modified'] = 1;
