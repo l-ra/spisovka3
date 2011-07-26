@@ -215,7 +215,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         try {
             $osoba_id = $Osoba->ulozit($data, $osoba_id);
             $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl upraven.');
-            $this->redirect(':Admin:Zamestnanci:detail',array('id'=>$subjekt_id));
+            $this->redirect(':Admin:Zamestnanci:detail',array('id'=>$osoba_id));
         } catch (DibiException $e) {
             $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  se nepodařilo upravit.','warning');
             Debug::dump($e);
