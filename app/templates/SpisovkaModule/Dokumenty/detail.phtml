@@ -841,12 +841,18 @@
             <dd>dokument vyřízen a běží skartační lhůta</dd>
             <dd class="normal">vyřídil {$wf->prideleno_jmeno}</dd>
             {elseif $wf->stav_dokumentu == 6}
-            <dd>dokument přidán ke skartačnímu řízení</dd>
-            <dd class="normal">přidal {$wf->prideleno_jmeno}</dd>
+            <dd>dokument předán do spisovny</dd>
+            <dd class="normal">předal {$wf->user_jmeno}</dd>
             {elseif $wf->stav_dokumentu == 7}
+            <dd>dokument přidán do spisovny</dd>
+            <dd class="normal">provedl {$wf->user_jmeno}</dd>
+            {elseif $wf->stav_dokumentu == 8}
+            <dd>dokument předán do skartačního řízení</dd>
+            <dd class="normal">provedl {$wf->user_jmeno}</dd>
+            {elseif $wf->stav_dokumentu == 9}
             <dd>dokument přidán do archivu</dd>
             <dd class="normal">rozhodl {$wf->prideleno_jmeno}</dd>
-            {elseif $wf->stav_dokumentu == 8}
+            {elseif $wf->stav_dokumentu == 10}
             <dd>dokument byl skartován</dd>
             <dd class="normal">rozhodl {$wf->prideleno_jmeno}</dd>
             {else}

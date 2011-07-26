@@ -201,6 +201,28 @@
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
+            {elseif $dok->stav_dokumentu == 6 }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            </td>
+            <td class="stav">
+                vyřízeno<br />předáno do spisovny
+                <br />
+                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+            </td>
+            {elseif $dok->stav_dokumentu == 7 }
+            <td class="prideleno">
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            </td>
+            <td class="stav">
+                vyřízeno<br />ve spisovně
+                <br />
+                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+            </td>
 
             {else}
             <td class="prideleno">
