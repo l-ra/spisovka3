@@ -67,7 +67,14 @@ class Orgjednotka extends TreeModel
             // aktualizovat
             $data['date_modified'] = new DateTime();
             $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
-            $this->upravitH($data, $orgjednotka_id);
+            
+            if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
+            if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+            if ( !isset($data['parent_id_old']) ) $data['parent_id_old'] = null;
+            if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = null;
+            if ( !empty($data['stav']) ) $data['stav'] = (int) $data['stav'];            
+            
+            $orgjednotka_id = $this->upravitH($data, $orgjednotka_id);
             //$this->update($data, array(array('id = %i',$orgjednotka_id)));
         } else {
             // insert
@@ -76,6 +83,10 @@ class Orgjednotka extends TreeModel
             $data['date_modified'] = new DateTime();
             $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
             $data['stav'] = (int) 1;
+            
+            if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
+            if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+            
             //$orgjednotka_id = $this->insert($data);
             $orgjednotka_id = $this->vlozitH($data);
         }

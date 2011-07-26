@@ -133,8 +133,14 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         unset($data['id']);
 
         try {
-            $orgjednotka_id = $OrgJednotka->ulozit($data, $orgjednotka_id);
-            $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'"  byla upravena.');
+            $res = $OrgJednotka->ulozit($data, $orgjednotka_id);
+            
+            if ( is_object($res) ) {
+                $this->flashMessage('Organizační jednotku  "'. $data['zkraceny_nazev'] .'" se nepodařilo upravit.','warning');
+                $this->flashMessage($res->getMessage(),'warning');
+            } else {
+                $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'"  byla upravena.');
+            }            
         } catch (DibiException $e) {
             $this->flashMessage('Organizační jednotku  "'. $data['zkraceny_nazev'] .'" se nepodařilo upravit.','warning');
             $this->flashMessage($e->getMessage(),'warning');
@@ -195,8 +201,13 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         try {
             $orgjednotka_id = $OrgJednotka->ulozit($data);
-            $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'" byla vytvořena.');
-            $this->redirect(':Admin:Orgjednotky:detail',array('id'=>$orgjednotka_id));
+            if ( is_object($orgjednotka_id) ) {
+                $this->flashMessage('Organizační jednotku "'. $data['zkraceny_nazev'] .'" se nepodařilo vytvořit.','warning');
+                $this->flashMessage($orgjednotka_id->getMessage(),'warning');
+            } else {
+                $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'" byla vytvořena.');
+                $this->redirect(':Admin:Orgjednotky:detail',array('id'=>$orgjednotka_id));
+            }               
         } catch (DibiException $e) {
             $this->flashMessage('Organizační jednotku "'. $data['zkraceny_nazev'] .'" se nepodařilo vytvořit.','warning');
             $this->flashMessage($e->getMessage(),'warning');
