@@ -773,7 +773,7 @@ INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `fixed_id`, `orgjednotka_id`,
 (5,	4,	NULL,	NULL,	'vedouci',	'vedoucí',	'Vedoucí organizační jednotky umožňující přijímat dokumenty',	1,	30,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'5',	'vedouci.5',	NULL),
 (6,	4,	NULL,	NULL,	'podatelna',	'pracovník podatelny',	'Pracovník podatelny, který může přijímat nebo odesílat dokumenty',	1,	20,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'6',	'podatelna.6',	NULL),
 (7,	4,	NULL,	NULL,	'skartacni_dohled',	'pracovník spisovny',	'Pracovník spisovny, který spravuje dokumenty ve spisovně',	1,	20,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'7',	'skartacni_dohled.7',	NULL),
-(8,	4,	NULL,	NULL,	'skartacni_komise',	'pracovník podatelny',	'Pracovník podatelny, který může přijímat nebo odesílat dokumenty',	1,	20,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'8',	'skartacni_komise.8',	NULL);
+(8,	4,	NULL,	NULL,	'skartacni_komise',	'člen skartační komise',	'Člen skartační komise, která rozhoduje o skartaci nebo archivaci dokumentu',	1,	20,	1,	'2011-05-18 15:32:11',	'2011-05-18 15:32:11',	'8',	'skartacni_komise.8',	NULL);
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}user_resource` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,

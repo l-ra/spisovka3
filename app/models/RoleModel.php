@@ -51,7 +51,7 @@ class RoleModel extends TreeModel
         if ( $simple == 1 ) {
             $rows = $query->fetchAll();
             $tmp = array();
-            $tmp[0] = '(nedědí)';
+            //$tmp[0] = '(nedědí)';
             foreach ($rows as $r) {
                 $tmp[ $r->id ] = $r->name;
             }

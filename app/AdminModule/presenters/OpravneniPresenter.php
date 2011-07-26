@@ -79,7 +79,6 @@ class Admin_OpravneniPresenter extends BasePresenter
             unset($role_select[$role->id]);
         }
         
-
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
@@ -145,11 +144,8 @@ class Admin_OpravneniPresenter extends BasePresenter
     {
 
         $RoleModel = new RoleModel();
-        $role_select = array();
-        $role_select[0] = '(nedědí)';
-        $role_select = array_merge($role_select, $RoleModel->seznam(1));
-
-
+        $role_select = $RoleModel->seznam(1);
+        
         $form1 = new AppForm();
         $form1->addText('name', 'Název role:', 50, 100)
                 ->addRule(Form::FILLED, 'Název role musí být vyplněno!');
@@ -162,10 +158,6 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoSeznamClicked');
-
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
 
         $renderer = $form1->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
