@@ -2428,8 +2428,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
                     'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
                     'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízené',
-                    'vse'=>'Všechny dokumenty přidělěné na organizační jednotku',
-                    'org'=>'Všechny dokumenty přiděléné na organizační jednotku včetně všech podřízených úzlech',
+                    'vse'=>'Všechny dokumenty přidělené na organizační jednotku',
+                    'org'=>'Všechny dokumenty přidělené na organizační jednotku včetně všech podřízených uzlů',
                 ),
                 
                 
