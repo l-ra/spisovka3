@@ -71,6 +71,7 @@ abstract class BasePresenter extends Presenter
         if (!function_exists('edate') ) {
             function edate($string,$format = null) {
                 if ( empty($string) ) return "";
+                if ( $string == "0000-00-00 00:00:00" ) return "";
                 if ( is_numeric($string) ) {
                     if ( !is_null($format) ) {
                         return date($format,$string);
@@ -91,6 +92,7 @@ abstract class BasePresenter extends Presenter
         if (!function_exists('edatetime') ) {
             function edatetime($string) {
                 if ( empty($string) ) return "";
+                if ( $string == "0000-00-00 00:00:00" ) return "";
                 if ( is_numeric($string) ) {
                     return date('j.n.Y G:i:s',$unixtime);
                 }
@@ -102,6 +104,7 @@ abstract class BasePresenter extends Presenter
         if (!function_exists('eyear') ) {
             function eyear($string) {
                 if ( empty($string) ) return "";
+                if ( $string == "0000-00-00 00:00:00" ) return "";
                 $datetime = new DateTime($string);
                 return $datetime->format('Y');
             }
