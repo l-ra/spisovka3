@@ -133,7 +133,7 @@ abstract class BasePresenter extends Presenter
 	}
 
 
-        if (in_array('programator', Environment::getUser()->getRoles())) {
+        if (DEBUG_ENABLE && in_array('programator', Environment::getUser()->getRoles())) {
             $this->template->debuger = TRUE;
         } else {
             $this->template->debuger = FALSE;
