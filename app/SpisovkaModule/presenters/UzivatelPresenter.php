@@ -50,7 +50,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
         // Zmena hesla
         $this->template->ZmenaHesla = $this->getParam('zmenitheslo',null);
-        Environment::setVariable('auth_params', array('osoba_id'=>$osoba_id,'user_id'=>$user->id));
+        Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$user->id));
         $Auth1 = new $authenticator();
         $Auth1->setAction('change_password');
         $this->addComponent($Auth1, 'auth_change_password');
