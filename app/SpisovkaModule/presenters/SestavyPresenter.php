@@ -30,7 +30,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function actionPdf()
     {
-        @ini_set("memory_limit","128M");
+        @ini_set("memory_limit",PDF_MEMORY_LIMIT);
         $sestava_id = $this->getParam('id',null);
         $this->forward('detail', array('view'=>'pdf','id'=>$sestava_id));
     }
@@ -237,6 +237,18 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->upravitForm = $this['upravitForm'];
     }
 
+    public function renderPodaciarch() 
+    {
+        @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+        $this->setLayout('print');
+    }
+    
+    public function renderPodaciarchnew() 
+    {
+        @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+        $this->setLayout('print');
+    }    
+    
     protected function createComponentNewForm()
     {
 

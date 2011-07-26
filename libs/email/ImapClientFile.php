@@ -546,7 +546,7 @@ class ImapClientFile {
 
         $tmp = new stdClass();
         /* subject */
-        $tmp->subject = $this->decode_header($message['Headers']['subject:']);
+        $tmp->subject = $this->decode_header(@$message['Headers']['subject:']);
 
         $tmp->message_id = $message['Headers']['message-id:'];
         $tmp->id_part = 1;
@@ -602,13 +602,13 @@ class ImapClientFile {
 
     private function get_address($address) {
         $address_array = array();
-        if(is_null($address)) {
+        if(is_null($address) || empty($address)) {
             return null;
         }
         foreach ($address as $item) {
             $tmp = new stdClass();
             $tmp->personal = (isset($item['name']))?$this->decode_header($item['name']):"";
-            $tmp->email = $item['address'];
+            $tmp->email = @$item['address'];
             if(!empty($tmp->personal)) {
                 $tmp->string = $tmp->personal ." <". $tmp->email .">";
             } else {

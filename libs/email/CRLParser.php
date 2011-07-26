@@ -91,6 +91,8 @@ class CRLParser extends DERParser {
     private function decode( $der )
     {
 
+        if ( empty($der) ) return null;
+        
         $info = new stdClass();
         // $der[0]['data'][0]['data'][XXX]['data']
         // 2 = CA
@@ -170,9 +172,11 @@ class CRLParser extends DERParser {
 
     private function sourceCRL($zdroj) {
 
+        $zdroj = trim($zdroj);
+        
         if ( empty($zdroj) ) return null;
         if ( @ini_get("allow_url_fopen") ) {
-            return file_get_contents($zdroj);
+            return @file_get_contents($zdroj);
         } else if ( function_exists('curl_init') ) {
             if ( $ch = curl_init($zdroj) ) {
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

@@ -64,7 +64,8 @@ class DERParser {
             $data = $this->pemraw2der($data);
         }
 
-        //file_put_contents('asn/test.tmp', $data);
+        @ini_set("memory_limit","128M");
+        //file_put_contents(CLIENT_DIR .'/temp/test.crl', $data);
 
         $this->data = $this->_parse($data);
         return $this->data;

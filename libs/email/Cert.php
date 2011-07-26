@@ -120,7 +120,7 @@ class Cert extends DERParser {
         $data_orig = $this->raw($p7s_data);
         $data = $this->parse($data_orig);
         $out = new stdClass();
-
+        
         $out->subjekt = null;
         $out->ca = array();
 

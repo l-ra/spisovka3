@@ -100,13 +100,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $tisk = $this->getParam('print');
         $pdf = $this->getParam('pdfprint');
         if ( $tisk ) {
-            @ini_set("memory_limit","128M");
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
             $this->setLayout(false);
             $this->setView('print');
         } elseif ( $pdf ) {
-            @ini_set("memory_limit","128M");
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             $this->pdf_output = 1;
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
@@ -157,6 +157,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 if ( strpos($errstr,'Undefined') === false ) {    
                     throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
                 }
+                
+                
             }
             set_error_handler('handlePDFError');
             
@@ -166,7 +168,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $response->send();
             $content = ob_get_clean();
             if ($content) {
-                
+        
+                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 $content = str_replace("<td", "<td valign='top'", $content);
                 $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
                 $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
@@ -204,6 +207,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 echo "<h1>Nelze vygenerovat PDF výstup.</h1>";
                 echo "<p>Generovaný obsah obsahuje příliš mnoho dat, které není možné zpracovat.<br />Zkuste omezit celkový počet dokumentů.</p>";
                 echo "<p><a href=".$location.">Přejít na předchozí stránku.</a></p>";
+                echo "<p>".$e->getMessage()."</p>";
                 exit;
             }
             

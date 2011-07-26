@@ -46,6 +46,8 @@ $epodatelna_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
 Environment::setVariable('user_config', $user_config);
 Environment::setVariable('epodatelna_config', $epodatelna_config);
 
+define('PDF_MEMORY_LIMIT','512M');
+
 //Environment::setMode(Environment::DEVELOPMENT);
 //Environment::setMode(Environment::PRODUCTION);
 
@@ -110,7 +112,13 @@ try {
 $router = $application->getRouter();
 
 // mod_rewrite detection
-if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) {
+// 
+$apache_mod = function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules()); 
+$nginx_mod = 0;//($_SERVER['SERVER_SOFTWARE']=='nginx');
+ 
+//if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) {
+if ( $apache_mod || $nginx_mod ) {
+        define('IS_SIMPLE_ROUTER',0);
 	$router[] = new Route('index.php', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
@@ -192,10 +200,10 @@ if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_
 		'action' => 'detail',
 		'id' => NULL,
 	));
- 
-
+        
 } else {
-	$router[] = new SimpleRouter('Spisovka:default');
+        define('IS_SIMPLE_ROUTER',1);
+	$router[] = new SimpleRouter('Spisovka:Default:default');
 }
 
 // Step 5: Run the application!

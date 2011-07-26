@@ -1,7 +1,7 @@
 <div class="ciselnik">
 
     <div class="blok_menu">
-        <a href="{$link}?ciselnik_new=1">Nový záznam</a>
+        <a href="{=Ciselnik::alink($link,'ciselnik_new=1')}">Nový záznam</a>
     </div>
 
 {if count($data)>0}
@@ -16,7 +16,7 @@
     {foreach $cols as $col_name => $col_params}
             <td>
             {if $col_params['link']}
-                <a href="{$link}?primary={$row->$primary}">
+                <a href="{=Ciselnik::alink($link,'primary='.$row->$primary)}">
             {/if}
             {if $col_params['form'] == "checkbox" }
                 {if $row->$col_name == 1}ano{else}ne{/if}

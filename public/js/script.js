@@ -184,7 +184,7 @@ $(function() {
     $('#predat_autocomplete').autocomplete({
         minLength: 3,
 	/*source: seznam_uzivatelu,*/
-        source: baseUri + 'uzivatel/seznamAjax',
+        source: (is_simple==1)?baseUri + '?presenter=Spisovka%3Auzivatel&action=seznamAjax':baseUri + 'uzivatel/seznamAjax',
 
 	focus: function(event, ui) {
             $('#predat_autocomplete').val(ui.item.nazev);
@@ -207,7 +207,7 @@ $(function() {
 
     $('#subjekt_autocomplete').autocomplete({
         minLength: 3,
-        source: baseUri + 'subjekty/0/seznamAjax',
+        source: (is_simple==1)?baseUri + '?presenter=Spisovka%3Asubjekty&action=seznamAjax':baseUri + 'subjekty/0/seznamAjax',
 
 	focus: function(event, ui) {
             $('#subjekt_autocomplete').val(ui.item.nazev);
@@ -234,7 +234,11 @@ $(function() {
                     }
                 }
 
-                url = baseUri + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=AO';
+                if ( is_simple == 1 ) {
+                    url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=AO';                    
+                } else {
+                    url = baseUri + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=AO';
+                }
                 x.open("GET", url, true);
                 x.send(null);
             }
@@ -310,7 +314,11 @@ aresSubjekt = function ( formName ) {
     var frmIC = document.getElementById('frm'+formName+'-ic');
     baseUri = baseUri.replace('/public','');
     //var url = baseUri + '/subjekty/ares/' + frmIC.value;
-    var url = baseUri + 'subjekty/' + frmIC.value +'/ares';
+    if ( is_simple == 1 ) {
+        var url = baseUri + '?presenter=Spisovka%3Asubjekty&id=' + frmIC.value +'&action=ares';
+    } else {    
+        var url = baseUri + 'subjekty/' + frmIC.value +'/ares';
+    }
     //alert( url );
 
     $.getJSON(url, function(data) {
@@ -399,7 +407,11 @@ renderPrilohy = function (dokument_id) {
             }
         }
         baseUri = baseUri.replace('/public','');
-        x.open("GET", baseUri + 'prilohy/'+ dokument_id +'/nacti', true);
+        if ( is_simple == 1 ) {
+            x.open("GET", baseUri + '?presenter=Spisovka%3Aprilohy&id='+ dokument_id +'&action=nacti', true);
+        } else {    
+            x.open("GET", baseUri + 'prilohy/'+ dokument_id +'/nacti', true);
+        }
         x.send(null);
     }
 
@@ -426,7 +438,11 @@ renderSubjekty = function (dokument_id) {
             }
         }
         baseUri = baseUri.replace('/public','');
-        x.open("GET", baseUri + 'subjekty/'+ dokument_id +'/nacti', true);
+        if ( is_simple == 1 ) {
+            x.open("GET", baseUri + '?presenter=Spisovka%3Asubjekty&id='+ dokument_id +'&action=nacti', true);
+        } else {
+            x.open("GET", baseUri + 'subjekty/'+ dokument_id +'/nacti', true);
+        }
         x.send(null);
     }
 
@@ -565,7 +581,12 @@ subjektNovyStorno = function (doc_id) {
             }
             return false;
         }
-        x.open("GET", baseUri + '/subjekty/0/vyber?dok_id='+doc_id, true);
+        if ( is_simple == 1 ) {
+            x.open("GET", baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=vyber&dok_id='+doc_id, true);
+        } else {    
+            x.open("GET", baseUri + '/subjekty/0/vyber?dok_id='+doc_id, true);
+        }        
+        
         x.send(null);
         return false;
     }
@@ -641,7 +662,12 @@ subjektNovy = function(event) {
                     formdata = '';
                 }
 
-                x.open("POST", baseUri + 'subjekty/0/vytvoritAjax', true);
+                if ( is_simple == 1 ) {
+                    x.open("POST", baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=vytvoritAjax', true);
+                } else { 
+                    x.open("POST", baseUri + 'subjekty/0/vytvoritAjax', true);
+                }
+                
                 x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 x.setRequestHeader("Content-length", formdata.length);
                 x.setRequestHeader("Connection", "close");
@@ -817,7 +843,13 @@ hledejDokumentAjax = function (vyraz, typ) {
             }
         }
         baseUri = baseUri.replace('/public','');
-        var url = baseUri + 'spojit/0/nacti?q=' + vyraz;
+        
+        if ( is_simple == 1 ) {
+            var url = baseUri + '?presenter=Spisovka%3Aspojit&id=0&action=nacti&q=' + vyraz;
+        } else { 
+            var url = baseUri + 'spojit/0/nacti?q=' + vyraz;
+        }
+        
         x.open("GET", url, true);
         x.send(null);
     }
@@ -942,7 +974,11 @@ filtrSestavy = function (elm) {
         }
 
         baseUri = baseUri.replace('/public','');
-        var url = baseUri + 'sestavy/0/filtr/?url='+elm.href;
+        if ( is_simple == 1 ) {
+            var url = baseUri + '?presenter=Spisovka%3Asestavy&id=0&action=filtr&url='+elm.href;
+        } else {         
+            var url = baseUri + 'sestavy/0/filtr/?url='+elm.href;
+        }
         x.open("GET", url, true);
         x.send(null);
     }
@@ -993,10 +1029,18 @@ function nastylovat(data,typ) {
 
     if ( typ == 1 ) {
 
-        var url = baseUri + 'dokumenty/'+ dokument_id +'/cjednaciadd?spojit_s=';
+        if ( is_simple == 1 ) {
+            var url = baseUri + '?presenter=Spisovka%3Adokumenty&id='+ dokument_id +'&action=cjednaciadd&spojit_s=';
+        } else {         
+            var url = baseUri + 'dokumenty/'+ dokument_id +'/cjednaciadd?spojit_s=';
+        }
         var fnc = "pripojitDokument(this)";
     } else {
-        var url = baseUri + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
+        if ( is_simple == 1 ) {
+            var url = baseUri + '?presenter=Spisovka%3Aspojit&id='+ dokument_id +'&action=vybrano&spojit_s=';
+        } else {            
+            var url = baseUri + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
+        }
         var fnc = "spojitDokument(this)";
     }
 

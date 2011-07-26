@@ -78,6 +78,17 @@ class Ciselnik extends Control {
         return $this;
     }
 
+    public static function alink($link,$params)
+    {
+        
+        if ( strpos($link,"?") !== false ) {
+            return $link ."&". $params;
+        } else {
+            return $link ."?". $params;
+        }
+        
+    }
+    
     public function render()
     {
 
