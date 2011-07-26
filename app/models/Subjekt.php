@@ -21,6 +21,8 @@ class Subjekt extends BaseModel
     public function ulozit($data, $subjekt_id = null)
     {
 
+        if ( empty($data['datum_narozeni']) ) $data['datum_narozeni'] = null;
+        
         if ( !is_null($subjekt_id) ) {
 
             // ulozit do historie
