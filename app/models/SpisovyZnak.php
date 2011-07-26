@@ -62,13 +62,18 @@ class SpisovyZnak extends TreeModel
 
         $data['stav'] = 1;
         $data['date_created'] = new DateTime();
-        $data['user_created'] = Environment::getUser()->getIdentity()->id;
+        $data['user_created'] = (int) Environment::getUser()->getIdentity()->id;
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
 
-        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
         if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = 3;
+        if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
+        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
 
+        if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
+        if ( !empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
+        if ( !empty($data['stav']) ) $data['stav'] = (int) $data['stav'];
+        
         $spisznak_id = $this->vlozitH($data);
         return $spisznak_id;
     }
@@ -76,11 +81,20 @@ class SpisovyZnak extends TreeModel
     public function upravit($data, $spisznak_id) {
 
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
 
-        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
         if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = 3;
+        if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
+        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+        if ( !isset($data['parent_id_old']) ) $data['parent_id_old'] = null;
+        if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = null;
 
+        if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
+        if ( !empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
+        if ( !empty($data['stav']) ) $data['stav'] = (int) $data['stav'];
+        
+        //Debug::dump($data); exit;
+        
         $ret = $this->upravitH($data, $spisznak_id);
 
         return $ret;

@@ -180,16 +180,21 @@ class Admin_SpisznakPresenter extends BasePresenter
         $spisznak_id = $data['id'];
         unset($data['id']);
 
-
         $SpisovyZnak = new SpisovyZnak();
 
         try {
-            $SpisovyZnak->upravit($data, $spisznak_id);
-            $this->flashMessage('Spisový znak  "'. $data['nazev'] .'"  byl upraven.');
-            $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
+            $res = $SpisovyZnak->upravit($data, $spisznak_id);
+            if ( is_object($res) ) {
+                $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
+                $this->flashMessage($res->getMessage(),'warning');
+                $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
+            } else {
+                $this->flashMessage('Spisový znak  "'. $data['nazev'] .'"  byl upraven.');
+                $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
+            }            
         } catch (DibiException $e) {
             $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-            Debug::dump($e);
+            //Debug::dump($e);
         }
 
     }
@@ -248,8 +253,14 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         try {
             $spisznak_id = $SpisovyZnak->vytvorit($data);
-            $this->flashMessage('Spisový znak "'. $data['nazev'] .'"  byl vytvořen.');
-            $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
+            if ( is_object($spisznak_id) ) {
+                $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
+                $this->flashMessage($spisznak_id->getMessage(),'warning');
+                //$this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
+            } else {
+                $this->flashMessage('Spisový znak  "'. $data['nazev'] .'" byl vytvořen.');
+                $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
+            }              
         } catch (DibiException $e) {
             $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
             $this->flashMessage($e->getMessage(),'warning');
