@@ -94,7 +94,7 @@ abstract class BasePresenter extends Presenter
                 if ( empty($string) ) return "";
                 if ( $string == "0000-00-00 00:00:00" ) return "";
                 if ( is_numeric($string) ) {
-                    return date('j.n.Y G:i:s',$unixtime);
+                    return date('j.n.Y G:i:s',$string);
                 }
                 $datetime = new DateTime($string);
                 return $datetime->format('j.n.Y G:i:s');
