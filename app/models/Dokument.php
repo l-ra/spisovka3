@@ -1158,7 +1158,7 @@ class Dokument extends BaseModel
                 'epod' => array(
                     'from' => array($this->tb_epodatelna => 'epod'),
                     'on' => array('epod.dokument_id=dok.id'),
-                    'cols' => array('identifikator')
+                    'cols' => array('identifikator','email_signature'=>'epod_is_email','isds_signature'=>'epod_is_isds')
                 ),
                 'spisovy_znak' => array(
                     'from' => array($this->tb_spisovy_znak => 'spisznak'),

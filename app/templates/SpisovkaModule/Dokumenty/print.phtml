@@ -35,6 +35,12 @@
                 {else}
                 příchozí
                 {/if}
+                {if !empty($dok->epod_is_email)}
+                <br>přijato emailem
+                {elseif !empty($dok->epod_is_isds)}
+                <br>přijato ISDS
+                {/if}
+                
             </td>
             <td class="prijato" title="{$dok->datum_vzniku|edatetime}">
                 {$dok->datum_vzniku|edate}
