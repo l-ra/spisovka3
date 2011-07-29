@@ -148,7 +148,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik->setTable('zpusob_odeslani');
         $ciselnik->setParams($this->getParam());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:zpusobodeslani'));
-
+        $ciselnik->addParam('no_delete', 'fixed');
         $ciselnik->addColumn('id',
                     array(
                         'title' => 'ID',
@@ -173,6 +173,14 @@ class Admin_CiselnikyPresenter extends BasePresenter
                         'view' => true
                     )
                 );
+        $ciselnik->addColumn('fixed',
+                    array(
+                        'title' => 'Pevný záznam?',
+                        'link' => false,
+                        'form' => 'none',
+                        'view' => true,
+                    )
+                );        
         $ciselnik->addColumn('stav',
                     array(
                         'title' => 'Stav',
