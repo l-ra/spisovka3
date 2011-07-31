@@ -100,7 +100,7 @@
 
     <div id="dokument_blok_poznamka">
         <div class="h2">Obsah zprávy</div>
-        <pre>{!$Zprava->popis}</pre>
+        {!$Zprava->popis|html2br}
     </div>
 
     <div id="dokument_blok_prilohy">

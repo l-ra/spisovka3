@@ -92,7 +92,8 @@
             {/foreach}
             </div>
             <div id="debug_body_info">
-            {block debug}{/block}
+            {capture $html_out}{block debug}{/block}{/capture}
+            {$html_out}
             </div>
 
         </div>

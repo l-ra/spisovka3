@@ -67,6 +67,28 @@ abstract class BasePresenter extends Presenter
             }
         }
         $this->template->registerHelper('enl2br', 'enl2br');
+        // Helper escapovaný nl2br + html parser
+        if (!function_exists('html2br') ) {
+            function html2br($string) {
+
+                if ( strpos($string,"&lt;") !== false ) {
+                    $string = html_entity_decode($string);
+                }                
+                
+                $string = preg_replace('#<body.*?>#i', "", $string);
+                $string = preg_replace('#<\!doctype.*?>#i', "", $string);
+                $string = preg_replace('#</body.*?>#i', "", $string);
+                $string = preg_replace('#<html.*?>#i', "", $string);
+                $string = preg_replace('#<script.*?>.*?</script>#is', "[javascript blokováno!]", $string);
+                $string = preg_replace('#<head.*?>.*?</head>#is', "", $string);
+                $string = preg_replace('#<iframe.*?>#i', "[iframe blokováno!]", $string);
+                $string = preg_replace('#</iframe>#i', "", $string);
+                $string = preg_replace('#src=".*?"#i', "[externí zdroj blokováno!]", $string);
+                                
+                return nl2br($string);
+            }
+        }
+        $this->template->registerHelper('html2br', 'html2br');
         // Helper vlastni datovy format
         if (!function_exists('edate') ) {
             function edate($string,$format = null) {
