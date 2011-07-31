@@ -99,6 +99,11 @@ $(function() {
         return false;
     });
 
+    $("#spisplan-zmena").live("submit", function () {
+        alert("kuk");
+        spisplanZmenit($(this));
+        return false;
+    });
 
     // Dialog - Vyber spisu
     $('#dialog-zmocneni').click(function(event){
@@ -943,8 +948,33 @@ spisVytvorit = function (elm) {
     if (x) {
         x.onreadystatechange = function() {
             if (x.readyState == 4 && x.status == 200) {
-                text = '<div class="flash_message flash_info">Spis byl úspěšně vytvořen.</div>';
-                text = text + x.responseText;
+                //text = '<div class="flash_message flash_info">Spis byl úspěšně vytvořen.</div>';
+                text = x.responseText;
+                $('#dialog').html(text);
+            }
+        }
+
+        var formdata = $(elm).serialize();
+
+        x.open("POST", $(elm).attr('action'), true);
+        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        x.setRequestHeader("Content-length", formdata.length);
+        x.setRequestHeader("Connection", "close");
+        x.send(formdata);
+    }
+
+    return false;
+}
+
+spisplanZmenit = function (elm) {
+    
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                text = x.responseText;
                 $('#dialog').html(text);
             }
         }
@@ -999,7 +1029,11 @@ zobrazSestavu = function (elm) {
     if ( elm.d_do.value != '' )  {param = param + 'd_do=' + elm.d_do.value + '&'}
     if ( elm.rok.value != '' )   {param = param + 'rok=' + elm.rok.value}
 
-    window.location.href = elm.url.value + param;
+    //window.location.href = elm.url.value + param;
+    window.open(elm.url.value + param);
+    $('#dialog').dialog('close');
+    
+    
 
     return false;
 }

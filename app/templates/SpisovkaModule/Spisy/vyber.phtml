@@ -2,33 +2,56 @@
     {if isset($chyba)}
     <div class="flash_message flash_warning">Spis se nepodařilo připojit k dokumentu. Zkuste to znovu.</div>
     {/if}
-
+    
+    <div id="spis_novy_click" style="padding:5px;"><a href="javascript:void(0);" onclick="return novySpis();">Vytvořit nový spis</a></div>
+    <div id="spis_novy" class="dokument_blok2" style="display:none;">
     <h2>Vytvořit nový spis</h2>
     {control novyForm}
+    </div>
 
+    <div id="dokument_blok_volby">
+        {$spisplanForm->render('begin')}
+        {$spisplanForm['spisplan']->label} {$spisplanForm['spisplan']->control}
+        {$spisplanForm['go_spisplan']->control}
+        {$spisplanForm->render('end')}
+    </div>    
+    
     <h2>Seznam spisů</h2>
     
     {if count($seznam)>0}
     <table>
         {foreach $seznam as $spis}
-        <tr class="{$spis->class}" id="sitem{$spis->spis_id}">
+        <tr class="item{=str_replace("."," item",$spis->sekvence)}" id="sitem{$spis->id}">
             <td>
-                {!=str_repeat("&nbsp;", 5*$spis->uroven)}
+                {!=str_repeat("&nbsp;", 10*$spis->uroven)}
                 {if $spis->typ=='VS'}
-                <img src="{$baseUri}images/icons/folder_yellow.png" alt="Věcná skupina" title="Věcná skupna" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                <img src="{$baseUri}images/icons/folder_yellow.png" alt="Věcná skupina" title="Věcná skupina" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                &nbsp;&nbsp;
+                {$spis->nazev}
+                {elseif $spis->typ=='SP'}
+                <img src="{$baseUri}images/icons/folder_green.png" alt="Spisový plán" title="Spisový plán" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
                 {$spis->nazev}
                 {else}
                 <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 &nbsp;&nbsp;
                 <a href="{link :Spisovka:Spisy:vybrano, 'id'=>$spis->id, 'dok_id'=>$dokument_id  }" onclick="spisVybran(this); return false;">{$spis->nazev}</a>
-                {/if}
+                {/if}                
             </td>
         </tr>
         {/foreach}
-
     </table>
     {else}
     <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
     {/if}
+    <script type="text/javascript">
+    
+        function novySpis() 
+        {
+            $('#spis_novy').show();
+            $('#spis_novy_click').hide();
+            return false;
+        }
+
+    </script>
     {/snippet}

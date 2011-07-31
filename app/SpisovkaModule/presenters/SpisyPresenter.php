@@ -28,20 +28,67 @@ class Spisovka_SpisyPresenter extends BasePresenter
         parent::startup();
     }
 
-    public function renderVyber()
+    public function actionVyber()
     {
-
-        $this->template->dokument_id = $this->getParam('id',null);
+        $Spisy = new Spis();
+        $this->spis_plan = $Spisy->seznamSpisovychPlanu();
+        
+        $this->template->dokument_id = $this->getParam('id',$this->getParam('dokument_id',null));
         if ( empty($this->template->dokument_id) ) {
             if ( isset($_POST['dokument_id']) ) {
                 $this->template->dokument_id = $_POST['dokument_id'];
             }
         }
+    }
+    
+    
+    public function renderVyber()
+    {
 
         $Spisy = new Spis();
-        $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
-        $seznam = $Spisy->seznam($args);
-        $this->template->seznam = $seznam;
+        $session_spisplan = Environment::getSession('s3_spisplan');
+        $spis_id = $this->getParam('spisplan_id',null);
+
+        if ( !is_null($spis_id) ) {
+            // spis_id
+        } else if ( !empty($session_spisplan->spis_id) ) {
+            $spis_id = $session_spisplan->spis_id;
+        } else if ( count($this->spis_plan)>0 ) {
+            reset($this->spis_plan);
+            $spis_id = key($this->spis_plan);
+        } else {
+            $spis_id = null;
+        }        
+        
+        if ( !empty($spis_id) ) {
+
+            $this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
+
+            $args = null;
+            if ( !empty($hledat) ) {
+                $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+            }
+
+            /*$user_config = Environment::getVariable('user_config');
+            $vp = new VisualPaginator($this, 'vp');
+            $paginator = $vp->getPaginator();
+            $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;*/
+
+            $args = $Spisy->spisovka($args);
+            /*$result = $Spisy->seznam($args, 5, $spis_id);
+            $paginator->itemCount = count($result);
+            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $this->template->seznam = $seznam;*/
+
+            $result = $Spisy->seznam($args, 5, $spis_id);
+            $this->template->seznam = $result->fetchAll();
+
+            $session_spisplan->spis_id = $spis_id;
+        } else {
+            $this->template->seznam = null;
+        }
+
+        $this->template->spisplanForm = $this['spisplanForm'];        
 
     }
 
@@ -321,7 +368,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$spis->skartacni_znak)
-                ->controlPrototype->readonly = TRUE;
+                ->controlPrototype->disabled = TRUE;
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
                 ->setValue(@$spis->skartacni_lhuta)
                 ->controlPrototype->readonly = TRUE;
@@ -403,17 +450,34 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $Spisy = new Spis();
 
         $typ_spisu = Spis::typSpisu();
-        $spisy = $Spisy->seznam(null,1);
+        $stav_select = Spis::stav();
+        $spousteci = SpisovyZnak::spousteci_udalost(null,1);
+        $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
+        $session_spisplan = Environment::getSession('s3_spisplan');
+
+        $spisy = $Spisy->select(11, null, $session_spisplan->spis_id);
+
+        $SpisovyZnak = new SpisovyZnak();
+        $spisznak_seznam = $SpisovyZnak->select(2);
+        //$spisovy_znak_max = $Spisy->maxSpisovyZnak( $session_spisplan->spis_id );        
+        
         $form1 = new AppForm();
         $form1->getElementPrototype()->id('spis-vytvorit');
-        $form1->addHidden('dokument_id',$this->template->dokument_id);
+        $form1->addHidden('dokument_id')
+                ->setValue($this->template->dokument_id);
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
         $form1->addText('nazev', 'Spisová značka / název:', 50, 80)
                 ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
         $form1->addText('popis', 'Popis:', 50, 200);
-        $form1->addSelect('spis_parent_id', 'Připojit k:', $spisy);
-
+        $form1->addSelect('parent_id', 'Mateřská entita:', $spisy)
+                ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
+        $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
+                ->controlPrototype->onchange("vybratSpisovyZnak();");
+        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
+        $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
+        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
+        
         $form1->addSubmit('vytvorit', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
 
@@ -432,24 +496,34 @@ class Spisovka_SpisyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
+        //echo "<pre>"; print_r($data); echo "</pre>"; exit;
+        
         $Spisy = new Spis();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
-        $data['user_created'] = Environment::getUser()->getIdentity()->user_id;
 
+        $dokument_id = $data['dokument_id'];
+        $this->template->dokument_id = $dokument_id;
+        unset($data['dokument_id']);
+        
         try {
             $spis_id = $Spisy->vytvorit($data);
-            $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
-            unset($data['dokument_id']);
-            if (!$this->isAjax()) {
-                //$this->redirect('this');
+            if ( is_object($spis_id) ) {
+                echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
+                echo '<div class="flash_message flash_error">Error: '. $spis_id->getMessage() .'</div>';
+                //$this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','error');
+                //$this->flashMessage('Error: '. $spis_id->getMessage(),'error');
             } else {
-                $this->invalidateControl('dokspis');
+                echo '<div class="flash_message flash_info">Spis "'. $data['nazev'] .'"  byl vytvořen.</div>';                
+                //$this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
+                //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
+                if (!$this->isAjax()) {
+                    //$this->redirect('this');
+                } else {
+                    $this->invalidateControl('dokspis');
+                }                
             }
-            
-            //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
+            //$this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
+            echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
         }
     }
 
@@ -466,9 +540,25 @@ class Spisovka_SpisyPresenter extends BasePresenter
         //Debug::dump($session_spisplan->spis_id);
 
         $form = new AppForm();
-        $form->addSelect('spisplan', 'Zobrazit spisový plán:', $this->spis_plan)
-                ->setValue($session_spisplan->spis_id)
-                ->getControlPrototype()->onchange("return document.forms['frm-spisplanForm'].submit();");
+        
+        if ( $this->getAction() == "vyber" ) {
+            $form->getElementPrototype()->onsubmit('return spisplanZmenit(this);');
+        }
+        
+        if ( $this->getAction() == "vyber" ) {
+            
+            $form->addHidden('dokument_id')
+                    ->setValue(@$this->template->dokument_id);
+            
+            $form->addSelect('spisplan', 'Zobrazit spisový plán:', $this->spis_plan)
+                    ->setValue($session_spisplan->spis_id)
+                    ->getControlPrototype()->onchange("return spisplanZmenit(document.forms['frm-spisplanForm']);");
+        } else {
+            $form->addSelect('spisplan', 'Zobrazit spisový plán:', $this->spis_plan)
+                    ->setValue($session_spisplan->spis_id)
+                    ->getControlPrototype()->onchange("return document.forms['frm-spisplanForm'].submit();");
+        }
+        
         $form->addSubmit('go_spisplan', 'Zobrazit')
                  ->setRendered(TRUE)
                  ->onClick[] = array($this, 'spisplanClicked');
@@ -488,9 +578,14 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $session_spisplan = Environment::getSession('s3_spisplan');
         $session_spisplan->spis_id = $form_data['spisplan'];
 
-        //Debug::dump($form_data['spisplan']);
-        //Debug::dump($session_spisplan->spis_id);
-        $this->forward('default', array('id'=>$form_data['spisplan']) );
+        $action = $this->getAction();
+        if ( $action == "vyber" ) {
+            // is ajax
+            $this->forward('vyber', array('spisplan_id'=>$form_data['spisplan'],'id'=>$form_data['dokument_id'],'is_ajax'=>1) );
+        } else {
+            $this->forward('default', array('id'=>$form_data['spisplan']) );
+        }
+        
     }
 
 

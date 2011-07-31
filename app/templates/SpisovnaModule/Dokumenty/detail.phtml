@@ -120,7 +120,7 @@
         {if !empty($Dok->poznamka)}
         <dl class="detail_item">
             <dt>Poznámka:</dt>
-            <dd>{!$Dok->poznamka|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka|html2br}&nbsp;</dd>
         </dl>
         {/if}
         {if $Typ_evidence=='priorace'}

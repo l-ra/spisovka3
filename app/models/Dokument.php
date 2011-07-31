@@ -1345,7 +1345,7 @@ class Dokument extends BaseModel
             $dokument->spisovy_znak_skart_znak = $row->spisznak_skartacni_znak;
             $dokument->spisovy_znak_skart_lhuta = $row->spisznak_skartacni_lhuta;
             $dokument->spisovy_znak_udalost = $row->spisznak_spousteci_udalost_id;
-            $dokument->spisovy_znak_udalost_nazev = SpisovyZnak::spousteci_udalost($row->spisznak_spousteci_udalost_id);
+            $dokument->spisovy_znak_udalost_nazev = SpisovyZnak::spousteci_udalost($row->spisznak_spousteci_udalost_id,10);
             $dokument->spisovy_znak_udalost_stav = '';
             $dokument->spisovy_znak_udalost_dtext = '';            
             /*if ( !empty($dokument->spisovy_znak_id) && $detail == 1 ) {

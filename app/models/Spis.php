@@ -129,6 +129,9 @@ class Spis extends TreeModel
         if ( empty($data['spisovy_znak']) ) $data['spisovy_znak'] = '';
         if ( empty($data['datum_uzavreni']) ) $data['datum_uzavreni'] = null;
         if ( empty($data['datum_otevreni']) ) $data['datum_otevreni'] = null;
+        
+        if ( empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = 10;
+        if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
 
         /*$SpisParent = $this->getInfo($data['parent_id']);
         if ( $SpisParent ) {
@@ -180,6 +183,7 @@ class Spis extends TreeModel
         if ( !isset($data['parent_id_old']) ) $data['parent_id_old'] = null;
         if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = null;
 
+        if ( empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = 10;
         if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
         if ( empty($data['datum_otevreni']) ) $data['datum_otevreni'] = null;
         if ( empty($data['datum_uzavreni']) ) $data['datum_uzavreni'] = null;
