@@ -590,8 +590,29 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     /* Dokument predan */
                     $Workflow->priradit($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
                     $this->flashMessage('Dokument předán zaměstnanci nebo organizační jendotce.');
+                    
+                    if ( !empty($data['predano_user']) ) {
+                        $User = new UserModel();
+                        $user_info = $User->getIdentity($data['predano_user']);
+                        $predano = Osoba::displayName($user_info);
+                    } else if ( !empty($data['predano_org']) ) {
+                        $Org = new Orgjednotka();
+                        $orgjednotka = $Org->getInfo($data['predano_org']);
+                        $predano = @$orgjednotka->ciselna_rada ." - ". @$orgjednotka->plny_nazev;
+                    }
+                } else {
+                    $predano = Osoba::displayName(@Environment::getUser()->getIdentity()->identity);
                 }
-
+                
+                if ( !empty($zprava->email_signature) ) {
+                    $email_info = array(
+                        'jid' => $data['jid'],
+                        'nazev' => $zprava->predmet,
+                        'predano' => $predano
+                    );
+                    EmailAvizo::epodatelna_zaevidovana($zprava->odesilatel,$email_info);
+                }
+                
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             } else {
                 $this->flashMessage('Dokument se nepodařilo vytvořit.','warning');
@@ -677,8 +698,29 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     /* Dokument predan */
                     $Workflow->priradit($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
                     $this->flashMessage('Dokument předán zaměstnanci nebo organizační jendotce.');
+                    
+                    if ( !empty($data['predano_user']) ) {
+                        $User = new UserModel();
+                        $user_info = $User->getIdentity($data['predano_user']);
+                        $predano = Osoba::displayName($user_info);
+                    } else if ( !empty($data['predano_org']) ) {
+                        $Org = new Orgjednotka();
+                        $orgjednotka = $Org->getInfo($data['predano_org']);
+                        $predano = @$orgjednotka->ciselna_rada ." - ". @$orgjednotka->plny_nazev;
+                    }
+                } else {
+                    $predano = Osoba::displayName(@Environment::getUser()->getIdentity()->identity);
                 }
 
+                if ( !empty($zprava->email_signature) ) {
+                    $email_info = array(
+                        'jid' => $data['jid'],
+                        'nazev' => $zprava->predmet,
+                        'predano' => $predano
+                    );
+                    EmailAvizo::epodatelna_zaevidovana($zprava->odesilatel,$email_info);
+                }
+                
                 return $data_after['jid'];
 
             } else {

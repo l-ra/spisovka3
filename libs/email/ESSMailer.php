@@ -97,7 +97,7 @@ class ESSMailer extends Object implements IMailer
             $part_header = explode("\n",$mess_part[0]);
             $headers = array();
             foreach ($part_header as $index => $row) {
-                $row_part = explode(":", $row);
+                $row_part = explode(":", $row, 2);
                 if(count($row_part)<1) {
                     $headers['Content-Type'] = $row;
                 } else {
@@ -126,7 +126,14 @@ class ESSMailer extends Object implements IMailer
 
 	Tools::tryError();
 
-        $tmp_mail  = "To: ". $mail->getEncodedHeader('To') . Mail::EOL;
+        $is_test = $this->is_test();
+        
+        if ( is_string($is_test) ) {
+            $tmp_mail  = "To: ". $is_test . Mail::EOL;
+            $tmp_mail .= "X-Swift-To: ". $mail->getEncodedHeader('To') . Mail::EOL;
+        } else {
+            $tmp_mail  = "To: ". $mail->getEncodedHeader('To') . Mail::EOL;
+        }
         $tmp_mail .= "Subject: ". $mail->getEncodedHeader('Subject') . Mail::EOL;
         $tmp_mail .= $header;
         $tmp_mail .= $linux ? "\n" : Mail::EOL ;
@@ -134,7 +141,7 @@ class ESSMailer extends Object implements IMailer
 
         //$tmp_mail .= $mail_source;
 
-        file_put_contents(CLIENT_DIR .'/temp/tmp_email.eml', $tmp_mail);
+        @file_put_contents(CLIENT_DIR .'/temp/tmp_email.eml', $tmp_mail);
 
         /*echo "<pre>";
         echo CLIENT_DIR .'/temp/tmp_email.eml';
@@ -142,21 +149,60 @@ class ESSMailer extends Object implements IMailer
         echo $tmp_mail;
         exit;*/
 
-        //$res = 1;
-	$res = mail(
+        
+        if ( is_string($is_test) ) {
+            // test - odesila se na danou adresu
+            $res = mail(
+		$is_test,
+		$mail->getEncodedHeader('Subject'),
+		$linux ? str_replace(Mail::EOL, "\n", $mess) : $mess,
+		$linux ? str_replace(Mail::EOL, "\n", $header) : $header
+            );              
+        } else if ( $is_test === -1 ) {
+            // test - neodesila se
+            $res = 1;
+            if (!file_exists(CLIENT_DIR .'/temp/test_emails') ) {
+                $oldumask = umask(0);
+                mkdir(CLIENT_DIR .'/temp/test_emails', 0777);
+                umask($oldumask);
+            }
+            @file_put_contents(CLIENT_DIR .'/temp/test_emails/'. date('Y-m-d-H-i-s') .'-'. $mail->getEncodedHeader('To') .'.eml', $tmp_mail);
+        } else {
+            // normalni
+            $res = mail(
 		$mail->getEncodedHeader('To'),
 		$mail->getEncodedHeader('Subject'),
 		$linux ? str_replace(Mail::EOL, "\n", $mess) : $mess,
 		$linux ? str_replace(Mail::EOL, "\n", $header) : $header
-	);
+            );            
+        }
 
 	if (Tools::catchError($msg)) {
             throw new InvalidStateException($msg);
         } elseif (!$res) {
-            throw new InvalidStateException('Email se nepodarilo odeslat.');
+            throw new InvalidStateException('Email se nepodařilo odeslat.');
 	}
         
         return true;
     }
 
+    /**
+     * Detekce zpusobu odeslani (normal/test_send/test_nosend)
+     * 
+     * 0  - normalni odeslani
+     * string(adresa) - testovaci odeslani na danou adresu
+     * -1 - odeslani do souboru - zadne odeslani emailu
+     * 
+     * @return int 
+     */
+    protected function is_test()
+    {
+        
+        $typ = 0;
+        //$typ = -1;
+        //$typ = "tomvan@email.cz";
+        
+        return $typ;
+    }
+    
 }

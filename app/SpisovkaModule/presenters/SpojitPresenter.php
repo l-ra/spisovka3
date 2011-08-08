@@ -36,6 +36,12 @@ class Spisovka_SpojitPresenter extends BasePresenter
         $seznam = $Dokument->seznam($args);
 
         if ( count($seznam)>0 ) {
+            
+            if ( count($seznam) > 200 ) {
+                echo "prilis_mnoho";
+                $this->terminate();
+            }
+            
             $tmp = array();
             foreach ( $seznam as $dokument_id ) {
 
