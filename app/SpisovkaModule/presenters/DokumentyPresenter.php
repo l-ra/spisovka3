@@ -2514,19 +2514,19 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
             $select = array(
                 'Vlastní' => array(
-                    'moje'=>'Dokumenty na mé jméno nebo přidělené na organizační jednotku',
-                    'predane'=>'Dokumenty, které mi byly předány',
-                    'pracoval'=>'Dokumenty, na kterých jsem kdy pracoval',
-                    'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
-                    'moje_vyrizuje'=>'Dokumenty, které vyřizuji',
-                    'moje_vyrizene'=>'Dokumenty, které jsem vyřídil',
+                    'moje'=>'Přidělené',
+                    'predane'=>'K převzetí',
+                    'moje_nove'=>'Nové / nepředané',
+                    'moje_vyrizuje'=>'K vyřízení',
+                    'moje_vyrizene'=>'Vyřízené',
+                    'pracoval'=>'Na kterých jsem kdy pracoval',
                 ),
                 'Společné' => array(
-                    'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
-                    'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
-                    'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízené',
-                    'vse'=>'Všechny dokumenty přidělené na organizační jednotku',
-                    'org'=>'Všechny dokumenty přidělené na organizační jednotku včetně všech podřízených uzlů',
+                    'vsichni_nove'=>'Všechny nepředané',
+                    'vsichni_vyrizuji'=>'Všechny k vyřízení',
+                    'vsichni_vyrizene'=>'Všechny vyřízené',
+                    'vse'=>'Všechny',
+                    'org'=>'Všechny včetně podřízených',
                 ),
                 
                 
@@ -2535,18 +2535,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
             $select = array(
                 'Vlastní' => array(
-                    'moje'=>'Dokumenty na mé jméno',
-                    'predane'=>'Dokumenty, které mi byly předány',
-                    'pracoval'=>'Dokumenty, na kterých jsem kdy pracoval',
-                    'moje_nove'=>'Vlastní dokumenty, které jsem ještě nepředal',
-                    'moje_vyrizuje'=>'Dokumenty, které vyřizuji',
-                    'moje_vyrizene'=>'Dokumenty, které jsem vyřídil',
+                    'moje'=>'Přidělené',
+                    'predane'=>'K převzetí',
+                    'moje_nove'=>'Nové / nepředané',
+                    'moje_vyrizuje'=>'K vyřízení',
+                    'moje_vyrizene'=>'Vyřízené',
+                    'pracoval'=>'na kterých jsem kdy pracoval',
                 ),
                 'Společné' => array(
                     /*'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
                     'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
                     'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízené',*/
-                    'vse'=>'Zobrazit všechny dokumenty'
+                    'vse'=>'Všechny'
                 )
             );
         }
