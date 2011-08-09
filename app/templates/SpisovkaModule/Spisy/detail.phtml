@@ -90,10 +90,15 @@
         <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit</a>
     </div>
         {/if}
-
+        
     <div class="detail_blok">
         <div class="detail_hlavicka">Seznam dokumentů</div>
     </div>
+        
+    <div class="dokument_blok2">
+        <a href="{link :Spisovka:Dokumenty:novy, 'spis_id'=>$Spis->id}">Nový dokument</a>
+    </div>         
+        
     <div id="dokumenty">
     {if count($seznam)>0}
     <table>

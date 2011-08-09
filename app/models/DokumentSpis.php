@@ -52,6 +52,7 @@ class DokumentSpis extends BaseModel
 
             foreach ($result as $joinDok) {
                 $dok = $Dokument->getInfo($joinDok->dokument_id, null, $dataplus);
+                if ( empty($dok->stav_dokumentu) ) continue;
                 $dok->poradi = empty($joinDok->poradi)?1:$joinDok->poradi;
                 $dok->stav_zarazeni = $joinDok->stav;
                 $dokumenty[ $joinDok->poradi ] = $dok;

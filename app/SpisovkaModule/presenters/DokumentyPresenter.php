@@ -134,6 +134,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             foreach ($seznam as $index => $row) {
                 $dok = $Dokument->getInfo($row->id,null, $dataplus);
+                if ( empty($dok->stav_dokumentu) ) continue;
                 $seznam[$index] = $dok;
             }
         } 
@@ -826,11 +827,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->Typ_evidence = $this->typ_evidence;
 
         $cisty = $this->getParam('cisty',0);
-
+        $spis_id = $this->getParam('spis_id',null);
+        $rozdelany_dokument = null;
+        
         if ( $cisty == 1 ) {
             $Dokumenty->odstranit_rozepsane();
             $this->redirect(':Spisovka:Dokumenty:novy');
             //$rozdelany_dokument = null;
+        } else if ( $spis_id )  {
+            $Dokumenty->odstranit_rozepsane();
         } else {
             $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
         }
@@ -882,7 +887,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             );
             $dokument = $Dokumenty->ulozit($pred_priprava);
 
-            $this->template->Spisy = null;
+            if ( $spis_id ) {
+                $DokumentSpis = new DokumentSpis();
+                $DokumentSpis->pripojit($dokument->id, $spis_id);
+                $spisy = $DokumentSpis->spisy($dokument->id);
+                $this->template->Spisy = $spisy;
+            } else {
+                $this->template->Spisy = null;
+            }
+            
+            
             $this->template->Subjekty = null;
             $this->template->Prilohy = null;
             $this->template->SouvisejiciDokumenty = null;

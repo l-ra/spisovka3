@@ -2,12 +2,6 @@
     {if isset($chyba)}
     <div class="flash_message flash_warning">Spis se nepodařilo připojit k dokumentu. Zkuste to znovu.</div>
     {/if}
-    
-    <div id="spis_novy_click" style="padding:5px;"><a href="javascript:void(0);" onclick="return novySpis();">Vytvořit nový spis</a></div>
-    <div id="spis_novy" class="dokument_blok2" style="display:none;">
-    <h2>Vytvořit nový spis</h2>
-    {control novyForm}
-    </div>
 
     <div id="dokument_blok_volby">
         {$spisplanForm->render('begin')}
@@ -16,7 +10,14 @@
         {$spisplanForm->render('end')}
     </div>    
     
+    <div id="spis_novy" class="dokument_blok2" style="display:none;">
+    <h2>Vytvořit nový spis</h2>
+    {control novyForm}
+    </div>    
+    
     <h2>Seznam spisů</h2>
+
+    <div id="spis_novy_click" class="dokument_blok2"><a href="javascript:void(0);" onclick="return novySpis();">Vytvořit nový spis</a></div>
     
     {if count($seznam)>0}
     <table>

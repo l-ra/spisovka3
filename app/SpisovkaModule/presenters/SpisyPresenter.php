@@ -250,6 +250,14 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $this->template->upravitForm = $this['upravitForm'];
     }
 
+    public function renderNovy()
+    {
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->seznam(null);
+        $this->template->SpisoveZnaky = $spisove_znaky;
+        $this->template->spisForm = $this['novyForm'];
+    }    
+    
     public function actionAkce($data)
     {
 
@@ -443,13 +451,12 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $this->redirect('this',array('id'=>$spis_id));
     }
 
-
     protected function createComponentNovyForm()
     {
 
         $Spisy = new Spis();
 
-        $typ_spisu = Spis::typSpisu();
+        //$typ_spisu = Spis::typSpisu();
         $stav_select = Spis::stav();
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
@@ -460,26 +467,34 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->select(2);
-        //$spisovy_znak_max = $Spisy->maxSpisovyZnak( $session_spisplan->spis_id );        
-        
+        //$spisovy_znak_max = $Spisy->maxSpisovyZnak( $session_spisplan->spis_id );
+
         $form1 = new AppForm();
-        $form1->getElementPrototype()->id('spis-vytvorit');
-        $form1->addHidden('dokument_id')
-                ->setValue($this->template->dokument_id);
-        $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
+        $form1->addHidden('typ')
+                ->setValue('S');
         $form1->addText('nazev', 'Spisová značka / název:', 50, 80)
                 ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
         $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('parent_id', 'Mateřská entita:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
+
+        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
+        //        ->setValue($spisovy_znak_max)
+        //        ->getControlPrototype()->onblur("return kontrolaSpisovyZnak('novy');");
         $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
                 ->controlPrototype->onchange("vybratSpisovyZnak();");
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
-        
+        $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10)
+                ->setValue( date('d.m.Y') );
+        $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10);
+
         $form1->addSubmit('vytvorit', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
+        $form1->addSubmit('storno', 'Zrušit')
+                 ->setValidationScope(FALSE)
+                 ->onClick[] = array($this, 'stornoClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
 
@@ -500,30 +515,41 @@ class Spisovka_SpisyPresenter extends BasePresenter
         
         $Spisy = new Spis();
 
-        $dokument_id = $data['dokument_id'];
+        $dokument_id = @$data['dokument_id'];
         $this->template->dokument_id = $dokument_id;
         unset($data['dokument_id']);
         
         try {
             $spis_id = $Spisy->vytvorit($data);
             if ( is_object($spis_id) ) {
-                echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
-                echo '<div class="flash_message flash_error">Error: '. $spis_id->getMessage() .'</div>';
-                //$this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','error');
-                //$this->flashMessage('Error: '. $spis_id->getMessage(),'error');
+                if ( $dokument_id ) {
+                    echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
+                    echo '<div class="flash_message flash_error">Error: '. $spis_id->getMessage() .'</div>';
+                } else {
+                    $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','error');
+                    $this->flashMessage('Error: '. $spis_id->getMessage(),'error');
+                }
             } else {
-                echo '<div class="flash_message flash_info">Spis "'. $data['nazev'] .'"  byl vytvořen.</div>';                
-                //$this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
-                //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
+                if ( $dokument_id ) {
+                    echo '<div class="flash_message flash_info">Spis "'. $data['nazev'] .'"  byl vytvořen.</div>';                
+                } else {
+                    $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
+                }
                 if (!$this->isAjax()) {
+                    $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
                     //$this->redirect('this');
                 } else {
                     $this->invalidateControl('dokspis');
                 }                
             }
         } catch (DibiException $e) {
-            //$this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
-            echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
+            if ( $dokument_id ) {
+                echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
+            } else {
+                $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
+            }
+            
+            
         }
     }
 
