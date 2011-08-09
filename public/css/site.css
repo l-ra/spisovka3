@@ -399,6 +399,21 @@ label.required {
 }
 
 
+.dokument_blok3 {
+    position: relative;
+    border: 1px #e0e0e0 solid;
+    padding: 5px; margin-bottom: 10px;
+    background: #8FBAD9 url() repeat-x;
+}
+
+.dokument_blok3 .h2 {
+    margin: 0px; padding: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-bottom: 1px #03406A solid;
+}
+
+
 #dokument_blok_hlavni {
     position: relative;
     border: 1px #e0e0e0 solid;

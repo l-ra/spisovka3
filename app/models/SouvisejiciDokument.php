@@ -34,8 +34,8 @@ class SouvisejiciDokument extends BaseModel
         $this->odebrat($odebrat);
 
         $row = array();
-        $row['dokument_id'] = $dokument_id;
-        $row['spojit_s_id'] = $spojit_s;
+        $row['dokument_id'] = (int) $dokument_id;
+        $row['spojit_s_id'] = (int) $spojit_s;
         $row['type'] = 1;
         $row['date_added'] = new DateTime();
         $row['user_id'] = Environment::getUser()->getIdentity()->id;

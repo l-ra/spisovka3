@@ -1198,6 +1198,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
 
+            $this->template->DruhZasilky = DruhZasilky::get(null,1);
+            
 
             $this->invalidateControl('dokspis');
         } else {
@@ -1742,6 +1744,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
             $sznacka = implode(", ",$sznacka_A);
         }
+        $this->template->SpisovaZnacka = $sznacka;
 
         // odesilatele
         $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
@@ -1765,6 +1768,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $odesilatele[$key] = Osoba::displayName($user_info->identity, 'jmeno') ." <". $user_info->identity->email ."> [zaměstnanec]";
         }
 
+        $this->template->odesilatele = $odesilatele;
+        
         $form = new AppForm();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
@@ -1860,6 +1865,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     //Debug::dump($adresat);
 
                     $datum_odeslani = new DateTime();
+                    $epodatelna_id = null;
+                    $zprava_odes = '';                    
+                    $cena = null;
+                    $hmotnost = null;
+                    $druh_zasilky = null;
+                    $cislo_faxu = '';
+                    $stav = 0;
 
                     if ( $metoda_odeslani == 0 ) {
                         // neodesilat - nebudeme delat nic
@@ -1869,14 +1881,30 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         // emailem
                         //echo "  => emailem";
                         if ( !empty($adresat->email) ) {
+                            
+                            $data = array(
+                                'email_from' => $post_data['email_from'][$subjekt_id],
+                                'email_predmet' => $post_data['email_predmet'][$subjekt_id],
+                                'email_text' => $post_data['email_text'][$subjekt_id],
+                            );
+                            
                             if ( $zprava = $this->odeslatEmailem($adresat, $data, $prilohy) ) {
                                 $Log = new LogModel();
                                 $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
                                 $this->flashMessage('Zpráva na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" byla úspěšně odeslána.');
+                                $stav = 2;
                             } else {
                                 $this->flashMessage('Zprávu na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" se nepodařilo odeslat!','warning');
+                                $stav = 0;
                                 continue;
                             }
+                            
+                            if ( isset($zprava['epodatelna_id']) ) {
+                                $epodatelna_id = $zprava['epodatelna_id'];
+                            }
+                            if ( isset($zprava['zprava']) ) {
+                                $zprava_odes = $zprava['zprava'];
+                            }                            
                         } else {
                             $this->flashMessage('Subjekt "'. Subjekt::displayName($adresat,'email') .'" nemá emailovou adresu. Zprávu tomuto adresátovi nelze poslat přes email!','warning');
                             continue;
@@ -1885,28 +1913,86 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         // isds
                         //echo "  => isds";
                         if ( !empty($adresat->id_isds) ) {
+                            
+                            $data = array(
+                                'isds_cjednaci_odes' => $post_data['email_from'][$subjekt_id],
+                                'isds_spis_odes' => $post_data['email_from'][$subjekt_id],
+                                'isds_cjednaci_adres' => $post_data['email_from'][$subjekt_id],
+                                'isds_spis_adres' => $post_data['email_from'][$subjekt_id],
+                                'isds_dvr' => isset($post_data['email_from'][$subjekt_id])?true:false,
+                                'isds_fikce' => isset($post_data['email_from'][$subjekt_id])?true:false,
+                            );
+                            
                             if ( $zprava = $this->odeslatISDS($adresat, $data, $prilohy) ) {
                                 $Log = new LogModel();
                                 $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
                                 $this->flashMessage('Datová zpráva pro "'. Subjekt::displayName($adresat,'isds') .'" byla úspěšně odeslána do systému ISDS.');
+                                $stav = 2;
                             } else {
                                 $this->flashMessage('Datoovu zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo odeslat do systému ISDS!','warning');
+                                $stav = 0;
                                 continue;
                             }
+                            
+                            if ( isset($zprava['epodatelna_id']) ) {
+                                $epodatelna_id = $zprava['epodatelna_id'];
+                            }
+                            if ( isset($zprava['zprava']) ) {
+                                $zprava_odes = $zprava['zprava'];
+                            }                            
+                            
                         } else {
                             $this->flashMessage('Subjekt "'. Subjekt::displayName($adresat,'jmeno') .'" nemá ID datové schránky. Zprávu tomuto adresátovi nelze poslat přes datovou schránku!','warning');
                             continue;
                         }
 
+                    } else if ( $metoda_odeslani == 3 ) {
+                        // postou
+                        if ( isset($post_data['datum_odeslani_postou'][$subjekt_id]) ) {
+                            $datum_odeslani = new DateTime( $post_data['datum_odeslani_postou'][$subjekt_id] );
+                        }
+                        
+                        $druh_zasilky_form = $post_data['druh_zasilky'][$subjekt_id];
+                        if ( count($druh_zasilky_form)>0 ) {
+                            $druh_zasilky_a = array();
+                            foreach( $druh_zasilky_form as $druh_id=>$druh_status ) {
+                                $druh_zasilky_a[] = $druh_id;
+                            }
+                            $druh_zasilky = serialize($druh_zasilky_a);
+                        }
+                        
+                        $cena = floatval($post_data['cena_zasilky'][$subjekt_id]);
+                        $hmotnost = floatval($post_data['hmotnost_zasilky'][$subjekt_id]);
+                        $stav = 1;
+                        
+                        $this->flashMessage('Dokument odeslán poštou na adresu "'. Subjekt::displayName($adresat) .'".');
+                        
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán poštou na adresu "'. Subjekt::displayName($adresat) .'".');
+                        
+                    } else if ( $metoda_odeslani == 4 ) {
+                        // faxem
+                        if ( isset($post_data['datum_odeslani_faxu'][$subjekt_id]) ) {
+                            $datum_odeslani = new DateTime( $post_data['datum_odeslani_faxu'][$subjekt_id] );
+                        }
+                        
+                        $cislo_faxu = $post_data['cislo_faxu'][$subjekt_id];
+                        $zprava_odes = $post_data['zprava_faxu'][$subjekt_id];
+                        $stav = 1;
+                        
+                        $this->flashMessage('Dokument odeslán faxem na číslo "'. $cislo_faxu .'".');
+                        
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán faxem na číslo "'. $cislo_faxu .'".');
+                        
                     } else {
-                        // jinak - externe (posta, fax, osobne, ...)
+                        // jinak - externe (osobne, ...)
                         //echo "  => jinak";
 
                         if ( isset($post_data['datum_odeslani'][$subjekt_id]) ) {
                             $datum_odeslani = new DateTime( $post_data['datum_odeslani'][$subjekt_id] );
                         }
 
-                        $Log = new LogModel();
                         switch ($metoda_odeslani) {
                             case 1:
                                 $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
@@ -1931,14 +2017,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                     }
 
-                    $epodatelna_id = null;
-                    if ( isset($zprava['epodatelna_id']) ) {
-                        $epodatelna_id = $zprava['epodatelna_id'];
-                    }
-                    $zprava_odes = '';
-                    if ( isset($zprava['zprava']) ) {
-                        $zprava_odes = $zprava['zprava'];
-                    }
 
                     // Zaznam do DB (dokument_odeslani)
                     $DokumentOdeslani = new DokumentOdeslani();
@@ -1948,7 +2026,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         'zpusob_odeslani_id' => (int) $metoda_odeslani,
                         'epodatelna_id' => $epodatelna_id,
                         'datum_odeslani' => $datum_odeslani,
-                        'zprava' => $zprava_odes
+                        'zprava' => $zprava_odes,
+                        'druh_zasilky' => $druh_zasilky,
+                        'cena' => $cena,
+                        'hmotnost' => $hmotnost,
+                        'cislo_faxu' => $cislo_faxu,
+                        'stav' => $stav
                     );
                     $DokumentOdeslani->ulozit($row);
                     

@@ -773,11 +773,16 @@
             {elseif $odes->zpusob_odeslani_id == 3}
                 {=Subjekt::displayName($odes,'plna_adresa')}
                 <br />
-                <span style="font-weight:normal;">odesláno poštou</span>
+                <span style="font-weight:normal;">
+                    odesláno poštou
+                    {if !empty($odes->druh_zasilky)}<br />druh zásilky: {!=DruhZasilky::vypis($odes->druh_zasilky)}{/if}
+                    {if !empty($odes->cena)}<br />cena: {$odes->cena} Kč{/if}
+                    {if !empty($odes->hmotnost)}<br />hmotnost: {$odes->hmotnost}{/if}
+                </span>
             {elseif $odes->zpusob_odeslani_id == 4}
                 {=Subjekt::displayName($odes,'telefon')}
                 <br />
-                <span style="font-weight:normal;">odesláno faxem</span>
+                <span style="font-weight:normal;">odesláno faxem na číslo {$odes->cislo_faxu}</span>
             {elseif $odes->zpusob_odeslani_id == 5}
                 {=Subjekt::displayName($odes,'jmeno')}
                 <br />

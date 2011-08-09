@@ -10,7 +10,7 @@ class DokumentOdeslani extends BaseModel
         $sql = array(
             'distinct'=>null,
             'from' => array($this->name => 'ds'),
-            'cols' => array('dokument_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava'),
+            'cols' => array('dokument_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava','cena','hmotnost','cislo_faxu','stav','druh_zasilky'),
             'leftJoin' => array(
                 'subjekt' => array(
                     'from' => array($this->tb_subjekt => 's'),
@@ -38,6 +38,7 @@ class DokumentOdeslani extends BaseModel
         if ( count($result)>0 ) {
             foreach ($result as $subjekt_index => $subjekt) {
                 $subjekty[ $subjekt->dokument_id ][ $subjekt_index ] = $subjekt;
+                $subjekty[ $subjekt->dokument_id ][ $subjekt_index ]->druh_zasilky = unserialize($subjekty[ $subjekt->dokument_id ][ $subjekt_index ]->druh_zasilky);
             }
 
             if ( !is_array($dokument_id) ) {

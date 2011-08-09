@@ -264,6 +264,8 @@ $(function() {
         $('input[name^=spis_vyber]').attr('checked',false);
         $('input[name^=zapujcka_vyber]').attr('checked',false);
     });
+    
+    
 
 });
 
@@ -798,6 +800,33 @@ odebratSubjekt = function(elm, dok_id){
     return false;
 }
 
+vyber_odes_form = function ( elm, subjekt_id ) {
+    
+    var volba = elm.options[elm.selectedIndex].value;
+    
+    odes_form_reset(subjekt_id);
+    
+    $('#odes_'+subjekt_id+'_'+volba).show();
+    
+    
+    return false;
+    
+}
+
+odes_form_reset = function ( subjekt_id ) {
+    
+    if ( typeof subjekt_id != "undefined" ) {
+        $('#odes_'+subjekt_id+'_1').hide();
+        $('#odes_'+subjekt_id+'_2').hide();
+        $('#odes_'+subjekt_id+'_3').hide();
+        $('#odes_'+subjekt_id+'_4').hide();
+    } else {
+        $('.odes_form').hide();
+    }
+    
+    
+}
+
 hledejDokument = function (input, typ) {
 	
     // nacteme hodnotu
@@ -839,6 +868,8 @@ hledejDokumentAjax = function (vyraz, typ) {
                 
                 if ( seznam_json == '' ) {
                     vysledek.innerHTML = '<div class="prazdno">Nebyly nalezeny žádné dokumenty odpovídající dané sekvenci.</div>';
+                } else if ( seznam_json == 'prilis_mnoho' ) {
+                    vysledek.innerHTML = '<div class="prazdno">Daná sekvence obsahuje příliš mnoho záznamů. Zkuste zvolit přesnější sekvenci.</div>';                    
                 } else {
                     var seznam = eval('(' + seznam_json + ')');
                     cache[vyraz] = seznam_json;
