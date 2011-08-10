@@ -76,6 +76,7 @@ class Osoba extends BaseModel
             $data['user_created'] = Environment::getUser()->getIdentity()->id;
             $data['date_modified'] = new DateTime();
             $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+            $data['stav'] = 0;
             $osoba_id = $this->insert($data);
 
         }
