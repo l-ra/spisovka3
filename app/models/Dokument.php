@@ -1164,7 +1164,17 @@ class Dokument extends BaseModel
                     'from' => array($this->tb_spisovy_znak => 'spisznak'),
                     'on' => array('spisznak.id=dok.spisovy_znak_id'),
                     'cols' => array('id'=>'spisznak_id','nazev'=>'spisznak_nazev','popis'=>'spisznak_popis','skartacni_znak'=>'spisznak_skartacni_znak','skartacni_lhuta'=>'spisznak_skartacni_lhuta','spousteci_udalost_id'=>'spisznak_spousteci_udalost_id')
-                ),                
+                ),
+                'zpusob_doruceni' => array(
+                    'from' => array($this->tb_zpusob_doruceni => 'zdoruceni'),
+                    'on' => array('zdoruceni.id=dok.zpusob_doruceni_id'),
+                    'cols' => array('nazev'=>'zpusob_doruceni')
+                ),  
+                'zpusob_vyrizeni' => array(
+                    'from' => array($this->tb_zpusob_vyrizeni => 'zvyrizeni'),
+                    'on' => array('zvyrizeni.id=dok.zpusob_vyrizeni_id'),
+                    'cols' => array('nazev'=>'zpusob_vyrizeni')
+                ),                    
                 
             ),
             'order_by' => array('dok.id'=>'DESC')
@@ -1382,12 +1392,12 @@ class Dokument extends BaseModel
             }*/
 
             //vyrizeni
-            if ( !empty($dokument->zpusob_vyrizeni_id) ) {
+            /*if ( !empty($dokument->zpusob_vyrizeni_id) ) {
                 $zpvyrizeni = Dokument::zpusobVyrizeni($dokument->zpusob_vyrizeni_id);
                 $dokument->zpusob_vyrizeni = $zpvyrizeni->nazev;
             } else {
                 $dokument->zpusob_vyrizeni = '';
-            }
+            }*/
 
             if ( !empty($dokument->identifikator) ) {
                 $Epodatelna = new Epodatelna();
@@ -1728,6 +1738,10 @@ class Dokument extends BaseModel
                 $DokumentPrilohy = new DokumentPrilohy();
                 $DokumentPrilohy->delete(array(array('dokument_id=%i',$dokument_id)));
 
+                $SouvisejiciDokument = new SouvisejiciDokument();
+                $SouvisejiciDokument->delete(array(array('dokument_id=%i',$dokument_id)));
+                
+                
                 $Workflow = new Workflow();
                 $Workflow->delete(array(array('dokument_id=%i',$dokument_id)));
 

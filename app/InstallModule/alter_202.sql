@@ -29,3 +29,8 @@ ADD `cena` FLOAT NULL AFTER `druh_zasilky` ,
 ADD `hmotnost` FLOAT NULL AFTER `cena` ,
 ADD `cislo_faxu` VARCHAR( 100 ) NULL AFTER `hmotnost` ,
 ADD `stav` TINYINT NOT NULL DEFAULT '1' AFTER `cislo_faxu`;
+
+ALTER TABLE `{tbls3}dokument` ADD `typ_prilohy` VARCHAR( 150 ) NULL DEFAULT '' AFTER `pocet_priloh`;
+ALTER TABLE `{tbls3}dokument` ADD `vyrizeni_typ_prilohy` VARCHAR( 150 ) NULL DEFAULT '' AFTER `vyrizeni_pocet_priloh`;
+ALTER TABLE `{tbls3}dokument_historie` ADD `typ_prilohy` VARCHAR( 150 ) NULL DEFAULT '' AFTER `pocet_priloh`;
+ALTER TABLE `{tbls3}dokument_historie` ADD `vyrizeni_typ_prilohy` VARCHAR( 150 ) NULL DEFAULT '' AFTER `vyrizeni_pocet_priloh`;

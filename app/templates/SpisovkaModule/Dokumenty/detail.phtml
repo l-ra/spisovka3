@@ -200,7 +200,11 @@
         </dl>
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
+            {if $isRozdelany}
             <dd>{$metadataForm['dokument_typ_id']->control}</dd>
+            {else}
+            <dd>{$Dok->typ_dokumentu->nazev}</dd>
+            {/if}
         </dl>
         {if empty($Dok->cislo_jednaci)}
         <dl class="detail_item">
@@ -248,13 +252,24 @@
             <dd>{$metadataForm['popis']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>{$metadataForm['datum_vzniku']->label}</dt>
+            <dt>Datum doručení/vzniku:</dt>
+            {if $isRozdelany}
             <dd>{$metadataForm['datum_vzniku']->control} {$metadataForm['datum_vzniku_cas']->control}</dd>
+            {else}
+            <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
+            {/if}
         </dl>
+        {if $isRozdelany}
         <dl class="detail_item">
             <dt>{$metadataForm['zpusob_doruceni_id']->label}</dt>
             <dd>{$metadataForm['zpusob_doruceni_id']->control}</dd>
         </dl> 
+        {elseif !empty($Dok->zpusob_doruceni)}
+        <dl class="detail_item">
+            <dt>Způsob doručení:</dt>
+            <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
+        </dl>        
+        {/if}        
         <dl class="detail_item">
             <dt>Číslo doporučeného dopisu:</dt>
             <dd>{$metadataForm['cislo_doporuceneho_dopisu']->control}</dd>
@@ -289,7 +304,10 @@
         {/if}
         <dl class="detail_item">
             <dt>Počet listů:</dt>
-            <dd>{$metadataForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$metadataForm['pocet_priloh']->control}</dd>
+            <dd>{$metadataForm['pocet_listu']->control}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$metadataForm['pocet_priloh']->control}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Typ přílohy: </span>{$metadataForm['typ_prilohy']->control}
+            </dd>
         </dl>
         <div>
             {$metadataForm['upravit']->control}
@@ -394,8 +412,8 @@
         </dl>
         {/if}
         <dl class="detail_item">
-            <dt>Počet listů / příloh:</dt>
-            <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num}</dd>
+            <dt>Počet listů / příloh / typ přílohy:</dt>
+            <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd>
         </dl>
         {if !empty($Dok->identifikator)}
         <dl class="detail_item">
@@ -469,7 +487,10 @@
         </dl>
         <dl class="detail_item">
             <dt>Počet listů:</dt>
-            <dd>{$vyrizovaniForm['vyrizeni_pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$vyrizovaniForm['vyrizeni_pocet_priloh']->control}</dd>
+            <dd>{$vyrizovaniForm['vyrizeni_pocet_listu']->control}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$vyrizovaniForm['vyrizeni_pocet_priloh']->control}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Typ přílohy: </span>{$vyrizovaniForm['vyrizeni_typ_prilohy']->control}
+            </dd>
         </dl>
         <dl class="detail_item">
             <dt>Uložení dokumentu:</dt>
@@ -517,8 +538,8 @@
         </dl>
         {/if}
         <dl class="detail_item">
-            <dt>Počet listů / příloh:</dt>
-            <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num}</dd>
+            <dt>Počet listů / příloh / typ příloh:</dt>
+            <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num} {if !empty($Dok->vyrizeni_typ_prilohy)}/ {$Dok->vyrizeni_typ_prilohy}{/if}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Uložení dokumentu:</dt>

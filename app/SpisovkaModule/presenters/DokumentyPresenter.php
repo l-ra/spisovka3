@@ -1239,10 +1239,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dokument_id = 0;
         }
 
-        if ( $this->getUser()->isInRole('podatelna') ) {
+        if ( Acl::isInRole('podatelna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,2);
+            $this->template->isPodatelna = true;
         } else {
             $typ_dokumentu = Dokument::typDokumentu(null,1);
+            $this->template->isPodatelna = false;
         }
 
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
@@ -1299,6 +1301,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$dok->pocet_listu);
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$dok->pocet_priloh);
+        $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
+                ->setValue(@$dok->typ_prilohy);        
 
 
         $form->addSubmit('novy', 'Vytvořit dokument')
@@ -1346,14 +1350,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $cjednaci = $CJ->nacti($data['odpoved'],0);
                 unset($data['odpoved']);
             } else {
-                $cjednaci = $CJ->generuj(1);
+                $cjednaci = $CJ->generuj(); // 1 - generuj, 0 - negeneruj
             }
 
             $data['jid'] = $cjednaci->app_id.'-ESS-'.$dokument_id;
-            $data['cislo_jednaci_id'] = (int) $cjednaci->id;
-            $data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
+            //$data['cislo_jednaci_id'] = (int) $cjednaci->id;
+            //$data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
             $data['podaci_denik'] = $cjednaci->podaci_denik;
-            $data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
+            //$data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
             $data['podaci_denik_rok'] = $cjednaci->rok;
 
             //Debug::dump($data); exit;
@@ -1441,11 +1445,19 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $Dok = @$this->template->Dok;
 
-        if ( $this->getUser()->isInRole('podatelna') ) {
+        if ( Acl::isInRole('podatelna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,2);
+            $this->template->isPodatelna = true;
         } else {
             $typ_dokumentu = Dokument::typDokumentu(null,1);
-        }
+            $this->template->isPodatelna = false;
+        }  
+        //if ( @$Dok->stav_dokumentu == 1 ) {
+            $this->template->isRozdelany = true;
+        //} else {
+        //    $this->template->isRozdelany = false;
+        //}
+        
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
 
         $form = new AppForm();
@@ -1456,32 +1468,37 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$Dok->popis);
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
-                ->setValue(@$Dok->dokument_typ_id);
-                //->controlPrototype->readonly = TRUE;
+        //if ( $this->template->isRozdelany ) {
+            $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
+                    ->setValue(@$Dok->dokument_typ_id);
+                    //->controlPrototype->readonly = TRUE;
+        //}
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$Dok->cislo_jednaci_odesilatele);
                 //->controlPrototype->readonly = TRUE;
 
-        $unixtime = strtotime(@$Dok->datum_vzniku);
-        if ( $unixtime == 0 ) {
-            $datum = date('d.m.Y');
-            $cas = date('H:i:s');
-        } else {
-            $datum = date('d.m.Y',$unixtime);
-            $cas = date('H:i:s',$unixtime);
-        }
+        //if ( $this->template->isRozdelany) {
+        
+            $unixtime = strtotime(@$Dok->datum_vzniku);
+            if ( $unixtime == 0 ) {
+                $datum = date('d.m.Y');
+                $cas = date('H:i:s');
+            } else {
+                $datum = date('d.m.Y',$unixtime);
+                $cas = date('H:i:s',$unixtime);
+            }
 
-        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10)
-                ->setValue($datum);
-        $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
-                ->setValue($cas);
+            $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10)
+                    ->setValue($datum);
+            $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
+                    ->setValue($cas);
 
-        $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:',$zpusob_doruceni)
-                ->setValue(@$dok->zpusob_doruceni_id);
+            $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:',$zpusob_doruceni)
+                    ->setValue(@$Dok->zpusob_doruceni_id);
+        //}
         
         $form->addText('cislo_doporuceneho_dopisu', 'Číslo jdoporučeného dopisu:', 50, 50)
-                ->setValue(@$dok->cislo_doporuceneho_dopisu);          
+                ->setValue(@$Dok->cislo_doporuceneho_dopisu);          
         
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
                 ->setValue(@$Dok->poznamka);
@@ -1490,7 +1507,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$Dok->pocet_listu);
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$Dok->pocet_priloh);
-
+        $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
+                ->setValue(@$Dok->typ_prilohy);  
+        
         $form->addSubmit('upravit', 'Uložit')
                  ->onClick[] = array($this, 'upravitMetadataClicked');
         $form->addSubmit('storno', 'Zrušit')
@@ -1517,7 +1536,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $dokument_id = $data['id'];
 
         // uprava casu
-        $data['datum_vzniku'] = $data['datum_vzniku'] ." ". $data['datum_vzniku_cas'];
+        if ( isset($data['datum_vzniku']) ) {
+            $data['datum_vzniku'] = $data['datum_vzniku'] ." ". $data['datum_vzniku_cas'];
+        }
         unset($data['datum_vzniku_cas']);
 
         //Debug::dump($data); exit;
@@ -1599,6 +1620,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$Dok->vyrizeni_pocet_listu);
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$Dok->vyrizeni_pocet_priloh);
+        $form->addText('vyrizeni_typ_prilohy', 'Typ přílohy:', 20, 50)
+                ->setValue(@$Dok->vyrizeni_typ_prilohy);          
 
 
 //                ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');

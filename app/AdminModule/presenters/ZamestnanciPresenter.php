@@ -280,6 +280,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $this->redirect(':Admin:Zamestnanci:detail',array('id'=>$osoba_id));
         } catch (DibiException $e) {
             $this->flashMessage('Zaměstnance "'. Osoba::displayName($data) .'" se nepodařilo vytvořit.','warning');
+            //$this->flashMessage('Chyba: '. $e->getMessage(),'warning');
         }
         
     }
