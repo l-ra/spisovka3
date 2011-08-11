@@ -34,3 +34,6 @@ ALTER TABLE `{tbls3}dokument` ADD `typ_prilohy` VARCHAR( 150 ) NULL DEFAULT '' A
 ALTER TABLE `{tbls3}dokument` ADD `vyrizeni_typ_prilohy` VARCHAR( 150 ) NULL DEFAULT '' AFTER `vyrizeni_pocet_priloh`;
 ALTER TABLE `{tbls3}dokument_historie` ADD `typ_prilohy` VARCHAR( 150 ) NULL DEFAULT '' AFTER `pocet_priloh`;
 ALTER TABLE `{tbls3}dokument_historie` ADD `vyrizeni_typ_prilohy` VARCHAR( 150 ) NULL DEFAULT '' AFTER `vyrizeni_pocet_priloh`;
+
+INSERT INTO `user_resource` (`id` ,`code` ,`note` ,`name` )
+VALUES (NULL , 'Spisovka_VypravnaPresenter', '', 'Výpravna');

@@ -45,6 +45,7 @@
         {access :Spisovka:Dokumenty:novy}<a href="{link :Spisovka:Dokumenty:novy}">Nový dokument</a>{/access}
         {access :Spisovka:Spisy:default}<a href="{link :Spisovka:Spisy:default}">Spisy</a>{/access}
         {access :Spisovka:Sestavy:default}<a href="{link :Spisovka:Sestavy:default}">Sestavy</a>{/access}
+        {access :Spisovka:Vypravna:default}<a href="{link :Spisovka:Vypravna:default}">K odeslání</a>{/access}
     </div>
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}

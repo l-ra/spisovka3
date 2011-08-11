@@ -50,29 +50,113 @@ class DokumentOdeslani extends BaseModel
             return null;
         }
 
-
-        /*if ( is_array($dokument_id) ) {
-            $res = $this->fetchAll(array('datum_odeslani'),
-                                   array( array('dokument_id IN (%in)',$dokument_id) ))
-                        ->fetchAssoc('id');
-        } else {
-            $res = $this->fetchAll(array('datum_odeslani'),
-                                   array( array('dokument_id=%i',$dokument_id) ))
-                        ->fetchAssoc('id');
-        }
-
-        if ( count($res)>0 ) {
-            $Subjekt = new Subjekt();
-            foreach ($res as &$row) {
-                $row->subjekt_info = $Subjekt->getInfo($row->subjekt_id);
-            }
-            return $res;
-        } else {
-            return null;
-        }*/
-
     }
 
+    public function get($id) {
+
+        $sql = array(
+            'distinct'=>false,
+            'from' => array($this->name => 'ds'),
+            'cols' => array('dokument_id','ds.id'=>'dokodes_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava','cena','hmotnost','cislo_faxu','stav','druh_zasilky'),
+            'leftJoin' => array(
+                'subjekt' => array(
+                    'from' => array($this->tb_subjekt => 's'),
+                    'on' => array('s.id=ds.subjekt_id'),
+                    'cols' => array('*')
+                 ),
+                'zpusob_odeslani' => array(
+                    'from' => array($this->tb_zpusob_odeslani => 'odes'),
+                    'on' => array('odes.id=ds.zpusob_odeslani_id'),
+                    'cols' => array('nazev'=>'zpusob_odeslani_nazev')
+                 ),
+                'dokument' => array(
+                    'from' => array($this->tb_dokument => 'dok'),
+                    'on' => array('dok.id=ds.dokument_id'),
+                    'cols' => array('nazev'=>'dok_nazev','jid'=>'dok_jid','cislo_jednaci'=>'dok_cislo_jednaci','poradi'=>'dok_poradi')
+                 ),                
+            ),
+            'order_by' => array('ds.datum_odeslani','s.nazev_subjektu','s.prijmeni','s.jmeno')
+        );
+
+
+        $sql['where'] = array( array('ds.id=%i',$id) );
+        
+        $result = $this->fetchAllComplet($sql)->fetch();
+        if ( $result ) {
+            $result->druh_zasilky = unserialize($result->druh_zasilky);
+            return $result;
+        } else {
+            return null;
+        }
+
+    }
+    
+    
+    public function kOdeslani($pouze_posta = null) {
+
+        $sql = array(
+            'distinct'=>true,
+            'from' => array($this->name => 'ds'),
+            'cols' => array('dokument_id','ds.id'=>'dokodes_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava','cena','hmotnost','cislo_faxu','stav','druh_zasilky'),
+            'leftJoin' => array(
+                'subjekt' => array(
+                    'from' => array($this->tb_subjekt => 's'),
+                    'on' => array('s.id=ds.subjekt_id'),
+                    'cols' => array('*')
+                 ),
+                'zpusob_odeslani' => array(
+                    'from' => array($this->tb_zpusob_odeslani => 'odes'),
+                    'on' => array('odes.id=ds.zpusob_odeslani_id'),
+                    'cols' => array('nazev'=>'zpusob_odeslani_nazev')
+                 ),
+                'dokument' => array(
+                    'from' => array($this->tb_dokument => 'dok'),
+                    'on' => array('dok.id=ds.dokument_id'),
+                    'cols' => array('nazev'=>'dok_nazev','jid'=>'dok_jid','cislo_jednaci'=>'dok_cislo_jednaci','poradi'=>'dok_poradi')
+                 ),                
+            ),
+            'order_by' => array('ds.datum_odeslani','s.nazev_subjektu','s.prijmeni','s.jmeno')
+        );
+
+
+        $sql['where'] = array( array('ds.stav=1') );
+        
+        if ( !is_null($pouze_posta) ) {
+            $sql['where'][] = array('ds.zpusob_odeslani_id=3');
+        }
+        
+        return $this->fetchAllComplet($sql);
+        
+        $dokumenty = array();
+        $result = $this->fetchAllComplet($sql)->fetchAll();
+        
+        
+        if ( count($result)>0 ) {
+            foreach ($result as $subjekt_index => $subjekt) {
+                $dokumenty[ $subjekt_index ] = $subjekt;
+                $dokumenty[ $subjekt_index ]->druh_zasilky = unserialize($dokumenty[ $subjekt_index ]->druh_zasilky);
+            }
+            return $dokumenty;
+        } else {
+            return null;
+        }
+
+    }
+    
+    public function odeslano( $id ) {
+
+        if ( empty($id) ) {
+            return null;
+        }
+
+        $row = array();
+        $row['stav'] = 2;
+        $row['datum_odeslani'] = new DateTime();
+
+        return $this->update($row, array( array('id=%i',$id) ));
+
+    }    
+    
     public function ulozit( $row ) {
 
         if ( !is_array($row) ) {

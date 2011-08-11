@@ -1,0 +1,269 @@
+@{block title}Dokument{/block}
+@{block debug}
+<?php echo "\n\nDokument: "; print_r($Dok); ?>
+@{/block}
+@{block content}
+
+    <div class="navigate">
+    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> -
+    <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id }">Seznam dokumentů</a> -
+    Odeslání dokumentu
+    </div>
+
+    <h2>Odeslat dokument</h2>
+
+    {$odeslatForm->render('begin')}
+
+    <div id="dokument_blok_subjekty">
+        <div class="h2">
+            Adresáti
+        </div>
+        <div id="dok-subjekty">
+        {if count($Dok->subjekty)>0}
+        <table class="seznam">
+            {foreach $Dok->subjekty as $subjekt}
+            <?php if ( $subjekt->rezim_subjektu == 'O' ) { continue; } ?>
+            <tr style="border-top: 2px solid;" class="dokument_blok2">
+            <td class="icon">
+                <img src="{$baseUri}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
+                <div class="info">
+                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
+                <br />
+                <span>
+                    {if $subjekt->rezim_subjektu == 'O'}
+                    odesílatel
+                    {elseif $subjekt->rezim_subjektu == 'A'}
+                    adresát
+                    {elseif $subjekt->rezim_subjektu == 'AO'}
+                    odesílatel i adresát
+                    {else}
+                    nespecifikováno
+                    {/if}
+                </span>
+                <br />
+                {=Subjekt::displayName($subjekt,'adresa')}
+                </div>
+                {if count($Dok->odeslani)>0}
+                    {foreach $Dok->odeslani as $dokodes}
+                        {if $dokodes->subjekt_id == $subjekt->id  }
+                <div class="vyber" style="color:#008800;">
+                    Tomuto adresátovi byl dokument již odeslán
+                </div>
+                        {?break}
+                        {/if}
+                    {/foreach}
+                {/if}
+            </td>
+            <td class="meta_plus">
+                &nbsp;
+                <div class="info">
+                <dl>
+                    <dt>email:</dt>
+                    <dd>{$subjekt->email}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>telefon:</dt>
+                    <dd>{$subjekt->telefon}&nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>isds:</dt>
+                    <dd>{$subjekt->id_isds}&nbsp;</dd>
+                </dl>
+
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="icon">&nbsp;</td>
+            <td colspan="2">
+                    Jak odeslat:
+                    <select name="subjekt[{$subjekt->id}]" onchange="return vyber_odes_form(this, {$subjekt->id});">
+                        <option value="0">neodesílat</option>
+                        <option value="1">odeslat emailem</option>
+                        <option value="2">odeslat datovou schránkou</option>
+                        <option value="3">odeslat poštou</option>
+                        <option value="4">odeslat faxem</option>
+                    </select>
+            </td>
+        </tr>
+        <tr id="odes_{$subjekt->id}_3" class="odes_form">
+            <td class="icon">&nbsp;</td>
+            <td colspan="2">
+                <dl>
+                    <dt>Datum odeslání:</dt>
+                    <dd><input type="text" class="datepicker" name="datum_odeslani_postou[{$subjekt->id}]" value="{=date('d.m.Y')}" /></dd>
+                </dl>                 
+                <dl>
+                    <dt>Druh zásilky:</dt>
+                    <dd>
+                    {foreach $DruhZasilky as $dz_index=>$dz_nazev}
+                    <input type="checkbox" name="druh_zasilky[{$subjekt->id}][{$dz_index}]" />&nbsp;{$dz_nazev}
+                    {/foreach}
+                    &nbsp;</dd>
+                </dl>
+                <dl>
+                    <dt>Cena Kč:</dt>
+                    <dd><input type="text" name="cena_zasilky[{$subjekt->id}]" size="10" /></dd>
+                </dl>                
+                <dl>
+                    <dt>Hmotnost:</dt>
+                    <dd><input type="text" name="hmotnost_zasilky[{$subjekt->id}]" size="10" /></dd>
+                </dl>                
+            </td>
+        </tr> 
+        <tr id="odes_{$subjekt->id}_4" class="odes_form">
+            <td class="icon">&nbsp;</td>
+            <td colspan="2">
+                <dl>
+                    <dt>Datum odeslání:</dt>
+                    <dd><input type="text" class="datepicker" name="datum_odeslani_faxu[{$subjekt->id}]" value="{=date('d.m.Y')}" /></dd>
+                </dl>                  
+                <dl>
+                    <dt>Číslo faxu:</dt>
+                    <dd><input type="text" name="cislo_faxu[{$subjekt->id}]" value="{$subjekt->telefon}" size="20" /></dd>
+                </dl>
+                <dl>
+                    <dt>Zpráva pro příjemce:</dt>
+                    <dd><textarea name="zprava_faxu[{$subjekt->id}]" rows="5" cols="80"></textarea></dd>
+                </dl>
+                
+            </td>
+        </tr>  
+        <tr id="odes_{$subjekt->id}_1" class="odes_form">
+            <td class="icon">&nbsp;</td>
+            <td colspan="2">
+                <dl class="detail_item">
+                    <dt>Odesílatel:</dt>
+                    <dd>
+                    {if count($odesilatele)}
+                    <select name="email_from[{$subjekt->id}]">
+                    {foreach $odesilatele as $o_index=>$o_email}
+                        <option value="{$o_index}">{$o_email}</option>
+                    {/foreach}
+                    </select>
+                    {else}
+                    <span style="color:red;">Nejsou k dispozici žádní odesilatele. Email nelze odeslat!</span>
+                    {/if}
+                    </dd>
+                </dl>
+                <dl class="detail_item">
+                    <dt>Předmět zprávy:</dt>
+                    <dd><input type="text" name="email_predmet[{$subjekt->id}]" value="{$Dok->nazev}" size="80" /></dd>
+                </dl>
+                <dl class="detail_item">
+                    <dt>Text zprávy:</dt>
+                    <dd><textarea name="email_text[{$subjekt->id}]" rows="10" cols="80"></textarea></dd>
+                </dl>
+            </td>
+        </tr>    
+        <tr id="odes_{$subjekt->id}_2" class="odes_form">
+            <td class="icon">&nbsp;</td>
+            <td colspan="2">
+                <dl class="detail_item">
+                    <dt>Předmět zprávy:</dt>
+                    <dd><input type="text" name="isds_predmet[{$subjekt->id}]" value="{$Dok->nazev}" size="80" /></dd>
+                </dl>
+                <dl class="detail_item">
+                    <dt>číslo jednací odesílatele:</dt>
+                    <dd><input type="text" name="isds_cjednaci_odes[{$subjekt->id}]" value="{$Dok->cislo_jednaci}" size="50" /></dd>
+                </dl>
+                <dl class="detail_item">
+                    <dt>Spisová značka odesílatele:</dt>
+                    <dd><input type="text" name="isds_spis_odes[{$subjekt->id}]" value="{$SpisovaZnacka}" size="50" /></dd>
+                </dl>
+                <dl class="detail_item">
+                    <dt>Číslo jednací adresáta:</dt>
+                    <dd><input type="text" name="isds_cjednaci_adres[{$subjekt->id}]" value="{$Dok->cislo_jednaci_odesilatele}" size="50" /></dd>
+                </dl>
+                <dl class="detail_item">
+                    <dt>Spisová značka adresáta:</dt>
+                    <dd><input type="text" name="isds_spis_adres[{$subjekt->id}]" value="" size="50" /></dd>
+                </dl>
+                <dl class="detail_item">
+                    <dt>Do vlastních rukou? :</dt>
+                    <dd><input type="checkbox" name="isds_dvr[{$subjekt->id}]" /></dd>
+                </dl>
+                <dl class="detail_item">
+                    <dt>Doručit fikcí? :</dt>
+                    <dd><input type="checkbox" checked="checked" name="isds_fikce[{$subjekt->id}]" /></dd>
+                </dl>
+            </td>
+        </tr>         
+        {/foreach}
+        </table>
+        {else}
+        <div class="prazdno">K tomuto dokumentu nejsou připojeni žádní adresáti.</div>
+        {/if}
+        </div>
+    </div>
+    
+    <div id="dokument_blok_prilohy">
+    <div class="h2">
+        Připojit přílohy k odeslání
+    </div>
+    <div id="dok-prilohy">
+    {accessview}
+    {if count($Dok->prilohy)>0}
+    <table class="seznam">
+        {foreach $Dok->prilohy as $file}
+        <tr>
+            <td class="icon">
+                <input type="checkbox" name="prilohy[{$file->id}]" />
+            </td>
+            <td class="icon">
+                <img src="{$baseUri}images/mimetypes/{$file->mime_type|webalize}.png" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
+            </td>
+            <td class="meta">
+                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->id, 'file'=>$file->id}">{$file->nazev}</a>
+                <div class="info">
+                {$file->real_name}
+                <br />
+                <span>{$file->typ_name}, {$file->size|bytes}, {$file->mime_type}</span>
+                </div>
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+            </td>
+            <td class="user">
+                nahráno {$file->date_created|edate}
+                <br />
+                {$file->user_name}
+            </td>
+        </tr>
+        {/foreach}
+    </table>
+        <dl class="detail_item">
+            <dt>Celková velikost příloh :</dt>
+            <dd>{$PrilohyCelkovaVelikost|bytes}&nbsp;</dd>
+            <dd>
+                {if $PrilohyCelkovaVelikost > 10485760 }
+                <span style="color: #ff0000;">Celková velikost příloh překročila povolený limit k odeslání 10MB. Odesílejte přílohy po kouscích.</span>
+                {elseif $PrilohyCelkovaVelikost > 2097152 }
+                <span style="color: #008888;">Celková velikost příloh překročila limit 2MB. Zprávu je možné odeslat. Pouze v případě odeslání přes email může dojít k limitu ze strany poštovního serveru. Zjistěte si, zda můžete takto velkou přílohu odeslat emailem.</span>
+                {/if}
+            </dd>
+        </dl>
+    {else}
+        <div class="prazdno">
+            K tomuto dokumentu nejsou připojené žádné přílohy.
+            <br />
+            Zprávu lze odeslat i bez příloh.
+        </div>
+    {/if}
+    {/accessview}
+    {noaccessview}
+        <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
+    {/noaccessview}
+    </div>
+    </div>
+
+    <div id="dokument_blok_akce">
+        {$odeslatForm['odeslat']->control}
+        &nbsp;&nbsp;
+        {$odeslatForm['storno']->control}
+    </div>
+    {$odeslatForm->render('end')}
+
+    <div id="dialog"></div>
+    <script type="text/javascript">odes_form_reset();</script>

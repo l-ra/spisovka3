@@ -1,0 +1,75 @@
+body {
+    background: #ffffff url() repeat-x;
+    margin: 0px;
+    padding: 0px;
+    text-align: left;
+    font-family: "Times New Roman", serif;
+    font-size: 9pt;
+}
+
+h1 {
+    text-align: center;
+    font-size: 11pt;
+    font-weight: normal;
+}
+
+img {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+div.placeno {
+    text-align: right;
+    padding: 2px 10px;
+}
+
+div.pod {
+    position: relative;
+}
+
+ol.poznamky {
+    margin-top: 20px;
+    color: #c0c0c0;
+}
+
+
+div.posta {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    text-align: left;
+    padding: 2px 10px;
+}
+
+div.razitko {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    text-align: right;
+    padding: 2px 50px 2px 10px;
+}
+
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    border: 3px solid;
+}
+
+td {
+    border: 1px solid;
+    padding: 5px;
+    height: 64px;
+}
+th {
+    border: 1px solid;
+    border-bottom: 3px solid;
+}
+
+.w1 { width: 47px; }
+.w2 { width: 187px; border-right: 3px solid; }
+.w3 { width: 200px; }
+.w4 { width: 79px; }
+.w5 { width: 76px; }
+.w6 { width: 113px; }

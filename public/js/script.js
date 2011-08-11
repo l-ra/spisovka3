@@ -827,6 +827,50 @@ odes_form_reset = function ( subjekt_id ) {
     
 }
 
+zobrazFax = function (elm) {
+    return dialog(elm,'Zobrazit zprávu faxu');
+}
+
+vypravnaDetail = function (elm) {
+    return dialog(elm,'Detail záznamu');
+}
+vypravnaSubmit = function () {
+
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                text = x.responseText;
+                
+                if ( text.indexOf('###provedeno###') != -1 ) {
+                    $('#dialog').dialog('close');
+                    alert('Záznam byl úspěšně upraven.');
+                } else {
+                    $('#dialog').html(text);
+                }
+            }
+        }
+
+        vypravna_form = document.getElementById('vypravna_form');
+        formdata = $(vypravna_form).serialize();
+
+        x.open("POST", vypravna_form.getAttribute('action'), true);
+        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        x.setRequestHeader("Content-length", formdata.length);
+        x.setRequestHeader("Connection", "close");
+        x.send(formdata);
+    }
+    
+    return false;
+}
+vypravnaZrusit = function () {
+    $('#dialog').dialog('close');
+    return false;
+}
+
+
 hledejDokument = function (input, typ) {
 	
     // nacteme hodnotu

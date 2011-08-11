@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <title>Podací arch</title>
+    <style type="text/css" media="screen, print">
+        <?php echo file_get_contents(APP_DIR .'/../public/css/podaci_arch.css'); ?>
+    </style>
+</head>
+<body>
+{for $p=1;$p<=$count_page;$p++}    
+<table>
+    <tr>
+        <td colspan="3">
+            <img src="{$baseUri}images/ceska_posta.png" width="41" height="28" />
+            <br />
+            Česká pošta, s.p., IČ 47114983
+        </td>
+        <td colspan="8">
+            <h1>POŠTOVNÍ PODACÍ ARCH</h1>
+        </td>
+        <td></td>
+        <td></td>
+    </tr>    
+    <tr>
+        <td colspan="10">
+            &nbsp;
+        </td>
+        <td class="text_prilohy">
+            Číslo přílohy
+        </td>
+        <td class="box_prilohy_top">
+            &nbsp;
+        </td>
+    </tr>    
+    <tr>
+        <td class="odesilatel" colspan="10">
+            ODESÍLATEL: {$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}
+        </td>        
+        <td class="text_prilohy">
+            přijímací knihy
+        </td>
+        <td class="box_prilohy_middle">
+            &nbsp;
+        </td>        
+    </tr>      
+    <tr>
+        <td class="datum" colspan="11">
+            Datum:
+        </td>
+        <td class="box_prilohy_bottom">
+            &nbsp;
+        </td>         
+    </tr>    
+    <tr>
+        <th class="w1" rowspan="4">Podací<br />číslo</th>
+        <th class="w2" rowspan="4">Jméno a příjmení adresáta<br />(název organizace)</th>
+        <th class="w3" rowspan="4">Adresní pošta<br />(PSČ, místo určení)</th>
+        <th class="w4" rowspan="4">Ulice, číslo domu</th>
+        <th class="w5" rowspan="2" colspan="2">Hmotnost</th>
+        <th class="w7" rowspan="2" colspan="2">Dobírka</th>
+        <th class="w9">Udaná cena</th>
+        <th class="w10" rowspan="2">Cena služby</th>
+        <th class="w11" rowspan="2">Placeno v hotovosti</th>
+        <th class="w12" rowspan="4">Poznámka<br />(doplňkové služby)</th>
+    </tr>
+    <tr>
+        <th class="w9n">Vyplacená částka</th>
+    </tr>
+    <tr>
+        <th class="w5n">kg</th>
+        <th class="w6n">g</th>
+        <th class="w7n">Kč</th>
+        <th class="w8n">h</th>
+        <th class="w9n">Kč</th>
+        <th class="w10n">Kč</th>
+        <th class="w11n">Kč</th>
+    </tr>
+    <tr>
+        <th class="w5n" colspan="4">Převod:</th>
+        <th class="w9n" colspan="3">&nbsp;</th>
+    </tr>
+{for $i=(($p-1)*10);$i < (($p)*10);$i++}    
+    <tr>
+        <td class="w1">&nbsp;</td>
+        <td class="w2">{=@Subjekt::displayName($seznam[$i],'jmeno_item')}&nbsp;</td>
+        <td class="w3">{=@Subjekt::displayName($seznam[$i],'mesto')}&nbsp;</td>
+        <td class="w4">{=@Subjekt::displayName($seznam[$i],'ulice')}&nbsp;</td>
+        <td class="w5">&nbsp;</td>
+        <td class="w6">&nbsp;</td>
+        <td class="w7">&nbsp;</td>
+        <td class="w8">&nbsp;</td>
+        <td class="w9">&nbsp;</td>
+        <td class="w10">&nbsp;</td>
+        <td class="w11">&nbsp;</td>
+        <td class="w12">&nbsp;</td>
+    </tr>    
+{/for}    
+    <tr>
+        <td class="blank" colspan="4">11-038<br />Vydáno ČP, s.p.</td>
+        <td class="blank" colspan="4">Převod - úhrn:</td>
+        <td class="b9">&nbsp;</td>
+        <td class="b10">&nbsp;</td>
+        <td class="b11">&nbsp;</td>
+        <td class="b12">&nbsp;</td>
+    </tr>  
+</table>
+{if $p!=$count_page}<pagebreak />{/if}
+{/for}
+</body>
+</html>

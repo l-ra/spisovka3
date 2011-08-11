@@ -382,6 +382,9 @@ class Subjekt extends BaseModel
             case 'ulice':
                 return $d_ulice;
                 break;
+            case 'mesto':
+                return $data->adresa_psc .' '. $data->adresa_mesto;
+                break;
             case 'email':
                 return $d_nazev .' ('. ( empty($data->email)?'nemá email':$data->email ) .')';
                 break;

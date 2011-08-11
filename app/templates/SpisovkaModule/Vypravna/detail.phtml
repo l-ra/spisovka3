@@ -1,0 +1,42 @@
+<form action="{link :Spisovka:Vypravna:detail, 'id'=>$dokument->dokodes_id}" method="post" id="vypravna_form">
+    <dl>
+        <dt>Datum odeslání:</dt>
+        <dd><input type="text" class="datepicker" name="datum_odeslani" value="{$dokument->datum_odeslani|edate}" /></dd>
+    </dl> 
+    {if $dokument->zpusob_odeslani_id == 3}
+    <dl>
+        <dt>Druh zásilky:</dt>
+        <dd>
+            {foreach $DruhZasilky as $dz_index=>$dz_nazev}
+            <input type="checkbox" name="druh_zasilky[{$dz_index}]" {if isset($dokument->druh_zasilky[$dz_index])}checked="checked"{/if} />&nbsp;{$dz_nazev}
+            {/foreach}
+        &nbsp;</dd>
+    </dl>
+    <dl>
+        <dt>Cena Kč:</dt>
+        <dd><input type="text" name="cena_zasilky" value="{$dokument->cena}" size="10" /></dd>
+    </dl>                
+    <dl>
+        <dt>Hmotnost:</dt>
+        <dd><input type="text" name="hmotnost_zasilky" value="{$dokument->hmotnost}" size="10" /></dd>
+    </dl>    
+    {/if}
+    {if $dokument->zpusob_odeslani_id == 4}
+    <dl>
+        <dt>Číslo faxu:</dt>
+        <dd><input type="text" name="cislo_faxu" value="{$dokument->cislo_faxu}" size="20" /></dd>
+    </dl>
+    <dl>
+        <dt>Zpráva pro příjemce:</dt>
+        <dd><textarea name="zprava" rows="5" cols="80">{$dokument->zprava}</textarea></dd>
+    </dl>    
+    {/if}
+    <dl>
+        <dt>&nbsp;</dt>
+        <dd>
+            <input type="submit" name="vypravna_upravit" value="Uložit" onclick="return vypravnaSubmit()" />
+            <input type="submit" name="vypravna_storno" value="Zrušit" onclick="return vypravnaZrusit();" />
+        </dd>
+    </dl>    
+    </form>
+                
