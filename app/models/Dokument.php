@@ -1404,6 +1404,10 @@ class Dokument extends BaseModel
                 $dokument->identifikator = $Epodatelna->identifikator(unserialize($dokument->identifikator));
             }
 
+            if ( empty($dokument->nazev) ) {
+                $dokument->nazev = "(bez názvu)";
+            }
+            
             return $dokument;
 
 
@@ -1452,7 +1456,7 @@ class Dokument extends BaseModel
             return false;
         } else if ( is_null($dokument_id) ) {
             // novy dokument
-
+            
             if ( empty($data['zmocneni_id']) ) $data['zmocneni_id'] = null;
             if ( empty($data['cislo_jednaci_id']) ) {
                 $data['cislo_jednaci_id'] = null;

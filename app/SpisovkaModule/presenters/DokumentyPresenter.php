@@ -1276,9 +1276,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     ->controlPrototype->readonly = TRUE;
         }
 
-        $form->addText('nazev', 'Věc:', 80, 100)
-                ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!')
-                ->setValue(@$dok->nazev);
+        if ( isset($dok->nazev) && $dok->nazev == "(bez názvu)" ) $dok->nazev = "";
+        if ( $this->template->isPodatelna ) {
+            $form->addText('nazev', 'Věc:', 80, 100)
+                    ->setValue(@$dok->nazev);
+            
+        } else {
+            $form->addText('nazev', 'Věc:', 80, 100)
+                    ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!')
+                    ->setValue(@$dok->nazev);
+        }
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$dok->popis);
         $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
@@ -1475,9 +1482,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form = new AppForm();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
-        $form->addText('nazev', 'Věc:', 80, 100)
-                ->setValue(@$Dok->nazev)
-                ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
+        
+        if ( $this->template->isPodatelna ) {
+            $form->addText('nazev', 'Věc:', 80, 100)
+                    ->setValue(@$Dok->nazev);
+        } else {
+            $form->addText('nazev', 'Věc:', 80, 100)
+                    ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!')
+                    ->setValue(@$Dok->nazev);
+        }        
+        
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$Dok->popis);
         //if ( $this->template->isRozdelany ) {

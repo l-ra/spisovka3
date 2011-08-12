@@ -368,7 +368,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $original = null;
         }
 
-        $typ_dokumentu = Dokument::typDokumentu(null,1);
+        $typ_dokumentu = Dokument::typDokumentu(null,2);
         $typ_dokumentu_extra = Dokument::typDokumentu();
 
         $form = new AppForm();
@@ -390,12 +390,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
 
         $form->addText('nazev', 'Věc:', 80, 100)
-                ->setValue(@$zprava->predmet)
-                ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
+                ->setValue(@$zprava->predmet);
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
 
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
-                ->setValue(1);
+        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu);
+                //->setValue(1);
 
         /*if ( !empty($zprava->email_signature) ) {
             foreach ($typ_dokumentu_extra as $tde) {
