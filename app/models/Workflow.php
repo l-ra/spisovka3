@@ -18,7 +18,7 @@ class Workflow extends BaseModel
  * 8 - ke skartaci
  * 9 - archivovan
  * 10 - skartovan
- * 
+ * 11 - zapujcen
  * 
  * 
  */
@@ -751,26 +751,26 @@ class Workflow extends BaseModel
                     //if ($transaction)
                     //dibi::begin();
 
-                    $Dokument = new Dokument();
-                    $dokument_info = $Dokument->getInfo($dokument_id);
+                    //$Dokument = new Dokument();
+                    //$dokument_info = $Dokument->getInfo($dokument_id);
 
                     // Deaktivujeme starsi zaznamy
-                    $this->deaktivovat($dokument_id);
+                    //$this->deaktivovat($dokument_id);
 
-                    $UserModel = new UserModel();
-                    $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
+                    //$UserModel = new UserModel();
+                    //$user_info = $UserModel->getUser($user_id, 1);
 
                     $data = array();
-                    $data['dokument_id'] = $dokument_info->id;
-                    $data['stav_dokumentu'] = 10;
-                    $data['stav_osoby'] = 1;
+                    $data['dokument_id'] = $dokument_id;
+                    $data['stav_dokumentu'] = 11;
+                    $data['stav_osoby'] = 0;
                     $data['aktivni'] = 1;
-                    $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
-                    $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
+                    $data['prideleno_id'] = $user_id;
+                    $data['orgjednotka_id'] = null;
 
                     $data['date'] = new DateTime();
-                    $data['user_id'] = $user->getIdentity()->id;
-                    $data['poznamka'] = $dokument_info->prideleno->poznamka;
+                    $data['user_id'] = Environment::getUser()->getIdentity()->id;
+                    $data['poznamka'] = "Přidělen k zapůjčení.";
 
                     $result_insert = $this->insert($data);
 
@@ -779,6 +779,9 @@ class Workflow extends BaseModel
 
                     if ( $result_insert ) {
 
+                        $Dokument = new Dokument();
+                        $Dokument->update(array('stav'=>1),array(array('id=%i',$dokument_id)));
+                        
                         $Log = new LogModel();
                         $Log->logDokument($dokument_id, LogModel::ZAPUJCKA_PRIDELENA, 'Dokument byl přidělen k zapůjčení.');
 
@@ -798,32 +801,32 @@ class Workflow extends BaseModel
     {
         if ( is_numeric($dokument_id) ) {
 
-            $user = Environment::getUser();
-
-            $Dokument = new Dokument();
-            $dokument_info = $Dokument->getInfo($dokument_id);
-
             // Deaktivujeme starsi zaznamy
             $this->deaktivovat($dokument_id);
-
-            $UserModel = new UserModel();
-            $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
-
-            $data = array();
-            $data['dokument_id'] = $dokument_info->id;
-            $data['stav_dokumentu'] = 10;
-            $data['stav_osoby'] = 1;
+            $update = array('stav_osoby'=>2);
+            $this->update($update, array(array('dokument_id=%i',$dokument_id),
+                                         array('stav_osoby=1')
+                                   )
+                         );
+            
+            
+            $posledni = $this->posledne_prideleny($dokument_id);
+            if ( !$posledni ) { 
+                return false;
+            }
+            $data = $this->obj2array($posledni);
+            unset($data['id']);
             $data['aktivni'] = 1;
-            $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
-            $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
-
             $data['date'] = new DateTime();
-            $data['user_id'] = $user->getIdentity()->id;
-            $data['poznamka'] = $dokument_info->prideleno->poznamka;
+            $data['user_id'] = $user_id;
+            $data['stav_osoby'] = 1;
 
             $result_insert = $this->insert($data);
             if ( $result_insert ) {
 
+                $Dokument = new Dokument();
+                $Dokument->update(array('stav'=>2),array(array('id=%i',$dokument_id)));
+                
                 $Log = new LogModel();
                 $Log->logDokument($dokument_id, LogModel::ZAPUJCKA_VRACENA, 'Dokument byl navrácen do spisovny.');
 
@@ -836,6 +839,41 @@ class Workflow extends BaseModel
         }
     }
 
+    
+    protected function posledne_prideleny($dokument_id)
+    {
+        
+        $param = array();
+
+        $param['where'] = array( 
+            array('dokument_id=%i', $dokument_id),
+            array('stav_dokumentu<>11') 
+            
+        );
+        $param['limit'] = 1;
+        $param['order'] = array('date'=>'DESC');
+
+        $row = $this->fetchAllComplet($param);
+        $row = $row->fetch();
+
+        if ( $row ) {
+
+            /*$UserModel = new UserModel();
+            if ( !empty($row->prideleno_id) ) {
+                $osoba = $UserModel->getUser($row->prideleno_id, 1);
+                if ( $osoba ) {
+                    $row->prideleno_jmeno = Osoba::displayName($osoba->identity);
+                    $row->prideleno_info = $osoba->identity;
+                }
+            }*/
+
+            return $row;
+        } else {
+            return null;
+        }        
+        
+        
+    }
     
     /**
      * Je uzivatel vlastnikem dokumentu

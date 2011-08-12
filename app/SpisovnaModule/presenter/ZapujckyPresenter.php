@@ -454,9 +454,11 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         
         $datum_od = date('d.m.Y');
         $form->addDatePicker('date_od', 'Datum výpůjčky:', 10)
-                ->setValue($datum_od);
+                ->setValue($datum_od)
+                ->setRequired('Datum výpůjčky musí být vyplněné!');
         $datum_do = date('d.m.Y');
-        $form->addDatePicker('date_do', 'Datum vrácení:', 10);
+        $form->addDatePicker('date_do', 'Datum vrácení:', 10)
+                ->setRequired('Datum vracení musí být vyplněné! Zadejte aspoň předpokládané datum vracení.');
 
         
         $form->addSubmit('novy', 'Vytvořit zápůjčku')

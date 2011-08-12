@@ -228,7 +228,22 @@
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
-
+            {elseif $dok->stav_dokumentu == 11 }
+            <td class="prideleno">
+                {if !empty($dok->predano)}
+                {$dok->predano->prideleno_jmeno}
+                <br />
+                {=@$dok->predano->orgjednotka_info->zkraceny_nazev}
+                {else}
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+                {/if}
+            </td>
+            <td class="stav">
+                zapůjčen
+                <br />
+            </td>
             {else}
             <td class="prideleno">
                 &nbsp;

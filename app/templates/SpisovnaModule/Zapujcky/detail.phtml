@@ -6,7 +6,7 @@
 @{block content}
 
     <div class="navigate">
-    <a href="{link :Spisovka:Zapujcky:default}">Zápůjčky</a> - detail zápůjčky
+    <a href="{link :Spisovna:Zapujcky:default}">Zápůjčky</a> - detail zápůjčky
     </div>
 
     <div id="dokument_blok_volby">
@@ -22,7 +22,7 @@
     <div id="dokument_blok_hlavni">
         <dl class="detail_item">
             <dt>Zapůjčený dokument:</dt>
-            <dd><a href="{link :Spisovna:Dokumenty:detail, 'id'=>$Zapujcka->dokument_id}">{$Zapujcka->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$Zapujcka->poradi}{/if} - {$Zapujcka->nazev}</a></dd>
+            <dd><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Zapujcka->dokument_id}">{$Zapujcka->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$Zapujcka->poradi}{/if} - {$Zapujcka->nazev}</a></dd>
         </dl>
         <dl class="detail_item">
             <dt>Zapůjčeno komu:</dt>

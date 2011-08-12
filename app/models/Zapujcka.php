@@ -250,6 +250,26 @@ class Zapujcka extends BaseModel
         
     }
 
+    public function getDokumentID($zapujcka_id) {
+
+        $sql = array(
+            'distinct'=>1,
+            'from' => array($this->name => 'z'),
+            'cols' => array('dokument_id')
+        );
+        $sql['where'] = array( array('z.id=%i',$zapujcka_id) );
+        
+        $select = $this->fetchAllComplet($sql);
+        $result = $select->fetch();
+        if ( $result ) {
+            return $result->dokument_id;
+        } else {
+            return null;
+        }
+        
+        
+    }    
+    
     public function getDokument($dokument_id) {
 
         $UserModel = new UserModel();
@@ -276,7 +296,7 @@ class Zapujcka extends BaseModel
                 ),                  
             )
         );
-        $sql['where'] = array( array('z.dokument_id=%i AND z.stav=1',$dokument_id) );
+        $sql['where'] = array( array('z.dokument_id=%i AND z.stav=2',$dokument_id) );
         
         $select = $this->fetchAllComplet($sql);
         $result = $select->fetch();
@@ -369,8 +389,20 @@ class Zapujcka extends BaseModel
             'user_schvalil_id' => Environment::getUser()->getIdentity()->id,
             'date_schvaleni' => new DateTime()
         );
-        $update = $this->update($data, array(array('id=%i',$zapujcka_id)));
-        return $update;        
+        
+        try {
+            $update = $this->update($data, array(array('id=%i',$zapujcka_id)));
+        
+            $Workflow = new Workflow();
+            $zapujcka_info = $this->getInfo($zapujcka_id);
+            $Workflow->zapujcka_pridelit($zapujcka_info->dokument_id, $zapujcka_info->user_id);
+        
+            return true;
+        } catch (DibiException $e) {
+            echo $e->getMessage();
+            echo $e->getSql();
+            return false;
+        }
         
     }  
     
@@ -383,8 +415,13 @@ class Zapujcka extends BaseModel
             'date_schvaleni' => $date,
             'date_do_skut' => $date,
         );
-        $update = $this->update($data, array(array('id=%i',$zapujcka_id)));
-        return $update;          
+        
+        try {
+            $update = $this->update($data, array(array('id=%i',$zapujcka_id)));
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
         
     }        
     
@@ -395,8 +432,15 @@ class Zapujcka extends BaseModel
             'stav' => 3,
             'date_do_skut' => $datum_vraceni,
         );
-        $update = $this->update($data, array(array('id=%i',$zapujcka_id)));
-        return $update;            
+        try {
+            $update = $this->update($data, array(array('id=%i',$zapujcka_id)));
+            $Workflow = new Workflow();
+            $dokument_id = $this->getDokumentID($zapujcka_id);
+            $Workflow->zapujcka_vratit($dokument_id, Environment::getUser()->getIdentity()->id);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
         
     }        
     

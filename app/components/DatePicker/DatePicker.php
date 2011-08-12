@@ -14,7 +14,7 @@ require_once LIBS_DIR . '/Nette/Forms/Controls/TextInput.php';
  * @package    Nette\Extras\DatePicker
  * @version    0.1
  */
-class DatePicker extends /*Nette\Forms\*/TextInput
+class DatePicker extends TextInput
 {
 
 	/**
@@ -36,10 +36,18 @@ class DatePicker extends /*Nette\Forms\*/TextInput
 	{
 		if (strlen($this->value)) {
 			$tmp = preg_replace('~([[:space:]])~', '', $this->value);
-			$tmp = explode('.', $tmp);
-			
+                        
+                        try {
+                            $tmp = new DateTime($this->value);
+                            return $tmp->format('Y-m-d');
+                        } catch(Exception $e) {
+                            Environment::getApplication()->getPresenter()->flashMessage('Formát data "'. strip_tags($this->getLabel()) .'" je neplatný!','error');
+                            return null;
+                        }
+                        
+			//$tmp = explode('.', $tmp);
 			// database format Y-m-d
-			return $tmp[2] . '-' . $tmp[1] . '-' . $tmp[0];
+			//return $tmp[2] . '-' . $tmp[1] . '-' . $tmp[0];
 		}
 		
 		return $this->value;
@@ -55,6 +63,8 @@ class DatePicker extends /*Nette\Forms\*/TextInput
 	{
 		$value = preg_replace('~([0-9]{4})-([0-9]{2})-([0-9]{2})~', '$3.$2.$1', $value);
 		parent::setValue($value);
+                
+                return $this;
 	}
 
 

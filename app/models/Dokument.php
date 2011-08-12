@@ -1298,7 +1298,7 @@ class Dokument extends BaseModel
                         $predano=1;
                     }
                     // Stav
-                    if ( $stav <= $wf->stav_dokumentu ) {
+                    if ( $stav <= $wf->stav_dokumentu && $wf->aktivni == 1 ) {
                         $stav = $wf->stav_dokumentu;
                     }
                 }

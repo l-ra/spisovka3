@@ -303,6 +303,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $formUpravit = null;
             }
 
+            // Dokument je zapujcen
+            if ( $dokument->stav_dokumentu == 11 ) {
+                $this->template->Pridelen = 0;
+                $this->template->Predan = 0;                
+                $this->template->Vyrizovani = 0;
+                $this->template->AccessEdit = 0;
+                $Zapujcka = new Zapujcka();
+                $this->template->Zapujcka = $Zapujcka->getDokument($dokument_id);
+            } else {
+                $this->template->Zapujcka = null;
+            }            
+            
             $this->template->Skartacni_dohled = 0;
             $this->template->Skartacni_komise = 0;
             
