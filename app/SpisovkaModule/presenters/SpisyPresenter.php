@@ -312,7 +312,10 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
         switch ($stav) {
             case 'uzavrit':
-                if ( $Spis->zmenitStav($spis_id, 0) ) {
+                $stav = $Spis->zmenitStav($spis_id, 0);
+                if ( $stav === -1 ) {
+                    $this->flashMessage('Spis nelze uzavřít. Jeden nebo více dokumentů nejsou vyřízeny.','warning');
+                } else if ( $stav ) {
                     $this->flashMessage('Spis byl uzavřen.');
                 } else {
                     $this->flashMessage('Spis se nepodařilo uzavřit.','error');

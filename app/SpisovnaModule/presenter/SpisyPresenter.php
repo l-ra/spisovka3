@@ -134,6 +134,9 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
             //$seznam = $Spisy->seznam(null, 0, $spis_id);
             //$this->template->seznam = $seznam;
+            
+            $this->template->akce_select = array(
+            );             
 
             $session_spisplan->spis_id = $spis_id;
         } else {
@@ -193,6 +196,11 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $this->template->seznam = $seznam;
             $session_spisplan->spis_id = $spis_id;
+            
+            $this->template->akce_select = array(
+                'prevzit_spisovna'=>'převzetí vybraných spisů do spisovny'
+            );               
+            
         } else {
             $this->template->seznam = null;
         }

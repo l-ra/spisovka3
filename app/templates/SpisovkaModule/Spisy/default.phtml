@@ -59,7 +59,9 @@
             <td class="akce">
                 {if $spis->typ=='S' && $spis->stav==0}
                 <input type="checkbox" class="checkbox" name="spis_vyber[]" value="{$spis->id}" title="Vybrat tento spis" />
-                {/if}&nbsp;
+                {else}
+                <input type="checkbox" name="off_spis_vyber[]" value="{$spis->id}" disabled="disabled" />
+                {/if}
             </td>
             <td>
                 {!=str_repeat("&nbsp;", 10*$spis->uroven)}

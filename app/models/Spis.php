@@ -200,14 +200,27 @@ class Spis extends TreeModel
 
         if ( !is_numeric($spis_id) || !is_numeric($stav) ) return null;
 
+        if ( $stav != 1 ) {
+            // Kontrola
+            if ( $kontrola = $this->kontrolaDokumentu($spis_id) ) {
+                foreach ($kontrola as $kmess) {
+                    Environment::getApplication()->getPresenter()->flashMessage($kmess,'warning');
+                }                
+                return -1;
+            }
+        }
+        
         $data = array();
         $data['date_modified'] = new DateTime();
         $data['user_modified'] = Environment::getUser()->getIdentity()->id;
         $data['stav'] = $stav;
 
-        $ret = $this->update($data, array('id=%i',$spis_id));
-
-        return $ret;
+        try {
+            $this->update($data, array('id=%i',$spis_id));
+            return true;
+        } catch (exception $e) {
+            return false;
+        }
 
     }
 
@@ -357,7 +370,6 @@ class Spis extends TreeModel
             foreach ($kontrola as $kmess) {
                 Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
             }
-
             return 'Spis '.$spis_info->nazev.' nelze přenést do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
         }
 
@@ -366,6 +378,31 @@ class Spis extends TreeModel
             return 'Spis '.$spis_info->nazev .' nelze přenést do spisovny! Spis není uzavřen.';
         }
 
+        // Kontrola kompletnosti vlozenych dokumentu (musi byt vyrizene)
+        if ( $kontrola = $this->kontrolaDokumentu($spis_info) ) {
+            // nejsou kompletni - neprenasim
+            foreach ($kontrola as $kmess) {
+                Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
+            }
+            return 'Spis '.$spis_info->nazev.' nelze přenést do spisovny! Jeden nebo více dokumentů spisu nejsou vyřízeny.';
+        }
+
+        // Prenest vsechny dokumenty do spisovny spolu se spisem
+        $DokumentSpis = new DokumentSpis();
+        $dokumenty = $DokumentSpis->dokumenty($spis_id, 1);
+        if ( count($dokumenty)>0 ) {
+            $Workflow = new Workflow();
+            foreach ( $dokumenty as $dok ) {
+                $stav = $Workflow->predatDoSpisovny($dok->id);
+                if ( $stav === true ) {
+                } else {
+                    if ( is_string($stav) ) {
+                        Environment::getApplication()->getPresenter()->flashMessage($stav,'warning');
+                    }
+                }                
+            }
+        }
+        
         // Predat do spisovny
         $result = $this->zmenitStav($spis_id, 2);
         if ( $result ) {
@@ -397,7 +434,31 @@ class Spis extends TreeModel
             return 'Spis '.$spis_info->nazev .' nelze připojit do spisovny! Spis nebyl předán do spisovny.';
         }
 
-
+        // Kontrola kompletnosti vlozenych dokumentu (musi byt vyrizene)
+        if ( $kontrola = $this->kontrolaDokumentu($spis_info) ) {
+            // nejsou kompletni - neprenasim
+            foreach ($kontrola as $kmess) {
+                Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
+            }
+            return 'Spis '.$spis_info->nazev.' nelze připojit do spisovny! Jeden nebo více dokumentů spisu nejsou vyřízeny.';
+        }
+        
+        // Pripojit vsechny dokumenty do spisovny spolu se spisem
+        $DokumentSpis = new DokumentSpis();
+        $dokumenty = $DokumentSpis->dokumenty($spis_id, 1);
+        if ( count($dokumenty)>0 ) {
+            $Workflow = new Workflow();
+            foreach ( $dokumenty as $dok ) {
+                $stav = $Workflow->pripojitDoSpisovny($dok->id);
+                if ( $stav === true ) {
+                } else {
+                    if ( is_string($stav) ) {
+                        Environment::getApplication()->getPresenter()->flashMessage($stav,'warning');
+                    }
+                }                
+            }
+        }        
+        
         // Pripojit do spisovny
         $result = $this->zmenitStav($spis_id, 3);
         if ( $result ) {
@@ -414,7 +475,7 @@ class Spis extends TreeModel
         
         $mess = array();
         if ( empty($data->nazev) ) $mess[] = "Spisová značka (název spisu) nemůže být prázdná!";
-        if ( empty($data->spisovy_znak) ) $mess[] = "Spisový znak nemůže být prázdný!";
+        if ( empty($data->spisovy_znak_id) ) $mess[] = "Spisový znak nemůže být prázdný!";
         if ( empty($data->skartacni_znak) ) $mess[] = "Skartační znak nemůže být prázdný!";
         if ( $data->skartacni_lhuta === "" ) $mess[] = "Skartační lhůta musí obsahovat hodnotu!";
         //if ( empty($data->datum_otevreni) ) $mess[] = "Spis nemá uveden datum otevření spisu!";
@@ -427,6 +488,35 @@ class Spis extends TreeModel
         }        
         
     }
+    
+    public function kontrolaDokumentu($data) {
+        
+        $mess = array();
+        
+        if ( is_numeric($data) ) {
+            // $data je id
+            $data = $this->getInfo($data);
+        }
+        
+        $DokumentSpis = new DokumentSpis();
+        $dokumenty = $DokumentSpis->dokumenty($data->id, 1);
+        
+        // stav nad 5 (4?)
+        if ( count($dokumenty)>0 ) {
+            foreach ( $dokumenty as $dok ) {
+                if ( $dok->stav_dokumentu < 5 ) {
+                    $mess[] = "Spis \"".$data->nazev."\" - Dokument \"".$dok->cislo_jednaci."\" není vyřízen.";
+                }
+            }
+        }
+        
+        if ( count($mess)>0 ) {
+            return $mess;
+        } else {
+            return null;
+        }        
+        
+    }    
 
     public static function typSpisu($typ = null, $sklonovat = 0) {
 

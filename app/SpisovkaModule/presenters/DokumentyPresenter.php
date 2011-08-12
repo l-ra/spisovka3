@@ -414,7 +414,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
                     break;
                 /* Predani vybranych dokumentu do spisovny  */
-                case 'predat_spisovna':
+                /*case 'predat_spisovna':
                     if ( isset($data['dokument_vyber']) ) {
                         $count_ok = $count_failed = 0;
                         foreach ( $data['dokument_vyber'] as $dokument_id ) {
@@ -438,7 +438,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             $this->redirect('this');
                         }
                     }
-                    break;
+                    break;*/
                 default:
                     break;
             }
