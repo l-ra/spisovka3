@@ -33,7 +33,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     protected function shutdown($response) {
         
-        if ($this->pdf_output == 1) {
+        if ($this->pdf_output == 1 || $this->pdf_output == 2) {
             
             function handlePDFError($errno, $errstr, $errfile, $errline, array $errcontext)
             {
@@ -52,32 +52,63 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $response->send();
             $content = ob_get_clean();
             if ($content) {
-                $content = str_replace("<td", "<td valign='top'", $content);
-                $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
-                $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
-                $content = preg_replace('#<div id="tisk_podpis">.*?</div>#s','', $content);
-                $content = preg_replace('#<table id="table_top">.*?</table>#s','', $content);
                 
-                $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
+                if ($this->pdf_output == 2) {
+                    $content = str_replace("<td", "<td valign='top'", $content);
+                    $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
+                    $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
+                    $content = preg_replace('#<div id="tisk_podpis">.*?</div>#s','', $content);
+                    $content = preg_replace('#<table id="table_top">.*?</table>#s','', $content);
                 
-                $app_info = Environment::getVariable('app_info');
-                $app_info = explode("#",$app_info);
-                $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
-                $mpdf->SetCreator($app_name);
-                $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
-                $mpdf->SetTitle('Spisová služba - Spisovna - Tisk');                
+                    $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
                 
-                $mpdf->defaultheaderfontsize = 10;	/* in pts */
-                $mpdf->defaultheaderfontstyle = 'B';	/* blank, B, I, or BI */
-                $mpdf->defaultheaderline = 1; 	/* 1 to include line below header/above footer */
-                $mpdf->defaultfooterfontsize = 9;	/* in pts */
-                $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
-                $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
-                $mpdf->SetHeader($this->template->title .'||'.$this->template->Urad->nazev);
-                $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $app_info = Environment::getVariable('app_info');
+                    $app_info = explode("#",$app_info);
+                    $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
+                    $mpdf->SetCreator($app_name);
+                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetTitle('Spisová služba - Detail dokumentu');                
                 
-                $mpdf->WriteHTML($content);
-                $mpdf->Output('spisovna.pdf', 'I');
+                    $mpdf->defaultheaderfontsize = 10;	/* in pts */
+                    $mpdf->defaultheaderfontstyle = 'B';	/* blank, B, I, or BI */
+                    $mpdf->defaultheaderline = 1; 	/* 1 to include line below header/above footer */
+                    $mpdf->defaultfooterfontsize = 9;	/* in pts */
+                    $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
+                    $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
+                    $mpdf->SetHeader('||'.$this->template->Urad->nazev);
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                
+                    $mpdf->WriteHTML($content);
+                
+                    $mpdf->Output('dokument.pdf', 'I');                    
+                } else {                
+                    $content = str_replace("<td", "<td valign='top'", $content);
+                    $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
+                    $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
+                    $content = preg_replace('#<div id="tisk_podpis">.*?</div>#s','', $content);
+                    $content = preg_replace('#<table id="table_top">.*?</table>#s','', $content);
+                
+                    $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
+                
+                    $app_info = Environment::getVariable('app_info');
+                    $app_info = explode("#",$app_info);
+                    $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
+                    $mpdf->SetCreator($app_name);
+                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetTitle('Spisová služba - Spisovna - Tisk');                
+                
+                    $mpdf->defaultheaderfontsize = 10;	/* in pts */
+                    $mpdf->defaultheaderfontstyle = 'B';	/* blank, B, I, or BI */
+                    $mpdf->defaultheaderline = 1; 	/* 1 to include line below header/above footer */
+                    $mpdf->defaultfooterfontsize = 9;	/* in pts */
+                    $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
+                    $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
+                    $mpdf->SetHeader($this->template->title .'||'.$this->template->Urad->nazev);
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                
+                    $mpdf->WriteHTML($content);
+                    $mpdf->Output('spisovna.pdf', 'I');
+                }
             }
             
             } catch (Exception $e) {
@@ -424,6 +455,20 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyřiďte co nejrychleji tento dokument.');
             }
 
+            // Volba vystupu - web/tisk/pdf
+            $tisk = $this->getParam('print');
+            $pdf = $this->getParam('pdfprint');
+            if ( $tisk ) {
+                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+                $this->setLayout(false);
+                $this->setView('printdetail');
+            } elseif ( $pdf ) {
+                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+                $this->pdf_output = 2;
+                $this->setLayout(false);
+                $this->setView('printdetail');
+            }              
+            
             $this->invalidateControl('dokspis');
         } else {
             // dokument neexistuje nebo se nepodarilo nacist

@@ -65,6 +65,15 @@
     <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> - Detail dokumentu
     </div>
 
+    <div id="tisk">
+        <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
+            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+        </a>
+        <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
+            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+        </a>        
+    </div>
+
     {accessedit}
     <div id="dokument_blok_volby">
        {if $Pridelen==1 }

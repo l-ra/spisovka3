@@ -1,84 +1,32 @@
-@{block title}Dokument{/block}
-@{block debug}
-<?php echo "\n\nDokument: "; print_r($Dok); ?>
-<?php echo "\n\nZapujcky: "; print_r($Zapujcka); ?>
-
-@{/block}
-@{block content}
-
-    <div class="navigate">
-    <a href="{link :Spisovna:Dokumenty:default}">Seznam dokumentů ve spisovně</a> - Detail dokumentu
-    </div>
-
-    <div id="tisk">
-        <a href="{link :Spisovna:Dokumenty:detail, 'id'=>$Dok->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-        </a>
-        <a href="{link :Spisovna:Dokumenty:detail, 'id'=>$Dok->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
-        </a>        
-    </div>
-
-    <div id="dokument_blok_volby">
-        {if empty($Zapujcka->id)}
-        <a href="{link :Spisovna:Zapujcky:nova, 'dokument_id'=>$Dok->id}">Žádost o zápůjčku</a>
-        {/if}
-    </div>
-
-    {if $Skartacni_dohled==1}
-    <div class="dokument_blok2">
-        <div class="h2">Připojit dokument do skartačního řízení k posuzení</div>
-        <dl class="detail_item">
-            <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>&nbsp;</dt>
-            <dd>
-                <a href="{link :Spisovna:Dokumenty:keskartaci, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="keskartacidokument">Přidat do skartačního řízení</a>
-            </dd>
-        </dl>
-    </div>
-    {/if}
-
-    {if $Skartacni_komise==1}
-    <div class="dokument_blok2">
-        <div class="h2">Rozhodnutí o skartaci dokumentu</div>
-        <dl class="detail_item">
-            <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Rozhodnutí:</dt>
-            <dd>
-                <a href="{link :Spisovna:Dokumenty:archivovat, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="archivovatdokument">Archivovat</a>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="{link :Spisovna:Dokumenty:skartovat, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="skartovatdokument">Skartovat</a>
-            </dd>
-        </dl>
-    </div>
-    {/if}
-
-
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <title>Spisová služba</title>
+    <style type="text/css" media="screen, print">
+        <?php echo file_get_contents(APP_DIR .'/../public/css/printdetail_site.css'); ?>
+    </style>
+</head>
+<body>
+<div id="content">
     <div id="dokument_blok_hlavni">
-        <div class="h2">{$Dok->typ_dokumentu->nazev}</div>
         <dl class="detail_item">
             <dt>JID:</dt>
             <dd>{$Dok->jid}&nbsp;</dd>
         </dl>
+        {if empty($Dok->cislo_jednaci)}
+        <dl class="detail_item">
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
+            <dd>Dokument není evidován!</dd>
+        </dl>
+        {else}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
             <dd class="nadpis">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Spisová značka:</dt>
             <dd>
@@ -100,6 +48,10 @@
             <dd>{!$Dok->popis|enl2br}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
+            <dt>Typ dokumentu:</dt>
+            <dd>{$Dok->typ_dokumentu->nazev}&nbsp;</dd>
+        </dl>        
+        <dl class="detail_item">
             <dt>Datum doručení/vzniku:</dt>
             <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
         </dl>
@@ -108,7 +60,7 @@
             <dt>Způsob doručení:</dt>
             <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
         </dl>        
-        {/if}        
+        {/if}
         {if !empty($Dok->cislo_jednaci_odesilatele)}
         <dl class="detail_item">
             <dt>Číslo jednací odesilatele:</dt>
@@ -120,7 +72,8 @@
             <dt>Číslo doporučeného dopisu:</dt>
             <dd>{$Dok->cislo_doporuceneho_dopisu}&nbsp;</dd>
         </dl>
-        {/if}        
+        {/if}
+        
         {if !empty($Dok->zmocneni)}
         <dl class="detail_item">
             <dt>Zmocnění:</dt>
@@ -134,23 +87,23 @@
         </dl>
         {/if}
         {if $Typ_evidence=='priorace'}
+        {if count($SouvisejiciDokumenty)>0 }
         <dl class="detail_item">
             <dt>Spojeno s dokumentem:</dt>
             <dd>
                 <span id="dok_spojit">
-                {if count($SouvisejiciDokumenty)>0 }
-                    {foreach $SouvisejiciDokumenty as $s}
-                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
-                    {/foreach}
-                {/if}
+                {foreach $SouvisejiciDokumenty as $s}
+                    {$s->cislo_jednaci} ({$s->jid})
+                {/foreach}
                 </span>
                 &nbsp;
             </dd>
         </dl>
         {/if}
+        {/if}
         <dl class="detail_item">
-            <dt>Počet listů / příloh:</dt>
-            <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num}</dd>
+            <dt>Počet listů / příloh / typ přílohy:</dt>
+            <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd>
         </dl>
         {if !empty($Dok->identifikator)}
         <dl class="detail_item">
@@ -188,12 +141,11 @@
             </dd>
         </dl>
         {/if}
-
         {/if}
     </div>
-    
+    {if $Vyrizovani == 1 }
     <div id="dokument_blok_vyrizeni">
-        <div class="h2">Vyřízení <span class='toggler' onclick='toggleWindow(this);'>&nbsp;</span></div>
+        <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
         <dl class="detail_item">
             <dt>Způsob vyřízení:</dt>
@@ -226,8 +178,8 @@
         </dl>
         {/if}
         <dl class="detail_item">
-            <dt>Počet listů / příloh:</dt>
-            <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num}</dd>
+            <dt>Počet listů / příloh / typ příloh:</dt>
+            <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num} {if !empty($Dok->vyrizeni_typ_prilohy)}/ {$Dok->vyrizeni_typ_prilohy}{/if}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Uložení dokumentu:</dt>
@@ -239,14 +191,15 @@
         </dl>
         </div>
     </div>
+    {/if}
 
     <div id="dokument_blok_poznamka">
-        <div class="h2">Vyřídil</div>
+        <div class="h2">Předání</div>
         {if is_null($Dok->prideleno)}
         <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
         {else}
         <dl class="detail_item">
-            <dt>Vyřídil:</dt>
+            <dt>Přiděleno:</dt>
             <dd>
             {if empty($Dok->prideleno->prideleno_id) }
                 organizační jednotce
@@ -258,12 +211,45 @@
                 {=@$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
             {/if}
             </dd>
-            <dl class="detail_item">
-                <dt>Datum vyřízení:</dt>
-                <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
-            </dl>            
+        </dl>
+        <dl class="detail_item">
+            <dt>Přiděleno dne:</dt>
+            <dd>{$Dok->prideleno->date|edatetime}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka pro přiděleného:</dt>
+            <dd>{!$Dok->prideleno->poznamka|enl2br}&nbsp;</dd>
         </dl>
         {/if}
+
+        {if !is_null($Dok->predano)}
+        <dl class="detail_item">
+            <dt>Předáno:</dt>
+            <dd>
+            {if empty($Dok->predano->prideleno_id) }
+                organizační jednotce
+                <br />
+                {$Dok->predano->orgjednotka_info->zkraceny_nazev}
+            {else}
+                {$Dok->predano->prideleno_jmeno}
+                <br />
+                {=@$Dok->predano->orgjednotka_info->zkraceny_nazev}
+            {/if}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Předáno dne:</dt>
+            <dd>{$Dok->predano->date|edatetime}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka pro předávajícího:</dt>
+            <dd>{!$Dok->predano->poznamka|enl2br}&nbsp;</dd>
+        </dl>
+        {/if}
+        <dl class="detail_item">
+            <dt>Lhůta k vyřízení:</dt>
+            <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd>
+        </dl>
     </div>
     
     {if !empty($Zapujcka->id)}
@@ -288,7 +274,7 @@
             </dl>         
         </dl>
     </div>
-    {/if}
+    {/if}    
 
     <div id="dokument_blok_subjekty">
         <div class="h2">
@@ -300,14 +286,16 @@
             {foreach $Dok->subjekty as $subjekt}
             <tr>
             <td class="icon">
-                <img src="{$baseUri}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
+                &nbsp;
             </td>
             <td class="meta">
-                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
+                <div style="font-weight: bold; padding:5px 0px;">{=Subjekt::displayName($subjekt,'jmeno_item')}</div>
                 <div class="info">
-                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
+                {=Subjekt::displayName($subjekt,'adresa')}
                 <br />
-                <span>
+                <span style="color:#c0c0c0; font-size: 8pt;">{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
+                <br />
+                <span style="color:#c0c0c0; font-size: 8pt;">
                     {if $subjekt->rezim_subjektu == 'O'}
                     odesílatel
                     {elseif $subjekt->rezim_subjektu == 'A'}
@@ -318,27 +306,16 @@
                     nespecifikováno
                     {/if}
                 </span>
-
-                <br />
-                {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
             </td>
             <td class="meta_plus">
-                &nbsp;
+                <div style="font-weight: bold; padding:5px 0px;">&nbsp;</div>
                 <div class="info">
-                <dl>
-                    <dt>email:</dt>
-                    <dd>{$subjekt->email}&nbsp;</dd>
-                </dl>
-                <dl>
-                    <dt>telefon:</dt>
-                    <dd>{$subjekt->telefon}&nbsp;</dd>
-                </dl>
-                <dl>
-                    <dt>isds:</dt>
-                    <dd>{$subjekt->id_isds}&nbsp;</dd>
-                </dl>
-
+                    email:&nbsp;&nbsp;&nbsp;<strong>{$subjekt->email}</strong>
+                <br />
+                telefon:&nbsp;&nbsp;&nbsp;<strong>{$subjekt->telefon}</strong>
+                <br>
+                isds:&nbsp;&nbsp;&nbsp;<strong>{$subjekt->id_isds}</strong>
                 </div>
             </td>
         </tr>
@@ -364,11 +341,11 @@
                 <img src="{$baseUri}images/mimetypes/{$file->mime_type|webalize}.png" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->id, 'file'=>$file->id}">{$file->nazev}</a>
+                <strong>{$file->nazev}</strong>
                 <div class="info">
                 {$file->real_name}
                 <br />
-                <span>
+                <span style="color:#c0c0c0; font-size: 8pt;">
                     {$file->typ_name}, {$file->size|bytes}, {$file->mime_type}
                     <br />
                     MD5 hash: {$file->md5_hash}
@@ -449,10 +426,6 @@
 
     <div class="dokument_blok2">
         <div class="h2">Historie</div>
-        <div class="blok_akce">
-            <a href="{link :Spisovna:Dokumenty:historie, 'id'=>$Dok->id}" id="dialog-historie">Transakční protokol</a>
-        </div>
-        
         {foreach $Dok->workflow as $wf}
         <dl class="detail_item">
             <dt>{$wf->date|edatetime}</dt>
@@ -464,19 +437,11 @@
             <?php
 
                 if ( empty($wf->prideleno_id) ) {
-                    if ( empty($wf->orgjednotka_info->zkraceny_nazev) ) {
-                        $wf_jmeno = "organizační jednotce";
-                        $wf_neprijato = 'předáno organizační jednotce. Ta dokument zatím nepřijala.';
-                    } else {
-                        $wf_jmeno = $wf->orgjednotka_info->zkraceny_nazev;
-                        $wf_neprijato = 'předáno organizační jednotce '. $wf_jmeno .'. Ta dokument zatím nepřijala.';
-                    }
-                } else if ( !empty($wf->prideleno_jmeno) ) {
+                    $wf_jmeno = $wf->orgjednotka_info->zkraceny_nazev;
+                    $wf_neprijato = 'předáno organizační jednotce '. $wf_jmeno .'. Ta dokument zatím nepřijala.';
+                } else {
                     $wf_jmeno = $wf->prideleno_jmeno;
                     $wf_neprijato = 'předáno '. $wf_jmeno .', ale zaměstnanec dokument zatím nepřijal';
-                } else {
-                    $wf_jmeno = "";
-                    $wf_neprijato = 'předáno, ale zaměstnanec dokument zatím nepřijal';
                 }
 
             ?>
@@ -524,6 +489,7 @@
         </dl>
         {/foreach}
     </div>
-
-
-    <div id="dialog"></div>
+    
+</div>
+</body>
+</html>    
