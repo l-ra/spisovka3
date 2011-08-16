@@ -713,7 +713,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                 if ( !empty($zprava->email_signature) ) {
                     $email_info = array(
-                        'jid' => $data['jid'],
+                        'jid' => $data_after['jid'],
                         'nazev' => $zprava->predmet,
                         'predano' => $predano
                     );

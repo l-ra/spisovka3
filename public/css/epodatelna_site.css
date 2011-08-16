@@ -199,6 +199,7 @@ body {
 
 #h_evidence .evidence_volba {
     float: left;
+    position: relative;
     width: 170px;
     margin-left: 5px;
 }

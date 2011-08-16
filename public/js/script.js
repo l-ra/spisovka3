@@ -197,11 +197,11 @@ $(function() {
         },
 	select: function(event, ui) {
             $('#predat_autocomplete').val('');
-            if ( ui.item.id[0] == "u" ) {
+            if ( ui.item.id.substring(0,1) == "u" ) {
                 $('#frmnovyForm-predano_user').val(ui.item.id.substr(1));
                 $('#frmnovyForm-predano_org').val('');
                 $('#predano').html("<dl class=\"detail_item\"><dt>Předáno:</dt><dd>"+ui.item.nazev+"<br />&nbsp;</dd></dl>");
-            } else if ( ui.item.id[0] == "o" ) {
+            } else if ( ui.item.id.substring(0,1) == "o" ) {
                 $('#frmnovyForm-predano_user').val('');
                 $('#frmnovyForm-predano_org').val(ui.item.id.substr(1));
                 $('#predano').html("<dl class=\"detail_item\"><dt>Předáno:</dt><dd>organizační jednotce<br />"+ui.item.nazev+"</dd></dl>");
@@ -906,8 +906,9 @@ hledejDokumentAjax = function (vyraz, typ) {
     if (x) {
         x.onreadystatechange = function() {
             if (x.readyState == 4 && x.status == 200) {
+                
                 $('#vysledek-spinner').hide();
-               	vysledek = document.getElementById('vysledek');
+               	var vysledek = document.getElementById('vysledek');
             	var seznam_json = x.responseText;
                 
                 if ( seznam_json == '' ) {
@@ -958,7 +959,7 @@ spojitDokument = function (elm) {
             }
         }
         url = elm.href;
-        //elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }

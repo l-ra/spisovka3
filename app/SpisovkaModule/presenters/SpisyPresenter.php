@@ -451,7 +451,12 @@ class Spisovka_SpisyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
         $spis_id = $data['id'];
-        $this->redirect('this',array('id'=>$spis_id));
+        if ( $spis_id ) {
+            $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
+        } else {
+            $this->redirect(':Spisovka:Spisy:default',array('id'=>$spis_id));
+        }
+        
     }
 
     protected function createComponentNovyForm()

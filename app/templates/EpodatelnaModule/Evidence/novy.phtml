@@ -81,8 +81,8 @@
                 <span id="dok_spojit">
                 {if count($SouvisejiciDokumenty)>0 }
                     {foreach $SouvisejiciDokumenty as $s}
-                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->dokument_id}">{$s->cislo_jednaci} ({$s->jid})</a>
-                    &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->dokument_id}">odebrat spojení</a>]
+                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
+                    {if 0}&nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->id}">odebrat spojení</a>]{/if}
                     {/foreach}
                 {/if}
                 </span>

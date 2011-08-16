@@ -336,10 +336,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
                     }
 
-                    $subjekt->id_isds = $original->dmDm->dbIDSender;
-                    $subjekt->nazev_subjektu = $original->dmDm->dmSender;
-                    $subjekt->type = ISDS_Spisovka::typDS($original->dmDm->dmSenderType);
-                    $subjekt->adresa_ulice = $original->dmDm->dmSenderAddress;
+                    $subjekt->id_isds = @$original->dmDm->dbIDSender;
+                    $subjekt->nazev_subjektu = @$original->dmDm->dmSender;
+                    $subjekt->type = ISDS_Spisovka::typDS(@$original->dmDm->dmSenderType);
+                    $subjekt->adresa_ulice = @$original->dmDm->dmSenderAddress;
 
                     $SubjektModel = new Subjekt();
                     $subjekt_databaze = $SubjektModel->hledat($subjekt,'isds');

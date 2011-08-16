@@ -23,6 +23,10 @@ img {
     clear: both;
 }
 
+form {
+    margin: 0px;
+}
+
 /* ***************************************************************** */
 /* *** TOP LAYOUT *** */
 #layout_top {
@@ -142,6 +146,8 @@ img {
 #dialog {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 9pt;
+    overflow: auto;
+    position: relative;
 }
 
 #content {
@@ -248,9 +254,18 @@ img {
 #dialog dt,
 #content dt {
     float: left;
+    position: relative;
     width: 200px;
     text-align: right;
-    /*padding-right: 20px;*/
+    margin-right: 20px;
+}
+
+#dialog dt.dt_dialog,
+#content dt.dt_dialog {
+    float: left;
+    position: static;
+    width: 200px;
+    text-align: right;
     margin-right: 20px;
 }
 
@@ -276,11 +291,13 @@ img {
 
 #content dd.pravidlo .opravneni_volba_head {
     float: right;
+    position: relative;
     width: 150px;
     text-align: right;
 }
 #content dd.pravidlo .opravneni_volba {
     float: right;
+    position: relative;
     width: 50px;
     text-align: right;
 }
@@ -331,7 +348,7 @@ label.required {
     width: 12px;
 }
 #dokumenty .typ {
-    width: 32px;
+    width: 45px;
 }
 #dokumenty .prijato {
     width: 70px;
@@ -665,7 +682,7 @@ label.required {
 #form_login label {
     text-align: right;
     display: inline-block;
-    position: relative;
+    /*position: relative;*/
     width: 150px;
     padding-right: 10px;
     padding-bottom: 10px;
@@ -784,7 +801,7 @@ label.required {
     float: left;
     width: 40px;
     text-align: right;
-    /*padding-right: 20px;*/
+    position: static;
     color: #808080;
     margin: 0px; padding: 0px;
     margin-right: 5px;
@@ -835,6 +852,7 @@ label.required {
 #filtr {
     float: left;
     width: 45%;
+    position: relative;
     margin: 20px 0px;
     text-align: left;
 }
@@ -854,9 +872,14 @@ label.required {
 /* *** SEARCH cONTROL *** */
 #search {
     float: right;
+    position: relative;
     margin: 20px 0px;
     text-align: right;
 }
+#search form {
+    margin: 0px;
+}
+
 #search #frmsearchForm-dotaz {
     border: 1px solid #03406A;
     color: #03406A;
@@ -867,13 +890,17 @@ label.required {
     color: white; font-weight: bold;
 }
 #search_advanced {
-    margin: 5px;
+    margin: 5px !important;
+    margin: 0px;
 }
 
 #tisk {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    width: 980px;
+    top: 0px;
+    left: 0px;
+    margin: 10px -50px 0px 0px;
+    text-align: right;
 }
 
 #tisk a {

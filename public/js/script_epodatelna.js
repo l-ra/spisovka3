@@ -356,8 +356,9 @@ nactiZpravy = function () {
     if (x) {
         x.onreadystatechange = function() {
             if (x.readyState == 4 && x.status == 200) {
-                zpravy = eval("("+x.responseText+")");
+                var zpravy = eval("("+x.responseText+")");
                 if ( zpravy != '' ) {
+                    
                     for(index in zpravy) {
                         if ( in_array(index, loaded_data) == true ) {
                             continue;
