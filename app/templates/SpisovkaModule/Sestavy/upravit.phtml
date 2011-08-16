@@ -127,12 +127,12 @@
             <br />{$upravitForm['prideleno_na_organizacni_jednotku']->control} Přidělěno na mou organizační jednotku
             <script type="text/javascript">
             <!--
-		$('#frmsearchForm-prideleno').focus().keyup(function(event) {
-                    if ( $('#frmsearchForm-prideleno').val().length > 2 ) {
-			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmsearchForm-prideleno').val()}, function(payload) {
+		$('#frmupravitForm-prideleno').focus().keyup(function(event) {
+                    if ( $('#frmupravitForm-prideleno').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmupravitForm-prideleno').val()}, function(payload) {
 				$('#prideleno').remove();
 
-				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmsearchForm-prideleno');
+				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmupravitForm-prideleno');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
@@ -154,12 +154,12 @@
             <br />{$upravitForm['predano_na_organizacni_jednotku']->control} Předáno na mou organizační jednotku
             <script type="text/javascript">
             <!--
-		$('#frmsearchForm-predano').focus().keyup(function(event) {
-                    if ( $('#frmsearchForm-predano').val().length > 2 ) {
-			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmsearchForm-predano').val()}, function(payload) {
+		$('#frmupravitForm-predano').focus().keyup(function(event) {
+                    if ( $('#frmupravitForm-predano').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmupravitForm-predano').val()}, function(payload) {
 				$('#predano').remove();
 
-				var list = $('<ul id="predano"></ul>').insertAfter('#frmsearchForm-predano');
+				var list = $('<ul id="predano"></ul>').insertAfter('#frmupravitForm-predano');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);

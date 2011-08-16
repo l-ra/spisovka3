@@ -28,6 +28,55 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     }
 
+    public function handleAutoComplete($text, $typ)
+    {
+        $this->payload->autoComplete = array();
+
+	$text = trim($text);
+	if ($text !== '') {
+
+            $OrgJednotka = new Orgjednotka();
+            $args = array(
+                array(
+                    'zkraceny_nazev LIKE %s OR','%'.$text.'%',
+                    'plny_nazev LIKE %s OR','%'.$text.'%',
+                    'ciselna_rada LIKE %s','%'.$text.'%'
+                )
+            );
+            $seznam = $OrgJednotka->seznam($args);
+            if ( count($seznam)>0 ) {
+                foreach( $seznam as $org ) {
+                    if ( $typ == 2 ) {
+                        $this->payload->autoComplete[] =
+                            "<input type='checkbox' name='predano_org[]' value='". $org->id ."' />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
+                    } else {
+                        $this->payload->autoComplete[] =
+                            "<input type='checkbox' name='prideleno_org[]' value='". $org->id ."' />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
+                    }
+                }
+            }
+
+            $Zamestnanci = new Osoba2User();
+            $seznam = $Zamestnanci->hledat($text);
+            if ( count($seznam)>0 ) {
+                foreach( $seznam as $user ) {
+                    if ( $typ == 2 ) {
+                        $this->payload->autoComplete[] =
+                            "<input type='checkbox' name='predano[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                    } else {
+                        $this->payload->autoComplete[] =
+                            "<input type='checkbox' name='prideleno[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+
+                    }
+                    
+                }
+            }
+	}
+
+        $this->terminate();
+    }
+    
+    
     public function actionPdf()
     {
         @ini_set("memory_limit",PDF_MEMORY_LIMIT);
