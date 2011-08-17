@@ -46,7 +46,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         $args = null;
         $args = array(
-            'where' => array('(ep.stav=1) AND (ep.epodatelna_typ=0)')
+            'where' => array('(ep.stav>=1) AND (ep.epodatelna_typ=0)')
         );
         $result = $this->Epodatelna->seznam($args);
         $paginator->itemCount = count($result);
@@ -566,11 +566,11 @@ dmFormat =
                             if ( $file = $UploadFile->uploadEpodatelna(serialize($mess), $data) ) {
                                 // ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['file_id'] = $file->id ."-". $file_o->id;
+                                $zprava['file_id'] = $file->id;
                                 $this->Epodatelna->update(
                                         array('stav'=>1,
                                               'stav_info'=>$zprava['stav_info'],
-                                              'file_id'=>$file->id ."-". $file_o->id
+                                              'file_id'=>$file->id,
                                             ),
                                         array(array('id=%i',$epod_id))
                                 );
