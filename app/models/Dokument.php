@@ -180,10 +180,10 @@ class Dokument extends BaseModel
                 $args['order'] = array('d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC','d.poradi'=>'DESC');
                 break;
             case 'jid':
-                $args['order'] = array('d.jid','d.podaci_denik_rok','d.podaci_denik_poradi','d.poradi');
+                $args['order'] = array('d.id','d.podaci_denik_rok','d.podaci_denik_poradi','d.poradi');
                 break;
             case 'jid_desc':
-                $args['order'] = array('d.jid'=>'DESC','d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC','d.poradi'=>'DESC');
+                $args['order'] = array('d.id'=>'DESC','d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC','d.poradi'=>'DESC');
                 break;            
             case 'vec':
                 $args['order'] = array('d.nazev');
