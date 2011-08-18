@@ -110,9 +110,25 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                001.200.5456
+                {$dok->spisovy_znak}
                 <br />
                 {$dok->skartacni_znak} / {$dok->skartacni_lhuta}
+                <br />
+                {if isset($zapujcky[$dok->id])}
+                zapůjčen
+                {elseif $dok->stav_dokumentu==6}
+                předán do spisovny
+                {elseif $dok->stav_dokumentu==7}
+                vyřízen
+                {elseif $dok->stav_dokumentu==8}
+                ke skartaci
+                {elseif $dok->stav_dokumentu==9}
+                archivován
+                {elseif $dok->stav_dokumentu==10}
+                skartován
+                {elseif $dok->stav_dokumentu==11}
+                zapůjčen
+                {/if}                
             </td>
         </tr>
         {/foreach}
