@@ -1698,7 +1698,8 @@ class Dokument extends BaseModel
             if ( empty($data->zpusob_vyrizeni_id) || $data->zpusob_vyrizeni_id == 0 ) $mess[] = "Není zvolen způsob vyřízení dokumentu!";
             if ( empty($data->spisovy_znak_id) ) $mess[] = "Není zvolen spisový znak!";
             if ( empty($data->skartacni_znak) ) $mess[] = "Není vyplněn skartační znak!";
-            if ( empty($data->skartacni_lhuta) ) $mess[] = "Není vyplněna skartační lhůta!";
+            //if ( empty($data->skartacni_lhuta) || $data->skartacni_lhuta !== 0 ) $mess[] = "Není vyplněna skartační lhůta!";
+            if ( $data->skartacni_lhuta == null || $data->skartacni_lhuta == "" ) $mess[] = "Není vyplněna skartační lhůta!";
             if ( empty($data->spousteci_udalost_id) ) $mess[] = "Není zvolena spouštěcí událost!";
 
             if ( count($data->subjekty)==0 ) {
