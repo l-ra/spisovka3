@@ -143,7 +143,6 @@
         {/if}
         {/if}
     </div>
-    {if $Vyrizovani == 1 }
     <div id="dokument_blok_vyrizeni">
         <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
@@ -191,15 +190,39 @@
         </dl>
         </div>
     </div>
-    {/if}
 
     <div id="dokument_blok_poznamka">
-        <div class="h2">Předání</div>
+        <div class="h2">Vytvořil a vyřídil</div>
+        {if $Dok->typ_dokumentu->smer == 1}
+        {foreach $Dok->workflow as $workflow}
+        {if $workflow->stav_dokumentu==1}
+        <dl class="detail_item">
+            <dt>Vytvořil:</dt>
+            <dd>
+            {if empty($workflow->prideleno_id) }
+                organizační jednotce
+                <br />
+                {$workflow->orgjednotka_info->zkraceny_nazev}
+            {else}
+                {$workflow->prideleno_jmeno}
+                <br />
+                {=@$workflow->orgjednotka_info->zkraceny_nazev}
+            {/if}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Vytvořil dne:</dt>
+            <dd>{$workflow->date|edatetime}</dd>
+        </dl>         
+        <?php break; ?>
+        {/if}
+        {/foreach}
+        {/if}        
         {if is_null($Dok->prideleno)}
         <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
         {else}
         <dl class="detail_item">
-            <dt>Přiděleno:</dt>
+            <dt>Vyřídil:</dt>
             <dd>
             {if empty($Dok->prideleno->prideleno_id) }
                 organizační jednotce
@@ -213,43 +236,10 @@
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>Přiděleno dne:</dt>
-            <dd>{$Dok->prideleno->date|edatetime}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Poznámka pro přiděleného:</dt>
-            <dd>{!$Dok->prideleno->poznamka|enl2br}&nbsp;</dd>
-        </dl>
+            <dt>Datum vyřízení:</dt>
+            <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
+        </dl>           
         {/if}
-
-        {if !is_null($Dok->predano)}
-        <dl class="detail_item">
-            <dt>Předáno:</dt>
-            <dd>
-            {if empty($Dok->predano->prideleno_id) }
-                organizační jednotce
-                <br />
-                {$Dok->predano->orgjednotka_info->zkraceny_nazev}
-            {else}
-                {$Dok->predano->prideleno_jmeno}
-                <br />
-                {=@$Dok->predano->orgjednotka_info->zkraceny_nazev}
-            {/if}
-            </dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Předáno dne:</dt>
-            <dd>{$Dok->predano->date|edatetime}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Poznámka pro předávajícího:</dt>
-            <dd>{!$Dok->predano->poznamka|enl2br}&nbsp;</dd>
-        </dl>
-        {/if}
-        <dl class="detail_item">
-            <dt>Lhůta k vyřízení:</dt>
-            <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd>
-        </dl>
     </div>
     
     {if !empty($Zapujcka->id)}
@@ -260,19 +250,19 @@
             <dd>
                 {=Osoba::displayName($Zapujcka)}
             </dd>
-            <dl class="detail_item">
-                <dt>Důvod zapůjčení:</dt>
-                <dd>{$Zapujcka->duvod|enl2br}&nbsp;</dd>
-            </dl>
-            <dl class="detail_item">
-                <dt>Datum výpůjčky:</dt>
-                <dd>{$Zapujcka->date_od|edate}</dd>
-            </dl>
-            <dl class="detail_item">
-                <dt>Datum vrácení:</dt>
-                <dd>{$Zapujcka->date_do|edate}</dd>
-            </dl>         
         </dl>
+        <dl class="detail_item">
+            <dt>Důvod zapůjčení:</dt>
+            <dd>{$Zapujcka->duvod|enl2br}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum výpůjčky:</dt>
+            <dd>{$Zapujcka->date_od|edate}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum vrácení:</dt>
+            <dd>{$Zapujcka->date_do|edate}</dd>
+        </dl>          
     </div>
     {/if}    
 

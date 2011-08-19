@@ -241,7 +241,32 @@
     </div>
 
     <div id="dokument_blok_poznamka">
-        <div class="h2">Vyřídil</div>
+        <div class="h2">Vytvořil a vyřídil</div>
+        {if $Dok->typ_dokumentu->smer == 1}
+        {foreach $Dok->workflow as $workflow}
+        {if $workflow->stav_dokumentu==1}
+        <dl class="detail_item">
+            <dt>Vytvořil:</dt>
+            <dd>
+            {if empty($workflow->prideleno_id) }
+                organizační jednotce
+                <br />
+                {$workflow->orgjednotka_info->zkraceny_nazev}
+            {else}
+                {$workflow->prideleno_jmeno}
+                <br />
+                {=@$workflow->orgjednotka_info->zkraceny_nazev}
+            {/if}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Vytvořil dne:</dt>
+            <dd>{$workflow->date|edatetime}</dd>
+        </dl>         
+        <?php break; ?>
+        {/if}
+        {/foreach}
+        {/if}        
         {if is_null($Dok->prideleno)}
         <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
         {else}
@@ -258,11 +283,11 @@
                 {=@$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
             {/if}
             </dd>
-            <dl class="detail_item">
-                <dt>Datum vyřízení:</dt>
-                <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
-            </dl>            
         </dl>
+        <dl class="detail_item">
+            <dt>Datum vyřízení:</dt>
+            <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
+        </dl>           
         {/if}
     </div>
     
@@ -274,19 +299,19 @@
             <dd>
                 {=Osoba::displayName($Zapujcka)}
             </dd>
-            <dl class="detail_item">
-                <dt>Důvod zapůjčení:</dt>
-                <dd>{$Zapujcka->duvod|enl2br}&nbsp;</dd>
-            </dl>
-            <dl class="detail_item">
-                <dt>Datum výpůjčky:</dt>
-                <dd>{$Zapujcka->date_od|edate}</dd>
-            </dl>
-            <dl class="detail_item">
-                <dt>Datum vrácení:</dt>
-                <dd>{$Zapujcka->date_do|edate}</dd>
-            </dl>         
         </dl>
+        <dl class="detail_item">
+            <dt>Důvod zapůjčení:</dt>
+            <dd>{$Zapujcka->duvod|enl2br}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum výpůjčky:</dt>
+            <dd>{$Zapujcka->date_od|edate}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Datum vrácení:</dt>
+            <dd>{$Zapujcka->date_do|edate}</dd>
+        </dl>          
     </div>
     {/if}
 
