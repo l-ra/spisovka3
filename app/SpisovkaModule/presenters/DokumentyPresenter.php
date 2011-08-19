@@ -377,6 +377,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $formUpravit = $this->getParam('upravit',null);
             }
 
+            if ( $dokument->stav_dokumentu == 1 ) {
+                $this->template->isRozdelany = true;
+            } else {
+                $this->template->isRozdelany = false;
+            }   
+            if ( $user->isInRole('superadmin') ) {
+                // muze editovat vse
+                $this->template->isRozdelany = true;
+            }
+            
             $this->template->FormUpravit = $formUpravit;
 
             if ( $this->getParam('udalost1',false) && $dokument->stav_dokumentu == 4) {
@@ -1514,11 +1524,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $typ_dokumentu = Dokument::typDokumentu(null,1);
             $this->template->isPodatelna = false;
         }  
-        //if ( @$Dok->stav_dokumentu == 1 ) {
-            $this->template->isRozdelany = true;
-        //} else {
-        //    $this->template->isRozdelany = false;
-        //}
         
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
 
@@ -1537,34 +1542,26 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$Dok->popis);
-        //if ( $this->template->isRozdelany ) {
-            $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
-                    ->setValue(@$Dok->dokument_typ_id);
-                    //->controlPrototype->readonly = TRUE;
-        //}
+        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
+                ->setValue(@$Dok->dokument_typ_id);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$Dok->cislo_jednaci_odesilatele);
-                //->controlPrototype->readonly = TRUE;
 
-        //if ( $this->template->isRozdelany) {
-        
-            $unixtime = strtotime(@$Dok->datum_vzniku);
-            if ( $unixtime == 0 ) {
-                $datum = date('d.m.Y');
-                $cas = date('H:i:s');
-            } else {
-                $datum = date('d.m.Y',$unixtime);
-                $cas = date('H:i:s',$unixtime);
-            }
+        $unixtime = strtotime(@$Dok->datum_vzniku);
+        if ( $unixtime == 0 ) {
+            $datum = date('d.m.Y');
+            $cas = date('H:i:s');
+        } else {
+            $datum = date('d.m.Y',$unixtime);
+            $cas = date('H:i:s',$unixtime);
+        }
 
-            $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10)
-                    ->setValue($datum);
-            $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
-                    ->setValue($cas);
-
-            $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:',$zpusob_doruceni)
-                    ->setValue(@$Dok->zpusob_doruceni_id);
-        //}
+        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10)
+                ->setValue($datum);
+        $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
+                ->setValue($cas);
+        $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:',$zpusob_doruceni)
+                ->setValue(@$Dok->zpusob_doruceni_id);
         
         $form->addText('cislo_doporuceneho_dopisu', 'Číslo jdoporučeného dopisu:', 50, 50)
                 ->setValue(@$Dok->cislo_doporuceneho_dopisu);          
@@ -1600,21 +1597,29 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function upravitMetadataClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        //Debug::dump($data); exit;
-
-        $dokument_id = $data['id'];
-
-        // uprava casu
-        if ( isset($data['datum_vzniku']) ) {
-            $data['datum_vzniku'] = $data['datum_vzniku'] ." ". $data['datum_vzniku_cas'];
-        }
-        unset($data['datum_vzniku_cas']);
-
-        //Debug::dump($data); exit;
-
+        
         $Dokument = new Dokument();
+        $dokument_id = $data['id'];
+        $dok = $Dokument->getInfo($dokument_id);        
 
-        $dok = $Dokument->getInfo($dokument_id);
+        //Debug::dump($data);
+        
+        if ( !($dok->stav_dokumentu == 1 || Environment::getUser()->isInRole('superadmin')) ) {
+            // needitovatelne skryte polozky
+            $data['datum_vzniku'] = $dok->datum_vzniku;
+            $data['dokument_typ_id'] = $dok->typ_dokumentu->id;
+            $data['zpusob_doruceni_id'] = $dok->zpusob_doruceni_id;
+            unset($data['datum_vzniku_cas']);
+        } else {
+            // uprava casu
+            if ( isset($data['datum_vzniku']) ) {
+                $data['datum_vzniku'] = $data['datum_vzniku'] ." ". $data['datum_vzniku_cas'];
+            }
+            unset($data['datum_vzniku_cas']);            
+        }
+        
+        //Debug::dump($data); exit;
+        //Debug::dump($dok); exit;
 
         try {
 

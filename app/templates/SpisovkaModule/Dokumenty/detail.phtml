@@ -299,10 +299,10 @@
             <dt>Zmocnění:</dt>
             <dd><span id="dok_zmocneni"></span>&nbsp;<a href="{link :Spisovka:Dokumenty:zmocneni, 'id'=>$Dok->dokument_id}" id="dialog-zmocneni">Připojit zmocnění</a></dd>
         </dl>-->
-        <dl class="detail_item">
+        {if 0}<dl class="detail_item">
             <dt>Poznámka:</dt>
             <dd>{$metadataForm['poznamka']->control}</dd>
-        </dl>
+        </dl>{/if}
         {if $Typ_evidence == 'priorace'}
         <dl class="detail_item">
             <dt>Spojit s dokumentem:</dt>
