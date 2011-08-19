@@ -1,6 +1,6 @@
 <?php
 
-class Ares extends Object {
+class Ares {
 
     //const URL = 'http://wwwinfo.mfcr.cz/cgi-bin/ares/darv_res.cgi?';
     const URL = 'http://wwwinfo.mfcr.cz/cgi-bin/ares/darv_bas.cgi?';
@@ -177,29 +177,38 @@ class Ares extends Object {
             return null;
         }
     }
-
-    private function jetoIC($ic) {
+   
+    public function jetoIC($ic) {
   
+        // odstranime vsemozne mezery
         $ic = preg_replace('#\s+#', '', $ic);
-        // má požadovaný tvar?
-        if (!preg_match('#^\d{8}$#', $ic)) {
-            return FALSE;
+        // je to cislo?
+        if ( !is_numeric($ic) ) return false;
+        // toto nechapu, ale vsude se uvadi
+        if ( strlen($ic) == 0 ) return true;
+        
+        $pocet = strlen($ic);
+        // doplnime nuly pokud je cifra < 8
+        if ( $pocet < 8 ) {
+            $nuly = "00000000";
+            $ic = substr($nuly,0,8-$pocet) . $ic;
         }
+
         // kontrolní součet
-        $a = 0;
+        $a = 0; $c = 0;
         for ($i = 0; $i < 7; $i++) {
             $a += $ic[$i] * (8 - $i);
         }
         $a = $a % 11;
-
-        if ($a === 0)  $c = 1;
+        
+        if     ($a === 0)  $c = 1;
         elseif ($a === 10) $c = 1;
         elseif ($a === 1)  $c = 0;
         else               $c = 11 - $a;
 
         return (int) $ic[7] === $c;
 
-    }
+    }    
 	
 }
 
