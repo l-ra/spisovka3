@@ -11,15 +11,21 @@
         <span class="button">první</span>
         <span class="button">předchozí</span>
 	{else}
-	<a href="{link this, 'page' => $paginator->getFirstPage()}">první</a>
-        <a href="{link this, 'page' => $paginator->page - 1}">předchozí</a>
+	<a href="{link this, 'page' => $paginator->getFirstPage()}{$query_first}">první</a>
+        {if ($paginator->page - 1)==1}
+        <a href="{link this, 'page' => $paginator->page - 1}{$query_first}">předchozí</a>
+        {else}
+        <a href="{link this, 'page' => $paginator->page - 1}{$other_params}">předchozí</a>
+        {/if}
 	{/if}
 
 	{foreach $steps as $step}
 	{if $step == $paginator->page}
 		<span class="current">{$step}</span>
-	{else}
-		<a href="{link this, 'page' => $step}">{$step}</a>
+	{elseif $step==1}
+		<a href="{link this, 'page' => $step}{$query_first}">{$step}</a>
+        {else}
+		<a href="{link this, 'page' => $step}{$other_params}">{$step}</a>
 	{/if}
 	{if $iterator->nextValue > $step + 1}<span>…</span>{/if}
 	{/foreach}
@@ -28,8 +34,8 @@
 	<span class="button">další</span>
         <span class="button">poslední</span>
 	{else}
-	<a href="{link this, 'page' => $paginator->page + 1}">další</a>
-        <a href="{link this, 'page' => $paginator->getLastPage()}">poslední</a>
+	<a href="{link this, 'page' => $paginator->page + 1}{$other_params}">další</a>
+        <a href="{link this, 'page' => $paginator->getLastPage()}{$other_params}">poslední</a>
 	{/if}
 
 

@@ -72,6 +72,27 @@ class VisualPaginator extends Control
 			$steps = array_values(array_unique($arr));
 		}
 
+                $url = Environment::getHttpRequest()->getUri()->getRelativeUri();
+                $query_string = Environment::getHttpRequest()->getUri()->getQuery();
+                $query_params = "";
+                parse_str($query_string, $query);
+                unset($query['vp-page']);
+                if ( count($query)>0 ) {
+                    foreach ( $query as $key=>$value ) {
+                        if ( empty($key) ) continue;
+                        $query_params .= "&". $key ."=". @urlencode($value);
+                    }
+                }
+                $query_params = substr($query_params, 1);
+
+                if ( !empty($query_params) ) {
+                    $this->template->query_first = "?".$query_params;
+                    $this->template->other_params = "&". $query_params;
+                } else {
+                    $this->template->query_first = "";
+                    $this->template->other_params = "";
+                }
+                
 		$this->template->steps = $steps;
 		$this->template->paginator = $paginator;
 		$this->template->setFile(dirname(__FILE__) . '/template.phtml');
