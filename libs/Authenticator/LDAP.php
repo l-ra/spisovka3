@@ -542,7 +542,7 @@ class Authenticator_LDAP extends Control implements IAuthenticator
             foreach ($seznam as $user) {
 
                 $form->addGroup($user['plne_jmeno'] ." - ". $user['uid']);
-                $subForm = $form->addContainer('user_'.$user['uid']);
+                $subForm = $form->addContainer('user_'. String::webalize($user['uid']));
 
                 if ( !isset($user_seznam[ $user['uid'] ])  ) {
                     $subForm->addCheckbox('add', 'Připojit');
