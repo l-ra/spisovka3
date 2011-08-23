@@ -31,7 +31,7 @@ class AbcPaginator extends Control
     public function render()
     {
 
-        $this->template->url = Environment::getHttpRequest()->getUri()->getRelativeUri();
+        $this->template->url = Environment::getHttpRequest()->getUri()->getPath();
         $this->template->abc = $this->presenter->getParam('abc');
 
         $this->template->setFile(dirname(__FILE__) . '/template.phtml');

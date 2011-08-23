@@ -72,7 +72,7 @@ class VisualPaginator extends Control
 			$steps = array_values(array_unique($arr));
 		}
 
-                $url = Environment::getHttpRequest()->getUri()->getRelativeUri();
+                $url = Environment::getHttpRequest()->getUri()->getPath();
                 $query_string = Environment::getHttpRequest()->getUri()->getQuery();
                 $query_params = "";
                 parse_str($query_string, $query);
