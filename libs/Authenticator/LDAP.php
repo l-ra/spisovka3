@@ -316,12 +316,12 @@ class Authenticator_LDAP extends Control implements IAuthenticator
 
         for($i = 0; $i < $info["count"]; $i++) {
             
-            $user[$i]["dn"] = $info[$i]["dn"];
-            $user[$i]["plne_jmeno"] = $info[$i]["cn"][0];
-            $user[$i]["uid"] = $info[$i]["uid"][0];
-            $user[$i]["jmeno"] = $info[$i]["givenname"][0];
-            $user[$i]["prijmeni"] = $info[$i]["sn"][0];
-            $user[$i]["email"] = $info[$i]["mail"][0];
+            $user[$i]["dn"] = isset($info[$i]["dn"][0])?$info[$i]["dn"][0]:"";
+            $user[$i]["plne_jmeno"] = isset($info[$i]["cn"][0])?$info[$i]["cn"][0]:"";
+            $user[$i]["uid"] = isset($info[$i]["uid"][0])?$info[$i]["uid"][0]:"";
+            $user[$i]["jmeno"] = isset($info[$i]["givenname"][0])?$info[$i]["givenname"][0]:"";
+            $user[$i]["prijmeni"] = isset($info[$i]["sn"][0])?$info[$i]["sn"][0]:$user[$i]["plne_jmeno"];
+            $user[$i]["email"] = isset($info[$i]["mail"][0])?$info[$i]["mail"][0]:"";
 
             foreach ($info[$i] as $key => $value) {
                 if ( is_numeric($key) ) continue;
