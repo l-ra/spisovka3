@@ -6,6 +6,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     private $filtr;
     private $filtr_bezvyrizenych;
     private $hledat;
+    private $seradit;
     private $odpoved = null;
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
@@ -50,6 +51,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
         if ( isset($filtr) ) {
             // zjisten filtr
+            $this->getHttpResponse()->setCookie('s3_filtr', serialize($filtr), strtotime('90 day'));
             $args = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
             $this->filtr = $filtr['filtr'];
             $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
@@ -89,7 +91,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         if ( isset($seradit) ) {
             $Dokument->seradit($args, $seradit);
+            $this->getHttpResponse()->setCookie('s3_seradit', $seradit, strtotime('90 day'));
+        } else {
+            $seradit = $this->getHttpRequest()->getCookie('s3_seradit');            
+            if ( $seradit ) {
+                // zjisteno razeni v cookie, tak vezmeme z nej
+                $Dokument->seradit($args, $seradit);
+            }           
         }
+        $this->seradit = $seradit;
+        $this->template->s3_seradit = $seradit;        
         $this->template->seradit = $seradit;
 
         $args = $Dokument->spisovka($args);
@@ -142,6 +153,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->seznam = $seznam;
 
         $this->template->filtrForm = $this['filtrForm'];
+        $this->template->seraditForm = $this['seraditForm'];
 
     }
 
@@ -2685,5 +2697,52 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
 
+    protected function createComponentSeraditForm()
+    {
+
+        $select = array(
+            'stav'=>'stavu dokumentu (sestupně)',
+            'stav_desc'=>'stavu dokumentu (vzestupně)',
+            'cj'=>'čísla jednacího (sestupně)',
+            'cj_desc'=>'čísla jednacího (vzestupně)',
+            'jid'=>'JID (sestupně)',
+            'jid_desc'=>'JID (vzestupně)',
+            'dvzniku'=>'data přijetí/vzniku (sestupně)',
+            'dvzniku_desc'=>'data přijetí/vzniku (vzestupně)',
+            'vec'=>'věci (sestupně)',
+            'vec_desc'=>'věci (vzestupně)',
+            'prideleno'=>'přidělené osoby (sestupně)',
+            'prideleno_desc'=>'přidělené osoby (vzestupně)',
+        );
+
+        $seradit =  !is_null($this->seradit)?$this->seradit:null;
+        
+        $form = new AppForm();
+        $form->addSelect('seradit', 'Seřadit podle:', $select)
+                ->setValue($seradit)
+                ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
+        $form->addSubmit('go_seradit', 'Seřadit')
+                 ->setRendered(TRUE)
+                 ->onClick[] = array($this, 'seraditClicked');
+
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = null;
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
+
+        return $form;
+    }
+
+    public function seraditClicked(SubmitButton $button)
+    {
+        $form_data = $button->getForm()->getValues();
+        $this->getHttpResponse()->setCookie('s3_seradit', $form_data['seradit'], strtotime('90 day'));
+        $this->forward(':Spisovka:Dokumenty:default', array('seradit'=>$form_data['seradit']) );
+    }
+    
+    
 }
 

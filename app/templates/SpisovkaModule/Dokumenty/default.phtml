@@ -29,40 +29,10 @@
         </div>
     </div>
     
-    <div style="clear:both;">&nbsp;</div>
+    <br style="clear:both;" />
 
     <div style="margin: 3px 0px;" id="seradit">
-    seřadit podle:
-    {if $seradit == "stav"}
-        <a href="{link this, 'seradit'=>'stav_desc'}" title="Seřadit podle stavu dokumentu (nový, předaný, vyřizuje se, vyřízený, ...)">stavu</a> &nbsp;
-    {else}
-        <a href="{link this, 'seradit'=>'stav'}" title="Seřadit podle stavu dokumentu (nový, předaný, vyřizuje se, vyřízený, ...)">stavu</a> &nbsp;
-    {/if}
-    {if $seradit == "cj"}
-        <a href="{link this, 'seradit'=>'cj_desc'}" title="Seřadit podle čísla jednacího">čísla jednacího</a> &nbsp;
-    {else}
-        <a href="{link this, 'seradit'=>'cj'}" title="Seřadit podle čísla jednacího">čísla jednacího</a> &nbsp;
-    {/if}
-    {if $seradit == "jid"}
-        <a href="{link this, 'seradit'=>'jid_desc'}" title="Seřadit podle JID (jednoznačného identifikátoru)">JID</a> &nbsp;
-    {else}
-        <a href="{link this, 'seradit'=>'jid'}" title="Seřadit podle JID (jednoznačného identifikátoru)">JID</a> &nbsp;
-    {/if}
-    {if $seradit == "dvzniku"}
-        <a href="{link this, 'seradit'=>'dvzniku_desc'}" title="Seřadit podle data přijetí/vzniku">data přijetí/vzniku</a> &nbsp;
-    {else}
-        <a href="{link this, 'seradit'=>'dvzniku'}" title="Seřadit podle data přijetí/vzniku">data přijetí/vzniku</a> &nbsp;
-    {/if}
-    {if $seradit == "vec"}
-        <a href="{link this, 'seradit'=>'vec_desc'}" title="Seřadit podle věci">věci</a> &nbsp;
-    {else}
-        <a href="{link this, 'seradit'=>'vec'}" title="Seřadit podle věci">věci</a> &nbsp;
-    {/if}
-    {if $seradit == "prideleno"}
-        <a href="{link this, 'seradit'=>'prideleno_desc'}" title="Seřadit podle příjmení osoby přidělené k dokumentu">přidělené osoby</a> &nbsp;
-    {else}
-        <a href="{link this, 'seradit'=>'prideleno'}" title="Seřadit podle příjmení osoby přidělené k dokumentu">přidělené osoby</a> &nbsp;
-    {/if}
+    {control seraditForm}
     </div>
 
     <div id="dokumenty">

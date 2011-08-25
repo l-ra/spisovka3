@@ -168,10 +168,10 @@ class Dokument extends BaseModel
 
         switch ($typ) {
             case 'stav':
-                $args['order'] = array('wf.stav_dokumentu');
+                $args['order'] = array('wf.aktivni','wf.stav_dokumentu');
                 break;
             case 'stav_desc':
-                $args['order'] = array('wf.stav_dokumentu'=>'DESC');
+                $args['order'] = array('wf.aktivni','wf.stav_dokumentu'=>'DESC');
                 break;
             case 'cj':
                 $args['order'] = array('d.podaci_denik_rok','d.podaci_denik_poradi','d.poradi');
@@ -204,14 +204,48 @@ class Dokument extends BaseModel
                 $args['order'] = array('d.skartacni_znak'=>'DESC','d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC');
                 break;
             case 'spisovy_znak':
-                $args['order'] = array('d.skartacni_znak','d.podaci_denik_rok','d.podaci_denik_poradi');
+                $args['leftJoin']['sznak'] = array(
+                    'from'=> array($this->tb_spisovy_znak => 'sznak'),
+                    'on' => array('sznak.id=d.spisovy_znak_id'),
+                    'cols' => null
+                );                
+                $args['order'] = array('sznak.nazev','d.podaci_denik_rok','d.podaci_denik_poradi');
                 break;
             case 'spisovy_znak_desc':
-                $args['order'] = array('d.skartacni_znak'=>'DESC','d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC');
+                $args['leftJoin']['sznak'] = array(
+                    'from'=> array($this->tb_spisovy_znak => 'sznak'),
+                    'on' => array('sznak.id=d.spisovy_znak_id'),
+                    'cols' => null
+                );                
+                $args['order'] = array('sznak.nazev'=>'DESC','d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC');
                 break;
             case 'prideleno':
-                //$args['order'] = array('podaci_denik_rok'=>'DESC','podaci_denik_poradi'=>'DESC');
+                $args['leftJoin']['wf_user'] = array(
+                    'from'=> array($this->tb_osoba_to_user => 'wf_user'),
+                    'on' => array('wf_user.user_id=wf.prideleno_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['wf_osoba'] = array(
+                    'from'=> array($this->tb_osoba => 'oso'),
+                    'on' => array('oso.id=wf_user.osoba_id'),
+                    'cols' => null
+                );
+                $args['order'] = array('oso.prijmeni','oso.jmeno');                
                 break;
+            case 'prideleno_desc':
+                $args['leftJoin']['wf_user'] = array(
+                    'from'=> array($this->tb_osoba_to_user => 'wf_user'),
+                    'on' => array('wf_user.user_id=wf.prideleno_id'),
+                    'cols' => null
+                );
+                $args['leftJoin']['wf_osoba'] = array(
+                    'from'=> array($this->tb_osoba => 'oso'),
+                    'on' => array('oso.id=wf_user.osoba_id'),
+                    'cols' => null
+                );
+                $args['order'] = array('oso.prijmeni'=>'DESC','oso.jmeno'=>'DESC');                
+                break;
+            
             default:
                 break;
         }

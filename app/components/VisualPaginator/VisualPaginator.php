@@ -76,7 +76,9 @@ class VisualPaginator extends Control
                 $query_string = Environment::getHttpRequest()->getUri()->getQuery();
                 $query_params = "";
                 parse_str($query_string, $query);
-                unset($query['vp-page']);
+                //Debug::dump($query);
+                unset($query['vp-page'],$query['seradit'],$query['filtr']);
+                //Debug::dump($query);
                 if ( count($query)>0 ) {
                     foreach ( $query as $key=>$value ) {
                         if ( empty($key) ) continue;
