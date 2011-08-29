@@ -1446,6 +1446,10 @@ class Dokument extends BaseModel
                 $dokument->nazev = "(bez názvu)";
             }
             
+            if ( strpos($dokument->cislo_jednaci,"odpoved_") !== false ) {
+                $dokument->cislo_jednaci = "";
+            }
+            
             return $dokument;
 
 
