@@ -157,10 +157,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
 
         if ( isset($hledat) ) {
-
             if (is_array($hledat) ) {
                 // podrobne hledani = array
-                $args = $hledat;
+                $args = $Dokument->filtr(null,$hledat);
                 $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
             } else {
                 // rychle hledani = string
@@ -168,8 +167,25 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $this->hledat = $hledat;
                 $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
             }
-
+            $this->getHttpResponse()->setCookie('s3_spisovna_hledat', serialize($hledat), strtotime('90 day'));
+        } else {
+            $cookie_hledat = $this->getHttpRequest()->getCookie('s3_spisovna_hledat');            
+            if ( $cookie_hledat ) {
+                // zjisteno hladaci filtr v cookie, tak vezmeme z nej
+                $hledat = unserialize($cookie_hledat);
+                if (is_array($hledat) ) {
+                    // podrobne hledani = array
+                    $args = $Dokument->filtr(null,$hledat);
+                    $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
+                } else {
+                    // rychle hledani = string
+                    $args = $Dokument->hledat($hledat);
+                    $this->hledat = $hledat;
+                    $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
+                }
+            }
         }
+        $this->template->s3_hledat = $hledat;        
 
         if ( isset($seradit) ) {
             $Dokument->seradit($args, $seradit);
@@ -768,7 +784,20 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $form = new AppForm();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
-        $form['dotaz']->getControlPrototype()->title = "Hledat lze dle věci, popisu, čísla jednacího a JID";
+
+        $cookie_hledat = $this->getHttpRequest()->getCookie('s3_spisovna_hledat');
+        $s3_hledat = unserialize($cookie_hledat);
+        if ( is_array($s3_hledat) ) {
+            $controlPrototype = $form['dotaz']->getControlPrototype();
+            $controlPrototype->style(array('background-color' => '#ccffcc','border'=>'1px #c0c0c0 solid'));
+            $controlPrototype->title = "Aplikováno pokročilé vyhledávání. Pro detail klikněte na odkaz \"Pokročilé vyhledávání\". Zadáním hodnoty do tohoto pole, se pokročilé vyhledávání zruší a aplikuje se rychlé vyhledávání.";  
+        } else if ( !empty($hledat) ) {
+            $controlPrototype = $form['dotaz']->getControlPrototype();
+            //$controlPrototype->style(array('background-color' => '#ccffcc','border'=>'1px #c0c0c0 solid'));
+            $controlPrototype->title = "Hledat lze dle věci, popisu, čísla jednacího a JID";  
+        } else {
+            $form['dotaz']->getControlPrototype()->title = "Hledat lze dle věci, popisu, čísla jednacího a JID";  
+        }        
 
         $form->addSubmit('hledat', 'Hledat')
                  ->onClick[] = array($this, 'hledatSimpleClicked');
@@ -787,7 +816,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $this->forward('this', array('hledat'=>$data['dotaz']));
+        //$this->forward('this', array('hledat'=>$data['dotaz']));
+        $this->redirect(':Spisovna:Dokumenty:default',array('hledat'=>$data['dotaz']));
 
     }
 

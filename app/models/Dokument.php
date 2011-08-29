@@ -604,7 +604,7 @@ class Dokument extends BaseModel
         }
         if ( isset($params['spousteci_udalost']) ) {
             if ( !empty($params['spousteci_udalost']) ) {
-                $args['where'][] = array('d.spousteci_udalost = %s',$params['spousteci_udalost']);
+                $args['where'][] = array('d.spousteci_udalost_id = %s',$params['spousteci_udalost']);
             }
         }
         if ( isset($params['spousteci_udalost_id']) ) {

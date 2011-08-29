@@ -867,6 +867,21 @@ label.required {
     color: white; font-weight: bold;
 }
 
+/* ******************************************************************* */
+/* *** SERADIT CONTROL *** */
+#seradit {
+    margin: 20px 0px;
+    text-align: left;
+}
+#seradit #frmseraditForm-seradit {
+    border: 1px solid #03406A;
+    color: #03406A;
+}
+#seradit #frmseraditForm-go_seradit {
+    background: #03406A;
+    border: 1px solid #03406A;
+    color: white; font-weight: bold;
+}
 
 /* ******************************************************************* */
 /* *** SEARCH cONTROL *** */
