@@ -469,7 +469,12 @@ class Authenticator_LDAP extends Control implements IAuthenticator
         $form = new AppForm($this, $name);
 
         $Role = new RoleModel();
-        $role_seznam = $Role->select();
+        $role_seznam = $Role->seznam();
+        $role_select = array();
+        foreach ($role_seznam as $key => $value) {
+            if ( $value->fixed == 1 ) continue;
+            $role_select[ $value->id ] = $value->name;
+        }  
 
         $params = Environment::getVariable('auth_params_new');
         $form->addHidden('osoba_id')->setValue($params['osoba_id']);
@@ -505,7 +510,7 @@ class Authenticator_LDAP extends Control implements IAuthenticator
                 //->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
                 ->addConditionOn($form["heslo"], Form::FILLED)
                     ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
-        $form->addSelect('role', 'Role:', $role_seznam);
+        $form->addSelect('role', 'Role:', $role_select);
 
 
         $form->addSubmit('new_user', 'Vytvořit účet');

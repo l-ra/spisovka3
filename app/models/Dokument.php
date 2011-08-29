@@ -1019,9 +1019,13 @@ class Dokument extends BaseModel
                 );
                 break;
             case 'vse':
-                $args = array(
-                    'where' => array( $where_org )
-                );
+                if ( !is_null($where_org) ) {
+                    $args = array(  
+                        'where' => array( $where_org )
+                    );
+                } else {
+                    $args = array();
+                }
                 break;
             default:
                 $args = array(
