@@ -207,8 +207,11 @@ class CisloJednaci extends BaseModel
 
     public function nacti($cjednaci_id, $generuj = 0) {
 
-            $row = $this->fetchRow(array(array('id=%i',$cjednaci_id)))->fetch();
+            
+        $row = $this->fetchRow(array(array('id=%i',$cjednaci_id)))->fetch();
 
+        if ( $row ) {
+            
             $info = array();
             $info['id'] = $cjednaci_id;
 
@@ -234,6 +237,9 @@ class CisloJednaci extends BaseModel
             $info['user_poradi'] = $row->user_poradi;
 
             return $this->generuj($generuj, $info);
+        } else {
+            return $this->generuj($generuj);
+        }
 
     }
 

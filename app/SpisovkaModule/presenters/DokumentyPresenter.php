@@ -912,9 +912,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = array(
                 array('stav=%i',0),
-                array('dokument_typ_id<>%i', 3),
-                array('user_created=%i',Environment::getUser()->getIdentity()->id)
+                array('user_created=%i',Environment::getUser()->getIdentity()->id),
         );
+        
         $args_rozd['order'] = array('date_created'=>'DESC');
 
         $this->template->Typ_evidence = $this->typ_evidence;
@@ -1028,7 +1028,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $args_rozd = array();
             $args_rozd['where'] = array(
                 array('stav=%i',0),
-                array('dokument_typ_id=%i',3),
+                array('dokument_typ_id=%i',2),
                 array('cislo_jednaci=%s',"odpoved_". $dok->id),
                 array('user_created=%i',Environment::getUser()->getIdentity()->id)
             );
@@ -1085,7 +1085,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     "nazev" => $dok->nazev,
                     "popis" => $dok->popis,
                     "stav" => 0,
-                    "dokument_typ_id" => 3,
+                    "dokument_typ_id" => 2,
                     "zpusob_doruceni_id" => null,
                     "cislo_jednaci" => ("odpoved_". $dok->id),
                     "poradi" => ($poradi),
