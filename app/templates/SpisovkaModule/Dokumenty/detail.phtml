@@ -92,7 +92,7 @@
        {if ($Pridelen==1 && $Vyrizovani == 0 ) }
        <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="kvyrizenidokument">Označit k vyřízení</a>
        {/if}
-       {if ($Pridelen=1) }
+       {if ($Pridelen==1 && !empty($Dok->cislo_jednaci)) }
        <a href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
@@ -101,8 +101,6 @@
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
        <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
        {/if}
-
-
     </div>
     {/accessedit}
     {if $Zapujcka}

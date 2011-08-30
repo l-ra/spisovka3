@@ -1029,7 +1029,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $args_rozd['where'] = array(
                 array('stav=%i',0),
                 array('dokument_typ_id=%i',2),
-                array('cislo_jednaci=%s',"odpoved_". $dok->id),
+                array('cislo_jednaci=%s',$dok->cislo_jednaci),
                 array('user_created=%i',Environment::getUser()->getIdentity()->id)
             );
             $args_rozd['order'] = array('date_created'=>'DESC');
@@ -1087,7 +1087,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     "stav" => 0,
                     "dokument_typ_id" => 2,
                     "zpusob_doruceni_id" => null,
-                    "cislo_jednaci" => ("odpoved_". $dok->id),
+                    "cislo_jednaci_id" => $dok->cislo_jednaci_id,
+                    "cislo_jednaci" => $dok->cislo_jednaci,
+                    "podaci_denik" => $dok->podaci_denik,
+                    "podaci_denik_poradi" => $dok->podaci_denik_poradi,
+                    "podaci_denik_rok" => $dok->podaci_denik_rok,
                     "poradi" => ($poradi),
                     "cislo_jednaci_odesilatele" => $dok->cislo_jednaci_odesilatele,
                     "datum_vzniku" => date('Y-m-d H:i:s'),
