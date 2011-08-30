@@ -1070,9 +1070,9 @@ class Dokument extends BaseModel
     public function spisovka($args) {
 
         if ( isset($args['where']) ) {
-            $args['where'][] = array('d.stav < 2');
+            $args['where'][] = array('d.stav = 1');
         } else {
-            $args['where'] = array(array('d.stav < 2'));
+            $args['where'] = array(array('d.stav = 1'));
         }
 
         return $args;
