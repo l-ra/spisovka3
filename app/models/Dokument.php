@@ -1591,32 +1591,37 @@ class Dokument extends BaseModel
             if ( empty($data['datum_vzniku']) ) {
                 $data['datum_vzniku'] = null;
             } 
-            if ( empty($data['pocet_listu']) ) {
-                $data['pocet_listu'] = 0;
-            } else {
-                $data['pocet_listu'] = (int) $data['pocet_listu'];
-            }             
-            if ( empty($data['pocet_priloh']) ) {
-                $data['pocet_priloh'] = 0;
-            } else {
-                $data['pocet_priloh'] = (int) $data['pocet_priloh'];
-            }     
-            if ( empty($data['vyrizeni_pocet_listu']) ) {
-                $data['vyrizeni_pocet_listu'] = 0;
-            } else {
-                $data['vyrizeni_pocet_listu'] = (int) $data['vyrizeni_pocet_listu'];
-            }             
-            if ( empty($data['vyrizeni_pocet_priloh']) ) {
-                $data['vyrizeni_pocet_priloh'] = 0;
-            } else {
-                $data['vyrizeni_pocet_priloh'] = (int) $data['vyrizeni_pocet_priloh'];
-            }       
+            if ( isset($data['pocet_listu']) ) {
+                if ( empty($data['pocet_listu']) ) {
+                    $data['pocet_listu'] = 0;
+                } else {
+                    $data['pocet_listu'] = (int) $data['pocet_listu'];
+                }             
+                if ( empty($data['pocet_priloh']) ) {
+                    $data['pocet_priloh'] = 0;
+                } else {
+                    $data['pocet_priloh'] = (int) $data['pocet_priloh'];
+                }     
+            }
+            if ( isset($data['vyrizeni_pocet_listu']) ) {
+                if ( empty($data['vyrizeni_pocet_listu']) ) {
+                    $data['vyrizeni_pocet_listu'] = 0;
+                } else {
+                    $data['vyrizeni_pocet_listu'] = (int) $data['vyrizeni_pocet_listu'];
+                }             
+                if ( empty($data['vyrizeni_pocet_priloh']) ) {
+                    $data['vyrizeni_pocet_priloh'] = 0;
+                } else {
+                    $data['vyrizeni_pocet_priloh'] = (int) $data['vyrizeni_pocet_priloh'];
+                }       
+            }
             if ( empty($data['jid']) ) {
                 $unique_info = Environment::getVariable('unique_info');
                 $unique_part = explode('#',$unique_info);
                 $app_id = 'OSS-'. $unique_part[0];
                 $data['jid'] = $app_id.'-ESS-'.$dokument_id;
-            }                
+            } 
+            if ( empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = null;           
 
             $data['date_created'] = new DateTime();
             $data['user_created'] = Environment::getUser()->getIdentity()->id;
@@ -1667,26 +1672,30 @@ class Dokument extends BaseModel
             if ( empty($data['datum_vzniku']) ) {
                 $data['datum_vzniku'] = null;
             } 
-            if ( empty($data['pocet_listu']) ) {
-                $data['pocet_listu'] = 0;
-            } else {
-                $data['pocet_listu'] = (int) $data['pocet_listu'];
-            }             
-            if ( empty($data['pocet_priloh']) ) {
-                $data['pocet_priloh'] = 0;
-            } else {
-                $data['pocet_priloh'] = (int) $data['pocet_priloh'];
-            }     
-            if ( empty($data['vyrizeni_pocet_listu']) ) {
-                $data['vyrizeni_pocet_listu'] = 0;
-            } else {
-                $data['vyrizeni_pocet_listu'] = (int) $data['vyrizeni_pocet_listu'];
-            }             
-            if ( empty($data['vyrizeni_pocet_priloh']) ) {
-                $data['vyrizeni_pocet_priloh'] = 0;
-            } else {
-                $data['vyrizeni_pocet_priloh'] = (int) $data['vyrizeni_pocet_priloh'];
-            }            
+            if ( isset($data['pocet_listu']) ) {
+                if ( empty($data['pocet_listu']) ) {
+                    $data['pocet_listu'] = 0;
+                } else {
+                    $data['pocet_listu'] = (int) $data['pocet_listu'];
+                }             
+                if ( empty($data['pocet_priloh']) ) {
+                    $data['pocet_priloh'] = 0;
+                } else {
+                    $data['pocet_priloh'] = (int) $data['pocet_priloh'];
+                }     
+            }
+            if ( isset($data['vyrizeni_pocet_listu']) ) {
+                if ( empty($data['vyrizeni_pocet_listu']) ) {
+                    $data['vyrizeni_pocet_listu'] = 0;
+                } else {
+                    $data['vyrizeni_pocet_listu'] = (int) $data['vyrizeni_pocet_listu'];
+                }             
+                if ( empty($data['vyrizeni_pocet_priloh']) ) {
+                    $data['vyrizeni_pocet_priloh'] = 0;
+                } else {
+                    $data['vyrizeni_pocet_priloh'] = (int) $data['vyrizeni_pocet_priloh'];
+                }            
+            }
             
             if ( empty($data['jid']) ) {
                 $unique_info = Environment::getVariable('unique_info');
@@ -1694,6 +1703,7 @@ class Dokument extends BaseModel
                 $app_id = 'OSS-'. $unique_part[0];
                 $data['jid'] = $app_id.'-ESS-'.$dokument_id;
             }  
+            if ( empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = null;           
 
             $old_dokument = $this->getBasicInfo($dokument_id);
 
@@ -1724,6 +1734,7 @@ class Dokument extends BaseModel
                     } else {
                         $old_dokument['zpusob_vyrizeni_id'] = (int) $old_dokument['zpusob_vyrizeni_id'];
                     }
+                    if ( empty($old_dokument['skartacni_lhuta']) ) $old_dokument['skartacni_lhuta'] = null;           
                     if ( empty($old_dokument['spousteci_udalost_id']) ) $old_dokument['spousteci_udalost_id'] = null;
                     $old_dokument = (array) $old_dokument;
                     $old_dokument['dokument_id'] = $dokument_id;
