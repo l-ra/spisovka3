@@ -2641,7 +2641,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         //$this->redirect('this', array('hledat'=>$data['dotaz']));
-        $this->redirect(':Spisovka:Dokumenty:default',array('hledat'=>$data));
+        $this->redirect(':Spisovka:Dokumenty:default',array('hledat'=>$data['dotaz']));
 
     }
 
