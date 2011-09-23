@@ -1075,6 +1075,38 @@ class Dokument extends BaseModel
             $args['where'] = array(array('d.stav = 1'));
         }
 
+        // Omezeni pouze na dokumenty z vlastni organizacni jednotky
+        $user = Environment::getUser()->getIdentity();
+        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
+        $isAdmin = Environment::getUser()->isInRole('admin');
+        
+        if ( !$isAdmin ) {
+            
+            $org_jednotka = array();
+            $org_jednotka_vedouci = array();
+
+            if ( @count( $user->user_roles )>0 ) {
+                foreach ( $user->user_roles as $role ) {
+                    if ( !empty($role->orgjednotka_id) ) {
+                        if (preg_match('/^vedouci/', $role->code) ) {
+                            $org_jednotka_vedouci[] = $role->orgjednotka_id;
+                        }
+                        $org_jednotka[] = $role->orgjednotka_id;
+                    }
+                }
+            } 
+            $where_org = null;
+            if ( count($org_jednotka_vedouci) > 0 ) {
+                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka_vedouci );
+            } else if ( count($org_jednotka) == 1 ) {
+                $where_org = array( 'wf.orgjednotka_id=%i',$org_jednotka[0] );
+            } else if ( count($org_jednotka) > 1 ) {
+                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
+            }
+            $args['where'][] = array( $where_org );
+            
+        }
+        
         return $args;
     }
 
@@ -1090,6 +1122,37 @@ class Dokument extends BaseModel
                 );
         }
         
+        // Omezeni pouze na dokumenty z vlastni organizacni jednotky
+        $user = Environment::getUser()->getIdentity();
+        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
+        $isAdmin = Environment::getUser()->isInRole('admin');
+        
+        if ( !$isAdmin ) {
+            
+            $org_jednotka = array();
+            $org_jednotka_vedouci = array();
+
+            if ( @count( $user->user_roles )>0 ) {
+                foreach ( $user->user_roles as $role ) {
+                    if ( !empty($role->orgjednotka_id) ) {
+                        if (preg_match('/^vedouci/', $role->code) ) {
+                            $org_jednotka_vedouci[] = $role->orgjednotka_id;
+                        }
+                        $org_jednotka[] = $role->orgjednotka_id;
+                    }
+                }
+            } 
+            $where_org = null;
+            if ( count($org_jednotka_vedouci) > 0 ) {
+                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka_vedouci );
+            } else if ( count($org_jednotka) == 1 ) {
+                $where_org = array( 'wf.orgjednotka_id=%i',$org_jednotka[0] );
+            } else if ( count($org_jednotka) > 1 ) {
+                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
+            }
+            $args['where'][] = array( $where_org );
+            
+        }
         return $args;
     }
 
