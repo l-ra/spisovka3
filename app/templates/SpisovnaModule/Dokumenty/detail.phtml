@@ -80,7 +80,7 @@
             <dd class="nadpis">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Spisová značka:</dt>
+            <dt>Název spisu:</dt>
             <dd>
             {if count($Dok->spisy)>0 }
                 {foreach $Dok->spisy as $s}

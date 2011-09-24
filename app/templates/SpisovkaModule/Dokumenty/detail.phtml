@@ -242,7 +242,7 @@
         </dl>
         {/if}
         <dl class="detail_item">
-            <dt>Spisová značka:</dt>
+            <dt>Název spisu:</dt>
             <dd>
                 <span id="dok_spis">
                 {if count($Dok->spisy)>0 }
@@ -254,7 +254,7 @@
                 {/if}
                 </span>
                 {if $Typ_evidence != 'sberny_arch'}
-                <a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}" id="dialog-spis">Připojit spisovou značku</a>
+                <a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}" id="dialog-spis">Připojit spis</a>
                 {/if}
             </dd>
         </dl>
@@ -357,7 +357,7 @@
         </dl>
         {/if}
         <dl class="detail_item">
-            <dt>Spisová značka:</dt>
+            <dt>Název spisu:</dt>
             <dd>
             {if count($Dok->spisy)>0 }
                 {foreach $Dok->spisy as $s}

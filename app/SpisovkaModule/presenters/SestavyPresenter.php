@@ -109,7 +109,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         // sloupce
         $sloupce_nazvy = array(
                 'cislo_jednaci'=>'číslo jednací',
-                'spis'=>'Spisová značka',
+                'spis'=>'Název spisu',
                 'datum_vzniku'=>'Datum doruč./vzniku',
                 'subjekty'=>'Odesílatel / adresát',
                 'cislo_jednaci_odesilatele'=>'č.j. odesílatele',
@@ -355,7 +355,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('nazev', 'Věc:', 80, 100);
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50);
-        $form->addText('spisova_znacka', 'Spisová značka:', 50, 50);
+        $form->addText('spisova_znacka', 'Název spisu:', 50, 50);
         $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu);
         $form->addSelect('typ_doruceni', 'Způsob doručení:', $typ_doruceni);
         $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
@@ -549,7 +549,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 ->setValue(@$params['popis']);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50)
                 ->setValue(@$params['cislo_jednaci']);
-        $form->addText('spisova_znacka', 'Spisová značka:', 50, 50)
+        $form->addText('spisova_znacka', 'Název spisu:', 50, 50)
                 ->setValue(@$params['spisova_znacka']);
         $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
                 ->setValue(@$params['dokument_typ_id']);

@@ -207,9 +207,9 @@ class Admin_SpisyPresenter extends BasePresenter
                 ->setValue(@$spis->id);
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu)
                 ->setValue(@$spis->typ);
-        $form1->addText('nazev', 'Spisová značka / název:', 50, 80)
+        $form1->addText('nazev', 'Název spisu:', 50, 80)
                 ->setValue(@$spis->nazev)
-                ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
+                ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spis->popis);
 
@@ -324,8 +324,8 @@ class Admin_SpisyPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
-        $form1->addText('nazev', 'Spisová značka / název:', 50, 80)
-                ->addRule(Form::FILLED, 'Spisová značka musí být vyplněna!');
+        $form1->addText('nazev', 'Název spisu:', 50, 80)
+                ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('parent_id', 'Mateřská entita:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");

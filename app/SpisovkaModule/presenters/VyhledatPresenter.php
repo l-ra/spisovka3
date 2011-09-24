@@ -132,7 +132,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 ->setValue(@$hledat['popis']);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50)
                 ->setValue(@$hledat['cislo_jednaci']);
-        $form->addText('spisova_znacka', 'Spisová značka:', 50, 50)
+        $form->addText('spisova_znacka', 'Název spisu:', 50, 50)
                 ->setValue(@$hledat['spisova_znacka']);
         $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
                 ->setValue(@$hledat['dokument_typ_id']);

@@ -474,7 +474,7 @@ class Spis extends TreeModel
     public function kontrola($data) {
         
         $mess = array();
-        if ( empty($data->nazev) ) $mess[] = "Spisová značka (název spisu) nemůže být prázdná!";
+        if ( empty($data->nazev) ) $mess[] = "Název spisu nemůže být prázdný!";
         if ( empty($data->spisovy_znak_id) ) $mess[] = "Spisový znak nemůže být prázdný!";
         if ( empty($data->skartacni_znak) ) $mess[] = "Skartační znak nemůže být prázdný!";
         if ( $data->skartacni_lhuta === "" ) $mess[] = "Skartační lhůta musí obsahovat hodnotu!";
