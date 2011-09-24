@@ -165,7 +165,7 @@ if ( $apache_mod || $nginx_mod ) {
                 'id'        => null
         ));
         // Spisovna module
-        $router[] = new Route('spisovna/<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|prijem|keskartaciseznam|skartace>', array(
+        $router[] = new Route('spisovna/<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|prijem|keskartaciseznam|skartace|reset>', array(
                 'module'    => 'Spisovna',
                 'presenter' => 'Default',
 		'action' => 'default',
@@ -186,7 +186,7 @@ if ( $apache_mod || $nginx_mod ) {
                 'params'    => null
         ));
 
-        $router[] = new Route('<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved>', array(
+        $router[] = new Route('<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|reset>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
 		'action' => 'default',
