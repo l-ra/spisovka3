@@ -758,7 +758,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $dokument_id = $this->getParam('id',null);
 
         $Log = new LogModel();
-        $historie = $Log->historieDokumentu($dokument_id);
+        $historie = $Log->historieDokumentu($dokument_id,1000);
 
         $this->template->historie = $historie;
 
