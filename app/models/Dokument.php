@@ -1080,7 +1080,12 @@ class Dokument extends BaseModel
         $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
         $isAdmin = Environment::getUser()->isInRole('admin');
         
-        if ( !$isAdmin ) {
+        if ( $isVedouci ) {
+            // prozatim bez omezeni
+            // - mozne problemy pri filtrovani organizacnich jednotek
+            // - tento stav ovsem propousti vse pri hledani
+            ;
+        } else if ( !$isAdmin ) {
             
             $org_jednotka = array();
             $org_jednotka_vedouci = array();
