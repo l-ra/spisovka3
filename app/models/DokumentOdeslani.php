@@ -10,7 +10,7 @@ class DokumentOdeslani extends BaseModel
         $sql = array(
             'distinct'=>null,
             'from' => array($this->name => 'ds'),
-            'cols' => array('dokument_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava','cena','hmotnost','cislo_faxu','stav','druh_zasilky'),
+            'cols' => array('dokument_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava','cena','hmotnost','cislo_faxu','ds.stav%sql'=>'stav_odeslani','druh_zasilky'),
             'leftJoin' => array(
                 'subjekt' => array(
                     'from' => array($this->tb_subjekt => 's'),
@@ -57,7 +57,7 @@ class DokumentOdeslani extends BaseModel
         $sql = array(
             'distinct'=>false,
             'from' => array($this->name => 'ds'),
-            'cols' => array('dokument_id','ds.id'=>'dokodes_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava','cena','hmotnost','cislo_faxu','stav','druh_zasilky'),
+            'cols' => array('dokument_id','ds.id'=>'dokodes_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava','cena','hmotnost','cislo_faxu','ds.stav%sql'=>'stav_odeslani','druh_zasilky'),
             'leftJoin' => array(
                 'subjekt' => array(
                     'from' => array($this->tb_subjekt => 's'),
@@ -143,6 +143,17 @@ class DokumentOdeslani extends BaseModel
 
     }
     
+    public function getDokumentID($id_dok_odes)
+    {
+        
+        $row = $this->fetchRow(array('id=%i',$id_dok_odes))->fetch();
+        if ( $row ) {
+            return $row->dokument_id;
+        }
+        return null;
+        
+    }
+    
     public function odeslano( $id ) {
 
         if ( empty($id) ) {
@@ -152,6 +163,12 @@ class DokumentOdeslani extends BaseModel
         $row = array();
         $row['stav'] = 2;
         $row['datum_odeslani'] = new DateTime();
+        
+        $info = $this->get($id);
+        if ( $info ) {
+            $Log = new LogModel();
+            $Log->logDokument($info->dokument_id, LogModel::DOK_ODESLAN,"Dokument odeslán ". $info->zpusob_odeslani_nazev);
+        }
 
         return $this->update($row, array( array('id=%i',$id) ));
 

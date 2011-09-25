@@ -1232,7 +1232,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $dokument_id = $this->getParam('id',null);
 
         $Log = new LogModel();
-        $historie = $Log->historieDokumentu($dokument_id);
+        $historie = $Log->historieDokumentu($dokument_id,1000);
 
         $this->template->historie = $historie;
 
@@ -1938,7 +1938,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
 
 
-        $form->addSubmit('odeslat', 'Odeslat zprávu adresátům')
+        $form->addSubmit('odeslat', 'Odeslat zprávu adresátům nebo předat do podatelny k odeslání')
                  ->onClick[] = array($this, 'odeslatClicked');
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
@@ -2108,10 +2108,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         $hmotnost = floatval($post_data['hmotnost_zasilky'][$subjekt_id]);
                         $stav = 1;
                         
-                        $this->flashMessage('Dokument odeslán poštou na adresu "'. Subjekt::displayName($adresat) .'".');
+                        $this->flashMessage('Dokument předán na podatelnu k odeslání poštou na adresu "'. Subjekt::displayName($adresat) .'".');
                         
                         $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán poštou na adresu "'. Subjekt::displayName($adresat) .'".');
+                        $Log->logDokument($dokument_id, LogModel::DOK_PREDODESLAN,'Dokument předán na podatelnu k odeslání poštou na adresu "'. Subjekt::displayName($adresat) .'".');
                         
                     } else if ( $metoda_odeslani == 4 ) {
                         // faxem
@@ -2123,10 +2123,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         $zprava_odes = $post_data['zprava_faxu'][$subjekt_id];
                         $stav = 1;
                         
-                        $this->flashMessage('Dokument odeslán faxem na číslo "'. $cislo_faxu .'".');
+                        $this->flashMessage('Dokument předán na podatelnu k odeslání faxem na číslo "'. $cislo_faxu .'".');
                         
                         $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán faxem na číslo "'. $cislo_faxu .'".');
+                        $Log->logDokument($dokument_id, LogModel::DOK_PREDODESLAN,'Dokument předán na podatelnu k odeslání faxem na číslo "'. $cislo_faxu .'".');
                         
                     } else {
                         // jinak - externe (osobne, ...)

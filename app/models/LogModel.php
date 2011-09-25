@@ -15,6 +15,7 @@ class LogModel extends BaseModel {
     const DOK_KVYRIZENI = 16;
     const DOK_VYRIZEN   = 17;
     const DOK_PRIJATEP  = 18;
+    const DOK_PREDODESLAN = 20;
     const DOK_ODESLAN   = 19;
     const DOK_SPUSTEN   = 101;
     const DOK_KESKARTACI = 102;
@@ -59,6 +60,7 @@ class LogModel extends BaseModel {
         '17' => 'Dokument vyřízen',
         '18' => 'Dokument přijat e-podatelnou',
         '19' => 'Dokument odeslán',
+        '20' => 'Dokument předán k odeslání',
         '101' => 'Spuštěna událost',
         '102' => 'Dokument připraven ke skartaci',
         '103' => 'Dokument skartován',
@@ -96,7 +98,7 @@ class LogModel extends BaseModel {
     public function logDokument($dokument_id, $typ, $poznamka = "") {
 
         $row = array();
-        $row['dokument_id'] = $dokument_id;
+        $row['dokument_id'] = (int) $dokument_id;
         $row['typ'] = $typ;
         $row['poznamka'] = $poznamka;
         
