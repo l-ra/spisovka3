@@ -284,11 +284,19 @@
             <dt>Způsob doručení:</dt>
             <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
         </dl>        
-        {/if}        
+        {/if}
+        {if $isRozdelany}
         <dl class="detail_item">
             <dt>Číslo doporučeného dopisu:</dt>
             <dd>{$metadataForm['cislo_doporuceneho_dopisu']->control}</dd>
-        </dl>          
+        </dl>    
+        {elseif !empty($Dok->cislo_doporuceneho_dopisu)}
+        <dl class="detail_item">
+            <dt>Číslo doporučeného dopisu:</dt>
+            <dd>{$Dok->cislo_doporuceneho_dopisu}&nbsp;</dd>
+        </dl>
+        {/if}        
+        
         <dl class="detail_item">
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$metadataForm['cislo_jednaci_odesilatele']->control}</dd>

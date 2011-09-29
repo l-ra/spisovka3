@@ -1563,13 +1563,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
         
+        $nazev = (@$Dok->nazev=="(bez názvu)")?"":$Dok->nazev;
         if ( $this->template->isPodatelna ) {
             $form->addText('nazev', 'Věc:', 80, 100)
-                    ->setValue(@$Dok->nazev);
+                    ->setValue($nazev);
         } else {
             $form->addText('nazev', 'Věc:', 80, 100)
                     ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!')
-                    ->setValue(@$Dok->nazev);
+                    ->setValue($nazev);
         }        
         
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
@@ -1641,6 +1642,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $data['datum_vzniku'] = $dok->datum_vzniku;
             $data['dokument_typ_id'] = $dok->typ_dokumentu->id;
             $data['zpusob_doruceni_id'] = $dok->zpusob_doruceni_id;
+            $data['cislo_doporuceneho_dopisu'] = $dok->cislo_doporuceneho_dopisu;
             unset($data['datum_vzniku_cas']);
         } else {
             // uprava casu

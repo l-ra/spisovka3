@@ -1076,7 +1076,7 @@ class Dokument extends BaseModel
         }
 
         // Omezeni pouze na dokumenty z vlastni organizacni jednotky
-        $user = Environment::getUser()->getIdentity();
+        /*$user = Environment::getUser()->getIdentity();
         $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
         $isAdmin = Environment::getUser()->isInRole('admin');
         
@@ -1110,7 +1110,7 @@ class Dokument extends BaseModel
             }
             $args['where'][] = array( $where_org );
             
-        }
+        }*/
         
         return $args;
     }
