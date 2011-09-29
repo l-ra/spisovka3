@@ -306,7 +306,8 @@ class Admin_CiselnikyPresenter extends BasePresenter
                     array(
                         'title' => 'Stav',
                         'link' => false,
-                        'form' => 'selectStav',
+                        'form' => 'select',
+                        'form_select' => array('0'=>'Neaktivní','1'=>'Aktivní','2'=>'Automatická událost'),
                         'view' => true
                     )
                 );
