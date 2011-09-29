@@ -393,7 +393,7 @@ class Workflow extends BaseModel
                     }
 
                     // spouteci udalost - manualni nebo automativky
-                    if ( $dokument_info->spisovy_znak_udalost_stav == 2 && is_null($accepted) ) {
+                    if ( $dokument_info->spousteci_udalost_stav == 2 && is_null($accepted) ) {
                         $stav = 5;
                         $datum_spusteni = date("Y-m-d");
                     } else if ( !is_null($accepted) ) {

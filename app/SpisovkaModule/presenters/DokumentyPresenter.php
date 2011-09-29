@@ -1721,7 +1721,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$Dok->skartacni_lhuta)
                 ->controlPrototype->readonly = TRUE;
         $form->addSelect('spousteci_udalost_id','Spouštěcí událost: ', $spousteci_udalost)
-                ->setValue(@$Dok->spousteci_udalost_id)
+                ->setValue( empty($Dok->spousteci_udalost_id)?3:@$Dok->spousteci_udalost_id )
                 ->controlPrototype->readonly = TRUE;
 
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10)

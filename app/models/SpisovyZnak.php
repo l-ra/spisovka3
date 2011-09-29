@@ -164,7 +164,12 @@ class SpisovyZnak extends TreeModel
                 return $result;
             }
         } else {
-            return ( isset($result[$kod]) )?$result[ $kod ]->nazev:'';
+            if ( $select == 1 ) {
+                return ( isset($result[$kod]) )?$result[ $kod ]:null;
+            } else {
+                return ( isset($result[$kod]) )?$result[ $kod ]->nazev:'';
+            }
+            
         }
 
     }

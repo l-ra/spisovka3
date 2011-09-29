@@ -1128,7 +1128,7 @@ class Dokument extends BaseModel
         }
         
         // Omezeni pouze na dokumenty z vlastni organizacni jednotky
-        $user = Environment::getUser()->getIdentity();
+        /*$user = Environment::getUser()->getIdentity();
         $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
         $isAdmin = Environment::getUser()->isInRole('admin');
         
@@ -1157,7 +1157,7 @@ class Dokument extends BaseModel
             }
             $args['where'][] = array( $where_org );
             
-        }
+        }*/
         return $args;
     }
 
@@ -1464,6 +1464,19 @@ class Dokument extends BaseModel
             $dokument->spisovy_znak_udalost_nazev = SpisovyZnak::spousteci_udalost($row->spisznak_spousteci_udalost_id,10);
             $dokument->spisovy_znak_udalost_stav = '';
             $dokument->spisovy_znak_udalost_dtext = '';            
+            
+            $spousteci_udalost = SpisovyZnak::spousteci_udalost($row->spousteci_udalost_id,1);
+            if ( isset($spousteci_udalost->nazev) ) {
+                $dokument->spousteci_udalost_nazev = $spousteci_udalost->nazev;
+                $dokument->spousteci_udalost_stav = $spousteci_udalost->stav;
+                $dokument->spousteci_udalost_dtext = $spousteci_udalost->poznamka_k_datumu;            
+            } else {
+                $dokument->spousteci_udalost_nazev = '';
+                $dokument->spousteci_udalost_stav = 0;
+                $dokument->spousteci_udalost_dtext = '';            
+            }
+            
+            
             /*if ( !empty($dokument->spisovy_znak_id) && $detail == 1 ) {
                 $SpisZnak = new SpisovyZnak();
                 $sznak = $SpisZnak->getInfo($dokument->spisovy_znak_id);
