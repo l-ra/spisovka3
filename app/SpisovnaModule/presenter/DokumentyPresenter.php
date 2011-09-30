@@ -518,7 +518,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     if ( isset($data['dokument_vyber']) ) {
                         $count_ok = $count_failed = 0;
                         foreach ( $data['dokument_vyber'] as $dokument_id ) {
-                            $stav = $Workflow->pripojitDoSpisovny($dokument_id);
+                            $stav = $Workflow->pripojitDoSpisovny($dokument_id, 1);
                             if ( $stav === true ) {
                                 $count_ok++;
                             } else {

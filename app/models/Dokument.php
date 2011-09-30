@@ -1298,13 +1298,15 @@ class Dokument extends BaseModel
             foreach ($result as $index => $row) {
                 $id = $row->id;
 
-                $spis = new stdClass();
-                $spis->id = $row->spis_id; unset($row->spis_id);
-                $spis->nazev = $row->nazev_spisu; unset($row->nazev_spisu);
-                $spis->popis = $row->popis_spisu; unset($row->popis_spisu);
-                $spis->stav = $row->stav_spisu; unset($row->stav_spisu);
-                $spis->poradi = $row->poradi_spisu; unset($row->poradi_spisu);
-                $tmp[$id]['spisy'][ $spis->id ] = $spis;
+                if ( !empty($row->spis_id) ) {
+                    $spis = new stdClass();
+                    $spis->id = $row->spis_id; unset($row->spis_id);
+                    $spis->nazev = $row->nazev_spisu; unset($row->nazev_spisu);
+                    $spis->popis = $row->popis_spisu; unset($row->popis_spisu);
+                    $spis->stav = $row->stav_spisu; unset($row->stav_spisu);
+                    $spis->poradi = $row->poradi_spisu; unset($row->poradi_spisu);
+                    $tmp[$id]['spisy'][ $spis->id ] = $spis;
+                }
 
                 $typ = new stdClass();
                 $typ->id = $row->dokument_typ_id; unset($row->dokument_typ_id);
@@ -1359,7 +1361,7 @@ class Dokument extends BaseModel
 
             $dokument = $tmp[ $dokument_id ]['raw'];
             $dokument->typ_dokumentu = $tmp[ $dokument_id ]['typ_dokumentu'];
-            $dokument->spisy = $tmp[ $dokument_id ]['spisy'];
+            $dokument->spisy = @$tmp[ $dokument_id ]['spisy'];
             $dokument->workflow = $tmp[ $dokument_id ]['workflow'];
 
             if ( isset($dataplus['subjekty'][$dokument_id]) ) {

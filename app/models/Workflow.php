@@ -472,7 +472,7 @@ class Workflow extends BaseModel
         }
     }
 
-    public function predatDoSpisovny($dokument_id)
+    public function predatDoSpisovny($dokument_id, $samostatny = 0)
     {
 
         // kontrola uzivatele
@@ -482,6 +482,10 @@ class Workflow extends BaseModel
 
         //echo "<pre>"; print_r($dokument_info); echo "</pre>"; exit;
 
+        if ( $samostatny == 1 && count($dokument_info->spisy)>0 ) {
+            return 'Dokument '.$dokument_info->jid.' nelze přenést do spisovny! Dokument je součásti spisu.';
+        }
+        
         // Test na uplnost dat
         if ( $kontrola = $Dokument->kontrola($dokument_info) ) {
             // nejsou kompletni data - neprenasim
@@ -523,7 +527,7 @@ class Workflow extends BaseModel
         
     }
 
-    public function pripojitDoSpisovny($dokument_id)
+    public function pripojitDoSpisovny($dokument_id, $samostatny = 0)
     {
 
         // kontrola uzivatele
@@ -531,6 +535,10 @@ class Workflow extends BaseModel
         $Dokument = new Dokument();
         $dokument_info = $Dokument->getInfo($dokument_id);
 
+        if ( $samostatny == 1 && count($dokument_info->spisy)>0 ) {
+            return 'Dokument '.$dokument_info->jid.' nelze příjmout do spisovny! Dokument je součásti spisu.';
+        }        
+        
         // Test na uplnost dat
         if ( $kontrola = $Dokument->kontrola($dokument_info) ) {
             // nejsou kompletni data - neprenasim
