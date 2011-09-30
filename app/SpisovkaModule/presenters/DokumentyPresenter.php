@@ -352,7 +352,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $formUpravit = null;
             }
             // Dokument je vyrizeny a spusteny
-            if ( $dokument->stav_dokumentu == 5) {
+            if ( $dokument->stav_dokumentu >= 5) {
                 $this->template->AccessEdit = 0;
                 $this->template->Pridelen = 0;
                 $this->template->Predan = 0;
@@ -382,7 +382,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             
             // Dokument je ve skartacnim obodbi
             if ( $skartacni_rozdil > 0 && $dokument->stav_dokumentu == 7
-                    && ($user->isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
+                    && (Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
                 $this->template->AccessEdit = 0;
                 $this->template->Pridelen = 1;
@@ -390,7 +390,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
             // Dokument je ve skartacnim rezimu
             if ( $dokument->stav_dokumentu == 8
-                    && ($user->isInRole('skartacni_komise') || $user->isInRole('superadmin')) ) {
+                    && (Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
                 $this->template->AccessEdit = 0;
                 $this->template->Pridelen = 1;
@@ -634,7 +634,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
-        if ( $user->isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+        if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
             if ( $Workflow->keskartaci($dokument_id, $user_id, $orgjednotka_id) ) {
                $this->flashMessage('Dokument byl přidán do skartačního řízení.');
             } else {

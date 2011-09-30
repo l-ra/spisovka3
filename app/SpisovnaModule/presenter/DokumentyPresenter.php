@@ -283,7 +283,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
-        if ( Environment::getUser()->isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
+        if ( Acl::isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
             $this->template->akce_select = array(
                 'zapujcka'=>'Zápůjčka'
             );            
@@ -429,7 +429,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $skartacni_rozdil = $DateDiff->diff($datum_skartace);
             
             if ( $skartacni_rozdil > 0 && $dokument->stav_dokumentu == 7
-                    && ($user->isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
+                    && (Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
                 $this->template->AccessEdit = 0;
                 $this->template->Pridelen = 1;
@@ -542,7 +542,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 case 'ke_skartaci':
                     if ( isset($data['dokument_vyber']) ) {
                         $count_ok = $count_failed = 0;
-                        if ( $user->isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+                        if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
                             foreach ( $data['dokument_vyber'] as $dokument_id ) {
                                 if ( $Workflow->keskartaci($dokument_id, $user->getIdentity()->id) ) {
                                     //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
@@ -660,7 +660,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
-        if ( $user->isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+        if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
             if ( $Workflow->keskartaci($dokument_id, $user_id, $orgjednotka_id) ) {
                $this->flashMessage('Dokument byl přidán do skartačního řízení.');
             } else {
@@ -824,7 +824,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     protected function createComponentFiltrForm()
     {
 
-        if ( Environment::getUser()->isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
+        if ( Acl::isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
             // pracovnik spisovny
             $filtr =  !is_null($this->filtr)?$this->filtr:'stav_77';
             $select = array(

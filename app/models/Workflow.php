@@ -88,11 +88,12 @@ class Workflow extends BaseModel
             $data['stav_dokumentu'] = 1;
             $data['aktivni'] = 1;
             $data['prideleno_id'] = $user->id;
-            $data['orgjednotka_id'] = empty($org_info->orgjednotka_id)?null:$org_info->orgjednotka_id;
+            $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
             $data['stav_osoby'] = 1;
             $data['date'] = new DateTime();
             $data['user_id'] = $user->id;
             $data['poznamka'] = $poznamka;
+            
             if ( $this->insert($data) ) {
                 return true;
             } else {
@@ -152,7 +153,12 @@ class Workflow extends BaseModel
                     $log = 'Dokument předán organizační jednotce.';
                 }
             } else {
-                $data['orgjednotka_id'] = null;
+                $UserModel = new UserModel();
+                $org_info = $UserModel->getOrg($user_id);
+                if ( is_array($org_info) ) {
+                    $org_info = current($org_info);
+                }                
+                $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
             }
 
             $data['date'] = new DateTime();
@@ -334,7 +340,12 @@ class Workflow extends BaseModel
                         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                         $data['orgjednotka_id'] = $orgjednotka_id;
                     } else {
-                        $data['orgjednotka_id'] = null;
+                        $UserModel = new UserModel();
+                        $org_info = $UserModel->getOrg($user_id);
+                        if ( is_array($org_info) ) {
+                            $org_info = current($org_info);
+                        }                
+                        $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
                     }
 
                     $data['date'] = new DateTime();
@@ -433,7 +444,12 @@ class Workflow extends BaseModel
                         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                         $data['orgjednotka_id'] = $orgjednotka_id;
                     } else {
-                        $data['orgjednotka_id'] = null;
+                        $UserModel = new UserModel();
+                        $org_info = $UserModel->getOrg($user_id);
+                        if ( is_array($org_info) ) {
+                            $org_info = current($org_info);
+                        }                
+                        $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
                     }
 
                     $data['date'] = new DateTime();
@@ -591,7 +607,7 @@ class Workflow extends BaseModel
         if ( is_numeric($dokument_id) ) {
 
                 $user = Environment::getUser();
-                if ( $user->isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+                if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -645,7 +661,7 @@ class Workflow extends BaseModel
         if ( is_numeric($dokument_id) ) {
 
                 $user = Environment::getUser();
-                if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+                if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -699,7 +715,7 @@ class Workflow extends BaseModel
         if ( is_numeric($dokument_id) ) {
 
                 $user = Environment::getUser();
-                if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+                if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -753,7 +769,7 @@ class Workflow extends BaseModel
         if ( is_numeric($dokument_id) ) {
 
                 $user = Environment::getUser();
-                if ( $user->isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+                if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -774,7 +790,13 @@ class Workflow extends BaseModel
                     $data['stav_osoby'] = 0;
                     $data['aktivni'] = 1;
                     $data['prideleno_id'] = $user_id;
-                    $data['orgjednotka_id'] = null;
+                    
+                    $UserModel = new UserModel();
+                    $org_info = $UserModel->getOrg($user_id);
+                    if ( is_array($org_info) ) {
+                        $org_info = current($org_info);
+                    }                
+                    $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = Environment::getUser()->getIdentity()->id;

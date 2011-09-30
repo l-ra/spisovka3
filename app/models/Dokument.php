@@ -1067,6 +1067,47 @@ class Dokument extends BaseModel
 
     }
 
+    protected function spisovnaOmezeniOrg($args)
+    {
+        // Omezeni pouze na dokumenty z vlastni organizacni jednotky
+        $user = Environment::getUser()->getIdentity();
+        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
+        $isAdmin = Environment::getUser()->isInRole('admin');
+        
+        if ( !$isAdmin ) {
+            
+            $org_jednotka = array();
+            $org_jednotka_vedouci = array();
+
+            if ( @count( $user->user_roles )>0 ) {
+                foreach ( $user->user_roles as $role ) {
+                    if ( !empty($role->orgjednotka_id) ) {
+                        if (preg_match('/^vedouci/', $role->code) ) {
+                            $org_jednotka_vedouci[] = $role->orgjednotka_id;
+                        }
+                        $org_jednotka[] = $role->orgjednotka_id;
+                    }
+                }
+            } 
+            
+            if ( $isVedouci ) {
+                $org_jednotka_vedouci = Orgjednotka::childOrg($org_jednotka_vedouci);
+            }
+            
+            $where_org = null;
+            if ( count($org_jednotka_vedouci) > 0 ) {
+                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka_vedouci );
+            } else if ( count($org_jednotka) == 1 ) {
+                $where_org = array( 'wf.orgjednotka_id=%i',$org_jednotka[0] );
+            } else if ( count($org_jednotka) > 1 ) {
+                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
+            }
+            $args['where'][] = array( $where_org );
+            
+        }
+        return $args;
+    }
+    
     public function spisovka($args) {
 
         if ( isset($args['where']) ) {
@@ -1127,38 +1168,7 @@ class Dokument extends BaseModel
                 );
         }
         
-        // Omezeni pouze na dokumenty z vlastni organizacni jednotky
-        /*$user = Environment::getUser()->getIdentity();
-        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
-        $isAdmin = Environment::getUser()->isInRole('admin');
-        
-        if ( !$isAdmin ) {
-            
-            $org_jednotka = array();
-            $org_jednotka_vedouci = array();
-
-            if ( @count( $user->user_roles )>0 ) {
-                foreach ( $user->user_roles as $role ) {
-                    if ( !empty($role->orgjednotka_id) ) {
-                        if (preg_match('/^vedouci/', $role->code) ) {
-                            $org_jednotka_vedouci[] = $role->orgjednotka_id;
-                        }
-                        $org_jednotka[] = $role->orgjednotka_id;
-                    }
-                }
-            } 
-            $where_org = null;
-            if ( count($org_jednotka_vedouci) > 0 ) {
-                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka_vedouci );
-            } else if ( count($org_jednotka) == 1 ) {
-                $where_org = array( 'wf.orgjednotka_id=%i',$org_jednotka[0] );
-            } else if ( count($org_jednotka) > 1 ) {
-                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
-            }
-            $args['where'][] = array( $where_org );
-            
-        }*/
-        return $args;
+        return $this->spisovnaOmezeniOrg($args);
     }
 
     public function spisovna_prijem($args) {
@@ -1169,7 +1179,7 @@ class Dokument extends BaseModel
             $args['where'] = array(array('wf.stav_dokumentu = 6 AND wf.aktivni = 1'));
         }
 
-        return $args;
+        return $this->spisovnaOmezeniOrg($args);
     }
 
     public function spisovna_keskartaci($args) {
@@ -1186,7 +1196,7 @@ class Dokument extends BaseModel
                              );
         }
 
-        return $args;
+        return $this->spisovnaOmezeniOrg($args);
     }
 
     public function spisovna_skartace($args) {
@@ -1197,7 +1207,7 @@ class Dokument extends BaseModel
             $args['where'] = array(array('wf.stav_dokumentu = 8 AND wf.aktivni = 1'));
         }
 
-        return $args;
+        return $this->spisovnaOmezeniOrg($args);
     }
 
     public function getInfo($dokument_id, $detail = 0, $dataplus = null) {
