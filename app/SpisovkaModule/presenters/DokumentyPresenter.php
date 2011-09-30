@@ -507,11 +507,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
                     break;
                 /* Predani vybranych dokumentu do spisovny  */
-                /*case 'predat_spisovna':
+                case 'predat_spisovna':
                     if ( isset($data['dokument_vyber']) ) {
                         $count_ok = $count_failed = 0;
                         foreach ( $data['dokument_vyber'] as $dokument_id ) {
-                            $stav = $Workflow->predatDoSpisovny($dokument_id);
+                            $stav = $Workflow->predatDoSpisovny($dokument_id, 1);
                             if ( $stav === true ) {
                                 $count_ok++;
                             } else {
@@ -531,7 +531,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             $this->redirect('this');
                         }
                     }
-                    break;*/
+                    break;
                 default:
                     break;
             }
@@ -1940,7 +1940,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
 
 
-        $form->addSubmit('odeslat', 'Odeslat zprávu adresátům nebo předat do podatelny k odeslání')
+        $form->addSubmit('odeslat', 'Předat podatelně či Odeslat')
                  ->onClick[] = array($this, 'odeslatClicked');
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
