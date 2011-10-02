@@ -7,6 +7,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
     {
         $this->template->searchForm = $this['searchForm'];
 
+        $this->template->DruhZasilky = DruhZasilky::get(null,1);
+        
         if ( $this->getParam('is_ajax') ) {
             $this->layout = false;
         }
@@ -278,11 +280,22 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         if ( isset($_POST['predano_org']) ) {
             $data['predano_org'] = $_POST['predano_org'];
         }
+        if ( isset($_POST['druh_zasilky']) ) {
+            if ( count($_POST['druh_zasilky'])>0 ) {
+                $druh_sql = array();
+                foreach ( $_POST['druh_zasilky'] as $druh_id => $druh_zasilky ) {
+                    $druh_sql[] = $druh_id;
+                }
+                $data['druh_zasilky'] = serialize($druh_sql);            
+            }
+        }        
 
         //Debug::dump($data);
         // eliminujeme prazdne hodnoty
         foreach ( $data as $d_index => $d_value ) {
-            if ( @strlen($d_value) == 0 ) {
+            if (is_array($d_value) ) {
+                continue;
+            } else if ( @strlen($d_value) == 0 ) {
                 unset($data[$d_index]);
             } else if ( $d_value == "0" ) {
                 unset($data[$d_index]);
@@ -290,7 +303,9 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 unset($data[$d_index]);
             }
         }
-        //Debug::dump($data);
+
+        //Debug::dump($_POST);
+        //Debug::dump($data); exit;
 
         //$this->forward(':Spisovka:Dokumenty:default',array('hledat'=>$data));
         $this->redirect(':Spisovka:Dokumenty:default',array('hledat'=>$data));

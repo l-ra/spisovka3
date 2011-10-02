@@ -2670,6 +2670,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'pracoval'=>'Na kterých jsem kdy pracoval',
                 ),
                 'Společné' => array(
+                    'doporucene'=>'Doporučené',
+                    'predane_vse'=>'Předané',
+                    'predane_k_odeslani'=>'K odeslání',
+                    'odeslane'=>'Odeslané',
                     'vsichni_nove'=>'Všechny nepředané',
                     'vsichni_vyrizuji'=>'Všechny k vyřízení',
                     'vsichni_vyrizene'=>'Všechny vyřízené',
@@ -2694,6 +2698,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     /*'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
                     'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
                     'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízené',*/
+                    'doporucene'=>'Doporučené',
+                    'predane_vse'=>'Předané',
+                    'predane_k_odeslani'=>'K odeslání',
+                    'odeslane'=>'Odeslané',
                     'vse'=>'Všechny'
                 )
             );
@@ -2732,7 +2740,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->getHttpResponse()->setCookie('s3_filtr', serialize($data), strtotime('90 day'));
 
         //$this->forward('this', array('filtr'=>$data) );
-        $this->forward(':Spisovka:Dokumenty:default', array('filtr'=>$data) );
+        $this->redirect(':Spisovka:Dokumenty:default', array('filtr'=>$data) );
 
     }
 
@@ -2779,7 +2787,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $form_data = $button->getForm()->getValues();
         $this->getHttpResponse()->setCookie('s3_seradit', $form_data['seradit'], strtotime('90 day'));
-        $this->forward(':Spisovka:Dokumenty:default', array('seradit'=>$form_data['seradit']) );
+        $this->redirect(':Spisovka:Dokumenty:default', array('seradit'=>$form_data['seradit']) );
     }
     
     

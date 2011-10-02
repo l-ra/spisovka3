@@ -356,7 +356,14 @@ class Dokument extends BaseModel
         // pouze doporucene
         if ( isset($params['cislo_doporuceneho_dopisu_pouze']) ) {
             if ( $params['cislo_doporuceneho_dopisu_pouze'] ) {
-                $args['where'][] = array("d.cislo_doporuceneho_dopisu <> ''");
+                $args['leftJoin']['zpusob_odeslani'] = array(
+                    'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                    'on' => array('dok_odeslani.dokument_id=d.id'),
+                    'cols' => null
+                );
+                $args['where'][] = array("(d.cislo_doporuceneho_dopisu <> '') OR 
+                                          (dok_odeslani.druh_zasilky LIKE '%i:0;i:2;%' OR dok_odeslani.druh_zasilky LIKE '%i:1;i:2;%')  
+                                         ");
             }
         }             
 
@@ -575,7 +582,19 @@ class Dokument extends BaseModel
                 $args['where'][] = array('dok_odeslani.datum_odeslani < %d',$params['datum_odeslani_do']);
             }
         }
-
+        
+        // druh zasilky
+        if ( isset($params['druh_zasilky']) ) {
+            $druh_sql = $params['druh_zasilky'];
+            if ( $druh_sql ) {
+                $args['leftJoin']['zpusob_odeslani'] = array(
+                    'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                    'on' => array('dok_odeslani.dokument_id=d.id'),
+                    'cols' => null
+                );
+                $args['where'][] = array('dok_odeslani.druh_zasilky = %s',$druh_sql);
+            }
+        }        
 
         if ( isset($params['spisovy_znak']) ) {
             if ( !empty($params['spisovy_znak']) ) {
@@ -979,6 +998,11 @@ class Dokument extends BaseModel
                     'where' => array( array('wf.prideleno_id=%i',$user->id),array('wf.stav_osoby=0'), array('wf.aktivni=1') )
                 );
                 break;
+            case 'predane_vse':
+                $args = array(
+                    'where' => array( array('wf.stav_osoby=0'), array('wf.aktivni=1') )
+                );
+                break;            
             case 'pracoval':
                 $vyrusit_bezvyrizeni = true;
                 $args = array(
@@ -1027,6 +1051,65 @@ class Dokument extends BaseModel
                     $args = array();
                 }
                 break;
+            case 'doporucene':
+                $vyrusit_bezvyrizeni = true;
+                if ( !is_null($where_org) ) {
+                    $args = array(  
+                        'where' => array( $where_org )
+                    );
+                } else {
+                    $args = array();
+                }                
+                
+                $args['leftJoin'] = array('zpusob_odeslani' => array(
+                        'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                        'on' => array('dok_odeslani.dokument_id=d.id'),
+                        'cols' => null
+                    ));
+                $args['where'][] = array("(d.cislo_doporuceneho_dopisu <> '') OR 
+                                             (dok_odeslani.druh_zasilky LIKE '%i:0;i:2;%' OR dok_odeslani.druh_zasilky LIKE '%i:1;i:2;%')"
+                                   );
+                //echo "<pre>"; print_r($args); echo "</pre>";
+                
+                break;     
+            case 'predane_k_odeslani':
+                $vyrusit_bezvyrizeni = true;
+                if ( !is_null($where_org) ) {
+                    $args = array(  
+                        'where' => array( $where_org )
+                    );
+                } else {
+                    $args = array();
+                }                
+                
+                $args['leftJoin'] = array('zpusob_odeslani' => array(
+                        'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                        'on' => array('dok_odeslani.dokument_id=d.id'),
+                        'cols' => null
+                    ));
+                $args['where'][] = array("dok_odeslani.stav=1");
+                //echo "<pre>"; print_r($args); echo "</pre>";
+                
+                break;  
+            case 'odeslane':
+                $vyrusit_bezvyrizeni = true;
+                if ( !is_null($where_org) ) {
+                    $args = array(  
+                        'where' => array( $where_org )
+                    );
+                } else {
+                    $args = array();
+                }                
+                
+                $args['leftJoin'] = array('zpusob_odeslani' => array(
+                        'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                        'on' => array('dok_odeslani.dokument_id=d.id'),
+                        'cols' => null
+                    ));
+                $args['where'][] = array("dok_odeslani.stav=2");
+                //echo "<pre>"; print_r($args); echo "</pre>";
+                
+                break;                 
             default:
                 $args = array(
                     'where' => array( array('0') )

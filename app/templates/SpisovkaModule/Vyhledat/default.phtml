@@ -66,11 +66,25 @@
             <dt>Způsob odeslání:</dt>
             <dd>{$searchForm['zpusob_odeslani']->control}</dd>
         </dl>
+        
+        
+        
         <dl class="detail_item">
             <dt>Datum odeslání:</dt>
             <dd>od: {$searchForm['datum_odeslani_od']->control} {$searchForm['datum_odeslani_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
             <dd>do: {$searchForm['datum_odeslani_do']->control} {$searchForm['datum_odeslani_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
         </dl>
+        <?php if (1) { ?>
+        <dl class="detail_item">
+            <dt>Druh zásilky:</dt>
+            <dd>
+                {foreach $DruhZasilky as $dz_index=>$dz_nazev}
+                <input type="checkbox" name="druh_zasilky[{$dz_index}]" />&nbsp;{$dz_nazev}
+                {/foreach}
+                &nbsp;
+            </dd>
+        </dl>     
+        <?php }//if 0 ?>
         <dl class="detail_item">
             <dt>Spisový znak:</dt>
             <dd>{$searchForm['spisovy_znak_id']->control}</dd>
