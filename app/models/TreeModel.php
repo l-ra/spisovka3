@@ -121,12 +121,17 @@ class TreeModel extends BaseModel
                     continue;
                 }
 
+                $popis = "";
+                if ( !empty($row->popis) ) {
+                    $popis = " - ". String::truncate($row->popis,90);
+                }
+                
                 if ( $type == 10 ) {
-                    $result[ $row->id ] = $row->{$this->nazev};
+                    $result[ $row->id ] = $row->{$this->nazev} .$popis;
                 } else if ( $type == 11 ) {
                     $result[ $row->id ] = $row;
                 } else {
-                    $result[ $row->id ] = str_repeat("...", $row->uroven) .' '. $row->{$this->nazev};
+                    $result[ $row->id ] = str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis;
                 }
                 
             }
