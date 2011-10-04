@@ -913,6 +913,7 @@ class Dokument extends BaseModel
         $user = Environment::getUser()->getIdentity();
         $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
         $isAdmin = Environment::getUser()->isInRole('admin');
+        $isPodatelna = ACL::isInRole('podatelna,skartacni_dohled');
         $vyrusit_bezvyrizeni = false;
         $org_jednotka = array();
         $org_jednotka_vedouci = array();
@@ -929,12 +930,14 @@ class Dokument extends BaseModel
         }
 
         $where_org = null;
-        if ( count($org_jednotka) == 1 ) {
+        if ( $isAdmin ) {
+            $where_org = array( '1' );
+        } else if ( $isPodatelna ) {
+            $where_org = array( '1' );
+        } else if ( count($org_jednotka) == 1 ) {
             $where_org = array( 'wf.orgjednotka_id=%i',$org_jednotka[0] );
         } else if ( count($org_jednotka) > 1 ) {
             $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
-        } else if ( $isAdmin ) {
-            $where_org = array( '1' );
         }
 
         switch ($nazev) {
@@ -1043,7 +1046,7 @@ class Dokument extends BaseModel
                 );
                 break;
             case 'vse':
-                if ( !is_null($where_org) ) {
+                if ( count($where_org)>0 ) {
                     $args = array(  
                         'where' => array( $where_org )
                     );
@@ -1053,7 +1056,7 @@ class Dokument extends BaseModel
                 break;
             case 'doporucene':
                 $vyrusit_bezvyrizeni = true;
-                if ( !is_null($where_org) ) {
+                if ( count($where_org)>0 ) {
                     $args = array(  
                         'where' => array( $where_org )
                     );
@@ -1074,7 +1077,7 @@ class Dokument extends BaseModel
                 break;     
             case 'predane_k_odeslani':
                 $vyrusit_bezvyrizeni = true;
-                if ( !is_null($where_org) ) {
+                if ( count($where_org)>0 ) {
                     $args = array(  
                         'where' => array( $where_org )
                     );
@@ -1093,7 +1096,7 @@ class Dokument extends BaseModel
                 break;  
             case 'odeslane':
                 $vyrusit_bezvyrizeni = true;
-                if ( !is_null($where_org) ) {
+                if ( count($where_org)>0 ) {
                     $args = array(  
                         'where' => array( $where_org )
                     );
@@ -1155,7 +1158,8 @@ class Dokument extends BaseModel
         // Omezeni pouze na dokumenty z vlastni organizacni jednotky
         $user = Environment::getUser()->getIdentity();
         $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
-        $isAdmin = Environment::getUser()->isInRole('admin');
+        $isAdmin = ACL::isInRole('admin,skartacni_dohled');
+        //$isAdmin = ACL::isInRole('admin');
         
         if ( !$isAdmin ) {
             
@@ -1185,7 +1189,10 @@ class Dokument extends BaseModel
             } else if ( count($org_jednotka) > 1 ) {
                 $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
             }
-            $args['where'][] = array( $where_org );
+            
+            //if ( count($where_org)>0 ) {
+                $args['where'][] = array( $where_org );
+            //}
             
         }
         return $args;
