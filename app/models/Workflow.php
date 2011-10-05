@@ -221,12 +221,12 @@ class Workflow extends BaseModel
                 // pokud neni predana osoba, tak test na vedouciho org.jednotky
                 $access = 0; $log_plus = ".";
                 if ( empty($predan->prideleno_id) ) {
-                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id, 'vedouci', $user_id) ) {
+                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
                         $access = 1;
                         $log_plus = " určený organizační jednotce ". $predan->orgjednotka_info->zkraceny_nazev. ".";
                     }
                 } else {
-                    if ( $predan->prideleno_id == $user_id ) {
+                    if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
                         $access = 1;
                     }
                 }
@@ -296,11 +296,11 @@ class Workflow extends BaseModel
 
                 $access = 0;
                 if ( empty($predan->prideleno_id) ) {
-                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id, 'vedouci', $user_id) ) {
+                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
                         $access = 1;
                     }
                 } else {
-                    if ( $predan->prideleno_id == $user_id ) {
+                    if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
                         $access = 1;
                     }
                 }
@@ -386,7 +386,7 @@ class Workflow extends BaseModel
             $predan = is_array($predan_array)?$predan_array[0]:null;
 
             if ( $predan ) {
-                if ( $predan->prideleno_id == $user_id ) {
+                if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -931,11 +931,11 @@ class Workflow extends BaseModel
 
         if ( $row ) {
             if ( empty($row->prideleno_id) ) {
-                if ( Orgjednotka::isInOrg($row->orgjednotka_id, 'vedouci', $user_id) ) {
+                if ( Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
                     return true;
                 }
             } else {
-                if ( $row->prideleno_id == $user_id ) {
+                if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
                     return true;
                 }
             }
@@ -973,11 +973,11 @@ class Workflow extends BaseModel
 
         if ( $row ) {
             if ( empty($row->prideleno_id) ) {
-                if ( Orgjednotka::isInOrg($row->orgjednotka_id, 'vedouci', $user_id) ) {
+                if ( Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
                     return true;
                 }
             } else {
-                if ( $row->prideleno_id == $user_id ) {
+                if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
                     return true;
                 }
             }

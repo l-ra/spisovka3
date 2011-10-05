@@ -912,7 +912,7 @@ class Dokument extends BaseModel
 
         $user = Environment::getUser()->getIdentity();
         $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
-        $isAdmin = Environment::getUser()->isInRole('admin');
+        $isAdmin = ACL::isInRole('admin');
         $isPodatelna = ACL::isInRole('podatelna,skartacni_dohled');
         $vyrusit_bezvyrizeni = false;
         $org_jednotka = array();
@@ -940,7 +940,294 @@ class Dokument extends BaseModel
             $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
         }
 
+        //Debug::dump($org_jednotka);
+        
         switch ($nazev) {
+            
+            /* FNUSA - filtry pro celou org */
+            case 'org_pridelene':
+                // pridelene na jmeno nebo organizacni jednotku uzivatele
+                if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );
+                } else {
+                    $args = array(
+                        'where' => array(
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );
+                }               
+                break;
+            case 'org_nove':
+                if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.stav_dokumentu = 1'),
+                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=1'),
+                            array('wf.aktivni=1') )
+                    );
+                } else {
+                    $args = array(
+                        'where' => array( 
+                            array('wf.stav_dokumentu = 1'),
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby=1'), 
+                            array('wf.aktivni=1') )
+                    ); 
+                }                  
+                break;
+            case 'org_kprevzeti':
+                // prijimajici - predane na jmeno nebo organizacni jednotku uzivatele
+                if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=0'),
+                            array('wf.aktivni=1') )
+                    );
+                } else {
+                    $args = array(
+                        'where' => array( 
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby=0'), 
+                            array('wf.aktivni=1') )
+                    ); 
+                }                  
+                break;
+            case 'org_predane':
+                // predavany - predane na jmeno nebo organizacni jednotku uzivatele
+                if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=1'),
+                            array('wf.aktivni=1') )
+                    );
+                } else {
+                    $args = array(
+                        'where' => array( 
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby=1'), 
+                            array('wf.aktivni=1') )
+                    ); 
+                }  
+                
+                
+                $args = array(
+                    'where' => array( array('wf.stav_osoby=0'), array('wf.aktivni=1') )
+                );                
+                
+            case 'org_kvyrizeni':
+                // k vyrizeni na jmeno nebo organizacni jednotku uzivatele
+                if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.stav_dokumentu = 3'),
+                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=1'),
+                            array('wf.aktivni=1') )
+                    );
+                } else {
+                    $args = array(
+                        'where' => array( 
+                            array('wf.stav_dokumentu = 3'),
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby=1'), 
+                            array('wf.aktivni=1') )
+                    ); 
+                }                 
+                break;
+            case 'org_vyrizene':
+                // vyrizene na jmeno nebo organizacni jednotku uzivatele
+                if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)'),
+                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=1'),
+                            array('wf.aktivni=1') )
+                    );
+                } else {
+                    $args = array(
+                        'where' => array( 
+                            array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)'),
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby=1'), 
+                            array('wf.aktivni=1') )
+                    ); 
+                }                  
+                break;
+            case 'org_pracoval':
+                $vyrusit_bezvyrizeni = true;
+                if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby < 100') )
+                    );
+                } else {
+                    $args = array(
+                        'where' => array( 
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby < 100') )
+                    ); 
+                }                 
+                break;                
+            case 'org_vse':
+
+                if ( $isAdmin || $isPodatelna ) {
+                    // vsechny dokumenty bez ohledu na organizacni jednotku
+                    $args = array(
+                        'where' => array( array('1') )
+                    );
+                } else if ( $isVedouci ) {
+                    // vsechny dokumenty na organizacni jednotku + vcetne podrizenych
+                    $org_jednotka_vedouci = Orgjednotka::childOrg($org_jednotka_vedouci);
+                    if ( count($org_jednotka_vedouci)>0 ) {
+                        $args = array(
+                            'where' => array(
+                                array('wf.orgjednotka_id IN (%in)',$org_jednotka_vedouci),
+                                array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                                array('wf.aktivni=1') )
+
+                        );                        
+                    } else {
+                        $args = array(
+                            'where' => array(
+                                array('wf.prideleno_id=%i',$user->id),
+                                array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                                array('wf.aktivni=1') )
+                        );                        
+                    }                    
+                } else {
+                    // vsechny dokumenty na organizacni jednotku
+                    if ( count($org_jednotka)>0 ) {
+                        $args = array(
+                            'where' => array(
+                                array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                                array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                                array('wf.aktivni=1') )
+                        );
+                    } else {
+                        $args = array(
+                            'where' => array(
+                                array('wf.prideleno_id=%i',$user->id),
+                                array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                                array('wf.aktivni=1') )
+                        );
+                    }                      
+                    
+                    
+                }
+                break;
+            
+            case 'org_doporucene':
+                $vyrusit_bezvyrizeni = true;
+             
+                if ( $isAdmin || $isPodatelna ) {
+                    $args = array();
+                } else if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );                    
+                } else {
+                    $args = array(
+                        'where' => array(
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );                    
+                }
+                
+                $args['leftJoin'] = array('zpusob_odeslani' => array(
+                        'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                        'on' => array('dok_odeslani.dokument_id=d.id'),
+                        'cols' => null
+                    ));
+                $args['where'][] = array("(d.cislo_doporuceneho_dopisu <> '') OR 
+                                             (dok_odeslani.druh_zasilky LIKE '%i:0;i:2;%' OR dok_odeslani.druh_zasilky LIKE '%i:1;i:2;%')"
+                                   );
+                
+                break;     
+            case 'org_predane_k_odeslani':
+                $vyrusit_bezvyrizeni = true;
+                if ( $isAdmin || $isPodatelna ) {
+                    $args = array();
+                } else if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );                    
+                } else {
+                    $args = array(
+                        'where' => array(
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );                    
+                }              
+                
+                $args['leftJoin'] = array('zpusob_odeslani' => array(
+                        'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                        'on' => array('dok_odeslani.dokument_id=d.id'),
+                        'cols' => null
+                    ));
+                $args['where'][] = array("dok_odeslani.stav=1");
+                //echo "<pre>"; print_r($args); echo "</pre>";
+                
+                break;  
+            case 'org_odeslane':
+                $vyrusit_bezvyrizeni = true;
+                if ( $isAdmin || $isPodatelna ) {
+                    $args = array();
+                } else if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );                    
+                } else {
+                    $args = array(
+                        'where' => array(
+                            array('wf.prideleno_id=%i',$user->id),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );                    
+                }          
+                
+                $args['leftJoin'] = array('zpusob_odeslani' => array(
+                        'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
+                        'on' => array('dok_odeslani.dokument_id=d.id'),
+                        'cols' => null
+                    ));
+                $args['where'][] = array("dok_odeslani.stav=2");
+                
+                break;                  
+                
+            /* FNUSA - filtry pro celou org * END */
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             case 'org':
                 if ( $isVedouci ) {
 

@@ -196,6 +196,8 @@ class Orgjednotka extends TreeModel
     public static function isInOrg($orgjednotka_id, $role = null, $user_id = null) {
         $is = false;
 
+        if ( empty($orgjednotka_id) ) return false;
+        
         if ( !is_null($user_id) ) {
             $UserModel = new UserModel();
             $user = $UserModel->getUser($user_id, true);
@@ -206,7 +208,7 @@ class Orgjednotka extends TreeModel
         if ( count( $user->user_roles )>0 ) {
             foreach ( $user->user_roles as $r ) {
                 if ( $r->orgjednotka_id == $orgjednotka_id ) {
-                    if ( is_null($r) ) {
+                    if ( is_null($role) ) {
                         $is = true;
                     } else {
                         if (strpos($r->code, $role) !== false ) {

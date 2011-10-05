@@ -306,14 +306,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }      
             
             // Prideleny nebo predany uzivatel
-            if ( @$dokument->prideleno->prideleno_id == $user_id ) {
+            if ( @$dokument->prideleno->prideleno_id == $user_id || Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id, null, $user_id) ) {
                 // prideleny
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
                 $formUpravit = $this->getParam('upravit',null);
             }
-            if ( @$dokument->predano->prideleno_id == $user_id ) {
+            if ( @$dokument->predano->prideleno_id == $user_id  || Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id, null, $user_id)) {
                 // predany
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
@@ -321,7 +321,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $formUpravit = $this->getParam('upravit',null);
             }
             if ( empty($dokument->prideleno->prideleno_id)
-                        && Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id, 'vedouci') ) {
+                        && Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) ) {
                 // prideleno organizacni jednotce
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
@@ -329,7 +329,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $formUpravit = $this->getParam('upravit',null);
             }
             if ( empty($dokument->predano->prideleno_id)
-                        && Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id, 'vedouci') ) {
+                        && Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id) ) {
                 // predano organizacni jednotce
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
@@ -2650,14 +2650,22 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     protected function createComponentFiltrForm()
     {
 
-        //$args = $Dokument->filtr('moje');
-        //$args = $Dokument->filtr('predane');
-        //$args = $Dokument->filtr('pracoval');
-        //$args = $Dokument->filtr('moje_nove');
-        //$args = $Dokument->filtr('vsichni_nove');
-        //$args = $Dokument->filtr('moje_vyrizuje');
-        //$args = $Dokument->filtr('vsichni_vyrizuji');
-
+        $filtr =  !is_null($this->filtr)?$this->filtr:'org_pridelene';
+        $select = array(
+            'org_pridelene'=>'Přidělené',
+            'org_kprevzeti'=>'K převzetí',
+            'org_nove'=>'Nové / nepředané',
+            'org_kvyrizeni'=>'K vyřízení',
+            'org_vyrizene'=>'Vyřízené',
+            'org_pracoval'=>'Na kterých jsem kdy pracoval',
+            'org_doporucene'=>'Doporučené',
+            'org_predane_k_odeslani'=>'Předané',
+            'org_predane_k_odeslani'=>'K odeslání',
+            'org_odeslane'=>'Odeslané', 
+            'org_vse'=>'Všechny',
+        );        
+        
+        if (0):
         if ( Environment::getUser()->isAllowed(null, 'is_vedouci') ) {
             $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
             $select = array(
@@ -2706,6 +2714,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 )
             );
         }
+        endif; // if 0
 
         $filtr_bezvyrizenych =  !is_null($this->filtr_bezvyrizenych)?$this->filtr_bezvyrizenych:false;
 
