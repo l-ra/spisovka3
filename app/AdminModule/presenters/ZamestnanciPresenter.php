@@ -328,6 +328,9 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         if ( isset($user_role) ) {
             foreach ($user_role as $ur) {
+
+                if ( isset($form1['role'.$ur->id]) ) continue;
+                
                 $form1->addGroup('role_id_' . $ur->id);
                 $subForm = $form1->addContainer('role'.$ur->id);
                 $subForm->addCheckbox("user_role", 'povolit')
