@@ -137,7 +137,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
         if ( isset($filtr) ) {
             // zjisten filtr
-            $args = $Dokument->filtr('spisovna', $filtr['filtr']);
+            $args_f = $Dokument->filtr('spisovna', $filtr['filtr']);
             $this->filtr = $filtr['filtr'];
             $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
         } else {
@@ -146,11 +146,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             if ( $cookie_filtr ) {
                 // zjisten filtr v cookie, tak vezmeme z nej
                 $filtr = unserialize($cookie_filtr);
-                $args = $Dokument->filtr('spisovna', $filtr['filtr']);
+                $args_f = $Dokument->filtr('spisovna', $filtr['filtr']);
                 $this->filtr = $filtr['filtr'];
                 $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
             } else {
-                $args = null;// $Dokument->filtr('');
+                $args_f = null;// $Dokument->filtr('');
                 $this->filtr = '';
             }
 
@@ -159,11 +159,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         if ( isset($hledat) ) {
             if (is_array($hledat) ) {
                 // podrobne hledani = array
-                $args = $Dokument->filtr(null,$hledat);
+                $args_h = $Dokument->filtr(null,$hledat);
                 $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
             } else {
                 // rychle hledani = string
-                $args = $Dokument->hledat($hledat);
+                $args_h = $Dokument->hledat($hledat);
                 $this->hledat = $hledat;
                 $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
             }
@@ -175,11 +175,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $hledat = unserialize($cookie_hledat);
                 if (is_array($hledat) ) {
                     // podrobne hledani = array
-                    $args = $Dokument->filtr(null,$hledat);
+                    $args_h = $Dokument->filtr(null,$hledat);
                     $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
                 } else {
                     // rychle hledani = string
-                    $args = $Dokument->hledat($hledat);
+                    $args_h = $Dokument->hledat($hledat);
                     $this->hledat = $hledat;
                     $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
                 }
@@ -187,6 +187,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
         $this->template->s3_hledat = $hledat;        
 
+        $args = $Dokument->spojitAgrs(@$args_f, @$args_h);
+        
         if ( isset($seradit) ) {
             $Dokument->seradit($args, $seradit);
             $this->getHttpResponse()->setCookie('s3_spisovna_seradit', $seradit, strtotime('90 day'));
@@ -850,7 +852,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $filtr =  !is_null($this->filtr)?$this->filtr:'stav_77';
             $select = array(
                 'stav_77'=>'Zobrazit vše',
-                'vlastni'=>'Vlastní dokumenty',
                 'Podle skartačního znaku' => array(
                     'skartacni_znak_A'=>'A',
                     'skartacni_znak_V'=>'V',
@@ -886,7 +887,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $form_data = $button->getForm()->getValues();
         $data = array('filtr'=>$form_data['filtr']);
         $this->getHttpResponse()->setCookie('s3_spisovna_filtr', serialize($data), strtotime('90 day'));
-        $this->forward(':Spisovna:Dokumenty:default', array('filtr'=>$data) );
+        $this->redirect(':Spisovna:Dokumenty:default', array('filtr'=>$data) );
     }
     
     protected function createComponentSeraditForm()
@@ -934,7 +935,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     {
         $form_data = $button->getForm()->getValues();
         $this->getHttpResponse()->setCookie('s3_spisovna_seradit', $form_data['seradit'], strtotime('90 day'));
-        $this->forward(':Spisovna:Dokumenty:default', array('seradit'=>$form_data['seradit']) );
+        $this->redirect(':Spisovna:Dokumenty:default', array('seradit'=>$form_data['seradit']) );
     }
     
     

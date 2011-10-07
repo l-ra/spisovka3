@@ -947,10 +947,16 @@ class Dokument extends BaseModel
             /* FNUSA - filtry pro celou org */
             case 'org_pridelene':
                 // pridelene na jmeno nebo organizacni jednotku uzivatele
-                if ( count($org_jednotka)>0 ) {
+                if ( $isAdmin ) {
                     $args = array(
                         'where' => array(
-                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.aktivni=1') )
+                    );                    
+                } else if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
                             array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
                             array('wf.aktivni=1') )
                     );
@@ -964,11 +970,18 @@ class Dokument extends BaseModel
                 }               
                 break;
             case 'org_nove':
-                if ( count($org_jednotka)>0 ) {
+                if ( $isAdmin ) {
                     $args = array(
                         'where' => array(
                             array('wf.stav_dokumentu = 1'),
-                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=1'),
+                            array('wf.aktivni=1') )
+                    );                   
+                } else if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.stav_dokumentu = 1'),
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
                             array('wf.stav_osoby=1'),
                             array('wf.aktivni=1') )
                     );
@@ -984,10 +997,16 @@ class Dokument extends BaseModel
                 break;
             case 'org_kprevzeti':
                 // prijimajici - predane na jmeno nebo organizacni jednotku uzivatele
-                if ( count($org_jednotka)>0 ) {
+                if ( $isAdmin ) {
                     $args = array(
                         'where' => array(
-                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=0'),
+                            array('wf.aktivni=1') )
+                    );                   
+                } else if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
                             array('wf.stav_osoby=0'),
                             array('wf.aktivni=1') )
                     );
@@ -1002,10 +1021,16 @@ class Dokument extends BaseModel
                 break;
             case 'org_predane':
                 // predavany - predane na jmeno nebo organizacni jednotku uzivatele
-                if ( count($org_jednotka)>0 ) {
+                if ( $isAdmin ) {
                     $args = array(
                         'where' => array(
-                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=1'),
+                            array('wf.aktivni=1') )
+                    );                   
+                } else if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
                             array('wf.stav_osoby=1'),
                             array('wf.aktivni=1') )
                     );
@@ -1025,11 +1050,18 @@ class Dokument extends BaseModel
                 
             case 'org_kvyrizeni':
                 // k vyrizeni na jmeno nebo organizacni jednotku uzivatele
-                if ( count($org_jednotka)>0 ) {
+                if ( $isAdmin ) {
                     $args = array(
                         'where' => array(
                             array('wf.stav_dokumentu = 3'),
-                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=1'),
+                            array('wf.aktivni=1') )
+                    );                   
+                } else if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('wf.stav_dokumentu = 3'),
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
                             array('wf.stav_osoby=1'),
                             array('wf.aktivni=1') )
                     );
@@ -1045,11 +1077,18 @@ class Dokument extends BaseModel
                 break;
             case 'org_vyrizene':
                 // vyrizene na jmeno nebo organizacni jednotku uzivatele
-                if ( count($org_jednotka)>0 ) {
+                if ( $isAdmin ) {
                     $args = array(
                         'where' => array(
                             array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)'),
-                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.stav_osoby=1'),
+                            array('wf.aktivni=1') )
+                    );                   
+                } else if ( count($org_jednotka)>0 ) {
+                    $args = array(
+                        'where' => array(
+                            array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)'),
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
                             array('wf.stav_osoby=1'),
                             array('wf.aktivni=1') )
                     );
@@ -1068,7 +1107,7 @@ class Dokument extends BaseModel
                 if ( count($org_jednotka)>0 ) {
                     $args = array(
                         'where' => array(
-                            array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
                             array('wf.stav_osoby < 100') )
                     );
                 } else {
@@ -1110,7 +1149,7 @@ class Dokument extends BaseModel
                     if ( count($org_jednotka)>0 ) {
                         $args = array(
                             'where' => array(
-                                array('(wf.prideleno_id=%i',$user->id, ') OR wf.orgjednotka_id IN (%in)',$org_jednotka),
+                                array('wf.orgjednotka_id IN (%in)',$org_jednotka),
                                 array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
                                 array('wf.aktivni=1') )
                         );
@@ -1427,7 +1466,8 @@ class Dokument extends BaseModel
             $stav = substr($params, 5);
             return $this->paramsFiltr(array('stav_dokumentu'=>$stav));
         } else if ( $params == 'vlastni' ) {
-            return $this->paramsFiltr(array('stav_dokumentu'=>77,'prideleno_osobne'=>1));
+            return $this->paramsFiltr(array('stav_dokumentu'=>77));
+            //return $this->paramsFiltr(array('stav_dokumentu'=>77,'prideleno_osobne'=>1));
         } else if ( strpos($params,'skartacni_znak_') !== false ) {
             $skartacni_znak = substr($params, 15);
             return $this->paramsFiltr(array('skartacni_znak'=>$skartacni_znak));
@@ -1470,9 +1510,9 @@ class Dokument extends BaseModel
             
             $where_org = null;
             if ( count($org_jednotka_vedouci) > 0 ) {
-                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka_vedouci );
+                $where_org = array( 'wf.orgjednotka_id IN (%in) AND wf.aktivni=1',$org_jednotka_vedouci );
             } else if ( count($org_jednotka) == 1 ) {
-                $where_org = array( 'wf.orgjednotka_id=%i',$org_jednotka[0] );
+                $where_org = array( 'wf.orgjednotka_id=%i AND wf.aktivni=1',$org_jednotka[0] );
             } else if ( count($org_jednotka) > 1 ) {
                 $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
             }
@@ -2028,7 +2068,7 @@ class Dokument extends BaseModel
                 $app_id = 'OSS-'. $unique_part[0];
                 $data['jid'] = $app_id.'-ESS-'.$dokument_id;
             } 
-            if ( empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0 ) $data['skartacni_lhuta'] = null;           
+            if ( isset($data['skartacni_lhuta']) && empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0 ) $data['skartacni_lhuta'] = null;           
 
             $data['date_created'] = new DateTime();
             $data['user_created'] = Environment::getUser()->getIdentity()->id;
@@ -2110,7 +2150,7 @@ class Dokument extends BaseModel
                 $app_id = 'OSS-'. $unique_part[0];
                 $data['jid'] = $app_id.'-ESS-'.$dokument_id;
             }  
-            if ( empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0 ) $data['skartacni_lhuta'] = null;           
+            if ( isset($data['skartacni_lhuta']) && empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0 ) $data['skartacni_lhuta'] = null;           
 
             $old_dokument = $this->getBasicInfo($dokument_id);
 
@@ -2141,7 +2181,7 @@ class Dokument extends BaseModel
                     } else {
                         $old_dokument['zpusob_vyrizeni_id'] = (int) $old_dokument['zpusob_vyrizeni_id'];
                     }
-                    if ( empty($old_dokument['skartacni_lhuta']) && $old_dokument['skartacni_lhuta'] != 0 ) $old_dokument['skartacni_lhuta'] = null;           
+                    if ( isset($old_dokument['skartacni_lhuta']) &&  empty($old_dokument['skartacni_lhuta']) && $old_dokument['skartacni_lhuta'] != 0 ) $old_dokument['skartacni_lhuta'] = null;           
                     if ( empty($old_dokument['spousteci_udalost_id']) ) $old_dokument['spousteci_udalost_id'] = null;
                     $old_dokument = (array) $old_dokument;
                     $old_dokument['dokument_id'] = $dokument_id;
@@ -2305,6 +2345,30 @@ class Dokument extends BaseModel
 
     }
 
+    public function spojitAgrs($args1, $args2)
+    {
+        $tmp = array();
+        
+        if ( count($args1)>0 ) {
+            foreach ( $args1 as $args1_index => $args1_value ) {
+                if ( isset($args2[$args1_index]) ) {
+                    $tmp[$args1_index] = array_merge($args1_value, $args2[$args1_index] );
+                    unset($args2[$args1_index]);
+                } else {
+                    $tmp[$args1_index] = $args1_value;
+                }
+            }
+        }
+        
+        if ( count($args2)>0 ) {
+            foreach ( $args2 as $args2_index => $args2_value ) {
+                $tmp[$args2_index] = $args2_value;
+            }
+        }
+        
+        return $tmp;
+    }
+    
     public static function typDokumentu( $kod = null, $select = 0 ) {
 
         $prefix = Environment::getConfig('database')->prefix;

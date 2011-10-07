@@ -52,7 +52,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( isset($filtr) ) {
             // zjisten filtr
             $this->getHttpResponse()->setCookie('s3_filtr', serialize($filtr), strtotime('90 day'));
-            $args = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
+            $args_f = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
             $this->filtr = $filtr['filtr'];
             $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
             $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
@@ -62,12 +62,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ( $cookie_filtr ) {
                 // zjisten filtr v cookie, tak vezmeme z nej
                 $filtr = unserialize($cookie_filtr);
-                $args = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
+                $args_f = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
                 $this->filtr = $filtr['filtr'];
                 $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
                 $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
             } else {
-                $args = $Dokument->filtr('moje');
+                $args_f = $Dokument->filtr('moje');
                 $this->filtr = 'moje';
                 $this->filtr_bezvyrizenych = false;
             }
@@ -77,11 +77,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( isset($hledat) ) {
             if (is_array($hledat) ) {
                 // podrobne hledani = array
-                $args = $Dokument->filtr(null,$hledat);
+                $args_h = $Dokument->filtr(null,$hledat);
                 $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
             } else {
                 // rychle hledani = string
-                $args = $Dokument->hledat($hledat);
+                $args_h = $Dokument->hledat($hledat);
                 $this->hledat = $hledat;
                 $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
             }
@@ -93,17 +93,26 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $hledat = unserialize($cookie_hledat);
                 if (is_array($hledat) ) {
                     // podrobne hledani = array
-                    $args = $Dokument->filtr(null,$hledat);
+                    $args_h = $Dokument->filtr(null,$hledat);
                     $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
                 } else {
                     // rychle hledani = string
-                    $args = $Dokument->hledat($hledat);
+                    $args_h = $Dokument->hledat($hledat);
                     $this->hledat = $hledat;
                     $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
                 }
             }
         }
         $this->template->s3_hledat = $hledat;
+        
+        //echo "<pre>";
+        //print_r(@$args_f);
+        //print_r(@$args_h);
+        
+        $args = $Dokument->spojitAgrs(@$args_f, @$args_h);
+        //echo "<pre>"; print_r($args); echo "</pre>";
+        //$args = $args_f;
+        
         
         if ( isset($seradit) ) {
             $Dokument->seradit($args, $seradit);

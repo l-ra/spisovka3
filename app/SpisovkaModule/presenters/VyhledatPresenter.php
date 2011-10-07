@@ -9,6 +9,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
         $this->template->DruhZasilky = DruhZasilky::get(null,1);
         
+        $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');
+        
         if ( $this->getParam('is_ajax') ) {
             $this->layout = false;
         }
@@ -49,10 +51,10 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 foreach( $seznam as $user ) {
                     if ( $typ == 2 ) {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='predano[]' value='". $user->user_id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
                     } else {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='prideleno[]' value='". $user->user_id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
 
                     }
                     
@@ -161,8 +163,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 ->setValue(@$hledat['pocet_listu']);
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$hledat['pocet_priloh']);
-        $form->addSelect('stav_dokumentu', 'Stav dokumentu:', $stav_dokumentu)
-                ->setValue(@$hledat['stav_dokumentu']);
+        //$form->addSelect('stav_dokumentu', 'Stav dokumentu:', $stav_dokumentu)
+        //        ->setValue(@$hledat['stav_dokumentu']);
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->setValue(@$hledat['lhuta']);

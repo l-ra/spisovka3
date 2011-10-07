@@ -8,10 +8,6 @@
             <dd>{$searchForm['dokument_typ_id']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Stav dokumentu:</dt>
-            <dd>{$searchForm['stav_dokumentu']->control}</dd>
-        </dl>
-        <dl class="detail_item">
             <dt>Číslo jednací:</dt>
             <dd>{$searchForm['cislo_jednaci']->control}</dd>
         </dl>
@@ -67,8 +63,6 @@
             <dd>{$searchForm['zpusob_odeslani']->control}</dd>
         </dl>
         
-        
-        
         <dl class="detail_item">
             <dt>Datum odeslání:</dt>
             <dd>od: {$searchForm['datum_odeslani_od']->control} {$searchForm['datum_odeslani_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
@@ -107,6 +101,7 @@
         </dl>
     </div>
 
+    {if $isPrivilege}
     <div id="dokument_blok_poznamka">
         <div class="h2">
             Přidělěno / předáno
@@ -166,6 +161,7 @@
             </dd>
         </dl>
     </div>
+    {/if}
 
     <div id="dokument_blok_poznamka">
         <div class="h2">

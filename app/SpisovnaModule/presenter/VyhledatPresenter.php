@@ -7,6 +7,8 @@ class Spisovna_VyhledatPresenter extends BasePresenter
     {
         $this->template->searchForm = $this['searchForm'];
 
+        $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');
+        
         if ( $this->getParam('is_ajax') ) {
             $this->layout = false;
         }
@@ -47,10 +49,10 @@ class Spisovna_VyhledatPresenter extends BasePresenter
                 foreach( $seznam as $user ) {
                     if ( $typ == 2 ) {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='predano[]' value='". $user->user_id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
                     } else {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='prideleno[]' value='". $user->user_id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
 
                     }
                     
