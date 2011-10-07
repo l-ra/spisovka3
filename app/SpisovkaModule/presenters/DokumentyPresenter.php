@@ -584,6 +584,27 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
     
+    public function renderOdmitnoutprevzeti()
+    {
+
+        $dokument_id = $this->getParam('id',null);
+        $user_id = $this->getParam('user',null);
+        $orgjednotka_id = $this->getParam('org',null);
+
+        $Workflow = new Workflow();
+        if ( $Workflow->predany($dokument_id) ) {
+            if ( $Workflow->zrusit_prevzeti($dokument_id) ) {
+               $this->flashMessage('Odmítl jste převzetí dokumentu.');
+            } else {
+                $this->flashMessage('Odmítnutí převzetí se nepodařilo. Zkuste to znovu.','warning');
+            }
+        } else {
+            $this->flashMessage('Nemáte oprávnění k odmítnutí převzetí dokumentu.','warning');
+        }
+        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+
+    }    
+    
     
     public function renderKvyrizeni()
     {

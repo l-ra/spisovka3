@@ -85,6 +85,7 @@
        <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>$user->id, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
        {if $Predan==1 }
        <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít dokument</a>
+       <a href="{link :Spisovka:Dokumenty:odmitnoutprevzeti, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
        {/if}
        {if ($Pridelen==1 && !empty($Dok->predano) ) }
        <a href="{link :Spisovka:Dokumenty:zrusitprevzeti, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="zrusitprevzetidokument">Zrušit převzeti dokumentu</a>
