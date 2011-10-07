@@ -168,7 +168,6 @@ form {
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px dotted #c0c0c0;
-    
 }
 
 #dialog .blok_menu,
@@ -911,9 +910,9 @@ label.required {
 
 #tisk {
     position: absolute;
-    width: 980px;
+    width: 480px;
     top: 0px;
-    left: 0px;
+    left: 500px;
     margin: 10px -50px 0px 0px;
     text-align: right;
 }
