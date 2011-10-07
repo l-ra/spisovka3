@@ -55,7 +55,7 @@ class LogModel extends BaseModel {
         '12' => 'Dokument změněn',
         '13' => 'Dokument smazán',
         '14' => 'Dokument předán',
-        '15' => 'Dokument převzán',
+        '15' => 'Dokument převzat',
         '16' => 'Dokument označen k vyřízení',
         '17' => 'Dokument vyřízen',
         '18' => 'Dokument přijat e-podatelnou',
