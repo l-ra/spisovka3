@@ -83,7 +83,7 @@ class TreeModel extends BaseModel
 
     }
 
-    public function select($type = 0, $id = null, $parent_id = null) {
+    public function select($type = 0, $id = null, $parent_id = null, $params = null) {
 
         $result = array();
         $parent_sekvence = null;
@@ -103,7 +103,7 @@ class TreeModel extends BaseModel
             $result[$null_id] = 'všechny ...';
         }
 
-        $rows = $this->nacti($parent_id);
+        $rows = $this->nacti($parent_id,true,true,$params);
         if ( count($rows) ) {
             foreach ( $rows as $row_index => $row ) {
 

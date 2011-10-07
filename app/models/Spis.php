@@ -521,10 +521,10 @@ class Spis extends TreeModel
     public static function typSpisu($typ = null, $sklonovat = 0) {
 
         $typ_array1 = array('S'=>'spis',
-                     'VS'=>'věcná skupina'
+                     'VS'=>'složka'
                      );
         $typ_array2 = array('S'=>'spisu',
-                     'VS'=>'věcné skupiny'
+                     'VS'=>'složky'
                      );
 
         $typ_array = ($sklonovat==1)?$typ_array2:$typ_array1;

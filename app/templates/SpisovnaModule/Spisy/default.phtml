@@ -6,45 +6,6 @@
 
     <h2>Seznam spisů</h2>
 
-    <div id="dokument_blok_volby">
-        {$spisplanForm->render('begin')}
-        {$spisplanForm['spisplan']->label} {$spisplanForm['spisplan']->control}
-        {$spisplanForm['go_spisplan']->control}
-        {$spisplanForm->render('end')}
-    </div>
-
-    {if isset($SpisovyPlan) }
-
-    <h2>{$SpisovyPlan->nazev}</h2>
-
-    <div class="dokument_blok">
-        <dl class="detail_item">
-            <dt>Spisový znak: </dt>
-            <dd>
-                {=Spis::spisovyZnak($SpisovyPlan)}&nbsp;
-            </dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Otevřeno dne: </dt>
-            <dd>
-                {$SpisovyPlan->datum_otevreni|edate}&nbsp;
-            </dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Uzavřeno dne:</dt>
-            <dd>
-                {$SpisovyPlan->datum_uzavreni|edate}&nbsp;
-            </dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Poznamka:</dt>
-            <dd>
-                {!$SpisovyPlan->popis|enl2br}&nbsp;
-            </dd>
-        </dl>
-    </div>
-    <br />
-
     <div id="search">
         {control searchForm}
     </div>
@@ -56,7 +17,7 @@
     <table>
         <tr>
             <th class="akce">&nbsp;</th>
-            <th>Spis / Věcná skupina</th>
+            <th>Spisy</th>
         </tr>
         {foreach $seznam as $spis}
         <tr class="{$spis->class}" id="sitem{$spis->spis_id}">
@@ -68,7 +29,7 @@
             <td>
                 {!=str_repeat("&nbsp;", 5*$spis->uroven)}
                 {if $spis->typ=='VS'}
-                <img src="{$baseUri}images/icons/folder_yellow.png" alt="Věcná skupina" title="Věcná skupna" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                <img src="{$baseUri}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
                 {$spis->nazev}
                 {else}
@@ -100,7 +61,3 @@
     <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
     {/if}
     </div>
-    {else}
-    <br class="clear">
-    <div class="prazdno">Nebyl zjištěn žádný spisový plán.</div>
-    {/if}

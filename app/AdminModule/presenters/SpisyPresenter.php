@@ -316,7 +316,8 @@ class Admin_SpisyPresenter extends BasePresenter
 
         $session_spisplan = Environment::getSession('s3_spisplan');
 
-        $spisy = $Spisy->select(11, null, $session_spisplan->spis_id);
+        $params = array('where'=> array("tb.typ = 'VS'") );
+        $spisy = $Spisy->select(11, null, $session_spisplan->spis_id, $params);
 
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->select(2);
@@ -324,10 +325,10 @@ class Admin_SpisyPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
-        $form1->addText('nazev', 'Název spisu:', 50, 80)
+        $form1->addText('nazev', 'Název spisu/složky:', 50, 80)
                 ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200);
-        $form1->addSelect('parent_id', 'Mateřská entita:', $spisy)
+        $form1->addSelect('parent_id', 'Složka:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
 
         //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
