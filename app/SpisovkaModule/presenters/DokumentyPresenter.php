@@ -453,6 +453,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyřiďte co nejrychleji tento dokument.');
             }
 
+            // Kontrola existence nazvu
+            if ( $this->template->Pridelen && $this->template->AccessEdit ) {
+                if ( $dokument->stav_dokumentu >= 2 && !Acl::isInRole('podatelna') && (empty($dokument->nazev) || $dokument->nazev == "(bez názvu)" ) ) {
+                    $this->template->nutnyNadpis = 1;
+                    $this->template->FormUpravit = 'metadata';
+                }
+            }
+            
+            
             // Volba vystupu - web/tisk/pdf
             $tisk = $this->getParam('print');
             $pdf = $this->getParam('pdfprint');

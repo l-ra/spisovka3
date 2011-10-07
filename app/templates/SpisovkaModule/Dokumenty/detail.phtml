@@ -78,6 +78,9 @@
     <div id="dokument_blok_volby">
        {if $Pridelen==1 }
        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
+       <?php if ( isset($nutnyNadpis) ) { ?>
+       <script type="text/javascript"> alert("Název dokumentu (věc) je prázdný. Je nutné ho vyplnit!"); </script>     
+       <?php } ?>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }">Upravit vyřízení</a>
