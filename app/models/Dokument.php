@@ -2395,6 +2395,18 @@ class Dokument extends BaseModel
                     }
                 }
                 return $tmp;
+            } else if ( $select == 4 ) { // podatelna + referent
+                $tmp = array();
+                foreach ($result as $dt) {
+                    if ( $dt->stav == 0 ) continue;
+                    if ( $dt->podatelna == 1 ) {
+                        $tmp[ $dt->id ] = $dt->nazev;
+                    }
+                    if ( $dt->referent == 1 ) {
+                        $tmp[ $dt->id ] = $dt->nazev;
+                    }                    
+                }
+                return $tmp;                
             } else if ( $select == 3 ) {
                 $tmp = array();
                 $tmp[0] = 'jakýkoli typ dokumentu';

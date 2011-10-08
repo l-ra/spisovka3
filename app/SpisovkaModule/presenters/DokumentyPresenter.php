@@ -1375,9 +1375,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dokument_id = 0;
         }
 
-        if ( Acl::isInRole('podatelna') ) {
+        if ( Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,skartacni_dohled') ) {
+            $typ_dokumentu = Dokument::typDokumentu(null,4);
+            $this->template->isPodatelna = true;
+        } else if ( Acl::isInRole('podatelna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,2);
             $this->template->isPodatelna = true;
+        } else if ( Acl::isInRole('admin') ) {
+            $typ_dokumentu = Dokument::typDokumentu(null,4);
+            $this->template->isPodatelna = true;            
         } else {
             $typ_dokumentu = Dokument::typDokumentu(null,1);
             $this->template->isPodatelna = false;
@@ -1588,13 +1594,19 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $Dok = @$this->template->Dok;
 
-        if ( Acl::isInRole('podatelna') ) {
+        if ( Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,skartacni_dohled') ) {
+            $typ_dokumentu = Dokument::typDokumentu(null,4);
+            $this->template->isPodatelna = true;
+        } else if ( Acl::isInRole('podatelna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,2);
             $this->template->isPodatelna = true;
+        } else if ( Acl::isInRole('admin') ) {
+            $typ_dokumentu = Dokument::typDokumentu(null,4);
+            $this->template->isPodatelna = true;            
         } else {
             $typ_dokumentu = Dokument::typDokumentu(null,1);
             $this->template->isPodatelna = false;
-        }  
+        }
         
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
 
