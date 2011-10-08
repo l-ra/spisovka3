@@ -78,6 +78,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         if ( isset($role->id) ) {
             unset($role_select[$role->id]);
         }
+        $role_select[0] = "(nedědí)";
         
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -91,7 +92,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1->addTextArea('note', 'Popis role:', 50, 5)
                 ->setValue(@$role->note);
         $form1->addSelect('parent_id', 'Dědí z role:', $role_select)
-                ->setValue(@$role->parent_id);
+                ->setValue( is_null(@$role->parent_id)?0:@$role->parent_id   );
 
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
@@ -119,10 +120,10 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         $RoleModel = new RoleModel();
         $role_id = $data['id'];
-        $data['date_modified'] = new DateTime();
+        $data['date_modified'] = date('Y-m-d H:i:s');
         unset($data['id']);
-
-        $RoleModel->upravit($data,array('id=%i',$role_id));
+        
+        $RoleModel->upravit($data,$role_id);
 
         $this->flashMessage('Role  "'. $data['name'] .'"  byla upravena.');
         $this->redirect('this',array('id'=>$role_id));

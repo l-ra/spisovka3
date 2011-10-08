@@ -99,16 +99,16 @@ class RoleModel extends TreeModel
 
         return $this->vlozitH($data);
     }
-    public function upravit($data,$where) {
+    public function upravit($data,$id) {
 
         if ( $this->cache ) {
             $cache = Environment::getCache('db_cache');
             unset($cache['s3_Role'], $cache['s3_Permission']);
         }
 
-        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+        if ( empty($data['parent_id']) || $data['parent_id'] == 0 ) $data['parent_id'] = null;
 
-        return $this->upravitH($data, $where);
+        return $this->upravitH($data, $id);
     }
     public function smazat($where) {
         if ( $this->cache ) {
