@@ -403,8 +403,12 @@ class Workflow extends BaseModel
                         return false;
                     }
 
+                    // spouteci udalost FNUSA
+                    $stav = 5;
+                    $datum_spusteni = (date("Y")+1) ."-01-01";
+                    
                     // spouteci udalost - manualni nebo automativky
-                    if ( $dokument_info->spousteci_udalost_stav == 2 && is_null($accepted) ) {
+                    /*if ( $dokument_info->spousteci_udalost_stav == 2 && is_null($accepted) ) {
                         $stav = 5;
                         $datum_spusteni = date("Y-m-d");
                     } else if ( !is_null($accepted) ) {
@@ -416,7 +420,7 @@ class Workflow extends BaseModel
                         }
                     } else {
                         return "udalost";
-                    }
+                    }*/
 
                     // Deaktivujeme starsi zaznamy
                     $this->deaktivovat($dokument_id);
