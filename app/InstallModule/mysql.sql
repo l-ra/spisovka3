@@ -1,5 +1,6 @@
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
+SET foreign_key_checks = 0;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -447,6 +448,10 @@ CREATE TABLE IF NOT EXISTS `{tbls3}spis` (
   KEY `spisovy_znak_id` (`spisovy_znak_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
+INSERT INTO `{tbls3}spis` (
+`id`,`parent_id`,`spousteci_udalost_id`,`spisovy_znak_id`,`nazev`,`popis`,`typ`,`sekvence`,`sekvence_string`,`uroven`,`stav`,`date_created`,`user_created`,`date_modified`,`user_modified`,`spisovy_znak`,`spisovy_znak_plneurceny`,`skartacni_znak`,`skartacni_lhuta`,`datum_otevreni`,`datum_uzavreni` )
+VALUES (1 , NULL , 1, NULL , 'SPISY', '', 'SP', '1', 'SPISY.1', 0, 1, NOW(), 1, NULL , NULL , NULL , NULL , 'V', '100', NOW(), NULL );
+
 CREATE TABLE IF NOT EXISTS `{tbls3}spisovy_znak` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_id` int(11) DEFAULT NULL,
@@ -478,22 +483,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}spousteci_udalost` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}spousteci_udalost` (`id`, `nazev`, `poznamka`, `stav`, `poznamka_k_datumu`) VALUES
-(1, 'Skartační lhůta začíná plynout po ztrátě platnosti dokumentu.', NULL, 1, 'ukončení platnosti dokumentu'),
-(2, 'Skartační lhůta začíná plynout po ukončení záruky.', NULL, 1, 'ukončení záruky'),
-(3, 'Skartační lhůta začíná plynout po uzavření dokumentu.', NULL, 1, 'uzavření/vyřízení dokumentu'),
-(4, 'Skartační lhůta počíná plynout po zařazení dokumentů z předávacích protokolů do skartačního řízení (předávací protokoly).', NULL, 1, 'zařazení dokumentů'),
-(5, 'Skartační lhůta začíná plynout po vyhodnocení dokumentu (Podkladový materiál k výkazům).', NULL, 1, 'vyhotovení dokumentu'),
-(6, 'Skartační lhůta začíná běžet po roce, v němž byla výpočetní a jiná technika naposledy použita, nebo po ukončení používání příslušného software (Provozní dokumentace, licence).', NULL, 1, 'posledního použití nebo ukončení použití'),
-(7, 'Skartační lhůta začíná plynout po vyhlášení výsledků voleb.', NULL, 1, 'vyhlášení výsledku voleb'),
-(8, 'Skartační lhůta začíná plynout po zrušení zařízení.', NULL, 1, 'zrušení zařízení'),
-(9, 'Nabytí účinnosti.', NULL, 1, 'nabytí účinnosti'),
-(10, 'Rozhodnutí, nabytí právní moci.', NULL, 1, 'rozhodnutí'),
-(11, 'Uvedení objektu do provozu.', NULL, 1, 'udevení objektu do provozu'),
-(12, 'Ukončení studia.', NULL, 1, 'ukončení studia'),
-(13, 'Ukončení pobytu.', NULL, 1, 'ukončení pobytu'),
-(14, 'Ukončení pracovního/služebního poměru.', NULL, 1, 'ukončení pracovního/služebního poměru'),
-(15, 'Skartační lhůta u dokumentů celostátně vyhlášeného referenda začíná plynout po vyhlášení výsledků referenda prezidentem republiky ve Sbírce zákonů, popřípadě po vyhlášení nálezu Ústavního soudu, kterým rozhodl, že postup při provádění referenda nebyl v souladu s ústavním zákonem o referendu o přistoupení České republiky k Evropské unii nebo zákonem vydaným k jeho provedení s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu.', NULL, 1, 'vyhlášení výsledků referenda'),
-(16, 'Skartační lhůta u dokumentů krajského referenda začíná plynout po vyhlášení výsledků referenda s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu.', NULL, 1, 'vyhlášení výsledků referenda');
+(1, 'Skartační lhůta začíná plynout po uzavření dokumentu.', NULL, 2, 'uzavření/vyřízení dokumentu');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}subjekt` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -618,7 +608,40 @@ INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
 (26, 4, 21, 'Y'),
 (27, 4, 22, 'Y'),
 (28, 4, 23, 'Y'),
-(29, 6, 24, 'Y');
+(29, 6, 24, 'Y'),
+(30, 6, 5, 'Y'),
+(31, 6, 4, 'Y'),
+(32, 6, 18, 'Y'),
+(33, 6, 7, 'Y'),
+(34, 6, 14, 'Y'),
+(35, 6, 8, 'Y'),
+(36, 6, 13, 'Y'),
+(37, 6, 6, 'Y'),
+(38, 6, 2, 'Y'),
+(39, 6, 3, 'Y'),
+(40, 6, 15, 'Y'),
+(41, 6, 19, 'Y'),
+(42, 6, 20, 'Y'),
+(43, 6, 21, 'Y'),
+(44, 6, 22, 'Y'),
+(45, 6, 23, 'Y'),
+(46, 7, 5, 'Y'),
+(47, 7, 4, 'Y'),
+(48, 7, 18, 'Y'),
+(49, 7, 7, 'Y'),
+(50, 7, 14, 'Y'),
+(51, 7, 8, 'Y'),
+(52, 7, 13, 'Y'),
+(53, 7, 6, 'Y'),
+(54, 7, 2, 'Y'),
+(55, 7, 3, 'Y'),
+(56, 7, 15, 'Y'),
+(57, 7, 19, 'Y'),
+(58, 7, 20, 'Y'),
+(59, 7, 21, 'Y'),
+(60, 7, 22, 'Y'),
+(61, 7, 23, 'Y'),
+(62, 3, 1, 'Y');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_resource` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -689,13 +712,13 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_role` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
 INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `fixed_id`, `orgjednotka_id`, `code`, `name`, `note`, `fixed`, `order`, `active`, `date_created`, `date_modified`, `sekvence`, `sekvence_string`, `uroven`) VALUES
-(1, NULL, NULL, NULL, 'admin', 'administrátor', 'Má absolutní moc provádět všechno možné', 2, 100, 1, NOW(), NOW(), '1', 'admin.1', NULL),
+(1, NULL, NULL, NULL, 'admin', 'administrátor', 'Pracovník, který má na starost správu spisové služby', 2, 100, 1, NOW(), NOW(), '1', 'admin.1', NULL),
 (2, NULL, NULL, NULL, 'guest', 'host', 'Role představující nepřihlášeného uživatele.\\r\\nTedy nastavení oprávnění v době, kdy k aplikaci není nikdo přihlášen.', 2, 0, 1, NOW(), NOW(), '2', 'guest.2', NULL),
-(3, 1, NULL, NULL, 'superadmin', 'SuperAdmin', 'Administrátor se super právy.\\r\\nTo znamená, že může manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', 2, 100, 1, NOW(), NOW(), '3', 'superadmin.3', NULL),
-(4, NULL, NULL, NULL, 'referent', 'referent', 'Základní role pracovníka spisové služby', 1, 10, 1, NOW(), NOW(), '4', 'referent.4', NULL),
-(5, 4, NULL, NULL, 'vedouci', 'vedoucí', 'Vedoucí organizační jednotky umožňující přijímat dokumenty', 1, 50, 1, NOW(), NOW(), '5', 'vedouci.5', NULL),
-(6, 4, NULL, NULL, 'podatelna', 'pracovník podatelny', 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', 1, 20, 1, NOW(), NOW(), '6', 'podatelna.6', NULL),
-(7, 4, NULL, NULL, 'skartacni_dohled', 'pracovník spisovny', 'Má na starost spisovnu', 1, 30, 1, NOW(), NOW(), '7', 'skartacni_dohled.7', NULL),
+(3, 1, NULL, NULL, 'superadmin', 'SuperAdmin', 'Administrátor se super právy.\\r\\nMůže manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', 2, 100, 1, NOW(), NOW(), '3', 'superadmin.3', NULL),
+(4, NULL, NULL, NULL, 'referent', 'pracovník', 'Základní role pracovníka spisové služby', 1, 10, 1, NOW(), NOW(), '4', 'referent.4', NULL),
+(5, 4, NULL, NULL, 'vedouci', 'sekretariát', 'Rozšířená role pracovníka spisové služby. Může nahlížet na podřízené uzly', 1, 50, 1, NOW(), NOW(), '5', 'vedouci.5', NULL),
+(6, NULL, NULL, NULL, 'podatelna', 'pracovník podatelny', 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', 1, 20, 1, NOW(), NOW(), '6', 'podatelna.6', NULL),
+(7, NULL, NULL, NULL, 'skartacni_dohled', 'pracovník spisovny', 'Má na starost spisovnu', 1, 30, 1, NOW(), NOW(), '7', 'skartacni_dohled.7', NULL),
 (8, 4, NULL, NULL, 'skartacni_komise', 'člen skartační komise', 'člen skartační komise, která rozhoduje o skartaci nebo archivaci dokumentu.', 1, 40, 1, NOW(), NOW(), '8', 'skartacni_komise.8', NULL);
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_rule` (
