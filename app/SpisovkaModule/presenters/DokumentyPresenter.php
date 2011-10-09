@@ -2705,12 +2705,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $select = array(
             'org_pridelene'=>'Přidělené',
             'org_kprevzeti'=>'K převzetí',
+            'org_predane'=>'Předané',
             'org_nove'=>'Nové / nepředané',
             'org_kvyrizeni'=>'K vyřízení',
             'org_vyrizene'=>'Vyřízené',
             'org_pracoval'=>'Na kterých jsem kdy pracoval',
             'org_doporucene'=>'Doporučené',
-            'org_predane_k_odeslani'=>'Předané',
+            
             'org_predane_k_odeslani'=>'K odeslání',
             'org_odeslane'=>'Odeslané', 
             'org_vse'=>'Všechny',

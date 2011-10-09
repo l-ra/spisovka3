@@ -1043,11 +1043,8 @@ class Dokument extends BaseModel
                     ); 
                 }  
                 
-                
-                $args = array(
-                    'where' => array( array('wf.stav_osoby=0'), array('wf.aktivni=1') )
-                );                
-                
+                $args['where'][] = array('wf.dokument_id IN ( SELECT DISTINCT wf1.dokument_id FROM `'. $this->tb_workflow .'` AS wf1 LEFT JOIN `'. $this->name .'` AS d1 ON (d1.id=wf1.dokument_id) WHERE (wf1.stav_osoby=0) AND (wf1.aktivni=1) AND (d1.stav = 1) )');
+                break;
             case 'org_kvyrizeni':
                 // k vyrizeni na jmeno nebo organizacni jednotku uzivatele
                 if ( $isAdmin ) {
