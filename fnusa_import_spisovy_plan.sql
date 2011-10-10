@@ -1,3 +1,7 @@
+SET foreign_key_checks = 0;
+SET NAMES 'utf8';
+ALTER TABLE s3_spisovy_znak CHANGE `popis` `popis` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL;
+
 INSERT INTO s3_spisovy_znak (`id`, `parent_id`, `nazev`, `popis`, `stav`, `sekvence`, `sekvence_string`, `uroven`, `date_created`, `user_created`, `date_modified`, `user_modified`, `skartacni_znak`, `skartacni_lhuta`, `spousteci_udalost_id`) VALUES ('2',NULL, '0', 'Politika, národní hospodářství, státní správa', '1', '2', '0.2', '0', NOW(), 1, NOW(), 1, '', '', 1);
 INSERT INTO s3_spisovy_znak (`id`, `parent_id`, `nazev`, `popis`, `stav`, `sekvence`, `sekvence_string`, `uroven`, `date_created`, `user_created`, `date_modified`, `user_modified`, `skartacni_znak`, `skartacni_lhuta`, `spousteci_udalost_id`) VALUES ('3',2, '0.1', 'Filosofie, politika,', '1', '2.3', '0.2#0.1.3', '1', NOW(), 1, NOW(), 1, '', '', 1);
 INSERT INTO s3_spisovy_znak (`id`, `parent_id`, `nazev`, `popis`, `stav`, `sekvence`, `sekvence_string`, `uroven`, `date_created`, `user_created`, `date_modified`, `user_modified`, `skartacni_znak`, `skartacni_lhuta`, `spousteci_udalost_id`) VALUES ('4',3, '0.1.1', 'Knihy (pokud nejsou součástí knihovny)', '1', '2.3.4', '0.2#0.1.3#0.1.1.4', '2', NOW(), 1, NOW(), 1, 'S', '20', 1);
