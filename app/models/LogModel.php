@@ -17,6 +17,7 @@ class LogModel extends BaseModel {
     const DOK_PRIJATEP  = 18;
     const DOK_PREDODESLAN = 20;
     const DOK_ODESLAN   = 19;
+    const DOK_NEODESLAN   = 107;
     const DOK_SPUSTEN   = 101;
     const DOK_KESKARTACI = 102;
     const DOK_SKARTOVAN  = 103;
@@ -61,6 +62,7 @@ class LogModel extends BaseModel {
         '18' => 'Dokument přijat e-podatelnou',
         '19' => 'Dokument odeslán',
         '20' => 'Dokument předán k odeslání',
+        '107' => 'Dokument byl vracen (nedošlo k odeslání)',
         '101' => 'Spuštěna událost',
         '102' => 'Dokument připraven ke skartaci',
         '103' => 'Dokument skartován',

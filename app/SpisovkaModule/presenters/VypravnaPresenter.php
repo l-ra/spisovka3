@@ -161,6 +161,27 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                         }
                     }
                     break;
+                case 'vratit':
+                    if ( isset($data['dokument_vyber']) ) {
+                        $count_ok = $count_failed = 0;
+                        foreach ( $data['dokument_vyber'] as $dokument_odeslani_id ) {
+                            if ( $DokumentOdeslani->vraceno($dokument_odeslani_id) ) {
+                                $count_ok++;
+                            } else {
+                                $count_failed++;
+                            }
+                        }
+                        if ( $count_ok > 0 ) {
+                            $this->flashMessage('Úspěšně jste vrátil '.$count_ok.' dokumentů.');
+                        }
+                        if ( $count_failed > 0 ) {
+                            $this->flashMessage(''.$count_failed.' dokumentů se nepodařilo vrátit!','warning');
+                        }
+                        if ( $count_ok > 0 && $count_failed > 0 ) {
+                            $this->redirect('this');
+                        }
+                    }
+                    break;                    
                 default:
                     break;
             }

@@ -172,7 +172,27 @@ class DokumentOdeslani extends BaseModel
 
         return $this->update($row, array( array('id=%i',$id) ));
 
-    }    
+    }   
+    
+    public function vraceno( $id ) {
+
+        if ( empty($id) ) {
+            return null;
+        }
+
+        $row = array();
+        $row['stav'] = 3;
+        $row['datum_odeslani'] = new DateTime();
+        
+        $info = $this->get($id);
+        if ( $info ) {
+            $Log = new LogModel();
+            $Log->logDokument($info->dokument_id, LogModel::DOK_NEODESLAN,"Dokument nebyl odeslán ". $info->zpusob_odeslani_nazev);
+        }
+
+        return $this->update($row, array( array('id=%i',$id) ));
+
+    }        
     
     public function ulozit( $row ) {
 
