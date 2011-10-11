@@ -73,9 +73,9 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                     ->setValue(0);
         }
 
-        $form1->addText('nazev', 'Název přílohy:', 50, 150);
-        $form1->addTextArea('popis', 'Popis:', 80, 5);
-        $form1->addSelect('typ', 'Typ souboru', FileModel::typPrilohy());
+        $form1->addText('priloha_nazev', 'Název přílohy:', 50, 150);
+        $form1->addTextArea('priloha_popis', 'Popis:', 80, 5);
+        $form1->addSelect('priloha_typ', 'Typ souboru', FileModel::typPrilohy());
         $form1->addFile('file', 'Soubor:');
         $form1->addSubmit('upload', 'Upload')
                  ->onClick[] = array($this, 'uploadClicked');
@@ -98,8 +98,12 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $upload = $data['file'];
 
         $dokument_id = $data['dokument_id'];
+        
+        $data['nazev'] = $data['priloha_nazev'];
+        $data['popis'] = $data['priloha_popis'];
+        $data['typ'] = $data['priloha_typ'];
         $typ = $data['typ'];
-        unset($data['dokument_id']);
+        unset($data['dokument_id'],$data['priloha_nazev'],$data['priloha_popis'],$data['priloha_typ']);
 
         $data['dir'] = date('Y') .'/DOK-'. sprintf('%06d',$dokument_id) .'-'.date('Y');
 
@@ -165,11 +169,11 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $form1->addHidden('file_id')
                 ->setValue($this->file_id);
         
-        $form1->addText('nazev', 'Název přílohy:', 50, 150)
+        $form1->addText('priloha_nazev', 'Název přílohy:', 50, 150)
                 ->setValue(@$file_info->nazev);
-        $form1->addTextArea('popis', 'Popis:', 80, 5)
+        $form1->addTextArea('priloha_popis', 'Popis:', 80, 5)
                 ->setValue(@$file_info->popis);
-        $form1->addSelect('typ', 'Typ souboru', FileModel::typPrilohy())
+        $form1->addSelect('priloha_typ', 'Typ souboru', FileModel::typPrilohy())
                 ->setValue(@$file_info->typ);
         $form1->addFile('file', 'Soubor:');
         $form1->addSubmit('upload', 'Upload')
@@ -195,7 +199,12 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         $dokument_id = $data['dokument_id'];
         $file_id = $data['file_id'];
+        
+        $data['nazev'] = $data['priloha_nazev'];
+        $data['popis'] = $data['priloha_popis'];
+        $data['typ'] = $data['priloha_typ'];
         $typ = $data['typ'];
+        unset($data['priloha_nazev'],$data['priloha_popis'],$data['priloha_typ']);
         unset($data['dokument_id']);
         unset($data['file_id']);
 
