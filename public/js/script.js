@@ -1103,6 +1103,7 @@ zobrazSestavu = function (elm) {
     if ( elm.pc_do.value != '' ) {param = param + 'pc_do=' + elm.pc_do.value + '&'}
     if ( elm.d_od.value != '' )  {param = param + 'd_od=' + elm.d_od.value + '&'}
     if ( elm.d_do.value != '' )  {param = param + 'd_do=' + elm.d_do.value + '&'}
+    if ( elm.d_today.checked )  {param = param + 'd_today=' + elm.d_today.value + '&'}
     if ( elm.rok.value != '' )   {param = param + 'rok=' + elm.rok.value}
 
     //window.location.href = elm.url.value + param;

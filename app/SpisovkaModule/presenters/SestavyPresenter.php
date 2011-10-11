@@ -178,12 +178,21 @@ class Spisovka_SestavyPresenter extends BasePresenter
         }
         if ( $this->getParam('d_do',null) ) {
             try {
-                $d_do = date("Y-m-d", strtotime($this->getParam('d_do',null)));
+                $d_do = date("Y-m-d", strtotime($this->getParam('d_do',null))+86400 );
                 //$d_do = new DateTime($this->getParam('d_do',null));
             } catch (Exception $e) {
                 $d_do = null;
             }
         }
+        
+        $today = $this->getParam('d_today',null);
+        // dnesek
+        if ( !empty($today) ) {
+            $d_od = date("Y-m-d");
+            $d_do = date("Y-m-d",time()+86400);
+        }
+        
+        
         $rok   = $this->getParam('rok',null);
 
         // rok

@@ -12,10 +12,16 @@
             <dt>Datum:</dt>
             <dd>
                 od: <input type="text" name="d_od" size="10" class="datepicker" />
-                do: <input type="text" name="d_do" size="10" class="datepicker" />
+                do (včetně): <input type="text" name="d_do" size="10" class="datepicker" />
                 <span class="normal">(platný formát data včetně dne, měsíce a roku)</span>
-            </dd>
+           </dd>
         </dl>
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>
+                <input type="checkbox" name="d_today" /> dnešní (<?php echo date("j.n.Y"); ?>)
+            </dd>            
+        </dl>        
         <dl class="detail_item">
             <dt>Rok:</dt>
             <dd>

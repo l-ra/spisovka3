@@ -250,11 +250,18 @@ form {
     clear: both;
 }
 
-#dialog dt,
 #content dt {
     float: left;
     position: relative;
     width: 200px;
+    text-align: right;
+    margin-right: 20px;
+}
+
+#dialog dt {
+    float: left;
+    position: relative;
+    width: 120px;
     text-align: right;
     margin-right: 20px;
 }
@@ -268,9 +275,13 @@ form {
     margin-right: 20px;
 }
 
-#dialog dd,
 #content dd {
     margin-left: 220px;
+    font-weight: bold;
+}
+
+#dialog dd {
+    margin-left: 140px;
     font-weight: bold;
 }
 
