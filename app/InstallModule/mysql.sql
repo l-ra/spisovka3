@@ -713,10 +713,10 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_role` (
 
 INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `fixed_id`, `orgjednotka_id`, `code`, `name`, `note`, `fixed`, `order`, `active`, `date_created`, `date_modified`, `sekvence`, `sekvence_string`, `uroven`) VALUES
 (1, NULL, NULL, NULL, 'admin', 'administrátor', 'Pracovník, který má na starost správu spisové služby', 2, 100, 1, NOW(), NOW(), '1', 'admin.1', NULL),
-(2, NULL, NULL, NULL, 'guest', 'host', 'Role představující nepřihlášeného uživatele.\\r\\nTedy nastavení oprávnění v době, kdy k aplikaci není nikdo přihlášen.', 2, 0, 1, NOW(), NOW(), '2', 'guest.2', NULL),
-(3, 1, NULL, NULL, 'superadmin', 'SuperAdmin', 'Administrátor se super právy.\\r\\nMůže manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', 2, 100, 1, NOW(), NOW(), '3', 'superadmin.3', NULL),
-(4, NULL, NULL, NULL, 'referent', 'pracovník', 'Základní role pracovníka spisové služby', 1, 10, 1, NOW(), NOW(), '4', 'referent.4', NULL),
-(5, 4, NULL, NULL, 'vedouci', 'sekretariát', 'Rozšířená role pracovníka spisové služby. Může nahlížet na podřízené uzly', 1, 50, 1, NOW(), NOW(), '5', 'vedouci.5', NULL),
+(2, NULL, NULL, NULL, 'guest', 'host', 'Role představující nepřihlášeného uživatele.\r\nTedy nastavení oprávnění v době, kdy k aplikaci není nikdo přihlášen.', 2, 0, 1, NOW(), NOW(), '2', 'guest.2', NULL),
+(3, 1, NULL, NULL, 'superadmin', 'SuperAdmin', 'Administrátor se super právy.\r\nMůže manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', 2, 100, 1, NOW(), NOW(), '3', 'superadmin.3', NULL),
+(4, NULL, NULL, NULL, 'referent', 'pracovník', '(referent) Základní role pracovníka spisové služby', 1, 10, 1, NOW(), NOW(), '4', 'referent.4', NULL),
+(5, 4, NULL, NULL, 'vedouci', 'sekretariát', '(vedoucí) Rozšířená role pracovníka spisové služby. Může nahlížet na podřízené uzly', 1, 50, 1, NOW(), NOW(), '5', 'vedouci.5', NULL),
 (6, NULL, NULL, NULL, 'podatelna', 'pracovník podatelny', 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', 1, 20, 1, NOW(), NOW(), '6', 'podatelna.6', NULL),
 (7, NULL, NULL, NULL, 'skartacni_dohled', 'pracovník spisovny', 'Má na starost spisovnu', 1, 30, 1, NOW(), NOW(), '7', 'skartacni_dohled.7', NULL),
 (8, 4, NULL, NULL, 'skartacni_komise', 'člen skartační komise', 'člen skartační komise, která rozhoduje o skartaci nebo archivaci dokumentu.', 1, 40, 1, NOW(), NOW(), '8', 'skartacni_komise.8', NULL);
@@ -734,11 +734,11 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_rule` (
 INSERT INTO `{tbls3}user_rule` (`id`, `resource_id`, `name`, `note`, `privilege`) VALUES
 (1, NULL, 'Bez omezení', NULL, NULL),
 (2, 4, 'Přihlášení uživatele', NULL, 'login'),
-(3, 4, 'Zobrazeni uvodní obrazovky', NULL, NULL),
-(4, 1, 'Zobrazení seznamu dokumentu', '', ''),
+(3, 4, 'Zobrazení úvodní obrazovky', NULL, NULL),
+(4, 1, 'Zobrazení seznamu dokumentů', '', ''),
 (5, 5, 'Základní obrazovka', '', ''),
 (6, 19, 'Práce se subjekty', '', ''),
-(7, 20, 'Práce s přílohy', '', ''),
+(7, 20, 'Práce s přílohami', '', ''),
 (8, 18, 'Práce se spisy', '', ''),
 (9, 2, 'Přístup do Epodatelny', '', ''),
 (10, 22, 'E-podatelna - evidence', '', ''),
@@ -747,7 +747,7 @@ INSERT INTO `{tbls3}user_rule` (`id`, `resource_id`, `name`, `note`, `privilege`
 (13, 26, 'Spojování dokumentů', '', ''),
 (14, 25, 'Sestavy', '', ''),
 (15, 29, 'Vyhledávání', '', ''),
-(16, NULL, 'Je vedoucí', 'Určuje, zda daná role je vedoucí role. Umožňuje přistupovat k dokumentům předané orgaizační jednotce', 'is_vedouci'),
+(16, NULL, 'Je vedoucí', 'Určuje, zda daná role je vedoucí role. Umožňuje přistupovat k dokumentům předané organizační jednotce', 'is_vedouci'),
 (18, 31, 'Nápověda', 'Zobrazení nápovědy', ''),
 (19, 32, 'Přístup do spisovny', '', ''),
 (20, 33, 'Přístup k dokumentům ve spisovně', '', ''),
