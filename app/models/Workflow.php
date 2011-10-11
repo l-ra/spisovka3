@@ -44,6 +44,7 @@ class Workflow extends BaseModel
         if ( count($rows)>0 ) {
 
             $UserModel = new UserModel();
+            $Orgjednotka = new Orgjednotka();
             foreach ($rows as $index => &$wf) {
                 if ( !empty($wf->prideleno_id) ) {
                     $osoba = $UserModel->getUser($wf->prideleno_id, 1);
@@ -52,7 +53,12 @@ class Workflow extends BaseModel
                         $wf->prideleno_info = $osoba->identity;
                     }
                 }
-
+                if ( !empty($wf->orgjadnotka_id) ) {
+                    $org = $Orgjednotka->getInfo($wf->orgjednotka_id);
+                    if ( $org ) {
+                        $wf->orgjednotka_info = $org;
+                    }
+                }
             }
 
             return $rows;
@@ -223,7 +229,7 @@ class Workflow extends BaseModel
                 if ( empty($predan->prideleno_id) ) {
                     if ( Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
                         $access = 1;
-                        $log_plus = " určený organizační jednotce ". $predan->orgjednotka_info->zkraceny_nazev. ".";
+                        $log_plus = " určený organizační jednotce ". @$predan->orgjednotka_info->zkraceny_nazev. ".";
                     }
                 } else {
                     if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
