@@ -2250,27 +2250,32 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $mail = new ESSMail;
         $mail->signed(1);
 
-        if ( !empty($data['email_from']) ) {
+        try {
+            if ( !empty($data['email_from']) ) {
 
-            if ( strpos($data['email_from'],"epod")!==false ) {
-                $id_odes = substr($data['email_from'],4);
-                $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-                $ep = $ep_config->toArray();
-                if ( isset( $ep['odeslani'][$id_odes] ) ) {
-                    $mail->setFromConfig($ep['odeslani'][$id_odes]);
+                if ( strpos($data['email_from'],"epod")!==false ) {
+                    $id_odes = substr($data['email_from'],4);
+                    $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
+                    $ep = $ep_config->toArray();
+                    if ( isset( $ep['odeslani'][$id_odes] ) ) {
+                        $mail->setFromConfig($ep['odeslani'][$id_odes]);
+                    } else {
+                        $mail->setFromConfig();
+                    }
+                } else if ( strpos($data['email_from'],"user")!==false ) {
+
+                    $user_part = explode("#",$data['email_from']);
+                    $mail->setFrom($user_part[2],$user_part[1]);
+
                 } else {
                     $mail->setFromConfig();
                 }
-            } else if ( strpos($data['email_from'],"user")!==false ) {
-
-                $user_part = explode("#",$data['email_from']);
-                $mail->setFrom($user_part[2],$user_part[1]);
-
             } else {
                 $mail->setFromConfig();
             }
-        } else {
-            $mail->setFromConfig();
+        } catch (Exception $e) {
+            $this->flashMessage('Chyba při odesilání emailu! '. $e->getMessage(),'error_ext');
+            return false;            
         }
 
         if ( strpos($adresat->email,';') !== false ) {
