@@ -1,4 +1,3 @@
-{capture $html_out}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -11,13 +10,16 @@
     </style>
 </head>
 <body>
-<h1>POŠTOVNÍ PODACÍ ARCH</h1>
+{for $p=1;$p<=$count_page;$p++}     
+<table class="header">
+    <tr>
+        <td class="h1"><img src="{$baseUri}images/ceska_posta1.png" widht="146" height="20" /></td>
+        <td><h1>POŠTOVNÍ PODACÍ ARCH</h1></td>
+    </tr>
+</table>
 
-<img src="{$baseUri}images/ceska_posta1.png" widht="146" height="20" />
-
-
-<p>Podavatel:</p>
-<p>Odesílatel:</p>
+<p>Podavatel: <strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
+<p>Odesílatel: <strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
     
 <div class="placeno">
 Placeno v hotovosti/Placeno převodem/Výplatní stroj (* Nehodící se škrtněte)
@@ -28,54 +30,40 @@ Placeno v hotovosti/Placeno převodem/Výplatní stroj (* Nehodící se škrtně
         <th class="w1">Poř. číslo</th>
         <th class="w2">Podací znaky</th>
         <th class="w3">Adresát - jméno, příjmení,<br> ulice, číslo domu,<br> PSČ, místo určení,<br> telefonní kontakt, email <sup>1)</sup></th>
-        <th class="w4">Dobírka <sup>1)</sup></th>
-        <th class="w5">Udaná cena <sup>2)</sup></th>
+        <th class="h4">Dobírka <sup>1)</sup></th>
+        <th class="h5">Udaná cena <sup>2)</sup></th>
         <th class="w6">Poznámka,<br> doplňkové služby <sup>1)</sup></th>
     </tr>
-{for $i=0;$i<10;$i++}    
+{for $i=(($p-1)*10);$i < (($p)*10);$i++}  
     <tr>
         <td class="w1">&nbsp;</td>
         <td class="w2">&nbsp;</td>
-        <td class="w3">&nbsp;</td>
-        <td class="w4">&nbsp;</td>
+        <td class="w3">
+            {=@Subjekt::displayName($seznam[$i],'jmeno_item')}&nbsp;<br/>
+            {=@Subjekt::displayName($seznam[$i],'ulice')}&nbsp;<br />
+            {=@Subjekt::displayName($seznam[$i],'mesto')}&nbsp;
+        </td>
+        <td class="w4">{if isset($seznam[$i]) && ($seznam[$i]['cena']==0 || empty($seznam[$i]['cena']))}{else}{=@$seznam[$i]['cena']}{/if}</td>
         <td class="w5">&nbsp;</td>
         <td class="w6">&nbsp;</td>
     </tr>
 {/for}
 </table>
 
-<div class="pod">
-    <div class="posta">
-    Česká pošta, s.p., IČ 47114983
-    </div>
-
-    <div class="razitko">
-    Potvrzení pošty (otisk razítka APOST)
-    </div>
-</div>
-
+<table class="header">
+    <tr>
+        <td>Česká pošta, s.p., IČ 47114983</td>
+        <td class="h2">Potvrzení pošty (otisk razítka APOST)</td>
+    </tr>
+</table>
+<br />
+<br />
 <ol class="poznamky">
     <li>Vyplní odesílatel</li>
     <li>U Doporučených zásilek – standard, Doporučených zásilek, Doporučených zásilek do zahraničí, Doporučených slepeckých zásilek a
 Doporučených slepeckých zásilek do zahraničí se neuvádí a sloupec se proškrtne.</li>
 </ol>
-
+{if $p!=$count_page}<pagebreak />{/if}
+{/for}
 </body>
-</html>  
-{/capture}<?php
-
-            $app_info = Environment::getVariable('app_info');
-            $app_info = explode("#",$app_info);
-            $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
-
-            $pdf = new mPDF('', 'A4',9,'Times');
-            $pdf->SetCreator($app_name);
-            $pdf->SetAuthor(Environment::getUser()->getIdentity()->name);
-            $pdf->SetTitle('Poštovní podací arch');
-            $pdf->SetMargins(0,0,2);
-            
-            $pdf->WriteHTML($html_out);
-            $pdf->Output('podaci_arch.pdf', 'I');
-            //echo $html_out;
-            
-?>
+</html>

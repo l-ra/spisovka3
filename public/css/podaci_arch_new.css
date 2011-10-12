@@ -8,15 +8,33 @@ body {
 }
 
 h1 {
-    text-align: center;
+    text-align: left;
     font-size: 11pt;
     font-weight: normal;
 }
 
+p {
+    margin-top: 0px;
+    border: 0px solid;
+}
+
 img {
-    position: absolute;
+    /*position: absolute;
     top: 0px;
-    left: 0px;
+    left: 0px;*/
+}
+
+table.header {
+    border-collapse: collapse;
+    width: 100%;
+    border: 0px solid;
+    margin-bottom: 0px;
+}
+
+table.header td {
+    border: 0px;
+    text-align: left;
+    height: 40px;
 }
 
 div.placeno {
@@ -60,16 +78,21 @@ table {
 td {
     border: 1px solid;
     padding: 5px;
-    height: 64px;
+    height: 70px;
 }
 th {
     border: 1px solid;
     border-bottom: 3px solid;
 }
 
-.w1 { width: 47px; }
-.w2 { width: 187px; border-right: 3px solid; }
-.w3 { width: 200px; }
-.w4 { width: 79px; }
-.w5 { width: 76px; }
-.w6 { width: 113px; }
+.h1 { width: 240px; }
+.h2 { width: 255px; }
+.w1 { width: 40px; }
+.w2 { width: 200px; border-right: 3px solid; }
+.w3 { width: 175px; }
+.h4 { width: 70px; }
+.h5 { width: 70px; }
+.w4 { width: 70px; text-align: right; }
+.w5 { width: 70px; text-align: right; }
+.w6 { width: 100px; }
+

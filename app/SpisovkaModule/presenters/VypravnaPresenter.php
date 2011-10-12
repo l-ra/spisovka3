@@ -46,20 +46,21 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             $result = $Dokument->kOdeslani(1);
             $seznam = $result->fetchAll();
+            
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
-            $this->setView('podaciarch');
-            
+            $this->setView('podaciarchnew');
         } elseif ( $pdf ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             $result = $Dokument->kOdeslani(1);
             $this->pdf_output = 1;
             $seznam = $result->fetchAll();
+            
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
-            $this->setView('podaciarch');
+            $this->setView('podaciarchnew');
         } else {
             $result = $Dokument->kOdeslani();
             $seznam = $result->fetchAll();
@@ -103,7 +104,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 $content = str_replace("<td", "<td valign='top'", $content);
                 
-                $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
+                $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
                 
                 $app_info = Environment::getVariable('app_info');
                 $app_info = explode("#",$app_info);
@@ -111,9 +112,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 $mpdf->SetCreator($app_name);
                 $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
                 $mpdf->SetTitle('Podací arch');                
-                
+                $mpdf->SetMargins(0, 0, 2);
                 $mpdf->WriteHTML($content);
-                
                 $mpdf->Output('podaci_arch.pdf', 'I');
             }
             
@@ -230,11 +230,11 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 $row['druh_zasilky'] = serialize($druh_zasilky_a);
             }
                         
-            if ( isset($post_data['cena']) ) { $row['cena'] = floatval($post_data['cena_zasilky']); }
+            if ( isset($post_data['cena_zasilky']) ) { $row['cena'] = floatval($post_data['cena_zasilky']); }
             if ( isset($post_data['hmotnost']) ) { $row['hmotnost'] = floatval($post_data['hmotnost_zasilky']); }
             if ( isset($post_data['cislo_faxu']) ) { $row['cislo_faxu'] = $post_data['cislo_faxu']; }
             if ( isset($post_data['zprava']) ) { $row['zprava'] = $post_data['zprava']; }
-
+            
             try {
                 $DokumentOdeslani->update($row, array(array("id=%i",$id)));
                 echo "###provedeno###";
