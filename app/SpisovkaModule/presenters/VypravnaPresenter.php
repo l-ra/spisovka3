@@ -40,37 +40,47 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $seznam = array();
         
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
-        if ( $tisk ) {
+        if ( $this->getParam('print') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $result = $Dokument->kOdeslani(1);
-            $seznam = $result->fetchAll();
-            
+            $seznam = $Dokument->kOdeslani(1,"doporucene");
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
             $this->setView('podaciarchnew');
-        } elseif ( $pdf ) {
+        } elseif ( $this->getParam('pdfprint') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $result = $Dokument->kOdeslani(1);
+            $seznam = $Dokument->kOdeslani(1,"doporucene");
             $this->pdf_output = 1;
-            $seznam = $result->fetchAll();
-            
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
             $this->setView('podaciarchnew');
+        } elseif ( $this->getParam('print_balik') ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            $seznam = $Dokument->kOdeslani(1,"balik");
+            $this->template->count_page = ceil(count($seznam)/10);
+            
+            $this->setLayout(false);
+            $this->setView('podaciarch');
+        } elseif ( $this->getParam('pdfprint_balik') ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            $seznam = $Dokument->kOdeslani(1,"balik");
+            $this->pdf_output = 2;
+            
+            $this->template->count_page = ceil(count($seznam)/10);
+            
+            $this->setLayout(false);
+            $this->setView('podaciarch');            
         } else {
-            $result = $Dokument->kOdeslani();
-            $seznam = $result->fetchAll();
+            $seznam = $Dokument->kOdeslani();
+            //$seznam = $result->fetchAll();
         }
 
-        if ( count($seznam)>0 ) {
+        /*if ( count($seznam)>0 ) {
             foreach ($seznam as $subjekt_index => $subjekt) {
                 $seznam[ $subjekt_index ]->druh_zasilky = @unserialize($seznam[ $subjekt_index ]->druh_zasilky);
             }
-        }      
+        } */     
         
         $this->template->seznam = $seznam;
 
@@ -78,7 +88,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     protected function shutdown($response) {
         
-        if ($this->pdf_output == 1) {
+        if ($this->pdf_output == 1 || $this->pdf_output == 2) {
 
             function handlePDFError($errno, $errstr, $errfile, $errline, array $errcontext)
             {
@@ -104,7 +114,11 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 $content = str_replace("<td", "<td valign='top'", $content);
                 
-                $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
+                if ( $this->pdf_output == 2 ) {
+                    $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
+                } else {
+                    $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
+                }
                 
                 $app_info = Environment::getVariable('app_info');
                 $app_info = explode("#",$app_info);
@@ -119,6 +133,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             
             } catch (Exception $e) {
                 $location = str_replace("pdfprint=1","",Environment::getHttpRequest()->getUri());
+                $location = str_replace("pdfprint=2","",$location);
 
                 echo "<h1>Nelze vygenerovat PDF výstup.</h1>";
                 echo "<p>Generovaný obsah obsahuje příliš mnoho dat, které není možné zpracovat.<br />Zkuste omezit celkový počet dokumentů.</p>";
@@ -228,10 +243,12 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                     $druh_zasilky_a[] = $druh_id;
                 }
                 $row['druh_zasilky'] = serialize($druh_zasilky_a);
+            } else {
+                $row['druh_zasilky'] = null;
             }
                         
             if ( isset($post_data['cena_zasilky']) ) { $row['cena'] = floatval($post_data['cena_zasilky']); }
-            if ( isset($post_data['hmotnost']) ) { $row['hmotnost'] = floatval($post_data['hmotnost_zasilky']); }
+            if ( isset($post_data['hmotnost_zasilky']) ) { $row['hmotnost'] = floatval($post_data['hmotnost_zasilky']); }
             if ( isset($post_data['cislo_faxu']) ) { $row['cislo_faxu'] = $post_data['cislo_faxu']; }
             if ( isset($post_data['zprava']) ) { $row['zprava'] = $post_data['zprava']; }
             

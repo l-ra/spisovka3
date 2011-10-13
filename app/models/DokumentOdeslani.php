@@ -92,7 +92,7 @@ class DokumentOdeslani extends BaseModel
     }
     
     
-    public function kOdeslani($pouze_posta = null) {
+    public function kOdeslani($pouze_posta = null, $druh = null) {
 
         $sql = array(
             'distinct'=>true,
@@ -125,16 +125,32 @@ class DokumentOdeslani extends BaseModel
             $sql['where'][] = array('ds.zpusob_odeslani_id=3');
         }
         
-        return $this->fetchAllComplet($sql);
+        //if ( is_null($druh) ) {
+        //    return $this->fetchAllComplet($sql);
+        //}
         
         $dokumenty = array();
         $result = $this->fetchAllComplet($sql)->fetchAll();
-        
         
         if ( count($result)>0 ) {
             foreach ($result as $subjekt_index => $subjekt) {
                 $dokumenty[ $subjekt_index ] = $subjekt;
                 $dokumenty[ $subjekt_index ]->druh_zasilky = unserialize($dokumenty[ $subjekt_index ]->druh_zasilky);
+                
+                if ( $druh == "balik" ) {
+                    if ( !$dokumenty[ $subjekt_index ]->druh_zasilky) {
+                        unset($dokumenty[ $subjekt_index ]);
+                    } else if ( !in_array(3, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
+                        unset($dokumenty[ $subjekt_index ]);
+                    }
+                } else if ( $druh == "doporucene" ) {
+                    if ( !$dokumenty[ $subjekt_index ]->druh_zasilky) {
+                        unset($dokumenty[ $subjekt_index ]);
+                    } else if ( !in_array(2, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
+                        unset($dokumenty[ $subjekt_index ]);
+                    }
+                }
+                
             }
             return $dokumenty;
         } else {
