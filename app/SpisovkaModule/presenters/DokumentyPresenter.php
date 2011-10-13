@@ -1933,7 +1933,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
 
         $sznacka = "";
-        if ( isset( $this->template->Dok->spisy ) ) {
+        if ( isset( $this->template->Dok->spisy ) && is_array($this->template->Dok->spisy) ) {
             $sznacka_A = array();
             foreach ($this->template->Dok->spisy as $spis) {
                 $sznacka_A[] = $spis->nazev;
