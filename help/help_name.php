@@ -11,7 +11,11 @@ $help_name['admin'] = 'Administrace';
 
 $help_name['admin/ciselniky'] = 'Číselníky';
 $help_name['admin/ciselniky/default'] = 'Seznam číselníků';
-$help_name['admin/ciselniky/zpvyrizeni'] = 'Způsob vyřízení';
+$help_name['admin/ciselniky/zpusobvyrizeni'] = 'Způsob vyřízení';
+$help_name['admin/ciselniky/typdokumentu'] = 'Typ dokumentu';
+$help_name['admin/ciselniky/spousteciudalost'] = 'Spouštěcí událost';
+$help_name['admin/ciselniky/zpusobodeslani'] = 'Způsob odeslání';
+$help_name['admin/ciselniky/zpusobdoruceni'] = 'Způsob doručení';
 
 $help_name['admin/epodatelna'] = 'Nastavení e-podatelny';
 $help_name['admin/epodatelna/default'] = 'nastavení e-podatelny';
@@ -56,6 +60,7 @@ $help_name['admin/zamestnanci'] = 'Zaměstnanci';
 $help_name['admin/zamestnanci/detail'] = 'Detail zaměstnance';
 $help_name['admin/zamestnanci/novy'] = 'Nový zaměstnanec';
 $help_name['admin/zamestnanci/seznam'] = 'Seznam zaměstnanců';
+$help_name['admin/zamestnanci/sync'] = 'Přidat zaměstnance přes externí zdroj';
 
 /*
  * E-podatelna
@@ -88,6 +93,7 @@ $help_name['spisovka/dokumenty'] = 'Dokumenty';
 $help_name['spisovka/dokumenty/default'] = 'Seznam dokumentů';
 $help_name['spisovka/dokumenty/detail'] = 'Detail dokumentu';
 $help_name['spisovka/dokumenty/novy'] = 'Nový dokument';
+$help_name['spisovka/dokumenty/odpoved'] = 'Nový dokument - odpověď';
 $help_name['spisovka/dokumenty/odeslat'] = 'Odeslat dokument';
 
 
@@ -104,6 +110,7 @@ $help_name['spisovka/sestavy/upravit'] = 'Upravit sestavu';
 $help_name['spisovka/spisy'] = 'Spisy';
 $help_name['spisovka/spisy/default'] = 'Seznam spisů';
 $help_name['spisovka/spisy/detail'] = 'Detail spisu';
+$help_name['spisovka/spisy/novy'] = 'Nový spis';
 $help_name['spisovka/spisy/vyber'] = 'Přidání spisu do dokumentu';
 
 $help_name['spisovka/subjekty'] = 'Subjekty';
@@ -117,3 +124,25 @@ $help_name['spisovka/uzivatel/login'] = 'Přihlašení do spisové služby';
 
 $help_name['spisovka/vyhledat'] = 'Vyhledávání';
 $help_name['spisovka/vyhledat/default'] = 'Vyhledat dokumenty';
+
+$help_name['spisovka/vypravna'] = 'K odeslání';
+$help_name['spisovka/vypravna/default'] = 'Seznam dokumentů k odeslání';
+
+/*
+ * Spisovna
+ */
+
+$help_name['spisovna/dokumenty'] = 'Dokumenty';
+$help_name['spisovna/dokumenty/prijem'] = 'Seznam dokumentů pro příjem do spisovny';
+$help_name['spisovna/dokumenty/default'] = 'Seznam dokumentů ve spisovně';
+$help_name['spisovna/dokumenty/detail'] = 'Detail dokumentu';
+
+$help_name['spisovna/spisy'] = 'Dokumenty';
+$help_name['spisovna/spisy/prijem'] = 'Seznam spisů pro příjem do spisovny';
+$help_name['spisovna/spisy/default'] = 'Seznam spisů ve spisovně';
+$help_name['spisovna/spisy/detail'] = 'Detail spisu';
+
+$help_name['spisovna/zapujcky'] = 'Zápůjčky';
+$help_name['spisovna/zapujcky/default'] = 'Zápůjčky';
+$help_name['spisovna/zapujcky/detail'] = 'Detail zápůjčky';
+$help_name['spisovna/zapujcky/nova'] = 'Žádanka o zápůjčku';

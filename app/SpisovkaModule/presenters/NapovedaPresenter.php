@@ -20,28 +20,41 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
         $template->AppInfo = $app_info;
 
         $template->setUri = "";
-        $modules = array("admin","epodatelna","install","spisovka");
+        $modules = array("admin","epodatelna","install","spisovka","spisovna");
         if ($param1 == "param1") {
             $template->setFile = APP_DIR ."/../help/hlavni.phtml";
             $template->Napovedy = $this->napovedy();
         } else if (in_array($param1, $modules) ) {
             // Moduly
-            if ( $param3 == "default" ) {
+            if ( $param3 == "detail" ) {
+                $param3a = "seznam";
+            } else {
+                $param3a = $param3;
+            }            
+
+            if ( $param3a == "default" ) {
                 $template->setUri = $param1 ."/". $param2;
             } else {
-                $template->setUri = $param1 ."/". $param2 ."/". $param3;
+                $template->setUri = $param1 ."/". $param2 ."/". $param3a;
             }
             $template->setFile = APP_DIR ."/../help/". ucfirst($param1) ."Module/". ucfirst($param2) ."/". $param3 .".phtml";
         } else {
             // Spisovka
-            if ( $param2 == "default" ) {
+            
+            if ( $param2 == "detail" ) {
+                $param2a = "default";
+            } else {
+                $param2a = $param2;
+            }
+            
+            if ( $param2a == "default" ) {
                 $template->setUri = $param1;
             } else {
-                $template->setUri = $param1 ."/". $param2;
+                $template->setUri = $param1 ."/". $param2a;
             }
             $template->setFile = APP_DIR ."/../help/SpisovkaModule/". ucfirst($param1) ."/". $param2 .".phtml";
         }
-
+        
         include APP_DIR ."/../help/help_name.php";
         $template->HelpName = $help_name;
 

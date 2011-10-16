@@ -30,6 +30,22 @@
     {/if}
     {/foreach}
 
+    <h2 class="seznam">Spisovna</h2>
+    {foreach $Napovedy['spisovna'] as $presenters_i => $presenters}
+    <h3>{=isset($HelpName['spisovna/'.$presenters_i])?$HelpName['spisovna/'.$presenters_i]:$presenters_i}</h3>
+    {if count($presenters)>0}
+        <ul>
+        {foreach $presenters as $actions}
+            {if isset($HelpName[$actions->url])}
+            <li><a href="{$klientUri}napoveda/{$actions->url}">{$HelpName[$actions->url]}</a></li>
+            {else}
+            <li>{$actions->name}</li>
+            {/if}
+        {/foreach}
+        </ul>
+    {/if}
+    {/foreach}  
+    
     <h2 class="seznam">Administrace</h2>
     {foreach $Napovedy['admin'] as $presenters_i => $presenters}
     <h3>{=isset($HelpName['admin/'.$presenters_i])?$HelpName['admin/'.$presenters_i]:$presenters_i}</h3>
