@@ -15,6 +15,10 @@ $(function() {
 
     $("input.datepicker").datepicker(
     {
+        /*showOn: 'button',
+        buttonText: 'Choose',
+        buttonImage: '/images/icons/1day.png',
+        buttonImageOnly: true,*/
         showButtonPanel: true,
         changeMonth: true,
 	changeYear: true,
@@ -30,6 +34,13 @@ $(function() {
         dayNames:["Neděle","Pondělí","Úterý","Středa","Čtvrtek","Pátek","Sobota"],
         dayNamesMin:["Ne","Po","Út","St","Čt","Pá","So"]
     });
+    /*$("input.datepicker").keyup(function(event) {
+        if (event.keyCode == '9') {
+            $("#ui-datepicker-div").hide();
+        }        
+    }); */
+    
+    
     $('input.datetimepicker').datepicker(
     {
         duration: '',
@@ -209,6 +220,12 @@ $(function() {
             return false;
 	}
     });
+    $("#predat_autocomplete").keypress(function(event) {
+        if ( event.which == 13 ) {
+            event.preventDefault();
+        }
+    });    
+    
 
     $('#subjekt_autocomplete').autocomplete({
         minLength: 3,
@@ -251,6 +268,11 @@ $(function() {
             return false;
 	}
     });
+    $("#subjekt_autocomplete").keypress(function(event) {
+        if ( event.which == 13 ) {
+            event.preventDefault();
+        }
+    });    
 
     $('#novysubjekt_click').click( subjektNovy );
 
