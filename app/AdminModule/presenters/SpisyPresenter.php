@@ -83,7 +83,7 @@ class Admin_SpisyPresenter extends BasePresenter
         $spisove_znaky = $SpisovyZnak->select(11);
         $this->template->SpisoveZnaky = $spisove_znaky;
         
-        if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
+        if ( isset($spisove_znaky[ @$spis->spisovy_znak_id ]) ) {
             $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak_id ]->popis;
             $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak_id ]->nazev;
         } else {
@@ -122,6 +122,96 @@ class Admin_SpisyPresenter extends BasePresenter
         $this->template->spisForm = $this['upravitSpisovyPlanForm'];
     }
 
+    public function actionOdebrat1()
+    {
+
+        $spis_id = $this->getParam('id',null);
+        $Spis = new Spis();
+        if ( is_numeric($spis_id) ) {
+            try {
+                $res = $Spis->odstranit($spis_id, 1);
+                if ( $res == 0 ) {
+                    $this->flashMessage('Spis byl úspěšně odstraněn.');
+                } else if ( $res == -1 ) {
+                    $this->flashMessage('Některý ze spisů je využíván v aplikaci.<br>Z toho důvodu není možné spisy odstranit.','warning_ext');
+                } else {
+                    $this->flashMessage('Spis se nepodařilo odstranit.','warning');
+                }
+            } catch (Exception $e) {
+                if ( $e->getCode() == 1451 ) {
+                    $this->flashMessage('Některý ze spisů je využíván v aplikaci.<br>Z toho důvodu není možné spisy odstranit.','warning_ext');
+                } else {
+                    $this->flashMessage('Spis se nepodařilo odstranit.','warning');
+                    $this->flashMessage($e->getMessage(),'warning');
+                }
+            }
+        }
+        $this->redirect(':Admin:Spisy:seznam');
+
+    }
+
+    public function actionOdebrat2()
+    {
+
+        $spis_id = $this->getParam('id',null);
+        $Spis = new Spis();
+        if ( is_numeric($spis_id) ) {
+            try {
+                $res = $Spis->odstranit($spis_id, 2);
+                if ( $res !== false ) {
+                    $this->flashMessage('Spis byl úspěšně odstraněn.');
+                } else if ( $res == -1 ) {
+                    $this->flashMessage('Spis je využíván v aplikaci.<br>Z toho důvodu není možné spis odstranit.','warning_ext');
+                } else {
+                    $this->flashMessage('Spis se nepodařilo odstranit.','warning');
+                }
+            } catch (Exception $e) {
+                if ( $e->getCode() == 1451 ) {
+                    $this->flashMessage('Spis je využíván v aplikaci.<br>Z toho důvodu není možné spis odstranit.','warning_ext');
+                } else {
+                    $this->flashMessage('Spis se nepodařilo odstranit.','warning');
+                    $this->flashMessage($e->getMessage(),'warning');
+                }
+            }
+        }
+        $this->redirect(':Admin:Spisy:seznam');
+
+    }    
+    
+    public function actionStav()
+    {
+
+        $spis_id = $this->getParam('id');
+        $stav = $this->getParam('stav');
+
+        $Spis = new Spis();
+
+        switch ($stav) {
+            case 'uzavrit':
+                $stav = $Spis->zmenitStav($spis_id, 0);
+                if ( $stav === -1 ) {
+                    $this->flashMessage('Spis nelze uzavřít. Jeden nebo více dokumentů nejsou vyřízeny.','warning');
+                } else if ( $stav ) {
+                    $this->flashMessage('Spis byl uzavřen.');
+                } else {
+                    $this->flashMessage('Spis se nepodařilo uzavřit.','error');
+                }
+                break;
+            case 'otevrit':
+                if ( $Spis->zmenitStav($spis_id, 1) ) {
+                    $this->flashMessage('Spis byl otevřen.');
+                } else {
+                    $this->flashMessage('Spis se nepodařilo otevřít.','error');
+                }
+                break;
+            default:
+                break;
+        }
+
+        $this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
+
+    }    
+    
     public function renderNovy()
     {
         $SpisovyZnak = new SpisovyZnak();
@@ -194,13 +284,15 @@ class Admin_SpisyPresenter extends BasePresenter
         
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->select(2);
-        //if ( empty($spis->spisovy_znak_index) ) {
-        //    $spisovy_znak_max = $Spisy->maxSpisovyZnak( @$spis->id );
-        //} else {
-        //    $spisovy_znak_max = $spis->spisovy_znak_index;
-        //}
 
-        //$spisy = $Spisy->select(1,@$spis->id);
+        $session_spisplan = Environment::getSession('s3_spisplan');
+        if ( empty($session_spisplan->spis_id) ) {
+            $session_spisplan->spis_id = 1;
+        }
+        $params = array('where'=> array("tb.typ = 'VS'") );
+        //$spisy = $Spisy->select(11, null, $session_spisplan->spis_id, $params);
+        $spisy = $Spisy->select(1, @$spis->id, $session_spisplan->spis_id, $params);
+        
 
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -212,15 +304,15 @@ class Admin_SpisyPresenter extends BasePresenter
                 ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spis->popis);
+        $form1->addSelect('parent_id', 'Složka:', $spisy)
+                ->setValue(@$spis->parent_id);
+        $form1->addHidden('parent_id_old')
+                ->setValue(@$spis->parent_id);        
 
+        
         $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
                 ->setValue(@$spis->spisovy_znak_id)
                 ->controlPrototype->onchange("vybratSpisovyZnak();");
-        
-        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
-        //        ->setValue($spisovy_znak_max)
-        //        ->getControlPrototype()->onblur("return kontrolaSpisovyZnak('upravit');");
-
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$spis->skartacni_znak)
                 ->controlPrototype->readonly = TRUE;
@@ -315,7 +407,9 @@ class Admin_SpisyPresenter extends BasePresenter
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $session_spisplan = Environment::getSession('s3_spisplan');
-
+        if ( empty($session_spisplan->spis_id) ) {
+            $session_spisplan->spis_id = 1;
+        }
         $params = array('where'=> array("tb.typ = 'VS'") );
         $spisy = $Spisy->select(11, null, $session_spisplan->spis_id, $params);
 

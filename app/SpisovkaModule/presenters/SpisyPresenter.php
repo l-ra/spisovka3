@@ -352,9 +352,13 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
         $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null,1);
 
-        //$spisy = $Spisy->select(1,@$spis->id);
-        //$params = array('where'=> array("tb.typ = 'VS'") );
+        $session_spisplan = Environment::getSession('s3_spisplan');
+        if ( empty($session_spisplan->spis_id) ) {
+            $session_spisplan->spis_id = 1;
+        }
+        $params = array('where'=> array("tb.typ = 'VS'") );
         //$spisy = $Spisy->select(11, null, $session_spisplan->spis_id, $params);
+        $spisy = $Spisy->select(1, @$spis->id, $session_spisplan->spis_id, $params);
 
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -366,8 +370,11 @@ class Spisovka_SpisyPresenter extends BasePresenter
                 ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spis->popis);
-        //$form1->addSelect('parent_id', 'Připojit k:', $spisy)
-        //        ->setValue(@$spis->parent_id);
+        $form1->addSelect('parent_id', 'Složka:', $spisy)
+                ->setValue(@$spis->parent_id);
+        $form1->addHidden('parent_id_old')
+                ->setValue(@$spis->parent_id);     
+        
         //$form1->addSelect('stav', 'Změnit stav na:', $stav_select)
         //             ->setValue(@$spis->stav);
 
@@ -472,7 +479,9 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $session_spisplan = Environment::getSession('s3_spisplan');
-
+        if ( empty($session_spisplan->spis_id) ) {
+            $session_spisplan->spis_id = 1;
+        }
         $params = array('where'=> array("tb.typ = 'VS'") );
         $spisy = $Spisy->select(11, null, $session_spisplan->spis_id, $params);
 

@@ -124,8 +124,8 @@ class Spis extends TreeModel
             $data['spisovy_znak_plneurceny'] = $data['spisovy_znak'];
         }
 
-        if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
-        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+        if ( !isset($data['parent_id']) ) $data['parent_id'] = 1;
+        if ( empty($data['parent_id']) ) $data['parent_id'] = 1;
         if ( empty($data['spisovy_znak']) ) $data['spisovy_znak'] = '';
         if ( empty($data['datum_uzavreni']) ) $data['datum_uzavreni'] = null;
         if ( empty($data['datum_otevreni']) ) $data['datum_otevreni'] = null;
@@ -165,23 +165,12 @@ class Spis extends TreeModel
         $data['date_modified'] = new DateTime();
         $data['user_modified'] = Environment::getUser()->getIdentity()->id;
 
-
-        // Vyplnění plneurceneho spisoveho znaku
-        /*$spis = $this->getInfo($spis_id);
-        if ( !empty($spis->parent_id) ) {
-            $spis_parent = $this->getInfo($spis->parent_id);
-            $spis_znak_parent = self::spisovyZnak($spis_parent, 2);
-            $data['spisovy_znak_plneurceny'] = $spis_znak_parent . $data['spisovy_znak'];
-        } else {
-            $data['spisovy_znak_plneurceny'] = $data['spisovy_znak'];
-        }*/
-
         if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = null;
         if ( empty($data['spisovy_znak_id']) ) $data['spisovy_znak_id'] = null;
-        if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
-        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
-        if ( !isset($data['parent_id_old']) ) $data['parent_id_old'] = null;
-        if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = null;
+        if ( !isset($data['parent_id']) ) $data['parent_id'] = 1;
+        if ( empty($data['parent_id']) ) $data['parent_id'] = 1;
+        if ( !isset($data['parent_id_old']) ) $data['parent_id_old'] = 1;
+        if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = 1;
 
         if ( empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = 10;
         if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
@@ -196,6 +185,21 @@ class Spis extends TreeModel
 
     }
 
+    public function odstranit($spis_id, $potomky = 2)
+    {
+
+        if ( empty($spis_id) ) return false;
+
+        if ( $potomky == 1 ) {
+            // odstranit i potomky
+            return $this->odstranitH($spis_id, true);
+        } else if ( $potomky == 2 ) {
+            // potomky maji noveho rodice
+            return $this->odstranitH($spis_id);
+        }
+
+    }    
+    
     public function zmenitStav($spis_id, $stav) {
 
         if ( !is_numeric($spis_id) || !is_numeric($stav) ) return null;
