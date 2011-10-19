@@ -72,8 +72,17 @@
         <dl class="detail_item">
             <dt>Druh zásilky:</dt>
             <dd>
+                <?php
+                $druh_zasilky = array();
+                if ( isset($params['druh_zasilky']) && !empty($params['druh_zasilky']) ) {
+                    $druh_zasilky_a = unserialize($params['druh_zasilky']);
+                    foreach ( $druh_zasilky_a as $druh ) {
+                        $druh_zasilky[$druh] = $druh;
+                    }
+                }
+                ?>
                 {foreach $DruhZasilky as $dz_index=>$dz_nazev}
-                <input type="checkbox" name="druh_zasilky[{$dz_index}]" />&nbsp;{$dz_nazev}
+                <input type="checkbox" name="druh_zasilky[{$dz_index}]" <?php echo isset($druh_zasilky[$dz_index])?' checked="checked"':''; ?> />&nbsp;{$dz_nazev}
                 {/foreach}
                 &nbsp;
             </dd>
@@ -109,17 +118,17 @@
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
-            {$searchForm['prideleno']->control}
+            {$searchForm['prideleno_text']->control}
             <br />{$searchForm['prideleno_osobne']->control} Přidělěno na mé jméno
             <br />{$searchForm['prideleno_na_organizacni_jednotku']->control} Přidělěno na mou organizační jednotku
             <script type="text/javascript">
             <!--
-		$('#frmsearchForm-prideleno').focus().keyup(function(event) {
-                    if ( $('#frmsearchForm-prideleno').val().length > 2 ) {
-			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmsearchForm-prideleno').val()}, function(payload) {
+		$('#frmsearchForm-prideleno_text').focus().keyup(function(event) {
+                    if ( $('#frmsearchForm-prideleno_text').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmsearchForm-prideleno_text').val()}, function(payload) {
 				$('#prideleno').remove();
 
-				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmsearchForm-prideleno');
+				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmsearchForm-prideleno_text');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
@@ -129,6 +138,26 @@
                         $('#prideleno').remove();
                     }
 		});
+                <?php if ( isset($params['prideleno_text']) && !empty($params['prideleno_text']) ) { 
+                        $prideleno_checked = "''"; $prideleno_org_checked = "''";
+                        if ( isset($params['prideleno']) ) {
+                            $prideleno_checked = "'". implode(",",$params['prideleno']) ."'";
+                        }
+                        if ( isset($params['prideleno_org']) ) {
+                            $prideleno_org_checked = "'". implode(",",$params['prideleno_org']) ."'";
+                        }                        
+                ?>
+			$.getJSON({link autoComplete!}, { typ: 1, text: '<?php echo $params['prideleno_text'] ."', user: $prideleno_checked, org: $prideleno_org_checked"; ?>}, function(payload) {
+				$('#prideleno').remove();
+
+				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmsearchForm-prideleno_text');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});            
+                <?php } ?>
+                
             -->
             </script>
             </dd>
@@ -136,17 +165,17 @@
         <dl class="detail_item">
             <dt>Předáno:</dt>
             <dd>
-            {$searchForm['predano']->control}
+            {$searchForm['predano_text']->control}
             <br />{$searchForm['predano_osobne']->control} Předáno na mé jméno
             <br />{$searchForm['predano_na_organizacni_jednotku']->control} Předáno na mou organizační jednotku
             <script type="text/javascript">
             <!--
-		$('#frmsearchForm-predano').focus().keyup(function(event) {
-                    if ( $('#frmsearchForm-predano').val().length > 2 ) {
-			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmsearchForm-predano').val()}, function(payload) {
+		$('#frmsearchForm-predano_text').focus().keyup(function(event) {
+                    if ( $('#frmsearchForm-predano_text').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmsearchForm-predano_text').val()}, function(payload) {
 				$('#predano').remove();
 
-				var list = $('<ul id="predano"></ul>').insertAfter('#frmsearchForm-predano');
+				var list = $('<ul id="predano"></ul>').insertAfter('#frmsearchForm-predano_text');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
@@ -156,6 +185,25 @@
                         $('#predano').remove();
                     }
 		});
+                <?php if ( isset($params['predano_text']) && !empty($params['predano_text']) ) { 
+                        $predano_checked = "''"; $predano_org_checked = "''";
+                        if ( isset($params['predano']) ) {
+                            $predano_checked = "'". implode(",",$params['predano']) ."'";
+                        }
+                        if ( isset($params['predano_org']) ) {
+                            $predano_org_checked = "'". implode(",",$params['predano_org']) ."'";
+                        }                        
+                ?>            
+			$.getJSON({link autoComplete!}, { typ: 2, text: '<?php echo $params['predano_text'] ."', user: $predano_checked, org: $predano_org_checked"; ?>}, function(payload) {
+				$('#predano').remove();
+
+				var list = $('<ul id="predano"></ul>').insertAfter('#frmsearchForm-predano_text');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});            
+                <?php } ?>
             -->
             </script>
             </dd>

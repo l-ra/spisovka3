@@ -59,6 +59,10 @@
             <dd>{$upravitForm['popis']->control}</dd>
         </dl>
         <dl class="detail_item">
+            <dt>Způsob doručení přes epodatelnu:</dt>
+            <dd>{$upravitForm['typ_doruceni']->control}</dd>
+        </dl>        
+        <dl class="detail_item">
             <dt>Způsob doručení:</dt>
             <dd>{$upravitForm['typ_doruceni']->control}</dd>
         </dl>
@@ -71,6 +75,11 @@
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$upravitForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Číslo doporučeného dopisu:</dt>
+            <dd>{$upravitForm['cislo_doporuceneho_dopisu']->control}</dd>
+            <dd>{$upravitForm['cislo_doporuceneho_dopisu_pouze']->control} pouze doporučené</dd>
+        </dl>         
         <dl class="detail_item">
             <dt>Poznámka:</dt>
             <dd>{$upravitForm['poznamka']->control}</dd>
@@ -93,6 +102,26 @@
             <dd>od: {$upravitForm['datum_odeslani_od']->control} {$upravitForm['datum_odeslani_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
             <dd>do: {$upravitForm['datum_odeslani_do']->control} {$upravitForm['datum_odeslani_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
         </dl>
+        <?php if (1) { ?>
+        <dl class="detail_item">
+            <dt>Druh zásilky:</dt>
+            <dd>
+                <?php
+                $druh_zasilky = array();
+                if ( isset($params['druh_zasilky']) && !empty($params['druh_zasilky']) ) {
+                    $druh_zasilky_a = unserialize($params['druh_zasilky']);
+                    foreach ( $druh_zasilky_a as $druh ) {
+                        $druh_zasilky[$druh] = $druh;
+                    }
+                }
+                ?>
+                {foreach $DruhZasilky as $dz_index=>$dz_nazev}
+                <input type="checkbox" name="druh_zasilky[{$dz_index}]" <?php echo isset($druh_zasilky[$dz_index])?' checked="checked"':''; ?> />&nbsp;{$dz_nazev}
+                {/foreach}
+                &nbsp;
+            </dd>
+        </dl>     
+        <?php }//if 0 ?>        
         <dl class="detail_item">
             <dt>Spisový znak:</dt>
             <dd>{$upravitForm['spisovy_znak_id']->control}</dd>
@@ -115,6 +144,7 @@
         </dl>
     </div>
 
+    {if $isPrivilege}
     <div id="dokument_blok_poznamka">
         <div class="h2">
             Přidělěno / předáno
@@ -122,17 +152,17 @@
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
-            {$upravitForm['prideleno']->control}
+            {$upravitForm['prideleno_text']->control}
             <br />{$upravitForm['prideleno_osobne']->control} Přidělěno na mé jméno
             <br />{$upravitForm['prideleno_na_organizacni_jednotku']->control} Přidělěno na mou organizační jednotku
             <script type="text/javascript">
             <!--
-		$('#frmupravitForm-prideleno').focus().keyup(function(event) {
-                    if ( $('#frmupravitForm-prideleno').val().length > 2 ) {
-			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmupravitForm-prideleno').val()}, function(payload) {
+		$('#frmupravitForm-prideleno_text').focus().keyup(function(event) {
+                    if ( $('#frmupravitForm-prideleno_text').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmupravitForm-prideleno_text').val()}, function(payload) {
 				$('#prideleno').remove();
 
-				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmupravitForm-prideleno');
+				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmupravitForm-prideleno_text');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
@@ -142,6 +172,26 @@
                         $('#prideleno').remove();
                     }
 		});
+                <?php if ( isset($params['prideleno_text']) && !empty($params['prideleno_text']) ) { 
+                        $prideleno_checked = "''"; $prideleno_org_checked = "''";
+                        if ( isset($params['prideleno']) ) {
+                            $prideleno_checked = "'". implode(",",$params['prideleno']) ."'";
+                        }
+                        if ( isset($params['prideleno_org']) ) {
+                            $prideleno_org_checked = "'". implode(",",$params['prideleno_org']) ."'";
+                        }                        
+                ?>
+			$.getJSON({link autoComplete!}, { typ: 1, text: '<?php echo $params['prideleno_text'] ."', user: $prideleno_checked, org: $prideleno_org_checked"; ?>}, function(payload) {
+				$('#prideleno').remove();
+
+				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmupravitForm-prideleno_text');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});            
+                <?php } ?>
+                
             -->
             </script>
             </dd>
@@ -149,17 +199,17 @@
         <dl class="detail_item">
             <dt>Předáno:</dt>
             <dd>
-            {$upravitForm['predano']->control}
+            {$upravitForm['predano_text']->control}
             <br />{$upravitForm['predano_osobne']->control} Předáno na mé jméno
             <br />{$upravitForm['predano_na_organizacni_jednotku']->control} Předáno na mou organizační jednotku
             <script type="text/javascript">
             <!--
-		$('#frmupravitForm-predano').focus().keyup(function(event) {
-                    if ( $('#frmupravitForm-predano').val().length > 2 ) {
-			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmupravitForm-predano').val()}, function(payload) {
+		$('#frmupravitForm-predano_text').focus().keyup(function(event) {
+                    if ( $('#frmupravitForm-predano_text').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmupravitForm-predano_text').val()}, function(payload) {
 				$('#predano').remove();
 
-				var list = $('<ul id="predano"></ul>').insertAfter('#frmupravitForm-predano');
+				var list = $('<ul id="predano"></ul>').insertAfter('#frmupravitForm-predano_text');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
@@ -169,11 +219,31 @@
                         $('#predano').remove();
                     }
 		});
+                <?php if ( isset($params['predano_text']) && !empty($params['predano_text']) ) { 
+                        $predano_checked = "''"; $predano_org_checked = "''";
+                        if ( isset($params['predano']) ) {
+                            $predano_checked = "'". implode(",",$params['predano']) ."'";
+                        }
+                        if ( isset($params['predano_org']) ) {
+                            $predano_org_checked = "'". implode(",",$params['predano_org']) ."'";
+                        }                        
+                ?>            
+			$.getJSON({link autoComplete!}, { typ: 2, text: '<?php echo $params['predano_text'] ."', user: $predano_checked, org: $predano_org_checked"; ?>}, function(payload) {
+				$('#predano').remove();
+
+				var list = $('<ul id="predano"></ul>').insertAfter('#frmupravitForm-predano_text');
+
+				for (var i in payload.autoComplete) {
+					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+				}
+			});            
+                <?php } ?>
             -->
             </script>
             </dd>
         </dl>
     </div>
+    {/if}
 
     <div id="dokument_blok_poznamka">
         <div class="h2">

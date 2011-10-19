@@ -7,6 +7,8 @@ class Spisovna_VyhledatPresenter extends BasePresenter
     {
         $this->template->searchForm = $this['searchForm'];
 
+        $this->template->DruhZasilky = DruhZasilky::get(null,1);
+        
         $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');
         
         if ( $this->getParam('is_ajax') ) {
@@ -15,10 +17,21 @@ class Spisovna_VyhledatPresenter extends BasePresenter
 
     }
 
-    public function handleAutoComplete($text, $typ)
+    public function handleAutoComplete($text, $typ, $user=null, $org=null)
     {
         $this->payload->autoComplete = array();
 
+        $user_a = array();
+        $org_a = array();
+        $user = trim($user);
+        if ( !empty($user) ) {
+            $user_a = explode(",",$user);
+        }
+        $org = trim($org);
+        if ( !empty($org) ) {
+            $org_a = explode(",",$org);
+        }
+        
 	$text = trim($text);
 	if ($text !== '') {
 
@@ -33,12 +46,13 @@ class Spisovna_VyhledatPresenter extends BasePresenter
             $seznam = $OrgJednotka->seznam($args);
             if ( count($seznam)>0 ) {
                 foreach( $seznam as $org ) {
+                    $checked_org = ( in_array($org->id, $org_a) )?' checked="checked"':'';
                     if ( $typ == 2 ) {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano_org[]' value='". $org->id ."' />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
+                            "<input type='checkbox' name='predano_org[]' value='". $org->id ."' $checked_org />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
                     } else {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno_org[]' value='". $org->id ."' />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
+                            "<input type='checkbox' name='prideleno_org[]' value='". $org->id ."' $checked_org />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
                     }
                 }
             }
@@ -47,15 +61,15 @@ class Spisovna_VyhledatPresenter extends BasePresenter
             $seznam = $Zamestnanci->hledat($text);
             if ( count($seznam)>0 ) {
                 foreach( $seznam as $user ) {
+                    $checked_user = ( in_array($user->id, $user_a) )?' checked="checked"':'';
                     if ( $typ == 2 ) {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano[]' value='". $user->user_id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='predano[]' value='". $user->id ."' $checked_user /> ". Osoba::displayName($user) ." (". $user->name .")";
                     } else {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno[]' value='". $user->user_id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='prideleno[]' value='". $user->id ."' $checked_user /> ". Osoba::displayName($user) ." (". $user->name .")";
 
                     }
-                    
                 }
             }
 	}
@@ -123,8 +137,10 @@ class Spisovna_VyhledatPresenter extends BasePresenter
             }
         } else {
             $hledat = null;
-        }        
-        
+        }
+        $this->template->params = $hledat;
+        //Debug::dump($hledat);
+        unset($hledat['druh_zasilky'],$hledat['prideleno'],$hledat['predano'],$hledat['prideleno_org'],$hledat['predano_org']);
         
         
         $form = new AppForm();
@@ -148,7 +164,7 @@ class Spisovna_VyhledatPresenter extends BasePresenter
         $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50)
                 ->setValue(@$hledat['cislo_doporuceneho_dopisu']);
         $form->addCheckbox('cislo_doporuceneho_dopisu_pouze', 'Pouze doporučené dopisy')
-                ->setValue(isset($hledat['cislo_doporuceneho_dopisu'])?1:0);
+                ->setValue((@$hledat['cislo_doporuceneho_dopisu_pouze'])?1:0);
         $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):', 10)
                 ->setValue(@$hledat['datum_vzniku_od']);
         $form->addText('datum_vzniku_cas_od', 'Čas doručení (od):', 10, 15)
@@ -209,19 +225,19 @@ class Spisovna_VyhledatPresenter extends BasePresenter
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$hledat['vyrizeni_pocet_priloh']);
 
-        $form->addText('prideleno', 'Přiděleno:', 50, 255)
-                ->setValue(@$hledat['prideleno']);
-        $form->addText('predano', 'Předáno:', 50, 255)
-                ->setValue(@$hledat['predano']);
+        $form->addText('prideleno_text', 'Přiděleno:', 50, 255)
+                ->setValue(@$hledat['prideleno_text']);
+        $form->addText('predano_text', 'Předáno:', 50, 255)
+                ->setValue(@$hledat['predano_text']);
 
         $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno')
-                ->setValue(isset($hledat['prideleno_osobne'])?1:0);
+                ->setValue((@$hledat['prideleno_osobne'])?1:0);
         $form->addCheckbox('prideleno_na_organizacni_jednotku', 'Přiděleno na mou organizační jednotku')
-                ->setValue(isset($hledat['prideleno_na_organizacni_jednotku'])?1:0);
+                ->setValue((@$hledat['prideleno_na_organizacni_jednotku'])?1:0);
         $form->addCheckbox('predano_osobne', 'Předáno na mé jméno')
-                ->setValue(isset($hledat['predano_osobne'])?1:0);
+                ->setValue((@$hledat['predano_osobne'])?1:0);
         $form->addCheckbox('predano_na_organizacni_jednotku', 'Předáno na mou organizační jednotku')
-                ->setValue(isset($hledat['predano_na_organizacni_jednotku'])?1:0);
+                ->setValue((@$hledat['predano_na_organizacni_jednotku'])?1:0);
 
         
         $form->addSelect('subjekt_type', 'Typ subjektu:', $typ_select)
@@ -281,11 +297,24 @@ class Spisovna_VyhledatPresenter extends BasePresenter
         if ( isset($_POST['predano_org']) ) {
             $data['predano_org'] = $_POST['predano_org'];
         }
+        if ( isset($_POST['druh_zasilky']) ) {
+            if ( count($_POST['druh_zasilky'])>0 ) {
+                $druh_sql = array();
+                foreach ( $_POST['druh_zasilky'] as $druh_id => $druh_zasilky ) {
+                    $druh_sql[] = $druh_id;
+                }
+                $data['druh_zasilky'] = serialize($druh_sql);            
+            }
+        } else {
+            $data['druh_zasilky'] = null;
+        }                
 
         //Debug::dump($data);
         // eliminujeme prazdne hodnoty
         foreach ( $data as $d_index => $d_value ) {
-            if ( @strlen($d_value) == 0 ) {
+            if (is_array($d_value) ) {
+                continue;
+            } else if ( @strlen($d_value) == 0 ) {
                 unset($data[$d_index]);
             } else if ( $d_value == "0" ) {
                 unset($data[$d_index]);
@@ -293,7 +322,7 @@ class Spisovna_VyhledatPresenter extends BasePresenter
                 unset($data[$d_index]);
             }
         }
-        //Debug::dump($data);        
+        //Debug::dump($data); exit;       
         
         
         //$args = $Dokument->filtr(null,$data);

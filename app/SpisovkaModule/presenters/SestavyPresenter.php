@@ -28,10 +28,21 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     }
 
-    public function handleAutoComplete($text, $typ)
+    public function handleAutoComplete($text, $typ, $user=null, $org=null)
     {
         $this->payload->autoComplete = array();
 
+        $user_a = array();
+        $org_a = array();
+        $user = trim($user);
+        if ( !empty($user) ) {
+            $user_a = explode(",",$user);
+        }
+        $org = trim($org);
+        if ( !empty($org) ) {
+            $org_a = explode(",",$org);
+        }
+        
 	$text = trim($text);
 	if ($text !== '') {
 
@@ -46,12 +57,13 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $seznam = $OrgJednotka->seznam($args);
             if ( count($seznam)>0 ) {
                 foreach( $seznam as $org ) {
+                    $checked_org = ( in_array($org->id, $org_a) )?' checked="checked"':'';
                     if ( $typ == 2 ) {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano_org[]' value='". $org->id ."' />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
+                            "<input type='checkbox' name='predano_org[]' value='". $org->id ."' $checked_org />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
                     } else {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno_org[]' value='". $org->id ."' />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
+                            "<input type='checkbox' name='prideleno_org[]' value='". $org->id ."' $checked_org />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
                     }
                 }
             }
@@ -60,12 +72,13 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $seznam = $Zamestnanci->hledat($text);
             if ( count($seznam)>0 ) {
                 foreach( $seznam as $user ) {
+                    $checked_user = ( in_array($user->id, $user_a) )?' checked="checked"':'';
                     if ( $typ == 2 ) {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='predano[]' value='". $user->id ."' $checked_user /> ". Osoba::displayName($user) ." (". $user->name .")";
                     } else {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno[]' value='". $user->id ."' /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='prideleno[]' value='". $user->id ."' $checked_user /> ". Osoba::displayName($user) ." (". $user->name .")";
 
                     }
                     
@@ -288,11 +301,21 @@ class Spisovka_SestavyPresenter extends BasePresenter
     public function renderNova()
     {
         $this->template->newForm = $this['newForm'];
+        
+        $this->template->DruhZasilky = DruhZasilky::get(null,1);
+        
+        $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');        
+        
     }
 
     public function renderUpravit()
     {
         $this->template->upravitForm = $this['upravitForm'];
+        
+        $this->template->DruhZasilky = DruhZasilky::get(null,1);
+        
+        $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');
+        
     }
 
     public function renderPodaciarch() 
@@ -369,6 +392,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addSelect('typ_doruceni', 'Způsob doručení:', $typ_doruceni);
         $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
+        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50);
+        $form->addCheckbox('cislo_doporuceneho_dopisu_pouze', 'Pouze doporučené dopisy');
         $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):', 10);
         $form->addText('datum_vzniku_cas_od', 'Čas doručení (od):', 10, 15);
         $form->addDatePicker('datum_vzniku_do', 'Datum doručení/vzniku do:', 10);
@@ -403,8 +428,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10);
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10);
 
-        $form->addText('prideleno', 'Přiděleno:', 50, 255);
-        $form->addText('predano', 'Předáno:', 50, 255);
+        $form->addText('prideleno_text', 'Přiděleno:', 50, 255);
+        $form->addText('predano_text', 'Předáno:', 50, 255);
 
         $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno');
         $form->addCheckbox('prideleno_na_organizacni_jednotku', 'Přiděleno na mou organizační jednotku');
@@ -461,6 +486,28 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $sestava['sloupce'] = $sloupce;
 
         // pro sestaveni parametru
+        if ( isset($_POST['prideleno']) ) {
+            $data['prideleno'] = $_POST['prideleno'];
+        }
+        if ( isset($_POST['predano']) ) {
+            $data['predano'] = $_POST['predano'];
+        }
+        if ( isset($_POST['prideleno_org']) ) {
+            $data['prideleno_org'] = $_POST['prideleno_org'];
+        }
+        if ( isset($_POST['predano_org']) ) {
+            $data['predano_org'] = $_POST['predano_org'];
+        }
+        if ( isset($_POST['druh_zasilky']) ) {
+            if ( count($_POST['druh_zasilky'])>0 ) {
+                $druh_sql = array();
+                foreach ( $_POST['druh_zasilky'] as $druh_id => $druh_zasilky ) {
+                    $druh_sql[] = $druh_id;
+                }
+                $data['druh_zasilky'] = serialize($druh_sql);            
+            }
+        }       
+        
         $params = '';
         $params = serialize($data);
 
@@ -495,7 +542,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
         } else {
             $params = null;
         }
-
+        $this->template->params = $params;
+        //Debug::dump($params);
+        unset($params['druh_zasilky'],$params['prideleno'],$params['predano'],$params['prideleno_org'],$params['predano_org']);
+        
         $typ_dokumentu = array();
         $typ_dokumentu = Dokument::typDokumentu(null,3);
 
@@ -568,6 +618,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 ->setValue(@$params['zpusob_doruceni_id']);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$params['cislo_jednaci_odesilatele']);
+        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50)
+                ->setValue(@$params['cislo_doporuceneho_dopisu']);
+        $form->addCheckbox('cislo_doporuceneho_dopisu_pouze', 'Pouze doporučené dopisy')
+                ->setValue((@$params['cislo_doporuceneho_dopisu_pouze'])?1:0);
         $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):', 10)
                 ->setValue(@$params['datum_vzniku_od']);
         $form->addText('datum_vzniku_cas_od', 'Čas doručení (od):', 10, 15)
@@ -628,17 +682,19 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$params['vyrizeni_pocet_priloh']);
 
-        $form->addText('prideleno', 'Přiděleno:', 50, 255);
-        $form->addText('predano', 'Předáno:', 50, 255);
+        $form->addText('prideleno_text', 'Přiděleno:', 50, 255)
+                ->setValue(@$params['prideleno_text']);
+        $form->addText('predano_text', 'Předáno:', 50, 255)
+                ->setValue(@$params['predano_text']);
 
         $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno')
-                ->setValue(@$params['prideleno_osobne']);
+                ->setValue((@$params['prideleno_osobne'])?1:0);
         $form->addCheckbox('prideleno_na_organizacni_jednotku', 'Přiděleno na mou organizační jednotku')
-                ->setValue(@$params['prideleno_na_organizacni_jednotku']);
+                ->setValue((@$params['prideleno_na_organizacni_jednotku'])?1:0);
         $form->addCheckbox('predano_osobne', 'Předáno na mé jméno')
-                ->setValue(@$params['predano_osobne']);
+                ->setValue((@$params['predano_osobne'])?1:0);
         $form->addCheckbox('predano_na_organizacni_jednotku', 'Předáno na mou organizační jednotku')
-                ->setValue(@$params['predano_na_organizacni_jednotku']);
+                ->setValue((@$params['predano_na_organizacni_jednotku'])?1:0);
 
 
         $form->addSelect('subjekt_type', 'Typ subjektu:', $typ_select)
@@ -650,7 +706,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('adresa_mesto', 'Obec:', 50, 48)
                 ->setValue(@$params['adresa_mesto']);
         $form->addText('adresa_psc', 'PSČ:', 10, 10)
-                ->setValue(@$params['adrea_psc']);
+                ->setValue(@$params['adresa_psc']);
 
         $form->addText('subjekt_email', 'Email:', 50, 250)
                 ->setValue(@$params['subjekt_email']);
@@ -694,16 +750,35 @@ class Spisovka_SestavyPresenter extends BasePresenter
         unset($data['id'],$data['sestava_nazev'],$data['sestava_popis'],
               $data['sestava_typ'],$data['sestava_filtr']);
 
-        //Debug::dump($data); exit;
-
         // pro sestaveni sloupce
         $sloupce = '';
         $sestava['sloupce'] = $sloupce;
 
         // pro sestaveni parametru
+        if ( isset($_POST['prideleno']) ) {
+            $data['prideleno'] = $_POST['prideleno'];
+        }
+        if ( isset($_POST['predano']) ) {
+            $data['predano'] = $_POST['predano'];
+        }
+        if ( isset($_POST['prideleno_org']) ) {
+            $data['prideleno_org'] = $_POST['prideleno_org'];
+        }
+        if ( isset($_POST['predano_org']) ) {
+            $data['predano_org'] = $_POST['predano_org'];
+        }
+        if ( isset($_POST['druh_zasilky']) ) {
+            if ( count($_POST['druh_zasilky'])>0 ) {
+                $druh_sql = array();
+                foreach ( $_POST['druh_zasilky'] as $druh_id => $druh_zasilky ) {
+                    $druh_sql[] = $druh_id;
+                }
+                $data['druh_zasilky'] = serialize($druh_sql);            
+            }
+        }          
+        
         $params = '';
         $params = serialize($data);
-
         $sestava['parametry'] = $params;
 
         //Debug::dump($sestava);

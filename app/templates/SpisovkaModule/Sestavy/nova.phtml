@@ -63,6 +63,10 @@
             <dd>{$newForm['typ_doruceni']->control}</dd>
         </dl>
         <dl class="detail_item">
+            <dt>Způsob doručení přes epodatelnu:</dt>
+            <dd>{$newForm['typ_doruceni']->control}</dd>
+        </dl>        
+        <dl class="detail_item">
             <dt>Datum doručení/vzniku </dt>
             <dd>od: {$newForm['datum_vzniku_od']->control} {$newForm['datum_vzniku_cas_od']->control} datum (d.m.r) / čas (h:m:s)</dd>
             <dd>do: {$newForm['datum_vzniku_do']->control} {$newForm['datum_vzniku_cas_do']->control} datum (d.m.r) / čas (h:m:s)</dd>
@@ -71,6 +75,11 @@
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$newForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Číslo doporučeného dopisu:</dt>
+            <dd>{$newForm['cislo_doporuceneho_dopisu']->control}</dd>
+            <dd>{$newForm['cislo_doporuceneho_dopisu_pouze']->control} pouze doporučené</dd>
+        </dl>           
         <dl class="detail_item">
             <dt>Poznámka:</dt>
             <dd>{$newForm['poznamka']->control}</dd>
@@ -93,6 +102,17 @@
             <dd>od: {$newForm['datum_odeslani_od']->control} {$newForm['datum_odeslani_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
             <dd>do: {$newForm['datum_odeslani_do']->control} {$newForm['datum_odeslani_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
         </dl>
+        <?php if (1) { ?>
+        <dl class="detail_item">
+            <dt>Druh zásilky:</dt>
+            <dd>
+                {foreach $DruhZasilky as $dz_index=>$dz_nazev}
+                <input type="checkbox" name="druh_zasilky[{$dz_index}]" />&nbsp;{$dz_nazev}
+                {/foreach}
+                &nbsp;
+            </dd>
+        </dl>     
+        <?php }//if 0 ?>        
         <dl class="detail_item">
             <dt>Spisový znak:</dt>
             <dd>{$newForm['spisovy_znak_id']->control}</dd>
@@ -115,6 +135,7 @@
         </dl>
     </div>
 
+    {if $isPrivilege}
     <div id="dokument_blok_poznamka">
         <div class="h2">
             Přidělěno / předáno
@@ -122,17 +143,17 @@
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
-            {$newForm['prideleno']->control}
+            {$newForm['prideleno_text']->control}
             <br />{$newForm['prideleno_osobne']->control} Přidělěno na mé jméno
             <br />{$newForm['prideleno_na_organizacni_jednotku']->control} Přidělěno na mou organizační jednotku
             <script type="text/javascript">
             <!--
-		$('#frmnewForm-prideleno').focus().keyup(function(event) {
-                    if ( $('#frmnewForm-prideleno').val().length > 2 ) {
-			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmnewForm-prideleno').val()}, function(payload) {
+		$('#frmnewForm-prideleno_text').focus().keyup(function(event) {
+                    if ( $('#frmnewForm-prideleno_text').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmnewForm-prideleno_text').val()}, function(payload) {
 				$('#prideleno').remove();
 
-				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmnewForm-prideleno');
+				var list = $('<ul id="prideleno"></ul>').insertAfter('#frmnewForm-prideleno_text');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
@@ -149,17 +170,17 @@
         <dl class="detail_item">
             <dt>Předáno:</dt>
             <dd>
-            {$newForm['predano']->control}
+            {$newForm['predano_text']->control}
             <br />{$newForm['predano_osobne']->control} Předáno na mé jméno
             <br />{$newForm['predano_na_organizacni_jednotku']->control} Předáno na mou organizační jednotku
             <script type="text/javascript">
             <!--
-		$('#frmnewForm-predano').focus().keyup(function(event) {
-                    if ( $('#frmnewForm-predano').val().length > 2 ) {
-			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmnewForm-predano').val()}, function(payload) {
+		$('#frmnewForm-predano_text').focus().keyup(function(event) {
+                    if ( $('#frmnewForm-predano_text').val().length > 2 ) {
+			$.getJSON({link autoComplete!}, { typ: 2, text: $('#frmnewForm-predano_text').val()}, function(payload) {
 				$('#predano').remove();
 
-				var list = $('<ul id="predano"></ul>').insertAfter('#frmnewForm-predano');
+				var list = $('<ul id="predano"></ul>').insertAfter('#frmnewForm-predano_text');
 
 				for (var i in payload.autoComplete) {
 					$('<li></li>').html(payload.autoComplete[i]).appendTo(list);
@@ -174,6 +195,7 @@
             </dd>
         </dl>
     </div>
+    {/if}
 
     <div id="dokument_blok_poznamka">
         <div class="h2">

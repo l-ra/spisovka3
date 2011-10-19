@@ -43,9 +43,14 @@
                 {/if}
             {elseif $sl=='datum_odeslani'}
                 {if count($dok->odeslani)}
-                {foreach $dok->odeslani as $odes}
-            {$odes->datum_odeslani|edate}<br />
-                {/foreach}
+                <?php 
+                    $odeslani = array(); 
+                    foreach ( $dok->odeslani as $odes ) {
+                        $odeslani[] = $odes->datum_odeslani;
+                    } 
+                    rsort($odeslani);
+                ?>                
+                {$odeslani[0]|edate}
                 {else}
             &nbsp;
                 {/if}
