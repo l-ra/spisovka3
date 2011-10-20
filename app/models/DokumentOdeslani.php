@@ -139,19 +139,33 @@ class DokumentOdeslani extends BaseModel
                 
                 if ( $druh == "balik" ) {
                     if ( !$dokumenty[ $subjekt_index ]->druh_zasilky) {
+                        // nelze detekovat - radeji vyradime
                         unset($dokumenty[ $subjekt_index ]);
                     } else if ( !in_array(3, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
+                        // vyradime cokoli co neni balik
+                        unset($dokumenty[ $subjekt_index ]);
+                    } else if ( in_array(1, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
+                        // je to sice balik, ale obycejny - vyradime
+                        unset($dokumenty[ $subjekt_index ]);                        
+                    } else if ( count($dokumenty[ $subjekt_index ]->druh_zasilky) < 2 ) {
+                        // samotny balik je obycejny balik - vyradime
                         unset($dokumenty[ $subjekt_index ]);
                     }
                 } else if ( $druh == "doporucene" ) {
                     if ( !$dokumenty[ $subjekt_index ]->druh_zasilky) {
+                        // nelze detekovat - radeji vyradime
+                        unset($dokumenty[ $subjekt_index ]);
+                    } else if ( in_array(3, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
+                        // baliky jsou ze hry
                         unset($dokumenty[ $subjekt_index ]);
                     } else if ( !in_array(2, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
+                        // vyradime cokoli co nema v sobe 2 - doporucene
                         unset($dokumenty[ $subjekt_index ]);
                     }
                 }
                 
             }
+            sort($dokumenty); // eliminuje nesourode indexy
             return $dokumenty;
         } else {
             return null;
