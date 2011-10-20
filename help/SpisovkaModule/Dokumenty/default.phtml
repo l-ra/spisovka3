@@ -1,23 +1,21 @@
     <h2>Seznam dokumentů</h2>
 
     <p>
-        Seznam dokumentů je primární stránka, která se otevře vždy, když se přihlásíte do systému.
-    Pokud tento seznam dokumentů chcete vidět v budoucnu při práci se Spisovou službou,
-    stačí kliknout na tlačítko Seznam dokumentů.
+    Seznam dokumentů je úvodní stránka, která se otevře ihned po přihlášení do systému. Pokud tento seznam dokumentů chcete vidět v budoucnu při práci se Spisovou službou, stačí klepnout na tlačítko Seznam dokumentů.
     </p>
     <p>
-        Jak již napovídá sám název této sekce, tak toto tlačítko v sobě skrývá seznam všech dokumentů
-    uložených v systému Spisové služby. Tyto dokumenty jsou rozřazeny do přehledné tabulky a to podle
-    jednacího čísla. V této tabulce ale naleznete i jiné informace než je jednací číslo,
-    jsou zde i tyto následující informace:
+    Pokud chcete vidět detaily dokumentu, stačí najet a klepnout na jeho název (věc) a budete přesměrováni do detailů daného dokumentu.     
+    </p>
+    <p>
+    Tlačítko Seznam dokumentů v sobě skrývá seznam všech dokumentů uložených v systému Spisové služby. Tyto dokumenty jsou rozřazeny do přehledné tabulky. V této tabulce naleznete následující položky:
     </p>
     <dl>
         <dt>Typ dokumentu</dt>
-        <dd>Ten je znázorněn ikonou podle toho, jaký typ dokumentu nastavíte.</dd>
+        <dd>Ten je vyjádřen ikonou, která představuje typ dokumentu (příchozí, odchozí atd.).</dd>
     </dl>
     <dl>
         <dt>Přijato</dt>
-        <dd>Tento sloupec zobrazuje datum přijetí.</dd>
+        <dd>Tento sloupec zobrazuje datum přijetí/vytvoření dokumentu.</dd>
     </dl>
     <dl>
         <dt>Číslo jednací, JID, Název spisu</dt>
@@ -25,64 +23,122 @@
     </dl>
     <dl>
         <dt>Věc, Adresáti/Odesilatelé, počet listů a příloh</dt>
-        <dd>V tomto sloupci naleznete předmět zprávy, seznam adresátů nebo odesilatelů a také zde zjistíte, kolik listů dokument má a také počet příloh.</dd>
+        <dd>V tomto sloupci naleznete předmět zprávy, seznam adresátů či odesilatelů a také zde zjistíte, kolik listů dokument má a počet příloh.</dd>
     </dl>
     <dl>
         <dt>Přiděleno</dt>
-        <dd>Tento sloupec zobrazuje jméno osoby, které byl daný dokument přidělen.</dd>
+        <dd>Tento sloupec zobrazuje jméno pracovníka a organizační jednotku pracovníka, které byl daný dokument přidělen.</dd>
     </dl>
     <dl>
         <dt>Stav</dt>
-        <dd>Poslední sloupec je vyhrazen pro určení stavu, v jakém se dokument nachází.</dd>
+        <dd>Poslední sloupec je vyhrazen pro určení stavu, v jakém se dokument nachází a od kdy se v něm nachází.</dd>
     </dl>
 
     <p>
-        Pod tlačítkem Seznam dokumentů se neskrývá pouze soupis všech dokumentů, ale naleznete zde i
-    dvě důležité funkce, které vám pomohou se naprosto bez problému orientovat i ve velkém množství dokumentů ve Spisové službě.
-    Jedná se o funkci filtr a vyhledávání.
+        Pod tlačítkem Seznam dokumentů se neskrývá pouze soupis všech dokumentů, ale naleznete zde i další důležité funkce, kterými jsou Seřadit podle, Akce, Tisk stránky, Generování stránky v PDF, Filtr a Vyhledávání.
     </p>
+    
+    <br>
+    <h3>Tisk stránky</h3>
     <p>
-        Filtry naleznete pod položkou Filtr, který se nachází hned pod nadpisem Seznam Dokumentů.
-    Pokud chcete vybrat jeden z filtrů, klikněte na šipku směřující dolů a zobrazí se vám rozbalovací menu s jednotlivými názvy filtrů.
-    Filtrovat dokumenty lze podle několika kriterií:
+        Pokud si potřebujete vytisknout seznam dokumentu, tak využijte ikony tiskárny, kterou naleznete v pravé horní části obrazovky. Jakmile na ni klepnete, seznam se upraví do verze pro tisk a vy jej můžete vytisknout.
+    </p>        
+
+    <br>
+    <h3>Vygenerování stránky v PDF</h3>
+    <p>
+    V případě, že potřebujete elektronickou podobu seznamu dokumentu, můžete stránku vygenerovat do PDF. Stačí jen najet a klepnout na ikonu PDF, která se nachází hned vedle ikony tiskárny.
+    </p>
+    
+    <br>
+    <h3>Seřadit podle</h3>
+    <p>
+    Těsně nad tabulkou se nachází rozbalovací menu s tlačítkem Seřadit. Pomocí této funkce můžete položky v tabulce řadit podle těchto kritérií:
+    <ul>
+        <li>Stavu dokumentu (vzestupně i sestupně)</li>
+        <li>Čísla jednacího (vzestupně i sestupně)</li>
+        <li>JID (vzestupně i sestupně)</li>
+        <li>Data přijetí/vzniku (vzestupně i sestupně)</li>
+        <li>Věci (vzestupně i sestupně)</li>
+        <li>Přidělené osoby (vzestupně i sestupně)</li>
+    </ul>    
+    </p>
+    
+    <br>
+    <h3>Hromadná operace</h3>
+    <p>
+    Každá položka má u sebe na začátku řádku zaškrtávací box, který souvisí s funkcí hromadné operace, která se nachází v patičce tabulky společně s možnostmi Zaškrtnout vše / Odškrtnout vše.
+    <br>
+    Celá funkce funguje tak, že zaškrtnete ty položky, u kterých chcete provést jednotnou akci, poté klepnete na rozbalovací menu v patičce tabulky, vyberete jednu z akcí a klepnete na tlačítko Provést.
+    </p>
+
+    <br>
+    <h3>Filtrování</h3>
+    <p>
+    Filtr naleznete hned pod nadpisem Seznam Dokumentů. Pokud chcete vybrat jeden z možných filtrů, klepněte na šipku směřující dolů a zobrazí se vám rozbalovací menu s jednotlivými názvy filtrů. Filtrovat dokumenty lze podle několika kriterií:
 
     <dl>
-        <dt>Dokumenty na mé jméno</dt>
-        <dd>Po zvolení této možnosti se vám zobrazí jen ty dokumenty, které jsou vystaveny pro vaši osobu.</dd>
+        <dt>Přidělené</dt>
+        <dd>Zobrazí se všechny přidělené dokumenty k vaší organizační jednotce.</dd>
     </dl>
     <dl>
-        <dt>Dokumenty, které mi byly přiděleny</dt>
-        <dd>Tento filtr vám ukáže jen ty dokumenty, které vám přidělila jiná osoba.</dd>
+        <dt>K převzetí</dt>
+        <dd>Zobrazí se všechny dokumenty, které jsou určeny k převzetí.</dd>
     </dl>
     <dl>
-        <dt>Dokumenty, na kterých jsem kdy pracoval</dt>
-        <dd>Jakmile vyberete tuto možnost, zobrazí se vám všechny dokumenty, na kterých jste podílel.</dd>
+        <dt>Předané</dt>
+        <dd>Zobrazí se všechny dokumenty, které byly předány na jinou organizační jednotku.</dd>
     </dl>
     <dl>
-        <dt>Vlastní dokumenty, které jsem ještě nepředal</dt>
-        <dd>Tato možnost vám ukáže vámi vytvořené dokumenty, které jste ještě nikomu nepřidělili.</dd>
+        <dt>Nové / nepředané</dt>
+        <dd>Zobrazí se všechny dokumenty, které nebyly dosud předány na jinou organizační jednotku. Jedná se především o nové a nepředané dokumenty.</dd>
     </dl>
     <dl>
-        <dt>Dokumenty, které vyřizuji</dt>
-        <dd>Po zvolení tohoto filtru se vám zobrazí ty dokumenty, které vyřizujete.</dd>
+        <dt>K vyřízení</dt>
+        <dd>Zobrazí se všechny dokumenty, které jsou určeny k vyřízení</dd>
     </dl>
     <dl>
-        <dt>Všechny nové dokumenty, které nebyly ještě předány</dt>
-        <dd>Po zvolení této možnosti se vám zobrazí všechny nové dokumenty, které čekají na rozdělení.</dd>
+        <dt>Vyřízené</dt>
+        <dd>Zobrazí se všechny vyřízené dokumenty. Takové, které ještě nebyly předány do spisovny. Dokumenty, jež se nachází ve spisovně, zde nejsou zobrazeny.</dd>
     </dl>
     <dl>
-        <dt>Všechny dokumenty, které se vyřizují</dt>
-        <dd>Tento filtr má za úkol ukázat vám všechny dokumenty, které se nacházejí ve stavu vyřizování.</dd>
+        <dt>Na kterých jsem kdy pracoval</dt>
+        <dd>Zobrazí se všechny dokumenty, na kterých jste kdy pracovali.</dd>
     </dl>
     <dl>
-        <dt>Zobrazit všechny dokumenty</dt>
-        <dd>Jakmile zvolíte tento filtr, zobrazí se vám všechny dokumenty.</dd>
+        <dt>Doporučené</dt>
+        <dd>Zobrazí se všechny dokumenty, které byly označeny jako doporučené.</dd>
+    </dl>
+    <dl>
+        <dt>K odeslání</dt>
+        <dd>Zobrazí se všechny dokumenty připravené k odeslání.</dd>
+    </dl>
+    <dl>
+        <dt>Odeslané</dt>
+        <dd>Zobrazí se všechny dokumenty, které jsou již odeslané.</dd>
+    </dl>
+    <dl>
+        <dt>Všechny</dt>
+        <dd>
+            Zobrazí se všechny dokumenty
+            <br>
+            Pracovníci podatelny a spisovny vidí všechny dokumenty bez ohledu na organizační jednotku.
+            <br>
+            Pracovníci sekretariátu vidí všechny dokumenty jak ze své organizační jednotky, tak i ze všech svých podřízených jednotek.
+            <br>
+            Ostatní pracovníci všechny dokumenty pouze ze své organizační jednotky.
+
+            
+        </dd>
     </dl>
 
+    U všech kritérií filtru máte možnost zaškrtnout možnost Nezobrazovat vyřízené nebo archivované dokumenty. 
+    <br>
+    Všechny filtry nepracují s uživatelem, ale jsou nastaveny na organizační jednotky, to znamená, že vše, na čem pracujete, mohou vidět i ostatní členové vaší organizační jednotky.    
+    </p>
+
+    <br><br><br>
+    <h3>Vyhledávání</h3>
     <p>
-        Druhou funkcí je vyhledávání, to naleznete napravo od filtru. Vyhledávat lze podle věci, popisu, čísla jednacího nebo podle JID.
-    Toto vyhledávání je pouze jednodušší odnoží daleko dokonalejšího vyhledávacího enginu, který se skrývá
-    pod položkou Vyhledat, kde je možné vyhledávat prakticky cokoliv.
-    Pokud chcete cokoliv najít podle výše uvedených kritérií, stačí pouze do textového pole
-    napsat výraz, JID, číslo jednací a kliknout na tlačítko hledat, které se nachází hned vedle textového pole.
+    Poslední funkcí je vyhledávání, to naleznete napravo od filtru. Vyhledávat lze podle věci, popisu, čísla jednacího nebo podle JID. Toto vyhledávání je pouze jednodušší odnoží daleko dokonalejšího vyhledávacího enginu, který se skrývá pod položkou Pokročilé vyhledávání, kde je možné vyhledávat prakticky cokoliv. Pokud chcete cokoliv najít podle výše uvedených kritérií, stačí pouze do textového pole napsat výraz, JID, číslo jednací a klepnout na tlačítko hledat, které se nachází hned vedle textového pole.    
     </p>

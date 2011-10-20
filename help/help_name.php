@@ -73,6 +73,10 @@ $help_name['epodatelna/default/detail'] = 'Detail příchozí zprávy';
 $help_name['epodatelna/default/odchozi'] = 'Seznam odchozích zpráv';
 $help_name['epodatelna/default/odetail'] = 'Detail odchozí zprávy';
 $help_name['epodatelna/default/seznam'] = 'Seznam příchozích zpráv';
+$help_name['epodatelna/default/prichozi'] = 'Seznam příchozích zpráv';
+$help_name['epodatelna/default/nove'] = 'Seznam nových příchozích zpráv';
+$help_name['epodatelna/default/zkontrolovat'] = 'Zkontrolovat schránku';
+
 
 $help_name['epodatelna/evidence'] = 'Evidence';
 $help_name['epodatelna/evidence/jiny'] = 'Evidovat v jiné evidenci';
@@ -135,9 +139,11 @@ $help_name['spisovka/vypravna/default'] = 'Seznam dokumentů k odeslání';
 $help_name['spisovna/dokumenty'] = 'Dokumenty';
 $help_name['spisovna/dokumenty/prijem'] = 'Seznam dokumentů pro příjem do spisovny';
 $help_name['spisovna/dokumenty/default'] = 'Seznam dokumentů ve spisovně';
+$help_name['spisovna/dokumenty/keskartaciseznam'] = 'Seznam dokumentů určených ke skartaci';
+$help_name['spisovna/dokumenty/skartace'] = 'Seznam dokumentů ve skartačním řízení';
 $help_name['spisovna/dokumenty/detail'] = 'Detail dokumentu';
 
-$help_name['spisovna/spisy'] = 'Dokumenty';
+$help_name['spisovna/spisy'] = 'Spisy';
 $help_name['spisovna/spisy/prijem'] = 'Seznam spisů pro příjem do spisovny';
 $help_name['spisovna/spisy/default'] = 'Seznam spisů ve spisovně';
 $help_name['spisovna/spisy/detail'] = 'Detail spisu';
