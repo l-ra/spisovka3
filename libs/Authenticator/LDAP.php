@@ -104,6 +104,8 @@ class Authenticator_LDAP extends Control implements IAuthenticator
             foreach ($row->user_roles as $role) {
                 $identity_role[] = $role->code;
             }
+        } else {
+            throw new AuthenticationException("Uživatel '$username' nemá přiřazenou žádnou roli. Není možné ho připustit k aplikaci. Kontaktujte svého správce.", self::NOT_APPROVED);
         }
 
         $row->klient = KLIENT;
