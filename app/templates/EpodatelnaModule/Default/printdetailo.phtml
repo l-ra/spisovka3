@@ -1,24 +1,16 @@
-@{block title}Detail zprávy{/block}
-@{block debug}
-<?php echo "Zprava: "; print_r($Zprava); ?>
-<?php echo "Prilohy: "; print_r($Prilohy); ?>
-<?php echo "Original: "; print_r($Original); ?>
-@{/block}
-@{block content}
-
-    <div class="navigate">
-    <a href="{link :Epodatelna:Default:odchozi}">Seznam odchozích zpráv</a> - Detail zprávy
-    </div>
-
-    <div id="tisk">
-        <a href="{link :Epodatelna:Default:odetail, 'id'=>$Zprava->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-        </a>
-        <a href="{link :Epodatelna:Default:odetail, 'id'=>$Zprava->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
-        </a>        
-    </div>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <title>Spisová služba</title>
+    <style type="text/css" media="screen, print">
+        <?php echo file_get_contents(APP_DIR .'/../public/css/printdetail_site.css'); ?>
+    </style>
+</head>
+<body>
+<div id="content">
     <div id="dokument_blok_hlavni">
         <dl class="detail_item">
             <dt>Pořadí DZ v e-podatelně:</dt>
@@ -73,7 +65,6 @@
                 <img src="{$baseUri}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
             </td>
             <td class="meta">
-                {if 0}<a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>$priloha['id']}">{$priloha['name']}</a>{/if}
                 <strong>{$priloha['name']}</strong>
                 <div class="info">
                 <span>{$priloha['size']|bytes}, {$priloha['mimetype']}</span>
@@ -87,4 +78,7 @@
     {/if}
     </div>
     </div>
-    <div id="dialog"></div>
+    
+</div>
+</body>
+</html>    
