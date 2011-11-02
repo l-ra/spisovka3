@@ -7,6 +7,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
     private $oddelovac_poradi = null;
     private $spis_plan;
     private $hledat;
+    private $pdf_output = 0;
 
     public function startup()
     {
@@ -28,6 +29,106 @@ class Spisovna_SpisyPresenter extends BasePresenter
         parent::startup();
     }
 
+    protected function shutdown($response) {
+        
+        if ($this->pdf_output == 1 || $this->pdf_output == 2) {
+
+            function handlePDFError($errno, $errstr, $errfile, $errline, array $errcontext)
+            {
+                if (0 === error_reporting()) {
+                    return;
+                }
+                //if ( $errno == 8 ) {
+                if ( strpos($errstr,'Undefined') === false ) {    
+                    throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
+                }
+                
+                
+            }
+            set_error_handler('handlePDFError');
+            
+            try {                
+        
+            ob_start();
+            $response->send();
+            $content = ob_get_clean();
+            if ($content) {
+        
+                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+                
+                if ($this->pdf_output == 2) {
+                    $content = str_replace("<td", "<td valign='top'", $content);
+                    $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
+                    $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
+                    $content = preg_replace('#<div id="tisk_podpis">.*?</div>#s','', $content);
+                    $content = preg_replace('#<table id="table_top">.*?</table>#s','', $content);
+                
+                    $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
+                
+                    $app_info = Environment::getVariable('app_info');
+                    $app_info = explode("#",$app_info);
+                    $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
+                    $mpdf->SetCreator($app_name);
+                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetTitle('Spisová služba - Detail spisu');                
+                
+                    $mpdf->defaultheaderfontsize = 10;	/* in pts */
+                    $mpdf->defaultheaderfontstyle = 'B';	/* blank, B, I, or BI */
+                    $mpdf->defaultheaderline = 1; 	/* 1 to include line below header/above footer */
+                    $mpdf->defaultfooterfontsize = 9;	/* in pts */
+                    $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
+                    $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
+                    $mpdf->SetHeader('||'.$this->template->Urad->nazev);
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                
+                    $mpdf->WriteHTML($content);
+                
+                    $mpdf->Output('dokument.pdf', 'I');                    
+                } else {
+                    $content = str_replace("<td", "<td valign='top'", $content);
+                    $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
+                    $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
+                    $content = preg_replace('#<div id="tisk_podpis">.*?</div>#s','', $content);
+                    $content = preg_replace('#<table id="table_top">.*?</table>#s','', $content);
+                
+                    $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
+                
+                    $app_info = Environment::getVariable('app_info');
+                    $app_info = explode("#",$app_info);
+                    $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
+                    $mpdf->SetCreator($app_name);
+                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetTitle('Spisová služba - Tisk');                
+                
+                    $mpdf->defaultheaderfontsize = 10;	/* in pts */
+                    $mpdf->defaultheaderfontstyle = 'B';	/* blank, B, I, or BI */
+                    $mpdf->defaultheaderline = 1; 	/* 1 to include line below header/above footer */
+                    $mpdf->defaultfooterfontsize = 9;	/* in pts */
+                    $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
+                    $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
+                    $mpdf->SetHeader('Seznam spisů ve spisovně||'.$this->template->Urad->nazev);
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                
+                    $mpdf->WriteHTML($content);
+                
+                    $mpdf->Output('spisova_sluzba.pdf', 'I');
+                }
+            }
+            
+            } catch (Exception $e) {
+                $location = str_replace("pdfprint=1","",Environment::getHttpRequest()->getUri());
+
+                echo "<h1>Nelze vygenerovat PDF výstup.</h1>";
+                echo "<p>Generovaný obsah obsahuje příliš mnoho dat, které není možné zpracovat.</p>";
+                echo "<p><a href=".$location.">Přejít na předchozí stránku.</a></p>";
+                echo "<p>".$e->getMessage()."</p>";
+                exit;
+            }
+            
+        }
+        
+    }    
+    
     public function renderVyber()
     {
 
@@ -128,10 +229,51 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $args = $Spisy->spisovna($args);
             $result = $Spisy->seznam($args, 5, $spis_id);
             $paginator->itemCount = count($result);
-            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            
+            // Volba vystupu - web/tisk/pdf
+            $tisk = $this->getParam('print');
+            $pdf = $this->getParam('pdfprint');
+            if ( $tisk ) {
+                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+                $seznam = $result->fetchAll();
+                if ( count($seznam)>0 ) {
+                    $spis_ids = array();
+                    foreach($seznam as $spis) {
+                        $spis_ids[] = $spis->id;
+                    }
+                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+                } else {
+                    $this->template->seznam_dokumentu = array();
+                }               
+                $this->setLayout(false);
+                $this->setView('print');
+            } elseif ( $pdf ) {
+                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+                $this->pdf_output = 1;
+                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+                $seznam = $result->fetchAll();
+                if ( count($seznam)>0 ) {
+                    $spis_ids = array();
+                    foreach($seznam as $spis) {
+                        $spis_ids[] = $spis->id;
+                    }
+                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+                } else {
+                    $this->template->seznam_dokumentu = array();
+                }                
+                $this->setLayout(false);
+                $this->setView('print');
+            } else {
+                $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            }               
+            
             $this->template->seznam = $seznam;
 
-
+            $SpisovyZnak = new SpisovyZnak();
+            $spisove_znaky = $SpisovyZnak->select(11);
+            $this->template->SpisoveZnaky = $spisove_znaky;            
+            
             //$seznam = $Spisy->seznam(null, 0, $spis_id);
             //$this->template->seznam = $seznam;
             
@@ -193,10 +335,52 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $args = $Spisy->spisovna_prijem($args);
             $result = $Spisy->seznam($args, 5, $spis_id);
             $paginator->itemCount = count($result);
-            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $this->template->seznam = $seznam;
-            $session_spisplan->spis_id = $spis_id;
+
+            // Volba vystupu - web/tisk/pdf
+            $tisk = $this->getParam('print');
+            $pdf = $this->getParam('pdfprint');
+            if ( $tisk ) {
+                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+                $seznam = $result->fetchAll();
+                if ( count($seznam)>0 ) {
+                    $spis_ids = array();
+                    foreach($seznam as $spis) {
+                        $spis_ids[] = $spis->id;
+                    }
+                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+                } else {
+                    $this->template->seznam_dokumentu = array();
+                }               
+                $this->setLayout(false);
+                $this->setView('print');
+            } elseif ( $pdf ) {
+                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+                $this->pdf_output = 1;
+                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+                $seznam = $result->fetchAll();
+                if ( count($seznam)>0 ) {
+                    $spis_ids = array();
+                    foreach($seznam as $spis) {
+                        $spis_ids[] = $spis->id;
+                    }
+                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+                } else {
+                    $this->template->seznam_dokumentu = array();
+                }                
+                $this->setLayout(false);
+                $this->setView('print');
+            } else {
+                $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            }              
             
+            $this->template->seznam = $seznam;
+            
+            $SpisovyZnak = new SpisovyZnak();
+            $spisove_znaky = $SpisovyZnak->select(11);
+            $this->template->SpisoveZnaky = $spisove_znaky;            
+            
+            $session_spisplan->spis_id = $spis_id;
             $this->template->akce_select = array(
                 'prevzit_spisovna'=>'převzetí vybraných spisů do spisovny'
             );               
@@ -217,6 +401,17 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $Spisy = new Spis();
         $this->template->Spis = $spis = $Spisy->getInfo($spis_id);
 
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->select(11);
+        $this->template->SpisoveZnaky = $spisove_znaky;
+        
+        if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
+            $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak_id ]->popis;
+            $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak_id ]->nazev;
+        } else {
+            $this->template->SpisZnak_popis = "";
+            $this->template->SpisZnak_nazev = "";
+        }           
 
         $DokumentSpis = new DokumentSpis();
         //$user_config = Environment::getVariable('user_config');
@@ -228,6 +423,20 @@ class Spisovna_SpisyPresenter extends BasePresenter
         //$seznam = $DokumentSpis->fetchPart($result, $paginator->offset, $paginator->itemsPerPage);
         //$this->template->seznam = $seznam;
         $this->template->seznam = $result;
+        
+        // Volba vystupu - web/tisk/pdf
+        $tisk = $this->getParam('print');
+        $pdf = $this->getParam('pdfprint');
+        if ( $tisk ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            $this->setLayout(false);
+            $this->setView('printdetail');
+        } elseif ( $pdf ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            $this->pdf_output = 2;
+            $this->setLayout(false);
+            $this->setView('printdetail');
+        }           
 
     }
 

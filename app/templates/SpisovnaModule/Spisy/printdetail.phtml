@@ -1,68 +1,20 @@
-@{block title}Detail spisu{/block}
-@{block javascript}
-	<script type="text/javascript">
-
-                function vybratSpisovyZnak() {
-
-                    var spisz_skart = new Array();
-                    var spisz_lhuta = new Array();
-                    var spisz_udalost = new Array();
-                    spisz_skart['0'] = '';
-                    spisz_lhuta['0'] = '';
-                    spisz_udalost['0'] = '';
-                {if count($SpisoveZnaky)>0}
-                {foreach $SpisoveZnaky as $sznak}
-                    spisz_skart[{$sznak->id}] = {$sznak->skartacni_znak};
-                    spisz_lhuta[{$sznak->id}] = {$sznak->skartacni_lhuta};
-                    spisz_udalost[{$sznak->id}] = {$sznak->spousteci_udalost_id};
-                {/foreach}
-                {/if}
-
-                    var frm_spis  = document.forms['frm-upravitForm'].spisovy_znak_id;
-                    var frm_skart  = document.forms['frm-upravitForm'].skartacni_znak;
-                    var frm_lhuta  = document.forms['frm-upravitForm'].skartacni_lhuta;
-                    var frm_udalost  = document.forms['frm-upravitForm'].spousteci_udalost_id;
-
-                    var key  = document.forms['frm-upravitForm'].spisovy_znak_id.selectedIndex;
-                    var value = document.forms['frm-upravitForm'].spisovy_znak_id.options[key].value;
-                    document.forms['frm-upravitForm'].skartacni_znak.value = spisz_skart[value];
-                    document.forms['frm-upravitForm'].skartacni_lhuta.value = spisz_lhuta[value];
-                    //document.forms['frm-novyForm'].spousteci_udalost.value = spisz_udalost[value];
-                    select_set_value(document.forms['frm-upravitForm'].spousteci_udalost_id,spisz_udalost[value]);
-                    return true;
-                }
-
-	</script>
-@{/block}
-@{block debug}
-<?php print_r($seznam); ?>
-@{/block}
-@{block content}
-    <div class="navigate">
-    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> -
-    <a href="{link :Spisovka:Spisy:default}">Seznam spisů</a> -
-    Detail spisu
-    </div>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <title>Spisová služba</title>
+    <style type="text/css" media="screen, print">
+        <?php echo file_get_contents(APP_DIR .'/../public/css/print_site.css'); ?>
+        <?php echo file_get_contents(APP_DIR .'/../public/css/printdetail_site.css'); ?>
+    </style>
+</head>
+<body>
+<div id="content">
     <h2>{$Spis->nazev}</h2>
-
-    <div id="tisk">
-        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-        </a>
-        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
-        </a>        
-    </div>    
     
-        {if ($FormUpravit=='info')}
     <div class="detail_blok">
-        <div class="detail_hlavicka">Info</div>
-        {control $upravitForm}
-    </div>
-        {else}
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Informace o spisu</div>
         <dl class="detail_item">
             <dt>Název spisu:</dt>
             <dd>{$Spis->nazev}&nbsp;</dd>
@@ -91,27 +43,16 @@
             <dt>Stav:</dt>
             <dd>
                 {=Spis::stav($Spis->stav)}
-                &nbsp;
-                {if $Spis->stav==1}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{link :Spisovka:Spisy:stav, 'id'=>$Spis->id, 'stav'=>'uzavrit'}" onclick="return confirm('Opravdu chcete uzavřít tento spis?');">Uzavřít spis</a>{/if}
-                {if $Spis->stav==0}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{link :Spisovka:Spisy:stav, 'id'=>$Spis->id, 'stav'=>'otevrit'}" onclick="return confirm('Opravdu chcete otevřít tento spis?');">Otevřít spis</a>{/if}
             </dd>
         </dl>
-        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit</a>
     </div>
-        {/if}
         
     <div class="detail_blok">
         <div class="detail_hlavicka">Seznam dokumentů</div>
     </div>
-        
-    <div class="dokument_blok2">
-        <a href="{link :Spisovka:Dokumenty:novy, 'spis_id'=>$Spis->id}">Nový dokument</a>
-    </div>         
-        
-    <div id="dokumenty">
+
     {if count($seznam)>0}
     <table>
-
         <tr>
             <th class="typ">Typ dokumentu</th>
             <th class="prijato">Přijato</th>
@@ -122,33 +63,37 @@
         </tr>
 
         {foreach $seznam as $dok}
-        <tr {if $dok->stav==2} style="background-color: #d0d0d0;"{/if}">
+        <tr>
             <td class="typ">
-                <img src="{$baseUri}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
+                {if $dok->typ_dokumentu->smer == 1}
+                vlastní
+                {else}
+                příchozí
+                {/if}
                 {if !empty($dok->epod_is_email)}
-                <img src="{$baseUri}images/icons/typdok1.png" alt="přijato emailem" title="přijato emailem" width="24" height="16" />
+                <br>přijato emailem
                 {elseif !empty($dok->epod_is_isds)}
-                <img src="{$baseUri}images/icons/typdok2.png" alt="přijato datovou schránkou" title="přijato datovou schránkou" width="24" height="16" />
+                <br>přijato ISDS
                 {/if}
             </td>
             <td class="prijato">
                 {$dok->datum_vzniku|edate}
             </td>
             <td class="cislo_jadnaci">
-                &nbsp;<strong><a href="{if $dok->stav==2}{link :Spisovna:Dokumenty:detail, 'id'=>$dok->id}{else}{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}{/if}">
+                <strong>
                    {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
-                </a></strong>
-                <div class="small">&nbsp;{$dok->jid}</div>
+                </strong>&nbsp;
+                <div class="small">{$dok->jid}&nbsp;</div>
                 {if count($dok->spisy)>0}
                 {foreach $dok->spisy as $spis}
-                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
+                {$spis->nazev}<br />
                 {/foreach}
                 {/if}
             </td>
             <td class="vec">
-                <strong title="{$dok->popis}"><a href="{if $dok->stav==2}{link :Spisovna:Dokumenty:detail, 'id'=>$dok->id}{else}{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}{/if}">
+                <strong>
                     {$dok->nazev}
-                </a></strong>
+                </strong>
                 <br />
                 {if count($dok->subjekty)>0}
                 {foreach $dok->subjekty as $subjekt}
@@ -292,12 +237,8 @@
                 lhůta {$dok->lhuta} dní
             </td>
             {/if}
-
-
-
         </tr>
         {/foreach}
-
 
     </table>
     {else}
@@ -314,4 +255,7 @@
     <div class="prazdno">K tomuto spisu nebyly zjištěny žádné dokumenty.</div>
         {/if}
     {/if}
-    </div>
+    
+</div>        
+</body>
+</html>    

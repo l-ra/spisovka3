@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <title>Spisová služba</title>
+    <style type="text/css" media="screen, print">
+        <?php echo file_get_contents(APP_DIR .'/../public/css/print_site.css'); ?>
+    </style>
+</head>
+<body>
+    <table id="table_top">
+        <tr>
+            <td align="left" valign="top">Seznam spisů</td>
+            <td align="right" valign="top">{$Urad->nazev}</td>
+        </tr>
+    </table>
+    <div id="dokumenty">
+    {if count($seznam)>0}
+    <table>
+        <tr>
+            <th>Spis</th>
+            <th>Počet dokumentů</th>
+            <th>Spisový znak</th>
+            <th>Skartační znak/lhůta</th>
+            <th>Stav</th>
+        </tr>
+        {foreach $seznam as $spis}
+        <tr>
+            <td>
+                {!=str_repeat("&nbsp;", 5*$spis->uroven)}
+                {if $spis->typ=='VS'}
+                <img src="{$baseUri}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                &nbsp;&nbsp;
+                {$spis->nazev}
+                {elseif $spis->typ=='SP'}
+                <img src="{$baseUri}images/icons/folder_green.png" alt="Spisový plán" title="Spisový plán" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                &nbsp;&nbsp;
+                {$spis->nazev}
+                {else}
+                <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
+                &nbsp;&nbsp;
+                <strong style="color:blue">{$spis->nazev}</strong>
+                {/if}
+            </td>
+            <td>{if isset($seznam_dokumentu[$spis->id])}{=count($seznam_dokumentu[$spis->id])}{else}0{/if}</td>
+            <td>{if isset($SpisoveZnaky[$spis->spisovy_znak_id])}{$SpisoveZnaky[$spis->spisovy_znak_id]->nazev}{/if} </td>
+            <td>{$spis->skartacni_znak} / {$spis->skartacni_lhuta}</td>
+            <td>{=Spis::stav($spis->stav)}</td>            
+        </tr>
+        {if isset($seznam_dokumentu[$spis->id]) && count($seznam_dokumentu[$spis->id])>0 }
+        {foreach $seznam_dokumentu[$spis->id] as $dok}
+        <tr>
+            <td colspan="5">
+                {!=str_repeat("&nbsp;", (5*$spis->uroven)+15)}
+                <strong>{$dok->cislo_jednaci}</strong> - {$dok->nazev}
+            </td>
+        </tr>
+        {/foreach}
+        {/if}
+        {/foreach}
+
+    </table>
+    <div id="tisk_podpis">
+        &nbsp;<br />
+        Vytištěno dne: {=date("j.n.Y G:i")}
+        <br />
+        Vytiskl: {=Environment::getUser()->getIdentity()->name}
+    </div>
+    {else}
+    <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
+    {/if}
+    </div>
+</body>
+</html>    

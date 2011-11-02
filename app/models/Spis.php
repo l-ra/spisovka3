@@ -77,6 +77,40 @@ class Spis extends TreeModel
         return $this->nacti($parent_id, true, true, $params);
 
     }
+    
+    public function seznamDokumentu($spis_id)
+    {
+        if ( empty($spis_id) ) return null;
+        if ( !is_array($spis_id) ) $spis_id = array($spis_id);
+        
+        $sql = array(
+            'distinct'=>1,
+            'from' => array($this->tb_dokspis => 'dokspis'),
+            'cols' => array('spis_id','dokument_id','poradi'),
+            'where' => array(array('dokspis.spis_id IN (%in)',$spis_id)),
+            'leftJoin' => array(
+                'dokument' => array(
+                    'from' => array($this->tb_dokument => 'd'),
+                    'on' => array('d.id=dokspis.dokument_id'),
+                    'cols' => array('nazev','popis','cislo_jednaci','jid','poradi')
+                ),
+            )
+        );   
+        
+        $select = $this->fetchAllComplet($sql);
+        $result = $select->fetchAll();
+        if ( count($result)>0 ) {
+            $dokumenty = array();
+            foreach ( $result as $dok ) {
+                $dokumenty[ $dok->spis_id ][ $dok->dokument_id ] = $dok;
+            }
+            return $dokumenty;
+        } else {
+            return null;
+        }
+        
+        
+    }
 
     public function spisovka($args) {
 
