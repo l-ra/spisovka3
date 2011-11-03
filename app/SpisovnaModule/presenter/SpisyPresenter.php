@@ -199,7 +199,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
         $Spisy = new Spis();
         $session_spisplan = Environment::getSession('s3_spisplan');
-        $spis_id = $this->getParam('id',null);
+        $spis_id = null;// $this->getParam('id',null);
 
         if ( !is_null($spis_id) ) {
             // spis_id
@@ -424,6 +424,14 @@ class Spisovna_SpisyPresenter extends BasePresenter
         //$this->template->seznam = $seznam;
         $this->template->seznam = $result;
         
+        if ( Acl::isInRole('skartacni_dohled,superadmin') ) {
+            $this->template->AccessEdit = 1;
+            $this->template->FormUpravit = $this->getParam('upravit',null);
+        } else {
+            $this->template->AccessEdit = 0;
+            $this->template->FormUpravit = null;
+        }
+        
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParam('print');
         $pdf = $this->getParam('pdfprint');
@@ -527,43 +535,23 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $Spisy = new Spis();
 
         $spis = @$this->template->Spis;
-        $typ_spisu = Spis::typSpisu();
-        $stav_select = Spis::stav();
+        
+        $spousteci = SpisovyZnak::spousteci_udalost(null,1);
+        $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->seznam(null,1);
-
-        $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null,1);
-
-        $spisy = $Spisy->select(1,@$spis->id);
+        $spisznak_seznam = $SpisovyZnak->select(2);
 
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$spis->id);
-        $form1->addSelect('typ', 'Typ spisu:', $typ_spisu)
-                ->setValue(@$spis->typ);
-        $form1->addText('nazev', 'Název spisu:', 50, 80)
-                ->setValue(@$spis->nazev)
-                ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
-        $form1->addText('popis', 'Popis:', 50, 200)
-                ->setValue(@$spis->popis);
-        $form1->addSelect('spis_parent_id', 'Připojit k:', $spisy)
-                ->setValue(@$spis->spis_parent_id);
-        $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
-                ->setValue(@$spis->stav);
-
-        $form1->addSelect('spisovy_znak', 'Spisový znak:', $spisznak_seznam)
-                ->setValue(@$spis->spisovy_znak)
-                ->controlPrototype->onchange("vybratSpisovyZnak();");
-        $form1->addText('skartacni_znak','Skartační znak: ', 3, 3)
+        $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
+                ->setValue(@$spis->spisovy_znak_id)
+                ->controlPrototype->onchange("vybratSpisovyZnak();");        
+        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$spis->skartacni_znak);
-                //->controlPrototype->readonly = TRUE;
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
                 ->setValue(@$spis->skartacni_lhuta);
-                //->controlPrototype->readonly = TRUE;
-        $form1->addSelect('spousteci_udalost_id','Spouštěcí událost: ', $spousteci_udalost)
-                ->setValue(@$spis->spousteci_udalost_id);
-                //->controlPrototype->readonly = TRUE;
 
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
@@ -587,21 +575,25 @@ class Spisovna_SpisyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
+        $Spisy = new Spis();
+        
         $spis_id = $data['id'];
         unset($data['id']);
+
         $data['date_modified'] = new DateTime();
         $data['user_modified'] = Environment::getUser()->getIdentity()->id;
-
-
-        $Spisy = new Spis();
-
+        
+        //Debug::dump($data); exit;
+        
         try {
-            $Spisy->upravit($data, $spis_id);
-            $this->flashMessage('Spis  "'. $data['nazev'] .'"  byl upraven.');
-            $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
+            $Spisy->update($data, array(array('id=%i',$spis_id)) );
+            $this->flashMessage('Spis byl upraven.');
+            $this->redirect(':Spisovna:Spisy:detail',array('id'=>$spis_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-            Debug::dump($e);
+            $this->flashMessage('Spis se nepodařilo upravit.','warning');
+            $this->flashMessage('CHYBA: "'. $e->getMessage(),'error_ext');
+            $this->redirect(':Spisovna:Spisy:detail',array('id'=>$spis_id));
+            //Debug::dump($e);
         }
 
     }
@@ -610,7 +602,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
         $spis_id = $data['id'];
-        $this->redirect('this',array('id'=>$spis_id));
+        $this->redirect(':Spisovna:Spisy:detail',array('id'=>$spis_id));
     }
 
 

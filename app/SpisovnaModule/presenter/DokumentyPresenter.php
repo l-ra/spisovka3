@@ -433,7 +433,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             if ( $skartacni_rozdil > 0 && $dokument->stav_dokumentu == 7
                     && (Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
-                $this->template->AccessEdit = 0;
+                $this->template->AccessEdit = 1;
                 $this->template->Pridelen = 1;
                 $this->template->Skartacni_dohled = 1;
             }
@@ -452,6 +452,13 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
                 $formUpravit = $this->getParam('upravit',null);
+            }
+            
+            if ( $dokument->stav_dokumentu == 9 || $dokument->stav_dokumentu == 10 ) {
+                $this->template->AccessEdit = 0;
+                $zapujcka = new stdClass();
+                $zapujcka->id = 1;
+                $this->template->Zapujcka = $zapujcka;
             }
 
             $this->template->FormUpravit = $formUpravit;
@@ -505,6 +512,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         
     }
 
+    public function renderDetail()
+    {
+        $this->template->vyrizovaniForm = $this['vyrizovaniForm'];
+    }    
+    
     public function actionAkce($data)
     {
 
@@ -766,6 +778,81 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     }
 
+protected function createComponentVyrizovaniForm()
+    {
+
+        $SpisovyZnak = new SpisovyZnak();
+        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null, 1);
+        $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
+
+        $Dok = @$this->template->Dok;
+
+        $form = new AppForm();
+        $form->addHidden('id')
+                ->setValue(@$Dok->id);
+
+        $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
+                ->setValue(@$Dok->ulozeni_dokumentu);
+
+        $form->addSelect('spisovy_znak_id', 'spisový znak:', $spisznak_seznam)
+                ->setValue(@$Dok->spisovy_znak_id)
+                ->controlPrototype->onchange("vybratSpisovyZnak();");        
+        $form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
+                ->setValue(@$Dok->skartacni_znak);
+        $form->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
+                ->setValue(@$Dok->skartacni_lhuta);
+
+        $form->addSubmit('upravit', 'Uložit')
+                 ->onClick[] = array($this, 'upravitVyrizeniClicked');
+        $form->addSubmit('storno', 'Zrušit')
+                 ->setValidationScope(FALSE)
+                 ->onClick[] = array($this, 'stornoClicked');
+
+
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form;
+    }
+
+    public function upravitVyrizeniClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $dokument_id = $data['id'];
+
+        //Debug::dump($data); exit;
+
+        $Dokument = new Dokument();
+
+        $dok = $Dokument->getInfo($dokument_id);
+
+        try {
+
+            $dokument = $Dokument->ulozit($data,$dokument_id);
+
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN, 'Upraven skartační režim.');
+
+            $this->flashMessage('Dokument "'. $dok->cislo_jednaci .'"  byl upraven.');
+            $this->redirect(':Spisovna:Dokumenty:detail',array('id'=>$dokument_id));
+        } catch (DibiException $e) {
+            $this->flashMessage('Dokument "'. $dok->cislo_jednaci .'" se nepodařilo upravit.','warning');
+            $this->flashMessage('CHYBA: '. $e->getMessage(),'warning');
+            $this->redirect(':Spisovna:Dokumenty:detail',array('id'=>$dokument_id));
+            //Debug::dump($e);
+            //exit;
+            //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+        }
+
+    }    
+    
     public function stornoClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
