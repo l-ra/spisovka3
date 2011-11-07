@@ -4,21 +4,21 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Spisová služba - E-podatelna - {block #title}{/block}</title>
-    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/site.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/epodatelna_site.css" />
-    <link rel="stylesheet" type="text/css" media="print" href="{$baseUri}css/print_site.css" />
-    <link type="text/css" href="{$baseUri}css/redmond/jquery-ui-custom.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/site.css?<?php echo filemtime(APP_DIR.'/../public/css/site.css'); ?>" />
+    <link rel="stylesheet" type="text/css" media="print" href="{$baseUri}css/print_site.css?<?php echo filemtime(APP_DIR.'/../public/css/print_site.css'); ?>" />
+    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/epodatelna_site.css?<?php echo filemtime(APP_DIR.'/../public/css/print_site.css'); ?>" />
+    <link type="text/css" href="{$baseUri}css/redmond/jquery-ui-custom.css?<?php echo filemtime(APP_DIR.'/../public/css/redmond/jquery-ui-custom.css'); ?>" rel="stylesheet" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <script type="text/javascript" src="{$baseUri}js/jquery-min.js"></script>
-    <script type="text/javascript" src="{$baseUri}js/jquery-ui-custom.min.js"></script>
+    <script type="text/javascript" src="{$baseUri}js/jquery-min.js?<?php echo filemtime(APP_DIR.'/../public/js/jquery-min.js'); ?>"></script>
+    <script type="text/javascript" src="{$baseUri}js/jquery-ui-custom.min.js?<?php echo filemtime(APP_DIR.'/../public/js/jquery-ui-custom.min.js'); ?>"></script>
     <script type="text/javascript">
         var baseUri = '{!$klientUri}';
         var is_simple = '{=IS_SIMPLE_ROUTER}';
     </script>
     {block #javascript}{/block}
-    <script type="text/javascript" src="{$baseUri}js/jquery.nette.js"></script>
-    <script type="text/javascript" src="{$baseUri}js/script.js"></script>
-    <script type="text/javascript" src="{$baseUri}js/script_epodatelna.js"></script>
+    <script type="text/javascript" src="{$baseUri}js/jquery.nette.js?<?php echo filemtime(APP_DIR.'/../public/js/jquery.nette.js'); ?>"></script>
+    <script type="text/javascript" src="{$baseUri}js/script.js?<?php echo filemtime(APP_DIR.'/../public/js/script.js'); ?>"></script>
+    <script type="text/javascript" src="{$baseUri}js/script_epodatelna.js?<?php echo filemtime(APP_DIR.'/../public/js/script_epodatelna.js'); ?>"></script>
 </head>
 <body>
 <div id="layout_top">
