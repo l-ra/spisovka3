@@ -14,4 +14,9 @@
     
     {control uploadForm}
 
+        <dl class="detail_item">
+            <dt></dt>
+            <dd class="normal">Maximální možná velikost souboru, kterou je možné nahrát: <?php if(function_exists("ini_get")) { echo ini_get("upload_max_filesize") ."B"; } else { echo "nelze zjístit"; } ?></dd>
+        </dl>    
+
     {/snippet}
