@@ -1,4 +1,4 @@
-<form action="{link :Spisovka:Vypravna:detail, 'id'=>$dokument->dokodes_id}" method="post" id="vypravna_form">
+<form action="{link :Spisovka:Vypravna:detail, 'id'=>$dokument->dokodes_id}" method="post" id="vypravna_form" onsubmit="return false;">
     <dl>
         <dt>Datum odeslání:</dt>
         <dd><input type="text" class="datepicker" name="datum_odeslani" value="{$dokument->datum_odeslani|edate}" /></dd>

@@ -216,7 +216,7 @@
                 </div>
                 <div class="vyber">
                     <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" id="dialog-subjektzmenit">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
             <td class="meta_plus">

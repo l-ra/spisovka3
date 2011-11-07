@@ -875,8 +875,8 @@ vypravnaSubmit = function () {
             }
         }
 
-        vypravna_form = document.getElementById('vypravna_form');
-        formdata = $(vypravna_form).serialize();
+        var vypravna_form = document.getElementById("vypravna_form");
+        var formdata = $(vypravna_form).serialize();
 
         x.open("POST", vypravna_form.getAttribute('action'), true);
         x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
