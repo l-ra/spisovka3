@@ -33,11 +33,9 @@
         <div id="top_jmeno">
             <a href="{vlink :Spisovka:Uzivatel:}" title="nastavení uživatele"><strong>{$user->name}</strong></a>
             <br />
-            {if isset($user->user_roles) && count($user->user_roles)>0 }
             {foreach $user->user_roles as $role}
                 {$role->name}<br />
             {/foreach}
-            {/if}
         </div>
     </div>
 </div>
