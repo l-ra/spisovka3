@@ -22,6 +22,7 @@ class Subjekt extends BaseModel
     {
 
         if ( empty($data['datum_narozeni']) ) $data['datum_narozeni'] = null;
+        if ( $data['datum_narozeni'] == "-0001-11-30" ) $data['datum_narozeni'] = null;
         
         if ( !is_null($subjekt_id) ) {
 

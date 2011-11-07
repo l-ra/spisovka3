@@ -513,8 +513,8 @@ subjektVytvorit = function () {
     if (x) {
         x.onreadystatechange = function() {
             if (x.readyState == 4 && x.status == 200) {
-
                 stav = x.responseText;
+                //alert(stav);
                 if ( stav.indexOf('###zmeneno###') != -1 ) {
                     stav = stav.replace('###zmeneno###','');
                     $('#dialog').dialog('close');
@@ -529,6 +529,8 @@ subjektVytvorit = function () {
 
         var subjekt_vytvorit = document.getElementById("subjekt-vytvorit");
         var formdata = $(subjekt_vytvorit).serialize();
+        
+        //alert(subjekt_vytvorit.getAttribute('action'));
         
         x.open("POST", subjekt_vytvorit.getAttribute('action'), true);
         x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -595,13 +597,13 @@ subjektzmenit = function(elm){
     return false;
 }
 
-subjektUpravitSubmit = function (elm) {
-    subjektVytvorit(elm);
+subjektUpravitSubmit = function () {
+    subjektVytvorit();
     return false;    
 }
 
-subjektNovySubmit = function (elm) {
-    subjektVytvorit(elm);
+subjektNovySubmit = function () {
+    subjektVytvorit();
     return false;    
 }
 

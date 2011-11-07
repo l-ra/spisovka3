@@ -332,7 +332,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
-        $form1['upravit']->controlPrototype->onclick("return subjektUpravitSubmit(this);");
+        $form1['upravit']->controlPrototype->onclick("return subjektUpravitSubmit();");
                  
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
@@ -370,7 +370,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
             $subjekt_info = $Subjekt->getInfo($subjekt_id);
             //$Log = new LogModel();
             //$Log->logDokument($dokument_id, LogModel::SUBJEKT_ZMENEN,'Změněn subjekt "'. Subjekt::displayName($subjekt_info) .'"');
-
+            
             if (!$this->isAjax()) {
                 //$this->redirect('this');
                 echo "###zmeneno###".$dokument_id; exit;
@@ -382,6 +382,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
             $this->flashMessage('Subjekt  "'. Subjekt::displayName($data,'jmeno') .'"  byl upraven.');
             //$this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id));
         } catch (DibiException $e) {
+            //Debug::dump($e);
+            echo "Chyba! Subjekt se nepodařilo upravit.";
             $this->flashMessage('Subjekt "'. Subjekt::displayName($data,'jmeno') .'" se nepodařilo upravit.','warning');
         }
 
@@ -446,7 +448,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
         $form1->addSubmit('novy', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
-        $form1['novy']->controlPrototype->onclick("return subjektNovySubmit(this);");
+        $form1['novy']->controlPrototype->onclick("return subjektNovySubmit();");
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->controlPrototype->onclick("return subjektNovyStorno($dokument_id);");
