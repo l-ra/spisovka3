@@ -77,7 +77,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $form1->addTextArea('priloha_popis', 'Popis:', 80, 5);
         $form1->addSelect('priloha_typ', 'Typ souboru', FileModel::typPrilohy());
         $form1->addFile('file', 'Soubor:');
-        $form1->addSubmit('upload', 'Upload')
+        $form1->addSubmit('upload', 'Nahrát')
                  ->onClick[] = array($this, 'uploadClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
@@ -176,7 +176,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $form1->addSelect('priloha_typ', 'Typ souboru', FileModel::typPrilohy())
                 ->setValue(@$file_info->typ);
         $form1->addFile('file', 'Soubor:');
-        $form1->addSubmit('upload', 'Upload')
+        $form1->addSubmit('upload', 'Nahrát')
                  ->onClick[] = array($this, 'reUploadClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
