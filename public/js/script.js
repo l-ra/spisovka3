@@ -128,10 +128,10 @@ $(function() {
         return dialog(this,'Subjekt');
     });
 
-    $("#subjekt-vytvorit").live("submit", function () {
+    /*$("#subjekt-vytvorit").live("submit", function () {
         subjektVytvorit($(this));
         return false;
-    });
+    });*/
     
     // Dialog - Vyber subjektu
     $('#subjekt_pripojit_click').click(function(event){
@@ -505,7 +505,7 @@ novySubjekt = function (elm) {
     return false;
 }
 
-subjektVytvorit = function (elm) {
+subjektVytvorit = function () {
 
     if (document.getElementById) {
         var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
@@ -527,9 +527,10 @@ subjektVytvorit = function (elm) {
             }
         }
 
-        var formdata = $(elm).serialize();
+        var subjekt_vytvorit = document.getElementById("subjekt-vytvorit");
+        var formdata = $(subjekt_vytvorit).serialize();
         
-        x.open("POST", $(elm).attr('action'), true);
+        x.open("POST", subjekt_vytvorit.getAttribute('action'), true);
         x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         x.setRequestHeader("Content-length", formdata.length);
         x.setRequestHeader("Connection", "close");
@@ -592,6 +593,16 @@ subjektzmenit = function(elm){
     $('#dialog').dialog('open');
 
     return false;
+}
+
+subjektUpravitSubmit = function (elm) {
+    subjektVytvorit(elm);
+    return false;    
+}
+
+subjektNovySubmit = function (elm) {
+    subjektVytvorit(elm);
+    return false;    
 }
 
 subjektUpravitStorno = function () {
@@ -738,6 +749,7 @@ osobaVybrana = function (elm) {
         }
 
         poznamka = document.getElementById('frmpred-poznamka').value;
+        poznamka = encodeURI(poznamka);
         url = elm.href + '&poznamka='+ poznamka;
         elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);

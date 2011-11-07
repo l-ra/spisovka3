@@ -129,7 +129,9 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         if ( isset($data['id']) ) {
             // pouze jedno
 
-            if ( empty($data['subjekt_nazev'][$data['id']]) ) {
+            if ( !empty($data['subjekt_nazev'][$data['id']]) && ( !empty($data['subjekt_prijmeni'][$data['id']]) || !empty($data['subjekt_jmeno'][$data['id']]) ) ) {
+                $typ = 'PO';
+            } else if ( empty($data['subjekt_nazev'][$data['id']]) ) {
                 $typ = 'FO';
             } else {
                 $typ = 'OVM';
@@ -139,8 +141,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
                 'type'=>$typ,
                 'ic'=>'',
                 'nazev_subjektu' => ( !empty($data['subjekt_nazev'][$data['id']])?$data['subjekt_nazev'][$data['id']]:"" ),
-                'jmeno' => ( !empty($data['subjekt_prijmeni'][$data['id']])?$data['subjekt_prijmeni'][$data['id']]:"" ),
-                'prijmeni' => ( !empty($data['subjekt_jmeno'][$data['id']])?$data['subjekt_jmeno'][$data['id']]:"" ),
+                'prijmeni' => ( !empty($data['subjekt_prijmeni'][$data['id']])?$data['subjekt_prijmeni'][$data['id']]:"" ),
+                'jmeno' => ( !empty($data['subjekt_jmeno'][$data['id']])?$data['subjekt_jmeno'][$data['id']]:"" ),
                 'adresa_ulice' => ( !empty($data['subjekt_ulice'][$data['id']])?$data['subjekt_ulice'][$data['id']]:"" ),
                 'adresa_cp' => ( !empty($data['subjekt_cp'][$data['id']])?$data['subjekt_cp'][$data['id']]:"" ),
                 'adresa_mesto' => ( !empty($data['subjekt_mesto'][$data['id']])?$data['subjekt_mesto'][$data['id']]:"" ),
@@ -262,6 +264,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->getElementPrototype()->id('subjekt-vytvorit');
+        $form1->getElementPrototype()->onsubmit('return false;');
         
         $form1->addHidden('subjekt_id')
                 ->setValue(@$subjekt->id);
@@ -329,9 +332,11 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
+        $form1['upravit']->controlPrototype->onclick("return subjektUpravitSubmit(this);");
+                 
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
-                 ->controlPrototype->onclick("subjektUpravitStorno();");
+                 ->controlPrototype->onclick("return subjektUpravitStorno();");
                  //->onClick[] = array($this, 'stornoClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
@@ -403,6 +408,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
         $form1 = new AppForm();
         $form1->getElementPrototype()->id('subjekt-vytvorit');
+        $form1->getElementPrototype()->onsubmit('return false;');
 
         $form1->addHidden('dokument_id')
                 ->setValue($dokument_id);
@@ -440,6 +446,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
         $form1->addSubmit('novy', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
+        $form1['novy']->controlPrototype->onclick("return subjektNovySubmit(this);");
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->controlPrototype->onclick("return subjektNovyStorno($dokument_id);");
