@@ -346,6 +346,11 @@ class Subjekt extends BaseModel
 
         $d_adresa = $d_ulice .', '. @$data->adresa_psc .' '. @$data->adresa_mesto;
 
+        if ( empty($d_nazev) ) $d_nazev = "(bez názvu)";
+        if ( empty($d_osoba) ) $d_osoba = "(bez názvu)";
+        if ( empty($d_nazev_item) ) $d_nazev_item = "(bez názvu)";
+        if ( empty($d_osoba_item) ) $d_osoba_item = "(bez názvu)";
+        
         // Sestaveni nazvu
         switch ($display) {
             case 'full':
