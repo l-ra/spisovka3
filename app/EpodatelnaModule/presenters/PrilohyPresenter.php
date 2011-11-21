@@ -142,7 +142,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                             $file_name = 'soubor_'.$fid.'.html';
                             $mime_type = 'text/html';
                         } else {
-                            $file_name = $file['FileName'];
+                            $file_name = empty($file['FileName'])?"file_$fid":$file['FileName'];
                             $mime_type = FileModel::mimeType($file_name);
                         }
                         $files[] = array(
