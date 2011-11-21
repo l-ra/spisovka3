@@ -42,6 +42,11 @@ class LogModel extends BaseModel {
     const SPIS_SMAZAN       = 43;
     const SPIS_DOK_PRIPOJEN = 44;
     const SPIS_DOK_ODEBRAN  = 45;
+    const SPIS_OTEVREN      = 46;
+    const SPIS_UZAVREN      = 47;
+    const SPIS_CHYBA        = 48;
+    const SPIS_PREDAN       = 49;
+    const SPIS_PRIJAT       = 50;    
     
     const ZAPUJCKA_VYTVORENA = 51;
     const ZAPUJCKA_SCHVALENA = 52;
@@ -85,6 +90,11 @@ class LogModel extends BaseModel {
         '43' => 'Spis smazán',
         '44' => 'Dokument připojen ke spisu',
         '45' => 'Dokument odebrán ze spisu',
+        '46' => 'Spis otevřen',
+        '47' => 'Spis uzavřen',
+        '48' => 'Chyba při práci se spisem',
+        '49' => 'Spis předán',
+        '50' => 'Spis přijat',
         '51' => 'Zápůjčka vytvořena',
         '52' => 'Zápůjčka schválena',
         '53' => 'Dokument zapůjčen',
@@ -126,6 +136,40 @@ class LogModel extends BaseModel {
 
     }
 
+    /* ***********************************************************************
+     * Logovani aktivity spisu
+     */
+
+    public function logSpis($spis_id, $typ, $poznamka = "") {
+
+        $row = array();
+        $row['spis_id'] = (int) $spis_id;
+        $row['typ'] = $typ;
+        $row['poznamka'] = $poznamka;
+        
+        $user = Environment::getUser()->getIdentity();
+        $row['user_id'] = $user->id;
+        $row['date'] = new DateTime();
+
+        return dibi::insert($this->tb_logspis, $row)
+            ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
+
+    }
+
+    public function historieSpisu($spis_id = null, $limit = 50, $offset = 0) {
+
+        $res = dibi::query(
+            'SELECT * FROM %n ld', $this->tb_logspis,
+            'LEFT JOIN %n ou', $this->tb_osoba_to_user ,'ON ou.user_id=ld.user_id',
+            'LEFT JOIN %n o', $this->tb_osoba ,'ON o.id=ou.osoba_id',
+            '%if', !is_null($dokument_id), 'WHERE %and', !is_null($dokument_id) ? array(array('ld.dokument_id=%i',$dokument_id)) : array(), '%end',
+            'ORDER BY ld.date'
+        );
+        return $res->fetchAll($offset, $limit);
+
+    }
+    
+    
     /* ***********************************************************************
      * Logovani pristupu
      */
@@ -171,5 +215,13 @@ class LogModel extends BaseModel {
         return dibi::delete($this->tb_logdokument)->where(array(array('dokument_id=%i',$dokument_id)))->execute();
     }
 
+    public function  deleteAllSpis() {
+        return dibi::query('TRUNCATE ['.$this->tb_logspis.'];');
+    }
 
+    public function  deleteSpis( $spis_id ) {
+        return dibi::delete($this->tb_logspis)->where(array(array('spis_id=%i',$spis_id)))->execute();
+    }
+
+    
 }

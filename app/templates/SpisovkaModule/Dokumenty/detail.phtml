@@ -251,7 +251,7 @@
                 <span id="dok_spis">
                 {if count($Dok->spisy)>0 }
                     {foreach $Dok->spisy as $s}
-                    {$s->nazev}<br />
+                    <a href="{link :Spisovka:Spisy:detail, 'id'=>$s->id}">{$s->nazev}</a>&nbsp;&nbsp;&nbsp;&nbsp; <a href="{link :Spisovka:Spisy:odebratspis, 'dok_id'=>$Dok->id, 'id'=>$s->id}" onclick="return confirm('Opravdu chcete vyjmout tento dokument ze spisu?');">Vyjmout ze spisu</a><br />
                     {/foreach}
                 {else}
                     nepřidělen k žádnému spisu
@@ -373,7 +373,7 @@
             <dd>
             {if count($Dok->spisy)>0 }
                 {foreach $Dok->spisy as $s}
-                {$s->nazev}<br />
+                <a href="{link :Spisovka:Spisy:detail, 'id'=>$s->id}">{$s->nazev}</a><br />
                 {/foreach}
             {else}
                 nepřidělen k žádnemu spisu

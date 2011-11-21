@@ -26,8 +26,13 @@
     <table>
         <tr>
             <th class="akce">&nbsp;</th>
-            <th>Spisy</th>
-        </tr>
+            <th>Spis</th>
+            <th>Počet dokumentů</th>
+            <th>Přiděleno</th>
+            <th>Spisový znak</th>
+            <th>Skartační znak/lhůta</th>
+            <th>Stav</th>            
+        </tr>   
         {foreach $seznam as $spis}
         <tr class="{$spis->class}" id="sitem{$spis->spis_id}">
             <td class="akce">
@@ -35,18 +40,33 @@
                 <input type="checkbox" class="checkbox" name="spis_vyber[]" value="{$spis->id}" title="Vybrat tento spis" />
                 {/if}&nbsp;
             </td>
-            <td>
-                {!=str_repeat("&nbsp;", 5*$spis->uroven)}
-                {if $spis->typ=='VS'}
-                <img src="{$baseUri}images/icons/folder_yellow.png" alt="Věcná skupina" title="Věcná skupna" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+            {if $spis->typ=='VS'}
+            <td colspan="6">
+                {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
+                <img src="{$baseUri}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
-                {$spis->nazev}
-                {else}
+                {$spis->nazev}                
+            </td>
+            {elseif $spis->typ=='SP'}
+            <td colspan="6">
+                {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
+                <img src="{$baseUri}images/icons/folder_green.png" alt="Spisový plán" title="Spisový plán" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                &nbsp;&nbsp;
+                {$spis->nazev}                
+            </td>
+            {else}
+            <td>
+                {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
                 <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 &nbsp;&nbsp;
-                <a href="{link :Spisovna:Spisy:detail, 'id'=>$spis->id }">{$spis->nazev}</a>
-                {/if}
+                <a href="{link :Spisovna:Spisy:detail, id => $spis->id}">{$spis->nazev}</a>
             </td>
+            <td>{if isset($seznam_dokumentu[$spis->id])}{=count($seznam_dokumentu[$spis->id])}{else}0{/if}</td>
+            <td>{$spis->orgjednotka_prideleno}</td>              
+            <td>{if isset($SpisoveZnaky[$spis->spisovy_znak_id])}{$SpisoveZnaky[$spis->spisovy_znak_id]->nazev}{/if} </td>
+            <td>{$spis->skartacni_znak} / {$spis->skartacni_lhuta}</td>
+            <td>{=Spis::stav($spis->stav)}</td>      
+            {/if}
         </tr>
         {/foreach}
 

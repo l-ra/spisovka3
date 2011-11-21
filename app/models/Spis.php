@@ -7,7 +7,7 @@ class Spis extends TreeModel
     protected $primary = 'id';
     
     
-    public function getInfo($spis_id)
+    public function getInfo($spis_id, $detail = false)
     {
 
         if ( empty($spis_id) ) {
@@ -21,8 +21,42 @@ class Spis extends TreeModel
         }
         
         $row = $result->fetch();
-        return ($row) ? $row : NULL;
+        if ($row) {
+            if ( $detail ) {
+                return $this->spisDetail($row);
+            } else {
+                return $row;
+            }
+        } else {
+            return null;
+        }
 
+    }
+    
+    private function spisDetail($row)
+    {
+        
+        $OrgJednotka = new Orgjednotka();
+        $Workflow = new Workflow();
+        
+        $user = Environment::getUser();
+        $user_id = $user->getIdentity()->id;
+        
+        if ( !empty($row->orgjednotka_id) ) {
+            $row->orgjednotka_prideleno = $OrgJednotka->getInfo($row->orgjednotka_id);
+        } else {
+            $row->orgjednotka_prideleno = null;
+        }
+        if ( !empty($row->orgjednotka_id_predano) ) {
+            $row->orgjednotka_predano = $OrgJednotka->getInfo($row->orgjednotka_id_predano);
+        } else {
+            $row->orgjednotka_predano = null;
+        } 
+        
+        $row->workflow = $Workflow->fetchAll(array('id'), array(array('spis_id=%i',$row->id)))->fetchAll();
+        
+        return $row;
+        
     }
 
     public function seznamSpisovychPlanu($pouze_aktivni = 0)
@@ -48,7 +82,7 @@ class Spis extends TreeModel
         }
     }
 
-    public function getSpisovyPlan()
+    /*public function getSpisovyPlan()
     {
 
         $where = array("typ='SP'","stav=1");
@@ -60,7 +94,7 @@ class Spis extends TreeModel
         } else {
             return null;
         }
-    }
+    }*/
 
     public function seznam($args = null, $select = 0, $parent_id = null)
     {
@@ -74,6 +108,21 @@ class Spis extends TreeModel
         }
 
         $params['order'] = array('tb.nazev');
+        
+        $params['leftJoin'] = array(
+            'orgjednotka1' => array(
+                'from' => array($this->tb_orgjednotka => 'org1'),
+                'on' => array('org1.id=tb.orgjednotka_id'),
+                'cols' => array('zkraceny_nazev'=>'orgjednotka_prideleno')                
+            ),
+            'orgjednotka2' => array(
+                'from' => array($this->tb_orgjednotka => 'org2'),
+                'on' => array('org2.id=tb.orgjednotka_id_predano'),
+                'cols' => array('zkraceny_nazev'=>'orgjednotka_predano')                
+            ),
+            
+        );
+        
         return $this->nacti($parent_id, true, true, $params);
 
     }
@@ -112,6 +161,64 @@ class Spis extends TreeModel
         
     }
 
+    private function omezeni_org()
+    {
+        
+        $user = Environment::getUser()->getIdentity();
+        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
+        $isAdmin = ACL::isInRole('admin');
+        $isPodatelna = ACL::isInRole('podatelna,skartacni_dohled');
+        $vyrusit_bezvyrizeni = false;
+        $org_jednotka = array();
+        $org_jednotka_vedouci = array();
+
+        if ( @count( $user->user_roles )>0 ) {
+            foreach ( $user->user_roles as $role ) {
+                if ( !empty($role->orgjednotka_id) ) {
+                    if (preg_match('/^vedouci/', $role->code) ) {
+                        $org_jednotka_vedouci[] = $role->orgjednotka_id;
+                    }
+                    $org_jednotka[] = $role->orgjednotka_id;
+                }
+            }
+        }
+
+        $where_org = null;
+        if ( $isAdmin ) {
+            $where_org = null;
+        } else if ( $isPodatelna ) {
+            $where_org = null;
+        } else if ( count($org_jednotka) == 1 ) {
+            $where_org = array( 'tb.orgjednotka_id=%i',$org_jednotka[0] );
+        } else if ( count($org_jednotka) > 1 ) {
+            $where_org = array( 'tb.orgjednotka_id IN (%in)',$org_jednotka );
+        }        
+        
+        if ( $isAdmin || $isPodatelna ) {
+            // vsechny spisy bez ohledu na organizacni jednotku
+            $where_org = 'all';
+        } else if ( $isVedouci ) {
+            // vsechny spisy na organizacni jednotku + vcetne podrizenych
+            $org_jednotka_vedouci = Orgjednotka::childOrg($org_jednotka_vedouci);
+            if ( count($org_jednotka_vedouci)>0 ) {
+                $where_org = array( 'tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL',$org_jednotka_vedouci,$org_jednotka_vedouci);
+            } else if ( count($org_jednotka)>0 ) {
+                $where_org = array( 'tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL',$org_jednotka,$org_jednotka);
+            } else {
+                $where_org = null;
+            }
+        } else {
+            // vsechny dokumenty na organizacni jednotku
+            if ( count($org_jednotka)>0 ) {
+                $where_org = array('tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL',$org_jednotka,$org_jednotka);
+            } else {
+                $where_org = null;
+            }     
+        }
+        return $where_org;
+        
+    }
+    
     public function spisovka($args) {
 
         if ( isset($args['where']) ) {
@@ -120,6 +227,16 @@ class Spis extends TreeModel
             $args['where'] = array(array("NOT (tb.typ = 'S' AND tb.stav > 2)"));
         }
 
+        $org = $this->omezeni_org();
+        if ( $org == 'all' ) {
+            // nic - je to admin, podatelna, spisovna
+        } else if ( $org == null ) {
+            // zadna jednotka - Co s tim? Zatim nezobrazovat
+            $args['where'][] = array("0");
+        } else {
+            $args['where'][] = $org;
+        }
+        
         return $args;
     }
 
@@ -131,6 +248,16 @@ class Spis extends TreeModel
             $args['where'] = array(array("NOT (tb.typ = 'S' AND tb.stav < 3)"));
         }
 
+        $org = $this->omezeni_org();
+        if ( $org == 'all' ) {
+            // nic
+        } else if ( $org == null ) {
+            // zadna jednotka - Co s tim? Zatim nezobrazovat
+            $args['where'][] = array("0");
+        } else {
+            $args['where'][] = $org;
+        }        
+        
         return $args;
     }
 
@@ -153,10 +280,13 @@ class Spis extends TreeModel
         $data['user_created'] = Environment::getUser()->getIdentity()->id;
         $data['date_modified'] = new DateTime();
         $data['user_modified'] = Environment::getUser()->getIdentity()->id;
-
-        if ( $data['typ'] == 'SP' ) {
-            $data['spisovy_znak_plneurceny'] = $data['spisovy_znak'];
-        }
+        
+        $UserModel = new UserModel();
+        $org_info = $UserModel->getOrg($user->id);
+        if ( is_array($org_info) ) {
+            $org_info = current($org_info);
+        }        
+        $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
 
         if ( !isset($data['parent_id']) ) $data['parent_id'] = 1;
         if ( empty($data['parent_id']) ) $data['parent_id'] = 1;
@@ -166,14 +296,6 @@ class Spis extends TreeModel
         
         if ( empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = 10;
         if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
-
-        /*$SpisParent = $this->getInfo($data['parent_id']);
-        if ( $SpisParent ) {
-            $spis_znak_parent = self::spisovyZnak($SpisParent, 2);
-            $data['spisovy_znak_plneurceny'] = $spis_znak_parent . $data['spisovy_znak'];
-        } else {
-            $data['spisovy_znak_plneurceny'] = $data['spisovy_znak'];
-        }*/
 
         if ( empty($data['spisovy_znak_id']) ) {
             $data['spisovy_znak_id'] = null;
@@ -190,6 +312,14 @@ class Spis extends TreeModel
         //Debug::dump($data); exit;
         
         $spis_id = $this->vlozitH($data);
+
+        $Log = new LogModel();
+        if ( is_object($spis_id) ) {
+            
+        } else {        
+            $Log->logSpis($spis_id, 41);
+        }
+        
         return $spis_id;
 
     }
@@ -214,6 +344,13 @@ class Spis extends TreeModel
         //Debug::dump($data); exit;
 
         $ret = $this->upravitH($data, $spis_id);
+        
+        $Log = new LogModel();
+        if ( is_object($ret) ) {
+            $Log->logSpis($spis_id, 48,'Hodnoty spisu se nepodařilo upravit.');
+        } else {        
+            $Log->logSpis($spis_id, 42);
+        }        
         
         return $ret;
 
@@ -253,16 +390,78 @@ class Spis extends TreeModel
         $data['user_modified'] = Environment::getUser()->getIdentity()->id;
         $data['stav'] = $stav;
 
+        $Log = new LogModel();
         try {
             $this->update($data, array('id=%i',$spis_id));
+            
+            if ( $stav == 1 ) {
+                $Log->logSpis($spis_id, 46);
+            } else {
+                $Log->logSpis($spis_id, 47);
+            }
+            
             return true;
         } catch (exception $e) {
+            $Log->logSpis($spis_id, 48, 'Nepodařilo se změnit stav spisu.');
             return false;
         }
 
     }
 
+    public function zmenitOrg($spis_id, $orgjednotka_id) 
+    {
+        
+        if ( empty($spis_id) ) return false;
+        if ( empty($orgjednotka_id) ) return false;
+        
+        try {
+            $this->update(
+                    array('orgjednotka_id'=>$orgjednotka_id,'orgjednotka_id_predano'=>null),
+                    array( array('id=%i',$spis_id) )
+                    );
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+        
+    }
 
+    public function predatOrg($spis_id, $orgjednotka_id) 
+    {
+        
+        if ( empty($spis_id) ) return false;
+        if ( empty($orgjednotka_id) ) return false;
+        
+        try {
+            $this->update(
+                    array('orgjednotka_id_predano'=>$orgjednotka_id),
+                    array( array('id=%i',$spis_id) )
+                    );
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+        
+    }
+    
+    public function zrusitPredani($spis_id) 
+    {
+        
+        if ( empty($spis_id) ) return false;
+        
+        try {
+            $this->update(
+                    array('orgjednotka_id_predano'=>null),
+                    array( array('id=%i',$spis_id) )
+                    );
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+        
+    }    
+    
+    
     public static function spisovyZnak( $spis, $simple = 0 )
     {
 
@@ -600,6 +799,9 @@ class Spis extends TreeModel
 
         $DokumentSpis = new DokumentSpis();
         $DokumentSpis->deleteAll();
+        
+        $LogModel = new LogModel();
+        $LogModel->deleteAllSpis();
 
         parent::deleteAll();
     }

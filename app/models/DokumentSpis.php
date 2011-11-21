@@ -27,6 +27,26 @@ class DokumentSpis extends BaseModel
         }
     }
 
+    public function spis( $dokument_id ) {
+
+        $param = array();
+        $param['where'] = array();
+        $param['where'][] = array('dokument_id=%i',$dokument_id);
+
+        $result = $this->fetchAllComplet($param)->fetchAll();
+        if ( count($result)>0 ) {
+            $Spis = new Spis();
+            foreach ($result as $joinSpis) {
+                $spis = $Spis->getInfo($joinSpis->spis_id);
+                $spis->poradi = $joinSpis->poradi;
+                $spis->stav_zarazeni = $joinSpis->stav;
+            }
+            return $spis;
+        } else {
+            return null;
+        }
+    }    
+    
     public function dokumenty( $spis_id , $detail = 0 ) {
 
         $param = array();

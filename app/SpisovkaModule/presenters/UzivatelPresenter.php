@@ -150,6 +150,24 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
 
     }
+    
+    public function renderVyberspis()
+    {
+
+        $this->template->uzivatel_id = $this->getParam('id',null);
+        $this->template->spis_id = $this->getParam('spis_id',null);
+        $this->template->novy = $this->getParam('novy',0);
+
+        $Zamestnanci = new Osoba2User();
+        $seznam = $Zamestnanci->seznam(1);
+        $this->template->seznam = $seznam;
+
+        $OrgJednotky = new Orgjednotka();
+        $oseznam = $OrgJednotky->seznam();
+        $this->template->org_seznam = $oseznam;
+
+
+    }    
 
     public function actionSeznamAjax()
     {
@@ -243,6 +261,81 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     }
     
     
+    public function renderSpisvybrano()
+    {
+
+        $osoba_id = $this->getParam('id',null);
+        $spis_id = $this->getParam('spis_id',null);
+        $user_id = $this->getParam('user',null);
+        $role_id = $this->getParam('role',null);
+        $orgjednotka_id = $this->getParam('orgjednotka',null);
+        $poznamka = $this->getParam('poznamka',null);
+        $novy = $this->getParam('novy',0);
+
+
+        if ( $novy == 1 ) {
+          echo '###predano###'. $spis_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
+
+          $UserModel = new UserModel();
+          $osoba = $UserModel->getIdentity($user_id);
+          $Orgjednotka = new Orgjednotka();
+          $org = $Orgjednotka->getInfo($orgjednotka_id);
+
+          echo '#'. Osoba::displayName($osoba) .'#'. @$org->zkraceny_nazev;
+
+          $this->terminate();
+        } else {
+            $Workflow = new Workflow();
+            
+            // Predat Spis
+            
+            $DokSpis = new DokumentSpis();
+            $dokumenty = $DokSpis->dokumenty($spis_id);
+            
+            if ( count($dokumenty)>0 ) {
+                // obsahuje dokumenty - predame i dokumenty
+                $dokument = current($dokumenty);
+                
+                if ( $Workflow->priradit($dokument->id, $user_id, $orgjednotka_id, $poznamka) ) {
+                    $link = $this->link(':Spisovka:Spisy:detail',array('id'=>$spis_id));
+                    echo '###vybrano###'. $link;
+                    $this->flashMessage('Spis byl předán.');
+                    $this->terminate();
+                    //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+                } else {
+                    // chyba
+                    $this->template->uzivatel_id = 0;
+                    $this->template->spis_id = $spis_id;
+                    $Zamestnanci = new Osoba2User();
+                    $seznam = $Zamestnanci->seznam(1);
+                    $this->template->seznam = $seznam;
+                    $this->template->chyba = 1;
+                    $this->template->render('vyberspis');
+                }
+            } else {
+                // pouze spis
+                $Spis = new Spis;
+                if ( $Spis->predatOrg($spis_id, $orgjednotka_id) ) {
+                    $link = $this->link(':Spisovka:Spisy:detail',array('id'=>$spis_id));
+                    $this->flashMessage('Spis byl předán.');
+                    echo '###vybrano###'. $link;
+                    $this->terminate();
+                    //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+                } else {
+                    // chyba
+                    $this->template->uzivatel_id = 0;
+                    $this->template->spis_id = $spis_id;
+                    $Zamestnanci = new Osoba2User();
+                    $seznam = $Zamestnanci->seznam(1);
+                    $this->template->seznam = $seznam;
+                    $this->template->chyba = 1;
+                    $this->template->render('vyberspis');
+                }                
+            }
+        }
+
+    }
+
     public function renderVybrano()
     {
 
@@ -286,7 +379,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         }
 
     }
-
+    
+    
 
 }
 

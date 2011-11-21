@@ -55,6 +55,15 @@
         </a>        
     </div>      
     
+    <div id="dokument_blok_volby">
+       {if $AccessEdit==1}
+       <a href="{link :Spisovna:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit skartační režim</a>
+       {/if}
+       {if empty($Spis->orgjednotka_id)}
+       <a href="{link :Spisovna:Spisy:prevzitspis, 'id'=>$Spis->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít spis do vlastnictví</a>
+       {/if}       
+    </div>    
+    
         {if ($FormUpravit=='info')}
     <div class="detail_blok">
         <div class="detail_hlavicka">Info</div>
@@ -88,20 +97,23 @@
             <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
+            <dt>Přiděleno organizační jednotce:</dt>
+            <dd>{if !empty($Spis->orgjednotka_prideleno)}{$Spis->orgjednotka_prideleno->zkraceny_nazev}{else}(není přidělěno k žádné organizační jednotce){/if}&nbsp;</dd>
+        </dl>         
+        <dl class="detail_item">
             <dt>Stav:</dt>
             <dd>
                 {=Spis::stav($Spis->stav)}
             </dd>
         </dl>
-        {if $AccessEdit==1}
-        <a href="{link :Spisovna:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit skartační režim</a>
-        {/if}
     </div>
         {/if}        
 
     <div class="detail_blok">
         <div class="detail_hlavicka">Seznam dokumentů</div>
     </div>
+        
+    {if $AccessView}        
     <div id="dokumenty">
     {if count($seznam)>0}
     <table>
@@ -204,3 +216,7 @@
         {/if}
     {/if}
     </div>
+    
+    {else}
+    <div class="prazdno">Nemáte oprávnění vidět seznam dokumentů.</div>
+    {/if}    

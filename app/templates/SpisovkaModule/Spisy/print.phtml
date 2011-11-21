@@ -22,6 +22,8 @@
         <tr>
             <th>Spis</th>
             <th>Počet dokumentů</th>
+            <th>Přiděleno</th>
+            <th>Předáno</th>            
             <th>Spisový znak</th>
             <th>Skartační znak/lhůta</th>
             <th>Stav</th>
@@ -45,6 +47,8 @@
                 {/if}
             </td>
             <td>{if isset($seznam_dokumentu[$spis->id])}{=count($seznam_dokumentu[$spis->id])}{else}0{/if}</td>
+            <td>{$spis->orgjednotka_prideleno}</td>              
+            <td>{$spis->orgjednotka_predano}</td>              
             <td>{if isset($SpisoveZnaky[$spis->spisovy_znak_id])}{$SpisoveZnaky[$spis->spisovy_znak_id]->nazev}{/if} </td>
             <td>{$spis->skartacni_znak} / {$spis->skartacni_lhuta}</td>
             <td>{=Spis::stav($spis->stav)}</td>            
@@ -52,7 +56,7 @@
         {if isset($seznam_dokumentu[$spis->id]) && count($seznam_dokumentu[$spis->id])>0 }
         {foreach $seznam_dokumentu[$spis->id] as $dok}
         <tr>
-            <td colspan="5">
+            <td colspan="7">
                 {!=str_repeat("&nbsp;", (5*$spis->uroven)+15)}
                 <strong>{$dok->cislo_jednaci}</strong> - {$dok->nazev}
             </td>

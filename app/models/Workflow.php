@@ -120,19 +120,18 @@ class Workflow extends BaseModel
             //if ($transaction)
             //dibi::begin();
 
-            // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
-            $update = array('stav_osoby%sql'=>'stav_osoby+100');
-            $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_osoby=0')));
-
-            // Deaktivujeme starsi zaznamy
-            //$this->deaktivovat($dokument_id);
-
-
             $Dokument = new Dokument();
             $dokument_info = $Dokument->getInfo($dokument_id);
 
             $UserModel = new UserModel();
             $user = Environment::getUser()->getIdentity();
+
+            // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
+            $update = array('stav_osoby%sql'=>'stav_osoby+100');
+            $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_osoby=0')));
+                
+            // Deaktivujeme starsi zaznamy
+            //$this->deaktivovat($dokument_id);
 
             $data = array();
             $data['dokument_id'] = $dokument_info->id;
@@ -141,10 +140,13 @@ class Workflow extends BaseModel
 
             $data['stav_osoby'] = 0;
 
+            $log = "";
+            $log_spis = "";
             if ( $user_id ) {
                 $prideleno_info = $UserModel->getUser($user_id, 1);
                 $data['prideleno_id'] = $prideleno_info->id;
                 $log = 'Dokument předán zaměstnanci '. Osoba::displayName($prideleno_info->identity) .'.';
+                $log_spis = 'Spis předán zaměstnanci '. Osoba::displayName($prideleno_info->identity) .'.';
             } else {
                 $data['prideleno_id'] = null;
             }
@@ -155,8 +157,10 @@ class Workflow extends BaseModel
                 $data['orgjednotka_id'] = $orgjednotka_id;
                 if ( $org_info ) {
                     $log = 'Dokument předán organizační jednotce '. $org_info->zkraceny_nazev .'.';
+                    $log_spis = 'Spis předán organizační jednotce '. $org_info->zkraceny_nazev .'.';
                 } else {
                     $log = 'Dokument předán organizační jednotce.';
+                    $log_spis = 'Spis předán organizační jednotce.';
                 }
             } else {
                 $UserModel = new UserModel();
@@ -172,6 +176,8 @@ class Workflow extends BaseModel
             $data['user_id'] = $user->id;
             $data['poznamka'] = $poznamka;
 
+            //Debug::dump($data);
+            
             $result_insert = $this->insert($data);
 
             //if ($transaction)
@@ -181,7 +187,44 @@ class Workflow extends BaseModel
 
                 $Log = new LogModel();
                 $Log->logDokument($dokument_id, LogModel::DOK_PREDAN, $log);
-                
+
+                // Prirazeni ostatnim dokumentum ve spisu
+                if ( count($dokument_info->spisy)>0 ) {
+                    $DokumentSpis = new DokumentSpis();
+                    $Spis = new Spis();
+                    foreach ( $dokument_info->spisy as $spis ) {
+
+                        // Vyradime ty zamestanance, kterym byly spisove dokumenty v minulosti predany
+                        $update = array('stav_osoby%sql'=>'stav_osoby+100');
+                        $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_osoby=0')));
+                    
+                        $seznam_dokumentu = $DokumentSpis->dokumenty($spis->id);
+                        if ( count($seznam_dokumentu)>0 ) {
+                            foreach ( $seznam_dokumentu as $dokument_other ) {
+                            
+                                $data_other = array();
+                                $data_other['dokument_id'] = $dokument_other->id;
+                                $data_other['spis_id'] = $spis->id;
+                                $data_other['stav_dokumentu'] = $dokument_other->stav_dokumentu;
+                                $data_other['aktivni'] = 1;
+                                $data_other['stav_osoby'] = 0;
+                                $data_other['prideleno_id'] = $data['prideleno_id'];
+                                $data_other['orgjednotka_id'] = $data['orgjednotka_id'];
+                                $data_other['date'] = new DateTime();
+                                $data_other['date_predani'] = new DateTime();
+                                $data_other['user_id'] = $data['user_id'];
+                                $data_other['poznamka'] = $data['poznamka'];
+                                $result_insert = $this->insert($data_other);
+                                //Debug::dump($data_other);
+                                $Log->logDokument($dokument_other->id, LogModel::DOK_PREDAN, $log);
+                            
+                            }
+                        }
+                        
+                        $Spis->predatOrg($spis->id, $data['orgjednotka_id']);
+                        $Log->logSpis($spis->id, LogModel::SPIS_PREDAN, $log_spis);
+                    }
+                }                
 
                 return true;
             } else {
@@ -198,9 +241,22 @@ class Workflow extends BaseModel
     {
         if ( is_numeric($dokument_id) ) {
 
+            
             // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
             $update = array('stav_osoby%sql'=>'stav_osoby+100','aktivni'=>0);
             $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_osoby=0')));
+            
+            // Vyradime i spisy, ktere byly predany
+            $DokumentSpis = new DokumentSpis();
+            $spisy = $DokumentSpis->spisy($dokument_id);
+            if ( count($spisy)>0 ) {
+                foreach ( $spisy as $spis ) {
+                    $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_osoby=0')));
+                    $Spis = new Spis();
+                    $Spis->zrusitPredani($spis->id);
+                    //$Log->logSpis($spis->id, LogModel::SPIS_, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal spis'.$log_plus);
+                }
+            }
 
 
             // TODO upravit aktivitu dokumentu - reaktivovat posledni dokument
@@ -225,7 +281,7 @@ class Workflow extends BaseModel
 
                 // test predaneho
                 // pokud neni predana osoba, tak test na vedouciho org.jednotky
-                $access = 0; $log_plus = ".";
+                $access = 0; $log = ""; $log_plus = ".";
                 if ( empty($predan->prideleno_id) ) {
                     if ( Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
                         $access = 1;
@@ -257,12 +313,16 @@ class Workflow extends BaseModel
                     $user = Environment::getUser()->getIdentity();
                     $user_info = $UserModel->getUser($user->id, 1);
 
+                    $log = "";
+                    
                     $data = array();
                     $data['stav_osoby'] = 1;
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->id;
                     $data['aktivni'] = 1;
 
+                    //Debug::dump($data);
+                    
                     $where = array('id=%i',$predan->id);
                     $result_update = $this->update($data,$where);
 
@@ -274,7 +334,53 @@ class Workflow extends BaseModel
                         $Log = new LogModel();
                         $Log->logDokument($dokument_id, LogModel::DOK_PRIJAT, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument'.$log_plus);
 
+                        $Dokument = new Dokument();
+                        $dokument_info = $Dokument->getInfo($dokument_id);
+                        
+                        // Prevzeti i ostatnim dokumentum ve spisu
+                        if ( count($dokument_info->spisy)>0 ) {
+                            $DokumentSpis = new DokumentSpis();
+                            $Spis = new Spis();
+                            foreach ( $dokument_info->spisy as $spis ) {
 
+                                // Prirazene zamestanance predame uz nejsou prirazeni - aplikace na ostatni dokumenty ve spisu
+                                $update = array('stav_osoby'=>2);
+                                
+                                $seznam_dokumentu = $DokumentSpis->dokumenty($spis->id);
+                                if ( count($seznam_dokumentu)>0 ) {
+                                    foreach ( $seznam_dokumentu as $dokument_other ) {
+
+                                        if ( $dokument_other->id == $dokument_id ) continue;
+
+                                        $this->update($update, array(array('dokument_id=%i',$dokument_other->id),
+                                                                     array('stav_osoby=1')
+                                                                    )
+                                        );  
+                                        $this->deaktivovat($dokument_other->id);
+                                        
+                                        $data_other = array();
+                                        $data_other['stav_osoby'] = 1;
+                                        $data_other['spis_id'] = $spis->id;
+                                        $data_other['date'] = new DateTime();
+                                        $data_other['user_id'] = $user->id;
+                                        $data_other['aktivni'] = 1;
+
+                                        //Debug::dump($data_other);
+                                        //Debug::dump($dokument_other);
+                                        $where = array('id=%i',$dokument_other->predano->id);
+                                        //Debug::dump($where);
+                                        $result_update = $this->update($data_other,$where);                                        
+
+                                        $Log->logDokument($dokument_other->id, LogModel::DOK_PRIJAT, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument'.$log_plus);
+                            
+                                    }
+                                }
+                                
+                                $Spis->zmenitOrg($spis->id, $predan->orgjednotka_id);
+                                $Log->logSpis($spis->id, LogModel::SPIS_PRIJAT, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal spis'.$log_plus);
+                            }
+                        }                
+                        
                         return true;
                     } else {
                         return false;
@@ -357,6 +463,7 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->id;
                     $data['poznamka'] = $predan->poznamka;
+                    $data['spis_id'] = $predan->spis_id;
 
                     $result_insert = $this->insert($data);
 
@@ -465,6 +572,7 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->id;
                     $data['poznamka'] = $predan->poznamka;
+                    $data['spis_id'] = $predan->spis_id;
 
                     $result_insert = $this->insert($data);
 
@@ -643,6 +751,7 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->getIdentity()->id;
                     $data['poznamka'] = $dokument_info->prideleno->poznamka;
+                    $data['spis_id'] = $dokument_info->prideleno->spis_id;
 
                     $result_insert = $this->insert($data);
 
@@ -697,6 +806,7 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->getIdentity()->id;
                     $data['poznamka'] = $dokument_info->prideleno->poznamka;
+                    $data['spis_id'] = $dokument_info->prideleno->spis_id;
 
                     $result_insert = $this->insert($data);
 
@@ -751,6 +861,7 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->getIdentity()->id;
                     $data['poznamka'] = $dokument_info->prideleno->poznamka;
+                    $data['spis_id'] = $dokument_info->prideleno->spis_id;
 
                     $result_insert = $this->insert($data);
 
@@ -787,6 +898,8 @@ class Workflow extends BaseModel
 
                     //$Dokument = new Dokument();
                     //$dokument_info = $Dokument->getInfo($dokument_id);
+                    $DokumentSpis = new DokumentSpis();
+                    $spis = $DokumentSpis->spis($dokument_id);
 
                     // Deaktivujeme starsi zaznamy
                     //$this->deaktivovat($dokument_id);
@@ -811,6 +924,7 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = Environment::getUser()->getIdentity()->id;
                     $data['poznamka'] = "Přidělen k zapůjčení.";
+                    $data['spis_id'] = empty($spis->id)?null:$spis->id;
 
                     $result_insert = $this->insert($data);
 
@@ -944,6 +1058,8 @@ class Workflow extends BaseModel
                 if ( Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
                     return true;
                 }
+            } else if ( Acl::isInRole('superadmin') ) {
+                return true;
             } else {
                 if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
                     return true;
@@ -986,6 +1102,8 @@ class Workflow extends BaseModel
                 if ( Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
                     return true;
                 }
+            } else if ( Acl::isInRole('superadmin') ) {
+                return true;
             } else {
                 if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
                     return true;
@@ -1008,6 +1126,18 @@ class Workflow extends BaseModel
         }
 
     }
+    
+    protected function deaktivovatSpis($spis_id) {
+
+        if ( is_numeric($spis_id) ) {
+            $update = array('aktivni'=>0);
+            $this->update($update, array(array('spis_id=%i',$spis_id),array('aktivni=1')));
+            return true;
+        } else {
+            return false;
+        }
+
+    }    
 
 }
 

@@ -237,15 +237,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                 @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
                 $seznam = $result->fetchAll();
-                if ( count($seznam)>0 ) {
-                    $spis_ids = array();
-                    foreach($seznam as $spis) {
-                        $spis_ids[] = $spis->id;
-                    }
-                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-                } else {
-                    $this->template->seznam_dokumentu = array();
-                }               
+             
                 $this->setLayout(false);
                 $this->setView('print');
             } elseif ( $pdf ) {
@@ -253,20 +245,22 @@ class Spisovna_SpisyPresenter extends BasePresenter
                 $this->pdf_output = 1;
                 //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
                 $seznam = $result->fetchAll();
-                if ( count($seznam)>0 ) {
-                    $spis_ids = array();
-                    foreach($seznam as $spis) {
-                        $spis_ids[] = $spis->id;
-                    }
-                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-                } else {
-                    $this->template->seznam_dokumentu = array();
-                }                
+              
                 $this->setLayout(false);
                 $this->setView('print');
             } else {
                 $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             }               
+            
+            if ( count($seznam)>0 ) {
+                $spis_ids = array();
+                foreach($seznam as $spis) {
+                    $spis_ids[] = $spis->id;
+                }
+                $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+            } else {
+                $this->template->seznam_dokumentu = array();
+            }              
             
             $this->template->seznam = $seznam;
 
@@ -343,15 +337,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                 @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
                 $seznam = $result->fetchAll();
-                if ( count($seznam)>0 ) {
-                    $spis_ids = array();
-                    foreach($seznam as $spis) {
-                        $spis_ids[] = $spis->id;
-                    }
-                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-                } else {
-                    $this->template->seznam_dokumentu = array();
-                }               
+            
                 $this->setLayout(false);
                 $this->setView('print');
             } elseif ( $pdf ) {
@@ -359,20 +345,22 @@ class Spisovna_SpisyPresenter extends BasePresenter
                 $this->pdf_output = 1;
                 //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
                 $seznam = $result->fetchAll();
-                if ( count($seznam)>0 ) {
-                    $spis_ids = array();
-                    foreach($seznam as $spis) {
-                        $spis_ids[] = $spis->id;
-                    }
-                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-                } else {
-                    $this->template->seznam_dokumentu = array();
-                }                
+            
                 $this->setLayout(false);
                 $this->setView('print');
             } else {
                 $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             }              
+            
+            if ( count($seznam)>0 ) {
+                $spis_ids = array();
+                foreach($seznam as $spis) {
+                    $spis_ids[] = $spis->id;
+                }
+                $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+            } else {
+                $this->template->seznam_dokumentu = array();
+            }               
             
             $this->template->seznam = $seznam;
             
@@ -399,38 +387,131 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $spis_id = $this->getParam('id',null);
         // Info o spisu
         $Spisy = new Spis();
-        $this->template->Spis = $spis = $Spisy->getInfo($spis_id);
+        $this->template->Spis = $spis = $Spisy->getInfo($spis_id, true);
 
-        $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->select(11);
-        $this->template->SpisoveZnaky = $spisove_znaky;
+        if ( $spis ) {
+            
+            $SpisovyZnak = new SpisovyZnak();
+            $spisove_znaky = $SpisovyZnak->select(11);
+            $this->template->SpisoveZnaky = $spisove_znaky;
         
-        if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
-            $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak_id ]->popis;
-            $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak_id ]->nazev;
-        } else {
-            $this->template->SpisZnak_popis = "";
-            $this->template->SpisZnak_nazev = "";
-        }           
+            if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
+                $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak_id ]->popis;
+                $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak_id ]->nazev;
+            } else {
+                $this->template->SpisZnak_popis = "";
+                $this->template->SpisZnak_nazev = "";
+            }        
+            
+            $user = Environment::getUser();
+            $user_id = $user->getIdentity()->id;  
+            $pridelen = $predan = $accessview = false;
+            $formUpravit = null;
+            
+            // prideleno
+            if ( Orgjednotka::isInOrg($spis->orgjednotka_id, null, $user_id) ) {
+                $pridelen = true;
+                $accessview = true;
+            }
+            // predano
+            if ( Orgjednotka::isInOrg($spis->orgjednotka_id_predano, null, $user_id) ) {
+                $predan = true;
+                $accessview = true;
+            }
+            
+            if ( $user->isInRole('superadmin') ) {
+                $accessview = 1;
+                $pridelen = 1;
+            }                
+            
+            if ( count($spis->workflow)>0 ) {
+                $prideleno = $predano = 0;
+                $wf_orgjednotka_prideleno = $spis->orgjednotka_id;
+                $wf_orgjednotka_predano = $spis->orgjednotka_id_predano;
+                $org_cache = array();
+                foreach ( $spis->workflow as $wf ) {
+                    
+                    if ( isset( $org_cache[$wf->orgjednotka_id] ) ) {
+                        $orgjednotka_expr = $org_cache[$wf->orgjednotka_id];
+                    } else {
+                        $orgjednotka_expr = Orgjednotka::isInOrg($wf->orgjednotka_id, null, $user_id);
+                        $org_cache[$wf->orgjednotka_id] = $orgjednotka_expr;
+                    }
+                    
+                    if ( !$accessview ) {
+                        if ( ($wf->prideleno_id == $user_id || $orgjednotka_expr)
+                             && ($wf->stav_osoby < 100 || $wf->stav_osoby !=0) ) {
+                            $accessview = 1;
+                        }   
+                    }
+                    
+                    if ( !$pridelen ) {
+                        if ( ($wf->prideleno_id == $user_id || $orgjednotka_expr)
+                            && ($wf->stav_osoby == 1 && $wf->aktivni == 1 ) ) {
+                            $pridelen = 1;
+                            $wf_orgjednotka_prideleno = $wf->orgjednotka_id;
+                        }   
+                    }
+                    if ( !$predan ) {
+                        if ( ($wf->prideleno_id == $user_id || $orgjednotka_expr)
+                            && ($wf->stav_osoby == 0 && $wf->aktivni == 1 ) ) {
+                            $predan = 1;
+                            $wf_orgjednotka_predano = $wf->orgjednotka_id;
+                        }   
+                    }
+                    
+                    if ( $predan && $pridelen && $accessview ) {
+                        break;
+                    }
+                }
+            }
+            
+            $this->template->Pridelen = $pridelen;
+            if ( $pridelen ) {
+                $this->template->AccessEdit = 0;
+                $formUpravit = null;
+            }
+            $this->template->Predan = $predan;
+            $this->template->AccessView = $accessview;    
+            
+            $Orgjednotka = new Orgjednotka();
+            if ( empty($spis->orgjednotka_id) && !empty($wf_orgjednotka_prideleno) ) {
+                $spis->orgjendotka_id = $wf_orgjednotka_prideleno;
+                $spis->orgjendotka_prideleno = $Orgjednotka->getInfo($wf_orgjednotka_prideleno);
+            }
+            if ( empty($spis->orgjednotka_id_predano) && !empty($wf_orgjednotka_predano) ) {
+                $spis->orgjendotka_id_predano = $wf_orgjednotka_predano;
+                $spis->orgjendotka_predano = $Orgjednotka->getInfo($wf_orgjednotka_predano);
+            }
+            
+            if ( $accessview ) {
+                $DokumentSpis = new DokumentSpis();
+                $result = $DokumentSpis->dokumenty($spis_id,1);
+                $this->template->seznam = $result;
+            } else {
+                $this->template->seznam = null;
+            }
+        
+            if ( Acl::isInRole('skartacni_dohled,superadmin') ) {
+                $this->template->AccessEdit = 1;
+                $formUpravit = $this->getParam('upravit',null);
+            } else {
+                $this->template->AccessEdit = 0;
+                $formUpravit = null;
+            }            
 
-        $DokumentSpis = new DokumentSpis();
-        //$user_config = Environment::getVariable('user_config');
-        //$vp = new VisualPaginator($this, 'vp');
-        //$paginator = $vp->getPaginator();
-        //$paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
-        $result = $DokumentSpis->dokumenty($spis_id,1);
-        //$paginator->itemCount = count($result);
-        //$seznam = $DokumentSpis->fetchPart($result, $paginator->offset, $paginator->itemsPerPage);
-        //$this->template->seznam = $seznam;
-        $this->template->seznam = $result;
-        
-        if ( Acl::isInRole('skartacni_dohled,superadmin') ) {
-            $this->template->AccessEdit = 1;
-            $this->template->FormUpravit = $this->getParam('upravit',null);
+            $this->template->FormUpravit = $formUpravit;
+            
+            
+            
+            
+            
+            
         } else {
-            $this->template->AccessEdit = 0;
-            $this->template->FormUpravit = null;
+            // spis neexistuje nebo se nepodarilo nacist
+            $this->setView('noexist');            
         }
+
         
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParam('print');
@@ -498,6 +579,29 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     }
 
+    public function renderPrevzitspis()
+    {
+
+        $spis_id = $this->getParam('id',null);
+        $user_id = $this->getParam('user',null);
+        $orgjednotka_id = $this->getParam('org',null);
+        if ( empty($user_id) ) {
+            $user = Environment::getUser();
+            $user_id = $user->getIdentity()->id;          
+        }        
+
+        $Spis = new Spis;
+        if ( $Spis->zmenitOrg($spis_id, $orgjednotka_id) ) {
+            $this->flashMessage('Úspěšně jste si převzal tento spis.');
+        } else {
+            $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
+        }               
+
+        $this->redirect(':Spisovna:Spisy:detail',array('id'=>$spis_id));
+
+    }
+    
+    
     public function actionStav()
     {
 

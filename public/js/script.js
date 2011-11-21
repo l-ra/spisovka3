@@ -764,6 +764,7 @@ osobaVybrana = function (elm) {
     return false;
 }
 
+
 prilohazmenit = function(elm){
 
     if (document.getElementById) {

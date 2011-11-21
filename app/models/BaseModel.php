@@ -33,6 +33,7 @@ abstract class BaseModel extends Object
 
     protected $tb_logaccess = 'log_access';
     protected $tb_logdokument = 'log_dokument';
+    protected $tb_logspis = 'log_spis';
 
     protected $tb_dokumenttyp = 'dokument_typ';
 
@@ -83,6 +84,7 @@ abstract class BaseModel extends Object
         $this->tbl_role = $prefix . $this->tbl_role;
         $this->tb_logaccess = $prefix . $this->tb_logaccess;
         $this->tb_logdokument = $prefix . $this->tb_logdokument;
+        $this->tb_logspis = $prefix . $this->tb_logspis;
 
         $this->tb_zpusob_doruceni = $prefix . $this->tb_zpusob_doruceni;
         $this->tb_zpusob_vyrizeni = $prefix . $this->tb_zpusob_vyrizeni;
@@ -300,7 +302,6 @@ abstract class BaseModel extends Object
 
         //Debug::dump($cols);
         //Debug::dump($cols_string_a);
-
 
        $query[] = array('SELECT '.(isset($distinct) ? 'DISTINCT':'').' %sql',$cols_string);
        

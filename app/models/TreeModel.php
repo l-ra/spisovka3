@@ -70,7 +70,7 @@ class TreeModel extends BaseModel
                 }
             }
             if ( isset($params['order']) ) { $sql['order'] = array_merge($sql['order'],$params['order']); }
-            if ( isset($params['leftJoin']) ) { $sql['LeftJoin'] = array_merge($sql['leftJoin'],$params['leftJoin']); }
+            if ( isset($params['leftJoin']) ) { $sql['leftJoin'] = array_merge($sql['leftJoin'],$params['leftJoin']); }
         }
 
         $result = $this->fetchAllComplet($sql);
@@ -92,7 +92,11 @@ class TreeModel extends BaseModel
             $type = $type - 10;
             $null_id = $parent_id;
         } else {
-            $null_id = 0;
+            if ( !empty($parent_id) ) {
+                $null_id = $parent_id;
+            } else {
+                $null_id = 0;
+            }
         }
 
         if ( $type == 1 ) {
@@ -125,7 +129,6 @@ class TreeModel extends BaseModel
                 if ( !empty($row->popis) ) {
                     $popis = " - ". String::truncate($row->popis,90);
                 }
-                
                 if ( $type == 10 ) {
                     $result[ $row->id ] = $row->{$this->nazev} .$popis;
                 } else if ( $type == 11 ) {
