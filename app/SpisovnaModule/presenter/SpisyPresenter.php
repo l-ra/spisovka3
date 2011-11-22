@@ -203,15 +203,15 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
         if ( !is_null($spis_id) ) {
             // spis_id
-        } else if ( !empty($session_spisplan->spis_id) ) {
-            $spis_id = $session_spisplan->spis_id;
+        //} else if ( !empty($session_spisplan->spis_id) ) {
+        //    $spis_id = $session_spisplan->spis_id;
         } else if ( count($this->spis_plan)>0 ) {
             reset($this->spis_plan);
             $spis_id = key($this->spis_plan);
         } else {
             $spis_id = null;
         }
-
+        
         if ( !empty($spis_id) ) {
 
             $this->template->SpisovyPlan = $Spisy->getInfo($spis_id);

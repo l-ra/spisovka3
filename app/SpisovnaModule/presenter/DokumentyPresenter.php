@@ -217,7 +217,12 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $args = $Dokument->spisovna($args);
         }
         
-        $result = $Dokument->seznam($args);
+        if ( $typ == 2 ) {
+            $result = $Dokument->seznamKeSkartaci($args);
+        } else {
+            $result = $Dokument->seznam($args);
+        }
+        
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
@@ -906,7 +911,7 @@ protected function createComponentVyrizovaniForm()
         $data = $button->getForm()->getValues();
 
         //$this->forward('this', array('hledat'=>$data['dotaz']));
-        $this->redirect(':Spisovna:Dokumenty:default',array('hledat'=>$data['dotaz']));
+        $this->redirect(':Spisovna:Dokumenty:'.$this->view,array('hledat'=>$data['dotaz']));
 
     }
 
@@ -974,7 +979,10 @@ protected function createComponentVyrizovaniForm()
         $form_data = $button->getForm()->getValues();
         $data = array('filtr'=>$form_data['filtr']);
         $this->getHttpResponse()->setCookie('s3_spisovna_filtr', serialize($data), strtotime('90 day'));
-        $this->redirect(':Spisovna:Dokumenty:default', array('filtr'=>$data) );
+        
+        
+        
+        $this->redirect(':Spisovna:Dokumenty:'.$this->view, array('filtr'=>$data) );
     }
     
     protected function createComponentSeraditForm()

@@ -109,6 +109,136 @@ class Dokument extends BaseModel
     }
 
     /**
+     * Seznam dokumentu s zivotnim cyklem
+     * 
+     * @param <type> $args 
+     */
+    public function seznamKeSkartaci($args = array(), $detail = 0) {
+
+        /*
+         * Metodika nejdelsiho skartacniho roku:
+         * - vypocteme skartacni rok ze tri mist
+         *   - dokument - skartacni_lhuta + datum_spousteci_udalosti 
+         *   - spis - skartacni_lhuta + datum_uzavreni
+         *   - ostatnich dokumentu spisu - skartacni_lhuta + datum_spousteci_udalosti
+         * - vybereme nejdelsi skartacni rok
+         * - tento se pouzije pro podminku NOW() > skartacni_rok
+         * 
+         */        
+        
+        if ( isset($args['where']) ) {
+            $where = $args['where'];
+        } else {
+            $where = null;
+        }
+        if ( isset($args['where_or']) ) {
+            $where_or = $args['where_or'];
+        } else {
+            $where_or = null;
+        }
+        
+        if ( isset($args['order']) ) {
+            $order = $args['order'];
+        } else {
+            //$order = array('dokument_id'=>'DESC');
+            $order = array('d.podaci_denik_rok'=>'DESC','d.podaci_denik_poradi'=>'DESC','d.poradi'=>'DESC');
+        } 
+        if ( isset($args['limit']) ) {
+            $limit = $args['limit'];
+        } else {
+            $limit = null;
+        }
+        if ( isset($args['offset']) ) {
+            $offset = $args['offset'];
+        } else {
+            $offset = null;
+        }
+        
+        $sql = array(
+        
+            'distinct'=>1,
+            'from' => array($this->tb_workflow => 'wf'),
+            'cols' => array('wf.dokument_id','wf.dokument_id'=>'id',"MAX(GREATEST(
+(CASE WHEN d.skartacni_lhuta > 1900 THEN MAKEDATE(d.skartacni_lhuta,1) ELSE DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR) END),
+(CASE WHEN spis.skartacni_lhuta IS NULL THEN '0000-00-00' WHEN spis.datum_uzavreni IS NULL THEN '0000-00-00' WHEN spis.datum_uzavreni = '0000-00-00 00:00:00' THEN '0000-00-00' WHEN spis.skartacni_lhuta > 1900 THEN MAKEDATE(spis.skartacni_lhuta,1) ELSE DATE_ADD(spis.datum_uzavreni, INTERVAL spis.skartacni_lhuta YEAR) END),
+(CASE WHEN d2.skartacni_lhuta IS NULL THEN '0000-00-00' WHEN d2.datum_spousteci_udalosti IS NULL THEN '0000-00-00' WHEN d2.skartacni_lhuta > 1900 THEN MAKEDATE(d2.skartacni_lhuta,1) ELSE DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR) END)
+))%sql"=>'skartace'),
+            'where' => $where,
+            'where_or' => $where_or,
+            'order' => $order,
+            'limit' => $limit,
+            'offset' => $offset,
+            'leftJoin' => array(
+                'dokument' => array(
+                    'from' => array($this->name => 'd'),
+                    'on' => array('d.id=wf.dokument_id'),
+                    'cols' => null
+                ),
+                'dokspisy' => array(
+                    'from' => array($this->tb_dokspis => 'sp'),
+                    'on' => array('sp.dokument_id=wf.dokument_id'),
+                    'cols' => null
+                ),
+                'spisy' => array(
+                    'from' => array($this->tb_spis => 'spis'),
+                    'on' => array('spis.id=sp.spis_id'),
+                    'cols' => null
+                ),
+                'dokspis' => array(
+                    'from'=> array($this->tb_dokspis => 'sp2'),
+                    'on' => array('sp2.spis_id=spis.id'),
+                    'cols' => null                    
+                ),
+                'dokument2' => array(
+                    'from'=> array($this->tb_dokument => 'd2'),
+                    'on' => array('d2.id=sp2.dokument_id'),
+                    'cols' => null                    
+                ),                
+                'typ_dokumentu' => array(
+                    'from' => array($this->tb_dokumenttyp => 'dtyp'),
+                    'on' => array('dtyp.id=d.dokument_typ_id'),
+                    'cols' => null
+                )                
+                
+            )
+        
+        );
+
+        if ( isset($args['leftJoin']) ) {
+            $sql['leftJoin'] = array_merge($sql['leftJoin'],$args['leftJoin']);
+        }
+
+        $sql['group'] = 'dokument_id';
+        $sql['having'] = array('NOW() > skartace');
+        
+        //echo "<pre>";
+        //print_r($sql);
+        //exit;
+        //echo "</pre>";
+
+        $select = $this->fetchAllComplet($sql);
+        
+        if ( $detail == 1 ) {
+            // return array(DibiRow)
+            $result = $select->fetchAll();
+            if ( count($result)>0 ) {
+                $tmp = array();
+                foreach ($result as $index => $row) {
+                    $dok = $this->getInfo($row->id, 1);
+                    $tmp[ $dok->id ] = $dok;
+                }
+                return $tmp;
+            } else {
+                return null;
+            }
+            
+        } else {
+            // return DibiResult
+            return $select;
+        }
+    }    
+    
+    /**
      * Seznam dokumentu bez zivotniho cyklu
      *
      * @param <type> $args
@@ -1021,6 +1151,10 @@ class Dokument extends BaseModel
                 break;
             case 'org_predane':
                 // predavany - predane na jmeno nebo organizacni jednotku uzivatele
+                // ??? - predane ve stavu k prevzeti nebo predane za jakychkoli okolnosti?
+                // k prevzeti - ted - nejdrive vsechny k prevzeti a pak vyfiltrovat pouze vlastni
+                // jakychkoli - wf.stav_osoby = 2 (kdysi byl pridelen, ale pak byl predan)
+                
                 if ( $isAdmin ) {
                     $args = array(
                         'where' => array(
@@ -1601,13 +1735,11 @@ class Dokument extends BaseModel
         if ( isset($args['where']) ) {
             $args['where'][] = array('d.stav > 1');
             $args['where'][] = array('wf.stav_dokumentu < 8 AND wf.aktivni=1');
-            $args['where'][] = array('NOW() > CASE WHEN d.skartacni_lhuta > 1900 THEN MAKEDATE(d.skartacni_lhuta,1) ELSE DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR) END');
         } else {
             $args['where'] = array(
                                 array('d.stav > 1'),
                                 array('wf.stav_dokumentu < 8 AND wf.aktivni=1'),
-                                array('NOW() > CASE WHEN d.skartacni_lhuta > 1900 THEN MAKEDATE(d.skartacni_lhuta,1) ELSE DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR) END')
-                             );
+                            );
         }
 
         return $this->spisovnaOmezeniOrg($args);
@@ -1648,7 +1780,7 @@ class Dokument extends BaseModel
                     'from' => array($this->tb_workflow => 'wf'),
                     'on' => array('wf.dokument_id=dok.id'),
                     'cols' => array('id'=>'workflow_id','stav_dokumentu','prideleno_id','orgjednotka_id',
-                                    'stav_osoby','date'=>'date_prideleni','date_predani','poznamka'=>'poznamka_predani','aktivni'=>'wf_aktivni')
+                                    'stav_osoby','date'=>'date_prideleni','date_predani','poznamka'=>'poznamka_predani','aktivni'=>'wf_aktivni','spis_id'=>'wf_spis_id')
                 ),
                 'workflow_prideleno' => array(
                     'from' => array($this->tb_osoba_to_user => 'wf_o2u'),
@@ -1775,6 +1907,7 @@ class Dokument extends BaseModel
                 $workflow->date = $row->date_prideleni; unset($row->date_prideleni);
                 $workflow->poznamka = $row->poznamka_predani; unset($row->poznamka_predani);
                 $workflow->aktivni = $row->wf_aktivni; unset($row->wf_aktivni);
+                $workflow->spis_id = $row->wf_spis_id; unset($row->wf_spis_id);
                 $tmp[$id]['workflow'][ $workflow->id ] = $workflow;
 
                 $tmp[$id]['raw'] = $row;
@@ -1788,6 +1921,19 @@ class Dokument extends BaseModel
             $dokument->spisy = @$tmp[ $dokument_id ]['spisy'];
             $dokument->workflow = $tmp[ $dokument_id ]['workflow'];
 
+            if ( count($dokument->spisy)>0 ) {
+                $spis = current($dokument->spisy);
+                $DokumentSpis = new DokumentSpis();
+                $dokument->skartacni_rezim = $DokumentSpis->skartacniRezim($spis->id);            
+            } else {
+                $sr = new stdClass();
+                $sr->dokument_skartacni_lhuta = $dokument->skartacni_lhuta;
+                $sr->dokument_skartacni_znak = $dokument->skartacni_znak;
+                $sr->spis_skartacni_lhuta = $dokument->skartacni_lhuta;
+                $sr->spis_skartacni_znak = $dokument->skartacni_znak;
+                $dokument->skartacni_rezim = $sr;
+            }
+            
             if ( isset($dataplus['subjekty'][$dokument_id]) ) {
                 $dokument->subjekty = $dataplus['subjekty'][$dokument_id];
             } else {

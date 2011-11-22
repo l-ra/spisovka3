@@ -178,7 +178,9 @@ abstract class BaseModel extends Object
             
         }
 
+        if ( isset($param['having']) ) $having = $param['having'];
         if ( isset($param['group']) ) $group = $param['group'];
+        
 
         if ( isset($param['leftJoin']) ) {
             $leftJoin = array();
@@ -328,11 +330,14 @@ abstract class BaseModel extends Object
         if ( isset($where) ){
             array_push($query, 'WHERE %and', $where);
         }
-        if ( isset($order) ){
-            array_push($query, 'ORDER BY %by', $order);
-        }
         if ( isset($group) ){
             array_push($query, 'GROUP BY %n', $group);
+        }
+        if ( isset($having) ){
+            array_push($query, 'HAVING %and', $having);
+        }        
+        if ( isset($order) ){
+            array_push($query, 'ORDER BY %by', $order);
         }
         if ( isset($limit) ){
             array_push($query, 'LIMIT %i', $limit);
