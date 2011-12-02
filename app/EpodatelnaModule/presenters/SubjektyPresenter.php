@@ -70,20 +70,14 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         if ( isset($data['id']) ) {
             // pouze jedno
 
-            if ( !empty($data['subjekt_nazev'][$data['id']]) && ( !empty($data['subjekt_prijmeni'][$data['id']]) || !empty($data['subjekt_jmeno'][$data['id']]) ) ) {
-                $typ = 'PFO';
-            } else if ( empty($data['subjekt_nazev'][$data['id']]) ) {
-                $typ = 'FO';
-            } else {
-                $typ = 'OVM';
-            }
-
             $vytvorit = array(
-                'type'=>$typ,
+                'type'=> ( !empty($data['subjekt_typ'][$data['id']])?$data['subjekt_typ'][$data['id']]:"" ),
                 'ic'=>'',
                 'nazev_subjektu' => ( !empty($data['subjekt_nazev'][$data['id']])?$data['subjekt_nazev'][$data['id']]:"" ),
                 'prijmeni' => ( !empty($data['subjekt_prijmeni'][$data['id']])?$data['subjekt_prijmeni'][$data['id']]:"" ),
                 'jmeno' => ( !empty($data['subjekt_jmeno'][$data['id']])?$data['subjekt_jmeno'][$data['id']]:"" ),
+                'titul_pred' => ( !empty($data['subjekt_titulpred'][$data['id']])?$data['subjekt_titulpred'][$data['id']]:"" ),
+                'titul_za' => ( !empty($data['subjekt_titulza'][$data['id']])?$data['subjekt_titulza'][$data['id']]:"" ),
                 'adresa_ulice' => ( !empty($data['subjekt_ulice'][$data['id']])?$data['subjekt_ulice'][$data['id']]:"" ),
                 'adresa_cp' => ( !empty($data['subjekt_cp'][$data['id']])?$data['subjekt_cp'][$data['id']]:"" ),
                 'adresa_mesto' => ( !empty($data['subjekt_mesto'][$data['id']])?$data['subjekt_mesto'][$data['id']]:"" ),

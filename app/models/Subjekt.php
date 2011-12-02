@@ -323,11 +323,11 @@ class Subjekt extends BaseModel
                 $d_osoba_item = "";
             }
 
-            if ( strpos(@$data->type,'OVM')!==false || strpos(@$data->type,'PO')!==false ) {
+            //if ( strpos(@$data->type,'OVM')!==false || strpos(@$data->type,'PO')!==false ) {
                 // nazev subjektu
-                $d_nazev = $nazev;
-                $d_nazev_item = $nazev;
-            }
+            //    $d_nazev = $nazev;
+            //    $d_nazev_item = $nazev;
+            //}
 
 
         // sestaveni adresy

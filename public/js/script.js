@@ -644,13 +644,31 @@ subjektNovy = function(event) {
 
         id = document.getElementById('subjekt_dokument_id').value;
 
+        if ( is_simple == 1 ) {
+            url_ajaxtyp = baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamtypusubjektu';
+        } else { 
+            url_ajaxtyp = baseUri + 'subjekty/0/seznamtypusubjektu';
+        }
+        $.getJSON(url_ajaxtyp, function(data){
+            var typ_select = '<select name="subjekt_typ['+id+']">';
+
+            $.each(data, function(key, val) {
+                typ_select = typ_select + '<option value="' + key + '">' + val + '</option>';
+            });
+            
+            typ_select = typ_select + "</select>";
+            $('#typ_subjektu').html(typ_select);
+        });            
+
         
         
         novy_subjekt = ''+
+'                        <dt>Typ subjektu:</dt>'+
+'                        <dd id="typ_subjektu"></dd>'+
 '                        <dt>Název subjektu:</dt>'+
 '                        <dd><input type="text" name="subjekt_nazev['+id+']" value="" size="60" /></dd>'+
-'                        <dt>Jméno Příjmení:</dt>'+
-'                        <dd><input type="text" name="subjekt_jmeno['+id+']" value="" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="" size="40" /></dd>'+
+'                        <dt>Titul před, jméno, příjmení, titul za:</dt>'+
+'                        <dd><input type="text" name="subjekt_titulpred['+id+']" value="" size="5" /><input type="text" name="subjekt_jmeno['+id+']" value="" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="" size="40" /><input type="text" name="subjekt_titulza['+id+']" value="" size="5" /></dd>'+
 '                        <dt>Ulice a číslo popisné:</dt>'+
 '                        <dd><input type="text" name="subjekt_ulice['+id+']" value="" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="10" /></dd>'+
 '                        <dt>PSČ a Město:</dt>'+
