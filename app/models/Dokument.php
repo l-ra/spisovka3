@@ -1611,6 +1611,51 @@ class Dokument extends BaseModel
 
     }
 
+    public function sestavaOmezeniOrg($args)
+    {
+        // Omezeni pouze na dokumenty z vlastni organizacni jednotky
+        $user = Environment::getUser()->getIdentity();
+        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
+        $isAdmin = ACL::isInRole('admin,skartacni_dohled,podatelna');
+        //$isAdmin = ACL::isInRole('admin');
+        
+        if ( !$isAdmin ) {
+            
+            $org_jednotka = array();
+            $org_jednotka_vedouci = array();
+
+            if ( @count( $user->user_roles )>0 ) {
+                foreach ( $user->user_roles as $role ) {
+                    if ( !empty($role->orgjednotka_id) ) {
+                        if (preg_match('/^vedouci/', $role->code) ) {
+                            $org_jednotka_vedouci[] = $role->orgjednotka_id;
+                        }
+                        $org_jednotka[] = $role->orgjednotka_id;
+                    }
+                }
+            } 
+            
+            if ( $isVedouci ) {
+                $org_jednotka_vedouci = Orgjednotka::childOrg($org_jednotka_vedouci);
+            }
+            
+            $where_org = null;
+            if ( count($org_jednotka_vedouci) > 0 ) {
+                $where_org = array( 'wf.orgjednotka_id IN (%in) AND wf.aktivni=1',$org_jednotka_vedouci );
+            } else if ( count($org_jednotka) == 1 ) {
+                $where_org = array( 'wf.orgjednotka_id=%i AND wf.aktivni=1',$org_jednotka[0] );
+            } else if ( count($org_jednotka) > 1 ) {
+                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
+            }
+            
+            //if ( count($where_org)>0 ) {
+                $args['where'][] = array( $where_org );
+            //}
+            
+        }
+        return $args;
+    }    
+    
     protected function spisovnaOmezeniOrg($args)
     {
         // Omezeni pouze na dokumenty z vlastni organizacni jednotky

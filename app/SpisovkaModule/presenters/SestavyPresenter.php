@@ -168,9 +168,11 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->sloupce = $sloupce;
 
         if ( empty( $sestava->parametry ) ) {
+            $parametry = null;
             $args = null;
         } else {
-            $args = $Dokument->filtr(null,unserialize($sestava->parametry));
+            $parametry = unserialize($sestava->parametry);
+            $args = $Dokument->filtr(null,$parametry);
         }
 
         if ( !isset($args['order']) ) {
@@ -238,13 +240,15 @@ class Spisovka_SestavyPresenter extends BasePresenter
         }
 
         // vystup
-        //$user_config = Environment::getVariable('user_config');
-        //$vp = new VisualPaginator($this, 'vp');
-        //$paginator = $vp->getPaginator();
-        //$paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+        if (!( $parametry['prideleno_osobne'] || $parametry['prideleno_na_organizacni_jednotku'] 
+             || $parametry['predano_osobne'] || $parametry['predano_na_organizacni_jednotku']
+             || @is_array($parametry['prideleno']) || @is_array($parametry['predano']) )) {
+            // Neni nikde pridelen nebo predan
+            // - aplikujeme tedy vseobecny filtr na role
+            $args = $Dokument->sestavaOmezeniOrg($args);
+        }
+        
         $result = $Dokument->seznam($args);
-        //$paginator->itemCount = count($result);
-        //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         $seznam = $result->fetchAll();
 
         if ( count($seznam)>0 ) {
