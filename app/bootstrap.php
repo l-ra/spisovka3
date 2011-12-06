@@ -109,6 +109,7 @@ try {
 }
 
 // Step 4: Setup application router
+Route::$defaultFlags |= (Environment::getHttpRequest()->isSecured() ? Route::SECURED : 0);
 $router = $application->getRouter();
 
 // mod_rewrite detection
