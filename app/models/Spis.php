@@ -136,7 +136,7 @@ class Spis extends TreeModel
             'distinct'=>1,
             'from' => array($this->tb_dokspis => 'dokspis'),
             'cols' => array('spis_id','dokument_id','poradi'),
-            'where' => array(array('dokspis.spis_id IN (%in)',$spis_id)),
+            'where' => array(array('dokspis.spis_id IN (%in)',$spis_id),'d.stav > 0'),
             'leftJoin' => array(
                 'dokument' => array(
                     'from' => array($this->tb_dokument => 'd'),
