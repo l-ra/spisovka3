@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}dokument` (
   `spousteci_udalost_id` int(11) DEFAULT NULL,
   `jid` varchar(100) NOT NULL,
   `nazev` varchar(100) NOT NULL,
-  `popis` varchar(255) DEFAULT NULL,
+  `popis` text,
   `cislo_jednaci` varchar(50) DEFAULT NULL,
   `poradi` smallint(6) DEFAULT '1',
   `cislo_jednaci_odesilatele` varchar(50) DEFAULT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}dokument_historie` (
   `spousteci_udalost_id` int(11) DEFAULT NULL,
   `jid` varchar(100) NOT NULL,
   `nazev` varchar(100) NOT NULL,
-  `popis` varchar(255) DEFAULT NULL,
+  `popis` text,
   `cislo_jednaci` varchar(50) DEFAULT NULL,
   `poradi` smallint(6) DEFAULT '1',
   `cislo_jednaci_odesilatele` varchar(50) DEFAULT NULL,
@@ -322,6 +322,18 @@ CREATE TABLE IF NOT EXISTS `{tbls3}log_dokument` (
   KEY `fk_log_dokument_user1` (`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `{tbls3}log_spis` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `spis_id` int(11) NOT NULL,
+  `user_id` int(10) unsigned NOT NULL,
+  `typ` tinyint(4) NOT NULL,
+  `poznamka` text,
+  `date` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_log_spis_spis1` (`spis_id`),
+  KEY `fk_log_spis_user1` (`user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `{tbls3}orgjednotka` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int(10) unsigned DEFAULT NULL,
@@ -440,17 +452,21 @@ CREATE TABLE IF NOT EXISTS `{tbls3}spis` (
   `skartacni_lhuta` int(11) NOT NULL DEFAULT '10',
   `datum_otevreni` datetime DEFAULT NULL,
   `datum_uzavreni` datetime DEFAULT NULL,
+  `orgjednotka_id` int(10) unsigned DEFAULT NULL,
+  `orgjednotka_id_predano` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_spis_spousteci_udalost1` (`spousteci_udalost_id`),
   KEY `fk_spis_spis1` (`parent_id`),
   KEY `fk_spis_user1` (`user_created`),
   KEY `fk_spis_user2` (`user_modified`),
-  KEY `spisovy_znak_id` (`spisovy_znak_id`)
+  KEY `spisovy_znak_id` (`spisovy_znak_id`),
+  KEY `orgjednotka_id` (`orgjednotka_id`),
+  KEY `orgjednotka_id_predano` (`orgjednotka_id_predano`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}spis` (
-`id`,`parent_id`,`spousteci_udalost_id`,`spisovy_znak_id`,`nazev`,`popis`,`typ`,`sekvence`,`sekvence_string`,`uroven`,`stav`,`date_created`,`user_created`,`date_modified`,`user_modified`,`spisovy_znak`,`spisovy_znak_plneurceny`,`skartacni_znak`,`skartacni_lhuta`,`datum_otevreni`,`datum_uzavreni` )
-VALUES (1 , NULL , 1, NULL , 'SPISY', '', 'SP', '1', 'SPISY.1', 0, 1, NOW(), 1, NULL , NULL , NULL , NULL , 'V', '100', NOW(), NULL );
+`id`,`parent_id`,`spousteci_udalost_id`,`spisovy_znak_id`,`nazev`,`popis`,`typ`,`sekvence`,`sekvence_string`,`uroven`,`stav`,`date_created`,`user_created`,`date_modified`,`user_modified`,`spisovy_znak`,`spisovy_znak_plneurceny`,`skartacni_znak`,`skartacni_lhuta`,`datum_otevreni`,`datum_uzavreni`,`orgjednotka_id`,`orgjednotka_id_predano` )
+VALUES (1 , NULL , 1, NULL , 'SPISY', '', 'SP', '1', 'SPISY.1', 0, 1, NOW(), 1, NULL , NULL , NULL , NULL , 'V', '100', NOW(), NULL, NULL, NULL );
 
 CREATE TABLE IF NOT EXISTS `{tbls3}spisovy_znak` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -769,6 +785,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_to_role` (
 CREATE TABLE IF NOT EXISTS `{tbls3}workflow` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dokument_id` int(11) NOT NULL,
+  `spis_id` int(11) DEFAULT NULL,
   `prideleno_id` int(10) unsigned DEFAULT NULL,
   `orgjednotka_id` int(10) unsigned DEFAULT NULL,
   `user_id` int(10) unsigned NOT NULL,
@@ -782,7 +799,8 @@ CREATE TABLE IF NOT EXISTS `{tbls3}workflow` (
   KEY `fk_workflow_dokument1` (`dokument_id`),
   KEY `fk_workflow_user1` (`prideleno_id`),
   KEY `fk_workflow_orgjednotka1` (`orgjednotka_id`),
-  KEY `fk_workflow_user2` (`user_id`)
+  KEY `fk_workflow_user2` (`user_id`),
+  KEY `spis_id` (`spis_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{tbls3}zapujcka` (
@@ -931,6 +949,10 @@ ALTER TABLE `{tbls3}file_historie`
 ALTER TABLE `{tbls3}log_dokument`
   ADD CONSTRAINT `fk_log_dokument_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_log_dokument_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `{tbls3}log_spis`
+  ADD CONSTRAINT `fk_log_spis_spis1` FOREIGN KEY (`spis_id`) REFERENCES `{tbls3}spis` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_log_spis_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}orgjednotka`
   ADD CONSTRAINT `fk_orgjednotka_user1` FOREIGN KEY (`user_created`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
