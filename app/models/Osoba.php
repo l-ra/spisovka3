@@ -53,12 +53,15 @@ class Osoba extends BaseModel
     public function ulozit($data, $osoba_id = null)
     {
 
+        $user_id = Environment::getUser()->getIdentity()->id;
+        if ( empty($user_id) ) $user_id = 1;
+        
         if ( !is_null($osoba_id) ) {
 
             // ulozit do historie
             $old_data = (array) $this->getInfo($osoba_id);
             $old_data['osoba_id'] = $osoba_id;
-            $old_data['user_created'] = Environment::getUser()->getIdentity()->id;
+            $old_data['user_created'] = $user_id;
             $old_data['date_created'] = new DateTime();
             unset($old_data['id'],$old_data['user_modified'],$old_data['date_modified']);
             $OsobaHistorie = new OsobaHistorie();
@@ -66,16 +69,16 @@ class Osoba extends BaseModel
 
             // aktualizovat
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = $user_id;
             $this->update($data, array(array('id = %i',$osoba_id)));
 
         } else {
 
             // insert
             $data['date_created'] = new DateTime();
-            $data['user_created'] = Environment::getUser()->getIdentity()->id;
+            $data['user_created'] = $user_id;
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = $user_id;
             $data['stav'] = 0;
             $osoba_id = $this->insert($data);
 

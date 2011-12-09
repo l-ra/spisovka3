@@ -1,0 +1,4 @@
+AuthUserFile ".htpasswd"
+AuthType Basic
+AuthName "Prihlaseni do spisove sluzby"
+require valid-user

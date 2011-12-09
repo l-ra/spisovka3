@@ -20,7 +20,9 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function renderLogout()
     {
+        $user = Environment::getUser()->getIdentity()->username;
         Environment::getUser()->signOut();
+        $this->getHttpResponse()->setCookie('s3_logout', $user, strtotime('10 minute'));
         $this->flashMessage('Byl jste úspěšně odhlášen.');
         $this->redirect(':Default:default');
     }

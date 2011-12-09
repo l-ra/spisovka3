@@ -1,0 +1,7 @@
+<IfModule mod_auth_kerb>
+    AuthType    Kerberos
+    AuthName    "Spisova sluzba - prihlasení pres SSO"
+    KrbAuthRealms       FIRMA.LOCAL
+    Krb5Keytab  /etc/httpd/keytab
+    require valid-user
+</IfModule>
