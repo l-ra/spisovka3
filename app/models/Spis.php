@@ -82,7 +82,7 @@ class Spis extends TreeModel
         }
     }
 
-    /*public function getSpisovyPlan()
+    public function getSpisovyPlan()
     {
 
         $where = array("typ='SP'","stav=1");
@@ -94,7 +94,7 @@ class Spis extends TreeModel
         } else {
             return null;
         }
-    }*/
+    }
 
     public function seznam($args = null, $select = 0, $parent_id = null)
     {

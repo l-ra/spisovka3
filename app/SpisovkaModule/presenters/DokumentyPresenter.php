@@ -916,7 +916,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $spis_new = array(
                         'nazev' => $cjednaci->cislo_jednaci,
                         'popis' => "",
-                        'spousteci_udalost_id' => 3,
+                        /*'spousteci_udalost_id' => 3,*/
                         'skartacni_znak' => 'S',                            
                         'skartacni_lhuta' => '10',                          
                         'typ' => 'S',
@@ -1521,7 +1521,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
                 // Vytvoreni spisu noveho archu
-                if ( $this->typ_evidence == 'sberny_arch' ) {
+                if ( $this->typ_evidence == 'sberny_arch' && isset($data['cislo_jednaci']) ) {
 
                     $Spis = new Spis();
                     $spis = $Spis->getInfo($data['cislo_jednaci']);
