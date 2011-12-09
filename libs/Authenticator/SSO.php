@@ -73,7 +73,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
             if ( Environment::getHttpRequest()->getCookie('s3_logout') ) {
                 unset($_SESSION['s3_auth_remoteuser']);
                 Environment::getHttpResponse()->setCookie('s3_logout', null, time());
-                header("Location: ". Environment::getVariable('klientUri',Environment::getVariable('baseUri')) ."auth/logout.php" ,302 );
+                header("Location: ". Environment::getVariable('baseUri') ."auth/logout.php" ,302 );
                 exit;
             }            
             
@@ -106,7 +106,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
                     exit;
                 } else { 
                     // SSO OK, přesměruju na SSO login
-                    header("Location: ". Environment::getVariable('klientUri',Environment::getVariable('baseUri')) ."auth",302 );                
+                    header("Location: ". Environment::getVariable('baseUri') ."auth",302 );                
                     exit;
                 }  
                 

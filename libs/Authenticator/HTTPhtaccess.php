@@ -76,7 +76,7 @@ class Authenticator_HTTPhtaccess extends Control implements IAuthenticator
             if ( Environment::getHttpRequest()->getCookie('s3_logout') ) {
                 unset($_SERVER['PHP_AUTH_USER']);
                 Environment::getHttpResponse()->setCookie('s3_logout', null, time());
-                header("Location: ". Environment::getVariable('klientUri',Environment::getVariable('baseUri')) ."auth/logout.php" ,302 );
+                header("Location: ". Environment::getVariable('baseUri') ."auth/logout.php" ,302 );
                 exit;
             }            
             
@@ -85,7 +85,7 @@ class Authenticator_HTTPhtaccess extends Control implements IAuthenticator
             //echo "<pre>"; print_r($_SERVER); echo "</pre>";
             
             if (!isset($_SERVER['PHP_AUTH_USER'])) {
-                header("Location: ". Environment::getVariable('klientUri',Environment::getVariable('baseUri')) ."auth",302 );                
+                header("Location: ". Environment::getVariable('baseUri') ."auth",302 );                
             } else {
                 try {
                     $user = Environment::getUser();
