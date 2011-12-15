@@ -165,6 +165,7 @@ abstract class BaseModel extends Object
         if ( isset($param['where']) ) $where = $param['where'];
         if ( isset($param['where_or']) ) $where_or = $param['where_or'];
         if ( isset($param['order']) ) $order = $param['order'];
+        if ( isset($param['order_sql']) ) $order_sql = $param['order_sql'];
         if ( isset($param['offset']) ) $offset = $param['offset'];
         if ( isset($param['limit']) ) $limit = $param['limit'];
         if ( isset($param['cols']) ) {
@@ -338,6 +339,9 @@ abstract class BaseModel extends Object
         }        
         if ( isset($order) ){
             array_push($query, 'ORDER BY %by', $order);
+        }
+        if ( isset($order_sql) ){
+            array_push($query, 'ORDER BY '. $order_sql);
         }
         if ( isset($limit) ){
             array_push($query, 'LIMIT %i', $limit);

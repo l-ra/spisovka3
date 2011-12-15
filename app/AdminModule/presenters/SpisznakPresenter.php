@@ -20,6 +20,17 @@ class Admin_SpisznakPresenter extends BasePresenter
         $result = $SpisovyZnak->seznam($where,5);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        
+/*        $seznam = $result->fetchAll();//($paginator->offset, $paginator->itemsPerPage);
+        //natsort($seznam);
+        echo "<pre>";
+        //print_r($seznam);
+        foreach ( $seznam as $s ) {
+            echo $s->nazev ."\n";
+        }
+        echo "</pre>";
+        exit;
+*/        
         $this->template->seznam = $seznam;
 
     }
@@ -152,6 +163,8 @@ class Admin_SpisznakPresenter extends BasePresenter
                 ->setValue(@$spisznak->parent_id);
         $form1->addHidden('parent_id_old')
                 ->setValue(@$spisznak->parent_id);
+        $form1->addSelect('selected', 'Možnost vybrat:', array("1"=>"ano","0"=>"ne"))
+                ->setValue(@$spisznak->selected);        
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
                 ->setValue(@$spisznak->stav);
 
@@ -226,6 +239,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $form1->addText('skartacni_lhuta', 'Skartační lhůta:', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
         $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
+        $form1->addSelect('selected', 'Možnost vybrat:', array("1"=>"ano","0"=>"ne"));
         $form1->addSubmit('vytvorit', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
         $form1->addSubmit('vytvorit_a_novy', 'Vytvořit spisový znak a založit nový')

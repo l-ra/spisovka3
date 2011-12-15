@@ -1728,7 +1728,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 1);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spisznak_seznam = $SpisovyZnak->select("2x");
         $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null, 1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 

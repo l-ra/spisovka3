@@ -35,6 +35,32 @@ class SpisovyZnak extends TreeModel
         //$result = $this->nacti($spisznak_parent, true, true, $args );
     }
 
+    public function seznamNativ($args = null, $select = 0, $spisznak_parent = null )
+    {
+
+        $sql = array(
+            'from' => array($this->name => 'tb'),
+            'cols' => array('*'),
+        );
+        //$sql['order_sql'] = "LENGTH(tb.nazev), tb.nazev";
+        //$sql['order'] = array('tb.nazev');
+        
+        if ( isset($args['where']) ) { 
+            if ( isset($sql['where']) ) {
+                $sql['where'] = array_merge($sql['where'],$args['where']);     
+            } else {
+                $sql['where'] = $args['where']; 
+            }
+        }        
+        
+        $result = $this->fetchAllComplet($sql);
+        if ( $select > 0 ) {
+            return $result;
+        } else {
+            $rows = $result->fetchAll();
+            return ($rows) ? $rows : NULL;
+        }
+    }    
 
     public function getInfo($spisznak_id)
     {
@@ -71,8 +97,10 @@ class SpisovyZnak extends TreeModel
         if ( empty($data['parent_id']) ) $data['parent_id'] = null;
 
         if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
+        if ( empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = null;
         if ( !empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
         if ( !empty($data['stav']) ) $data['stav'] = (int) $data['stav'];
+        if ( !empty($data['selected']) ) $data['selected'] = (int) $data['selected'];
         
         $spisznak_id = $this->vlozitH($data);
         return $spisznak_id;
@@ -90,8 +118,10 @@ class SpisovyZnak extends TreeModel
         if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = null;
 
         if ( !empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
+        if ( empty($data['skartacni_lhuta']) ) $data['skartacni_lhuta'] = null;
         if ( !empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
         if ( !empty($data['stav']) ) $data['stav'] = (int) $data['stav'];
+        if ( !empty($data['selected']) ) $data['selected'] = (int) $data['selected'];
         
         //Debug::dump($data); exit;
         
