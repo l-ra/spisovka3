@@ -36,11 +36,13 @@
             {elseif $sl=='pocet_nelistu'}
                 {=count($dok->prilohy)}
             {elseif $sl=='vyridil'}
-                {if empty($dok->prideleno->prideleno_jmeno)}
-            &nbsp;
+                {if empty($dok->prideleno->prideleno_id) }
+            {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
                 {else}
             {$dok->prideleno->prideleno_jmeno}
-                {/if}
+            <br />
+            {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+                {/if}            
             {elseif $sl=='datum_odeslani'}
                 {if count($dok->odeslani)}
                 <?php 

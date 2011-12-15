@@ -130,7 +130,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 'pocet_priloh'=>'Počet příloh',
                 'pocet_nelistu'=>'Počet nelistů',
                 'nazev'=>'Věc',
-                'vyridil'=>'Vyřídil',
+                'vyridil'=>'Přiděleno / Vyřídil',
                 'zpusob_vyrizeni'=>'Způsob vyřízení',
                 'datum_odeslani'=>'Datum odeslání',
                 'spisovy_znak'=>'Spis. znak',

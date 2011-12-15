@@ -282,7 +282,7 @@ class Spis extends TreeModel
         $data['user_modified'] = Environment::getUser()->getIdentity()->id;
         
         $UserModel = new UserModel();
-        $org_info = $UserModel->getOrg($user->id);
+        $org_info = $UserModel->getOrg(Environment::getUser()->getIdentity()->id);
         if ( is_array($org_info) ) {
             $org_info = current($org_info);
         }        

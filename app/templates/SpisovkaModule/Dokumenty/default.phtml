@@ -48,7 +48,7 @@
             <th class="prijato">Přijato</th>
             <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
-            <th class="prideleno">Přiděleno</th>
+            <th class="prideleno">Přiděleno / Vyřídil<br />> Předáno</th>
             <th class="stav">Stav</th>
         </tr>
         {foreach $seznam as $dok}
@@ -124,6 +124,15 @@
                 <br />
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             {/if}
+                <br />
+            {if empty($dok->predano->prideleno_id) }
+                > {$dok->predano->orgjednotka_info->zkraceny_nazev}
+            {else}
+                > {$dok->predano->prideleno_jmeno}
+                <br />
+                > {=@$dok->predano->orgjednotka_info->zkraceny_nazev}
+            {/if}
+            
             </td>
             <td class="stav {if $dok->lhuta_stav==2}stav_red{elseif $dok->lhuta_stav==1}stav_yellow{else}stav{/if}">
                 předáno
