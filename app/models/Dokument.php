@@ -564,11 +564,11 @@ class Dokument extends BaseModel
 
                 if ( $params['stav_dokumentu'] == 4 ) {
                     // vyrizene - 4,5,6
-                    $args['where'][] = array('wf.stav_dokumentu IN (4,5,6) AND wf.aktivni=1');
+                    $args['where'][] = array('wf.stav_dokumentu IN (4,5,6) AND wf.aktivni=1 AND wf.stav_osoby=1');
                 } else if ( $params['stav_dokumentu'] == 77 ) {
-                    $args['where'][] = array('wf.stav_dokumentu IN (6,7,8) AND wf.aktivni=1');
+                    $args['where'][] = array('wf.stav_dokumentu IN (6,7,8) AND wf.aktivni=1 AND wf.stav_osoby=1');
                 } else {
-                    $args['where'][] = array('wf.stav_dokumentu = %i AND wf.aktivni=1',$params['stav_dokumentu']);
+                    $args['where'][] = array('wf.stav_dokumentu = %i AND wf.aktivni=1 AND wf.stav_osoby=1',$params['stav_dokumentu']);
                 }
                 
             }
@@ -1641,11 +1641,11 @@ class Dokument extends BaseModel
             
             $where_org = null;
             if ( count($org_jednotka_vedouci) > 0 ) {
-                $where_org = array( 'wf.orgjednotka_id IN (%in) AND wf.aktivni=1',$org_jednotka_vedouci );
+                $where_org = array( 'wf.orgjednotka_id IN (%in) AND wf.aktivni=1 AND wf.stav_osoby=1',$org_jednotka_vedouci );
             } else if ( count($org_jednotka) == 1 ) {
-                $where_org = array( 'wf.orgjednotka_id=%i AND wf.aktivni=1',$org_jednotka[0] );
+                $where_org = array( 'wf.orgjednotka_id=%i AND wf.aktivni=1 AND wf.stav_osoby=1',$org_jednotka[0] );
             } else if ( count($org_jednotka) > 1 ) {
-                $where_org = array( 'wf.orgjednotka_id IN (%in)',$org_jednotka );
+                $where_org = array( 'wf.orgjednotka_id IN (%in) AND wf.aktivni=1 AND wf.stav_osoby=1',$org_jednotka );
             }
             
             //if ( count($where_org)>0 ) {
