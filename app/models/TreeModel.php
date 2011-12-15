@@ -165,10 +165,12 @@ class TreeModel extends BaseModel
             // 2. update tree
             $parent_id = $data['parent_id'];
             $data_tree = array();
+            $sekvence_string = isset($data['sekvence_string'])?$data['sekvence_string']:$data[$this->nazev_sekvence];
+            unset($data['sekvence_string']);
             if ( empty($parent_id) || $parent_id == 0 ) {
                 // is root node
                 $data_tree['sekvence'] = $id;
-                $data_tree['sekvence_string'] = $data[$this->nazev_sekvence] .'.'. $id;
+                $data_tree['sekvence_string'] = $sekvence_string .'.'. $id;
                 $data_tree['uroven'] = 0;
             } else {
                 // is subnode
@@ -180,7 +182,7 @@ class TreeModel extends BaseModel
                 }
 
                 $data_tree['sekvence'] = $parent->sekvence .'.'. $id;
-                $data_tree['sekvence_string'] = $parent->sekvence_string .'#'. $data[$this->nazev_sekvence] .'.'. $id;
+                $data_tree['sekvence_string'] = $parent->sekvence_string .'#'. $sekvence_string .'.'. $id;
                 $data_tree['uroven'] = $parent->uroven + 1;
             }
             $this->update($data_tree, array( array('id=%i',$id)));
@@ -208,6 +210,22 @@ class TreeModel extends BaseModel
         try {
 
             $info = $this->fetchRow(array('id=%i',$id))->fetch();
+            
+            if ( isset($data['spisovy_znak_format']) ) {
+                $part = explode(".",$info->{$this->nazev_sekvence});
+                if ( count($part)>0 ) {
+                    foreach($part as $pi => $pn) {
+                        if (is_numeric($pn) ) {
+                            $part[$pi] = sprintf("%04d",$pn);
+                        }
+                    }
+                }
+                
+                $info_nazev_sekvence = implode(".",$part);
+                unset($data['spisovy_znak_format']);
+            } else {
+                $info_nazev_sekvence = $info->{$this->nazev_sekvence};
+            }
 
             if ( isset($data['parent_id_old']) || is_null($data['parent_id_old']) ) {
                 $parent_id_old = $data['parent_id_old'];
@@ -227,6 +245,9 @@ class TreeModel extends BaseModel
             }
 
             $data_tree = array();
+            $sekvence_string = isset($data['sekvence_string'])?$data['sekvence_string']:$data[$this->nazev_sekvence];
+            unset($data['sekvence_string']);
+            
             if ( empty($parent_id) || $parent_id == 0 ) {
                 // is root node
 
@@ -238,19 +259,19 @@ class TreeModel extends BaseModel
                 }
 
                 $data_tree['sekvence'] = $id;
-                $data_tree['sekvence_string'] = $data[$this->nazev_sekvence] .'.'. $id;
+                $data_tree['sekvence_string'] = $sekvence_string .'.'. $id;
                 $data_tree['uroven'] = 0;
                 $this->update($data_tree, array( array('id=%i',$id)));
 
                 // change child nodes
                 $data_node = array();
                 $data_node['sekvence%sql'] = "REPLACE(sekvence,'". $parent_old->sekvence .'.'. $id ."','". $id ."')";
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $parent_old->sekvence_string ."#". $info->{$this->nazev_sekvence} .".". $id ."','". $data[$this->nazev_sekvence] .".". $id ."')";
+                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $parent_old->sekvence_string ."#". $info_nazev_sekvence .".". $id ."','". $sekvence_string .".". $id ."')";
                 $rozdil = $info->uroven - $data_tree['uroven'];
                 $data_node['uroven%sql'] = "uroven - (".$rozdil.")";//. $parent_new->uroven + 1;
 
                 $this->update($data_node, array( array("sekvence LIKE %s", $parent_old->sekvence .'.'. $id .".%" ) ));
-
+                
             } else if ( $parent_id != $parent_id_old && empty($parent_id_old) ) {
                 // change parent from root
                 $parent_new = $this->fetchRow(array('id=%i',$parent_id))->fetch();
@@ -261,18 +282,18 @@ class TreeModel extends BaseModel
                 }
 
                 $data_tree['sekvence'] = $parent_new->sekvence .'.'. $id;
-                $data_tree['sekvence_string'] = $parent_new->sekvence_string .'#'. $data[$this->nazev_sekvence] .'.'. $id;
+                $data_tree['sekvence_string'] = $parent_new->sekvence_string .'#'. $sekvence_string .'.'. $id;
                 $data_tree['uroven'] = $parent_new->uroven + 1;
                 $this->update($data_tree, array( array('id=%i',$id)));
 
                 // change child nodes
                 $data_node = array();
                 $data_node['sekvence%sql'] = "REPLACE(sekvence,'". $id ."','". $parent_new->sekvence .'.'. $id ."')";
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info->{$this->nazev_sekvence} .".". $id ."','". $parent_new->sekvence_string ."#". $data[$this->nazev_sekvence] .".". $id ."')";
+                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info_nazev_sekvence .".". $id ."','". $parent_new->sekvence_string ."#". $sekvence_string .".". $id ."')";
                 $rozdil = $info->uroven - $data_tree['uroven'];
                 $data_node['uroven%sql'] = "uroven - (".$rozdil.")";//. $parent_new->uroven + 1;
                 $this->update($data_node, array( array("sekvence LIKE %s", $id .".%") ));
-
+                
             } else if ( $parent_id != $parent_id_old ) {
                 // change parent
                 $parent_old = $this->fetchRow(array('id=%i',$parent_id_old))->fetch();
@@ -284,25 +305,25 @@ class TreeModel extends BaseModel
                 }
 
                 $data_tree['sekvence'] = $parent_new->sekvence .'.'. $id;
-                $data_tree['sekvence_string'] = $parent_new->sekvence_string .'#'. $data[$this->nazev_sekvence] .'.'. $id;
+                $data_tree['sekvence_string'] = $parent_new->sekvence_string .'#'. $sekvence_string .'.'. $id;
                 $data_tree['uroven'] = $parent_new->uroven + 1;
                 $this->update($data_tree, array( array('id=%i',$id)));
 
                 // change child nodes
                 $data_node = array();
                 $data_node['sekvence%sql'] = "REPLACE(sekvence,'". $parent_old->sekvence .'.'. $id ."','". $parent_new->sekvence .'.'. $id ."')";
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $parent_old->sekvence_string ."#". $info->{$this->nazev_sekvence} .".". $id ."','". $parent_new->sekvence_string ."#". $data[$this->nazev_sekvence] .".". $id ."')";
+                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $parent_old->sekvence_string ."#". $info_nazev_sekvence .".". $id ."','". $parent_new->sekvence_string ."#". $sekvence_string .".". $id ."')";
                 $rozdil = $info->uroven - $data_tree['uroven'];
                 $data_node['uroven%sql'] = "uroven - (".$rozdil.")";//. $parent_new->uroven + 1;
                 $this->update($data_node, array( array("sekvence LIKE %s", $parent_old->sekvence .'.'. $id .".%") ));
-
+                
             } else {
                 // nochange parent
             
                 $data_node = array();
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info->{$this->nazev_sekvence} .".". $info->id ."','". $data[$this->nazev_sekvence] .".". $info->id ."')";
-                $this->update($data_node, array( array("sekvence_string LIKE %s","%". $info->{$this->nazev_sekvence} .".". $info->id ."%") ));
-            
+                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info_nazev_sekvence .".". $info->id ."','". $sekvence_string .".". $info->id ."')";
+                
+                $this->update($data_node, array( array("sekvence_string LIKE %s","%". $info_nazev_sekvence .".". $info->id ."%") ));
             }
 
             dibi::commit();

@@ -102,6 +102,16 @@ class SpisovyZnak extends TreeModel
         if ( !empty($data['stav']) ) $data['stav'] = (int) $data['stav'];
         if ( !empty($data['selected']) ) $data['selected'] = (int) $data['selected'];
         
+        $part = explode(".",$data['nazev']);
+        if ( count($part)>0 ) {
+            foreach ($part as $pi=>$pn) {
+                if ( is_numeric($pn) ) {
+                    $part[$pi] = sprintf("%04d",$pn);
+                }
+            }
+        }
+        $data['sekvence_string'] = implode(".",$part);
+        
         $spisznak_id = $this->vlozitH($data);
         return $spisznak_id;
     }
@@ -122,6 +132,17 @@ class SpisovyZnak extends TreeModel
         if ( !empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
         if ( !empty($data['stav']) ) $data['stav'] = (int) $data['stav'];
         if ( !empty($data['selected']) ) $data['selected'] = (int) $data['selected'];
+
+        $part = explode(".",$data['nazev']);
+        if ( count($part)>0 ) {
+            foreach ($part as $pi=>$pn) {
+                if ( is_numeric($pn) ) {
+                    $part[$pi] = sprintf("%04d",$pn);
+                }
+            }
+        }
+        $data['spisovy_znak_format'] = 1;
+        $data['sekvence_string'] = implode(".",$part);        
         
         //Debug::dump($data); exit;
         
