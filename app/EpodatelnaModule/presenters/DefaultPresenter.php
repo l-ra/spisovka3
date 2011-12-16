@@ -318,6 +318,14 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 // zrejme odchozi zprava ven
             }
 
+            if ( !empty($zprava->dokument_id) ) {
+                $Dokument = new Dokument();
+                $this->template->Dokument = $Dokument->getInfo($zprava->dokument_id);
+            } else {
+                $this->template->Dokument = null;
+            }
+            
+            
             // Volba vystupu - web/tisk/pdf
             $tisk = $this->getParam('print');
             $pdf = $this->getParam('pdfprint');

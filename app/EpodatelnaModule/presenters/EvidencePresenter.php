@@ -284,7 +284,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                         try {
                             $cislo = $this->vytvorit($evidence);
-                            echo '<div class="evidence_report">Zpráva byla zaevidována ve spisové službě pod číslem "'.$cislo.'".</div>';
+                            echo '<div class="evidence_report">Zpráva byla zaevidována ve spisové službě pod číslem "<a href="'. $this->link(':Spisovka:Dokumenty:detail', array("id"=>$cislo['id'])) .'" target="_blank">'.$cislo['jid'].'</a>".</div>';
                         } catch (Exception $e) {
                             echo '###Zprávu číslo '.$id.' se nepodařilo zaevidovat do spisové služby.';
                             echo ' CHYBA: '. $e->getMessage();
@@ -720,7 +720,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     EmailAvizo::epodatelna_zaevidovana($zprava->odesilatel,$email_info);
                 }
                 
-                return $data_after['jid'];
+                return array('jid' => $data_after['jid'] , 'id' => $dokument_id );
 
             } else {
                 throw new Exception('Dokument se nepodařilo vytvořit!');
