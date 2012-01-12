@@ -23,13 +23,10 @@ abstract class BasePresenter extends Presenter
                 }
                 if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
                     $backlink = $this->getApplication()->storeRequest();
-                    $this->redirect(':Spisovka:Uzivatel:login', array('backlink' => $backlink));
+                    $asession = $this->getParam('_backlink');
+                    $this->redirect(':Spisovka:Uzivatel:login', array('backlink' => $backlink, '_asession'=>$asession));
                 }
-            //} else if ( $user->getIdentity()->klient != KLIENT ) {
-            //    if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
-            //        $backlink = $this->getApplication()->storeRequest();
-            //        $this->redirect(':Spisovka:Uzivatel:login', array('backlink' => $backlink));
-            //    }
+
             } else {
 
                 $Acl = Acl::getInstance();

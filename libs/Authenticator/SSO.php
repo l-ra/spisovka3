@@ -81,7 +81,28 @@ class Authenticator_SSO extends Control implements IAuthenticator
             //echo "<pre>"; print_r($headers); echo "</pre>"; exit;
             //echo "<pre>"; print_r($_SERVER); echo "</pre>";
             
-            if ( isset($_SESSION['s3_auth_remoteuser']) ) {
+            // SESSION fix
+            $uuid = Environment::getHttpRequest()->getQuery('_asession');
+            //echo "<pre>dd: "; print_r($uuid); echo "</pre>"; exit;
+            $aSESSION_raw = file_get_contents(APP_DIR ."/../log/asession_".$uuid);
+            $is_logged = false;
+            if ( !empty($aSESSION_raw) ) {
+                $aSESSION = unserialize($aSESSION_raw);
+                if (is_array($aSESSION) ) {
+                    if ( @$aSESSION['time'] >= (time()-300) ) {
+                        if ( @$aSESSION['user_agent'] == $_SERVER['HTTP_USER_AGENT'] && @$aSESSION['ip'] == $_SERVER['REMOTE_ADDR'] ) {
+                            if ( @$aSESSION['is_logged'] == true ) {
+                                $is_logged = true;
+                                $_SESSION['s3_auth_remoteuser'] = $aSESSION['s3_auth_remoteuser'];
+                                @unlink(APP_DIR ."/../log/asession_".$uuid);
+                            }
+                        }
+                    }
+                }
+            }            
+            
+            
+            if ( $_SESSION['s3_auth_remoteuser'] ) {
                 
                 try {
                     $user = Environment::getUser();

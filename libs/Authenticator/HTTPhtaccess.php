@@ -82,7 +82,9 @@ class Authenticator_HTTPhtaccess extends Control implements IAuthenticator
             
             //$headers = apache_request_headers();
             //echo "<pre>"; print_r($headers); echo "</pre>"; exit;
-            //echo "<pre>"; print_r($_SERVER); echo "</pre>";
+            //echo "<pre style='text-align:left;'>"; print_r($_SERVER); echo "</pre>";
+            //echo "<pre style='text-align:left;'>"; print_r($_GET); echo "</pre>";
+            //echo "<pre style='text-align:left;'>"; print_r($_REQUEST); echo "</pre>";
             
             if (!isset($_SERVER['PHP_AUTH_USER'])) {
                 header("Location: ". Environment::getVariable('baseUri') ."auth",302 );                
