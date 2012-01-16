@@ -108,6 +108,27 @@ body {
 
 
 /* ***************************************************************** */
+/* *** USER SYNCH *** */
+
+#synch_table {
+    border-collapse: collapse;
+}
+
+.synch_input {
+    /*border: 0px;*/
+}
+
+
+#hromadna_akce {
+    position: relative;
+    padding: 10px 10px;
+    margin: 0px; margin-bottom: 10px;
+    background-color: #681203;
+    color: #ffffff;
+}
+
+
+/* ***************************************************************** */
 /* *** BOTTOM LAYOUT *** */
 #layout_bottom {
     margin: 0px;
