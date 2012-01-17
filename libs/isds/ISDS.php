@@ -1628,6 +1628,12 @@ class ISDS {
                 //$tmp_file .= var_export($this->debug_log, true);
 
                 foreach ( $this->debug_log as $log ) {
+            	    // P.L. 2011-12-05  oprava fatal error pri pouziti var_export
+            	    $val = '';
+            	    ob_start();
+            	    var_dump($log['value']);
+            	    $val = ob_get_contents();
+                   ob_end_clean();
 
                     if ( $log['type'] == 1 ) {
 
@@ -1635,16 +1641,16 @@ class ISDS {
 
                     } else if ( $log['type'] == 2 ) {
 
-                        $tmp_file .= ">>> ". $log['message'] ." = ". var_export($log['value'],true) ."\n";
+                        $tmp_file .= ">>> ". $log['message'] ." = $val\n";
 
                     } else if ( $log['type'] == 3 ) {
 
-                        $tmp_file .= "<<< ". $log['message'] ." = ". var_export($log['value'],true) ."\n";
+                        $tmp_file .= "<<< ". $log['message'] ." = $val\n";
 
                     } else {
 
                         if ( !empty( $log['value'] ) ) {
-                            $tmp_file .= "    ". $log['message'] ." = ". var_export($log['value'],true) ."\n";
+                            $tmp_file .= "    ". $log['message'] ." = $val\n";
                         } else {
                             $tmp_file .= "    ". $log['message'] ."\n";
                         }
