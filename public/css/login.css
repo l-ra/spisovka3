@@ -22,3 +22,12 @@
     padding: 5px 5px;
     border: 0px;
 }
+
+#login_error {
+    border: 1px #880000 solid;
+    background-color: #ffcccc;
+    padding: 10px;
+    line-height: 20px;
+    color: #880000;
+    margin: 30px;
+}

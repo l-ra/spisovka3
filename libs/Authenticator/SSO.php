@@ -25,7 +25,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
 
         // vstupy
         $username = $credentials[self::USERNAME];
-        //$password = sha1( $credentials[self::USERNAME] . $credentials[self::PASSWORD] );
+        $password = sha1( $credentials[self::USERNAME] . $credentials[self::PASSWORD] );
         // u SSO se heslo neoveruje. Ten se overil pri overeni, zde jen zkontrolujeme usera
 
         // Vyhledani uzivatele
@@ -40,8 +40,20 @@ class Authenticator_SSO extends Control implements IAuthenticator
             throw new AuthenticationException("Uživatel '$username' nenalezen.", self::IDENTITY_NOT_FOUND);
         }
 
-        $user->zalogovan($row->id);
-        $log->logAccess($row->id, 1);
+        if ( $credentials['extra'] == 1 ) {
+            // Alternativni prihlaseni klasickym zpusobem - overeni hesla
+            if ($row->password !== $password) {
+                $log->logAccess($row->id, 0);
+                throw new AuthenticationException("Neplatné heslo.", self::INVALID_CREDENTIAL);
+            } else {
+                $user->zalogovan($row->id);
+                $log->logAccess($row->id, 1);
+            }   
+        } else {
+            // SSO prihlaseni - heslo se neoveruje
+            $user->zalogovan($row->id);
+            $log->logAccess($row->id, 1);
+        }
 
         // Odstraneni hesla ve vypisu
         unset($row->password);
@@ -186,16 +198,21 @@ class Authenticator_SSO extends Control implements IAuthenticator
                 $access[0] = $ldap_params->ldap;
             }
             
-            $seznam = array();
+            $seznam = array(); $spojeno = 0;
             foreach ( $access as $params ) {
                 if ( $this->ldap_connect($params) ) {
                     $seznam = $this->ldap_getAllUser();
                     //$seznam = array_merge($seznam, $seznam_in);
                     $this->ldap_close();
+                    $spojeno++;
                     break;
                 }
             }
-            return $seznam;
+            if ( $spojeno == 0 ) {
+                return "Nepodařilo se spojit s žádným LDAP serverem!";
+            } else {
+                return $seznam;
+            }
 
         } catch (Exception $e) {
             return $e->getMessage();
@@ -286,7 +303,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
             // SESSION fix
             $uuid = Environment::getHttpRequest()->getQuery('_asession');
             //echo "<pre>dd: "; print_r($uuid); echo "</pre>"; exit;
-            $aSESSION_raw = file_get_contents(APP_DIR ."/../log/asession_".$uuid);
+            $aSESSION_raw = @file_get_contents(APP_DIR ."/../log/asession_".$uuid);
             $is_logged = false;
             if ( !empty($aSESSION_raw) ) {
                 $aSESSION = unserialize($aSESSION_raw);
@@ -304,7 +321,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
             }            
             
             
-            if ( $_SESSION['s3_auth_remoteuser'] ) {
+            if ( @$_SESSION['s3_auth_remoteuser'] ) {
                 
                 try {
                     $user = Environment::getUser();
@@ -325,8 +342,11 @@ class Authenticator_SSO extends Control implements IAuthenticator
                     header("HTTP/1.1 401 Authorization Required");
                     header("WWW-Authenticate: Negotiate");
                     // SSO není podporováno, zobrazím standardní login či informace
-                    echo "SSO autentizace neprobehla.";
-                    exit;
+                    //echo "SSO autentizace neprobehla.";
+                    $this->template->alter_login = "SSO přihlášení selhalo nebo nebylo provedeno!<br />Zkuste to znovu. Pokud se situace opakuje, kontaktujte svého správce.<br />Následující přihlašovací formulář slouží pouze pro alternativní přihlášení.";
+                    $this->template->setFile(dirname(__FILE__) . '/auth_login.phtml');
+                    $this->template->render();                    
+                    //exit;
                 } else { 
                     // SSO OK, přesměruju na SSO login
                     header("Location: ". Environment::getVariable('baseUri') ."auth",302 );                
@@ -380,7 +400,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
 
         $form->addSubmit('login', 'Přihlásit');
         $form->onSubmit[] = array($this, 'formSubmitHandler');
-        $form->addProtection('Prosím přihlašte se znovu.');
+        //$form->addProtection('Prosím přihlašte se znovu.');
 
         return $form;
 
@@ -714,7 +734,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
         try {
             $user = Environment::getUser();
             $user->setNamespace(KLIENT);
-            $user->authenticate($data['username'], $data['password']);
+            $user->authenticate($data['username'], $data['password'], 1);
             $this->presenter->redirect(':Spisovka:Default:default');
         } catch (AuthenticationException $e) {
             $this->presenter->flashMessage($e->getMessage(), 'warning');
