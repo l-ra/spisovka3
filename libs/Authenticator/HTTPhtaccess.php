@@ -82,7 +82,7 @@ class Authenticator_HTTPhtaccess extends Control implements IAuthenticator
 
             if ( Environment::getHttpRequest()->getQuery('alternativelogin') ) {
                 $base_url = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
-                $this->template->alter_login = "SSO přihlášení selhalo nebo nebylo provedeno!<br />Zkuste znovu použít následující odkaz <a href='". $base_url ."'>Zkusit znovu přihlášení přes SSO</a>.<br /> Pokud se situace opakuje, kontaktujte svého správce.<br />Následující přihlašovací formulář slouží pouze pro alternativní přihlášení.";
+                $this->template->alter_login = "HTTP přihlášení selhalo nebo nebylo provedeno!<br />Zkuste znovu použít následující odkaz <a href='". $base_url ."'>Zkusit znovu přihlášení přes HTTP</a>.<br /> Pokud se situace opakuje, kontaktujte svého správce.<br />Následující přihlašovací formulář slouží pouze pro alternativní přihlášení.";
                 $this->template->setFile(dirname(__FILE__) . '/auth_login.phtml');
                 $this->template->render();                 
             } else if (!isset($_SERVER['PHP_AUTH_USER'])) {
