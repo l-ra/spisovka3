@@ -24,7 +24,8 @@ abstract class BasePresenter extends Presenter
                 if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
                     $backlink = $this->getApplication()->storeRequest();
                     $asession = $this->getParam('_backlink');
-                    $this->redirect(':Spisovka:Uzivatel:login', array('backlink' => $backlink, '_asession'=>$asession));
+                    $alterantive = $this->getParam('alternativelogin');
+                    $this->redirect(':Spisovka:Uzivatel:login', array('backlink' => $backlink, '_asession'=>$asession, 'alternativelogin'=>$alterantive));
                 }
 
             } else {

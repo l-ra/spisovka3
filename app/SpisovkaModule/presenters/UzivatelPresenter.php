@@ -17,7 +17,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->template->title = "Přihlásit se";
     }
 
-
     public function renderLogout()
     {
         $user = Environment::getUser()->getIdentity()->username;

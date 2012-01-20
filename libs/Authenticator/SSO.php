@@ -251,12 +251,15 @@ class Authenticator_SSO extends Control implements IAuthenticator
         for($i = 0; $i < $info["count"]; $i++) {
             
             $user[$i]["server"] = $this->server;
-            $user[$i]["dn"] = isset($info[$i]["dn"][0])?$info[$i]["dn"][0]:"";
-            $user[$i]["plne_jmeno"] = isset($info[$i]["cn"][0])?$info[$i]["cn"][0]:"";
-            $user[$i]["uid"] = isset($info[$i]["uid"][0])?$info[$i]["uid"][0]:"";
+            $user[$i]["dn"] = isset($info[$i]["distinguishedname"][0])?$info[$i]["distinguishedname"][0]:"";
+            $user[$i]["plne_jmeno"] = isset($info[$i]["displayname"][0])?$info[$i]["displayname"][0]:"";
+            $user[$i]["uid"] = isset($info[$i]["samaccountname"][0])?$info[$i]["samaccountname"][0]:"";
             $user[$i]["jmeno"] = isset($info[$i]["givenname"][0])?$info[$i]["givenname"][0]:"";
             $user[$i]["prijmeni"] = isset($info[$i]["sn"][0])?$info[$i]["sn"][0]:$user[$i]["plne_jmeno"];
+            $user[$i]["funkce"] = isset($info[$i]["company"][0])?$info[$i]["company"][0]:"";
             $user[$i]["email"] = isset($info[$i]["mail"][0])?$info[$i]["mail"][0]:"";
+            $user[$i]["telefon"] = isset($info[$i]["telephonenumber"][0])?$info[$i]["telephonenumber"][0]:"";
+
 
             foreach ($info[$i] as $key => $value) {
                 if ( is_numeric($key) ) continue;
@@ -334,24 +337,30 @@ class Authenticator_SSO extends Control implements IAuthenticator
                     $this->template->render();
                     //header("Location: ". Environment::getVariable('klientUri',Environment::getVariable('baseUri')) ."auth" ,302 );                
                 }                
+            } else if ( Environment::getHttpRequest()->getQuery('alternativelogin') ) {
+                $base_url = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
+                $this->template->alter_login = "SSO přihlášení selhalo nebo nebylo provedeno!<br />Zkuste znovu použít následující odkaz <a href='". $base_url ."'>Zkusit znovu přihlášení přes SSO</a>.<br /> Pokud se situace opakuje, kontaktujte svého správce.<br />Následující přihlašovací formulář slouží pouze pro alternativní přihlášení.";
+                $this->template->setFile(dirname(__FILE__) . '/auth_login.phtml');
+                $this->template->render();                 
                 
             } else {
             
-                $headers = apache_request_headers();
-                if(empty($headers['Authorization'])) {
-                    header("HTTP/1.1 401 Authorization Required");
-                    header("WWW-Authenticate: Negotiate");
+                // - vyrazeni Negotiate - provadi dvojite prihlaseni, ktere muze byt matouci
+                //$headers = apache_request_headers();
+                //if(empty($headers['Authorization'])) {
+                //    header("HTTP/1.1 401 Authorization Required");
+                //    header("WWW-Authenticate: Negotiate");
                     // SSO není podporováno, zobrazím standardní login či informace
                     //echo "SSO autentizace neprobehla.";
-                    $this->template->alter_login = "SSO přihlášení selhalo nebo nebylo provedeno!<br />Zkuste to znovu. Pokud se situace opakuje, kontaktujte svého správce.<br />Následující přihlašovací formulář slouží pouze pro alternativní přihlášení.";
-                    $this->template->setFile(dirname(__FILE__) . '/auth_login.phtml');
-                    $this->template->render();                    
+                //    $this->template->alter_login = "SSO přihlášení selhalo nebo nebylo provedeno!<br />Zkuste to znovu. Pokud se situace opakuje, kontaktujte svého správce.<br />Následující přihlašovací formulář slouží pouze pro alternativní přihlášení.";
+                //    $this->template->setFile(dirname(__FILE__) . '/auth_login.phtml');
+                //    $this->template->render();                    
                     //exit;
-                } else { 
+                //} else { 
                     // SSO OK, přesměruju na SSO login
                     header("Location: ". Environment::getVariable('baseUri') ."auth",302 );                
                     exit;
-                }  
+                //}  
                 
             }
             
@@ -650,7 +659,9 @@ class Authenticator_SSO extends Control implements IAuthenticator
             echo "    <th>Role</th>\n";
             echo "    <th>Příjmení</th>\n";
             echo "    <th>Jméno</th>\n";
+            echo "    <th>Funkce</th>\n";
             echo "    <th>Email</th>\n";
+            echo "    <th>Telefon</th>\n";
             echo "  </tr>\n";
             foreach ($seznam as $id => $user) {
                 if ( !isset($user_seznam[ $user['uid'] ])  ) {
@@ -661,7 +672,9 @@ class Authenticator_SSO extends Control implements IAuthenticator
                     echo "    <td>". $this->mySelect("usersynch_role[".$id."]", $role_seznam, 2) ."</td>\n";
                     echo "    <td><input class='synch_input' type='text' name='usersynch_prijmeni[".$id."]' value='". $user['prijmeni'] ."' /></td>\n";
                     echo "    <td><input class='synch_input' type='text' name='usersynch_jmeno[".$id."]' value='". $user['jmeno'] ."' /></td>\n";
+                    echo "    <td><input class='synch_input' type='text' name='usersynch_funkce[".$id."]' value='". $user['funkce'] ."' /></td>\n";
                     echo "    <td><input class='synch_input' type='text' name='usersynch_email[".$id."]' value='". $user['email'] ."' /></td>\n";
+                    echo "    <td><input class='synch_input' type='text' name='usersynch_telefon[".$id."]' value='". $user['telefon'] ."' /></td>\n";
                     echo "  </tr>\n";                    
                 } else {
                     // pripojen
@@ -927,6 +940,8 @@ class Authenticator_SSO extends Control implements IAuthenticator
                         'prijmeni' => $data['usersynch_prijmeni'][$index],
                         'jmeno' => $data['usersynch_jmeno'][$index],
                         'email' => $data['usersynch_email'][$index],
+                        'telefon' => $data['usersynch_telefon'][$index],
+                        'pozice' => $data['usersynch_funkce'][$index],
                         'role' => $data['usersynch_role'][$index],
                     );
                     
@@ -942,7 +957,9 @@ class Authenticator_SSO extends Control implements IAuthenticator
                     $osoba = array(
                         'jmeno' => $user['jmeno'],
                         'prijmeni' => $user['prijmeni'],
-                        'email' => $user['email']
+                        'email' => $user['email'],
+                        'telefon' => $user['telefon'],
+                        'pozice' => $user['pozice']
                     );
                     $osoba_id = $Osoba->ulozit($osoba);
                     $User->pridatUcet($user_id, $osoba_id, $user['role']);

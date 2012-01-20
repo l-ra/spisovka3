@@ -79,15 +79,14 @@ class Authenticator_HTTPhtaccess extends Control implements IAuthenticator
                 header("Location: ". Environment::getVariable('baseUri') ."auth/logout.php" ,302 );
                 exit;
             }            
-            
-            //$headers = apache_request_headers();
-            //echo "<pre>"; print_r($headers); echo "</pre>"; exit;
-            //echo "<pre style='text-align:left;'>"; print_r($_SERVER); echo "</pre>";
-            //echo "<pre style='text-align:left;'>"; print_r($_GET); echo "</pre>";
-            //echo "<pre style='text-align:left;'>"; print_r($_REQUEST); echo "</pre>";
-            
-            if (!isset($_SERVER['PHP_AUTH_USER'])) {
-                header("Location: ". Environment::getVariable('baseUri') ."auth",302 );                
+
+            if ( Environment::getHttpRequest()->getQuery('alternativelogin') ) {
+                $base_url = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
+                $this->template->alter_login = "SSO přihlášení selhalo nebo nebylo provedeno!<br />Zkuste znovu použít následující odkaz <a href='". $base_url ."'>Zkusit znovu přihlášení přes SSO</a>.<br /> Pokud se situace opakuje, kontaktujte svého správce.<br />Následující přihlašovací formulář slouží pouze pro alternativní přihlášení.";
+                $this->template->setFile(dirname(__FILE__) . '/auth_login.phtml');
+                $this->template->render();                 
+            } else if (!isset($_SERVER['PHP_AUTH_USER'])) {
+                header("Location: ". Environment::getVariable('baseUri') ."auth/index.php",302 );                
             } else {
                 try {
                     $user = Environment::getUser();
@@ -102,7 +101,6 @@ class Authenticator_HTTPhtaccess extends Control implements IAuthenticator
                 }
                 
             }            
-            
         } else if ( $this->action == "change_password" ) {
             $this->template->setFile(dirname(__FILE__) . '/auth_change_password.phtml');
             $this->template->render();
