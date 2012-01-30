@@ -126,7 +126,7 @@ class Cert extends DERParser {
 
         if ( !empty($data[0]['data'][0]['data']) && $data[0]['data'][0]['data'] == 'signedData' ) {
 
-            if ( count($data[0]['data'][1]['data'][0]['data'][2]['data'][2]['data'])>0 ) {
+            if ( isset($data[0]['data'][1]['data'][0]['data'][2]['data'][2]['data']) && count($data[0]['data'][1]['data'][0]['data'][2]['data'][2]['data'])>0 ) {
                 $i = 0;
 
                 foreach ( $data[0]['data'][1]['data'][0]['data'][2]['data'][2]['data'] as $part ) {

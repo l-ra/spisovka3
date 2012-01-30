@@ -260,10 +260,11 @@ class esignature {
         } else {
             // email neprosel overenim
             $status = openssl_error_string();
-
             if($res == -1) {
                 // Chyba
                 if( strpos($status,"invalid mime type")!==false ) {
+                    $status = "Email není podepsán!";
+                } else if ( strpos($status,"no content type")!==false )  {
                     $status = "Email není podepsán!";
                 } else {
                     $status = "Email nelze ověřit! Email je buď poškozený nebo není kompletní nebo nelze ověřit podpis.";
@@ -284,7 +285,7 @@ class esignature {
                     $res = 0;
                 } else if( strpos($status,"certificate verify error")!==false ) {
 
-                    if ( $cert_info->error > 0 ) {
+                    if ( @$cert_info->error > 0 ) {
                         $status = "Podpis je neplatný! ". $cert_info->error_message;
                         $res = 3;
                     } else {

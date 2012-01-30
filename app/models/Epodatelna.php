@@ -134,7 +134,6 @@ class Epodatelna extends BaseModel
 
     public function identifikator($zprava, $original = null)
     {
-
         if ( empty($zprava) && empty($original) ) {
             return null;
         } else if (!empty($zprava->identifikator)) {
@@ -205,7 +204,7 @@ class Epodatelna extends BaseModel
 
             } else if ( !empty($zprava->isds_signature) ) {
 
-                if ( !empty($original) ) {
+                if ( !empty($original->dmDm->dmID) ) {
 
                 $identifikator['typ'] = "isds";
                 $identifikator['id_datove_zpravy'] = $original->dmDm->dmID;
@@ -243,7 +242,46 @@ class Epodatelna extends BaseModel
                 //$popis .= "Status: ". $original->dmMessageStatus ." - ". ISDS_Spisovka::stavZpravy($original->dmMessageStatus) ."\n";
 
                 $identifikator['popis'] = $popis;
+                
+                } else if ( !empty($original) ) {
 
+                $identifikator['typ'] = "isds";
+                $identifikator['id_datove_zpravy'] = $original->dmID;
+                $identifikator['odesilatel'] = $original->dbIDSender;
+                $identifikator['adresat'] = $original->dbIDRecipient;
+
+                $popis  = "ID datové zprávy  : ". $original->dmID ."\n";
+                $popis .= "Předmět    : ". $original->dmAnnotation ."\n";
+                $popis .= "\n";
+                $popis .= "Odesílatel : ". $original->dbIDSender ."\n";
+                $popis .= "             ". $original->dmSender ."\n";
+                $popis .= "             ". $original->dmSenderAddress ."\n";
+                $popis .= "\n";
+                $popis .= "Adresát    : ". $original->dbIDRecipient ."\n";
+                $popis .= "             ". $original->dmRecipient ."\n";
+                $popis .= "             ". $original->dmRecipientAddress ."\n";
+                $popis .= "\n";
+
+                $dt_dodani = strtotime($original->dmDeliveryTime);
+                $dt_doruceni = strtotime($original->dmAcceptanceTime);
+                $popis .= "Datum a čas dodání              : ". date("d.m.Y H:i:s",$dt_dodani) ."\n";
+                $popis .= "Datum a čas doručení            : ". date("d.m.Y H:i:s",$dt_doruceni) ."\n";
+                $popis .= "Datum a čas přijetí epodatelnou : ". date("d.m.Y H:i:s",$prijato) ."\n";
+                $popis .= "\n";
+
+                $popis .= "Číslo jednací odeslatele   : ". $original->dmSenderRefNumber ."\n";
+                $popis .= "Spisová značka odesílatele : ". $original->dmSenderIdent ."\n";
+                $popis .= "Číslo jednací příjemce     : ". $original->dmRecipientRefNumber ."\n";
+                $popis .= "Spisová značka příjemce    : ". $original->dmRecipientIdent ."\n";
+                $popis .= "\n";
+                $popis .= "Do vlastních rukou? : ". (!empty($original->dmPersonalDelivery)?"ano":"ne") ."\n";
+                $popis .= "Doručeno fikcí?     : ". (!empty($original->dmAllowSubstDelivery)?"ano":"ne") ."\n";
+                $popis .= "Zpráva určena pro   : ". $original->dmToHands ."\n";
+                //$popis .= "\n";
+                //$popis .= "Status: ". $original->dmMessageStatus ." - ". ISDS_Spisovka::stavZpravy($original->dmMessageStatus) ."\n";
+
+                $identifikator['popis'] = $popis;
+                    
                 }
 
             } else {

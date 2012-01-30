@@ -2090,6 +2090,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                                 $this->flashMessage('Zpráva na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" byla úspěšně odeslána.');
                                 $stav = 2;
                             } else {
+                                $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
                                 $this->flashMessage('Zprávu na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" se nepodařilo odeslat!','warning');
                                 $stav = 0;
                                 continue;
@@ -2111,12 +2112,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         if ( !empty($adresat->id_isds) ) {
                             
                             $data = array(
-                                'isds_cjednaci_odes' => $post_data['email_from'][$subjekt_id],
-                                'isds_spis_odes' => $post_data['email_from'][$subjekt_id],
-                                'isds_cjednaci_adres' => $post_data['email_from'][$subjekt_id],
-                                'isds_spis_adres' => $post_data['email_from'][$subjekt_id],
-                                'isds_dvr' => isset($post_data['email_from'][$subjekt_id])?true:false,
-                                'isds_fikce' => isset($post_data['email_from'][$subjekt_id])?true:false,
+                                'isds_predmet' => $post_data['isds_predmet'][$subjekt_id],
+                                'isds_cjednaci_odes' => $post_data['isds_cjednaci_odes'][$subjekt_id],
+                                'isds_spis_odes' => $post_data['isds_spis_odes'][$subjekt_id],
+                                'isds_cjednaci_adres' => $post_data['isds_cjednaci_adres'][$subjekt_id],
+                                'isds_spis_adres' => $post_data['isds_spis_adres'][$subjekt_id],
+                                'isds_dvr' => isset($post_data['isds_dvr'][$subjekt_id])?true:false,
+                                'isds_fikce' => isset($post_data['isds_fikce'][$subjekt_id])?true:false,
                             );
                             
                             if ( $zprava = $this->odeslatISDS($adresat, $data, $prilohy) ) {
@@ -2125,6 +2127,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                                 $this->flashMessage('Datová zpráva pro "'. Subjekt::displayName($adresat,'isds') .'" byla úspěšně odeslána do systému ISDS.');
                                 $stav = 2;
                             } else {
+                                $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
                                 $this->flashMessage('Datoovu zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo odeslat do systému ISDS!','warning');
                                 $stav = 0;
                                 continue;
@@ -2553,7 +2556,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $zprava['poradi'] = $Epodatelna->getMax(1);
                 $zprava['rok'] = date('Y');
                 $zprava['isds_signature'] = $mess->dmID;
-                $zprava['predmet'] = $mess->dmAnnotation;
+                $zprava['predmet'] = empty($mess->dmAnnotation)?"(Datová zpráva bez předmětu)":$mess->dmAnnotation;
                 $zprava['popis'] = $popis;
                 $zprava['odesilatel'] = $mess->dmRecipient .', '. $mess->dmRecipientAddress;
                 $zprava['odesilatel_id'] = $adresat->id;
@@ -2620,11 +2623,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             if ( $file = $UploadFile->uploadEpodatelna(serialize($mess), $data) ) {
                                 // ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['file_id'] = $file->id ."-". $file_o->id;
+                                //$zprava['file_id'] = $file->id ."-". $file_o->id;
+                                $zprava['file_id'] = $file->id;
                                 $Epodatelna->update(
                                         array('stav'=>1,
                                               'stav_info'=>$zprava['stav_info'],
-                                              'file_id'=>$file->id ."-". $file_o->id
+                                              'file_id'=>$file->id
                                             ),
                                         array(array('id=%i',$epod_id))
                                 );
@@ -2650,6 +2654,20 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             return false;
         }
 
+        // $id_mess
+        } catch (DibiException $e) {
+            if ( !empty($id_mess) ) {
+                $this->flashMessage('Chyba v DB: '. $e->getMessage(),'warning_ext');
+                return array(
+                    'source'=>$mess,
+                    'epodatelna_id'=>$epod_id,
+                    'isds_signature' => $zprava,
+                    'zprava'=>$popis
+                );
+            } else {
+                $this->flashMessage('Chyba v DB: '. $e->getMessage(),'warning_ext');
+                return false;
+            }
         } catch (Exception $e) {
             $this->flashMessage('Chyba ISDS: '. $e->getMessage(),'warning_ext');
         }
