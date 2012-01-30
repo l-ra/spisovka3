@@ -2483,7 +2483,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ( $id_mess = $isds->odeslatZpravu($dmEnvelope, $prilohy) ) {
 
                 sleep(3);
-                $odchozi_zpravy = $isds->seznamOdeslanychZprav( time()-3600 , time() );
+                $odchozi_zpravy = $isds->seznamOdeslanychZprav( time()-3600 , time()+3600 );
                 //Debug::dump($odchozi_zpravy);
                 $mess = null;
                 if ( count($odchozi_zpravy)>0 ) {
