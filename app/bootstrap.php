@@ -7,16 +7,15 @@ require LIBS_DIR . '/Nette/loader.php';
 
 // 2a) enable Nette\Debug for better exception and error visualisation
 Environment::setVariable('logDir',APP_DIR .'/../log/');
-if ( defined('DEBUG_ENABLE') ) {
-    if ( DEBUG_ENABLE ) {
-        Environment::setMode(Environment::DEVELOPMENT);
-        Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error.log');
-    } else {
-        Environment::setMode(Environment::PRODUCTION);
-        Debug::enable(Debug::PRODUCTION, '%logDir%/php_error.log');
-    }
+
+if ( !defined('DEBUG_ENABLE') )
+    define('DEBUG_ENABLE', 0);
+if ( DEBUG_ENABLE ) {
+    Environment::setMode(Environment::DEVELOPMENT);
+    Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error.log');
 } else {
-    Debug::enable(Debug::DETECT, '%logDir%/php_error.log');
+    Environment::setMode(Environment::PRODUCTION);
+    Debug::enable(Debug::PRODUCTION, '%logDir%/php_error.log');
 }
 
 // 2b) load configuration from config.ini file
