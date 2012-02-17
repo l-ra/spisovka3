@@ -131,8 +131,8 @@ class Admin_SpisyPresenter extends BasePresenter
     
     public function actionSeznam()
     {
-        $Spisy = new Spis();
-        $this->spis_plan = $Spisy->seznamSpisovychPlanu();
+        //$Spisy = new Spis();
+        //$this->spis_plan = $Spisy->seznamSpisovychPlanu();
     }
 
     public function renderSeznam($hledat = null)
@@ -140,7 +140,7 @@ class Admin_SpisyPresenter extends BasePresenter
 
         $Spisy = new Spis();
 
-        $session_spisplan = Environment::getSession('s3_spisplan');
+        /*$session_spisplan = Environment::getSession('s3_spisplan');
         $spis_id = $this->getParam('id',null);
 
         if ( !is_null($spis_id) ) {
@@ -152,11 +152,12 @@ class Admin_SpisyPresenter extends BasePresenter
             $spis_id = key($this->spis_plan);
         } else {
             $spis_id = null;
-        }
+        }*/
+        $spis_id = null;
 
-        if ( !empty($spis_id) ) {
+        //if ( !empty($spis_id) ) {
 
-            $this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
+            //$this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
 
             $args = null;
             if ( !empty($hledat) ) {
@@ -218,12 +219,12 @@ class Admin_SpisyPresenter extends BasePresenter
             //$seznam = $Spisy->seznam(null, 0, $spis_id);
             //$this->template->seznam = $seznam;
 
-            $session_spisplan->spis_id = $spis_id;
-        } else {
-            $this->template->seznam = null;
-        }
+            //$session_spisplan->spis_id = $spis_id;
+        //} else {
+        //    $this->template->seznam = null;
+        //}
 
-        $this->template->spisplanForm = $this['spisplanForm'];
+        //$this->template->spisplanForm = $this['spisplanForm'];
 
     }
 

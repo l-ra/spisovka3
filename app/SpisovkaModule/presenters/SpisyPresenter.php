@@ -132,7 +132,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
     public function actionVyber()
     {
         $Spisy = new Spis();
-        $this->spis_plan = $Spisy->seznamSpisovychPlanu();
+        //$this->spis_plan = $Spisy->seznamSpisovychPlanu();
         
         $this->template->dokument_id = $this->getParam('id',$this->getParam('dokument_id',null));
         if ( empty($this->template->dokument_id) ) {
@@ -263,8 +263,8 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
     public function actionDefault()
     {
-        $Spisy = new Spis();
-        $this->spis_plan = $Spisy->seznamSpisovychPlanu();
+        //$Spisy = new Spis();
+        //$this->spis_plan = $Spisy->seznamSpisovychPlanu();
     }
 
     public function renderDefault($hledat = null)
@@ -276,7 +276,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
         }
 
         $Spisy = new Spis();
-        $session_spisplan = Environment::getSession('s3_spisplan');
+        /*$session_spisplan = Environment::getSession('s3_spisplan');
         $spis_id = $this->getParam('id',null);
 
         if ( !is_null($spis_id) ) {
@@ -288,9 +288,10 @@ class Spisovka_SpisyPresenter extends BasePresenter
             $spis_id = key($this->spis_plan);
         } else {
             $spis_id = null;
-        }
+        }*/
+        $spis_id = null;
 
-        if ( !empty($spis_id) ) {
+        //if ( !empty($spis_id) ) {
 
             $args = null;
             if ( !empty($hledat) ) {
@@ -347,12 +348,12 @@ class Spisovka_SpisyPresenter extends BasePresenter
             //$seznam = $Spisy->seznam(null, 0, $spis_id);
             //$this->template->seznam = $seznam;
 
-            $session_spisplan->spis_id = $spis_id;
-        } else {
-            $this->template->seznam = null;
-        }
+            //$session_spisplan->spis_id = $spis_id;
+        //} else {
+        //    $this->template->seznam = null;
+        //}
 
-        $this->template->spisplanForm = $this['spisplanForm'];
+        //$this->template->spisplanForm = $this['spisplanForm'];
 
         /*
         $args = null;

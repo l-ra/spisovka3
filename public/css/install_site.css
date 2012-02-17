@@ -74,3 +74,42 @@
 		padding: 0 10px 10px 50px;
 		color: #555;
 	}
+        
+        .update_site {
+            border: 1px #000000 solid;
+            background-color: #f0f0f0;
+            padding: 0px;
+        }
+        .update_site h1 {
+            background-color: #03406A;
+            color: #ffffff;            
+            padding: 10px;
+            margin-top: 0px;
+        }
+        
+        .update_rev {
+            border: 1px #000000 solid;
+            background-color: #ffffff;
+            margin: 5px;
+            padding: 10px 5px;
+            overflow: auto;
+        }
+        
+        .update_rev pre {
+            
+        }
+        
+        .update_info {
+            margin: 20px;
+            white-space: pre;
+            font-family: monospace;            
+        }
+        
+        .update_no {
+            text-align: center;
+            padding-bottom: 20px;
+        }        
+        
+        .update_title {
+            font-weight: bold;
+        }

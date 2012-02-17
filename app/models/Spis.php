@@ -61,7 +61,8 @@ class Spis extends TreeModel
 
     public function seznamSpisovychPlanu($pouze_aktivni = 0)
     {
-
+        return null;
+        
         if ( $pouze_aktivni ) {
             $where = array("typ='SP'","stav=1");
         } else {

@@ -29,6 +29,7 @@ class TreeModel extends BaseModel
         $sql = array(
             'from' => array($this->name => 'tb'),
             'cols' => array('*'),
+            'leftJoin' => array()
         );
 
         if ( $child ) {
