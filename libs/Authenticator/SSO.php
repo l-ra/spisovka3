@@ -39,6 +39,10 @@ class Authenticator_SSO extends Control implements IAuthenticator
         if (!$row) {
             throw new AuthenticationException("Uživatel '$username' nenalezen.", self::IDENTITY_NOT_FOUND);
         }
+        
+        if ( $row->active == 0 ) {
+            throw new AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
+        }          
 
         if ( $credentials['extra'] == 1 ) {
             // Alternativni prihlaseni klasickym zpusobem - overeni hesla

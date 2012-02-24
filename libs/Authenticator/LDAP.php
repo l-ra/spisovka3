@@ -36,6 +36,11 @@ class Authenticator_LDAP extends Control implements IAuthenticator
         $row = $user->getUser($username,true);
 
         if ( isset($row->local) && $row->local == 0 ) {
+            
+            if ( $row->active == 0 ) {
+                throw new AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
+            }            
+            
             if ($row->password !== $password_local) {
                 $log->logAccess($row->id, 0);
                 throw new AuthenticationException("Neplatné přihlašovací údaje.", self::INVALID_CREDENTIAL);
@@ -53,6 +58,11 @@ class Authenticator_LDAP extends Control implements IAuthenticator
             try {
                 if ( $this->ldap_login($username, $password, $ldap_params->ldap) ) {
                     if ( $row ) {
+                        
+                        if ( $row->active == 0 ) {
+                            throw new AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
+                        }                          
+                        
                         $user->zalogovan($row->id);
                         $log->logAccess($row->id, 1);
                     } else {

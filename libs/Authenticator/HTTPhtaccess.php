@@ -28,6 +28,10 @@ class Authenticator_HTTPhtaccess extends Control implements IAuthenticator
         if (!$row) {
             throw new AuthenticationException("Uživatel '$username' nenalezen.", self::IDENTITY_NOT_FOUND);
         }
+        
+        if ( $row->active == 0 ) {
+            throw new AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
+        }        
 
         // Overeni hesla
         if ($row->password !== $password) {
