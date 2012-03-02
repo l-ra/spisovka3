@@ -159,7 +159,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
 
     }
 
-    protected function ldap_getAllUser($lconn = null)
+    protected function ldap_getAllUser($lconn = null, $seznam = null)
     {
 
         /* Kontrola ukazatele pripojeni */
@@ -175,9 +175,9 @@ class Authenticator_SSO extends Control implements IAuthenticator
         $filtr = "(".$this->rdn_prefix."*)";
         $rec = @ldap_search($lconn, $this->baseDN, $filtr);
         $info = @ldap_get_entries($lconn, $rec);
-
+        
         /* Parsovani dat */
-        $parse = $this->ldap_parseEntries($info);
+        $parse = $this->ldap_parseEntries($info, $seznam);
         return $parse;
 
     }
@@ -205,11 +205,10 @@ class Authenticator_SSO extends Control implements IAuthenticator
             $seznam = array(); $spojeno = 0;
             foreach ( $access as $params ) {
                 if ( $this->ldap_connect($params) ) {
-                    $seznam = $this->ldap_getAllUser();
-                    //$seznam = array_merge($seznam, $seznam_in);
+                    $seznam = $this->ldap_getAllUser(null, $seznam);
                     $this->ldap_close();
                     $spojeno++;
-                    break;
+                    //break;
                 }
             }
             if ( $spojeno == 0 ) {
@@ -247,31 +246,58 @@ class Authenticator_SSO extends Control implements IAuthenticator
 
     }
 
-    protected function ldap_parseEntries($info)
+    protected function ldap_parseEntries($info, $user = array())
     {
 
-        $user = array();
+        //$user = array();
 
         for($i = 0; $i < $info["count"]; $i++) {
             
-            $user[$i]["server"] = $this->server;
-            $user[$i]["dn"] = isset($info[$i]["distinguishedname"][0])?$info[$i]["distinguishedname"][0]:"";
-            $user[$i]["plne_jmeno"] = isset($info[$i]["displayname"][0])?$info[$i]["displayname"][0]:"";
-            $user[$i]["uid"] = isset($info[$i]["samaccountname"][0])?$info[$i]["samaccountname"][0]:"";
-            $user[$i]["jmeno"] = isset($info[$i]["givenname"][0])?$info[$i]["givenname"][0]:"";
-            $user[$i]["prijmeni"] = isset($info[$i]["sn"][0])?$info[$i]["sn"][0]:$user[$i]["plne_jmeno"];
-            $user[$i]["funkce"] = isset($info[$i]["company"][0])?$info[$i]["company"][0]:"";
-            $user[$i]["email"] = isset($info[$i]["mail"][0])?$info[$i]["mail"][0]:"";
-            $user[$i]["telefon"] = isset($info[$i]["telephonenumber"][0])?$info[$i]["telephonenumber"][0]:"";
-
-
-            foreach ($info[$i] as $key => $value) {
-                if ( is_numeric($key) ) continue;
-                $user[$i]['ldap'][$key] = $value[0];
+            $uid = isset($info[$i]["samaccountname"][0])?$info[$i]["samaccountname"][0]:$i;
+            $user[$uid]["server"] = $this->server;
+            $user[$uid]["dn"] = isset($info[$i]["distinguishedname"][0])?$info[$i]["distinguishedname"][0]:"";
+            $user[$uid]["plne_jmeno"] = isset($info[$i]["displayname"][0])?$info[$i]["displayname"][0]:"";
+            $user[$uid]["uid"] = isset($info[$i]["samaccountname"][0])?$info[$i]["samaccountname"][0]:"";
+            $user[$uid]["jmeno"] = isset($info[$i]["givenname"][0])?$info[$i]["givenname"][0]:"";
+            $user[$uid]["prijmeni"] = isset($info[$i]["sn"][0])?$info[$i]["sn"][0]:$user[$uid]["plne_jmeno"];
+            
+            $user[$uid]["titul_pred"] = isset($info[$i]["personaltitle"][0])?$info[$i]["personaltitle"][0]:"";
+            
+            //   > title = všeobecná sestra
+            //   > department = neurologie dětská ambulance
+            //   > company = Nemocnice Teplice, o.z.
+            $funkce_a = array();
+            if ( !empty($info[$i]['title'][0]) ) $funkce_a[] = $info[$i]['title'][0];
+            if ( !empty($info[$i]['department'][0]) ) $funkce_a[] = $info[$i]['department'][0];
+            if ( !empty($info[$i]['company'][0]) ) $funkce_a[] = $info[$i]['company'][0];
+            
+            $funkce = implode(", ",$funkce_a);
+            $user[$uid]["funkce"] = $funkce;
+            
+            if ( !empty($info[$i]['mail'][0]) ) {
+                $email = $info[$i]['mail'][0];
+            //} else if ( !empty($info[$i]['userprincipalname'][0]) ) {
+            //    $email = $info[$i]['userprincipalname'][0];
+            } else {
+                $email = "";
             }
-        }
+            $user[$uid]["email"] = $email;
+            
+            $tel_a = array();
+            if ( !empty($info[$i]['telephonenumber'][0]) ) $tel_a[] = $info[$i]['telephonenumber'][0];
+            if ( !empty($info[$i]['mobile'][0]) ) $tel_a[] = $info[$i]['mobile'][0];
+            
+            $telefon = implode(", ",$tel_a);
+            $user[$uid]["telefon"] = $telefon;           
 
+            //foreach ($info[$i] as $key => $value) {
+            //    if ( is_numeric($key) ) continue;
+            //    $user[$uid]['ldap'][$key] = $value[0];
+            //}
+        }
+        
         if ( count($user) > 0 ) {
+            ksort($user);
             return $user;
         } else {
             return null;
@@ -651,41 +677,55 @@ class Authenticator_SSO extends Control implements IAuthenticator
 
             echo "<div>\n";
             echo "Zde naleznete seznam všech uživatelů uložených přes LDAP.\n<br /><br />\n";
-            echo "Přidání zaměstnance se provádí tak, že u každého uživatele zaškrtnete položku připojit a ve stejném řádku vyberete požadovanou roli a případně poupravit nebo doplnit další hodnoty jako příjmení, jméno a email.\n<br /><br />\n";
+            echo "Přidání zaměstnance se provádí tak, že u každého uživatele zaškrtnete položku připojit a ve stejném řádku vyberete požadovanou roli.\n<br /><br />\n";
             echo "Po dokončení nastavení a úprav stisknete na tlačítko synchronizovat.\n<br /><br />\n";
 
             echo "</div>\n<br />\n";
+            echo "<div>Nalezeno ". count($seznam) ." záznamů.</div>\n";
             echo "<form action='' method='post'>\n";
             echo "<table id='synch_table'>\n";
             echo "  <tr>\n";
             echo "    <th>Připojit</th>\n";
             echo "    <th>Uživatelské jméno</th>\n";
             echo "    <th>Role</th>\n";
-            echo "    <th>Příjmení</th>\n";
-            echo "    <th>Jméno</th>\n";
-            echo "    <th>Funkce</th>\n";
-            echo "    <th>Email</th>\n";
-            echo "    <th>Telefon</th>\n";
+            echo "    <th>Jméno a příjmení<br />Funkce</th>\n";
+            echo "    <th>Email<br />Telefon</th>\n";
             echo "  </tr>\n";
             foreach ($seznam as $id => $user) {
                 if ( !isset($user_seznam[ $user['uid'] ])  ) {
                     // novy - nepripojen
                     echo "  <tr>\n";
-                    echo "    <td><input type='checkbox' name='usersynch_pripojit[".$id."]' /></td>\n";
-                    echo "    <td><input class='synch_input' type='text' name='usersynch_username[".$id."]' value='". $user['uid'] ."' readonly='readonly' /></td>\n";
-                    echo "    <td>". $this->mySelect("usersynch_role[".$id."]", $role_seznam, 2) ."</td>\n";
-                    echo "    <td><input class='synch_input' type='text' name='usersynch_prijmeni[".$id."]' value='". $user['prijmeni'] ."' /></td>\n";
-                    echo "    <td><input class='synch_input' type='text' name='usersynch_jmeno[".$id."]' value='". $user['jmeno'] ."' /></td>\n";
-                    echo "    <td><input class='synch_input' type='text' name='usersynch_funkce[".$id."]' value='". $user['funkce'] ."' /></td>\n";
-                    echo "    <td><input class='synch_input' type='text' name='usersynch_email[".$id."]' value='". $user['email'] ."' /></td>\n";
-                    echo "    <td><input class='synch_input' type='text' name='usersynch_telefon[".$id."]' value='". $user['telefon'] ."' /></td>\n";
+                    echo "    <td>\n";
+                    echo "       <input type='checkbox' name='usersynch_pripojit[".$id."]' />\n";
+                    echo "    </td>\n";
+                    echo "    <td>\n";
+                    echo "       <strong>". $user['uid'] ."</strong>\n";
+                    echo "       <input class='synch_input' type='hidden' name='usersynch_username[".$id."]' value='". $user['uid'] ."' />\n";
+                    echo "    </td>\n";
+                    echo "    <td>\n";
+                    echo "       ". $this->mySelect("usersynch_role[".$id."]", $role_seznam, 2) ."\n";
+                    echo "    </td>\n";
+                    echo "    <td>\n";
+                    echo "       <strong>". $user['jmeno'] ." ". $user['prijmeni'] ."</strong><br/>\n";
+                    echo "       ". $user['funkce'] ."<br/>\n";
+                    echo "       <input class='synch_input' type='hidden' name='usersynch_prijmeni[".$id."]' value='". $user['prijmeni'] ."' />\n";
+                    echo "       <input class='synch_input' type='hidden' name='usersynch_jmeno[".$id."]' value='". $user['jmeno'] ."' />\n";
+                    echo "       <input class='synch_input' type='hidden' name='usersynch_funkce[".$id."]' value='". $user['funkce'] ."' />\n";
+                    echo "       <input class='synch_input' type='hidden' name='usersynch_titul_pred[".$id."]' value='". $user['titul_pred'] ."' />\n";
+                    echo "    </td>\n";
+                    echo "    <td>\n";
+                    echo "       ". $user['email'] ."<br/>\n";
+                    echo "       ". $user['telefon'] ."<br/>\n";
+                    echo "       <input class='synch_input' type='hidden' name='usersynch_email[".$id."]' value='". $user['email'] ."' />\n";
+                    echo "       <input class='synch_input' type='hidden' name='usersynch_telefon[".$id."]' value='". $user['telefon'] ."' />\n";
+                    echo "    </td>\n";
                     echo "  </tr>\n";                    
                 } else {
                     // pripojen
                     echo "  <tr>\n";
                     echo "    <td>&nbsp;</td>\n";
-                    echo "    <td>". $user['uid'] ."</td>\n";
-                    echo "    <td colspan='4'>Uživatel je připojen do spisové služby.</td>\n";
+                    echo "    <td><strong>". $user['uid'] ."</strong></td>\n";
+                    echo "    <td colspan='3'>Uživatel je připojen do spisové služby.</td>\n";
                     echo "  </tr>\n";                    
                 }
             }
@@ -946,6 +986,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
                         'email' => $data['usersynch_email'][$index],
                         'telefon' => $data['usersynch_telefon'][$index],
                         'pozice' => $data['usersynch_funkce'][$index],
+                        'titul_pred' => $data['usersynch_titul_pred'][$index],
                         'role' => $data['usersynch_role'][$index],
                     );
                     
@@ -961,6 +1002,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
                     $osoba = array(
                         'jmeno' => $user['jmeno'],
                         'prijmeni' => $user['prijmeni'],
+                        'titul_pred' => $user['titul_pred'],
                         'email' => $user['email'],
                         'telefon' => $user['telefon'],
                         'pozice' => $user['pozice']
