@@ -418,6 +418,36 @@ zkontrolovatSchranku = function (elm) {
     return false;
 }
 
+zkontrolovatOdchoziSchranku = function (elm) {
+
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                //stav = x.responseText;
+                //$('#zkontrolovat_status').html(x.responseText);
+                //nactiZpravy();
+            }
+        }
+
+        if ( is_simple == 1 ) {
+            url = baseUri + '?presenter=Epodatelna%3Adefault&action=zkontrolovatOdchoziISDS';
+        } else {  
+            url = baseUri + 'epodatelna/default/zkontrolovatOdchoziISDS';
+        }
+        x.open("GET", url, true);
+        x.send(null);
+    }
+
+    //$('#zkontrolovat_status').html('<img src="'+baseUri+'images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
+
+
+    return false;
+}
+
+
 nactiZpravy = function () {
 
     if (document.getElementById) {

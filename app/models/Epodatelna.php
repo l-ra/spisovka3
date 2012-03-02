@@ -379,5 +379,23 @@ class Epodatelna extends BaseModel
 
     }
 
+    public function getLastISDS()
+    {
+        
+        $data = $this->fetchAll(array('doruceno_dne'=>'DESC'), array(
+            'epodatelna_typ=0','isds_signature IS NOT NULL'
+        ), 0, 1)->fetch();
+        if ( $data ) {
+            $do = strtotime($data->doruceno_dne);
+            if ( $do != 0 ) {
+                return $do - 10800; // posledni - 3 dny
+            } else {
+                return null;
+            } 
+        } else {
+            return null;
+        }
+        
+    }
 
 }

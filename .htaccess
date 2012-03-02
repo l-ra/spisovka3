@@ -9,5 +9,8 @@ Options -Indexes
 	# front controller
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule favicon.ico$ favicon.ico [R=301]
 	RewriteRule !\.(pdf|js|ico|gif|jpg|png|css|rar|zip|tar\.gz)$ index.php [L]
 </IfModule>
+
+# RewriteRule favicon.ico - fix na log - prohlizec zjistuje favicon.ico i tam, kde neni a to dle adresy
