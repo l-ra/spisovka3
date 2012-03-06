@@ -484,6 +484,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}spisovy_znak` (
   `skartacni_znak` enum('A','S','V') DEFAULT NULL,
   `skartacni_lhuta` int(11) DEFAULT NULL,
   `spousteci_udalost_id` int(11) NOT NULL,
+  `selected` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `fk_spisovy_znak_spousteci_udalost1` (`spousteci_udalost_id`),
   KEY `fk_spisovy_znak_spisovy_znak1` (`parent_id`)
