@@ -198,10 +198,10 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
 
         $Spisy = new Spis();
-        //$session_spisplan = Environment::getSession('s3_spisplan');
+        /*$session_spisplan = Environment::getSession('s3_spisplan');
         $spis_id = null;// $this->getParam('id',null);
 
-        /*if ( !is_null($spis_id) ) {
+        if ( !is_null($spis_id) ) {
             // spis_id
         //} else if ( !empty($session_spisplan->spis_id) ) {
         //    $spis_id = $session_spisplan->spis_id;
@@ -211,6 +211,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         } else {
             $spis_id = null;
         }*/
+        $spis_id = null;
         
         //if ( !empty($spis_id) ) {
 
@@ -315,7 +316,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
         //if ( !empty($spis_id) ) {
 
-            $this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
+            //$this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
 
             $args = null;
             if ( !empty($hledat) ) {
@@ -378,7 +379,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         //    $this->template->seznam = null;
         //}
 
-        $this->template->spisplanForm = $this['spisplanForm'];
+        //$this->template->spisplanForm = $this['spisplanForm'];
 
     }
 

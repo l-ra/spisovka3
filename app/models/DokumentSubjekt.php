@@ -49,11 +49,11 @@ class DokumentSubjekt extends BaseModel
     public function pripojit($dokument_id, $subjekt_id, $typ = 'AO') {
 
         $row = array();
-        $row['dokument_id'] = $dokument_id;
-        $row['subjekt_id'] = $subjekt_id;
+        $row['dokument_id'] = (int)$dokument_id;
+        $row['subjekt_id'] = (int)$subjekt_id;
         $row['typ'] = $typ;
         $row['date_added'] = new DateTime();
-        $row['user_id'] = Environment::getUser()->getIdentity()->id;
+        $row['user_id'] = (int)Environment::getUser()->getIdentity()->id;
 
         return $this->insert($row);
 
