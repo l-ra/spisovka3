@@ -2090,6 +2090,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                                 $this->flashMessage('Zpráva na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" byla úspěšně odeslána.');
                                 $stav = 2;
                             } else {
+                                $Log = new LogModel();
                                 $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
                                 $this->flashMessage('Zprávu na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" se nepodařilo odeslat!','warning');
                                 $stav = 0;
@@ -2127,8 +2128,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                                 $this->flashMessage('Datová zpráva pro "'. Subjekt::displayName($adresat,'isds') .'" byla úspěšně odeslána do systému ISDS.');
                                 $stav = 2;
                             } else {
+                                $Log = new LogModel();
                                 $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
-                                $this->flashMessage('Datoovu zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo odeslat do systému ISDS!','warning');
+                                $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo odeslat do systému ISDS!','warning');
                                 $stav = 0;
                                 continue;
                             }
