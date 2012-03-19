@@ -50,7 +50,7 @@
             {elseif $spis->typ=='SP'}
             <td colspan="6">
                 {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
-                <img src="{$baseUri}images/icons/folder_green.png" alt="Spisový plán" title="Spisový plán" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                <img src="{$baseUri}images/icons/folder_green.png" alt="Hlavní spis" title="Hlavní spis" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
                 {$spis->nazev}                
             </td>

@@ -141,6 +141,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
         $Spisy = new Spis();
         $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
+        $args = $Spisy->spisovna($args);
         $seznam = $Spisy->seznam($args);
         $this->template->seznam = $seznam;
 
