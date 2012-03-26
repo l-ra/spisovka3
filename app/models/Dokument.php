@@ -2475,7 +2475,9 @@ class Dokument extends BaseModel
     public function odstranit_rozepsane()
     {
 
-        $where = array('stav=0');
+        $where = array('stav=0',
+            array('user_created=%i',Environment::getUser()->getIdentity()->id)
+        );
 
         $seznam = $this->seznamKlasicky(array('where'=>$where));
         if ( count($seznam)>0 ) {
