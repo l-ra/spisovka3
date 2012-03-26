@@ -139,6 +139,8 @@ class TreeModel extends BaseModel
                 } else if ( $type == "2x" ) {
                     if ( isset($row->selected) && $row->selected == 0 ) {
                         $result[ $row->id ] = Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis)->disabled(TRUE);
+                    } else if ( $row->stav == 0 ) {    
+                        $result[ $row->id ] = Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' [neaktivní] '. $row->{$this->nazev}.$popis)->disabled(TRUE);
                     } else {
                         $result[ $row->id ] = Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis);
                     }
@@ -160,14 +162,15 @@ class TreeModel extends BaseModel
         
         dibi::begin();
         try {
+            $sekvence_string = isset($data['sekvence_string'])?$data['sekvence_string']:$data[$this->nazev_sekvence];
+            unset($data['sekvence_string']);
+            
             // 1. clasic insert
             $id = $this->insert( $data );
 
             // 2. update tree
             $parent_id = $data['parent_id'];
             $data_tree = array();
-            $sekvence_string = isset($data['sekvence_string'])?$data['sekvence_string']:$data[$this->nazev_sekvence];
-            unset($data['sekvence_string']);
             if ( empty($parent_id) || $parent_id == 0 ) {
                 // is root node
                 $data_tree['sekvence'] = $id;
@@ -210,6 +213,9 @@ class TreeModel extends BaseModel
         dibi::begin();
         try {
 
+            $sekvence_string = isset($data['sekvence_string'])?$data['sekvence_string']:$data[$this->nazev_sekvence];
+            unset($data['sekvence_string']);
+            
             $info = $this->fetchRow(array('id=%i',$id))->fetch();
             
             if ( isset($data['spisovy_znak_format']) ) {
@@ -246,8 +252,6 @@ class TreeModel extends BaseModel
             }
 
             $data_tree = array();
-            $sekvence_string = isset($data['sekvence_string'])?$data['sekvence_string']:$data[$this->nazev_sekvence];
-            unset($data['sekvence_string']);
             
             if ( empty($parent_id) || $parent_id == 0 ) {
                 // is root node
@@ -323,7 +327,6 @@ class TreeModel extends BaseModel
             
                 $data_node = array();
                 $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info_nazev_sekvence .".". $info->id ."','". $sekvence_string .".". $info->id ."')";
-                
                 $this->update($data_node, array( array("sekvence_string LIKE %s","%". $info_nazev_sekvence .".". $info->id ."%") ));
             }
 

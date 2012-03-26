@@ -21,7 +21,11 @@
                 {!=str_repeat("&nbsp;", 5*$spisznak->uroven)}
                 <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 &nbsp;&nbsp;
+                {if $spisznak->stav == 0 }
+                <a href="{link :Admin:Spisznak:detail, id => $spisznak->id}" style="text-decoration: line-through;">{$spisznak->nazev}</a>{if !empty($spisznak->popis)}<span style="color: #c0c0c0;"> - {$spisznak->popis}</span>{/if}
+                {else}
                 <a href="{link :Admin:Spisznak:detail, id => $spisznak->id}">{$spisznak->nazev}</a>{if !empty($spisznak->popis)} - {$spisznak->popis}{/if}
+                {/if}
             </td>
         </tr>
         {/foreach}

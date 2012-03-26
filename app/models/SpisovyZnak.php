@@ -24,10 +24,13 @@ class SpisovyZnak extends TreeModel
         $params = null;
         if ( !is_null($args) ) {
             $params['where'] = $args['where'];
+        } else {
+            //$params['where'] = array(array('stav=1'));
         }
         if ( $select == 5 ) {
             $params['paginator'] = 1;
         }
+        
 
         $params['order'] = array('tb.nazev');
         return $this->nacti($spisznak_parent, true, true, $params);
@@ -106,7 +109,9 @@ class SpisovyZnak extends TreeModel
         if ( count($part)>0 ) {
             foreach ($part as $pi=>$pn) {
                 if ( is_numeric($pn) ) {
-                    $part[$pi] = sprintf("%04d",$pn);
+                    $part[$pi] = sprintf("%04d",intval($pn));
+                } else {
+                    $part[$pi] = $pn;
                 }
             }
         }
@@ -137,14 +142,16 @@ class SpisovyZnak extends TreeModel
         if ( count($part)>0 ) {
             foreach ($part as $pi=>$pn) {
                 if ( is_numeric($pn) ) {
-                    $part[$pi] = sprintf("%04d",$pn);
+                    $part[$pi] = sprintf("%04d",intval($pn));
+                } else {
+                    $part[$pi] = $pn;
                 }
             }
         }
         $data['spisovy_znak_format'] = 1;
         $data['sekvence_string'] = implode(".",$part);        
         
-        //Debug::dump($data); exit;
+        //Debug::dump($data); //exit;
         
         $ret = $this->upravitH($data, $spisznak_id);
 

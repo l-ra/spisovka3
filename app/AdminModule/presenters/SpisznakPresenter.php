@@ -93,10 +93,11 @@ class Admin_SpisznakPresenter extends BasePresenter
         if ( is_numeric($spisznak_id) ) {
             try {
                 $res = $SpisovyZnak->odstranit($spisznak_id, 2);
-                if ( $res !== false ) {
+                //var_dump($res); exit;
+                if ( $res === -1 ) {
+                    $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.','warning_ext');                    
+                } else if ( $res !== false ) {
                     $this->flashMessage('Spisový znak byl úspěšně odstraněn.');
-                } else if ( $res == -1 ) {
-                    $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.','warning_ext');
                 } else {
                     $this->flashMessage('Spisový znak se nepodařilo odstranit.','warning');
                 }

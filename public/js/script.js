@@ -1122,6 +1122,11 @@ spisplanZmenit = function (elm) {
     return false;
 }
 
+selectReadOnly = function ( select ) {
+    select.selectedIndex = 1;
+    return false;
+}
+
 filtrSestavy = function (elm) {
 
     if (document.getElementById) {
