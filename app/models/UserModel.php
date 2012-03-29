@@ -192,9 +192,13 @@ class UserModel extends BaseModel
 
         $user = $this->fetchRow(array('id=%i',$user_id))->fetch();
 
-        $row = array( 'password'=>sha1($user->username . $password),
-                      'last_modified'=> new DateTime()
-                );
+        $row = array();
+        $row['last_modified'] = new DateTime();
+
+        // pokud je heslo prazdne = zadna zmena, jinak zmena
+        if ( !empty($password) ) {
+            $row['password'] = sha1($user->username . $password);
+        }
 
         if ( !is_null($local) ) {
             $row['local'] = $local;

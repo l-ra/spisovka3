@@ -285,8 +285,13 @@ class Authenticator_Basic extends Control implements IAuthenticator
             if ( count($uzivatel)>0 ) {
                 foreach ($uzivatel as $user) {
                     if ( $user->id == $params['user_id'] ) {
-                        if ( $User->zmenitHeslo($user->id, $data['heslo'], 0) ) {
-                            $zmeneno = 1;
+                        if ( $User->zmenitHeslo($user->id, $data['heslo'], $data['local']) ) {
+                            if ( !empty($data['heslo']) ) {
+                                $zmeneno = 1;
+                            } else {
+                                $zmeneno = 0;
+                            }
+                            
                         }
                         break;
                     }

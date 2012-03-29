@@ -816,15 +816,22 @@ class Authenticator_SSO extends Control implements IAuthenticator
             if ( count($uzivatel)>0 ) {
                 foreach ($uzivatel as $user) {
                     if ( $user->id == $params['user_id'] ) {
-                        if ( $User->zmenitHeslo($user->id, $data['heslo'], 0) ) {
-                            $zmeneno = 1;
+                        if ( $User->zmenitHeslo($user->id, $data['heslo'], $data['local']) ) {
+                            if ( !empty($data['heslo']) ) {
+                                $zmeneno = 1;
+                            } else {
+                                $zmeneno = 2;
+                            }
+                            
                         }
                         break;
                     }
                 }
             }
 
-            if ( $zmeneno == 1 ) {
+            if ( $zmeneno == 2 ) {
+                $this->presenter->flashMessage('Hodnoty byly změněny. Heslo uživatele "'. $user->username .'" však zůstává stejné.');
+            } else if ( $zmeneno == 1 ) {
                 $this->presenter->flashMessage('Heslo uživatele "'. $user->username .'"  bylo úspěšně změněno.');
             } else {
                 $this->presenter->flashMessage('Nedošlo k žádné změně.');
