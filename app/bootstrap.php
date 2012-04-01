@@ -108,16 +108,38 @@ try {
 }
 
 // Step 4: Setup application router
+
+// 
+// Detect and set HTTP protocol => HTTP(80) or HTTPS(443)
+// 
+// $defaultFlags = Route::SECURED; -> force HTTPS
+// $defaultFlags = 0; -> force HTTP
+// $defaultFlags |= (Environment::getHttpRequest()->isSecured() ? Route::SECURED : 0) -> auto detect (HTTP or HTTPS)
 Route::$defaultFlags |= (Environment::getHttpRequest()->isSecured() ? Route::SECURED : 0);
+
+// Get router
 $router = $application->getRouter();
 
-// mod_rewrite detection
+//
+// Cool URL detection
 // 
-$apache_mod = function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules()); 
-$nginx_mod = 0;//($_SERVER['SERVER_SOFTWARE']=='nginx');
- 
-//if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) {
-if ( $apache_mod || $nginx_mod ) {
+//echo "<pre>"; print_r($_SERVER); echo "</pre>"; exit;
+
+$cool_url = false;
+if ( isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On' ) {
+    // Detect in $_SERVER['HTTP_MOD_REWRITE'] 
+    // Apache => .htaccess directive SetEnv HTTP_MOD_REWRITE On
+    // Nginx  => nginx.conf directive fastcgi_param HTTP_MOD_REWRITE On;
+    $cool_url = true;
+} else if ( isset($_SERVER['REDIRECT_HTTP_MOD_REWRITE']) && $_SERVER['REDIRECT_HTTP_MOD_REWRITE'] == 'On' ) {
+    // Detect in $_SERVER - applied redirect, otherwise the first condition (HTTP_MOD_REWRITE)
+    $cool_url = true;
+} else if ( function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules()) ) {
+    // Detect in Apache module (only if PHP as module)
+    $cool_url = true;
+}
+
+if ( $cool_url ) {
         define('IS_SIMPLE_ROUTER',0);
 	$router[] = new Route('index.php', array(
                 'module'    => 'Spisovka',
