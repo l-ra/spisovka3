@@ -3,14 +3,17 @@ Options -Indexes
 
 # mod_rewrite
 <IfModule mod_rewrite.c>
+
+    <IfModule env_module>
+        # set mod_rewrite detecting
+        SetEnv HTTP_MOD_REWRITE On
+    </IfModule>
+
 	RewriteEngine On
 	# RewriteBase /
 
 	# front controller
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteRule favicon.ico$ favicon.ico [R=301]
 	RewriteRule !\.(pdf|js|ico|gif|jpg|png|css|rar|zip|tar\.gz)$ index.php [L]
 </IfModule>
-
-# RewriteRule favicon.ico - fix na log - prohlizec zjistuje favicon.ico i tam, kde neni a to dle adresy
