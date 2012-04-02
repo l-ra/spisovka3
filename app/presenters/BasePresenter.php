@@ -38,6 +38,10 @@ abstract class BasePresenter extends Presenter
                         //$this->forward(':Error:noaccess',array('param'=>array('resource'=>$this->reflection->name,'privilege'=>$this->getAction())));
                         $this->forward(':Error:noaccess');
                     }
+                } else if ($this->name == "Spisovka:Uzivatel" && $this->view == "login") {
+                    // Uzivatel je prihlasen - login obrazovka je zbytecna, presmerujeme na uvodni obrazovku
+                    // Oprava mozneho bugu s dvojim prihlasovanim = po prihlaseni se opet zobrazuje login obrazovka
+                    $this->redirect(':Spisovka:Default:default');
                 }
             }
 
