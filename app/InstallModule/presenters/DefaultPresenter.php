@@ -293,15 +293,15 @@ class Install_DefaultPresenter extends BasePresenter
 		'passed' => is_writable(CLIENT_DIR .'/temp/'),
 		'message' => 'Povoleno',
 		'errorMessage' => 'Není možné zapisovat do dočasné složky.',
-		'description' => 'Povolte zápis do složky /app/temp/',
+		'description' => 'Povolte zápis do složky /client/temp/',
             ),
             array(
 		'title' => 'Zápis do konfigurační složky',
-		'required' => FALSE,
-		'passed' => is_writable(CLIENT_DIR .'/configs/'),
+		'required' => TRUE,
+		'passed' => is_writable(CLIENT_DIR .'/configs/') && is_writable(CLIENT_DIR .'/configs/epodatelna.ini') && is_writable(CLIENT_DIR .'/configs/klient.ini'),
 		'message' => 'Povoleno',
 		'errorMessage' => 'Není možné zapisovat do konfigurační složky.',
-		'description' => 'Povolte zápis do složky /app/configs/. Tato složka slouží k uživateskému ukládání nastavení klienta, e-podatelny apod.',
+		'description' => 'Povolte zápis do složky /client/configs/ a do souborů klient.ini a epodatelna.ini, které se v ní nacházejí. Tato složka slouží k uživateskému ukládání nastavení klienta, e-podatelny apod.',
             ),
             array(
 		'title' => 'Zápis do složky sessions',
@@ -309,7 +309,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'passed' => is_writable(CLIENT_DIR .'/sessions/'),
 		'message' => 'Povoleno',
 		'errorMessage' => 'Není možné zapisovat do složky sessions.',
-		'description' => 'Povolte zápis do složky /app/sessions/. Tato složka slouží k ukládání různých stavů aplikace.',
+		'description' => 'Povolte zápis do složky /client/sessions/. Tato složka slouží k ukládání různých stavů aplikace.',
             ),
             array(
 		'title' => 'Zápis do logovací složky',
@@ -320,7 +320,23 @@ class Install_DefaultPresenter extends BasePresenter
 		'description' => 'Povolte zápis do složky /log/. Tato složka slouží k ukládání různých logovacích a chybových hlášek.<br / >
                                   Není nutná. Pokud však chcete zaznamenávat chybové hlášky, je potřeba tuto složku k zápisu povolit.',
             ),
-
+            array(
+        'title' => 'Zápis do složky dokumentů',
+        'required' => TRUE,
+        'passed' => is_writable(CLIENT_DIR .'/files/dokumenty/'),
+        'message' => 'Povoleno',
+        'errorMessage' => 'Není možné zapisovat do složky dokumentů.',
+        'description' => 'Povolte zápis do složky /client/files/dokumenty/. Tato složka slouží jako úložiště dokumentů.',
+           ),
+           array(
+        'title' => 'Zápis do složky e-podatelny',
+        'required' => TRUE,
+        'passed' => is_writable(CLIENT_DIR .'/files/epodatelna/'),
+        'message' => 'Povoleno',
+        'errorMessage' => 'Není možné zapisovat do složky e-podatelny.',
+        'description' => 'Povolte zápis do složky /client/files/epodatelna/. Tato složka slouží jako úložiště e-podatelny.',
+           ),
+        
         ));
 
         //$reflection = class_exists('ReflectionFunction') && !$this->iniFlag('zend.ze1_compatibility_mode') ? new ReflectionFunction('paint') : NULL;
@@ -391,14 +407,14 @@ class Install_DefaultPresenter extends BasePresenter
 		'description' => 'Configuration directive <code>variables_order</code> is missing. Nette Framework requires this to be set.',
             ),
 
-            /*array(
+            array(
 		'title' => 'Reflection extension',
 		'required' => TRUE,
 		'passed' => (bool) $reflection,
 		'description' => 'Reflection extension is required.',
             ),
 
-            array(
+            /*array(
 		'title' => 'Reflection phpDoc',
 		'required' => FALSE,
 		'passed' => $reflection ? strpos($reflection->getDocComment(), 'Paints') !== FALSE : FALSE,
@@ -428,9 +444,9 @@ class Install_DefaultPresenter extends BasePresenter
 		'description' => 'ICONV extension is required and must work properly.',
             ),
 
-            array(
+          array(
 		'title' => 'Multibyte String extension',
-		'required' => FALSE,
+		'required' => TRUE,
 		'passed' => extension_loaded('mbstring'),
 		'description' => 'Multibyte String extension is absent. Some internationalization components may not work properly.',
             ),
@@ -451,14 +467,14 @@ class Install_DefaultPresenter extends BasePresenter
 		'description' => 'Multibyte String function overloading is enabled. Nette Framework requires this to be disabled. If it is enabled, some string function may not work properly.',
             ),
 
-            array(
+        /*  array(
 		'title' => 'SQLite extension',
 		'required' => FALSE,
 		'passed' => extension_loaded('sqlite'),
 		'description' => 'SQLite extension is absent. You will not be able to use tags and priorities with <code>Nette\Caching\FileStorage</code>.',
             ),
 
-            array(
+          array(
 		'title' => 'Memcache extension',
 		'required' => FALSE,
 		'passed' => extension_loaded('memcache'),
@@ -484,7 +500,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'required' => FALSE,
 		'passed' => @exec('identify -format "%w,%h,%m" ' . addcslashes(dirname(__FILE__) . '/assets/logo.gif', ' ')) === '176,104,GIF', // intentionally @
 		'description' => 'ImageMagick server library is absent. You will not be able to use <code>Nette\ImageMagick</code>.',
-            ),
+            ), */
 
             array(
 		'title' => 'Fileinfo extension or mime_content_type()',
@@ -1037,26 +1053,25 @@ class Install_DefaultPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $Osoba = new Osoba();
-        $User = new UserModel();
-
-        $data['stav'] = 0;
-        $data['user_created'] = 1;
+        $data['stav'] = 1;
         $data['date_created'] = new DateTime();
-        $data['user_modified'] = 1;
-        $data['date_modified'] = new DateTime();
 
         $user_data = array(
             'username'=>$data['username'],
-            'heslo'=>$data['heslo']
+            'heslo'=>$data['heslo'],
+            'role'=>1
         );
-
         unset($data['username'], $data['heslo'], $data['heslo_potvrzeni']);
 
         try {
-
-            $user_id = $User->insert($user_data);
             $osoba_id = $Osoba->insert($data);
-            $User->pridatUcet($user_id, $osoba_id, 1);
+
+            if ( $osoba_id ) {
+
+                $User = new UserModel();
+                $User->pridatUcet($osoba_id, $user_data);
+
+            }
 
             $session = Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
