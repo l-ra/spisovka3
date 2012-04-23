@@ -33,7 +33,12 @@
 @{block content}
 
     <div class="navigate">
-    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> - Nový dokument
+    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a>
+    {if (isset($odpoved_na_dokument) && $odpoved_na_dokument)}
+    - Vytvoření odpovědi
+    {else}
+    - Nový dokument
+    {/if}
     </div>
 
     {$novyForm->render('begin')}

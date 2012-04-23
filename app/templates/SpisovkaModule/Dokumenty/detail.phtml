@@ -63,6 +63,11 @@
 
     <div class="navigate">
     <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> - Detail dokumentu
+    {if ($FormUpravit=='metadata')}
+    - Úprava metadat
+    {elseif ($FormUpravit=='vyrizeni')}
+    - Úprava vyřízení
+    {/if}
     </div>
 
     <div id="tisk">
