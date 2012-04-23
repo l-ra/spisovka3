@@ -981,13 +981,15 @@ abstract class Presenter extends Control implements IPresenter
 
 			$globalState = $this->getGlobalState($destination === 'this' ? NULL : $presenterClass);
 			if ($current && $args) {
-				$tmp = $globalState + $this->params;
+				// NETTE BUG - https://github.com/HosipLan/nette/commit/705148f42da595355fd9643582b6bb5cfa071219
+                                /* $tmp = $globalState + $this->params;
 				foreach ($args as $key => $val) {
 					if ((string) $val !== (isset($tmp[$key]) ? (string) $tmp[$key] : '')) {
 						$current = FALSE;
 						break;
 					}
-				}
+				}*/
+                                $current = http_build_query($globalState + $this->params) === http_build_query($args);
 			}
 			$args += $globalState;
 		}
