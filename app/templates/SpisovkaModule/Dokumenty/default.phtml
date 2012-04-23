@@ -106,7 +106,7 @@
 
 
 
-            {if $dok->stav_dokumentu == 1}
+            {if $dok->stav_dokumentu == 1 && !empty($dok->prideleno)}
             <td class="prideleno">
                 {$dok->prideleno->prideleno_jmeno}
             </td>
