@@ -183,6 +183,7 @@ class DokumentSpis extends BaseModel
         $spis_info = $Spis->getInfo($spis_id);
 
         $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis_info->nazev .'"');
+        $Log->logSpis($spis_id, LogModel::SPIS_DOK_PRIPOJEN,'Připojen dokument "'. $dokument_id .'"');
 
         return $this->insert($row);
 

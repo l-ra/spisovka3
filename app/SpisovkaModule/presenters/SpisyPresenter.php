@@ -208,10 +208,6 @@ class Spisovka_SpisyPresenter extends BasePresenter
             $DokumentSpis = new DokumentSpis();
             $DokumentSpis->pripojit($dokument_id, $spis_id);
 
-            $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis->nazev .'"');
-            $Log->logSpis($spis_id, LogModel::SPIS_DOK_PRIPOJEN,'Připojen dokument "'. $dokument_id .'"');
-
             echo '###vybrano###'. $spis->nazev;
             $this->terminate();
 
