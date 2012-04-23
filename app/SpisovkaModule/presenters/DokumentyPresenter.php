@@ -2130,6 +2130,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                                 $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
                                 $this->flashMessage('Datová zpráva pro "'. Subjekt::displayName($adresat,'isds') .'" byla úspěšně odeslána do systému ISDS.');
                                 $stav = 2;
+                                if ( !is_array($zprava) ) {
+                                    $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo uložit do e-podatelny.', 'warning');
+                                    continue;
+                                }
                             } else {
                                 $Log = new LogModel();
                                 $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');

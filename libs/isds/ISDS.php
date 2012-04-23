@@ -23,7 +23,7 @@ class ISDS {
 
     protected $debug = 0;
     protected $debug_log = array();
-    protected $debug_file = 1;
+    protected $debug_file = 0;
     protected $debug_file_text = "";
     
     protected $proxy = 0;
@@ -386,8 +386,6 @@ class ISDS {
 
             return $messageID;
 	} catch (Exception $e) {
-            $this->StatusCode    = $messageStatus->dmStatusCode;
-            $this->StatusMessage = $messageStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
 
@@ -614,8 +612,6 @@ class ISDS {
             
         } catch (Exception $e) {
             
-            $this->StatusCode    = $MessageStatus->dmStatusCode;
-            $this->StatusMessage = $MessageStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
@@ -896,8 +892,6 @@ class ISDS {
             return $ListOfSentOutput->dmRecords;
 
         } catch (Exception $e) {
-            $this->StatusCode    = @$ListOfSentOutput->dmStatus->dmStatusCode;
-            $this->StatusMessage = @$ListOfSentOutput->dmStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
@@ -948,7 +942,7 @@ class ISDS {
             $ListOfRecOutput = $this->InfoWS()->GetListOfReceivedMessages($ListOfReceivedInput);
             $this->StatusCode = $ListOfRecOutput->dmStatus->dmStatusCode;
             $this->StatusMessage = $ListOfRecOutput->dmStatus->dmStatusMessage;
-            $ListOfRecOutput->dmRecords->dmRecord = @$this->PrepareArray(@$ListOfRecOutput->dmRecords->dmRecord);
+            $ListOfRecOutput->dmRecords->dmRecord = $this->PrepareArray($ListOfRecOutput->dmRecords->dmRecord);
             return $ListOfRecOutput->dmRecords;
             
         } catch (Exception $e) {
@@ -1619,6 +1613,10 @@ class ISDS {
 
             if ( count( $this->debug_log )>0 ) {
 
+               // Nutne pri pouziti Xdebug, nebot nyni pouzivame var_dump
+               $html_errors = ini_get('html_errors');
+               ini_set('html_errors', 0);
+
                 $tmp_file  = "=================================================\n";
                 $tmp_file .= "  ISDS log \n";
                 $tmp_file .= "\n";
@@ -1662,6 +1660,7 @@ class ISDS {
             $filename = APP_DIR .'/../log/isds_'. KLIENT ."_". date("Y-m-d H-i-s") ." ". md5(microtime()) .".log";
             //file_put_contents($filename, $this->debug_file_text);
             file_put_contents($filename, $tmp_file);
+            ini_set('html_errors', $html_errors);
         }
 
     }

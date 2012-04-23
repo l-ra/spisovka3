@@ -10,6 +10,7 @@ class ISDS_Spisovka extends ISDS {
         
     }
 
+    /* Vrati ISDSBox nebo hodi vyjimku s popisem chyby */
     public function pripojit($params = null) {
 
         if ( is_array($params) ) {
@@ -18,7 +19,6 @@ class ISDS_Spisovka extends ISDS {
                 $config = $params;
             } else {
                 throw new InvalidArgumentException("Neplatné pole parametru.");
-                return false;
             }
         } else if ( is_object($params) ) {
             // prime hodnoty
@@ -26,7 +26,6 @@ class ISDS_Spisovka extends ISDS {
                 $config = $params->toArray();
             } else {
                 throw new InvalidArgumentException("Neplatný objekt parametru.");
-                return false;
             }
         } else {
             
@@ -39,20 +38,15 @@ class ISDS_Spisovka extends ISDS {
                     $config = $ep_config[ $params ];
                 } else {
                     throw new InvalidArgumentException("Požadované nastavení neexistuje.");
-                    return false;
                 }
             } else { // zadny parametr
                 if ( isset( $ep_config[0] ) ) { // existuje nejake nastaveni?
                     $config = $ep_config[0];
                 } else {
                     throw new InvalidArgumentException("Nastavení pro ISDS neexistuje.");
-                    return false;
                 }
             }
         }
-
-        //$this->
-
 
         $isds_portaltype = ($config['test']==1)?0:1;
         $this->config = $config;
@@ -67,7 +61,6 @@ class ISDS_Spisovka extends ISDS {
             } else {
                 // certifikat nenalezen
                 throw new FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
-                return false;
             }
         } else if ( $config['typ_pripojeni'] == 2 ) {
             // certifikatem + jmenem a heslem
@@ -76,26 +69,19 @@ class ISDS_Spisovka extends ISDS {
             } else {
                 // certifikat nenalezen
                 throw new FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
-                return false;
             }
-        } else {
+        } else
             throw new Exception("Chyba nastavení ISDS! - Nespecifikovaná chyba.");
-            return false;
-        }
         
-        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == "")) {
+        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == ""))
             return $this->ISDSBox;
+        
+        if ( $this->ErrorInfo == "Služba ISDS je momentálně nedostupná" ) {
+            throw new Exception("Server ISDS je dočasně nedostupný.<br />Omlouváme se všem uživatelům datových schránek za dočasné omezení přístupu do systému datových schránek z důvodu plánované údržby systému. Děkujeme za pochopení.");
+        } else if ( $this->ErrorInfo == "Neplatné přihlašovací údaje!" ) {
+            throw new Exception("Neplatné přihlašovací údaje!");
         } else {
-            if ( $this->ErrorInfo == "Služba ISDS je momentálně nedostupná" ) {
-                throw new Exception("Server ISDS je dočasně nedostupný.<br />Omlouváme se všem uživatelům datových schránek za dočasné omezení přístupu do systému datových schránek z důvodu plánované údržby systému. Děkujeme za pochopení.");
-                return false;
-            } else if ( $this->ErrorInfo == "Neplatné přihlašovací údaje!" ) {
-                throw new Exception("Neplatné přihlašovací údaje!");
-                return false;
-            } else {
-                throw new Exception("Chyba ISDS: ".$this->StatusCode." - ".$this->ErrorInfo);
-            }
-            return false;
+            throw new Exception("Chyba ISDS: ".$this->StatusCode." - ".$this->ErrorInfo);
         }
     }
 
@@ -168,6 +154,8 @@ class ISDS_Spisovka extends ISDS {
     }
 
     public function odeslatZpravu($zprava, $prilohy) {
+
+        $this->NullRetInfo();
 
         $this->debug_function('odeslatZpravu');
 
@@ -256,38 +244,26 @@ class ISDS_Spisovka extends ISDS {
         $this->debug_param('dmFiles', $MessageCreateInput['dmFiles']);
 
 	try {
-
             // odeslani zpravy a ziskani ID zpravy
             $MessageCreateOutput = $this->OperationsWS()->CreateMessage($MessageCreateInput);
+            $messageStatus = $MessageCreateOutput->dmStatus;
+            $this->StatusCode    = $messageStatus->dmStatusCode;
+            $this->StatusMessage = $messageStatus->dmStatusMessage;
 
             if ( isset($MessageCreateOutput->dmID) ) {
                 $MessageID = $MessageCreateOutput->dmID;
-                $messageStatus = $MessageCreateOutput->dmStatus;
-                $this->StatusCode    = $messageStatus->dmStatusCode;
-                $this->StatusMessage = $messageStatus->dmStatusMessage;
-                $this->debug_return('return',$messageID,1);
+                $this->debug_return('return',$MessageID,1);
                 return $MessageID;
             } else {
-                $messageStatus = @$MessageCreateOutput->dmStatus;
-                $this->StatusCode    = @$messageStatus->dmStatusCode;
-                $this->StatusMessage = @$messageStatus->dmStatusMessage;
-                $this->ErrorCode     = null;
-                $this->ErrorInfo     = "";
                 $this->debug_return('error',"Datovou zprávu se nepodařilo odeslat");
                 $this->debug_return('return',false,1);
-                throw new InvalidStateException($this->StatusMessage);
                 return false;
             }
 	} catch (Exception $e) {
-            $messageStatus = @$MessageCreateOutput->dmStatus;
-            $this->StatusCode    = @$messageStatus->dmStatusCode;
-            $this->StatusMessage = @$messageStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             $this->debug_return('error',"Datovou zprávu se nepodařilo odeslat");
             $this->debug_return('return',false,1);
-
-            throw new InvalidStateException($e->getMessage());
             return false;
 	}
 
