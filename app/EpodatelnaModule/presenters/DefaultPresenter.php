@@ -578,7 +578,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
 
-        if ( $ISDSBox = $isds->pripojit($config) ) {
+        try {
+            $ISDSBox = $isds->pripojit($config);
             
             $od = $this->Epodatelna->getLastISDS();
             $do = time() + 7200;
@@ -813,9 +814,9 @@ dmFormat =
             } else {
                 return null;
             }
-        } else {
+        } catch (Exception $e) {
             $this->flashMessage('Nepodařilo se připojit k ISDS schránce "'. $config['ucet'] .'"!
-                                  ISDS chyba: '. $isds->error(),'warning');
+                                  ISDS chyba: '. $e->getMessage(),'warning');
             return null;
         }
     }
