@@ -305,10 +305,6 @@
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$metadataForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
-        <!--<dl class="detail_item">
-            <dt>Zmocnění:</dt>
-            <dd><span id="dok_zmocneni"></span>&nbsp;<a href="{link :Spisovka:Dokumenty:zmocneni, 'id'=>$Dok->dokument_id}" id="dialog-zmocneni">Připojit zmocnění</a></dd>
-        </dl>-->
         {if !empty($Dok->poznamka)}<dl class="detail_item">
             <dt>Poznámka:</dt>
             <dd>{$metadataForm['poznamka']->control}</dd>
@@ -411,12 +407,6 @@
         </dl>
         {/if}
         
-        {if !empty($Dok->zmocneni)}
-        <dl class="detail_item">
-            <dt>Zmocnění:</dt>
-            <dd>{$Dok->zmocneni}&nbsp;</dd>
-        </dl>
-        {/if}
         {if !empty($Dok->poznamka)}
         <dl class="detail_item">
             <dt>Poznámka:</dt>

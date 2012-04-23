@@ -170,7 +170,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             foreach ($seznam as $index => $row) {
                 $dok = $Dokument->getInfo($row->id,null, $dataplus);
-                if ( empty($dok->stav_dokumentu) ) continue;
+                if ( empty($dok->stav_dokumentu) ) {
+                    unset($seznam[$index]);
+                    continue;
+                }
                 $seznam[$index] = $dok;
             }
         } 
