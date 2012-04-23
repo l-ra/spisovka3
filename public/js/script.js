@@ -287,10 +287,16 @@ $(function() {
         $('input[name^=zapujcka_vyber]').attr('checked',false);
     });
     
-    
+    $('form[name="frm-novyForm"]').bind("submit", dokumentVytvoritSubmit );
 
 });
 
+// Ochrana pred vicenasobnym odeslanim formulare
+function dokumentVytvoritSubmit()
+{
+    $("input[type=submit]", this).attr('disabled','disabled');
+    return true;
+}
 
 /*
  *  Vyvolani dialogu

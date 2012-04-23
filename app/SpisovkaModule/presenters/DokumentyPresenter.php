@@ -1496,7 +1496,19 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         try {
 
-            //Debug::dump($dokument_id); exit;
+            // [P.L.] 2012-04-13   Pridany zakladni kontroly
+            // TODO [T.V.] 2012-04-23 - zkontrolovat na novou podobu
+            $result = $Dokument->fetchRow(array(array('id=%i', $dokument_id)));
+            if ( count($result) != 1) {
+                throw new LogicException("Rozepsaný dokument ID $dokument_id nenalezen.", 1);
+            }
+            $row = $result->fetch();
+            $stav = $row['stav'];
+            if ($stav != 0) {
+                throw new LogicException("Dokument ID $dokument_id je již vytvořen.", 2);
+            }
+            unset($result);
+
             $CJ = new CisloJednaci();
 
             if ( !empty($data['odpoved']) ) {
@@ -1576,7 +1588,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } catch (DibiException $e) {
             $this->flashMessage('Dokument se nepodařilo vytvořit.','warning');
             $this->flashMessage('CHYBA: '. $e->getMessage(),'warning');
-            //Debug::dump($e); exit;
+        } catch (LogicException $e) {
+            $this->flashMessage('Kontrola platnosti selhala:' . $e->getMessage(),'warning');
+            if ($e->getCode() == 2) {
+                $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+            }
         }
 
     }
