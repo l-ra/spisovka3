@@ -407,12 +407,12 @@ class Install_DefaultPresenter extends BasePresenter
 		'description' => 'Configuration directive <code>variables_order</code> is missing. Nette Framework requires this to be set.',
             ),
 
-            array(
+        /*    array(
 		'title' => 'Reflection extension',
 		'required' => TRUE,
 		'passed' => (bool) $reflection,
 		'description' => 'Reflection extension is required.',
-            ),
+            ),*/
 
             /*array(
 		'title' => 'Reflection phpDoc',
@@ -1053,25 +1053,29 @@ class Install_DefaultPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $Osoba = new Osoba();
+        $User = new UserModel();
+
+        dibi::query("SET @@global.sql_mode= ''");
+        dibi::query("SET foreign_key_checks = 0");        
+        
         $data['stav'] = 1;
+        $data['user_created'] = 1;
         $data['date_created'] = new DateTime();
+        $data['user_modified'] = 1;
+        $data['date_modified'] = new DateTime();
 
         $user_data = array(
             'username'=>$data['username'],
-            'heslo'=>$data['heslo'],
-            'role'=>1
+            'heslo'=>$data['heslo']
         );
+
         unset($data['username'], $data['heslo'], $data['heslo_potvrzeni']);
 
         try {
+
+            $user_id = $User->insert($user_data);
             $osoba_id = $Osoba->insert($data);
-
-            if ( $osoba_id ) {
-
-                $User = new UserModel();
-                $User->pridatUcet($osoba_id, $user_data);
-
-            }
+            $User->pridatUcet($user_id, $osoba_id, 1);
 
             $session = Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
@@ -1085,7 +1089,7 @@ class Install_DefaultPresenter extends BasePresenter
             $this->flashMessage($e->getMessage(),'warning');
         }
 
-    }
+    }    
 
     /***/
 
