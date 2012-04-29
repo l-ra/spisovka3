@@ -146,7 +146,7 @@ class Workflow extends BaseModel
                 $prideleno_info = $UserModel->getUser($user_id, 1);
                 $data['prideleno_id'] = $prideleno_info->id;
                 $log = 'Dokument předán zaměstnanci '. Osoba::displayName($prideleno_info->identity) .'.';
-                $log_spis = 'Spis předán zaměstnanci '. Osoba::displayName($prideleno_info->identity) .'.';
+                $log_spis = 'Spis predan zamestnanci '. Osoba::displayName($prideleno_info->identity) .'.';
             } else {
                 $data['prideleno_id'] = null;
             }
@@ -157,10 +157,10 @@ class Workflow extends BaseModel
                 $data['orgjednotka_id'] = $orgjednotka_id;
                 if ( $org_info ) {
                     $log = 'Dokument předán organizační jednotce '. $org_info->zkraceny_nazev .'.';
-                    $log_spis = 'Spis předán organizační jednotce '. $org_info->zkraceny_nazev .'.';
+                    $log_spis = 'Spis predan organizacni jednotce '. $org_info->zkraceny_nazev .'.';
                 } else {
                     $log = 'Dokument předán organizační jednotce.';
-                    $log_spis = 'Spis předán organizační jednotce.';
+                    $log_spis = 'Spis predan organizacni jednotce.';
                 }
             } else {
                 $UserModel = new UserModel();
@@ -377,7 +377,7 @@ class Workflow extends BaseModel
                                 }
                                 
                                 $Spis->zmenitOrg($spis->id, $predan->orgjednotka_id);
-                                $Log->logSpis($spis->id, LogModel::SPIS_PRIJAT, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal spis'.$log_plus);
+                                $Log->logSpis($spis->id, LogModel::SPIS_PRIJAT, 'Zamestnanec '. Osoba::displayName($user_info->identity) .' prijal spis'.$log_plus);
                             }
                         }                
                         

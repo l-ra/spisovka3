@@ -144,6 +144,17 @@ class Spis extends TreeModel
                     'on' => array('d.id=dokspis.dokument_id'),
                     'cols' => array('nazev','popis','cislo_jednaci','jid','poradi')
                 ),
+                'workflow' => array(
+                    'from' => array($this->tb_workflow => 'wf'),
+                    'on' => array('wf.dokument_id=d.id AND wf.aktivni=1 AND wf.stav_osoby=1'),
+                    'cols' => array('stav_dokumentu','prideleno_id','orgjednotka_id')
+                ),  
+                'orgwf' => array(
+                    'from' => array($this->tb_orgjednotka => 'orgwf'),
+                    'on' => array('orgwf.id=wf.orgjednotka_id'),
+                    'cols' => array('zkraceny_nazev'=>'orgjednotka_prideleno')
+                ),   
+                
             )
         );   
         
@@ -348,7 +359,7 @@ class Spis extends TreeModel
         
         $Log = new LogModel();
         if ( is_object($ret) ) {
-            $Log->logSpis($spis_id, 48,'Hodnoty spisu se nepodařilo upravit.');
+            $Log->logSpis($spis_id, 48,'Hodnoty spisu se nepodarilo upravit.');
         } else {        
             $Log->logSpis($spis_id, 42);
         }        

@@ -39,7 +39,6 @@
 @{/block}
 @{block content}
     <div class="navigate">
-    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> -
     <a href="{link :Spisovka:Spisy:default}">Seznam spisů</a> -
     Detail spisu
     </div>
@@ -58,7 +57,7 @@
     <div id="dokument_blok_volby">
        {if $Pridelen==1 }
        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit spis</a>
-       <a href="{link :Spisovka:Uzivatel:vyberspis, 'id'=>$user->id, 'spis_id'=>$Spis->id}" id="dialog-uzivatel">Předat dokument</a>
+       <a href="{link :Spisovka:Uzivatel:vyberspis, 'id'=>$user->id, 'spis_id'=>$Spis->id}" id="dialog-spis">Předat spis</a>
        {/if}
        {if $Predan==1 }
        <a href="{link :Spisovka:Spisy:prevzit, 'id'=>$Spis->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít spis</a>
@@ -200,9 +199,13 @@
 
             {if $dok->stav_dokumentu == 1}
             <td class="prideleno">
-                {if !empty($dok->prideleno->prideleno_jmeno)}
+            {if empty($dok->prideleno->prideleno_id) }
+                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {else}
                 {$dok->prideleno->prideleno_jmeno}
-                {/if}&nbsp;
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {/if}  
             </td>
             <td class="stav">
                 nový
@@ -211,9 +214,21 @@
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->predano) }
             <td class="prideleno">
-                {if !empty($dok->predano->prideleno_jmeno)}
-                {$dok->predano->prideleno_jmeno}
-                {/if}&nbsp;
+            {if empty($dok->prideleno->prideleno_id) }
+                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {else}
+                {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {/if}
+                <br />
+            {if empty($dok->predano->prideleno_id) }
+                > {$dok->predano->orgjednotka_info->zkraceny_nazev}
+            {else}
+                > {$dok->predano->prideleno_jmeno}
+                <br />
+                > {=@$dok->predano->orgjednotka_info->zkraceny_nazev}
+            {/if}
             </td>
             <td class="stav">
                 předáno
@@ -222,9 +237,13 @@
             </td>
             {elseif $dok->stav_dokumentu == 2 && !empty($dok->prideleno) }
             <td class="prideleno">
-                {if !empty($dok->prideleno->prideleno_jmeno)}
+            {if empty($dok->prideleno->prideleno_id) }
+                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {else}
                 {$dok->prideleno->prideleno_jmeno}
-                {/if}&nbsp;
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {/if}            
             </td>
             <td class="stav">
                 přiděleno
@@ -236,6 +255,8 @@
                 {if !empty($dok->prideleno->prideleno_jmeno)}
                 {$dok->prideleno->prideleno_jmeno}
                 {/if}&nbsp;
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}                
             </td>
             <td class="stav">
                 vyřizuje se
@@ -249,6 +270,8 @@
                 {if !empty($dok->prideleno->prideleno_jmeno)}
                 {$dok->prideleno->prideleno_jmeno}
                 {/if}&nbsp;
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}                  
             </td>
             <td class="stav">
                 vyřízeno

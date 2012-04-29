@@ -169,8 +169,14 @@ $(function() {
     // Dialog - Vyber zamestnance pro predani
     $('#dialog-uzivatel').click(function(event){
         event.preventDefault();
-        return dialog(this,'Předat dokument zaměstnanci');
+        return dialog(this,'Předat dokument organizační jednotce nebo zaměstnanci');
     });
+    
+    // Dialog - Vyber org pro predani spisu
+    $('#dialog-spis').click(function(event){
+        event.preventDefault();
+        return dialog(this,'Předat spis organizační jednotce nebo zaměstnanci');
+    });    
 
     // Dialog - Vyber zamestnance pro predani
     $('#dialog-spojit').click(function(event){

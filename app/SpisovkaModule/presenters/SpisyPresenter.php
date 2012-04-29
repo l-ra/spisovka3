@@ -245,7 +245,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::SPIS_DOK_ODEBRAN,'Dokument vyjmut ze spisu "'. $spis->nazev .'"');
-            $Log->logSpis($spis_id, LogModel::SPIS_DOK_ODEBRAN,'Dokument "'. $dokument_id .'" odebrán ze spisu');
+            $Log->logSpis($spis_id, LogModel::SPIS_DOK_ODEBRAN,'Dokument "'. $dokument_id .'" odebran ze spisu');
             
             $this->flashMessage('Dokument byl úspěšně vyjmut ze spisu "'. $spis->nazev .'"');
         } else {
@@ -371,7 +371,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
         $this->template->seznam = $seznam;*/
 
     }
-
+    
     public function actionDetail()
     {
         
@@ -1112,6 +1112,66 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
     }
 
+    
+    public function renderPrideleni()
+    {
+
+        $user = Environment::getUser();
+            
+        if ( !$user->isInRole('superadmin','admin') ) {
+            $this->flashMessage('Nemáte oprávnění k provádění této činnosti!','warning');
+            $this->redirect(':Spisovka:Spisy:default');
+        }         
+        
+        
+        
+        $Spisy = new Spis();
+        $spis_id = null;
+
+        $post = $this->getRequest()->getPost();
+        if ( isset($post['spisorg_pridelit']) ) {
+            if ( isset($post['orgvybran']) ) {
+                $Spis = new Spis;
+                foreach( $post['orgvybran'] as $orgvybran_spis => $orgvybran_org ) {
+                    if ( $Spis->zmenitOrg($orgvybran_spis, $orgvybran_org) ) {
+                        $this->flashMessage('Úspěšně jste si přidělil spis číslo '.$orgvybran_spis);
+                    } else {
+                        $this->flashMessage('Přidělení spisu číslo '.$orgvybran_spis.' se nepodařilo. Zkuste to znovu.','warning');
+                    }                     
+                }
+            }
+            $this->redirect(':Spisovka:Spisy:default');
+        }
+        
+            $args = null;
+            if ( !empty($hledat) ) {
+                $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+            }
+
+            $args = $Spisy->spisovka($args);
+            $result = $Spisy->seznam($args, 5, $spis_id);
+            
+            $seznam = $result->fetchAll();
+            
+            if ( count($seznam)>0 ) {
+                $spis_ids = array();
+                foreach($seznam as $spis) {
+                    $spis_ids[] = $spis->id;
+                }
+                $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+            } else {
+                $this->template->seznam_dokumentu = array();
+            }               
+            
+            $this->template->seznam = $seznam;
+
+            $SpisovyZnak = new SpisovyZnak();
+            $spisove_znaky = $SpisovyZnak->select(11);
+            $this->template->SpisoveZnaky = $spisove_znaky;
+
+    }
+    
+    
 
 }
 
