@@ -108,7 +108,13 @@
 
             {if $dok->stav_dokumentu == 1 && !empty($dok->prideleno)}
             <td class="prideleno">
+            {if empty($dok->prideleno->prideleno_id) }
+                {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {else}
                 {$dok->prideleno->prideleno_jmeno}
+                <br />
+                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+            {/if}
             </td>
             <td class="stav {if $dok->lhuta_stav==2}stav_red" title="Vypršela lhůta k vyřízení! Vyříďte neprodleně tento dokument."{elseif $dok->lhuta_stav==1}stav_yellow" title="Za pár dní vyprší lhůta k vyřízení! Vyříďte co nejrychleji tento dokument."{else}stav"{/if}>
                 nový
