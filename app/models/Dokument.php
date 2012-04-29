@@ -1389,15 +1389,6 @@ class Dokument extends BaseModel
             /* FNUSA - filtry pro celou org * END */
             
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
             case 'org':
                 if ( $isVedouci ) {
 
@@ -1405,12 +1396,18 @@ class Dokument extends BaseModel
 
                     if ( count($org_jednotka_vedouci) == 1 ) {
                         $args = array(
-                            'where' => array( array('wf.orgjednotka_id=%i',$org_jednotka_vedouci[0]) )
+                            'where' => array( 
+                                array('wf.orgjednotka_id=%i',$org_jednotka_vedouci[0]), 
+                                array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                                array('wf.aktivni=1') )
                         );
                     } else if ( count($org_jednotka_vedouci) > 1 ) {
                         $args = array(
-                            'where' => array( array('wf.orgjednotka_id IN (%in)',$org_jednotka_vedouci) )
-                        );
+                            'where' => array( 
+                                array('wf.orgjednotka_id IN (%in)',$org_jednotka_vedouci), 
+                                array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                                array('wf.aktivni=1') )
+                        );                        
                     } else if ( $isAdmin ) {
                         $args = array(
                             'where' => array( array('1') )
@@ -1446,7 +1443,7 @@ class Dokument extends BaseModel
                 } else {
                     $args = array(
                         'where' => array(
-                            array('wf.prideleno_id=%i',$user->id,),
+                            array('wf.prideleno_id=%i',$user->id),
                             array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
                             array('wf.aktivni=1') )
                     );
@@ -1455,61 +1452,85 @@ class Dokument extends BaseModel
                 break;
             case 'predane':
                 $args = array(
-                    'where' => array( array('wf.prideleno_id=%i',$user->id),array('wf.stav_osoby=0'), array('wf.aktivni=1') )
+                    'where' => array( 
+                        array('wf.prideleno_id=%i',$user->id),
+                        array('wf.stav_osoby=0'), 
+                        array('wf.aktivni=1') )
                 );
                 break;
             case 'predane_vse':
                 $args = array(
-                    'where' => array( array('wf.stav_osoby=0'), array('wf.aktivni=1') )
+                    'where' => array( 
+                        array('wf.stav_osoby=0'), 
+                        array('wf.aktivni=1') )
                 );
                 break;            
             case 'pracoval':
                 $vyrusit_bezvyrizeni = true;
                 $args = array(
-                    'where' => array( array('wf.prideleno_id=%i',$user->id),array('wf.stav_osoby < 100') )
+                    'where' => array( 
+                        array('wf.prideleno_id=%i',$user->id),
+                        array('wf.stav_osoby < 100') )
                 );
                 break;
             case 'moje_nove':
                 $args = array(
-                    'where' => array( array('wf.prideleno_id=%i',$user->id),array('wf.stav_osoby = 1'), array('wf.stav_dokumentu = 1'), array('wf.aktivni=1') )
+                    'where' => array( 
+                        array('wf.prideleno_id=%i',$user->id),
+                        array('wf.stav_osoby = 1'), 
+                        array('wf.stav_dokumentu = 1'), 
+                        array('wf.aktivni=1') )
                 );
                 break;
             case 'vsichni_nove':
                 $args = array(
-                    'where' => array( array('wf.stav_dokumentu = 1'), array('wf.aktivni=1'), $where_org )
+                    'where' => array( 
+                        array('wf.stav_dokumentu = 1'), 
+                        array('wf.aktivni=1'), 
+                        $where_org )
                 );
                 break;
             case 'moje_vyrizuje':
                 $args = array(
-                    'where' => array( array('wf.prideleno_id=%i',$user->id),array('wf.stav_osoby = 1'), array('wf.stav_dokumentu = 3'), array('wf.aktivni=1') )
+                    'where' => array( 
+                        array('wf.prideleno_id=%i',$user->id),
+                        array('wf.stav_osoby = 1'), 
+                        array('wf.stav_dokumentu = 3'), 
+                        array('wf.aktivni=1') )
                 );
                 break;
             case 'vsichni_vyrizuji':
                 $args = array(
-                    'where' => array( array('wf.stav_dokumentu = 3'), array('wf.aktivni=1'), $where_org )
+                    'where' => array( 
+                        array('wf.stav_dokumentu = 3'), 
+                        array('wf.aktivni=1'), 
+                        $where_org )
                 );
                 break;
             case 'moje_vyrizene':
                 $vyrusit_bezvyrizeni = true;
                 $args = array(
-                    'where' => array( array('wf.prideleno_id=%i',$user->id),array('wf.stav_osoby = 1'),
-                                      array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)') )
+                    'where' => array( 
+                        array('wf.prideleno_id=%i',$user->id),
+                        array('wf.stav_osoby = 1'),
+                        array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)') )
                 );
                 break;
             case 'vsichni_vyrizene':
                 $vyrusit_bezvyrizeni = true;
                 $args = array(
-                    'where' => array( array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)'), $where_org )
+                    'where' => array( 
+                        array('(wf.stav_dokumentu = 4 AND wf.aktivni=1) OR (wf.stav_dokumentu = 5 AND wf.aktivni=1)'), 
+                        $where_org )
                 );
                 break;
             case 'vse':
-                if ( count($where_org)>0 ) {
-                    $args = array(  
-                        'where' => array( $where_org )
-                    );
-                } else {
-                    $args = array();
-                }
+                $args = array(
+                    'where' => array(
+                        array( $where_org ),
+                        array('wf.stav_osoby=0 OR wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                        array('wf.aktivni=1') )
+                );
                 break;
             case 'doporucene':
                 $vyrusit_bezvyrizeni = true;
@@ -1584,7 +1605,6 @@ class Dokument extends BaseModel
             $args['where'][] = array('!((wf.stav_dokumentu = 4) OR (wf.stav_dokumentu = 5))');
 
         }
-
 
         return $args;
 

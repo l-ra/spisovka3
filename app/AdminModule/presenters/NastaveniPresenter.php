@@ -13,6 +13,8 @@ class Admin_NastaveniPresenter extends BasePresenter
         $this->template->Urad = $user_config->urad;
 
         $this->template->CisloJednaci = $user_config->cislo_jednaci;
+        
+        $this->template->Nastaveni = $user_config->nastaveni;
 
         $this->template->Ukazka = $CJ->generuj();
 
@@ -186,5 +188,64 @@ class Admin_NastaveniPresenter extends BasePresenter
         $this->redirect('this');
     }
 
+    
+    protected function createComponentNastaveniForm()
+    {
+
+        $user_config = Environment::getVariable('user_config');
+        $nastaveni = $user_config->nastaveni;
+
+        $form1 = new AppForm();
+        $form1->addText('pocet_polozek', 'Počet položek v seznamu:', 10, 10)
+                ->setValue($nastaveni->pocet_polozek)
+                ->addRule(Form::INTEGER, 'Počet položek v seznamu musí být číslo.')
+                ->addRule(Form::RANGE, 'Počet položek v seznamu musí být v rozsahu od 1 do 500', array(1, 500));
+                //->addRule(Form::FILLED, 'Počet položek v seznamu musí být vyplněn.');
+
+        $typ = array(
+            0 => 'dokument/spis může upravovat pouze zvolená osoba',
+            1 => 'dokument/spis může upravovat kdokoli z dané organizační jednotky'
+        );
+        
+        $form1->addRadioList('typ_pristupu', 'Typ přístupu k dokumentům:', $typ)
+                ->setValue( !isset($nastaveni->typ_pristupu)?0:$nastaveni->typ_pristupu );
+
+        $form1->addSubmit('upravit', 'Uložit')
+                 ->onClick[] = array($this, 'nastavitClicked');
+        $form1->addSubmit('storno', 'Zrušit')
+                 ->setValidationScope(FALSE)
+                 ->onClick[] = array($this, 'stornoClicked');
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+
+        $renderer = $form1->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form1;
+    }
+
+
+    public function nastavitClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
+        $config_data = $config->toArray();
+        $config_data['nastaveni']['pocet_polozek'] = $data['pocet_polozek'];
+        $config_data['nastaveni']['typ_pristupu'] = $data['typ_pristupu'];
+
+        $config_modify = new Config();
+        $config_modify->import($config_data);
+        $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
+
+        Environment::setVariable('user_config', $config_modify);
+
+        $this->flashMessage('Obecné nastavení bylo upraveno.');
+        $this->redirect('this');
+    }
+    
 
 }

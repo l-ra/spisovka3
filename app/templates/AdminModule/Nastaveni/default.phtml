@@ -185,3 +185,28 @@
             </dd>
         </dl>
     </div>
+    
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Obecné nastavení</div>
+        {if ($FormUpravit=='nastaveni')}
+        {control nastaveniForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Počet položek v seznamu:</dt>
+            <dd>{$Nastaveni->pocet_polozek}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Typ přístupu k dokumentům:</dt>
+            <dd>
+                {if isset($Nastaveni->typ_pristupu) && $Nastaveni->typ_pristupu==1}
+                dokument/spis může upravovat kdokoli z dané organizační jednotky
+                {else}
+                dokument/spis může upravovat pouze zvolená osoba
+                {/if}
+            </dd>
+        </dl>
+
+        {access :Admin:Nastaveni:default}<a href="{link :Admin:Nastaveni:default, 'upravit'=>'nastaveni'}">Upravit</a>{/access}
+        {/if}
+    </div>
+    

@@ -10,6 +10,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     private $odpoved = null;
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
+    private $typ_pristupu = 1; // 0 = na jmeno, 1 = na utvar
     private $pdf_output = 0;
 
     public function startup()
@@ -27,6 +28,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->oddelovac_poradi = '/';
         }
         $this->template->Oddelovac_poradi = $this->oddelovac_poradi;
+        if ( isset($user_config->nastaveni->typ_pristupu) ) {
+            $this->typ_pristupu = $user_config->nastaveni->typ_pristupu;
+        } else {
+            $this->typ_pristupu = 1;
+        }        
 
         parent::startup();
     }
@@ -318,20 +324,25 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }      
             
             // Prideleny nebo predany uzivatel
-            if ( @$dokument->prideleno->prideleno_id == $user_id || Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id, null, $user_id) ) {
+            // $this->typ_pristupu = 0 -> spravuje pouze uzivatel (prideleno_id)
+            // $this->typ_pristupu = 1 -> spravuje kdokoli z utvaru (orgjednotka_id)
+            if ( @$dokument->prideleno->prideleno_id == $user_id 
+                    || (Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id, null, $user_id) && $this->typ_pristupu) ) {
                 // prideleny
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
                 $formUpravit = $this->getParam('upravit',null);
             }
-            if ( @$dokument->predano->prideleno_id == $user_id  || Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id, null, $user_id)) {
+            if ( @$dokument->predano->prideleno_id == $user_id 
+                    || (Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id, null, $user_id) && $this->typ_pristupu) ) {
                 // predany
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;
                 $formUpravit = $this->getParam('upravit',null);
             }
+            
             if ( empty($dokument->prideleno->prideleno_id)
                         && Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) ) {
                 // prideleno organizacni jednotce
@@ -2750,72 +2761,70 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     protected function createComponentFiltrForm()
     {
 
-        $filtr =  !is_null($this->filtr)?$this->filtr:'org_pridelene';
-        $select = array(
-            'org_pridelene'=>'Přidělené',
-            'org_kprevzeti'=>'K převzetí',
-            'org_predane'=>'Předané',
-            'org_nove'=>'Nové / nepředané',
-            'org_kvyrizeni'=>'K vyřízení',
-            'org_vyrizene'=>'Vyřízené',
-            'org_pracoval'=>'Na kterých jsem kdy pracoval',
-            'org_doporucene'=>'Doporučené',
+        if ( $this->typ_pristupu ) {
+            // Typ pristupu na organizacni jednotku
+            $filtr =  !is_null($this->filtr)?$this->filtr:'org_pridelene';
+            $select = array(
+                'org_pridelene'=>'Přidělené',
+                'org_kprevzeti'=>'K převzetí',
+                'org_predane'=>'Předané',
+                'org_nove'=>'Nové / nepředané',
+                'org_kvyrizeni'=>'K vyřízení',
+                'org_vyrizene'=>'Vyřízené',
+                'org_pracoval'=>'Na kterých jsem kdy pracoval',
+                'org_doporucene'=>'Doporučené',
             
-            'org_predane_k_odeslani'=>'K odeslání',
-            'org_odeslane'=>'Odeslané', 
-            'org_vse'=>'Všechny',
-        );        
-        
-        if (0):
-        if ( Environment::getUser()->isAllowed(null, 'is_vedouci') ) {
-            $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
-            $select = array(
-                'Vlastní' => array(
-                    'moje'=>'Přidělené',
-                    'predane'=>'K převzetí',
-                    'moje_nove'=>'Nové / nepředané',
-                    'moje_vyrizuje'=>'K vyřízení',
-                    'moje_vyrizene'=>'Vyřízené',
-                    'pracoval'=>'Na kterých jsem kdy pracoval',
-                ),
-                'Společné' => array(
-                    'doporucene'=>'Doporučené',
-                    'predane_vse'=>'Předané',
-                    'predane_k_odeslani'=>'K odeslání',
-                    'odeslane'=>'Odeslané',
-                    'vsichni_nove'=>'Všechny nepředané',
-                    'vsichni_vyrizuji'=>'Všechny k vyřízení',
-                    'vsichni_vyrizene'=>'Všechny vyřízené',
-                    'vse'=>'Všechny',
-                    'org'=>'Všechny včetně podřízených',
-                ),
-                
-                
-            );
+                'org_predane_k_odeslani'=>'K odeslání',
+                'org_odeslane'=>'Odeslané', 
+                'org_vse'=>'Všechny',
+            );               
         } else {
+            // Typ pristupu na osobu
             $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
-            $select = array(
-                'Vlastní' => array(
-                    'moje'=>'Přidělené',
-                    'predane'=>'K převzetí',
-                    'moje_nove'=>'Nové / nepředané',
-                    'moje_vyrizuje'=>'K vyřízení',
-                    'moje_vyrizene'=>'Vyřízené',
-                    'pracoval'=>'na kterých jsem kdy pracoval',
-                ),
-                'Společné' => array(
-                    /*'vsichni_nove'=>'Všechny nové dokumenty, které nebyly ještě předány',
-                    'vsichni_vyrizuji'=>'Všechny dokumenty, které se vyřizují',
-                    'vsichni_vyrizene'=>'Všechny dokumenty, které jsou vyřízené',*/
-                    'doporucene'=>'Doporučené',
-                    'predane_vse'=>'Předané',
-                    'predane_k_odeslani'=>'K odeslání',
-                    'odeslane'=>'Odeslané',
-                    'vse'=>'Všechny'
-                )
-            );
+            if ( Environment::getUser()->isAllowed(null, 'is_vedouci') ) {
+                // Vedouci role - vetsi moznosti nahlizeni
+                $select = array(
+                    'Vlastní' => array(
+                        'moje'=>'Přidělené',
+                        'predane'=>'K převzetí',
+                        'moje_nove'=>'Nové / nepředané',
+                        'moje_vyrizuje'=>'K vyřízení',
+                        'moje_vyrizene'=>'Vyřízené',
+                        'pracoval'=>'Na kterých jsem kdy pracoval',
+                    ),
+                    'Společné' => array(
+                        'doporucene'=>'Doporučené',
+                        'predane_vse'=>'Předané',
+                        'predane_k_odeslani'=>'K odeslání',
+                        'odeslane'=>'Odeslané',
+                        'vsichni_nove'=>'Všechny nepředané',
+                        'vsichni_vyrizuji'=>'Všechny k vyřízení',
+                        'vsichni_vyrizene'=>'Všechny vyřízené',
+                        'vse'=>'Všechny',
+                        'org'=>'Všechny včetně podřízených',
+                    ),
+                );
+            } else {
+                // Standardni role
+                $select = array(
+                    'Vlastní' => array(
+                        'moje'=>'Přidělené',
+                        'predane'=>'K převzetí',
+                        'moje_nove'=>'Nové / nepředané',
+                        'moje_vyrizuje'=>'K vyřízení',
+                        'moje_vyrizene'=>'Vyřízené',
+                        'pracoval'=>'na kterých jsem kdy pracoval',
+                    ),
+                    'Společné' => array(
+                        'doporucene'=>'Doporučené',
+                        'predane_vse'=>'Předané',
+                        'predane_k_odeslani'=>'K odeslání',
+                        'odeslane'=>'Odeslané',
+                        'vse'=>'Všechny'
+                    )
+                );
+            }
         }
-        endif; // if 0
 
         $filtr_bezvyrizenych =  !is_null($this->filtr_bezvyrizenych)?$this->filtr_bezvyrizenych:false;
 
