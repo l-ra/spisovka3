@@ -1055,7 +1055,7 @@ class Install_DefaultPresenter extends BasePresenter
         $Osoba = new Osoba();
         $User = new UserModel();
 
-        dibi::query("SET @@global.sql_mode= ''");
+        dibi::query("SET sql_mode = ''");
         dibi::query("SET foreign_key_checks = 0");        
         
         $data['stav'] = 1;
