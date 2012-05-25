@@ -131,7 +131,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
-
+        
         $Dokument = new Dokument();
 
         $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
@@ -282,7 +282,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     }
 
-    public function renderDefault($filtr = null, $hledat = null, $seradit = null)
+    public function renderDefault()
     {
 
         $post = $this->getRequest()->getPost();
@@ -300,11 +300,15 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             );              
         }
 
+        $filtr = $this->getParam('filtr');
+        $hledat = $this->getParam('hledat');
+        $seradit = $this->getParam('seradit');         
+        
         $this->template->title = "Seznam dokumentů ve spisovně";
         $this->seznam(0, $filtr, $hledat, $seradit);
     }
 
-    public function renderPrijem($filtr = null, $hledat = null, $seradit = null)
+    public function renderPrijem()
     {
 
         $post = $this->getRequest()->getPost();
@@ -312,16 +316,21 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
+        $filtr = $this->getParam('filtr');
+        $hledat = $this->getParam('hledat');
+        $seradit = $this->getParam('seradit');         
+        
         $this->template->akce_select = array(
             'prevzit_spisovna'=>'převzetí seznamu dokumentů do spisovny'
         );
+        
         $this->template->title = "Seznam dokumentů pro příjem do spisovny";
         $this->template->is_prijem = 1;
         $this->setView('default');
         $this->seznam(1, $filtr, $hledat, $seradit);
     }
 
-    public function renderKeskartaciseznam($filtr = null, $hledat = null, $seradit = null)
+    public function renderKeskartaciseznam()
     {
 
         $post = $this->getRequest()->getPost();
@@ -329,6 +338,10 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
+        $filtr = $this->getParam('filtr');
+        $hledat = $this->getParam('hledat');
+        $seradit = $this->getParam('seradit');         
+        
         $this->template->akce_select = array(
             'ke_skartaci'=>'předat do skartačního řízení'
         );
@@ -337,7 +350,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->seznam(2, $filtr, $hledat, $seradit);
     }
 
-    public function renderSkartace($filtr = null, $hledat = null, $seradit = null)
+    public function renderSkartace()
     {
 
         $post = $this->getRequest()->getPost();
@@ -345,6 +358,10 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
+        $filtr = $this->getParam('filtr');
+        $hledat = $this->getParam('hledat');
+        $seradit = $this->getParam('seradit');         
+        
         $this->template->akce_select = array(
             'archivovat'=>'archivovat vybrané dokumenty',
             'skartovat'=>'skartovat vybrané dokumenty',

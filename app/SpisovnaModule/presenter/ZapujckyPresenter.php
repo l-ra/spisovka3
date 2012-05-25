@@ -96,13 +96,17 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     }    
     
     
-    public function renderDefault($filtr = null, $hledat = null, $seradit = null)
+    public function renderDefault()
     {
         
         $post = $this->getRequest()->getPost();
         if ( isset($post['hromadna_submit']) ) {
             $this->actionAkce($post);
         }        
+        
+        $filtr = $this->getParam('filtr');
+        $hledat = $this->getParam('hledat');
+        $seradit = $this->getParam('seradit');         
         
         $user_config = Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');

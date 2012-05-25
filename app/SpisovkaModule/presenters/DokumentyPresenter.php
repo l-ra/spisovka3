@@ -37,7 +37,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         parent::startup();
     }
 
-    public function renderDefault($filtr = null, $hledat = null, $seradit = null)
+    public function renderDefault()
     {
 
         $post = $this->getRequest()->getPost();
@@ -46,6 +46,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $this->template->Typ_evidence = $this->typ_evidence;
+        
+        $filtr = $this->getParam('filtr');
+        $hledat = $this->getParam('hledat');
+        $seradit = $this->getParam('seradit');
 
         $user_config = Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
