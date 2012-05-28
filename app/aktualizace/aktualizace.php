@@ -14,6 +14,8 @@
         exit;
     }    
 }*/
+    
+    set_time_limit(0); // zpracovani muze byt delsi dle mnozstvi dat
 
     include WWW_DIR ."libs/dibi/dibi.php";
     
@@ -111,6 +113,7 @@
             "database"=>$ini['common']['database.database'],
             "charset"=>$ini['common']['database.charset'],
             "prefix"=>$ini['common']['database.prefix'],
+            "profiler"=>FALSE
         );
 
         echo '<div class="dokument_blok">';

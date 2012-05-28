@@ -3,7 +3,6 @@
 --
 -- Nahradte rucne {tbls3} za odpovidajici hodnotu - prefix nebo nic
 --
-C:\server\mysql\bin>mysql -u root spisovka3_pokusy < i:\bp.spisovka\s4a_sync_zaloha.sql
 -- -----------------------------------------------------------------------------;
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -34,7 +33,7 @@ ADD COLUMN `uroven` TINYINT(3) UNSIGNED NULL DEFAULT NULL  AFTER `sekvence_strin
 , ADD INDEX `fk_orgjednotka_user2` (`user_modified` ASC) 
 , ADD INDEX `parent_id` (`parent_id` ASC) ;
 
-UPDATE orgjednotka SET parent_id = NULL, sekvence = id, sekvence_string = CONCAT(ciselna_rada,'.',id), uroven = 0;
+UPDATE {tbls3}orgjednotka SET parent_id = NULL, sekvence = id, sekvence_string = CONCAT(ciselna_rada,'.',id), uroven = 0;
 
 ALTER TABLE `{tbls3}cislo_jednaci` CHANGE COLUMN `orgjednotka_id` `orgjednotka_id` INT(10) UNSIGNED NULL DEFAULT NULL  , CHANGE COLUMN `user_id` `user_id` INT(10) UNSIGNED NULL DEFAULT NULL  ,
   ADD CONSTRAINT `fk_cislo_jednaci_orgjednotka1`
@@ -48,8 +47,11 @@ ALTER TABLE `{tbls3}cislo_jednaci` CHANGE COLUMN `orgjednotka_id` `orgjednotka_i
   ON DELETE NO ACTION
   ON UPDATE NO ACTION
 , ADD INDEX `fk_cislo_jednaci_user1` (`user_id` ASC) 
-, ADD INDEX `fk_cislo_jednaci_orgjednotka1` (`orgjednotka_id` ASC) 
-, DROP INDEX `search`;
+, ADD INDEX `fk_cislo_jednaci_orgjednotka1` (`orgjednotka_id` ASC)
+, DROP INDEX `orgjednotka_id`
+, DROP INDEX `user_id`
+, DROP INDEX `urad_zkratka` ;
+
 
 UPDATE `{tbls3}dokument` AS d1 LEFT JOIN `{tbls3}dokument_typ` AS dt ON dt.id = d1.typ_dokumentu_id SET d1.zpusob_doruceni_id = IF(dt.typ>0,dt.typ,NULL);
 
@@ -57,7 +59,7 @@ ALTER TABLE `{tbls3}dokument_typ`
 DROP COLUMN `typ` , ADD COLUMN `podatelna` TINYINT(1) NOT NULL DEFAULT '1'  AFTER `smer` , 
 ADD COLUMN `referent` TINYINT(1) NOT NULL DEFAULT '1'  AFTER `podatelna` ;
 
-UPDATE dokument_typ SET referent = smer, podatelna = IF(smer=1,0,1);
+UPDATE {tbls3}dokument_typ SET referent = smer, podatelna = IF(smer=1,0,1);
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}zpusob_doruceni` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -67,7 +69,7 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}zpusob_doruceni` (
   `note` VARCHAR(255) NULL DEFAULT NULL ,
   `epodatelna` TINYINT(1) NULL DEFAULT '0' ,
   PRIMARY KEY (`id`) )
-ENGINE = InnoDB AUTO_INCREMENT = 6 DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
+ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
 INSERT INTO `{tbls3}zpusob_doruceni` (`id`, `nazev`, `stav`, `fixed`, `note`, `epodatelna`) VALUES
 (1,	'emailem',	1,	1,	NULL,	1),
@@ -234,7 +236,11 @@ ADD COLUMN `cislo_doporuceneho_dopisu` VARCHAR(150) NULL DEFAULT NULL  AFTER `da
 , ADD INDEX `fk_dokument_user1` (`user_created` ASC) 
 , ADD INDEX `fk_dokument_user2` (`user_modified` ASC) 
 , ADD INDEX `fk_dokument_zpusob_doruceni1` (`zpusob_doruceni_id` ASC) 
-, DROP INDEX `cislojednaci_id` ;
+, DROP INDEX `typ_dokumentu_id`
+, DROP INDEX `cislojednaci_id`
+, DROP INDEX `zpusob_vyrizeni_id`
+, DROP INDEX `zmocneni_id`
+, DROP INDEX `zpusob_doruceni_id` ;
 
 UPDATE `{tbls3}dokument` AS d1 LEFT JOIN `{tbls3}spousteci_udalost` AS su ON su.nazev = d1.spousteci_udalost SET d1.spousteci_udalost_id = IF(su.id,su.id,NULL);
 
@@ -285,12 +291,12 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}subjekt_historie` (
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
 INSERT INTO `{tbls3}subjekt_historie` (subjekt_id,stav,`type`,ic,dic,nazev_subjektu,jmeno,prijmeni,prostredni_jmeno,titul_pred,titul_za,rodne_jmeno,datum_narozeni,misto_narozeni,okres_narozeni,stat_narozeni,adresa_mesto,adresa_ulice,adresa_cp,adresa_co,adresa_psc,adresa_stat,narodnost,email,telefon,id_isds,poznamka,date_created,user_created)
-SELECT s2.id,s2.stav,s2.type,s2.ic,s2.dic,s2.nazev_subjektu,s2.jmeno,s2.prijmeni,s2.prostredni_jmeno,s2.titul_pred,s2.titul_za,s2.rodne_jmeno,s2.datum_narozeni,s2.misto_narozeni,s2.okres_narozeni,s2.stat_narozeni,s2.adresa_mesto,s2.adresa_ulice,s2.adresa_cp,s2.adresa_co,s2.adresa_psc,s2.adresa_stat,s2.narodnost,s2.email,s2.telefon,s2.id_isds,s2.poznamka,s2.date_created,s2.user_added FROM `{tbls3}subjekt` AS s2 WHERE s2.stav >= 100;
+SELECT s2.id,s2.stav,s2.type,s2.ic,s2.dic,s2.nazev_subjektu,s2.jmeno,s2.prijmeni,s2.prostredni_jmeno,s2.titul_pred,s2.titul_za,s2.rodne_jmeno,s2.datum_narozeni,s2.misto_narozeni,s2.okres_narozeni,s2.stat_narozeni,s2.adresa_mesto,s2.adresa_ulice,s2.adresa_cp,s2.adresa_co,s2.adresa_psc,s2.adresa_stat,s2.narodnost,s2.email,s2.telefon,s2.id_isds,s2.poznamka,s2.date_created,IFNULL(s2.user_added,1) FROM `{tbls3}subjekt` AS s2 WHERE s2.stav >= 100;
 
 DELETE FROM `{tbls3}subjekt` WHERE stav >= 100;
 
 ALTER TABLE `{tbls3}subjekt` DROP COLUMN `version` , 
-CHANGE COLUMN `user_added` `user_created` INT(10) UNSIGNED NOT NULL  AFTER `date_created` , 
+CHANGE COLUMN `user_added` `user_created` INT(10) UNSIGNED NOT NULL AFTER `date_created` , 
 ADD COLUMN `user_modified` INT(10) UNSIGNED NULL DEFAULT NULL  AFTER `date_modified` , 
 CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT  , 
   ADD CONSTRAINT `fk_subjekt_user1`
@@ -339,9 +345,9 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}file_historie` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
-INSERT INTO `file_historie` 
+INSERT INTO `{tbls3}file_historie` 
 (file_id,stav,typ,nazev,popis,mime_type,real_name,real_path,real_type,date_created,user_created,guid,md5_hash,size) 
-SELECT f1.id,f1.stav,f1.typ,f1.nazev,f1.popis,f1.mime_type,f1.real_name,f1.real_path,f1.real_type,f1.date_created,f1.user_created,f1.guid,f1.md5_hash,f1.size FROM `file` AS f1 LEFT JOIN (SELECT id, MAX(VERSION) AS VERSION FROM `file` WHERE 1 GROUP BY id) AS sub ON (f1.id=sub.id AND f1.version = sub.version) WHERE sub.id IS NULL;
+SELECT f1.id,f1.stav,f1.typ,f1.nazev,f1.popis,f1.mime_type,f1.real_name,f1.real_path,f1.real_type,f1.date_created,f1.user_created,f1.guid,f1.md5_hash,f1.size FROM `{tbls3}file` AS f1 LEFT JOIN (SELECT id, MAX(VERSION) AS VERSION FROM `{tbls3}file` WHERE 1 GROUP BY id) AS sub ON (f1.id=sub.id AND f1.version = sub.version) WHERE sub.id IS NULL;
 
 DELETE `{tbls3}file` FROM `{tbls3}file` LEFT JOIN (SELECT id, MAX(VERSION) AS VERSION FROM `{tbls3}file` WHERE 1 GROUP BY id) AS sub ON (`{tbls3}file`.id=sub.id AND `{tbls3}file`.version = sub.version) WHERE sub.id IS NULL;
 
@@ -443,7 +449,8 @@ CHANGE COLUMN `date_created` `date_created` DATETIME NOT NULL  ,
 , ADD INDEX `fk_dokument_odeslani_user1` (`user_id` ASC) 
 , ADD INDEX `fk_dokument_odeslani_zpusob_odeslani1` (`zpusob_odeslani_id` ASC) 
 , ADD INDEX `fk_dokument_odeslani_epodatelna1` (`epodatelna_id` ASC) 
-, DROP INDEX `dokument_id`;
+, DROP INDEX `dokument`
+, DROP INDEX `subjekt`;
 
 UPDATE `{tbls3}dokument_odeslani` SET stav=2;
 
@@ -470,7 +477,8 @@ CHANGE COLUMN `date_added` `date_added` DATETIME NOT NULL  ,
 , ADD INDEX `fk_dokument_to_file_dokument1` (`dokument_id` ASC) 
 , ADD INDEX `fk_dokument_to_file_file1` (`file_id` ASC) 
 , ADD INDEX `fk_dokument_to_file_user1` (`user_id` ASC) 
-, DROP INDEX `dokument_id` ;
+, DROP INDEX `dokument`
+, DROP INDEX `file`;
 
 ALTER TABLE `{tbls3}spisovy_znak` CHANGE COLUMN `spisznak_parent` `parent_id` INT(11) NULL DEFAULT NULL , 
 CHANGE COLUMN `spousteci_udalost` `spousteci_udalost_id` INT(11) NULL DEFAULT NULL , 
@@ -490,7 +498,7 @@ ADD COLUMN `selected` tinyint(1) NOT NULL DEFAULT '1' AFTER `spousteci_udalost_i
 , ADD INDEX `fk_spisovy_znak_spisovy_znak1` (`parent_id` ASC) ;
 
 ALTER TABLE `{tbls3}spis` CHANGE COLUMN `spis_parent` `parent_id` INT(11) NULL DEFAULT NULL , 
-CHANGE COLUMN `spousteci_udalost` `spousteci_udalost_id` INT(11) NULL DEFAULT NULL , 
+ADD COLUMN `spousteci_udalost_id` INT(11) NULL DEFAULT NULL AFTER `spousteci_udalost`, 
 CHANGE COLUMN `spisovy_znak` `spisovy_znak_id` INT(10) NULL DEFAULT NULL  AFTER `spousteci_udalost_id` , 
 ADD COLUMN `sekvence_string` VARCHAR(1000) NULL DEFAULT NULL  AFTER `sekvence` , 
 ADD COLUMN `datum_otevreni` DATETIME NULL DEFAULT NULL  AFTER `skartacni_lhuta` , 
@@ -556,7 +564,8 @@ CHANGE COLUMN `date_added` `date_added` DATETIME NULL DEFAULT NULL ,
 , ADD INDEX `fk_dokument_to_spis_dokument1` (`dokument_id` ASC) 
 , ADD INDEX `fk_dokument_to_spis_spis1` (`spis_id` ASC) 
 , ADD INDEX `fk_dokument_to_spis_user1` (`user_id` ASC) 
-, DROP INDEX `dokument_id` ;
+, DROP INDEX `dokument` 
+, DROP INDEX `spis` ;
 
 ALTER TABLE `{tbls3}dokument_to_subjekt` DROP COLUMN `subjekt_version` , 
 DROP COLUMN `dokument_version` , 
@@ -580,7 +589,8 @@ CHANGE COLUMN `date_added` `date_added` DATETIME NOT NULL  ,
 , ADD INDEX `fk_dokument_to_subjekt_dokument1` (`dokument_id` ASC) 
 , ADD INDEX `fk_dokument_to_subjekt_subjekt1` (`subjekt_id` ASC) 
 , ADD INDEX `fk_dokument_to_subjekt_user1` (`user_id` ASC) 
-, DROP INDEX `dokument_id` ;
+, DROP INDEX `dokument` 
+, DROP INDEX `subjekt` ;
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}druh_zasilky` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
@@ -588,7 +598,7 @@ CREATE  TABLE IF NOT EXISTS `{tbls3}druh_zasilky` (
   `fixed` TINYINT(4) NOT NULL DEFAULT '0' ,
   `stav` TINYINT(4) NOT NULL DEFAULT '1' ,
   PRIMARY KEY (`id`) )
-ENGINE = InnoDB AUTO_INCREMENT = 10 DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
+ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COLLATE = utf8_general_ci;
 
 INSERT INTO `{tbls3}druh_zasilky` (`id`, `nazev`, `fixed`, `stav`) VALUES
 (1,	'obyčejné',	1,	1),
@@ -621,7 +631,7 @@ CHANGE COLUMN `user_id` `user_id` INT(10) UNSIGNED NOT NULL  AFTER `dokument_id`
   ON UPDATE NO ACTION
 , ADD INDEX `fk_log_dokument_dokument1` (`dokument_id` ASC) 
 , ADD INDEX `fk_log_dokument_user1` (`user_id` ASC) 
-, DROP INDEX `dokument_id` ;
+, DROP INDEX `dokument` ;
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}log_spis` (
   `id` INT(11) NOT NULL AUTO_INCREMENT ,
@@ -703,8 +713,9 @@ ALTER TABLE `{tbls3}osoba_to_user` CHANGE COLUMN `osoba_id` `osoba_id` INT(11) N
   ON DELETE NO ACTION
   ON UPDATE NO ACTION
 , ADD INDEX `fk_osoba_to_user_osoba1` (`osoba_id` ASC) 
-, ADD INDEX `fk_osoba_to_user_user1` (`user_id` ASC) 
-, DROP INDEX `osoba_id` ;
+, ADD INDEX `fk_osoba_to_user_user1` (`user_id` ASC)
+, DROP INDEX `osoba`
+, DROP INDEX `user` ;
 
 
 ALTER TABLE `{tbls3}souvisejici_dokument` CHANGE COLUMN `spojit_s` `spojit_s_id` INT(11) NOT NULL , 
@@ -727,7 +738,8 @@ CHANGE COLUMN `user_added` `user_id` INT(10) UNSIGNED NOT NULL ,
 , ADD INDEX `fk_souvisejici_dokument_dokument1` (`dokument_id` ASC) 
 , ADD INDEX `fk_souvisejici_dokument_dokument2` (`spojit_s_id` ASC) 
 , ADD INDEX `fk_souvisejici_dokument_user1` (`user_id` ASC) 
-, DROP INDEX `dokument_id` ;
+, DROP INDEX `dokument`
+, DROP INDEX `spojit` ;
 
 ALTER TABLE `{tbls3}user_role` ADD COLUMN `fixed_id` INT(10) UNSIGNED NULL DEFAULT NULL  AFTER `parent_id` , 
 ADD COLUMN `sekvence` VARCHAR(300) NULL DEFAULT NULL  AFTER `date_modified` , 
@@ -764,7 +776,8 @@ ALTER TABLE `{tbls3}user_acl` CHANGE COLUMN `role_id` `role_id` INT(10) UNSIGNED
   ON UPDATE NO ACTION
 , ADD INDEX `fk_user_acl_user_role1` (`role_id` ASC) 
 , ADD INDEX `fk_user_acl_user_rule1` (`rule_id` ASC) 
-, DROP INDEX `role_id` ;
+, DROP INDEX `role`
+, DROP INDEX `rule` ;
 
 ALTER TABLE `{tbls3}user_to_role`
   ADD CONSTRAINT `fk_user_to_role_user1`
@@ -778,8 +791,9 @@ ALTER TABLE `{tbls3}user_to_role`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION
 , ADD INDEX `fk_user_to_role_user1` (`user_id` ASC) 
-, ADD INDEX `fk_user_to_role_user_role1` (`role_id` ASC) 
-, DROP INDEX `user_id` ;
+, ADD INDEX `fk_user_to_role_user_role1` (`role_id` ASC)
+, DROP INDEX `user`
+, DROP INDEX `role` ;
 
 ALTER TABLE `{tbls3}workflow` DROP COLUMN `user_info` , 
 DROP COLUMN `orgjednotka_info` , 
@@ -813,9 +827,9 @@ CHANGE COLUMN `user_id` `user_id` INT(10) UNSIGNED NOT NULL ,
 , ADD INDEX `fk_workflow_user1` (`prideleno_id` ASC) 
 , ADD INDEX `fk_workflow_orgjednotka1` (`orgjednotka_id` ASC) 
 , ADD INDEX `fk_workflow_user2` (`user_id` ASC) 
-, ADD INDEX `spis_id` (`spis_id` ASC) 
-, DROP INDEX `osoba` 
-, DROP INDEX `dokument` ;
+, ADD INDEX `spis_id` (`spis_id` ASC)
+, DROP INDEX `dokument`
+, DROP INDEX `prideleno` ;
 
 CREATE  TABLE IF NOT EXISTS `{tbls3}zapujcka` (
   `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ,

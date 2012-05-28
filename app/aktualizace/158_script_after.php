@@ -146,29 +146,41 @@ try {
         }
     }
 
-    $sz_rows = dibi::query('SELECT * FROM %n', $config['prefix'] ."workflow","")->fetchAll();
-    if ( count($sz_rows)>0 ) {
-        foreach ( $sz_rows as $row ) {
+    for ( $offset=0; $offset<=1000; $offset++ ) {
+        
+        // z dusledku pametove narocnosti se rozdeli zatez po 500 
+        // potrva tak dlouho, dokud zadne dalsi stranky nebudou
+    
+        $sz_rows = dibi::query('SELECT id,orgjednotka_id,prideleno_id,dokument_id,spis_id FROM %n', $config['prefix'] ."workflow","")->fetchAll($offset*1000, 1000);
+        if ( count($sz_rows)>0 ) {
+            foreach ( $sz_rows as $row ) {
+                
+                $update_row = array();
+                if ( empty($row->orgjednotka_id) && !empty($row->prideleno_id) && isset($wf_users[$row->prideleno_id]) ) {
+                    //$update_row['orgjednotka_id'] = $wf_users[$row->prideleno_id];
+                }
+                if ( empty($row->spis_id) && isset($wf_spisy[ $row->dokument_id ]) ) {
+                    $update_row['spis_id'] = $wf_spisy[ $row->dokument_id ];
+                }
             
-            $update_row = array();
-            if ( empty($row->orgjednotka_id) && !empty($row->prideleno_id) && isset($wf_users[$row->prideleno_id]) ) {
-                //$update_row['orgjednotka_id'] = $wf_users[$row->prideleno_id];
-            }
-            if ( empty($row->spis_id) && isset($wf_spisy[ $row->dokument_id ]) ) {
-                $update_row['spis_id'] = $wf_spisy[ $row->dokument_id ];
-            }
-            
-            if ( count($update_row)>0 ) {
-                //dibi::update($config['prefix'] ."workflow", $update_row)
-                //        ->where(array(array('id=%i',$row->id)))
-                //        ->test();                 
-                dibi::update($config['prefix'] ."workflow", $update_row)
-                        ->where(array(array('id=%i',$row->id)))
+                if ( count($update_row)>0 ) {
+                    dibi::update($config['prefix'] ."workflow", $update_row)
+                            ->where(array(array('id=%i',$row->id)))
                         ->execute();         
+                }
+                
             }
-
-        }
-    }    
+            
+            if ( count($sz_rows) < 1000 ) {
+                $offset = 1001;
+                break;                
+            }
+            
+        } else {
+            $offset = 1001;
+            break;
+        }   
+    }
     
     echo "<span style='color:green;'>OK</span>";
     //dibi::commit();
