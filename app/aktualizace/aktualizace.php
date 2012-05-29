@@ -253,15 +253,59 @@
         
         if ( isset($_GET['go']) ) {
             if ( $rev_error != 1 ) file_put_contents($site_path."/configs/_aktualizace",$arev);
+            // vymazeme temp od robotloader, templates a cache
+            deleteDir($site_path ."/temp/");
         }
 
         dibi::disconnect();
-
+        
+        
+        
         echo "</div>\n\n";
 
         
     }
 
+function deleteDir($dir, $dir_parent = null) 
+{ 
+   if (substr($dir, strlen($dir)-1, 1) != '/') 
+       $dir .= '/'; 
+
+   if ( empty($dir) || $dir == "/" || $dir == "." || $dir == ".." ) {
+       // zamezeni aspon zakladnich adresaru, ktere mohou delat neplechu
+       return false;
+   }
+   
+   if ($handle = opendir($dir)) 
+   { 
+       while ($obj = readdir($handle)) 
+       { 
+           if ($obj != '.' && $obj != '..') 
+           { 
+               if (is_dir($dir.$obj)) 
+               { 
+                   if (!deleteDir($dir.$obj,$dir)) 
+                       return false; 
+               } 
+               elseif (is_file($dir.$obj)) 
+               { 
+                   if (!@unlink($dir.$obj)) 
+                       return false; 
+               } 
+           } 
+       } 
+       closedir($handle); 
+   
+       if ( !is_null($dir_parent) ) {
+           if (!@rmdir($dir)) 
+               return false; 
+       }
+       return true; 
+   } 
+   return false; 
+}      
+    
+    
 ?>
     </div>
 </div>
