@@ -17,6 +17,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
     private $rdn_postfix;
     private $rdn_user;
     private $rdn_pass;
+    private $filter;
 
     private $ldap_conn;    
 
@@ -87,14 +88,14 @@ class Authenticator_SSO extends Control implements IAuthenticator
     {
 
         if (function_exists('ldap_connect') ) {
-            if ( $lconn = @ldap_connect($params->server, $params->port) ) {
+            if ( $lconn = ldap_connect($params->server, $params->port) ) {
 
                 ldap_set_option($lconn, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($lconn, LDAP_OPT_REFERRALS, 0);
 
                 //$bind_rdn = $params->rdn_prefix . $params->user . $params->rdn_postfix;
 
-                if ( $lbind = @ldap_bind($lconn, $params->user, $params->pass) ) {
+                if ( $lbind = ldap_bind($lconn, $params->user, $params->pass) ) {
 
                     $this->server = $params->server;
                     $this->port = $params->port;
@@ -103,6 +104,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
                     $this->rdn_postfix = $params->rdn_postfix;
                     $this->rdn_user = $params->user;
                     $this->rdn_pass = $params->pass;
+                    $this->filter = $params->filter;
 
                     $this->ldap_conn = $lconn;
                     return $lconn;
@@ -172,9 +174,12 @@ class Authenticator_SSO extends Control implements IAuthenticator
         }
 
         /* Nastaveni a nacteni dat */
-        $filtr = "(".$this->rdn_prefix."*)";
-        $rec = @ldap_search($lconn, $this->baseDN, $filtr);
-        $info = @ldap_get_entries($lconn, $rec);
+        // $filtr = "(".$this->rdn_prefix."*)";
+        $filtr = $this->filter;
+        if (empty($filtr))
+            $filtr = '(objectClass=user)';
+        $rec = ldap_search($lconn, $this->baseDN, $filtr);
+        $info = ldap_get_entries($lconn, $rec);
         
         /* Parsovani dat */
         $parse = $this->ldap_parseEntries($info, $seznam);
