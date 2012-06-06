@@ -1,0 +1,58 @@
+{block title}Seznam spisových znaků - Export{/block}
+{block content}
+    <div class="navigate">
+    <a href="{link :Admin:Spisznak:seznam}">Seznam spisových znaků</a> - Export
+    </div>
+    <h2>Export spisových znaků</h2>
+    
+    <form action="{link :Admin:Spisznak:export}" method="post">
+    <div class="detail_blok">
+        <dl class="detail_item">
+            <dt>Exportovat do formátu:</dt>
+            <dd>
+                <input type="radio" name="export_do" value="csv" checked="checked" /> CSV <br />
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Exportovat co:</dt>
+            <dd>
+                <select name="export_co">
+                    <option value="1">všechny spisove znaky</option>
+                    <option value="2">pouze aktivní spisové znaky</option>
+                </select>    
+            </dd>
+        </dl>        
+
+        <br /><br />
+        <div class="detail_hlavicka">Parametry pro export do CSV</div>
+        <dl class="detail_item">
+            <dt>Výstupní kódování:</dt>
+            <dd>
+                <select name="csv_code">
+                    <option value="UTF-8">UTF-8</option>
+                    <option value="ISO-8859-2">ISO-8859-2</option>
+                    <option value="Windows-1250">windows-1250</option>
+                    <option value="Windows-1250">ASCII (odstraněna diakritika!)</option>
+                </select>    
+            </dd>
+        </dl>          
+        <dl class="detail_item">
+            <dt>Oddělovač řádků:</dt>
+            <dd><input type="text" name="csv_radek" value="\r\n" size="5" /></dd>
+        </dl>            
+        <dl class="detail_item">
+            <dt>Oddělovač sloupců:</dt>
+            <dd><input type="text" name="csv_sloupce" value="," size="5" /></dd>
+        </dl>            
+        <dl class="detail_item">
+            <dt>Ohraničení hodnot:</dt>
+            <dd><input type="text" name="csv_hodnoty" value='"' size="5" /></dd>
+        </dl>            
+    </div>
+        
+    <div id="dokument_blok_akce">
+        <input type="submit" name="do_export" value="Exportovat" />
+    </div>        
+        
+    </form>
+    
