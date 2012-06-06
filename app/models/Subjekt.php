@@ -93,7 +93,7 @@ class Subjekt extends BaseModel
 
                 if ( strpos($data->email,";")!==false ) {
                     $email_a = explode(";",$data->email);
-                    if ( $count($email_a)>0 ) {
+                    if ( count($email_a)>0 ) {
                         $where_or = array();
                         foreach ( $email_a as $ea ) {
                             $ea = trim($ea);
@@ -107,7 +107,7 @@ class Subjekt extends BaseModel
                     }
                 } else if ( strpos($data->email,",")!==false ) {
                     $email_a = explode(",",$data->email);
-                    if ( $count($email_a)>0 ) {
+                    if ( count($email_a)>0 ) {
                         $where_or = array();
                         foreach ( $email_a as $ea ) {
                             $ea = trim($ea);
