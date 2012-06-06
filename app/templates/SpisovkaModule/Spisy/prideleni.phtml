@@ -1,0 +1,72 @@
+@{block title}Seznam spisů pro přidělení{/block}
+@{block content}
+
+    <h2>Seznam spisů pro přidělení</h2>
+
+    <div id="dokumenty">
+    {if count($seznam)>0}
+    <form action="" method="post">
+    <table>
+        <tr>
+            <th>Spis</th>
+            <th>Počet dokumentů</th>
+            <th>Přiděleno</th>
+            <th>Předáno</th>            
+        </tr>
+        {foreach $seznam as $spis}
+        <tr>
+            <td>
+                {!=str_repeat("&nbsp;", 5*$spis->uroven)}
+                {if $spis->typ=='VS'}
+                <img src="{$baseUri}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                &nbsp;&nbsp;
+                {$spis->nazev}
+                {elseif $spis->typ=='SP'}
+                <img src="{$baseUri}images/icons/folder_green.png" alt="Hlavní spis" title="Hlavní spis" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                &nbsp;&nbsp;
+                {$spis->nazev}
+                {else}
+                <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
+                &nbsp;&nbsp;
+                <strong style="color:blue">{$spis->nazev}</strong>
+                {/if}
+            </td>
+            <td>{if isset($seznam_dokumentu[$spis->id])}{=count($seznam_dokumentu[$spis->id])}{else}0{/if}</td>
+            <td><strong>
+                    {if !empty($spis->orgjednotka_prideleno)}
+                    {$spis->orgjednotka_prideleno}
+                    {else}
+                    <span style="color:#880000;">(nepřiděleno k žádné organizační jednotce!)</span>
+                    {/if}
+                    
+                </strong></td>              
+            <td>{$spis->orgjednotka_predano}</td>              
+        </tr>
+        {if isset($seznam_dokumentu[$spis->id]) && count($seznam_dokumentu[$spis->id])>0 }
+        {foreach $seznam_dokumentu[$spis->id] as $dok}
+        <tr>
+            <td colspan="2">
+                {!=str_repeat("&nbsp;", (5*$spis->uroven)+15)}
+                <strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}">{$dok->cislo_jednaci}</a></strong> - {$dok->nazev}
+            </td>
+            <td>
+                {if empty($spis->orgjednotka_prideleno)}
+                    {if $dok->orgjednotka_prideleno}
+                        <input type="checkbox" name="orgvybran[{$dok->spis_id}]" value="{$dok->orgjednotka_id}">{$dok->orgjednotka_prideleno}
+                    {/if}
+                {/if}
+            </td>
+            <td></td>
+        </tr>
+        {/foreach}
+        {/if}
+        {/foreach}
+
+    </table>
+        <br />
+    <input type="submit" name="spisorg_pridelit" value="Nastavit přidělení zvolených organizačních jednotek u vybraných spisů">
+    </form>
+    {else}
+    <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
+    {/if}
+    </div>
