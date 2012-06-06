@@ -247,6 +247,40 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         echo json_encode($data);
         exit;
     }
+    
+    public function renderIsdsid()
+    {
+        $id = $this->getParam('id',null);
+        
+        if ( is_null($id) ) {
+            exit;
+        }
+        
+        $isds = new ISDS_Spisovka();
+        if ( $isds->pripojit() ) {
+            
+            $filtr['dbID'] = $id;
+            $prijemci = $isds->FindDataBoxEx($filtr);
+            if ( isset($prijemci->dbOwnerInfo) ) {
+                
+                $info = $prijemci->dbOwnerInfo[0];
+                
+                /*echo "<pre>";
+                print_r($info);
+                echo "</pre>";*/
+                
+                echo json_encode($info);
+            } else {
+                echo json_encode(array("error"=>$isds->error()));
+            }
+            
+            exit;
+                                    
+        } else {
+            echo json_encode(array("error"=>$isds->error()));
+            exit;
+        }
+    }    
 
     protected function createComponentUpravitForm()
     {

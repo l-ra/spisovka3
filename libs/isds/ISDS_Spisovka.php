@@ -115,7 +115,7 @@ class ISDS_Spisovka extends ISDS {
 
         $Records = $this->GetListOfReceivedMessages($od,$do,0,10000,1023,null); // 1023
 
-        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == ""))
+        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == "") && isset($Records->dmRecord))
         {
             return $Records->dmRecord;
         } else {
@@ -133,7 +133,7 @@ class ISDS_Spisovka extends ISDS {
 
         $Records = $this->GetListOfSentMessages($od,$do,0,10000,1023,null);
 
-        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == ""))
+        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == "") && isset($Records->dmRecord))
         {
             return $Records->dmRecord;
             //return $Records;

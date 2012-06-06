@@ -392,6 +392,57 @@ aresSubjekt = function ( formName ) {
 
 }
 
+/*
+ * ISDS - vyhledat subjekt na zaklade id  schranky
+ *
+ */
+isdsSubjekt = function ( formName ) {
+
+    var frmID = document.getElementById('frm'+formName+'-id_isds');
+    baseUri = baseUri.replace('/public','');
+    //var url = baseUri + '/subjekty/ares/' + frmIC.value;
+    if ( is_simple == 1 ) {
+        var url = baseUri + '?presenter=Spisovka%3Asubjekty&id=' + frmID.value +'&action=isdsid';
+    } else {    
+        var url = baseUri + 'subjekty/' + frmID.value +'/isdsid';
+    }
+    //alert( url );
+
+    $.getJSON(url, function(data) {
+
+        if ( data == null ) {
+            alert('Záznam neexistuje nebo bylo zadáno chybné ID datové schránky.');
+        } else if ( data.error ) {
+            alert(data.error);
+        } else {
+            
+            $("#frm"+formName+"-type option[value="+data.dbType+"]").attr('selected', 'selected');
+            
+            document.getElementById('frm'+formName+'-ic').value = data.ic;
+            document.getElementById('frm'+formName+'-nazev_subjektu').value = data.firmName;
+            document.getElementById('frm'+formName+'-jmeno').value = data.pnFirstName;
+            document.getElementById('frm'+formName+'-prostredni_jmeno').value = data.pnMiddleName;
+            document.getElementById('frm'+formName+'-prijmeni').value = data.pnLastName;
+            document.getElementById('frm'+formName+'-adresa_ulice').value = data.adStreet;
+            document.getElementById('frm'+formName+'-adresa_cp').value = data.adNumberInMunicipality;
+            document.getElementById('frm'+formName+'-adresa_co').value = data.adNumberInStreet;
+            document.getElementById('frm'+formName+'-adresa_mesto').value = data.adCity;
+            document.getElementById('frm'+formName+'-adresa_psc').value = data.adZipCode;
+        }
+        
+    });
+
+    $("#ajax-spinner").show().css({
+        position: "absolute"
+        //left: event.pageX + 20,
+        //top: event.pageY + 40
+    });
+
+    return false;
+
+
+}
+
 toggleWindow = function (elm) {
 
     //parent = $(elm).parent();
@@ -728,7 +779,7 @@ subjektNovy = function(event) {
 
                 if ( typeof document.forms["frm-novyForm"] != "undefined" ) {
                     formdata = 'id='+id+'&' + $(document.forms["frm-novyForm"]).serialize();
-                } else if ( typeof document.forms["frm-novySubjekt"] != "undefined" ) {
+                }else if ( typeof document.forms["frm-novySubjekt"] != "undefined" ) {
                     formdata = 'id='+id+'&' + $(document.forms["frm-novySubjekt"]).serialize();
                 } else {
                     formdata = '';
@@ -982,7 +1033,7 @@ hledejDokumentAjax = function (vyraz, typ) {
                     vysledek.innerHTML = '<div class="prazdno">Nebyly nalezeny žádné dokumenty odpovídající dané sekvenci.</div>';
                 } else if ( seznam_json == 'prilis_mnoho' ) {
                     vysledek.innerHTML = '<div class="prazdno">Daná sekvence obsahuje příliš mnoho záznamů. Zkuste zvolit přesnější sekvenci.</div>';                    
-                } else {
+                }else {
                     var seznam = eval('(' + seznam_json + ')');
                     cache[vyraz] = seznam_json;
                     vysledek.innerHTML = nastylovat(seznam, typ);
@@ -1107,6 +1158,12 @@ spisVytvorit = function (elm) {
     }
 
     return false;
+}
+
+overitISDS = function (elm) {
+    
+    return dialog(elm,'Ověření datové zprávy');
+    
 }
 
 spisplanZmenit = function (elm) {

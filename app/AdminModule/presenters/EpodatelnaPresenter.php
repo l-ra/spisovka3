@@ -69,7 +69,16 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $ep = $ep_config->toArray();
 
-        $id = $this->getParam('id',null);
+        $id_alter = null;
+        $do = $this->getParam('do');
+        if ( $do ) {
+            $id_index = $this->getHttpRequest()->getPost('index');
+            $id_typ = $this->getHttpRequest()->getPost('ep_typ','i');
+            $id_alter = $id_typ . $id_index;
+        }
+        
+        
+        $id = $this->getParam('id',$id_alter);
         $typ = substr($id,0,1);
         $index = substr($id,1);
 
@@ -150,7 +159,16 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         // Zmena udaju
         $this->template->FormUpravit = $this->getParam('upravit',null);
+        $this->template->FormHesloISDS = $this->getParam('zmenit_heslo_isds',null);
 
+        if ( $do ) {
+            $this->template->Index = $this->getHttpRequest()->getPost('index');
+            $this->template->Typ = $this->getHttpRequest()->getPost('ep_typ','i');
+            
+            if ( $do == 'zmenit_heslo_isds' ) {
+                $this->template->FormHesloISDS = 1;
+            }
+        }
     }
 
 
@@ -523,7 +541,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $config_data['isds'][$index]['idbox'] = $idbox;
             $config_data['isds'][$index]['vlastnik'] = $vlastnik;
             $config_data['isds'][$index]['stav'] = $stav;
-            $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla))?"(bez omezení)":$stav_hesla;
+            $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla))?"(bez omezení)":date("j.n.Y G:i",strtotime($stav_hesla));
 
             $config_modify = new Config();
             $config_modify->import($config_data);
@@ -538,6 +556,141 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
     }
 
+    function ruleContains($item, $args)
+    {
+        return (strpos($item->value,$args) !== false);
+    }
+    
+    function ruleNoEqual($item, $args)
+    {
+        return (strpos($item->value,$args) !== false);
+    }     
+    
+    protected function createComponentZmenitHesloISDSForm()
+    {
+
+        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
+        $ep = $ep_config->toArray();
+
+        $id = $this->getParam('id',null);
+        $index = substr($id,1);
+        $isds = $ep['isds'][$index];
+        
+        
+        $id = $this->getParam('id',null);
+        $index = substr($id,1);
+
+        $form = new AppForm();
+        $form->addHidden('index')
+                ->setValue($index);
+        $form->addHidden('zmenit_heslo_isds')
+                ->setValue(1);        
+        $form->addHidden('ep_typ')
+                ->setValue('i');
+
+        $form->addPassword('password', 'Přihlašovací heslo ISDS:', 30, 30)
+                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+                ->addRule(Form::MIN_LENGTH,'Heslo do datové schránky musí být minimálně %d znaků dlouhé.', 8)
+                ->addRule(Form::MAX_LENGTH,'Heslo do datové schránky musí být maximálně %d znaků dlouhé.', 32)
+                /*->addRule(callback($this, 'ruleNoEqual'),'Heslo mesmí obsahovat id (login) uživatele, jemuž se heslo mění.',$isds['login'])
+                ->addRule(callback($this, 'ruleNoEqual'),'Heslo se nesmí shodovat s původním heslem.',$isds['password'])
+                ->addRule(callback($this, 'ruleContains'),'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','qwert')
+                ->addRule(callback($this, 'ruleContains'),'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','asdgf')
+                ->addRule(callback($this, 'ruleContains'),'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','12345')
+                */;
+                
+        $form->addPassword('password_confirm', 'Přihlašovací heslo ještě jednou:', 30, 30)
+                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+                ->addConditionOn($form["password"], Form::FILLED)
+                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form["password"]);        
+
+        $form->addSubmit('zmenit', 'Změnit heslo')
+                 ->onClick[] = array($this, 'zmenitHesloISDSClicked');
+        $form->addSubmit('storno', 'Zrušit')
+                 ->setValidationScope(FALSE)
+                 ->onClick[] = array($this, 'stornoClicked');
+
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form;
+    }    
+    
+    public function zmenitHesloISDSClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+        //echo "<pre>Data: "; print_r($data); echo "</pre>"; exit;
+
+        $chyba = 0;
+
+        $index = $data['index'];
+
+        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
+        $config_data = $config->toArray();
+        $old_pass = $config_data['isds'][$index]['password'];
+
+        if ( $chyba == 0 ) {
+
+            $idbox = "";
+            $vlastnik = "";
+            $stav = "";
+            try {
+                $ISDS = new ISDS_Spisovka();
+                if ( $ISDS->pripojit($config_data['isds'][$index]) ) {
+                    
+                    // zmena hesla
+                    if ( $ISDS->ChangeISDSPassword($old_pass, $data['password']) ) {
+                    //if ( false ) {
+                        
+                        $info = $ISDS->informaceDS();
+                        if ( !empty($info) ) {
+
+                            $idbox = $info->dbID;
+                            if ( empty($info->firmName) ) {
+                                // jmeno prijmeni
+                                $vlastnik = $info->pnFirstName ." ". $info->pnLastName ." [".$info->dbType."]";
+                            } else {
+                                // firma urad
+                                $vlastnik = $info->firmName ." [".$info->dbType."]";
+                            }
+                            $stav = ISDS_Spisovka::stavDS($info->dbState) ." (kontrolováno dne ". date("j.n.Y G:i") .")";
+                            $stav_hesla = $ISDS->GetPasswordInfo();
+                        }  
+                        
+                        $config_data['isds'][$index]['password'] = $data['password'];
+                        $config_data['isds'][$index]['idbox'] = $idbox;
+                        $config_data['isds'][$index]['vlastnik'] = $vlastnik;
+                        $config_data['isds'][$index]['stav'] = $stav;
+                        $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla))?"(bez omezení)":date("j.n.Y G:i",strtotime($stav_hesla));
+
+                        $config_modify = new Config();
+                        $config_modify->import($config_data);
+                        $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
+                        
+                        Environment::setVariable('epodatelna_config', $config_modify);                        
+                        
+                        $this->flashMessage('Heslo k datové schránky bylo úspěšně změněno.');
+                        $this->redirect(':Admin:Epodatelna:detail',array('id'=>('i' . $data['index']) ));
+                        
+                    } else {
+                        $this->flashMessage('Heslo k datové schránky se nepodařilo změnit.','warning');
+                        $this->flashMessage('Chyba ISDS: '. $ISDS->error(),'warning');
+                        //$this->redirect(':Admin:Epodatelna:detail',array('id'=>('i' . $data['index']),'zmenit_heslo_isds'=>'1' ));
+                    }
+
+                } else {
+                    $this->flashMessage('Nelze se připojit k ISDS! Chyba: '. $ISDS->error(),"warning");
+                    $this->redirect(':Admin:Epodatelna:detail',array('id'=>('i' . $data['index']) ));
+                }
+            } catch (Exception $e) {
+                //$this->flashMessage('Nelze se připojit k ISDS! '. $e->getMessage(),"warning");
+            }
+        }
+    }
+    
     protected function createComponentNastavitEmailForm()
     {
 

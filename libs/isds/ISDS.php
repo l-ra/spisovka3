@@ -295,9 +295,12 @@ class ISDS {
             $this->StatusCode = $output->dbStatus->dbStatusCode;
             $this->StatusMessage = $output->dbStatus->dbStatusMessage;
 
-            $this->debug_return('return',$output->dbOwnerInfo,1);
-
-            return $output->dbOwnerInfo;
+            if ( isset($output->dbOwnerInfo) ) {
+                $this->debug_return('return',$output->dbOwnerInfo,1);
+                return $output->dbOwnerInfo;
+            } else {
+                return null;
+            }
 	} catch (Exception $e) {
             $this->ErrorCode = $e->getCode();
             $this->ErrorInfo = $e->getMessage();
@@ -681,6 +684,43 @@ class ISDS {
             return false;
 	}
     }
+    
+    /**
+     * Overeni platnosti zpravy
+     *
+     * @param string kompletní datová zpráva nebo doručenka v base64 kódování
+     * @return dmAuthResult
+     */
+    public function AuthenticateMessage($source)
+    {
+
+        $this->NullRetInfo();
+
+        try {
+
+            $dmMessage = array('dmMessage'=>$source);
+            $dmAuthResult = $this->OperationsWS()->AuthenticateMessage($dmMessage);
+            
+            if ( isset($dmAuthResult->dmStatus) ) {
+                if ( $dmAuthResult->dmStatus->dmStatusCode == '0000' ) {
+                    return true;
+                } else {
+                    $this->StatusCode = $dmAuthResult->dmStatus->dmStatusCode;
+                    $this->StatusMessage = $dmAuthResult->dmStatus->dmStatusMessage;                    
+                    return false;
+                }
+            } else {
+                $this->StatusCode = "-1";
+                $this->StatusMessage = "Nepodařilo se ověřit datovou zprávu";                    
+                return false;
+            }
+            
+	} catch (Exception $e) {
+            $this->ErrorCode     = $e->getCode();
+            $this->ErrorInfo     = $e->getMessage();
+            return false;
+	}
+    }    
 
     /**
      * Stazeni pouhe obalky prijate zpravy (bez pisemnosti). Vrati obalku zpravy.
@@ -888,8 +928,13 @@ class ISDS {
             $ListOfSentOutput = $this->InfoWS()->GetListOfSentMessages($ListOfSentInput);
             $this->StatusCode = $ListOfSentOutput->dmStatus->dmStatusCode;
             $this->StatusMessage = $ListOfSentOutput->dmStatus->dmStatusMessage;
-            $ListOfSentOutput->dmRecords->dmRecord = $this->PrepareArray($ListOfSentOutput->dmRecords->dmRecord);
-            return $ListOfSentOutput->dmRecords;
+            
+            if ( isset($ListOfSentOutput->dmRecords->dmRecord) ) {
+                $ListOfSentOutput->dmRecords->dmRecord = $this->PrepareArray($ListOfSentOutput->dmRecords->dmRecord);
+                return $ListOfSentOutput->dmRecords;
+            } else {
+                return null;
+            }            
 
         } catch (Exception $e) {
             $this->ErrorCode     = $e->getCode();
@@ -942,8 +987,13 @@ class ISDS {
             $ListOfRecOutput = $this->InfoWS()->GetListOfReceivedMessages($ListOfReceivedInput);
             $this->StatusCode = $ListOfRecOutput->dmStatus->dmStatusCode;
             $this->StatusMessage = $ListOfRecOutput->dmStatus->dmStatusMessage;
-            $ListOfRecOutput->dmRecords->dmRecord = $this->PrepareArray($ListOfRecOutput->dmRecords->dmRecord);
-            return $ListOfRecOutput->dmRecords;
+            
+            if ( isset($ListOfRecOutput->dmRecords->dmRecord) ) {
+                $ListOfRecOutput->dmRecords->dmRecord = $this->PrepareArray($ListOfRecOutput->dmRecords->dmRecord);
+                return $ListOfRecOutput->dmRecords;
+            } else {
+                return null;
+            }
             
         } catch (Exception $e) {
             $this->StatusCode    = @$ListOfRecOutput->dmStatus->dmStatusCode;
@@ -1033,6 +1083,76 @@ class ISDS {
         }
     }
 
+    /**
+     * Vyhledani datove schranky
+     *
+     * dbOwnerInfo = array(
+     *       dbID, dbType, dbState,
+     *       pnFirstName, pnMiddleName, pnLastName, pnLastNameAtBirth,
+     *       ic, firmName,
+     *       biDate, biCity, biCounty, biState,
+     *       adCity, adStreet, adNumberInStreet, adNumberInMunicipality
+     *       adZipCode, adState, nationality,
+     *       email, telNumber
+     * )
+     *
+     * @param array     $filtr      pole obsahujici hodnoty dbOwnerInfo
+     * @return dbResults
+     *
+     */
+    public function FindDataBoxEx($filtr)
+    {
+
+        $this->NullRetInfo();
+	$OwnerInfo=array(
+            'dbID'=>(!empty($filtr['dbID'])?$filtr['dbID']:null),
+            'dbType'=>(!empty($filtr['dbType'])?$filtr['dbType']:null),
+            'dbState'=>(!empty($filtr['dbState'])?$filtr['dbState']:null),
+            'ic'=>(!empty($filtr['ic'])?$filtr['ic']:null),
+            'pnFirstName'=>(!empty($filtr['pnFirstName'])?$filtr['pnFirstName']:null),
+            'pnMiddleName'=>(!empty($filtr['pnMiddleName'])?$filtr['pnMiddleName']:null),
+            'pnLastName'=>(!empty($filtr['pnLastName'])?$filtr['pnLastName']:null),
+            'pnLastNameAtBirth'=>(!empty($filtr['pnLastNameAtBirth'])?$filtr['pnLastNameAtBirth']:null),
+            'firmName'=>(!empty($filtr['firmName'])?$filtr['firmName']:null),
+            'biDate'=>(!empty($filtr['biDate'])?$filtr['biDate']:null),
+            'biCity'=>(!empty($filtr['biCity'])?$filtr['biCity']:null),
+            'biCounty'=>(!empty($filtr['biCounty'])?$filtr['biCounty']:null),
+            'biState'=>(!empty($filtr['biState'])?$filtr['biState']:null),
+            'adCity'=>(!empty($filtr['adCity'])?$filtr['adCity']:null),
+            'adStreet'=>(!empty($filtr['adStreet'])?$filtr['adStreet']:null),
+            'adNumberInStreet'=>(!empty($filtr['adNumberInStreet'])?$filtr['adNumberInStreet']:null),
+            'adNumberInMunicipality'=>(!empty($filtr['adNumberInMunicipality'])?$filtr['adNumberInMunicipality']:null),
+            'adZipCode'=>(!empty($filtr['adZipCode'])?$filtr['adZipCode']:null),
+            'adState'=>(!empty($filtr['adState'])?$filtr['adState']:null),
+            'nationality'=>(!empty($filtr['nationality'])?$filtr['nationality']:null),
+            'email'=>(!empty($filtr['email'])?$filtr['email']:null),
+            'telNumber'=>(!empty($filtr['telNumber'])?$filtr['telNumber']:null)
+        );
+
+        $FindInput=array('dbOwnerInfo'=>$OwnerInfo);
+
+	try {
+
+            $FindOutput=$this->ManipulationsWS()->FindDataBox($FindInput);
+            $this->StatusCode = @$FindOutput->dbStatus->dbStatusCode;
+            $this->StatusMessage = @$FindOutput->dbStatus->dbStatusMessage;
+            if ( !empty($FindOutput->dbResults->dbOwnerInfo) ) {
+                $FindOutput->dbResults->dbOwnerInfo = $this->PrepareArray($FindOutput->dbResults->dbOwnerInfo);
+                return $FindOutput->dbResults;
+            } else {
+                return null;
+            }
+
+        } catch (Exception $e) {
+            $this->StatusCode    = @$FindOutput->dbStatus->dbStatusCode;
+            $this->StatusMessage = @$FindOutput->dbStatus->dbStatusMessage;
+            $this->ErrorCode     = $e->getCode();
+            $this->ErrorInfo     = $e->getMessage();
+            return false;
+        }
+    }
+    
+    
     /**
      * Overeni dostupnosti datove schranky
      * 
@@ -1240,9 +1360,14 @@ class ISDS {
 	
         try {
             $Output = $this->AccessWS()->GetUserInfoFromLogin($Input);
-            $this->StatusCode = $Output->dbStatus->dbStatusCode;
-            $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
-            return $Output->dbUserInfo;
+
+            if ( isset($Output->dbUserInfo) ) {
+                return $Output->dbUserInfo;
+            } else {
+                $this->StatusCode = $Output->dbStatus->dbStatusCode;
+                $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
+                return null;
+            }
 	} catch (Exception $e) {
             $this->StatusCode    = $Output->dbStatus->dbStatusCode;
             $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
@@ -1298,7 +1423,7 @@ class ISDS {
         );
 	
         try {
-            $Output=$this->AccessWS->ChangeISDSPassword($Input);
+            $Output = $this->AccessWS()->ChangeISDSPassword($Input);
             $this->StatusCode = $Output->dbStatus->dbStatusCode;
             $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
             return($this->StatusCode == "0000");

@@ -196,11 +196,23 @@ abstract class BasePresenter extends Presenter
         } else if ( ($this->name == "Error") && (!Environment::getUser()->isAuthenticated()) ) {
             $this->setLayout('login');
         } else if ( $this->template->module == "Admin" ) {
-            $this->setLayout('admin');
+            if ( $this->getParam("is_ajax") ) {
+                $this->setLayout(false);
+            } else {
+                $this->setLayout('admin');
+            }
         } else if ( $this->template->module == "Spisovna" ) {
-            $this->setLayout('spisovna');
+            if ( $this->getParam("is_ajax") ) {
+                $this->setLayout(false);
+            } else {
+                $this->setLayout('spisovna');
+            }
         } else if ( $this->template->module == "Epodatelna" ) {
-            $this->setLayout('epodatelna');
+            if ( $this->getParam("is_ajax") ) {
+                $this->setLayout(false);
+            } else {
+                $this->setLayout('epodatelna');
+            }
         }
 
         if ( $this->template->module == "" || $this->template->module == "Spisovka" ) {

@@ -37,6 +37,42 @@
                 {/if}
             </dd>
         </dl>
+        {elseif ($FormHesloISDS=='1')}
+        <dl class="detail_item">
+            <dt>ID datové schránky:</dt>
+            <dd>{$Info['idbox']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Vlastník DS:</dt>
+            <dd>{$Info['vlastnik']}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Stav DS:</dt>
+            <dd>{$Info['stav']}&nbsp;</dd>
+        </dl>        
+        <dl class="detail_item">
+            <dt>Přihlašovací jméno do ISDS:</dt>
+            <dd>{$Info['login']}&nbsp;</dd>
+        </dl>
+        <br />
+        <div class="detail_hlavicka">Změna hesla ISDS</div>
+        {control zmenitHesloISDSForm}
+        <br />
+        <div class="blok_form">
+        Pravidla pro vytvoření hesla jsou daná vyhláškou MV (a ještě zpřísněna) a jsou shodná
+        s vytvářením hesel na Portálu ISDS:
+        <ul>
+            <li>Heslo do datové schránky musí být minimálně 8 a maximálně 32 znaků dlouhé.</li>
+            <li>Heslo musí obsahovat minimálně jedno velké písmeno, jedno malé písmeno a jedno
+            číslo. Povolené znaky jsou písmena (a-z, A-Z), číslice (0-9) a speciální znaky (! # $
+            % & ( ) * + , - . : = ? @ [ ] _ { | } ~). </li>
+            <li>Není povoleno heslo shodné s jedním z posledních použitých 255 hesel.</li>
+            <li>Nesmí obsahovat id (login) uživatele, jemuž se heslo mění.</li>
+            <li>V hesle se nesmí opakovat za sebou 3 a více stejných znaků. </li>
+            <li>Heslo nesmí začínat na "qwert", "asdgf", "12345". </li>
+        </ul>
+        </div>        
+      
         {else}
         <dl class="detail_item">
             <dt>ID datové schránky:</dt>
@@ -67,6 +103,8 @@
             <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}</dd>
         </dl>
         <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'zmenit_heslo_isds'=>1}">Změnit heslo k ISDS</a>
         {/if}
         {elseif $Typ == 'e'}
         {if ($FormUpravit=='1')}

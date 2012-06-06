@@ -108,6 +108,14 @@
             </dd>
         </dl>
         {/if}
+        {if $Identifikator['typ'] == "____isds" }
+        <dl class="detail_item">
+            <dt>Ověření identifikátoru:</dt>
+            <dd id="isds_overeni">
+                <a href="{link :Epodatelna:Default:isdsovereni, 'id'=>$Zprava->id}" onclick="return overitISDS(this);">Ověřit datovou zprávu</a>
+            </dd>
+        </dl>
+        {/if}        
 
     </div>
 

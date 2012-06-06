@@ -1226,7 +1226,68 @@ dmFormat =
         return $tmp;
     }
 
+    public function actionIsdsovereni()
+    {
+        $this->template->error = 0;
+        $epodatelna_id = $this->getParam('id');
+        if ( $epodatelna_id ) {
+            $Epodatelna = new Epodatelna();
+            $epodatelna_info = $Epodatelna->getInfo($epodatelna_id);
 
+            if ( $epodatelna_info ) {
+                if ( !empty( $epodatelna_info->file_id ) ) {
+                           
+                    $FileModel = new FileModel();
+                    $file = $FileModel->getInfo($epodatelna_info->file_id+1);
+                    
+                    if ( $file ) {
+                    
+                        // Nacteni originalu DS
+                        $storage_conf = Environment::getConfig('storage');
+                        eval("\$DownloadFile = new ".$file->real_type."();");
+                        $source = $DownloadFile->download($file,1);
+                        
+                        if ( $source ) {
+                                
+                            $isds = new ISDS_Spisovka();
+                            if ( $ISDSBox = $isds->pripojit() ) {
+                                
+                                $source = chunk_split(base64_encode($source), 64, "\n");
+                                if ( $isds->AuthenticateMessage( $source ) ) {
+                                    $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
+                                } else {
+                                    $this->template->error = 4;
+                                    $this->template->vysledek = "Datová zpráva byla ověřena, ale není platná!".
+                                                                "<br />".
+                                                                'ISDS zpráva: '. $isds->error();
+                                }
+                                    
+                            } else {
+                                $this->template->error = 3;
+                                $this->template->vysledek = "Nepodařilo se připojit k ISDS schránce!".
+                                                                "<br />".
+                                                                'ISDS chyba: '. $isds->error();
+                            }
+                        }
+                    }
+                }
+            } else {
+                $this->template->vysledek = "Nebyl nalezena zpráva!";
+                $this->template->error = 1;
+            }
+        } else {
+            $this->template->vysledek = "Neplatný parametr!";
+            $this->template->error = 1;
+        }
+        
+        $is_ajax = $this->getParam("is_ajax");
+        if ( $is_ajax ) {
+            $this->setLayout(FALSE);
+        }        
+        
+    }
+
+    
     public function actionIsds()
     {
 
