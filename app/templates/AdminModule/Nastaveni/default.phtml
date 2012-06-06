@@ -80,6 +80,10 @@
             <dt>Typ evidence:</dt>
             <dd>{if $CisloJednaci->typ_evidence == 'sberny_arch'}sběrný arch{else}{$CisloJednaci->typ_evidence}{/if}&nbsp;</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Podací deník:</dt>
+            <dd>{if $CisloJednaci->typ_deniku == 'org'}samostatný pro každou organizační jednotku{else}společný pro celý úřad{/if}&nbsp;</dd>
+        </dl>        
         {access :Admin:Nastaveni:default}<a href="{link :Admin:Nastaveni:default, 'upravit'=>'cjednaci'}">Upravit</a>{/access}
         {/if}
         <dl class="detail_item">

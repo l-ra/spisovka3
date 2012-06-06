@@ -78,7 +78,12 @@ class CisloJednaci extends BaseModel
         if ( is_null($info) ) {
             $info = array();
 
-            $info['podaci_denik'] = $this->info->podaci_denik;
+            if ( isset($this->info->typ_deniku) && $this->info->typ_deniku == "org" ) {
+                $info['podaci_denik'] = $this->info->podaci_denik . (!empty($this->org)?"_".$this->org->ciselna_rada:"");
+            } else {
+                $info['podaci_denik'] = $this->info->podaci_denik;
+            }
+            
             $info['rok'] = date('Y');
             $info['poradove_cislo'] = $this->max('poradove_cislo');
 
@@ -252,7 +257,13 @@ class CisloJednaci extends BaseModel
         $cislo = null;
         switch ($typ) {
             case "poradove_cislo":
-                $where[] = array('podaci_denik=%s',$this->info->podaci_denik);
+                
+                if ( isset($this->info->typ_deniku) && $this->info->typ_deniku == "org" ) {
+                    $where[] = array('podaci_denik=%s',$this->info->podaci_denik . (!empty($this->org)?"_".$this->org->ciselna_rada:""));
+                } else {
+                    $where[] = array('podaci_denik=%s',$this->info->podaci_denik);
+                }                
+                
                 $result = $this->fetchAll(array('poradove_cislo'=>'DESC'),$where,null,1);
                 $row = $result->fetch();
                 $cislo = (@$row->poradove_cislo)?($row->poradove_cislo)+1 : $pocatek_cisla;

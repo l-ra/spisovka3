@@ -145,6 +145,9 @@ class Admin_NastaveniPresenter extends BasePresenter
                     ->setValue( !isset($CJ->oddelovac)?'/':$CJ->oddelovac );
         }
 
+        $form1->addRadioList('typ_deniku', 'Podací deník:', array('urad'=>'společný pro celý úřad','org'=>'samostatný pro každou organizační jednotku'))
+                ->setValue( isset($CJ->typ_deniku)?$CJ->typ_deniku:'urad' );        
+        
         //$form1->addText('typ', 'Metoda přičítání:', 50, 200)
         //        ->setValue($CJ->typ);
 
@@ -178,6 +181,8 @@ class Admin_NastaveniPresenter extends BasePresenter
             $config_data['cislo_jednaci']['oddelovac'] = $data['oddelovac'];
         }
 
+        $config_data['cislo_jednaci']['typ_deniku'] = $data['typ_deniku'];
+        
         $config_modify = new Config();
         $config_modify->import($config_data);
         $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
