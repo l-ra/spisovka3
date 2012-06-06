@@ -96,7 +96,7 @@ try {
     dibi::connect(Environment::getConfig('database'));
     dibi::addSubst('PREFIX', Environment::getConfig('database')->prefix);
     if ( !Environment::isProduction() ) {
-        dibi::getProfiler()->setFile(APP_DIR .'/../log/mysql_'. KLIENT .'.log');
+        dibi::getProfiler()->setFile(APP_DIR .'/../log/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
     }
     define('DB_PREFIX', Environment::getConfig('database')->prefix);
 } catch (DibiDriverException $e) {
