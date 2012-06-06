@@ -109,6 +109,95 @@ class Admin_SubjektyPresenter extends BasePresenter
         exit;
     }
 
+    public function renderIsdsid()
+    {
+        $id = $this->getParam('id',null);
+        
+        if ( is_null($id) ) {
+            exit;
+        }
+        
+        $isds = new ISDS_Spisovka();
+        if ( $isds->pripojit() ) {
+            
+            $filtr['dbID'] = $id;
+            $prijemci = $isds->FindDataBoxEx($filtr);
+            if ( isset($prijemci->dbOwnerInfo) ) {
+                
+                $info = $prijemci->dbOwnerInfo[0];
+                
+                /*echo "<pre>";
+                print_r($info);
+                echo "</pre>";*/
+                
+                echo json_encode($info);
+            } else {
+                echo json_encode(array("error"=>$isds->error()));
+            }
+            
+            exit;
+                                    
+        } else {
+            echo json_encode(array("error"=>$isds->error()));
+            exit;
+        }
+    }     
+    
+    public function renderImport()
+    {
+    }    
+    
+    public function renderExport()
+    {
+        
+        if ( $this->getHttpRequest()->isPost() ) {
+            // Exportovani
+            $post_data = $this->getHttpRequest()->getPost();
+            //Debug::dump($post_data);
+            
+            $Subjekt = new Subjekt();
+            $args = null;
+            if ( $post_data['export_co'] == 2 ) {
+                // pouze aktivni
+                $args['where'] = array( array('stav=1') );
+            }
+            $seznam = $Subjekt->seznam($args)->fetchAll();
+            if ( $seznam ) {
+                
+                if ( $post_data['export_do'] == "csv" ) {
+                    // export do CSV
+                    $ignore_cols = array("date_created","user_created","date_modified","user_modified");
+                    $export_data = Export::csv(
+                                    $seznam, 
+                                    $ignore_cols, 
+                                    $post_data['csv_code'], 
+                                    $post_data['csv_radek'], 
+                                    $post_data['csv_sloupce'], 
+                                    $post_data['csv_hodnoty']);
+                    
+                    //echo "<pre>"; echo $export_data; echo "</pre>"; exit;
+                
+                    $httpResponse = Environment::getHttpResponse();
+                    $httpResponse->setContentType('application/octetstream');
+                    $httpResponse->setHeader('Content-Description', 'File Transfer');
+                    $httpResponse->setHeader('Content-Disposition', 'attachment; filename="export_subjektu.csv"');
+                    $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
+                    $httpResponse->setHeader('Expires', '0');
+                    $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+                    $httpResponse->setHeader('Pragma', 'public');
+                    $httpResponse->setHeader('Content-Length', strlen($export_data));
+                    echo $export_data;  
+                    exit;
+                
+                }
+                
+            } else {
+                $this->flashMessage('Nebyly nalezany žádné data k exportu!', 'warning');
+            }
+        }
+        
+    }
+    
     protected function createComponentUpravitForm()
     {
 
@@ -376,6 +465,6 @@ class Admin_SubjektyPresenter extends BasePresenter
         $this->forward('this', array('hledat'=>$data['dotaz']));
 
     }
-
+  
 
 }

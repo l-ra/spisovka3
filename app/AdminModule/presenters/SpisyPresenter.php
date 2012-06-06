@@ -408,6 +408,65 @@ class Admin_SpisyPresenter extends BasePresenter
         $this->template->spisForm = $this['novySpisovyPlanForm'];
     }
 
+    public function renderImport()
+    {
+    }    
+    
+    public function renderExport()
+    {
+        
+        if ( $this->getHttpRequest()->isPost() ) {
+            // Exportovani
+            $post_data = $this->getHttpRequest()->getPost();
+            //Debug::dump($post_data);
+            
+            $Spis = new Spis();
+            $args = null;
+            if ( $post_data['export_co'] == 2 ) {
+                // pouze aktivni
+                $args['where'] = array( array('stav=1') );
+            }
+            
+            $seznam = $Spis->seznam($args,5)->fetchAll();
+            
+            if ( $seznam ) {
+                
+                if ( $post_data['export_do'] == "csv" ) {
+                    // export do CSV
+                    $ignore_cols = array("date_created","user_created","date_modified","user_modified",
+                                         "sekvence_string");
+                    $export_data = Export::csv(
+                                    $seznam, 
+                                    $ignore_cols, 
+                                    $post_data['csv_code'], 
+                                    $post_data['csv_radek'], 
+                                    $post_data['csv_sloupce'], 
+                                    $post_data['csv_hodnoty']);
+                    
+                    //echo "<pre>"; echo $export_data; echo "</pre>"; exit;
+                
+                    $httpResponse = Environment::getHttpResponse();
+                    $httpResponse->setContentType('application/octetstream');
+                    $httpResponse->setHeader('Content-Description', 'File Transfer');
+                    $httpResponse->setHeader('Content-Disposition', 'attachment; filename="export_spisu.csv"');
+                    $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
+                    $httpResponse->setHeader('Expires', '0');
+                    $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+                    $httpResponse->setHeader('Pragma', 'public');
+                    $httpResponse->setHeader('Content-Length', strlen($export_data));
+                    echo $export_data;  
+                    exit;
+                
+                }
+                
+            } else {
+                $this->flashMessage('Nebyly nalezany žádné data k exportu!', 'warning');
+            }
+        }
+        
+    }    
+    
+    
     /**
      * Select formular se seznamem spisovych planu
      *
