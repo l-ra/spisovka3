@@ -113,3 +113,8 @@
         .update_title {
             font-weight: bold;
         }
+        
+        div.error {
+            background-color: #ff4040;
+        }
+        
