@@ -283,15 +283,20 @@ function my_assert_handler($file, $line, $code)
             /* Nic nezapisovat pokud není spuštěn ostrý update
                                         file_put_contents($site_path."/configs/_aktualizace",$arev); */
         }
-        unset($apply_rev);
         
         if ( isset($_GET['go']) ) {
             if ( $rev_error != 1 ) 
                 if (! file_put_contents($site_path."/configs/_aktualizace",$arev))
                     error("Upozornění: nepodařilo se zapsat nové číslo verze do souboru _aktualizace");
+                    
+            
             // vymazeme temp od robotloader, templates a cache
-            deleteDir($site_path ."/temp/");
+            // Nemazat temp, pokud zadna aktualizace nebyla provedena
+            if ($apply_rev != 0)
+                deleteDir($site_path ."/temp/");
         }
+
+        unset($apply_rev);
 
         dibi::disconnect();        
         
