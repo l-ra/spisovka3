@@ -5,7 +5,7 @@ class Orgjednotka extends TreeModel
 
     protected $name = 'orgjednotka';
     protected $nazev = 'zkraceny_nazev';
-    protected $nazev_sekvence = 'ciselna_rada';
+    protected $nazev_sekvence = 'zkraceny_nazev';
     protected $primary = 'id';
     
     

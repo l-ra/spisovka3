@@ -17,21 +17,27 @@
     {if count($seznam)>0}
     <table class="seznam">
         <tr>
-            <th>Zkratka / číselná řada</th>
+            <th>Zkrácený název</th>
             <th>Název organizační jednotky</th>
+            <th>Zkratka / číselná řada</th>            
         </tr>
         {foreach $seznam as $org}
         <tr class="item{=str_replace("."," item",$org->sekvence)}{if $org->stav!=1} item-noactive{/if}" id="sitem{$org->id}">
             {if $org->stav != 1}
-            <td style="width:100px;">{!=str_repeat("&nbsp;", 5*$org->uroven)}<a href="{link :Admin:Orgjednotky:detail, 'id'=>$org->id}" style="color:#c0c0c0;">{$org->ciselna_rada}</a></td>
+            <td style="width:100px;">{!=str_repeat("&nbsp;", 5*$org->uroven)}<a href="{link :Admin:Orgjednotky:detail, 'id'=>$org->id}" style="color:#c0c0c0;">{$org->zkraceny_nazev}</a></td>
             {else}
-            <td style="width:100px;">{!=str_repeat("&nbsp;", 5*$org->uroven)}<a href="{link :Admin:Orgjednotky:detail, 'id'=>$org->id}">{$org->ciselna_rada}</a></td>
+            <td style="width:100px;">{!=str_repeat("&nbsp;", 5*$org->uroven)}<a href="{link :Admin:Orgjednotky:detail, 'id'=>$org->id}">{$org->zkraceny_nazev}</a></td>
             {/if}
             {if $org->stav != 1}
-            <td style="color:#c0c0c0;">{$org->zkraceny_nazev}</td>
+            <td style="color:#c0c0c0;">{$org->plny_nazev}</td>
             {else}
-            <td>{$org->zkraceny_nazev}</td>
+            <td>{$org->plny_nazev}</td>
             {/if}
+            {if $org->stav != 1}
+            <td style="color:#c0c0c0;">{$org->ciselna_rada}</td>
+            {else}
+            <td>{$org->ciselna_rada}</td>
+            {/if}            
         </tr>
         {/foreach}
     </table>
