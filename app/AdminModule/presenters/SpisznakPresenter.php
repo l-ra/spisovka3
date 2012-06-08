@@ -278,7 +278,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->redirect('this',array('id'=>$data['id']));
     }
 
-    public function stornoSeznamClicked(SubmitButton $button)
+    public function stornoNovyClicked(SubmitButton $button)
     {
         $this->redirect(':Admin:Spisznak:seznam');
     }
@@ -306,7 +306,7 @@ class Admin_SpisznakPresenter extends BasePresenter
                  ->onClick[] = array($this, 'vytvoritanovyClicked');
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+                 ->onClick[] = array($this, 'stornoNovyClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
 
