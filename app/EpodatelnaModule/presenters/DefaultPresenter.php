@@ -1229,6 +1229,7 @@ dmFormat =
     public function actionIsdsovereni()
     {
         $this->template->error = 0;
+        $this->template->vysledek = "";
         $epodatelna_id = $this->getParam('id');
         if ( $epodatelna_id ) {
             $Epodatelna = new Epodatelna();
@@ -1236,10 +1237,8 @@ dmFormat =
 
             if ( $epodatelna_info ) {
                 if ( !empty( $epodatelna_info->file_id ) ) {
-                           
                     $FileModel = new FileModel();
-                    $file = $FileModel->getInfo($epodatelna_info->file_id+1);
-                    
+                    $file = $FileModel->fetchRow(array(array("nazev=%s",'ep-isds-'.$epodatelna_id.'.zfo'))  )->fetch();
                     if ( $file ) {
                     
                         // Nacteni originalu DS
@@ -1252,7 +1251,6 @@ dmFormat =
                             $isds = new ISDS_Spisovka();
                             if ( $ISDSBox = $isds->pripojit() ) {
                                 
-                                $source = chunk_split(base64_encode($source), 64, "\n");
                                 if ( $isds->AuthenticateMessage( $source ) ) {
                                     $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
                                 } else {
@@ -1272,7 +1270,7 @@ dmFormat =
                     }
                 }
             } else {
-                $this->template->vysledek = "Nebyl nalezena zpráva!";
+                $this->template->vysledek = "Nebyla nalezena zpráva!";
                 $this->template->error = 1;
             }
         } else {

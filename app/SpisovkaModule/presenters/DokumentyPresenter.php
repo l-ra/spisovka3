@@ -1386,6 +1386,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function actionIsdsovereni()
     {
         $this->template->error = 0;
+        $this->template->vysledek = "";
         $dokument_id = $this->getParam('id');
         if ( $dokument_id ) {
             $Dokument = new Dokument();
@@ -1394,7 +1395,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ( $dokument_info ) {
                 $nalezeno = 0;
                 foreach( $dokument_info->prilohy as $file ) {
-                    if ( strpos($file->nazev,".zfo") !== false ) {
+                    if ( strpos($file->nazev,"zfo") !== false ) {
                         if ( !empty( $file->id ) ) {
                             // nalezeno ZFO
                             $nalezeno = 1;
@@ -1403,12 +1404,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             $storage_conf = Environment::getConfig('storage');
                             eval("\$DownloadFile = new ".$file->real_type."();");
                             $source = $DownloadFile->download($file,1);
+                            //echo $source;
                             if ( $source ) {
                                 
                                 $isds = new ISDS_Spisovka();
                                 if ( $ISDSBox = $isds->pripojit() ) {
                                     
-                                    if ( $isds->AuthenticateMessage( base64_encode($source) ) ) {
+                                    if ( $isds->AuthenticateMessage( $source ) ) {
                                         $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
                                     } else {
                                         $this->template->error = 4;
@@ -1416,7 +1418,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                                                                     "<br />".
                                                                     'ISDS zpráva: '. $isds->error();
                                     }
-                                    
                                 } else {
                                     $this->template->error = 3;
                                     $this->template->vysledek = "Nepodařilo se připojit k ISDS schránce!".
@@ -1426,15 +1427,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             }
                         }
                     }
-                }
+                }       
                 
                 if ( $nalezeno == 0 ) {
                     // nenalezena zadna datova zprava
                     $this->template->error = 2;
                     $this->template->vysledek = "Nebyla nalezena datová zpráva k ověření!";
                 }
-                
-                    
                 
             } else {
                 $this->template->vysledek = "Nebyl nalezen dokument!";
