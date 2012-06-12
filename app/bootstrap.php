@@ -134,9 +134,9 @@ if ( isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On'
 } else if ( isset($_SERVER['REDIRECT_HTTP_MOD_REWRITE']) && $_SERVER['REDIRECT_HTTP_MOD_REWRITE'] == 'On' ) {
     // Detect in $_SERVER - applied redirect, otherwise the first condition (HTTP_MOD_REWRITE)
     $cool_url = true;
-} else if ( function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules()) ) {
+//} else if ( function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules()) ) {
     // Detect in Apache module (only if PHP as module)
-    $cool_url = true;
+//    $cool_url = true;
 }
 
 if ( $cool_url ) {
@@ -146,6 +146,19 @@ if ( $cool_url ) {
                 'presenter' => 'Default',
                 'action' => 'default',
 	), Route::ONE_WAY);
+        
+	$router[] = new Route('instalace.php', array(
+                'module'    => 'Install',
+                'presenter' => 'Default',
+                'action' => 'uvod',
+	), Route::ONE_WAY); 
+	
+        $router[] = new Route('kontrola.php', array(
+                'module'    => 'Install',
+                'presenter' => 'Default',
+                'action' => 'kontrola',
+                'no_install' => 1
+	), Route::ONE_WAY);        
 
 	// Uzivatel
         $router[] = new Route('uzivatel/<action>/<id>', array(
@@ -225,7 +238,17 @@ if ( $cool_url ) {
         
 } else {
         define('IS_SIMPLE_ROUTER',1);
-	$router[] = new SimpleRouter('Spisovka:Default:default');
+        
+        $path = Environment::getHttpRequest()->getOriginalUri()->getPath();
+        if ( strpos($path,"/instalace.php") !== false ) {
+            $router[] = new SimpleRouter('Install:Default:uvod');
+        } else if ( strpos($path,"/kontrola.php") !== false ) {
+            Environment::setVariable('no_install', 1);
+            $router[] = new SimpleRouter('Install:Default:kontrola');
+        } else {
+            $router[] = new SimpleRouter('Spisovka:Default:default');
+        }
+	
 }
 
 // Step 5: Run the application!

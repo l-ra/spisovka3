@@ -51,8 +51,8 @@ database.profiler = TRUE         ; povoluje profilovani - zaznamenani pouzitych 
 
 5. Provedte instalacni proceduru aplikace.
 
-Spustte internetovy prohlizec a zadejte adresu aplikace + parametr pro start instalace /install/uvod.
-Priklad: http://demo.spisovka3.cz/install/uvod
+Spustte internetovy prohlizec a zadejte adresu aplikace + instalace.php
+Priklad: http://demo.spisovka3.cz/instalace.php
 
 Ridte se nyni pokyny uvedenymi na strankach instalace.
 

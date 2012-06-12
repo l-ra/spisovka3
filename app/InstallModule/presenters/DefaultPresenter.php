@@ -3,9 +3,16 @@
 class Install_DefaultPresenter extends BasePresenter
 {
 
+    private $no_install = false;
+    
     public function startup() {
 
-        if ( file_exists(CLIENT_DIR .'/configs/install') ) {
+        $this->no_install = $this->getParam("no_install", Environment::getVariable('no_install'));
+        $this->template->no_install = $this->no_install;
+        
+        if ( $this->action == "kontrola" && $this->no_install ) {
+            $this->setLayout("install");
+        } else if ( file_exists(CLIENT_DIR .'/configs/install') ) {
             // instalovano
             $this->setView('instalovano');
         }
@@ -38,11 +45,13 @@ class Install_DefaultPresenter extends BasePresenter
     public function renderKontrola()
     {
 
-        $session = Environment::getSession('s3_install');
-        if ( !isset($session->step) ) {
-            $session->step = array();
+        if ( !$this->no_install ) {
+            $session = Environment::getSession('s3_install');
+            if ( !isset($session->step) ) {
+                $session->step = array();
+            }
+            @$session->step['uvod'] = 1;
         }
-        @$session->step['uvod'] = 1;
 
         $this->template->errors = FALSE;
         $this->template->warnings = FALSE;
@@ -560,8 +569,10 @@ class Install_DefaultPresenter extends BasePresenter
         $this->template->requirements = $requirements_nette;
         $this->template->requirements_ess = $requirements_ess;
 
-        if ( !$this->template->errors ){
-            @$session->step['kontrola'] = 1;
+        if ( $this->no_install ) {
+            if ( !$this->template->errors ){
+                @$session->step['kontrola'] = 1;
+            }
         }
         
 
