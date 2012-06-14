@@ -13,57 +13,57 @@
             <dd>{$novyForm['type']->control}</dd>
         </dl>
 
-        <dl class="detail_item">
+        <dl class="detail_item type_ovm">
             <dt>{$novyForm['nazev_subjektu']->label}</dt>
             <dd>{$novyForm['nazev_subjektu']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_ovm">
             <dt>{$novyForm['ic']->label}</dt>
             <dd>{$novyForm['ic']->control} <a href="#" onclick="return aresSubjekt('novyForm');">Vyhledat pomoci systému ARES</a></dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_ovm">
             <dt>{$novyForm['dic']->label}</dt>
             <dd>{$novyForm['dic']->control}</dd>
         </dl>
 
-        <dl class="detail_item">
+        <dl class="detail_item type_ovm type_fo">
             <dt>{$novyForm['titul_pred']->label}</dt>
             <dd>{$novyForm['titul_pred']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_ovm type_fo">
             <dt>{$novyForm['jmeno']->label}</dt>
             <dd>{$novyForm['jmeno']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_ovm type_fo">
             <dt>{$novyForm['prostredni_jmeno']->label}</dt>
             <dd>{$novyForm['prostredni_jmeno']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_ovm type_fo">
             <dt>{$novyForm['prijmeni']->label}</dt>
             <dd>{$novyForm['prijmeni']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_ovm type_fo">
             <dt>{$novyForm['titul_za']->label}</dt>
             <dd>{$novyForm['titul_za']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_fo">
             <dt>{$novyForm['rodne_jmeno']->label}</dt>
             <dd>{$novyForm['rodne_jmeno']->control}</dd>
         </dl>
 
-        <dl class="detail_item">
+        <dl class="detail_item type_fo">
             <dt>{$novyForm['datum_narozeni']->label}</dt>
             <dd>{$novyForm['datum_narozeni']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_fo">
             <dt>{$novyForm['misto_narozeni']->label}</dt>
             <dd>{$novyForm['misto_narozeni']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_fo">
             <dt>{$novyForm['okres_narozeni']->label}</dt>
             <dd>{$novyForm['okres_narozeni']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item type_fo">
             <dt>{$novyForm['stat_narozeni']->label}</dt>
             <dd>{$novyForm['stat_narozeni']->control}</dd>
         </dl>
@@ -113,3 +113,41 @@
 
         {$novyForm->render('end')}
     </div>
+    
+    <script type="text/javascript">
+
+        $('#frmnovyForm-type').change(function () {
+            value = $("#frmnovyForm-type").val();
+            //alert(value);
+            if ( value.indexOf('PFO')>=0 ) {
+                $(".type_fo").show();
+                $(".type_ovm").show();            
+            } else if ( value.indexOf('OVM')>=0 || value.indexOf('PO')>=0 ) {
+                $(".type_fo").hide();
+                $(".type_ovm").show();
+            } else {
+                $(".type_ovm").hide();
+                $(".type_fo").show();
+            }
+
+        })
+        .trigger('change');
+
+        function typSubjektu()
+        {
+            value = $("#frmnovyForm-type").val();
+            //alert(value);
+            if ( value.indexOf('PFO')>=0 ) {
+                $(".type_fo").show();
+                $(".type_ovm").show();            
+            } else if ( value.indexOf('OVM')>=0 || value.indexOf('PO')>=0 ) {
+                $(".type_fo").hide();
+                $(".type_ovm").show();
+            } else {
+                $(".type_ovm").hide();
+                $(".type_fo").show();
+            }            
+        }
+        typSubjektu();
+
+    </script>    

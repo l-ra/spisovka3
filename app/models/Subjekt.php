@@ -88,7 +88,8 @@ class Subjekt extends BaseModel
                 $sql = array(
                     'distinct'=>1,
                     'cols'=>$cols,
-                    'order'=> array('nazev_subjektu','prijmeni','jmeno')
+                    /*'order'=> array('nazev_subjektu','prijmeni','jmeno')*/
+                    'order_sql' => 'CONCAT(s.nazev_subjektu,s.prijmeni,s.jmeno)'
                 );
 
                 if ( strpos($data->email,";")!==false ) {
@@ -408,10 +409,19 @@ class Subjekt extends BaseModel
 
     public static function stat($kod = null, $select = 0) {
 
-        $stat = array('CZE'=>'Česká republika',
+        /*$stat = array('CZE'=>'Česká republika',
                       'SVK'=>'Slovenská republika'
-                     );
+                     );*/
 
+        $prefix = Environment::getConfig('database')->prefix;
+        $tb_staty = $prefix .'stat';
+
+        $result = dibi::query('SELECT nazev,kod FROM %n', $tb_staty,'WHERE stav=1 ORDER BY nazev')->fetchAll();        
+        $stat = array();
+        foreach ($result as $rdata ) {
+            $stat[ $rdata->kod ] = $rdata->nazev;
+        }
+        
         if ( is_null($kod) ) {
             if ( $select == 3 ) {
                 $tmp = array();

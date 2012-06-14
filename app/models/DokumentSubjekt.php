@@ -19,7 +19,8 @@ class DokumentSubjekt extends BaseModel
                  'on' => array('s.id=ds.subjekt_id'),
                  'cols' => array('*')
             ),
-            'order_by' => array('s.nazev_subjektu','s.prijmeni','s.jmeno')
+            'order_sql' => 'CONCAT(s.nazev_subjektu,s.prijmeni,s.jmeno)'
+            
         );
 
 

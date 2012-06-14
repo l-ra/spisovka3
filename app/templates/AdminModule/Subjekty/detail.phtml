@@ -27,23 +27,23 @@
             <dd>{$upravitForm['dic']->control}</dd>
         </dl>
 
-        <dl class="detail_item type_fo detail_item type_ovm">
+        <dl class="detail_item type_fo type_ovm">
             <dt>{$upravitForm['titul_pred']->label}</dt>
             <dd>{$upravitForm['titul_pred']->control}</dd>
         </dl>
-        <dl class="detail_item type_fo detail_item type_ovm">
+        <dl class="detail_item type_fo type_ovm">
             <dt>{$upravitForm['jmeno']->label}</dt>
             <dd>{$upravitForm['jmeno']->control}</dd>
         </dl>
-        <dl class="detail_item type_fo detail_item type_ovm">
+        <dl class="detail_item type_fo type_ovm">
             <dt>{$upravitForm['prostredni_jmeno']->label}</dt>
             <dd>{$upravitForm['prostredni_jmeno']->control}</dd>
         </dl>
-        <dl class="detail_item type_fo detail_item type_ovm">
+        <dl class="detail_item type_fo type_ovm">
             <dt>{$upravitForm['prijmeni']->label}</dt>
             <dd>{$upravitForm['prijmeni']->control}</dd>
         </dl>
-        <dl class="detail_item type_fo detail_item type_ovm">
+        <dl class="detail_item type_fo type_ovm">
             <dt>{$upravitForm['titul_za']->label}</dt>
             <dd>{$upravitForm['titul_za']->control}</dd>
         </dl>
@@ -221,5 +221,21 @@
         })
         .trigger('change');
 
+        function typSubjektu()
+        {
+            value = $("#frmupravitForm-type").val();
+            //alert(value);
+            if ( value.indexOf('PFO')>=0 ) {
+                $(".type_fo").show();
+                $(".type_ovm").show();            
+            } else if ( value.indexOf('OVM')>=0 || value.indexOf('PO')>=0 ) {
+                $(".type_fo").hide();
+                $(".type_ovm").show();
+            } else {
+                $(".type_ovm").hide();
+                $(".type_fo").show();
+            }            
+        }
+        typSubjektu();
 
     </script>

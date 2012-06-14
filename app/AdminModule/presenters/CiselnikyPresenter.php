@@ -317,6 +317,56 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $this->setView('detail');
     }
 
+    public function actionStaty()
+    {
+        $this->template->ciselnik_title = "Státy";
+        $this->template->title = " - ". $this->template->ciselnik_title ." - číselník";
+
+        $ciselnik = new Ciselnik();
+        $ciselnik->setTable('stat');
+        $ciselnik->setParams($this->getParam());
+        $ciselnik->setLink($this->link(':Admin:Ciselniky:staty'));
+        $ciselnik->orderBy('nazev');
+
+        $ciselnik->addColumn('id',
+                    array(
+                        'title' => 'ID',
+                        'link' => false,
+                        'form' => 'hidden',
+                        'view' => false
+                    )
+                );
+        $ciselnik->addColumn('nazev',
+                    array(
+                        'title' => 'Název',
+                        'link' => true,
+                        'form' => 'text',
+                        'view' => true
+                    )
+                );
+        $ciselnik->addColumn('kod',
+                    array(
+                        'title' => 'Kód státu',
+                        'link' => false,
+                        'form' => 'text',
+                        'view' => true
+                    )
+                );
+        $ciselnik->addColumn('stav',
+                    array(
+                        'title' => 'Stav',
+                        'link' => false,
+                        'form' => 'selectStav',
+                        'view' => true
+                    )
+                );
+        
+        $this->addComponent($ciselnik, 'ciselnik');
+
+        $this->setView('detail');
+    }
+    
+    
     public function ciselnikFormHandler(SubmitButton $button)
     {
 	$form = $button->getParent();
