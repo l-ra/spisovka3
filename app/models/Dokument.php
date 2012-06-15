@@ -2395,7 +2395,7 @@ class Dokument extends BaseModel
                     $old_dokument['dokument_id'] = $dokument_id;
                     $old_dokument['user_created'] = Environment::getUser()->getIdentity()->id;
                     $old_dokument['date_created'] = new DateTime();
-                    unset($old_dokument['id'],$old_dokument['user_modified'],$old_dokument['date_modified']);
+                    unset($old_dokument['id'],$old_dokument['user_modified'],$old_dokument['date_modified'],$old_dokument['spousteci_udalost']);
                     //Debug::dump($old_dokument);
                     $DokumentHistorie = new DokumentHistorie();
                     $DokumentHistorie->insert($old_dokument);
