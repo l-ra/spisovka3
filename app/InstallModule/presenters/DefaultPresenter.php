@@ -569,7 +569,7 @@ class Install_DefaultPresenter extends BasePresenter
         $this->template->requirements = $requirements_nette;
         $this->template->requirements_ess = $requirements_ess;
 
-        if ( $this->no_install ) {
+        if ( !$this->no_install ) {
             if ( !$this->template->errors ){
                 @$session->step['kontrola'] = 1;
             }
@@ -1069,7 +1069,7 @@ class Install_DefaultPresenter extends BasePresenter
         dibi::query("SET sql_mode = ''");
         dibi::query("SET foreign_key_checks = 0");        
         
-        $data['stav'] = 1;
+        $data['stav'] = 0;
         $data['user_created'] = 1;
         $data['date_created'] = new DateTime();
         $data['user_modified'] = 1;

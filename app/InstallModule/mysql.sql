@@ -658,7 +658,9 @@ INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
 (59, 7, 21, 'Y'),
 (60, 7, 22, 'Y'),
 (61, 7, 23, 'Y'),
-(62, 3, 1, 'Y');
+(62, 3, 1, 'Y'),
+(63, 4,	38, 'Y'),
+(64, 4,	39, 'Y');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_resource` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -705,7 +707,9 @@ INSERT INTO `{tbls3}user_resource` (`id`, `code`, `note`, `name`) VALUES
 (34, 'Spisovna_SpisyPresenter', NULL, 'Spisovna - spisy'),
 (35, 'Spisovna_VyhledatPresenter', NULL, 'Spisovna - vyhledavani'),
 (36, 'Spisovna_ZapujckyPresenter', NULL, 'Spisovna - zapujcky'),
-(37, 'Spisovka_VypravnaPresenter', NULL, 'Výpravna');
+(37, 'Spisovka_VypravnaPresenter', NULL, 'Výpravna'),
+(38, 'Spisovka_ZpravyPresenter', NULL, 'Zprávy'),
+(39, 'Spisovka_CronPresenter', 'Cron - zajišťuje opakované činnosti', 'Cron');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_role` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -771,7 +775,9 @@ INSERT INTO `{tbls3}user_rule` (`id`, `resource_id`, `name`, `note`, `privilege`
 (21, 34, 'Přístup ke spisům ve spisovně', '', ''),
 (22, 35, 'Vyhledávání dokumentů ve spisovně', '', ''),
 (23, 36, 'Spisovna - zápůjčky', '', ''),
-(24, 37, 'Výpravna', '', '');
+(24, 37, 'Výpravna', '', ''),
+(25, 38, 'Zobrazení zpráv', '', ''),
+(26, 39, 'Cron', '', '');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_to_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -900,6 +906,31 @@ INSERT INTO `{tbls3}stat` (`id`, `nazev`, `kod`, `stav`) VALUES
 (1,	'Česká republika',	'CZE',	1),
 (2,	'Slovenská republika',	'SVK',	1);
 
+CREATE TABLE `{tbls3}zprava` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `zprava_typ_id` int(11) NOT NULL DEFAULT '1',
+  `zprava` text NOT NULL,
+  `date_created` datetime NOT NULL,
+  `user_created` int(11) DEFAULT NULL COMMENT 'null=automat',
+  `zobrazit_od` datetime DEFAULT NULL,
+  `zobrazit_do` datetime DEFAULT NULL,
+  `stav` tinyint(4) NOT NULL DEFAULT '1',
+  `uid` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uid` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `{tbls3}zprava_osoba` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `zprava_id` int(11) NOT NULL,
+  `osoba_id` int(11) NOT NULL,
+  `date` datetime NOT NULL,
+  `stav` tinyint(4) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `zprava_id` (`zprava_id`),
+  KEY `osoba_id` (`osoba_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+
 
 ALTER TABLE `{tbls3}cislo_jednaci`
   ADD CONSTRAINT `fk_cislo_jednaci_orgjednotka1` FOREIGN KEY (`orgjednotka_id`) REFERENCES `{tbls3}orgjednotka` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -1023,6 +1054,10 @@ ALTER TABLE `{tbls3}workflow`
   ADD CONSTRAINT `fk_workflow_orgjednotka1` FOREIGN KEY (`orgjednotka_id`) REFERENCES `{tbls3}orgjednotka` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_workflow_user1` FOREIGN KEY (`prideleno_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_workflow_user2` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+ALTER TABLE `{tbls3}zprava_osoba`
+  ADD CONSTRAINT `zprava_osoba_ibfk_1` FOREIGN KEY (`zprava_id`) REFERENCES `{tbls3}zprava` (`id`),
+  ADD CONSTRAINT `zprava_osoba_ibfk_2` FOREIGN KEY (`osoba_id`) REFERENCES `{tbls3}osoba` (`id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

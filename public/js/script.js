@@ -440,8 +440,30 @@ isdsSubjekt = function ( formName ) {
 
     return false;
 
+}
+
+/*
+ * CRON - zpracovani na pozadi
+ *
+ */
+ajaxcron = function () {
+
+    baseUri = baseUri.replace('/public','');
+    if ( is_simple == 1 ) {
+        var url = baseUri + '?presenter=Spisovka%3Acron&id=0&action=ajax';
+    } else {    
+        var url = baseUri + 'cron/0/ajax';
+    }
+    //alert( url );
+
+    $.get(url, function(data) {
+    });
+
+    return false;
 
 }
+
+
 
 toggleWindow = function (elm) {
 

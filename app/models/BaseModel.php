@@ -52,6 +52,11 @@ abstract class BaseModel extends Object
     protected $tb_zpusob_doruceni = 'zpusob_doruceni';
     protected $tb_zpusob_vyrizeni = 'zpusob_vyrizeni';
     protected $tb_zpusob_odeslani = 'zpusob_odeslani';
+    
+    protected $tb_stat = 'stat';
+    
+    protected $tb_zprava = 'zprava';
+    protected $tb_zprava_osoba = 'zprava_osoba';
 
 
     public function  __construct() {
@@ -89,6 +94,12 @@ abstract class BaseModel extends Object
         $this->tb_zpusob_doruceni = $prefix . $this->tb_zpusob_doruceni;
         $this->tb_zpusob_vyrizeni = $prefix . $this->tb_zpusob_vyrizeni;
         $this->tb_zpusob_odeslani = $prefix . $this->tb_zpusob_odeslani;
+        
+        $this->tb_stat = $prefix . $this->tb_stat;
+        
+        $this->tb_zprava = $prefix . $this->tb_zprava;
+        $this->tb_zprava_osoba = $prefix . $this->tb_zprava_osoba;
+        
 
     }
 

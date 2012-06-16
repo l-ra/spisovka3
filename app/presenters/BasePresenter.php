@@ -231,6 +231,7 @@ abstract class BasePresenter extends Presenter
             $app_info = array('3.x','rev.X','OSS Spisová služba v3','1270716764');
         }
         $this->template->AppInfo = $app_info;
+        $this->template->NovaVerze = Zprava::je_aktualni();
         
         $this->template->klientUri = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
         
@@ -239,7 +240,7 @@ abstract class BasePresenter extends Presenter
          */
         $user_config = Environment::getVariable('user_config');
         $this->template->Urad = $user_config->urad;
-
+        
         /**
          * Uzivatel
          */
@@ -248,15 +249,28 @@ abstract class BasePresenter extends Presenter
             $this->template->user = $user->getIdentity();
             $UserModel = new UserModel();
             $this->template->orgjednotka = $UserModel->getOrg($this->template->user);
+            
+            /**
+             * Zobrazeni zprav uzivateli
+            */
+            $Zprava = new Zprava();
+            $this->template->zpravy = $Zprava->hlasky();            
+            
         } else {
             $ident = new stdClass();
             $ident->name = "Nepřihlášen";
             $ident->user_roles = array();
             $this->template->user = $ident;
         }
+        
+
+        
+        
+        
+        
 
     }
-
+    
     public function templatePrepareFilters($template)
     {
         $template->registerFilter($filter = new /*Nette\Templates\*/CurlyBracketsFilter);

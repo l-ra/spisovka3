@@ -632,6 +632,14 @@ label.required {
     background: #ffffff url() repeat-x;
 }
 
+#info_flash {
+    width: 960px;
+    margin: 0 auto 0 auto;
+    padding: 10px;
+    text-align: center;
+    background: #ffffff url() repeat-x;
+}
+
 .flash_message {
     margin-bottom: 5px;
     padding: 15px 50px;
@@ -662,6 +670,40 @@ label.required {
     color: #681203;
     border: 1px #681203 solid;
     background: #ffcccc url('../images/icons/dialog-error.png') 10px 5px no-repeat;
+}
+
+.flash_infozprava {
+    margin-bottom: 5px;
+    padding: 15px 5px 5px 50px;
+    text-align: left;
+    /*color: #03406A;*/
+    border: 1px #03406A solid;
+    background: #8FBAD9 url('../images/icons/subjekt_ao.png') 10px 5px no-repeat;
+}
+
+.flash_infozprava_item {
+    margin-bottom: 5px;
+    padding: 15px 5px 5px 50px;
+    text-align: left;
+    border-bottom: 1px #c0c0c0 solid;
+    background: #ffffff url('../images/icons/subjekt_ao.png') 10px 5px no-repeat;
+}
+
+#flash_version {
+    
+    /*width: 960px;*/
+    margin: 0 auto 0 auto;
+    padding: 15px 5px 15px 50px;
+    text-align: left;
+    color: #880000;
+    border: 1px #681203 solid;
+    background: #ffcccc url('../images/icons/dialog-error.png') 10px 10px no-repeat;
+}
+
+.flash_action {
+    text-align: right;
+    margin: 0px;
+    padding: 4px;
 }
 
 #error {
