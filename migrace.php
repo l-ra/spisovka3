@@ -36,7 +36,6 @@
  * 
  */
 
-
 // Nastaveni cesty k aplikaci S3 (identicke s index.php - pro nacteni pomocnych funkci)
 define('WWW_DIR', dirname(__FILE__) );
 define('APP_DIR', WWW_DIR . '/app');
@@ -446,32 +445,50 @@ unset($S2_vyriz);
  *
  ************************************************************************** */
 debug_head('Migrace spisů', 2);
-$S2_spisy = $S2->query('SELECT * FROM [:S2:spisy]')->fetchAll();
+$S2_spisy = $S2->query('SELECT * FROM [:S2:spisy] ORDER BY id_spis')->fetchAll();
 
 if ( count($S2_spisy)>0 ) {
     if (MIGRACE) {
         $S3->query('TRUNCATE TABLE '.S3_.'spis');
+        $S3->insert(S3_.'spis', array(
+                'id' => 1,
+                'parent_id' => null,
+                'spousteci_udalost_id' => 3,
+                'spisovy_znak_id' => null,
+                'nazev' => 'SPISY',
+                'popis' => '',
+                'typ' => 'VS',
+                'sekvence' => 1,
+                'sekvence_string' => 'SPISY.1',
+                'uroven' => 0,
+                'skartacni_znak' => 'V',
+                'skartacni_lhuta' => 1000,
+                'stav' => 1,
+                'datum_otevreni' => new DateTime(),
+                'date_created' => new DateTime(),
+                'user_created' => 1,
+        ))->execute();        
     }
     foreach ( $S2_spisy as $S2_s ) {
         
-        //if ($S2_s->id_spis == 1) continue;
+        if ($S2_s->id_spis == 1) continue;
         
-        echo "\n>> ".htmlspecialchars($S2_s->id_spis)." = ".htmlspecialchars($S2_s->cislo_spisu);
+        echo "\n>> ".htmlspecialchars($S2_s->id_spis+1)." = ".htmlspecialchars($S2_s->cislo_spisu);
         if (MIGRACE):
         try {
-            $nazev = (empty($S2_s->cislo_spisu))?"Spis č.".($S2_s->id_spis):$S2_s->cislo_spisu;
-            $sekvence = $nazev .".". $S2_s->id_spis;
+            $nazev = (empty($S2_s->cislo_spisu))?"Spis č.".($S2_s->id_spis+1):$S2_s->cislo_spisu;
+            $sekvence = $nazev .".". ($S2_s->id_spis+1);
             $S3->insert(S3_.'spis', array(
-                'id' => (int) $S2_s->id_spis,
-                'parent_id' => null,
+                'id' => (int) ($S2_s->id_spis+1),
+                'parent_id' => 1,
                 'spousteci_udalost_id' => 3,
                 'spisovy_znak_id' => null,
                 'nazev' => $nazev,
                 'popis' => (string) $S2_s->poznamka,
                 'typ' => 'S',
-                'sekvence' => (int) $S2_s->id_spis,
-                'sekvence_string' => $sekvence,
-                'uroven' => 0,
+                'sekvence' => '1.'. ($S2_s->id_spis+1),
+                'sekvence_string' => "SPISY.1#". $sekvence,
+                'uroven' => 1,
                 'skartacni_znak' => 'V',
                 'skartacni_lhuta' => 1000,
                 'stav' => (int) $S2_s->stav,
@@ -1201,24 +1218,24 @@ if ( count($S2_dok)>0 ) {
 
                 // Pripojeni spisu do dokumentu
                 if ( !empty( $S2_d->id_spis ) && $S2_d->id_spis > 1 ) {
-                    $S3_spis_count = $S3->query('SELECT poradi FROM [:S3:dokument_to_spis] WHERE spis_id=%i ORDER BY poradi DESC LIMIT 1;',$S2_d->id_spis)->fetchSingle();
+                    $S3_spis_count = $S3->query('SELECT poradi FROM [:S3:dokument_to_spis] WHERE spis_id=%i ORDER BY poradi DESC LIMIT 1;',$S2_d->id_spis+1)->fetchSingle();
                     if (MIGRACE):
                         
                     if ( isset($orgjednotka) ) {
                         // prideleni vlastnictvi spisu dle organizacni jednotky - z workflow
-                        $S3->update(S3_.'spis',array('orgjednotka_id'=>$orgjednotka))->where(array(array('id=%i',$S2_d->id_spis)))->execute();
+                        $S3->update(S3_.'spis',array('orgjednotka_id'=>$orgjednotka))->where(array(array('id=%i',$S2_d->id_spis+1)))->execute();
                     }
                         
                     $S3->insert(S3_.'dokument_to_spis', array(
                         'dokument_id'=>$dokument_id,
-                        'spis_id'=>($S2_d->id_spis),
+                        'spis_id'=>($S2_d->id_spis+1),
                         'poradi'=> ($S3_spis_count + 1),
                         'stav'=> 1,
                         'date_added' => new DateTime(),
                         'user_id' => 1
                     ))->execute();
                     endif;
-                    echo "\n   => <span style='color:green'>připojen spis ". ($S2_d->id_spis) ."</span>";
+                    echo "\n   => <span style='color:green'>připojen spis ". ($S2_d->id_spis+1) ."</span>";
                 }
                 unset($S3_spis_count);                
                 

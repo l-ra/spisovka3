@@ -500,7 +500,22 @@ CREATE TABLE IF NOT EXISTS `{tbls3}spousteci_udalost` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}spousteci_udalost` (`id`, `nazev`, `poznamka`, `stav`, `poznamka_k_datumu`) VALUES
-(1, 'Skartační lhůta začíná plynout po uzavření dokumentu.', NULL, 2, 'uzavření/vyřízení dokumentu');
+(1, 'Skartační lhůta začíná plynout po ztrátě platnosti dokumentu.', NULL, 1,'ukončení platnosti dokumentu'),
+(2, 'Skartační lhůta začíná plynout po ukončení záruky.', NULL, 1,'ukončení záruky'),
+(3, 'Skartační lhůta začíná plynout po uzavření dokumentu.', NULL, 2,'uzavření/vyřízení dokumentu'),
+(4, 'Skartační lhůta počíná plynout po zařazení dokumentů z předávacích protokolů do skartačního řízení (předávací protokoly).', NULL, 1, 'zařazení dokumentů'),
+(5, 'Skartační lhůta začíná plynout po vyhodnocení dokumentu (Podkladový materiál k výkazům).', NULL, 1, 'vyhotovení dokumentu'),
+(6, 'Skartační lhůta začíná běžet po roce, v němž byla výpočetní a jiná technika naposledy použita, nebo po ukončení používání příslušného software (Provozní dokumentace, licence).', NULL, 1,'posledního použití nebo ukončení použití'),
+(7, 'Skartační lhůta začíná plynout po vyhlášení výsledků voleb.', NULL, 1,'vyhlášení výsledku voleb'),
+(8, 'Skartační lhůta začíná plynout po zrušení zařízení.', NULL, 1,'zrušení zařízení'),
+(9, 'Nabytí účinnosti.', NULL, 1,'nabytí účinnosti'),
+(10, 'Rozhodnutí, nabytí právní moci.', NULL, 1,'rozhodnutí'),
+(11, 'Uvedení objektu do provozu.', NULL, 1,'udevení objektu do provozu'),
+(12, 'Ukončení studia.', NULL, 1,'ukončení studia'),
+(13, 'Ukončení pobytu.', NULL, 1,'ukončení pobytu'),
+(14, 'Ukončení pracovního/služebního poměru.', NULL, 1,'ukončení pracovního/služebního poměru'),
+(15, 'Skartační lhůta u dokumentů celostátně vyhlášeného referenda začíná plynout po vyhlášení výsledků referenda prezidentem republiky ve Sbírce zákonů, popřípadě po vyhlášení nálezu Ústavního soudu, kterým rozhodl, že postup při provádění referenda nebyl v souladu s ústavním zákonem o referendu o přistoupení České republiky k Evropské unii nebo zákonem vydaným k jeho provedení s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu.', NULL, 1,'vyhlášení výsledků referenda'),
+(16, 'Skartační lhůta u dokumentů krajského referenda začíná plynout po vyhlášení výsledků referenda s povinností zachování tří nepoužitých hlasovacích lístků pro referendum pro uložení v příslušném archivu.', NULL, 1,'vyhlášení výsledků referenda');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}subjekt` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
