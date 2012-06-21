@@ -1,25 +1,85 @@
 <?php
 
-// Nastaveni cesty pro S3 (pro migraci)
+/**
+ * 
+ *  Migracni skript OSS Spisove sluzby
+ * 
+ *  - provadi migraci dat z verze 2.1 na verzi 3 (aktualni)
+ *
+ *
+ *  Nastaveni:
+ *
+ *  - nastaveni cesty pro S3
+ *    Pouzijte stejne nastaveni jako v pripade index.php.
+ *    Pripadne ponechte beze zmen. 
+ * 
+ *    WWW_DIR - cesta k tomuto souboru (nemenit)
+ *    APP_DIR - cesta k adresari /app z pohledu tohoto souboru
+ *    LIBS_DIR - cesta k adresari /libs z pohledu tohoto souboru
+ *    CLIENT_DIR - cesta k uzivatelskemu adresari /client z pohledu tohoto souboru 
+ *
+ *  - nastaveni cesty pro S2
+ *    
+ *    S2_DIR - nastavte cestu k root adresari, kde se nachazi Spisova sluzba verze 2
+ *
+ *
+ *  Pouziti:
+ * 
+ *  - pro spravnou funkcnost je potreba spravne nastavit cesty (viz nastaveni)
+ *  - spustte tento skript v prohlizeci zadanim http://<adresa>/migrace.php
+ *  - pokud je vse v poradku, muzete kliknout na odkaz "spustit migraci dat"
+ * 
+ *  POZOR! Proces migrace maze vsechny data ve Spisove sluzbe verzi 3
+ *  
+ *  V zavislosti na mnozstvi dat muze migrace trvat i nekolik desitek minut.
+ *  Behem migraci neprerusujte akci!
+ * 
+ */
+
+
+// Nastaveni cesty k aplikaci S3 (identicke s index.php - pro nacteni pomocnych funkci)
 define('WWW_DIR', dirname(__FILE__) );
 define('APP_DIR', WWW_DIR . '/app');
 define('LIBS_DIR', WWW_DIR . '/libs');
 
-// Nastaveni cesty pro S3 (nastaveni)
-define('CLIENT_DIR', WWW_DIR . '/client'); // pro single
-//define('CLIENT_DIR', WWW_DIR . '/clients/client1'); // pro hosting
+// Nastaveni cesty pro S3 (klientske nastaveni verze 3)
+define('CLIENT_DIR', WWW_DIR . '/client');
 
-// Nastaveni cesty pro S2 (absolutni cesta k root aplikaci)
-define('S2_DIR', 'i:/bp.spisovka/s2');
+// Nastaveni cesty pro S2 (absolutni cesta k root aplikaci verze 2)
+define('S2_DIR', '/cesta/ke/spisovce_2');
 
-define('MIGRACE',0); // spusti migraci, 0 = test / pouze vystup
-define('TEST_KONTROLA',0); // spusti jen poctecni kontrolu
 
+
+
+
+/* **************************************************************************
+ *
+ *  Zde konci uzivatelska cast.
+ *  Nasledujici radky jiz nemenit!
+ *
+ ************************************************************************** */
+/************************************************************************** */
 /* **************************************************************************
  *
  *  Databaze S2 (automaticky z cesty nebo vyplnit rucne)
  *
  ************************************************************************** */
+
+if (!file_exists(S2_DIR .'/system/db_nastaveni.php') ) {
+    header('Content-type: text/html; charset="utf-8"',true);
+    echo "<pre>";
+    echo "Nelze načíst nastavení ze Spisovky 2! Migraci nelze provést.<br/>Zkontrolujte nastavení cesty.";
+    echo "</pre>";
+    exit;
+}
+
+if (!file_exists(CLIENT_DIR ."/configs/system.ini") ) {
+    header('Content-type: text/html; charset="utf-8"',true);
+    echo "<pre>";
+    echo "Nelze načíst nastavení ze Spisovky 3! Migraci nelze provést.<br/>Zkontrolujte nastavení cesty.";
+    echo "</pre>";
+    exit;
+}
 
 include S2_DIR .'/system/db_nastaveni.php';
 //define("SPIS_DB_SERVER"  ,"localhost");
@@ -55,6 +115,7 @@ $S3_DB_CONFIG = array(
     "prefix"   => $S3_DB_INI['common']['database.prefix'],
 );
 
+
 /* **************************************************************************
  *
  *  Pripojeni DB
@@ -63,10 +124,10 @@ $S3_DB_CONFIG = array(
 
 session_start();
 set_time_limit(0); // dle poctu klidne i 30 minut
-// skript je spatne napsany, vyzaduje velike mnozstvi pameti
-// v zavislosti na velikosti databaze
 ini_set('memory_limit', '300M');
 ini_set('display_errors', 1);
+
+try {
 
 include LIBS_DIR .'/dibi/dibi.php';
 
@@ -75,10 +136,22 @@ include APP_DIR .'/models/BaseModel.php';
 include APP_DIR .'/models/FileModel.php';
 include APP_DIR .'/components/UUID.php';
 
+if ( isset($_GET['go']) && $_GET['go'] == "migrace" ) {
+    define('MIGRACE',1); // spusti migraci, 0 = test / pouze vystup
+    define('TEST_KONTROLA',0); // spusti jen pocatecni kontrolu
+} else {
+    define('MIGRACE',0); // spusti migraci, 0 = test / pouze vystup
+    define('TEST_KONTROLA',1); // spusti jen pocatecni kontrolu
+}
 
-debug_head('Konfigurace databáze');
-debug($S2_DB_CONFIG,'DB Config S2');
-debug($S3_DB_CONFIG,'DB Config S3');
+if (MIGRACE) debug_head('Konfigurace databáze');
+$S2_DB_CONFIG_temp = $S2_DB_CONFIG;
+$S2_DB_CONFIG_temp['password'] = "***";
+$S3_DB_CONFIG_temp = $S3_DB_CONFIG;
+$S3_DB_CONFIG_temp['password'] = "***";
+if (MIGRACE) debug($S2_DB_CONFIG_temp,'DB Config S2');
+if (MIGRACE) debug($S3_DB_CONFIG_temp,'DB Config S3');
+unset($S2_DB_CONFIG_temp,$S3_DB_CONFIG_temp);
 
 $S2 = new DibiConnection($S2_DB_CONFIG);
 dibi::addSubst('S2', $S2_DB_CONFIG['prefix']);
@@ -87,6 +160,17 @@ $S3 = new DibiConnection($S3_DB_CONFIG);
 dibi::addSubst('S3', $S3_DB_CONFIG['prefix']);
 define('S3_', $S3_DB_CONFIG['prefix']);
 
+} catch (Exception $e) {
+    header('Content-type: text/html; charset="utf-8"',true);
+    echo "<pre>";
+    echo "Chyba při načítání migračního skriptu! Migraci nelze provést.";
+    echo "<br/><br />Chyba: ". $e->getMessage();
+    echo "<br /><br/>Zkontrolujte správnost nastavení konfiguračních souborů spisovek, případně dostupnost daných služeb.";
+    echo "</pre>";
+    exit;
+}
+
+header('Content-type: text/html; charset="utf-8"',true);
 echo "<pre>";
 //exit;
 $ERROR_LOG = array();
@@ -96,7 +180,7 @@ $ERROR_LOG = array();
  * Migrace nastaveni
  *
  ************************************************************************** */
-debug_head('Migrace nastavení',2);
+if (MIGRACE) debug_head('Migrace nastavení',2);
 
 include S2_DIR .'/system/system_nastaveni.php';
 $S3_nastaveni_klient = parse_ini_file(CLIENT_DIR .'/configs/klient.ini',TRUE);
@@ -109,9 +193,9 @@ $S3_CJ = parseCJ(SPIS_MASKA_JEDNACIHO_CISLA);
 $S3_nastaveni_klient['cislo_jednaci']['maska'] = $S3_CJ['maska'];
 $S3_nastaveni_klient['cislo_jednaci']['typ_evidence'] = 'priorace';
 
-if (TEST_KONTROLA!=1) write_ini_file(CLIENT_DIR .'/configs/klient.ini', $S3_nastaveni_klient);
-debug($S3_nastaveni_klient);
-echo "\n   => <span style='color:green'>nastavení klienta přeneseno</span>";
+if (MIGRACE) write_ini_file(CLIENT_DIR .'/configs/klient.ini', $S3_nastaveni_klient);
+if (MIGRACE) debug($S3_nastaveni_klient);
+if (MIGRACE) echo "\n   => <span style='color:green'>nastavení klienta přeneseno</span>";
 
 
 $S3_nastaveni_epod = parse_ini_file(CLIENT_DIR .'/configs/epodatelna.ini',TRUE);
@@ -157,12 +241,116 @@ $S3_nastaveni_epod['isds']['0.podatelna'] = ISDS_PODATELNA;
 $S3_nastaveni_epod['isds']['0.test'] = ISDS_TEST;
 $S3_nastaveni_epod['isds']['0.typ_pripojeni'] = 0;
 
-if (TEST_KONTROLA!=1) write_ini_file(CLIENT_DIR .'/configs/epodatelna.ini', $S3_nastaveni_epod);
-if (TEST_KONTROLA==1) debug($S3_nastaveni_epod);
-echo "\n   => <span style='color:green'>nastavení e-podatelny přeneseno</span>";
+if (MIGRACE) write_ini_file(CLIENT_DIR .'/configs/epodatelna.ini', $S3_nastaveni_epod);
+if (MIGRACE) debug($S3_nastaveni_epod);
+if (MIGRACE) echo "\n   => <span style='color:green'>nastavení e-podatelny přeneseno</span>";
 
+if (TEST_KONTROLA==1) {
+    
+    echo "****************************************************************************************************\n";
+    echo "****************************************************************************************************\n";
+    echo "\n";
+    echo "  Migrační skript OSS Spisové služby \n";
+    echo "\n";
+    echo "****************************************************************************************************\n";
+    echo "****************************************************************************************************\n";
+    echo "\n";
+    echo "  Tento skript provádí migraci dat z verze 2.1 na verzi 3.\n";
+    echo "\n";
+    echo "  Vidíte-li tuto stránku, pak je nastavení v pořádku. Můžete provést\n";
+    echo "  migraci dat kliknutím na odkaz 'spustit migraci dat'.\n";
+    echo "  V závislosti na množství dat může migrace trvat i půl hodiny.\n";
+    echo "  Během procesu nepřerušujte stránku, nezavírejte prohlížeč ani nevypínejte počítač.\n";
+    echo "  Pokud k tomu dojde, bude migrace neúplná. Pak je potřeba migraci provést znovu.\n";
+    echo "\n";
+    echo "  POZOR! Migrace dat provádí odstranění veškerých dat ze Spisové služby verze 3.\n";
+    echo "  Migraci lze provést pouze na čerstvě nainstalovaném aplikaci.\n";
+    echo "\n";
+    echo "\n";
+    echo "\n";
+    
+    echo "\n Počáteční informace o procesu migrace: \n\n";
+    
+    $cas = 0;
+    
+    $pocet = 0; $zpr = 0;
+    $pocet = $S2->query('SELECT count(*) FROM [:S2:spis_znak]')->fetchSingle();
+    echo "  Migrace spisových znaků\n";
+    echo "     - počet: $pocet \n";
+    $zpr = $pocet * 0.005;
+    $cas += $zpr;
+    echo "     - odhadovaný čas zpracování: ". number_format($zpr,3,","," ") ." sekund \n";
+    
+    $pocet = 0; $zpr = 0;
+    $pocet = $S2->query('SELECT count(*) FROM [:S2:zpusob_vyrizeni]')->fetchSingle();
+    echo "  Migrace způsobu vyřízení\n";
+    echo "     - počet: $pocet \n";
+    $zpr = $pocet * 0.005;
+    $cas += $zpr;
+    echo "     - odhadovaný čas zpracování: ". number_format($zpr,3,","," ") ." sekund \n";
 
-if (TEST_KONTROLA==1) exit;
+    $pocet = 0; $zpr = 0;
+    $pocet = $S2->query('SELECT count(*) FROM [:S2:odesilatele]')->fetchSingle();
+    echo "  Migrace subjektů\n";
+    echo "     - počet: $pocet \n";
+    $zpr = $pocet * 0.005;
+    $cas += $zpr;
+    echo "     - odhadovaný čas zpracování: ". number_format($zpr,3,","," ") ." sekund \n";
+
+    $pocet = 0; $zpr = 0;
+    $pocet = $S2->query('SELECT count(*) FROM [:S2:orgjednotky]')->fetchSingle();
+    echo "  Migrace organizačních jednotek\n";
+    echo "     - počet: $pocet \n";
+    $zpr = $pocet * 0.04;
+    $cas += $zpr;
+    echo "     - odhadovaný čas zpracování: ". number_format($zpr,3,","," ") ." sekund \n";
+
+    $pocet = 0; $zpr = 0;
+    $pocet = $S2->query('SELECT count(*) FROM [:S2:zamestnanci]')->fetchSingle();
+    echo "  Migrace zamestnanců a jejich uživatelských účtů\n";
+    echo "     - počet: $pocet \n";
+    $zpr = $pocet * 0.0252;
+    $cas += $zpr;
+    echo "     - odhadovaný čas zpracování: ". number_format($zpr,3,","," ") ." sekund \n";
+
+    $pocet = 0; $zpr = 0;
+    $pocet = $S2->query('SELECT count(*) FROM [:S2:spisy]')->fetchSingle();
+    echo "  Migrace spisů\n";
+    echo "     - počet: $pocet \n";
+    $zpr = $pocet * 0.005;
+    $cas += $zpr;
+    echo "     - odhadovaný čas zpracování: ". number_format($zpr,3,","," ") ." sekund \n";
+    
+    $pocet = 0; $zpr = 0;
+    $pocet = $S2->query('SELECT count(*) FROM [:S2:dokumenty]')->fetchSingle();
+    echo "  Migrace dokumentů včetně jejich workflow\n";
+    echo "     - počet: $pocet \n";
+    $zpr = $pocet * 0.0911;
+    $cas += $zpr;
+    echo "     - odhadovaný čas zpracování: ". number_format($zpr,3,","," ") ." sekund \n";
+    
+    echo "\n\n";
+    echo "  Celkový odhadovaný čas trvání migrace: <strong>". number_format($cas,3,","," ") ." sekund (". number_format($cas/60,0) ." minut a ". number_format($cas%60,0) ." sekund)</strong>.\n";
+    echo "  (* celkový čas je pouze hrubý odhad. Může se lišit v závislosti na výkonu serveru a zatížení. Rozpětí přiblížně +- 50%)\n";
+    
+    
+    
+    
+    
+    
+    echo "\n";
+    echo "\n";
+    echo "\n";
+    echo "<h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='migrace.php?go=migrace'>Spustit migraci dat</a></h3>\n";
+    echo "\n";
+    echo "\n";
+    
+ //*  Migracni skript OSS Spisove sluzby
+ //* 
+ //*  - provadi migraci dat z verze 2.1 na verzi 3 (aktualni)    
+    
+    exit;
+}
 
 $S3->query("SET FOREIGN_KEY_CHECKS=0;");
 $S3->query("SET SQL_MODE='';");
@@ -175,25 +363,31 @@ $S3->query("SET SQL_MODE='';");
 debug_head('Migrace spisových znaků', 2);
 
 $S2_spisove_znaky = $S2->query('SELECT * FROM [:S2:spis_znak]')->fetchAll();
-//debug($S2_spisove_znaky,"S2 Spisové znaky");
 if ( count($S2_spisove_znaky)>0 ) {
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'spisovy_znak');
     foreach ( $S2_spisove_znaky as $S2_sz ) {
         echo "\n>> ".htmlspecialchars($S2_sz->id_spisznak)." = ".htmlspecialchars($S2_sz->znak)." (".htmlspecialchars($S2_sz->popis).") - ".htmlspecialchars($S2_sz->skartacni_znak)."/".htmlspecialchars($S2_sz->skartacni_lhuta);
         if (MIGRACE):
         try {
+            
+            $nazev = (empty($S2_sz->znak))?sprintf("%04d",$S2_sz->id_spisznak):$S2_sz->znak;
+            $sekvence = $nazev .".". $S2_sz->id_spisznak;
+            
             $S3->insert(S3_.'spisovy_znak', array(
                 'id' => (int) $S2_sz->id_spisznak,
-                'spisznak_parent' => null,
-                'nazev' => (empty($S2_sz->znak))?"Spisový znak č.".$S2_sz->id_spisznak:$S2_sz->znak,
+                'parent_id' => null,
+                'nazev' => $nazev,
                 'popis' => (string) $S2_sz->popis,
                 'skartacni_znak' => !empty($S2_sz->skartacni_znak[0])?$S2_sz->skartacni_znak[0]:null,
-                'skartacni_lhuta' => $S2_sz->skartacni_lhuta,
-                'uroven' => 1,
+                'skartacni_lhuta' => intval($S2_sz->skartacni_lhuta),
+                'uroven' => 0,
                 'sekvence' => (int) $S2_sz->id_spisznak,
+                'sekvence_string' => $sekvence,
                 'stav' => (int) $S2_sz->stav,
-                'spousteci_udalost' => 3,
-                'date_created' => new DateTime()
+                'spousteci_udalost_id' => 3,
+                'date_created' => new DateTime($S2_sz->vytvoreno),
+                'user_created' => 1,
+                'selected' => 1
             ))->execute();
             echo "\n   => <span style='color:green'>přeneseno</span>";
         } catch ( DibiException $e ) {
@@ -205,6 +399,7 @@ if ( count($S2_spisove_znaky)>0 ) {
         endif;
     }
 }
+unset($S2_spisove_znaky, $nazev, $sekvence);
 /* **************************************************************************
  *
  * Migrace způsob vyřízení
@@ -217,7 +412,7 @@ if ( isset($_SESSION['S3_zpvyrizeni']) ) {
 } else {
 $S2_vyriz = $S2->query('SELECT * FROM [:S2:zpusob_vyrizeni]')->fetchAll();
 $S3_zpvyrizeni = array();
-//debug($S2_spisove_znaky,"S2 Spisové znaky");
+
 if ( count($S2_vyriz)>0 ) {
     if (MIGRACE) $S3->query('DELETE FROM '.S3_.'zpusob_vyrizeni WHERE stav=2');
     foreach ( $S2_vyriz as $S2_vy ) {
@@ -243,6 +438,7 @@ if ( count($S2_vyriz)>0 ) {
     if (MIGRACE) $_SESSION['S3_zpvyrizeni'] = $S3_zpvyrizeni;
 }
 } // if session
+unset($S2_vyriz);
 
 /* **************************************************************************
  *
@@ -251,29 +447,37 @@ if ( count($S2_vyriz)>0 ) {
  ************************************************************************** */
 debug_head('Migrace spisů', 2);
 $S2_spisy = $S2->query('SELECT * FROM [:S2:spisy]')->fetchAll();
-//debug($S2_spisy,"S2 Spisy");
+
 if ( count($S2_spisy)>0 ) {
     if (MIGRACE) {
         $S3->query('TRUNCATE TABLE '.S3_.'spis');
-        //$S3->query("INSERT INTO `".S3_."spis` (`id`, `nazev`, `popis`, `spisovy_znak`, `typ`, `spis_parent`, `uroven`, `sekvence`, `stav`, `date_created`, `user_created`, `date_modified`, `user_modified`, `skartacni_znak`, `skartacni_lhuta`, `spousteci_udalost`) VALUES
-        //            (1, 'Spisy', 'Nejvyšší větev spisové hierarchie', NULL, 'VS', NULL, 0, '', 1, NULL, NULL, '2012-01-03 11:09:34', 1, NULL, NULL, NULL);");
     }
     foreach ( $S2_spisy as $S2_s ) {
-        if ($S2_s->id_spis == 1)
-            continue;
-        echo "\n>> ".htmlspecialchars($S2_s->id_spis+1)." = ".htmlspecialchars($S2_s->cislo_spisu);
+        
+        //if ($S2_s->id_spis == 1) continue;
+        
+        echo "\n>> ".htmlspecialchars($S2_s->id_spis)." = ".htmlspecialchars($S2_s->cislo_spisu);
         if (MIGRACE):
         try {
+            $nazev = (empty($S2_s->cislo_spisu))?"Spis č.".($S2_s->id_spis):$S2_s->cislo_spisu;
+            $sekvence = $nazev .".". $S2_s->id_spis;
             $S3->insert(S3_.'spis', array(
-                'id' => (int) $S2_s->id_spis + 1,
-                'nazev' => (empty($S2_s->cislo_spisu))?"Spis č.".($S2_s->id_spis+1):$S2_s->cislo_spisu,
+                'id' => (int) $S2_s->id_spis,
+                'parent_id' => null,
+                'spousteci_udalost_id' => 3,
+                'spisovy_znak_id' => null,
+                'nazev' => $nazev,
                 'popis' => (string) $S2_s->poznamka,
                 'typ' => 'S',
-                'skartacni_znak' => null,
-                'skartacni_lhuta' => null,
+                'sekvence' => (int) $S2_s->id_spis,
+                'sekvence_string' => $sekvence,
+                'uroven' => 0,
+                'skartacni_znak' => 'V',
+                'skartacni_lhuta' => 1000,
                 'stav' => (int) $S2_s->stav,
-                'spousteci_udalost' => null,
-                'date_created' => new DateTime()
+                'datum_otevreni' => new DateTime($S2_s->vytvoreno),
+                'date_created' => new DateTime($S2_s->vytvoreno),
+                'user_created' => 1,
             ))->execute();
             echo "\n   => <span style='color:green'>přeneseno</span>";
         } catch ( DibiException $e ) {
@@ -285,7 +489,7 @@ if ( count($S2_spisy)>0 ) {
         endif;
     }
 }
-
+unset($S2_spisy,$nazev,$sekvence);
 
 /* **************************************************************************
  *
@@ -294,14 +498,15 @@ if ( count($S2_spisy)>0 ) {
  ************************************************************************** */
 debug_head('Migrace subjektů', 2);
 $S2_sub = $S2->query('SELECT * FROM [:S2:odesilatele]')->fetchAll();
-//debug($S2_sub,"S2 Subjekty");
+
 if ( count($S2_sub)>0 ) {
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'subjekt');
     foreach ( $S2_sub as $S2_s ) {
         echo "\n>> ".htmlspecialchars($S2_s->id_odesilatel ." = ". $S2_s->nazev);
-        //echo htmlspecialchars(" = ". implode(", ", (array) $S2_s ));
         if (MIGRACE):
+        
         $nazev = (empty($S2_s->nazev))?"Subjekt č.".$S2_s->id_odesilatel:$S2_s->nazev;
+        
         if ( $S2_s->typ == "FO" || $S2_s->typ == "PFO" ) {
             $prijmeni = $nazev;
         } else {
@@ -311,13 +516,13 @@ if ( count($S2_sub)>0 ) {
         try {
             $S3->insert(S3_.'subjekt', array(
                 'id' => (int) $S2_s->id_odesilatel,
-                'version' => (int) 1,
                 'stav' => (int) $S2_s->stav,
                 'type' => (empty($S2_s->typ))?"PO":$S2_s->typ,
                 'ic' => '',
                 'dic' => '',
                 'nazev_subjektu' => $nazev,
                 'prijmeni' => $prijmeni,
+                'jmeno' => '',
                 'adresa_mesto' => $S2_s->mesto,
                 'adresa_ulice' => $S2_s->ulice,
                 'adresa_cp' => $S2_s->cislo_popisne,
@@ -328,7 +533,8 @@ if ( count($S2_sub)>0 ) {
                 'telefon' => '',
                 'id_isds' => $S2_s->isds_idbox,
                 'poznamka' => '',
-                'date_created' => new DateTime()
+                'date_created' => new DateTime($S2_s->vytvoreno),
+                'user_created' => 1
             ))->execute();
             echo "\n   => <span style='color:green'>přeneseno</span>";
         } catch ( DibiException $e ) {
@@ -340,6 +546,7 @@ if ( count($S2_sub)>0 ) {
         endif;
     }
 }
+unset($S2_sub,$nazev,$prijmeni);
 
 /* **************************************************************************
  *
@@ -351,13 +558,13 @@ debug_head('Migrace organizačních jednotek', 2);
 if ( !isset($_SESSION['S3_orgjednotka']) ) {
 
 $S2_org = $S2->query('SELECT * FROM [:S2:orgjednotky]')->fetchAll();
-//debug($S2_org,"S2 Organizační jednotky");
+
 if ( count($S2_org)>0 ) {
 
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'orgjednotka');
     if (MIGRACE) $S3->query('DELETE FROM '.S3_."user_rule WHERE privilege LIKE 'orgjednotka_%';");
     if (MIGRACE) $S3->query('DELETE FROM '.S3_."user_role WHERE fixed=0;");
-    if (MIGRACE) $S3->query('DELETE FROM '.S3_."user_acl WHERE role_id > 6;"); // cokoli nad id 6, pod jsou fixni role
+    if (MIGRACE) $S3->query('DELETE FROM '.S3_."user_acl WHERE role_id > 8;"); // cokoli nad id 8, pod jsou fixni role
 
     foreach ( $S2_org as $S2_o ) {
         echo "\n>> ".htmlspecialchars($S2_o->id_orgjednotka ." = ". $S2_o->zkratka ." - ". $S2_o->nazev);
@@ -367,16 +574,24 @@ if ( count($S2_org)>0 ) {
             $code = (empty($S2_o->zkratka))?"OJ".$S2_o->id_orgjednotka:$S2_o->zkratka;
             $plny_nazev = (empty($S2_o->nazev))?"Organizační jednotka č.".$S2_o->id_orgjednotka:$S2_o->nazev;
             $zkraceny_nazev = (empty($S2_o->nazev))?"Org. jednotka č.".$S2_o->id_orgjednotka:$S2_o->nazev;
+            $sekvence = $zkraceny_nazev .".". $S2_o->id_orgjednotka;
 
             $org_id = null;
             $org_id = $S3->insert(S3_.'orgjednotka', array(
                 'id' => (int) $S2_o->id_orgjednotka,
+                'parent_id' => null,
                 'plny_nazev' => $plny_nazev,
                 'zkraceny_nazev' => $zkraceny_nazev,
                 'ciselna_rada' => $code,
                 'note' => '',
                 'stav' => (int) $S2_o->stav,
-                'date_created' => new DateTime()
+                'date_created' => new DateTime($S2_o->vytvoreno),
+                'user_created' => 1,
+                'date_modified' => new DateTime($S2_o->vytvoreno),
+                'user_modified' => 1,
+                'sekvence' => (int) $S2_o->id_orgjednotka,
+                'sekvence_string' => $sekvence,
+                'uroven' => 0
             ))->execute(dibi::IDENTIFIER);
             echo "\n   => <span style='color:green'>přeneseno (id $org_id)</span>";
 
@@ -469,6 +684,7 @@ if ( count($S2_org)>0 ) {
 }
 
 } // if session
+unset($S2_org,$code,$plny_nazev,$zkraceny_nazev,$sekvence);
 
 /* **************************************************************************
  *
@@ -477,7 +693,6 @@ if ( count($S2_org)>0 ) {
  ************************************************************************** */
 debug_head('Migrace zamestnanců a jejich uživatelských účtů', 2);
 $S2_usr = $S2->query('SELECT * FROM [:S2:zamestnanci]')->fetchAll();
-//debug($S2_usr,"S2 Zaměstnanci");
 
 if ( count($S2_usr)>0 ) {
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'user');
@@ -505,6 +720,14 @@ if ( count($S2_usr)>0 ) {
             } else {
                 $prijmeni = $S2_u->prijmeni;
             }
+            
+            $stav = ($S2_u->stav==1)?0:1;
+            $aktivni = (int) $S2_u->stav;
+            if ( $S2_u->login == "isds" ) {
+                $stav = 1;
+                $aktivni = 0;
+            }
+            
             $osoba_id = $S3->insert(S3_.'osoba', array(
                 'prijmeni' => $prijmeni,
                 'jmeno' => (empty($S2_u->jmeno))?"":$S2_u->jmeno,
@@ -512,8 +735,9 @@ if ( count($S2_usr)>0 ) {
                 'titul_za' => $S2_u->titul_za,
                 'email' => $S2_u->email,
                 'pozice' => $S2_u->pozice,
-                'stav' => (int) $S2_u->stav,
-                'date_created' => new DateTime()
+                'stav' => $stav,
+                'date_created' => new DateTime($S2_u->vytvoreno),
+                'user_created' => 1
             ))->execute(dibi::IDENTIFIER);
 
             if ( $osoba_id ) {
@@ -524,8 +748,8 @@ if ( count($S2_usr)>0 ) {
                     'id' => $S2_u->id_zamestnanec,
                     'username' => $S2_u->login,
                     'password' => $S2_u->heslo,
-                    'active' => (int) $S2_u->stav,
-                    'date_created' => new DateTime()
+                    'active' => $aktivni,
+                    'date_created' => new DateTime($S2_u->vytvoreno)
                 ))->execute(dibi::IDENTIFIER);
 
                 if ( $user_id ) {
@@ -536,7 +760,7 @@ if ( count($S2_usr)>0 ) {
                     if ( $S3->insert(S3_.'osoba_to_user', array(
                         'osoba_id' => $osoba_id,
                         'user_id' => $user_id,
-                        'active' => 1,
+                        'active' => $aktivni,
                         'date_added' => new DateTime()
                     ))->execute() ) {
                         echo "\n   => <span style='color:green'>Uživatel připojen k osobě</span>";
@@ -593,9 +817,7 @@ if ( count($S2_usr)>0 ) {
         endif;
     }
 }
-
-
-
+unset($S2_usr, $S3_role, $S2_org, $S2_role, $prijmeni);
 
 echo "\n\n\n";
 /* **************************************************************************
@@ -604,8 +826,9 @@ echo "\n\n\n";
  *
  ************************************************************************** */
 debug_head('Migrace dokumentů včetně jejich workflow', 2);
+
 $S2_dok = $S2->query('SELECT * FROM [:S2:dokumenty]')->fetchAll();
-//debug($S2_dok,"S2 Dokumenty");
+
 
 echo "<div style='color:blue'>";
 debug(count($S2_dok),"Celkový počet dokumentů");
@@ -622,8 +845,7 @@ if ( count($S2_dok)>0 ) {
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'file');
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'workflow');
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'log_dokument');
-    
-    if (MIGRACE) $S3->query("ALTER TABLE ".S3_."file CHANGE `popis` `popis` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '';");
+    if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'log_spis');
     
 
     $typ_odesiletele = array(''=>'AO','0'=>'A','1'=>'O','2'=>'AO');
@@ -732,7 +954,7 @@ if ( count($S2_dok)>0 ) {
                         'dokument_id' => null,
                         'stav' => '11',
                         'stav_info' => 'Zpráva zaevidována v evidenci '.$S2_d->evidence,
-                        'source_id' => null,                        
+                        'file_id' => null,                        
                 ))->execute();
                 endif;
                 echo "\n>> JINA EVIDENCE ".htmlspecialchars($S2_d->id_dokument ." = ". $S2_d->cislo_jednaci ." - ". $S2_d->strucny_obsah);
@@ -758,7 +980,7 @@ if ( count($S2_dok)>0 ) {
 
         // Podaci denik
         $podaci_rok = 0;
-        if (preg_match("/20(08|09|10|11|12)|^".$S2_d->poradove_cislo."/", $S2_d->cislo_jednaci, $matches) ) {
+        if (preg_match("/20(08|09|10|11|12|13|14|15)|^".$S2_d->poradove_cislo."/", $S2_d->cislo_jednaci, $matches) ) {
             $podaci_rok = $matches[0];
         }
         
@@ -776,9 +998,9 @@ if ( count($S2_dok)>0 ) {
         if ( $S2_d->vlastni == 1 ) {
             $typ_dokumentu = 2;
         } else if ( !empty( $S2_d->id_email ) ) {
-            $typ_dokumentu = 4;
+            $typ_dokumentu = 1;
         } else if ( !empty( $S2_d->id_isds ) ) {
-            $typ_dokumentu = 5;
+            $typ_dokumentu = 1;
         } else if ( $S2_d->vlastni == 1 ) {
             $typ_dokumentu = 2;
         }
@@ -790,7 +1012,7 @@ if ( count($S2_dok)>0 ) {
         if (MIGRACE):
         if ( $S2_d->id_zpvyrizeni != 0 ) {
             $zpusob_vyrizeni = $S3_zpvyrizeni[ $S2_d->id_zpvyrizeni ];
-            $spoust = 'Skartační lhůta začíná plynout po uzavření dokumentu.';
+            $spoust = 3;
             $spoust_datum = $S2_d->vyriz_datum;
         } else {
             $spoust = null;
@@ -806,18 +1028,17 @@ if ( count($S2_dok)>0 ) {
         try {
             $dokument = array(
                 'id' => (int) $S2_d->id_dokument,
-                'version' => (int) 1,
                 'jid' => $S2_d->jid_dokument .".". $S2_d->id_dokument,
                 'nazev' => (empty($S2_d->strucny_obsah))?"Dokument ".$S2_d->cislo_jednaci:$S2_d->strucny_obsah,
                 'popis' => $S2_d->poznamka,
-                'cislojednaci_id' => null,
+                'cislo_jednaci_id' => null,
                 'cislo_jednaci' => $S2_d->cislo_jednaci,
                 'poradi' => $S2_d->cislo_jednaci_poradi,
                 'cislo_jednaci_odesilatele' => $S2_d->cislo_jednaci_odes,
                 'podaci_denik' => 'denik',
                 'podaci_denik_poradi' => $S2_d->poradove_cislo,
                 'podaci_denik_rok' => $podaci_rok,
-                'typ_dokumentu_id' => $typ_dokumentu,
+                'dokument_typ_id' => $typ_dokumentu,
                 'spisovy_plan' => '',
                 'spisovy_znak_id' => $S2_d->id_spisznak,
                 'skartacni_znak' => empty($S2_d->skartacni_znak)?null:$S2_d->skartacni_znak,
@@ -827,7 +1048,7 @@ if ( count($S2_dok)>0 ) {
                 'lhuta' => (int) $S2_d->lhuta,
                 'epodatelna_id' => null,
                 'stav' => 1,
-                'date_created' => new DateTime(),
+                'date_created' => new DateTime($S2_d->vytvoreno),
                 'datum_vzniku' => $datum_vzniku,
                 'pocet_listu' => $S2_d->pocet_listu,
                 'pocet_priloh' => $S2_d->pocet_listu_priloh,
@@ -838,7 +1059,7 @@ if ( count($S2_dok)>0 ) {
                 'ulozeni_dokumentu' => $S2_d->ulozeni_originalu,
                 'datum_vyrizeni' => $S2_d->vyriz_datum,
                 'poznamka_vyrizeni' => $S2_d->vyriz_poznamka,
-                'spousteci_udalost' => $spoust,
+                'spousteci_udalost_id' => $spoust,
                 'datum_spousteci_udalosti' => $spoust_datum,
 
             );
@@ -872,10 +1093,9 @@ if ( count($S2_dok)>0 ) {
                         if (MIGRACE):
                         $S3->insert(S3_.'dokument_to_subjekt', array(
                             'dokument_id'=>$dokument_id,
-                            'dokument_version'=>null,
                             'subjekt_id'=>$S2_do->id_odesilatel,
-                            'subjekt_version'=>null,
                             'typ'=> $typ_odesiletele[ $S2_do->prichozi ],
+                            'user_id' => 1,
                             'date_added' => new DateTime(),
                         ))->execute();
                         endif;
@@ -890,23 +1110,8 @@ if ( count($S2_dok)>0 ) {
                         echo "\n   => <span style='color:green'>připojen subjekt ". $S2_do->id_odesilatel ."</span>";
                     }
                 }
+                unset($S2_odesilatele);
 
-                // Pripojeni spisu do dokumentu
-                if ( !empty( $S2_d->id_spis ) && $S2_d->id_spis > 1 ) {
-                    $S3_spis_count = $S3->query('SELECT poradi FROM [:S3:dokument_to_spis] WHERE spis_id=%i ORDER BY poradi DESC LIMIT 1;',$S2_d->id_spis+1)->fetchSingle();
-                    if (MIGRACE):
-                    $S3->insert(S3_.'dokument_to_spis', array(
-                        'dokument_id'=>$dokument_id,
-                        'dokument_version'=>null,
-                        'spis_id'=>($S2_d->id_spis+1),
-                        'poradi'=> ($S3_spis_count + 1),
-                        'stav'=> 1,
-                        'date_added' => new DateTime(),
-                    ))->execute();
-                    endif;
-                    echo "\n   => <span style='color:green'>připojen spis ". ($S2_d->id_spis+1) ."</span>";
-                }
-                
                 // Sestaveni prubehu stavu dokumentu (historie)
                 $S2_zaznamy = $S2->query('SELECT * FROM [:S2:zaznamy] WHERE id_dokument=%i ORDER BY datum',$S2_d->id_dokument)->fetchAll();
                 if ( count($S2_zaznamy)>0 ) {
@@ -926,9 +1131,6 @@ if ( count($S2_dok)>0 ) {
                             $prideleno = null;
                             $orgjednotka = null;
                             $user = 1;
-                            $prideleno_info = "";
-                            $orgjednotka_info = "";
-                            $user_info = "";
 
                             // detekce typu
                             if ( empty($S2_z->id_kam_typ) ) {
@@ -941,75 +1143,34 @@ if ( count($S2_dok)>0 ) {
 
                             if ( $S2_z->id_kam_typ == 'Z' ) {
                                 $prideleno = $S2_z->id_kam;
-                                $prideleno_info_db = $S3->fetch('SELECT o.*
-                                    FROM [:S3:osoba_to_user] ou
-                                    LEFT JOIN [:S3:osoba] o ON (o.id = ou.osoba_id)
-                                    WHERE ou.user_id=%i AND o.stav<10',$prideleno);
-                                $prideleno_info = serialize($prideleno_info_db);
                                 $user = $S2_z->id_zamestnanec;
-                                $user_info_db = $S3->fetch('SELECT o.*
-                                    FROM [:S3:osoba_to_user] ou
-                                    LEFT JOIN [:S3:osoba] o ON (o.id = ou.osoba_id)
-                                    WHERE ou.user_id=%i AND o.stav<10',$user);
-                                $user_info = serialize($user_info_db);
                             } else if ( $S2_z->id_kam_typ == 'O' ) {
                                 $orgjednotka = $S2_z->id_kam;
-                                $orgjednotka_info_db = $S3->fetch('SELECT * FROM [:S3:orgjednotka] WHERE id=%i',$orgjednotka);
-                                $orgjednotka_info = serialize($orgjednotka_info_db);
                                 $user = $S2_z->id_zamestnanec;
-                                $user_info_db = $S3->fetch('SELECT o.*
-                                    FROM [:S3:osoba_to_user] ou
-                                    LEFT JOIN [:S3:osoba] o ON (o.id = ou.osoba_id)
-                                    WHERE ou.user_id=%i AND o.stav<10',$user);
-                                $user_info = serialize($user_info_db);
                             } else if ( $S2_z->id_kam_typ == 'P' ) {
                                 $orgjednotka = (empty( $S2_z->id_kam ))?$S2_centpod:$S2_z->id_kam;
-                                $orgjednotka_info_db = $S3->fetch('SELECT * FROM [:S3:orgjednotka] WHERE id=%i',$orgjednotka);
-                                $orgjednotka_info = serialize($orgjednotka_info_db);
                                 $user = $S2_z->id_zamestnanec;
-                                $user_info_db = $S3->fetch('SELECT o.*
-                                    FROM [:S3:osoba_to_user] ou
-                                    LEFT JOIN [:S3:osoba] o ON (o.id = ou.osoba_id)
-                                    WHERE ou.user_id=%i AND o.stav<10',$user);
-                                $user_info = serialize($user_info_db);
                             } else if ( $S2_z->id_kam_typ == 'N' ) {
 
                                 if ( $S2_z->id_kam == 0 ) {
                                     // Podatelna
                                     $orgjednotka = $S2_centpod;
-                                    $orgjednotka_info_db = $S3->fetch('SELECT * FROM [:S3:orgjednotka] WHERE id=%i',$orgjednotka);
-                                    $orgjednotka_info = serialize($orgjednotka_info_db);
                                     $user = 1;
-                                    $user_info_db = $S3->fetch('SELECT o.*
-                                        FROM [:S3:osoba_to_user] ou
-                                        LEFT JOIN [:S3:osoba] o ON (o.id = ou.osoba_id)
-                                        WHERE ou.user_id=%i AND o.stav<10',$user);
-                                    $user_info = serialize($user_info_db);
                                 } else {
                                     $prideleno = $S2_z->id_zamestnanec;
-                                    $prideleno_info_db = $S3->fetch('SELECT o.*
-                                        FROM [:S3:osoba_to_user] ou
-                                        LEFT JOIN [:S3:osoba] o ON (o.id = ou.osoba_id)
-                                        WHERE ou.user_id=%i AND o.stav<10',$prideleno);
-                                    $prideleno_info = serialize($prideleno_info_db);
                                     $user = $S2_z->id_zamestnanec;
-                                    $user_info = serialize($prideleno_info_db);
                                 }
                             }
 
                             if (MIGRACE):
                             $workflow_id = $S3->insert(S3_.'workflow', array(
                                 'dokument_id'=>$dokument_id,
-                                'dokument_version'=>null,
                                 'stav_dokumentu'=> $stav_dokumentu_work[ $S2_z->dok_stav ],
-                                'prideleno'=> $prideleno,
-                                'prideleno_info'=> $prideleno_info,
+                                'prideleno_id'=> $prideleno,
                                 'orgjednotka_id'=> $orgjednotka,
-                                'orgjednotka_info'=> $orgjednotka_info,
                                 'stav_osoby'=> 2,
                                 'date'=> ( empty($S2_z->datum)?new DateTime():$S2_z->datum ),
                                 'user_id'=> $user,
-                                'user_info'=> $user_info,
                                 'poznamka'=> $S2_d->pred_poznamka,
                                 'date_predani'=> $S2_d->pred_dne,
                                 'aktivni'=> 0,
@@ -1036,38 +1197,57 @@ if ( count($S2_dok)>0 ) {
 
 
                 }
+                unset($S2_zaznamy);
 
+                // Pripojeni spisu do dokumentu
+                if ( !empty( $S2_d->id_spis ) && $S2_d->id_spis > 1 ) {
+                    $S3_spis_count = $S3->query('SELECT poradi FROM [:S3:dokument_to_spis] WHERE spis_id=%i ORDER BY poradi DESC LIMIT 1;',$S2_d->id_spis)->fetchSingle();
+                    if (MIGRACE):
+                        
+                    if ( isset($orgjednotka) ) {
+                        // prideleni vlastnictvi spisu dle organizacni jednotky - z workflow
+                        $S3->update(S3_.'spis',array('orgjednotka_id'=>$orgjednotka))->where(array(array('id=%i',$S2_d->id_spis)))->execute();
+                    }
+                        
+                    $S3->insert(S3_.'dokument_to_spis', array(
+                        'dokument_id'=>$dokument_id,
+                        'spis_id'=>($S2_d->id_spis),
+                        'poradi'=> ($S3_spis_count + 1),
+                        'stav'=> 1,
+                        'date_added' => new DateTime(),
+                        'user_id' => 1
+                    ))->execute();
+                    endif;
+                    echo "\n   => <span style='color:green'>připojen spis ". ($S2_d->id_spis) ."</span>";
+                }
+                unset($S3_spis_count);                
+                
+                // Pripojeni priloh do dokumentu
+                $S2_prilohy = $S2->query('SELECT * FROM [:S2:prilohy] WHERE id_dokument=%i',$S2_d->id_dokument)->fetchAll();
+                if ( count($S2_prilohy)>0 ) {
+                    foreach ( $S2_prilohy as $S2_pr ) {
 
-
-
-                    // Pripojeni priloh do dokumentu
-                    $S2_prilohy = $S2->query('SELECT * FROM [:S2:prilohy] WHERE id_dokument=%i',$S2_d->id_dokument)->fetchAll();
-                    //debug($S2_prilohy);
-                    if ( count($S2_prilohy)>0 ) {
-                        foreach ( $S2_prilohy as $S2_pr ) {
-
-                            $typ = 1;
-                            if ( $S2_pr->stav == 2 ) {
-                                $typ = 5;
-                            }
-                            $real_path = str_replace("prilohy/","/files/dokumenty/", $S2_pr->umisteni);
+                        $typ = 1;
+                        if ( $S2_pr->stav == 2 ) {
+                            $typ = 5;
+                        }
+                        $real_path = str_replace("prilohy/","/files/dokumenty/", $S2_pr->umisteni);
                             
-                            $quid = UUID::v4();
-                            $mime_type = FileModel::mimeType($real_path);
+                        $quid = UUID::v4();
+                        $mime_type = FileModel::mimeType($real_path);
 
-                            if ( file_exists(CLIENT_DIR . $real_path) ) {
-                                $size = filesize(CLIENT_DIR . $real_path);
-                                $md5_hash = md5_file(CLIENT_DIR . $real_path);
-                            } else {
-                                $size = $S2_pr->velikost;
-                                $md5_hash = '';
-                            }
+                        if ( file_exists(CLIENT_DIR . $real_path) ) {
+                            $size = filesize(CLIENT_DIR . $real_path);
+                            $md5_hash = md5_file(CLIENT_DIR . $real_path);
+                        } else {
+                            $size = $S2_pr->velikost;
+                            $md5_hash = '';
+                        }
 
-                            if (MIGRACE):
+                        if (MIGRACE):
                             // Pridani zaznamu prilohy
                             $S3->insert(S3_.'file', array(
                                 'id'=> (int) $S2_pr->id_priloha,
-                                'version'=> 1,
                                 'typ'=> $typ,
                                 'stav'=> 1,
                                 'nazev'=> $S2_pr->nazev,
@@ -1076,70 +1256,72 @@ if ( count($S2_dok)>0 ) {
                                 'real_name'=> $S2_pr->nazev,
                                 'real_path'=> $real_path,
                                 'real_type'=> 'UploadFile_Basic',
-                                'date_created'=> $S2_pr->vlozeno,
-                                'user_created'=> $S2_pr->vlozil,
+                                'date_created'=> empty($S2_pr->vlozeno)?new DateTime():$S2_pr->vlozeno,
+                                'user_created'=> empty($S2_pr->vlozil)?1:$S2_pr->vlozil,
                                 'guid'=> $quid,
                                 'md5_hash'=> $md5_hash,
                                 'size'=> $size,
                             ))->execute();
-                            endif;
+                        endif;
 
-                            $priloha_id = (int) $S2_pr->id_priloha;
+                        $priloha_id = (int) $S2_pr->id_priloha;
 
-                            if ( $priloha_id ) {
-                                 echo "\n   => <span style='color:green'>Příloha {$S2_pr->nazev} vytvořena</span>";
-                                if (MIGRACE) :
+                        if ( $priloha_id ) {
+                            echo "\n   => <span style='color:green'>Příloha {$S2_pr->nazev} vytvořena</span>";
+                            if (MIGRACE) :
                                 if ( $S3->insert(S3_.'dokument_to_file', array(
                                     'dokument_id'=> $dokument_id,
-                                    'dokument_version'=> null,
                                     'file_id'=> $priloha_id,
-                                    'file_version'=> null,
                                     'active'=> 1,
-                                    'date_added' => new DateTime(),
+                                    'date_added' => empty($S2_pr->vlozeno)?new DateTime():$S2_pr->vlozeno,
+                                    'user_id' => empty($S2_pr->vlozil)?1:$S2_pr->vlozil
                                 ))->execute() ) {
                                     echo "\n   => <span style='color:green'>připojena příloha ". $S2_pr->nazev ."</span>";
                                 }
-                                endif;
+                            endif;
 
-                            } else {
-                                echo "\n   => <span style='color:red'>příloha {$S2_pr->nazev} nepřenesena!</span>";
-                            }
+                        } else {
+                            echo "\n   => <span style='color:red'>příloha {$S2_pr->nazev} nepřenesena!</span>";
                         }
                     }
+                }
+                unset($S2_prilohy);
+                
                     
                 // Detekce elektronicke zpravy a zaevidovani do epodatelny
                 if ( !empty($S2_d->id_isds) || !empty($S2_d->id_email) ) {
                     if (MIGRACE):
 
-                    if ( isset($epodatelna_poradi[$podaci_rok]) ) {
-                        $epodatelna_poradi[$podaci_rok]++;
-                    } else {
-                        $epodatelna_poradi[$podaci_rok] = 1;
-                    }
-                    $S3->insert(S3_.'epodatelna', array(
-                        'epodatelna_typ' => 0,
-                        'poradi' => $epodatelna_poradi[$podaci_rok],
-                        'rok' => $podaci_rok,
-                        'email_signature' => !empty($S2_d->id_email)?$S2_d->id_email:null,
-                        'isds_signature' => !empty($S2_d->id_isds)?$S2_d->id_isds:null,
-                        'identifikator' => null,
-                        'predmet' => (empty($S2_d->strucny_obsah))?"Dokument ".$S2_d->cislo_jednaci:$S2_d->strucny_obsah,
-                        'popis' => ''.$S2_d->poznamka,
-                        'odesilatel' => !empty($epodatelna_odesilatel)?$epodatelna_odesilatel:"(nezjišttěno)",
-                        'odesilatel_id' => $epodatelna_odesilatel_id,
-                        'adresat' => 'Centrální podatelna',
-                        'prijato_dne' => $datum_vzniku,
-                        'doruceno_dne' => $datum_vzniku,
-                        'prijal_kdo' => null,
-                        'prijal_info' => null,
-                        'sha1_hash' => sha1($S2_d->id_isds.$S2_d->id_email),
-                        'prilohy' => '',
-                        'evidence' => !empty($S2_d->evidence)?$S2_d->evidence:"",
-                        'dokument_id' => $dokument_id,
-                        'stav' => '10',
-                        'stav_info' => 'Zpráva přidána do spisové služby jako '.$S2_d->jid_dokument .".". $S2_d->id_dokument,
-                        'source_id' => null,                        
-                    ))->execute();
+                        if ( isset($epodatelna_poradi[$podaci_rok]) ) {
+                            $epodatelna_poradi[$podaci_rok]++;
+                        } else {
+                            $epodatelna_poradi[$podaci_rok] = 1;
+                        }
+                        $S3->insert(S3_.'epodatelna', array(
+                            'epodatelna_typ' => 0,
+                            'poradi' => $epodatelna_poradi[$podaci_rok],
+                            'rok' => $podaci_rok,
+                            'email_signature' => !empty($S2_d->id_email)?$S2_d->id_email:null,
+                            'isds_signature' => !empty($S2_d->id_isds)?$S2_d->id_isds:null,
+                            'identifikator' => null,
+                            'predmet' => (empty($S2_d->strucny_obsah))?"Dokument ".$S2_d->cislo_jednaci:$S2_d->strucny_obsah,
+                            'popis' => ''.$S2_d->poznamka,
+                            'odesilatel' => !empty($epodatelna_odesilatel)?$epodatelna_odesilatel:"(nezjišttěno)",
+                            'odesilatel_id' => $epodatelna_odesilatel_id,
+                            'adresat' => 'Centrální podatelna',
+                            'prijato_dne' => $datum_vzniku,
+                            'doruceno_dne' => $datum_vzniku,
+                            'prijal_kdo' => null,
+                            'prijal_info' => null,
+                            'sha1_hash' => sha1($S2_d->id_isds.$S2_d->id_email),
+                            'prilohy' => '',
+                            'evidence' => !empty($S2_d->evidence)?$S2_d->evidence:"",
+                            'dokument_id' => $dokument_id,
+                            'stav' => '10',
+                            'stav_info' => 'Zpráva přidána do spisové služby jako '.$S2_d->jid_dokument .".". $S2_d->id_dokument,
+                            'file_id' => null,                        
+                        ))->execute();
+                        
                     endif;
                     echo "\n   => <span style='color:green'>Dokument přijat elektronicky. Záznam v epodatelně - ". $epodatelna_odesilatel ."</span>";
                 }                    
@@ -1198,6 +1380,12 @@ if ( count($ERROR_LOG)>0 ) {
 }
 } 
 
+//$po = memory_get_usage();
+//echo "\n\n\n===========================\n";
+//echo "Vyuzita pamet\n\n";
+//echo "Pocatek: ". $pred ."\n";
+//echo "Konec  : ". $po ."\n";
+//echo "Rozdil : ". ($po-$pred) ."\n";
 
 
 echo "</pre>";
@@ -1234,14 +1422,8 @@ function logDokument($S3, $dokument_id, $typ, $user = 1, $date = null, $poznamka
 
         if ( is_object($user) ) {
             $user_id = $user->id;
-            $user_info = serialize($user);
         } else {
             $user_id = $user;
-            $user_info_db = $S3->fetch('SELECT o.*
-                FROM [:S3:osoba_to_user] ou
-                LEFT JOIN [:S3:osoba] o ON (o.id = ou.osoba_id)
-                WHERE ou.user_id=%i AND o.stav<10',$user);
-            $user_info = serialize($user_info_db);
         }
 
         if ( empty($date) ) {
@@ -1249,7 +1431,6 @@ function logDokument($S3, $dokument_id, $typ, $user = 1, $date = null, $poznamka
         }
 
         $row['user_id'] = $user_id;
-        $row['user_info'] = $user_info;
         $row['date'] = $date;
 
         return $S3->insert(S3_.'log_dokument', $row)

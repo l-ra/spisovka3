@@ -1,6 +1,10 @@
-================================================================================
+********************************************************************************
+********************************************************************************
+
 Instalace OSS Spisove sluzby v3
-================================================================================
+
+********************************************************************************
+********************************************************************************
 
 Predtim, nez zacnete s instalaci, si overte zakladni pozadavky pro spusteni aplikace:
 
@@ -9,7 +13,7 @@ PHP 5.2 a vyssi
 MySQL 5 a vyssi
 povolen .htaccess (AllowOverride All)
 povolen mod_rewrite
-dostupne PHP knihovny iconv, curl, open_ssl, soap, mail,
+dostupne PHP knihovny iconv, mbstring, curl, open_ssl, soap, mail,
 
 
 1. Nahrejte vsechny soubory uvedene v tomto archivu na server.
@@ -23,7 +27,9 @@ dostupne PHP knihovny iconv, curl, open_ssl, soap, mail,
 /log/        = slozka pro logovani chyb
 
 V ostatnych adresarich by se zapisovat nemelo.
-Jediny adresar, ktery by mel byt viditelny z venku, je /public. Ostatni adresare by mely byt neviditelne a nepristupne.
+Jediny adresar, ktery by mel byt viditelny z venku, je /public. Ostatni adresare 
+by mely byt neviditelne a nepristupne.
+
 
 3. V souboru index.php upravte cesty, pokud jsou odlisne od skutecnosti:
 
@@ -52,7 +58,7 @@ database.profiler = TRUE         ; povoluje profilovani - zaznamenani pouzitych 
 5. Provedte instalacni proceduru aplikace.
 
 Spustte internetovy prohlizec a zadejte adresu aplikace + instalace.php
-Priklad: http://demo.spisovka3.cz/instalace.php
+Priklad: http://demo.mojespisovka.cz/instalace.php
 
 Ridte se nyni pokyny uvedenymi na strankach instalace.
 
@@ -78,7 +84,7 @@ Po uspesnem dokonceni je aplikace pripravena k pouziti.
 
 Jakekoli chyby behem instalace jsou oznameny chybovou hlaskou.
 Pokud je to ve Vasich silach, muzete chybu opravit. Jinak kontaktujte
-odpovidajici osoby nebo navstivte stranku http://www.spisovka3.cz.
+odpovidajici osoby nebo navstivte stranku http://www.mojespisovka.cz.
 
 ================================================================================
 UPOZORNENI:
