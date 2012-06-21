@@ -117,6 +117,9 @@ function my_assert_handler($file, $line, $code)
       
     assert('count($rev_a) > 0');
       
+    // Setrid klienty podle abeceny  
+    asort($sites);
+      
     foreach ( $sites as $site_path => $site_name ) {
         
         echo "<div class='update_site'>";
