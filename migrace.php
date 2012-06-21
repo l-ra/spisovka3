@@ -420,7 +420,7 @@ if ( count($S2_vyriz)>0 ) {
         try {
             $zpusob_vyrizeni = $S3->insert(S3_.'zpusob_vyrizeni', array(
                 'nazev' => $S2_vy->nazev,
-                'stav' => 2,
+                'stav' => 0,
             ))->execute(dibi::IDENTIFIER);
 
             $S3_zpvyrizeni[ $S2_vy->id_zpvyrizeni ] = $zpusob_vyrizeni;
