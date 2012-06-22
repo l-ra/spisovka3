@@ -1,6 +1,48 @@
-﻿================================================================================
+================================================================================
  Historie uprav OSS Spisove sluzby v3
 ================================================================================
+=== Ver. 3.3.0 =================================================================
+Released: 22.06.2012
+
+Vseobecne zmeny:
+ 
+- pridan novy modul Spisovna
+- ve spisovne pridana zapujcka
+- pridana vypravna
+- upraven zpusob odeslani
+- vetsi uprava prace se spisy (podrobny vypis, vlastni rezie - vlastnictvi, predavani, uzavirani/otvirani)
+- uprava vypisu
+  - hromadne operace s dokumenty a se spisy (prevzeti, predavani)
+  - uprava pokrocileho vyhledavani (nove formou dialogoveho okna)
+  - uprava rychlych filtru
+  - vylepsene razeni
+  - u predanych pripojena krome informace prideleneho i informace o predanem
+- pridany naseptavace pro rychlejsi praci se subjekty, s uzivateli
+- rychlejsi vytvoreni subjektu primo z detailu dokumentu
+- z kazde obrazovky moznost tisku normalne i do PDF
+- pridany nektere nove metadata (cislo doporuceneho dopisu, zpusob doruceni)
+- rychla evidence zpravy primo pri kontrole novych zprav v epodatelne
+- administrace: moznost vyhledavat
+- administrace: u subjektu, uzivatelu abecedni strankovani
+- hierarchicka organizacni jednotka (nadrazene, podrizene slozky) 
+  + nadrazena slozka moznost nahlizet do podrizene slozky
+- administrace: uprava ciselniku (typy a zpusoby)
+- propracovana napoveda 
+
+ 
+Aplikacni zmeny:
+ 
+- optimalizovana databaze
+  - pridany relace
+  - oddelene verzovani polozek
+- upraven prihlasovaci mechanismus pro snadne a individualni moznosti autentikatoru
+- upraven system prace s hierarchickou strukturou (rychlejsi nacitani)
+- novy vylepseny debug panel
+- novy modul Zpravy pro zobrazovani zprav uzivatelum
+- pridana detekce nove verze spisove sluzby
+
+opraveny chyby, optimalizace kodu a vsechno mozne
+
 === Ver. 3.0.3 =================================================================
 Released: 24.05.2011
 
