@@ -12,10 +12,10 @@ if ( !defined('DEBUG_ENABLE') )
     define('DEBUG_ENABLE', 0);
 if ( DEBUG_ENABLE ) {
     Environment::setMode(Environment::DEVELOPMENT);
-    Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error.log');
+    Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error_'.date('Ymd').'.log');
 } else {
     Environment::setMode(Environment::PRODUCTION);
-    Debug::enable(Debug::PRODUCTION, '%logDir%/php_error.log');
+    Debug::enable(Debug::PRODUCTION, '%logDir%/php_error_'.date('Ymd').'.log');
 }
 
 // 2b) load configuration from config.ini file
@@ -45,10 +45,8 @@ $epodatelna_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
 Environment::setVariable('user_config', $user_config);
 Environment::setVariable('epodatelna_config', $epodatelna_config);
 
+// setting memory_limit for PDF generate
 define('PDF_MEMORY_LIMIT','512M');
-
-//Environment::setMode(Environment::DEVELOPMENT);
-//Environment::setMode(Environment::PRODUCTION);
 
 // app info
 $app_info = @file_get_contents(APP_DIR .'/configs/version');
@@ -89,16 +87,19 @@ function Form_addDateTimePicker(Form $_this, $name, $label, $cols = NULL, $maxLe
 Form::extensionMethod('Form::addDatePicker', 'Form_addDatePicker');
 Form::extensionMethod('Form::addDateTimePicker', 'Form_addDateTimePicker');
 
-Mail::$defaultMailer = 'ESSMailer'; // nebo new MyMailer
+Mail::$defaultMailer = 'ESSMailer';
 
 // 3b) Load database
 try {
-    dibi::connect(Environment::getConfig('database'));
-    dibi::addSubst('PREFIX', Environment::getConfig('database')->prefix);
+    $db_config = Environment::getConfig('database')->toArray();
+    $db_config['profiler'] = 'OssSqlProfiller';
+    
+    dibi::connect($db_config);
+    dibi::addSubst('PREFIX', $db_config['prefix']);
     if ( !Environment::isProduction() ) {
         dibi::getProfiler()->setFile(APP_DIR .'/../log/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
     }
-    define('DB_PREFIX', Environment::getConfig('database')->prefix);
+    define('DB_PREFIX', $db_config['prefix']);
 } catch (DibiDriverException $e) {
     if ( !Environment::isProduction() ) {
         define('DB_ERROR', $e->getMessage());
@@ -123,7 +124,6 @@ $router = $application->getRouter();
 //
 // Cool URL detection
 // 
-//echo "<pre>"; print_r($_SERVER); echo "</pre>"; exit;
 
 $cool_url = false;
 if ( isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On' ) {
@@ -134,14 +134,11 @@ if ( isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On'
 } else if ( isset($_SERVER['REDIRECT_HTTP_MOD_REWRITE']) && $_SERVER['REDIRECT_HTTP_MOD_REWRITE'] == 'On' ) {
     // Detect in $_SERVER - applied redirect, otherwise the first condition (HTTP_MOD_REWRITE)
     $cool_url = true;
-//} else if ( function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules()) ) {
-    // Detect in Apache module (only if PHP as module)
-//    $cool_url = true;
 }
 
 if ( $cool_url ) {
         define('IS_SIMPLE_ROUTER',0);
-	$router[] = new Route('index.php', array(
+        $router[] = new Route('index.php', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
                 'action' => 'default',
