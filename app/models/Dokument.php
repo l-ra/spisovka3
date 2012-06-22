@@ -2530,6 +2530,37 @@ class Dokument extends BaseModel
         return true;
     }
 
+    /**
+     * Vyhleda dokumenty se stejnym cislem jednacim (prichozi-odpoved)
+     * Plati pouze pro prioraci
+     * 
+     * Pouziva se k detekci, zda existuje odpoved, a ke spolecne uprave 
+     * obou dokumentu v zalezitosti vyrizovani.
+     * 
+     * @param string $cislo_jednaci cislo jednaci dokumentu
+     * @param int $dokument_id id dokumentu, ktery se vylouci ze seznamu
+     * @return array seznam dokumentu se stejnym cislem jednacim 
+     */
+    public function stejne($cislo_jednaci, $dokument_id = null)
+    {
+        if ( empty($cislo_jednaci) ) return null;
+        
+        if ( is_null($dokument_id) ) {
+            return $this->fetchAll(array('id'), 
+                                   array(
+                                       array('cislo_jednaci=%s',$cislo_jednaci),
+                                   ))->fetchAll();
+            
+        } else {
+            return $this->fetchAll(array('id'), 
+                                   array(
+                                       array('cislo_jednaci=%s',$cislo_jednaci),
+                                       array('id != %i',$dokument_id)
+                                   ))->fetchAll();
+        }
+        
+    }
+    
     public function deleteAll()
     {
 

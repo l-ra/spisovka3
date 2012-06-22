@@ -105,7 +105,7 @@
        {if ($Pridelen==1 && $Vyrizovani == 0 ) }
        <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="kvyrizenidokument">Označit k vyřízení</a>
        {/if}
-       {if ($Pridelen==1 && !empty($Dok->cislo_jednaci)) }
+       {if ($povolitOdpoved && $Pridelen==1 && !empty($Dok->cislo_jednaci)) }
        <a href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
@@ -422,16 +422,14 @@
             <dd>{!$Dok->poznamka|html2br}&nbsp;</dd>
         </dl>
         {/if}
-        {if $Typ_evidence=='priorace'}
+        {if count($SouvisejiciDokumenty)>0 }
         <dl class="detail_item">
             <dt>Spojeno s dokumentem:</dt>
             <dd>
                 <span id="dok_spojit">
-                {if count($SouvisejiciDokumenty)>0 }
-                    {foreach $SouvisejiciDokumenty as $s}
-                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
-                    {/foreach}
-                {/if}
+                {foreach $SouvisejiciDokumenty as $s}
+                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a><br />
+                {/foreach}
                 </span>
                 &nbsp;
             </dd>

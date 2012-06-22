@@ -456,14 +456,36 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
-
+            
             $this->template->Typ_evidence = $this->typ_evidence;
+            $this->template->SouvisejiciDokumenty = array();
+            $this->template->povolitOdpoved = false;
+            $souvisejici_dokumenty = array();
             if ( $this->typ_evidence == 'priorace' ) {
                 // Nacteni souvisejicicho dokumentu
                 $Souvisejici = new SouvisejiciDokument();
                 $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument_id);
+                if ( count($this->template->SouvisejiciDokumenty)>0 ) {
+                    foreach ( $this->template->SouvisejiciDokumenty as $souvisejici_dok ) {
+                        $souvisejici_dokumenty[ $souvisejici_dok->id ] = $souvisejici_dok->id;
+                    }
+                }
+                $this->template->povolitOdpoved = true;
+                $stejne_dokumenty = $Dokument->stejne($dokument->cislo_jednaci,$dokument->id);          
+                if ( count($stejne_dokumenty)>0 ) {
+                    // nelze jiz vytvorit odpoved - jedno cislo jednaci muze mit maximalne jen 2 JID
+                    $this->template->povolitOdpoved = false;
+                    foreach ( $stejne_dokumenty as $dok ) {
+                        // odpoved pripojime do souvisejici
+                        if ( !isset($souvisejici_dokumenty[$dok->id]) ) {
+                            $this->template->SouvisejiciDokumenty[] = $dok;
+                            $souvisejici_dokumenty[ $dok->id ] = $dok->id;
+                        }
+                    }
+                }
             }
 
+            
             // Kontrola lhuty a skartace
             if ( $dokument->lhuta_stav==2 && $dokument->stav_dokumentu < 4 ) {
                 $this->flashMessage('Vypršela lhůta k vyřízení! Vyřiďte neprodleně tento dokument.','warning');
