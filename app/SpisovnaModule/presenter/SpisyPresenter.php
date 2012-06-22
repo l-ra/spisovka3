@@ -186,8 +186,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     public function actionDefault()
     {
-        //$Spisy = new Spis();
-        //$this->spis_plan = $Spisy->seznamSpisovychPlanu();
     }
 
     public function renderDefault()
@@ -199,96 +197,70 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
 
         $Spisy = new Spis();
-        /*$session_spisplan = Environment::getSession('s3_spisplan');
-        $spis_id = null;// $this->getParam('id',null);
-
-        if ( !is_null($spis_id) ) {
-            // spis_id
-        //} else if ( !empty($session_spisplan->spis_id) ) {
-        //    $spis_id = $session_spisplan->spis_id;
-        } else if ( count($this->spis_plan)>0 ) {
-            reset($this->spis_plan);
-            $spis_id = key($this->spis_plan);
-        } else {
-            $spis_id = null;
-        }*/
         $spis_id = null;
-        
-        //if ( !empty($spis_id) ) {
 
-            //$this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
+        $args = null;
+        if ( !empty($hledat) ) {
+            $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+        }
 
-            $args = null;
-            if ( !empty($hledat) ) {
-                $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
-            }
+        $user_config = Environment::getVariable('user_config');
+        $vp = new VisualPaginator($this, 'vp');
+        $paginator = $vp->getPaginator();
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
 
-            $user_config = Environment::getVariable('user_config');
-            $vp = new VisualPaginator($this, 'vp');
-            $paginator = $vp->getPaginator();
-            $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
-
-            $args = $Spisy->spisovna($args);
-            $result = $Spisy->seznam($args, 5, $spis_id);
-            $paginator->itemCount = count($result);
+        $args = $Spisy->spisovna($args);
+        $result = $Spisy->seznam($args, 5, $spis_id);
+        $paginator->itemCount = count($result);
             
-            // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParam('print');
-            $pdf = $this->getParam('pdfprint');
-            if ( $tisk ) {
-                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-                $seznam = $result->fetchAll();
+        // Volba vystupu - web/tisk/pdf
+        $tisk = $this->getParam('print');
+        $pdf = $this->getParam('pdfprint');
+        if ( $tisk ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $seznam = $result->fetchAll();
              
-                $this->setLayout(false);
-                $this->setView('print');
-            } elseif ( $pdf ) {
-                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-                $this->pdf_output = 1;
-                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-                $seznam = $result->fetchAll();
-              
-                $this->setLayout(false);
-                $this->setView('print');
-            } else {
-                $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            }               
+            $this->setLayout(false);
+            $this->setView('print');
+        } elseif ( $pdf ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            $this->pdf_output = 1;
+            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $seznam = $result->fetchAll();
+             
+            $this->setLayout(false);
+            $this->setView('print');
+        } else {
+            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        }               
             
-            if ( count($seznam)>0 ) {
-                $spis_ids = array();
-                foreach($seznam as $spis) {
-                    $spis_ids[] = $spis->id;
-                }
-                $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-            } else {
-                $this->template->seznam_dokumentu = array();
-            }              
+        if ( count($seznam)>0 ) {
+            $spis_ids = array();
+            foreach($seznam as $spis) {
+                $spis_ids[] = $spis->id;
+            }
+            $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+        } else {
+            $this->template->seznam_dokumentu = array();
+        }              
             
-            $this->template->seznam = $seznam;
+        $this->template->seznam = $seznam;
 
-            $SpisovyZnak = new SpisovyZnak();
-            $spisove_znaky = $SpisovyZnak->select(11);
-            $this->template->SpisoveZnaky = $spisove_znaky;            
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->select(11);
+        $this->template->SpisoveZnaky = $spisove_znaky;            
             
-            //$seznam = $Spisy->seznam(null, 0, $spis_id);
-            //$this->template->seznam = $seznam;
+        //$seznam = $Spisy->seznam(null, 0, $spis_id);
+        //$this->template->seznam = $seznam;
             
-            $this->template->akce_select = array(
-            );             
-
-            //$session_spisplan->spis_id = $spis_id;
-        //} else {
-        //    $this->template->seznam = null;
-        //}
-
-        //$this->template->spisplanForm = $this['spisplanForm'];
+        $this->template->akce_select = array(
+        );             
 
     }
 
     public function actionPrijem()
     {
-        //$Spisy = new Spis();
-        //$this->spis_plan = $Spisy->seznamSpisovychPlanu();
     }
 
     public function renderPrijem()
@@ -300,88 +272,64 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
 
         $Spisy = new Spis();
-        /*$session_spisplan = Environment::getSession('s3_spisplan');
-        $spis_id = $this->getParam('id',null);
-
-        if ( !is_null($spis_id) ) {
-            // spis_id
-        } else if ( !empty($session_spisplan->spis_id) ) {
-            $spis_id = $session_spisplan->spis_id;
-        } else if ( count($this->spis_plan)>0 ) {
-            reset($this->spis_plan);
-            $spis_id = key($this->spis_plan);
-        } else {
-            $spis_id = null;
-        }*/
         $spis_id = null;
 
-        //if ( !empty($spis_id) ) {
+        $args = null;
+        if ( !empty($hledat) ) {
+            $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+        }
 
-            //$this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
+        $user_config = Environment::getVariable('user_config');
+        $vp = new VisualPaginator($this, 'vp');
+        $paginator = $vp->getPaginator();
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
 
-            $args = null;
-            if ( !empty($hledat) ) {
-                $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+        $args = $Spisy->spisovna_prijem($args);
+        $result = $Spisy->seznam($args, 5, $spis_id);
+        $paginator->itemCount = count($result);
+
+        // Volba vystupu - web/tisk/pdf
+        $tisk = $this->getParam('print');
+        $pdf = $this->getParam('pdfprint');
+        if ( $tisk ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $seznam = $result->fetchAll();
+            
+            $this->setLayout(false);
+            $this->setView('print');
+        } elseif ( $pdf ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            $this->pdf_output = 1;
+            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $seznam = $result->fetchAll();
+            
+            $this->setLayout(false);
+            $this->setView('print');
+        } else {
+            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        }              
+            
+        if ( count($seznam)>0 ) {
+            $spis_ids = array();
+            foreach($seznam as $spis) {
+                $spis_ids[] = $spis->id;
             }
-
-            $user_config = Environment::getVariable('user_config');
-            $vp = new VisualPaginator($this, 'vp');
-            $paginator = $vp->getPaginator();
-            $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
-
-            $args = $Spisy->spisovna_prijem($args);
-            $result = $Spisy->seznam($args, 5, $spis_id);
-            $paginator->itemCount = count($result);
-
-            // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParam('print');
-            $pdf = $this->getParam('pdfprint');
-            if ( $tisk ) {
-                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-                $seznam = $result->fetchAll();
+            $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+        } else {
+            $this->template->seznam_dokumentu = array();
+        }               
             
-                $this->setLayout(false);
-                $this->setView('print');
-            } elseif ( $pdf ) {
-                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-                $this->pdf_output = 1;
-                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-                $seznam = $result->fetchAll();
+        $this->template->seznam = $seznam;
             
-                $this->setLayout(false);
-                $this->setView('print');
-            } else {
-                $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            }              
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->select(11);
+        $this->template->SpisoveZnaky = $spisove_znaky;            
             
-            if ( count($seznam)>0 ) {
-                $spis_ids = array();
-                foreach($seznam as $spis) {
-                    $spis_ids[] = $spis->id;
-                }
-                $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-            } else {
-                $this->template->seznam_dokumentu = array();
-            }               
+        $this->template->akce_select = array(
+            'prevzit_spisovna'=>'převzetí vybraných spisů do spisovny'
+        );               
             
-            $this->template->seznam = $seznam;
-            
-            $SpisovyZnak = new SpisovyZnak();
-            $spisove_znaky = $SpisovyZnak->select(11);
-            $this->template->SpisoveZnaky = $spisove_znaky;            
-            
-            //$session_spisplan->spis_id = $spis_id;
-            $this->template->akce_select = array(
-                'prevzit_spisovna'=>'převzetí vybraných spisů do spisovny'
-            );               
-            
-        //} else {
-        //    $this->template->seznam = null;
-        //}
-
-        //$this->template->spisplanForm = $this['spisplanForm'];
-
     }
 
     public function actionDetail()
@@ -643,7 +591,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
         $spis = @$this->template->Spis;
         
-        $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $SpisovyZnak = new SpisovyZnak();
@@ -769,45 +716,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
     }
 
-    /**
-     * Select formular se seznamem spisovych planu
-     *
-     * @return AppForm
-     */
-    protected function createComponentSpisplanForm()
-    {
-
-        $session_spisplan = Environment::getSession('s3_spisplan');
-
-        //Debug::dump($session_spisplan->spis_id);
-
-        $form = new AppForm();
-        $form->addSelect('spisplan', 'Zobrazit spisový plán:', $this->spis_plan)
-                ->setValue($session_spisplan->spis_id)
-                ->getControlPrototype()->onchange("return document.forms['frm-spisplanForm'].submit();");
-        $form->addSubmit('go_spisplan', 'Zobrazit')
-                 ->setRendered(TRUE)
-                 ->onClick[] = array($this, 'spisplanClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
-
-    public function spisplanClicked(SubmitButton $button)
-    {
-        $form_data = $button->getForm()->getValues();
-        $session_spisplan = Environment::getSession('s3_spisplan');
-        $session_spisplan->spis_id = $form_data['spisplan'];
-
-        //Debug::dump($form_data['spisplan']);
-        //Debug::dump($session_spisplan->spis_id);
-        $this->forward('default', array('id'=>$form_data['spisplan']) );
-    }
 
     protected function createComponentSearchForm()
     {

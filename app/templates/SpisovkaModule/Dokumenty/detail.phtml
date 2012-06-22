@@ -22,7 +22,7 @@
 		}
 
 
-                function vybratSpisovyZnak() {
+                function vybratSpisovyZnak(form) {
 
                     var spisz_skart = new Array();
                     var spisz_lhuta = new Array();
@@ -38,17 +38,21 @@
                 {/foreach}
                 {/if}
 
-                    var frm_spis  = document.forms['frm-vyrizovaniForm'].spisovy_znak_id;
-                    var frm_skart  = document.forms['frm-vyrizovaniForm'].skartacni_znak;
-                    var frm_lhuta  = document.forms['frm-vyrizovaniForm'].skartacni_lhuta;
-                    var frm_udalost  = document.forms['frm-vyrizovaniForm'].spousteci_udalost_id;
+                    if ( typeof form == 'undefined' ) {
+                        form = 'frm-vyrizovaniForm';
+                    }
 
-                    var key  = document.forms['frm-vyrizovaniForm'].spisovy_znak_id.selectedIndex;
-                    var value = document.forms['frm-vyrizovaniForm'].spisovy_znak_id.options[key].value;
-                    document.forms['frm-vyrizovaniForm'].skartacni_znak.value = spisz_skart[value];
-                    document.forms['frm-vyrizovaniForm'].skartacni_lhuta.value = spisz_lhuta[value];
+                    var frm_spis  = document.forms[form].spisovy_znak_id;
+                    var frm_skart  = document.forms[form].skartacni_znak;
+                    var frm_lhuta  = document.forms[form].skartacni_lhuta;
+                    var frm_udalost  = document.forms[form].spousteci_udalost_id;
+
+                    var key  = document.forms[form].spisovy_znak_id.selectedIndex;
+                    var value = document.forms[form].spisovy_znak_id.options[key].value;
+                    document.forms[form].skartacni_znak.value = spisz_skart[value];
+                    document.forms[form].skartacni_lhuta.value = spisz_lhuta[value];
                     //document.forms['frm-vyrizovaniForm'].spousteci_udalost.value = spisz_udalost[value];
-                    select_set_value(document.forms['frm-vyrizovaniForm'].spousteci_udalost_id,spisz_udalost[value]);
+                    select_set_value(document.forms[form].spousteci_udalost_id,spisz_udalost[value]);
                     return true;
                 }
 

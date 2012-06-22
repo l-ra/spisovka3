@@ -131,100 +131,70 @@ class Admin_SpisyPresenter extends BasePresenter
     
     public function actionSeznam()
     {
-        //$Spisy = new Spis();
-        //$this->spis_plan = $Spisy->seznamSpisovychPlanu();
     }
 
     public function renderSeznam($hledat = null)
     {
 
         $Spisy = new Spis();
-
-        /*$session_spisplan = Environment::getSession('s3_spisplan');
-        $spis_id = $this->getParam('id',null);
-
-        if ( !is_null($spis_id) ) {
-            // spis_id
-        } else if ( !empty($session_spisplan->spis_id) ) {
-            $spis_id = $session_spisplan->spis_id;
-        } else if ( count($this->spis_plan)>0 ) {
-            reset($this->spis_plan);
-            $spis_id = key($this->spis_plan);
-        } else {
-            $spis_id = null;
-        }*/
         $spis_id = null;
 
-        //if ( !empty($spis_id) ) {
+        $args = null;
+        if ( !empty($hledat) ) {
+            $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+        }
 
-            //$this->template->SpisovyPlan = $Spisy->getInfo($spis_id);
+        $user_config = Environment::getVariable('user_config');
+        $vp = new VisualPaginator($this, 'vp');
+        $paginator = $vp->getPaginator();
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
 
-            $args = null;
-            if ( !empty($hledat) ) {
-                $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
-            }
-
-            $user_config = Environment::getVariable('user_config');
-            $vp = new VisualPaginator($this, 'vp');
-            $paginator = $vp->getPaginator();
-            $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
-
-            $result = $Spisy->seznam($args, 5, $spis_id);
-            $paginator->itemCount = count($result);
+        $result = $Spisy->seznam($args, 5, $spis_id);
+        $paginator->itemCount = count($result);
             
-            // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParam('print');
-            $pdf = $this->getParam('pdfprint');
-            if ( $tisk ) {
-                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-                $seznam = $result->fetchAll();
-                if ( count($seznam)>0 ) {
-                    $spis_ids = array();
-                    foreach($seznam as $spis) {
-                        $spis_ids[] = $spis->id;
-                    }
-                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-                } else {
-                    $this->template->seznam_dokumentu = array();
-                }               
-                $this->setLayout(false);
-                $this->setView('print');
-            } elseif ( $pdf ) {
-                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-                $this->pdf_output = 1;
-                //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-                $seznam = $result->fetchAll();
-                if ( count($seznam)>0 ) {
-                    $spis_ids = array();
-                    foreach($seznam as $spis) {
-                        $spis_ids[] = $spis->id;
-                    }
-                    $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-                } else {
-                    $this->template->seznam_dokumentu = array();
-                }                
-                $this->setLayout(false);
-                $this->setView('print');
+        // Volba vystupu - web/tisk/pdf
+        $tisk = $this->getParam('print');
+        $pdf = $this->getParam('pdfprint');
+        if ( $tisk ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $seznam = $result->fetchAll();
+            if ( count($seznam)>0 ) {
+                $spis_ids = array();
+                foreach($seznam as $spis) {
+                    $spis_ids[] = $spis->id;
+                }
+                $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
             } else {
-                $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+                $this->template->seznam_dokumentu = array();
             }               
+            $this->setLayout(false);
+            $this->setView('print');
+        } elseif ( $pdf ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            $this->pdf_output = 1;
+            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $seznam = $result->fetchAll();
+            if ( count($seznam)>0 ) {
+                $spis_ids = array();
+                foreach($seznam as $spis) {
+                    $spis_ids[] = $spis->id;
+                }
+                $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+            } else {
+                $this->template->seznam_dokumentu = array();
+            }                
+            $this->setLayout(false);
+            $this->setView('print');
+        } else {
+            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        }               
             
-            $this->template->seznam = $seznam;
+        $this->template->seznam = $seznam;
 
-            $SpisovyZnak = new SpisovyZnak();
-            $spisove_znaky = $SpisovyZnak->select(11);
-            $this->template->SpisoveZnaky = $spisove_znaky;            
-
-            //$seznam = $Spisy->seznam(null, 0, $spis_id);
-            //$this->template->seznam = $seznam;
-
-            //$session_spisplan->spis_id = $spis_id;
-        //} else {
-        //    $this->template->seznam = null;
-        //}
-
-        //$this->template->spisplanForm = $this['spisplanForm'];
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->select(11);
+        $this->template->SpisoveZnaky = $spisove_znaky;            
 
     }
 
@@ -403,11 +373,6 @@ class Admin_SpisyPresenter extends BasePresenter
         $this->template->spisForm = $this['novyForm'];
     }
 
-    public function renderNovyplan()
-    {
-        $this->template->spisForm = $this['novySpisovyPlanForm'];
-    }
-
     public function renderImport()
     {
     }    
@@ -467,46 +432,6 @@ class Admin_SpisyPresenter extends BasePresenter
     }    
     
     
-    /**
-     * Select formular se seznamem spisovych planu
-     *
-     * @return AppForm
-     */
-    protected function createComponentSpisplanForm()
-    {
-
-        $session_spisplan = Environment::getSession('s3_spisplan');
-
-        //Debug::dump($session_spisplan->spis_id);
-
-        $form = new AppForm();
-        $form->addSelect('spisplan', 'Zobrazit spisový plán:', $this->spis_plan)
-                ->setValue($session_spisplan->spis_id)
-                ->getControlPrototype()->onchange("return document.forms['frm-spisplanForm'].submit();");
-        $form->addSubmit('go_spisplan', 'Zobrazit')
-                 ->setRendered(TRUE)
-                 ->onClick[] = array($this, 'spisplanClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
-
-    public function spisplanClicked(SubmitButton $button)
-    {
-        $form_data = $button->getForm()->getValues();
-        $session_spisplan = Environment::getSession('s3_spisplan');
-        $session_spisplan->spis_id = $form_data['spisplan'];
-
-        //Debug::dump($form_data['spisplan']);
-        //Debug::dump($session_spisplan->spis_id);
-        $this->forward('seznam', array('id'=>$form_data['spisplan']) );
-    }
-
 /**
  *
  * Formular a zpracovani pro udaju osoby
@@ -716,158 +641,6 @@ class Admin_SpisyPresenter extends BasePresenter
         } catch (DibiException $e) {
             $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
         }
-    }
-
-    protected function createComponentNovySpisovyPlanForm()
-    {
-
-        $Spisy = new Spis();
-
-        $spisovy_znak_max = $Spisy->maxSpisovyZnak();
-
-
-        $form1 = new AppForm();
-        $form1->addText('nazev', 'Název:', 50, 80)
-                ->addRule(Form::FILLED, 'Název spisového plánu musí být vyplněn!');
-        $form1->addTextArea('popis', 'Popis:', 80, 5);
-        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
-        //        ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!')
-        //        ->setValue($spisovy_znak_max);
-                //->getControlPrototype()->onblur("return kontrolaSpisovyZnak('novyplan');");
-        $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10)
-                ->setValue( date('d.m.Y') );
-
-        $form1->addSubmit('vytvorit', 'Vytvořit spisový plán')
-                 ->onClick[] = array($this, 'vytvoritNovyPlanClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
-    }
-
-    public function vytvoritNovyPlanClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $Spisy = new Spis();
-        $data['typ'] = 'SP';
-        $data['parent_id'] = null;
-
-        try {
-            $spis_id = $Spisy->vytvorit($data);
-            $this->flashMessage('Spisový plán "'. $data['nazev'] .'"  byl vytvořen.');
-            $this->redirect(':Admin:Spisy:seznam',array('id'=>$spis_id));
-        } catch (DibiException $e) {
-            $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
-        }
-    }
-
-    protected function createComponentUpravitSpisovyPlanForm()
-    {
-
-        $Spis = new Spis();
-        $SpisovyPlan = $Spis->getInfo($this->spis_plan);
-
-        if ( empty($SpisovyPlan->spisovy_znak_index) ) {
-            $spisovy_znak_max = $Spis->maxSpisovyZnak( $SpisovyPlan->id );
-        } else {
-            $spisovy_znak_max = $SpisovyPlan->spisovy_znak_index;
-        }
-
-        $form1 = new AppForm();
-        $form1->addHidden('spisovy_plan_id')
-                ->setValue($SpisovyPlan->id);
-        $form1->addText('nazev', 'Název:', 50, 80)
-                ->addRule(Form::FILLED, 'Název spisového plánu musí být vyplněn!')
-                ->setValue($SpisovyPlan->nazev);
-        $form1->addTextArea('popis', 'Popis:', 80, 5)
-                ->setValue($SpisovyPlan->popis);
-        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
-        //        ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!')
-        //        ->setValue($spisovy_znak_max);
-                //->getControlPrototype()->onblur("return kontrolaSpisovyZnak('upravitSpisovyPlan');");
-
-        $unixtime = strtotime($SpisovyPlan->datum_otevreni);
-        if ( $unixtime == 0 ) {
-            $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10);
-        } else {
-            $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10)
-                ->setValue( date('d.m.Y',$unixtime) );
-        }
-
-        $unixtime = strtotime($SpisovyPlan->datum_uzavreni);
-        if ( $unixtime == 0 ) {
-            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10);
-        } else {
-            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10)
-                ->setValue( date('d.m.Y',$unixtime) );
-        }
-
-
-        $form1->addSubmit('upravit', 'Upravit spisový plán')
-                 ->onClick[] = array($this, 'upravitSpisovyPlanClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
-    }
-
-    public function upravitSpisovyPlanClicked(SubmitButton $button)
-    {
-        $form_data = $button->getForm()->getValues();
-
-        $spisovy_plan_id = $form_data['spisovy_plan_id'];
-        unset($form_data['spisovy_plan_id']);
-
-        $Spis = new Spis();
-        $form_data['parent_id'] = null;
-        $form_data['parent_id_old'] = null;
-        $Spis->upravit($form_data, $spisovy_plan_id);
-
-        $this->redirect('seznam');
-    }
-
-    public function actionZmenitspisovyznak()
-    {
-        $Spis = new Spis();
-        $spisovy_znak_max = $Spis->maxSpisovyZnak( $this->getParam('id',null) );
-        echo $spisovy_znak_max;
-        exit;
-    }
-
-    public function actionKontrolaspisovyznak()
-    {
-        $Spis = new Spis();
-        $spisovy_znak = $this->getParam('id',null);
-
-        if (is_numeric($spisovy_znak) ) {
-            $spisovy_znak_bool = $Spis->kontrolaSpisovyZnak( $spisovy_znak, $this->getParam('spis',null) );
-            if ( $spisovy_znak_bool ) {
-                echo '1';
-            } else {
-                echo '0';
-            }
-        } else {
-            echo '-1';
-        }
-
-        exit;
     }
 
     protected function createComponentSearchForm()

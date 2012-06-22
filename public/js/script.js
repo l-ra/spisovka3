@@ -94,7 +94,7 @@ $(function() {
     // Dialog
     $('#dialog').dialog({
         autoOpen: false,
-	width: 700,
+	width: 800,
         height: 500,
         modal: true
     });
@@ -711,7 +711,7 @@ subjektNovyStorno = function (doc_id) {
         if ( is_simple == 1 ) {
             x.open("GET", baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=vyber&dok_id='+doc_id, true);
         } else {    
-            x.open("GET", baseUri + '/subjekty/0/vyber?dok_id='+doc_id, true);
+            x.open("GET", baseUri + 'subjekty/0/vyber?dok_id='+doc_id, true);
         }        
         
         x.send(null);
@@ -824,6 +824,39 @@ subjektNovy = function(event) {
 
         return false;
     }
+
+spisVytvoritSubmit = function () {
+
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                $('#dialog').html(x.responseText);
+            }
+        }
+
+        var spis_vytvorit = document.getElementById("subjekt-vytvorit");
+        var formdata = $(spis_vytvorit).serialize();
+        
+        //alert(spis_vytvorit.getAttribute('action'));
+        
+        x.open("POST", spis_vytvorit.getAttribute('action'), true);
+        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        x.setRequestHeader("Content-length", formdata.length);
+        x.setRequestHeader("Connection", "close");
+        x.send(formdata);
+    }
+
+    return false;
+}
+
+spisVytvoritStorno = function (doc_id) {
+
+    $('#spis_novy').hide();
+    return false;
+}
 
 osobaVybrana = function (elm) {
 

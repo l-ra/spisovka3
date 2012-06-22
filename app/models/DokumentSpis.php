@@ -67,7 +67,7 @@ class DokumentSpis extends BaseModel
             $dataplus['subjekty'] = $DokSubjekty->subjekty($dokument_ids);
             $Dokrilohy = new DokumentPrilohy();
             $dataplus['prilohy'] = $Dokrilohy->prilohy($dokument_ids);
-            $DokOdeslani = new DokumentOdeslani();
+            //$DokOdeslani = new DokumentOdeslani();
             $dataplus['odeslani'] = array( '0'=> null );//$DokOdeslani->odeslaneZpravy($dokument_ids);
 
             foreach ($result as $joinDok) {
