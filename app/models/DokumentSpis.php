@@ -47,14 +47,22 @@ class DokumentSpis extends BaseModel
         }
     }    
     
-    public function dokumenty( $spis_id , $detail = 0 ) {
+    public function dokumenty( $spis_id , $detail = 0, &$paginator = null ) {
 
         $param = array();
         $param['where'] = array();
         $param['where'][] = array('spis_id=%i',$spis_id);
 
         $dokumenty = array();
-        $result = $this->fetchAllComplet($param)->fetchAll();
+        
+        $query = $this->fetchAllComplet($param);
+        if ( !is_null($paginator) ) {
+            $paginator->itemCount = $query->count();
+            $result = $query->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        } else {
+            $result = $query->fetchAll();
+        }
+        
         if ( count($result)>0 ) {
             $Dokument = new Dokument();
 
@@ -75,8 +83,9 @@ class DokumentSpis extends BaseModel
                 if ( empty($dok->stav_dokumentu) ) continue;
                 $dok->poradi = empty($joinDok->poradi)?1:$joinDok->poradi;
                 $dok->stav_zarazeni = $joinDok->stav;
-                $dokumenty[ $joinDok->poradi ] = $dok;
+                $dokumenty[ $joinDok->dokument_id ] = $dok;
             }
+            sort($dokumenty);
             return $dokumenty;
         } else {
             return null;

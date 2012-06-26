@@ -406,7 +406,15 @@ class Spisovka_SpisyPresenter extends BasePresenter
             
             if ( $accessview ) {
                 $DokumentSpis = new DokumentSpis();
-                $result = $DokumentSpis->dokumenty($spis_id,1);
+                
+                //$user_config = Environment::getVariable('user_config');
+                //$vp = new VisualPaginator($this, 'vp');
+                //$paginator = $vp->getPaginator();
+                //$paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+                //$result = $DokumentSpis->dokumenty($spis_id, 1, $paginator);
+                
+                $result = $DokumentSpis->dokumenty($spis_id, 1);
+                
                 $this->template->seznam = $result;
             } else {
                 $this->template->seznam = null;
