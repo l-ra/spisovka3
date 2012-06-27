@@ -8,17 +8,17 @@ define('APP_DIR', WWW_DIR . '/app');
 define('LIBS_DIR', WWW_DIR . '/libs');
 
 // absolute or relative url path to public dir
-define('BASE_URI', '/brno/public/');
+define('BASE_URI', '/public/');
 // absolute or relative url path to app dir
-define('BASE_APP', '/brno/');
+define('BASE_APP', '/');
 
 
 // client identificator
-define('KLIENT', 'brno');
+define('KLIENT', 'klient');
 // absolute filesystem path to the client files
 define('CLIENT_DIR', WWW_DIR . '/client');
 
-define('DEBUG_ENABLE', 1);
+define('DEBUG_ENABLE', 0);
 
 // load bootstrap file
 require APP_DIR . '/bootstrap.php';
