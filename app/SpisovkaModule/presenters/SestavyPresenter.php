@@ -3,7 +3,6 @@
 class Spisovka_SestavyPresenter extends BasePresenter
 {
 
-
     public function renderDefault()
     {
 
@@ -92,15 +91,39 @@ class Spisovka_SestavyPresenter extends BasePresenter
     
     public function actionPdf()
     {
+        $pc_od = $this->getParam('pc_od',null);
+        $pc_do = $this->getParam('pc_do',null);  
+        $d_od  = $this->getParam('d_od',null);
+        $d_do  = $this->getParam('d_do',null);        
+        $today = $this->getParam('d_today',null);
+        $rok   = $this->getParam('rok',null);  
+        
         @ini_set("memory_limit",PDF_MEMORY_LIMIT);
         $sestava_id = $this->getParam('id',null);
-        $this->forward('detail', array('view'=>'pdf','id'=>$sestava_id));
+        $this->forward('detail', 
+                array('view'=>'pdf', 'id'=>$sestava_id,
+                      'pc_od'=>$pc_od, 'pc_do'=>$pc_do, 
+                      'd_od'=>$d_od, 'd_do'=>$d_do, 
+                      'd_today'=>$today, 'rok'=>$rok, 
+                     ));
     }
 
     public function actionTisk()
     {
+        $pc_od = $this->getParam('pc_od',null);
+        $pc_do = $this->getParam('pc_do',null);  
+        $d_od  = $this->getParam('d_od',null);
+        $d_do  = $this->getParam('d_do',null);        
+        $today = $this->getParam('d_today',null);
+        $rok   = $this->getParam('rok',null);  
+        
         $sestava_id = $this->getParam('id',null);
-        $this->forward('detail', array('view'=>'tisk','id'=>$sestava_id));
+        $this->forward('detail', 
+                array('view'=>'tisk','id'=>$sestava_id,
+                      'pc_od'=>$pc_od, 'pc_do'=>$pc_do, 
+                      'd_od'=>$d_od, 'd_do'=>$d_do, 
+                      'd_today'=>$today, 'rok'=>$rok,                     
+                     ));
     }
 
     public function renderDetail($view)
@@ -137,6 +160,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 'skartacni_znak'=>'Skart. znak',
                 'skartacni_lhuta'=>'Skart. lhůta',
                 'zaznam_vyrazeni'=>'Záznam vyřazení',
+                'podpis'=>'Předáno',
             );
         $this->template->sloupce_nazvy = $sloupce_nazvy;
 
@@ -160,6 +184,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 '13'=>'skartacni_znak',
                 '14'=>'skartacni_lhuta',
                 '15'=>'zaznam_vyrazeni',
+                '16'=>'podpis',
             );
             
         } else {
@@ -180,20 +205,22 @@ class Spisovka_SestavyPresenter extends BasePresenter
         }
 
         // vstup
-        $pc_od = $this->getParam('pc_od',null);
-        $pc_do = $this->getParam('pc_do',null);
+        $pc_od = $this->getParam('pc_od');
+        $pc_do = $this->getParam('pc_do');
+        $d_od = $this->getParam('d_od');
+        $d_do = $this->getParam('d_do');
         
-        if ( $this->getParam('d_od',null) ) {
+        if ( $d_od ) {
             try {
-                $d_od = date("Y-m-d", strtotime($this->getParam('d_od',null)));
+                $d_od = date("Y-m-d", strtotime($d_od));
                 //$d_od = new DateTime($this->getParam('d_od',null));
             } catch (Exception $e) {
                 $d_od = null;
             }
         }
-        if ( $this->getParam('d_do',null) ) {
+        if ( $d_do ) {
             try {
-                $d_do = date("Y-m-d", strtotime($this->getParam('d_do',null))+86400 );
+                $d_do = date("Y-m-d", strtotime($d_do)+86400 );
                 //$d_do = new DateTime($this->getParam('d_do',null));
             } catch (Exception $e) {
                 $d_do = null;
@@ -328,7 +355,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             }
 
         } 
-
+        
         $this->template->seznam = $seznam;
         $this->setLayout('print');
         if ( $view == 'pdf' ) {

@@ -46,10 +46,8 @@
             &nbsp;
             {elseif $sl=='datum_vzniku'}
             {$dok->datum_vzniku|edate}
-
-
-
-                
+            {elseif $sl=='podpis'}
+            <span style="color:white;">____________________</span>
             {else}
             {$dok->$sl}
             {/if}
@@ -89,7 +87,6 @@
 
             $pdf->SetHeader($Sestava->nazev.'||'.$Urad->nazev .', '. $rok);
             $pdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
-            
             
             $pdf->WriteHTML($html_out);
             $pdf->Output('sestava.pdf', 'I');

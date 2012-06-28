@@ -60,10 +60,8 @@
             &nbsp;
             {elseif $sl=='datum_vzniku'}
             {$dok->datum_vzniku|edate}
-
-
-
-                
+            {elseif $sl=='podpis'}
+            <span style="color:white;">____________________</span>
             {else}
             {$dok->$sl}
             {/if}
