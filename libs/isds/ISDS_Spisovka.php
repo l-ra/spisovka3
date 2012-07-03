@@ -3,14 +3,13 @@
 
 class ISDS_Spisovka extends ISDS {
 
-    private $ISDSBox;
     private $config;
 
     public function __construct() {
         
     }
 
-    /* Vrati ISDSBox nebo hodi vyjimku s popisem chyby */
+    /* Vrati true nebo hodi vyjimku s popisem chyby */
     public function pripojit($params = null) {
 
         if ( is_array($params) ) {
@@ -53,11 +52,11 @@ class ISDS_Spisovka extends ISDS {
 
         if ( $config['typ_pripojeni'] == 0 ) {
             // jmenem a heslem
-            $this->ISDSBox = $this->ISDSBox($isds_portaltype, 0,$config['login'],$config['password'],"","");
+            $rcISDSBox = $this->ISDSBox($isds_portaltype, 0,$config['login'],$config['password'],"","");
         } else if ( $config['typ_pripojeni'] == 1 ) {
             // certifikatem
             if ( file_exists($config['certifikat']) ) {
-                $this->ISDSBox = $this->ISDSBox($isds_portaltype, 1,"","",$config['certifikat'],$config['cert_pass']);
+                $rcISDSBox = $this->ISDSBox($isds_portaltype, 1,"","",$config['certifikat'],$config['cert_pass']);
             } else {
                 // certifikat nenalezen
                 throw new FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
@@ -65,7 +64,7 @@ class ISDS_Spisovka extends ISDS {
         } else if ( $config['typ_pripojeni'] == 2 ) {
             // certifikatem + jmenem a heslem
             if ( file_exists($config['certifikat']) ) {
-                $this->ISDSBox = $this->ISDSBox($isds_portaltype, 2,$config['login'],$config['password'],$config['certifikat'],$config['cert_pass']);
+                $rcISDSBox = $this->ISDSBox($isds_portaltype, 2,$config['login'],$config['password'],$config['certifikat'],$config['cert_pass']);
             } else {
                 // certifikat nenalezen
                 throw new FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
@@ -73,15 +72,15 @@ class ISDS_Spisovka extends ISDS {
         } else
             throw new Exception("Chyba nastavení ISDS! - Nespecifikovaná chyba.");
         
-        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == ""))
-            return $this->ISDSBox;
+        if ($rcISDSBox)
+            return true;
         
         if ( $this->ErrorInfo == "Služba ISDS je momentálně nedostupná" ) {
             throw new Exception("Server ISDS je dočasně nedostupný.<br />Omlouváme se všem uživatelům datových schránek za dočasné omezení přístupu do systému datových schránek z důvodu plánované údržby systému. Děkujeme za pochopení.");
         } else if ( $this->ErrorInfo == "Neplatné přihlašovací údaje!" ) {
             throw new Exception("Neplatné přihlašovací údaje!");
         } else {
-            throw new Exception("Chyba ISDS: ".$this->StatusCode." - ".$this->ErrorInfo);
+            throw new Exception("Chyba ISDS: " . $this->error());
         }
     }
 
@@ -89,7 +88,7 @@ class ISDS_Spisovka extends ISDS {
 
         if ($idDS != null) {
             $Results = $this->FindDataBox($idDS,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null);
-            if (($ISDSBox->StatusCode == "0000") && ($ISDSBox->ErrorInfo == ""))
+            if (($this->StatusCode == "0000") && ($this->ErrorInfo == ""))
             {
                 return $Results->dbOwnerInfo[0];
             } else {

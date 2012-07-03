@@ -579,7 +579,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
 
         try {
-            $ISDSBox = $isds->pripojit($config);
+            $isds->pripojit($config);
             
             $od = $this->Epodatelna->getLastISDS();
             $do = time() + 7200;
@@ -883,7 +883,7 @@ dmFormat =
         
         $isds = new ISDS_Spisovka();
 
-        if ( $ISDSBox = $isds->pripojit($config) ) {
+        if ( $isds->pripojit($config) ) {
             
             $zpravy = $isds->seznamOdeslanychZprav($od,$do);
             
@@ -1284,35 +1284,5 @@ dmFormat =
         }        
         
     }
-
-    
-    public function actionIsds()
-    {
-
-        $isds = new ISDS_Spisovka();
-
-        if ( $ISDSBox = $isds->pripojit() ) {
-
-            //$zpravy = $isds->seznamPrichozichZprav();
-            //$zpravy = $isds->seznamOdeslanychZprav();
-            //$zpravy = $isds->seznamOdeslanychZprav( time()-3600 , time() );
-
-            //echo "<pre>";
-            //print_r($zpravy);
-            //echo "</pre>";
-
-
-
-        } else {
-            $this->flashMessage('Nepodařilo se připojit k ISDS schránce "'. $config['ucet'] .'"!
-                                 <br />
-                                 ISDS chyba: '. $isds->StatusCode .' - '. $isds->StatusMessage .'','warning');
-        }
-
-        $this->terminate();
-        exit;
-    }
-
-
 
 }
