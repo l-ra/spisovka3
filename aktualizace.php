@@ -28,7 +28,7 @@
 /* ***  V NASLEDUJICICH RADCICH JIZ NEZASAHOVAT !!!  ************************ */
 /* ************************************************************************** */
 
-    if ( strpos(__FILE__,"public\aktualizace.php") !== false ) {
+    if ( strpos(__FILE__,"public/aktualizace.php") !== false ) {
         define("WWW_DIR","../");
         define("PUBLIC_DIR","");
     } else {
