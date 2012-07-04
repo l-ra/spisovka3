@@ -89,7 +89,8 @@ class Subjekt extends BaseModel
                     'distinct'=>1,
                     'cols'=>$cols,
                     /*'order'=> array('nazev_subjektu','prijmeni','jmeno')*/
-                    'order_sql' => 'CONCAT(s.nazev_subjektu,s.prijmeni,s.jmeno)'
+                    /* P.L. nechapu, proc se zde zabyvat komplikovanym razenim. Subjekt s danou emailovou adresou bude obvykle jeden, ne? */
+                    'order_sql' => 'CONCAT(nazev_subjektu,prijmeni,jmeno)'
                 );
 
                 if ( strpos($data->email,";")!==false ) {
