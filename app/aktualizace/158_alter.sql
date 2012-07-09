@@ -494,7 +494,7 @@ ADD COLUMN `selected` tinyint(1) NOT NULL DEFAULT '1' AFTER `spousteci_udalost_i
   ON UPDATE NO ACTION, 
   ADD CONSTRAINT `spisovy_znak_ibfk_1`
   FOREIGN KEY (`parent_id` )
-  REFERENCES `spisovy_znak` (`id` )
+  REFERENCES `{tbls3}spisovy_znak` (`id` )
 , ADD INDEX `fk_spisovy_znak_spousteci_udalost1` (`spousteci_udalost_id` ASC) 
 , ADD INDEX `fk_spisovy_znak_spisovy_znak1` (`parent_id` ASC) ;
 
