@@ -12,7 +12,8 @@ class Authenticator_Basic extends Control implements IAuthenticator
 
         // vstupy
         $username = $credentials[self::USERNAME];
-        $password = sha1( $credentials[self::USERNAME] . $credentials[self::PASSWORD] );
+        $hash_S3 = sha1( $credentials[self::USERNAME] . $credentials[self::PASSWORD] );
+        $hash_S2 = md5(md5($credentials[self::PASSWORD]));
 
         // Vyhledani uzivatele
         $user = new UserModel();
@@ -31,7 +32,7 @@ class Authenticator_Basic extends Control implements IAuthenticator
         }        
 
         // Overeni hesla
-        if ($row->password !== $password) {
+        if ($row->password !== $hash_S3 && $row->password !== $hash_S2) {
             $log->logAccess($row->id, 0);
             throw new AuthenticationException("Neplatné heslo.", self::INVALID_CREDENTIAL);
         } else {
