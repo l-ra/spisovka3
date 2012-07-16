@@ -37,29 +37,13 @@ k tomu dojde, bude migrace neúplná. Pak je potřeba migraci provést znovu.
 migrace a zpráva o výsledku migrace.
 
 8) Nyní jsou ve Spisové službě verze 3 k dispozici všechny data migrovaná 
-z verze 2.
+z verze 2 kromě příloh dokumentů.
 
-9) Pro zdárné dokončení migrace je potřeba provést poslední dva kroky. 
-Přenést soubory a nastavit autentizátor.
-
-10) Zkopírujte veškerý obsah složky "/prilohy" ze Spisové služby verze 2 
+9) Zkopírujte veškerý obsah složky "/prilohy" ze Spisové služby verze 2 
 (obsahuje roky) do složky "/client/files/dokumenty" Spisové služby verze 3. 
 (Ukázka: původně "/prilohy/2012" nově "/client/files/dokumenty/2012")
 
-11) Poslední krok je úprava souboru "system.ini" Spisové služby verze 3. Verze 2 
-a verze 3 obsahuji odlišnou metodu ukládání hesla. Aby hesla z verze 2 fungovala 
-i ve verzi 3, je potřeba změnit autentizátor. 
-Otevřete soubor "/client/configs/system.ini" u verze 3 
-a řádek:
-service.Nette-Security-IAuthenticator = Authenticator_Basic 
+10) Vymažte obsah složky "/client/temp" u verze 3.
 
-změňte na: 
-service.Nette-Security-IAuthenticator = Authenticator_BasicS2
-
-Soubor uložte.
-
-12) Vymažte obsah složky "/client/temp" u verze 3.
-
-13) Celý proces je dokončen. Nyní můžete začít používat novou verzi i s daty 
+11) Celý proces je dokončen. Nyní můžete začít používat novou verzi i s daty 
 z verze 2.
-
