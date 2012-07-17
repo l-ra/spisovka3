@@ -615,7 +615,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         Environment::setVariable('epodatelna_config', $config_modify);
 
-        $this->flashMessage('Nastavení emailové schránky byly upraveny.');
+        $this->flashMessage('Nastavení emailové schránky bylo upraveno.');
         $this->redirect('this',array('id'=>('e' . $data['index']) ));
     }
 

@@ -2408,7 +2408,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $mail->setFromConfig();
             }
         } catch (Exception $e) {
-            $this->flashMessage('Chyba při odesilání emailu! '. $e->getMessage(),'error_ext');
+            $this->flashMessage('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
             return false;            
         }
 
@@ -2440,7 +2440,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         try {
             $mail->send();
         } catch (Exception $e) {
-            $this->flashMessage('Chyba při odesilání emailu! '. $e->getMessage(),'error_ext');
+            $this->flashMessage('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
             return false;
         }
 

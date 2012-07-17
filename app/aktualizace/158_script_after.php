@@ -327,12 +327,12 @@ try {
 }
 
 
-echo "\n\n Pridani pravidla Odesilání dokumentu ... ";
+echo "\n\n Pridani pravidla Odesílání dokumentu ... ";
 //dibi::begin();
 try {
     
     $rule_id = dibi::insert($config['prefix'] ."user_rule", array(
-        'resource_id' => 1, 'name' => 'Odesilání dokumentu','note' => 'Povolit přímé odesílání dokumentu', 'privilege' => 'odeslat' ))->execute(dibi::IDENTIFIER);
+        'resource_id' => 1, 'name' => 'Odesílání dokumentu','note' => 'Povolit přímé odesílání dokumentu', 'privilege' => 'odeslat' ))->execute(dibi::IDENTIFIER);
     //dibi::insert($config['prefix'] ."user_acl", array(
     //    'role_id' => '', 'rule_id' => null, 'allowed' => 'Y' ))->execute(dibi::IDENTIFIER);    
     

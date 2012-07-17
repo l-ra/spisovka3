@@ -240,7 +240,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
                 );
         $ciselnik->addColumn('epodatelna',
                     array(
-                        'title' => 'Elektornické doručení?',
+                        'title' => 'Elektronické doručení?',
                         'link' => false,
                         'form' => 'checkbox',
                         'view' => true

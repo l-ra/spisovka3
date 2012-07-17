@@ -52,11 +52,11 @@ class ESSMail extends Mail {
                     $this->config = $ep['odeslani'][0];
                     return true;
                 } else {
-                    throw new InvalidStateException('Nebyl zjištěn aktivní účet pro odesilání emailů.');
+                    throw new InvalidStateException('Nebyl zjištěn aktivní účet pro odesílání emailů.');
                     return false;
                 }
             } else {
-                throw new InvalidStateException('Nebyl zjištěn účet pro odesilání emailů.');
+                throw new InvalidStateException('Nebyl zjištěn účet pro odesílání emailů.');
                 return false;
             }
         } else {
@@ -65,7 +65,7 @@ class ESSMail extends Mail {
                 $this->config = $config;
                 return true;
             } else {
-                throw new InvalidStateException('Konfigurace pro odesilání emailů není platná.');
+                throw new InvalidStateException('Konfigurace pro odesílání emailů není platná.');
                 return false;
             }
         }

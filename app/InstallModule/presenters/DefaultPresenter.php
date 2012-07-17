@@ -251,7 +251,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'passed' => $mail_support,
 		'message' => 'povoleno',
 		'errorMessage' => 'Není zapnuta podpora funkce mail()',
-		'description' => 'Je potřeba pro odesilání emailových zpráv.',
+		'description' => 'Je potřeba pro odesílání emailových zpráv.',
             ),
             array(
 		'title' => 'Podpora IMAP',
@@ -267,7 +267,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'passed' => $imap_pop3,
 		'message' => 'Povoleno',
 		'errorMessage' => $imap_pop3_text,
-		'description' => 'Je potřeba pro odesilání emailových zpráv.',
+		'description' => 'Je potřeba pro odesílání emailových zpráv.',
             ),
             array(
 		'title' => '  IMAP - příjem přes POP3s',
@@ -275,7 +275,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'passed' => $imap_pop3s,
 		'message' => 'Povoleno',
 		'errorMessage' => $imap_pop3s_text,
-		'description' => 'Je potřeba pro odesilání emailových zpráv.',
+		'description' => 'Je potřeba pro odesílání emailových zpráv.',
             ),
             array(
 		'title' => '  IMAP - příjem přes IMAP',
@@ -283,7 +283,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'passed' => $imap_imap,
 		'message' => 'Povoleno',
 		'errorMessage' => $imap_imap_text,
-		'description' => 'Je potřeba pro odesilání emailových zpráv.',
+		'description' => 'Je potřeba pro odesílání emailových zpráv.',
             ),
             array(
 		'title' => '  IMAP - příjem přes IMAPs',
@@ -291,7 +291,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'passed' => $imap_imaps,
 		'message' => 'Povoleno',
 		'errorMessage' => $imap_imaps_text,
-		'description' => 'Je potřeba pro odesilání emailových zpráv.',
+		'description' => 'Je potřeba pro odesílání emailových zpráv.',
             ),
 
             

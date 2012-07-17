@@ -35,7 +35,7 @@ class EmailAvizo {
             //$mail->send();
             return true;
         } catch (Exception $e) {
-            //throw new InvalidStateException('Chyba při odesilání emailu! '. $e->getMessage(),'error_ext');
+            //throw new InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
             return false;
         }        
         
@@ -76,7 +76,7 @@ class EmailAvizo {
             //$mail->send();
             return true;
         } catch (Exception $e) {
-            //throw new InvalidStateException('Chyba při odesilání emailu! '. $e->getMessage(),'error_ext');
+            //throw new InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
             return false;
         }        
         
@@ -101,7 +101,7 @@ class EmailAvizo {
             //$mail->send();
             return true;
         } catch (Exception $e) {
-            //throw new InvalidStateException('Chyba při odesilání emailu! '. $e->getMessage(),'error_ext');
+            //throw new InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
             return false;
         }        
         
@@ -127,11 +127,11 @@ class EmailAvizo {
                     self::$config = $ep['odeslani'][0];
                     return $ep['odeslani'][0];
                 } else {
-                    //throw new InvalidStateException('Nebyl zjištěn aktivní účet pro odesilání emailů.');
+                    //throw new InvalidStateException('Nebyl zjištěn aktivní účet pro odesílání emailů.');
                     return false;
                 }
             } else {
-                //throw new InvalidStateException('Nebyl zjištěn účet pro odesilání emailů.');
+                //throw new InvalidStateException('Nebyl zjištěn účet pro odesílání emailů.');
                 return false;
             }
         } else {
@@ -139,7 +139,7 @@ class EmailAvizo {
                 self::$config = $config;
                 return $config;
             } else {
-                //throw new InvalidStateException('Konfigurace pro odesilání emailů není platná.');
+                //throw new InvalidStateException('Konfigurace pro odesílání emailů není platná.');
                 return false;
             }
         }
