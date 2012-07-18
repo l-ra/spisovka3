@@ -47,8 +47,8 @@ abstract class BasePresenter extends Presenter
 
         else:
 
-            if ( $this->name == "Spisovka:Default" && $this->view == "default" ) {
-                $this->forward(':Install:Default:default');
+            if ( strncmp($this->name, 'Install', 7) != 0 ) {
+                $this->redirect(':Install:Default:default');
             }
 
             //echo $this->reflection->name ." - ". $this->getAction();
