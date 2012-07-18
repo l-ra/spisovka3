@@ -687,14 +687,17 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             mkdir(CLIENT_DIR .'/configs/files');
         }
 
-        if ( is_writeable(CLIENT_DIR .'/configs/files') ) {
+        $chyba_pri_uploadu = 0;
+        {
             $fileName = CLIENT_DIR ."/configs/files/certifikat_email_". $index .".crt";
             if (!$upload instanceof HttpUploadedFile) {
                 $this->flashMessage('Certifikát se nepodařilo nahrát.','warning');
             } else if ( $upload->isOk() ) {
-                if ( $upload->move($fileName) ) {
+                try {
+                    $upload->move($fileName);
                     $data['cert'] = $fileName;
-                } else {
+                } catch (Exception $e) {
+                    $chyba_pri_uploadu = 1;
                     $this->flashMessage('Certifikát se nepodařilo přenést na cílové místo.','warning');
                 }
             } else {
@@ -710,9 +713,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                     break;
                 }
             }
-        } else {
-            // nelze nahrat
-            $this->flashMessage('Certifikát nelze nahrát na cílové místo.','warning');
         }
         unset($data['cert_file']);
 
@@ -720,14 +720,16 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         //nahrani privatniho klice
         $upload = $data['cert_key_file'];
 
-        if ( is_writeable(CLIENT_DIR .'/configs/files') ) {
+        {
             $fileName = CLIENT_DIR ."/configs/files/certifikat_email_". $index .".key";
             if (!$upload instanceof HttpUploadedFile) {
                 $this->flashMessage('Soubor privátního klíče se nepodařilo nahrát.','warning');
             } else if ( $upload->isOk() ) {
-                if ( $upload->move($fileName) ) {
+                try {
+                    $upload->move($fileName);
                     $data['cert_key'] = $fileName;
-                } else {
+                } catch (Exception $e) {
+                    $chyba_pri_uploadu = 1;
                     $this->flashMessage('Soubor privátního klíče se nepodařilo přenést na cílové místo.','warning');
                 }
             } else {
@@ -743,12 +745,12 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                     break;
                 }
             }
-        } else {
-            // nelze nahrat
-            $this->flashMessage('Soubor privátního klíče nelze nahrát na cílové místo.','warning');
         }
         unset($data['cert_key_file']);
 
+        if ($chyba_pri_uploadu && !is_writeable(CLIENT_DIR .'/configs/files'))
+            $this->flashMessage('Nemohu zapisovat do adresáře client/configs/files/.','warning');
+            
         $config_data['odeslani'][$index]['ucet'] = $data['ucet'];
         $config_data['odeslani'][$index]['aktivni'] = $data['aktivni'];
         $config_data['odeslani'][$index]['typ_odeslani'] = $data['typ_odeslani'];
