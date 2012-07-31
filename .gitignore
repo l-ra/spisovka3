@@ -1,0 +1,81 @@
+
+# /
+/clients
+
+# /app/SpisovnaModule/
+
+# /app/SpisovnaModule/presenter/
+
+# /app/aktualizace/
+
+# /app/templates/SpisovkaModule/Vypravna/
+
+# /app/templates/SpisovnaModule/
+
+# /app/templates/SpisovnaModule/Default/
+
+# /app/templates/SpisovnaModule/Dokumenty/
+
+# /app/templates/SpisovnaModule/Spisy/
+
+# /app/templates/SpisovnaModule/Vyhledat/
+
+# /app/templates/SpisovnaModule/Zapujcky/
+
+# /client/configs/
+/client/configs/install
+
+# /client/files/
+/client/files/*
+
+# /client/files/dokumenty/
+/client/files/dokumenty/*
+
+# /client/files/epodatelna/
+/client/files/epodatelna/*
+
+# /client/sessions/
+/client/sessions/*
+
+# /client/temp/
+/client/temp/*
+
+# /help/SpisovkaModule/Vypravna/
+
+# /help/SpisovnaModule/
+
+# /help/SpisovnaModule/Dokumenty/
+
+# /help/SpisovnaModule/Spisy/
+
+# /help/SpisovnaModule/Zapujcky/
+
+# /libs/mpdf/
+
+# /libs/mpdf/classes/
+
+# /libs/mpdf/font/
+
+# /libs/mpdf/graph_cache/
+
+# /libs/mpdf/includes/
+
+# /libs/mpdf/mpdfi/
+
+# /libs/mpdf/mpdfi/filters/
+
+# /libs/mpdf/patterns/
+
+# /libs/mpdf/tmp/
+
+# /libs/mpdf/ttfontdata/
+
+# /libs/mpdf/ttfonts/
+
+# /libs/mpdf/utils/
+
+# /log/
+/log/*.log
+/log/*.html
+
+# /public/auth/
