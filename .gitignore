@@ -1,0 +1,9 @@
+/clients
+/client/configs/install
+/client/files/*
+/client/files/dokumenty/*
+/client/files/epodatelna/*
+/client/sessions/*
+/client/temp/*
+/log/*.log
+/log/*.html
