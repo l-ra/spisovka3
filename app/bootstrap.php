@@ -12,6 +12,7 @@ if ( !defined('DEBUG_ENABLE') )
     define('DEBUG_ENABLE', 0);
 if ( DEBUG_ENABLE ) {
     Environment::setMode(Environment::DEVELOPMENT);
+    Environment::setMode(Environment::PRODUCTION, FALSE);
     Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error_'.date('Ymd').'.log');
 } else {
     Environment::setMode(Environment::PRODUCTION);
