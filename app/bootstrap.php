@@ -51,6 +51,8 @@ define('PDF_MEMORY_LIMIT','512M');
 
 // app info
 $app_info = @file_get_contents(APP_DIR .'/configs/version');
+// trim the EOL character
+$app_info = trim($app_info);
 Environment::setVariable('app_info', $app_info);
 
 // 2c) check if directory /app/temp is writable
