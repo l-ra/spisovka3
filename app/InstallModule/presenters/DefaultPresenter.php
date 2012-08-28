@@ -187,8 +187,7 @@ class Install_DefaultPresenter extends BasePresenter
         $requirements_ess = $this->paint( array(
             array(
 		'title' => 'Aplikace',
-		'message' => ( @$app_info[2] .' (#'. @$app_info[1] .', vydáno '. @date('j.n.Y',@$app_info[3]) .')')
-                /*'message' => $app_info[2]*/
+		'message' => ( $app_info[2] )
             ),
             array(
 		'title' => 'Web server',
