@@ -53,7 +53,7 @@ class Workflow extends BaseModel
                         $wf->prideleno_info = $osoba->identity;
                     }
                 }
-                if ( !empty($wf->orgjadnotka_id) ) {
+                if ( !empty($wf->orgjednotka_id) ) {
                     $org = $Orgjednotka->getInfo($wf->orgjednotka_id);
                     if ( $org ) {
                         $wf->orgjednotka_info = $org;
@@ -114,12 +114,11 @@ class Workflow extends BaseModel
 
     public function priradit($dokument_id, $user_id, $orgjednotka_id, $poznamka = '')
     {
-        if ( is_numeric($dokument_id) ) {
+        if ( !is_numeric($dokument_id) )
+            return false;
 
-            //$transaction = (! dibi::inTransaction());
-            //if ($transaction)
-            //dibi::begin();
-
+        try {
+            dibi::begin();  // P.L.
             $Dokument = new Dokument();
             $dokument_info = $Dokument->getInfo($dokument_id);
 
@@ -130,9 +129,6 @@ class Workflow extends BaseModel
             $update = array('stav_osoby%sql'=>'stav_osoby+100');
             $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_osoby=0')));
                 
-            // Deaktivujeme starsi zaznamy
-            //$this->deaktivovat($dokument_id);
-
             $data = array();
             $data['dokument_id'] = $dokument_info->id;
             $data['stav_dokumentu'] = 2;
@@ -175,66 +171,59 @@ class Workflow extends BaseModel
             $data['date_predani'] = new DateTime();
             $data['user_id'] = $user->id;
             $data['poznamka'] = $poznamka;
-
-            //Debug::dump($data);
             
-            $result_insert = $this->insert($data);
+            $Log = new LogModel();
 
-            //if ($transaction)
-            //dibi::commit();
-
-            if ( $result_insert ) {
-
-                $Log = new LogModel();
+            // [P.L] je-li dokument ve spisu, nepredavej jej dvakrat
+            if ( !isset($dokument_info->spisy) ) {
+                $result_insert = $this->insert($data);
                 $Log->logDokument($dokument_id, LogModel::DOK_PREDAN, $log);
-
-                // Prirazeni ostatnim dokumentum ve spisu
-                if ( count($dokument_info->spisy)>0 ) {
-                    $DokumentSpis = new DokumentSpis();
-                    $Spis = new Spis();
-                    foreach ( $dokument_info->spisy as $spis ) {
-
-                        // Vyradime ty zamestanance, kterym byly spisove dokumenty v minulosti predany
-                        $update = array('stav_osoby%sql'=>'stav_osoby+100');
-                        $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_osoby=0')));
-                    
-                        $seznam_dokumentu = $DokumentSpis->dokumenty($spis->id);
-                        if ( count($seznam_dokumentu)>0 ) {
-                            foreach ( $seznam_dokumentu as $dokument_other ) {
-                            
-                                $data_other = array();
-                                $data_other['dokument_id'] = $dokument_other->id;
-                                $data_other['spis_id'] = $spis->id;
-                                $data_other['stav_dokumentu'] = $dokument_other->stav_dokumentu;
-                                $data_other['aktivni'] = 1;
-                                $data_other['stav_osoby'] = 0;
-                                $data_other['prideleno_id'] = $data['prideleno_id'];
-                                $data_other['orgjednotka_id'] = $data['orgjednotka_id'];
-                                $data_other['date'] = new DateTime();
-                                $data_other['date_predani'] = new DateTime();
-                                $data_other['user_id'] = $data['user_id'];
-                                $data_other['poznamka'] = $data['poznamka'];
-                                $result_insert = $this->insert($data_other);
-                                //Debug::dump($data_other);
-                                $Log->logDokument($dokument_other->id, LogModel::DOK_PREDAN, $log);
-                            
-                            }
-                        }
-                        
-                        $Spis->predatOrg($spis->id, $data['orgjednotka_id']);
-                        $Log->logSpis($spis->id, LogModel::SPIS_PREDAN, $log_spis);
-                    }
-                }                
-
-                return true;
-            } else {
-                return false;
             }
 
-        } else {
-            return false;
-        }
+            // Prirazeni ostatnim dokumentum ve spisu
+            if ( isset($dokument_info->spisy) ) {
+                $DokumentSpis = new DokumentSpis();
+                $Spis = new Spis();
+                // Spis bude vzdy jen jeden
+                $spis = current($dokument_info->spisy);
 
+                // Vyradime ty zamestanance, kterym byly spisove dokumenty v minulosti predany
+                $update = array('stav_osoby%sql'=>'stav_osoby+100');
+                $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_osoby=0')));
+            
+                $seznam_dokumentu = $DokumentSpis->dokumenty($spis->id);
+                // Musi vratit minimalne jeden, predavany dokument
+                // count($seznam_dokumentu)>0 je nesmysl
+                foreach ( $seznam_dokumentu as $dokument_other ) {
+                   
+                    $data_other = array();
+                    $data_other['dokument_id'] = $dokument_other->id;
+                    $data_other['spis_id'] = $spis->id;
+                    $data_other['stav_dokumentu'] = 2;
+                    $data_other['aktivni'] = 1;
+                    $data_other['stav_osoby'] = 0;
+                    $data_other['prideleno_id'] = $data['prideleno_id'];
+                    $data_other['orgjednotka_id'] = $data['orgjednotka_id'];
+                    $data_other['date'] = new DateTime();
+                    $data_other['date_predani'] = new DateTime();
+                    $data_other['user_id'] = $data['user_id'];
+                    $data_other['poznamka'] = $data['poznamka'];
+                    $result_insert = $this->insert($data_other);
+                    //Debug::dump($data_other);
+                    $Log->logDokument($dokument_other->id, LogModel::DOK_PREDAN, $log);            
+                }
+                
+                $Spis->predatOrg($spis->id, $data['orgjednotka_id']);
+                $Log->logSpis($spis->id, LogModel::SPIS_PREDAN, $log_spis);
+            }                
+
+            dibi::commit();
+            return true;
+        }
+        catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
     }
 
     public function zrusit_prevzeti($dokument_id)
@@ -269,131 +258,120 @@ class Workflow extends BaseModel
 
     }
 
-
+    // P.L. Upravy viz komentare v metode priradit()    
     public function prevzit($dokument_id, $user_id, $orgjednotka_id = null)
     {
-        if ( is_numeric($dokument_id) ) {
+        if ( !is_numeric($dokument_id) )
+            return false;
 
-            $predan_array = $this->dokument($dokument_id, 0);
-            $predan = is_array($predan_array)?$predan_array[0]:null;
+        $predan_array = $this->dokument($dokument_id, 0);
+        $predan = is_array($predan_array)?$predan_array[0]:null;
 
-            if ( $predan ) {
+        if ( !$predan )
+            return false;
 
-                // test predaneho
-                // pokud neni predana osoba, tak test na vedouciho org.jednotky
-                $access = 0; $log = ""; $log_plus = ".";
-                if ( empty($predan->prideleno_id) ) {
-                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
-                        $access = 1;
-                        $log_plus = " určený organizační jednotce ". @$predan->orgjednotka_info->zkraceny_nazev. ".";
-                    }
-                } else {
-                    if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
-                        $access = 1;
-                    }
-                }
+        // test predaneho
+        // pokud neni predana osoba, tak test na vedouciho org.jednotky
+        $access = 0; $log = ""; $log_plus = ".";
+        if ( empty($predan->prideleno_id) ) {
+            if ( Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
+                $access = 1;
+                $log_plus = " určený organizační jednotce ". @$predan->orgjednotka_info->zkraceny_nazev. ".";
+            }
+        } else {
+            if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
+                $access = 1;
+            }
+        }
 
-                if ( $access == 1 ) {
+        if ( $access != 1 )
+            return false;
 
-                    //$transaction = (! dibi::inTransaction());
-                    //if ($transaction)
-                    //dibi::begin();
+        $UserModel = new UserModel();
+        $user = Environment::getUser()->getIdentity();
+        $user_info = $UserModel->getUser($user->id, 1);
 
-                    // Prirazene zamestanance predame uz nejsou prirazeni
+        $log = "";
+        
+        $data = array();
+        $data['stav_osoby'] = 1;
+        $data['date'] = new DateTime();
+        $data['user_id'] = $user->id;
+        $data['aktivni'] = 1;
+
+        $Dokument = new Dokument();
+        $Log = new LogModel();
+        $dokument_info = $Dokument->getInfo($dokument_id);
+
+        try {
+            dibi::begin();
+
+            if ( !isset($dokument_info->spisy) ) {
+                // Prirazene zamestanance predame uz nejsou prirazeni
+                $update = array('stav_osoby'=>2);
+                $this->update($update, array(array('dokument_id=%i',$dokument_id),
+                                             array('stav_osoby=1')
+                                            )
+                             );
+                // Deaktivujeme starsi zaznamy
+                $this->deaktivovat($dokument_id);
+
+                $where = array('id=%i',$predan->id);
+                $result_update = $this->update($data,$where);
+
+                $Log->logDokument($dokument_id, LogModel::DOK_PRIJAT, 
+                    'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument'.$log_plus);
+            }
+            
+            // Prevzeti i ostatnim dokumentum ve spisu
+            if ( isset($dokument_info->spisy) ) {
+                $DokumentSpis = new DokumentSpis();
+                $Spis = new Spis();
+                $spis = current($dokument_info->spisy);
+                    
+                $seznam_dokumentu = $DokumentSpis->dokumenty($spis->id);
+                
+                foreach ( $seznam_dokumentu as $dokument_other ) {
+
+                    // Neni-li dokument ve stavu predani, doslo nekde k vazne chybe
+                    // a nesmime provest nasledujici kod (prevzit dokument), jinak se poskodi data v tabulce workflow a dokument zmizi ze systemu
+                    if ( !isset($dokument_other->predano) )
+                        continue;
+                        
+                    // Prirazene zamestanance predame uz nejsou prirazeni - aplikace na ostatni dokumenty ve spisu
                     $update = array('stav_osoby'=>2);
-                    $this->update($update, array(array('dokument_id=%i',$dokument_id),
+                    $this->update($update, array(array('dokument_id=%i',$dokument_other->id),
                                                  array('stav_osoby=1')
                                                 )
-                                 );
+                    );  
+                    $this->deaktivovat($dokument_other->id);
                     
-                    // Deaktivujeme starsi zaznamy
-                    $this->deaktivovat($dokument_id);
+                    $data_other = array();
+                    $data_other['stav_osoby'] = 1;
+                    $data_other['spis_id'] = $spis->id;
+                    $data_other['date'] = new DateTime();
+                    $data_other['user_id'] = $user->id;
+                    $data_other['aktivni'] = 1;
 
-                    $UserModel = new UserModel();
-                    $user = Environment::getUser()->getIdentity();
-                    $user_info = $UserModel->getUser($user->id, 1);
+                    $where = array('id=%i',$dokument_other->predano->id);
+                    $result_update = $this->update($data_other,$where);                                        
 
-                    $log = "";
-                    
-                    $data = array();
-                    $data['stav_osoby'] = 1;
-                    $data['date'] = new DateTime();
-                    $data['user_id'] = $user->id;
-                    $data['aktivni'] = 1;
-
-                    //Debug::dump($data);
-                    
-                    $where = array('id=%i',$predan->id);
-                    $result_update = $this->update($data,$where);
-
-                    //if ($transaction)
-                    //dibi::commit();
-
-                    if ( $result_update ) {
-
-                        $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_PRIJAT, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument'.$log_plus);
-
-                        $Dokument = new Dokument();
-                        $dokument_info = $Dokument->getInfo($dokument_id);
-                        
-                        // Prevzeti i ostatnim dokumentum ve spisu
-                        if ( count($dokument_info->spisy)>0 ) {
-                            $DokumentSpis = new DokumentSpis();
-                            $Spis = new Spis();
-                            foreach ( $dokument_info->spisy as $spis ) {
-
-                                // Prirazene zamestanance predame uz nejsou prirazeni - aplikace na ostatni dokumenty ve spisu
-                                $update = array('stav_osoby'=>2);
-                                
-                                $seznam_dokumentu = $DokumentSpis->dokumenty($spis->id);
-                                if ( count($seznam_dokumentu)>0 ) {
-                                    foreach ( $seznam_dokumentu as $dokument_other ) {
-
-                                        if ( $dokument_other->id == $dokument_id ) continue;
-
-                                        $this->update($update, array(array('dokument_id=%i',$dokument_other->id),
-                                                                     array('stav_osoby=1')
-                                                                    )
-                                        );  
-                                        $this->deaktivovat($dokument_other->id);
-                                        
-                                        $data_other = array();
-                                        $data_other['stav_osoby'] = 1;
-                                        $data_other['spis_id'] = $spis->id;
-                                        $data_other['date'] = new DateTime();
-                                        $data_other['user_id'] = $user->id;
-                                        $data_other['aktivni'] = 1;
-
-                                        //Debug::dump($data_other);
-                                        //Debug::dump($dokument_other);
-                                        $where = array('id=%i',$dokument_other->predano->id);
-                                        //Debug::dump($where);
-                                        $result_update = $this->update($data_other,$where);                                        
-
-                                        $Log->logDokument($dokument_other->id, LogModel::DOK_PRIJAT, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument'.$log_plus);
-                            
-                                    }
-                                }
-                                
-                                $Spis->zmenitOrg($spis->id, $predan->orgjednotka_id);
-                                $Log->logSpis($spis->id, LogModel::SPIS_PRIJAT, 'Zamestnanec '. Osoba::displayName($user_info->identity) .' prijal spis'.$log_plus);
-                            }
-                        }                
-                        
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
+                    $Log->logDokument($dokument_other->id, LogModel::DOK_PRIJAT, 
+                        'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument'.$log_plus);
+        
                 }
-            } else {
-                return false;
+                    
+                $Spis->zmenitOrg($spis->id, $predan->orgjednotka_id);
+                $Log->logSpis($spis->id, LogModel::SPIS_PRIJAT, 
+                    'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal spis'.$log_plus);
             }
-
-        } else {
-            return false;
+            
+            dibi::commit();
+            return true;
+        }
+        catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
         }
     }
 

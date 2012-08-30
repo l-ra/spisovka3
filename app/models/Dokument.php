@@ -1983,7 +1983,8 @@ class Dokument extends BaseModel
 
             $dokument = $tmp[ $dokument_id ]['raw'];
             $dokument->typ_dokumentu = $tmp[ $dokument_id ]['typ_dokumentu'];
-            $dokument->spisy = @$tmp[ $dokument_id ]['spisy'];
+            if ( isset($tmp[ $dokument_id ]['spisy']) )
+                $dokument->spisy = $tmp[ $dokument_id ]['spisy'];
             $dokument->workflow = $tmp[ $dokument_id ]['workflow'];
 
             if ( count($dokument->spisy)>0 ) {
