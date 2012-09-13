@@ -902,12 +902,10 @@ CREATE TABLE IF NOT EXISTS `{tbls3}zpusob_vyrizeni` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}zpusob_vyrizeni` (`id`, `nazev`, `stav`, `fixed`, `note`) VALUES
-(1, 'vyřízení prvopisem', 1, 0, NULL),
-(2, 'postoupení', 1, 0, NULL),
-(3, 'vzetí na vědomí', 1, 0, NULL),
-(4, 'úřední záznam', 1, 0, NULL),
-(5, 'storno', 1, 0, NULL),
-(6, 'jiný způsob', 1, 0, 'fdsfdsfds');
+(1, 'vyřízení dokumentem', 1, 1, NULL),
+(2, 'postoupení', 1, 1, NULL),
+(3, 'vzetí na vědomí', 1, 1, NULL),
+(4, 'jiný způsob', 1, 1, 'U tohoto způsobu je nutné vždy vyplnit poznámku k vyřízení.');
 
 CREATE TABLE `{tbls3}stat` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
