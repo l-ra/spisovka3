@@ -1,7 +1,29 @@
 ================================================================================
  Historie uprav OSS Spisove sluzby v3
 ================================================================================
-=== Ver. 3.3.0 =================================================================
+
+Nové funkce:
+
+- sestavy - přidán sloupec předáno pro vložení podpisu
+
+Jiné změny:
+
+- změna předdefinovaných způsobů vyřízení dle novely Národního standardu
+
+Opravy:
+
+- opraveny některé překlepy a pravopisné chyby
+- nefungovala submit tlačítka na všech formulářích nazvaných frm-novyForm (např. při vytváření dokumentu)
+- oprava odkazů na stránce přihlášení pomocí SSO
+- opraveny exceptions při evidování emailu do spisovky
+- při problému s přihlášením do datové schránky by se měla nyní zobrazit zpráva včetně ISDS kódu chyby
+- opraven problém se spisovými znaky po aktualizaci ze starší verze programu
+- po migraci ze spisovky verze 2 se nešlo do programu přihlásit
+- při kontrole schránky v e-podatelně doplněna zpráva, pokud žádná schránka není nastavena
+- oprava pádu aplikace, jež není nainstalována, zadá-li se nesprávně URL aplikace
+- při editaci dědění rolí, se změna nadřazené role nesprávně zobrazila v hierarchii
+
+=== Ver. 3.3.0 RC1 =============================================================
 Released: 22.06.2012
 
 Vseobecne zmeny:
