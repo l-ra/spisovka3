@@ -234,7 +234,8 @@ class TreeModel extends BaseModel
                 $info_nazev_sekvence = $info->{$this->nazev_sekvence};
             }
 
-            if ( isset($data['parent_id_old']) || is_null($data['parent_id_old']) ) {
+            $parent_id_old = null;
+            if ( isset($data['parent_id_old']) ) {
                 $parent_id_old = $data['parent_id_old'];
                 unset($data['parent_id_old']);
             }
