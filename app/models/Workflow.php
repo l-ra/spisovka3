@@ -594,7 +594,7 @@ class Workflow extends BaseModel
 
         //echo "<pre>"; print_r($dokument_info); echo "</pre>"; exit;
 
-        if ( $samostatny == 1 && count($dokument_info->spisy)>0 ) {
+        if ( $samostatny == 1 && isset($dokument_info->spisy) ) {
             return 'Dokument '.$dokument_info->jid.' nelze přenést do spisovny! Dokument je součásti spisu.';
         }
         
@@ -647,7 +647,7 @@ class Workflow extends BaseModel
         $Dokument = new Dokument();
         $dokument_info = $Dokument->getInfo($dokument_id);
 
-        if ( $samostatny == 1 && count($dokument_info->spisy)>0 ) {
+        if ( $samostatny == 1 && isset($dokument_info->spisy) ) {
             return 'Dokument '.$dokument_info->jid.' nelze příjmout do spisovny! Dokument je součásti spisu.';
         }        
         

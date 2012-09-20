@@ -1987,7 +1987,7 @@ class Dokument extends BaseModel
                 $dokument->spisy = $tmp[ $dokument_id ]['spisy'];
             $dokument->workflow = $tmp[ $dokument_id ]['workflow'];
 
-            if ( count($dokument->spisy)>0 ) {
+            if ( isset($dokument->spisy) ) {
                 $spis = current($dokument->spisy);
                 $DokumentSpis = new DokumentSpis();
                 $dokument->skartacni_rezim = $DokumentSpis->skartacniRezim($spis->id);            

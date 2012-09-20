@@ -11,7 +11,7 @@
             {foreach $sloupce as $sl}
             <td>
             {if $sl=='spis'}
-                {if count($dok->spisy)>0}
+                {if isset($dok->spisy)}
                 {foreach $dok->spisy as $spis}
             {$spis->nazev}
                 {/foreach}

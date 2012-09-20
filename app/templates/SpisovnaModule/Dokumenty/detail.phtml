@@ -120,7 +120,7 @@
         <dl class="detail_item">
             <dt>Název spisu:</dt>
             <dd>
-            {if count($Dok->spisy)>0 }
+            {if isset($Dok->spisy) }
                 {foreach $Dok->spisy as $s}
                 {$s->nazev}<br />
                 {/foreach}

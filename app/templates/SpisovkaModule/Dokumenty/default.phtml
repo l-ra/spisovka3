@@ -76,7 +76,7 @@
                    {/if}
                 </a></strong>
                 <div class="small">&nbsp;{$dok->jid}</div>
-                {if count($dok->spisy)>0}
+                {if isset($dok->spisy)}
                 {foreach $dok->spisy as $spis}
                 <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
                 {/foreach}

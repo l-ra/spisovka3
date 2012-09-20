@@ -50,7 +50,7 @@
                    {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
                 </strong>
                 <div class="small">{$dok->jid}</div>
-                {if count($dok->spisy)>0}
+                {if isset($dok->spisy)}
                 {foreach $dok->spisy as $spis}
                 {$spis->nazev}<br />
                 {/foreach}

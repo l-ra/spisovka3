@@ -1739,7 +1739,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
         
-        $nazev = (@$Dok->nazev=="(bez názvu)")?"":$Dok->nazev;
+        $nazev = (@$Dok->nazev=="(bez názvu)")?"":@$Dok->nazev;
 
         $nazev_control = $form->addText('nazev', 'Věc:', 80, 100)
                     ->setValue($nazev);
