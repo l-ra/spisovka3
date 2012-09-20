@@ -526,7 +526,9 @@ class Spisovka_SpisyPresenter extends BasePresenter
             }
         } else {
             $Spis = new Spis;
-            if ( $Spis->zmenitOrg($spis_id, $orgjednotka_id) ) {
+            if ( !isset($orgjednotka_id) )
+                $this->flashMessage('Nemůžete převzít spis, protože nejste zařazen do organizační jednotky.','warning');
+            else if ( $Spis->zmenitOrg($spis_id, $orgjednotka_id) ) {
                 $this->flashMessage('Úspěšně jste si převzal tento spis.');
             } else {
                 $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
