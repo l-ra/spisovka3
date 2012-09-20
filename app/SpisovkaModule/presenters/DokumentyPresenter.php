@@ -2176,203 +2176,195 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         //echo "\n\nAdresati:\n\n";
 
-        if ( isset($post_data['subjekt'])) {
-            if ( count($post_data['subjekt'])>0 ) {
-                foreach ($post_data['subjekt'] as $subjekt_id => $metoda_odeslani) {
-                    $adresat = $Subjekt->getInfo($subjekt_id);
-                    //echo Subjekt::displayName($adresat) ."\n";
-                    //Debug::dump($adresat);
+        if ( isset($post_data['subjekt']) && count($post_data['subjekt'])>0 ) {
+            foreach ($post_data['subjekt'] as $subjekt_id => $metoda_odeslani) {
+                $adresat = $Subjekt->getInfo($subjekt_id);
+                //echo Subjekt::displayName($adresat) ."\n";
+                //Debug::dump($adresat);
 
-                    $datum_odeslani = new DateTime();
-                    $epodatelna_id = null;
-                    $zprava_odes = '';                    
-                    $cena = null;
-                    $hmotnost = null;
-                    $druh_zasilky = null;
-                    $cislo_faxu = '';
-                    $stav = 0;
+                $datum_odeslani = new DateTime();
+                $epodatelna_id = null;
+                $zprava_odes = '';                    
+                $cena = null;
+                $hmotnost = null;
+                $druh_zasilky = null;
+                $cislo_faxu = '';
+                $stav = 0;
 
-                    if ( $metoda_odeslani == 0 ) {
-                        // neodesilat - nebudeme delat nic
-                        //echo "  => neodesilat";
+                if ( $metoda_odeslani == 0 ) {
+                    // neodesilat - nebudeme delat nic
+                    //echo "  => neodesilat";
+                    continue;
+                } elseif ( $metoda_odeslani == 1 ) {
+                    // emailem
+                    //echo "  => emailem";
+                    if ( !empty($adresat->email) ) {
+                        
+                        $data = array(
+                            'email_from' => $post_data['email_from'][$subjekt_id],
+                            'email_predmet' => $post_data['email_predmet'][$subjekt_id],
+                            'email_text' => $post_data['email_text'][$subjekt_id],
+                        );
+                        
+                        if ( $zprava = $this->odeslatEmailem($adresat, $data, $prilohy) ) {
+                            $Log = new LogModel();
+                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
+                            $this->flashMessage('Zpráva na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" byla úspěšně odeslána.');
+                            $stav = 2;
+                        } else {
+                            $Log = new LogModel();
+                            $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
+                            $this->flashMessage('Zprávu na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" se nepodařilo odeslat!','warning');
+                            $stav = 0;
+                            continue;
+                        }
+                        
+                        if ( isset($zprava['epodatelna_id']) ) {
+                            $epodatelna_id = $zprava['epodatelna_id'];
+                        }
+                        if ( isset($zprava['zprava']) ) {
+                            $zprava_odes = $zprava['zprava'];
+                        }                            
+                    } else {
+                        $this->flashMessage('Subjekt "'. Subjekt::displayName($adresat,'email') .'" nemá emailovou adresu. Zprávu tomuto adresátovi nelze poslat přes email!','warning');
                         continue;
-                    } elseif ( $metoda_odeslani == 1 ) {
-                        // emailem
-                        //echo "  => emailem";
-                        if ( !empty($adresat->email) ) {
-                            
-                            $data = array(
-                                'email_from' => $post_data['email_from'][$subjekt_id],
-                                'email_predmet' => $post_data['email_predmet'][$subjekt_id],
-                                'email_text' => $post_data['email_text'][$subjekt_id],
-                            );
-                            
-                            if ( $zprava = $this->odeslatEmailem($adresat, $data, $prilohy) ) {
-                                $Log = new LogModel();
-                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
-                                $this->flashMessage('Zpráva na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" byla úspěšně odeslána.');
-                                $stav = 2;
-                            } else {
-                                $Log = new LogModel();
-                                $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
-                                $this->flashMessage('Zprávu na emailovou adresu "'. Subjekt::displayName($adresat,'email') .'" se nepodařilo odeslat!','warning');
-                                $stav = 0;
+                    }
+                } elseif ( $metoda_odeslani == 2 ) {
+                    // isds
+                    //echo "  => isds";
+                    if ( !empty($adresat->id_isds) ) {
+                        
+                        $data = array(
+                            'isds_predmet' => $post_data['isds_predmet'][$subjekt_id],
+                            'isds_cjednaci_odes' => $post_data['isds_cjednaci_odes'][$subjekt_id],
+                            'isds_spis_odes' => $post_data['isds_spis_odes'][$subjekt_id],
+                            'isds_cjednaci_adres' => $post_data['isds_cjednaci_adres'][$subjekt_id],
+                            'isds_spis_adres' => $post_data['isds_spis_adres'][$subjekt_id],
+                            'isds_dvr' => isset($post_data['isds_dvr'][$subjekt_id])?true:false,
+                            'isds_fikce' => isset($post_data['isds_fikce'][$subjekt_id])?true:false,
+                        );
+                        
+                        if ( $zprava = $this->odeslatISDS($adresat, $data, $prilohy) ) {
+                            $Log = new LogModel();
+                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
+                            $this->flashMessage('Datová zpráva pro "'. Subjekt::displayName($adresat,'isds') .'" byla úspěšně odeslána do systému ISDS.');
+                            $stav = 2;
+                            if ( !is_array($zprava) ) {
+                                $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo uložit do e-podatelny.', 'warning');
                                 continue;
                             }
-                            
-                            if ( isset($zprava['epodatelna_id']) ) {
-                                $epodatelna_id = $zprava['epodatelna_id'];
-                            }
-                            if ( isset($zprava['zprava']) ) {
-                                $zprava_odes = $zprava['zprava'];
-                            }                            
                         } else {
-                            $this->flashMessage('Subjekt "'. Subjekt::displayName($adresat,'email') .'" nemá emailovou adresu. Zprávu tomuto adresátovi nelze poslat přes email!','warning');
+                            $Log = new LogModel();
+                            $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
+                            $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo odeslat do systému ISDS!','warning');
+                            $stav = 0;
                             continue;
                         }
-                    } elseif ( $metoda_odeslani == 2 ) {
-                        // isds
-                        //echo "  => isds";
-                        if ( !empty($adresat->id_isds) ) {
-                            
-                            $data = array(
-                                'isds_predmet' => $post_data['isds_predmet'][$subjekt_id],
-                                'isds_cjednaci_odes' => $post_data['isds_cjednaci_odes'][$subjekt_id],
-                                'isds_spis_odes' => $post_data['isds_spis_odes'][$subjekt_id],
-                                'isds_cjednaci_adres' => $post_data['isds_cjednaci_adres'][$subjekt_id],
-                                'isds_spis_adres' => $post_data['isds_spis_adres'][$subjekt_id],
-                                'isds_dvr' => isset($post_data['isds_dvr'][$subjekt_id])?true:false,
-                                'isds_fikce' => isset($post_data['isds_fikce'][$subjekt_id])?true:false,
-                            );
-                            
-                            if ( $zprava = $this->odeslatISDS($adresat, $data, $prilohy) ) {
-                                $Log = new LogModel();
-                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
-                                $this->flashMessage('Datová zpráva pro "'. Subjekt::displayName($adresat,'isds') .'" byla úspěšně odeslána do systému ISDS.');
-                                $stav = 2;
-                                if ( !is_array($zprava) ) {
-                                    $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo uložit do e-podatelny.', 'warning');
-                                    continue;
-                                }
-                            } else {
-                                $Log = new LogModel();
-                                $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
-                                $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo odeslat do systému ISDS!','warning');
-                                $stav = 0;
-                                continue;
-                            }
-                            
-                            if ( isset($zprava['epodatelna_id']) ) {
-                                $epodatelna_id = $zprava['epodatelna_id'];
-                            }
-                            if ( isset($zprava['zprava']) ) {
-                                $zprava_odes = $zprava['zprava'];
-                            }                            
-                            
-                        } else {
-                            $this->flashMessage('Subjekt "'. Subjekt::displayName($adresat,'jmeno') .'" nemá ID datové schránky. Zprávu tomuto adresátovi nelze poslat přes datovou schránku!','warning');
-                            continue;
+                        
+                        if ( isset($zprava['epodatelna_id']) ) {
+                            $epodatelna_id = $zprava['epodatelna_id'];
                         }
-
-                    } else if ( $metoda_odeslani == 3 ) {
-                        // postou
-                        if ( isset($post_data['datum_odeslani_postou'][$subjekt_id]) ) {
-                            $datum_odeslani = new DateTime( $post_data['datum_odeslani_postou'][$subjekt_id] );
-                        }
-                        
-                        $druh_zasilky_form = $post_data['druh_zasilky'][$subjekt_id];
-                        if ( count($druh_zasilky_form)>0 ) {
-                            $druh_zasilky_a = array();
-                            foreach( $druh_zasilky_form as $druh_id=>$druh_status ) {
-                                $druh_zasilky_a[] = $druh_id;
-                            }
-                            $druh_zasilky = serialize($druh_zasilky_a);
-                        }
-                        
-                        $cena = floatval($post_data['cena_zasilky'][$subjekt_id]);
-                        $hmotnost = floatval($post_data['hmotnost_zasilky'][$subjekt_id]);
-                        $stav = 1;
-                        
-                        $this->flashMessage('Dokument předán na podatelnu k odeslání poštou na adresu "'. Subjekt::displayName($adresat) .'".');
-                        
-                        $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_PREDODESLAN,'Dokument předán na podatelnu k odeslání poštou na adresu "'. Subjekt::displayName($adresat) .'".');
-                        
-                    } else if ( $metoda_odeslani == 4 ) {
-                        // faxem
-                        if ( isset($post_data['datum_odeslani_faxu'][$subjekt_id]) ) {
-                            $datum_odeslani = new DateTime( $post_data['datum_odeslani_faxu'][$subjekt_id] );
-                        }
-                        
-                        $cislo_faxu = $post_data['cislo_faxu'][$subjekt_id];
-                        $zprava_odes = $post_data['zprava_faxu'][$subjekt_id];
-                        $stav = 1;
-                        
-                        $this->flashMessage('Dokument předán na podatelnu k odeslání faxem na číslo "'. $cislo_faxu .'".');
-                        
-                        $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_PREDODESLAN,'Dokument předán na podatelnu k odeslání faxem na číslo "'. $cislo_faxu .'".');
+                        if ( isset($zprava['zprava']) ) {
+                            $zprava_odes = $zprava['zprava'];
+                        }                            
                         
                     } else {
-                        // jinak - externe (osobne, ...)
-                        //echo "  => jinak";
-
-                        if ( isset($post_data['datum_odeslani'][$subjekt_id]) ) {
-                            $datum_odeslani = new DateTime( $post_data['datum_odeslani'][$subjekt_id] );
-                        }
-
-                        switch ($metoda_odeslani) {
-                            case 1:
-                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
-                                break;
-                            case 2:
-                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
-                                break;
-                            case 3:
-                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán poštou na adresu "'. Subjekt::displayName($adresat) .'".');
-                                break;
-                            case 4:
-                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán faxem na číslo "'. Subjekt::displayName($adresat,'telefon') .'".');
-                                break;
-                            case 5:
-                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán osobně "'. Subjekt::displayName($adresat,'jmeno') .'".');
-                                break;
-                            case 6:
-                                $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán telefonicky na číslo "'. Subjekt::displayName($adresat,'telefon') .'".');
-                                break;
-                            default: break;
-                        }
-
+                        $this->flashMessage('Subjekt "'. Subjekt::displayName($adresat,'jmeno') .'" nemá ID datové schránky. Zprávu tomuto adresátovi nelze poslat přes datovou schránku!','warning');
+                        continue;
                     }
 
-
-                    // Zaznam do DB (dokument_odeslani)
-                    $DokumentOdeslani = new DokumentOdeslani();
-                    $row = array(
-                        'dokument_id' => $dokument_id,
-                        'subjekt_id' => $adresat->id,
-                        'zpusob_odeslani_id' => (int) $metoda_odeslani,
-                        'epodatelna_id' => $epodatelna_id,
-                        'datum_odeslani' => $datum_odeslani,
-                        'zprava' => $zprava_odes,
-                        'druh_zasilky' => $druh_zasilky,
-                        'cena' => $cena,
-                        'hmotnost' => $hmotnost,
-                        'cislo_faxu' => $cislo_faxu,
-                        'stav' => $stav
-                    );
-                    $DokumentOdeslani->ulozit($row);
+                } else if ( $metoda_odeslani == 3 ) {
+                    // postou
+                    if ( isset($post_data['datum_odeslani_postou'][$subjekt_id]) ) {
+                        $datum_odeslani = new DateTime( $post_data['datum_odeslani_postou'][$subjekt_id] );
+                    }
                     
+                    $druh_zasilky_form = $post_data['druh_zasilky'][$subjekt_id];
+                    if ( count($druh_zasilky_form)>0 ) {
+                        $druh_zasilky_a = array();
+                        foreach( $druh_zasilky_form as $druh_id=>$druh_status ) {
+                            $druh_zasilky_a[] = $druh_id;
+                        }
+                        $druh_zasilky = serialize($druh_zasilky_a);
+                    }
+                    
+                    $cena = floatval($post_data['cena_zasilky'][$subjekt_id]);
+                    $hmotnost = floatval($post_data['hmotnost_zasilky'][$subjekt_id]);
+                    $stav = 1;
+                    
+                    $this->flashMessage('Dokument předán na podatelnu k odeslání poštou na adresu "'. Subjekt::displayName($adresat) .'".');
+                    
+                    $Log = new LogModel();
+                    $Log->logDokument($dokument_id, LogModel::DOK_PREDODESLAN,'Dokument předán na podatelnu k odeslání poštou na adresu "'. Subjekt::displayName($adresat) .'".');
+                    
+                } else if ( $metoda_odeslani == 4 ) {
+                    // faxem
+                    if ( isset($post_data['datum_odeslani_faxu'][$subjekt_id]) ) {
+                        $datum_odeslani = new DateTime( $post_data['datum_odeslani_faxu'][$subjekt_id] );
+                    }
+                    
+                    $cislo_faxu = $post_data['cislo_faxu'][$subjekt_id];
+                    $zprava_odes = $post_data['zprava_faxu'][$subjekt_id];
+                    $stav = 1;
+                    
+                    $this->flashMessage('Dokument předán na podatelnu k odeslání faxem na číslo "'. $cislo_faxu .'".');
+                    
+                    $Log = new LogModel();
+                    $Log->logDokument($dokument_id, LogModel::DOK_PREDODESLAN,'Dokument předán na podatelnu k odeslání faxem na číslo "'. $cislo_faxu .'".');
+                    
+                } else {
+                    // jinak - externe (osobne, ...)
+                    //echo "  => jinak";
+
+                    if ( isset($post_data['datum_odeslani'][$subjekt_id]) ) {
+                        $datum_odeslani = new DateTime( $post_data['datum_odeslani'][$subjekt_id] );
+                    }
+
+                    switch ($metoda_odeslani) {
+                        case 1:
+                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
+                            break;
+                        case 2:
+                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
+                            break;
+                        case 3:
+                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán poštou na adresu "'. Subjekt::displayName($adresat) .'".');
+                            break;
+                        case 4:
+                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán faxem na číslo "'. Subjekt::displayName($adresat,'telefon') .'".');
+                            break;
+                        case 5:
+                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán osobně "'. Subjekt::displayName($adresat,'jmeno') .'".');
+                            break;
+                        case 6:
+                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán telefonicky na číslo "'. Subjekt::displayName($adresat,'telefon') .'".');
+                            break;
+                        default: break;
+                    }
                 }
 
-                $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-            } else {
-                // zadni adresati
+                // Zaznam do DB (dokument_odeslani)
+                $DokumentOdeslani = new DokumentOdeslani();
+                $row = array(
+                    'dokument_id' => $dokument_id,
+                    'subjekt_id' => $adresat->id,
+                    'zpusob_odeslani_id' => (int) $metoda_odeslani,
+                    'epodatelna_id' => $epodatelna_id,
+                    'datum_odeslani' => $datum_odeslani,
+                    'zprava' => $zprava_odes,
+                    'druh_zasilky' => $druh_zasilky,
+                    'cena' => $cena,
+                    'hmotnost' => $hmotnost,
+                    'cislo_faxu' => $cislo_faxu,
+                    'stav' => $stav
+                );
+                $DokumentOdeslani->ulozit($row);                
             }
         } else {
             // zadni adresati
         }
 
+        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
     }
 
 
