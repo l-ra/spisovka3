@@ -375,6 +375,10 @@ label.required {
 #dokumenty .vec {
 
 }
+/* Styl pouzit v seznamu dokumentu ve vypravne */
+#dokumenty .uzel {
+    width: 150px;
+}
 #dokumenty .prideleno {
     width: 150px;
 }

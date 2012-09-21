@@ -32,6 +32,7 @@
             <th class="typ">Způsob odeslání</th>
             <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Adresát</th>
+            <th class="uzel">Předal</th>
             <th class="prideleno">Druh zásilky/cena/hmotnost/zpráva</th>
         </tr>
         {foreach $seznam as $dok}
@@ -65,6 +66,9 @@
                 {=Subjekt::displayName($dok,'adresa')}
                 {/if}    
                 </div>
+            </td>
+            <td class="uzel">
+                {=Osoba::displayName($dok,'user')}
             </td>
             <td class="prideleno">
                 {if $dok->zpusob_odeslani_id == 3 }    

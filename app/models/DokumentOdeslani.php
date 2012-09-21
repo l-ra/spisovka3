@@ -114,6 +114,18 @@ class DokumentOdeslani extends BaseModel
                     'on' => array('dok.id=ds.dokument_id'),
                     'cols' => array('nazev'=>'dok_nazev','jid'=>'dok_jid','cislo_jednaci'=>'dok_cislo_jednaci','poradi'=>'dok_poradi')
                  ),                
+                'user' => array(
+                    'from' => array($this->tb_osoba_to_user => 'o2user'),
+                    'on' => array('o2user.user_id=ds.user_id'),
+                    'cols' => array()
+                ),
+                'user_osoba' => array(
+                    'from' => array($this->tb_osoba => 'user_osoba'),
+                    'on' => array('user_osoba.id=o2user.osoba_id'),
+                    'cols' => array(
+                                    'prijmeni'=>'user_prijmeni','jmeno'=>'user_jmeno','titul_pred'=>'user_titul_pred','titul_za'=>'user_titul_za'
+                                   )
+                ),
             ),
             'order_by' => array('ds.datum_odeslani','s.nazev_subjektu','s.prijmeni','s.jmeno')
         );
