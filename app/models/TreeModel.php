@@ -237,8 +237,8 @@ class TreeModel extends BaseModel
             $parent_id_old = null;
             if ( isset($data['parent_id_old']) ) {
                 $parent_id_old = $data['parent_id_old'];
-                unset($data['parent_id_old']);
             }
+            unset($data['parent_id_old']);
 
             if ( $data['parent_id'] == 0 ) $data['parent_id'] = null;
 
