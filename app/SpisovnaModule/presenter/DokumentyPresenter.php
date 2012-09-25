@@ -1006,20 +1006,20 @@ protected function createComponentVyrizovaniForm()
     {
 
         $select = array(
-            'cj'=>'čísla jednacího (sestupně)',
-            'cj_desc'=>'čísla jednacího (vzestupně)',
-            'jid'=>'JID (sestupně)',
-            'jid_desc'=>'JID (vzestupně)',
-            'dvzniku'=>'data přijetí/vzniku (sestupně)',
-            'dvzniku_desc'=>'data přijetí/vzniku (vzestupně)',
-            'vec'=>'věci (sestupně)',
-            'vec_desc'=>'věci (vzestupně)',
-            'prideleno'=>'přidělené osoby (sestupně)',
-            'prideleno_desc'=>'přidělené osoby (vzestupně)',
-            'skartacni_znak'=>'skartačního znaku (sestupně)',
-            'skartacni_znak_desc'=>'skartačního znaku (vzestupně)',
-            'spisovy_znak'=>'spisového znaku (sestupně)',
-            'spisovy_znak_desc'=>'spisového znaku (vzestupně)',
+            'cj'=>'čísla jednacího (vzestupně)',
+            'cj_desc'=>'čísla jednacího (sestupně)',
+            'jid'=>'JID (vzestupně)',
+            'jid_desc'=>'JID (sestupně)',
+            'dvzniku'=>'data přijetí/vzniku (vzestupně)',
+            'dvzniku_desc'=>'data přijetí/vzniku (sestupně)',
+            'vec'=>'věci (vzestupně)',
+            'vec_desc'=>'věci (sestupně)',
+            'prideleno'=>'přidělené osoby (vzestupně)',
+            'prideleno_desc'=>'přidělené osoby (sestupně)',
+            'skartacni_znak'=>'skartačního znaku (vzestupně)',
+            'skartacni_znak_desc'=>'skartačního znaku (sestupně)',
+            'spisovy_znak'=>'spisového znaku (vzestupně)',
+            'spisovy_znak_desc'=>'spisového znaku (sestupně)',
         );
 
         $seradit =  !is_null($this->seradit)?$this->seradit:null;

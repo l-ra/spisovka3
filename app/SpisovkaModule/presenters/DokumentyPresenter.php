@@ -2951,18 +2951,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
 
         $select = array(
-            'stav'=>'stavu dokumentu (sestupně)',
-            'stav_desc'=>'stavu dokumentu (vzestupně)',
-            'cj'=>'čísla jednacího (sestupně)',
-            'cj_desc'=>'čísla jednacího (vzestupně)',
-            'jid'=>'JID (sestupně)',
-            'jid_desc'=>'JID (vzestupně)',
-            'dvzniku'=>'data přijetí/vzniku (sestupně)',
-            'dvzniku_desc'=>'data přijetí/vzniku (vzestupně)',
-            'vec'=>'věci (sestupně)',
-            'vec_desc'=>'věci (vzestupně)',
-            'prideleno'=>'přidělené osoby (sestupně)',
-            'prideleno_desc'=>'přidělené osoby (vzestupně)',
+            'stav'=>'stavu dokumentu (vzestupně)',
+            'stav_desc'=>'stavu dokumentu (sestupně)',
+            'cj'=>'čísla jednacího (vzestupně)',
+            'cj_desc'=>'čísla jednacího (sestupně)',
+            'jid'=>'JID (vzestupně)',
+            'jid_desc'=>'JID (sestupně)',
+            'dvzniku'=>'data přijetí/vzniku (vzestupně)',
+            'dvzniku_desc'=>'data přijetí/vzniku (sestupně)',
+            'vec'=>'věci (vzestupně)',
+            'vec_desc'=>'věci (sestupně)',
+            'prideleno'=>'přidělené osoby (vzestupně)',
+            'prideleno_desc'=>'přidělené osoby (sestupně)',
         );
 
         $seradit =  !is_null($this->seradit)?$this->seradit:null;
