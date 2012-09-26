@@ -32,7 +32,7 @@ function my_assert_handler($file, $line, $code)
     ini_set('display_errors', 1);
     set_time_limit(0);
 
-    include WWW_DIR ."libs/dibi/dibi.php";
+    require WWW_DIR ."libs/dibi/dibi.php";
     
     define('UPDATE_DIR',WWW_DIR.'app/aktualizace/');    
     $alter = array();
@@ -186,7 +186,7 @@ function my_assert_handler($file, $line, $code)
                     $continue = 0;    
                     if (file_exists(UPDATE_DIR . $arev .'_check.php') ) {
                         // include, ne include_once !!
-                        include UPDATE_DIR . $arev .'_check.php';
+                        require UPDATE_DIR . $arev .'_check.php';
                     }                     
                     if ( $continue == 1 ) { $continue = 0; continue; }
                     $apply_rev++;
@@ -213,7 +213,7 @@ function my_assert_handler($file, $line, $code)
                         if ( isset($_GET['go']) ) {
                             echo "<div class='update_title'>Provedení PHP skriptu (před aktualizaci databáze)</div>";
                             echo "<pre>";
-                            include_once UPDATE_DIR . $arev .'_script_prev.php';
+                            require UPDATE_DIR . $arev .'_script_prev.php';
                             echo "</pre>";
                             
                         } else {
@@ -261,7 +261,7 @@ function my_assert_handler($file, $line, $code)
                         if ( isset($_GET['go']) ) {
                             echo "<div class='update_title'>Provedení PHP skriptu (po aktualizaci databáze)</div>";
                             echo "<pre>";
-                            include_once UPDATE_DIR . $arev .'_script_after.php';
+                            require UPDATE_DIR . $arev .'_script_after.php';
                             echo "</pre>";
                         } else {
                             echo "<div class='update_title'>Bude proveden PHP skript (po aktualizaci databáze)</div>";
