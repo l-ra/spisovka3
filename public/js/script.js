@@ -440,6 +440,9 @@ isdsSubjekt = function ( formName ) {
  */
 ajaxcron = function () {
 
+    if (!(Math.random() < 0.05))
+	return false;
+	
     baseUri = baseUri.replace('/public','');
     if ( is_simple == 1 ) {
         var url = baseUri + '?presenter=Spisovka%3Acron&id=0&action=ajax';
