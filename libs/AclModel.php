@@ -89,7 +89,7 @@ class AclModel extends BaseModel {
                     ru.privilege as privilege
                     FROM ['. $this->name . '] a
                     JOIN ['. $this->tb_role . '] ro ON (a.role_id = ro.id)
-                    LEFT JOIN ['. $this->tb_rule . '] ru ON (a.rule_id = ru.id)
+                    JOIN ['. $this->tb_rule . '] ru ON (a.rule_id = ru.id)
                     LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.id)
 
                     ORDER BY ro.fixed DESC, a.allowed DESC, ro.code, ru.privilege
