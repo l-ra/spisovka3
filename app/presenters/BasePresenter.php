@@ -193,8 +193,6 @@ abstract class BasePresenter extends Presenter
             $this->setLayout('db');
         } else if ( $this->name == "Spisovka:Uzivatel" && $this->view == "login" ) {
             $this->setLayout('login');
-        } else if ( ($this->name == "Error") && (!Environment::getUser()->isAuthenticated()) ) {
-            $this->setLayout('login');
         } else if ( $this->template->module == "Admin" ) {
             if ( $this->getParam("is_ajax") ) {
                 $this->setLayout(false);
@@ -245,7 +243,7 @@ abstract class BasePresenter extends Presenter
          * Uzivatel
          */
         $user = Environment::getUser();
-        if ( $user->isAuthenticated() ) {
+        if ( $this->name != 'Error' && $user->isAuthenticated() ) {
             $this->template->user = $user->getIdentity();
             $UserModel = new UserModel();
             $this->template->orgjednotka = $UserModel->getOrg($this->template->user);
