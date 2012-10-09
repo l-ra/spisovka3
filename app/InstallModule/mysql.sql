@@ -673,9 +673,7 @@ INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
 (59, 7, 21, 'Y'),
 (60, 7, 22, 'Y'),
 (61, 7, 23, 'Y'),
-(62, 3, 1, 'Y'),
-(63, 4,	38, 'Y'),
-(64, 4,	39, 'Y');
+(62, 3, 1, 'Y');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_resource` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

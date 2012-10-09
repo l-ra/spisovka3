@@ -22,6 +22,12 @@ class Acl extends Permission {
         $this->allow(Permission::ALL, 'ErrorPresenter');
         $this->allow(Permission::ALL, 'Spisovka_ErrorPresenter');
         
+        // P.L. tato nesmyslná oprávnění (zejména cron) neměla v programu vůbec být
+        // takto je musíme pro všechny uživatele povolit, protože to bude jednodušší než tvořit aktualizační skript, který je z databáze smaže
+        // Uživatel stále bude mít možnost oprávnění explicitně odepřít
+        $this->allow(Permission::ALL, 'Spisovka_ZpravyPresenter');
+        $this->allow(Permission::ALL, 'Spisovka_CronPresenter');
+
         foreach($model->getPermission() as $perm) {
             if ( !empty($perm->role) && !empty($perm->resource) && !empty($perm->privilege) ) {
                 // role + resource + privilege
