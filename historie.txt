@@ -13,6 +13,7 @@ Jiné změny:
 
 - změna předdefinovaných způsobů vyřízení dle novely Národního standardu
 - vypnuta kontrola nových verzí programu, protože v některých případech docházelo k potížím
+- dojde-li k aplikační výjimce, text výjimky se zobrazí uživateli pro urychlení diagnostiky problému
 
 Opravy:
 
