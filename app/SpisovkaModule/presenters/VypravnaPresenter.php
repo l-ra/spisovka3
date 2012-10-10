@@ -6,6 +6,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
     private $pdf_output = 0;
+    private $seradit = null;
 
     public function startup()
     {
@@ -39,17 +40,23 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $Dokument = new DokumentOdeslani();
         $seznam = array();
         
+        $seradit = $this->getParam('seradit');
+        if (empty($seradit))
+            $seradit = 'datum';
+        // Uloz hodnotu pro pouziti ve formulari razeni
+        $this->seradit = $seradit;
+        
         // Volba vystupu - web/tisk/pdf
         if ( $this->getParam('print') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani(1,"doporucene");
+            $seznam = $Dokument->kOdeslani($seradit, 1,"doporucene");
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
             $this->setView('podaciarchnew');
         } elseif ( $this->getParam('pdfprint') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani(1,"doporucene");
+            $seznam = $Dokument->kOdeslani($seradit, 1,"doporucene");
             $this->pdf_output = 1;
             $this->template->count_page = ceil(count($seznam)/10);
             
@@ -57,14 +64,14 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             $this->setView('podaciarchnew');
         } elseif ( $this->getParam('print_balik') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani(1,"balik");
+            $seznam = $Dokument->kOdeslani($seradit, 1,"balik");
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
             $this->setView('podaciarch');
         } elseif ( $this->getParam('pdfprint_balik') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani(1,"balik");
+            $seznam = $Dokument->kOdeslani($seradit, 1,"balik");
             $this->pdf_output = 2;
             
             $this->template->count_page = ceil(count($seznam)/10);
@@ -72,7 +79,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             $this->setLayout(false);
             $this->setView('podaciarch');            
         } else {
-            $seznam = $Dokument->kOdeslani();
+            $seznam = $Dokument->kOdeslani($seradit);
             //$seznam = $result->fetchAll();
         }
 
@@ -278,5 +285,41 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     }   
    
 
-}
+    protected function createComponentSeraditForm()
+    {
 
+        $select = array(
+            'datum'=>'data odeslání (vzestupně)',
+            'datum_desc'=>'data odeslání (sestupně)',
+            'cj'=>'čísla jednacího (vzestupně)',
+            'cj_desc'=>'čísla jednacího (sestupně)'
+        );
+
+        $form = new AppForm();
+        $form->addSelect('seradit', 'Seřadit podle:', $select)
+                ->setValue($this->seradit)
+                ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
+
+        $submit = $form->addSubmit('go_seradit', 'Seřadit')
+                    ->setRendered(TRUE);
+        $submit->getControlPrototype()->style(array('display' => 'none'));
+        $submit->onClick[] = array($this, 'seraditClicked');
+
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = null;
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
+
+        return $form;
+    }
+
+    public function seraditClicked(SubmitButton $button)
+    {
+        $form_data = $button->getForm()->getValues();
+        // $this->getHttpResponse()->setCookie('s3_seradit', $form_data['seradit'], strtotime('90 day'));
+        $this->redirect(':Spisovka:Vypravna:default', array('seradit'=>$form_data['seradit']) );
+    }
+}

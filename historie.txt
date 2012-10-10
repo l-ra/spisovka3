@@ -8,6 +8,7 @@ Nové funkce:
 
 - sestavy - přidán sloupec předáno pro ruční dopsání podpisu
 - výpravna - do seznamu dokumentů přidán sloupec s uživatelem, který dokument předal výpravně
+- výpravna - přidána možnost seřadit dokumenty podle datumu odeslání nebo čísla jednacího
 
 Jiné změny:
 
@@ -17,7 +18,6 @@ Jiné změny:
 
 Opravy:
 
-- opraveny některé překlepy a pravopisné chyby
 - řazení v seznamu dokumentů - vzestupně řadilo dokumenty sestupně a naopak
 - nefungovala submit tlačítka na všech formulářích nazvaných frm-novyForm (např. při vytváření dokumentu)
 - opraveny exceptions při evidování emailu do spisovky

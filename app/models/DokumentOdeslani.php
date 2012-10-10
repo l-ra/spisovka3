@@ -92,8 +92,23 @@ class DokumentOdeslani extends BaseModel
     }
     
     
-    public function kOdeslani($pouze_posta = null, $druh = null) {
+    public function kOdeslani($volba_razeni, $pouze_posta = null, $druh = null) {
 
+        switch ($volba_razeni) {
+            case 'datum_desc':
+                $razeni = array('ds.datum_odeslani' => 'DESC','s.nazev_subjektu','s.prijmeni','s.jmeno');
+                break;
+            case 'cj':
+                $razeni = array('dok_cislo_jednaci');
+                break;
+            case 'cj_desc':
+                $razeni = array('dok_cislo_jednaci' => 'DESC');
+                break;
+            default:
+                $razeni = array('ds.datum_odeslani','s.nazev_subjektu','s.prijmeni','s.jmeno');
+        }
+            
+            
         $sql = array(
             'distinct'=>true,
             'from' => array($this->name => 'ds'),
@@ -127,7 +142,7 @@ class DokumentOdeslani extends BaseModel
                                    )
                 ),
             ),
-            'order_by' => array('ds.datum_odeslani','s.nazev_subjektu','s.prijmeni','s.jmeno')
+            'order' => $razeni
         );
 
 
@@ -177,7 +192,7 @@ class DokumentOdeslani extends BaseModel
                 }
                 
             }
-            sort($dokumenty); // eliminuje nesourode indexy
+            ksort($dokumenty); // eliminuje nesourode indexy
             return $dokumenty;
         } else {
             return null;
