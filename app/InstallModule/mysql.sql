@@ -747,8 +747,8 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_role` (
 
 INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `fixed_id`, `orgjednotka_id`, `code`, `name`, `note`, `fixed`, `order`, `active`, `date_created`, `date_modified`, `sekvence`, `sekvence_string`, `uroven`) VALUES
 (1, NULL, NULL, NULL, 'admin', 'administrátor', 'Pracovník, který má na starost správu spisové služby', 2, 100, 1, NOW(), NOW(), '1', 'admin.1', NULL),
-(2, NULL, NULL, NULL, 'guest', 'host', 'Role představující nepřihlášeného uživatele.\r\nTedy nastavení oprávnění v době, kdy k aplikaci není nikdo přihlášen.', 2, 0, 1, NOW(), NOW(), '2', 'guest.2', NULL),
-(3, 1, NULL, NULL, 'superadmin', 'SuperAdmin', 'Administrátor se super právy.\r\nMůže manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', 2, 100, 1, NOW(), NOW(), '3', 'superadmin.3', NULL),
+(2, NULL, NULL, NULL, 'guest', 'host', 'Role představující nepřihlášeného uživatele.\nTedy nastavení oprávnění v době, kdy k aplikaci není nikdo přihlášen.', 2, 0, 1, NOW(), NOW(), '2', 'guest.2', NULL),
+(3, 1, NULL, NULL, 'superadmin', 'SuperAdmin', 'Administrátor se super právy.\nMůže manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', 2, 100, 1, NOW(), NOW(), '3', 'superadmin.3', NULL),
 (4, NULL, NULL, NULL, 'referent', 'pracovník', '(referent) Základní role pracovníka spisové služby', 1, 10, 1, NOW(), NOW(), '4', 'referent.4', NULL),
 (5, 4, NULL, NULL, 'vedouci', 'sekretariát', '(vedoucí) Rozšířená role pracovníka spisové služby. Může nahlížet na podřízené uzly', 1, 50, 1, NOW(), NOW(), '5', 'vedouci.5', NULL),
 (6, NULL, NULL, NULL, 'podatelna', 'pracovník podatelny', 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', 1, 20, 1, NOW(), NOW(), '6', 'podatelna.6', NULL),

@@ -18,7 +18,7 @@
         {foreach $seznam as $role}
         <tr class="item{=str_replace("."," item",$role->sekvence)}" id="sitem{$role->id}">
             <td>{!=str_repeat("&nbsp;", 5*$role->uroven)}<a href="{vlink :Admin:Opravneni:detail, 'id'=>$role->id}">{$role->name}</a></td>
-            <td>{!$role->note|enl2br}</td>
+            <td>{!$role->note|replace:'\n','<br />'}</td>
         </tr>
         {/foreach}
     </table>
