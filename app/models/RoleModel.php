@@ -22,7 +22,7 @@ class RoleModel extends TreeModel
 
     }
 
-
+    /* simple = 1  je použito pro seznam rolí pro combo box formuláře nová role / upravit roli */
 
     public function seznam($simple=0,$sql=null) {
 
@@ -53,6 +53,9 @@ class RoleModel extends TreeModel
             $tmp = array();
             //$tmp[0] = '(nedědí)';
             foreach ($rows as $r) {
+                if (!empty($r->orgjednotka_id))
+                    // P.L. Z automaticky vytvořených rolí organizačních jednotek nelze dědit
+                    continue;
                 $tmp[ $r->id ] = $r->name;
             }
             return $tmp;
@@ -63,6 +66,30 @@ class RoleModel extends TreeModel
         }
     }
 
+    public function seznam_pro_zmenu_dedeni($id)
+    {
+        $query = dibi::query(
+            'SELECT r.*,pr.name parent_name FROM %n r', $this->name,
+            'LEFT JOIN '. $this->name .' pr ON pr.id=r.parent_id',
+            '%ex', (isset($where) ? array('WHERE %and', $where) : NULL),
+            'ORDER BY r.fixed DESC, r.order DESC, r.name'
+        );
+
+        $rows = $query->fetchAll();
+        $tmp = array();
+        foreach ($rows as $r) {
+            if (!empty($r->orgjednotka_id))
+                // P.L. Z automaticky vytvořených rolí organizačních jednotek nelze dědit
+                continue;
+            if (strstr($r->sekvence_string, '.' . $id . '#'))
+                // nutno zabránit vytvoření cyklického grafu
+                continue;
+
+            $tmp[ $r->id ] = $r->name;
+        }
+        return $tmp;        
+    }
+    
     public function getInfo($role_id) {
 
         $query = dibi::query(

@@ -30,6 +30,7 @@ Opravy:
 - při editaci dědění rolí, se změna nadřazené role nesprávně zobrazila v hierarchii
 - opraveny chyby při předávání/přijímání dokumentů, které jsou ve spisu (předávání spisu)
 - odesílání dokumentu - přidána kontrola pro případ, že dokument nemá žádného adresáta
+- přidána kontrola při nastavování dědění rolí
 
 === Ver. 3.3.0 RC1 =============================================================
 Released: 22.06.2012

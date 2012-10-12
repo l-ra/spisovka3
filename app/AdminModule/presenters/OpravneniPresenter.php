@@ -74,7 +74,11 @@ class Admin_OpravneniPresenter extends BasePresenter
         $role = $this->template->Role;
         $RoleModel = new RoleModel();
 
-        $role_select = $RoleModel->seznam(1);
+        // hack - udaje ze sablony jsou dostupne jen pri vykresleni formulare, ne kdyz se zpracovava odeslany formular
+        // pri zpracovani submitu musime pouzit nadmnozinu roli, co byla pouzita pro vykresleni
+        $role_select = isset($role->id) ? 
+            $RoleModel->seznam_pro_zmenu_dedeni($role->id) : $RoleModel->seznam(1);
+            
         if ( isset($role->id) ) {
             unset($role_select[$role->id]);
         }
@@ -148,14 +152,16 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         $RoleModel = new RoleModel();
         $role_select = $RoleModel->seznam(1);
-        
+        $role_select[0] = "(nedědí)";
+
         $form1 = new AppForm();
         $form1->addText('name', 'Název role:', 50, 100)
                 ->addRule(Form::FILLED, 'Název role musí být vyplněno!');
         $form1->addText('code', 'Kódové označení role:', 50, 150)
                 ->addRule(Form::FILLED, 'Kódové označení role musí být vyplněno!');
         $form1->addTextArea('note', 'Popis role:', 50, 5);
-        $form1->addSelect('parent_id', 'Dědí z role:', $role_select);
+        $form1->addSelect('parent_id', 'Dědí z role:', $role_select)
+            ->setValue(0);
         $form1->addSubmit('novy', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
         $form1->addSubmit('storno', 'Zrušit')
