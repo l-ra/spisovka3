@@ -275,61 +275,7 @@ class Admin_SpisyPresenter extends BasePresenter
         $this->template->spisForm = $this['upravitSpisovyPlanForm'];
     }
 
-    public function actionOdebrat1()
-    {
-
-        $spis_id = $this->getParam('id',null);
-        $Spis = new Spis();
-        if ( is_numeric($spis_id) ) {
-            try {
-                $res = $Spis->odstranit($spis_id, 1);
-                if ( $res == 0 ) {
-                    $this->flashMessage('Spis byl úspěšně odstraněn.');
-                } else if ( $res == -1 ) {
-                    $this->flashMessage('Některý ze spisů je využíván v aplikaci.<br>Z toho důvodu není možné spisy odstranit.','warning_ext');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo odstranit.','warning');
-                }
-            } catch (Exception $e) {
-                if ( $e->getCode() == 1451 ) {
-                    $this->flashMessage('Některý ze spisů je využíván v aplikaci.<br>Z toho důvodu není možné spisy odstranit.','warning_ext');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo odstranit.','warning');
-                    $this->flashMessage($e->getMessage(),'warning');
-                }
-            }
-        }
-        $this->redirect(':Admin:Spisy:seznam');
-
-    }
-
-    public function actionOdebrat2()
-    {
-
-        $spis_id = $this->getParam('id',null);
-        $Spis = new Spis();
-        if ( is_numeric($spis_id) ) {
-            try {
-                $res = $Spis->odstranit($spis_id, 2);
-                if ( $res !== false ) {
-                    $this->flashMessage('Spis byl úspěšně odstraněn.');
-                } else if ( $res == -1 ) {
-                    $this->flashMessage('Spis je využíván v aplikaci.<br>Z toho důvodu není možné spis odstranit.','warning_ext');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo odstranit.','warning');
-                }
-            } catch (Exception $e) {
-                if ( $e->getCode() == 1451 ) {
-                    $this->flashMessage('Spis je využíván v aplikaci.<br>Z toho důvodu není možné spis odstranit.','warning_ext');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo odstranit.','warning');
-                    $this->flashMessage($e->getMessage(),'warning');
-                }
-            }
-        }
-        $this->redirect(':Admin:Spisy:seznam');
-
-    }    
+    /* P.L. Pro pripad pridani funkce mazani spisu viz kod v SpisznakPresenter. */
     
     public function actionStav()
     {

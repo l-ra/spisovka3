@@ -65,6 +65,19 @@ class SpisovyZnak extends TreeModel
         }
     }    
 
+    public function ma_podrizene_spisove_znaky($id)
+    {
+        $sql = array(
+            'from' => array($this->name => 'tb'),
+            'cols' => array('id'),
+            'where' => array(array("parent_id=%i", $id)),
+        );
+        
+        $result = $this->fetchAllComplet($sql);
+        $rows = $result->fetchAll();
+        return $rows != false;
+    }
+    
     public function getInfo($spisznak_id)
     {
 
@@ -83,8 +96,10 @@ class SpisovyZnak extends TreeModel
 
         $result = $this->fetchAllComplet($sql);
         $row = $result->fetch();
-        return ($row) ? $row : NULL;
-
+        if ($row)
+            return $row;
+            
+        throw new InvalidArgumentException("Spisový znak id '$spisznak_id' neexistuje.");
     }
 
     public function vytvorit($data) {
@@ -159,19 +174,9 @@ class SpisovyZnak extends TreeModel
 
     }
 
-    public function odstranit($spisznak_id, $potomky = 2)
+    public function odstranit($spisznak_id, $odebrat_strom)
     {
-
-        if ( empty($spisznak_id) ) return false;
-
-        if ( $potomky == 1 ) {
-            // odstranit i potomky
-            return $this->odstranitH($spisznak_id, true);
-        } else if ( $potomky == 2 ) {
-            // potomky maji noveho rodice
-            return $this->odstranitH($spisznak_id);
-        }
-
+        return $this->odstranitH($spisznak_id, $odebrat_strom);
     }
 
     public static function spousteci_udalost( $kod = null, $select = 0 ) {

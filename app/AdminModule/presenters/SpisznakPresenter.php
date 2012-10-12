@@ -52,68 +52,36 @@ class Admin_SpisznakPresenter extends BasePresenter
         $SpisovyZnak = new SpisovyZnak();
         $this->spisznak = $SpisovyZnak->getInfo($id);
         $this->template->SpisZnak = $this->spisznak;
+        
+        $this->template->has_children = $SpisovyZnak->ma_podrizene_spisove_znaky($id);
 
         $this->template->title = " - Detail spisového znaku";
 
     }
 
-    public function actionOdebrat1()
+    protected function _odebrat($odebrat_strom)
     {
-
         $spisznak_id = $this->getParam('id',null);
         $SpisovyZnak = new SpisovyZnak();
-        if ( is_numeric($spisznak_id) ) {
-            try {
-                $res = $SpisovyZnak->odstranit($spisznak_id, 1);
-                if ( $res == 0 ) {
-                    $this->flashMessage('Spisový znak byl úspěšně odstraněn.');
-                } else if ( $res == -1 ) {
-                    $this->flashMessage('Některý ze spisových znaků je využíván v aplikaci.<br>Z toho důvodu není možné spisové znaky odstranit.','warning_ext');
-                } else {
-                    $this->flashMessage('Spisový znak se nepodařilo odstranit.','warning');
-                }
-            } catch (Exception $e) {
-                if ( $e->getCode() == 1451 ) {
-                    $this->flashMessage('Některý ze spisových znaků je využíván v aplikaci.<br>Z toho důvodu není možné spisové znaky odstranit.','warning_ext');
-                } else {
-                    $this->flashMessage('Spisový znak se nepodařilo odstranit.','warning');
-                    $this->flashMessage($e->getMessage(),'warning');
-                }
-            }
-        }
+        $res = $SpisovyZnak->odstranit($spisznak_id, $odebrat_strom);
+        if ( !$res )
+            $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.','warning_ext');                    
+        else 
+            $this->flashMessage('Spisový znak byl úspěšně odstraněn.');
+            
         $this->redirect(':Admin:Spisznak:seznam');
-
     }
 
-    public function actionOdebrat2()
+    public function actionOdebrat()
+    {   
+        $this->_odebrat(false);
+    }
+
+    public function actionOdebratstrom()
     {
-
-        $spisznak_id = $this->getParam('id',null);
-        $SpisovyZnak = new SpisovyZnak();
-        if ( is_numeric($spisznak_id) ) {
-            try {
-                $res = $SpisovyZnak->odstranit($spisznak_id, 2);
-                //var_dump($res); exit;
-                if ( $res === -1 ) {
-                    $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.','warning_ext');                    
-                } else if ( $res !== false ) {
-                    $this->flashMessage('Spisový znak byl úspěšně odstraněn.');
-                } else {
-                    $this->flashMessage('Spisový znak se nepodařilo odstranit.','warning');
-                }
-            } catch (Exception $e) {
-                if ( $e->getCode() == 1451 ) {
-                    $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.','warning_ext');
-                } else {
-                    $this->flashMessage('Spisový znak se nepodařilo odstranit.','warning');
-                    $this->flashMessage($e->getMessage(),'warning');
-                }
-            }
-        }
-        $this->redirect(':Admin:Spisznak:seznam');
-
+        $this->_odebrat(true);
     }
-
+    
     public function renderDetail()
     {
         $this->template->upravitForm = $this['upravitForm'];

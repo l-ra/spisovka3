@@ -367,21 +367,6 @@ class Spis extends TreeModel
         return $ret;
 
     }
-
-    public function odstranit($spis_id, $potomky = 2)
-    {
-
-        if ( empty($spis_id) ) return false;
-
-        if ( $potomky == 1 ) {
-            // odstranit i potomky
-            return $this->odstranitH($spis_id, true);
-        } else if ( $potomky == 2 ) {
-            // potomky maji noveho rodice
-            return $this->odstranitH($spis_id);
-        }
-
-    }    
     
     public function zmenitStav($spis_id, $stav) {
 

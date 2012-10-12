@@ -158,7 +158,6 @@ class TreeModel extends BaseModel
     {
 
         if ( empty($data['parent_id']) ) $data['parent_id'] = null;
-        if ( $data['parent_id'] == 0 ) $data['parent_id'] = null;
         
         dibi::begin();
         try {
@@ -180,9 +179,8 @@ class TreeModel extends BaseModel
                 // is subnode
                 $parent = $this->fetchRow(array('id=%i',$parent_id))->fetch();
                 if ( !$parent ) {
-                    // error - parent is not exist
                     dibi::rollback();
-                    return false;
+                    throw new InvalidArgumentException("TreeModel::vlozitH() - záznam ID $parent_id neexistuje.");
                 }
 
                 $data_tree['sekvence'] = $parent->sekvence .'.'. $id;
@@ -196,18 +194,16 @@ class TreeModel extends BaseModel
 
         } catch (Exception $e) {
             dibi::rollback();
-            return $e;
+            throw $e;
         }
-
     }
 
     public function upravitH ( $data, $id )
     {
 
         // 0. control param
-        if ( empty($id) && !is_numeric($id) ) {
-            return false;
-        }
+        if ( empty($id) && !is_numeric($id) )
+            throw new InvalidArgumentException('TreeModel::upravitH() - neplatný parameter "id"');
 
         // 1. clasic update
         dibi::begin();
@@ -235,7 +231,7 @@ class TreeModel extends BaseModel
             }
 
             $parent_id_old = null;
-            if ( isset($data['parent_id_old']) ) {
+            if ( isset($data['parent_id_old']) && !empty($data['parent_id_old'])) {
                 $parent_id_old = $data['parent_id_old'];
             }
             unset($data['parent_id_old']);
@@ -247,21 +243,20 @@ class TreeModel extends BaseModel
             // 2. update tree
             $parent_id = $data['parent_id'];
 
-            if ( is_null($parent_id) && is_null($parent_id_old) ) {
+            if ( empty($parent_id) && empty($parent_id_old) ) {
                 $parent_id = 999;
                 $parent_id_old = 999;
             }
 
             $data_tree = array();
             
-            if ( empty($parent_id) || $parent_id == 0 ) {
+            if ( empty($parent_id) && !empty($parent_id_old) ) {
                 // is root node
 
                 $parent_old = $this->fetchRow(array('id=%i',$parent_id_old))->fetch();
                 if ( !$parent_old ) {
-                    // error - new parent is not exist
                     dibi::rollback();
-                    return false;
+                    throw new InvalidArgumentException("TreeModel::upravitH() - záznam ID $parent_id_old neexistuje.");
                 }
 
                 $data_tree['sekvence'] = $id;
@@ -282,9 +277,8 @@ class TreeModel extends BaseModel
                 // change parent from root
                 $parent_new = $this->fetchRow(array('id=%i',$parent_id))->fetch();
                 if ( !$parent_new ) {
-                    // error - new parent is not exist
                     dibi::rollback();
-                    return false;
+                    throw new InvalidArgumentException("TreeModel::upravitH() - záznam ID $parent_id neexistuje.");
                 }
 
                 $data_tree['sekvence'] = $parent_new->sekvence .'.'. $id;
@@ -305,9 +299,8 @@ class TreeModel extends BaseModel
                 $parent_old = $this->fetchRow(array('id=%i',$parent_id_old))->fetch();
                 $parent_new = $this->fetchRow(array('id=%i',$parent_id))->fetch();
                 if ( !$parent_new ) {
-                    // error - new parent is not exist
                     dibi::rollback();
-                    return false;
+                    throw new InvalidArgumentException("TreeModel::upravitH() - záznam ID $parent_id neexistuje.");
                 }
 
                 $data_tree['sekvence'] = $parent_new->sekvence .'.'. $id;
@@ -336,75 +329,79 @@ class TreeModel extends BaseModel
 
         } catch (Exception $e) {
             dibi::rollback();
-            return $e;
+            throw $e;
         }
     }
 
-    public function odstranitH ( $id , $with_nodes = false )
+    /* Vraci: true - uspech
+              false - neuspech, selhala kontrola cizího klíče
+       Nebo hodí výjimku 
+                   
+       delete_children true - podrizene uzly se smazou (pokud je to mozne)
+                              funguje jenom pro jednu uroven potomku!
+                       false - podrizene uzly se presunou pod noveho rodice
+                       
+       Je volano nyni pouze z modelu spisoveho znaku.
+    */
+                   
+    public function odstranitH ( $id , $delete_children )
     {
+        $info = $this->getInfo($id); 
+        if ( !$info )
+            return false;
 
-        if ( empty($id) ) return false;
-
-        if ( $with_nodes ) {
-            // delete node with subnodes
-            $info = $this->getInfo($id);
-            if ( $info ) {
-                dibi::begin();
-                try {
-                    $res = $this->delete( array("sekvence LIKE %s", $info->sekvence .".%") );
-                    $this->delete( array("id=%i", $id) );
-                    dibi::commit();
-                    return $res;
-                } catch (Exception $e) {
-                    dibi::rollback();
-                    if ( $e->getCode() == 1451 ) {
-                        return -1;
-                    } else {
-                        return false;
-                    }
-                }
+        if ( $delete_children ) {
+            
+            dibi::begin();
+            try {
+                $res = $this->delete( array("sekvence LIKE %s", $info->sekvence .".%") );
+                $this->delete( array("id=%i", $id) );
+                dibi::commit();
+                return true;
                 
-            } else {
-                return null;
+            } catch (Exception $e) {
+                dibi::rollback();
+                if ( $e->getCode() == 1451 )
+                    return false;
+                throw $e;
             }
+                            
         } else {
-            // delete node and move subnodes at new parent
-            $info = $this->getInfo($id);
-            if ( $info ) {
-                dibi::begin();
-                try {
-                    $data_node = array();
-                    if ( empty($info->parent_id) ) {
-                        // parent is root
-                        $data_node['sekvence%sql'] = "REPLACE(sekvence,'". $info->sekvence .".','')";
-                        $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info->sekvence_string ."#','')";
-                        $data_node['uroven%sql'] = "uroven - 1";//. $parent_new->uroven + 1;
-                    } else {
-                        $parent_info = $this->getInfo($info->parent_id);
-                        // change child nodes
-                        $data_node['sekvence%sql'] = "REPLACE(sekvence,'". $info->sekvence ."','". $parent_info->sekvence ."')";
-                        $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info->sekvence_string ."','". $parent_info->sekvence_string ."')";
-                        //$rozdil = $info->uroven - $parent_info->uroven;
-                        //$data_node['uroven%sql'] = "uroven - (".$rozdil.")";//. $parent_new->uroven + 1;
-                        $data_node['uroven%sql'] = "uroven - 1";//. $parent_new->uroven + 1;
-                    }
-                    //Debug::dump($data_node); exit;
-
-                    $res = $this->update($data_node, array( array("sekvence LIKE %s", $info->sekvence .".%") ));
-                    $this->delete( array("id=%i", $id) );
-                    dibi::commit();
-                    return $res;
-                } catch (Exception $e) {
-                    dibi::rollback();
-                    if ( $e->getCode() == 1451 ) {
-                        return -1;
-                    } else {
-                        return false;
-                    }
+            
+            dibi::begin();
+            try {
+                $data_node = array();
+                if ( empty($info->parent_id) ) {
+                    // parent is root
+                    $data_node['sekvence%sql'] = "REPLACE(sekvence,'". $info->sekvence .".','')";
+                    $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info->sekvence_string ."#','')";
+                    $data_node['uroven%sql'] = "uroven - 1";//. $parent_new->uroven + 1;
+                } else {
+                    $parent_info = $this->getInfo($info->parent_id);
+                    // change child nodes
+                    $data_node['sekvence%sql'] = "REPLACE(sekvence,'". $info->sekvence ."','". $parent_info->sekvence ."')";
+                    $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info->sekvence_string ."','". $parent_info->sekvence_string ."')";
+                    //$rozdil = $info->uroven - $parent_info->uroven;
+                    //$data_node['uroven%sql'] = "uroven - (".$rozdil.")";//. $parent_new->uroven + 1;
+                    $data_node['uroven%sql'] = "uroven - 1";//. $parent_new->uroven + 1;
                 }
-            } else {
-                return false;
-            }
+                //Debug::dump($data_node); exit;
+
+                $this->update($data_node, array( array("sekvence LIKE %s", $info->sekvence .".%") ));
+                
+                $this->update(array('parent_id' => $info->parent_id), 
+                    array( "parent_id = ".$info->id ));
+                    
+                $this->delete( array("id=%i", $id) );
+                dibi::commit();
+                return true;
+                
+            } catch (Exception $e) {
+                dibi::rollback();
+                if ( $e->getCode() == 1451 )
+                    return false;                    
+                throw $e;
+            }             
         }
     }
 
