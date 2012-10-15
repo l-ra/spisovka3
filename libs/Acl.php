@@ -6,11 +6,15 @@ class Acl extends Permission {
 
     public function __construct() {
 
+        static $pass = 0;
+        
+        if (++$pass > 1)
+            throw new LogicException('Acl::__construct() - objekt už byl vytvořen');
+            
         $model = new AclModel();
 
         // roles
-        foreach($model->getRoles() as $role)
-            $this->addRole($role->code, $role->parent_code);
+        $this->addAllRoles($model->getRoles());
 
         // resources
         foreach($model->getResources() as $resource)
@@ -53,20 +57,44 @@ class Acl extends Permission {
             }
         }
         
-
+        // hack, ale lepe to kvuli navrhu Nette asi udelat nejde
+        // Po prvnim vytvoreni objektu zrus registraci factory a zaregistruj singleton
+        $locator = Environment::getServiceLocator();
+        $locator->removeService('Nette\Security\IAuthenticator');
+        $locator->addService('Nette\Security\IAuthenticator', $this);
     }
 
     public static function getInstance() {
 
-        if(self::$instance === false){
-            self::$instance = new Acl();
-            return self::$instance;
-        } else {
-            return self::$instance;
-        }
-
+        return Environment::getService('Nette\Security\IAuthenticator');
+        
     }
 
+    // Prochazi seznam vsech roli a vklada je ve spravnem poradi
+    protected function addAllRoles($roles)
+    {
+        // Nejdrive pridej koreny stromu
+        foreach($roles as &$role) {
+            $role->added = false;
+            if (empty($role->parent_code)) {
+                $role->added = true;
+                $this->addRole($role->code, $role->parent_code);
+            }
+        }
+        
+        do {
+            $continue = false;
+            foreach ($roles as &$role) {
+                if ($role->added === true)
+                    continue;
+                $continue = true;
+                if ($this->hasRole($role->parent_code)) {
+                    $role->added = true;
+                    $this->addRole($role->code, $role->parent_code);
+                }
+            }
+        } while ($continue);
+    }
 
     public function allowed($resource = self::ALL, $privilege = self::ALL) {
 
@@ -140,8 +168,7 @@ class Acl extends Permission {
 
     public static function isInRole($roles)
     {
-        
-        $Acl = new Acl();
+        $Acl = Acl::getInstance();
         
         $user_roles = array();
         $roles_a = array();
