@@ -13,8 +13,7 @@ if ( !defined('DEBUG_ENABLE') )
 if ( DEBUG_ENABLE ) {
     Environment::setMode(Environment::DEVELOPMENT);
     Environment::setMode(Environment::PRODUCTION, FALSE);
-    // Logovani je aktivni pouze v PRODUCTION modu
-    Debug::enable(Debug::DEVELOPMENT);
+    Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error_'.date('Ym').'.log');
 } else {
     Environment::setMode(Environment::PRODUCTION);
     Debug::enable(Debug::PRODUCTION, '%logDir%/php_error_'.date('Ym').'.log');

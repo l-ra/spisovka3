@@ -441,7 +441,8 @@ final class Debug
 		}
 
 		// logging configuration
-		if (self::$productionMode && $logFile !== FALSE) {
+        // odstranena podminka na self::$productionMode
+		if ($logFile !== FALSE) {
 			self::$logFile = 'log/php_error.log';
 
 			if (class_exists('Environment')) {
@@ -590,7 +591,7 @@ final class Debug
 		if (!self::$enabled) {
 			return;
 
-		} elseif (self::$logFile) {
+		} elseif (self::$logFile && self::$productionMode) {
 			try {
 				$hash = md5($exception . (method_exists($exception, 'getPrevious') ? $exception->getPrevious() : (isset($exception->previous) ? $exception->previous : '')));
 				error_log("PHP Fatal error:  Uncaught $exception");
