@@ -67,7 +67,7 @@ class LogModel extends BaseModel {
         '18' => 'Dokument přijat e-podatelnou',
         '19' => 'Dokument odeslán',
         '20' => 'Dokument předán k odeslání',
-        '107' => 'Dokument byl vracen (nedošlo k odeslání)',
+        '107' => 'Dokument byl vrácen (nedošlo k odeslání)',
         '101' => 'Spuštěna událost',
         '102' => 'Dokument připraven ke skartaci',
         '103' => 'Dokument skartován',

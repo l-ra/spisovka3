@@ -30,7 +30,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Stav:</dt>
-            <dd>{if $OrgJednotka->stav!=1}neaktvní{else}aktivní{/if}&nbsp;</dd>
+            <dd>{if $OrgJednotka->stav!=1}neaktivní{else}aktivní{/if}&nbsp;</dd>
         </dl>
         <a href="{link :Admin:Orgjednotky:detail, 'id'=>$OrgJednotka->id, 'upravit'=>'info'}">Upravit</a>
         {/if}
