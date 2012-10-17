@@ -115,6 +115,14 @@ class DibiProfiler extends DibiObject implements IDibiProfiler
 
 		if (($event & $this->filter) === 0) return;
 
+        if ($event & self::BEGIN && $this->file)
+            $this->writeFile("OK: START TRANSACTION\n\n");
+        if ($event & self::COMMIT && $this->file)
+            $this->writeFile("OK: COMMIT\n\n");
+        if ($event & self::ROLLBACK && $this->file)
+            $this->writeFile("OK: ROLLBACK\n\n");
+        
+
 		if ($event & self::QUERY) {
 			try {
 				$count = $res instanceof DibiResult ? count($res) : '-';
