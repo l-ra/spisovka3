@@ -42,10 +42,8 @@ class Admin_SpisznakPresenter extends BasePresenter
     }
 
 
-    public function actionDetail()
+    public function renderDetail()
     {
-        
-
         $this->template->FormUpravit = $this->getParam('upravit',null);
         $id = $this->getParam('id',null);
 
@@ -56,7 +54,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->template->has_children = $SpisovyZnak->ma_podrizene_spisove_znaky($id);
 
         $this->template->title = " - Detail spisového znaku";
-
+        $this->template->upravitForm = $this['upravitForm'];
     }
 
     protected function _odebrat($odebrat_strom)
@@ -82,11 +80,6 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->_odebrat(true);
     }
     
-    public function renderDetail()
-    {
-        $this->template->upravitForm = $this['upravitForm'];
-    }
-
     public function renderNovy()
     {
         $this->template->novyForm = $this['novyForm'];
@@ -161,7 +154,11 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         $SpisovyZnak = new SpisovyZnak();
         if ( empty($this->spisznak) ) {
-            $spisznak = $SpisovyZnak->getInfo($this->getParam('id',null));
+            $id = $this->getParam('id',null);
+            if ($id !== null)
+                $spisznak = $SpisovyZnak->getInfo($id);
+            else
+                $spisznak = array();
         } else {
             $spisznak = $this->spisznak;
         }
@@ -196,13 +193,13 @@ class Admin_SpisznakPresenter extends BasePresenter
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
                 ->setValue(@$spisznak->stav);
 
-        $form1->addSubmit('upravit', 'Upravit')
-                 ->onClick[] = array($this, 'upravitClicked');
+        $submit = $form1->addSubmit('upravit', 'Upravit');
+        $submit->onClick[] = array($this, 'upravitClicked');
+        $submit->onInvalidClick[] = array($this, 'upravitClickedChyba');
+        
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
 
         $renderer = $form1->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
@@ -214,6 +211,13 @@ class Admin_SpisznakPresenter extends BasePresenter
     }
 
 
+    public function upravitClickedChyba(SubmitButton $button)
+    {
+        $this->flashMessage('Při ověřování formuláře došlo k chybě.','warning');
+        $data = $button->getForm()->getValues();
+        $this->redirect('this',array('id'=>$data['id']));
+    }
+    
     public function upravitClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -224,20 +228,16 @@ class Admin_SpisznakPresenter extends BasePresenter
         $SpisovyZnak = new SpisovyZnak();
 
         try {
-            $res = $SpisovyZnak->upravit($data, $spisznak_id);
-            if ( is_object($res) ) {
-                $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-                $this->flashMessage($res->getMessage(),'warning');
-                $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
-            } else {
-                $this->flashMessage('Spisový znak  "'. $data['nazev'] .'"  byl upraven.');
-                $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
-            }            
-        } catch (DibiException $e) {
+            $SpisovyZnak->upravit($data, $spisznak_id);
+            $this->flashMessage('Spisový znak  "'. $data['nazev'] .'"  byl upraven.');
+            
+        } catch (Exception $e) {
             $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
+            $this->flashMessage($res->getMessage(),'warning');
             //Debug::dump($e);
         }
 
+        $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
     }
 
     public function stornoClicked(SubmitButton $button)
