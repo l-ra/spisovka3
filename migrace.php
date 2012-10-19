@@ -47,7 +47,8 @@ define('CLIENT_DIR', WWW_DIR . '/client');
 // Nastaveni cesty pro S2 (absolutni cesta k root aplikaci verze 2)
 define('S2_DIR', '/cesta/ke/spisovce_2');
 
-
+// Skartační lhůta pro migrované spisy v rocích
+define('SKARTACNI_LHUTA_SPISU', 5);
 
 
 
@@ -64,8 +65,9 @@ define('S2_DIR', '/cesta/ke/spisovce_2');
  *
  ************************************************************************** */
 
+header('Content-type: text/html; charset="utf-8"',true);
+ 
 if (!file_exists(S2_DIR .'/system/db_nastaveni.php') ) {
-    header('Content-type: text/html; charset="utf-8"',true);
     echo "<pre>";
     echo "Nelze načíst nastavení ze Spisovky 2! Migraci nelze provést.<br/>Zkontrolujte nastavení cesty.";
     echo "</pre>";
@@ -73,7 +75,6 @@ if (!file_exists(S2_DIR .'/system/db_nastaveni.php') ) {
 }
 
 if (!file_exists(CLIENT_DIR ."/configs/system.ini") ) {
-    header('Content-type: text/html; charset="utf-8"',true);
     echo "<pre>";
     echo "Nelze načíst nastavení ze Spisovky 3! Migraci nelze provést.<br/>Zkontrolujte nastavení cesty.";
     echo "</pre>";
@@ -160,7 +161,6 @@ dibi::addSubst('S3', $S3_DB_CONFIG['prefix']);
 define('S3_', $S3_DB_CONFIG['prefix']);
 
 } catch (Exception $e) {
-    header('Content-type: text/html; charset="utf-8"',true);
     echo "<pre>";
     echo "Chyba při načítání migračního skriptu! Migraci nelze provést.";
     echo "<br/><br />Chyba: ". $e->getMessage();
@@ -169,7 +169,6 @@ define('S3_', $S3_DB_CONFIG['prefix']);
     exit;
 }
 
-header('Content-type: text/html; charset="utf-8"',true);
 echo "<pre>";
 //exit;
 $ERROR_LOG = array();
@@ -462,7 +461,7 @@ if ( count($S2_spisy)>0 ) {
                 'sekvence_string' => 'SPISY.1',
                 'uroven' => 0,
                 'skartacni_znak' => 'V',
-                'skartacni_lhuta' => 1000,
+                'skartacni_lhuta' => SKARTACNI_LHUTA_SPISU,
                 'stav' => 1,
                 'datum_otevreni' => new DateTime(),
                 'date_created' => new DateTime(),
