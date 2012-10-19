@@ -412,7 +412,7 @@ zkontrolovatSchranku = function (elm) {
         x.send(null);
     }
 
-    $('#zkontrolovat_status').html('<img src="'+baseUri+'images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
+    $('#zkontrolovat_status').html('<img src="'+baseUri+'public/images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
 
 
     return false;
@@ -440,9 +440,6 @@ zkontrolovatOdchoziSchranku = function (elm) {
         x.open("GET", url, true);
         x.send(null);
     }
-
-    //$('#zkontrolovat_status').html('<img src="'+baseUri+'images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
-
 
     return false;
 }
