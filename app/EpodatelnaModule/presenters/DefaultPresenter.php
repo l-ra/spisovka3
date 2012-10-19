@@ -381,7 +381,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     }
 
-    public function renderZkontrolovatAjax()
+    public function actionZkontrolovatAjax()
     {
 
 

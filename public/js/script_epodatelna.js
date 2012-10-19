@@ -399,7 +399,6 @@ zkontrolovatSchranku = function (elm) {
             if (x.readyState == 4 && x.status == 200) {
                 stav = x.responseText;
                 $('#zkontrolovat_status').html(x.responseText);
-                nactiZpravy();
             }
         }
 
@@ -428,7 +427,6 @@ zkontrolovatOdchoziSchranku = function (elm) {
             if (x.readyState == 4 && x.status == 200) {
                 //stav = x.responseText;
                 //$('#zkontrolovat_status').html(x.responseText);
-                //nactiZpravy();
             }
         }
 
