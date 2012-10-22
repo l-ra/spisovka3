@@ -9,6 +9,7 @@ Nové funkce:
 - sestavy - přidán sloupec předáno pro ruční dopsání podpisu
 - výpravna - do seznamu dokumentů přidán sloupec s uživatelem, který dokument předal výpravně
 - výpravna - přidána možnost seřadit dokumenty podle datumu odeslání nebo čísla jednacího
+- přidáno nové oprávnění pro odesílání datových zpráv. Je nutné jej přiřadit příslušným rolím.
 
 Jiné změny:
 
@@ -22,6 +23,7 @@ Opravy:
 - nefungovala submit tlačítka na všech formulářích nazvaných frm-novyForm (např. při vytváření dokumentu)
 - opraveny exceptions při evidování emailu do spisovky
 - při problému s přihlášením do datové schránky by se měla nyní zobrazit zpráva včetně ISDS kódu chyby
+- rovněž doplněno chybové hlášení při odesílání dokumentu datovou schránkou
 - opraven problém se spisovými znaky po aktualizaci ze starší verze programu
 - po migraci ze spisovky verze 2 se nešlo do programu přihlásit
 - oprava odkazů na stránce přihlášení pomocí SSO
@@ -32,6 +34,7 @@ Opravy:
 - odesílání dokumentu - přidána kontrola pro případ, že dokument nemá žádného adresáta
 - přidána kontrola při nastavování dědění rolí
 - oprava mazání spisových znaků
+- v seznamu dokumentů ve spisu se chybně zobrazovaly ikony v Internet Exploreru
 
 === Ver. 3.3.0 RC1 =============================================================
 Released: 22.06.2012
