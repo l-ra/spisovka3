@@ -2231,47 +2231,49 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
                 } elseif ( $metoda_odeslani == 2 ) {
                     // isds
-                    //echo "  => isds";
-                    if ( !empty($adresat->id_isds) ) {
-                        
-                        $data = array(
-                            'isds_predmet' => $post_data['isds_predmet'][$subjekt_id],
-                            'isds_cjednaci_odes' => $post_data['isds_cjednaci_odes'][$subjekt_id],
-                            'isds_spis_odes' => $post_data['isds_spis_odes'][$subjekt_id],
-                            'isds_cjednaci_adres' => $post_data['isds_cjednaci_adres'][$subjekt_id],
-                            'isds_spis_adres' => $post_data['isds_spis_adres'][$subjekt_id],
-                            'isds_dvr' => isset($post_data['isds_dvr'][$subjekt_id])?true:false,
-                            'isds_fikce' => isset($post_data['isds_fikce'][$subjekt_id])?true:false,
-                        );
-                        
-                        if ( $zprava = $this->odeslatISDS($adresat, $data, $prilohy) ) {
-                            $Log = new LogModel();
-                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
-                            $this->flashMessage('Datová zpráva pro "'. Subjekt::displayName($adresat,'isds') .'" byla úspěšně odeslána do systému ISDS.');
-                            $stav = 2;
-                            if ( !is_array($zprava) ) {
-                                $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo uložit do e-podatelny.', 'warning');
-                                continue;
-                            }
-                        } else {
-                            $Log = new LogModel();
-                            $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
-                            $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo odeslat do systému ISDS!','warning');
-                            $stav = 0;
-                            continue;
-                        }
-                        
-                        if ( isset($zprava['epodatelna_id']) ) {
-                            $epodatelna_id = $zprava['epodatelna_id'];
-                        }
-                        if ( isset($zprava['zprava']) ) {
-                            $zprava_odes = $zprava['zprava'];
-                        }                            
-                        
-                    } else {
+                    if (!Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani')) {
+                        $this->flashMessage('Nemáte oprávnění odesílat datové zprávy.','warning');
+                        continue;                    
+                    }
+                    
+                    if ( empty($adresat->id_isds) ) {
                         $this->flashMessage('Subjekt "'. Subjekt::displayName($adresat,'jmeno') .'" nemá ID datové schránky. Zprávu tomuto adresátovi nelze poslat přes datovou schránku!','warning');
                         continue;
                     }
+                                            
+                    $data = array(
+                        'isds_predmet' => $post_data['isds_predmet'][$subjekt_id],
+                        'isds_cjednaci_odes' => $post_data['isds_cjednaci_odes'][$subjekt_id],
+                        'isds_spis_odes' => $post_data['isds_spis_odes'][$subjekt_id],
+                        'isds_cjednaci_adres' => $post_data['isds_cjednaci_adres'][$subjekt_id],
+                        'isds_spis_adres' => $post_data['isds_spis_adres'][$subjekt_id],
+                        'isds_dvr' => isset($post_data['isds_dvr'][$subjekt_id])?true:false,
+                        'isds_fikce' => isset($post_data['isds_fikce'][$subjekt_id])?true:false,
+                    );
+                    
+                    if ( $zprava = $this->odeslatISDS($adresat, $data, $prilohy) ) {
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
+                        $this->flashMessage('Datová zpráva pro "'. Subjekt::displayName($adresat,'isds') .'" byla úspěšně odeslána do systému ISDS.');
+                        $stav = 2;
+                        if ( !is_array($zprava) ) {
+                            $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo uložit do e-podatelny.', 'warning');
+                            continue;
+                        }
+                    } else {
+                        $Log = new LogModel();
+                        $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,'Dokument se nepodařilo odeslat datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
+                        $this->flashMessage('Datovou zprávu pro "'. Subjekt::displayName($adresat,'isds') .'" se nepodařilo odeslat do systému ISDS!','warning');
+                        $stav = 0;
+                        continue;
+                    }
+                    
+                    if ( isset($zprava['epodatelna_id']) ) {
+                        $epodatelna_id = $zprava['epodatelna_id'];
+                    }
+                    if ( isset($zprava['zprava']) ) {
+                        $zprava_odes = $zprava['zprava'];
+                    }                            
 
                 } else if ( $metoda_odeslani == 3 ) {
                     // postou
@@ -2576,13 +2578,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function odeslatISDS($adresat, $data, $prilohy)
     {
-
-        //$isds_debug = 1;
         try {
 
-
-        $isds = new ISDS_Spisovka();
-        if ( $ISDSBox = $isds->pripojit() ) {
+            $isds = new ISDS_Spisovka();
+            $ISDSBox = $isds->pripojit();
 
             $dmEnvelope = array(
                 "dbIDRecipient"=>$adresat->id_isds,
@@ -2601,181 +2600,175 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 "doruceni_fikci"=>($data['isds_fikce']==true)?0:1
             );
 
-            if ( $id_mess = $isds->odeslatZpravu($dmEnvelope, $prilohy) ) {
-
-                sleep(3);
-                $odchozi_zpravy = $isds->seznamOdeslanychZprav( time()-3600 , time()+3600 );
-                //Debug::dump($odchozi_zpravy);
-                $mess = null;
-                if ( count($odchozi_zpravy)>0 ) {
-                    foreach ($odchozi_zpravy as $oz) {
-                        if ( $oz->dmID == $id_mess ) {
-                            $mess = $oz;
-                            break;
-                        }
-                    }
-                }
-                if ( is_null($mess) ) {
-                    return false;
-                }
-
-                $popis  = '';
-                $popis .= "ID datové zprávy    : ". $mess->dmID ."\n";// = 342682
-                $popis .= "Věc, předmět zprávy : ". $mess->dmAnnotation ."\n";//  = Vaše datová zpráva byla přijata
-                $popis .= "\n";
-                $popis .= "Číslo jednací odeslatele   : ". $mess->dmSenderRefNumber ."\n";//  = AB-44656
-                $popis .= "Spisová značka odesílatele : ". $mess->dmSenderIdent ."\n";//  = ZN-161
-                $popis .= "Číslo jednací příjemce     : ". $mess->dmRecipientRefNumber ."\n";//  = KAV-34/06-ŘKAV/2010
-                $popis .= "Spisová značka příjemce    : ". $mess->dmRecipientIdent ."\n";//  = 0.06.00
-                $popis .= "\n";
-                $popis .= "Do vlastních rukou? : ". (!empty($mess->dmPersonalDelivery)?"ano":"ne") ."\n";//  =
-                $popis .= "Doručeno fikcí?     : ". (!empty($mess->dmAllowSubstDelivery)?"ano":"ne") ."\n";//  =
-                $popis .= "Zpráva určena pro   : ". $mess->dmToHands ."\n";//  =
-                $popis .= "\n";
-                $popis .= "Odesílatel:\n";
-                $popis .= "            ". $mess->dbIDSender ."\n";//  = hjyaavk
-                $popis .= "            ". $mess->dmSender ."\n";//  = Město Milotice
-                $popis .= "            ". $mess->dmSenderAddress ."\n";//  = Kovářská 14/1, 37612 Milotice, CZ
-                $popis .= "            ". $mess->dmSenderType ." - ". ISDS_Spisovka::typDS($mess->dmSenderType) ."\n";//  = 10
-                $popis .= "            org.jednotka: ". $mess->dmSenderOrgUnit ." [". $mess->dmSenderOrgUnitNum ."]\n";//  =
-                $popis .= "\n";
-                $popis .= "Příjemce:\n";
-                $popis .= "            ". $mess->dbIDRecipient ."\n";//  = pksakua
-                $popis .= "            ". $mess->dmRecipient ."\n";//  = Společnost pro výzkum a podporu OpenSource
-                $popis .= "            ". $mess->dmRecipientAddress ."\n";//  = 40501 Děčín, CZ
-                        //$popis .= "Je příjemce ne-OVM povýšený na OVM: ". $mess->dmDm->dmAmbiguousRecipient ."\n";//  =
-                $popis .= "            org.jednotka: ". $mess->dmRecipientOrgUnit ." [". $mess->dmRecipientOrgUnitNum ."]\n";//  =
-                $popis .= "\n";
-                $popis .= "Status: ". $mess->dmMessageStatus ." - ". ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) ."\n";
-                $dt_dodani = strtotime($mess->dmDeliveryTime);
-                $dt_doruceni = strtotime($mess->dmAcceptanceTime);
-                $popis .= "Datum a čas dodání   : ". date("j.n.Y G:i:s",$dt_dodani) ." (". $mess->dmDeliveryTime .")\n";//  =
-                if ( $dt_doruceni == 0) {
-                    $popis .= "Datum a čas doručení : (příjemce zprávu zatím nepřijal)\n";//  =    
-                } else {
-                    $popis .= "Datum a čas doručení : ". date("j.n.Y G:i:s",$dt_doruceni) ." (". $mess->dmAcceptanceTime .")\n";//  =                    
-                }
-                $popis .= "Přiblížná velikost všech příloh : ". $mess->dmAttachmentSize ."kB\n";//  =
-
-
-                //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleLaw ."\n";//  =
-                //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleYear ."\n";//  =
-                //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleSect ."\n";//  =
-                //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitlePar ."\n";//  =
-                //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitlePoint ."\n";//  =
-
-                // Do epodatelny
-                $storage_conf = Environment::getConfig('storage');
-                eval("\$UploadFile = new ".$storage_conf->type."();");
-
-                $Epodatelna = new Epodatelna();
-                $config = $isds->getConfig();
-                $user = Environment::getUser()->getIdentity();
-
-                $zprava = array();
-                $zprava['epodatelna_typ'] = 1;
-                $zprava['poradi'] = $Epodatelna->getMax(1);
-                $zprava['rok'] = date('Y');
-                $zprava['isds_signature'] = $mess->dmID;
-                $zprava['predmet'] = empty($mess->dmAnnotation)?"(Datová zpráva bez předmětu)":$mess->dmAnnotation;
-                $zprava['popis'] = $popis;
-                $zprava['odesilatel'] = $mess->dmRecipient .', '. $mess->dmRecipientAddress;
-                $zprava['odesilatel_id'] = $adresat->id;
-                $zprava['adresat'] = $config['ucet'] .' ['. $config['idbox'] .']';
-                $zprava['prijato_dne'] = new DateTime();
-
-                $zprava['doruceno_dne'] = new DateTime($mess->dmAcceptanceTime);
-
-                $zprava['prijal_kdo'] = $user->id;
-                $zprava['prijal_info'] = serialize($user->identity);
-
-                $zprava['sha1_hash'] = '';
-
-                $aprilohy = array();
-                if ( count($prilohy)>0 ) {
-                    foreach( $prilohy as $index => $file ) {
-                        $aprilohy[] = array(
-                                    'name'=>$file->real_name,
-                                    'size'=>$file->size,
-                                    'mimetype'=> $file->mime_type,
-                                    'id'=>$index
-                        );
-                    }
-                }
-                $zprava['prilohy'] = serialize($aprilohy);
-
-                $zprava['evidence'] = 'spisovka';
-                $zprava['dokument_id'] = $data['id'];
-                $zprava['stav'] = 0;
-                $zprava['stav_info'] = '';
-
-                        //print_r($zprava);
-                        //exit;
-
-                        if ( $epod_id = $Epodatelna->insert($zprava) ) {
-
-                            /* Ulozeni podepsane ISDS zpravy */
-                            $data = array(
-                                'filename'=>'ep_isds_'.$epod_id .'.zfo',
-                                'dir'=>'EP-O-'. sprintf('%06d',$zprava['poradi']).'-'.$zprava['rok'],
-                                'typ'=>'5',
-                                'popis'=>'Podepsaný originál ISDS zprávy z epodatelny '.$zprava['poradi'].'-'.$zprava['rok']
-                                //'popis'=>'Emailová zpráva'
-                            );
-
-                            $signedmess = $isds->SignedSentMessageDownload($id_mess);
-
-                            if ( $file_o = $UploadFile->uploadEpodatelna($signedmess, $data) ) {
-                                // ok
-                            } else {
-                                $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
-                                // false
-                            }
-
-                            /* Ulozeni reprezentace zpravy */
-                            $data = array(
-                                'filename'=>'ep_isds_'.$epod_id .'.bsr',
-                                'dir'=>'EP-O-'. sprintf('%06d',$zprava['poradi']).'-'.$zprava['rok'],
-                                'typ'=>'5',
-                                'popis'=>' Byte-stream reprezentace ISDS zprávy z epodatelny '.$zprava['poradi'].'-'.$zprava['rok']
-                                //'popis'=>'Emailová zpráva'
-                            );
-
-                            if ( $file = $UploadFile->uploadEpodatelna(serialize($mess), $data) ) {
-                                // ok
-                                $zprava['stav_info'] = 'Zpráva byla uložena';
-                                //$zprava['file_id'] = $file->id ."-". $file_o->id;
-                                $zprava['file_id'] = $file->id;
-                                $Epodatelna->update(
-                                        array('stav'=>1,
-                                              'stav_info'=>$zprava['stav_info'],
-                                              'file_id'=>$file->id
-                                            ),
-                                        array(array('id=%i',$epod_id))
-                                );
-                            } else {
-                                $zprava['stav_info'] = 'Reprezentace zprávy se nepodařilo uložit';
-                                // false
-                            }
-
-                        } else {
-                            $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
-                        }
-                
-                return array(
-                    'source'=>$mess,
-                    'epodatelna_id'=>$epod_id,
-                    'isds_signature' => $zprava,
-                    'zprava'=>$popis
-                );
-            } else {
+            $id_mess = $isds->odeslatZpravu($dmEnvelope, $prilohy);
+            if (!$id_mess) {
+                $this->flashMessage('Chyba ISDS: '. $isds->error(),'warning_ext');
                 return false;
             }
-        } else {
-            return false;
-        }
+            
+            sleep(3);
+            $odchozi_zpravy = $isds->seznamOdeslanychZprav( time()-3600 , time()+3600 );
+            //Debug::dump($odchozi_zpravy);
+            $mess = null;
+            if ( count($odchozi_zpravy)>0 ) {
+                foreach ($odchozi_zpravy as $oz) {
+                    if ( $oz->dmID == $id_mess ) {
+                        $mess = $oz;
+                        break;
+                    }
+                }
+            }
+            if ( is_null($mess) ) {
+                return false;
+            }
 
-        // $id_mess
+            $popis  = '';
+            $popis .= "ID datové zprávy    : ". $mess->dmID ."\n";// = 342682
+            $popis .= "Věc, předmět zprávy : ". $mess->dmAnnotation ."\n";//  = Vaše datová zpráva byla přijata
+            $popis .= "\n";
+            $popis .= "Číslo jednací odeslatele   : ". $mess->dmSenderRefNumber ."\n";//  = AB-44656
+            $popis .= "Spisová značka odesílatele : ". $mess->dmSenderIdent ."\n";//  = ZN-161
+            $popis .= "Číslo jednací příjemce     : ". $mess->dmRecipientRefNumber ."\n";//  = KAV-34/06-ŘKAV/2010
+            $popis .= "Spisová značka příjemce    : ". $mess->dmRecipientIdent ."\n";//  = 0.06.00
+            $popis .= "\n";
+            $popis .= "Do vlastních rukou? : ". (!empty($mess->dmPersonalDelivery)?"ano":"ne") ."\n";//  =
+            $popis .= "Doručeno fikcí?     : ". (!empty($mess->dmAllowSubstDelivery)?"ano":"ne") ."\n";//  =
+            $popis .= "Zpráva určena pro   : ". $mess->dmToHands ."\n";//  =
+            $popis .= "\n";
+            $popis .= "Odesílatel:\n";
+            $popis .= "            ". $mess->dbIDSender ."\n";//  = hjyaavk
+            $popis .= "            ". $mess->dmSender ."\n";//  = Město Milotice
+            $popis .= "            ". $mess->dmSenderAddress ."\n";//  = Kovářská 14/1, 37612 Milotice, CZ
+            $popis .= "            ". $mess->dmSenderType ." - ". ISDS_Spisovka::typDS($mess->dmSenderType) ."\n";//  = 10
+            $popis .= "            org.jednotka: ". $mess->dmSenderOrgUnit ." [". $mess->dmSenderOrgUnitNum ."]\n";//  =
+            $popis .= "\n";
+            $popis .= "Příjemce:\n";
+            $popis .= "            ". $mess->dbIDRecipient ."\n";//  = pksakua
+            $popis .= "            ". $mess->dmRecipient ."\n";//  = Společnost pro výzkum a podporu OpenSource
+            $popis .= "            ". $mess->dmRecipientAddress ."\n";//  = 40501 Děčín, CZ
+                    //$popis .= "Je příjemce ne-OVM povýšený na OVM: ". $mess->dmDm->dmAmbiguousRecipient ."\n";//  =
+            $popis .= "            org.jednotka: ". $mess->dmRecipientOrgUnit ." [". $mess->dmRecipientOrgUnitNum ."]\n";//  =
+            $popis .= "\n";
+            $popis .= "Status: ". $mess->dmMessageStatus ." - ". ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) ."\n";
+            $dt_dodani = strtotime($mess->dmDeliveryTime);
+            $dt_doruceni = strtotime($mess->dmAcceptanceTime);
+            $popis .= "Datum a čas dodání   : ". date("j.n.Y G:i:s",$dt_dodani) ." (". $mess->dmDeliveryTime .")\n";//  =
+            if ( $dt_doruceni == 0) {
+                $popis .= "Datum a čas doručení : (příjemce zprávu zatím nepřijal)\n";//  =    
+            } else {
+                $popis .= "Datum a čas doručení : ". date("j.n.Y G:i:s",$dt_doruceni) ." (". $mess->dmAcceptanceTime .")\n";//  =                    
+            }
+            $popis .= "Přiblížná velikost všech příloh : ". $mess->dmAttachmentSize ."kB\n";//  =
+
+
+            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleLaw ."\n";//  =
+            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleYear ."\n";//  =
+            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleSect ."\n";//  =
+            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitlePar ."\n";//  =
+            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitlePoint ."\n";//  =
+
+            // Do epodatelny
+            $storage_conf = Environment::getConfig('storage');
+            eval("\$UploadFile = new ".$storage_conf->type."();");
+
+            $Epodatelna = new Epodatelna();
+            $config = $isds->getConfig();
+            $user = Environment::getUser()->getIdentity();
+
+            $zprava = array();
+            $zprava['epodatelna_typ'] = 1;
+            $zprava['poradi'] = $Epodatelna->getMax(1);
+            $zprava['rok'] = date('Y');
+            $zprava['isds_signature'] = $mess->dmID;
+            $zprava['predmet'] = empty($mess->dmAnnotation)?"(Datová zpráva bez předmětu)":$mess->dmAnnotation;
+            $zprava['popis'] = $popis;
+            $zprava['odesilatel'] = $mess->dmRecipient .', '. $mess->dmRecipientAddress;
+            $zprava['odesilatel_id'] = $adresat->id;
+            $zprava['adresat'] = $config['ucet'] .' ['. $config['idbox'] .']';
+            $zprava['prijato_dne'] = new DateTime();
+
+            $zprava['doruceno_dne'] = new DateTime($mess->dmAcceptanceTime);
+
+            $zprava['prijal_kdo'] = $user->id;
+            $zprava['prijal_info'] = serialize($user->identity);
+
+            $zprava['sha1_hash'] = '';
+
+            $aprilohy = array();
+            if ( count($prilohy)>0 ) {
+                foreach( $prilohy as $index => $file ) {
+                    $aprilohy[] = array(
+                                'name'=>$file->real_name,
+                                'size'=>$file->size,
+                                'mimetype'=> $file->mime_type,
+                                'id'=>$index
+                    );
+                }
+            }
+            $zprava['prilohy'] = serialize($aprilohy);
+
+            $zprava['evidence'] = 'spisovka';
+            $zprava['dokument_id'] = $data['id'];
+            $zprava['stav'] = 0;
+            $zprava['stav_info'] = '';
+
+            if ( $epod_id = $Epodatelna->insert($zprava) ) {
+
+                /* Ulozeni podepsane ISDS zpravy */
+                $data = array(
+                    'filename'=>'ep_isds_'.$epod_id .'.zfo',
+                    'dir'=>'EP-O-'. sprintf('%06d',$zprava['poradi']).'-'.$zprava['rok'],
+                    'typ'=>'5',
+                    'popis'=>'Podepsaný originál ISDS zprávy z epodatelny '.$zprava['poradi'].'-'.$zprava['rok']
+                    //'popis'=>'Emailová zpráva'
+                );
+
+                $signedmess = $isds->SignedSentMessageDownload($id_mess);
+
+                if ( $file_o = $UploadFile->uploadEpodatelna($signedmess, $data) ) {
+                    // ok
+                } else {
+                    $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
+                    // false
+                }
+
+                /* Ulozeni reprezentace zpravy */
+                $data = array(
+                    'filename'=>'ep_isds_'.$epod_id .'.bsr',
+                    'dir'=>'EP-O-'. sprintf('%06d',$zprava['poradi']).'-'.$zprava['rok'],
+                    'typ'=>'5',
+                    'popis'=>' Byte-stream reprezentace ISDS zprávy z epodatelny '.$zprava['poradi'].'-'.$zprava['rok']
+                    //'popis'=>'Emailová zpráva'
+                );
+
+                if ( $file = $UploadFile->uploadEpodatelna(serialize($mess), $data) ) {
+                    // ok
+                    $zprava['stav_info'] = 'Zpráva byla uložena';
+                    //$zprava['file_id'] = $file->id ."-". $file_o->id;
+                    $zprava['file_id'] = $file->id;
+                    $Epodatelna->update(
+                            array('stav'=>1,
+                                  'stav_info'=>$zprava['stav_info'],
+                                  'file_id'=>$file->id
+                                ),
+                            array(array('id=%i',$epod_id))
+                    );
+                } else {
+                    $zprava['stav_info'] = 'Reprezentace zprávy se nepodařilo uložit';
+                    // false
+                }
+
+            } else {
+                $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
+            }
+    
+            return array(
+                'source'=>$mess,
+                'epodatelna_id'=>$epod_id,
+                'isds_signature' => $zprava,
+                'zprava'=>$popis
+            );
+
         } catch (DibiException $e) {
             if ( !empty($id_mess) ) {
                 $this->flashMessage('Chyba v DB: '. $e->getMessage(),'warning_ext');
@@ -2787,11 +2780,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 );
             } else {
                 $this->flashMessage('Chyba v DB: '. $e->getMessage(),'warning_ext');
-                return false;
             }
         } catch (Exception $e) {
+            // chyba v pripojeni k datove schrance
             $this->flashMessage('Chyba ISDS: '. $e->getMessage(),'warning_ext');
         }
+        
+        return false;
     }
 
     protected function createComponentSearchForm()

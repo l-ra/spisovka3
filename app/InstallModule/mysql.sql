@@ -722,7 +722,8 @@ INSERT INTO `{tbls3}user_resource` (`id`, `code`, `note`, `name`) VALUES
 (36, 'Spisovna_ZapujckyPresenter', NULL, 'Spisovna - zápůjčky'),
 (37, 'Spisovka_VypravnaPresenter', NULL, 'Výpravna'),
 (38, 'Spisovka_ZpravyPresenter', NULL, 'Zprávy'),
-(39, 'Spisovka_CronPresenter', 'Cron - zajišťuje opakované činnosti', 'Cron');
+(39, 'Spisovka_CronPresenter', 'Cron - zajišťuje opakované činnosti', 'Cron'),
+(40, 'DatovaSchranka', NULL, 'Datová schránka');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_role` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -790,7 +791,8 @@ INSERT INTO `{tbls3}user_rule` (`id`, `resource_id`, `name`, `note`, `privilege`
 (23, 36, 'Spisovna - zápůjčky', '', ''),
 (24, 37, 'Výpravna', '', ''),
 (25, 38, 'Zobrazení zpráv', '', ''),
-(26, 39, 'Cron', '', '');
+(26, 39, 'Cron', '', ''),
+(27, 40, 'Odesílání datových zpráv', '', 'odesilani');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_to_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
