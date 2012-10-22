@@ -196,9 +196,9 @@ function my_assert_handler($file, $line, $code)
                     if ( isset($_GET['go']) ) dibi::begin();
                     
                     // Info
-                    if (file_exists(UPDATE_DIR . $arev .'_info.php') ) {
+                    if (file_exists(UPDATE_DIR . $arev .'_info.txt') ) {
                         echo "<div class='update_title'>Informace o této aktualizaci:</div>";
-                        echo "<div class='update_info'>". file_get_contents(UPDATE_DIR . $arev .'_info.php') ."</div>";
+                        echo "<div class='update_info'>". file_get_contents(UPDATE_DIR . $arev .'_info.txt') ."</div>";
                     } else {
                         echo "<div class='update_title'>Informace o této aktualizaci:</div>";
                         if ( $arevs[1] == "." ) {
