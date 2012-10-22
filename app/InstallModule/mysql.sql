@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}dokument` (
   `skartacni_znak` enum('A','S','V') DEFAULT NULL,
   `skartacni_lhuta` int(11) DEFAULT NULL,
   `poznamka` text,
-  `lhuta` tinyint(4) NOT NULL DEFAULT '30',
+  `lhuta` smallint(6) NOT NULL DEFAULT '30',
   `epodatelna_id` int(11) DEFAULT NULL,
   `stav` tinyint(4) NOT NULL DEFAULT '1',
   `md5_hash` varchar(45) NOT NULL,
