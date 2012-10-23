@@ -698,7 +698,7 @@ INSERT INTO `{tbls3}user_resource` (`id`, `code`, `note`, `name`) VALUES
 (12, 'Admin_SubjektyPresenter', NULL, 'Administrace - subjekty'),
 (13, 'Admin_PrilohyPresenter', NULL, 'Administrace - soubory'),
 (14, 'Admin_CiselnikyPresenter', NULL, 'Administrace - číselníky'),
-(15, 'Admin_SpisyPresenter', NULL, 'Administrace - spisový plán'),
+(15, 'Admin_SpisyPresenter', NULL, 'Administrace - spisy'),
 (16, 'Admin_SpisznakPresenter', NULL, 'Administrace - spisové znaky'),
 (17, 'Admin_ProtokolPresenter', NULL, 'Administrace - protokoly'),
 (18, 'Spisovka_SpisyPresenter', NULL, 'Spisy'),
@@ -791,8 +791,19 @@ INSERT INTO `{tbls3}user_rule` (`id`, `resource_id`, `name`, `note`, `privilege`
 (23, 36, 'Spisovna - zápůjčky', '', ''),
 (24, 37, 'Výpravna', '', ''),
 (25, 38, 'Zobrazení zpráv', '', ''),
-(26, 39, 'Cron', '', ''),
-(27, 40, 'Odesílání datových zpráv', '', 'odesilani');
+(27, 40, 'Odesílání datových zpráv', '', 'odesilani'),
+(30, 3, 'Zobrazit', '', ''),
+(31, 6, 'Zobrazit / měnit', '', ''),
+(32, 9, 'Zobrazit / měnit', '', ''),
+(33, 10, 'Zobrazit / měnit', '', ''),
+(34, 11, 'Zobrazit / měnit', '', ''),
+(35, 12, 'Zobrazit / měnit', '', ''),
+(36, 13, 'Zobrazit', '', ''),
+(37, 14, 'Zobrazit / měnit', '', ''),
+(38, 15, 'Zobrazit / měnit', '', ''),
+(39, 16, 'Zobrazit / měnit', '', ''),
+(40, 17, 'Zobrazit', '', ''),
+(41, 21, 'Zobrazit / měnit', '', '');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_to_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1051,8 +1062,8 @@ ALTER TABLE `{tbls3}subjekt_historie`
   ADD CONSTRAINT `fk_subjekt_user10` FOREIGN KEY (`user_created`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}user_acl`
-  ADD CONSTRAINT `fk_user_acl_user_role1` FOREIGN KEY (`role_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `user_acl_ibfk_1` FOREIGN KEY (`rule_id`) REFERENCES `{tbls3}user_rule` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_user_acl_user_role1` FOREIGN KEY (`role_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `user_acl_ibfk_1` FOREIGN KEY (`rule_id`) REFERENCES `{tbls3}user_rule` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}user_role`
   ADD CONSTRAINT `fk_user_role_orgjednotka1` FOREIGN KEY (`orgjednotka_id`) REFERENCES `{tbls3}orgjednotka` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

@@ -114,7 +114,9 @@ function my_assert_handler($file, $line, $code)
     <div id="content"> 
         
 <?php    
-      
+
+    $do_update = isset($_GET['go']);
+
     assert('count($rev_a) > 0');
       
     // Setrid klienty podle abeceny  
@@ -193,24 +195,21 @@ function my_assert_handler($file, $line, $code)
                     
                     echo "<div class='update_rev'>";
 
-                    if ( isset($_GET['go']) ) dibi::begin();
+                    if ( $do_update ) dibi::begin();
                     
                     // Info
-                    if (file_exists(UPDATE_DIR . $arev .'_info.txt') ) {
-                        echo "<div class='update_title'>Informace o této aktualizaci:</div>";
+                    echo "<div class='update_title'>Informace o této aktualizaci:</div>";
+                    if ( $arevs[1] == "." )
+                        echo "<div class='update_info'><strong>Verze ". $arevs ."</strong></div>";
+                    else
+                        echo "<div class='update_info'><strong>Revize #". $arevs ."</strong></div>";
+
+                    if (file_exists(UPDATE_DIR . $arev .'_info.txt') )
                         echo "<div class='update_info'>". file_get_contents(UPDATE_DIR . $arev .'_info.txt') ."</div>";
-                    } else {
-                        echo "<div class='update_title'>Informace o této aktualizaci:</div>";
-                        if ( $arevs[1] == "." ) {
-                            echo "<div class='update_info'><strong>Verze ". $arevs ."</strong></div>";
-                        } else {
-                            echo "<div class='update_info'><strong>Revize #". $arevs ."</strong></div>";
-                        }                        
-                    }
                     
                     // PRE script
                     if (file_exists(UPDATE_DIR . $arev .'_script_prev.php') ) {
-                        if ( isset($_GET['go']) ) {
+                        if ( $do_update ) {
                             echo "<div class='update_title'>Provedení PHP skriptu (před aktualizaci databáze)</div>";
                             echo "<pre>";
                             require UPDATE_DIR . $arev .'_script_prev.php';
@@ -224,7 +223,7 @@ function my_assert_handler($file, $line, $code)
                     // SQL
                     if ( isset($alter[$arev]) && count($alter[$arev])>0 ) {
                         
-                        if ( isset($_GET['go']) ) {
+                        if ( $do_update ) {
                             echo "<div class='update_title'>Aktualizace databáze:</div>";
                         } else {
                             echo "<div class='update_title'>Bude provedena aktualizace databáze s následujícími SQL příkazy:</div>";
@@ -240,7 +239,7 @@ function my_assert_handler($file, $line, $code)
                             if ( empty($query) ) continue;
                             if ( $query[0] == "-" ) continue;
 
-                            if ( isset($_GET['go']) ) {
+                            if ( $do_update ) {
                                 try {
                                     dibi::query($query);
                                     echo "<span style='color:green'> >> ". $query ."</span>\n";
@@ -258,7 +257,7 @@ function my_assert_handler($file, $line, $code)
                     
                     // AFTER source
                     if (file_exists(UPDATE_DIR . $arev .'_script_after.php') ) {
-                        if ( isset($_GET['go']) ) {
+                        if ( $do_update ) {
                             echo "<div class='update_title'>Provedení PHP skriptu (po aktualizaci databáze)</div>";
                             echo "<pre>";
                             require UPDATE_DIR . $arev .'_script_after.php';
@@ -268,10 +267,10 @@ function my_assert_handler($file, $line, $code)
                         }
                     } 
                     
-                        if ( isset($_GET['go']) ) dibi::commit();
+                        if ( $do_update ) dibi::commit();
                     
                     } catch (DibiException $e) {
-                        if ( isset($_GET['go']) ) dibi::rollback();
+                        if ( $do_update ) dibi::rollback();
                         $rev_error = 1;
                         break;
                     }
@@ -287,7 +286,7 @@ function my_assert_handler($file, $line, $code)
                                         file_put_contents($site_path."/configs/_aktualizace",$arev); */
         }
         
-        if ( isset($_GET['go']) ) {
+        if ( $do_update ) {
             if ( $rev_error != 1 ) 
                 if (! file_put_contents($site_path."/configs/_aktualizace",$arev))
                     error("Upozornění: nepodařilo se zapsat nové číslo verze do souboru _aktualizace");
