@@ -92,7 +92,7 @@ class DokumentOdeslani extends BaseModel
     }
     
     
-    public function kOdeslani($volba_razeni, $pouze_posta = null, $druh = null) {
+    public function kOdeslani($volba_razeni, $hledani, $pouze_posta = null, $druh = null) {
 
         switch ($volba_razeni) {
             case 'datum_desc':
@@ -107,8 +107,7 @@ class DokumentOdeslani extends BaseModel
             default:
                 $razeni = array('ds.datum_odeslani','s.nazev_subjektu','s.prijmeni','s.jmeno');
         }
-            
-            
+                        
         $sql = array(
             'distinct'=>true,
             'from' => array($this->name => 'ds'),
@@ -129,14 +128,14 @@ class DokumentOdeslani extends BaseModel
                     'on' => array('dok.id=ds.dokument_id'),
                     'cols' => array('nazev'=>'dok_nazev','jid'=>'dok_jid','cislo_jednaci'=>'dok_cislo_jednaci','poradi'=>'dok_poradi')
                  ),                
-                'user' => array(
+                'o2user' => array(
                     'from' => array($this->tb_osoba_to_user => 'o2user'),
                     'on' => array('o2user.user_id=ds.user_id'),
                     'cols' => array()
                 ),
-                'user_osoba' => array(
-                    'from' => array($this->tb_osoba => 'user_osoba'),
-                    'on' => array('user_osoba.id=o2user.osoba_id'),
+                'osoba' => array(
+                    'from' => array($this->tb_osoba => 'osoba'),
+                    'on' => array('osoba.id=o2user.osoba_id'),
                     'cols' => array(
                                     'prijmeni'=>'user_prijmeni','jmeno'=>'user_jmeno','titul_pred'=>'user_titul_pred','titul_za'=>'user_titul_za'
                                    )
@@ -151,6 +150,13 @@ class DokumentOdeslani extends BaseModel
         if ( !is_null($pouze_posta) ) {
             $sql['where'][] = array('ds.zpusob_odeslani_id=3');
         }
+
+        if (!empty($hledani))
+            $sql['where_or'] = array(
+                array('CONCAT(s.nazev_subjektu,s.prijmeni) LIKE %s','%'.$hledani.'%'),            
+                array('osoba.prijmeni LIKE %s','%'.$hledani.'%'),
+                array('cislo_jednaci LIKE %s','%'.$hledani.'%'),
+            );
         
         //if ( is_null($druh) ) {
         //    return $this->fetchAllComplet($sql);

@@ -21,9 +21,17 @@
         </a>          
         
     </div>
+    
+    <div id="search">
+        {control searchForm}
+        <div id="search_advanced">
+        {if !empty($zobraz_zrusit_hledani)}<a href="{link :Spisovka:Vypravna:reset}" style="color:#ff0000;">Zrušit vyhledávání</a>&nbsp;&nbsp;&nbsp;{/if}        
+        </div>
+    </div>
     <div id="seradit">
     {control seraditForm}
     </div>
+    <br /><br /> <!-- #search div je float, proto musime udelat misto -->
     
     <div id="dokumenty">
     {if count($seznam)>0}

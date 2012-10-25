@@ -9,6 +9,7 @@ Nové funkce:
 - sestavy - přidán sloupec předáno pro ruční dopsání podpisu
 - výpravna - do seznamu dokumentů přidán sloupec s uživatelem, který dokument předal výpravně
 - výpravna - přidána možnost seřadit dokumenty podle datumu odeslání nebo čísla jednacího
+- výpravna - přidáno jednoduché hledání
 - přidáno nové oprávnění pro odesílání datových zpráv. Je nutné jej přiřadit příslušným rolím.
 - přidána oprávnění pro jednotlivé části administrace
 

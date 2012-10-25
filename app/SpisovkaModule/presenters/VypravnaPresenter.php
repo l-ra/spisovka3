@@ -7,6 +7,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     private $oddelovac_poradi = null;
     private $pdf_output = 0;
     private $seradit = null;
+    // retezec, ktery uzivatel zadal do vyhledavaciho pole
+    private $jednoduche_hledani = null;
 
     public function startup()
     {
@@ -27,7 +29,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         parent::startup();
     }
 
-    public function renderDefault($filtr = null, $hledat = null, $seradit = null)
+    public function renderDefault()
     {
 
         $post = $this->getRequest()->getPost();
@@ -41,22 +43,45 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $seznam = array();
         
         $seradit = $this->getParam('seradit');
-        if (empty($seradit))
-            $seradit = 'datum';
+        if (empty($seradit)) {
+            $cookie = $this->getHttpRequest()->getCookie('s3_vypravna_seradit');  
+            if ( $cookie )
+                $seradit = unserialize($cookie);
+            if (empty($seradit))
+                $seradit = 'datum';
+        }
+        else
+            $this->getHttpResponse()->setCookie('s3_vypravna_seradit', serialize($seradit), strtotime('90 day'));
+            
         // Uloz hodnotu pro pouziti ve formulari razeni
         $this->seradit = $seradit;
+        
+        $hledat = $this->getParam('hledat');
+        if (!empty($hledat)) {
+            $this->jednoduche_hledani = $hledat;
+            $this->template->zobraz_zrusit_hledani = true;
+            $this->getHttpResponse()->setCookie('s3_vypravna_hledat', serialize($hledat), strtotime('90 day'));
+        }
+        else {
+            $cookie_hledat = $this->getHttpRequest()->getCookie('s3_vypravna_hledat');  
+            if ( $cookie_hledat ) {
+                $hledat = unserialize($cookie_hledat);
+                $this->jednoduche_hledani = $hledat;
+                $this->template->zobraz_zrusit_hledani = true;
+            }
+        }
         
         // Volba vystupu - web/tisk/pdf
         if ( $this->getParam('print') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, 1,"doporucene");
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, 1,"doporucene");
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
             $this->setView('podaciarchnew');
         } elseif ( $this->getParam('pdfprint') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, 1,"doporucene");
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, 1,"doporucene");
             $this->pdf_output = 1;
             $this->template->count_page = ceil(count($seznam)/10);
             
@@ -64,14 +89,14 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             $this->setView('podaciarchnew');
         } elseif ( $this->getParam('print_balik') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, 1,"balik");
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, 1,"balik");
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
             $this->setView('podaciarch');
         } elseif ( $this->getParam('pdfprint_balik') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, 1,"balik");
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, 1,"balik");
             $this->pdf_output = 2;
             
             $this->template->count_page = ceil(count($seznam)/10);
@@ -79,7 +104,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             $this->setLayout(false);
             $this->setView('podaciarch');            
         } else {
-            $seznam = $Dokument->kOdeslani($seradit);
+            $seznam = $Dokument->kOdeslani($seradit, $hledat);
             //$seznam = $result->fetchAll();
         }
 
@@ -322,4 +347,45 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         // $this->getHttpResponse()->setCookie('s3_seradit', $form_data['seradit'], strtotime('90 day'));
         $this->redirect(':Spisovka:Vypravna:default', array('seradit'=>$form_data['seradit']) );
     }
+
+    protected function createComponentSearchForm()
+    {
+        $hledat =  !is_null($this->jednoduche_hledani)?$this->jednoduche_hledani:'';
+
+        $form = new AppForm();
+        $form->addText('dotaz', 'Hledat:', 20, 100)
+                 ->setValue($hledat);
+        // $form->addHidden('seradit')->setValue($this->seradit));
+        
+        // $cookie_hledat = $this->getHttpRequest()->getCookie('s3_vypravna_hledat');
+        // $s3_hledat = unserialize($cookie_hledat);
+        $controlPrototype = $form['dotaz']->getControlPrototype();
+        $controlPrototype->title = "Hledat lze dle adresáta, předávajícího a čísla jednacího";  
+
+        $form->addSubmit('hledat', 'Hledat')
+                 ->onClick[] = array($this, 'hledatSimpleClicked');
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = null;
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
+
+        return $form;
+    }
+    
+    public function hledatSimpleClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+        $this->redirect(':Spisovka:Vypravna:'.$this->view,array('hledat'=>$data['dotaz'],
+            /* 'seradit'=>$data['seradit'] */));
+    }
+
+    public function actionReset()
+    {
+        $this->getHttpResponse()->deleteCookie('s3_vypravna_hledat');
+        $this->redirect(':Spisovka:Vypravna:default');
+    }      
+
 }
