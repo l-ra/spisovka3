@@ -1,5 +1,6 @@
 /clients
 /client/configs/install
+/client/configs/*.ini
 /client/files/*
 /client/files/dokumenty/*
 /client/files/epodatelna/*
@@ -7,3 +8,4 @@
 /client/temp/*
 /log/*.log
 /log/*.html
+index.php

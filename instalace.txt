@@ -30,6 +30,7 @@ V ostatnych adresarich by se zapisovat nemelo.
 Jediny adresar, ktery by mel byt viditelny z venku, je /public. Ostatni adresare 
 by mely byt neviditelne a nepristupne.
 
+2a. V korenovem adresari prejmenujte soubor index.ph na index.php. V adresari client/configs/ prejmenujte soubory s priponou .in na .ini
 
 3. V souboru index.php upravte cesty, pokud jsou odlisne od skutecnosti:
 
