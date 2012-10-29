@@ -138,9 +138,13 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     {
 
         $this->template->uzivatel_id = $this->getParam('id',null);
-        $this->template->dokument_id = $this->getParam('dok_id',null);
+        $this->template->dokument_id = $dok_id = $this->getParam('dok_id',null);
         $this->template->novy = $this->getParam('novy',0);
 
+        $model = new Dokument();
+        $dok = $model->getInfo($dok_id);
+        $this->template->dokument_je_ve_spisu = isset($dok->spisy);
+        
         $Zamestnanci = new Osoba2User();
         $seznam = $Zamestnanci->seznam(1);
         $this->template->seznam = $seznam;
