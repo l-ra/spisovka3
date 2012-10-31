@@ -51,37 +51,38 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 $seradit = 'datum';
         }
         else
-            $this->getHttpResponse()->setCookie('s3_vypravna_seradit', serialize($seradit), strtotime('90 day'));
-            
+            $this->getHttpResponse()->setCookie('s3_vypravna_seradit', serialize($seradit), strtotime('90 day'));            
         // Uloz hodnotu pro pouziti ve formulari razeni
         $this->seradit = $seradit;
         
         $hledat = $this->getParam('hledat');
-        if (!empty($hledat)) {
-            $this->jednoduche_hledani = $hledat;
-            $this->template->zobraz_zrusit_hledani = true;
-            $this->getHttpResponse()->setCookie('s3_vypravna_hledat', serialize($hledat), strtotime('90 day'));
+        if (empty($hledat)) {
+            $cookie = $this->getHttpRequest()->getCookie('s3_vypravna_hledat');  
+            if ( $cookie )
+                $hledat = unserialize($cookie);
         }
-        else {
-            $cookie_hledat = $this->getHttpRequest()->getCookie('s3_vypravna_hledat');  
-            if ( $cookie_hledat ) {
-                $hledat = unserialize($cookie_hledat);
-                $this->jednoduche_hledani = $hledat;
-                $this->template->zobraz_zrusit_hledani = true;
-            }
+        else
+            $this->getHttpResponse()->setCookie('s3_vypravna_hledat', serialize($hledat), strtotime('90 day'));        
+        $this->jednoduche_hledani = $hledat;
+        $this->template->zobraz_zrusit_hledani = !empty($hledat);
+
+        $filtr = null;
+        $cookie = $this->getHttpRequest()->getCookie('s3_vypravna_filtr');  
+        if ( $cookie ) {
+            $filtr = unserialize($cookie);
         }
         
         // Volba vystupu - web/tisk/pdf
         if ( $this->getParam('print') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, $hledat, 1,"doporucene");
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, "doporucene");
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
             $this->setView('podaciarchnew');
         } elseif ( $this->getParam('pdfprint') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, $hledat, 1,"doporucene");
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, "doporucene");
             $this->pdf_output = 1;
             $this->template->count_page = ceil(count($seznam)/10);
             
@@ -89,14 +90,14 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             $this->setView('podaciarchnew');
         } elseif ( $this->getParam('print_balik') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, $hledat, 1,"balik");
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, "balik");
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
             $this->setView('podaciarch');
         } elseif ( $this->getParam('pdfprint_balik') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, $hledat, 1,"balik");
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, "balik");
             $this->pdf_output = 2;
             
             $this->template->count_page = ceil(count($seznam)/10);
@@ -104,7 +105,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             $this->setLayout(false);
             $this->setView('podaciarch');            
         } else {
-            $seznam = $Dokument->kOdeslani($seradit, $hledat);
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, $filtr);
             //$seznam = $result->fetchAll();
         }
 
@@ -388,4 +389,64 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->redirect(':Spisovka:Vypravna:default');
     }      
 
+    protected function createComponentFiltrovatForm()
+    {
+
+        $select = array(
+            'datum'=>'data odeslání (vzestupně)',
+            'datum_desc'=>'data odeslání (sestupně)',
+            'cj'=>'čísla jednacího (vzestupně)',
+            'cj_desc'=>'čísla jednacího (sestupně)'
+        );
+
+        $form = new AppForm();
+        $form->addSelect('seradit', 'Seřadit podle:', $select)
+                ->setValue($this->seradit)
+                ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
+
+        $submit = $form->addSubmit('go_seradit', 'Seřadit')
+                    ->setRendered(TRUE);
+        $submit->getControlPrototype()->style(array('display' => 'none'));
+        $submit->onClick[] = array($this, 'seraditClicked');
+
+
+        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = null;
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;
+
+        return $form;
+    }
+    
+    public function actionFiltrovat()
+    {
+        $post_data = Environment::getHttpRequest()->getPost();
+        
+        // hidden element zajisti, ze detekujeme odeslani formulare, kde neni zadny checkbox zaskrtnuty
+        if ( !empty($post_data) ) {
+            if ( isset($post_data['druh_zasilky']) ) {
+                // nastav filtrovani               
+                $druh_zasilky_a = array();
+                foreach( $post_data['druh_zasilky'] as $druh_id=>$druh_status ) {
+                    $druh_zasilky_a[] = $druh_id;
+                }
+
+                $this->getHttpResponse()->setCookie('s3_vypravna_filtr', serialize($druh_zasilky_a), strtotime('90 day'));
+           }
+            else {
+                // zrus filtrovani
+                $this->getHttpResponse()->deleteCookie('s3_vypravna_filtr');
+            }
+            // v obou pripadech prejdi na vychozi stranku vypravny
+            $this->redirect(':Spisovka:Vypravna:default');
+        }
+    }
+    
+    public function renderFiltrovat()
+    {
+        $this->template->DruhZasilky = DruhZasilky::get(null,1);
+        $this->setLayout(false);
+    }
 }

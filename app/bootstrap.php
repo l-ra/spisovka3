@@ -221,7 +221,7 @@ if ( $cool_url ) {
                 'params'    => null
         ));
 
-        $router[] = new Route('<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|reset>', array(
+        $router[] = new Route('<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|reset|filtrovat>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
 		'action' => 'default',

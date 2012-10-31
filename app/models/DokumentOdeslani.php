@@ -92,7 +92,7 @@ class DokumentOdeslani extends BaseModel
     }
     
     
-    public function kOdeslani($volba_razeni, $hledani, $pouze_posta = null, $druh = null) {
+    public function kOdeslani($volba_razeni, $hledani, $filtr) {
 
         switch ($volba_razeni) {
             case 'datum_desc':
@@ -147,7 +147,7 @@ class DokumentOdeslani extends BaseModel
 
         $sql['where'] = array( array('ds.stav=1') );
         
-        if ( !is_null($pouze_posta) ) {
+        if ( $filtr !== null ) {
             $sql['where'][] = array('ds.zpusob_odeslani_id=3');
         }
 
@@ -157,20 +157,24 @@ class DokumentOdeslani extends BaseModel
                 array('osoba.prijmeni LIKE %s','%'.$hledani.'%'),
                 array('cislo_jednaci LIKE %s','%'.$hledani.'%'),
             );
-        
-        //if ( is_null($druh) ) {
-        //    return $this->fetchAllComplet($sql);
-        //}
-        
+                
         $dokumenty = array();
         $result = $this->fetchAllComplet($sql)->fetchAll();
         
         if ( count($result)>0 ) {
             foreach ($result as $subjekt_index => $subjekt) {
+                if (is_array($filtr)) {
+                    // filtruj podle druhu zasilky
+                    $a_druh_db = unserialize($subjekt->druh_zasilky);
+                    $a_result = array_intersect($a_druh_db, $filtr);
+                    if (empty($a_result))
+                        continue;
+                }
+                
                 $dokumenty[ $subjekt_index ] = $subjekt;
                 $dokumenty[ $subjekt_index ]->druh_zasilky = unserialize($dokumenty[ $subjekt_index ]->druh_zasilky);
                 
-                if ( $druh == "balik" ) {
+                if ( $filtr === "balik" ) {
                     if ( !$dokumenty[ $subjekt_index ]->druh_zasilky) {
                         // nelze detekovat - radeji vyradime
                         unset($dokumenty[ $subjekt_index ]);
@@ -184,7 +188,7 @@ class DokumentOdeslani extends BaseModel
                         // samotny balik je obycejny balik - vyradime
                         unset($dokumenty[ $subjekt_index ]);
                     }
-                } else if ( $druh == "doporucene" ) {
+                } else if ( $filtr === "doporucene" ) {
                     if ( !$dokumenty[ $subjekt_index ]->druh_zasilky) {
                         // nelze detekovat - radeji vyradime
                         unset($dokumenty[ $subjekt_index ]);
