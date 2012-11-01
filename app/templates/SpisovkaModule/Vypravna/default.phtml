@@ -23,12 +23,12 @@
     </div>
     
     <div id="filtr" style="margin-bottom: 0px">
-        <a href="{link :Spisovka:Vypravna:filtrovat}" onclick="return dialog(this, 'Výběr filtrování');">Filtrovat</a>
+        <a href="{link :Spisovka:Vypravna:filtrovat}" onclick="return dialog(this, 'Výběr filtrování');">Filtrovat</a>{if $zobraz_zrusit_filtr}&nbsp;&nbsp;<a href="{link :Spisovka:Vypravna:reset, 'reset' => 'filtr'}" >Zrušit filtr</a>&nbsp;&nbsp;&nbsp;{/if}   
     </div>
     <div id="search" style="margin-bottom: 0px">
         {control searchForm}
         <div id="search_advanced">
-        {if !empty($zobraz_zrusit_hledani)}<a href="{link :Spisovka:Vypravna:reset}" style="color:#ff0000;">Zrušit vyhledávání</a>&nbsp;&nbsp;&nbsp;{/if}        
+        {if !empty($zobraz_zrusit_hledani)}<a href="{link :Spisovka:Vypravna:reset, 'reset' => 'hledat'}" style="color:#ff0000;">Zrušit vyhledávání</a>&nbsp;&nbsp;&nbsp;{/if}        
         </div>
     </div>    
     

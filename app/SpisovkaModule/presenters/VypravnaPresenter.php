@@ -30,8 +30,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     }
 
     public function renderDefault()
-    {
-
+    {        
         $post = $this->getRequest()->getPost();
         if ( isset($post['hromadna_submit']) ) {
             $this->actionAkce($post);
@@ -41,36 +40,17 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
         $Dokument = new DokumentOdeslani();
         $seznam = array();
-        
-        $seradit = $this->getParam('seradit');
-        if (empty($seradit)) {
-            $cookie = $this->getHttpRequest()->getCookie('s3_vypravna_seradit');  
-            if ( $cookie )
-                $seradit = unserialize($cookie);
-            if (empty($seradit))
-                $seradit = 'datum';
-        }
-        else
-            $this->getHttpResponse()->setCookie('s3_vypravna_seradit', serialize($seradit), strtotime('90 day'));            
+                    
+        $seradit = UserSettings::get('vypravna_seradit', 'datum');
         // Uloz hodnotu pro pouziti ve formulari razeni
         $this->seradit = $seradit;
         
-        $hledat = $this->getParam('hledat');
-        if (empty($hledat)) {
-            $cookie = $this->getHttpRequest()->getCookie('s3_vypravna_hledat');  
-            if ( $cookie )
-                $hledat = unserialize($cookie);
-        }
-        else
-            $this->getHttpResponse()->setCookie('s3_vypravna_hledat', serialize($hledat), strtotime('90 day'));        
+        $hledat = UserSettings::get('vypravna_hledat');
         $this->jednoduche_hledani = $hledat;
         $this->template->zobraz_zrusit_hledani = !empty($hledat);
 
-        $filtr = null;
-        $cookie = $this->getHttpRequest()->getCookie('s3_vypravna_filtr');  
-        if ( $cookie ) {
-            $filtr = unserialize($cookie);
-        }
+        $filtr = UserSettings::get('vypravna_filtr');
+        $this->template->zobraz_zrusit_filtr = !empty($filtr);
         
         // Volba vystupu - web/tisk/pdf
         if ( $this->getParam('print') ) {
@@ -345,8 +325,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     public function seraditClicked(SubmitButton $button)
     {
         $form_data = $button->getForm()->getValues();
-        // $this->getHttpResponse()->setCookie('s3_seradit', $form_data['seradit'], strtotime('90 day'));
-        $this->redirect(':Spisovka:Vypravna:default', array('seradit'=>$form_data['seradit']) );
+        UserSettings::set('vypravna_seradit', $form_data['seradit']);
+        $this->redirect(':Spisovka:Vypravna:default');
     }
 
     protected function createComponentSearchForm()
@@ -356,17 +336,13 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $form = new AppForm();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
-        // $form->addHidden('seradit')->setValue($this->seradit));
         
-        // $cookie_hledat = $this->getHttpRequest()->getCookie('s3_vypravna_hledat');
-        // $s3_hledat = unserialize($cookie_hledat);
         $controlPrototype = $form['dotaz']->getControlPrototype();
         $controlPrototype->title = "Hledat lze dle adresáta, předávajícího a čísla jednacího";  
 
         $form->addSubmit('hledat', 'Hledat')
                  ->onClick[] = array($this, 'hledatSimpleClicked');
 
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = null;
@@ -379,46 +355,19 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     public function hledatSimpleClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $this->redirect(':Spisovka:Vypravna:'.$this->view,array('hledat'=>$data['dotaz'],
-            /* 'seradit'=>$data['seradit'] */));
+        UserSettings::set('vypravna_hledat', $data['dotaz']);
+        $this->redirect(':Spisovka:Vypravna:'.$this->view);
     }
 
     public function actionReset()
     {
-        $this->getHttpResponse()->deleteCookie('s3_vypravna_hledat');
+        $what = $this->getParam('reset');
+        if ($what == 'hledat')
+            UserSettings::remove('vypravna_hledat');
+        elseif ($what == 'filtr')
+            UserSettings::remove('vypravna_filtr');
         $this->redirect(':Spisovka:Vypravna:default');
     }      
-
-    protected function createComponentFiltrovatForm()
-    {
-
-        $select = array(
-            'datum'=>'data odeslání (vzestupně)',
-            'datum_desc'=>'data odeslání (sestupně)',
-            'cj'=>'čísla jednacího (vzestupně)',
-            'cj_desc'=>'čísla jednacího (sestupně)'
-        );
-
-        $form = new AppForm();
-        $form->addSelect('seradit', 'Seřadit podle:', $select)
-                ->setValue($this->seradit)
-                ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
-
-        $submit = $form->addSubmit('go_seradit', 'Seřadit')
-                    ->setRendered(TRUE);
-        $submit->getControlPrototype()->style(array('display' => 'none'));
-        $submit->onClick[] = array($this, 'seraditClicked');
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
     
     public function actionFiltrovat()
     {
@@ -433,11 +382,11 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                     $druh_zasilky_a[] = $druh_id;
                 }
 
-                $this->getHttpResponse()->setCookie('s3_vypravna_filtr', serialize($druh_zasilky_a), strtotime('90 day'));
+                UserSettings::set('vypravna_filtr', $druh_zasilky_a);
            }
             else {
                 // zrus filtrovani
-                $this->getHttpResponse()->deleteCookie('s3_vypravna_filtr');
+                UserSettings::remove('vypravna_filtr');
             }
             // v obou pripadech prejdi na vychozi stranku vypravny
             $this->redirect(':Spisovka:Vypravna:default');
