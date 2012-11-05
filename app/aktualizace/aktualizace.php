@@ -159,14 +159,8 @@ function my_assert_handler($file, $line, $code)
         }
 
         // dibi::getProfiler()->setFile(UPDATE_DIR.'log.sql'); 
-
-        if (file_exists($site_path."/configs/_aktualizace") ) {
-            $revision = trim(file_get_contents($site_path."/configs/_aktualizace"));
-            if (empty($revision))
-                $revision = 0;
-        } else {
-            $revision = 0;
-        }
+        
+        $revision = getRevisionNo();
 
         echo '<dl class="detail_item">';
         echo '    <dt>Poslední zjištěná revize klienta:</dt>';
@@ -176,7 +170,7 @@ function my_assert_handler($file, $line, $code)
         echo '</div>';
         echo '<br />';
 
-        $apply_rev = 0; $rev_error = 0;
+        $apply_rev = 0; $rev_error = false;
         if ( count($rev_a)>0 ) {
             
             foreach( $rev_a as $arev => $arevs ) {
@@ -245,8 +239,7 @@ function my_assert_handler($file, $line, $code)
                                     echo "<span style='color:green'> >> ". $query ."</span>\n";
                                 } catch ( DibiException $e ) {
                                     echo "<span style='color:red'> >> ". $query ."</span>\n";
-                                    echo "<span style='color:red'> >> Chyba: ". $e->getMessage() ."</span>\n";
-                                    throw new DibiException($e->getMessage(),$e->getCode(),$e->getSql());
+                                    throw $e;
                                 }
                             } else {
                                 echo "". $query .";\n";
@@ -267,11 +260,16 @@ function my_assert_handler($file, $line, $code)
                         }
                     } 
                     
-                        if ( $do_update ) dibi::commit();
+                    if ( $do_update ) { 
+                        dibi::commit();
+                        // Je nutne provest zaznam po kazde uspesne aktualizaci pro pripad, ze by nektera z aktualizaci byla neuspesna
+                        updateRevisionNo($arev);
+                    }
                     
                     } catch (DibiException $e) {
                         if ( $do_update ) dibi::rollback();
-                        $rev_error = 1;
+                        error("Došlo k databázové chybě, aktualizace neproběhla úspěšně!<br />Popis chyby: " . $e->getMessage());
+                        $rev_error = true;
                         break;
                     }
                     
@@ -282,13 +280,11 @@ function my_assert_handler($file, $line, $code)
         
         if ($apply_rev == 0) {
             echo "<div class='update_no'>Nebyla zjištěna žádná aktualizace. Spisová služba je aktuální.</div>";
-            /* Nic nezapisovat pokud není spuštěn ostrý update
-                                        file_put_contents($site_path."/configs/_aktualizace",$arev); */
         }
         
         if ( $do_update ) {
-            if ( $rev_error != 1 ) 
-                if (! file_put_contents($site_path."/configs/_aktualizace",$arev))
+            if ( !$rev_error ) 
+                if (!updateRevisionNo($arev))
                     error("Upozornění: nepodařilo se zapsat nové číslo verze do souboru _aktualizace");
                     
             
@@ -306,22 +302,41 @@ function my_assert_handler($file, $line, $code)
         
     }
 
+function getRevisionNo()
+{
+    global $site_path;
+    $revision = 0;
+    if (file_exists($site_path."/configs/_aktualizace") ) {
+        $revision = trim(file_get_contents($site_path."/configs/_aktualizace"));
+        if (empty($revision))
+            $revision = 0;
+    }
+    return $revision;
+}
+
+function updateRevisionNo($rev)
+{
+    global $site_path;
+    return file_put_contents($site_path."/configs/_aktualizace",$rev);
+}
+
 function deleteDir($dir, $dir_parent = null) 
 { 
-   if (substr($dir, strlen($dir)-1, 1) != '/') 
+    if (substr($dir, strlen($dir)-1, 1) != '/') 
        $dir .= '/'; 
 
-   if ( empty($dir) || $dir == "/" || $dir == "." || $dir == ".." ) {
+    if ( empty($dir) || $dir == "/" || $dir == "." || $dir == ".." ) {
        // zamezeni aspon zakladnich adresaru, ktere mohou delat neplechu
        return false;
-   }
-   
-   if ($handle = opendir($dir)) 
-   { 
-       while ($obj = readdir($handle)) 
-       { 
-           if ($obj != '.' && $obj != '..') 
-           { 
+    }
+
+    if ($handle = opendir($dir)) 
+    { 
+        while ($obj = readdir($handle)) 
+        { 
+            // git neumi spravovat prazdne adresare, proto v adresari temp je stub soubor .gitignore
+            if ($obj != '.' && $obj != '..' && $obj != '.gitignore') 
+            { 
                if (is_dir($dir.$obj)) 
                { 
                    if (!deleteDir($dir.$obj,$dir)) 
@@ -332,17 +347,17 @@ function deleteDir($dir, $dir_parent = null)
                    if (!@unlink($dir.$obj)) 
                        return false; 
                } 
-           } 
-       } 
-       closedir($handle); 
-   
-       if ( !is_null($dir_parent) ) {
+            } 
+        } 
+        closedir($handle); 
+
+        if ( !is_null($dir_parent) ) {
            if (!@rmdir($dir)) 
                return false; 
-       }
-       return true; 
-   } 
-   return false; 
+        }
+        return true; 
+    } 
+    return false; 
 }      
     
     
