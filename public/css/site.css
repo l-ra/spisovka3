@@ -1,5 +1,5 @@
 body {
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
     margin: 0px;
     padding: 0px;
     text-align: left;
@@ -30,7 +30,7 @@ form {
 /* ***************************************************************** */
 /* *** TOP LAYOUT *** */
 #layout_top {
-    background: #8FBAD9 url() repeat-x;
+    background: #8FBAD9 ;
     margin: 0px;
     padding-top: 20px;
 }
@@ -41,7 +41,7 @@ form {
     padding: 0px;
     /*height: 120px;*/
     position: relative;
-    background: #3E94D1 url() repeat-x;
+    background: #3E94D1 ;
 }
 
 #top h1 {
@@ -113,7 +113,7 @@ form {
 }
 
 #menu {
-    background: #03406A url() repeat-x;
+    background: #03406A ;
     padding: 10px 10px;
     color: #DDDDDD;
     font-weight: bold;
@@ -152,7 +152,7 @@ form {
 
 #content {
     position: relative;
-    background: #ffffff url() repeat-x;
+    background: #ffffff ;
     min-height: 500px;
     padding: 10px;
     margin: 0px;
@@ -410,7 +410,7 @@ label.required {
     position: relative;
     border: 1px #f0f0f0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 .dokument_blok2 .h2 {
@@ -434,7 +434,7 @@ label.required {
     position: relative;
     border: 1px #e0e0e0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #8FBAD9 url() repeat-x;
+    background: #8FBAD9 ;
 }
 
 .dokument_blok3 .h2 {
@@ -449,7 +449,7 @@ label.required {
     position: relative;
     border: 1px #e0e0e0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #8FBAD9 url() repeat-x;
+    background: #8FBAD9 ;
 }
 
 #dokument_blok_hlavni .nadpis {
@@ -468,7 +468,7 @@ label.required {
     position: relative;
     border: 1px #f0f0f0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 #dokument_blok_poznamka .h2 {
@@ -491,7 +491,7 @@ label.required {
     position: relative;
     border: 1px #f0f0f0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 #dokument_blok_vyrizeni .h2 {
@@ -525,7 +525,7 @@ label.required {
 #dokument_blok_prilohy {
     position: relative;
     padding: 5px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 #dokument_blok_prilohy .h2 {
     margin: 0px; padding: 5px;
@@ -537,14 +537,14 @@ label.required {
 #dokument_blok_akce {
     border: 1px #e0e0e0 solid;
     padding: 15px; margin-bottom: 0px;
-    background: #8FBAD9 url() repeat-x;
+    background: #8FBAD9 ;
 }
 
 #dokument_blok_volby {
     position: relative;
     padding: 10px 10px;
     margin: 0px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 #dokument_blok_volby a {
@@ -612,7 +612,7 @@ label.required {
     text-align: right;
     color: #03406A;
     font-size: 8pt;
-    background: #3E94D1 url() repeat-x;
+    background: #3E94D1 ;
 }
 
 #bottom a {
@@ -633,7 +633,7 @@ label.required {
     margin: 0 auto 0 auto;
     padding: 10px;
     text-align: center;
-    background: #ffffff url() repeat-x;
+    background: #ffffff ;
 }
 
 #info_flash {
@@ -641,7 +641,7 @@ label.required {
     margin: 0 auto 0 auto;
     padding: 10px;
     text-align: center;
-    background: #ffffff url() repeat-x;
+    background: #ffffff ;
 }
 
 .flash_message {
@@ -650,7 +650,7 @@ label.required {
     text-align: left;
     color: #666600;
     border: 1px #666600 solid;
-    background: #ffffcc url() repeat-x;
+    background: #ffffcc ;
 }
 
 .flash_info, .flash_info_ext {
@@ -740,7 +740,7 @@ label.required {
     width: 400px;
     margin: 0 auto 0 auto;
     padding: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 #form_login label {
@@ -758,7 +758,7 @@ label.required {
     width: 600px;
     margin: 0 auto 0 auto;
     padding: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 /* ***************************************************************** */
@@ -1038,7 +1038,7 @@ label.required {
     padding: 5px 5px 5px 5px;
     color: #FFC273;
     font-size: 10pt;
-    background: #03406A url() repeat-x;
+    background: #03406A ;
 }
 
 #debug_head {

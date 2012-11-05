@@ -1,5 +1,5 @@
 body {
-    background: #ffffff url() repeat-x;
+    background: #ffffff ;
     margin: 0px;
     padding: 0px;
     text-align: left;
@@ -58,7 +58,7 @@ body {
     position: relative;
     border: 1px #f0f0f0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 .dokument_blok2 .h2 {
@@ -82,7 +82,7 @@ body {
     position: relative;
     border: 1px #e0e0e0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #8FBAD9 url() repeat-x;
+    background: #8FBAD9 ;
 }
 
 .dokument_blok3 .h2 {
@@ -97,7 +97,7 @@ body {
     position: relative;
     border: 1px #e0e0e0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #8FBAD9 url() repeat-x;
+    background: #8FBAD9 ;
 }
 
 #dokument_blok_hlavni .nadpis {
@@ -116,7 +116,7 @@ body {
     position: relative;
     border: 1px #f0f0f0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 #dokument_blok_poznamka .h2 {
@@ -139,7 +139,7 @@ body {
     position: relative;
     border: 1px #f0f0f0 solid;
     padding: 5px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 #dokument_blok_vyrizeni .h2 {
@@ -173,7 +173,7 @@ body {
 #dokument_blok_prilohy {
     position: relative;
     padding: 5px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 #dokument_blok_prilohy .h2 {
     margin: 0px; padding: 5px;
@@ -185,14 +185,14 @@ body {
 #dokument_blok_akce {
     border: 1px #e0e0e0 solid;
     padding: 15px; margin-bottom: 0px;
-    background: #8FBAD9 url() repeat-x;
+    background: #8FBAD9 ;
 }
 
 #dokument_blok_volby {
     position: relative;
     padding: 10px 10px;
     margin: 0px; margin-bottom: 10px;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 #dokument_blok_volby a {

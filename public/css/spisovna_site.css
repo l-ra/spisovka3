@@ -1,15 +1,15 @@
 body {
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 /* ***************************************************************** */
 /* *** TOP LAYOUT *** */
 #layout_top {
-    background: #9FCE98 url() repeat-x;
+    background: #9FCE98 ;
 }
 
 #top {
-    background: #5FBC50 url() repeat-x;
+    background: #5FBC50 ;
 }
 
 #top h1 {
@@ -53,7 +53,7 @@ body {
 }
 
 #menu {
-    background: #134E09 url() repeat-x;
+    background: #134E09 ;
     padding: 10px 10px;
 }
 
@@ -66,7 +66,7 @@ body {
 }
 
 #content {
-    background: #ffffff url() repeat-x;
+    background: #ffffff ;
     min-height: 500px;
 }
 
@@ -81,12 +81,12 @@ body {
 
 #dokument_blok_hlavni {
     border: 1px #5FBC50 solid;
-    background: #9FCE98 url() repeat-x;
+    background: #9FCE98 ;
 }
 
 #dokument_blok_poznamka {
     border: 1px #f0f0f0 solid;
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 #dokument_blok_poznamka .h2 {
@@ -99,7 +99,7 @@ body {
 
 
 #dokument_blok_prilohy {
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 #dokument_blok_prilohy .h2 {
     border-bottom: 1px #e0e0e0 solid;
@@ -107,11 +107,11 @@ body {
 
 #dokument_blok_akce {
     border: 1px #e0e0e0 solid;
-    background: #8FBAD9 url() repeat-x;
+    background: #8FBAD9 ;
 }
 
 #dokument_blok_volby {
-    background: #f0f0f0 url() repeat-x;
+    background: #f0f0f0 ;
 }
 
 #dokument_blok_volby a {
@@ -163,7 +163,7 @@ body {
     text-align: right;
     color: #134E09;
     font-size: 8pt;
-    background: #5FBC50 url() repeat-x;
+    background: #5FBC50 ;
 }
 
 #bottom a {
@@ -186,7 +186,7 @@ body {
     padding: 5px 5px 5px 5px;
     color: #FFC273;
     font-size: 10pt;
-    background: #134E09 url() repeat-x;
+    background: #134E09 ;
 }
 
 #debug_head {
