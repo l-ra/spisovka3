@@ -294,18 +294,35 @@ function my_assert_handler($file, $line, $code)
                 deleteDir($site_path ."/temp/");
         }
 
-        unset($apply_rev);
 
         dibi::disconnect();        
         
+        if ($do_update && !$rev_error && $apply_rev != 0)
+            echo "<p>Aktualizace klienta proběhla úspěšně.</p>";
+            
         echo "</div>\n\n";
-        
+        unset($apply_rev);        
     }
+
+    // Konec php programu
 
 function getRevisionNo()
 {
-    global $site_path;
+    global $site_path, $config;
     $revision = 0;
+    
+    try {
+        $result = dibi::query("SELECT [value] FROM %n WHERE [name] = 'db_revision'",
+            $config['prefix'] . 'settings');
+        if (count($result) > 0) {
+            $revision = $result->fetchSingle();
+            return $revision;
+        }
+    }
+    catch (Exception $e) {
+        // V databazi pravdepodobne neexistuje zminena tabulka
+    }
+    
     if (file_exists($site_path."/configs/_aktualizace") ) {
         $revision = trim(file_get_contents($site_path."/configs/_aktualizace"));
         if (empty($revision))
@@ -316,7 +333,18 @@ function getRevisionNo()
 
 function updateRevisionNo($rev)
 {
-    global $site_path;
+    global $site_path, $config;
+    
+    try {
+        dibi::query('UPDATE %n', $config['prefix'] . 'settings', 'SET [value] = %i',
+            $rev, "WHERE [name] = 'db_revision'");
+        return true;
+    }
+    catch (Exception $e) {
+        // V databazi pravdepodobne neexistuje zminena tabulka
+        // fall through
+    }
+    
     return file_put_contents($site_path."/configs/_aktualizace",$rev);
 }
 

@@ -99,6 +99,10 @@
             
         }
         
+        .update_site p {
+            margin: 10px;            
+        }
+        
         .update_info {
             margin: 20px;
             white-space: pre;
