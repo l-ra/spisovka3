@@ -1,10 +1,10 @@
 <?php
 
 try {
-    // kontrola na existenci tabulky stat
+    // kontrola na existenci tabulky
     dibi::query('SELECT id FROM %n', $config['prefix'] ."user_settings")->fetchAll();
     
-    // tabulka zprava existuje, revize se neprovede
+    // tabulka existuje, revize se neprovede
     $continue = 1;
     
 } catch (DibiException $e) {
