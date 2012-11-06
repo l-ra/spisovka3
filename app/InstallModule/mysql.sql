@@ -1093,6 +1093,13 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_settings` (
 ALTER TABLE `{tbls3}user_settings` 
   ADD CONSTRAINT `fk_user_settings_id1` FOREIGN KEY ( `id` ) REFERENCES `{tbls3}user` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
+CREATE TABLE `{tbls3}settings` (
+  `name` VARCHAR( 50 ) CHARACTER SET ascii NOT NULL ,
+  `value` VARCHAR( 250 ) NOT NULL ,
+  PRIMARY KEY ( `name` )
+) ENGINE = InnoDB CHARACTER SET utf8;
+
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '0');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
