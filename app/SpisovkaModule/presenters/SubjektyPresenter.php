@@ -257,8 +257,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         }
         
         $isds = new ISDS_Spisovka();
-        if ( $isds->pripojit() ) {
-            
+        try {
+            $isds->pripojit();
             $filtr['dbID'] = $id;
             $prijemci = $isds->FindDataBoxEx($filtr);
             if ( isset($prijemci->dbOwnerInfo) ) {
@@ -276,8 +276,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
             
             exit;
                                     
-        } else {
-            echo json_encode(array("error"=>$isds->error()));
+        } catch (Exception $e) {
+            echo json_encode(array("error"=>$e->getMessage()));
             exit;
         }
     }    

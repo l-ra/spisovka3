@@ -1430,7 +1430,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             if ( $source ) {
                                 
                                 $isds = new ISDS_Spisovka();
-                                if ( $ISDSBox = $isds->pripojit() ) {
+                                $_pripojeno = false;
+                                try {
+                                    $isds->pripojit();
+                                    $_pripojeno = true;
+                                }
+                                catch (Exception $e) {
+                                    $_chyba = $e->getMessage();
+                                }
+                                if ( $_pripojeno ) {
                                     
                                     if ( $isds->AuthenticateMessage( $source ) ) {
                                         $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
@@ -1443,8 +1451,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                                 } else {
                                     $this->template->error = 3;
                                     $this->template->vysledek = "Nepodařilo se připojit k ISDS schránce!".
-                                                                "<br />".
-                                                                'ISDS chyba: '. $isds->error();
+                                                                "<br />" . $_chyba;
                                 }
                             }
                         }
@@ -2581,7 +2588,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         try {
 
             $isds = new ISDS_Spisovka();
-            $ISDSBox = $isds->pripojit();
+            $isds->pripojit();
 
             $dmEnvelope = array(
                 "dbIDRecipient"=>$adresat->id_isds,

@@ -828,7 +828,6 @@ dmFormat =
 
     public function zkontrolujOdchoziISDS($zprava = null)
     {
-
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
         
         $ep_zpravy = array();
@@ -872,15 +871,8 @@ dmFormat =
                 'rok' => $zprava->rok
             );            
         }
-        
-        //echo "<pre>";
-        //echo "$od - ".date("j.n.Y G:i:s",$od)." \n";
-        //echo "$do - ".date("j.n.Y G:i:s",$do)." \n";
-        //echo print_r($ep_zpravy);
-        //exit;
-        
-        if ( count($ep_zpravy) == 0 ) return false; // neni co kontrolovat
-        
+               
+        if ( count($ep_zpravy) == 0 ) return false; // neni co kontrolovat        
         
         $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $config_data = $config->toArray();
@@ -888,8 +880,15 @@ dmFormat =
         
         $isds = new ISDS_Spisovka();
 
-        if ( $isds->pripojit($config) ) {
-            
+        try {
+            $isds->pripojit($config);
+        }
+        catch (Exception $e) {
+            $this->flashMessage('Nepodařilo se připojit k ISDS schránce "'. $config['ucet'] .'"!
+                                  ISDS chyba: '. $e->getMessage(),'warning');
+            return null;
+        }
+       
             $zpravy = $isds->seznamOdeslanychZprav($od,$do);
             
             if ( count( $zpravy )>0 ) {
@@ -1001,11 +1000,6 @@ dmFormat =
                 }
                 
                 return ( count($tmp)>0 )?$tmp:null;
-        } else {
-            $this->flashMessage('Nepodařilo se připojit k ISDS schránce "'. $config['ucet'] .'"!
-                                  ISDS chyba: '. $isds->error(),'warning');
-            return null;
-        }
     }
     
     
@@ -1253,9 +1247,9 @@ dmFormat =
                         
                         if ( $source ) {
                                 
-                            $isds = new ISDS_Spisovka();
-                            if ( $ISDSBox = $isds->pripojit() ) {
-                                
+                            $isds = new ISDS_Spisovka();                           
+                            try {
+                                $isds->pripojit();
                                 if ( $isds->AuthenticateMessage( $source ) ) {
                                     $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
                                 } else {
@@ -1265,11 +1259,11 @@ dmFormat =
                                                                 'ISDS zpráva: '. $isds->error();
                                 }
                                     
-                            } else {
+                            } catch (Exception $e) {
                                 $this->template->error = 3;
                                 $this->template->vysledek = "Nepodařilo se připojit k ISDS schránce!".
                                                                 "<br />".
-                                                                'ISDS chyba: '. $isds->error();
+                                                                'chyba: '. $e->getMessage();
                             }
                         }
                     }
