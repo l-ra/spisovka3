@@ -134,44 +134,39 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->redirect('this');
     }
 
-    public function renderVyber()
+    protected function _renderVyber()
     {
-
+        if ($this->getParam('chyba',null))
+            $this->template->chyba = 1;
+            
         $this->template->uzivatel_id = $this->getParam('id',null);
-        $this->template->dokument_id = $dok_id = $this->getParam('dok_id',null);
         $this->template->novy = $this->getParam('novy',0);
+
+        $Zamestnanci = new Osoba2User();
+        $seznam = $Zamestnanci->seznam(1);
+        $this->template->seznam = $seznam;
+
+        $OrgJednotky = new Orgjednotka();
+        $oseznam = $OrgJednotky->seznam();
+        $this->template->org_seznam = $oseznam;
+    }
+    
+    public function renderVyber()
+    {            
+        $this->template->dokument_id = $dok_id = $this->getParam('dok_id',null);
 
         $model = new Dokument();
         $dok = $model->getInfo($dok_id);
         $this->template->dokument_je_ve_spisu = isset($dok->spisy);
         
-        $Zamestnanci = new Osoba2User();
-        $seznam = $Zamestnanci->seznam(1);
-        $this->template->seznam = $seznam;
-
-        $OrgJednotky = new Orgjednotka();
-        $oseznam = $OrgJednotky->seznam();
-        $this->template->org_seznam = $oseznam;
-
+        $this->_renderVyber();
 
     }
     
     public function renderVyberspis()
     {
-
-        $this->template->uzivatel_id = $this->getParam('id',null);
-        $this->template->spis_id = $this->getParam('spis_id',null);
-        $this->template->novy = $this->getParam('novy',0);
-
-        $Zamestnanci = new Osoba2User();
-        $seznam = $Zamestnanci->seznam(1);
-        $this->template->seznam = $seznam;
-
-        $OrgJednotky = new Orgjednotka();
-        $oseznam = $OrgJednotky->seznam();
-        $this->template->org_seznam = $oseznam;
-
-
+        $this->template->spis_id = $spis_id = $this->getParam('spis_id',null);
+        $this->_renderVyber();
     }    
 
     public function actionSeznamAjax()
@@ -277,18 +272,17 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $poznamka = $this->getParam('poznamka',null);
         $novy = $this->getParam('novy',0);
 
-
         if ( $novy == 1 ) {
-          echo '###predano###'. $spis_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
+            echo '###predano###'. $spis_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
 
-          $UserModel = new UserModel();
-          $osoba = $UserModel->getIdentity($user_id);
-          $Orgjednotka = new Orgjednotka();
-          $org = $Orgjednotka->getInfo($orgjednotka_id);
+            $UserModel = new UserModel();
+            $osoba = $UserModel->getIdentity($user_id);
+            $Orgjednotka = new Orgjednotka();
+            $org = $Orgjednotka->getInfo($orgjednotka_id);
 
-          echo '#'. Osoba::displayName($osoba) .'#'. @$org->zkraceny_nazev;
+            echo '#'. Osoba::displayName($osoba) .'#'. @$org->zkraceny_nazev;
 
-          $this->terminate();
+            $this->terminate();
         } else {
             $Workflow = new Workflow();
             
@@ -306,16 +300,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
                     echo '###vybrano###'. $link;
                     $this->flashMessage('Spis byl předán.');
                     $this->terminate();
-                    //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
                 } else {
-                    // chyba
-                    $this->template->uzivatel_id = 0;
-                    $this->template->spis_id = $spis_id;
-                    $Zamestnanci = new Osoba2User();
-                    $seznam = $Zamestnanci->seznam(1);
-                    $this->template->seznam = $seznam;
-                    $this->template->chyba = 1;
-                    $this->template->render('vyberspis');
+                    $this->forward('vyberspis', array('chyba' => 1, 'spis_id' => $spis_id));
                 }
             } else {
                 // pouze spis
@@ -325,16 +311,9 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
                     $this->flashMessage('Spis byl předán.');
                     echo '###vybrano###'. $link;
                     $this->terminate();
-                    //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
                 } else {
-                    // chyba
-                    $this->template->uzivatel_id = 0;
-                    $this->template->spis_id = $spis_id;
-                    $Zamestnanci = new Osoba2User();
-                    $seznam = $Zamestnanci->seznam(1);
-                    $this->template->seznam = $seznam;
-                    $this->template->chyba = 1;
-                    $this->template->render('vyberspis');
+                    // forwarduj pozadavek na novy render dialogu a dej mu informaci, ze ma upozornit uzivatele, ze doslo k chybe
+                    $this->forward('vyberspis', array('chyba' => 1, 'spis_id' => $spis_id));
                 }                
             }
         }
@@ -343,7 +322,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function renderVybrano()
     {
-
         $osoba_id = $this->getParam('id',null);
         $dokument_id = $this->getParam('dok_id',null);
         $user_id = $this->getParam('user',null);
@@ -351,7 +329,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $orgjednotka_id = $this->getParam('orgjednotka',null);
         $poznamka = $this->getParam('poznamka',null);
         $novy = $this->getParam('novy',0);
-
 
         if ( $novy == 1 ) {
           echo '###predano###'. $dokument_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
@@ -370,22 +347,11 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
                 $link = $this->link(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
                 echo '###vybrano###'. $link;
                 $this->terminate();
-                //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             } else {
-                // chyba
-                $this->template->uzivatel_id = 0;
-                $this->template->dokument_id = $dokument_id;
-                $Zamestnanci = new Osoba2User();
-                $seznam = $Zamestnanci->seznam(1);
-                $this->template->seznam = $seznam;
-                $this->template->chyba = 1;
-                $this->template->render('vyber');
+                // forwarduj pozadavek na novy render dialogu a dej mu informaci, ze ma upozornit uzivatele, ze doslo k chybe
+                $this->forward('vyber', array('chyba' => 1, 'dok_id' => $dokument_id));
             }
         }
-
     }
-    
-    
 
 }
-

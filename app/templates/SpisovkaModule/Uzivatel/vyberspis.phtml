@@ -45,7 +45,7 @@
         {foreach $seznam as $osoba}
         <tr>
             <td>
-                <a href="{link :Spisovka:Uzivatel:spisvybrano, 'id'=>$osoba->id, 'user'=>$osoba->user_id, 'role'=>$osoba->role_id, 'orgjednotka'=>$osoba->orgjednotka_id, 'spis_id'=>$spis_id, 'novy'=>$novy }" onclick="osobaVybranaSpis(this); return false;">
+                <a href="{link :Spisovka:Uzivatel:spisvybrano, 'id'=>$osoba->id, 'user'=>$osoba->user_id, 'role'=>$osoba->role_id, 'orgjednotka'=>$osoba->orgjednotka_id, 'spis_id'=>$spis_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
                    {=Osoba::displayName($osoba,'full_item')}
                </a>&nbsp;&nbsp;
             </td>
