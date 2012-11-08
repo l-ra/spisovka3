@@ -34,14 +34,16 @@ class ErrorPresenter extends BasePresenter
 
 			if ($exception instanceof BadRequestException) {
 				Environment::getHttpResponse()->setCode($exception->getCode());
-				$this->template->title = '404 Not Found';
+				// $this->template->title = '404 Not Found';
+                $this->template->message = $exception->getMessage();
 				$this->setView('404');
 			} else {
 				Environment::getHttpResponse()->setCode(500);
-				$this->template->title = '500 Internal Server Error';
-                               $this->template->message = $exception->getMessage();
+				// $this->template->title = '500 Internal Server Error';
+                $this->template->message = $exception->getMessage();
 				$this->setView('500');
 
+                // vytvor log pro vyjimku
 				Debug::processException($exception);
 			}
 		}
