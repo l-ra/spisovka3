@@ -298,7 +298,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
                 if ( $Workflow->priradit($dokument->id, $user_id, $orgjednotka_id, $poznamka) ) {
                     $link = $this->link(':Spisovka:Spisy:detail',array('id'=>$spis_id));
                     echo '###vybrano###'. $link;
-                    $this->flashMessage('Spis byl předán.');
                     $this->terminate();
                 } else {
                     $this->forward('vyberspis', array('chyba' => 1, 'spis_id' => $spis_id));
@@ -308,7 +307,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
                 $Spis = new Spis;
                 if ( $Spis->predatOrg($spis_id, $orgjednotka_id) ) {
                     $link = $this->link(':Spisovka:Spisy:detail',array('id'=>$spis_id));
-                    $this->flashMessage('Spis byl předán.');
                     echo '###vybrano###'. $link;
                     $this->terminate();
                 } else {
