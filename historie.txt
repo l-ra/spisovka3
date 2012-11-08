@@ -173,6 +173,3 @@ Released: 06.09.2010
 - vice uzivatelskych uctu pro jednoho zamestanace
 - vice roli pro jednoho uzivatele
 - vytvareni vlastnich roli s nastavenim pristupovych prav
-
-
-
