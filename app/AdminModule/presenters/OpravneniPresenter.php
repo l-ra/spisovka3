@@ -87,12 +87,17 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1 = new AppForm();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
+        $form1->addHidden('fixed')
+                ->setValue(@$role->fixed);
         $form1->addText('name', 'Název role:', 50, 100)
                 ->setValue(@$role->name)
                 ->addRule(Form::FILLED, 'Název role musí být vyplněno!');
-        $form1->addText('code', 'Kódové označení role:', 50, 150)
-                ->setValue(@$role->code)
-                ->addRule(Form::FILLED, 'Kódové označení musí být vyplněno!');
+        $input = $form1->addText('code', 'Kódové označení role:', 50, 150)
+                ->setValue(@$role->code);
+                // ->addRule(Form::FILLED, 'Kódové označení musí být vyplněno!');
+        if (isset($role->fixed) && $role->fixed != 0)
+            $input->setDisabled();
+            
         $form1->addTextArea('note', 'Popis role:', 50, 5)
                 ->setValue(@$role->note);
         $form1->addSelect('parent_id', 'Dědí z role:', $role_select)
@@ -129,9 +134,18 @@ class Admin_OpravneniPresenter extends BasePresenter
         $data['date_modified'] = date('Y-m-d H:i:s');
         unset($data['id']);
         
-        $RoleModel->upravit($data,$role_id);
-
-        $this->flashMessage('Role  "'. $data['name'] .'"  byla upravena.');
+        // Zabran menit kod preddefinovanych roli
+        if ($data['fixed'] != 0)
+            unset($data['code']);
+        
+        try
+        {
+            $RoleModel->upravit($data,$role_id);
+            $this->flashMessage('Role  "'. $data['name'] .'"  byla upravena.');
+        }
+        catch (Exception $e) {
+            $this->flashMessage('Chyba - ' . $e->getMessage(), 'warning');
+        }
         $this->redirect('this',array('id'=>$role_id));
     }
 
@@ -186,14 +200,14 @@ class Admin_OpravneniPresenter extends BasePresenter
         if ( empty($data['parent_id']) ) $data['parent_id'] = null;
         $data['date_created'] = new DateTime();
 
-        //try {
+        try {
             $role_id = $RoleModel->vlozit($data);
             $this->flashMessage('Role  "'. $data['name'] .'" byla vytvořena.');
             $this->redirect(':Admin:Opravneni:detail',array('id'=>$role_id));
-        //} catch (DibiException $e) {
-        //    $this->flashMessage('Roli "'. $data['name'] .'" se nepodařilo vytvořit.','warning');
-        //    $this->flashMessage($e->getMessage(),'warning');
-       // }
+        } catch (DibiException $e) {
+            $this->flashMessage('Roli "'. $data['name'] .'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage('Chyba - ' . $e->getMessage(),'warning');
+        }
     }
 
 /**

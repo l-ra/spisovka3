@@ -1099,7 +1099,9 @@ CREATE TABLE `{tbls3}settings` (
   PRIMARY KEY ( `name` )
 ) ENGINE = InnoDB CHARACTER SET utf8;
 
-INSERT INTO `{tbls3}settings` VALUES('db_revision', '0');
+ALTER TABLE `{tbls3}user_role` ADD UNIQUE `user_role_code` ( `code` );
+
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '540');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
