@@ -251,9 +251,12 @@ abstract class BasePresenter extends Presenter
             /**
              * Zobrazeni zprav uzivateli
             */
-            $Zprava = new Zprava();
-            $this->template->zpravy = $Zprava->hlasky();            
-            
+            if ($user->isAllowed('Spisovka_ZpravyPresenter')) {
+                $Zprava = new Zprava();
+                $this->template->zpravy = $Zprava->hlasky();            
+            }
+            else
+                $this->template->zpravy = array();
         } else {
             $ident = new stdClass();
             $ident->name = "Nepřihlášen";

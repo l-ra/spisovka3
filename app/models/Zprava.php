@@ -119,25 +119,33 @@ class Zprava extends BaseModel
         if ( !isset($data['zprava_typ_id']) ) $data['zprava_typ_id'] = 1;
         if ( !isset($data['date_created']) ) $data['date_created'] = new DateTime();
         if ( !isset($data['user_created']) ) {
+            $data['user_created'] = null;
+            /* P.L. Toto nutno presunout do presenteru
             $user = Environment::getUser();
             if ( !$user->isAuthenticated() ) {
                 $data['user_created'] = $user->id;
             } else {
                 $data['user_created'] = null;
             }
+            */
         }
         if ( !isset($data['zobrazit_od']) ) $data['zobrazit_od'] = date("Y-m-d H:i:s");
         if ( !isset($data['stav']) ) $data['stav'] = 1;
         
         $data['uid'] = md5($data['zprava'].$data['zobrazit_od']);
         
-        //echo "<pre>"; print_r($data); echo "</pre>";
-        try {
-            return $this->insert($data);
-        } catch (Exception $e) {
+        $sql = array(
+            'from' => array($this->name => 'z'),
+            'cols' => array('id'),
+            'where' => array(array('z.uid = %s', $data['uid'])),
+        );        
+                
+        $result = $this->fetchAllComplet($sql);
+        if (count($result) > 0)
+            // zprava (pravdepodobne z RSS kanalu) jiz je v tabulce ulozena
             return false;
-        }
         
+        return $this->insert($data);
     }
     
     public function precteno($zprava_id)
@@ -181,26 +189,7 @@ class Zprava extends BaseModel
         
     }
     
-    
-    public static function informace_z_webu()
-    {
-        $url = "http://www.mojespisovka.cz/rss/novinky";
         
-        if (file_exists(CLIENT_DIR .'/temp/'. md5($url)) ) {
-            $cachetime = filemtime(CLIENT_DIR .'/temp/'. md5($url));
-            if ( date("Ymd") < date("Ymd",$cachetime) ) {
-                $source = self::getSource($url);
-                self::ulozit_zpravy($source);
-                file_put_contents(CLIENT_DIR .'/temp/'. md5($url), $source);
-            }
-        } else {
-            $source = self::getSource($url);
-            //echo $source; exit;
-            self::ulozit_zpravy($source);
-            file_put_contents(CLIENT_DIR .'/temp/'. md5($url), $source);
-        }
-    }
-    
     private static function ulozit_zpravy($source)
     {
         if (!is_null($source) ) {
@@ -236,11 +225,8 @@ class Zprava extends BaseModel
                         'zobrazit_od' => $zobrazit_od,
                         'zprava_typ_id' => 2, /* z webu */
                     );
-                    
-                    //echo "<pre>"; print_r($item); echo "</pre>";
-                    //echo "<pre>"; print_r($data); echo "</pre>";
-                    
-                    return $Zprava->ulozit($data);
+                                        
+                    $Zprava->ulozit($data);
                 }
             } else {
                 return false;
@@ -249,30 +235,11 @@ class Zprava extends BaseModel
             return false;
         }        
     }    
-    
-    public static function aktualni_verze()
-    {
-        $url = "http://www.mojespisovka.cz/rss/verze";
-        
-        if (file_exists(CLIENT_DIR .'/temp/'. md5($url)) ) {
-            $cachetime = filemtime(CLIENT_DIR .'/temp/'. md5($url));
-            if ( date("Ymd") < date("Ymd",$cachetime) ) {
-                $source = self::getSource($url);
-                self::aktualni_verze_zpracuj($source);
-                file_put_contents(CLIENT_DIR .'/temp/'. md5($url), $source);
-            }
-        } else {
-            $source = self::getSource($url);
-            self::aktualni_verze_zpracuj($source);
-            file_put_contents(CLIENT_DIR .'/temp/'. md5($url), $source);
-        }
-    }  
- 
+     
     private static function aktualni_verze_zpracuj($source)
     {
         if (!is_null($source) ) {
             $xml = simplexml_load_string($source);
-            
             if ( isset($xml->channel->item) ) {
                 foreach ( $xml->channel->item as $item ) {
                     $title = trim((string)$item->title);
@@ -373,22 +340,67 @@ class Zprava extends BaseModel
         
         $zdroj = $zdroj ."?id=". base64_encode($zprava);
         
-        if (@ini_get("allow_url_fopen")) {
+        /* if (@ini_get("allow_url_fopen")) {
             return @file_get_contents($zdroj);
-        } else if ( function_exists('curl_init') ) {
-            if ( $ch = curl_init($zdroj) ) {
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HEADER, 0);
-                $response = curl_exec($ch);
-                curl_close($ch);
-                return $response;
-            } else {
-                return null;
-            }
-        } else {
+        } */ 
+        if ( !function_exists('curl_init') )
             return null;
-        }
+            
+        if ( !($ch = curl_init($zdroj)) )     
+            return null;
+                        
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        // test - curl_setopt ($ch, CURLOPT_PORT , 8089); 
+        curl_setopt ($ch, CURLOPT_TIMEOUT , 10); 
+        $response = curl_exec($ch);
+        $success = (curl_errno($ch) == 0) && (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 200);
+        curl_close($ch);
+        return $success ? $response : null;
+    }
 
-    }       
     
+    protected static function proved_kontrolu($novinky)
+    {
+        if ($novinky) {
+            $url = "http://www.mojespisovka.cz/rss/novinky";
+            // $url = "http://server/test/rss";
+            $filename = CLIENT_DIR .'/temp/curl_novinky';
+        }
+        else {
+            $url = "http://www.mojespisovka.cz/rss/verze";
+            $filename = CLIENT_DIR .'/temp/curl_aktualizace';
+        }
+        $update_needed = true;
+        
+        if (file_exists($filename)) {
+            $cachetime = filemtime($filename);
+            if (date("Ymd") == date("Ymd",$cachetime))
+                // dnes uz kontrola probehla
+                $update_needed = false;
+        }
+                
+        if ($update_needed)
+        {
+            // aktualizuj soubor jako znamku toho, ze stahovani zacalo
+            // to by melo zarucit, ze nepobezi nekolik stahovani soucasne
+            file_put_contents($filename, '');
+            $source = self::getSource($url);
+            if ($novinky)
+                self::ulozit_zpravy($source);
+            else
+                self::aktualni_verze_zpracuj($source);
+            file_put_contents($filename, $source);
+        }
+    }
+
+    public static function aktualni_verze()
+    {
+        self::proved_kontrolu(false);
+    }  
+    
+    public static function informace_z_webu()
+    {
+        self::proved_kontrolu(true);
+    }
 }

@@ -439,11 +439,8 @@ isdsSubjekt = function ( formName ) {
  *
  */
 ajaxcron = function () {
-
-    // P.L. Zpracovani "na pozadi" je nefunkcni, funkci jsem zrusil
-    return false;
     
-    if (!(Math.random() < 0.05))
+    if (!(Math.random() < 0.1))
         return false;
 	
     baseUri = baseUri.replace('/public','');
