@@ -1,6 +1,8 @@
 <?php
 
-class Spisovka_CronPresenter extends BasePresenter
+// Trida NESMI dedit z BasePresenteru (kvuli autentizaci)
+
+class Spisovka_CronPresenter extends Presenter
 {
 
 
