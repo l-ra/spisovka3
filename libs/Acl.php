@@ -22,10 +22,7 @@ class Acl extends Permission {
         $this->addResource('Default');
 
         // permission
-        $this->allow(Permission::ALL, 'Default');
-        $this->allow(Permission::ALL, 'ErrorPresenter');
-        $this->allow(Permission::ALL, 'Spisovka_ErrorPresenter');
-        
+        $this->allow(Permission::ALL, 'Default');        
         // Je potřeba toto oprávnění ve výchozím stavu povolit. Uživatel stále bude mít možnost oprávnění explicitně odepřít
         $this->allow(Permission::ALL, 'Spisovka_ZpravyPresenter');
 
