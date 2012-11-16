@@ -1,6 +1,5 @@
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
-SET foreign_key_checks = 0;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -443,7 +442,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}spis` (
   `uroven` tinyint(4) DEFAULT NULL,
   `stav` tinyint(4) NOT NULL DEFAULT '1',
   `date_created` datetime NOT NULL,
-  `user_created` int(10) unsigned NOT NULL,
+  `user_created` int(10) unsigned DEFAULT NULL,
   `date_modified` datetime DEFAULT NULL,
   `user_modified` int(10) unsigned DEFAULT NULL,
   `spisovy_znak` varchar(45) DEFAULT NULL,
@@ -466,7 +465,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}spis` (
 
 INSERT INTO `{tbls3}spis` (
 `id`,`parent_id`,`spousteci_udalost_id`,`spisovy_znak_id`,`nazev`,`popis`,`typ`,`sekvence`,`sekvence_string`,`uroven`,`stav`,`date_created`,`user_created`,`date_modified`,`user_modified`,`spisovy_znak`,`spisovy_znak_plneurceny`,`skartacni_znak`,`skartacni_lhuta`,`datum_otevreni`,`datum_uzavreni`,`orgjednotka_id`,`orgjednotka_id_predano` )
-VALUES (1 , NULL , 1, NULL , 'SPISY', '', 'SP', '1', 'SPISY.1', 0, 1, NOW(), 1, NULL , NULL , NULL , NULL , 'V', '100', NOW(), NULL, NULL, NULL );
+VALUES (1 , NULL , 1, NULL , 'SPISY', '', 'SP', '1', 'SPISY.1', 0, 1, NOW(), NULL, NULL , NULL , NULL , NULL , 'V', '100', NOW(), NULL, NULL, NULL );
 
 CREATE TABLE IF NOT EXISTS `{tbls3}spisovy_znak` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -614,64 +613,6 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_acl` (
   KEY `fk_user_acl_user_rule1` (`rule_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
-INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
-(1, 1, 1, 'Y'),
-(2, 2, 1, 'N'),
-(3, 2, 2, 'Y'),
-(4, 2, 3, 'Y'),
-(6, 4, 4, 'Y'),
-(7, 4, 7, 'Y'),
-(8, 4, 14, 'Y'),
-(9, 4, 8, 'Y'),
-(10, 4, 13, 'Y'),
-(11, 4, 6, 'Y'),
-(12, 4, 2, 'Y'),
-(13, 4, 3, 'Y'),
-(14, 4, 15, 'Y'),
-(15, 5, 16, 'Y'),
-(16, 6, 9, 'Y'),
-(17, 6, 10, 'Y'),
-(18, 6, 11, 'Y'),
-(19, 6, 12, 'Y'),
-(23, 4, 18, 'Y'),
-(24, 4, 19, 'Y'),
-(25, 4, 20, 'Y'),
-(26, 4, 21, 'Y'),
-(27, 4, 22, 'Y'),
-(28, 4, 23, 'Y'),
-(29, 6, 24, 'Y'),
-(31, 6, 4, 'Y'),
-(32, 6, 18, 'Y'),
-(33, 6, 7, 'Y'),
-(34, 6, 14, 'Y'),
-(35, 6, 8, 'Y'),
-(36, 6, 13, 'Y'),
-(37, 6, 6, 'Y'),
-(38, 6, 2, 'Y'),
-(39, 6, 3, 'Y'),
-(40, 6, 15, 'Y'),
-(41, 6, 19, 'Y'),
-(42, 6, 20, 'Y'),
-(43, 6, 21, 'Y'),
-(44, 6, 22, 'Y'),
-(45, 6, 23, 'Y'),
-(47, 7, 4, 'Y'),
-(48, 7, 18, 'Y'),
-(49, 7, 7, 'Y'),
-(50, 7, 14, 'Y'),
-(51, 7, 8, 'Y'),
-(52, 7, 13, 'Y'),
-(53, 7, 6, 'Y'),
-(54, 7, 2, 'Y'),
-(55, 7, 3, 'Y'),
-(56, 7, 15, 'Y'),
-(57, 7, 19, 'Y'),
-(58, 7, 20, 'Y'),
-(59, 7, 21, 'Y'),
-(60, 7, 22, 'Y'),
-(61, 7, 23, 'Y'),
-(62, 3, 1, 'Y');
-
 CREATE TABLE IF NOT EXISTS `{tbls3}user_resource` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(150) NOT NULL,
@@ -761,8 +702,6 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_rule` (
 
 INSERT INTO `{tbls3}user_rule` (`id`, `resource_id`, `name`, `note`, `privilege`) VALUES
 (1, NULL, 'Bez omezení', NULL, NULL),
-(2, 4, 'Přihlášení uživatele', NULL, 'login'),
-(3, 4, 'Zobrazení úvodní obrazovky', NULL, NULL),
 (4, 1, 'Zobrazení seznamu dokumentů', '', ''),
 (6, 19, 'Práce se subjekty', '', ''),
 (7, 20, 'Práce s přílohami', '', ''),
@@ -796,6 +735,62 @@ INSERT INTO `{tbls3}user_rule` (`id`, `resource_id`, `name`, `note`, `privilege`
 (39, 16, 'Zobrazit / měnit', '', ''),
 (40, 17, 'Zobrazit', '', ''),
 (41, 21, 'Zobrazit / měnit', '', '');
+
+
+ALTER TABLE `{tbls3}user_acl`
+  ADD CONSTRAINT `fk_user_acl_user_role1` FOREIGN KEY (`role_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `user_acl_ibfk_1` FOREIGN KEY (`rule_id`) REFERENCES `{tbls3}user_rule` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
+(1, 1, 1, 'Y'),
+(2, 2, 1, 'N'),
+(6, 4, 4, 'Y'),
+(7, 4, 7, 'Y'),
+(8, 4, 14, 'Y'),
+(9, 4, 8, 'Y'),
+(10, 4, 13, 'Y'),
+(11, 4, 6, 'Y'),
+(14, 4, 15, 'Y'),
+(15, 5, 16, 'Y'),
+(16, 6, 9, 'Y'),
+(17, 6, 10, 'Y'),
+(18, 6, 11, 'Y'),
+(19, 6, 12, 'Y'),
+(23, 4, 18, 'Y'),
+(24, 4, 19, 'Y'),
+(25, 4, 20, 'Y'),
+(26, 4, 21, 'Y'),
+(27, 4, 22, 'Y'),
+(28, 4, 23, 'Y'),
+(29, 6, 24, 'Y'),
+(31, 6, 4, 'Y'),
+(32, 6, 18, 'Y'),
+(33, 6, 7, 'Y'),
+(34, 6, 14, 'Y'),
+(35, 6, 8, 'Y'),
+(36, 6, 13, 'Y'),
+(37, 6, 6, 'Y'),
+(40, 6, 15, 'Y'),
+(41, 6, 19, 'Y'),
+(42, 6, 20, 'Y'),
+(43, 6, 21, 'Y'),
+(44, 6, 22, 'Y'),
+(45, 6, 23, 'Y'),
+(47, 7, 4, 'Y'),
+(48, 7, 18, 'Y'),
+(49, 7, 7, 'Y'),
+(50, 7, 14, 'Y'),
+(51, 7, 8, 'Y'),
+(52, 7, 13, 'Y'),
+(53, 7, 6, 'Y'),
+(56, 7, 15, 'Y'),
+(57, 7, 19, 'Y'),
+(58, 7, 20, 'Y'),
+(59, 7, 21, 'Y'),
+(60, 7, 22, 'Y'),
+(61, 7, 23, 'Y'),
+(62, 3, 1, 'Y');
+
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_to_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -1052,10 +1047,6 @@ ALTER TABLE `{tbls3}subjekt`
 ALTER TABLE `{tbls3}subjekt_historie`
   ADD CONSTRAINT `fk_subjekt_historie_subjekt1` FOREIGN KEY (`subjekt_id`) REFERENCES `{tbls3}subjekt` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_subjekt_user10` FOREIGN KEY (`user_created`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
-ALTER TABLE `{tbls3}user_acl`
-  ADD CONSTRAINT `fk_user_acl_user_role1` FOREIGN KEY (`role_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `user_acl_ibfk_1` FOREIGN KEY (`rule_id`) REFERENCES `{tbls3}user_rule` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}user_role`
   ADD CONSTRAINT `fk_user_role_orgjednotka1` FOREIGN KEY (`orgjednotka_id`) REFERENCES `{tbls3}orgjednotka` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

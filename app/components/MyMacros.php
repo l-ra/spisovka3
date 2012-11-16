@@ -17,7 +17,12 @@ class MyMacros extends Control {
 
     public static function vlink($__param,$__link) {
 
-        //$__param = "";
+        //P.L. zrus tuto funkci, protoze:
+        // 1. pristup se kontroluje na cilove adrese odkazu
+        // 2. a pristup se kontroluje v hlavni sablone jiz v momente, kdy se rozhoduje, zda link vubec zobrazit
+        return $__link;
+        
+        /* //$__param = "";
         if ( strpos($__link, "error:")!==false ) {
             return "#";
         } else {
@@ -29,7 +34,7 @@ class MyMacros extends Control {
             } else {
                 return "#";
             }
-        }
+        } */
     }
 
     public static function alink($param) {

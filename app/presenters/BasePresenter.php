@@ -33,13 +33,11 @@ abstract class BasePresenter extends Presenter
                 $Acl = Acl::getInstance();
 
                 if ($this->name == "Spisovka:Uzivatel") {
+                    // Tento presenter je vzdy pristupny
                     if ($this->view == "login")
                         // Uzivatel je prihlasen - login obrazovka je zbytecna, presmerujeme na uvodni obrazovku
                         // Oprava mozneho bugu s dvojim prihlasovanim = po prihlaseni se opet zobrazuje login obrazovka
                         $this->redirect(':Spisovka:Default:default');
-                    else if ($this->view == "logout") {
-                        // Nedelej nic, uzivatel ma vzdy pravo se odhlasit
-                    }
                 }
                 else if (!$user->isAllowed($this->reflection->name, $this->getAction())) {
                     // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku

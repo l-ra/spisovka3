@@ -25,6 +25,8 @@ class Acl extends Permission {
         $this->allow(Permission::ALL, 'Spisovka_ZpravyPresenter');
         // úvodní obrazovka po přihlášení
         $this->allow(Permission::ALL, 'Spisovka_DefaultPresenter');
+        // přihlášení / odhlášení - neni potreba, tento presenter je vyjmut z kontroly pristupu. viz BasePresenter
+        // $this->allow(Permission::ALL, 'Spisovka_UzivatelPresenter');
 
         foreach($model->getPermission() as $perm) {
             if ( !empty($perm->role) && !empty($perm->resource) && !empty($perm->privilege) ) {
