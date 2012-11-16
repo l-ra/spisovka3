@@ -23,6 +23,8 @@ class Acl extends Permission {
         // permission
         // Je potřeba toto oprávnění ve výchozím stavu povolit. Uživatel stále bude mít možnost oprávnění explicitně odepřít
         $this->allow(Permission::ALL, 'Spisovka_ZpravyPresenter');
+        // úvodní obrazovka po přihlášení
+        $this->allow(Permission::ALL, 'Spisovka_DefaultPresenter');
 
         foreach($model->getPermission() as $perm) {
             if ( !empty($perm->role) && !empty($perm->resource) && !empty($perm->privilege) ) {
