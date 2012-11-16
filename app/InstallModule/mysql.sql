@@ -1065,6 +1065,9 @@ ALTER TABLE `{tbls3}user_role`
   ADD CONSTRAINT `fk_user_role_orgjednotka1` FOREIGN KEY (`orgjednotka_id`) REFERENCES `{tbls3}orgjednotka` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_user_role_user_role1` FOREIGN KEY (`parent_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
+ALTER TABLE `{tbls3}user_rule`
+  ADD CONSTRAINT `fk_user_rule_user_resource1` FOREIGN KEY (`resource_id`) REFERENCES `{tbls3}user_resource` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+  
 ALTER TABLE `{tbls3}user_to_role`
   ADD CONSTRAINT `fk_user_to_role_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_user_to_role_user_role1` FOREIGN KEY (`role_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
