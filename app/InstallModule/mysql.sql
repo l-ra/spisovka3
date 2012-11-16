@@ -688,9 +688,8 @@ INSERT INTO `{tbls3}user_resource` (`id`, `code`, `note`, `name`) VALUES
 (2, 'Epodatelna_DefaultPresenter', NULL, 'E-podatelna - úvodní obrazovka'),
 (3, 'Admin_DefaultPresenter', NULL, 'Administrace - úvodní obrazovka'),
 (4, 'Spisovka_UzivatelPresenter', NULL, 'Přihlašování a změna osobních údajů uživatele'),
-(5, 'Spisovka_DefaultPresenter', NULL, 'Úvodní obrazovka (rozšířená)'),
+(5, 'Spisovka_DefaultPresenter', NULL, 'Úvodní obrazovka'),
 (6, 'Admin_ZamestnanciPresenter', NULL, 'Administrace - zaměstnanci'),
-(7, 'DefaultPresenter', NULL, 'Úvodní obrazovka (základní)'),
 (9, 'Admin_OpravneniPresenter', NULL, 'Administrace - oprávnění'),
 (10, 'Admin_OrgjednotkyPresenter', NULL, 'Administrace - organizační jednotky'),
 (11, 'Admin_NastaveniPresenter', NULL, 'Administrace - nastavení'),
@@ -1098,7 +1097,7 @@ CREATE TABLE `{tbls3}settings` (
 
 ALTER TABLE `{tbls3}user_role` ADD UNIQUE `user_role_code` ( `code` );
 
-INSERT INTO `{tbls3}settings` VALUES('db_revision', '540');
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '550');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
