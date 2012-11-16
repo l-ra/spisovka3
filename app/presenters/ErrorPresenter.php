@@ -15,7 +15,7 @@ class ErrorPresenter extends BasePresenter
         // Standardni sablona "layout" zpusobuje dvojite chyby, pokud je nejaky problem
         // s autentizaci/autorizaci
 
-        BasePresenter::beforeRender();
+        parent::beforeRender();
         $this->setLayout('login');
     }
 

@@ -32,16 +32,19 @@ abstract class BasePresenter extends Presenter
 
                 $Acl = Acl::getInstance();
 
-                if (!$user->isAllowed($this->reflection->name, $this->getAction())) {
-                    // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku
-                    if (!( $this->name == "Error" && $this->view == "noaccess" )) {
-                        //$this->forward(':Error:noaccess',array('param'=>array('resource'=>$this->reflection->name,'privilege'=>$this->getAction())));
-                        $this->forward(':Error:noaccess');
+                if ($this->name == "Spisovka:Uzivatel") {
+                    if ($this->view == "login")
+                        // Uzivatel je prihlasen - login obrazovka je zbytecna, presmerujeme na uvodni obrazovku
+                        // Oprava mozneho bugu s dvojim prihlasovanim = po prihlaseni se opet zobrazuje login obrazovka
+                        $this->redirect(':Spisovka:Default:default');
+                    else if ($this->view == "logout") {
+                        // Nedelej nic, uzivatel ma vzdy pravo se odhlasit
                     }
-                } else if ($this->name == "Spisovka:Uzivatel" && $this->view == "login") {
-                    // Uzivatel je prihlasen - login obrazovka je zbytecna, presmerujeme na uvodni obrazovku
-                    // Oprava mozneho bugu s dvojim prihlasovanim = po prihlaseni se opet zobrazuje login obrazovka
-                    $this->redirect(':Spisovka:Default:default');
+                }
+                else if (!$user->isAllowed($this->reflection->name, $this->getAction())) {
+                    // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku
+                    //$this->forward(':Error:noaccess',array('param'=>array('resource'=>$this->reflection->name,'privilege'=>$this->getAction())));
+                    $this->forward(':NoAccess:default');
                 }
             }
 
