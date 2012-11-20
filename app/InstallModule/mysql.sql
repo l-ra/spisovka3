@@ -682,7 +682,6 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_role` (
 
 INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `fixed_id`, `orgjednotka_id`, `code`, `name`, `note`, `fixed`, `order`, `active`, `date_created`, `date_modified`, `sekvence`, `sekvence_string`, `uroven`) VALUES
 (1, NULL, NULL, NULL, 'admin', 'administrátor', 'Pracovník, který má na starost správu spisové služby', 2, 100, 1, NOW(), NOW(), '1', 'admin.1', NULL),
-(2, NULL, NULL, NULL, 'guest', 'host', 'Role představující nepřihlášeného uživatele.\nTedy nastavení oprávnění v době, kdy k aplikaci není nikdo přihlášen.', 2, 0, 1, NOW(), NOW(), '2', 'guest.2', NULL),
 (3, 1, NULL, NULL, 'superadmin', 'SuperAdmin', 'Administrátor se super právy.\nMůže manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', 2, 100, 1, NOW(), NOW(), '3', 'superadmin.3', NULL),
 (4, NULL, NULL, NULL, 'referent', 'pracovník', '(referent) Základní role pracovníka spisové služby', 1, 10, 1, NOW(), NOW(), '4', 'referent.4', NULL),
 (5, 4, NULL, NULL, 'vedouci', 'sekretariát', '(vedoucí) Rozšířená role pracovníka spisové služby. Může nahlížet na podřízené uzly', 1, 50, 1, NOW(), NOW(), '5', 'vedouci.5', NULL),
@@ -743,7 +742,6 @@ ALTER TABLE `{tbls3}user_acl`
 
 INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
 (1, 1, 1, 'Y'),
-(2, 2, 1, 'N'),
 (6, 4, 4, 'Y'),
 (7, 4, 7, 'Y'),
 (8, 4, 14, 'Y'),
@@ -1057,7 +1055,7 @@ ALTER TABLE `{tbls3}user_rule`
   
 ALTER TABLE `{tbls3}user_to_role`
   ADD CONSTRAINT `fk_user_to_role_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_user_to_role_user_role1` FOREIGN KEY (`role_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_user_to_role_user_role1` FOREIGN KEY (`role_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}workflow`
   ADD CONSTRAINT `fk_workflow_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,

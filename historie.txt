@@ -6,9 +6,14 @@
 
 Nové funkce:
 
+Jiné změny:
+
+- odstraněna role host
+
 Opravy:
 
 - našeptávač vyhledával i v neaktivních subjektech
+- opět aktivována kontrola nových verzí programu
 
 === Ver. 3.3.2 =================================================================
 

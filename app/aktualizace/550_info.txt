@@ -1,0 +1,2 @@
+- drobné změny v oprávněních
+- smazána role "host"
