@@ -194,12 +194,14 @@ class Install_DefaultPresenter extends BasePresenter
 		'message' => $_SERVER['SERVER_SOFTWARE'],
             ),
 
+        // imap_open vyzaduje 5.3.2, problem s MS Exchange
+        
             array(
 		'title' => 'PHP verze',
 		'required' => TRUE,
-		'passed' => version_compare(PHP_VERSION, '5.2.0', '>='),
+		'passed' => version_compare(PHP_VERSION, '5.3.2', '>='),
 		'message' => PHP_VERSION,
-		'description' => 'Použiváte starší verzi PHP. Aplikace pro správny chod vyžaduje PHP verzi 5.2.0 nebo výš.',
+		'description' => 'Používáte starší verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.3.2 nebo vyšší.',
             ),
 
             array(

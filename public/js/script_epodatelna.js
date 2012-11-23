@@ -396,11 +396,16 @@ zkontrolovatSchranku = function (elm) {
     }
     if (x) {
         x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                stav = x.responseText;
-                $('#zkontrolovat_status').html(x.responseText);
+            if (x.readyState == 4)
+                if (x.status == 200) {
+                    stav = x.responseText;
+                    $('#zkontrolovat_status').html(x.responseText);
+                    // nacteni novych zprav z database se musi provest az po stazeni vsech zprav z emailove schranky
+                    nactiZpravy();
+                }
+                else
+                   $('#zkontrolovat_status').html('Při kontrole zpráv došlo k chybě ' + x.status);
             }
-        }
 
         if ( is_simple == 1 ) {
             url = baseUri + '?presenter=Epodatelna%3Adefault&action=zkontrolovatAjax';

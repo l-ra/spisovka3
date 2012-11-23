@@ -374,106 +374,71 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         
     }
 
-    public function actionZkrontrolovat()
-    {
 
-
-
-    }
-
+    // Stáhne zprávy ze všech schránek a dá uživateli vědět výsledek
+    
     public function actionZkontrolovatAjax()
     {
+        @set_time_limit(120); // z moznych dusledku vetsich poctu polozek je nastaven timeout
 
-
-        @set_time_limit(600); // z moznych dusledku vetsich poctu polozek je nastaven timeout na 10 minut
-
-        $id = $this->getParam('id',null);
+        /* $id = $this->getParam('id',null);
         $typ = substr($id,0,1);
-        $index = substr($id,1);
+        $index = substr($id,1); */
 
         $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
         $config_data = $config->toArray();
         $result = array();
 
-        if ( !empty($typ) && !empty($index) ) {
-            // predan parametr - zkontroluj jen toto
-            $typ_array = array('i'=>'isds','e'=>'email');
-            if ( array_key_exists($typ,$typ_array) ) {
-                $typ = $typ_array[ $typ ];
-                if ( isset( $config_data[$typ][$index] ) ) {
-                    $config = $config_data[$typ][$index];
-                    if ( $typ == 'isds' ) {
-                        $result[$typ .'_'. $index] = $this->zkontrolujISDS($config);
-                        if ( count($result[$typ .'_'. $index])>0 ) {
-                            echo 'Z ISDS schránky "'.$config['ucet'].'" bylo přijato '.(count($result[$typ .'_'. $index])).' nových zpráv.<br/>';
-                        } else {
-                            echo 'Z ISDS schránky "'.$config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
-                        }
-                    } else if ( $typ == 'email' ) {
-                        $result[$typ .'_'. $index] = $this->zkontrolujEmail($config);
-                        if ( count($result[$typ .'_'. $index])>0 ) {
-                            echo 'Z emailové schránky "'.$config['ucet'].'" bylo přijato '.(count($result[$typ .'_'. $index])).' nových zpráv.<br />';
-                        } else {
-                            echo 'Z emailové schránky "'.$config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
-                        }
-                    }
-                } else {
-                    echo '<span style="color:red">Není možné zkontrolovat schránku. Neexistuje dané nastavení!</span><br />';
-                }
-            }
-        } else {
-            // zkontroluj vse
-            $nalezena_aktivni_schranka = 0;
+        $nalezena_aktivni_schranka = 0;
 
-            // kontrola ISDS
-            $zkontroluj_isds = 1;
-            if ( count( $config_data['isds'] )>0 && $zkontroluj_isds==1 ) {
-                foreach ($config_data['isds'] as $index => $isds_config) {
-                    if ( $isds_config['aktivni'] == 1 ) {
-                        $nalezena_aktivni_schranka = 1;
-                        $result['isds_'.$index] = $this->zkontrolujISDS($isds_config);
-                        if ( count($result['isds_'.$index])>0 ) {
-                            echo 'Z ISDS schránky "'.$isds_config['ucet'].'" bylo přijato '.(count($result['isds_'.$index])).' nových zpráv.<br />';
-                        } else {
-                            echo 'Z ISDS schránky "'.$isds_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
-                        }
-                    }
-                }
-            }
-            // kontrola emailu
-            $zkontroluj_email = 1;
-            if ( count( $config_data['email'] )>0 && $zkontroluj_email==1 ) {
-                foreach ($config_data['email'] as $index => $email_config) {
-                    if ( $email_config['aktivni'] == 1 ) {
-                        $nalezena_aktivni_schranka = 1;
-                        $result['email_'.$index] = $this->zkontrolujEmail($email_config);
-                        if ( count($result['email_'.$index])>0 ) {
-                            echo 'Z emailové schránky "'.$email_config['ucet'].'" bylo přijato '.(count($result['email_'.$index])).' nových zpráv.<br />';
-                        } else {
-                            echo 'Z emailové schránky "'.$email_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
-                        }
+        // kontrola ISDS
+        $zkontroluj_isds = 1;
+        if ( count( $config_data['isds'] )>0 && $zkontroluj_isds==1 ) {
+            foreach ($config_data['isds'] as $index => $isds_config) {
+                if ( $isds_config['aktivni'] == 1 ) {
+                    $nalezena_aktivni_schranka = 1;
+                    $result = $this->zkontrolujISDS($isds_config);
+                    if ( count($result)>0 ) {
+                        echo 'Z ISDS schránky "'.$isds_config['ucet'].'" bylo přijato '.(count($result)).' nových zpráv.<br />';
+                    } else {
+                        echo 'Z ISDS schránky "'.$isds_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
                     }
                 }
             }
         }
+        // kontrola emailu
+        $zkontroluj_email = 1;
+        if ( count( $config_data['email'] )>0 && $zkontroluj_email==1 ) {
+            foreach ($config_data['email'] as $index => $email_config) {
+                if ( $email_config['aktivni'] == 1 ) {
+                    $nalezena_aktivni_schranka = 1;
+                    $result = $this->zkontrolujEmail($email_config);
+                    if (is_string($result))
+                        echo $result . '<br />';
+                    else if ( $result > 0 ) {
+                        echo "Z emailové schránky \"".$email_config['ucet']."\" bylo přijato $result nových zpráv.<br />";
+                    } else {
+                        echo 'Z emailové schránky "'.$email_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
+                    }
+                }
+            }
+        }
+
         if ( ! $nalezena_aktivni_schranka)
             echo 'Žádná schránka není definována nebo nastavena jako aktivní.<br />';
         
         exit;
-
-
     }
 
     public function actionZkontrolovatOdchoziISDS()
     {
-        @set_time_limit(600);   
+        // @set_time_limit(600);   
         $this->zkontrolujOdchoziISDS();
         exit;
     }
     
     public function actionNactiNoveAjax()
     {
-        
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
 
         //$user_config = Environment::getVariable('user_config');
@@ -569,9 +534,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $zpravy = null;
         }
 
-        //echo "<pre>"; print_r($zpravy); echo "</pre>"; exit;
-
-        echo json_encode($zpravy);
+        // Funkce nekdy loguje varovani, ze vstup neni ve formatu utf-8
+        echo @json_encode($zpravy);
         exit;
 
     }
@@ -1002,163 +966,166 @@ dmFormat =
                 return ( count($tmp)>0 )?$tmp:null;
     }
     
+    // Vrátí počet nových zpráv nebo řetězec s popisem chyby
     
-    public function zkontrolujEmail($config)
+    private function zkontrolujEmail($config)
     {
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
 
         $imap = new ImapClient();
         $email_mailbox = '{'. $config['server'] .':'. $config['port'] .''. $config['typ'] .'}'. $config['inbox'];
 
-        $imap_connect = $imap->connect($email_mailbox,$config['login'],$config['password']);
-        if ($imap_connect) {
-            if ( $imap->count_messages() ) {
-                $tmp = array();
-                $user = Environment::getUser()->getIdentity();
+        $success = $imap->connect($email_mailbox,$config['login'],$config['password']);
+        if (!$success) {
+            $msg = 'Nepodařilo se připojit k emailové schránce "'. $config['ucet'] .'"!<br />
+                    IMAP chyba: '. $imap->error();            
+            return $msg;
+        }
+        
+        if (!$imap->count_messages()) {
+            //  nejsou žádné zprávy k přijetí
+            $imap->close();
+            return 0;
+        }
 
-                $storage_conf = Environment::getConfig('storage');
-                eval("\$UploadFile = new ".$storage_conf->type."();");
+        $tmp = array();
+        $user = Environment::getUser()->getIdentity();
 
-                $zpravy = $imap->get_head_messages();
-                foreach($zpravy as $z) {
-                    // kontrola existence v epodatelny
-                    if ( ! $this->Epodatelna->existuje($z->message_id ,'email') ) {
-                        // nova zprava, ktera neni nahrana v epodatelne
+        $storage_conf = Environment::getConfig('storage');
+        eval("\$UploadFile = new ".$storage_conf->type."();");
 
-                        // Nacteni kompletni zpravy
-                        $mess = $imap->get_message($z->id_part);
-                        
-                        $popis = '';
-                        foreach ($mess->texts as $zpr) {
-                            if($zpr->subtype == "HTML") {
-                                $zpr->text_convert = str_ireplace("<br>", "\n", $zpr->text_convert);
-                                $zpr->text_convert = str_ireplace("<br />", "\n", $zpr->text_convert);
-                                $popis .= htmlspecialchars($zpr->text_convert);
+        $zpravy = $imap->get_head_messages();
+        
+        foreach($zpravy as $z) {
+            // kontrola existence v epodatelny
+            if ( ! $this->Epodatelna->existuje($z->message_id ,'email') ) {
+                // nova zprava, ktera neni nahrana v epodatelne
+
+                // Nacteni kompletni zpravy
+                $mess = $imap->get_message($z->id_part);
+                
+                $popis = '';
+                foreach ($mess->texts as $zpr) {
+                    if($zpr->subtype == "HTML") {
+                        $zpr->text_convert = str_ireplace("<br>", "\n", $zpr->text_convert);
+                        $zpr->text_convert = str_ireplace("<br />", "\n", $zpr->text_convert);
+                        $popis .= htmlspecialchars($zpr->text_convert);
+                    } else {
+                        $popis .= htmlspecialchars($zpr->text_convert);
+                    }
+                    $popis .= "\n\n";
+                }
+
+                if ( empty($z->from_address) ) {
+                    $predmet = empty($z->subject)?"[Bez předmětu] Emailová zpráva":$z->subject;
+                } else {
+                    $predmet = empty($z->subject)?"[Bez předmětu] Emailová zpráva od ".$z->from_address:$z->subject;
+                }
+
+
+                $zprava = array();
+                $zprava['poradi'] = $this->Epodatelna->getMax();
+                $zprava['rok'] = date('Y');
+                $zprava['email_signature'] = $z->message_id;
+                $zprava['predmet'] = $predmet;
+                $zprava['popis'] = $popis;
+                $zprava['odesilatel'] = $z->from_address;
+                //$zprava['odesilatel_id'] = $z->dmAnnotation;
+                $zprava['adresat'] = $config['ucet'] .' ['. $config['login'] .']';
+                $zprava['prijato_dne'] = new DateTime();
+                $zprava['doruceno_dne'] = new DateTime( date('Y-m-d H:i:s',$z->udate) );
+                $zprava['prijal_kdo'] = $user->id;
+                //$zprava['prijal_info'] = serialize($user->identity);
+
+                $zprava['sha1_hash'] = sha1($mess->source);
+
+                $prilohy = array();
+                if( isset($mess->attachments) ) {
+                    foreach ($mess->attachments as $pr) {
+                        $prilohy[] = array(
+                            'name'=>$pr->filename,
+                            'size'=>$pr->size,
+                            'mimetype'=> FileModel::mimeType($pr->filename),
+                            'id'=>$pr->id_part
+                        );
+                    }
+                }
+                $zprava['prilohy'] = serialize($prilohy);
+
+                //$zprava['evidence'] = $z->dmAnnotation;
+                //$zprava['dokument_id'] = $z->dmAnnotation;
+                $zprava['stav'] = 0;
+                $zprava['stav_info'] = '';
+                //$zprava['source'] = $z;
+                //unset($mess->source);
+                //$zprava['source'] = $mess;
+                $zprava['file_id'] = null;
+
+                // Test na dostupnost epodpisu
+                if ( $config['only_signature'] == true ) {
+                    // pouze podepsane - obsahuje el.podpis
+                    if ( count($mess->signature)>0 ) {
+                        if ( $config['qual_signature'] == true ) {
+                            // pouze kvalifikovane
+                            $esign = new esignature();
+                            $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
+                            $tmp_email = CLIENT_DIR .'/temp/emailtest_'. sha1($mess->message_id).'.tmp';
+                            file_put_contents($tmp_email,$mess->source);
+                            $esigned = $esign->verifySignature($tmp_email, $esign_cert, $esign_status);
+                            if ( @$esigned['cert_info']['CA_is_qualified'] == 1 ) {
+                                // obsahuje - pokracujeme
                             } else {
-                                $popis .= htmlspecialchars($zpr->text_convert);
-                            }
-                            $popis .= "\n\n";
-                        }
-
-                        if ( empty($z->from_address) ) {
-                            $predmet = empty($z->subject)?"[Bez předmětu] Emailová zpráva":$z->subject;
-                        } else {
-                            $predmet = empty($z->subject)?"[Bez předmětu] Emailová zpráva od ".$z->from_address:$z->subject;
-                        }
-
-
-                        $zprava = array();
-                        $zprava['poradi'] = $this->Epodatelna->getMax();
-                        $zprava['rok'] = date('Y');
-                        $zprava['email_signature'] = $z->message_id;
-                        $zprava['predmet'] = $predmet;
-                        $zprava['popis'] = $popis;
-                        $zprava['odesilatel'] = $z->from_address;
-                        //$zprava['odesilatel_id'] = $z->dmAnnotation;
-                        $zprava['adresat'] = $config['ucet'] .' ['. $config['login'] .']';
-                        $zprava['prijato_dne'] = new DateTime();
-                        $zprava['doruceno_dne'] = new DateTime( date('Y-m-d H:i:s',$z->udate) );
-                        $zprava['prijal_kdo'] = $user->id;
-                        //$zprava['prijal_info'] = serialize($user->identity);
-
-                        $zprava['sha1_hash'] = sha1($mess->source);
-
-                        $prilohy = array();
-                        if( isset($mess->attachments) ) {
-                            foreach ($mess->attachments as $pr) {
-                                $prilohy[] = array(
-                                    'name'=>$pr->filename,
-                                    'size'=>$pr->size,
-                                    'mimetype'=> FileModel::mimeType($pr->filename),
-                                    'id'=>$pr->id_part
-                                );
-                            }
-                        }
-                        $zprava['prilohy'] = serialize($prilohy);
-
-                        //$zprava['evidence'] = $z->dmAnnotation;
-                        //$zprava['dokument_id'] = $z->dmAnnotation;
-                        $zprava['stav'] = 0;
-                        $zprava['stav_info'] = '';
-                        //$zprava['source'] = $z;
-                        //unset($mess->source);
-                        //$zprava['source'] = $mess;
-                        $zprava['file_id'] = null;
-
-                        // Test na dostupnost epodpisu
-                        if ( $config['only_signature'] == true ) {
-                            // pouze podepsane - obsahuje el.podpis
-                            if ( count($mess->signature)>0 ) {
-                                if ( $config['qual_signature'] == true ) {
-                                    // pouze kvalifikovane
-                                    $esign = new esignature();
-                                    $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
-                                    $tmp_email = CLIENT_DIR .'/temp/emailtest_'. sha1($mess->message_id).'.tmp';
-                                    file_put_contents($tmp_email,$mess->source);
-                                    $esigned = $esign->verifySignature($tmp_email, $esign_cert, $esign_status);
-                                    if ( @$esigned['cert_info']['CA_is_qualified'] == 1 ) {
-                                        // obsahuje - pokracujeme
-                                    } else {
-                                        // neobsahuje kvalifikovany epodpis
-                                        $zprava['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje kvalifikovaný elektronický podpis';
-                                        $this->Epodatelna->insert($zprava);
-                                        continue;
-                                    }
-                                }
-                            } else {
-                                // email neobsahuje epodpis
-                                $zprava['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje elektronický podpis';
+                                // neobsahuje kvalifikovany epodpis
+                                $zprava['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje kvalifikovaný elektronický podpis';
                                 $this->Epodatelna->insert($zprava);
                                 continue;
                             }
-                        }                        
-                        
-                        if ( $epod_id = $this->Epodatelna->insert($zprava) ) {
-
-                            $data = array(
-                                'filename'=>'ep_email_'.$epod_id .'.eml',
-                                'dir'=>'EP-I-'. sprintf('%06d',$zprava['poradi']).'-'.$zprava['rok'],
-                                'typ'=>'5',
-                                'popis'=>'Emailová zpráva z epodatelny '.$zprava['poradi'].'-'.$zprava['rok']
-                                //'popis'=>'Emailová zpráva'
-                            );
-
-                            if ( $file = $UploadFile->uploadEpodatelna($mess->source, $data) ) {
-                                // ok
-                                $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['file_id'] = $file->id;
-                                $this->Epodatelna->update(
-                                        array('stav'=>1,
-                                              'stav_info'=>$zprava['stav_info'],
-                                              'file_id'=>$file->id
-                                            ),
-                                        array(array('id=%i',$epod_id))
-                                );
-                            } else {
-                                $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
-                                // false
-                            }
-                        } else {
-                            $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
                         }
-
-                        $tmp[] = $zprava;
-                        unset($zprava);
-
+                    } else {
+                        // email neobsahuje epodpis
+                        $zprava['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje elektronický podpis';
+                        $this->Epodatelna->insert($zprava);
+                        continue;
                     }
+                }                        
+                
+                if ( $epod_id = $this->Epodatelna->insert($zprava) ) {
+
+                    $data = array(
+                        'filename'=>'ep_email_'.$epod_id .'.eml',
+                        'dir'=>'EP-I-'. sprintf('%06d',$zprava['poradi']).'-'.$zprava['rok'],
+                        'typ'=>'5',
+                        'popis'=>'Emailová zpráva z epodatelny '.$zprava['poradi'].'-'.$zprava['rok']
+                        //'popis'=>'Emailová zpráva'
+                    );
+
+                    if ( $file = $UploadFile->uploadEpodatelna($mess->source, $data) ) {
+                        // ok
+                        $zprava['stav_info'] = 'Zpráva byla uložena';
+                        $zprava['file_id'] = $file->id;
+                        $this->Epodatelna->update(
+                                array('stav'=>1,
+                                      'stav_info'=>$zprava['stav_info'],
+                                      'file_id'=>$file->id
+                                    ),
+                                array(array('id=%i',$epod_id))
+                        );
+                    } else {
+                        $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
+                        // false
+                    }
+                } else {
+                    $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
                 }
 
-                return ( count($tmp)>0 )?$tmp:null;
-            } else {
-                $this->flashMessage('V emailové schránce "'. $config['ucet'] .'" nejsou žádné zprávy k přijetí.');
-                return null;
+                $tmp[] = $zprava;
+                unset($zprava);
+
             }
-        } else {
-            $this->flashMessage('Nepodařilo se připojit k emailové schránce "'. $config['ucet'] .'"!
-                                 <br />
-                                 IMAP chyba: '. $imap->error() .'','warning_ext');
-            return null;
         }
+        
+        $imap->close();
+        return count($tmp);
     }
 
     public function nactiISDS($file_id)

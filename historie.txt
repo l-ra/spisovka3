@@ -14,6 +14,8 @@ Opravy:
 
 - našeptávač vyhledával i v neaktivních subjektech
 - opět aktivována kontrola nových verzí programu
+- epodatelna - ošetření chyb při připojování k emailové schránce
+- epodatelna - opraven problém s připojením k serveru Microsoft Exchange 2007
 
 === Ver. 3.3.2 =================================================================
 

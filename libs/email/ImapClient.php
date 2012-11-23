@@ -34,34 +34,33 @@ class ImapClient {
      */
     function connect($mailbox,$user,$password) {
 
-        if ( function_exists('imap_open') ) {
-            @imap_timeout(IMAP_OPENTIMEOUT,10);
-            if ( @imap_open($mailbox,$user,$password ,OP_PROTOTYPE) ) {
-                if ($this->_stream = @imap_open($mailbox,$user,$password)) {
-                    return $this->_stream;
-                } else {
-                    //throw new InvalidArgumentException('Nelze se připojit k serveru '. $mailbox .'!');
-                    return null;
-                }
-            } else {
-                throw new InvalidArgumentException('Nelze se připojit k serveru '. $mailbox .'!');
-                return null;
-            }
-        } else {
+        if ( !function_exists('imap_open') )
             throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
-            return null;
+        
+        // Pozor, tento timeout NEFUNGUJE pro SSL spojeni (php bug)
+        imap_timeout(IMAP_OPENTIMEOUT,10);
+        if ( $rc = imap_open($mailbox,$user,$password,0,0,
+                             array('DISABLE_AUTHENTICATOR' => 'GSSAPI'))) {
+            $this->_stream = $rc;
+            return true;
         }
+        return false;
     }
 
     /**
      * Ukoceni spojeni s postovnim serverem
      */
     function close() {
-        if (!is_null($this->_stream)) {
-            @imap_close($this->_stream);
+        if (is_resource($this->_stream)) {
+            imap_close($this->_stream);
+            $this->_stream = null;
         }
     }
 
+    function __destruct() {
+        $this->close();
+    }
+    
     public function error() {
         return preg_replace('/\{(.*?)\}INBOX/', '', imap_last_error());
     }

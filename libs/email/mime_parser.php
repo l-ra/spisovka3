@@ -948,8 +948,8 @@ class mime_parser_class
 										}
 									}
 									if(count($decoded_header)
-									&& (!strcmp($decoded_header[$last = count($decoded_header)-1]['Encoding'], 'ASCII'))
-									|| !strcmp($decoded_header[$last]['Encoding'], $encoding))
+									&& (!strcmp($decoded_header[$last = count($decoded_header)-1]['Encoding'], 'ASCII')
+									|| !strcmp($decoded_header[$last]['Encoding'], $encoding)))
 									{
 										$decoded_header[$last]['Value'].= $decoded;
 										$decoded_header[$last]['Encoding']= $encoding;
