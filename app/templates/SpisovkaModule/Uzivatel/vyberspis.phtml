@@ -21,11 +21,14 @@
         <tr>
             <td>
                 <a href="{link :Spisovka:Uzivatel:spisvybrano, 'orgjednotka'=>$org->id, 'spis_id'=>$spis_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
-                   {$org->zkraceny_nazev}
+                   {$org->ciselna_rada}
                </a>&nbsp;&nbsp;
             </td>
             <td>
-                {$org->plny_nazev}&nbsp;
+                {if !empty($org->plny_nazev)}{$org->plny_nazev}
+                {else}{$org->zkraceny_nazev}
+                {/if}
+                &nbsp;
             </td>
 
         </tr>

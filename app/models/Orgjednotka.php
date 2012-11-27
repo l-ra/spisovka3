@@ -29,11 +29,14 @@ class Orgjednotka extends TreeModel
             $params['paginator'] = 1;
         }
 
-        $params['order'] = array('zkraceny_nazev');
         return $this->nacti(null, true, true, $params);
-
     }
 
+    public function linearniSeznam()
+    {
+        return $this->nacti(null, true, true, array('order' => 'ciselna_rada'));
+    }
+    
     public function seznamRoli($orgjednotka_id) {
 
         $RoleModel = new RoleModel();

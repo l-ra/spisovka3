@@ -12,10 +12,11 @@ Jiné změny:
 
 Opravy:
 
-- našeptávač vyhledával i v neaktivních subjektech
 - opět aktivována kontrola nových verzí programu
+- našeptávač vyhledával i v neaktivních subjektech
 - epodatelna - ošetření chyb při připojování k emailové schránce
 - epodatelna - opraven problém s připojením k serveru Microsoft Exchange 2007
+- předání dokumentu / spisu - seznam organizačních jednotek je nyní řazen podle jejich zkratky
 
 === Ver. 3.3.2 =================================================================
 

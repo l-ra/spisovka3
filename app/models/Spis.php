@@ -107,8 +107,6 @@ class Spis extends TreeModel
         if ( $select == 5 ) {
             $params['paginator'] = 1;
         }
-
-        $params['order'] = array('tb.nazev');
         
         $params['leftJoin'] = array(
             'orgjednotka1' => array(

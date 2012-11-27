@@ -14,8 +14,7 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         $RoleModel = new RoleModel();
         $params = array(
-            'paginator' => 1,
-            'order' => array('name')
+            'paginator' => 1
         );
         //$result = $RoleModel->seznam(2);
         $result = $RoleModel->nacti(null, true, true, $params);

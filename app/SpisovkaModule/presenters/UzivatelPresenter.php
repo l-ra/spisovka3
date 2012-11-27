@@ -147,7 +147,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->template->seznam = $seznam;
 
         $OrgJednotky = new Orgjednotka();
-        $oseznam = $OrgJednotky->seznam();
+        $oseznam = $OrgJednotky->linearniSeznam();
         $this->template->org_seznam = $oseznam;
     }
     
@@ -167,6 +167,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     {
         $this->template->spis_id = $spis_id = $this->getParam('spis_id',null);
         $this->_renderVyber();
+        // Zvazit do budoucna - jednotnou sablonu pro predani dokumentu i spisu
+        // $this->setView('vyber');
     }    
 
     public function actionSeznamAjax()

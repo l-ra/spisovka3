@@ -31,11 +31,7 @@ class SpisovyZnak extends TreeModel
             $params['paginator'] = 1;
         }
         
-
-        $params['order'] = array('tb.nazev');
         return $this->nacti($spisznak_parent, true, true, $params);
-
-        //$result = $this->nacti($spisznak_parent, true, true, $args );
     }
 
     public function seznamNativ($args = null, $select = 0, $spisznak_parent = null )

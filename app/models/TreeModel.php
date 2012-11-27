@@ -23,7 +23,7 @@ class TreeModel extends BaseModel
         
     }
 
-    public function nacti ( $parent_id = null, $child = true, $sort_by_name = true, $params = null )
+    public function nacti( $parent_id = null, $child = true, $sort_by_name = true, $params = null )
     {
 
         $sql = array(
@@ -70,8 +70,10 @@ class TreeModel extends BaseModel
                     $sql['where'] = $params['where']; 
                 }
             }
-            if ( isset($params['order']) ) { $sql['order'] = array_merge($sql['order'],$params['order']); }
-            if ( isset($params['leftJoin']) ) { $sql['leftJoin'] = array_merge($sql['leftJoin'],$params['leftJoin']); }
+            if ( isset($params['order']) ) 
+                $sql['order'] = $params['order'];
+            if ( isset($params['leftJoin']) ) 
+                $sql['leftJoin'] = array_merge($sql['leftJoin'],$params['leftJoin']);
         }
 
         $result = $this->fetchAllComplet($sql);
