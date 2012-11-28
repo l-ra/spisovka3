@@ -12,6 +12,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     private $oddelovac_poradi = null;
     private $typ_pristupu = 1; // 0 = na jmeno, 1 = na utvar
     private $pdf_output = 0;
+    private $hromadny_tisk = false;
+    private $hromadny_tisk_vyber;
 
     public function startup()
     {
@@ -114,15 +116,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
         }
         $this->template->s3_hledat = $hledat;
-        
-        //echo "<pre>";
-        //print_r(@$args_f);
-        //print_r(@$args_h);
-        
-        $args = $Dokument->spojitAgrs(@$args_f, @$args_h);
-        //echo "<pre>"; print_r($args); echo "</pre>";
-        //$args = $args_f;
-        
+
+        if (!$this->hromadny_tisk)
+            $args = $Dokument->spojitAgrs(@$args_f, @$args_h);
+        else {
+            $args = array('where' => array(
+                array('d.[id] IN (%i)', $this->hromadny_tisk_vyber)));
+        }
         
         if ( isset($seradit) ) {
             $Dokument->seradit($args, $seradit);
@@ -145,7 +145,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParam('print');
         $pdf = $this->getParam('pdfprint');
-        if ( $tisk ) {
+        if ( $tisk || $this->hromadny_tisk) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
@@ -533,70 +533,62 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function actionAkce($data)
     {
-
-        //echo "<pre>"; print_r($data); echo "</pre>"; exit;
-
-        if ( isset($data['hromadna_akce']) ) {
-            $Workflow = new Workflow();
-            $user = Environment::getUser()->getIdentity();
-            switch ($data['hromadna_akce']) {
-                /* Prevzeti vybranych dokumentu */
-                case 'prevzit':
-                    if ( isset($data['dokument_vyber']) ) {
-                        $count_ok = $count_failed = 0;
-                        foreach ( $data['dokument_vyber'] as $dokument_id ) {
-                            if ( $Workflow->predany($dokument_id) ) {
-                                if ( $Workflow->prevzit($dokument_id, $user->id) ) {
-                                    $count_ok++;
-                                } else {
-                                    $count_failed++;
-                                }
-                            }
-                        }
-                        if ( $count_ok > 0 ) {
-                            $this->flashMessage('Úspěšně jste převzal '.$count_ok.' dokumentů.');
-                        }
-                        if ( $count_failed > 0 ) {
-                            $this->flashMessage('U '.$count_failed.' dokumentů se nepodařilo převzít dokument!','warning');
-                        }
-                        if ( $count_ok > 0 && $count_failed > 0 ) {
-                            $this->redirect('this');
-                        }
-                    }
-                    break;
-                /* Predani vybranych dokumentu do spisovny  */
-                case 'predat_spisovna':
-                    if ( isset($data['dokument_vyber']) ) {
-                        $count_ok = $count_failed = 0;
-                        foreach ( $data['dokument_vyber'] as $dokument_id ) {
-                            $stav = $Workflow->predatDoSpisovny($dokument_id, 1);
-                            if ( $stav === true ) {
-                                $count_ok++;
-                            } else {
-                                if ( is_string($stav) ) {
-                                    $this->flashMessage($stav,'warning');
-                                }
-                                $count_failed++;
-                            }
-                        }
-                        if ( $count_ok > 0 ) {
-                            $this->flashMessage('Úspěšně jste předal '.$count_ok.' dokumentů do spisovny.');
-                        }
-                        if ( $count_failed > 0 ) {
-                            $this->flashMessage($count_failed.' dokumentů se nepodařilo předat do spisovny!','warning');
-                        }
-                        if ( $count_ok > 0 && $count_failed > 0 ) {
-                            $this->redirect('this');
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
+        if ( !isset($data['hromadna_akce']) || !isset($data['dokument_vyber']) )
+            return;
             
-            
-        }
-       
+        $Workflow = new Workflow();
+        $user = Environment::getUser()->getIdentity();
+        
+        switch ($data['hromadna_akce']) {
+            case 'tisk':
+                $this->hromadny_tisk = 1;
+                $this->hromadny_tisk_vyber = $data['dokument_vyber'];
+                break;
+                
+            /* Prevzeti vybranych dokumentu */
+            case 'prevzit':
+                
+                $count_ok = $count_failed = 0;
+                foreach ( $data['dokument_vyber'] as $dokument_id ) {
+                    if ( $Workflow->predany($dokument_id) ) {
+                        if ( $Workflow->prevzit($dokument_id, $user->id) )
+                            $count_ok++;
+                        else
+                            $count_failed++;
+                    }
+                }
+                if ( $count_ok > 0 )
+                    $this->flashMessage('Úspěšně jste převzal '.$count_ok.' dokumentů.');
+                if ( $count_failed > 0 )
+                    $this->flashMessage('U '.$count_failed.' dokumentů se nepodařilo převzít dokument!','warning');
+                break;
+                
+            /* Predani vybranych dokumentu do spisovny  */
+            case 'predat_spisovna':
+
+                $count_ok = $count_failed = 0;
+                foreach ( $data['dokument_vyber'] as $dokument_id ) {
+                    $stav = $Workflow->predatDoSpisovny($dokument_id, 1);
+                    if ( $stav === true ) {
+                        $count_ok++;
+                    } else {
+                        if ( is_string($stav) ) {
+                            $this->flashMessage($stav,'warning');
+                        }
+                        $count_failed++;
+                    }
+                }
+                if ( $count_ok > 0 ) {
+                    $this->flashMessage('Úspěšně jste předal '.$count_ok.' dokumentů do spisovny.');
+                }
+                if ( $count_failed > 0 ) {
+                    $this->flashMessage($count_failed.' dokumentů se nepodařilo předat do spisovny!','warning');
+                }
+                if ( $count_ok > 0 && $count_failed > 0 ) {
+                    $this->redirect('this');
+                }
+                break;
+        }                               
     }
 
     public function renderPrevzit()
