@@ -1383,7 +1383,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->template->DruhZasilky = DruhZasilky::get(null,1);
             
-
+            $this->template->OpravnenOdeslatDZ = Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani');
+            
             $this->invalidateControl('dokspis');
         } else {
             // dokument neexistuje nebo se nepodarilo nacist

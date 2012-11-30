@@ -86,7 +86,11 @@
                     <select name="subjekt[{$subjekt->id}]" onchange="return vyber_odes_form(this, {$subjekt->id});">
                         <option value="0">neodesílat</option>
                         <option value="1">odeslat emailem</option>
+                        {if $OpravnenOdeslatDZ}
                         <option value="2">odeslat datovou schránkou</option>
+                        {else}
+                        <option value="2" disabled="disabled">odeslat datovou schránkou - nejste oprávněn</option>
+                        {/if}
                         <option value="3">odeslat poštou</option>
                         <option value="4">odeslat faxem</option>
                     </select>
