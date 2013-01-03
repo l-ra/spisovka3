@@ -463,11 +463,14 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $datum_do = date('d.m.Y');
         $form->addDatePicker('date_do', 'Datum vrácení:', 10)
                 ->setRequired('Datum vrácení musí být vyplněné! Zadejte alespoň předpokládané datum vrácení.')
-                ->forbidPastDates();
+                ->forbidPastDates()
+                ->addRule(Form::VALID, 'Datum vrácení nemůže být v minulosti.');
 
         
-        $form->addSubmit('novy', 'Vytvořit zápůjčku')
-                 ->onClick[] = array($this, 'vytvoritClicked');
+        $submit = $form->addSubmit('novy', 'Vytvořit zápůjčku');
+        $submit->onClick[] = array($this, 'vytvoritClicked');
+        $submit->onInvalidClick[] = array($this, 'vytvoritClickedChyba');
+                 
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoSeznamClicked');
@@ -479,8 +482,15 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;           
-        
-        
+
+    }
+    
+    public function vytvoritClickedChyba(SubmitButton $button)
+    {
+        $errors = $button->getForm()->getErrors();
+        foreach($errors as $error)
+            $this->flashMessage($error, 'warning');
+        // Neni treba provadet redirect, formular se vykresli nyni znovu
     }
     
     public function vytvoritClicked(SubmitButton $button)

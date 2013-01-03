@@ -87,4 +87,19 @@ class DatePicker extends TextInput
         
         return $this;
     }
+
+    /**
+     * Vyzaduje, aby control byl vyplnen.
+     */
+    public static function validateValid(IFormControl $control)
+    {
+        $value = $control->getValue();
+        if (is_null($value))
+            return false;
+        if (!$control->forbidPastDates)
+            return true;
+            
+        $today = date('Y-m-d');
+        return strcmp($value, $today) >= 0;
+    }
 }
