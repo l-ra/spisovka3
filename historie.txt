@@ -6,6 +6,8 @@
 
 Nové funkce:
 
+- seznam dokumentů v modulu spisovka - přidána možnost tisknout vybrané dokumenty
+
 Jiné změny:
 
 - odstraněna role host

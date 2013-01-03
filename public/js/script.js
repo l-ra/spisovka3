@@ -40,6 +40,7 @@ $(function() {
         }        
     }); */
     
+    $("input.DPNoPast").datepicker("option", "minDate", 0);
     
     $('input.datetimepicker').datepicker(
     {

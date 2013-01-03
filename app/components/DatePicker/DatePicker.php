@@ -16,7 +16,8 @@ require_once LIBS_DIR . '/Nette/Forms/Controls/TextInput.php';
  */
 class DatePicker extends TextInput
 {
-
+    protected $forbidPastDates = false;
+    
 	/**
 	 * @param  string  label
 	 * @param  int  width of the control
@@ -75,9 +76,15 @@ class DatePicker extends TextInput
 	public function getControl()
 	{		
 		$control = parent::getControl();
-		$control->class = 'datepicker';
+		$control->class = $this->forbidPastDates ? 'datepicker DPNoPast' : 'datepicker';
 		
 		return $control;
 	}
 
+    public function forbidPastDates()
+    {
+        $this->forbidPastDates = true;
+        
+        return $this;
+    }
 }
