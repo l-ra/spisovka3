@@ -71,7 +71,8 @@ function my_assert_handler($file, $line, $code)
     $sites = array();
     if ( MULTISITE == 1 ) {
         $odir = opendir(WWW_DIR ."clients");
-        while (($file = readdir($odir)) !== false) {
+        if ($odir !== false)
+          while (($file = readdir($odir)) !== false) {
             if ( $file == "." || $file == ".." || $file[0] == '@') {
                 // Adresáře začínající na @ jsou speciální adresáře, není tam instalace klienta
                 continue;
