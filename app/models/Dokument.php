@@ -1052,11 +1052,14 @@ class Dokument extends BaseModel
             foreach ( $user->user_roles as $role ) {
                 if ( !empty($role->orgjednotka_id) ) {
                     if (preg_match('/^vedouci/', $role->code) ) {
-                        $org_jednotka_vedouci[] = $role->orgjednotka_id;
+                        $org_jednotka_vedouci[$role->orgjednotka_id] = $role->orgjednotka_id;
                     }
-                    $org_jednotka[] = $role->orgjednotka_id;
+                    $org_jednotka[$role->orgjednotka_id] = $role->orgjednotka_id;
                 }
             }
+            // Uživatel může mít více rolí k dané org. jednotce. Proto tato úprava s vkládáním položek do pole
+            sort($org_jednotka);
+            sort($org_jednotka_vedouci);
         }
 
         $where_org = null;

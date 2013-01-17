@@ -270,4 +270,20 @@ class Orgjednotka extends TreeModel
         
         parent::deleteAll();
     }
+    
+    // Predpoklad - uzivatel je prirazen do jedine jednotky
+    // Vrátí id org. jednotky aktuálního uživatele
+    public static function dejOrgUzivatele() {
+    
+        $identity = Environment::getUser()->getIdentity();
+        if ($identity === null)
+            return null;
+
+        $orgjednotka_id = null;
+        foreach ($identity->user_roles as $role) {
+            if (!empty($role->orgjednotka_id))
+                $orgjednotka_id = $role->orgjednotka_id;
+        }
+        return $orgjednotka_id;
+    }
 }

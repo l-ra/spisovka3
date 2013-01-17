@@ -312,7 +312,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             //Debug::dump($user);
 
             $user_id = $user->getIdentity()->id;
-
+            $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
+            if ($isVedouci) {
+                // Zjednoduseni - uzivatel muze byt vedoucim jenom jednoho utvaru
+                $id = Orgjednotka::dejOrgUzivatele();
+                $povoleneOrgJednotky = array();
+                if ($id)
+                    $povoleneOrgJednotky = Orgjednotka::childOrg($id);
+            }
+            
             $this->template->Pridelen = 0;
             $this->template->Predan = 0;
             $this->template->AccessEdit = 0;
@@ -326,6 +334,19 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
                 }
             }      
+
+            // P.L.
+            if ($isVedouci)
+                if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky)
+                 || in_array(@$dokument->predano->orgjednotka_id, $povoleneOrgJednotky)) {
+                    $this->template->AccessEdit = 1;
+                    $this->template->AccessView = 1;
+                    if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky))
+                        $this->template->Pridelen = 1;
+                    else
+                        $this->template->Predan = 1;                
+                    $formUpravit = $this->getParam('upravit',null);            
+                }
             
             // Prideleny nebo predany uzivatel
             // $this->typ_pristupu = 0 -> spravuje pouze uzivatel (prideleno_id)
@@ -1384,7 +1405,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->DruhZasilky = DruhZasilky::get(null,1);
             
             $this->template->OpravnenOdeslatDZ = Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani');
-            
+                        
             $this->invalidateControl('dokspis');
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
