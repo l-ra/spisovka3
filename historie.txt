@@ -24,6 +24,7 @@ Opravy:
 - sekretariát má nyní přístup k dokumentům v podřízených organizačních jednotkách
 - typ subjektu nyní může být neuveden
 - drobné opravy při vyhledávání subjektu pomocí ARES
+- pole dokumentu "věc" zvětšeno na 250 znaků
 
 === Ver. 3.3.2 =================================================================
 

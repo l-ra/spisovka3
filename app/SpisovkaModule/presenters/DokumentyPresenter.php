@@ -1538,11 +1538,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         if ( isset($dok->nazev) && $dok->nazev == "(bez názvu)" ) $dok->nazev = "";
         if ( $this->template->isPodatelna ) {
-            $form->addText('nazev', 'Věc:', 80, 100)
+            $form->addText('nazev', 'Věc:', 80, 250)
                     ->setValue(@$dok->nazev);
             
         } else {
-            $form->addText('nazev', 'Věc:', 80, 100)
+            $form->addText('nazev', 'Věc:', 80, 250)
                     ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!')
                     ->setValue(@$dok->nazev);
         }
@@ -1762,7 +1762,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $nazev = (@$Dok->nazev=="(bez názvu)")?"":@$Dok->nazev;
 
-        $nazev_control = $form->addText('nazev', 'Věc:', 80, 100)
+        $nazev_control = $form->addText('nazev', 'Věc:', 80, 250)
                     ->setValue($nazev);
         if ( !$this->template->isPodatelna ) {
             $nazev_control->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
