@@ -207,7 +207,7 @@
         $('#frmupravitForm-type').change(function () {
             value = $("#frmupravitForm-type").val();
             //alert(value);
-            if ( value.indexOf('PFO')>=0 ) {
+            if ( value.indexOf('PFO')>=0 || value === '' ) {
                 $(".type_fo").show();
                 $(".type_ovm").show();            
             } else if ( value.indexOf('OVM')>=0 || value.indexOf('PO')>=0 ) {
@@ -225,7 +225,7 @@
         {
             value = $("#frmupravitForm-type").val();
             //alert(value);
-            if ( value.indexOf('PFO')>=0 ) {
+            if ( value.indexOf('PFO')>=0 || value === '' ) {
                 $(".type_fo").show();
                 $(".type_ovm").show();            
             } else if ( value.indexOf('OVM')>=0 || value.indexOf('PO')>=0 ) {

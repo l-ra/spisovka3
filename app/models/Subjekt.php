@@ -445,7 +445,8 @@ class Subjekt extends BaseModel
 
     public static function typ_subjektu( $kod = null, $select = 0 ) {
 
-        $typ = array('OVM'=>'Orgán veřejné moci',
+        $typ = array( ''=>'Neuveden / neznámý',
+                      'OVM'=>'Orgán veřejné moci',
                       'FO'=>'Fyzická osoba',
                       'PFO'=>'Fyzická osoba s podnikatelskou činnosti',
                       'PO'=>'Firma, subjekt s podnikatelskou činnosti',

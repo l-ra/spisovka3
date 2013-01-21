@@ -119,7 +119,7 @@
         $('#frmnovyForm-type').change(function () {
             value = $("#frmnovyForm-type").val();
             //alert(value);
-            if ( value.indexOf('PFO')>=0 ) {
+            if ( value.indexOf('PFO')>=0 || value === '') {
                 $(".type_fo").show();
                 $(".type_ovm").show();            
             } else if ( value.indexOf('OVM')>=0 || value.indexOf('PO')>=0 ) {
@@ -132,22 +132,5 @@
 
         })
         .trigger('change');
-
-        function typSubjektu()
-        {
-            value = $("#frmnovyForm-type").val();
-            //alert(value);
-            if ( value.indexOf('PFO')>=0 ) {
-                $(".type_fo").show();
-                $(".type_ovm").show();            
-            } else if ( value.indexOf('OVM')>=0 || value.indexOf('PO')>=0 ) {
-                $(".type_fo").hide();
-                $(".type_ovm").show();
-            } else {
-                $(".type_ovm").hide();
-                $(".type_fo").show();
-            }            
-        }
-        typSubjektu();
 
     </script>    
