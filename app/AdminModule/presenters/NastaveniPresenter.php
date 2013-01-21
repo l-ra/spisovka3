@@ -150,7 +150,12 @@ class Admin_NastaveniPresenter extends BasePresenter
         
         //$form1->addText('typ', 'Metoda přičítání:', 50, 200)
         //        ->setValue($CJ->typ);
-
+        
+        $CJ = new CisloJednaci;
+        $form1->addCheckbox('minuly_rok', 'Evidovat dokumenty do minulého roku')
+            ->setValue($CJ->get_minuly_rok())
+            ->setOption('description', 'Tuto volbu použijte jen ve výjimečných případech. Zaškrtnutí ovlivní generování všech č.j. v aplikaci.');
+        
         $form1->addSubmit('upravit', 'Uložit')
                  ->onClick[] = array($this, 'nastavitCJClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -182,6 +187,9 @@ class Admin_NastaveniPresenter extends BasePresenter
         }
 
         $config_data['cislo_jednaci']['typ_deniku'] = $data['typ_deniku'];
+
+        $min_rok = $data['minuly_rok'] ? 1 : 0;
+        $config_data['cislo_jednaci']['minuly_rok'] = $min_rok;
         
         $config_modify = new Config();
         $config_modify->import($config_data);

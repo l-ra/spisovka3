@@ -7,6 +7,7 @@
 Nové funkce:
 
 - seznam dokumentů v modulu spisovka - přidána možnost tisknout vybrané dokumenty
+- možnost evidovat dokumenty do minulého roku. Nastavení je globální pro celou aplikaci.
 
 Jiné změny:
 

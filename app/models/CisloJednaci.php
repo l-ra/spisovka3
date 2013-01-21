@@ -14,6 +14,7 @@ class CisloJednaci extends BaseModel
     protected $user_info;
     protected $org;
     protected $pocatek_cisla;
+    protected $pouzij_minuly_rok;
 
     public function  __construct() {
 
@@ -63,7 +64,7 @@ class CisloJednaci extends BaseModel
             $this->org = $Org->getInfo($orgjednotka_id);
         }
 
-
+        $this->pouzij_minuly_rok = isset($this->info->minuly_rok) && $this->info->minuly_rok == 1;
     }
 
     /**
@@ -85,6 +86,8 @@ class CisloJednaci extends BaseModel
             }
             
             $info['rok'] = date('Y');
+            if ($this->pouzij_minuly_rok)
+                --$info['rok'];
             $info['poradove_cislo'] = $this->max('poradove_cislo');
 
             $info['urad_zkratka'] = $this->urad->zkratka;
@@ -251,7 +254,7 @@ class CisloJednaci extends BaseModel
     private function max($typ) {
 
         $where = array();
-        $where[] = array('rok=%i',date('Y'));
+        $where[] = array('rok=%i', $this->pouzij_minuly_rok ? date('Y')-1 : date('Y'));
 
         $pocatek_cisla = $this->pocatek_cisla;
         $cislo = null;
@@ -296,5 +299,9 @@ class CisloJednaci extends BaseModel
         return $cislo;
     }
 
-
+    public function  get_minuly_rok() {
+        
+        return $this->pouzij_minuly_rok;
+    }
+    
 }
