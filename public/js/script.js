@@ -368,6 +368,8 @@ aresSubjekt = function ( formName ) {
             document.getElementById('frm'+formName+'-adresa_co').value = data.cislo_orientacni;
             document.getElementById('frm'+formName+'-adresa_mesto').value = data.mesto;
             document.getElementById('frm'+formName+'-adresa_psc').value = data.psc;
+            document.getElementById('frm'+formName+'-adresa_stat').value = 'CZE';
+            document.getElementById('frm'+formName+'-stat_narozeni').value = 'CZE';
         }
 
 

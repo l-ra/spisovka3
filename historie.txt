@@ -22,6 +22,8 @@ Opravy:
 - předání dokumentu / spisu - seznam organizačních jednotek je nyní řazen podle jejich zkratky
 - datum vrácení výpůjčky ve spisovně nemůže být v minulosti
 - sekretariát má nyní přístup k dokumentům v podřízených organizačních jednotkách
+- typ subjektu nyní může být neuveden
+- drobné opravy při vyhledávání subjektu pomocí ARES
 
 === Ver. 3.3.2 =================================================================
 
