@@ -706,9 +706,9 @@ INSERT INTO `{tbls3}user_rule` (`id`, `resource_id`, `name`, `note`, `privilege`
 (7, 20, 'Práce s přílohami', '', ''),
 (8, 18, 'Práce se spisy', '', ''),
 (9, 2, 'Přístup do Epodatelny', '', ''),
-(10, 22, 'E-podatelna - evidence', '', ''),
-(11, 24, 'E-podatelna - přílohy', '', ''),
-(12, 23, 'E-podatelna - subjekty', '', ''),
+(10, 23, 'E-podatelna - evidence', '', ''),
+(11, 22, 'E-podatelna - přílohy', '', ''),
+(12, 24, 'E-podatelna - subjekty', '', ''),
 (13, 26, 'Spojování dokumentů', '', ''),
 (14, 25, 'Sestavy', '', ''),
 (15, 29, 'Vyhledávání', '', ''),
@@ -1085,7 +1085,7 @@ CREATE TABLE `{tbls3}settings` (
 
 ALTER TABLE `{tbls3}user_role` ADD UNIQUE `user_role_code` ( `code` );
 
-INSERT INTO `{tbls3}settings` VALUES('db_revision', '550');
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '570');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
