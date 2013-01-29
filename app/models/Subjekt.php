@@ -461,16 +461,10 @@ class Subjekt extends BaseModel
                      );
 
         if ( is_null($kod) ) {
-            if ( $select == 3 ) {
-                $tmp = array();
-                $tmp[''] = 'jakýkoli typ subjektu';
-                foreach ($typ as $i => $s) {
-                    $tmp[ $i ] = $s;
-                }
-                return $tmp;
-            } else {
-                return $typ;
-            }
+            if ( $select == 3 )
+                $typ[''] = 'jakýkoli typ subjektu';
+            
+            return $typ;
         } else {
             return ( key_exists($kod, $typ) )?$typ[ $kod ]:null;
         }
