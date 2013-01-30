@@ -2,7 +2,7 @@
  Historie uprav OSS Spisove sluzby v3
 ================================================================================
 
-=== Ver.  =================================================================
+=== Ver. 3.3.3 =================================================================
 
 Nové funkce:
 
@@ -25,6 +25,7 @@ Opravy:
 - typ subjektu nyní může být neuveden
 - drobné opravy při vyhledávání subjektu pomocí ARES
 - pole dokumentu "věc" zvětšeno na 250 znaků
+- neoprávněný uživatel nyní nemůže zobrazit metadata dokumentu
 
 === Ver. 3.3.2 =================================================================
 
