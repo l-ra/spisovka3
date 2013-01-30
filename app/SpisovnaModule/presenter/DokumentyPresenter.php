@@ -527,6 +527,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             }              
             
             $this->invalidateControl('dokspis');
+            
+            if (!$this->template->AccessView)
+                $this->setView('dok-noaccess');     
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');
