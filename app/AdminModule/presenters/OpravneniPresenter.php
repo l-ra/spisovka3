@@ -136,6 +136,15 @@ class Admin_OpravneniPresenter extends BasePresenter
         // Zabran menit kod preddefinovanych roli
         if ($data['fixed'] != 0)
             unset($data['code']);
+        else if (empty ($data['code'])) {
+            // Uzivatel se snazi shodit program zadanim prazdneho kodu uzivatelske role
+            //$this->flashMessage('Chyba - kódové označení role musí být vyplněno', 'warning');
+            //$this->redirect('this',array('id'=>$role_id, 'upravit'=>'info'));
+            //return;
+
+            // ignoruj uzivateluv pokus a ponechej v db puvodni kod
+            unset($data['code']);
+        }
         
         try
         {
