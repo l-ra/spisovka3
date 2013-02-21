@@ -61,7 +61,7 @@ class FileModel extends BaseModel
         $row['real_path'] = $data['real_path'];
         $row['real_type'] = isset($data['real_type'])?$data['real_type']:'UploadFile_Basic';
 
-        $row['mime_type'] = isset($data['mime_type'])?$data['mime_type']:FileModel::mimeType($row['real_path']);
+        $row['mime_type'] = FileModel::mimeType($row['real_path']);
 
         if ( !isset($data['md5_hash']) ) {
             if ( file_exists($data['real_path']) ) {
@@ -395,6 +395,7 @@ class FileModel extends BaseModel
             'xlt' => 'application/vnd.ms-excel',
             'xlw' => 'application/vnd.ms-excel',
             'xof' => 'x-world/x-vrml',
+            'xml' => 'application/xml',
             'xpm' => 'image/x-xpixmap',
             'xwd' => 'image/x-xwindowdump',
             'z' => 'application/x-compress',
@@ -410,22 +411,19 @@ class FileModel extends BaseModel
             $ext = @strtolower(array_pop(explode('.',$filename)));
         }
 
-        if ( array_key_exists($ext, $mime_types) ) {
+        if ( array_key_exists($ext, $mime_types) ) 
             return $mime_types[$ext];
-        //} elseif ( function_exists('finfo_open') ) {
+            
+        // if ( function_exists('finfo_open') ) {
         //    $finfo = finfo_open(FILEINFO_MIME);
         //    $mimetype = finfo_file($finfo, $filename);
         //    finfo_close($finfo);
         //    return $mimetype;
-        } else if(function_exists("mime_content_type")) {
+        
+        if (function_exists("mime_content_type"))
             $fileSuffix = @mime_content_type($filename);
-            return ( $fileSuffix )?trim($fileSuffix[0]):'application/octet-stream';
-        } else {
-            return 'application/octet-stream';
-        }
-
+            return $fileSuffix ? trim($fileSuffix[0]) : 'application/octet-stream';
+        
+        return 'application/octet-stream';       
     }
-
-
-
 }

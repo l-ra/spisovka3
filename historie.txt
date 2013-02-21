@@ -26,6 +26,7 @@ Opravy:
 - drobné opravy při vyhledávání subjektu pomocí ARES
 - pole dokumentu "věc" zvětšeno na 250 znaků
 - neoprávněný uživatel nyní nemůže zobrazit metadata dokumentu
+- opraveno posílání XML příloh dokumentu datovou schránkou
 
 === Ver. 3.3.2 =================================================================
 
