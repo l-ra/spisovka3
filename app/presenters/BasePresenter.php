@@ -105,7 +105,13 @@ abstract class BasePresenter extends Presenter
                         return date('j.n.Y',$string);
                     }
                 }
-                $datetime = new DateTime($string);
+                try {
+                    $datetime = new DateTime($string);
+                }
+                catch (Exception $e) {
+                    // datum je neplatné (možná $string vůbec není datum), tak vrať argument
+                    return $string;
+                }
                 if ( !is_null($format) ) {
                     return $datetime->format($format);
                 } else {
