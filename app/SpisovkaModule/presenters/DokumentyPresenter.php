@@ -2426,38 +2426,34 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             } else {
                 $mail->setFromConfig();
             }
-        } catch (Exception $e) {
-            $this->flashMessage('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
-            return false;            
-        }
 
-        if ( strpos($adresat->email,';') !== false ) {
-            $email_parse = explode(';',$adresat->email);
-            foreach($email_parse as $emp) {
-                $email = trim($emp);
-                $mail->addTo($email);
+            if ( strpos($adresat->email,';') !== false ) {
+                $email_parse = explode(';',$adresat->email);
+                foreach($email_parse as $emp) {
+                    $email = trim($emp);
+                    $mail->addTo($email);
+                }
+            } elseif ( strpos($adresat->email,',') !== false ) {
+                $email_parse = explode(',',$adresat->email);
+                foreach($email_parse as $emp) {
+                    $email = trim($emp);
+                    $mail->addTo($email);
+                }
+            } else {
+                $mail->addTo($adresat->email);
             }
-        } elseif ( strpos($adresat->email,',') !== false ) {
-            $email_parse = explode(',',$adresat->email);
-            foreach($email_parse as $emp) {
-                $email = trim($emp);
-                $mail->addTo($email);
+
+            $mail->setSubject($data['email_predmet']);
+            $mail->setBody($data['email_text']);
+
+            if ( count($prilohy)>0 ) {
+                foreach ($prilohy as $p) {
+                    $mail->addAttachment($p->tmp_file);
+                }
             }
-        } else {
-            $mail->addTo($adresat->email);
-        }
 
-        $mail->setSubject($data['email_predmet']);
-        $mail->setBody($data['email_text']);
-
-        if ( count($prilohy)>0 ) {
-            foreach ($prilohy as $p) {
-                $mail->addAttachment($p->tmp_file);
-            }
-        }
-
-        try {
             $mail->send();
+            
         } catch (Exception $e) {
             $this->flashMessage('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
             return false;
