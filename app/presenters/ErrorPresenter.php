@@ -31,14 +31,17 @@ class ErrorPresenter extends BasePresenter
 
 		} else {
 			$this->template->robots = 'noindex,noarchive';
-
+            $httpResponse = Environment::getHttpResponse();
+            
 			if ($exception instanceof BadRequestException) {
-				Environment::getHttpResponse()->setCode($exception->getCode());
+                if (!$httpResponse->isSent())
+                    $httpResponse->setCode($exception->getCode());
 				// $this->template->title = '404 Not Found';
                 $this->template->message = $exception->getMessage();
 				$this->setView('404');
 			} else {
-				Environment::getHttpResponse()->setCode(500);
+                if (!$httpResponse->isSent())
+                    $httpResponse->setCode(500);
 				// $this->template->title = '500 Internal Server Error';
                 $this->template->message = $exception->getMessage();
 				$this->setView('500');
