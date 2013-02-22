@@ -27,6 +27,7 @@ Opravy:
 - pole dokumentu "věc" zvětšeno na 250 znaků
 - neoprávněný uživatel nyní nemůže zobrazit metadata dokumentu
 - opraveno posílání XML příloh dokumentu datovou schránkou
+- nastavení lhůty vyřízení dokumentu na nulu způsobilo chybu
 
 === Ver. 3.3.2 =================================================================
 
