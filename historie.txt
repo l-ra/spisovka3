@@ -28,6 +28,7 @@ Opravy:
 - neoprávněný uživatel nyní nemůže zobrazit metadata dokumentu
 - opraveno posílání XML příloh dokumentu datovou schránkou
 - nastavení lhůty vyřízení dokumentu na nulu způsobilo chybu
+- opravena bezpečnostní chyba při kombinovaném přihlášení přes LDAP
 
 === Ver. 3.3.2 =================================================================
 

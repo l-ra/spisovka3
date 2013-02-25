@@ -86,9 +86,9 @@ class Authenticator_LDAP extends Control implements IAuthenticator
                     //}
                 }
             } catch (AuthenticationException $e) {
-                if ( $e->getCode() == "3" ) {
+                if ( $e->getCode() == self::FAILURE ) {
                     if ( isset($row->local) && $row->local == 2 ) {
-                        if ( $row->password !== $password_local ) {
+                        if ( $row->password === $password_local ) {
                             $user->zalogovan($row->id);
                             $log->logAccess($row->id, 1);
                         } else {
