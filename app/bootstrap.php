@@ -28,8 +28,14 @@ if ( !defined('KLIENT') ) {
     exit;
 }
 
+// dynamicky uprav protokol v nastaveni BASE_URI
+$baseUri = BASE_URI;
+if (Environment::getHttpRequest()->isSecured())
+    $baseUri = str_replace('http:', 'https:', $baseUri);
+Environment::setVariable('baseUri', $baseUri);
+unset($baseUri);
+
 Environment::setVariable('klientUri', $basePath );
-Environment::setVariable('baseUri', BASE_URI);
 Environment::setVariable('baseApp', BASE_APP);
 
 $unique_info = @file_get_contents(CLIENT_DIR .'/configs/install');
