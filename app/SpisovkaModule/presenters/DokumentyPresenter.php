@@ -2873,7 +2873,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 'org_nove'=>'Nové / nepředané',
                 'org_kvyrizeni'=>'K vyřízení',
                 'org_vyrizene'=>'Vyřízené',
-                'org_pracoval'=>'Na kterých jsem kdy pracoval',
+                'pracoval'=>'Na kterých jsem kdy pracoval',
+                'org_pracoval'=>'Na kterých pracovala moje o.j.',
                 'org_doporucene'=>'Doporučené',
             
                 'org_predane_k_odeslani'=>'K odeslání',
