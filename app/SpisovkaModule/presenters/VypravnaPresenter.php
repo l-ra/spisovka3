@@ -130,7 +130,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 if ( $this->pdf_output == 2 ) {
                     $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
                 } else {
-                    $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
+                    $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica',
+                                7, 9, 5, 6, 0, 0);
                 }
                 
                 $app_info = Environment::getVariable('app_info');
@@ -139,7 +140,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 $mpdf->SetCreator($app_name);
                 $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
                 $mpdf->SetTitle('Podací arch');                
-                $mpdf->SetMargins(0, 0, 2);
                 $mpdf->WriteHTML($content);
                 $mpdf->Output('podaci_arch.pdf', 'I');
             }

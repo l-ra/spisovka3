@@ -161,53 +161,54 @@ class DokumentOdeslani extends BaseModel
         $dokumenty = array();
         $result = $this->fetchAllComplet($sql)->fetchAll();
         
-        if ( count($result)>0 ) {
-            foreach ($result as $subjekt_index => $subjekt) {
-                if (is_array($filtr)) {
-                    // filtruj podle druhu zasilky
-                    $a_druh_db = unserialize($subjekt->druh_zasilky);
-                    $a_result = array_intersect($a_druh_db, $filtr);
-                    if (empty($a_result))
-                        continue;
-                }
-                
-                $dokumenty[ $subjekt_index ] = $subjekt;
-                $dokumenty[ $subjekt_index ]->druh_zasilky = unserialize($dokumenty[ $subjekt_index ]->druh_zasilky);
-                
-                if ( $filtr === "balik" ) {
-                    if ( !$dokumenty[ $subjekt_index ]->druh_zasilky) {
-                        // nelze detekovat - radeji vyradime
-                        unset($dokumenty[ $subjekt_index ]);
-                    } else if ( !in_array(3, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
-                        // vyradime cokoli co neni balik
-                        unset($dokumenty[ $subjekt_index ]);
-                    } else if ( in_array(1, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
-                        // je to sice balik, ale obycejny - vyradime
-                        unset($dokumenty[ $subjekt_index ]);                        
-                    } else if ( count($dokumenty[ $subjekt_index ]->druh_zasilky) < 2 ) {
-                        // samotny balik je obycejny balik - vyradime
-                        unset($dokumenty[ $subjekt_index ]);
-                    }
-                } else if ( $filtr === "doporucene" ) {
-                    if ( !$dokumenty[ $subjekt_index ]->druh_zasilky) {
-                        // nelze detekovat - radeji vyradime
-                        unset($dokumenty[ $subjekt_index ]);
-                    } else if ( in_array(3, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
-                        // baliky jsou ze hry
-                        unset($dokumenty[ $subjekt_index ]);
-                    } else if ( !in_array(2, $dokumenty[ $subjekt_index ]->druh_zasilky ) ) {
-                        // vyradime cokoli co nema v sobe 2 - doporucene
-                        unset($dokumenty[ $subjekt_index ]);
-                    }
-                }
-                
-            }
-            ksort($dokumenty); // eliminuje nesourode indexy
-            return $dokumenty;
-        } else {
+        if ( count($result) == 0 )
             return null;
+            
+        foreach ($result as $index => $row) {
+            if (is_array($filtr)) {
+                // filtruj podle druhu zasilky
+                $a_druh_db = unserialize($row->druh_zasilky);
+                $a_result = array_intersect($a_druh_db, $filtr);
+                if (empty($a_result))
+                    continue;
+            }
+            
+            $dokumenty[ $index ] = $row;
+            $dokumenty[ $index ]->druh_zasilky = unserialize($dokumenty[ $index ]->druh_zasilky);
+            
+            if ( $filtr === "balik" ) {
+                if ( !$dokumenty[ $index ]->druh_zasilky) {
+                    // nelze detekovat - radeji vyradime
+                    unset($dokumenty[ $index ]);
+                } else if ( !in_array(3, $dokumenty[ $index ]->druh_zasilky ) ) {
+                    // vyradime cokoli co neni balik
+                    unset($dokumenty[ $index ]);
+                } else if ( in_array(1, $dokumenty[ $index ]->druh_zasilky ) ) {
+                    // je to sice balik, ale obycejny - vyradime
+                    unset($dokumenty[ $index ]);                        
+                } else if ( count($dokumenty[ $index ]->druh_zasilky) < 2 ) {
+                    // samotny balik je obycejny balik - vyradime
+                    unset($dokumenty[ $index ]);
+                }
+            } else if ( $filtr === "doporucene" ) {
+                if ( !$dokumenty[ $index ]->druh_zasilky) {
+                    // nelze detekovat - radeji vyradime
+                    unset($dokumenty[ $index ]);
+                } else if ( in_array(3, $dokumenty[ $index ]->druh_zasilky ) ) {
+                    // baliky jsou ze hry
+                    unset($dokumenty[ $index ]);
+                } else if ( !in_array(2, $dokumenty[ $index ]->druh_zasilky ) ) {
+                    // vyradime cokoli co nema v sobe 2 - doporucene
+                    unset($dokumenty[ $index ]);
+                }
+            }            
         }
-
+        
+        // vysledek musi mit indexy 0, 1, 2, ...
+        $result = array();
+        foreach($dokumenty as $d)
+            $result[] = $d;
+        return $result;
     }
     
     public function getDokumentID($id_dok_odes)

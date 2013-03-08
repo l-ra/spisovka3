@@ -384,18 +384,6 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');
         
     }
-
-    public function renderPodaciarch() 
-    {
-        @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-        $this->setLayout('print');
-    }
-    
-    public function renderPodaciarchnew() 
-    {
-        @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-        $this->setLayout('print');
-    }    
     
     protected function createComponentNewForm()
     {

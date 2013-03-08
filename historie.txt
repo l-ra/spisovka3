@@ -7,6 +7,7 @@ Opravy:
 - seznam dokumentů - filtr "Na kterých jsem kdy pracoval" pracuje nyní stejně
   bez ohledu na nastavení předávání dokumentů. Přidán filtr "Na kterých pracovala moje o.j.".
 - seznam dokumentů - "Nezobrazovat vyřízené nebo archivované dokumenty" nesprávně zobrazilo dokumenty předané do spisovny
+- opraveno rozvržení poštovního podacího archu. Je nutné jej tisknout pomocí PDF prohlížeče.
 
 === Ver. 3.3.3 =================================================================
 
