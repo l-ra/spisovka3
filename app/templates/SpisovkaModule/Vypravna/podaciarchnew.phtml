@@ -46,7 +46,7 @@ Placeno v hotovosti/Placeno převodem/Výplatní stroj (* Nehodící se škrtně
         </td>
         <td class="w4 right">{if isset($seznam[$i]) && ($seznam[$i]['cena']==0 || empty($seznam[$i]['cena']))}{else}{=@$seznam[$i]['cena']}{/if}</td>
         <td class="w5 right">&nbsp;</td>
-        <td class="w6">&nbsp;</td>
+        <td class="w6">{!=DruhZasilky::vypis($seznam[$i]['druh_zasilky'], true)}</td>
     </tr>
 {/for}
 </table>

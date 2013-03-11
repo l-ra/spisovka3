@@ -2,6 +2,10 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
+Nové funkce:
+
+- výpravna - na poštovní podací arch jsou vypsány doplňkové služby
+
 Opravy:
 
 - seznam dokumentů - filtr "Na kterých jsem kdy pracoval" pracuje nyní stejně

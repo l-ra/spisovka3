@@ -44,31 +44,35 @@ class DruhZasilky extends BaseModel
 
     }    
     
-    public static function vypis( $data ) {
+    public static function vypis( $data, $podaci_arch = false ) {
 
-        if ( !empty($data) && is_array($data) ) {
-            
+        static $ciselnik = array();
+        
+        /* Odfiltruj polozky, ktere nejsou doplnkovymi sluzbami Ceske Posty
+           - obycejne
+           - doporucene - vsechno, na co se pouziva podaci arch je doporucene
+           - balik - pro jistotu, mel by byt odfiltrovan uz pri vyberu polozek pro p. arch
+           - cizina
+        */
+        static $filtr_arch = array(1, 2, 3, 7);
+        
+        if (empty($ciselnik)) {
             $prefix = Environment::getConfig('database')->prefix;
             $tb_druh_zasilky = $prefix .'druh_zasilky';
+            $ciselnik = dibi::query('SELECT * FROM %n', $tb_druh_zasilky )->fetchAssoc('id');
+        }
 
-            $result = dibi::query('SELECT * FROM %n', $tb_druh_zasilky )->fetchAssoc('id');
-            
-            $druh_a = array();
-            foreach( $data as $druh_zasilky_id ) {
-                $druh_a[] = $result[ $druh_zasilky_id ]->nazev;
-            }
-            
-            return implode(", ", $druh_a);
-            
-        } else {
+        if ( empty($data) || !is_array($data) )
             return '';
+
+        $druh_a = array();
+        foreach( $data as $druh_zasilky_id ) {
+            if ($podaci_arch && in_array($druh_zasilky_id, $filtr_arch))
+                continue;
+            $druh_a[] = $ciselnik[ $druh_zasilky_id ]->nazev;
         }
         
-
-        
-
+        return empty($druh_a) ? '' : implode(", ", $druh_a);            
     }    
-    
-    
-    
+
 }
