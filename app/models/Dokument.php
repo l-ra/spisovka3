@@ -1126,7 +1126,9 @@ class Dokument extends BaseModel
                             array('wf.stav_osoby=1'), 
                             array('wf.aktivni=1') )
                     ); 
-                }                  
+                }
+                // odfiltruj dokumenty, ktere jsou predane
+                $args['where'][] = array('wf.dokument_id NOT IN ( SELECT DISTINCT wf1.dokument_id FROM `'. $this->tb_workflow .'` AS wf1 WHERE wf1.stav_osoby=0 AND wf1.aktivni=1 )');
                 break;
             case 'org_kprevzeti':
                 // prijimajici - predane na jmeno nebo organizacni jednotku uzivatele
