@@ -60,14 +60,27 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             $Zamestnanci = new Osoba2User();
             $seznam = $Zamestnanci->hledat($text);
             if ( count($seznam)>0 ) {
+                $seznam_in = array();
                 foreach( $seznam as $user ) {
-                    $checked_user = ( in_array($user->id, $user_a) )?' checked="checked"':'';
+                    // sjednotit vsechny role uzivatele do jednoho a vypisovat jen jeden zaznam uzivatele
+                    // id = id osoby
+                    // user_id = id uzivatele
+                    // name = jmeno role
+                    // role_id = id role
+                    $seznam_in[ $user->user_id ]['user_id'] = $user->user_id;
+                    $seznam_in[ $user->user_id ]['name'] = Osoba::displayName($user);
+                    
+                    $seznam_in[ $user->user_id ]['role'][ $user->role_id ] = $user->name;
+                }
+                
+                foreach( $seznam_in as $user ) {
+                    $checked_user = ( in_array($user['user_id'], $user_a) )?' checked="checked"':'';
                     if ( $typ == 2 ) {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano[]' value='". $user->id ."' $checked_user /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='predano[]' value='". $user['user_id'] ."' $checked_user /> ". $user['name'] ." (". implode(', ',$user['role']) .")";
                     } else {
                         $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno[]' value='". $user->id ."' $checked_user /> ". Osoba::displayName($user) ." (". $user->name .")";
+                            "<input type='checkbox' name='prideleno[]' value='". $user['user_id'] ."' $checked_user /> ". $user['name'] ." (". implode(', ',$user['role']) .")";
 
                     }
                 }
