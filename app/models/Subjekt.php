@@ -382,10 +382,10 @@ class Subjekt extends BaseModel
                 return $d_nazev .', '. $d_adresa;
                 break;
             case 'formalni_adresa':
-                return $d_ulice .'<br />'. $data->adresa_psc .' '. $data->adresa_mesto .'<br />'. Subjekt::stat($data->adresa_stat);
+                return $d_ulice .'<br />'. $data->adresa_psc .' '. $data->adresa_mesto .'<br />'. Subjekt::stat($data->adresa_stat,10);
                 break;
             case 'plna_formalni_adresa':
-                return $d_nazev .'<br />'. $d_ulice .'<br />'. $data->adresa_psc .' '. $data->adresa_mesto .'<br />'. Subjekt::stat($data->adresa_stat);
+                return $d_nazev .'<br />'. $d_ulice .'<br />'. $data->adresa_psc .' '. $data->adresa_mesto .'<br />'. Subjekt::stat($data->adresa_stat,10);
                 break;
             case 'ulice':
                 return $d_ulice;
