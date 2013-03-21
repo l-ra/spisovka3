@@ -26,11 +26,11 @@
         <dl class="detail_item">
             <dt>Certifikát:</dt>
             <dd>
-                {if $Info['certifikat']['stav']==0}
+                {if $Info['certifikat_stav']==0}
                 Certifikát není nahrán nebo není potřeba.
-                {elseif $Info['certifikat']['stav']==1}
+                {elseif $Info['certifikat_stav']==1}
                 Certifikát je nahrán.
-                {elseif $Info['certifikat']['stav']==2}
+                {elseif $Info['certifikat_stav']==2}
                 Certifikát je nahrán a je platný.
                 {else}
                 Nelze zjístit stav certifikátu.

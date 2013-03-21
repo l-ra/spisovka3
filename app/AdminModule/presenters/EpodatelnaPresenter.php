@@ -86,9 +86,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             case 'i': 
                 $crt = $ep['isds'][$index]['certifikat'];
                 if ( file_exists($crt) ) {
-                    $ep['isds'][$index]['certifikat']['stav'] = 1;
+                    $ep['isds'][$index]['certifikat_stav'] = 1;
                 } else {
-                    $ep['isds'][$index]['certifikat']['stav'] = 0;
+                    $ep['isds'][$index]['certifikat_stav'] = 0;
                 }
                 
 
