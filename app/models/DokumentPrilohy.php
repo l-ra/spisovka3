@@ -45,9 +45,19 @@ class DokumentPrilohy extends BaseModel
                     $joinFile->user_name = '';
                 }
                 $joinFile->typ_name = FileModel::typPrilohy($joinFile->typ);
-
-
-               $prilohy[ $joinFile->dokument_id ][ $joinFile->id ] = $joinFile;
+                // Nahrazeni online mime-type
+                $joinFile->mime_type = FileModel::mimeType($joinFile->real_path);
+                // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
+                $mime_type_webalize = String::webalize($joinFile->mime_type);
+                $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
+                if ( @file_exists($mime_type_icon) ) {
+                    $joinFile->mime_type_icon = BASE_URI ."images/mimetypes/". $mime_type_webalize .".png";
+                } else {
+                    $joinFile->mime_type_icon = BASE_URI ."images/mimetypes/application-octet-stream.png";
+                }
+                
+                
+                $prilohy[ $joinFile->dokument_id ][ $joinFile->id ] = $joinFile;
             }
 
             if ( !is_array($dokument_id) ) {

@@ -134,7 +134,11 @@
         {foreach $Prilohy as $priloha}
         <tr>
             <td class="icon">
+                {if file_exists(APP_DIR ."/../public/images/mimetypes/". String::webalize($priloha['mimetype']) .".png")}
                 <img src="{$baseUri}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+                {else}
+                <img src="{$baseUri}images/mimetypes/application-octet-stream.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+                {/if}
             </td>
             <td class="meta">
                 <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>trim($priloha['id'])}">{$priloha['name']}</a>
