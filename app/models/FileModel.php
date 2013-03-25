@@ -21,8 +21,7 @@ class FileModel extends BaseModel
             $user = $UserModel->getIdentity($row->user_created);
             $row->user_name = Osoba::displayName($user);
             $row->typ_name = FileModel::typPrilohy($row->typ, 1);
-            $row->mime_type = FileModel::mimeType($row->real_path);
-            // Nahrazeni online mime-type
+            // Ignoruj mime-type ulozeny v databazi (nastaveny pri nahrani prilohy) a zjisti jej pokazde znovu
             $row->mime_type = FileModel::mimeType($row->real_path);
             // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
             $mime_type_webalize = String::webalize($row->mime_type);
