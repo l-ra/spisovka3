@@ -269,7 +269,7 @@ function my_assert_handler($file, $line, $code)
                     
                     } catch (DibiException $e) {
                         if ( $do_update ) dibi::rollback();
-                        error("Došlo k databázové chybě, aktualizace neproběhla úspěšně!<br />Popis chyby: " . $e->getMessage());
+                        error("Došlo k databázové chybě, aktualizace neproběhla úspěšně!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
                         $rev_error = true;
                         break;
                     }
@@ -298,6 +298,9 @@ function my_assert_handler($file, $line, $code)
 
         dibi::disconnect();        
         
+        if ($rev_error)
+    	    break; // Preskoc ostatni klienty - chyba muze byt vazna
+    	    
         if ($do_update && !$rev_error && $apply_rev != 0)
             echo "<p>Aktualizace klienta proběhla úspěšně.</p>";
             
