@@ -957,7 +957,7 @@ ALTER TABLE `{tbls3}dokument`
 ALTER TABLE `{tbls3}dokument_historie`
   ADD CONSTRAINT `fk_dokument_cislo_jednaci10` FOREIGN KEY (`cislo_jednaci_id`) REFERENCES `{tbls3}cislo_jednaci` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_dokument_typ0` FOREIGN KEY (`dokument_typ_id`) REFERENCES `{tbls3}dokument_typ` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_dokument_historie_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_dokument_historie_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_spousteci_udalost10` FOREIGN KEY (`spousteci_udalost_id`) REFERENCES `{tbls3}spousteci_udalost` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_user10` FOREIGN KEY (`user_created`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_zmocneni10` FOREIGN KEY (`zmocneni_id`) REFERENCES `{tbls3}zmocneni` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -965,29 +965,29 @@ ALTER TABLE `{tbls3}dokument_historie`
   ADD CONSTRAINT `fk_dokument_zpusob_vyrizeni10` FOREIGN KEY (`zpusob_vyrizeni_id`) REFERENCES `{tbls3}zpusob_vyrizeni` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}dokument_odeslani`
-  ADD CONSTRAINT `fk_dokument_odeslani_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_dokument_odeslani_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_odeslani_epodatelna1` FOREIGN KEY (`epodatelna_id`) REFERENCES `{tbls3}epodatelna` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_odeslani_subjekt1` FOREIGN KEY (`subjekt_id`) REFERENCES `{tbls3}subjekt` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_odeslani_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_odeslani_zpusob_odeslani1` FOREIGN KEY (`zpusob_odeslani_id`) REFERENCES `{tbls3}zpusob_odeslani` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}dokument_to_file`
-  ADD CONSTRAINT `fk_dokument_to_file_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_dokument_to_file_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_to_file_file1` FOREIGN KEY (`file_id`) REFERENCES `{tbls3}file` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_to_file_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}dokument_to_spis`
-  ADD CONSTRAINT `fk_dokument_to_spis_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_dokument_to_spis_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_to_spis_spis1` FOREIGN KEY (`spis_id`) REFERENCES `{tbls3}spis` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_to_spis_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}dokument_to_subjekt`
-  ADD CONSTRAINT `fk_dokument_to_subjekt_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_dokument_to_subjekt_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_to_subjekt_subjekt1` FOREIGN KEY (`subjekt_id`) REFERENCES `{tbls3}subjekt` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_dokument_to_subjekt_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}epodatelna`
-  ADD CONSTRAINT `fk_epodatelna_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_epodatelna_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_epodatelna_file1` FOREIGN KEY (`file_id`) REFERENCES `{tbls3}file` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_epodatelna_subjekt1` FOREIGN KEY (`odesilatel_id`) REFERENCES `{tbls3}subjekt` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
@@ -1000,7 +1000,7 @@ ALTER TABLE `{tbls3}file_historie`
   ADD CONSTRAINT `fk_file_user10` FOREIGN KEY (`user_created`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}log_dokument`
-  ADD CONSTRAINT `fk_log_dokument_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_log_dokument_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_log_dokument_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}log_spis`
@@ -1024,8 +1024,8 @@ ALTER TABLE `{tbls3}osoba_to_user`
   ADD CONSTRAINT `fk_osoba_to_user_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}souvisejici_dokument`
-  ADD CONSTRAINT `fk_souvisejici_dokument_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_souvisejici_dokument_dokument2` FOREIGN KEY (`spojit_s_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_souvisejici_dokument_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_souvisejici_dokument_dokument2` FOREIGN KEY (`spojit_s_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_souvisejici_dokument_user1` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}spis`
@@ -1058,7 +1058,7 @@ ALTER TABLE `{tbls3}user_to_role`
   ADD CONSTRAINT `fk_user_to_role_user_role1` FOREIGN KEY (`role_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 ALTER TABLE `{tbls3}workflow`
-  ADD CONSTRAINT `fk_workflow_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_workflow_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_workflow_orgjednotka1` FOREIGN KEY (`orgjednotka_id`) REFERENCES `{tbls3}orgjednotka` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_workflow_user1` FOREIGN KEY (`prideleno_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_workflow_user2` FOREIGN KEY (`user_id`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -1085,7 +1085,7 @@ CREATE TABLE `{tbls3}settings` (
 
 ALTER TABLE `{tbls3}user_role` ADD UNIQUE `user_role_code` ( `code` );
 
-INSERT INTO `{tbls3}settings` VALUES('db_revision', '570');
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '580');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
