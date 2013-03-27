@@ -1,5 +1,7 @@
 ------------------------;
 
+SET FOREIGN_KEY_CHECKS=0;
+
 ALTER TABLE `{tbls3}dokument_historie`
   DROP FOREIGN KEY `fk_dokument_historie_dokument1`;
 ALTER TABLE `{tbls3}dokument_historie`
@@ -46,3 +48,5 @@ ALTER TABLE `{tbls3}workflow`
   DROP FOREIGN KEY `fk_workflow_dokument1`;  
 ALTER TABLE `{tbls3}workflow`
   ADD CONSTRAINT `fk_workflow_dokument1` FOREIGN KEY (`dokument_id`) REFERENCES `{tbls3}dokument` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+SET FOREIGN_KEY_CHECKS=1;
