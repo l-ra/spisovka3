@@ -264,9 +264,9 @@ $(function() {
                 }
 
                 if ( is_simple == 1 ) {
-                    url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=AO';                    
+                    url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=AO&autocomplete=1';                    
                 } else {
-                    url = baseUri + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=AO';
+                    url = baseUri + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=AO&autocomplete=1';
                 }
                 x.open("GET", url, true);
                 x.send(null);
@@ -296,6 +296,13 @@ $(function() {
     
 });
 
+
+dontFollowLink = function () {
+
+    // nutny hack pro Internet Explorer
+    if (typeof event != 'undefined')
+        event.returnValue = false;
+}
 
 /*
  *  Vyvolani dialogu
@@ -494,8 +501,8 @@ spisVybran = function (elm) {
                 }
             }
         }
+        dontFollowLink();
         url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }
@@ -576,7 +583,6 @@ novySubjekt = function (elm) {
             }
         }
         url = elm.href;
-        //elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }
@@ -631,6 +637,8 @@ subjektVybran = function (elm) {
         var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
     }
     if (x) {
+        $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
+
         x.onreadystatechange = function() {
             if (x.readyState == 4 && x.status == 200) {
                 stav = x.responseText;
@@ -640,18 +648,16 @@ subjektVybran = function (elm) {
                     $('#dialog').dialog('close');
                     renderSubjekty(stav);
                 } else {
-                    $('#dialog').html(stav);
+                    $('#ajax-spinner', $('#dialog')).remove();
+                    alert(stav);
                 }
             }
         }
         url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        dontFollowLink();
         x.open("GET", url, true);
         x.send(null);
     }
-
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
 
     return false;
 }
@@ -668,7 +674,7 @@ subjektzmenit = function(elm){
             }
         }
         url = elm.href;
-        elm.href = "javascript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        dontFollowLink();
         x.open("GET", url, true);
         x.send(null);
     }
@@ -887,7 +893,7 @@ osobaVybrana = function (elm) {
         poznamka = document.getElementById('frmpred-poznamka').value;
         poznamka = encodeURI(poznamka);
         url = elm.href + '&poznamka='+ poznamka;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        dontFollowLink();
         x.open("GET", url, true);
         x.send(null);
     }
@@ -911,7 +917,7 @@ prilohazmenit = function(elm){
             }
         }
         url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        dontFollowLink();
         x.open("GET", url, true);
         x.send(null);
     }
@@ -937,7 +943,7 @@ odebratPrilohu = function(elm, dok_id){
                 }
             }
             url = elm.href;
-            elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+            dontFollowLink();
             x.open("GET", url, true);
             x.send(null);
         }
@@ -961,7 +967,7 @@ odebratSubjekt = function(elm, dok_id){
                 }
             }
             url = elm.href;
-            elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+            dontFollowLink();
             x.open("GET", url, true);
             x.send(null);
         }
@@ -1130,7 +1136,7 @@ spojitDokument = function (elm) {
             }
         }
         url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+        dontFollowLink();
         x.open("GET", url, true);
         x.send(null);
     }
@@ -1176,7 +1182,6 @@ pripojitDokument = function (elm) {
             }
         }
         url = elm.href;
-        //elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
         x.open("GET", url, true);
         x.send(null);
     }

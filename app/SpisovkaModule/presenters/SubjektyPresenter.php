@@ -13,6 +13,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $args = array( 'where'=>array("stav=1") );
         $seznam = $Subjekt->seznam($args);
         $this->template->seznam = $seznam;
+        if ($this->getParam('chyba',null))
+            $this->template->chyba = 1;
     }
 
     public function renderNacti()
@@ -26,40 +28,38 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
     }
 
+    // Volano pouze pres Ajax
     public function renderVybrano()
     {
+        try {
+            $subjekt_id = $this->getParam('id',null);
+            $dokument_id = $this->getParam('dok_id',null);
+            $typ = $this->getParam('typ',null);
+            $autocomplete = $this->getParam('autocomplete',0);
+            
+            $Subjekt = new Subjekt();
+            $subjekt = $Subjekt->getInfo($subjekt_id);            
+            if ( $subjekt ) {
 
-        $subjekt_id = $this->getParam('id',null);
-        $dokument_id = $this->getParam('dok_id',null);
-        $typ = $this->getParam('typ',null);
-        $Subjekt = new Subjekt();
+                // Propojit s dokumentem
+                $DokumentSubjekt = new DokumentSubjekt();
+                $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, $typ);
 
-        $subjekt = $Subjekt->getInfo($subjekt_id);
-        if ( $subjekt ) {
+                $Log = new LogModel();
+                $Log->logDokument($dokument_id, LogModel::SUBJEKT_PRIDAN,'Přidán subjekt "'. Subjekt::displayName($subjekt,'jmeno') .'"');
 
-            // Propojit s dokumentem
-            $DokumentSubjekt = new DokumentSubjekt();
-            $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, $typ);
+                echo '###vybrano###'. $dokument_id;
 
-            $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::SUBJEKT_PRIDAN,'Přidán subjekt "'. Subjekt::displayName($subjekt,'jmeno') .'"');
-
-            echo '###vybrano###'. $dokument_id;//. $spis->nazev;
-            $this->terminate();
-
-        } else {
-            // chyba
-            $this->template->dokument_id = $this->getParam('id',null);
-
-            $Spisy = new Spis();
-            $args = null;
-            $seznam = $Spisy->seznam($args);
-            $this->template->seznam = $seznam;
-
-            $this->template->chyba = 1;
-            $this->template->render('vyber');
-
+            } else {
+                // chyba            
+                echo 'Zvolený subjekt se nepodařilo načíst.';
+            }
         }
+        catch (Exception $e) {
+            echo 'Chyba ' . $e->getCode() . ' - ' . $e->getMessage();
+        }
+        
+        $this->terminate();
     }
 
     public function renderOdebrat()
