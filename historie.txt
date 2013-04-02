@@ -13,6 +13,7 @@ Opravy:
 - seznam dokumentů - "Nezobrazovat vyřízené nebo archivované dokumenty" nesprávně zobrazilo dokumenty předané do spisovny
 - opraveno rozvržení poštovního podacího archu. Je nutné jej tisknout pomocí PDF prohlížeče.
 - datová schránka - nově je možno odesílat i soubory ve formátu DOCX a XLSX
+- pokročilé hledání - hledání dokumentů přidělených nebo předaných uživateli pracuje nyní správně a dočasně se vypne filtr dokumentů
 
 === Ver. 3.3.3 =================================================================
 

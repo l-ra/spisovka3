@@ -5,6 +5,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     private $filtr;
     private $filtr_bezvyrizenych;
+    private $zakaz_filtr = false;
     private $hledat;
     private $seradit;
     private $odpoved = null;
@@ -61,7 +62,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Dokument = new Dokument();
 
         $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
-        if ( isset($filtr) ) {
+        if ( isset($filtr['filtr']) ) {
             // zjisten filtr
             $this->getHttpResponse()->setCookie('s3_filtr', serialize($filtr), strtotime('90 day'));
             $args_f = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
@@ -86,6 +87,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         }        
         
+        $args_h = array();
         if ( isset($hledat) ) {
             if (is_array($hledat) ) {
                 // podrobne hledani = array
@@ -117,6 +119,22 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
         $this->template->s3_hledat = $hledat;
 
+        /* [P.L.] Pokud uzivatel zvoli pokrocile hledani a hleda dokumenty pridelene/predane uzivateli ci jednotce,
+        ignoruj filtr, ktery uzivatel nastavil a pouzij filtr "Vsechny" */
+        if (is_array($hledat)
+            && (isset($hledat['prideleno'])
+            || isset($hledat['predano'])
+            || isset($hledat['prideleno_org'])
+            || isset($hledat['predano_org'])
+            ))
+        {
+            $bez_vyrizenych = false;
+            if (isset($filtr['bez_vyrizenych']))
+                $bez_vyrizenych = $filtr['bez_vyrizenych'];
+            $args_f = $Dokument->filtr('vse', null, $bez_vyrizenych);
+            $this->zakaz_filtr = true;
+        }
+        
         if (!$this->hromadny_tisk)
             $args = $Dokument->spojitAgrs(@$args_f, @$args_h);
         else {
@@ -2932,9 +2950,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $filtr_bezvyrizenych =  !is_null($this->filtr_bezvyrizenych)?$this->filtr_bezvyrizenych:false;
 
         $form = new AppForm();
-        $form->addSelect('filtr', 'Filtr:', $select)
-                ->setValue($filtr)
-                ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
+        $form->addHidden('hidden')
+            ->setValue(1);
+
+        $control = $form->addSelect('filtr', 'Filtr:', $select)
+                ->setValue($filtr);
+        $control->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
+        if ($this->zakaz_filtr)
+            $control->setDisabled();
+            
         $form->addCheckbox('bez_vyrizenych','Nezobrazovat vyřízené nebo archivované dokumenty')
                 ->setValue($filtr_bezvyrizenych)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
