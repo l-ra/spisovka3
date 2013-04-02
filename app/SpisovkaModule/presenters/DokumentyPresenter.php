@@ -941,11 +941,22 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParam('id',null);
         $cjednaci_id = $this->getParam('cislo_jednaci_id',null);
-        $user_id = $this->getParam('user',null);
+        // Parametr user je predan, ale neni pouzit. Je to nejaky pozustatek z minulosti
+        // $user_id = $this->getParam('user',null);
 
         $Dokument = new Dokument();
-        //$dokument_info = $Dokument->getInfo($dokument_id);
+        $dokument_info = $Dokument->getInfo($dokument_id);
+        if (empty($dokument_info))
+            throw new Exception("Přidělení č.j. - nemohu načíst dokument id $dokument.");
 
+        // Je treba zkontrolovat, jestli dokument uz cislo jednaci nema prideleno
+        if (!empty($dokument_info['cislo_jednaci_id'])) {
+            // throw new Exception("Dokument má již č.j. přiděleno.");
+            $this->flashMessage('Dokument má již číslo jednací přiděleno.', 'error');
+            $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+            return;
+        }
+            
         $CJ = new CisloJednaci();
 
         if ( !empty($cjednaci_id) ) {
