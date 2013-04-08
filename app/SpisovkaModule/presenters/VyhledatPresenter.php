@@ -11,6 +11,9 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         
         $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');
         
+        if (Environment::getUser()->isAllowed(NULL, 'is_vedouci'))
+            $this->template->isPrivilege = true;
+            
         if ( $this->getParam('is_ajax') ) {
             $this->layout = false;
         }
