@@ -268,9 +268,13 @@ function my_assert_handler($file, $line, $code)
                     }
                     
                     } catch (DibiException $e) {
-                        if ( $do_update ) dibi::rollback();
-                        error("Došlo k databázové chybě, aktualizace neproběhla úspěšně!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
-                        $rev_error = true;
+                        if ( $do_update ) {
+                            dibi::rollback();
+                            error("Došlo k databázové chybě, aktualizace neproběhla úspěšně!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
+                            $rev_error = true;
+                        }
+                        else
+                            error("Při kontrole došlo k databázové chybě!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
                         break;
                     }
                     
