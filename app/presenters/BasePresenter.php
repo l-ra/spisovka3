@@ -240,6 +240,8 @@ abstract class BasePresenter extends Presenter
         
         $this->template->klientUri = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
         
+        $this->template->licence = '<a href="http://joinup.ec.europa.eu/software/page/eupl/licence-eupl">EUPL v.1.1</a>';
+        
         /**
          * Informace o Klientovi
          */

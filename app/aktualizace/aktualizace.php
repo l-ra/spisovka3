@@ -403,7 +403,7 @@ function deleteDir($dir, $dir_parent = null)
 <div id="layout_bottom">
     <div id="bottom">
         <strong>OSS Spisová služba</strong><br/>
-        Na toto dílo se vztahuje <a href="http://www.osor.eu/eupl/european-union-public-licence-eupl-v.1.1">licence EUPL V.1.1</a>
+        Na toto dílo se vztahuje licence EUPL v.1.1</a>
     </div>
 </div>
 
