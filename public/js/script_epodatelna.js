@@ -126,7 +126,7 @@ $(function() {
 	}
     });
 
-    $('#novysubjekt_click').click( function() {
+    $('#novysubjekt_click').click( function(event) {
         event.preventDefault();
 
         id = document.getElementById('frmnovyForm-epodatelna_id').value;
