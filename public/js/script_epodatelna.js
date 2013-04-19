@@ -147,7 +147,7 @@ $(function() {
             $('#typ_subjektu').html(typ_select);
         });   
 
-        alert('subjekt_original');
+        //alert('subjekt_original');
 
         novy_subjekt = ''+
 '                        <dt>Typ subjektu:</dt>'+
