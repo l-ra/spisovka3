@@ -138,6 +138,7 @@ $(function() {
     $('#subjekt_pripojit_click').click(function(event){
         event.preventDefault();
         $('#subjekt_pripojit').show();
+        $('#subjekt_autocomplete').focus();
         
         return false;
     });    
