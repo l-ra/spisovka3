@@ -750,7 +750,7 @@ form_odmitnout +
 	}
     });
     
-    $('#novysubjekt_click_'+id).click( function() {
+    $('#novysubjekt_click_'+id).click( function(event) {
         event.preventDefault();
 
         novy_subjekt = ''+
