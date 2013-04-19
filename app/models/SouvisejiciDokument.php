@@ -8,16 +8,26 @@ class SouvisejiciDokument extends BaseModel
     public function souvisejici($dokument_id) {
 
         $param = array();
-        $param['where'] = array();
-        $param['where'][] = array('dokument_id=%i',$dokument_id);
+        $param['where_or'] = array();
+        $param['where_or'][] = array('dokument_id=%i',$dokument_id);
+        $param['where_or'][] = array('spojit_s_id=%i',$dokument_id);
 
         $dokumenty = array();
         $result = $this->fetchAllComplet($param)->fetchAll();
         if ( count($result)>0 ) {
             $Dokument = new Dokument();
             foreach ($result as $joinDok) {
-                $dok = $Dokument->getBasicInfo($joinDok->spojit_s_id);
-                $dokumenty[ $joinDok->dokument_id ] = $dok;
+                if ( $joinDok->spojit_s_id == $dokument_id ) {
+                    // zpetne spojeny s
+                    $dok = $Dokument->getBasicInfo($joinDok->dokument_id);
+                    $dok->spojeni = 'zpetne_spojen';
+                    $dokumenty[ $joinDok->dokument_id ] = $dok;
+                } else {
+                    // spojen s
+                    $dok = $Dokument->getBasicInfo($joinDok->spojit_s_id);
+                    $dok->spojeni = 'spojen';
+                    $dokumenty[ $joinDok->spojit_s_id ] = $dok;
+                }
             }
             return $dokumenty;
         } else {

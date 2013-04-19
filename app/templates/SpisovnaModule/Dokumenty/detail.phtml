@@ -179,6 +179,7 @@
                 {if count($SouvisejiciDokumenty)>0 }
                     {foreach $SouvisejiciDokumenty as $s}
                     <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
+                    <br>
                     {/foreach}
                 {/if}
                 </span>

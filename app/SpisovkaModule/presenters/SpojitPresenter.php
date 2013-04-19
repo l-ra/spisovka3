@@ -97,9 +97,16 @@ class Spisovka_SpojitPresenter extends BasePresenter
     {
         $dokument_id = $this->getParam('id',null);
         $spojit_s = $this->getParam('spojeny',null);
+        $zpetne_spojeny = $this->getParam('zpetne_spojeny',null);
 
         $Souvisejici = new SouvisejiciDokument();
-        $param = array( array('dokument_id=%i',$dokument_id),array('spojit_s_id=%i',$spojit_s) );
+        
+        if ( $zpetne_spojeny ) {
+            $param = array( array('spojit_s_id=%i',$dokument_id),array('dokument_id=%i',$zpetne_spojeny) );
+        } else {
+            $param = array( array('dokument_id=%i',$dokument_id),array('spojit_s_id=%i',$spojit_s) );
+        }
+        
 
         if ( $Souvisejici->odebrat($param) ) {
             $this->flashMessage('Spojený dokument byl odebrán z dokumentu.');

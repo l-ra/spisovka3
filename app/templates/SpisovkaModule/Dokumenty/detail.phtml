@@ -328,7 +328,12 @@
                 {if count($SouvisejiciDokumenty)>0 }
                     {foreach $SouvisejiciDokumenty as $s}
                     <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
+                    {if $s->spojeni == "zpetne_spojen"}
+                    &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'zpetne_spojeny'=>$s->id}">odebrat spojení</a>]
+                    {else}
                     &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->id}">odebrat spojení</a>]
+                    {/if}
+                    <br />
                     {/foreach}
                 {/if}
                 </span>
