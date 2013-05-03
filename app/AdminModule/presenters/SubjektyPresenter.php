@@ -203,7 +203,7 @@ class Admin_SubjektyPresenter extends BasePresenter
 
         $subjekt = $this->template->Subjekt;
         $typ_select = Subjekt::typ_subjektu();
-        $stat_select = Subjekt::stat();
+        $stat_select = array("" => "Neuveden") + Subjekt::stat();
 
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -293,6 +293,10 @@ class Admin_SubjektyPresenter extends BasePresenter
 
         $subjekt_id = $data['id'];
         unset($data['id']);
+        if (empty($data['stat_narozeni']))
+            $data['stat_narozeni'] = null;
+        if (empty($data['adresa_stat']))
+            $data['adresa_stat'] = null;
 
         $Subjekt = new Subjekt();
 

@@ -290,7 +290,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $subjekt = $this->template->Subjekt;
         $dokument_id = $this->template->dokument_id;
         $typ_select = Subjekt::typ_subjektu();
-        $stat_select = Subjekt::stat();
+        $stat_select = array("" => "Neuveden") + Subjekt::stat();
 
         $DokumentSubjekt = new DokumentSubjekt();
         $seznam = $DokumentSubjekt->subjekty($dokument_id);
@@ -400,6 +400,10 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $dokument_id = $data['dokument_id'];
         $smer = $data['smer'];
         unset($data['subjekt_id'],$data['dokument_id'], $data['smer']);
+        if (empty($data['stat_narozeni']))
+            $data['stat_narozeni'] = null;
+        if (empty($data['adresa_stat']))
+            $data['adresa_stat'] = null;
 
         $Subjekt = new Subjekt();
         try {
