@@ -410,9 +410,6 @@ class Subjekt extends BaseModel
 
     public static function stat($kod = null, $select = 0) {
 
-        /*$stat = array('CZE'=>'Česká republika',
-                      'SVK'=>'Slovenská republika'
-                     );*/
 
         $prefix = Environment::getConfig('database')->prefix;
         $tb_staty = $prefix .'stat';
@@ -424,10 +421,16 @@ class Subjekt extends BaseModel
         }
         
         if ( is_null($kod) ) {
+            // kod == null znamena, ze volajici chce seznam statu
+            $stat2 = array('CZE'=>'Česká republika');
+            unset($stat['CZE']);
+            foreach ($stat as $i => $s)
+                $stat2[ $i ] = $s;
+
             if ( $select == 3 ) {
                 $tmp = array();
                 $tmp[''] = 'v jakémkoli státě';
-                foreach ($stat as $i => $s) {
+                foreach ($stat2 as $i => $s) {
                     $tmp[ $i ] = $s;
                 }
                 return $tmp;
@@ -435,7 +438,7 @@ class Subjekt extends BaseModel
                 // prazdna hodnota
                 return "";
             } else {
-                return $stat;
+                return $stat2;
             }
         } else {
             return ( key_exists($kod, $stat) )?$stat[ $kod ]:null;
