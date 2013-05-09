@@ -13,7 +13,7 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
         $this->template->epodatelna_id = $this->getParam('epod_id',null);
         
         $Subjekt = new Subjekt();
-        $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
+        $args = array( 'where'=>array("stav=1") );
         $seznam = $Subjekt->seznam($args);
         $this->template->seznam = $seznam;
     }
@@ -84,7 +84,7 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
                 'adresa_psc' => ( !empty($data['subjekt_psc'][$data['id']])?$data['subjekt_psc'][$data['id']]:"" ),
                 'email' => ( !empty($data['subjekt_email'][$data['id']])?$data['subjekt_email'][$data['id']]:"" ),
                 'id_isds' => ( !empty($data['subjekt_isds'][$data['id']])?$data['subjekt_isds'][$data['id']]:"" ),
-                'adresa_stat' => "CZE",
+                'adresa_stat' => isset($data['stat'][$data['id']])?$data['stat'][$data['id']]:"CZE",
                 'telefon'=>'',
             );
 
@@ -106,7 +106,7 @@ class Epodatelna_SubjektyPresenter extends BasePresenter
                 echo "#Subjekt se nepodařil vytvořit.";
             }
         } else {
-            echo "#Subjekt nebyl přidán! Nepodařilo se zjístit ID zprávy.";
+            echo "#Subjekt nebyl přidán! Nepodařilo se zjistit ID zprávy.";
         }
 
         exit;

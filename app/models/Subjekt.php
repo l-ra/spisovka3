@@ -415,35 +415,24 @@ class Subjekt extends BaseModel
         $tb_staty = $prefix .'stat';
 
         $result = dibi::query('SELECT nazev,kod FROM %n', $tb_staty,'WHERE stav=1 ORDER BY nazev')->fetchAll();        
+        
         $stat = array();
+        // Dej CR na prvni misto v seznamu
+        $stat['CZE'] = 'Česká republika';
         foreach ($result as $rdata ) {
             $stat[ $rdata->kod ] = $rdata->nazev;
         }
         
-        if ( is_null($kod) ) {
-            // kod == null znamena, ze volajici chce seznam statu
-            $stat2 = array('CZE'=>'Česká republika');
-            unset($stat['CZE']);
-            foreach ($stat as $i => $s)
-                $stat2[ $i ] = $s;
+        if ( !is_null($kod) )
+            return key_exists($kod, $stat) ? $stat[$kod] : null;
 
-            if ( $select == 3 ) {
-                $tmp = array();
-                $tmp[''] = 'v jakémkoli státě';
-                foreach ($stat2 as $i => $s) {
-                    $tmp[ $i ] = $s;
-                }
-                return $tmp;
-            } else if ( $select == 10 ) {
-                // prazdna hodnota
-                return "";
-            } else {
-                return $stat2;
-            }
-        } else {
-            return ( key_exists($kod, $stat) )?$stat[ $kod ]:null;
-        }
+        if ( $select == 3 )
+            return array('' => 'v jakémkoli státě') + $stat;
+        else if ( $select == 10 )
+            // prazdna hodnota
+            return "";
 
+        return $stat;
     }
 
     public static function typ_subjektu( $kod = null, $select = 0 ) {

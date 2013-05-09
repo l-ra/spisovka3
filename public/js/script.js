@@ -750,6 +750,21 @@ subjektNovy = function(event) {
             $('#typ_subjektu').html(typ_select);
         });            
 
+        if ( is_simple == 1 ) {
+            url_ajaxtyp = baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamstatuajax';
+        } else { 
+            url_ajaxtyp = baseUri + 'subjekty/0/seznamstatuajax';
+        }
+        $.getJSON(url_ajaxtyp, function(data){
+            var select = '<select name="stat['+id+']">';
+
+            $.each(data, function(key, val) {
+                select = select + '<option value="' + key + '">' + val + '</option>';
+            });
+            
+            select = select + "</select>";
+            $('#novy_subjekt_stat').html(select);
+        });            
         
         
         novy_subjekt = ''+
@@ -763,6 +778,8 @@ subjektNovy = function(event) {
 '                        <dd><input type="text" name="subjekt_ulice['+id+']" value="" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="10" /></dd>'+
 '                        <dt>PSČ a Město:</dt>'+
 '                        <dd><input type="text" name="subjekt_psc['+id+']" value="" size="6" /><input type="text" name="subjekt_mesto['+id+']" value="" size="50" /></dd>'+
+'                        <dt>Stát:</dt>'+
+'                        <dd id="novy_subjekt_stat"></dd>'+
 '                        <dt>Email:</dt>'+
 '                        <dd><input type="text" name="subjekt_email['+id+']" value="" size="60" /></dd>'+
 '                        <dt>ID datové schránky:</dt>'+

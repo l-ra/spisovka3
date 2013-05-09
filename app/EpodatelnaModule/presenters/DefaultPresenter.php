@@ -374,6 +374,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         
     }
 
+    public function renderZkontrolovat()
+    {
+        new SeznamStatu($this, 'seznamstatu');
+    }
 
     // Stáhne zprávy ze všech schránek a dá uživateli vědět výsledek
     

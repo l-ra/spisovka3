@@ -209,6 +209,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         }
         
         $this->template->novyForm = $this['novyForm'];
+        
+        new SeznamStatu($this, 'seznamstatu');
     }
 
     public function renderOdmitnout()

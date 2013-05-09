@@ -225,6 +225,10 @@
         {
             value = $("#frmupravitForm-type").val();
             //alert(value);
+            // Pokud needitujeme subjekt, formular neexistuje
+            if (typeof(value) == 'undefined')
+                return;
+                
             if ( value.indexOf('PFO')>=0 || value === '' ) {
                 $(".type_fo").show();
                 $(".type_ovm").show();            

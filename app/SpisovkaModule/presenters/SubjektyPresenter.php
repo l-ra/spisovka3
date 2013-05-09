@@ -123,8 +123,6 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
     public function actionSeznamtypusubjektu()
     {
-
-        $seznam = array();
         $typy_subjektu = Subjekt::typ_subjektu();
 
         echo json_encode($typy_subjektu);
@@ -132,6 +130,12 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         exit;
     }    
     
+    public function actionSeznamStatuAjax()
+    {
+        echo json_encode(Subjekt::stat());
+        exit;
+    }    
+
     public function actionVytvoritAjax()
     {
 
@@ -156,7 +160,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
                 'adresa_psc' => ( !empty($data['subjekt_psc'][$data['id']])?$data['subjekt_psc'][$data['id']]:"" ),
                 'email' => ( !empty($data['subjekt_email'][$data['id']])?$data['subjekt_email'][$data['id']]:"" ),
                 'id_isds' => ( !empty($data['subjekt_isds'][$data['id']])?$data['subjekt_isds'][$data['id']]:"" ),
-                'adresa_stat' => "CZE",
+                'adresa_stat' => $data['stat'][$data['id']],
                 'telefon'=>'',
             );
 
@@ -182,7 +186,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
                 echo "#Subjekt se nepodařil vytvořit.";
             }
         } else {
-            echo "#Subjekt nebyl přidán! Nepodařilo se zjístit ID zprávy.";
+            echo "#Subjekt nebyl přidán! Nepodařilo se zjistit ID zprávy.";
         }
 
         exit;
