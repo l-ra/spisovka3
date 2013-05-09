@@ -30,9 +30,22 @@ class AbcPaginator extends Control
      */
     public function render()
     {
-
-        $this->template->url = Environment::getHttpRequest()->getUri()->getPath();
+        
+        $url = Environment::getHttpRequest()->getUri()->getPath();
+        $query_string = Environment::getHttpRequest()->getUri()->getQuery();
+        $query_params = "";
+        parse_str($query_string, $query);
+        unset($query['abc-abc'],$query['vp-page'],$query['do']);
+        if ( count($query)>0 ) {
+            foreach ( $query as $key=>$value ) {
+                if ( empty($key) ) continue;
+                    $query_params .= "&". $key ."=". @urlencode($value);
+                }
+            }
+        
         $this->template->abc = $this->presenter->getParam('abc');
+        $this->template->url = $url;
+        $this->template->query = $query_params;
 
         $this->template->setFile(dirname(__FILE__) . '/template.phtml');
         $this->template->render();
