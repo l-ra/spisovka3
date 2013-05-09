@@ -2,9 +2,13 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
+=== Ver. 3.3.4 =================================================================
+
 Nové funkce:
 
 - výpravna - na poštovní podací arch jsou vypsány doplňkové služby
+- subjekty - při rychlém vytváření subjektů lze zadat v adrese položku stát
+           - Česká Republika je nyní první (a výchozí) položka v seznamu států
 
 Opravy:
 
@@ -15,8 +19,10 @@ Opravy:
 - datová schránka - nově je možno odesílat i soubory ve formátu DOCX a XLSX
 - pokročilé hledání - hledání dokumentů přidělených nebo předaných uživateli pracuje nyní správně a dočasně se vypne filtr dokumentů. Též sekretariát o.j. má přístup k tomuto hledání.
 - opraveno možné přeskočení čísla jednacího v okamžiku jeho přidělení dokumentu
-- E-podatelna - oprava funkce "Vytvořit nový subjekt z odesílatele"
 - spojení dokumentů je nyní obousměrné
+- E-podatelna - oprava funkce "Vytvořit nový subjekt z odesílatele"
+- subjekty - opraveno zobrazování údaje stát narození
+- opraveno abecední stránkování v případě, kdy není k dispozici rewrite url
 
 === Ver. 3.3.3 =================================================================
 
