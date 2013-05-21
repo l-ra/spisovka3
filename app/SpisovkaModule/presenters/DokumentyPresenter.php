@@ -1598,7 +1598,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:',$zpusob_doruceni);
         
-        $form->addText('cislo_doporuceneho_dopisu', 'Číslo jdoporučeného dopisu:', 50, 50)
+        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50)
                 ->setValue(@$dok->cislo_doporuceneho_dopisu);        
         
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
@@ -1826,7 +1826,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:',$zpusob_doruceni)
                 ->setValue(@$Dok->zpusob_doruceni_id);
         
-        $form->addText('cislo_doporuceneho_dopisu', 'Číslo jdoporučeného dopisu:', 50, 50)
+        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50)
                 ->setValue(@$Dok->cislo_doporuceneho_dopisu);          
         
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
@@ -1872,7 +1872,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $data['datum_vzniku'] = $dok->datum_vzniku;
             $data['dokument_typ_id'] = $dok->typ_dokumentu->id;
             $data['zpusob_doruceni_id'] = $dok->zpusob_doruceni_id;
-            $data['cislo_doporuceneho_dopisu'] = $dok->cislo_doporuceneho_dopisu;
+
+            // P.L. ne kazdy uzivatel ma pravo menit tyto udaje a pole formulare v tom pripade pak bude prazdne
+            if (empty($data['cislo_doporuceneho_dopisu']))
+                unset($data['cislo_doporuceneho_dopisu']);
+            if (empty($data['cislo_jednaci_odesilatele']))
+                unset($data['cislo_jednaci_odesilatele']);
+                
             unset($data['datum_vzniku_cas']);
         } else {
             // uprava casu
