@@ -296,16 +296,16 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $typ_select = Subjekt::typ_subjektu();
         $stat_select = array("" => "Neuveden") + Subjekt::stat();
 
-        $DokumentSubjekt = new DokumentSubjekt();
+        /* $DokumentSubjekt = new DokumentSubjekt();
         $seznam = $DokumentSubjekt->subjekty($dokument_id);
         if ( isset($seznam[@$subjekt->id]) ) {
             $smer_default = $seznam[@$subjekt->id]->rezim_subjektu;
         } else {
             $smer_default = null;
         }
-        unset($seznam);
+        unset($seznam); */
         
-        $smer_select = array('AO'=>'adresát i odesílatel','A'=>'adresát','O'=>'odesílatel');
+        // $smer_select = array('AO'=>'adresát i odesílatel','A'=>'adresát','O'=>'odesílatel');
 
         $form1 = new AppForm();
         $form1->getElementPrototype()->id('subjekt-vytvorit');
@@ -316,8 +316,8 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         $form1->addHidden('dokument_id')
                 ->setValue(@$dokument_id);
         
-        $form1->addSelect('smer', 'Připojit jako:', $smer_select)
-                ->setValue($smer_default);
+        // $form1->addSelect('smer', 'Připojit jako:', $smer_select)
+                // ->setValue($smer_default);
 
         $form1->addSelect('type', 'Typ subjektu:', $typ_select)
                 ->setValue(@$subjekt->type);
@@ -402,7 +402,7 @@ class Spisovka_SubjektyPresenter extends BasePresenter
 
         $subjekt_id = $data['subjekt_id'];
         $dokument_id = $data['dokument_id'];
-        $smer = $data['smer'];
+        // $smer = $data['smer'];
         unset($data['subjekt_id'],$data['dokument_id'], $data['smer']);
         if (empty($data['stat_narozeni']))
             $data['stat_narozeni'] = null;
@@ -413,10 +413,11 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         try {
             $subjekt_id = $Subjekt->ulozit($data, $subjekt_id);
 
-            $DokumentSubjekt = new DokumentSubjekt();
-            $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, $smer);
+            // $DokumentSubjekt = new DokumentSubjekt();
+            // $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, $smer);
 
             $subjekt_info = $Subjekt->getInfo($subjekt_id);
+            // P.L. Zmenu ciselniku nemuzeme logovat do protokolu dokumentu
             //$Log = new LogModel();
             //$Log->logDokument($dokument_id, LogModel::SUBJEKT_ZMENEN,'Změněn subjekt "'. Subjekt::displayName($subjekt_info) .'"');
             
@@ -588,6 +589,20 @@ class Spisovka_SubjektyPresenter extends BasePresenter
         }
     }
 
+    // Volano pouze pres Ajax
+    // Nevraci zpet informaci (krome HTTP stavoveho kodu), predpoklada se, ze operace se vzdy provede uspesne
+    public function actionZmenRezim()
+    {
+        $subjekt_id = $this->getParam('id',null);
+        $dokument_id = $this->getParam('dok_id',null);
+        $typ = $this->getParam('typ',null);
+        
+        // Zmen typ propojeni
+        $DokumentSubjekt = new DokumentSubjekt();
+        $DokumentSubjekt->zmenit($dokument_id, $subjekt_id, $typ);
 
+        echo 'OK';
+        $this->terminate();
+    }
 
 }

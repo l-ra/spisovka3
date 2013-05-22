@@ -1456,3 +1456,34 @@ function htmlspecialchars (string, quote_style, charset, double_encode) {
 
     return string;
 }
+
+zmen_rezim_subjektu = function() {
+
+    var rezim = this.title;
+    if (rezim == 'A')
+        rezim = 'O';
+    else if (rezim == 'O')
+        rezim = 'AO';
+    else
+        rezim = 'A';
+        
+    // zmen element obrazku
+    // this.title = this.alt = rezim;    
+    // var url = this.src;
+    // url = url.replace(/subjekt_[^\.]*/, 'subjekt_' + rezim.toLowerCase());
+    // this.src = url;
+
+    var subjekt_id = this.id.replace(/subjekt_ikona_/, '');
+    var url;
+    if ( is_simple == 1 )
+        url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+subjekt_id+'&action=zmenrezim&';
+        
+    else
+        url = baseUri + 'subjekty/'+subjekt_id+'/zmenrezim?';
+    url += 'dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ='+rezim;    
+
+    $.get(url, '', function(data) {
+        renderSubjekty(document.getElementById('subjekt_dokument_id').value);
+    }, 'text');
+    
+}

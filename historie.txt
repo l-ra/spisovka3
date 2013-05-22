@@ -9,6 +9,7 @@ Nové funkce:
 - výpravna - na poštovní podací arch jsou vypsány doplňkové služby
 - subjekty - při rychlém vytváření subjektů lze zadat v adrese položku stát
            - Česká Republika je nyní první (a výchozí) položka v seznamu států
+           - lze rychle přepínat připojení subjektu k dokumentu kliknutím na ikonu obálky
 
 Opravy:
 

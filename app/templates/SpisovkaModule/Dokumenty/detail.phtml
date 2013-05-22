@@ -722,8 +722,13 @@
                 </dd>
             </dl>
             </div>
-            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id}); return false;">Obnovit seznam subjektu</a><span id="reload_spinner"></span>
+            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id}); return false;">Obnovit seznam subjektů</a><span id="reload_spinner"></span>
         </div>
+        <script type="text/javascript">
+        // viz o par radku nize
+        // pouzij Javascript jen pokud je uzivatel opravnen menit subjekty
+        $('#dok-subjekty td.icon img').live('click', zmen_rezim_subjektu);
+        </script>
         {/if}
         <div id="dok-subjekty">
         {if count($Dok->subjekty)>0}
@@ -731,7 +736,7 @@
             {foreach $Dok->subjekty as $subjekt}
             <tr>
             <td class="icon">
-                <img src="{$baseUri}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
+                <img id="subjekt_ikona_{$subjekt->id}" src="{$baseUri}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
             </td>
             <td class="meta">
                 <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
