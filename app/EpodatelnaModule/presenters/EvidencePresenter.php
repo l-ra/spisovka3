@@ -534,7 +534,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $DokumentSubjekt = new DokumentSubjekt();
                     foreach( $subjekty as $subjekt_id => $subjekt_status ) {
                         if ( $subjekt_status == 'on' ) {
-                            $DokumentSubjekt->pripojit($dokument_id, $subjekt_id);
+                            $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'O');
                         }
                     }
                 }
@@ -667,7 +667,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $DokumentSubjekt = new DokumentSubjekt();
                     foreach( $data['subjekt'] as $subjekt_id => $subjekt_status ) {
                         if ( $subjekt_status == 'on' ) {
-                            $DokumentSubjekt->pripojit($dokument_id, $subjekt_id);
+                            $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'O');
                         }
                     }
                 }

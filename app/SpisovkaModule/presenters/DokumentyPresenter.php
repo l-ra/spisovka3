@@ -1245,12 +1245,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $subjekty_old = $DokumentSubjekt->subjekty($dokument_id);
                     if ( count($subjekty_old)>0 ) {
                         foreach ( $subjekty_old as $subjekt ) {
-                            if ( $subjekt->type != 'O' ) {
-                                $DokumentSubjekt->pripojit($dok_odpoved->id, $subjekt->id, $subjekt->rezim_subjektu);
-                            }
+                            $rezim = $subjekt->rezim_subjektu;
+                            if ($rezim == 'O')
+                                $rezim = 'A';
+                            else if ($rezim == 'A')
+                                $rezim = 'O';
+                            $DokumentSubjekt->pripojit($dok_odpoved->id, $subjekt->id, $rezim);
                         }
                     }
-                    $subjekty_new = $DokumentSubjekt->subjekty($dokument_id);
+                    $subjekty_new = $DokumentSubjekt->subjekty($dok_odpoved->id);
                     $this->template->Subjekty = $subjekty_new;
 
                     // kopirovani prilohy
