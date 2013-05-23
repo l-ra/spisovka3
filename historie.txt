@@ -25,6 +25,7 @@ Opravy:
 - e-podatelna - oprava funkce "Vytvořit nový subjekt z odesílatele"
 - subjekty - opraveno zobrazování údaje stát narození
 - opraveno abecední stránkování v případě, kdy není k dispozici rewrite url
+- nápověda nyní funguje i bez rewrite url
 
 === Ver. 3.3.3 =================================================================
 

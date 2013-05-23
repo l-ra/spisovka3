@@ -17,8 +17,7 @@
 </div>
 <div id="layout">
     <div id="menu">
-        <a href="{$klientUri}{$setUri}">&lt;&lt; zpět na stránku</a>&nbsp;&nbsp;
-        <a href="{$klientUri}napoveda">Hlavní stránka nápovědy</a>
+        <a href="{$klientUri}{if IS_SIMPLE_ROUTER}?presenter=Spisovka:Napoveda&param1=obsah{else}napoveda{/if}">Hlavní stránka nápovědy</a>
     </div>
     <div id="help_content">
 {if file_exists($setFile)}
@@ -26,7 +25,7 @@
 {else}
     <h2>Bez nápovědy</h2>
     <p>
-        Pro uvedenou stránku "<a href="{$klientUri}{$setUri}"><strong>{$klientUri}{$setUri}</strong></a>" není k dispozici nápověda. Případně nápověda není potřeba.
+        Pro uvedenou stránku není k dispozici nápověda, respektive nápověda není potřeba.
     </p>
 {/if}
     </div>

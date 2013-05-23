@@ -220,11 +220,14 @@ abstract class BasePresenter extends Presenter
             }
         }
 
-        if ( $this->template->module == "" || $this->template->module == "Spisovka" ) {
-            $this->template->currentUri = "napoveda/". strtolower($this->template->presenter) ."/". strtolower($this->view);
-        } else {
-            $this->template->currentUri = "napoveda/". strtolower($this->template->module) ."/". strtolower($this->template->presenter) ."/". strtolower($this->view);
+        if (IS_SIMPLE_ROUTER == 1) {
+            $helpUri = "?presenter=Spisovka:Napoveda&";
+            $helpUri .= strtolower("param1={$this->template->module}&param2={$this->template->presenter}&param3={$this->view}");
         }
+        else {
+            $helpUri = "napoveda/". strtolower("{$this->template->module}/{$this->template->presenter}/{$this->view}");
+        }
+        $this->template->helpUri = $helpUri;
 
         /**
          * Informace o Aplikaci

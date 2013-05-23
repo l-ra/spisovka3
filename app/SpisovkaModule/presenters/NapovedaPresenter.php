@@ -19,40 +19,12 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
         }
         $template->AppInfo = $app_info;
 
-        $template->setUri = "";
-        $modules = array("admin","epodatelna","install","spisovka","spisovna");
-        if ($param1 == "param1") {
+        // $modules = array("admin","epodatelna","install","spisovka","spisovna");
+        if ($param1 == "obsah") {
             $template->setFile = APP_DIR ."/../help/hlavni.phtml";
             $template->Napovedy = $this->napovedy();
-        } else if (in_array($param1, $modules) ) {
-            // Moduly
-            if ( $param3 == "detail" ) {
-                $param3a = "seznam";
-            } else {
-                $param3a = $param3;
-            }            
-
-            if ( $param3a == "default" ) {
-                $template->setUri = $param1 ."/". $param2;
-            } else {
-                $template->setUri = $param1 ."/". $param2 ."/". $param3a;
-            }
+        } else  {
             $template->setFile = APP_DIR ."/../help/". ucfirst($param1) ."Module/". ucfirst($param2) ."/". $param3 .".phtml";
-        } else {
-            // Spisovka
-            
-            if ( $param2 == "detail" ) {
-                $param2a = "default";
-            } else {
-                $param2a = $param2;
-            }
-            
-            if ( $param2a == "default" ) {
-                $template->setUri = $param1;
-            } else {
-                $template->setUri = $param1 ."/". $param2a;
-            }
-            $template->setFile = APP_DIR ."/../help/SpisovkaModule/". ucfirst($param1) ."/". $param2 .".phtml";
         }
         
         include APP_DIR ."/../help/help_name.php";
@@ -84,15 +56,14 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
             $tmp->path = $file;
             $tmp->name = implode(" - ", $file_part);
 
-                $param1 = strtolower(str_replace("Module", "", $file_part[1]));
-                $param2 = strtolower($file_part[2]);
-                $param3 = strtolower(str_replace(".phtml", "", $file_part[3]));
-                if ( $param1 == "spisovka" ) {
-                    $tmp->url = $param2 ."/". $param3;
-                } else {
-                    $tmp->url = $param1 ."/". $param2 ."/". $param3;
-                }
-            $tmp->code = $param1 ."/". $param2 ."/". $param3;
+            $param1 = strtolower(str_replace("Module", "", $file_part[1]));
+            $param2 = strtolower($file_part[2]);
+            $param3 = strtolower(str_replace(".phtml", "", $file_part[3]));
+            if (IS_SIMPLE_ROUTER)
+                $tmp->url = "?presenter=Spisovka:Napoveda&param1=$param1&param2=$param2&param3=$param3";
+            else 
+                $tmp->url = "napoveda/$param1/$param2/$param3";                
+            $tmp->code = "$param1/$param2/$param3";
 
             eval("\$dirs['". $param1 ."']['". $param2 ."']['". $param3 ."'] = \$tmp;");
 

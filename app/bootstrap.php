@@ -178,7 +178,7 @@ if ( $cool_url ) {
                 'module'    => 'Spisovka',
                 'presenter' => 'Napoveda',
 		'action' => 'default',
-		'param1' => 'param1',
+		'param1' => 'obsah',
                 'param2' => 'param2',
                 'param3' => 'param3'
 	));
