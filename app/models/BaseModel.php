@@ -58,10 +58,20 @@ abstract class BaseModel extends Object
     protected $tb_zprava = 'zprava';
     protected $tb_zprava_osoba = 'zprava_osoba';
 
-
+    
+    public static function getDbPrefix() {
+    
+        static $prefix = null;
+        
+        if ($prefix === null)
+            $prefix = Environment::getConfig('database')->prefix;
+    
+        return $prefix;
+    }
+    
     public function  __construct() {
 
-        $prefix = Environment::getConfig('database')->prefix;
+        $prefix = self::getDbPrefix();
         $this->name = $prefix . $this->name;
 
         $this->tb_dokument = $prefix . $this->tb_dokument;
@@ -414,7 +424,6 @@ abstract class BaseModel extends Object
     public function getDataSource($table = null)
     {
         if ( !is_null($table) ) {
-            //$prefix = Environment::getConfig('database')->prefix;
             return dibi::dataSource('SELECT * FROM %n', $table);    
         } else {
             return dibi::dataSource('SELECT * FROM %n', $this->name);

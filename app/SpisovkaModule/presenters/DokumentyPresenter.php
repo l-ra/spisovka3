@@ -1379,31 +1379,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             // dokument zobrazime
             $this->template->Dok = $dokument;
 
-            $user = Environment::getUser();
-            //Debug::dump($user);
+            // Neprováděj prozatím žádné kontroly. Nechceme, aby se uživateli zobrazil příkaz "odeslat dokument" a po kliknutí obdržel chybové hlášení.
+            // Kontrola se provede jen v detailu dokumentu, kde se rozhodne, zda se uživateli příkaz zobrazí nebo ne.
+            // Kód určující oprávnění v akci "detail" bude muset být zcela přepsán.
+            $UzivatelOpravnen = 1;
 
-            $user_id = $user->getIdentity()->id;
-            $this->template->Pridelen = 0;
-            $this->template->Predan = 0;
-            // Prideleny nebo predany uzivatel
-            if ( @$dokument->prideleno->prideleno_id == $user_id ) {
-                $this->template->AccessEdit = 1;
-                $this->template->AccessView = 1;
-                $this->template->Pridelen = 1;
-            } else if ( @$dokument->predano->prideleno_id == $user_id ) {
-                $this->template->AccessEdit = 1;
-                $this->template->AccessView = 1;
-                $this->template->Predan = 1;
-            } else {
-                $this->template->AccessEdit = 0;
-                $this->template->AccessView = 0;
-                if ( count($dokument->workflow)>0 ) {
-                    foreach ($dokument->workflow as $wf) {
-                        if ( ($wf->prideleno_id == $user_id) && ($wf->stav_osoby < 100) ) {
-                            $this->template->AccessView = 1;
-                        }
-                    }
-                }
+            if (!$UzivatelOpravnen) {
+                $this->flashMessage('Nejste oprávněn odeslat tento dokument.','error');
+                $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
             }
 
             // Prilohy
@@ -1417,19 +1400,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->template->ChybaPredOdeslani = 0;
 
-
             // Dokument se vyrizuje
             if ( $dokument->stav_dokumentu == 3 ) {
                 $this->template->Vyrizovani = 1;
             } else {
                 $this->template->Vyrizovani = 0;
-            }
-
-            // SuperAdmin - moznost zasahovat do dokumentu
-            if ( $user->isInRole('superadmin') ) {
-                $this->template->AccessEdit = 1;
-                $this->template->AccessView = 1;
-                $this->template->Pridelen = 1;
             }
 
             $this->template->FormUpravit = $this->getParam('upravit',null);
@@ -1440,11 +1415,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->DruhZasilky = DruhZasilky::get(null,1);
             
             $this->template->OpravnenOdeslatDZ = Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani');
-                        
+
+            $this->template->ZpusobyOdeslani = ZpusobOdeslani::getZpusoby();
+            
             $this->invalidateControl('dokspis');
 
-            if (!$this->template->AccessView)
-                $this->setView('dok-noaccess');
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');
@@ -1736,7 +1711,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 if ( !empty($data['predano_user']) || !empty($data['predano_org']) ) {
                     /* Dokument predan */
                     $Workflow->priradit($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
-                    $this->flashMessage('Dokument předán zaměstnanci nebo organizační jendotce.');
+                    $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
                 }
 
                 $name = $button->getName();
@@ -2381,33 +2356,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     
                 } else {
                     // jinak - externe (osobne, ...)
-                    //echo "  => jinak";
 
                     if ( isset($post_data['datum_odeslani'][$subjekt_id]) ) {
                         $datum_odeslani = new DateTime( $post_data['datum_odeslani'][$subjekt_id] );
                     }
-
-                    switch ($metoda_odeslani) {
-                        case 1:
-                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán emailem na adresu "'. Subjekt::displayName($adresat,'email') .'".');
-                            break;
-                        case 2:
-                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán datovou zprávou na adresu "'. Subjekt::displayName($adresat,'isds') .'".');
-                            break;
-                        case 3:
-                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán poštou na adresu "'. Subjekt::displayName($adresat) .'".');
-                            break;
-                        case 4:
-                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán faxem na číslo "'. Subjekt::displayName($adresat,'telefon') .'".');
-                            break;
-                        case 5:
-                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán osobně "'. Subjekt::displayName($adresat,'jmeno') .'".');
-                            break;
-                        case 6:
-                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán telefonicky na číslo "'. Subjekt::displayName($adresat,'telefon') .'".');
-                            break;
-                        default: break;
-                    }
+                    
+                    $Log = new LogModel();
+                    $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,'Dokument odeslán způsobem "' . ZpusobOdeslani::getName($metoda_odeslani) . '" adresátovi "'. Subjekt::displayName($adresat,'jmeno') .'".');
                 }
 
                 // Zaznam do DB (dokument_odeslani)

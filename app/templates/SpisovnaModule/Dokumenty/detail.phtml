@@ -578,18 +578,10 @@
                 {=Subjekt::displayName($odes,'telefon')}
                 <br />
                 <span style="font-weight:normal;">(vraceno) nebylo odesláno faxem na číslo {$odes->cislo_faxu}</span>
-            {elseif $odes->zpusob_odeslani_id == 5}
+            {else}
                 {=Subjekt::displayName($odes,'jmeno')}
                 <br />
-                <span style="font-weight:normal;">předáno osobně</span>
-            {elseif $odes->zpusob_odeslani_id == 6}
-                {=Subjekt::displayName($odes,'telefon')}
-                <br />
-                <span style="font-weight:normal;">předáno telefonicky</span>
-            {else}
-                {=Subjekt::displayName($odes)}
-                <br />
-                <span style="font-weight:normal;">způsob odeslání nespecifikováno</span>
+                <span style="font-weight:normal;">způsob odeslání: {=ZpusobOdeslani::getName($odes->zpusob_odeslani_id)}</span>
             {/if}
             </dd>
         </dl>

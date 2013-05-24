@@ -11,6 +11,8 @@ Nové funkce:
            - Česká Republika je nyní první (a výchozí) položka v seznamu států
            - lze rychle přepínat připojení subjektu k dokumentu kliknutím na ikonu obálky,
              e-podatelna subjekt připojí jako odesílatele
+- číselník způsobů doručení - je možné určit, které způsoby mají být aktivní
+  a definovat vlastní způsoby. Přidána položka "osobní předání".
 
 Opravy:
 

@@ -886,7 +886,7 @@ INSERT INTO `{tbls3}zpusob_odeslani` (`id`, `nazev`, `stav`, `fixed`, `note`) VA
 (2, 'datovou schránkou', 1, 1, NULL),
 (3, 'poštou', 1, 1, NULL),
 (4, 'faxem', 1, 1, ''),
-(5, 'telefonicky', 1, 1, '');
+(5, 'osobní převzetí', 1, 1, '');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}zpusob_vyrizeni` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1085,7 +1085,7 @@ CREATE TABLE `{tbls3}settings` (
 
 ALTER TABLE `{tbls3}user_role` ADD UNIQUE `user_role_code` ( `code` );
 
-INSERT INTO `{tbls3}settings` VALUES('db_revision', '580');
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '590');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

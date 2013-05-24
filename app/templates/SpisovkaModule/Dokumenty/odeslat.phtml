@@ -85,14 +85,13 @@
                     Jak odeslat:
                     <select name="subjekt[{$subjekt->id}]" onchange="return vyber_odes_form(this, {$subjekt->id});">
                         <option value="0">neodesílat</option>
-                        <option value="1">odeslat emailem</option>
-                        {if $OpravnenOdeslatDZ}
-                        <option value="2">odeslat datovou schránkou</option>
+                        {foreach $ZpusobyOdeslani as $zpusob}
+                        {if $zpusob['id'] == 2 && !$OpravnenOdeslatDZ}
+                            <option value="2" disabled="disabled">{$zpusob['nazev']} - nejste oprávněn</option>
                         {else}
-                        <option value="2" disabled="disabled">odeslat datovou schránkou - nejste oprávněn</option>
+                            <option value="{$zpusob['id']}">{$zpusob['nazev']}</option>
                         {/if}
-                        <option value="3">odeslat poštou</option>
-                        <option value="4">odeslat faxem</option>
+                        {/foreach}
                     </select>
             </td>
         </tr>
@@ -212,7 +211,6 @@
         Připojit přílohy k odeslání
     </div>
     <div id="dok-prilohy">
-    {accessview}
     {if count($Dok->prilohy)>0}
     <table class="seznam">
         {foreach $Dok->prilohy as $file}
@@ -258,10 +256,6 @@
             Zprávu lze odeslat i bez příloh (neplatí pro datovou schránku).
         </div>
     {/if}
-    {/accessview}
-    {noaccessview}
-        <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
-    {/noaccessview}
     </div>
     </div>
 
