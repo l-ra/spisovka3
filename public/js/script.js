@@ -859,7 +859,7 @@ spisVytvoritSubmit = function () {
             }
         }
 
-        var spis_vytvorit = document.getElementById("subjekt-vytvorit");
+        var spis_vytvorit = document.getElementById("spis-vytvorit");
         var formdata = $(spis_vytvorit).serialize();
         
         //alert(spis_vytvorit.getAttribute('action'));

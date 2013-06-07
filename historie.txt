@@ -30,6 +30,7 @@ Opravy:
 - opraveno abecední stránkování v případě, kdy není k dispozici rewrite url
 - nápověda nyní funguje i bez rewrite url
 - do spisu, který není otevřen, není možné přidávat dokumenty
+- oprava vytváření spisu z Ajax dialogového okna
 
 === Ver. 3.3.3 =================================================================
 
