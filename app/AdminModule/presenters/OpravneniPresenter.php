@@ -59,6 +59,21 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->template->opravneniForm = $this['opravneniForm'];
     }
 
+    public function actionSmazat()
+    {
+        $RoleModel = new RoleModel();
+        $role_id = $this->getParam('id',null);
+        $role = $RoleModel->getInfo($role_id);
+        
+        try {
+            $RoleModel->smazat(array("id = %i", $role_id));
+            $this->flashMessage('Role byla smazána.');
+        } catch (DibiException $e) {
+            $this->flashMessage('Roli nebylo možné smazat.','error');        
+        }
+
+        $this->redirect(':Admin:Opravneni:seznam');
+    }
 
 /**
  *

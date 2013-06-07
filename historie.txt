@@ -13,7 +13,8 @@ Nové funkce:
              e-podatelna subjekt připojí jako odesílatele
 - číselník způsobů doručení - je možné určit, které způsoby mají být aktivní
   a definovat vlastní způsoby. Přidána položka "osobní předání".
-
+- je možné smazat uživatelem vytvořené role
+  
 Opravy:
 
 - seznam dokumentů - filtr "Na kterých jsem kdy pracoval" pracuje nyní stejně
