@@ -32,6 +32,12 @@
     <div class="detail_blok">
         <div class="detail_hlavicka">Oprávnění</div>
         <br />
+        {if !$lzeMenitOpravneni}
+        Oprávnění této role není možné upravovat.
+        {else}
+        {if $lzeMenitOpravneni == 2}
+        <p style="color:red">Oprávnění této role doporučujeme neměnit.</p>
+        {/if}
         {$opravneniForm->render('begin')}
         <dl class="detail_item">
             <dt>&nbsp;</dt>
@@ -63,6 +69,7 @@
         </div>
         
         {$opravneniForm->render('end')}
+        {/if}
     </div>
 
     {accessrole programator}

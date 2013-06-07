@@ -51,8 +51,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->template->seznamOpravneni = $opravneni;
         $this->template->seznamPravidel = $pravidla;
 
-
-
+        $this->template->lzeMenitOpravneni = self::lzeMenitRoli($role);
     }
 
     public function renderDetail()
@@ -263,10 +262,17 @@ class Admin_OpravneniPresenter extends BasePresenter
         $AclModel = new AclModel();
         $role_id = (int) $data['id'];
         unset($data['id']);
+        
         $RoleModel = new RoleModel();
         $role = $RoleModel->getInfo($role_id);
         $opravneni = $AclModel->seznamOpravneni($role->code);
         $pravidla = $AclModel->seznamPravidel($role->code);
+
+        // Zkontroluj, zda lze roli menit
+        if (!self::lzeMenitRoli($role)) {
+            $this->redirect('this',array('id'=>$role_id));
+            return;
+        }
 
         // Predkontrola - vyrazeni nemenici opravneni a nedefinovanych opravneni
         foreach ($data as $id => $stav) {
@@ -437,5 +443,12 @@ class Admin_OpravneniPresenter extends BasePresenter
 
     }
 
-
+    // Vraci:  0 - nelze menit
+    //  1 - lze menit
+    //  2 - lze, ale zobraz varovani
+    protected function lzeMenitRoli($role)
+    {
+        return in_array($role->code, array("admin", "superadmin"))
+            ? 2 : 1;
+    }
 }
