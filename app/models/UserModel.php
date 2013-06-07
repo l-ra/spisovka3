@@ -192,6 +192,10 @@ class UserModel extends BaseModel
 
         $user = $this->fetchRow(array('id=%i',$user_id))->fetch();
 
+        // zabran, aby uzivatel mohl u dema menit heslo k uctu "demo"
+        if (Demo::isDemo() && $user->username == 'demo')
+            return false;
+            
         $row = array();
         $row['last_modified'] = new DateTime();
 
