@@ -344,7 +344,7 @@ class Subjekt extends BaseModel
         } else if ( empty($data->adresa_ulice) ) {
             $d_ulice = '';
         } else {
-            $d_ulice = @$data->adresa_ulice .' '. @$data->adresa_cp .'/'. @$data->adresa_co;
+            $d_ulice = @$data->adresa_ulice .' '. @$data->adresa_co;
         }
 
         $d_adresa = $d_ulice .', '. @$data->adresa_psc .' '. @$data->adresa_mesto;
