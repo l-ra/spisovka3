@@ -134,7 +134,7 @@
         
     {if $AccessView}    
 
-    {if $Pridelen==1 }
+    {if $Pridelen==1 && $Spis->stav == 1}
     <div class="dokument_blok2">
         <a href="{link :Spisovka:Dokumenty:novy, 'spis_id'=>$Spis->id}">Nový dokument</a>
     </div>         

@@ -29,6 +29,7 @@ Opravy:
 - subjekty - opraveno zobrazování údaje stát narození
 - opraveno abecední stránkování v případě, kdy není k dispozici rewrite url
 - nápověda nyní funguje i bez rewrite url
+- do spisu, který není otevřen, není možné přidávat dokumenty
 
 === Ver. 3.3.3 =================================================================
 

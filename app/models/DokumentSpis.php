@@ -165,6 +165,11 @@ class DokumentSpis extends BaseModel
 
         $Log = new LogModel();
 
+        $Spis = new Spis();
+        $spis_info = $Spis->getInfo($spis_id);
+        if ($spis_info->stav != 1)
+            throw new Exception('Do spisu, který není otevřený, není možné přidávat dokumenty.');        
+            
         $odebrat = array(
                         array('dokument_id=%i',$dokument_id)
                    );
@@ -188,8 +193,6 @@ class DokumentSpis extends BaseModel
         $row['date_added'] = new DateTime();
         $row['user_id'] = Environment::getUser()->getIdentity()->id;
 
-        $Spis = new Spis();
-        $spis_info = $Spis->getInfo($spis_id);
 
         $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis_info->nazev .'"');
         $Log->logSpis($spis_id, LogModel::SPIS_DOK_PRIPOJEN,"Pripojen dokument ". $dokument_id);
