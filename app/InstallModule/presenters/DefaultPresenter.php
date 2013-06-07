@@ -101,59 +101,19 @@ class Install_DefaultPresenter extends BasePresenter
         }
 
         // IMAP support
+        $imap_support = 0;
+        $imap_version = "";
         if( function_exists('imap_open') ) {
             $imap_support = 1;
-            // test pripojeni
-            $imap_server = '';
-            if (@imap_open('{rebutia.i-dol.cz:110/pop3/novalidate-cert}INBOX','testpripojeni','test',OP_PROTOTYPE)) {
-                $imap_pop3 = 1; $imap_pop3_text = '';
-            } else {
-                $imap_pop3 = 0; $imap_pop3_text = @imap_last_error();
-                $imap_pop3_text = preg_replace('/\{(.*?)\}INBOX/', '', $imap_pop3_text);
-            }
-            if (@imap_open('{rebutia.i-dol.cz:995/pop3/ssl/novalidate-cert}INBOX','testpripojeni','test',OP_PROTOTYPE)) {
-                $imap_pop3s = 1; $imap_pop3s_text = '';
-            } else {
-                $imap_pop3s = 0; $imap_pop3s_text = @imap_last_error();
-                $imap_pop3s_text = preg_replace('/\{(.*?)\}INBOX/', '', $imap_pop3s_text);
-            }
-            if (@imap_open('{rebutia.i-dol.cz:143/imap/novalidate-cert}INBOX','testpripojeni','test',OP_PROTOTYPE)) {
-                $imap_imap = 1; $imap_imap_text = '';
-            } else {
-                $imap_imap = 0; $imap_imap_text = @imap_last_error();
-                $imap_imap_text = preg_replace('/\{(.*?)\}INBOX/', '', $imap_imap_text);
-            }
-            if (@imap_open('{rebutia.i-dol.cz:993/imap/ssl/novalidate-cert}INBOX','testpripojeni','test',OP_PROTOTYPE)) {
-                $imap_imaps = 1; $imap_imaps_text = '';
-            } else {
-                $imap_imaps = 0; $imap_imaps_text = @imap_last_error();
-                $imap_imaps_text = preg_replace('/\{(.*?)\}INBOX/', '', $imap_imaps_text);
-            }
 
-            if(isset($phpinfo['imap']['IMAP c-Client Version'])) {
+            if (isset($phpinfo['imap']['IMAP c-Client Version']))
                 $imap_version = "IMAP ". $phpinfo['imap']['IMAP c-Client Version'];
-            } else {
-                $imap_version = "";
-            }
-            if(isset($phpinfo['imap']['SSL Support'])) {
-                if( $phpinfo['imap']['SSL Support'] == "enabled" ) {
-                    $imap_ssl = 1;
-                } else if ( $phpinfo['imap']['SSL Support'] == "disabled" ) {
-                    $imap_ssl = 0;
-                } else {
-                    $imap_ssl = -1;
-                }
-            } else {
-                $imap_ssl = -1;
-            }
 
-        } else {
-            $imap_support = 0;
-            $imap_version = "";
-            $imap_ssl = -1;
+            if (isset($phpinfo['imap']['SSL Support']))
+                $imap_version .= ", SSL " . $phpinfo['imap']['SSL Support'];
+            if (isset($phpinfo['imap']['Kerberos Support']))
+                $imap_version .= ", Kerberos " . $phpinfo['imap']['Kerberos Support'];
         }
-
-        $imap_ssl_array = array('1'=>'Zapnuta','0'=>'Vypnuta','-1'=>'Nelze zjistit');
 
         // OpenSSL support
         if( function_exists('openssl_pkcs7_verify') ) {
@@ -242,7 +202,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'title' => 'Podpora OpenSSL',
 		'required' => FALSE,
 		'passed' => $openssl_support,
-		'message' => 'povoleno',
+		'message' => 'Ano',
 		'errorMessage' => 'Není zapnuta plná podpora knihovny OpenSSL',
 		'description' => 'Je potřeba pro ověřování a podepisování kvalifikovaných emailových zpráv.',
             ),
@@ -250,7 +210,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'title' => 'Podpora mail()',
 		'required' => FALSE,
 		'passed' => $mail_support,
-		'message' => 'povoleno',
+		'message' => 'Ano',
 		'errorMessage' => 'Není zapnuta podpora funkce mail()',
 		'description' => 'Je potřeba pro odesílání emailových zpráv.',
             ),
@@ -262,40 +222,6 @@ class Install_DefaultPresenter extends BasePresenter
 		'errorMessage' => 'Není zapnuta podpora knihovny IMAP',
 		'description' => 'Je potřeba pro příjem emailových zpráv.',
             ),
-            array(
-		'title' => '  IMAP - příjem přes POP3',
-		'required' => FALSE,
-		'passed' => $imap_pop3,
-		'message' => 'Povoleno',
-		'errorMessage' => $imap_pop3_text,
-		'description' => 'Je potřeba pro odesílání emailových zpráv.',
-            ),
-            array(
-		'title' => '  IMAP - příjem přes POP3s',
-		'required' => FALSE,
-		'passed' => $imap_pop3s,
-		'message' => 'Povoleno',
-		'errorMessage' => $imap_pop3s_text,
-		'description' => 'Je potřeba pro odesílání emailových zpráv.',
-            ),
-            array(
-		'title' => '  IMAP - příjem přes IMAP',
-		'required' => FALSE,
-		'passed' => $imap_imap,
-		'message' => 'Povoleno',
-		'errorMessage' => $imap_imap_text,
-		'description' => 'Je potřeba pro odesílání emailových zpráv.',
-            ),
-            array(
-		'title' => '  IMAP - příjem přes IMAPs',
-		'required' => FALSE,
-		'passed' => $imap_imaps,
-		'message' => 'Povoleno',
-		'errorMessage' => $imap_imaps_text,
-		'description' => 'Je potřeba pro odesílání emailových zpráv.',
-            ),
-
-            
 
             array(
 		'title' => 'Zápis do dočasné složky',
