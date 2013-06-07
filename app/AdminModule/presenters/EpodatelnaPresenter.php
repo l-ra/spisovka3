@@ -229,7 +229,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100)
                 ->setValue($isds['cert_pass']);
 
-        $form1->addSelect('test', 'Režim:', array('0'=>'Realný provoz (mojedatovaschranka.cz)',
+        $form1->addSelect('test', 'Režim:', array('0'=>'Reálný provoz (mojedatovaschranka.cz)',
                                                   '1'=>'Testovací režim (czebox.cz)'
                                             )
                 )->setValue($isds['test']);
