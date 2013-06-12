@@ -40,7 +40,7 @@ session_start();
 if ( isset($_SERVER['PHP_AUTH_USER']) ) $_SESSION['s3_auth_username'] = $_SERVER['PHP_AUTH_USER'];
 if ( isset($_SERVER['PHP_AUTH_PW']) )   $_SESSION['s3_auth_password'] = $_SERVER['PHP_AUTH_PW'];
 if ( isset($_SERVER['REMOTE_USER']) )   $_SESSION['s3_auth_remoteuser'] = $_SERVER['REMOTE_USER'];
-$is_logged = ( isset($_SERVER['PHP_AUTH_USER']) || isset($_SERVER['REMOTE_USER']) )?true:false;
+$is_logged = isset($_SERVER['PHP_AUTH_USER']) || isset($_SERVER['REMOTE_USER']);
 
 // session fix
 $aSESSION = array(
@@ -53,7 +53,12 @@ $aSESSION = array(
     'is_logged' => $is_logged
 );
 $uuid = uniqid();
-file_put_contents("../../log/asession_".$uuid, serialize($aSESSION));
+
+// P.L. nevytvarej zbytecne soubor, pokud uzivatel neni prihlasen
+// soubor se smaze pouze pri uspesnem prihlaseni v metode SSO autentizatoru, takze u zakaznika se potom mnozily tyto docasne soubory s citlivymi daty
+// A v pripade multisite instalace ukladat citliva data do spolecneho adresare log/ je tez riziko
+if ($is_logged)
+    file_put_contents("../../log/asession_".$uuid, serialize($aSESSION));
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -163,7 +168,7 @@ body {
         <p style="text-align:center; margin-top: 30px;">
            Pokračujte kliknutím na následující odkaz:
            <br />
-           <a style="display:block; margin:10px; font-size: 12pt;" href="<?php echo $URL_LINK ."?_backlink=". $uuid; ?>">přejít na hlavní stránku aplikace</a>
+           <a style="display:block; margin:10px; font-size: 12pt;" href="<?php echo $URL_LINK ."?_asession=". $uuid; ?>">přejít na hlavní stránku aplikace</a>
         </p>        
         
 <?php } else { ?>        

@@ -2,9 +2,7 @@
 
 class Spisovka_UzivatelPresenter extends BasePresenter {
 
-    public $backlink = '';
-
-    public function actionLogin($backlink)
+    public function actionLogin()
     {
 
         $authenticator = (array) Environment::getConfig('service');
@@ -13,7 +11,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $Auth->setAction('login');
         $this->addComponent($Auth, 'auth');
 
-        $this->backlink = $backlink;
         $this->template->title = "Přihlásit se";
     }
 

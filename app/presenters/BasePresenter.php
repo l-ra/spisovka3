@@ -22,10 +22,10 @@ abstract class BasePresenter extends Presenter
                     $this->flashMessage('Uplynula doba neaktivity! Systém vás z bezpečnostných důvodu odhlásil.', 'warning');
                 }
                 if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
-                    $backlink = $this->getApplication()->storeRequest();
-                    $asession = $this->getParam('_backlink');
-                    $alterantive = $this->getParam('alternativelogin');
-                    $this->redirect(':Spisovka:Uzivatel:login', array('backlink' => $backlink, '_asession'=>$asession, 'alternativelogin'=>$alterantive));
+                    // asession ID je pouzito jenom u SSO prihlasovani
+                    $asession = $this->getParam('_asession');
+                    $alternative = $this->getParam('alternativelogin');
+                    $this->redirect(':Spisovka:Uzivatel:login', array('_asession'=>$asession, 'alternativelogin'=>$alternative));
                 }
 
             } else {
