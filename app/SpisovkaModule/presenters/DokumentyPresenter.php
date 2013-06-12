@@ -327,7 +327,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Dok = $dokument;
 
             $user = Environment::getUser();
-            //Debug::dump($user);
 
             $user_id = $user->getIdentity()->id;
             $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
@@ -1059,6 +1058,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         if ( count($rozdelany_dokument)>0 ) {
             $dokument = $rozdelany_dokument[0];
+            // Oprava Task #254
+            $dokument = $Dokumenty->getInfo($dokument->id);
 
             $this->flashMessage('Byl detekován a načten rozepsaný dokument.<p>Pokud chcete založit úplně nový dokument, klikněte na následující odkaz. <a href="'. $this->link(':Spisovka:Dokumenty:novy',array('cisty'=>1)) .'">Vytvořit nový nerozepsaný dokument.</a>','info_ext');
 
@@ -1562,7 +1563,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$dok->popis);
         $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
-                ->setValue(@$dok->dokument_typ->id);
+                ->setValue(@$dok->typ_dokumentu->id);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$dok->cislo_jednaci_odesilatele);
 
