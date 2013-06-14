@@ -18,9 +18,21 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     {
         $user = Environment::getUser()->getIdentity()->username;
         Environment::getUser()->signOut();
+        // Hack - cookie kontroluji nektere alternativni autentikatory pri zobrazovani prihlasovaciho dialogu
         $this->getHttpResponse()->setCookie('s3_logout', $user, strtotime('10 minute'));
         $this->flashMessage('Byl jste úspěšně odhlášen.');
-        $this->redirect(':Spisovka:Default:default');
+
+        // P.L. Je-li to mozne, vrat se presne na stranku, kde byl uzivatel, nez kliknul na odhlasit
+        // Zpravu o uspesnem odhlaseni nebude mozne v tom pripade zobrazit
+        $referer = $this->getHttpRequest()->getHeader('referer');
+        if ($referer) {
+            // odstran query cast URL, nutne aby se ne obrazovce s prihlasovacim dialogem nezobrazovala posledni flash zprava
+            $uri = new Uri($referer);
+            $uri->setQuery('');
+            $this->redirectUri($uri);
+        }
+        else
+            $this->redirect('login');
     }
 
     public function actionDefault()

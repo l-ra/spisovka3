@@ -19,13 +19,13 @@ abstract class BasePresenter extends Presenter
         // Je uzivatel prihlasen?
             if (!$user->isAuthenticated()) {
                 if ($user->getSignOutReason() === User::INACTIVITY) {
-                    $this->flashMessage('Uplynula doba neaktivity! Systém vás z bezpečnostných důvodu odhlásil.', 'warning');
+                    $this->flashMessage('Uplynula doba neaktivity! Systém vás z bezpečnostních důvodů odhlásil.', 'warning');
                 }
                 if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
                     // asession ID je pouzito jenom u SSO prihlasovani
                     $asession = $this->getParam('_asession');
                     $alternative = $this->getParam('alternativelogin');
-                    $this->redirect(':Spisovka:Uzivatel:login', array('_asession'=>$asession, 'alternativelogin'=>$alternative));
+                    $this->forward(':Spisovka:Uzivatel:login', array('_asession'=>$asession, 'alternativelogin'=>$alternative));
                 }
 
             } else {

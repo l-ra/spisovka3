@@ -14,6 +14,11 @@ Nové funkce:
 - číselník způsobů doručení - je možné určit, které způsoby mají být aktivní
   a definovat vlastní způsoby. Přidána položka "osobní předání".
 - je možné smazat uživatelem vytvořené role
+
+Jiné změny:
+
+- po odhlášení a opětovném přihlášení program zůstane na stránce, která byla aktivní
+  před odhlášením
   
 Opravy:
 

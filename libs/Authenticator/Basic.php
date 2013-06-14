@@ -118,6 +118,10 @@ class Authenticator_Basic extends Control implements IAuthenticator
         $form->addPassword('password', 'Heslo:')
             ->addRule(Form::FILLED, 'Zadejte přihlašovací heslo.');
 
+        $val = Environment::getHttpRequest()->getOriginalUri()->getAbsoluteUri();
+        $form->addHidden('backlink')
+            ->setValue($val);
+            
         $form->addSubmit('login', 'Přihlásit');
         $form->onSubmit[] = array($this, 'formSubmitHandler');
         $form->addProtection('Prosím přihlašte se znovu.');
@@ -262,7 +266,11 @@ class Authenticator_Basic extends Control implements IAuthenticator
             $user = Environment::getUser();
             $user->setNamespace(KLIENT);
             $user->authenticate($data['username'], $data['password']);
-            $this->presenter->redirect(':Spisovka:Default:default');
+            if (isset($data['backlink']) && !empty($data['backlink']))
+                $this->presenter->redirectUri($data['backlink']);
+            else
+                $this->presenter->redirect('this');
+            
         } catch (AuthenticationException $e) {
             $this->presenter->flashMessage($e->getMessage(), 'warning');
         }
