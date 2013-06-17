@@ -192,8 +192,8 @@ class UserModel extends BaseModel
 
         $user = $this->fetchRow(array('id=%i',$user_id))->fetch();
 
-        // zabran, aby uzivatel mohl u dema menit heslo k uctu "demo"
-        if (Demo::isDemo() && $user->username == 'demo')
+        // zabran, aby uzivatel mohl u dema menit heslo k urcitym uctum
+        if (Demo::isDemo() && !Demo::canChangePassword($user))
             return false;
             
         $row = array();

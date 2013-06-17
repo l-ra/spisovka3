@@ -17,6 +17,10 @@ class Demo {
         return self::$is_demo;
     }
 
+    public static function canChangePassword($user) {
+    
+        return strstr($user->username, 'demo') === false;
+    }
 }
 
 
