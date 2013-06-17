@@ -266,7 +266,9 @@ class Authenticator_Basic extends Control implements IAuthenticator
             $user = Environment::getUser();
             $user->setNamespace(KLIENT);
             $user->authenticate($data['username'], $data['password']);
-            if (isset($data['backlink']) && !empty($data['backlink']))
+
+            $redirect_home = (bool)Settings::get('login_redirect_homepage', false);
+            if (!$redirect_home && isset($data['backlink']) && !empty($data['backlink']))
                 $this->presenter->redirectUri($data['backlink']);
             else
                 $this->presenter->redirect('this');

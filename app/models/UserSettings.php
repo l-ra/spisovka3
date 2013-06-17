@@ -9,7 +9,7 @@ class UserSettings
     protected static function _getInstance() {
     
         if (self::$instance === null)
-            self::$instance = new UserSettings;
+            self::$instance = new self;
         return self::$instance;
     }
 
@@ -28,7 +28,7 @@ class UserSettings
     public static function remove($key) {
     
         $i = self::_getInstance();
-        return $i->_set($key, null);
+        $i->_set($key, null);
     }
     
     // ------------------------------------------------------------
@@ -40,7 +40,7 @@ class UserSettings
     protected function __construct() {
     
         $this->user_id = Environment::getUser()->getIdentity()->id;
-        $this->table_prefix = Environment::getConfig('database')->prefix;
+        $this->table_prefix = BaseModel::getDbPrefix();
         
         $result = dibi::query('SELECT [settings] FROM %n', $this->table_prefix . self::TABLE_NAME, 'WHERE [id] = %i', $this->user_id);
         if (count($result) > 0) {
