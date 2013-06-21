@@ -1,6 +1,4 @@
 var loaded_data = new Array();
-var seznam_uzivatelu;
-var select_user;
 
 $(function() {
 
@@ -490,54 +488,6 @@ nactiZpravy = function () {
     return false;
 }
 
-nactiUzivatele = function () {
-
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                seznam_uzivatelu = eval("("+x.responseText+")");
-            }
-        }
-
-        if ( is_simple == 1 ) {
-            url = baseUri + '?presenter=Spisovka%3Auzivatel&action=seznamAjax';
-        } else {  
-            url = baseUri + 'uzivatel/seznamAjax';
-        }
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    return false;
-}
-
-selectUser = function (id) {
-
-    optgroup = 0;
-    select_user = '<select name="predat['+id+']" id="combobox_user_'+id+'">';
-    select_user = select_user + '<option value="0">nepředávat (bude ve vlastnictví zaměstnance, který toto zpracoval)</option>';
-    for(index in seznam_uzivatelu) {
-        if ( seznam_uzivatelu[index]['type'] == "part" ) {
-            if ( optgroup > 0 ) {
-                select_user = select_user + '</optgroup>';
-            }
-            select_user = select_user + '<optgroup label="'+ seznam_uzivatelu[index]['name'] +'">';
-            optgroup = optgroup+1;
-        } else {
-            select_user = select_user + '<option value="'+ seznam_uzivatelu[index]['id'] +'">'+ seznam_uzivatelu[index]['name'] +'</option>';
-        }
-    }
-    if ( optgroup > 0 ) {
-        select_user = select_user + '</optgroup>';
-    }
-    select_user = select_user + '</select>';
-
-    return select_user;
-}
-
 function in_array (needle, haystack)
 {
     var key = '';
@@ -672,8 +622,6 @@ subjekt_seznam +
 '                    </dl>'+
 '                    <dl>'+
 '                        <dt>Předat:</dt>'+
-//'                        <dd class="ui-widget"><input type="text" name="predat['+id+']" id="predat_'+id+'" size="60" /></dd>'+
-//'                        <dd class="ui-widget">'+selectUser(id)+'</dd>'+
 '                        <dd class="ui-widget">'+
 '                           <input type="text" name="predat_autocomplete['+id+']" id="predat_autocomplete_'+id+'" size="60" />'+
 '                           <input type="hidden" name="predat['+id+']" id="predat_'+id+'" />'+
@@ -724,7 +672,6 @@ form_odmitnout +
 
     $('#predat_autocomplete_'+id).autocomplete({
         minLength: 3,
-	/*source: seznam_uzivatelu,*/
         source: (is_simple==1)?baseUri + '?presenter=Spisovka%3Auzivatel&action=seznamAjax':baseUri + 'uzivatel/seznamAjax',
 
 	focus: function(event, ui) {
@@ -739,7 +686,6 @@ form_odmitnout +
 
     $('#subjekt_autocomplete_'+id).autocomplete({
         minLength: 3,
-	/*source: seznam_uzivatelu,*/
         source: (is_simple==1)?baseUri + '?presenter=Spisovka%3Asubjekty&action=seznamAjax':baseUri + 'subjekty/0/seznamAjax',
 
 	focus: function(event, ui) {

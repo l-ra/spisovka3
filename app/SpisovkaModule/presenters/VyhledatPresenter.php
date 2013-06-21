@@ -2,6 +2,15 @@
 
 class Spisovka_VyhledatPresenter extends BasePresenter
 {
+    public function getCookieName()
+    {
+        return 's3_hledat';
+    }
+    
+    public function getRedirectPath()
+    {
+        return ':Spisovka:Dokumenty:default';
+    }
 
     public function renderDefault()
     {
@@ -22,7 +31,12 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
     public function handleAutoComplete($text, $typ, $user=null, $org=null)
     {
-        $this->payload->autoComplete = array();
+        self::autoCompleteHandler($this, $text, $typ, $user, $org);
+    }
+    
+    public static function autoCompleteHandler($presenter, $text, $typ, $user=null, $org=null)
+    {
+        $presenter->payload->autoComplete = array();
 
         $user_a = array();
         $org_a = array();
@@ -35,8 +49,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             $org_a = explode(",",$org);
         }
         
-	$text = trim($text);
-	if ($text !== '') {
+        $text = trim($text);
+        if ($text !== '') {
 
             $OrgJednotka = new Orgjednotka();
             $args = array(
@@ -51,10 +65,10 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 foreach( $seznam as $org ) {
                     $checked_org = ( in_array($org->id, $org_a) )?' checked="checked"':'';
                     if ( $typ == 2 ) {
-                        $this->payload->autoComplete[] =
+                        $presenter->payload->autoComplete[] =
                             "<input type='checkbox' name='predano_org[]' value='". $org->id ."' $checked_org />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
                     } else {
-                        $this->payload->autoComplete[] =
+                        $presenter->payload->autoComplete[] =
                             "<input type='checkbox' name='prideleno_org[]' value='". $org->id ."' $checked_org />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
                     }
                 }
@@ -63,40 +77,30 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             $Zamestnanci = new Osoba2User();
             $seznam = $Zamestnanci->hledat($text);
             if ( count($seznam)>0 ) {
-                $seznam_in = array();
                 foreach( $seznam as $user ) {
-                    // sjednotit vsechny role uzivatele do jednoho a vypisovat jen jeden zaznam uzivatele
-                    // id = id osoby
-                    // user_id = id uzivatele
-                    // name = jmeno role
-                    // role_id = id role
-                    $seznam_in[ $user->user_id ]['user_id'] = $user->user_id;
-                    $seznam_in[ $user->user_id ]['name'] = Osoba::displayName($user);
-                    
-                    $seznam_in[ $user->user_id ]['role'][ $user->role_id ] = $user->name;
-                }
-                
-                foreach( $seznam_in as $user ) {
-                    $checked_user = ( in_array($user['user_id'], $user_a) )?' checked="checked"':'';
-                    if ( $typ == 2 ) {
-                        $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano[]' value='". $user['user_id'] ."' $checked_user /> ". $user['name'] ." (". implode(', ',$user['role']) .")";
-                    } else {
-                        $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno[]' value='". $user['user_id'] ."' $checked_user /> ". $user['name'] ." (". implode(', ',$user['role']) .")";
-
-                    }
+                    $display_name = Osoba::displayName($user);                   
+                    $checked_user = ( in_array($user->user_id, $user_a) ) 
+                        ? ' checked="checked"' : '';
+                        
+                    if ( $typ == 2 )
+                        $s = "<input type='checkbox' name='predano[]'";
+                    else
+                        $s = "<input type='checkbox' name='prideleno[]'";
+                    $s .= " value='". $user->user_id ."' $checked_user /> $display_name";
+                    if ($user->pocet_uctu > 1)
+                        $s .= " ( {$user->username} )";
+                    $presenter->payload->autoComplete[] = $s;
                 }
             }
-	}
+        }
 
-        $this->terminate();
+        $presenter->terminate();
     }
 
     public function actionReset()
     {
-        $this->getHttpResponse()->deleteCookie('s3_hledat');
-        $this->redirect(':Spisovka:Dokumenty:default');
+        $this->getHttpResponse()->deleteCookie($this->getCookieName());
+        $this->redirect($this->getRedirectPath());
     }    
     
     protected function createComponentSearchForm()
@@ -145,7 +149,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $pridelen = array('0'=>'kdokoli','2'=>'přidělen','1'=>'předán');
 
         
-        $hledat = $this->getHttpRequest()->getCookie('s3_hledat');
+        $hledat = $this->getHttpRequest()->getCookie($this->getCookieName());
         
         if ( !empty($hledat) ) {
             $hledat = unserialize($hledat);
@@ -242,9 +246,12 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 ->setValue(@$hledat['vyrizeni_pocet_priloh']);
 
         $form->addText('prideleno_text', 'Přiděleno:', 50, 255)
-                ->setValue(@$hledat['prideleno_text']);
+                ->setValue(@$hledat['prideleno_text'])
+                ->getControlPrototype()->autocomplete = 'off';
+                
         $form->addText('predano_text', 'Předáno:', 50, 255)
-                ->setValue(@$hledat['predano_text']);
+                ->setValue(@$hledat['predano_text'])
+                ->getControlPrototype()->autocomplete = 'off';
 
         $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno')
                 ->setValue((@$hledat['prideleno_osobne'])?1:0);
@@ -343,12 +350,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         //Debug::dump($data); exit;
 
         //$this->forward(':Spisovka:Dokumenty:default',array('hledat'=>$data));
-        $this->redirect(':Spisovka:Dokumenty:default',array('hledat'=>$data));
-
-
+        $this->redirect($this->getRedirectPath(), array('hledat'=>$data));
     }
-
-
 
 }
 

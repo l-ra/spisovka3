@@ -152,7 +152,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->template->novy = $this->getParam('novy',0);
 
         $Zamestnanci = new Osoba2User();
-        $seznam = $Zamestnanci->seznam(1);
+        $seznam = $Zamestnanci->seznam();
         $this->template->seznam = $seznam;
 
         $OrgJednotky = new Orgjednotka();
@@ -180,97 +180,85 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         // $this->setView('vyber');
     }    
 
+    // Autocomplete callback
+    // Hleda jak uzivatele, tak org. jednotky
     public function actionSeznamAjax()
     {
-        
-        $Zamestnanci = new Osoba2User();
-        $OrgJednotky = new Orgjednotka();
-
-        $seznam = array();
-
         $term = $this->getParam('term');
 
-        if ( !empty($term) ) {
-            $seznam_zamestnancu = $Zamestnanci->hledat($term);
+        $a1 = $this->_ojSeznam($term);
+        $a2 = $this->_userSeznam($term);
+
+        echo json_encode(array_merge($a1, $a2));
+
+        exit;
+    }
+
+    // Autocomplete callback
+    // Hleda pouze uzivatele, ne org. jednotky
+    // Volano z modulu spisovna
+    public function actionUserSeznamAjax()
+    {        
+        $term = $this->getParam('term');
+
+        echo json_encode($this->_userSeznam($term));
+        exit;
+    }
+    
+    protected function _ojSeznam($term)
+    {
+        $OrgJednotky = new Orgjednotka();
+
+        if ( !empty($term) )
             $seznam_orgjednotek = $OrgJednotky->nacti(null, true, true, 
                     array('where'=>array( array('LOWER(tb.ciselna_rada) LIKE LOWER(%s)','%'.$term.'%',' OR LOWER(tb.zkraceny_nazev) LIKE LOWER(%s)','%'.$term.'%') )));
-        } else {
-            $seznam_zamestnancu = $Zamestnanci->seznam(1);
+        else
             $seznam_orgjednotek = $OrgJednotky->nacti();
-        }
-
+    
+        $seznam = array();
+        
         if ( count($seznam_orgjednotek)>0 ) {
             //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat organizační jednotce');
-            foreach( $seznam_orgjednotek as $org ) {
+            foreach( $seznam_orgjednotek as $org )
                 $seznam[ ] = array(
                     "id"=> 'o'. $org->id,
                     "type" => 'item',
                     "value"=> '<strong style="color:blue;">'.$org->ciselna_rada.'</strong> - '.$org->zkraceny_nazev,
                     "nazev"=> $org->ciselna_rada ." - ". $org->zkraceny_nazev
                 );
-            }
         }
 
+        return $seznam;
+    }
+
+    protected function _userSeznam($term)
+    {
+        $Zamestnanci = new Osoba2User();
+
+        if ( !empty($term) )
+            $seznam_zamestnancu = $Zamestnanci->hledat($term);
+        else
+            $seznam_zamestnancu = $Zamestnanci->seznam();
+    
+        $seznam = array();
 
         if ( count($seznam_zamestnancu)>0 ) {
             //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat zaměstnanci');
             foreach( $seznam_zamestnancu as $user ) {
-                if ( !empty($user->name) ) {
-                    $role = " ( ".$user->name." )";
-                } else {
-                    $role = "";
-                }
+                $additional_info = '';
+                if ( $user->pocet_uctu > 1 )
+                    $additional_info = " ( {$user->username} )";
                 $seznam[ ] = array(
                     "id"=> 'u'. $user->user_id,
                     "type" => 'item',
-                    "value"=> ('<strong>'.Osoba::displayName($user, 'full_item')."</strong>". $role),
-                    "nazev"=> (Osoba::displayName($user, 'full_item') . $role)
+                    "value" => ('<strong>'.Osoba::displayName($user, 'full_item') . "</strong>$additional_info"),
+                    "nazev" => Osoba::displayName($user, 'full_item')
                 );
             }
         }
-
-        echo json_encode($seznam);
-
-        exit;
-    }
-
-    public function actionUserSeznamAjax()
-    {
         
-        $Zamestnanci = new Osoba2User();
-
-        $seznam = array();
-
-        $term = $this->getParam('term');
-
-        if ( !empty($term) ) {
-            $seznam_zamestnancu = $Zamestnanci->hledat($term);
-        } else {
-            $seznam_zamestnancu = $Zamestnanci->seznam(1);
-        }
-
-        if ( count($seznam_zamestnancu)>0 ) {
-            //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat zaměstnanci');
-            foreach( $seznam_zamestnancu as $user ) {
-                if ( !empty($user->name) ) {
-                    $role = " ( ".$user->name." )";
-                } else {
-                    $role = "";
-                }
-                $seznam[ ] = array(
-                    "id"=> $user->user_id,
-                    "type" => 'item',
-                    "value"=> ('<strong>'.Osoba::displayName($user, 'full_item')."</strong>". $role),
-                    "nazev"=> (Osoba::displayName($user, 'full_item') . $role)
-                );
-            }
-        }
-
-        echo json_encode($seznam);
-
-        exit;
+        return $seznam;
     }
-    
     
     public function renderSpisvybrano()
     {
@@ -283,6 +271,14 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $poznamka = $this->getParam('poznamka',null);
         $novy = $this->getParam('novy',0);
 
+        if ($orgjednotka_id === null) {
+            $UserModel = new UserModel();
+            $org_info = $UserModel->getOrg($user_id);
+            if ( is_array($org_info) )
+                $org_info = current($org_info);
+            $orgjednotka_id = @$org_info->id;
+        }
+        
         if ( $novy == 1 ) {
             echo '###predano###'. $spis_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
 
@@ -334,7 +330,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $osoba_id = $this->getParam('id',null);
         $dokument_id = $this->getParam('dok_id',null);
         $user_id = $this->getParam('user',null);
-        $role_id = $this->getParam('role',null);
         $orgjednotka_id = $this->getParam('orgjednotka',null);
         $poznamka = $this->getParam('poznamka',null);
         $novy = $this->getParam('novy',0);

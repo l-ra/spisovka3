@@ -29,65 +29,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function handleAutoComplete($text, $typ, $user=null, $org=null)
     {
-        $this->payload->autoComplete = array();
-
-        $user_a = array();
-        $org_a = array();
-        $user = trim($user);
-        if ( !empty($user) ) {
-            $user_a = explode(",",$user);
-        }
-        $org = trim($org);
-        if ( !empty($org) ) {
-            $org_a = explode(",",$org);
-        }
-        
-	$text = trim($text);
-	if ($text !== '') {
-
-            $OrgJednotka = new Orgjednotka();
-            $args = array(
-                array(
-                    'zkraceny_nazev LIKE %s OR','%'.$text.'%',
-                    'plny_nazev LIKE %s OR','%'.$text.'%',
-                    'ciselna_rada LIKE %s','%'.$text.'%'
-                )
-            );
-            $seznam = $OrgJednotka->seznam($args);
-            if ( count($seznam)>0 ) {
-                foreach( $seznam as $org ) {
-                    $checked_org = ( in_array($org->id, $org_a) )?' checked="checked"':'';
-                    if ( $typ == 2 ) {
-                        $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano_org[]' value='". $org->id ."' $checked_org />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
-                    } else {
-                        $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno_org[]' value='". $org->id ."' $checked_org />organizační jednotce ". $org->zkraceny_nazev ." (". $org->ciselna_rada .")";
-                    }
-                }
-            }
-
-            $Zamestnanci = new Osoba2User();
-            $seznam = $Zamestnanci->hledat($text);
-            if ( count($seznam)>0 ) {
-                foreach( $seznam as $user ) {
-                    $checked_user = ( in_array($user->id, $user_a) )?' checked="checked"':'';
-                    if ( $typ == 2 ) {
-                        $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='predano[]' value='". $user->id ."' $checked_user /> ". Osoba::displayName($user) ." (". $user->name .")";
-                    } else {
-                        $this->payload->autoComplete[] =
-                            "<input type='checkbox' name='prideleno[]' value='". $user->id ."' $checked_user /> ". Osoba::displayName($user) ." (". $user->name .")";
-
-                    }
-                    
-                }
-            }
-	}
-
-        $this->terminate();
+        Spisovka_VyhledatPresenter::autoCompleteHandler($this, $text, $typ, $user, $org);
     }
-    
     
     public function actionPdf()
     {
@@ -483,8 +426,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10);
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10);
 
-        $form->addText('prideleno_text', 'Přiděleno:', 50, 255);
-        $form->addText('predano_text', 'Předáno:', 50, 255);
+        $form->addText('prideleno_text', 'Přiděleno:', 50, 255)
+                ->getControlPrototype()->autocomplete = 'off';
+        $form->addText('predano_text', 'Předáno:', 50, 255)
+                ->getControlPrototype()->autocomplete = 'off';
 
         $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno');
         $form->addCheckbox('prideleno_na_organizacni_jednotku', 'Přiděleno na mou organizační jednotku');
@@ -738,9 +683,11 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 ->setValue(@$params['vyrizeni_pocet_priloh']);
 
         $form->addText('prideleno_text', 'Přiděleno:', 50, 255)
-                ->setValue(@$params['prideleno_text']);
+                ->setValue(@$params['prideleno_text'])
+                ->getControlPrototype()->autocomplete = 'off';
         $form->addText('predano_text', 'Předáno:', 50, 255)
-                ->setValue(@$params['predano_text']);
+                ->setValue(@$params['predano_text'])
+                ->getControlPrototype()->autocomplete = 'off';
 
         $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno')
                 ->setValue((@$params['prideleno_osobne'])?1:0);

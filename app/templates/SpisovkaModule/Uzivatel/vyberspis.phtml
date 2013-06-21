@@ -45,15 +45,18 @@
         <br />
     {if count($seznam)>0}
     <table class="seznam">
-        {foreach $seznam as $osoba}
+        {foreach $seznam as $user}
         <tr>
             <td>
-                <a href="{link :Spisovka:Uzivatel:spisvybrano, 'id'=>$osoba->id, 'user'=>$osoba->user_id, 'role'=>$osoba->role_id, 'orgjednotka'=>$osoba->orgjednotka_id, 'spis_id'=>$spis_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
-                   {=Osoba::displayName($osoba,'full_item')}
+                <a href="{link :Spisovka:Uzivatel:spisvybrano, 'id'=>$user->id, 'user'=>$user->user_id, 'spis_id'=>$spis_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
+                   {=Osoba::displayName($user,'full_item')}
                </a>&nbsp;&nbsp;
             </td>
             <td>
-               {=$osoba->name}
+                {if $user->pocet_uctu > 1}
+                {$user->username}
+                {/if}
+                &nbsp;
             </td>
 
         </tr>

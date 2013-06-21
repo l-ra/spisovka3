@@ -200,50 +200,37 @@ class Osoba2User extends BaseModel
 {
     protected $name = 'osoba_to_user';
 
-    public function seznam($aktivni = 1, $filtr = null) {
+    public function seznam() {
 
-/*        dibi::test('SELECT ou.osoba_id, ou.user_id, r.id role_id, o.*, r.code, r.name, r.orgjednotka_id
-                               FROM %n ou',$this->name,
-                              ' LEFT JOIN %n ur',$this->user_to_role,'ON ur.user_id=ou.user_id'.
-                              ' LEFT JOIN %n o',$this->osoba,'ON o.id=ou.osoba_id'.
-                              ' LEFT JOIN %n r',$this->tbl_role,'ON r.id=ur.role_id'.
+        $result = dibi::query('SELECT ou.osoba_id, ou.user_id, o.*, u.username, sq.pocet_uctu'.
+                              ' FROM %n ou',$this->name,
+                              ' JOIN %n o',$this->osoba,'ON o.id=ou.osoba_id'.
+                              ' JOIN %n u',$this->tb_user,'ON u.id=ou.user_id'.
+                              ' JOIN (SELECT osoba_id, COUNT(*) as pocet_uctu FROM %n', $this->name,
+                              ' WHERE active=1 GROUP BY osoba_id) AS sq ON o.id = sq.osoba_id'.
                               ' WHERE ou.active=1'.
-                              ' ORDER BY o.prijmeni, o.jmeno, r.name'
-                );*/
-
-
-        $result = dibi::query('SELECT ou.osoba_id, ou.user_id, r.id role_id, o.*, r.code, r.name, r.orgjednotka_id
-                               FROM %n ou',$this->name,
-                              ' LEFT JOIN %n ur',$this->user_to_role,'ON ur.user_id=ou.user_id'.
-                              ' LEFT JOIN %n o',$this->osoba,'ON o.id=ou.osoba_id'.
-                              ' LEFT JOIN %n r',$this->tbl_role,'ON r.id=ur.role_id'.
-                              ' WHERE ou.active=1'.
-                              ' ORDER BY o.prijmeni, o.jmeno, r.name'
+                              ' ORDER BY o.prijmeni, o.jmeno'
                 );
 
         return $result->fetchAll();
-
-
     }
 
     public function hledat($text) {
 
-        $result = dibi::query('SELECT ou.osoba_id, ou.user_id, r.id AS role_id, o.*, r.code, r.name, r.orgjednotka_id
-                               FROM %n ou',$this->name,
-                              ' LEFT JOIN %n ur',$this->user_to_role,'ON ur.user_id=ou.user_id'.
-                              ' LEFT JOIN %n o',$this->osoba,'ON o.id=ou.osoba_id'.
-                              ' LEFT JOIN %n r',$this->tbl_role,'ON r.id=ur.role_id'.
-                              " WHERE (ou.active=1) AND".
-                              " ( LOWER(CONCAT(o.jmeno,' ',o.prijmeni)) LIKE LOWER(%s)","%".$text."%",
-                              " OR LOWER(CONCAT(o.prijmeni,' ',o.jmeno)) LIKE LOWER(%s)","%".$text."%"," ) ".
-                              ' ORDER BY o.prijmeni, o.jmeno, r.name'
+        $result = dibi::query('SELECT ou.osoba_id, ou.user_id, o.*, u.username, sq.pocet_uctu'.
+                              ' FROM %n ou',$this->name,
+                              ' JOIN %n o',$this->osoba,'ON o.id=ou.osoba_id'.
+                              ' JOIN %n u',$this->tb_user,'ON u.id=ou.user_id'.
+                              ' JOIN (SELECT osoba_id, COUNT(*) as pocet_uctu FROM %n', $this->name,
+                              ' WHERE active=1 GROUP BY osoba_id) AS sq ON o.id = sq.osoba_id'.
+                              " WHERE ou.active=1 AND".
+                              " ( LOWER(CONCAT(o.jmeno,' ',o.prijmeni)) LIKE LOWER(%s)","%$text%",
+                              " OR LOWER(CONCAT(o.prijmeni,' ',o.jmeno)) LIKE LOWER(%s)","%$text%"," ) ".
+                              ' ORDER BY o.prijmeni, o.jmeno'
                 );
 
         return $result->fetchAll();
-
-
     }
-
 }
 
 class OsobaHistorie extends BaseModel
