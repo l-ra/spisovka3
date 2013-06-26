@@ -66,7 +66,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->addComponent($Auth1, 'auth_change_password');
 
 
-        $role = $User->getRoles($uzivatel->id);
+        $role = UserModel::getRoles($uzivatel->id);
         $this->template->Role = $role;
 
     }
@@ -271,13 +271,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $poznamka = $this->getParam('poznamka',null);
         $novy = $this->getParam('novy',0);
 
-        if ($orgjednotka_id === null) {
-            $UserModel = new UserModel();
-            $org_info = $UserModel->getOrg($user_id);
-            if ( is_array($org_info) )
-                $org_info = current($org_info);
-            $orgjednotka_id = @$org_info->id;
-        }
+        if ($orgjednotka_id === null)
+            $orgjednotka_id = OrgJednotka::dejOrgUzivatele($user_id);
         
         if ( $novy == 1 ) {
             echo '###predano###'. $spis_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;

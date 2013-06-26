@@ -191,15 +191,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             } else {
 
                 $user = Environment::getUser()->getIdentity();
-                $orgjednotka_id = null;
-                if ( count($user->user_roles)>0 ) {
-                    foreach ( $user->user_roles as $user_role ) {
-                        if ( !empty( $user_role->orgjednotka_id ) ) {
-                            $orgjednotka_id = $user_role->orgjednotka_id;
-                            break;
-                        }
-                    }
-                }
+                $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 
                 if ( empty($orgjednotka_id) ) {
                     $org = null;

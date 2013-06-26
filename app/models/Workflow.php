@@ -83,18 +83,12 @@ class Workflow extends BaseModel
 
             $user = Environment::getUser()->getIdentity();
 
-            $UserModel = new UserModel();
-            $org_info = $UserModel->getOrg($user->id);
-            if ( is_array($org_info) ) {
-                $org_info = current($org_info);
-            }
-
             $data = array();
             $data['dokument_id'] = $dokument_id;
             $data['stav_dokumentu'] = 1;
             $data['aktivni'] = 1;
             $data['prideleno_id'] = $user->id;
-            $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
+            $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
             $data['stav_osoby'] = 1;
             $data['date'] = new DateTime();
             $data['user_id'] = $user->id;
@@ -159,12 +153,7 @@ class Workflow extends BaseModel
                     $log_spis = 'Spis predan organizacni jednotce.';
                 }
             } else {
-                $UserModel = new UserModel();
-                $org_info = $UserModel->getOrg($user_id);
-                if ( is_array($org_info) ) {
-                    $org_info = current($org_info);
-                }                
-                $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
+                $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
             }
 
             $data['date'] = new DateTime();
@@ -430,12 +419,7 @@ class Workflow extends BaseModel
                         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                         $data['orgjednotka_id'] = $orgjednotka_id;
                     } else {
-                        $UserModel = new UserModel();
-                        $org_info = $UserModel->getOrg($user_id);
-                        if ( is_array($org_info) ) {
-                            $org_info = current($org_info);
-                        }                
-                        $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
+                        $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
                     }
 
                     $data['date'] = new DateTime();
@@ -539,12 +523,7 @@ class Workflow extends BaseModel
                         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                         $data['orgjednotka_id'] = $orgjednotka_id;
                     } else {
-                        $UserModel = new UserModel();
-                        $org_info = $UserModel->getOrg($user_id);
-                        if ( is_array($org_info) ) {
-                            $org_info = current($org_info);
-                        }                
-                        $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
+                        $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
                     }
 
                     $data['date'] = new DateTime();
@@ -890,14 +869,8 @@ class Workflow extends BaseModel
                     $data['stav_dokumentu'] = 11;
                     $data['stav_osoby'] = 0;
                     $data['aktivni'] = 1;
-                    $data['prideleno_id'] = $user_id;
-                    
-                    $UserModel = new UserModel();
-                    $org_info = $UserModel->getOrg($user_id);
-                    if ( is_array($org_info) ) {
-                        $org_info = current($org_info);
-                    }                
-                    $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
+                    $data['prideleno_id'] = $user_id;                    
+                    $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = Environment::getUser()->getIdentity()->id;

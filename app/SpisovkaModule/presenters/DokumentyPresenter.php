@@ -5,6 +5,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     private $filtr;
     private $filtr_bezvyrizenych;
+    private $filtr_moje;
     private $zakaz_filtr = false;
     private $hledat;
     private $seradit;
@@ -65,27 +66,28 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( isset($filtr['filtr']) ) {
             // zjisten filtr
             $this->getHttpResponse()->setCookie('s3_filtr', serialize($filtr), strtotime('90 day'));
-            $args_f = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
-            $this->filtr = $filtr['filtr'];
-            $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
-            $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
         } else {
-            // filtr nezjisten - pouzijeme default
             $cookie_filtr = $this->getHttpRequest()->getCookie('s3_filtr');
             if ( $cookie_filtr ) {
                 // zjisten filtr v cookie, tak vezmeme z nej
                 $filtr = unserialize($cookie_filtr);
-                $args_f = $Dokument->filtr($filtr['filtr'],null,$filtr['bez_vyrizenych']);
-                $this->filtr = $filtr['filtr'];
-                $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
-                $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
             } else {
-                $args_f = $Dokument->filtr('moje');
-                $this->filtr = 'moje';
-                $this->filtr_bezvyrizenych = false;
+                // filtr nezjisten - pouzijeme nejaky
+                $filtr = array();
+                $filtr['filtr'] = 'pridelene';
+                $filtr['bez_vyrizenych'] = false;
+                $filtr['jen_moje'] = false;
             }
+        }
+        // Pri prechodu ze starsi verze nebude tento parametr nastaven
+        if (!isset($filtr['jen_moje']))
+            $filtr['jen_moje'] = false;
+        $args_f = $Dokument->fixedFiltr($filtr['filtr'], $filtr['bez_vyrizenych'], $filtr['jen_moje']);
+        $this->filtr = $filtr['filtr'];
+        $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
+        $this->filtr_moje = $filtr['jen_moje'];
+        $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
 
-        }        
         
         $args_h = array();
         if ( isset($hledat) ) {
@@ -131,7 +133,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $bez_vyrizenych = false;
             if (isset($filtr['bez_vyrizenych']))
                 $bez_vyrizenych = $filtr['bez_vyrizenych'];
-            $args_f = $Dokument->filtr('vse', null, $bez_vyrizenych);
+            $args_f = $Dokument->fixedFiltr('vse', $bez_vyrizenych, false);
             $this->zakaz_filtr = true;
         }
         
@@ -385,23 +387,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $formUpravit = $this->getParam('upravit',null);
             }
             
-            if ( empty($dokument->prideleno->prideleno_id)
-                        && Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) ) {
-                // prideleno organizacni jednotce
-                $this->template->AccessEdit = 1;
-                $this->template->AccessView = 1;
-                $this->template->Pridelen = 1;
-                $formUpravit = $this->getParam('upravit',null);
-            }
-            if ( empty($dokument->predano->prideleno_id)
-                        && Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id) ) {
-                // predano organizacni jednotce
-                $this->template->AccessEdit = 1;
-                $this->template->AccessView = 1;
-                $this->template->Predan = 1;
-                $formUpravit = $this->getParam('upravit',null);
-            }
-
             // Dokument se vyrizuje
             if ( $dokument->stav_dokumentu >= 3 ) {
                 $this->template->Vyrizovani = 1;
@@ -2048,7 +2033,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $dokument_id = $data['id'];
         $UserModel = new UserModel();
         $user_id = Environment::getUser()->getIdentity()->id;
-        $orgjednotka_id = @$UserModel->getOrg(Environment::getUser()->getIdentity())->id;
+        $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
         if ( $data['udalost_typ'] == 1 && !empty($data['datum_spousteci_udalosti']) ) {
             // spusteni udalosti dle datumu
             $add = array('stav'=>5, 'datum'=>$data['datum_spousteci_udalosti']);
@@ -2856,74 +2841,26 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function createComponentFiltrForm()
     {
-
-        if ( $this->typ_pristupu ) {
-            // Typ pristupu na organizacni jednotku
-            $filtr =  !is_null($this->filtr)?$this->filtr:'org_pridelene';
-            $select = array(
-                'org_pridelene'=>'Přidělené',
-                'org_kprevzeti'=>'K převzetí',
-                'org_predane'=>'Předané',
-                'org_nove'=>'Nové / nepředané',
-                'org_kvyrizeni'=>'K vyřízení',
-                'org_vyrizene'=>'Vyřízené',
-                'pracoval'=>'Na kterých jsem kdy pracoval',
-                'org_pracoval'=>'Na kterých pracovala moje o.j.',
-                'org_doporucene'=>'Doporučené',
-            
-                'org_predane_k_odeslani'=>'K odeslání',
-                'org_odeslane'=>'Odeslané', 
-                'org_vse'=>'Všechny',
-            );               
-        } else {
-            // Typ pristupu na osobu
-            $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
-            if ( Environment::getUser()->isAllowed(null, 'is_vedouci') ) {
-                // Vedouci role - vetsi moznosti nahlizeni
-                $select = array(
-                    'Vlastní' => array(
-                        'moje'=>'Přidělené',
-                        'predane'=>'K převzetí',
-                        'moje_nove'=>'Nové / nepředané',
-                        'moje_vyrizuje'=>'K vyřízení',
-                        'moje_vyrizene'=>'Vyřízené',
-                        'pracoval'=>'Na kterých jsem kdy pracoval',
-                    ),
-                    'Společné' => array(
-                        'doporucene'=>'Doporučené',
-                        'predane_vse'=>'Předané',
-                        'predane_k_odeslani'=>'K odeslání',
-                        'odeslane'=>'Odeslané',
-                        'vsichni_nove'=>'Všechny nepředané',
-                        'vsichni_vyrizuji'=>'Všechny k vyřízení',
-                        'vsichni_vyrizene'=>'Všechny vyřízené',
-                        'vse'=>'Všechny',
-                        'org'=>'Všechny včetně podřízených',
-                    ),
-                );
-            } else {
-                // Standardni role
-                $select = array(
-                    'Vlastní' => array(
-                        'moje'=>'Přidělené',
-                        'predane'=>'K převzetí',
-                        'moje_nove'=>'Nové / nepředané',
-                        'moje_vyrizuje'=>'K vyřízení',
-                        'moje_vyrizene'=>'Vyřízené',
-                        'pracoval'=>'na kterých jsem kdy pracoval',
-                    ),
-                    'Společné' => array(
-                        'doporucene'=>'Doporučené',
-                        'predane_vse'=>'Předané',
-                        'predane_k_odeslani'=>'K odeslání',
-                        'odeslane'=>'Odeslané',
-                        'vse'=>'Všechny'
-                    )
-                );
-            }
-        }
-
+        // Typ pristupu na organizacni jednotku
+        $filtr =  !is_null($this->filtr) ? $this->filtr : 'org_pridelene';
+        $select = array(
+            'pridelene'=>'Přidělené',
+            'kprevzeti'=>'K převzetí',
+            'predane'=>'Předané',
+            'nove'=>'Nové / nepředané',
+            'kvyrizeni'=>'Vyřizuje se',
+            'vyrizene'=>'Vyřízené',
+            'pracoval'=>'Na kterých jsem kdy pracoval',
+            'org_pracoval'=>'Na kterých pracovala moje o.j.',
+            'vse'=>'Všechny',
+            'Výpravna' => array (
+                'doporucene'=>'Doporučené',
+                'predane_k_odeslani'=>'K odeslání',
+                'odeslane'=>'Odeslané', ),
+        );               
+        
         $filtr_bezvyrizenych =  !is_null($this->filtr_bezvyrizenych)?$this->filtr_bezvyrizenych:false;
+        $filtr_moje =  !is_null($this->filtr_moje)?$this->filtr_moje:false;
 
         $form = new AppForm();
         $form->addHidden('hidden')
@@ -2938,6 +2875,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addCheckbox('bez_vyrizenych','Nezobrazovat vyřízené nebo archivované dokumenty')
                 ->setValue($filtr_bezvyrizenych)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
+                
+        // Zde by se melo kontrolovat opravneni a podle nej pripadne Input vlozit jako Hidden pole
+        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+        if ($orgjednotka_id === null)
+            $control = $form->addHidden('jen_moje');
+        else
+            $control = $form->addCheckbox('jen_moje','Zobrazit jen dokumenty na mé jméno');
+        $control->setValue($filtr_moje)
+                ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
+                
         $form->addSubmit('go_filtr', 'Filtrovat')
                  ->setRendered(TRUE)
                  ->onClick[] = array($this, 'filtrClicked');
@@ -2957,7 +2904,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $form_data = $button->getForm()->getValues();
 
-        $data = array('filtr'=>$form_data['filtr'],'bez_vyrizenych'=>$form_data['bez_vyrizenych']);
+        $data = array('filtr'=>$form_data['filtr'],
+                      'bez_vyrizenych'=>$form_data['bez_vyrizenych'],
+                      'jen_moje' => $form_data['jen_moje']);
 
         $this->getHttpResponse()->setCookie('s3_filtr', serialize($data), strtotime('90 day'));
 

@@ -128,7 +128,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ( count($uzivatel)>0 ) {
             $role = array();
             foreach ($uzivatel as $uziv) {
-                $role[ $uziv->id ] = $User->getRoles($uziv->id);
+                $role[ $uziv->id ] = UserModel::getRoles($uziv->id);
             }
 
             $this->template->Role = $role;
@@ -310,7 +310,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         }
 
         $User = new UserModel();
-        $user_role = $User->getRoles($user_id);
+        $user_role = UserModel::getRoles($user_id);
 
         $Role = new RoleModel();
         $role_seznam = $Role->seznam();
@@ -373,7 +373,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $User = new UserModel();
         $UserRole = new User2Role();
 
-        $user_role = $User->getRoles($user_id);
+        $user_role = UserModel::getRoles($user_id);
 
         //Debug::dump($data);
         //Debug::dump($user_role);

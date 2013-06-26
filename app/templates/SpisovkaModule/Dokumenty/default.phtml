@@ -19,7 +19,8 @@
         {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
         {$filtrForm['go_filtr']->control}
         <br/>
-        {$filtrForm['bez_vyrizenych']->control}{$filtrForm['bez_vyrizenych']->label}
+        {$filtrForm['bez_vyrizenych']->control}{$filtrForm['bez_vyrizenych']->label}<br/>
+        {$filtrForm['jen_moje']->control}{$filtrForm['jen_moje']->label}
         {$filtrForm->render('end')}
     </div>
     <div id="search">
@@ -269,11 +270,11 @@
         {if $no_items==1}
         <div class="prazdno">Nemáte k dispozici žádné dokumenty.</div>
         {elseif $no_items==2}
-        <div class="prazdno">K danému filtru nemáte k dispozici žádné dokumenty.</div>
+        <div class="prazdno">Danému filtru neodpovídá žádný dokument.</div>
         {elseif $no_items==3}
-        <div class="prazdno">Dokumenty odpovidající hledanému výrazu nebyly nalezeny.</div>
+        <div class="prazdno">Dokumenty odpovídající hledanému výrazu nebyly nalezeny.</div>
         {elseif $no_items==4}
-        <div class="prazdno">Dokumenty odpovidající daným požadavkům nebyly nalezeny.</div>
+        <div class="prazdno">Dokumenty odpovídající daným požadavkům nebyly nalezeny.</div>
         {/if}
         {else}
     <div class="prazdno">Nebyly zjištěny žádné dokumenty.</div>

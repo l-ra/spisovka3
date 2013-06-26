@@ -39,23 +39,9 @@ class CisloJednaci extends BaseModel
         $unique_part = explode('#',$unique_info);
         $this->unique = 'OSS-'. $unique_part[0];
 
-        try {
-            $user = Environment::getUser()->getIdentity()->id;
-        } catch ( Exception $e ) {
-            $user = 1;
-        }
-        $UserModel = new UserModel();
-        $this->user_info = $UserModel->getUser($user, 1);
+        $this->user_info = Environment::getUser()->getIdentity();
 
-        $orgjednotka_id = null;
-        if ( count($this->user_info->user_roles)>0 ) {
-            foreach ( $this->user_info->user_roles as $user_role ) {
-                if ( !empty( $user_role->orgjednotka_id ) ) {
-                    $orgjednotka_id = $user_role->orgjednotka_id;
-                    break;
-                }
-            }
-        }
+        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 
         if ( empty($orgjednotka_id) ) {
             $this->org = null;

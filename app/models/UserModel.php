@@ -44,7 +44,7 @@ class UserModel extends BaseModel
          * Nacteni roli uzivatele
          */
         $user = new UserModel();
-        $row->user_roles = $user->getRoles($row->id);
+        $row->user_roles = self::getRoles($row->id);
 
         return ($row) ? $row : NULL;
     }
@@ -69,7 +69,7 @@ class UserModel extends BaseModel
 
     }
 
-    public function getRoles($user_id)
+    public static function getRoles($user_id)
     {
 
         $rows = dibi::fetchAll('SELECT r.*
@@ -79,37 +79,6 @@ class UserModel extends BaseModel
 
         return ($rows) ? $rows : NULL;
 
-    }
-
-    public function getOrg($user_id = null)
-    {
-        $org = array();
-
-        if (is_object($user_id)) {
-            $user = $user_id;
-        } else if ( !is_null($user_id) ) {
-            $UserModel = new UserModel();
-            $user = $UserModel->getUser($user_id, true);
-        } else {
-            $user = Environment::getUser()->getIdentity();
-        }
-
-        if ( count( $user->user_roles )>0 ) {
-            $OrgJednotka = new Orgjednotka();
-            foreach ( $user->user_roles as $r ) {
-                if ( !empty($r->orgjednotka_id) ) {
-                    $org[ $r->orgjednotka_id ] = $OrgJednotka->getInfo($r->orgjednotka_id);
-                }
-            }
-        }
-
-        if ( count($org)>1 ) {
-            return $org;
-        } else if ( count($org)==1 ) {
-            return current($org);
-        } else {
-            return null;
-        }
     }
 
     public function insert(array $data)

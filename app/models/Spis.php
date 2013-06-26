@@ -171,62 +171,34 @@ class Spis extends TreeModel
         
     }
 
+    // vraci retezec 'all', null nebo query string
+    
     private function omezeni_org()
     {
         
-        $user = Environment::getUser()->getIdentity();
         $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
         $isAdmin = ACL::isInRole('admin');
         $isPodatelna = ACL::isInRole('podatelna,skartacni_dohled');
         $vyrusit_bezvyrizeni = false;
-        $org_jednotka = array();
-        $org_jednotka_vedouci = array();
 
-        if ( @count( $user->user_roles )>0 ) {
-            foreach ( $user->user_roles as $role ) {
-                if ( !empty($role->orgjednotka_id) ) {
-                    if (preg_match('/^vedouci/', $role->code) ) {
-                        $org_jednotka_vedouci[] = $role->orgjednotka_id;
-                    }
-                    $org_jednotka[] = $role->orgjednotka_id;
-                }
-            }
-        }
-
-        $where_org = null;
-        if ( $isAdmin ) {
-            $where_org = null;
-        } else if ( $isPodatelna ) {
-            $where_org = null;
-        } else if ( count($org_jednotka) == 1 ) {
-            $where_org = array( 'tb.orgjednotka_id=%i',$org_jednotka[0] );
-        } else if ( count($org_jednotka) > 1 ) {
-            $where_org = array( 'tb.orgjednotka_id IN (%in)',$org_jednotka );
-        }        
-        
-        if ( $isAdmin || $isPodatelna ) {
+        if ( $isAdmin || $isPodatelna )
             // vsechny spisy bez ohledu na organizacni jednotku
-            $where_org = 'all';
-        } else if ( $isVedouci ) {
-            // vsechny spisy na organizacni jednotku + vcetne podrizenych
-            $org_jednotka_vedouci = Orgjednotka::childOrg($org_jednotka_vedouci);
-            if ( count($org_jednotka_vedouci)>0 ) {
-                $where_org = array( 'tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL',$org_jednotka_vedouci,$org_jednotka_vedouci);
-            } else if ( count($org_jednotka)>0 ) {
-                $where_org = array( 'tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL',$org_jednotka,$org_jednotka);
-            } else {
-                $where_org = null;
-            }
-        } else {
-            // vsechny dokumenty na organizacni jednotku
-            if ( count($org_jednotka)>0 ) {
-                $where_org = array('tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL',$org_jednotka,$org_jednotka);
-            } else {
-                $where_org = null;
-            }     
-        }
-        return $where_org;
-        
+            return 'all';
+
+        $oj_id = Orgjednotka::dejOrgUzivatele();
+        if ($oj_id === null)
+            return null;
+            
+        if ($isVedouci)
+            $org_jednotka = Orgjednotka::childOrg($oj_id);
+        else
+            $org_jednotka = array($oj_id);
+
+        if ( count($org_jednotka) > 1 )
+            return array( 'tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL', $org_jednotka, $org_jednotka);
+            
+        else 
+            return array( 'tb.orgjednotka_id = %i OR tb.orgjednotka_id_predano = %i OR tb.orgjednotka_id IS NULL', $org_jednotka, $org_jednotka);
     }
     
     public function spisovka($args) {
@@ -291,12 +263,7 @@ class Spis extends TreeModel
         $data['date_modified'] = new DateTime();
         $data['user_modified'] = Environment::getUser()->getIdentity()->id;
         
-        $UserModel = new UserModel();
-        $org_info = $UserModel->getOrg(Environment::getUser()->getIdentity()->id);
-        if ( is_array($org_info) ) {
-            $org_info = current($org_info);
-        }        
-        $data['orgjednotka_id'] = empty($org_info->id)?null:$org_info->id;
+        $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
 
         if ( !isset($data['parent_id']) ) $data['parent_id'] = 1;
         if ( empty($data['parent_id']) ) $data['parent_id'] = 1;

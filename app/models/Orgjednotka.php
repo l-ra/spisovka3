@@ -196,32 +196,42 @@ class Orgjednotka extends TreeModel
         
     }
 
-    public static function isInOrg($orgjednotka_id, $role = null, $user_id = null) {
-        $is = false;
+    public function  deleteAllOrg() {
 
-        if ( empty($orgjednotka_id) ) return false;
+        $Workflow = new Workflow();
+        $Workflow->update(array('orgjednotka_id'=>null),array('orgjednotka_id IS NOT NULL'));
+
+        $CJ = new CisloJednaci();
+        $CJ->update(array('orgjednotka_id'=>null),array('orgjednotka_id IS NOT NULL'));
+
+
+        $UserModel = new User2Role();
+        $UserModel->delete(array('role_id > 6'));
+
+        $AclModel = new AclModel();
+        $AclModel->delete(array('role_id > 6'));
+        $AclModel->deleteRule(array("privilege LIKE 'orgjednotka_%'"));
+
+        $RoleModel = new RoleModel();
+        $RoleModel->delete(array('fixed=0'));
         
-        if ( !is_null($user_id) ) {
-            $UserModel = new UserModel();
-            $user = $UserModel->getUser($user_id, true);
-        } else {
-            $user = Environment::getUser()->getIdentity();
-        }
+        parent::deleteAll();
+    }
+    
+    // Tato funkce je pouzita pro kontrolu pristupu k dokumentum
+    // Testuje, zda ma uzivatel pravo k urcene org. jednotce
+    public static function isInOrg($orgjednotka_id, $role = null, // Parametr role neni nikde pouzit
+                                    $user_id = null) {
+
+        if ( empty($orgjednotka_id) )
+            return false;
         
-        if ( count( $user->user_roles )>0 ) {
-            foreach ( $user->user_roles as $r ) {
-                if ( $r->orgjednotka_id == $orgjednotka_id ) {
-                    if ( is_null($role) ) {
-                        $is = true;
-                    } else {
-                        if (strpos($r->code, $role) !== false ) {
-                            $is = true;
-                        }
-                    }
-                }
-            }
-        }
-        return $is;
+        // docasny "hack" - omezeni, ze uzivatel muze byt jen v jedne o.j.
+        $oj_uzivatele = self::dejOrgUzivatele($user_id);
+        if ($oj_uzivatele === false)
+            return false;
+            
+        return $oj_uzivatele === $orgjednotka_id;
     }
 
     public static function childOrg($orgjednotka_id) {
@@ -249,38 +259,24 @@ class Orgjednotka extends TreeModel
         return $org;
     }
 
-    public function  deleteAllOrg() {
-
-        $Workflow = new Workflow();
-        $Workflow->update(array('orgjednotka_id'=>null),array('orgjednotka_id IS NOT NULL'));
-
-        $CJ = new CisloJednaci();
-        $CJ->update(array('orgjednotka_id'=>null),array('orgjednotka_id IS NOT NULL'));
-
-
-        $UserModel = new User2Role();
-        $UserModel->delete(array('role_id > 6'));
-
-        $AclModel = new AclModel();
-        $AclModel->delete(array('role_id > 6'));
-        $AclModel->deleteRule(array("privilege LIKE 'orgjednotka_%'"));
-
-        $RoleModel = new RoleModel();
-        $RoleModel->delete(array('fixed=0'));
-        
-        parent::deleteAll();
-    }
-    
     // Predpoklad - uzivatel je prirazen do jedine jednotky
     // Vrátí id org. jednotky aktuálního uživatele
-    public static function dejOrgUzivatele() {
+    // nebo null, neni-li uzivatel zarazen do zadne jednotky
+    public static function dejOrgUzivatele($user_id = null) {
     
-        $identity = Environment::getUser()->getIdentity();
-        if ($identity === null)
-            return null;
+        if ($user_id === null) {
+            $identity = Environment::getUser()->getIdentity();
+            if ($identity === null)
+                return null;
 
+            $roles = $identity->user_roles;
+        }
+        else
+            $roles = UserModel::getRoles($user_id);
+            
         $orgjednotka_id = null;
-        foreach ($identity->user_roles as $role) {
+        
+        foreach ($roles as $role) {
             if (!empty($role->orgjednotka_id))
                 $orgjednotka_id = $role->orgjednotka_id;
         }

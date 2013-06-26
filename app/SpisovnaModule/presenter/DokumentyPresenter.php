@@ -389,8 +389,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->template->Zapujcka = $Zapujcka->getDokument($dokument_id);
             
             $user = Environment::getUser();
-            //Debug::dump($user);
-
+            $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
             $user_id = $user->getIdentity()->id;
 
             $this->template->Pridelen = 0;
@@ -410,20 +409,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $formUpravit = $this->getParam('upravit',null);
             } else if ( @$dokument->predano->prideleno_id == $user_id ) {
                 // predany
-                $this->template->AccessEdit = 0;
-                $this->template->AccessView = 1;
-                $this->template->Predan = 1;
-                $formUpravit = $this->getParam('upravit',null);
-            } else if ( empty($dokument->prideleno->prideleno_id)
-                        && Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id, 'vedouci') ) {
-                // prideleno organizacni jednotce
-                $this->template->AccessEdit = 0;
-                $this->template->AccessView = 1;
-                $this->template->Pridelen = 1;
-                $formUpravit = $this->getParam('upravit',null);
-            } else if ( empty($dokument->predano->prideleno_id)
-                        && Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id, 'vedouci') ) {
-                // predano organizacni jednotce
                 $this->template->AccessEdit = 0;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;

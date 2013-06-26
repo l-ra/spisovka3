@@ -2,6 +2,16 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
+Nové funkce:
+
+- uživatel by neměl ztratit přístup k dokumentům poté, co byl zařazen do jiné org. jednotky
+
+Opravy:
+
+- filtr dokumentů "Přidělené" zobrazoval nesprávně i dokumenty k převzetí
+- filtr "Na kterých jsem kdy pracoval" a "Na kterých pracovala moje o.j."
+  zobrazoval i dokumenty k převzetí
+
 === Ver. 3.3.4 =================================================================
 
 Nové funkce:
