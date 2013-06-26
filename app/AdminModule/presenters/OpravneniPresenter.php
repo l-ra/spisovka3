@@ -30,32 +30,30 @@ class Admin_OpravneniPresenter extends BasePresenter
 
     }
 
-
     public function actionDetail()
     {
-        $this->template->title = " - Detail role";
-
         $role_id = $this->getParam('id',null);
         $RoleModel = new RoleModel();
 
-        $role = $RoleModel->getInfo($role_id);
+        $role = $role_id === null ? null : $RoleModel->getInfo($role_id);
         $this->template->Role = $role;
+
+        // Opravneni
+        $AclModel = new AclModel();
+        $opravneni = $AclModel->seznamOpravneni($role !== null ? $role->code : null);
+        $pravidla = $AclModel->seznamPravidel($role !== null ? $role->code : null);
+        $this->template->seznamOpravneni = $opravneni;
+        $this->template->seznamPravidel = $pravidla;
+    }
+    
+    public function renderDetail()
+    {
+        $this->template->title = " - Detail role";
 
         // Zmena udaju role
         $this->template->FormUpravit = $this->getParam('upravit',null);
 
-        // Opravneni
-        $AclModel = new AclModel();
-        $opravneni = $AclModel->seznamOpravneni(@$role->code);
-        $pravidla = $AclModel->seznamPravidel(@$role->code);
-        $this->template->seznamOpravneni = $opravneni;
-        $this->template->seznamPravidel = $pravidla;
-
-        $this->template->lzeMenitOpravneni = self::lzeMenitRoli($role);
-    }
-
-    public function renderDetail()
-    {
+        $this->template->lzeMenitOpravneni = self::lzeMenitRoli($this->template->Role);
         $this->template->opravneniForm = $this['opravneniForm'];
     }
 
@@ -63,7 +61,6 @@ class Admin_OpravneniPresenter extends BasePresenter
     {
         $RoleModel = new RoleModel();
         $role_id = $this->getParam('id',null);
-        $role = $RoleModel->getInfo($role_id);
         
         try {
             $RoleModel->smazat(array("id = %i", $role_id));
@@ -84,7 +81,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     protected function createComponentUpravitForm()
     {
 
-        $role = $this->template->Role;
+        $role = @$this->template->Role;
         $RoleModel = new RoleModel();
 
         // hack - udaje ze sablony jsou dostupne jen pri vykresleni formulare, ne kdyz se zpracovava odeslany formular
@@ -162,6 +159,11 @@ class Admin_OpravneniPresenter extends BasePresenter
         
         try
         {
+            if (!isset($data['code'])) {
+                // 'code' prvek nemuze byt prazdny i kdyz nema byt zmenen. Slouzi pro vypocet 'sekvence_string'
+                $old_role = $RoleModel->getInfo($role_id);
+                $data['code'] = $old_role->code;
+            }
             $RoleModel->upravit($data,$role_id);
             $this->flashMessage('Role  "'. $data['name'] .'"  byla upravena.');
         }
@@ -241,7 +243,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     protected function createComponentOpravneniForm()
     {
 
-        $role = $this->template->Role;
+        $role = isset($this->template->Role) ? $this->template->Role : null;
 
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -461,8 +463,10 @@ class Admin_OpravneniPresenter extends BasePresenter
     // Vraci:  0 - nelze menit
     //  1 - lze menit
     //  2 - lze, ale zobraz varovani
-    protected function lzeMenitRoli($role)
+    protected static function lzeMenitRoli($role)
     {
+        if (!is_object($role))
+            throw new InvalidArgumentException("Parametr 'role' není objekt.");
         return in_array($role->code, array("admin", "superadmin"))
             ? 2 : 1;
     }

@@ -92,14 +92,16 @@ class RoleModel extends TreeModel
     
     public function getInfo($role_id) {
 
-        $query = dibi::query(
+        $res = dibi::query(
             'SELECT r.*,pr.name parent_name FROM %n r', $this->name,
             'LEFT JOIN '. $this->name .' pr ON pr.id=r.parent_id',
             'WHERE r.id=%i', $role_id
         );
 
-        return $query->fetch();
+        if (count($res) == 0)
+            throw new InvalidArgumentException("Role id '$role_id' neexistuje.");
 
+        return $res->fetch();
     }
 
     public function getRoleByOrg($orgjednotka_id, $role_id) {
