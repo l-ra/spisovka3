@@ -22,7 +22,7 @@ class SubjektyPresenter extends BasePresenter
     public function renderNovy()
     {
         $this->template->title = " - Nový subjekt";
-        $this->template->novyForm = $this['novyForm'];
+        $this->template->subjektForm = $this['novyForm'];
     }
     
     public function vytvoritClicked(SubmitButton $button)
@@ -47,15 +47,14 @@ class SubjektyPresenter extends BasePresenter
         }
     }
 
-    protected function createComponentNovyForm()
+    protected function vytvorFormular()
     {
         $typ_select = Subjekt::typ_subjektu();
-        $stat_select = Subjekt::stat();
-        
+        $stat_select = array("" => "Neuveden") + Subjekt::stat();
+
         $form1 = new AppForm();
         $form1->getElementPrototype()->id('subjekt-vytvorit');
-        $form1->getElementPrototype()->onsubmit('return false;');
-        
+
         $form1->addSelect('type', 'Typ subjektu:', $typ_select);
         $form1->addText('nazev_subjektu', 'Název subjektu:', 50, 255);
         $form1->addText('ic', 'IČ:', 12, 8);
@@ -72,25 +71,23 @@ class SubjektyPresenter extends BasePresenter
         $form1->addText('misto_narozeni', 'Místo narození:', 50, 48);
         $form1->addText('okres_narozeni', 'Okres narození:', 50, 48);
         $form1->addText('narodnost', 'Národnost / Stát registrace:', 50, 48);
-        $form1->addSelect('stat_narozeni', 'Stát narození:', $stat_select);
+        $form1->addSelect('stat_narozeni', 'Stát narození:', $stat_select)
+                ->setValue('CZE');
 
         $form1->addText('adresa_ulice', 'Ulice / část obce:', 50, 48);
         $form1->addText('adresa_cp', 'číslo popisné:', 10, 10);
         $form1->addText('adresa_co', 'Číslo orientační:', 10, 10);
         $form1->addText('adresa_mesto', 'Obec:', 50, 48);
         $form1->addText('adresa_psc', 'PSČ:', 10, 10);
-        $form1->addSelect('adresa_stat', 'Stát:', $stat_select);
+        $form1->addSelect('adresa_stat', 'Stát:', $stat_select)
+                ->setValue('CZE');
 
         $form1->addText('email', 'Email:', 50, 250);
         $form1->addText('telefon', 'Telefon:', 50, 150);
         $form1->addText('id_isds', 'ID datové schránky:', 10, 50);
 
-        $form1->addTextArea('poznamka', 'Poznámka', 50, 6);
+        $form1->addTextArea('poznamka', 'Poznámka:', 50, 6);
 
-        $form1->addSubmit('novy', 'Vytvořit');
-        $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE);
-        
         $renderer = $form1->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = 'dl';
@@ -99,85 +96,63 @@ class SubjektyPresenter extends BasePresenter
 
         return $form1;
     }
+    
+    protected function createComponentNovyForm()
+    {
+        $form1 = $this->vytvorFormular();
+        
+        $form1->getElementPrototype()->onsubmit('return false;');      
+        $form1->addSubmit('novy', 'Vytvořit');
+        $form1->addSubmit('storno', 'Zrušit')
+                 ->setValidationScope(FALSE);
+        
+        return $form1;
+    }
 
     protected function createComponentUpravitForm()
     {
-        $subjekt = @$this->template->Subjekt;
-        
-        $typ_select = Subjekt::typ_subjektu();
-        $stat_select = array("" => "Neuveden") + Subjekt::stat();
+        $form1 = $this->vytvorFormular();
 
-        $form1 = new AppForm();
-        $form1->getElementPrototype()->id('subjekt-vytvorit');
-        
+        $subjekt = @$this->template->Subjekt;
         $form1->addHidden('id')
                 ->setValue(@$subjekt->id);
         
-        $form1->addSelect('type', 'Typ subjektu:', $typ_select)
-                ->setValue(@$subjekt->type);
-        $form1->addText('nazev_subjektu', 'Název subjektu:', 50, 255)
-                ->setValue(@$subjekt->nazev_subjektu);
-        $form1->addText('ic', 'IČ:', 12, 8)
-                ->setValue(@$subjekt->ic);
-        $form1->addText('dic', 'DIČ:', 12, 12)
-                ->setValue(@$subjekt->dic);
-
-        $form1->addText('jmeno', 'Jméno:', 50, 24)
-                ->setValue(@$subjekt->jmeno);
-        $form1->addText('prostredni_jmeno', 'Prostřední jméno:', 50, 35)
-                ->setValue(@$subjekt->prostredni_jmeno);
-        $form1->addText('prijmeni', 'Příjmení:', 50, 35)
-                ->setValue(@$subjekt->prijmeni);
-        $form1->addText('rodne_jmeno', 'Rodné jméno:', 50, 35)
-                ->setValue(@$subjekt->rodne_jmeno);
-        $form1->addText('titul_pred', 'Titul před:', 20, 35)
-                ->setValue(@$subjekt->titul_pred);
-        $form1->addText('titul_za', 'Titul za:', 20, 10)
-                ->setValue(@$subjekt->titul_za);
-
-        $form1->addDatePicker('datum_narozeni', 'Datum narození:', 10)
-                ->setValue(@$subjekt->datum_narozeni);
-        $form1->addText('misto_narozeni', 'Místo narození:', 50, 48)
-                ->setValue(@$subjekt->misto_narozeni);
-        $form1->addText('okres_narozeni', 'Okres narození:', 50, 48)
-                ->setValue(@$subjekt->okres_narozeni);
-        $form1->addText('narodnost', 'Národnost / Stát registrace:', 50, 48)
-                ->setValue(@$subjekt->narodnost);
-        $form1->addSelect('stat_narozeni', 'Stát narození:', $stat_select)
-                ->setValue(@$subjekt->stat_narozeni);
-
-        $form1->addText('adresa_ulice', 'Ulice / část obce:', 50, 48)
-                ->setValue(@$subjekt->adresa_ulice);
-        $form1->addText('adresa_cp', 'číslo popisné:', 10, 10)
-                ->setValue(@$subjekt->adresa_cp);
-        $form1->addText('adresa_co', 'Číslo orientační:', 10, 10)
-                ->setValue(@$subjekt->adresa_co);
-        $form1->addText('adresa_mesto', 'Obec:', 50, 48)
-                ->setValue(@$subjekt->adresa_mesto);
-        $form1->addText('adresa_psc', 'PSČ:', 10, 10)
-                ->setValue(@$subjekt->adresa_psc);
-        $form1->addSelect('adresa_stat', 'Stát:', $stat_select)
-                ->setValue(@$subjekt->adresa_stat);
-
-        $form1->addText('email', 'Email:', 50, 250)
-                ->setValue(@$subjekt->email);
-        $form1->addText('telefon', 'Telefon:', 50, 150)
-                ->setValue(@$subjekt->telefon);
-        $form1->addText('id_isds', 'ID datové schránky:', 10, 50)
-                ->setValue(@$subjekt->id_isds);
-
-        $form1->addTextArea('poznamka', 'Poznámka', 50, 6)
-                ->setValue(@$subjekt->poznamka);
-
         $form1->addSubmit('upravit', 'Upravit');
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE);
+                 
+        if ($subjekt !== null) {
+            $form1['type']->setValue(@$subjekt->type);
+            $form1['nazev_subjektu']->setValue(@$subjekt->nazev_subjektu);
+            $form1['ic']->setValue(@$subjekt->ic);
+            $form1['dic']->setValue(@$subjekt->dic);
 
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
+            $form1['jmeno']->setValue(@$subjekt->jmeno);
+            $form1['prostredni_jmeno']->setValue(@$subjekt->prostredni_jmeno);
+            $form1['prijmeni']->setValue(@$subjekt->prijmeni);
+            $form1['rodne_jmeno']->setValue(@$subjekt->rodne_jmeno);
+            $form1['titul_pred']->setValue(@$subjekt->titul_pred);
+            $form1['titul_za']->setValue(@$subjekt->titul_za);
+
+            $form1['datum_narozeni']->setValue(@$subjekt->datum_narozeni);
+            $form1['misto_narozeni']->setValue(@$subjekt->misto_narozeni);
+            $form1['okres_narozeni']->setValue(@$subjekt->okres_narozeni);
+            $form1['narodnost']->setValue(@$subjekt->narodnost);
+            $form1['stat_narozeni']->setValue(@$subjekt->stat_narozeni);
+
+            $form1['adresa_ulice']->setValue(@$subjekt->adresa_ulice);
+            $form1['adresa_cp']->setValue(@$subjekt->adresa_cp);
+            $form1['adresa_co']->setValue(@$subjekt->adresa_co);
+            $form1['adresa_mesto']->setValue(@$subjekt->adresa_mesto);
+            $form1['adresa_psc']->setValue(@$subjekt->adresa_psc);
+            $form1['adresa_stat']->setValue(@$subjekt->adresa_stat);
+
+            $form1['email']->setValue(@$subjekt->email);
+            $form1['telefon']->setValue(@$subjekt->telefon);
+            $form1['id_isds']->setValue(@$subjekt->id_isds);
+
+            $form1['poznamka']->setValue(@$subjekt->poznamka);
+        }
 
         return $form1;
     }
@@ -364,7 +339,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         exit;
     }    
 
-    public function actionUpravit()
+    public function renderUpravit()
     {
         $subjekt_id = $this->getParam('id',null);
         $dokument_id = $this->getParam('dok_id',null);
@@ -375,12 +350,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $this->template->Subjekt = $subjekt;
         $this->template->dokument_id = $dokument_id;
         $this->template->FormUpravit = $this->getParam('upravit',null);
-
-    }
-
-    public function renderUpravit()
-    {
-        $this->template->upravitForm = $this['upravitForm'];
+        $this->template->subjektForm = $this['upravitForm'];
     }
 
 /**

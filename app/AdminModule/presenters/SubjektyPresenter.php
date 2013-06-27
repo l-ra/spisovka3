@@ -123,7 +123,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         $subjekt = $Subjekt->getInfo($subjekt_id);
         $this->template->Subjekt = $subjekt;
         
-        $this->template->upravitForm = $this['upravitForm'];
+        $this->template->subjektForm = $this['upravitForm'];
     }
 
     

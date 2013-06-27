@@ -1,0 +1,133 @@
+    {$subjektForm->render('begin')}
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Info</div>
+        <dl class="detail_item">
+            <dt>{$subjektForm['type']->label}</dt>
+            <dd>{$subjektForm['type']->control}</dd>
+        </dl>
+
+        <dl class="detail_item type_ovm">
+            <dt>{$subjektForm['nazev_subjektu']->label}</dt>
+            <dd>{$subjektForm['nazev_subjektu']->control}</dd>
+        </dl>
+        <dl class="detail_item type_ovm">
+            <dt>{$subjektForm['ic']->label}</dt>
+            <dd>{$subjektForm['ic']->control} <a href="#" onclick="return aresSubjekt({$subjektForm->name});">Vyhledat pomoci systému ARES</a></dd>
+        </dl>
+        <dl class="detail_item type_ovm">
+            <dt>{$subjektForm['dic']->label}</dt>
+            <dd>{$subjektForm['dic']->control}</dd>
+        </dl>
+
+        <dl class="detail_item type_ovm type_fo">
+            <dt>{$subjektForm['titul_pred']->label}</dt>
+            <dd>{$subjektForm['titul_pred']->control}</dd>
+        </dl>
+        <dl class="detail_item type_ovm type_fo">
+            <dt>{$subjektForm['jmeno']->label}</dt>
+            <dd>{$subjektForm['jmeno']->control}</dd>
+        </dl>
+        <dl class="detail_item type_ovm type_fo">
+            <dt>{$subjektForm['prostredni_jmeno']->label}</dt>
+            <dd>{$subjektForm['prostredni_jmeno']->control}</dd>
+        </dl>
+        <dl class="detail_item type_ovm type_fo">
+            <dt>{$subjektForm['prijmeni']->label}</dt>
+            <dd>{$subjektForm['prijmeni']->control}</dd>
+        </dl>
+        <dl class="detail_item type_ovm type_fo">
+            <dt>{$subjektForm['titul_za']->label}</dt>
+            <dd>{$subjektForm['titul_za']->control}</dd>
+        </dl>
+        <dl class="detail_item type_fo">
+            <dt>{$subjektForm['rodne_jmeno']->label}</dt>
+            <dd>{$subjektForm['rodne_jmeno']->control}</dd>
+        </dl>
+
+        <dl class="detail_item type_fo">
+            <dt>{$subjektForm['datum_narozeni']->label}</dt>
+            <dd>{$subjektForm['datum_narozeni']->control}</dd>
+        </dl>
+        <dl class="detail_item type_fo">
+            <dt>{$subjektForm['misto_narozeni']->label}</dt>
+            <dd>{$subjektForm['misto_narozeni']->control}</dd>
+        </dl>
+        <dl class="detail_item type_fo">
+            <dt>{$subjektForm['okres_narozeni']->label}</dt>
+            <dd>{$subjektForm['okres_narozeni']->control}</dd>
+        </dl>
+        <dl class="detail_item type_fo">
+            <dt>{$subjektForm['stat_narozeni']->label}</dt>
+            <dd>{$subjektForm['stat_narozeni']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$subjektForm['adresa_ulice']->label}</dt>
+            <dd>
+                {$subjektForm['adresa_ulice']->control}
+                č.p. {$subjektForm['adresa_cp']->control}
+                č.o. {$subjektForm['adresa_co']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>PSČ a město:</dt>
+            <dd>
+                {$subjektForm['adresa_psc']->control}
+                {$subjektForm['adresa_mesto']->control}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$subjektForm['adresa_stat']->label}</dt>
+            <dd>{$subjektForm['adresa_stat']->control}</dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$subjektForm['email']->label}</dt>
+            <dd>{$subjektForm['email']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$subjektForm['telefon']->label}</dt>
+            <dd>{$subjektForm['telefon']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>{$subjektForm['id_isds']->label}</dt>
+            <dd>{$subjektForm['id_isds']->control} <a href="#" onclick="return isdsSubjekt({$subjektForm->name});">Vyhledat pomoci systému ISDS</a></dd>
+        </dl>
+
+        <dl class="detail_item">
+            <dt>{$subjektForm['poznamka']->label}</dt>
+            <dd>{$subjektForm['poznamka']->control}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>&nbsp;</dt>
+            <dd>{if isset($subjektForm['novy'])}
+                {$subjektForm['novy']->control}
+                {else}
+                {$subjektForm['upravit']->control}
+                {/if}
+                {$subjektForm['storno']->control}</dd>
+        </dl>
+
+    </div>
+    {$subjektForm->render('end')}
+    
+    <script type="text/javascript">
+
+        $('#frm{!$subjektForm->name}-type').change(function () {
+            value = $("#frm{!$subjektForm->name}-type").val();
+            //alert(value);
+            if ( value.indexOf('PFO')>=0 || value === '' ) {
+                $(".type_fo").show();
+                $(".type_ovm").show();            
+            } else if ( value.indexOf('OVM')>=0 || value.indexOf('PO')>=0 ) {
+                $(".type_fo").hide();
+                $(".type_ovm").show();
+            } else {
+                $(".type_ovm").hide();
+                $(".type_fo").show();
+            }
+
+        })
+        .trigger('change');
+
+    </script>    
