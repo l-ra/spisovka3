@@ -205,7 +205,7 @@
                 <dt>Vyhledat subjekt:</dt>
                 <dd>
                     <input type="text" name="subjekt_autocomplete" id="subjekt_epod_autocomplete" size="60" />
-                    <a href="{link :Epodatelna:Subjekty:vyber, 'id'=>0, 'epod_id'=>$Zprava->id}" id="dialog-subjekt">Seznam</a>
+                    <a href="{link :Epodatelna:Subjekty:vyber}" id="dialog-subjekt">Seznam</a>
                 </dd>
             </dl>
             <dl class="detail_item" id="subjekt_novy">
@@ -256,11 +256,6 @@
                 <br />
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
-                {if 0}
-                <div class="vyber">
-                    <a href="{link :Epodatelna:Subjekty:upravit, 'id'=>$subjekt->id, 'epod_id'=>$Zprava->id}" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;                    
-                </div>
-                {/if}
             </td>
             <td class="meta_plus">
                 &nbsp;

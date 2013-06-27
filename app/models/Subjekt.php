@@ -11,11 +11,11 @@ class Subjekt extends BaseModel
     
     public function getInfo($subjekt_id)
     {
-
         $result = $this->fetchRow(array('id=%i',$subjekt_id));
-        $row = $result->fetch();
-        return ($row) ? $row : NULL;
-
+        if (count($result) == 0)
+            throw new InvalidArgumentException("Subjekt id '$subjekt_id' neexistuje.");
+        
+        return $result->fetch();
     }
 
     public function ulozit($data, $subjekt_id = null)

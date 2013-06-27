@@ -128,11 +128,6 @@ $(function() {
         event.preventDefault();
         return dialog(this,'Subjekt');
     });
-
-    /*$("#subjekt-vytvorit").live("submit", function () {
-        subjektVytvorit($(this));
-        return false;
-    });*/
     
     // Dialog - Vyber subjektu
     $('#subjekt_pripojit_click').click(function(event){
@@ -604,7 +599,6 @@ subjektVytvorit = function () {
         x.onreadystatechange = function() {
             if (x.readyState == 4 && x.status == 200) {
                 stav = x.responseText;
-                //alert(stav);
                 if ( stav.indexOf('###zmeneno###') != -1 ) {
                     stav = stav.replace('###zmeneno###','');
                     $('#dialog').dialog('close');
@@ -785,6 +779,7 @@ subjektNovy = function(event) {
 '                        <dt>ID datové schránky:</dt>'+
 '                        <dd><input type="text" name="subjekt_isds['+id+']" value="" size="30" /></dd>'+
 '                        <dt>&nbsp;</dt>'+
+'                        <input type="hidden" name="dokument_id" value="'+id+'" />'+
 '                        <dd><input type="submit" name="subjekt_pridat['+id+']" value="Vytvořit a přidat" id="subjekt_pridat" /></dd>';
 
         if ( typeof document.forms["frm-novyForm"] == "undefined" ) {

@@ -71,42 +71,6 @@ $(function() {
         return false;
     });
 
-    /*$("#epodsubjekt-vytvorit").live("submit", function () {
-
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-
-                    stav = x.responseText;
-                    if ( stav.indexOf('###zmeneno###') != -1 ) {
-                        stav = stav.replace('###zmeneno###','');
-                        stav_a = stav.split("#");
-
-                        $('#dialog').dialog('close');
-                        renderEpodSubjekty(stav_a[0],stav_a[1]);
-                    } else {
-                        text = '';// '<div class="flash_message flash_info">Subjekt byl úspěšně vytvořen.</div>';
-                        text = text + x.responseText;
-                        $('#dialog').html(text);
-                    }
-
-                }
-            }
-            var formdata = $(this).serialize();
-
-            x.open("POST", $(this).attr('action'), true);
-            x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            x.setRequestHeader("Content-length", formdata.length);
-            x.setRequestHeader("Connection", "close");
-            x.send(formdata);
-        }
-
-        return false;
-    });*/
-
     $('#subjekt_epod_autocomplete').autocomplete({
         minLength: 3,
         source: (is_simple==1)?baseUri + '?presenter=Spisovka%3Asubjekty&action=seznamAjax':baseUri + 'subjekty/0/seznamAjax',
@@ -118,7 +82,7 @@ $(function() {
 	select: function(event, ui) {
             $('#subjekt_epod_autocomplete').val('');
 
-            renderEpodSubjekty(ui.item.id,document.getElementById('frmnovyForm-epodatelna_id').value);
+            renderEpodSubjekty(ui.item.id);
 
             return false;
 	}
@@ -189,15 +153,13 @@ $(function() {
                             text = text.substr(1);
                             alert(text);
                         } else {
-
                             part = text.split("#");
-
                             $('#subjekt_novy').html(
                                 '                        <dt>&nbsp;</dt>'+
                                 '                        <dd><a href="" id="epod_evid_novysubjekt_click">Vytvořit nový subjekt z odesílatele</a></dd>'
                             );
 
-                            renderEpodSubjekty(part[0],id);
+                            renderEpodSubjekty(part[0]);
 
                             alert('Subjekt byl vytvořen a přidán mezi nalezené subjekty.');
 
@@ -239,10 +201,8 @@ epodSubjektVytvorit = function (elm) {
                     stav = x.responseText;
                     if ( stav.indexOf('###zmeneno###') != -1 ) {
                         stav = stav.replace('###zmeneno###','');
-                        stav_a = stav.split("#");
-
                         $('#dialog').dialog('close');
-                        renderEpodSubjekty(stav_a[0],stav_a[1]);
+                        renderEpodSubjekty(stav);
                     } else {
                         text = '';// '<div class="flash_message flash_info">Subjekt byl úspěšně vytvořen.</div>';
                         text = text + x.responseText;
@@ -264,17 +224,39 @@ epodSubjektVytvorit = function (elm) {
     return false;
 }
 
-epodSubjektUpravitSubmit = function (elm) {
-    epodSubjektVytvorit(elm);
-    return false;    
-}
-
 epodSubjektNovySubmit = function (elm) {
     epodSubjektVytvorit(elm);
     return false;    
 }
 
-renderEpodSubjekty = function (subjekt_id, epodatelna_id) {
+epodSubjektNovyStorno = function () {
+
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                $('#dialog').html(x.responseText);
+            }
+            return false;
+        }
+        if ( is_simple == 1 ) {
+            x.open("GET", baseUri + '?presenter=Epodatelna%3Asubjekty&action=vyber', true);
+        } else {    
+            x.open("GET", baseUri + 'epodatelna/subjekty/vyber', true);
+        }        
+        
+        x.send(null);
+        return false;
+    }
+
+    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
+
+    return false;
+}
+
+renderEpodSubjekty = function (subjekt_id) {
 
     if (document.getElementById) {
         var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
@@ -314,9 +296,9 @@ renderEpodSubjekty = function (subjekt_id, epodatelna_id) {
         }
         baseUri = baseUri.replace('/public','');
         if ( is_simple == 1 ) {
-            x.open("POST", baseUri + '?presenter=Epodatelna%3Asubjekty&action=nacti&id='+ subjekt_id + '/?epod_id='+epodatelna_id, true);
+            x.open("POST", baseUri + '?presenter=Epodatelna%3Asubjekty&action=nacti&id=' + subjekt_id, true);
         } else {  
-            x.open("GET", baseUri + 'epodatelna/subjekty/nacti/'+ subjekt_id + '/?epod_id='+epodatelna_id, true);
+            x.open("GET", baseUri + 'epodatelna/subjekty/nacti/'+ subjekt_id, true);
         }
         x.send(null);
     }
@@ -327,36 +309,11 @@ renderEpodSubjekty = function (subjekt_id, epodatelna_id) {
     return false;
 }
 
-epodSubjektVybran = function (elm) {
+epodSubjektVybran = function (elm, subjekt_id) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                stav = x.responseText;
-
-                if ( stav.indexOf('###vybrano###') != -1 ) {
-                    stav = stav.replace('###vybrano###','');
-                    stav_a = stav.split("#");
-                    $('#dialog').dialog('close');
-                    renderEpodSubjekty(stav_a[0],stav_a[1]);
-                } else {
-                    $('#dialog').html(stav);
-                }
-            }
-        }
-        url = elm.href;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu        
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
-
-    return false;
+    $('#dialog').dialog('close');
+    elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
+    renderEpodSubjekty(subjekt_id);
 }
 
 EpodosobaVybrana = function (elm) {
