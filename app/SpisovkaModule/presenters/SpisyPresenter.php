@@ -815,13 +815,11 @@ class Spisovka_SpisyPresenter extends BasePresenter
     public function stornoClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $spis_id = $data['id'];
-        if ( $spis_id ) {
-            $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
+        if ( isset($data['id']) ) {
+            $this->redirect(':Spisovka:Spisy:detail',array('id' => $data['id']));
         } else {
-            $this->redirect(':Spisovka:Spisy:default',array('id'=>$spis_id));
-        }
-        
+            $this->redirect(':Spisovka:Spisy:default');
+        }        
     }
 
     protected function createComponentNovyForm()

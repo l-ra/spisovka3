@@ -2268,6 +2268,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
                                             
                     $data = array(
+                        'dokument_id' => $dokument_id,
                         'isds_predmet' => $post_data['isds_predmet'][$subjekt_id],
                         'isds_cjednaci_odes' => $post_data['isds_cjednaci_odes'][$subjekt_id],
                         'isds_spis_odes' => $post_data['isds_spis_odes'][$subjekt_id],
@@ -2307,7 +2308,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         $datum_odeslani = new DateTime( $post_data['datum_odeslani_postou'][$subjekt_id] );
                     }
                     
-                    $druh_zasilky_form = $post_data['druh_zasilky'][$subjekt_id];
+                    $druh_zasilky_form = @$post_data['druh_zasilky'][$subjekt_id];
                     if ( count($druh_zasilky_form)>0 ) {
                         $druh_zasilky_a = array();
                         foreach( $druh_zasilky_form as $druh_id=>$druh_status ) {
@@ -2710,7 +2711,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['prilohy'] = serialize($aprilohy);
 
             $zprava['evidence'] = 'spisovka';
-            $zprava['dokument_id'] = $data['id'];
+            $zprava['dokument_id'] = $data['dokument_id'];
             $zprava['stav'] = 0;
             $zprava['stav_info'] = '';
 

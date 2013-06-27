@@ -34,7 +34,7 @@
             <th>Stav</th>            
         </tr>            
         {foreach $seznam as $spis}
-        <tr class="{$spis->class}" id="sitem{$spis->spis_id}">
+        <tr id="sitem{$spis->id}">
             <td class="akce">
                 {if $spis->typ=='S' && $spis->stav==0}
                 <input type="checkbox" class="checkbox" name="spis_vyber[]" value="{$spis->id}" title="Vybrat tento spis" />
