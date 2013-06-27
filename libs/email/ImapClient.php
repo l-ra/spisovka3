@@ -52,6 +52,9 @@ class ImapClient {
      */
     function close() {
         if (is_resource($this->_stream)) {
+            // Pokud rucne nevycistime chyby a varovani od c-client knihovny, PHP je vsechny zapise jako Notice do error logu
+            $errs = imap_errors();
+            unset($errs);
             imap_close($this->_stream);
             $this->_stream = null;
         }
