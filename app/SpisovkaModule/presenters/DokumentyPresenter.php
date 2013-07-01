@@ -938,7 +938,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             // throw new Exception("Dokument má již č.j. přiděleno.");
             $this->flashMessage('Dokument má již číslo jednací přiděleno.', 'error');
             $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-            return;
         }
             
         $CJ = new CisloJednaci();
@@ -1634,24 +1633,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
             unset($result);
 
+            // Poznamka: c.j. se v pripade noveho dokumentu generuje az na pokyn uzivatele
+            // a u odpovedi jsou sloupce c.j. vyplneny uz pri vytvareni odpovedi
             $CJ = new CisloJednaci();
-
-            if ( !empty($data['odpoved']) ) {
-                $cjednaci = $CJ->nacti($data['odpoved'],0);
-                unset($data['odpoved']);
-            } else {
-                $cjednaci = $CJ->generuj(); // 1 - generuj, 0 - negeneruj
-            }
-
-            $data['jid'] = $cjednaci->app_id.'-ESS-'.$dokument_id;
-            //$data['cislo_jednaci_id'] = (int) $cjednaci->id;
-            //$data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
-            $data['podaci_denik'] = $cjednaci->podaci_denik;
-            //$data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
-            $data['podaci_denik_rok'] = $cjednaci->rok;
-
-            //Debug::dump($data); exit;
-
+            $data['jid'] = $CJ->dejAppId() . "-ESS-$dokument_id";
+            
             $dokument = $Dokument->ulozit($data, $dokument_id);//   array('dokument_id'=>0);// $Dokument->ulozit($data);
 
             if ( $dokument ) {
@@ -2878,6 +2864,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
                 
         // Zde by se melo kontrolovat opravneni a podle nej pripadne Input vlozit jako Hidden pole
+        // Pokud uzivatel neni v zadne org. jednotce,  na hodnote filtru "jen_moje" nezalezi
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
         if ($orgjednotka_id === null)
             $control = $form->addHidden('jen_moje');

@@ -53,6 +53,11 @@ class CisloJednaci extends BaseModel
         $this->pouzij_minuly_rok = isset($this->info->minuly_rok) && $this->info->minuly_rok == 1;
     }
 
+    public function dejAppId() {
+    
+        return $this->unique;    
+    }
+    
     /**
      * Vygeneruje cislo jednaci
      * @return string
