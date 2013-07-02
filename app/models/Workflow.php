@@ -254,7 +254,7 @@ class Workflow extends BaseModel
     }
 
     // P.L. Upravy viz komentare v metode priradit()    
-    public function prevzit($dokument_id, $user_id, $orgjednotka_id = null)
+    public function prevzit($dokument_id)
     {
         if ( !is_numeric($dokument_id) )
             return false;
@@ -265,6 +265,9 @@ class Workflow extends BaseModel
         if ( !$predan )
             return false;
 
+        $user = Environment::getUser()->getIdentity();
+        $user_id = $user_identity->id;
+            
         // test predaneho
         // pokud neni predana osoba, tak test na vedouciho org.jednotky
         $access = 0; $log = ""; $log_plus = ".";
@@ -281,10 +284,6 @@ class Workflow extends BaseModel
 
         if ( $access != 1 )
             return false;
-
-        $UserModel = new UserModel();
-        $user = Environment::getUser()->getIdentity();
-        $user_info = $UserModel->getUser($user->id, 1);
 
         $log = "";
         
@@ -315,7 +314,7 @@ class Workflow extends BaseModel
                 $result_update = $this->update($data,$where);
 
                 $Log->logDokument($dokument_id, LogModel::DOK_PRIJAT, 
-                    'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument'.$log_plus);
+                    'Zaměstnanec '. Osoba::displayName($user->identity) .' přijal dokument'.$log_plus);
             }
             
             // Prevzeti i ostatnim dokumentum ve spisu
@@ -352,13 +351,13 @@ class Workflow extends BaseModel
                     $result_update = $this->update($data_other,$where);                                        
 
                     $Log->logDokument($dokument_other->id, LogModel::DOK_PRIJAT, 
-                        'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal dokument'.$log_plus);
+                        'Zaměstnanec '. Osoba::displayName($user->identity) .' přijal dokument'.$log_plus);
         
                 }
                     
                 $Spis->zmenitOrg($spis->id, $predan->orgjednotka_id);
                 $Log->logSpis($spis->id, LogModel::SPIS_PRIJAT, 
-                    'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal spis'.$log_plus);
+                    'Zaměstnanec '. Osoba::displayName($user->identity) .' přijal spis'.$log_plus);
             }
             
             dibi::commit();
@@ -370,8 +369,11 @@ class Workflow extends BaseModel
         }
     }
 
-    public function vyrizuje($dokument_id, $user_id, $orgjednotka_id = null)
+    public function vyrizuje($dokument_id)
     {
+        $user_identity = Environment::getUser()->getIdentity();
+        $user_id = $user_identity->id;
+
         if ( is_numeric($dokument_id) ) {
 
             $predan_array = $this->dokument($dokument_id, 1);
@@ -402,10 +404,6 @@ class Workflow extends BaseModel
                     $Dokument = new Dokument();
                     $dokument_info = $Dokument->getInfo($dokument_id);
 
-                    $UserModel = new UserModel();
-                    $user = Environment::getUser()->getIdentity();
-                    $user_info = $UserModel->getUser($user->id, 1);
-
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
                     $data['stav_dokumentu'] = 3;
@@ -413,23 +411,11 @@ class Workflow extends BaseModel
 
                     $data['stav_osoby'] = 1;
 
-                    if ( $user_id ) {
-                        $prideleno_info = $UserModel->getUser($user_id, 1);
-                        $data['prideleno_id'] = $prideleno_info->id;
-                    } else {
-                        $data['prideleno_id'] = null;
-                    }
-
-                    if ( $orgjednotka_id ) {
-                        $OrgJednotka = new Orgjednotka();
-                        $org_info = $OrgJednotka->getInfo($orgjednotka_id);
-                        $data['orgjednotka_id'] = $orgjednotka_id;
-                    } else {
-                        $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
-                    }
+                    $data['prideleno_id'] = $user_id;
+                    $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
 
                     $data['date'] = new DateTime();
-                    $data['user_id'] = $user->id;
+                    $data['user_id'] = $user_id;
                     $data['poznamka'] = $predan->poznamka;
                     $data['spis_id'] = $predan->spis_id;
 
@@ -441,7 +427,7 @@ class Workflow extends BaseModel
                     if ( $result_insert ) {
 
                         $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_KVYRIZENI, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' převzal dokument k vyřízení.');
+                        $Log->logDokument($dokument_id, LogModel::DOK_KVYRIZENI, 'Zaměstnanec '. $user_identity->display_name .' převzal dokument k vyřízení.');
 
                         return true;
                     } else {
@@ -663,7 +649,7 @@ class Workflow extends BaseModel
     }
 
 
-    public function keskartaci($dokument_id, $user_id, $orgjednotka_id = null)
+    public function keskartaci($dokument_id)
     {
         if ( is_numeric($dokument_id) ) {
 
@@ -718,7 +704,7 @@ class Workflow extends BaseModel
         }
     }
 
-    public function archivovat($dokument_id, $user_id, $orgjednotka_id = null)
+    public function archivovat($dokument_id)
     {
         if ( is_numeric($dokument_id) ) {
 
@@ -773,7 +759,7 @@ class Workflow extends BaseModel
         }
     }
 
-    public function skartovat($dokument_id, $user_id, $orgjednotka_id = null)
+    public function skartovat($dokument_id)
     {
         if ( is_numeric($dokument_id) ) {
 

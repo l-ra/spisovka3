@@ -148,7 +148,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         if ($this->getParam('chyba',null))
             $this->template->chyba = 1;
             
-        $this->template->uzivatel_id = $this->getParam('id',null);
         $this->template->novy = $this->getParam('novy',0);
 
         $Zamestnanci = new Osoba2User();

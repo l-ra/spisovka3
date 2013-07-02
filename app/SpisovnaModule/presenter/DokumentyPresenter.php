@@ -597,7 +597,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                         $count_ok = $count_failed = 0;
                         if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
                             foreach ( $data['dokument_vyber'] as $dokument_id ) {
-                                if ( $Workflow->archivovat($dokument_id, $user->getIdentity()->id) ) {
+                                if ( $Workflow->archivovat($dokument_id) ) {
                                     //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
                                     $count_ok++;
                                 } else {
@@ -626,7 +626,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                         $count_ok = $count_failed = 0;
                         if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
                             foreach ( $data['dokument_vyber'] as $dokument_id ) {
-                                if ( $Workflow->skartovat($dokument_id, $user->getIdentity()->id) ) {
+                                if ( $Workflow->skartovat($dokument_id) ) {
                                     //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
                                     $count_ok++;
                                 } else {
@@ -699,15 +699,12 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function renderArchivovat()
     {
-
         $dokument_id = $this->getParam('id',null);
         $user = Environment::getUser();
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
-            if ( $Workflow->archivovat($dokument_id, $user_id, $orgjednotka_id) ) {
+            if ( $Workflow->archivovat($dokument_id) ) {
                $this->flashMessage('Dokument byl archivován.');
             } else {
                $this->flashMessage('Dokument se nepodařilo zařadit do archivu. Zkuste to znovu.','warning');
@@ -716,20 +713,16 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
         }
         $this->redirect(':Spisovna:Dokumenty:detail',array('id'=>$dokument_id));
-
     }
 
     public function renderSkartovat()
     {
-
         $dokument_id = $this->getParam('id',null);
         $user = Environment::getUser();
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
-            if ( $Workflow->skartovat($dokument_id, $user_id, $orgjednotka_id) ) {
+            if ( $Workflow->skartovat($dokument_id) ) {
                $this->flashMessage('Dokument byl skartován.');
             } else {
                $this->flashMessage('Dokument se nepodařilo skartovat. Zkuste to znovu.','warning');
@@ -738,7 +731,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
         }
         $this->redirect(':Spisovna:Dokumenty:detail',array('id'=>$dokument_id));
-
     }
 
     public function renderDownload() 

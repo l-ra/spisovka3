@@ -557,13 +557,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->udalostForm = $this['udalostForm'];
     }
 
-    public function actionAkce($data)
+    protected function actionAkce($data)
     {
         if ( !isset($data['hromadna_akce']) || !isset($data['dokument_vyber']) )
             return;
             
         $Workflow = new Workflow();
-        $user = Environment::getUser()->getIdentity();
         
         switch ($data['hromadna_akce']) {
             case 'tisk':
@@ -577,7 +576,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $count_ok = $count_failed = 0;
                 foreach ( $data['dokument_vyber'] as $dokument_id ) {
                     if ( $Workflow->predany($dokument_id) ) {
-                        if ( $Workflow->prevzit($dokument_id, $user->id) )
+                        if ( $Workflow->prevzit($dokument_id) )
                             $count_ok++;
                         else
                             $count_failed++;
@@ -619,14 +618,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderPrevzit()
     {
-
         $dokument_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->predany($dokument_id) ) {
-            if ( $Workflow->prevzit($dokument_id, $user_id, $orgjednotka_id) ) {
+            if ( $Workflow->prevzit($dokument_id) ) {
                 $this->flashMessage('Úspěšně jste si převzal tento dokument.');
             } else {
                 $this->flashMessage('Převzetí dokumentu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
@@ -636,15 +632,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
     }
 
     public function renderZrusitprevzeti()
     {
-
         $dokument_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
@@ -657,15 +649,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->flashMessage('Nemáte oprávnění ke zrušení převzetí dokumentu.','warning');
         }
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
     }
     
     public function renderOdmitnoutprevzeti()
     {
 
         $dokument_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->predany($dokument_id) ) {
@@ -684,14 +673,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     
     public function renderKvyrizeni()
     {
-
         $dokument_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
-            if ( $Workflow->vyrizuje($dokument_id, $user_id, $orgjednotka_id) ) {
+            if ( $Workflow->vyrizuje($dokument_id) ) {
                $Workflow->zrusit_prevzeti($dokument_id);
 
                $DokumentSpis = new DokumentSpis();
@@ -710,7 +696,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                    }
                }
 
-
                $this->flashMessage('Převzal jste tento dokument k vyřízení.');
             } else {
                 $this->flashMessage('Označení dokumentu k vyřízení se nepodařilo. Zkuste to znovu.','warning');
@@ -727,12 +712,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParam('id',null);
         $user = Environment::getUser();
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
-            if ( $Workflow->keskartaci($dokument_id, $user_id, $orgjednotka_id) ) {
+            if ( $Workflow->keskartaci($dokument_id) ) {
                $this->flashMessage('Dokument byl přidán do skartačního řízení.');
             } else {
                $this->flashMessage('Dokument se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
@@ -749,12 +732,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParam('id',null);
         $user = Environment::getUser();
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
-            if ( $Workflow->archivovat($dokument_id, $user_id, $orgjednotka_id) ) {
+            if ( $Workflow->archivovat($dokument_id) ) {
                $this->flashMessage('Dokument byl archivován.');
             } else {
                $this->flashMessage('Dokument se nepodařilo zařadit do archivu. Zkuste to znovu.','warning');
@@ -768,15 +749,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderSkartovat()
     {
-
         $dokument_id = $this->getParam('id',null);
         $user = Environment::getUser();
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
-            if ( $Workflow->skartovat($dokument_id, $user_id, $orgjednotka_id) ) {
+            if ( $Workflow->skartovat($dokument_id) ) {
                $this->flashMessage('Dokument byl skartován.');
             } else {
                $this->flashMessage('Dokument se nepodařilo skartovat. Zkuste to znovu.','warning');
@@ -785,7 +763,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
         }
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
     }
 
 
@@ -925,8 +902,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParam('id',null);
         $cjednaci_id = $this->getParam('cislo_jednaci_id',null);
-        // Parametr user je predan, ale neni pouzit. Je to nejaky pozustatek z minulosti
-        // $user_id = $this->getParam('user',null);
 
         $Dokument = new Dokument();
         $dokument_info = $Dokument->getInfo($dokument_id);

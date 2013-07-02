@@ -459,12 +459,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
     {
 
         $spis_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
         $orgjednotka_id = $this->getParam('org',null);
-        if ( empty($user_id) ) {
-            $user = Environment::getUser();
-            $user_id = $user->getIdentity()->id;          
-        }        
 
         $DokSpis = new DokumentSpis();
         $dokumenty = $DokSpis->dokumenty($spis_id);        
@@ -475,7 +470,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
             $Workflow = new Workflow();
             if ( $Workflow->predany($dokument->id) ) {
-                if ( $Workflow->prevzit($dokument->id, $user_id, $orgjednotka_id) ) {
+                if ( $Workflow->prevzit($dokument->id) ) {
                     $this->flashMessage('Úspěšně jste si převzal tento spis.');
                 } else {
                     $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
@@ -516,7 +511,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
             $Workflow = new Workflow();
             if ( $Workflow->priradit($dokument->id, $user_id, $orgjednotka_id, "") ) {
-                if ( $Workflow->prevzit($dokument->id, $user_id, $orgjednotka_id) ) {
+                if ( $Workflow->prevzit($dokument->id) ) {
                     $this->flashMessage('Úspěšně jste si převzal tento spis.');
                 } else {
                     $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');

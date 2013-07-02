@@ -94,16 +94,16 @@
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }">Upravit vyřízení</a>
        {/if}
-       <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>$user->id, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
+       <a href="{link :Spisovka:Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
        {if $Predan==1 }
-       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít dokument</a>
-       <a href="{link :Spisovka:Dokumenty:odmitnoutprevzeti, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
+       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument</a>
+       <a href="{link :Spisovka:Dokumenty:odmitnoutprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
        {/if}
        {if ($Pridelen==1 && !empty($Dok->predano) ) }
-       <a href="{link :Spisovka:Dokumenty:zrusitprevzeti, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="zrusitprevzetidokument">Zrušit převzetí dokumentu</a>
+       <a href="{link :Spisovka:Dokumenty:zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit převzetí dokumentu</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 0 ) }
-       <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="kvyrizenidokument">Označit k vyřízení</a>
+       <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id}" id="kvyrizenidokument">Označit k vyřízení</a>
        {/if}
        {if ($povolitOdpoved && $Pridelen==1 && !empty($Dok->cislo_jednaci)) }
        <a href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
@@ -119,7 +119,7 @@
     {if $Zapujcka}
     <div id="dokument_blok_volby">
        {if !empty($Dok->predano->prideleno_id) }
-       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít dokument k zapůjčení</a>
+       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument k zapůjčení</a>
        {/if}
        <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}">Vrátit dokument</a>
     </div>
@@ -187,7 +187,7 @@
         <dl class="detail_item">
             <dt>&nbsp;</dt>
             <dd>
-                <a href="{link :Spisovka:Dokumenty:keskartaci, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="keskartacidokument">Přidat do skartačního řízení</a>
+                <a href="{link :Spisovka:Dokumenty:keskartaci, 'id'=>$Dok->id}" id="keskartacidokument">Přidat do skartačního řízení</a>
             </dd>
         </dl>
     </div>
@@ -207,9 +207,9 @@
         <dl class="detail_item">
             <dt>Rozhodnutí:</dt>
             <dd>
-                <a href="{link :Spisovka:Dokumenty:archivovat, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="archivovatdokument">Archivovat</a>
+                <a href="{link :Spisovka:Dokumenty:archivovat, 'id'=>$Dok->id}" id="archivovatdokument">Archivovat</a>
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="{link :Spisovka:Dokumenty:skartovat, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="skartovatdokument">Skartovat</a>
+                <a href="{link :Spisovka:Dokumenty:skartovat, 'id'=>$Dok->id}" id="skartovatdokument">Skartovat</a>
             </dd>
         </dl>
     </div>
@@ -240,10 +240,10 @@
             <dd>Dokument není evidován!
                 {if $Pridelen==1}
                 {if $Typ_evidence == 'sberny_arch'}
-                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
+                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
                 <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do dokumentu/spisu</a>
                 {else}
-                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spis. služby</a>
+                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spis. služby</a>
                 {/if}
                 {/if}
             </dd>
@@ -361,10 +361,10 @@
             <dd>Dokument není evidován!
                 {if $Pridelen==1}
                 {if $Typ_evidence == 'sberny_arch'}
-                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
+                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
                 <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do dokumentu/spisu</a>
                 {else}
-                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id, 'user'=>$user->id}">Zaevidovat do spis. služby</a>
+                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spis. služby</a>
                 {/if}
                 {/if}
             </dd>
