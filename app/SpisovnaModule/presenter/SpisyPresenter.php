@@ -529,28 +529,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
 
     }
-
-    public function renderPrevzitspis()
-    {
-
-        $spis_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
-        if ( empty($user_id) ) {
-            $user = Environment::getUser();
-            $user_id = $user->getIdentity()->id;          
-        }        
-
-        $Spis = new Spis;
-        if ( $Spis->zmenitOrg($spis_id, $orgjednotka_id) ) {
-            $this->flashMessage('Úspěšně jste si převzal tento spis.');
-        } else {
-            $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
-        }               
-
-        $this->redirect(':Spisovna:Spisy:detail',array('id'=>$spis_id));
-
-    }
     
     
     public function actionStav()

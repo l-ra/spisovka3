@@ -59,9 +59,6 @@
        {if $AccessEdit==1}
        <a href="{link :Spisovna:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit skartační režim</a>
        {/if}
-       {if empty($Spis->orgjednotka_id)}
-       <a href="{link :Spisovna:Spisy:prevzitspis, 'id'=>$Spis->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít spis do vlastnictví</a>
-       {/if}       
     </div>    
     
         {if ($FormUpravit=='info')}

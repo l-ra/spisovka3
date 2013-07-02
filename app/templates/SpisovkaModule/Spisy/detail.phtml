@@ -60,14 +60,14 @@
        <a href="{link :Spisovka:Uzivatel:vyberspis, 'id'=>$user->id, 'spis_id'=>$Spis->id}" id="dialog-spis">Předat spis</a>
        {/if}
        {if $Predan==1 }
-       <a href="{link :Spisovka:Spisy:prevzit, 'id'=>$Spis->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít spis</a>
-       <a href="{link :Spisovka:Spisy:odmitnoutprevzeti, 'id'=>$Spis->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
+       <a href="{link :Spisovka:Spisy:prevzit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis</a>
+       <a href="{link :Spisovka:Spisy:odmitnoutprevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
        {/if}
        {if ($Pridelen==1 && !empty($Spis->orgjednotka_id_predano) ) }
-       <a href="{link :Spisovka:Spisy:zrusitprevzeti, 'id'=>$Spis->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="zrusitprevzetidokument">Zrušit převzeti spisu</a>
+       <a href="{link :Spisovka:Spisy:zrusitprevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Zrušit převzeti spisu</a>
        {/if}
        {if empty($Spis->orgjednotka_id)}
-       <a href="{link :Spisovka:Spisy:prevzitspis, 'id'=>$Spis->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="prevzitdokument">Převzít spis do vlastnictví</a>
+       <a href="{link :Spisovka:Spisy:privlastnit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis do vlastnictví</a>
        {/if}
        
        {if $Pridelen==1 }

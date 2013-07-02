@@ -680,12 +680,10 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParam('id',null);
         $user = Environment::getUser();
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $Workflow = new Workflow();
         if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
-            if ( $Workflow->keskartaci($dokument_id, $user_id, $orgjednotka_id) ) {
+            if ( $Workflow->keskartaci($dokument_id) ) {
                $this->flashMessage('Dokument byl přidán do skartačního řízení.');
             } else {
                $this->flashMessage('Dokument se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');

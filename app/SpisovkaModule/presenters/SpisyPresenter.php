@@ -457,9 +457,7 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
     public function renderPrevzit()
     {
-
         $spis_id = $this->getParam('id',null);
-        $orgjednotka_id = $this->getParam('org',null);
 
         $DokSpis = new DokumentSpis();
         $dokumenty = $DokSpis->dokumenty($spis_id);        
@@ -479,6 +477,8 @@ class Spisovka_SpisyPresenter extends BasePresenter
                 $this->flashMessage('Nemáte oprávnění k převzetí spisu.','warning');
             }
         } else {
+            $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+        
             $Spis = new Spis;
             if ( $Spis->zmenitOrg($spis_id, $orgjednotka_id) ) {
                 $this->flashMessage('Úspěšně jste si převzal tento spis.');
@@ -491,60 +491,32 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
     }
 
-    public function renderPrevzitspis()
+    /* Tato operace je povolena pouze, kdyz spis nema zadneho vlastnika */
+    public function renderPrivlastnit()
     {
-
         $spis_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
-        if ( empty($user_id) ) {
-            $user = Environment::getUser();
-            $user_id = $user->getIdentity()->id;          
-        }        
 
-        $DokSpis = new DokumentSpis();
-        $dokumenty = $DokSpis->dokumenty($spis_id);        
+        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
         
-        if ( count($dokumenty)>0 ) {
-            // obsahuje dokumenty - predame i dokumenty
-            $dokument = current($dokumenty);   
-
-            $Workflow = new Workflow();
-            if ( $Workflow->priradit($dokument->id, $user_id, $orgjednotka_id, "") ) {
-                if ( $Workflow->prevzit($dokument->id) ) {
-                    $this->flashMessage('Úspěšně jste si převzal tento spis.');
-                } else {
-                    $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
-                }
-            } else {
-                $this->flashMessage('Přiřazení spisu se nepodařilo. Zkuste to znovu.','warning');
-            }
+        $Spis = new Spis;
+        $sp = $Spis->getInfo($spis_id);
+        if (!empty($sp->orgjednotka_id) || !empty($sp->orgjednotka_id_predano))
+            $this->flashMessage('Operace zamítnuta.', 'error');
+        else if ( !isset($orgjednotka_id) )
+            $this->flashMessage('Nemůžete převzít spis, protože nejste zařazen do organizační jednotky.','warning');
+        else if ( $Spis->zmenitOrg($spis_id, $orgjednotka_id) ) {
+            $this->flashMessage('Úspěšně jste si převzal tento spis. Pokud spis obsahoval dokumenty, jejich vlastnictví změněno nebylo.');
         } else {
-            $Spis = new Spis;
-            if ( !isset($orgjednotka_id) )
-                $this->flashMessage('Nemůžete převzít spis, protože nejste zařazen do organizační jednotky.','warning');
-            else if ( $Spis->zmenitOrg($spis_id, $orgjednotka_id) ) {
-                $this->flashMessage('Úspěšně jste si převzal tento spis.');
-            } else {
-                $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
-            }               
-        }
-
+            $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
+        }               
+  
         $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
-
     }
     
     
     public function renderZrusitprevzeti()
     {
-
         $spis_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
-        if ( empty($user_id) ) {
-            $user = Environment::getUser();
-            $user_id = $user->getIdentity()->id;          
-        }        
 
         $DokSpis = new DokumentSpis();
         $dokumenty = $DokSpis->dokumenty($spis_id);        
@@ -580,12 +552,6 @@ class Spisovka_SpisyPresenter extends BasePresenter
     {
 
         $spis_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
-        if ( empty($user_id) ) {
-            $user = Environment::getUser();
-            $user_id = $user->getIdentity()->id;          
-        }        
 
         $DokSpis = new DokumentSpis();
         $dokumenty = $DokSpis->dokumenty($spis_id);        
