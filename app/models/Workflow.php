@@ -120,7 +120,7 @@ class Workflow extends BaseModel
             $user = Environment::getUser()->getIdentity();
 
             // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
-            $update = array('stav_osoby%sql'=>'stav_osoby+100');
+            $update = array('stav_osoby%sql'=>'stav_osoby+100', 'aktivni'=>0);
             $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_osoby=0')));
                 
             $data = array();
@@ -177,7 +177,7 @@ class Workflow extends BaseModel
                 $spis = current($dokument_info->spisy);
 
                 // Vyradime ty zamestanance, kterym byly spisove dokumenty v minulosti predany
-                $update = array('stav_osoby%sql'=>'stav_osoby+100');
+                $update = array('stav_osoby%sql'=>'stav_osoby+100', 'aktivni'=>0);
                 $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_osoby=0')));
             
                 $seznam_dokumentu = $DokumentSpis->dokumenty($spis->id);
