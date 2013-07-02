@@ -1042,7 +1042,7 @@ class Dokument extends BaseModel
         $org_jednotka = array();
         if ($oj_id !== null)
             $org_jednotka[] = $oj_id;
-        $vidi_vsechny_dokumenty = ACL::isInRole('admin,podatelna,skartacni_dohled');
+        $vidi_vsechny_dokumenty = self::vidiVsechnyDokumenty();
         
         // Zkontroluj, zda mam pravo videt dokumenty ostatnich uzivatelu v o.j.
         if (false)
@@ -1054,7 +1054,7 @@ class Dokument extends BaseModel
             
             case 'pridelene':
                 $a = array(
-                            array('wf.stav_osoby=1 OR wf.stav_osoby=2'),
+                            array('wf.stav_osoby>0'),
                     );                    
                 break;
                 
@@ -1125,7 +1125,7 @@ class Dokument extends BaseModel
                 break;
                 
             case 'vse':               
-                $a = array('wf.stav_osoby <= 2');                    
+                $a = array();                    
                 if ( $isVedouci && $oj_id !== null )
                     $org_jednotka = Orgjednotka::childOrg($oj_id);
                 break;
@@ -1165,10 +1165,7 @@ class Dokument extends BaseModel
                         'cols' => null
                     ));
 
-                $a = array(
-                        'wf.stav_osoby <= 2',
-                        $podminka
-                );
+                $a = array($podminka);
                 // propadni dolu :)
                 
             case 'pridelene':
@@ -1228,62 +1225,42 @@ class Dokument extends BaseModel
 
     public function sestavaOmezeniOrg($args)
     {
-        // Omezeni pouze na dokumenty z vlastni organizacni jednotky
         $user = Environment::getUser()->getIdentity();
         $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
-        $isAdmin = ACL::isInRole('admin,skartacni_dohled,podatelna');
-        //$isAdmin = ACL::isInRole('admin');
+        $vidi_vsechny_dokumenty = self::vidiVsechnyDokumenty();
         
-        if ( !$isAdmin ) {
+        if ( !$vidi_vsechny_dokumenty ) {
             
             $org_jednotka_id = Orgjednotka::dejOrgUzivatele();
             
-            if ( $isVedouci )
+            if ($org_jednotka_id === null)
+                $org_jednotka = array();            
+            else if ( $isVedouci )
                 $org_jednotka = Orgjednotka::childOrg($org_jednotka_id);
             else
                 $org_jednotka = array($org_jednotka_id);
                 
-            $where_org = null;
-            if ( count($org_jednotka) == 1 ) {
-                $where_org = array( 'wf.orgjednotka_id=%i AND wf.aktivni=1 AND wf.stav_osoby=1',$org_jednotka[0] );
-            } else if ( count($org_jednotka) > 1 ) {
-                $where_org = array( 'wf.orgjednotka_id IN (%in) AND wf.aktivni=1 AND wf.stav_osoby=1',$org_jednotka );
-            } else
-                // Kdo neni v zadne jednotce, nebude videt nic
-                $where_org = array( 'FALSE' );
-                
-            $args['where'][] = array( $where_org );
+            $a = array('wf.aktivni=1 AND wf.stav_osoby=1');
+            
+            if ( count($org_jednotka) > 1 )
+                $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN (%in)', 
+                            $user->id, $org_jednotka);
+            else if ( count($org_jednotka) == 1 )
+                $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id = %i', 
+                            $user->id, $org_jednotka[0]);
+            else
+                $a[] = array('wf.prideleno_id=%i', $user->id);
+                                
+            $args['where'] = array_merge($args['where'], $a);
         }
+        
         return $args;
     }    
     
     protected function spisovnaOmezeniOrg($args)
     {
-        // Omezeni pouze na dokumenty z vlastni organizacni jednotky
-        $user = Environment::getUser()->getIdentity();
-        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
-        $isAdmin = ACL::isInRole('admin,skartacni_dohled');
-        //$isAdmin = ACL::isInRole('admin');
-        
-        if ( !$isAdmin ) {
-
-            $oj_id = Orgjednotka::dejOrgUzivatele();
-            if (!$oj_id)
-                $org_jednotka = array();            
-            else if ($isVedouci)
-                $org_jednotka = Orgjednotka::childOrg($oj_id);
-            else
-                $org_jednotka = array($oj_id);
-            
-            $where_org = null;
-            if ( count($org_jednotka) > 1 )
-                $where_org = array( 'wf.orgjednotka_id IN (%in) AND wf.aktivni=1', $org_jednotka );
-            else if ( count($org_jednotka) == 1 )
-                $where_org = array( 'wf.orgjednotka_id=%i AND wf.aktivni=1', $org_jednotka[0] );
-            
-            $args['where'][] = array( $where_org );            
-        }
-        return $args;
+        // [P.L.]  Neni treba duplikovat kod
+        return $this->sestavaOmezeniOrg($args);
     }
     
     public function spisovka($args) {
@@ -2304,29 +2281,11 @@ class Dokument extends BaseModel
 
     }
 
-
-    public static function stav($dokument = null) {
-
-        $stavy = array('1'=>'aktivný',
-                       '2'=>'neaktivný',
-                       '3'=>'zrušený'
-            );
-
-        if ( is_null( $dokument ) ) {
-            return $stavy;
-        } else if ( !is_numeric($dokument) ) {
-            return null;
-        }
-
-        $index = ($dokument>=100)?$dokument-100:$dokument;
-        if ( array_key_exists($index, $stavy) ) {
-         return $stavy[ $index ];
-        } else {
-            return null;
-        }
-
+    public static function vidiVsechnyDokumenty()
+    {
+        return ACL::isInRole('admin,podatelna,skartacni_dohled');    
     }
-
+    
 }
 
 class DokumentHistorie extends BaseModel

@@ -183,29 +183,28 @@ class Spisovka_SestavyPresenter extends BasePresenter
         // podaci denik
         if ( $sestava->id == 1 ) { // pouze na podaci denik, u jinych sestav zatim ne
         
-        $user_config = Environment::getVariable('user_config');
-        if ( isset($user_config->cislo_jednaci->typ_deniku) && $user_config->cislo_jednaci->typ_deniku == "org" ) 
-        {
-            if ( Acl::isInRole('superadmin') ) {
-                // vse
-            } else {
-
-                $user = Environment::getUser()->getIdentity();
-                $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
-
-                if ( empty($orgjednotka_id) ) {
-                    $org = null;
+            $user_config = Environment::getVariable('user_config');
+            if ( isset($user_config->cislo_jednaci->typ_deniku) && $user_config->cislo_jednaci->typ_deniku == "org" ) {        
+                if ( Acl::isInRole('superadmin') ) {
+                    // vse
                 } else {
-                    $Org = new Orgjednotka();
-                    $org = $Org->getInfo($orgjednotka_id);
-                }            
-             
-                // jen zaznamy z vlastniho podaciho deniku organizacni jednotky
-                $args['where'][] = array('d.podaci_denik=%s',$user_config->cislo_jednaci->podaci_denik . (!empty($org)?"_".$org->ciselna_rada:""));            
+
+                    $user = Environment::getUser()->getIdentity();
+                    $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+
+                    if ( empty($orgjednotka_id) ) {
+                        $org = null;
+                    } else {
+                        $Org = new Orgjednotka();
+                        $org = $Org->getInfo($orgjednotka_id);
+                    }            
+                 
+                    // jen zaznamy z vlastniho podaciho deniku organizacni jednotky
+                    $args['where'][] = array('d.podaci_denik=%s',$user_config->cislo_jednaci->podaci_denik . (!empty($org)?"_".$org->ciselna_rada:""));            
+                    
+                }
                 
             }
-            
-        }
         } // if sestava->id == 1
         
         // rok
