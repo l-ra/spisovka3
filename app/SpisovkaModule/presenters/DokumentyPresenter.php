@@ -799,7 +799,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
-            $ret = $Workflow->vyrizeno($dokument_id, $user_id, $orgjednotka_id);
+            $ret = $Workflow->vyrizeno($dokument_id);
             if ( $ret === "udalost" ) {
                 // manualni vyrizeni
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id,'udalost'=>1));
@@ -2020,6 +2020,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $UserModel = new UserModel();
         $user_id = Environment::getUser()->getIdentity()->id;
         $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
+        // Pozn. $add je stary kod, neni pouzito
         if ( $data['udalost_typ'] == 1 && !empty($data['datum_spousteci_udalosti']) ) {
             // spusteni udalosti dle datumu
             $add = array('stav'=>5, 'datum'=>$data['datum_spousteci_udalosti']);
@@ -2036,7 +2037,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
-            $ret = $Workflow->vyrizeno($dokument_id, $user_id, $orgjednotka_id, $add);
+            $ret = $Workflow->vyrizeno($dokument_id);
             if ( $ret == "udalost" ) {
                 // manualni vyrizeni
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id,'udalost'=>1));

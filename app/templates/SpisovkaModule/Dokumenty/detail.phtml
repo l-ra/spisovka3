@@ -112,7 +112,7 @@
        <a href="{link :Spisovka:Dokumenty:odeslat , 'id'=>$Dok->id }">Odeslat dokument</a>
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
-       <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id, 'user'=>$user->id, 'org'=>@$orgjednotka->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
+       <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
        {/if}
     </div>
     {/accessedit}

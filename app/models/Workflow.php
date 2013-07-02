@@ -459,7 +459,7 @@ class Workflow extends BaseModel
         }
     }
 
-    public function vyrizeno($dokument_id, $user_id, $orgjednotka_id = null, $accepted = null)
+    public function vyrizeno($dokument_id)
     {
         if ( is_numeric($dokument_id) ) {
 
@@ -488,21 +488,6 @@ class Workflow extends BaseModel
                     $stav = 5;
                     $datum_spusteni = (date("Y")+1) ."-01-01";
                     
-                    // spouteci udalost - manualni nebo automativky
-                    /*if ( $dokument_info->spousteci_udalost_stav == 2 && is_null($accepted) ) {
-                        $stav = 5;
-                        $datum_spusteni = date("Y-m-d");
-                    } else if ( !is_null($accepted) ) {
-                        $stav = $accepted['stav'];
-                        if ( !empty($accepted['datum']) ) {
-                            $datum_spusteni = $accepted['datum'];
-                        } else {
-                            $datum_spusteni = null;
-                        }
-                    } else {
-                        return "udalost";
-                    }*/
-
                     // Deaktivujeme starsi zaznamy
                     $this->deaktivovat($dokument_id);
 
@@ -521,16 +506,11 @@ class Workflow extends BaseModel
                         $prideleno_info = $UserModel->getUser($user_id, 1);
                         $data['prideleno_id'] = $prideleno_info->id;
                     } else {
-                        $data['prideleno_id'] = null;
                     }
 
-                    if ( $orgjednotka_id ) {
-                        $OrgJednotka = new Orgjednotka();
-                        $org_info = $OrgJednotka->getInfo($orgjednotka_id);
-                        $data['orgjednotka_id'] = $orgjednotka_id;
-                    } else {
-                        $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
-                    }
+                    $user_id = Environment::getUser()->getIdentity()->id;
+                    $data['prideleno_id'] = $user_id;
+                    $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
 
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->id;
