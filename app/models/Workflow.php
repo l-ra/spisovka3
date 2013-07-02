@@ -122,6 +122,9 @@ class Workflow extends BaseModel
             // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
             $update = array('stav_osoby%sql'=>'stav_osoby+100', 'aktivni'=>0);
             $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_osoby=0')));
+            // Zrus stav dokumentu oznaceny k vyrizeni
+            $update = array('stav_dokumentu'=>'2');
+            $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_dokumentu=3')));
                 
             $data = array();
             $data['dokument_id'] = $dokument_info->id;
@@ -179,6 +182,9 @@ class Workflow extends BaseModel
                 // Vyradime ty zamestanance, kterym byly spisove dokumenty v minulosti predany
                 $update = array('stav_osoby%sql'=>'stav_osoby+100', 'aktivni'=>0);
                 $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_osoby=0')));
+                // Zrus stav dokumentu oznaceny k vyrizeni
+                $update = array('stav_dokumentu'=>'2');
+                $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_dokumentu=3')));
             
                 $seznam_dokumentu = $DokumentSpis->dokumenty($spis->id);
                 // Musi vratit minimalne jeden, predavany dokument
