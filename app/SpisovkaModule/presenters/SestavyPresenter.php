@@ -183,6 +183,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
         // podaci denik
         if ( $sestava->id == 1 ) { // pouze na podaci denik, u jinych sestav zatim ne
         
+            // P.L. V podacim deniku nemohou byt dokumenty, ktere nemaji c.j.
+            $args['where'][] = 'd.cislo_jednaci IS NOT NULL';
+            
             $user_config = Environment::getVariable('user_config');
             if ( isset($user_config->cislo_jednaci->typ_deniku) && $user_config->cislo_jednaci->typ_deniku == "org" ) {        
                 if ( Acl::isInRole('superadmin') ) {

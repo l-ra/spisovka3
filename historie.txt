@@ -13,6 +13,7 @@ Opravy:
   zobrazoval i dokumenty k převzetí
 - v administraci nebyly vidět neaktivní subjekty
 - při předání dokumentu, který se vyřizoval, se neodstranil stav "vyřizuje se"
+- sestava "Podací deník" nesprávně obsahovala i dokumenty bez čísla jednacího
 
 === Ver. 3.3.4 =================================================================
 
