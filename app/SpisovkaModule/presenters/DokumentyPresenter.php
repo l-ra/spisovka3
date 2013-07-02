@@ -653,21 +653,21 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     
     public function renderOdmitnoutprevzeti()
     {
-
         $dokument_id = $this->getParam('id',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->predany($dokument_id) ) {
             if ( $Workflow->zrusit_prevzeti($dokument_id) ) {
-               $this->flashMessage('Odmítl jste převzetí dokumentu.');
+                $this->flashMessage('Odmítl jste převzetí dokumentu.');
+                $this->redirect(':Spisovka:Dokumenty:default');
             } else {
                 $this->flashMessage('Odmítnutí převzetí se nepodařilo. Zkuste to znovu.','warning');
             }
         } else {
-            $this->flashMessage('Nemáte oprávnění k odmítnutí převzetí dokumentu.','warning');
+            $this->flashMessage('Nemůžete odmítnout převzetí dokumentu, který Vám nebyl předán.','warning');
         }
+        
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
     }    
     
     
