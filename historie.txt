@@ -12,6 +12,7 @@ Opravy:
 - filtr "Na kterých jsem kdy pracoval" a "Na kterých pracovala moje o.j."
   zobrazoval i dokumenty k převzetí
 - v administraci nebyly vidět neaktivní subjekty
+- při předání dokumentu, který se vyřizoval, se neodstranil stav "vyřizuje se"
 
 === Ver. 3.3.4 =================================================================
 
