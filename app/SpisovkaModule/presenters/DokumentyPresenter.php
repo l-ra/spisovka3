@@ -1989,12 +1989,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function udalostClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        //Debug::dump($data); exit;
 
         $dokument_id = $data['id'];
         $UserModel = new UserModel();
-        $user_id = Environment::getUser()->getIdentity()->id;
-        $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
+        
         // Pozn. $add je stary kod, neni pouzito
         if ( $data['udalost_typ'] == 1 && !empty($data['datum_spousteci_udalosti']) ) {
             // spusteni udalosti dle datumu
@@ -2027,9 +2025,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } else {
             $this->flashMessage('Nemáte oprávnění označit dokument za vyřízený.','warning');
         }
+        
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
-
     }
 
 
