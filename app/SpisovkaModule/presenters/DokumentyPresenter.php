@@ -344,7 +344,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Predan = 0;
             $this->template->AccessEdit = 0;
             $this->template->AccessView = 0;
-            $formUpravit = null;
+            $formUpravit = $this->getParam('upravit',null);
+            
             if ( count($dokument->workflow)>0 ) {
                 // uzivatel na dokumentu nekdy pracoval, tak mu dame moznost aspon nahlizet
                 foreach ($dokument->workflow as $wf) {
@@ -364,27 +365,24 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         $this->template->Pridelen = 1;
                     else
                         $this->template->Predan = 1;                
-                    $formUpravit = $this->getParam('upravit',null);            
                 }
             
             // Prideleny nebo predany uzivatel
             // $this->typ_pristupu = 0 -> spravuje pouze uzivatel (prideleno_id)
             // $this->typ_pristupu = 1 -> spravuje kdokoli z utvaru (orgjednotka_id)
             if ( @$dokument->prideleno->prideleno_id == $user_id 
-                    || (Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id, null, $user_id) && $this->typ_pristupu) ) {
+                    || (Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) && $this->typ_pristupu) ) {
                 // prideleny
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
-                $formUpravit = $this->getParam('upravit',null);
             }
             if ( @$dokument->predano->prideleno_id == $user_id 
-                    || (Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id, null, $user_id) && $this->typ_pristupu) ) {
+                    || (Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id) && $this->typ_pristupu) ) {
                 // predany
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;
-                $formUpravit = $this->getParam('upravit',null);
             }
             
             // Dokument se vyrizuje
@@ -399,7 +397,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->Pridelen = 0;
                 $this->template->Predan = 0;
                 $this->template->SpousteciUdalost = 1;
-                $formUpravit = null;
             }
             // Dokument je vyrizeny a spusteny
             if ( $dokument->stav_dokumentu >= 5) {
@@ -407,7 +404,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->Pridelen = 0;
                 $this->template->Predan = 0;
                 $this->template->SpousteciUdalost = 0;
-                $formUpravit = null;
             }
 
             // Dokument je zapujcen
@@ -452,7 +448,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
-                $formUpravit = $this->getParam('upravit',null);
             }
 
             if ( $dokument->stav_dokumentu == 1 ) {
@@ -465,7 +460,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->isRozdelany = true;
             }
             
-            $this->template->FormUpravit = $formUpravit;
+            $this->template->FormUpravit = $this->template->AccessEdit ? $formUpravit : null;
 
             if ( $this->getParam('udalost1',false) && $dokument->stav_dokumentu == 4) {
                 $this->template->FormUdalost = 3;
