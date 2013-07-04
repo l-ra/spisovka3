@@ -11,11 +11,11 @@ class Orgjednotka extends TreeModel
     
     public function getInfo($orgjednotka_id)
     {
-
         $result = $this->fetchRow(array('id=%i',$orgjednotka_id));
-        $row = $result->fetch();
-        return ($row) ? $row : NULL;
-
+        if (count($result) == 0)   
+            throw new InvalidArgumentException("Organizační jednotka id '$orgjednotka_id' neexistuje.");
+            
+        return $result->fetch();
     }
 
     public function seznam($args = null, $no_result = 0)
@@ -101,101 +101,6 @@ class Orgjednotka extends TreeModel
         }
     }
 
-    public function pridatOrganizacniStrukturu($orgjednotka_id, $parent_role_id) {
-
-        // vytvoreni role ze zakladu
-        $RoleModel = new RoleModel();
-
-        $role_fixed = $RoleModel->getInfo($parent_role_id);
-        $orgjednotka = $this->getInfo($orgjednotka_id);
-
-        //dibi::begin('org_struct');
-
-        $row = array();
-        $row['parent_id'] = $parent_role_id;
-        $row['code'] = $role_fixed->code ."_". $orgjednotka_id;
-        $row['name'] = $role_fixed->name ." ". $orgjednotka->ciselna_rada;
-        $row['active'] = 1;
-        $row['date_created'] = new DateTime();
-        $row['orgjednotka_id'] = $orgjednotka_id;
-        $row['fixed'] = 0;
-        $row['order'] = $role_fixed->order;
-
-        //Debug::dump($row);
-        //exit;
-
-        $role_id = $RoleModel->vlozit($row);
-
-        //echo dibi::$sql;
-
-        //Debug::dump($role_id);
-
-        if ( $role_id ) {
-            // pridani pravidla pro tuto konkretni org. jednotku
-            $AclModel = new AclModel();
-            $pravidlo = $AclModel->hledatPravidlo(array('privilege'=>"orgjednotka_". $orgjednotka_id));
-
-            if ( !(count($pravidlo) > 0) ) {
-                // Pravidlo
-                $row1 = array();
-                $row1['name'] = "Oprávnění pro org. jednotku ". $orgjednotka->zkraceny_nazev;
-                $row1['note'] = "Oprávnění platné pouze pro organizační jednotku ". $orgjednotka->zkraceny_nazev;
-                $row1['privilege'] = "orgjednotka_". $orgjednotka_id;
-                $rule_id = $AclModel->insertRule($row1);
-                //echo dibi::$sql;
-            } else {
-                $rule_id = $pravidlo[0]->id;
-            }
-
-
-            // Aplikace pravidla na roli
-            $row2 = array();
-            $row2['role_id'] = (int) $role_id;
-            $row2['rule_id'] = (int) $rule_id;
-            $row2['allowed'] = 'Y';
-
-            //Debug::dump($row2);
-
-            $AclModel->insert($row2);
-
-
-            //echo dibi::$sql;
-
-            //dibi::commit('org_struct');
-            
-        } else {
-            //dibi::rollback('org_struct');
-            return false;
-        }
-
-    }
-
-    public function odebratOrganizacniStrukturu($orgjednotka_id, $role_id) {
-
-        $AclModel = new AclModel();
-        $UserModel = new User2Role();
-        $RoleModel = new RoleModel();
-
-        //$transaction = (! dibi::inTransaction());
-        //if ($transaction)
-        //dibi::begin();
-        
-        // odebrani roli uzivatelum
-        $UserModel->delete(array('role_id=%i',$role_id));
-        // obebrani pravidel z role
-        $AclModel->delete(array('role_id=%i',$role_id));
-        // obebrani pravidel
-        //$AclModel->deleteRule(array('privilege=%s',"orgjednotka_". $orgjednotka_id));
-        // odebrani role
-        $RoleModel->delete(array('id=%i',$role_id));
-        
-        //if ($transaction)
-        //dibi::commit();
-
-        return true;
-        
-    }
-
     public function  deleteAllOrg() {
 
         $Workflow = new Workflow();
@@ -203,31 +108,19 @@ class Orgjednotka extends TreeModel
 
         $CJ = new CisloJednaci();
         $CJ->update(array('orgjednotka_id'=>null),array('orgjednotka_id IS NOT NULL'));
-
-
-        $UserModel = new User2Role();
-        $UserModel->delete(array('role_id > 6'));
-
-        $AclModel = new AclModel();
-        $AclModel->delete(array('role_id > 6'));
-        $AclModel->deleteRule(array("privilege LIKE 'orgjednotka_%'"));
-
-        $RoleModel = new RoleModel();
-        $RoleModel->delete(array('fixed=0'));
         
         parent::deleteAll();
     }
     
-    // Tato funkce je pouzita pro kontrolu pristupu k dokumentum
+    // Tato funkce je pouzita pro kontrolu pristupu k dokumentum a spisum
     // Testuje, zda ma uzivatel pravo k urcene org. jednotce
-    public static function isInOrg($orgjednotka_id, $role = null, // Parametr role neni nikde pouzit
-                                    $user_id = null) {
+    public static function isInOrg($orgjednotka_id) {
 
         if ( empty($orgjednotka_id) )
             return false;
         
-        // docasny "hack" - omezeni, ze uzivatel muze byt jen v jedne o.j.
-        $oj_uzivatele = self::dejOrgUzivatele($user_id);
+        // docasne omezeni, ze uzivatel muze byt jen v jedne o.j.
+        $oj_uzivatele = self::dejOrgUzivatele();
         if ($oj_uzivatele === false)
             return false;
             
@@ -259,27 +152,28 @@ class Orgjednotka extends TreeModel
         return $org;
     }
 
-    // Predpoklad - uzivatel je prirazen do jedine jednotky
-    // Vrátí id org. jednotky aktuálního uživatele
-    // nebo null, neni-li uzivatel zarazen do zadne jednotky
+    // Vrátí id org. jednotky aktuálního/zvoleného uživatele
+    // nebo null, neni-li uzivatel zarazen do zadne jednotky nebo kdyz nema identitu
     public static function dejOrgUzivatele($user_id = null) {
     
         if ($user_id === null) {
             $identity = Environment::getUser()->getIdentity();
             if ($identity === null)
+                // nepřihlášený uživatel
                 return null;
 
-            $roles = $identity->user_roles;
+            return $identity->orgjednotka_id;
         }
-        else
-            $roles = UserModel::getRoles($user_id);
-            
-        $orgjednotka_id = null;
-        
-        foreach ($roles as $role) {
-            if (!empty($role->orgjednotka_id))
-                $orgjednotka_id = $role->orgjednotka_id;
-        }
-        return $orgjednotka_id;
+
+        $user = UserModel::getUser($user_id);
+        return $user === null ? null : $user->orgjednotka_id;
     }
+
+    public static function getName($id) {
+        
+        $o = new self;
+        $oj = $o->getInfo($id);
+        return $oj->zkraceny_nazev;
+    }
+
 }

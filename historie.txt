@@ -5,7 +5,10 @@
 Nové funkce:
 
 - uživatel by neměl ztratit přístup k dokumentům poté, co byl zařazen do jiné org. jednotky
-
+- změněn způsob, jakým je uživatel zařazen do organizační jednotky.
+  Role už k tomu neslouží a je možné automaticky vytvořené role smazat.
+  Nyní může být uživatel pouze v jedné organizační jednotce.
+  
 Opravy:
 
 - filtr dokumentů "Přidělené" zobrazoval nesprávně i dokumenty k převzetí

@@ -599,6 +599,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user` (
   `password` varchar(50) DEFAULT NULL,
   `last_ip` varchar(15) DEFAULT NULL,
   `local` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `orgjednotka_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `USERNAME` (`username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
@@ -1046,6 +1047,9 @@ ALTER TABLE `{tbls3}subjekt_historie`
   ADD CONSTRAINT `fk_subjekt_historie_subjekt1` FOREIGN KEY (`subjekt_id`) REFERENCES `{tbls3}subjekt` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_subjekt_user10` FOREIGN KEY (`user_created`) REFERENCES `{tbls3}user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
+ALTER TABLE `{tbls3}user`
+  ADD CONSTRAINT `fk_user_orgjednotka1` FOREIGN KEY (`orgjednotka_id`) REFERENCES `{tbls3}orgjednotka` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+  
 ALTER TABLE `{tbls3}user_role`
   ADD CONSTRAINT `fk_user_role_orgjednotka1` FOREIGN KEY (`orgjednotka_id`) REFERENCES `{tbls3}orgjednotka` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_user_role_user_role1` FOREIGN KEY (`parent_id`) REFERENCES `{tbls3}user_role` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -1085,7 +1089,7 @@ CREATE TABLE `{tbls3}settings` (
 
 ALTER TABLE `{tbls3}user_role` ADD UNIQUE `user_role_code` ( `code` );
 
-INSERT INTO `{tbls3}settings` VALUES('db_revision', '600');
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '610');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

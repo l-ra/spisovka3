@@ -227,7 +227,7 @@ function my_assert_handler($file, $line, $code)
                         echo "<pre>";
                         foreach ( $alter[$arev] as $query ) {
                             $query = str_replace("\r", "", $query);
-                            $query = str_replace("\n", "", $query);
+                            $query = str_replace("\n", " ", $query);
                             $query = str_replace("\t", " ", $query);
                             $query = str_replace("{tbls3}", $config['prefix'], $query);
                             $query = trim($query);

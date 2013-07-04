@@ -266,18 +266,17 @@ class Workflow extends BaseModel
             return false;
 
         $user = Environment::getUser()->getIdentity();
-        $user_id = $user_identity->id;
             
         // test predaneho
         // pokud neni predana osoba, tak test na vedouciho org.jednotky
         $access = 0; $log = ""; $log_plus = ".";
         if ( empty($predan->prideleno_id) ) {
-            if ( Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
+            if ( Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
                 $access = 1;
                 $log_plus = " určený organizační jednotce ". @$predan->orgjednotka_info->zkraceny_nazev. ".";
             }
         } else {
-            if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
+            if ( $predan->prideleno_id == $user->id || Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
                 $access = 1;
             }
         }
@@ -383,11 +382,11 @@ class Workflow extends BaseModel
 
                 $access = 0;
                 if ( empty($predan->prideleno_id) ) {
-                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
+                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
                         $access = 1;
                     }
                 } else {
-                    if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
+                    if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
                         $access = 1;
                     }
                 }
@@ -447,13 +446,16 @@ class Workflow extends BaseModel
 
     public function vyrizeno($dokument_id)
     {
+        $user_identity = Environment::getUser()->getIdentity();
+        $user_id = $user_identity->id;
+
         if ( is_numeric($dokument_id) ) {
 
             $predan_array = $this->dokument($dokument_id, 1);
             $predan = is_array($predan_array)?$predan_array[0]:null;
 
             if ( $predan ) {
-                if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id, null, $user_id) ) {
+                if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -477,10 +479,6 @@ class Workflow extends BaseModel
                     // Deaktivujeme starsi zaznamy
                     $this->deaktivovat($dokument_id);
 
-                    $UserModel = new UserModel();
-                    $user = Environment::getUser()->getIdentity();
-                    $user_info = $UserModel->getUser($user->id, 1);
-
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
                     $data['stav_dokumentu'] = $stav;
@@ -488,18 +486,11 @@ class Workflow extends BaseModel
                     $data['stav_osoby'] = 1;
                     $data['aktivni'] = 1;
 
-                    if ( $user_id ) {
-                        $prideleno_info = $UserModel->getUser($user_id, 1);
-                        $data['prideleno_id'] = $prideleno_info->id;
-                    } else {
-                    }
-
-                    $user_id = Environment::getUser()->getIdentity()->id;
                     $data['prideleno_id'] = $user_id;
                     $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
 
                     $data['date'] = new DateTime();
-                    $data['user_id'] = $user->id;
+                    $data['user_id'] = $user_id;
                     $data['poznamka'] = $predan->poznamka;
                     $data['spis_id'] = $predan->spis_id;
 
@@ -958,13 +949,11 @@ class Workflow extends BaseModel
      * @param int $user_id
      * @return bool 
      */
-    public function prirazeny($dokument_id, $user_id = null)
+    public function prirazeny($dokument_id)
     {
         $param = array();
 
-        if ( is_null($user_id) ) {
-            $user_id = Environment::getUser()->getIdentity()->id;
-        }
+        $user_id = Environment::getUser()->getIdentity()->id;
 
         $param['where'] = array( 
                 array('dokument_id=%i', $dokument_id),
@@ -978,13 +967,13 @@ class Workflow extends BaseModel
 
         if ( $row ) {
             if ( empty($row->prideleno_id) ) {
-                if ( Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
+                if ( Orgjednotka::isInOrg($row->orgjednotka_id) ) {
                     return true;
                 }
             } else if ( Acl::isInRole('superadmin') ) {
                 return true;
             } else {
-                if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
+                if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id) ) {
                     return true;
                 }
             }
@@ -1000,21 +989,17 @@ class Workflow extends BaseModel
      * @param int $user_id
      * @return bool
      */
-    public function predany($dokument_id, $user_id = null)
+    public function predany($dokument_id)
     {
         $param = array();
 
-        if ( is_null($user_id) ) {
-            $user_id = Environment::getUser()->getIdentity()->id;
-        }
-
+        $user_id = Environment::getUser()->getIdentity()->id;
 
         $param['where'] = array(
                 array('dokument_id=%i', $dokument_id),
                 array('stav_osoby=%i', 0),
                 array('aktivni=%i', 1)
             );
-        //array('prideleno=%i', $user_id),
         $param['limit'] = 1;
 
         $rows = $this->fetchAllComplet($param);
@@ -1022,13 +1007,13 @@ class Workflow extends BaseModel
 
         if ( $row ) {
             if ( empty($row->prideleno_id) ) {
-                if ( Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
+                if ( Orgjednotka::isInOrg($row->orgjednotka_id) ) {
                     return true;
                 }
             } else if ( Acl::isInRole('superadmin') ) {
                 return true;
             } else {
-                if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id, null, $user_id) ) {
+                if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id) ) {
                     return true;
                 }
             }

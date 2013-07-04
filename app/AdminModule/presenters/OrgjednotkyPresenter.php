@@ -67,7 +67,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
     public function renderDetail()
     {
-        $this->template->roleForm = $this['roleForm'];
     }
 
 
@@ -214,114 +213,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         }
     }
 
-/*
- * Nastaveni organizacni struktury
- */
-    protected function createComponentRoleForm()
-    {
-
-        $orgjednotka_id = $this->getParam('id',null);
-        $OrgJednotka = new Orgjednotka();
-        
-        $role = $OrgJednotka->seznamRoli($orgjednotka_id);
-
-        $form1 = new AppForm();
-        $form1->addHidden('id')
-                ->setValue($orgjednotka_id);
-
-        foreach ($role['role'] as $r) {
-
-                $role_available = 0;
-                foreach ($role['role_org'] as $role_org) {
-                    if ( $role_org->parent_id == $r->id ) {
-                        $role_available = 1;
-                        break;
-                    }
-                }
-
-                $form1->addGroup('role_id_' . $r->id);
-                $subForm = $form1->addContainer('role'.$r->id);
-                $subForm->addCheckbox("org_role", 'povolit')
-                        ->setValue( $role_available );
-
-        }
-
-        $form1->addSubmit('upravit', 'Upravit organizační strukturu')
-                 ->onClick[] = array($this, 'upravitRoleClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
-
-        return $form1;
-    }
-
-    public function upravitRoleClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $orgjednotka_id = $data['id'];
-        $OrgJednotka = new Orgjednotka();
-        unset($data['id']);
-
-        $role = $OrgJednotka->seznamRoli($orgjednotka_id);
-
-        //Debug::dump($data);
-        //Debug::dump($role['role_org']);
-        //exit;
-
-        // Predkontrola - vyrazeni nemenici opravneni a nedefinovanych opravneni
-        foreach ($data as $id => $stav) {
-
-            $role_id = (int) substr($id, 4); // role4
-
-            // porovnat s puvodnim daty = role, ktere se nemenily, vyradime
-            foreach ($role['role_org'] as $role_org_id => $role_org) {
-                if ( ($role_org->parent_id == $role_id) && ($stav['org_role']==TRUE) ) {
-                    unset($data[$id]);
-                    unset($role['role_org'][ $role_org_id ]);
-                    continue;
-                }
-            }
-
-            // Vyradime FALSE data - nebyly vybrany
-            if ( $stav['org_role']==FALSE ) {
-                    unset($data[$id]);
-                    continue;
-            }
-
-        }
-
-        //echo "=======================";
-        //Debug::dump($data);
-        //Debug::dump($role['role_org']);
-        //exit;
-
-
-        // Odebrani zbyvajicich roli = oznaceny k odebrani
-        if ( count($role['role_org']) > 0 ) {
-            foreach ($role['role_org'] as $roleorg_id => $ro) {
-
-                // Odebrani organizacni role ze systemu
-                $OrgJednotka->odebratOrganizacniStrukturu($orgjednotka_id, $roleorg_id);
-                
-            }
-        }
-
-        // Pridani novych organizacnich roli
-        if ( count($data) > 0 ) {
-            foreach ($data as $id => $stav) {
-                $role_id = (int) substr($id, 4);
-
-                // Pridani organizacnich roli do systemu
-                $OrgJednotka->pridatOrganizacniStrukturu($orgjednotka_id, $role_id);
-
-            }
-        }
-
-        $this->flashMessage('Organizační struktura byla upravena.');
-        $this->redirect('this',array('id'=>$orgjednotka_id));
-    }
-
     public function actionTruncate()
     {
 
@@ -330,7 +221,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $Org = new Orgjednotka();
         $Org->deleteAllOrg();
 
-        echo "smnazano";
+        echo "smazano";
         exit;
     }
 

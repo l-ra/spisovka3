@@ -41,7 +41,6 @@ abstract class BasePresenter extends Presenter
                 }
                 else if (!$user->isAllowed($this->reflection->name, $this->getAction())) {
                     // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku
-                    //$this->forward(':Error:noaccess',array('param'=>array('resource'=>$this->reflection->name,'privilege'=>$this->getAction())));
                     $this->forward(':NoAccess:default');
                 }
             }

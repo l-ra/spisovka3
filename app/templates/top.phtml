@@ -6,13 +6,15 @@
             {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:}">E-podatelna</a>&nbsp;&nbsp;{/access}
             {access :Spisovna:Default:}<a href="{vlink :Spisovna:Default:}">Spisovna</a>&nbsp;&nbsp;{/access}
             {access :Admin:Default:}<a href="{vlink :Admin:Default:}">Administrace</a>&nbsp;&nbsp;{/access}
-            {access :Spisovka:Zpravy:default}<a href="{vlink :Spisovka:Zpravy:default}">Zprávy</a>&nbsp;&nbsp;{/access}
+            {access :Spisovka:Zpravy:}<a href="{vlink :Spisovka:Zpravy:default}">Zprávy</a>&nbsp;&nbsp;{/access}
             <a href="{$klientUri}{$helpUri}">Nápověda</a>&nbsp;&nbsp;
             <a href="{vlink :Spisovka:Uzivatel:logout}">Odhlásit</a>
         </div>
         <div id="top_jmeno">
-            <a href="{vlink :Spisovka:Uzivatel:}" title="nastavení uživatele"><strong>{$user->name}</strong></a>
-            <br />
+            <a href="{vlink :Spisovka:Uzivatel:}" title="nastavení uživatele"><strong>{$user->name}</strong></a><br />
+            {if $user->org_nazev != ''}
+            [ {$user->org_nazev} ]<br />
+            {/if}
             {foreach $user->user_roles as $role}
                 {$role->name}<br />
             {/foreach}

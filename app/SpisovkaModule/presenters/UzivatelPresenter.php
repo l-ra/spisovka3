@@ -55,7 +55,9 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         // Zmena osobnich udaju
         $this->template->FormUpravit = $this->getParam('upravit',null);
 
-        $uzivatel = $User->getUser($user->id);
+        $uzivatel = $User->getUser($user->id, true);
+        if ($uzivatel->org_nazev === '')
+            $uzivatel->org_nazev = 'žádná';
         $this->template->Uzivatel = $uzivatel;
 
         // Zmena hesla

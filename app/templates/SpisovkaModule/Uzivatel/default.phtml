@@ -41,6 +41,10 @@
             <dd>{if $Uzivatel->last_login}{$Uzivatel->last_login|edatetime}  z  {$Uzivatel->last_ip}{/if}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
+            <dt>Organizační jednotka:</dt>
+            <dd>{$Uzivatel->org_nazev}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
             <dt>Role:</dt>
             <dd>
                 {if count($Role)>0}

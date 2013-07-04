@@ -80,18 +80,22 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $osoba_id = $this->getParam('id',null);
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
 
-        // Zmena osobnich udaju
+        // Parametr urcuje, co budeme editovat (jaky zobrazime formular)
         $this->template->FormUpravit = $this->getParam('upravit',null);
+        $this->template->UpravitUserId = $this->getParam('user',null);
 
         // Zmena roli
         $this->template->RoleUpravit = $this->getParam('role',null);
 
-
+        
         $uzivatel = $Osoba->getUser($osoba_id);
         $this->template->Uzivatel = $uzivatel;
 
         // Zmena hesla
-        $zmena_hesla = $this->getParam('user',null);
+        if ($this->template->FormUpravit == 'heslo')
+            $zmena_hesla = $this->getParam('user',null);
+        else
+            $zmena_hesla = null;
         $this->template->ZmenaHesla = null;
         if ( !is_null($zmena_hesla) ) {
             if ( key_exists($zmena_hesla, $uzivatel) ) {
@@ -127,7 +131,12 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         if ( count($uzivatel)>0 ) {
             $role = array();
-            foreach ($uzivatel as $uziv) {
+            foreach ($uzivatel as &$uziv) {
+                if ($uziv->orgjednotka_id !== null)
+                    $uziv->org_nazev = Orgjednotka::getName($uziv->orgjednotka_id);
+                else
+                    $uziv->org_nazev = "žádná";
+                
                 $role[ $uziv->id ] = UserModel::getRoles($uziv->id);
             }
 
@@ -162,7 +171,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     protected function createComponentUpravitForm()
     {
-
         $osoba = $this->template->Osoba;
 
         $form1 = new AppForm();
@@ -215,7 +223,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         try {
             $osoba_id = $Osoba->ulozit($data, $osoba_id);
             $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl upraven.');
-            $this->redirect(':Admin:Zamestnanci:detail',array('id'=>$osoba_id));
+            $this->redirect('this',array('id'=>$osoba_id));
         } catch (DibiException $e) {
             $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  se nepodařilo upravit.','warning');
             Debug::dump($e);
@@ -227,7 +235,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $data = $button->getForm()->getValues();
-        $osoba_id = !empty($data['id'])?$data['id']:$data['osoba_id'];
+        $osoba_id = !empty($data['osoba_id']) ? $data['osoba_id'] : $data['id'];
         $this->redirect('this',array('id'=>$osoba_id));
     }
 
@@ -316,7 +324,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $role_seznam = $Role->seznam();
         $role_select = array();
         foreach ($role_seznam as $key => $value) {
-            if ( $value->fixed == 1 ) continue;
             $role_select[ $value->id ] = $value->name;
         }
 
@@ -338,7 +345,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             }
         }
 
-        $form1->addCheckbox("add_role", 'Přadat roli')
+        $form1->addCheckbox("add_role", 'Přidat roli')
                         ->setValue(0);
         $form1->addSelect('role', 'Role:', $role_select);
 
@@ -462,4 +469,57 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     }
 
+    protected function createComponentOJForm()
+    {
+        $form1 = new AppForm();
+        
+        $m = new Orgjednotka;
+        $seznam = $m->linearniSeznam();
+        $select = array(0 => 'žádná');
+        foreach ($seznam as $org)
+            $select[$org->id] = $org->ciselna_rada . ' - ' . $org->zkraceny_nazev;
+        
+        $osoba = $this->template->Osoba;
+        $user_id = $this->getParam('user', null);
+        
+        $form1->addHidden('osoba_id')
+                ->setValue(@$osoba->id);
+        $form1->addHidden('id')
+                ->setValue($user_id);
+                
+        $c = $form1->addSelect('orgjednotka_id', 'Organizační jednotka:', $select);
+        if (isset($this->template->Uzivatel)) {
+            $user = $this->template->Uzivatel[$user_id];
+            $c->setValue($user->orgjednotka_id);
+        }
+
+        $form1->addSubmit('upravit', 'Změnit')
+                 ->onClick[] = array($this, 'zmenitOJClicked');
+        $form1->addSubmit('storno', 'Zrušit')
+                 ->setValidationScope(FALSE)
+                 ->onClick[] = array($this, 'stornoClicked');
+
+        $renderer = $form1->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form1;
+    }
+    
+    public function zmenitOJClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+        $orgjednotka_id = $data['orgjednotka_id'];
+        if ($orgjednotka_id === '0')
+            $orgjednotka_id = null;
+            
+        $model = new UserModel();        
+        $model->update(array('orgjednotka_id' => $orgjednotka_id),
+            array(array('id = %i', $data['id'])));
+        $this->flashMessage('Organizační jednotka byla změněna.');
+
+        $this->redirect('this',array('id' => $data['osoba_id']));
+    }
 }

@@ -9,7 +9,8 @@ abstract class BaseModel extends Object
     const ROLE_TABLE = 'user_role';
     const USER2ROLE_TABLE = 'user_to_role';
     const OSOBA2USER_TABLE = 'osoba_to_user';
-
+    const ORGJEDNOTKA_TABLE = 'orgjednotka';
+    
     /** @var string object name */
     protected $name;
 

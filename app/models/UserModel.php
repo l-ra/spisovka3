@@ -36,6 +36,9 @@ class UserModel extends BaseModel
         if ( $identity == TRUE ) {
             $row->identity = $this->getIdentity($row->id);
             $row->display_name = Osoba::displayName($row->identity);
+            
+            $row->org_nazev = $row->orgjednotka_id !== null 
+                ? Orgjednotka::getName($row->orgjednotka_id) : '';
         } else {
             $row->display_name = $row->username;
         }

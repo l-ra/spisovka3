@@ -360,12 +360,12 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $formUpravit = null;
             
             // prideleno
-            if ( Orgjednotka::isInOrg($spis->orgjednotka_id, null, $user_id) ) {
+            if ( Orgjednotka::isInOrg($spis->orgjednotka_id) ) {
                 $pridelen = true;
                 $accessview = true;
             }
             // predano
-            if ( Orgjednotka::isInOrg($spis->orgjednotka_id_predano, null, $user_id) ) {
+            if ( Orgjednotka::isInOrg($spis->orgjednotka_id_predano) ) {
                 $predan = true;
                 $accessview = true;
             }
@@ -385,7 +385,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                     if ( isset( $org_cache[$wf->orgjednotka_id] ) ) {
                         $orgjednotka_expr = $org_cache[$wf->orgjednotka_id];
                     } else {
-                        $orgjednotka_expr = Orgjednotka::isInOrg($wf->orgjednotka_id, null, $user_id);
+                        $orgjednotka_expr = Orgjednotka::isInOrg($wf->orgjednotka_id);
                         $org_cache[$wf->orgjednotka_id] = $orgjednotka_expr;
                     }
                     

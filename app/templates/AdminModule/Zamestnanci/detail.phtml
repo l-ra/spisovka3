@@ -23,7 +23,7 @@
             <dt>funkce:</dt>
             <dd>{$Osoba->pozice}&nbsp;</dd>
         </dl>
-        <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'upravit'=>'info'}">Upravit</a>
+        <a href="{link this, 'id'=>$Osoba->id, 'upravit'=>'info'}">Upravit</a>
         {/if}
     </div>
 
@@ -55,6 +55,16 @@
             <dt>Poslední přihlášení:</dt>
             <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}&nbsp;</dd>
         </dl>
+        
+        {if ($FormUpravit == 'org' && $UpravitUserId == $u->id)}
+        {control oJForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Organizační jednotka:</dt>
+            <dd>{$u->org_nazev}&nbsp;</dd>
+        </dl>
+        {/if}
+        
         <dl class="detail_item">
             <dt>Role:</dt>
             <dd>
@@ -92,11 +102,13 @@
         <dl class="detail_item">
             <dt>&nbsp;</dt>
             <dd>
-                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'user'=>$u->id}">Změnit heslo</a>
+                <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'heslo'}">Změnit heslo</a>
                 &nbsp;&nbsp;&nbsp;
-                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'odebrat'=>$u->id}">Odebrat účet</a>
+                <a href="{link this, 'id'=>$Osoba->id, 'odebrat'=>$u->id}">Odebrat účet</a>
                 &nbsp;&nbsp;&nbsp;
-                <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'role'=>$u->id}">Změnit role</a>
+                <a href="{link this, 'id'=>$Osoba->id, 'role'=>$u->id}">Změnit role</a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'org'}">Změnit organizační jednotku</a>
 
             </dd>
         </dl>
