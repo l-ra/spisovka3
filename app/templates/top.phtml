@@ -1,0 +1,21 @@
+<div id="layout_top">
+    <div id="top">
+        <h1><a href="{vlink :$module:Default:}">{$module_name}</a> <span id="top_urad">{$Urad->nazev}</span></h1>
+        <div id="top_menu">
+            {access :Spisovka:Default:}<a href="{vlink :Spisovka:Default:}">Spisová služba</a>&nbsp;&nbsp;{/access}
+            {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:}">E-podatelna</a>&nbsp;&nbsp;{/access}
+            {access :Spisovna:Default:}<a href="{vlink :Spisovna:Default:}">Spisovna</a>&nbsp;&nbsp;{/access}
+            {access :Admin:Default:}<a href="{vlink :Admin:Default:}">Administrace</a>&nbsp;&nbsp;{/access}
+            {access :Spisovka:Zpravy:default}<a href="{vlink :Spisovka:Zpravy:default}">Zprávy</a>&nbsp;&nbsp;{/access}
+            <a href="{$klientUri}{$helpUri}">Nápověda</a>&nbsp;&nbsp;
+            <a href="{vlink :Spisovka:Uzivatel:logout}">Odhlásit</a>
+        </div>
+        <div id="top_jmeno">
+            <a href="{vlink :Spisovka:Uzivatel:}" title="nastavení uživatele"><strong>{$user->name}</strong></a>
+            <br />
+            {foreach $user->user_roles as $role}
+                {$role->name}<br />
+            {/foreach}
+        </div>
+    </div>
+</div>
