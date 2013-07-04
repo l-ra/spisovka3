@@ -308,12 +308,8 @@ abstract class BasePresenter extends Presenter
         $filter->handler->macros['/accessedit'] =
                 '<?php endif; ?>';
 
-
         $filter->handler->macros['vlink'] =
-                '<?php echo MyMacros::vlink("%%",%:macroLink%); ?>';
-        $filter->handler->macros['alink'] =
-                '<?php echo %:macroEscape%(MyMacros::alink("%%")); ?>';
-        
+                '<?php echo MyMacros::vlink("%%",%:macroLink%); ?>';        
     }
 
 }

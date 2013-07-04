@@ -24,7 +24,7 @@
             <dd>{!$Role->note|replace:'\n','<br />'}&nbsp;</dd>
         </dl>
         {if empty($Role->orgjednotka_id)}
-        {access :Admin:Opravneni:detail}<a href="{link :Admin:Opravneni:detail, 'id'=>$Role->id, 'upravit'=>'info'}">Upravit</a>
+        {access :Admin:Opravneni:}<a href="{link :Admin:Opravneni:detail, 'id'=>$Role->id, 'upravit'=>'info'}">Upravit</a>
         {if $Role->fixed == 0}
         &nbsp;<a href="{link :Admin:Opravneni:smazat, 'id'=>$Role->id}" onClick="return confirm('Ujistěte se, že role není přiřazena některému z uživatelů. Také z role nesmí jiné role dědit, aby ji bylo možné smazat.\nOpravdu chcete provést smazání?');">Smazat</a>
         {/if}

@@ -25,10 +25,10 @@
 
 <div id="layout">
     <div id="menu">
-        {access :Epodatelna:Default:zkontrolovat}<a href="{vlink :Epodatelna:Default:zkontrolovat}">Zkontrolovat schránku</a>{/access}
-        {access :Epodatelna:Default:nove}<a href="{vlink :Epodatelna:Default:nove}">Nové zprávy</a>{/access}
-        {access :Epodatelna:Default:prichozi}<a href="{vlink :Epodatelna:Default:prichozi}">Příchozí zprávy</a>{/access}
-        {access :Epodatelna:Default:odchozi}<a href="{vlink :Epodatelna:Default:odchozi}">Odchozí zprávy</a>{/access}
+        {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:zkontrolovat}">Zkontrolovat schránku</a>{/access}
+        {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:nove}">Nové zprávy</a>{/access}
+        {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:prichozi}">Příchozí zprávy</a>{/access}
+        {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:odchozi}">Odchozí zprávy</a>{/access}
     </div>
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}

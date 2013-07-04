@@ -30,12 +30,12 @@
         <a href="{link :Spisovna:Dokumenty:prijem}">dokumentů</a>
         {/accessrole}
         &nbsp;&nbsp;&nbsp;
-        {access :Spisovna:Dokumenty:default}
+        {access :Spisovna:Dokumenty:}
         <a href="{link :Spisovna:Dokumenty:default}">Seznam dokumentů</a>
         <a href="{link :Spisovna:Spisy:default}">Spisy</a>
         {/access}
         &nbsp;&nbsp;&nbsp;
-        {access :Spisovna:Zapujcky:default}<a href="{link :Spisovna:Zapujcky:default}">Zápůjčky</a>{/access}
+        {access :Spisovna:Zapujcky:}<a href="{link :Spisovna:Zapujcky:default}">Zápůjčky</a>{/access}
         &nbsp;&nbsp;&nbsp;
         {accessrole skartacni_dohled,superadmin}<a href="{link :Spisovna:Dokumenty:keskartaciseznam}">Ke skartaci</a>{/accessrole}
         {accessrole skartacni_dohled,skartacni_rizeni,superadmin}<a href="{link :Spisovna:Dokumenty:skartace}">Skartační řízení</a>{/accessrole}

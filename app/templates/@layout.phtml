@@ -23,11 +23,11 @@
 
 <div id="layout">
     <div id="menu">
-        {access :Spisovka:Dokumenty:default}<a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a>{/access}
-        {access :Spisovka:Dokumenty:novy}<a href="{link :Spisovka:Dokumenty:novy}">Nový dokument</a>{/access}
-        {access :Spisovka:Spisy:default}<a href="{link :Spisovka:Spisy:default}">Spisy</a>{/access}
-        {access :Spisovka:Sestavy:default}<a href="{link :Spisovka:Sestavy:default}">Sestavy</a>{/access}
-        {access :Spisovka:Vypravna:default}<a href="{link :Spisovka:Vypravna:default}">K odeslání</a>{/access}
+        {access :Spisovka:Dokumenty:}<a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a>{/access}
+        {access :Spisovka:Dokumenty:}<a href="{link :Spisovka:Dokumenty:novy}">Nový dokument</a>{/access}
+        {access :Spisovka:Spisy:}<a href="{link :Spisovka:Spisy:default}">Spisy</a>{/access}
+        {access :Spisovka:Sestavy:}<a href="{link :Spisovka:Sestavy:default}">Sestavy</a>{/access}
+        {access :Spisovka:Vypravna:}<a href="{link :Spisovka:Vypravna:default}">K odeslání</a>{/access}
     </div>
     <div n:if="count($zpravy)>0" id="info_flash">
         {foreach $zpravy as $zprava}

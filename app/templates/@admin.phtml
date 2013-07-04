@@ -26,15 +26,15 @@
     <div id="menu">
         {access :Admin:Nastaveni:}<a href="{vlink :Admin:Nastaveni:}">Nastavení</a>{/access}
         {access :Admin:Epodatelna:}<a href="{vlink :Admin:Epodatelna:}">E-podatelna</a>{/access}
-        {access :Admin:Spisy:seznam}<a href="{vlink :Admin:Spisy:seznam}">Spisy</a>{/access}
-        {access :Admin:Subjekty:seznam}<a href="{vlink :Admin:Subjekty:seznam}">Odesílatelé/Adresáti</a>{/access}
-        {access :Admin:Zamestnanci:seznam}<a href="{vlink :Admin:Zamestnanci:seznam}">Zaměstnanci</a>{/access}
-        {access :Admin:Orgjednotky:seznam}<a href="{vlink :Admin:Orgjednotky:seznam}">Org. jednotky</a>{/access}
-        {access :Admin:Opravneni:seznam}<a href="{vlink :Admin:Opravneni:seznam}">Oprávnění</a>{/access}
-        <!--{access :Admin:Prilohy:default}<a href="{vlink :Admin:Prilohy:default}">Soubory</a>{/access}-->
-        {access :Admin:Spisznak:seznam}<a href="{vlink :Admin:Spisznak:seznam}">Spisové znaky</a>{/access}
-        {access :Admin:Ciselniky:default}<a href="{vlink :Admin:Ciselniky:default}">Číselníky</a>{/access}
-        {access :Admin:Protokol:default}<a href="{vlink :Admin:Protokol:default}">Protokoly</a>{/access}
+        {access :Admin:Spisy:}<a href="{vlink :Admin:Spisy:seznam}">Spisy</a>{/access}
+        {access :Admin:Subjekty:}<a href="{vlink :Admin:Subjekty:seznam}">Odesílatelé/Adresáti</a>{/access}
+        {access :Admin:Zamestnanci:}<a href="{vlink :Admin:Zamestnanci:seznam}">Zaměstnanci</a>{/access}
+        {access :Admin:Orgjednotky:}<a href="{vlink :Admin:Orgjednotky:seznam}">Org. jednotky</a>{/access}
+        {access :Admin:Opravneni:}<a href="{vlink :Admin:Opravneni:seznam}">Oprávnění</a>{/access}
+        <!--{access :Admin:Prilohy:}<a href="{vlink :Admin:Prilohy:}">Soubory</a>{/access}-->
+        {access :Admin:Spisznak:}<a href="{vlink :Admin:Spisznak:seznam}">Spisové znaky</a>{/access}
+        {access :Admin:Ciselniky:}<a href="{vlink :Admin:Ciselniky:default}">Číselníky</a>{/access}
+        {access :Admin:Protokol:}<a href="{vlink :Admin:Protokol:default}">Protokoly</a>{/access}
     </div>
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}
