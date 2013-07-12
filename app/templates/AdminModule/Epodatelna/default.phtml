@@ -31,7 +31,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Podatelna pro příjem této DS:</dt>
-            <dd>{if empty($isds['podatelna'])}kterákoli{else}{$isds['podatelna']}{/if}&nbsp;</dd>
+            <dd>{if empty($isds['podatelna'])}kterákoli{else}{=Orgjednotka::getName($isds['podatelna'])}{/if}&nbsp;</dd>
         </dl>
     </div>
     {/foreach}
@@ -73,7 +73,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Podatelna pro příjem této schránky:</dt>
-            <dd>{if empty($email['podatelna'])}kterákoli{else}{$email['podatelna']}{/if}&nbsp;</dd>
+            <dd>{if empty($email['podatelna'])}kterákoli{else}{=Orgjednotka::getName($email['podatelna'])}{/if}&nbsp;</dd>
         </dl>
     </div>
     {/foreach}

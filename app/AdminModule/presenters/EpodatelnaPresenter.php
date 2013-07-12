@@ -152,6 +152,10 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             default: $this->info = null; break;
         }
 
+        if (isset($this->info['podatelna']) && !empty($this->info['podatelna'])) {        
+            $this->info['podatelna'] = Orgjednotka::getName($this->info['podatelna']);
+        }
+        
         $this->template->Info = $this->info;
         $this->template->Typ = $typ;
         $this->template->Index = $index;
@@ -192,9 +196,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $org_select = array('0'=>'Kterákoli podatelna');
         $OrgJednotky = new Orgjednotka();
-        if ( $orgjednotky_data = $OrgJednotky->seznam() ) {
-            
-        }
+        if ( $orgjednotky_data = $OrgJednotky->seznam() )
+            foreach($orgjednotky_data as $oj)
+                $org_select[$oj->id] = $oj->ciselna_rada . ' - ' . $oj->zkraceny_nazev;
 
         $connect_type = array(
             '0' => 'Základní (jménem a heslem)',
@@ -517,9 +521,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $org_select = array('0'=>'Kterákoli podatelna');
         $OrgJednotky = new Orgjednotka();
-        if ( $orgjednotky_data = $OrgJednotky->seznam() ) {
-
-        }
+        if ( $orgjednotky_data = $OrgJednotky->seznam() )
+            foreach($orgjednotky_data as $oj)
+                $org_select[$oj->id] = $oj->ciselna_rada . ' - ' . $oj->zkraceny_nazev;
 
         $typ_serveru = array(
             ''=>'',

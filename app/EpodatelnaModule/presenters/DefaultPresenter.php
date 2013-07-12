@@ -399,14 +399,18 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $zkontroluj_isds = 1;
         if ( count( $config_data['isds'] )>0 && $zkontroluj_isds==1 ) {
             foreach ($config_data['isds'] as $index => $isds_config) {
-                if ( $isds_config['aktivni'] == 1 ) {
-                    $nalezena_aktivni_schranka = 1;
-                    $result = $this->zkontrolujISDS($isds_config);
-                    if ( count($result)>0 ) {
-                        echo 'Z ISDS schránky "'.$isds_config['ucet'].'" bylo přijato '.(count($result)).' nových zpráv.<br />';
-                    } else {
-                        echo 'Z ISDS schránky "'.$isds_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
-                    }
+                if ( $isds_config['aktivni'] != 1 )
+                    continue;
+                if ( $isds_config['podatelna'] 
+                     && !Orgjednotka::isInOrg($isds_config['podatelna']) )
+                    continue;
+                
+                $nalezena_aktivni_schranka = 1;
+                $result = $this->zkontrolujISDS($isds_config);
+                if ( count($result)>0 ) {
+                    echo 'Z ISDS schránky "'.$isds_config['ucet'].'" bylo přijato '.(count($result)).' nových zpráv.<br />';
+                } else {
+                    echo 'Z ISDS schránky "'.$isds_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
                 }
             }
         }
@@ -414,16 +418,20 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $zkontroluj_email = 1;
         if ( count( $config_data['email'] )>0 && $zkontroluj_email==1 ) {
             foreach ($config_data['email'] as $index => $email_config) {
-                if ( $email_config['aktivni'] == 1 ) {
-                    $nalezena_aktivni_schranka = 1;
-                    $result = $this->zkontrolujEmail($email_config);
-                    if (is_string($result))
-                        echo $result . '<br />';
-                    else if ( $result > 0 ) {
-                        echo "Z emailové schránky \"".$email_config['ucet']."\" bylo přijato $result nových zpráv.<br />";
-                    } else {
-                        echo 'Z emailové schránky "'.$email_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
-                    }
+                if ( $email_config['aktivni'] != 1 )
+                    continue;
+                if ( $email_config['podatelna'] 
+                     && !Orgjednotka::isInOrg($email_config['podatelna']) )
+                    continue;
+
+                $nalezena_aktivni_schranka = 1;
+                $result = $this->zkontrolujEmail($email_config);
+                if (is_string($result))
+                    echo $result . '<br />';
+                else if ( $result > 0 ) {
+                    echo "Z emailové schránky \"".$email_config['ucet']."\" bylo přijato $result nových zpráv.<br />";
+                } else {
+                    echo 'Z emailové schránky "'.$email_config['ucet'].'" nebyly zjištěny žádné nové zprávy.<br />';
                 }
             }
         }
