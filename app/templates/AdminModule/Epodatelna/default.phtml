@@ -6,6 +6,8 @@
 
 <h2>Datové schránky</h2>
 
+    <p><a href="{link novaschranka, 'typ'=>'i'}">Přidat schránku</a></p>
+    
     {if count($n_isds)>0}
     {foreach $n_isds as $index => $isds}
     <div class="detail_blok">
@@ -36,12 +38,14 @@
     </div>
     {/foreach}
     {else}
-    <div class="prazdno">Nebyly nalezeny žádné účty datových schránek</div>
+    <div class="prazdno">Nebyly nalezeny žádné účty datových schránek.</div>
     {/if}
 
 
 <h2>Emailové schránky</h2>
 
+    <p><a href="{link novaschranka, 'typ'=>'e'}">Přidat schránku</a></p>
+    
     {if count($n_email)>0}
     {foreach $n_email as $index => $email}
     <div class="detail_blok">
@@ -78,7 +82,7 @@
     </div>
     {/foreach}
     {else}
-    <div class="prazdno">Nebyly nalezeny žádné účty datových schránek</div>
+    <div class="prazdno">Nebyly nalezeny žádné účty emailových schránek.</div>
     {/if}
 
 <h2>Odesílání přes email</h2>

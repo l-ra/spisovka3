@@ -104,6 +104,8 @@
         </dl>
         <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
         &nbsp;&nbsp;&nbsp;
+        <a href="{link :Admin:Epodatelna:smazat, 'id'=>$Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
+        &nbsp;&nbsp;&nbsp;
         <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'zmenit_heslo_isds'=>1}">Změnit heslo k ISDS</a>
         {/if}
         {elseif $Typ == 'e'}
@@ -141,6 +143,8 @@
             <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}&nbsp;</dd>
         </dl>
         <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="{link :Admin:Epodatelna:smazat, 'id'=>$Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
         {/if}
         {elseif $Typ == 'o'}
         {if ($FormUpravit=='1')}

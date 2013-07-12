@@ -48,9 +48,7 @@ if ( $unique_info === FALSE ) {
 
 Environment::loadConfig(CLIENT_DIR .'/configs/system.ini');
 $user_config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
-$epodatelna_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
 Environment::setVariable('user_config', $user_config);
-Environment::setVariable('epodatelna_config', $epodatelna_config);
 
 // setting memory_limit for PDF generate
 define('PDF_MEMORY_LIMIT','512M');

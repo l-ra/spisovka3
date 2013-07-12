@@ -4,10 +4,12 @@
 
 Nové funkce:
 
-- uživatel by neměl ztratit přístup k dokumentům poté, co byl zařazen do jiné org. jednotky
+- uživatel by neměl ztratit přístup k dokumentům poté, co byl přeřazen do jiné org. jednotky
 - změněn způsob, jakým je uživatel zařazen do organizační jednotky.
-  Role už k tomu neslouží a je možné automaticky vytvořené role smazat.
+  Role už k tomu neslouží a je možné v minulosti automaticky vytvořené role smazat.
   Nyní může být uživatel pouze v jedné organizační jednotce.
+- E-podatelna - možnost nadefinovat více datových a emailových schránek
+        a konkrétní schránku lze přiřadit určité organizační jednotce.
   
 Opravy:
 

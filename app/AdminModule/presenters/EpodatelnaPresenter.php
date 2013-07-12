@@ -8,14 +8,15 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     public function renderDefault()
     {
         // Klientske nastaveni
-        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $ep = $ep_config->toArray();
+        $ep = self::nactiNastaveni();
 
         // ISDS
         $this->template->n_isds = $ep['isds'];
 
         // Email
-        if ( count($ep['email'])>0 ) {
+        if ( count($ep['email']) == 0 )
+            $this->template->n_email = null;
+        else {
             $e_mail = array();
 
             $typ_serveru = array(
@@ -32,8 +33,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             }
 
             $this->template->n_email = $e_mail;
-        } else {
-            $this->template->n_email = null;
         }
 
         // Odeslani
@@ -64,10 +63,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     public function renderDetail()
     {
-
         // Klientske nastaveni
-        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $ep = $ep_config->toArray();
+        $ep = self::nactiNastaveni();
 
         $id_alter = null;
         $do = $this->getParam('do');
@@ -185,9 +182,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     protected function createComponentNastavitISDSForm()
     {
-
-        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $ep = $ep_config->toArray();
+        $ep = self::nactiNastaveni();
 
         $id = $this->getParam('id',null);
         $typ = substr($id,0,1);
@@ -266,8 +261,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $index = $data['index'];
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $config_data = $config->toArray();
+        $config_data = self::nactiNastaveni();
 
         $data['certifikat'] = "";
         if ( $data['typ_pripojeni'] == 1 || $data['typ_pripojeni'] == 2 ) {
@@ -360,11 +354,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $config_data['isds'][$index]['stav'] = $stav;
             $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla))?"(bez omezení)":date("j.n.Y G:i",strtotime($stav_hesla));
 
-            $config_modify = new Config();
-            $config_modify->import($config_data);
-            $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
-
-            Environment::setVariable('epodatelna_config', $config_modify);
+            self::ulozNastaveni($config_data);
 
             //if ( $chyba == 0 ) {
                 $this->flashMessage('Nastavení datové schránky bylo upraveno.');
@@ -385,9 +375,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     
     protected function createComponentZmenitHesloISDSForm()
     {
-
-        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $ep = $ep_config->toArray();
+        $ep = self::nactiNastaveni();
 
         $id = $this->getParam('id',null);
         $index = substr($id,1);
@@ -445,8 +433,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $index = $data['index'];
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $config_data = $config->toArray();
+        $config_data = self::nactiNastaveni();
+
         $old_pass = $config_data['isds'][$index]['password'];
 
         if ( $chyba == 0 ) {
@@ -483,12 +471,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                         $config_data['isds'][$index]['stav'] = $stav;
                         $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla))?"(bez omezení)":date("j.n.Y G:i",strtotime($stav_hesla));
 
-                        $config_modify = new Config();
-                        $config_modify->import($config_data);
-                        $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
-                        
-                        Environment::setVariable('epodatelna_config', $config_modify);                        
-                        
+                        self::ulozNastaveni($config_data);
+
                         $this->flashMessage('Heslo k datové schránky bylo úspěšně změněno.');
                         $this->redirect(':Admin:Epodatelna:detail',array('id'=>('i' . $data['index']) ));
                         
@@ -510,9 +494,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     
     protected function createComponentNastavitEmailForm()
     {
-
-        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $ep = $ep_config->toArray();
+        $ep = self::nactiNastaveni();
 
         $id = $this->getParam('id',null);
         $typ = substr($id,0,1);
@@ -597,8 +579,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $index = $data['index'];
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $config_data = $config->toArray();
+        $config_data = self::nactiNastaveni();
 
         $config_data['email'][$index]['ucet'] = $data['ucet'];
         $config_data['email'][$index]['aktivni'] = $data['aktivni'];
@@ -612,12 +593,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $config_data['email'][$index]['only_signature'] = $data['only_signature'];
         $config_data['email'][$index]['qual_signature'] = $data['qual_signature'];
 
-        //Debug::dump($config_data); exit;
-        $config_modify = new Config();
-        $config_modify->import($config_data);
-        $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
-
-        Environment::setVariable('epodatelna_config', $config_modify);
+        self::ulozNastaveni($config_data);
 
         $this->flashMessage('Nastavení emailové schránky bylo upraveno.');
         $this->redirect('this',array('id'=>('e' . $data['index']) ));
@@ -625,9 +601,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     protected function createComponentNastavitOdesForm()
     {
-
-        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $ep = $ep_config->toArray();
+        $ep = self::nactiNastaveni();
 
         $id = $this->getParam('id',null);
         $typ = substr($id,0,1);
@@ -681,8 +655,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $index = $data['index'];
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $config_data = $config->toArray();
+        $config_data = self::nactiNastaveni();
 
         $data['cert'] = "";
         //nahrani certifikatu
@@ -766,12 +739,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
         $config_data['odeslani'][$index]['cert_pass'] = $data['cert_pass'];
 
-        //Debug::dump($config_data); exit;
-        $config_modify = new Config();
-        $config_modify->import($config_data);
-        $config_modify->save(CLIENT_DIR .'/configs/epodatelna.ini');
-
-        Environment::setVariable('epodatelna_config', $config_modify);
+        self::ulozNastaveni($config_data);
 
         $this->flashMessage('Nastavení odeslání emailu bylo upraveno.');
         $this->redirect('this',array('id'=>('o' . $data['index']) ));
@@ -783,5 +751,83 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $this->redirect('this',array('id'=>($data['ep_typ'] . $data['index']) ));
     }
 
+    public function actionSmazat()
+    {
+        $id_schranky = $this->getParam('id');
 
+        $config_data = self::nactiNastaveni();
+
+        $por_cislo = substr($id_schranky, 1);
+        if (substr($id_schranky, 0, 1) == 'i')
+            unset($config_data['isds'][$por_cislo]);
+        else if (substr($id_schranky, 0, 1) == 'e')
+            unset($config_data['email'][$por_cislo]);
+        
+        self::ulozNastaveni($config_data);
+        $this->flashMessage('Schránka byla smazána.');
+        $this->redirect('default');
+    }
+
+    public function actionNovaschranka()
+    {    
+        $typ = $this->getParam('typ', 'e');
+        $config_data = self::nactiNastaveni();
+
+        if ($typ == 'i') {
+            $index = 0;
+            foreach ($config_data['isds'] as $i => $val)
+                $index = max ($index, $i);
+            $index++;
+        
+            $config_data['isds'][$index]['ucet'] = 'Nová datová schránka';
+            $config_data['isds'][$index]['aktivni'] = false;
+            $config_data['isds'][$index]['idbox'] = '';
+            $config_data['isds'][$index]['vlastnik'] = '';
+            $config_data['isds'][$index]['stav'] = '';
+            $config_data['isds'][$index]['typ_pripojeni'] = 0;
+            $config_data['isds'][$index]['login'] = '';
+            $config_data['isds'][$index]['password'] = '';
+            $config_data['isds'][$index]['certifikat'] = '';
+            $config_data['isds'][$index]['cert_pass'] = '';
+            $config_data['isds'][$index]['test'] = 0;
+            $config_data['isds'][$index]['podatelna'] = 0;
+            $config_data['isds'][$index]['stav_hesla'] = '';
+        }
+        else {
+            $index = 0;
+            foreach ($config_data['email'] as $i => $val)
+                $index = max ($index, $i);
+            $index++;
+            
+            $config_data['email'][$index]['ucet'] = 'Nová emailová schránka';
+            $config_data['email'][$index]['aktivni'] = false;
+            $config_data['email'][$index]['typ'] = "/pop3/ssl/novalidate-cert";
+            $config_data['email'][$index]['server'] = '';
+            $config_data['email'][$index]['port'] = 995;
+            $config_data['email'][$index]['inbox'] = "INBOX";
+            $config_data['email'][$index]['login'] = '';
+            $config_data['email'][$index]['password'] = '';
+            $config_data['email'][$index]['podatelna'] = 0;
+            $config_data['email'][$index]['only_signature'] = '';
+            $config_data['email'][$index]['qual_signature'] = '';        
+        }
+        
+        self::ulozNastaveni($config_data);
+        $this->flashMessage('Schránka přidána.');
+        $this->redirect('detail', array('id' => "$typ$index"));
+    }
+
+    public static function nactiNastaveni()
+    {
+        return Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini')
+                ->toArray();
+    }
+    
+    protected static function ulozNastaveni($config_data)
+    {
+        $new_config = new Config();
+        $new_config->import($config_data);
+        $new_config->save(CLIENT_DIR .'/configs/epodatelna.ini');
+    }
+    
 }
