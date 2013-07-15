@@ -136,7 +136,7 @@ include APP_DIR .'/models/BaseModel.php';
 include APP_DIR .'/models/FileModel.php';
 include APP_DIR .'/components/UUID.php';
 
-if ( isset($_GET['go']) && $_GET['go'] == "migrace" ) {
+if ( isset($_POST['go']) ) {
     define('MIGRACE',1); // spusti migraci, 0 = test / pouze vystup
     define('TEST_KONTROLA',0); // spusti jen pocatecni kontrolu
 } else {
@@ -339,7 +339,9 @@ if (TEST_KONTROLA==1) {
     echo "\n";
     echo "\n";
     echo "\n";
-    echo "<h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='migrace.php?go=migrace'>Spustit migraci dat</a></h3>\n";
+    echo '<h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<form action="migrace.php" method="post">
+<input name="go" type="submit" value="Spustit migraci dat"></input>
+</form></h3>';
     echo "\n";
     echo "\n";
     
