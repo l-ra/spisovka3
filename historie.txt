@@ -19,6 +19,7 @@ Opravy:
 - v administraci nebyly vidět neaktivní subjekty
 - při předání dokumentu, který se vyřizoval, se neodstranil stav "vyřizuje se"
 - sestava "Podací deník" nesprávně obsahovala i dokumenty bez čísla jednacího
+- uživatel s rolí "superadmin" mohl při editaci nechtěně změnit typ dokumentu
 
 === Ver. 3.3.4 =================================================================
 

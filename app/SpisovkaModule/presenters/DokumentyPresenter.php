@@ -1726,7 +1726,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$Dok->popis);
         $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
-                ->setValue(@$Dok->dokument_typ_id);
+                ->setValue(@$Dok->typ_dokumentu->id);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$Dok->cislo_jednaci_odesilatele);
 
