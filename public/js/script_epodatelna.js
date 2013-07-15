@@ -283,11 +283,10 @@ renderEpodSubjekty = function (subjekt_id) {
 
                     subjekt_tr = document.getElementById('epodsubjekt-'+subjekt_id);
                     if ( subjekt_tr != null ) {
-                        // replace
                         $(subjekt_tr).replaceWith(x.responseText);
                     } else {
                         // append
-                        $('#subjekty-table').append(x.responseText);
+                        $('#subjekty-table tbody').append(x.responseText);
                     }
 
                     
