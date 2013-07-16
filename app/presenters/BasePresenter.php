@@ -30,8 +30,6 @@ abstract class BasePresenter extends Presenter
 
             } else {
 
-                $Acl = Acl::getInstance();
-
                 if ($this->name == "Spisovka:Uzivatel") {
                     // Tento presenter je vzdy pristupny
                     if ($this->view == "login")

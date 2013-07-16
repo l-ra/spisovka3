@@ -165,9 +165,9 @@ class AclModel extends BaseModel {
 
             if ( !is_null($role) ) {
 
-                $Acl = Acl::getInstance();
-                $opravneni = $Acl->allowedByRole($role,$pravidlo->resource_code,$pravidlo->privilege);
-                if ( count($opravneni)>0 ) {
+                $authz = Environment::getService('Nette\Security\IAuthorizator');
+                $povoleno = $authz->isAllowed($role, $pravidlo->resource_code, $pravidlo->privilege);
+                if ( $povoleno ) {
                     $povoleno = "ano";
                 } else {
                     $povoleno = "ne";
