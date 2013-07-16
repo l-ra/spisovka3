@@ -32,11 +32,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->oddelovac_poradi = '/';
         }
         $this->template->Oddelovac_poradi = $this->oddelovac_poradi;
-        if ( isset($user_config->nastaveni->typ_pristupu) ) {
-            $this->typ_pristupu = $user_config->nastaveni->typ_pristupu;
-        } else {
-            $this->typ_pristupu = 1;
-        }        
+
+        $this->typ_pristupu = Orgjednotka::jePristupNaUrovniJednotky();
 
         parent::startup();
     }
@@ -444,7 +441,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             // SuperAdmin - moznost zasahovat do dokumentu
-            if ( $user->isInRole('superadmin') ) {
+            if ( Acl::isInRole('superadmin') ) {
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
@@ -611,7 +608,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }                               
     }
 
-    public function renderPrevzit()
+    public function actionPrevzit()
     {
         $dokument_id = $this->getParam('id',null);
 
@@ -629,7 +626,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
     }
 
-    public function renderZrusitprevzeti()
+    public function actionZrusitprevzeti()
     {
         $dokument_id = $this->getParam('id',null);
 
@@ -646,7 +643,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
     }
     
-    public function renderOdmitnoutprevzeti()
+    public function actionOdmitnoutprevzeti()
     {
         $dokument_id = $this->getParam('id',null);
 
@@ -666,7 +663,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     }    
     
     
-    public function renderKvyrizeni()
+    public function actionKvyrizeni()
     {
         $dokument_id = $this->getParam('id',null);
 
@@ -702,7 +699,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
 
-    public function renderKeskartaci()
+    public function actionKeskartaci()
     {
 
         $dokument_id = $this->getParam('id',null);
@@ -722,7 +719,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
 
-    public function renderArchivovat()
+    public function actionArchivovat()
     {
 
         $dokument_id = $this->getParam('id',null);
@@ -742,7 +739,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
 
-    public function renderSkartovat()
+    public function actionSkartovat()
     {
         $dokument_id = $this->getParam('id',null);
         $user = Environment::getUser();
@@ -762,7 +759,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
 
 
-    public function renderVyrizeno()
+    public function actionVyrizeno()
     {
 
         $dokument_id = $this->getParam('id',null);
@@ -892,7 +889,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function renderPridelitcj()
+    public function actionPridelitcj()
     {
 
         $dokument_id = $this->getParam('id',null);
@@ -977,8 +974,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
-
     }
 
     public function renderNovy()

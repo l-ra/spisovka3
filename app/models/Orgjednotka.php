@@ -176,4 +176,14 @@ class Orgjednotka extends TreeModel
         return $oj->zkraceny_nazev;
     }
 
+    public static function jePristupNaUrovniJednotky() {
+        
+        $user_config = Environment::getVariable('user_config');
+        if (!isset($user_config->nastaveni->typ_pristupu))
+            // Vychozi hodnota. Napr. po migraci z verze 3.0 toho nastaveni neexistuje
+            return false;
+            
+        return $user_config->nastaveni->typ_pristupu == 1;
+    }
+
 }

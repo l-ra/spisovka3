@@ -221,7 +221,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         );
         
         $form1->addRadioList('typ_pristupu', 'Typ přístupu k dokumentům:', $typ)
-                ->setValue( !isset($nastaveni->typ_pristupu)?0:$nastaveni->typ_pristupu );
+                ->setValue( Orgjednotka::jePristupNaUrovniJednotky() ? 1 : 0 );
 
         $form1->addSubmit('upravit', 'Uložit')
                  ->onClick[] = array($this, 'nastavitClicked');
