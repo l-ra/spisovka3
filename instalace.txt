@@ -27,8 +27,9 @@ dostupne PHP knihovny iconv, mbstring, curl, open_ssl, soap, mail,
 /log/        = slozka pro logovani chyb
 
 V ostatnych adresarich by se zapisovat nemelo.
-Jediny adresar, ktery by mel byt viditelny z venku, je /public. Ostatni adresare 
-by mely byt neviditelne a nepristupne.
+Adresare /client/ (vcetne podadresaru) a /log/ nesmi byt pres webovy server pristupne.
+Pro server Apache to zajistuji soubory .htaccess, pokud jsou povoleny. Spravnost tohoho
+nastaveni overte, aby nebylo mozne se neopravnene dostat k citlivym datum.
 
 2a. V korenovem adresari prejmenujte soubor index.ph na index.php. V adresari client/configs/ prejmenujte soubory s priponou .in na .ini
 
@@ -38,7 +39,6 @@ WWW_DIR    = absolutni cesta k souboru index.php. Nemenit!
 APP_DIR    = absolutni cesta k aplikacnim souborum (adresar /app). Vetsinou nemenit!
 LIBS_DIR   = absolutni cesta ke knihovnam aplikace (adresar /libs). Vetsinou nemenit!
 BASE_URI   = absolutni nebo relativni url cesta k adresari /public
-BASE_APP   = absolutni nebo relativni url cesta k index.php (WWW_DIR)
 
 KLIENT     = identifikator klienta. Vetsinou nemenit!
 CLIENT_DIR = absolutni cesta k uzivatelskym souborum (adresar /client). Vetsinou nemenit!
