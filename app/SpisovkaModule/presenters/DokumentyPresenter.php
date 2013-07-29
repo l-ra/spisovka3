@@ -2390,10 +2390,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $source = "";
             if ( file_exists(CLIENT_DIR .'/temp/tmp_email.eml') ) {
-                //if ( $fp = @fopen(WWW_DIR .'/files/tmp_email.eml','rb') ) {
-                //    $source = fread($fp, filesize(WWW_DIR .'/files/tmp_email.eml') );
-                //    @fclose($fp);
-                //}
                 $source = CLIENT_DIR .'/temp/tmp_email.eml';
             }
 

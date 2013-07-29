@@ -9,9 +9,6 @@ define('LIBS_DIR', WWW_DIR . '/libs');
 
 // absolute or relative url path to public dir
 define('BASE_URI', '/public/');
-// absolute or relative url path to app dir
-define('BASE_APP', '/');
-
 
 // client identificator
 define('KLIENT', 'klient');

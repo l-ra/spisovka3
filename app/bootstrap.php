@@ -36,7 +36,6 @@ Environment::setVariable('baseUri', $baseUri);
 unset($baseUri);
 
 Environment::setVariable('klientUri', $basePath );
-Environment::setVariable('baseApp', BASE_APP);
 
 $unique_info = @file_get_contents(CLIENT_DIR .'/configs/install');
 if ( $unique_info === FALSE ) {
