@@ -175,6 +175,13 @@ class SpisovyZnak extends TreeModel
         return $this->odstranitH($spisznak_id, $odebrat_strom);
     }
 
+    /* Hodnoty parametru select:
+       0 - vrat seznam pro pouziti v select boxu
+       1 - vrat seznam pro pouziti v select boxu s polozkou "Zadna"
+       3 - to same, ale pro select box pro vyhledavani
+       8 - vrat objekt DibiRow spousteci udalosti (pouzito ve tride Dokument)
+       10 - vrat nazev spousteci udalosti dane parametrem kod
+    */
     public static function spousteci_udalost( $kod = null, $select = 0 ) {
 
         if ( empty( self::$spousteci_udalost ) ) {
@@ -194,43 +201,35 @@ class SpisovyZnak extends TreeModel
             $result = self::$spousteci_udalost;
         }
 
-        $tmp = new stdClass();
-            $tmp->id = 0;
-            $tmp->nazev = 'Žádná';
-            $tmp->poznamka = '';
-            $tmp->stav = 1;
-        $result[''] = $tmp;
-        unset($tmp);
+        if ( $select == 8 )
+            return isset($result[$kod]) ? $result[ $kod ] : null;
 
-        if ( is_null($kod) ) {
-            if ( $select == 1 ) {
-                $tmp = array();
-                $tmp[''] = 'Žádná';
-                foreach ($result as $dt) {
-                    $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
-                }
-                return $tmp;
-            } else if ( $select == 3 ) {
-               $tmp = array();
-                $tmp[''] = 'všechny spouštěcí události';
-                foreach ($result as $dt) {
-                    $tmp[ $dt->nazev ] = String::truncate($dt->nazev,90);
-                }
-                return $tmp;
-            } else if ( $select == 10 ) {
+        if ( $select == 10 )
+            if ( $kod === null )
                 return '';
-            } else {
-                return $result;
-            }
-        } else {
-            if ( $select == 1 ) {
-                return ( isset($result[$kod]) )?$result[ $kod ]:null;
-            } else {
-                return ( isset($result[$kod]) )?$result[ $kod ]->nazev:'';
-            }
+            else
+                return isset($result[$kod]) ? $result[ $kod ]->nazev : '';
             
+        if ( $select == 1 ) {
+            $tmp = array();
+            // Viz Task #166
+            // $tmp[''] = 'Žádná';
+            foreach ($result as $dt) {
+                $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
+            }
+            return $tmp;
+        } 
+        if ( $select == 3 ) {
+            $tmp = array();
+            $tmp[''] = 'všechny spouštěcí události';
+            foreach ($result as $dt) {
+                $tmp[ $dt->nazev ] = String::truncate($dt->nazev,90);
+            }
+            return $tmp;
         }
 
+        // Pri jakekoli jine hodnote parametru $select vrat prosty seznam vsech udalosti
+        return $result;
     }
 
     public static function stav($stav = null) {

@@ -1608,7 +1608,7 @@ class Dokument extends BaseModel
             $dokument->spisovy_znak_udalost_stav = '';
             $dokument->spisovy_znak_udalost_dtext = '';            
             
-            $spousteci_udalost = SpisovyZnak::spousteci_udalost($row->spousteci_udalost_id,1);
+            $spousteci_udalost = SpisovyZnak::spousteci_udalost($row->spousteci_udalost_id,8);
             if ( isset($spousteci_udalost->nazev) ) {
                 $dokument->spousteci_udalost_nazev = $spousteci_udalost->nazev;
                 $dokument->spousteci_udalost_stav = $spousteci_udalost->stav;
