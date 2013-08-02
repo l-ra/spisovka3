@@ -233,9 +233,12 @@ final class InstantClientScript extends Object
 		case $operation === ':filled' && $control instanceof FormControl:
 			return "res = nette.getValue($elem) != '';";
 
+        /* [P.L.] Task #262 Nesmyslný kód, způsobuje v prohlížeči rekurzi
+           V Internet Exploreru se zobrazovalo Out of memory
 		case $operation === ':valid' && $control instanceof FormControl:
 			return "res = !this[" . json_encode($control->getHtmlName()) . "](sender);";
-
+        */
+        
 		case $operation === ':equal' && $control instanceof FormControl:
 			if ($control instanceof Checkbox) $arg = (bool) $arg;
 			$tmp = array();
