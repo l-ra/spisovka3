@@ -10,7 +10,8 @@ Nové funkce:
   Nyní může být uživatel pouze v jedné organizační jednotce.
 - E-podatelna - možnost nadefinovat více datových a emailových schránek
         a konkrétní schránku lze přiřadit určité organizační jednotce.
-  
+- nastavení e-mailové schránky - výběr protokolu nyní automaticky nastaví číslo portu
+        
 Opravy:
 
 - filtr dokumentů "Přidělené" zobrazoval nesprávně i dokumenty k převzetí

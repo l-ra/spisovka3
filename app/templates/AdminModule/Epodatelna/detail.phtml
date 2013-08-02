@@ -111,6 +111,21 @@
         {elseif $Typ == 'e'}
         {if ($FormUpravit=='1')}
         {control nastavitEmailForm}
+        <script type="text/javascript">
+
+            $('#frmnastavitEmailForm-typ').change(function () {
+                value = $("#frmnastavitEmailForm-typ").val();
+                port = $("#frmnastavitEmailForm-port");
+                ssl = value.indexOf('/ssl') >= 0;
+                
+                if ( value.indexOf('/pop3') >= 0) {
+                    port.val(ssl ? 995 : 110);
+                } else if ( value.indexOf('/imap') >= 0) {
+                    port.val(ssl ? 993 : 143);
+                }
+            })
+
+        </script>    
         {else}
         <dl class="detail_item">
             <dt>Protokol:</dt>

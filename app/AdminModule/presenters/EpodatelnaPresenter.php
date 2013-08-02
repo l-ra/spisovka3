@@ -508,12 +508,10 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 $org_select[$oj->id] = $oj->ciselna_rada . ' - ' . $oj->zkraceny_nazev;
 
         $typ_serveru = array(
-            ''=>'',
-            '/pop3/novalidate-cert'=>'POP3 (standardní port 110)',
-            '/pop3/ssl/novalidate-cert'=>'POP3-SSL (standardní port 995)',
-            '/imap/novalidate-cert'=>'IMAP (standardní port 143)',
-            '/imap/ssl/novalidate-cert'=>'IMAP+SSL (standardní port 993)',
-            '/nntp'=>'NNTP (standardní port 119)'
+            '/pop3/novalidate-cert'=>'POP3',
+            '/pop3/ssl/novalidate-cert'=>'POP3-SSL',
+            '/imap/novalidate-cert'=>'IMAP',
+            '/imap/ssl/novalidate-cert'=>'IMAP+SSL',
         );
 
         $form1 = new AppForm();
