@@ -2,14 +2,13 @@ var stop_timer = 0;
 var url;
 var cache = Array();
 
-// Datepicker
-$(function() {
+function InstallDatePicker() {
 
     /*
      * DatePicter - volba datumu z kalendare
      */
     var date = new Date();
-    var year = date.getYear() + 1900;
+    var year = date.getFullYear();
     var year_before = year - 15;
     var year_after = year + 2;
 
@@ -53,7 +52,12 @@ $(function() {
         currentText: 'Dnes',
         closeText: 'OK'
     });
+}
 
+$(function() {
+
+    InstallDatePicker();
+    
     /*
      * Nastaveni spinneru jako okenko pod kurzorem
      */

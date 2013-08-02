@@ -260,38 +260,8 @@
 
     <div id="dialog"></div>
 
-    <script type="text/javascript">
-        $(function() {
-            var date = new Date();
-            var year = date.getYear() + 1900;
-            var year_before = year - 15;
-            var year_after = year + 2;
-            $("input.datepicker").datepicker(
-            {
-                showButtonPanel: true,
-                changeMonth: true,
-                changeYear: true,
-                yearRange: year_before+':'+year_after,
-                dateFormat : "dd.mm.yy",
-                closeText:"Zrušit",
-                prevText:"Předchozí",
-                nextText:"Další",
-                currentText:"Dnes",
-                monthNames:["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"],
-                monthNamesShort:["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"],
-                dayNames:["Neděle","Pondělí","Úterý","Středa","Čtvrtek","Pátek","Sobota"],
-                dayNamesMin:["Ne","Po","Út","St","Čt","Pá","So"]
-            });
-            $('input.datetimepicker').datepicker(
-            {
-                duration: '',
-                changeMonth: true,
-                changeYear: true,
-                yearRange: '2007:2020',
-                showTime: true,
-                time24h: true,
-                currentText: 'Dnes',
-                closeText: 'OK'
-            });
-        });
-    </script>
+<script type="text/javascript">
+
+    InstallDatePicker();
+
+</script>
