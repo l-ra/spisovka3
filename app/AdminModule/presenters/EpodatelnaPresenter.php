@@ -220,9 +220,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addText('login', 'Přihlašovací jméno od ISDS:', 50, 100)
                 ->setValue($isds['login'])
                 ->addRule(Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
-        $form1->addText('password', 'Přihlašovací heslo ISDS:', 50, 100)
-                ->setValue($isds['password'])
-                ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
+        $form1->addPassword('password', 'Přihlašovací heslo ISDS:', 50, 100);
+                // ->setValue($isds['password'])
+                // ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
 
         $form1->addFile('certifikat_file', 'Cesta k certifikátu (formát X.509):');
         $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100)
@@ -309,10 +309,10 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $config_data['isds'][$index]['aktivni'] = $data['aktivni'];
             $config_data['isds'][$index]['typ_pripojeni'] = $data['typ_pripojeni'];
             $config_data['isds'][$index]['login'] = $data['login'];
-            $config_data['isds'][$index]['password'] = $data['password'];
-            if ( !empty($data['certifikat']) ) {
+            if ( !empty($data['password']) )
+                $config_data['isds'][$index]['password'] = $data['password'];
+            if ( !empty($data['certifikat']) )
                 $config_data['isds'][$index]['certifikat'] = $data['certifikat'];
-            }
             $config_data['isds'][$index]['cert_pass'] = $data['cert_pass'];
             $config_data['isds'][$index]['test'] = $data['test'];
             $config_data['isds'][$index]['podatelna'] = $data['podatelna'];
@@ -540,9 +540,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addText('login', 'Přihlašovací jméno:', 50, 100)
                 ->setValue($email['login'])
                 ->addRule(Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
-        $form1->addText('password', 'Přihlašovací heslo:', 50, 100)
-                ->setValue($email['password'])
-                ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
+        $form1->addPassword('password', 'Přihlašovací heslo:', 50, 100);
+                // ->setValue($email['password'])
+                // ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
 
 
         $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select)
@@ -586,7 +586,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $config_data['email'][$index]['port'] = $data['port'];
         $config_data['email'][$index]['inbox'] = $data['inbox'];
         $config_data['email'][$index]['login'] = $data['login'];
-        $config_data['email'][$index]['password'] = $data['password'];
+        if (!empty($data['password']))
+            $config_data['email'][$index]['password'] = $data['password'];
         $config_data['email'][$index]['podatelna'] = $data['podatelna'];
         $config_data['email'][$index]['only_signature'] = $data['only_signature'];
         $config_data['email'][$index]['qual_signature'] = $data['qual_signature'];
