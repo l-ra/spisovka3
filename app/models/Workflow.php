@@ -41,13 +41,12 @@ class Workflow extends BaseModel
         $rows = $this->fetchAllComplet($param);
         $rows = $rows->fetchAll();
 
-        if ( count($rows)>0 ) {
+        if ( count($rows) > 0 ) {
 
-            $UserModel = new UserModel();
             $Orgjednotka = new Orgjednotka();
             foreach ($rows as $index => &$wf) {
                 if ( !empty($wf->prideleno_id) ) {
-                    $osoba = $UserModel->getUser($wf->prideleno_id, 1);
+                    $osoba = UserModel::getUser($wf->prideleno_id, 1);
                     if ( $osoba ) {
                         $rows[$index]->prideleno_jmeno = Osoba::displayName($osoba->identity);
                         $wf->prideleno_info = $osoba->identity;
@@ -62,13 +61,9 @@ class Workflow extends BaseModel
             }
 
             return $rows;
-        } else {
-            return null;
         }
-
-
         
-
+        return null;
     }
 
     /**
@@ -116,7 +111,6 @@ class Workflow extends BaseModel
             $Dokument = new Dokument();
             $dokument_info = $Dokument->getInfo($dokument_id);
 
-            $UserModel = new UserModel();
             $user = Environment::getUser()->getIdentity();
 
             // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
@@ -136,7 +130,7 @@ class Workflow extends BaseModel
             $log = "";
             $log_spis = "";
             if ( $user_id ) {
-                $prideleno_info = $UserModel->getUser($user_id, 1);
+                $prideleno_info = UserModel::getUser($user_id, 1);
                 $data['prideleno_id'] = $prideleno_info->id;
                 $log = 'Dokument předán zaměstnanci '. Osoba::displayName($prideleno_info->identity) .'.';
                 $log_spis = 'Spis predan zamestnanci '. Osoba::displayName($prideleno_info->identity) .'.';
@@ -373,75 +367,63 @@ class Workflow extends BaseModel
         $user_identity = Environment::getUser()->getIdentity();
         $user_id = $user_identity->id;
 
-        if ( is_numeric($dokument_id) ) {
-
-            $predan_array = $this->dokument($dokument_id, 1);
-            $predan = is_array($predan_array)?$predan_array[0]:null;
-
-            if ( $predan ) {
-
-                $access = 0;
-                if ( empty($predan->prideleno_id) ) {
-                    if ( Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
-                        $access = 1;
-                    }
-                } else {
-                    if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
-                        $access = 1;
-                    }
-                }
-
-                if ( $access == 1 ) {
-
-                    //$transaction = (! dibi::inTransaction());
-                    //if ($transaction)
-                    //dibi::begin();
-
-                    // Deaktivujeme starsi zaznamy
-                    $this->deaktivovat($dokument_id);
-
-                    $Dokument = new Dokument();
-                    $dokument_info = $Dokument->getInfo($dokument_id);
-
-                    $data = array();
-                    $data['dokument_id'] = $dokument_info->id;
-                    $data['stav_dokumentu'] = 3;
-                    $data['aktivni'] = 1;
-
-                    $data['stav_osoby'] = 1;
-
-                    $data['prideleno_id'] = $user_id;
-                    $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
-
-                    $data['date'] = new DateTime();
-                    $data['user_id'] = $user_id;
-                    $data['poznamka'] = $predan->poznamka;
-                    $data['spis_id'] = $predan->spis_id;
-
-                    $result_insert = $this->insert($data);
-
-                    //if ($transaction)
-                    //dibi::commit();
-
-                    if ( $result_insert ) {
-
-                        $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_KVYRIZENI, 'Zaměstnanec '. $user_identity->display_name .' převzal dokument k vyřízení.');
-
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-
-        } else {
+        if ( !is_numeric($dokument_id) )
             return false;
+
+        $predan_array = $this->dokument($dokument_id, 1);
+        $predan = is_array($predan_array)?$predan_array[0]:null;
+
+        if ( !$predan )
+            return false;
+
+        $access = 0;
+        if ( empty($predan->prideleno_id) ) {
+            if ( Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
+                $access = 1;
+            }
+        } else {
+            if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
+                $access = 1;
+            }
         }
+
+        if ( $access != 1 )
+            return false;
+
+        // [P.L.] transakce je nutná, bez ní může dojít k poškození dat
+        dibi::begin();
+        try {
+            // Deaktivujeme starsi zaznamy
+            $this->deaktivovat($dokument_id);
+
+            $data = array();
+            $data['dokument_id'] = $dokument_id;
+            $data['stav_dokumentu'] = 3;
+            $data['aktivni'] = 1;
+
+            $data['stav_osoby'] = 1;
+
+            $data['prideleno_id'] = $user_id;
+            $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
+
+            $data['date'] = new DateTime();
+            $data['user_id'] = $user_id;
+            $data['poznamka'] = $predan->poznamka;
+            $data['spis_id'] = $predan->spis_id;
+
+            $this->insert($data);
+
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_KVYRIZENI, 'Zaměstnanec '. $user_identity->display_name .' převzal dokument k vyřízení.');
+
+            dibi::commit();
+        }
+        catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
+        
+        return true;
     }
 
     public function vyrizeno($dokument_id)
@@ -657,8 +639,7 @@ class Workflow extends BaseModel
                     // Deaktivujeme starsi zaznamy
                     $this->deaktivovat($dokument_id);
 
-                    $UserModel = new UserModel();
-                    $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
+                    $user_info = UserModel::getUser($user->getIdentity()->id, 1);
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
@@ -712,8 +693,7 @@ class Workflow extends BaseModel
                     // Deaktivujeme starsi zaznamy
                     $this->deaktivovat($dokument_id);
 
-                    $UserModel = new UserModel();
-                    $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
+                    $user_info = UserModel::getUser($user->getIdentity()->id, 1);
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
@@ -767,8 +747,7 @@ class Workflow extends BaseModel
                     // Deaktivujeme starsi zaznamy
                     $this->deaktivovat($dokument_id);
 
-                    $UserModel = new UserModel();
-                    $user_info = $UserModel->getUser($user->getIdentity()->id, 1);
+                    $user_info = UserModel::getUser($user->getIdentity()->id, 1);
 
                     $data = array();
                     $data['dokument_id'] = $dokument_info->id;
@@ -823,9 +802,6 @@ class Workflow extends BaseModel
 
                     // Deaktivujeme starsi zaznamy
                     //$this->deaktivovat($dokument_id);
-
-                    //$UserModel = new UserModel();
-                    //$user_info = $UserModel->getUser($user_id, 1);
 
                     $data = array();
                     $data['dokument_id'] = $dokument_id;
@@ -910,7 +886,6 @@ class Workflow extends BaseModel
     
     protected function posledne_prideleny($dokument_id)
     {
-        
         $param = array();
 
         $param['where'] = array( 
@@ -926,9 +901,9 @@ class Workflow extends BaseModel
 
         if ( $row ) {
 
-            /*$UserModel = new UserModel();
+            /*
             if ( !empty($row->prideleno_id) ) {
-                $osoba = $UserModel->getUser($row->prideleno_id, 1);
+                $osoba = UserModel::getUser($row->prideleno_id, 1);
                 if ( $osoba ) {
                     $row->prideleno_jmeno = Osoba::displayName($osoba->identity);
                     $row->prideleno_info = $osoba->identity;
@@ -936,11 +911,9 @@ class Workflow extends BaseModel
             }*/
 
             return $row;
-        } else {
-            return null;
-        }        
+        }
         
-        
+        return null;
     }
     
     /**

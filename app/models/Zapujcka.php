@@ -209,8 +209,6 @@ class Zapujcka extends BaseModel
 
     public function getInfo($zapujcka_id) {
 
-        $UserModel = new UserModel();
-
         $sql = array(
             'distinct'=>1,
             'from' => array($this->name => 'z'),
@@ -237,17 +235,10 @@ class Zapujcka extends BaseModel
         
         $select = $this->fetchAllComplet($sql);
         $result = $select->fetch();
-        if ( $result ) {
-
-
+        if ( $result )
             return $result;
 
-
-        } else {
-            return null;
-        }
-        
-        
+        return null;
     }
 
     public function getDokumentID($zapujcka_id) {
@@ -271,8 +262,6 @@ class Zapujcka extends BaseModel
     }    
     
     public function getDokument($dokument_id) {
-
-        $UserModel = new UserModel();
 
         $sql = array(
             'distinct'=>1,
@@ -300,17 +289,10 @@ class Zapujcka extends BaseModel
         
         $select = $this->fetchAllComplet($sql);
         $result = $select->fetch();
-        if ( $result ) {
-
-
+        if ( $result )
             return $result;
 
-
-        } else {
-            return null;
-        }
-        
-        
+        return null;
     }
     
     

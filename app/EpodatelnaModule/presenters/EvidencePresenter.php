@@ -193,8 +193,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         }
 
-        $UserModel = new UserModel();
-        $user = $UserModel->getUser(Environment::getUser()->getIdentity()->id, 1);
+        $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
         $this->template->Prideleno = Osoba::displayName($user->identity);
 
         $CJ = new CisloJednaci();
@@ -593,8 +592,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
                     
                     if ( !empty($data['predano_user']) ) {
-                        $User = new UserModel();
-                        $user_info = $User->getIdentity($data['predano_user']);
+                        $user_info = UserModel::getIdentity($data['predano_user']);
                         $predano = Osoba::displayName($user_info);
                     } else if ( !empty($data['predano_org']) ) {
                         $Org = new Orgjednotka();
@@ -701,8 +699,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
                     
                     if ( !empty($data['predano_user']) ) {
-                        $User = new UserModel();
-                        $user_info = $User->getIdentity($data['predano_user']);
+                        $user_info = UserModel::getIdentity($data['predano_user']);
                         $predano = Osoba::displayName($user_info);
                     } else if ( !empty($data['predano_org']) ) {
                         $Org = new Orgjednotka();

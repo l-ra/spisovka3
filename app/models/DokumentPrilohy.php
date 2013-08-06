@@ -29,17 +29,13 @@ class DokumentPrilohy extends BaseModel
             $sql['where'][] = array('dokument_id=%i',$dokument_id);
         }
 
-
-        if ( $detail == 1 ) {
-            $UserModel = new UserModel();
-        }
         $prilohy = array();
         $result = $this->fetchAllComplet($sql)->fetchAll();
         if ( count($result)>0 ) {
             foreach ($result as $joinFile) {
 
                 if ( $detail == 1 && !empty($joinFile->user_created) ) {
-                    $user = $UserModel->getUser($joinFile->user_created, 1);
+                    $user = UserModel::getUser($joinFile->user_created, 1);
                     $joinFile->user_name = Osoba::displayName($user->identity);
                 } else {
                     $joinFile->user_name = '';

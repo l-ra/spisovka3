@@ -228,8 +228,7 @@ class CisloJednaci extends BaseModel
             $info['org_poradi'] = $row->org_poradi;
 
             $info['user_id'] = $row->user_id;
-            $User = new UserModel();
-            $user_info = $User->getUser($row->user_id,true);
+            $user_info = UserModel::getUser($row->user_id,true);
 
             $info['user'] = $user_info->username;
             $info['prijmeni'] = String::webalize($user_info->identity->prijmeni);

@@ -42,20 +42,16 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $authenticator = $authenticator['Nette-Security-IAuthenticator'];
 
         $Osoba = new Osoba();
-        $User = new UserModel();
 
         $user = Environment::getUser()->getIdentity();
         
-        //Debug::dump($user);
-
-
         $osoba_id = $user->identity->id;
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
 
         // Zmena osobnich udaju
         $this->template->FormUpravit = $this->getParam('upravit',null);
 
-        $uzivatel = $User->getUser($user->id, true);
+        $uzivatel = UserModel::getUser($user->id, true);
         if ($uzivatel->org_nazev === '')
             $uzivatel->org_nazev = 'žádná';
         $this->template->Uzivatel = $uzivatel;
@@ -67,10 +63,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $Auth1->setAction('change_password');
         $this->addComponent($Auth1, 'auth_change_password');
 
-
         $role = UserModel::getRoles($uzivatel->id);
         $this->template->Role = $role;
-
     }
 
 /**
@@ -278,8 +272,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         if ( $novy == 1 ) {
             echo '###predano###'. $spis_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
 
-            $UserModel = new UserModel();
-            $osoba = $UserModel->getIdentity($user_id);
+            $osoba = UserModel::getIdentity($user_id);
             $Orgjednotka = new Orgjednotka();
             $org = $Orgjednotka->getInfo($orgjednotka_id);
 
@@ -333,8 +326,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         if ( $novy == 1 ) {
           echo '###predano###'. $dokument_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
 
-          $UserModel = new UserModel();
-          $osoba = $UserModel->getIdentity($user_id);
+          $osoba = UserModel::getIdentity($user_id);
           $Orgjednotka = new Orgjednotka();
           $org = $Orgjednotka->getInfo($orgjednotka_id);
 

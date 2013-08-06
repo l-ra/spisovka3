@@ -13,28 +13,29 @@ class UserModel extends BaseModel
      * @return DibiRow
      */
 
-    public function getUser($mixed,$identity = FALSE)
+    public static function getUser($mixed,$identity = FALSE)
     {
+        $instance = new self;
 
         /*
          * Ziskání uzivatele
          */
         if ( is_numeric($mixed) ) {
             // $mixed is numeric -> ID
-            $row = $this->fetchRow(array('id=%i',$mixed))->fetch();
+            $row = $instance->fetchRow(array('id=%i',$mixed))->fetch();
         } else {
             // $mixed is string -> username
-            $row = $this->fetchRow(array('username=%s',$mixed))->fetch();
+            $row = $instance->fetchRow(array('username=%s',$mixed))->fetch();
         }
 
-        if ( is_null($row) ) return null;
-        if ( !$row ) return null;
+        if ( is_null($row) || !$row)
+            return null;
 
         /*
          * Nacteni identity uzivatele
          */
         if ( $identity == TRUE ) {
-            $row->identity = $this->getIdentity($row->id);
+            $row->identity = self::getIdentity($row->id);
             $row->display_name = Osoba::displayName($row->identity);
             
             $row->org_nazev = $row->orgjednotka_id !== null 
@@ -46,10 +47,9 @@ class UserModel extends BaseModel
         /*
          * Nacteni roli uzivatele
          */
-        $user = new UserModel();
         $row->user_roles = self::getRoles($row->id);
 
-        return ($row) ? $row : NULL;
+        return $row;
     }
 
 
@@ -60,33 +60,28 @@ class UserModel extends BaseModel
      * @return DibiRow
      */
 
-    public function getIdentity($user_id)
+    public static function getIdentity($user_id)
     {
-
         $row = dibi::fetch('SELECT o.*
                             FROM [:PREFIX:'. self::OSOBA2USER_TABLE . '] ou
                             LEFT JOIN [:PREFIX:'. self::OSOBA_TABLE .'] o ON (o.id = ou.osoba_id)
                             WHERE ou.user_id=%i AND o.stav<10',$user_id);
 
         return ($row) ? $row : NULL;
-
     }
 
     public static function getRoles($user_id)
     {
-
         $rows = dibi::fetchAll('SELECT r.*
                                  FROM [:PREFIX:'. self::USER2ROLE_TABLE . '] ur
                                  LEFT JOIN [:PREFIX:'. self::ROLE_TABLE .'] r ON (r.id = ur.role_id)
                                  WHERE ur.user_id=%i',$user_id);
 
         return ($rows) ? $rows : NULL;
-
     }
 
     public function insert(array $data)
-    {
-        
+    {       
         $rown = array('username'=>$data['username'],
                       'password'=>sha1($data['username'] . $data['heslo']),
                       'date_created'=> new DateTime(),
@@ -95,7 +90,6 @@ class UserModel extends BaseModel
                 );
 
         return parent::insert($rown);
-
     }
 
     public function pridatUcet($user_id, $osoba_id, $role_id) {

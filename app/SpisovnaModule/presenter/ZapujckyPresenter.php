@@ -426,8 +426,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         }
         
         if ( $user_id ) {
-            $User = new UserModel();
-            $user_info = $User->getIdentity($user_id);
+            $user_info = UserModel::getIdentity($user_id);
             $osoba = Osoba::displayName($user_info);
         } else {
             $user = Environment::getUser();

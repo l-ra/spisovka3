@@ -306,18 +306,14 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     protected function createComponentRoleForm()
     {
-
         $osoba = $this->template->Osoba;
         
-        $user = $this->template->Uzivatel;
-
         if ( isset($_POST['user_id']) ) {
             $user_id = $_POST['user_id'];
         } else {
             $user_id = $this->getParam('role', null);
         }
 
-        $User = new UserModel();
         $user_role = UserModel::getRoles($user_id);
 
         $Role = new RoleModel();
@@ -377,7 +373,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         unset($data['osoba_id'],$data['user_id'],$data['add_role'],$data['role']);
 
-        $User = new UserModel();
         $UserRole = new User2Role();
 
         $user_role = UserModel::getRoles($user_id);

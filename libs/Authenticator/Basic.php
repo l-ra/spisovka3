@@ -18,7 +18,7 @@ class Authenticator_Basic extends Control implements IAuthenticator
         // Vyhledani uzivatele
         $user = new UserModel();
         $log = new LogModel();
-        $row = $user->getUser($username,true);
+        $row = UserModel::getUser($username,true);
 
         //Debug::dump($row); //exit;
 

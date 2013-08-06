@@ -32,7 +32,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
         // Vyhledani uzivatele
         $user = new UserModel();
         $log = new LogModel();
-        $row = $user->getUser($username,true);
+        $row = UserModel::getUser($username,true);
 
         //Debug::dump($row); //exit;
 
@@ -467,8 +467,7 @@ class Authenticator_SSO extends Control implements IAuthenticator
             $user_id = Environment::getUser()->getIdentity()->id;
         }
 
-        $User = new UserModel();
-        $user_info = $User->getUser($user_id);
+        $user_info = UserModel::getUser($user_id);
         $local = @$user_info->local;
 
         $form->addSelect('local', "Způsob přihlášení:",

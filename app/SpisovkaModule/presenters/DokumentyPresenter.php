@@ -1071,8 +1071,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         }
 
-        $UserModel = new UserModel();
-        $user = $UserModel->getUser(Environment::getUser()->getIdentity()->id, 1);
+        $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
         $this->template->Prideleno = Osoba::displayName($user->identity);
 
         $CJ = new CisloJednaci();
@@ -1126,8 +1125,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $prilohy  = $DokumentPrilohy->prilohy($dok_odpoved->id,null,1);
                 $this->template->Prilohy = $prilohy;
 
-                $UserModel = new UserModel();
-                $user = $UserModel->getUser(Environment::getUser()->getIdentity()->id, 1);
+                $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
                 $this->template->Prideleno = Osoba::displayName($user->identity);
 
                 $CJ = new CisloJednaci();
@@ -1219,8 +1217,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $prilohy_new  = $DokumentPrilohy->prilohy($dok_odpoved->id,1);
                     $this->template->Prilohy = $prilohy_new;
 
-                    $UserModel = new UserModel();
-                    $user = $UserModel->getUser(Environment::getUser()->getIdentity()->id, 1);
+                    $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
                     $this->template->Prideleno = Osoba::displayName($user->identity);
 
                     $CJ = new CisloJednaci();
@@ -1981,7 +1978,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $dokument_id = $data['id'];
-        $UserModel = new UserModel();
         
         // Pozn. $add je stary kod, neni pouzito
         if ( $data['udalost_typ'] == 1 && !empty($data['datum_spousteci_udalosti']) ) {

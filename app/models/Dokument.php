@@ -1328,8 +1328,6 @@ class Dokument extends BaseModel
 
     public function getInfo($dokument_id, $detail = 0, $dataplus = null) {
 
-        $UserModel = new UserModel();
-
         $sql = array(
         
             'distinct'=>null,

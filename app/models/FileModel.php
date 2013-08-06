@@ -17,8 +17,7 @@ class FileModel extends BaseModel
 
         if ( $row ) {
 
-            $UserModel = new UserModel();
-            $user = $UserModel->getIdentity($row->user_created);
+            $user = UserModel::getIdentity($row->user_created);
             $row->user_name = Osoba::displayName($user);
             $row->typ_name = FileModel::typPrilohy($row->typ, 1);
             // Ignoruj mime-type ulozeny v databazi (nastaveny pri nahrani prilohy) a zjisti jej pokazde znovu
@@ -45,11 +44,10 @@ class FileModel extends BaseModel
         $select = $this->fetchAll(array('nazev'));
         $rows = $select->fetchAll();
 
-        $UserModel = new UserModel();
         $tmp = array();
         foreach ($rows as $file) {
             
-            $user = $UserModel->getIdentity($file->user_created);
+            $user = UserModel::getIdentity($file->user_created);
             $file->user_name = Osoba::displayName($user);
             $file->typ_name = FileModel::typPrilohy($file->typ, 1);
             // Nahrazeni online mime-type
