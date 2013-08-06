@@ -283,7 +283,7 @@ class Workflow extends BaseModel
         $data = array();
         $data['stav_osoby'] = 1;
         $data['date'] = new DateTime();
-        $data['user_id'] = $user->id;
+        $data['user_id'] = $data['prideleno_id'] = $user->id;
         $data['aktivni'] = 1;
 
         $Dokument = new Dokument();
@@ -337,7 +337,7 @@ class Workflow extends BaseModel
                     $data_other['stav_osoby'] = 1;
                     $data_other['spis_id'] = $spis->id;
                     $data_other['date'] = new DateTime();
-                    $data_other['user_id'] = $user->id;
+                    $data_other['user_id'] = $data['prideleno_id'] = $user->id;
                     $data_other['aktivni'] = 1;
 
                     $where = array('id=%i',$dokument_other->predano->id);

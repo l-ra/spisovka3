@@ -24,6 +24,8 @@ Opravy:
 - chyby projevující se při použití prohlížeče Internet Explorer:
     - oprava chybové zprávy při vytváření zápůjčky
     - v prvku formuláře pro výběr datumu se nabízel rok 3898 místo 2013
+- převzetí dokumentu předaného na organizační jednotku nenastavilo
+  nového vlastníka dokumentu    
         
 === Ver. 3.3.4 =================================================================
 
