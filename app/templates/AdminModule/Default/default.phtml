@@ -2,7 +2,7 @@
 {block content}
 <h2>Vítejte v administraci</h2>
 
-{if $NovaVerze['aktualni']==0}
+{if !$KontrolaNovychVerzi['je_aktualni']}
 <div id="flash_version">
     <strong>Je k dispozici nová verze!</strong>
     <br /><br />
@@ -11,7 +11,7 @@
     Přejděte na stránky OSS Spisové služby a stáhněte si aktualizační balík. Poté proveďte aktualizaci dle přiložených pokynů.
     
     <br /><br />
-    Vaše současná verze je <strong>{$NovaVerze['soucasna_verze']}</strong>. Nová verze je <strong>{$NovaVerze['aktualni_verze']}</strong>.
+    Vaše současná verze je <strong>{$KontrolaNovychVerzi['soucasna_verze']}</strong>. Nová verze je <strong>{$KontrolaNovychVerzi['dostupna_verze']}</strong>.
     
 </div>
 {/if}

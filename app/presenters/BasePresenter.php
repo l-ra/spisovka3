@@ -147,8 +147,6 @@ abstract class BasePresenter extends Presenter
         }
         $this->template->registerHelper('num', 'num');
 
-
-
         // Nastaveni title
         if ( !isset( $this->template->title ) ) {
             $this->template->title = "";
@@ -156,17 +154,15 @@ abstract class BasePresenter extends Presenter
 
         // module : presenter : view
         $this->template->view = $this->view;
-	$a = strrpos($this->name, ':');
-	if ($a === FALSE) {
+        $a = strrpos($this->name, ':');
+        if ($a === FALSE) {
             $this->template->module = '';
             $this->template->presenter = $this->name;
-	} else {
+        } else {
             $this->template->module = substr($this->name, 0, $a + 0);
             $this->template->presenter = substr($this->name, $a + 1);
-	}
+        }
 
-
-        //if (DEBUG_ENABLE) {
         if (DEBUG_ENABLE && in_array('programator', Environment::getUser()->getRoles())) {
             $this->template->debuger = TRUE;
         } else {
@@ -197,26 +193,27 @@ abstract class BasePresenter extends Presenter
             $this->setLayout('db');
         } else if ( $this->name == "Spisovka:Uzivatel" && $this->view == "login" ) {
             $this->setLayout('login');
-        } else if ( $this->template->module == "Admin" ) {
-            if ( $this->getParam("is_ajax") ) {
-                $this->setLayout(false);
-            } else {
-                $this->setLayout('admin');
-            }
-        } else if ( $this->template->module == "Spisovna" ) {
-            if ( $this->getParam("is_ajax") ) {
-                $this->setLayout(false);
-            } else {
-                $this->setLayout('spisovna');
-            }
-        } else if ( $this->template->module == "Epodatelna" ) {
-            if ( $this->getParam("is_ajax") ) {
-                $this->setLayout(false);
-            } else {
-                $this->setLayout('epodatelna');
-            }
         }
-
+        // Poznamka: Modul Spisovka ma nastaven vychozi layout nazvany "layout"
+        else switch ($this->template->module) {
+            case "Admin":
+                $this->setLayout('admin');
+                break;
+            case "Spisovna":
+                $this->setLayout('spisovna');
+                break;
+            case "Epodatelna":
+                $this->setLayout('epodatelna');
+                break;
+            case "Spisovka":
+                if ($this->template->presenter == "Zpravy")
+                    $this->setLayout('zpravy');
+                break;
+        }
+                
+        if ($this->getParam("is_ajax"))
+            $this->setLayout(false);
+        
         if (IS_SIMPLE_ROUTER == 1) {
             $helpUri = "?presenter=Spisovka:Napoveda&";
             $helpUri .= strtolower("param1={$this->template->module}&param2={$this->template->presenter}&param3={$this->view}");
@@ -236,7 +233,7 @@ abstract class BasePresenter extends Presenter
             $app_info = array('3.x','rev.X','OSS Spisová služba v3','1270716764');
         }
         $this->template->AppInfo = $app_info;
-        $this->template->NovaVerze = Zprava::je_aktualni();
+        $this->template->KontrolaNovychVerzi = UpdateAgent::je_aplikace_aktualni();
         
         $this->template->klientUri = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
         
@@ -256,26 +253,20 @@ abstract class BasePresenter extends Presenter
             $this->template->user = $user->getIdentity();
             
             /**
-             * Zobrazeni zprav uzivateli
+             * Upozorneni o zpravach uzivateli
             */
+            $this->template->zpravy_pocet_neprectenych = 0;
             if ($user->isAllowed('Spisovka_ZpravyPresenter')) {
-                $Zprava = new Zprava();
-                $this->template->zpravy = $Zprava->hlasky();            
+                // zjisti kolik ma uzivatel neprectenych zprav
+                $this->template->zpravy_pocet_neprectenych = 5;
             }
-            else
-                $this->template->zpravy = array();
+                
         } else {
             $ident = new stdClass();
             $ident->name = "Nepřihlášen";
             $ident->user_roles = array();
             $this->template->user = $ident;
         }
-        
-
-        
-        
-        
-        
 
     }
     

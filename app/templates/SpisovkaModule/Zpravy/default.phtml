@@ -4,18 +4,7 @@
     
     {if count($seznam)>0}
         {foreach $seznam as $zprava}
-        <div class="flash_infozprava{if $zprava['precteno']!=0}_item{/if}">
-            <strong>{if empty($zprava['zobrazit_od'])}{$zprava['date_created']|edate}{else}{$zprava['zobrazit_od']|edate}{/if} od {if !$zprava['user_created']}Informační zpráva OSS Spisové služby (www.spisovka3.cz){else}{$zprava['od']}{/if}</strong>
-            <p>
-            {!$zprava['zprava']}
-            </p>
-            <p class="flash_action">
-                {if $zprava['precteno']==71}
-                <a href="{link :Spisovka:Zpravy:skryt, 'id'=>$zprava['id']}">Skrýt zprávu</a>
-                {elseif $zprava['precteno']==""}
-                <a href="{link :Spisovka:Zpravy:precteno, 'id'=>$zprava['id']}">Označit za přečtenou</a>
-                {/if}
-            </p>
+        <div class="flash_infozprava">
         </div>
         {/foreach}
     {widget vp}

@@ -1,72 +1,48 @@
 <?php
 
 class Spisovka_ZpravyPresenter extends BasePresenter {
-
-    public $backlink = '';
-    
+   
+    // Zobrazi neprectene zpravy
     public function renderDefault()
     {
+        $this->zobrazZpravy(true);
+    }
+    
+    // Zobrazi vsechny, to je i prectene zpravy
+    public function renderVsechny()
+    {
+        $this->zobrazZpravy(false);
 
-        $user_config = Environment::getVariable('user_config');
+        // Pouzij spolecnou sablonu
+        $this->setView('default');
+    }
+
+    protected function zobrazZpravy($jen_neprectene)
+    {
+        /* $user_config = Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
-        $Zprava = new Zprava();
-        $result = $Zprava->nacti();
+
+        $result = Zpravy::nacti();
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        
+        */
+
+        $seznam = array();
         $this->template->seznam = $seznam;
-        
     }
     
-    public function actionPrectena($backlink)
+    // Melo by byt implementovano jako Ajax akce
+    public function actionPrecteno()
     {
-        
         $id = $this->getParam('id');
         if ( $id ) {
-            $Zprava = new Zprava();
-            $Zprava->precteno($id);
+            // $Zpravy = new Zpravy();
+            // $Zpravy->precteno($id);
+            echo 'OK';
         }
-        
-        $this->backlink = $backlink;
-        $this->redirect(':Spisovka:Dokumenty:default');
-    }
-    
-    public function actionPrecteno($backlink)
-    {
-        
-        $id = $this->getParam('id');
-        if ( $id ) {
-            $Zprava = new Zprava();
-            $Zprava->precteno($id);
-        }
-        
-        $this->backlink = $backlink;
-        $this->redirect(':Spisovka:Zpravy:default');
-    }    
-    
-    public function actionSkryt($backlink)
-    {
-        
-        $id = $this->getParam('id');
-        if ( $id ) {
-            $Zprava = new Zprava();
-            $Zprava->skryt($id);
-        }
-        
-        $this->backlink = $backlink;
-        $this->redirect(':Spisovka:Zpravy:default');
-    }    
-
-    public function actionNacti()
-    {
-        
-        /* Kontrola novych zprav z webu pres ajax */
-        Zprava::informace_z_webu();
         exit;
-        
     }
-    
-}
 
+}
