@@ -23,14 +23,9 @@
 
 <div id="layout">
     <div id="menu">
-        {access :Spisovka:Dokumenty:}<a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a>{/access}
-        {access :Spisovka:Dokumenty:}<a href="{link :Spisovka:Dokumenty:novy}">Nový dokument</a>{/access}
-        {access :Spisovka:Spisy:}<a href="{link :Spisovka:Spisy:default}">Spisy</a>{/access}
-        {access :Spisovka:Sestavy:}<a href="{link :Spisovka:Sestavy:default}">Sestavy</a>{/access}
-        {access :Spisovka:Vypravna:}<a href="{link :Spisovka:Vypravna:default}">K odeslání</a>{/access}
+        <a href="{link default}">Nepřečtené</a>
+        <a href="{link vsechny}">Všechny</a>
     </div>
-
-{include zpravy.phtml}    
     
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}
@@ -86,10 +81,9 @@
 <div id="layout_bottom">
     <div id="bottom">
         <strong>{$AppInfo[2]}</strong><br/>
-        {if !$KontrolaNovychVerzi['je_aktualni']}<span style="color:#880000;"><strong>Je k dispozici nová verze aplikace číslo {$KontrolaNovychVerzi['dostupna_verze']}</strong></span><br />{/if}
+        {if $NovaVerze['aktualni']==0}<span style="color:#880000;"><strong>Je k dispozici nová verze!</strong> Vaše současná verze je {$NovaVerze['soucasna_verze']}. Nová verze je {$NovaVerze['aktualni_verze']}</span><br />{/if}
         Na toto dílo se vztahuje licence {!$licence}
     </div>
 </div>
-    <script type="text/javascript"> ajaxcron(); </script>
 </body>
 </html>

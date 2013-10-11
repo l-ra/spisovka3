@@ -41,6 +41,9 @@
         {accessrole skartacni_dohled,skartacni_rizeni,superadmin}<a href="{link :Spisovna:Dokumenty:skartace}">Skartační řízení</a>{/accessrole}
 
     </div>
+
+    {include zpravy.phtml}    
+
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}
     </div>

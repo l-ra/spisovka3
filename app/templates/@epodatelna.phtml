@@ -30,6 +30,9 @@
         {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:prichozi}">Příchozí zprávy</a>{/access}
         {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:odchozi}">Odchozí zprávy</a>{/access}
     </div>
+
+    {include zpravy.phtml}    
+
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}
     </div>

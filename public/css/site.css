@@ -676,13 +676,8 @@ label.required {
     background: #ffcccc url('../images/icons/dialog-error.png') 10px 5px no-repeat;
 }
 
-.flash_infozprava {
-    margin-bottom: 5px;
-    padding: 15px 5px 5px 50px;
-    text-align: left;
-    /*color: #03406A;*/
-    border: 1px #03406A solid;
-    background: #8FBAD9 url('../images/icons/subjekt_ao.png') 10px 5px no-repeat;
+#upozorneni_na_nove_zpravy {
+    padding: 10px 20px;
 }
 
 .flash_infozprava_item {
