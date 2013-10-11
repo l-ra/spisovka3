@@ -5,23 +5,23 @@
 class Spisovka_CronPresenter extends Presenter
 {
 
-
     public function renderDefault()
     {
     }
 
-    public function actionAjax()
+    public function actionSpustit()
     {
         
         /* Kontrola novych zprav z webu */
-        Zprava::informace_z_webu();
+        UpdateAgent::update(UpdateAgent::CHECK_NOTICES);
 
         /* Kontrola nove verze */
-        Zprava::aktualni_verze();
+        UpdateAgent::update(UpdateAgent::CHECK_NEW_VERSION);
+        
+        // Zjisti, kdy naposledy byly odeslany informace o uzivateli a po uplynuti urciteho intervalu je odesli znovu
+        //BonzAgent::bonzuj();
         
         exit;
-    }
-
-    
+    }   
     
 }
