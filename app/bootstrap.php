@@ -44,6 +44,7 @@ if ( $unique_info === FALSE ) {
 } else {
     Environment::setVariable('unique_info', $unique_info);
 }
+unset($unique_info);
 
 Environment::loadConfig(CLIENT_DIR .'/configs/system.ini');
 $user_config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
@@ -57,6 +58,7 @@ $app_info = @file_get_contents(APP_DIR .'/configs/version');
 // trim the EOL character
 $app_info = trim($app_info);
 Environment::setVariable('app_info', $app_info);
+unset($app_info);
 
 // 2c) check if directory /app/temp is writable
 Environment::setVariable('tempDir',CLIENT_DIR .'/temp');
@@ -143,101 +145,109 @@ if ( isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On'
 }
 
 if ( $cool_url ) {
-        define('IS_SIMPLE_ROUTER',0);
-        $router[] = new Route('index.php', array(
+    define('IS_SIMPLE_ROUTER',0);
+    
+    $router[] = new Route('index.php', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
                 'action' => 'default',
-	), Route::ONE_WAY);
+                ), Route::ONE_WAY);
         
 	$router[] = new Route('instalace.php', array(
                 'module'    => 'Install',
                 'presenter' => 'Default',
                 'action' => 'uvod',
-	), Route::ONE_WAY); 
+                ), Route::ONE_WAY); 
 	
-        $router[] = new Route('kontrola.php', array(
+    $router[] = new Route('kontrola.php', array(
                 'module'    => 'Install',
                 'presenter' => 'Default',
                 'action' => 'kontrola',
                 'no_install' => 1
-	), Route::ONE_WAY);        
+                ), Route::ONE_WAY);        
 
 	// Uzivatel
-        $router[] = new Route('uzivatel/<action>/<id>', array(
+    $router[] = new Route('uzivatel/<action>/<id>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Uzivatel',
-		'action' => 'default',
-		'id' => NULL,
-	));
+                'action' => 'default',
+                'id' => NULL,
+                ));
 	// Help
-        $router[] = new Route('napoveda/<param1>/<param2>/<param3>', array(
+    $router[] = new Route('napoveda/<param1>/<param2>/<param3>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Napoveda',
-		'action' => 'default',
-		'param1' => 'obsah',
+                'action' => 'default',
+                'param1' => 'obsah',
                 'param2' => 'param2',
                 'param3' => 'param3'
-	));
+                ));
 	// Error
-        $router[] = new Route('error/<action>/<id>', array(
+    $router[] = new Route('error/<action>/<id>', array(
                 /*'module'    => 'Spisovka',*/
                 'presenter' => 'Error',
-		'action' => 'default',
-		'id' => NULL,
-	));
+                'action' => 'default',
+                'id' => NULL,
+                ));
 
-        // Admin module
-        $router[] = new Route('admin/<presenter>/<action>/<id>/<params>', array(
+    // Admin module
+    $router[] = new Route('admin/<presenter>/<action>/<id>/<params>', array(
                 'module'    => 'Admin',
                 'presenter' => 'Default',
                 'action'    => 'default',
                 'id'        => null,
                 'params'    => null
-        ));
-        // E-podatelna module
-        $router[] = new Route('epodatelna/<presenter>/<action>/<id>', array(
+                ));
+    // E-podatelna module
+    $router[] = new Route('epodatelna/<presenter>/<action>/<id>', array(
                 'module'    => 'Epodatelna',
                 'presenter' => 'Default',
                 'action'    => 'default',
                 'id'        => null
-        ));
-        // Spisovna module
-        $router[] = new Route('spisovna/<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|prijem|keskartaciseznam|skartace|reset>', array(
+                ));
+    // Spisovna module
+    $router[] = new Route('spisovna/<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|prijem|keskartaciseznam|skartace|reset>', array(
                 'module'    => 'Spisovna',
                 'presenter' => 'Default',
-		'action' => 'default',
-		'id' => NULL,
-	));
-        $router[] = new Route('spisovna/<presenter>/<id>/<action>', array(
+                'action' => 'default',
+                'id' => NULL,
+                ));
+    $router[] = new Route('spisovna/<presenter>/<id>/<action>', array(
                 'module'    => 'Spisovna',
                 'presenter' => 'Default',
                 'action'    => 'detail',
                 'id'        => null
-        ));
-        // Install module
-        $router[] = new Route('install/<action>/<id>/<params>', array(
+                ));
+    // Install module
+    $router[] = new Route('install/<action>/<id>/<params>', array(
                 'module'    => 'Install',
                 'presenter' => 'Default',
                 'action'    => 'default',
                 'id'        => null,
                 'params'    => null
-        ));
+                ));
 
-        $router[] = new Route('<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|reset|filtrovat>', array(
+    $router[] = new Route('zpravy/<action>/<id>', array(
+                'module'    => 'Spisovka',
+                'presenter' => 'Zpravy',
+                'action' => 'default',
+                'id' => NULL,
+                ));
+                
+    $router[] = new Route('<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|reset|filtrovat|spustit>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
-		'action' => 'default',
-		'id' => NULL,
-	));
+                'action' => 'default',
+                'id' => NULL,
+                ));
 
-	// Basic router
-        $router[] = new Route('<presenter>/<id>/<action>', array(
+    // Basic router
+    $router[] = new Route('<presenter>/<id>/<action>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
-		'action' => 'detail',
-		'id' => NULL,
-	));
+                'action' => 'detail',
+                'id' => NULL,
+                ));
         
 } else {
         define('IS_SIMPLE_ROUTER',1);

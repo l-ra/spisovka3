@@ -455,9 +455,9 @@ ajaxcron = function () {
 	
     baseUri = baseUri.replace('/public','');
     if ( is_simple == 1 ) {
-        var url = baseUri + '?presenter=Spisovka%3Acron&id=0&action=ajax';
+        var url = baseUri + '?presenter=Spisovka%3Acron&action=spustit';
     } else {    
-        var url = baseUri + 'cron/0/ajax';
+        var url = baseUri + 'cron/spustit';
     }
     //alert( url );
 
