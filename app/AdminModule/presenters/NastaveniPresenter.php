@@ -3,6 +3,15 @@
 class Admin_NastaveniPresenter extends BasePresenter
 {
 
+    static public $ciselnik_zpusoby_uhrad = array(
+            '' => 'neurčeno - vyplním ručně na každém archu',
+            'v hotovosti',
+            'převodem',
+            'výplatním strojem',
+            'Kreditem',
+            'poštovními známkami',
+        );
+    
     public function renderDefault()
     {
 
@@ -17,6 +26,9 @@ class Admin_NastaveniPresenter extends BasePresenter
         $this->template->Nastaveni = $user_config->nastaveni;
 
         $this->template->Ukazka = $CJ->generuj();
+
+        $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
+        $this->template->zpusob_uhrady = Settings::get('Ceska_posta_zpusob_uhrady', '');
 
         // Zmena udaju
         $this->template->FormUpravit = $this->getParam('upravit',null);
@@ -223,6 +235,14 @@ class Admin_NastaveniPresenter extends BasePresenter
         $form1->addRadioList('typ_pristupu', 'Typ přístupu k dokumentům:', $typ)
                 ->setValue( Orgjednotka::jePristupNaUrovniJednotky() ? 1 : 0 );
 
+        $form1->addText('cislo_zakaznicke_karty', 'Číslo Zákaznické karty:', 13, 13)
+                ->setValue( Settings::get('Ceska_posta_cislo_zakaznicke_karty', '') )
+                ->addRule(Form::INTEGER, 'Chybné číslo karty.');
+
+        $form1->addRadioList('zpusob_uhrady', 'Způsob úhrady:', self::$ciselnik_zpusoby_uhrad)
+                ->setValue( array_search(Settings::get('Ceska_posta_zpusob_uhrady', ''),
+                            self::$ciselnik_zpusoby_uhrad));
+
         $form1->addSubmit('upravit', 'Uložit')
                  ->onClick[] = array($this, 'nastavitClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -256,9 +276,12 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         Environment::setVariable('user_config', $config_modify);
 
+        Settings::set('Ceska_posta_cislo_zakaznicke_karty', $data['cislo_zakaznicke_karty']);
+        Settings::set('Ceska_posta_zpusob_uhrady', $data['zpusob_uhrady'] === ''
+                ? '' : self::$ciselnik_zpusoby_uhrad[$data['zpusob_uhrady']]);
+
         $this->flashMessage('Obecné nastavení bylo upraveno.');
         $this->redirect('this');
     }
     
-
 }

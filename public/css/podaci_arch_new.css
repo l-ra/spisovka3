@@ -3,14 +3,14 @@ body {
     margin: 0px;
     padding: 0px;
     text-align: left;
-    font-family: "Times New Roman", serif;
+    font-family: "DejaVuSerifCondensed";
     font-size: 9pt;
 }
 
 h1 {
     text-align: left;
-    font-size: 11pt;
-    font-weight: normal;
+    font-size: 16pt;
+    font-weight: bold;
 }
 
 p {
@@ -32,15 +32,23 @@ table.header {
     margin-bottom: 0px;
 }
 
+table.footer {
+    border: 0px solid;
+}
+
 table.header td {
     border: 0px;
     text-align: left;
     height: 40px;
+    padding-left: 0px;
+}
+
+table.footer  td {
+    border: 0px solid;
 }
 
 div.placeno {
-    text-align: right;
-    padding: 1px 10px;
+    padding: 2px 0px;
 }
 
 div.pod {
@@ -87,8 +95,8 @@ th {
 }
 
 /* styly pro prvky TD */
-.d1 { width: 280px; }
-.d2 { width: 255px; }
+.d1 { width: 146px; }
+.d2 { width: 50%; padding-right: 15mm; font-size: 7pt; }
 .w1 { width: 12.5mm; }
 .w2 { width: 59mm; border-right: 3px solid; }
 .w3 { width: 50mm; }
@@ -98,3 +106,15 @@ th {
 
 .right { text-align: right; }
 
+.cislo_karty {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+div.spacer{
+    height: 8px;
+}
+
+#zpusob_uhrady{
+    font-weight: bold;
+}

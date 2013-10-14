@@ -53,18 +53,26 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->template->zobraz_zrusit_filtr = !empty($filtr);
         
         // Volba vystupu - web/tisk/pdf
-        if ( $this->getParam('print') ) {
+        /* if ( $this->getParam('print') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             $seznam = $Dokument->kOdeslani($seradit, $hledat, "doporucene");
             $this->template->count_page = ceil(count($seznam)/10);
             
             $this->setLayout(false);
             $this->setView('podaciarchnew');
-        } elseif ( $this->getParam('pdfprint') ) {
+        }*/
+        if ( $this->getParam('pdfprint') ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             $seznam = $Dokument->kOdeslani($seradit, $hledat, "doporucene");
             $this->pdf_output = 1;
             $this->template->count_page = ceil(count($seznam)/10);
+
+            $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
+            $this->template->zpusob_uhrady = Settings::get('Ceska_posta_zpusob_uhrady', '');
+            
+            $ciselnik = Admin_NastaveniPresenter::$ciselnik_zpusoby_uhrad;
+            array_shift($ciselnik);
+            $this->template->zpusoby_uhrad = $ciselnik;
             
             $this->setLayout(false);
             $this->setView('podaciarchnew');
@@ -127,11 +135,12 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 $content = str_replace("<td", "<td valign='top'", $content);
                 
+                // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
                 if ( $this->pdf_output == 2 ) {
                     $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
                 } else {
                     $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica',
-                                7, 9, 5, 6, 0, 0);
+                                7, 9, 8, 6, 0, 0);
                 }
                 
                 $app_info = Environment::getVariable('app_info');

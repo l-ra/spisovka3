@@ -14,26 +14,30 @@
 {for $p=1;$p<=$count_page;$p++}     
 <table class="header">
     <tr>
+        <td><h1>Podací arch</h1></td>
         <td class="d1"><img src="{$baseUri}images/ceska_posta1.png" widht="146" height="20" /></td>
-        <td><h1>POŠTOVNÍ PODACÍ ARCH</h1></td>
     </tr>
 </table>
 
-<p>Podavatel: <strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
-<p>Odesílatel: <strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
-    
-<div class="placeno">
-Placeno v hotovosti/Placeno převodem/Výplatní stroj (* Nehodící se škrtněte)
-</div>
+<p>Podavatel:&nbsp;&nbsp;<strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
+<p>Odesílatel:&nbsp;&nbsp;<strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
+
+<div class="spacer"></div>
+<p>Číslo Zákaznické karty odesílatele:&nbsp;&nbsp;<span class="cislo_karty">{$cislo_zakaznicke_karty}</span></p>
+<p class="placeno">
+Úhrada:&nbsp;&nbsp;{if $zpusob_uhrady != ''}<span id="zpusob_uhrady">{$zpusob_uhrady}</span>{else}
+{foreach $zpusoby_uhrad as $z}□&nbsp;{$z}&nbsp;&nbsp;&nbsp;{/foreach}{/if}
+</p>
+<div class="spacer"></div>
     
 <table>
     <tr>
         <th class="w1">Poř. číslo</th>
         <th class="w2">Podací znaky</th>
-        <th class="w3">Adresát - jméno, příjmení,<br> ulice, číslo domu,<br> PSČ, místo určení,<br> telefonní kontakt, email <sup>1)</sup></th>
-        <th class="w4">Dobírka <sup>1)</sup></th>
-        <th class="w5">Udaná cena <sup>2)</sup></th>
-        <th class="w6">Poznámka,<br> doplňkové služby <sup>1)</sup></th>
+        <th class="w3">Adresát - jméno, příjmení, ulice, číslo domu, PSČ, místo určení, tel. kontakt, email</th>
+        <th class="w4">Dobírka</th>
+        <th class="w5">Udaná cena<sup>*</sup></th>
+        <th class="w6">Poznámka,<br> doplňkové služby</th>
     </tr>
 {for $i=(($p-1)*10);$i < (($p)*10);$i++}  
     <tr>
@@ -51,17 +55,14 @@ Placeno v hotovosti/Placeno převodem/Výplatní stroj (* Nehodící se škrtně
 {/for}
 </table>
 
-<table class="header">
+<table class="footer">
     <tr>
-        <td>Česká pošta, s.p., IČ 47114983</td>
-        <td class="d2">Potvrzení pošty (otisk razítka APOST)</td>
+        <td class="d2">* V případě zásilek, u kterých v souladu se zněním Poštovních nebo
+Obchodních podmínek České pošty odesílatel neuvádí udanou cenu,
+se sloupec Udaná cena nevyplňuje.</td>
+        <td>Potvrzení pošty:</td>
     </tr>
 </table>
-<ol class="poznamky">
-    <li>Vyplní odesílatel</li>
-    <li>U Doporučených zásilek – standard, Doporučených zásilek, Doporučených zásilek do zahraničí, Doporučených slepeckých zásilek a
-Doporučených slepeckých zásilek do zahraničí se neuvádí a sloupec se proškrtne.</li>
-</ol>
 {if $p!=$count_page}<pagebreak />{/if}
 {/for}
 </body>

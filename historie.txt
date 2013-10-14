@@ -14,6 +14,8 @@ Nové funkce:
         
 Opravy:
 
+- aktualizován poštovní podací arch. Dále je možné specifikovat číslo zákaznické
+  karty a způsob platby (nastavuje se v administraci).
 - filtr dokumentů "Přidělené" zobrazoval nesprávně i dokumenty k převzetí
 - filtr "Na kterých jsem kdy pracoval" a "Na kterých pracovala moje o.j."
   zobrazoval i dokumenty k převzetí

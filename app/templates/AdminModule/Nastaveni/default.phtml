@@ -5,9 +5,6 @@
 <?php echo "Ukazka: "; print_r($Ukazka); ?>
 {/block}
 {block content}
-    <div class="navigate">
-    Nastavení
-    </div>
     <h2>Nastavení</h2>
 
 
@@ -191,7 +188,7 @@
     </div>
     
     <div class="detail_blok">
-        <div class="detail_hlavicka">Obecné nastavení</div>
+        <div class="detail_hlavicka">Ostatní nastavení</div>
         {if ($FormUpravit=='nastaveni')}
         {control nastaveniForm}
         {else}
@@ -208,6 +205,15 @@
                 dokument/spis může upravovat pouze zvolená osoba
                 {/if}
             </dd>
+        </dl>
+        <div class="detail_hlavicka">Odeslání Českou poštou</div>
+        <dl class="detail_item">
+            <dt>Číslo zákaznické karty:</dt>
+            <dd>{$cislo_zakaznicke_karty}&nbsp;</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Způsob úhrady:</dt>
+            <dd>{$zpusob_uhrady}&nbsp;</dd>
         </dl>
 
         {access :Admin:Nastaveni:}<a href="{link :Admin:Nastaveni:default, 'upravit'=>'nastaveni'}">Upravit</a>{/access}
