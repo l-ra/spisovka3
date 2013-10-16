@@ -303,6 +303,9 @@ abstract class BasePresenter extends Presenter
 
         $filter->handler->macros['vlink'] =
                 '<?php echo MyMacros::vlink("%%",%:macroLink%); ?>';        
+                
+        $filter->handler->macros['css'] =
+            '<?php echo MyMacros::CSS("%%", $baseUri); ?>';
     }
 
 }

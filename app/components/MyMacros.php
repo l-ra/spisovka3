@@ -20,5 +20,19 @@ class MyMacros extends Control {
         $__resource = $__array[1] ."_". $__array[2] ."Presenter";
         return "'". $__resource ."'";        
     }
+    
+    public static function CSS($content, $baseUri) {
+    
+		$filename = LatteFilter::fetchToken($content); // filename [,] [media]
+        $media = LatteFilter::fetchToken($content);
+
+        $filename .= '.css';
+        if (empty($media))
+            $media = 'screen';
+        $href = "{$baseUri}css/$filename?" . @filemtime(APP_DIR . "/../public/css/$filename");
+        $res = "<link rel=\"stylesheet\" type=\"text/css\" media=\"$media\" href=\"$href\" />";
+
+        return $res;   
+    }
 }
 

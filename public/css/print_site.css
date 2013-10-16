@@ -74,6 +74,7 @@ td {
 #hromadna_akce { display:none; }
 #dokument_blok_volby { display: none; }
 #layout_bottom { display:none; }
+#upozorneni_na_nove_zpravy{ display:none; }
 .paginator { display: none; }
 .checkbox { display: none; }
 td.akce { display: none; }

@@ -1,8 +1,7 @@
 {extends @layout.phtml}
 
 {block header}
-    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/site.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/install_site.css" />
+    {css install_site}
     <script type="text/javascript">
         var baseUri = '{!$klientUri}';
         var is_simple = '{=IS_SIMPLE_ROUTER}';
