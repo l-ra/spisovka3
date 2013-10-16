@@ -3,6 +3,8 @@
 // Step 1: Load Nette Framework
 require LIBS_DIR . '/Nette/loader.php';
 
+try {
+
 // Step 2: Configure environment
 
 // 2a) enable Nette\Debug for better exception and error visualisation
@@ -63,7 +65,7 @@ unset($app_info);
 // 2c) check if directory /app/temp is writable
 Environment::setVariable('tempDir',CLIENT_DIR .'/temp');
 if (@file_put_contents(Environment::expand('%tempDir%/_check'), '') === FALSE) {
-	throw new Exception("Make directory '" . Environment::getVariable('tempDir') . "' writable!");
+	throw new Exception("Nelze zapisovat do adresare '" . Environment::getVariable('tempDir') . "'");
 }
 
 // 2d) enable RobotLoader - this allows load all classes automatically
@@ -108,12 +110,10 @@ try {
         dibi::getProfiler()->setFile(APP_DIR .'/../log/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
     }
     define('DB_PREFIX', $db_config['prefix']);
-} catch (DibiDriverException $e) {
-    if ( !Environment::isProduction() ) {
-        define('DB_ERROR', $e->getMessage());
-    } else {
-        define('DB_ERROR', 1);
-    }
+}
+catch (DibiDriverException $e) {
+    echo 'Aplikaci se nepodarilo pripojit do databaze.<br>';
+    throw $e;
 }
 
 // Step 4: Setup application router
@@ -262,6 +262,13 @@ if ( $cool_url ) {
             $router[] = new SimpleRouter('Spisovka:Default:default');
         }
 	
+}
+
+}
+catch (Exception $e) {
+    echo 'Behem inicializace aplikace doslo k vyjimce. Podrobnejsi informace lze nalezt v aplikacnim logu.<br>'
+        .'Podrobnosti: ' . $e->getMessage();
+    throw $e;
 }
 
 // Step 5: Run the application!
