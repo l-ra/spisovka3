@@ -1,0 +1,40 @@
+<div id="debug">
+    <div id="debug_head">
+        <div id="debug_info">Debug Info</div>
+        <div id="debug_route"><strong>{$module}:{$presenter}:{$view}</strong></div>
+        <div id="debug_time">Čas: <strong><?php echo sprintf('%0.3f', (microtime(TRUE) - Debug::$time) * 1000); ?> ms</strong></div>
+        <div id="debug_memory">Paměť: <strong title="špička: <?php echo TemplateHelpers::bytes(memory_get_peak_usage());  ?>"><?php echo TemplateHelpers::bytes(memory_get_usage()); ?></strong></div>
+        <div id="debug_sql">SQL: <strong><?php echo dibi::$numOfQueries ." / ". number_format( (dibi::$totalTime)*1000,3,'.',' '); ?> ms</strong></div>
+        <div id="debug_close">Zavřít</div>
+        <br class="clear" />
+    </div>
+    <div id="debug_body">
+        <div id="debug_body_route">
+    Module:    {$module}
+    Presenter: {$presenter}
+    View:      {$view}
+
+    User:      {=print_r(Environment::getUser()->getIdentity())}
+
+    Server:
+    {foreach $_SERVER as $sname => $svalue}
+    <span style="color:#0000ff">{$sname}</span> = <span style="color:#008800">{if is_array($svalue)}Array(){else}{$svalue}{/if}</span>
+    {/foreach}
+        </div>
+        <div id="debug_body_sql">
+        {foreach dibi::getProfiler()->tickets as $dblog }
+            {if $dblog[1] == 4}
+            <div class="debug_body_sql_item">
+            <?php dibi::test($dblog[2]); ?>
+            </div>
+            {/if}
+        {/foreach}
+        </div>
+        <div id="debug_body_info">
+        {capture $html_out}{block debug}{/block}{/capture}
+        {$html_out}
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript" src="{$baseUri}js/script_debug.js"></script>

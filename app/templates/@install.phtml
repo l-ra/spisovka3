@@ -1,49 +1,18 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <title>Spisová služba - {block #title}{/block}</title>
+{extends @layout.phtml}
+
+{block header}
     <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/site.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/install_site.css" />
-    <link rel="shortcut icon" href="{$baseUri}favicon.ico" type="image/x-icon" />
     <script type="text/javascript">
         var baseUri = '{!$klientUri}';
         var is_simple = '{=IS_SIMPLE_ROUTER}';
     </script>
     <script src="{$baseUri}/js/denied/checker.js" type="text/javascript"></script>
     {block #javascript}{/block}
-</head>
-<body>
-<div id="layout_top">
-    <div id="top">
-        <h1><a href="{link :Spisovka:Default:}">Spisová služba</a> <span id="top_urad">Instalace</span></h1>
-        <div id="top_menu">
-            &nbsp;
-        </div>
-        <div id="top_jmeno">
-            &nbsp;
-        </div>
-    </div>
-</div>
-<div id="layout">
-    <div id="menu">
-    &nbsp;{block #menu}{/block}
-    </div>
-    <div n:if="count($flashes)>0" id="flash">
-        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{$flash->message}</div>{/foreach}
-    </div>
-    <div id="content">
-        {include #content}
-    </div>
-</div>
-<div id="layout_bottom">
-    <div id="bottom">
-        <strong>{$AppInfo[2]}</strong><br/>
-        Na toto dílo se vztahuje licence {!$licence}
-    </div>
-</div>
+{/block}    
 
+{block menu}
+&nbsp;
+{/block}    
 
-</body>
-</html>
+{= $no_top_menu = true}

@@ -1,5 +1,9 @@
 <div id="layout_top">
     <div id="top">
+    {if isset($no_top_menu)}
+        <h1>Spisová služba<span id="top_urad">{if $module == "Install"}Instalace{else}{$Urad->nazev}{/if}</span></h1>
+        <div id="top_jmeno">&nbsp;</div>
+    {else}
         <h1><a href="{vlink :$module:Default:}">{$module_name}</a> <span id="top_urad">{$Urad->nazev}</span></h1>
         <div id="top_menu">
             {access :Spisovka:Default:}<a href="{vlink :Spisovka:Default:}">Spisová služba</a>&nbsp;&nbsp;{/access}
@@ -19,5 +23,6 @@
                 {$role->name}<br />
             {/foreach}
         </div>
+    {/if}
     </div>
 </div>

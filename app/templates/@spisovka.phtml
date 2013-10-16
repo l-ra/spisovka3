@@ -16,6 +16,9 @@
 {/block}    
 
 {block menu}
-    <a href="{link default}">Nepřečtené</a>
-    <a href="{link vsechny}">Všechny</a>
+    {access :Spisovka:Dokumenty:}<a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a>{/access}
+    {access :Spisovka:Dokumenty:}<a href="{link :Spisovka:Dokumenty:novy}">Nový dokument</a>{/access}
+    {access :Spisovka:Spisy:}<a href="{link :Spisovka:Spisy:default}">Spisy</a>{/access}
+    {access :Spisovka:Sestavy:}<a href="{link :Spisovka:Sestavy:default}">Sestavy</a>{/access}
+    {access :Spisovka:Vypravna:}<a href="{link :Spisovka:Vypravna:default}">K odeslání</a>{/access}
 {/block}    

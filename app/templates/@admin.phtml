@@ -1,14 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <title>Spisová služba - Administrace{$title}</title>
+{extends @layout.phtml}
+
+{block header}
     <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/site.css?<?php echo filemtime(APP_DIR.'/../public/css/site.css'); ?>" />
     <link rel="stylesheet" type="text/css" media="screen" href="{$baseUri}css/admin_site.css?<?php echo filemtime(APP_DIR.'/../public/css/admin_site.css'); ?>" />
     <link rel="stylesheet" type="text/css" media="print" href="{$baseUri}css/print_site.css?<?php echo filemtime(APP_DIR.'/../public/css/print_site.css'); ?>" />
     <link type="text/css" href="{$baseUri}css/blitzer/jquery-ui-custom.css?<?php echo filemtime(APP_DIR.'/../public/css/blitzer/jquery-ui-custom.css'); ?>" rel="stylesheet" />
-    <link rel="shortcut icon" href="{$baseUri}favicon.ico" type="image/x-icon" />
     <script type="text/javascript" src="{$baseUri}js/jquery-min.js?<?php echo filemtime(APP_DIR.'/../public/js/jquery-min.js'); ?>"></script>
     <script type="text/javascript" src="{$baseUri}js/jquery-ui-custom.min.js?<?php echo filemtime(APP_DIR.'/../public/js/jquery-ui-custom.min.js'); ?>"></script>
     <script type="text/javascript">
@@ -18,83 +14,18 @@
     {block #javascript}{/block}
     <script type="text/javascript" src="{$baseUri}js/jquery.nette.js?<?php echo filemtime(APP_DIR.'/../public/js/jquery.nette.js'); ?>"></script>
     <script type="text/javascript" src="{$baseUri}js/script.js?<?php echo filemtime(APP_DIR.'/../public/js/script.js'); ?>"></script>
-</head>
-<body>
-{include top.phtml, module => 'Admin', module_name => 'Administrace' }
+{/block}    
 
-<div id="layout">
-    <div id="menu">
-        {access :Admin:Nastaveni:}<a href="{vlink :Admin:Nastaveni:}">Nastavení</a>{/access}
-        {access :Admin:Epodatelna:}<a href="{vlink :Admin:Epodatelna:}">E-podatelna</a>{/access}
-        {access :Admin:Spisy:}<a href="{vlink :Admin:Spisy:seznam}">Spisy</a>{/access}
-        {access :Admin:Subjekty:}<a href="{vlink :Admin:Subjekty:seznam}">Odesílatelé/Adresáti</a>{/access}
-        {access :Admin:Zamestnanci:}<a href="{vlink :Admin:Zamestnanci:seznam}">Zaměstnanci</a>{/access}
-        {access :Admin:Orgjednotky:}<a href="{vlink :Admin:Orgjednotky:seznam}">Org. jednotky</a>{/access}
-        {access :Admin:Opravneni:}<a href="{vlink :Admin:Opravneni:seznam}">Oprávnění</a>{/access}
-        <!--{access :Admin:Prilohy:}<a href="{vlink :Admin:Prilohy:}">Soubory</a>{/access}-->
-        {access :Admin:Spisznak:}<a href="{vlink :Admin:Spisznak:seznam}">Spisové znaky</a>{/access}
-        {access :Admin:Ciselniky:}<a href="{vlink :Admin:Ciselniky:default}">Číselníky</a>{/access}
-        {access :Admin:Protokol:}<a href="{vlink :Admin:Protokol:default}">Protokoly</a>{/access}
-    </div>
-
-    {include zpravy.phtml}    
-
-    <div n:if="count($flashes)>0" id="flash">
-        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}
-    </div>
-    <div id="content">
-        {include #content}
-    </div>
-    {if $debuger }
-    <div id="debug">
-        <div id="debug_head">
-            <div id="debug_info">Debug Info</div>
-            <div id="debug_route"><strong>{$module}:{$presenter}:{$view}</strong></div>
-            <div id="debug_time">Čas: <strong><?php echo sprintf('%0.3f', (microtime(TRUE) - Debug::$time) * 1000); ?> ms</strong></div>
-            <div id="debug_memory">Paměť: <strong title="špička: <?php echo TemplateHelpers::bytes(memory_get_peak_usage());  ?>"><?php echo TemplateHelpers::bytes(memory_get_usage()); ?></strong></div>
-            <div id="debug_sql">SQL: <strong><?php echo dibi::$numOfQueries ." / ". number_format( (dibi::$totalTime)*1000,3,'.',' '); ?> ms</strong></div>
-            <div id="debug_close">Zavřít</div>
-            <br class="clear" />
-        </div>
-        <div id="debug_body">
-            <div id="debug_body_route">
-        Module:    {$module}
-        Presenter: {$presenter}
-        View:      {$view}
-
-        Server:
-        {foreach $_SERVER as $sname => $svalue}
-        <span style="color:#0000ff">{$sname}</span> = <span style="color:#008800">{if is_array($svalue)}Array(){else}{$svalue}{/if}</span>
-        {/foreach}
-            </div>
-            <div id="debug_body_sql">
-            {foreach dibi::getProfiler()->tickets as $dblog }
-                {if $dblog[1] == 4}
-                <div class="debug_body_sql_item">
-                <?php dibi::test($dblog[2]); ?>
-                </div>
-                {/if}
-            {/foreach}
-            </div>
-            <div id="debug_body_info">
-            {capture $html_out}{block debug}{/block}{/capture}
-            {$html_out}
-            </div>
-
-        </div>
-    </div>
-    <script type="text/javascript" src="{$baseUri}js/script_debug.js"></script>
-    {/if}
-
-</div>
-<div id="layout_bottom">
-    <div id="bottom">
-        <strong>{$AppInfo[2]}</strong><br/>
-        {if $NovaVerze['aktualni']==0}<span style="color:#880000;"><strong>Je k dispozici nová verze!</strong> Vaše současná verze je {$NovaVerze['soucasna_verze']}. Nová verze je {$NovaVerze['aktualni_verze']}</span><br />{/if}
-        Na toto dílo se vztahuje licence {!$licence}
-    </div>
-</div>
-
-
-</body>
-</html>
+{block menu}
+    {access :Admin:Nastaveni:}<a href="{vlink :Admin:Nastaveni:}">Nastavení</a>{/access}
+    {access :Admin:Epodatelna:}<a href="{vlink :Admin:Epodatelna:}">E-podatelna</a>{/access}
+    {access :Admin:Spisy:}<a href="{vlink :Admin:Spisy:seznam}">Spisy</a>{/access}
+    {access :Admin:Subjekty:}<a href="{vlink :Admin:Subjekty:seznam}">Odesílatelé/Adresáti</a>{/access}
+    {access :Admin:Zamestnanci:}<a href="{vlink :Admin:Zamestnanci:seznam}">Zaměstnanci</a>{/access}
+    {access :Admin:Orgjednotky:}<a href="{vlink :Admin:Orgjednotky:seznam}">Org. jednotky</a>{/access}
+    {access :Admin:Opravneni:}<a href="{vlink :Admin:Opravneni:seznam}">Oprávnění</a>{/access}
+    <!--{access :Admin:Prilohy:}<a href="{vlink :Admin:Prilohy:}">Soubory</a>{/access}-->
+    {access :Admin:Spisznak:}<a href="{vlink :Admin:Spisznak:seznam}">Spisové znaky</a>{/access}
+    {access :Admin:Ciselniky:}<a href="{vlink :Admin:Ciselniky:default}">Číselníky</a>{/access}
+    {access :Admin:Protokol:}<a href="{vlink :Admin:Protokol:default}">Protokoly</a>{/access}
+{/block}    

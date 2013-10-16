@@ -13,8 +13,6 @@ abstract class BasePresenter extends Presenter
 
         $user = Environment::getUser();
         $user->setNamespace(KLIENT);
-        // Nema uzivatel pristup na tuto stranku?
-
 
         // Je uzivatel prihlasen?
             if (!$user->isAuthenticated()) {
@@ -174,40 +172,45 @@ abstract class BasePresenter extends Presenter
          *     - aplikace verejne odstavena
          *     - provadi se udrzba
          */
-        if (file_exists(APP_DIR ."/configs/servicemode") ) {
+        /* [P.L.] Tuto funkci aplikace je treba predelat
+           - toto je potreba kontrolovat jiz v startup(), tady je prilis pozde
+           
+           if (file_exists(APP_DIR ."/configs/servicemode") ) {
             $service_mode = 1;    
         } else {
             $service_mode = 0;
-        }
-
+        } */
 
         /**
          * Nastaveni layoutu podle modulu
          */
-
-        if ( $service_mode == 1) {
-            $this->setLayout('offline');
-        } else if ( defined('APPLICATION_INSTALL') ) {
+        if ( defined('APPLICATION_INSTALL') ) {
             $this->setLayout('install');
-        } else if ( defined('DB_ERROR') ) {
-            $this->setLayout('db');
         } else if ( $this->name == "Spisovka:Uzivatel" && $this->view == "login" ) {
             $this->setLayout('login');
         }
-        // Poznamka: Modul Spisovka ma nastaven vychozi layout nazvany "layout"
         else switch ($this->template->module) {
             case "Admin":
                 $this->setLayout('admin');
+                $this->template->module_name = 'Administrace';
                 break;
             case "Spisovna":
                 $this->setLayout('spisovna');
+                $this->template->module_name = 'Spisovna';
                 break;
             case "Epodatelna":
                 $this->setLayout('epodatelna');
+                $this->template->module_name = 'E-podatelna';
                 break;
             case "Spisovka":
                 if ($this->template->presenter == "Zpravy")
                     $this->setLayout('zpravy');
+                else
+                    $this->setLayout('spisovka');
+                $this->template->module_name = 'Spisová služba';
+                break;
+            case "Install":
+                $this->setLayout('install');
                 break;
         }
                 
@@ -248,9 +251,11 @@ abstract class BasePresenter extends Presenter
         /**
          * Uzivatel
          */
+        $this->template->is_authenticated = false;
         $user = Environment::getUser();
         if ( $this->name != 'Error' && $user->isAuthenticated() ) {
             $this->template->user = $user->getIdentity();
+            $this->template->is_authenticated = true;
             
             /**
              * Upozorneni o zpravach uzivateli
