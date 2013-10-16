@@ -34,5 +34,16 @@ class MyMacros extends Control {
 
         return $res;   
     }
+
+    public static function JavaScript($content, $baseUri) {
+    
+		$filename = LatteFilter::fetchToken($content); // filename
+
+        $filename .= '.js';
+        $href = "{$baseUri}js/$filename?" . @filemtime(APP_DIR . "/../public/js/$filename");
+        $res = "<script type=\"text/javascript\" src=\"$href\"></script>";
+
+        return $res;   
+    }
 }
 

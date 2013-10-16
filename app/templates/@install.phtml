@@ -2,12 +2,8 @@
 
 {block header}
     {css install_site}
-    <script type="text/javascript">
-        var baseUri = '{!$klientUri}';
-        var is_simple = '{=IS_SIMPLE_ROUTER}';
-    </script>
-    <script src="{$baseUri}/js/denied/checker.js" type="text/javascript"></script>
-    {block #javascript}{/block}
+
+    {js denied/checker}
 {/block}    
 
 {block menu}

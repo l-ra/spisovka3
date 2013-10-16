@@ -306,6 +306,8 @@ abstract class BasePresenter extends Presenter
                 
         $filter->handler->macros['css'] =
             '<?php echo MyMacros::CSS("%%", $baseUri); ?>';
+        $filter->handler->macros['js'] =
+            '<?php echo MyMacros::JavaScript("%%", $baseUri); ?>';
     }
 
 }

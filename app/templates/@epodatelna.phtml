@@ -2,16 +2,7 @@
 
 {block header}
     {css epodatelna_site}
-    <script type="text/javascript" src="{$baseUri}js/jquery-min.js?<?php echo filemtime(APP_DIR.'/../public/js/jquery-min.js'); ?>"></script>
-    <script type="text/javascript" src="{$baseUri}js/jquery-ui-custom.min.js?<?php echo filemtime(APP_DIR.'/../public/js/jquery-ui-custom.min.js'); ?>"></script>
-    <script type="text/javascript">
-        var baseUri = '{!$klientUri}';
-        var is_simple = '{=IS_SIMPLE_ROUTER}';
-    </script>
-    {block #javascript}{/block}
-    <script type="text/javascript" src="{$baseUri}js/jquery.nette.js?<?php echo filemtime(APP_DIR.'/../public/js/jquery.nette.js'); ?>"></script>
-    <script type="text/javascript" src="{$baseUri}js/script.js?<?php echo filemtime(APP_DIR.'/../public/js/script.js'); ?>"></script>
-    <script type="text/javascript" src="{$baseUri}js/script_epodatelna.js?<?php echo filemtime(APP_DIR.'/../public/js/script_epodatelna.js'); ?>"></script>
+    {js script_epodatelna}
 {/block}    
 
 {block menu}
