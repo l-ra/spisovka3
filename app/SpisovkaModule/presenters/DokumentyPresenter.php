@@ -1033,7 +1033,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         } else {
 
-            if ( $this->getUser()->isInRole('podatelna') ) {
+            if ( Acl::isInRole('podatelna') ) {
                 $dokument_typ_id = 1;
             } else {
                 $dokument_typ_id = 2;
