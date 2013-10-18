@@ -726,7 +726,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $user = Environment::getUser();
 
         $Workflow = new Workflow();
-        if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+        if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
             if ( $Workflow->archivovat($dokument_id) ) {
                $this->flashMessage('Dokument byl archivován.');
             } else {
@@ -745,7 +745,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $user = Environment::getUser();
 
         $Workflow = new Workflow();
-        if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+        if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
             if ( $Workflow->skartovat($dokument_id) ) {
                $this->flashMessage('Dokument byl skartován.');
             } else {

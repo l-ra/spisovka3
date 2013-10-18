@@ -446,7 +446,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             }
             // Dokument je ve skartacnim rezimu
             if ( $dokument->stav_dokumentu == 8
-                    && ($user->isInRole('skartacni_komise') || $user->isInRole('superadmin')) ) {
+                    && (Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
                 $this->template->AccessEdit = 0;
                 $this->template->Pridelen = 1;
@@ -595,7 +595,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 case 'archivovat':
                     if ( isset($data['dokument_vyber']) ) {
                         $count_ok = $count_failed = 0;
-                        if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+                        if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
                             foreach ( $data['dokument_vyber'] as $dokument_id ) {
                                 if ( $Workflow->archivovat($dokument_id) ) {
                                     //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
@@ -624,7 +624,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 case 'skartovat':
                     if ( isset($data['dokument_vyber']) ) {
                         $count_ok = $count_failed = 0;
-                        if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+                        if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
                             foreach ( $data['dokument_vyber'] as $dokument_id ) {
                                 if ( $Workflow->skartovat($dokument_id) ) {
                                     //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
@@ -655,7 +655,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                         $user = Environment::getUser();
                         foreach ( $data['dokument_vyber'] as $dokument_id ) {
                             
-                            if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+                            if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
                                 $this->redirect(':Spisovna:Zapujcky:nova',array('dokument_id'=>$dokument_id));
                             } else {
                                 $this->redirect(':Spisovna:Zapujcky:nova',array('dokument_id'=>$dokument_id,'user_id'=>$user->getIdentity()->id));
