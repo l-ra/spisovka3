@@ -341,6 +341,12 @@ class Spisovka_SpisyPresenter extends BasePresenter
                 $pridelen = 1;
             }                
             
+            // Oprava ticket #194
+            // Mohou nastat situace, kdy spis nema zadneho vlastnika, napr. po migraci ze spisovky 2
+            // V tom pripade musi byt videt seznam dokumentu ve spisu
+            if (!$spis->orgjednotka_id && !$spis->orgjednotka_id_predano)
+                $accessview = 1;
+            
             if ( count($spis->workflow)>0 ) {
                 $prideleno = $predano = 0;
                 $wf_orgjednotka_prideleno = $spis->orgjednotka_id;
