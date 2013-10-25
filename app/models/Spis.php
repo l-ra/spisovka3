@@ -35,9 +35,7 @@ class Spis extends TreeModel
     
     private function spisDetail($row)
     {
-        
         $OrgJednotka = new Orgjednotka();
-        $Workflow = new Workflow();
         
         $user = Environment::getUser();
         $user_id = $user->getIdentity()->id;
@@ -52,11 +50,16 @@ class Spis extends TreeModel
         } else {
             $row->orgjednotka_predano = null;
         } 
+
+        $query = array(        
+            "SELECT w.* FROM {$this->tb_dokspis} AS ds INNER JOIN {$this->tb_workflow} AS w"
+            . " ON ds.dokument_id = w.dokument_id WHERE ds.spis_id = %i",
+            $row->id
+        );
         
-        $row->workflow = $Workflow->fetchAll(array('id'), array(array('spis_id=%i',$row->id)))->fetchAll();
-        
-        return $row;
-        
+        $row->workflow = dibi::query($query)->fetchAll();
+
+        return $row;        
     }
 
     public function seznamSpisovychPlanu($pouze_aktivni = 0)

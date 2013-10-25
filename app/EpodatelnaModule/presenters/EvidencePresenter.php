@@ -588,7 +588,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                 if ( !empty($data['predano_user']) || !empty($data['predano_org']) ) {
                     /* Dokument predan */
-                    $Workflow->priradit($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
+                    $Workflow->predat($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
                     $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
                     
                     if ( !empty($data['predano_user']) ) {
@@ -695,7 +695,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                 if ( !empty($data['predano_user']) || !empty($data['predano_org']) ) {
                     /* Dokument predan */
-                    $Workflow->priradit($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
+                    $Workflow->predat($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
                     $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
                     
                     if ( !empty($data['predano_user']) ) {

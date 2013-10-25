@@ -101,7 +101,7 @@ class Workflow extends BaseModel
 
     }
 
-    public function priradit($dokument_id, $user_id, $orgjednotka_id, $poznamka = '')
+    public function predat($dokument_id, $user_id, $orgjednotka_id, $poznamka = '')
     {
         if ( !is_numeric($dokument_id) )
             return false;
@@ -174,12 +174,13 @@ class Workflow extends BaseModel
                 $spis = current($dokument_info->spisy);
 
                 // Vyradime ty zamestanance, kterym byly spisove dokumenty v minulosti predany
-                $update = array('stav_osoby%sql'=>'stav_osoby+100', 'aktivni'=>0);
-                $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_osoby=0')));
+                $this->update_dokumenty_ve_spisu($spis->id, 
+                    'stav_osoby = stav_osoby + 100, aktivni = 0', 'stav_osoby = 0');
+                
                 // Zrus stav dokumentu oznaceny k vyrizeni
-                $update = array('stav_dokumentu'=>'2');
-                $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_dokumentu=3')));
-            
+                $this->update_dokumenty_ve_spisu($spis->id, 
+                    'stav_dokumentu = 2', 'stav_dokumentu = 3');
+
                 $seznam_dokumentu = $DokumentSpis->dokumenty($spis->id);
                 // Musi vratit minimalne jeden, predavany dokument
                 // count($seznam_dokumentu)>0 je nesmysl
@@ -187,7 +188,6 @@ class Workflow extends BaseModel
                    
                     $data_other = array();
                     $data_other['dokument_id'] = $dokument_other->id;
-                    $data_other['spis_id'] = $spis->id;
                     $data_other['stav_dokumentu'] = 2;
                     $data_other['aktivni'] = 1;
                     $data_other['stav_osoby'] = 0;
@@ -229,7 +229,9 @@ class Workflow extends BaseModel
             $spisy = $DokumentSpis->spisy($dokument_id);
             if ( count($spisy)>0 ) {
                 foreach ( $spisy as $spis ) {
-                    $this->update($update, array(array('spis_id=%i',$spis->id),array('stav_osoby=0')));
+                    $this->update_dokumenty_ve_spisu($spis->id, 
+                    'stav_osoby = stav_osoby + 100, aktivni = 0', 'stav_osoby = 0');
+
                     $Spis = new Spis();
                     $Spis->zrusitPredani($spis->id);
                     //$Log->logSpis($spis->id, LogModel::SPIS_, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal spis'.$log_plus);
@@ -335,7 +337,6 @@ class Workflow extends BaseModel
                     
                     $data_other = array();
                     $data_other['stav_osoby'] = 1;
-                    $data_other['spis_id'] = $spis->id;
                     $data_other['date'] = new DateTime();
                     $data_other['user_id'] = $data['prideleno_id'] = $user->id;
                     $data_other['aktivni'] = 1;
@@ -409,7 +410,6 @@ class Workflow extends BaseModel
             $data['date'] = new DateTime();
             $data['user_id'] = $user_id;
             $data['poznamka'] = $predan->poznamka;
-            $data['spis_id'] = $predan->spis_id;
 
             $this->insert($data);
 
@@ -474,7 +474,6 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user_id;
                     $data['poznamka'] = $predan->poznamka;
-                    $data['spis_id'] = $predan->spis_id;
 
                     $result_insert = $this->insert($data);
 
@@ -652,7 +651,6 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->getIdentity()->id;
                     $data['poznamka'] = $dokument_info->prideleno->poznamka;
-                    $data['spis_id'] = $dokument_info->prideleno->spis_id;
 
                     $result_insert = $this->insert($data);
 
@@ -706,7 +704,6 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->getIdentity()->id;
                     $data['poznamka'] = $dokument_info->prideleno->poznamka;
-                    $data['spis_id'] = $dokument_info->prideleno->spis_id;
 
                     $result_insert = $this->insert($data);
 
@@ -760,7 +757,6 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = $user->getIdentity()->id;
                     $data['poznamka'] = $dokument_info->prideleno->poznamka;
-                    $data['spis_id'] = $dokument_info->prideleno->spis_id;
 
                     $result_insert = $this->insert($data);
 
@@ -814,7 +810,6 @@ class Workflow extends BaseModel
                     $data['date'] = new DateTime();
                     $data['user_id'] = Environment::getUser()->getIdentity()->id;
                     $data['poznamka'] = "Přidělen k zapůjčení.";
-                    $data['spis_id'] = empty($spis->id)?null:$spis->id;
 
                     $result_insert = $this->insert($data);
 
@@ -997,28 +992,25 @@ class Workflow extends BaseModel
     }
 
     protected function deaktivovat($dokument_id, $dokument_version = null) {
-
-        if ( is_numeric($dokument_id) ) {
-            $update = array('aktivni'=>0);
-            $this->update($update, array(array('dokument_id=%i',$dokument_id),array('aktivni=1')));
-            return true;
-        } else {
-            return false;
-        }
-
+       
+        dibi::query("UPDATE {$this->name} SET aktivni = 0 WHERE dokument_id = %i", $dokument_id);
     }
     
-    protected function deaktivovatSpis($spis_id) {
+    /* protected function deaktivovatSpis($spis_id) {
 
-        if ( is_numeric($spis_id) ) {
-            $update = array('aktivni'=>0);
-            $this->update($update, array(array('spis_id=%i',$spis_id),array('aktivni=1')));
-            return true;
-        } else {
+        if ( !is_numeric($spis_id) )
             return false;
-        }
+            
+        $this->update_dokumenty_ve_spisu($spis_id, 
+                'aktivni = 0', 'aktivni = 1');
+        return true;
+    }  */  
 
-    }    
-
+    protected function update_dokumenty_ve_spisu($spis_id, $update, $where) {
+    
+        dibi::query("UPDATE {$this->name} w, {$this->tb_dokspis} ds SET $update "
+            . "WHERE w.dokument_id = ds.dokument_id AND ds.spis_id = %i AND $where",
+            $spis_id);
+    }
 }
 

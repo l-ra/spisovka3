@@ -804,7 +804,6 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_to_role` (
 CREATE TABLE IF NOT EXISTS `{tbls3}workflow` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dokument_id` int(11) NOT NULL,
-  `spis_id` int(11) DEFAULT NULL,
   `prideleno_id` int(10) unsigned DEFAULT NULL,
   `orgjednotka_id` int(10) unsigned DEFAULT NULL,
   `user_id` int(10) unsigned NOT NULL,
@@ -819,7 +818,6 @@ CREATE TABLE IF NOT EXISTS `{tbls3}workflow` (
   KEY `fk_workflow_user1` (`prideleno_id`),
   KEY `fk_workflow_orgjednotka1` (`orgjednotka_id`),
   KEY `fk_workflow_user2` (`user_id`),
-  KEY `spis_id` (`spis_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{tbls3}zapujcka` (

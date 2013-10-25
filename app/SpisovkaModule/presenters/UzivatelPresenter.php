@@ -291,7 +291,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
                 // obsahuje dokumenty - predame i dokumenty
                 $dokument = current($dokumenty);
                 
-                if ( $Workflow->priradit($dokument->id, $user_id, $orgjednotka_id, $poznamka) ) {
+                if ( $Workflow->predat($dokument->id, $user_id, $orgjednotka_id, $poznamka) ) {
                     $link = $this->link(':Spisovka:Spisy:detail',array('id'=>$spis_id));
                     echo '###vybrano###'. $link;
                     $this->terminate();
@@ -335,7 +335,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
           $this->terminate();
         } else {
             $Workflow = new Workflow();
-            if ( $Workflow->priradit($dokument_id, $user_id, $orgjednotka_id, $poznamka) ) {
+            if ( $Workflow->predat($dokument_id, $user_id, $orgjednotka_id, $poznamka) ) {
                 $link = $this->link(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
                 echo '###vybrano###'. $link;
                 $this->terminate();

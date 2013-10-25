@@ -1347,8 +1347,8 @@ class Dokument extends BaseModel
                 'workflow' => array(
                     'from' => array($this->tb_workflow => 'wf'),
                     'on' => array('wf.dokument_id=dok.id'),
-                    'cols' => array('id'=>'workflow_id','stav_dokumentu','prideleno_id','orgjednotka_id',
-                                    'stav_osoby','date'=>'date_prideleni','date_predani','poznamka'=>'poznamka_predani','aktivni'=>'wf_aktivni','spis_id'=>'wf_spis_id')
+                    'cols' => array('id'=>'workflow_id','stav_dokumentu','prideleno_id',        'orgjednotka_id',
+                            'stav_osoby','date'=>'date_prideleni','date_predani','poznamka'=>'poznamka_predani','aktivni'=>'wf_aktivni')
                 ),
                 'workflow_prideleno' => array(
                     'from' => array($this->tb_osoba_to_user => 'wf_o2u'),
@@ -1475,7 +1475,6 @@ class Dokument extends BaseModel
                 $workflow->date = $row->date_prideleni; unset($row->date_prideleni);
                 $workflow->poznamka = $row->poznamka_predani; unset($row->poznamka_predani);
                 $workflow->aktivni = $row->wf_aktivni; unset($row->wf_aktivni);
-                $workflow->spis_id = $row->wf_spis_id; unset($row->wf_spis_id);
                 $tmp[$id]['workflow'][ $workflow->id ] = $workflow;
 
                 $tmp[$id]['raw'] = $row;
