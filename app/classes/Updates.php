@@ -66,8 +66,10 @@ class UpdateAgent {
     public static function je_aplikace_aktualni()
     {
         $app_info = Environment::getVariable('app_info');
-        if (!empty($app_info) )
-            $soucasna_verze = trim(explode("#", $app_info)[0]);
+        if (!empty($app_info) ) {
+            $a = explode("#", $app_info);
+            $soucasna_verze = trim($a[0]);
+        }
         else
             $soucasna_verze = '0.0.0';
                 
