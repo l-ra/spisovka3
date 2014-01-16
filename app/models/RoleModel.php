@@ -8,19 +8,10 @@ class RoleModel extends TreeModel
     protected $nazev_sekvence = 'code';
     protected $primary = 'id';
 
-    protected $cache;
-
-    public function  __construct() {
+    /* public function  __construct() {
 
         parent::__construct();
-
-        if ( defined('DB_CACHE') ) {
-            $this->cache = DB_CACHE;
-        } else {
-            $this->cache = Environment::getConfig('database')->cache;
-        }
-
-    }
+    } */
 
     /* simple = 1  je použito pro seznam rolí pro combo box formuláře nová role / upravit roli */
 
@@ -119,10 +110,8 @@ class RoleModel extends TreeModel
 
     public function vlozit($data) {
 
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            unset($cache['s3_Role'], $cache['s3_Permission']);
-        }
+        DbCache::delete('s3_Role');
+        DbCache::delete('s3_Permission');
 
         if ( empty($data['parent_id']) ) $data['parent_id'] = null;
 
@@ -130,20 +119,17 @@ class RoleModel extends TreeModel
     }
     public function upravit($data,$id) {
 
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            unset($cache['s3_Role'], $cache['s3_Permission']);
-        }
+        DbCache::delete('s3_Role');
+        DbCache::delete('s3_Permission');
 
         if ( empty($data['parent_id']) || $data['parent_id'] == 0 ) $data['parent_id'] = null;
 
         return $this->upravitH($data, $id);
     }
     public function smazat($where) {
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            unset($cache['s3_Role'], $cache['s3_Permission']);
-        }
+    
+        DbCache::delete('s3_Role');
+        DbCache::delete('s3_Permission');
         return parent::delete($where);
     }
 

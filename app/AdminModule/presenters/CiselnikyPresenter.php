@@ -3,9 +3,8 @@
 class CiselnikSpousteciUdalost extends Ciselnik
 {
     protected function dataChangedHandler()
-    {        
-        $cache = Environment::getCache('db_cache');
-        unset($cache['s3_Spousteci_udalost']);
+    {
+        DbCache::delete('s3_Spousteci_udalost');
     }
 }
 

@@ -7,8 +7,6 @@ class SpisovyZnak extends TreeModel
     protected $primary = 'id';
     protected $tb_spoudalost = 'spousteci_udalost';
 
-    protected static $spousteci_udalost;
-
 
     public function __construct() {
 
@@ -184,21 +182,14 @@ class SpisovyZnak extends TreeModel
     */
     public static function spousteci_udalost( $kod = null, $select = 0 ) {
 
-        if ( empty( self::$spousteci_udalost ) ) {
-
-            $cache = Environment::getCache('db_cache');
-            if (isset($cache['s3_Spousteci_udalost'])) {
-                $result = $cache['s3_Spousteci_udalost'];
-            } else {
-                $prefix = Environment::getConfig('database')->prefix;
-                $tb_spoudalost = $prefix .'spousteci_udalost';
-                $result = dibi::query('SELECT * FROM %n', $tb_spoudalost)->fetchAssoc('id');
-                $cache['s3_Spousteci_udalost'] = $result;
-            }
-
-            self::$spousteci_udalost = $result;
-        } else {
-            $result = self::$spousteci_udalost;
+        $result = DbCache::get('s3_Spousteci_udalost');
+        
+        if ($result === null) {           
+            $prefix = Environment::getConfig('database')->prefix;
+            $tb_spoudalost = $prefix .'spousteci_udalost';
+            $result = dibi::query('SELECT * FROM %n', $tb_spoudalost)->fetchAssoc('id');
+            
+            DbCache::set('s3_Spousteci_udalost', $result);
         }
 
         if ( $select == 8 )

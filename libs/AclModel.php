@@ -7,17 +7,9 @@ class AclModel extends BaseModel {
     protected $tb_resource = 'user_resource';
     protected $tb_rule = 'user_rule';
 
-    protected $cache;
-
     public function  __construct() {
 
         $prefix = Environment::getConfig('database')->prefix;
-
-        if ( defined('DB_CACHE') ) {
-            $this->cache = DB_CACHE;
-        } else {
-            $this->cache = Environment::getConfig('database')->cache;
-        }
 
         $this->name = $prefix . $this->name;        
         $this->tb_role = $prefix . $this->tb_role;        
@@ -28,13 +20,9 @@ class AclModel extends BaseModel {
 
     public function getRoles() {
 
-        // cache - neni treba furt tahat z DB, kdyz se to po vetsinu casu nemeni
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            if ( isset($cache['s3_Role']) ) {
-                return $cache['s3_Role'];
-            }
-        }
+        $res = DbCache::get('s3_Role');
+        if ($res !== null)
+            return $res;
 
         $res = dibi::fetchAll('SELECT r1.code, r2.code as parent_code
                                FROM ['. $this->tb_role . '] r1
@@ -42,9 +30,7 @@ class AclModel extends BaseModel {
                                ORDER BY r1.parent_id ASC
         ');
 
-        if ( $this->cache ) {
-            $cache['s3_Role'] = $res;
-        }
+        DbCache::set('s3_Role', $res);
             
         return $res;
 
@@ -54,32 +40,22 @@ class AclModel extends BaseModel {
 
         $cols = ($all==1)?'*':'code';
 
-        // cache - neni treba furt tahat z DB, kdyz se to po vetsinu casu nemeni
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            if ( isset($cache['s3_Resource_'.$cols]) ) {
-                return $cache['s3_Resource_'.$cols];
-            }
-        }
-
+        $res = DbCache::get('s3_Resource_' . $cols);
+        if ($res !== null)
+            return $res;
+            
         $res = dibi::fetchAll('SELECT '.$cols.' FROM ['. $this->tb_resource . '] ORDER BY code ASC');
 
-        if ( $this->cache ) {
-            $cache['s3_Resource_'.$cols] = $res;
-        }
+        DbCache::set('s3_Resource_' . $cols, $res);
         
         return $res;
     }
 
     public function getPermission() {
 
-        // cache - neni treba furt tahat z DB, kdyz se to po vetsinu casu nemeni
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            if ( isset($cache['s3_Permission']) ) {
-                return $cache['s3_Permission'];
-            }
-        }
+        $res = DbCache::get('s3_Permission');
+        if ($res !== null)
+            return $res;
 
         $res = dibi::fetchAll('
                 SELECT
@@ -95,9 +71,7 @@ class AclModel extends BaseModel {
                     ORDER BY ro.fixed DESC, a.allowed DESC, ro.code, ru.privilege
         ');
 
-        if ( $this->cache ) {
-            $cache['s3_Permission'] = $res;
-        }
+        DbCache::set('s3_Permission', $res);
         
         return $res;
     }
@@ -216,10 +190,7 @@ class AclModel extends BaseModel {
 
     public function insertAcl($data) {
 
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            unset($cache['s3_Permission']);
-        }
+        DbCache::delete('s3_Permission');
 
         $data['role_id'] = (int) $data['role_id'];
         $data['rule_id'] = (int) $data['rule_id'];
@@ -229,20 +200,19 @@ class AclModel extends BaseModel {
     }
 
     public function insertResource($data) {
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            unset($cache['s3_Resource_*'],$cache['s3_Resource_code'],$cache['s3_Permission']);
-        }
+
+        DbCache::delete('s3_Resource_*');
+        DbCache::delete('s3_Resource_code');
+        DbCache::delete('s3_Permission');
 
         return dibi::insert($this->tb_resource, $data)
             ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
     }
 
     public function insertRule($data) {
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            unset($cache['s3_Rule'],$cache['s3_Permission']);
-        }
+    
+        DbCache::delete('s3_Permission');
+
         return dibi::insert($this->tb_rule, $data)
             ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
     }
@@ -257,10 +227,9 @@ class AclModel extends BaseModel {
                 $where = array($where);
             }
         }
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            unset($cache['s3_Permission']);
-        }
+
+        DbCache::delete('s3_Permission');
+
         return dibi::delete($this->name)->where($where)->execute();
     }
 
@@ -274,10 +243,11 @@ class AclModel extends BaseModel {
                 $where = array($where);
             }
         }
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            unset($cache['s3_Resource_*'],$cache['s3_Resource_code'],$cache['s3_Permission']);
-        }
+        
+        DbCache::delete('s3_Resource_*');
+        DbCache::delete('s3_Resource_code');
+        DbCache::delete('s3_Permission');
+        
         return dibi::delete($this->tb_resource)->where($where)->execute();
     }
 
@@ -291,12 +261,11 @@ class AclModel extends BaseModel {
                 $where = array($where);
             }
         }
-        if ( $this->cache ) {
-            $cache = Environment::getCache('db_cache');
-            unset($cache['s3_Rule'],$cache['s3_Permission']);
-        }
+        
+        DbCache::delete('s3_Rule');
+        DbCache::delete('s3_Permission');
+        
         return dibi::delete($this->tb_rule)->where($where)->execute();
-    }
-    
+    }    
 
 }
