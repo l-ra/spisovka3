@@ -1,5 +1,14 @@
 <?php
 
+class CiselnikSpousteciUdalost extends Ciselnik
+{
+    protected function dataChangedHandler()
+    {        
+        $cache = Environment::getCache('db_cache');
+        unset($cache['s3_Spousteci_udalost']);
+    }
+}
+
 class Admin_CiselnikyPresenter extends BasePresenter
 {
 
@@ -265,7 +274,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $this->template->ciselnik_title = "Spouštěcí událost";
         $this->template->title = " - ". $this->template->ciselnik_title ." - číselník";
 
-        $ciselnik = new Ciselnik();
+        $ciselnik = new CiselnikSpousteciUdalost();
         $ciselnik->setTable('spousteci_udalost');
         $ciselnik->setParams($this->getParam());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:spousteciudalost'));

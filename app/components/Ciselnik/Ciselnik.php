@@ -337,6 +337,7 @@ class Ciselnik extends Control {
 
             $model = new Model( $this->table );
             $model->insert($values);
+            $this->dataChangedHandler();
 
             $this->presenter->flashMessage('Záznam byl úspěšně vytvořen.');
         } catch (Exception $e) {
@@ -355,6 +356,7 @@ class Ciselnik extends Control {
             $model = new Model( $this->table );
             $id_name = !empty($this->primary)?$this->primary:'id';
             $model->update($values, array( array('%and', array($id_name => $id)) ) );
+            $this->dataChangedHandler();
 
             $this->presenter->flashMessage('Záznam byl úspěšně upraven.');
         } catch (Exception $e) {
@@ -373,6 +375,7 @@ class Ciselnik extends Control {
             $model = new Model( $this->table );
             $id_name = !empty($this->primary)?$this->primary:'id';
             $model->delete(array( array('%and', array($id_name => $id)) ) );
+            $this->dataChangedHandler();
 
             $this->presenter->flashMessage('Záznam byl úspěšně odstraněn.');
         } catch (Exception $e) {
@@ -390,4 +393,8 @@ class Ciselnik extends Control {
         if (!$this->presenter->isAjax()) $this->redirect('this');
     }
 
+    // Určeno k přepsání v případné třídě potomka
+    protected function dataChangedHandler()
+    {        
+    }
 }

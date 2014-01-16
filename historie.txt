@@ -31,6 +31,7 @@ Opravy:
 - převzetí dokumentu předaného na organizační jednotku nenastavilo
   nového vlastníka dokumentu
 - v administraci E-podatelny se nyní nezobrazují hesla ke schránkám
+- editace číselníku spouštěcí události se neprojevila v aplikaci
         
 === Ver. 3.3.4 =================================================================
 
