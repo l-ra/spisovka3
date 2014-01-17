@@ -32,6 +32,8 @@ Opravy:
   nového vlastníka dokumentu
 - v administraci E-podatelny se nyní nezobrazují hesla ke schránkám
 - editace číselníku spouštěcí události se neprojevila v aplikaci
+- oprava možného problému s nesprávnými hlavičkami mailu při odesílání dokumentu 
+  e-mailem. Objevil se na instalaci Linuxu s poštovním agentem Postfix.
         
 === Ver. 3.3.4 =================================================================
 
