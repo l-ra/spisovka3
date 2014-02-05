@@ -1,4 +1,4 @@
-<?
+<?php
 
 // Ukazkovy skript pro komunikaci s ISDS
 //
