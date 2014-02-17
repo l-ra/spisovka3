@@ -34,6 +34,7 @@ Opravy:
 - editace číselníku spouštěcí události se neprojevila v aplikaci
 - oprava možného problému s nesprávnými hlavičkami mailu při odesílání dokumentu 
   e-mailem. Objevil se na instalaci Linuxu s poštovním agentem Postfix.
+- oprava zavádějícího označení "věcná skupina" u spisového znaku na "popis"
         
 === Ver. 3.3.4 =================================================================
 

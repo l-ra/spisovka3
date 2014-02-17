@@ -175,7 +175,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $form1->addText('nazev', 'Spisový znak:', 50, 80)
                 ->setValue(@$spisznak->nazev)
                 ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!');
-        $form1->addText('popis', 'Věcná skupina:', 50, 200)
+        $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spisznak->popis);
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$spisznak->skartacni_znak);
@@ -262,7 +262,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $form1 = new AppForm();
         $form1->addText('nazev', 'Spisový znak:', 50, 80)
                 ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!');
-        $form1->addText('popis', 'Věcná skupina:', 50, 200);
+        $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta', 'Skartační lhůta:', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci)
