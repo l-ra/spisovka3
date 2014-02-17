@@ -85,7 +85,7 @@
             <dd>{$upravitForm['poznamka']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Způsob vyžízení:</dt>
+            <dt>Způsob vyřízení:</dt>
             <dd>{$upravitForm['zpusob_vyrizeni']->control}</dd>
         </dl>
         <dl class="detail_item">
@@ -147,14 +147,14 @@
     {if $isPrivilege}
     <div id="dokument_blok_poznamka">
         <div class="h2">
-            Přidělěno / předáno
+            Přiděleno / předáno
         </div>
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
             {$upravitForm['prideleno_text']->control}
-            <br />{$upravitForm['prideleno_osobne']->control} Přidělěno na mé jméno
-            <br />{$upravitForm['prideleno_na_organizacni_jednotku']->control} Přidělěno na mou organizační jednotku
+            <br />{$upravitForm['prideleno_osobne']->control} Přiděleno na mé jméno
+            <br />{$upravitForm['prideleno_na_organizacni_jednotku']->control} Přiděleno na mou organizační jednotku
             <script type="text/javascript">
             <!--
 		$('#frmupravitForm-prideleno_text').focus().keyup(function(event) {

@@ -85,7 +85,7 @@
             <dd>{$newForm['poznamka']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Způsob vyžízení:</dt>
+            <dt>Způsob vyřízení:</dt>
             <dd>{$newForm['zpusob_vyrizeni']->control}</dd>
         </dl>
         <dl class="detail_item">
@@ -138,14 +138,14 @@
     {if $isPrivilege}
     <div id="dokument_blok_poznamka">
         <div class="h2">
-            Přidělěno / předáno
+            Přiděleno / předáno
         </div>
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
             {$newForm['prideleno_text']->control}
-            <br />{$newForm['prideleno_osobne']->control} Přidělěno na mé jméno
-            <br />{$newForm['prideleno_na_organizacni_jednotku']->control} Přidělěno na mou organizační jednotku
+            <br />{$newForm['prideleno_osobne']->control} Přiděleno na mé jméno
+            <br />{$newForm['prideleno_na_organizacni_jednotku']->control} Přiděleno na mou organizační jednotku
             <script type="text/javascript">
             <!--
 		$('#frmnewForm-prideleno_text').focus().keyup(function(event) {

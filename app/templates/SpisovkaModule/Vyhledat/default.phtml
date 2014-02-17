@@ -50,7 +50,7 @@
             <dd>{$searchForm['poznamka']->control}</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Způsob vyžízení:</dt>
+            <dt>Způsob vyřízení:</dt>
             <dd>{$searchForm['zpusob_vyrizeni']->control}</dd>
         </dl>
         <dl class="detail_item">
@@ -113,15 +113,15 @@
     {if $isPrivilege}
     <div id="dokument_blok_poznamka">
         <div class="h2">
-            Přidělěno / předáno
+            Přiděleno / předáno
         </div>
         <p>Poznámka: Při použití tohoto hledání se dočasně deaktivuje filtr dokumentů.</p>
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
             {$searchForm['prideleno_text']->control}
-            <br />{$searchForm['prideleno_osobne']->control} Přidělěno na mé jméno
-            <br />{$searchForm['prideleno_na_organizacni_jednotku']->control} Přidělěno na mou organizační jednotku
+            <br />{$searchForm['prideleno_osobne']->control} Přiděleno na mé jméno
+            <br />{$searchForm['prideleno_na_organizacni_jednotku']->control} Přiděleno na mou organizační jednotku
             <script type="text/javascript">
             <!--
 		$('#frmsearchForm-prideleno_text').focus().keyup(function(event) {
