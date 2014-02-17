@@ -1059,7 +1059,7 @@ CREATE TABLE `{tbls3}settings` (
 
 ALTER TABLE `{tbls3}user_role` ADD UNIQUE `user_role_code` ( `code` );
 
-INSERT INTO `{tbls3}settings` VALUES('db_revision', '610');
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '640');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
