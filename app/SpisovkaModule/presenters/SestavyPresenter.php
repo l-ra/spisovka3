@@ -137,7 +137,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         if ( empty( $sestava->parametry ) ) {
             $parametry = null;
-            $args = null;
+            $args = array();
         } else {
             $parametry = unserialize($sestava->parametry);
             $args = $Dokument->filtr(null,$parametry);
@@ -240,7 +240,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         }
 
         // vystup
-        if (!( $parametry['prideleno_osobne'] || $parametry['prideleno_na_organizacni_jednotku'] 
+        // $parametry je null u podaciho deniku
+        if (empty($parametry) || !( $parametry['prideleno_osobne'] || $parametry['prideleno_na_organizacni_jednotku'] 
              || $parametry['predano_osobne'] || $parametry['predano_na_organizacni_jednotku']
              || @is_array($parametry['prideleno']) || @is_array($parametry['predano']) )) {
             // Neni nikde pridelen nebo predan
