@@ -2463,7 +2463,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['prilohy'] = serialize($prilohy);
 
             $zprava['evidence'] = 'spisovka';
-            $zprava['dokument_id'] = $data['id'];
+            $zprava['dokument_id'] = $data['dokument_id'];
             $zprava['stav'] = 0;
             $zprava['stav_info'] = '';
             //$zprava['source'] = $z;
