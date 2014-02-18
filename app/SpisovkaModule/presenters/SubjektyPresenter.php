@@ -181,7 +181,7 @@ class SubjektyPresenter extends BasePresenter
             'adresa_psc' => ( !empty($data['subjekt_psc'][$id])?$data['subjekt_psc'][$id]:"" ),
             'email' => ( !empty($data['subjekt_email'][$id])?$data['subjekt_email'][$id]:"" ),
             'id_isds' => ( !empty($data['subjekt_isds'][$id])?$data['subjekt_isds'][$id]:"" ),
-            'adresa_stat' => $data['stat'][$id],
+            'adresa_stat' => ( !empty($data['stat'][$id])?$data['stat'][$id]:"" ),
             'telefon'=>'',
         );
 
