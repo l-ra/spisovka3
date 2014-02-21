@@ -486,7 +486,8 @@ CREATE TABLE IF NOT EXISTS `{tbls3}spisovy_znak` (
   `selected` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `fk_spisovy_znak_spousteci_udalost1` (`spousteci_udalost_id`),
-  KEY `fk_spisovy_znak_spisovy_znak1` (`parent_id`)
+  KEY `fk_spisovy_znak_spisovy_znak1` (`parent_id`),
+  UNIQUE KEY `nazev` (`nazev`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{tbls3}spousteci_udalost` (
@@ -1059,7 +1060,7 @@ CREATE TABLE `{tbls3}settings` (
 
 ALTER TABLE `{tbls3}user_role` ADD UNIQUE `user_role_code` ( `code` );
 
-INSERT INTO `{tbls3}settings` VALUES('db_revision', '640');
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '650');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

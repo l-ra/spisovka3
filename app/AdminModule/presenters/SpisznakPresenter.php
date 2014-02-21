@@ -233,8 +233,7 @@ class Admin_SpisznakPresenter extends BasePresenter
             
         } catch (Exception $e) {
             $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-            $this->flashMessage($res->getMessage(),'warning');
-            //Debug::dump($e);
+            $this->flashMessage($e->getMessage(),'warning');
         }
 
         $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));

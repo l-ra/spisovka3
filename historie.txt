@@ -34,6 +34,7 @@ Opravy:
 - oprava možného problému s nesprávnými hlavičkami mailu při odesílání dokumentu 
   e-mailem. Objevil se na instalaci Linuxu s poštovním agentem Postfix.
 - oprava zavádějícího označení "věcná skupina" u spisového znaku na "popis"
+- aplikace nyní kontroluje, zda je spisový znak jedinečný
 - nastavení e-mailové schránky - výběr protokolu nyní automaticky nastaví číslo portu
 - výpravna - po změně druhu zásilky aplikace neprovedla překreslení stránky
         
