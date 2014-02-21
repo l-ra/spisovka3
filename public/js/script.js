@@ -1041,6 +1041,7 @@ vypravnaSubmit = function () {
                 if ( text.indexOf('###provedeno###') != -1 ) {
                     $('#dialog').dialog('close');
                     alert('Záznam byl úspěšně upraven.');
+                    window.top.location = window.top.location;
                 } else {
                     $('#dialog').html(text);
                 }

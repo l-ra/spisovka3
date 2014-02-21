@@ -10,7 +10,6 @@ Nové funkce:
   Nyní může být uživatel pouze v jedné organizační jednotce.
 - E-podatelna - možnost nadefinovat více datových a emailových schránek
         a konkrétní schránku lze přiřadit určité organizační jednotce.
-- nastavení e-mailové schránky - výběr protokolu nyní automaticky nastaví číslo portu
         
 Opravy:
 
@@ -35,6 +34,8 @@ Opravy:
 - oprava možného problému s nesprávnými hlavičkami mailu při odesílání dokumentu 
   e-mailem. Objevil se na instalaci Linuxu s poštovním agentem Postfix.
 - oprava zavádějícího označení "věcná skupina" u spisového znaku na "popis"
+- nastavení e-mailové schránky - výběr protokolu nyní automaticky nastaví číslo portu
+- výpravna - po změně druhu zásilky aplikace neprovedla překreslení stránky
         
 === Ver. 3.3.4 =================================================================
 
