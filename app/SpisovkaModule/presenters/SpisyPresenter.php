@@ -2,7 +2,7 @@
 
 class SpisyPresenter extends BasePresenter
 {
-    public function upravitClickedShared(SubmitButton $button, $redirect)
+    public function upravitClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -20,9 +20,27 @@ class SpisyPresenter extends BasePresenter
             $this->flashMessage($e->getMessage(), 'warning');
         }
 
-        $this->redirect($redirect, array('id'=>$spis_id));
+        $this->redirect(":{$this->name}:detail", array('id'=>$spis_id));
     }
 
+    public function vytvoritClicked(SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        $Spisy = new Spis();
+
+        try {
+            $spis_id = $Spisy->vytvorit($data);
+            
+            $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
+            $this->redirect(":{$this->name}:detail", array('id'=>$spis_id));
+            
+        } catch (Exception $e) {
+            $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage($e->getMessage(), 'warning');
+        }
+    }
+    
 };
 
 
@@ -777,12 +795,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
         return $form1;
     }
-
-
-    public function upravitClicked(SubmitButton $button)
-    {
-        $this->upravitClickedShared($button, ':Spisovka:Spisy:detail');
-    }
         
     public function stornoClicked(SubmitButton $button)
     {
@@ -841,49 +853,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
-    }
-
-    public function vytvoritClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-        
-        $Spisy = new Spis();
-
-        $dokument_id = @$data['dokument_id'];
-        $this->template->dokument_id = $dokument_id;
-        unset($data['dokument_id']);
-        
-        try {
-            $spis_id = $Spisy->vytvorit($data);
-            if ( is_object($spis_id) ) {
-                if ( $dokument_id ) {
-                    echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
-                    echo '<div class="flash_message flash_error">Error: '. $spis_id->getMessage() .'</div>';
-                } else {
-                    $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','error');
-                    $this->flashMessage('Error: '. $spis_id->getMessage(),'error');
-                }
-            } else {
-                if ( $dokument_id ) {
-                    echo '<div class="flash_message flash_info">Spis "'. $data['nazev'] .'"  byl vytvořen.</div>';                
-                } else {
-                    $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
-                }
-                if (!$this->isAjax()) {
-                    $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
-                } else {
-                    $this->invalidateControl('dokspis');
-                }                
-            }
-        } catch (DibiException $e) {
-            if ( $dokument_id ) {
-                echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
-            } else {
-                $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
-            }
-            
-            
-        }
     }
 
     protected function createComponentNovyajaxForm()
@@ -957,14 +926,11 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         
         try {
             $spis_id = $Spisy->vytvorit($data);
-            if ( is_object($spis_id) ) {
-                echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
-                echo '<div class="flash_message flash_error">Error: '. $spis_id->getMessage() .'</div>';
-            } else {
-                echo '<div class="flash_message flash_info">Spis "'. $data['nazev'] .'"  byl vytvořen.</div>';                
-            }
-        } catch (DibiException $e) {
+            echo '<div class="flash_message flash_info">Spis "'. $data['nazev'] .'"  byl vytvořen.</div>';
+            
+        } catch (Exception $e) {
             echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
+            echo '<div class="flash_message flash_error">'. $e->getMessage() .'</div>';
         }
         
         $this->setLayout(false);

@@ -294,11 +294,7 @@ class Spis extends TreeModel
         $spis_id = $this->vlozitH($data);
 
         $Log = new LogModel();
-        if ( is_object($spis_id) ) {
-            
-        } else {        
-            $Log->logSpis($spis_id, 41);
-        }
+        $Log->logSpis($spis_id, 41);
         
         return $spis_id;
 

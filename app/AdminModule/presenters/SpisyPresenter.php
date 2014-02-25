@@ -470,12 +470,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         return $form1;
     }
 
-
-    public function upravitClicked(SubmitButton $button)
-    {
-        $this->upravitClickedShared($button, ':Admin:Spisy:detail');
-    }
-
     public function stornoClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -544,28 +538,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
-    }
-
-    public function vytvoritClicked(SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        //echo "<pre>"; print_r($data); echo "</pre>"; exit;
-
-        $Spisy = new Spis();
-
-        try {
-            $spis_id = $Spisy->vytvorit($data);
-            if ( is_object($spis_id) ) {
-                $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','error');
-                $this->flashMessage('Error: '. $spis_id->getMessage(),'error');
-            } else {
-                $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
-                $this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
-            }
-        } catch (DibiException $e) {
-            $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
-        }
     }
 
     protected function createComponentSearchForm()
