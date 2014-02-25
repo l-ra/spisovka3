@@ -158,14 +158,9 @@ class SpisovyZnak extends TreeModel
             }
         }
         $data['spisovy_znak_format'] = 1;
-        $data['sekvence_string'] = implode(".",$part);        
-        
-        //Debug::dump($data); //exit;
-        
-        $ret = $this->upravitH($data, $spisznak_id);
+        $data['sekvence_string'] = implode(".",$part);
 
-        return $ret;
-
+        $this->upravitH($data, $spisznak_id);
     }
 
     public function odstranit($spisznak_id, $odebrat_strom)

@@ -124,7 +124,7 @@ class RoleModel extends TreeModel
 
         if ( empty($data['parent_id']) || $data['parent_id'] == 0 ) $data['parent_id'] = null;
 
-        return $this->upravitH($data, $id);
+        $this->upravitH($data, $id);
     }
     public function smazat($where) {
     

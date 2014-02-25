@@ -1,6 +1,32 @@
 <?php
 
-class Spisovka_SpisyPresenter extends BasePresenter
+class SpisyPresenter extends BasePresenter
+{
+    public function upravitClickedShared(SubmitButton $button, $redirect)
+    {
+        $data = $button->getForm()->getValues();
+
+        $spis_id = $data['id'];
+        unset($data['id']);
+
+        $Spisy = new Spis();
+
+        try {
+            $Spisy->upravit($data, $spis_id);
+            $this->flashMessage('Spis  "'. $data['nazev'] .'"  byl upraven.');
+            
+        } catch (Exception $e) {
+            $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo upravit.', 'warning');
+            $this->flashMessage($e->getMessage(), 'warning');
+        }
+
+        $this->redirect($redirect, array('id'=>$spis_id));
+    }
+
+};
+
+
+class Spisovka_SpisyPresenter extends SpisyPresenter
 {
 
     private $typ_evidence = null;
@@ -755,30 +781,9 @@ class Spisovka_SpisyPresenter extends BasePresenter
 
     public function upravitClicked(SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
-
-        $spis_id = $data['id'];
-        unset($data['id']);
-
-        $Spisy = new Spis();
-
-        try {
-            $res = $Spisy->upravit($data, $spis_id);
-            if ( is_object($res) ) {
-                $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-                $this->flashMessage($res->getMessage(),'warning');
-                $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
-            } else {
-                $this->flashMessage('Spis  "'. $data['nazev'] .'"  byl upraven.');
-                $this->redirect(':Spisovka:Spisy:detail',array('id'=>$spis_id));
-            }
-        } catch (DibiException $e) {
-            $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-            $this->flashMessage($e->getMessage(),'warning');
-        }
-
+        $this->upravitClickedShared($button, ':Spisovka:Spisy:detail');
     }
-
+        
     public function stornoClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();

@@ -77,8 +77,7 @@ class Orgjednotka extends TreeModel
             if ( empty($data['parent_id_old']) ) $data['parent_id_old'] = null;
             if ( !empty($data['stav']) ) $data['stav'] = (int) $data['stav'];            
             
-            $orgjednotka_id = $this->upravitH($data, $orgjednotka_id);
-            //$this->update($data, array(array('id = %i',$orgjednotka_id)));
+            $this->upravitH($data, $orgjednotka_id);
         } else {
             // insert
             $data['date_created'] = new DateTime();

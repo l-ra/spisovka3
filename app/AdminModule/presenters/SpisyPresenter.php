@@ -1,6 +1,6 @@
 <?php
 
-class Admin_SpisyPresenter extends BasePresenter
+class Admin_SpisyPresenter extends SpisyPresenter
 {
 
     private $typ_evidence = null;
@@ -473,28 +473,7 @@ class Admin_SpisyPresenter extends BasePresenter
 
     public function upravitClicked(SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
-
-        $spis_id = $data['id'];
-        unset($data['id']);
-
-        $Spisy = new Spis();
-
-        try {
-            $res = $Spisy->upravit($data, $spis_id);
-            if ( is_object($res) ) {
-                $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-                $this->flashMessage($res->getMessage(),'warning');
-                $this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
-            } else {
-                $this->flashMessage('Spis  "'. $data['nazev'] .'"  byl upraven.');
-                $this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
-            }
-        } catch (DibiException $e) {
-            $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-            $this->flashMessage($e->getMessage(),'warning');
-        }
-
+        $this->upravitClickedShared($button, ':Admin:Spisy:detail');
     }
 
     public function stornoClicked(SubmitButton $button)

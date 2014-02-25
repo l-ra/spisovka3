@@ -204,7 +204,7 @@ class TreeModel extends BaseModel
     {
 
         // 0. control param
-        if ( empty($id) && !is_numeric($id) )
+        if ( empty($id) || !is_numeric($id) )
             throw new InvalidArgumentException('TreeModel::upravitH() - neplatný parameter "id"');
 
         // 1. clasic update
@@ -327,7 +327,6 @@ class TreeModel extends BaseModel
             }
 
             dibi::commit();
-            return $id;
 
         } catch (Exception $e) {
             dibi::rollback();

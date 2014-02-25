@@ -321,19 +321,16 @@ class Spis extends TreeModel
         if ( empty($data['datum_otevreni']) ) $data['datum_otevreni'] = null;
         if ( empty($data['datum_uzavreni']) ) $data['datum_uzavreni'] = null;
 
-        //Debug::dump($data); exit;
-
-        $ret = $this->upravitH($data, $spis_id);
-        
         $Log = new LogModel();
-        if ( is_object($ret) ) {
-            $Log->logSpis($spis_id, 48,'Hodnoty spisu se nepodarilo upravit.');
-        } else {        
-            $Log->logSpis($spis_id, 42);
-        }        
-        
-        return $ret;
 
+        try {
+            $this->upravitH($data, $spis_id);
+            $Log->logSpis($spis_id, 42);
+        }
+        catch (Exception $e) {
+            $Log->logSpis($spis_id, 48,'Hodnoty spisu se nepodarilo upravit.');
+            throw $e;
+        }
     }
     
     public function zmenitStav($spis_id, $stav) {
