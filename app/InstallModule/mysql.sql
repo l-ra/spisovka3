@@ -454,6 +454,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}spis` (
   `orgjednotka_id` int(10) unsigned DEFAULT NULL,
   `orgjednotka_id_predano` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `nazev` (`nazev`),
   KEY `fk_spis_spousteci_udalost1` (`spousteci_udalost_id`),
   KEY `fk_spis_spis1` (`parent_id`),
   KEY `fk_spis_user1` (`user_created`),
@@ -818,7 +819,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}workflow` (
   KEY `fk_workflow_dokument1` (`dokument_id`),
   KEY `fk_workflow_user1` (`prideleno_id`),
   KEY `fk_workflow_orgjednotka1` (`orgjednotka_id`),
-  KEY `fk_workflow_user2` (`user_id`),
+  KEY `fk_workflow_user2` (`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `{tbls3}zapujcka` (
@@ -1060,7 +1061,7 @@ CREATE TABLE `{tbls3}settings` (
 
 ALTER TABLE `{tbls3}user_role` ADD UNIQUE `user_role_code` ( `code` );
 
-INSERT INTO `{tbls3}settings` VALUES('db_revision', '650');
+INSERT INTO `{tbls3}settings` VALUES('db_revision', '660');
   
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
