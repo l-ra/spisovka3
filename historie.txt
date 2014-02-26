@@ -37,7 +37,8 @@ Opravy:
 - aplikace nyní kontroluje, zda je spisový znak a název spisu jedinečný
 - nastavení e-mailové schránky - výběr protokolu nyní automaticky nastaví číslo portu
 - výpravna - po změně druhu zásilky aplikace neprovedla překreslení stránky
-        
+- opraveno číselné stránkování v případě, kdy není k dispozici rewrite url
+
 === Ver. 3.3.4 =================================================================
 
 Nové funkce:
