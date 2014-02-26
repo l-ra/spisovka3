@@ -129,22 +129,26 @@ Route::$defaultFlags |= (Environment::getHttpRequest()->isSecured() ? Route::SEC
 // Get router
 $router = $application->getRouter();
 
-//
 // Cool URL detection
-// 
+// Detekce je nespolehliva, bez mod_env nefunguje
+// Proto je zde moznost specifikovat nastaveni primo v system.ini
 
-$cool_url = false;
-if ( isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On' ) {
-    // Detect in $_SERVER['HTTP_MOD_REWRITE'] 
-    // Apache => .htaccess directive SetEnv HTTP_MOD_REWRITE On
-    // Nginx  => nginx.conf directive fastcgi_param HTTP_MOD_REWRITE On;
-    $cool_url = true;
-} else if ( isset($_SERVER['REDIRECT_HTTP_MOD_REWRITE']) && $_SERVER['REDIRECT_HTTP_MOD_REWRITE'] == 'On' ) {
-    // Detect in $_SERVER - applied redirect, otherwise the first condition (HTTP_MOD_REWRITE)
-    $cool_url = true;
-}
+$clean_url = Environment::getConfig('clean_url');
 
-if ( $cool_url ) {
+if ($clean_url === null)
+    if ( isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On' )
+        // Detect in $_SERVER['HTTP_MOD_REWRITE'] 
+        // Apache => .htaccess directive SetEnv HTTP_MOD_REWRITE On
+        // Nginx  => nginx.conf directive fastcgi_param HTTP_MOD_REWRITE On;
+        $clean_url = true;
+        
+    else if ( isset($_SERVER['REDIRECT_HTTP_MOD_REWRITE']) 
+                && $_SERVER['REDIRECT_HTTP_MOD_REWRITE'] == 'On' )
+        $clean_url = true;
+    else
+        $clean_url = false;
+
+if ( $clean_url ) {
     define('IS_SIMPLE_ROUTER',0);
     
     $router[] = new Route('index.php', array(

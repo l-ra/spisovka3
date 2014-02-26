@@ -10,6 +10,10 @@ Nové funkce:
   Nyní může být uživatel pouze v jedné organizační jednotce.
 - E-podatelna - možnost nadefinovat více datových a emailových schránek
         a konkrétní schránku lze přiřadit určité organizační jednotce.
+- pokud je mod_rewrite povolen a aplikace jej nedetekuje automaticky,
+  je možné do souboru system.ini přidat následující nastavení:
+     clean_url = true
+  To zajistí použití čistých url.     
         
 Opravy:
 
