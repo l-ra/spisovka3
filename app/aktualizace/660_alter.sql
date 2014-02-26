@@ -1,3 +1,3 @@
 ------------------------;
 
-ALTER TABLE `{tbls3}spis` ADD UNIQUE KEY `nazev` (`nazev`);
+ALTER TABLE `{tbls3}spisovy_znak` ADD UNIQUE KEY `nazev` (`nazev`);
