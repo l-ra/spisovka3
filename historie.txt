@@ -44,6 +44,8 @@ Opravy:
 - nastavení e-mailové schránky - výběr protokolu nyní automaticky nastaví číslo portu
 - výpravna - po změně druhu zásilky aplikace neprovedla překreslení stránky
 - opraveno číselné stránkování v případě, kdy není k dispozici rewrite url
+- E-podatelna - u mailové schránky možnost stahovat zprávy ze složek,
+  kde název složky obsahuje diakritiku
 
 === Ver. 3.3.4 =================================================================
 

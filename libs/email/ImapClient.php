@@ -36,6 +36,9 @@ class ImapClient {
 
         if ( !function_exists('imap_open') )
             throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
+            
+        if ( function_exists('mb_convert_encoding') )
+            $mailbox = mb_convert_encoding($mailbox, "UTF7-IMAP", "UTF-8");
         
         // Pozor, tento timeout NEFUNGUJE pro SSL spojeni (php bug)
         imap_timeout(IMAP_OPENTIMEOUT,10);
