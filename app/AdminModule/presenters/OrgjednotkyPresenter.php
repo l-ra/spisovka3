@@ -47,6 +47,10 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
     public function actionDetail()
     {
+    }
+
+    public function renderDetail()
+    {
         $this->template->title = " - Detail organizační jednotky";
 
         $orgjednotka_id = $this->getParam('id',null);
@@ -61,12 +65,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         // Zmena udaju organizacni jednotky
         $this->template->FormUpravit = $this->getParam('upravit',null);
-
-
-    }
-
-    public function renderDetail()
-    {
     }
 
 
