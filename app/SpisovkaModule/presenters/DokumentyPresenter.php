@@ -547,6 +547,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->metadataForm = $this['metadataForm'];
         $this->template->vyrizovaniForm = $this['vyrizovaniForm'];
         $this->template->udalostForm = $this['udalostForm'];
+
+        $this->template->typy_dokumentu = Dokument::typDokumentu();
     }
 
     protected function actionAkce($data)
@@ -1077,7 +1079,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $CJ = new CisloJednaci();
         $this->template->cjednaci = $CJ->generuj();
 
-
+        $this->template->typy_dokumentu = Dokument::typDokumentu();
+        
         if ( $dokument ) {
             $this->template->Dok = $dokument;
         } else {

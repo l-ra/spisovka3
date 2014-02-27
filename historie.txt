@@ -13,7 +13,9 @@ Nové funkce:
 - pokud je mod_rewrite povolen a aplikace jej nedetekuje automaticky,
   je možné do souboru system.ini přidat následující nastavení:
      clean_url = true
-  To zajistí použití čistých url.     
+  To zajistí použití čistých url.
+- připojení subjektu k dokumentu pomocí rychlého vyhledávání automaticky
+  určí adresáta/odesílatele podle typu dokumentu  
         
 Opravy:
 

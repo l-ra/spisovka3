@@ -263,10 +263,27 @@ $(function() {
                     }
                 }
 
+                // Nasledujici kod zajistuje automaticke urceni typu pripojeni subjektu
+                var typ_id = $('#frmnovyForm-dokument_typ_id').val();
+                if (typeof typ_id == 'undefined')
+                    typ_id = $('#frmmetadataForm-dokument_typ_id').val();
+                if (typeof typ_id == 'undefined')
+                    typ_id = typ_dokumentu_id;
+                    
+                var typ_code;
+                if (typeof typ_id != 'undefined'
+                    && typeof smer_typu_dokumentu != 'undefined')
+                    typ_code = smer_typu_dokumentu[typ_id] == 0 ? 'O' : 'A';
+                else {
+                    // V sablone chybi informace o typech dokumentu
+                    // window.alert('chyba programu');
+                    typ_code = 'AO';
+                }
+                
                 if ( is_simple == 1 ) {
-                    url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=AO&autocomplete=1';                    
+                    url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=' + typ_code + '&autocomplete=1';                    
                 } else {
-                    url = baseUri + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=AO&autocomplete=1';
+                    url = baseUri + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=' + typ_code + '&autocomplete=1';
                 }
                 x.open("GET", url, true);
                 x.send(null);

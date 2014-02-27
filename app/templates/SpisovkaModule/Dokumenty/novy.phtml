@@ -21,6 +21,12 @@
                         }
 		}
 	</script>
+	<script type="text/javascript">
+        var smer_typu_dokumentu = new Array();
+        {foreach $typy_dokumentu as $t}
+        smer_typu_dokumentu[{$t->id}] = {$t->smer};
+        {/foreach}
+	</script>
 @{/block}
 @{block debug}
 <?php echo "\n\nDokument: "; print_r($Dok); ?>
