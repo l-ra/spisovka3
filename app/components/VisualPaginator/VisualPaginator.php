@@ -98,6 +98,10 @@ class VisualPaginator extends Control
                 
 		$this->template->steps = $steps;
 		$this->template->paginator = $paginator;
+        $this->template->onclick = '';
+        if (isset($query['is_ajax']))
+            $this->template->onclick = 'onclick="reloadDialog(this); return false;"';
+
 		$this->template->setFile(dirname(__FILE__) . '/template.phtml');
 		$this->template->render();
 	}

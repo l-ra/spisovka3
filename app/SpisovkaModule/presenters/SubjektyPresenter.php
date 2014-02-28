@@ -5,9 +5,21 @@ class SubjektyPresenter extends BasePresenter
 
     public function renderVyber()
     {
-        $Subjekt = new Subjekt();
+        $abcPaginator = new AbcPaginator($this, 'abc');
+        $abc = $abcPaginator->getParam('abc');
+        $user_config = Environment::getVariable('user_config');
+        $vp = new VisualPaginator($this, 'vp');
+        $paginator = $vp->getPaginator();
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+        
         $args = array( 'where' => array("stav=1") );
-        $this->template->seznam = $Subjekt->seznam($args);
+        if ( !empty($abc) )
+            $args['where'][] = array("nazev_subjektu LIKE %s OR prijmeni LIKE %s",$abc.'%',$abc.'%');
+            
+        $Subjekt = new Subjekt();
+        $result = $Subjekt->seznam($args);   
+        $paginator->itemCount = count($result);
+        $this->template->seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
     }
 
     public function renderAres()

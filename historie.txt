@@ -16,6 +16,7 @@ Nové funkce:
   To zajistí použití čistých url.
 - připojení subjektu k dokumentu pomocí rychlého vyhledávání automaticky
   určí adresáta/odesílatele podle typu dokumentu  
+- dialogové okno pro výběr subjektu obsahuje nyní abecední filtr a stránkování
         
 Opravy:
 

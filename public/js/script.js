@@ -678,6 +678,29 @@ subjektVybran = function (elm) {
     return false;
 }
 
+reloadDialog = function (elm) {
+
+    if (document.getElementById) {
+        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    }
+    if (x) {
+        $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
+
+        x.onreadystatechange = function() {
+            if (x.readyState == 4 && x.status == 200) {
+                $('#ajax-spinner', $('#dialog')).remove();
+                $('#dialog').html(x.responseText);
+            }
+        }
+        url = elm.href;
+        dontFollowLink();
+        x.open("GET", url, true);
+        x.send(null);
+    }
+
+    return false;
+}
+
 subjektzmenit = function(elm){
 
     if (document.getElementById) {

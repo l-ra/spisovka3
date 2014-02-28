@@ -43,9 +43,12 @@ class AbcPaginator extends Control
                 }
             }
         
-        $this->template->abc = $this->presenter->getParam('abc');
+        $this->template->current_letter = $this->getParam('abc');
         $this->template->url = $url;
         $this->template->query = $query_params;
+        $this->template->js_function = false;
+        if (isset($query['is_ajax']))
+            $this->template->js_function = 'reloadDialog';
 
         $this->template->setFile(dirname(__FILE__) . '/template.phtml');
         $this->template->render();
