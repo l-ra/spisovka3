@@ -29,7 +29,7 @@
     {include #menu}
     </div>
 
-    {if isset($zpravy_pocet_neprectenych) && $zpravy_pocet_neprectenych > 0}
+    {if isset($zpravy_pocet_neprectenych) && $zpravy_pocet_neprectenych > 0 && $presenter != "Zpravy"}
     <div id="upozorneni_na_nove_zpravy">
         Máte {$zpravy_pocet_neprectenych} nepřečtených zpráv.
         &nbsp;&nbsp;<a href="{link :Spisovka:Zpravy:}">Přečíst</a>        
