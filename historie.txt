@@ -2,6 +2,8 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
+=== Ver. 3.4.0 =================================================================
+
 Nové funkce:
 
 - uživatel by neměl ztratit přístup k dokumentům poté, co byl přeřazen do jiné org. jednotky
