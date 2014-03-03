@@ -262,8 +262,8 @@ abstract class BasePresenter extends Presenter
             */
             $this->template->zpravy_pocet_neprectenych = 0;
             if ($user->isAllowed('Spisovka_ZpravyPresenter')) {
-                // zjisti kolik ma uzivatel neprectenych zprav
-                $this->template->zpravy_pocet_neprectenych = 5;
+                // zjisti kolik ma uzivatel neprectenych zprav                
+                $this->template->zpravy_pocet_neprectenych = Zpravy::dej_pocet_neprectenych_zprav();
             }
                 
         } else {

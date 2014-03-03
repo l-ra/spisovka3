@@ -34,6 +34,9 @@ class Zpravy extends BaseModel
         */
     }
 
-
+    public static function dej_pocet_neprectenych_zprav()    
+    {
+        return 0;
+    }
 }
 

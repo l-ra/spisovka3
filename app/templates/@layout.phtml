@@ -31,7 +31,14 @@
 
     {if isset($zpravy_pocet_neprectenych) && $zpravy_pocet_neprectenych > 0 && $presenter != "Zpravy"}
     <div id="upozorneni_na_nove_zpravy">
-        Máte {$zpravy_pocet_neprectenych} nepřečtených zpráv.
+        Máte {$zpravy_pocet_neprectenych}
+        {if $zpravy_pocet_neprectenych < 2}
+        nepřečtenou zprávu.
+        {elseif $zpravy_pocet_neprectenych < 5}
+        nepřečtené zprávy.
+        {else}
+        nepřečtených zpráv.
+        {/if}
         &nbsp;&nbsp;<a href="{link :Spisovka:Zpravy:}">Přečíst</a>        
     </div>    
     {/if}

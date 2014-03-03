@@ -678,6 +678,7 @@ label.required {
 
 #upozorneni_na_nove_zpravy {
     padding: 10px 20px;
+    background-color: #d0d0d0;
 }
 
 .flash_infozprava_item {
