@@ -6,7 +6,7 @@
 
 Nové funkce:
 
-- uživatel by neměl ztratit přístup k dokumentům poté, co byl přeřazen do jiné org. jednotky
+- uživatel neztratí přístup k dokumentům poté, co byl přeřazen do jiné org. jednotky
 - změněn způsob, jakým je uživatel zařazen do organizační jednotky.
   Role už k tomu neslouží a je možné v minulosti automaticky vytvořené role smazat.
   Nyní může být uživatel pouze v jedné organizační jednotce.
@@ -32,7 +32,7 @@ Opravy:
 - v administraci nebyly vidět neaktivní subjekty
 - při předání dokumentu, který se vyřizoval, se neodstranil stav "vyřizuje se"
 - sestava "Podací deník" nesprávně obsahovala i dokumenty bez čísla jednacího
-- uživatel s rolí "superadmin" mohl při editaci nechtěně změnit typ dokumentu
+- uživatel mohl při editaci metadat nechtěně změnit typ dokumentu
 - chyby projevující se při použití prohlížeče Internet Explorer:
     - oprava chybové zprávy při vytváření zápůjčky
     - v prvku formuláře pro výběr datumu se nabízel rok 3898 místo 2013
