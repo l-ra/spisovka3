@@ -652,7 +652,7 @@ dmFiles = objekt
                         $popis .= "ID datové zprávy    : ". $mess->dmDm->dmID ."\n";// = 342682
                         $popis .= "Věc, předmět zprávy : ". $annotation ."\n";//  = Vaše datová zpráva byla přijata
                         $popis .= "\n";
-                        $popis .= "Číslo jednací odeslatele   : ". $mess->dmDm->dmSenderRefNumber ."\n";//  = AB-44656
+                        $popis .= "Číslo jednací odesílatele   : ". $mess->dmDm->dmSenderRefNumber ."\n";//  = AB-44656
                         $popis .= "Spisová značka odesílatele : ". $mess->dmDm->dmSenderIdent ."\n";//  = ZN-161
                         $popis .= "Číslo jednací příjemce     : ". $mess->dmDm->dmRecipientRefNumber ."\n";//  = KAV-34/06-ŘKAV/2010
                         $popis .= "Spisová značka příjemce    : ". $mess->dmDm->dmRecipientIdent ."\n";//  = 0.06.00
@@ -884,7 +884,7 @@ dmFormat =
                     $popis .= "ID datové zprávy    : ". $mess->dmID ."\n";// = 342682
                     $popis .= "Věc, předmět zprávy : ". $annotation ."\n";//  = Vaše datová zpráva byla přijata
                     $popis .= "\n";
-                    $popis .= "Číslo jednací odeslatele   : ". $mess->dmSenderRefNumber ."\n";//  = AB-44656
+                    $popis .= "Číslo jednací odesílatele   : ". $mess->dmSenderRefNumber ."\n";//  = AB-44656
                     $popis .= "Spisová značka odesílatele : ". $mess->dmSenderIdent ."\n";//  = ZN-161
                     $popis .= "Číslo jednací příjemce     : ". $mess->dmRecipientRefNumber ."\n";//  = KAV-34/06-ŘKAV/2010
                     $popis .= "Spisová značka příjemce    : ". $mess->dmRecipientIdent ."\n";//  = 0.06.00

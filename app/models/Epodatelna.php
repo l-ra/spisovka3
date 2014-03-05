@@ -166,7 +166,7 @@ class Epodatelna extends BaseModel
                 $popis .= "Adresát     : ". @$original['zprava']->to_address ."\n";
                 $popis .= "\n";
                 $popis .= "Datum a čas doručení            : ". date("d.m.Y H:i:s",$doruceno) ."\n";
-                $popis .= "Datum a čas přijetí epodatelnou : ". date("d.m.Y H:i:s",$prijato) ."\n";
+                $popis .= "Datum a čas přijetí e-podatelnou : ". date("d.m.Y H:i:s",$prijato) ."\n";
                 $popis .= "\n";
 
                 if ( (int)$original['signature']['signed'] >= 0 && !empty($original['signature']['signed']) ) {
@@ -227,10 +227,10 @@ class Epodatelna extends BaseModel
                 $dt_doruceni = strtotime($original->dmAcceptanceTime);
                 $popis .= "Datum a čas dodání              : ". date("d.m.Y H:i:s",$dt_dodani) ."\n";
                 $popis .= "Datum a čas doručení            : ". date("d.m.Y H:i:s",$dt_doruceni) ."\n";
-                $popis .= "Datum a čas přijetí epodatelnou : ". date("d.m.Y H:i:s",$prijato) ."\n";
+                $popis .= "Datum a čas přijetí e-podatelnou : ". date("d.m.Y H:i:s",$prijato) ."\n";
                 $popis .= "\n";
 
-                $popis .= "Číslo jednací odeslatele   : ". $original->dmDm->dmSenderRefNumber ."\n";
+                $popis .= "Číslo jednací odesílatele   : ". $original->dmDm->dmSenderRefNumber ."\n";
                 $popis .= "Spisová značka odesílatele : ". $original->dmDm->dmSenderIdent ."\n";
                 $popis .= "Číslo jednací příjemce     : ". $original->dmDm->dmRecipientRefNumber ."\n";
                 $popis .= "Spisová značka příjemce    : ". $original->dmDm->dmRecipientIdent ."\n";
@@ -266,10 +266,10 @@ class Epodatelna extends BaseModel
                 $dt_doruceni = strtotime($original->dmAcceptanceTime);
                 $popis .= "Datum a čas dodání              : ". date("d.m.Y H:i:s",$dt_dodani) ."\n";
                 $popis .= "Datum a čas doručení            : ". date("d.m.Y H:i:s",$dt_doruceni) ."\n";
-                $popis .= "Datum a čas přijetí epodatelnou : ". date("d.m.Y H:i:s",$prijato) ."\n";
+                $popis .= "Datum a čas přijetí e-podatelnou : ". date("d.m.Y H:i:s",$prijato) ."\n";
                 $popis .= "\n";
 
-                $popis .= "Číslo jednací odeslatele   : ". $original->dmSenderRefNumber ."\n";
+                $popis .= "Číslo jednací odesílatele   : ". $original->dmSenderRefNumber ."\n";
                 $popis .= "Spisová značka odesílatele : ". $original->dmSenderIdent ."\n";
                 $popis .= "Číslo jednací příjemce     : ". $original->dmRecipientRefNumber ."\n";
                 $popis .= "Spisová značka příjemce    : ". $original->dmRecipientIdent ."\n";
