@@ -110,12 +110,14 @@
         </dl>
     </div>
 
-    {if $isPrivilege}
+    {if $muzeHledatDlePrideleni}
     <div id="dokument_blok_poznamka">
         <div class="h2">
             Přiděleno / předáno
         </div>
-        <p>Poznámka: Při použití tohoto hledání se dočasně deaktivuje filtr dokumentů.</p>
+        Poznámka: Při použití tohoto hledání se dočasně deaktivuje filtr dokumentů.<br/>
+        <span n:if="!$vidiVsechnyDokumenty">Poznámka: Nemáte právo vidět všechny dokumenty, výsledek hledání bude omezen.</span>
+
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>

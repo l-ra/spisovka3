@@ -1224,26 +1224,24 @@ class Dokument extends BaseModel
             
             $org_jednotka_id = Orgjednotka::dejOrgUzivatele();
             
-            $org_jednotka = array();
+            $org_jednotky = array();
             if ($org_jednotka_id === null)
                 ;            
             else if ( $isVedouci )
-                $org_jednotka = Orgjednotka::childOrg($org_jednotka_id);
+                $org_jednotky = Orgjednotka::childOrg($org_jednotka_id);
             else if ($user->isAllowed('Dokument', 'cist_moje_oj'))
-                $org_jednotka = array($org_jednotka_id);
+                $org_jednotky = array($org_jednotka_id);
                 
-            $a = array('wf.aktivni=1 AND wf.stav_osoby=1');
+            $args['where'][] = 'wf.aktivni=1 AND wf.stav_osoby=1';
             
-            if ( count($org_jednotka) > 1 )
-                $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN (%in)', 
-                            $user_id, $org_jednotka);
-            else if ( count($org_jednotka) == 1 )
-                $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id = %i', 
-                            $user_id, $org_jednotka[0]);
+            if ( count($org_jednotky) > 1 )
+                $args['where'][] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN (%in)', 
+                            $user_id, $org_jednotky);
+            else if ( count($org_jednotky) == 1 )
+                $args['where'][] = array('wf.prideleno_id=%i OR wf.orgjednotka_id = %i', 
+                            $user_id, $org_jednotky[0]);
             else
-                $a[] = array('wf.prideleno_id=%i', $user_id);
-                                
-            $args['where'] = array_merge($args['where'], $a);
+                $args['where'][] = array('wf.prideleno_id=%i', $user_id);
         }
         
         return $args;

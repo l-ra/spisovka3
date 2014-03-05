@@ -140,7 +140,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $args = array();
         } else {
             $parametry = unserialize($sestava->parametry);
-            $args = $Dokument->fixedFiltr($parametry, false, false);
+            $args = $Dokument->paramsFiltr($parametry);
         }
 
         if ( !isset($args['order']) ) {

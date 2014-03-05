@@ -18,15 +18,15 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
         $this->template->DruhZasilky = DruhZasilky::get(null,1);
         
-        $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');
-        
-        if (Environment::getUser()->isAllowed(NULL, 'is_vedouci'))
-            $this->template->isPrivilege = true;
+        $user = Environment::getUser();
+        $this->template->muzeHledatDlePrideleni = 
+            $user->isAllowed(NULL, 'is_vedouci')
+            || $user->isAllowed('Dokument', 'cist_moje_oj')
+            || $user->isAllowed('Dokument', 'cist_vse');
+        $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');
             
-        if ( $this->getParam('is_ajax') ) {
+        if ( $this->getParam('is_ajax') )
             $this->layout = false;
-        }
-
     }
 
     public function handleAutoComplete($text, $typ, $user=null, $org=null)
