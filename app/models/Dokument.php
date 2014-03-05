@@ -383,21 +383,8 @@ class Dokument extends BaseModel
 
     }
 
-    public function filtr($nazev = null, $params = null, $bez_vyrizenych = false) {
 
-        if ( is_null($nazev) && is_null($params) ) {
-            return null;
-        } else if ( $nazev == 'spisovna' ) {
-            return $this->spisovnaFiltr($params);
-        } else if ( is_null($nazev) ) {
-            return $this->paramsFiltr($params);
-        } else {
-            // nevim, odkud se tato metoda vola, ale fixedFiltr by se mela volat primo
-            return $this->fixedFiltr($nazev, $bez_vyrizenych, false);
-        }
-    }
-
-    private function paramsFiltr($params) {
+    public function paramsFiltr($params) {
 
         $args = array();
 
@@ -1032,21 +1019,20 @@ class Dokument extends BaseModel
 
     }
 
+    /* $pouze_dokumenty_na_osobu - uživatelská volba, která je součástí filtru
+    */
     public function fixedFiltr($nazev, $bez_vyrizenych, $pouze_dokumenty_na_osobu) {
 
-        $user = Environment::getUser()->getIdentity();
-        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
+        $user = Environment::getUser();
+        $user_id = $user->getIdentity()->id;
+        $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
         $vyrusit_bezvyrizeni = false;
 
         $oj_id = Orgjednotka::dejOrgUzivatele();
         $org_jednotka = array();
-        if ($oj_id !== null)
+        if ($oj_id !== null && $user->isAllowed('Dokument', 'cist_moje_oj'))
             $org_jednotka[] = $oj_id;
-        $vidi_vsechny_dokumenty = self::vidiVsechnyDokumenty();
-        
-        // Zkontroluj, zda mam pravo videt dokumenty ostatnich uzivatelu v o.j.
-        if (false)
-            $pouze_dokumenty_na_osobu = true;
+        $vidi_vsechny_dokumenty = self::uzivatelVidiVsechnyDokumenty();
 
         $args = array();  // priprav navratovou hodnotu
 
@@ -1100,7 +1086,7 @@ class Dokument extends BaseModel
                 $vyrusit_bezvyrizeni = true;
                 $args = array(
                     'where' => array( 
-                        array('wf.prideleno_id=%i',$user->id),
+                        array('wf.prideleno_id=%i',$user_id),
                         array('wf.stav_osoby > 0'),
                         array('wf.stav_osoby < 100') )
                 );
@@ -1179,16 +1165,16 @@ class Dokument extends BaseModel
                 $a[] = 'wf.aktivni=1';
                 
                 if ($pouze_dokumenty_na_osobu)
-                    $a[] = array('wf.prideleno_id=%i', $user->id);
+                    $a[] = array('wf.prideleno_id=%i', $user_id);
                 else if ( $vidi_vsechny_dokumenty ) ;
                 else if ( count($org_jednotka) > 1 )
                     $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN (%in)', 
-                                $user->id, $org_jednotka);
+                                $user_id, $org_jednotka);
                 else if ( count($org_jednotka) == 1 )
                     $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id = %i', 
-                                $user->id, $org_jednotka[0]);
+                                $user_id, $org_jednotka[0]);
                 else
-                    $a[] = array('wf.prideleno_id=%i', $user->id);
+                    $a[] = array('wf.prideleno_id=%i', $user_id);
                     
                 $args['where'] = $a;
                 break;
@@ -1202,22 +1188,26 @@ class Dokument extends BaseModel
 
     }
 
-    private function spisovnaFiltr($params = null)
+    public function spisovnaFiltr($params = null)
     {
 
         if ( strpos($params,'stav_') !== false ) {
             $stav = substr($params, 5);
             return $this->paramsFiltr(array('stav_dokumentu'=>$stav));
-        } else if ( $params == 'vlastni' ) {
+        }
+        else if ( $params == 'vlastni' ) {
             return $this->paramsFiltr(array('stav_dokumentu'=>77));
             //return $this->paramsFiltr(array('stav_dokumentu'=>77,'prideleno_osobne'=>1));
-        } else if ( strpos($params,'skartacni_znak_') !== false ) {
+        }
+        else if ( strpos($params,'skartacni_znak_') !== false ) {
             $skartacni_znak = substr($params, 15);
             return $this->paramsFiltr(array('skartacni_znak'=>$skartacni_znak));
-        } else if ( strpos($params,'zpusob_vyrizeni_') !== false ) {
+        }
+        else if ( strpos($params,'zpusob_vyrizeni_') !== false ) {
             $zpusob_vyrizeni = substr($params, 16);
             return $this->paramsFiltr(array('zpusob_vyrizeni_id'=>$zpusob_vyrizeni));
-        } else {
+        }
+        else {
             return $this->paramsFiltr(array('stav_dokumentu'=>77));
         }
 
@@ -1225,31 +1215,33 @@ class Dokument extends BaseModel
 
     public function sestavaOmezeniOrg($args)
     {
-        $user = Environment::getUser()->getIdentity();
-        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
-        $vidi_vsechny_dokumenty = self::vidiVsechnyDokumenty();
+        $user = Environment::getUser();
+        $user_id = $user->getIdentity()->id;
+        $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
+        $vidi_vsechny_dokumenty = self::uzivatelVidiVsechnyDokumenty();
         
         if ( !$vidi_vsechny_dokumenty ) {
             
             $org_jednotka_id = Orgjednotka::dejOrgUzivatele();
             
+            $org_jednotka = array();
             if ($org_jednotka_id === null)
-                $org_jednotka = array();            
+                ;            
             else if ( $isVedouci )
                 $org_jednotka = Orgjednotka::childOrg($org_jednotka_id);
-            else
+            else if ($user->isAllowed('Dokument', 'cist_moje_oj'))
                 $org_jednotka = array($org_jednotka_id);
                 
             $a = array('wf.aktivni=1 AND wf.stav_osoby=1');
             
             if ( count($org_jednotka) > 1 )
                 $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN (%in)', 
-                            $user->id, $org_jednotka);
+                            $user_id, $org_jednotka);
             else if ( count($org_jednotka) == 1 )
                 $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id = %i', 
-                            $user->id, $org_jednotka[0]);
+                            $user_id, $org_jednotka[0]);
             else
-                $a[] = array('wf.prideleno_id=%i', $user->id);
+                $a[] = array('wf.prideleno_id=%i', $user_id);
                                 
             $args['where'] = array_merge($args['where'], $a);
         }
@@ -2278,9 +2270,11 @@ class Dokument extends BaseModel
 
     }
 
-    public static function vidiVsechnyDokumenty()
+    protected static function uzivatelVidiVsechnyDokumenty()
     {
-        return ACL::isInRole('admin,podatelna,skartacni_dohled');    
+        // takto to bylo ve starem systemu
+        // return ACL::isInRole('admin,podatelna,skartacni_dohled'); 
+        return Environment::getUser()->isAllowed('Dokument', 'cist_vse');
     }
     
 }

@@ -919,36 +919,44 @@ class Workflow extends BaseModel
      */
     public function prirazeny($dokument_id)
     {
+        $user = Environment::getUser();
+        $user_id = $user->getIdentity()->id;
+        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+        $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
+
         $param = array();
-
-        $user_id = Environment::getUser()->getIdentity()->id;
-
         $param['where'] = array( 
                 array('dokument_id=%i', $dokument_id),
-                array('stav_osoby=%i', 1),
-                array('aktivni=%i', 1)
+                'stav_osoby = 1',
+                'aktivni = 1'
             );
         $param['limit'] = 1;
 
-        $rows = $this->fetchAllComplet($param);
-        $row = $rows->fetch();
+        $result = $this->fetchAllComplet($param);
+        $row = $result->fetch();
 
-        if ( $row ) {
-            if ( empty($row->prideleno_id) ) {
-                if ( Orgjednotka::isInOrg($row->orgjednotka_id) ) {
-                    return true;
-                }
-            } else if ( Acl::isInRole('superadmin') ) {
-                return true;
-            } else {
-                if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id) ) {
-                    return true;
-                }
-            }
+        if ( !$row )
+            return false; // chyba integrity dat nebo parametr dokument_id je neplatny
+            
+        if ( Acl::isInRole('superadmin') )
+            return true;
+            
+        if ($orgjednotka_id !== null && $user->isAllowed('Dokument', 'menit_moje_oj')
+            && $orgjednotka_id == $row->orgjednotka_id)
+            return true;
+            
+        if ( empty($row->prideleno_id) ) {
+            // P.L. 2013-07-16 Neni prirazeno konkretnimu uzivateli. 
+            // Nemelo by se stat, prijmuti dokumentu musi provest konkretni uzivatel
+            // Ale treba pocitat s chybami v datech z minulosti
+            
+            if ($isVedouci && $orgjednotka_id !== null)
+                return $orgjednotka_id == $row->orgjednotka_id;
 
+            return false;
         }
-
-        return false;
+            
+        return $row->prideleno_id == $user_id;
     }
 
     /**
@@ -961,34 +969,41 @@ class Workflow extends BaseModel
     {
         $param = array();
 
-        $user_id = Environment::getUser()->getIdentity()->id;
+        $user = Environment::getUser();
+        $user_id = $user->getIdentity()->id;
+        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+        $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
 
         $param['where'] = array(
                 array('dokument_id=%i', $dokument_id),
-                array('stav_osoby=%i', 0),
-                array('aktivni=%i', 1)
+                'stav_osoby = 0',
+                'aktivni = 1'
             );
         $param['limit'] = 1;
 
-        $rows = $this->fetchAllComplet($param);
-        $row = $rows->fetch();
+        $result = $this->fetchAllComplet($param);
+        $row = $result->fetch();
 
-        if ( $row ) {
-            if ( empty($row->prideleno_id) ) {
-                if ( Orgjednotka::isInOrg($row->orgjednotka_id) ) {
-                    return true;
-                }
-            } else if ( Acl::isInRole('superadmin') ) {
-                return true;
-            } else {
-                if ( $row->prideleno_id == $user_id || Orgjednotka::isInOrg($row->orgjednotka_id) ) {
-                    return true;
-                }
-            }
+        if ( !$row )
+            return false; // zaznam nenalezen, dokument neni ve stavu predani
 
+        if ( Acl::isInRole('superadmin') )
+            return true;
+
+        if ($orgjednotka_id !== null && $user->isAllowed('Dokument', 'menit_moje_oj')
+            && $orgjednotka_id == $row->orgjednotka_id)
+            return true;
+            
+        if ( empty($row->prideleno_id) ) {
+            // Dokument predany pouze na org. jednotku
+            
+            if ($isVedouci && $orgjednotka_id !== null)
+                return Orgjednotka::dejOrgUzivatele() == $row->orgjednotka_id;
+
+            return false;        
         }
         
-        return false;
+        return $row->prideleno_id == $user_id;
     }
 
     protected function deaktivovat($dokument_id, $dokument_version = null) {

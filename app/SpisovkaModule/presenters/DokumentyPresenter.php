@@ -12,7 +12,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     private $odpoved = null;
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
-    private $typ_pristupu = 1; // 0 = na jmeno, 1 = na utvar
     private $pdf_output = 0;
     private $hromadny_tisk = false;
     private $hromadny_tisk_vyber;
@@ -32,8 +31,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->oddelovac_poradi = '/';
         }
         $this->template->Oddelovac_poradi = $this->oddelovac_poradi;
-
-        $this->typ_pristupu = Orgjednotka::jePristupNaUrovniJednotky();
 
         parent::startup();
     }
@@ -84,38 +81,27 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->filtr_bezvyrizenych = $filtr['bez_vyrizenych'];
         $this->filtr_moje = $filtr['jen_moje'];
         $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
-
         
         $args_h = array();
-        if ( isset($hledat) ) {
+        if ( isset($hledat) )
+            $this->getHttpResponse()->setCookie('s3_hledat', serialize($hledat), strtotime('90 day'));
+        else {
+            $cookie_hledat = $this->getHttpRequest()->getCookie('s3_hledat');            
+            if ( $cookie_hledat )
+                // zjisteno hladaci filtr v cookie, tak vezmeme z nej
+                $hledat = unserialize($cookie_hledat);
+        }
+        if ( isset($hledat) )
             if (is_array($hledat) ) {
                 // podrobne hledani = array
-                $args_h = $Dokument->filtr(null,$hledat);
+                $args_h = $Dokument->paramsFiltr($hledat);
                 $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
             } else {
                 // rychle hledani = string
                 $args_h = $Dokument->hledat($hledat);
                 $this->hledat = $hledat;
                 $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
-            }
-            $this->getHttpResponse()->setCookie('s3_hledat', serialize($hledat), strtotime('90 day'));
-        } else {
-            $cookie_hledat = $this->getHttpRequest()->getCookie('s3_hledat');            
-            if ( $cookie_hledat ) {
-                // zjisteno hladaci filtr v cookie, tak vezmeme z nej
-                $hledat = unserialize($cookie_hledat);
-                if (is_array($hledat) ) {
-                    // podrobne hledani = array
-                    $args_h = $Dokument->filtr(null,$hledat);
-                    $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
-                } else {
-                    // rychle hledani = string
-                    $args_h = $Dokument->hledat($hledat);
-                    $this->hledat = $hledat;
-                    $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
-                }
-            }
-        }
+            }       
         $this->template->s3_hledat = $hledat;
 
         /* [P.L.] Pokud uzivatel zvoli pokrocile hledani a hleda dokumenty pridelene/predane uzivateli ci jednotce,
@@ -326,16 +312,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Dok = $dokument;
 
             $user = Environment::getUser();
-
             $user_id = $user->getIdentity()->id;
-            $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
-            if ($isVedouci) {
-                // Zjednoduseni - uzivatel muze byt vedoucim jenom jednoho utvaru
-                $id = Orgjednotka::dejOrgUzivatele();
-                $povoleneOrgJednotky = array();
-                if ($id)
-                    $povoleneOrgJednotky = Orgjednotka::childOrg($id);
-            }
             
             $this->template->Pridelen = 0;
             $this->template->Predan = 0;
@@ -353,7 +330,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }      
 
             // P.L.
-            if ($isVedouci)
+            $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
+            if ($isVedouci) {
+                // Uzivatel muze byt vedoucim jenom jednoho utvaru
+                $id = Orgjednotka::dejOrgUzivatele();
+                $povoleneOrgJednotky = array();
+                if ($id)
+                    $povoleneOrgJednotky = Orgjednotka::childOrg($id);
+                    
                 if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky)
                  || in_array(@$dokument->predano->orgjednotka_id, $povoleneOrgJednotky)) {
                     $this->template->AccessEdit = 1;
@@ -363,23 +347,29 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     else
                         $this->template->Predan = 1;                
                 }
+            }
             
             // Prideleny nebo predany uzivatel
-            // $this->typ_pristupu = 0 -> spravuje pouze uzivatel (prideleno_id)
-            // $this->typ_pristupu = 1 -> spravuje kdokoli z utvaru (orgjednotka_id)
             if ( @$dokument->prideleno->prideleno_id == $user_id 
-                    || (Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) && $this->typ_pristupu) ) {
+                 || (Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) 
+                     && $user->isAllowed('Dokument', 'menit_moje_oj')) ) {
                 // prideleny
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
             }
-            if ( @$dokument->predano->prideleno_id == $user_id 
-                    || (Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id) && $this->typ_pristupu) ) {
+            else if ( @$dokument->predano->prideleno_id == $user_id 
+                    || (Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id)
+                     && $user->isAllowed('Dokument', 'menit_moje_oj')) ) {
                 // predany
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;
+            }
+            else if ( $user->isAllowed('Dokument', 'cist_moje_oj')
+                    && (Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id)
+                        || Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id)) ) {
+                $this->template->AccessView = 1;
             }
             
             // Dokument se vyrizuje
@@ -2573,7 +2563,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $popis .= "ID datové zprávy    : ". $mess->dmID ."\n";// = 342682
             $popis .= "Věc, předmět zprávy : ". $mess->dmAnnotation ."\n";//  = Vaše datová zpráva byla přijata
             $popis .= "\n";
-            $popis .= "Číslo jednací odeslatele   : ". $mess->dmSenderRefNumber ."\n";//  = AB-44656
+            $popis .= "Číslo jednací odesílatele   : ". $mess->dmSenderRefNumber ."\n";//  = AB-44656
             $popis .= "Spisová značka odesílatele : ". $mess->dmSenderIdent ."\n";//  = ZN-161
             $popis .= "Číslo jednací příjemce     : ". $mess->dmRecipientRefNumber ."\n";//  = KAV-34/06-ŘKAV/2010
             $popis .= "Spisová značka příjemce    : ". $mess->dmRecipientIdent ."\n";//  = 0.06.00
@@ -2824,7 +2814,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // Zde by se melo kontrolovat opravneni a podle nej pripadne Input vlozit jako Hidden pole
         // Pokud uzivatel neni v zadne org. jednotce,  na hodnote filtru "jen_moje" nezalezi
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
-        if ($orgjednotka_id === null)
+        $user = Environment::getUser();
+         
+        if (($orgjednotka_id === null || !$user->isAllowed('Dokument', 'cist_moje_oj'))
+            && !$user->isAllowed('Dokument', 'cist_vse'))
             $control = $form->addHidden('jen_moje');
         else
             $control = $form->addCheckbox('jen_moje','Zobrazit jen dokumenty na mé jméno');

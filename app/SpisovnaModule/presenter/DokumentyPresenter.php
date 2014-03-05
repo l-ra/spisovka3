@@ -134,58 +134,46 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         
         $Dokument = new Dokument();
 
-        $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
-        if ( isset($filtr) ) {
+        if ( isset($filtr['filtr']) ) {
             // zjisten filtr
-            $args_f = $Dokument->filtr('spisovna', $filtr['filtr']);
-            $this->filtr = $filtr['filtr'];
-            $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
+            $this->getHttpResponse()->setCookie('s3_spisovna_filtr', serialize($filtr), strtotime('90 day'));
         } else {
-            // filtr nezjisten - pouzijeme default
             $cookie_filtr = $this->getHttpRequest()->getCookie('s3_spisovna_filtr');
             if ( $cookie_filtr ) {
                 // zjisten filtr v cookie, tak vezmeme z nej
                 $filtr = unserialize($cookie_filtr);
-                $args_f = $Dokument->filtr('spisovna', $filtr['filtr']);
-                $this->filtr = $filtr['filtr'];
-                $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
-            } else {
-                $args_f = null;// $Dokument->filtr('');
-                $this->filtr = '';
             }
-
+            if (!isset($filtr['filtr'])) {
+                // filtr nezjisten - pouzijeme filtr Vse
+                $filtr = array();
+                $filtr['filtr'] = 'stav_77';
+            }
         }
-
-        if ( isset($hledat) ) {
+        $this->filtr = $filtr['filtr'];
+        $this->template->no_items = ($filtr['filtr'] == 'stav_77') ? 1 : 2; // indikator pri nenalezeni dokumentu
+        $args_f = $Dokument->spisovnaFiltr($filtr['filtr']);
+        
+        $args_h = array();
+        if ( isset($hledat) )
+            $this->getHttpResponse()->setCookie('s3_spisovna_hledat', serialize($hledat), strtotime('90 day'));
+        else {
+            $cookie_hledat = $this->getHttpRequest()->getCookie('s3_spisovna_hledat');            
+            if ( $cookie_hledat )
+                // zjisteno hladaci filtr v cookie, tak vezmeme z nej
+                $hledat = unserialize($cookie_hledat);
+        }
+        if ( isset($hledat) )
             if (is_array($hledat) ) {
                 // podrobne hledani = array
-                $args_h = $Dokument->filtr(null,$hledat);
+                $args_h = $Dokument->paramsFiltr($hledat);
                 $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
             } else {
                 // rychle hledani = string
                 $args_h = $Dokument->hledat($hledat);
                 $this->hledat = $hledat;
                 $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
-            }
-            $this->getHttpResponse()->setCookie('s3_spisovna_hledat', serialize($hledat), strtotime('90 day'));
-        } else {
-            $cookie_hledat = $this->getHttpRequest()->getCookie('s3_spisovna_hledat');            
-            if ( $cookie_hledat ) {
-                // zjisteno hladaci filtr v cookie, tak vezmeme z nej
-                $hledat = unserialize($cookie_hledat);
-                if (is_array($hledat) ) {
-                    // podrobne hledani = array
-                    $args_h = $Dokument->filtr(null,$hledat);
-                    $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
-                } else {
-                    // rychle hledani = string
-                    $args_h = $Dokument->hledat($hledat);
-                    $this->hledat = $hledat;
-                    $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
-                }
-            }
-        }
-        $this->template->s3_hledat = $hledat;        
+            }       
+        $this->template->s3_hledat = $hledat;
 
         $args = $Dokument->spojitAgrs(@$args_f, @$args_h);
         

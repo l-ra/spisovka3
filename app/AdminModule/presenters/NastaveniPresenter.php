@@ -232,9 +232,6 @@ class Admin_NastaveniPresenter extends BasePresenter
             1 => 'dokument/spis může upravovat kdokoli z dané organizační jednotky'
         );
         
-        $form1->addRadioList('typ_pristupu', 'Typ přístupu k dokumentům:', $typ)
-                ->setValue( Orgjednotka::jePristupNaUrovniJednotky() ? 1 : 0 );
-
         $form1->addText('cislo_zakaznicke_karty', 'Číslo Zákaznické karty:', 13, 13)
                 ->setValue( Settings::get('Ceska_posta_cislo_zakaznicke_karty', '') )
                 ->addRule(Form::INTEGER, 'Chybné číslo karty.');
@@ -268,7 +265,6 @@ class Admin_NastaveniPresenter extends BasePresenter
         $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $config_data = $config->toArray();
         $config_data['nastaveni']['pocet_polozek'] = $data['pocet_polozek'];
-        $config_data['nastaveni']['typ_pristupu'] = $data['typ_pristupu'];
 
         $config_modify = new Config();
         $config_modify->import($config_data);
