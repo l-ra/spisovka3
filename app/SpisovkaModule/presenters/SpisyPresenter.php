@@ -979,14 +979,12 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     {
 
         $user = Environment::getUser();
-            
-        if ( !$user->isInRole('superadmin','admin') ) {
-            $this->flashMessage('Nemáte oprávnění k provádění této činnosti!','warning');
-            $this->redirect(':Spisovka:Spisy:default');
-        }         
-        
-        
-        
+
+        // tento nefunkční hack by se měl z programu odstranit
+        $this->flashMessage('Funkce byla z programu odstraněna.','error');
+        $this->redirect(':Spisovka:Spisy:default');
+
+/*
         $Spisy = new Spis();
         $spis_id = null;
 
@@ -1030,10 +1028,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $SpisovyZnak = new SpisovyZnak();
             $spisove_znaky = $SpisovyZnak->select(11);
             $this->template->SpisoveZnaky = $spisove_znaky;
-
+        */
     }
-    
-    
 
 }
 
