@@ -240,14 +240,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         }
 
         // vystup
-        // $parametry je null u podaciho deniku
-        if (empty($parametry) || !( $parametry['prideleno_osobne'] || $parametry['prideleno_na_organizacni_jednotku'] 
-             || $parametry['predano_osobne'] || $parametry['predano_na_organizacni_jednotku']
-             || @is_array($parametry['prideleno']) || @is_array($parametry['predano']) )) {
-            // Neni nikde pridelen nebo predan
-            // - aplikujeme tedy vseobecny filtr na role
-            $args = $Dokument->sestavaOmezeniOrg($args);
-        }
+        $args = $Dokument->sestavaOmezeniOrg($args);
         
         $result = $Dokument->seznam($args);
         $seznam = $result->fetchAll();
@@ -309,8 +302,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         
         $this->template->DruhZasilky = DruhZasilky::get(null,1);
         
-        $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');        
-        
+        $user = Environment::getUser();
+        $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
     }
 
     public function renderUpravit()
@@ -319,8 +312,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         
         $this->template->DruhZasilky = DruhZasilky::get(null,1);
         
-        $this->template->isPrivilege = Acl::isInRole('podatelna,skartacni_dohled,admin');
-        
+        $user = Environment::getUser();
+        $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
     }
     
     protected function createComponentNewForm()

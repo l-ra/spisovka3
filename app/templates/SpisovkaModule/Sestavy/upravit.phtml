@@ -144,11 +144,11 @@
         </dl>
     </div>
 
-    {if $isPrivilege}
     <div id="dokument_blok_poznamka">
         <div class="h2">
             Přiděleno / předáno
         </div>
+        <span n:if="!$vidiVsechnyDokumenty">Poznámka: Sestava bude zahrnovat jen dokumenty, ke kterým máte přístup.</span>
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
             <dd>
@@ -243,8 +243,7 @@
             </dd>
         </dl>
     </div>
-    {/if}
-
+ 
     <div id="dokument_blok_poznamka">
         <div class="h2">
             Adresáti / odesílatelé
