@@ -113,6 +113,8 @@ class Orgjednotka extends TreeModel
     
     // Tato funkce je pouzita pro kontrolu pristupu k dokumentum a spisum
     // Testuje, zda ma uzivatel pravo k urcene org. jednotce
+    // TODO: Metoda potrebuje prejmenovat
+    // TODO: Testovat na opravneni vedouciho
     public static function isInOrg($orgjednotka_id) {
 
         if ( empty($orgjednotka_id) )
@@ -123,7 +125,8 @@ class Orgjednotka extends TreeModel
         if ($oj_uzivatele === false)
             return false;
             
-        return $oj_uzivatele === $orgjednotka_id;
+        return ($oj_uzivatele === $orgjednotka_id) 
+               && Environment::getUser()->isAllowed('Dokument', 'cist_moje_oj');
     }
 
     public static function childOrg($orgjednotka_id) {

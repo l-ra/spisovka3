@@ -187,10 +187,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $args['where'][] = 'd.cislo_jednaci IS NOT NULL';
             
             $user_config = Environment::getVariable('user_config');
+            
             if ( isset($user_config->cislo_jednaci->typ_deniku) && $user_config->cislo_jednaci->typ_deniku == "org" ) {        
-                if ( Acl::isInRole('superadmin') ) {
-                    // vse
-                } else {
 
                     $user = Environment::getUser()->getIdentity();
                     $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
@@ -205,8 +203,6 @@ class Spisovka_SestavyPresenter extends BasePresenter
                     // jen zaznamy z vlastniho podaciho deniku organizacni jednotky
                     $args['where'][] = array('d.podaci_denik=%s',$user_config->cislo_jednaci->podaci_denik . (!empty($org)?"_".$org->ciselna_rada:""));            
                     
-                }
-                
             }
         } // if sestava->id == 1
         

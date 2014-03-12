@@ -1,8 +1,7 @@
 @{block title}Dokument{/block}
 @{block content}
-
     <div id="error">
-        <h2>Nejste oprávněn zobrazit tento dokument</h2>
+        <h2>Nejste oprávněn zobrazit tento {if $presenter == 'Spisy'}spis{else}dokument{/if}</h2>
         <p>
         </p>
     </div>

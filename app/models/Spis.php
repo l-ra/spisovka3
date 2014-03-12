@@ -9,28 +9,12 @@ class Spis extends TreeModel
     
     public function getInfo($spis_id, $detail = false)
     {
-
-        if ( empty($spis_id) ) {
-            return null;
-        } else if ( !is_numeric($spis_id) ) {
-            // string - nazev
-            $result = $this->fetchRow(array('nazev=%s',$spis_id));
-        } else {
-            // int - id
-            $result = $this->fetchRow(array('id=%i',$spis_id));
-        }
-        
+        $result = $this->fetchRow(array('id=%i',$spis_id));
         $row = $result->fetch();
-        if ($row) {
-            if ( $detail ) {
-                return $this->spisDetail($row);
-            } else {
-                return $row;
-            }
-        } else {
-            return null;
-        }
+        if (!$row)        
+            throw new InvalidArgumentException("Spis id '$spis_id' neexistuje.");
 
+        return $detail ? $this->spisDetail($row) : $row;
     }
     
     private function spisDetail($row)
@@ -174,76 +158,46 @@ class Spis extends TreeModel
         
     }
 
-    // vraci retezec 'all', null nebo query string
-    
-    private function omezeni_org()
+    private function omezeni_org($args)
     {
-        
-        $isVedouci = Environment::getUser()->isAllowed(NULL, 'is_vedouci');
-        $isAdmin = ACL::isInRole('admin');
-        $isPodatelna = ACL::isInRole('podatelna,skartacni_dohled');
-        $vyrusit_bezvyrizeni = false;
-
-        if ( $isAdmin || $isPodatelna )
-            // vsechny spisy bez ohledu na organizacni jednotku
-            return 'all';
-
+        $user = Environment::getUser();
         $oj_id = Orgjednotka::dejOrgUzivatele();
-        if ($oj_id === null)
-            return null;
-            
-        if ($isVedouci)
-            $org_jednotka = Orgjednotka::childOrg($oj_id);
-        else
-            $org_jednotka = array($oj_id);
 
-        if ( count($org_jednotka) > 1 )
-            return array( 'tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL', $org_jednotka, $org_jednotka);
-            
-        else 
-            return array( 'tb.orgjednotka_id = %i OR tb.orgjednotka_id_predano = %i OR tb.orgjednotka_id IS NULL', $org_jednotka, $org_jednotka);
+        if ( $user->isAllowed('Dokument', 'cist_vse') )
+            ; // vsechny spisy bez ohledu na organizacni jednotku
+        else  if ($oj_id === null)
+            $args['where'][] = array("0");
+        else {           
+            if ($user->isAllowed(NULL, 'is_vedouci'))
+                $org_jednotky = Orgjednotka::childOrg($oj_id);
+            else
+                $org_jednotky = array($oj_id);
+
+            if ( count($org_jednotky) > 1 )
+                $args['where'][] =  array( 'tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL', $org_jednotky, $org_jednotky);
+                
+            else 
+                $args['where'][] = array( 'tb.orgjednotka_id = %i OR tb.orgjednotka_id_predano = %i OR tb.orgjednotka_id IS NULL', $org_jednotky, $org_jednotky);
+        }
+        
+        return $args;
+    }
+    
+    private function spisovka_spisovna($args, $podminka)
+    {
+        $args['where'][] = $podminka;
+
+        return $this->omezeni_org($args);
     }
     
     public function spisovka($args) {
 
-        if ( isset($args['where']) ) {
-            $args['where'][] = array("NOT (tb.typ = 'S' AND tb.stav > 2)");
-        } else {
-            $args['where'] = array(array("NOT (tb.typ = 'S' AND tb.stav > 2)"));
-        }
-
-        $org = $this->omezeni_org();
-        if ( $org == 'all' ) {
-            // nic - je to admin, podatelna, spisovna
-        } else if ( $org == null ) {
-            // zadna jednotka - Co s tim? Zatim nezobrazovat
-            $args['where'][] = array("0");
-        } else {
-            $args['where'][] = $org;
-        }
-        
-        return $args;
+        return $this->spisovka_spisovna($args, "NOT (tb.typ = 'S' AND tb.stav > 2)");
     }
 
     public function spisovna($args) {
 
-        if ( isset($args['where']) ) {
-            $args['where'][] = array("NOT (tb.typ = 'S' AND tb.stav < 3)");
-        } else {
-            $args['where'] = array(array("NOT (tb.typ = 'S' AND tb.stav < 3)"));
-        }
-
-        $org = $this->omezeni_org();
-        if ( $org == 'all' ) {
-            // nic
-        } else if ( $org == null ) {
-            // zadna jednotka - Co s tim? Zatim nezobrazovat
-            $args['where'][] = array("0");
-        } else {
-            $args['where'][] = $org;
-        }        
-        
-        return $args;
+        return $this->spisovka_spisovna($args, "NOT (tb.typ = 'S' AND tb.stav < 3)");
     }
 
     public function spisovna_prijem($args) {
@@ -764,4 +718,91 @@ class Spis extends TreeModel
         parent::deleteAll();
     }
 
+    // $spis - informace, ktere vratilo getInfo
+    public static function zjistiOpravneniUzivatele($spis) {
+
+        $user = Environment::getUser();
+        $user_id = $user->getIdentity()->id;  
+        $oj_uzivatele = OrgJednotka::dejOrgUzivatele();
+        $Lze_cist = $Lze_menit = $Lze_prevzit = false;
+        
+        if ($oj_uzivatele === null)
+            $org_jednotky = array();
+        else if ($user->isAllowed(NULL, 'is_vedouci'))
+            $org_jednotky = Orgjednotka::childOrg($oj_uzivatele);
+        else
+            $org_jednotky = array($oj_uzivatele);
+        
+        // prideleno
+        if ( in_array($spis->orgjednotka_id, $org_jednotky) ) {
+            $Lze_menit = true;
+            $Lze_cist = true;
+        }
+        // predano
+        if ( $oj_uzivatele !== null && $spis->orgjednotka_id_predano == $oj_uzivatele) {
+            $Lze_prevzit = true;
+            $Lze_cist = true;
+        }
+                
+        // Oprava ticket #194
+        // Mohou nastat situace, kdy spis nema zadneho vlastnika, napr. po migraci ze spisovky 2
+        // V tom pripade musi byt videt seznam dokumentu ve spisu
+        if (!$spis->orgjednotka_id && !$spis->orgjednotka_id_predano)
+            $Lze_cist = 1;
+
+        if ($user->isAllowed('Dokument', 'cist_vse'))
+            $Lze_cist = 1;
+        
+        if ( count($spis->workflow) > 0 ) {
+            $org_cache = array();
+            foreach ( $spis->workflow as $wf ) {
+                
+                if ( isset( $org_cache[$wf->orgjednotka_id] ) ) {
+                    $orgjednotka_expr = $org_cache[$wf->orgjednotka_id];
+                } else {
+                    $orgjednotka_expr = Orgjednotka::isInOrg($wf->orgjednotka_id);
+                    $org_cache[$wf->orgjednotka_id] = $orgjednotka_expr;
+                }
+                
+                if ( !$Lze_cist )
+                    if ( ($wf->prideleno_id == $user_id || $orgjednotka_expr)
+                         && $wf->stav_osoby < 100 ) {
+                        // uzivatel vlastnil nejaky dokument ve spisu v minulosti
+                        $Lze_cist = 1;
+                    }   
+                
+                if ( !$Lze_menit )
+                    if ( ($wf->prideleno_id == $user_id || $orgjednotka_expr)
+                        && ($wf->stav_osoby == 1 && $wf->aktivni == 1 ) ) {
+                        // uzivatel vlastni nejaky dokument ve spisu ted
+                        $Lze_menit = 1;
+                    }   
+
+                if ( !$Lze_prevzit )
+                    if ( ($wf->prideleno_id == $user_id || $orgjednotka_expr)
+                        && ($wf->stav_osoby == 0 && $wf->aktivni == 1 ) ) {
+                        $Lze_prevzit = 1;
+                    }   
+                
+                if ( $Lze_prevzit && $Lze_menit && $Lze_cist ) {
+                    break;
+                }
+            }
+        }
+
+        // 2 = predan do spisovny
+        if ( $spis->stav == 2)
+            $Lze_menit = false;
+
+        if ( $user->isInRole('superadmin') ) {
+            $Lze_cist = 1;
+            $Lze_menit = 1;
+        }
+
+        return array('lze_cist' => $Lze_cist,
+                    'lze_menit' => $Lze_menit, 
+                    'lze_prevzit' => $Lze_prevzit);
+    
+    }
+    
 }

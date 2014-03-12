@@ -210,6 +210,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     }
 
+    // TODO: Zcela chybi kontrola opravneni
     public function renderVybrano()
     {
 
@@ -217,33 +218,25 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $dokument_id = $this->getParam('dok_id',null);
         $Spisy = new Spis();
 
-        $spis = $Spisy->getInfo($spis_id);
-        if ( $spis ) {
+        try {
+            $spis = $Spisy->getInfo($spis_id);
+            if ( !$spis || !$dokument_id)
+                throw new Exception('Neplatný parametr');
 
             // Propojit s dokumentem
             $DokumentSpis = new DokumentSpis();
             $DokumentSpis->pripojit($dokument_id, $spis_id);
 
             echo '###vybrano###'. $spis->nazev;
-            $this->terminate();
-
-        } else {
-            // chyba
-            
-
-            $Spisy = new Spis();
-            $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
-            $seznam = $Spisy->seznam($args);
-            $this->template->seznam = $seznam;
-            $this->template->dokument_id = $dokument_id;
-
-            $this->template->chyba = 1;
-            
-            $this->template->render('vyber');
+        }
+        catch (Exception $e) {
+            echo "Chyba: " . $e->getMessage();
         }
         
+        $this->terminate();
     }
 
+    // TODO: Zcela chybi kontrola opravneni
     public function actionOdebratspis()
     {
 
@@ -285,7 +278,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         }
 
         $Spisy = new Spis();
-        $spis_id = null;
 
         $args = null;
         if ( !empty($hledat) ) {
@@ -298,7 +290,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
 
         $args = $Spisy->spisovka($args);
-        $result = $Spisy->seznam($args, 5, $spis_id);
+        $result = $Spisy->seznam($args, 5);
         $paginator->itemCount = count($result);
             
         // Volba vystupu - web/tisk/pdf
@@ -349,155 +341,58 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $Spisy = new Spis();
         $this->template->Spis = $spis = $Spisy->getInfo($spis_id, true);
         
-        if ( $spis ) {
-            
-            $SpisovyZnak = new SpisovyZnak();
-            $spisove_znaky = $SpisovyZnak->select(11);
-            $this->template->SpisoveZnaky = $spisove_znaky;
-        
-            if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
-                $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak_id ]->popis;
-                $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak_id ]->nazev;
-            } else {
-                $this->template->SpisZnak_popis = "";
-                $this->template->SpisZnak_nazev = "";
-            }        
-            
-            $user = Environment::getUser();
-            $user_id = $user->getIdentity()->id;  
-            $pridelen = $predan = $accessview = false;
-            $formUpravit = null;
-            
-            
-            // prideleno
-            if ( Orgjednotka::isInOrg($spis->orgjednotka_id) ) {
-                $pridelen = true;
-                $accessview = true;
-            }
-            // predano
-            if ( Orgjednotka::isInOrg($spis->orgjednotka_id_predano) ) {
-                $predan = true;
-                $accessview = true;
-            }
-            
-            if ( $user->isInRole('superadmin') ) {
-                $accessview = 1;
-                $pridelen = 1;
-            }                
-            
-            // Oprava ticket #194
-            // Mohou nastat situace, kdy spis nema zadneho vlastnika, napr. po migraci ze spisovky 2
-            // V tom pripade musi byt videt seznam dokumentu ve spisu
-            if (!$spis->orgjednotka_id && !$spis->orgjednotka_id_predano)
-                $accessview = 1;
-            
-            if ( count($spis->workflow)>0 ) {
-                $prideleno = $predano = 0;
-                $wf_orgjednotka_prideleno = $spis->orgjednotka_id;
-                $wf_orgjednotka_predano = $spis->orgjednotka_id_predano;
-                $org_cache = array();
-                foreach ( $spis->workflow as $wf ) {
-                    
-                    if ( isset( $org_cache[$wf->orgjednotka_id] ) ) {
-                        $orgjednotka_expr = $org_cache[$wf->orgjednotka_id];
-                    } else {
-                        $orgjednotka_expr = Orgjednotka::isInOrg($wf->orgjednotka_id);
-                        $org_cache[$wf->orgjednotka_id] = $orgjednotka_expr;
-                    }
-                    
-                    if ( !$accessview ) {
-                        if ( ($wf->prideleno_id == $user_id || $orgjednotka_expr)
-                             && ($wf->stav_osoby < 100 || $wf->stav_osoby !=0) ) {
-                            $accessview = 1;
-                        }   
-                    }
-                    
-                    if ( !$pridelen ) {
-                        if ( ($wf->prideleno_id == $user_id || $orgjednotka_expr)
-                            && ($wf->stav_osoby == 1 && $wf->aktivni == 1 ) ) {
-                            $pridelen = 1;
-                            $wf_orgjednotka_prideleno = $wf->orgjednotka_id;
-                        }   
-                    }
-                    if ( !$predan ) {
-                        if ( ($wf->prideleno_id == $user_id || $orgjednotka_expr)
-                            && ($wf->stav_osoby == 0 && $wf->aktivni == 1 ) ) {
-                            $predan = 1;
-                            $wf_orgjednotka_predano = $wf->orgjednotka_id;
-                        }   
-                    }
-                    
-                    if ( $predan && $pridelen && $accessview ) {
-                        break;
-                    }
-                }
-            }
-            
-            $this->template->Pridelen = $pridelen;
-            if ( $pridelen ) {
-                $this->template->AccessEdit = $pridelen;
-                $formUpravit = $this->getParam('upravit',null);
-                if ( empty($spis->orgjednotka_id) ) {
-                    
-                }
-            }
-            $this->template->Predan = $predan;
-            $this->template->AccessView = $accessview;    
-            
-            $Orgjednotka = new Orgjednotka();
-            if ( empty($spis->orgjednotka_id) && !empty($wf_orgjednotka_prideleno) ) {
-                $spis->orgjendotka_id = $wf_orgjednotka_prideleno;
-                $spis->orgjendotka_prideleno = $Orgjednotka->getInfo($wf_orgjednotka_prideleno);
-            }
-            if ( empty($spis->orgjednotka_id_predano) && !empty($wf_orgjednotka_predano) ) {
-                $spis->orgjendotka_id_predano = $wf_orgjednotka_predano;
-                $spis->orgjendotka_predano = $Orgjednotka->getInfo($wf_orgjednotka_predano);
-            }
-            
-            if ( $accessview ) {
-                $DokumentSpis = new DokumentSpis();
-                
-                //$user_config = Environment::getVariable('user_config');
-                //$vp = new VisualPaginator($this, 'vp');
-                //$paginator = $vp->getPaginator();
-                //$paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
-                //$result = $DokumentSpis->dokumenty($spis_id, 1, $paginator);
-                
-                $result = $DokumentSpis->dokumenty($spis_id, 1);
-                
-                $this->template->seznam = $result;
-            } else {
-                $this->template->seznam = null;
-            }
-        
-            if ( $spis->stav == 2 && !$user->isInRole('superadmin') ) {
-                $this->template->AccessEdit = 0;
-                $this->template->Pridelen = 0;
-                $formUpravit = null;
-            }
-            
-
-            $this->template->FormUpravit = $formUpravit;
-        
-            // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParam('print');
-            $pdf = $this->getParam('pdfprint');
-            if ( $tisk ) {
-                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-                $this->setLayout(false);
-                $this->setView('printdetail');
-            } elseif ( $pdf ) {
-                @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-                $this->pdf_output = 2;
-                $this->setLayout(false);
-                $this->setView('printdetail');
-            }  
-            
-        } else {
+        if ( !$spis ) {
             // spis neexistuje nebo se nepodarilo nacist
-            $this->setView('noexist');            
+            $this->setView('noexist');
+            return;
         }
 
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->select(11);
+        $this->template->SpisoveZnaky = $spisove_znaky;
+    
+        if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
+            $this->template->SpisZnak_popis = $spisove_znaky[ $spis->spisovy_znak_id ]->popis;
+            $this->template->SpisZnak_nazev = $spisove_znaky[ $spis->spisovy_znak_id ]->nazev;
+        } else {
+            $this->template->SpisZnak_popis = "";
+            $this->template->SpisZnak_nazev = "";
+        }        
+        
+        $opravneni = Spis::zjistiOpravneniUzivatele($spis);
+        $this->template->Lze_prevzit = $opravneni['lze_prevzit'];
+        $this->template->Lze_cist = $opravneni['lze_cist'];
+        $this->template->Lze_menit = $opravneni['lze_menit'];
+        $this->template->Editovat = $opravneni['lze_menit'] && $this->getParam('upravit') == 'info';
+
+        if (!$opravneni['lze_cist']) {
+            $this->setView('dok-noaccess');
+            return;
+        }
+        
+        //$user_config = Environment::getVariable('user_config');
+        //$vp = new VisualPaginator($this, 'vp');
+        //$paginator = $vp->getPaginator();
+        //$paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+        //$result = $DokumentSpis->dokumenty($spis_id, 1, $paginator);
+            
+        $DokumentSpis = new DokumentSpis();
+        $this->template->seznam = $opravneni['lze_cist'] ? $DokumentSpis->dokumenty($spis_id, 1) : null;
+    
+        // Volba vystupu - web/tisk/pdf
+        $tisk = $this->getParam('print');
+        $pdf = $this->getParam('pdfprint');
+        if ( $tisk ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            $this->setLayout(false);
+            $this->setView('printdetail');
+        } elseif ( $pdf ) {
+            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
+            $this->pdf_output = 2;
+            $this->setLayout(false);
+            $this->setView('printdetail');
+        }  
+            
     }
 
     public function renderDetail()
@@ -505,10 +400,13 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->template->upravitForm = $this['upravitForm'];
     }
 
-    public function renderPrevzit()
+    public function actionPrevzit()
     {
         $spis_id = $this->getParam('id',null);
 
+        $Spisy = new Spis;
+        $Spisy->getInfo($spis_id);
+            
         $DokSpis = new DokumentSpis();
         $dokumenty = $DokSpis->dokumenty($spis_id);        
         
@@ -529,8 +427,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         } else {
             $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
         
-            $Spis = new Spis;
-            if ( $Spis->zmenitOrg($spis_id, $orgjednotka_id) ) {
+            if ( $Spisy->zmenitOrg($spis_id, $orgjednotka_id) ) {
                 $this->flashMessage('Úspěšně jste si převzal tento spis.');
             } else {
                 $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.','warning');
@@ -568,6 +465,9 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     {
         $spis_id = $this->getParam('id',null);
 
+        $Spisy = new Spis;
+        $Spisy->getInfo($spis_id);
+        
         $DokSpis = new DokumentSpis();
         $dokumenty = $DokSpis->dokumenty($spis_id);        
         
@@ -602,6 +502,9 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     {
 
         $spis_id = $this->getParam('id',null);
+
+        $Spisy = new Spis;
+        $Spisy->getInfo($spis_id);
 
         $DokSpis = new DokumentSpis();
         $dokumenty = $DokSpis->dokumenty($spis_id);        

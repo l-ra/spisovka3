@@ -174,14 +174,14 @@ class DokumentSpis extends BaseModel
                         array('dokument_id=%i',$dokument_id)
                    );
 
+        $this->odebrat($odebrat);
+        
         $spisy = $this->dokumenty($dokument_id);
         if ( count($spisy)>0 ) {
             foreach( $spisy as $s ) {
                 $Log->logDokument($dokument_id, LogModel::SPIS_DOK_ODEBRAN,'Dokument odebrán ze spisu "'. $s->nazev .'"');
             }
         }
-
-        $this->odebrat($odebrat);
 
         $poradi = $this->pocetDokumentu($spis_id);
 
@@ -193,12 +193,10 @@ class DokumentSpis extends BaseModel
         $row['date_added'] = new DateTime();
         $row['user_id'] = Environment::getUser()->getIdentity()->id;
 
+        $this->insert($row);
 
         $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis_info->nazev .'"');
         $Log->logSpis($spis_id, LogModel::SPIS_DOK_PRIPOJEN,"Pripojen dokument ". $dokument_id);
-
-        return $this->insert($row);
-
     }
 
     public function odebrat($param) {

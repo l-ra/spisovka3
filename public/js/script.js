@@ -116,7 +116,6 @@ $(function() {
     });
 
     $("#spisplan-zmena").live("submit", function () {
-        alert("kuk");
         spisplanZmenit($(this));
         return false;
     });
@@ -514,7 +513,8 @@ spisVybran = function (elm) {
                     $('#dok_spis').html(stav);
                     $('#dialog').dialog('close');
                 } else {
-                    $('#dialog').html(stav);
+                    $('#ajax-spinner', $('#dialog')).remove();
+                    alert(stav);
                 }
             }
         }
