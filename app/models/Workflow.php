@@ -38,8 +38,8 @@ class Workflow extends BaseModel
 
         $param['order'] = array('date'=>'DESC');
 
-        $rows = $this->fetchAllComplet($param);
-        $rows = $rows->fetchAll();
+        $res = $this->fetchAllComplet($param);
+        $rows = $res->fetchAll();
 
         if ( count($rows) > 0 ) {
 
@@ -431,80 +431,72 @@ class Workflow extends BaseModel
         $user_identity = Environment::getUser()->getIdentity();
         $user_id = $user_identity->id;
 
-        if ( is_numeric($dokument_id) ) {
+        if ( !is_numeric($dokument_id) )
+            return false;
+            
+        $wf_array = $this->dokument($dokument_id, 1);
+        if ( !is_array($wf_array) ) 
+            return 'neprideleno';
+            
+        $wf = $wf_array[0];
+        if ( $wf->prideleno_id != $user_id && !Orgjednotka::isInOrg($wf->orgjednotka_id) )
+            return 'neprideleno';
+        
+        try {
+            dibi::begin();
+            
+            $Dokument = new Dokument();
+            $dokument_info = $Dokument->getInfo($dokument_id);
 
-            $predan_array = $this->dokument($dokument_id, 1);
-            $predan = is_array($predan_array)?$predan_array[0]:null;
-
-            if ( $predan ) {
-                if ( $predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id) ) {
-
-                    //$transaction = (! dibi::inTransaction());
-                    //if ($transaction)
-                    //dibi::begin();
-
-                    $Dokument = new Dokument();
-                    $dokument_info = $Dokument->getInfo($dokument_id);
-
-                    // Test na uplnost dat
-                    if ( $kontrola = $Dokument->kontrola($dokument_info) ) {
-                        foreach ($kontrola as $kmess) {
-                            Environment::getApplication()->getPresenter()->flashMessage($kmess,'warning');
-                        }
-                        return false;
-                    }
-
-                    // spouteci udalost FNUSA
-                    $stav = 5;
-                    $datum_spusteni = (date("Y")+1) ."-01-01";
-                    
-                    // Deaktivujeme starsi zaznamy
-                    $this->deaktivovat($dokument_id);
-
-                    $data = array();
-                    $data['dokument_id'] = $dokument_info->id;
-                    $data['stav_dokumentu'] = $stav;
-
-                    $data['stav_osoby'] = 1;
-                    $data['aktivni'] = 1;
-
-                    $data['prideleno_id'] = $user_id;
-                    $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
-
-                    $data['date'] = new DateTime();
-                    $data['user_id'] = $user_id;
-                    $data['poznamka'] = $predan->poznamka;
-
-                    $result_insert = $this->insert($data);
-
-                    //if ($transaction)
-                    //dibi::commit();
-
-                    if ( $result_insert ) {
-
-                        $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_VYRIZEN, 'Dokument označen za vyřízený.');
-
-                        if ( $stav == 5 ) {
-                            $data = array('datum_spousteci_udalosti'=>$datum_spusteni);
-                            $Dokument->ulozit($data, $dokument_id);
-                            $Log->logDokument($dokument_id, LogModel::DOK_SPUSTEN, 'Byla spuštěna událost. Začíná běžet skartační lhůta.');
-                        }
-
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return 'neprideleno';
+            // Test na uplnost dat
+            if ( $kontrola = $Dokument->kontrola($dokument_info) ) {
+                foreach ($kontrola as $kmess) {
+                    Environment::getApplication()->getPresenter()->flashMessage($kmess,'warning');
                 }
-            } else {
-                return 'neprideleno';
+                return false;
             }
 
-        } else {
-            return false;
+            // spouteci udalost FNUSA
+            $stav = 5;
+            $datum_spusteni = (date("Y")+1) ."-01-01";
+            
+            // Deaktivujeme starsi zaznamy
+            $this->deaktivovat($dokument_id);
+
+            $data = array();
+            $data['dokument_id'] = $dokument_info->id;
+            $data['stav_dokumentu'] = $stav;
+
+            $data['stav_osoby'] = 1;
+            $data['aktivni'] = 1;
+
+            $data['prideleno_id'] = $user_id;
+            $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
+
+            $data['date'] = new DateTime();
+            $data['user_id'] = $user_id;
+            $data['poznamka'] = $wf->poznamka;
+
+            $result_insert = $this->insert($data);
+
+            
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_VYRIZEN, 'Dokument označen za vyřízený.');
+
+            if ( $stav == 5 ) {
+                $data = array('datum_spousteci_udalosti'=>$datum_spusteni);
+                $Dokument->ulozit($data, $dokument_id);
+                $Log->logDokument($dokument_id, LogModel::DOK_SPUSTEN, 'Byla spuštěna událost. Začíná běžet skartační lhůta.');
+            }
+
+            dibi::commit();
         }
+        catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
+        
+        return true;
     }
 
     public function predatDoSpisovny($dokument_id, $samostatny = 0)
