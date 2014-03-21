@@ -58,7 +58,7 @@
 
 <div id="layout_bottom">
     <div id="bottom">
-        <strong>{$AppInfo[2]}</strong><br/>
+        <a href="{link :Spisovka:Seznamzmen:}" title="Zobrazit historii změn"><strong>{$AppInfo[2]}</strong></a><br/>
         {if isset($KontrolaNovychVerzi) && !$KontrolaNovychVerzi['je_aktualni']}<span style="color:#880000;"><strong>Je k dispozici nová verze aplikace číslo {$KontrolaNovychVerzi['dostupna_verze']}</strong></span><br />{/if}
         Na toto dílo se vztahuje licence {!$licence}
     </div>

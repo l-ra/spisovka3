@@ -21,6 +21,8 @@ Nové funkce:
 - připojení subjektu k dokumentu pomocí rychlého vyhledávání automaticky
   určí adresáta/odesílatele podle typu dokumentu  
 - dialogové okno pro výběr subjektu obsahuje nyní abecední filtr a stránkování
+- kliknutí na označení verze aplikace v patičce stránky zobrazí soubor
+  s historií změn aplikace
         
 Jiné změny:
 

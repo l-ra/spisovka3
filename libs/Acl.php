@@ -24,10 +24,16 @@ class Acl extends Permission {
         // permission
         // Je potřeba toto oprávnění ve výchozím stavu povolit. Uživatel stále bude mít možnost oprávnění explicitně odepřít
         $this->allow(Permission::ALL, 'Spisovka_ZpravyPresenter');
+        
         // úvodní obrazovka po přihlášení
         $this->allow(Permission::ALL, 'Spisovka_DefaultPresenter');
+        
         // přihlášení / odhlášení - neni potreba, tento presenter je vyjmut z kontroly pristupu. viz BasePresenter
         // $this->allow(Permission::ALL, 'Spisovka_UzivatelPresenter');
+
+        // Resource, který má být vždy přístupný, nebudeme definovat v databázi, ale zde
+        $this->addResource('Spisovka_SeznamzmenPresenter');
+        $this->allow(Permission::ALL, 'Spisovka_SeznamzmenPresenter');
 
         foreach($model->getPermission() as $perm) {
             if ( !empty($perm->role) && !empty($perm->resource) && !empty($perm->privilege) ) {
