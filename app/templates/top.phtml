@@ -15,13 +15,15 @@
             <a href="{vlink :Spisovka:Uzivatel:logout}">Odhlásit</a>
         </div>
         <div id="top_jmeno">
-            <a href="{vlink :Spisovka:Uzivatel:}" title="nastavení uživatele"><strong>{$user->name}</strong></a><br />
+            <span title="Role uživatele:
+{foreach $user->user_roles as $role}{$role->name}
+{/foreach}">
+            <a href="{vlink :Spisovka:Uzivatel:}"><strong>{$user->name}</strong></a><br />
             {if $user->org_nazev != ''}
-            [ {$user->org_nazev} ]<br />
+            {$user->org_nazev}<br />
             {/if}
-            {foreach $user->user_roles as $role}
-                {$role->name}<br />
-            {/foreach}
+            </span>
+            
         </div>
     {/if}
     </div>

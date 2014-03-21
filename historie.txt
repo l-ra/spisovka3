@@ -22,6 +22,11 @@ Nové funkce:
   určí adresáta/odesílatele podle typu dokumentu  
 - dialogové okno pro výběr subjektu obsahuje nyní abecední filtr a stránkování
         
+Jiné změny:
+
+- v hlavičce stránky se zobrazuje jméno uživatele a jeho organizační jednotka,
+  role uživatele se zobrazí po najetí myší na jméno
+  
 Opravy:
 
 - při vytváření nového dokumentu pracovníkem e-podatelny se nyní nastaví typ
