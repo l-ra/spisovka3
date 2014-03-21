@@ -215,6 +215,7 @@ class Workflow extends BaseModel
         }
     }
 
+    // Zrusit PREDANI dokumentu - funkce byla nespravne pojmenovana
     public function zrusit_prevzeti($dokument_id)
     {
         if ( is_numeric($dokument_id) ) {
@@ -441,7 +442,7 @@ class Workflow extends BaseModel
         $wf = $wf_array[0];
         if ( $wf->prideleno_id != $user_id && !Orgjednotka::isInOrg($wf->orgjednotka_id) )
             return 'neprideleno';
-        
+               
         try {
             dibi::begin();
             
@@ -453,12 +454,19 @@ class Workflow extends BaseModel
                 foreach ($kontrola as $kmess) {
                     Environment::getApplication()->getPresenter()->flashMessage($kmess,'warning');
                 }
+                dibi::rollback();
                 return false;
             }
 
-            // spouteci udalost FNUSA
-            $stav = 5;
-            $datum_spusteni = (date("Y")+1) ."-01-01";
+            $automaticke_spusteni = $dokument_info->spousteci_udalost_stav == 2;
+            if ($automaticke_spusteni) {
+                $stav = 5;
+                $datum_spusteni = date('Y-m-d');
+            }
+            else
+                $stav = 4;
+                
+            $this->zrusit_prevzeti($dokument_id);
             
             // Deaktivujeme starsi zaznamy
             $this->deaktivovat($dokument_id);
@@ -477,16 +485,15 @@ class Workflow extends BaseModel
             $data['user_id'] = $user_id;
             $data['poznamka'] = $wf->poznamka;
 
-            $result_insert = $this->insert($data);
-
+            $this->insert($data);
             
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_VYRIZEN, 'Dokument označen za vyřízený.');
 
-            if ( $stav == 5 ) {
-                $data = array('datum_spousteci_udalosti'=>$datum_spusteni);
+            if ( $automaticke_spusteni ) {
+                $data = array('datum_spousteci_udalosti' => $datum_spusteni);
                 $Dokument->ulozit($data, $dokument_id);
-                $Log->logDokument($dokument_id, LogModel::DOK_SPUSTEN, 'Byla spuštěna událost. Začíná běžet skartační lhůta.');
+                $Log->logDokument($dokument_id, LogModel::DOK_SPUSTEN, 'Začíná plynout skartační lhůta.');
             }
 
             dibi::commit();
@@ -496,9 +503,60 @@ class Workflow extends BaseModel
             throw $e;
         }
         
-        return true;
+        return $automaticke_spusteni ? true : 'udalost';
     }
 
+    // Vetsina kodu je zkopirovana z metody vyrizeno()
+    // Kontrola opravneni se provadi uz v presenteru
+    public function spustitUdalost($dokument_id, $datum_spusteni)
+    {
+        $user_identity = Environment::getUser()->getIdentity();
+        $user_id = $user_identity->id;
+
+        try {
+            dibi::begin();
+            
+            $Dokument = new Dokument();
+
+            // Deaktivujeme starsi zaznamy
+            $this->deaktivovat($dokument_id);
+
+            $data = array();
+            $data['dokument_id'] = $dokument_id;
+            $data['stav_dokumentu'] = 5;
+
+            $data['stav_osoby'] = 1;
+            $data['aktivni'] = 1;
+
+            $data['prideleno_id'] = $user_id;
+            $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
+
+            $data['date'] = new DateTime();
+            $data['user_id'] = $user_id;
+
+            $this->insert($data);
+            
+            $Dokument->ulozit(array('datum_spousteci_udalosti' => $datum_spusteni), $dokument_id);
+
+            $today = new DateTime();
+            $today->setTime(0, 0);
+            $given_date = new DateTime($datum_spusteni);
+            if ($given_date == $today)
+                $msg = 'Začíná plynout skartační lhůta.';
+            else
+                $msg = 'Skartační lhůta začne plynout od ' . $given_date->format('j.n.Y') . '.';
+            
+            $Log = new LogModel();            
+            $Log->logDokument($dokument_id, LogModel::DOK_SPUSTEN, $msg);
+    
+            dibi::commit();
+        }
+        catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
+    }
+    
     public function predatDoSpisovny($dokument_id, $samostatny = 0)
     {
 

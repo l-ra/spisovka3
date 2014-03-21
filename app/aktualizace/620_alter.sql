@@ -28,3 +28,10 @@ ALTER TABLE `{tbls3}log_spis`
 
 ALTER TABLE `{tbls3}log_spis`
   ADD CONSTRAINT `fk_log_spis_spis1` FOREIGN KEY (`spis_id`) REFERENCES `{tbls3}spis` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+------------------------;
+  
+ALTER TABLE `{tbls3}dokument`
+  CHANGE COLUMN `datum_spousteci_udalosti` `datum_spousteci_udalosti` date DEFAULT NULL;
+  
+UPDATE `{tbls3}dokument` SET datum_spousteci_udalosti = datum_spousteci_udalosti - INTERVAL 1 DAY WHERE datum_spousteci_udalosti LIKE '%-01-01';

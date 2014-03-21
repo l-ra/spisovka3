@@ -12,6 +12,8 @@ Nové funkce:
   Nyní může být uživatel pouze v jedné organizační jednotce.
 - E-podatelna - možnost nadefinovat více datových a emailových schránek
         a konkrétní schránku lze přiřadit určité organizační jednotce.
+- nyní je možné u spouštěcí události nastavit automatické nebo ruční spuštění
+  plynutí skartační lhůty. V případně ručního spuštění lze zadat rozhodné datum.
 - pokud je mod_rewrite povolen a aplikace jej nedetekuje automaticky,
   je možné do souboru system.ini přidat následující nastavení:
      clean_url = true
@@ -49,6 +51,8 @@ Opravy:
 - opraveno číselné stránkování v případě, kdy není k dispozici rewrite url
 - E-podatelna - u mailové schránky možnost stahovat zprávy ze složek,
   kde název složky obsahuje diakritiku
+- u uživatelů, kteří v minulosti upgradovali z verze 3.0, opraven výpočet 
+  konce skartační lhůty dokumentů
 
 === Ver. 3.3.4 =================================================================
 

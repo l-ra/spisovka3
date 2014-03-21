@@ -323,7 +323,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ( count($dokument->workflow)>0 ) {
                 // uzivatel na dokumentu nekdy pracoval, tak mu dame moznost aspon nahlizet
                 foreach ($dokument->workflow as $wf) {
-                    if ( ($wf->prideleno_id == $user_id) && ($wf->stav_osoby < 100 || $wf->stav_osoby !=0) ) {
+                    if ( $wf->prideleno_id == $user_id ) {
                         $this->template->AccessView = 1;
                     }
                 }
@@ -408,20 +408,17 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Skartacni_dohled = 0;
             $this->template->Skartacni_komise = 0;
             
-            $datum_skartace = new DateTime($dokument->skartacni_rok);
-            $datum_aktualni = new DateTime();
-            $DateDiff = new DateDiff();
-            $skartacni_rozdil = $DateDiff->diff($datum_skartace);            
+            $uplynula_skart_lhuta = !empty($dokument->skartacni_rok)
+                        && date('Y') >= $dokument->skartacni_rok;
             
-            // Dokument je ve skartacnim obodbi
-            if ( $skartacni_rozdil > 0 && $dokument->stav_dokumentu == 7
+            if ( $uplynula_skart_lhuta && $dokument->stav_dokumentu == 7
                     && (Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
                 $this->template->AccessEdit = 0;
                 $this->template->Pridelen = 1;
                 $this->template->Skartacni_dohled = 1;
             }
-            // Dokument je ve skartacnim rezimu
+            // Dokument je ve skartacnim rizeni
             if ( $dokument->stav_dokumentu == 8
                     && (Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
@@ -449,15 +446,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             
             $this->template->FormUpravit = $this->template->AccessEdit ? $formUpravit : null;
 
-            if ( $this->getParam('udalost1',false) && $dokument->stav_dokumentu == 4) {
-                $this->template->FormUdalost = 3;
-            } else if ( $this->getParam('udalost',false) && $dokument->stav_dokumentu <= 3 ) {
-                $this->template->FormUdalost = 2;
-            } else if ( $dokument->stav_dokumentu == 4 ) {
-                $this->template->FormUdalost = 1;
-            } else {
-                $this->template->FormUdalost = 0;
-            }
+            $this->template->FormUdalost = $this->getParam('udalost',false) && $dokument->stav_dokumentu == 4;
 
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
@@ -762,14 +751,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( $Workflow->prirazeny($dokument_id) ) {
             $ret = $Workflow->vyrizeno($dokument_id);
             if ( $ret === "udalost" ) {
-                // manualni vyrizeni
+                // manualni udalost
+                $this->flashMessage('Označil jste tento dokument za vyřízený!');
                 $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id,'udalost'=>1));
             } else if ( $ret === "neprideleno" ) {
                 // neprideleno
                 $this->flashMessage('Nemáte oprávnění označit dokument za vyřízený.','warning');
             } else if ( $ret === true ) {
-                // automaticke vyrizeni
-                $Workflow->zrusit_prevzeti($dokument_id);
+                // automaticka udalost
                 $this->flashMessage('Označil jste tento dokument za vyřízený!');
             } else {
                 $this->flashMessage('Označení dokumentu za vyřízený se nepodařilo. Zkuste to znovu.','warning');
@@ -1942,19 +1931,23 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$Dok->id);
 
         $options = array(
-            '1'=>'Spustit událost od data (vyplňte datum '. @$Dok->spisovy_znak_udalost_dtext .')',
-            '2'=>'Spustit událost ručně (událost se spustí v pozdějším čase ručně)',
-            '3'=>'Spustit událost okamžitě (po odeslání se událost spustí)'
+            '1'=>'Dnešní den',
+            '2'=>'Zadám datum',
+            '3'=>'Datum určím až v budoucnu',
         );
-        $form->addRadioList('udalost_typ', 'Jak spustit událost:', $options);
+        $form->addRadioList('udalost_typ', 'Jak spustit událost:', $options)
+            ->setValue(1)
+            ->controlPrototype->onclick("onChangeRadioButtonSpousteciUdalost();");
 
-        $form->addDatePicker('datum_spousteci_udalosti', 'Datum spuštění události:');
-
-        $form->addSubmit('vyridit', 'Vyřídit dokument')
+        $form->addDatePicker('datum_spousteci_udalosti', 'Datum spouštěcí události:')
+            //->setDisabled() - nelze volat pri zpracovani odeslaneho formulare, vyresil jsem tedy v Javascriptu
+            ->forbidPastDates();
+            
+        $form->addSubmit('ok', 'Potvrdit')
                  ->onClick[] = array($this, 'udalostClicked');
-        $form->addSubmit('storno', 'Zrušit vyřízení')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+        // $form->addSubmit('storno', 'Zrušit vyřízení')
+                 // ->setValidationScope(FALSE)
+                 // ->onClick[] = array($this, 'stornoClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
@@ -1971,41 +1964,46 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $dokument_id = $data['id'];
-        
-        // Pozn. $add je stary kod, neni pouzito
-        if ( $data['udalost_typ'] == 1 && !empty($data['datum_spousteci_udalosti']) ) {
-            // spusteni udalosti dle datumu
-            $add = array('stav'=>5, 'datum'=>$data['datum_spousteci_udalosti']);
-        } else if ( $data['udalost_typ'] == 2 ) {
-            // rucni spusteni udalosti
-            $add = array('stav'=>4);
-        } else if ( $data['udalost_typ'] == 3 ) {
-            // okamzite spusteni
-            $add = array('stav'=>5, 'datum'=>date('Y-m-d'));
-        } else {
-            $this->flashMessage('Nebyla vybrána spouštěcí událost. Vyberte událost nebo zrušte vyřízení.','warning');
-            $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id, 'udalost'=>1));
-        }
+        $redir_params = array('id' => $dokument_id);
+        $datum = null;
 
+        $Dokumenty = new Dokument();
+        $dokument = $Dokumenty->getInfo($dokument_id);
+        
         $Workflow = new Workflow();
-        if ( $Workflow->prirazeny($dokument_id) ) {
-            $ret = $Workflow->vyrizeno($dokument_id);
-            if ( $ret == "udalost" ) {
-                // manualni vyrizeni
-                $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id,'udalost'=>1));
-            } else if ( $ret == true ) {
-                // automaticke vyrizeni
-                $Workflow->zrusit_prevzeti($dokument_id);
-                $this->flashMessage('Označil jste tento dokument za vyřízený!');
-            } else {
-                $this->flashMessage('Označení dokumentu za vyřízený se nepodařilo. Zkuste to znovu.','warning');
-
-            }
-        } else {
-            $this->flashMessage('Nemáte oprávnění označit dokument za vyřízený.','warning');
-        }
+        if ($Workflow->prirazeny($dokument_id) && $dokument->stav_dokumentu == 4) {
         
-        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+            switch ($data['udalost_typ']) {
+            case 1 : 
+                $datum = date('Y-m-d');
+                $zprava = 'Událost byla spuštěna.';
+                break;
+
+            case 2 : 
+                if (empty($data['datum_spousteci_udalosti'])) {
+                    $this->flashMessage('Nebyla zadáno datum spuštění.','warning');
+                    // znovu zobraz formular
+                    $redir_params['udalost'] = 1;
+                }
+                else {
+                    $datum = $data['datum_spousteci_udalosti'];
+                    $zprava = 'Datum spuštění bylo nastaveno.';
+                }
+                break;
+                
+            case 3 : 
+                // nedelej nic
+            }
+            
+            if (!empty($datum)) {                
+                $Workflow->spustitUdalost($dokument_id, $datum);
+                $this->flashMessage($zprava, 'info');
+            }
+        }
+        else
+            $this->flashMessage('Nemáte oprávnění spustit událost.','warning');
+                
+        $this->redirect(':Spisovka:Dokumenty:detail', $redir_params);
     }
 
 

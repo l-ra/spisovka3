@@ -1322,7 +1322,7 @@ class Dokument extends BaseModel
         
             'distinct'=>null,
             'from' => array($this->name => 'dok'),
-            'cols' => array('*','id'=>'dokument_id','%sqlCASE WHEN dok.skartacni_lhuta > 1900 THEN MAKEDATE(dok.skartacni_lhuta,1) ELSE DATE_ADD(dok.datum_spousteci_udalosti, INTERVAL dok.skartacni_lhuta YEAR) END'=>'skartacni_rok'),
+            'cols' => array('*','id'=>'dokument_id','%sqlCASE WHEN dok.skartacni_lhuta > 1900 THEN dok.skartacni_lhuta ELSE YEAR(dok.datum_spousteci_udalosti)+1+dok.skartacni_lhuta END'=>'skartacni_rok'),
             'leftJoin' => array(
                 'dokspisy' => array(
                     'from' => array($this->tb_dokspis => 'sp'),
@@ -1562,28 +1562,10 @@ class Dokument extends BaseModel
                 $dokument->lhuta_stav = 0;
             }
 
-            // datum skartace
-            if ( !empty($dokument->datum_spousteci_udalosti) ) {
-                $datum_spusteni = strtotime($dokument->datum_spousteci_udalosti);
-                if ( empty($dokument->skartacni_lhuta) ) {
-                    // neurceno
-                    $dokument->datum_skartace = 'neurčeno';
-                } else if ( $dokument->skartacni_lhuta > 1900 ) {
-                    // jde o rok 1.1.rok
-                    $dokument->datum_skartace = mktime(0,0,0,1,1,(int)$dokument->skartacni_lhuta);
-                } else {
-                    // jde o roky
-                    //$datum_skartace =
-                    $dokument->datum_skartace = DateDiff::add($dokument->datum_spousteci_udalosti, $dokument->skartacni_lhuta);
-                }
-
-                //$dokument->datum_skartace = $dokument->skartacni_rok;
-                //= new DateTime($dokument->skartacni_rok);
-                //Debug::dump($datum_skartace);
-
-            } else {
-                $dokument->datum_skartace = 'neurčeno';
-            }
+            if ( empty($dokument->datum_spousteci_udalosti) || is_null($dokument->skartacni_lhuta) )
+                // V techto pripadech bude zrejme db dotaz vracet nesmyslny vysledek nebo null
+                // Pro jistotu skartacni rok definuj jako nulu
+                $dokument->skartacni_rok = 0;
 
             // spisovy znak
             $dokument->spisovy_znak = $row->spisznak_nazev;

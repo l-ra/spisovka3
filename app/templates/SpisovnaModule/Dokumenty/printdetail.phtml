@@ -164,7 +164,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Skartační lhůta:</dt>
-            <dd class="normal"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(datum skartace {$Dok->skartacni_rok|edate}){/if}</dd>
+            <dd class="normal"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>
@@ -172,7 +172,7 @@
         </dl>
         {if $Dok->stav_dokumentu>=5}
         <dl class="detail_item">
-            <dt>Datum spuštění události:</dt>
+            <dt>Datum spouštěcí události:</dt>
             <dd>{$Dok->datum_spousteci_udalosti|edate}&nbsp;</dd>
         </dl>
         {/if}

@@ -161,7 +161,7 @@ class Install_DefaultPresenter extends BasePresenter
 		'required' => TRUE,
 		'passed' => version_compare(PHP_VERSION, '5.3.2', '>='),
 		'message' => PHP_VERSION,
-		'description' => 'Používáte starší verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.3.2 nebo vyšší.',
+		'description' => 'Používáte starou verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.3.2 nebo vyšší.',
             ),
 
             array(

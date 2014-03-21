@@ -133,6 +133,8 @@ abstract class BasePresenter extends Presenter
             function eyear($string) {
                 if ( empty($string) ) return "";
                 if ( $string == "0000-00-00 00:00:00" ) return "";
+                if (is_numeric($string) && $string > 1800 && $string < 2200)
+                    return $string;
                 $datetime = new DateTime($string);
                 return $datetime->format('Y');
             }

@@ -418,14 +418,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->template->Vyrizovani = 0;
             $this->template->Skartacni_dohled = 0;
             $this->template->Skartacni_komise = 0;
-            // Dokument je ve skartacnim obodbi
 
-            $datum_skartace = new DateTime($dokument->skartacni_rok);
-            $datum_aktualni = new DateTime();
-            $DateDiff = new DateDiff();
-            $skartacni_rozdil = $DateDiff->diff($datum_skartace);
-            
-            if ( $skartacni_rozdil > 0 && $dokument->stav_dokumentu == 7
+            $uplynula_skart_lhuta = !empty($dokument->skartacni_rok)
+                        && date('Y') >= $dokument->skartacni_rok;
+
+            if ( $uplynula_skart_lhuta && $dokument->stav_dokumentu == 7
                     && (Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
                 $this->template->AccessView = 1;
                 $this->template->AccessEdit = 1;

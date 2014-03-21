@@ -56,7 +56,22 @@
                     return true;
                 }
 
+    function onChangeRadioButtonSpousteciUdalost(elm) {
 
+        var isChecked = $('#frmudalostForm-udalost_typ-1').is(':checked');
+
+        var sel = $('#frmudalostForm-datum_spousteci_udalosti');
+        if (!isChecked)
+            sel.attr('disabled','disabled');
+        else {
+            sel.removeAttr('disabled');
+            sel.focus();
+        }
+    }
+    $(document).ready(function() {
+        $('#frmudalostForm-datum_spousteci_udalosti').attr('disabled','disabled');
+    });
+    
 	</script>
 	<script type="text/javascript">
         var smer_typu_dokumentu = new Array();
@@ -91,8 +106,8 @@
         </a>        
     </div>
 
-    {accessedit}
     <div id="dokument_blok_volby">
+       {accessedit}
        {if $Pridelen==1 }
        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
        <?php if ( isset($nutnyNadpis) ) { ?>
@@ -122,8 +137,10 @@
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
        <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
        {/if}
+       &nbsp;
+       {/accessedit}
+       <a href="{link this, 'id'=>$Dok->id, 'udalost'=>1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
     </div>
-    {/accessedit}
     {if $Zapujcka}
     <div id="dokument_blok_volby">
        {if !empty($Dok->predano->prideleno_id) }
@@ -133,26 +150,23 @@
     </div>
     {/if}    
 
-    {if ($FormUdalost==2 || $FormUdalost==3 )}
+    {if ($FormUdalost)}
     <div class="dokument_blok2">
-        {if $FormUdalost==2}
-        <div class="h2">K dokončení vyřízení vyberte způsob spuštění události</div>
-        {else}
-        <div class="h2">Ke spuštění události vyberte způsob</div>
-        {/if}
+        <div class="h2">Vyberte datum spouštěcí události</div>
+        <p><strong>Poznámka:</strong> Spouštěcí událost je okamžik rozhodný pro počátek plynutí skartační lhůty. Skartační lhůta se určuje počtem celých roků počítaných od 1. ledna kalendářního roku následujícího po kalendářním roce, v němž nastala spouštěcí událost.</p>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         {$udalostForm->render('begin')}
         <dl class="detail_item">
-            <dt>Jak spustit událost?</dt>
+            <dt>Určete rozhodný okamžik:</dt>
             <dd>
-                {$udalostForm['udalost_typ']->control} (vyplňte {$Dok->spisovy_znak_udalost_dtext})
+                {$udalostForm['udalost_typ']->control}
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>Datum spuštění události:</dt>
+            <dt>Datum spouštěcí události:</dt>
             <dd>
                 {$udalostForm['datum_spousteci_udalosti']->control}
             </dd>
@@ -160,30 +174,16 @@
         <dl class="detail_item">
             <dt>&nbsp;</dt>
             <dd>
-                {$udalostForm['vyridit']->control} {$udalostForm['storno']->control}
+                {$udalostForm['ok']->control}
             </dd>
         </dl>
         {$udalostForm->render('end')}
-    </div>
-    {elseif $FormUdalost==1}
-    <div class="dokument_blok2">
-        <div class="h2">Dokument je vyřízen, ale není spuštěna událost</div>
-        <dl class="detail_item">
-            <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt></dt>
-            <dd>
-               <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'udalost1'=>1}">Změnit spouštěcí událost</a>
-            </dd>
-        </dl>
     </div>
     {/if}
 
     {if $Skartacni_dohled==1}
     <div class="dokument_blok2">
-        <div class="h2">Připojit dokument do skartačního řízení k posuzení</div>
+        <div class="h2">Připojit dokument do skartačního řízení k posouzení</div>
         <dl class="detail_item">
             <dt>Spisový znak:</dt>
             <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
@@ -568,7 +568,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Skartační lhůta:</dt>
-            <dd class="normal"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(datum skartace {$Dok->skartacni_rok|edate}){/if}</dd>
+            <dd class="normal"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>
@@ -576,7 +576,7 @@
         </dl>
         {if $Dok->stav_dokumentu>=5}
         <dl class="detail_item">
-            <dt>Datum spuštění události:</dt>
+            <dt>Datum spouštěcí události:</dt>
             <dd>{$Dok->datum_spousteci_udalosti|edate}&nbsp;</dd>
         </dl>
         {/if}
