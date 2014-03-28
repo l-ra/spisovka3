@@ -680,7 +680,8 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_role` (
   `uroven` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_user_role_user_role1` (`parent_id`),
-  KEY `fk_user_role_orgjednotka1` (`orgjednotka_id`)
+  KEY `fk_user_role_orgjednotka1` (`orgjednotka_id`),
+  UNIQUE KEY `code` (`code`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
 INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `fixed_id`, `orgjednotka_id`, `code`, `name`, `note`, `fixed`, `order`, `active`, `date_created`, `date_modified`, `sekvence`, `sekvence_string`, `uroven`) VALUES
