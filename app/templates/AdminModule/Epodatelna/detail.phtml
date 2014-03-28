@@ -104,8 +104,10 @@
         </dl>
         <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
         &nbsp;&nbsp;&nbsp;
+        {if $vice_datovych_schranek}
         <a href="{link :Admin:Epodatelna:smazat, 'id'=>$Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
         &nbsp;&nbsp;&nbsp;
+        {/if}
         <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'zmenit_heslo_isds'=>1}">Změnit heslo k ISDS</a>
         {/if}
         {elseif $Typ == 'e'}

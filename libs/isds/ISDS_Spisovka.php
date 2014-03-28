@@ -9,23 +9,30 @@ class ISDS_Spisovka extends ISDS {
         
     }
 
+    /* Funkce vrati, zda povolit vice schranek v aplikaci.
+       Pripraveno jako potencionalni moznost do budoucna. */
+    public static function vice_datovych_schranek()
+    {
+        return Settings::get('isds_allow_more_boxes', false);
+    }
+    
     /* Vrati true nebo hodi vyjimku s popisem chyby */
+    /* Parametr je zrejme zbytecny. Zda se, ze organizace muze mit pouze jednu datovou schranku */
     public function pripojit($params = null) {
 
         if ( is_array($params) ) {
             // prime hodnoty
-            if ( isset($params['typ_pripojeni']) ) {
-                $config = $params;
-            } else {
-                throw new InvalidArgumentException("Neplatné pole parametru.");
-            }
+            if ( !isset($params['typ_pripojeni']) )
+                throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
+
+            $config = $params;
+            
         } else if ( is_object($params) ) {
             // prime hodnoty
-            if ( isset($params->typ_pripojeni) ) {
-                $config = $params->toArray();
-            } else {
-                throw new InvalidArgumentException("Neplatný objekt parametru.");
-            }
+            if ( !isset($params->typ_pripojeni) )
+                throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
+
+            $config = $params->toArray();
         } else {
             
             $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
@@ -33,17 +40,15 @@ class ISDS_Spisovka extends ISDS {
             $ep_config = $ep_config['isds'];
             
             if ( is_numeric($params) ) { // parametrem je index z nastaveni
-                if ( isset( $ep_config[$params] ) ) { // existuje takove nastaveni?
-                    $config = $ep_config[ $params ];
-                } else {
-                    throw new InvalidArgumentException("Požadované nastavení neexistuje.");
-                }
+                if ( !isset( $ep_config[$params] ) ) // existuje takove nastaveni?
+                    throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
+                    
+                $config = $ep_config[ $params ];
+                
             } else { // zadny parametr
-                if ( isset( $ep_config[0] ) ) { // existuje nejake nastaveni?
-                    $config = $ep_config[0];
-                } else {
-                    throw new InvalidArgumentException("Nastavení pro ISDS neexistuje.");
-                }
+                $config = current($ep_config);
+                if ( $config === false ) // existuje nejake nastaveni?
+                    throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka.");                    
             }
         }
 

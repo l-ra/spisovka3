@@ -12,6 +12,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         // ISDS
         $this->template->n_isds = $ep['isds'];
+        $this->template->vice_datovych_schranek = ISDS_Spisovka::vice_datovych_schranek();
 
         // Email
         if ( count($ep['email']) == 0 )
@@ -63,6 +64,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     public function renderDetail()
     {
+        $this->template->vice_datovych_schranek = ISDS_Spisovka::vice_datovych_schranek();
+
         // Klientske nastaveni
         $ep = self::nactiNastaveni();
 
