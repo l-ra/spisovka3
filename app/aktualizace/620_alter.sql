@@ -35,3 +35,8 @@ ALTER TABLE `{tbls3}dokument`
   CHANGE COLUMN `datum_spousteci_udalosti` `datum_spousteci_udalosti` date DEFAULT NULL;
   
 UPDATE `{tbls3}dokument` SET datum_spousteci_udalosti = datum_spousteci_udalosti - INTERVAL 1 DAY WHERE datum_spousteci_udalosti LIKE '%-01-01';
+
+------------------------;
+
+ALTER TABLE `{tbls3}dokument_odeslani`
+  ADD COLUMN poznamka VARCHAR(200) DEFAULT NULL;

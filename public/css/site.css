@@ -1107,3 +1107,13 @@ label.required {
     padding: 10px;
     border-bottom: 1px #c0c0c0 solid;
 }
+
+/* ***************************************************************** */
+/* *** Ruzne *** */
+
+#vypravna_form input[name=poznamka],
+tr.odes_form input.poznamka {
+
+    width: 500px;
+}
+

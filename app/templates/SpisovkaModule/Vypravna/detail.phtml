@@ -19,7 +19,11 @@
     <dl>
         <dt>Hmotnost:</dt>
         <dd><input type="text" name="hmotnost_zasilky" value="{$dokument->hmotnost}" size="10" /></dd>
-    </dl>    
+    </dl>
+    <dl>
+        <dt>Poznámka:</dt>
+        <dd><input type="text" name="poznamka" value="{$dokument->poznamka}" /></dd>
+    </dl>
     {/if}
     {if $dokument->zpusob_odeslani_id == 4}
     <dl>

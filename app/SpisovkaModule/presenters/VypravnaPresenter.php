@@ -273,6 +273,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             if ( isset($post_data['hmotnost_zasilky']) ) { $row['hmotnost'] = floatval($post_data['hmotnost_zasilky']); }
             if ( isset($post_data['cislo_faxu']) ) { $row['cislo_faxu'] = $post_data['cislo_faxu']; }
             if ( isset($post_data['zprava']) ) { $row['zprava'] = $post_data['zprava']; }
+            if ( isset($post_data['poznamka']) ) { $row['poznamka'] = $post_data['poznamka']; }
             
             try {
                 $DokumentOdeslani->update($row, array(array("id=%i",$id)));

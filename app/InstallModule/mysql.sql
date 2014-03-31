@@ -143,6 +143,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}dokument_odeslani` (
   `cislo_faxu` varchar(100) DEFAULT NULL,
   `stav` tinyint(4) NOT NULL DEFAULT '1',
   `date_created` datetime NOT NULL,
+  `poznamka` VARCHAR(200) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_dokument_odeslani_dokument1` (`dokument_id`),
   KEY `fk_dokument_odeslani_subjekt1` (`subjekt_id`),

@@ -2152,6 +2152,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $druh_zasilky = null;
                 $cislo_faxu = '';
                 $stav = 0;
+                $poznamka = null;
 
                 if ( $metoda_odeslani == 0 ) {
                     // neodesilat - nebudeme delat nic
@@ -2255,6 +2256,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     
                     $cena = floatval($post_data['cena_zasilky'][$subjekt_id]);
                     $hmotnost = floatval($post_data['hmotnost_zasilky'][$subjekt_id]);
+                    $poznamka = $post_data['poznamka'][$subjekt_id];
                     $stav = 1;
                     
                     $this->flashMessage('Dokument předán na podatelnu k odeslání poštou na adresu "'. Subjekt::displayName($adresat) .'".');
@@ -2301,7 +2303,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'cena' => $cena,
                     'hmotnost' => $hmotnost,
                     'cislo_faxu' => $cislo_faxu,
-                    'stav' => $stav
+                    'stav' => $stav,
+                    'poznamka' =>$poznamka
                 );
                 $DokumentOdeslani->ulozit($row);                
             }

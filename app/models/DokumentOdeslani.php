@@ -57,13 +57,8 @@ class DokumentOdeslani extends BaseModel
         $sql = array(
             'distinct'=>false,
             'from' => array($this->name => 'ds'),
-            'cols' => array('dokument_id','ds.id'=>'dokodes_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava','cena','hmotnost','cislo_faxu','ds.stav%sql'=>'stav_odeslani','druh_zasilky'),
+            'cols' => array('dokument_id','ds.id'=>'dokodes_id','subjekt_id','datum_odeslani','zpusob_odeslani_id','user_id','zprava','cena','hmotnost','cislo_faxu','ds.stav%sql'=>'stav_odeslani','druh_zasilky','poznamka'),
             'leftJoin' => array(
-                'subjekt' => array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => array('*')
-                 ),
                 'zpusob_odeslani' => array(
                     'from' => array($this->tb_zpusob_odeslani => 'odes'),
                     'on' => array('odes.id=ds.zpusob_odeslani_id'),

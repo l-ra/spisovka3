@@ -12,6 +12,8 @@ Nové funkce:
   Nyní může být uživatel pouze v jedné organizační jednotce.
 - E-podatelna - možnost nadefinovat více emailových schránek a konkrétní schránku
                 lze přiřadit určité organizační jednotce.
+- výpravna - pro odeslání dokumentu poštou přidáno pole poznámky, kde může
+  uživatel zadat libovolný údaj
 - nyní je možné u spouštěcí události nastavit automatické nebo ruční spuštění
   plynutí skartační lhůty. V případně ručního spuštění lze zadat rozhodné datum.
 - pokud je mod_rewrite povolen a aplikace jej nedetekuje automaticky,
