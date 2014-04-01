@@ -1,4 +1,5 @@
 @{block title}Dokument{/block}
+{assign Select2 => true}
 @{block javascript}
 	<script type="text/javascript" src="{$baseUri}js/webtoolkit.aim.js"></script>
 	<script type="text/javascript">
@@ -62,18 +63,19 @@
 
         var sel = $('#frmudalostForm-datum_spousteci_udalosti');
         if (!isChecked)
-            sel.attr('disabled','disabled');
+            sel.prop('disabled', true);
         else {
-            sel.removeAttr('disabled');
+            sel.prop('disabled', false);
             sel.focus();
         }
     }
+
     $(document).ready(function() {
-        $('#frmudalostForm-datum_spousteci_udalosti').attr('disabled','disabled');
+        $('#frmudalostForm-datum_spousteci_udalosti').prop('disabled', true);
+        $('#frmvyrizovaniForm-spisovy_znak_id').select2({ width: 'resolve' });
+        
     });
     
-	</script>
-	<script type="text/javascript">
         var smer_typu_dokumentu = new Array();
         {foreach $typy_dokumentu as $t}
         smer_typu_dokumentu[{$t->id}] = {$t->smer};

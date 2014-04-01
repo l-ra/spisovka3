@@ -300,14 +300,14 @@ $(function() {
     $('#novysubjekt_click').click( subjektNovy );
 
     $('#checkbox_all_on').click(function(event) {
-        $('input[name^=dokument_vyber]').attr('checked',true);
-        $('input[name^=spis_vyber]').attr('checked',true);
-        $('input[name^=zapujcka_vyber]').attr('checked',true);
+        $('input[name^=dokument_vyber]').prop('checked',true);
+        $('input[name^=spis_vyber]').prop('checked',true);
+        $('input[name^=zapujcka_vyber]').prop('checked',true);
     });
     $('#checkbox_all_off').click(function(event) {
-        $('input[name^=dokument_vyber]').attr('checked',false);
-        $('input[name^=spis_vyber]').attr('checked',false);
-        $('input[name^=zapujcka_vyber]').attr('checked',false);
+        $('input[name^=dokument_vyber]').prop('checked',false);
+        $('input[name^=spis_vyber]').prop('checked',false);
+        $('input[name^=zapujcka_vyber]').prop('checked',false);
     });
     
 });
@@ -434,7 +434,7 @@ isdsSubjekt = function ( formName ) {
             alert(data.error);
         } else {
             
-            $("#frm"+formName+"-type option[value="+data.dbType+"]").attr('selected', 'selected');
+            $("#frm"+formName+"-type option[value="+data.dbType+"]").prop('selected', true);
             
             document.getElementById('frm'+formName+'-ic').value = data.ic;
             document.getElementById('frm'+formName+'-nazev_subjektu').value = data.firmName;

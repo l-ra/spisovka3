@@ -9,7 +9,7 @@
     {css print_site, print}
     {css redmond/jquery-ui-custom}
     
-    {js jquery-min}
+    {js jquery-1.7.2.min}
     {js jquery-ui-custom.min}
     {js jquery.nette}
     <script type="text/javascript">
@@ -17,6 +17,11 @@
         var is_simple = '{=IS_SIMPLE_ROUTER}';
     </script>
     {js script}
+    {if isset($Select2)}
+        {css select2}
+        {js select2.min}
+    {/if}
+
     {block #javascript}{/block}
 
     {include #header}
