@@ -1,4 +1,5 @@
 @{block title}Detail spisu{/block}
+{assign Select2 => true}
 @{block javascript}
 	<script type="text/javascript">
 
@@ -31,7 +32,7 @@
                     select_set_value(document.forms['frm-upravitForm'].spousteci_udalost_id,spisz_udalost[value]);
                     return true;
                 }
-
+                
 	</script>
 @{/block}
 @{block debug}

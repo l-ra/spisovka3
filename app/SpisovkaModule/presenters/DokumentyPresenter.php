@@ -1833,9 +1833,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('datum_vyrizeni_cas', 'Čas vyřízení:', 10, 15)
                 ->setValue($cas);
 
-        $form->addSelect('spisovy_znak_id', 'spisový znak:', $spisznak_seznam)
-                ->setValue(@$Dok->spisovy_znak_id)
-                ->controlPrototype->onchange("vybratSpisovyZnak();");
+        //pouziti preddefinovane komponenty
+        $form->addComponent( new SpisovyZnakComponent('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id);
+
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
                 ->setValue(@$Dok->ulozeni_dokumentu);
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 6)
