@@ -423,9 +423,12 @@ class Admin_SpisyPresenter extends SpisyPresenter
                 ->setValue(@$spis->parent_id);        
 
         
-        $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
-                ->setValue(@$spis->spisovy_znak_id)
-                ->controlPrototype->onchange("vybratSpisovyZnak();");
+//        $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
+//                ->setValue(@$spis->spisovy_znak_id)
+//                ->controlPrototype->onchange("vybratSpisovyZnak();");
+        $form1->addComponent( new SpisovyZnakComponent('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form1->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id);
+        
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$spis->skartacni_znak)
                 ->controlPrototype->readonly = TRUE;

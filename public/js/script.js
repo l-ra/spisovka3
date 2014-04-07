@@ -57,7 +57,7 @@ function InstallDatePicker() {
 $(function() {
 
     InstallDatePicker();
-    
+    initSelect2(); 
     /*
      * Nastaveni spinneru jako okenko pod kurzorem
      */
@@ -1527,3 +1527,18 @@ zmen_rezim_subjektu = function() {
     }, 'text');
     
 }
+/**
+ * Initializuje Select2 widgety na prvcich select s atributem data-widget-select2=1
+ * kontroluje zda je funkce dostupna
+ * @returns {void}
+ */
+initSelect2 = function() {
+    if (typeof $().select2 !== 'undefined') {
+        $('select:not(has-select2-widget)[data-widget-select2=1]').each(function() {
+
+            var options = $(this).data('widget-select2-options') || {};
+
+            $(this).select2(options).attr('has-select2-widget', 1);
+        });
+    }
+};

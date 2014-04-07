@@ -652,13 +652,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $form1->addHidden('parent_id_old')
                 ->setValue(@$spis->parent_id);     
 
-        //pouziti nastaveni standardni komponenty Select
-        $select = $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
-                ->setOption('data-widget-select2', '1')
-                ->setValue(@$spis->spisovy_znak_id)
-                ->controlPrototype->onchange("vybratSpisovyZnak();");
-        $select->attrs['data-widget-select2'] = 1;
-        $select->attrs['data-widget-select2-options'] = json_encode(array('width' => 'resolve'));
+        $form1->addComponent( new SpisovyZnakComponent('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form1->getComponent('spisovy_znak_id')->setValue(@$spis->spisovy_znak_id);
         
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)                
                 ->setValue(@$spis->skartacni_znak)
@@ -799,8 +794,12 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('parent_id', 'Složka:', $spisy);
                 //->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
-        $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
-                ->controlPrototype->onchange("vybratSpisovyZnak('frm-novyajaxForm');");
+        $form1->addComponent( new SpisovyZnakComponent('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form1->getComponent('spisovy_znak_id')
+            ->setSelect2Option('width', '75%') // pri ajaxu nefunguje width resolve
+            ->controlPrototype->onchange("vybratSpisovyZnak('frm-novyajaxForm');")
+            ;
+        
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
