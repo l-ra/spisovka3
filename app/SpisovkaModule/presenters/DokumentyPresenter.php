@@ -1834,8 +1834,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue($cas);
 
         //pouziti preddefinovane komponenty
-        $form->addComponent( new SpisovyZnakComponent('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
-        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id);
+        $form->addComponent( new Select2Component('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id)
+            ->controlPrototype->onchange("vybratSpisovyZnak(this);");
 
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
                 ->setValue(@$Dok->ulozeni_dokumentu);

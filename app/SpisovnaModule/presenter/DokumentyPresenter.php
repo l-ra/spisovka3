@@ -780,11 +780,9 @@ protected function createComponentVyrizovaniForm()
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
                 ->setValue(@$Dok->ulozeni_dokumentu);
 
-        $form->addComponent( new SpisovyZnakComponent('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
-        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id);
-//        $form->addSelect('spisovy_znak_id', 'spisový znak:', $spisznak_seznam)
-//                ->setValue(@$Dok->spisovy_znak_id)
-//                ->controlPrototype->onchange("vybratSpisovyZnak();");        
+        $form->addComponent( new Select2Component('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id)
+            ->controlPrototype->onchange("vybratSpisovyZnak(this);");
         $form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$Dok->skartacni_znak);
         $form->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)

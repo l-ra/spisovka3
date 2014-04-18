@@ -1,39 +1,7 @@
 @{block title}Detail spisu{/block}
 {assign Select2 => true}
 @{block javascript}
-	<script type="text/javascript">
-
-                function vybratSpisovyZnak() {
-
-                    var spisz_skart = new Array();
-                    var spisz_lhuta = new Array();
-                    var spisz_udalost = new Array();
-                    spisz_skart['0'] = '';
-                    spisz_lhuta['0'] = '';
-                    spisz_udalost['0'] = '';
-                {if count($SpisoveZnaky)>0}
-                {foreach $SpisoveZnaky as $sznak}
-                    spisz_skart[{$sznak->id}] = {$sznak->skartacni_znak};
-                    spisz_lhuta[{$sznak->id}] = {$sznak->skartacni_lhuta};
-                    spisz_udalost[{$sznak->id}] = {$sznak->spousteci_udalost_id};
-                {/foreach}
-                {/if}
-
-                    var frm_spis  = document.forms['frm-upravitForm'].spisovy_znak_id;
-                    var frm_skart  = document.forms['frm-upravitForm'].skartacni_znak;
-                    var frm_lhuta  = document.forms['frm-upravitForm'].skartacni_lhuta;
-                    var frm_udalost  = document.forms['frm-upravitForm'].spousteci_udalost_id;
-
-                    var key  = document.forms['frm-upravitForm'].spisovy_znak_id.selectedIndex;
-                    var value = document.forms['frm-upravitForm'].spisovy_znak_id.options[key].value;
-                    document.forms['frm-upravitForm'].skartacni_znak.value = spisz_skart[value];
-                    document.forms['frm-upravitForm'].skartacni_lhuta.value = spisz_lhuta[value];
-                    //document.forms['frm-novyForm'].spousteci_udalost.value = spisz_udalost[value];
-                    select_set_value(document.forms['frm-upravitForm'].spousteci_udalost_id,spisz_udalost[value]);
-                    return true;
-                }
-                
-	</script>
+{include ../../@vlozSpisZnak.phtml}
 @{/block}
 @{block debug}
 <?php print_r($seznam); ?>

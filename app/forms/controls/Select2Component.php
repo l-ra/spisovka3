@@ -1,17 +1,17 @@
 <?php
 
 /**
- * SpisovyZnakComponent - formularovy prvek pro spisovy znak se Select2 widgetem pro opakovane pouziti
+ * Select2Component - formularovy prvek pro Select2 widget pro opakovane pouziti
  *
  * @author Petr Slavicek
  */
-class SpisovyZnakComponent extends SelectBox implements IComponent
+class Select2Component extends SelectBox implements IComponent
 {
     public function __construct($label = NULL, array $items = NULL, $size = NULL)
     {
         parent::__construct($label, $items, $size);
         $this->controlPrototype->attrs['data-widget-select2'] = 1; //pouzit widget Select2
-        //Select2 options, resolve nefunguje u Ajax formularu
+        //Select2 options resolve nefunguje u Ajax formularu
         $this->controlPrototype->attrs['data-widget-select2-options'] = json_encode(array('width' => 'resolve'));
         $this->controlPrototype->onchange("vybratSpisovyZnak();");
     }
@@ -20,7 +20,7 @@ class SpisovyZnakComponent extends SelectBox implements IComponent
      * nastavi option pro Select2 widget
      * @param string $name
      * @param string $value
-     * @return \SpisovyZnakComponent
+     * @return \Select2Component
      */
     public function setSelect2Option($name, $value)
     {

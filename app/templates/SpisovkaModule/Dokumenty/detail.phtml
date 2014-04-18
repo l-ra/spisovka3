@@ -3,86 +3,52 @@
 @{block javascript}
 	<script type="text/javascript" src="{$baseUri}js/webtoolkit.aim.js"></script>
 	<script type="text/javascript">
-		function startCallback() {
+function startCallback() {
 			return true;
 		}
 
 		function completeCallback(response) {
 
-                        if ( response.indexOf('###vybrano###') != -1 ) {
-                            alert('Příloha byl nahrána.');
-                            $('#dialog').dialog('close');
-                            renderPrilohy({$Dok->id});
-                        } else if ( response.indexOf('###zmemeno###') != -1 ) {
-                            alert('Příloha byla upravena.');
-                            $('#dialog').dialog('close');
-                            renderPrilohy({$Dok->id});
-                        } else {
-                            $('#dialog').html(response);
-                        }
-		}
+                        if ( response.indexOf('###vybrano###') != - 1) {
+    alert('Příloha byl nahrána.');
+            $('#dialog').dialog('close');
+            renderPrilohy({$Dok - > id});
+    } else if (response.indexOf('###zmemeno###') != - 1) {
+    alert('Příloha byla upravena.');
+            $('#dialog').dialog('close');
+            renderPrilohy({$Dok - > id});
+    } else {
+    $('#dialog').html(response);
+    }
+    }
 
-
-                function vybratSpisovyZnak(form) {
-
-                    var spisz_skart = new Array();
-                    var spisz_lhuta = new Array();
-                    var spisz_udalost = new Array();
-                    spisz_skart['0'] = '';
-                    spisz_lhuta['0'] = '';
-                    spisz_udalost['0'] = '';
-                {if count($SpisoveZnaky)>0}
-                {foreach $SpisoveZnaky as $sznak}
-                    spisz_skart[{$sznak->id}] = {$sznak->skartacni_znak};
-                    spisz_lhuta[{$sznak->id}] = {$sznak->skartacni_lhuta};
-                    spisz_udalost[{$sznak->id}] = {$sznak->spousteci_udalost_id};
-                {/foreach}
-                {/if}
-
-                    if ( typeof form == 'undefined' ) {
-                        form = 'frm-vyrizovaniForm';
-                    }
-
-                    var frm_spis  = document.forms[form].spisovy_znak_id;
-                    var frm_skart  = document.forms[form].skartacni_znak;
-                    var frm_lhuta  = document.forms[form].skartacni_lhuta;
-                    var frm_udalost  = document.forms[form].spousteci_udalost_id;
-
-                    var key  = document.forms[form].spisovy_znak_id.selectedIndex;
-                    var value = document.forms[form].spisovy_znak_id.options[key].value;
-                    document.forms[form].skartacni_znak.value = spisz_skart[value];
-                    document.forms[form].skartacni_lhuta.value = spisz_lhuta[value];
-                    //document.forms['frm-vyrizovaniForm'].spousteci_udalost.value = spisz_udalost[value];
-                    select_set_value(document.forms[form].spousteci_udalost_id,spisz_udalost[value]);
-                    return true;
-                }
 
     function onChangeRadioButtonSpousteciUdalost(elm) {
 
-        var isChecked = $('#frmudalostForm-udalost_typ-1').is(':checked');
-
-        var sel = $('#frmudalostForm-datum_spousteci_udalosti');
-        if (!isChecked)
+    var isChecked = $('#frmudalostForm-udalost_typ-1').is(':checked');
+            var sel = $('#frmudalostForm-datum_spousteci_udalosti');
+            if (!isChecked)
             sel.prop('disabled', true);
-        else {
+            else {
             sel.prop('disabled', false);
-            sel.focus();
-        }
+                    sel.focus();
+            }
     }
 
     $(document).ready(function() {
-        $('#frmudalostForm-datum_spousteci_udalosti').prop('disabled', true);
-        //$('#frmvyrizovaniForm-spisovy_znak_id').select2({ width: 'resolve' });
-        
-    });
-    
-        var smer_typu_dokumentu = new Array();
-        {foreach $typy_dokumentu as $t}
-        smer_typu_dokumentu[{$t->id}] = {$t->smer};
-        {/foreach}
-        
-        var typ_dokumentu_id = {$Dok->typ_dokumentu->id};
+    $('#frmudalostForm-datum_spousteci_udalosti').prop('disabled', true);
+            //$('#frmvyrizovaniForm-spisovy_znak_id').select2({ width: 'resolve' });
+
+    });   
+
+     var smer_typu_dokumentu = new Array();
+    {foreach $typy_dokumentu as $t}
+    smer_typu_dokumentu[{$t->id}] = {$t->smer};
+    {/foreach}
+
+    var typ_dokumentu_id = {$Dok->typ_dokumentu->id};    
 	</script>
+    {include ../../@vlozSpisZnak.phtml}
 @{/block}
 @{block debug}
 <?php echo "\n\nDokument: "; print_r($Dok); ?>
