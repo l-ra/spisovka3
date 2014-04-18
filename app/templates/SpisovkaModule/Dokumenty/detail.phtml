@@ -12,11 +12,11 @@ function startCallback() {
                         if ( response.indexOf('###vybrano###') != - 1) {
     alert('Příloha byl nahrána.');
             $('#dialog').dialog('close');
-            renderPrilohy({$Dok - > id});
+            renderPrilohy({$Dok->id});
     } else if (response.indexOf('###zmemeno###') != - 1) {
     alert('Příloha byla upravena.');
             $('#dialog').dialog('close');
-            renderPrilohy({$Dok - > id});
+            renderPrilohy({$Dok->id});
     } else {
     $('#dialog').html(response);
     }
