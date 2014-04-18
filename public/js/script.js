@@ -1547,12 +1547,6 @@ vybratSpisovyZnak = function(element) {
 
     var formName = $(element).parents('form').first().attr('name');
    
-//nenasel jsem pouziti nikde v kodu 
-//    var frm_spis = document.forms[formName].spisovy_znak_id;
-//    var frm_skart = document.forms[formName].skartacni_znak;
-//    var frm_lhuta = document.forms[formName].skartacni_lhuta;
-//    var frm_udalost = document.forms[formName].spousteci_udalost_id;
-
     var key = document.forms[formName].spisovy_znak_id.selectedIndex;
     var value = document.forms[formName].spisovy_znak_id.options[key].value;
     document.forms[formName].skartacni_znak.value = spisz_skart[value];

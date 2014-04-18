@@ -733,15 +733,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $form1->addSelect('parent_id', 'Složka:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
         
-        $form1->addComponent( new Select2Component('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form1->addComponent( new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
         $form1->getComponent('spisovy_znak_id')
             ->controlPrototype->onchange("vybratSpisovyZnak(this);");
-        
-//        $select = $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
-//                ->controlPrototype->onchange("vybratSpisovyZnak(this);");
-//        $select->attrs['data-widget-select2'] = 1;
-//        $select->attrs['data-widget-select2-options'] = json_encode(array('width' => 'resolve'));
-        
+                
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);

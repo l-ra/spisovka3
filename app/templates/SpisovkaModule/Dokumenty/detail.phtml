@@ -3,17 +3,17 @@
 @{block javascript}
 	<script type="text/javascript" src="{$baseUri}js/webtoolkit.aim.js"></script>
 	<script type="text/javascript">
-function startCallback() {
+        function startCallback() {
 			return true;
 		}
 
 		function completeCallback(response) {
 
-                        if ( response.indexOf('###vybrano###') != - 1) {
+                        if ( response.indexOf('###vybrano###') != -1) {
     alert('Příloha byl nahrána.');
             $('#dialog').dialog('close');
             renderPrilohy({$Dok->id});
-    } else if (response.indexOf('###zmemeno###') != - 1) {
+    } else if (response.indexOf('###zmemeno###') != -1) {
     alert('Příloha byla upravena.');
             $('#dialog').dialog('close');
             renderPrilohy({$Dok->id});
