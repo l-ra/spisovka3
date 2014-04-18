@@ -12,8 +12,7 @@ class Select2Component extends SelectBox implements IComponent
         parent::__construct($label, $items, $size);
         $this->controlPrototype->attrs['data-widget-select2'] = 1; //pouzit widget Select2
         //Select2 options resolve nefunguje u Ajax formularu
-        $this->controlPrototype->attrs['data-widget-select2-options'] = json_encode(array('width' => 'resolve'));
-        $this->controlPrototype->onchange("vybratSpisovyZnak();");
+        $this->controlPrototype->attrs['data-widget-select2-options'] = json_encode(array('width' => 'resolve'));        
     }
     
     /**
