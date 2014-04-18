@@ -125,7 +125,7 @@
             <br />{$searchForm['prideleno_osobne']->control} Přiděleno na mé jméno
             <br />{$searchForm['prideleno_na_organizacni_jednotku']->control} Přiděleno na mou organizační jednotku
             <script type="text/javascript">
-            <!--
+            <!--        
 		$('#frmsearchForm-prideleno_text').focus().keyup(function(event) {
                     if ( $('#frmsearchForm-prideleno_text').val().length > 2 ) {
 			$.getJSON({link autoComplete!}, { typ: 1, text: $('#frmsearchForm-prideleno_text').val()}, function(payload) {
@@ -265,5 +265,6 @@
 <script type="text/javascript">
 
     InstallDatePicker();
+    initSelect2();
 
 </script>

@@ -228,8 +228,13 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15)
                 ->setValue(@$hledat['datum_odeslani_cas_do']);
 
-        $form->addText('spisovy_znak_id', 'spisový znak:')
-                ->setValue(@$hledat['spisovy_znak_id']);
+        $SpisovyZnak = new SpisovyZnak();
+        $spisznak_seznam = $SpisovyZnak->select(2);
+        
+        $form->addComponent(new Select2Component('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form->getComponent('spisovy_znak_id')->setValue(@$hledat['spisovy_znak_id']);
+//        $form->addText('spisovy_znak_id', 'spisový znak:')
+//                ->setValue(@$hledat['spisovy_znak_id']);
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 4)
                 ->setValue(@$hledat['ulozeni_dokumentu']);
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 4)
