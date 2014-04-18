@@ -182,7 +182,7 @@ class SpisovyZnak extends TreeModel
         if ($result === null) {           
             $prefix = Environment::getConfig('database')->prefix;
             $tb_spoudalost = $prefix .'spousteci_udalost';
-            $result = dibi::query('SELECT * FROM %n', $tb_spoudalost)->fetchAssoc('id');
+            $result = dibi::query('SELECT * FROM %n', $tb_spoudalost, 'WHERE stav<>0')->fetchAssoc('id');
             
             DbCache::set('s3_Spousteci_udalost', $result);
         }
