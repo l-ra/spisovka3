@@ -1860,7 +1860,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10)
                 ->setValue(@$Dok->vyrizeni_pocet_listu)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet listů musí být číslo');
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$Dok->vyrizeni_pocet_priloh->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet příloh musí být číslo'));
+                ->setValue(@$Dok->vyrizeni_pocet_priloh)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet příloh musí být číslo');
         $form->addText('vyrizeni_typ_prilohy', 'Typ přílohy:', 20, 50)
                 ->setValue(@$Dok->vyrizeni_typ_prilohy);          
 
