@@ -401,7 +401,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:', 10);
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15);
 
-        $form->addText('spisovy_znak_id', 'spisový znak:');
+        $SpisovyZnak = new SpisovyZnak();
+        $spisznak_seznam = $SpisovyZnak->select(2);
+
+        $form->addComponent(new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 4);
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 4);
         $form->addSelect('skartacni_znak','Skartační znak: ', $skartacni_znak);
@@ -649,8 +652,12 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15)
                 ->setValue(@$params['datum_odeslani_cas_do']);
 
-        $form->addText('spisovy_znak_id', 'spisový znak:')
-                ->setValue(@$params['spisovy_znak_id']);
+        $SpisovyZnak = new SpisovyZnak();
+        $spisznak_seznam = $SpisovyZnak->select(2);
+        
+        $form->addComponent(new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form->getComponent('spisovy_znak_id')->setValue(@$params['spisovy_znak_id']);
+                
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 4)
                 ->setValue(@$params['ulozeni_dokumentu']);
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 4)

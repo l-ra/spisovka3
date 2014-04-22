@@ -17,9 +17,11 @@
         var is_simple = '{=IS_SIMPLE_ROUTER}';
     </script>
     {js script}
-    {css select2}
-    {js select2.min}
- 
+    {if isset($Select2)}
+        {css select2}
+        {js select2.min}
+    {/if}
+    
     {block #javascript}{/block}
 
     {include #header}
