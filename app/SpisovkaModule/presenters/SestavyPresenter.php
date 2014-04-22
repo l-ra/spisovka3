@@ -294,22 +294,26 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderNova()
     {
-        $this->template->newForm = $this['newForm'];
+        $this->template->form = $this['newForm'];
+        $this->template->nadpis = 'Nová sestava';
         
         $this->template->DruhZasilky = DruhZasilky::get(null,1);
         
         $user = Environment::getUser();
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
+        $this->setView('form');
     }
 
     public function renderUpravit()
     {
-        $this->template->upravitForm = $this['upravitForm'];
+        $this->template->form = $this['upravitForm'];
+        $this->template->nadpis = 'Upravit sestavu';
         
         $this->template->DruhZasilky = DruhZasilky::get(null,1);
         
         $user = Environment::getUser();
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
+        $this->setView('form');
     }
     
     protected function createComponentNewForm()
@@ -434,7 +438,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('subjekt_telefon', 'Telefon:', 50, 150);
         $form->addText('subjekt_isds', 'ID datové schránky:', 10, 50);
 
-        $form->addSubmit('novy', 'Vytvořit')
+        $form->addSubmit('odeslat', 'Vytvořit')
                  ->onClick[] = array($this, 'vytvoritClicked');
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
@@ -709,7 +713,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 ->setValue(@$params['subjekt_isds']);
 
 
-        $form->addSubmit('upravit', 'Upravit')
+        $form->addSubmit('odeslat', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
