@@ -14,7 +14,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
     public function renderDefault()
     {
-        $this->template->searchForm = $this['searchForm'];
+        $this->template->form = $this['searchForm'];
 
         $this->template->DruhZasilky = DruhZasilky::get(null,1);
         

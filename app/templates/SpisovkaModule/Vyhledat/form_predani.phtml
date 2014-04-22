@@ -1,0 +1,88 @@
+    <div id="dokument_blok_poznamka">
+        <div class="h2">
+            Přiděleno / předáno
+        </div>
+    {if $presenter == 'Sestavy'}
+        <span n:if="!$vidiVsechnyDokumenty">Poznámka: Sestava bude zahrnovat jen dokumenty, ke kterým máte přístup.</span>
+    {else}
+        {if $module == "Spisovka"}Poznámka: Při použití tohoto hledání se dočasně deaktivuje filtr dokumentů.<br/>{/if}
+        <span n:if="!$vidiVsechnyDokumenty">Poznámka: Nemáte právo vidět všechny dokumenty, výsledek hledání bude omezen.</span>
+    {/if}
+        <dl class="detail_item">
+            <dt>Přiděleno:</dt>
+            <dd>
+            {$form['prideleno_text']->control}
+            <br />{$form['prideleno_osobne']->control} Přiděleno na mé jméno
+            <br />{$form['prideleno_na_organizacni_jednotku']->control} Přiděleno na mou organizační jednotku
+
+        <script type="text/javascript">
+        <!--
+        function pridelenoPredanoSearchHandler(type, payload) {
+            $('#'+type).remove();
+
+            var list = $('<ul id="'+type+'"></ul>').insertAfter('input[name='+type+'_text]');
+
+            for (var i in payload.autoComplete) {
+                $('<li></li>').html(payload.autoComplete[i]).appendTo(list);
+            }            
+        }
+        function pridelenoSearchHandler(payload) {
+            pridelenoPredanoSearchHandler('prideleno', payload);
+        }
+        function predanoSearchHandler(payload) {
+            pridelenoPredanoSearchHandler('predano', payload);
+        }
+        function keyUpHandler(type, element) {
+            if ( $(element).val().length > 2 )
+                $.getJSON({link autoComplete!}, { typ: type == 'prideleno' ? 1 : 2, text: $(element).val()},
+                window[type+'SearchHandler']);
+            else
+                $('#'+type).remove();
+        }
+        $('input[name=prideleno_text]').keyup(function(event) {
+            keyUpHandler('prideleno', this);
+        });
+        <?php if ( isset($params['prideleno_text']) && !empty($params['prideleno_text']) ) { 
+                $prideleno_checked = "''"; $prideleno_org_checked = "''";
+                if ( isset($params['prideleno']) ) {
+                    $prideleno_checked = "'". implode(",",$params['prideleno']) ."'";
+                }
+                if ( isset($params['prideleno_org']) ) {
+                    $prideleno_org_checked = "'". implode(",",$params['prideleno_org']) ."'";
+                }                        
+        ?>
+        $.getJSON({link autoComplete!}, { typ: 1, text: '<?php echo $params['prideleno_text'] ."', user: $prideleno_checked, org: $prideleno_org_checked"; ?>}, pridelenoSearchHandler);
+        <?php } ?>
+                
+        -->
+        </script>
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Předáno:</dt>
+            <dd>
+            {$form['predano_text']->control}
+            <br />{$form['predano_osobne']->control} Předáno na mé jméno
+            <br />{$form['predano_na_organizacni_jednotku']->control} Předáno na mou organizační jednotku
+        <script type="text/javascript">
+        <!--
+        $('input[name=predano_text]').keyup(function(event) {
+            keyUpHandler('predano', this);
+        });
+        <?php if ( isset($params['predano_text']) && !empty($params['predano_text']) ) { 
+                $predano_checked = "''"; $predano_org_checked = "''";
+                if ( isset($params['predano']) ) {
+                    $predano_checked = "'". implode(",",$params['predano']) ."'";
+                }
+                if ( isset($params['predano_org']) ) {
+                    $predano_org_checked = "'". implode(",",$params['predano_org']) ."'";
+                }                        
+        ?>
+        $.getJSON({link autoComplete!}, { typ: 2, text: '<?php echo $params['predano_text'] ."', user: $predano_checked, org: $predano_org_checked"; ?>}, predanoSearchHandler);
+        <?php } ?>
+                
+        -->
+        </script>
+            </dd>
+        </dl>
+    </div>
