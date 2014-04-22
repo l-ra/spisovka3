@@ -206,6 +206,9 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->template->seznam = $seznam;*/
 
         $result = $Spisy->seznam($args, 5, $spis_id);
+        $SpisovyZnak = new SpisovyZnak();
+        $spisove_znaky = $SpisovyZnak->seznam(null);
+        $this->template->SpisoveZnaky = $spisove_znaky;
         $this->template->seznam = $result->fetchAll();
 
     }
