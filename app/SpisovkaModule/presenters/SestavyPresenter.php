@@ -380,13 +380,13 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('datum_vzniku_cas_od', 'Čas doručení (od):', 10, 15);
         $form->addDatePicker('datum_vzniku_do', 'Datum doručení/vzniku do:', 10);
         $form->addText('datum_vzniku_cas_do', 'Čas doručení do:', 10, 15);
-
-        $form->addText('pocet_listu', 'Počet listů:', 5, 10);
-        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10);
+//nepouzito v sablone
+//        $form->addText('pocet_listu', 'Počet listů:', 5, 10);
+//        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10);
         $form->addSelect('stav_dokumentu', 'Stav dokumentu:', $stav_dokumentu);
 
-        $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
-                ->setValue('30');
+//        $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
+//                ->setValue('30');
         $form->addTextArea('poznamka', 'Poznámka:', 80, 4);
 
         $form->addSelect('zpusob_vyrizeni', 'Způsob vyřízení:', $zpusob_vyrizeni);
@@ -410,8 +410,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addSelect('skartacni_znak','Skartační znak: ', $skartacni_znak);
         $form->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
         $form->addSelect('spousteci_udalost','Spouštěcí událost: ', $spudalost_seznam);
-        $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10);
-        $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10);
+//        $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10);
+//        $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10);
 
         $form->addText('prideleno_text', 'Přiděleno:', 50, 255)
                 ->getControlPrototype()->autocomplete = 'off';
@@ -618,10 +618,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('datum_vzniku_cas_do', 'Čas doručení do:', 10, 15)
                 ->setValue(@$params['datum_vzniku_cas_do']);
 
-        $form->addText('pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$params['pocet_listu']);
-        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$params['pocet_priloh']);
+//        $form->addText('pocet_listu', 'Počet listů:', 5, 10)
+//                ->setValue(@$params['pocet_listu']);
+//        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
+//                ->setValue(@$params['pocet_priloh']);
         $form->addSelect('stav_dokumentu', 'Stav dokumentu:', $stav_dokumentu)
                 ->setValue(@$params['stav_dokumentu']);
 
@@ -668,10 +668,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 ->setValue(@$params['skartacni_lhuta']);
         $form->addSelect('spousteci_udalost','Spouštěcí událost: ', $spudalost_seznam)
                 ->setValue(@$params['spousteci_udalost']);
-        $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$params['vyrizeni_pocet_listu']);
-        $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$params['vyrizeni_pocet_priloh']);
+//        $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10)
+//                ->setValue(@$params['vyrizeni_pocet_listu']);
+//        $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
+//                ->setValue(@$params['vyrizeni_pocet_priloh']);
 
         $form->addText('prideleno_text', 'Přiděleno:', 50, 255)
                 ->setValue(@$params['prideleno_text'])
