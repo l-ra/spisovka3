@@ -1510,6 +1510,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->addRule(Form::FILLED, 'Lhůta k vyřízení musí být vyplněna!')
+                ->addRule(Form::NUMERIC, 'Lhůta k vyřízení musí být číslo')
                 ->setValue('30');
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
                 ->setValue(@$dok->poznamka);
@@ -1519,9 +1520,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addHidden('zmocneni')->setValue(0);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$dok->pocet_listu);
+                ->setValue(@$dok->pocet_listu)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet listů musí být číslo');
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$dok->pocet_priloh);
+                ->setValue(@$dok->pocet_priloh)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet příloh musí být číslo');
         $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
                 ->setValue(@$dok->typ_prilohy);        
 
@@ -1727,7 +1728,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$Dok->poznamka);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$Dok->pocet_listu);
+                ->setValue(@$Dok->pocet_listu)->addRule(Form::NUMERIC);
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$Dok->pocet_priloh);
         $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
@@ -1857,9 +1858,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->controlPrototype->readonly = TRUE;
 
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$Dok->vyrizeni_pocet_listu);
+                ->setValue(@$Dok->vyrizeni_pocet_listu)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet listů musí být číslo');
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$Dok->vyrizeni_pocet_priloh);
+                ->setValue(@$Dok->vyrizeni_pocet_priloh->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet příloh musí být číslo'));
         $form->addText('vyrizeni_typ_prilohy', 'Typ přílohy:', 20, 50)
                 ->setValue(@$Dok->vyrizeni_typ_prilohy);          
 

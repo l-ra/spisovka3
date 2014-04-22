@@ -432,7 +432,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 ->setValue($cas);
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
-                ->setValue('30');
+                ->setValue('30')->addRule(Form::NUMERIC, 'Lhůta k vyřízení musí být číslo');
         
         if ( !empty($zprava->isds_signature) ) {
             $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
@@ -447,8 +447,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         
         $form->addHidden('zmocneni')->setValue(0);
 
-        $form->addText('pocet_listu', 'Počet listů:', 5, 10);
-        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10);
+        $form->addText('pocet_listu', 'Počet listů:', 5, 10)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet listů musí být číslo');
+        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet příloh musí být číslo');
 
 
         $form->addSubmit('novy', 'Vytvořit')
