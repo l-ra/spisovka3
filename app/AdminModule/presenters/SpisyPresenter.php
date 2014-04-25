@@ -199,10 +199,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
     }
 
 
-    public function actionDetail()
+    public function renderDetail()
     {
-        
-
         $this->template->FormUpravit = $this->getParam('upravit',null);
 
         $spis_id = $this->getParam('id',null);
@@ -229,6 +227,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $DokumentSpis = new DokumentSpis();
         $result = $DokumentSpis->dokumenty($spis_id,1);
         $this->template->seznam = $result;        
+
+        $this->template->spisForm = $this['upravitForm'];
         
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParam('print');
@@ -244,11 +244,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
             $this->setView('printdetail');
         }          
         
-    }
-
-    public function renderDetail()
-    {
-        $this->template->spisForm = $this['upravitForm'];
     }
 
     public function actionUpravit()
