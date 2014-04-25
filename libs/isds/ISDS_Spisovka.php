@@ -56,7 +56,9 @@ class ISDS_Spisovka extends ISDS {
     }
     
     /* Vrati true nebo hodi vyjimku s popisem chyby */
-    /* Parametr je zrejme zbytecny. Zda se, ze organizace muze mit pouze jednu datovou schranku */
+    /* Parametr je zrejme zbytecny. Zda se, ze organizace muze mit pouze jednu datovou schranku 
+     *  - tvancura: parametr se pouziva tehdy, pokud je potreba nacist konkretni schranku (treba pri overeni zpravy, kde se pouzije schranka adresata)
+     */
     public function pripojit($params = null) {
 
         if ( is_array($params) ) {
