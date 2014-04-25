@@ -16,49 +16,8 @@ class ISDS_Spisovka extends ISDS {
         return Settings::get('isds_allow_more_boxes', false);
     }
     
-    /**
-     * Nacte konfiguraci pro pripojeni k ISDS
-     * 
-     * $param muze nabyvat tri hodnot:
-     *   - jako cislo = index daneho nastaveni
-     *   - jako retezec = id datove schranky
-     *   - prazdny = nacte prvni mozne nastaveni
-     * 
-     * @param int|string $param
-     * @return array
-     * @throws InvalidArgumentException
-     */
-    public function nactiKonfiguraci($param = null)
-    {
-        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $ep_config = $ep_config->toArray();
-        $ep_config = $ep_config['isds'];
-            
-        $config = null;
-        if ( is_numeric($params) ) { // parametrem je index z nastaveni
-            if ( !isset( $ep_config[$params] ) ) // existuje takove nastaveni?
-                throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
-            $config = $ep_config[ $params ];
-        } else if ( is_string($param) ) { // parametrem je string - id schranky
-            foreach ( $ep_config as $epc ) {
-                if ( $epc['idbox'] == $param ) {
-                    return $epc;
-                }
-            }
-            throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
-        } else { // zadny parametr
-            $config = reset($ep_config);
-            if ( $config === false ) // existuje nejake nastaveni?
-                throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka.");                    
-        }
-        
-        return $config;
-    }
-    
     /* Vrati true nebo hodi vyjimku s popisem chyby */
-    /* Parametr je zrejme zbytecny. Zda se, ze organizace muze mit pouze jednu datovou schranku 
-     *  - tvancura: parametr se pouziva tehdy, pokud je potreba nacist konkretni schranku (treba pri overeni zpravy, kde se pouzije schranka adresata)
-     */
+    /* Parametr je zrejme zbytecny. Zda se, ze organizace muze mit pouze jednu datovou schranku */
     public function pripojit($params = null) {
 
         if ( is_array($params) ) {
@@ -76,11 +35,23 @@ class ISDS_Spisovka extends ISDS {
             $config = $params->toArray();
         } else {
             
-            $config = $this->nactiKonfiguraci($params);
-            if ( $config === false ) // existuje nejake nastaveni?
-                throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka.");                    
+            $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
+            $ep_config = $ep_config->toArray();
+            $ep_config = $ep_config['isds'];
+            
+            if ( is_numeric($params) ) { // parametrem je index z nastaveni
+                if ( !isset( $ep_config[$params] ) ) // existuje takove nastaveni?
+                    throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
+                    
+                $config = $ep_config[ $params ];
+                
+            } else { // zadny parametr
+                $config = current($ep_config);
+                if ( $config === false ) // existuje nejake nastaveni?
+                    throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka.");                    
+            }
         }
-        
+
         $isds_portaltype = ($config['test']==1)?0:1;
         $this->config = $config;
 

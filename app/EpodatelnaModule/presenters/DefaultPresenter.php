@@ -1226,16 +1226,9 @@ dmFormat =
                         
                         if ( $source ) {
                                 
-                            /* Nacti schranku patrici teto zprave */
-                            $schranka = null;
-                            $isds_identifikator = unserialize($epodatelna_info->identifikator);
-                            if ( $isds_identifikator && isset($isds_identifikator['adresat']) ) {
-                                $schranka = $isds_identifikator['adresat'];
-                            }
-                            
                             $isds = new ISDS_Spisovka();                           
                             try {
-                                $isds->pripojit($schranka);
+                                $isds->pripojit();
                                 if ( $isds->AuthenticateMessage( $source ) ) {
                                     $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
                                 } else {
