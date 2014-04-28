@@ -144,26 +144,7 @@ $(function() {
     // Dialog - Vyber subjektu
     $('#dialog-pridat-prilohu').click(function(event){
         event.preventDefault();
-
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    $('#dok-prilohy-form').html(x.responseText);
-                }
-            }
-            url = this.href;
-            x.open("GET", url, true);
-            x.send(null);
-        }
-
-        $('#dok-prilohy-form').html('<div id="ajax-spinner" style="display: inline;"></div>');
-
-        return false;
-
-        //return dialog(this,'Přidat přílohu');
+        return dialog(this,'Přidat přílohu');
     });
 
     // Dialog - Vyber zamestnance pro predani
