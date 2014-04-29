@@ -16,16 +16,16 @@ Nové funkce:
   uživatel zadat libovolný údaj
 - nyní je možné u spouštěcí události nastavit automatické nebo ruční spuštění
   plynutí skartační lhůty. V případně ručního spuštění lze zadat rozhodné datum.
-- pokud je mod_rewrite povolen a aplikace jej nedetekuje automaticky,
-  je možné do souboru system.ini přidat následující nastavení:
-     clean_url = true
-  To zajistí použití čistých url.
 - připojení subjektu k dokumentu pomocí rychlého vyhledávání automaticky
   určí adresáta/odesílatele podle typu dokumentu  
 - dialogové okno pro výběr subjektu obsahuje nyní abecední filtr a stránkování
+- nový rozbalovací seznam pro výběr spisového znaku, umožňuje vyhledávání
 - kliknutí na označení verze aplikace v patičce stránky zobrazí soubor
   s historií změn aplikace
-- nový rozbalovací seznam pro výběr spisového znaku, umožňuje vyhledávání
+- pokud je v Apache mod_rewrite povolen a aplikace jej nedetekuje automaticky,
+  je možné do souboru system.ini přidat následující nastavení:
+     clean_url = true
+  To zajistí použití čistých url.
         
 Jiné změny:
 
@@ -34,40 +34,46 @@ Jiné změny:
   
 Opravy:
 
+Administrace:
+- v administraci nebyly vidět neaktivní subjekty
+- v nastavení E-podatelny se nyní nezobrazují hesla ke schránkám
+- nastavení e-mailové schránky 
+    - výběr protokolu nyní automaticky nastaví číslo portu
+    - možnost stahovat zprávy ze složek, kde název složky obsahuje diakritiku
+- editace číselníku spouštěcí události se neprojevila v aplikaci
+- spouštěcí událost označená jako neaktivní není nyní nabízena uživateli
+- aplikace nyní kontroluje, zda je spisový znak a název spisu jedinečný
+- oprava zavádějícího označení "věcná skupina" u spisového znaku na "popis"
+
+Modul Spisová služba:
 - při vytváření nového dokumentu pracovníkem e-podatelny se nyní nastaví typ
   dokumentu automaticky na "příchozí"
-- aktualizován poštovní podací arch. Dále je možné specifikovat číslo zákaznické
-  karty a způsob platby (nastavuje se v administraci).
 - filtr dokumentů "Přidělené" zobrazoval nesprávně i dokumenty k převzetí
 - filtr "Na kterých jsem kdy pracoval" a "Na kterých pracovala moje o.j."
   zobrazoval i dokumenty k převzetí
-- v administraci nebyly vidět neaktivní subjekty
 - při předání dokumentu, který se vyřizoval, se neodstranil stav "vyřizuje se"
+- převzetí dokumentu předaného na organizační jednotku nenastavilo
+  nového vlastníka dokumentu
+- uživatel mohl při editaci metadat nechtěně změnit typ dokumentu
+- pokročilé vyhledávání umožňuje nyní hledat dokumenty dle spisového znaku,
+  to samé platí pro filtr dokumentů u sestav
+- u uživatelů, kteří v minulosti upgradovali z verze 3.0, opraven výpočet 
+  konce skartační lhůty dokumentů
+
 - sestava "Podací deník" nesprávně obsahovala i dokumenty bez čísla jednacího
 - sestava nyní v hlavičce zobrazuje rok zvolený při spuštění sestavy namísto
   aktuálního roku
-- uživatel mohl při editaci metadat nechtěně změnit typ dokumentu
+
+- výpravna - po změně druhu zásilky aplikace neprovedla překreslení stránky
+- aktualizován poštovní podací arch. Dále je možné specifikovat číslo zákaznické
+  karty a způsob platby (nastavuje se v administraci).
+
+- opraveno číselné stránkování v případě, kdy není k dispozici rewrite url
 - chyby projevující se při použití prohlížeče Internet Explorer:
     - oprava chybové zprávy při vytváření zápůjčky
     - v prvku formuláře pro výběr datumu se nabízel rok 3898 místo 2013
-- převzetí dokumentu předaného na organizační jednotku nenastavilo
-  nového vlastníka dokumentu
-- v administraci E-podatelny se nyní nezobrazují hesla ke schránkám
-- editace číselníku spouštěcí události se neprojevila v aplikaci
-- spouštěcí událost označená jako neaktivní není nyní nabízena uživateli
 - oprava možného problému s nesprávnými hlavičkami mailu při odesílání dokumentu 
   e-mailem. Objevil se na instalaci Linuxu s poštovním agentem Postfix.
-- oprava zavádějícího označení "věcná skupina" u spisového znaku na "popis"
-- aplikace nyní kontroluje, zda je spisový znak a název spisu jedinečný
-- nastavení e-mailové schránky - výběr protokolu nyní automaticky nastaví číslo portu
-- výpravna - po změně druhu zásilky aplikace neprovedla překreslení stránky
-- opraveno číselné stránkování v případě, kdy není k dispozici rewrite url
-- E-podatelna - u mailové schránky možnost stahovat zprávy ze složek,
-  kde název složky obsahuje diakritiku
-- u uživatelů, kteří v minulosti upgradovali z verze 3.0, opraven výpočet 
-  konce skartační lhůty dokumentů
-- pokročilé vyhledávání umožňuje nyní hledat dokumenty dle spisového znaku,
-  to samé platí pro filtr dokumentů u sestav
   
 === Ver. 3.3.4 =================================================================
 
