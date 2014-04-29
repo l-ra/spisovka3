@@ -44,6 +44,8 @@ Opravy:
 - v administraci nebyly vidět neaktivní subjekty
 - při předání dokumentu, který se vyřizoval, se neodstranil stav "vyřizuje se"
 - sestava "Podací deník" nesprávně obsahovala i dokumenty bez čísla jednacího
+- sestava nyní v hlavičce zobrazuje rok zvolený při spuštění sestavy namísto
+  aktuálního roku
 - uživatel mohl při editaci metadat nechtěně změnit typ dokumentu
 - chyby projevující se při použití prohlížeče Internet Explorer:
     - oprava chybové zprávy při vytváření zápůjčky
