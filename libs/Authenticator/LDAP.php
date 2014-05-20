@@ -819,6 +819,8 @@ class Authenticator_LDAP extends Control implements IAuthenticator
                 );
             }
 
+            $user_data['local'] = $data['local'];
+            
             try {
 
                 $user_id = $User->insert($user_data);
