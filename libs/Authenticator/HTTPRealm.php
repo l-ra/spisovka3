@@ -1,6 +1,6 @@
 <?php
 
-class Authenticator_HTTPRealm extends Control implements IAuthenticator
+class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticator
 {
 
     protected $receivedSignal;
@@ -201,14 +201,6 @@ class Authenticator_HTTPRealm extends Control implements IAuthenticator
 
         $form = new AppForm($this, $name);
 
-        $Role = new RoleModel();
-        $role_seznam = $Role->seznam();
-        $role_select = array();
-        foreach ($role_seznam as $key => $value) {
-            if ( $value->fixed == 1 ) continue;
-            $role_select[ $value->id ] = $value->name;
-        }        
-
         $params = Environment::getVariable('auth_params_new');
         $form->addHidden('osoba_id')->setValue($params['osoba_id']);
 
@@ -220,8 +212,9 @@ class Authenticator_HTTPRealm extends Control implements IAuthenticator
                 ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
                 ->addConditionOn($form["heslo"], Form::FILLED)
                     ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
-        $form->addSelect('role', 'Role:', $role_select);
 
+        $this->formAddRoleSelect($form);
+        $this->formAddOrgSelect($form);
 
         $form->addSubmit('new_user', 'Vytvořit účet');
         $form->addSubmit('storno', 'Zrušit')
@@ -333,40 +326,6 @@ class Authenticator_HTTPRealm extends Control implements IAuthenticator
         }
         $this->presenter->redirect('this');
         
-    }
-
-    public function handleNewUser($data)
-    {
-        if ( isset($data['osoba_id']) ) {
-
-           // Debug::dump($data); exit;
-
-            $User = new UserModel();
-
-            $user_data = array(
-                'username'=>$data['username'],
-                'heslo'=>$data['heslo'],
-            );
-
-            try {
-
-                $user_id = $User->insert($user_data);
-                $User->pridatUcet($user_id, $data['osoba_id'], $data['role']);
-
-                $this->presenter->flashMessage('Účet uživatele "'. $data['username'] .'" byl úspěšně vytvořen.');
-                $this->presenter->redirect('this',array('id'=>$data['osoba_id']));
-            } catch (DibiException $e) {
-                if ( $e->getCode() == 1062 ) {
-                    $this->presenter->flashMessage('Uživatel "'. $data['username'] .'" již existuje. Zvolte jiný.','warning');
-                } else {
-                    $this->presenter->flashMessage('Účet uživatele se nepodařilo vytvořit.','warning');
-                }
-                $this->presenter->redirect('this',array('id'=>$data['osoba_id'],'new_user'=>1));
-            }
-        } else {
-            //$this->presenter->redirect('this');
-        }
-        $this->presenter->redirect('this');
     }
 
 

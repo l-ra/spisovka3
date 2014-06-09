@@ -1,6 +1,6 @@
 <?php
 
-class Authenticator_LDAP extends Control implements IAuthenticator
+class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
 {
 
     private $server = "localhost";
@@ -497,14 +497,6 @@ class Authenticator_LDAP extends Control implements IAuthenticator
 
         $form = new AppForm($this, $name);
 
-        $Role = new RoleModel();
-        $role_seznam = $Role->seznam();
-        $role_select = array();
-        foreach ($role_seznam as $key => $value) {
-            if ( $value->fixed == 1 ) continue;
-            $role_select[ $value->id ] = $value->name;
-        }  
-
         $params = Environment::getVariable('auth_params_new');
         $form->addHidden('osoba_id')->setValue($params['osoba_id']);
 
@@ -513,7 +505,7 @@ class Authenticator_LDAP extends Control implements IAuthenticator
                           0=>'pouze lokální přihlášení',
                           2=>'kombinované přihlášení (pokud selže externí přihlášení, tak se použije lokální přihlášení)'
                     )
-               );
+               )->setValue(1);
 
         $seznam = $this->getAllUser();
         $ldap_seznam = array();
@@ -539,8 +531,9 @@ class Authenticator_LDAP extends Control implements IAuthenticator
                 //->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
                 ->addConditionOn($form["heslo"], Form::FILLED)
                     ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
-        $form->addSelect('role', 'Role:', $role_select);
 
+        $this->formAddRoleSelect($form);
+        $this->formAddOrgSelect($form);
 
         $form->addSubmit('new_user', 'Vytvořit účet');
         $form->addSubmit('storno', 'Zrušit')
@@ -801,47 +794,12 @@ class Authenticator_LDAP extends Control implements IAuthenticator
 
     public function handleNewUser($data)
     {
-        if ( isset($data['osoba_id']) ) {
-
-            //Debug::dump($data); exit;
-
-            $User = new UserModel();
-
-            if ( $data['username_ldap'] != "0" ) {
-                $user_data = array(
-                    'username'=>$data['username_ldap'],
-                    'heslo'=>$data['username_ldap']
-                );
-            } else {
-                $user_data = array(
-                    'username'=>$data['username'],
-                    'heslo'=>$data['heslo']
-                );
-            }
-
-            $user_data['local'] = $data['local'];
+        if ( $data['username_ldap'] != "0" )
+            $data['username'] = $data['heslo'] = $data['username_ldap'];
             
-            try {
-
-                $user_id = $User->insert($user_data);
-                $User->pridatUcet($user_id, $data['osoba_id'], $data['role']);
-
-                $this->presenter->flashMessage('Účet uživatele "'. $user_data['username'] .'" byl úspěšně vytvořen.');
-                $this->presenter->redirect('this',array('id'=>$data['osoba_id']));
-            } catch (DibiException $e) {
-                if ( $e->getCode() == 1062 ) {
-                    $this->presenter->flashMessage('Uživatel "'. $user_data['username'] .'" již existuje. Zvolte jiný.','warning');
-                } else {
-                    $this->presenter->flashMessage('Účet uživatele se nepodařilo vytvořit.','warning');
-                }
-                $this->presenter->redirect('this',array('id'=>$data['osoba_id'],'new_user'=>1));
-            }
-        } else {
-            //$this->presenter->redirect('this');
-        }
-        $this->presenter->redirect('this');
+        parent::handleNewUser($data);
     }
-
+    
     public function handleSync($data)
     {
         unset($data['synchonizovat']);

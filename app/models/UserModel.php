@@ -86,6 +86,7 @@ class UserModel extends BaseModel
                       'password'=>sha1($data['username'] . $data['heslo']),
                       'date_created'=> new DateTime(),
                       'local' => (isset($data['local'])?$data['local']:0),
+                      'orgjednotka_id' => isset($data['orgjednotka_id']) && !empty($data['orgjednotka_id']) ? $data['orgjednotka_id'] : NULL,
                       'active'=>1
                 );
 
