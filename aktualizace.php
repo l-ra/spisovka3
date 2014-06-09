@@ -29,15 +29,15 @@
 /* ************************************************************************** */
 
     if ( strpos(__FILE__,"public/aktualizace.php") !== false ) {
-        define("WWW_DIR","../");
-        define("PUBLIC_DIR","");
+        define("WWW_DIR", dirname(__FILE__) . "/..");
+        define("PUBLIC_DIR", "");
     } else {
-        define("WWW_DIR","");
-        define("PUBLIC_DIR","public/");
+        define("WWW_DIR", dirname(__FILE__) );
+        define("PUBLIC_DIR", "public/");
     }
     
 /* ************************************************************************** */    
     
-    include WWW_DIR ."app/aktualizace/aktualizace.php";
+    include WWW_DIR . "/app/aktualizace/aktualizace.php";
     
 /* ************************************************************************** */    

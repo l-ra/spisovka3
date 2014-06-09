@@ -527,7 +527,18 @@ class Install_DefaultPresenter extends BasePresenter
             $db_tables = dibi::getDatabaseInfo()->getTableNames();
 
             $sql_template_source = file_get_contents(APP_DIR .'/InstallModule/mysql.sql');
-            $sql_query = explode(";",$sql_template_source);
+            $sql_queries = explode(";",$sql_template_source);
+
+            // pridej SQL prikazy z aktualizaci
+            Updates::init();
+            $res = Updates::find_updates();
+            $revisions = $res['revisions'];
+            $alter_scripts = $res['alter_scripts'];
+            foreach ($revisions as $revision)
+                if ($revision >= 680 && isset($alter_scripts[$revision])) {
+                    $sql_queries = array_merge($sql_queries, $alter_scripts[$revision]);
+                }            
+            $latest_revision = $revision;
 
             $database_a = array(
                 array(
@@ -552,7 +563,7 @@ class Install_DefaultPresenter extends BasePresenter
                 )
             );
 
-            foreach ( $sql_query as $query ) {
+            foreach ( $sql_queries as $query ) {
 
                 $query = str_replace("\r", "", $query);
                 $query = str_replace("\n", "", $query);
@@ -579,24 +590,33 @@ class Install_DefaultPresenter extends BasePresenter
                     }
 
 
-                    if ( strpos($query, "CREATE")!==false ) {
+                    if ( strpos($query, "CREATE TABLE") !== false ) {
                         $message = "Tabulka byla úspěšně vytvořena";
                         $error_message = "Tabulku se nepodařilo vytvořit!";
-                    } else if ( strpos($query, "INSERT")!==false ) {
-                        $message = "Data do tabulky byly úspěšně nahrány.";
+                    } else if ( strpos($query, "INSERT INTO") !== false ) {
+                        $message = "Data do tabulky byla úspěšně nahrána.";
                         $error_message = "Data do tabulky se nepodařilo nahrát!";
+                    }
+                    else if ( strpos($query, "ALTER TABLE") !== false ) {
+                        $message = "Struktura tabulky byla úspěšně upravena.";
+                        $error_message = "Tabulku se nepodařilo změnit!";
+                    }
+                    else {
+                        $message = "Databázový příkaz byl úspěšně proveden.";
+                        $error_message = "Databázový příkaz nebyl správně proveden!";
                     }
 
                     $query = "<p>SQL Chyba: ". $sql_error ." </p><p>QUERY: $query</p>";
 
-                    $database_a[] = array(
-                        'title' => @$query_part[1],
-                        'required' => TRUE,
-                        'passed' => $passed,
-                        'message' => @$message,
-                        'errorMessage' => @$error_message,
-                        'description' => $query,
-                    );
+                    if (!$passed)
+                        $database_a[] = array(
+                            'title' => @$query_part[1],
+                            'required' => TRUE,
+                            'passed' => $passed,
+                            'message' => @$message,
+                            'errorMessage' => @$error_message,
+                            'description' => $query,
+                        );
                 } else {
                     // predkontrola
                     $query_part = explode("`",$query);
@@ -617,6 +637,10 @@ class Install_DefaultPresenter extends BasePresenter
 
 
             }
+
+            $this_installation = new Client_To_Update(CLIENT_DIR);
+            $this_installation->update_revision_number($latest_revision);
+            
 
             $database = $this->paint( $database_a );
             $this->template->database = $database;
