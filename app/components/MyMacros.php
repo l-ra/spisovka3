@@ -45,5 +45,14 @@ class MyMacros extends Control {
 
         return $res;   
     }
+    
+    // Vykresli standardni prvek formulare
+    public static function input($form, $name) {
+    
+        return "<dl class=\"detail_item\">
+            <dt>{$form[$name]->caption}</dt>
+            <dd>{$form[$name]->control}</dd>
+        </dl>";
+    }
 }
 
