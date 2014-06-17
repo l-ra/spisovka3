@@ -348,7 +348,9 @@ class Subjekt extends BaseModel
         }
 
         $d_adresa = $d_ulice .', '. @$data->adresa_psc .' '. @$data->adresa_mesto;
-
+        if (trim($d_adresa) == ',')
+            $d_adresa = '';
+            
         if ( empty($d_nazev) ) $d_nazev = "(bez názvu)";
         if ( empty($d_osoba) ) $d_osoba = "(bez názvu)";
         if ( empty($d_nazev_item) ) $d_nazev_item = "(bez názvu)";
@@ -379,8 +381,10 @@ class Subjekt extends BaseModel
                 return $d_adresa;
                 break;
             case 'plna_adresa':
-                return $d_nazev .', '. $d_adresa;
-                break;
+                $res = $d_nazev;
+                if (!empty($d_adresa))
+                    $res .= ', ' . $d_adresa;
+                return $res;
             case 'formalni_adresa':
                 return $d_ulice .'<br />'. $data->adresa_psc .' '. $data->adresa_mesto .'<br />'. Subjekt::stat($data->adresa_stat,10);
                 break;
