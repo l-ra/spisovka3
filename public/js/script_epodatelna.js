@@ -88,7 +88,7 @@ $(function() {
 	}
     });
 
-    $('#subjekt_novy').delegate('#epod_evid_novysubjekt_click', 'click', function(event) {    
+    $('#subjekt_novy').on('click', '#epod_evid_novysubjekt_click', function(event) {    
         event.preventDefault();
 
         id = document.getElementById('frmnovyForm-epodatelna_id').value;
@@ -211,14 +211,7 @@ epodSubjektVytvorit = function (elm) {
             }
         }
 
-        var subjekt_vytvorit = document.getElementById("subjekt-vytvorit");
-        var formdata = $(subjekt_vytvorit).serialize();
-        
-        x.open("POST", subjekt_vytvorit.getAttribute('action'), true);
-        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        x.setRequestHeader("Content-length", formdata.length);
-        x.setRequestHeader("Connection", "close");
-        x.send(formdata);
+        postForm(x, $("#subjekt-vytvorit"));
     }
 
     return false;
@@ -660,7 +653,7 @@ form_odmitnout +
 	}
     });
     
-    $('#subjekt_novy_'+id).delegate('#novysubjekt_click_'+id, 'click', function(event) {    
+    $('#subjekt_novy_'+id).delegate('click', '#novysubjekt_click_'+id, function(event) {    
         event.preventDefault();
 
         if ( is_simple == 1 ) {

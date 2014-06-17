@@ -196,7 +196,7 @@
         </div>
         <script type="text/javascript">
         // viz o par radku nize
-        $('#dok-subjekty td.icon img').live('click', zmen_rezim_subjektu);
+        $('#dokument_blok_subjekty').on('click', '#dok-subjekty td.icon img', zmen_rezim_subjektu);
         </script>
         <div id="dok-subjekty">
         {if count($Subjekty)>0}

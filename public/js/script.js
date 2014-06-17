@@ -71,7 +71,7 @@ $(function() {
     }).hide();
 
     /* Volání AJAXu u všech odkazů s třídou ajax */
-    $("a.ajax").live("click", function (event) {
+    $(document).on("click", "a.ajax", function (event) {
         event.preventDefault();
         $.get(this.href);
 
@@ -80,17 +80,6 @@ $(function() {
             left: event.pageX + 20,
             top: event.pageY + 40
         });
-    });
-
-    /* AJAXové odeslání formulářů */
-    $("form.ajax").live("submit", function () {
-        $(this).ajaxSubmit();
-        return false;
-    });
-
-    $("form.ajax :submit").live("click", function () {
-        $(this).ajaxSubmit();
-        return false;
     });
 
     // Povinne polozky
@@ -108,16 +97,6 @@ $(function() {
     $('#dialog-spis').click(function(event){
         event.preventDefault();
         return dialog(this,'Spisy');
-    });
-
-    $("#spis-vytvorit").live("submit", function () {
-        spisVytvorit($(this));
-        return false;
-    });
-
-    $("#spisplan-zmena").live("submit", function () {
-        spisplanZmenit($(this));
-        return false;
     });
 
     // Dialog - Vyber spisu
@@ -613,16 +592,7 @@ subjektVytvorit = function () {
             }
         }
 
-        var subjekt_vytvorit = document.getElementById("subjekt-vytvorit");
-        var formdata = $(subjekt_vytvorit).serialize();
-        
-        //alert(subjekt_vytvorit.getAttribute('action'));
-        
-        x.open("POST", subjekt_vytvorit.getAttribute('action'), true);
-        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        x.setRequestHeader("Content-length", formdata.length);
-        x.setRequestHeader("Connection", "close");
-        x.send(formdata);
+        postForm(x, $("#subjekt-vytvorit"));
     }
 
     return false;
@@ -879,16 +849,7 @@ spisVytvoritSubmit = function () {
             }
         }
 
-        var spis_vytvorit = document.getElementById("spis-vytvorit");
-        var formdata = $(spis_vytvorit).serialize();
-        
-        //alert(spis_vytvorit.getAttribute('action'));
-        
-        x.open("POST", spis_vytvorit.getAttribute('action'), true);
-        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        x.setRequestHeader("Content-length", formdata.length);
-        x.setRequestHeader("Connection", "close");
-        x.send(formdata);
+        postForm(x, $("#spis-vytvorit"));
     }
 
     return false;
@@ -1069,14 +1030,7 @@ vypravnaSubmit = function () {
             }
         }
 
-        var vypravna_form = document.getElementById("vypravna_form");
-        var formdata = $(vypravna_form).serialize();
-
-        x.open("POST", vypravna_form.getAttribute('action'), true);
-        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        x.setRequestHeader("Content-length", formdata.length);
-        x.setRequestHeader("Connection", "close");
-        x.send(formdata);
+        postForm(x, $("#vypravna_form"));        
     }
     
     return false;
@@ -1231,31 +1185,6 @@ pripojitDokument = function (elm) {
     return false;
 }
 
-spisVytvorit = function (elm) {
-
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                //text = '<div class="flash_message flash_info">Spis byl úspěšně vytvořen.</div>';
-                text = x.responseText;
-                $('#dialog').html(text);
-            }
-        }
-
-        var formdata = $(elm).serialize();
-
-        x.open("POST", $(elm).attr('action'), true);
-        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        x.setRequestHeader("Content-length", formdata.length);
-        x.setRequestHeader("Connection", "close");
-        x.send(formdata);
-    }
-
-    return false;
-}
 
 overitISDS = function (elm) {
     
@@ -1263,30 +1192,6 @@ overitISDS = function (elm) {
     
 }
 
-spisplanZmenit = function (elm) {
-    
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                text = x.responseText;
-                $('#dialog').html(text);
-            }
-        }
-
-        var formdata = $(elm).serialize();
-
-        x.open("POST", $(elm).attr('action'), true);
-        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        x.setRequestHeader("Content-length", formdata.length);
-        x.setRequestHeader("Connection", "close");
-        x.send(formdata);
-    }
-
-    return false;
-}
 
 selectReadOnly = function ( select ) {
     select.selectedIndex = 1;
@@ -1536,3 +1441,20 @@ vybratSpisovyZnak = function(element) {
     select_set_value(document.forms[formName].spousteci_udalost_id, spisz_udalost[value]);
     return true;
 };
+
+postForm = function (x, form) {
+
+    if (!(form instanceof jQuery))
+        form = $(form);
+        
+    if (x) {
+        var formdata = form.serialize();
+
+        x.open("POST", form.attr('action'), true);
+        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        x.setRequestHeader("Content-length", formdata.length);
+        x.setRequestHeader("Connection", "close");
+        x.send(formdata);
+    }
+}
+

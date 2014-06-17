@@ -701,7 +701,7 @@
         <script type="text/javascript">
         // viz o par radku nize
         // pouzij Javascript jen pokud je uzivatel opravnen menit subjekty
-        $('#dok-subjekty td.icon img').live('click', zmen_rezim_subjektu);
+        $('#dokument_blok_subjekty').on('click', '#dok-subjekty td.icon img', zmen_rezim_subjektu);
         </script>
         {/if}
         <div id="dok-subjekty">
