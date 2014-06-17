@@ -316,7 +316,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function renderVybrano()
     {
-        $osoba_id = $this->getParam('id',null);
         $dokument_id = $this->getParam('dok_id',null);
         $user_id = $this->getParam('user',null);
         $orgjednotka_id = $this->getParam('orgjednotka',null);
@@ -328,10 +327,14 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
           $osoba = UserModel::getIdentity($user_id);
           $Orgjednotka = new Orgjednotka();
-          $org = $Orgjednotka->getInfo($orgjednotka_id);
 
-          echo '#'. Osoba::displayName($osoba) .'#'. @$org->zkraceny_nazev;
-
+          echo '#'. Osoba::displayName($osoba) .'#';
+          try {
+            $org = $Orgjednotka->getInfo($orgjednotka_id);
+            echo $org->zkraceny_nazev;
+          }
+          catch(Exception $e) {
+          }
           $this->terminate();
         } else {
             $Workflow = new Workflow();
