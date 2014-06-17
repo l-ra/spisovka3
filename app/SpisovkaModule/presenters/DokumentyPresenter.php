@@ -372,6 +372,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->AccessView = 1;
             }
             
+            if ($user->isAllowed('Dokument', 'cist_vse'))
+                $this->template->AccessView = 1;
+            
             // Dokument se vyrizuje
             if ( $dokument->stav_dokumentu >= 3 ) {
                 $this->template->Vyrizovani = 1;
