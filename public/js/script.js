@@ -33,11 +33,6 @@ function InstallDatePicker() {
         dayNames:["Neděle","Pondělí","Úterý","Středa","Čtvrtek","Pátek","Sobota"],
         dayNamesMin:["Ne","Po","Út","St","Čt","Pá","So"]
     });
-    /*$("input.datepicker").keyup(function(event) {
-        if (event.keyCode == '9') {
-            $("#ui-datepicker-div").hide();
-        }        
-    }); */
     
     $("input.DPNoPast").datepicker("option", "minDate", 0);
     
@@ -309,11 +304,10 @@ dialog = function ( elm, title ) {
         x.send(null);
     }
 
-    if ( typeof title == 'null' ) {
-        $('#ui-dialog-title-dialog').html('Dialogové okno');
-    } else {
-        $('#ui-dialog-title-dialog').html(title);
-    }
+    if ( typeof title == 'null' )
+        title = 'Dialogové okno';
+        
+    $('#dialog').dialog( "option", "title", title );
     
     $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
     $('#dialog').dialog('open');
@@ -564,7 +558,8 @@ novySubjekt = function (elm) {
         x.send(null);
     }
 
-    $('#ui-dialog-title-dialog').html('Nový subjekt');
+    $('#dialog').dialog( "option", "title", 'Nový subjekt' );
+    
     $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
     //$('#dialog').dialog('open');
 
@@ -669,7 +664,7 @@ subjektzmenit = function(elm){
         x.send(null);
     }
 
-    $('#ui-dialog-title-dialog').html('Subjekt');
+    $('#dialog').dialog( "option", "title", 'Subjekt' );
     $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
     $('#dialog').dialog('open');
 
@@ -921,7 +916,7 @@ prilohazmenit = function(elm){
         x.send(null);
     }
 
-    $('#ui-dialog-title-dialog').html('Upravit přílohu');
+    $('#dialog').dialog( "option", "title", 'Upravit přílohu' );
     $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
     $('#dialog').dialog('open');
 
@@ -1220,7 +1215,7 @@ filtrSestavy = function (elm) {
         x.send(null);
     }
 
-    $('#ui-dialog-title-dialog').html('Filtr');
+    $('#dialog').dialog( "option", "title", 'Filtr' );
     $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
     $('#dialog').dialog('open');
 

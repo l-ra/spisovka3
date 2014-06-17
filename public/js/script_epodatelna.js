@@ -18,7 +18,7 @@ $(function() {
             x.send(null);
         }
 
-        $('#ui-dialog-title-dialog').html('Evidovat');
+        $('#dialog').dialog( "option", "title", 'Evidovat' );
         $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
         $('#dialog').dialog('open');
 
@@ -41,7 +41,7 @@ $(function() {
             x.send(null);
         }
 
-        $('#ui-dialog-title-dialog').html('Odmítnout zprávu');
+        $('#dialog').dialog( "option", "title", 'Odmítnout zprávu' );
         $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
         $('#dialog').dialog('open');
 
@@ -64,7 +64,7 @@ $(function() {
             x.send(null);
         }
 
-        $('#ui-dialog-title-dialog').html('Nový subjekt');
+        $('#dialog').dialog( "option", "title", 'Nový subjekt' );
         $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
         $('#dialog').dialog('open');
 

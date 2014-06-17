@@ -218,7 +218,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
                 $seznam[ ] = array(
                     "id"=> 'o'. $org->id,
                     "type" => 'item',
-                    "value"=> '<strong style="color:blue;">'.$org->ciselna_rada.'</strong> - '.$org->zkraceny_nazev,
+                    "value"=> $org->ciselna_rada.' - '.$org->zkraceny_nazev,
                     "nazev"=> $org->ciselna_rada ." - ". $org->zkraceny_nazev
                 );
         }
@@ -246,7 +246,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
                 $seznam[ ] = array(
                     "id"=> 'u'. $user->user_id,
                     "type" => 'item',
-                    "value" => ('<strong>'.Osoba::displayName($user, 'full_item') . "</strong>$additional_info"),
+                    "value" => (Osoba::displayName($user, 'full_item') . "$additional_info"),
                     "nazev" => Osoba::displayName($user, 'full_item')
                 );
             }
