@@ -11,3 +11,7 @@ INSERT INTO `{tbls3}user_acl` (`role_id`, `rule_id`, `allowed`) VALUES ((SELECT 
 
 INSERT INTO `{tbls3}user_rule` (`resource_id`, `name`, `privilege`) VALUES (@RESOURCE_ID, 'Čtení všech dokumentů', 'cist_vse');
 INSERT INTO `{tbls3}user_rule` (`resource_id`, `name`, `privilege`) VALUES (@RESOURCE_ID, 'Změny dokumentů svojí org. jednotky', 'menit_moje_oj');
+
+------------------------;
+
+ALTER TABLE `{tbls3}sestava` ADD COLUMN zobrazeni_dat TEXT NULL DEFAULT NULL;

@@ -30,7 +30,20 @@
             <dd>{$form['sestava_filtr']->control} (zobrazit výběr rozsahu podle pořadového čísla nebo data)</dd>
         </dl>
     </div>
-
+    
+    <div id="dokument_blok_poznamka">
+        <div class="h2">
+            Zobrazované údaje
+        </div>
+        {input zobrazeni_cas}
+        {input zobrazeni_adresa}
+        <p><strong>Výběr sloupců:</strong></p>
+        {input sloupce_smer_dokumentu}
+        {input sloupce_poznamka}
+        {input sloupce_poznamka_predani}
+        {input sloupce_prazdny}
+    </div>
+    
     {include ../Vyhledat/form_common.phtml}
 
     {include ../Vyhledat/form_predani.phtml}

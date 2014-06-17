@@ -12,6 +12,8 @@ Nové funkce:
   Nyní může být uživatel pouze v jedné organizační jednotce.
 - E-podatelna - možnost nadefinovat více emailových schránek a konkrétní schránku
                 lze přiřadit určité organizační jednotce.
+- sestavy - na základě podnětů od uživatelů byla do aplikace přidána možnost
+  do jisté míry přizpůsobit informace zobrazované v sestavě
 - výpravna - pro odeslání dokumentu poštou přidáno pole poznámky, kde může
   uživatel zadat libovolný údaj
 - nyní je možné u spouštěcí události nastavit automatické nebo ruční spuštění

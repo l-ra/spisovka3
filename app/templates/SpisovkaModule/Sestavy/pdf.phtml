@@ -1,62 +1,7 @@
 {capture $html_out}
     {if count($seznam)>0}
     <table cellspacing="0" cellpadding="1" border="1">
-        <tr>
-            {foreach $sloupce as $sl}
-            <th>{$sloupce_nazvy[$sl]}</th>
-            {/foreach}
-        </tr>
-        {foreach $seznam as $dok}
-        <tr>
-            {foreach $sloupce as $sl}
-            <td>
-            {if $sl=='spis'}
-                {if isset($dok->spisy)}
-                {foreach $dok->spisy as $spis}
-            {$spis->nazev}
-                {/foreach}
-                {else}
-            &nbsp;
-                {/if}
-            {elseif $sl=='subjekty'}
-                {if count($dok->subjekty)>0}
-                {foreach $dok->subjekty as $subjekt}
-            {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
-                {/foreach}
-                {else}
-            &nbsp;
-                {/if}
-            {elseif $sl=='pocet_nelistu'}
-                {=count($dok->prilohy)}
-            {elseif $sl=='vyridil'}
-                {if empty($dok->prideleno->prideleno_jmeno)}
-            &nbsp;
-                {else}
-            {$dok->prideleno->prideleno_jmeno}
-                {/if}
-            {elseif $sl=='datum_odeslani'}
-                {if count($dok->odeslani)}
-                {foreach $dok->odeslani as $odes}
-            {$odes->datum_odeslani|edate}<br />
-                {/foreach}
-                {else}
-            &nbsp;
-                {/if}
-            {elseif $sl=='zaznam_vyrazeni'}
-            &nbsp;
-            {elseif $sl=='datum_vzniku'}
-            {$dok->datum_vzniku|edate}
-            {elseif $sl=='podpis'}
-            <span style="color:white;">____________________</span>
-            {else}
-            {$dok->$sl}
-            {/if}
-            </td>
-            {/foreach}
-        </tr>
-        {/foreach}
-
-
+    {include detail_data.phtml}    
     </table>
     {else}
     <div style="text-align: center; margin-top: 15px;">
