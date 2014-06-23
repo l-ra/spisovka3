@@ -33,6 +33,8 @@ Jiné změny:
 
 - v hlavičce stránky se zobrazuje jméno uživatele a jeho organizační jednotka,
   role uživatele se zobrazí po najetí myší na jméno
+- aktualizovány Javascript knihovny používané aplikací pro lepší podporu
+  Internetových prohlížečů
   
 Opravy:
 

@@ -56,15 +56,17 @@ $(function() {
     /*
      * Nastaveni spinneru jako okenko pod kurzorem
      */
-    $('<div id="ajax-spinner"></div>').appendTo("body").ajaxStop(function () {
+    $('<div id="ajax-spinner"></div>').appendTo("body").hide();
+    
+    $(document).ajaxStop(function () {
         // a při události ajaxStop spinner schovám a nastavím mu původní pozici
-        $(this).hide().css({
+        $("#ajax-spinner").hide().css({
             position: "fixed",
             left: "50%",
             top: "50%"
         });
-    }).hide();
-
+    })
+    
     /* Volání AJAXu u všech odkazů s třídou ajax */
     $(document).on("click", "a.ajax", function (event) {
         event.preventDefault();
