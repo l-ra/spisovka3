@@ -94,11 +94,7 @@ abstract class BasePresenter extends Presenter
                 if ( $string == "0000-00-00 00:00:00" ) return "";
                 if ( $string == "0000-00-00" ) return "";
                 if ( is_numeric($string) ) {
-                    if ( !is_null($format) ) {
-                        return date($format,$string);
-                    } else {
-                        return date('j.n.Y',$string);
-                    }
+                    return date($format == null ? 'j.n.Y' : $format, $string);
                 }
                 try {
                     $datetime = new DateTime($string);
@@ -107,28 +103,19 @@ abstract class BasePresenter extends Presenter
                     // datum je neplatné (možná $string vůbec není datum), tak vrať argument
                     return $string;
                 }
-                if ( !is_null($format) ) {
-                    return $datetime->format($format);
-                } else {
-                    return $datetime->format('j.n.Y');
-                }                
-                return $datetime->format('j.n.Y G:i:s');                
-            }
+                
+                return $datetime->format($format == null ? 'j.n.Y' : $format);
+            }            
         }
         $this->template->registerHelper('edate', 'edate');
+        
         if (!function_exists('edatetime') ) {
             function edatetime($string) {
-                if ( empty($string) ) return "";
-                if ( $string == "0000-00-00 00:00:00" ) return "";
-                if ( $string == "0000-00-00" ) return "";
-                if ( is_numeric($string) ) {
-                    return date('j.n.Y G:i:s',$string);
-                }
-                $datetime = new DateTime($string);
-                return $datetime->format('j.n.Y G:i:s');
+                return edate($string, 'j.n.Y G:i:s');
             }
         }
         $this->template->registerHelper('edatetime', 'edatetime');
+        
         if (!function_exists('eyear') ) {
             function eyear($string) {
                 if ( empty($string) ) return "";
@@ -140,6 +127,7 @@ abstract class BasePresenter extends Presenter
             }
         }
         $this->template->registerHelper('eyear', 'eyear');
+        
         if (!function_exists('num') ) {
             function num($string) {
                 return (int) $string;
