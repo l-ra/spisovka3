@@ -546,17 +546,28 @@ class ImapClientFile {
 
         $tmp = new stdClass();
         /* subject */
-        $tmp->subject = $this->decode_header(@$message['Headers']['subject:']);
+        $tmp->subject = '';
+        if (isset($message['Headers']['subject:']))
+            $tmp->subject = $this->decode_header($message['Headers']['subject:']);
 
-        $tmp->message_id = $message['Headers']['message-id:'];
+        $tmp->message_id = isset($message['Headers']['message-id:']) 
+                            ? $message['Headers']['message-id:'] : '';
         $tmp->id_part = 1;
 
         /* Address */
-        $tmp->to = $this->get_address($message['ExtractedAddresses']['to:']);
-        $tmp->to_address = $this->decode_header($message['Headers']['to:']);
+        $tmp->to = null;
+        if (isset($message['ExtractedAddresses']['to:']))
+            $tmp->to = $this->get_address($message['ExtractedAddresses']['to:']);
+        $tmp->to_address = '';
+        if (isset($message['Headers']['to:']))
+            $tmp->to_address = $this->decode_header($message['Headers']['to:']);
 
-        $tmp->from = $this->get_address($message['ExtractedAddresses']['from:']);
-        $tmp->from_address = $this->decode_header($message['Headers']['from:']);
+        $tmp->from = null;
+        if (isset($message['ExtractedAddresses']['from:']))
+            $tmp->from = $this->get_address($message['ExtractedAddresses']['from:']);
+        $tmp->from_address = '';
+        if (isset($message['Headers']['from:']))
+            $tmp->from_address = $this->decode_header($message['Headers']['from:']);
 
         if(isset($message['ExtractedAddresses']['cc:'])) {
             $tmp->cc = $this->get_address($message['ExtractedAddresses']['cc:']);
@@ -727,6 +738,11 @@ class ImapClientFile {
 
     private function decode_header($string,$charset=null) {
 
+        // [P.L.] tato funkce byla někdy volána s parametrem typu objekt
+        // příčinu není snadné odhalit, tedy alespoň zkontrolujeme typ parametru
+        if (!is_string($string))
+            return '';
+            
         if(is_null($charset)) $charset = $this->_charset;
 
         if (function_exists('imap_mime_header_decode')) {
