@@ -1737,8 +1737,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
                 ->setValue(@$Dok->typ_prilohy);  
         
-        $form->addSubmit('upravit', 'Uložit')
-                 ->onClick[] = array($this, 'upravitMetadataClicked');
+        $submit = $form->addSubmit('upravit', 'Uložit');
+        $submit->onClick[] = array($this, 'upravitMetadataClicked');
+        $submit->onInvalidClick[] = array($this, 'upravitMetadataChyba');
+        
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoClicked');
@@ -1755,6 +1757,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
+    public function upravitMetadataChyba(SubmitButton $button)
+    {
+        $errors = $button->getForm()->getErrors();
+        foreach($errors as $error)
+            $this->flashMessage($error, 'warning');
+            
+        $data = $button->getForm()->getValues();
+        $this->redirect(':Spisovka:Dokumenty:detail',array('id' => $data['id']));
+    }
+    
     public function upravitMetadataClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
