@@ -34,7 +34,8 @@ class Orgjednotka extends TreeModel
 
     public function linearniSeznam()
     {
-        return $this->nacti(null, true, true, array('order' => 'ciselna_rada'));
+        $result = $this->nacti(null, true, true, array('order' => 'ciselna_rada'));
+        return $result !== NULL ? $result : array();
     }
     
     public function seznamRoli($orgjednotka_id) {
