@@ -601,7 +601,7 @@ final class Debug
 						break;
 					}
 				}
-				$file = dirname(self::$logFile) . "/exception " . @date('Y-m-d H-i-s') . " $hash.html";
+				$file = dirname(self::$logFile) . "/exception " . KLIENT . " " . @date('Y-m-d H-i-s') . " $hash.html";
 				if (empty($skip) && self::$logHandle = @fopen($file, 'x')) {
 					ob_start(); // double buffer prevents sending HTTP headers in some PHP
 					ob_start(array(__CLASS__, '_writeFile'), 1);
