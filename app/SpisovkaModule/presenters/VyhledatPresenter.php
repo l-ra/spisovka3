@@ -232,7 +232,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $spisznak_seznam = $SpisovyZnak->select(2);
         
         $form->addComponent(new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
-        $form->getComponent('spisovy_znak_id')->setValue(@$hledat['spisovy_znak_id']);
+        $form->getComponent('spisovy_znak_id')->setValue(@$hledat['spisovy_znak_id'])
+            ->setSelect2Option('width', '75%'); // pri ajaxu nefunguje width resolve
 //        $form->addText('spisovy_znak_id', 'spisový znak:')
 //                ->setValue(@$hledat['spisovy_znak_id']);
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 4)
