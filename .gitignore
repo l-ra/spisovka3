@@ -1,4 +1,5 @@
 /clients
+/client/configs/_aktualizace
 /client/configs/install
 /client/configs/*.ini
 /client/files/*
