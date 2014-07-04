@@ -831,8 +831,8 @@ function mPDF($mode='',$format='A4',$default_font_size=0,$default_font='',$mgl=1
 		if (empty($this->grad)) { $this->grad = new grad($this); }
 /*-- END BACKGROUNDS --*/
 /*-- FORMS --*/
-		if (!class_exists('form', false)) { include(_MPDF_PATH.'classes/form.php'); }
-		if (empty($this->form)) { $this->form = new form($this); }
+		if (!class_exists('mPDF::form', false)) { include(_MPDF_PATH.'classes/form.php'); }
+		if (empty($this->form)) { $this->form = new mPDF\form($this); }
 /*-- END FORMS --*/
 
 	$this->time0 = microtime(true);
@@ -23525,7 +23525,7 @@ function _getBorderWidths($bindata) {
 	if (!$bindata) { return array(0,0,0,0); }
 	if (!$this->packTableData) { return array($bindata['border_details']['T']['w'], $bindata['border_details']['R']['w'], $bindata['border_details']['B']['w'], $bindata['border_details']['L']['w']); }
 
-	$bd = unpack("nbord/nrs/drw/a6rca/A10rst/nrd/nls/dlw/a6lca/A10lst/nld/nts/dtw/a6tca/A10tst/ntd/nbs/dbw/a6bca/A10bst/nbd/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd", $bindata);
+	$bd = unpack("nbord/nrs/drw/A6rca/A10rst/nrd/nls/dlw/A6lca/A10lst/nld/nts/dtw/A6tca/A10tst/ntd/nbs/dbw/A6bca/A10bst/nbd/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd", $bindata);
 	$cell['border_details']['R']['w'] = $bd['rw'];
 	$cell['border_details']['L']['w'] = $bd['lw'];
 	$cell['border_details']['T']['w'] = $bd['tw'];
@@ -23538,7 +23538,7 @@ function _unpackCellBorder($bindata) {
 	if (!$bindata) { return array(); }
 	if (!$this->packTableData) { return $bindata; }
 
-	$bd = unpack("nbord/nrs/drw/a6rca/A10rst/nrd/nls/dlw/a6lca/A10lst/nld/nts/dtw/a6tca/A10tst/ntd/nbs/dbw/a6bca/A10bst/nbd/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd", $bindata);
+	$bd = unpack("nbord/nrs/drw/A6rca/A10rst/nrd/nls/dlw/A6lca/A10lst/nld/nts/dtw/A6tca/A10tst/ntd/nbs/dbw/A6bca/A10bst/nbd/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd", $bindata);
 
 	$cell['border'] = $bd['bord'];
 	$cell['border_details']['R']['s'] = $bd['rs'];
@@ -29527,7 +29527,7 @@ function printcellbuffer() {
 	if (count($this->cellBorderBuffer )) {
 		sort($this->cellBorderBuffer);
 		foreach($this->cellBorderBuffer AS $cbb) {
-			$cba = unpack("A16dom/nbord/A1side/ns/dbw/a6ca/A10style/dx/dy/dw/dh/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd/dover/", $cbb);
+			$cba = unpack("A16dom/nbord/A1side/ns/dbw/A6ca/A10style/dx/dy/dw/dh/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd/dover/", $cbb);
 			$side = $cba['side'];
 			$details = array();
 			$details[$side]['dom'] = (float) $cba['dom'];

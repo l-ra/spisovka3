@@ -1,5 +1,7 @@
 <?php
 
+namespace mPDF;
+
 class form {
 
 var $mpdf = null;

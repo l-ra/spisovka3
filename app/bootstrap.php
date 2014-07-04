@@ -72,6 +72,8 @@ if (@file_put_contents(Environment::expand('%tempDir%/_check'), '') === FALSE) {
 $loader = new RobotLoader();
 $loader->addDirectory(APP_DIR);
 $loader->addDirectory(LIBS_DIR);
+// mPDF nelze nacitat pres RobotLoader, protoze PHP by dosla pamet
+$loader->addClass('mPDF', LIBS_DIR . '/mpdf/mpdf.php');
 $loader->register();
 
 // 2e) setup sessions
