@@ -67,6 +67,7 @@ Modul Spisová služba:
 - sestava "Podací deník" nesprávně obsahovala i dokumenty bez čísla jednacího
 - sestava nyní v hlavičce zobrazuje rok zvolený při spuštění sestavy namísto
   aktuálního roku
+- opraven export do PDF, aby pracoval i s php 5.5
 
 - výpravna - po změně druhu zásilky aplikace neprovedla překreslení stránky
 - aktualizován poštovní podací arch. Dále je možné specifikovat číslo zákaznické
