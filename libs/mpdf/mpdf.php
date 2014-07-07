@@ -23538,7 +23538,11 @@ function _unpackCellBorder($bindata) {
 	if (!$bindata) { return array(); }
 	if (!$this->packTableData) { return $bindata; }
 
-	$bd = unpack("nbord/nrs/drw/A6rca/A10rst/nrd/nls/dlw/A6lca/A10lst/nld/nts/dtw/A6tca/A10tst/ntd/nbs/dbw/A6bca/A10bst/nbd/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd", $bindata);
+    $format = "nbord/nrs/drw/A6rca/A10rst/nrd/nls/dlw/A6lca/A10lst/nld/nts/dtw/A6tca/A10tst/ntd/nbs/dbw/A6bca/A10bst/nbd/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd";
+    if (version_compare(PHP_VERSION, '5.5.0-dev', '>='))
+        $format = str_replace(array('A6rca', 'A6lca', 'A6tca', 'A6bca'), 
+                            array('a6rca', 'a6lca', 'a6tca', 'a6bca'), $format);
+	$bd = unpack($format, $bindata);
 
 	$cell['border'] = $bd['bord'];
 	$cell['border_details']['R']['s'] = $bd['rs'];
@@ -29527,7 +29531,10 @@ function printcellbuffer() {
 	if (count($this->cellBorderBuffer )) {
 		sort($this->cellBorderBuffer);
 		foreach($this->cellBorderBuffer AS $cbb) {
-			$cba = unpack("A16dom/nbord/A1side/ns/dbw/A6ca/A10style/dx/dy/dw/dh/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd/dover/", $cbb);
+            $format = "A16dom/nbord/A1side/ns/dbw/A6ca/A10style/dx/dy/dw/dh/dmbl/dmbr/dmrt/dmrb/dmtl/dmtr/dmlt/dmlb/dcpd/dover/";
+            if (version_compare(PHP_VERSION, '5.5.0-dev', '>='))
+                $format = str_replace('A6ca', 'a6ca', $format);
+			$cba = unpack($format, $cbb);
 			$side = $cba['side'];
 			$details = array();
 			$details[$side]['dom'] = (float) $cba['dom'];
