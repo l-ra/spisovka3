@@ -85,6 +85,8 @@ $application = Environment::getApplication();
 $application->errorPresenter = 'Error';
 $application->catchExceptions = Environment::isProduction();
 
+register_shutdown_function(array('ShutdownHandler', '_handler'));
+
 // 3a) Load components
 require_once APP_DIR . '/components/DatePicker/DatePicker.php';
 function Form_addDatePicker(Form $_this, $name, $label, $cols = NULL, $maxLength = NULL)
