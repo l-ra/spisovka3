@@ -551,9 +551,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select)
                 ->setValue($email['podatelna']);
 
-        $form1->addCheckbox('only_signature', 'přijímat pouze emaily s připojeným e-podpisem')
+        $form1->addCheckbox('only_signature', 'přijímat pouze emaily s elektronickým podpisem/značkou')
                 ->setValue($email['only_signature']);
-        $form1->addCheckbox('qual_signature', 'přijímat pouze emaily s ověřeným kvalifikovaným podpisem/značkou')
+        $form1->addCheckbox('qual_signature', 'přijímat pouze emaily s uznávaným elektronickým podpisem/značkou')
                 ->setValue($email['qual_signature']);
 
 

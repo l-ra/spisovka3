@@ -126,6 +126,12 @@
                     port.val(ssl ? 993 : 143);
                 }
             })
+            $('#frmnastavitEmailForm-only_signature').change(function () {
+                checkbox2 = $("#frmnastavitEmailForm-qual_signature");
+                checkbox2.prop('disabled', !this.checked);
+            })
+            
+            $("#frmnastavitEmailForm-qual_signature").prop('disabled', $('#frmnastavitEmailForm-only_signature').prop('checked') == false)
 
         </script>    
         {else}
