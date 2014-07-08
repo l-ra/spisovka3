@@ -35,19 +35,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         
         if ($this->pdf_output == 1 || $this->pdf_output == 2) {
             
-            function handlePDFError($errno, $errstr, $errfile, $errline, array $errcontext)
-            {
-                if (0 === error_reporting()) {
-                    return;
-                }
-                if ( strpos($errstr,'Undefined') === false ) {    
-                    throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
-                }
-            }
-            set_error_handler('handlePDFError');
-            
-            try {                
-            
             ob_start();
             $response->send();
             $content = ob_get_clean();
@@ -110,15 +97,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $mpdf->Output('spisovna.pdf', 'I');
                 }
             }
-            
-            } catch (Exception $e) {
-                $location = str_replace("pdfprint=1","",Environment::getHttpRequest()->getUri());
-
-                echo "<h1>Nelze vygenerovat PDF výstup.</h1>";
-                echo "<p>Generovaný obsah obsahuje příliš mnoho dat, které není možné zpracovat.<br />Zkuste omezit celkový počet dokumentů.</p>";
-                echo "<p><a href=".$location.">Přejít na předchozí stránku.</a></p>";
-                exit;
-            }            
         }
         
     }    

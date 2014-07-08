@@ -111,22 +111,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         
         if ($this->pdf_output == 1 || $this->pdf_output == 2) {
 
-            function handlePDFError($errno, $errstr, $errfile, $errline, array $errcontext)
-            {
-                if (0 === error_reporting()) {
-                    return;
-                }
-                //if ( $errno == 8 ) {
-                if ( strpos($errstr,'Undefined') === false ) {    
-                    throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
-                }
-                
-                
-            }
-            set_error_handler('handlePDFError');
-            
-            try {                
-        
             ob_start();
             $response->send();
             $content = ob_get_clean();
@@ -151,19 +135,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 $mpdf->SetTitle('Podací arch');                
                 $mpdf->WriteHTML($content);
                 $mpdf->Output('podaci_arch.pdf', 'I');
-            }
-            
-            } catch (Exception $e) {
-                $location = str_replace("pdfprint=1","",Environment::getHttpRequest()->getUri());
-                $location = str_replace("pdfprint=2","",$location);
-
-                echo "<h1>Nelze vygenerovat PDF výstup.</h1>";
-                echo "<p>Generovaný obsah obsahuje příliš mnoho dat, které není možné zpracovat.<br />Zkuste omezit celkový počet dokumentů.</p>";
-                echo "<p><a href=".$location.">Přejít na předchozí stránku.</a></p>";
-                echo "<p>".$e->getMessage()."</p>";
-                exit;
-            }
-            
+            }            
         }
         
     }  

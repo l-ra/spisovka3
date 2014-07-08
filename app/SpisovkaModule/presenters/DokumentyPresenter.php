@@ -201,23 +201,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     protected function shutdown($response) {
         
         if ($this->pdf_output == 1 || $this->pdf_output == 2) {
-
-            function handlePDFError($errno, $errstr, $errfile, $errline, array $errcontext)
-            {
-                if (0 === error_reporting()) {
-                    return;
-                }
-                //if ( $errno == 8 ) {
-                if ( strpos($errstr,'Undefined') === false ) {    
-                    throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
-                }
-                
-                
-            }
-            set_error_handler('handlePDFError');
-            
-            try {                
-        
+                   
             ob_start();
             $response->send();
             $content = ob_get_clean();
@@ -233,7 +217,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $content = preg_replace('#<table id="table_top">.*?</table>#s','', $content);
                 
                     $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
-                
+
                     $app_info = Environment::getVariable('app_info');
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
@@ -283,20 +267,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $mpdf->Output('spisova_sluzba.pdf', 'I');
                 }
             }
-            
-            } catch (Exception $e) {
-                $location = str_replace("pdfprint=1","",Environment::getHttpRequest()->getUri());
-
-                echo "<h1>Nelze vygenerovat PDF výstup.</h1>";
-                echo "<p>Generovaný obsah obsahuje příliš mnoho dat, které není možné zpracovat.<br />Zkuste omezit celkový počet dokumentů.</p>";
-                echo "<p><a href=".$location.">Přejít na předchozí stránku.</a></p>";
-                echo "<p>".$e->getMessage()."</p>";
-                exit;
-            }
-            
         }
-        
-    }    
+    }
     
     public function actionDetail()
     {
