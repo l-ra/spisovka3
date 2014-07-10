@@ -16,7 +16,6 @@ class Admin_OpravneniPresenter extends BasePresenter
         $params = array(
             'paginator' => 1
         );
-        //$result = $RoleModel->seznam(2);
         $result = $RoleModel->nacti(null, true, true, $params);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -86,8 +85,7 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         // hack - udaje ze sablony jsou dostupne jen pri vykresleni formulare, ne kdyz se zpracovava odeslany formular
         // pri zpracovani submitu musime pouzit nadmnozinu roli, co byla pouzita pro vykresleni
-        $role_select = isset($role->id) ? 
-            $RoleModel->seznam_pro_zmenu_dedeni($role->id) : $RoleModel->seznam(1);
+        $role_select = $RoleModel->seznamProDedeni($role->id);
             
         if ( isset($role->id) ) {
             unset($role_select[$role->id]);
@@ -189,7 +187,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     {
 
         $RoleModel = new RoleModel();
-        $role_select = $RoleModel->seznam(1);
+        $role_select = $RoleModel->seznamProDedeni();
         $role_select[0] = "(nedědí)";
 
         $form1 = new AppForm();
