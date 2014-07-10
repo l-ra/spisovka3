@@ -38,32 +38,6 @@ class Orgjednotka extends TreeModel
         return $result !== NULL ? $result : array();
     }
     
-    public function seznamRoli($orgjednotka_id) {
-
-        $RoleModel = new RoleModel();
-        // dostupne zakladni role
-        $role_data = $RoleModel->seznam(0,array('where'=>array('r.fixed=1')));
-        // registrovane role teto organizacni jednotky
-        $role_org_data = $RoleModel->seznam(0,array(
-                                            'where'=>array(
-                                                array('r.orgjednotka_id=%i',$orgjednotka_id)
-                                                )
-                                            )
-                                         );
-
-        $role = array();
-        foreach( $role_data as $r ) {
-            $role[ $r->id ] = $r;
-        }
-        $role_org = array();
-        foreach( $role_org_data as $ro ) {
-            $role_org[ $ro->id ] = $ro;
-        }
-
-        return array('role'=>$role, 'role_org'=>$role_org);
-
-    }
-
     public function ulozit($data, $orgjednotka_id = null)
     {
 

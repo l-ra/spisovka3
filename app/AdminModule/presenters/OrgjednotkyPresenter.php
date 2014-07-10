@@ -59,10 +59,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $org = $OrgJednotka->getInfo($orgjednotka_id);
         $this->template->OrgJednotka = $org;
 
-        $role = $OrgJednotka->seznamRoli($orgjednotka_id);
-        $this->template->SeznamRole = $role['role'];
-        $this->template->SeznamOrgRole = $role['role_org'];
-
         // Zmena udaju organizacni jednotky
         $this->template->FormUpravit = $this->getParam('upravit',null);
     }
