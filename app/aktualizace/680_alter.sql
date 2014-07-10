@@ -15,3 +15,14 @@ INSERT INTO `{tbls3}user_rule` (`resource_id`, `name`, `privilege`) VALUES (@RES
 -- ----------------------;
 
 ALTER TABLE `{tbls3}sestava` ADD COLUMN zobrazeni_dat TEXT NULL DEFAULT NULL;
+
+-- ----------------------;
+
+UPDATE `{tbls3}user_role` SET `order` = NULL;
+
+-- ----------------------;
+
+ALTER TABLE `{tbls3}orgjednotka` DROP COLUMN uroven;
+ALTER TABLE `{tbls3}spis` DROP COLUMN uroven;
+ALTER TABLE `{tbls3}spisovy_znak` DROP COLUMN uroven;
+ALTER TABLE `{tbls3}user_role` DROP COLUMN uroven;
