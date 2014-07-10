@@ -219,36 +219,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         exit;
     }
 
-    public function actionObnovit()
-    {
-
-        set_time_limit(600);
-
-        $Org = new Orgjednotka();
-        $seznam = $Org->nacti();
-
-        echo "<pre>";
-
-        foreach ( $seznam as $org ) {
-
-            //Debug::dump($org);
-            if ( empty($org->sekvence) ) {
-                echo $org->zkraceny_nazev ."\n";
-                $obnovit = array(
-                    'sekvence' => $org->id,
-                    'sekvence_string' => $org->ciselna_rada .".". $org->id,
-                    'uroven' => 0
-                );
-                $Org->update($obnovit, array( array('id=%i',$org->id) ));
-                unset($obnovit);
-            }
-
-
-        }
-
-        exit;
-    }
-
     protected function createComponentSearchForm()
     {
 
