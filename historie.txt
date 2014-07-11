@@ -35,6 +35,7 @@ Jiné změny:
   role uživatele se zobrazí po najetí myší na jméno
 - aktualizovány Javascript knihovny používané aplikací pro lepší podporu
   Internetových prohlížečů
+- při připojení do datové schránky se nyní kontroluje SSL certifikát serveru
   
 Opravy:
 

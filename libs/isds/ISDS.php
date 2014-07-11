@@ -21,6 +21,9 @@ class ISDS {
 
     protected $params_soap = array();
 
+    // Pozor, pouzito pouze pro prvotni kontrolu pripojeni pres cURL. Soapclient poté certifikát vůbec nekontroluje
+    protected $ssl_verifypeer = true;
+    
     protected $debug = 0;
     protected $debug_log = array();
     protected $debug_file = 0;
@@ -88,7 +91,7 @@ class ISDS {
         }
 
         $params['location'] = $this->GetServiceURL(3);
-
+        
         $this->params_soap = $params;
 
         $this->debug("PortalType",$portalType);
@@ -1687,8 +1690,9 @@ class ISDS {
             curl_setopt($this->ch, CURLOPT_SSLCERT,$params['local_cert']);
             curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD,$params['passphrase']);
 	}
-
-        curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, false); // kasle se na https certy
+    
+    curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, $this->ssl_verifypeer);
+    
 	if (!empty($params['proxy_host'])) {
             curl_setopt($this->ch, CURLOPT_PROXY, 'http://'.$params['proxy_host'].':'.$params['proxy_port']);
             curl_setopt($this->ch, CURLOPT_HTTPPROXYTUNNEL, true);
