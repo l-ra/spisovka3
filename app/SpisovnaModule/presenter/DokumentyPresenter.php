@@ -1028,7 +1028,7 @@ protected function createComponentVyrizovaniForm()
                 $seznam[ ] = array(
                     "id"=> $dok->id,
                     "type" => 'item',
-                    "value"=> '<strong>'.$dok->cislo_jednaci.'</strong> - '.$dok->nazev,
+                    "value"=> $dok->cislo_jednaci.' - '.$dok->nazev,
                     "nazev"=> $dok->cislo_jednaci ." - ". $dok->nazev
                 );
             }
