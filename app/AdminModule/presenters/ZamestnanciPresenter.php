@@ -317,11 +317,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $user_role = UserModel::getRoles($user_id);
 
         $Role = new RoleModel();
-        $role_seznam = $Role->seznam();
-        $role_select = array();
-        foreach ($role_seznam as $key => $value) {
-            $role_select[ $value->id ] = $value->name;
-        }
+        $role_select = $Role->seznam();
 
         $form1 = new AppForm();
         $form1->addHidden('osoba_id')

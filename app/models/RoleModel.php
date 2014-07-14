@@ -9,6 +9,15 @@ class RoleModel extends TreeModel
     protected $primary = 'id';
 
 
+    public function seznam()
+    {
+        $query = dibi::query(
+            "SELECT id, name FROM [{$this->name}] ORDER BY name"
+        );
+
+        return $query->fetchPairs('id', 'name');    
+    }
+
     public function seznamProDedeni($id = null)
     {
         // $id = null   - při vytváření nové role
