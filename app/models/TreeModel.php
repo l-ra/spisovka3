@@ -28,7 +28,7 @@ class TreeModel extends BaseModel
 
         $sql = array(
             'from' => array($this->name => 'tb'),
-            'cols' => array('*', "%sqlLENGTH(sekvence) - LENGTH(REPLACE(sekvence, '.', ''))" => 'uroven'),
+            'cols' => array('*', "%sqlLENGTH(tb.sekvence) - LENGTH(REPLACE(tb.sekvence, '.', ''))" => 'uroven'),
             'leftJoin' => array()
         );
 
