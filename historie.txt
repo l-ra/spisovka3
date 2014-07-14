@@ -28,7 +28,9 @@ Nové funkce:
   je možné do souboru system.ini přidat následující nastavení:
      clean_url = true
   To zajistí použití čistých url.
-        
+- na jedné doménové adrese je nyní možné provozovat více instancí aplikace současně
+  (byla upravena session cookie)
+  
 Jiné změny:
 
 - v hlavičce stránky se zobrazuje jméno uživatele a jeho organizační jednotka,

@@ -78,7 +78,11 @@ $loader->register();
 
 // 2e) setup sessions
 $session = Environment::getSession();
+$session->setName('SpisovkaSessionID');
 $session->setSavePath(CLIENT_DIR . '/sessions/');
+
+$cookie_path = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+$session->setCookieParams($cookie_path);
 
 // Step 3: Configure application
 $application = Environment::getApplication();
