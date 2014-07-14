@@ -38,6 +38,7 @@ Jiné změny:
 - aktualizovány Javascript knihovny používané aplikací pro lepší podporu
   Internetových prohlížečů
 - při připojení do datové schránky se nyní kontroluje SSL certifikát serveru
+  datových schránek
   
 Opravy:
 
@@ -51,7 +52,8 @@ Administrace:
 - spouštěcí událost označená jako neaktivní není nyní nabízena uživateli
 - aplikace nyní kontroluje, zda je spisový znak a název spisu jedinečný
 - oprava zavádějícího označení "věcná skupina" u spisového znaku na "popis"
-
+- v editaci uživatelského účtu již nebude možné jednu roli přiřadit uživateli vícekrát
+  
 Modul Spisová služba:
 - při vytváření nového dokumentu pracovníkem e-podatelny se nyní nastaví typ
   dokumentu automaticky na "příchozí"

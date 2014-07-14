@@ -334,6 +334,9 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                 $subForm = $form1->addContainer('role'.$ur->id);
                 $subForm->addCheckbox("user_role", 'povolit')
                         ->setValue(1);
+                        
+                // zamez tomu, aby uživatel mohl stejnou roli mít přiřazenu několikrát
+                unset($role_select[$ur->id]);
             }
         }
 
