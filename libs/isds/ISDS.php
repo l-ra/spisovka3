@@ -22,7 +22,7 @@ class ISDS {
     protected $params_soap = array();
 
     // Pozor, pouzito pouze pro prvotni kontrolu pripojeni pres cURL. Soapclient poté certifikát vůbec nekontroluje
-    protected $ssl_verifypeer = true;
+    protected $ssl_verify_peer = true;
     
     protected $debug = 0;
     protected $debug_log = array();
@@ -37,6 +37,12 @@ class ISDS {
     protected $ErrorInfo;	// popis chyby vznikle pri volani sluzby posledni akce
     protected $ValidLogin;	// true pokud probehlo uspesne prihlaseni
 
+    /* Prázdný konstruktor, pro volání ze zdědených tříd
+     */
+    public function __construct()
+    {
+    }
+    
     /**
      *
      * @param int    $portalType    rezim pristupu k portalu (0 = czebox.cz, 1 = mojedatovaschranka.cz)
@@ -1691,7 +1697,7 @@ class ISDS {
             curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD,$params['passphrase']);
 	}
     
-    curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, $this->ssl_verifypeer);
+    curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, $this->ssl_verify_peer);
     
 	if (!empty($params['proxy_host'])) {
             curl_setopt($this->ch, CURLOPT_PROXY, 'http://'.$params['proxy_host'].':'.$params['proxy_port']);

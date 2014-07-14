@@ -5,8 +5,10 @@ class ISDS_Spisovka extends ISDS {
 
     private $config;
 
-    public function __construct() {
-        
+    public function __construct()
+    {
+        parent::__construct();
+        $this->ssl_verify_peer = Settings::get('isds_ssl_verify_peer', true);
     }
 
     /* Funkce vrati, zda povolit vice schranek v aplikaci.
