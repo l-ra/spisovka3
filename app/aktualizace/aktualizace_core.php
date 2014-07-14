@@ -148,6 +148,11 @@ class Client_To_Update {
         try {
             dibi::query('UPDATE %n', $this->db_config['prefix'] . 'settings', 'SET [value] = %i',
                 $revision, "WHERE [name] = 'db_revision'");
+            
+            // pokud je cislo revize v databazi, je soubor nadbytecny
+            // ingoruj, pokud soubor neexistuje
+            @unlink($this->revision_filename);
+            
             return true;
         }
         catch (Exception $e) {
