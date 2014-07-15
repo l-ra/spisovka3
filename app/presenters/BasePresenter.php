@@ -35,7 +35,7 @@ abstract class BasePresenter extends Presenter
                         // Oprava mozneho bugu s dvojim prihlasovanim = po prihlaseni se opet zobrazuje login obrazovka
                         $this->redirect(':Spisovka:Default:default');
                 }
-                else if (!$user->isAllowed($this->reflection->name, $this->getAction())) {
+                else if (!$this->isUserAllowed()) {
                     // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku
                     $this->forward(':NoAccess:default');
                 }
@@ -54,6 +54,11 @@ abstract class BasePresenter extends Presenter
         parent::startup();
     }
 
+    protected function isUserAllowed()
+    {
+        return Environment::getUser()->isAllowed($this->reflection->name, $this->getAction());
+    }
+    
     protected function beforeRender()
     {
         //$this->template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
