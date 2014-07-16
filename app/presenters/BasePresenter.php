@@ -275,24 +275,28 @@ abstract class BasePresenter extends Presenter
         $template->registerFilter($filter = new /*Nette\Templates\*/CurlyBracketsFilter);
 
         $filter->handler->macros['access'] =
-                '<?php if ( @Environment::getUser()->isAllowed(%MyMacros::toParam%) ) { ?>';
+                '<?php if (%MyMacros::access%) { ?>';
         $filter->handler->macros['/access'] =
                 '<?php } ?>';
+        $filter->handler->macros['isAllowed'] =
+                '<?php if (%MyMacros::isAllowed%) { ?>';
+        $filter->handler->macros['/isAllowed'] =
+                '<?php } ?>';
         $filter->handler->macros['accessrole'] =
-                '<?php if ( @Acl::isInRole("%%")) { ?>';
+                '<?php if ( Acl::isInRole("%%")) { ?>';
         $filter->handler->macros['/accessrole'] =
                 '<?php } ?>';
         $filter->handler->macros['accessview'] =
-                '<?php if (@$AccessView==1): ?>';
+                '<?php if ($AccessView==1): ?>';
         $filter->handler->macros['/accessview'] =
                 '<?php endif; ?>';
         $filter->handler->macros['noaccessview'] =
-                '<?php if (!@$AccessView==1): ?>';
+                '<?php if (!$AccessView==1): ?>';
         $filter->handler->macros['/noaccessview'] =
                 '<?php endif; ?>';
 
         $filter->handler->macros['accessedit'] =
-                '<?php if (@$AccessEdit==1): ?>';
+                '<?php if ($AccessEdit==1): ?>';
         $filter->handler->macros['/accessedit'] =
                 '<?php endif; ?>';
 

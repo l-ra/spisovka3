@@ -12,13 +12,24 @@ class MyMacros extends Control {
         return $__link;        
     }
 
-    // Volano pouze z Latte makra Access
     // Ignoruj pripadnou polozku view (__array[3] ) v parametru makra, protoze v aplikaci se prideluje pristup pouze na urovni presenteru
-    public static function toParam($param) {
+    public static function access($param) {
 
         $__array = explode(":",$param);
         $__resource = $__array[1] ."_". $__array[2] ."Presenter";
-        return "'". $__resource ."'";        
+        
+        return "Environment::getUser()->isAllowed('$__resource')";        
+    }
+
+    public static function isAllowed($content)
+    {
+        $resource = LatteFilter::fetchToken($content); // resource [,] [privilege]
+        $params = "'$resource'";
+        $privilege = LatteFilter::fetchToken($content);
+        if ($privilege !== null)
+            $params .= ", '$privilege'";
+            
+        return "Environment::getUser()->isAllowed($params)";
     }
     
     public static function CSS($content, $baseUri) {
