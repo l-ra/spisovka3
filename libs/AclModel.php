@@ -196,7 +196,7 @@ class AclModel extends BaseModel {
         $data['rule_id'] = (int) $data['rule_id'];
 
         return dibi::insert($this->name, $data)
-            ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
+            ->execute();
     }
 
     public function insertResource($data) {
@@ -206,7 +206,7 @@ class AclModel extends BaseModel {
         DbCache::delete('s3_Permission');
 
         return dibi::insert($this->tb_resource, $data)
-            ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
+            ->execute(dibi::IDENTIFIER);
     }
 
     public function insertRule($data) {
@@ -214,7 +214,7 @@ class AclModel extends BaseModel {
         DbCache::delete('s3_Permission');
 
         return dibi::insert($this->tb_rule, $data)
-            ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
+            ->execute(dibi::IDENTIFIER);
     }
 
     public function deleteAcl($where) {
