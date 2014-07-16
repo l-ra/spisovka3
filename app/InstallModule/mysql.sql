@@ -686,12 +686,12 @@ CREATE TABLE IF NOT EXISTS `{tbls3}user_role` (
 
 INSERT INTO `{tbls3}user_role` (`id`, `parent_id`, `fixed_id`, `orgjednotka_id`, `code`, `name`, `note`, `fixed`, `order`, `active`, `date_created`, `date_modified`, `sekvence`, `sekvence_string`, `uroven`) VALUES
 (1, NULL, NULL, NULL, 'admin', 'administrátor', 'Pracovník, který má na starost správu spisové služby', 2, 100, 1, NOW(), NOW(), '1', 'admin.1', NULL),
-(3, 1, NULL, NULL, 'superadmin', 'SuperAdmin', 'Administrátor se super právy.\nMůže manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', 2, 100, 1, NOW(), NOW(), '3', 'superadmin.3', NULL),
+(3, 1, NULL, NULL, 'superadmin', 'SuperAdmin', 'Administrátor se super právy.\nMůže manipulovat s jakýmikoli daty. Včetně dokumentů bez ohledu na vlastníka a stavu. ', 2, 100, 1, NOW(), NOW(), '1.3', 'admin.1#superadmin.3', NULL),
 (4, NULL, NULL, NULL, 'referent', 'pracovník', '(referent) Základní role pracovníka spisové služby', 1, 10, 1, NOW(), NOW(), '4', 'referent.4', NULL),
-(5, 4, NULL, NULL, 'vedouci', 'sekretariát', '(vedoucí) Rozšířená role pracovníka spisové služby. Může nahlížet na podřízené uzly', 1, 50, 1, NOW(), NOW(), '5', 'vedouci.5', NULL),
-(6, NULL, NULL, NULL, 'podatelna', 'pracovník podatelny', 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', 1, 20, 1, NOW(), NOW(), '6', 'podatelna.6', NULL),
-(7, NULL, NULL, NULL, 'skartacni_dohled', 'pracovník spisovny', 'Má na starost spisovnu', 1, 30, 1, NOW(), NOW(), '7', 'skartacni_dohled.7', NULL),
-(8, 4, NULL, NULL, 'skartacni_komise', 'člen skartační komise', 'člen skartační komise, která rozhoduje o skartaci nebo archivaci dokumentu.', 1, 40, 1, NOW(), NOW(), '8', 'skartacni_komise.8', NULL);
+(5, 4, NULL, NULL, 'vedouci', 'sekretariát', '(vedoucí) Rozšířená role pracovníka spisové služby. Může nahlížet na podřízené uzly', 1, 50, 1, NOW(), NOW(), '4.5', 'referent.4#vedouci.5', NULL),
+(6, 4, NULL, NULL, 'podatelna', 'pracovník podatelny', 'Pracovník podatelny, který může přijímat nebo odesílat dokumenty', 1, 20, 1, NOW(), NOW(), '4.6', 'referent.4#podatelna.6', NULL),
+(7, 4, NULL, NULL, 'skartacni_dohled', 'pracovník spisovny', 'Má na starost spisovnu', 1, 30, 1, NOW(), NOW(), '4.7', 'referent.4#skartacni_dohled.7', NULL),
+(8, 4, NULL, NULL, 'skartacni_komise', 'člen skartační komise', 'člen skartační komise, která rozhoduje o skartaci nebo archivaci dokumentu.', 1, 40, 1, NOW(), NOW(), '4.8', 'referent.4#skartacni_komise.8', NULL);
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_rule` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -759,40 +759,20 @@ INSERT INTO `{tbls3}user_acl` (`id`, `role_id`, `rule_id`, `allowed`) VALUES
 (18, 6, 11, 'Y'),
 (19, 6, 12, 'Y'),
 (23, 4, 18, 'Y'),
-(24, 4, 19, 'Y'),
-(25, 4, 20, 'Y'),
-(26, 4, 21, 'Y'),
-(27, 4, 22, 'Y'),
-(28, 4, 23, 'Y'),
 (29, 6, 24, 'Y'),
-(31, 6, 4, 'Y'),
-(32, 6, 18, 'Y'),
-(33, 6, 7, 'Y'),
-(34, 6, 14, 'Y'),
-(35, 6, 8, 'Y'),
-(36, 6, 13, 'Y'),
-(37, 6, 6, 'Y'),
-(40, 6, 15, 'Y'),
-(41, 6, 19, 'Y'),
-(42, 6, 20, 'Y'),
-(43, 6, 21, 'Y'),
-(44, 6, 22, 'Y'),
-(45, 6, 23, 'Y'),
-(47, 7, 4, 'Y'),
-(48, 7, 18, 'Y'),
-(49, 7, 7, 'Y'),
-(50, 7, 14, 'Y'),
-(51, 7, 8, 'Y'),
-(52, 7, 13, 'Y'),
-(53, 7, 6, 'Y'),
-(56, 7, 15, 'Y'),
 (57, 7, 19, 'Y'),
 (58, 7, 20, 'Y'),
 (59, 7, 21, 'Y'),
 (60, 7, 22, 'Y'),
 (61, 7, 23, 'Y'),
-(62, 3, 1, 'Y');
-
+(62, 3, 1, 'Y'),
+(63, 4, 42, 'Y'),
+(64, 4, 27, 'Y'),
+(65, 8, 19, 'Y'),
+(66, 8, 20, 'Y'),
+(67, 8, 21, 'Y'),
+(68, 8, 22, 'Y'),
+(69, 8, 23, 'Y');
 
 CREATE TABLE IF NOT EXISTS `{tbls3}user_to_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
