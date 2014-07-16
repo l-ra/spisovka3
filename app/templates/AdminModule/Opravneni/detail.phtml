@@ -72,3 +72,21 @@
         {$opravneniForm->render('end')}
         {/if}
     </div>
+
+<script type="text/javascript">
+    $("[name='frm-opravneniForm']").on('change', null, function(event) {
+        var chkbox = $(event.target);
+        // nazev checkboxu
+        if (chkbox.prop('checked')) {
+            // zrus zaskrtnuti souvisejiciho checkboxu
+            var name = chkbox.attr('name');
+            if (name.search('allow') != -1)
+                name = name.replace('allow', 'deny');
+            else
+                name = name.replace('deny', 'allow');
+
+            $("[name='" + name + "']").prop('checked', false);
+        }
+    });
+
+</script>
