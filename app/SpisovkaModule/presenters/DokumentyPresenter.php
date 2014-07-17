@@ -1340,7 +1340,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dokument_id = 0;
         }
 
-        if ( Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,skartacni_dohled') ) {
+        if ( Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,spisovna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,4);
             $this->template->isPodatelna = true;
         } else if ( Acl::isInRole('podatelna') ) {
@@ -1563,7 +1563,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $Dok = @$this->template->Dok;
 
-        if ( Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,skartacni_dohled') ) {
+        if ( Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,spisovna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,4);
             $this->template->isPodatelna = true;
         } else if ( Acl::isInRole('podatelna') ) {

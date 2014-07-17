@@ -10,7 +10,7 @@
     </div>
 
     <div id="dokument_blok_volby">
-        {if $Zapujcka->stav == 1 && $Skartacni_dohled}
+        {if $Zapujcka->stav == 1 && $Opravnen_schvalit_zapujcku}
         <a href="{link :Spisovna:Zapujcky:schvalit, 'id'=>$Zapujcka->id}">Schválení zápůjčky</a>
         <a href="{link :Spisovna:Zapujcky:odmitnuti, 'id'=>$Zapujcka->id}">Odmítnutí zápůjčky</a>
         {/if}

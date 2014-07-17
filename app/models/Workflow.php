@@ -835,7 +835,7 @@ class Workflow extends BaseModel
         if ( is_numeric($dokument_id) ) {
 
                 $user = Environment::getUser();
-                if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+                if ( Acl::isInRole('spisovna') || $user->isInRole('superadmin') ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)

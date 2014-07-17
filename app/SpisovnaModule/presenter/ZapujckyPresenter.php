@@ -131,7 +131,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         }
         $this->template->seradit = $seradit;        
         
-        if ( Acl::isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
+        if ( Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin') ) {
             $this->template->akce_select = array(
                 'vratit' => 'Vrátit vybrané zápůjčky',
                 'schvalit' => 'Schválit vybrané zápůjčky',
@@ -193,15 +193,9 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->template->Zapujcka = null;
         $zapujcka = $Zapujcka->getInfo($zapujcka_id);
         if ( $zapujcka ) {
-
-            $this->template->Skartacni_dohled = 0;
-            if ( Acl::isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
-                $this->template->Skartacni_dohled = 1;
-            }
-            
-            
-            
-            
+            $this->template->Opravnen_schvalit_zapujcku = 
+                Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin');
+                
             $this->template->Zapujcka = $zapujcka;
 
         } else {
@@ -302,7 +296,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         
         $zapujcka_id = $this->getParam('id');
         if ( !empty($zapujcka_id) && is_numeric($zapujcka_id) ) {
-            if ( Acl::isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
+            if ( Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin') ) {
                 
                 $Zapujcka = new Zapujcka();
                 if ( $Zapujcka->schvalit($zapujcka_id) ) {
@@ -325,7 +319,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         
         $zapujcka_id = $this->getParam('id');
         if ( !empty($zapujcka_id) && is_numeric($zapujcka_id) ) {
-            if ( Acl::isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
+            if ( Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin') ) {
                 
                 $Zapujcka = new Zapujcka();
                 if ( $Zapujcka->odmitnout($zapujcka_id) ) {
@@ -407,7 +401,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $osoba = Osoba::displayName($user_info);
         } else {
             $user = Environment::getUser();
-            if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+            if ( Acl::isInRole('spisovna') || $user->isInRole('superadmin') ) {
                 $osoba = "";
                 $user_id = null;
                 $form->addHidden('is_in_role')->setValue(1);
@@ -540,7 +534,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     protected function createComponentFiltrForm()
     {
 
-        if ( Acl::isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
+        if ( Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin') ) {
             $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
             $select = array(
                 'aktualni'=>'Zobrazit aktuální zápůjčky',
