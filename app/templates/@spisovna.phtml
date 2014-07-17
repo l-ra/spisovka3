@@ -6,18 +6,18 @@
 {/block}    
 
 {block menu}
-    {accessrole skartacni_dohled,superadmin}Příjem 
+    {isAllowed Spisovna prijem_dokumentu}Příjem 
     <a href="{link :Spisovna:Spisy:prijem}">spisů</a> / 
     <a href="{link :Spisovna:Dokumenty:prijem}">dokumentů</a>
-    {/accessrole}
+    {/isAllowed}
     &nbsp;&nbsp;&nbsp;
-    {access :Spisovna:Dokumenty:}
+    {isAllowed Spisovna cist_dokumenty}
     <a href="{link :Spisovna:Dokumenty:default}">Seznam dokumentů</a>
     <a href="{link :Spisovna:Spisy:default}">Spisy</a>
-    {/access}
+    {/isAllowed}
     &nbsp;&nbsp;&nbsp;
     {access :Spisovna:Zapujcky:}<a href="{link :Spisovna:Zapujcky:default}">Zápůjčky</a>{/access}
     &nbsp;&nbsp;&nbsp;
-    {accessrole skartacni_dohled,superadmin}<a href="{link :Spisovna:Dokumenty:keskartaciseznam}">Ke skartaci</a>{/accessrole}
-    {accessrole skartacni_dohled,skartacni_rizeni,superadmin}<a href="{link :Spisovna:Dokumenty:skartace}">Skartační řízení</a>{/accessrole}
+    {isAllowed Spisovna skartacni_navrh}<a href="{link :Spisovna:Dokumenty:keskartaciseznam}">Ke skartaci</a>{/isAllowed}
+    {isAllowed Spisovna skartacni_rizeni}<a href="{link :Spisovna:Dokumenty:skartace}">Skartační řízení</a>{/isAllowed}
 {/block}

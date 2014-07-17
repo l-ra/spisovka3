@@ -1249,8 +1249,9 @@ class Dokument extends BaseModel
     
     protected function spisovnaOmezeniOrg($args)
     {
-        // [P.L.]  Neni treba duplikovat kod
-        return $this->sestavaOmezeniOrg($args);
+        // Pracovník spisovny vidí všechny dokumenty ve spisovně
+        // Jakmile je dokument ve spisovně, přidělení dokumentu na uživatele a org. jednotku ztrácí význam
+        return $args;
     }
     
     public function spisovka($args) {

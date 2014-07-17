@@ -9,6 +9,11 @@ class Spisovna_SpisyPresenter extends BasePresenter
     private $hledat;
     private $pdf_output = 0;
 
+    protected function isUserAllowed()
+    {
+        return Environment::getUser()->isAllowed('Spisovna', 'cist_dokumenty');
+    }
+
     public function startup()
     {
         $user_config = Environment::getVariable('user_config');
@@ -232,12 +237,10 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     }
 
-    public function actionPrijem()
-    {
-    }
-
     public function renderPrijem()
     {
+        if (!Environment::getUser()->isAllowed('Spisovna', 'prijem_dokumentu'))
+            $this->forward(':NoAccess:default');
 
         $post = $this->getRequest()->getPost();
         if ( isset($post['hromadna_submit']) ) {
@@ -416,7 +419,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                 $this->template->seznam = null;
             }
         
-            if ( Acl::isInRole('skartacni_dohled,superadmin') ) {
+            if ( $user->isAllowed('Spisovna', 'zmenit_skartacni_rezim') ) {
                 $this->template->AccessEdit = 1;
                 $formUpravit = $this->getParam('upravit',null);
             } else {

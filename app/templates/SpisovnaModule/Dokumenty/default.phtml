@@ -130,7 +130,7 @@
                 {elseif $dok->stav_dokumentu==7}
                 vyřízen
                 {elseif $dok->stav_dokumentu==8}
-                ke skartaci
+                skartační řízení
                 {elseif $dok->stav_dokumentu==9}
                 archivován
                 {elseif $dok->stav_dokumentu==10}
@@ -144,7 +144,7 @@
 
 
     </table>
-    <div id="hromadna_akce">
+    <div id="hromadna_akce" n:if="isset($akce_select) && !empty($akce_select)">
         <span id="checkbox_all_on">Zaškrtnout vše</span> / <span id="checkbox_all_off">Odškrtnout vše</span>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         Vybrané položky:&nbsp;&nbsp;

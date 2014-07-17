@@ -11,6 +11,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     private $oddelovac_poradi = null;
     private $pdf_output = 0;
 
+    protected function isUserAllowed()
+    {
+        return Environment::getUser()->isAllowed('Spisovna', 'cist_dokumenty');
+    }
+    
     public function startup()
     {
         $user_config = Environment::getVariable('user_config');
@@ -256,15 +261,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
-        if ( Acl::isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
-            $this->template->akce_select = array(
-                'zapujcka'=>'Zápůjčka'
-            );            
-        } else {
-            $this->template->akce_select = array(
-                'zapujcka'=>'Zápůjčka'
-            );              
-        }
+        $this->template->akce_select = array();              
 
         $filtr = $this->getParam('filtr');
         $hledat = $this->getParam('hledat');
@@ -276,7 +273,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function renderPrijem()
     {
-
+        if (!Environment::getUser()->isAllowed('Spisovna', 'prijem_dokumentu'))
+            $this->forward(':NoAccess:default');
+            
         $post = $this->getRequest()->getPost();
         if ( isset($post['hromadna_submit']) ) {
             $this->actionAkce($post);
@@ -298,6 +297,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function renderKeskartaciseznam()
     {
+        if (!Environment::getUser()->isAllowed('Spisovna', 'skartacni_navrh'))
+            $this->forward(':NoAccess:default');
 
         $post = $this->getRequest()->getPost();
         if ( isset($post['hromadna_submit']) ) {
@@ -311,13 +312,15 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->template->akce_select = array(
             'ke_skartaci'=>'předat do skartačního řízení'
         );
-        $this->template->title = "Seznam dokumentů určených ke skartaci";
+        $this->template->title = "Seznam dokumentů, kterým uplynula skartační lhůta";
         $this->setView('default');
         $this->seznam(2, $filtr, $hledat, $seradit);
     }
 
     public function renderSkartace()
     {
+        if (!Environment::getUser()->isAllowed('Spisovna', 'skartacni_rizeni'))
+            $this->forward(':NoAccess:default');
 
         $post = $this->getRequest()->getPost();
         if ( isset($post['hromadna_submit']) ) {
@@ -337,9 +340,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->seznam(3, $filtr, $hledat, $seradit);
     }
 
-    public function actionDetail()
+    public function renderDetail()
     {
-
         $Dokument = new Dokument();
 
         // Nacteni parametru
@@ -352,97 +354,31 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
             // Zapujcka
             $Zapujcka = new Zapujcka();
-            $this->template->Zapujcka = $Zapujcka->getDokument($dokument_id);
-            
-            $user = Environment::getUser();
-            $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
-            $user_id = $user->getIdentity()->id;
-
-            $this->template->Pridelen = 0;
-            $this->template->Predan = 0;
-            $formUpravit = null;
-            // Prideleny nebo predany uzivatel
-            if ( Acl::isInRole('skartacni_dohled,superadmin') ) {
-                $this->template->AccessEdit = 1;
-                $this->template->AccessView = 1;
-                $this->template->Pridelen = 1;
-                $formUpravit = $this->getParam('upravit',null);                
-            } else if ( @$dokument->prideleno->prideleno_id == $user_id ) {
-                // prideleny
-                $this->template->AccessEdit = 0;
-                $this->template->AccessView = 1;
-                $this->template->Pridelen = 1;
-                $formUpravit = $this->getParam('upravit',null);
-            } else if ( @$dokument->predano->prideleno_id == $user_id ) {
-                // predany
-                $this->template->AccessEdit = 0;
-                $this->template->AccessView = 1;
-                $this->template->Predan = 1;
-                $formUpravit = $this->getParam('upravit',null);
-            } else {
-                // byvaly muze aspon prohlednout
-                $this->template->AccessEdit = 0;
-                $this->template->AccessView = 0;
-                $formUpravit = null;
-                if ( count($dokument->workflow)>0 ) {
-                    foreach ($dokument->workflow as $wf) {
-                        if ( ($wf->prideleno_id == $user_id) && ($wf->stav_osoby < 100 || $wf->stav_osoby !=0) ) {
-                            $this->template->AccessView = 1;
-                        }
-                    }
-                }
-            }
-
-            $this->template->Vyrizovani = 0;
-            $this->template->Skartacni_dohled = 0;
-            $this->template->Skartacni_komise = 0;
-
-            $uplynula_skart_lhuta = !empty($dokument->skartacni_rok)
-                        && date('Y') >= $dokument->skartacni_rok;
-
-            if ( $uplynula_skart_lhuta && $dokument->stav_dokumentu == 7
-                    && (Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
-                $this->template->AccessView = 1;
-                $this->template->AccessEdit = 1;
-                $this->template->Pridelen = 1;
-                $this->template->Skartacni_dohled = 1;
-            }
-            // Dokument je ve skartacnim rezimu
-            if ( $dokument->stav_dokumentu == 8
-                    && (Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin')) ) {
-                $this->template->AccessView = 1;
-                $this->template->AccessEdit = 0;
-                $this->template->Pridelen = 1;
-                $this->template->Skartacni_komise = 1;
-            }
-
-            // SuperAdmin - moznost zasahovat do dokumentu
-            if ( $user->isInRole('superadmin') ) {
-                $this->template->AccessEdit = 1;
-                $this->template->AccessView = 1;
-                $this->template->Pridelen = 1;
-                $formUpravit = $this->getParam('upravit',null);
-            }
-            
             if ( $dokument->stav_dokumentu == 9 || $dokument->stav_dokumentu == 10 ) {
-                $this->template->AccessEdit = 0;
                 $zapujcka = new stdClass();
                 $zapujcka->id = 1;
                 $this->template->Zapujcka = $zapujcka;
             }
+            else
+                $this->template->Zapujcka = $Zapujcka->getDokument($dokument_id);
+            
+            $user = Environment::getUser();
 
-            $this->template->FormUpravit = $formUpravit;
+            $this->template->Lze_menit_skartacni_rezim = 
+                    $dokument->stav_dokumentu == 7
+                    && $user->isAllowed('Spisovna', 'zmenit_skartacni_rezim');
+            $this->template->Upravit_param = $this->getParam('upravit', null);
 
-            if ( $this->getParam('udalost1',false) && $dokument->stav_dokumentu == 4) {
-                $this->template->FormUdalost = 3;
-            } else if ( $this->getParam('udalost',false) && $dokument->stav_dokumentu <= 3 ) {
-                $this->template->FormUdalost = 2;
-            } else if ( $dokument->stav_dokumentu == 4 ) {
-                $this->template->FormUdalost = 1;
-            } else {
-                $this->template->FormUdalost = 0;
-            }
-
+            $uplynula_skart_lhuta = !empty($dokument->skartacni_rok)
+                        && date('Y') >= $dokument->skartacni_rok;
+            $this->template->Lze_zaradit_do_skartacniho_rizeni =  
+                    $uplynula_skart_lhuta && $dokument->stav_dokumentu == 7
+                    && $user->isAllowed('Spisovna', 'skartacni_navrh');
+            
+            $this->template->Lze_provest_skartacni_rizeni = 
+                    $dokument->stav_dokumentu == 8
+                    && $user->isAllowed('Spisovna', 'skartacni_rizeni');
+            
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
 
@@ -451,13 +387,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 // Nacteni souvisejicicho dokumentu
                 $Souvisejici = new SouvisejiciDokument();
                 $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument_id);
-            }
-
-            // Kontrola lhuty a skartace
-            if ( $dokument->lhuta_stav==2 && $dokument->stav_dokumentu < 4 ) {
-                $this->flashMessage('Vypršela lhůta k vyřízení! Vyřiďte neprodleně tento dokument.','warning');
-            } else if ( $dokument->lhuta_stav==1 && $dokument->stav_dokumentu < 4 ) {
-                $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyřiďte co nejrychleji tento dokument.');
             }
 
             // Volba vystupu - web/tisk/pdf
@@ -473,22 +402,18 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $this->setLayout(false);
                 $this->setView('printdetail');
             }              
+
+            if ($this->template->Lze_menit_skartacni_rezim)
+                $this->template->vyrizovaniForm = $this['vyrizovaniForm'];
             
             $this->invalidateControl('dokspis');
-            
-            if (!$this->template->AccessView)
-                $this->setView('dok-noaccess');     
+
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');
         }
         
     }
-
-    public function renderDetail()
-    {
-        $this->template->vyrizovaniForm = $this['vyrizovaniForm'];
-    }    
     
     public function actionAkce($data)
     {
@@ -529,7 +454,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 case 'ke_skartaci':
                     if ( isset($data['dokument_vyber']) ) {
                         $count_ok = $count_failed = 0;
-                        if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+                        if ( $user->isAllowed('Spisovna', 'skartacni_navrh') ) {
                             foreach ( $data['dokument_vyber'] as $dokument_id ) {
                                 if ( $Workflow->keskartaci($dokument_id, $user->getIdentity()->id) ) {
                                     //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
@@ -558,7 +483,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 case 'archivovat':
                     if ( isset($data['dokument_vyber']) ) {
                         $count_ok = $count_failed = 0;
-                        if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+                        if ( $user->isAllowed('Spisovna', 'skartacni_rizeni') ) {
                             foreach ( $data['dokument_vyber'] as $dokument_id ) {
                                 if ( $Workflow->archivovat($dokument_id) ) {
                                     //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
@@ -587,7 +512,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 case 'skartovat':
                     if ( isset($data['dokument_vyber']) ) {
                         $count_ok = $count_failed = 0;
-                        if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+                        if ( $user->isAllowed('Spisovna', 'skartacni_rizeni') ) {
                             foreach ( $data['dokument_vyber'] as $dokument_id ) {
                                 if ( $Workflow->skartovat($dokument_id) ) {
                                     //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
@@ -613,21 +538,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                         }
                     }
                     break;
-                case 'zapujcka':
-                    if ( isset($data['dokument_vyber']) ) {
-                        $user = Environment::getUser();
-                        foreach ( $data['dokument_vyber'] as $dokument_id ) {
-                            
-                            if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
-                                $this->redirect(':Spisovna:Zapujcky:nova',array('dokument_id'=>$dokument_id));
-                            } else {
-                                $this->redirect(':Spisovna:Zapujcky:nova',array('dokument_id'=>$dokument_id,'user_id'=>$user->getIdentity()->id));
-                            }
-                            
-                            break;
-                        }
-                    }
-                    break;                    
                 default:
                     break;
             }
@@ -645,14 +555,14 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $user = Environment::getUser();
 
         $Workflow = new Workflow();
-        if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+        if ($user->isAllowed('Spisovna', 'skartacni_navrh') ) {
             if ( $Workflow->keskartaci($dokument_id) ) {
                $this->flashMessage('Dokument byl přidán do skartačního řízení.');
             } else {
                $this->flashMessage('Dokument se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
             }
         } else {
-            $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
+            $this->flashMessage('Nemáte oprávnění přidávat dokumenty do skartačního zřízení.','warning');
         }
         $this->redirect(':Spisovna:Dokumenty:detail',array('id'=>$dokument_id));
 
@@ -664,14 +574,14 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $user = Environment::getUser();
 
         $Workflow = new Workflow();
-        if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+        if ( $user->isAllowed('Spisovna', 'skartacni_rizeni') ) {
             if ( $Workflow->archivovat($dokument_id) ) {
                $this->flashMessage('Dokument byl archivován.');
             } else {
                $this->flashMessage('Dokument se nepodařilo zařadit do archivu. Zkuste to znovu.','warning');
             }
         } else {
-            $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
+            $this->flashMessage('Nemáte oprávnění provést operaci.','warning');
         }
         $this->redirect(':Spisovna:Dokumenty:detail',array('id'=>$dokument_id));
     }
@@ -682,14 +592,14 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $user = Environment::getUser();
 
         $Workflow = new Workflow();
-        if ( $user->isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+        if ( $user->isAllowed('Spisovna', 'skartacni_rizeni') ) {
             if ( $Workflow->skartovat($dokument_id) ) {
                $this->flashMessage('Dokument byl skartován.');
             } else {
                $this->flashMessage('Dokument se nepodařilo skartovat. Zkuste to znovu.','warning');
             }
         } else {
-            $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
+            $this->flashMessage('Nemáte oprávnění provést operaci.','warning');
         }
         $this->redirect(':Spisovna:Dokumenty:detail',array('id'=>$dokument_id));
     }
@@ -786,6 +696,10 @@ protected function createComponentVyrizovaniForm()
 
     public function upravitVyrizeniClicked(SubmitButton $button)
     {
+        if (!Environment::getUser()->isAllowed('Spisovna', 'zmenit_skartacni_rezim')) {
+            $this->forward(':NoAccess:default');
+        }
+        
         $data = $button->getForm()->getValues();
 
         $dokument_id = $data['id'];
@@ -875,43 +789,26 @@ protected function createComponentVyrizovaniForm()
 
     protected function createComponentFiltrForm()
     {
-
-        if ( Acl::isInRole('skartacni_dohled') || Environment::getUser()->isInRole('superadmin') ) {
-            // pracovnik spisovny
-            $filtr =  !is_null($this->filtr)?$this->filtr:'stav_77';
-            $select = array(
-                'stav_77'=>'Zobrazit vše',
-                'Podle stavu' => array(
-                    'stav_6'=>'předáno do spisovny',
-                    'stav_7'=>'ve spisovně (probíhá skartační lhůta)',
-                    'stav_8'=>'ke skartaci (probíhá skartační řízení)',
-                    'stav_9'=>'archivován',
-                    'stav_10'=>'skartován',
-                ),
-                'Podle skartačního znaku' => array(
-                    'skartacni_znak_A'=>'A',
-                    'skartacni_znak_V'=>'V',
-                    'skartacni_znak_S'=>'S',
-                ),
-                'Podle způsobu vyřízení' => Dokument::zpusobVyrizeni(null,4)
-                
-                
-            );            
-        } else {
-            // ostatni
-            $filtr =  !is_null($this->filtr)?$this->filtr:'stav_77';
-            $select = array(
-                'stav_77'=>'Zobrazit vše',
-                'Podle skartačního znaku' => array(
-                    'skartacni_znak_A'=>'A',
-                    'skartacni_znak_V'=>'V',
-                    'skartacni_znak_S'=>'S',
-                ),
-                'Podle způsobu vyřízení' => Dokument::zpusobVyrizeni(null,4)
-                
-                
-            );            
-        }
+        // pracovnik spisovny
+        $filtr =  !is_null($this->filtr)?$this->filtr:'stav_77';
+        $select = array(
+            'stav_77'=>'Zobrazit vše',
+            'Podle stavu' => array(
+                'stav_6'=>'předáno do spisovny',
+                'stav_7'=>'ve spisovně (probíhá skartační lhůta)',
+                'stav_8'=>'ke skartaci (probíhá skartační řízení)',
+                'stav_9'=>'archivován',
+                'stav_10'=>'skartován',
+            ),
+            'Podle skartačního znaku' => array(
+                'skartacni_znak_A'=>'A',
+                'skartacni_znak_V'=>'V',
+                'skartacni_znak_S'=>'S',
+            ),
+            'Podle způsobu vyřízení' => Dokument::zpusobVyrizeni(null,4)
+            
+            
+        );            
 
         $form = new AppForm();
         $form->addSelect('filtr', 'Filtr:', $select)

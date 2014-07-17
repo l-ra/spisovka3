@@ -73,7 +73,7 @@
         {/foreach}
 
     </table>
-    <div id="hromadna_akce">
+    <div id="hromadna_akce" n:if="isset($akce_select) && !empty($akce_select)">
         <span id="checkbox_all_on">Zaškrtnout vše</span> / <span id="checkbox_all_off">Odškrtnout vše</span>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         Vybrané položky:&nbsp;&nbsp;

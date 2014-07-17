@@ -322,7 +322,6 @@
         Přílohy
     </div>
     <div id="dok-prilohy">
-    {accessview}
     {if count($Dok->prilohy)>0}
     <table class="seznam">
         {foreach $Dok->prilohy as $file}
@@ -354,10 +353,6 @@
     {else}
         <div class="prazdno">K tomuto dokumentu nejsou připojené žádné elektronické přílohy.</div>
     {/if}
-    {/accessview}
-    {noaccessview}
-        <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
-    {/noaccessview}
     </div>
     </div>
 

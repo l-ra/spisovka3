@@ -22,17 +22,16 @@
             <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
         </a>        
     </div>
-
     <div id="dokument_blok_volby">
-        {if $AccessEdit==1}
-        <a href="{link :Spisovna:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni' }">Upravit skartační režim</a>
+        {if $Lze_menit_skartacni_rezim}
+        <a href="{link :Spisovna:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'skart_rezim' }">Upravit skartační režim</a>
         {/if}
         {if empty($Zapujcka->id)}
         <a href="{link :Spisovna:Zapujcky:nova, 'dokument_id'=>$Dok->id}">Žádost o zápůjčku</a>
         {/if}
     </div>
 
-    {if $Skartacni_dohled==1}
+    {if $Lze_zaradit_do_skartacniho_rizeni}
     <div class="dokument_blok2">
         <div class="h2">Připojit dokument do skartačního řízení k posouzení</div>
         <dl class="detail_item">
@@ -52,7 +51,7 @@
     </div>
     {/if}
 
-    {if $Skartacni_komise==1}
+    {if $Lze_provest_skartacni_rizeni==1}
     <div class="dokument_blok2">
         <div class="h2">Rozhodnutí o skartaci dokumentu</div>
         <dl class="detail_item">
@@ -203,7 +202,7 @@
     <div id="dokument_blok_vyrizeni">
         <div class="h2">Vyřízení <span class='toggler' onclick='toggleWindow(this);'>&nbsp;</span></div>
         <div class="dokument_blok">
-        {if ($FormUpravit=='vyrizeni')}
+        {if $Lze_menit_skartacni_rezim && $Upravit_param == 'skart_rezim'}
         {$vyrizovaniForm->render('begin')}
         <dl class="detail_item">
             <dt>Způsob vyřízení:</dt>
@@ -440,7 +439,6 @@
         Přílohy
     </div>
     <div id="dok-prilohy">
-    {accessview}
     {if count($Dok->prilohy)>0}
     <table class="seznam">
         {foreach $Dok->prilohy as $file}
@@ -472,10 +470,6 @@
     {else}
         <div class="prazdno">K tomuto dokumentu nejsou připojené žádné elektronické přílohy.</div>
     {/if}
-    {/accessview}
-    {noaccessview}
-        <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
-    {/noaccessview}
     </div>
     </div>
 

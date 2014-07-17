@@ -147,50 +147,6 @@
     </div>
     {/if}
 
-    {if $Skartacni_dohled==1}
-    <div class="dokument_blok2">
-        <div class="h2">Připojit dokument do skartačního řízení k posouzení</div>
-        <dl class="detail_item">
-            <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>&nbsp;</dt>
-            <dd>
-                <a href="{link :Spisovka:Dokumenty:keskartaci, 'id'=>$Dok->id}" id="keskartacidokument">Přidat do skartačního řízení</a>
-            </dd>
-        </dl>
-    </div>
-    {/if}
-
-    {if $Skartacni_komise==1}
-    <div class="dokument_blok2">
-        <div class="h2">Rozhodnutí o skartaci dokumentu</div>
-        <dl class="detail_item">
-            <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Rozhodnutí:</dt>
-            <dd>
-                <a href="{link :Spisovka:Dokumenty:archivovat, 'id'=>$Dok->id}" id="archivovatdokument">Archivovat</a>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="{link :Spisovka:Dokumenty:skartovat, 'id'=>$Dok->id}" id="skartovatdokument">Skartovat</a>
-            </dd>
-        </dl>
-    </div>
-    {/if}
-
-
-
     <div id="dokument_blok_hlavni">
         {if ($FormUpravit=='metadata')}
         {$metadataForm->render('begin')}

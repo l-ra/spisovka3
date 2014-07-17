@@ -379,29 +379,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             } else {
                 $this->template->Zapujcka = null;
             }            
-            
-            $this->template->Skartacni_dohled = 0;
-            $this->template->Skartacni_komise = 0;
-            
-            $uplynula_skart_lhuta = !empty($dokument->skartacni_rok)
-                        && date('Y') >= $dokument->skartacni_rok;
-            
-            if ( $uplynula_skart_lhuta && $dokument->stav_dokumentu == 7
-                    && (Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin')) ) {
-                $this->template->AccessView = 1;
-                $this->template->AccessEdit = 0;
-                $this->template->Pridelen = 1;
-                $this->template->Skartacni_dohled = 1;
-            }
-            // Dokument je ve skartacnim rizeni
-            if ( $dokument->stav_dokumentu == 8
-                    && (Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin')) ) {
-                $this->template->AccessView = 1;
-                $this->template->AccessEdit = 0;
-                $this->template->Pridelen = 1;
-                $this->template->Skartacni_komise = 1;
-            }
-
+                        
             // SuperAdmin - moznost zasahovat do dokumentu
             if ( Acl::isInRole('superadmin') ) {
                 $this->template->AccessEdit = 1;
@@ -654,66 +632,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
 
     }
-
-    public function actionKeskartaci()
-    {
-
-        $dokument_id = $this->getParam('id',null);
-        $user = Environment::getUser();
-
-        $Workflow = new Workflow();
-        if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
-            if ( $Workflow->keskartaci($dokument_id) ) {
-               $this->flashMessage('Dokument byl přidán do skartačního řízení.');
-            } else {
-               $this->flashMessage('Dokument se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
-            }
-        } else {
-            $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
-        }
-        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
-    }
-
-    public function actionArchivovat()
-    {
-
-        $dokument_id = $this->getParam('id',null);
-        $user = Environment::getUser();
-
-        $Workflow = new Workflow();
-        if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
-            if ( $Workflow->archivovat($dokument_id) ) {
-               $this->flashMessage('Dokument byl archivován.');
-            } else {
-               $this->flashMessage('Dokument se nepodařilo zařadit do archivu. Zkuste to znovu.','warning');
-            }
-        } else {
-            $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
-        }
-        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
-    }
-
-    public function actionSkartovat()
-    {
-        $dokument_id = $this->getParam('id',null);
-        $user = Environment::getUser();
-
-        $Workflow = new Workflow();
-        if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
-            if ( $Workflow->skartovat($dokument_id) ) {
-               $this->flashMessage('Dokument byl skartován.');
-            } else {
-               $this->flashMessage('Dokument se nepodařilo skartovat. Zkuste to znovu.','warning');
-            }
-        } else {
-            $this->flashMessage('Nemáte oprávnění manipulovat s tímto dokumentem.','warning');
-        }
-        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-    }
-
-
 
     public function actionVyrizeno()
     {

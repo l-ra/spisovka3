@@ -15,7 +15,7 @@ class Workflow extends BaseModel
  * 5 - vyrizeno a spousteci udalost spustena
  * 6 - predan do spisovny
  * 7 - ve spisovne
- * 8 - ke skartaci
+ * 8 - ve skartacnim rizeni
  * 9 - archivovan
  * 10 - skartovan
  * 11 - zapujcen
@@ -676,7 +676,7 @@ class Workflow extends BaseModel
         if ( is_numeric($dokument_id) ) {
 
                 $user = Environment::getUser();
-                if ( Acl::isInRole('skartacni_dohled') || $user->isInRole('superadmin') ) {
+                if ($user->isAllowed('Spisovna', 'skartacni_navrh')) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -729,7 +729,7 @@ class Workflow extends BaseModel
         if ( is_numeric($dokument_id) ) {
 
                 $user = Environment::getUser();
-                if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+                if ( $user->isAllowed('Spisovna', 'skartacni_rizeni') ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
@@ -782,7 +782,7 @@ class Workflow extends BaseModel
         if ( is_numeric($dokument_id) ) {
 
                 $user = Environment::getUser();
-                if ( Acl::isInRole('skartacni_komise') || $user->isInRole('superadmin') ) {
+                if ( $user->isAllowed('Spisovna', 'skartacni_rizeni') ) {
 
                     //$transaction = (! dibi::inTransaction());
                     //if ($transaction)
