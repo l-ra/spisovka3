@@ -108,7 +108,7 @@ class AclModel extends BaseModel {
                 re.note resource_note
                 FROM ['. $this->tb_rule . '] ru
                 LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.id)
-                ORDER BY re.code, ru.name
+                ORDER BY re.code, ru.order
         ');
 
         $tmp = array();
@@ -133,7 +133,8 @@ class AclModel extends BaseModel {
 
             //$tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ] = $pravidlo;
             $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['name'] = $pravidlo->name;
-            $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['note'] = $pravidlo->note;
+            // Pozn.: Sloupec 'note' byl z tabulky odstanen
+            $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['note'] = '';
             $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['resource'] = $pravidlo->resource_code;
             $tmp[ $resource_id ]['pravidla'][ $pravidlo->id ]['privilege'] = $pravidlo->privilege;
 
