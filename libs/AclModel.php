@@ -108,7 +108,7 @@ class AclModel extends BaseModel {
                 re.note resource_note
                 FROM ['. $this->tb_rule . '] ru
                 LEFT JOIN ['. $this->tb_resource . '] re ON (ru.resource_id = re.id)
-                ORDER BY re.code ASC
+                ORDER BY re.code, ru.name
         ');
 
         $tmp = array();
