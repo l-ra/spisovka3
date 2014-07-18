@@ -133,6 +133,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             }
         }
         $this->filtr = $filtr['filtr'];
+        if ($this->view != 'default' && strpos($filtr['filtr'], 'stav_') == 0)
+            $filtr['filtr'] = 'stav_77';
+            
         $this->template->no_items = ($filtr['filtr'] == 'stav_77') ? 1 : 2; // indikator pri nenalezeni dokumentu
         $args_f = $Dokument->spisovnaFiltr($filtr['filtr']);
         
@@ -290,9 +293,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         );
         
         $this->template->title = "Seznam dokumentů pro příjem do spisovny";
-        $this->template->is_prijem = 1;
-        $this->setView('default');
         $this->seznam(1, $filtr, $hledat, $seradit);
+        $this->setView('default');
     }
 
     public function renderKeskartaciseznam()
@@ -313,8 +315,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             'ke_skartaci'=>'předat do skartačního řízení'
         );
         $this->template->title = "Seznam dokumentů, kterým uplynula skartační lhůta";
-        $this->setView('default');
         $this->seznam(2, $filtr, $hledat, $seradit);
+        $this->setView('default');
     }
 
     public function renderSkartace()
@@ -336,8 +338,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             'skartovat'=>'skartovat vybrané dokumenty',
         );
         $this->template->title = "Seznam dokumentů ve skartačním řízení";
-        $this->setView('default');
         $this->seznam(3, $filtr, $hledat, $seradit);
+        $this->setView('default');
     }
 
     public function renderDetail()
@@ -794,9 +796,6 @@ protected function createComponentVyrizovaniForm()
         $select = array(
             'stav_77'=>'Zobrazit vše',
             'Podle stavu' => array(
-                'stav_6'=>'předáno do spisovny',
-                'stav_7'=>'ve spisovně (probíhá skartační lhůta)',
-                'stav_8'=>'ke skartaci (probíhá skartační řízení)',
                 'stav_9'=>'archivován',
                 'stav_10'=>'skartován',
             ),
@@ -806,10 +805,10 @@ protected function createComponentVyrizovaniForm()
                 'skartacni_znak_S'=>'S',
             ),
             'Podle způsobu vyřízení' => Dokument::zpusobVyrizeni(null,4)
-            
-            
         );            
-
+        if (isset($this->template->view) && $this->template->view != 'default')
+            unset($select['Podle stavu']);
+            
         $form = new AppForm();
         $form->addSelect('filtr', 'Filtr:', $select)
                 ->setValue($filtr)
