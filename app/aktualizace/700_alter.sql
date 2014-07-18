@@ -31,3 +31,7 @@ INSERT INTO `{tbls3}user_acl` (`role_id`, `rule_id`, `allowed`) VALUES (@KOMISE_
 
 UPDATE `{tbls3}user_role` SET `code` = 'spisovna2' WHERE `code` = 'spisovna';
 UPDATE `{tbls3}user_role` SET `code` = 'spisovna' WHERE `code` = 'skartacni_dohled';
+
+-- ----------------------;
+
+DELETE FROM `{tbls3}user_resource` WHERE `code` IN ('Spisovna_DokumentyPresenter', 'Spisovna_SpisyPresenter', 'Spisovna_VyhledatPresenter', 'Spisovna_DefaultPresenter');

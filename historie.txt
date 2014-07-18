@@ -14,6 +14,11 @@ Nové funkce:
                 lze přiřadit určité organizační jednotce.
 - sestavy - na základě podnětů od uživatelů byla do aplikace přidána možnost
   do jisté míry přizpůsobit informace zobrazované v sestavě
+- nová oprávnění pro přístup k dokumentům umožňují jednoduše a přesně nastavit,
+  kdo má vidět pouze svoje dokumenty, dokumenty své organizační jednotky nebo
+  všechny dokumenty v aplikaci
+- aplikace nyní více spoléhá na rozhodná oprávnění a méně na to, zda má uživatel
+  přiřazenu specifickou roli
 - výpravna - pro odeslání dokumentu poštou přidáno pole poznámky, kde může
   uživatel zadat libovolný údaj
 - nyní je možné u spouštěcí události nastavit automatické nebo ruční spuštění
@@ -33,6 +38,7 @@ Nové funkce:
   
 Jiné změny:
 
+- přepracována oprávnění pro modul Spisovna
 - v hlavičce stránky se zobrazuje jméno uživatele a jeho organizační jednotka,
   role uživatele se zobrazí po najetí myší na jméno
 - aktualizovány Javascript knihovny používané aplikací pro lepší podporu

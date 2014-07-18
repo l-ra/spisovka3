@@ -249,6 +249,7 @@ abstract class BasePresenter extends Presenter
         $this->template->is_authenticated = false;
         $user = Environment::getUser();
         if ( $this->name != 'Error' && $user->isAuthenticated() ) {
+            $this->template->userobj = $user;
             $this->template->user = $user->getIdentity();
             $this->template->is_authenticated = true;
             

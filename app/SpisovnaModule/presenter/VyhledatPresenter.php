@@ -12,5 +12,9 @@ class Spisovna_VyhledatPresenter extends Spisovka_VyhledatPresenter
         return ':Spisovna:Dokumenty:default';
     }
 
+    protected function isUserAllowed()
+    {
+        return Environment::getUser()->isAllowed('Spisovna', 'cist_dokumenty');
+    }
 }
 
