@@ -59,7 +59,9 @@ Administrace:
 - aplikace nyní kontroluje, zda je spisový znak a název spisu jedinečný
 - oprava zavádějícího označení "věcná skupina" u spisového znaku na "popis"
 - v editaci uživatelského účtu již nebude možné jednu roli přiřadit uživateli vícekrát
-  
+- organizační jednotka označená jako neaktivní již není nabízena aplikací
+  při předávání dokumentů a přiřazování uživatelům
+
 Modul Spisová služba:
 - při vytváření nového dokumentu pracovníkem e-podatelny se nyní nastaví typ
   dokumentu automaticky na "příchozí"
