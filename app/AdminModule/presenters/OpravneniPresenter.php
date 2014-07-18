@@ -257,9 +257,12 @@ class Admin_OpravneniPresenter extends BasePresenter
                 $subForm = $form1->addContainer('perm'.$rule_id);
                 $subForm->addCheckbox("opravneni_allow", 'povolit')
                         ->setValue( (@$opravneni[$rule_id]->allowed == 'Y')?1:0 );
-                $subForm->addCheckbox("opravneni_deny", 'zakázat')
+                $chk = $subForm->addCheckbox("opravneni_deny", 'zakázat')
                         ->setValue( (@$opravneni[$rule_id]->allowed == 'N')?1:0 );
-
+                // zakaž možnost odepřít oprávnění administátora a vedoucího
+                if ($rule['resource'] == NULL) {
+                    $chk->setDisabled();
+                }
             }
         }
 
