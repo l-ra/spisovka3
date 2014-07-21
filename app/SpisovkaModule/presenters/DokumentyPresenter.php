@@ -567,12 +567,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
             if ( $Workflow->zrusit_prevzeti($dokument_id) ) {
-               $this->flashMessage('Zrušil jste převzetí dokumentu.');
+                $this->flashMessage('Zrušil jste předání dokumentu.');
+                $Log = new LogModel();
+                $Log->logDokument($dokument_id, LogModel::DOK_PREDANI_ZRUSENO, "Předání dokumentu bylo zrušeno.");
             } else {
-                $this->flashMessage('Zrušení převzetí se nepodařilo. Zkuste to znovu.','warning');
+                $this->flashMessage('Zrušení předání se nepodařilo. Zkuste to znovu.','warning');
             }
         } else {
-            $this->flashMessage('Nemáte oprávnění ke zrušení převzetí dokumentu.','warning');
+            $this->flashMessage('Nemáte oprávnění ke zrušení předání dokumentu.','warning');
         }
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
     }
@@ -585,6 +587,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( $Workflow->predany($dokument_id) ) {
             if ( $Workflow->zrusit_prevzeti($dokument_id) ) {
                 $this->flashMessage('Odmítl jste převzetí dokumentu.');
+                $Log = new LogModel();
+                $Log->logDokument($dokument_id, LogModel::DOK_PREVZETI_ODMITNUTO, "Uživatel odmítnul převzít dokument.");
                 $this->redirect(':Spisovka:Dokumenty:default');
             } else {
                 $this->flashMessage('Odmítnutí převzetí se nepodařilo. Zkuste to znovu.','warning');

@@ -215,39 +215,36 @@ class Workflow extends BaseModel
         }
     }
 
-    // Zrusit PREDANI dokumentu - funkce byla nespravne pojmenovana
+    // Funkce je volána z více míst v programu, tudíž je problém zde vytvořit položku v transakčním logu dokumentu
+    // - zrušit převzetí dokumentu
+    // - odmítnout převzetí dokumentu
+    // - označení dokumentu k vyřízení
+    // - zrušit převzetí spisu
+    // - odmítnout převzetí spisu
     public function zrusit_prevzeti($dokument_id)
     {
-        if ( is_numeric($dokument_id) ) {
-
-            
-            // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
-            $update = array('stav_osoby%sql'=>'stav_osoby+100','aktivni'=>0);
-            $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_osoby=0')));
-            
-            // Vyradime i spisy, ktere byly predany
-            $DokumentSpis = new DokumentSpis();
-            $spisy = $DokumentSpis->spisy($dokument_id);
-            if ( count($spisy)>0 ) {
-                foreach ( $spisy as $spis ) {
-                    $this->update_dokumenty_ve_spisu($spis->id, 
-                    'stav_osoby = stav_osoby + 100, aktivni = 0', 'stav_osoby = 0');
-
-                    $Spis = new Spis();
-                    $Spis->zrusitPredani($spis->id);
-                    //$Log->logSpis($spis->id, LogModel::SPIS_, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal spis'.$log_plus);
-                }
-            }
-
-
-            // TODO upravit aktivitu dokumentu - reaktivovat posledni dokument
-
-            return true;
-
-        } else {
+        if (!is_numeric($dokument_id))
             return false;
+            
+        // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
+        $update = array('stav_osoby%sql'=>'stav_osoby+100','aktivni'=>0);
+        $this->update($update, array(array('dokument_id=%i',$dokument_id),array('stav_osoby=0')));
+        
+        // Vyradime i spisy, ktere byly predany
+        $DokumentSpis = new DokumentSpis();
+        $spisy = $DokumentSpis->spisy($dokument_id);
+        if ( count($spisy)>0 ) {
+            foreach ( $spisy as $spis ) {
+                $this->update_dokumenty_ve_spisu($spis->id, 
+                'stav_osoby = stav_osoby + 100, aktivni = 0', 'stav_osoby = 0');
+
+                $Spis = new Spis();
+                $Spis->zrusitPredani($spis->id);
+                //$Log->logSpis($spis->id, LogModel::SPIS_, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal spis'.$log_plus);
+            }
         }
 
+        return true;
     }
 
     // P.L. Upravy viz komentare v metode priradit()    

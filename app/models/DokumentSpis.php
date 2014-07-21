@@ -13,18 +13,20 @@ class DokumentSpis extends BaseModel
 
         $spisy = array();
         $result = $this->fetchAllComplet($param)->fetchAll();
-        if ( count($result)>0 ) {
-            $Spis = new Spis();
-            foreach ($result as $joinSpis) {
-                $spis = $Spis->getInfo($joinSpis->spis_id);
-                $spis->poradi = $joinSpis->poradi;
-                $spis->stav_zarazeni = $joinSpis->stav;
-                $spisy[ $joinSpis->spis_id ] = $spis;
-            }
-            return $spisy;
-        } else {
+        if (count($result) == 0)
             return null;
-        }
+
+        if (count($result) > 1)
+            throw new Exception("Detekován dokument ID $dokument_id, který je zařazen do více spisů!");
+            
+        $Spis = new Spis();
+        $joinSpis = current($result);
+        $spis = $Spis->getInfo($joinSpis->spis_id);
+        $spis->poradi = $joinSpis->poradi;
+        $spis->stav_zarazeni = $joinSpis->stav;
+        $spisy[ $joinSpis->spis_id ] = $spis;
+
+        return $spisy;
     }
 
     public function spis( $dokument_id ) {

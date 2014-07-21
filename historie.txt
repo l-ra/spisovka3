@@ -71,6 +71,8 @@ Modul Spisová služba:
 - při předání dokumentu, který se vyřizoval, se neodstranil stav "vyřizuje se"
 - převzetí dokumentu předaného na organizační jednotku nenastavilo
   nového vlastníka dokumentu
+- zrušení předání a odmítnutí převzetí dokumentu nyní vytvoří záznam
+  v transakčním logu dokumentu  
 - uživatel mohl při editaci metadat nechtěně změnit typ dokumentu
 - pokročilé vyhledávání umožňuje nyní hledat dokumenty dle spisového znaku,
   to samé platí pro filtr dokumentů u sestav

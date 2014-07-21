@@ -24,7 +24,9 @@ class LogModel extends BaseModel {
     const DOK_ARCHIVOVAN = 104;
     const DOK_SPISOVNA_PREDAN = 105;
     const DOK_SPISOVNA_PRIPOJEN = 106;
-
+    const DOK_PREDANI_ZRUSENO = 108;
+    const DOK_PREVZETI_ODMITNUTO = 109;
+    
     const SUBJEKT_VYTVOREN = 21;
     const SUBJEKT_ZMENEN   = 22;
     const SUBJEKT_SMAZAN   = 23;
@@ -74,6 +76,8 @@ class LogModel extends BaseModel {
         '104' => 'Dokument archivován',
         '105' => 'Dokument předán do spisovny',
         '106' => 'Dokument umístěn ve spisovně',
+        '108' => 'Předání zrušeno',
+        '109' => 'Převzetí odmítnuto',
 
         '21' => 'Vytvořen nový subjekt',
         '22' => 'Subjekt změněn',
