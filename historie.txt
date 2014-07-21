@@ -92,6 +92,8 @@ Modul Spisová služba:
 - chyby projevující se při použití prohlížeče Internet Explorer:
     - oprava chybové zprávy při vytváření zápůjčky
     - v prvku formuláře pro výběr datumu se nabízel rok 3898 místo 2013
+- oprava vertikálních rozestupů mezi prvky formulářů. Ve všech prohlížečích by
+  nyní měla mít stránka stejnou výšku.
 - oprava možného problému s nesprávnými hlavičkami mailu při odesílání dokumentu 
   e-mailem. Objevil se na instalaci Linuxu s poštovním agentem Postfix.
   

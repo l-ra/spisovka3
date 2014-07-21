@@ -243,6 +243,8 @@ form {
 
 #dialog .detail_item,
 #content .detail_item {
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 #dialog dl,
