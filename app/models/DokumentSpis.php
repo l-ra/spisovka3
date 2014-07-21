@@ -5,48 +5,28 @@ class DokumentSpis extends BaseModel
 
     protected $name = 'dokument_to_spis';
 
+    // Funkce je zde kvůli kompatibilitě se starým kódem, aby se nemusel předělávat celý program
     public function spisy( $dokument_id ) {
 
-        $param = array();
-        $param['where'] = array();
-        $param['where'][] = array('dokument_id=%i',$dokument_id);
-
-        $spisy = array();
-        $result = $this->fetchAllComplet($param)->fetchAll();
-        if (count($result) == 0)
-            return null;
-
-        if (count($result) > 1)
-            throw new Exception("Detekován dokument ID $dokument_id, který je zařazen do více spisů!");
-            
-        $Spis = new Spis();
-        $joinSpis = current($result);
-        $spis = $Spis->getInfo($joinSpis->spis_id);
-        $spis->poradi = $joinSpis->poradi;
-        $spis->stav_zarazeni = $joinSpis->stav;
-        $spisy[ $joinSpis->spis_id ] = $spis;
-
-        return $spisy;
+        $spis = $this->spis($dokument_id);
+        return $spis ? array($spis->spis_id => $spis) : null;
     }
 
     public function spis( $dokument_id ) {
 
         $param = array();
-        $param['where'] = array();
-        $param['where'][] = array('dokument_id=%i',$dokument_id);
+        $param['where'] = array(array('dokument_id=%i',$dokument_id));
 
-        $result = $this->fetchAllComplet($param)->fetchAll();
-        if ( count($result)>0 ) {
-            $Spis = new Spis();
-            foreach ($result as $joinSpis) {
-                $spis = $Spis->getInfo($joinSpis->spis_id);
-                $spis->poradi = $joinSpis->poradi;
-                $spis->stav_zarazeni = $joinSpis->stav;
-            }
-            return $spis;
-        } else {
+        $result = $this->fetchAllComplet($param)->fetch();
+        if (!$result)
             return null;
-        }
+
+        $Spis = new Spis();
+        $spis = $Spis->getInfo($result->spis_id);
+        $spis->poradi = $result->poradi;
+        $spis->stav_zarazeni = $result->stav;
+                
+        return $spis;
     }    
     
     public function dokumenty( $spis_id , $detail = 0, &$paginator = null ) {
@@ -175,30 +155,37 @@ class DokumentSpis extends BaseModel
         $odebrat = array(
                         array('dokument_id=%i',$dokument_id)
                    );
+        try {
+            dibi::begin();
+            
+            // je treba zjistit informace o puvodnim spisu, nez z nej dokument vyjmeme
+            $puvodni_spis = $this->spis($dokument_id);                  
+            $this->odebrat($odebrat);
+            
+            if ($puvodni_spis)
+                $Log->logDokument($dokument_id, LogModel::SPIS_DOK_ODEBRAN,'Dokument odebrán ze spisu "'. $puvodni_spis->nazev .'"');
 
-        $this->odebrat($odebrat);
-        
-        $spisy = $this->dokumenty($dokument_id);
-        if ( count($spisy)>0 ) {
-            foreach( $spisy as $s ) {
-                $Log->logDokument($dokument_id, LogModel::SPIS_DOK_ODEBRAN,'Dokument odebrán ze spisu "'. $s->nazev .'"');
-            }
+            $poradi = $this->pocetDokumentu($spis_id);
+
+            $row = array();
+            $row['dokument_id'] = $dokument_id;
+            $row['spis_id'] = $spis_id;
+            $row['poradi'] = $poradi + 1;
+            $row['stav'] = $stav;
+            $row['date_added'] = new DateTime();
+            $row['user_id'] = Environment::getUser()->getIdentity()->id;
+
+            $this->insert($row);
+
+            $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis_info->nazev .'"');
+            $Log->logSpis($spis_id, LogModel::SPIS_DOK_PRIPOJEN,"Pripojen dokument ". $dokument_id);
+            
+            dibi::commit();
         }
-
-        $poradi = $this->pocetDokumentu($spis_id);
-
-        $row = array();
-        $row['dokument_id'] = $dokument_id;
-        $row['spis_id'] = $spis_id;
-        $row['poradi'] = $poradi + 1;
-        $row['stav'] = $stav;
-        $row['date_added'] = new DateTime();
-        $row['user_id'] = Environment::getUser()->getIdentity()->id;
-
-        $this->insert($row);
-
-        $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis_info->nazev .'"');
-        $Log->logSpis($spis_id, LogModel::SPIS_DOK_PRIPOJEN,"Pripojen dokument ". $dokument_id);
+        catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
     }
 
     public function odebrat($param) {

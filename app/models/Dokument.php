@@ -1409,26 +1409,9 @@ class Dokument extends BaseModel
         if ( count($result)>0 ) {
 
             $tmp = array();
-            $dokument_id = $dokument_version = 0;
+            $dokument_version = 0;
             foreach ($result as $index => $row) {
-                $id = $row->id;
-
-                if ( !empty($row->spis_id) ) {
-                    $spis = new stdClass();
-                    $spis->id = $row->spis_id; unset($row->spis_id);
-                    $spis->nazev = $row->nazev_spisu; unset($row->nazev_spisu);
-                    $spis->popis = $row->popis_spisu; unset($row->popis_spisu);
-                    $spis->stav = $row->stav_spisu; unset($row->stav_spisu);
-                    $spis->poradi = $row->poradi_spisu; unset($row->poradi_spisu);
-                    $tmp[$id]['spisy'][ $spis->id ] = $spis;
-                }
-
-                $typ = new stdClass();
-                $typ->id = $row->dokument_typ_id; unset($row->dokument_typ_id);
-                $typ->nazev = $row->typ_nazev; unset($row->typ_nazev);
-                $typ->popis = $row->typ_popis; unset($row->typ_popis);
-                $typ->smer = $row->typ_smer; unset($row->typ_smer);
-                $tmp[$id]['typ_dokumentu'] = $typ;
+                $id = $row->id; // toto je ID z tabulky dokument, totozny udaj je i v $row->dokument_id
 
                 $workflow = new stdClass();
                 $workflow->id = $row->workflow_id; unset($row->workflow_id);
@@ -1466,22 +1449,37 @@ class Dokument extends BaseModel
                 $workflow->date = $row->date_prideleni; unset($row->date_prideleni);
                 $workflow->poznamka = $row->poznamka_predani; unset($row->poznamka_predani);
                 $workflow->aktivni = $row->wf_aktivni; unset($row->wf_aktivni);
-                $tmp[$id]['workflow'][ $workflow->id ] = $workflow;
-
-                $tmp[$id]['raw'] = $row;
-
-                if ( $row->id >= $dokument_id ) $dokument_id = $row->id;
-
+                $tmp['workflow'][ $workflow->id ] = $workflow;
             }
 
-            $dokument = $tmp[ $dokument_id ]['raw'];
-            $dokument->typ_dokumentu = $tmp[ $dokument_id ]['typ_dokumentu'];
-            if ( isset($tmp[ $dokument_id ]['spisy']) )
-                $dokument->spisy = $tmp[ $dokument_id ]['spisy'];
-            $dokument->workflow = $tmp[ $dokument_id ]['workflow'];
+            $spis = null;
+            if ( !empty($row->spis_id) ) {
+                $spis = new stdClass();
+                $spis->id = $row->spis_id; unset($row->spis_id);
+                $spis->nazev = $row->nazev_spisu; unset($row->nazev_spisu);
+                $spis->popis = $row->popis_spisu; unset($row->popis_spisu);
+                $spis->stav = $row->stav_spisu; unset($row->stav_spisu);
+                $spis->poradi = $row->poradi_spisu; unset($row->poradi_spisu);
+            }
+            
+            $typ = new stdClass();
+            $typ->id = $row->dokument_typ_id; unset($row->dokument_typ_id);
+            $typ->nazev = $row->typ_nazev; unset($row->typ_nazev);
+            $typ->popis = $row->typ_popis; unset($row->typ_popis);
+            $typ->smer = $row->typ_smer; unset($row->typ_smer);
 
-            if ( isset($dokument->spisy) ) {
-                $spis = current($dokument->spisy);
+            $dokument = $row;
+            
+            $dokument->typ_dokumentu = $typ;
+            if (isset($spis)) {
+                $dokument->spis = $spis;
+                // puvodne spisovka pitome umoznovala zaradit dokument do vice spisu najednou
+                // zustava zde kvuli kompatibilite
+                $dokument->spisy = array($spis->id => $spis);
+            }
+            $dokument->workflow = $tmp['workflow'];
+
+            if ( isset($spis) ) {
                 $DokumentSpis = new DokumentSpis();
                 $dokument->skartacni_rezim = $DokumentSpis->skartacniRezim($spis->id);            
             } else {
