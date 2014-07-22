@@ -107,61 +107,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
         
     }    
     
-    public function renderVyber()
-    {
-
-        $this->template->dokument_id = $this->getParam('id',null);
-        if ( empty($this->template->dokument_id) ) {
-            if ( isset($_POST['dokument_id']) ) {
-                $this->template->dokument_id = $_POST['dokument_id'];
-            }
-        }
-
-        $Spisy = new Spis();
-        $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
-        $args = $Spisy->spisovna($args);
-        $seznam = $Spisy->seznam($args);
-        $this->template->seznam = $seznam;
-
-    }
-
-    public function renderVybrano()
-    {
-
-        $spis_id = $this->getParam('id',null);
-        $dokument_id = $this->getParam('dok_id',null);
-        $Spisy = new Spis();
-
-        $spis = $Spisy->getInfo($spis_id);
-        if ( $spis ) {
-
-            // Propojit s dokumentem
-            $DokumentSpis = new DokumentSpis();
-            $DokumentSpis->pripojit($dokument_id, $spis_id);
-
-            $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::SPIS_DOK_PRIPOJEN,'Dokument přidán do spisu "'. $spis->nazev .'"');
-
-            echo '###vybrano###'. $spis->nazev;
-            $this->terminate();
-
-        } else {
-            // chyba
-            
-
-            $Spisy = new Spis();
-            $args = null;// array( 'where'=>array("nazev_subjektu like %s",'%blue%') );
-            $seznam = $Spisy->seznam($args);
-            $this->template->seznam = $seznam;
-            $this->template->dokument_id = $dokument_id;
-
-            $this->template->chyba = 1;
-            
-            $this->template->render('vyber');
-        }
-        
-    }
-
     public function actionDefault()
     {
     }
