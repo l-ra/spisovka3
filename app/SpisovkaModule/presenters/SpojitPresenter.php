@@ -67,30 +67,29 @@ class Spisovka_SpojitPresenter extends BasePresenter
         $this->terminate();
     }
 
-    public function renderVybrano()
+    public function actionVybrano()
     {
-
         $dokument_id = $this->getParam('id',null);
         $dokument_spojit = $this->getParam('spojit_s',null);
 
         $Dokument = new Dokument();
 
-        $dok_in = $Dokument->getBasicInfo($dokument_id);
-        $dok_out = $Dokument->getBasicInfo($dokument_spojit);
-        if ( $dok_in && $dok_out ) {
+        try {
+            $dok_in = $Dokument->getBasicInfo($dokument_id);
+            $dok_out = $Dokument->getBasicInfo($dokument_spojit);
+            if (!$dok_in || !$dok_out)
+                throw new Exception('Neplatný parametr');
 
             // spojit s dokumentem
             $SouvisejiciDokument = new SouvisejiciDokument();
             $SouvisejiciDokument->spojit($dokument_id, $dokument_spojit);
 
             echo '###vybrano###'. $dok_out->cislo_jednaci .' ('. $dok_out->jid .')';//. $spis->nazev;
-            $this->terminate();
-
-        } else {
-            // chyba
-            $this->template->chyba = 1;
-            $this->template->render('vyber');
+        } 
+        catch (Exception $e) {
+            echo 'Při pokusu o spojení dokumentů došlo k chybě - ' . $e->getMessage();
         }
+        $this->terminate();
     }
 
     public function renderOdebrat()
