@@ -26,3 +26,4 @@ ALTER TABLE `{tbls3}orgjednotka` DROP COLUMN uroven;
 ALTER TABLE `{tbls3}spis` DROP COLUMN uroven;
 ALTER TABLE `{tbls3}spisovy_znak` DROP COLUMN uroven;
 ALTER TABLE `{tbls3}user_role` DROP COLUMN uroven;
+

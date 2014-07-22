@@ -113,6 +113,7 @@ class Client_To_Update {
     {
         try {
             dibi::connect($this->db_config);
+            dibi::addSubst('PREFIX', $this->db_config['prefix']);
         }
         catch(DibiException $e) {
             throw new Exception("Nepodařilo se připojit k databázi. Klienta nelze aktualizovat.");

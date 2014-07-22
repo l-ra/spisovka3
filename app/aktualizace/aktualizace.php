@@ -110,10 +110,20 @@ function my_assert_handler($file, $line, $code)
 
                 // Continue = 1 znamena, ze aktualizace byla jiz provedena a pokracuje se dalsi aktualizaci
                 // Check skripty se pouzivaly v minulosti, kdy nebylo mozne spolehlive urcit revizi klienta
+                // V soucasnosti slouzi check skripty jinemu ucelu - maji pomoci detekovat problem drive, nez uzivatel spusti aktualizaci
                 $continue = 0;    
-                if (file_exists(UPDATE_DIR . $rev .'_check.php') ) {
+                if ($rev <= 530 && file_exists(UPDATE_DIR . $rev .'_check.php') ) {
                     // include, ne include_once !!
-                    require UPDATE_DIR . $rev .'_check.php';
+                    try {
+                        require UPDATE_DIR . $rev .'_check.php';
+                    }
+                    catch (Exception $e) {
+                        error("Při provádění kontrolního skriptu došlo k chybě!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
+                        // Je pravděpodobné, že tuto revizi nemá klient nainstalovánu
+                        $found_update = true;
+                        // Ukonči kontrolu revizí a přeskoč na dalšího klienta
+                        break;
+                    }
                 }                     
                 if ( $continue == 1 )
                     continue;
@@ -130,6 +140,28 @@ function my_assert_handler($file, $line, $code)
 
                 if (file_exists(UPDATE_DIR . $rev .'_info.txt') )
                     echo "<div class='update_info'>". file_get_contents(UPDATE_DIR . $rev .'_info.txt') ."</div>";
+                
+                // 
+                if ($rev > 530 && file_exists(UPDATE_DIR . $rev .'_check.php') ) {
+                    try {
+                        require_once UPDATE_DIR . $rev .'_check.php';
+                        $function_name = "revision_{$rev}_check";
+                        $function_name();
+                    }
+                    catch (Exception $e) {
+                        $msg = "Při provádění kontroly došlo k chybě! Aktualizaci není možné provést.<br />Popis chyby: ";
+                        if ($e->getCode())
+                            $msg .= $e->getCode() . ' - ';
+                        $msg .= $e->getMessage();
+                        error($msg);
+                        
+                        // Pokud je spuštěna aktualizace, ukonči ji a přeskoč na dalšího klienta
+                        // Pokud není, pokračuj v zobrazení a případné kontrole dalších db aktualizací
+                        if ($do_update)
+                            break;
+
+                    }
+                }
                 
                 // PRE script
                 if (file_exists(UPDATE_DIR . $rev .'_script_prev.php') ) {
@@ -202,9 +234,13 @@ function my_assert_handler($file, $line, $code)
                         error("Došlo k databázové chybě, aktualizace neproběhla úspěšně!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
                         $rev_error = true;
                     }
-                    else
-                        error("Při kontrole došlo k databázové chybě!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
                     break;
+                }
+                catch (Exception $e) {
+                    if ( $do_update )
+                        dibi::rollback();
+                    error("Došlo k neočekávané výjimce, ukončuji program.<br />Popis chyby: " . $e->getMessage());
+                    die();
                 }
                 
                 echo "</div>";

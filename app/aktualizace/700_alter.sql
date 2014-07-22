@@ -1,5 +1,11 @@
 -- ----------------------;
 
+ALTER TABLE `{tbls3}user_rule` 
+    ADD COLUMN `order` INT NOT NULL DEFAULT '0',
+    DROP COLUMN `note`;
+
+-- ----------------------;
+
 INSERT INTO `{tbls3}user_resource` (`code`, `name`) VALUES ('Spisovna', 'Spisovna');
 SET @RESOURCE_ID=LAST_INSERT_ID();
 
