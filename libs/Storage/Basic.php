@@ -20,6 +20,17 @@ class Storage_Basic extends FileModel {
         
     }
 
+    public function remove($file_id) {
+    
+        $row = $this->fetchRow(array('id=%i', $file_id))->fetch();
+        if (!$row)
+            throw new Exception("Nemohu načíst přílohu ID $file_id.");
+        
+        // odstraň záznam z databáze
+        $this->delete(array(array('id=%i', $file_id)));
+        unlink(CLIENT_DIR . $row['real_path']);
+    }
+
     public function uploadDokument($data) {
 
         $upload = $data['file'];

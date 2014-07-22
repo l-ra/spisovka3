@@ -92,7 +92,9 @@ class DokumentPrilohy extends BaseModel
 
     }
 
-    public function odebrat($param) {
+    public function odebrat($dokument_id, $file_id)
+    {
+        $param = array( array('file_id=%i',$file_id),array('dokument_id=%i',$dokument_id) );
         return $this->delete($param);
     }
 

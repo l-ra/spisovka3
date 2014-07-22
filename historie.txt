@@ -78,7 +78,9 @@ Modul Spisová služba:
   to samé platí pro filtr dokumentů u sestav
 - u uživatelů, kteří v minulosti upgradovali z verze 3.0, opraven výpočet 
   konce skartační lhůty dokumentů
-
+- opětovné nahrání přílohy nebo její odstranění nyní smaže soubor ze serveru,
+  aby se neplýtvalo diskovým prostorem
+  
 - sestava "Podací deník" nesprávně obsahovala i dokumenty bez čísla jednacího
 - sestava nyní v hlavičce zobrazuje rok zvolený při spuštění sestavy namísto
   aktuálního roku

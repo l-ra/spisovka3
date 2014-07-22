@@ -30,26 +30,32 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
     }
 
+    // Je volano pres AJAX, takze volani flashMessage() postradaji smysl
     public function renderOdebrat()
     {
         $file_id = $this->getParam('id',null);
         $dokument_id = $this->getParam('dok_id',null);
 
+        $FileModel = new FileModel();
+        $file_info = $FileModel->getInfo($file_id);
+        
         $DokumentPrilohy = new DokumentPrilohy();
-        $param = array( array('file_id=%i',$file_id),array('dokument_id=%i',$dokument_id) );
 
-        if ( $DokumentPrilohy->odebrat($param) ) {
+        if ( $DokumentPrilohy->odebrat($dokument_id, $file_id) ) {
+        
+            $storage_conf = Environment::getConfig('storage');
+            eval("\$UploadFile = new ".$storage_conf->type."();");
+            
+            $UploadFile->remove($file_id);
+            
             $Log = new LogModel();
-            $FileModel = new FileModel();
-            $file_info = $FileModel->getInfo($file_id);
             $Log->logDokument($dokument_id, LogModel::PRILOHA_ODEBRANA,'Odebrána příloha "'. $file_info->nazev .' ('. $file_info->real_name .')"');
             $this->flashMessage('Příloha byla úspěšně odebrána.');
         } else {
             $this->flashMessage('Přílohu se nepodařilo odebrat. Zkuste to znovu.','warning');
         }
+
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
-
     }
 
 /**
@@ -216,16 +222,24 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             eval("\$UploadFile = new ".$storage_conf->type."();");
 
             if ( $file = $UploadFile->uploadDokument($data) ) {
-                // pripojit k dokumentu
+                $FileModel = new FileModel();
+                $file_info1 = $FileModel->getInfo($file_id);
+                $file_info2 = $FileModel->getInfo($file->id);
+
+                    // pripojit k dokumentu
                 $this->template->chyba = $file;
                 $DokumentPrilohy = new DokumentPrilohy();
                 if ($DokumentPrilohy->pripojit($dokument_id, $file->id)) {
-                    $DokumentPrilohy->deaktivovat($dokument_id, $file_id); // deaktivujeme puvodni prilohu
-
+                    // tady by se melo mozna kontrolovat nejake uzivatelske nastaveni, jak se ma reupload prilohy chovat
+                    if (false) {
+                        $DokumentPrilohy->deaktivovat($dokument_id, $file_id); // deaktivujeme puvodni prilohu
+                    }
+                    else {
+                        $DokumentPrilohy->odebrat($dokument_id, $file_id);
+                        $UploadFile->remove($file_id);
+                    }
+                    
                     $Log = new LogModel();
-                    $FileModel = new FileModel();
-                    $file_info1 = $FileModel->getInfo($file_id);
-                    $file_info2 = $FileModel->getInfo($file->id);
                     $Log->logDokument($dokument_id, LogModel::PRILOHA_ZMENENA,'Změněna příloha z "'. $file_info1->nazev .' ('. $file_info1->real_name .')" na "'. $file_info2->nazev .' ('. $file_info2->real_name .')"');
 
                     echo '###vybrano###'. $dokument_id;
