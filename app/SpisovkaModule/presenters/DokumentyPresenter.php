@@ -969,7 +969,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $spisy_old = $DokumentSpis->spisy($dokument_id);
                     if ( count($spisy_old)>0 ) {
                         foreach ( $spisy_old as $spis ) {
-                            $DokumentSpis->pripojit($dok_odpoved->id, $spis->id, $stav = 1);
+                            $DokumentSpis->pripojit($dok_odpoved->id, $spis->id);
                         }
                     }
                     $spisy_new = $DokumentSpis->spisy($dok_odpoved->id);

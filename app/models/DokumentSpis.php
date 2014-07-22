@@ -24,7 +24,6 @@ class DokumentSpis extends BaseModel
         $Spis = new Spis();
         $spis = $Spis->getInfo($result->spis_id);
         $spis->poradi = $result->poradi;
-        $spis->stav_zarazeni = $result->stav;
                 
         return $spis;
     }    
@@ -64,7 +63,6 @@ class DokumentSpis extends BaseModel
                 $dok = $Dokument->getInfo($joinDok->dokument_id, null, $dataplus);
                 if ( empty($dok->stav_dokumentu) ) continue;
                 $dok->poradi = empty($joinDok->poradi)?1:$joinDok->poradi;
-                $dok->stav_zarazeni = $joinDok->stav;
                 $dokumenty[ $joinDok->dokument_id ] = $dok;
             }
             sort($dokumenty);
@@ -143,7 +141,7 @@ class DokumentSpis extends BaseModel
         }
     }
 
-    public function pripojit($dokument_id, $spis_id, $stav = 1) {
+    public function pripojit($dokument_id, $spis_id) {
 
         $Log = new LogModel();
 
@@ -171,7 +169,6 @@ class DokumentSpis extends BaseModel
             $row['dokument_id'] = $dokument_id;
             $row['spis_id'] = $spis_id;
             $row['poradi'] = $poradi + 1;
-            $row['stav'] = $stav;
             $row['date_added'] = new DateTime();
             $row['user_id'] = Environment::getUser()->getIdentity()->id;
 
