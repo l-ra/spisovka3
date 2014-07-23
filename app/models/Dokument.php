@@ -1328,7 +1328,7 @@ class Dokument extends BaseModel
                 'dokspisy' => array(
                     'from' => array($this->tb_dokspis => 'sp'),
                     'on' => array('sp.dokument_id=dok.id'),
-                    'cols' => array('poradi'=>'poradi_spisu','stav'=>'stav_spisu')
+                    'cols' => array('poradi'=>'poradi_spisu')
                 ),
                 'typ_dokumentu' => array(
                     'from' => array($this->tb_dokumenttyp => 'dtyp'),
@@ -1458,7 +1458,6 @@ class Dokument extends BaseModel
                 $spis->id = $row->spis_id; unset($row->spis_id);
                 $spis->nazev = $row->nazev_spisu; unset($row->nazev_spisu);
                 $spis->popis = $row->popis_spisu; unset($row->popis_spisu);
-                $spis->stav = $row->stav_spisu; unset($row->stav_spisu);
                 $spis->poradi = $row->poradi_spisu; unset($row->poradi_spisu);
             }
             
