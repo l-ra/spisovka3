@@ -1,1 +1,0 @@
-- přidána oprávnění pro jednotlivé administrační sekce

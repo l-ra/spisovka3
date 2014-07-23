@@ -1,0 +1,34 @@
+[158]
+<h2>Rozsáhlá aktualizace!</h2>
+Jedná se o velkou aktualizaci aplikace z verze 3.0 na verzi 3.2.
+
+V závislosti na množství dat, může aktualizace trvat i několik desítek sekund.
+Nepřerušujte akci, dokud se stránka celá nenačte. 
+Místy se může zdát, že se aktualizace zasekla, ale dokud se stránka načítá, je to v pořádku.
+Aktualizace probíhá na pozadí, výstup pouze informuje.
+[309]
+<strong> Verze 3.2.2 , revize: 309, released: 2.12.2011 </strong>
+
+- Změna počtu znaků v poli "popis" u dokumentu.
+[321]
+<strong> Verze 3.2.3 , revize: 321, released: 15.12.2011 </strong>
+
+- Spisovy znak - moznost vyberu/nevyberu spisoveho znaku (v selectu polozka bud aktivni nebo neaktivni pro vyber)
+[450]
+- nová tabulka Stat
+[458]
+- nové tabulky pro zprávy
+[500]
+- nové oprávnění pro odesílání dokumentů datovou schránkou
+- odstraněn limit u lhůty pro vyřízení dokumentu
+[510]
+- přidána oprávnění pro jednotlivé administrační sekce
+[520]
+- nová tabulka pro ukládání uživatelských nastavení
+[550]
+- drobné změny v oprávněních
+- smazána role "host"
+[610]
+- Významná změna zařazení uživatelů do organizačních jednotek.
+[700]
+- změny oprávnění pro spisovnu

@@ -6,6 +6,7 @@ class Updates {
     public static $update_dir;
     public static $alter_scripts = array();
     public static $revisions = array();
+    public static $descriptions = array();
     public static $clients = array();
     
     public static function init() {
@@ -20,6 +21,13 @@ class Updates {
         $dir_handle = opendir(self::$update_dir);
         if ($dir_handle !== FALSE) {
             while (($filename = readdir($dir_handle)) !== false) {
+            
+                if ($filename == 'information.txt') {
+                    $info = file(self::$update_dir . $filename);
+                    if ($info)
+                        self::$descriptions = self::_parse_info_file($info);
+                    continue;
+                }
                 
                 $parts = explode("_", $filename);
                 if ( is_numeric($parts[0]) ) {
@@ -44,9 +52,34 @@ class Updates {
         
         self::$alter_scripts = $alter_scripts;
         self::$revisions = $revisions;
-        return array('revisions' => $revisions, 'alter_scripts' => $alter_scripts);
+        return array('revisions' => $revisions, 'alter_scripts' => $alter_scripts, 
+                'descriptions' => self::$descriptions);
     }
 
+    protected static function _parse_info_file($info) {
+    
+        $rev = 0;
+        $a = array();
+        
+        foreach ($info as $line) {
+            if ($line{0} == '[')
+                if (preg_match('/^\[(\d+)\]/', $line, $matches) == 1) {
+                    $rev = $matches[1];
+                    continue;
+                }
+                
+            // ignoruj prazdny radek
+            /* if (trim($line) === '')
+                continue; */
+                
+            if (!isset($a[$rev]))
+                $a[$rev] = '';
+            $a[$rev] .= $line;
+        }
+        
+        return $a;
+    }
+    
     public static function find_clients() {
     
         $clients = array();

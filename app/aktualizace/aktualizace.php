@@ -28,6 +28,7 @@ function my_assert_handler($file, $line, $code)
     $res = Updates::find_updates();
     $revisions = $res['revisions'];
     $alter_scripts = $res['alter_scripts'];
+    $descriptions = $res['descriptions'];
     assert('count($revisions) > 0');
     
     $clients = Updates::find_clients();
@@ -138,9 +139,9 @@ function my_assert_handler($file, $line, $code)
                 echo "<div class='update_title'>Informace o této aktualizaci:</div>";
                 echo "<div class='update_info'><strong>Revize #". $rev ."</strong></div>";
 
-                if (file_exists(UPDATE_DIR . $rev .'_info.txt') )
-                    echo "<div class='update_info'>". file_get_contents(UPDATE_DIR . $rev .'_info.txt') ."</div>";
-                
+                if (isset($descriptions[$rev]))
+                    echo "<div class='update_info'>{$descriptions[$rev]}</div>";
+                    
                 // 
                 if ($rev > 530 && file_exists(UPDATE_DIR . $rev .'_check.php') ) {
                     try {

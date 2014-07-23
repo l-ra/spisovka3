@@ -1,2 +1,0 @@
-- nové oprávnění pro odesílání dokumentů datovou schránkou
-- odstraněn limit u lhůty pro vyřízení dokumentu
