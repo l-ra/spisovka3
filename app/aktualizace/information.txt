@@ -28,7 +28,16 @@ Aktualizace probíhá na pozadí, výstup pouze informuje.
 [550]
 - drobné změny v oprávněních
 - smazána role "host"
+[590]
+<strong> Verze 3.3.4</strong>
 [610]
 - Významná změna zařazení uživatelů do organizačních jednotek.
+[620]
+- oprava výpočtu skartační lhůty
+[660]
+- přidána omezení na jedinečnost názvu spisu, spisového znaku a kódu uživatelské role
+- změna primárních klíčů u tabulek dokument_to_spis, user_to_role a user_acl
+[680]
+- nová oprávnění pro přístup k dokumentům
 [700]
 - změny oprávnění pro spisovnu

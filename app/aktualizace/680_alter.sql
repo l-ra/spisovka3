@@ -1,7 +1,5 @@
 -- ----------------------;
 
-ALTER TABLE `{tbls3}user_role` ADD UNIQUE KEY `code` (`code`);
-
 INSERT INTO `{tbls3}user_resource` (`code`, `name`) VALUES ('Dokument', 'Dokumenty');
 SET @RESOURCE_ID=LAST_INSERT_ID();
 

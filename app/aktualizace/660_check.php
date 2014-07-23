@@ -14,6 +14,12 @@ function revision_660_check()
     if (count($result))
         throw new Exception('Kontrola integrity dat selhala. Název spisu musí být jedinečný!');
 
+    // --------------------------------------------------------------------    
+    $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`code`) AS pocet FROM [:PREFIX:user_role] GROUP BY `code`) subq WHERE pocet > 1');
+    
+    if (count($result))
+        throw new Exception('Kontrola integrity dat selhala. Kód role musí být jedinečný!');
+
     // --------------------------------------------------------------------
     $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`dokument_id`) AS pocet FROM [:PREFIX:dokument_to_spis] GROUP BY `dokument_id`) subq WHERE pocet > 1');
     
