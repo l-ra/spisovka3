@@ -125,8 +125,8 @@ function my_assert_handler($file, $line, $code)
                         break;
                     }
                 }                     
-                // if ( $continue == 1 )
-                    // continue;
+                if ( $continue == 1 )
+                    continue;
                 $found_update = true;
                 
                 echo "<div class='update_rev'>";

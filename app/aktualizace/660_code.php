@@ -45,4 +45,20 @@ function revision_660_check()
     
 }
 
+function revision_660_after()
+{
+    // zkus zmenit db strukturu, ale ignoruj, pokud by databaze hlasila chybu - kdyby zmena nebyla mozna
+    try {
+        dibi::query('ALTER TABLE `:PREFIX:spisovy_znak` ADD UNIQUE KEY `nazev` (`nazev`)');
+    }
+    catch (Exception $e) {
+    }
+    
+    try {
+        dibi::query('ALTER TABLE `:PREFIX:spis` ADD UNIQUE KEY `nazev` (`nazev`)');
+    }
+    catch (Exception $e) {
+    }
+}
+
 ?>
