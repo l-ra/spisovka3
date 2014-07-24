@@ -18,6 +18,11 @@ nedoslo k prepsani Vasich konfiguracnich souboru
 
 2) Aktualizace od verze 3.0.x a vys
 
+Upozorneni:
+Z verze 3.0.x neni mozne primo aktualizovat na verzi 3.4 a novejsi. Je potreba
+nejprve nainstalovat verzi 3.3. Pokud to je mozne, je doporuceno z verze 3.0.x
+neupgradovat a vytvorit novou instalaci.
+
 Zde nedochazi ke zmenam adresarove struktury, upgrade je velmi jednoduchy:
 
 - zaloha celeho adresare se Spisovkou
