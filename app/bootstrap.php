@@ -1,5 +1,15 @@
 <?php
 
+if ( !defined('KLIENT') ) {
+    echo "<h1>Chyba aplikace. Nebyl zjisten klient!</h1>";
+    exit;
+}
+
+if (file_exists(APP_DIR ."/configs/servicemode")) {
+    readfile(APP_DIR ."/configs/servicemode");
+    exit;
+}
+
 // Step 1: Load Nette Framework
 require LIBS_DIR . '/Nette/loader.php';
 
@@ -23,12 +33,6 @@ if ( DEBUG_ENABLE ) {
 
 // 2b) load configuration from config.ini file
 $basePath = Environment::getHttpRequest()->getUri()->basePath;
-
-
-if ( !defined('KLIENT') ) {
-    echo "<h1>Chyba aplikace. Nebyl zjisten klient!</h1>";
-    exit;
-}
 
 // dynamicky uprav protokol v nastaveni BASE_URI
 $baseUri = BASE_URI;

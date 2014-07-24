@@ -35,6 +35,9 @@ Nové funkce:
   To zajistí použití čistých url.
 - na jedné doménové adrese je nyní možné provozovat více instancí aplikace současně
   (byla upravena session cookie)
+- aplikaci je možné jednoduše dočasně odstavit z provozu zkopírováním souboru 
+  app/configs/_servicemode na servicemode. V souboru pak je možné zadat vlastní
+  zprávu pro uživatele.
   
 Jiné změny:
 
