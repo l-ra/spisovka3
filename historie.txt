@@ -2,7 +2,7 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
-=== Ver. 3.4.0 =================================================================
+=== Verze 3.4.0 =================================================================
 
 Nové funkce:
 
@@ -102,7 +102,7 @@ Modul Spisová služba:
 - oprava možného problému s nesprávnými hlavičkami mailu při odesílání dokumentu 
   e-mailem. Objevil se na instalaci Linuxu s poštovním agentem Postfix.
   
-=== Ver. 3.3.4 =================================================================
+=== Verze 3.3.4 =================================================================
 
 Nové funkce:
 
@@ -137,7 +137,7 @@ Opravy:
 - do spisu, který není otevřen, není možné přidávat dokumenty
 - oprava vytváření spisu z Ajax dialogového okna
 
-=== Ver. 3.3.3 =================================================================
+=== Verze 3.3.3 =================================================================
 
 Nové funkce:
 
@@ -165,7 +165,7 @@ Opravy:
 - nastavení lhůty vyřízení dokumentu na nulu způsobilo chybu
 - opravena bezpečnostní chyba při kombinovaném přihlášení přes LDAP
 
-=== Ver. 3.3.2 =================================================================
+=== Verze 3.3.2 =================================================================
 
 Nové funkce:
 
@@ -202,7 +202,7 @@ Opravy:
 - oprava mazání spisových znaků
 - v seznamu dokumentů ve spisu se chybně zobrazovaly ikony v Internet Exploreru
 
-=== Ver. 3.3.0 RC1 =============================================================
+=== Verze 3.3.0 RC1 =============================================================
 Released: 22.06.2012
 
 Vseobecne zmeny:
@@ -244,7 +244,7 @@ Aplikacni zmeny:
 
 opraveny chyby, optimalizace kodu a vsechno mozne
 
-=== Ver. 3.0.3 =================================================================
+=== Verze 3.0.3 =================================================================
 Released: 24.05.2011
 
 - oprava - chyba pri vytvareni spisu v dokumentu
@@ -271,7 +271,7 @@ Released: 24.05.2011
   SQL skriptum, uprava nacitani SQL skriptu ve spravnem poradi
 
 
-=== Ver. 3.0.2 =================================================================
+=== Verze 3.0.2 =================================================================
 Released: 16.03.2011
 
 - zrusena kontrola prilohy u listinneho dokumentu
@@ -294,7 +294,7 @@ Released: 16.03.2011
 - oprava aktualizacniho skriptu - zapisovalo se cislo nove revize i v pripade, ze aktualizace neprobehla
 - uprava aktualizacniho skriptu - (standalone/multisite)
 
-=== Ver. 3.0.1 =================================================================
+=== Verze 3.0.1 =================================================================
 Released: 14.02.2011
 
 - kontrola pred vyrizenim dokumentu
@@ -318,7 +318,7 @@ Released: 14.02.2011
 - Nette fix - bezduvodne odhlasovani v IE
 
 
-=== Ver. 3.0.0 =================================================================
+=== Verze 3.0.0 =================================================================
 Released: 06.09.2010
 
 - nove vykonne jadro zalozene na Nette Framework
