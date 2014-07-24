@@ -292,7 +292,8 @@ function deleteDir($dir, $dir_parent = null)
        return false;
     }
 
-    if ($handle = opendir($dir)) 
+    // potlac pripadne varovani, je mozne, ze do adresare nemame pristup (pripad hostingu)
+    if ($handle = @opendir($dir)) 
     { 
         while ($obj = readdir($handle)) 
         { 
