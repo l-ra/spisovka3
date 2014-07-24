@@ -22,7 +22,7 @@ function my_assert_handler($file, $line, $code)
     define('UPDATE_DIR', WWW_DIR . '/app/aktualizace/');    
     
     require 'aktualizace_core.php';
-    
+
     Updates::init();
     
     $res = Updates::find_updates();
@@ -111,9 +111,8 @@ function my_assert_handler($file, $line, $code)
 
                 // Continue = 1 znamena, ze aktualizace byla jiz provedena a pokracuje se dalsi aktualizaci
                 // Check skripty se pouzivaly v minulosti, kdy nebylo mozne spolehlive urcit revizi klienta
-                // V soucasnosti slouzi check skripty jinemu ucelu - maji pomoci detekovat problem drive, nez uzivatel spusti aktualizaci
-                $continue = 0;    
-                if ($rev <= 530 && file_exists(UPDATE_DIR . $rev .'_check.php') ) {
+                $continue = 0;
+                if (file_exists(UPDATE_DIR . $rev .'_check.php') ) {
                     // include, ne include_once !!
                     try {
                         require UPDATE_DIR . $rev .'_check.php';
@@ -126,14 +125,15 @@ function my_assert_handler($file, $line, $code)
                         break;
                     }
                 }                     
-                if ( $continue == 1 )
-                    continue;
+                // if ( $continue == 1 )
+                    // continue;
                 $found_update = true;
                 
                 echo "<div class='update_rev'>";
 
                 // poznamka: transakce nefunguji ocekavanym zpusobem, meni-li se pri nich databazova struktura (coz dela vetsina aktualizaci)
-                if ( $do_update ) dibi::begin();
+                if ( $do_update )
+                    dibi::begin();
                 
                 // Info
                 echo "<div class='update_title'>Informace o této aktualizaci:</div>";
@@ -141,12 +141,13 @@ function my_assert_handler($file, $line, $code)
 
                 if (isset($descriptions[$rev]))
                     echo "<div class='update_info'>{$descriptions[$rev]}</div>";
-                    
-                // 
-                if ($rev > 530 && file_exists(UPDATE_DIR . $rev .'_check.php') ) {
+
+                // php z nepochopitelnych duvodu hlasi warning, neni-li pouzit @
+                @include_once UPDATE_DIR . $rev . '_code.php';
+
+                $function_name = "revision_{$rev}_check";
+                if (function_exists($function_name)) {
                     try {
-                        require_once UPDATE_DIR . $rev .'_check.php';
-                        $function_name = "revision_{$rev}_check";
                         $function_name();
                     }
                     catch (Exception $e) {
@@ -165,11 +166,12 @@ function my_assert_handler($file, $line, $code)
                 }
                 
                 // PRE script
-                if (file_exists(UPDATE_DIR . $rev .'_script_prev.php') ) {
+                $function_name = "revision_{$rev}_before";
+                if (function_exists($function_name)) {
                     if ( $do_update ) {
                         echo "<div class='update_title'>Provedení PHP skriptu (před aktualizaci databáze)</div>";
                         echo "<pre>";
-                        require UPDATE_DIR . $rev .'_script_prev.php';
+                        $function_name();
                         echo "</pre>";
                         
                     } else {
@@ -212,11 +214,12 @@ function my_assert_handler($file, $line, $code)
                 }
                 
                 // AFTER source
-                if (file_exists(UPDATE_DIR . $rev .'_script_after.php') ) {
+                $function_name = "revision_{$rev}_after";
+                if (function_exists($function_name)) {
                     if ( $do_update ) {
                         echo "<div class='update_title'>Provedení PHP skriptu (po aktualizaci databáze)</div>";
                         echo "<pre>";
-                        require UPDATE_DIR . $rev .'_script_after.php';
+                        $function_name();
                         echo "</pre>";
                     } else {
                         echo "<div class='update_title'>Bude proveden PHP skript (po aktualizaci databáze)</div>";

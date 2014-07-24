@@ -33,3 +33,8 @@ CREATE TABLE IF NOT EXISTS `{tbls3}zprava_osoba` (
 ALTER TABLE `{tbls3}zprava_osoba`
   ADD CONSTRAINT `zprava_osoba_ibfk_1` FOREIGN KEY (`zprava_id`) REFERENCES `{tbls3}zprava` (`id`),
   ADD CONSTRAINT `zprava_osoba_ibfk_2` FOREIGN KEY (`osoba_id`) REFERENCES `{tbls3}osoba` (`id`);
+  
+INSERT INTO `{tbls3}user_resource` (`code`, `name`) VALUES ('Spisovka_ZpravyPresenter', 'Zprávy');
+SET @RESOURCE_ID=LAST_INSERT_ID();
+
+INSERT INTO `{tbls3}user_rule` (`resource_id`, `name`) VALUES (@RESOURCE_ID, 'Zobrazení zpráv');

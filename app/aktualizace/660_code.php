@@ -2,6 +2,9 @@
 
 function revision_660_check()
 {
+/*  Bohužel jedinečnost názvu spisů a spisových znaků nemůžeme pro stávající uživatele
+    aplikace vynucovat.
+    
     // --------------------------------------------------------------------
     $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`nazev`) AS pocet FROM [:PREFIX:spisovy_znak] GROUP BY `nazev`) subq WHERE pocet > 1');
     
@@ -13,6 +16,7 @@ function revision_660_check()
     
     if (count($result))
         throw new Exception('Kontrola integrity dat selhala. Název spisu musí být jedinečný!');
+*/
 
     // --------------------------------------------------------------------    
     $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`code`) AS pocet FROM [:PREFIX:user_role] GROUP BY `code`) subq WHERE pocet > 1');
