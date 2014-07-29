@@ -135,7 +135,7 @@ class Authenticator_Base extends Control
     // Vytvoří uživatelský účet a případně i účet osoby
     // $osoba_data - je buď id osoby nebo pole
     // vrátí boolean - úspěch operace
-    protected function vytvoritUcet($osoba_data, $user_data, $silent = false)
+    public function vytvoritUcet($osoba_data, $user_data, $silent = false)
     {
         $osoba_vytvorena = false;
         
