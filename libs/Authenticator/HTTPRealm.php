@@ -328,12 +328,4 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
         
     }
 
-
-    public function handleSync($data)
-    {
-        unset($data['synchonizovat']);
-
-        $this->presenter->redirect('this');
-    }
-
 }

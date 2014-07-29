@@ -3,19 +3,13 @@
 class Authenticator_Base extends Control
 {
 
-    public function formAddRoleSelect(AppForm $form)
+    protected function formAddRoleSelect(AppForm $form)
     {
         $Role = new RoleModel();
-        $role_seznam = $Role->seznam();
-        $role_select = array();
-        foreach ($role_seznam as $key => $value) {
-            $role_select[ $value->id ] = $value->name;
-        }        
-
-        $form->addSelect('role', 'Role:', $role_select);    
+        $form->addSelect('role', 'Role:', $Role->seznam());    
     }
 
-    public function formAddOrgSelect(AppForm $form)
+    protected function formAddOrgSelect(AppForm $form)
     {
         $m = new Orgjednotka;
         $seznam = $m->linearniSeznam();
@@ -26,40 +20,158 @@ class Authenticator_Base extends Control
         $form->addSelect('orgjednotka_id', 'Organizační jednotka:', $select);
     }
     
-    public function handleNewUser($data)
+    // Přidá uživatelský účet existující osobě
+    protected function handleNewUser($data)
     {
-        if ( isset($data['osoba_id']) ) {
-
-            $User = new UserModel();
-
-            $user_data = array(
-                'username' => $data['username'],
-                'heslo' => $data['heslo'],
-                'orgjednotka_id' => $data['orgjednotka_id']
-            );
-            if (isset($data['local']))
-                $user_data['local'] = $data['local'];
-
-            try {
-                $user_id = $User->insert($user_data);
-                $User->pridatUcet($user_id, $data['osoba_id'], $data['role']);
-
-                $this->presenter->flashMessage('Účet uživatele "'. $data['username'] .'" byl úspěšně vytvořen.');
-                $this->presenter->redirect('this',array('id'=>$data['osoba_id']));
-            }
-            catch (DibiException $e) {
-                if ( $e->getCode() == 1062 ) {
-                    $this->presenter->flashMessage('Uživatel "'. $data['username'] .'" již existuje. Zvolte jiný.','warning');
-                } else {
-                    $this->presenter->flashMessage('Účet uživatele se nepodařilo vytvořit.','warning');
-                }
-                $this->presenter->redirect('this',array('id'=>$data['osoba_id'],'new_user'=>1));
-            }
-        } else {
-            //$this->presenter->redirect('this');
+        if (!isset($data['osoba_id'])) {
+            $this->presenter->redirect('this');
         }
+        
+        $this->vytvoritUcet($data['osoba_id'], $data);
+
+        $this->presenter->redirect('this', array('id' => $data['osoba_id']));
+    }
+
+    // nedelej nic
+    protected function handleSync($data)
+    {
         $this->presenter->redirect('this');
     }
     
+    // Pouzito pro SSO a LDAP
+    protected function handleSync2($data)
+    {
+        unset($data['synchonizovat']);
+        
+        if ( count($data)>0 ) {
+            $Osoba = new Osoba();
+            $User = new UserModel();
+            $user_add = 0;
+            foreach ( $data as $user ) {
+                if ( isset($user['add']) && $user['add'] == true ) {
+
+                    $osoba = array(
+                        'jmeno' => $user['jmeno'],
+                        'prijmeni' => $user['prijmeni'],
+                        'email' => $user['email']
+                    );
+
+                    $user_data = array(
+                        'username' => $user['username'],
+                        'heslo' => $user['email'],
+                        'local' => 1,
+                        'role' => $user['role']
+                    );
+                    
+                    $success = $this->vytvoritUcet($osoba, $user_data);
+
+                    $user_add++;
+
+                }
+            }
+            if ( $user_add == 0 ) {
+                $this->presenter->flashMessage('Nebyli přidáni žádní zaměstnanci.');
+            }
+
+        } else {
+            $this->presenter->flashMessage('Nebyli přidáni žádní zaměstnanci.');
+        }
+
+        $this->presenter->redirect('this');
+    }
+    
+    // pouze SSO a LDAP
+    protected function handleSyncManual()
+    {
+        $data = Environment::getHttpRequest()->getPost();
+        
+        if ( isset($data['usersynch_pripojit']) && count($data['usersynch_pripojit'])>0 ) {
+            $Osoba = new Osoba();
+            $User = new UserModel();
+            $user_add = 0;
+            foreach ( $data['usersynch_pripojit'] as $index => $status )
+                if ( $status == "on" ) {
+                
+                    $username = $data['usersynch_username'][$index];
+                    
+                    $osoba = array(
+                        'jmeno' => $data['usersynch_jmeno'][$index],
+                        'prijmeni' => $data['usersynch_prijmeni'][$index],
+                        'email' => $data['usersynch_email'][$index],
+                    );
+                    if (isset($data['usersynch_titul_pred'][$index]))
+                        $osoba['titul_pred'] = $data['usersynch_titul_pred'][$index];
+                    if (isset($data['usersynch_telefon'][$index]))
+                        $osoba['telefon'] = $data['usersynch_telefon'][$index];
+                    if (isset($data['usersynch_funkce'][$index]))
+                        $osoba['pozice'] = $data['usersynch_funkce'][$index];                        
+                    
+                    $user_data = array(
+                        'username' => $username,
+                        'heslo' => $data['usersynch_email'][$index],
+                        'local' => 1,
+                        'role' => $data['usersynch_role'][$index]
+                    );
+                    
+                    $success = $this->vytvoritUcet($osoba, $user_data);
+
+                    $user_add++;
+                }
+
+            if ( $user_add == 0 ) {
+                $this->presenter->flashMessage('Nebyli přidáni žádní zaměstnanci.');
+            }
+
+        } else {
+            $this->presenter->flashMessage('Nebyli přidáni žádní zaměstnanci.');
+        }
+
+        if ( Environment::getHttpRequest()->getMethod() == "POST" ) {
+            //$this->presenter->redirect('this');
+            header("Location: ". Environment::getHttpRequest()->getUri()->getAbsoluteUri() ,"303");
+        }
+    }
+    
+    // Vytvoří uživatelský účet a případně i účet osoby
+    // $osoba_data - je buď id osoby nebo pole
+    // vrátí boolean - úspěch operace
+    protected function vytvoritUcet($osoba_data, $user_data, $silent = false)
+    {
+        $osoba_vytvorena = false;
+        
+        try {
+            if (is_array($osoba_data)) {
+                $osoba_model = new Osoba;
+                $osoba_id = $osoba_model->ulozit($osoba_data);
+                $osoba_vytvorena = true;
+            }
+            else
+                $osoba_id = $osoba_data;
+                
+            UserModel::pridatUcet($osoba_id, $user_data);            
+
+            if (!$silent)
+                $this->presenter->flashMessage('Účet uživatele "'. $user_data['username'] .'" byl úspěšně vytvořen.');
+            
+            return true;
+        }
+        catch (Exception $e) {
+            if (!$silent)
+                if ( $e->getCode() == 1062 ) {
+                    $this->presenter->flashMessage("Uživatelský účet s názvem \"{$user_data['username']}\" již existuje. Zvolte jiný název.", 'warning');
+                } else {
+                    $this->presenter->flashMessage('Účet uživatele se nepodařilo vytvořit.', 'warning');
+                    $this->presenter->flashMessage('Chyba: '. $e->getMessage(), 'warning');
+                }
+            
+            if ($osoba_vytvorena) {
+                // pokud byl uživatel vytvořen "napůl", odstraň záznam zaměstnance
+                $osoba_model->delete("[id] = $osoba_id");
+            }
+
+            return false;
+        }
+    }
+
 }
 

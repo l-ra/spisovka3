@@ -1028,17 +1028,18 @@ class Install_DefaultPresenter extends BasePresenter
 
         $user_data = array(
             'username'=>$data['username'],
-            'heslo'=>$data['heslo']
+            'heslo'=>$data['heslo'],
+            'role' => 1
         );
 
         unset($data['username'], $data['heslo'], $data['heslo_potvrzeni']);
 
-        try {
-
-            $user_id = $User->insert($user_data);
-            $osoba_id = $Osoba->insert($data);
-            $User->pridatUcet($user_id, $osoba_id, 1);
-
+        $auth = new Authenticator_Base();
+        
+        if (!$auth->vytvoritUcet($data, $user_data, true)) {
+            $this->flashMessage('Správce se nepodařilo vytvořit.', 'warning');
+        }
+        else {
             $session = Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
                 $session->step = array();
@@ -1046,12 +1047,9 @@ class Install_DefaultPresenter extends BasePresenter
             @$session->step['spravce'] = 1;
 
             $this->redirect('konec');
-        } catch (DibiException $e) {
-            $this->flashMessage('Správce se nepodařilo vytvořit.','warning');
-            $this->flashMessage($e->getMessage(),'warning');
         }
 
-    }    
+    }
 
     /***/
 

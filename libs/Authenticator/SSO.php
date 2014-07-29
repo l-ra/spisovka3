@@ -867,138 +867,15 @@ class Authenticator_SSO extends Authenticator_Base implements IAuthenticator
             'local' => 1
         );
 
-        try {
-            
-            dibi::begin();
-
-            $user_id = $User->insert($user_data);
-            $osoba_id = $Osoba->ulozit($osoba_data);
-            $User->pridatUcet($user_id, $osoba_id, 2);
-            
-            dibi::commit();
-
-            $this->presenter->flashMessage('Účet uživatele "'. $user_data['username'] .'" byl úspěšně vytvořen.');
-        } catch (DibiException $e) {
-            if ( $e->getCode() == 1062 ) {
-                $this->presenter->flashMessage('Uživatel "'. $user_data['username'] .'" již existuje. Kontaktujte svého správce pro vyřešení tohoto problému.','warning');
-            } else {
-                $this->presenter->flashMessage('Účet uživatele se nepodařilo vytvořit.','warning');
-                $this->presenter->flashMessage('Chyba: '. $e->getMessage(),'warning');
-            }
-        }
+        $this->vytvoritUcet($osoba_data, $user_data);
         
         $this->presenter->redirect('this');
     }    
 
     public function handleSync($data)
     {
-        unset($data['synchonizovat']);
-        
-        if ( count($data)>0 ) {
-            $Osoba = new Osoba();
-            $User = new UserModel();
-            $user_add = 0;
-            foreach ( $data as $user ) {
-                if ( isset($user['add']) && $user['add'] == true ) {
-
-                    dibi::begin();
-
-                    $user_data = array(
-                        'username' => $user['username'],
-                        'heslo' => $user['email'],
-                        'local' => 1
-                    );
-                    $user_id = $User->insert($user_data);
-
-                    $osoba = array(
-                        'jmeno' => $user['jmeno'],
-                        'prijmeni' => $user['prijmeni'],
-                        'email' => $user['email']
-                    );
-                    $osoba_id = $Osoba->ulozit($osoba);
-                    $User->pridatUcet($user_id, $osoba_id, $user['role']);
-
-                    dibi::commit();
-
-                    $this->presenter->flashMessage('Uživatel "'. $user['username'] .'" byl přidán do systému.');
-                    $user_add++;
-
-                }
-            }
-            if ( $user_add == 0 ) {
-                $this->presenter->flashMessage('Nebyli přidáni žádní zaměstnanci.');
-            }
-
-        } else {
-            $this->presenter->flashMessage('Nebyli přidáni žádní zaměstnanci.');
-        }
-
-        $this->presenter->redirect('this');
-
+        $this->handleSync2($data);
     }
-
-    public function handleSyncManual()
-    {
-        $data = Environment::getHttpRequest()->getPost();
-        
-        if ( isset($data['usersynch_pripojit']) && count($data['usersynch_pripojit'])>0 ) {
-            $Osoba = new Osoba();
-            $User = new UserModel();
-            $user_add = 0;
-            foreach ( $data['usersynch_pripojit'] as $index => $status ) {
-                if ( $status == "on" ) {
-
-                    $user = array(
-                        'username' => $data['usersynch_username'][$index],
-                        'prijmeni' => $data['usersynch_prijmeni'][$index],
-                        'jmeno' => $data['usersynch_jmeno'][$index],
-                        'email' => $data['usersynch_email'][$index],
-                        'telefon' => $data['usersynch_telefon'][$index],
-                        'pozice' => $data['usersynch_funkce'][$index],
-                        'titul_pred' => $data['usersynch_titul_pred'][$index],
-                        'role' => $data['usersynch_role'][$index],
-                    );
-                    
-                    dibi::begin();
-
-                    $user_data = array(
-                        'username' => $user['username'],
-                        'heslo' => $user['email'],
-                        'local' => 1
-                    );
-                    $user_id = $User->insert($user_data);
-
-                    $osoba = array(
-                        'jmeno' => $user['jmeno'],
-                        'prijmeni' => $user['prijmeni'],
-                        'titul_pred' => $user['titul_pred'],
-                        'email' => $user['email'],
-                        'telefon' => $user['telefon'],
-                        'pozice' => $user['pozice']
-                    );
-                    $osoba_id = $Osoba->ulozit($osoba);
-                    $User->pridatUcet($user_id, $osoba_id, $user['role']);
-
-                    dibi::commit();
-
-                    $this->presenter->flashMessage('Uživatel "'. $user['username'] .'" byl přidán do systému.');
-                    $user_add++;
-
-                }
-            }
-            if ( $user_add == 0 ) {
-                $this->presenter->flashMessage('Nebyli přidáni žádní zaměstnanci.');
-            }
-
-        } else {
-            $this->presenter->flashMessage('Nebyli přidáni žádní zaměstnanci.');
-        }
-
-        if ( Environment::getHttpRequest()->getMethod() == "POST" ) {
-            //$this->presenter->redirect('this');
-            header("Location: ". Environment::getHttpRequest()->getUri()->getAbsoluteUri() ,"303");
-        }
-    }    
 
     protected function mySelect($name,$data,$default=null)
     {

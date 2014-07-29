@@ -315,12 +315,4 @@ class Authenticator_Basic extends Authenticator_Base implements IAuthenticator
         
     }
 
-
-    public function handleSync($data)
-    {
-        unset($data['synchonizovat']);
-
-        $this->presenter->redirect('this');
-    }
-
 }

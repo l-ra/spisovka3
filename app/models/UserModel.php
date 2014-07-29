@@ -85,7 +85,7 @@ class UserModel extends BaseModel
         $rown = array('username'=>$data['username'],
                       'password'=>sha1($data['username'] . $data['heslo']),
                       'date_created'=> new DateTime(),
-                      'local' => (isset($data['local'])?$data['local']:0),
+                      'local' => (isset($data['local']) ? $data['local'] : 0),
                       'orgjednotka_id' => isset($data['orgjednotka_id']) && !empty($data['orgjednotka_id']) ? $data['orgjednotka_id'] : NULL,
                       'active'=>1
                 );
@@ -93,9 +93,27 @@ class UserModel extends BaseModel
         return parent::insert($rown);
     }
 
-    public function pridatUcet($user_id, $osoba_id, $role_id) {
+    public static function pridatUcet($osoba_id, $data) {
 
-        if ( !empty($user_id) && !empty($osoba_id) && !empty($role_id) ) {
+        $insert_data = array(
+            'username' => $data['username'],
+            'heslo' => $data['heslo'],
+        );
+        if (isset($data['orgjednotka_id']))
+            $insert_data['orgjednotka_id'] = $data['orgjednotka_id'];
+        if (isset($data['local']))
+            $insert_data['local'] = $data['local'];
+        
+        $role_id = $data['role'];
+
+        if (empty($osoba_id))
+            throw new Exception('UserModel::pridatUcet() - neplatné ID osoby');
+
+        try {
+            dibi::begin();
+            
+            $UserModel = new UserModel();
+            $user_id = $UserModel->insert($insert_data);
             
             $Osoba2User = new Osoba2User();
             $rowou = array( 'osoba_id'=>$osoba_id, 
@@ -104,19 +122,24 @@ class UserModel extends BaseModel
                     );
             $Osoba2User->insert_basic($rowou);
 
-            $User2Role = new User2Role();
-            $rowur = array( 'role_id'=>$role_id,
-                            'user_id'=>$user_id,
-                            'date_added'=>new DateTime()
-                    );
-            $User2Role->insert_basic($rowur);
-
-
+            if (!empty($role_id)) {
+                // přiřad účtu roli, jen pokud byla zadána
+                $User2Role = new User2Role();
+                $rowur = array( 'role_id'=>$role_id,
+                                'user_id'=>$user_id,
+                                'date_added'=>new DateTime()
+                        );
+                $User2Role->insert_basic($rowur);
+            }
+            
+            dibi::commit();
+            
             return true;
-        } else {
-            return null;
         }
-
+        catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
     }
 
     public function odebratUcet($osoba_id, $user_id) {

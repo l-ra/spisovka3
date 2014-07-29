@@ -389,8 +389,7 @@ class Authenticator_HTTPhtaccess extends Authenticator_Base implements IAuthenti
 
 
     public function handleUserRegistration($data)
-    {
-        
+    {        
         $Osoba = new Osoba();
         $osoba_data = array(
             'jmeno' => $data['jmeno'],
@@ -409,34 +408,9 @@ class Authenticator_HTTPhtaccess extends Authenticator_Base implements IAuthenti
             'local' => 1
         );
 
-        try {
-            
-            dibi::begin();
-
-            $user_id = $User->insert($user_data);
-            $osoba_id = $Osoba->ulozit($osoba_data);
-            $User->pridatUcet($user_id, $osoba_id, 2);
-            
-            dibi::commit();
-
-            $this->presenter->flashMessage('Účet uživatele "'. $user_data['username'] .'" byl úspěšně vytvořen.');
-        } catch (DibiException $e) {
-            if ( $e->getCode() == 1062 ) {
-                $this->presenter->flashMessage('Uživatel "'. $user_data['username'] .'" již existuje. Kontaktujte svého správce pro vyřešení tohoto problému.','warning');
-            } else {
-                $this->presenter->flashMessage('Účet uživatele se nepodařilo vytvořit.','warning');
-                $this->presenter->flashMessage('Chyba: '. $e->getMessage(),'warning');
-            }
-        }
+        $this->vytvoritUcet($osoba_data, $user_data);
         
         $this->presenter->redirect('this');
     }    
-
-    public function handleSync($data)
-    {
-        unset($data['synchonizovat']);
-
-        $this->presenter->redirect('this');
-    }
 
 }
