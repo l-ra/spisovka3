@@ -4,6 +4,7 @@ class DokumentSpis extends BaseModel
 {
 
     protected $name = 'dokument_to_spis';
+    protected $autoIncrement = false;
 
     // Funkce je zde kvůli kompatibilitě se starým kódem, aby se nemusel předělávat celý program
     public function spisy( $dokument_id ) {
