@@ -1035,6 +1035,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->odpoved = $dok->cislo_jednaci_id;
             $this->template->odpoved_na_dokument = true;
 
+            $this->template->typy_dokumentu = Dokument::typDokumentu();
+            
             $this->template->novyForm = $this['novyForm'];
             $this->setView('novy');
 
