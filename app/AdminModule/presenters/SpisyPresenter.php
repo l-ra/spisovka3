@@ -469,7 +469,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->select(2);
-        //$spisovy_znak_max = $Spisy->maxSpisovyZnak( $session_spisplan->spis_id );
 
         $form1 = new AppForm();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
@@ -479,9 +478,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $form1->addSelect('parent_id', 'Složka:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
 
-        //$form1->addText('spisovy_znak', 'Spisový znak:', 10, 10)
-        //        ->setValue($spisovy_znak_max)
-        //        ->getControlPrototype()->onblur("return kontrolaSpisovyZnak('novy');");
         $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
                 ->controlPrototype->onchange("vybratSpisovyZnak();");
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);

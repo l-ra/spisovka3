@@ -698,7 +698,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->select(2);
-        //$spisovy_znak_max = $Spisy->maxSpisovyZnak( $session_spisplan->spis_id );
 
         $form1 = new AppForm();
         $form1->addHidden('typ')

@@ -46,44 +46,6 @@ class Spis extends TreeModel
         return $row;        
     }
 
-    public function seznamSpisovychPlanu($pouze_aktivni = 0)
-    {
-        return null;
-        
-        if ( $pouze_aktivni ) {
-            $where = array("typ='SP'","stav=1");
-        } else {
-            $where = array(array("typ='SP'"));
-        }
-
-        $order = array('stav'=>'DESC','date_created'=>'DESC');
-        $query = $this->fetchAll($order,$where);
-        $rows = $query->fetchAll();
-        if ( count($rows)>0 ) {
-            $spis_plan = array();
-            foreach( $rows as $row ) {
-                $spis_plan[ $row->id ] = $row->nazev;
-            }
-            return $spis_plan;
-        } else {
-            return null;
-        }
-    }
-
-    public function getSpisovyPlan()
-    {
-
-        $where = array("typ='SP'","stav=1");
-        $order = array('stav'=>'DESC','date_created'=>'DESC');
-        $query = $this->fetchAll($order,$where,null,1);
-        $rows = $query->fetch();
-        if ( $rows ) {
-            return $rows->id;
-        } else {
-            return null;
-        }
-    }
-
     public function seznam($args = null, $select = 0, $parent_id = null)
     {
 
@@ -420,36 +382,6 @@ class Spis extends TreeModel
                 return implode($maska,$part_out);
             }
         }
-
-    }
-
-    public function maxSpisovyZnak( $spis_id = null )
-    {
-
-        if ( is_null($spis_id) ) {
-            $spisovy_znak = $this->fetchAll( array('spisovy_znak'=>'DESC'), array("typ='SP'"), null, 1);
-            $spisovy_znak_max = $spisovy_znak->fetch();
-
-            if ( $spisovy_znak_max ) {
-                return ($spisovy_znak_max->spisovy_znak + 1);
-            } else {
-                return 1;
-            }
-        } else {
-            $Spis = $this->getInfo($spis_id);
-            if ( $Spis ) {
-                $spisovy_znak = $this->fetchAll( array('spisovy_znak'=>'DESC'), array(array("parent_id=%i",$Spis->id)), null, 1);
-                $spisovy_znak_max = $spisovy_znak->fetch();
-                if ( $spisovy_znak_max ) {
-                    return ($spisovy_znak_max->spisovy_znak + 1);
-                } else {
-                    return 1;
-                }
-            } else {
-                return 1;
-            }
-        }
-
 
     }
 

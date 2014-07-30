@@ -726,13 +726,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 if ( !$spis ) {
                     // vytvorime spis
                     
-                    //$session_spisplan = Environment::getSession('s3_spisplan');
-                    //if ( !empty($session_spisplan->spis_id) ) {
-                    //    $spisplan_id = $session_spisplan->spis_id;
-                    //} else {
-                        $spisplan_id = $Spis->getSpisovyPlan();
-                    //}                    
-                    
                     $spis_new = array(
                         'nazev' => $cjednaci->cislo_jednaci,
                         'popis' => "",
@@ -740,11 +733,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         'skartacni_znak' => 'S',                            
                         'skartacni_lhuta' => '10',                          
                         'typ' => 'S',
-                        'stav' => 1
+                        'stav' => 1,
+                        'parent_id' => 1
                     );
-                    if ( !empty($spisplan_id) ) {
-                        $spis_new['parent_id'] = (int) $spisplan_id;
-                    }
                     $spis_id = $Spis->vytvorit($spis_new);
                     $spis = $Spis->getInfo($spis_id);
                 }
@@ -1404,11 +1395,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $Spis = new Spis();
                     $spis = $Spis->getInfo($data['cislo_jednaci']);
                     if ( !$spis ) {
-                        // zjistime aktualni spisovy plan
-                        $spisovy_plan = $Spis->getSpisovyPlan();
                         // vytvorime spis
                         $spis_new = array(
-                            'parent_id' => $spisovy_plan,
+                            'parent_id' => 1,
                             'nazev' => $data['cislo_jednaci'],
                             'popis' => $data['popis'],
                             'spousteci_udalost_id' => 3,
