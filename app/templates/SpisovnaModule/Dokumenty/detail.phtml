@@ -26,7 +26,7 @@
         {if $Lze_menit_skartacni_rezim}
         <a href="{link :Spisovna:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'skart_rezim' }">Upravit skartační režim</a>
         {/if}
-        {if empty($Zapujcka->id)}
+        {if $Lze_zapujcit}
         <a href="{link :Spisovna:Zapujcky:nova, 'dokument_id'=>$Dok->id}">Žádost o zápůjčku</a>
         {/if}
     </div>
@@ -350,7 +350,7 @@
         {/if}
     </div>
     
-    {if !empty($Zapujcka->id)}
+    {if $Zapujcka != null}
     <div id="dokument_blok_poznamka">
         <div class="h2">Zápůjčka</div>
         <dl class="detail_item">

@@ -354,15 +354,17 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             // dokument zobrazime
             $this->template->Dok = $dokument;
 
-            // Zapujcka
             $Zapujcka = new Zapujcka();
             if ( $dokument->stav_dokumentu == 9 || $dokument->stav_dokumentu == 10 ) {
-                $zapujcka = new stdClass();
-                $zapujcka->id = 1;
-                $this->template->Zapujcka = $zapujcka;
+                // stav archivovan nebo skartovan
+                $this->template->Zapujcka = null;
+                $this->template->Lze_zapujcit = false;
             }
-            else
+            else {
                 $this->template->Zapujcka = $Zapujcka->getDokument($dokument_id);
+                // lze zapujcit, pokud uz neni zapujcen
+                $this->template->Lze_zapujcit = $this->template->Zapujcka === null;
+            }
             
             $user = Environment::getUser();
 
