@@ -168,14 +168,6 @@
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
             <dd>Dokument není evidován!
-                {if $Pridelen==1}
-                {if $Typ_evidence == 'sberny_arch'}
-                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
-                <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do dokumentu/spisu</a>
-                {else}
-                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spis. služby</a>
-                {/if}
-                {/if}
             </dd>
         </dl>
         {else}
@@ -292,7 +284,7 @@
                 {if $Pridelen==1}
                 {if $Typ_evidence == 'sberny_arch'}
                 <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
-                <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do dokumentu/spisu</a>
+                <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do spisu</a>
                 {else}
                 <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spis. služby</a>
                 {/if}

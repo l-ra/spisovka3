@@ -16,17 +16,10 @@
             <dt>JID:</dt>
             <dd>{$Dok->jid}&nbsp;</dd>
         </dl>
-        {if empty($Dok->cislo_jednaci)}
-        <dl class="detail_item">
-            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
-            <dd>Dokument není evidován!</dd>
-        </dl>
-        {else}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
             <dd class="nadpis">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
-        {/if}
         <dl class="detail_item">
             <dt>Název spisu:</dt>
             <dd>

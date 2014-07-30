@@ -722,7 +722,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ( $this->typ_evidence == 'sberny_arch' ) {
 
                 $Spis = new Spis();
-                $spis = $Spis->getInfo($cjednaci->cislo_jednaci);
+                $spis = $Spis->findByName($cjednaci->cislo_jednaci);
                 if ( !$spis ) {
                     // vytvorime spis
                     
@@ -912,14 +912,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $Souvisejici = new SouvisejiciDokument();
                     $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dok_odpoved->id);
 
-                    $this->template->cjednaci = $CJ->nacti($dok->cislo_jednaci_id);
                 } else if ( $this->typ_evidence == 'sberny_arch' ) {
                     // sberny arch
                     //$dok_odpoved->poradi = $dok_odpoved->poradi;
-                    $this->template->cjednaci = $CJ->nacti($dok->cislo_jednaci_id);
-                } else {
-                    $this->template->cjednaci = $CJ->nacti($dok->cislo_jednaci_id);
                 }
+
+                $this->template->cjednaci = $CJ->nacti($dok->cislo_jednaci_id);
 
                 $this->template->Dok = $dok_odpoved;
 
@@ -1006,16 +1004,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         $Souvisejici->spojit($dok_odpoved->id,$dokument_id);
                         $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dok_odpoved->id);
                         
-                        $this->template->cjednaci = $CJ->nacti($dok->cislo_jednaci_id);
                     } else if ( $this->typ_evidence == 'sberny_arch' ) {
                         // sberny arch
                         //$dok_odpoved->poradi = $dok_odpoved->poradi;
-                        $this->template->cjednaci = $CJ->nacti($dok->cislo_jednaci_id);
-
-                    } else {
-                        $this->template->cjednaci = $CJ->nacti($dok->cislo_jednaci_id);
                     }
 
+                    $this->template->cjednaci = $CJ->nacti($dok->cislo_jednaci_id);
                     $this->template->Dok = $dok_odpoved;
                 } else {
                     $this->template->Dok = null;
@@ -1393,7 +1387,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 if ( $this->typ_evidence == 'sberny_arch' && isset($data['cislo_jednaci']) ) {
 
                     $Spis = new Spis();
-                    $spis = $Spis->getInfo($data['cislo_jednaci']);
+                    $spis = $Spis->findByName($data['cislo_jednaci']);
                     if ( !$spis ) {
                         // vytvorime spis
                         $spis_new = array(

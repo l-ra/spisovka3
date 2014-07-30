@@ -17,6 +17,14 @@ class Spis extends TreeModel
         return $detail ? $this->spisDetail($row) : $row;
     }
     
+    // Vrátí první spis z daným názvem, protože bohužel není zaručeno, že název spisu bude jedinečný
+    public function findByName($spis_name)
+    {
+        $result = $this->fetchRow(array('nazev=%s', $spis_name));
+        $row = $result->fetch();
+        return $row ? $row : null;
+    }
+    
     private function spisDetail($row)
     {
         $OrgJednotka = new Orgjednotka();
