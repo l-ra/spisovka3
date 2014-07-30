@@ -10,7 +10,7 @@ class DokumentSpis extends BaseModel
     public function spisy( $dokument_id ) {
 
         $spis = $this->spis($dokument_id);
-        return $spis ? array($spis->spis_id => $spis) : null;
+        return $spis ? array($spis->id => $spis) : null;
     }
 
     public function spis( $dokument_id ) {
