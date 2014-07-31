@@ -283,8 +283,8 @@
             <dd>Dokument není evidován!
                 {if $Pridelen==1}
                 {if $Typ_evidence == 'sberny_arch'}
-                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spisové služby - nový dokument/spis</a>
-                <br /><a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id, 'evidence'=>1}" id="dialog-cjednaci">Zaevidovat do spisové služby - vložit do spisu</a>
+                <br />Zaevidovat do spisové služby:&nbsp;&nbsp;<a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
+                &nbsp;&nbsp;<a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
                 {else}
                 <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spis. služby</a>
                 {/if}

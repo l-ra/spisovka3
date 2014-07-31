@@ -1653,15 +1653,12 @@ class Dokument extends BaseModel
 
     public function getBasicInfo($dokument_id) {
 
-        $where = array( array('id=%i',$dokument_id) );
-        $order_by = array('id'=>'DESC');
-        $limit = 1;
+        $where = array( array('id=%i', $dokument_id) );
 
-        $select = $this->fetchAll($order_by, $where, null, $limit);
+        $select = $this->fetchAll(null, $where);
         $result = $select->fetch();
 
         return $result;
-
     }
 
     public function getMax() {

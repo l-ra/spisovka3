@@ -1269,9 +1269,9 @@ function nastylovat(data,typ) {
     if ( typ == 1 ) {
 
         if ( is_simple == 1 ) {
-            var url = baseUri + '?presenter=Spisovka%3Adokumenty&id='+ dokument_id +'&action=cjednaciadd&spojit_s=';
+            var url = baseUri + '?presenter=Spisovka%3Adokumenty&id='+ dokument_id +'&action=vlozitdosbernehoarchu&vlozit_do=';
         } else {         
-            var url = baseUri + 'dokumenty/'+ dokument_id +'/cjednaciadd?spojit_s=';
+            var url = baseUri + 'dokumenty/'+ dokument_id +'/vlozitdosbernehoarchu?vlozit_do=';
         }
         var fnc = "pripojitDokument(this)";
     } else {

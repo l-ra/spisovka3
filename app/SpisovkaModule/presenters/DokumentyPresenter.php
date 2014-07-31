@@ -37,7 +37,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderDefault()
     {
-
         $post = $this->getRequest()->getPost();
         if ( isset($post['hromadna_submit']) ) {
             $this->actionAkce($post);
@@ -672,6 +671,64 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $this->template->dokument_id = $this->getParam('id',null);
         $this->template->evidence = $this->getParam('evidence',0);
+    }
+
+    // tato metoda slouží pouze pro sběrný arch
+    public function actionVlozitdosbernehoarchu()
+    {
+        try {
+            if ($this->typ_evidence != 'sberny_arch')
+                throw new Exception("operace je platná pouze u typu evidence sběrný arch");
+                
+            $dokument_id = (int) $this->getParam('id',null);
+            $iniciacni_dokument_id = (int) $this->getParam('vlozit_do',null);
+
+            $Dokument = new Dokument();
+
+            // getBasicInfo neháže výjimku, pokud dokument neexistuje
+            // nasledujici prikaz pouze overi, ze dokument_id existuje
+            $dok1 = $Dokument->getBasicInfo($dokument_id);
+            // predpoklad - dok2 je iniciacni dokument spisu
+            $dok2 = $Dokument->getBasicInfo($iniciacni_dokument_id);
+
+            if (!($dok1 && $dok2) || $dok2->poradi != 1)
+                throw new Exception("neplatný parametr");
+            
+            // spojit s dokumentem
+            $poradi = $Dokument->getMaxPoradi($dok2->cislo_jednaci_id);
+
+            $cislo_jednaci = $dok2->cislo_jednaci;
+            $data = array();
+            $data['cislo_jednaci_id'] = $dok2->cislo_jednaci_id;
+            $data['cislo_jednaci'] = $cislo_jednaci;
+            $data['poradi'] = $poradi;
+            $data['podaci_denik'] = $dok2->podaci_denik;
+            $data['podaci_denik_poradi'] = $dok2->podaci_denik_poradi;
+            $data['podaci_denik_rok'] = $dok2->podaci_denik_rok;
+
+            // predpoklad - spis musi existovat, jinak je neco hodne spatne
+            $Spis = new Spis();
+            $spis = $Spis->findByName($cislo_jednaci);
+            if (!$spis)
+                throw new Exception("chyba integrity dat. Spis '$cislo_jednaci' neexistuje.");
+
+            $Dokument->update($data, array(array('id=%i',$dokument_id)));
+                
+            // pripojime
+            $DokumentSpis = new DokumentSpis();
+            $DokumentSpis->pripojit($dokument_id, $spis->id);
+            // zaznam do logu az nakonec, kdyz jsou vsechny operace uspesne
+            
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_UNDEFINED, 'Dokument připojen do evidence. Přiděleno číslo jednací: '.$cislo_jednaci);
+
+            echo '###zaevidovano###'. $this->link('detail',array('id'=>$dokument_id));
+        }
+        catch (Exception $e) {
+            echo __METHOD__ . "() - " . $e->getMessage();
+        }
+        
+        $this->terminate();
     }
 
     public function actionPridelitcj()

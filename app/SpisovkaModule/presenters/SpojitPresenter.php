@@ -25,14 +25,14 @@ class Spisovka_SpojitPresenter extends BasePresenter
 
     public function renderNacti()
     {
-        $dokument_id = $this->getParam('id',null);
-        $evidence = $this->getParam('evidence',0);
         $query = $this->getParam('q',null);
 
         $Dokument = new Dokument();
         $args = $Dokument->hledat($query,'dokument');
         $args['order'] = array('d.podaci_denik_rok','d.podaci_denik_poradi','d.poradi');
 
+        // nehledej mezi dokumenty ve spisovně
+        $args = $Dokument->spisovka($args);
         $seznam = $Dokument->seznam($args);
 
         if ( count($seznam)>0 ) {
@@ -49,8 +49,10 @@ class Spisovka_SpojitPresenter extends BasePresenter
 
                 $dok = $Dokument->getBasicInfo($dokument_id);
 
-                if ( $this->typ_evidence == "sberny_arch" ) {
-                    if ( $dok->poradi != 1 ) continue;
+                // Tomášovina - kód je použit též u sběrného archu pro zařazení dokumentu do spisu
+                if ($this->typ_evidence == "sberny_arch") {
+                    if ($dok->poradi != 1 || empty($dok->cislo_jednaci))
+                        continue;
                 }
 
                 $tmp[ $dok->id ]['dokument_id'] = $dok->id;

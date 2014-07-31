@@ -54,24 +54,23 @@
             <dt>JID:</dt>
             <dd>{$cjednaci->app_id}-ESS-{$Dok->id}&nbsp;</dd>
         </dl>
+        {if $Typ_evidence != 'sberny_arch'}
         <dl class="detail_item">
-            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
+            <dt>Číslo jednací:</dt>
             <dd style="color: #808080;">
-                <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;
-                {if $Typ_evidence == 'sberny_arch'} / {$novyForm['poradi']->control} &nbsp; <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">Vložit do existujícího spisu</a> {/if}
+                <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;                
                 <span style="color:#000000; font-weight: normal;">(není-li uvedeno jinak, je číslo jednací pouze informativní!)</span>
             </dd>
         </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
             <dd>{$novyForm['dokument_typ_id']->control}</dd>
         </dl>
+        {if $Typ_evidence != 'sberny_arch'}
         <dl class="detail_item">
             <dt>Název spisu:</dt>
             <dd>
-                {if $Typ_evidence == 'sberny_arch'}
-                &nbsp;
-                {else}
                 <span id="dok_spis">
                 {if count($Spisy)>0 }
                     {foreach $Spisy as $s}
@@ -84,9 +83,9 @@
                 </span>
 
                 <a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}" id="dialog-spis">Připojit spis</a>
-                {/if}
             </dd>
         </dl>
+        {/if}
         <dl class="detail_item">
             <dt>{$novyForm['nazev']->label}</dt>
             <dd>{$novyForm['nazev']->control}</dd>
