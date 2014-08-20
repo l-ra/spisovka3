@@ -221,10 +221,17 @@ class CisloJednaci extends BaseModel
             $info['urad_zkratka'] = $row->urad_zkratka;
             $info['urad_poradi'] = $row->urad_poradi;
 
-            $info['orgjednotka_id'] = $row->orgjednotka_id;
-            $OrgJednotka = new Orgjednotka();
-            $org_info = $OrgJednotka->getInfo($row->orgjednotka_id);
-            $info['org'] = @$org_info->ciselna_rada;
+            $orgjednotka_id = $row->orgjednotka_id;
+            $info['orgjednotka_id'] = $orgjednotka_id;
+            if ($orgjednotka_id !== null) {
+                $OrgJednotka = new Orgjednotka();
+                $org_info = $OrgJednotka->getInfo($orgjednotka_id);
+                $info['org'] = $org_info->ciselna_rada;
+            }
+            else {
+                $info['org'] = null;
+            }
+            
             $info['org_poradi'] = $row->org_poradi;
 
             $info['user_id'] = $row->user_id;

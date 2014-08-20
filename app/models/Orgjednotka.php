@@ -10,12 +10,7 @@ class Orgjednotka extends TreeModel
     
     
     public function getInfo($orgjednotka_id)
-    {
-        if ( is_null($orgjednotka_id) ) {
-            // TODO chyba pri vytvareni odpovedi - pri generovani cisla jednaciho
-            return null;
-        }
-        
+    {       
         $result = $this->fetchRow(array('id=%i',$orgjednotka_id));
         if (count($result) == 0)   
             throw new InvalidArgumentException("Organizační jednotka id '$orgjednotka_id' neexistuje.");
