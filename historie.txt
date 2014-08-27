@@ -6,6 +6,9 @@
 
 Nové funkce:
 
+- naplnění číselníku států. Státy, které má aplikace nabízet je potřeba zvolit
+  jako aktivní.
+  
 Jiné změny:
 
 - sestavy nyní tisknou záhlaví tabulky na každé stránce

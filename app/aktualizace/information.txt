@@ -42,3 +42,5 @@ Aktualizace probíhá na pozadí, výstup pouze informuje.
 [700]
 - změny oprávnění pro spisovnu
 - pokud role pro spisovnu neexistují (např. po upgradu ze spisovky 3.0), jsou vytvořeny 
+[720]
+- naplnění číselníku států
