@@ -83,3 +83,7 @@ td.typ { width: 10px; }
 th.typ { width: 10px; }
 td.cislo_jednaci { text-align: right; }
 th.cislo_jednaci { text-align: right; }
+
+@media print {
+   thead { display: table-header-group; }
+}
