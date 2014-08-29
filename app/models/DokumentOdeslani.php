@@ -162,8 +162,10 @@ class DokumentOdeslani extends BaseModel
         foreach ($result as $index => $row) {
             if (is_array($filtr)) {
                 // filtruj podle druhu zasilky
+                $a_result = null;
                 $a_druh_db = unserialize($row->druh_zasilky);
-                $a_result = array_intersect($a_druh_db, $filtr);
+                if (is_array($a_druh_db))
+                    $a_result = array_intersect($a_druh_db, $filtr);
                 if (empty($a_result))
                     continue;
             }

@@ -5,7 +5,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
-    private $pdf_output = 0;
+    private $pdf_output = false;
     private $seradit = null;
     // retezec, ktery uzivatel zadal do vyhledavaciho pole
     private $jednoduche_hledani = null;
@@ -53,20 +53,12 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->template->zobraz_zrusit_filtr = !empty($filtr);
         
         // Volba vystupu - web/tisk/pdf
-        /* if ( $this->getParam('print') ) {
-            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, $hledat, "doporucene");
+        if ($this->getParam('print') || $this->getParam('print_balik')) {
+            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
+            $filtr_tisk = $this->getParam('print_balik') ? "balik" : "doporucene";
+            $seznam = $Dokument->kOdeslani($seradit, $hledat, $filtr_tisk);
+            $this->pdf_output = true;
             $this->template->count_page = ceil(count($seznam)/10);
-            
-            $this->setLayout(false);
-            $this->setView('podaciarchnew');
-        }*/
-        if ( $this->getParam('pdfprint') ) {
-            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, $hledat, "doporucene");
-            $this->pdf_output = 1;
-            $this->template->count_page = ceil(count($seznam)/10);
-
             $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
             $this->template->zpusob_uhrady = Settings::get('Ceska_posta_zpusob_uhrady', '');
             
@@ -75,26 +67,10 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             $this->template->zpusoby_uhrad = $ciselnik;
             
             $this->setLayout(false);
-            $this->setView('podaciarchnew');
-        } elseif ( $this->getParam('print_balik') ) {
-            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, $hledat, "balik");
-            $this->template->count_page = ceil(count($seznam)/10);
-            
-            $this->setLayout(false);
             $this->setView('podaciarch');
-        } elseif ( $this->getParam('pdfprint_balik') ) {
-            @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-            $seznam = $Dokument->kOdeslani($seradit, $hledat, "balik");
-            $this->pdf_output = 2;
-            
-            $this->template->count_page = ceil(count($seznam)/10);
-            
-            $this->setLayout(false);
-            $this->setView('podaciarch');            
-        } else {
+        }
+        else {
             $seznam = $Dokument->kOdeslani($seradit, $hledat, $filtr);
-            //$seznam = $result->fetchAll();
         }
 
         /*if ( count($seznam)>0 ) {
@@ -109,7 +85,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     protected function shutdown($response) {
         
-        if ($this->pdf_output == 1 || $this->pdf_output == 2) {
+        if ($this->pdf_output) {
 
             ob_start();
             $response->send();
@@ -120,12 +96,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 $content = str_replace("<td", "<td valign='top'", $content);
                 
                 // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
-                if ( $this->pdf_output == 2 ) {
-                    $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
-                } else {
-                    $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica',
+                $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica',
                                 7, 9, 8, 6, 0, 0);
-                }
                 
                 $app_info = Environment::getVariable('app_info');
                 $app_info = explode("#",$app_info);
@@ -257,22 +229,16 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             
         }
         
+        $odes = $DokumentOdeslani->get($id);
         
-        $dokument = $DokumentOdeslani->get($id);
-        
-        if ( !empty($dokument->druh_zasilky) ) {
-            $dokument->druh_zasilky = array_flip($dokument->druh_zasilky);
-        }
-        
-        $this->template->dokument = $dokument;
+        $this->template->dokument = $odes;
 
-        $this->template->DruhZasilky = DruhZasilky::get(null,1);
+        $this->addComponent(new VyberPostovniZasilky($odes->druh_zasilky), 'druhZasilky');
         
         $this->setLayout(false);
         
     }   
-   
-
+       
     protected function createComponentSeraditForm()
     {
 
@@ -377,7 +343,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     
     public function renderFiltrovat()
     {
-        $this->template->DruhZasilky = DruhZasilky::get(null,1);
+        $filtr = UserSettings::get('vypravna_filtr');
+        $this->addComponent(new VyberPostovniZasilky($filtr), 'druhZasilky');
         $this->setLayout(false);
     }
 }

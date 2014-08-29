@@ -156,7 +156,6 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik->setTable('zpusob_odeslani');
         $ciselnik->setParams($this->getParam());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:zpusobodeslani'));
-        $ciselnik->addParam('no_delete', 'fixed');
         $ciselnik->addColumn('id',
                     array(
                         'title' => 'ID',
@@ -213,7 +212,6 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik->setParams($this->getParam());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:zpusobdoruceni'));
 
-        $ciselnik->addParam('no_delete', 'fixed');
         $ciselnik->addColumn('id',
                     array(
                         'title' => 'ID',
@@ -374,6 +372,56 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $this->setView('detail');
     }
     
+    public function actionDruhzasilky()
+    {
+        $this->template->ciselnik_title = "Druh zásilky";
+        $this->template->title = " - ". $this->template->ciselnik_title ." - číselník";
+
+        $ciselnik = new CiselnikSpousteciUdalost();
+        $ciselnik->setTable('druh_zasilky');
+        $ciselnik->setParams($this->getParam());
+        $ciselnik->setLink($this->link(':Admin:Ciselniky:druhzasilky'));
+        $ciselnik->addParam('no_delete', true);
+        $ciselnik->orderBy('order');
+        
+        $ciselnik->addColumn('id',
+                    array(
+                        'title' => 'ID',
+                        'link' => false,
+                        'form' => 'hidden',
+                        'view' => false
+                    )
+                );
+        $ciselnik->addColumn('nazev',
+                    array(
+                        'title' => 'Název',
+                        'link' => true,
+                        'form' => 'text',
+                        'view' => true
+                    )
+                );
+        $ciselnik->addColumn('order',
+                    array(
+                        'title' => 'Pořadí',
+                        'link' => false,
+                        'form' => 'text',
+                        'view' => true
+                    )
+                );
+        $ciselnik->addColumn('stav',
+                    array(
+                        'title' => 'Stav',
+                        'link' => false,
+                        'form' => 'select',
+                        'form_select' => array('0'=>'Neaktivní','1'=>'Aktivní'),
+                        'view' => true
+                    )
+                );
+
+        $this->addComponent($ciselnik, 'ciselnik');
+
+        $this->setView('detail');
+    }
     
     public function ciselnikFormHandler(SubmitButton $button)
     {

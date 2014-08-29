@@ -1189,8 +1189,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
 
-            $this->template->DruhZasilky = DruhZasilky::get(null,1);
-            
+            $this->addComponent(new VyberPostovniZasilky(), 'druhZasilky');
+
             $this->template->OpravnenOdeslatDZ = Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani');
 
             $this->template->ZpusobyOdeslani = ZpusobOdeslani::getZpusoby();

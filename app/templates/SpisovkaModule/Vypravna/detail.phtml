@@ -6,11 +6,7 @@
     {if $dokument->zpusob_odeslani_id == 3}
     <dl>
         <dt>Druh zásilky:</dt>
-        <dd>
-            {foreach $DruhZasilky as $dz_index=>$dz_nazev}
-            <input type="checkbox" name="druh_zasilky[{$dz_index}]" {if isset($dokument->druh_zasilky[$dz_index])}checked="checked"{/if} />&nbsp;{$dz_nazev}
-            {/foreach}
-        &nbsp;</dd>
+        <dd>{widget druhZasilky}</dd>
     </dl>
     <dl>
         <dt>Cena Kč:</dt>

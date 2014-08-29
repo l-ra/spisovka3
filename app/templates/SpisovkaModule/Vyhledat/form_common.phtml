@@ -75,21 +75,7 @@
         <?php if (1) { ?>
         <dl class="detail_item">
             <dt>Druh zásilky:</dt>
-            <dd>
-                <?php
-                $druh_zasilky = array();
-                if ( isset($params['druh_zasilky']) && !empty($params['druh_zasilky']) ) {
-                    $druh_zasilky_a = unserialize($params['druh_zasilky']);
-                    foreach ( $druh_zasilky_a as $druh ) {
-                        $druh_zasilky[$druh] = $druh;
-                    }
-                }
-                ?>
-                {foreach $DruhZasilky as $dz_index=>$dz_nazev}
-                <input type="checkbox" name="druh_zasilky[{$dz_index}]" <?php echo isset($druh_zasilky[$dz_index])?' checked="checked"':''; ?> />&nbsp;{$dz_nazev}
-                {/foreach}
-                &nbsp;
-            </dd>
+            <dd>{$form['druh_zasilky']->render()}</dd>
         </dl>     
         <?php }//if 0 ?>        
         <dl class="detail_item">

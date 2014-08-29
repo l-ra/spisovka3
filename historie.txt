@@ -8,6 +8,8 @@ Nové funkce:
 
 - naplnění číselníku států. Státy, které má aplikace nabízet je potřeba zvolit
   jako aktivní.
+- výběr druhu poštovní zásilky je přehlednější a její číselník je možné
+  v administraci přizpůsobit
   
 Jiné změny:
 

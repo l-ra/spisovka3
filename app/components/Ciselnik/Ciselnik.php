@@ -150,12 +150,14 @@ class Ciselnik extends Control {
                 $id = !empty($this->primary)?$this->primary:'id';
                 $this->data = $model->fetchRow(array('%and', array($id => $this->_params['primary'] )))->fetch();
                 
-                $is_fixed = 0;
+                $can_delete = true;
                 if ( isset($this->data->fixed) ) {
                     if ( $this->data->fixed == 1 ) {
-                        $is_fixed = 1;
+                        $can_delete = false;
                     }
                 }
+                if (isset($this->_params['no_delete']) && isset($this->_params['no_delete']))
+                    $can_delete = false;
                 
             }
 
@@ -257,7 +259,7 @@ class Ciselnik extends Control {
             } else if ( $this->action == 'edit' ) {
                 $form->addHidden('primary')->setValue( $this->data->$id );
                 $form->addSubmit('upravitCiselnik', 'Upravit');
-                if ( !$is_fixed ) {
+                if ( $can_delete ) {
                     $form->addSubmit('odstranitCiselnik', 'Odstranit')
                             ->getControlPrototype()->onclick = "return confirm('Opravdu chcete smazat tento záznam?');";
                 }

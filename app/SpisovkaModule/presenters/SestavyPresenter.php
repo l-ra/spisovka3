@@ -324,9 +324,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         $this->template->form = $this['newForm'];
         $this->template->nadpis = 'Nová sestava';
-        
-        $this->template->DruhZasilky = DruhZasilky::get(null,1);
-        
+               
         $user = Environment::getUser();
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
         $this->setView('form');
@@ -336,8 +334,6 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         $this->template->form = $this['upravitForm'];
         $this->template->nadpis = 'Upravit sestavu';
-        
-        $this->template->DruhZasilky = DruhZasilky::get(null,1);
         
         $user = Environment::getUser();
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
@@ -436,6 +432,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:', 10);
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15);
 
+        $form->addComponent(new VyberPostovniZasilky(), 'druh_zasilky');
+        
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->select(2);
 
@@ -522,7 +520,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         if ( isset($sestava->zobrazeni_dat) && !empty($sestava->zobrazeni_dat))
             $params = array_merge($params, unserialize($sestava->zobrazeni_dat));        
 
-        unset($params['druh_zasilky'],$params['prideleno'],$params['predano'],$params['prideleno_org'],$params['predano_org']);        
+        unset($params['prideleno'],$params['predano'],$params['prideleno_org'],$params['predano_org']);        
 
         $form = $this->createForm();
         
@@ -536,6 +534,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $form['sestava_filtr']->setValue($sestava->filtr);
         }
 
+        if (isset($params['druh_zasilky']))
+            $form['druh_zasilky']->setValue($params['druh_zasilky']);
+        unset($params['druh_zasilky']);
+        
         if (!empty($params))
             foreach($params as $key => $value)
                 try {

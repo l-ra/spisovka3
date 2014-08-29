@@ -15,8 +15,6 @@ class Spisovka_VyhledatPresenter extends BasePresenter
     public function renderDefault()
     {
         $this->template->form = $this['searchForm'];
-
-        $this->template->DruhZasilky = DruhZasilky::get(null,1);
         
         $user = Environment::getUser();
         $this->template->muzeHledatDlePrideleni = 
@@ -160,8 +158,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             $hledat = null;
         }
         $this->template->params = $hledat;
-        //Debug::dump($hledat);
-        unset($hledat['druh_zasilky'],$hledat['prideleno'],$hledat['predano'],$hledat['prideleno_org'],$hledat['predano_org']);
+        // Debug::dump($hledat);
+        unset($hledat['prideleno'],$hledat['predano'],$hledat['prideleno_org'],$hledat['predano_org']);
         
         $form = new AppForm();
 
@@ -228,6 +226,10 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15)
                 ->setValue(@$hledat['datum_odeslani_cas_do']);
 
+        $vyber = isset($hledat['druh_zasilky']) ? unserialize($hledat['druh_zasilky']) : null;
+        $form->addComponent(new VyberPostovniZasilky($vyber), 'druh_zasilky');
+        unset($hledat['druh_zasilky']);
+        
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->select(2);
         

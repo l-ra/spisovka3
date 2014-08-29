@@ -1,14 +1,10 @@
 <form action="{link :Spisovka:Vypravna:filtrovat}" method="post" id="vypravna_form" >
-    <p>Filtrování zrušíte ponecháním všech polí nezaškrtnutých</p>
-        
     <dl>
         <dt>Druh zásilky:</dt>
         <dd>
             <input type="hidden" name="helper" value="1" />
-            {foreach $DruhZasilky as $dz_index=>$dz_nazev}
-            <input type="checkbox" name="druh_zasilky[{$dz_index}]" />&nbsp;{$dz_nazev}
-            {/foreach}
-        &nbsp;</dd>
+            {control druhZasilky}            
+        </dd>
     </dl>
     <dl>
         <dt>&nbsp;</dt>

@@ -104,11 +104,7 @@
                 </dl>                 
                 <dl>
                     <dt>Druh zásilky:</dt>
-                    <dd>
-                    {foreach $DruhZasilky as $dz_index=>$dz_nazev}
-                    <input type="checkbox" name="druh_zasilky[{$subjekt->id}][{$dz_index}]" />&nbsp;{$dz_nazev}
-                    {/foreach}
-                    &nbsp;</dd>
+                    <dd>{widget druhZasilky "druh_zasilky[$subjekt->id]"}</dd>
                 </dl>
                 <dl>
                     <dt>Cena Kč:</dt>
