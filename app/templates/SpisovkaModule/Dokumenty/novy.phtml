@@ -27,6 +27,22 @@
         {foreach $typy_dokumentu as $t}
         smer_typu_dokumentu[{$t->id}] = {$t->smer};
         {/foreach}
+        
+        $(document).ready(function() {
+            var typ_id = $('[name="dokument_typ_id"]').val();
+            if (smer_typu_dokumentu[typ_id] == 0)
+                $('.pouze_prichozi_dokument').show();
+            else
+                $('.pouze_prichozi_dokument').hide();
+                
+            $('[name="dokument_typ_id"]').change(function() {
+                var val = $(this).val();
+                if (smer_typu_dokumentu[val] == 0)
+                    $('.pouze_prichozi_dokument').show();
+                else
+                    $('.pouze_prichozi_dokument').hide();
+            });
+        });        
 	</script>
 @{/block}
 @{block debug}
@@ -98,7 +114,8 @@
             <dt>{$novyForm['datum_vzniku']->label}</dt>
             <dd>{$novyForm['datum_vzniku']->control} {$novyForm['datum_vzniku_cas']->control}</dd>
         </dl>
-        {if $isPodatelna}
+        {* tyto prvky jsou zobrazovany / skryvany Javascriptem *}
+        <div class="pouze_prichozi_dokument">
         <dl class="detail_item">
             <dt>{$novyForm['zpusob_doruceni_id']->label}</dt>
             <dd>{$novyForm['zpusob_doruceni_id']->control}</dd>
@@ -110,8 +127,8 @@
         <dl class="detail_item">
             <dt>Číslo doporučeného dopisu:</dt>
             <dd>{$novyForm['cislo_doporuceneho_dopisu']->control}</dd>
-        </dl>  
-        {/if}
+        </dl>
+        </div>
         {if 0}
         <dl class="detail_item">
             <dt>Poznámka:</dt>

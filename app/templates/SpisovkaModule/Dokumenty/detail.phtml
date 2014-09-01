@@ -209,7 +209,7 @@
             <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
             {/if}
         </dl>
-        {if $isRozdelany && $isPodatelna}
+        {if $isRozdelany && $Dok->typ_dokumentu->smer == 0}
         <dl class="detail_item">
             <dt>{$metadataForm['zpusob_doruceni_id']->label}</dt>
             <dd>{$metadataForm['zpusob_doruceni_id']->control}</dd>
@@ -220,13 +220,11 @@
             <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
         </dl>        
         {/if}
-        {if $isPodatelna}
+        {if $Dok->typ_dokumentu->smer == 0}
         <dl class="detail_item">
             <dt>Číslo doporučeného dopisu:</dt>
             <dd>{$metadataForm['cislo_doporuceneho_dopisu']->control}</dd>
         </dl>    
-        {/if}                
-        {if $isPodatelna}
         <dl class="detail_item">
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$metadataForm['cislo_jednaci_odesilatele']->control}</dd>

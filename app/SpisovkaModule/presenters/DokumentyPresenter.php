@@ -1297,16 +1297,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         if ( Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,spisovna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,4);
-            $this->template->isPodatelna = true;
         } else if ( Acl::isInRole('podatelna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,2);
-            $this->template->isPodatelna = true;
         } else if ( Acl::isInRole('admin') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,4);
-            $this->template->isPodatelna = true;            
         } else {
             $typ_dokumentu = Dokument::typDokumentu(null,1);
-            $this->template->isPodatelna = false;
         }
 
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
@@ -1326,16 +1322,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     ->controlPrototype->readonly = TRUE;
         }
 
-        if ( isset($dok->nazev) && $dok->nazev == "(bez názvu)" ) $dok->nazev = "";
-        if ( $this->template->isPodatelna ) {
-            $form->addText('nazev', 'Věc:', 80, 250)
-                    ->setValue(@$dok->nazev);
-            
-        } else {
-            $form->addText('nazev', 'Věc:', 80, 250)
-                    ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!')
-                    ->setValue(@$dok->nazev);
+        if (isset($dok->nazev) && $dok->nazev == "(bez názvu)")
+            $dok->nazev = "";
+        $form->addText('nazev', 'Věc:', 80, 250)
+                ->setValue(@$dok->nazev);
+        if (!Acl::isInRole('podatelna')) {
+            $form['nazev']->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
         }
+        
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$dok->popis);
         $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
@@ -1518,16 +1512,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         if ( Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,spisovna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,4);
-            $this->template->isPodatelna = true;
         } else if ( Acl::isInRole('podatelna') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,2);
-            $this->template->isPodatelna = true;
         } else if ( Acl::isInRole('admin') ) {
             $typ_dokumentu = Dokument::typDokumentu(null,4);
-            $this->template->isPodatelna = true;            
         } else {
             $typ_dokumentu = Dokument::typDokumentu(null,1);
-            $this->template->isPodatelna = false;
         }
         
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
@@ -1540,7 +1530,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $nazev_control = $form->addText('nazev', 'Věc:', 80, 250)
                     ->setValue($nazev);
-        if ( !$this->template->isPodatelna ) {
+        if ( !Acl::isInRole('podatelna') ) {
             $nazev_control->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
         }        
         
