@@ -785,14 +785,13 @@ label.required {
     width: 38px;
 }
 
-#dialog .seznam td.icon-view,
-#content .seznam td.icon-view {
-    text-align: right;
-    width: 150px;
+/* použito pouze pro seznam sestav */
+td.seznam-sestav-pruh-ikon {
+    text-align: left;
+    width: 180px;
 }
 
-#dialog .seznam td.icon-view a,
-#content .seznam td.icon-view a {
+td.seznam-sestav-pruh-ikon a {
     border: 0px;
     text-decoration: none;
 }

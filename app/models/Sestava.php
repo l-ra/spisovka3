@@ -1,76 +1,44 @@
 <?php
 
-class Sestava extends BaseModel
+/**
+ * @author Pavel Lastovicka
+ * @version 1.0
+ * @created 02-IX-2014 12:28:36
+ */
+class Sestava extends DBEntity
 {
 
-    protected $name = 'sestava';
-    protected $primary = 'id';
-    
-    
-    public function getInfo($sestava_id)
+	const TBL_NAME = 'sestava';
+
+    public static function getAll(array $params = array())
     {
-
-        $result = $this->fetchRow(array('id=%i',$sestava_id));
-        $row = $result->fetch();
-        return ($row) ? $row : NULL;
-
+        return parent::_getAll(__CLASS__, $params);
     }
+    
+	public function isDeletable()
+	{
+        return $this->id != 1;
+	}
 
-    public function seznam($args = null,$select = 0)
-    {
+	public function canBeDeleted()
+	{
+        $allowed = true; // Environment::getUser()->isAllowed('Sestava', 'smazat');
+        return $this->isDeletable() && $allowed;
+	}
 
-        $sql = array();
+	public function isModifiable()
+	{
+        return $this->typ != 2;
+	}
 
-        if ( isset($args['where']) ) {
-            $sql['where'] = array($args['where']);
-        }
-
-        if ( isset($args['order']) ) {
-            $sql['order'] = $args['order'];
-        } else {
-            $sql['order'] = array('typ'=>'DESC','nazev');
-        }
-
-
-        $select = $this->fetchAllComplet($sql);
-        return $select;
-
-    }
-
-    public function vytvorit($data) {
-
-        return $this->insert($data);
-
-    }
-
-    public function upravit($data,$sestava_id) {
-
-        //$transaction = (! dibi::inTransaction());
-        //if ($transaction)
-        //dibi::begin();
-
-        $ret = $this->update($data,array('id=%i',$sestava_id));
-
-        //if ($transaction)
-        //dibi::commit();
-
-        return $ret;
-
-    }
-
-    public static function stav($stav = null) {
-
-        $stav_array = array('1'=>'aktnivní',
-                            '0'=>'neaktivní'
-                     );
-
-        if ( is_null($stav) ) {
-            return $stav_array;
-        } else {
-            return array_key_exists($stav, $stav_array)?$stav_array[$stav]:null;
-        }
-
-
-    }
+	public function delete()
+	{
+        if (!$this->canBeDeleted())
+            return false;
+            
+        parent::delete();
+        return true;
+	}
 
 }
+?>

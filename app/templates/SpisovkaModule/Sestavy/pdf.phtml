@@ -14,9 +14,7 @@
             $app_info = explode("#",$app_info);
             $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
 
-            //$pdf = new mPDF();
             $pdf = new mPDF('', 'A4-L',9,'Helvetica');
-            //$pdf = new SestavaPDF('', 'A4-L',9,'Helvetica');
             $pdf->SetCreator($app_name);
             $pdf->SetAuthor(Environment::getUser()->getIdentity()->name);
             $pdf->SetTitle('Sestava');

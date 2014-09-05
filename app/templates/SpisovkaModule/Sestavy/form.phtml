@@ -13,20 +13,11 @@
         <div class="h2">
             Sestava
         </div>
+        {input sestava_nazev}
+        {input sestava_popis}
+        {input sestava_typ}
         <dl class="detail_item">
-            <dt>Název sestavy:</dt>
-            <dd>{$form['sestava_nazev']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Popis sestavy:</dt>
-            <dd>{$form['sestava_popis']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Typ sestavy:</dt>
-            <dd>{$form['sestava_typ']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Filtrovat? </dt>
+            <dt>{$form['sestava_filtr']->caption}</dt>
             <dd>{$form['sestava_filtr']->control} (zobrazit výběr rozsahu podle pořadového čísla nebo data)</dd>
         </dl>
     </div>

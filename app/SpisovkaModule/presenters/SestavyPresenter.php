@@ -5,26 +5,17 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderDefault()
     {
-
         $user_config = Environment::getVariable('user_config');
-        $Sestava = new Sestava();
 
-        // Pevne sestavy
-        $result1 = $Sestava->seznam(array('where'=>array('typ=2')));
-        $seznam_pevne = $result1->fetchAll();
-
-        $this->template->sestavy_pevne = $seznam_pevne;
-
-        // Volitelne sestavy
-        $result2 = $Sestava->seznam(array( 'where'=>array('typ=1') ));
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
-        $paginator->itemCount = count($result2);
-        $seznam_volit = $result2->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        $this->template->sestavy_volitelne = $seznam_volit;
-
-
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek : 20;
+        
+        $seznam = Sestava::getAll(array('offset' => $paginator->offset, 
+                                  'limit' => $paginator->itemsPerPage,
+                                  'order' => array('typ' => 'DESC', 'nazev')));
+        $paginator->itemCount = count($seznam);
+        $this->template->sestavy = $seznam;        
     }
 
     public function handleAutoComplete($text, $typ, $user=null, $org=null)
@@ -71,13 +62,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderDetail($view)
     {
-
         $Dokument = new Dokument();
-        $Sestava = new Sestava();
 
-        $sestava_id = $this->getParam('id',null);
-
-        $sestava = $Sestava->getInfo($sestava_id);
+        $sestava = new Sestava($this->getParam('id'));
         $this->template->Sestava = $sestava;
 
         // info
@@ -332,6 +319,14 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderUpravit()
     {
+        $sestava = new Sestava($this->getParam('id'));
+        $this->template->sestava = $sestava;
+        
+        if (!$sestava->isModifiable()) {
+            $this->flashMessage('Sestavu "'.$sestava->nazev.'" není možné měnit.', 'warning');
+            $this->redirect(':Spisovka:Sestavy:default');
+        }
+        
         $this->template->form = $this['upravitForm'];
         $this->template->nadpis = 'Upravit sestavu';
         
@@ -389,8 +384,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         $form->addText('sestava_nazev', 'Název sestavy:', 80, 100);
         $form->addTextArea('sestava_popis', 'Popis sestavy:', 80, 3);
-        $form->addSelect('sestava_typ', 'Typ sestavy:', array('1'=>'volitelná sestava','2'=>'pevná sestava'));
-        $form->addCheckbox('sestava_filtr', 'Filtrovat:');
+        $form->addSelect('sestava_typ', 'Lze měnit? :', array('1'=>'upravitelná sestava','2'=>'pevná sestava'));
+        $form->addCheckbox('sestava_filtr', 'Filtrovat? :');
 
         $form->addCheckbox('zobrazeni_cas', 'U datumů zobrazit i čas:');
         $form->addCheckbox('zobrazeni_adresa', 'Zobrazit adresy u subjektů:');
@@ -491,16 +486,15 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $sestava = $this->handleSubmit($data);
+        $sestava_data = $this->handleSubmit($data);
 
         try {
-            $Sestava = new Sestava();
-            $Sestava->vytvorit($sestava);
+            Sestava::create('Sestava', $sestava_data);
 
-            $this->flashMessage('Sestava "'.$sestava['nazev'].'" byla vytvořena.');
+            $this->flashMessage('Sestava "'.$sestava_data['nazev'].'" byla vytvořena.');
             $this->redirect(':Spisovka:Sestavy:default');
         } catch (DibiException $e) {
-            $this->flashMessage('Sestavu "'.$sestava['nazev'].'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage('Sestavu "'.$sestava_data['nazev'].'" se nepodařilo vytvořit.','warning');
             $this->flashMessage('CHYBA: '. $e->getMessage(),'warning');
         }
 
@@ -508,11 +502,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     protected function createComponentUpravitForm()
     {
-
-        $Sestava = new Sestava();
-        $sestava_id = $this->getParam('id',null);
-        $sestava = $Sestava->getInfo($sestava_id);
-
+        $sestava = @$this->template->sestava;
+        
         $params = array();
         if ( isset($sestava->parametry) )
             $params = unserialize($sestava->parametry);
@@ -618,19 +609,18 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $sestava_id = $data['id'];
-
-        $sestava = $this->handleSubmit($data);
+        $sestava_data = $this->handleSubmit($data);
 
         try {
-
-            $Sestava = new Sestava();
-            $Sestava->upravit($sestava,$sestava_id);
-
-            $this->flashMessage('Sestava "'.$sestava['nazev'].'" byla upravena.');
+            $sestava = new Sestava($data['id']);
+            $sestava->modify($sestava_data);
+            $sestava->save();
+            
+            $this->flashMessage("Sestava '$sestava->nazev' byla upravena.");
             $this->redirect(':Spisovka:Sestavy:default');
-        } catch (DibiException $e) {
-            $this->flashMessage('Sestavu "'.$sestava['nazev'].'" se nepodařilo upravit.','warning');
+        }
+        catch (DibiException $e) {
+            $this->flashMessage("Sestavu '$sestava->nazev' se nepodařilo upravit.", 'warning');
             $this->flashMessage('CHYBA: '. $e->getMessage(),'warning');
         }
 
@@ -642,6 +632,16 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->redirect(':Spisovka:Sestavy:default');
     }
 
-
+    public function actionSmazat()
+    {
+        $s = new Sestava($this->getParam('id'));
+        
+        if ($s->delete())
+            $this->flashMessage('Sestava byla smazána.');
+        else
+            $this->flashMessage('Sestavu nebylo možné smazat.', 'warning');
+            
+        $this->redirect(':Spisovka:Sestavy:default');
+    }
 }
 
