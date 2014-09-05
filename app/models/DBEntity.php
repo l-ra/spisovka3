@@ -3,7 +3,6 @@
 
 /**
  * @author Pavel Lastovicka
- * @version 1.0
  * @created 02-IX-2014 13:06:54
  */
 abstract class DBEntity
@@ -56,15 +55,6 @@ abstract class DBEntity
     }
 
 	/**
-	 * deletes the entity from a database
-	 */
-	public function delete()
-	{
-        dibi::query("DELETE FROM %n WHERE id = {$this->id}", $this::TBL_NAME);
-	}
-
-	/**
-	 * 
 	 * @param name    string
 	 */
 	public function __get($name)
@@ -92,7 +82,7 @@ abstract class DBEntity
 	/**
 	 * 
 	 * @param name    string
-	 * @param value    mixed
+	 * @param value   mixed
 	 */
 	public function __set($name, $value)
 	{
@@ -128,12 +118,34 @@ abstract class DBEntity
     
 	public function save()
 	{
+        if (!$this->canUserModify())
+            throw new Exception("Uložení entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
         if ($this->data_changed) {
             dibi::update($this::TBL_NAME, $this->data)->where("id = {$this->id}")->execute();
         }
 	}
 
+	/**
+	 * deletes the entity from a database
+	 */
+	public function delete()
+	{
+        if (!$this->canUserDelete())
+            throw new Exception("Smazání entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
+            
+        dibi::query("DELETE FROM %n WHERE id = {$this->id}", $this::TBL_NAME);
+	}
 
+	public function canUserModify()
+	{
+        return true;
+    }
+    
+	public function canUserDelete()
+	{
+        return true;
+    }
+    
 	/**
 	 * @param class   string    classname of instantiated elements
 	 * @param params

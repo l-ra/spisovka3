@@ -46,3 +46,5 @@ Aktualizace probíhá na pozadí, výstup pouze informuje.
 - naplnění číselníku států
 [730]
 - uspořádání druhů poštovních zásilek
+[740]
+- nová oprávnění pro přístup k sestavám

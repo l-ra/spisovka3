@@ -32,10 +32,10 @@
                 <a href="{link :Spisovka:Sestavy:pdf, id => $sestava->id}" {!$filtr} title="Vytisknout sestavu do PDF">
                     <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
                 </a>
-                <a n:if="$sestava->isModifiable()" href="{link :Spisovka:Sestavy:upravit, id => $sestava->id}" title="Upravit vlastnosti sestavy">
+                <a n:if="$sestava->canUserModify()" href="{link :Spisovka:Sestavy:upravit, id => $sestava->id}" title="Upravit vlastnosti sestavy">
                     <img src="{$baseUri}images/icons/edit.png" alt="edit.png" width="32" height="32" />
                 </a>
-                <a n:if="$sestava->canBeDeleted()" href="{link :Spisovka:Sestavy:smazat, id => $sestava->id}" title="Smazat sestavu" onclick="return confirm('Opravdu chcete tuto sestavu smazat?')">
+                <a n:if="$sestava->canUserDelete()" href="{link :Spisovka:Sestavy:smazat, id => $sestava->id}" title="Smazat sestavu" onclick="return confirm('Opravdu chcete tuto sestavu smazat?')">
                     <img src="{$baseUri}images/icons/delete.png" alt="delete.png" width="32" height="32" />
                 </a>
             </td>

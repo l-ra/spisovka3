@@ -10,7 +10,8 @@ Nové funkce:
   jako aktivní.
 - výběr druhu poštovní zásilky je přehlednější a její číselník je možné
   v administraci přizpůsobit
-- sestavy je nyní možné mazat. Upraveno zobrazení seznamu sestav.
+- sestavy je nyní možné mazat. Upraveno zobrazení seznamu sestav. Nová oprávnění
+  pro změny a mazání.
   
 Jiné změny:
 

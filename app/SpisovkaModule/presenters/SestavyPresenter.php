@@ -2,7 +2,11 @@
 
 class Spisovka_SestavyPresenter extends BasePresenter
 {
-
+    protected function isUserAllowed()
+    {
+        return Sestava::isUserAllowed();
+    }
+    
     public function renderDefault()
     {
         $user_config = Environment::getVariable('user_config');
@@ -608,22 +612,22 @@ class Spisovka_SestavyPresenter extends BasePresenter
     public function upravitClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-
+        $id = $data['id'];
         $sestava_data = $this->handleSubmit($data);
 
         try {
-            $sestava = new Sestava($data['id']);
+            $sestava = new Sestava($id);
             $sestava->modify($sestava_data);
             $sestava->save();
             
             $this->flashMessage("Sestava '$sestava->nazev' byla upravena.");
-            $this->redirect(':Spisovka:Sestavy:default');
         }
-        catch (DibiException $e) {
+        catch (Exception $e) {
             $this->flashMessage("Sestavu '$sestava->nazev' se nepodařilo upravit.", 'warning');
-            $this->flashMessage('CHYBA: '. $e->getMessage(),'warning');
+            $this->flashMessage('Popis chyby: '. $e->getMessage(),'warning');
         }
-
+        
+        $this->redirect(':Spisovka:Sestavy:default');
     }
 
 
@@ -636,11 +640,14 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         $s = new Sestava($this->getParam('id'));
         
-        if ($s->delete())
+        try {
+            $s->delete();
             $this->flashMessage('Sestava byla smazána.');
-        else
-            $this->flashMessage('Sestavu nebylo možné smazat.', 'warning');
-            
+        }
+        catch (Exception $e) {
+            $this->flashMessage($e->getMessage(), 'warning');
+        }
+        
         $this->redirect(':Spisovka:Sestavy:default');
     }
 }
