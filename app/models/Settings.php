@@ -59,9 +59,11 @@ class Settings
     protected function _set($key, $value) {
     
         if ($value === false)
-            $value = 'false';
+            $db_value = 'false';
         else if ($value === true)
-            $value = 'true';
+            $db_value = 'true';
+        else
+            $db_value = $value;
 
         if ($value === null) {
             unset($this->settings[$key]);
@@ -71,12 +73,12 @@ class Settings
             // Je-li promenna jiz nastavena na stejnou hodnotu, pak nic neprovadej
             if ($this->settings[$key] != $value) {
                 $this->settings[$key] = $value;
-                dibi::query('UPDATE %n', $this->table_prefix . self::TABLE_NAME, 'SET [value] = %s', $value, 'WHERE [name] = %s', $key);
+                dibi::query('UPDATE %n', $this->table_prefix . self::TABLE_NAME, 'SET [value] = %s', $db_value, 'WHERE [name] = %s', $key);
             }
         }
         else {
             $this->settings[$key] = $value;
-            dibi::query('INSERT INTO %n', $this->table_prefix . self::TABLE_NAME, '([name], [value]) VALUES (%s, %s)', $key, $value);
+            dibi::query('INSERT INTO %n', $this->table_prefix . self::TABLE_NAME, '([name], [value]) VALUES (%s, %s)', $key, $db_value);
         }
     }
     
