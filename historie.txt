@@ -19,6 +19,8 @@ Jiné změny:
 
 Opravy:
 
+- opraveno nefunkční přihlášení do aplikace s poslední verzí prohlížeče
+  Google Chrome
 - při vytváření dokumentu nebo editaci metadat, pole formuláře "číslo jednací
   odesílatele", "způsob doručení" a "číslo doporučeného dopisu" se zobrazí správně
   dle typu dokumentu, nezávisle na roli uživatele
