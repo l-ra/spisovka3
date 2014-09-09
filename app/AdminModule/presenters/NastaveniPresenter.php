@@ -27,6 +27,8 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         $this->template->Ukazka = $CJ->generuj();
 
+        $this->template->force_https = Settings::get('router_force_https', false);
+        
         $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
         $this->template->zpusob_uhrady = Settings::get('Ceska_posta_zpusob_uhrady', '');
 
@@ -225,8 +227,10 @@ class Admin_NastaveniPresenter extends BasePresenter
                 ->setValue($nastaveni->pocet_polozek)
                 ->addRule(Form::INTEGER, 'Počet položek v seznamu musí být číslo.')
                 ->addRule(Form::RANGE, 'Počet položek v seznamu musí být v rozsahu od 1 do 500', array(1, 500));
-                //->addRule(Form::FILLED, 'Počet položek v seznamu musí být vyplněn.');
 
+        $form1->addCheckBox('force_https', 'Vynutit zabezpečené připojení protokolem HTTPS')
+                ->setValue(Settings::get('router_force_https', false));
+                
         $typ = array(
             0 => 'dokument/spis může upravovat pouze zvolená osoba',
             1 => 'dokument/spis může upravovat kdokoli z dané organizační jednotky'
@@ -272,6 +276,8 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         Environment::setVariable('user_config', $config_modify);
 
+        Settings::set('router_force_https', $data['force_https']);
+        
         Settings::set('Ceska_posta_cislo_zakaznicke_karty', $data['cislo_zakaznicke_karty']);
         Settings::set('Ceska_posta_zpusob_uhrady', $data['zpusob_uhrady'] === ''
                 ? '' : self::$ciselnik_zpusoby_uhrad[$data['zpusob_uhrady']]);

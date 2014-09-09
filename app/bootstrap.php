@@ -133,10 +133,8 @@ catch (DibiDriverException $e) {
 // 
 // Detect and set HTTP protocol => HTTP(80) or HTTPS(443)
 // 
-// $defaultFlags = Route::SECURED; -> force HTTPS
-// $defaultFlags = 0; -> force HTTP
-// $defaultFlags |= (Environment::getHttpRequest()->isSecured() ? Route::SECURED : 0) -> auto detect (HTTP or HTTPS)
-Route::$defaultFlags |= (Environment::getHttpRequest()->isSecured() ? Route::SECURED : 0);
+if (Settings::get('router_force_https', false) || Environment::getHttpRequest()->isSecured())
+    Route::$defaultFlags |= Route::SECURED;
 
 // Get router
 $router = $application->getRouter();

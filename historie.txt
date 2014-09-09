@@ -12,6 +12,7 @@ Nové funkce:
   v administraci přizpůsobit
 - sestavy je nyní možné mazat. Upraveno zobrazení seznamu sestav. Nová oprávnění
   pro změny a mazání.
+- v administraci v části "nastavení" je možné aktivovat použití protokolu HTTPS
   
 Jiné změny:
 
