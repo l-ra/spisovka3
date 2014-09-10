@@ -10,7 +10,7 @@ database.password =
 database.database =
 database.charset  = utf8
 database.prefix   = s3_
-database.profiler = TRUE
+database.profiler = FALSE
 database.cache    = TRUE
 
 service.Nette-Security-IAuthenticator = Authenticator_Basic

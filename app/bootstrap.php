@@ -114,12 +114,13 @@ Mail::$defaultMailer = 'ESSMailer';
 // 3b) Load database
 try {
     $db_config = Environment::getConfig('database')->toArray();
-    $db_config['profiler'] = 'OssSqlProfiller';
     
     dibi::connect($db_config);
     dibi::addSubst('PREFIX', $db_config['prefix']);
     if ( !Environment::isProduction() ) {
-        dibi::getProfiler()->setFile(APP_DIR .'/../log/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
+        $profiler = dibi::getProfiler();
+        if ($profiler)
+            $profiler->setFile(APP_DIR .'/../log/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
     }
     define('DB_PREFIX', $db_config['prefix']);
 }
