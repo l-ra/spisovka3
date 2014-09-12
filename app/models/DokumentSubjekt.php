@@ -47,6 +47,24 @@ class DokumentSubjekt extends BaseModel
         }
     }
 
+    /**
+     *  Vrátí pole subjektů, které jsou připojeny k určeným dokumentům
+     */
+    public static function subjekty2(array $dokument_ids) {
+
+        return dibi::query("SELECT s.* FROM [:PREFIX:dokument_to_subjekt] ds INNER JOIN [:PREFIX:subjekt] s ON s.id = ds.subjekt_id WHERE dokument_id IN (%in) GROUP BY s.id", $dokument_ids)->fetchAssoc('id');        
+    }
+    
+    public static function dejAsociaci(array $dokument_ids) {
+
+        $dr = dibi::query("SELECT dokument_id, subjekt_id FROM [:PREFIX:dokument_to_subjekt] WHERE dokument_id IN (%in) ORDER BY date_added", $dokument_ids);
+        $a = array();
+        foreach ($dr as $row)
+            $a[$row->dokument_id][] = (int)$row->subjekt_id;
+    
+        return $a;
+    }
+    
     public function pripojit($dokument_id, $subjekt_id, $typ = 'AO') {
 
         $row = array();

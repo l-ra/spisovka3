@@ -1,85 +1,70 @@
-        <thead><tr>
-            {foreach $sloupce as $sl}
-            <th>{$sloupce_nazvy[$sl]}</th>
-            {/foreach}
-        </tr></thead>
-        {foreach $seznam as $dok}
-        <tr>
-            {foreach $sloupce as $sl}
-            <td <?php switch ($sl) {
-                case "smer":
-                case "pocet_listu":
-                case "pocet_priloh":
-                case "pocet_nelistu":
-                case "skartacni_znak":
-                case "skartacni_lhuta":
-                    echo 'align="center"';
-              } ?>> 
-            {if $sl=='spis'}
-                {if isset($dok->spisy)}
-                {foreach $dok->spisy as $spis}
-            {$spis->nazev}
-                {/foreach}
-                {else}
-            &nbsp;
-                {/if}
-            {elseif $sl=='subjekty'}
-                {if count($dok->subjekty)>0}
-                {foreach $dok->subjekty as $subjekt}
-            {=Subjekt::displayName($subjekt, $zobrazeni['zobrazeni_adresa'] ? 'plna_adresa' : 'jmeno')}<br />
-                {/foreach}
-                {else}
-            &nbsp;
-                {/if}
-            {elseif $sl=='pocet_nelistu'}
-                {=count($dok->prilohy)}
-            {elseif $sl=='vyridil'}
-                {if empty($dok->prideleno->prideleno_id) }
-            {$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-                {else}
-            {$dok->prideleno->prideleno_jmeno}
-            <br />
-            {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-                {/if}            
-            {elseif $sl=='datum_odeslani'}
-                {if count($dok->odeslani)}
-                <?php 
-                    $odeslani = array(); 
-                    foreach ( $dok->odeslani as $odes ) {
-                        $odeslani[] = $odes->datum_odeslani;
-                    } 
-                    rsort($odeslani);
-                ?>                
-                {if $zobrazeni['zobrazeni_cas']}
-                {$odeslani[0]|edatetime}
-                {else}
-                {$odeslani[0]|edate}
-                {/if}
-                {else}
-            &nbsp;
-                {/if}
-            {elseif $sl=='zaznam_vyrazeni'}
-                &nbsp;
-            {elseif $sl=='datum_vzniku'}
-                {if $zobrazeni['zobrazeni_cas']}
-                {$dok->datum_vzniku|edatetime}
-                {else}
-                {$dok->datum_vzniku|edate}
-                {/if}
-            {elseif $sl=='prazdny_sloupec'}
-                <span style="color:white;">____________________</span>
-            {elseif $sl=='smer'}
-                {$dok->typ_dokumentu->smer == 1 ? 'V' : 'P'}
-            {elseif $sl=='poznamka_predani'}
-                {if !empty($dok->predano->poznamka)}
-                {!$dok->predano->poznamka|enl2br}
-                {else}
-                {!$dok->prideleno->poznamka|enl2br}
-                {/if}
-            {else}
-            {$dok->$sl}
-            {/if}
-            </td>
-            {/foreach}
-        </tr>
-        {/foreach}
+<thead><tr>
+	{foreach $sloupce as $sl}
+	<th>{$sloupce_nazvy[$sl]}</th>
+	{/foreach}
+</tr></thead>
+{foreach $seznam as $dok}
+<tr>
+{foreach $sloupce as $sl}
+<td <?php switch ($sl) {
+	case "smer":
+	case "pocet_listu":
+	case "pocet_priloh":
+	case "pocet_nelistu":
+	case "skartacni_znak":
+	case "skartacni_lhuta":
+		echo 'align="center"';
+  } ?>>{if $sl=='spis'}
+	{if isset($dok->spisy)}
+	{foreach $dok->spisy as $spis}
+	{$spis->nazev}
+	{/foreach}
+	{else}&nbsp;
+	{/if}
+{elseif $sl=='subjekty'}
+	{if isset($d2s[$dok->id])}
+	{foreach $d2s[$dok->id] as $s_id}
+	{=Subjekt::displayName($subjekty[$s_id], $zobrazeni['zobrazeni_adresa'] ? 'plna_adresa' : 'jmeno')}<br />
+	{/foreach}
+	{else}
+	&nbsp;
+	{/if}
+{elseif $sl=='pocet_nelistu'}
+	{$dok->pocet_souboru}
+{elseif $sl=='vyridil'}
+    {if isset($dok->prideleno)}
+	{if empty($dok->prideleno->prideleno_id) }
+	{$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+	{else}
+	{$dok->prideleno->prideleno_jmeno}<br />{=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+	{/if}
+    {/if}
+{elseif $sl=='datum_odeslani'}
+	{if $zobrazeni['zobrazeni_cas']}
+	{$dok->datum_odeslani|edatetime}
+	{else}
+	{$dok->datum_odeslani|edate}
+	{/if}
+{elseif $sl=='zaznam_vyrazeni'}
+	&nbsp;
+{elseif $sl=='datum_vzniku'}
+	{if $zobrazeni['zobrazeni_cas']}
+	{$dok->datum_vzniku|edatetime}
+	{else}
+	{$dok->datum_vzniku|edate}
+	{/if}
+{elseif $sl=='prazdny_sloupec'}
+	<span style="color:white;">____________________</span>
+{elseif $sl=='smer'}
+	{$dok->typ_dokumentu->smer == 1 ? 'V' : 'P'}
+{elseif $sl=='poznamka_predani'}
+	{if !empty($dok->predano->poznamka)}
+	{!$dok->predano->poznamka|enl2br}
+	{else}
+	{!$dok->prideleno->poznamka|enl2br}
+	{/if}
+{else}
+{$dok->$sl}{/if}</td>
+{/foreach}
+</tr>
+{/foreach}

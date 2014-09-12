@@ -5,6 +5,14 @@ class DokumentOdeslani extends BaseModel
 
     protected $name = 'dokument_odeslani';
 
+    // Pouzito v sestavach
+    public static function datumy_odeslani(array $dokument_ids)
+    {
+        $result = dibi::query("SELECT dokument_id, MAX(datum_odeslani) AS datum_odeslani FROM [:PREFIX:dokument_odeslani] WHERE dokument_id IN (%in) GROUP BY dokument_id ", $dokument_ids)->fetchPairs('dokument_id', 'datum_odeslani');
+        
+        return count($result) ? $result : array();
+    }
+    
     public function odeslaneZpravy($dokument_id) {
 
         $sql = array(

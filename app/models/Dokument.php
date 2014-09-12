@@ -7,11 +7,9 @@ class Dokument extends BaseModel
     protected $primary = 'id';
 
     /**
-     * Seznam dokumentu s zivotnim cyklem
-     * 
-     * @param <type> $args 
+     * Seznam ID dokumentu
      */
-    public function seznam($args = array(), $detail = 0) {
+    public function seznam(array $args = array()) {
 
         if ( isset($args['where']) ) {
             $where = $args['where'];
@@ -81,39 +79,14 @@ class Dokument extends BaseModel
             $sql['leftJoin'] = array_merge($sql['leftJoin'],$args['leftJoin']);
         }
 
-        //echo "<pre>";
-        //print_r($sql);
-        //exit;
-        //echo "</pre>";
-
-        $select = $this->fetchAllComplet($sql);
-        
-        if ( $detail == 1 ) {
-            // return array(DibiRow)
-            $result = $select->fetchAll();
-            if ( count($result)>0 ) {
-                $tmp = array();
-                foreach ($result as $index => $row) {
-                    $dok = $this->getInfo($row->id, 1);
-                    $tmp[ $dok->id ] = $dok;
-                }
-                return $tmp;
-            } else {
-                return null;
-            }
-            
-        } else {
-            // return DibiResult
-            return $select;
-        }
+        return $this->fetchAllComplet($sql);
     }
 
     /**
-     * Seznam dokumentu s zivotnim cyklem
+     * Seznam ID dokumentu
      * 
-     * @param <type> $args 
      */
-    public function seznamKeSkartaci($args = array(), $detail = 0) {
+    public function seznamKeSkartaci(array $args = array()) {
 
         /*
          * Metodika nejdelsiho skartacniho roku:
@@ -210,32 +183,9 @@ class Dokument extends BaseModel
 
         $sql['group'] = 'dokument_id';
         $sql['having'] = array('NOW() > skartace');
-        
-        //echo "<pre>";
-        //print_r($sql);
-        //exit;
-        //echo "</pre>";
 
-        $select = $this->fetchAllComplet($sql);
-        
-        if ( $detail == 1 ) {
-            // return array(DibiRow)
-            $result = $select->fetchAll();
-            if ( count($result)>0 ) {
-                $tmp = array();
-                foreach ($result as $index => $row) {
-                    $dok = $this->getInfo($row->id, 1);
-                    $tmp[ $dok->id ] = $dok;
-                }
-                return $tmp;
-            } else {
-                return null;
-            }
-            
-        } else {
-            // return DibiResult
-            return $select;
-        }
+        // return DibiResult
+        return $this->fetchAllComplet($sql);
     }    
     
     /**
@@ -1317,8 +1267,15 @@ class Dokument extends BaseModel
         return $this->spisovnaOmezeniOrg($args);
     }
 
-    public function getInfo($dokument_id, $detail = 0, $dataplus = null) {
+    // $detail - nyní slouží pouze jako parametr pro nahrávání informace o přílohách
+    public function getInfo($dokument_id, $details = null) {
 
+        if ($details === null)
+            $details = "";
+        if (!is_string($details))
+            throw new InvalidArgumentException(__METHOD__ . "() - neplatný argument");
+        $details = explode(',', $details);
+        
         $sql = array(
         
             'distinct'=>null,
@@ -1403,7 +1360,10 @@ class Dokument extends BaseModel
         );
         
         $sql['where'] = array( array('dok.id=%i',$dokument_id) );
-        
+
+        if (!in_array('workflow', $details))
+            $sql['leftJoin']['workflow']['on'][] = 'wf.aktivni=1';
+            
         $select = $this->fetchAllComplet($sql);
         $result = $select->fetchAll();
         if ( count($result)>0 ) {
@@ -1477,65 +1437,42 @@ class Dokument extends BaseModel
                 $dokument->spisy = array($spis->id => $spis);
             }
             $dokument->workflow = $tmp['workflow'];
-
-            if ( isset($spis) ) {
-                $DokumentSpis = new DokumentSpis();
-                $dokument->skartacni_rezim = $DokumentSpis->skartacniRezim($spis->id);            
-            } else {
-                $sr = new stdClass();
-                $sr->dokument_skartacni_lhuta = $dokument->skartacni_lhuta;
-                $sr->dokument_skartacni_znak = $dokument->skartacni_znak;
-                $sr->spis_skartacni_lhuta = $dokument->skartacni_lhuta;
-                $sr->spis_skartacni_znak = $dokument->skartacni_znak;
-                $dokument->skartacni_rezim = $sr;
-            }
             
-            if ( isset($dataplus['subjekty'][$dokument_id]) ) {
-                $dokument->subjekty = $dataplus['subjekty'][$dokument_id];
-            } else {
+            if (in_array('subjekty', $details)) {
                 $DokSubjekty = new DokumentSubjekt();
                 $dokument->subjekty = $DokSubjekty->subjekty($dokument_id);
             }
 
-            if ( isset($dataplus['prilohy'][$dokument_id]) ) {
-                $dokument->prilohy = $dataplus['prilohy'][$dokument_id];
-            } else {
+            if (in_array('soubory', $details)) {
                 $Dokrilohy = new DokumentPrilohy();
-                $dokument->prilohy = $Dokrilohy->prilohy($dokument_id,null,$detail);
+                $dokument->prilohy = $Dokrilohy->prilohy($dokument_id);
             }
 
-            if ( isset($dataplus['odeslani'][$dokument_id]) ) {
-                if ( isset( $dataplus['odeslani'][$dokument_id] ) ) {
-                    $dokument->odeslani = $dataplus['odeslani'][$dokument_id];
-                } else {
-                    $dokument->odeslani = null;
-                }
-            } else {
+            if (in_array('odeslani', $details)) {
                 $DokOdeslani = new DokumentOdeslani();
                 $dokument->odeslani = $DokOdeslani->odeslaneZpravy($dokument_id);
             }
-
 
             $dokument->prideleno = null;
             $dokument->predano = null;
             $prideleno = $predano = $stav = 0;
             if ( count($dokument->workflow)>0 ) {
-                foreach ($dokument->workflow as $wf) {
-                    // Pridelen
-                    if ( ($wf->stav_osoby == 1 && $wf->aktivni == 1 ) && $prideleno==0 ) {
-                        $dokument->prideleno = $wf;
-                        $prideleno=1;
+                foreach ($dokument->workflow as $wf)
+                    if ($wf->aktivni == 1) {
+                        // Pridelen
+                        if ($wf->stav_osoby == 1 && $prideleno == 0) {
+                            $dokument->prideleno = $wf;
+                            $prideleno=1;
+                        }
+                        // Predan
+                        if ($wf->stav_osoby == 0 && $predano == 0) {
+                            $dokument->predano = $wf;
+                            $predano=1;
+                        }
+                        // Stav
+                        if ($stav <= $wf->stav_dokumentu)
+                            $stav = $wf->stav_dokumentu;
                     }
-                    // Predan
-                    if ( ($wf->stav_osoby == 0 && $wf->aktivni == 1 ) && $predano==0 ) {
-                        $dokument->predano = $wf;
-                        $predano=1;
-                    }
-                    // Stav
-                    if ( $stav <= $wf->stav_dokumentu && $wf->aktivni == 1 ) {
-                        $stav = $wf->stav_dokumentu;
-                    }
-                }
             }
             $dokument->stav_dokumentu = $stav;
 
@@ -1586,48 +1523,6 @@ class Dokument extends BaseModel
                 $dokument->spousteci_udalost_dtext = '';            
             }
             
-            
-            /*if ( !empty($dokument->spisovy_znak_id) && $detail == 1 ) {
-                $SpisZnak = new SpisovyZnak();
-                $sznak = $SpisZnak->getInfo($dokument->spisovy_znak_id);
-                if ( $sznak ) {
-                    $dokument->spisovy_znak = $sznak->nazev;
-                    $dokument->spisovy_znak_popis = $sznak->popis;
-                    $dokument->spisovy_znak_skart_znak = $sznak->skartacni_znak;
-                    $dokument->spisovy_znak_skart_lhuta = $sznak->skartacni_lhuta;
-                    $dokument->spisovy_znak_udalost = $sznak->spousteci_udalost_id;
-                    $dokument->spisovy_znak_udalost_nazev = $sznak->spousteci_udalost_nazev;
-                    $dokument->spisovy_znak_udalost_stav = $sznak->spousteci_udalost_stav;
-                    $dokument->spisovy_znak_udalost_dtext = $sznak->spousteci_udalost_dtext;
-                } else {
-                    $dokument->spisovy_znak = '';
-                    $dokument->spisovy_znak_popis = '';
-                    $dokument->spisovy_znak_skart_znak = '';
-                    $dokument->spisovy_znak_skart_lhuta = '';
-                    $dokument->spisovy_znak_udalost = '';
-                    $dokument->spisovy_znak_udalost_nazev = '';
-                    $dokument->spisovy_znak_udalost_stav = '';
-                    $dokument->spisovy_znak_udalost_dtext = '';
-                }
-            } else {
-                $dokument->spisovy_znak = '';
-                $dokument->spisovy_znak_popis = '';
-                $dokument->spisovy_znak_skart_znak = '';
-                $dokument->spisovy_znak_skart_lhuta = '';
-                $dokument->spisovy_znak_udalost = '';
-                $dokument->spisovy_znak_udalost_nazev = '';
-                $dokument->spisovy_znak_udalost_stav = '';
-                $dokument->spisovy_znak_udalost_dtext = '';
-            }*/
-
-            //vyrizeni
-            /*if ( !empty($dokument->zpusob_vyrizeni_id) ) {
-                $zpvyrizeni = Dokument::zpusobVyrizeni($dokument->zpusob_vyrizeni_id);
-                $dokument->zpusob_vyrizeni = $zpvyrizeni->nazev;
-            } else {
-                $dokument->zpusob_vyrizeni = '';
-            }*/
-
             if ( !empty($dokument->identifikator) ) {
                 $Epodatelna = new Epodatelna();
                 $dokument->identifikator = $Epodatelna->identifikator(unserialize($dokument->identifikator));

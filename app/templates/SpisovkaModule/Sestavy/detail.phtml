@@ -12,15 +12,16 @@
     </table>
     <div>
         &nbsp;<br />
-        Vytištěno dne: {=date("j.n.Y G:i")}
-        <br />
+        Počet dokumentů: {= count($seznam)} <br />
+        Vytištěno dne: {=date("j.n.Y G:i")} <br />
         Vytiskl: {=Environment::getUser()->getIdentity()->name}
     </div>    
     {elseif isset($prilis_mnoho)}
     <div style="text-align: center; margin-top: 15px; color: red;">
-        Tato sestava obsahuje příliš mnoho dokumentů pro zobrazení na této obrazovce. Jejich zobrazení by trvalo hodně dlouho.
-        <p>
-        Chcete-li přesto zobrazit všech {$pocet_dokumentu} dokumentů, klikněte na odkaz pokračovat a vyčkejte dokud se sestava celá nenačte. Jinak zvolte jiné parametry.
+        Tato sestava obsahuje mnoho dokumentů. Její zobrazení může trvat dlouho.<p>
+        {if $view == 'pdf'}Export do PDF je mnohem pomalejší, zde je limit několik set dokumentů (při stadardním časovém limitu 30 sekund).<p>{/if}        
+        Chcete-li přesto zobrazit všech {$pocet_dokumentu} dokumentů, klikněte na odkaz pokračovat a vyčkejte dokud se sestava celá nenačte.<p>
+        Časový limit je {= ini_get('max_execution_time')} sekund.
 
         <div>
             <a href="{$reload_url}">Pokračovat</a>

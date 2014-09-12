@@ -174,18 +174,20 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             $DokSubjekty = new DokumentSubjekt();
-            $dataplus['subjekty'] = $DokSubjekty->subjekty($dokument_ids);
-            $Dokrilohy = new DokumentPrilohy();
-            $dataplus['prilohy'] = $Dokrilohy->prilohy($dokument_ids);
-            $DokOdeslani = new DokumentOdeslani();
-            $dataplus['odeslani'] = array( '0'=> null );//$DokOdeslani->odeslaneZpravy($dokument_ids);
+            $subjekty = $DokSubjekty->subjekty($dokument_ids);
+            $pocty_souboru = DokumentPrilohy::pocet_priloh($dokument_ids);
 
             foreach ($seznam as $index => $row) {
-                $dok = $Dokument->getInfo($row->id,null, $dataplus);
+                $dok = $Dokument->getInfo($row->id, '');
                 if ( empty($dok->stav_dokumentu) ) {
+                    // toto má myslím zajistit, aby se v seznamu nezobrazovaly rozepsané dokumenty
                     unset($seznam[$index]);
                     continue;
                 }
+                $id = $dok->id;
+                $dok->subjekty = isset($subjekty[$id]) ? $subjekty[$id] : null;
+                // $dok->prilohy = isset($prilohy[$id]) ? $prilohy[$id] : null;
+                $dok->pocet_souboru = isset($pocty_souboru[$id]) ? $pocty_souboru[$id] : 0;
                 $seznam[$index] = $dok;
             }
         } 
@@ -277,7 +279,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // Nacteni parametru
         $dokument_id = $this->getParam('id',null);
 
-        $dokument = $Dokument->getInfo($dokument_id, 1);
+        $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
         if ( $dokument ) {
             // dokument zobrazime
             $this->template->Dok = $dokument;
@@ -855,7 +857,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $subjekty = $DokumentSubjekt->subjekty($dokument->id);
             $this->template->Subjekty = $subjekty;
 
-            $prilohy  = $DokumentPrilohy->prilohy($dokument->id,null,1);
+            $prilohy  = $DokumentPrilohy->prilohy($dokument->id);
             $this->template->Prilohy = $prilohy;
 
             if ( $this->typ_evidence == 'priorace' ) {
@@ -956,7 +958,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $subjekty = $DokumentSubjekt->subjekty($dok_odpoved->id);
                 $this->template->Subjekty = $subjekty;
 
-                $prilohy  = $DokumentPrilohy->prilohy($dok_odpoved->id,null,1);
+                $prilohy  = $DokumentPrilohy->prilohy($dok_odpoved->id);
                 $this->template->Prilohy = $prilohy;
 
                 $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
@@ -1037,7 +1039,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $this->template->Subjekty = $subjekty_new;
 
                     // kopirovani prilohy
-                    $prilohy_old  = $DokumentPrilohy->prilohy($dokument_id,null,1);
+                    $prilohy_old  = $DokumentPrilohy->prilohy($dokument_id);
 
                     if ( count($prilohy_old)>0 ) {
                         foreach ( $prilohy_old as $priloha ) {
@@ -1046,7 +1048,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             }
                         }
                     }
-                    $prilohy_new  = $DokumentPrilohy->prilohy($dok_odpoved->id,1);
+                    $prilohy_new  = $DokumentPrilohy->prilohy($dok_odpoved->id);
                     $this->template->Prilohy = $prilohy_new;
 
                     $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
@@ -1150,7 +1152,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         // Nacteni parametru
         $dokument_id = $this->getParam('id',null);
-        $dokument = $Dokument->getInfo($dokument_id, 1);
+        $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani");
 
         if ( $dokument ) {
             // dokument zobrazime
@@ -1216,7 +1218,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $dokument_id = $this->getParam('id');
         if ( $dokument_id ) {
             $Dokument = new Dokument();
-            $dokument_info = $Dokument->getInfo($dokument_id);
+            $dokument_info = $Dokument->getInfo($dokument_id, "soubory");
 
             if ( $dokument_info ) {
                 $nalezeno = 0;

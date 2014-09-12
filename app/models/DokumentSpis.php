@@ -54,16 +54,17 @@ class DokumentSpis extends BaseModel
             }
 
             $DokSubjekty = new DokumentSubjekt();
-            $dataplus['subjekty'] = $DokSubjekty->subjekty($dokument_ids);
-            $Dokrilohy = new DokumentPrilohy();
-            $dataplus['prilohy'] = $Dokrilohy->prilohy($dokument_ids);
-            //$DokOdeslani = new DokumentOdeslani();
-            $dataplus['odeslani'] = array( '0'=> null );//$DokOdeslani->odeslaneZpravy($dokument_ids);
+            $subjekty = $DokSubjekty->subjekty($dokument_ids);
+            $pocty_souboru = DokumentPrilohy::pocet_priloh($dokument_ids);
 
             foreach ($result as $joinDok) {
-                $dok = $Dokument->getInfo($joinDok->dokument_id, null, $dataplus);
-                if ( empty($dok->stav_dokumentu) ) continue;
+                $dok = $Dokument->getInfo($joinDok->dokument_id, '');
+                if (empty($dok->stav_dokumentu))
+                    continue;
                 $dok->poradi = empty($joinDok->poradi)?1:$joinDok->poradi;
+                $id = $dok->id;
+                $dok->subjekty = isset($subjekty[$id]) ? $subjekty[$id] : null;
+                $dok->pocet_souboru = isset($pocty_souboru[$id]) ? $pocty_souboru[$id] : 0;
                 $dokumenty[ $joinDok->dokument_id ] = $dok;
             }
             sort($dokumenty);
@@ -71,58 +72,6 @@ class DokumentSpis extends BaseModel
         } else {
             return null;
         }
-    }
-
-    public function skartacniRezim($spis_id)
-    {
-        
-        $sql = array(
-            'distinct'=>null,
-            'from' => array($this->tb_spis => 'spis'),
-            'cols' => array('nazev'=>'spis_nazev','spisovy_znak_id','skartacni_lhuta','skartacni_znak'),
-            'leftJoin' => array(
-                'dokspis' => array(
-                    'from' => array($this->name => 'ds'),
-                    'on' => array('spis.id=ds.spis_id'),
-                    'cols' => array('dokument_id','spis_id'),                    
-                ),                
-                'dokumenty' => array(
-                    'from' => array($this->tb_dokument => 'dok'),
-                    'on' => array('dok.id=ds.dokument_id'),
-                    'cols' => array('nazev'=>'dok_nazev','cislo_jednaci','jid','spisovy_znak_id'=>'dok_spisovy_znak','skartacni_lhuta'=>'dok_skartacni_lhuta','skartacni_znak'=>'dok_skartacni_znak')
-                ),
-
-            )
-        );
-        
-        $sql['where'] = array( array('spis.id=%i',$spis_id) );
-        
-        $select = $this->fetchAllComplet($sql);
-        $result = $select->fetchAll();
-        if ( count($result)>0 ) {
-        
-            $sr = new stdClass();
-            $sr->dokument_skartacni_lhuta = 0;
-            $sr->dokument_skartacni_znak = 'V';
-            $sr->spis_skartacni_lhuta = 0;
-            $sr->spis_skartacni_znak = 'V';
-            
-            foreach ($result as $row) {
-                
-                if ( $row->dok_skartacni_lhuta > $sr->dokument_skartacni_lhuta ) {
-                    $sr->dokument_skartacni_lhuta = $row->dok_skartacni_lhuta;
-                }
-                if ( $row->skartacni_lhuta > $sr->spis_skartacni_lhuta ) {
-                    $sr->spis_skartacni_lhuta = $row->skartacni_lhuta;
-                }
-                $sr->spis_skartacni_znak = $row->skartacni_znak;
-            }
-            
-            return $sr;
-        } else {
-            return null;
-        }
-        
     }
     
     public function pocetDokumentu( $spis_id ) {

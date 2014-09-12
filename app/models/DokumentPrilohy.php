@@ -5,8 +5,16 @@ class DokumentPrilohy extends BaseModel
 
     protected $name = 'dokument_to_file';
 
-    public function prilohy( $dokument_id, $detail = 0 ) {
+    // Pouzito v sestavach
+    public static function pocet_priloh(array $dokument_ids)
+    {
+        $result = dibi::query("SELECT dokument_id, COUNT(*) AS pocet FROM [:PREFIX:dokument_to_file] WHERE dokument_id IN (%in) GROUP BY dokument_id", $dokument_ids)->fetchPairs('dokument_id', 'pocet');
+        
+        return count($result) ? $result : array();
+    }
 
+    public function prilohy($dokument_id)
+    {
 
         $sql = array(
             'distinct'=>null,
@@ -34,12 +42,10 @@ class DokumentPrilohy extends BaseModel
         if ( count($result)>0 ) {
             foreach ($result as $joinFile) {
 
-                if ( $detail == 1 && !empty($joinFile->user_created) ) {
-                    $user = UserModel::getUser($joinFile->user_created, 1);
-                    $joinFile->user_name = Osoba::displayName($user->identity);
-                } else {
-                    $joinFile->user_name = '';
-                }
+                // Kvůli Tomášově chybě ve verzi 3.2 se jméno ve spisovce nezobrazovalo (byl změněn počet parametrů této metody).
+                // Nikdo si nestěžoval, nechme to takto být. Tato informace je dostupná ještě v transakčním logu dokumentu.
+                $joinFile->user_name = '';
+                
                 $joinFile->typ_name = FileModel::typPrilohy($joinFile->typ);
                 // Nahrazeni online mime-type
                 $joinFile->mime_type = FileModel::mimeType($joinFile->real_path);
@@ -51,7 +57,6 @@ class DokumentPrilohy extends BaseModel
                 } else {
                     $joinFile->mime_type_icon = BASE_URI ."images/mimetypes/application-octet-stream.png";
                 }
-                
                 
                 $prilohy[ $joinFile->dokument_id ][ $joinFile->id ] = $joinFile;
             }

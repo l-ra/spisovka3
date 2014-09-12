@@ -231,31 +231,12 @@ class Subjekt extends BaseModel
     public static function displayName($data, $display = 'basic')
     {
 
-        if ( is_string($data) ) return $data;
-        if ( is_array($data) ) {
-            $tmp = new stdClass();
-            $tmp->type = $data['type'];
-            $tmp->nazev_subjektu = $data['nazev_subjektu'];
-            $tmp->ic = $data['ic'];
-            $tmp->jmeno = $data['jmeno'];
-            $tmp->prostredni_jmeno = $data['prostredni_jmeno'];
-            $tmp->prijmeni = $data['prijmeni'];
-            $tmp->titul_pred = $data['titul_pred'];
-            $tmp->titul_za = $data['titul_za'];
-            $tmp->adresa_ulice = $data['adresa_ulice'];
-            $tmp->adresa_cp = $data['adresa_cp'];
-            $tmp->adresa_co = $data['adresa_co'];
-            $tmp->adresa_mesto = $data['adresa_mesto'];
-            $tmp->adresa_psc = $data['adresa_psc'];
-            $tmp->adresa_stat = $data['adresa_stat'];
-            $tmp->email = $data['email'];
-            $tmp->telefon = $data['telefon'];
-            $tmp->id_isds = $data['id_isds'];
-
-            $data = $tmp;
-            unset($tmp);
-        }
-        if ( !is_object($data) ) return "";
+        if (is_string($data))
+            return $data;
+        if (is_array($data))
+            $data = ArrayObject($data);        
+        if (!is_object($data))
+            return "";
 
         // Sestaveni casti
 

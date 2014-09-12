@@ -165,17 +165,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        }         
-
-        /*if ( count($seznam)>0 ) {
-            foreach ($seznam as $index => $row) {
-                
-                
-                
-                $dok = $Dokument->getInfo($row->id,null, $dataplus);
-                $seznam[$index] = $dok;
-            }
-        }*/
+        }
 
         $this->template->seznam = $seznam;
         $this->template->filtrForm = $this['filtrForm'];

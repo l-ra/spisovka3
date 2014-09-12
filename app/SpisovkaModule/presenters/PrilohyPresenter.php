@@ -24,7 +24,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $dokument_id = $this->getParam('id',null); // tady jako dokument_id
 
         $DokumentPrilohy = new DokumentPrilohy();
-        $seznam = $DokumentPrilohy->prilohy($dokument_id,null,1);
+        $seznam = $DokumentPrilohy->prilohy($dokument_id);
         $this->template->seznamPriloh = $seznam;
         $this->template->dokument_id = $dokument_id;
 

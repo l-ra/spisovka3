@@ -19,7 +19,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                                   'limit' => $paginator->itemsPerPage,
                                   'order' => array('typ' => 'DESC', 'nazev')));
         $paginator->itemCount = count($seznam);
-        $this->template->sestavy = $seznam;        
+        $this->template->sestavy = $seznam;                
     }
 
     public function handleAutoComplete($text, $typ, $user=null, $org=null)
@@ -34,7 +34,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $d_od  = $this->getParam('d_od',null);
         $d_do  = $this->getParam('d_do',null);        
         $today = $this->getParam('d_today',null);
-        $rok   = $this->getParam('rok',null);  
+        $rok   = $this->getParam('rok',null);
+        $pokracovat = $this->getParam('pokracovat', false);
         
         @ini_set("memory_limit",PDF_MEMORY_LIMIT);
         $sestava_id = $this->getParam('id',null);
@@ -42,7 +43,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 array('view'=>'pdf', 'id'=>$sestava_id,
                       'pc_od'=>$pc_od, 'pc_do'=>$pc_do, 
                       'd_od'=>$d_od, 'd_do'=>$d_do, 
-                      'd_today'=>$today, 'rok'=>$rok, 
+                      'd_today'=>$today, 'rok'=>$rok, 'pokracovat'=>$pokracovat
                      ));
     }
 
@@ -256,57 +257,62 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         // vystup
         $args = $Dokument->sestavaOmezeniOrg($args);
-        
+
         $result = $Dokument->seznam($args);
         $seznam = $result->fetchAll();
 
         if ( count($seznam)>0 ) {
 
-            $pokracovat = $this->getParam('pokracovat',null);
-
-            if ( count($seznam) > 200 && !$pokracovat ) {
+            $mnoho = count($seznam) > ($view == 'pdf' ? 100 : 500);
+            $this->template->pocet_dokumentu = count($seznam);
+            
+            if ( $mnoho && !$this->getParam('pokracovat', false) ) {
 
                 $this->template->prilis_mnoho = 1;
-                $this->template->pocet_dokumentu = count($seznam);
                 $seznam = array();
                 
                 $reload_url = Environment::getHttpRequest()->getOriginalUri()->getAbsoluteUri();
                 if ( strpos($reload_url,'?') !== false ) {
                     $reload_url .= "&pokracovat=1";
                 } else {
+                    if (substr($reload_url, -1) != '/')
+                        $reload_url .= '/';
                     $reload_url .= "?pokracovat=1";
                 }
                 $this->template->reload_url = $reload_url;
 
             } else {
 
-                $dataplus = array();
-
                 $dokument_ids = array();
-                foreach ($seznam as $row) {
+                foreach ($seznam as $row)
                     $dokument_ids[] = $row->id;
-                }
 
-                $DokSubjekty = new DokumentSubjekt();
-                $dataplus['subjekty'] = $DokSubjekty->subjekty($dokument_ids);
-                $Dokrilohy = new DokumentPrilohy();
-                $dataplus['prilohy'] = $Dokrilohy->prilohy($dokument_ids);
-                $DokOdeslani = new DokumentOdeslani();
-                $dataplus['odeslani'] = array( '0'=> null );//$DokOdeslani->odeslaneZpravy($dokument_ids);
+                // $start_memory = memory_get_usage();
+                $this->template->subjekty = DokumentSubjekt::subjekty2($dokument_ids);
+                $this->template->d2s = DokumentSubjekt::dejAsociaci($dokument_ids);
+                // Debug::dump("Pamet zabrana nahranim subjektu: " . (memory_get_usage() - $start_memory));
 
+                $pocty_souboru = DokumentPrilohy::pocet_priloh($dokument_ids);
+                
+                $datumy_odeslani = DokumentOdeslani::datumy_odeslani($dokument_ids);
+                                        
                 foreach ($seznam as $index => $row) {
-                    $dok = $Dokument->getInfo($row->id,null, $dataplus);
+                    $dok = $Dokument->getInfo($row->id, '');
+                    $id = $dok->id;
+                    $dok->pocet_souboru = isset($pocty_souboru[$id]) ? $pocty_souboru[$id] : 0;
+                    $dok->datum_odeslani = isset($datumy_odeslani[$id]) 
+                                                ? $datumy_odeslani[$id] : '';
                     $seznam[$index] = $dok;
                 }
+                
+                if ($view == 'pdf')
+                    $this->setView('pdf');
             }
 
         } 
         
         $this->template->seznam = $seznam;
         $this->setLayout('print');
-        if ( $view == 'pdf' ) {
-            $this->setView('pdf');
-        }
 
 
     }

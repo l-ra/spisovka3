@@ -229,17 +229,15 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             }
 
             $DokSubjekty = new DokumentSubjekt();
-            $dataplus['subjekty'] = $DokSubjekty->subjekty($dokument_ids);
-            $Dokrilohy = new DokumentPrilohy();
-            $dataplus['prilohy'] = $Dokrilohy->prilohy($dokument_ids);
-            $DokOdeslani = new DokumentOdeslani();
-            $dataplus['odeslani'] = array( '0'=> null );//$DokOdeslani->odeslaneZpravy($dokument_ids);
-            //$SpisoveZnaky = new SpisovyZnak();
-            //$dataplus['spisovy_znak'] = array( '0'=> null );//$DokOdeslani->odeslaneZpravy($dokument_ids);
-
+            $subjekty = $DokSubjekty->subjekty($dokument_ids);
+            $pocty_souboru = DokumentPrilohy::pocet_priloh($dokument_ids);
 
             foreach ($seznam as $index => $row) {
-                $dok = $Dokument->getInfo($row->id,null, $dataplus);
+                $dok = $Dokument->getInfo($row->id, '');
+                $id = $dok->id;
+                $dok->subjekty = isset($subjekty[$id]) ? $subjekty[$id] : null;
+                $dok->prilohy = isset($prilohy[$id]) ? $prilohy[$id] : null;
+                $dok->pocet_souboru = isset($pocty_souboru[$id]) ? $pocty_souboru[$id] : 0;
                 $seznam[$index] = $dok;
             }
         }
@@ -349,7 +347,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         // Nacteni parametru
         $dokument_id = $this->getParam('id',null);
 
-        $dokument = $Dokument->getInfo($dokument_id, 1);
+        $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
         if ( $dokument ) {
             // dokument zobrazime
             $this->template->Dok = $dokument;
