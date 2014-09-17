@@ -1,6 +1,13 @@
 {capture $html_out}
     {if count($seznam)>0}
-    <table cellspacing="0" cellpadding="1" border="1">
+    <style type="text/css" media="screen, print">
+        table { 
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+        td, th { border : 1px solid gray; padding : 3px, 2px; }
+    </style>
+    <table>
     {include detail_data.phtml}    
     </table>
     {else}

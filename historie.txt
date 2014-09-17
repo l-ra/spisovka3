@@ -27,6 +27,7 @@ Opravy:
 - při vytváření dokumentu nebo editaci metadat, pole formuláře "číslo jednací
   odesílatele", "způsob doručení" a "číslo doporučeného dopisu" se zobrazí správně
   dle typu dokumentu, nezávisle na roli uživatele
+- opraveno ohraničení buněk v tisku sestavy do PDF
 
 === Verze 3.4.0 =================================================================
 
