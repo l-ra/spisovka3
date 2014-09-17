@@ -217,6 +217,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+            $this->setView('default');
         }        
 
         if ( count($seznam)>0 ) {
@@ -292,7 +293,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         
         $this->template->title = "Seznam dokumentů pro příjem do spisovny";
         $this->seznam(1, $filtr, $hledat, $seradit);
-        $this->setView('default');
     }
 
     public function renderKeskartaciseznam()
@@ -314,7 +314,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         );
         $this->template->title = "Seznam dokumentů, kterým uplynula skartační lhůta";
         $this->seznam(2, $filtr, $hledat, $seradit);
-        $this->setView('default');
     }
 
     public function renderSkartace()
@@ -337,7 +336,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         );
         $this->template->title = "Seznam dokumentů ve skartačním řízení";
         $this->seznam(3, $filtr, $hledat, $seradit);
-        $this->setView('default');
     }
 
     public function renderDetail()
