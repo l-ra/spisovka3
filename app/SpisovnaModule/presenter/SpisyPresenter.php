@@ -123,8 +123,10 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $spis_id = null;
 
         $args = null;
-        if ( !empty($hledat) ) {
-            $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+        $this->hledat = $this->getParam('hledat', null);
+        
+        if ( !empty($this->hledat) ) {
+            $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$this->hledat.'%')));
         }
 
         $user_config = Environment::getVariable('user_config');
@@ -642,8 +644,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
     public function hledatSimpleClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-
-        $this->forward('this', array('hledat'=>$data['dotaz']));
+        $this->redirect('this', array('hledat'=>$data['dotaz']));
 
     }
 

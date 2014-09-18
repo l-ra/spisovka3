@@ -258,6 +258,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $args = null;
         if ( !empty($hledat) ) {
             $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$hledat.'%')));
+            $this->hledat = $hledat;
         }
 
         $user_config = Environment::getVariable('user_config');
@@ -855,7 +856,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     {
         $data = $button->getForm()->getValues();
 
-        $this->forward('this', array('hledat'=>$data['dotaz']));
+        $this->redirect('this', array('hledat'=>$data['dotaz']));
 
     }
 
