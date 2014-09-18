@@ -19,7 +19,9 @@ Nové funkce:
 Jiné změny:
 
 - sestavy nyní tisknou záhlaví tabulky na každé stránce
-
+- při vytvoření odpovědi na dokument se zkopírují spisový znak a skartační režim,
+  pokud jsou vyplněny
+  
 Opravy:
 
 - opraveno nefunkční přihlášení do aplikace s poslední verzí prohlížeče

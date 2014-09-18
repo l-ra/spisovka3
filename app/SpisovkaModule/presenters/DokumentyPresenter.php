@@ -1003,7 +1003,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     "datum_vzniku" => date('Y-m-d H:i:s'),
                     "lhuta" => "30",
                     "poznamka" => $dok->poznamka,
-                    "zmocneni_id" => null
+                    "zmocneni_id" => null,
+                    "spisovy_znak_id" => $dok->spisovy_znak_id,
+                    "skartacni_znak" => $dok->skartacni_znak,
+                    "skartacni_lhuta" => $dok->skartacni_lhuta,
+                    "spousteci_udalost_id" => $dok->spousteci_udalost_id
                 );
                 $dok_odpoved = $Dokumenty->ulozit($pred_priprava);
 
