@@ -313,8 +313,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     
                 if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky)
                  || in_array(@$dokument->predano->orgjednotka_id, $povoleneOrgJednotky)) {
-                    $this->template->AccessEdit = 1;
                     $this->template->AccessView = 1;
+                    
+                    // vedouci ma pristup k dokumentu, ktery je predan primo na org. jednotku (kdyz chybi konkretni uzivatel)
+                    if ($user->isAllowed('Dokument', 'menit_moje_oj')
+                        || isset($dokument->predano) && @$dokument->predano->prideleno_id == null)
+                        $this->template->AccessEdit = 1;
+                        
                     if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky))
                         $this->template->Pridelen = 1;
                     else

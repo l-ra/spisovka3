@@ -31,6 +31,8 @@ Opravy:
   dle typu dokumentu, nezávisle na roli uživatele
 - opraveno ohraničení buněk v tisku sestavy do PDF
 - hledání ve spisech ve spisovně nebylo funkční
+- oprávnění "Změny dokumentů svojí org. jednotky" je nyní kontrolováno 
+  i u vedoucího. Ve výchozím stavu má vedoucí toto oprávnění přiděleno.
 
 === Verze 3.4.0 =================================================================
 
