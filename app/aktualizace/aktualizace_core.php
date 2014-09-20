@@ -13,51 +13,69 @@ class Updates {
         self::$update_dir = WWW_DIR . '/app/aktualizace/';
     }
     
-    public static function find_updates() {
-
-        $alter_scripts = array();
-        $revisions = array();
+    /**
+     *  $contents bude obsahovat obsah souboru v pripade, ze je soubor v ZIP archivu
+     */
+    protected static function _process_file($filename, $contents) 
+    {
+        if ($filename == 'information.txt') {
+            $info = file(self::$update_dir . $filename);
+            if ($info)
+                self::$descriptions = self::_parse_info_file($info);
+            return;
+        }
+        
+        $parts = explode("_", $filename);
+        if (is_numeric($parts[0])) {
+        
+            $revision = $parts[0];
+            self::$revisions[$revision] = $revision;
+            
+            if (strpos($filename,"_alter.sql") !== false) {
+                $sql_source = $contents ? $contents 
+                                        : file_get_contents(self::$update_dir . $filename);
+                $sql_queries = explode(";", $sql_source);
+                // odstran komentar na zacatku souboru, ktery je oddelen strednikem
+                unset($sql_queries[0]);
+                self::$alter_scripts[$revision] = $sql_queries;
+            }                
+            
+        }
+        
+    }
+    
+    public static function find_updates()
+    {
+        self::$alter_scripts = array();
+        self::$revisions = array();
         
         $dir_handle = opendir(self::$update_dir);
         if ($dir_handle !== FALSE) {
-            while (($filename = readdir($dir_handle)) !== false) {
-            
-                if ($filename == 'information.txt') {
-                    $info = file(self::$update_dir . $filename);
-                    if ($info)
-                        self::$descriptions = self::_parse_info_file($info);
-                    continue;
-                }
-                
-                $parts = explode("_", $filename);
-                if ( is_numeric($parts[0]) ) {
-                
-                    $revision = $parts[0];
-                    $revisions[ $revision ] = $revision;
-                    
-                    if ( strpos($filename,"_alter.sql") !== false ) {
-                        $sql_source = file_get_contents(self::$update_dir . $filename);
-                        $sql_queries = explode(";", $sql_source);
-                        // odstran komentar na zacatku souboru, ktery je oddelen strednikem
-                        unset($sql_queries[0]);
-                        $alter_scripts[ $revision ] = $sql_queries;
-                    }                
-                    
+        
+            $zip = new ZipArchive;
+            if ($zip->open(self::$update_dir . 'db_scripts.zip') === TRUE) {
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    $stat = $zip->statIndex($i);
+                    $filename = $stat['name'];
+                    self::_process_file($filename, $zip->getFromName($filename));
                 }
             }
+            
+            while (($filename = readdir($dir_handle)) !== false) {
+                self::_process_file($filename, null);
+            }
+            
             closedir($dir_handle);
         }
         
-        ksort( $revisions, SORT_NUMERIC ); //setridit pole, aby se alter skripty spoustely ve spravnem poradi
+        ksort( self::$revisions, SORT_NUMERIC ); //setridit pole, aby se alter skripty spoustely ve spravnem poradi
         
-        self::$alter_scripts = $alter_scripts;
-        self::$revisions = $revisions;
-        return array('revisions' => $revisions, 'alter_scripts' => $alter_scripts, 
+        return array('revisions' => self::$revisions, 'alter_scripts' => self::$alter_scripts, 
                 'descriptions' => self::$descriptions);
     }
 
-    protected static function _parse_info_file($info) {
-    
+    protected static function _parse_info_file($info)
+    {    
         $rev = 0;
         $a = array();
         
@@ -80,8 +98,8 @@ class Updates {
         return $a;
     }
     
-    public static function find_clients() {
-    
+    public static function find_clients()
+    {    
         $clients = array();
         if ( defined('MULTISITE') && MULTISITE == 1 ) {
             $dh = opendir(WWW_DIR . "/clients");
