@@ -22,7 +22,8 @@ function my_assert_handler($file, $line, $code)
     define('UPDATE_DIR', WWW_DIR . '/app/aktualizace/');    
     
     require 'aktualizace_core.php';
-
+    require 'is_installed.php';
+    
     Updates::init();
     
     $res = Updates::find_updates();
@@ -109,13 +110,12 @@ function my_assert_handler($file, $line, $code)
                 
                 try {
 
-                // Continue = 1 znamena, ze aktualizace byla jiz provedena a pokracuje se dalsi aktualizaci
                 // Check skripty se pouzivaly v minulosti, kdy nebylo mozne spolehlive urcit revizi klienta
-                $continue = 0;
-                if (file_exists(UPDATE_DIR . $rev .'_check.php') ) {
-                    // include, ne include_once !!
+                $function_name = "is_installed_{$rev}";
+                if (function_exists($function_name)) {
                     try {
-                        require UPDATE_DIR . $rev .'_check.php';
+                        if ($function_name())
+                            continue; // aktualizace byla jiz provedena a pokracuje se dalsi aktualizaci
                     }
                     catch (Exception $e) {
                         error("Při provádění kontrolního skriptu došlo k chybě!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
@@ -124,9 +124,8 @@ function my_assert_handler($file, $line, $code)
                         // Ukonči kontrolu revizí a přeskoč na dalšího klienta
                         break;
                     }
-                }                     
-                if ( $continue == 1 )
-                    continue;
+                }
+                
                 $found_update = true;
                 
                 echo "<div class='update_rev'>";
