@@ -9,7 +9,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     private $zakaz_filtr = false;
     private $hledat;
     private $seradit;
-    private $odpoved = null;
+    private $odpoved = false;
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
     private $pdf_output = 0;
@@ -1085,12 +1085,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
             }
 
-            $this->odpoved = $dok->cislo_jednaci_id;
+            $this->odpoved = true;
             $this->template->odpoved_na_dokument = true;
 
             $this->template->typy_dokumentu = Dokument::typDokumentu();
             
-            $this->template->novyForm = $this['novyForm'];
+            $this->template->novyForm = $this['odpovedForm'];
             $this->setView('novy');
 
         } else {
@@ -1294,10 +1294,31 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
         
     }
-    
+
     protected function createComponentNovyForm()
     {
+        $form = $this->createNovyOrOdpovedForm();
+        $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
+                ->addRule(Form::FILLED, 'Lhůta k vyřízení musí být vyplněna!')
+                ->addRule(Form::NUMERIC, 'Lhůta k vyřízení musí být číslo')
+                ->setValue('30');
+        $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
 
+        $form->addSubmit('novy_pridat', 'Vytvořit dokument a založit nový');
+        $form['novy_pridat']->onClick[] = array($this, 'vytvoritClicked');
+        $form['novy_pridat']->onInvalidClick[] = array($this, 'vytvoritClickedChyba');
+
+        return $form;
+    }
+
+    protected function createComponentOdpovedForm()
+    {
+        $form = $this->createNovyOrOdpovedForm();
+        return $form;
+    }
+    
+    protected function createNovyOrOdpovedForm()
+    {
         $dok = null;
         if( isset($this->template->Dok) ) {
             $dokument_id = isset($this->template->Dok->id)?$this->template->Dok->id:0;
@@ -1322,7 +1343,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addHidden('id')
                 ->setValue($dokument_id);
         $form->addHidden('odpoved')
-                ->setValue($this->odpoved);
+                ->setValue($this->odpoved === true ? 1 : 0);
         $form->addHidden('predano_user');
         $form->addHidden('predano_org');
         $form->addHidden('predano_poznamka');
@@ -1360,16 +1381,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50)
                 ->setValue(@$dok->cislo_doporuceneho_dopisu);        
-        
-        $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
-                ->addRule(Form::FILLED, 'Lhůta k vyřízení musí být vyplněna!')
-                ->addRule(Form::NUMERIC, 'Lhůta k vyřízení musí být číslo')
-                ->setValue('30');
-        $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
-                ->setValue(@$dok->poznamka);
-
-        $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
-        
+                
         $form->addHidden('zmocneni')->setValue(0);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
@@ -1380,10 +1392,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$dok->typ_prilohy);        
 
 
-        $form->addSubmit('novy', 'Vytvořit dokument')
-                 ->onClick[] = array($this, 'vytvoritClicked');
-        $form->addSubmit('novy_pridat', 'Vytvořit dokument a založit nový')
-                 ->onClick[] = array($this, 'vytvoritClicked');
+        $form->addSubmit('novy', 'Vytvořit dokument');
+        $form['novy']->onClick[] = array($this, 'vytvoritClicked');
+        $form['novy']->onInvalidClick[] = array($this, 'vytvoritClickedChyba');
+                
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoSeznamClicked');
@@ -1398,6 +1410,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
+    public function vytvoritClickedChyba(SubmitButton $button)
+    {
+        $this->displayFormErrors($button);
+        $this->redirect(':Spisovka:Dokumenty:default');
+    }
+    
     public function vytvoritClicked(SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -1474,19 +1492,24 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 }
 
-                $this->flashMessage('Dokument byl vytvořen.');
-
-                if ( !empty($data['predano_user']) || !empty($data['predano_org']) ) {
-                    /* Dokument predan */
-                    $Workflow->predat($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
-                    $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
+                if ($data['odpoved'] == 1) {
+                    $this->flashMessage('Odpověď byla vytvořena.');
+                    $this->forward(':Spisovka:Dokumenty:kvyrizeni', array('id'=>$dokument_id));
                 }
+                else {
+                    $this->flashMessage('Dokument byl vytvořen.');
 
-                $name = $button->getName();
-                if ( $name == "novy_pridat" ) {
-                    $this->redirect(':Spisovka:Dokumenty:novy');
-                } else {
-                    $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));    
+                    if ( !empty($data['predano_user']) || !empty($data['predano_org']) ) {
+                        /* Dokument predan */
+                        $Workflow->predat($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
+                        $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
+                    }
+                
+                    $name = $button->getName();
+                    if ( $name == "novy_pridat" )
+                        $this->redirect(':Spisovka:Dokumenty:novy');
+                    else
+                        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
                 }
                 
             } else {

@@ -2,7 +2,7 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
-=== Verze 3.4.1 =================================================================
+=== Verze 3.4.1 ================================================================
 
 Nové funkce:
 
@@ -21,6 +21,7 @@ Jiné změny:
 - sestavy nyní tisknou záhlaví tabulky na každé stránce
 - při vytvoření odpovědi na dokument se zkopírují spisový znak a skartační režim,
   pokud jsou vyplněny
+- vytvoření odpovědi ji automaticky označí k vyřízení
   
 Opravy:
 

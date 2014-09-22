@@ -312,5 +312,11 @@ abstract class BasePresenter extends Presenter
         $filter->handler->macros['input'] =
             '<?php echo MyMacros::input($form, "%%"); ?>';
     }
-
+    
+    protected function displayFormErrors(SubmitButton $button)
+    {
+        $errors = $button->getForm()->getErrors();
+        foreach($errors as $error)
+            $this->flashMessage($error, 'warning');
+    }
 }
