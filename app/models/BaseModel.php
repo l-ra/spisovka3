@@ -380,25 +380,6 @@ abstract class BaseModel extends Object
     }
 
     /**
-     * Selects rows from the table in specified order
-     * @param array $order
-     * @param array $where
-     * @param array $offset
-     * @param array $limit
-     * @return DibiResult
-     */
-    public function fetchAllSearch($order = NULL, $where_or = NULL, $offset = NULL, $limit = NULL)
-    {
-        return dibi::query(
-            'SELECT * FROM %n', $this->name,
-            '%if', isset($where), 'WHERE %or', isset($where) ? $where : array(), '%end',
-            '%if', isset($order), 'ORDER BY %by', $order, '%end',
-            '%if', isset($limit), 'LIMIT %i %end', $limit,
-            '%if', isset($offset), 'OFFSET %i %end', $offset
-        );
-    }
-
-    /**
      * Select row from the table in specified where
      * @param array $where
      * @return DibiResult
@@ -422,6 +403,7 @@ abstract class BaseModel extends Object
         );
     }
 
+    /* Neni v programu pouzito
     public function getDataSource($table = null)
     {
         if ( !is_null($table) ) {
@@ -430,7 +412,7 @@ abstract class BaseModel extends Object
             return dibi::dataSource('SELECT * FROM %n', $this->name);
         }
 
-    }
+    } */
 
     /**
      * Inserts a new row
