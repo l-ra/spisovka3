@@ -44,7 +44,7 @@
             <th class="akce">&nbsp;</th>
             <th class="typ">Způsob odeslání</th>
             <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
-            <th class="vec">Adresát</th>
+            <th class="vec">Adresát<br /><br />Poznámka</th>
             <th class="uzel">Předal</th>
             <th class="prideleno">Druh zásilky/cena/hmotnost/zpráva</th>
         </tr>
@@ -79,6 +79,9 @@
                 {=Subjekt::displayName($dok,'adresa')}
                 {/if}    
                 </div>
+                {if !empty($dok->poznamka_odeslani)}
+                <br />poznámka: {$dok->poznamka_odeslani}
+                {/if}
             </td>
             <td class="uzel">
                 {=Osoba::displayName($dok,'user')}
