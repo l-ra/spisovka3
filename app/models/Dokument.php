@@ -1369,9 +1369,8 @@ class Dokument extends BaseModel
         if ( count($result)>0 ) {
 
             $tmp = array();
-            $dokument_version = 0;
-            foreach ($result as $index => $row) {
-                $id = $row->id; // toto je ID z tabulky dokument, totozny udaj je i v $row->dokument_id
+            foreach ($result as $row) {
+                // $id = $row->id; // toto je ID z tabulky dokument, totozny udaj je i v $row->dokument_id
 
                 $workflow = new stdClass();
                 $workflow->id = $row->workflow_id; unset($row->workflow_id);
