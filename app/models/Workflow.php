@@ -444,7 +444,7 @@ class Workflow extends BaseModel
             dibi::begin();
             
             $Dokument = new Dokument();
-            $dokument_info = $Dokument->getInfo($dokument_id);
+            $dokument_info = $Dokument->getInfo($dokument_id, "subjekty");
 
             // Test na uplnost dat
             if ( $kontrola = $Dokument->kontrola($dokument_info) ) {
@@ -560,7 +560,7 @@ class Workflow extends BaseModel
         // kontrola uzivatele
 
         $Dokument = new Dokument();
-        $dokument_info = $Dokument->getInfo($dokument_id);
+        $dokument_info = $Dokument->getInfo($dokument_id, "subjekty");
 
         //echo "<pre>"; print_r($dokument_info); echo "</pre>"; exit;
 
@@ -609,13 +609,13 @@ class Workflow extends BaseModel
         
     }
 
-    public function pripojitDoSpisovny($dokument_id, $samostatny = 0)
+    public function prevzitDoSpisovny($dokument_id, $samostatny = 0)
     {
 
         // kontrola uzivatele
 
         $Dokument = new Dokument();
-        $dokument_info = $Dokument->getInfo($dokument_id);
+        $dokument_info = $Dokument->getInfo($dokument_id, "subjekty");
 
         if ( $samostatny == 1 && isset($dokument_info->spisy) ) {
             return 'Dokument '.$dokument_info->jid.' nelze příjmout do spisovny! Dokument je součásti spisu.';
