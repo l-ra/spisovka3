@@ -390,7 +390,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $form1->addHidden('parent_id_old')
                 ->setValue(@$spis->parent_id);    
 
-        $form1->addComponent( new Select2Component('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form1->addComponent( new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
         $form1->getComponent('spisovy_znak_id')->setValue(@$spis->spisovy_znak_id)
             ->controlPrototype->onchange("vybratSpisovyZnak(this);");
         
@@ -445,7 +445,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->redirect('this',array('id'=>$spis_id));
     }
 
-    public function stornoSeznamClicked(SubmitButton $button)
+    public function stornoNovyClicked(SubmitButton $button)
     {
         $this->redirect(':Admin:Spisy:seznam');
     }
@@ -478,8 +478,9 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $form1->addSelect('parent_id', 'Složka:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
 
-        $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
-                ->controlPrototype->onchange("vybratSpisovyZnak();");
+        $form1->addComponent( new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form1->getComponent('spisovy_znak_id')->controlPrototype->onchange("vybratSpisovyZnak(this);");
+
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
@@ -491,7 +492,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
                  ->onClick[] = array($this, 'vytvoritClicked');
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+                 ->onClick[] = array($this, 'stornoNovyClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
 
