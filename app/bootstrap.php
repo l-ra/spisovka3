@@ -134,7 +134,16 @@ catch (DibiDriverException $e) {
 // 
 // Detect and set HTTP protocol => HTTP(80) or HTTPS(443)
 // 
-if (Settings::get('router_force_https', false) || Environment::getHttpRequest()->isSecured())
+$force_https = false;
+try {
+    // Nasledujici prikaz funguje az pote, co je provedena instalace
+    $force_https = Settings::get('router_force_https', false);
+}
+catch(DibiException $e) {
+    // ignoruj
+}
+
+if ($force_https || Environment::getHttpRequest()->isSecured())
     Route::$defaultFlags |= Route::SECURED;
 
 // Get router
