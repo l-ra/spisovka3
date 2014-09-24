@@ -234,7 +234,7 @@ class Subjekt extends BaseModel
         if (is_string($data))
             return $data;
         if (is_array($data))
-            $data = ArrayObject($data);        
+            $data = new ArrayObject($data, ArrayObject::ARRAY_AS_PROPS);        
         if (!is_object($data))
             return "";
 
