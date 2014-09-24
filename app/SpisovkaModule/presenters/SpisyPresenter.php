@@ -30,15 +30,15 @@ class SpisyPresenter extends BasePresenter
         $Spisy = new Spis();
 
         try {
-            $spis_id = $Spisy->vytvorit($data);
-            
-            $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');
-            $this->redirect(":{$this->name}:detail", array('id'=>$spis_id));
-            
+            $spis_id = $Spisy->vytvorit($data);            
+            $this->flashMessage('Spis "'. $data['nazev'] .'"  byl vytvořen.');            
         } catch (Exception $e) {
             $this->flashMessage('Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
             $this->flashMessage($e->getMessage(), 'warning');
+            $this->redirect(":{$this->name}:");
         }
+        
+        $this->redirect(":{$this->name}:detail", array('id'=>$spis_id));
     }
     
 };
