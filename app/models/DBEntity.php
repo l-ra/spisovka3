@@ -42,7 +42,7 @@ abstract class DBEntity
     protected function _load()
     {
         $id = $this->id;
-        $result = dibi::query("SELECT * FROM %n WHERE id = $id", $this::TBL_NAME);
+        $result = dibi::query("SELECT * FROM %n WHERE id = $id", ':PREFIX:' . $this::TBL_NAME);
         if (!count($result))
             throw new Exception(__METHOD__ . "() - entita " . get_class($this) . " ID $id neexistuje");
             
@@ -121,7 +121,7 @@ abstract class DBEntity
         if (!$this->canUserModify())
             throw new Exception("Uložení entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
         if ($this->data_changed) {
-            dibi::update($this::TBL_NAME, $this->data)->where("id = {$this->id}")->execute();
+            dibi::update(':PREFIX:' . $this::TBL_NAME, $this->data)->where("id = {$this->id}")->execute();
         }
     }
 
@@ -133,7 +133,7 @@ abstract class DBEntity
         if (!$this->canUserDelete())
             throw new Exception("Smazání entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
             
-        dibi::query("DELETE FROM %n WHERE id = {$this->id}", $this::TBL_NAME);
+        dibi::query("DELETE FROM %n WHERE id = {$this->id}", ':PREFIX:' . $this::TBL_NAME);
     }
 
     public function canUserModify()
@@ -152,7 +152,7 @@ abstract class DBEntity
      */
     protected static function _getAll($class, array $params = array())
     {
-        $query = array('SELECT * FROM %n', $class::TBL_NAME);
+        $query = array('SELECT * FROM %n', ':PREFIX:' . $class::TBL_NAME);
         
         if (isset($params['where']))
             array_push($query, 'WHERE %and', $params['where']);
@@ -187,7 +187,7 @@ abstract class DBEntity
      */
     public static function create($class, array $data)
     {
-        $id = dibi::insert($class::TBL_NAME, $data)->execute(dibi::IDENTIFIER);
+        $id = dibi::insert(':PREFIX:' . $class::TBL_NAME, $data)->execute(dibi::IDENTIFIER);
         
         return new $class($id);
     }
