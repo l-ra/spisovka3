@@ -8,19 +8,19 @@
 abstract class DBEntity
 {
 
-	const TBL_NAME = 'dbentity';
-	/**
-	 * integer primary key
-	 */
-	protected $id;
-	protected $data = null;
+    const TBL_NAME = 'dbentity';
+    /**
+     * integer primary key
+     */
+    protected $id;
+    protected $data = null;
     protected $data_changed = false;
     
-	/**
-	 * @param id    int
-	 */
-	public function __construct($param)
-	{
+    /**
+     * @param id    int
+     */
+    public function __construct($param)
+    {
         /* if (is_object($param) && is_a($param, 'DibiRow')) {
             $this->data = $param;
             $this->id = $param->id;
@@ -39,26 +39,26 @@ abstract class DBEntity
         return "$method() - entita $message";
     }
     
-	protected function _load()
-	{
+    protected function _load()
+    {
         $id = $this->id;
         $result = dibi::query("SELECT * FROM %n WHERE id = $id", $this::TBL_NAME);
         if (!count($result))
             throw new Exception(__METHOD__ . "() - entita " . get_class($this) . " ID $id neexistuje");
             
         $this->data = $result->fetch();
-	}
+    }
 
-	protected function _setData(DibiRow $data)
+    protected function _setData(DibiRow $data)
     {
         $this->data = $data;        
     }
 
-	/**
-	 * @param name    string
-	 */
-	public function __get($name)
-	{
+    /**
+     * @param name    string
+     */
+    public function __get($name)
+    {
         if (!$this->data)
             $this->_load();
             
@@ -66,10 +66,10 @@ abstract class DBEntity
             return $this->data[$name];
             
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
-	}
+    }
 
-	public function __isset($name)
-	{
+    public function __isset($name)
+    {
         if (!$this->data)
             $this->_load();
             
@@ -77,15 +77,15 @@ abstract class DBEntity
             return isset($this->data[$name]);
             
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
-	}
+    }
     
-	/**
-	 * 
-	 * @param name    string
-	 * @param value   mixed
-	 */
-	public function __set($name, $value)
-	{
+    /**
+     * 
+     * @param name    string
+     * @param value   mixed
+     */
+    public function __set($name, $value)
+    {
         if (!$this->data)
             $this->_load();
             
@@ -100,15 +100,15 @@ abstract class DBEntity
             $this->data[$name] = $value;
             $this->data_changed = true;
         }
-	}
+    }
 
-	public function getData()
-	{
+    public function getData()
+    {
         if (!$this->data)
             $this->_load();
             
         return $this->data;
-	}
+    }
 
     public function modify(array $data)
     {           
@@ -116,42 +116,42 @@ abstract class DBEntity
             $this->__set($key, $value);
     }
     
-	public function save()
-	{
+    public function save()
+    {
         if (!$this->canUserModify())
             throw new Exception("Uložení entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
         if ($this->data_changed) {
             dibi::update($this::TBL_NAME, $this->data)->where("id = {$this->id}")->execute();
         }
-	}
+    }
 
-	/**
-	 * deletes the entity from a database
-	 */
-	public function delete()
-	{
+    /**
+     * deletes the entity from a database
+     */
+    public function delete()
+    {
         if (!$this->canUserDelete())
             throw new Exception("Smazání entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
             
         dibi::query("DELETE FROM %n WHERE id = {$this->id}", $this::TBL_NAME);
-	}
+    }
 
-	public function canUserModify()
-	{
+    public function canUserModify()
+    {
         return true;
     }
     
-	public function canUserDelete()
-	{
+    public function canUserDelete()
+    {
         return true;
     }
     
-	/**
-	 * @param class   string    classname of instantiated elements
-	 * @param params
-	 */
-	protected static function _getAll($class, array $params = array())
-	{
+    /**
+     * @param class   string    classname of instantiated elements
+     * @param params
+     */
+    protected static function _getAll($class, array $params = array())
+    {
         $query = array('SELECT * FROM %n', $class::TBL_NAME);
         
         if (isset($params['where']))
@@ -177,20 +177,20 @@ abstract class DBEntity
         }
         
         return $a;
-	}
+    }
     
-	/**
-	 * creates an instance and returns it
-	 * 
-	 * @param   data
+    /**
+     * creates an instance and returns it
+     * 
+     * @param   data
      * @returns object
-	 */
-	public static function create($class, array $data)
-	{
+     */
+    public static function create($class, array $data)
+    {
         $id = dibi::insert($class::TBL_NAME, $data)->execute(dibi::IDENTIFIER);
         
         return new $class($id);
-	}
+    }
 
 }
 

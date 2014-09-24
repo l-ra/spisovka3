@@ -7,28 +7,28 @@
 class Sestava extends DBEntity
 {
 
-	const TBL_NAME = 'sestava';
+    const TBL_NAME = 'sestava';
 
     public static function getAll(array $params = array())
     {
         return parent::_getAll(__CLASS__, $params);
     }
     
-	public function isDeletable()
-	{
+    public function isDeletable()
+    {
         return $this->id != 1;
-	}
+    }
 
-	public function isModifiable()
-	{
+    public function isModifiable()
+    {
         return $this->typ != 2;
-	}
+    }
 
-	public function canUserDelete()
-	{
+    public function canUserDelete()
+    {
         $allowed = Environment::getUser()->isAllowed('Sestava', 'mazat');
         return $this->isDeletable() && $allowed;
-	}
+    }
 
     public function canUserModify()
     {
