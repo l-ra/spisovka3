@@ -990,17 +990,23 @@ dmFormat =
                 $mess = $imap->get_message($z->id_part);
                 
                 $popis = '';
+                $byla_plain_cast = false;
+                
                 foreach ($mess->texts as $zpr) {
-                    if($zpr->subtype == "HTML") {
+                    if ($zpr->subtype == "PLAIN") {
+                        $byla_plain_cast = true;
+                        $popis .= htmlspecialchars($zpr->text_convert) . "\n";
+                    }
+                    // Pozn.: standardne je v mailu plain cast a hned za ni HTML cast
+                    if ($zpr->subtype == "HTML" && !$byla_plain_cast) {
                         $zpr->text_convert = str_ireplace("<br>", "\n", $zpr->text_convert);
                         $zpr->text_convert = str_ireplace("<br />", "\n", $zpr->text_convert);
-                        $popis .= htmlspecialchars($zpr->text_convert);
-                    } else {
-                        $popis .= htmlspecialchars($zpr->text_convert);
+                        $popis .= htmlspecialchars($zpr->text_convert) . "\n";
                     }
-                    $popis .= "\n\n";
                 }
-
+                if (strlen($popis) > 10000)
+                    $popis = substr($popis, 0, 10000);
+                    
                 if ( empty($z->from_address) ) {
                     $predmet = empty($z->subject)?"[Bez předmětu] Emailová zpráva":$z->subject;
                 } else {
