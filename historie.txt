@@ -34,6 +34,7 @@ Opravy:
 - hledání ve spisech ve spisovně nebylo funkční
 - oprávnění "Změny dokumentů svojí org. jednotky" je nyní kontrolováno 
   i u vedoucího. Ve výchozím stavu má vedoucí toto oprávnění přiděleno.
+- opraveno přidávání subjektů ve formuláři vytváření odpovědi
 
 === Verze 3.4.0 =================================================================
 

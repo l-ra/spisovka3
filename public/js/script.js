@@ -224,6 +224,8 @@ $(function() {
                 if (typeof typ_id == 'undefined')
                     typ_id = $('#frmmetadataForm-dokument_typ_id').val();
                 if (typeof typ_id == 'undefined')
+                    typ_id = $('#frmodpovedForm-dokument_typ_id').val();
+                if (typeof typ_id == 'undefined')
                     typ_id = typ_dokumentu_id;
                     
                 var typ_code;
@@ -808,14 +810,16 @@ subjektNovy = function(event) {
                     }
                 }
 
-                if ( typeof document.forms["frm-novyForm"] != "undefined" ) {
-                    formdata = 'id='+id+'&' + $(document.forms["frm-novyForm"]).serialize();
-                }else if ( typeof document.forms["frm-novySubjekt"] != "undefined" ) {
-                    formdata = 'id='+id+'&' + $(document.forms["frm-novySubjekt"]).serialize();
-                } else {
-                    formdata = '';
-                }
-
+                var form = document.forms["frm-novyForm"];
+                if ( typeof form == "undefined" )
+                    form = document.forms["frm-odpovedForm"];
+                if ( typeof form == "undefined" )
+                    form = document.forms["frm-novySubjekt"];
+                    
+                var formdata = '';                
+                if ( typeof form != "undefined" )
+                    formdata = 'id='+id+'&' + $(form).serialize();
+                
                 if ( is_simple == 1 ) {
                     x.open("POST", baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=vytvoritAjax', true);
                 } else { 
