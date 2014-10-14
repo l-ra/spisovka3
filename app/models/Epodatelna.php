@@ -302,7 +302,7 @@ class Epodatelna extends BaseModel
 
             if ( empty($identifikator['cert_signed']) ) {
                 $identifikator['cert_signed'] = -1;
-                $identifikator['cert_status'] = "Email není podepsán!";
+                $identifikator['cert_status'] = "Email není podepsán.";
             } elseif ( (int)$identifikator['cert_signed'] >= 0 ) {
                 //$identifikator['cert_info']['platnost_do'] = time() - (86400*2);
                 $od = $identifikator['cert_info']['platnost_od'];
@@ -368,6 +368,11 @@ class Epodatelna extends BaseModel
                 $identifikator['cert_log']['aktualne']['date'] = date("d.m.Y H:i:s");
                 $identifikator['cert_log']['aktualne']['message'] = $identifikator['cert_status'];
                 $identifikator['cert_log']['aktualne']['status'] = $identifikator['cert_signed'];
+                
+                // [P.L.] Oprava problemu z minulosti, kdy aplikace hlasila, ze maily bez podpisu
+                // mely poskozeny podpis. Zobraz aktualni stav overereni, ne text z databaze
+                $identifikator['cert_status'] = $original['signature']['status'];
+                
             } else {
                 $identifikator['cert_log']['aktualne']['date'] = date("d.m.Y H:i:s");
                 $identifikator['cert_log']['aktualne']['message'] = $identifikator['cert_status'];

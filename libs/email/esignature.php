@@ -211,15 +211,6 @@ class esignature {
         }
     }
 
-    public function verifySignature_source($message,&$cert=null,&$status="") {
-        $tmp_mess = $this->tempnam("", "mess");
-        $fp = fopen($tmp_mess,"w");
-            fwrite($fp,$message);
-        fclose($fp);
-
-        return $this->verifySignature($tmp_mess, $cert, $status);
-    }
-
 /**
  *
  * @param string $filename
@@ -263,9 +254,9 @@ class esignature {
             if($res == -1) {
                 // Chyba
                 if( strpos($status,"invalid mime type")!==false ) {
-                    $status = "Email není podepsán!";
+                    $status = "Email není podepsán.";
                 } else if ( strpos($status,"no content type")!==false )  {
-                    $status = "Email není podepsán!";
+                    $status = "Email není podepsán.";
                 } else {
                     $status = "Email nelze ověřit! Email je buď poškozený nebo není kompletní nebo nelze ověřit podpis.";
                     //$status = "Email nelze ověřit! Chyba aplikace! ". openssl_error_string();
