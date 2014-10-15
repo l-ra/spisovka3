@@ -1522,11 +1522,6 @@ class Dokument extends BaseModel
                 $dokument->spousteci_udalost_dtext = '';            
             }
             
-            if ( !empty($dokument->identifikator) ) {
-                $Epodatelna = new Epodatelna();
-                $dokument->identifikator = $Epodatelna->identifikator(unserialize($dokument->identifikator));
-            }
-
             if ( empty($dokument->nazev) ) {
                 $dokument->nazev = "(bez názvu)";
             }

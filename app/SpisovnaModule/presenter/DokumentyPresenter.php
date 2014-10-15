@@ -348,6 +348,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
         if ( $dokument ) {
             // dokument zobrazime
+            if (!empty($dokument->identifikator)) {
+                $Epodatelna = new Epodatelna();
+                $dokument->identifikator = $Epodatelna->identifikator(unserialize($dokument->identifikator));
+            }
+
             $this->template->Dok = $dokument;
 
             $Zapujcka = new Zapujcka();
