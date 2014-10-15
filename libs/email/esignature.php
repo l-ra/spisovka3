@@ -234,11 +234,12 @@ class esignature {
             // email overen
             $cert = openssl_x509_parse("file://$tmp_cert");
 
-            // test identity emailu
-            if ( $this->verifyEmailAddress($cert, $filename, $email1, $email2) == 0 ) {
-                $status = "Email je ověřen a platný, ale má rozdilné emailové adresy! ($email1 <> $email2)";
-            } else {
-                $status = "Email je ověřen a platný";
+            $res2 = $this->verifyEmailAddress($cert, $filename, $email_cert, $email_real);
+            $status = "Podpis je ověřen a platný";
+            if ($res2 === false) {
+                $status .= ", ale emailová adresa odesilatele neodpovídá certifikátu! ($email_cert <> $email_real)";
+            } else if ($res2 === -1) {
+                $status .= ", ale z certifikátu se nepodařilo zjistit emailovou adresu.";
             }
 
             @unlink($tmp_cert);
@@ -302,30 +303,23 @@ class esignature {
         }
 
     }
+    
+    // $email_cert - adresa v certifikatu
+    // $email_real - skutecna adresa odesilatele
+    private function verifyEmailAddress($cert, $filename, &$email_cert = null, &$email_real = null) {
 
-    private function verifyEmailAddress($cert,$filename,&$email1=null,&$email2=null) {
-
-        if(isset( $cert['extensions']['subjectAltName'])) {
-            if( preg_match("/email:(.*?),/", $cert['extensions']['subjectAltName'],$mathes) ) {
-                $email1 = trim($mathes[1]);
-                $email_source = file_get_contents($filename);
-                if( preg_match("/From:(.*)/", $email_source,$mathes2) ) {
-                    $email2 = $mathes2[1];
-                    if( strpos($mathes2[1],$email1)!==false ) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return -1;
-                }
-            } else {
-                return -1;
-            }
-        } else {
-            return -1;
-        }
+        if (!isset( $cert['extensions']['subjectAltName'])
+            || !preg_match("/email:(.*?),/", $cert['extensions']['subjectAltName'], $matches))
+            return -1; // K tomuto by nemělo nikdy dojít
         
+        $email_cert = trim($matches[1]);
+        
+        $email_source = file_get_contents($filename);
+        $headers = imap_rfc822_parse_headers($email_source);
+        $sender = current($headers->from);
+        $email_real = "{$sender->mailbox}@{$sender->host}";
+        
+        return $email_cert == $email_real;
     }
 
     public function getInfo($cert=null) {

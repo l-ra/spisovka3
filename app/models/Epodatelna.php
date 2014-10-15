@@ -136,13 +136,16 @@ class Epodatelna extends BaseModel
     {
         if ( empty($zprava) && empty($original) ) {
             return null;
-        } else if (!empty($zprava->identifikator)) {
+        } else if (!empty($zprava->identifikator) 
+                   // Bugfix: Pokud identifikátor obsahuje tento řetězec, je nutné jej sestavit znovu
+                   && strpos($zprava->identifikator, 'ale má rozdilné emailové adresy!') === false) {
             if ( is_array($zprava->identifikator) ) {
                 $identifikator = $zprava->identifikator;
             } else {
                 $identifikator = unserialize($zprava->identifikator);
             }
         } else if ( isset($zprava['typ']) ) {
+            // Zavoláno při zobrazení detailu dokumentu
             $identifikator = $zprava;
         } else {
             $identifikator = array();

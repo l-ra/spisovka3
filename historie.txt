@@ -35,6 +35,7 @@ Opravy:
 - oprávnění "Změny dokumentů svojí org. jednotky" je nyní kontrolováno 
   i u vedoucího. Ve výchozím stavu má vedoucí toto oprávnění přiděleno.
 - opraveno přidávání subjektů ve formuláři vytváření odpovědi
+- opravy kontroly elektronického podpisu u e-mailů
 
 === Verze 3.4.0 =================================================================
 
