@@ -184,7 +184,7 @@ class LogModel extends BaseModel {
         $row['user_id'] = $user_id;
         $row['date'] = new DateTime();
         $row['ip'] = Environment::getHttpRequest()->getRemoteAddress();
-        $row['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+        $row['user_agent'] = substr($_SERVER['HTTP_USER_AGENT'], 0, 190);
         $row['stav'] = $stav;
 
         return dibi::insert($this->tb_logaccess, $row)
