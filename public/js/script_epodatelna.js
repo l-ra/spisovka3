@@ -459,7 +459,7 @@ function bytesToSize (bytes) {
 generujZpravu = function ( id, data ) {
 
     typ = 0;
-    if ( typeof data['email_signature'] == "string" ) {
+    if ( typeof data['email_id'] == "string" ) {
         typ = 1;
         typ_string = '<img src="'+baseUri+'images/icons/typdok1.png" alt="Email" title="Email" width="24" height="16" />';
 
@@ -480,7 +480,7 @@ generujZpravu = function ( id, data ) {
 '                        <dd><textarea name="zprava_odmitnuti['+id+']" rows="3" cols="60"></textarea></dd>'+
 '                    </dl>';
 
-    } else if ( typeof data['isds_signature'] == "string" ) {
+    } else if ( typeof data['isds_id'] == "string" ) {
         typ = 2;
         typ_string = '<img src="'+baseUri+'images/icons/typdok2.png" alt="ISDS" title="ISDS" width="24" height="16" />';
         form_odmitnout = '';

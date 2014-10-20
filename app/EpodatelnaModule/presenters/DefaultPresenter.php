@@ -237,7 +237,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             }
 
             $original = null;
-            if ( !empty($zprava->email_signature) ) {
+            if ( !empty($zprava->email_id) ) {
                 // Nacteni originalu emailu
                 if ( !empty( $zprava->file_id ) ) {
                     $original = $this->nactiEmail($zprava->file_id);
@@ -276,7 +276,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
 
                 }
-            } else if ( !empty($zprava->isds_signature) ) {
+            } else if ( !empty($zprava->isds_id) ) {
                 // Nacteni originalu DS
                 if ( !empty( $zprava->file_id ) ) {
                     $source = $this->nactiISDS($zprava->file_id);
@@ -463,7 +463,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
                 $subjekt = new stdClass();
                 $original = null;
-                if ( !empty($zprava->email_signature) ) {
+                if ( !empty($zprava->email_id) ) {
                     // Nacteni originalu emailu
                     if ( !empty( $zprava->file_id ) ) {
                         $DefaultPresenter = new Epodatelna_DefaultPresenter();
@@ -488,7 +488,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $subjekt_databaze = $SubjektModel->hledat($subjekt,'email');
                     $zpravy[ $zprava->id ]->subjekt = array('original'=>$subjekt,'databaze'=>$subjekt_databaze);
 
-                } else if ( !empty($zprava->isds_signature) ) {
+                } else if ( !empty($zprava->isds_id) ) {
                     // Nacteni originalu DS
                     if ( !empty( $zprava->file_id ) ) {
                         $DefaultPresenter = new Epodatelna_DefaultPresenter();
@@ -665,7 +665,7 @@ dmFiles = objekt
                         $zprava = array();
                         $zprava['poradi'] = $this->Epodatelna->getMax();
                         $zprava['rok'] = date('Y');
-                        $zprava['isds_signature'] = $z->dmID;
+                        $zprava['isds_id'] = $z->dmID;
                         $zprava['predmet'] = $annotation;
                         $zprava['popis'] = $popis;
                         $zprava['odesilatel'] = $z->dmSender .', '. $z->dmSenderAddress;
@@ -787,7 +787,7 @@ dmFormat =
         if ( is_null($zprava) ) {
             // Nacti zpravy, ktere nemaji datum doruceni
             $args = array(
-                'where' => array('ep.epodatelna_typ=1','ep.isds_signature IS NOT NULL','ep.prijato_dne=ep.doruceno_dne')
+                'where' => array('ep.epodatelna_typ=1','ep.isds_id IS NOT NULL','ep.prijato_dne=ep.doruceno_dne')
             );
             $epod = $this->Epodatelna->seznam($args)->fetchAll();
             if ( count($epod)>0 ) {
@@ -796,8 +796,8 @@ dmFormat =
                     if ( $od > ($datum-36000) ) $od = $datum-36000;
                     if ( $do < ($datum+36000) ) $do = $datum+36000;
                     
-                    $ep_zpravy[ $zprava->isds_signature ] = array(
-                        'id_mess' => $zprava->isds_signature,
+                    $ep_zpravy[ $zprava->isds_id ] = array(
+                        'id_mess' => $zprava->isds_id,
                         'epodatelna_id' => $zprava->id,
                         'datum_odeslani' => $zprava->prijato_dne,
                         'datum_doruceni' => $zprava->doruceno_dne,
@@ -811,8 +811,8 @@ dmFormat =
             $od = $datum - 36000;
             $do = $datum + 36000;
                     
-            $ep_zpravy[ $zprava->isds_signature ] = array(
-                'id_mess' => $zprava->isds_signature,
+            $ep_zpravy[ $zprava->isds_id ] = array(
+                'id_mess' => $zprava->isds_id,
                 'epodatelna_id' => $zprava->id,
                 'datum_odeslani' => $zprava->prijato_dne,
                 'datum_doruceni' => $zprava->doruceno_dne,
@@ -1017,7 +1017,7 @@ dmFormat =
                 $zprava = array();
                 $zprava['poradi'] = $this->Epodatelna->getMax();
                 $zprava['rok'] = date('Y');
-                $zprava['email_signature'] = $z->message_id;
+                $zprava['email_id'] = $z->message_id;
                 $zprava['predmet'] = $predmet;
                 $zprava['popis'] = $popis;
                 $zprava['odesilatel'] = $z->from_address;

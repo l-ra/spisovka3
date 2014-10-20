@@ -71,7 +71,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
 
             $original = null;
-            if ( !empty($zprava->email_signature) ) {
+            if ( !empty($zprava->email_id) ) {
                 // Nacteni originalu emailu
                 if ( !empty( $zprava->file_id ) ) {
                     $DefaultPresenter = new Epodatelna_DefaultPresenter();
@@ -96,7 +96,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $subjekt_databaze = $SubjektModel->hledat($subjekt,'email');
                 $this->template->Subjekt = array('original'=>$subjekt,'databaze'=>$subjekt_databaze);
 
-            } else if ( !empty($zprava->isds_signature) ) {
+            } else if ( !empty($zprava->isds_id) ) {
                 // Nacteni originalu DS
                 if ( !empty( $zprava->file_id ) ) {
                     $DefaultPresenter = new Epodatelna_DefaultPresenter();
@@ -221,7 +221,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $epodatelna_id = $this->getParam('id',null);
         $zprava = $Epodatelna->getInfo($epodatelna_id);
 
-        if ( !empty($zprava->isds_signature) ) {
+        if ( !empty($zprava->isds_id) ) {
             if ( !empty( $zprava->file_id ) ) {
                 $DefaultPresenter = new Epodatelna_DefaultPresenter();
                 $file_id = explode("-",$zprava->file_id);
@@ -397,7 +397,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu);
                 //->setValue(1);
 
-        /*if ( !empty($zprava->email_signature) ) {
+        /*if ( !empty($zprava->email_id) ) {
             foreach ($typ_dokumentu_extra as $tde) {
                 if ( $tde->typ == 1 && $tde->smer == 0 ) {
                     $id_tde = $tde->id;
@@ -406,7 +406,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
             $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
                     ->setValue($id_tde);
-        } else if ( !empty($zprava->isds_signature) ) {
+        } else if ( !empty($zprava->isds_id) ) {
             foreach ($typ_dokumentu_extra as $tde) {
                 if ( $tde->typ == 2 && $tde->smer == 0 ) {
                     $id_tde = $tde->id;
@@ -434,7 +434,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->setValue('30')->addRule(Form::NUMERIC, 'Lhůta k vyřízení musí být číslo');
         
-        if ( !empty($zprava->isds_signature) ) {
+        if ( !empty($zprava->isds_id) ) {
             $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
         } else {
             $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
@@ -522,9 +522,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             if ( $dokument ) {
 
                 // Ulozeni prilohy
-                if ( !empty($zprava->email_signature) ) {
+                if ( !empty($zprava->email_id) ) {
                     $this->emailPrilohy($epodatelna_id, $dokument_id);
-                } else if ( !empty($zprava->isds_signature) ) {
+                } else if ( !empty($zprava->isds_id) ) {
                     $this->isdsPrilohy($epodatelna_id, $dokument_id);
                 }
 
@@ -578,7 +578,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $predano = Osoba::displayName(@Environment::getUser()->getIdentity()->identity);
                 }
                 
-                if ( !empty($zprava->email_signature) ) {
+                if ( !empty($zprava->email_id) ) {
                     $email_info = array(
                         'jid' => $data['jid'],
                         'nazev' => $zprava->predmet,
@@ -629,9 +629,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $dokument_id = $dokument->id;
 
                 // Ulozeni prilohy
-                if ( !empty($zprava->email_signature) ) {
+                if ( !empty($zprava->email_id) ) {
                     $this->emailPrilohy($epodatelna_id, $dokument_id);
-                } else if ( !empty($zprava->isds_signature) ) {
+                } else if ( !empty($zprava->isds_id) ) {
                     $this->isdsPrilohy($epodatelna_id, $dokument_id);
                 }
 
@@ -685,7 +685,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $predano = Osoba::displayName(@Environment::getUser()->getIdentity()->identity);
                 }
 
-                if ( !empty($zprava->email_signature) ) {
+                if ( !empty($zprava->email_id) ) {
                     $email_info = array(
                         'jid' => $data_after['jid'],
                         'nazev' => $zprava->predmet,
@@ -808,7 +808,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $res = $DefaultPresenter->nactiISDS($file_info->id);
 
                 $data = array(
-                    'filename'=>'datova_zprava_'.$info->isds_signature.'.zfo',
+                    'filename'=>'datova_zprava_'.$info->isds_id.'.zfo',
                     'dir'=> date('Y') .'/DOK-'. sprintf('%06d',$dokument_id) .'-'.date('Y'),
                     'typ'=>'5',
                     'popis'=>'Podepsaná originální datová zpráva'

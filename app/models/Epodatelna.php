@@ -85,20 +85,20 @@ class Epodatelna extends BaseModel
         if ( $typ == 'isds' ) {
             $args = array(
                 'where' => array(
-                    array('isds_signature = %s',$id_zpravy)
+                    array('isds_id = %s',$id_zpravy)
                 )
             );
         } else if ( $typ == 'email' ) {
             $args = array(
                 'where' => array(
-                    array('email_signature = %s',$id_zpravy)
+                    array('email_id = %s',$id_zpravy)
                 )
             );
         } else if ( $typ == 'vse' ) {
             $args = array(
                 'where_or' => array(
-                    array('isds_signature = %s',$id_zpravy),
-                    array('email_signature = %s',$id_zpravy)
+                    array('isds_id = %s',$id_zpravy),
+                    array('email_id = %s',$id_zpravy)
                 )
             );
         } else {
@@ -156,7 +156,7 @@ class Epodatelna extends BaseModel
             $identifikator['doruceno_dne'] = $doruceno;
             $identifikator['prijato_dne'] = $prijato;
 
-            if ( !empty($zprava->email_signature) ) {
+            if ( !empty($zprava->email_id) ) {
 
                 $identifikator['typ'] = "email";
                 $identifikator['odesilatel'] = $zprava->odesilatel;
@@ -205,7 +205,7 @@ class Epodatelna extends BaseModel
 
                 $identifikator['popis'] = $popis;
 
-            } else if ( !empty($zprava->isds_signature) ) {
+            } else if ( !empty($zprava->isds_id) ) {
 
                 if ( !empty($original->dmDm->dmID) ) {
 
@@ -391,7 +391,7 @@ class Epodatelna extends BaseModel
     {
         
         $data = $this->fetchAll(array('doruceno_dne'=>'DESC'), array(
-            'epodatelna_typ=0','isds_signature IS NOT NULL'
+            'epodatelna_typ=0','isds_id IS NOT NULL'
         ), 0, 1)->fetch();
         if ( $data ) {
             $do = strtotime($data->doruceno_dne);

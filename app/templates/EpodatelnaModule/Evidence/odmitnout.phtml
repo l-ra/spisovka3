@@ -5,9 +5,9 @@
 
     <h2>Odmítnout zprávu</h2>
     
-    {if !empty($Zprava->email_signature)}
+    {if !empty($Zprava->email_id)}
     {control odmitnoutEmailForm}
-    {elseif !empty($Zprava->isds_signature)}
+    {elseif !empty($Zprava->isds_id)}
     {control odmitnoutISDSForm}
     {/if}
 

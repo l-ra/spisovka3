@@ -43,9 +43,9 @@
         <dl class="detail_item">
             <dt>Typ zprávy:</dt>
             <dd>
-            {if !empty($Zprava->email_signature) }
+            {if !empty($Zprava->email_id) }
                 Emailová zpráva
-            {elseif !empty($Zprava->isds_signature) }
+            {elseif !empty($Zprava->isds_id) }
                 Datová zpráva z ISDS
             {else}
                 Typ nezjištěn

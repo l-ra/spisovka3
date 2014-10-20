@@ -394,10 +394,10 @@ class Dokument extends BaseModel
                         $args['where'][] = array('epod.id IS NOT NULL');
                         break;
                     case 2: // email
-                        $args['where'][] = array('epod.email_signature IS NOT NULL');
+                        $args['where'][] = array('epod.email_id IS NOT NULL');
                         break;
                     case 3: // isds
-                        $args['where'][] = array('epod.isds_signature IS NOT NULL');
+                        $args['where'][] = array('epod.isds_id IS NOT NULL');
                         break;
                     case 4: // mimo epod
                         $args['where'][] = array('epod.id IS NULL');
@@ -1336,7 +1336,7 @@ class Dokument extends BaseModel
                 'epod' => array(
                     'from' => array($this->tb_epodatelna => 'epod'),
                     'on' => array('epod.dokument_id=dok.id'),
-                    'cols' => array('identifikator','email_signature'=>'epod_is_email','isds_signature'=>'epod_is_isds')
+                    'cols' => array('identifikator','email_id'=>'epod_is_email','isds_id'=>'epod_is_isds')
                 ),
                 'spisovy_znak' => array(
                     'from' => array($this->tb_spisovy_znak => 'spisznak'),

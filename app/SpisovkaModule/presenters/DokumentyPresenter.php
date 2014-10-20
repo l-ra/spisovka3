@@ -2316,7 +2316,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['epodatelna_typ'] = 1;
             $zprava['poradi'] = $Epodatelna->getMax(1);
             $zprava['rok'] = date('Y');
-            $zprava['email_signature'] = $email_mess->message_id;
+            $zprava['email_id'] = $email_mess->message_id;
             $zprava['predmet'] = empty($email_mess->subject)?$data['email_predmet']:$email_mess->subject;
             if ( empty($zprava['predmet']) ) $zprava['predmet'] = "(bez předmětu)";
             $zprava['popis'] = $data['email_text'];
@@ -2397,7 +2397,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             return array(
                 'source'=>$source,
                 'epodatelna_id'=>$epod_id,
-                'email_signature'=>$email_mess->message_id,
+                'email_id'=>$email_mess->message_id,
                 'zprava'=>$data['email_text']
             );
         //} else {
@@ -2508,7 +2508,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['epodatelna_typ'] = 1;
             $zprava['poradi'] = $Epodatelna->getMax(1);
             $zprava['rok'] = date('Y');
-            $zprava['isds_signature'] = $mess->dmID;
+            $zprava['isds_id'] = $mess->dmID;
             $zprava['predmet'] = empty($mess->dmAnnotation)?"(Datová zpráva bez předmětu)":$mess->dmAnnotation;
             $zprava['popis'] = $popis;
             $zprava['odesilatel'] = $mess->dmRecipient .', '. $mess->dmRecipientAddress;
@@ -2594,7 +2594,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             return array(
                 'source'=>$mess,
                 'epodatelna_id'=>$epod_id,
-                'isds_signature' => $zprava,
+                'isds_id' => $zprava,
                 'zprava'=>$popis
             );
 
@@ -2604,7 +2604,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 return array(
                     'source'=>$mess,
                     'epodatelna_id'=>$epod_id,
-                    'isds_signature' => $zprava,
+                    'isds_id' => $zprava,
                     'zprava'=>$popis
                 );
             } else {
