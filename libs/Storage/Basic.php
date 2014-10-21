@@ -22,7 +22,7 @@ class Storage_Basic extends FileModel {
 
     public function remove($file_id) {
     
-        $row = $this->fetchRow(array('id=%i', $file_id))->fetch();
+        $row = $this->select(array(array('id=%i', $file_id)))->fetch();
         if (!$row)
             throw new Exception("Nemohu načíst přílohu ID $file_id.");
         

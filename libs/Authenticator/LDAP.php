@@ -512,7 +512,7 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
         $ldap_seznam[0] = "vyberte ze seznamu...";
         if ( is_array($seznam) ) {
             $User = new UserModel();
-            $user_seznam = $User->fetchAll()->fetchAssoc('username');
+            $user_seznam = $User->select()->fetchAssoc('username');
 
             foreach ($seznam as $user) {
                 if ( !isset($user_seznam[$user['uid']]) ) {
@@ -561,10 +561,10 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
         if ( is_array($seznam) ) {
 
             $Role = new RoleModel();
-            $role_seznam = $Role->select();
+            $role_seznam = $Role->selectBox();
 
             $User = new UserModel();
-            $user_seznam = $User->fetchAll()->fetchAssoc('username');
+            $user_seznam = $User->select()->fetchAssoc('username');
             
             foreach ($seznam as $id => $user) {
                 $form->addGroup($user['plne_jmeno'] ." - ". $user['uid']);
@@ -639,10 +639,10 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
         if ( is_array($seznam) ) {
 
             $Role = new RoleModel();
-            $role_seznam = $Role->select();
+            $role_seznam = $Role->selectBox();
 
             $User = new UserModel();
-            $user_seznam = $User->fetchAll()->fetchAssoc('username');
+            $user_seznam = $User->select()->fetchAssoc('username');
 
             echo "<div>\n";
             echo "Zde naleznete seznam všech uživatelů uložených přes LDAP.\n<br /><br />\n";

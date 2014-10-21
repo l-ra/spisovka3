@@ -305,7 +305,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->template->seznam = $seznam;
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->select(11);
+        $spisove_znaky = $SpisovyZnak->selectBox(11);
         $this->template->SpisoveZnaky = $spisove_znaky;
 
     }
@@ -325,7 +325,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         }
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->select(11);
+        $spisove_znaky = $SpisovyZnak->selectBox(11);
         $this->template->SpisoveZnaky = $spisove_znaky;
     
         if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
@@ -609,10 +609,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spisznak_seznam = $SpisovyZnak->selectBox(2);
         
         $params = array('where'=> array("tb.typ = 'VS'") );
-        $spisy = $Spisy->select(1, @$spis->id, 1, $params);
+        $spisy = $Spisy->selectBox(1, @$spis->id, 1, $params);
 
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -695,10 +695,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $params = array('where'=> array("tb.typ = 'VS'") );
-        $spisy = $Spisy->select(11, null, 1, $params);
+        $spisy = $Spisy->selectBox(11, null, 1, $params);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
         $form1 = new AppForm();
         $form1->addHidden('typ')
@@ -746,10 +746,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $params = array('where'=> array("tb.typ = 'VS'") );
-        $spisy = $Spisy->select(11, null, 1, $params);
+        $spisy = $Spisy->selectBox(11, null, 1, $params);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
         $dokument_id = $this->getParam('id',$this->getParam('dokument_id',null));
         if ( empty($dokument_id) ) {
@@ -912,7 +912,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $this->template->seznam = $seznam;
 
             $SpisovyZnak = new SpisovyZnak();
-            $spisove_znaky = $SpisovyZnak->select(11);
+            $spisove_znaky = $SpisovyZnak->selectBox(11);
             $this->template->SpisoveZnaky = $spisove_znaky;
         */
     }

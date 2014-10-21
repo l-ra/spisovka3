@@ -42,7 +42,7 @@ class DokumentOdeslani extends BaseModel
         }
         
         $subjekty = array();
-        $result = $this->fetchAllComplet($sql)->fetchAll();
+        $result = $this->selectComplex($sql)->fetchAll();
         if ( count($result)>0 ) {
             foreach ($result as $subjekt_index => $subjekt) {
                 $subjekty[ $subjekt->dokument_id ][ $subjekt_index ] = $subjekt;
@@ -84,7 +84,7 @@ class DokumentOdeslani extends BaseModel
 
         $sql['where'] = array( array('ds.id=%i',$id) );
         
-        $result = $this->fetchAllComplet($sql)->fetch();
+        $result = $this->selectComplex($sql)->fetch();
         if ( $result ) {
             $result->druh_zasilky = unserialize($result->druh_zasilky);
             return $result;
@@ -162,7 +162,7 @@ class DokumentOdeslani extends BaseModel
             );
                 
         $dokumenty = array();
-        $result = $this->fetchAllComplet($sql)->fetchAll();
+        $result = $this->selectComplex($sql)->fetchAll();
         
         if ( count($result) == 0 )
             return null;
@@ -219,7 +219,7 @@ class DokumentOdeslani extends BaseModel
     public function getDokumentID($id_dok_odes)
     {
         
-        $row = $this->fetchRow(array('id=%i',$id_dok_odes))->fetch();
+        $row = $this->select(array(array('id=%i',$id_dok_odes)))->fetch();
         if ( $row ) {
             return $row->dokument_id;
         }

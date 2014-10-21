@@ -803,7 +803,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $DefaultPresenter = new Epodatelna_DefaultPresenter();
 
             $FileModel = new FileModel();
-            $file_info = $FileModel->fetchAll(null,array(array('real_name=%s','ep-isds-'.$epodatelna_id.'.zfo')))->fetch();
+            $file_info = $FileModel->select(array(array('real_name=%s','ep-isds-'.$epodatelna_id.'.zfo')))->fetch();
             if ( $file_info ) {
                 $res = $DefaultPresenter->nactiISDS($file_info->id);
 

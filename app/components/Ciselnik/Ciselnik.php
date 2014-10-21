@@ -148,7 +148,7 @@ class Ciselnik extends Control {
             if ( $this->action == 'edit' ) {
                 $model = new Model($this->table);
                 $id = !empty($this->primary)?$this->primary:'id';
-                $this->data = $model->fetchRow(array('%and', array($id => $this->_params['primary'] )))->fetch();
+                $this->data = $model->select(array(array("$id = ", $this->_params['primary'])))->fetch();
                 
                 $can_delete = true;
                 if ( isset($this->data->fixed) ) {

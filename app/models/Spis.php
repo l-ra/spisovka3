@@ -9,7 +9,7 @@ class Spis extends TreeModel
     
     public function getInfo($spis_id, $detail = false)
     {
-        $result = $this->fetchRow(array('id=%i',$spis_id));
+        $result = $this->select(array(array('id=%i',$spis_id)));
         $row = $result->fetch();
         if (!$row)        
             throw new InvalidArgumentException("Spis id '$spis_id' neexistuje.");
@@ -20,7 +20,7 @@ class Spis extends TreeModel
     // Vrátí první spis z daným názvem, protože bohužel není zaručeno, že název spisu bude jedinečný
     public function findByName($spis_name)
     {
-        $result = $this->fetchRow(array('nazev=%s', $spis_name));
+        $result = $this->select(array(array('nazev=%s', $spis_name)));
         $row = $result->fetch();
         return $row ? $row : null;
     }
@@ -113,7 +113,7 @@ class Spis extends TreeModel
             )
         );   
         
-        $select = $this->fetchAllComplet($sql);
+        $select = $this->selectComplex($sql);
         $result = $select->fetchAll();
         if ( count($result)>0 ) {
             $dokumenty = array();
@@ -403,7 +403,7 @@ class Spis extends TreeModel
         $spisovy_znak_plneurceny = $spis_parent->spisovy_znak_plneurceny .'.'. $spisovy_znak;
 
         // vyhledame, zda existuje
-        $spis_exist = $this->fetchAll(null, array(array("spisovy_znak_plneurceny=%s",$spisovy_znak_plneurceny)), null, 1);
+        $spis_exist = $this->select(array(array("spisovy_znak_plneurceny=%s",$spisovy_znak_plneurceny)), null, null, 1);
         $spis_exist_fetch = $spis_exist->fetch();
 
         if ( !$spis_exist_fetch ) {
@@ -426,7 +426,7 @@ class Spis extends TreeModel
                 $spisovy_znak_plneurceny = $spis_parent->spisovy_znak_plneurceny .'.'. $spisovy_znak;
 
                 // vyhledame, zda existuje
-                $spis_exist = $this->fetchAll(null, array(array("spisovy_znak_plneurceny=%s",$spisovy_znak_plneurceny)), null, 1);
+                $spis_exist = $this->select(array(array("spisovy_znak_plneurceny=%s",$spisovy_znak_plneurceny)), null, null, 1);
                 $spis_exist_fetch = $spis_exist->fetch();
 
                 if ( !$spis_exist_fetch ) {

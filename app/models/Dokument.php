@@ -79,7 +79,7 @@ class Dokument extends BaseModel
             $sql['leftJoin'] = array_merge($sql['leftJoin'],$args['leftJoin']);
         }
 
-        return $this->fetchAllComplet($sql);
+        return $this->selectComplex($sql);
     }
 
     /**
@@ -185,7 +185,7 @@ class Dokument extends BaseModel
         $sql['having'] = array('NOW() > skartace');
 
         // return DibiResult
-        return $this->fetchAllComplet($sql);
+        return $this->selectComplex($sql);
     }    
     
     /**
@@ -222,7 +222,7 @@ class Dokument extends BaseModel
         }
 
 
-        $select = $this->fetchAll($order,$where,$offset,$limit);
+        $select = $this->select($where, $order,$offset,$limit);
 
         $rows = $select->fetchAll();
 
@@ -1364,7 +1364,7 @@ class Dokument extends BaseModel
         if (!in_array('workflow', $details))
             $sql['leftJoin']['workflow']['on'][] = 'wf.aktivni=1';
             
-        $select = $this->fetchAllComplet($sql);
+        $select = $this->selectComplex($sql);
         $result = $select->fetchAll();
         if ( count($result)>0 ) {
 
@@ -1544,7 +1544,7 @@ class Dokument extends BaseModel
 
         $where = array( array('id=%i', $dokument_id) );
 
-        $select = $this->fetchAll(null, $where);
+        $select = $this->select($where);
         $result = $select->fetch();
 
         return $result;
@@ -1552,7 +1552,7 @@ class Dokument extends BaseModel
 
     public function getMax() {
 
-        $result = $this->fetchAll(array('id'=>'DESC'),null,null,1);
+        $result = $this->select(null, array('id'=>'DESC'),null,1);
         $row = $result->fetch();
         return ($row) ? ($row->id+1) : 1;
 
@@ -1562,7 +1562,7 @@ class Dokument extends BaseModel
 
         if ( empty($cjednaci) ) return 1;
 
-        $result = $this->fetchAll(array('poradi'=>'DESC'),array(array('cislo_jednaci_id=%i',$cjednaci)),null,1);
+        $result = $this->select(array(array('cislo_jednaci_id=%i',$cjednaci)),array('poradi'=>'DESC'),null,1);
         $row = $result->fetch();
         return ($row) ? ($row->poradi+1) : 1;
 
@@ -1905,17 +1905,12 @@ class Dokument extends BaseModel
         if ( empty($cislo_jednaci) ) return null;
         
         if ( is_null($dokument_id) ) {
-            return $this->fetchAll(array('id'), 
-                                   array(
-                                       array('cislo_jednaci=%s',$cislo_jednaci),
-                                   ))->fetchAll();
+            return $this->select(array(array('cislo_jednaci=%s',$cislo_jednaci)), array('id'))->fetchAll();
             
         } else {
-            return $this->fetchAll(array('id'), 
-                                   array(
-                                       array('cislo_jednaci=%s',$cislo_jednaci),
+            return $this->select(array(array('cislo_jednaci=%s',$cislo_jednaci),
                                        array('id != %i',$dokument_id)
-                                   ))->fetchAll();
+                                   ), array('id'))->fetchAll();
         }
         
     }

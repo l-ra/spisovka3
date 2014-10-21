@@ -11,7 +11,7 @@ class Orgjednotka extends TreeModel
     
     public function getInfo($orgjednotka_id)
     {       
-        $result = $this->fetchRow(array('id=%i',$orgjednotka_id));
+        $result = $this->select(array(array('id=%i',$orgjednotka_id)));
         if (count($result) == 0)   
             throw new InvalidArgumentException("Organizační jednotka id '$orgjednotka_id' neexistuje.");
             
@@ -117,9 +117,7 @@ class Orgjednotka extends TreeModel
         $OrgJednotka = new Orgjednotka();
         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
         if ( $org_info ) {
-            $fetch = $OrgJednotka->fetchAll(array('sekvence'),
-                                array( array('sekvence LIKE %s', $org_info->sekvence .'.%')  )
-                            );
+            $fetch = $OrgJednotka->select(array( array('sekvence LIKE %s', $org_info->sekvence .'.%'), array('sekvence')));
             $result = $fetch->fetchAll();
             if ( count($result)>0 ) {
                 foreach ( $result as $res ) {

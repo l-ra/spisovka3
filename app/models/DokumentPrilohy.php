@@ -38,7 +38,7 @@ class DokumentPrilohy extends BaseModel
         }
 
         $prilohy = array();
-        $result = $this->fetchAllComplet($sql)->fetchAll();
+        $result = $this->selectComplex($sql)->fetchAll();
         if ( count($result)>0 ) {
             foreach ($result as $joinFile) {
 

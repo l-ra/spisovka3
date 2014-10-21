@@ -75,7 +75,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         $org = $this->template->OrgJednotka;
         $OrgJednotka = new Orgjednotka();
-        $org_seznam = $OrgJednotka->select(1, @$org->id);
+        $org_seznam = $OrgJednotka->selectBox(1, @$org->id);
 
         $form1 = new AppForm();
         $form1->addHidden('id')
@@ -157,7 +157,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     {
 
         $OrgJednotka = new Orgjednotka();
-        $org_seznam = $OrgJednotka->select(1);
+        $org_seznam = $OrgJednotka->selectBox(1);
 
         $form1 = new AppForm();
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)

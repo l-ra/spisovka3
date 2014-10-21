@@ -13,7 +13,7 @@ class SouvisejiciDokument extends BaseModel
         $param['where_or'][] = array('spojit_s_id=%i',$dokument_id);
 
         $dokumenty = array();
-        $result = $this->fetchAllComplet($param)->fetchAll();
+        $result = $this->selectComplex($param)->fetchAll();
         if ( count($result)>0 ) {
             $Dokument = new Dokument();
             foreach ($result as $joinDok) {

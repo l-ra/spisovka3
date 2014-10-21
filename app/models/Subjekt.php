@@ -11,7 +11,7 @@ class Subjekt extends BaseModel
     
     public function getInfo($subjekt_id)
     {
-        $result = $this->fetchRow(array('id=%i',$subjekt_id));
+        $result = $this->select(array(array('id=%i',$subjekt_id)));
         if (count($result) == 0)
             throw new InvalidArgumentException("Subjekt id '$subjekt_id' neexistuje.");
         
@@ -125,7 +125,7 @@ class Subjekt extends BaseModel
                     $sql['where'] = array( array('email LIKE %s','%'.$data->email.'%') );
                 }
 
-                $fetch = $this->fetchAllComplet($sql)->fetchAll();
+                $fetch = $this->selectComplex($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
             }
 
@@ -141,7 +141,7 @@ class Subjekt extends BaseModel
                     ),
                     'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
-                $fetch = $this->fetchAllComplet($sql)->fetchAll();
+                $fetch = $this->selectComplex($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
             }
 
@@ -156,7 +156,7 @@ class Subjekt extends BaseModel
                     'where'=> array( array('id_isds LIKE %s','%'.$data->id_isds.'%') ),
                     'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
-                $fetch = $this->fetchAllComplet($sql)->fetchAll();
+                $fetch = $this->selectComplex($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
             }
 
@@ -172,7 +172,7 @@ class Subjekt extends BaseModel
                     ),
                     'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
-                $fetch = $this->fetchAllComplet($sql)->fetchAll();
+                $fetch = $this->selectComplex($sql)->fetchAll();
                 $result = array_merge($result, $fetch);
             }
 
@@ -193,39 +193,28 @@ class Subjekt extends BaseModel
 
     public function seznam($args = null)
     {
-
+        $params = array();
+        
         if ( isset($args['where']) ) {
-            $where = $args['where'];
-        } else {
-            $where = null;
+            $params['where'] = $args['where'];
         }
-
+        
         if ( isset($args['order']) ) {
-            $order = $args['order'];
+            $params['order'] = $args['order'];
         } else {
-            //$order = array('nazev_subjektu','prijmeni','jmeno');
-            $order = "CONCAT(nazev_subjektu,prijmeni,jmeno)";
+            $params['order_sql'] = "CONCAT(nazev_subjektu,prijmeni,jmeno)";
         }
 
         if ( isset($args['offset']) ) {
-            $offset = $args['offset'];
-        } else {
-            $offset = null;
+            $params['offset'] = $args['offset'];
         }
 
         if ( isset($args['limit']) ) {
-            $limit = $args['limit'];
-        } else {
-            $limit = null;
+            $params['limit'] = $args['limit'];
         }
 
-
-        $select = $this->fetchAllSpecialOrder($order,$where,$offset,$limit);
-        return ($select) ? $select : NULL;
-
-        //$rows = $select->fetchAll();
-        //return ($rows) ? $rows : NULL;
-
+        $res = $this->selectComplex($params);
+        return ($res) ? $res : NULL;
     }
 
     public static function displayName($data, $display = 'basic')

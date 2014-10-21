@@ -1195,7 +1195,7 @@ dmFormat =
             if ( $epodatelna_info ) {
                 if ( !empty( $epodatelna_info->file_id ) ) {
                     $FileModel = new FileModel();
-                    $file = $FileModel->fetchRow(array(array("nazev=%s",'ep-isds-'.$epodatelna_id.'.zfo'))  )->fetch();
+                    $file = $FileModel->select(array(array("nazev=%s",'ep-isds-'.$epodatelna_id.'.zfo'))  )->fetch();
                     if ( $file ) {
                     
                         // Nacteni originalu DS

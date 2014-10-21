@@ -12,7 +12,7 @@ class FileModel extends BaseModel
     public function getInfo($file_id, $file_version = null)
     {
 
-        $result = $this->fetchRow(array('id=%i',$file_id));
+        $result = $this->select(array(array('id=%i',$file_id)));
         $row = $result->fetch();
 
         if ( $row ) {
@@ -41,7 +41,7 @@ class FileModel extends BaseModel
 
     public function seznam($vse=0, $dokument_id=null, $dokument_version=null) {
 
-        $select = $this->fetchAll(array('nazev'));
+        $select = $this->select(null, array('nazev'));
         $rows = $select->fetchAll();
 
         $tmp = array();
@@ -127,7 +127,7 @@ class FileModel extends BaseModel
     public function upravitMetadata($data, $file_id) {
 
 
-        $file_info = $this->fetchRow(array('id=%i',$file_id))->fetch();
+        $file_info = $this->select(array(array('id=%i',$file_id)))->fetch();
         if ( !$file_info ) return false;
 
         $file_info = $this->obj2array($file_info);

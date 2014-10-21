@@ -1444,7 +1444,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             // [P.L.] 2012-04-13   Pridany zakladni kontroly
             // TODO [T.V.] 2012-04-23 - zkontrolovat na novou podobu
-            $result = $Dokument->fetchRow(array(array('id=%i', $dokument_id)));
+            $result = $Dokument->select(array(array('id=%i', $dokument_id)));
             if ( count($result) != 1) {
                 throw new LogicException("Rozepsaný dokument ID $dokument_id nenalezen.", 1);
             }
@@ -1696,7 +1696,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 1);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select("2x");
+        $spisznak_seznam = $SpisovyZnak->selectBox("2x");
         $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null, 1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 

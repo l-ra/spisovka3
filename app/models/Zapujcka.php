@@ -72,7 +72,7 @@ class Zapujcka extends BaseModel
             $sql['leftJoin'] = array_merge($sql['leftJoin'],$args['leftJoin']);
         }
 
-        $select = $this->fetchAllComplet($sql);
+        $select = $this->selectComplex($sql);
         
         if ( $detail == 1 ) {
             // return array(DibiRow)
@@ -96,7 +96,7 @@ class Zapujcka extends BaseModel
     public function aktivniSeznam()
     {
         $seznam = array();
-        $result = $this->fetchAll(null, array('stav=1 OR stav=2'))->fetchAll();
+        $result = $this->select(array('stav=1 OR stav=2'))->fetchAll();
         if ( count($result)>0 ) {
             foreach( $result as $zapujcka ) {
                 $seznam[$zapujcka->dokument_id] = $zapujcka->dokument_id;
@@ -233,7 +233,7 @@ class Zapujcka extends BaseModel
         );
         $sql['where'] = array( array('z.id=%i',$zapujcka_id) );
         
-        $select = $this->fetchAllComplet($sql);
+        $select = $this->selectComplex($sql);
         $result = $select->fetch();
         if ( $result )
             return $result;
@@ -250,7 +250,7 @@ class Zapujcka extends BaseModel
         );
         $sql['where'] = array( array('z.id=%i',$zapujcka_id) );
         
-        $select = $this->fetchAllComplet($sql);
+        $select = $this->selectComplex($sql);
         $result = $select->fetch();
         if ( $result ) {
             return $result->dokument_id;
@@ -287,7 +287,7 @@ class Zapujcka extends BaseModel
         );
         $sql['where'] = array( array('z.dokument_id=%i AND z.stav=2',$dokument_id) );
         
-        $select = $this->fetchAllComplet($sql);
+        $select = $this->selectComplex($sql);
         $result = $select->fetch();
         if ( $result )
             return $result;
@@ -301,7 +301,7 @@ class Zapujcka extends BaseModel
         $where = array( array('id=%i',$zapujcka_id) );
         $limit = 1;
 
-        $select = $this->fetchAll(null, $where, null, $limit);
+        $select = $this->select($where, null, null, $limit);
         $result = $select->fetch();
 
         return $result;

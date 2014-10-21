@@ -123,46 +123,30 @@ abstract class BaseModel extends Object
      * @param array $limit
      * @return DibiResult
      */
-    public function fetchAll($order = NULL, $where = NULL, $offset = NULL, $limit = NULL)
-    {
-        /*dibi::test(
-            'SELECT * FROM %n', $this->name,
-            '%if', isset($where), 'WHERE %and', isset($where) ? $where : array(), '%end',
-            '%if', isset($order), 'ORDER BY %by', $order, '%end',
-            '%if', isset($limit), 'LIMIT %i %end', $limit,
-            '%if', isset($offset), 'OFFSET %i %end', $offset
-        );*/
-
-        return dibi::query(
-            'SELECT * FROM %n', $this->name,
-            '%if', isset($where), 'WHERE %and', isset($where) ? $where : array(), '%end',
-            '%if', isset($order), 'ORDER BY %by', $order, '%end',
-            '%if', isset($limit), 'LIMIT %i %end', $limit,
-            '%if', isset($offset), 'OFFSET %i %end', $offset
-        );
-    }
-
-    public function fetchAllSpecialOrder($order = NULL, $where = NULL, $offset = NULL, $limit = NULL)
-    {
-
-        return dibi::query(
-            'SELECT * FROM %n', $this->name,
-            '%if', isset($where), 'WHERE %and', isset($where) ? $where : array(), '%end',
-            '%if', isset($order), 'ORDER BY %sql', $order, '%end',
-            '%if', isset($limit), 'LIMIT %i %end', $limit,
-            '%if', isset($offset), 'OFFSET %i %end', $offset
-        );
+    public function select($where = NULL, $order = NULL, $offset = NULL, $limit = NULL)
+    {        
+        $args = array('SELECT * FROM %n', $this->name);
+        if (isset($where))
+            array_push ($args, 'WHERE %and', $where);
+        if (isset($order))
+            array_push ($args, 'ORDER BY %by', $order);
+        if (isset($offset))
+            array_push ($args, 'OFFSET %i', $offset);
+        if (isset($limit))
+            array_push ($args, 'LIMIT %i', $limit);
+        
+        return dibi::query($args);
     }
 
     /**
-     * Selects rows from the table in specified order
+     * Slozitejsi dotaz s moznym spojovanim tabulek
      * @param array $order
      * @param array $where
      * @param array $offset
      * @param array $limit
      * @return DibiResult
      */
-    public function fetchAllComplet($param)
+    public function selectComplex($param)
     {
 
         if ( isset($param['distinct']) ) $distinct = $param['distinct'];
@@ -377,30 +361,6 @@ abstract class BaseModel extends Object
         // a nyní předáme pole
         return dibi::query($query);
 
-    }
-
-    /**
-     * Select row from the table in specified where
-     * @param array $where
-     * @return DibiResult
-     */
-    public function fetchRow($where = null)
-    {
-
-        if ( is_null($where) ) {
-            return null;
-        } else if ( !is_array($where) ) {
-            $where = array($where);
-        } else {
-            if ( !is_array(current($where)) ) {
-                $where = array($where);
-            }
-        }
-
-        return dibi::query(
-            'SELECT * FROM %n', $this->name,
-            '%ex', (!empty($where) ? array('WHERE %and', $where) : NULL)
-        );
     }
 
     /* Neni v programu pouzito

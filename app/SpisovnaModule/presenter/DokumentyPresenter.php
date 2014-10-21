@@ -660,7 +660,7 @@ protected function createComponentVyrizovaniForm()
     {
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spisznak_seznam = $SpisovyZnak->selectBox(2);
         $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null, 1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 

@@ -173,7 +173,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $this->template->seznam = $seznam;
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->select(11);
+        $spisove_znaky = $SpisovyZnak->selectBox(11);
         $this->template->SpisoveZnaky = $spisove_znaky;            
             
         //$seznam = $Spisy->seznam(null, 0, $spis_id);
@@ -246,7 +246,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $this->template->seznam = $seznam;
             
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->select(11);
+        $spisove_znaky = $SpisovyZnak->selectBox(11);
         $this->template->SpisoveZnaky = $spisove_znaky;            
             
         $this->template->akce_select = array(
@@ -266,7 +266,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         if ( $spis ) {
             
             $SpisovyZnak = new SpisovyZnak();
-            $spisove_znaky = $SpisovyZnak->select(11);
+            $spisove_znaky = $SpisovyZnak->selectBox(11);
             $this->template->SpisoveZnaky = $spisove_znaky;
         
             if ( isset($spisove_znaky[ $spis->spisovy_znak_id ]) ) {
@@ -495,7 +495,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
         $form1 = new AppForm();
         $form1->addHidden('id')

@@ -29,7 +29,7 @@ class CisloJednaci extends BaseModel
         // pocatek cisla
         $this->pocatek_cisla = 1;
         if ( @$this->info->pocatek_cisla > 1 ) {
-             $count = $this->fetchAll()->count();
+             $count = $this->select()->count();
              if ( $count == 0 ) {
                  $this->pocatek_cisla = isset($this->info->pocatek_cisla)?$this->info->pocatek_cisla:1;
              }
@@ -207,7 +207,7 @@ class CisloJednaci extends BaseModel
     public function nacti($cjednaci_id, $generuj = 0) {
 
             
-        $row = $this->fetchRow(array(array('id=%i',$cjednaci_id)))->fetch();
+        $row = $this->select(array(array('id=%i',$cjednaci_id)))->fetch();
 
         if ( $row ) {
             
@@ -264,13 +264,13 @@ class CisloJednaci extends BaseModel
                     $where[] = array('podaci_denik=%s',$this->info->podaci_denik);
                 }                
                 
-                $result = $this->fetchAll(array('poradove_cislo'=>'DESC'),$where,null,1);
+                $result = $this->select($where, array('poradove_cislo'=>'DESC'),null,1);
                 $row = $result->fetch();
                 $cislo = (@$row->poradove_cislo)?($row->poradove_cislo)+1 : $pocatek_cisla;
                 break;
             case "urad":
                 $where[] = array('urad_zkratka=%s',$this->urad->zkratka);
-                $result = $this->fetchAll(array('urad_poradi'=>'DESC'),$where,null,1);
+                $result = $this->select($where, array('urad_poradi'=>'DESC'),null,1);
                 $row = $result->fetch();
                 $cislo = (@$row->urad_poradi)?($row->urad_poradi)+1 : $pocatek_cisla;
                 break;
@@ -280,13 +280,13 @@ class CisloJednaci extends BaseModel
                 } else {
                     $where[] = array('orgjednotka_id=%i',$this->org->id);
                 }
-                $result = $this->fetchAll(array('org_poradi'=>'DESC'),$where,null,1);
+                $result = $this->select($where, array('org_poradi'=>'DESC'),null,1);
                 $row = $result->fetch();
                 $cislo = (@$row->org_poradi)?($row->org_poradi)+1 : $pocatek_cisla;
                 break;
             case "user":
                 $where[] = array('user_id=%i',$this->user_info->id);
-                $result = $this->fetchAll(array('user_poradi'=>'DESC'),$where,null,1);
+                $result = $this->select($where, array('user_poradi'=>'DESC'),null,1);
                 $row = $result->fetch();
                 $cislo = (@$row->user_poradi)?($row->user_poradi)+1 : $pocatek_cisla;
                 break;

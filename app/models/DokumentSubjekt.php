@@ -31,7 +31,7 @@ class DokumentSubjekt extends BaseModel
         }
 
         $subjekty = array();
-        $result = $this->fetchAllComplet($sql)->fetchAll();
+        $result = $this->selectComplex($sql)->fetchAll();
         if ( count($result)>0 ) {
             foreach ($result as $subjekt) {
                 $subjekty[ $subjekt->dokument_id ][ $subjekt->id ] = $subjekt;

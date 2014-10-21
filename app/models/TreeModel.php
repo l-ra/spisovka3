@@ -17,7 +17,7 @@ class TreeModel extends BaseModel
 
     public function getInfo($id) {
         
-        $row = $this->fetchRow(array('id=%i',$id));
+        $row = $this->select(array(array('id=%i',$id)));
         $result = $row->fetch();
         return $result;
         
@@ -76,7 +76,7 @@ class TreeModel extends BaseModel
                 $sql['leftJoin'] = array_merge($sql['leftJoin'],$params['leftJoin']);
         }
 
-        $result = $this->fetchAllComplet($sql);
+        $result = $this->selectComplex($sql);
         if ( isset($params['paginator']) ) {
             return $result;
         } else {
@@ -86,7 +86,7 @@ class TreeModel extends BaseModel
 
     }
 
-    public function select($type = 0, $id = null, $parent_id = null, $params = null) {
+    public function selectBox($type = 0, $id = null, $parent_id = null, $params = null) {
 
         $result = array();
         $parent_sekvence = null;
@@ -114,7 +114,7 @@ class TreeModel extends BaseModel
 
         $rows = $this->nacti($parent_id,true,true,$params);
         if ( count($rows) ) {
-            foreach ( $rows as $row_index => $row ) {
+            foreach ( $rows as $row ) {
 
                 if ( $row->id == $id ) {
                     $parent_sekvence = $row->sekvence;
@@ -178,7 +178,7 @@ class TreeModel extends BaseModel
                 $data_tree['sekvence_string'] = $sekvence_string .'.'. $id;
             } else {
                 // is subnode
-                $parent = $this->fetchRow(array('id=%i',$parent_id))->fetch();
+                $parent = $this->select(array(array('id=%i',$parent_id)))->fetch();
                 if ( !$parent ) {
                     dibi::rollback();
                     throw new InvalidArgumentException("TreeModel::vlozitH() - záznam ID $parent_id neexistuje.");
@@ -212,7 +212,7 @@ class TreeModel extends BaseModel
             $sekvence_string = isset($data['sekvence_string'])?$data['sekvence_string']:$data[$this->nazev_sekvence];
             unset($data['sekvence_string']);
             
-            $info = $this->fetchRow(array('id=%i',$id))->fetch();
+            $info = $this->select(array(array('id=%i',$id)))->fetch();
             
             if ( isset($data['spisovy_znak_format']) ) {
                 $part = explode(".",$info->{$this->nazev_sekvence});
@@ -253,7 +253,7 @@ class TreeModel extends BaseModel
             if ( empty($parent_id) && !empty($parent_id_old) ) {
                 // is root node
 
-                $parent_old = $this->fetchRow(array('id=%i',$parent_id_old))->fetch();
+                $parent_old = $this->select(array(array('id=%i',$parent_id_old)))->fetch();
                 if ( !$parent_old ) {
                     dibi::rollback();
                     throw new InvalidArgumentException("TreeModel::upravitH() - záznam ID $parent_id_old neexistuje.");
@@ -272,7 +272,7 @@ class TreeModel extends BaseModel
                 
             } else if ( $parent_id != $parent_id_old && empty($parent_id_old) ) {
                 // change parent from root
-                $parent_new = $this->fetchRow(array('id=%i',$parent_id))->fetch();
+                $parent_new = $this->select(array(array('id=%i',$parent_id)))->fetch();
                 if ( !$parent_new ) {
                     dibi::rollback();
                     throw new InvalidArgumentException("TreeModel::upravitH() - záznam ID $parent_id neexistuje.");
@@ -290,8 +290,8 @@ class TreeModel extends BaseModel
                 
             } else if ( $parent_id != $parent_id_old ) {
                 // change parent
-                $parent_old = $this->fetchRow(array('id=%i',$parent_id_old))->fetch();
-                $parent_new = $this->fetchRow(array('id=%i',$parent_id))->fetch();
+                $parent_old = $this->select(array(array('id=%i',$parent_id_old)))->fetch();
+                $parent_new = $this->select(array(array('id=%i',$parent_id)))->fetch();
                 if ( !$parent_new ) {
                     dibi::rollback();
                     throw new InvalidArgumentException("TreeModel::upravitH() - záznam ID $parent_id neexistuje.");
@@ -344,7 +344,7 @@ class TreeModel extends BaseModel
             
             dibi::begin();
             try {
-                $res = $this->delete( array("sekvence LIKE %s", $info->sekvence .".%") );
+                $this->delete( array("sekvence LIKE %s", $info->sekvence .".%") );
                 $this->delete( array("id=%i", $id) );
                 dibi::commit();
                 return true;

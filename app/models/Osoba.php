@@ -10,7 +10,7 @@ class Osoba extends BaseModel
     public function getInfo($osoba_id)
     {
 
-        $result = $this->fetchRow(array('id=%i',$osoba_id));
+        $result = $this->select(array(array('id=%i',$osoba_id)));
         $row = $result->fetch();
         return ($row) ? $row : NULL;
 
@@ -45,7 +45,7 @@ class Osoba extends BaseModel
     public function seznam($args = null)
     {
 
-        $select = $this->fetchAll(array('prijmeni','jmeno'),$args);
+        $select = $this->select($args, array('prijmeni','jmeno'));
         return $select;
 
     }

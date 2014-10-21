@@ -73,7 +73,7 @@ class Epodatelna extends BaseModel
         //print_r($sql);
         //echo "</pre>";
 
-        $select = $this->fetchAllComplet($sql);
+        $select = $this->selectComplex($sql);
         //$result = $select->fetchAll();
 
         return $select;
@@ -105,7 +105,7 @@ class Epodatelna extends BaseModel
             return 0;
         }
 
-        $query = $this->fetchAllComplet($args);
+        $query = $this->selectComplex($args);
         return $query->count();
 
     }
@@ -119,14 +119,15 @@ class Epodatelna extends BaseModel
         );
 
 
-        $query = $this->fetchAllComplet($args);
+        $query = $this->selectComplex($args);
         return $query->fetch();
 
     }
 
     public function getMax($smer = 0) {
 
-        $result = $this->fetchAll(array('poradi'=>'DESC'),array('rok'=>date('Y'),array('epodatelna_typ=%i',$smer)),null,null,1);
+        $result = $this->select(array('rok'=>date('Y'),array('epodatelna_typ=%i',$smer)),
+                            array('poradi'=>'DESC'),null,1);
         $row = $result->fetch();
         return ($row) ? ($row->poradi+1) : 1;
 
@@ -390,9 +391,8 @@ class Epodatelna extends BaseModel
     public function getLastISDS()
     {
         
-        $data = $this->fetchAll(array('doruceno_dne'=>'DESC'), array(
-            'epodatelna_typ=0','isds_id IS NOT NULL'
-        ), 0, 1)->fetch();
+        $data = $this->select(array('epodatelna_typ=0', 'isds_id IS NOT NULL'), 
+                            array('doruceno_dne'=>'DESC'), 0, 1)->fetch();
         if ( $data ) {
             $do = strtotime($data->doruceno_dne);
             if ( $do != 0 ) {

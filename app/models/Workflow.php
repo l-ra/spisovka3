@@ -38,7 +38,7 @@ class Workflow extends BaseModel
 
         $param['order'] = array('date'=>'DESC');
 
-        $res = $this->fetchAllComplet($param);
+        $res = $this->selectComplex($param);
         $rows = $res->fetchAll();
 
         if ( count($rows) > 0 ) {
@@ -582,7 +582,7 @@ class Workflow extends BaseModel
         }
 
         // Predat do spisovny
-        $workflow_data = $this->fetchRow(array('id=%i',$dokument_info['prideleno']->id))->fetch();
+        $workflow_data = $this->select(array(array('id=%i',$dokument_info['prideleno']->id)))->fetch();
         if ( $workflow_data ) {
 
             $workflow_data = (array) $workflow_data;
@@ -635,7 +635,7 @@ class Workflow extends BaseModel
         }
 
         // Pripojit do spisovny
-        $workflow_data = $this->fetchRow(array('id=%i',$dokument_info['prideleno']->id))->fetch();
+        $workflow_data = $this->select(array(array('id=%i',$dokument_info['prideleno']->id)))->fetch();
         if ( $workflow_data ) {
 
             $dokument_update = array(
@@ -938,7 +938,7 @@ class Workflow extends BaseModel
         $param['limit'] = 1;
         $param['order'] = array('date'=>'DESC');
 
-        $row = $this->fetchAllComplet($param);
+        $row = $this->selectComplex($param);
         $row = $row->fetch();
 
         if ( $row ) {
@@ -979,7 +979,7 @@ class Workflow extends BaseModel
             );
         $param['limit'] = 1;
 
-        $result = $this->fetchAllComplet($param);
+        $result = $this->selectComplex($param);
         $row = $result->fetch();
 
         if ( !$row )
@@ -1028,7 +1028,7 @@ class Workflow extends BaseModel
             );
         $param['limit'] = 1;
 
-        $result = $this->fetchAllComplet($param);
+        $result = $this->selectComplex($param);
         $row = $result->fetch();
 
         if ( !$row )

@@ -50,7 +50,7 @@ class SpisovyZnak extends TreeModel
             }
         }        
         
-        $result = $this->fetchAllComplet($sql);
+        $result = $this->selectComplex($sql);
         if ( $select > 0 ) {
             return $result;
         } else {
@@ -67,7 +67,7 @@ class SpisovyZnak extends TreeModel
             'where' => array(array("parent_id=%i", $id)),
         );
         
-        $result = $this->fetchAllComplet($sql);
+        $result = $this->selectComplex($sql);
         $rows = $result->fetchAll();
         return $rows != false;
     }
@@ -88,7 +88,7 @@ class SpisovyZnak extends TreeModel
             'where' => array(array('sz.id=%i',$spisznak_id))
         );
 
-        $result = $this->fetchAllComplet($sql);
+        $result = $this->selectComplex($sql);
         $row = $result->fetch();
         if ($row)
             return $row;

@@ -166,7 +166,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->template->seznam = $seznam;
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->select(11);
+        $spisove_znaky = $SpisovyZnak->selectBox(11);
         $this->template->SpisoveZnaky = $spisove_znaky;            
 
     }
@@ -186,7 +186,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->template->SpisyPod = null;//$Spisy->seznam_pod($spis_id,1);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->select(11);
+        $spisove_znaky = $SpisovyZnak->selectBox(11);
         $this->template->SpisoveZnaky = $spisove_znaky;
         
         if ( isset($spisove_znaky[ @$spis->spisovy_znak_id ]) ) {
@@ -364,15 +364,15 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
         
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
         $session_spisplan = Environment::getSession('s3_spisplan');
         if ( empty($session_spisplan->spis_id) ) {
             $session_spisplan->spis_id = 1;
         }
         $params = array('where'=> array("tb.typ = 'VS'") );
-        //$spisy = $Spisy->select(11, null, $session_spisplan->spis_id, $params);
-        $spisy = $Spisy->select(1, @$spis->id, $session_spisplan->spis_id, $params);
+        //$spisy = $Spisy->selectBox(11, null, $session_spisplan->spis_id, $params);
+        $spisy = $Spisy->selectBox(1, @$spis->id, $session_spisplan->spis_id, $params);
         
 
         $form1 = new AppForm();
@@ -465,10 +465,10 @@ class Admin_SpisyPresenter extends SpisyPresenter
             $session_spisplan->spis_id = 1;
         }
         $params = array('where'=> array("tb.typ = 'VS'") );
-        $spisy = $Spisy->select(11, null, $session_spisplan->spis_id, $params);
+        $spisy = $Spisy->selectBox(11, null, $session_spisplan->spis_id, $params);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
         $form1 = new AppForm();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);

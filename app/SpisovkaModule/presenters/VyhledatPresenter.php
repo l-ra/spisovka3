@@ -231,7 +231,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         unset($hledat['druh_zasilky']);
         
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->select(2);
+        $spisznak_seznam = $SpisovyZnak->selectBox(2);
         
         $form->addComponent(new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
         $form->getComponent('spisovy_znak_id')->setValue(@$hledat['spisovy_znak_id'])

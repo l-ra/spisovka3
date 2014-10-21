@@ -22,10 +22,10 @@ class UserModel extends BaseModel
          */
         if ( is_numeric($mixed) ) {
             // $mixed is numeric -> ID
-            $row = $instance->fetchRow(array('id=%i',$mixed))->fetch();
+            $row = $instance->select(array(array('id=%i',$mixed)))->fetch();
         } else {
             // $mixed is string -> username
-            $row = $instance->fetchRow(array('username=%s',$mixed))->fetch();
+            $row = $instance->select(array(array('username=%s',$mixed)))->fetch();
         }
 
         if ( is_null($row) || !$row)
@@ -180,7 +180,7 @@ class UserModel extends BaseModel
 
     public function zmenitHeslo($user_id, $password, $local = null) {
 
-        $user = $this->fetchRow(array('id=%i',$user_id))->fetch();
+        $user = $this->select(array(array('id=%i',$user_id)))->fetch();
 
         // zabran, aby uzivatel mohl u dema menit heslo k urcitym uctum
         if (Demo::isDemo() && !Demo::canChangePassword($user))
