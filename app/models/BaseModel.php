@@ -130,10 +130,10 @@ abstract class BaseModel extends Object
             array_push ($args, 'WHERE %and', $where);
         if (isset($order))
             array_push ($args, 'ORDER BY %by', $order);
-        if (isset($offset))
-            array_push ($args, 'OFFSET %i', $offset);
         if (isset($limit))
             array_push ($args, 'LIMIT %i', $limit);
+        if (isset($offset))
+            array_push ($args, 'OFFSET %i', $offset);
         
         return dibi::query($args);
     }
