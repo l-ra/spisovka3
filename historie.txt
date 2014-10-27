@@ -36,6 +36,8 @@ Opravy:
   i u vedoucího. Ve výchozím stavu má vedoucí toto oprávnění přiděleno.
 - opraveno přidávání subjektů ve formuláři vytváření odpovědi
 - opravy kontroly elektronického podpisu u e-mailů
+- pro případ instalace spisovky na Windows přidán balíček kořenových certifikátů
+  pro ověření serveru datových schránek
 
 === Verze 3.4.0 =================================================================
 

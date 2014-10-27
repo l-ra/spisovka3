@@ -1696,7 +1696,9 @@ class ISDS {
             curl_setopt($this->ch, CURLOPT_SSLCERT,$params['local_cert']);
             curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD,$params['passphrase']);
 	}
-    
+
+    if (stristr(PHP_OS,'WIN') !== false)
+        curl_setopt($this->ch, CURLOPT_CAINFO, dirname(__FILE__) . '\cacert.pem' );    
     curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, $this->ssl_verify_peer);
     
 	if (!empty($params['proxy_host'])) {
