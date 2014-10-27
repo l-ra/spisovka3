@@ -1687,11 +1687,6 @@ class ISDS {
             curl_setopt($this->ch, CURLOPT_USERPWD,$params['login'].":".$params['password']);
 	}
 
-	// na Linuxu nastavit verzi 3, na Windows ne !
-	if (stristr(PHP_OS,'WIN') === false) {
-            curl_setopt($this->ch, CURLOPT_SSLVERSION,3);
-	}
-
 	if ($logintype != 0) {
             curl_setopt($this->ch, CURLOPT_SSLCERT,$params['local_cert']);
             curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD,$params['passphrase']);
