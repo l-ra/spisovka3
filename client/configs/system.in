@@ -3,7 +3,7 @@
 ; clean_url = true
 
 ; database
-database.driver   = mysql
+database.driver   = mysqli
 database.host     = localhost
 database.username =
 database.password =
