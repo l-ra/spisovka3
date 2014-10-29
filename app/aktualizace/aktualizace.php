@@ -17,9 +17,9 @@ function my_assert_handler($file, $line, $code)
     ini_set('display_errors', 1);
     set_time_limit(0);
 
-    require WWW_DIR . "/libs/dibi/dibi.php";
+    require LIBS_DIR . "/dibi/dibi.php";
     
-    define('UPDATE_DIR', WWW_DIR . '/app/aktualizace/');    
+    define('UPDATE_DIR', APP_DIR . '/aktualizace/');    
     
     require 'aktualizace_core.php';
     require 'is_installed.php';
@@ -41,9 +41,9 @@ function my_assert_handler($file, $line, $code)
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Spisová služba - Aktualizace</title>
-    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo PUBLIC_DIR; ?>css/site.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo PUBLIC_DIR; ?>css/install_site.css" />
-    <link rel="shortcut icon" href="<?php echo PUBLIC_DIR; ?>favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo PUBLIC_URI; ?>css/site.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo PUBLIC_URI; ?>css/install_site.css" />
+    <link rel="shortcut icon" href="<?php echo PUBLIC_URI; ?>favicon.ico" type="image/x-icon" />
 </head>
 <body>
 <div id="layout_top">

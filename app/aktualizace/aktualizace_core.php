@@ -10,7 +10,7 @@ class Updates {
     public static $clients = array();
     
     public static function init() {
-        self::$update_dir = WWW_DIR . '/app/aktualizace/';
+        self::$update_dir = APP_DIR . '/aktualizace/';
     }
     
     /**
@@ -102,19 +102,22 @@ class Updates {
     {    
         $clients = array();
         if ( defined('MULTISITE') && MULTISITE == 1 ) {
-            $dh = opendir(WWW_DIR . "/clients");
+            $clients_dir = APP_DIR . "/../clients";
+            $dh = opendir($clients_dir);
             if ($dh !== false)
                 while (($filename = readdir($dh)) !== false) {
-                    if ( $filename == "." || $filename == ".." || $filename[0] == '@')
+                    if ($filename == "." || $filename == ".." || $filename[0] == '@')
                         // Adresáře začínající na @ jsou speciální adresáře, není tam instalace klienta
                         continue;
                         
-                    if ( is_dir(WWW_DIR . "/clients/$filename"))
-                        $clients[ WWW_DIR . "/clients/$filename" ] = "$filename (" . WWW_DIR . "/clients/$filename)";
+                    if (is_dir("$clients_dir/$filename"))
+                        $clients["$clients_dir/$filename"] = "$filename ($clients_dir/$filename)";
                 }
-        } else
-            $clients[ WWW_DIR . "/client" ] = "STANDALONE (" . WWW_DIR . "/client)";
-
+        } else {
+            $client_dir = APP_DIR . "/../client";
+            $clients[$client_dir] = "STANDALONE ($client_dir)";
+        }
+        
         asort($clients);     // Setrid klienty podle abeceny  
         self::$clients = $clients;
         return $clients;

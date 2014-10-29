@@ -35,7 +35,6 @@ nastaveni overte, aby nebylo mozne se neopravnene dostat k citlivym datum.
 
 3. V souboru index.php upravte cesty, pokud jsou odlisne od skutecnosti:
 
-WWW_DIR    = absolutni cesta k souboru index.php. Nemenit!
 APP_DIR    = absolutni cesta k aplikacnim souborum (adresar /app). Vetsinou nemenit!
 LIBS_DIR   = absolutni cesta ke knihovnam aplikace (adresar /libs). Vetsinou nemenit!
 BASE_URI   = absolutni nebo relativni url cesta k adresari /public
