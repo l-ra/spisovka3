@@ -50,23 +50,25 @@ class Updates {
         self::$revisions = array();
         
         $dir_handle = opendir(self::$update_dir);
-        if ($dir_handle !== FALSE) {
-        
-            $zip = new ZipArchive;
-            if ($zip->open(self::$update_dir . 'db_scripts.zip') === TRUE) {
-                for ($i = 0; $i < $zip->numFiles; $i++) {
-                    $stat = $zip->statIndex($i);
-                    $filename = $stat['name'];
-                    self::_process_file($filename, $zip->getFromName($filename));
-                }
-            }
-            
-            while (($filename = readdir($dir_handle)) !== false) {
-                self::_process_file($filename, null);
-            }
-            
-            closedir($dir_handle);
+        if ($dir_handle === FALSE)
+            throw new Exception(__METHOD__ . "() - nemohu otevřít adresář " . self::$update_dir);
+
+        $zip = new ZipArchive;
+        $filename = self::$update_dir . 'db_scripts.zip';
+        if ($zip->open($filename) !== TRUE)
+            throw new Exception(__METHOD__ . "() - nemohu otevřít soubor $filename.");
+
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $stat = $zip->statIndex($i);
+            $filename = $stat['name'];
+            self::_process_file($filename, $zip->getFromName($filename));
         }
+        
+        while (($filename = readdir($dir_handle)) !== false) {
+            self::_process_file($filename, null);
+        }
+        
+        closedir($dir_handle);
         
         ksort( self::$revisions, SORT_NUMERIC ); //setridit pole, aby se alter skripty spoustely ve spravnem poradi
         

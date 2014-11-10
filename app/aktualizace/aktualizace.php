@@ -1,40 +1,3 @@
-<?php
-
-function error($message)
-{
-    echo "<div class=\"error\">$message</div>";
-}
-
-function my_assert_handler($file, $line, $code)
-{
-    error("Kontrola selhala: $code (řádek $line)");
-}
-
-    assert_options(ASSERT_ACTIVE, 1);
-    assert_options(ASSERT_BAIL, 1);
-    assert_options(ASSERT_WARNING, 0);
-    assert_options(ASSERT_CALLBACK, 'my_assert_handler');
-    ini_set('display_errors', 1);
-    set_time_limit(0);
-
-    require LIBS_DIR . "/dibi/dibi.php";
-    
-    define('UPDATE_DIR', APP_DIR . '/aktualizace/');    
-    
-    require 'aktualizace_core.php';
-    require 'is_installed.php';
-    
-    Updates::init();
-    
-    $res = Updates::find_updates();
-    $revisions = $res['revisions'];
-    $alter_scripts = $res['alter_scripts'];
-    $descriptions = $res['descriptions'];
-    assert('count($revisions) > 0');
-    
-    $clients = Updates::find_clients();
-
-?>    
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -58,6 +21,48 @@ function my_assert_handler($file, $line, $code)
     </div>
 </div>
 <div id="layout">
+<?php
+
+function error($message)
+{
+    echo "<div class=\"error\">$message</div>";
+}
+
+function my_assert_handler($file, $line, $code)
+{
+    error("Kontrola selhala: $code (řádek $line)");
+}
+
+try {
+    assert_options(ASSERT_ACTIVE, 1);
+    assert_options(ASSERT_BAIL, 1);
+    assert_options(ASSERT_WARNING, 0);
+    assert_options(ASSERT_CALLBACK, 'my_assert_handler');
+    ini_set('display_errors', 1);
+    set_time_limit(0);
+
+    require LIBS_DIR . "/dibi/dibi.php";
+    
+    define('UPDATE_DIR', APP_DIR . '/aktualizace/');    
+    
+    require 'aktualizace_core.php';
+    require 'is_installed.php';
+    
+    Updates::init();
+
+    $res = Updates::find_updates();
+    $revisions = $res['revisions'];
+    $alter_scripts = $res['alter_scripts'];
+    $descriptions = $res['descriptions'];
+    assert('count($revisions) > 0');
+    
+    $clients = Updates::find_clients();
+}
+catch (Exception $e) {
+    error($e->getMessage());
+    die;
+}
+?>    
     <div id="menu">
     &nbsp;
     <a href="aktualizace.php?go=1" onclick="return confirm('Opravdu chcete provést aktualizaci spisové služby?');">Spustit aktualizaci</a>
