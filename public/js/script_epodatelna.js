@@ -653,7 +653,8 @@ form_odmitnout +
 	}
     });
     
-    $('#subjekt_novy_'+id).delegate('click', '#novysubjekt_click_'+id, function(event) {    
+    //$('#subjekt_novy_'+id).delegate('click', '#novysubjekt_click_'+id, function(event) {    
+    $('#novysubjekt_click_'+id).click(function(event) {    
         event.preventDefault();
 
         if ( is_simple == 1 ) {
