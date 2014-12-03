@@ -2,6 +2,11 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
+Opravy:
+
+- v E-podatelně na stránce stahování zpráv nepracovala funkce "vytvořit 
+  subjekt z odesilatele"
+
 === Verze 3.4.1 ================================================================
 
 Nové funkce:
