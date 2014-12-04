@@ -4,8 +4,10 @@
 
 Opravy:
 
-- v E-podatelně na stránce stahování zpráv nepracovala funkce "vytvořit 
-  subjekt z odesilatele"
+- E-podatelna - na stránce stahování zpráv nepracovala funkce "vytvořit nový
+                subjekt z odesilatele"
+              - pokud v datové schránce nebyla žádná nová zpráva, aplikace
+                při kontrole schránky místo zprávy zobrazila nulu
 
 === Verze 3.4.1 ================================================================
 

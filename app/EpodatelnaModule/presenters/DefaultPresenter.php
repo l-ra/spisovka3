@@ -537,10 +537,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             //echo $do ." ". date("j.n.Y",$do);
             //exit;
 
-            $zpravy = $isds->seznamPrichozichZprav($od,$do);
-            if (count($zpravy) <= 0)
-                return 0;
-                
             $tmp = array();
             $user = Environment::getUser()->getIdentity();
 
@@ -548,8 +544,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             eval("\$UploadFile = new ".$storage_conf->type."();");
             
             $pocet_novych_zprav = 0;
-            
-            foreach($zpravy as $z)
+            $zpravy = $isds->seznamPrichozichZprav($od, $do);
+
+            if ($zpravy)
+              foreach($zpravy as $z)
                 // kontrola existence v epodatelny
                 if ( ! $this->Epodatelna->existuje($z->dmID ,'isds') ) {
                     // nova zprava, ktera neni nahrana v epodatelne
