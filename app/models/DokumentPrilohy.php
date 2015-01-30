@@ -107,5 +107,41 @@ class DokumentPrilohy extends BaseModel
         return $this->delete(array(array('dokument_id=%i',$dokument_id)));
     }
 
-
+    public static function maxVelikostUploadu($lidsky_vystup = false)
+    {
+        function _getSize($str) {
+            
+            $c = substr($str, -1);
+            
+            switch(strtoupper($c)) {
+                case 'K':
+                    $n = substr($str, 0, -1);
+                    return $n * pow(2, 10);
+                case 'M':
+                    $n = substr($str, 0, -1);
+                    return $n * pow(2, 20);
+                case 'G':
+                    $n = substr($str, 0, -1);
+                    return $n * pow(2, 30);
+            }
+            
+            return (int)$str;
+        }
+        
+        if (function_exists("ini_get")) {
+            $s1 = ini_get("upload_max_filesize");
+            $n1 = _getSize($s1);
+            $s2 = ini_get("post_max_size");
+            $n2 = _getSize($s2);
+            $min = min($n1, $n2);
+            
+            if (!$lidsky_vystup)
+                return $min;
+            if ($min % pow(2, 20) == 0)
+                return $min/pow(2, 20) . " MB";
+            return $min/1024 . " kB";
+        }
+        
+        return $lidsky_vystup ? "nepodařilo se zjistit" : false;
+    }
 }
