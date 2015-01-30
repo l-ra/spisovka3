@@ -8,6 +8,8 @@ Opravy:
                 subjekt z odesilatele"
               - pokud v datové schránce nebyla žádná nová zpráva, aplikace
                 při kontrole schránky místo zprávy zobrazila nulu
+- max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 
+  serveru zobrazoval nesprávně
 
 === Verze 3.4.1 ================================================================
 
