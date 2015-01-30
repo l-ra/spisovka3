@@ -30,6 +30,12 @@ class Settings
         $i = self::_getInstance();
         $i->_set($key, null);
     }
+
+    public static function getAll() {
+    
+        $i = self::_getInstance();
+        return $i->_getAll();
+    }
     
     // ------------------------------------------------------------
 
@@ -56,6 +62,10 @@ class Settings
         return isset($this->settings[$key]) ? $this->settings[$key] : $default;
     }
 
+    protected function _getAll() {
+        return $this->settings;
+    }
+    
     protected function _set($key, $value) {
     
         if ($value === false)
