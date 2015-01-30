@@ -19,7 +19,7 @@ kontakt.email = ""
 kontakt.www = ""
 
 [cislo_jednaci]
-maska = "{urad}/{urad_poradi|6}/{rok}"
+maska = "{urad}/{urad_poradi|4}/{rok}"
 typ = "urad"
 podaci_denik = "denik"
 typ_evidence = "priorace"
