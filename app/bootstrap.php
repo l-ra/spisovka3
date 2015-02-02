@@ -18,7 +18,7 @@ try {
 // Step 2: Configure environment
 
 // 2a) enable Nette\Debug for better exception and error visualisation
-Environment::setVariable('logDir',APP_DIR .'/../log/');
+Environment::setVariable('logDir',APP_DIR .'/../log');
 
 if ( !defined('DEBUG_ENABLE') )
     define('DEBUG_ENABLE', 0);

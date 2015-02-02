@@ -59,7 +59,17 @@ class Admin_SupportPresenter extends BasePresenter
         ob_end_clean();
         
         echo $phpinfo;
-        
+
+        // Vypis PHP log soubor
+        $logDir = Environment::getVariable('logDir');
+        $month_ago = time() - (30 * 24 * 60 * 60);
+        $filename1 = "{$logDir}/php_error_" . date('Ym', $month_ago) . '.log';
+        $filename2 = "{$logDir}/php_error_" . date('Ym') . '.log';
+        // neni-li jeste 15-teho, zobraz i log z predesleho mesice
+        $php_errors_older = date('j') < 15 ? file_get_contents($filename1) : '';
+        $php_errors = file_get_contents($filename2); 
+        echo "<pre>\n\nChybový log PHP\n---------------\n\n$php_errors_older$php_errors";
+
         die;
     }
     
