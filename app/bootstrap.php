@@ -115,6 +115,11 @@ Mail::$defaultMailer = 'ESSMailer';
 try {
     $db_config = Environment::getConfig('database')->toArray();
     
+    // oprava chybne konfigurace na hostingu
+    // profiler je bez DEBUG modu k nicemu, jen plytva pameti (memory leak)
+    if (!DEBUG_ENABLE)
+        $db_config['profiler'] = false;
+        
     dibi::connect($db_config);
     dibi::addSubst('PREFIX', $db_config['prefix']);
     if ( !Environment::isProduction() ) {
