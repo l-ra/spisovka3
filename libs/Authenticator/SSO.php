@@ -45,7 +45,12 @@ class Authenticator_SSO extends Authenticator_Base implements IAuthenticator
             throw new AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
         }          
 
-        if ( $credentials['extra'] == 1 ) {
+        if ( isset($credentials['extra']) && $credentials['extra'] == "sso" ) {
+            // SSO prihlaseni - heslo se neoveruje
+            $user->zalogovan($row->id);
+            $log->logAccess($row->id, 1);
+        }
+		else {
             // Alternativni prihlaseni klasickym zpusobem - overeni hesla
             if ($row->password !== $password) {
                 $log->logAccess($row->id, 0);
@@ -54,10 +59,6 @@ class Authenticator_SSO extends Authenticator_Base implements IAuthenticator
                 $user->zalogovan($row->id);
                 $log->logAccess($row->id, 1);
             }   
-        } else {
-            // SSO prihlaseni - heslo se neoveruje
-            $user->zalogovan($row->id);
-            $log->logAccess($row->id, 1);
         }
 
         // Odstraneni hesla ve vypisu
@@ -364,7 +365,7 @@ class Authenticator_SSO extends Authenticator_Base implements IAuthenticator
                 try {
                     $user = Environment::getUser();
                     $user->setNamespace(KLIENT);
-                    $user->authenticate($_SESSION['s3_auth_remoteuser'], "");
+                    $user->authenticate($_SESSION['s3_auth_remoteuser'], "", "sso");
                     header("Location: ". Environment::getVariable('klientUri',Environment::getVariable('baseUri')) ,302 );
                 } catch ( AuthenticationException $e ) {
                     $this->action = "user_registration";
@@ -781,18 +782,6 @@ class Authenticator_SSO extends Authenticator_Base implements IAuthenticator
             }
 	}
 	if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
-    }
-
-    public function handleLogin($data)
-    {
-        try {
-            $user = Environment::getUser();
-            $user->setNamespace(KLIENT);
-            $user->authenticate($data['username'], $data['password'], 1);
-            $this->presenter->redirect(':Spisovka:Default:default');
-        } catch (AuthenticationException $e) {
-            $this->presenter->flashMessage($e->getMessage(), 'warning');
-        }
     }
 
     public function handleChangePassword($data)

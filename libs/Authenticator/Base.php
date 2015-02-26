@@ -3,6 +3,26 @@
 class Authenticator_Base extends Control
 {
 
+    protected function handleLogin($data)
+    {
+        try {
+            $user = Environment::getUser();
+            $user->setNamespace(KLIENT);
+            $user->authenticate($data['username'], $data['password']);
+
+            $redirect_home = (bool)Settings::get('login_redirect_homepage', false);
+            if (!$redirect_home && isset($data['backlink']) && !empty($data['backlink']))
+                $this->presenter->redirectUri($data['backlink']);
+            else
+                $this->presenter->redirect('this');
+				// $this->presenter->redirect(':Spisovka:Default:default');
+        }
+		catch (AuthenticationException $e) {
+            $this->presenter->flashMessage($e->getMessage(), 'warning');
+			sleep(2); // sniz riziko brute force utoku
+        }
+    }
+
     protected function formAddRoleSelect(AppForm $form)
     {
         $Role = new RoleModel();

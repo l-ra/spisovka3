@@ -279,18 +279,6 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
 	if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
     }
 
-    public function handleLogin($data)
-    {
-        try {
-            $user = Environment::getUser();
-            $user->setNamespace(KLIENT);
-            $user->authenticate($data['username'], $data['password']);
-            $this->presenter->redirect(':Spisovka:Default:default');
-        } catch (AuthenticationException $e) {
-            $this->presenter->flashMessage($e->getMessage(), 'warning');
-        }
-    }
-
     public function handleChangePassword($data)
     {
         $zmeneno = 0;
