@@ -52,6 +52,8 @@ if ( $unique_info === FALSE ) {
 }
 unset($unique_info);
 
+createIniFiles();
+
 Environment::loadConfig(CLIENT_DIR .'/configs/system.ini');
 $user_config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
 Environment::setVariable('user_config', $user_config);
@@ -81,9 +83,13 @@ $loader->addClass('mPDF', LIBS_DIR . '/mpdf/mpdf.php');
 $loader->register();
 
 // 2e) setup sessions
+$session_dir = CLIENT_DIR . '/sessions';
+if (@file_put_contents("$session_dir/_check", '') === FALSE) {
+	throw new Exception("Nelze zapisovat do adresare '$session_dir'");
+}
 $session = Environment::getSession();
 $session->setName('SpisovkaSessionID');
-$session->setSavePath(CLIENT_DIR . '/sessions/');
+$session->setSavePath($session_dir);
 
 $cookie_path = str_replace('index.php', '', $_SERVER['PHP_SELF']);
 $session->setCookieParams($cookie_path);
@@ -302,3 +308,25 @@ catch (Exception $e) {
 
 // Step 5: Run the application!
 $application->run();
+
+
+function createIniFiles()
+{
+	$dir = CLIENT_DIR .'/configs';
+	createIniFile("$dir/system.ini");
+	createIniFile("$dir/klient.ini");
+	createIniFile("$dir/epodatelna.ini");
+}
+
+function createIniFile($filename)
+{
+	if (file_exists($filename))
+		return;
+	
+	$template = substr($filename, 0, -1);
+	if (!copy($template, $filename))
+		throw new Exception("Nemohu vytvorit soubor $filename.");
+	
+	$perm = strstr($filename, 'system.ini') !== FALSE ? 0440 : 0640;
+	@chmod($filename, $perm);
+}
