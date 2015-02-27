@@ -15,7 +15,7 @@
 
 <div id="kontrola">
 <?php if (isset($db_install)): ?>
-    <?php if ($errors): ?>
+    <?php if ($error): ?>
     <div class="failed result">
         <h2>Při nahrání tabulek do databáze nastala chyba!</h2>
         <p>V detailu vyhledejte označenou položku a zjistěte příčinu chyby.</p>
@@ -42,12 +42,18 @@
         <p>Nahrání tabulek a dat proběhlo v pořádku. Můžete pokračovat v instalaci.</p>
         <p><a href="{link :Install:Default:urad}">Pokračovat v instalaci</a></p>
     </div>
-    <?php elseif ($errors): ?>
+    <?php elseif ($tabulka_jiz_existuje): ?>
     <div class="failed result">
         <h2>Nelze nahrát tabulky a data do databáze!</h2>
         <p>V uvedené databázi již existují tabulky určené pro tuto aplikaci. </p>
         <p>V případě, že chcete ponechat existující tabulky, je potřeba v nastavení změnit prefix tabulek nebo jméno databáze. Jinak bude potřeba uvedené tabulky smazat z databáze.</p>
         <p>V této fázi není možné pokračovat v instalaci. Pro pokračování instalace je potřeba provést nápravu. Po dokončení úprav proveďte <a href="?">novou kontrolu</a>. </p>
+    </div>
+    <?php elseif ($error): ?>
+    <div class="failed result">
+        <h2>Došlo k výjimce!</h2>
+		<p>Popis chyby: {$error}</p>
+		<p>Pravděpodobně není nastaveno připojení v souboru system.ini.</p>
     </div>
     <?php else: ?>
     <div class="passed result">

@@ -517,8 +517,8 @@ class Install_DefaultPresenter extends BasePresenter
             $this->template->provedeno = 1;
         }
 
-        $this->template->errors = FALSE;
-        $this->template->warnings = FALSE;
+        $this->template->error = false;
+		$this->template->tabulka_jiz_existuje = false;
         
         try {
             $db_config = Environment::getConfig('database');
@@ -571,57 +571,51 @@ class Install_DefaultPresenter extends BasePresenter
                 $query = str_replace("{tbls3}", $db_config->prefix, $query);
                 $query = trim($query);
 
-                if ( empty($query) ) continue;
+                if ( empty($query) )
+					continue;
 
                 if ( $this->getParam('install', null) ) {
-                    // instalace
+                    // provedeni SQL skriptu
                     $this->template->db_install = 1;
-                    $query_part = explode("`",$query);
-                    // provedeni prikazu
                     try {
-
-                        dibi::query($query);
-                        
-                        $passed = true;
-                        $sql_error = "";
-                    } catch ( DibiException $e ) {
-                        $passed = false;
+                        dibi::query($query);                        
+                    }
+					catch ( DibiException $e ) {
+						$this->template->error = true;
                         $sql_error = $e->getMessage();
-                    }
-
-
-                    if ( strpos($query, "CREATE TABLE") !== false ) {
-                        $message = "Tabulka byla úspěšně vytvořena";
-                        $error_message = "Tabulku se nepodařilo vytvořit!";
-                    } else if ( strpos($query, "INSERT INTO") !== false ) {
-                        $message = "Data do tabulky byla úspěšně nahrána.";
-                        $error_message = "Data do tabulky se nepodařilo nahrát!";
-                    }
-                    else if ( strpos($query, "ALTER TABLE") !== false ) {
-                        $message = "Struktura tabulky byla úspěšně upravena.";
-                        $error_message = "Tabulku se nepodařilo změnit!";
-                    }
-                    else {
-                        $message = "Databázový příkaz byl úspěšně proveden.";
-                        $error_message = "Databázový příkaz nebyl správně proveden!";
-                    }
-
-                    $query = "<p>SQL Chyba: ". $sql_error ." </p><p>QUERY: $query</p>";
-
-                    if (!$passed)
+						
+						if ( strpos($query, "CREATE TABLE") !== false ) {
+							// $message = "Tabulka byla úspěšně vytvořena";
+							$error_message = "Tabulku se nepodařilo vytvořit!";
+						} else if ( strpos($query, "INSERT INTO") !== false ) {
+							// $message = "Data do tabulky byla úspěšně nahrána.";
+							$error_message = "Data do tabulky se nepodařilo nahrát!";
+						}
+						else if ( strpos($query, "ALTER TABLE") !== false ) {
+							// $message = "Struktura tabulky byla úspěšně upravena.";
+							$error_message = "Tabulku se nepodařilo změnit!";
+						}
+						else {
+							// $message = "Databázový příkaz byl úspěšně proveden.";
+							$error_message = "Databázový příkaz nebyl správně proveden!";
+						}
+						$query_parts = explode("`", $query);
                         $database_a[] = array(
-                            'title' => @$query_part[1],
+                            'title' => @$query_parts[1],
                             'required' => TRUE,
-                            'passed' => $passed,
-                            'message' => @$message,
-                            'errorMessage' => @$error_message,
-                            'description' => $query,
+                            'passed' => false,
+                            'message' => '',
+                            'errorMessage' => $error_message,
+                            'description' => "<p>SQL Chyba: ". $sql_error ." </p><p>QUERY: $query</p>",
                         );
+                    }
+
                 } else {
                     // predkontrola
                     $query_part = explode("`",$query);
                     if ( ( strpos($query, "CREATE")!==false ) && isset($query_part[1]) ) {
                         if ( in_array($query_part[1], $db_tables) ) {
+							$this->template->tabulka_jiz_existuje = true;
                             $database_a[] = array(
                                 'title' => @$query_part[1],
                                 'required' => TRUE,
@@ -633,9 +627,6 @@ class Install_DefaultPresenter extends BasePresenter
                         }
                     }
                 }
-
-
-
             }
 
             $this_installation = new Client_To_Update(CLIENT_DIR);
@@ -645,13 +636,12 @@ class Install_DefaultPresenter extends BasePresenter
             $database = $this->paint( $database_a );
             $this->template->database = $database;
 
-            if ( !($this->template->errors) && isset($this->template->db_install) ) {
+            if ( !($this->template->error) && isset($this->template->db_install) ) {
                 @$session->step['databaze'] = 1;
             }
 
         } catch (DibiDriverException $e) {
-            $database_info = $e->getMessage();
-            $this->template->errors = $database_info;
+            $this->template->error = $e->getMessage();
         }
     }
 
