@@ -31,9 +31,8 @@ Adresare /client/ (vcetne podadresaru) a /log/ nesmi byt pres webovy server pris
 Pro server Apache to zajistuji soubory .htaccess, pokud jsou povoleny. Spravnost tohoho
 nastaveni overte, aby nebylo mozne se neopravnene dostat k citlivym datum.
 
-2a. V korenovem adresari prejmenujte soubor index.ph na index.php. V adresari client/configs/ prejmenujte soubory s priponou .in na .ini
 
-3. V souboru index.php upravte cesty, pokud jsou odlisne od skutecnosti:
+3. V korenovem adresari prejmenujte soubor index.ph na index.php. V souboru index.php upravte cesty, pokud jsou odlisne od skutecnosti:
 
 APP_DIR    = absolutni cesta k aplikacnim souborum (adresar /app). Vetsinou nemenit!
 LIBS_DIR   = absolutni cesta ke knihovnam aplikace (adresar /libs). Vetsinou nemenit!
@@ -43,16 +42,13 @@ KLIENT     = identifikator klienta. Vetsinou nemenit!
 CLIENT_DIR = absolutni cesta k uzivatelskym souborum (adresar /client). Vetsinou nemenit!
 
 
-4. V souboru /client/configs/system.ini nastavte spravne hodnoty pro pristup k databazi:
+4. V adresari /client/configs/ zkopirujte soubor system.in do system.ini. V souboru system.ini nastavte spravne hodnoty pro pristup k databazi:
 
-database.driver = mysql          ; databazovy zdroj (aktualne pouze mysql)
 database.host = localhost        ; adresa serveru
 database.username =              ; prihlasovaci jmeno k databazi
 database.password =              ; prihlasovaci heslo k databazi
-database.database =              ; databaze (musi existovat !!!)
-database.charset  = utf8         ; kodovani databaze
+database.database =              ; databaze (musi existovat!)
 database.prefix  =               ; prefix tabulek ( priklad: "s3_". Pouzijte, pokud v databazi jiz existuje aplikace spisovky nebo jakekoli jine tabulky)
-database.profiler = TRUE         ; povoluje profilovani - zaznamenani pouzitych SQL dotazu
 
 
 5. Provedte instalacni proceduru aplikace.
