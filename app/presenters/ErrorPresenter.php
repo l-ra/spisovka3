@@ -26,7 +26,7 @@ class ErrorPresenter extends BasePresenter
 	{
 
 		if ($this->isAjax()) {
-			$this->getAjaxDriver()->events[] = array('error', $exception->getMessage());
+			echo $exception->getMessage();
 			$this->terminate();
 
 		} else {
