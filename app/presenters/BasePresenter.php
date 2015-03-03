@@ -273,8 +273,10 @@ abstract class BasePresenter extends Presenter
     
     public function templatePrepareFilters($template)
     {
-        $template->registerFilter($filter = new /*Nette\Templates\*/CurlyBracketsFilter);
-
+        $filter = new LatteFilter;
+        $filter->setHandler(new LatteMacros);
+        $template->registerFilter($filter);
+		
         $filter->handler->macros['access'] =
                 '<?php if (%MyMacros::access%) { ?>';
         $filter->handler->macros['/access'] =
@@ -320,3 +322,4 @@ abstract class BasePresenter extends Presenter
             $this->flashMessage($error, 'warning');
     }
 }
+
