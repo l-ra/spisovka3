@@ -1435,8 +1435,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $data['datum_vzniku'] = $data['datum_vzniku'] ." ". $data['datum_vzniku_cas'];
         unset($data['datum_vzniku_cas']);
 
-        // predani
-        $predani_poznamka = $data['predani_poznamka'];
+        // predani - neni ve formulari odpovedi
+        $predani_poznamka = isset($data['predani_poznamka']) ? $data['predani_poznamka'] : '';
 
         unset($data['predani_poznamka'],$data['id'],$data['version']);
 
