@@ -1,6 +1,6 @@
-@{block title}Dokument{/block}
+{block title}Dokument{/block}
 {assign Select2 => true}
-@{block javascript}
+{block javascript}
 	<script type="text/javascript" src="{$baseUri}js/webtoolkit.aim.js"></script>
 	<script type="text/javascript">
         function startCallback() {
@@ -47,12 +47,12 @@
     var typ_dokumentu_id = {$Dok->typ_dokumentu->id};    
 	</script>
     {include ../../@vlozSpisZnak.phtml}
-@{/block}
-@{block debug}
+{/block}
+{block debug}
 <?php echo "\n\nDokument: "; print_r($Dok); ?>
 
-@{/block}
-@{block content}
+{/block}
+{block content}
 
     <div class="navigate">
     <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> - Detail dokumentu

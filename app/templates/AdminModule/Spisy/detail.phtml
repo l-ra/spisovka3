@@ -1,8 +1,9 @@
 {block title}Detail spisu{/block}
 {assign Select2 => true}
-@{block javascript}{if ($FormUpravit=='info')}
+{block javascript}{if ($FormUpravit=='info')}
 {include ../../@vlozSpisZnak.phtml}
-{/if}@{/block}
+{/if}
+{/block}
 {block content}
     <div class="navigate">
     <a href="{link :Admin:Spisy:seznam}">Spisy</a> - Detail

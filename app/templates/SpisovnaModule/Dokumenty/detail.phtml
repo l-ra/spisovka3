@@ -1,14 +1,14 @@
-@{block title}Dokument{/block}
+{block title}Dokument{/block}
 {assign Select2 => true}
-@{block javascript}
+{block javascript}
 {include ../../@vlozSpisZnak.phtml}
-@{/block}
-@{block debug}
+{/block}
+{block debug}
 <?php echo "\n\nDokument: "; print_r($Dok); ?>
 <?php echo "\n\nZapujcky: "; print_r($Zapujcka); ?>
 
-@{/block}
-@{block content}
+{/block}
+{block content}
 
     <div class="navigate">
     <a href="{link :Spisovna:Dokumenty:default}">Seznam dokumentů ve spisovně</a> - Detail dokumentu

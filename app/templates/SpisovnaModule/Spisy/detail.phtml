@@ -1,12 +1,12 @@
-@{block title}Seznam spisů{/block}
+{block title}Seznam spisů{/block}
 {assign Select2 => true}
-@{block javascript}
+{block javascript}
 {include ../../@vlozSpisZnak.phtml}
-@{/block}
-@{block debug}
+{/block}
+{block debug}
 <?php print_r($seznam); ?>
-@{/block}
-@{block content}
+{/block}
+{block content}
     <div class="navigate">
     <a href="{link :Spisovna:Dokumenty:default}">Seznam dokumentů</a> -
     <a href="{link :Spisovna:Spisy:default}">Seznam spisů</a> -
