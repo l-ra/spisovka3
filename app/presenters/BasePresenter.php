@@ -157,9 +157,9 @@ abstract class BasePresenter extends Presenter
         }
 
         if (DEBUG_ENABLE && in_array('programator', Environment::getUser()->getRoles())) {
-            $this->template->debuger = TRUE;
+            $this->template->debugger = TRUE;
         } else {
-            $this->template->debuger = FALSE;
+            $this->template->debugger = FALSE;
         }
 
         /**
@@ -276,7 +276,7 @@ abstract class BasePresenter extends Presenter
         $filter = new LatteFilter;
         $filter->setHandler(new LatteMacros);
         $template->registerFilter($filter);
-		
+
         $filter->handler->macros['access'] =
                 '<?php if (%MyMacros::access%) { ?>';
         $filter->handler->macros['/access'] =

@@ -54,8 +54,9 @@
     <div id="content">
         {include #content}
     </div>
-    {if isset($debuger) && $debuger}
-    {include debug.phtml}    
+    {if isset($debugger) && $debugger}
+    {capture $debug_data}{block debug}{/block}{/capture}
+    {include debug.phtml, extra_data => $debug_data}    
     {/if}
 </div>
 
