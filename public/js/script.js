@@ -327,12 +327,15 @@ dialog = function ( elm, title ) {
 aresSubjekt = function ( formName ) {
 
     var frmIC = document.getElementById('frm'+formName+'-ic');
+    IC = frmIC.value;
+    if (!IC)
+        return false; // Je-li pole IC prázdné, nevolej neplatné URL
+    
     baseUri = baseUri.replace('/public','');
-    //var url = baseUri + '/subjekty/ares/' + frmIC.value;
     if ( is_simple == 1 ) {
-        var url = baseUri + '?presenter=Spisovka%3Asubjekty&id=' + frmIC.value +'&action=ares';
+        var url = baseUri + '?presenter=Spisovka%3Asubjekty&id=' + IC +'&action=ares';
     } else {    
-        var url = baseUri + 'subjekty/' + frmIC.value +'/ares';
+        var url = baseUri + 'subjekty/' + IC +'/ares';
     }
     //alert( url );
 
