@@ -161,7 +161,7 @@ class dibi
 	public static $numOfQueries = 0;
 
 	/** @var string  Default dibi driver */
-	public static $defaultDriver = 'mysql';
+	public static $defaultDriver = 'mysqli';
 
 
 
