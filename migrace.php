@@ -380,7 +380,6 @@ if ( count($S2_spisove_znaky)>0 ) {
                 'popis' => (string) $S2_sz->popis,
                 'skartacni_znak' => !empty($S2_sz->skartacni_znak[0])?$S2_sz->skartacni_znak[0]:null,
                 'skartacni_lhuta' => intval($S2_sz->skartacni_lhuta),
-                'uroven' => 0,
                 'sekvence' => (int) $S2_sz->id_spisznak,
                 'sekvence_string' => $sekvence,
                 'stav' => (int) $S2_sz->stav,
@@ -461,7 +460,6 @@ if ( count($S2_spisy)>0 ) {
                 'typ' => 'VS',
                 'sekvence' => 1,
                 'sekvence_string' => 'SPISY.1',
-                'uroven' => 0,
                 'skartacni_znak' => 'V',
                 'skartacni_lhuta' => SKARTACNI_LHUTA_SPISU,
                 'stav' => 1,
@@ -489,7 +487,6 @@ if ( count($S2_spisy)>0 ) {
                 'typ' => 'S',
                 'sekvence' => '1.'. ($S2_s->id_spis+1),
                 'sekvence_string' => "SPISY.1#". $sekvence,
-                'uroven' => 1,
                 'skartacni_znak' => 'V',
                 'skartacni_lhuta' => 1000,
                 'stav' => (int) $S2_s->stav,
@@ -608,8 +605,7 @@ if ( count($S2_org)>0 ) {
                 'date_modified' => new DateTime($S2_o->vytvoreno),
                 'user_modified' => 1,
                 'sekvence' => (int) $S2_o->id_orgjednotka,
-                'sekvence_string' => $sekvence,
-                'uroven' => 0
+                'sekvence_string' => $sekvence
             ))->execute(dibi::IDENTIFIER);
             echo "\n   => <span style='color:green'>přeneseno (id $org_id)</span>";
 
@@ -620,7 +616,6 @@ if ( count($S2_org)>0 ) {
                 $rule_id = null;
                 $rule_id = $S3->insert(S3_.'user_rule', array(
                     'name' => "Oprávnění pro org. jednotku ". $zkraceny_nazev,
-                    'note' => "Oprávnění platné pouze pro organizační jednotku ". $zkraceny_nazev,
                     'privilege' => "orgjednotka_". $org_id,
                 ))->execute(dibi::IDENTIFIER);
                 echo "\n   => <span style='color:green'>vytvořeno pravidlo pro organizační jednotku $code (id $rule_id)</span>";

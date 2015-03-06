@@ -2,6 +2,11 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
+Nové funkce:
+
+- administrátor má možnost vytvořit protokol s informacemi pro technickou
+  podporu.
+
 Opravy:
 
 - E-podatelna - na stránce stahování zpráv nepracovala funkce "vytvořit nový
@@ -10,6 +15,7 @@ Opravy:
                 při kontrole schránky místo zprávy zobrazila nulu
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 
   serveru zobrazoval nesprávně
+- opraven skript pro migraci ze spisové služby verze 2
 
 === Verze 3.4.1 ================================================================
 
