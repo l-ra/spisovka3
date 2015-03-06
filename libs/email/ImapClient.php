@@ -180,18 +180,17 @@ class ImapClient {
     }
 
 
-    function source_message($id_message) {
-        if (!is_null($this->_stream)) {
-
-            /* Header */
-            $mail_header = imap_fetchheader($this->_stream,$id_message);
-            /* Body */
-            $mail_body = imap_body($this->_stream, $id_message);
-            $mail = $mail_header ."". $mail_body;
-            return $mail;
-        } else {
+    function source_message($id_message)
+    {
+        if (is_null($this->_stream))
             return null;
-        }
+
+        /* Header */
+        $mail_header = imap_fetchheader($this->_stream,$id_message);
+        /* Body */
+        // [P.L.] zkousel jsem eliminovat pozadavek na pamet ve 2x velikosti e-mailu,
+        // ale zrejme to je nemozne dosahnout bez oddeleni hlavicky a tela e-mailu.
+        return $mail_header . imap_body($this->_stream, $id_message);
     }
 
     private function parse_message_body($id_message,$body) {

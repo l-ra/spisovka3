@@ -552,14 +552,16 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 if ( ! $this->Epodatelna->existuje($z->dmID ,'isds') ) {
                     // nova zprava, ktera neni nahrana v epodatelne
 
-                    // rozparsovat do jednotne podoby
-                    $storage = new FileStorage(CLIENT_DIR .'/temp');
-                    $cache = new Cache($storage); // nebo $cache = Environment::getCache()
-                    if (isset($cache['zkontrolovat_isds_'.$z->dmID])):
-                        $mess = $cache['zkontrolovat_isds_'.$z->dmID];
-                    else:
+                    // [P.L.] - cache neni vubec funkcni, neukladaly se tam vysledky
+                    // $storage = new FileStorage(CLIENT_DIR .'/temp');
+                    // $cache = new Cache($storage); // nebo $cache = Environment::getCache()
+                    // if (isset($cache['zkontrolovat_isds_'.$z->dmID])):
+                        // $mess = $cache['zkontrolovat_isds_'.$z->dmID];
+                    // else:
+                    
                         $mess = $isds->prectiZpravu($z->dmID);
-                    endif;
+                    // endif;
+                    
 
                         //echo "<pre>";
 /*
@@ -982,6 +984,9 @@ dmFormat =
             if ( ! $this->Epodatelna->existuje($z->message_id ,'email') ) {
                 // nova zprava, ktera neni nahrana v epodatelne
 
+                // Nejprve uvolni pamet predchozi zpravy
+                $mess = null;
+                
                 // Nacteni kompletni zpravy
                 $mess = $imap->get_message($z->id_part);
                 
