@@ -1213,6 +1213,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->ZpusobyOdeslani = ZpusobOdeslani::getZpusoby();
             
             $this->invalidateControl('dokspis');
+            
+            $max_vars = ini_get('max_input_vars');
+            $safe_recipient_count = floor(($max_vars - 10) / 17);
+            $recipient_count = 0;
+            foreach($dokument->subjekty as $subjekt)
+                if ($subjekt->rezim_subjektu != 'O')
+                    $recipient_count++;
+            if ($recipient_count > $safe_recipient_count) {
+                $this->flashMessage("Dokument má příliš mnoho adresátů a není možné jej odeslat. Maximální počet adresátů je $safe_recipient_count.", 'warning');
+                $this->flashMessage("Limit je ovlivněn PHP nastavením \"max_input_vars\" na serveru.");
+                $this->redirect(':Spisovka:Dokumenty:detail', array('id'=>$dokument_id));                
+            }            
 
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
@@ -1994,18 +2006,25 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Dokument = new Dokument();
         $Subjekt = new Subjekt();
         $File = new FileModel();
-        //$dok = $Dokument->getInfo($dokument_id, $dokument_version);
 
+        if (empty($dokument_id)) {
+            $this->flashMessage('Ve formuláři odeslání dokumentu chybí jeho ID! Pravděpodobně došlo k překročení limitu počtu adresátů u dokumentu.', 'warning');
+            $this->redirect(':Spisovka:Dokumenty:');
+        }
+        // nejprve ověř, že dokument existuje
+        $doc = $Dokument->getInfo($dokument_id);
+        if (!$doc) {
+            $this->flashMessage('Nemohu načíst dokument. Dokument nebude odeslán.', 'warning');
+            $this->redirect(':Spisovka:Dokumenty:');            
+        }
+        
         $post_data = Environment::getHttpRequest()->getPost();
 
-        //Debug::dump($post_data);
-        //Debug::dump($data);
-
-        //exit;
+        // Debug::dump($post_data);
+        // Debug::dump($data);
 
         //echo "<pre>";
         //echo "\n\nPřílohy:\n\n";
-
         $prilohy = array();
         if ( isset($post_data['prilohy'])) {
             if ( count($post_data['prilohy'])>0 ) {
