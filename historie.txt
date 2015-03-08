@@ -5,7 +5,7 @@
 Nové funkce:
 
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
-  podporu.
+  podporu. Funkce je dostupná na adrese /admin/support/
 
 Opravy:
 
@@ -15,6 +15,8 @@ Opravy:
                 při kontrole schránky místo zprávy zobrazila nulu
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 
   serveru zobrazoval nesprávně
+- odeslání dokumentu je limitováno počtem adresátů. Program nyní limit kontroluje
+  a informuje uživatele. Limit je obvykle zhruba 55 adresátů.
 - opraven skript pro migraci ze spisové služby verze 2
 
 === Verze 3.4.1 ================================================================
