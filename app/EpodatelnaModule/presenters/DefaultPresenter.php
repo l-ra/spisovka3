@@ -1235,12 +1235,5 @@ dmFormat =
             $this->template->vysledek = "Neplatný parametr!";
             $this->template->error = 1;
         }
-        
-        $is_ajax = $this->getParam("is_ajax");
-        if ( $is_ajax ) {
-            $this->setLayout(FALSE);
-        }        
-        
     }
-
 }

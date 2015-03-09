@@ -208,7 +208,9 @@ abstract class BasePresenter extends Presenter
                 $this->setLayout('install');
                 break;
         }
-                
+
+        // [P.L.] Nejsem si jist, jestli tohle je k necemu dobre. 
+        // Podle mne Nette samo pozna, ze se jedna o Ajax pozadavek.
         if ($this->getParam("is_ajax"))
             $this->setLayout(false);
         

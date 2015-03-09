@@ -22,9 +22,6 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             || $user->isAllowed('Dokument', 'cist_moje_oj')
             || $user->isAllowed('Dokument', 'cist_vse');
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');
-            
-        if ( $this->getParam('is_ajax') )
-            $this->layout = false;
     }
 
     public function handleAutoComplete($text, $typ, $user=null, $org=null)
