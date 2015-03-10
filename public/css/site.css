@@ -893,19 +893,27 @@ td.seznam-sestav-pruh-ikon a {
     width: 120px;
 }
 
-#vysledek-spinner,
-#ajax-spinner {
-    position:fixed;
+#ajax-spinner,
+.dialog-spinner {
     left: 50%;
     top: 50%;
-    margin: -15px 0 0 -15px;
     background: white url('../images/spinner.gif') no-repeat 50% 50%;
+    font-size: 0;
+    border: 0px;
+}
+.dialog-spinner {
+    width: 100%;
+    height: 100%;
+}
+#ajax-spinner {
+    position:fixed;
+    z-index: 120;
+    margin: -15px 0 0 -15px;
     padding: 13px;
     border: 2px solid #CCC;
-    font-size: 0;
 }
 
-#ajax-spinner-hor {
+/* #ajax-spinner-hor {
     position:fixed;
     left: 50%;
     top: 50%;
@@ -914,7 +922,8 @@ td.seznam-sestav-pruh-ikon a {
     padding: 13px 70px;
     border: 2px solid #CCC;
     font-size: 0;
-}
+    z-index: 119;
+} */
 
 
 /* ******************************************************************* */

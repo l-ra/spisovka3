@@ -72,8 +72,9 @@ class VisualPaginator extends Control
 			$steps = array_values(array_unique($arr));
 		}
 
-                $url = Environment::getHttpRequest()->getUri()->getPath();
-                $query_string = Environment::getHttpRequest()->getUri()->getQuery();
+                $request = Environment::getHttpRequest();
+                $url = $request->getUri()->getPath();
+                $query_string = $request->getUri()->getQuery();
                 $query_params = "";
                 parse_str($query_string, $query);
                 //echo "<pre>"; print_r($query); echo "</pre>";
@@ -99,7 +100,7 @@ class VisualPaginator extends Control
 		$this->template->steps = $steps;
 		$this->template->paginator = $paginator;
         $this->template->onclick = '';
-        if (isset($query['is_ajax']))
+        if ($request->isAjax())
             $this->template->onclick = 'onclick="reloadDialog(this); return false;"';
 
 		$this->template->setFile(dirname(__FILE__) . '/template.phtml');

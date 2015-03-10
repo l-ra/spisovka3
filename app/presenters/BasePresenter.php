@@ -209,9 +209,9 @@ abstract class BasePresenter extends Presenter
                 break;
         }
 
-        // [P.L.] Nejsem si jist, jestli tohle je k necemu dobre. 
-        // Podle mne Nette samo pozna, ze se jedna o Ajax pozadavek.
-        if ($this->getParam("is_ajax"))
+        // [P.L.] Slouží pouze jako pojistka proti případné chybě v šabloně
+        // Ajax šablony nemají definovat žádný blok, pak se layout nepoužije
+        if (Environment::getHttpRequest()->isAjax())
             $this->setLayout(false);
         
         if (IS_SIMPLE_ROUTER == 1) {

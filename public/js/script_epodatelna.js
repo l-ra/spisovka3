@@ -3,71 +3,12 @@ var loaded_data = new Array();
 $(function() {
 
     $('#dialog-evidence').click(function(event){
-        event.preventDefault();
-
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    $('#dialog').html(x.responseText);
-                }
-            }
-            x.open("GET", this.href, true);
-            x.send(null);
-        }
-
-        $('#dialog').dialog( "option", "title", 'Evidovat' );
-        $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
-        $('#dialog').dialog('open');
-
+        dialog(this,'Evidovat');
         return false;
     });
 
     $('#dialog-odmitnout').click(function(event){
-        event.preventDefault();
-
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    $('#dialog').html(x.responseText);
-                }
-            }
-            x.open("GET", this.href, true);
-            x.send(null);
-        }
-
-        $('#dialog').dialog( "option", "title", 'Odmítnout zprávu' );
-        $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
-        $('#dialog').dialog('open');
-
-        return false;
-    });
-
-    $('#dialog-novysubjekt').click(function(event){
-        event.preventDefault();
-
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    $('#dialog').html(x.responseText);
-                }
-            }
-            x.open("GET", this.href, true);
-            x.send(null);
-        }
-
-        $('#dialog').dialog( "option", "title", 'Nový subjekt' );
-        $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
-        $('#dialog').dialog('open');
-
+        dialog(this,'Odmítnout zprávu');
         return false;
     });
 
@@ -224,80 +165,59 @@ epodSubjektNovySubmit = function (elm) {
 
 epodSubjektNovyStorno = function () {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#dialog').html(x.responseText);
-            }
-            return false;
-        }
-        if ( is_simple == 1 ) {
-            x.open("GET", baseUri + '?presenter=Epodatelna%3Asubjekty&action=vyber', true);
-        } else {    
-            x.open("GET", baseUri + 'epodatelna/subjekty/vyber', true);
-        }        
-        
-        x.send(null);
-        return false;
-    }
+    $('#dialog').html(dialogSpinner());
 
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
+    if ( is_simple == 1 ) {
+        url = baseUri + '?presenter=Epodatelna%3Asubjekty&action=vyber';
+    } else {    
+        url = baseUri + 'epodatelna/subjekty/vyber';
+    }
+    
+    $.get(url, function(data) {
+        $('#dialog').html(data);
+    });
+    
     return false;
 }
 
 renderEpodSubjekty = function (subjekt_id) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    showSpinner();
+    
+    if ( is_simple == 1 ) {
+        url = baseUri + '?presenter=Epodatelna%3Asubjekty&action=nacti&id=' + subjekt_id;
+    } else {  
+        url = baseUri + 'epodatelna/subjekty/nacti/'+ subjekt_id;
     }
-    if (x) {
-        x.onreadystatechange = function() {
 
-            if (x.readyState == 4 && x.status == 200) {
+    $.get(url, function(data) {
+        subjekty_table = document.getElementById('subjekty-table');
+        
+        if ( subjekty_table == null ) {
+            html =        '        <table class="seznam" id="subjekty-table">';
+            html = html + '           <tr>';
+            html = html + '               <td class="icon">Použít</td>';
+            html = html + '               <td class="icon">&nbsp;</td>';
+            html = html + '               <td class="meta">&nbsp;</td>';
+            html = html + '               <td class="meta_plus">&nbsp;</td>';
+            html = html + '           </tr>';
+            html = html + data;
+            html = html + '        </table>';
+            $('#dok-subjekty').html(html);
+        } else {
 
-                subjekty_table = document.getElementById('subjekty-table');
-                
-                if ( subjekty_table == null ) {
-                    html =        '        <table class="seznam" id="subjekty-table">';
-                    html = html + '           <tr>';
-                    html = html + '               <td class="icon">Použít</td>';
-                    html = html + '               <td class="icon">&nbsp;</td>';
-                    html = html + '               <td class="meta">&nbsp;</td>';
-                    html = html + '               <td class="meta_plus">&nbsp;</td>';
-                    html = html + '           </tr>';
-                    html = html + x.responseText;
-                    html = html + '        </table>';
-                    $('#dok-subjekty').html(html);
-                } else {
-
-                    subjekt_tr = document.getElementById('epodsubjekt-'+subjekt_id);
-                    if ( subjekt_tr != null ) {
-                        $(subjekt_tr).replaceWith(x.responseText);
-                    } else {
-                        // append
-                        $('#subjekty-table tbody').append(x.responseText);
-                    }
-
-                    
-                }
+            subjekt_tr = document.getElementById('epodsubjekt-'+subjekt_id);
+            if ( subjekt_tr != null ) {
+                $(subjekt_tr).replaceWith(data);
+            } else {
+                // append
+                $('#subjekty-table tbody').append(data);
             }
+
+            
         }
-        baseUri = baseUri.replace('/public','');
-        if ( is_simple == 1 ) {
-            x.open("POST", baseUri + '?presenter=Epodatelna%3Asubjekty&action=nacti&id=' + subjekt_id, true);
-        } else {  
-            x.open("GET", baseUri + 'epodatelna/subjekty/nacti/'+ subjekt_id, true);
-        }
-        x.send(null);
-    }
-
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
-
+    });
+    
     return false;
 }
 
@@ -308,133 +228,60 @@ epodSubjektVybran = function (elm, subjekt_id) {
     renderEpodSubjekty(subjekt_id);
 }
 
-EpodosobaVybrana = function (elm) {
-
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                stav = x.responseText;
-
-                if ( stav.indexOf('###vybrano###') != -1 ) {
-                    stav = stav.replace('###vybrano###','');
-                    $('#dialog').dialog('close');
-                    location.href = stav;
-
-                    //renderSubjekty(stav);
-                } else {
-                    $('#dialog').html(stav);
-                }
-            }
-        }
-
-        poznamka = document.getElementById('frmpred-poznamka').value;
-        url = elm.href + '&poznamka='+ poznamka;
-        elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
-        x.open("GET", url, true);
-        
-        x.send(null);
-    }
-
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
-
-    return false;
-}
-
 zkontrolovatSchranku = function (elm) {
-
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4)
-                if (x.status == 200) {
-                    stav = x.responseText;
-                    $('#zkontrolovat_status').html(x.responseText);
-                    // nacteni novych zprav z database se musi provest az po stazeni vsech zprav z emailove schranky
-                    nactiZpravy();
-                }
-                else
-                   $('#zkontrolovat_status').html('Při kontrole zpráv došlo k chybě ' + x.status);
-            }
-
-        if ( is_simple == 1 ) {
-            url = baseUri + '?presenter=Epodatelna%3Adefault&action=zkontrolovatAjax';
-        } else {  
-            url = baseUri + 'epodatelna/default/zkontrolovatAjax';
-        }
-        x.open("GET", url, true);
-        x.send(null);
-    }
 
     $('#zkontrolovat_status').html('<img src="'+baseUri+'public/images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
 
+    if ( is_simple == 1 ) {
+        url = baseUri + '?presenter=Epodatelna%3Adefault&action=zkontrolovatAjax';
+    } else {  
+        url = baseUri + 'epodatelna/default/zkontrolovatAjax';
+    }
 
-    return false;
+    $.get(url, function(data) {
+        $('#zkontrolovat_status').html(data);
+        // nacteni novych zprav z database se musi provest az po stazeni vsech zprav z emailove schranky
+        nactiZpravy();
+    }).fail(function(data) {
+        $('#zkontrolovat_status').html('Při kontrole zpráv došlo k chybě ' + x.status);
+    });    
 }
 
 zkontrolovatOdchoziSchranku = function (elm) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                //stav = x.responseText;
-                //$('#zkontrolovat_status').html(x.responseText);
-            }
-        }
-
-        if ( is_simple == 1 ) {
-            url = baseUri + '?presenter=Epodatelna%3Adefault&action=zkontrolovatOdchoziISDS';
-        } else {  
-            url = baseUri + 'epodatelna/default/zkontrolovatOdchoziISDS';
-        }
-        x.open("GET", url, true);
-        x.send(null);
+    if ( is_simple == 1 ) {
+        url = baseUri + '?presenter=Epodatelna%3Adefault&action=zkontrolovatOdchoziISDS';
+    } else {  
+        url = baseUri + 'epodatelna/default/zkontrolovatOdchoziISDS';
     }
 
-    return false;
+    // zde není potřeba žádná zpětná vazba
+    $.get(url);
 }
 
 
 nactiZpravy = function () {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+    showSpinner();
+    
+    if ( is_simple == 1 ) {
+        url = baseUri + '?presenter=Epodatelna%3Adefault&action=nactiNoveAjax';
+    } else {  
+        url = baseUri + 'epodatelna/default/nactiNoveAjax';
     }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                var zpravy = eval("("+x.responseText+")");
-                if ( zpravy != '' ) {
-                    
-                    for(index in zpravy) {
-                        if ( in_array(index, loaded_data) == true ) {
-                            continue;
-                        }
-                        generujZpravu( index, zpravy[index] );
-                        loaded_data[ index ] = index;
-                    }
+    $.get(url, function(data) {
+        var zpravy = eval("(" + data + ")");
+        if ( zpravy != '' ) {
+            
+            for(index in zpravy) {
+                if ( in_array(index, loaded_data) == true ) {
+                    continue;
                 }
+                generujZpravu( index, zpravy[index] );
+                loaded_data[ index ] = index;
             }
         }
-
-        if ( is_simple == 1 ) {
-            url = baseUri + '?presenter=Epodatelna%3Adefault&action=nactiNoveAjax';
-        } else {  
-            url = baseUri + 'epodatelna/default/nactiNoveAjax';
-        }
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    return false;
+    });    
 }
 
 function in_array (needle, haystack)

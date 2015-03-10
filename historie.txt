@@ -7,6 +7,12 @@ Nové funkce:
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
   podporu. Funkce je dostupná na adrese /admin/support/
 
+Jiné změny:
+
+- přepsána velká část Javascriptu starající se o dynamické změny na stránce.
+  Tzv. rotující kolečko by se nyní mělo spolehlivě zobrazovat a skrývat, když
+  aplikace zpracovává požadavek nebo nahrává data na pozadí.
+  
 Opravy:
 
 - E-podatelna - na stránce stahování zpráv nepracovala funkce "vytvořit nový

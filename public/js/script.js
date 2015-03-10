@@ -49,114 +49,109 @@ function InstallDatePicker() {
     });
 }
 
+function showSpinner() {
+    $("#ajax-spinner").show();
+}
+function hideSpinner() {
+    $("#ajax-spinner").hide();
+}
+function dialogSpinner()
+{
+    return $('<div class="dialog-spinner"></div>');    
+}
+
+
 $(function() {
 
     InstallDatePicker();
-    initSelect2(); 
+    initSelect2();
+    
     /*
-     * Nastaveni spinneru jako okenko pod kurzorem
+     * Nastaveni spinneru. Je vzdy pritomen, standarne ale je schovan.
      */
     $('<div id="ajax-spinner"></div>').appendTo("body").hide();
     
     $(document).ajaxStop(function () {
-        // a při události ajaxStop spinner schovám a nastavím mu původní pozici
-        $("#ajax-spinner").hide().css({
-            position: "fixed",
-            left: "50%",
-            top: "50%"
-        });
+        // při události ajaxStop spinner schovám
+        hideSpinner();
     })
     
-    /* Volání AJAXu u všech odkazů s třídou ajax */
-    $(document).on("click", "a.ajax", function (event) {
-        event.preventDefault();
-        $.get(this.href);
-
-        $("#ajax-spinner").show().css({
-            position: "absolute",
-            left: event.pageX + 20,
-            top: event.pageY + 40
-        });
-    });
-
     // Povinne polozky
     $('label.required').attr('title','Povinná položka').append(' <span class="star">*</span>');
 
     // Dialog
     $('#dialog').dialog({
         autoOpen: false,
-	width: 800,
+        width: 800,
         height: 500,
         modal: true
     });
 
     // Dialog - Vyber spisu
     $('#dialog-spis').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Spisy');
+        dialog(this,'Spisy');
+        return false;
     });
 
     // Dialog - Vyber spisu
     $('#dialog-zmocneni').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Připojit zmocnění');
+        dialog(this,'Připojit zmocnění');
+        return false;
     });
 
     // Dialog - Vyber subjektu
     $('#dialog-subjekt').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Subjekt');
+        dialog(this,'Subjekt');
+        return false;
     });
     
     // Dialog - Vyber subjektu
     $('#subjekt_pripojit_click').click(function(event){
-        event.preventDefault();
         $('#subjekt_pripojit').show();
-        $('#subjekt_autocomplete').focus();
-        
+        $('#subjekt_autocomplete').focus();        
         return false;
     });    
 
     // Dialog - Vyber subjektu
     $('#dialog-pridat-prilohu').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Přidat přílohu');
+        dialog(this,'Přidat přílohu');
+        return false;
     });
 
     // Dialog - Vyber zamestnance pro predani
     $('#dialog-uzivatel').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Předat dokument organizační jednotce nebo zaměstnanci');
+        dialog(this,'Předat dokument organizační jednotce nebo zaměstnanci');
+        return false;
     });
     
     // Dialog - Vyber org pro predani spisu
-    $('#dialog-spis').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Předat spis organizační jednotce nebo zaměstnanci');
+    $('#dialog-predatspis').click(function(event){
+        dialog(this,'Předat spis organizační jednotce nebo zaměstnanci');
+        return false;
     });    
 
     // Dialog - Vyber zamestnance pro predani
     $('#dialog-spojit').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Spojit s dokumentem');
+        dialog(this,'Spojit s dokumentem');
+        return false;
     });
 
     // Dialog - Historie
     $('#dialog-historie').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Historie - Transakční protokol');
+        dialog(this,'Historie - Transakční protokol');
+        return false;        
     });
 
     // Dialog - pripojit k archu
     $('#dialog-cjednaci').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Vložit do spisu');
+        dialog(this,'Vložit do spisu');
+        return false;
     });
 
     // Dialog - hledat
     $('#dialog-search').click(function(event){
-        event.preventDefault();
-        return dialog(this,'Pokročilé vyhledávání');
+        dialog(this,'Pokročilé vyhledávání');
+        return false;
     });
 
 
@@ -271,53 +266,46 @@ $(function() {
     
 });
 
-
-dontFollowLink = function () {
-
-    // nutny hack pro Internet Explorer
-    if (typeof event != 'undefined')
-        event.returnValue = false;
-}
-
 /*
  *  Vyvolani dialogu
  *
  *
  */
-dialog = function ( elm, title ) {
-
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#dialog').html(x.responseText);
-            }
-        }
-
-        url = elm.href;
-
-        if ( url.indexOf("?") !== -1 ) {
-            url = url +"&is_ajax=1";
-        } else {
-            url = url +"?is_ajax=1";
-        }
-
-        x.open("GET", url, true);
-        x.send(null);
-    }
+dialog = function ( elm, title, url ) {
 
     if ( typeof title == 'null' )
         title = 'Dialogové okno';
         
     $('#dialog').dialog( "option", "title", title );
     
-    $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
+    // Interni spinner v dialogu - bude nahrazen, az se obsah dialogu nahraje
+    $('#dialog').html(dialogSpinner());
+    $('#dialog').bind('dialogclose', function(event) {
+        // Dialog pouziva lokalni spinner, takze by nemelo byt treba resit ten globalni.
+        // Ale bohuzel ne vsechen kod zatim pouziva jQuery Ajax interface
+        // Pri zavreni dialogu skryj globalni spinner, aby nebezel donekonecna
+        hideSpinner();
+    });
     $('#dialog').dialog('open');
 
+    if (typeof url == 'undefined')
+        url = elm.href;
+    
+    $.get(url, function(data) {
+        $('#dialog').html(data);
+    });
+    
     return false;
+}
 
+reloadDialog = function (elm) {
+
+    $('#dialog').html(dialogSpinner());
+    $.get(elm.href, function(data) {
+        $('#dialog').html(data);
+    });
+    
+    return false;
 }
 
 /*
@@ -328,19 +316,22 @@ aresSubjekt = function ( formName ) {
 
     var frmIC = document.getElementById('frm'+formName+'-ic');
     IC = frmIC.value;
-    if (!IC)
+    if (!IC) {
+        alert('Vyplňte IČ subjektu.');
         return false; // Je-li pole IC prázdné, nevolej neplatné URL
+    }
     
-    baseUri = baseUri.replace('/public','');
     if ( is_simple == 1 ) {
         var url = baseUri + '?presenter=Spisovka%3Asubjekty&id=' + IC +'&action=ares';
     } else {    
         var url = baseUri + 'subjekty/' + IC +'/ares';
     }
     //alert( url );
+    
+    showSpinner();
 
     $.getJSON(url, function(data) {
-
+        
         if ( data == null ) {
             alert('Záznam neexistuje nebo bylo zadáno chybné IČ.');
         } else {
@@ -355,20 +346,9 @@ aresSubjekt = function ( formName ) {
             document.getElementById('frm'+formName+'-adresa_stat').value = 'CZE';
             document.getElementById('frm'+formName+'-stat_narozeni').value = 'CZE';
         }
-
-
-        
-    });
-
-    $("#ajax-spinner").show().css({
-        position: "absolute"
-        //left: event.pageX + 20,
-        //top: event.pageY + 40
     });
 
     return false;
-
-
 }
 
 /*
@@ -378,7 +358,12 @@ aresSubjekt = function ( formName ) {
 isdsSubjekt = function ( formName ) {
 
     var frmID = document.getElementById('frm'+formName+'-id_isds');
-    baseUri = baseUri.replace('/public','');
+    ID = frmID.value;
+    if (!ID) {
+        alert('Zadejte ID datové schránky.');
+        return false;
+    }
+
     //var url = baseUri + '/subjekty/ares/' + frmIC.value;
     if ( is_simple == 1 ) {
         var url = baseUri + '?presenter=Spisovka%3Asubjekty&id=' + frmID.value +'&action=isdsid';
@@ -411,11 +396,7 @@ isdsSubjekt = function ( formName ) {
         
     });
 
-    $("#ajax-spinner").show().css({
-        position: "absolute"
-        //left: event.pageX + 20,
-        //top: event.pageY + 40
-    });
+    showSpinner();
 
     return false;
 
@@ -430,7 +411,6 @@ ajaxcron = function () {
     if (!(Math.random() < 0.1))
         return false;
 	
-    baseUri = baseUri.replace('/public','');
     if ( is_simple == 1 ) {
         var url = baseUri + '?presenter=Spisovka%3Acron&action=spustit';
     } else {    
@@ -459,118 +439,77 @@ toggleWindow = function (elm) {
 
 spisVybran = function (elm) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                stav = x.responseText;
-
-                if ( stav.indexOf('###vybrano###') != -1 ) {
-                    stav = stav.replace('###vybrano###','');
-                    //old_text = document.getElementById('dok_spis').innerHTML;
-                    //old_text = old_text.replace('nepřidělen k žádnemu spisu','');
-                    $('#dok_spis').html(stav);
-                    $('#dialog').dialog('close');
-                } else {
-                    $('#ajax-spinner', $('#dialog')).remove();
-                    alert(stav);
-                }
-            }
+    showSpinner();
+    
+    $.get(elm.href, function(data) {
+        if ( data.indexOf('###vybrano###') != -1 ) {
+            data = data.replace('###vybrano###','');
+            $('#dok_spis').html(data);
+            $('#dialog').dialog('close');
+        } else {
+            alert(data);
         }
-        dontFollowLink();
-        url = elm.href;
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
+    });
 
     return false;
 }
 
+subjektVybran = function (elm) {
+
+    showSpinner();
+    
+    $.get(elm.href, function(data) {
+        if ( data.indexOf('###vybrano###') != -1 ) {
+            data = data.replace('###vybrano###','');
+            $('#dialog').dialog('close');
+            renderSubjekty(data);
+        } else {
+            alert(data);
+        }
+    });
+
+    return false;
+}
+
+
 renderPrilohy = function (dokument_id) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#dok-prilohy').html(x.responseText);
-                $('#reload_spinner').html('');
-            }
-        }
-        baseUri = baseUri.replace('/public','');
-        if ( is_simple == 1 ) {
-            x.open("GET", baseUri + '?presenter=Spisovka%3Aprilohy&id='+ dokument_id +'&action=nacti', true);
-        } else {    
-            x.open("GET", baseUri + 'prilohy/'+ dokument_id +'/nacti', true);
-        }
-        x.send(null);
+    showSpinner();
+
+    if ( is_simple == 1 ) {
+        url = baseUri + '?presenter=Spisovka%3Aprilohy&id='+ dokument_id +'&action=nacti';
+    } else {    
+        url = baseUri + 'prilohy/'+ dokument_id +'/nacti';
     }
 
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-    $('#reload_spinner').append('<div id="ajax-spinner-hor" style="display: inline;"></div>');
-
+    $.get(url, function(data) {
+        $('#dok-prilohy').html(data);
+    });
 
     return false;
 }
 
 renderSubjekty = function (dokument_id) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
+    showSpinner();
 
-            if (x.readyState == 4 && x.status == 200) {
-
-                $('#dok-subjekty').html(x.responseText);
-                //document.getElementById('dok-subjekty').innerHTML = "dffds";// x.responseText;
-                $('#reload_spinner').html('');
-            }
-        }
-        baseUri = baseUri.replace('/public','');
-        if ( is_simple == 1 ) {
-            x.open("GET", baseUri + '?presenter=Spisovka%3Asubjekty&id='+ dokument_id +'&action=nacti', true);
-        } else {
-            x.open("GET", baseUri + 'subjekty/'+ dokument_id +'/nacti', true);
-        }
-        x.send(null);
+    if ( is_simple == 1 ) {
+        url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+ dokument_id +'&action=nacti';
+    } else {    
+        url = baseUri + 'subjekty/'+ dokument_id +'/nacti';
     }
 
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-    $('#reload_spinner').append('<div id="ajax-spinner-hor" style="display: inline;"></div>');
+    $.get(url, function(data) {
+        $('#dok-subjekty').html(data);
+    });
 
     return false;
 }
 
+
 novySubjekt = function (elm) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#dialog').html(x.responseText);
-            }
-        }
-        url = elm.href;
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    $('#dialog').dialog( "option", "title", 'Nový subjekt' );
-    
-    $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
-    //$('#dialog').dialog('open');
-
-    return false;
+    return dialog(elm, 'Nový subjekt');
 }
 
 subjektVytvorit = function () {
@@ -600,82 +539,9 @@ subjektVytvorit = function () {
     return false;
 }
 
-subjektVybran = function (elm) {
-
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                stav = x.responseText;
-
-                if ( stav.indexOf('###vybrano###') != -1 ) {
-                    stav = stav.replace('###vybrano###','');
-                    $('#dialog').dialog('close');
-                    renderSubjekty(stav);
-                } else {
-                    $('#ajax-spinner', $('#dialog')).remove();
-                    alert(stav);
-                }
-            }
-        }
-        url = elm.href;
-        dontFollowLink();
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    return false;
-}
-
-reloadDialog = function (elm) {
-
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#ajax-spinner', $('#dialog')).remove();
-                $('#dialog').html(x.responseText);
-            }
-        }
-        url = elm.href;
-        dontFollowLink();
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    return false;
-}
-
 subjektzmenit = function(elm){
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#dialog').html(x.responseText);
-            }
-        }
-        url = elm.href;
-        dontFollowLink();
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    $('#dialog').dialog( "option", "title", 'Subjekt' );
-    $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
-    $('#dialog').dialog('open');
-
-    return false;
+    return dialog(elm, 'Subjekt');
 }
 
 subjektUpravitSubmit = function () {
@@ -694,34 +560,17 @@ subjektUpravitStorno = function () {
 
 subjektNovyStorno = function (doc_id) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#dialog').html(x.responseText);
-            }
-            return false;
-        }
-        if ( is_simple == 1 ) {
-            x.open("GET", baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=vyber&dok_id='+doc_id, true);
-        } else {    
-            x.open("GET", baseUri + 'subjekty/0/vyber?dok_id='+doc_id, true);
-        }        
-        
-        x.send(null);
-        return false;
+    if ( is_simple == 1 ) {
+        url = baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=vyber&dok_id='+doc_id;
+    } else {    
+        url = baseUri + 'subjekty/0/vyber?dok_id='+doc_id;
     }
 
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
+    dialog(null, 'Subjekt', url);   
     return false;
-
 }
 
 subjektNovy = function(event) {
-        event.preventDefault();
 
         id = document.getElementById('subjekt_dokument_id').value;
 
@@ -867,42 +716,29 @@ spisVytvoritStorno = function (doc_id) {
 
 osobaVybrana = function (elm) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                stav = x.responseText;
+    poznamka = document.getElementById('frmpred-poznamka').value;
+    poznamka = encodeURI(poznamka);
+    url = elm.href + '&poznamka='+ poznamka;
 
-                if ( stav.indexOf('###vybrano###') != -1 ) {
-                    stav = stav.replace('###vybrano###','');
-                    $('#dialog').dialog('close');
-                    location.href = stav;
-                } else if ( stav.indexOf('###predano###') != -1 ) {
-                    stav = stav.replace('###predano###','');
-                    part = stav.split('#');
-                    $('#frmnovyForm-predano_user').val(part[1]);
-                    $('#frmnovyForm-predano_org').val(part[2]);
-                    $('#frmnovyForm-predano_poznamka').val(part[3]);
-                    $('#predano').html("<dl class=\"detail_item\"><dt>Předáno:</dt><dd>"+part[5]+"<br />"+part[4]+"</dd></dl><dl class=\"detail_item\"><dt>Poznámka pro předávajícího:</dt><dd>"+part[3]+"&nbsp;</dd></dl>");
-                    $('#dialog').dialog('close');
-                } else {
-                    $('#dialog').html(stav);
-                }
-            }
+    showSpinner();
+    
+    $.get(url, function(data) {
+        if ( data.indexOf('###vybrano###') != -1 ) {
+            data = data.replace('###vybrano###','');
+            $('#dialog').dialog('close');
+            location.href = data;
+        } else if ( data.indexOf('###predano###') != -1 ) {
+            data = data.replace('###predano###','');
+            part = data.split('#');
+            $('#frmnovyForm-predano_user').val(part[1]);
+            $('#frmnovyForm-predano_org').val(part[2]);
+            $('#frmnovyForm-predano_poznamka').val(part[3]);
+            $('#predano').html("<dl class=\"detail_item\"><dt>Předáno:</dt><dd>"+part[5]+"<br />"+part[4]+"</dd></dl><dl class=\"detail_item\"><dt>Poznámka pro předávajícího:</dt><dd>"+part[3]+"&nbsp;</dd></dl>");
+            $('#dialog').dialog('close');
+        } else {
+            $('#dialog').html(data);
         }
-
-        poznamka = document.getElementById('frmpred-poznamka').value;
-        poznamka = encodeURI(poznamka);
-        url = elm.href + '&poznamka='+ poznamka;
-        dontFollowLink();
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
+    });
 
     return false;
 }
@@ -910,47 +746,16 @@ osobaVybrana = function (elm) {
 
 prilohazmenit = function(elm){
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#dialog').html(x.responseText);
-            }
-        }
-        url = elm.href;
-        dontFollowLink();
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    $('#dialog').dialog( "option", "title", 'Upravit přílohu' );
-    $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
-    $('#dialog').dialog('open');
-
-    return false;
+    return dialog(elm, 'Upravit přílohu');
 }
 
 odebratPrilohu = function(elm, dok_id){
 
     if ( confirm('Opravdu chcete odebrat přílohu z dokumentu?') ) {
 
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    renderPrilohy(dok_id);
-                }
-            }
-            url = elm.href;
-            dontFollowLink();
-            x.open("GET", url, true);
-            x.send(null);
-        }
-
+        $.get(elm.href, function(data) {
+            renderPrilohy(dok_id);
+        });
     }
 
     return false;
@@ -959,24 +764,12 @@ odebratPrilohu = function(elm, dok_id){
 odebratSubjekt = function(elm, dok_id){
 
     if ( confirm('Opravdu chcete odebrat subjekt z dokumentu?') ) {
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    renderSubjekty(dok_id);
-                    return false;
-                }
-            }
-            url = elm.href;
-            dontFollowLink();
-            x.open("GET", url, true);
-            x.send(null);
-        }
 
+        $.get(elm.href, function(data) {
+            renderSubjekty(dok_id);
+        });
     }
-
+    
     return false;
 }
 
@@ -1074,119 +867,77 @@ hledejDokument = function (input, typ) {
 
 hledejDokumentAjax = function (vyraz, typ) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                
-                $('#vysledek-spinner').hide();
-               	var vysledek = document.getElementById('vysledek');
-            	var seznam_json = x.responseText;
-                
-                if ( seznam_json == '' ) {
-                    vysledek.innerHTML = '<div class="prazdno">Nebyly nalezeny žádné dokumenty odpovídající dané sekvenci.</div>';
-                } else if ( seznam_json == 'prilis_mnoho' ) {
-                    vysledek.innerHTML = '<div class="prazdno">Daná sekvence obsahuje příliš mnoho záznamů. Zkuste zvolit přesnější sekvenci.</div>';                    
-                }else {
-                    var seznam = eval('(' + seznam_json + ')');
-                    cache[vyraz] = seznam_json;
-                    vysledek.innerHTML = nastylovat(seznam, typ);
-                }
-            	
-            }
-        }
-        baseUri = baseUri.replace('/public','');
-        
-        if ( is_simple == 1 ) {
-            var url = baseUri + '?presenter=Spisovka%3Aspojit&id=0&action=nacti&q=' + vyraz;
-        } else { 
-            var url = baseUri + 'spojit/0/nacti?q=' + vyraz;
-        }
-        
-        x.open("GET", url, true);
-        x.send(null);
-    }
+    showSpinner();
 
-    $('#vysledek-spinner').toggle();
+    if ( is_simple == 1 ) {
+        var url = baseUri + '?presenter=Spisovka%3Aspojit&id=0&action=nacti&q=' + vyraz;
+    } else
+        var url = baseUri + 'spojit/0/nacti?q=' + vyraz;
+    
+    $.get(url, function(data) {
+        var vysledek = document.getElementById('vysledek');
+        
+        if ( data == '' ) {
+            vysledek.innerHTML = '<div class="prazdno">Nebyly nalezeny žádné dokumenty odpovídající dané sekvenci.</div>';
+        } else if ( data == 'prilis_mnoho' ) {
+            vysledek.innerHTML = '<div class="prazdno">Daná sekvence obsahuje příliš mnoho záznamů. Zkuste zvolit přesnější sekvenci.</div>';                    
+        } else {
+            var seznam = eval('(' + data + ')');
+            cache[vyraz] = data;
+            vysledek.innerHTML = nastylovat(seznam, typ);
+        }
+    });
+    
     return false;
 }
 
 spojitDokument = function (elm) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                stav = x.responseText;
-
-                if ( stav.indexOf('###vybrano###') != -1 ) {
-                    stav = stav.replace('###vybrano###','');
-                    $('#dok_spojit').html(stav);
-                    $('#dialog').dialog('close');
-                } else {
-                    $('#dialog').html(stav);
-                }
-            }
+    showSpinner();
+    
+    $.get(elm.href, function(data) {
+        if ( data.indexOf('###vybrano###') != -1 ) {
+            data = data.replace('###vybrano###','');
+            $('#dok_spojit').html(data);
+            $('#dialog').dialog('close');
+        } else {
+            $('#dialog').html(data);
         }
-        url = elm.href;
-        dontFollowLink();
-        x.open("GET", url, true);
-        x.send(null);
-    }
-
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
+    });
 
     return false;
 }
 
 pripojitDokument = function (elm) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                stav = x.responseText;
+    showSpinner();
+    
+    $.get(elm.href, function(data) {
+        if ( data.indexOf('###vybrano###') != -1 ) {
+            data = data.replace('###vybrano###','');
 
-                if ( stav.indexOf('###vybrano###') != -1 ) {
-                    stav = stav.replace('###vybrano###','');
+            part = data.split('#');
 
-                    part = stav.split('#');
+            //alert(data +' - '+ part[1]);
 
-                    //alert(stav +' - '+ part[1]);
+            $('#dok_cjednaci').html(part[0]);
+            document.getElementById('frmnovyForm-poradi').value = part[1];
+            document.getElementById('frmnovyForm-odpoved').value = part[2];
 
-                    $('#dok_cjednaci').html(part[0]);
-                    document.getElementById('frmnovyForm-poradi').value = part[1];
-                    document.getElementById('frmnovyForm-odpoved').value = part[2];
+            //elm.href = url;
+            $('#dialog').dialog('close');
+        } else if ( data.indexOf('###zaevidovano###') != -1 ) {
+            data = data.replace('###zaevidovano###','');
+            window.location = data;
+            //elm.href = url;
+            $('#dialog').dialog('close');
 
-                    //elm.href = url;
-                    $('#dialog').dialog('close');
-                } else if ( stav.indexOf('###zaevidovano###') != -1 ) {
-                    stav = stav.replace('###zaevidovano###','');
-                    window.location = stav;
-                    //elm.href = url;
-                    $('#dialog').dialog('close');
-
-                } else {
-                    $('#dialog').html(stav);
-                }
-            }
+        } else {
+            $('#dialog').html(data);
         }
-        url = elm.href;
-        x.open("GET", url, true);
-        x.send(null);
-    }
+    });
 
-    $('#dialog').append('<div id="ajax-spinner" style="display: inline;"></div>');
-
-
-    return false;
+    return false;                
 }
 
 
@@ -1204,31 +955,13 @@ selectReadOnly = function ( select ) {
 
 filtrSestavy = function (elm) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#dialog').html(x.responseText);
-            }
-        }
-
-        baseUri = baseUri.replace('/public','');
-        if ( is_simple == 1 ) {
-            var url = baseUri + '?presenter=Spisovka%3Asestavy&id=0&action=filtr&url='+elm.href;
-        } else {         
-            var url = baseUri + 'sestavy/0/filtr/?url='+elm.href;
-        }
-        x.open("GET", url, true);
-        x.send(null);
+    if ( is_simple == 1 ) {
+        var url = baseUri + '?presenter=Spisovka%3Asestavy&id=0&action=filtr&url='+elm.href;
+    } else {         
+        var url = baseUri + 'sestavy/0/filtr/?url='+elm.href;
     }
 
-    $('#dialog').dialog( "option", "title", 'Filtr' );
-    $('#dialog').html('<div id="ajax-spinner" style="display: inline;"></div>');
-    $('#dialog').dialog('open');
-
-    return false;
+    return dialog(elm, 'Filtr', url);
 }
 
 zobrazSestavu = function (elm) {
@@ -1243,9 +976,8 @@ zobrazSestavu = function (elm) {
 
     //window.location.href = elm.url.value + param;
     window.open(elm.url.value + param);
+
     $('#dialog').dialog('close');
-    
-    
 
     return false;
 }
@@ -1264,7 +996,6 @@ function nastylovat(data,typ) {
         html = html + "<th>věc</th>";
         html = html + "</tr>";
 
-    baseUri = baseUri.replace('/public','');
     dokument_id = document.getElementById('dokumentid').value;
     evidence = document.getElementById('evidence');
     if ( evidence == null ) {
@@ -1406,8 +1137,7 @@ zmen_rezim_subjektu = function() {
     var subjekt_id = this.id.replace(/subjekt_ikona_/, '');
     var url;
     if ( is_simple == 1 )
-        url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+subjekt_id+'&action=zmenrezim&';
-        
+        url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+subjekt_id+'&action=zmenrezim&';        
     else
         url = baseUri + 'subjekty/'+subjekt_id+'/zmenrezim?';
     url += 'dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ='+rezim;    

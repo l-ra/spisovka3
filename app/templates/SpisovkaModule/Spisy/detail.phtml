@@ -26,7 +26,7 @@
     <div id="dokument_blok_volby">
        {if $Lze_menit }
        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit spis</a>
-       <a href="{link :Spisovka:Uzivatel:vyberspis, 'id'=>$user->id, 'spis_id'=>$Spis->id}" id="dialog-spis">Předat spis</a>
+       <a href="{link :Spisovka:Uzivatel:vyberspis, 'id'=>$user->id, 'spis_id'=>$Spis->id}" id="dialog-predatspis">Předat spis</a>
        {/if}
        {if $Lze_prevzit }
        <a href="{link :Spisovka:Spisy:prevzit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis</a>

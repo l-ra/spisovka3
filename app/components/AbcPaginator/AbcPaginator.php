@@ -19,7 +19,6 @@
  *
  * @author     Tomas Vancura
  * @copyright  Copyright (c) 2011 Tomas Vancura
- * @package    Nette Extras
  */
 class AbcPaginator extends Control
 {
@@ -30,9 +29,9 @@ class AbcPaginator extends Control
      */
     public function render()
     {
-        
-        $url = Environment::getHttpRequest()->getUri()->getPath();
-        $query_string = Environment::getHttpRequest()->getUri()->getQuery();
+        $request = Environment::getHttpRequest();
+        $url = $request->getUri()->getPath();
+        $query_string = $request->getUri()->getQuery();
         $query_params = "";
         parse_str($query_string, $query);
         unset($query['abc-abc'],$query['vp-page'],$query['do']);
@@ -47,7 +46,7 @@ class AbcPaginator extends Control
         $this->template->url = $url;
         $this->template->query = $query_params;
         $this->template->js_function = false;
-        if (isset($query['is_ajax']))
+        if ($request->isAjax())
             $this->template->js_function = 'reloadDialog';
 
         $this->template->setFile(dirname(__FILE__) . '/template.phtml');
