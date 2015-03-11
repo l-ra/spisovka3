@@ -198,11 +198,16 @@ abstract class BasePresenter extends Presenter
                 $this->template->module_name = 'E-podatelna';
                 break;
             case "Spisovka":
-                if ($this->template->presenter == "Zpravy")
+                $this->template->module_name = 'Spisová služba';
+                
+                if ($this->template->presenter == "Napoveda") {
+                    $this->setLayout('napoveda');
+                    $this->template->module_name = 'Nápověda';
+                }
+                else if ($this->template->presenter == "Zpravy")
                     $this->setLayout('zpravy');
                 else
                     $this->setLayout('spisovka');
-                $this->template->module_name = 'Spisová služba';
                 break;
             case "Install":
                 $this->setLayout('install');
@@ -235,7 +240,7 @@ abstract class BasePresenter extends Presenter
         $this->template->AppInfo = $app_info;
         $this->template->KontrolaNovychVerzi = UpdateAgent::je_aplikace_aktualni();
         
-        $this->template->klientUri = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
+        $this->template->baseUrl = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
         
         $this->template->licence = '<a href="http://joinup.ec.europa.eu/software/page/eupl/licence-eupl">EUPL v.1.1</a>';
         

@@ -6,33 +6,18 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
 
     public function actionDefault($param1, $param2, $param3)
     {
-
-        $template = new Template();
-        $template->registerFilter(new LatteFilter);
-        $template->baseUri = Environment::getVariable('baseUri');
-        $template->klientUri = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
-        $app_info = Environment::getVariable('app_info');
-        if ( !empty($app_info) ) {
-            $app_info = explode("#",$app_info);
-        } else {
-            $app_info = array('3.x','rev.X','OSS Spisová služba v3','1270716764');
-        }
-        $template->AppInfo = $app_info;
-
-        // $modules = array("admin","epodatelna","install","spisovka","spisovna");
         if ($param1 == "obsah") {
-            $template->setFile = APP_DIR ."/../help/hlavni.phtml";
-            $template->Napovedy = $this->napovedy();
-        } else  {
-            $template->setFile = APP_DIR ."/../help/". ucfirst($param1) ."Module/". ucfirst($param2) ."/". $param3 .".phtml";
+            $this->template->helpFile = APP_DIR ."/../help/hlavni.phtml";
+            $this->template->helpContents = $this->napovedy();
+            include APP_DIR ."/../help/help_name.php";
+            $this->template->helpTitles = $help_name;
+            $this->setView('obsah');
         }
-        
-        include APP_DIR ."/../help/help_name.php";
-        $template->HelpName = $help_name;
-
-        $template->setFile(APP_DIR ."/../help/@layout.phtml");
-        $template->render();
-        $this->terminate();
+        else {
+            $this->template->helpFile = APP_DIR ."/../help/". ucfirst($param1) ."Module/". ucfirst($param2) ."/". $param3 .".phtml";
+            if (!is_file($this->template->helpFile))
+                $this->setView('neexistuje');
+        }
     }
 
     private function napovedy()

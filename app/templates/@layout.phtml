@@ -12,7 +12,7 @@
     {js jquery-1.11.1.min}
     {js jquery-ui.min}
     <script type="text/javascript">
-        var baseUri = '{!$klientUri}';
+        var BASE_URL = '{!$baseUrl}';
         var is_simple = '{=IS_SIMPLE_ROUTER}';
     </script>
     {js script}
@@ -50,7 +50,7 @@
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}
     </div>
-    <div id="content">
+    <div id="{if $presenter == 'Napoveda'}help_content{else}content{/if}">
         {include #content}
     </div>
     {if isset($debugger) && $debugger}

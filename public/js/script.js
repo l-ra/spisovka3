@@ -158,7 +158,7 @@ $(function() {
     $('#predat_autocomplete').autocomplete({
         minLength: 3,
 	/*source: seznam_uzivatelu,*/
-        source: (is_simple==1)?baseUri + '?presenter=Spisovka%3Auzivatel&action=seznamAjax':baseUri + 'uzivatel/seznamAjax',
+        source: (is_simple==1)?BASE_URL + '?presenter=Spisovka%3Auzivatel&action=seznamAjax':BASE_URL + 'uzivatel/seznamAjax',
 
 	focus: function(event, ui) {
             $('#predat_autocomplete').val(ui.item.nazev);
@@ -187,7 +187,7 @@ $(function() {
 
     $('#subjekt_autocomplete').autocomplete({
         minLength: 3,
-        source: (is_simple==1)?baseUri + '?presenter=Spisovka%3Asubjekty&action=seznamAjax':baseUri + 'subjekty/0/seznamAjax',
+        source: (is_simple==1)?BASE_URL + '?presenter=Spisovka%3Asubjekty&action=seznamAjax':BASE_URL + 'subjekty/0/seznamAjax',
 
 	focus: function(event, ui) {
             $('#subjekt_autocomplete').val(ui.item.nazev);
@@ -234,9 +234,9 @@ $(function() {
                 }
                 
                 if ( is_simple == 1 ) {
-                    url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=' + typ_code + '&autocomplete=1';                    
+                    url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=' + typ_code + '&autocomplete=1';                    
                 } else {
-                    url = baseUri + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=' + typ_code + '&autocomplete=1';
+                    url = BASE_URL + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=' + typ_code + '&autocomplete=1';
                 }
                 x.open("GET", url, true);
                 x.send(null);
@@ -322,9 +322,9 @@ aresSubjekt = function ( formName ) {
     }
     
     if ( is_simple == 1 ) {
-        var url = baseUri + '?presenter=Spisovka%3Asubjekty&id=' + IC +'&action=ares';
+        var url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=' + IC +'&action=ares';
     } else {    
-        var url = baseUri + 'subjekty/' + IC +'/ares';
+        var url = BASE_URL + 'subjekty/' + IC +'/ares';
     }
     //alert( url );
     
@@ -364,11 +364,11 @@ isdsSubjekt = function ( formName ) {
         return false;
     }
 
-    //var url = baseUri + '/subjekty/ares/' + frmIC.value;
+    //var url = BASE_URL + '/subjekty/ares/' + frmIC.value;
     if ( is_simple == 1 ) {
-        var url = baseUri + '?presenter=Spisovka%3Asubjekty&id=' + frmID.value +'&action=isdsid';
+        var url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=' + frmID.value +'&action=isdsid';
     } else {    
-        var url = baseUri + 'subjekty/' + frmID.value +'/isdsid';
+        var url = BASE_URL + 'subjekty/' + frmID.value +'/isdsid';
     }
     //alert( url );
 
@@ -412,9 +412,9 @@ ajaxcron = function () {
         return false;
 	
     if ( is_simple == 1 ) {
-        var url = baseUri + '?presenter=Spisovka%3Acron&action=spustit';
+        var url = BASE_URL + '?presenter=Spisovka%3Acron&action=spustit';
     } else {    
-        var url = baseUri + 'cron/spustit';
+        var url = BASE_URL + 'cron/spustit';
     }
     //alert( url );
 
@@ -477,9 +477,9 @@ renderPrilohy = function (dokument_id) {
     showSpinner();
 
     if ( is_simple == 1 ) {
-        url = baseUri + '?presenter=Spisovka%3Aprilohy&id='+ dokument_id +'&action=nacti';
+        url = BASE_URL + '?presenter=Spisovka%3Aprilohy&id='+ dokument_id +'&action=nacti';
     } else {    
-        url = baseUri + 'prilohy/'+ dokument_id +'/nacti';
+        url = BASE_URL + 'prilohy/'+ dokument_id +'/nacti';
     }
 
     $.get(url, function(data) {
@@ -494,9 +494,9 @@ renderSubjekty = function (dokument_id) {
     showSpinner();
 
     if ( is_simple == 1 ) {
-        url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+ dokument_id +'&action=nacti';
+        url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+ dokument_id +'&action=nacti';
     } else {    
-        url = baseUri + 'subjekty/'+ dokument_id +'/nacti';
+        url = BASE_URL + 'subjekty/'+ dokument_id +'/nacti';
     }
 
     $.get(url, function(data) {
@@ -561,9 +561,9 @@ subjektUpravitStorno = function () {
 subjektNovyStorno = function (doc_id) {
 
     if ( is_simple == 1 ) {
-        url = baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=vyber&dok_id='+doc_id;
+        url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=vyber&dok_id='+doc_id;
     } else {    
-        url = baseUri + 'subjekty/0/vyber?dok_id='+doc_id;
+        url = BASE_URL + 'subjekty/0/vyber?dok_id='+doc_id;
     }
 
     dialog(null, 'Subjekt', url);   
@@ -575,9 +575,9 @@ subjektNovy = function(event) {
         id = document.getElementById('subjekt_dokument_id').value;
 
         if ( is_simple == 1 ) {
-            url_ajaxtyp = baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamtypusubjektu';
+            url_ajaxtyp = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamtypusubjektu';
         } else { 
-            url_ajaxtyp = baseUri + 'subjekty/0/seznamtypusubjektu';
+            url_ajaxtyp = BASE_URL + 'subjekty/0/seznamtypusubjektu';
         }
         $.getJSON(url_ajaxtyp, function(data){
             var typ_select = '<select name="subjekt_typ['+id+']">';
@@ -591,9 +591,9 @@ subjektNovy = function(event) {
         });            
 
         if ( is_simple == 1 ) {
-            url_ajaxtyp = baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamstatuajax';
+            url_ajaxtyp = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamstatuajax';
         } else { 
-            url_ajaxtyp = baseUri + 'subjekty/0/seznamstatuajax';
+            url_ajaxtyp = BASE_URL + 'subjekty/0/seznamstatuajax';
         }
         $.getJSON(url_ajaxtyp, function(data){
             var select = '<select name="stat['+id+']">';
@@ -673,9 +673,9 @@ subjektNovy = function(event) {
                     formdata = 'id='+id+'&' + $(form).serialize();
                 
                 if ( is_simple == 1 ) {
-                    x.open("POST", baseUri + '?presenter=Spisovka%3Asubjekty&id=0&action=vytvoritAjax', true);
+                    x.open("POST", BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=vytvoritAjax', true);
                 } else { 
-                    x.open("POST", baseUri + 'subjekty/0/vytvoritAjax', true);
+                    x.open("POST", BASE_URL + 'subjekty/0/vytvoritAjax', true);
                 }
                 
                 x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -870,9 +870,9 @@ hledejDokumentAjax = function (vyraz, typ) {
     showSpinner();
 
     if ( is_simple == 1 ) {
-        var url = baseUri + '?presenter=Spisovka%3Aspojit&id=0&action=nacti&q=' + vyraz;
+        var url = BASE_URL + '?presenter=Spisovka%3Aspojit&id=0&action=nacti&q=' + vyraz;
     } else
-        var url = baseUri + 'spojit/0/nacti?q=' + vyraz;
+        var url = BASE_URL + 'spojit/0/nacti?q=' + vyraz;
     
     $.get(url, function(data) {
         var vysledek = document.getElementById('vysledek');
@@ -956,9 +956,9 @@ selectReadOnly = function ( select ) {
 filtrSestavy = function (elm) {
 
     if ( is_simple == 1 ) {
-        var url = baseUri + '?presenter=Spisovka%3Asestavy&id=0&action=filtr&url='+elm.href;
+        var url = BASE_URL + '?presenter=Spisovka%3Asestavy&id=0&action=filtr&url='+elm.href;
     } else {         
-        var url = baseUri + 'sestavy/0/filtr/?url='+elm.href;
+        var url = BASE_URL + 'sestavy/0/filtr/?url='+elm.href;
     }
 
     return dialog(elm, 'Filtr', url);
@@ -1007,16 +1007,16 @@ function nastylovat(data,typ) {
     if ( typ == 1 ) {
 
         if ( is_simple == 1 ) {
-            var url = baseUri + '?presenter=Spisovka%3Adokumenty&id='+ dokument_id +'&action=vlozitdosbernehoarchu&vlozit_do=';
+            var url = BASE_URL + '?presenter=Spisovka%3Adokumenty&id='+ dokument_id +'&action=vlozitdosbernehoarchu&vlozit_do=';
         } else {         
-            var url = baseUri + 'dokumenty/'+ dokument_id +'/vlozitdosbernehoarchu?vlozit_do=';
+            var url = BASE_URL + 'dokumenty/'+ dokument_id +'/vlozitdosbernehoarchu?vlozit_do=';
         }
         var fnc = "pripojitDokument(this)";
     } else {
         if ( is_simple == 1 ) {
-            var url = baseUri + '?presenter=Spisovka%3Aspojit&id='+ dokument_id +'&action=vybrano&spojit_s=';
+            var url = BASE_URL + '?presenter=Spisovka%3Aspojit&id='+ dokument_id +'&action=vybrano&spojit_s=';
         } else {            
-            var url = baseUri + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
+            var url = BASE_URL + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
         }
         var fnc = "spojitDokument(this)";
     }
@@ -1137,9 +1137,9 @@ zmen_rezim_subjektu = function() {
     var subjekt_id = this.id.replace(/subjekt_ikona_/, '');
     var url;
     if ( is_simple == 1 )
-        url = baseUri + '?presenter=Spisovka%3Asubjekty&id='+subjekt_id+'&action=zmenrezim&';        
+        url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+subjekt_id+'&action=zmenrezim&';        
     else
-        url = baseUri + 'subjekty/'+subjekt_id+'/zmenrezim?';
+        url = BASE_URL + 'subjekty/'+subjekt_id+'/zmenrezim?';
     url += 'dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ='+rezim;    
 
     $.get(url, '', function(data) {
