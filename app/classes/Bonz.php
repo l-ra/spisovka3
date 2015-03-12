@@ -11,7 +11,7 @@ class BonzAgent {
         if ( !empty($app_info) ) {
             $app_info = explode("#",$app_info);
         } else {
-            $app_info = array('3.x','rev.X','OSS Spisov· sluûba v3','1270716764');
+            $app_info = array('3.x','rev.X','OSS Spisov√° slu≈æba v3','1270716764');
         }
             
         $user_config = Environment::getVariable('user_config');

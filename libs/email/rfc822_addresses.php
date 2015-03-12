@@ -13,7 +13,7 @@
 	<package>net.manuellemos.mimeparser</package>
 
 	<version>@(#) $Id: rfc822_addresses.php,v 1.13 2010/04/08 20:09:23 mlemos Exp $</version>
-	<copyright>Copyright © (C) Manuel Lemos 2006 - 2008</copyright>
+	<copyright>Copyright Â© (C) Manuel Lemos 2006 - 2008</copyright>
 	<title>RFC 822 e-mail addresses parser</title>
 	<author>Manuel Lemos</author>
 	<authoraddress>mlemos-at-acm.org</authoraddress>

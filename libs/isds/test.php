@@ -161,7 +161,7 @@ if (($ISDSBox->StatusCode == "0000") && ($ISDSBox->ErrorInfo == ""))
 		Tisk('Zmocneni - paragraf v zakone: '.$Record->dmLegalTitleSect);
 		Tisk('Zmocneni - odstavec v paragrafu: '.$Record->dmLegalTitlePar);
 		Tisk('Zmocneni - pismeno v odstavci: '.$Record->dmLegalTitlePoint);
-		Tisk('Do vlastních rukou: '.$Record->dmPersonalDelivery);
+		Tisk('Do vlastnÃ­ch rukou: '.$Record->dmPersonalDelivery);
 		Tisk('Nahradni doruceni povoleno: '.$Record->dmAllowSubstDelivery);
 		Tisk('Ambiguous recipient: '.$Record->dmAmbiguousRecipient);
 		Tisk('MessageStatus: '.$Record->dmMessageStatus);
@@ -225,7 +225,7 @@ if (($ISDSBox->StatusCode == "0000") && ($ISDSBox->ErrorInfo == ""))
 	Tisk('Zmocneni - paragraf v zakone: '.$Message->dmDm->dmLegalTitleSect);
 	Tisk('Zmocneni - odstavec v paragrafu: '.$Message->dmDm->dmLegalTitlePar);
 	Tisk('Zmocneni - pismeno v odstavci: '.$Message->dmDm->dmLegalTitlePoint);
-	Tisk('Do vlastních rukou: '.$Message->dmDm->dmPersonalDelivery);
+	Tisk('Do vlastnÃ­ch rukou: '.$Message->dmDm->dmPersonalDelivery);
 	Tisk('Nahradni doruceni povoleno: '.$Message->dmDm->dmAllowSubstDelivery);
 	Tisk('Ambiguous recipient: '.$Message->dmDM->dmAmbiguousRecipient);
 	
@@ -327,7 +327,7 @@ if (($ISDSBox->StatusCode == "0000") && ($ISDSBox->ErrorInfo == ""))
 	Tisk('Zmocneni - paragraf v zakone: '.$DM->dmLegalTitleSect);
 	Tisk('Zmocneni - odstavec v paragrafu: '.$DM->dmLegalTitlePar);
 	Tisk('Zmocneni - pismeno v odstavci: '.$DM->dmLegalTitlePoint);
-	Tisk('Do vlastních rukou: '.$DM->dmPersonalDelivery);
+	Tisk('Do vlastnÃ­ch rukou: '.$DM->dmPersonalDelivery);
 	Tisk('Nahradni doruceni povoleno: '.$DM->dmAllowSubstDelivery);
 	Tisk('Ambiguous recipient: '.$DM->dmAmbiguousRecipient);
 
@@ -391,7 +391,7 @@ if (($ISDSBox->StatusCode == "0000") && ($ISDSBox->ErrorInfo == ""))
 	Tisk('Zmocneni - paragraf v zakone: '.$DM->dmLegalTitleSect);
 	Tisk('Zmocneni - odstavec v paragrafu: '.$DM->dmLegalTitlePar);
 	Tisk('Zmocneni - pismeno v odstavci: '.$DM->dmLegalTitlePoint);
-	Tisk('Do vlastních rukou: '.$DM->dmPersonalDelivery);
+	Tisk('Do vlastnÃ­ch rukou: '.$DM->dmPersonalDelivery);
 	Tisk('Nahradni doruceni povoleno: '.$DM->dmAllowSubstDelivery);
 	Tisk('Ambiguous recipient: '.$DM->dmAmbiguousRecipient);
 
@@ -479,7 +479,7 @@ if (($ISDSBox->StatusCode == "0000") && ($ISDSBox->ErrorInfo == ""))
 		Tisk('Zmocneni - paragraf v zakone: '.$Record->dmLegalTitleSect);
 		Tisk('Zmocneni - odstavec v paragrafu: '.$Record->dmLegalTitlePar);
 		Tisk('Zmocneni - pismeno v odstavci: '.$Record->dmLegalTitlePoint);
-		Tisk('Do vlastních rukou: '.$Record->dmPersonalDelivery);
+		Tisk('Do vlastnÃ­ch rukou: '.$Record->dmPersonalDelivery);
 		Tisk('Nahradni doruceni povoleno: '.$Record->dmAllowSubstDelivery);
 		Tisk('Ambiguous recipient: '.$Record->dmAmbiguousRecipient);
 		Tisk('MessageStatus: '.$Record->dmMessageStatus);
