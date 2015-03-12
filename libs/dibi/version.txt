@@ -1,1 +1,0 @@
-Dibi 1.2 (revision 3b2ca19 released on 2009-09-18)
