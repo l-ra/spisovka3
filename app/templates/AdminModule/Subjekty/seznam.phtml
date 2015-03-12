@@ -23,7 +23,7 @@
         {foreach $seznam as $subjekt}
         <tr>
             <td class="icon">
-                <img src="{$baseUri}images/subjekt/{if empty($subjekt->type)}fo{else}{$subjekt->type|lower}{/if}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
+                <img src="{$publicUrl}images/subjekt/{if empty($subjekt->type)}fo{else}{$subjekt->type|lower}{/if}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
             </td>
             <td class="meta">
                 <a href="{link :Admin:Subjekty:detail, id => $subjekt->id}"{if $subjekt->stav>1} style="text-decoration:line-through;" title="{!=Subjekt::stav($subjekt->stav)}"{/if}>{=Subjekt::displayName($subjekt,'jmeno_item')}&nbsp;</a>

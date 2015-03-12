@@ -1,7 +1,7 @@
 {block title}Dokument{/block}
 {assign Select2 => true}
 {block javascript}
-	<script type="text/javascript" src="{$baseUri}js/webtoolkit.aim.js"></script>
+	<script type="text/javascript" src="{$publicUrl}js/webtoolkit.aim.js"></script>
 	<script type="text/javascript">
         function startCallback() {
 			return true;
@@ -65,10 +65,10 @@
 
     <div id="tisk">
         <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
         </a>
         <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+            <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
         </a>        
     </div>
 
@@ -656,7 +656,7 @@
             {foreach $Dok->subjekty as $subjekt}
             <tr>
             <td class="icon">
-                <img id="subjekt_ikona_{$subjekt->id}" src="{$baseUri}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
+                <img id="subjekt_ikona_{$subjekt->id}" src="{$publicUrl}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
             </td>
             <td class="meta">
                 <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>

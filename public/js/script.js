@@ -74,7 +74,7 @@ $(function() {
     $(document).ajaxStop(function () {
         // při události ajaxStop spinner schovám
         hideSpinner();
-    })
+    });
     
     // Povinne polozky
     $('label.required').attr('title','Povinná položka').append(' <span class="star">*</span>');

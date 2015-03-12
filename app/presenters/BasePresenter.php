@@ -240,7 +240,8 @@ abstract class BasePresenter extends Presenter
         $this->template->AppInfo = $app_info;
         $this->template->KontrolaNovychVerzi = UpdateAgent::je_aplikace_aktualni();
         
-        $this->template->baseUrl = Environment::getVariable('klientUri',Environment::getVariable('baseUri'));
+        $this->template->baseUrl = Environment::getVariable('baseUri');
+        $this->template->publicUrl = Environment::getVariable('publicUrl');
         
         $this->template->licence = '<a href="http://joinup.ec.europa.eu/software/page/eupl/licence-eupl">EUPL v.1.1</a>';
         
@@ -314,9 +315,9 @@ abstract class BasePresenter extends Presenter
                 '<?php echo MyMacros::vlink("%%",%:macroLink%); ?>';        
                 
         $filter->handler->macros['css'] =
-            '<?php echo MyMacros::CSS("%%", $baseUri); ?>';
+            '<?php echo MyMacros::CSS("%%", $publicUrl); ?>';
         $filter->handler->macros['js'] =
-            '<?php echo MyMacros::JavaScript("%%", $baseUri); ?>';
+            '<?php echo MyMacros::JavaScript("%%", $publicUrl); ?>';
 
         $filter->handler->macros['input'] =
             '<?php echo MyMacros::input($form, "%%"); ?>';

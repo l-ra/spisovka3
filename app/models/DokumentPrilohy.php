@@ -53,9 +53,9 @@ class DokumentPrilohy extends BaseModel
                 $mime_type_webalize = String::webalize($joinFile->mime_type);
                 $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
                 if ( @file_exists($mime_type_icon) ) {
-                    $joinFile->mime_type_icon = BASE_URI ."images/mimetypes/". $mime_type_webalize .".png";
+                    $joinFile->mime_type_icon = Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";
                 } else {
-                    $joinFile->mime_type_icon = BASE_URI ."images/mimetypes/application-octet-stream.png";
+                    $joinFile->mime_type_icon = Environment::getVariable('publicUrl') ."images/mimetypes/application-octet-stream.png";
                 }
                 
                 $prilohy[ $joinFile->dokument_id ][ $joinFile->id ] = $joinFile;

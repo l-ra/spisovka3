@@ -26,9 +26,9 @@ class FileModel extends BaseModel
             $mime_type_webalize = String::webalize($row->mime_type);
             $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
             if ( @file_exists($mime_type_icon) ) {
-                $row->mime_type_icon = BASE_URI ."images/mimetypes/". $mime_type_webalize .".png";
+                $row->mime_type_icon = Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";
             } else {
-                $row->mime_type_icon = BASE_URI ."images/mimetypes/application-octet-stream.png";
+                $row->mime_type_icon = Environment::getVariable('publicUrl') ."images/mimetypes/application-octet-stream.png";
             }            
             
             
@@ -56,9 +56,9 @@ class FileModel extends BaseModel
             $mime_type_webalize = String::webalize($file->mime_type);
             $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
             if ( @file_exists($mime_type_icon) ) {
-                $file->mime_type_icon = BASE_URI ."images/mimetypes/". $mime_type_webalize .".png";
+                $file->mime_type_icon = Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";
             } else {
-                $file->mime_type_icon = BASE_URI ."images/mimetypes/application-octet-stream.png";
+                $file->mime_type_icon = Environment::getVariable('publicUrl') ."images/mimetypes/application-octet-stream.png";
             }             
             
             $tmp[ $file->id ] = $file;

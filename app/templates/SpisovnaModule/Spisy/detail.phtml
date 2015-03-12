@@ -17,10 +17,10 @@
 
     <div id="tisk">
         <a href="{link :Spisovna:Spisy:detail, 'id'=>$Spis->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
         </a>
         <a href="{link :Spisovna:Spisy:detail, 'id'=>$Spis->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+            <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
         </a>        
     </div>      
     
@@ -96,11 +96,11 @@
         {foreach $seznam as $dok}
         <tr>
             <td class="typ">
-                <img src="{$baseUri}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
+                <img src="{$publicUrl}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
                 {if !empty($dok->epod_is_email)}
-                <img src="{$baseUri}images/icons/typdok1.png" alt="přijato emailem" title="přijato emailem" width="24" height="16" />
+                <img src="{$publicUrl}images/icons/typdok1.png" alt="přijato emailem" title="přijato emailem" width="24" height="16" />
                 {elseif !empty($dok->epod_is_isds)}
-                <img src="{$baseUri}images/icons/typdok2.png" alt="přijato datovou schránkou" title="přijato datovou schránkou" width="24" height="16" />
+                <img src="{$publicUrl}images/icons/typdok2.png" alt="přijato datovou schránkou" title="přijato datovou schránkou" width="24" height="16" />
                 {/if}                
             </td>
             <td class="prijato">

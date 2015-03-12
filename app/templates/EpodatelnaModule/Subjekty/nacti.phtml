@@ -3,7 +3,7 @@
                 <input type="checkbox" name="subjekt[{$subjekt->id}]" />
             </td>
             <td class="icon">
-                <img src="{$baseUri}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
+                <img src="{$publicUrl}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
             </td>
             <td class="meta">
                 <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>

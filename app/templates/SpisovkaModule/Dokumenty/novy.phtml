@@ -1,7 +1,7 @@
 {block title}Nový dokument{/block}
 {assign Select2 => true}
 {block javascript}
-	<script type="text/javascript" src="{$baseUri}js/webtoolkit.aim.js"></script>
+	<script type="text/javascript" src="{$publicUrl}js/webtoolkit.aim.js"></script>
 	<script type="text/javascript">
 		function startCallback() {
 			return true;
@@ -214,7 +214,7 @@
             {foreach $Subjekty as $subjekt}
             <tr>
             <td class="icon">
-                <img id="subjekt_ikona_{$subjekt->id}" src="{$baseUri}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
+                <img id="subjekt_ikona_{$subjekt->id}" src="{$publicUrl}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
             </td>
             <td class="meta">
                 <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>

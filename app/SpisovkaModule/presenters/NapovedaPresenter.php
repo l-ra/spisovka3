@@ -9,6 +9,7 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
         if ($param1 == "obsah") {
             $this->template->helpFile = APP_DIR ."/../help/hlavni.phtml";
             $this->template->helpContents = $this->napovedy();
+            $help_name = array();
             include APP_DIR ."/../help/help_name.php";
             $this->template->helpTitles = $help_name;
             $this->setView('obsah');

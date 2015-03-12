@@ -8,10 +8,10 @@
 
     <div id="tisk">
         <a href="{link this, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
         </a>
         <a href="{link this, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+            <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
         </a>        
     </div>    
     
@@ -43,21 +43,21 @@
             {if $spis->typ=='VS'}
             <td colspan="6">
                 {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
-                <img src="{$baseUri}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                <img src="{$publicUrl}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
                 {$spis->nazev}                
             </td>
             {elseif $spis->typ=='SP'}
             <td colspan="6">
                 {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
-                <img src="{$baseUri}images/icons/folder_green.png" alt="Hlavní spis" title="Hlavní spis" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                <img src="{$publicUrl}images/icons/folder_green.png" alt="Hlavní spis" title="Hlavní spis" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
                 {$spis->nazev}                
             </td>
             {else}
             <td>
                 {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
-                <img src="{$baseUri}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
+                <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 &nbsp;&nbsp;
                 <a href="{link :Spisovna:Spisy:detail, id => $spis->id}">{$spis->nazev}</a>
             </td>

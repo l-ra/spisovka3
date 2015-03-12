@@ -164,7 +164,7 @@
         <table class="seznam">
             <tr>
             <td class="icon">
-                <img src="{$baseUri}images/subjekt/ovm.png" alt="obrazek" title="obrazek" width="32" height="32" />
+                <img src="{$publicUrl}images/subjekt/ovm.png" alt="obrazek" title="obrazek" width="32" height="32" />
             </td>
             <td class="meta">
                 <strong>
@@ -247,7 +247,7 @@
                 <input type="checkbox" name="subjekt[{$subjekt->id}]" />
             </td>
             <td class="icon">
-                <img src="{$baseUri}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
+                <img src="{$publicUrl}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
             </td>
             <td class="meta">
                 <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
@@ -300,9 +300,9 @@
         <tr>
             <td class="icon">
                 {if file_exists(APP_DIR ."/../public/images/mimetypes/". String::webalize($priloha['mimetype']) .".png")}
-                <img src="{$baseUri}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+                <img src="{$publicUrl}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
                 {else}
-                <img src="{$baseUri}images/mimetypes/application-octet-stream.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+                <img src="{$publicUrl}images/mimetypes/application-octet-stream.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
                 {/if}                 
             </td>
             <td class="meta">

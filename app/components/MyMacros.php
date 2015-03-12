@@ -32,7 +32,7 @@ class MyMacros extends Control {
         return "Environment::getUser()->isAllowed($params)";
     }
     
-    public static function CSS($content, $baseUri) {
+    public static function CSS($content, $publicUrl) {
     
 		$filename = LatteFilter::fetchToken($content); // filename [,] [media]
         $media = LatteFilter::fetchToken($content);
@@ -40,18 +40,18 @@ class MyMacros extends Control {
         $filename .= '.css';
         if (empty($media))
             $media = 'screen';
-        $href = "{$baseUri}css/$filename?" . @filemtime(APP_DIR . "/../public/css/$filename");
+        $href = "{$publicUrl}css/$filename?" . @filemtime(APP_DIR . "/../public/css/$filename");
         $res = "<link rel=\"stylesheet\" type=\"text/css\" media=\"$media\" href=\"$href\" />";
 
         return $res;   
     }
 
-    public static function JavaScript($content, $baseUri) {
+    public static function JavaScript($content, $publicUrl) {
     
 		$filename = LatteFilter::fetchToken($content); // filename
 
         $filename .= '.js';
-        $href = "{$baseUri}js/$filename?" . @filemtime(APP_DIR . "/../public/js/$filename");
+        $href = "{$publicUrl}js/$filename?" . @filemtime(APP_DIR . "/../public/js/$filename");
         $res = "<script type=\"text/javascript\" src=\"$href\"></script>";
 
         return $res;   

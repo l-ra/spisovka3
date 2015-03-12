@@ -23,7 +23,7 @@
         {foreach $seznam as $osoba}
         <tr>
             <td class="icon">
-                <img src="{$baseUri}images/subjekt/personal.png" alt="personal.png" width="32" height="32" />
+                <img src="{$publicUrl}images/subjekt/personal.png" alt="personal.png" width="32" height="32" />
             </td>
             <td class="meta">
                 <a href="{link :Admin:Zamestnanci:detail, id => $osoba->id}">{=Osoba::displayName($osoba,'full_item')}</a>&nbsp;

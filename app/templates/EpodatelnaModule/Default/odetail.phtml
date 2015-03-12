@@ -12,10 +12,10 @@
 
     <div id="tisk">
         <a href="{link :Epodatelna:Default:odetail, 'id'=>$Zprava->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$baseUri}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
         </a>
         <a href="{link :Epodatelna:Default:odetail, 'id'=>$Zprava->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$baseUri}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+            <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
         </a>        
     </div>
 
@@ -71,9 +71,9 @@
         <tr>
             <td class="icon">
                 {if file_exists(APP_DIR ."/../public/images/mimetypes/". String::webalize($priloha['mimetype']) .".png")}
-                <img src="{$baseUri}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+                <img src="{$publicUrl}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
                 {else}
-                <img src="{$baseUri}images/mimetypes/application-octet-stream.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+                <img src="{$publicUrl}images/mimetypes/application-octet-stream.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
                 {/if}                
             </td>
             <td class="meta">
