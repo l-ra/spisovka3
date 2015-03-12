@@ -124,16 +124,17 @@ try {
     
     // oprava chybne konfigurace na hostingu
     // profiler je bez DEBUG modu k nicemu, jen plytva pameti (memory leak)
-    if (!DEBUG_ENABLE)
+    if (Environment::isProduction())
         $db_config['profiler'] = false;
+    else if ($db_config['profiler']) {
+        $db_config['profiler'] = array(
+            'run' => true, 
+            'file' => APP_DIR .'/../log/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
+    }
         
     dibi::connect($db_config);
-    dibi::addSubst('PREFIX', $db_config['prefix']);
-    if ( !Environment::isProduction() ) {
-        $profiler = dibi::getProfiler();
-        if ($profiler)
-            $profiler->setFile(APP_DIR .'/../log/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
-    }
+
+    dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];
     define('DB_PREFIX', $db_config['prefix']);
 }
 catch (DibiDriverException $e) {

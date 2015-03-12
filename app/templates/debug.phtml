@@ -22,7 +22,7 @@
     {/foreach}
         </div>
         <div id="debug_body_sql">
-        {if dibi::getProfiler()}
+        {if 0 && dibi::getProfiler()}
         {foreach dibi::getProfiler()->tickets as $dblog }
             {if $dblog[1] == 4}
             <div class="debug_body_sql_item">

@@ -8,7 +8,7 @@ class DokumentOdeslani extends BaseModel
     // Pouzito v sestavach
     public static function datumy_odeslani(array $dokument_ids)
     {
-        $result = dibi::query("SELECT dokument_id, MAX(datum_odeslani) AS datum_odeslani FROM [:PREFIX:dokument_odeslani] WHERE dokument_id IN (%in) GROUP BY dokument_id ", $dokument_ids)->fetchPairs('dokument_id', 'datum_odeslani');
+        $result = dibi::query("SELECT dokument_id, MAX(datum_odeslani) AS datum_odeslani FROM [:PREFIX:dokument_odeslani] WHERE dokument_id IN %in GROUP BY dokument_id ", $dokument_ids)->fetchPairs('dokument_id', 'datum_odeslani');
         
         return count($result) ? $result : array();
     }
@@ -36,7 +36,7 @@ class DokumentOdeslani extends BaseModel
 
 
         if ( is_array($dokument_id) ) {
-            $sql['where'] = array( array('dokument_id IN (%in)', $dokument_id) );
+            $sql['where'] = array( array('dokument_id IN %in', $dokument_id) );
         } else {
             $sql['where'] = array( array('dokument_id=%i',$dokument_id) );
         }

@@ -8,7 +8,7 @@ class DokumentPrilohy extends BaseModel
     // Pouzito v sestavach
     public static function pocet_priloh(array $dokument_ids)
     {
-        $result = dibi::query("SELECT dokument_id, COUNT(*) AS pocet FROM [:PREFIX:dokument_to_file] WHERE dokument_id IN (%in) GROUP BY dokument_id", $dokument_ids)->fetchPairs('dokument_id', 'pocet');
+        $result = dibi::query("SELECT dokument_id, COUNT(*) AS pocet FROM [:PREFIX:dokument_to_file] WHERE dokument_id IN %in GROUP BY dokument_id", $dokument_ids)->fetchPairs('dokument_id', 'pocet');
         
         return count($result) ? $result : array();
     }
@@ -32,7 +32,7 @@ class DokumentPrilohy extends BaseModel
         $sql['where'][] = array('df.active=1');
 
         if ( is_array($dokument_id) ) {
-            $sql['where'][] = array('dokument_id IN (%in)', $dokument_id);
+            $sql['where'][] = array('dokument_id IN %in', $dokument_id);
         } else {
             $sql['where'][] = array('dokument_id=%i',$dokument_id);
         }

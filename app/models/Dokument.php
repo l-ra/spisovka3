@@ -925,12 +925,12 @@ class Dokument extends BaseModel
         }
         if ( isset($params['prideleno']) ) {
             if ( count($params['prideleno'])>0 && is_array($params['prideleno']) ) {
-                $args['where'][] = array('wf.prideleno_id IN (%in) AND wf.stav_osoby=1 AND wf.aktivni=1',$params['prideleno']);
+                $args['where'][] = array('wf.prideleno_id IN %in AND wf.stav_osoby=1 AND wf.aktivni=1',$params['prideleno']);
             }
         }
         if ( isset($params['predano']) ) {
             if ( count($params['predano'])>0 && is_array($params['predano']) ) {
-                $args['where'][] = array('wf.prideleno_id IN (%in) AND wf.stav_osoby=0 AND wf.aktivni=1',$params['predano']);
+                $args['where'][] = array('wf.prideleno_id IN %in AND wf.stav_osoby=0 AND wf.aktivni=1',$params['predano']);
             }
         }
 
@@ -954,12 +954,12 @@ class Dokument extends BaseModel
 
         if ( isset($params['prideleno_org']) ) {
             if ( count($params['prideleno_org'])>0 && is_array($params['prideleno_org']) ) {
-                $args['where'][] = array('wf.orgjednotka_id IN (%in) AND wf.stav_osoby=1 AND wf.aktivni=1',$params['prideleno_org']);
+                $args['where'][] = array('wf.orgjednotka_id IN %in AND wf.stav_osoby=1 AND wf.aktivni=1',$params['prideleno_org']);
             }
         }
         if ( isset($params['predano_org']) ) {
             if ( count($params['predano_org'])>0 && is_array($params['predano_org']) ) {
-                $args['where'][] = array('wf.orgjednotka_id IN (%in) AND wf.stav_osoby=0 AND wf.aktivni=1',$params['predano_org']);
+                $args['where'][] = array('wf.orgjednotka_id IN %in AND wf.stav_osoby=0 AND wf.aktivni=1',$params['predano_org']);
             }
         }
 
@@ -1047,7 +1047,7 @@ class Dokument extends BaseModel
                 if ( count($org_jednotka) > 0 ) {
                     $args = array(
                         'where' => array(
-                            array('wf.orgjednotka_id IN (%in)',$org_jednotka),
+                            array('wf.orgjednotka_id IN %in',$org_jednotka),
                             array('wf.stav_osoby > 0'),
                             array('wf.stav_osoby < 100') )
                     );
@@ -1118,7 +1118,7 @@ class Dokument extends BaseModel
                     $a[] = array('wf.prideleno_id=%i', $user_id);
                 else if ( $vidi_vsechny_dokumenty ) ;
                 else if ( count($org_jednotka) > 1 )
-                    $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN (%in)', 
+                    $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN %in', 
                                 $user_id, $org_jednotka);
                 else if ( count($org_jednotka) == 1 )
                     $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id = %i', 
@@ -1185,7 +1185,7 @@ class Dokument extends BaseModel
             $args['where'][] = 'wf.aktivni=1 AND wf.stav_osoby=1';
             
             if ( count($org_jednotky) > 1 )
-                $args['where'][] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN (%in)', 
+                $args['where'][] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN %in', 
                             $user_id, $org_jednotky);
             else if ( count($org_jednotky) == 1 )
                 $args['where'][] = array('wf.prideleno_id=%i OR wf.orgjednotka_id = %i', 

@@ -312,7 +312,7 @@ abstract class BaseModel extends Object
         //Debug::dump($cols);
         //Debug::dump($cols_string_a);
 
-       $query[] = array('SELECT '.(isset($distinct) ? 'DISTINCT':'').' %sql',$cols_string);
+       $query = array('SELECT '.(isset($distinct) ? 'DISTINCT':'').' %sql', $cols_string);
        
         
         if ( isset($from) ) {

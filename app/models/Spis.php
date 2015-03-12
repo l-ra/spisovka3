@@ -92,7 +92,7 @@ class Spis extends TreeModel
             'distinct'=>1,
             'from' => array($this->tb_dokspis => 'dokspis'),
             'cols' => array('spis_id','dokument_id','poradi'),
-            'where' => array(array('dokspis.spis_id IN (%in)',$spis_id),'d.stav > 0'),
+            'where' => array(array('dokspis.spis_id IN %in',$spis_id),'d.stav > 0'),
             'leftJoin' => array(
                 'dokument' => array(
                     'from' => array($this->tb_dokument => 'd'),
@@ -144,7 +144,7 @@ class Spis extends TreeModel
                 $org_jednotky = array($oj_id);
 
             if ( count($org_jednotky) > 1 )
-                $args['where'][] =  array( 'tb.orgjednotka_id IN (%in) OR tb.orgjednotka_id_predano IN (%in) OR tb.orgjednotka_id IS NULL', $org_jednotky, $org_jednotky);
+                $args['where'][] =  array( 'tb.orgjednotka_id IN %in OR tb.orgjednotka_id_predano IN %in OR tb.orgjednotka_id IS NULL', $org_jednotky, $org_jednotky);
                 
             else 
                 $args['where'][] = array( 'tb.orgjednotka_id = %i OR tb.orgjednotka_id_predano = %i OR tb.orgjednotka_id IS NULL', $org_jednotky, $org_jednotky);

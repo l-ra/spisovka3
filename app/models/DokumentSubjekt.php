@@ -25,7 +25,7 @@ class DokumentSubjekt extends BaseModel
 
 
         if ( is_array($dokument_id) ) {
-            $sql['where'] = array( array('dokument_id IN (%in)', $dokument_id) );
+            $sql['where'] = array( array('dokument_id IN %in', $dokument_id) );
         } else {
             $sql['where'] = array( array('dokument_id=%i',$dokument_id) );
         }
@@ -52,12 +52,12 @@ class DokumentSubjekt extends BaseModel
      */
     public static function subjekty2(array $dokument_ids) {
 
-        return dibi::query("SELECT s.* FROM [:PREFIX:dokument_to_subjekt] ds INNER JOIN [:PREFIX:subjekt] s ON s.id = ds.subjekt_id WHERE dokument_id IN (%in) GROUP BY s.id", $dokument_ids)->fetchAssoc('id');        
+        return dibi::query("SELECT s.* FROM [:PREFIX:dokument_to_subjekt] ds INNER JOIN [:PREFIX:subjekt] s ON s.id = ds.subjekt_id WHERE dokument_id IN %in GROUP BY s.id", $dokument_ids)->fetchAssoc('id');        
     }
     
     public static function dejAsociaci(array $dokument_ids) {
 
-        $dr = dibi::query("SELECT dokument_id, subjekt_id FROM [:PREFIX:dokument_to_subjekt] WHERE dokument_id IN (%in) ORDER BY date_added", $dokument_ids);
+        $dr = dibi::query("SELECT dokument_id, subjekt_id FROM [:PREFIX:dokument_to_subjekt] WHERE dokument_id IN %in ORDER BY date_added", $dokument_ids);
         $a = array();
         foreach ($dr as $row)
             $a[$row->dokument_id][] = (int)$row->subjekt_id;
