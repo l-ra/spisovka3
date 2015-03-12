@@ -13,6 +13,7 @@ Jiné změny:
   Tzv. rotující kolečko by se nyní mělo spolehlivě zobrazovat a skrývat, když
   aplikace zpracovává požadavek nebo nahrává data na pozadí.
 - sjednocen layout nápovědy se zbytkem aplikace
+- proveden upgrade staré knihovny pro připojení k databázi
   
 Opravy:
 
