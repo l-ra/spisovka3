@@ -6,6 +6,9 @@ Instalace OSS Spisove sluzby v3
 ********************************************************************************
 ********************************************************************************
 
+Poznamka: Tento navod resi pouze instalaci pro jednoho klienta (organizaci). Pro
+pripadny hosting vice klientu je potreba se obratit na dodavatele aplikace.
+
 Predtim, nez zacnete s instalaci, si overte zakladni pozadavky pro spusteni aplikace:
 
 Apache 2
@@ -32,14 +35,9 @@ Pro server Apache to zajistuji soubory .htaccess, pokud jsou povoleny. Spravnost
 nastaveni overte, aby nebylo mozne se neopravnene dostat k citlivym datum.
 
 
-3. V korenovem adresari prejmenujte soubor index.ph na index.php. V souboru index.php upravte cesty, pokud jsou odlisne od skutecnosti:
+3. V korenovem adresari prejmenujte soubor index.ph na index.php. V souboru index.php zkontrolujte nastaveni. V typicke instalaci pro jednoho klienta je jedine nastaveni, ktere je nekdy potreba zadat $public_url.
 
-APP_DIR    = absolutni cesta k aplikacnim souborum (adresar /app). Vetsinou nemenit!
-LIBS_DIR   = absolutni cesta ke knihovnam aplikace (adresar /libs). Vetsinou nemenit!
-BASE_URI   = absolutni nebo relativni url cesta k adresari /public
-
-KLIENT     = identifikator klienta. Vetsinou nemenit!
-CLIENT_DIR = absolutni cesta k uzivatelskym souborum (adresar /client). Vetsinou nemenit!
+$public_url = absolutni nebo relativni URL mapujici adresar /public
 
 
 4. V adresari /client/configs/ zkopirujte soubor system.in do system.ini. V souboru system.ini nastavte spravne hodnoty pro pristup k databazi:

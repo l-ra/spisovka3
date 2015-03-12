@@ -11,6 +11,9 @@ if (file_exists(APP_DIR ."/configs/servicemode")) {
 }
 
 // Step 1: Load Nette Framework
+if (!defined('LIBS_DIR'))
+    define('LIBS_DIR', APP_DIR . '/../libs');
+
 require LIBS_DIR . '/Nette/loader.php';
 
 try {
@@ -32,16 +35,14 @@ if ( DEBUG_ENABLE ) {
 }
 
 // 2b) load configuration from config.ini file
-$basePath = Environment::getHttpRequest()->getUri()->basePath;
 
-// dynamicky uprav protokol v nastaveni BASE_URI
-$baseUri = BASE_URI;
+// dynamicky uprav protokol v nastaveni PUBLIC_URL
+$publicUrl = $public_url;
 if (Environment::getHttpRequest()->isSecured())
-    $baseUri = str_replace('http:', 'https:', $baseUri);
-Environment::setVariable('baseUri', $baseUri);
-unset($baseUri);
+    $publicUrl = str_replace('http:', 'https:', $publicUrl);
+Environment::setVariable('publicUrl', $publicUrl);
+unset($publicUrl);
 
-Environment::setVariable('klientUri', $basePath );
 
 $unique_info = @file_get_contents(CLIENT_DIR .'/configs/install');
 if ( $unique_info === FALSE ) {
