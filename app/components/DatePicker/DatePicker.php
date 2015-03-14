@@ -14,7 +14,7 @@ require_once LIBS_DIR . '/Nette/Forms/Controls/TextInput.php';
  * @package    Nette\Extras\DatePicker
  * @version    0.1
  */
-class DatePicker extends TextInput
+class DatePicker extends Nette\Forms\Controls\TextInput
 {
     protected $forbidPastDates = false;
     
@@ -42,7 +42,7 @@ class DatePicker extends TextInput
                             $tmp = new DateTime($this->value);
                             return $tmp->format('Y-m-d');
                         } catch(Exception $e) {
-                            Environment::getApplication()->getPresenter()->flashMessage('Formát data "'. strip_tags($this->getLabel()) .'" je neplatný!','error');
+                            Nette\Environment::getApplication()->getPresenter()->flashMessage('Formát data "'. strip_tags($this->getLabel()) .'" je neplatný!','error');
                             return null;
                         }
                         
@@ -71,7 +71,7 @@ class DatePicker extends TextInput
 
 	/**
 	 * Generates control's HTML element.
-	 * @return Html
+	 * @return Nette\Utils\Html
 	 */
 	public function getControl()
 	{		
@@ -91,7 +91,7 @@ class DatePicker extends TextInput
     /**
      * Vyzaduje, aby control byl vyplnen.
      */
-    public static function validateValid(IFormControl $control)
+    public static function validateValid(Nette\Forms\IControl $control)
     {
         $value = $control->getValue();
         if (is_null($value))

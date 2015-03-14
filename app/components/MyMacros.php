@@ -2,7 +2,7 @@
 
 // Pomocna trida pro uzivatelska Latte makra
 
-class MyMacros extends Control {
+class MyMacros extends Nette\Application\UI\Control {
 
     public static function vlink($__param,$__link) {
 
@@ -16,16 +16,16 @@ class MyMacros extends Control {
     public static function access($param) {
 
         $__array = explode(":",$param);
-        $__resource = $__array[1] ."_". $__array[2] ."Presenter";
+        $__resource = $__array[1] ."_". $__array[2] ."Nette\Application\UI\Presenter";
         
         return "Environment::getUser()->isAllowed('$__resource')";        
     }
 
     public static function isAllowed($content)
     {
-        $resource = LatteFilter::fetchToken($content); // resource [,] [privilege]
+        $resource = Nette\Latte\Engine::fetchToken($content); // resource [,] [privilege]
         $params = "'$resource'";
-        $privilege = LatteFilter::fetchToken($content);
+        $privilege = Nette\Latte\Engine::fetchToken($content);
         if ($privilege !== null)
             $params .= ", '$privilege'";
             
@@ -34,8 +34,8 @@ class MyMacros extends Control {
     
     public static function CSS($content, $publicUrl) {
     
-		$filename = LatteFilter::fetchToken($content); // filename [,] [media]
-        $media = LatteFilter::fetchToken($content);
+		$filename = Nette\Latte\Engine::fetchToken($content); // filename [,] [media]
+        $media = Nette\Latte\Engine::fetchToken($content);
 
         $filename .= '.css';
         if (empty($media))
@@ -48,7 +48,7 @@ class MyMacros extends Control {
 
     public static function JavaScript($content, $publicUrl) {
     
-		$filename = LatteFilter::fetchToken($content); // filename
+		$filename = Nette\Latte\Engine::fetchToken($content); // filename
 
         $filename .= '.js';
         $href = "{$publicUrl}js/$filename?" . @filemtime(APP_DIR . "/../public/js/$filename");

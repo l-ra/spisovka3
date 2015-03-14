@@ -7,7 +7,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
     public function renderSeznam($hledat = null)
     {
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -77,17 +77,17 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $OrgJednotka = new Orgjednotka();
         $org_seznam = $OrgJednotka->selectBox(1, @$org->id);
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$org->id);
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)
                 ->setValue(@$org->zkraceny_nazev)
-                ->addRule(Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
         $form1->addText('plny_nazev', 'Plný název jednotky:', 50, 200)
                 ->setValue(@$org->plny_nazev);
         $form1->addText('ciselna_rada', 'Zkratka / číselná řada:', 15, 30)
                 ->setValue(@$org->ciselna_rada)
-                ->addRule(Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
         $form1->addTextArea('note', 'Informace:', 50, 5)
                 ->setValue(@$org->note);
         $form1->addSelect('stav', 'Stav:', array(0=>'neaktivní',1=>'aktivní'))
@@ -117,7 +117,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     }
 
 
-    public function upravitClicked(SubmitButton $button)
+    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -141,14 +141,14 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $this->redirect('this',array('id'=>$orgjednotka_id));
     }
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $orgjednotka_id = $data['id'];
         $this->redirect('this',array('id'=>$orgjednotka_id));
     }
 
-    public function stornoSeznamClicked(SubmitButton $button)
+    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect(':Admin:Orgjednotky:seznam');
     }
@@ -159,12 +159,12 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $OrgJednotka = new Orgjednotka();
         $org_seznam = $OrgJednotka->selectBox(1);
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)
-                ->addRule(Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
         $form1->addText('plny_nazev', 'Plný název jednotky:', 50, 200);
         $form1->addText('ciselna_rada', 'Zkratka / číselná řada:', 15, 30)
-                ->addRule(Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
         $form1->addTextArea('note', 'Informace:', 50, 5);
         $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam);
         $form1->addSubmit('novy', 'Vytvořit')
@@ -186,7 +186,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         return $form1;
     }
 
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -224,7 +224,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         $hledat =  !is_null($this->hledat)?$this->hledat:'';
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
         $form['dotaz']->getControlPrototype()->title = "Hledat lze názvu organizační jednotky (plný, zkrácený, zkratka)";
@@ -242,7 +242,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         return $form;
     }
 
-    public function hledatSimpleClicked(SubmitButton $button)
+    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 

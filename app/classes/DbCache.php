@@ -10,11 +10,11 @@ class DBCache {
         if (!$initialized) {
         
             $initialized = true;
-            $setting = Environment::getConfig('database')->cache;
+            $setting = Nette\Environment::getConfig('database')->cache;
             $should_cache = $setting == 1;
 
             if ($should_cache)
-                self::$cache = Environment::getCache('db_cache');
+                self::$cache = Nette\Environment::getCache('db_cache');
         }
     }
 

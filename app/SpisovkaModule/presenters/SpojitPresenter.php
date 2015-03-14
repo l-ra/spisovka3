@@ -7,7 +7,7 @@ class Spisovka_SpojitPresenter extends BasePresenter
 
     public function startup()
     {
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $this->typ_evidence = 0;
         if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
             $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;

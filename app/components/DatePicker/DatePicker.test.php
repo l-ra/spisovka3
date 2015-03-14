@@ -11,20 +11,20 @@ require_once LIBS_DIR . '/Extras/DatePicker.php';
 Debug::enable();
 
 // budoucí metoda Form::addDatePicker()
-function Form_addDatePicker(Form $_this, $name, $label, $cols = NULL, $maxLength = NULL)
+function Form_addDatePicker(Nette\Forms\Form $_this, $name, $label, $cols = NULL, $maxLength = NULL)
 {
 	return $_this[$name] = new DatePicker($label, $cols, $maxLength);
 }
 
 
-Form::extensionMethod('Form::addDatePicker', 'Form_addDatePicker'); // v PHP 5.2
+Nette\Forms\Form::extensionMethod('Nette\Forms\Form::addDatePicker', 'Form_addDatePicker'); // v PHP 5.2
 //Form::extensionMethod('addDatePicker', 'Form_addDatePicker'); // v PHP 5.3
 
 
 // Step 1: Define form with validation rules
-$form = new Form;
+$form = new Nette\Forms\Form;
 $form->addDatePicker('datum', 'Kdy to bude?', 10)
-	->addRule(Form::FILLED, 'Zadejte prosím datum.');
+	->addRule(Nette\Forms\Form::FILLED, 'Zadejte prosím datum.');
 
 $form->addSubmit('submit_date', 'Odešli');
 

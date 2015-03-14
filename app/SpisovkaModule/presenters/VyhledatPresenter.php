@@ -16,7 +16,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
     {
         $this->template->form = $this['searchForm'];
         
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         $this->template->muzeHledatDlePrideleni = 
             $user->isAllowed(NULL, 'is_vedouci')
             || $user->isAllowed('Dokument', 'cist_moje_oj')
@@ -158,7 +158,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         // Debug::dump($hledat);
         unset($hledat['prideleno'],$hledat['predano'],$hledat['prideleno_org'],$hledat['predano_org']);
         
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
 
         $form->addText('nazev', 'Věc:', 80, 100)
                 ->setValue(@$hledat['nazev']);
@@ -307,7 +307,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         return $form;
     }
 
-    public function vyhledatClicked(SubmitButton $button)
+    public function vyhledatClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 

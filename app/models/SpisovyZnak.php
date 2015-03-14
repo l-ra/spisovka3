@@ -10,7 +10,7 @@ class SpisovyZnak extends TreeModel
 
     public function __construct() {
 
-        $prefix = Environment::getConfig('database')->prefix;
+        $prefix = Nette\Environment::getConfig('database')->prefix;
         $this->name = $prefix . $this->name;
         $this->tb_spoudalost = $prefix . $this->tb_spoudalost;
         
@@ -100,9 +100,9 @@ class SpisovyZnak extends TreeModel
 
         $data['stav'] = 1;
         $data['date_created'] = new DateTime();
-        $data['user_created'] = (int) Environment::getUser()->getIdentity()->id;
+        $data['user_created'] = (int) Nette\Environment::getUser()->getIdentity()->id;
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = (int) Nette\Environment::getUser()->getIdentity()->id;
 
         if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = 3;
         if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
@@ -133,7 +133,7 @@ class SpisovyZnak extends TreeModel
     public function upravit($data, $spisznak_id) {
 
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = (int) Nette\Environment::getUser()->getIdentity()->id;
 
         if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = 3;
         if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
@@ -180,7 +180,7 @@ class SpisovyZnak extends TreeModel
         $result = DbCache::get('s3_Spousteci_udalost');
         
         if ($result === null) {           
-            $prefix = Environment::getConfig('database')->prefix;
+            $prefix = Nette\Environment::getConfig('database')->prefix;
             $tb_spoudalost = $prefix .'spousteci_udalost';
             $result = dibi::query('SELECT * FROM %n', $tb_spoudalost, 'WHERE stav<>0')->fetchAssoc('id');
             

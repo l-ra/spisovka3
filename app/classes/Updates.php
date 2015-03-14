@@ -65,7 +65,7 @@ class UpdateAgent {
     
     public static function je_aplikace_aktualni()
     {
-        $app_info = Environment::getVariable('app_info');
+        $app_info = Nette\Environment::getVariable('app_info');
         if (!empty($app_info) ) {
             $a = explode("#", $app_info);
             $soucasna_verze = trim($a[0]);

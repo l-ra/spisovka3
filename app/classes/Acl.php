@@ -1,6 +1,6 @@
 <?php
 
-class Acl extends Permission {
+class Acl extends Nette\Security\Permission {
 
     private static $instance = false;
 
@@ -23,17 +23,17 @@ class Acl extends Permission {
 
         // permission
         // Je potřeba toto oprávnění ve výchozím stavu povolit. Uživatel stále bude mít možnost oprávnění explicitně odepřít
-        $this->allow(Permission::ALL, 'Spisovka_ZpravyPresenter');
+        $this->allow(Nette\Security\Permission::ALL, 'Spisovka_ZpravyPresenter');
         
         // úvodní obrazovka po přihlášení
-        $this->allow(Permission::ALL, 'Spisovka_DefaultPresenter');
+        $this->allow(Nette\Security\Permission::ALL, 'Spisovka_DefaultPresenter');
         
         // přihlášení / odhlášení - neni potreba, tento presenter je vyjmut z kontroly pristupu. viz BasePresenter
         // $this->allow(Permission::ALL, 'Spisovka_UzivatelPresenter');
 
         // Resource, který má být vždy přístupný, nebudeme definovat v databázi, ale zde
         $this->addResource('Spisovka_SeznamzmenPresenter');
-        $this->allow(Permission::ALL, 'Spisovka_SeznamzmenPresenter');
+        $this->allow(Nette\Security\Permission::ALL, 'Spisovka_SeznamzmenPresenter');
 
         foreach($model->getPermission() as $perm) {
             if ( !empty($perm->role) && !empty($perm->resource) && !empty($perm->privilege) ) {
@@ -47,16 +47,16 @@ class Acl extends Permission {
                 $this->{$perm->allowed == 'Y' ? 'allow' : 'deny'}($perm->role);
             } else if ( empty($perm->role) && !empty($perm->resource) && empty($perm->privilege) ) {
                 // resource
-                $this->{$perm->allowed == 'Y' ? 'allow' : 'deny'}(Permission::ALL, $perm->resource);
+                $this->{$perm->allowed == 'Y' ? 'allow' : 'deny'}(Nette\Security\Permission::ALL, $perm->resource);
             } else if ( empty($perm->role) && empty($perm->resource) && !empty($perm->privilege) ) {
                 // privilege
-                $this->{$perm->allowed == 'Y' ? 'allow' : 'deny'}(Permission::ALL, Permission::ALL, $perm->privilege);
+                $this->{$perm->allowed == 'Y' ? 'allow' : 'deny'}(Nette\Security\Permission::ALL, Nette\Security\Permission::ALL, $perm->privilege);
             } else if ( !empty($perm->role) && empty($perm->resource) && !empty($perm->privilege) ) {
                 // role + privilege
-                $this->{$perm->allowed == 'Y' ? 'allow' : 'deny'}($perm->role, Permission::ALL, $perm->privilege);
+                $this->{$perm->allowed == 'Y' ? 'allow' : 'deny'}($perm->role, Nette\Security\Permission::ALL, $perm->privilege);
             } else if ( empty($perm->role) && !empty($perm->resource) && !empty($perm->privilege) ) {
                 // resource + privilege
-                $this->{$perm->allowed == 'Y' ? 'allow' : 'deny'}(Permission::ALL, $perm->resource, $perm->privilege);
+                $this->{$perm->allowed == 'Y' ? 'allow' : 'deny'}(Nette\Security\Permission::ALL, $perm->resource, $perm->privilege);
             }
         }       
     }
@@ -94,11 +94,11 @@ class Acl extends Permission {
     // Pri kontrole bere v uvahu primo nadrazene role tem, ktere ma uzivatel prirazen
     public static function isInRole($roles)
     {
-        $authz = Environment::getService('Nette\Security\IAuthorizator');
+        $authz = Nette\Environment::getService('Nette\Security\IAuthorizator');
         $user_roles = array();
         $roles_a = array();
         
-        $user_roles = Environment::getUser()->roles;
+        $user_roles = Nette\Environment::getUser()->roles;
         foreach ( $user_roles as $user_role ) {
             $user_roles = array_merge($user_roles, $authz->getRoleParents($user_role));
         }

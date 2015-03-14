@@ -72,7 +72,7 @@ class DokumentSubjekt extends BaseModel
         $row['subjekt_id'] = (int)$subjekt_id;
         $row['typ'] = $typ;
         $row['date_added'] = new DateTime();
-        $row['user_id'] = (int)Environment::getUser()->getIdentity()->id;
+        $row['user_id'] = (int)Nette\Environment::getUser()->getIdentity()->id;
 
         return $this->insert($row);
 
@@ -85,7 +85,7 @@ class DokumentSubjekt extends BaseModel
         $row['subjekt_id'] = $subjekt_id;
         $row['typ'] = $typ;
         $row['date_added'] = new DateTime();
-        $row['user_id'] = Environment::getUser()->getIdentity()->id;
+        $row['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
 
         return $this->update($row,array( array('dokument_id=%i',$dokument_id),array('subjekt_id=%i',$subjekt_id) ));
 

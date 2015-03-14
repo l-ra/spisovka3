@@ -1,6 +1,6 @@
 <?php
 
-abstract class BasePresenter extends Presenter
+abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
 
     public $oldLayoutMode = FALSE;
@@ -11,12 +11,12 @@ abstract class BasePresenter extends Presenter
 
         if ( !defined('APPLICATION_INSTALL') ):
 
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         $user->setNamespace(KLIENT);
 
         // Je uzivatel prihlasen?
             if (!$user->isAuthenticated()) {
-                if ($user->getSignOutReason() === User::INACTIVITY) {
+                if ($user->getSignOutReason() === Nette\Security\User::INACTIVITY) {
                     $this->flashMessage('Uplynula doba neaktivity! Systém vás z bezpečnostních důvodů odhlásil.', 'warning');
                 }
                 if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
@@ -56,7 +56,7 @@ abstract class BasePresenter extends Presenter
 
     protected function isUserAllowed()
     {
-        return Environment::getUser()->isAllowed($this->reflection->name, $this->getAction());
+        return Nette\Environment::getUser()->isAllowed($this->reflection->name, $this->getAction());
     }
     
     protected function beforeRender()
@@ -156,7 +156,7 @@ abstract class BasePresenter extends Presenter
             $this->template->presenter = substr($this->name, $a + 1);
         }
 
-        if (DEBUG_ENABLE && in_array('programator', Environment::getUser()->getRoles())) {
+        if (DEBUG_ENABLE && in_array('programator', Nette\Environment::getUser()->getRoles())) {
             $this->template->debugger = TRUE;
         } else {
             $this->template->debugger = FALSE;
@@ -216,7 +216,7 @@ abstract class BasePresenter extends Presenter
 
         // [P.L.] Slouží pouze jako pojistka proti případné chybě v šabloně
         // Ajax šablony nemají definovat žádný blok, pak se layout nepoužije
-        if (Environment::getHttpRequest()->isAjax())
+        if (Nette\Environment::getHttpRequest()->isAjax())
             $this->setLayout(false);
         
         if (IS_SIMPLE_ROUTER == 1) {
@@ -231,7 +231,7 @@ abstract class BasePresenter extends Presenter
         /**
          * Informace o Aplikaci
          */
-        $app_info = Environment::getVariable('app_info');
+        $app_info = Nette\Environment::getVariable('app_info');
         if ( !empty($app_info) ) {
             $app_info = explode("#",$app_info);
         } else {
@@ -240,22 +240,22 @@ abstract class BasePresenter extends Presenter
         $this->template->AppInfo = $app_info;
         $this->template->KontrolaNovychVerzi = UpdateAgent::je_aplikace_aktualni();
         
-        $this->template->baseUrl = Environment::getVariable('baseUri');
-        $this->template->publicUrl = Environment::getVariable('publicUrl');
+        $this->template->baseUrl = Nette\Environment::getVariable('baseUri');
+        $this->template->publicUrl = Nette\Environment::getVariable('publicUrl');
         
         $this->template->licence = '<a href="http://joinup.ec.europa.eu/software/page/eupl/licence-eupl">EUPL v.1.1</a>';
         
         /**
          * Informace o Klientovi
          */
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $this->template->Urad = $user_config->urad;
         
         /**
          * Uzivatel
          */
         $this->template->is_authenticated = false;
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         if ( $this->name != 'Error' && $user->isAuthenticated() ) {
             $this->template->userobj = $user;
             $this->template->user = $user->getIdentity();
@@ -281,7 +281,7 @@ abstract class BasePresenter extends Presenter
     
     public function templatePrepareFilters($template)
     {
-        $filter = new LatteFilter;
+        $filter = new Nette\Latte\Engine;
         $filter->setHandler(new LatteMacros);
         $template->registerFilter($filter);
 
@@ -323,7 +323,7 @@ abstract class BasePresenter extends Presenter
             '<?php echo MyMacros::input($form, "%%"); ?>';
     }
     
-    protected function displayFormErrors(SubmitButton $button)
+    protected function displayFormErrors(Nette\Forms\Controls\SubmitButton $button)
     {
         $errors = $button->getForm()->getErrors();
         foreach($errors as $error)

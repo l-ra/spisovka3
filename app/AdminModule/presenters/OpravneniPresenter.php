@@ -7,7 +7,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     {
         $this->template->title = " - Seznam rolí";
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -92,14 +92,14 @@ class Admin_OpravneniPresenter extends BasePresenter
         }
         $role_select[0] = "(nedědí)";
         
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
         $form1->addHidden('fixed')
                 ->setValue(@$role->fixed);
         $form1->addText('name', 'Název role:', 50, 100)
                 ->setValue(@$role->name)
-                ->addRule(Form::FILLED, 'Název role musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název role musí být vyplněno!');
         $input = $form1->addText('code', 'Kódové označení role:', 50, 150)
                 ->setValue(@$role->code);
                 // ->addRule(Form::FILLED, 'Kódové označení musí být vyplněno!');
@@ -133,7 +133,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     }
 
 
-    public function upravitClicked(SubmitButton $button)
+    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -171,14 +171,14 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->redirect('this',array('id'=>$role_id));
     }
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $role_id = $data['id'];
         $this->redirect('this',array('id'=>$role_id));
     }
 
-    public function stornoSeznamClicked(SubmitButton $button)
+    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect(':Admin:Opravneni:seznam');
     }
@@ -190,11 +190,11 @@ class Admin_OpravneniPresenter extends BasePresenter
         $role_select = $RoleModel->seznamProDedeni();
         $role_select[0] = "(nedědí)";
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('name', 'Název role:', 50, 100)
-                ->addRule(Form::FILLED, 'Název role musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název role musí být vyplněno!');
         $form1->addText('code', 'Kódové označení role:', 50, 150)
-                ->addRule(Form::FILLED, 'Kódové označení role musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Kódové označení role musí být vyplněno!');
         $form1->addTextArea('note', 'Popis role:', 50, 5);
         $form1->addSelect('parent_id', 'Dědí z role:', $role_select)
             ->setValue(0);
@@ -213,7 +213,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         return $form1;
     }
 
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -243,7 +243,7 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         $role = isset($this->template->Role) ? $this->template->Role : null;
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
 
@@ -273,7 +273,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     }
 
 
-    public function upravitOpravneniClicked(SubmitButton $button)
+    public function upravitOpravneniClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -361,13 +361,13 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         $role = $this->template->Role;
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
         $form1->addText('name', 'Název zdroje:', 50, 100)
-                ->addRule(Form::FILLED, 'Název zdroje musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název zdroje musí být vyplněno!');
         $form1->addText('code', 'Systémové označení zdroje:', 50, 150)
-                ->addRule(Form::FILLED, 'Systémové označení zdroje musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Systémové označení zdroje musí být vyplněno!');
         $form1->addTextArea('note', 'Popis zdroje:', 50, 5);
 
         $form1->addSubmit('novyresource', 'Vytvořit')
@@ -387,7 +387,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         return $form1;
     }
 
-    public function novyResourceClicked(SubmitButton $button)
+    public function novyResourceClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -417,11 +417,11 @@ class Admin_OpravneniPresenter extends BasePresenter
             $resource[ $r->id ] = $r->code;
         }
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
         $form1->addText('name', 'Název pravidla:', 50, 100)
-                ->addRule(Form::FILLED, 'Název pravidla musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název pravidla musí být vyplněno!');
         $form1->addTextArea('note', 'Popis pravidla:', 50, 5);
         $form1->addSelect('resource_id', 'Resource:', $resource);
         $form1->addText('privilege', 'Privilege:', 50, 100);
@@ -442,7 +442,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         return $form1;
     }
 
-    public function novePravidloClicked(SubmitButton $button)
+    public function novePravidloClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 

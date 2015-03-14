@@ -118,7 +118,7 @@ class LogModel extends BaseModel {
         $row['typ'] = $typ;
         $row['poznamka'] = $poznamka;
         
-        $user = Environment::getUser()->getIdentity();
+        $user = Nette\Environment::getUser()->getIdentity();
         $row['user_id'] = $user->id;
         $row['date'] = new DateTime();
 
@@ -151,7 +151,7 @@ class LogModel extends BaseModel {
         $row['typ'] = $typ;
         $row['poznamka'] = $poznamka;
         
-        $user = Environment::getUser()->getIdentity();
+        $user = Nette\Environment::getUser()->getIdentity();
         $row['user_id'] = $user->id;
         $row['date'] = new DateTime();
 
@@ -183,7 +183,7 @@ class LogModel extends BaseModel {
         $row = array();
         $row['user_id'] = $user_id;
         $row['date'] = new DateTime();
-        $row['ip'] = Environment::getHttpRequest()->getRemoteAddress();
+        $row['ip'] = Nette\Environment::getHttpRequest()->getRemoteAddress();
         $row['user_agent'] = substr($_SERVER['HTTP_USER_AGENT'], 0, 190);
         $row['stav'] = $stav;
 

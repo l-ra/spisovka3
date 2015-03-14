@@ -9,7 +9,7 @@ class Epodatelna extends BaseModel
 
     public function  __construct() {
 
-        $prefix = Environment::getConfig('database')->prefix;
+        $prefix = Nette\Environment::getConfig('database')->prefix;
         $this->name = $prefix . $this->name;
         $this->tb_file = $prefix . $this->tb_file;
 

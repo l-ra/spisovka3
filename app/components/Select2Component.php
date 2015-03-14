@@ -5,7 +5,7 @@
  *
  * @author Petr Slavicek
  */
-class Select2Component extends SelectBox implements IComponent
+class Select2Component extends Nette\Forms\Controls\SelectBox implements Nette\ComponentModel\IComponent
 {
     public function __construct($label = NULL, array $items = NULL, $size = NULL)
     {

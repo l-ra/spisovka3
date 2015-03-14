@@ -18,7 +18,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $CJ = new CisloJednaci();
 
         // Klientske nastaveni
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $this->template->Urad = $user_config->urad;
 
         $this->template->CisloJednaci = $user_config->cislo_jednaci;
@@ -47,20 +47,20 @@ class Admin_NastaveniPresenter extends BasePresenter
     protected function createComponentNastaveniUraduForm()
     {
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $Urad = $user_config->urad;
         $stat_select = Subjekt::stat();
 
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('nazev', 'Název:', 50, 100)
                 ->setValue($Urad->nazev)
-                ->addRule(Form::FILLED, 'Název úřadu musí být vyplněn.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název úřadu musí být vyplněn.');
         $form1->addText('plny_nazev', 'Plný název:', 50, 200)
                 ->setValue($Urad->plny_nazev);
         $form1->addText('zkratka', 'Zkratka:', 15, 30)
                 ->setValue($Urad->zkratka)
-                ->addRule(Form::FILLED, 'Zkratka úřadu musí být vyplněna.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Zkratka úřadu musí být vyplněna.');
 
         $form1->addText('ulice', 'Ulice:', 50, 100)
                 ->setValue($Urad->adresa->ulice);
@@ -103,7 +103,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     }
 
 
-    public function nastavitUradClicked(SubmitButton $button)
+    public function nastavitUradClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -132,13 +132,13 @@ class Admin_NastaveniPresenter extends BasePresenter
         $config_modify->import($config_data);
         $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
         
-        Environment::setVariable('user_config', $config_modify);
+        Nette\Environment::setVariable('user_config', $config_modify);
 
         $this->flashMessage('Informace o sobě byly upraveny.');
         $this->redirect('this');
     }
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect('this');
     }
@@ -146,13 +146,13 @@ class Admin_NastaveniPresenter extends BasePresenter
     protected function createComponentNastaveniCJForm()
     {
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $CJ = $user_config->cislo_jednaci;
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('maska', 'Maska:', 50, 100)
                 ->setValue($CJ->maska)
-                ->addRule(Form::FILLED, 'Maska čísla jednacího musí být vyplněna.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Maska čísla jednacího musí být vyplněna.');
 
         if ( $CJ->typ_evidence != 'priorace' ) {
             $form1->addText('oddelovac', 'Znak oddělovače pořadového čísla:', 3, 1)
@@ -188,7 +188,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     }
 
 
-    public function nastavitCJClicked(SubmitButton $button)
+    public function nastavitCJClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -209,7 +209,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $config_modify->import($config_data);
         $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
 
-        Environment::setVariable('user_config', $config_modify);
+        Nette\Environment::setVariable('user_config', $config_modify);
 
         $this->flashMessage('Nastavení čísla jednacího byly upraveny.');
         $this->redirect('this');
@@ -219,14 +219,14 @@ class Admin_NastaveniPresenter extends BasePresenter
     protected function createComponentNastaveniForm()
     {
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $nastaveni = $user_config->nastaveni;
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('pocet_polozek', 'Počet položek v seznamu:', 10, 10)
                 ->setValue($nastaveni->pocet_polozek)
-                ->addRule(Form::INTEGER, 'Počet položek v seznamu musí být číslo.')
-                ->addRule(Form::RANGE, 'Počet položek v seznamu musí být v rozsahu od 1 do 500', array(1, 500));
+                ->addRule(Nette\Forms\Form::INTEGER, 'Počet položek v seznamu musí být číslo.')
+                ->addRule(Nette\Forms\Form::RANGE, 'Počet položek v seznamu musí být v rozsahu od 1 do 500', array(1, 500));
 
         $form1->addCheckBox('force_https', 'Vynutit zabezpečené připojení protokolem HTTPS')
                 ->setValue(Settings::get('router_force_https', false));
@@ -238,7 +238,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         
         $form1->addText('cislo_zakaznicke_karty', 'Číslo Zákaznické karty:', 13, 13)
                 ->setValue( Settings::get('Ceska_posta_cislo_zakaznicke_karty', '') )
-                ->addRule(Form::INTEGER, 'Chybné číslo karty.');
+                ->addRule(Nette\Forms\Form::INTEGER, 'Chybné číslo karty.');
 
         $form1->addRadioList('zpusob_uhrady', 'Způsob úhrady:', self::$ciselnik_zpusoby_uhrad)
                 ->setValue( array_search(Settings::get('Ceska_posta_zpusob_uhrady', ''),
@@ -262,7 +262,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     }
 
 
-    public function nastavitClicked(SubmitButton $button)
+    public function nastavitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -274,7 +274,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $config_modify->import($config_data);
         $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
 
-        Environment::setVariable('user_config', $config_modify);
+        Nette\Environment::setVariable('user_config', $config_modify);
 
         Settings::set('router_force_https', $data['force_https']);
         

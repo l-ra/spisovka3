@@ -2,7 +2,7 @@
 
 class SpisyPresenter extends BasePresenter
 {
-    public function upravitClicked(SubmitButton $button)
+    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -23,7 +23,7 @@ class SpisyPresenter extends BasePresenter
         $this->redirect(":{$this->name}:detail", array('id'=>$spis_id));
     }
 
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -55,7 +55,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function startup()
     {
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $this->typ_evidence = 0;
         if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
             $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
@@ -93,11 +93,11 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                 
                     $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
                 
-                    $app_info = Environment::getVariable('app_info');
+                    $app_info = Nette\Environment::getVariable('app_info');
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->name);
                     $mpdf->SetTitle('Spisová služba - Detail spisu');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -107,7 +107,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     $mpdf->SetHeader('||'.$this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                 
@@ -121,11 +121,11 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                 
                     $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
                 
-                    $app_info = Environment::getVariable('app_info');
+                    $app_info = Nette\Environment::getVariable('app_info');
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->name);
                     $mpdf->SetTitle('Spisová služba - Tisk');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -135,7 +135,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     $mpdf->SetHeader('Seznam spisů||'.$this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                 
@@ -261,7 +261,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $this->hledat = $hledat;
         }
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -528,7 +528,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
         if ( isset($data['hromadna_akce']) ) {
             $Spis = new Spis();
-            $user = Environment::getUser()->getIdentity();
+            $user = Nette\Environment::getUser()->getIdentity();
             switch ($data['hromadna_akce']) {
                 /* Predani vybranych spisu do spisovny  */
                 case 'predat_spisovna':
@@ -614,14 +614,14 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $params = array('where'=> array("tb.typ = 'VS'") );
         $spisy = $Spisy->selectBox(1, @$spis->id, 1, $params);
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$spis->id);
         $form1->addHidden('typ')
                 ->setValue(@$spis->typ);
         $form1->addText('nazev', 'Název spisu:', 50, 80)
                 ->setValue(@$spis->nazev)
-                ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spis->popis);
         $form1->addSelect('parent_id', 'Složka:', $spisy)
@@ -676,7 +676,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         return $form1;
     }
         
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         if ( isset($data['id']) ) {
@@ -700,11 +700,11 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('typ')
                 ->setValue('S');
         $form1->addText('nazev', 'Název spisu:', 50, 80)
-                ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('parent_id', 'Složka:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
@@ -758,7 +758,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             }
         }        
         
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->getElementPrototype()->id('spis-vytvorit');
         $form1->getElementPrototype()->onsubmit('return false;');        
         
@@ -767,7 +767,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $form1->addHidden('typ')
                 ->setValue('S');
         $form1->addText('nazev', 'Název spisu:', 50, 80)
-                ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('parent_id', 'Složka:', $spisy);
                 //->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
@@ -800,7 +800,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         return $form1;
     }
 
-    public function vytvoritAjaxClicked(SubmitButton $button)
+    public function vytvoritAjaxClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         
@@ -822,7 +822,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->setLayout(false);
     }
 
-    public function stornoAjaxClicked(SubmitButton $button)
+    public function stornoAjaxClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $dokument_id = @$data['dokument_id'];
@@ -834,7 +834,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
         $hledat =  !is_null($this->hledat)?$this->hledat:'';
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
         $form['dotaz']->getControlPrototype()->title = "Hledat lze dle názvu spisu";
@@ -852,7 +852,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         return $form;
     }
 
-    public function hledatSimpleClicked(SubmitButton $button)
+    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -864,7 +864,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     public function renderPrideleni()
     {
 
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
 
         // tento nefunkční hack by se měl z programu odstranit
         $this->flashMessage('Funkce byla z programu odstraněna.','error');

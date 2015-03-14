@@ -5,7 +5,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
     public function downloadSource($file_id, $typ = 2)
     {
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$DownloadFile = new ".$storage_conf->type."();");
 
         $FileModel = new FileModel();
@@ -18,7 +18,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
     public function downloadEpodSource($epodatelna_id, $typ = 2)
     {
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$DownloadFile = new ".$storage_conf->type."();");
 
         $Epod = new Epodatelna();
@@ -228,7 +228,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
             if ( !empty($tmp_file['file']) ) {
 
-                $httpResponse = Environment::getHttpResponse();
+                $httpResponse = Nette\Environment::getHttpResponse();
                 $httpResponse->setContentType($tmp_file['mime-type']);
                 $httpResponse->setHeader('Content-Description', 'File Transfer');
                 $httpResponse->setHeader('Content-Disposition', 'attachment; filename="' . $tmp_file['file_name'] . '"');
@@ -249,7 +249,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
             $tmp_file = $this->downloadISDSPrilohu($res, $part);
 
-            $httpResponse = Environment::getHttpResponse();
+            $httpResponse = Nette\Environment::getHttpResponse();
             $httpResponse->setContentType($tmp_file['mime-type']);
             $httpResponse->setHeader('Content-Description', 'File Transfer');
             $httpResponse->setHeader('Content-Disposition', 'attachment; filename="' . $tmp_file['file_name'] . '"');

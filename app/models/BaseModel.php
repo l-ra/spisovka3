@@ -1,6 +1,6 @@
 <?php //netteloader=BaseModel
 
-abstract class BaseModel extends Object
+abstract class BaseModel extends Nette\Object
 {
 
     /** Table constant */
@@ -65,7 +65,7 @@ abstract class BaseModel extends Object
         static $prefix = null;
         
         if ($prefix === null)
-            $prefix = Environment::getConfig('database')->prefix;
+            $prefix = Nette\Environment::getConfig('database')->prefix;
     
         return $prefix;
     }
@@ -489,7 +489,7 @@ abstract class BaseModel extends Object
         if ( count($array)>0 ) {
 
             if ( is_null($limit) ) {
-                $user_config = Environment::getVariable('user_config');
+                $user_config = Nette\Environment::getVariable('user_config');
                 $limit = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
             }
 

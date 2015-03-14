@@ -31,11 +31,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 
                     $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
                 
-                    $app_info = Environment::getVariable('app_info');
+                    $app_info = Nette\Environment::getVariable('app_info');
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->name);
                     $mpdf->SetTitle('Spisová služba - Epodatelna - Detail zprávy');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -45,7 +45,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     $mpdf->SetHeader('||'.$this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                 
@@ -59,11 +59,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 
                     $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
                 
-                    $app_info = Environment::getVariable('app_info');
+                    $app_info = Nette\Environment::getVariable('app_info');
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->name);
                     $mpdf->SetTitle('Spisová služba - Tisk');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -78,7 +78,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     } else {
                         $mpdf->SetHeader('Seznam příchozích zpráv||'.$this->template->Urad->nazev);
                     }
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                 
@@ -95,7 +95,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -137,7 +137,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -180,7 +180,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -538,9 +538,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             //exit;
 
             $tmp = array();
-            $user = Environment::getUser()->getIdentity();
+            $user = Nette\Environment::getUser()->getIdentity();
 
-            $storage_conf = Environment::getConfig('storage');
+            $storage_conf = Nette\Environment::getConfig('storage');
             eval("\$UploadFile = new ".$storage_conf->type."();");
             
             $pocet_novych_zprav = 0;
@@ -840,9 +840,9 @@ dmFormat =
             
             if ( count( $zpravy )>0 ) {
                 $tmp = array();
-                $user = Environment::getUser()->getIdentity();
+                $user = Nette\Environment::getUser()->getIdentity();
 
-                $storage_conf = Environment::getConfig('storage');
+                $storage_conf = Nette\Environment::getConfig('storage');
                 eval("\$UploadFile = new ".$storage_conf->type."();");
 
                 foreach($zpravy as $mess) {
@@ -972,9 +972,9 @@ dmFormat =
         }
 
         $tmp = array();
-        $user = Environment::getUser()->getIdentity();
+        $user = Nette\Environment::getUser()->getIdentity();
 
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$UploadFile = new ".$storage_conf->type."();");
 
         $zpravy = $imap->get_head_messages();
@@ -1122,7 +1122,7 @@ dmFormat =
 
     public function nactiISDS($file_id)
     {
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$DownloadFile = new ".$storage_conf->type."();");
 
         if ( strpos($file_id,"-") !== false ) {
@@ -1144,7 +1144,7 @@ dmFormat =
     public function nactiEmail($file_id, $output = 0)
     {
 
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$DownloadFile = new ".$storage_conf->type."();");
 
         if ( strpos($file_id,"-") !== false ) {
@@ -1200,7 +1200,7 @@ dmFormat =
                     if ( $file ) {
                     
                         // Nacteni originalu DS
-                        $storage_conf = Environment::getConfig('storage');
+                        $storage_conf = Nette\Environment::getConfig('storage');
                         eval("\$DownloadFile = new ".$file->real_type."();");
                         $source = $DownloadFile->download($file,1);
                         

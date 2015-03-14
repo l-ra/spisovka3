@@ -43,7 +43,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         if ( $DokumentPrilohy->odebrat($dokument_id, $file_id) ) {
         
-            $storage_conf = Environment::getConfig('storage');
+            $storage_conf = Nette\Environment::getConfig('storage');
             eval("\$UploadFile = new ".$storage_conf->type."();");
             
             $UploadFile->remove($file_id);
@@ -67,7 +67,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     protected function createComponentUploadForm()
     {
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
         $form1->getElementPrototype()->onSubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
 
@@ -98,7 +98,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     }
 
 
-    public function uploadClicked(SubmitButton $button)
+    public function uploadClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $upload = $data['file'];
@@ -114,7 +114,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $data['dir'] = date('Y') .'/DOK-'. sprintf('%06d',$dokument_id) .'-'.date('Y');
 
         // Nacteni rozhrani pro upload dle nastaveni
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$UploadFile = new ".$storage_conf->type."();");
 
         try {
@@ -161,7 +161,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $File = new FileModel();
         $file_info = $File->getInfo($this->file_id);
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
         $form1->getElementPrototype()->onSubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
 
@@ -197,7 +197,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     }
 
 
-    public function reUploadClicked(SubmitButton $button)
+    public function reUploadClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -218,7 +218,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         if ( $upload->error == 0 ) {
             // Nacteni rozhrani pro upload dle nastaveni
-            $storage_conf = Environment::getConfig('storage');
+            $storage_conf = Nette\Environment::getConfig('storage');
             eval("\$UploadFile = new ".$storage_conf->type."();");
 
             if ( $file = $UploadFile->uploadDokument($data) ) {

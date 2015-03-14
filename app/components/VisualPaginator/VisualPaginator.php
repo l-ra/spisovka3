@@ -27,9 +27,9 @@
  * @copyright  Copyright (c) 2009 David Grudl
  * @package    Nette Extras
  */
-class VisualPaginator extends Control
+class VisualPaginator extends Nette\Application\UI\Control
 {
-	/** @var Paginator */
+	/** @var Nette\Utils\Paginator */
 	private $paginator;
 
 	/** @persistent */
@@ -43,7 +43,7 @@ class VisualPaginator extends Control
 	public function getPaginator()
 	{
 		if (!$this->paginator) {
-			$this->paginator = new Paginator;
+			$this->paginator = new Nette\Utils\Paginator;
 		}
 		return $this->paginator;
 	}
@@ -72,7 +72,7 @@ class VisualPaginator extends Control
 			$steps = array_values(array_unique($arr));
 		}
 
-                $request = Environment::getHttpRequest();
+                $request = Nette\Environment::getHttpRequest();
                 $url = $request->getUri()->getPath();
                 $query_string = $request->getUri()->getQuery();
                 $query_params = "";

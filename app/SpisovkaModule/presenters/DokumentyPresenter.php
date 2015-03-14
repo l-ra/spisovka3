@@ -18,7 +18,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function startup()
     {
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $this->typ_evidence = 0;
         if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
             $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
@@ -48,7 +48,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $hledat = $this->getParam('hledat');
         $seradit = $this->getParam('seradit');
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -219,11 +219,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 
                     $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
 
-                    $app_info = Environment::getVariable('app_info');
+                    $app_info = Nette\Environment::getVariable('app_info');
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->name);
                     $mpdf->SetTitle('Spisová služba - Detail dokumentu');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -233,7 +233,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     $mpdf->SetHeader('||'.$this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                 
@@ -247,11 +247,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 
                     $mpdf = new mPDF('iso-8859-2', 'A4-L',9,'Helvetica');
                 
-                    $app_info = Environment::getVariable('app_info');
+                    $app_info = Nette\Environment::getVariable('app_info');
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->name);
                     $mpdf->SetTitle('Spisová služba - Tisk');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -261,7 +261,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     $mpdf->SetHeader('Seznam dokumentů||'.$this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                 
@@ -290,7 +290,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             
             $this->template->Dok = $dokument;
 
-            $user = Environment::getUser();
+            $user = Nette\Environment::getUser();
             $user_id = $user->getIdentity()->id;
             
             $this->template->Pridelen = 0;
@@ -830,7 +830,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = array(
                 array('stav=%i',0),
-                array('user_created=%i',Environment::getUser()->getIdentity()->id),
+                array('user_created=%i',Nette\Environment::getUser()->getIdentity()->id),
         );
         
         $args_rozd['order'] = array('date_created'=>'DESC');
@@ -917,7 +917,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         }
 
-        $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
+        $user = UserModel::getUser(Nette\Environment::getUser()->getIdentity()->id, 1);
         $this->template->Prideleno = Osoba::displayName($user->identity);
 
         $CJ = new CisloJednaci();
@@ -950,7 +950,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 array('stav=%i',0),
                 array('dokument_typ_id=%i',2),
                 array('cislo_jednaci=%s',$dok->cislo_jednaci),
-                array('user_created=%i',Environment::getUser()->getIdentity()->id)
+                array('user_created=%i',Nette\Environment::getUser()->getIdentity()->id)
             );
             $args_rozd['order'] = array('date_created'=>'DESC');
 
@@ -972,7 +972,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $prilohy  = $DokumentPrilohy->prilohy($dok_odpoved->id);
                 $this->template->Prilohy = $prilohy;
 
-                $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
+                $user = UserModel::getUser(Nette\Environment::getUser()->getIdentity()->id, 1);
                 $this->template->Prideleno = Osoba::displayName($user->identity);
 
                 $CJ = new CisloJednaci();
@@ -1066,7 +1066,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $prilohy_new  = $DokumentPrilohy->prilohy($dok_odpoved->id);
                     $this->template->Prilohy = $prilohy_new;
 
-                    $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
+                    $user = UserModel::getUser(Nette\Environment::getUser()->getIdentity()->id, 1);
                     $this->template->Prideleno = Osoba::displayName($user->identity);
 
                     $CJ = new CisloJednaci();
@@ -1118,7 +1118,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $prilohy = $DokumentPrilohy->prilohy($dokument_id);
         if ( key_exists($file_id, $prilohy) ) {
 
-            $storage_conf = Environment::getConfig('storage');
+            $storage_conf = Nette\Environment::getConfig('storage');
             eval("\$DownloadFile = new ".$storage_conf->type."();");
             $FileModel = new FileModel();
             $file = $FileModel->getInfo($file_id);
@@ -1208,7 +1208,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->addComponent(new VyberPostovniZasilky(), 'druhZasilky');
 
-            $this->template->OpravnenOdeslatDZ = Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani');
+            $this->template->OpravnenOdeslatDZ = Nette\Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani');
 
             $this->template->ZpusobyOdeslani = ZpusobOdeslani::getZpusoby();
             
@@ -1256,7 +1256,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             $nalezeno = 1;
                             
                             // Nacteni originalu DS
-                            $storage_conf = Environment::getConfig('storage');
+                            $storage_conf = Nette\Environment::getConfig('storage');
                             eval("\$DownloadFile = new ".$file->real_type."();");
                             $source = $DownloadFile->download($file,1);
                             //echo $source;
@@ -1311,8 +1311,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $form = $this->createNovyOrOdpovedForm();
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
-                ->addRule(Form::FILLED, 'Lhůta k vyřízení musí být vyplněna!')
-                ->addRule(Form::NUMERIC, 'Lhůta k vyřízení musí být číslo')
+                ->addRule(Nette\Forms\Form::FILLED, 'Lhůta k vyřízení musí být vyplněna!')
+                ->addRule(Nette\Forms\Form::NUMERIC, 'Lhůta k vyřízení musí být číslo')
                 ->setValue('30');
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
 
@@ -1351,7 +1351,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
         
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
                 ->setValue($dokument_id);
         $form->addHidden('odpoved')
@@ -1371,7 +1371,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('nazev', 'Věc:', 80, 250)
                 ->setValue(@$dok->nazev);
         if (!Acl::isInRole('podatelna')) {
-            $form['nazev']->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
+            $form['nazev']->addRule(Nette\Forms\Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
         }
         
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
@@ -1397,9 +1397,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addHidden('zmocneni')->setValue(0);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$dok->pocet_listu)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet listů musí být číslo');
+                ->setValue(@$dok->pocet_listu)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet listů musí být číslo');
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$dok->pocet_priloh)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet příloh musí být číslo');
+                ->setValue(@$dok->pocet_priloh)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet příloh musí být číslo');
         $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
                 ->setValue(@$dok->typ_prilohy);        
 
@@ -1422,13 +1422,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function vytvoritClickedChyba(SubmitButton $button)
+    public function vytvoritClickedChyba(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->displayFormErrors($button);
         $this->redirect(':Spisovka:Dokumenty:default');
     }
     
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -1539,14 +1539,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     }
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $dokument_id = $data['id'];
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
     }
 
-    public function stornoSeznamClicked(SubmitButton $button)
+    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect(':Spisovka:Dokumenty:default');
     }
@@ -1568,7 +1568,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
         
@@ -1577,7 +1577,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $nazev_control = $form->addText('nazev', 'Věc:', 80, 250)
                     ->setValue($nazev);
         if ( !Acl::isInRole('podatelna') ) {
-            $nazev_control->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
+            $nazev_control->addRule(Nette\Forms\Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
         }        
         
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
@@ -1610,9 +1610,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$Dok->poznamka);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$Dok->pocet_listu)->addRule(Form::NUMERIC, 'Počet listů musí být číslo');
+                ->setValue(@$Dok->pocet_listu)->addRule(Nette\Forms\Form::NUMERIC, 'Počet listů musí být číslo');
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$Dok->pocet_priloh)->addRule(Form::NUMERIC, 'Počet příloh musí být číslo');
+                ->setValue(@$Dok->pocet_priloh)->addRule(Nette\Forms\Form::NUMERIC, 'Počet příloh musí být číslo');
         $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
                 ->setValue(@$Dok->typ_prilohy);  
         
@@ -1636,7 +1636,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function upravitMetadataChyba(SubmitButton $button)
+    public function upravitMetadataChyba(Nette\Forms\Controls\SubmitButton $button)
     {
         $errors = $button->getForm()->getErrors();
         foreach($errors as $error)
@@ -1646,7 +1646,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect(':Spisovka:Dokumenty:detail',array('id' => $data['id']));
     }
     
-    public function upravitMetadataClicked(SubmitButton $button)
+    public function upravitMetadataClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         
@@ -1656,7 +1656,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         //Debug::dump($data);
         
-        if ( !($dok->stav_dokumentu == 1 || Environment::getUser()->isInRole('superadmin')) ) {
+        if ( !($dok->stav_dokumentu == 1 || Nette\Environment::getUser()->isInRole('superadmin')) ) {
             // needitovatelne skryte polozky
             $data['datum_vzniku'] = $dok->datum_vzniku;
             $data['dokument_typ_id'] = $dok->typ_dokumentu->id;
@@ -1708,7 +1708,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Dok = @$this->template->Dok;
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
         $form->addSelect('zpusob_vyrizeni_id', 'Způsob vyřízení:', $zpusob_vyrizeni)
@@ -1752,9 +1752,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->controlPrototype->readonly = TRUE;
 
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$Dok->vyrizeni_pocet_listu)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet listů musí být číslo');
+                ->setValue(@$Dok->vyrizeni_pocet_listu)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet listů musí být číslo');
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$Dok->vyrizeni_pocet_priloh)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet příloh musí být číslo');
+                ->setValue(@$Dok->vyrizeni_pocet_priloh)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet příloh musí být číslo');
         $form->addText('vyrizeni_typ_prilohy', 'Typ přílohy:', 20, 50)
                 ->setValue(@$Dok->vyrizeni_typ_prilohy);          
 
@@ -1779,7 +1779,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function upravitVyrizeniClicked(SubmitButton $button)
+    public function upravitVyrizeniClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -1823,7 +1823,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Dok = @$this->template->Dok;
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
 
@@ -1856,7 +1856,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function udalostClicked(SubmitButton $button)
+    public function udalostClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -1940,7 +1940,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
             }
         }
-        $user_info = Environment::getUser()->getIdentity();
+        $user_info = Nette\Environment::getUser()->getIdentity();
         if ( !empty($user_info->identity->email) ) {
             $key = "user#". Osoba::displayName($user_info->identity, 'jmeno') ."#". $user_info->identity->email;
             $odesilatele[$key] = Osoba::displayName($user_info->identity, 'jmeno') ." <". $user_info->identity->email ."> [zaměstnanec]";
@@ -1948,7 +1948,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->template->odesilatele = $odesilatele;
         
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
         $form->addSelect('email_from', 'Odesílatel:', $odesilatele);
@@ -1991,7 +1991,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function odeslatClicked(SubmitButton $button)
+    public function odeslatClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         //Debug::dump($data); exit;
@@ -2012,7 +2012,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->redirect(':Spisovka:Dokumenty:');            
         }
         
-        $post_data = Environment::getHttpRequest()->getPost();
+        $post_data = Nette\Environment::getHttpRequest()->getPost();
 
         // Debug::dump($post_data);
         // Debug::dump($data);
@@ -2023,7 +2023,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( isset($post_data['prilohy'])) {
             if ( count($post_data['prilohy'])>0 ) {
 
-                $storage_conf = Environment::getConfig('storage');
+                $storage_conf = Nette\Environment::getConfig('storage');
                 eval("\$DownloadFile = new ".$storage_conf->type."();");
 
                 foreach ($post_data['prilohy'] as $file_id => $status) {
@@ -2098,7 +2098,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
                 } elseif ( $metoda_odeslani == 2 ) {
                     // isds
-                    if (!Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani')) {
+                    if (!Nette\Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani')) {
                         $this->flashMessage('Nemáte oprávnění odesílat datové zprávy.','warning');
                         continue;                    
                     }
@@ -2288,7 +2288,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             // Do epodatelny
-            $storage_conf = Environment::getConfig('storage');
+            $storage_conf = Nette\Environment::getConfig('storage');
             eval("\$UploadFile = new ".$storage_conf->type."();");
 
             // nacist email z ImapClient
@@ -2320,7 +2320,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
             }
 
-            $user = Environment::getUser()->getIdentity();
+            $user = Nette\Environment::getUser()->getIdentity();
 
 
             // zapis do epodatelny
@@ -2510,12 +2510,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitlePoint ."\n";//  =
 
             // Do epodatelny
-            $storage_conf = Environment::getConfig('storage');
+            $storage_conf = Nette\Environment::getConfig('storage');
             eval("\$UploadFile = new ".$storage_conf->type."();");
 
             $Epodatelna = new Epodatelna();
             $config = $isds->getConfig();
-            $user = Environment::getUser()->getIdentity();
+            $user = Nette\Environment::getUser()->getIdentity();
 
             $zprava = array();
             $zprava['epodatelna_typ'] = 1;
@@ -2636,7 +2636,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $hledat =  !is_null($this->hledat)?$this->hledat:'';
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
         
@@ -2670,7 +2670,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function hledatSimpleClicked(SubmitButton $button)
+    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -2702,7 +2702,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $filtr_bezvyrizenych =  !is_null($this->filtr_bezvyrizenych)?$this->filtr_bezvyrizenych:false;
         $filtr_moje =  !is_null($this->filtr_moje)?$this->filtr_moje:false;
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('hidden')
             ->setValue(1);
 
@@ -2719,7 +2719,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // Zde by se melo kontrolovat opravneni a podle nej pripadne Input vlozit jako Hidden pole
         // Pokud uzivatel neni v zadne org. jednotce,  na hodnote filtru "jen_moje" nezalezi
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
          
         if (($orgjednotka_id === null || !$user->isAllowed('Dokument', 'cist_moje_oj'))
             && !$user->isAllowed('Dokument', 'cist_vse'))
@@ -2744,7 +2744,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function filtrClicked(SubmitButton $button)
+    public function filtrClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $form_data = $button->getForm()->getValues();
 
@@ -2779,7 +2779,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $seradit =  !is_null($this->seradit)?$this->seradit:null;
         
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addSelect('seradit', 'Seřadit podle:', $select)
                 ->setValue($seradit)
                 ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
@@ -2798,7 +2798,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function seraditClicked(SubmitButton $button)
+    public function seraditClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $form_data = $button->getForm()->getValues();
         $this->getHttpResponse()->setCookie('s3_seradit', $form_data['seradit'], strtotime('90 day'));

@@ -47,7 +47,7 @@ class Orgjednotka extends TreeModel
         if ( !empty($orgjednotka_id) ) {
             // aktualizovat
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = (int) Nette\Environment::getUser()->getIdentity()->id;
             
             if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
             if ( empty($data['parent_id']) ) $data['parent_id'] = null;
@@ -59,9 +59,9 @@ class Orgjednotka extends TreeModel
         } else {
             // insert
             $data['date_created'] = new DateTime();
-            $data['user_created'] = (int) Environment::getUser()->getIdentity()->id;
+            $data['user_created'] = (int) Nette\Environment::getUser()->getIdentity()->id;
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = (int) Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = (int) Nette\Environment::getUser()->getIdentity()->id;
             $data['stav'] = (int) 1;
             
             if ( !isset($data['parent_id']) ) $data['parent_id'] = null;
@@ -104,7 +104,7 @@ class Orgjednotka extends TreeModel
             return false;
             
         return ($oj_uzivatele === $orgjednotka_id) 
-               && Environment::getUser()->isAllowed('Dokument', 'cist_moje_oj');
+               && Nette\Environment::getUser()->isAllowed('Dokument', 'cist_moje_oj');
     }
 
     public static function childOrg($orgjednotka_id) {
@@ -135,7 +135,7 @@ class Orgjednotka extends TreeModel
     public static function dejOrgUzivatele($user_id = null) {
     
         if ($user_id === null) {
-            $identity = Environment::getUser()->getIdentity();
+            $identity = Nette\Environment::getUser()->getIdentity();
             if ($identity === null)
                 // nepřihlášený uživatel
                 return null;

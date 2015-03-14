@@ -140,11 +140,11 @@ class TreeModel extends BaseModel
                     $result[ $row->id ] = $row;
                 } else if ( $type == "2x" ) {
                     if ( isset($row->selected) && $row->selected == 0 ) {
-                        $result[ $row->id ] = Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis)->disabled(TRUE);
+                        $result[ $row->id ] = Nette\Utils\Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis)->disabled(TRUE);
                     } else if ( $row->stav == 0 ) {    
-                        $result[ $row->id ] = Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' [neaktivní] '. $row->{$this->nazev}.$popis)->disabled(TRUE);
+                        $result[ $row->id ] = Nette\Utils\Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' [neaktivní] '. $row->{$this->nazev}.$popis)->disabled(TRUE);
                     } else {
-                        $result[ $row->id ] = Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis);
+                        $result[ $row->id ] = Nette\Utils\Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis);
                     }
                 } else {
                     $result[ $row->id ] = str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis;

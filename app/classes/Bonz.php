@@ -7,17 +7,17 @@ class BonzAgent {
     
     public static function bonzuj() {
     
-        $app_info = Environment::getVariable('app_info');
+        $app_info = Nette\Environment::getVariable('app_info');
         if ( !empty($app_info) ) {
             $app_info = explode("#",$app_info);
         } else {
             $app_info = array('3.x','rev.X','OSS Spisová služba v3','1270716764');
         }
             
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $klient_info = $user_config->urad;
             
-        $unique_info = Environment::getVariable('unique_info');
+        $unique_info = Nette\Environment::getVariable('unique_info');
         $unique_part = explode('#',$unique_info);
         
         

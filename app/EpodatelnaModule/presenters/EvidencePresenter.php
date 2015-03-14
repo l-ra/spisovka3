@@ -11,7 +11,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function startup()
     {
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $this->typ_evidence = 0;
         if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
             $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
@@ -139,7 +139,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         /* Priprava dokumentu */
         $Dokumenty = new Dokument();
 
-        $rozdelany = Environment::getSession('s3_rozdelany');
+        $rozdelany = Nette\Environment::getSession('s3_rozdelany');
         $rozdelany_dokument = null;
 
         if ( isset($rozdelany->is) ) {
@@ -193,7 +193,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         }
 
-        $user = UserModel::getUser(Environment::getUser()->getIdentity()->id, 1);
+        $user = UserModel::getUser(Nette\Environment::getUser()->getIdentity()->id, 1);
         $this->template->Prideleno = Osoba::displayName($user->identity);
 
         $CJ = new CisloJednaci();
@@ -372,7 +372,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $typ_dokumentu = Dokument::typDokumentu(null,2);
         $typ_dokumentu_extra = Dokument::typDokumentu();
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('dokument_id')
                 ->setValue($dokument_id);
         $form->addHidden('epodatelna_id')
@@ -432,7 +432,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 ->setValue($cas);
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
-                ->setValue('30')->addRule(Form::NUMERIC, 'Lhůta k vyřízení musí být číslo');
+                ->setValue('30')->addRule(Nette\Forms\Form::NUMERIC, 'Lhůta k vyřízení musí být číslo');
         
         if ( !empty($zprava->isds_id) ) {
             $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
@@ -447,8 +447,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         
         $form->addHidden('zmocneni')->setValue(0);
 
-        $form->addText('pocet_listu', 'Počet listů:', 5, 10)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet listů musí být číslo');
-        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)->addCondition(Form::FILLED)->addRule(Form::NUMERIC, 'Počet příloh musí být číslo');
+        $form->addText('pocet_listu', 'Počet listů:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet listů musí být číslo');
+        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet příloh musí být číslo');
 
 
         $form->addSubmit('novy', 'Vytvořit')
@@ -469,7 +469,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         return $form;
     }
 
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -486,7 +486,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
-        $post_data = Environment::getHttpRequest()->post;
+        $post_data = Nette\Environment::getHttpRequest()->post;
         $subjekty = isset($post_data['subjekt'])?$post_data['subjekt']:null;
 
         // predani
@@ -558,7 +558,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                 $this->flashMessage('Dokument byl vytvořen.');
 
-                $rozdelany = Environment::getSession('s3_rozdelany');
+                $rozdelany = Nette\Environment::getSession('s3_rozdelany');
                 unset($rozdelany->is, $rozdelany->dokument_id, $rozdelany);
 
                 if ( !empty($data['predano_user']) || !empty($data['predano_org']) ) {
@@ -575,7 +575,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         $predano = @$orgjednotka->ciselna_rada ." - ". @$orgjednotka->plny_nazev;
                     }
                 } else {
-                    $predano = Osoba::displayName(@Environment::getUser()->getIdentity()->identity);
+                    $predano = Osoba::displayName(@Nette\Environment::getUser()->getIdentity()->identity);
                 }
                 
                 if ( !empty($zprava->email_id) ) {
@@ -682,7 +682,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         $predano = @$orgjednotka->ciselna_rada ." - ". @$orgjednotka->plny_nazev;
                     }
                 } else {
-                    $predano = Osoba::displayName(@Environment::getUser()->getIdentity()->identity);
+                    $predano = Osoba::displayName(@Nette\Environment::getUser()->getIdentity()->identity);
                 }
 
                 if ( !empty($zprava->email_id) ) {
@@ -713,7 +713,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $EvidencePrilohy = new Epodatelna_PrilohyPresenter();
         $prilohy = $EvidencePrilohy->emailPrilohy($epodatelna_id);
         
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$UploadFile = new ".$storage_conf->type."();");
 
         $DokumentFile = new DokumentPrilohy();
@@ -790,7 +790,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $EvidencePrilohy = new Epodatelna_PrilohyPresenter();
         $prilohy = $EvidencePrilohy->isdsPrilohy($epodatelna_id);
 
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$UploadFile = new ".$storage_conf->type."();");
 
         $DokumentFile = new DokumentPrilohy();
@@ -852,7 +852,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     }
 
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $dokument_id = $data['dokument_id'];
@@ -860,7 +860,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $this->redirect('this',array('id'=>$dokument_id));
     }
 
-    public function stornoSeznamClicked(SubmitButton $button)
+    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect(':Epodatelna:Default:nove');
     }
@@ -870,11 +870,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $epodatelna_id = $this->getParam('id',null);
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addText('evidence', 'Evidence:', 50, 100)
-                ->addRule(Form::FILLED, 'Název evidence musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název evidence musí být vyplněno!');
         $form->addSubmit('evidovat', 'Zaevidovat')
                  ->setRendered(TRUE)
                  ->onClick[] = array($this, 'zaevidovatClicked');
@@ -890,7 +890,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         return $form;
     }
 
-    public function zaevidovatClicked(SubmitButton $button)
+    public function zaevidovatClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -934,11 +934,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $mess .= @$zprava->popis;
 
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
-                ->addRule(Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
 
 
         $form->addCheckbox('upozornit', 'Poslat upozornění odesilateli?')
@@ -966,7 +966,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         return $form;
     }
 
-    public function odmitnoutEmailClicked(SubmitButton $button)
+    public function odmitnoutEmailClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -1038,11 +1038,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $original = @$this->template->original;
 
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
-                ->addRule(Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
 
 
         $form->addCheckbox('upozornit', 'Poslat upozornění odesilateli?')
@@ -1067,7 +1067,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         return $form;
     }
 
-    public function odmitnoutISDSClicked(SubmitButton $button)
+    public function odmitnoutISDSClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 

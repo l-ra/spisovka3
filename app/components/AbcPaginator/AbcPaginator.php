@@ -20,7 +20,7 @@
  * @author     Tomas Vancura
  * @copyright  Copyright (c) 2011 Tomas Vancura
  */
-class AbcPaginator extends Control
+class AbcPaginator extends Nette\Application\UI\Control
 {
 
     /**
@@ -29,7 +29,7 @@ class AbcPaginator extends Control
      */
     public function render()
     {
-        $request = Environment::getHttpRequest();
+        $request = Nette\Environment::getHttpRequest();
         $url = $request->getUri()->getPath();
         $query_string = $request->getUri()->getQuery();
         $query_params = "";

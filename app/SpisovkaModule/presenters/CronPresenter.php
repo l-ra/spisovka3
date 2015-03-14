@@ -2,7 +2,7 @@
 
 // Trida NESMI dedit z BasePresenteru (kvuli autentizaci)
 
-class Spisovka_CronPresenter extends Presenter
+class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
 {
 
     public function renderDefault()

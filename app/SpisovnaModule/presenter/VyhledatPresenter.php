@@ -14,7 +14,7 @@ class Spisovna_VyhledatPresenter extends Spisovka_VyhledatPresenter
 
     protected function isUserAllowed()
     {
-        return Environment::getUser()->isAllowed('Spisovna', 'cist_dokumenty');
+        return Nette\Environment::getUser()->isAllowed('Spisovna', 'cist_dokumenty');
     }
 }
 

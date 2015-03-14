@@ -5,7 +5,7 @@ class NoAccessPresenter extends BasePresenter
     public function startup()
     {
        // Preskoc startup kod v BasePresenteru
-       Presenter::startup();
+       Nette\Application\UI\Presenter::startup();
     }
 
     public function beforeRender()

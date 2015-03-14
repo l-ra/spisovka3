@@ -9,18 +9,18 @@
  Debug::enable();
 
  // Budoucí metoda Form::addDateTimePicker()
- function Form_addDateTimePicker(Form $_this, $name, $label, $cols = NULL, $maxLength = NULL)
+ function Form_addDateTimePicker(Nette\Forms\Form $_this, $name, $label, $cols = NULL, $maxLength = NULL)
  {
    return $_this[$name] = new DateTimePicker($label, $cols, $maxLength);
  }
 
- Form::extensionMethod('Form::addDateTimePicker', 'Form_addDateTimePicker');  // v PHP 5.2
+ Nette\Forms\Form::extensionMethod('Nette\Forms\Form::addDateTimePicker', 'Form_addDateTimePicker');  // v PHP 5.2
  //Form::extensionMethod('addDateTimePicker', 'Form_addDateTimePicker');  // v PHP 5.3
 
- $form = new Form();
+ $form = new Nette\Forms\Form();
 
  $form->addDateTimePicker('datum_cas', 'Kdy a v kolik to bude?', 16, 16)
-      ->addRule(Form::FILLED, 'Zadejte prosím datum a čas.');
+      ->addRule(Nette\Forms\Form::FILLED, 'Zadejte prosím datum a čas.');
 
  $form->addSubmit('submit_datetime', 'Odeslat');
 

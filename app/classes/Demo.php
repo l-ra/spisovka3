@@ -9,7 +9,7 @@ class Demo {
         if (self::$is_demo === null) {
         
             self::$is_demo = false;
-            $config = Environment::getConfig('demo');
+            $config = Nette\Environment::getConfig('demo');
             if ($config !== null && $config->demo == 1) 
                 self::$is_demo = true;
         }

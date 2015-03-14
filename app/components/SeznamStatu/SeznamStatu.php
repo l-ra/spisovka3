@@ -1,6 +1,6 @@
 <?php
 
-class SeznamStatu extends Control
+class SeznamStatu extends Nette\Application\UI\Control
 {
 
     /**

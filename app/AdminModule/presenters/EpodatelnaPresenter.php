@@ -205,14 +205,14 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         );
 
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('index')
                 ->setValue($index);
         $form1->addHidden('ep_typ')
                 ->setValue('i');
         $form1->addText('ucet', 'Název účtu:', 50, 100)
                 ->setValue($isds['ucet'])
-                ->addRule(Form::FILLED, 'Název účtu musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
         $form1->addCheckbox('aktivni', ' aktivní účet?')
                 ->setValue($isds['aktivni']);
 
@@ -222,7 +222,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $form1->addText('login', 'Přihlašovací jméno od ISDS:', 50, 100)
                 ->setValue($isds['login'])
-                ->addRule(Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
         $form1->addPassword('password', 'Přihlašovací heslo ISDS:', 50, 100);
                 // ->setValue($isds['password'])
                 // ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
@@ -256,7 +256,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         return $form1;
     }
 
-    public function nastavitISDSClicked(SubmitButton $button)
+    public function nastavitISDSClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -276,7 +276,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
             if ( is_writeable(CLIENT_DIR ."/configs/files") ) {
                 $fileName = CLIENT_DIR ."/configs/files/certifikat_isds". $index .".crt";
-                if (!$upload instanceof HttpUploadedFile) {
+                if (!$upload instanceof Nette\Http\FileUpload) {
                     $this->flashMessage('Certifikát se nepodařilo nahrát.','warning');
                 } else if ( $upload->isOk() ) {
                     if ( $upload->move($fileName) ) {
@@ -388,7 +388,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $id = $this->getParam('id',null);
         $index = substr($id,1);
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addHidden('index')
                 ->setValue($index);
         $form->addHidden('zmenit_heslo_isds')
@@ -397,9 +397,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 ->setValue('i');
 
         $form->addPassword('password', 'Přihlašovací heslo ISDS:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addRule(Form::MIN_LENGTH,'Heslo do datové schránky musí být minimálně %d znaků dlouhé.', 8)
-                ->addRule(Form::MAX_LENGTH,'Heslo do datové schránky musí být maximálně %d znaků dlouhé.', 32)
+                ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+                ->addRule(Nette\Forms\Form::MIN_LENGTH,'Heslo do datové schránky musí být minimálně %d znaků dlouhé.', 8)
+                ->addRule(Nette\Forms\Form::MAX_LENGTH,'Heslo do datové schránky musí být maximálně %d znaků dlouhé.', 32)
                 /*->addRule(callback($this, 'ruleNoEqual'),'Heslo mesmí obsahovat id (login) uživatele, jemuž se heslo mění.',$isds['login'])
                 ->addRule(callback($this, 'ruleNoEqual'),'Heslo se nesmí shodovat s původním heslem.',$isds['password'])
                 ->addRule(callback($this, 'ruleContains'),'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','qwert')
@@ -408,9 +408,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 */;
                 
         $form->addPassword('password_confirm', 'Přihlašovací heslo ještě jednou:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addConditionOn($form["password"], Form::FILLED)
-                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form["password"]);        
+                ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+                ->addConditionOn($form["password"], Nette\Forms\Form::FILLED)
+                    ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !", $form["password"]);        
 
         $form->addSubmit('zmenit', 'Změnit heslo')
                  ->onClick[] = array($this, 'zmenitHesloISDSClicked');
@@ -427,7 +427,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         return $form;
     }    
     
-    public function zmenitHesloISDSClicked(SubmitButton $button)
+    public function zmenitHesloISDSClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         //echo "<pre>Data: "; print_r($data); echo "</pre>"; exit;
@@ -517,7 +517,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             '/imap/ssl/novalidate-cert'=>'IMAP+SSL',
         );
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('index')
                 ->setValue($index);
         $form1->addHidden('ep_typ')
@@ -525,24 +525,24 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $form1->addText('ucet', 'Název účtu:', 50, 100)
                 ->setValue($email['ucet'])
-                ->addRule(Form::FILLED, 'Název účtu musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
         $form1->addCheckbox('aktivni', ' aktivní účet?')
                 ->setValue($email['aktivni']);
         $form1->addSelect('typ', 'Protokol:', $typ_serveru)
                 ->setValue($email['typ'])
-                ->addRule(Form::FILLED, 'Vyberte protokol pro připojení k emailové schránce.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Vyberte protokol pro připojení k emailové schránce.');
         $form1->addText('server', 'Adresa serveru:', 50, 100)
                 ->setValue($email['server'])
-                ->addRule(Form::FILLED, 'Adresa poštovního serveru musí být vyplněna.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Adresa poštovního serveru musí být vyplněna.');
         $form1->addText('port', 'Port:', 5, 50)
                 ->setValue($email['port'])
-                ->addRule(Form::FILLED, 'Port serveru musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Port serveru musí být vyplněno.');
         $form1->addText('inbox', 'Složka:', 50, 100)
                 ->setValue($email['inbox']);
 
         $form1->addText('login', 'Přihlašovací jméno:', 50, 100)
                 ->setValue($email['login'])
-                ->addRule(Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
         $form1->addPassword('password', 'Přihlašovací heslo:', 50, 100);
                 // ->setValue($email['password'])
                 // ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
@@ -574,7 +574,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         return $form1;
     }
 
-    public function nastavitEmailClicked(SubmitButton $button)
+    public function nastavitEmailClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -610,14 +610,14 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $index = substr($id,1);
         $odes = $ep['odeslani'][$index];
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('index')
                 ->setValue($index);
         $form1->addHidden('ep_typ')
                 ->setValue($typ);
         $form1->addText('ucet', 'Název účtu:', 50, 100)
                 ->setValue($odes['ucet'])
-                ->addRule(Form::FILLED, 'Název účtu musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
         $form1->addCheckbox('aktivni', ' aktivní účet?')
                 ->setValue($odes['aktivni']);
         $form1->addSelect('typ_odeslani', 'Jak odesílat:', array('0'=>'klasicky bez kvalifikovaného podpisu/značky',
@@ -651,7 +651,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         return $form1;
     }
 
-    public function nastavitOdesClicked(SubmitButton $button)
+    public function nastavitOdesClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -669,7 +669,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $chyba_pri_uploadu = 0;
         {
             $fileName = CLIENT_DIR ."/configs/files/certifikat_email_". $index .".crt";
-            if (!$upload instanceof HttpUploadedFile) {
+            if (!$upload instanceof Nette\Http\FileUpload) {
                 $this->flashMessage('Certifikát se nepodařilo nahrát.','warning');
             } else if ( $upload->isOk() ) {
                 try {
@@ -701,7 +701,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         {
             $fileName = CLIENT_DIR ."/configs/files/certifikat_email_". $index .".key";
-            if (!$upload instanceof HttpUploadedFile) {
+            if (!$upload instanceof Nette\Http\FileUpload) {
                 $this->flashMessage('Soubor privátního klíče se nepodařilo nahrát.','warning');
             } else if ( $upload->isOk() ) {
                 try {
@@ -747,7 +747,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $this->redirect('this',array('id'=>('o' . $data['index']) ));
     }
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $this->redirect('this',array('id'=>($data['ep_typ'] . $data['index']) ));

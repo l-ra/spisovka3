@@ -207,7 +207,7 @@ class UserModel extends BaseModel
     public function zalogovan($user_id) {
 
         $row = array('last_login' => new DateTime(),
-                     'last_ip' => Environment::getHttpRequest()->getRemoteAddress()
+                     'last_ip' => Nette\Environment::getHttpRequest()->getRemoteAddress()
                 );
         return $this->update($row,array('id=%i',$user_id));
 

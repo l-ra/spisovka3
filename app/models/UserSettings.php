@@ -39,7 +39,7 @@ class UserSettings
    
     protected function __construct() {
     
-        $this->user_id = Environment::getUser()->getIdentity()->id;
+        $this->user_id = Nette\Environment::getUser()->getIdentity()->id;
         $this->table_prefix = BaseModel::getDbPrefix();
         
         $result = dibi::query('SELECT [settings] FROM %n', $this->table_prefix . self::TABLE_NAME, 'WHERE [id] = %i', $this->user_id);

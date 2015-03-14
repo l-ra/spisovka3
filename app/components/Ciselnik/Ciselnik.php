@@ -7,7 +7,7 @@
  * @copyright  Copyright (c) 2009 David Grudl
  * @package    Nette Extras
  */
-class Ciselnik extends Control {
+class Ciselnik extends Nette\Application\UI\Control {
 
     /** @var string */
     protected $receivedSignal;
@@ -140,7 +140,7 @@ class Ciselnik extends Control {
             $this->receivedSignal = 'submit';
 	}
 
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
         $form->onSubmit[] = array($this, 'formSubmitHandler');
 
         if ( count($this->cols)>0 ) {
@@ -297,10 +297,10 @@ class Ciselnik extends Control {
 
     /**
      * Ciselnik form submit handler.
-     * @param  AppForm
+     * @param  Nette\Application\UI\Form
      * @return void
      */
-    public function formSubmitHandler(AppForm $form)
+    public function formSubmitHandler(Nette\Application\UI\Form $form)
     {
         $this->receivedSignal = 'submit';
 
@@ -326,7 +326,7 @@ class Ciselnik extends Control {
             } else if ( isset($data['stornoCiselnik']) ) {
                 $this->handleStorno();
             } else {
-                throw new InvalidStateException("Unknown submit button.");
+                throw new Nette\InvalidStateException("Unknown submit button.");
             }
 
 	}

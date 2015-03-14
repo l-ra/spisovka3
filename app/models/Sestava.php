@@ -26,13 +26,13 @@ class Sestava extends DBEntity
 
     public function canUserDelete()
     {
-        $allowed = Environment::getUser()->isAllowed('Sestava', 'mazat');
+        $allowed = Nette\Environment::getUser()->isAllowed('Sestava', 'mazat');
         return $this->isDeletable() && $allowed;
     }
 
     public function canUserModify()
     {
-        $allowed = Environment::getUser()->isAllowed('Sestava', 'menit');
+        $allowed = Nette\Environment::getUser()->isAllowed('Sestava', 'menit');
         return $this->isModifiable() && $allowed;
     }
     
@@ -42,7 +42,7 @@ class Sestava extends DBEntity
      */
     public static function isUserAllowed()
     {
-        return Environment::getUser()->isAllowed('Sestava', 'zobrazit');
+        return Nette\Environment::getUser()->isAllowed('Sestava', 'zobrazit');
     }
 }
 ?>

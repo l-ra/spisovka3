@@ -319,13 +319,13 @@ class Zapujcka extends BaseModel
         } else if ( is_null($zapujcka_id) ) {
             // nova zapujcka
             
-            $data['user_vytvoril_id'] = Environment::getUser()->getIdentity()->id;
+            $data['user_vytvoril_id'] = Nette\Environment::getUser()->getIdentity()->id;
             $data['date_created'] = new DateTime();
             
             if ( $is_in_role ) {
                 // prijat a schvalen
                 $data['stav'] = 2;
-                $data['user_schvalil_id'] = Environment::getUser()->getIdentity()->id;
+                $data['user_schvalil_id'] = Nette\Environment::getUser()->getIdentity()->id;
                 $data['date_schvaleni'] = new DateTime();
             } else {
                 // prijat
@@ -351,7 +351,7 @@ class Zapujcka extends BaseModel
 
     public function osobni($args) {
 
-        $user = Environment::getUser()->getIdentity();
+        $user = Nette\Environment::getUser()->getIdentity();
         
         if ( isset($args['where']) ) {
             $args['where'][] = array(array('z.user_id = %i AND z.stav < 3',$user->id));
@@ -368,7 +368,7 @@ class Zapujcka extends BaseModel
         
         $data = array(
             'stav' => 2,
-            'user_schvalil_id' => Environment::getUser()->getIdentity()->id,
+            'user_schvalil_id' => Nette\Environment::getUser()->getIdentity()->id,
             'date_schvaleni' => new DateTime()
         );
         
@@ -393,7 +393,7 @@ class Zapujcka extends BaseModel
         $date = new DateTime();
         $data = array(
             'stav' => 4,
-            'user_schvalil_id' => Environment::getUser()->getIdentity()->id,
+            'user_schvalil_id' => Nette\Environment::getUser()->getIdentity()->id,
             'date_schvaleni' => $date,
             'date_do_skut' => $date,
         );
@@ -418,7 +418,7 @@ class Zapujcka extends BaseModel
             $update = $this->update($data, array(array('id=%i',$zapujcka_id)));
             $Workflow = new Workflow();
             $dokument_id = $this->getDokumentID($zapujcka_id);
-            $Workflow->zapujcka_vratit($dokument_id, Environment::getUser()->getIdentity()->id);
+            $Workflow->zapujcka_vratit($dokument_id, Nette\Environment::getUser()->getIdentity()->id);
             return true;
         } catch (Exception $e) {
             return false;

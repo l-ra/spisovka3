@@ -7,7 +7,7 @@ class Install_DefaultPresenter extends BasePresenter
     
     public function startup() {
 
-        $this->no_install = $this->getParam("no_install", Environment::getVariable('no_install'));
+        $this->no_install = $this->getParam("no_install", Nette\Environment::getVariable('no_install'));
         $this->template->no_install = $this->no_install;
         
         if ( $this->action == "kontrola" && $this->no_install ) {
@@ -16,7 +16,7 @@ class Install_DefaultPresenter extends BasePresenter
             // instalovano
             $this->setView('instalovano');
         }
-        $session = Environment::getSession('s3_install');
+        $session = Nette\Environment::getSession('s3_install');
 
         parent::startup();
 
@@ -28,7 +28,7 @@ class Install_DefaultPresenter extends BasePresenter
     public function renderDefault()
     {
 
-        $session = Environment::getSession('s3_install');
+        $session = Nette\Environment::getSession('s3_install');
         unset($session->step);
 
         //$this->redirect('uvod');
@@ -36,7 +36,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderUvod()
     {
-        $session = Environment::getSession('s3_install');
+        $session = Nette\Environment::getSession('s3_install');
         if ( !isset($session->step) ) {
             $session->step = array();
         }
@@ -46,7 +46,7 @@ class Install_DefaultPresenter extends BasePresenter
     {
 
         if ( !$this->no_install ) {
-            $session = Environment::getSession('s3_install');
+            $session = Nette\Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
                 $session->step = array();
             }
@@ -124,7 +124,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         // DB test
         try {
-            $db_info = Environment::getConfig('database');
+            $db_info = Nette\Environment::getConfig('database');
             dibi::connect($db_info);
             $database_support = 1;
             $database_info = $db_info['driver'] .'://'. $db_info['username'] .'@'. $db_info['host'] .'/'. $db_info['database'];
@@ -134,7 +134,7 @@ class Install_DefaultPresenter extends BasePresenter
         }
 
         // Appliaction info
-        $app_info = Environment::getVariable('app_info');
+        $app_info = Nette\Environment::getVariable('app_info');
         if ( !empty($app_info) ) {
             $app_info = explode("#",$app_info);
         } else {
@@ -509,7 +509,7 @@ class Install_DefaultPresenter extends BasePresenter
     public function renderDatabaze()
     {
 
-        $session = Environment::getSession('s3_install');
+        $session = Nette\Environment::getSession('s3_install');
         if ( !isset($session->step) ) {
             $session->step = array();
         }
@@ -521,7 +521,7 @@ class Install_DefaultPresenter extends BasePresenter
 		$this->template->tabulka_jiz_existuje = false;
         
         try {
-            $db_config = Environment::getConfig('database');
+            $db_config = Nette\Environment::getConfig('database');
             dibi::connect($db_config);
 
             $db_tables = dibi::getDatabaseInfo()->getTableNames();
@@ -647,7 +647,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderUrad()
     {
-        $session = Environment::getSession('s3_install');
+        $session = Nette\Environment::getSession('s3_install');
         if ( !isset($session->step) ) {
             $session->step = array();
         }
@@ -658,7 +658,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderEvidence()
     {
-        $session = Environment::getSession('s3_install');
+        $session = Nette\Environment::getSession('s3_install');
         if ( !isset($session->step) ) {
             $session->step = array();
         }
@@ -670,7 +670,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderSpravce()
     {
-        $session = Environment::getSession('s3_install');
+        $session = Nette\Environment::getSession('s3_install');
         if ( !isset($session->step) ) {
             $session->step = array();
         }
@@ -684,7 +684,7 @@ class Install_DefaultPresenter extends BasePresenter
     public function renderKonec()
     {
 
-        $session = Environment::getSession('s3_install');
+        $session = Nette\Environment::getSession('s3_install');
 
         $dokonceno = 1; $errors = array();
         
@@ -805,20 +805,20 @@ class Install_DefaultPresenter extends BasePresenter
     protected function createComponentNastaveniUraduForm()
     {
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $Urad = $user_config->urad;
         $stat_select = Subjekt::stat();
 
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('nazev', 'Název:', 50, 100)
                 ->setValue($Urad->nazev)
-                ->addRule(Form::FILLED, 'Název úřadu musí být vyplněn.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název úřadu musí být vyplněn.');
         $form1->addText('plny_nazev', 'Plný název:', 50, 200)
                 ->setValue($Urad->plny_nazev);
         $form1->addText('zkratka', 'Zkratka:', 15, 30)
                 ->setValue($Urad->zkratka)
-                ->addRule(Form::FILLED, 'Zkratka úřadu musí být vyplněna.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Zkratka úřadu musí být vyplněna.');
 
         $form1->addText('ulice', 'Ulice:', 50, 100)
                 ->setValue($Urad->adresa->ulice);
@@ -855,7 +855,7 @@ class Install_DefaultPresenter extends BasePresenter
         return $form1;
     }
 
-    public function nastavitUradClicked(SubmitButton $button)
+    public function nastavitUradClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -884,16 +884,16 @@ class Install_DefaultPresenter extends BasePresenter
             $config_modify = new Config();
             $config_modify->import($config_data);
             @$config_modify->save(CLIENT_DIR .'/configs/klient.ini');
-            Environment::setVariable('user_config', $config_modify);
+            Nette\Environment::setVariable('user_config', $config_modify);
 
-            $session = Environment::getSession('s3_install');
+            $session = Nette\Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
                 $session->step = array();
             }
             @$session->step['urad'] = 1;
             $this->redirect('evidence');
             
-        } catch ( IOException $e ) {
+        } catch ( Nette\IOException $e ) {
 
             $this->flashMessage('Informace o sobě se nepodařilo uložit!','warning');
             $this->flashMessage('Zkuste pokus o uložení provést znovu. V případě, že to nepomáhá, zkontrolujte existenci konfiguračního souboru a možnost zápisu do něj.','warning');
@@ -907,18 +907,18 @@ class Install_DefaultPresenter extends BasePresenter
     protected function createComponentNastaveniCJForm()
     {
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $CJ = $user_config->cislo_jednaci;
 
         $evidence = array("priorace"=>"Priorace","sberny_arch"=>"Sběrný arch");
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addRadioList('typ_evidence', 'Typ evidence:', $evidence)
                 ->setValue($CJ->typ_evidence)
-                ->addRule(Form::FILLED, 'Volba evidence musí být vybrána.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Volba evidence musí být vybrána.');
         $form1->addText('maska', 'Maska:', 50, 100)
                 ->setValue($CJ->maska)
-                ->addRule(Form::FILLED, 'Maska čísla jednacího musí být vyplněna.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Maska čísla jednacího musí být vyplněna.');
         $form1->addText('pocatek_cisla', 'Nastavit počáteční pořadové číslo:', 10, 15)
                 ->setValue($CJ->pocatek_cisla);
 
@@ -936,7 +936,7 @@ class Install_DefaultPresenter extends BasePresenter
         return $form1;
     }
 
-    public function nastavitCJClicked(SubmitButton $button)
+    public function nastavitCJClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -951,15 +951,15 @@ class Install_DefaultPresenter extends BasePresenter
             $config_modify = new Config();
             $config_modify->import($config_data);
             @$config_modify->save(CLIENT_DIR .'/configs/klient.ini');
-            Environment::setVariable('user_config', $config_modify);
+            Nette\Environment::setVariable('user_config', $config_modify);
 
-            $session = Environment::getSession('s3_install');
+            $session = Nette\Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
                 $session->step = array();
             }
             @$session->step['evidence'] = 1;
             $this->redirect('spravce');
-        } catch ( IOException $e) {
+        } catch ( Nette\IOException $e) {
             $this->flashMessage('Nastavení evidence se nepodařilo uložit!','warning');
             $this->flashMessage('Zkuste pokus o uložení provést znovu. V případě, že to nepomáhá, zkontrolujte existenci konfiguračního souboru a možnost zápisu do něj.','warning');
             $this->flashMessage('Exception: '. $e->getMessage(),'warning');
@@ -969,10 +969,10 @@ class Install_DefaultPresenter extends BasePresenter
     protected function createComponentSpravceForm()
     {
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('jmeno', 'Jméno:', 50, 150);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
-                ->addRule(Form::FILLED, 'Alespoň příjmení správce musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Alespoň příjmení správce musí být vyplněno.');
         $form1->addText('titul_pred', 'Titul před:', 50, 150);
         $form1->addText('titul_za', 'Titul za:', 50, 150);
         $form1->addText('email', 'Email:', 50, 150);
@@ -980,13 +980,13 @@ class Install_DefaultPresenter extends BasePresenter
         $form1->addText('pozice', 'Funkce:', 50, 150);
 
         $form1->addText('username', 'Uživatelské jméno:', 30, 150)
-                ->addRule(Form::FILLED, 'Uživatelské jméno správce musí být vyplněno.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Uživatelské jméno správce musí být vyplněno.');
         $form1->addPassword('heslo', 'Heslo:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné.');
         $form1->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
-                ->addRule(Form::FILLED, 'Kontrolní heslo musí být vyplněné pro vyloučení překlepu hesla.')
-                ->addConditionOn($form1["heslo"], Form::FILLED)
-                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form1["heslo"]);
+                ->addRule(Nette\Forms\Form::FILLED, 'Kontrolní heslo musí být vyplněné pro vyloučení překlepu hesla.')
+                ->addConditionOn($form1["heslo"], Nette\Forms\Form::FILLED)
+                    ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !", $form1["heslo"]);
 
         $form1->addSubmit('novy', 'Vytvořit správce')
                  ->onClick[] = array($this, 'spravceClicked');
@@ -1000,7 +1000,7 @@ class Install_DefaultPresenter extends BasePresenter
         return $form1;
     }
 
-    public function spravceClicked(SubmitButton $button)
+    public function spravceClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -1030,7 +1030,7 @@ class Install_DefaultPresenter extends BasePresenter
             $this->flashMessage('Správce se nepodařilo vytvořit.', 'warning');
         }
         else {
-            $session = Environment::getSession('s3_install');
+            $session = Nette\Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
                 $session->step = array();
             }

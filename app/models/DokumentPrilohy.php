@@ -53,9 +53,9 @@ class DokumentPrilohy extends BaseModel
                 $mime_type_webalize = String::webalize($joinFile->mime_type);
                 $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
                 if ( @file_exists($mime_type_icon) ) {
-                    $joinFile->mime_type_icon = Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";
+                    $joinFile->mime_type_icon = Nette\Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";
                 } else {
-                    $joinFile->mime_type_icon = Environment::getVariable('publicUrl') ."images/mimetypes/application-octet-stream.png";
+                    $joinFile->mime_type_icon = Nette\Environment::getVariable('publicUrl') ."images/mimetypes/application-octet-stream.png";
                 }
                 
                 $prilohy[ $joinFile->dokument_id ][ $joinFile->id ] = $joinFile;
@@ -77,7 +77,7 @@ class DokumentPrilohy extends BaseModel
         $row['dokument_id'] = $dokument_id;
         $row['file_id'] = $file_id;
         $row['date_added'] = new DateTime();
-        $row['user_id'] = Environment::getUser()->getIdentity()->id;
+        $row['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
 
         return $this->insert($row);
 

@@ -1,6 +1,6 @@
 <?php
 
-class UUID extends Object {
+class UUID extends Nette\Object {
 
 
     protected $urand;

@@ -5,7 +5,7 @@ class Admin_PrilohyPresenter extends BasePresenter
 
     public function renderDefault()
     {
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -22,7 +22,7 @@ class Admin_PrilohyPresenter extends BasePresenter
     public function actionDownload()
     {
 
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$DownloadFile = new ".$storage_conf->type."();");
 
         $FileModel = new FileModel();
@@ -65,7 +65,7 @@ class Admin_PrilohyPresenter extends BasePresenter
     protected function createComponentUploadForm()
     {
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('nazev', 'Název přílohy:', 50, 150);
         $form1->addTextArea('popis', 'Popis:', 80, 5);
         $form1->addSelect('typ', 'Typ souboru', FileModel::typPrilohy());
@@ -85,13 +85,13 @@ class Admin_PrilohyPresenter extends BasePresenter
     }
 
 
-    public function uploadClicked(SubmitButton $button)
+    public function uploadClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $upload = $data['file'];
 
         // Nacteni rozhrani pro upload dle nastaveni
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         eval("\$UploadFile = new ".$storage_conf->type."();");
 
         if ( $file = $UploadFile->uploadDokument($data) ) {

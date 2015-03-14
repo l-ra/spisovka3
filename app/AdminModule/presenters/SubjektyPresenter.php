@@ -20,7 +20,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         return $form1;
     }
 
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -57,7 +57,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
         // paginator
         $abcPaginator = new AbcPaginator($this, 'abc');
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -195,7 +195,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
                     
                     //echo "<pre>"; echo $export_data; echo "</pre>"; exit;
                 
-                    $httpResponse = Environment::getHttpResponse();
+                    $httpResponse = Nette\Environment::getHttpResponse();
                     $httpResponse->setContentType('application/octetstream');
                     $httpResponse->setHeader('Content-Description', 'File Transfer');
                     $httpResponse->setHeader('Content-Disposition', 'attachment; filename="export_subjektu.csv"');
@@ -217,7 +217,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     }
     
 
-    public function upravitClicked(SubmitButton $button)
+    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $subjekt_id = $data['id'];
@@ -244,14 +244,14 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
     }
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $subjekt_id = $data['id'];
         $this->redirect('this',array('id'=>$subjekt_id));
     }
 
-    public function stornoSeznamClicked(SubmitButton $button)
+    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect(':Admin:Subjekty:seznam');
     }
@@ -262,7 +262,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         $subjekt = $this->template->Subjekt;
         $stav_select = Subjekt::stav();
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$subjekt->id);
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
@@ -282,7 +282,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         return $form1;
     }
 
-    public function zmenitStavClicked(SubmitButton $button)
+    public function zmenitStavClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -303,7 +303,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
         $hledat =  !is_null($this->hledat)?$this->hledat:'';
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
         $form['dotaz']->getControlPrototype()->title = "Hledat lze názvu subjektu, jména, IČ, emailu, telefonu, ISDS, města, PSČ";
@@ -321,7 +321,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         return $form;
     }
 
-    public function hledatSimpleClicked(SubmitButton $button)
+    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 

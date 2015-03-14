@@ -7,7 +7,7 @@ class SubjektyPresenter extends BasePresenter
     {
         $abcPaginator = new AbcPaginator($this, 'abc');
         $abc = $abcPaginator->getParam('abc');
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -37,7 +37,7 @@ class SubjektyPresenter extends BasePresenter
         $this->template->subjektForm = $this['novyForm'];
     }
     
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -64,7 +64,7 @@ class SubjektyPresenter extends BasePresenter
         $typ_select = Subjekt::typ_subjektu();
         $stat_select = array("" => "Neuveden") + Subjekt::stat();
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->getElementPrototype()->id('subjekt-vytvorit');
 
         $form1->addSelect('type', 'Typ subjektu:', $typ_select);
@@ -421,7 +421,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         return $form1;
     }
     
-    public function upravitClicked(SubmitButton $button)
+    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $subjekt_id = $data['id'];

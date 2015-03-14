@@ -11,7 +11,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     
     public function startup()
     {
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $this->typ_evidence = 0;
         if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
             $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
@@ -46,11 +46,11 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 
                 $mpdf = new mPDF('iso-8859-2', 'A4',9,'Helvetica');
                 
-                $app_info = Environment::getVariable('app_info');
+                $app_info = Nette\Environment::getVariable('app_info');
                 $app_info = explode("#",$app_info);
                 $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                 $mpdf->SetCreator($app_name);
-                $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->name);
                 $mpdf->SetTitle('Spisová služba - Zápůjčky');                
                 
                 $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -60,7 +60,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                 $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                 $mpdf->SetHeader('Zápůjčky||'.$this->template->Urad->nazev);
-                $mpdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                 
                 
@@ -85,7 +85,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $hledat = $this->getParam('hledat');
         $seradit = $this->getParam('seradit');         
         
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -131,7 +131,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         }
         $this->template->seradit = $seradit;        
         
-        if ( Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin') ) {
+        if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
             $this->template->akce_select = array(
                 'vratit' => 'Vrátit vybrané zápůjčky',
                 'schvalit' => 'Schválit vybrané zápůjčky',
@@ -184,7 +184,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $zapujcka = $Zapujcka->getInfo($zapujcka_id);
         if ( $zapujcka ) {
             $this->template->Opravnen_schvalit_zapujcku = 
-                Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin');
+                Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin');
                 
             $this->template->Zapujcka = $zapujcka;
 
@@ -202,7 +202,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         if ( isset($data['hromadna_akce']) ) {
             $Zapujcka = new Zapujcka();
-            $user = Environment::getUser();
+            $user = Nette\Environment::getUser();
             switch ($data['hromadna_akce']) {
                 /* Schvaleni vybranych zapujcek  */
                 case 'schvalit':
@@ -286,7 +286,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         
         $zapujcka_id = $this->getParam('id');
         if ( !empty($zapujcka_id) && is_numeric($zapujcka_id) ) {
-            if ( Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin') ) {
+            if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
                 
                 $Zapujcka = new Zapujcka();
                 if ( $Zapujcka->schvalit($zapujcka_id) ) {
@@ -309,7 +309,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         
         $zapujcka_id = $this->getParam('id');
         if ( !empty($zapujcka_id) && is_numeric($zapujcka_id) ) {
-            if ( Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin') ) {
+            if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
                 
                 $Zapujcka = new Zapujcka();
                 if ( $Zapujcka->odmitnout($zapujcka_id) ) {
@@ -354,7 +354,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     protected function createComponentNovyForm()
     {
         
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         
         $dokument_id = $this->getParam('dokument_id');
         $user_id = $this->getParam('user_id');
@@ -390,7 +390,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $user_info = UserModel::getIdentity($user_id);
             $osoba = Osoba::displayName($user_info);
         } else {
-            $user = Environment::getUser();
+            $user = Nette\Environment::getUser();
             if ( Acl::isInRole('spisovna') || $user->isInRole('superadmin') ) {
                 $osoba = "";
                 $user_id = null;
@@ -424,7 +424,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $form->addDatePicker('date_do', 'Datum vrácení:', 10)
                 ->setRequired('Datum vrácení musí být vyplněné! Zadejte alespoň předpokládané datum vrácení.')
                 ->forbidPastDates()
-                ->addRule(Form::VALID, 'Datum vrácení nemůže být v minulosti.');
+                ->addRule(Nette\Forms\Form::VALID, 'Datum vrácení nemůže být v minulosti.');
 
         
         $submit = $form->addSubmit('novy', 'Vytvořit zápůjčku');
@@ -445,7 +445,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     }
     
-    public function vytvoritClickedChyba(SubmitButton $button)
+    public function vytvoritClickedChyba(Nette\Forms\Controls\SubmitButton $button)
     {
         $errors = $button->getForm()->getErrors();
         foreach($errors as $error)
@@ -453,7 +453,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         // Neni treba provadet redirect, formular se vykresli nyni znovu
     }
     
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         
@@ -478,14 +478,14 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     
     
     
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $zapujcka_id = $data['id'];
         $this->redirect(':Spisovna:Zapujcky:detail',array('id'=>$zapujcka_id));
     }
 
-    public function stornoSeznamClicked(SubmitButton $button)
+    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect(':Spisovna:Zapujcky:default');
     }
@@ -495,7 +495,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         $hledat =  !is_null($this->hledat)?$this->hledat:'';
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
         $form['dotaz']->getControlPrototype()->title = "Hledat lze dle věci, popisu, čísla jednacího a JID";
@@ -513,7 +513,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         return $form;
     }
 
-    public function hledatSimpleClicked(SubmitButton $button)
+    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -524,7 +524,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     protected function createComponentFiltrForm()
     {
 
-        if ( Acl::isInRole('spisovna') || Environment::getUser()->isInRole('superadmin') ) {
+        if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
             $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
             $select = array(
                 'aktualni'=>'Zobrazit aktuální zápůjčky',
@@ -543,7 +543,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $this->template->zobrazit_filtr = 0;
         }
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addSelect('filtr', 'Filtr:', $select)
                 ->setValue($filtr)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
@@ -562,7 +562,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         return $form;
     }
 
-    public function filtrClicked(SubmitButton $button)
+    public function filtrClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $form_data = $button->getForm()->getValues();
         $data = array('filtr'=>$form_data['filtr']);

@@ -13,7 +13,7 @@ class EmailAvizo {
         try {
             
             // Urad
-            $user_config = Environment::getVariable('user_config');
+            $user_config = Nette\Environment::getVariable('user_config');
             $urad = $user_config->urad;
             
             $mail = new ESSMail;
@@ -50,7 +50,7 @@ class EmailAvizo {
         try {
             
             // Urad
-            $user_config = Environment::getVariable('user_config');
+            $user_config = Nette\Environment::getVariable('user_config');
             $urad = $user_config->urad;
             
             $mail = new ESSMail;

@@ -9,7 +9,7 @@ class Admin_SpisznakPresenter extends BasePresenter
     {
         $this->template->title = " - Seznam spisových znaků";
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -122,7 +122,7 @@ class Admin_SpisznakPresenter extends BasePresenter
                     
                     //echo "<pre>"; echo $export_data; echo "</pre>"; exit;
                 
-                    $httpResponse = Environment::getHttpResponse();
+                    $httpResponse = Nette\Environment::getHttpResponse();
                     $httpResponse->setContentType('application/octetstream');
                     $httpResponse->setHeader('Content-Description', 'File Transfer');
                     $httpResponse->setHeader('Content-Disposition', 'attachment; filename="export_subjektu.csv"');
@@ -168,13 +168,13 @@ class Admin_SpisznakPresenter extends BasePresenter
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$spisznak->id);
 
         $form1->addText('nazev', 'Spisový znak:', 50, 80)
                 ->setValue(@$spisznak->nazev)
-                ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Spisový znak musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200)
                 ->setValue(@$spisznak->popis);
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
@@ -211,14 +211,14 @@ class Admin_SpisznakPresenter extends BasePresenter
     }
 
 
-    public function upravitClickedChyba(SubmitButton $button)
+    public function upravitClickedChyba(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->flashMessage('Při ověřování formuláře došlo k chybě.','warning');
         $data = $button->getForm()->getValues();
         $this->redirect('this',array('id'=>$data['id']));
     }
     
-    public function upravitClicked(SubmitButton $button)
+    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -239,13 +239,13 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
     }
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $this->redirect('this',array('id'=>$data['id']));
     }
 
-    public function stornoNovyClicked(SubmitButton $button)
+    public function stornoNovyClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect(':Admin:Spisznak:seznam');
     }
@@ -258,9 +258,9 @@ class Admin_SpisznakPresenter extends BasePresenter
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('nazev', 'Spisový znak:', 50, 80)
-                ->addRule(Form::FILLED, 'Spisový znak musí být vyplněn!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Spisový znak musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta', 'Skartační lhůta:', 5, 5);
@@ -287,7 +287,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         return $form1;
     }
 
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -309,7 +309,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         }
     }
     
-    public function vytvoritanovyClicked(SubmitButton $button)
+    public function vytvoritanovyClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 

@@ -10,7 +10,7 @@ class Admin_SupportPresenter extends BasePresenter
    
     protected function isUserAllowed()
     {
-        return Environment::getUser()->isInRole('admin');
+        return Nette\Environment::getUser()->isInRole('admin');
     }
 
     
@@ -61,7 +61,7 @@ class Admin_SupportPresenter extends BasePresenter
         echo $phpinfo;
 
         // Vypis PHP log soubor
-        $logDir = Environment::getVariable('logDir');
+        $logDir = Nette\Environment::getVariable('logDir');
         $month_ago = time() - (30 * 24 * 60 * 60);
         $filename1 = "{$logDir}/php_error_" . date('Ym', $month_ago) . '.log';
         $filename2 = "{$logDir}/php_error_" . date('Ym') . '.log';

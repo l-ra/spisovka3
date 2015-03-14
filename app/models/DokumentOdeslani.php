@@ -281,7 +281,7 @@ class DokumentOdeslani extends BaseModel
         //$row['datum_odeslani'] = $typ;
         if ( empty($row['zpusob_odeslani_id']) ) $row['zpusob_odeslani_id'] = null;
         if ( empty($row['epodatelna_id']) ) $row['epodatelna_id'] = null;
-        $row['user_id'] = Environment::getUser()->getIdentity()->id;
+        $row['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
         $row['date_created'] = new DateTime();
 
 

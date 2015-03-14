@@ -9,7 +9,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     
     public function renderDefault()
     {
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
 
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -206,11 +206,11 @@ class Spisovka_SestavyPresenter extends BasePresenter
             // P.L. V podacim deniku nemohou byt dokumenty, ktere nemaji c.j.
             $args['where'][] = 'd.cislo_jednaci IS NOT NULL';
             
-            $user_config = Environment::getVariable('user_config');
+            $user_config = Nette\Environment::getVariable('user_config');
             
             if ( isset($user_config->cislo_jednaci->typ_deniku) && $user_config->cislo_jednaci->typ_deniku == "org" ) {        
 
-                    $user = Environment::getUser()->getIdentity();
+                    $user = Nette\Environment::getUser()->getIdentity();
                     $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 
                     if ( empty($orgjednotka_id) ) {
@@ -271,7 +271,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 $this->template->prilis_mnoho = 1;
                 $seznam = array();
                 
-                $reload_url = Environment::getHttpRequest()->getOriginalUri()->getAbsoluteUri();
+                $reload_url = Nette\Environment::getHttpRequest()->getOriginalUri()->getAbsoluteUri();
                 if ( strpos($reload_url,'?') !== false ) {
                     $reload_url .= "&pokracovat=1";
                 } else {
@@ -322,7 +322,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->form = $this['newForm'];
         $this->template->nadpis = 'Nová sestava';
                
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
         $this->setView('form');
     }
@@ -340,7 +340,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->form = $this['upravitForm'];
         $this->template->nadpis = 'Upravit sestavu';
         
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
         $this->setView('form');
     }
@@ -390,7 +390,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $pridelen = array('0'=>'kdokoli','2'=>'přidělen','1'=>'předán');
 
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
 
         $form->addText('sestava_nazev', 'Název sestavy:', 80, 100);
         $form->addTextArea('sestava_popis', 'Popis sestavy:', 80, 3);
@@ -492,7 +492,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         return $form;
     }
 
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -543,7 +543,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             foreach($params as $key => $value)
                 try {
                     $input = $form[$key];
-                    if (is_a($input, 'Checkbox')) ;
+                    if (is_a($input, 'Nette\Forms\Controls\Checkbox')) ;
                         // nedelej nic, framework provadi kontrolu parametru lepe
                         // $value = $value ? true : false;
                     $input->setValue($value);
@@ -615,7 +615,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     }
     
     
-    public function upravitClicked(SubmitButton $button)
+    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $id = $data['id'];
@@ -637,7 +637,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     }
 
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect(':Spisovka:Sestavy:default');
     }

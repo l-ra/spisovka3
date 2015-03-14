@@ -1,6 +1,6 @@
 <?php
 
-class VyberPostovniZasilky extends Control
+class VyberPostovniZasilky extends Nette\Application\UI\Control
 {
     protected $value = array();
     protected $input_name = "druh_zasilky";

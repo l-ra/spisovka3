@@ -910,14 +910,14 @@ class Dokument extends BaseModel
 
 
         if ( isset($params['prideleno_osobne']) && $params['prideleno_osobne'] ) {
-            $user_id = Environment::getUser()->getIdentity()->id;
+            $user_id = Nette\Environment::getUser()->getIdentity()->id;
             if ( !isset($params['prideleno']) ) {
                 $params['prideleno'] = array();
             }
             $params['prideleno'][] = $user_id;
         }
         if ( isset($params['predano_osobne']) && $params['predano_osobne'] ) {
-            $user_id = Environment::getUser()->getIdentity()->id;
+            $user_id = Nette\Environment::getUser()->getIdentity()->id;
             if ( !isset($params['predano']) ) {
                 $params['predano'] = array();
             }
@@ -973,7 +973,7 @@ class Dokument extends BaseModel
     */
     public function fixedFiltr($nazev, $bez_vyrizenych, $pouze_dokumenty_na_osobu) {
 
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         $user_id = $user->getIdentity()->id;
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
         $vyrusit_bezvyrizeni = false;
@@ -1165,7 +1165,7 @@ class Dokument extends BaseModel
 
     public function sestavaOmezeniOrg($args)
     {
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         $user_id = $user->getIdentity()->id;
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
         $vidi_vsechny_dokumenty = self::uzivatelVidiVsechnyDokumenty();
@@ -1630,7 +1630,7 @@ class Dokument extends BaseModel
                 }       
             }
             if ( empty($data['jid']) ) {
-                $unique_info = Environment::getVariable('unique_info');
+                $unique_info = Nette\Environment::getVariable('unique_info');
                 $unique_part = explode('#',$unique_info);
                 $app_id = 'OSS-'. $unique_part[0];
                 $data['jid'] = $app_id.'-ESS-'.$dokument_id;
@@ -1638,9 +1638,9 @@ class Dokument extends BaseModel
             if ( isset($data['skartacni_lhuta']) && empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0 ) $data['skartacni_lhuta'] = null;           
 
             $data['date_created'] = new DateTime();
-            $data['user_created'] = Environment::getUser()->getIdentity()->id;
+            $data['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
 
             $data['stav'] = isset($data['stav'])?$data['stav']:1;
             $data['md5_hash'] = $this->generujHash($data);
@@ -1712,7 +1712,7 @@ class Dokument extends BaseModel
             }
             
             if ( empty($data['jid']) ) {
-                $unique_info = Environment::getVariable('unique_info');
+                $unique_info = Nette\Environment::getVariable('unique_info');
                 $unique_part = explode('#',$unique_info);
                 $app_id = 'OSS-'. $unique_part[0];
                 $data['jid'] = $app_id.'-ESS-'.$dokument_id;
@@ -1752,7 +1752,7 @@ class Dokument extends BaseModel
                     if ( empty($old_dokument['spousteci_udalost_id']) ) $old_dokument['spousteci_udalost_id'] = null;
                     $old_dokument = (array) $old_dokument;
                     $old_dokument['dokument_id'] = $dokument_id;
-                    $old_dokument['user_created'] = Environment::getUser()->getIdentity()->id;
+                    $old_dokument['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
                     $old_dokument['date_created'] = new DateTime();
                     unset($old_dokument['id'],$old_dokument['user_modified'],$old_dokument['date_modified'],$old_dokument['spousteci_udalost']);
                     //Debug::dump($old_dokument);
@@ -1761,7 +1761,7 @@ class Dokument extends BaseModel
                 }
 
                 $update_data['date_modified'] = new DateTime();
-                $update_data['user_modified'] = Environment::getUser()->getIdentity()->id;
+                $update_data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
                 $update_data['md5_hash'] = $md5_hash;
                 unset($update_data['id']);
                 $updateres = $this->update($update_data, array(
@@ -1788,7 +1788,7 @@ class Dokument extends BaseModel
             $dokument_id = $data['id'];
             unset($data['id']);
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
 
             $this->update($data, array(array('id=%i',$dokument_id)) );
 
@@ -1855,7 +1855,7 @@ class Dokument extends BaseModel
     {
 
         $where = array('stav=0',
-            array('user_created=%i',Environment::getUser()->getIdentity()->id)
+            array('user_created=%i',Nette\Environment::getUser()->getIdentity()->id)
         );
 
         $seznam = $this->seznamKlasicky(array('where'=>$where));
@@ -1966,7 +1966,7 @@ class Dokument extends BaseModel
     
     public static function typDokumentu( $kod = null, $select = 0 ) {
 
-        $prefix = Environment::getConfig('database')->prefix;
+        $prefix = Nette\Environment::getConfig('database')->prefix;
         $tb_dokument_typ = $prefix .'dokument_typ';
 
         $result = dibi::query('SELECT * FROM %n', $tb_dokument_typ )->fetchAssoc('id');
@@ -2021,7 +2021,7 @@ class Dokument extends BaseModel
 
     public static function zpusobVyrizeni( $kod = null, $select = 0 ) {
 
-        $prefix = Environment::getConfig('database')->prefix;
+        $prefix = Nette\Environment::getConfig('database')->prefix;
         $tb_zpusob_vyrizeni = $prefix .'zpusob_vyrizeni';
 
         $result = dibi::query('SELECT * FROM %n', $tb_zpusob_vyrizeni )->fetchAssoc('id');
@@ -2060,7 +2060,7 @@ class Dokument extends BaseModel
 
     public static function zpusobDoruceni( $kod = null, $select = 0 ) {
 
-        $prefix = Environment::getConfig('database')->prefix;
+        $prefix = Nette\Environment::getConfig('database')->prefix;
         $tb_zpusob_doruceni = $prefix .'zpusob_doruceni';
 
         $result = dibi::query('SELECT * FROM %n', $tb_zpusob_doruceni )->fetchAssoc('id');
@@ -2100,7 +2100,7 @@ class Dokument extends BaseModel
 
     public static function zpusobOdeslani( $kod = null, $select = 0 ) {
 
-        $prefix = Environment::getConfig('database')->prefix;
+        $prefix = Nette\Environment::getConfig('database')->prefix;
         $tb_zpusob_odeslani = $prefix .'zpusob_odeslani';
 
         $result = dibi::query('SELECT * FROM %n', $tb_zpusob_odeslani )->fetchAssoc('id');
@@ -2133,7 +2133,7 @@ class Dokument extends BaseModel
     {
         // takto to bylo ve starem systemu
         // return ACL::isInRole('admin,podatelna,skartacni_dohled'); 
-        return Environment::getUser()->isAllowed('Dokument', 'cist_vse');
+        return Nette\Environment::getUser()->isAllowed('Dokument', 'cist_vse');
     }
     
 }

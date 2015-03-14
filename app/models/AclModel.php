@@ -9,7 +9,7 @@ class AclModel extends BaseModel {
 
     public function  __construct() {
 
-        $prefix = Environment::getConfig('database')->prefix;
+        $prefix = Nette\Environment::getConfig('database')->prefix;
 
         $this->name = $prefix . $this->name;        
         $this->tb_role = $prefix . $this->tb_role;        
@@ -140,7 +140,7 @@ class AclModel extends BaseModel {
 
             if ( !is_null($role) ) {
 
-                $authz = Environment::getService('Nette\Security\IAuthorizator');
+                $authz = Nette\Environment::getService('Nette\Security\IAuthorizator');
                 $povoleno = $authz->isAllowed($role, $pravidlo->resource_code, $pravidlo->privilege);
                 if ( $povoleno ) {
                     $povoleno = "ano";

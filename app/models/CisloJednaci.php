@@ -18,11 +18,11 @@ class CisloJednaci extends BaseModel
 
     public function  __construct() {
 
-        $prefix = Environment::getConfig('database')->prefix;
+        $prefix = Nette\Environment::getConfig('database')->prefix;
         $this->name = $prefix . $this->name;
         $this->tb_dokument = $prefix . $this->tb_dokument;
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $this->info = $user_config->cislo_jednaci;
         $this->urad = $user_config->urad;
 
@@ -35,11 +35,11 @@ class CisloJednaci extends BaseModel
              }
         }
 
-        $unique_info = Environment::getVariable('unique_info');
+        $unique_info = Nette\Environment::getVariable('unique_info');
         $unique_part = explode('#',$unique_info);
         $this->unique = 'OSS-'. $unique_part[0];
 
-        $this->user_info = Environment::getUser()->getIdentity();
+        $this->user_info = Nette\Environment::getUser()->getIdentity();
 
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 

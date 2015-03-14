@@ -12,7 +12,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     public function startup()
     {
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $this->typ_evidence = 0;
         if ( isset($user_config->cislo_jednaci->typ_evidence) ) {
             $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
@@ -99,11 +99,11 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica',
                                 7, 9, 8, 6, 0, 0);
                 
-                $app_info = Environment::getVariable('app_info');
+                $app_info = Nette\Environment::getVariable('app_info');
                 $app_info = explode("#",$app_info);
                 $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                 $mpdf->SetCreator($app_name);
-                $mpdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+                $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->name);
                 $mpdf->SetTitle('Podací arch');                
                 $mpdf->WriteHTML($content);
                 $mpdf->Output('podaci_arch.pdf', 'I');
@@ -193,7 +193,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $DokumentOdeslani = new DokumentOdeslani();
         $id = $this->getParam('id');
         
-        $post_data = Environment::getHttpRequest()->getPost();
+        $post_data = Nette\Environment::getHttpRequest()->getPost();
         if ( isset($post_data['datum_odeslani']) ) {
             // Ulozit data
             
@@ -249,7 +249,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             'cj_desc'=>'čísla jednacího (sestupně)'
         );
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addSelect('seradit', 'Seřadit podle:', $select)
                 ->setValue($this->seradit)
                 ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
@@ -270,7 +270,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         return $form;
     }
 
-    public function seraditClicked(SubmitButton $button)
+    public function seraditClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $form_data = $button->getForm()->getValues();
         UserSettings::set('vypravna_seradit', $form_data['seradit']);
@@ -281,7 +281,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     {
         $hledat =  !is_null($this->jednoduche_hledani)?$this->jednoduche_hledani:'';
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
         
@@ -300,7 +300,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         return $form;
     }
     
-    public function hledatSimpleClicked(SubmitButton $button)
+    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         UserSettings::set('vypravna_hledat', $data['dotaz']);
@@ -319,7 +319,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     
     public function actionFiltrovat()
     {
-        $post_data = Environment::getHttpRequest()->getPost();
+        $post_data = Nette\Environment::getHttpRequest()->getPost();
         
         // hidden element zajisti, ze detekujeme odeslani formulare, kde neni zadny checkbox zaskrtnuty
         if ( !empty($post_data) ) {

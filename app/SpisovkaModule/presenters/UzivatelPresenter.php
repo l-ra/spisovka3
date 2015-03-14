@@ -5,7 +5,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     public function actionLogin()
     {
 
-        $authenticator = (array) Environment::getConfig('service');
+        $authenticator = (array) Nette\Environment::getConfig('service');
         $authenticator = $authenticator['Nette-Security-IAuthenticator'];
         $Auth = new $authenticator();
         $Auth->setAction('login');
@@ -16,8 +16,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function renderLogout()
     {
-        $user = Environment::getUser()->getIdentity()->username;
-        Environment::getUser()->signOut();
+        $user = Nette\Environment::getUser()->getIdentity()->username;
+        Nette\Environment::getUser()->signOut();
         // Hack - cookie kontroluji nektere alternativni autentikatory pri zobrazovani prihlasovaciho dialogu
         $this->getHttpResponse()->setCookie('s3_logout', $user, strtotime('10 minute'));
         $this->flashMessage('Byl jste úspěšně odhlášen.');
@@ -38,12 +38,12 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     public function actionDefault()
     {
 
-        $authenticator = (array) Environment::getConfig('service');
+        $authenticator = (array) Nette\Environment::getConfig('service');
         $authenticator = $authenticator['Nette-Security-IAuthenticator'];
 
         $Osoba = new Osoba();
 
-        $user = Environment::getUser()->getIdentity();
+        $user = Nette\Environment::getUser()->getIdentity();
         
         $osoba_id = $user->identity->id;
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
@@ -58,7 +58,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
         // Zmena hesla
         $this->template->ZmenaHesla = $this->getParam('zmenitheslo',null);
-        Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$user->id));
+        Nette\Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$user->id));
         $Auth1 = new $authenticator();
         $Auth1->setAction('change_password');
         $this->addComponent($Auth1, 'auth_change_password');
@@ -78,7 +78,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
         $osoba = $this->template->Osoba;
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('osoba_id')
                 ->setValue(@$osoba->id);
         $form1->addText('jmeno', 'Jméno:', 50, 150)
@@ -115,7 +115,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     }
 
 
-    public function upravitClicked(SubmitButton $button)
+    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $data = $button->getForm()->getValues();
@@ -133,7 +133,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->redirect('this');
     }
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $this->redirect('this');

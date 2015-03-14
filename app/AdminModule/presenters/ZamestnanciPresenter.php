@@ -10,7 +10,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         // paginator
         $abcPaginator = new AbcPaginator($this, 'abc');
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
@@ -71,7 +71,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         $this->template->title = " - Detail zaměstnance";
 
-        $authenticator = (array) Environment::getConfig('service');
+        $authenticator = (array) Nette\Environment::getConfig('service');
         $authenticator = $authenticator['Nette-Security-IAuthenticator'];
 
         $Osoba = new Osoba();
@@ -104,7 +104,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         }
         $Auth1 = new $authenticator();
         $Auth1->setAction('change_password');
-        Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$zmena_hesla, 'admin'=>1));
+        Nette\Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$zmena_hesla, 'admin'=>1));
         $this->addComponent($Auth1, 'changePasswordForm');
 
 
@@ -115,7 +115,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         }
         $Auth2 = new $authenticator();
         $Auth2->setAction('new_user');
-        Environment::setVariable('auth_params_new', array('osoba_id'=>$osoba_id));
+        Nette\Environment::setVariable('auth_params_new', array('osoba_id'=>$osoba_id));
         $this->addComponent($Auth2, 'newUserForm');
 
         // Odebrani uctu
@@ -155,7 +155,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     public function actionSync()
     {
 
-        $authenticator = (array) Environment::getConfig('service');
+        $authenticator = (array) Nette\Environment::getConfig('service');
         $authenticator = $authenticator['Nette-Security-IAuthenticator'];
         $Auth = new $authenticator();
         $Auth->setAction('sync');
@@ -173,14 +173,14 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         $osoba = $this->template->Osoba;
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$osoba->id);
         $form1->addText('jmeno', 'Jméno:', 50, 150)
                 ->setValue(@$osoba->jmeno);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
                 ->setValue(@$osoba->prijmeni)
-                ->addRule(Form::FILLED, 'Příjmení musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Příjmení musí být vyplněno!');
         $form1->addText('titul_pred', 'Titul před:', 50, 150)
                 ->setValue(@$osoba->titul_pred);
         $form1->addText('titul_za', 'Titul za:', 50, 150)
@@ -211,7 +211,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     }
 
 
-    public function upravitClicked(SubmitButton $button)
+    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $data = $button->getForm()->getValues();
@@ -231,7 +231,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     }
 
-    public function stornoClicked(SubmitButton $button)
+    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $data = $button->getForm()->getValues();
@@ -239,7 +239,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->redirect('this',array('id'=>$osoba_id));
     }
 
-    public function stornoSeznamClicked(SubmitButton $button)
+    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $this->redirect(':Admin:Zamestnanci:seznam');
     }
@@ -247,10 +247,10 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     protected function createComponentNovyForm()
     {
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addText('jmeno', 'Jméno:', 50, 150);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
-                ->addRule(Form::FILLED, 'Příjmení musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Příjmení musí být vyplněno!');
         $form1->addText('titul_pred', 'Titul před:', 50, 150);
         $form1->addText('titul_za', 'Titul za:', 50, 150);
         $form1->addText('email', 'Email:', 50, 150);
@@ -275,7 +275,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         return $form1;
     }
 
-    public function vytvoritClicked(SubmitButton $button)
+    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $data = $button->getForm()->getValues();
@@ -319,7 +319,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $Role = new RoleModel();
         $role_select = $Role->seznam();
 
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('osoba_id')
                 ->setValue(@$osoba->id);
         $form1->addHidden('user_id')
@@ -361,7 +361,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         return $form1;
     }
 
-    public function upravitRoleClicked(SubmitButton $button)
+    public function upravitRoleClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -426,7 +426,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     }
 
-    public function changePasswordFormHandler(SubmitButton $button)
+    public function changePasswordFormHandler(Nette\Forms\Controls\SubmitButton $button)
     {
 	$form = $button->getParent();
 	$changePasswordForm = $this->getComponent('changePasswordForm');
@@ -437,7 +437,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         $hledat =  !is_null($this->hledat)?$this->hledat:'';
 
-        $form = new AppForm();
+        $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                  ->setValue($hledat);
         $form['dotaz']->getControlPrototype()->title = "Hledat lze dle jména, emailu, telefonu";
@@ -455,7 +455,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         return $form;
     }
 
-    public function hledatSimpleClicked(SubmitButton $button)
+    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
 
@@ -465,7 +465,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     protected function createComponentOJForm()
     {
-        $form1 = new AppForm();
+        $form1 = new Nette\Application\UI\Form();
         
         $m = new Orgjednotka;
         $seznam = $m->linearniSeznam();
@@ -502,7 +502,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         return $form1;
     }
     
-    public function zmenitOJClicked(SubmitButton $button)
+    public function zmenitOJClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $orgjednotka_id = $data['orgjednotka_id'];

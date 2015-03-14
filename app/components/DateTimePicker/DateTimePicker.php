@@ -13,7 +13,7 @@
 
  //require_once(LIBS_DIR.'/Nette/Forms/Controls/TextInput.php');
 
- class DateTimePicker extends /*Nette\Forms\*/TextInput
+ class DateTimePicker extends /*Nette\Forms\*/Nette\Forms\Controls\TextInput
  {
    /**
     * Konstruktor
@@ -72,7 +72,7 @@
     *
     * @access public
     *
-    * @return Html
+    * @return Nette\Utils\Html
     */
    public function getControl()
    {

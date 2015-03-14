@@ -10,7 +10,7 @@ class Admin_SpecialPresenter extends BasePresenter
 
     protected function isUserAllowed()
     {
-        return Environment::getUser()->isInRole('admin');
+        return Nette\Environment::getUser()->isInRole('admin');
     }
 
     protected function error($msg)

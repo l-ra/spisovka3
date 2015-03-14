@@ -29,7 +29,7 @@ class Spis extends TreeModel
     {
         $OrgJednotka = new Orgjednotka();
         
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         $user_id = $user->getIdentity()->id;
         
         if ( !empty($row->orgjednotka_id) ) {
@@ -130,7 +130,7 @@ class Spis extends TreeModel
 
     private function omezeni_org($args)
     {
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         $oj_id = Orgjednotka::dejOrgUzivatele();
 
         if ( $user->isAllowed('Dokument', 'cist_vse') )
@@ -186,9 +186,9 @@ class Spis extends TreeModel
 
         $data['datum_otevreni'] = new DateTime();
         $data['date_created'] = new DateTime();
-        $data['user_created'] = Environment::getUser()->getIdentity()->id;
+        $data['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
         
         $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
 
@@ -227,7 +227,7 @@ class Spis extends TreeModel
     public function upravit($data,$spis_id) {
 
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
 
         if ( empty($data['spousteci_udalost_id']) ) $data['spousteci_udalost_id'] = null;
         if ( empty($data['spisovy_znak_id']) ) $data['spisovy_znak_id'] = null;
@@ -261,7 +261,7 @@ class Spis extends TreeModel
             // Kontrola
             if ( $kontrola = $this->kontrolaDokumentu($spis_id) ) {
                 foreach ($kontrola as $kmess) {
-                    Environment::getApplication()->getPresenter()->flashMessage($kmess,'warning');
+                    Nette\Environment::getApplication()->getPresenter()->flashMessage($kmess,'warning');
                 }                
                 return -1;
             }
@@ -269,7 +269,7 @@ class Spis extends TreeModel
         
         $data = array();
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
         $data['stav'] = $stav;
 
         $Log = new LogModel();
@@ -347,7 +347,7 @@ class Spis extends TreeModel
     public static function spisovyZnak( $spis, $simple = 0 )
     {
 
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         if ( !isset($user_config->spisovy_znak) ) {
             $maska = ".";
             $cifernik = 3;
@@ -457,7 +457,7 @@ class Spis extends TreeModel
         if ( $kontrola = $this->kontrola($spis_info) ) {
             // nejsou kompletni data - neprenasim
             foreach ($kontrola as $kmess) {
-                Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
+                Nette\Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
             }
             return 'Spis '.$spis_info->nazev.' nelze přenést do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
         }
@@ -471,7 +471,7 @@ class Spis extends TreeModel
         if ( $kontrola = $this->kontrolaDokumentu($spis_info) ) {
             // nejsou kompletni - neprenasim
             foreach ($kontrola as $kmess) {
-                Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
+                Nette\Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
             }
             return 'Spis '.$spis_info->nazev.' nelze přenést do spisovny! Jeden nebo více dokumentů spisu nejsou vyřízeny.';
         }
@@ -486,7 +486,7 @@ class Spis extends TreeModel
                 if ( $stav === true ) {
                 } else {
                     if ( is_string($stav) ) {
-                        Environment::getApplication()->getPresenter()->flashMessage($stav,'warning');
+                        Nette\Environment::getApplication()->getPresenter()->flashMessage($stav,'warning');
                     }
                 }                
             }
@@ -527,7 +527,7 @@ class Spis extends TreeModel
         if ( $kontrola = $this->kontrolaDokumentu($spis_info) ) {
             // nejsou kompletni - neprenasim
             foreach ($kontrola as $kmess) {
-                Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
+                Nette\Environment::getApplication()->getPresenter()->flashMessage('Spis '.$spis_info->nazev.' - '.$kmess,'warning');
             }
             return 'Spis '.$spis_info->nazev.' nelze připojit do spisovny! Jeden nebo více dokumentů spisu nejsou vyřízeny.';
         }
@@ -542,7 +542,7 @@ class Spis extends TreeModel
                 if ( $stav === true ) {
                 } else {
                     if ( is_string($stav) ) {
-                        Environment::getApplication()->getPresenter()->flashMessage($stav,'warning');
+                        Nette\Environment::getApplication()->getPresenter()->flashMessage($stav,'warning');
                     }
                 }                
             }
@@ -661,7 +661,7 @@ class Spis extends TreeModel
     // $spis - informace, ktere vratilo getInfo
     public static function zjistiOpravneniUzivatele($spis) {
 
-        $user = Environment::getUser();
+        $user = Nette\Environment::getUser();
         $user_id = $user->getIdentity()->id;  
         $oj_uzivatele = OrgJednotka::dejOrgUzivatele();
         $Lze_cist = $Lze_menit = $Lze_prevzit = false;

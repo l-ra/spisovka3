@@ -25,7 +25,7 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
     {
         $dirs = array();
 
-        foreach (NFinder::findFiles('*.phtml')->from(APP_DIR ."/../help/") as $file) {
+        foreach (Nette\Utils\Finder::findFiles('*.phtml')->from(APP_DIR ."/../help/") as $file) {
 
             $file = str_replace(APP_DIR ."/../help", "", $file);
             if ( strpos($file, "/") !== false ) {
