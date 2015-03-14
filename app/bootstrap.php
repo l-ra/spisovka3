@@ -15,7 +15,7 @@ if (!defined('LIBS_DIR'))
     define('LIBS_DIR', APP_DIR . '/../libs');
 define ('VENDOR_DIR', APP_DIR . '/../vendor');
 
-require LIBS_DIR . '/Nette/loader.php';
+// require LIBS_DIR . '/Nette/loader.php';
 require VENDOR_DIR . '/autoload.php';
 
 try {

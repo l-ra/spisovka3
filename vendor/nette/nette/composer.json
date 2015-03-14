@@ -1,0 +1,58 @@
+{
+	"name": "nette/nette",
+	"type": "library",
+	"description": "Nette Framework - innovative framework for fast and easy development of secured web applications in PHP. Write less, have cleaner code and your work will bring you joy.",
+	"keywords": ["framework", "mvc", "debugging", "templating", "database", "forms", "mailing"],
+	"homepage": "http://nette.org",
+	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
+	"authors": [
+		{
+			"name": "David Grudl",
+			"homepage": "http://davidgrudl.com"
+		},
+		{
+			"name": "Nette Community",
+			"homepage": "http://nette.org/contributors"
+		}
+	],
+	"require": {
+		"php": ">=5.3.1",
+		"ext-iconv": "*",
+		"ext-tokenizer": "*"
+	},
+	"replace": {
+		"nette/application": "self.version",
+		"nette/bootstrap": "self.version",
+		"nette/caching": "self.version",
+		"nette/component-model": "self.version",
+		"nette/database": "self.version",
+		"nette/di": "self.version",
+		"nette/finder": "self.version",
+		"nette/forms": "self.version",
+		"nette/http": "self.version",
+		"nette/mail": "self.version",
+		"nette/neon": "self.version",
+		"nette/php-generator": "self.version",
+		"nette/reflection": "self.version",
+		"nette/robot-loader": "self.version",
+		"nette/safe-stream": "self.version",
+		"nette/security": "self.version",
+		"nette/tokenizer": "self.version",
+		"nette/utils": "self.version",
+		"latte/latte": "self.version",
+		"tracy/tracy": "self.version"
+	},
+	"suggest": {
+		"ext-mbstring": "",
+		"ext-pdo": "",
+		"ext-gd": "",
+		"ext-fileinfo": ""
+	},
+	"require-dev": {
+		"nette/tester": "~1.3"
+	},
+	"autoload": {
+		"classmap": ["Nette/"],
+		"files": ["Nette/common/shortcuts.php"]
+	}
+}

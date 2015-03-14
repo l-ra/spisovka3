@@ -63,5 +63,95 @@
             "postgresql",
             "sqlite"
         ]
+    },
+    {
+        "name": "nette/nette",
+        "version": "v2.1.9",
+        "version_normalized": "2.1.9.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/nette/nette.git",
+            "reference": "1fa4d477c855d38751be15b2e7e4eb352f114220"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/nette/nette/zipball/1fa4d477c855d38751be15b2e7e4eb352f114220",
+            "reference": "1fa4d477c855d38751be15b2e7e4eb352f114220",
+            "shasum": ""
+        },
+        "require": {
+            "ext-iconv": "*",
+            "ext-tokenizer": "*",
+            "php": ">=5.3.1"
+        },
+        "replace": {
+            "latte/latte": "self.version",
+            "nette/application": "self.version",
+            "nette/bootstrap": "self.version",
+            "nette/caching": "self.version",
+            "nette/component-model": "self.version",
+            "nette/database": "self.version",
+            "nette/di": "self.version",
+            "nette/finder": "self.version",
+            "nette/forms": "self.version",
+            "nette/http": "self.version",
+            "nette/mail": "self.version",
+            "nette/neon": "self.version",
+            "nette/php-generator": "self.version",
+            "nette/reflection": "self.version",
+            "nette/robot-loader": "self.version",
+            "nette/safe-stream": "self.version",
+            "nette/security": "self.version",
+            "nette/tokenizer": "self.version",
+            "nette/utils": "self.version",
+            "tracy/tracy": "self.version"
+        },
+        "require-dev": {
+            "nette/tester": "~1.3"
+        },
+        "suggest": {
+            "ext-fileinfo": "",
+            "ext-gd": "",
+            "ext-mbstring": "",
+            "ext-pdo": ""
+        },
+        "time": "2015-01-06 21:16:30",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "Nette/"
+            ],
+            "files": [
+                "Nette/common/shortcuts.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause",
+            "GPL-2.0",
+            "GPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "David Grudl",
+                "homepage": "http://davidgrudl.com"
+            },
+            {
+                "name": "Nette Community",
+                "homepage": "http://nette.org/contributors"
+            }
+        ],
+        "description": "Nette Framework - innovative framework for fast and easy development of secured web applications in PHP. Write less, have cleaner code and your work will bring you joy.",
+        "homepage": "http://nette.org",
+        "keywords": [
+            "Forms",
+            "database",
+            "debugging",
+            "framework",
+            "mailing",
+            "mvc",
+            "templating"
+        ]
     }
 ]
