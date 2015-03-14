@@ -14,7 +14,7 @@ class Storage_Basic extends FileModel {
 
         parent::__construct();
 
-        $storage_conf = Environment::getConfig('storage');
+        $storage_conf = Nette\Environment::getConfig('storage');
         $this->dokument_dir = $storage_conf->dokument_dir;
         $this->epodatelna_dir = $storage_conf->epodatelna_dir;
         
@@ -69,7 +69,7 @@ class Storage_Basic extends FileModel {
         // test existence souboru
         $fileName = $this->fileExists($fileName);
 
-        if (!$upload instanceof HttpUploadedFile) {
+        if (!$upload instanceof Nette\Http\FileUpload) {
             $this->error_message = 'Soubor se nepodařilo nahrát';
             $this->error_code = 0;
             return null;
@@ -310,7 +310,7 @@ class Storage_Basic extends FileModel {
                 } else {
                     // primy stream - poslat ven
 
-                    $httpResponse = Environment::getHttpResponse();
+                    $httpResponse = Nette\Environment::getHttpResponse();
                     if ( !empty($file->mime_type) ) {
                         $httpResponse->setContentType($file->mime_type);
                     } else {
@@ -336,8 +336,8 @@ class Storage_Basic extends FileModel {
                 return 1;
             }
 
-        } catch (InvalidStateException $e) {
-            throw new BadRequestException($e->getMessage());
+        } catch (Nette\InvalidStateException $e) {
+            throw new Nette\Application\BadRequestException($e->getMessage());
             return 2;
         }
     }

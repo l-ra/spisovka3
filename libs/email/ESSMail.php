@@ -1,7 +1,7 @@
 <?php
 
 
-class ESSMail extends Mail {
+class ESSMail extends Nette\Mail\Message {
 
 
     public $signed = 0;
@@ -11,7 +11,7 @@ class ESSMail extends Mail {
         $ret = parent::__construct();
 
         // Nastaveni identifikace maileru
-        $app_info = Environment::getVariable('app_info');
+        $app_info = Nette\Environment::getVariable('app_info');
         if ( !empty($app_info) ) {
             $app_info = explode("#",$app_info);
         } else {
@@ -52,11 +52,11 @@ class ESSMail extends Mail {
                     $this->config = $ep['odeslani'][0];
                     return true;
                 } else {
-                    throw new InvalidStateException('Nebyl zjištěn aktivní účet pro odesílání emailů.');
+                    throw new Nette\InvalidStateException('Nebyl zjištěn aktivní účet pro odesílání emailů.');
                     return false;
                 }
             } else {
-                throw new InvalidStateException('Nebyl zjištěn účet pro odesílání emailů.');
+                throw new Nette\InvalidStateException('Nebyl zjištěn účet pro odesílání emailů.');
                 return false;
             }
         } else {
@@ -65,7 +65,7 @@ class ESSMail extends Mail {
                 $this->config = $config;
                 return true;
             } else {
-                throw new InvalidStateException('Konfigurace pro odesílání emailů není platná.');
+                throw new Nette\InvalidStateException('Konfigurace pro odesílání emailů není platná.');
                 return false;
             }
         }
@@ -80,11 +80,11 @@ class ESSMail extends Mail {
     {
 
         // Urad
-        $user_config = Environment::getVariable('user_config');
+        $user_config = Nette\Environment::getVariable('user_config');
         $urad = $user_config->urad;
 
         // Uzivatel
-        $user_system = Environment::getUser();
+        $user_system = Nette\Environment::getUser();
         if ( $user_system->isAuthenticated() ) {
             $user = $user_system->getIdentity();
         } else {

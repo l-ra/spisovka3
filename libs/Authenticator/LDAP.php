@@ -1,6 +1,6 @@
 <?php
 
-class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
+class Authenticator_LDAP extends Authenticator_Base implements Nette\Security\IAuthenticator
 {
 
     private $server = "localhost";
@@ -38,21 +38,21 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
         if ( isset($row->local) && $row->local == 0 ) {
             
             if ( $row->active == 0 ) {
-                throw new AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
+                throw new Nette\Security\AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
             }            
             
             if ($row->password !== $password_local) {
                 $log->logAccess($row->id, 0);
-                throw new AuthenticationException("Neplatné přihlašovací údaje.", self::INVALID_CREDENTIAL);
+                throw new Nette\Security\AuthenticationException("Neplatné přihlašovací údaje.", self::INVALID_CREDENTIAL);
             } else {
                 $user->zalogovan($row->id);
                 $log->logAccess($row->id, 1);
             }
         } else {
             // LDAP autentizace
-            $ldap_params = Environment::getConfig('authenticator');
+            $ldap_params = Nette\Environment::getConfig('authenticator');
             if ( !isset($ldap_params->ldap) ) {
-                throw new AuthenticationException("Nedostupné nastavení nutné pro přihlášení.", self::FAILURE);
+                throw new Nette\Security\AuthenticationException("Nedostupné nastavení nutné pro přihlášení.", self::FAILURE);
             }
 
             try {
@@ -60,13 +60,13 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
                     if ( $row ) {
                         
                         if ( $row->active == 0 ) {
-                            throw new AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
+                            throw new Nette\Security\AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
                         }                          
                         
                         $user->zalogovan($row->id);
                         $log->logAccess($row->id, 1);
                     } else {
-                        throw new AuthenticationException("Uživatel '$username' není evidován v tomto systému. Kontaktujte svého správce.", self::IDENTITY_NOT_FOUND);
+                        throw new Nette\Security\AuthenticationException("Uživatel '$username' není evidován v tomto systému. Kontaktujte svého správce.", self::IDENTITY_NOT_FOUND);
                         return false;
                     }
                 } else {
@@ -82,10 +82,10 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
                         if ( $row ) {
                             $log->logAccess($row->id, 0);
                         }
-                        throw new AuthenticationException("Neplatné přihlašovací údaje.", self::INVALID_CREDENTIAL);
+                        throw new Nette\Security\AuthenticationException("Neplatné přihlašovací údaje.", self::INVALID_CREDENTIAL);
                     //}
                 }
-            } catch (AuthenticationException $e) {
+            } catch (Nette\Security\AuthenticationException $e) {
                 if ( $e->getCode() == self::FAILURE ) {
                     if ( isset($row->local) && $row->local == 2 ) {
                         if ( $row->password === $password_local ) {
@@ -93,13 +93,13 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
                             $log->logAccess($row->id, 1);
                         } else {
                             $log->logAccess($row->id, 0);
-                            throw new AuthenticationException("Neplatné přihlašovací údaje. (local)", self::INVALID_CREDENTIAL);
+                            throw new Nette\Security\AuthenticationException("Neplatné přihlašovací údaje. (local)", self::INVALID_CREDENTIAL);
                         }
                     } else {
-                        throw new AuthenticationException($e->getMessage(), $e->getCode());
+                        throw new Nette\Security\AuthenticationException($e->getMessage(), $e->getCode());
                     }
                 } else {
-                    throw new AuthenticationException($e->getMessage(), $e->getCode());
+                    throw new Nette\Security\AuthenticationException($e->getMessage(), $e->getCode());
                 }
             }
 
@@ -115,13 +115,13 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
                 $identity_role[] = $role->code;
             }
         } else {
-            throw new AuthenticationException("Uživatel '$username' nemá přiřazenou žádnou roli. Není možné ho připustit k aplikaci. Kontaktujte svého správce.", self::NOT_APPROVED);
+            throw new Nette\Security\AuthenticationException("Uživatel '$username' nemá přiřazenou žádnou roli. Není možné ho připustit k aplikaci. Kontaktujte svého správce.", self::NOT_APPROVED);
         }
 
         $row->klient = KLIENT;
 
         // tady nacitam taky roli
-        return new Identity($row->display_name, $identity_role, $row);
+        return new Nette\Security\Identity($row->display_name, $identity_role, $row);
     }
 
     /*
@@ -153,16 +153,16 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
                     $this->ldap_conn = $lconn;
                     return $lconn;
                 } else {
-                    throw new AuthenticationException("Chyba LDAP: ". ldap_error($lconn), self::INVALID_CREDENTIAL);
+                    throw new Nette\Security\AuthenticationException("Chyba LDAP: ". ldap_error($lconn), self::INVALID_CREDENTIAL);
                     return false;
                 }
             } else {
-                throw new AuthenticationException("Chyba LDAP: ". ldap_error($lconn), self::FAILURE);
+                throw new Nette\Security\AuthenticationException("Chyba LDAP: ". ldap_error($lconn), self::FAILURE);
                 return false;
             }
 
         } else {
-            throw new AuthenticationException("Nedostupná LDAP komponenta.", self::FAILURE);
+            throw new Nette\Security\AuthenticationException("Nedostupná LDAP komponenta.", self::FAILURE);
             return false;
         }
 
@@ -205,21 +205,21 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
                     if ( $error_no == 49 ) {
                         return false;
                     } else if ( $error_no == -1 ) {
-                        throw new AuthenticationException("Nelze se připojit k LDAP serveru.", self::FAILURE);
+                        throw new Nette\Security\AuthenticationException("Nelze se připojit k LDAP serveru.", self::FAILURE);
                         return false;
                     } else {
                         // -1 - no connect to server
-                        throw new AuthenticationException("Chyba LDAP: ". ldap_errno($lconn) ." - ". ldap_error($lconn), self::INVALID_CREDENTIAL);
+                        throw new Nette\Security\AuthenticationException("Chyba LDAP: ". ldap_errno($lconn) ." - ". ldap_error($lconn), self::INVALID_CREDENTIAL);
                         return false;
                     }
                 }
             } else {
-                throw new AuthenticationException("Chyba LDAP: ". ldap_error($lconn), self::FAILURE);
+                throw new Nette\Security\AuthenticationException("Chyba LDAP: ". ldap_error($lconn), self::FAILURE);
                 return false;
             }
 
         } else {
-            throw new AuthenticationException("Nedostupná LDAP komponenta.", self::FAILURE);
+            throw new Nette\Security\AuthenticationException("Nedostupná LDAP komponenta.", self::FAILURE);
             return false;
         }
 
@@ -295,9 +295,9 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
         return $user;*/
         
         // LDAP autentizace
-        $ldap_params = Environment::getConfig('authenticator');
+        $ldap_params = Nette\Environment::getConfig('authenticator');
         if ( !isset($ldap_params->ldap) ) {
-            throw new AuthenticationException("Nedostupné nastavení nutné pro přihlášení.", self::FAILURE);
+            throw new Nette\Security\AuthenticationException("Nedostupné nastavení nutné pro přihlášení.", self::FAILURE);
         }
 
         try {
@@ -420,12 +420,12 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
             $this->receivedSignal = 'submit';
 	}
 
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
         $form->addText('username', 'Uživatelské jméno:')
-            ->addRule(Form::FILLED, 'Zadejte uživatelské jméno, nebo e-mail.');
+            ->addRule(Nette\Forms\Form::FILLED, 'Zadejte uživatelské jméno, nebo e-mail.');
 
         $form->addPassword('password', 'Heslo:')
-            ->addRule(Form::FILLED, 'Zadejte přihlašovací heslo.');
+            ->addRule(Nette\Forms\Form::FILLED, 'Zadejte přihlašovací heslo.');
 
         $form->addSubmit('login', 'Přihlásit');
         $form->onSubmit[] = array($this, 'formSubmitHandler');
@@ -441,15 +441,15 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
             $this->receivedSignal = 'submit';
 	}
 
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
 
-        $params = Environment::getVariable('auth_params_change');
+        $params = Nette\Environment::getVariable('auth_params_change');
         if ( isset($params['admin']) ) {
             $form->addHidden('osoba_id')->setValue($params['osoba_id']);
             $form->addHidden('user_id')->setValue($params['user_id']);
             $user_id = $params['user_id'];
         } else {
-            $user_id = Environment::getUser()->getIdentity()->id;
+            $user_id = Nette\Environment::getUser()->getIdentity()->id;
         }
 
         $user_info = UserModel::getUser($user_id);
@@ -466,8 +466,8 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
                 //->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
         $form->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
                 //->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addConditionOn($form["heslo"], Form::FILLED)
-                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
+                ->addConditionOn($form["heslo"], Nette\Forms\Form::FILLED)
+                    ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
 
         $form->addSubmit('change_password', 'Změnit heslo');
         $form->addSubmit('storno', 'Zrušit')
@@ -495,9 +495,9 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
             $this->receivedSignal = 'submit';
 	}
 
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
 
-        $params = Environment::getVariable('auth_params_new');
+        $params = Nette\Environment::getVariable('auth_params_new');
         $form->addHidden('osoba_id')->setValue($params['osoba_id']);
 
         $form->addSelect('local', "Způsob přihlášení:",
@@ -529,8 +529,8 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
                 //->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
         $form->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
                 //->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addConditionOn($form["heslo"], Form::FILLED)
-                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
+                ->addConditionOn($form["heslo"], Nette\Forms\Form::FILLED)
+                    ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
 
         $this->formAddRoleSelect($form);
         $this->formAddOrgSelect($form);
@@ -557,7 +557,7 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
 
         $seznam = $this->getAllUser();
         
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
         if ( is_array($seznam) ) {
 
             $Role = new RoleModel();
@@ -635,7 +635,7 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
         
         $seznam = $this->getAllUser();
         
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
         if ( is_array($seznam) ) {
 
             $Role = new RoleModel();
@@ -703,7 +703,7 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
         
     }
 
-    public function formSubmitHandler(AppForm $form)
+    public function formSubmitHandler(Nette\Application\UI\Form $form)
     {
         $this->receivedSignal = 'submit';
 
@@ -728,7 +728,7 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
                     $this->presenter->redirect('this');
                 }
             } else {
-                throw new InvalidStateException("Unknown submit button.");
+                throw new Nette\InvalidStateException("Unknown submit button.");
             }
 	}
 	if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
@@ -739,7 +739,7 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
         $zmeneno = 0;
         $User = new UserModel();
 
-        $params = Environment::getVariable('auth_params_change');
+        $params = Nette\Environment::getVariable('auth_params_change');
 
         if ( isset($data['osoba_id']) ) {
             $params['osoba_id'] = $data['osoba_id'];
@@ -796,7 +796,7 @@ class Authenticator_LDAP extends Authenticator_Base implements IAuthenticator
     protected function mySelect($name,$data,$default=null)
     {
         
-        $el = Html::el('select')->name($name);
+        $el = Nette\Utils\Html::el('select')->name($name);
         foreach ( $data as $index => $value ) {
             $el->create('option')
                 ->value($index)

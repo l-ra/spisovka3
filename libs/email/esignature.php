@@ -503,7 +503,7 @@ class esignature {
             @unlink($tmp_signed);
             return $signedo;
         } else {
-            throw new InvalidStateException('Email se nepodaril podepsat. SSL: '. openssl_error_string());
+            throw new Nette\InvalidStateException('Email se nepodaril podepsat. SSL: '. openssl_error_string());
             return null;
         }
     }

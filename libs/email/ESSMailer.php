@@ -3,7 +3,7 @@
 /**
  * Sends e-mails via the PHP internal mail() function.
  */ 
-class ESSMailer extends Object implements IMailer
+class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
 {
     /* 0 - normalni odeslani
      * 1 - odeslani do souboru - zadne odeslani emailu
@@ -13,10 +13,10 @@ class ESSMailer extends Object implements IMailer
     
     /**
      * Sends e-mail.
-     * @param  Mail
+     * @param  Nette\Mail\Message
      * @return void
      */
-    public function send(Mail $mail)
+    public function send(Nette\Mail\Message $mail)
     {
     	$tmp = clone $mail;
 
@@ -32,7 +32,7 @@ class ESSMailer extends Object implements IMailer
 
         if ( $tmp->signed != 1 || $tmp->config['typ_odeslani'] != 1 ) {
             $mail_source = $tmp->generateMessage();            
-            $parts = explode(Mail::EOL . Mail::EOL, $mail_source, 2);
+            $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
             $header = $parts[0];
             $mess = $parts[1];
         }
@@ -49,8 +49,8 @@ class ESSMailer extends Object implements IMailer
                 throw new Exception('Email nelze podepsat. Neplatný certifikát!');
                 
             $mail_source = $tmp->generateMessage();
-            $in_parts = explode(Mail::EOL . Mail::EOL, $mail_source, 2);
-            $header_parts = explode(Mail::EOL,$in_parts[0]);
+            $in_parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
+            $header_parts = explode(Nette\Mail\Message::EOL,$in_parts[0]);
             foreach( $header_parts as $iheader => $header ) {
                 if ( strpos($header,'X-Mailer') !== false ) { unset( $header_parts[$iheader] ); }
                 if ( strpos($header,'Date') !== false ) { unset( $header_parts[$iheader] ); }
@@ -58,8 +58,8 @@ class ESSMailer extends Object implements IMailer
                 if ( strpos($header,'From') !== false ) { unset( $header_parts[$iheader] ); }
                 if ( strpos($header,'Content-type') !== false ) { unset( $header_parts[$iheader] ); }
             }
-            $in_parts[0] = implode(Mail::EOL,$header_parts);
-            $mess = implode(Mail::EOL . Mail::EOL, $in_parts);
+            $in_parts[0] = implode(Nette\Mail\Message::EOL,$header_parts);
+            $mess = implode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $in_parts);
 
             $headers = $tmp->headers;
             $headers['From'] = $tmp->getEncodedHeader('From');
@@ -83,7 +83,7 @@ class ESSMailer extends Object implements IMailer
             unset($headers['Content-Transfer-Encoding']);
             $header = "";
             foreach ($headers as $key => $value) {
-                $header .= $key .": ". $value . Mail::EOL;
+                $header .= $key .": ". $value . Nette\Mail\Message::EOL;
             }
             $mess = $mess_part[1];
         }
@@ -118,10 +118,10 @@ class ESSMailer extends Object implements IMailer
          
         Tools::tryError();
         if ($linux) {
-            $to = str_replace(Mail::EOL, "\n", $to);
-            $subject = str_replace(Mail::EOL, "\n", $subject);
-            $mess = str_replace(Mail::EOL, "\n", $mess);
-            $header = str_replace(Mail::EOL, "\n", $header);
+            $to = str_replace(Nette\Mail\Message::EOL, "\n", $to);
+            $subject = str_replace(Nette\Mail\Message::EOL, "\n", $subject);
+            $mess = str_replace(Nette\Mail\Message::EOL, "\n", $mess);
+            $header = str_replace(Nette\Mail\Message::EOL, "\n", $header);
         }
         $res = mail($to, $subject, $mess, $header);
 

@@ -1546,7 +1546,7 @@ class ISDS {
     */
     public function userAgent() {
 
-        $app_info = Environment::getVariable('app_info');
+        $app_info = Nette\Environment::getVariable('app_info');
         if ( !empty($app_info) ) {
             $app_info = explode("#",$app_info);
             $user_agent = "OSS Spisova sluzba v". $app_info[0];
@@ -1839,7 +1839,7 @@ class ISDSSoapClient extends SoapClient
 
     public function userAgent() {
 
-        $app_info = Environment::getVariable('app_info');
+        $app_info = Nette\Environment::getVariable('app_info');
         if ( !empty($app_info) ) {
             $app_info = explode("#",$app_info);
             $user_agent = "OSS Spisova sluzba v". $app_info[0];

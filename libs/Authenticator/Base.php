@@ -1,12 +1,12 @@
 <?php
 
-class Authenticator_Base extends Control
+class Authenticator_Base extends Nette\Application\UI\Control
 {
 
     protected function handleLogin($data)
     {
         try {
-            $user = Environment::getUser();
+            $user = Nette\Environment::getUser();
             $user->setNamespace(KLIENT);
             $user->authenticate($data['username'], $data['password']);
 
@@ -17,19 +17,19 @@ class Authenticator_Base extends Control
                 $this->presenter->redirect('this');
 				// $this->presenter->redirect(':Spisovka:Default:default');
         }
-		catch (AuthenticationException $e) {
+		catch (Nette\Security\AuthenticationException $e) {
             $this->presenter->flashMessage($e->getMessage(), 'warning');
 			sleep(2); // sniz riziko brute force utoku
         }
     }
 
-    protected function formAddRoleSelect(AppForm $form)
+    protected function formAddRoleSelect(Nette\Application\UI\Form $form)
     {
         $Role = new RoleModel();
         $form->addSelect('role', 'Role:', $Role->seznam());    
     }
 
-    protected function formAddOrgSelect(AppForm $form)
+    protected function formAddOrgSelect(Nette\Application\UI\Form $form)
     {
         $m = new Orgjednotka;
         $seznam = $m->linearniSeznam();
@@ -103,7 +103,7 @@ class Authenticator_Base extends Control
     // pouze SSO a LDAP
     protected function handleSyncManual()
     {
-        $data = Environment::getHttpRequest()->getPost();
+        $data = Nette\Environment::getHttpRequest()->getPost();
         
         if ( isset($data['usersynch_pripojit']) && count($data['usersynch_pripojit'])>0 ) {
             $Osoba = new Osoba();
@@ -146,9 +146,9 @@ class Authenticator_Base extends Control
             $this->presenter->flashMessage('Nebyli přidáni žádní zaměstnanci.');
         }
 
-        if ( Environment::getHttpRequest()->getMethod() == "POST" ) {
+        if ( Nette\Environment::getHttpRequest()->getMethod() == "POST" ) {
             //$this->presenter->redirect('this');
-            header("Location: ". Environment::getHttpRequest()->getUri()->getAbsoluteUri() ,"303");
+            header("Location: ". Nette\Environment::getHttpRequest()->getUri()->getAbsoluteUri() ,"303");
         }
     }
     

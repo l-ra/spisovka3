@@ -66,7 +66,7 @@ class ISDS_Spisovka extends ISDS {
                 $rcISDSBox = $this->ISDSBox($isds_portaltype, 1,"","",$config['certifikat'],$config['cert_pass']);
             } else {
                 // certifikat nenalezen
-                throw new FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
+                throw new Nette\FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
             }
         } else if ( $config['typ_pripojeni'] == 2 ) {
             // certifikatem + jmenem a heslem
@@ -74,7 +74,7 @@ class ISDS_Spisovka extends ISDS {
                 $rcISDSBox = $this->ISDSBox($isds_portaltype, 2,$config['login'],$config['password'],$config['certifikat'],$config['cert_pass']);
             } else {
                 // certifikat nenalezen
-                throw new FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
+                throw new Nette\FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
             }
         } else
             throw new Exception("Chyba nastavení ISDS! - Nespecifikovaná chyba.");

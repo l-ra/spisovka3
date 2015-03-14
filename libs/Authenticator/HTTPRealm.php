@@ -1,6 +1,6 @@
 <?php
 
-class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticator
+class Authenticator_HTTPRealm extends Authenticator_Base implements Nette\Security\IAuthenticator
 {
 
     protected $receivedSignal;
@@ -26,17 +26,17 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
 
         // Overeni uzivatele
         if (!$row) {
-            throw new AuthenticationException("Uživatel '$username' nenalezen.", self::IDENTITY_NOT_FOUND);
+            throw new Nette\Security\AuthenticationException("Uživatel '$username' nenalezen.", self::IDENTITY_NOT_FOUND);
         }
         
         if ( $row->active == 0 ) {
-            throw new AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
+            throw new Nette\Security\AuthenticationException("Uživatel '$username' byl deaktivován.", self::NOT_APPROVED);
         }        
 
         // Overeni hesla
         if ($row->password !== $password) {
             $log->logAccess($row->id, 0);
-            throw new AuthenticationException("Neplatné heslo.", self::INVALID_CREDENTIAL);
+            throw new Nette\Security\AuthenticationException("Neplatné heslo.", self::INVALID_CREDENTIAL);
         } else {
             $user->zalogovan($row->id);
             $log->logAccess($row->id, 1);
@@ -52,13 +52,13 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
                 $identity_role[] = $role->code;
             }
         } else {
-            throw new AuthenticationException("Uživatel '$username' nemá přiřazenou žádnou roli. Není možné ho připustit k aplikaci. Kontaktujte svého správce.", self::NOT_APPROVED);
+            throw new Nette\Security\AuthenticationException("Uživatel '$username' nemá přiřazenou žádnou roli. Není možné ho připustit k aplikaci. Kontaktujte svého správce.", self::NOT_APPROVED);
         }
         
         $row->klient = KLIENT;
 
         // tady nacitam taky roli
-        return new Identity($row->display_name, $identity_role, $row);
+        return new Nette\Security\Identity($row->display_name, $identity_role, $row);
     }
 
     
@@ -77,28 +77,28 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
 
         if ( $this->action == "login" ) {
             
-            if ( Environment::getHttpRequest()->getCookie('s3_logout') ) {
+            if ( Nette\Environment::getHttpRequest()->getCookie('s3_logout') ) {
                 unset($_SERVER['PHP_AUTH_USER']);
-                Environment::getHttpResponse()->setCookie('s3_logout', null, time());
+                Nette\Environment::getHttpResponse()->setCookie('s3_logout', null, time());
             }
             
             if (!isset($_SERVER['PHP_AUTH_USER'])) {
                 header('HTTP/1.0 401 Unauthorized');
                 header('WWW-Authenticate: Basic realm="Prihlaseni do spisove sluzby"');
-                Environment::getUser()->signOut();
+                Nette\Environment::getUser()->signOut();
                 echo '<div style="color: red;">Pro přihlášení se potřeba se přihlásit.</div>';
                 exit;
             } else {
                 
                 try {
-                    $user = Environment::getUser();
+                    $user = Nette\Environment::getUser();
                     $user->setNamespace(KLIENT);
                     $user->authenticate($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
-                    header("Location: ". Environment::getVariable('klientUri',Environment::getVariable('baseUri')) ,302 );
-                } catch ( AuthenticationException $e ) {
+                    header("Location: ". Nette\Environment::getVariable('klientUri',Nette\Environment::getVariable('baseUri')) ,302 );
+                } catch ( Nette\Security\AuthenticationException $e ) {
                     header('HTTP/1.0 401 Unauthorized');
                     header('WWW-Authenticate: Basic realm="Prihlaseni do spisove sluzby"');
-                    Environment::getUser()->signOut();
+                    Nette\Environment::getUser()->signOut();
                     echo '<div style="color: red;">Pro přihlášení se potřeba se přihlásit.</div>';
                     exit;
                 }
@@ -141,12 +141,12 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
             $this->receivedSignal = 'submit';
 	}
 
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
         $form->addText('username', 'Uživatelské jméno:')
-            ->addRule(Form::FILLED, 'Zadejte uživatelské jméno, nebo e-mail.');
+            ->addRule(Nette\Forms\Form::FILLED, 'Zadejte uživatelské jméno, nebo e-mail.');
 
         $form->addPassword('password', 'Heslo:')
-            ->addRule(Form::FILLED, 'Zadejte přihlašovací heslo.');
+            ->addRule(Nette\Forms\Form::FILLED, 'Zadejte přihlašovací heslo.');
 
         $form->addSubmit('login', 'Přihlásit');
         $form->onSubmit[] = array($this, 'formSubmitHandler');
@@ -162,20 +162,20 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
             $this->receivedSignal = 'submit';
 	}
 
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
 
-        $params = Environment::getVariable('auth_params_change');
+        $params = Nette\Environment::getVariable('auth_params_change');
         if ( isset($params['admin']) ) {
             $form->addHidden('osoba_id')->setValue($params['osoba_id']);
             $form->addHidden('user_id')->setValue($params['user_id']);
         }
 
         $form->addPassword('heslo', 'Heslo:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
         $form->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addConditionOn($form["heslo"], Form::FILLED)
-                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
+                ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+                ->addConditionOn($form["heslo"], Nette\Forms\Form::FILLED)
+                    ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
 
         $form->addSubmit('change_password', 'Změnit heslo');
         $form->addSubmit('storno', 'Zrušit')
@@ -199,19 +199,19 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
             $this->receivedSignal = 'submit';
 	}
 
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
 
-        $params = Environment::getVariable('auth_params_new');
+        $params = Nette\Environment::getVariable('auth_params_new');
         $form->addHidden('osoba_id')->setValue($params['osoba_id']);
 
         $form->addText('username', 'Uživatelské jméno:', 30, 150)
-                ->addRule(Form::FILLED, 'Uživatelské jméno musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Uživatelské jméno musí být vyplněno!');
         $form->addPassword('heslo', 'Heslo:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
+                ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.');
         $form->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
-                ->addRule(Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addConditionOn($form["heslo"], Form::FILLED)
-                    ->addRule(Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
+                ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+                ->addConditionOn($form["heslo"], Nette\Forms\Form::FILLED)
+                    ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !", $form["heslo"]);
 
         $this->formAddRoleSelect($form);
         $this->formAddOrgSelect($form);
@@ -237,7 +237,7 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
             $this->receivedSignal = 'submit';
 	}
 
-        $form = new AppForm($this, $name);
+        $form = new Nette\Application\UI\Form($this, $name);
 
         echo '<div class="prazdno">';
         echo 'Tento autentizátor nepodporuje synchronizaci!';
@@ -248,7 +248,7 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
     }
 
 
-    public function formSubmitHandler(AppForm $form)
+    public function formSubmitHandler(Nette\Application\UI\Form $form)
     {
         $this->receivedSignal = 'submit';
 
@@ -273,7 +273,7 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
                     $this->presenter->redirect('this');
                 }
             } else {
-                throw new InvalidStateException("Unknown submit button.");
+                throw new Nette\InvalidStateException("Unknown submit button.");
             }
 	}
 	if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
@@ -284,7 +284,7 @@ class Authenticator_HTTPRealm extends Authenticator_Base implements IAuthenticat
         $zmeneno = 0;
         $User = new UserModel();
 
-        $params = Environment::getVariable('auth_params_change');
+        $params = Nette\Environment::getVariable('auth_params_change');
 
         if ( isset($data['osoba_id']) ) {
             $params['osoba_id'] = $data['osoba_id'];
