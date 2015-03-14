@@ -10,11 +10,13 @@ if (file_exists(APP_DIR ."/configs/servicemode")) {
     exit;
 }
 
-// Step 1: Load Nette Framework
+// Step 1: Configure automatic loading
 if (!defined('LIBS_DIR'))
     define('LIBS_DIR', APP_DIR . '/../libs');
+define ('VENDOR_DIR', APP_DIR . '/../vendor');
 
 require LIBS_DIR . '/Nette/loader.php';
+require VENDOR_DIR . '/autoload.php';
 
 try {
 
