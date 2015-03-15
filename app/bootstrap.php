@@ -19,13 +19,13 @@ if (!defined('LIBS_DIR'))
     define('LIBS_DIR', APP_DIR . '/../libs');
 define ('VENDOR_DIR', APP_DIR . '/../vendor');
 
+// prikaz nastavi loading pouze pro balicky instalovane Composerem
 require VENDOR_DIR . '/autoload.php';
 
 define('TEMP_DIR', CLIENT_DIR . '/temp');
 
 // check if directory /app/temp is writable
-// Nette\Environment::setVariable('tempDir',CLIENT_DIR .'/temp');
-if (@file_put_contents(TEMP_DIR.'/_check', '') === FALSE) {
+if (@file_put_contents(TEMP_DIR . '/_check', '') === FALSE) {
 	throw new Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
 }
 
@@ -33,7 +33,7 @@ if (@file_put_contents(TEMP_DIR.'/_check', '') === FALSE) {
 $loader = new Nette\Loaders\RobotLoader();
 $loader->addDirectory(APP_DIR);
 $loader->addDirectory(LIBS_DIR);
-$loader->setCacheStorage(new Nette\Caching\Storages\FileStorage(TEMP_DIR));
+$loader->setCacheStorage(new Nette\Caching\Storages\FileStorage(TEMP_DIR . '/cache'));
 // mPDF nelze nacitat pres RobotLoader, protoze PHP by dosla pamet
 //$loader->addClass('mPDF', LIBS_DIR . '/mpdf/mpdf.php');
 $loader->register();
@@ -60,7 +60,7 @@ if ( DEBUG_ENABLE ) {
 
 createIniFiles();
 
-Nette\Environment::loadConfig(CLIENT_DIR .'/configs/system.neon');
+Nette\Environment::loadConfig(CLIENT_DIR . '/configs/system.neon');
 
 // dynamicky uprav protokol v nastaveni PUBLIC_URL
 $publicUrl = $public_url;
@@ -73,18 +73,16 @@ unset($publicUrl);
 // konfigurace spisovky
 
 // Promennou logDir pouziva nyni jen SupportPresenter
-// Nette\Environment::setVariable('logDir', APP_DIR .'/../log');
+Nette\Environment::setVariable('logDir', APP_DIR . '/../log');
 
 $loader = new Nette\DI\Config\Loader();
-$user_config = Nette\ArrayHash::from($loader->load(CLIENT_DIR .'/configs/klient.ini'));
-// var_dump($user_config);
-// var_dump($user_config->nastaveni->pocet_polozek);
+$user_config = Nette\ArrayHash::from($loader->load(CLIENT_DIR . '/configs/klient.ini'));
 Nette\Environment::setVariable('user_config', $user_config);
+unset($loader);
 
-// app info
+// version information
 $app_info = @file_get_contents(APP_DIR .'/configs/version');
-// trim the EOL character
-$app_info = trim($app_info);
+$app_info = trim($app_info); // trim the EOL character
 Nette\Environment::setVariable('app_info', $app_info);
 unset($app_info);
 
@@ -183,7 +181,7 @@ $router = $application->getRouter();
 // Detekce je nespolehliva, bez mod_env nefunguje
 // Proto je zde moznost specifikovat nastaveni primo v system.ini
 
-$clean_url = Nette\Environment::getConfig('clean_url');
+$clean_url = Nette\Environment::getVariable('clean_url', null);
 
 if ($clean_url === null)
     if ( isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On' )

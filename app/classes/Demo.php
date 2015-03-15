@@ -8,10 +8,7 @@ class Demo {
     
         if (self::$is_demo === null) {
         
-            self::$is_demo = false;
-            $config = Nette\Environment::getConfig('demo');
-            if ($config !== null && $config->demo == 1) 
-                self::$is_demo = true;
+            self::$is_demo = (bool) Nette\Environment::getVariable('demo', false);
         }
         
         return self::$is_demo;
