@@ -1,21 +1,22 @@
+php:
+    date.timezone = "Europe/Prague"
+
 parameters:
 
-# date.timezone = "Europe/Prague"
-
-    demo.demo = true
+    demo = true
     # clean_url = true
 
     database:
         driver   = mysqli
         host     = localhost
-        username = pavel
-        password = sdfdsf234
-        database = pavel_s33_vyvoj
+        username = 
+        password = 
+        database = 
         charset  = utf8
         prefix   = 
         profiler = true
         cache    = true
-        sqlmode  = STRICT_TRANS_TABLES
+        sqlmode  = 
 
     service:
         Nette-Security-IAuthenticator = Auth_Component_Basic
