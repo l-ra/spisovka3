@@ -198,7 +198,7 @@ class UserModel extends BaseModel
             $row['local'] = $local;
         }
 
-        //Debug::dump($row); exit;
+        //Nette\Diagnostics\Debugger::dump($row); exit;
 
         return $this->update($row,array('id=%i',$user_id));
 

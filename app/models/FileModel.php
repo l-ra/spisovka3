@@ -23,7 +23,7 @@ class FileModel extends BaseModel
             // Ignoruj mime-type ulozeny v databazi (nastaveny pri nahrani prilohy) a zjisti jej pokazde znovu
             $row->mime_type = FileModel::mimeType($row->real_path);
             // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
-            $mime_type_webalize = String::webalize($row->mime_type);
+            $mime_type_webalize = Nette\Utils\Strings::webalize($row->mime_type);
             $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
             if ( @file_exists($mime_type_icon) ) {
                 $row->mime_type_icon = Nette\Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";
@@ -53,7 +53,7 @@ class FileModel extends BaseModel
             // Nahrazeni online mime-type
             $file->mime_type = FileModel::mimeType($file->real_path);
             // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
-            $mime_type_webalize = String::webalize($file->mime_type);
+            $mime_type_webalize = Nette\Utils\Strings::webalize($file->mime_type);
             $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
             if ( @file_exists($mime_type_icon) ) {
                 $file->mime_type_icon = Nette\Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";
@@ -112,7 +112,7 @@ class FileModel extends BaseModel
         // ulozeni
         $row['stav'] = 1;
 
-        //Debug::dump($row); exit;
+        //Nette\Diagnostics\Debugger::dump($row); exit;
 
         $file_id = $this->insert($row);
 

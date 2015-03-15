@@ -140,7 +140,7 @@ class AclModel extends BaseModel {
 
             if ( !is_null($role) ) {
 
-                $authz = Nette\Environment::getService('Nette\Security\IAuthorizator');
+                $authz = Nette\Environment::getService('authorizator');
                 $povoleno = $authz->isAllowed($role, $pravidlo->resource_code, $pravidlo->privilege);
                 if ( $povoleno ) {
                     $povoleno = "ano";

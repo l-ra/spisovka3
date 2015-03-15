@@ -4,22 +4,22 @@
         <h1>Spisová služba<span id="top_urad">{if $module == "Install"}Instalace{else}{$Urad->nazev}{/if}</span></h1>
         <div id="top_jmeno">&nbsp;</div>
     {else}
-        <h1><a href="{vlink :$module:Default:}">{$module_name}</a> <span id="top_urad">{$Urad->nazev}</span></h1>
+        <h1><a href="{link :$module:Default:}">{$module_name}</a> <span id="top_urad">{$Urad->nazev}</span></h1>
         <div id="top_menu">
-            {access :Spisovka:Default:}<a href="{vlink :Spisovka:Default:}">Spisová služba</a>&nbsp;&nbsp;{/access}
-            {access :Epodatelna:Default:}<a href="{vlink :Epodatelna:Default:}">E-podatelna</a>&nbsp;&nbsp;{/access}
+            {access :Spisovka:Default:}<a href="{link :Spisovka:Default:}">Spisová služba</a>&nbsp;&nbsp;{/access}
+            {access :Epodatelna:Default:}<a href="{link :Epodatelna:Default:}">E-podatelna</a>&nbsp;&nbsp;{/access}
             {if $userobj->isAllowed('Spisovna', 'cist_dokumenty') || $userobj->isAllowed('Spisovna_ZapujckyPresenter')}
-            <a href="{vlink :Spisovna:Default:}">Spisovna</a>&nbsp;&nbsp;{/if}
-            {access :Admin:Default:}<a href="{vlink :Admin:Default:}">Administrace</a>&nbsp;&nbsp;{/access}
-{*            {access :Spisovka:Zpravy:}<a href="{vlink :Spisovka:Zpravy:default}">Zprávy</a>&nbsp;&nbsp;{/access} *}
+            <a href="{link :Spisovna:Default:}">Spisovna</a>&nbsp;&nbsp;{/if}
+            {access :Admin:Default:}<a href="{link :Admin:Default:}">Administrace</a>&nbsp;&nbsp;{/access}
+{*            {access :Spisovka:Zpravy:}<a href="{link :Spisovka:Zpravy:default}">Zprávy</a>&nbsp;&nbsp;{/access} *}
             <a href="{$baseUrl}{$helpUri}">Nápověda</a>&nbsp;&nbsp;
-            <a href="{vlink :Spisovka:Uzivatel:logout}">Odhlásit</a>
+            <a href="{link :Spisovka:Uzivatel:logout}">Odhlásit</a>
         </div>
         <div id="top_jmeno">
             <span title="Role uživatele:
 {foreach $user->user_roles as $role}{$role->name}
 {/foreach}">
-            <a href="{vlink :Spisovka:Uzivatel:}"><strong>{$user->name}</strong></a><br />
+            <a href="{link :Spisovka:Uzivatel:}"><strong>{$user->display_name}</strong></a><br />
             {if $user->org_nazev != ''}
             {$user->org_nazev}<br />
             {/if}

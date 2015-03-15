@@ -226,7 +226,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $this->redirect('this',array('id'=>$osoba_id));
         } catch (DibiException $e) {
             $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  se nepodařilo upravit.','warning');
-            Debug::dump($e);
+            Nette\Diagnostics\Debugger::dump($e);
         }
 
     }
@@ -376,8 +376,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         $user_role = UserModel::getRoles($user_id);
 
-        //Debug::dump($data);
-        //Debug::dump($user_role);
+        //Nette\Diagnostics\Debugger::dump($data);
+        //Nette\Diagnostics\Debugger::dump($user_role);
 
         // Predkontrola - vyrazeni nemenici role
         foreach ($data as $id => $stav) {
@@ -394,8 +394,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         }
 
         //echo "===================";
-        //Debug::dump($data);
-        //Debug::dump($user_role);
+        //Nette\Diagnostics\Debugger::dump($data);
+        //Nette\Diagnostics\Debugger::dump($user_role);
 
 
         // odebrani nevybranych roli

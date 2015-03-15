@@ -309,8 +309,8 @@ abstract class BaseModel extends Nette\Object
             $cols_string = "`".$from_index[0]."`.`*`";
         }
 
-        //Debug::dump($cols);
-        //Debug::dump($cols_string_a);
+        //Nette\Diagnostics\Debugger::dump($cols);
+        //Nette\Diagnostics\Debugger::dump($cols_string_a);
 
        $query = array('SELECT '.(isset($distinct) ? 'DISTINCT':'').' %sql', $cols_string);
        
@@ -356,7 +356,7 @@ abstract class BaseModel extends Nette\Object
             array_push($query, 'OFFSET %i', $offset);
         }
 
-        //Debug::dump($query);
+        //Nette\Diagnostics\Debugger::dump($query);
         //dibi::test($query); exit;
         // a nyní předáme pole
         return dibi::query($query);

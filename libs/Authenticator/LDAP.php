@@ -569,7 +569,7 @@ class Authenticator_LDAP extends Authenticator_Base implements Nette\Security\IA
             foreach ($seznam as $id => $user) {
                 $form->addGroup($user['plne_jmeno'] ." - ". $user['uid']);
                 $subForm = $form->addContainer('user_'. $id);
-                //$subForm = $form->addContainer('user_'. String::webalize($user['uid']));
+                //$subForm = $form->addContainer('user_'. Nette\Utils\Strings::webalize($user['uid']));
 
                 if ( !isset($user_seznam[ $user['uid'] ])  ) {
                     $subForm->addCheckbox('add', 'Připojit');

@@ -213,7 +213,7 @@ class Spis extends TreeModel
         }
 
         $data['stav'] = isset($data['stav'])?$data['stav']:1;
-        //Debug::dump($data); exit;
+        //Nette\Diagnostics\Debugger::dump($data); exit;
         
         $spis_id = $this->vlozitH($data);
 

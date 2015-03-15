@@ -90,7 +90,7 @@ class CisloJednaci extends BaseModel
 
             $info['user_id'] = $this->user_info->id;
             $info['user'] = $this->user_info->username;
-            $info['prijmeni'] = String::webalize(@$this->user_info->identity->prijmeni);
+            $info['prijmeni'] = Nette\Utils\Strings::webalize(@$this->user_info->identity->prijmeni);
             $info['user_poradi'] = $this->max('user');
         }
 
@@ -175,7 +175,7 @@ class CisloJednaci extends BaseModel
             $tmp->user_id = $this->user_info->id;
             $tmp->user = $this->user_info->username;
             $tmp->user_poradi = $info['user_poradi'];
-            $tmp->prijmeni = String::webalize(@$this->user_info->identity->prijmeni);
+            $tmp->prijmeni = Nette\Utils\Strings::webalize(@$this->user_info->identity->prijmeni);
 
             return $tmp;
         } else {
@@ -196,7 +196,7 @@ class CisloJednaci extends BaseModel
             $tmp->user_id = $this->user_info->id;
             $tmp->user = $this->user_info->username;
             $tmp->user_poradi = $info['user_poradi'];
-            $tmp->prijmeni = String::webalize($this->user_info->identity->prijmeni);
+            $tmp->prijmeni = Nette\Utils\Strings::webalize($this->user_info->identity->prijmeni);
 
 
             return $tmp;
@@ -238,7 +238,7 @@ class CisloJednaci extends BaseModel
             $user_info = UserModel::getUser($row->user_id,true);
 
             $info['user'] = $user_info->username;
-            $info['prijmeni'] = String::webalize($user_info->identity->prijmeni);
+            $info['prijmeni'] = Nette\Utils\Strings::webalize($user_info->identity->prijmeni);
             $info['user_poradi'] = $row->user_poradi;
 
             return $this->generuj($generuj, $info);

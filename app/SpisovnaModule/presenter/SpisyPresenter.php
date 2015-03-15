@@ -538,7 +538,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $data['date_modified'] = new DateTime();
         $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
         
-        //Debug::dump($data); exit;
+        //Nette\Diagnostics\Debugger::dump($data); exit;
         
         try {
             $Spisy->update($data, array(array('id=%i',$spis_id)) );
@@ -548,7 +548,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $this->flashMessage('Spis se nepodařilo upravit.','warning');
             $this->flashMessage('CHYBA: "'. $e->getMessage(),'error_ext');
             $this->redirect(':Spisovna:Spisy:detail',array('id'=>$spis_id));
-            //Debug::dump($e);
+            //Nette\Diagnostics\Debugger::dump($e);
         }
 
     }

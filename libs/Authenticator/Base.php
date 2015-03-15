@@ -7,12 +7,12 @@ class Authenticator_Base extends Nette\Application\UI\Control
     {
         try {
             $user = Nette\Environment::getUser();
-            $user->setNamespace(KLIENT);
-            $user->authenticate($data['username'], $data['password']);
+            // $user->setNamespace(KLIENT);
+            $user->login($data['username'], $data['password']);
 
             $redirect_home = (bool)Settings::get('login_redirect_homepage', false);
             if (!$redirect_home && isset($data['backlink']) && !empty($data['backlink']))
-                $this->presenter->redirectUri($data['backlink']);
+                $this->presenter->redirectUrl($data['backlink']);
             else
                 $this->presenter->redirect('this');
 				// $this->presenter->redirect(':Spisovka:Default:default');

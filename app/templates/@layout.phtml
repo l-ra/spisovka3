@@ -7,13 +7,13 @@
     <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
     {css site}
     {css print_site, print}
-    {css redmond/jquery-ui.min}
-    
+    {css 'redmond/jquery-ui.min'}
+
     {js jquery-1.11.1.min}
     {js jquery-ui.min}
     <script type="text/javascript">
         var BASE_URL = '{!$baseUrl}';
-        var is_simple = '{=IS_SIMPLE_ROUTER}';
+        var is_simple = {=IS_SIMPLE_ROUTER};
     </script>
     {js script}
     {if isset($Select2)}

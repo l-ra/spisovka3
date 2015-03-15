@@ -201,7 +201,7 @@ class SpisovyZnak extends TreeModel
             // Viz Task #166
             // $tmp[''] = 'Žádná';
             foreach ($result as $dt) {
-                $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
+                $tmp[ $dt->id ] = \Nette\Utils\Strings::truncate($dt->nazev,90);
             }
             return $tmp;
         } 
@@ -209,7 +209,7 @@ class SpisovyZnak extends TreeModel
             $tmp = array();
             $tmp[''] = 'všechny spouštěcí události';
             foreach ($result as $dt) {
-                $tmp[ $dt->nazev ] = String::truncate($dt->nazev,90);
+                $tmp[ $dt->nazev ] = \Nette\Utils\Strings::truncate($dt->nazev,90);
             }
             return $tmp;
         }

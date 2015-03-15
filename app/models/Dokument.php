@@ -338,7 +338,7 @@ class Dokument extends BaseModel
 
         $args = array();
 
-        //Debug::dump($params); exit;
+        //Nette\Diagnostics\Debugger::dump($params); exit;
 
         if ( isset($params['nazev']) ) {
             if ( !empty($params['nazev']) ) {
@@ -963,7 +963,7 @@ class Dokument extends BaseModel
             }
         }
 
-        //Debug::dump($args); exit;
+        //Nette\Diagnostics\Debugger::dump($args); exit;
 
         return $args;
 
@@ -1723,7 +1723,7 @@ class Dokument extends BaseModel
 
             if ( $old_dokument ) {
 
-                //Debug::dump($data); //exit;
+                //Nette\Diagnostics\Debugger::dump($data); //exit;
 
                 // sestaveni upravenych dat
                 $update_data = array();
@@ -1735,8 +1735,8 @@ class Dokument extends BaseModel
                 }
                 $md5_hash = $this->generujHash($update_data);
 
-                //Debug::dump($update_data);
-                //Debug::dump($md5_hash);
+                //Nette\Diagnostics\Debugger::dump($update_data);
+                //Nette\Diagnostics\Debugger::dump($md5_hash);
                 //exit;
 
                 if ( $md5_hash != $old_dokument->md5_hash  ) {
@@ -1755,7 +1755,7 @@ class Dokument extends BaseModel
                     $old_dokument['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
                     $old_dokument['date_created'] = new DateTime();
                     unset($old_dokument['id'],$old_dokument['user_modified'],$old_dokument['date_modified'],$old_dokument['spousteci_udalost']);
-                    //Debug::dump($old_dokument);
+                    //Nette\Diagnostics\Debugger::dump($old_dokument);
                     $DokumentHistorie = new DokumentHistorie();
                     $DokumentHistorie->insert($old_dokument);
                 }
@@ -2039,7 +2039,7 @@ class Dokument extends BaseModel
                 $tmp[0] = 'jakýkoli způsob vyřízení';
                 foreach ($result as $dt) {
                     if ( $dt->stav == 0 ) continue;
-                    $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
+                    $tmp[ $dt->id ] = Nette\Utils\Strings::truncate($dt->nazev,90);
                 }
                 return $tmp;
             } else if ( $select == 4 ) {
@@ -2117,7 +2117,7 @@ class Dokument extends BaseModel
                $tmp = array();
                 $tmp[0] = 'jakýkoli způsob odeslani';
                 foreach ($result as $dt) {
-                    $tmp[ $dt->id ] = String::truncate($dt->nazev,90);
+                    $tmp[ $dt->id ] = Nette\Utils\Strings::truncate($dt->nazev,90);
                 }
                 return $tmp;
             } else {

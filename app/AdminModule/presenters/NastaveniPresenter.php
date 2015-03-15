@@ -109,7 +109,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $config_data = $config->toArray();
-        //Debug::dump($config_data); exit;
+        //Nette\Diagnostics\Debugger::dump($config_data); exit;
 
         $config_data['urad']['nazev'] = $data['nazev'];
         $config_data['urad']['plny_nazev'] = $data['plny_nazev'];
@@ -127,7 +127,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $config_data['urad']['kontakt']['email'] = $data['email'];
         $config_data['urad']['kontakt']['www'] = $data['www'];
 
-        //Debug::dump($config_data); exit;
+        //Nette\Diagnostics\Debugger::dump($config_data); exit;
         $config_modify = new Config();
         $config_modify->import($config_data);
         $config_modify->save(CLIENT_DIR .'/configs/klient.ini');

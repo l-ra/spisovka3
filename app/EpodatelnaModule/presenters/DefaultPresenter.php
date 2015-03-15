@@ -1165,7 +1165,7 @@ dmFormat =
         $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
         $esigned = $esign->verifySignature($res, $esign_cert, $esign_status);
 
-        //Debug::dump($esigned); exit;
+        //Nette\Diagnostics\Debugger::dump($esigned); exit;
         $tmp['signature']['cert'] = @$esigned['cert'];
         $tmp['signature']['cert_info'] = @$esigned['cert_info'];
         $tmp['signature']['status'] = @$esigned['status'];

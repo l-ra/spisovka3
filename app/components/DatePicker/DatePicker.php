@@ -1,7 +1,5 @@
 <?php
 
-require_once LIBS_DIR . '/Nette/Forms/Controls/TextInput.php';
-
 
 
 /**

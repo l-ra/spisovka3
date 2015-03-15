@@ -16,39 +16,29 @@ class MyMacros extends Nette\Application\UI\Control {
     public static function access($param) {
 
         $__array = explode(":",$param);
-        $__resource = $__array[1] ."_". $__array[2] ."Nette\Application\UI\Presenter";
+        $__resource = $__array[1] ."_". $__array[2] . "Presenter";
         
-        return "Environment::getUser()->isAllowed('$__resource')";        
+        return Nette\Environment::getUser()->isAllowed($__resource);        
     }
 
-    public static function isAllowed($content)
+    public static function isAllowed($resource, $privilege)
     {
-        $resource = Nette\Latte\Engine::fetchToken($content); // resource [,] [privilege]
-        $params = "'$resource'";
-        $privilege = Nette\Latte\Engine::fetchToken($content);
-        if ($privilege !== null)
-            $params .= ", '$privilege'";
-            
-        return "Environment::getUser()->isAllowed($params)";
+        return Nette\Environment::getUser()->isAllowed($resource, $privilege);
     }
     
-    public static function CSS($content, $publicUrl) {
-    
-		$filename = Nette\Latte\Engine::fetchToken($content); // filename [,] [media]
-        $media = Nette\Latte\Engine::fetchToken($content);
+    public static function CSS($publicUrl, $filename, $media = 'screen') {
+
+        // $filename = Nette\Latte\Engine::fetchToken($content); // filename [,] [media]
+        // $media = Nette\Latte\Engine::fetchToken($content);
 
         $filename .= '.css';
-        if (empty($media))
-            $media = 'screen';
         $href = "{$publicUrl}css/$filename?" . @filemtime(APP_DIR . "/../public/css/$filename");
         $res = "<link rel=\"stylesheet\" type=\"text/css\" media=\"$media\" href=\"$href\" />";
 
         return $res;   
     }
 
-    public static function JavaScript($content, $publicUrl) {
-    
-		$filename = Nette\Latte\Engine::fetchToken($content); // filename
+    public static function JavaScript($filename, $publicUrl) {
 
         $filename .= '.js';
         $href = "{$publicUrl}js/$filename?" . @filemtime(APP_DIR . "/../public/js/$filename");

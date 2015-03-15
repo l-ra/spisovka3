@@ -12,11 +12,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         if ( !defined('APPLICATION_INSTALL') ):
 
         $user = Nette\Environment::getUser();
-        $user->setNamespace(KLIENT);
+        // $user->setNamespace(KLIENT);
 
         // Je uzivatel prihlasen?
-            if (!$user->isAuthenticated()) {
-                if ($user->getSignOutReason() === Nette\Security\User::INACTIVITY) {
+            if (!$user->isLoggedIn()) {
+                if ($user->getLogoutReason() === Nette\Security\User::INACTIVITY) {
                     $this->flashMessage('Uplynula doba neaktivity! Systém vás z bezpečnostních důvodů odhlásil.', 'warning');
                 }
                 if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
@@ -239,8 +239,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         }
         $this->template->AppInfo = $app_info;
         $this->template->KontrolaNovychVerzi = UpdateAgent::je_aplikace_aktualni();
-        
-        $this->template->baseUrl = Nette\Environment::getVariable('baseUri');
+
+        $this->template->baseUrl = $this->getHttpRequest()->getUrl()->getBasePath();
         $this->template->publicUrl = Nette\Environment::getVariable('publicUrl');
         
         $this->template->licence = '<a href="http://joinup.ec.europa.eu/software/page/eupl/licence-eupl">EUPL v.1.1</a>';
@@ -256,9 +256,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
          */
         $this->template->is_authenticated = false;
         $user = Nette\Environment::getUser();
-        if ( $this->name != 'Error' && $user->isAuthenticated() ) {
+        if ( $this->name != 'Error' && $user->isLoggedIn() ) {
             $this->template->userobj = $user;
-            $this->template->user = $user->getIdentity();
+            $identity = $user->getIdentity();
+            // var_dump($identity);
+            $this->template->user = $identity;
             $this->template->is_authenticated = true;
             
             /**
@@ -281,15 +283,20 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     
     public function templatePrepareFilters($template)
     {
-        $filter = new Nette\Latte\Engine;
-        $filter->setHandler(new LatteMacros);
-        $template->registerFilter($filter);
+        $latte = new Nette\Latte\Engine;
+        $template->registerFilter($latte);
+        
+        $set = new Nette\Latte\Macros\MacroSet($latte->compiler);
+        $set->addMacro('css', 'echo MyMacros::CSS($publicUrl, %node.args);');
+        $set->addMacro('js', 'echo MyMacros::JavaScript(%node.word, $publicUrl);');
 
-        $filter->handler->macros['access'] =
-                '<?php if (%MyMacros::access%) { ?>';
-        $filter->handler->macros['/access'] =
-                '<?php } ?>';
-        $filter->handler->macros['isAllowed'] =
+        $set->addMacro('access', 'if (MyMacros::access(%node.word)) {', '}');
+        $set->addMacro('isAllowed', 'if (MyMacros::isAllowed(%node.args)) {', '}');
+
+        // Neni momentalne pouzito:
+        // $set->addMacro('accessrole', '{', '}');
+        
+        /* $filter->handler->macros['isAllowed'] =
                 '<?php if (%MyMacros::isAllowed%) { ?>';
         $filter->handler->macros['/isAllowed'] =
                 '<?php } ?>';
@@ -297,30 +304,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                 '<?php if ( Acl::isInRole("%%")) { ?>';
         $filter->handler->macros['/accessrole'] =
                 '<?php } ?>';
-        $filter->handler->macros['accessview'] =
-                '<?php if ($AccessView==1): ?>';
-        $filter->handler->macros['/accessview'] =
-                '<?php endif; ?>';
-        $filter->handler->macros['noaccessview'] =
-                '<?php if (!$AccessView==1): ?>';
-        $filter->handler->macros['/noaccessview'] =
-                '<?php endif; ?>';
-
-        $filter->handler->macros['accessedit'] =
-                '<?php if ($AccessEdit==1): ?>';
-        $filter->handler->macros['/accessedit'] =
-                '<?php endif; ?>';
-
-        $filter->handler->macros['vlink'] =
-                '<?php echo MyMacros::vlink("%%",%:macroLink%); ?>';        
                 
-        $filter->handler->macros['css'] =
-            '<?php echo MyMacros::CSS("%%", $publicUrl); ?>';
-        $filter->handler->macros['js'] =
-            '<?php echo MyMacros::JavaScript("%%", $publicUrl); ?>';
-
         $filter->handler->macros['input'] =
-            '<?php echo MyMacros::input($form, "%%"); ?>';
+            '<?php echo MyMacros::input($form, "%%"); ?>'; */
     }
     
     protected function displayFormErrors(Nette\Forms\Controls\SubmitButton $button)
@@ -329,5 +315,22 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         foreach($errors as $error)
             $this->flashMessage($error, 'warning');
     }
+    
+    /**
+     * Formats view template file names.
+     * @return array
+     */
+    public function formatTemplateFiles()
+    {
+        $name = $this->getName();
+        $dir = str_replace(':', 'Module/', $name);
+        // $dir = is_dir("$dir/templates") ? $dir : dirname($dir);
+        $templates = APP_DIR . '/templates';
+        return array(
+            "$templates/$dir/$this->view.phtml",
+            "$templates/$dir/$this->view.latte",
+        );
+    }
+    
 }
 

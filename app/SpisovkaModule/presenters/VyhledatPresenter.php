@@ -155,7 +155,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             $hledat = null;
         }
         $this->template->params = $hledat;
-        // Debug::dump($hledat);
+        // Nette\Diagnostics\Debugger::dump($hledat);
         unset($hledat['prideleno'],$hledat['predano'],$hledat['prideleno_org'],$hledat['predano_org']);
         
         $form = new Nette\Application\UI\Form();
@@ -337,7 +337,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             $data['druh_zasilky'] = null;
         }        
 
-        //Debug::dump($data); 
+        //Nette\Diagnostics\Debugger::dump($data); 
         // eliminujeme prazdne hodnoty
         foreach ( $data as $d_index => $d_value ) {
             if (is_array($d_value) ) {
@@ -351,8 +351,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             }
         }
 
-        //Debug::dump($_POST);
-        //Debug::dump($data); exit;
+        //Nette\Diagnostics\Debugger::dump($_POST);
+        //Nette\Diagnostics\Debugger::dump($data); exit;
 
         //$this->forward(':Spisovka:Dokumenty:default',array('hledat'=>$data));
         $this->redirect($this->getRedirectPath(), array('hledat'=>$data));

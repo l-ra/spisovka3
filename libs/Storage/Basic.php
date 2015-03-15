@@ -62,9 +62,9 @@ class Storage_Basic extends FileModel {
             }
         }
 
-        $file = String::webalize($upload->getName(),'.');
+        $file = Nette\Utils\Strings::webalize($upload->getName(),'.');
         $fileName = $file_dir . "/" . $file;
-        //$fileName = CLIENT_DIR .''. $this->dokument_dir . "/" . String::webalize($upload->getName(),'.');
+        //$fileName = CLIENT_DIR .''. $this->dokument_dir . "/" . Nette\Utils\Strings::webalize($upload->getName(),'.');
 
         // test existence souboru
         $fileName = $this->fileExists($fileName);
@@ -78,7 +78,7 @@ class Storage_Basic extends FileModel {
 
             $file = new stdClass();
             $file->type = $this->getReflection()->getName();
-            $file->real_name = String::webalize($upload->getName(),'.');
+            $file->real_name = Nette\Utils\Strings::webalize($upload->getName(),'.');
             $file->real_path = str_replace(CLIENT_DIR, '', $dest->getTemporaryFile());
             $file->size = $dest->getSize();
             $file->content_type = $dest->getContentType();
@@ -151,11 +151,11 @@ class Storage_Basic extends FileModel {
             }
         }
 
-        $filename = String::webalize($data['filename'],'.');
+        $filename = Nette\Utils\Strings::webalize($data['filename'],'.');
         if (strlen($filename) != strlen($data['filename']) ) {
             if ( isset($data['charset']) && strtolower($data['charset']) != 'UTF-8' ) {
                 $filename = iconv($data['charset']."//TRANSLIT",'utf-8',$data['filename']);
-                $filename = String::webalize($filename,'.');
+                $filename = Nette\Utils\Strings::webalize($filename,'.');
                 if ( isset($data['nazev']) ) {
                     $data['nazev'] = iconv($data['charset']."//TRANSLIT",'utf-8',$data['nazev']);
                 }
@@ -238,7 +238,7 @@ class Storage_Basic extends FileModel {
             }
         }
 
-        $filename = String::webalize($data['filename'],'.');
+        $filename = Nette\Utils\Strings::webalize($data['filename'],'.');
         $filepath = $file_dir . "/" . $filename;
         if ( $fp = fopen($filepath,'w') ) {
             if (!fwrite( $fp, $source, strlen($source) ) ) {

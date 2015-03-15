@@ -30,8 +30,8 @@ class AbcPaginator extends Nette\Application\UI\Control
     public function render()
     {
         $request = Nette\Environment::getHttpRequest();
-        $url = $request->getUri()->getPath();
-        $query_string = $request->getUri()->getQuery();
+        $url = $request->getUrl()->getPath();
+        $query_string = $request->getUrl()->getQuery();
         $query_params = "";
         parse_str($query_string, $query);
         unset($query['abc-abc'],$query['vp-page'],$query['do']);

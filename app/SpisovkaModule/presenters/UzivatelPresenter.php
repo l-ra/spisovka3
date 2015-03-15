@@ -1,5 +1,6 @@
 <?php
 
+
 class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function actionLogin()
@@ -17,7 +18,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     public function renderLogout()
     {
         $user = Nette\Environment::getUser()->getIdentity()->username;
-        Nette\Environment::getUser()->signOut();
+        Nette\Environment::getUser()->logout();
         // Hack - cookie kontroluji nektere alternativni autentikatory pri zobrazovani prihlasovaciho dialogu
         $this->getHttpResponse()->setCookie('s3_logout', $user, strtotime('10 minute'));
         $this->flashMessage('Byl jste úspěšně odhlášen.');
@@ -27,9 +28,9 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $referer = $this->getHttpRequest()->getHeader('referer');
         if ($referer) {
             // odstran query cast URL, nutne aby se ne obrazovce s prihlasovacim dialogem nezobrazovala posledni flash zprava
-            $uri = new Uri($referer);
+            $uri = new Nette\Http\Url($referer);
             $uri->setQuery('');
-            $this->redirectUri($uri);
+            $this->redirectUrl($uri);
         }
         else
             $this->redirect('login');

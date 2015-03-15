@@ -34,7 +34,7 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
         $log = new LogModel();
         $row = UserModel::getUser($username,true);
 
-        //Debug::dump($row); //exit;
+        //Nette\Diagnostics\Debugger::dump($row); //exit;
 
         // Overeni uzivatele
         if (!$row) {
@@ -606,7 +606,7 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
 
                 $form->addGroup($user['plne_jmeno'] ." - ". $user['uid']);
                 $subForm = $form->addContainer('user_'. $id);
-                //$subForm = $form->addContainer('user_'. String::webalize($user['uid']));
+                //$subForm = $form->addContainer('user_'. Nette\Utils\Strings::webalize($user['uid']));
 
                 if ( !isset($user_seznam[ $user['uid'] ])  ) {
                     $subForm->addCheckbox('add', 'Připojit');

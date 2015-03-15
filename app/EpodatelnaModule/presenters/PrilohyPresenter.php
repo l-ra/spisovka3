@@ -94,7 +94,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
             if ( is_null($part) ) {
 
                 $zprava = $imap->analyze_message();
-                //Debug::dump($zprava); exit;
+                //Nette\Diagnostics\Debugger::dump($zprava); exit;
 
                 $files = array();
                 // Hlavni zprava

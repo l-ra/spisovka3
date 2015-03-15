@@ -50,7 +50,7 @@ class DokumentPrilohy extends BaseModel
                 // Nahrazeni online mime-type
                 $joinFile->mime_type = FileModel::mimeType($joinFile->real_path);
                 // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
-                $mime_type_webalize = String::webalize($joinFile->mime_type);
+                $mime_type_webalize = Nette\Utils\Strings::webalize($joinFile->mime_type);
                 $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
                 if ( @file_exists($mime_type_icon) ) {
                     $joinFile->mime_type_icon = Nette\Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";

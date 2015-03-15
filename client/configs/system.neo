@@ -1,0 +1,41 @@
+parameters:
+
+# date.timezone = "Europe/Prague"
+
+    demo.demo = true
+    # clean_url = true
+
+    database:
+        driver   = mysqli
+        host     = localhost
+        username = pavel
+        password = sdfdsf234
+        database = pavel_s33_vyvoj
+        charset  = utf8
+        prefix   = 
+        profiler = true
+        cache    = true
+        sqlmode  = STRICT_TRANS_TABLES
+
+    service:
+        Nette-Security-IAuthenticator = Auth_Component_Basic
+
+    authenticator:
+        ldap:
+            server =
+            port = 389
+            baseDN = "dc=,dc=cz"
+            rdn_prefix = "uid="
+            rdn_postfix = ",ou=users,dc=,dc=cz"
+            user = "cn=,dc=,dc=cz"
+            pass = ""
+
+    storage:
+        type = Storage_Basic
+        dokument_dir = /files/dokumenty
+        epodatelna_dir = /files/epodatelna
+
+services:
+    authenticator = Authenticator_Basic
+    authorizator = Acl
+    nette.presenterFactory = PresenterFactory(%appDir%, ...)

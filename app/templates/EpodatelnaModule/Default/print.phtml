@@ -82,7 +82,7 @@
         &nbsp;<br />
         Vytištěno dne: {=date("j.n.Y G:i")}
         <br />
-        Vytiskl: {=Environment::getUser()->getIdentity()->name}
+        Vytiskl: {=Nette\Environment::getUser()->getIdentity()->name}
     </div>
     {else}
         <div class="prazdno">Nejsou žádné příchozí zprávy.</div>

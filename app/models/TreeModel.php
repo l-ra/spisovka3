@@ -132,7 +132,7 @@ class TreeModel extends BaseModel
 
                 $popis = "";
                 if ( !empty($row->popis) ) {
-                    $popis = " - ". String::truncate($row->popis,90);
+                    $popis = " - ". \Nette\Utils\Strings::truncate($row->popis,90);
                 }
                 if ( $type == 10 ) {
                     $result[ $row->id ] = $row->{$this->nazev} .$popis;
@@ -371,7 +371,7 @@ class TreeModel extends BaseModel
                     $data_node['sekvence%sql'] = "REPLACE(sekvence,'". $info->sekvence ."','". $parent_info->sekvence ."')";
                     $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'". $info->sekvence_string ."','". $parent_info->sekvence_string ."')";
                 }
-                //Debug::dump($data_node); exit;
+                //Nette\Diagnostics\Debugger::dump($data_node); exit;
 
                 $this->update($data_node, array( array("sekvence LIKE %s", $info->sekvence .".%") ));
                 

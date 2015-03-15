@@ -95,7 +95,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         if ( $this->getHttpRequest()->isPost() ) {
             // Exportovani
             $post_data = $this->getHttpRequest()->getPost();
-            //Debug::dump($post_data);
+            //Nette\Diagnostics\Debugger::dump($post_data);
             
             $SpisovyZnak = new SpisovyZnak();
             $args = null;

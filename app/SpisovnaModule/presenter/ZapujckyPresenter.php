@@ -457,8 +457,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
         
-        //Debug::dump($data);
-        //Debug::dump($this->getHttpRequest()->getPost());
+        //Nette\Diagnostics\Debugger::dump($data);
+        //Nette\Diagnostics\Debugger::dump($this->getHttpRequest()->getPost());
         //exit;
         
         $Zapujcka = new Zapujcka();
@@ -548,7 +548,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 ->setValue($filtr)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
         $form->addSubmit('go_filtr', 'Filtrovat')
-                 ->setRendered(TRUE)
+                 // ->setRendered(TRUE)
                  ->onClick[] = array($this, 'filtrClicked');
 
 

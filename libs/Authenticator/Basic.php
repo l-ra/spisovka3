@@ -1,13 +1,7 @@
 <?php
 
-
-class Authenticator_Basic extends Authenticator_Base implements Nette\Security\IAuthenticator
+class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthenticator
 {
-
-    protected $receivedSignal;
-    protected $action;
-    protected $wasRendered = FALSE;
-
     public function authenticate(array $credentials)
     {
 
@@ -21,7 +15,7 @@ class Authenticator_Basic extends Authenticator_Base implements Nette\Security\I
         $log = new LogModel();
         $row = UserModel::getUser($username,true);
 
-        //Debug::dump($row); //exit;
+        //Nette\Diagnostics\Debugger::dump($row); //exit;
 
         // Overeni uzivatele
         if (!$row) {
@@ -41,7 +35,7 @@ class Authenticator_Basic extends Authenticator_Base implements Nette\Security\I
             $log->logAccess($row->id, 1);
         }
 
-        // Odstraneni hesla ve vypisu
+        // Odstraneni hesla v identite
         unset($row->password);
 
         // Sestaveni roli
@@ -57,8 +51,17 @@ class Authenticator_Basic extends Authenticator_Base implements Nette\Security\I
         $row->klient = KLIENT;
 
         // tady nacitam taky roli
-        return new Nette\Security\Identity($row->display_name, $identity_role, $row);
-    }
+        return new Nette\Security\Identity($row->id, $identity_role, $row);
+    }    
+}
+
+
+class Auth_Component_Basic extends Authenticator_Base
+{
+
+    protected $receivedSignal;
+    protected $action;
+    protected $wasRendered = FALSE;
 
     /*
      * Componenta
@@ -119,7 +122,7 @@ class Authenticator_Basic extends Authenticator_Base implements Nette\Security\I
         $form->addPassword('password', 'Heslo:')
             ->addRule(Nette\Forms\Form::FILLED, 'Zadejte přihlašovací heslo.');
 
-        $val = Nette\Environment::getHttpRequest()->getOriginalUri()->getAbsoluteUri();
+        $val = Nette\Environment::getHttpRequest()->url->getAbsoluteUrl();
         $form->addHidden('backlink')
             ->setValue($val);
             

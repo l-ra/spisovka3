@@ -1654,7 +1654,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $dokument_id = $data['id'];
         $dok = $Dokument->getInfo($dokument_id);        
 
-        //Debug::dump($data);
+        //Nette\Diagnostics\Debugger::dump($data);
         
         if ( !($dok->stav_dokumentu == 1 || Nette\Environment::getUser()->isInRole('superadmin')) ) {
             // needitovatelne skryte polozky
@@ -1677,8 +1677,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             unset($data['datum_vzniku_cas']);            
         }
         
-        //Debug::dump($data); exit;
-        //Debug::dump($dok); exit;
+        //Nette\Diagnostics\Debugger::dump($data); exit;
+        //Nette\Diagnostics\Debugger::dump($dok); exit;
 
         try {
 
@@ -1792,7 +1792,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // spisovy znak
 
 
-        //Debug::dump($data); exit;
+        //Nette\Diagnostics\Debugger::dump($data); exit;
 
         $Dokument = new Dokument();
 
@@ -1811,7 +1811,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->flashMessage('Dokument "'. $dok->cislo_jednaci .'" se nepodařilo upravit.','warning');
             $this->flashMessage('CHYBA: '. $e->getMessage(),'warning');
 
-            Debug::dump($e);
+            Nette\Diagnostics\Debugger::dump($e);
             exit;
             //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
         }
@@ -1994,7 +1994,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function odeslatClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        //Debug::dump($data); exit;
+        //Nette\Diagnostics\Debugger::dump($data); exit;
 
         $dokument_id = $data['id'];
         $Dokument = new Dokument();
@@ -2014,8 +2014,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $post_data = Nette\Environment::getHttpRequest()->getPost();
 
-        // Debug::dump($post_data);
-        // Debug::dump($data);
+        // Nette\Diagnostics\Debugger::dump($post_data);
+        // Nette\Diagnostics\Debugger::dump($data);
 
         //echo "<pre>";
         //echo "\n\nPřílohy:\n\n";
@@ -2046,7 +2046,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             foreach ($post_data['subjekt'] as $subjekt_id => $metoda_odeslani) {
                 $adresat = $Subjekt->getInfo($subjekt_id);
                 //echo Subjekt::displayName($adresat) ."\n";
-                //Debug::dump($adresat);
+                //Nette\Diagnostics\Debugger::dump($adresat);
 
                 $datum_odeslani = new DateTime();
                 $epodatelna_id = null;
@@ -2305,7 +2305,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             //echo $source;
-            //Debug::dump($email_mess);
+            //Nette\Diagnostics\Debugger::dump($email_mess);
             //exit;
 
             
@@ -2450,7 +2450,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             
             sleep(3);
             $odchozi_zpravy = $isds->seznamOdeslanychZprav( time()-3600 , time()+3600 );
-            //Debug::dump($odchozi_zpravy);
+            //Nette\Diagnostics\Debugger::dump($odchozi_zpravy);
             $mess = null;
             if ( count($odchozi_zpravy)>0 ) {
                 foreach ($odchozi_zpravy as $oz) {
@@ -2682,7 +2682,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     protected function createComponentFiltrForm()
     {
         // Typ pristupu na organizacni jednotku
-        $filtr =  !is_null($this->filtr) ? $this->filtr : 'org_pridelene';
+        $filtr =  !is_null($this->filtr) ? $this->filtr : 'vse';
         $select = array(
             'pridelene'=>'Přidělené',
             'kprevzeti'=>'K převzetí',
@@ -2730,7 +2730,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
                 
         $form->addSubmit('go_filtr', 'Filtrovat')
-                 ->setRendered(TRUE)
+                 // ->setRendered(TRUE)
                  ->onClick[] = array($this, 'filtrClicked');
 
 
@@ -2784,7 +2784,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue($seradit)
                 ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
         $form->addSubmit('go_seradit', 'Seřadit')
-                 ->setRendered(TRUE)
+                 // ->setRendered(TRUE)
                  ->onClick[] = array($this, 'seraditClicked');
 
 

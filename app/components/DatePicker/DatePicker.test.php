@@ -36,7 +36,7 @@ if ($form->isSubmitted()) {
 		echo '<h2>Form was submitted and successfully validated</h2>';
 
 		$values = $form->getValues();
-		Debug::dump($values);
+		Nette\Diagnostics\Debugger::dump($values);
 
 		// this is the end, my friend :-)
 		if (empty($disableExit)) exit;

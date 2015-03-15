@@ -22,7 +22,7 @@ class Authenticator_HTTPhtaccess extends Authenticator_Base implements Nette\Sec
         $log = new LogModel();
         $row = UserModel::getUser($username,true);
 
-        //Debug::dump($row); //exit;
+        //Nette\Diagnostics\Debugger::dump($row); //exit;
 
         // Overeni uzivatele
         if (!$row) {

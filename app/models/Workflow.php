@@ -198,7 +198,7 @@ class Workflow extends BaseModel
                     $data_other['user_id'] = $data['user_id'];
                     $data_other['poznamka'] = $data['poznamka'];
                     $result_insert = $this->insert($data_other);
-                    //Debug::dump($data_other);
+                    //Nette\Diagnostics\Debugger::dump($data_other);
                     $Log->logDokument($dokument_other->id, LogModel::DOK_PREDAN, $log);            
                 }
                 

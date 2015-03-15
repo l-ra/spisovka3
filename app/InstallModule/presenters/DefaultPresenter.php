@@ -20,7 +20,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         parent::startup();
 
-        //Debug::dump($session->step);
+        //Nette\Diagnostics\Debugger::dump($session->step);
         $this->template->step = $session->step;
 
     }
@@ -861,7 +861,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
         $config_data = $config->toArray();
-        //Debug::dump($config_data); exit;
+        //Nette\Diagnostics\Debugger::dump($config_data); exit;
 
         $config_data['urad']['nazev'] = $data['nazev'];
         $config_data['urad']['plny_nazev'] = $data['plny_nazev'];

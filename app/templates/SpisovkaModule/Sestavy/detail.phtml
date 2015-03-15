@@ -14,7 +14,7 @@
         &nbsp;<br />
         Počet dokumentů: {= count($seznam)} <br />
         Vytištěno dne: {=date("j.n.Y G:i")} <br />
-        Vytiskl: {=Environment::getUser()->getIdentity()->name}
+        Vytiskl: {=Nette\Environment::getUser()->getIdentity()->name}
     </div>    
     {elseif isset($prilis_mnoho)}
     <div style="text-align: center; margin-top: 15px; color: red;">

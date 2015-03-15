@@ -1,8 +1,10 @@
 {block title}Nastavení{/block}
 {block debug}
-<?php echo "Urad: "; Debug::dump($Urad); ?>
-<?php echo "CisloJednaci: "; Debug::dump($CisloJednaci); ?>
-<?php echo "Ukazka: "; print_r($Ukazka); ?>
+<?php 
+echo "Urad: "; Nette\Diagnostics\Debugger::dump($Urad); 
+echo "CisloJednaci: "; Nette\Diagnostics\Debugger::dump($CisloJednaci); 
+echo "Ukazka: "; print_r($Ukazka);
+?>
 {/block}
 {block content}
     <h2>Nastavení</h2>

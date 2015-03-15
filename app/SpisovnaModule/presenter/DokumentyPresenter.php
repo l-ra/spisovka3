@@ -709,7 +709,7 @@ protected function createComponentVyrizovaniForm()
 
         $dokument_id = $data['id'];
 
-        //Debug::dump($data); exit;
+        //Nette\Diagnostics\Debugger::dump($data); exit;
 
         $Dokument = new Dokument();
 
@@ -728,7 +728,7 @@ protected function createComponentVyrizovaniForm()
             $this->flashMessage('Dokument "'. $dok->cislo_jednaci .'" se nepodařilo upravit.','warning');
             $this->flashMessage('CHYBA: '. $e->getMessage(),'warning');
             $this->redirect(':Spisovna:Dokumenty:detail',array('id'=>$dokument_id));
-            //Debug::dump($e);
+            //Nette\Diagnostics\Debugger::dump($e);
             //exit;
             //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
         }
@@ -817,7 +817,7 @@ protected function createComponentVyrizovaniForm()
                 ->setValue($filtr)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
         $form->addSubmit('go_filtr', 'Filtrovat')
-                 ->setRendered(TRUE)
+                 // ->setRendered(TRUE)
                  ->onClick[] = array($this, 'filtrClicked');
 
 
@@ -869,7 +869,7 @@ protected function createComponentVyrizovaniForm()
                 ->setValue($seradit)
                 ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
         $form->addSubmit('go_seradit', 'Seřadit')
-                 ->setRendered(TRUE)
+                 // ->setRendered(TRUE)
                  ->onClick[] = array($this, 'seraditClicked');
 
 

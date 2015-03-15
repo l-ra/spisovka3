@@ -171,7 +171,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         if ( $this->getHttpRequest()->isPost() ) {
             // Exportovani
             $post_data = $this->getHttpRequest()->getPost();
-            //Debug::dump($post_data);
+            //Nette\Diagnostics\Debugger::dump($post_data);
             
             $Subjekt = new Subjekt();
             $args = null;

@@ -73,8 +73,8 @@ class VisualPaginator extends Nette\Application\UI\Control
 		}
 
                 $request = Nette\Environment::getHttpRequest();
-                $url = $request->getUri()->getPath();
-                $query_string = $request->getUri()->getQuery();
+                $url = $request->getUrl()->getPath();
+                $query_string = $request->getUrl()->getQuery();
                 $query_params = "";
                 parse_str($query_string, $query);
                 //echo "<pre>"; print_r($query); echo "</pre>";

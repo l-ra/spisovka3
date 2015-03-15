@@ -6,17 +6,17 @@
 {/block}    
 
 {block menu}
-    {isAllowed Spisovna prijem_dokumentu}Příjem 
+    {isAllowed Spisovna, prijem_dokumentu}Příjem 
     <a href="{link :Spisovna:Spisy:prijem}">spisů</a> / 
     <a href="{link :Spisovna:Dokumenty:prijem}">dokumentů</a>
     {/isAllowed}
     &nbsp;&nbsp;&nbsp;
-    {isAllowed Spisovna cist_dokumenty}
+    {isAllowed Spisovna, cist_dokumenty}
     <a href="{link :Spisovna:Dokumenty:default}">Seznam dokumentů</a>
     <a href="{link :Spisovna:Spisy:default}">Spisy</a>
     {/isAllowed}
     {access :Spisovna:Zapujcky:}<a href="{link :Spisovna:Zapujcky:default}">Zápůjčky</a>{/access}
     
-    {isAllowed Spisovna skartacni_navrh}<a href="{link :Spisovna:Dokumenty:keskartaciseznam}">Ke skartaci</a>{/isAllowed}
-    {isAllowed Spisovna skartacni_rizeni}<a href="{link :Spisovna:Dokumenty:skartace}">Skartační řízení</a>{/isAllowed}
+    {isAllowed Spisovna, skartacni_navrh}<a href="{link :Spisovna:Dokumenty:keskartaciseznam}">Ke skartaci</a>{/isAllowed}
+    {isAllowed Spisovna, skartacni_rizeni}<a href="{link :Spisovna:Dokumenty:skartace}">Skartační řízení</a>{/isAllowed}
 {/block}

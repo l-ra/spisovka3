@@ -496,8 +496,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         try {
 
-            //Debug::dump($_POST);
-            //Debug::dump($data); exit;
+            //Nette\Diagnostics\Debugger::dump($_POST);
+            //Nette\Diagnostics\Debugger::dump($data); exit;
             
             $CJ = new CisloJednaci();
             //if ( !empty($data['odpoved']) ) {
@@ -507,7 +507,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 //$cjednaci = $CJ->generuj(1); - z epodatelny
                 $cjednaci = $CJ->generuj(); // ve spisovkce
             //}
-            //Debug::dump($cjednaci); exit;
+            //Nette\Diagnostics\Debugger::dump($cjednaci); exit;
                 
             $data['jid'] = $cjednaci->app_id.'-ESS-'.$dokument_id;
             $data['poradi'] = 1;
@@ -876,7 +876,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addText('evidence', 'Evidence:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název evidence musí být vyplněno!');
         $form->addSubmit('evidovat', 'Zaevidovat')
-                 ->setRendered(TRUE)
+                 // ->setRendered(TRUE)
                  ->onClick[] = array($this, 'zaevidovatClicked');
 
 
@@ -952,7 +952,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
 
         $form->addSubmit('odmitnout', 'Provést')
-                 ->setRendered(TRUE)
+                 // ->setRendered(TRUE)
                  ->onClick[] = array($this, 'odmitnoutEmailClicked');
 
 
@@ -1053,7 +1053,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 ->setValue('[odmítnuto] '. @$zprava->predmet);
 
         $form->addSubmit('odmitnout', 'Provést')
-                 ->setRendered(TRUE)
+                 // ->setRendered(TRUE)
                  ->onClick[] = array($this, 'odmitnoutISDSClicked');
 
 
@@ -1071,7 +1071,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        //Debug::dump($data); exit;
+        //Nette\Diagnostics\Debugger::dump($data); exit;
 
         try {
 

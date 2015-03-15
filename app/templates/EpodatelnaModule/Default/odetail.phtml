@@ -70,7 +70,7 @@
         {foreach $Prilohy as $priloha}
         <tr>
             <td class="icon">
-                {if file_exists(APP_DIR ."/../public/images/mimetypes/". String::webalize($priloha['mimetype']) .".png")}
+                {if file_exists(APP_DIR ."/../public/images/mimetypes/". Nette\Utils\Strings::webalize($priloha['mimetype']) .".png")}
                 <img src="{$publicUrl}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
                 {else}
                 <img src="{$publicUrl}images/mimetypes/application-octet-stream.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />

@@ -94,7 +94,7 @@ class Acl extends Nette\Security\Permission {
     // Pri kontrole bere v uvahu primo nadrazene role tem, ktere ma uzivatel prirazen
     public static function isInRole($roles)
     {
-        $authz = Nette\Environment::getService('Nette\Security\IAuthorizator');
+        $authz = Nette\Environment::getService('authorizator');
         $user_roles = array();
         $roles_a = array();
         

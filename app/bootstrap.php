@@ -10,35 +10,57 @@ if (file_exists(APP_DIR ."/configs/servicemode")) {
     exit;
 }
 
+// setting memory_limit for PDF generation
+define('PDF_MEMORY_LIMIT','512M');
+
+
 // Step 1: Configure automatic loading
 if (!defined('LIBS_DIR'))
     define('LIBS_DIR', APP_DIR . '/../libs');
 define ('VENDOR_DIR', APP_DIR . '/../vendor');
 
-// require LIBS_DIR . '/Nette/loader.php';
 require VENDOR_DIR . '/autoload.php';
+
+define('TEMP_DIR', CLIENT_DIR . '/temp');
+
+// check if directory /app/temp is writable
+// Nette\Environment::setVariable('tempDir',CLIENT_DIR .'/temp');
+if (@file_put_contents(TEMP_DIR.'/_check', '') === FALSE) {
+	throw new Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
+}
+
+// enable RobotLoader - this allows load all classes automatically
+$loader = new Nette\Loaders\RobotLoader();
+$loader->addDirectory(APP_DIR);
+$loader->addDirectory(LIBS_DIR);
+$loader->setCacheStorage(new Nette\Caching\Storages\FileStorage(TEMP_DIR));
+// mPDF nelze nacitat pres RobotLoader, protoze PHP by dosla pamet
+//$loader->addClass('mPDF', LIBS_DIR . '/mpdf/mpdf.php');
+$loader->register();
+
 
 try {
 
 // Step 2: Configure environment
-define('TEMP_DIR', CLIENT_DIR . '/temp');
 
 // 2a) enable Nette\Debug for better exception and error visualisation
-Nette\Environment::setVariable('logDir',APP_DIR .'/../log');
 
 if ( !defined('DEBUG_ENABLE') )
     define('DEBUG_ENABLE', 0);
 if ( DEBUG_ENABLE ) {
-    // Nette\Environment::setMode(Nette\Environment::DEVELOPMENT);
-    // Nette\Environment::setMode(Nette\Environment::PRODUCTION, FALSE);
-    // Debug::enable(Debug::DEVELOPMENT, '%logDir%/php_error_'.date('Ym').'.log');
+    Nette\Environment::setProductionMode(false);
+    Nette\Diagnostics\Debugger::enable(Nette\Diagnostics\Debugger::DEVELOPMENT, APP_DIR . '/../log'); 
+    // '%logDir%/php_error_'.date('Ym').'.log');
 } else {
-    // Nette\Environment::setMode(Nette\Environment::PRODUCTION);
-    // Debug::enable(Debug::PRODUCTION, '%logDir%/php_error_'.date('Ym').'.log');
+    Nette\Environment::setProductionMode(true);
+    Nette\Diagnostics\Debugger::enable(Nette\Diagnostics\Debugger::PRODUCTION, APP_DIR . '/../log'); 
 }
-echo 'TADY';
 
 // 2b) load configuration from config.ini file
+
+createIniFiles();
+
+Nette\Environment::loadConfig(CLIENT_DIR .'/configs/system.neon');
 
 // dynamicky uprav protokol v nastaveni PUBLIC_URL
 $publicUrl = $public_url;
@@ -47,6 +69,24 @@ if (Nette\Environment::getHttpRequest()->isSecured())
 Nette\Environment::setVariable('publicUrl', $publicUrl);
 unset($publicUrl);
 
+
+// konfigurace spisovky
+
+// Promennou logDir pouziva nyni jen SupportPresenter
+// Nette\Environment::setVariable('logDir', APP_DIR .'/../log');
+
+$loader = new Nette\DI\Config\Loader();
+$user_config = Nette\ArrayHash::from($loader->load(CLIENT_DIR .'/configs/klient.ini'));
+// var_dump($user_config);
+// var_dump($user_config->nastaveni->pocet_polozek);
+Nette\Environment::setVariable('user_config', $user_config);
+
+// app info
+$app_info = @file_get_contents(APP_DIR .'/configs/version');
+// trim the EOL character
+$app_info = trim($app_info);
+Nette\Environment::setVariable('app_info', $app_info);
+unset($app_info);
 
 $unique_info = @file_get_contents(CLIENT_DIR .'/configs/install');
 if ( $unique_info === FALSE ) {
@@ -57,35 +97,6 @@ if ( $unique_info === FALSE ) {
 }
 unset($unique_info);
 
-createIniFiles();
-
-Nette\Environment::loadConfig(CLIENT_DIR .'/configs/system.ini');
-$user_config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
-Nette\Environment::setVariable('user_config', $user_config);
-
-// setting memory_limit for PDF generate
-define('PDF_MEMORY_LIMIT','512M');
-
-// app info
-$app_info = @file_get_contents(APP_DIR .'/configs/version');
-// trim the EOL character
-$app_info = trim($app_info);
-Nette\Environment::setVariable('app_info', $app_info);
-unset($app_info);
-
-// 2c) check if directory /app/temp is writable
-// Nette\Environment::setVariable('tempDir',CLIENT_DIR .'/temp');
-if (@file_put_contents(Nette\Environment::expand('%tempDir%/_check'), '') === FALSE) {
-	throw new Exception("Nelze zapisovat do adresare '" . Nette\Environment::getVariable('tempDir') . "'");
-}
-
-// 2d) enable RobotLoader - this allows load all classes automatically
-$loader = new Nette\Loaders\RobotLoader();
-$loader->addDirectory(APP_DIR);
-$loader->addDirectory(LIBS_DIR);
-// mPDF nelze nacitat pres RobotLoader, protoze PHP by dosla pamet
-$loader->addClass('mPDF', LIBS_DIR . '/mpdf/mpdf.php');
-$loader->register();
 
 // 2e) setup sessions
 $session_dir = CLIENT_DIR . '/sessions';
@@ -97,7 +108,8 @@ $session->setName('SpisovkaSessionID');
 $session->setSavePath($session_dir);
 
 $cookie_path = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-$session->setCookieParams($cookie_path);
+$session->setCookieParameters($cookie_path);
+
 
 // Step 3: Configure application
 $application = Nette\Environment::getApplication();
@@ -105,6 +117,7 @@ $application->errorPresenter = 'Error';
 $application->catchExceptions = Nette\Environment::isProduction();
 
 register_shutdown_function(array('ShutdownHandler', '_handler'));
+
 
 // 3a) Load components
 require_once APP_DIR . '/components/DatePicker/DatePicker.php';
@@ -124,7 +137,7 @@ Nette\Mail\Message::$defaultMailer = 'ESSMailer';
 
 // 3b) Load database
 try {
-    $db_config = Nette\Environment::getConfig('database')->toArray();
+    $db_config = Nette\Environment::getConfig('database');
     
     // oprava chybne konfigurace na hostingu
     // profiler je bez DEBUG modu k nicemu, jen plytva pameti (memory leak)
@@ -319,7 +332,7 @@ $application->run();
 function createIniFiles()
 {
 	$dir = CLIENT_DIR .'/configs';
-	createIniFile("$dir/system.ini");
+	createIniFile("$dir/system.neon");
 	createIniFile("$dir/klient.ini");
 	createIniFile("$dir/epodatelna.ini");
 }

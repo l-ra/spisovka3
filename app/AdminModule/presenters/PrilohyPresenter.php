@@ -34,7 +34,7 @@ class Admin_PrilohyPresenter extends BasePresenter
             $file = $FileModel->getInfo($file_id);
         }
 
-        //Debug::dump($file);
+        //Nette\Diagnostics\Debugger::dump($file);
 
         $res = $DownloadFile->download($file);
 

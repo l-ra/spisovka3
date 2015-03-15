@@ -47,7 +47,7 @@ class ErrorPresenter extends BasePresenter
 				$this->setView('500');
 
                 // vytvor log pro vyjimku
-				Debug::processException($exception);
+				// Nette\Diagnostics\Debugger::processException($exception);
 			}
 		}
 

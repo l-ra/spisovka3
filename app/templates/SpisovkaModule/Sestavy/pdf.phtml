@@ -17,13 +17,13 @@
     {/if}
 {/capture}<?php
 
-            $app_info = Environment::getVariable('app_info');
+            $app_info = Nette\Environment::getVariable('app_info');
             $app_info = explode("#",$app_info);
             $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
 
             $pdf = new mPDF('', 'A4-L',9,'Helvetica');
             $pdf->SetCreator($app_name);
-            $pdf->SetAuthor(Environment::getUser()->getIdentity()->name);
+            $pdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->name);
             $pdf->SetTitle('Sestava');
             
             $pdf->defaultheaderfontsize = 10;	/* in pts */
@@ -36,7 +36,7 @@
 
 
             $pdf->SetHeader($Sestava->nazev.'||'.$Urad->nazev .', '. $rok);
-            $pdf->SetFooter("{DATE j.n.Y}/".Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+            $pdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
             
             $pdf->WriteHTML($html_out);
             $pdf->Output('sestava.pdf', 'I');
