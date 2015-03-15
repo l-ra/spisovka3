@@ -499,7 +499,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $sestava_data = $this->handleSubmit($data);
 
         try {
-            Sestava::create('Sestava', $sestava_data);
+            Sestava::create($sestava_data);
 
             $this->flashMessage('Sestava "'.$sestava_data['nazev'].'" byla vytvořena.');
             $this->redirect(':Spisovka:Sestavy:default');

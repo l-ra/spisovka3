@@ -150,9 +150,9 @@ abstract class DBEntity
      * @param class   string    classname of instantiated elements
      * @param params
      */
-    protected static function _getAll($class, array $params = array())
+    public static function getAll(array $params = array())
     {
-        $query = array('SELECT * FROM %n', ':PREFIX:' . $class::TBL_NAME);
+        $query = array('SELECT * FROM %n', ':PREFIX:' . static::TBL_NAME);
         
         if (isset($params['where']))
             array_push($query, 'WHERE %and', $params['where']);
@@ -171,7 +171,7 @@ abstract class DBEntity
         $a = array();
         
         foreach ($resultSet as $row) {
-            $o = new $class((int)$row->id);
+            $o = new static((int)$row->id);
             $o->_setData($row);
             $a[] = $o;
         }
@@ -185,9 +185,9 @@ abstract class DBEntity
      * @param   data
      * @returns object
      */
-    public static function create($class, array $data)
+    public static function create(array $data)
     {
-        $id = dibi::insert(':PREFIX:' . $class::TBL_NAME, $data)->execute(dibi::IDENTIFIER);
+        $id = dibi::insert(':PREFIX:' . static::TBL_NAME, $data)->execute(dibi::IDENTIFIER);
         
         return new $class($id);
     }

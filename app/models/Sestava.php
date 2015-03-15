@@ -8,11 +8,6 @@ class Sestava extends DBEntity
 {
 
     const TBL_NAME = 'sestava';
-
-    public static function getAll(array $params = array())
-    {
-        return parent::_getAll(__CLASS__, $params);
-    }
     
     public function isDeletable()
     {
