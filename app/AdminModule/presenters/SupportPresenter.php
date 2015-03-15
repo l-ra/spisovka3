@@ -38,16 +38,17 @@ class Admin_SupportPresenter extends BasePresenter
         }
         echo "\n";
         
-        echo "Konfigurace systému:\n\n";
-        // $config = Environment::getConfig();
-        $config = parse_ini_file(CLIENT_DIR . "/configs/system.ini", false);
-        $config['database.password'] = 'XXXXXX';
-        $config['authenticator.ldap.pass'] = 'XXXXXX';
-        print_r($config);
+        echo "Konfigurace klienta:\n";
+        echo "--------------------\n\n";
+        $config = Nette\Environment::getConfig();
+        print_r($config->user_config);
         echo "\n";
         
-        echo "Konfigurace klienta:\n\n";
-        $config = parse_ini_file(CLIENT_DIR . "/configs/klient.ini", true);
+        echo "Konfigurace systému:\n";
+        echo "--------------------\n\n";
+        unset($config->user_config);  // toto jsme jiz zobrazili
+        unset($config->database->password);
+        unset($config->authenticator->ldap->pass);
         print_r($config);
         echo "\n";
         
