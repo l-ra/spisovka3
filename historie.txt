@@ -14,6 +14,7 @@ Jiné změny:
   aplikace zpracovává požadavek nebo nahrává data na pozadí.
 - sjednocen layout nápovědy se zbytkem aplikace
 - proveden upgrade staré knihovny pro připojení k databázi
+- nový modul pro vývojáře pro základní automatické testování aplikace
   
 Opravy:
 

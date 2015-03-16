@@ -1,0 +1,67 @@
+:Spisovka:Default:
+:Spisovka:Dokumenty:
+:Spisovka:Dokumenty:novy
+:Spisovka:Dokumenty:novy { "cisty": 1 }
+:Spisovka:Dokumenty:detail { "id": 190 }
+:Spisovka:Spisy:
+:Spisovka:Spisy:novy
+:Spisovka:Spisy:detail { "id": 8 }
+:Spisovka:Spisy:detail { "id": 8, "upravit": "info" }
+:Spisovka:Sestavy:
+:Spisovka:Sestavy:nova
+:Spisovka:Sestavy:detail { "id": 1 }
+:Spisovka:Sestavy:upravit { "id": 4 }
+:Spisovka:Sestavy:tisk { "id": 6 }
+:Spisovka:Vypravna:
+:Spisovka:Vypravna:filtrovat
+:Spisovka:Vypravna:detail { "id": 26 }
+:Spisovka:Vyhledat:
+:Spisovka:Vyhledat:reset
+:Epodatelna:Default:
+:Spisovna:Default:
+:Spisovna:Dokumenty:
+:Admin:Default:
+:Admin:Nastaveni:
+:Admin:Nastaveni: { "upravit": "info" }
+:Admin:Nastaveni: { "upravit": "cjednaci" }
+:Admin:Nastaveni: { "upravit": "nastaveni" }
+:Admin:Epodatelna:
+:Admin:Spisy:seznam
+:Admin:Spisy:novy
+:Admin:Spisy:detail { "id": 52 }
+:Admin:Spisy:export
+:Admin:Subjekty:seznam
+:Admin:Subjekty:novy
+:Admin:Subjekty:detail { "id": 1 }
+:Admin:Subjekty:export
+:Admin:Zamestnanci:seznam
+:Admin:Zamestnanci:novy
+:Admin:Zamestnanci:detail { "id": 1 }
+:Admin:Zamestnanci:detail { "id": 1, "upravit": "info" }
+:Admin:Zamestnanci:detail { "id": 1, "new_user": 1 }
+:Admin:Zamestnanci:detail { "id": 1, "user": 1, "upravit": "heslo" }
+:Admin:Zamestnanci:detail { "id": 1, "role": 1 }
+:Admin:Zamestnanci:detail { "id": 1, "user": 1, "upravit": "org" }
+:Admin:Orgjednotky:seznam
+:Admin:Orgjednotky:novy
+:Admin:Orgjednotky:detail { "id": 1 }
+:Admin:Orgjednotky:detail { "id": 1, "upravit": "info" }
+:Admin:Opravneni:seznam
+:Admin:Opravneni:novy
+:Admin:Opravneni:detail { "id": 1 }
+:Admin:Opravneni:detail { "id": 1, "upravit": "info" }
+:Admin:Spisznak:seznam
+:Admin:Spisznak:novy
+:Admin:Spisznak:detail { "id": 17 }
+:Admin:Spisznak:detail { "id": 17, "upravit": "info" }
+:Admin:Ciselniky:
+:Admin:Ciselniky:typdokumentu
+:Admin:Ciselniky:spousteciudalost
+:Admin:Ciselniky:zpusobvyrizeni
+:Admin:Ciselniky:zpusobodeslani
+:Admin:Ciselniky:zpusobdoruceni
+:Admin:Ciselniky:staty
+:Admin:Ciselniky:druhzasilky
+:Admin:Protokol:
+:Admin:Protokol:prihlaseni
+:Spisovka:Napoveda:
