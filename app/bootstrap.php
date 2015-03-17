@@ -33,7 +33,10 @@ if (@file_put_contents(TEMP_DIR . '/_check', '') === FALSE) {
 $loader = new Nette\Loaders\RobotLoader();
 $loader->addDirectory(APP_DIR);
 $loader->addDirectory(LIBS_DIR);
-$loader->setCacheStorage(new Nette\Caching\Storages\FileStorage(TEMP_DIR . '/cache'));
+$cacheDir = TEMP_DIR . '/cache';
+if (!is_dir($cacheDir))
+    mkdir($cacheDir);
+$loader->setCacheStorage(new Nette\Caching\Storages\FileStorage($cacheDir));
 // mPDF nelze nacitat pres RobotLoader, protoze PHP by dosla pamet
 //$loader->addClass('mPDF', LIBS_DIR . '/mpdf/mpdf.php');
 $loader->register();
@@ -250,6 +253,7 @@ if ( $clean_url ) {
                 'id'        => null,
                 'params'    => null
                 ));
+                        
     // E-podatelna module
     $router[] = new Nette\Application\Routers\Route('epodatelna/<presenter>/<action>/<id>', array(
                 'module'    => 'Epodatelna',
