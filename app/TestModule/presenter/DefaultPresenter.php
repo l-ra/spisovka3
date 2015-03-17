@@ -101,7 +101,10 @@ class Test_DefaultPresenter extends BasePresenter
                 return 'OK';
             }
             
-            return get_class($response);
+            $classname = get_class($response);
+            // Odstran z nazvu namespace
+            $classname = substr($classname, strrpos($classname, '\\') + 1);
+            return $classname;
         }
         catch (Exception $e) {
             @ob_end_clean();

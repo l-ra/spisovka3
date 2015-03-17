@@ -3,23 +3,42 @@
 :Spisovka:Dokumenty:novy
 :Spisovka:Dokumenty:novy { "cisty": 1 }
 :Spisovka:Dokumenty:detail { "id": 190 }
+:Spisovka:Prilohy:pridat { "id": 1234 }
 :Spisovka:Spisy:
 :Spisovka:Spisy:novy
 :Spisovka:Spisy:detail { "id": 8 }
 :Spisovka:Spisy:detail { "id": 8, "upravit": "info" }
+:Spisovka:Spisy:vyber { "id": 1234 }
 :Spisovka:Sestavy:
 :Spisovka:Sestavy:nova
 :Spisovka:Sestavy:detail { "id": 1 }
 :Spisovka:Sestavy:upravit { "id": 4 }
 :Spisovka:Sestavy:tisk { "id": 6 }
+:Spisovka:Sestavy:pdf { "id": 6 }
+:Spisovka:Sestavy:detail { "id": 6, "view": "tisk" }
+:Spisovka:Subjekty:novy { "dok_id": 1234 }
+:Spisovka:Subjekty:vyber { "dok_id": 1234 }
 :Spisovka:Vypravna:
 :Spisovka:Vypravna:filtrovat
 :Spisovka:Vypravna:detail { "id": 26 }
 :Spisovka:Vyhledat:
-:Spisovka:Vyhledat:reset
+:Spisovka:Uzivatel:vyber { "dok_id": 1234 }
 :Epodatelna:Default:
+:Epodatelna:Default:nove
+:Epodatelna:Default:prichozi
+:Epodatelna:Default:odchozi
 :Spisovna:Default:
 :Spisovna:Dokumenty:
+:Spisovna:Dokumenty:prijem
+:Spisovna:Dokumenty:keskartaciseznam
+:Spisovna:Dokumenty:skartace
+:Spisovna:Dokumenty:detail { "id": 2289 }
+:Spisovna:Dokumenty:detail { "id": 2289, "upravit": "skart_rezim" }
+:Spisovna:Spisy:
+:Spisovna:Spisy:prijem
+:Spisovna:Zapujcky:
+:Spisovna:Zapujcky:nova
+:Spisovna:Zapujcky:detail { "id": 21 }
 :Admin:Default:
 :Admin:Nastaveni:
 :Admin:Nastaveni: { "upravit": "info" }
@@ -65,3 +84,6 @@
 :Admin:Protokol:
 :Admin:Protokol:prihlaseni
 :Spisovka:Napoveda:
+:Spisovka:Uzivatel:
+:Spisovka:Uzivatel: { "id": 1, "upravit": "info" }
+:Spisovka:Uzivatel: { "zmenitheslo": 1 }
