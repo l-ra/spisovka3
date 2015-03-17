@@ -50,9 +50,11 @@ class MyMacros extends Nette\Application\UI\Control {
     // Vykresli standardni prvek formulare
     public static function input($form, $name) {
     
+        $caption = $form[$name]->caption;
+        $control = isset($form[$name]->controlPart) ? $form[$name]->controlPart : $form[$name]->control;
         return "<dl class=\"detail_item\">
-            <dt>{$form[$name]->caption}</dt>
-            <dd>{$form[$name]->control}</dd>
+            <dt>$caption</dt>
+            <dd>$control</dd>
         </dl>";
     }
 }

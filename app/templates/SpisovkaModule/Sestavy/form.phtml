@@ -13,12 +13,12 @@
         <div class="h2">
             Sestava
         </div>
-        {input sestava_nazev}
-        {input sestava_popis}
-        {input sestava_typ}
+        {input2 sestava_nazev}
+        {input2 sestava_popis}
+        {input2 sestava_typ}
         <dl class="detail_item">
             <dt>{$form['sestava_filtr']->caption}</dt>
-            <dd>{$form['sestava_filtr']->control} (zobrazit výběr rozsahu podle pořadového čísla nebo data)</dd>
+            <dd>{$form['sestava_filtr']->controlPart} (zobrazit výběr rozsahu podle pořadového čísla nebo data)</dd>
         </dl>
     </div>
     
@@ -26,13 +26,13 @@
         <div class="h2">
             Zobrazované údaje
         </div>
-        {input zobrazeni_cas}
-        {input zobrazeni_adresa}
+        {input2 zobrazeni_cas}
+        {input2 zobrazeni_adresa}
         <p><strong>Výběr sloupců:</strong></p>
-        {input sloupce_smer_dokumentu}
-        {input sloupce_poznamka}
-        {input sloupce_poznamka_predani}
-        {input sloupce_prazdny}
+        {input2 sloupce_smer_dokumentu}
+        {input2 sloupce_poznamka}
+        {input2 sloupce_poznamka_predani}
+        {input2 sloupce_prazdny}
     </div>
     
     {include ../Vyhledat/form_common.phtml}

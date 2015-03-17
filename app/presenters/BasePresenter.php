@@ -293,6 +293,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $set->addMacro('access', 'if (MyMacros::access(%node.word)) {', '}');
         $set->addMacro('isAllowed', 'if (MyMacros::isAllowed(%node.args)) {', '}');
 
+        $set->addMacro('input2', 'echo MyMacros::input($form, %node.args)');
+        
         // Neni momentalne pouzito:
         // $set->addMacro('accessrole', '{', '}');
         
