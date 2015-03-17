@@ -69,7 +69,7 @@ class Admin_PrilohyPresenter extends BasePresenter
         $form1->addText('nazev', 'Název přílohy:', 50, 150);
         $form1->addTextArea('popis', 'Popis:', 80, 5);
         $form1->addSelect('typ', 'Typ souboru', FileModel::typPrilohy());
-        $form1->addFile('file', 'Soubor:');
+        $form1->addUpload('file', 'Soubor:');
         $form1->addSubmit('upload', 'Upload')
                  ->onClick[] = array($this, 'uploadClicked');
 

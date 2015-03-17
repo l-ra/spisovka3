@@ -112,7 +112,7 @@
     <div class="prazdno">Nebyly nalezeny žádné účty datových schránek</div>
     {/if}
 
-<h2>Kvalifikované certifikační autority</h2>
+<h2>Certifikáty kvalifikovaných certifikačních autorit</h2>
 
     {if count($n_ca)>0}
     <div class="detail_blok">
@@ -130,25 +130,5 @@
     {/foreach}
     </div>
     {else}
-    <div class="prazdno">Nebyly nalezeny žádné kvalifikované certifikační autority</div>
-    {/if}
-
-    {if 0 /* count($n_ca)>0*/}
-    <div class="detail_blok">
-    {foreach $n_ca as $index => $ca}
-        <dl class="detail_item">
-            <dt>&nbsp;</dt>
-            <dd>
-                {$ca['name']}<br />
-                <span style="font-weight: normal;">
-                    {$ca['info']}<br />
-                    platnost: {$ca['platnost_od']} - {$ca['platnost_do']}
-                </span>
-
-            </dd>
-        </dl>
-    {/foreach}
-    </div>
-    
-    <div class="prazdno">Nebyly nalezeny žádné kvalifikované certifikační autority</div>
+    <div class="prazdno">Nebyly nalezeny žádné certifikáty</div>
     {/if}

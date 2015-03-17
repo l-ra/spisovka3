@@ -545,8 +545,11 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         $form = new Nette\Application\UI\Form();
         $form->addSelect('filtr', 'Filtr:', $select)
-                ->setValue($filtr)
+                // ->setValue($filtr)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
+        if ($this->template->zobrazit_filtr)
+            $form['filtr']->setValue($filtr);
+        
         $form->addSubmit('go_filtr', 'Filtrovat')
                  // ->setRendered(TRUE)
                  ->onClick[] = array($this, 'filtrClicked');

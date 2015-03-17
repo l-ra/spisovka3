@@ -25,7 +25,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
 
         $ciselnik = new Ciselnik();
         $ciselnik->setTable('dokument_typ');
-        $ciselnik->setParams($this->getParam());
+        $ciselnik->setParams($this->getParameters());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:typdokumentu'));
 
         $ciselnik->addColumn('id',
@@ -98,7 +98,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
 
         $ciselnik = new Ciselnik();
         $ciselnik->setTable('zpusob_vyrizeni');
-        $ciselnik->setParams($this->getParam());
+        $ciselnik->setParams($this->getParameters());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:zpusobvyrizeni'));
 
         $ciselnik->addColumn('id',
@@ -154,7 +154,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
 
         $ciselnik = new Ciselnik();
         $ciselnik->setTable('zpusob_odeslani');
-        $ciselnik->setParams($this->getParam());
+        $ciselnik->setParams($this->getParameters());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:zpusobodeslani'));
         $ciselnik->addColumn('id',
                     array(
@@ -209,7 +209,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
 
         $ciselnik = new Ciselnik();
         $ciselnik->setTable('zpusob_doruceni');
-        $ciselnik->setParams($this->getParam());
+        $ciselnik->setParams($this->getParameters());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:zpusobdoruceni'));
 
         $ciselnik->addColumn('id',
@@ -273,7 +273,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
 
         $ciselnik = new CiselnikSpousteciUdalost();
         $ciselnik->setTable('spousteci_udalost');
-        $ciselnik->setParams($this->getParam());
+        $ciselnik->setParams($this->getParameters());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:spousteciudalost'));
 
         $ciselnik->addColumn('id',
@@ -330,7 +330,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
 
         $ciselnik = new Ciselnik();
         $ciselnik->setTable('stat');
-        $ciselnik->setParams($this->getParam());
+        $ciselnik->setParams($this->getParameters());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:staty'));
         $ciselnik->orderBy('nazev');
 
@@ -379,7 +379,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
 
         $ciselnik = new CiselnikSpousteciUdalost();
         $ciselnik->setTable('druh_zasilky');
-        $ciselnik->setParams($this->getParam());
+        $ciselnik->setParams($this->getParameters());
         $ciselnik->setLink($this->link(':Admin:Ciselniky:druhzasilky'));
         $ciselnik->addParam('no_delete', true);
         $ciselnik->orderBy('order');

@@ -190,7 +190,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $id = $this->getParam('id',null);
         $typ = substr($id,0,1);
         $index = substr($id,1);
-        $isds = $ep['isds'][$index];
+        $isds = !empty($id) ? $ep['isds'][$index] : array();
 
         $org_select = array('0'=>'Kterákoli podatelna');
         $OrgJednotky = new Orgjednotka();
@@ -227,7 +227,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 // ->setValue($isds['password'])
                 // ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
 
-        $form1->addFile('certifikat_file', 'Cesta k certifikátu (formát X.509):');
+        $form1->addUpload('certifikat_file', 'Cesta k certifikátu (formát X.509):');
         $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100)
                 ->setValue($isds['cert_pass']);
 
@@ -382,7 +382,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $id = $this->getParam('id',null);
         $index = substr($id,1);
-        $isds = $ep['isds'][$index];
+        $isds = !empty($id) ? $ep['isds'][$index] : array();
         
         
         $id = $this->getParam('id',null);
@@ -502,7 +502,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $id = $this->getParam('id',null);
         $typ = substr($id,0,1);
         $index = substr($id,1);
-        $email = $ep['email'][$index];
+        $email = !empty($id) ? $ep['email'][$index] : array();
 
         $org_select = array('0'=>'Kterákoli podatelna');
         $OrgJednotky = new Orgjednotka();
@@ -608,7 +608,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $id = $this->getParam('id',null);
         $typ = substr($id,0,1);
         $index = substr($id,1);
-        $odes = $ep['odeslani'][$index];
+        $odes = !empty($id) ? $ep['odeslani'][$index] : array();
 
         $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('index')
@@ -628,8 +628,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100)
                 ->setValue($odes['email']);
 
-        $form1->addFile('cert_file', 'Cesta k certifikátu:');
-        $form1->addFile('cert_key_file', 'Cesta k privátnímu klíči:');
+        $form1->addUpload('cert_file', 'Cesta k certifikátu:');
+        $form1->addUpload('cert_key_file', 'Cesta k privátnímu klíči:');
         $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100)
                 ->setValue($odes['cert_pass']);
 
@@ -821,15 +821,15 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     public static function nactiNastaveni()
     {
-        return Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini')
-                ->toArray();
+        $loader = new Nette\DI\Config\Loader();
+        return Nette\ArrayHash::from($loader->load(CLIENT_DIR . '/configs/epodatelna.ini'));
     }
     
     protected static function ulozNastaveni($config_data)
     {
-        $new_config = new Config();
+/*        $new_config = new Config();
         $new_config->import($config_data);
-        $new_config->save(CLIENT_DIR .'/configs/epodatelna.ini');
+        $new_config->save(CLIENT_DIR .'/configs/epodatelna.ini'); */
     }
     
 }
