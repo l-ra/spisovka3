@@ -310,7 +310,7 @@ if ( $clean_url ) {
 } else {
         define('IS_SIMPLE_ROUTER',1);
         
-        $path = Nette\Environment::getHttpRequest()->getOriginalUri()->getPath();
+        $path = Nette\Environment::getHttpRequest()->getUrl()->getPath();
         if ( strpos($path,"/instalace.php") !== false ) {
             $router[] = new Nette\Application\Routers\SimpleRouter('Install:Default:uvod');
         } else if ( strpos($path,"/kontrola.php") !== false ) {

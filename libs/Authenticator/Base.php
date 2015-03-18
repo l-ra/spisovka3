@@ -148,7 +148,7 @@ class Authenticator_Base extends Nette\Application\UI\Control
 
         if ( Nette\Environment::getHttpRequest()->getMethod() == "POST" ) {
             //$this->presenter->redirect('this');
-            header("Location: ". Nette\Environment::getHttpRequest()->getUri()->getAbsoluteUri() ,"303");
+            header("Location: ". Nette\Environment::getHttpRequest()->getUrl()->getAbsoluteUrl() ,"303");
         }
     }
     

@@ -822,7 +822,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     public static function nactiNastaveni()
     {
         $loader = new Nette\DI\Config\Loader();
-        return Nette\ArrayHash::from($loader->load(CLIENT_DIR . '/configs/epodatelna.ini'));
+        return ($loader->load(CLIENT_DIR . '/configs/epodatelna.ini'));
     }
     
     protected static function ulozNastaveni($config_data)

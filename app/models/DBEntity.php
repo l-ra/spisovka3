@@ -189,7 +189,7 @@ abstract class DBEntity
     {
         $id = dibi::insert(':PREFIX:' . static::TBL_NAME, $data)->execute(dibi::IDENTIFIER);
         
-        return new $class($id);
+        return new static($id);
     }
 
 }
