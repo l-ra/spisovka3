@@ -2,6 +2,6 @@
     "require": {
         "php": ">=5.3.7",
         "dibi/dibi": "2.*",
-        "nette/nette": "2.1.*"
+        "nette/nette": "2.2.*"
     }
 }

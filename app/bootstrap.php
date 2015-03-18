@@ -134,7 +134,6 @@ function Form_addDateTimePicker(Nette\Forms\Form $_this, $name, $label, $cols = 
 Nette\Forms\Form::extensionMethod('Nette\Forms\Form::addDatePicker', 'Form_addDatePicker');
 Nette\Forms\Form::extensionMethod('Nette\Forms\Form::addDateTimePicker', 'Form_addDateTimePicker');
 
-Nette\Mail\Message::$defaultMailer = 'ESSMailer';
 
 // 3b) Load database
 try {

@@ -282,11 +282,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     }
     
     public function templatePrepareFilters($template)
-    {
-        $latte = new Nette\Latte\Engine;
-        $template->registerFilter($latte);
+    {       
+        $latte = $template->getLatte();
         
-        $set = new Nette\Latte\Macros\MacroSet($latte->compiler);
+        $set = new Nette\Latte\Macros\MacroSet($latte->getCompiler());
         $set->addMacro('css', 'echo MyMacros::CSS($publicUrl, %node.args);');
         $set->addMacro('js', 'echo MyMacros::JavaScript(%node.word, $publicUrl);');
 
