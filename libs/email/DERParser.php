@@ -430,8 +430,8 @@ class DERParser {
                     ( $x == 2 && ( $y > 50 && $y != 100 ) ) ) )
                 {
                     break;
-		}
-		$out .= sprintf("%d.%d", $x, $y);
+                }
+                $out .= sprintf("%d.%d", $x, $y);
                 $isFirst = false;
             } else {
 

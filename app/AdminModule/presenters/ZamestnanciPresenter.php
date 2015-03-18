@@ -428,8 +428,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     public function changePasswordFormHandler(Nette\Forms\Controls\SubmitButton $button)
     {
-	$form = $button->getParent();
-	$changePasswordForm = $this->getComponent('changePasswordForm');
+        $form = $button->getParent();
+        $changePasswordForm = $this->getComponent('changePasswordForm');
     }
 
     protected function createComponentSearchForm()

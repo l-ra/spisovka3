@@ -50,7 +50,7 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
             $user->zalogovan($row->id);
             $log->logAccess($row->id, 1);
         }
-		else {
+        else {
             // Alternativni prihlaseni klasickym zpusobem - overeni hesla
             if ($row->password !== $password) {
                 $log->logAccess($row->id, 0);
@@ -425,16 +425,16 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
     {
         if ($signal == 'submit') {
             return $this->receivedSignal === 'submit';
-	} else {
+        } else {
             return $this->getPresenter()->isSignalReceiver($this, $signal);
-	}
+        }
     }
 
     protected function createComponentLoginForm($name)
     {
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}
+        }
 
         $form = new Nette\Application\UI\Form($this, $name);
         $form->addText('username', 'Uživatelské jméno:')
@@ -455,7 +455,7 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
     {
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}
+        }
 
         $form = new Nette\Application\UI\Form($this, $name);
 
@@ -509,7 +509,7 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
 
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}
+        }
 
         $form = new Nette\Application\UI\Form($this, $name);
 
@@ -554,7 +554,7 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
 
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}
+        }
 
         $form = new Nette\Application\UI\Form($this, $name);
 
@@ -585,11 +585,11 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
     {
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}
+        }
 
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}        
+        }        
         
         $seznam = $this->getAllUser();
 
@@ -658,7 +658,7 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
     {
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}        
+        }        
 
         $this->handleSyncManual();
         
@@ -755,8 +755,8 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
     {
         $this->receivedSignal = 'submit';
 
-	// was form submitted?
-	if ($form->isSubmitted()) {
+        // was form submitted?
+        if ($form->isSubmitted()) {
 
             $values = $form->getValues();
             $data = $form->getHttpData();
@@ -780,8 +780,9 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
             } else {
                 throw new Nette\InvalidStateException("Unknown submit button.");
             }
-	}
-	if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
+        }
+        if (!$this->presenter->isAjax())
+            $this->presenter->redirect('this');
     }
 
     public function handleChangePassword($data)

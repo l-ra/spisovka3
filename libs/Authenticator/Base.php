@@ -15,11 +15,11 @@ class Authenticator_Base extends Nette\Application\UI\Control
                 $this->presenter->redirectUrl($data['backlink']);
             else
                 $this->presenter->redirect('this');
-				// $this->presenter->redirect(':Spisovka:Default:default');
+                // $this->presenter->redirect(':Spisovka:Default:default');
         }
-		catch (Nette\Security\AuthenticationException $e) {
+        catch (Nette\Security\AuthenticationException $e) {
             $this->presenter->flashMessage($e->getMessage(), 'warning');
-			sleep(2); // sniz riziko brute force utoku
+            sleep(2); // sniz riziko brute force utoku
         }
     }
 

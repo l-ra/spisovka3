@@ -138,7 +138,7 @@ class Ciselnik extends Nette\Application\UI\Control {
     {
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}
+        }
 
         $form = new Nette\Application\UI\Form($this, $name);
         $form->onSubmit[] = array($this, 'formSubmitHandler');
@@ -289,9 +289,9 @@ class Ciselnik extends Nette\Application\UI\Control {
     {
         if ($signal == 'submit') {
             return $this->receivedSignal === 'submit';
-	} else {
+        } else {
             return $this->getPresenter()->isSignalReceiver($this, $signal);
-	}
+        }
     }
 
 
@@ -304,8 +304,8 @@ class Ciselnik extends Nette\Application\UI\Control {
     {
         $this->receivedSignal = 'submit';
 
-	// was form submitted?
-	if ($form->isSubmitted()) {
+        // was form submitted?
+        if ($form->isSubmitted()) {
             
             $values = $form->getValues();
             $data = $form->getHttpData();
@@ -328,9 +328,10 @@ class Ciselnik extends Nette\Application\UI\Control {
             } else {
                 throw new Nette\InvalidStateException("Unknown submit button.");
             }
-
-	}
-	if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
+        }
+        
+        if (!$this->presenter->isAjax())
+            $this->presenter->redirect('this');
     }
 
     public function handleNew($values)
@@ -347,8 +348,10 @@ class Ciselnik extends Nette\Application\UI\Control {
             $this->presenter->flashMessage($e->getMessage(),'error');
         }
 
-	$this->invalidateControl();
-        if (!$this->presenter->isAjax()) $this->redirect('this');
+        $this->invalidateControl();
+        
+        if (!$this->presenter->isAjax())
+            $this->redirect('this');
     }
 
     public function handleEdit($values, $id)
@@ -366,8 +369,10 @@ class Ciselnik extends Nette\Application\UI\Control {
             $this->presenter->flashMessage($e->getMessage(),'error');
         }
 
-	$this->invalidateControl();
-        if (!$this->presenter->isAjax()) $this->redirect('this');
+        $this->invalidateControl();
+        
+        if (!$this->presenter->isAjax())
+            $this->redirect('this');
     }
 
     public function handleDelete($id)
@@ -385,14 +390,16 @@ class Ciselnik extends Nette\Application\UI\Control {
             $this->presenter->flashMessage($e->getMessage(),'error');
         }
 
-	$this->invalidateControl();
-        if (!$this->presenter->isAjax()) $this->redirect('this');
+        $this->invalidateControl();
+        if (!$this->presenter->isAjax())
+            $this->redirect('this');
     }
 
     public function handleStorno()
     {
-	$this->invalidateControl();
-        if (!$this->presenter->isAjax()) $this->redirect('this');
+        $this->invalidateControl();
+        if (!$this->presenter->isAjax())
+            $this->redirect('this');
     }
 
     // Určeno k přepsání v případné třídě potomka

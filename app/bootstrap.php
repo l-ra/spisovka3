@@ -26,7 +26,7 @@ define('TEMP_DIR', CLIENT_DIR . '/temp');
 
 // check if directory /app/temp is writable
 if (@file_put_contents(TEMP_DIR . '/_check', '') === FALSE) {
-	throw new Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
+    throw new Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
 }
 
 // enable RobotLoader - this allows load all classes automatically
@@ -102,7 +102,7 @@ unset($unique_info);
 // 2e) setup sessions
 $session_dir = CLIENT_DIR . '/sessions';
 if (@file_put_contents("$session_dir/_check", '') === FALSE) {
-	throw new Exception("Nelze zapisovat do adresare '$session_dir'");
+    throw new Exception("Nelze zapisovat do adresare '$session_dir'");
 }
 $session = Nette\Environment::getSession();
 $session->setName('SpisovkaSessionID');
@@ -207,12 +207,12 @@ if ( $clean_url ) {
                 'action' => 'default',
                 ), Nette\Application\Routers\Route::ONE_WAY);
         
-	$router[] = new Nette\Application\Routers\Route('instalace.php', array(
+    $router[] = new Nette\Application\Routers\Route('instalace.php', array(
                 'module'    => 'Install',
                 'presenter' => 'Default',
                 'action' => 'uvod',
                 ), Nette\Application\Routers\Route::ONE_WAY); 
-	
+    
     $router[] = new Nette\Application\Routers\Route('kontrola.php', array(
                 'module'    => 'Install',
                 'presenter' => 'Default',
@@ -220,14 +220,14 @@ if ( $clean_url ) {
                 'no_install' => 1
                 ), Nette\Application\Routers\Route::ONE_WAY);        
 
-	// Uzivatel
+    // Uzivatel
     $router[] = new Nette\Application\Routers\Route('uzivatel/<action>/<id>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Uzivatel',
                 'action' => 'default',
                 'id' => NULL,
                 ));
-	// Help
+    // Help
     $router[] = new Nette\Application\Routers\Route('napoveda/<param1>/<param2>/<param3>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Napoveda',
@@ -236,7 +236,7 @@ if ( $clean_url ) {
                 'param2' => 'param2',
                 'param3' => 'param3'
                 ));
-	// Error
+    // Error
     $router[] = new Nette\Application\Routers\Route('error/<action>/<id>', array(
                 /*'module'    => 'Spisovka',*/
                 'presenter' => 'Error',
@@ -318,7 +318,7 @@ if ( $clean_url ) {
         } else {
             $router[] = new Nette\Application\Routers\SimpleRouter('Spisovka:Default:default');
         }
-	
+    
 }
 
 }
@@ -334,21 +334,21 @@ $application->run();
 
 function createIniFiles()
 {
-	$dir = CLIENT_DIR .'/configs';
-	createIniFile("$dir/system.neon");
-	createIniFile("$dir/klient.ini");
-	createIniFile("$dir/epodatelna.ini");
+    $dir = CLIENT_DIR .'/configs';
+    createIniFile("$dir/system.neon");
+    createIniFile("$dir/klient.ini");
+    createIniFile("$dir/epodatelna.ini");
 }
 
 function createIniFile($filename)
 {
-	if (file_exists($filename))
-		return;
-	
-	$template = substr($filename, 0, -1);
-	if (!copy($template, $filename))
-		throw new Exception("Nemohu vytvorit soubor $filename.");
-	
-	$perm = strstr($filename, 'system.ini') !== FALSE ? 0440 : 0640;
-	@chmod($filename, $perm);
+    if (file_exists($filename))
+        return;
+    
+    $template = substr($filename, 0, -1);
+    if (!copy($template, $filename))
+        throw new Exception("Nemohu vytvorit soubor $filename.");
+    
+    $perm = strstr($filename, 'system.ini') !== FALSE ? 0440 : 0640;
+    @chmod($filename, $perm);
 }

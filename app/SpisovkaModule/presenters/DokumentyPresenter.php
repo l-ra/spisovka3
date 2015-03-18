@@ -995,8 +995,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             } else {
                 // totozna odpoved neexistuje
     
-		// nalezeni nejvyssiho cisla poradi v ramci spisu
-		$poradi = $Dokumenty->getMaxPoradi($dok->cislo_jednaci_id);
+                // nalezeni nejvyssiho cisla poradi v ramci spisu
+                $poradi = $Dokumenty->getMaxPoradi($dok->cislo_jednaci_id);
 
                 $pred_priprava = array(
                     "nazev" => $dok->nazev,

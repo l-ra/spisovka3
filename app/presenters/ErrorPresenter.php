@@ -19,39 +19,39 @@ class ErrorPresenter extends BasePresenter
         $this->setLayout('login');
     }
 
-	/**
-	 * @return void
-	 */
-	public function renderDefault($exception)
-	{
+    /**
+     * @return void
+     */
+    public function renderDefault($exception)
+    {
 
-		if ($this->isAjax()) {
-			echo $exception->getMessage();
-			$this->terminate();
+        if ($this->isAjax()) {
+            echo $exception->getMessage();
+            $this->terminate();
 
-		} else {
-			$this->template->robots = 'noindex,noarchive';
+        } else {
+            $this->template->robots = 'noindex,noarchive';
             $httpResponse = Nette\Environment::getHttpResponse();
             
-			if ($exception instanceof Nette\Application\BadRequestException) {
+            if ($exception instanceof Nette\Application\BadRequestException) {
                 if (!$httpResponse->isSent())
                     $httpResponse->setCode($exception->getCode());
-				// $this->template->title = '404 Not Found';
+                // $this->template->title = '404 Not Found';
                 $this->template->message = $exception->getMessage();
-				$this->setView('404');
-			} else {
+                $this->setView('404');
+            } else {
                 if (!$httpResponse->isSent())
                     $httpResponse->setCode(500);
-				// $this->template->title = '500 Internal Server Error';
+                // $this->template->title = '500 Internal Server Error';
                 $this->template->message = $exception->getMessage();
-				$this->setView('500');
+                $this->setView('500');
 
                 // vytvor log pro vyjimku
-				// Nette\Diagnostics\Debugger::processException($exception);
-			}
-		}
+                // Nette\Diagnostics\Debugger::processException($exception);
+            }
+        }
 
-	}
+    }
 
 
 }

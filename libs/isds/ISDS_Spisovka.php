@@ -241,7 +241,7 @@ class ISDS_Spisovka extends ISDS {
 
 
         // Sestaveni zpravy
-	$MessageCreateInput = array(
+        $MessageCreateInput = array(
                     'dmEnvelope' => $dmEnvelope,
                     'dmFiles' => $dmFiles
                 );
@@ -249,7 +249,7 @@ class ISDS_Spisovka extends ISDS {
         $this->debug_param('dmEnvelope', $MessageCreateInput['dmEnvelope']);
         $this->debug_param('dmFiles', $MessageCreateInput['dmFiles']);
 
-	try {
+        try {
             // odeslani zpravy a ziskani ID zpravy
             $MessageCreateOutput = $this->OperationsWS()->CreateMessage($MessageCreateInput);
             $messageStatus = $MessageCreateOutput->dmStatus;
@@ -265,13 +265,13 @@ class ISDS_Spisovka extends ISDS {
                 $this->debug_return('return',false,1);
                 return false;
             }
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             $this->debug_return('error',"Datovou zprávu se nepodařilo odeslat");
             $this->debug_return('return',false,1);
             return false;
-	}
+        }
 
     }
 

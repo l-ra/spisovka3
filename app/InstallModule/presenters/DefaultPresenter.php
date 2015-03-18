@@ -146,114 +146,114 @@ class Install_DefaultPresenter extends BasePresenter
 
         $requirements_ess = $this->paint( array(
             array(
-		'title' => 'Aplikace',
-		'message' => ( $app_info[2] )
+                'title' => 'Aplikace',
+                'message' => ( $app_info[2] )
             ),
             array(
-		'title' => 'Web server',
-		'message' => $_SERVER['SERVER_SOFTWARE'],
+                'title' => 'Web server',
+                'message' => $_SERVER['SERVER_SOFTWARE'],
             ),
 
         // imap_open vyzaduje 5.3.2, problem s MS Exchange
         
             array(
-		'title' => 'PHP verze',
-		'required' => TRUE,
-		'passed' => version_compare(PHP_VERSION, '5.3.2', '>='),
-		'message' => PHP_VERSION,
-		'description' => 'Používáte starou verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.3.2 nebo vyšší.',
+                'title' => 'PHP verze',
+                'required' => TRUE,
+                'passed' => version_compare(PHP_VERSION, '5.3.2', '>='),
+                'message' => PHP_VERSION,
+                'description' => 'Používáte starou verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.3.2 nebo vyšší.',
             ),
 
             array(
-		'title' => 'Databáze',
-		'required' => TRUE,
-		'passed' => $database_support,
-		'message' => $database_info,
+                'title' => 'Databáze',
+                'required' => TRUE,
+                'passed' => $database_support,
+                'message' => $database_info,
                 'errorMessage' => 'Nelze se připojit k databázi.',
-		'description' => 'Databáze je nutná pro běh aplikace. Zkontrolujte správnost nastavení nebo dostupnost databázového serveru.<br />SQL chyba: '. $database_info,
+                'description' => 'Databáze je nutná pro běh aplikace. Zkontrolujte správnost nastavení nebo dostupnost databázového serveru.<br />SQL chyba: '. $database_info,
             ),
 
             array(
-		'title' => 'Podpora cURL',
-		'required' => FALSE,
-		'passed' => $curl_support,
-		'message' => $user_agent,
-		'errorMessage' => 'Není zapnuta podpora knihovny cURL.',
-		'description' => 'Je nutná pro vzdálenou komunikaci. Používá se pro komunikaci s ISDS, CzechPoint a hledání v systému ARES.',
+                'title' => 'Podpora cURL',
+                'required' => FALSE,
+                'passed' => $curl_support,
+                'message' => $user_agent,
+                'errorMessage' => 'Není zapnuta podpora knihovny cURL.',
+                'description' => 'Je nutná pro vzdálenou komunikaci. Používá se pro komunikaci s ISDS, CzechPoint a hledání v systému ARES.',
             ),
 
             array(
-		'title' => 'Podpora cURL SSL',
-		'required' => FALSE,
-		'passed' => $curl_support,
-		'message' => $curl_ssl_version,
-		'errorMessage' => ($curl_support==1)?'Není možné použít cURL k zabezpečené komunikaci přes SSL':'Není zapnuta podpora cURL.',
-		'description' => 'Pro vzdálenou komunikaci s ISDS a CzechPoint je potřeba šifrovaného spojení (SSL).',
+                'title' => 'Podpora cURL SSL',
+                'required' => FALSE,
+                'passed' => $curl_support,
+                'message' => $curl_ssl_version,
+                'errorMessage' => ($curl_support==1)?'Není možné použít cURL k zabezpečené komunikaci přes SSL':'Není zapnuta podpora cURL.',
+                'description' => 'Pro vzdálenou komunikaci s ISDS a CzechPoint je potřeba šifrovaného spojení (SSL).',
             ),
             array(
-		'title' => 'Podpora SOAP',
-		'required' => FALSE,
-		'passed' => $soap_support,
-		'message' => '',
-		'errorMessage' => 'Není zapnuta podpora knihovny SOAP (SoapClient)',
-		'description' => 'Je potřeba pro komunikaci a práci s ISDS a CzechPoint.',
+                'title' => 'Podpora SOAP',
+                'required' => FALSE,
+                'passed' => $soap_support,
+                'message' => '',
+                'errorMessage' => 'Není zapnuta podpora knihovny SOAP (SoapClient)',
+                'description' => 'Je potřeba pro komunikaci a práci s ISDS a CzechPoint.',
             ),
             array(
-		'title' => 'Podpora OpenSSL',
-		'required' => FALSE,
-		'passed' => $openssl_support,
-		'message' => 'Ano',
-		'errorMessage' => 'Není zapnuta plná podpora knihovny OpenSSL',
-		'description' => 'Je potřeba pro ověřování a podepisování kvalifikovaných emailových zpráv.',
+                'title' => 'Podpora OpenSSL',
+                'required' => FALSE,
+                'passed' => $openssl_support,
+                'message' => 'Ano',
+                'errorMessage' => 'Není zapnuta plná podpora knihovny OpenSSL',
+                'description' => 'Je potřeba pro ověřování a podepisování kvalifikovaných emailových zpráv.',
             ),
             array(
-		'title' => 'Podpora mail()',
-		'required' => FALSE,
-		'passed' => $mail_support,
-		'message' => 'Ano',
-		'errorMessage' => 'Není zapnuta podpora funkce mail()',
-		'description' => 'Je potřeba pro odesílání emailových zpráv.',
+                'title' => 'Podpora mail()',
+                'required' => FALSE,
+                'passed' => $mail_support,
+                'message' => 'Ano',
+                'errorMessage' => 'Není zapnuta podpora funkce mail()',
+                'description' => 'Je potřeba pro odesílání emailových zpráv.',
             ),
             array(
-		'title' => 'Podpora IMAP',
-		'required' => FALSE,
-		'passed' => $imap_support,
-		'message' => $imap_version,
-		'errorMessage' => 'Není zapnuta podpora knihovny IMAP',
-		'description' => 'Je potřeba pro příjem emailových zpráv.',
+                'title' => 'Podpora IMAP',
+                'required' => FALSE,
+                'passed' => $imap_support,
+                'message' => $imap_version,
+                'errorMessage' => 'Není zapnuta podpora knihovny IMAP',
+                'description' => 'Je potřeba pro příjem emailových zpráv.',
             ),
 
             array(
-		'title' => 'Zápis do dočasné složky',
-		'required' => TRUE,
-		'passed' => is_writable(CLIENT_DIR .'/temp/'),
-		'message' => 'Povoleno',
-		'errorMessage' => 'Není možné zapisovat do dočasné složky.',
-		'description' => 'Povolte zápis do složky /client/temp/',
+                'title' => 'Zápis do dočasné složky',
+                'required' => TRUE,
+                'passed' => is_writable(CLIENT_DIR .'/temp/'),
+                'message' => 'Povoleno',
+                'errorMessage' => 'Není možné zapisovat do dočasné složky.',
+                'description' => 'Povolte zápis do složky /client/temp/',
             ),
             array(
-		'title' => 'Zápis do konfigurační složky',
-		'required' => TRUE,
-		'passed' => is_writable(CLIENT_DIR .'/configs/') && is_writable(CLIENT_DIR .'/configs/epodatelna.ini') && is_writable(CLIENT_DIR .'/configs/klient.ini'),
-		'message' => 'Povoleno',
-		'errorMessage' => 'Není možné zapisovat do konfigurační složky.',
-		'description' => 'Povolte zápis do složky /client/configs/ a do souborů klient.ini a epodatelna.ini, které se v ní nacházejí. Tato složka slouží k uživateskému ukládání nastavení klienta, e-podatelny apod.',
+                'title' => 'Zápis do konfigurační složky',
+                'required' => TRUE,
+                'passed' => is_writable(CLIENT_DIR .'/configs/') && is_writable(CLIENT_DIR .'/configs/epodatelna.ini') && is_writable(CLIENT_DIR .'/configs/klient.ini'),
+                'message' => 'Povoleno',
+                'errorMessage' => 'Není možné zapisovat do konfigurační složky.',
+                'description' => 'Povolte zápis do složky /client/configs/ a do souborů klient.ini a epodatelna.ini, které se v ní nacházejí. Tato složka slouží k uživateskému ukládání nastavení klienta, e-podatelny apod.',
             ),
             array(
-		'title' => 'Zápis do složky sessions',
-		'required' => TRUE,
-		'passed' => is_writable(CLIENT_DIR .'/sessions/'),
-		'message' => 'Povoleno',
-		'errorMessage' => 'Není možné zapisovat do složky sessions.',
-		'description' => 'Povolte zápis do složky /client/sessions/. Tato složka slouží k ukládání různých stavů aplikace.',
+                'title' => 'Zápis do složky sessions',
+                'required' => TRUE,
+                'passed' => is_writable(CLIENT_DIR .'/sessions/'),
+                'message' => 'Povoleno',
+                'errorMessage' => 'Není možné zapisovat do složky sessions.',
+                'description' => 'Povolte zápis do složky /client/sessions/. Tato složka slouží k ukládání různých stavů aplikace.',
             ),
             array(
-		'title' => 'Zápis do logovací složky',
-		'required' => FALSE,
-		'passed' => is_writable(APP_DIR .'/../log/'),
-		'message' => 'Povoleno',
-		'errorMessage' => 'Není možné zapisovat do logovací složky.',
-		'description' => 'Povolte zápis do složky /log/. Tato složka slouží k ukládání různých logovacích a chybových hlášek.<br / >
+                'title' => 'Zápis do logovací složky',
+                'required' => FALSE,
+                'passed' => is_writable(APP_DIR .'/../log/'),
+                'message' => 'Povoleno',
+                'errorMessage' => 'Není možné zapisovat do logovací složky.',
+                'description' => 'Povolte zápis do složky /log/. Tato složka slouží k ukládání různých logovacích a chybových hlášek.<br / >
                                   Není nutná. Pokud však chcete zaznamenávat chybové hlášky, je potřeba tuto složku k zápisu povolit.',
             ),
             array(
@@ -278,216 +278,216 @@ class Install_DefaultPresenter extends BasePresenter
         //$reflection = class_exists('ReflectionFunction') && !$this->iniFlag('zend.ze1_compatibility_mode') ? new ReflectionFunction('paint') : NULL;
         $requirements_nette = $this->paint( array(
             array(
-		'title' => 'Web server',
-		'message' => $_SERVER['SERVER_SOFTWARE'],
+                'title' => 'Web server',
+                'message' => $_SERVER['SERVER_SOFTWARE'],
             ),
 
             array(
-		'title' => 'PHP version',
-		'required' => TRUE,
-		'passed' => version_compare(PHP_VERSION, '5.2.0', '>='),
-		'message' => PHP_VERSION,
-		'description' => 'Your PHP version is too old. Nette Framework requires at least PHP 5.2.0 or higher.',
+                'title' => 'PHP version',
+                'required' => TRUE,
+                'passed' => version_compare(PHP_VERSION, '5.2.0', '>='),
+                'message' => PHP_VERSION,
+                'description' => 'Your PHP version is too old. Nette Framework requires at least PHP 5.2.0 or higher.',
             ),
 
             array(
-		'title' => 'Memory limit',
-		'message' => ini_get('memory_limit'),
+                'title' => 'Memory limit',
+                'message' => ini_get('memory_limit'),
             ),
 
             'ha' => array(
-		'title' => '.htaccess file protection',
-		'required' => FALSE,
-		'description' => 'File protection by <code>.htaccess</code> is optional. If it is absent, you must be careful to put files into document_root folder.',
-		'script' => "var el = document.getElementById('resha');\nel.className = typeof checkerScript == 'undefined' ? 'passed' : 'warning';\nel.parentNode.removeChild(el.nextSibling.nodeType === 1 ? el.nextSibling : el.nextSibling.nextSibling);",
+                'title' => '.htaccess file protection',
+                'required' => FALSE,
+                'description' => 'File protection by <code>.htaccess</code> is optional. If it is absent, you must be careful to put files into document_root folder.',
+                'script' => "var el = document.getElementById('resha');\nel.className = typeof checkerScript == 'undefined' ? 'passed' : 'warning';\nel.parentNode.removeChild(el.nextSibling.nodeType === 1 ? el.nextSibling : el.nextSibling.nextSibling);",
             ),
 
             array(
-		'title' => 'Function ini_set',
-		'required' => FALSE,
-		'passed' => function_exists('ini_set'),
-		'description' => 'Function <code>ini_set()</code> is disabled. Some parts of Nette Framework may not work properly.',
+                'title' => 'Function ini_set',
+                'required' => FALSE,
+                'passed' => function_exists('ini_set'),
+                'description' => 'Function <code>ini_set()</code> is disabled. Some parts of Nette Framework may not work properly.',
             ),
 
             array(
-		'title' => 'Magic quotes',
-		'required' => FALSE,
-		'passed' => !$this->iniFlag('magic_quotes_gpc') && !$this->iniFlag('magic_quotes_runtime'),
-		'message' => 'Disabled',
-		'errorMessage' => 'Enabled',
-		'description' => 'Magic quotes <code>magic_quotes_gpc</code> and <code>magic_quotes_runtime</code> are enabled and should be turned off. Nette Framework disables <code>magic_quotes_runtime</code> automatically.',
+                'title' => 'Magic quotes',
+                'required' => FALSE,
+                'passed' => !$this->iniFlag('magic_quotes_gpc') && !$this->iniFlag('magic_quotes_runtime'),
+                'message' => 'Disabled',
+                'errorMessage' => 'Enabled',
+                'description' => 'Magic quotes <code>magic_quotes_gpc</code> and <code>magic_quotes_runtime</code> are enabled and should be turned off. Nette Framework disables <code>magic_quotes_runtime</code> automatically.',
             ),
 
             array(
-		'title' => 'Register_globals',
-		'required' => TRUE,
-		'passed' => !$this->iniFlag('register_globals'),
-		'message' => 'Disabled',
-		'errorMessage' => 'Enabled',
-		'description' => 'Configuration directive <code>register_globals</code> is enabled. Nette Framework requires this to be disabled.',
+                'title' => 'Register_globals',
+                'required' => TRUE,
+                'passed' => !$this->iniFlag('register_globals'),
+                'message' => 'Disabled',
+                'errorMessage' => 'Enabled',
+                'description' => 'Configuration directive <code>register_globals</code> is enabled. Nette Framework requires this to be disabled.',
             ),
 
             array(
-		'title' => 'Zend.ze1_compatibility_mode',
-		'required' => TRUE,
-		'passed' => !$this->iniFlag('zend.ze1_compatibility_mode'),
-		'message' => 'Disabled',
-		'errorMessage' => 'Enabled',
-		'description' => 'Configuration directive <code>zend.ze1_compatibility_mode</code> is enabled. Nette Framework requires this to be disabled.',
+                'title' => 'Zend.ze1_compatibility_mode',
+                'required' => TRUE,
+                'passed' => !$this->iniFlag('zend.ze1_compatibility_mode'),
+                'message' => 'Disabled',
+                'errorMessage' => 'Enabled',
+                'description' => 'Configuration directive <code>zend.ze1_compatibility_mode</code> is enabled. Nette Framework requires this to be disabled.',
             ),
 
             array(
-		'title' => 'Variables_order',
-		'required' => TRUE,
-		'passed' => strpos(ini_get('variables_order'), 'G') !== FALSE && strpos(ini_get('variables_order'), 'P') !== FALSE && strpos(ini_get('variables_order'), 'C') !== FALSE,
-		'description' => 'Configuration directive <code>variables_order</code> is missing. Nette Framework requires this to be set.',
+                'title' => 'Variables_order',
+                'required' => TRUE,
+                'passed' => strpos(ini_get('variables_order'), 'G') !== FALSE && strpos(ini_get('variables_order'), 'P') !== FALSE && strpos(ini_get('variables_order'), 'C') !== FALSE,
+                'description' => 'Configuration directive <code>variables_order</code> is missing. Nette Framework requires this to be set.',
             ),
 
         /*    array(
-		'title' => 'Reflection extension',
-		'required' => TRUE,
-		'passed' => (bool) $reflection,
-		'description' => 'Reflection extension is required.',
+                'title' => 'Reflection extension',
+                'required' => TRUE,
+                'passed' => (bool) $reflection,
+                'description' => 'Reflection extension is required.',
             ),*/
 
             /*array(
-		'title' => 'Reflection phpDoc',
-		'required' => FALSE,
-		'passed' => $reflection ? strpos($reflection->getDocComment(), 'Paints') !== FALSE : FALSE,
+                'title' => 'Reflection phpDoc',
+                'required' => FALSE,
+                'passed' => $reflection ? strpos($reflection->getDocComment(), 'Paints') !== FALSE : FALSE,
     		'description' => 'Reflection phpDoc are not available (probably due to an eAccelerator bug). Persistent parameters must be declared using static function.',
             ),*/
 
             array(
-		'title' => 'SPL extension',
-		'required' => TRUE,
-		'passed' => extension_loaded('SPL'),
-		'description' => 'SPL extension is required.',
+                'title' => 'SPL extension',
+                'required' => TRUE,
+                'passed' => extension_loaded('SPL'),
+                'description' => 'SPL extension is required.',
             ),
 
             array(
-		'title' => 'PCRE extension',
-		'required' => TRUE,
-		'passed' => extension_loaded('pcre'),
-		'description' => 'PCRE extension is required.',
+                'title' => 'PCRE extension',
+                'required' => TRUE,
+                'passed' => extension_loaded('pcre'),
+                'description' => 'PCRE extension is required.',
             ),
 
             array(
-		'title' => 'ICONV extension',
-		'required' => TRUE,
-		'passed' => extension_loaded('iconv') && (ICONV_IMPL !== 'unknown') && @iconv('UTF-16', 'UTF-8//IGNORE', iconv('UTF-8', 'UTF-16//IGNORE', 'test')) === 'test',
-		'message' => 'Enabled and works properly',
-		'errorMessage' => 'Disabled or works not properly',
-		'description' => 'ICONV extension is required and must work properly.',
+                'title' => 'ICONV extension',
+                'required' => TRUE,
+                'passed' => extension_loaded('iconv') && (ICONV_IMPL !== 'unknown') && @iconv('UTF-16', 'UTF-8//IGNORE', iconv('UTF-8', 'UTF-16//IGNORE', 'test')) === 'test',
+                'message' => 'Enabled and works properly',
+                'errorMessage' => 'Disabled or works not properly',
+                'description' => 'ICONV extension is required and must work properly.',
             ),
 
           array(
-		'title' => 'Multibyte String extension',
-		'required' => TRUE,
-		'passed' => extension_loaded('mbstring'),
-		'description' => 'Multibyte String extension is absent. Some internationalization components may not work properly.',
+                'title' => 'Multibyte String extension',
+                'required' => TRUE,
+                'passed' => extension_loaded('mbstring'),
+                'description' => 'Multibyte String extension is absent. Some internationalization components may not work properly.',
             ),
 
             array(
-		'title' => 'PHP tokenizer',
-		'required' => TRUE,
-		'passed' => extension_loaded('tokenizer'),
-		'description' => 'PHP tokenizer is required.',
+                'title' => 'PHP tokenizer',
+                'required' => TRUE,
+                'passed' => extension_loaded('tokenizer'),
+                'description' => 'PHP tokenizer is required.',
             ),
 
             array(
-		'title' => 'Multibyte String function overloading',
-		'required' => TRUE,
-		'passed' => !extension_loaded('mbstring') || !(mb_get_info('func_overload') & 2),
-		'message' => 'Disabled',
-		'errorMessage' => 'Enabled',
-		'description' => 'Multibyte String function overloading is enabled. Nette Framework requires this to be disabled. If it is enabled, some string function may not work properly.',
+                'title' => 'Multibyte String function overloading',
+                'required' => TRUE,
+                'passed' => !extension_loaded('mbstring') || !(mb_get_info('func_overload') & 2),
+                'message' => 'Disabled',
+                'errorMessage' => 'Enabled',
+                'description' => 'Multibyte String function overloading is enabled. Nette Framework requires this to be disabled. If it is enabled, some string function may not work properly.',
             ),
 
         /*  array(
-		'title' => 'SQLite extension',
-		'required' => FALSE,
-		'passed' => extension_loaded('sqlite'),
-		'description' => 'SQLite extension is absent. You will not be able to use tags and priorities with <code>Nette\Caching\FileStorage</code>.',
+                'title' => 'SQLite extension',
+                'required' => FALSE,
+                'passed' => extension_loaded('sqlite'),
+                'description' => 'SQLite extension is absent. You will not be able to use tags and priorities with <code>Nette\Caching\FileStorage</code>.',
             ),
 
           array(
-		'title' => 'Memcache extension',
-		'required' => FALSE,
-		'passed' => extension_loaded('memcache'),
-		'description' => 'Memcache extension is absent. You will not be able to use <code>Nette\Caching\MemcachedStorage</code>.',
+                'title' => 'Memcache extension',
+                'required' => FALSE,
+                'passed' => extension_loaded('memcache'),
+                'description' => 'Memcache extension is absent. You will not be able to use <code>Nette\Caching\MemcachedStorage</code>.',
             ),
 
             array(
-		'title' => 'GD extension',
-		'required' => FALSE,
-		'passed' => extension_loaded('gd'),
-		'description' => 'GD extension is absent. You will not be able to use <code>Nette\Image</code>.',
+                'title' => 'GD extension',
+                'required' => FALSE,
+                'passed' => extension_loaded('gd'),
+                'description' => 'GD extension is absent. You will not be able to use <code>Nette\Image</code>.',
             ),
 
             array(
-		'title' => 'Bundled GD extension',
-		'required' => FALSE,
-		'passed' => extension_loaded('gd') && GD_BUNDLED,
-		'description' => 'Bundled GD extension is absent. You will not be able to use some function as <code>Nette\Image::filter()</code> or <code>Nette\Image::rotate()</code>.',
+                'title' => 'Bundled GD extension',
+                'required' => FALSE,
+                'passed' => extension_loaded('gd') && GD_BUNDLED,
+                'description' => 'Bundled GD extension is absent. You will not be able to use some function as <code>Nette\Image::filter()</code> or <code>Nette\Image::rotate()</code>.',
             ),
 
             array(
-		'title' => 'ImageMagick library',
-		'required' => FALSE,
-		'passed' => @exec('identify -format "%w,%h,%m" ' . addcslashes(dirname(__FILE__) . '/assets/logo.gif', ' ')) === '176,104,GIF', // intentionally @
-		'description' => 'ImageMagick server library is absent. You will not be able to use <code>Nette\ImageMagick</code>.',
+                'title' => 'ImageMagick library',
+                'required' => FALSE,
+                'passed' => @exec('identify -format "%w,%h,%m" ' . addcslashes(dirname(__FILE__) . '/assets/logo.gif', ' ')) === '176,104,GIF', // intentionally @
+                'description' => 'ImageMagick server library is absent. You will not be able to use <code>Nette\ImageMagick</code>.',
             ), */
 
             array(
-		'title' => 'Fileinfo extension or mime_content_type()',
-		'required' => FALSE,
-		'passed' => extension_loaded('fileinfo') || function_exists('mime_content_type'),
-		'description' => 'Fileinfo extension or function <code>mime_content_type()</code> are absent. You will not be able to determine mime type of uploaded files.',
+                'title' => 'Fileinfo extension or mime_content_type()',
+                'required' => FALSE,
+                'passed' => extension_loaded('fileinfo') || function_exists('mime_content_type'),
+                'description' => 'Fileinfo extension or function <code>mime_content_type()</code> are absent. You will not be able to determine mime type of uploaded files.',
             ),
 
             array(
-		'title' => 'HTTP extension',
-		'required' => FALSE,
-		'passed' => !extension_loaded('http'),
-		'message' => 'Disabled',
-		'errorMessage' => 'Enabled',
-		'description' => 'HTTP extension has naming conflict with Nette Framework. You have to disable this extension or use „prefixed“ version.',
+                'title' => 'HTTP extension',
+                'required' => FALSE,
+                'passed' => !extension_loaded('http'),
+                'message' => 'Disabled',
+                'errorMessage' => 'Enabled',
+                'description' => 'HTTP extension has naming conflict with Nette Framework. You have to disable this extension or use „prefixed“ version.',
             ),
 
             array(
-		'title' => 'HTTP_HOST or SERVER_NAME',
-		'required' => TRUE,
-		'passed' => isset($_SERVER["HTTP_HOST"]) || isset($_SERVER["SERVER_NAME"]),
-		'message' => 'Present',
-		'errorMessage' => 'Absent',
-		'description' => 'Either <code>$_SERVER["HTTP_HOST"]</code> or <code>$_SERVER["SERVER_NAME"]</code> must be available for resolving host name.',
+                'title' => 'HTTP_HOST or SERVER_NAME',
+                'required' => TRUE,
+                'passed' => isset($_SERVER["HTTP_HOST"]) || isset($_SERVER["SERVER_NAME"]),
+                'message' => 'Present',
+                'errorMessage' => 'Absent',
+                'description' => 'Either <code>$_SERVER["HTTP_HOST"]</code> or <code>$_SERVER["SERVER_NAME"]</code> must be available for resolving host name.',
             ),
 
             array(
-		'title' => 'REQUEST_URI or ORIG_PATH_INFO',
-		'required' => TRUE,
-		'passed' => isset($_SERVER["REQUEST_URI"]) || isset($_SERVER["ORIG_PATH_INFO"]),
-		'message' => 'Present',
-		'errorMessage' => 'Absent',
-		'description' => 'Either <code>$_SERVER["REQUEST_URI"]</code> or <code>$_SERVER["ORIG_PATH_INFO"]</code> must be available for resolving request URL.',
+                'title' => 'REQUEST_URI or ORIG_PATH_INFO',
+                'required' => TRUE,
+                'passed' => isset($_SERVER["REQUEST_URI"]) || isset($_SERVER["ORIG_PATH_INFO"]),
+                'message' => 'Present',
+                'errorMessage' => 'Absent',
+                'description' => 'Either <code>$_SERVER["REQUEST_URI"]</code> or <code>$_SERVER["ORIG_PATH_INFO"]</code> must be available for resolving request URL.',
             ),
 
             array(
-		'title' => 'SCRIPT_FILENAME, SCRIPT_NAME, PHP_SELF',
-		'required' => TRUE,
-		'passed' => isset($_SERVER["SCRIPT_FILENAME"], $_SERVER["SCRIPT_NAME"], $_SERVER["PHP_SELF"]),
-		'message' => 'Present',
-		'errorMessage' => 'Absent',
-		'description' => '<code>$_SERVER["SCRIPT_FILENAME"]</code> and <code>$_SERVER["SCRIPT_NAME"]</code> and <code>$_SERVER["PHP_SELF"]</code> must be available for resolving script file path.',
+                'title' => 'SCRIPT_FILENAME, SCRIPT_NAME, PHP_SELF',
+                'required' => TRUE,
+                'passed' => isset($_SERVER["SCRIPT_FILENAME"], $_SERVER["SCRIPT_NAME"], $_SERVER["PHP_SELF"]),
+                'message' => 'Present',
+                'errorMessage' => 'Absent',
+                'description' => '<code>$_SERVER["SCRIPT_FILENAME"]</code> and <code>$_SERVER["SCRIPT_NAME"]</code> and <code>$_SERVER["PHP_SELF"]</code> must be available for resolving script file path.',
             ),
 
             array(
-		'title' => 'SERVER_ADDR or LOCAL_ADDR',
-		'required' => TRUE,
-		'passed' => isset($_SERVER["SERVER_ADDR"]) || isset($_SERVER["LOCAL_ADDR"]),
-		'message' => 'Present',
-		'errorMessage' => 'Absent',
-		'description' => '<code>$_SERVER["SERVER_ADDR"]</code> or <code>$_SERVER["LOCAL_ADDR"]</code> must be available for detecting development / production mode.',
+                'title' => 'SERVER_ADDR or LOCAL_ADDR',
+                'required' => TRUE,
+                'passed' => isset($_SERVER["SERVER_ADDR"]) || isset($_SERVER["LOCAL_ADDR"]),
+                'message' => 'Present',
+                'errorMessage' => 'Absent',
+                'description' => '<code>$_SERVER["SERVER_ADDR"]</code> or <code>$_SERVER["LOCAL_ADDR"]</code> must be available for detecting development / production mode.',
             ),
         ));
 
@@ -518,7 +518,7 @@ class Install_DefaultPresenter extends BasePresenter
         }
 
         $this->template->error = false;
-		$this->template->tabulka_jiz_existuje = false;
+                $this->template->tabulka_jiz_existuje = false;
         
         try {
             $db_config = Nette\Environment::getConfig('database');
@@ -572,7 +572,7 @@ class Install_DefaultPresenter extends BasePresenter
                 $query = trim($query);
 
                 if ( empty($query) )
-					continue;
+                                        continue;
 
                 if ( $this->getParam('install', null) ) {
                     // provedeni SQL skriptu
@@ -580,26 +580,26 @@ class Install_DefaultPresenter extends BasePresenter
                     try {
                         dibi::query($query);                        
                     }
-					catch ( DibiException $e ) {
-						$this->template->error = true;
+                                        catch ( DibiException $e ) {
+                                                $this->template->error = true;
                         $sql_error = $e->getMessage();
-						
-						if ( strpos($query, "CREATE TABLE") !== false ) {
-							// $message = "Tabulka byla úspěšně vytvořena";
-							$error_message = "Tabulku se nepodařilo vytvořit!";
-						} else if ( strpos($query, "INSERT INTO") !== false ) {
-							// $message = "Data do tabulky byla úspěšně nahrána.";
-							$error_message = "Data do tabulky se nepodařilo nahrát!";
-						}
-						else if ( strpos($query, "ALTER TABLE") !== false ) {
-							// $message = "Struktura tabulky byla úspěšně upravena.";
-							$error_message = "Tabulku se nepodařilo změnit!";
-						}
-						else {
-							// $message = "Databázový příkaz byl úspěšně proveden.";
-							$error_message = "Databázový příkaz nebyl správně proveden!";
-						}
-						$query_parts = explode("`", $query);
+                                                
+                                                if ( strpos($query, "CREATE TABLE") !== false ) {
+                                                        // $message = "Tabulka byla úspěšně vytvořena";
+                                                        $error_message = "Tabulku se nepodařilo vytvořit!";
+                                                } else if ( strpos($query, "INSERT INTO") !== false ) {
+                                                        // $message = "Data do tabulky byla úspěšně nahrána.";
+                                                        $error_message = "Data do tabulky se nepodařilo nahrát!";
+                                                }
+                                                else if ( strpos($query, "ALTER TABLE") !== false ) {
+                                                        // $message = "Struktura tabulky byla úspěšně upravena.";
+                                                        $error_message = "Tabulku se nepodařilo změnit!";
+                                                }
+                                                else {
+                                                        // $message = "Databázový příkaz byl úspěšně proveden.";
+                                                        $error_message = "Databázový příkaz nebyl správně proveden!";
+                                                }
+                                                $query_parts = explode("`", $query);
                         $database_a[] = array(
                             'title' => @$query_parts[1],
                             'required' => TRUE,
@@ -615,7 +615,7 @@ class Install_DefaultPresenter extends BasePresenter
                     $query_part = explode("`",$query);
                     if ( ( strpos($query, "CREATE")!==false ) && isset($query_part[1]) ) {
                         if ( in_array($query_part[1], $db_tables) ) {
-							$this->template->tabulka_jiz_existuje = true;
+                                                        $this->template->tabulka_jiz_existuje = true;
                             $database_a[] = array(
                                 'title' => @$query_part[1],
                                 'required' => TRUE,
@@ -1045,31 +1045,31 @@ class Install_DefaultPresenter extends BasePresenter
 
     private function iniFlag($var)
     {
-	$status = strtolower(ini_get($var));
-	return $status === 'on' || $status === 'true' || $status === 'yes' || $status % 256;
+        $status = strtolower(ini_get($var));
+        return $status === 'on' || $status === 'true' || $status === 'yes' || $status % 256;
     }
 
     private function paint($requirements)
     {
         $this->template->redirect = round(time(), -1);
-	if (!isset($_GET) || (isset($_GET['r']) && $_GET['r'] == $this->template->redirect)) {
-		$this->template->redirect = NULL;
-	}
+        if (!isset($_GET) || (isset($_GET['r']) && $_GET['r'] == $this->template->redirect)) {
+                $this->template->redirect = NULL;
+        }
 
-	//$this->template->errors = FALSE;
+        //$this->template->errors = FALSE;
         //$this->template->warnings = FALSE;
 
-	foreach ($requirements as $id => $requirement)
-	{
-		$requirements[$id] = $requirement = (object) $requirement;
-		if (isset($requirement->passed) && !$requirement->passed) {
-			if ($requirement->required) {
-				$this->template->errors = TRUE;
-			} else {
-				$this->template->warnings = TRUE;
-			}
-		}
-	}
+        foreach ($requirements as $id => $requirement)
+        {
+                $requirements[$id] = $requirement = (object) $requirement;
+                if (isset($requirement->passed) && !$requirement->passed) {
+                        if ($requirement->required) {
+                                $this->template->errors = TRUE;
+                        } else {
+                                $this->template->warnings = TRUE;
+                        }
+                }
+        }
 
         return  $requirements;
 

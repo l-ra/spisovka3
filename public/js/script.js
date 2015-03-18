@@ -20,7 +20,7 @@ function InstallDatePicker() {
         buttonImageOnly: true,*/
         showButtonPanel: true,
         changeMonth: true,
-	changeYear: true,
+        changeYear: true,
         yearRange: year_before+':'+year_after,
         dateFormat : "dd.mm.yy",
         closeText:"Zrušit",
@@ -157,14 +157,14 @@ $(function() {
 
     $('#predat_autocomplete').autocomplete({
         minLength: 3,
-	/*source: seznam_uzivatelu,*/
+        /*source: seznam_uzivatelu,*/
         source: (is_simple==1)?BASE_URL + '?presenter=Spisovka%3Auzivatel&action=seznamAjax':BASE_URL + 'uzivatel/seznamAjax',
 
-	focus: function(event, ui) {
+        focus: function(event, ui) {
             $('#predat_autocomplete').val(ui.item.nazev);
             return false;
         },
-	select: function(event, ui) {
+        select: function(event, ui) {
             $('#predat_autocomplete').val('');
             if ( ui.item.id.substring(0,1) == "u" ) {
                 $('#frmnovyForm-predano_user').val(ui.item.id.substr(1));
@@ -176,7 +176,7 @@ $(function() {
                 $('#predano').html("<dl class=\"detail_item\"><dt>Předáno:</dt><dd>organizační jednotce<br />"+ui.item.nazev+"</dd></dl>");
             }
             return false;
-	}
+        }
     });
     $("#predat_autocomplete").keypress(function(event) {
         if ( event.which == 13 ) {
@@ -189,11 +189,11 @@ $(function() {
         minLength: 3,
         source: (is_simple==1)?BASE_URL + '?presenter=Spisovka%3Asubjekty&action=seznamAjax':BASE_URL + 'subjekty/0/seznamAjax',
 
-	focus: function(event, ui) {
+        focus: function(event, ui) {
             $('#subjekt_autocomplete').val(ui.item.nazev);
             return false;
         },
-	select: function(event, ui) {
+        select: function(event, ui) {
             $('#subjekt_autocomplete').val('');
 
             if (document.getElementById) {
@@ -243,7 +243,7 @@ $(function() {
             }
 
             return false;
-	}
+        }
     });
     $("#subjekt_autocomplete").keypress(function(event) {
         if ( event.which == 13 ) {
@@ -410,7 +410,7 @@ ajaxcron = function () {
     
     if (!(Math.random() < 0.1))
         return false;
-	
+    
     if ( is_simple == 1 ) {
         var url = BASE_URL + '?presenter=Spisovka%3Acron&action=spustit';
     } else {    
@@ -839,7 +839,7 @@ vypravnaZrusit = function () {
 
 
 hledejDokument = function (input, typ) {
-	
+    
     // nacteme hodnotu
     var vyraz = input.value;
     // vezmeme jen nad tri znaky

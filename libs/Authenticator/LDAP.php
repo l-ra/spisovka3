@@ -409,16 +409,16 @@ class Authenticator_LDAP extends Authenticator_Base implements Nette\Security\IA
     {
         if ($signal == 'submit') {
             return $this->receivedSignal === 'submit';
-	} else {
+        } else {
             return $this->getPresenter()->isSignalReceiver($this, $signal);
-	}
+        }
     }
 
     protected function createComponentLoginForm($name)
     {
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}
+        }
 
         $form = new Nette\Application\UI\Form($this, $name);
         $form->addText('username', 'Uživatelské jméno:')
@@ -439,7 +439,7 @@ class Authenticator_LDAP extends Authenticator_Base implements Nette\Security\IA
     {
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}
+        }
 
         $form = new Nette\Application\UI\Form($this, $name);
 
@@ -493,7 +493,7 @@ class Authenticator_LDAP extends Authenticator_Base implements Nette\Security\IA
 
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}
+        }
 
         $form = new Nette\Application\UI\Form($this, $name);
 
@@ -553,7 +553,7 @@ class Authenticator_LDAP extends Authenticator_Base implements Nette\Security\IA
     {
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}        
+        }        
 
         $seznam = $this->getAllUser();
         
@@ -629,7 +629,7 @@ class Authenticator_LDAP extends Authenticator_Base implements Nette\Security\IA
     {
         if (!$this->wasRendered) {
             $this->receivedSignal = 'submit';
-	}        
+        }        
 
         $this->handleSyncManual();
         
@@ -707,8 +707,8 @@ class Authenticator_LDAP extends Authenticator_Base implements Nette\Security\IA
     {
         $this->receivedSignal = 'submit';
 
-	// was form submitted?
-	if ($form->isSubmitted()) {
+        // was form submitted?
+        if ($form->isSubmitted()) {
 
             $values = $form->getValues();
             $data = $form->getHttpData();
@@ -730,8 +730,9 @@ class Authenticator_LDAP extends Authenticator_Base implements Nette\Security\IA
             } else {
                 throw new Nette\InvalidStateException("Unknown submit button.");
             }
-	}
-	if (!$this->presenter->isAjax()) $this->presenter->redirect('this');
+        }
+        if (!$this->presenter->isAjax())
+            $this->presenter->redirect('this');
     }
 
     public function handleChangePassword($data)

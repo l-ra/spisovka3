@@ -1,125 +1,124 @@
 
-	#kontrola .result {
-		font-size: 10pt;
-		margin: 1.5em 0;
-		padding: 1em 1em;
-		border: 2px solid white;
-	}
+    #kontrola .result {
+        font-size: 10pt;
+        margin: 1.5em 0;
+        padding: 1em 1em;
+        border: 2px solid white;
+    }
 
-	#kontrola .passed h2 {
-		color: #091;
-	}
+    #kontrola .passed h2 {
+        color: #091;
+    }
 
-	#kontrola .failed h2 {
-		color: #A30;
-	}
+    #kontrola .failed h2 {
+        color: #A30;
+    }
 
-	#kontrola table {
-		font: 9pt/1.5 Verdana, sans-serif;
-		padding: 0;
-		margin: 0;
-		border-collapse: collapse;
-		width: 100%;
-	}
+    #kontrola table {
+        font: 9pt/1.5 Verdana, sans-serif;
+        padding: 0;
+        margin: 0;
+        border-collapse: collapse;
+        width: 100%;
+    }
 
-	#kontrola table td {
-		text-align: left;
-		padding: 10px;
-		vertical-align: top;
-		border-style: solid;
-		border-width: 1px 0 0;
-		border-color: inherit;
-		background: white none no-repeat 12px 8px;
-		background-color: inherit;
-	}
+    #kontrola table td {
+        text-align: left;
+        padding: 10px;
+        vertical-align: top;
+        border-style: solid;
+        border-width: 1px 0 0;
+        border-color: inherit;
+        background: white none no-repeat 12px 8px;
+        background-color: inherit;
+    }
 
-	#kontrola table td.th {
-		font-weight: bold;
-		padding-left: 50px;
-	}
+    #kontrola table td.th {
+        font-weight: bold;
+        padding-left: 50px;
+    }
 
-	#kontrola .passed, .info {
-		background-color: #DFD;
-		border-color: #BEB;
-	}
+    #kontrola .passed, .info {
+        background-color: #DFD;
+        border-color: #BEB;
+    }
 
-	#kontrola .passed td.th {
-		background-image: url('../images/assets/passed.gif');
-	}
+    #kontrola .passed td.th {
+        background-image: url('../images/assets/passed.gif');
+    }
 
-	#kontrola .info td.th {
-		background-image: url('../images/assets/info.gif');
-	}
+    #kontrola .info td.th {
+        background-image: url('../images/assets/info.gif');
+    }
 
-	#kontrola .warning {
-		background-color: #FCF9CF;
-		border-color: #EE9;
-	}
+    #kontrola .warning {
+        background-color: #FCF9CF;
+        border-color: #EE9;
+    }
 
-	#kontrola .warning td.th {
-		background-image: url('../images/assets/warning.gif');
-	}
+    #kontrola .warning td.th {
+        background-image: url('../images/assets/warning.gif');
+    }
 
-	#kontrola .failed {
-		background-color: #F4D2D2;
-		border-color: #EAA;
-	}
+    #kontrola .failed {
+        background-color: #F4D2D2;
+        border-color: #EAA;
+    }
 
-	#kontrola .failed td.th {
-		background-image: url('../images/assets/failed.gif');
-	}
+    #kontrola .failed td.th {
+        background-image: url('../images/assets/failed.gif');
+    }
 
-	#kontrola .description td {
-		border-top: none !important;
-		padding: 0 10px 10px 50px;
-		color: #555;
-	}
+    #kontrola .description td {
+        border-top: none !important;
+        padding: 0 10px 10px 50px;
+        color: #555;
+    }
         
-        .update_site {
-            border: 1px #000000 solid;
-            background-color: #f0f0f0;
-            padding: 0px;
-        }
-        .update_site h1 {
-            background-color: #03406A;
-            color: #ffffff;            
-            padding: 10px;
-            margin-top: 0px;
-        }
+    .update_site {
+        border: 1px #000000 solid;
+        background-color: #f0f0f0;
+        padding: 0px;
+    }
+    .update_site h1 {
+        background-color: #03406A;
+        color: #ffffff;            
+        padding: 10px;
+        margin-top: 0px;
+    }
+    
+    .update_rev {
+        border: 1px #000000 solid;
+        background-color: #ffffff;
+        margin: 5px;
+        padding: 10px 5px;
+        overflow: auto;
+    }
+    
+    .update_rev pre {
         
-        .update_rev {
-            border: 1px #000000 solid;
-            background-color: #ffffff;
-            margin: 5px;
-            padding: 10px 5px;
-            overflow: auto;
-        }
-        
-        .update_rev pre {
-            
-        }
-        
-        .update_site p {
-            margin: 10px;            
-        }
-        
-        .update_info {
-            margin: 20px;
-            white-space: pre;
-            font-family: monospace;            
-        }
-        
-        .update_no {
-            text-align: center;
-            padding-bottom: 20px;
-        }        
-        
-        .update_title {
-            font-weight: bold;
-        }
-        
-        div.error {
-            background-color: #ff4040;
-            padding: 2px;
-        }
-        
+    }
+    
+    .update_site p {
+        margin: 10px;            
+    }
+    
+    .update_info {
+        margin: 20px;
+        white-space: pre;
+        font-family: monospace;            
+    }
+    
+    .update_no {
+        text-align: center;
+        padding-bottom: 20px;
+    }        
+    
+    .update_title {
+        font-weight: bold;
+    }
+    
+    div.error {
+        background-color: #ff4040;
+        padding: 2px;
+    }

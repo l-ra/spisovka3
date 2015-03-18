@@ -32,12 +32,12 @@ class Ares {
             return null;
         }
     }
-	
+    
     public function nastavIC($ic) {
         $this->ic = $ic;
         return true;
     }
-	
+    
     public function zpracuj() {
   
         if ( !$this->jetoIC($this->ic) )
@@ -211,7 +211,7 @@ class Ares {
         return (int) $ic[7] === $c;
 
     }    
-	
+    
 }
 
 

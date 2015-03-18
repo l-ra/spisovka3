@@ -7,36 +7,36 @@
 <div class="paginator">
         <div class="paginator_info">Zobrazeno {$paginator->getLength()} z {$paginator->getItemCount()} záznamů.</div>
 {if $paginator->pageCount > -1}
-	{if $paginator->isFirst()}
+    {if $paginator->isFirst()}
         <span class="button">první</span>
         <span class="button">předchozí</span>
-	{else}
-	<a href="{link this, 'page' => $paginator->getFirstPage()}{$query_first}" {!$onclick}>první</a>
+    {else}
+    <a href="{link this, 'page' => $paginator->getFirstPage()}{$query_first}" {!$onclick}>první</a>
         {if ($paginator->page - 1)==1}
         <a href="{link this, 'page' => $paginator->page - 1}{$query_first}" {!$onclick}>předchozí</a>
         {else}
         <a href="{link this, 'page' => $paginator->page - 1}{$other_params}" {!$onclick}>předchozí</a>
         {/if}
-	{/if}
+    {/if}
 
-	{foreach $steps as $step}
-	{if $step == $paginator->page}
-		<span class="current">{$step}</span>
-	{elseif $step==1}
-		<a href="{link this, 'page' => $step}{$query_first}" {!$onclick}>{$step}</a>
+    {foreach $steps as $step}
+    {if $step == $paginator->page}
+        <span class="current">{$step}</span>
+    {elseif $step==1}
+        <a href="{link this, 'page' => $step}{$query_first}" {!$onclick}>{$step}</a>
         {else}
-		<a href="{link this, 'page' => $step}{$other_params}" {!$onclick}>{$step}</a>
-	{/if}
-	{if $iterator->nextValue > $step + 1}<span>…</span>{/if}
-	{/foreach}
+        <a href="{link this, 'page' => $step}{$other_params}" {!$onclick}>{$step}</a>
+    {/if}
+    {if $iterator->nextValue > $step + 1}<span>…</span>{/if}
+    {/foreach}
 
-	{if $paginator->isLast()}
-	<span class="button">další</span>
+    {if $paginator->isLast()}
+    <span class="button">další</span>
         <span class="button">poslední</span>
-	{else}
-	<a href="{link this, 'page' => $paginator->page + 1}{$other_params}" {!$onclick}>další</a>
+    {else}
+    <a href="{link this, 'page' => $paginator->page + 1}{$other_params}" {!$onclick}>další</a>
         <a href="{link this, 'page' => $paginator->getLastPage()}{$other_params}" {!$onclick}>poslední</a>
-	{/if}
+    {/if}
 
 
 {/if}

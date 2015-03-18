@@ -31,11 +31,11 @@ class ISDS {
     
     protected $proxy = 0;
 
-    protected $StatusCode;	// statuscode posledni akce
-    protected $StatusMessage;	// statusmessage posledni akce
-    protected $ErrorCode;	// kod chyby vznikle pri volani sluzby posledni akce
-    protected $ErrorInfo;	// popis chyby vznikle pri volani sluzby posledni akce
-    protected $ValidLogin;	// true pokud probehlo uspesne prihlaseni
+    protected $StatusCode;      // statuscode posledni akce
+    protected $StatusMessage;   // statusmessage posledni akce
+    protected $ErrorCode;       // kod chyby vznikle pri volani sluzby posledni akce
+    protected $ErrorInfo;       // popis chyby vznikle pri volani sluzby posledni akce
+    protected $ValidLogin;      // true pokud probehlo uspesne prihlaseni
 
     /* Prázdný konstruktor, pro volání ze zdědených tříd
      */
@@ -292,11 +292,11 @@ class ISDS {
         $this->debug_function('GetOwnerInfoFromLogin');
 
         $this->NullRetInfo();
-	$Input = array('dbDummy'=>"");
+        $Input = array('dbDummy'=>"");
 
         $this->debug("param: ", $Input);
 
-	try {
+        try {
 
             $output = $this->AccessWS()->GetOwnerInfoFromLogin($Input);
 
@@ -310,7 +310,7 @@ class ISDS {
             } else {
                 return null;
             }
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->ErrorCode = $e->getCode();
             $this->ErrorInfo = $e->getMessage();
             $this->StatusCode = @$output->dbStatus->dbStatusCode;
@@ -319,7 +319,7 @@ class ISDS {
             $this->debug_return('return',false,1);
 
             return false;
-	}
+        }
     }
 
     /**
@@ -348,17 +348,17 @@ class ISDS {
      * @return dmID
      */
     public function CreateMessage(
-		$IDRecipient, $Annotation, $AllowSubstDelivery,
-		$LegalTitleLaw,	$LegalTitlePar,	$LegalTitlePoint, $LegalTitleSect, $LegalTitleYear,
-		$RecipientIdent, $RecipientOrgUnit, $RecipientOrgUnitNum, $RecipientRefNumber,
-		$SenderIdent, $SenderOrgUnit, $SenderOrgUnitNum, $SenderRefNumber,
-		$ToHands, $PersonalDelivery, $OVM,
+                $IDRecipient, $Annotation, $AllowSubstDelivery,
+                $LegalTitleLaw, $LegalTitlePar, $LegalTitlePoint, $LegalTitleSect, $LegalTitleYear,
+                $RecipientIdent, $RecipientOrgUnit, $RecipientOrgUnitNum, $RecipientRefNumber,
+                $SenderIdent, $SenderOrgUnit, $SenderOrgUnitNum, $SenderRefNumber,
+                $ToHands, $PersonalDelivery, $OVM,
                 $outFiles)
     {
 
         $this->NullRetInfo();
         
-	$envelope = array(
+        $envelope = array(
             'dmSenderOrgUnit' => $SenderOrgUnit,
             'dmSenderOrgUnitNum' => $SenderOrgUnitNum,
             'dbIDRecipient' => $IDRecipient,
@@ -379,7 +379,7 @@ class ISDS {
             'dmAllowSubstDelivery' => $AllowSubstDelivery,
             'dmOVM'=>$OVM);
         
-	$messageCreateInput = array(
+        $messageCreateInput = array(
             'dmEnvelope' => $envelope,
             'dmFiles' => $outFiles->fileInfos());
 
@@ -397,7 +397,7 @@ class ISDS {
             $this->debug_return('return',$messageID,1);
 
             return $messageID;
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
 
@@ -412,9 +412,9 @@ class ISDS {
      *
      * $Recipients = array(
      *                  dbIDRecipient = ID adresata
-     *			dmRecipientOrgUnit = Organizacni jednotka adresata slovne
-     *			dmRecipientOrgUnitNum = Cislo organizacni jednotky adresata
-     *			dmToHands = popis komu je zasilka urcena
+     *                  dmRecipientOrgUnit = Organizacni jednotka adresata slovne
+     *                  dmRecipientOrgUnitNum = Cislo organizacni jednotky adresata
+     *                  dmToHands = popis komu je zasilka urcena
      * );
      * - pole adresatu muze obsahovat maximalne 50 prvku
      *
@@ -445,17 +445,17 @@ class ISDS {
      * @return array(dmID) Vraci pole informujici o tom jak dopadlo odeslani zasilky jednotlivym adresatum
      */
     public function CreateMultipleMessage(
-		$Recipients, $Annotation, $AllowSubstDelivery,
-		$LegalTitleLaw, $LegalTitlePar, $LegalTitlePoint, $LegalTitleSect, $LegalTitleYear,
-		$RecipientIdent, $RecipientRefNumber,
+                $Recipients, $Annotation, $AllowSubstDelivery,
+                $LegalTitleLaw, $LegalTitlePar, $LegalTitlePoint, $LegalTitleSect, $LegalTitleYear,
+                $RecipientIdent, $RecipientRefNumber,
                 $SenderIdent, $SenderOrgUnit, $SenderOrgUnitNum, $SenderRefNumber,
-		$PersonalDelivery, $OVM, $OutFiles)
+                $PersonalDelivery, $OVM, $OutFiles)
     {
 
         $this->debug_function('CreateMultipleMessage');
 
         $this->NullRetInfo();
-	$Envelope = array(
+        $Envelope = array(
             'dmSenderOrgUnit' => $SenderOrgUnit,
             'dmSenderOrgUnitNum' => $SenderOrgUnitNum,
             'dmAnnotation' => $Annotation,
@@ -493,7 +493,7 @@ class ISDS {
             $this->debug_return('return', $return, 1);
             return $return;
 
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             
             $this->StatusCode    = $MessageStatus->dmStatusCode;
             $this->StatusMessage = $MessageStatus->dmStatusMessage;
@@ -519,7 +519,7 @@ class ISDS {
 
         $MessInput = array('dmID'=>$MessageID);
 
-	try {
+        try {
 
             $MessageDownloadOutput = $this->OperationsWS()->MessageDownload($MessInput);
             $ReturnedMessage = $MessageDownloadOutput->dmReturnedMessage;
@@ -529,14 +529,14 @@ class ISDS {
             $ReturnedMessage->dmDm->dmFiles->dmFile = $this->PrepareArray($ReturnedMessage->dmDm->dmFiles->dmFile);
             return $ReturnedMessage;
 
-	} catch (Exception $e) {
+        } catch (Exception $e) {
 
             $this->StatusCode    = $MessageStatus->dmStatusCode;
             $this->StatusMessage = $MessageStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
     }
 
     /**
@@ -551,7 +551,7 @@ class ISDS {
         $this->NullRetInfo();
 
         $MessInput=array('dmID'=>$MessageID);
-		
+                
         try {
                 
             $SignedMessDownOutput = $this->OperationsWS()->SignedMessageDownload($MessInput);
@@ -562,7 +562,7 @@ class ISDS {
 
             return $ReturnedMessage;
 
-	} catch (Exception $e) {
+        } catch (Exception $e) {
 
             $this->StatusCode    = $MessageStatus->dmStatusCode;
             $this->StatusMessage = $MessageStatus->dmStatusMessage;
@@ -586,7 +586,7 @@ class ISDS {
         $this->NullRetInfo();
 
         $Message = $this->SignedMessageDownload($MessageID);
-	if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
+        if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
             if (@file_put_contents($FileName,$Message)) {
                 return true;
             } else {
@@ -594,7 +594,7 @@ class ISDS {
                 $this->ErrorInfo = 'Nepodařilo se uložit zprávu do souboru "'.$FileName.'"!';
                 return false;
             }
-	} else {
+        } else {
             return false;
         }
     }
@@ -628,7 +628,7 @@ class ISDS {
             $this->ErrorInfo     = $e->getMessage();
             return false;
 
-	}
+        }
     }
 
     /**
@@ -642,7 +642,7 @@ class ISDS {
     {
         
         $Message = $this->SignedSentMessageDownload($MessageID);
-	if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
+        if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
             if (@file_put_contents($FileName,$Message)) {
                 return true;
             } else {
@@ -650,10 +650,10 @@ class ISDS {
                 $this->ErrorInfo = 'Nepodařilo se uložit zprávu do souboru "'.$FileName.'"!';
                 return false;
             }
-	} else {
+        } else {
             return false;
         }
-		
+                
     }
 
     /**
@@ -675,7 +675,7 @@ class ISDS {
         $this->NullRetInfo();
 
         $MessInput=array('dmID'=>$MessageID);
-	
+        
         try {
 
             $MessageVerifyOutput = $this->InfoWS()->VerifyMessage($MessInput);
@@ -684,14 +684,14 @@ class ISDS {
             $this->StatusMessage = $Status->dmStatusMessage;
             return $MessageVerifyOutput->dmHash;
 
-	} catch (Exception $e) {
+        } catch (Exception $e) {
 
             $this->StatusCode    = $Status->dmStatusCode;
             $this->StatusMessage = $Status->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
     }
     
     /**
@@ -724,11 +724,11 @@ class ISDS {
                 return false;
             }
             
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
     }    
 
     /**
@@ -741,10 +741,10 @@ class ISDS {
     {
 
         $this->NullRetInfo();
-	$MessInput=array('dmID'=>$MessageID);
+        $MessInput=array('dmID'=>$MessageID);
         
         try {
-	
+        
             $MessEnvelDownOutput = $this->InfoWS()->MessageEnvelopeDownload($MessInput);
 
             $Status = $MessEnvelDownOutput->dmStatus;
@@ -760,7 +760,7 @@ class ISDS {
             $this->ErrorInfo     = $e->getMessage();
             return false;
 
-	}
+        }
     }
 
     /**
@@ -789,7 +789,7 @@ class ISDS {
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
     }
 
     /**
@@ -804,9 +804,9 @@ class ISDS {
             return $A;
         }
 
-	$B=array();
-	$B[0]=$A;
-	return $B;
+        $B=array();
+        $B[0]=$A;
+        return $B;
         
     }
 
@@ -821,9 +821,9 @@ class ISDS {
         
         $this->NullRetInfo();
 
-	$MessInput=array('dmID'=>$MessageID);
+        $MessInput=array('dmID'=>$MessageID);
 
-	try {
+        try {
 
             $DeliveryMessageOutput = $this->InfoWS()->GetDeliveryInfo($MessInput);
 
@@ -833,7 +833,7 @@ class ISDS {
             $DeliveryMessageOutput->dmDelivery->dmEvents->dmEvent = $this->PrepareArray($DeliveryMessageOutput->dmDelivery->dmEvents->dmEvent);
             return $DeliveryMessageOutput->dmDelivery;
 
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->StatusCode    = $DeliveryMessageOutput->dmStatus->dmStatusCode;
             $this->StatusMessage = $DeliveryMessageOutput->dmStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
@@ -852,8 +852,8 @@ class ISDS {
     {
 
         $this->NullRetInfo();
-	$MessInput=array('dmID'=>$MessageID);
-	
+        $MessInput=array('dmID'=>$MessageID);
+        
         try {
             
             $SignDeliveryMessOutput = $this->InfoWS()->GetSignedDeliveryInfo($MessInput);
@@ -861,7 +861,7 @@ class ISDS {
             $this->StatusMessage = $SignDeliveryMessOutput->dmStatus->dmStatusMessage;
             return $SignDeliveryMessOutput->dmSignature;
 
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->StatusCode    = $SignDeliveryMessOutput->dmStatus->dmStatusCode;
             $this->StatusMessage = $SignDeliveryMessOutput->dmStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
@@ -889,7 +889,7 @@ class ISDS {
                 $this->ErrorInfo = 'Nepodařilo se uložit zprávu do souboru "'.$FileName.'"!';
                 return false;
             }
-	} else {
+        } else {
             return false;
         }
     }
@@ -932,7 +932,7 @@ class ISDS {
             'dmLimit'=>$Limit
         );
         
-	try {
+        try {
 
             $ListOfSentOutput = $this->InfoWS()->GetListOfSentMessages($ListOfSentInput);
             $this->StatusCode = $ListOfSentOutput->dmStatus->dmStatusCode;
@@ -949,7 +949,7 @@ class ISDS {
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
     }
 
     /**
@@ -1010,7 +1010,7 @@ class ISDS {
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
 
     }
 
@@ -1042,13 +1042,13 @@ class ISDS {
      * @return dbResults
      *
      */
-    public function FindDataBox($IdDb, $Type, $dbState,	$ic, $FirstName, $MiddleName, $LastName, $LastNameAtBirth,
+    public function FindDataBox($IdDb, $Type, $dbState, $ic, $FirstName, $MiddleName, $LastName, $LastNameAtBirth,
                         $firmName, $biDate, $biCity, $biCounty, $biState, $adCity, $adStreet, $adNumberInStreet,
                         $adNumberInMunicipality, $adZipCode, $adState, $nationality, $email, $telNumber)
     {
 
         $this->NullRetInfo();
-	$OwnerInfo=array(
+        $OwnerInfo=array(
             'dbID'=>$IdDb,
             'dbType'=>$Type,
             'dbState'=>$dbState,
@@ -1072,17 +1072,17 @@ class ISDS {
             'email'=>$email,
             'telNumber'=>$telNumber
         );
-	
+        
         $FindInput=array('dbOwnerInfo'=>$OwnerInfo);
 
-	try {
+        try {
             
             $FindOutput=$this->ManipulationsWS()->FindDataBox($FindInput);
             $this->StatusCode = $FindOutput->dbStatus->dbStatusCode;
             $this->StatusMessage = $FindOutput->dbStatus->dbStatusMessage;
             $FindOutput->dbResults->dbOwnerInfo = $this->PrepareArray($FindOutput->dbResults->dbOwnerInfo);
             return $FindOutput->dbResults;
-	
+        
         } catch (Exception $e) {
             $this->StatusCode    = $FindOutput->dbStatus->dbStatusCode;
             $this->StatusMessage = $FindOutput->dbStatus->dbStatusMessage;
@@ -1113,7 +1113,7 @@ class ISDS {
     {
 
         $this->NullRetInfo();
-	$OwnerInfo=array(
+        $OwnerInfo=array(
             'dbID'=>(!empty($filtr['dbID'])?$filtr['dbID']:null),
             'dbType'=>(!empty($filtr['dbType'])?$filtr['dbType']:null),
             'dbState'=>(!empty($filtr['dbState'])?$filtr['dbState']:null),
@@ -1140,7 +1140,7 @@ class ISDS {
 
         $FindInput=array('dbOwnerInfo'=>$OwnerInfo);
 
-	try {
+        try {
 
             $FindOutput=$this->ManipulationsWS()->FindDataBox($FindInput);
             $this->StatusCode = @$FindOutput->dbStatus->dbStatusCode;
@@ -1181,20 +1181,20 @@ class ISDS {
 
         $this->NullRetInfo();
 
-	$Inputdb = array('dbID'=>$DataBoxID);
-	
+        $Inputdb = array('dbID'=>$DataBoxID);
+        
         try {
             $Output = $this->ManipulationsWS()->CheckDataBox($Inputdb);
             $this->StatusCode = $Output->dbStatus->dbStatusCode;
             $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
             return $Output->dbState;
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->StatusCode    = $Output->dbStatus->dbStatusCode;
             $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
 
     }
 
@@ -1220,20 +1220,20 @@ class ISDS {
     {
     
         $Result = array();
-	
-        for ($i=1; $i<=9; $i++)	{
+        
+        for ($i=1; $i<=9; $i++) {
             $Result[$i]=0;
-	}
-	
+        }
+        
         $Step=512; $Start=1;
         
         do {
             if ($received) {
                 $Records = $this->GetListOfReceivedMessages('2000','3000',$Start,$Step,1023,null);
             } else {
-		$Records = $this->GetListOfSentMessages('2000','3000',$Start,$Step,1023,null);
+                $Records = $this->GetListOfSentMessages('2000','3000',$Start,$Step,1023,null);
             }
-	
+        
             $Start = $Start + $Step;
             $NumOf=count($Records->dmRecord);
             for ($i=0;$i<$NumOf;$i++) {
@@ -1241,7 +1241,7 @@ class ISDS {
             }
         } while ($NumOf == $Step);
         
-	return $Result;
+        return $Result;
 
     }
 
@@ -1254,8 +1254,8 @@ class ISDS {
     {
 
         $Step=512;
-	$Start=1;
-	
+        $Start=1;
+        
         do {
             $Records = $this->GetListOfReceivedMessages('2000','3000',$Start,$Step,1023,null);
             $Start = $Start + $Step;
@@ -1263,11 +1263,11 @@ class ISDS {
             for ($i=0;$i<$NumOf;$i++) {
                 if ($Records->dmRecord[$i]->dmMessageStatus != 7) {
                     $this->MarkMessageAsDownloaded($Records->dmRecord[$i]->dmID);
-		}
+                }
             }
-	} while ($NumOf == $Step);
+        } while ($NumOf == $Step);
         
-	return true;
+        return true;
     }
 
     /**
@@ -1283,19 +1283,19 @@ class ISDS {
         $this->NullRetInfo();
 
         $MessInput=array('dmID'=>$MessageID);
-	
+        
         try {
             $ConDerOut = $this->InfoWS()->ConfirmDelivery($MessInput);
             $this->StatusCode=$ConDerOut->dmStatus->dmStatusCode;
             $this->StatusMessage=$ConDerOut->dmStatus->dmStatusMessage;
             return true;
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->StatusCode    = $ConDerOut->dmStatus->dmStatusCode;
             $this->StatusMessage = $ConDerOut->dmStatus->dmStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
     }
 
     /**
@@ -1311,19 +1311,19 @@ class ISDS {
         $this->NullRetInfo();
 
         $IDDBInput=array('dbID'=>$BoxID);
-	
+        
         try {
             $ReqStatusOut = $this->ManipulationsWS()->SetOpenAddressing($IDDBInput);
             $this->StatusCode = $ReqStatusOut->dbStatus->dbStatusCode;
             $this->StatusMessage = $ReqStatusOut->dbStatus->dbStatusMessage;
             return true;
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->StatusCode    = $ReqStatusOut->dbStatus->dbStatusCode;
             $this->StatusMessage = $ReqStatusOut->dbStatus->dbStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
 
 
     }
@@ -1341,19 +1341,19 @@ class ISDS {
         $this->NullRetInfo();
 
         $IDDBInput=array('dbID'=>$BoxID);
-		
+                
         try {
             $ReqStatusOut = $this->ManipulationsWS()->ClearOpenAddressing($IDDBInput);
             $this->StatusCode = $ReqStatusOut->dbStatus->dbStatusCode;
             $this->StatusMessage = $ReqStatusOut->dbStatus->dbStatusMessage;
             return true;
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->StatusCode    = $ReqStatusOut->dbStatus->dbStatusCode;
             $this->StatusMessage = $ReqStatusOut->dbStatus->dbStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
     }
 
     /**
@@ -1365,8 +1365,8 @@ class ISDS {
     public function GetUserInfoFromLogin()
     {
         $this->NullRetInfo();
-	$Input=array('dbDummy'=>"");
-	
+        $Input=array('dbDummy'=>"");
+        
         try {
             $Output = $this->AccessWS()->GetUserInfoFromLogin($Input);
 
@@ -1377,7 +1377,7 @@ class ISDS {
                 $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
                 return null;
             }
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->StatusCode    = $Output->dbStatus->dbStatusCode;
             $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
             $this->ErrorCode     = $e->getCode();
@@ -1399,19 +1399,19 @@ class ISDS {
         $this->NullRetInfo();
 
         $Input=array('dbDummy'=>"");
-	
+        
         try {
             $Output=$this->AccessWS()->GetPasswordInfo($Input);
             $this->StatusCode = $Output->dbStatus->dbStatusCode;
             $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
             return $Output->pswExpDate;
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->StatusCode    = $Output->dbStatus->dbStatusCode;
             $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
     }
 
     /**
@@ -1426,23 +1426,23 @@ class ISDS {
     {
 
         $this->NullRetInfo();
-	$Input=array(
+        $Input=array(
             'dbOldPassword'=>$OldPassword,
             'dbNewPassword'=>$NewPassword
         );
-	
+        
         try {
             $Output = $this->AccessWS()->ChangeISDSPassword($Input);
             $this->StatusCode = $Output->dbStatus->dbStatusCode;
             $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
             return($this->StatusCode == "0000");
-	} catch (Exception $e) {
+        } catch (Exception $e) {
             $this->StatusCode    = $Output->dbStatus->dbStatusCode;
             $this->StatusMessage = $Output->dbStatus->dbStatusMessage;
             $this->ErrorCode     = $e->getCode();
             $this->ErrorInfo     = $e->getMessage();
             return false;
-	}
+        }
     }
 
     
@@ -1455,8 +1455,8 @@ class ISDS {
     protected function NullRetInfo()
     {
         $this->ErrorInfo = "";
-	$this->StatusCode = "";
-	$this->StatusMessage = "";
+        $this->StatusCode = "";
+        $this->StatusMessage = "";
         return true;
     }
 
@@ -1471,56 +1471,56 @@ class ISDS {
         }
 
         // https://ws1.czebox.cz/DS/DsManage
-	$res = "https://ws1";
+        $res = "https://ws1";
 
-	switch ($portalType):
+        switch ($portalType):
             case 0:
                 $res = $res.".czebox.cz/";
                 break;
             case 1:
-		$res = $res.".mojedatovaschranka.cz/";
-		break;
-	endswitch;
+                $res = $res.".mojedatovaschranka.cz/";
+                break;
+        endswitch;
 
-	switch ($loginType):
-	case 1:
-		$res = $res."cert/";
-		break;
-	case 2:
-		$res = $res."hspis/";
-		break;
-	endswitch;
-	$res = $res."DS/";
-	switch ($serviceType):
+        switch ($loginType):
+        case 1:
+                $res = $res."cert/";
+                break;
+        case 2:
+                $res = $res."hspis/";
+                break;
+        endswitch;
+        $res = $res."DS/";
+        switch ($serviceType):
             case 0:
-		$res = $res."dz";
-    		break;
+                $res = $res."dz";
+                break;
             case 1:
-		$res = $res."dx";
-		break;
+                $res = $res."dx";
+                break;
             case 2:
-		$res = $res."DsManage";
-		break;
+                $res = $res."DsManage";
+                break;
             case 3:
-		$res = $res."DsManage";
-		break;
-	endswitch;
+                $res = $res."DsManage";
+                break;
+        endswitch;
 
-	return $res;
+        return $res;
     }
 
     protected function GetServiceWSDL($serviceType)
     {
         switch ($serviceType):
             case 0:
-		return LIBS_DIR ."/isds/dm_operations.wsdl";
+                return LIBS_DIR ."/isds/dm_operations.wsdl";
             case 1:
-		return LIBS_DIR ."/isds/dm_info.wsdl";
+                return LIBS_DIR ."/isds/dm_info.wsdl";
             case 2:
-		return LIBS_DIR ."/isds/db_manipulations.wsdl";
+                return LIBS_DIR ."/isds/db_manipulations.wsdl";
             case 3:
-		return LIBS_DIR ."/isds/db_access.wsdl";
-	endswitch;
+                return LIBS_DIR ."/isds/db_access.wsdl";
+        endswitch;
     }
 
     /**
@@ -1672,41 +1672,41 @@ class ISDS {
         $this->debug("  logintype: ". $logintype);
         $this->debug("  params: ", $params);
 
-	$this->ch = curl_init();
+        $this->ch = curl_init();
 
-	curl_setopt($this->ch, CURLOPT_POST, true);
-	curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($this->ch, CURLOPT_FAILONERROR, true);
-	//curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
-	curl_setopt($this->ch, CURLINFO_HEADER_OUT, true);
-	curl_setopt($this->ch, CURLOPT_UNRESTRICTED_AUTH,false);
-	curl_setopt($this->ch, CURLOPT_NOBODY,false);
+        curl_setopt($this->ch, CURLOPT_POST, true);
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->ch, CURLOPT_FAILONERROR, true);
+        //curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($this->ch, CURLINFO_HEADER_OUT, true);
+        curl_setopt($this->ch, CURLOPT_UNRESTRICTED_AUTH,false);
+        curl_setopt($this->ch, CURLOPT_NOBODY,false);
 
-	if (!empty($params['login'])) {
+        if (!empty($params['login'])) {
             //$this->debug("   CURLOPT_USERPWD: ". $params['login'].":".$params['password']);
             curl_setopt($this->ch, CURLOPT_USERPWD,$params['login'].":".$params['password']);
-	}
+        }
 
-	if ($logintype != 0) {
+        if ($logintype != 0) {
             curl_setopt($this->ch, CURLOPT_SSLCERT,$params['local_cert']);
             curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD,$params['passphrase']);
-	}
+        }
 
     if (stristr(PHP_OS,'WIN') !== false)
         curl_setopt($this->ch, CURLOPT_CAINFO, dirname(__FILE__) . '\cacert.pem' );    
     curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, $this->ssl_verify_peer);
     
-	if (!empty($params['proxy_host'])) {
+        if (!empty($params['proxy_host'])) {
             curl_setopt($this->ch, CURLOPT_PROXY, 'http://'.$params['proxy_host'].':'.$params['proxy_port']);
             curl_setopt($this->ch, CURLOPT_HTTPPROXYTUNNEL, true);
             if (!empty($params['proxy_login'])) {
                 curl_setopt($this->ch, CURLOPT_PROXYUSERPWD, $params['proxy_login'].':'.$params['proxy_password']);
             }
-	}
+        }
 
         $this->debug("   url: ". $this->GetServiceURL(0,$logintype));
-	curl_setopt($this->ch, CURLOPT_URL, $this->GetServiceURL(0,$logintype));
-	curl_setopt($this->ch, CURLOPT_POSTFIELDS,
+        curl_setopt($this->ch, CURLOPT_URL, $this->GetServiceURL(0,$logintype));
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS,
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".
             "    <soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n".
             "  <soap:Body>\n".
@@ -1758,11 +1758,11 @@ class ISDS {
                 //$tmp_file .= var_export($this->debug_log, true);
 
                 foreach ( $this->debug_log as $log ) {
-            	    // P.L. 2011-12-05  oprava fatal error pri pouziti var_export
-            	    $val = '';
-            	    ob_start();
-            	    var_dump($log['value']);
-            	    $val = ob_get_contents();
+                    // P.L. 2011-12-05  oprava fatal error pri pouziti var_export
+                    $val = '';
+                    ob_start();
+                    var_dump($log['value']);
+                    $val = ob_get_contents();
                    ob_end_clean();
 
                     if ( $log['type'] == 1 ) {
@@ -1820,21 +1820,21 @@ class ISDSSoapClient extends SoapClient
             'User-Agent: '.$this->userAgent(),
             'Content-Type: text/xml; charset=utf-8',
             'SOAPAction: "'.$action.'"'
-	);
+        );
 
         $this->__last_request_headers = $headers;
 
-	curl_setopt($this->ch, CURLOPT_URL, $location);
-	curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
-	curl_setopt($this->ch, CURLOPT_POSTFIELDS,$request);
+        curl_setopt($this->ch, CURLOPT_URL, $location);
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS,$request);
 
-	$response = curl_exec($this->ch);
+        $response = curl_exec($this->ch);
 
-	if (curl_errno($this->ch) != 0) {
+        if (curl_errno($this->ch) != 0) {
             throw new exception('CurlError: '.curl_errno($this->ch).' Message:'.curl_error($this->ch));
-	}
+        }
 
-	return $response;
+        return $response;
     }
 
     public function userAgent() {
@@ -1914,17 +1914,17 @@ class ISDSSentOutFiles {
             'dmFileDescr'=>$FileDescr,
             'dmFormat'=>$Format,
             'dmEncodedContent'=>$file
-	);
-	
+        );
+        
         if ($this->FileInfos == null) {
             $this->FileInfos[0] = $dmFile;
             $this->FullFileNames[0] = $FullFileName;
-	} else {
+        } else {
             $this->FileInfos[count($this->FileInfos)]=$dmFile;
             $this->FullFileNames[count($this->FullFileNames)]=$FullFileName;
-	}
+        }
 
-	return true;
+        return true;
     }
 
     /**
@@ -1943,14 +1943,14 @@ class ISDSSentOutFiles {
 
         if (!file_exists($FullFileName)) {
             return false;
-	}
+        }
 
-	$file = file_get_contents($FullFileName);
-	if (!$file) {
+        $file = file_get_contents($FullFileName);
+        if (!$file) {
             return false;
-	}
+        }
 
-	return $this->AddFileSpecFromMemory($file,$MimeType,$MetaType,$Guid,$UpFileGuid,$FileDescr,$Format,$FullFileName);
+        return $this->AddFileSpecFromMemory($file,$MimeType,$MetaType,$Guid,$UpFileGuid,$FileDescr,$Format,$FullFileName);
     }
 
     /**
@@ -1965,16 +1965,16 @@ class ISDSSentOutFiles {
 
         if ($this->FileInfos == null) {
             $MetaType="main";
-	} else {
+        } else {
             $MetaType="enclosure";
-	}
+        }
 
-	$path_parts = pathinfo($FullFileName);
-	
+        $path_parts = pathinfo($FullFileName);
+        
         return $this->AddFileSpecFromFile(
                         $FullFileName,
-			$MimeType,
-			$MetaType,"","",$path_parts['basename'],""
+                        $MimeType,
+                        $MetaType,"","",$path_parts['basename'],""
                 );
     }
 
