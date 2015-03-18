@@ -2068,6 +2068,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     if ( !empty($adresat->email) ) {
                         
                         $data = array(
+                            'dokument_id' => $dokument_id,
                             'email_from' => $post_data['email_from'][$subjekt_id],
                             'email_predmet' => $post_data['email_predmet'][$subjekt_id],
                             'email_text' => $post_data['email_text'][$subjekt_id],
