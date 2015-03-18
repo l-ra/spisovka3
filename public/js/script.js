@@ -956,9 +956,13 @@ selectReadOnly = function ( select ) {
 filtrSestavy = function (elm) {
 
     if ( is_simple == 1 ) {
-        var url = BASE_URL + '?presenter=Spisovka%3Asestavy&id=0&action=filtr&url='+elm.href;
+        re = /id=([0-9]+)/;
+        var matched = re.exec(elm.href);
+        var url = BASE_URL + '?presenter=Spisovka%3Asestavy&id='+ matched[1] +'&action=filtr';
     } else {         
-        var url = BASE_URL + 'sestavy/0/filtr/?url='+elm.href;
+        re = /sestavy\/([0-9]+)/;
+        var matched = re.exec(elm.href);
+        var url = BASE_URL + 'sestavy/'+ matched[1] +'/filtr/';
     }
 
     return dialog(elm, 'Filtr', url);
@@ -966,7 +970,8 @@ filtrSestavy = function (elm) {
 
 zobrazSestavu = function (elm) {
 
-    var param = '?';
+    var param = is_simple == 1 ? '&' : '?';
+    
     if ( elm.pc_od.value != '' ) {param = param + 'pc_od=' + elm.pc_od.value + '&'}
     if ( elm.pc_do.value != '' ) {param = param + 'pc_do=' + elm.pc_do.value + '&'}
     if ( elm.d_od.value != '' )  {param = param + 'd_od=' + elm.d_od.value + '&'}

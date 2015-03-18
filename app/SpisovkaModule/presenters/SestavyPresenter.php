@@ -271,7 +271,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 $this->template->prilis_mnoho = 1;
                 $seznam = array();
                 
-                $reload_url = Nette\Environment::getHttpRequest()->getOriginalUri()->getAbsoluteUri();
+                $reload_url = Nette\Environment::getHttpRequest()->getUrl()->getAbsoluteUrl();
                 if ( strpos($reload_url,'?') !== false ) {
                     $reload_url .= "&pokracovat=1";
                 } else {
@@ -656,5 +656,11 @@ class Spisovka_SestavyPresenter extends BasePresenter
         
         $this->redirect(':Spisovka:Sestavy:default');
     }
+
+    public function renderFiltr()
+    {
+        $this->template->id = $this->getParam('id');
+    }
+
 }
 
