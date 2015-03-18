@@ -230,7 +230,7 @@ epodSubjektVybran = function (elm, subjekt_id) {
 
 zkontrolovatSchranku = function (elm) {
 
-    $('#zkontrolovat_status').html('<img src="'+BASE_URL+'public/images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
+    $('#zkontrolovat_status').html('<img src="'+PUBLIC_URL+'images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
 
     if ( is_simple == 1 ) {
         url = BASE_URL + '?presenter=Epodatelna%3Adefault&action=zkontrolovatAjax';
