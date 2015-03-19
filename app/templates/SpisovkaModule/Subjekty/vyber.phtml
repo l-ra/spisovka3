@@ -2,10 +2,8 @@
     <div class="flash_message flash_warning">Subjekt se nepodařilo připojit k dokumentu. Zkuste to znovu.</div>
     {/if}
 
-    <h2>Seznam subjektů</h2>
-
     <div class="blok_menu">
-        <a href="{link :Spisovka:Subjekty:novy, 'dok_id'=>$dokument_id}" onclick="return novySubjekt(this);">Nový subjekt</a>
+        <a href="{link :Spisovka:Subjekty:novy}" onclick="return dialogNovySubjekt(this);">Nový subjekt</a>
     </div>
 
     {control abc}

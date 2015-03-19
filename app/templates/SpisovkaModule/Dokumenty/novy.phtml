@@ -9,20 +9,21 @@
 
 		function completeCallback(response) {
 
-                        if ( response.indexOf('###vybrano###') != -1 ) {
-                            alert('Příloha byl nahrána.');
-                            $('#dialog').dialog('close');
-                            renderPrilohy({$Dok->id});
-                        } else if ( response.indexOf('###zmemeno###') != -1 ) {
-                            alert('Příloha byla upravena.');
-                            $('#dialog').dialog('close');
-                            renderPrilohy({$Dok->id});
-                        } else {
-                            $('#dialog').html(response);
-                        }
+            if ( response.indexOf('###vybrano###') != -1 ) {
+                alert('Příloha byl nahrána.');
+                $('#dialog').dialog('close');
+                renderPrilohy({$Dok->id});
+            } else if ( response.indexOf('###zmemeno###') != -1 ) {
+                alert('Příloha byla upravena.');
+                $('#dialog').dialog('close');
+                renderPrilohy({$Dok->id});
+            } else {
+                $('#dialog').html(response);
+            }
 		}
-	</script>
-	<script type="text/javascript">
+        
+        var DOKUMENT_ID = {$Dok->id};
+        
         var smer_typu_dokumentu = new Array();
         {foreach $typy_dokumentu as $t}
         smer_typu_dokumentu[{$t->id}] = {$t->smer};
@@ -188,7 +189,6 @@
             Adresáti / odesílatelé
         </div>
         <div class="blok_akce">
-            <input type="hidden" name="subjekt_dokument_id" id="subjekt_dokument_id" value="{$Dok->id}" />
             <dl class="detail_item">
                 <dt>Připojit subjekt:</dt>
                 <dd>
@@ -237,8 +237,8 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this);">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
             <td class="meta_plus">

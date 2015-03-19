@@ -26,8 +26,8 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id }" onclick="return odebratSubjekt(this, {!$dokument_id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id }" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id }" onclick="return odebratSubjekt(this);">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>&nbsp;&nbsp;
                 </div>
             </td>
             <td class="meta_plus">

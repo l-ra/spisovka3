@@ -37,28 +37,6 @@ class SubjektyPresenter extends BasePresenter
         $this->template->subjektForm = $this['novyForm'];
     }
     
-    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $dokument_id = isset($data['dokument_id']) ? $data['dokument_id'] : null;
-        unset($data['dokument_id']);
-
-        $Subjekt = new Subjekt();
-
-        try {
-            $Subjekt->ulozit($data);
-            if ($dokument_id !== null)
-                $this->forward('vyber',array('dok_id'=>$dokument_id));
-            else
-                $this->forward('vyber');
-            
-        } catch (DibiException $e) {
-            echo "Chyba! Subjekt se nepodařilo vytvořit.<br/>" . $e->getMessage();
-            $this->terminate();
-        }
-    }
-
     protected function vytvorFormular()
     {
         $typ_select = Subjekt::typ_subjektu();
@@ -246,9 +224,9 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
     }
 
     // Volano pouze pres Ajax
-    public function renderVybrano()
+    public function actionVybrano()
     {
-        try {
+        try {            
             $subjekt_id = $this->getParam('id',null);
             $dokument_id = $this->getParam('dok_id',null);
             $typ = $this->getParam('typ',null);
@@ -409,41 +387,28 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
     {
         $form1 = parent::createComponentUpravitForm();
 
-        $dokument_id = @$this->template->dokument_id;
-        $form1->addHidden('dokument_id')
-                ->setValue(@$dokument_id);
-
         $form1->getElementPrototype()->onsubmit('return false;');
-        $form1['upravit']->onClick[] = array($this, 'upravitClicked');
+        $form1->onSuccess[] = array($this, 'upravitFormSucceeded');
         $form1['upravit']->controlPrototype->onclick("return subjektUpravitSubmit();");
         $form1['storno']->controlPrototype->onclick("return subjektUpravitStorno();");
                 
         return $form1;
     }
     
-    public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function upravitFormSucceeded(Nette\Application\UI\Form $form, $data)
     {
-        $data = $button->getForm()->getValues();
         $subjekt_id = $data['id'];
 
-        $dokument_id = $data['dokument_id'];
-        unset($data['dokument_id']);
-        
         if (empty($data['stat_narozeni']))
             $data['stat_narozeni'] = null;
         if (empty($data['adresa_stat']))
             $data['adresa_stat'] = null;
 
-        $Subjekt = new Subjekt();
         try {
-            $subjekt_id = $Subjekt->ulozit($data, $subjekt_id);
-
-            // P.L. Zmenu ciselniku nemuzeme logovat do protokolu dokumentu
-            // $subjekt_info = $Subjekt->getInfo($subjekt_id);
-            //$Log = new LogModel();
-            //$Log->logDokument($dokument_id, LogModel::SUBJEKT_ZMENEN,'Změněn subjekt "'. Subjekt::displayName($subjekt_info) .'"');
+            $Subjekt = new Subjekt();
+            $Subjekt->ulozit($data, $subjekt_id);
             
-            echo "###zmeneno###".$dokument_id; exit;
+            echo "###zmeneno###";
 
         } catch (Exception $e) {
             echo "Chyba! Subjekt se nepodařilo upravit.<br/>" . $e->getMessage();
@@ -457,15 +422,25 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
     {
         $form1 = parent::createComponentNovyForm();
         
-        $dokument_id = $this->getParam('dok_id',null);
-        $form1->addHidden('dokument_id')
-                ->setValue($dokument_id);
-
-        $form1['novy']->onClick[] = array($this, 'vytvoritClicked');
+        // formulář je odesílán přes Ajax, nelze tedy navázat událost na submit tlačítko
+        $form1->onSuccess[] = array($this, 'novyFormSucceeded');
         $form1['novy']->controlPrototype->onclick("return subjektNovySubmit();");
-        $form1['storno']->controlPrototype->onclick("return subjektNovyStorno($dokument_id);");
+        $form1['storno']->controlPrototype->onclick("return dialogVyberSubjektu();");
 
         return $form1;
+    }
+
+    public function novyFormSucceeded(Nette\Application\UI\Form $form, $data)
+    {
+        try {
+            $Subjekt = new Subjekt();
+            $Subjekt->ulozit((array)$data);
+            echo "OK";
+            
+        } catch (Exception $e) {
+            echo "Chyba! Subjekt se nepodařilo vytvořit.<br/>" . $e->getMessage();
+        }
+        $this->terminate();
     }
 
     // Volano pouze pres Ajax

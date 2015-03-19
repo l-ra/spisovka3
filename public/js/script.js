@@ -93,44 +93,34 @@ $(function() {
         return false;
     });
 
-    // Dialog - Vyber spisu
     $('#dialog-zmocneni').click(function(event){
         dialog(this,'Připojit zmocnění');
         return false;
     });
 
-    // Dialog - Vyber subjektu
-    $('#dialog-subjekt').click(function(event){
-        dialog(this,'Subjekt');
-        return false;
-    });
+    $('#dialog-subjekt').click(dialogVyberSubjektu);
     
-    // Dialog - Vyber subjektu
     $('#subjekt_pripojit_click').click(function(event){
         $('#subjekt_pripojit').show();
         $('#subjekt_autocomplete').focus();        
         return false;
     });    
 
-    // Dialog - Vyber subjektu
     $('#dialog-pridat-prilohu').click(function(event){
         dialog(this,'Přidat přílohu');
         return false;
     });
 
-    // Dialog - Vyber zamestnance pro predani
     $('#dialog-uzivatel').click(function(event){
         dialog(this,'Předat dokument organizační jednotce nebo zaměstnanci');
         return false;
     });
     
-    // Dialog - Vyber org pro predani spisu
     $('#dialog-predatspis').click(function(event){
         dialog(this,'Předat spis organizační jednotce nebo zaměstnanci');
         return false;
     });    
 
-    // Dialog - Vyber zamestnance pro predani
     $('#dialog-spojit').click(function(event){
         dialog(this,'Spojit s dokumentem');
         return false;
@@ -187,7 +177,8 @@ $(function() {
 
     $('#subjekt_autocomplete').autocomplete({
         minLength: 3,
-        source: (is_simple==1)?BASE_URL + '?presenter=Spisovka%3Asubjekty&action=seznamAjax':BASE_URL + 'subjekty/0/seznamAjax',
+        source: (is_simple==1) ? BASE_URL + '?presenter=Spisovka%3Asubjekty&action=seznamAjax'
+                            : BASE_URL + 'subjekty/0/seznamAjax',
 
         focus: function(event, ui) {
             $('#subjekt_autocomplete').val(ui.item.nazev);
@@ -196,51 +187,39 @@ $(function() {
         select: function(event, ui) {
             $('#subjekt_autocomplete').val('');
 
-            if (document.getElementById) {
-                var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-            }
-            if (x) {
-                x.onreadystatechange = function() {
-                    if (x.readyState == 4 && x.status == 200) {
-                        stav = x.responseText;
-
-                        if ( stav.indexOf('###vybrano###') != -1 ) {
-                            stav = stav.replace('###vybrano###','');
-                            alert('Subjekt připojen.');
-                            renderSubjekty(stav);
-                        } else {
-                            alert(stav);
-                        }
-                    }
-                }
-
-                // Nasledujici kod zajistuje automaticke urceni typu pripojeni subjektu
-                var typ_id = $('#frmnovyForm-dokument_typ_id').val();
-                if (typeof typ_id == 'undefined')
-                    typ_id = $('#frmmetadataForm-dokument_typ_id').val();
-                if (typeof typ_id == 'undefined')
-                    typ_id = $('#frmodpovedForm-dokument_typ_id').val();
-                if (typeof typ_id == 'undefined')
-                    typ_id = typ_dokumentu_id;
-                    
-                var typ_code;
-                if (typeof typ_id != 'undefined'
-                    && typeof smer_typu_dokumentu != 'undefined')
-                    typ_code = smer_typu_dokumentu[typ_id] == 0 ? 'O' : 'A';
-                else {
-                    // V sablone chybi informace o typech dokumentu
-                    // window.alert('chyba programu');
-                    typ_code = 'AO';
-                }
+            // Nasledujici kod zajistuje automaticke urceni typu pripojeni subjektu
+            var typ_id = $('#frmnovyForm-dokument_typ_id').val();
+            if (typeof typ_id == 'undefined')
+                typ_id = $('#frmmetadataForm-dokument_typ_id').val();
+            if (typeof typ_id == 'undefined')
+                typ_id = $('#frmodpovedForm-dokument_typ_id').val();
+            if (typeof typ_id == 'undefined')
+                typ_id = typ_dokumentu_id;
                 
-                if ( is_simple == 1 ) {
-                    url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=' + typ_code + '&autocomplete=1';                    
-                } else {
-                    url = BASE_URL + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ=' + typ_code + '&autocomplete=1';
-                }
-                x.open("GET", url, true);
-                x.send(null);
+            var typ_code;
+            if (typeof typ_id != 'undefined'
+                && typeof smer_typu_dokumentu != 'undefined')
+                typ_code = smer_typu_dokumentu[typ_id] == 0 ? 'O' : 'A';
+            else {
+                // V sablone chybi informace o typech dokumentu
+                // window.alert('chyba programu');
+                typ_code = 'AO';
             }
+            
+            if ( is_simple == 1 ) {
+                url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+DOKUMENT_ID+'&typ=' + typ_code + '&autocomplete=1';                    
+            } else {
+                url = BASE_URL + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+DOKUMENT_ID+'&typ=' + typ_code + '&autocomplete=1';
+            }
+            
+            $.get(url, function(data) {
+                if ( data.indexOf('###vybrano###') != -1 ) {
+                    alert('Subjekt připojen.');
+                    renderSubjekty();
+                } else {
+                    alert(data);
+                }
+            });                
 
             return false;
         }
@@ -288,9 +267,12 @@ dialog = function ( elm, title, url ) {
     });
     $('#dialog').dialog('open');
 
-    if (typeof url == 'undefined')
-        url = elm.href;
-    
+    if (typeof url == 'undefined') {
+        if (!(elm instanceof jQuery))       
+            elm = $(elm);
+        
+        url = elm.attr('href');
+    }
     $.get(url, function(data) {
         $('#dialog').html(data);
     });
@@ -460,9 +442,8 @@ subjektVybran = function (elm) {
     
     $.get(elm.href, function(data) {
         if ( data.indexOf('###vybrano###') != -1 ) {
-            data = data.replace('###vybrano###','');
             $('#dialog').dialog('close');
-            renderSubjekty(data);
+            renderSubjekty();
         } else {
             alert(data);
         }
@@ -489,14 +470,14 @@ renderPrilohy = function (dokument_id) {
     return false;
 }
 
-renderSubjekty = function (dokument_id) {
+renderSubjekty = function () {
 
     showSpinner();
 
     if ( is_simple == 1 ) {
-        url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+ dokument_id +'&action=nacti';
+        url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+ DOKUMENT_ID +'&action=nacti';
     } else {    
-        url = BASE_URL + 'subjekty/'+ dokument_id +'/nacti';
+        url = BASE_URL + 'subjekty/'+ DOKUMENT_ID +'/nacti';
     }
 
     $.get(url, function(data) {
@@ -507,72 +488,56 @@ renderSubjekty = function (dokument_id) {
 }
 
 
-novySubjekt = function (elm) {
+dialogVyberSubjektu = function () {
+
+    dialog($('#dialog-subjekt'), 'Seznam subjektů');   
+    return false;
+}
+
+dialogNovySubjekt = function (elm) {
 
     return dialog(elm, 'Nový subjekt');
 }
 
-subjektVytvorit = function () {
+dialogUpravitSubjekt = function(elm){
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                stav = x.responseText;
-                if ( stav.indexOf('###zmeneno###') != -1 ) {
-                    stav = stav.replace('###zmeneno###','');
-                    $('#dialog').dialog('close');
-                    renderSubjekty(stav);
-                } else {
-                    text = '';// '<div class="flash_message flash_info">Subjekt byl úspěšně vytvořen.</div>';
-                    text = text + x.responseText;
-                    $('#dialog').html(text);
-                }
-            }
-        }
-
-        postForm(x, $("#subjekt-vytvorit"));
-    }
-
-    return false;
-}
-
-subjektzmenit = function(elm){
-
-    return dialog(elm, 'Subjekt');
+    return dialog(elm, 'Upravit subjekt');
 }
 
 subjektUpravitSubmit = function () {
-    subjektVytvorit();
-    return false;    
-}
-
-subjektNovySubmit = function () {
-    subjektVytvorit();
+    postFormJ($("#subjekt-vytvorit"), function(data) {
+        if ( data.indexOf('###zmeneno###') != -1 ) {
+            $('#dialog').dialog('close');
+            renderSubjekty();
+        } else {
+            // chyba
+            $('#dialog').html(data);            
+        }
+    });
     return false;    
 }
 
 subjektUpravitStorno = function () {
     $('#dialog').dialog('close');
+    return false;
 }
 
-subjektNovyStorno = function (doc_id) {
-
-    if ( is_simple == 1 ) {
-        url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=vyber&dok_id='+doc_id;
-    } else {    
-        url = BASE_URL + 'subjekty/0/vyber?dok_id='+doc_id;
-    }
-
-    dialog(null, 'Subjekt', url);   
-    return false;
+subjektNovySubmit = function () {
+    postFormJ($("#subjekt-vytvorit"), function(data) {
+        if (data == "OK") {
+            alert('Subjekt byl úspěšně vytvořen.');
+            dialogVyberSubjektu();
+        } else {
+            // chyba
+            $('#dialog').html(data);            
+        }
+    });
+    return false;    
 }
 
 subjektNovy = function(event) {
 
-        id = document.getElementById('subjekt_dokument_id').value;
+        id = DOKUMENT_ID;
 
         if ( is_simple == 1 ) {
             url_ajaxtyp = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamtypusubjektu';
@@ -654,7 +619,7 @@ subjektNovy = function(event) {
                                 '                        <dd><a href="" id="novysubjekt_click">Vytvořit nový subjekt</a></dd>'
                             );
                             $('#novysubjekt_click').click( subjektNovy );
-                            renderSubjekty(id);
+                            renderSubjekty();
 
                             alert('Subjekt byl vytvořen a přidán.');
 
@@ -761,12 +726,12 @@ odebratPrilohu = function(elm, dok_id){
     return false;
 }
 
-odebratSubjekt = function(elm, dok_id){
+odebratSubjekt = function(elm){
 
     if ( confirm('Opravdu chcete odebrat subjekt z dokumentu?') ) {
 
         $.get(elm.href, function(data) {
-            renderSubjekty(dok_id);
+            renderSubjekty();
         });
     }
     
@@ -1145,10 +1110,10 @@ zmen_rezim_subjektu = function() {
         url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+subjekt_id+'&action=zmenrezim&';        
     else
         url = BASE_URL + 'subjekty/'+subjekt_id+'/zmenrezim?';
-    url += 'dok_id='+document.getElementById('subjekt_dokument_id').value+'&typ='+rezim;    
+    url += 'dok_id='+DOKUMENT_ID+'&typ='+rezim;    
 
     $.get(url, '', function(data) {
-        renderSubjekty(document.getElementById('subjekt_dokument_id').value);
+        renderSubjekty();
     }, 'text');
     
 }
@@ -1197,3 +1162,10 @@ postForm = function (x, form) {
     }
 }
 
+postFormJ = function (form, callback) {
+
+    if (!(form instanceof jQuery))
+        form = $(form);
+    
+    $.post(form.attr('action'), form.serialize(), callback);
+}

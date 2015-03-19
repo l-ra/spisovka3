@@ -80,7 +80,7 @@ class UserModel extends BaseModel
         return ($rows) ? $rows : NULL;
     }
 
-    public function insert(array $data)
+    public function insert($data)
     {       
         $rown = array('username'=>$data['username'],
                       'password'=>sha1($data['username'] . $data['heslo']),

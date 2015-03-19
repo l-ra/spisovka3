@@ -379,7 +379,7 @@ abstract class BaseModel extends Nette\Object
      * @param array $values to insert
      * @return
      */
-    public function insert(array $values)
+    public function insert($values)
     {
         //dibi::insert($this->name, $values)
         //    ->test();
@@ -388,7 +388,7 @@ abstract class BaseModel extends Nette\Object
             ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
     }
 
-    public function insert_basic(array $values)
+    public function insert_basic($values)
     {
 
         return dibi::insert($this->name, $values)
@@ -401,7 +401,7 @@ abstract class BaseModel extends Nette\Object
      * @param array $where
      * @return
      */
-    public function update(array $values, $where = null)
+    public function update($values, $where = null)
     {
 
         if ( is_null($where) ) {

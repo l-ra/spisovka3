@@ -9,37 +9,40 @@
 
 		function completeCallback(response) {
 
-                        if ( response.indexOf('###vybrano###') != -1) {
-    alert('Příloha byl nahrána.');
-            $('#dialog').dialog('close');
-            renderPrilohy({$Dok->id});
-    } else if (response.indexOf('###zmemeno###') != -1) {
-    alert('Příloha byla upravena.');
-            $('#dialog').dialog('close');
-            renderPrilohy({$Dok->id});
-    } else {
-    $('#dialog').html(response);
-    }
-    }
+            if ( response.indexOf('###vybrano###') != -1) {
+                alert('Příloha byl nahrána.');
+                $('#dialog').dialog('close');
+                renderPrilohy({$Dok->id});
+            } else if (response.indexOf('###zmemeno###') != -1) {
+                alert('Příloha byla upravena.');
+                $('#dialog').dialog('close');
+                renderPrilohy({$Dok->id});
+            } else {
+                $('#dialog').html(response);
+            }
+        }
 
 
     function onChangeRadioButtonSpousteciUdalost(elm) {
 
-    var isChecked = $('#frmudalostForm-udalost_typ-1').is(':checked');
-            var sel = $('#frmudalostForm-datum_spousteci_udalosti');
-            if (!isChecked)
+        var isChecked = $('#frmudalostForm-udalost_typ-1').is(':checked');
+        var sel = $('#frmudalostForm-datum_spousteci_udalosti');
+        if (!isChecked)
             sel.prop('disabled', true);
-            else {
+        else {
             sel.prop('disabled', false);
-                    sel.focus();
-            }
+            sel.focus();
+        }
     }
 
     $(document).ready(function() {
         $('#frmudalostForm-datum_spousteci_udalosti').prop('disabled', true);
     });   
 
-     var smer_typu_dokumentu = new Array();
+    
+    var DOKUMENT_ID = {$Dok->id};
+    
+    var smer_typu_dokumentu = new Array();
     {foreach $typy_dokumentu as $t}
     smer_typu_dokumentu[{$t->id}] = {$t->smer};
     {/foreach}
@@ -626,7 +629,6 @@
             <a href="#" id="subjekt_pripojit_click">Připojit subjekt</a>
         </div>        
         <div class="blok_akce">
-            <input type="hidden" name="subjekt_dokument_id" id="subjekt_dokument_id" value="{$Dok->id}" />
             <div id="subjekt_pripojit" style="display:none;">
             <dl class="detail_item">
                 <dt>Vyhledat a připojit subjekt:</dt>
@@ -680,8 +682,8 @@
                 </div>
                 {if $Pridelen==1 }
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return subjektzmenit(this);">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this);">odebrat</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>&nbsp;&nbsp;
                 </div>
                 {/if}
             </td>
