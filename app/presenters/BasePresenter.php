@@ -279,6 +279,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             $this->template->user = $ident;
         }
 
+        // Nastav, aby Nette generovalo ID prvku formulare jako ve stare verzi
+        Nette\Forms\Controls\BaseControl::$idMask = 'frm%s';
     }
     
     public function templatePrepareFilters($template)
