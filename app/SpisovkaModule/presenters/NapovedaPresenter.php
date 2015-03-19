@@ -7,15 +7,15 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
     public function actionDefault($param1, $param2, $param3)
     {
         if ($param1 == "obsah") {
-            $this->template->helpFile = APP_DIR ."/../help/hlavni.phtml";
+            $this->template->helpFile = dirname(APP_DIR) ."/help/hlavni.phtml";
             $this->template->helpContents = $this->napovedy();
             $help_name = array();
-            include APP_DIR ."/../help/help_name.php";
+            include dirname(APP_DIR) ."/help/help_name.php";
             $this->template->helpTitles = $help_name;
             $this->setView('obsah');
         }
         else {
-            $this->template->helpFile = APP_DIR ."/../help/". ucfirst($param1) ."Module/". ucfirst($param2) ."/". $param3 .".phtml";
+            $this->template->helpFile = dirname(APP_DIR) ."/help/". ucfirst($param1) ."Module/". ucfirst($param2) ."/". $param3 .".phtml";
             if (!is_file($this->template->helpFile))
                 $this->setView('neexistuje');
         }
@@ -25,9 +25,9 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
     {
         $dirs = array();
 
-        foreach (Nette\Utils\Finder::findFiles('*.phtml')->from(APP_DIR ."/../help/") as $file) {
+        foreach (Nette\Utils\Finder::findFiles('*.phtml')->from(dirname(APP_DIR) ."/help/") as $file) {
 
-            $file = str_replace(APP_DIR ."/../help", "", $file);
+            $file = str_replace(dirname(APP_DIR) ."/help", "", $file);
             if ( strpos($file, "/") !== false ) {
                 $file_part = explode("/",$file);
             } else {

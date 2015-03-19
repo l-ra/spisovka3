@@ -1789,7 +1789,7 @@ class ISDS {
                 }
             }
 
-            $filename = APP_DIR .'/../log/isds_'. KLIENT ."_". date("Y-m-d H-i-s") ." ". md5(microtime()) .".log";
+            $filename = LOG_DIR .'/isds_'. KLIENT ."_". date("Y-m-d H-i-s") ." ". md5(microtime()) .".log";
             //file_put_contents($filename, $this->debug_file_text);
             file_put_contents($filename, $tmp_file);
             ini_set('html_errors', $html_errors);

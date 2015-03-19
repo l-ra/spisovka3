@@ -104,7 +104,7 @@ class Updates {
     {    
         $clients = array();
         if ( defined('MULTISITE') && MULTISITE == 1 ) {
-            $clients_dir = APP_DIR . "/../clients";
+            $clients_dir = dirname(APP_DIR) . "/clients";
             $dh = opendir($clients_dir);
             if ($dh !== false)
                 while (($filename = readdir($dh)) !== false) {
@@ -116,7 +116,7 @@ class Updates {
                         $clients["$clients_dir/$filename"] = "$filename ($clients_dir/$filename)";
                 }
         } else {
-            $client_dir = APP_DIR . "/../client";
+            $client_dir = dirname(APP_DIR) . "/client";
             $clients[$client_dir] = "STANDALONE ($client_dir)";
         }
         

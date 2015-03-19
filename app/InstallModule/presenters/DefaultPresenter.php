@@ -7,7 +7,7 @@ class Install_DefaultPresenter extends BasePresenter
     
     public function startup() {
 
-        $this->no_install = $this->getParam("no_install", Nette\Environment::getVariable('no_install'));
+        $this->no_install = $this->getParam("no_install", false);
         $this->template->no_install = $this->no_install;
         
         if ( $this->action == "kontrola" && $this->no_install ) {
@@ -250,7 +250,7 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'Zápis do logovací složky',
                 'required' => FALSE,
-                'passed' => is_writable(APP_DIR .'/../log/'),
+                'passed' => is_writable(LOG_DIR),
                 'message' => 'Povoleno',
                 'errorMessage' => 'Není možné zapisovat do logovací složky.',
                 'description' => 'Povolte zápis do složky /log/. Tato složka slouží k ukládání různých logovacích a chybových hlášek.<br / >

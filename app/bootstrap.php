@@ -16,8 +16,8 @@ define('PDF_MEMORY_LIMIT','512M');
 
 // Step 1: Configure automatic loading
 if (!defined('LIBS_DIR'))
-    define('LIBS_DIR', APP_DIR . '/../libs');
-define ('VENDOR_DIR', APP_DIR . '/../vendor');
+    define('LIBS_DIR', dirname(APP_DIR) . '/libs');
+define ('VENDOR_DIR', dirname(APP_DIR) . '/vendor');
 
 // prikaz nastavi loading pouze pro balicky instalovane Composerem
 require VENDOR_DIR . '/autoload.php';
@@ -48,15 +48,17 @@ try {
 
 // 2a) enable Nette\Debug for better exception and error visualisation
 
+define('LOG_DIR', dirname(APP_DIR) . '/log');
+
 if ( !defined('DEBUG_ENABLE') )
     define('DEBUG_ENABLE', 0);
 if ( DEBUG_ENABLE ) {
     Nette\Environment::setProductionMode(false);
-    Nette\Diagnostics\Debugger::enable(Nette\Diagnostics\Debugger::DEVELOPMENT, APP_DIR . '/../log'); 
+    Nette\Diagnostics\Debugger::enable(Nette\Diagnostics\Debugger::DEVELOPMENT, LOG_DIR); 
     // '%logDir%/php_error_'.date('Ym').'.log');
 } else {
     Nette\Environment::setProductionMode(true);
-    Nette\Diagnostics\Debugger::enable(Nette\Diagnostics\Debugger::PRODUCTION, APP_DIR . '/../log'); 
+    Nette\Diagnostics\Debugger::enable(Nette\Diagnostics\Debugger::PRODUCTION, LOG_DIR); 
 }
 
 // 2b) load configuration from config.ini file
@@ -76,7 +78,7 @@ unset($publicUrl);
 // konfigurace spisovky
 
 // Promennou logDir pouziva nyni jen SupportPresenter
-Nette\Environment::setVariable('logDir', APP_DIR . '/../log');
+Nette\Environment::setVariable('logDir', LOG_DIR);
 
 $loader = new Nette\DI\Config\Loader();
 $user_config = Nette\ArrayHash::from($loader->load(CLIENT_DIR . '/configs/klient.ini'));
@@ -149,7 +151,7 @@ try {
     else if ($db_config['profiler']) {
         $db_config['profiler'] = array(
             'run' => true, 
-            'file' => APP_DIR .'/../log/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
+            'file' => LOG_DIR .'/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
     }
         
     $connection = dibi::connect($db_config);

@@ -342,7 +342,7 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
             // SESSION fix
             $uuid = Nette\Environment::getHttpRequest()->getQuery('_asession');
             //echo "<pre>dd: "; print_r($uuid); echo "</pre>"; exit;
-            $aSESSION_raw = @file_get_contents(APP_DIR ."/../log/asession_".$uuid);
+            $aSESSION_raw = @file_get_contents(LOG_DIR ."/asession_".$uuid);
             $is_logged = false;
             if ( !empty($aSESSION_raw) ) {
                 $aSESSION = unserialize($aSESSION_raw);
@@ -352,7 +352,7 @@ class Authenticator_SSO extends Authenticator_Base implements Nette\Security\IAu
                             if ( @$aSESSION['is_logged'] == true ) {
                                 $is_logged = true;
                                 $_SESSION['s3_auth_remoteuser'] = $aSESSION['s3_auth_remoteuser'];
-                                @unlink(APP_DIR ."/../log/asession_".$uuid);
+                                @unlink(LOG_DIR ."/asession_".$uuid);
                             }
                         }
                     }

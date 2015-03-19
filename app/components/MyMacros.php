@@ -32,7 +32,7 @@ class MyMacros extends Nette\Application\UI\Control {
         // $media = Nette\Latte\Engine::fetchToken($content);
 
         $filename .= '.css';
-        $href = "{$publicUrl}css/$filename?" . @filemtime(APP_DIR . "/../public/css/$filename");
+        $href = "{$publicUrl}css/$filename?" . @filemtime(dirname(APP_DIR) . "/public/css/$filename");
         $res = "<link rel=\"stylesheet\" type=\"text/css\" media=\"$media\" href=\"$href\" />";
 
         return $res;   
@@ -41,7 +41,7 @@ class MyMacros extends Nette\Application\UI\Control {
     public static function JavaScript($filename, $publicUrl) {
 
         $filename .= '.js';
-        $href = "{$publicUrl}js/$filename?" . @filemtime(APP_DIR . "/../public/js/$filename");
+        $href = "{$publicUrl}js/$filename?" . @filemtime(dirname(APP_DIR) . "/public/js/$filename");
         $res = "<script type=\"text/javascript\" src=\"$href\"></script>";
 
         return $res;   
