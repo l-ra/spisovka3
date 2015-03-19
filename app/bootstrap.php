@@ -152,8 +152,14 @@ try {
             'file' => APP_DIR .'/../log/mysql_'. KLIENT .'_'. date('Ymd') .'.log');
     }
         
-    dibi::connect($db_config);
-
+    $connection = dibi::connect($db_config);
+    if (DEBUG_ENABLE) {
+        // false - Neni treba explain SELECT dotazu
+        $panel = new Dibi\Bridges\Tracy\Panel(false, DibiEvent::ALL); 
+        $panel->register($connection);
+        unset($panel);
+    }
+    
     dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];
     define('DB_PREFIX', $db_config['prefix']);
 }
