@@ -24,6 +24,7 @@ Opravy:
                 při kontrole schránky místo zprávy zobrazila nulu
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 
   serveru zobrazoval nesprávně
+- odebrání přílohy u odpovědi na dokument zaznamenalo výjimku v aplikačním logu
 - odeslání dokumentu je limitováno počtem adresátů. Program nyní limit kontroluje
   a informuje uživatele. Limit je obvykle zhruba 55 adresátů.
 - opraven skript pro migraci ze spisové služby verze 2
