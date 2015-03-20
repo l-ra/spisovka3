@@ -144,38 +144,32 @@ class UserModel extends BaseModel
 
     public function odebratUcet($osoba_id, $user_id) {
 
-        //$transaction = (! dibi::inTransaction());
-        //if ($transaction)
-        //dibi::begin();
+        if ($user_id == Nette\Environment::getUser()->id) {
+            throw new Exception('Nemůžete smazat účet, pod kterým jste přihlášen!');
+        }
 
-        $Osoba2User = new Osoba2User();
-        $Osoba2User->update(array('active'=>0),
-                            array(
-                               array('user_id=%i',$user_id),
-                               array('osoba_id=%i',$osoba_id)
-                            ));
+        dibi::begin();
+        try {
+            $Osoba2User = new Osoba2User();
+            $Osoba2User->update(array('active'=>0),
+                                array(
+                                   array('user_id=%i',$user_id),
+                                   array('osoba_id=%i',$osoba_id)
+                                ));
 
-        /*$Osoba2User->delete(array(
-                               array('user_id=%i',$user_id),
-                               array('osoba_id=%i',$osoba_id)
-                            ));
-        $User2Role = new User2Role();
-        $User2Role->delete(array('user_id=%i',$user_id));
-        */
+            $this->update(array(
+                            'active'=>0,
+                            'username%sql'=>"CONCAT(username,'_',".time().")"
+                          ),
+                          array('id=%i',$user_id)
+                    );
 
-        $ret = $this->update(array(
-                        'active'=>0,
-                        'username%sql'=>"CONCAT(username,'_',".time().")"
-                      ),
-                      array('id=%i',$user_id)
-                );
-
-        //$ret = $this->delete(array('user_id=%i',$user_id));
-
-        //if ($transaction)
-        //dibi::commit();
-
-        return $ret;
+            dibi::commit();
+        }
+        catch(Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
     }
 
     public function zmenitHeslo($user_id, $password, $local = null) {

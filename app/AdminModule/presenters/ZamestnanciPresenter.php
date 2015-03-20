@@ -119,12 +119,15 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->addComponent($Auth2, 'newUserForm');
 
         // Odebrani uctu
-        $odebrat_ucet = $this->getParam('odebrat',null);
-        if ( !is_null($odebrat_ucet) ) {
-            if ( $User->odebratUcet($osoba_id, $odebrat_ucet) ) {
+        $odebrat_ucet = $this->getParam('odebrat', false);
+        if ($odebrat_ucet)
+            try {
+                $User->odebratUcet($osoba_id, $odebrat_ucet);
                 $this->flashMessage('Účet uživatele byl odebrán.');
             }
-        }
+            catch (Exception $e) {
+                $this->flashMessage($e->getMessage(), 'warning');                
+            }
 
         $uzivatel = $Osoba->getUser($osoba_id,1);
         $this->template->Uzivatel = $uzivatel;
