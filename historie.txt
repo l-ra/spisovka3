@@ -2,6 +2,8 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
+=== Verze 3.5.0 ================================================================
+
 Nové funkce:
 
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
