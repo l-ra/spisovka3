@@ -333,13 +333,77 @@ class Dokument extends BaseModel
 
     }
 
+    private function _datum_param_to_sql($name, $params, &$args)
+    {        
+        $tableref = $name === 'datum_odeslani' ? 'dok_odeslani' : 'd';
+        
+        if (isset($params[$name]) && !empty($params[$name])) {
+            $date = $params[$name];
+            if (isset($params["$name_cas"]) && !empty($params["$name_cas"]))
+                $date .= ' ' . $params["$name_cas"];
+                    
+            new DateTime($date);
+            $args['where'][] = array("$tableref.$name = %d", $date);
+            
+            // neni mozne pozadovat presne datum a zaroven rozmezi data
+            return;
+        }
+       
+        // FIX pro sestavy
+        // bohuzel formular sestav uklada do databaze vsechny parametry,
+        // tedy i ty, ktere uzivatel nezada
+        if (empty($params["{$name}_od"]))
+            unset($params["{$name}_od"]);
+        if (empty($params["{$name}_do"]))
+            unset($params["{$name}_do"]);
+            
+        if (isset($params["{$name}_od"]) || isset($params["{$name}_do"])) {
+            if (isset($params["{$name}_od"]) && isset($params["{$name}_do"])) {
+                $date_from = $params["{$name}_od"];
+                $date_to = $params["{$name}_do"];
+                
+                if (isset($params["{$name}_cas_od"]))
+                    $date_from .= ' ' . $params["{$name}_cas_od"];
+                    
+                if (isset($params["{$name}_cas_do"]))
+                    $date_to .= ' ' . $params["{$name}_cas_do"];
+                else {
+                    $stamp = strtotime($params["{$name}_do"]);
+                    if ($stamp)
+                        $date_to = date("Y-m-d", $stamp + 86400);
+                }
+                                
+                $args['where'][] = array("$tableref.$name BETWEEN %t AND %t",
+                                    new DateTime($date_from), new DateTime($date_to));
+            }
+            else if (isset($params["{$name}_od"])) {
+                $date_from = $params["{$name}_od"];
+            
+                if (isset($params["{$name}_cas_od"]))
+                    $date_from .= ' ' . $params["{$name}_cas_od"];
+                    
+                $args['where'][] = array("$tableref.$name >= %t", new DateTime($date_from));
+            }
+            else if (isset($params["{$name}_do"])) {
+                $date_to = $params["{$name}_do"];
+                
+                if (isset($params["{$name}_cas_do"]))
+                    $date_to .= ' ' . $params["{$name}_cas_do"];
+                else {
+                    $stamp = strtotime($params["{$name}_do"]);
+                    if ($stamp)
+                        $date_to = date("Y-m-d", $stamp + 86400);
+                }
+                
+                $args['where'][] = array("$tableref.$name < %t", new DateTime($date_to));
+            }
+        }   
+    }
 
     public function paramsFiltr($params) {
 
         $args = array();
-
-        //Nette\Diagnostics\Debugger::dump($params); exit;
-
+        
         if ( isset($params['nazev']) ) {
             if ( !empty($params['nazev']) ) {
                 $args['where'][] = array('d.nazev LIKE %s','%'.$params['nazev'].'%');
@@ -435,53 +499,21 @@ class Dokument extends BaseModel
             }
         }             
 
-        // Datum vzniku
-        if ( isset($params['datum_vzniku']) ) {
-            if ( !empty($params['datum_vzniku']) ) {
-                $cas = '';
-                if ( isset($params['datum_vzniku_cas']) ) {
-                    if ( !empty($params['datum_vzniku_cas']) ) {
-                        $cas = ' '. $params['datum_vzniku_cas'];
-                    }
-                }
-                $args['where'][] = array('d.datum_vzniku = %d',$params['datum_vzniku'].$cas);
-            }
+        try {
+            $what = 'vzniku';
+            $this->_datum_param_to_sql('datum_vzniku', $params, $args);
+            $what = 'vyřízení';
+            $this->_datum_param_to_sql('datum_vyrizeni', $params, $args);
+            $what = 'odeslání';            
+            $this->_datum_param_to_sql('datum_odeslani', $params, $args);
         }
-
-        // Datum vzniku - rozmezi
-        if ( isset($params['datum_vzniku_od']) || isset($params['datum_vzniku_do']) ) {
-            if ( !empty($params['datum_vzniku_od']) && !empty($params['datum_vzniku_do']) ) {
-                if ( !empty($params['datum_vzniku_cas_od']) ) {
-                    $params['datum_vzniku_od'] = $params['datum_vzniku_od'] .' '. $params['datum_vzniku_cas_od'];
-                }
-                if ( !empty($params['datum_vzniku_cas_do']) ) {
-                    $params['datum_vzniku_do'] = $params['datum_vzniku_do'] .' '. $params['datum_vzniku_cas_do'];
-                } else {
-                    $unix_do = strtotime($params['datum_vzniku_do']);
-                    if ( $unix_do ) {
-                        $params['datum_vzniku_do'] = date("Y-m-d",$unix_do+86400);
-                    }
-                }
-
-                $args['where'][] = array('d.datum_vzniku BETWEEN %d AND %d',$params['datum_vzniku_od'],$params['datum_vzniku_do']);
-            } else if ( !empty($params['datum_vzniku_od']) ) {
-                if ( !empty($params['datum_vzniku_cas_od']) ) {
-                    $params['datum_vzniku_od'] = $params['datum_vzniku_od'] .' '. $params['datum_vzniku_cas_od'];
-                }
-                $args['where'][] = array('d.datum_vzniku >= %d',$params['datum_vzniku_od']);
-            } else if ( !empty($params['datum_vzniku_do']) ) {
-                if ( !empty($params['datum_vzniku_cas_do']) ) {
-                    $params['datum_vzniku_do'] = $params['datum_vzniku_do'] .' '. $params['datum_vzniku_cas_do'];
-                } else {
-                    $unix_do = strtotime($params['datum_vzniku_do']);
-                    if ( $unix_do ) {
-                        $params['datum_vzniku_do'] = date("Y-m-d",$unix_do+86400);
-                    }
-                }
-                $args['where'][] = array('d.datum_vzniku < %d',$params['datum_vzniku_do']);
-            }
+        catch (Exception $e) {
+            if (strpos($e->getMessage(), 'DateTime') === false)
+                throw $e;
+                
+            throw new Exception("Neplatné kritérium data/času $what dokumentu.");
         }
-
+        
         // pocet listu
         if ( isset($params['pocet_listu']) ) {
             if ( !empty($params['pocet_listu']) ) {
@@ -533,51 +565,6 @@ class Dokument extends BaseModel
             }
         }
 
-        // datum vyrizeni
-        if ( isset($params['datum_vyrizeni']) ) {
-            if ( !empty($params['datum_vyrizeni']) ) {
-                $cas = '';
-                if ( !empty($params['datum_vyrizeni_cas']) ) {
-                    $cas = ' '. $params['datum_vyrizeni_cas'];
-                }
-                $args['where'][] = array('d.datum_vyrizeni = %d',$params['datum_vyrizeni'].$cas);
-            }
-        }
-        
-        // datum vyrizeni - rozmezi
-        if ( isset($params['datum_vyrizeni_od']) || isset($params['datum_vyrizeni_do']) ) {
-            if ( !empty($params['datum_vyrizeni_od']) && !empty($params['datum_vyrizeni_do']) ) {
-                if ( !empty($params['datum_vyrizeni_cas_od']) ) {
-                    $params['datum_vyrizeni_od'] = $params['datum_vyrizeni_od'] .' '. $params['datum_vyrizeni_cas_od'];
-                }
-                if ( !empty($params['datum_vyrizeni_cas_do']) ) {
-                    $params['datum_vyrizeni_do'] = $params['datum_vyrizeni_do'] .' '. $params['datum_vyrizeni_cas_do'];
-                } else {
-                    $unix_do = strtotime($params['datum_vyrizeni_do']);
-                    if ( $unix_do ) {
-                        $params['datum_vyrizeni_do'] = date("Y-m-d",$unix_do+86400);
-                    }
-                }
-
-                $args['where'][] = array('d.datum_vyrizeni BETWEEN %d AND %d',$params['datum_vyrizeni_od'],$params['datum_vyrizeni_do']);
-            } else if ( !empty($params['datum_vyrizeni_od']) ) {
-                if ( !empty($params['datum_vyrizeni_cas_od']) ) {
-                    $params['datum_vyrizeni_od'] = $params['datum_vyrizeni_od'] .' '. $params['datum_vyrizeni_cas_od'];
-                }
-                $args['where'][] = array('d.datum_vyrizeni >= %d',$params['datum_vyrizeni_od']);
-            } else if ( !empty($params['datum_vyrizeni_do']) ) {
-                if ( !empty($params['datum_vyrizeni_cas_do']) ) {
-                    $params['datum_vyrizeni_do'] = $params['datum_vyrizeni_do'] .' '. $params['datum_vyrizeni_cas_do'];
-                } else {
-                    $unix_do = strtotime($params['datum_vyrizeni_do']);
-                    if ( $unix_do ) {
-                        $params['datum_vyrizeni_do'] = date("Y-m-d",$unix_do+86400);
-                    }
-                }
-                $args['where'][] = array('d.datum_vyrizeni < %d',$params['datum_vyrizeni_do']);
-            }
-        }
-
         // zpusob odeslani
         if ( isset($params['zpusob_odeslani']) ) {
             if ( !empty($params['zpusob_odeslani']) || $params['zpusob_odeslani'] != '0' ) {
@@ -593,62 +580,15 @@ class Dokument extends BaseModel
         }
 
         // datum odeslani
-        if ( isset($params['datum_odeslani']) ) {
-            if ( !empty($params['datum_odeslani']) ) {
-
-                $args['leftJoin']['zpusob_odeslani'] = array(
-                    'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
-                    'on' => array('dok_odeslani.dokument_id=d.id'),
-                    'cols' => null
-                );
-
-                $cas = '';
-                if ( !empty($params['datum_odeslani_cas']) ) {
-                    $cas = ' '. $params['datum_odeslani_cas'];
-                }
-                $args['where'][] = array('dok_odeslani.datum_odeslani = %d',$params['datum_odeslani'].$cas);
-            }
-        }
-
-        // datum odeslani - rozmezi
-        if ( isset($params['datum_odeslani_od']) || isset($params['datum_odeslani_do']) ) {
-
+        // zde se resi jen spojeni tabulek, tvorba db dotazu je o par radek nahore
+        if (!empty($params['datum_odeslani'])
+            || !empty($params['datum_odeslani_od']) || !empty($params['datum_odeslani_do'])) {
+                
             $args['leftJoin']['zpusob_odeslani'] = array(
                 'from'=> array($this->tb_dok_odeslani => 'dok_odeslani'),
                 'on' => array('dok_odeslani.dokument_id=d.id'),
                 'cols' => null
             );
-
-            if ( !empty($params['datum_odeslani_od']) && !empty($params['datum_odeslani_do']) ) {
-                if ( !empty($params['datum_odeslani_cas_od']) ) {
-                    $params['datum_odeslani_od'] = $params['datum_odeslani_od'] .' '. $params['datum_odeslani_cas_od'];
-                }
-                if ( !empty($params['datum_odeslani_cas_do']) ) {
-                    $params['datum_odeslani_do'] = $params['datum_odeslani_do'] .' '. $params['datum_odeslani_cas_do'];
-                } else {
-                    $unix_do = strtotime($params['datum_odeslani_do']);
-                    if ( $unix_do ) {
-                        $params['datum_odeslani_do'] = date("Y-m-d",$unix_do+86400);
-                    }
-                }
-
-                $args['where'][] = array('dok_odeslani.datum_odeslani BETWEEN %d AND %d',$params['datum_odeslani_od'],$params['datum_odeslani_do']);
-            } else if ( !empty($params['datum_odeslani_od']) ) {
-                if ( !empty($params['datum_odeslani_cas_od']) ) {
-                    $params['datum_odeslani_od'] = $params['datum_odeslani_od'] .' '. $params['datum_odeslani_cas_od'];
-                }
-                $args['where'][] = array('dok_odeslani.datum_odeslani >= %d',$params['datum_odeslani_od']);
-            } else if ( !empty($params['datum_odeslani_do']) ) {
-                if ( !empty($params['datum_odeslani_cas_do']) ) {
-                    $params['datum_odeslani_do'] = $params['datum_odeslani_do'] .' '. $params['datum_odeslani_cas_do'];
-                } else {
-                    $unix_do = strtotime($params['datum_odeslani_do']);
-                    if ( $unix_do ) {
-                        $params['datum_odeslani_do'] = date("Y-m-d",$unix_do+86400);
-                    }
-                }
-                $args['where'][] = array('dok_odeslani.datum_odeslani < %d',$params['datum_odeslani_do']);
-            }
         }
         
         // druh zasilky

@@ -155,12 +155,18 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->sloupce = $sloupce;
         $this->template->zobrazeni = $zobr;
         
-        if ( empty( $sestava->parametry ) ) {
-            $parametry = null;
-            $args = array();
-        } else {
-            $parametry = unserialize($sestava->parametry);
-            $args = $Dokument->paramsFiltr($parametry);
+        try {
+            if ( empty( $sestava->parametry ) ) {
+                $parametry = null;
+                $args = array();
+            } else {
+                $parametry = unserialize($sestava->parametry);
+                $args = $Dokument->paramsFiltr($parametry);
+            }
+        }
+        catch (Exception $e) {
+            $this->flashMessage("Sestavu nelze zobrazit: " . $e->getMessage(), 'warning');
+            $this->redirect('default');
         }
 
         if ( !isset($args['order']) ) {
@@ -608,7 +614,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $sestava['zobrazeni_dat'] = serialize($zobrazeni_dat);
         
         $params = '';
-        $params = serialize($data);
+        $params = serialize((array)$data); // $data jsou nove ArrayHash
         $sestava['parametry'] = $params;
 
         return $sestava;

@@ -90,17 +90,23 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 // zjisteno hladaci filtr v cookie, tak vezmeme z nej
                 $hledat = unserialize($cookie_hledat);
         }
-        if ( isset($hledat) )
-            if (is_array($hledat) ) {
-                // podrobne hledani = array
-                $args_h = $Dokument->paramsFiltr($hledat);
-                $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
-            } else {
-                // rychle hledani = string
-                $args_h = $Dokument->hledat($hledat);
-                $this->hledat = $hledat;
-                $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
-            }       
+        try {
+            if ( isset($hledat) )
+                if (is_array($hledat) ) {
+                    // podrobne hledani = array
+                    $args_h = $Dokument->paramsFiltr($hledat);
+                    $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
+                } else {
+                    // rychle hledani = string
+                    $args_h = $Dokument->hledat($hledat);
+                    $this->hledat = $hledat;
+                    $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
+                }
+        }
+        catch (Exception $e) {
+            $this->flashMessage($e->getMessage() . " Hledání bylo zrušeno.", 'warning');
+            $this->forward(':Spisovka:Vyhledat:reset');
+        }
         $this->template->s3_hledat = $hledat;
 
         /* [P.L.] Pokud uzivatel zvoli pokrocile hledani a hleda dokumenty pridelene/predane uzivateli ci jednotce,
