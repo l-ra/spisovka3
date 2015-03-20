@@ -31,7 +31,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     }
 
     // Je volano pres AJAX, takze volani flashMessage() postradaji smysl
-    public function renderOdebrat()
+    public function actionOdebrat()
     {
         $file_id = $this->getParam('id',null);
         $dokument_id = $this->getParam('dok_id',null);
@@ -46,16 +46,21 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             $storage_conf = Nette\Environment::getConfig('storage');
             eval("\$UploadFile = new ".$storage_conf->type."();");
             
-            $UploadFile->remove($file_id);
+            try {
+                $UploadFile->remove($file_id);
+            }
+            catch (Exception $e) {
+                // Priloha muze byt sdilena mezi dokumentem a odpovedi, tudiz nemusi
+                // byt mozne ji fyzicky smazat
+            }
             
             $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::PRILOHA_ODEBRANA,'Odebrána příloha "'. $file_info->nazev .' ('. $file_info->real_name .')"');
-            $this->flashMessage('Příloha byla úspěšně odebrána.');
+            $Log->logDokument($dokument_id, LogModel::PRILOHA_ODEBRANA,
+                        'Odebrána příloha "'. $file_info->nazev .' ('. $file_info->real_name .')"');
         } else {
-            $this->flashMessage('Přílohu se nepodařilo odebrat. Zkuste to znovu.','warning');
         }
 
-        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
+        $this->terminate();
     }
 
 /**
