@@ -24,11 +24,15 @@ Opravy:
                 subjekt z odesilatele"
               - pokud v datové schránce nebyla žádná nová zpráva, aplikace
                 při kontrole schránky místo zprávy zobrazila nulu
+                
+- zápis chybných hodnot do formuláře při hledání dokumentu podle datumů nezpůsobí
+  chybu aplikace
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 
   serveru zobrazoval nesprávně
 - odebrání přílohy u odpovědi na dokument zaznamenalo výjimku v aplikačním logu
 - odeslání dokumentu je limitováno počtem adresátů. Program nyní limit kontroluje
   a informuje uživatele. Limit je obvykle zhruba 55 adresátů.
+  
 - smazání uživatelského účtu vyžaduje nyní potvrzení uživatele
 - uživatel si nyní nemůže smazat svůj vlastní účet
 - opraven skript pro migraci ze spisové služby verze 2
