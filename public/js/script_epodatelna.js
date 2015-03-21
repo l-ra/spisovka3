@@ -133,27 +133,15 @@ $(function() {
 
 epodSubjektVytvorit = function (elm) {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                    stav = x.responseText;
-                    if ( stav.indexOf('###zmeneno###') != -1 ) {
-                        stav = stav.replace('###zmeneno###','');
-                        $('#dialog').dialog('close');
-                        renderEpodSubjekty(stav);
-                    } else {
-                        text = '';// '<div class="flash_message flash_info">Subjekt byl úspěšně vytvořen.</div>';
-                        text = text + x.responseText;
-                        $('#dialog').html(text);
-                    }
-            }
-        }
-
-        postForm(x, $("#subjekt-vytvorit"));
-    }
+    postFormJ($("#subjekt-vytvorit"), function (data) {
+        if ( data.indexOf('###zmeneno###') != -1 ) {
+            data = data.replace('###zmeneno###','');
+            $('#dialog').dialog('close');
+            renderEpodSubjekty(data);
+        } else {
+            $('#dialog').html(data);
+        }        
+    });
 
     return false;
 }

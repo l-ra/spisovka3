@@ -601,54 +601,40 @@ subjektNovy = function(event) {
 
         $("#subjekt_pridat").click(function() {
 
-            if (document.getElementById) {
-                var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-            }
-            if (x) {
-                x.onreadystatechange = function() {
-                    if (x.readyState == 4 && x.status == 200) {
-                        text = x.responseText;
-
-                        if ( text[0] == "#" ) {
-                            text = text.substr(1);
-                            alert(text);
-                        } else {
-                            part = text.split("#");
-                            $('#subjekt_novy').html(
-                                '                        <dt>&nbsp;</dt>'+
-                                '                        <dd><a href="" id="novysubjekt_click">Vytvořit nový subjekt</a></dd>'
-                            );
-                            $('#novysubjekt_click').click( subjektNovy );
-                            renderSubjekty();
-
-                            alert('Subjekt byl vytvořen a přidán.');
-
-                        }
-                    }
-                }
-
-                var form = document.forms["frm-novyForm"];
-                if ( typeof form == "undefined" )
-                    form = document.forms["frm-odpovedForm"];
-                if ( typeof form == "undefined" )
-                    form = document.forms["frm-novySubjekt"];
-                    
-                var formdata = '';                
-                if ( typeof form != "undefined" )
-                    formdata = 'id='+id+'&' + $(form).serialize();
+            var form = document.forms["frm-novyForm"];
+            if ( typeof form == "undefined" )
+                form = document.forms["frm-odpovedForm"];
+            if ( typeof form == "undefined" )
+                form = document.forms["frm-novySubjekt"];
                 
-                if ( is_simple == 1 ) {
-                    x.open("POST", BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=vytvoritAjax', true);
-                } else { 
-                    x.open("POST", BASE_URL + 'subjekty/0/vytvoritAjax', true);
-                }
-                
-                x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                x.setRequestHeader("Content-length", formdata.length);
-                x.setRequestHeader("Connection", "close");
-                x.send(formdata);
+            var formdata = '';                
+            if ( typeof form != "undefined" )
+                formdata = 'id='+id+'&' + $(form).serialize();
+            
+            var url;
+            if ( is_simple == 1 ) {
+                url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=vytvoritAjax';
+            } else { 
+                url = BASE_URL + 'subjekty/0/vytvoritAjax';
             }
+            
+            $.post(url, formdata, function (text) {
+                if ( text[0] == "#" ) {
+                    text = text.substr(1);
+                    alert(text);
+                } else {
+                    $('#subjekt_novy').html(
+                        '<dt>&nbsp;</dt>'+
+                        '<dd><a href="" id="novysubjekt_click">Vytvořit nový subjekt</a></dd>'
+                    );
+                    $('#novysubjekt_click').click( subjektNovy );
+                    renderSubjekty();
 
+                    alert('Subjekt byl vytvořen a přidán.');
+
+                }                
+            });
+            
             return false;
         });
 
@@ -657,18 +643,9 @@ subjektNovy = function(event) {
 
 spisVytvoritSubmit = function () {
 
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                $('#dialog').html(x.responseText);
-            }
-        }
-
-        postForm(x, $("#spis-vytvorit"));
-    }
+    postFormJ($("#spis-vytvorit"), function(data) {
+        $('#dialog').html(data);        
+    });
 
     return false;
 }
@@ -773,28 +750,15 @@ vypravnaDetail = function (elm) {
     return dialog(elm,'Detail záznamu');
 }
 vypravnaSubmit = function () {
-
-    if (document.getElementById) {
-        var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-    }
-    if (x) {
-        x.onreadystatechange = function() {
-            if (x.readyState == 4 && x.status == 200) {
-                text = x.responseText;
-                
-                if ( text.indexOf('###provedeno###') != -1 ) {
-                    $('#dialog').dialog('close');
-                    alert('Záznam byl úspěšně upraven.');
-                    window.top.location = window.top.location;
-                } else {
-                    $('#dialog').html(text);
-                }
-            }
-        }
-
-        postForm(x, $("#vypravna_form"));        
-    }
-    
+    postFormJ($("#vypravna_form"), function(text) {
+        if ( text.indexOf('###provedeno###') != -1 ) {
+            $('#dialog').dialog('close');
+            alert('Záznam byl úspěšně upraven.');
+            window.top.location = window.top.location;
+        } else {
+            $('#dialog').html(text);
+        }        
+    });
     return false;
 }
 vypravnaZrusit = function () {
@@ -1145,22 +1109,6 @@ vybratSpisovyZnak = function(element) {
     select_set_value(document.forms[formName].spousteci_udalost_id, spisz_udalost[value]);
     return true;
 };
-
-postForm = function (x, form) {
-
-    if (!(form instanceof jQuery))
-        form = $(form);
-        
-    if (x) {
-        var formdata = form.serialize();
-
-        x.open("POST", form.attr('action'), true);
-        x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        x.setRequestHeader("Content-length", formdata.length);
-        x.setRequestHeader("Connection", "close");
-        x.send(formdata);
-    }
-}
 
 postFormJ = function (form, callback) {
 
