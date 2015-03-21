@@ -784,12 +784,12 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                 ->setValue( date('d.m.Y') );
         $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10);
 
-        $form1->addSubmit('vytvorit', 'Vytvořit')
-                 ->onClick[] = array($this, 'vytvoritAjaxClicked');
+        $form1->addSubmit('vytvorit', 'Vytvořit');
         $form1['vytvorit']->controlPrototype->onclick("return spisVytvoritSubmit();");
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->controlPrototype->onclick("return spisVytvoritStorno('$dokument_id');");
+        $form1->onSuccess[] = array($this, 'vytvoritAjaxClicked');
 
         $renderer = $form1->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
@@ -800,10 +800,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         return $form1;
     }
 
-    public function vytvoritAjaxClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function vytvoritAjaxClicked(Nette\Application\UI\Form $form, $data)
     {
-        $data = $button->getForm()->getValues();
-        
         $Spisy = new Spis();
 
         $dokument_id = @$data['dokument_id'];
