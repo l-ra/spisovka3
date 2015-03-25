@@ -525,7 +525,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     {
 
         if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
-            $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
+            $filtr =  !is_null($this->filtr)?$this->filtr:'vse';
             $select = array(
                 'aktualni'=>'Zobrazit aktuální zápůjčky',
                 'zapujcene'=>'Zobrazit zapůjčené zápůjčky',
@@ -536,7 +536,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             );
             $this->template->zobrazit_filtr = 1;
         } else {
-            $filtr =  !is_null($this->filtr)?$this->filtr:'moje';
+            $filtr =  !is_null($this->filtr)?$this->filtr:'';
             $select = array(
                 ''=>'Zobrazit vše',
             );
@@ -550,12 +550,10 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         if ($this->template->zobrazit_filtr)
             $form['filtr']->setValue($filtr);
         
-        $form->addSubmit('go_filtr', 'Filtrovat')
-                 // ->setRendered(TRUE)
-                 ->onClick[] = array($this, 'filtrClicked');
+        $form->addSubmit('go_filtr', 'Filtrovat');
 
+        $form->onSuccess[] = array($this, 'filtrClicked');
 
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = null;
@@ -565,9 +563,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         return $form;
     }
 
-    public function filtrClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function filtrClicked(Nette\Application\UI\Form $form, $form_data)
     {
-        $form_data = $button->getForm()->getValues();
         $data = array('filtr'=>$form_data['filtr']);
         $this->getHttpResponse()->setCookie('s3_zapujcka_filtr', serialize($data), strtotime('90 day'));
         $this->forward(':Spisovna:Zapujcky:default', array('filtr'=>$data) );

@@ -2736,12 +2736,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $control->setValue($filtr_moje)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
                 
-        $form->addSubmit('go_filtr', 'Filtrovat')
-                 // ->setRendered(TRUE)
-                 ->onClick[] = array($this, 'filtrClicked');
+        $form->addSubmit('go_filtr', 'Filtrovat');
 
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $form->onSuccess[] = array($this, 'filtrClicked');
+        
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = null;
@@ -2751,18 +2749,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function filtrClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function filtrClicked(Nette\Application\UI\Form $form, $data)
     {
-        $form_data = $button->getForm()->getValues();
+        $data2 = array('filtr'=>$data['filtr'],
+                      'bez_vyrizenych'=>$data['bez_vyrizenych'],
+                      'jen_moje' => $data['jen_moje']);
 
-        $data = array('filtr'=>$form_data['filtr'],
-                      'bez_vyrizenych'=>$form_data['bez_vyrizenych'],
-                      'jen_moje' => $form_data['jen_moje']);
+        $this->getHttpResponse()->setCookie('s3_filtr', serialize($data2), strtotime('90 day'));
 
-        $this->getHttpResponse()->setCookie('s3_filtr', serialize($data), strtotime('90 day'));
-
-        //$this->forward('this', array('filtr'=>$data) );
-        $this->redirect(':Spisovka:Dokumenty:default', array('filtr'=>$data) );
+        $this->redirect(':Spisovka:Dokumenty:default', array('filtr'=>$data2) );
 
     }
 

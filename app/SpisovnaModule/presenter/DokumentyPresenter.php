@@ -822,12 +822,10 @@ protected function createComponentVyrizovaniForm()
         $form->addSelect('filtr', 'Filtr:', $select)
                 ->setValue($filtr)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
-        $form->addSubmit('go_filtr', 'Filtrovat')
-                 // ->setRendered(TRUE)
-                 ->onClick[] = array($this, 'filtrClicked');
+        $form->addSubmit('go_filtr', 'Filtrovat');
 
+        $form->onSuccess[] = array($this, 'filtrClicked');
 
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = null;
@@ -837,13 +835,10 @@ protected function createComponentVyrizovaniForm()
         return $form;
     }
 
-    public function filtrClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function filtrClicked(Nette\Application\UI\Form $form, $form_data)
     {
-        $form_data = $button->getForm()->getValues();
         $data = array('filtr'=>$form_data['filtr']);
         $this->getHttpResponse()->setCookie('s3_spisovna_filtr', serialize($data), strtotime('90 day'));
-        
-        
         
         $this->redirect(':Spisovna:Dokumenty:'.$this->view, array('filtr'=>$data) );
     }
