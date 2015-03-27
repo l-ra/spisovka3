@@ -20,13 +20,7 @@ abstract class DBEntity
      * @param id    int
      */
     public function __construct($param)
-    {
-        /* if (is_object($param) && is_a($param, 'DibiRow')) {
-            $this->data = $param;
-            $this->id = $param->id;
-            return;
-        } */
-        
+    {       
         if (!is_integer($param))
             if (!is_string($param) || !ctype_digit($param) || $param == 0)
                 throw new InvalidArgumentException(__METHOD__ . "() - neplatný parametr");

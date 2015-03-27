@@ -362,8 +362,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $typ = substr($id,0,1);
         $index = substr($id,1); */
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $config_data = $config->toArray();
+        $config_data = (new Spisovka\ConfigEpodatelna())->get();
         $result = array();
 
         $nalezena_aktivni_schranka = 0;
@@ -821,8 +820,7 @@ dmFormat =
                
         if ( count($ep_zpravy) == 0 ) return false; // neni co kontrolovat        
         
-        $config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $config_data = $config->toArray();
+        $config_data = (new Spisovka\ConfigEpodatelna())->get();
         $config = $config_data['isds'][0];
         
         $isds = new ISDS_Spisovka();

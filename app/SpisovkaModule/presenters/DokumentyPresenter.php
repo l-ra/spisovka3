@@ -1931,8 +1931,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->SpisovaZnacka = $sznacka;
 
         // odesilatele
-        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $ep = $ep_config->toArray();
+        $ep = (new Spisovka\ConfigEpodatelna())->get();
         $odesilatele = array();
 
         if ( count($ep['odeslani'])>0 ) {
@@ -2238,8 +2237,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 if ( strpos($data['email_from'],"epod")!==false ) {
                     $id_odes = substr($data['email_from'],4);
-                    $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-                    $ep = $ep_config->toArray();
+                    $ep = (new Spisovka\ConfigEpodatelna())->get();
                     if ( isset( $ep['odeslani'][$id_odes] ) ) {
                         $mail->setFromConfig($ep['odeslani'][$id_odes]);
                     } else {

@@ -45,8 +45,7 @@ class ESSMail extends Nette\Mail\Message {
 
         if ( is_null($config) ) {
 
-            $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-            $ep = $ep_config->toArray();
+            $ep = (new Spisovka\ConfigEpodatelna())->get();
             if ( isset($ep['odeslani'][0]) ) {
                 if ( $ep['odeslani'][0]['aktivni'] == '1' ) {
                     $this->config = $ep['odeslani'][0];

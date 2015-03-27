@@ -549,7 +549,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             foreach($params as $key => $value)
                 try {
                     $input = $form[$key];
-                    if (is_a($input, 'Nette\Forms\Controls\Checkbox')) ;
+                    if ($input instanceof Nette\Forms\Controls\Checkbox) ;
                         // nedelej nic, framework provadi kontrolu parametru lepe
                         // $value = $value ? true : false;
                     $input->setValue($value);

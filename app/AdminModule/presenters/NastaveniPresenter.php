@@ -107,9 +107,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
-        $config_data = $config->toArray();
-        //Nette\Diagnostics\Debugger::dump($config_data); exit;
+        $config_data = Nette\Environment::getVariable('user_config');
 
         $config_data['urad']['nazev'] = $data['nazev'];
         $config_data['urad']['plny_nazev'] = $data['plny_nazev'];
@@ -126,14 +124,9 @@ class Admin_NastaveniPresenter extends BasePresenter
         $config_data['urad']['kontakt']['telefon'] = $data['telefon'];
         $config_data['urad']['kontakt']['email'] = $data['email'];
         $config_data['urad']['kontakt']['www'] = $data['www'];
-
-        //Nette\Diagnostics\Debugger::dump($config_data); exit;
-        $config_modify = new Config();
-        $config_modify->import($config_data);
-        $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
         
-        Nette\Environment::setVariable('user_config', $config_modify);
-
+        (new Spisovka\ConfigClient())->save($config_data);
+        
         $this->flashMessage('Informace o sobě byly upraveny.');
         $this->redirect('this');
     }
@@ -192,8 +185,8 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
-        $config_data = $config->toArray();
+        $config_data = Nette\Environment::getVariable('user_config');
+
         $config_data['cislo_jednaci']['maska'] = $data['maska'];
         
         if ( $config_data['cislo_jednaci']['typ_evidence'] != "priorace" ) {
@@ -205,13 +198,9 @@ class Admin_NastaveniPresenter extends BasePresenter
         $min_rok = $data['minuly_rok'] ? 1 : 0;
         $config_data['cislo_jednaci']['minuly_rok'] = $min_rok;
         
-        $config_modify = new Config();
-        $config_modify->import($config_data);
-        $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
+        (new Spisovka\ConfigClient())->save($config_data);
 
-        Nette\Environment::setVariable('user_config', $config_modify);
-
-        $this->flashMessage('Nastavení čísla jednacího byly upraveny.');
+        $this->flashMessage('Nastavení čísla jednacího bylo upraveno.');
         $this->redirect('this');
     }
 
@@ -266,15 +255,10 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
-        $config_data = $config->toArray();
+        $config_data = Nette\Environment::getVariable('user_config');
         $config_data['nastaveni']['pocet_polozek'] = $data['pocet_polozek'];
 
-        $config_modify = new Config();
-        $config_modify->import($config_data);
-        $config_modify->save(CLIENT_DIR .'/configs/klient.ini');
-
-        Nette\Environment::setVariable('user_config', $config_modify);
+        (new Spisovka\ConfigClient())->save($config_data);
 
         Settings::set('router_force_https', $data['force_https']);
         

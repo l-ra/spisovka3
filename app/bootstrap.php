@@ -80,10 +80,8 @@ unset($publicUrl);
 // Promennou logDir pouziva nyni jen SupportPresenter
 Nette\Environment::setVariable('logDir', LOG_DIR);
 
-$loader = new Nette\DI\Config\Loader();
-$user_config = Nette\ArrayHash::from($loader->load(CLIENT_DIR . '/configs/klient.ini'));
-Nette\Environment::setVariable('user_config', $user_config);
-unset($loader);
+Nette\Environment::setVariable('user_config', 
+        (new Spisovka\ConfigClient())->get());
 
 // version information
 $app_info = @file_get_contents(APP_DIR .'/configs/version');

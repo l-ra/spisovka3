@@ -652,7 +652,7 @@ class Install_DefaultPresenter extends BasePresenter
             $session->step = array();
         }
 
-        $user_config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
+        $user_config = (new Spisovka\ConfigClient())->get();
         $this->template->Urad = $user_config->urad;
     }
 
@@ -664,7 +664,7 @@ class Install_DefaultPresenter extends BasePresenter
         }
         @$session->step['evidence'] = 0;
 
-        $user_config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
+        $user_config = (new Spisovka\ConfigClient())->get();
         $this->template->CisloJednaci = $user_config->cislo_jednaci;
     }
 
@@ -719,7 +719,8 @@ class Install_DefaultPresenter extends BasePresenter
 
         if ( $dokonceno == 1 ) {
 
-            $Urad = Config::fromFile(CLIENT_DIR .'/configs/klient.ini')->urad;
+            $user_config = (new Spisovka\ConfigClient())->get();
+            $Urad = $user_config->urad;
             $zerotime = mktime(0,0,0,8,20,2008);
             $diff = time() - $zerotime;
             $diff = round($diff / 3600);
@@ -743,11 +744,11 @@ class Install_DefaultPresenter extends BasePresenter
 
     }
 
+    // Toto se snad ani vubec nevola
     public function renderEpodatelna()
     {
         // Klientske nastaveni
-        $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-        $ep = $ep_config->toArray();
+        $ep = (new Spisovka\ConfigEpodatelna())->get();
 
         // ISDS
         $this->template->n_isds = $ep['isds'];

@@ -774,7 +774,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {    
         $typ = $this->getParam('typ', 'e');
         $config_data = self::nactiNastaveni();
-
+        $config_data = $config_data->toArray();
+        
         if ($typ == 'i') {
             $index = 0;
             foreach ($config_data['isds'] as $i => $val)
@@ -813,7 +814,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $config_data['email'][$index]['only_signature'] = '';
             $config_data['email'][$index]['qual_signature'] = '';        
         }
-        
+
         self::ulozNastaveni($config_data);
         $this->flashMessage('Schránka přidána.');
         $this->redirect('detail', array('id' => "$typ$index"));
@@ -821,15 +822,26 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     public static function nactiNastaveni()
     {
-        $loader = new Nette\DI\Config\Loader();
-        return ($loader->load(CLIENT_DIR . '/configs/epodatelna.ini'));
+        $res = (new Spisovka\ConfigEpodatelna())->get();
+
+        // oprav boolean hodnoty z konfiguracniho souboru
+        // kvuli bugu v parse_ini_file()
+        $i = reset($res->isds);
+        $i->aktivni = (bool)$i->aktivni;
+        $o = reset($res->odeslani);
+        $o->aktivni = (bool)$o->aktivni;
+        foreach ($res->email as $e) {
+            $e->aktivni = (bool)$e->aktivni;
+            $e->only_signature = (bool)$e->only_signature;
+            $e->qual_signature = (bool)$e->qual_signature;
+        }
+        
+        return $res;
     }
     
     protected static function ulozNastaveni($config_data)
     {
-/*        $new_config = new Config();
-        $new_config->import($config_data);
-        $new_config->save(CLIENT_DIR .'/configs/epodatelna.ini'); */
+        (new Spisovka\ConfigEpodatelna())->save($config_data);
     }
     
 }

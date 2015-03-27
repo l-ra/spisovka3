@@ -22,7 +22,7 @@ class ISDS_Spisovka extends ISDS {
     /* Parametr je zrejme zbytecny. Zda se, ze organizace muze mit pouze jednu datovou schranku */
     public function pripojit($params = null) {
 
-        if ( is_array($params) ) {
+        if (is_array($params) || $params instanceof \Nette\Utils\ArrayHash) {
             // prime hodnoty
             if ( !isset($params['typ_pripojeni']) )
                 throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
@@ -37,8 +37,7 @@ class ISDS_Spisovka extends ISDS {
             $config = $params->toArray();
         } else {
             
-            $ep_config = Config::fromFile(CLIENT_DIR .'/configs/epodatelna.ini');
-            $ep_config = $ep_config->toArray();
+            $ep_config = (new Spisovka\ConfigEpodatelna())->get();
             $ep_config = $ep_config['isds'];
             
             if ( is_numeric($params) ) { // parametrem je index z nastaveni
@@ -48,6 +47,7 @@ class ISDS_Spisovka extends ISDS {
                 $config = $ep_config[ $params ];
                 
             } else { // zadny parametr
+                // Toto nemusí fungovat s ArrayHashem
                 $config = current($ep_config);
                 if ( $config === false ) // existuje nejake nastaveni?
                     throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka.");                    
