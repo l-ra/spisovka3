@@ -82,44 +82,31 @@ $(function() {
 
         $("#subjekt_pridat").click(function() {
 
-            if (document.getElementById) {
-                var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+            var formdata = 'id='+id+'&' + $(document.forms["frm-novyForm"]).serialize();
+
+            if ( is_simple == 1 ) {
+                url = BASE_URL + '?presenter=Epodatelna%3Asubjekty&action=vytvoritAjax';
+            } else {  
+                url = BASE_URL + 'epodatelna/subjekty/vytvoritAjax';
             }
-            if (x) {
-                x.onreadystatechange = function() {
-                    if (x.readyState == 4 && x.status == 200) {
-                        text = x.responseText;
+            
+            $.post(url, formdata, function (text) {
+                if ( text[0] == "#" ) {
+                    text = text.substr(1);
+                    alert(text);
+                } else {
+                    part = text.split("#");
+                    $('#subjekt_novy').html(
+                        '<dt>&nbsp;</dt>'+
+                        '<dd><a href="" id="epod_evid_novysubjekt_click">Vytvořit nový subjekt z odesílatele</a></dd>'
+                    );
 
-                        if ( text[0] == "#" ) {
-                            text = text.substr(1);
-                            alert(text);
-                        } else {
-                            part = text.split("#");
-                            $('#subjekt_novy').html(
-                                '                        <dt>&nbsp;</dt>'+
-                                '                        <dd><a href="" id="epod_evid_novysubjekt_click">Vytvořit nový subjekt z odesílatele</a></dd>'
-                            );
+                    renderEpodSubjekty(part[0]);
 
-                            renderEpodSubjekty(part[0]);
+                    alert('Subjekt byl vytvořen a přidán mezi nalezené subjekty.');
 
-                            alert('Subjekt byl vytvořen a přidán mezi nalezené subjekty.');
-
-                        }
-                    }
                 }
-
-                var formdata = 'id='+id+'&' + $(document.forms["frm-novyForm"]).serialize();
-
-                if ( is_simple == 1 ) {
-                    x.open("POST", BASE_URL + '?presenter=Epodatelna%3Asubjekty&action=vytvoritAjax', true);
-                } else {  
-                    x.open("POST", BASE_URL + 'epodatelna/subjekty/vytvoritAjax', true);
-                }
-                x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                x.setRequestHeader("Content-length", formdata.length);
-                x.setRequestHeader("Connection", "close");
-                x.send(formdata);
-            }
+            });
 
             return false;
         });
@@ -539,47 +526,31 @@ form_odmitnout +
 
         $("#subjekt_pridat_"+id).click(function() {
 
-            if (document.getElementById) {
-                var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+            var formdata = 'id='+id+'&' + $('#h_evidence').serialize();
+
+            if ( is_simple == 1 ) {
+                url = BASE_URL + '?presenter=Epodatelna%3Asubjekty&action=vytvoritAjax';
+            } else { 
+                url = BASE_URL + 'epodatelna/subjekty/vytvoritAjax';
             }
-            if (x) {
-                x.onreadystatechange = function() {
-                    if (x.readyState == 4 && x.status == 200) {
-                        text = x.responseText;
-                        if ( text[0] == "#" ) {
-                            text = text.substr(1);
-                            alert(text);
-                        } else {
 
-                            part = text.split("#");
+            $.post(url, formdata, function (text) {
+                if ( text[0] == "#" ) {
+                    text = text.substr(1);
+                    alert(text);
+                } else {
 
-                            $('#subjekt_novy_'+id).html(
-                                '                        <dt>&nbsp;</dt>'+
-                                '                        <dd><a href="" id="novysubjekt_click_'+id+'">Vytvořit nový subjekt z odesílatele</a></dd>'
-                            );
+                    part = text.split("#");
 
-                            subjekt_seznam = '<input type="checkbox" name="subjekt['+id+']['+part[0]+']" />';
-                            subjekt_seznam = subjekt_seznam + part[1] +'<br/>';
-                            $('#subjekt_seznam_'+id).append(subjekt_seznam);
+                    $('#subjekt_novy_'+id).html('');
 
-                            alert('Subjekt byl vytvořen a přidán mezi nalezené subjekty.');
+                    subjekt_seznam = '<input type="checkbox" name="subjekt['+id+']['+part[0]+']" />';
+                    subjekt_seznam = subjekt_seznam + part[1] +'<br/>';
+                    $('#subjekt_seznam_'+id).append(subjekt_seznam);
 
-                        }
-                    }
-                }
-
-                var formdata = 'id='+id+'&' + $('#h_evidence').serialize();
-
-                if ( is_simple == 1 ) {
-                    x.open("POST", BASE_URL + '?presenter=Epodatelna%3Asubjekty&action=vytvoritAjax', true);
-                } else { 
-                    x.open("POST", BASE_URL + 'epodatelna/subjekty/vytvoritAjax', true);
-                }
-                x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                x.setRequestHeader("Content-length", formdata.length);
-                x.setRequestHeader("Connection", "close");
-                x.send(formdata);
-            }
+                    alert('Subjekt byl vytvořen a přidán mezi nalezené subjekty.');
+                }                    
+            });
 
             return false;
         });
@@ -617,100 +588,27 @@ form_odmitnout +
         }
     });
 
-    $("#submit_evidovat_"+id).click(function() {
+    evidenceFormHandler = function() {
 
-        //alert('Evidovat do jine evidence zpravu '+ id);
+        var formdata = 'id='+id+'&' + $('#h_evidence').serialize();
 
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    text = x.responseText;
-                    if ( text[0] == "#" ) {
-                        text = text.substr(3);
-                        alert(text);
-                    } else {
-                        $('#evidence_show_'+id).html(x.responseText);
-                    }
-                }
+        $.post($('#h_evidence').attr('action'), formdata, function (text) {
+            if ( text[0] == "#" ) {
+                text = text.substr(3);
+                alert(text);
+            } else {
+                $('#evidence_show_'+id).html(text);
             }
-
-            var formdata = 'id='+id+'&' + $('#h_evidence').serialize();
-
-            x.open("POST", $('#h_evidence').attr('action'), true);
-            x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            x.setRequestHeader("Content-length", formdata.length);
-            x.setRequestHeader("Connection", "close");
-            x.send(formdata);
-        }
+        });
 
         return false;
-    });
+    };
+    
+    $("#submit_evidovat_"+id).click(evidenceFormHandler);
 
-    $("#submit_evidovat_jinam_"+id).click(function() {
+    // handler je totozny, jak v predeslem pripade
+    $("#submit_evidovat_jinam_"+id).click(evidenceFormHandler);
 
-        //alert('Evidovat do jine evidence zpravu '+ id);
+    $("#submit_odmitnout_"+id).click(evidenceFormHandler);
 
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    text = x.responseText;
-                    if ( text[0] == "#" ) {
-                        text = text.substr(3);
-                        alert(text);
-                    } else {
-                        $('#evidence_show_'+id).html(x.responseText);
-                    }
-                }
-            }
-
-            var formdata = 'id='+id+'&' + $('#h_evidence').serialize();
-            
-            x.open("POST", $('#h_evidence').attr('action'), true);
-            x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            x.setRequestHeader("Content-length", formdata.length);
-            x.setRequestHeader("Connection", "close");
-            x.send(formdata);
-        }
-
-        return false;
-    });
-
-    $("#submit_odmitnout_"+id).click(function() {
-
-        //alert('Odmitnout zpravu '+ id);
-        if (document.getElementById) {
-            var x = (window.ActiveXObject) ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-        }
-        if (x) {
-            x.onreadystatechange = function() {
-                if (x.readyState == 4 && x.status == 200) {
-                    text = x.responseText;
-                    if ( text[0] == "#" ) {
-                        text = text.substr(3);
-                        alert(text);
-                    } else {
-                        $('#evidence_show_'+id).html(x.responseText);
-                    }
-                }
-            }
-
-            var formdata = 'id='+id+'&' + $('#h_evidence').serialize();
-
-            x.open("POST", $('#h_evidence').attr('action'), true);
-            x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            x.setRequestHeader("Content-length", formdata.length);
-            x.setRequestHeader("Connection", "close");
-            x.send(formdata);
-        }
-
-        return false;
-    });
-
-
-}
+};
