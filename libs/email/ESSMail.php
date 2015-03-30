@@ -22,6 +22,13 @@ class ESSMail extends Nette\Mail\Message {
         return $ret;
     }
 
+    // pro kompatibilitu s kodem napsanym pro stare Nette
+    public function send() {
+        
+        $mailer = new Nette\Mail\SendmailMailer;
+        $mailer->send($this);
+    }
+
     /**
      * Povolit podepisovani emailu?
      *
