@@ -255,12 +255,10 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
 
         $submit = $form->addSubmit('go_seradit', 'Seřadit');
-                    // ->setRendered(TRUE);
         $submit->getControlPrototype()->style(array('display' => 'none'));
-        $submit->onClick[] = array($this, 'seraditClicked');
+        
+        $form->onSuccess[] = array($this, 'seraditSucceeded');
 
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = null;
@@ -270,9 +268,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         return $form;
     }
 
-    public function seraditClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function seraditSucceeded(Nette\Application\UI\Form $form, $form_data)
     {
-        $form_data = $button->getForm()->getValues();
         UserSettings::set('vypravna_seradit', $form_data['seradit']);
         $this->redirect(':Spisovka:Vypravna:default');
     }
