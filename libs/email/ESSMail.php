@@ -25,7 +25,8 @@ class ESSMail extends Nette\Mail\Message {
     // pro kompatibilitu s kodem napsanym pro stare Nette
     public function send() {
         
-        $mailer = new Nette\Mail\SendmailMailer;
+        // $mailer = new Nette\Mail\SendmailMailer;
+        $mailer = new ESSMailer();
         $mailer->send($this);
     }
 
@@ -41,45 +42,15 @@ class ESSMail extends Nette\Mail\Message {
     }
 
     /**
-     * Nastavi konfiguraci emailu dle uzivatelske nastaveni e-podatelny
-     * V pripade prazdneho parametru se pouzije defaultni ucet e-podatelny
-     *
-     * @param array $config konfigurace dle nastaveni e-podatelny
-     * @return bool
+     * Nastavi e-mail adresu odesilatele dle uzivatelske nastaveni e-podatelny
      */
-    public function setFromConfig($config = null)
+    public function setFromConfig($foo = null)
     {
-
-        if ( is_null($config) ) {
-
-            $ep = (new Spisovka\ConfigEpodatelna())->get();
-            if ( isset($ep['odeslani'][0]) ) {
-                if ( $ep['odeslani'][0]['aktivni'] == '1' ) {
-                    $this->config = $ep['odeslani'][0];
-                    return true;
-                } else {
-                    throw new Nette\InvalidStateException('Nebyl zjištěn aktivní účet pro odesílání emailů.');
-                    return false;
-                }
-            } else {
-                throw new Nette\InvalidStateException('Nebyl zjištěn účet pro odesílání emailů.');
-                return false;
-            }
-        } else {
-
-            if ( isset($config['email']) ) {
-                $this->config = $config;
-                return true;
-            } else {
-                throw new Nette\InvalidStateException('Konfigurace pro odesílání emailů není platná.');
-                return false;
-            }
-        }
-    }
-
-    public function getFromConfig()
-    {
-        return $this->config;
+        $ep = (new Spisovka\ConfigEpodatelna())->get();
+        $odes = reset($ep['odeslani']);
+        $email = $odes['email'];
+        if ($email)
+            $this->setFrom($email);
     }
 
     public function setBodySign($body)

@@ -2323,24 +2323,17 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $email_mess->to_address = $adresat->email;
             }
 
-            //echo $source;
-            //Nette\Diagnostics\Debugger::dump($email_mess);
-            //exit;
-
             
-            $email_config = $mail->getFromConfig();
-            if ( is_null($email_config) ) {
-                if ( isset($user_part) ) {
-                    $email_config['ucet'] = $user_part[1];
-                    $email_config['email'] = $user_part[2];
-                } else {
-                    $email_config['ucet'] = "uživatel";
-                    $email_config['email'] = $email_mess->from_address;
-                }
+            if ( isset($user_part) ) {
+                $email_config['ucet'] = $user_part[1];
+                $email_config['email'] = $user_part[2];
+            } else {
+                $email_config['ucet'] = "uživatel";
+                $email_config['email'] = $email_mess->from_address;
             }
-
+            $adresat_popis = $email_config['ucet'] .' ['. $email_config['email'] .']';
+            
             $user = Nette\Environment::getUser()->getIdentity();
-
 
             // zapis do epodatelny
             $Epodatelna = new Epodatelna();
@@ -2354,13 +2347,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['popis'] = $data['email_text'];
             $zprava['odesilatel'] = $email_mess->to_address;
             $zprava['odesilatel_id'] = $adresat->id;
-            $zprava['adresat'] = $email_config['ucet'] .' ['. $email_config['email'] .']';
+            $zprava['adresat'] = $adresat_popis;
             $zprava['prijato_dne'] = new DateTime();
             $zprava['doruceno_dne'] = new DateTime();
             $zprava['prijal_kdo'] = $user->id;
             $zprava['prijal_info'] = serialize($user->identity);
 
-            $zprava['sha1_hash'] = sha1_file($source);
+            $zprava['sha1_hash'] = $source ? sha1_file($source) : '';
 
             $prilohy = array();
             if( isset($email_mess->attachments) ) {

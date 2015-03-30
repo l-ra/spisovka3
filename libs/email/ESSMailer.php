@@ -116,7 +116,10 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             return true;
         }
          
-        Tools::tryError();
+        set_error_handler(function($severity, $message) { // zachytávání chyb
+            restore_error_handler();
+            throw new Exception("Došlo k problému při odesílání mailu: $message");
+        }, E_WARNING);
         if ($linux) {
             $to = str_replace(Nette\Mail\Message::EOL, "\n", $to);
             $subject = str_replace(Nette\Mail\Message::EOL, "\n", $subject);
@@ -124,9 +127,8 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             $header = str_replace(Nette\Mail\Message::EOL, "\n", $header);
         }
         $res = mail($to, $subject, $mess, $header);
-
-        if (Tools::catchError($msg))
-            throw new Exception($msg);
+        restore_error_handler();
+        
         if (!$res)
             throw new Exception('Email se nepodařilo odeslat.');
         
