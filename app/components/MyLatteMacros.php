@@ -2,7 +2,7 @@
 
 // Pomocna trida pro uzivatelska Latte makra
 
-class MyMacros {
+class MyLatteMacros {
 
     public static function vlink($__param,$__link) {
 

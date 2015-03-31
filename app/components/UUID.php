@@ -1,13 +1,6 @@
 <?php
 
-class UUID extends Nette\Object {
-
-
-    protected $urand;
-
-    public function __construct() {
-
-    }
+class UUID {
 
     public static function v4() {
 

@@ -288,28 +288,21 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $latte = $template->getLatte();
         
         $set = new Nette\Latte\Macros\MacroSet($latte->getCompiler());
-        $set->addMacro('css', 'echo MyMacros::CSS($publicUrl, %node.args);');
-        $set->addMacro('js', 'echo MyMacros::JavaScript(%node.word, $publicUrl);');
+        $set->addMacro('css', 'echo MyLatteMacros::CSS($publicUrl, %node.args);');
+        $set->addMacro('js', 'echo MyLatteMacros::JavaScript(%node.word, $publicUrl);');
 
-        $set->addMacro('access', 'if (MyMacros::access(%node.word)) {', '}');
-        $set->addMacro('isAllowed', 'if (MyMacros::isAllowed(%node.args)) {', '}');
+        $set->addMacro('access', 'if (MyLatteMacros::access(%node.word)) {', '}');
+        $set->addMacro('isAllowed', 'if (MyLatteMacros::isAllowed(%node.args)) {', '}');
 
-        $set->addMacro('input2', 'echo MyMacros::input($form, %node.args)');
+        $set->addMacro('input2', 'echo MyLatteMacros::input($form, %node.args)');
         
-        // Neni momentalne pouzito:
+        /* Neni momentalne pouzito:
         // $set->addMacro('accessrole', '{', '}');
         
-        /* $filter->handler->macros['isAllowed'] =
-                '<?php if (%MyMacros::isAllowed%) { ?>';
-        $filter->handler->macros['/isAllowed'] =
-                '<?php } ?>';
         $filter->handler->macros['accessrole'] =
                 '<?php if ( Acl::isInRole("%%")) { ?>';
         $filter->handler->macros['/accessrole'] =
-                '<?php } ?>';
-                
-        $filter->handler->macros['input'] =
-            '<?php echo MyMacros::input($form, "%%"); ?>'; */
+                '<?php } ?>'; */                
     }
     
     protected function displayFormErrors(Nette\Forms\Controls\SubmitButton $button)
