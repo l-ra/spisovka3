@@ -2,7 +2,7 @@
 
 // Pomocna trida pro uzivatelska Latte makra
 
-class MyMacros extends Nette\Application\UI\Control {
+class MyMacros {
 
     public static function vlink($__param,$__link) {
 
