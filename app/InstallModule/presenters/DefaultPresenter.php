@@ -860,9 +860,7 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
-        $config_data = $config->toArray();
-        //Nette\Diagnostics\Debugger::dump($config_data); exit;
+        $config_data = (new Spisovka\ConfigClient())->get();
 
         $config_data['urad']['nazev'] = $data['nazev'];
         $config_data['urad']['plny_nazev'] = $data['plny_nazev'];
@@ -881,12 +879,8 @@ class Install_DefaultPresenter extends BasePresenter
         $config_data['urad']['kontakt']['www'] = $data['www'];
 
         try {
-
-            $config_modify = new Config();
-            $config_modify->import($config_data);
-            @$config_modify->save(CLIENT_DIR .'/configs/klient.ini');
-            Nette\Environment::setVariable('user_config', $config_modify);
-
+            (new Spisovka\ConfigEpodatelna())->save($config_data);
+            
             $session = Nette\Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
                 $session->step = array();
@@ -941,18 +935,14 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config = Config::fromFile(CLIENT_DIR .'/configs/klient.ini');
-        $config_data = $config->toArray();
+        $config_data = (new Spisovka\ConfigClient())->get();
+        
         $config_data['cislo_jednaci']['maska'] = $data['maska'];
         $config_data['cislo_jednaci']['typ_evidence'] = $data['typ_evidence'];
         $config_data['cislo_jednaci']['pocatek_cisla'] = $data['pocatek_cisla'];
 
         try {
-
-            $config_modify = new Config();
-            $config_modify->import($config_data);
-            @$config_modify->save(CLIENT_DIR .'/configs/klient.ini');
-            Nette\Environment::setVariable('user_config', $config_modify);
+            (new Spisovka\ConfigEpodatelna())->save($config_data);
 
             $session = Nette\Environment::getSession('s3_install');
             if ( !isset($session->step) ) {

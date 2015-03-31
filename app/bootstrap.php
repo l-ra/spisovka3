@@ -358,6 +358,6 @@ function createIniFile($filename)
     if (!copy($template, $filename))
         throw new Exception("Nemohu vytvorit soubor $filename.");
     
-    $perm = strstr($filename, 'system.ini') !== FALSE ? 0440 : 0640;
+    $perm = strstr($filename, 'system.neon') !== FALSE ? 0440 : 0640;
     @chmod($filename, $perm);
 }
