@@ -227,6 +227,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         
         $form1->addText('cislo_zakaznicke_karty', 'Číslo Zákaznické karty:', 13, 13)
                 ->setValue( Settings::get('Ceska_posta_cislo_zakaznicke_karty', '') )
+                ->addCondition(Nette\Forms\Form::FILLED)
                 ->addRule(Nette\Forms\Form::INTEGER, 'Chybné číslo karty.');
 
         $form1->addRadioList('zpusob_uhrady', 'Způsob úhrady:', self::$ciselnik_zpusoby_uhrad)
