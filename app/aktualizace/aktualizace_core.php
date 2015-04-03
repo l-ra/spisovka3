@@ -137,26 +137,35 @@ class Client_To_Update {
     public function __construct($path_to_client)
     {   
         $this->path = $path_to_client;
-        $this->revision_filename = "{$this->path}/configs/_aktualizace";
-        
-        $ini = parse_ini_file("{$this->path}/configs/system.ini", true);
-        if ($ini === FALSE)
-            throw new Exception("Nemohu přečíst konfigurační soubor system.ini");
-            
-        $this->db_config = array(
-            "driver" => $ini['common']['database.driver'],
-            "host" => $ini['common']['database.host'],
-            "username" => $ini['common']['database.username'],
-            "password" => $ini['common']['database.password'],
-            "database" => $ini['common']['database.database'],
-            "charset" => $ini['common']['database.charset'],
-            "prefix" => $ini['common']['database.prefix'],
-            "profiler" => false
-        );
+        $this->revision_filename = "{$this->path}/configs/_aktualizace";        
     }
 
     public function get_db_config()
     {
+        if (!$this->db_config)
+            // neprovadej autoload tridy, abychom poznali, jestli jsme volani ze spisovky
+            // nebo z aktualizacniho skriptu
+            if (class_exists('\Nette\Environment', false)) {
+                $config = \Nette\Environment::getConfig();
+                $this->db_config = $config->database;
+            }
+            else {
+                $ini = parse_ini_file("{$this->path}/configs/system.ini", true);
+                if ($ini !== FALSE)            
+                    $this->db_config = array(
+                        "driver" => $ini['common']['database.driver'],
+                        "host" => $ini['common']['database.host'],
+                        "username" => $ini['common']['database.username'],
+                        "password" => $ini['common']['database.password'],
+                        "database" => $ini['common']['database.database'],
+                        "charset" => $ini['common']['database.charset'],
+                        "prefix" => $ini['common']['database.prefix'],
+                        "profiler" => false
+                    );
+                else
+                    throw new Exception("Nemohu přečíst konfigurační soubor system.ini");
+            }
+
         return $this->db_config;
     }
 
@@ -167,9 +176,10 @@ class Client_To_Update {
 
     public function connect_to_db()
     {
+        $db_config = $this->get_db_config();
         try {
-            dibi::connect($this->db_config);
-            dibi::addSubst('PREFIX', $this->db_config['prefix']);
+            dibi::connect($db_config);
+            dibi::addSubst('PREFIX', $db_config['prefix']);
         }
         catch(DibiException $e) {
             throw new Exception("Nepodařilo se připojit k databázi. Klienta nelze aktualizovat.");

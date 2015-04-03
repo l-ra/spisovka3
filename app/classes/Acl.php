@@ -11,7 +11,12 @@ class Acl extends Nette\Security\Permission {
         // Trida je singleton, ochrana proti vicenasobnemu vytvoreni
         if (++$pass > 1)
             throw new LogicException('Acl::__construct() - objekt už byl vytvořen');
-            
+
+        // Při instalaci aplikace ještě data v databázi neexistují,
+        // musíme vrátit výchozí (prázdný) authorizator
+        if (defined('APPLICATION_INSTALL'))
+            return;
+        
         $model = new AclModel();
 
         // roles
