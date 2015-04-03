@@ -629,9 +629,10 @@ class Install_DefaultPresenter extends BasePresenter
                 }
             }
 
-            $this_installation = new Client_To_Update(CLIENT_DIR);
-            $this_installation->update_revision_number($latest_revision);
-            
+            if ($this->getParam('install', false)) {
+                $this_installation = new Client_To_Update(CLIENT_DIR);
+                $this_installation->update_revision_number($latest_revision);
+            }            
 
             $database = $this->paint( $database_a );
             $this->template->database = $database;
@@ -879,7 +880,7 @@ class Install_DefaultPresenter extends BasePresenter
         $config_data['urad']['kontakt']['www'] = $data['www'];
 
         try {
-            (new Spisovka\ConfigEpodatelna())->save($config_data);
+            (new Spisovka\ConfigClient())->save($config_data);
             
             $session = Nette\Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
@@ -942,7 +943,7 @@ class Install_DefaultPresenter extends BasePresenter
         $config_data['cislo_jednaci']['pocatek_cisla'] = $data['pocatek_cisla'];
 
         try {
-            (new Spisovka\ConfigEpodatelna())->save($config_data);
+            (new Spisovka\ConfigClient())->save($config_data);
 
             $session = Nette\Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
@@ -1017,7 +1018,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         $auth = new Authenticator_Base();
         
-        if (!$auth->vytvoritUcet($data, $user_data, true)) {
+        if (!$auth->vytvoritUcet((array)$data, $user_data, true)) {
             $this->flashMessage('Správce se nepodařilo vytvořit.', 'warning');
         }
         else {

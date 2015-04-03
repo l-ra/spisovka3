@@ -10,6 +10,8 @@ if (file_exists(APP_DIR ."/configs/servicemode")) {
     exit;
 }
 
+try {
+
 // setting memory_limit for PDF generation
 define('PDF_MEMORY_LIMIT','512M');
 
@@ -41,8 +43,6 @@ $loader->setCacheStorage(new Nette\Caching\Storages\FileStorage($cacheDir));
 //$loader->addClass('mPDF', LIBS_DIR . '/mpdf/mpdf.php');
 $loader->register();
 
-
-try {
 
 // Step 2: Configure environment
 
@@ -160,6 +160,8 @@ try {
         unset($panel);
     }
     
+    if (!$db_config['prefix'])
+        $db_config['prefix'] = '';  // nahrad pripadnou null hodnotu za prazdny retezec
     dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];
     define('DB_PREFIX', $db_config['prefix']);
 }
