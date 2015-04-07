@@ -149,6 +149,11 @@ class Client_To_Update {
                 $config = \Nette\Environment::getConfig();
                 $this->db_config = $config->database;
             }
+            else if (is_file("{$this->path}/configs/database.neon")) {
+                $data = (new Spisovka\ConfigDatabase($this->path))->get();
+                $this->db_config = $data->parameters->database;
+                $this->db_config->profiler = false;
+            }
             else {
                 $ini = parse_ini_file("{$this->path}/configs/system.ini", true);
                 if ($ini !== FALSE)            
@@ -179,7 +184,7 @@ class Client_To_Update {
         $db_config = $this->get_db_config();
         try {
             dibi::connect($db_config);
-            dibi::addSubst('PREFIX', $db_config['prefix']);
+            dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];
         }
         catch(DibiException $e) {
             throw new Exception("Nepodařilo se připojit k databázi. Klienta nelze aktualizovat.");

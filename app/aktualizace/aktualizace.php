@@ -41,11 +41,17 @@ try {
     ini_set('display_errors', 1);
     set_time_limit(0);
 
-    require LIBS_DIR . "/dibi/dibi.php";
-    
+    define ('VENDOR_DIR', dirname(APP_DIR) . '/vendor');
+    require VENDOR_DIR . '/autoload.php';
+
+    $loader = new Nette\Loaders\RobotLoader();
+    $loader->addDirectory(APP_DIR);
+    // neukladej nikam cache
+    $loader->setCacheStorage(new Nette\Caching\Storages\DevNullStorage());
+    $loader->register();
+        
     define('UPDATE_DIR', APP_DIR . '/aktualizace/');    
     
-    require 'aktualizace_core.php';
     require 'is_installed.php';
     
     Updates::init();
