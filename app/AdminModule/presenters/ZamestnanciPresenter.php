@@ -115,7 +115,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         // Odebrani uctu
         $odebrat_ucet = $this->getParam('odebrat', false);
-        if ($odebrat_ucet)
+        if ($odebrat_ucet) {
             try {
                 $User->odebratUcet($osoba_id, $odebrat_ucet);
                 $this->flashMessage('Účet uživatele byl odebrán.');
@@ -123,6 +123,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             catch (Exception $e) {
                 $this->flashMessage($e->getMessage(), 'warning');                
             }
+            $this->redirect('this', array('id' => $osoba_id));
+        }
 
         if (count($accounts)) {
             $role = array();
