@@ -5,10 +5,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function actionLogin()
     {
-
-        $authenticator = (array) Nette\Environment::getConfig('service');
-        $authenticator = $authenticator['Nette-Security-IAuthenticator'];
-        $Auth = new $authenticator();
+        $Auth = Nette\Environment::getService('authenticator.UI');
         $Auth->setAction('login');
         $this->addComponent($Auth, 'auth');
 
@@ -38,10 +35,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function actionDefault()
     {
-
-        $authenticator = (array) Nette\Environment::getConfig('service');
-        $authenticator = $authenticator['Nette-Security-IAuthenticator'];
-
         $Osoba = new Osoba();
 
         $user = Nette\Environment::getUser()->getIdentity();
@@ -60,7 +53,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         // Zmena hesla
         $this->template->ZmenaHesla = $this->getParam('zmenitheslo',null);
         Nette\Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$user->id));
-        $Auth1 = new $authenticator();
+        $Auth1 = Nette\Environment::getService('authenticator.UI');
         $Auth1->setAction('change_password');
         $this->addComponent($Auth1, 'auth_change_password');
 

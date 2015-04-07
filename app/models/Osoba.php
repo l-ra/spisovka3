@@ -16,6 +16,7 @@ class Osoba extends BaseModel
 
     }
 
+    // Vrati pole uzivatelskych uctu osoby. Indexem je user_id.
     public function getUser($osoba_id, $active = 0)
     {
 
@@ -32,13 +33,12 @@ class Osoba extends BaseModel
         }
 
 
-        $tmp = array();
+        $res = array();
         foreach ($rows as $row) {
-            $tmp[ $row->id ] = $row;
+            $res[ $row->id ] = $row;
         }
-        $rows = $tmp;
 
-        return ($rows) ? $rows : NULL;
+        return $res ?: null;
 
     }
 

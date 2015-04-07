@@ -2,6 +2,10 @@
 
 class Authenticator_Base extends Nette\Application\UI\Control
 {
+    // nutne kvuli vytvoreni sluzby pomoci Nette
+    public function __construct() {
+        parent::__construct();
+    }
 
     protected function handleLogin($data)
     {

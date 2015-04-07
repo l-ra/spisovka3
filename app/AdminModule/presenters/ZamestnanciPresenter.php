@@ -71,9 +71,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         $this->template->title = " - Detail zaměstnance";
 
-        $authenticator = (array) Nette\Environment::getConfig('service');
-        $authenticator = $authenticator['Nette-Security-IAuthenticator'];
-
         $Osoba = new Osoba();
         $User = new UserModel();
 
@@ -86,26 +83,24 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         // Zmena roli
         $this->template->RoleUpravit = $this->getParam('role',null);
-
         
-        $uzivatel = $Osoba->getUser($osoba_id);
-        $this->template->Uzivatel = $uzivatel;
+        $accounts = $Osoba->getUser($osoba_id, 1);
+        $this->template->Accounts = $accounts;
 
         // Zmena hesla
-        if ($this->template->FormUpravit == 'heslo')
-            $zmena_hesla = $this->getParam('user',null);
-        else
-            $zmena_hesla = null;
         $this->template->ZmenaHesla = null;
-        if ( !is_null($zmena_hesla) ) {
-            if ( key_exists($zmena_hesla, $uzivatel) ) {
-                $this->template->ZmenaHesla = $zmena_hesla;
+        if ($this->template->FormUpravit == 'heslo') {
+            $user_id = $this->getParam('user', null);
+            // Stupidni kontrola parametru. Kdo je opravnen spravou uzivatelu v administraci,
+            // muze menit heslo komukoliv.
+            if (key_exists($user_id, $accounts)) {
+                $this->template->ZmenaHesla = (int)$user_id;
             }
         }
-        $Auth1 = new $authenticator();
-        $Auth1->setAction('change_password');
-        Nette\Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$zmena_hesla, 'admin'=>1));
-        $this->addComponent($Auth1, 'changePasswordForm');
+        $Auth = Nette\Environment::getService('authenticator.UI');
+        $Auth->setAction('change_password');
+        Nette\Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$user_id, 'admin'=>1));
+        $this->addComponent($Auth, 'changePasswordForm');            
 
 
         // Vytvoreni uctu
@@ -113,7 +108,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ( !is_null($vytvorit_ucet) ) {
             $this->template->vytvoritUcet = 1;
         }
-        $Auth2 = new $authenticator();
+        $Auth2 = Nette\Environment::getService('authenticator.UI.2');
         $Auth2->setAction('new_user');
         Nette\Environment::setVariable('auth_params_new', array('osoba_id'=>$osoba_id));
         $this->addComponent($Auth2, 'newUserForm');
@@ -129,12 +124,9 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                 $this->flashMessage($e->getMessage(), 'warning');                
             }
 
-        $uzivatel = $Osoba->getUser($osoba_id,1);
-        $this->template->Uzivatel = $uzivatel;
-
-        if ( count($uzivatel)>0 ) {
+        if (count($accounts)) {
             $role = array();
-            foreach ($uzivatel as &$uziv) {
+            foreach ($accounts as &$uziv) {
                 if ($uziv->orgjednotka_id !== null)
                     $uziv->org_nazev = Orgjednotka::getName($uziv->orgjednotka_id);
                 else
@@ -157,10 +149,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     public function actionSync()
     {
-
-        $authenticator = (array) Nette\Environment::getConfig('service');
-        $authenticator = $authenticator['Nette-Security-IAuthenticator'];
-        $Auth = new $authenticator();
+        $Auth = Nette\Environment::getService('authenticator.UI');
         $Auth->setAction('sync');
         $this->addComponent($Auth, 'syncForm');
 

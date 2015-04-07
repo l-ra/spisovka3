@@ -42,13 +42,13 @@
         {control newUserForm}
         {/if}
 
-        {if count($Uzivatel)>0}
-        {foreach $Uzivatel as $u}
+        {if count($Accounts)>0}
+        {foreach $Accounts as $u}
         <dl class="detail_item">
             <dt>Uživatelské jméno:</dt>
             <dd>{$u->username}&nbsp;</dd>
         </dl>
-        {if ($ZmenaHesla==$u->id && !is_null($ZmenaHesla))}
+        {if ($ZmenaHesla === $u->id)}
         {control changePasswordForm}
         {/if}
         <dl class="detail_item">
