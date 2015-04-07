@@ -93,7 +93,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ($this->template->FormUpravit == 'heslo') {
             // Stupidni kontrola parametru. Kdo je opravnen spravou uzivatelu v administraci,
             // muze menit heslo komukoliv.
-            if (key_exists($user_id, $accounts)) {
+            if (array_key_exists($user_id, $accounts)) {
                 $this->template->ZmenaHesla = (int)$user_id;
             }
         }

@@ -623,7 +623,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         
         $DokumentPrilohy = new DokumentPrilohy();
         $prilohy = $DokumentPrilohy->prilohy($dokument_id);
-        if ( key_exists($file_id, $prilohy) ) {
+        if ( array_key_exists($file_id, $prilohy) ) {
 
             $storage_conf = Nette\Environment::getConfig('storage');
             eval("\$DownloadFile = new ".$storage_conf->type."();");

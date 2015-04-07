@@ -56,7 +56,7 @@ abstract class DBEntity
         if (!$this->data)
             $this->_load();
             
-        if (key_exists($name, $this->data))
+        if (array_key_exists($name, $this->data))
             return $this->data[$name];
             
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
@@ -67,7 +67,7 @@ abstract class DBEntity
         if (!$this->data)
             $this->_load();
             
-        if (key_exists($name, $this->data))
+        if (array_key_exists($name, $this->data))
             return isset($this->data[$name]);
             
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
@@ -83,7 +83,7 @@ abstract class DBEntity
         if (!$this->data)
             $this->_load();
             
-        if (!key_exists($name, $this->data))
+        if (!array_key_exists($name, $this->data))
             throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
         
         if (strcasecmp($name, 'id') == 0)

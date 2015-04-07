@@ -398,7 +398,7 @@ class Subjekt extends BaseModel
         }
         
         if ( !is_null($kod) )
-            return key_exists($kod, $stat) ? $stat[$kod] : null;
+            return array_key_exists($kod, $stat) ? $stat[$kod] : null;
 
         if ( $select == 3 )
             return array('' => 'v jakémkoli státě') + $stat;
@@ -432,7 +432,7 @@ class Subjekt extends BaseModel
             
             return $typ;
         } else {
-            return ( key_exists($kod, $typ) )?$typ[ $kod ]:null;
+            return ( array_key_exists($kod, $typ) )?$typ[ $kod ]:null;
         }
         
     }
