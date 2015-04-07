@@ -89,8 +89,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         // Zmena hesla
         $this->template->ZmenaHesla = null;
+        $user_id = $this->getParam('user', null);
         if ($this->template->FormUpravit == 'heslo') {
-            $user_id = $this->getParam('user', null);
             // Stupidni kontrola parametru. Kdo je opravnen spravou uzivatelu v administraci,
             // muze menit heslo komukoliv.
             if (key_exists($user_id, $accounts)) {
@@ -500,7 +500,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
         $orgjednotka_id = $data['orgjednotka_id'];
-        if ($orgjednotka_id === '0')
+        if ($orgjednotka_id === 0)
             $orgjednotka_id = null;
             
         $model = new UserModel();        
