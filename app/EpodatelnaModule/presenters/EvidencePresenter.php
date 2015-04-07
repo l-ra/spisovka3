@@ -25,8 +25,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     public function renderPridelitcj()
     {
 
-        $dokument_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
+        $dokument_id = $this->getParameter('id',null);
+        $user_id = $this->getParameter('user',null);
 
         $Dokument = new Dokument();
 
@@ -54,7 +54,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         /* Nacteni zpravy */
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
 
-        $epodatelna_id = $this->getParam('id',null);
+        $epodatelna_id = $this->getParameter('id',null);
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
         $this->template->Typ_evidence = $this->typ_evidence;
@@ -218,7 +218,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         /* Nacteni zpravy */
         $Epodatelna = new Epodatelna();
 
-        $epodatelna_id = $this->getParam('id',null);
+        $epodatelna_id = $this->getParameter('id',null);
         $zprava = $Epodatelna->getInfo($epodatelna_id);
 
         if ( !empty($zprava->isds_id) ) {
@@ -868,7 +868,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     protected function createComponentEvidenceForm()
     {
 
-        $epodatelna_id = $this->getParam('id',null);
+        $epodatelna_id = $this->getParameter('id',null);
 
         $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
@@ -927,7 +927,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     protected function createComponentOdmitnoutEmailForm()
     {
 
-        $epodatelna_id = $this->getParam('id',null);
+        $epodatelna_id = $this->getParameter('id',null);
         $zprava = @$this->template->Zprava;
 
         $mess = "\n\n--------------------\n";
@@ -1032,7 +1032,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     protected function createComponentOdmitnoutISDSForm()
     {
 
-        $epodatelna_id = $this->getParam('id',null);
+        $epodatelna_id = $this->getParameter('id',null);
         $zprava = @$this->template->Zprava;
         $original = @$this->template->original;
 

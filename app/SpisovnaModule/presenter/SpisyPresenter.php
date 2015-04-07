@@ -123,7 +123,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $spis_id = null;
 
         $args = null;
-        $this->hledat = $this->getParam('hledat', null);
+        $this->hledat = $this->getParameter('hledat', null);
         
         if ( !empty($this->hledat) ) {
             $args = array( 'where'=>array(array("tb.nazev LIKE %s",'%'.$this->hledat.'%')));
@@ -139,8 +139,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $paginator->itemCount = count($result);
             
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -212,8 +212,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -258,7 +258,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
     public function actionDetail()
     {
 
-        $spis_id = $this->getParam('id',null);
+        $spis_id = $this->getParameter('id',null);
         // Info o spisu
         $Spisy = new Spis();
         $this->template->Spis = $spis = $Spisy->getInfo($spis_id, true);
@@ -368,7 +368,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         
             if ( $user->isAllowed('Spisovna', 'zmenit_skartacni_rezim') ) {
                 $this->template->AccessEdit = 1;
-                $formUpravit = $this->getParam('upravit',null);
+                $formUpravit = $this->getParameter('upravit',null);
             } else {
                 $this->template->AccessEdit = 0;
                 $formUpravit = null;
@@ -388,8 +388,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
         
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             $this->setLayout(false);
@@ -457,8 +457,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
     public function actionStav()
     {
 
-        $spis_id = $this->getParam('id');
-        $stav = $this->getParam('stav');
+        $spis_id = $this->getParameter('id');
+        $stav = $this->getParameter('stav');
 
         $Spis = new Spis();
 

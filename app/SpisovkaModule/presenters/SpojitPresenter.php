@@ -20,12 +20,12 @@ class Spisovka_SpojitPresenter extends BasePresenter
 
     public function renderVyber()
     {
-        $this->template->dokument_id = $this->getParam('id',null);
+        $this->template->dokument_id = $this->getParameter('id',null);
     }
 
     public function renderNacti()
     {
-        $query = $this->getParam('q',null);
+        $query = $this->getParameter('q',null);
 
         $Dokument = new Dokument();
         $args = $Dokument->hledat($query,'dokument');
@@ -71,8 +71,8 @@ class Spisovka_SpojitPresenter extends BasePresenter
 
     public function actionVybrano()
     {
-        $dokument_id = $this->getParam('id',null);
-        $dokument_spojit = $this->getParam('spojit_s',null);
+        $dokument_id = $this->getParameter('id',null);
+        $dokument_spojit = $this->getParameter('spojit_s',null);
 
         $Dokument = new Dokument();
 
@@ -96,9 +96,9 @@ class Spisovka_SpojitPresenter extends BasePresenter
 
     public function renderOdebrat()
     {
-        $dokument_id = $this->getParam('id',null);
-        $spojit_s = $this->getParam('spojeny',null);
-        $zpetne_spojeny = $this->getParam('zpetne_spojeny',null);
+        $dokument_id = $this->getParameter('id',null);
+        $spojit_s = $this->getParameter('spojeny',null);
+        $zpetne_spojeny = $this->getParameter('zpetne_spojeny',null);
 
         $Souvisejici = new SouvisejiciDokument();
         

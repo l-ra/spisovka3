@@ -33,7 +33,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $this->template->zpusob_uhrady = Settings::get('Ceska_posta_zpusob_uhrady', '');
 
         // Zmena udaju
-        $this->template->FormUpravit = $this->getParam('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
 
     }
 

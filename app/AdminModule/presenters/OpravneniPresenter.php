@@ -31,7 +31,7 @@ class Admin_OpravneniPresenter extends BasePresenter
 
     public function actionDetail()
     {
-        $role_id = $this->getParam('id',null);
+        $role_id = $this->getParameter('id',null);
         $RoleModel = new RoleModel();
 
         $role = $role_id === null ? null : $RoleModel->getInfo($role_id);
@@ -50,7 +50,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->template->title = " - Detail role";
 
         // Zmena udaju role
-        $this->template->FormUpravit = $this->getParam('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
 
         $this->template->lzeMenitOpravneni = self::lzeMenitRoli($this->template->Role);
         $this->template->opravneniForm = $this['opravneniForm'];
@@ -59,7 +59,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     public function actionSmazat()
     {
         $RoleModel = new RoleModel();
-        $role_id = $this->getParam('id',null);
+        $role_id = $this->getParameter('id',null);
         
         try {
             $RoleModel->smazat(array("id = %i", $role_id));

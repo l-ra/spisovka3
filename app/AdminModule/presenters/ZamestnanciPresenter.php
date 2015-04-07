@@ -33,7 +33,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         }
 
         // zobrazit podle pismena
-        $abc = $abcPaginator->getParam('abc');
+        $abc = $abcPaginator->getParameter('abc');
         if ( !empty($abc) ) {
             if ( is_array($args) ) {
                 $args[] = array("prijmeni LIKE %s",$abc.'%');
@@ -74,22 +74,22 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $Osoba = new Osoba();
         $User = new UserModel();
 
-        $osoba_id = $this->getParam('id',null);
+        $osoba_id = $this->getParameter('id',null);
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
 
         // Parametr urcuje, co budeme editovat (jaky zobrazime formular)
-        $this->template->FormUpravit = $this->getParam('upravit',null);
-        $this->template->UpravitUserId = $this->getParam('user',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
+        $this->template->UpravitUserId = $this->getParameter('user',null);
 
         // Zmena roli
-        $this->template->RoleUpravit = $this->getParam('role',null);
+        $this->template->RoleUpravit = $this->getParameter('role',null);
         
         $accounts = $Osoba->getUser($osoba_id, 1);
         $this->template->Accounts = $accounts;
 
         // Zmena hesla
         $this->template->ZmenaHesla = null;
-        $user_id = $this->getParam('user', null);
+        $user_id = $this->getParameter('user', null);
         if ($this->template->FormUpravit == 'heslo') {
             // Stupidni kontrola parametru. Kdo je opravnen spravou uzivatelu v administraci,
             // muze menit heslo komukoliv.
@@ -104,7 +104,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
 
         // Vytvoreni uctu
-        $vytvorit_ucet = $this->getParam('new_user',null);
+        $vytvorit_ucet = $this->getParameter('new_user',null);
         if ( !is_null($vytvorit_ucet) ) {
             $this->template->vytvoritUcet = 1;
         }
@@ -114,7 +114,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->addComponent($Auth2, 'newUserForm');
 
         // Odebrani uctu
-        $odebrat_ucet = $this->getParam('odebrat', false);
+        $odebrat_ucet = $this->getParameter('odebrat', false);
         if ($odebrat_ucet) {
             try {
                 $User->odebratUcet($osoba_id, $odebrat_ucet);
@@ -305,7 +305,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ( isset($_POST['user_id']) ) {
             $user_id = $_POST['user_id'];
         } else {
-            $user_id = $this->getParam('role', null);
+            $user_id = $this->getParameter('role', null);
         }
 
         $user_role = UserModel::getRoles($user_id);
@@ -468,7 +468,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $select[$org->id] = $org->ciselna_rada . ' - ' . $org->zkraceny_nazev;
         
         $osoba = $this->template->Osoba;
-        $user_id = $this->getParam('user', null);
+        $user_id = $this->getParameter('user', null);
         
         $form1->addHidden('osoba_id')
                 ->setValue(@$osoba->id);

@@ -148,7 +148,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     
     public function actionVyber()
     {
-        $this->template->dokument_id = $this->getParam('id',$this->getParam('dokument_id',null));
+        $this->template->dokument_id = $this->getParameter('id',$this->getParameter('dokument_id',null));
         if ( empty($this->template->dokument_id) ) {
             if ( isset($_POST['dokument_id']) ) {
                 $this->template->dokument_id = $_POST['dokument_id'];
@@ -190,8 +190,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     public function renderVybrano()
     {
 
-        $spis_id = $this->getParam('id',null);
-        $dokument_id = $this->getParam('dok_id',null);
+        $spis_id = $this->getParameter('id',null);
+        $dokument_id = $this->getParameter('dok_id',null);
         $Spisy = new Spis();
 
         try {
@@ -216,8 +216,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     public function actionOdebratspis()
     {
 
-        $spis_id = $this->getParam('id',null);
-        $dokument_id = $this->getParam('dok_id',null);
+        $spis_id = $this->getParameter('id',null);
+        $dokument_id = $this->getParameter('dok_id',null);
         $Spisy = new Spis();
 
         $spis = $Spisy->getInfo($spis_id);
@@ -271,8 +271,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $paginator->itemCount = count($result);
             
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -313,7 +313,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     public function actionDetail()
     {
         
-        $spis_id = $this->getParam('id',null);
+        $spis_id = $this->getParameter('id',null);
         // Info o spisu
         $Spisy = new Spis();
         $this->template->Spis = $spis = $Spisy->getInfo($spis_id, true);
@@ -340,7 +340,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->template->Lze_prevzit = $opravneni['lze_prevzit'];
         $this->template->Lze_cist = $opravneni['lze_cist'];
         $this->template->Lze_menit = $opravneni['lze_menit'];
-        $this->template->Editovat = $opravneni['lze_menit'] && $this->getParam('upravit') == 'info';
+        $this->template->Editovat = $opravneni['lze_menit'] && $this->getParameter('upravit') == 'info';
 
         if (!$opravneni['lze_cist']) {
             $this->setView('dok-noaccess');
@@ -357,8 +357,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->template->seznam = $opravneni['lze_cist'] ? $DokumentSpis->dokumenty($spis_id, 1) : null;
     
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             $this->setLayout(false);
@@ -379,7 +379,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function actionPrevzit()
     {
-        $spis_id = $this->getParam('id',null);
+        $spis_id = $this->getParameter('id',null);
 
         $Spisy = new Spis;
         $Spisy->getInfo($spis_id);
@@ -418,7 +418,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     /* Tato operace je povolena pouze, kdyz spis nema zadneho vlastnika */
     public function renderPrivlastnit()
     {
-        $spis_id = $this->getParam('id',null);
+        $spis_id = $this->getParameter('id',null);
 
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
         
@@ -440,7 +440,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     
     public function renderZrusitprevzeti()
     {
-        $spis_id = $this->getParam('id',null);
+        $spis_id = $this->getParameter('id',null);
 
         $Spisy = new Spis;
         $Spisy->getInfo($spis_id);
@@ -478,7 +478,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     public function renderOdmitnoutprevzeti()
     {
 
-        $spis_id = $this->getParam('id',null);
+        $spis_id = $this->getParameter('id',null);
 
         $Spisy = new Spis;
         $Spisy->getInfo($spis_id);
@@ -568,8 +568,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     public function actionStav()
     {
 
-        $spis_id = $this->getParam('id');
-        $stav = $this->getParam('stav');
+        $spis_id = $this->getParameter('id');
+        $stav = $this->getParameter('stav');
 
         $Spis = new Spis();
 
@@ -751,7 +751,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
-        $dokument_id = $this->getParam('id',$this->getParam('dokument_id',null));
+        $dokument_id = $this->getParameter('id',$this->getParameter('dokument_id',null));
         if ( empty($dokument_id) ) {
             if ( isset($_POST['dokument_id']) ) {
                 $dokument_id = $_POST['dokument_id'];

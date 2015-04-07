@@ -9,19 +9,19 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
     public function renderPridat()
     {
-        $this->file_id = $this->getParam('id',null);
-        $this->dokument_id = $this->getParam('dok_id',null);
+        $this->file_id = $this->getParameter('id',null);
+        $this->dokument_id = $this->getParameter('dok_id',null);
     }
 
     public function renderUpravit()
     {
-        $this->file_id = $this->getParam('id',null);
-        $this->dokument_id = $this->getParam('dok_id',null);
+        $this->file_id = $this->getParameter('id',null);
+        $this->dokument_id = $this->getParameter('dok_id',null);
     }
 
     public function renderNacti()
     {
-        $dokument_id = $this->getParam('id',null); // tady jako dokument_id
+        $dokument_id = $this->getParameter('id',null); // tady jako dokument_id
 
         $DokumentPrilohy = new DokumentPrilohy();
         $seznam = $DokumentPrilohy->prilohy($dokument_id);
@@ -33,8 +33,8 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     // Je volano pres AJAX, takze volani flashMessage() postradaji smysl
     public function actionOdebrat()
     {
-        $file_id = $this->getParam('id',null);
-        $dokument_id = $this->getParam('dok_id',null);
+        $file_id = $this->getParameter('id',null);
+        $dokument_id = $this->getParameter('dok_id',null);
 
         $FileModel = new FileModel();
         $file_info = $FileModel->getInfo($file_id);

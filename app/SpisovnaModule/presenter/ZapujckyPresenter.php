@@ -81,9 +81,9 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $this->actionAkce($post);
         }        
         
-        $filtr = $this->getParam('filtr');
-        $hledat = $this->getParam('hledat');
-        $seradit = $this->getParam('seradit');         
+        $filtr = $this->getParameter('filtr');
+        $hledat = $this->getParameter('hledat');
+        $seradit = $this->getParameter('seradit');         
         
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
@@ -148,8 +148,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $paginator->itemCount = count($result);
         
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -178,7 +178,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $Zapujcka = new Zapujcka();
 
         // Nacteni parametru
-        $zapujcka_id = $this->getParam('id',null);
+        $zapujcka_id = $this->getParameter('id',null);
 
         $this->template->Zapujcka = null;
         $zapujcka = $Zapujcka->getInfo($zapujcka_id);
@@ -284,7 +284,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     public function actionSchvalit()
     {
         
-        $zapujcka_id = $this->getParam('id');
+        $zapujcka_id = $this->getParameter('id');
         if ( !empty($zapujcka_id) && is_numeric($zapujcka_id) ) {
             if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
                 
@@ -307,7 +307,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     public function actionOdmitnout()
     {
         
-        $zapujcka_id = $this->getParam('id');
+        $zapujcka_id = $this->getParameter('id');
         if ( !empty($zapujcka_id) && is_numeric($zapujcka_id) ) {
             if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
                 
@@ -330,7 +330,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     public function actionVratit()
     {
         
-        $zapujcka_id = $this->getParam('id');
+        $zapujcka_id = $this->getParameter('id');
         if ( !empty($zapujcka_id) && is_numeric($zapujcka_id) ) {
             $Zapujcka = new Zapujcka();
             if ( $Zapujcka->vraceno($zapujcka_id, new Datetime()) ) {
@@ -356,8 +356,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         
         $form = new Nette\Application\UI\Form();
         
-        $dokument_id = $this->getParam('dokument_id');
-        $user_id = $this->getParam('user_id');
+        $dokument_id = $this->getParameter('dokument_id');
+        $user_id = $this->getParameter('user_id');
         
         if ( $dokument_id ) {
             $Dokument = new Dokument();

@@ -206,8 +206,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -271,9 +271,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $this->template->akce_select = array();              
 
-        $filtr = $this->getParam('filtr');
-        $hledat = $this->getParam('hledat');
-        $seradit = $this->getParam('seradit');         
+        $filtr = $this->getParameter('filtr');
+        $hledat = $this->getParameter('hledat');
+        $seradit = $this->getParameter('seradit');         
         
         $this->template->title = "Seznam dokumentů ve spisovně";
         $this->seznam(0, $filtr, $hledat, $seradit);
@@ -289,9 +289,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
-        $filtr = $this->getParam('filtr');
-        $hledat = $this->getParam('hledat');
-        $seradit = $this->getParam('seradit');         
+        $filtr = $this->getParameter('filtr');
+        $hledat = $this->getParameter('hledat');
+        $seradit = $this->getParameter('seradit');         
         
         $this->template->akce_select = array(
             'prevzit_spisovna'=>'převzetí seznamu dokumentů do spisovny'
@@ -311,9 +311,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
-        $filtr = $this->getParam('filtr');
-        $hledat = $this->getParam('hledat');
-        $seradit = $this->getParam('seradit');         
+        $filtr = $this->getParameter('filtr');
+        $hledat = $this->getParameter('hledat');
+        $seradit = $this->getParameter('seradit');         
         
         $this->template->akce_select = array(
             'ke_skartaci'=>'předat do skartačního řízení'
@@ -332,9 +332,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
-        $filtr = $this->getParam('filtr');
-        $hledat = $this->getParam('hledat');
-        $seradit = $this->getParam('seradit');         
+        $filtr = $this->getParameter('filtr');
+        $hledat = $this->getParameter('hledat');
+        $seradit = $this->getParameter('seradit');         
         
         $this->template->akce_select = array(
             'archivovat'=>'archivovat vybrané dokumenty',
@@ -349,7 +349,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $Dokument = new Dokument();
 
         // Nacteni parametru
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
 
         $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
         if ( $dokument ) {
@@ -378,7 +378,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->template->Lze_menit_skartacni_rezim = 
                     $dokument->stav_dokumentu == 7
                     && $user->isAllowed('Spisovna', 'zmenit_skartacni_rezim');
-            $this->template->Upravit_param = $this->getParam('upravit', null);
+            $this->template->Upravit_param = $this->getParameter('upravit', null);
 
             $uplynula_skart_lhuta = !empty($dokument->skartacni_rok)
                         && date('Y') >= $dokument->skartacni_rok;
@@ -401,8 +401,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             }
 
             // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParam('print');
-            $pdf = $this->getParam('pdfprint');
+            $tisk = $this->getParameter('print');
+            $pdf = $this->getParameter('pdfprint');
             if ( $tisk ) {
                 @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 $this->setLayout(false);
@@ -562,7 +562,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     public function renderKeskartaci()
     {
 
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
         $user = Nette\Environment::getUser();
 
         $Workflow = new Workflow();
@@ -581,7 +581,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function renderArchivovat()
     {
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
         $user = Nette\Environment::getUser();
 
         $Workflow = new Workflow();
@@ -599,7 +599,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function renderSkartovat()
     {
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
         $user = Nette\Environment::getUser();
 
         $Workflow = new Workflow();
@@ -618,8 +618,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     public function renderDownload() 
     {
 
-        $dokument_id = $this->getParam('id',null);
-        $file_id = $this->getParam('file',null);
+        $dokument_id = $this->getParameter('id',null);
+        $file_id = $this->getParameter('file',null);
         
         $DokumentPrilohy = new DokumentPrilohy();
         $prilohy = $DokumentPrilohy->prilohy($dokument_id);
@@ -653,7 +653,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     public function renderHistorie()
     {
 
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
 
         $Log = new LogModel();
         $historie = $Log->historieDokumentu($dokument_id,1000);
@@ -905,7 +905,7 @@ protected function createComponentVyrizovaniForm()
         $zapujcky = $Zapujcka->aktivniSeznam();        
         
         
-        $term = $this->getParam('term');
+        $term = $this->getParameter('term');
 
         if ( !empty($term) ) {
             $args = $Dokument->hledat($term);

@@ -6,7 +6,7 @@ class SubjektyPresenter extends BasePresenter
     public function renderVyber()
     {
         $abcPaginator = new AbcPaginator($this, 'abc');
-        $abc = $abcPaginator->getParam('abc');
+        $abc = $abcPaginator->getParameter('abc');
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -24,7 +24,7 @@ class SubjektyPresenter extends BasePresenter
 
     public function renderAres()
     {
-        $ic = $this->getParam('id',null);
+        $ic = $this->getParameter('id',null);
         $ares = new Ares($ic);
         $data = $ares->get();
         echo json_encode($data);
@@ -209,13 +209,13 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
     public function renderVyber()
     {
         parent::renderVyber();
-        $this->template->dokument_id = $this->getParam('dok_id',null);
+        $this->template->dokument_id = $this->getParameter('dok_id',null);
     }
 
     // Volano pouze pres Ajax
     public function renderNacti()
     {
-        $dokument_id = $this->getParam('id',null); // tady jako dokument_id
+        $dokument_id = $this->getParameter('id',null); // tady jako dokument_id
 
         $DokumentSubjekt = new DokumentSubjekt();
         $seznam = $DokumentSubjekt->subjekty($dokument_id);
@@ -227,10 +227,10 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
     public function actionVybrano()
     {
         try {            
-            $subjekt_id = $this->getParam('id',null);
-            $dokument_id = $this->getParam('dok_id',null);
-            $typ = $this->getParam('typ',null);
-            $autocomplete = $this->getParam('autocomplete',0);
+            $subjekt_id = $this->getParameter('id',null);
+            $dokument_id = $this->getParameter('dok_id',null);
+            $typ = $this->getParameter('typ',null);
+            $autocomplete = $this->getParameter('autocomplete',0);
             
             $Subjekt = new Subjekt();
             $subjekt = $Subjekt->getInfo($subjekt_id);            
@@ -259,8 +259,8 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
 
     public function renderOdebrat()
     {
-        $subjekt_id = $this->getParam('id',null);
-        $dokument_id = $this->getParam('dok_id',null);
+        $subjekt_id = $this->getParameter('id',null);
+        $dokument_id = $this->getParameter('dok_id',null);
 
         $DokumentSubjekt = new DokumentSubjekt();
         $param = array( array('subjekt_id=%i',$subjekt_id),array('dokument_id=%i',$dokument_id) );
@@ -288,7 +288,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
 
         $seznam = array();
 
-        $term = $this->getParam('term');
+        $term = $this->getParameter('term');
 
         if ( !empty($term) ) {
             $args = array('where'=>array(array("LOWER(CONCAT_WS('', nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)",'%'.$term.'%'),
@@ -331,15 +331,15 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
 
     public function renderUpravit()
     {
-        $subjekt_id = $this->getParam('id',null);
-        $dokument_id = $this->getParam('dok_id',null);
+        $subjekt_id = $this->getParameter('id',null);
+        $dokument_id = $this->getParameter('dok_id',null);
 
         $model = new Subjekt();
         $subjekt = $subjekt_id === null ? null : $model->getInfo($subjekt_id);
 
         $this->template->Subjekt = $subjekt;
         $this->template->dokument_id = $dokument_id;
-        $this->template->FormUpravit = $this->getParam('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
         $this->template->subjektForm = $this['upravitForm'];
     }
 
@@ -351,7 +351,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
 
     public function renderIsdsid()
     {
-        $id = $this->getParam('id',null);
+        $id = $this->getParameter('id',null);
         
         if ( is_null($id) ) {
             exit;
@@ -447,9 +447,9 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
     // Nevraci zpet informaci (krome HTTP stavoveho kodu), predpoklada se, ze operace se vzdy provede uspesne
     public function actionZmenRezim()
     {
-        $subjekt_id = $this->getParam('id',null);
-        $dokument_id = $this->getParam('dok_id',null);
-        $typ = $this->getParam('typ',null);
+        $subjekt_id = $this->getParameter('id',null);
+        $dokument_id = $this->getParameter('dok_id',null);
+        $typ = $this->getParameter('typ',null);
         
         // Zmen typ propojeni
         $DokumentSubjekt = new DokumentSubjekt();

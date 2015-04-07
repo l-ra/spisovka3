@@ -36,7 +36,7 @@ class Spisovka_ZpravyPresenter extends BasePresenter {
     // Melo by byt implementovano jako Ajax akce
     public function actionPrecteno()
     {
-        $id = $this->getParam('id');
+        $id = $this->getParameter('id');
         if ( $id ) {
             // $Zpravy = new Zpravy();
             // $Zpravy->precteno($id);

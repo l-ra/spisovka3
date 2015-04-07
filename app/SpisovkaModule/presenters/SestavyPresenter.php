@@ -29,16 +29,16 @@ class Spisovka_SestavyPresenter extends BasePresenter
     
     public function actionPdf()
     {
-        $pc_od = $this->getParam('pc_od',null);
-        $pc_do = $this->getParam('pc_do',null);  
-        $d_od  = $this->getParam('d_od',null);
-        $d_do  = $this->getParam('d_do',null);        
-        $today = $this->getParam('d_today',null);
-        $rok   = $this->getParam('rok',null);
-        $pokracovat = $this->getParam('pokracovat', false);
+        $pc_od = $this->getParameter('pc_od',null);
+        $pc_do = $this->getParameter('pc_do',null);  
+        $d_od  = $this->getParameter('d_od',null);
+        $d_do  = $this->getParameter('d_do',null);        
+        $today = $this->getParameter('d_today',null);
+        $rok   = $this->getParameter('rok',null);
+        $pokracovat = $this->getParameter('pokracovat', false);
         
         @ini_set("memory_limit",PDF_MEMORY_LIMIT);
-        $sestava_id = $this->getParam('id',null);
+        $sestava_id = $this->getParameter('id',null);
         $this->forward('detail', 
                 array('view'=>'pdf', 'id'=>$sestava_id,
                       'pc_od'=>$pc_od, 'pc_do'=>$pc_do, 
@@ -49,14 +49,14 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function actionTisk()
     {
-        $pc_od = $this->getParam('pc_od',null);
-        $pc_do = $this->getParam('pc_do',null);  
-        $d_od  = $this->getParam('d_od',null);
-        $d_do  = $this->getParam('d_do',null);        
-        $today = $this->getParam('d_today',null);
-        $rok   = $this->getParam('rok',null);  
+        $pc_od = $this->getParameter('pc_od',null);
+        $pc_do = $this->getParameter('pc_do',null);  
+        $d_od  = $this->getParameter('d_od',null);
+        $d_do  = $this->getParameter('d_do',null);        
+        $today = $this->getParameter('d_today',null);
+        $rok   = $this->getParameter('rok',null);  
         
-        $sestava_id = $this->getParam('id',null);
+        $sestava_id = $this->getParameter('id',null);
         $this->forward('detail', 
                 array('view'=>'tisk','id'=>$sestava_id,
                       'pc_od'=>$pc_od, 'pc_do'=>$pc_do, 
@@ -69,7 +69,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         $Dokument = new Dokument();
 
-        $sestava = new Sestava($this->getParam('id'));
+        $sestava = new Sestava($this->getParameter('id'));
         $this->template->Sestava = $sestava;
 
         // info
@@ -174,15 +174,15 @@ class Spisovka_SestavyPresenter extends BasePresenter
         }
 
         // vstup
-        $pc_od = $this->getParam('pc_od');
-        $pc_do = $this->getParam('pc_do');
-        $d_od = $this->getParam('d_od');
-        $d_do = $this->getParam('d_do');
+        $pc_od = $this->getParameter('pc_od');
+        $pc_do = $this->getParameter('pc_do');
+        $d_od = $this->getParameter('d_od');
+        $d_do = $this->getParameter('d_do');
         
         if ( $d_od ) {
             try {
                 $d_od = date("Y-m-d", strtotime($d_od));
-                //$d_od = new DateTime($this->getParam('d_od',null));
+                //$d_od = new DateTime($this->getParameter('d_od',null));
             } catch (Exception $e) {
                 $d_od = null;
             }
@@ -190,20 +190,20 @@ class Spisovka_SestavyPresenter extends BasePresenter
         if ( $d_do ) {
             try {
                 $d_do = date("Y-m-d", strtotime($d_do)+86400 );
-                //$d_do = new DateTime($this->getParam('d_do',null));
+                //$d_do = new DateTime($this->getParameter('d_do',null));
             } catch (Exception $e) {
                 $d_do = null;
             }
         }
         
-        $today = $this->getParam('d_today',null);
+        $today = $this->getParameter('d_today',null);
         // dnesek
         if ( !empty($today) ) {
             $d_od = date("Y-m-d");
             $d_do = date("Y-m-d",time()+86400);
         }
                 
-        $rok = $this->getParam('rok', null);
+        $rok = $this->getParameter('rok', null);
         $this->template->rok = !empty($rok) ? $rok : date('Y');
 
         // podaci denik
@@ -272,7 +272,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $mnoho = count($seznam) > ($view == 'pdf' ? 100 : 500);
             $this->template->pocet_dokumentu = count($seznam);
             
-            if ( $mnoho && !$this->getParam('pokracovat', false) ) {
+            if ( $mnoho && !$this->getParameter('pokracovat', false) ) {
 
                 $this->template->prilis_mnoho = 1;
                 $seznam = array();
@@ -335,7 +335,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderUpravit()
     {
-        $sestava = new Sestava($this->getParam('id'));
+        $sestava = new Sestava($this->getParameter('id'));
         $this->template->sestava = $sestava;
         
         if (!$sestava->isModifiable()) {
@@ -650,7 +650,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function actionSmazat()
     {
-        $s = new Sestava($this->getParam('id'));
+        $s = new Sestava($this->getParameter('id'));
         
         try {
             $s->delete();
@@ -665,7 +665,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderFiltr()
     {
-        $this->template->id = $this->getParam('id');
+        $this->template->id = $this->getParameter('id');
     }
 
 }

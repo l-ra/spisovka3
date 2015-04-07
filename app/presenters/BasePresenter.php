@@ -21,8 +21,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                 }
                 if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
                     // asession ID je pouzito jenom u SSO prihlasovani
-                    $asession = $this->getParam('_asession');
-                    $alternative = $this->getParam('alternativelogin');
+                    $asession = $this->getParameter('_asession');
+                    $alternative = $this->getParameter('alternativelogin');
                     $this->forward(':Spisovka:Uzivatel:login', array('_asession'=>$asession, 'alternativelogin'=>$alternative));
                 }
 

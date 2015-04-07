@@ -126,8 +126,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $paginator->itemCount = count($result);
             
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -174,9 +174,9 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     public function renderDetail()
     {
-        $this->template->FormUpravit = $this->getParam('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
 
-        $spis_id = $this->getParam('id',null);
+        $spis_id = $this->getParameter('id',null);
         $Spisy = new Spis();
 
         $spis = $Spisy->getInfo($spis_id);
@@ -204,8 +204,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->template->spisForm = $this['upravitForm'];
         
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             $this->setLayout(false);
@@ -222,7 +222,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
     public function actionUpravit()
     {
         $session_spisplan = Nette\Environment::getSession('s3_spisplan');
-        $spis_id = $this->getParam('id',null);
+        $spis_id = $this->getParameter('id',null);
         if ( !is_null($spis_id) ) {
             // spis_id
         } else if ( !empty($session_spisplan->spis_id) ) {
@@ -248,8 +248,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
     public function actionStav()
     {
 
-        $spis_id = $this->getParam('id');
-        $stav = $this->getParam('stav');
+        $spis_id = $this->getParameter('id');
+        $stav = $this->getParameter('stav');
 
         $Spis = new Spis();
 

@@ -43,7 +43,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
 
         // Zmena osobnich udaju
-        $this->template->FormUpravit = $this->getParam('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
 
         $uzivatel = UserModel::getUser($user->id, true);
         if ($uzivatel->org_nazev === '')
@@ -51,7 +51,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->template->Uzivatel = $uzivatel;
 
         // Zmena hesla
-        $this->template->ZmenaHesla = $this->getParam('zmenitheslo',null);
+        $this->template->ZmenaHesla = $this->getParameter('zmenitheslo',null);
         Nette\Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$user->id));
         $Auth1 = Nette\Environment::getService('authenticator.UI');
         $Auth1->setAction('change_password');
@@ -135,10 +135,10 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     protected function _renderVyber()
     {
-        if ($this->getParam('chyba',null))
+        if ($this->getParameter('chyba',null))
             $this->template->chyba = 1;
             
-        $this->template->novy = $this->getParam('novy',0);
+        $this->template->novy = $this->getParameter('novy',0);
 
         $Zamestnanci = new Osoba2User();
         $seznam = $Zamestnanci->seznam();
@@ -151,7 +151,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     
     public function renderVyber()
     {            
-        $this->template->dokument_id = $dok_id = $this->getParam('dok_id',null);
+        $this->template->dokument_id = $dok_id = $this->getParameter('dok_id',null);
 
         $model = new Dokument();
         $dok = $model->getInfo($dok_id);
@@ -163,7 +163,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     
     public function renderVyberspis()
     {
-        $this->template->spis_id = $spis_id = $this->getParam('spis_id',null);
+        $this->template->spis_id = $spis_id = $this->getParameter('spis_id',null);
         $this->_renderVyber();
         // Zvazit do budoucna - jednotnou sablonu pro predani dokumentu i spisu
         // $this->setView('vyber');
@@ -173,7 +173,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     // Hleda jak uzivatele, tak org. jednotky
     public function actionSeznamAjax()
     {
-        $term = $this->getParam('term');
+        $term = $this->getParameter('term');
 
         $a1 = $this->_ojSeznam($term);
         $a2 = $this->_userSeznam($term);
@@ -188,7 +188,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     // Volano z modulu spisovna
     public function actionUserSeznamAjax()
     {        
-        $term = $this->getParam('term');
+        $term = $this->getParameter('term');
 
         echo json_encode($this->_userSeznam($term));
         exit;
@@ -252,13 +252,13 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     public function renderSpisvybrano()
     {
 
-        $osoba_id = $this->getParam('id',null);
-        $spis_id = $this->getParam('spis_id',null);
-        $user_id = $this->getParam('user',null);
-        $role_id = $this->getParam('role',null);
-        $orgjednotka_id = $this->getParam('orgjednotka',null);
-        $poznamka = $this->getParam('poznamka',null);
-        $novy = $this->getParam('novy',0);
+        $osoba_id = $this->getParameter('id',null);
+        $spis_id = $this->getParameter('spis_id',null);
+        $user_id = $this->getParameter('user',null);
+        $role_id = $this->getParameter('role',null);
+        $orgjednotka_id = $this->getParameter('orgjednotka',null);
+        $poznamka = $this->getParameter('poznamka',null);
+        $novy = $this->getParameter('novy',0);
 
         if ($orgjednotka_id === null)
             $orgjednotka_id = OrgJednotka::dejOrgUzivatele($user_id);
@@ -310,11 +310,11 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function renderVybrano()
     {
-        $dokument_id = $this->getParam('dok_id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('orgjednotka',null);
-        $poznamka = $this->getParam('poznamka',null);
-        $novy = $this->getParam('novy',0);
+        $dokument_id = $this->getParameter('dok_id',null);
+        $user_id = $this->getParameter('user',null);
+        $orgjednotka_id = $this->getParameter('orgjednotka',null);
+        $poznamka = $this->getParameter('poznamka',null);
+        $novy = $this->getParameter('novy',0);
 
         if ( $novy == 1 ) {
           echo '###predano###'. $dokument_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;

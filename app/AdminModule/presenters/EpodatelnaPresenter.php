@@ -70,7 +70,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $ep = self::nactiNastaveni();
 
         $id_alter = null;
-        $do = $this->getParam('do');
+        $do = $this->getParameter('do');
         if ( $do ) {
             $id_index = $this->getHttpRequest()->getPost('index');
             $id_typ = $this->getHttpRequest()->getPost('ep_typ','i');
@@ -78,7 +78,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
         
         
-        $id = $this->getParam('id',$id_alter);
+        $id = $this->getParameter('id',$id_alter);
         $typ = substr($id,0,1);
         $index = substr($id,1);
 
@@ -162,8 +162,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
 
         // Zmena udaju
-        $this->template->FormUpravit = $this->getParam('upravit',null);
-        $this->template->FormHesloISDS = $this->getParam('zmenit_heslo_isds',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
+        $this->template->FormHesloISDS = $this->getParameter('zmenit_heslo_isds',null);
 
         if ( $do ) {
             $this->template->Index = $this->getHttpRequest()->getPost('index');
@@ -187,7 +187,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
         $ep = self::nactiNastaveni();
 
-        $id = $this->getParam('id',null);
+        $id = $this->getParameter('id',null);
         $typ = substr($id,0,1);
         $index = substr($id,1);
         $isds = !empty($id) ? $ep['isds'][$index] : array();
@@ -380,12 +380,12 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
         $ep = self::nactiNastaveni();
 
-        $id = $this->getParam('id',null);
+        $id = $this->getParameter('id',null);
         $index = substr($id,1);
         $isds = !empty($id) ? $ep['isds'][$index] : array();
         
         
-        $id = $this->getParam('id',null);
+        $id = $this->getParameter('id',null);
         $index = substr($id,1);
 
         $form = new Nette\Application\UI\Form();
@@ -499,7 +499,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
         $ep = self::nactiNastaveni();
 
-        $id = $this->getParam('id',null);
+        $id = $this->getParameter('id',null);
         $typ = substr($id,0,1);
         $index = substr($id,1);
         $email = !empty($id) ? $ep['email'][$index] : array();
@@ -605,7 +605,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
         $ep = self::nactiNastaveni();
 
-        $id = $this->getParam('id',null);
+        $id = $this->getParameter('id',null);
         $typ = substr($id,0,1);
         $index = substr($id,1);
         $odes = !empty($id) ? $ep['odeslani'][$index] : array();
@@ -755,7 +755,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     public function actionSmazat()
     {
-        $id_schranky = $this->getParam('id');
+        $id_schranky = $this->getParameter('id');
 
         $config_data = self::nactiNastaveni();
 
@@ -772,7 +772,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     public function actionNovaschranka()
     {    
-        $typ = $this->getParam('typ', 'e');
+        $typ = $this->getParameter('typ', 'e');
         $config_data = self::nactiNastaveni();
         $config_data = $config_data->toArray();
         

@@ -44,8 +44,8 @@ class Admin_SpisznakPresenter extends BasePresenter
 
     public function renderDetail()
     {
-        $this->template->FormUpravit = $this->getParam('upravit',null);
-        $id = $this->getParam('id',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
+        $id = $this->getParameter('id',null);
 
         $SpisovyZnak = new SpisovyZnak();
         $this->spisznak = $SpisovyZnak->getInfo($id);
@@ -59,7 +59,7 @@ class Admin_SpisznakPresenter extends BasePresenter
 
     protected function _odebrat($odebrat_strom)
     {
-        $spisznak_id = $this->getParam('id',null);
+        $spisznak_id = $this->getParameter('id',null);
         $SpisovyZnak = new SpisovyZnak();
         $res = $SpisovyZnak->odstranit($spisznak_id, $odebrat_strom);
         if ( !$res )
@@ -154,7 +154,7 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         $SpisovyZnak = new SpisovyZnak();
         if ( empty($this->spisznak) ) {
-            $id = $this->getParam('id',null);
+            $id = $this->getParameter('id',null);
             if ($id !== null)
                 $spisznak = $SpisovyZnak->getInfo($id);
             else

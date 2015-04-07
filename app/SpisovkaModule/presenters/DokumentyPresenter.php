@@ -44,9 +44,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->template->Typ_evidence = $this->typ_evidence;
         
-        $filtr = $this->getParam('filtr');
-        $hledat = $this->getParam('hledat');
-        $seradit = $this->getParam('seradit');
+        $filtr = $this->getParameter('filtr');
+        $hledat = $this->getParameter('hledat');
+        $seradit = $this->getParameter('seradit');
 
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
@@ -151,8 +151,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $paginator->itemCount = count($result);
         
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk || $this->hromadny_tisk) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -283,7 +283,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Dokument = new Dokument();
 
         // Nacteni parametru
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
 
         $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
         if ( $dokument ) {
@@ -303,7 +303,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Predan = 0;
             $this->template->AccessEdit = 0;
             $this->template->AccessView = 0;
-            $formUpravit = $this->getParam('upravit',null);
+            $formUpravit = $this->getParameter('upravit',null);
             
             if ( count($dokument->workflow)>0 ) {
                 // uzivatel na dokumentu nekdy pracoval, tak mu dame moznost aspon nahlizet
@@ -417,7 +417,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             
             $this->template->FormUpravit = $this->template->AccessEdit ? $formUpravit : null;
 
-            $this->template->FormUdalost = $this->getParam('udalost',false) && $dokument->stav_dokumentu == 4;
+            $this->template->FormUdalost = $this->getParameter('udalost',false) && $dokument->stav_dokumentu == 4;
 
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
@@ -468,8 +468,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             
             
             // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParam('print');
-            $pdf = $this->getParam('pdfprint');
+            $tisk = $this->getParameter('print');
+            $pdf = $this->getParameter('pdfprint');
             if ( $tisk ) {
                 @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 $this->setLayout(false);
@@ -562,7 +562,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function actionPrevzit()
     {
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->predany($dokument_id) ) {
@@ -580,7 +580,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function actionZrusitprevzeti()
     {
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
@@ -599,7 +599,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     
     public function actionOdmitnoutprevzeti()
     {
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->predany($dokument_id) ) {
@@ -621,7 +621,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     
     public function actionKvyrizeni()
     {
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
@@ -658,9 +658,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function actionVyrizeno()
     {
 
-        $dokument_id = $this->getParam('id',null);
-        $user_id = $this->getParam('user',null);
-        $orgjednotka_id = $this->getParam('org',null);
+        $dokument_id = $this->getParameter('id',null);
+        $user_id = $this->getParameter('user',null);
+        $orgjednotka_id = $this->getParameter('org',null);
 
         $Workflow = new Workflow();
         if ( $Workflow->prirazeny($dokument_id) ) {
@@ -688,8 +688,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderCjednaci()
     {
-        $this->template->dokument_id = $this->getParam('id',null);
-        $this->template->evidence = $this->getParam('evidence',0);
+        $this->template->dokument_id = $this->getParameter('id',null);
+        $this->template->evidence = $this->getParameter('evidence',0);
     }
 
     // tato metoda slouží pouze pro sběrný arch
@@ -699,8 +699,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ($this->typ_evidence != 'sberny_arch')
                 throw new Exception("operace je platná pouze u typu evidence sběrný arch");
                 
-            $dokument_id = (int) $this->getParam('id',null);
-            $iniciacni_dokument_id = (int) $this->getParam('vlozit_do',null);
+            $dokument_id = (int) $this->getParameter('id',null);
+            $iniciacni_dokument_id = (int) $this->getParameter('vlozit_do',null);
 
             $Dokument = new Dokument();
 
@@ -753,8 +753,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function actionPridelitcj()
     {
 
-        $dokument_id = $this->getParam('id',null);
-        $cjednaci_id = $this->getParam('cislo_jednaci_id',null);
+        $dokument_id = $this->getParameter('id',null);
+        $cjednaci_id = $this->getParameter('cislo_jednaci_id',null);
 
         $Dokument = new Dokument();
         $dokument_info = $Dokument->getInfo($dokument_id);
@@ -843,8 +843,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->template->Typ_evidence = $this->typ_evidence;
 
-        $cisty = $this->getParam('cisty',0);
-        $spis_id = $this->getParam('spis_id',null);
+        $cisty = $this->getParameter('cisty',0);
+        $spis_id = $this->getParameter('spis_id',null);
         $rozdelany_dokument = null;
         
         if ( $cisty == 1 ) {
@@ -946,7 +946,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Dokumenty = new Dokument();
         
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
         $dok = $Dokumenty->getInfo($dokument_id);
 
         if ( $dok ) {
@@ -1117,8 +1117,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function renderDownload() 
     {
 
-        $dokument_id = $this->getParam('id',null);
-        $file_id = $this->getParam('file',null);
+        $dokument_id = $this->getParameter('id',null);
+        $file_id = $this->getParameter('file',null);
         
         $DokumentPrilohy = new DokumentPrilohy();
         $prilohy = $DokumentPrilohy->prilohy($dokument_id);
@@ -1157,7 +1157,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function renderHistorie()
     {
 
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
 
         $Log = new LogModel();
         $historie = $Log->historieDokumentu($dokument_id,1000);
@@ -1172,7 +1172,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Dokument = new Dokument();
 
         // Nacteni parametru
-        $dokument_id = $this->getParam('id',null);
+        $dokument_id = $this->getParameter('id',null);
         $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani");
 
         if ( $dokument ) {
@@ -1207,7 +1207,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->Vyrizovani = 0;
             }
 
-            $this->template->FormUpravit = $this->getParam('upravit',null);
+            $this->template->FormUpravit = $this->getParameter('upravit',null);
 
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
@@ -1248,7 +1248,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $this->template->error = 0;
         $this->template->vysledek = "";
-        $dokument_id = $this->getParam('id');
+        $dokument_id = $this->getParameter('id');
         if ( $dokument_id ) {
             $Dokument = new Dokument();
             $dokument_info = $Dokument->getInfo($dokument_id, "soubory");

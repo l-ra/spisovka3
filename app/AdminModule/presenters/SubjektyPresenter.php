@@ -85,7 +85,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         }
         
         // zobrazit podle pismena
-        $abc = $abcPaginator->getParam('abc');
+        $abc = $abcPaginator->getParameter('abc');
         if ( !empty($abc) ) {
             if ( isset($args['where']) ) {
                 $args['where'][] = array("nazev_subjektu LIKE %s OR prijmeni LIKE %s",$abc.'%',$abc.'%');
@@ -115,9 +115,9 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     {
         $this->template->title = " - Detail subjektu";
 
-        $this->template->FormUpravit = $this->getParam('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
 
-        $subjekt_id = $this->getParam('id',null);
+        $subjekt_id = $this->getParameter('id',null);
 
         $Subjekt = new Subjekt();
         $subjekt = $Subjekt->getInfo($subjekt_id);
@@ -129,7 +129,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     
     public function renderIsdsid()
     {
-        $id = $this->getParam('id',null);
+        $id = $this->getParameter('id',null);
         
         if ( is_null($id) ) {
             exit;

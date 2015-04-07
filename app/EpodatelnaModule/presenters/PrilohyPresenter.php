@@ -205,9 +205,9 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
     public function actionDownload()
     {
 
-        $epodatelna_id = $this->getParam('id',null);
-        $part = $this->getParam('file',null);
-        $string = $this->getParam('string',null);
+        $epodatelna_id = $this->getParameter('id',null);
+        $part = $this->getParameter('file',null);
+        $string = $this->getParameter('string',null);
 
         $res = $this->downloadEpodSource($epodatelna_id,2);
         $filename = basename($res);

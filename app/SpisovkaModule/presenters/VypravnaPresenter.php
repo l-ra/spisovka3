@@ -53,9 +53,9 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->template->zobraz_zrusit_filtr = !empty($filtr);
         
         // Volba vystupu - web/tisk/pdf
-        if ($this->getParam('print') || $this->getParam('print_balik')) {
+        if ($this->getParameter('print') || $this->getParameter('print_balik')) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $filtr_tisk = $this->getParam('print_balik') ? "balik" : "doporucene";
+            $filtr_tisk = $this->getParameter('print_balik') ? "balik" : "doporucene";
             $seznam = $Dokument->kOdeslani($seradit, $hledat, $filtr_tisk);
             $this->pdf_output = true;
             $this->template->count_page = ceil(count($seznam)/10);
@@ -176,12 +176,12 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     {
         
         $DokumentOdeslani = new DokumentOdeslani();
-        $id = $this->getParam('id');
+        $id = $this->getParameter('id');
         
         $dokument = $DokumentOdeslani->get($id);
         
         $this->template->dokument = $dokument;
-        $this->template->isPrint = $this->getParam('print');
+        $this->template->isPrint = $this->getParameter('print');
         
         $this->setLayout(false);
         
@@ -191,7 +191,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     {
         
         $DokumentOdeslani = new DokumentOdeslani();
-        $id = $this->getParam('id');
+        $id = $this->getParameter('id');
         
         $post_data = Nette\Environment::getHttpRequest()->getPost();
         if ( isset($post_data['datum_odeslani']) ) {
@@ -306,7 +306,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     public function actionReset()
     {
-        $what = $this->getParam('reset');
+        $what = $this->getParameter('reset');
         if ($what == 'hledat')
             UserSettings::remove('vypravna_hledat');
         elseif ($what == 'filtr')

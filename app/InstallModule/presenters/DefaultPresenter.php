@@ -7,7 +7,7 @@ class Install_DefaultPresenter extends BasePresenter
     
     public function startup() {
 
-        $this->no_install = $this->getParam("no_install", false);
+        $this->no_install = $this->getParameter("no_install", false);
         $this->template->no_install = $this->no_install;
         
         if ( $this->action == "kontrola" && $this->no_install ) {
@@ -574,7 +574,7 @@ class Install_DefaultPresenter extends BasePresenter
                 if ( empty($query) )
                                         continue;
 
-                if ( $this->getParam('install', null) ) {
+                if ( $this->getParameter('install', null) ) {
                     // provedeni SQL skriptu
                     $this->template->db_install = 1;
                     try {
@@ -629,7 +629,7 @@ class Install_DefaultPresenter extends BasePresenter
                 }
             }
 
-            if ($this->getParam('install', false)) {
+            if ($this->getParameter('install', false)) {
                 $this_installation = new Client_To_Update(CLIENT_DIR);
                 $this_installation->update_revision_number($latest_revision);
             }            

@@ -73,7 +73,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     
-                    if ( $this->getParam('typ') == 'odchozi' ) {
+                    if ( $this->getParameter('typ') == 'odchozi' ) {
                         $mpdf->SetHeader('Seznam odchozích zpráv||'.$this->template->Urad->nazev);
                     } else {
                         $mpdf->SetHeader('Seznam příchozích zpráv||'.$this->template->Urad->nazev);
@@ -108,8 +108,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $paginator->itemCount = count($result);
         
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -151,8 +151,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $paginator->itemCount = count($result);
         
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -194,8 +194,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $paginator->itemCount = count($result);
         
         // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParam('print');
-        $pdf = $this->getParam('pdfprint');
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
         if ( $tisk ) {
             @ini_set("memory_limit",PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -223,7 +223,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
 
-        $epodatelna_id = $this->getParam('id',null);
+        $epodatelna_id = $this->getParameter('id',null);
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
         if ( $zprava ) {
@@ -302,8 +302,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             
             
             // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParam('print');
-            $pdf = $this->getParam('pdfprint');
+            $tisk = $this->getParameter('print');
+            $pdf = $this->getParameter('pdfprint');
             if ( $tisk ) {
                 @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 $this->setLayout(false);
@@ -332,8 +332,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->actionDetail();
         
             // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParam('print');
-            $pdf = $this->getParam('pdfprint');
+            $tisk = $this->getParameter('print');
+            $pdf = $this->getParameter('pdfprint');
             if ( $tisk ) {
                 @ini_set("memory_limit",PDF_MEMORY_LIMIT);
                 $this->setLayout(false);
@@ -358,7 +358,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     {
         @set_time_limit(120); // z moznych dusledku vetsich poctu polozek je nastaven timeout
 
-        /* $id = $this->getParam('id',null);
+        /* $id = $this->getParameter('id',null);
         $typ = substr($id,0,1);
         $index = substr($id,1); */
 
@@ -1186,7 +1186,7 @@ dmFormat =
     {
         $this->template->error = 0;
         $this->template->vysledek = "";
-        $epodatelna_id = $this->getParam('id');
+        $epodatelna_id = $this->getParameter('id');
         if ( $epodatelna_id ) {
             $Epodatelna = new Epodatelna();
             $epodatelna_info = $Epodatelna->getInfo($epodatelna_id);

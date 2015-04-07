@@ -26,7 +26,7 @@ class Admin_PrilohyPresenter extends BasePresenter
         eval("\$DownloadFile = new ".$storage_conf->type."();");
 
         $FileModel = new FileModel();
-        $file_id = $this->getParam('id',null);
+        $file_id = $this->getParameter('id',null);
         if( strpos($file_id,'-') !== false ) {
             list($file_id, $file_version) = explode('-',$file_id);
             $file = $FileModel->getInfo($file_id, $file_version);

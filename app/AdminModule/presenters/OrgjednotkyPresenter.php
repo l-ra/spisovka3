@@ -53,14 +53,14 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     {
         $this->template->title = " - Detail organizační jednotky";
 
-        $orgjednotka_id = $this->getParam('id',null);
+        $orgjednotka_id = $this->getParameter('id',null);
         $OrgJednotka = new Orgjednotka();
 
         $org = $OrgJednotka->getInfo($orgjednotka_id);
         $this->template->OrgJednotka = $org;
 
         // Zmena udaju organizacni jednotky
-        $this->template->FormUpravit = $this->getParam('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit',null);
     }
 
 

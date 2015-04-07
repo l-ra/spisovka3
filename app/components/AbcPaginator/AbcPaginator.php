@@ -42,7 +42,7 @@ class AbcPaginator extends Nette\Application\UI\Control
                 }
             }
         
-        $this->template->current_letter = $this->getParam('abc');
+        $this->template->current_letter = $this->getParameter('abc');
         $this->template->url = $url;
         $this->template->query = $query_params;
         $this->template->js_function = false;
