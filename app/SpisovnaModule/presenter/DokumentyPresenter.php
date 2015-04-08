@@ -869,12 +869,9 @@ protected function createComponentVyrizovaniForm()
         $form->addSelect('seradit', 'Seřadit podle:', $select)
                 ->setValue($seradit)
                 ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
-        $form->addSubmit('go_seradit', 'Seřadit')
-                 // ->setRendered(TRUE)
-                 ->onClick[] = array($this, 'seraditClicked');
 
+        $form->onSuccess[] = array($this, 'seraditFormSucceeded');
 
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = null;
@@ -884,9 +881,8 @@ protected function createComponentVyrizovaniForm()
         return $form;
     }
 
-    public function seraditClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function seraditFormSucceeded(Nette\Application\UI\Form $form, $form_data)
     {
-        $form_data = $button->getForm()->getValues();
         $this->getHttpResponse()->setCookie('s3_spisovna_seradit', $form_data['seradit'], strtotime('90 day'));
         $this->redirect(':Spisovna:Dokumenty:default', array('seradit'=>$form_data['seradit']) );
     }
