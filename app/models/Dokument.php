@@ -1392,8 +1392,11 @@ class Dokument extends BaseModel
                 $dokument->odeslani = $DokOdeslani->odeslaneZpravy($dokument_id);
             }
 
-            $dokument->prideleno = null;
-            $dokument->predano = null;
+            /* Dulezite: Toto nesmime nastavit na null, protoze
+               funkce isset potom vraci true
+                $dokument->prideleno = null;
+                $dokument->predano = null;
+            */
             $prideleno = $predano = $stav = 0;
             if ( count($dokument->workflow)>0 ) {
                 foreach ($dokument->workflow as $wf)

@@ -220,7 +220,7 @@
         {/if}
         {/foreach}
         {/if}         
-        {if is_null($Dok->prideleno)}
+        {if !isset($Dok->prideleno)}
         <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
         {else}
         <dl class="detail_item">
@@ -247,7 +247,7 @@
         </dl>
         {/if}
 
-        {if !is_null($Dok->predano)}
+        {if isset($Dok->predano)}
         <dl class="detail_item">
             <dt>Předáno:</dt>
             <dd>

@@ -211,7 +211,7 @@
         {/if}
         {/foreach}
         {/if}        
-        {if is_null($Dok->prideleno)}
+        {if !isset($Dok->prideleno)}
         <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
         {else}
         <dl class="detail_item">
