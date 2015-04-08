@@ -2,8 +2,6 @@
 
 class Acl extends Nette\Security\Permission {
 
-    private static $instance = false;
-
     public function __construct() {
 
         static $pass = 0;
