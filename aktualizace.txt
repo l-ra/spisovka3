@@ -6,52 +6,37 @@ Aktualizace OSS Spisove sluzby v3
 ********************************************************************************
 ********************************************************************************
 
+1) Migrace z verze 2.1.x
 
-1) Aktualizace z verze 3.0.0
-
-Detailni postup je popsan v samostatnem dokumentu Spisovka3-upgrade.pdf, ktery 
-je soucasti specialniho balicku pro update spisovka_3.0.x_aktualizace.zip - 
-obsahuje aktualizacni skript - aktualizace.php a pro zmenu neobsahuje veskere 
-konfiguracni adresare, aby v pripade rozbaleni primo v hlavnim adresari spisovky 
-nedoslo k prepsani Vasich konfiguracnich souboru
+Prejdete na soubor migrace.txt.
 
 
-2) Aktualizace od verze 3.0.x a vys
+2) Aktualizace z verze 3.0.1 a novejsi
 
 Upozorneni:
 Z verze 3.0.x neni mozne primo aktualizovat na verzi 3.4 a novejsi. Je potreba
 nejprve nainstalovat verzi 3.3. Pokud to je mozne, je doporuceno z verze 3.0.x
 neupgradovat a vytvorit novou instalaci.
 
-Zde nedochazi ke zmenam adresarove struktury, upgrade je velmi jednoduchy:
+Postup upgrade je jednoduchy:
 
-- zaloha celeho adresare se Spisovkou
-- zaloha databaze
-- pred rozbalenim instalacniho balicku je potreba smazat obsah adresaru "app"
-  "libs", "public" a "help" jelikoz je mozne, ze v nove verzi aplikace jiz nektere soubory
-  neexistuji nebo byly presunuty do jineho umisteni
-- rozbaleni instalacniho balicku spisovka_3.x.x.zip do Vaseho 
-adresare se spisovkou, pri dotazu na prepsani existujicich souboru potvrdit Ano
-- dle navodu v souboru aktualizace.php upravit skript aktualizace.php 
-(standalone, multisite, cesty apod.)
+- zaloha celeho adresare se Spisovkou (dle uvazeni)
+- zaloha databaze (doporucujeme)
+
+- pred rozbalenim instalacniho balicku je potreba smazat vsechny adresare
+  MIMO "client" a "log", jelikoz je mozne, ze v nove verzi aplikace
+  jiz nektere soubory neexistuji nebo byly presunuty do jineho umisteni
+- rozbaleni instalacniho balicku spisovka_3.x.x.zip do Vaseho adresare
+  se spisovkou, pri dotazu na prepsani existujicich souboru potvrdit Ano
+  
 - spustit skript aktualizace.php - napr: http://10.0.0.10/spisovka3/aktualizace.php
-- zkontrolovat zda skript nabizi nejake zmeny, upravy v databazi (je mozne, ze 
-konkretni aktualizacni balik zadne zmeny v DB nemusi nabizet, ale pro jistotu 
-zkontrolujte)
+- postupovat podle instrukci na obrazovce
+- smazat obsah adresare client/temp (obvykle to provede aktualizacni skript,
+  ale ne vzdy)
 
+Dulezite upozorneni:
 
-3) Aktualizace z verze 2.1.x na 3.x.x
-
-Prejdete na soubor migrace.txt
-
-
-
-Dulezite upozorneni!
-
-Pri aktualizaci vzdy prepiste stare soubory novymi, tyka se hlavne adresaru 
-/app a /libs. Zalohu provadejte mimo adresar spisovky. Nedelejte zadne soubory 
-typu SpisyPresenter.php.bak apod. Muze potom dojit ke znefunkcneni cele aplikace!
-Framework Nette prohlizi obsahy vsech souboru v aplikacni casti, ty zpracuje a 
-pak teprve vykonava. Mohou tak vznikat duplicity v definicich apod., pruvodnim 
-jevem je okno debuggeru se znamou cervenou radkou.
+Pri aktualizaci vzdy prepiste stare soubory novymi. Zalohu ulozte mimo
+adresar spisovky. Nevytvarejte zadne soubory typu SpisyPresenter.php.bak apod.
+Mohlo by potom dojit ke znefunkcneni cele aplikace.
  
