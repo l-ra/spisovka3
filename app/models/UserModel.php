@@ -172,9 +172,9 @@ class UserModel extends BaseModel
         }
     }
 
-    public function zmenitHeslo($user_id, $password, $local = null) {
+    public function changePassword($user_id, $password) {
 
-        $user = $this->select(array(array('id=%i',$user_id)))->fetch();
+        $user = $this->select([['id=%i', $user_id]])->fetch();
 
         // zabran, aby uzivatel mohl u dema menit heslo k urcitym uctum
         if (Demo::isDemo() && !Demo::canChangePassword($user))
@@ -188,16 +188,17 @@ class UserModel extends BaseModel
             $row['password'] = sha1($user->username . $password);
         }
 
-        if ( !is_null($local) ) {
-            $row['local'] = $local;
-        }
-
-        //Nette\Diagnostics\Debugger::dump($row); exit;
-
-        return $this->update($row,array('id=%i',$user_id));
-
+        $this->update($row, array('id=%i', $user_id));
+        return true;
     }
 
+    public function changeAuthType($user_id, $auth_type) {
+        
+        $change = ['local' => $auth_type];
+        $change['last_modified'] = new DateTime();
+        $this->update($change, array('id=%i', $user_id));        
+    }
+    
     public function zalogovan($user_id) {
 
         $row = array('last_login' => new DateTime(),

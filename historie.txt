@@ -11,6 +11,7 @@ Nové funkce:
 
 Jiné změny:
 
+- aplikace je nyní podporována na PHP verze 5.4 a 5.5
 - přepsána velká část Javascriptu starající se o dynamické změny na stránce.
   Tzv. rotující kolečko by se nyní mělo spolehlivě zobrazovat a skrývat, když
   aplikace zpracovává požadavek nebo nahrává data na pozadí.

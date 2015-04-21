@@ -1,35 +1,21 @@
+includes:
+    - database.neon
+
 php:
     date.timezone = "Europe/Prague"
 
 parameters:
 
-    demo = true
     # clean_url = true
 
-    database:
-        driver   = mysqli
-        host     = localhost
-        username = 
-        password = 
-        database = 
-        charset  = utf8
-        prefix   = 
-        profiler = true
-        cache    = true
-        sqlmode  = 
-
-    service:
-        Nette-Security-IAuthenticator = Auth_Component_Basic
-
-    authenticator:
-        ldap:
-            server =
-            port = 389
-            baseDN = "dc=,dc=cz"
-            rdn_prefix = "uid="
-            rdn_postfix = ",ou=users,dc=,dc=cz"
-            user = "cn=,dc=,dc=cz"
-            pass = ""
+    ldap:
+        server = localhost
+        port = 389
+        base_dn = "ou=people,dc=company,dc=cz"
+        user_rdn = "uid=%%username%%"
+        search_dn =
+        search_password =
+        search_filter = '(objectClass=inetOrgPerson)'
 
     storage:
         type = Storage_Basic
@@ -37,6 +23,10 @@ parameters:
         epodatelna_dir = /files/epodatelna
 
 services:
-    authenticator = Authenticator_Basic
     authorizator = Acl
+    authenticator = Authenticator_Basic
+    authenticatorUI = Authenticator_UI
+#    userImport = Import_LDAP
+    ldap = Spisovka_LDAP(%ldap%)
     nette.presenterFactory = PresenterFactory(%appDir%, ...)
+    

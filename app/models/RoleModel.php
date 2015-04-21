@@ -8,7 +8,16 @@ class RoleModel extends TreeModel
     protected $nazev_sekvence = 'code';
     protected $primary = 'id';
 
-
+    public function getDefaultRole()
+    {
+        $role_id = dibi::query(
+            "SELECT id  FROM [{$this->name}] WHERE code = 'referent'"
+        )->fetchSingle();
+        if (!$role_id)
+            throw new Exception ('Role \'pracovník\' neexistuje!');
+        return $role_id;
+    }
+            
     public function seznam()
     {
         $query = dibi::query(

@@ -5,7 +5,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function actionLogin()
     {
-        $Auth = Nette\Environment::getService('authenticator.UI');
+        $Auth = $this->context->createService('authenticatorUI');
         $Auth->setAction('login');
         $this->addComponent($Auth, 'auth');
 
@@ -14,10 +14,11 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     public function renderLogout()
     {
-        $user = Nette\Environment::getUser()->getIdentity()->username;
-        Nette\Environment::getUser()->logout();
+        $user = $this->user;
+        $username = $user->getIdentity()->username;
+        $user->logout();
         // Hack - cookie kontroluji nektere alternativni autentikatory pri zobrazovani prihlasovaciho dialogu
-        $this->getHttpResponse()->setCookie('s3_logout', $user, strtotime('10 minute'));
+        $this->getHttpResponse()->setCookie('s3_logout', $username, strtotime('10 minute'));
         $this->flashMessage('Byl jste úspěšně odhlášen.');
 
         // P.L. Je-li to mozne, vrat se presne na stranku, kde byl uzivatel, nez kliknul na odhlasit
@@ -37,7 +38,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     {
         $Osoba = new Osoba();
 
-        $user = Nette\Environment::getUser()->getIdentity();
+        $user = $this->user->getIdentity();
         
         $osoba_id = $user->identity->id;
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
@@ -52,9 +53,10 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
         // Zmena hesla
         $this->template->ZmenaHesla = $this->getParameter('zmenitheslo',null);
-        Nette\Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$user->id));
-        $Auth1 = Nette\Environment::getService('authenticator.UI');
+
+        $Auth1 = $this->context->createService('authenticatorUI');
         $Auth1->setAction('change_password');
+        $Auth1->setParams(['osoba_id' => $osoba_id, 'user_id' => $user->id]);
         $this->addComponent($Auth1, 'auth_change_password');
 
         $role = UserModel::getRoles($uzivatel->id);

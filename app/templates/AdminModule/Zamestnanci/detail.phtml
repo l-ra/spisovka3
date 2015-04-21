@@ -51,6 +51,14 @@
         {if ($ZmenaHesla === $u->id)}
         {control changePasswordForm}
         {/if}
+        {if ($ZmenaPrihlaseni === $u->id)}
+        {control changeAuthTypeForm}
+        {elseif $remote_auth_supported}
+        <dl class="detail_item">
+            <dt>Ověření hesla:</dt>
+            <dd>{$u->local ? 'externí' : 'lokální'}&nbsp;</dd>
+        </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Poslední přihlášení:</dt>
             <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}&nbsp;</dd>
@@ -102,13 +110,19 @@
         <dl class="detail_item">
             <dt>&nbsp;</dt>
             <dd>
-                <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'heslo'}">Změnit heslo</a>
+                {if $u->local != 1}
+                <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'heslo'}">Změnit {if $remote_auth_supported}lokální {/if}heslo</a>
                 &nbsp;&nbsp;&nbsp;
-                <a href="{link this, 'id'=>$Osoba->id, 'odebrat'=>$u->id}" onclick="return confirm('Opravdu chcete smazat tento účet?');">Smazat účet</a>
+                {/if}
+                {if $remote_auth_supported}
+                <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'typ_auth'}">Změnit ověření hesla</a>
                 &nbsp;&nbsp;&nbsp;
+                {/if}
                 <a href="{link this, 'id'=>$Osoba->id, 'role'=>$u->id}">Změnit role</a>
                 &nbsp;&nbsp;&nbsp;
                 <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'org'}">Změnit organizační jednotku</a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="{link this, 'id'=>$Osoba->id, 'odebrat'=>$u->id}" onclick="return confirm('Opravdu chcete smazat tento účet?');">Smazat účet</a>
 
             </dd>
         </dl>

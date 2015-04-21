@@ -159,9 +159,9 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'PHP verze',
                 'required' => TRUE,
-                'passed' => version_compare(PHP_VERSION, '5.3.2', '>='),
+                'passed' => version_compare(PHP_VERSION, '5.4.0', '>='),
                 'message' => PHP_VERSION,
-                'description' => 'Používáte starou verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.3.2 nebo vyšší.',
+                'description' => 'Používáte starou verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.4 nebo 5.5.',
             ),
 
             array(
@@ -1016,7 +1016,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         unset($data['username'], $data['heslo'], $data['heslo_potvrzeni']);
 
-        $auth = new Authenticator_Base();
+        $auth = new Authenticator_UI();
         
         if (!$auth->vytvoritUcet((array)$data, $user_data, true)) {
             $this->flashMessage('Správce se nepodařilo vytvořit.', 'warning');

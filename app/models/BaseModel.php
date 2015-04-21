@@ -399,7 +399,7 @@ abstract class BaseModel extends Nette\Object
      * Updates a row
      * @param array $values to insert
      * @param array $where
-     * @return
+     * @return mixed  zavisi na databazovem ovladaci, nepouzivat!
      */
     public function update($values, $where = null)
     {

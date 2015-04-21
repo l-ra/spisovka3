@@ -97,22 +97,34 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                 $this->template->ZmenaHesla = (int)$user_id;
             }
         }
-        $Auth = Nette\Environment::getService('authenticator.UI');
+        
+        $this->template->remote_auth_supported = $this->context->getService('authenticator')->supportsRemoteAuth();
+
+        $Auth = $this->context->createService('authenticatorUI');
         $Auth->setAction('change_password');
-        Nette\Environment::setVariable('auth_params_change', array('osoba_id'=>$osoba_id,'user_id'=>$user_id, 'admin'=>1));
+        $Auth->setParams(['osoba_id'=>$osoba_id, 'user_id'=>$user_id]);
         $this->addComponent($Auth, 'changePasswordForm');            
 
-
+        
         // Vytvoreni uctu
         $vytvorit_ucet = $this->getParameter('new_user',null);
         if ( !is_null($vytvorit_ucet) ) {
             $this->template->vytvoritUcet = 1;
         }
-        $Auth2 = Nette\Environment::getService('authenticator.UI.2');
+        $Auth2 = $this->context->createService('authenticatorUI');
         $Auth2->setAction('new_user');
-        Nette\Environment::setVariable('auth_params_new', array('osoba_id'=>$osoba_id));
+        $Auth2->setParams(['osoba_id' => $osoba_id]);
         $this->addComponent($Auth2, 'newUserForm');
-
+        
+        // Zmena prihlaseni
+        $this->template->ZmenaPrihlaseni = 
+                $this->getParameter('upravit', '') == 'typ_auth'
+                ? (int)$user_id : false;
+        $Auth3 = $this->context->createService('authenticatorUI');
+        $Auth3->setAction('change_auth');
+        $Auth3->setParams(['osoba_id' => $osoba_id, 'user_id' => $user_id]);
+        $this->addComponent($Auth3, 'changeAuthTypeForm');
+        
         // Odebrani uctu
         $odebrat_ucet = $this->getParameter('odebrat', false);
         if ($odebrat_ucet) {
@@ -151,7 +163,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     public function actionSync()
     {
-        $Auth = Nette\Environment::getService('authenticator.UI');
+        $Auth = $this->context->createService('authenticatorUI');
         $Auth->setAction('sync');
         $this->addComponent($Auth, 'syncForm');
 
