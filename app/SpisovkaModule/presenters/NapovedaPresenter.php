@@ -51,11 +51,7 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
                 $tmp->url = "napoveda/$param1/$param2/$param3";                
             $tmp->code = "$param1/$param2/$param3";
 
-            eval("\$dirs['". $param1 ."']['". $param2 ."']['". $param3 ."'] = \$tmp;");
-
-            //echo "    \$help_name['". $tmp->url ."'] = '';<br>";
-            unset($tmp,$param1,$param2,$param3);
-            //echo $file ." = ". implode(" - ", $file_part) ."\n";
+            $dirs[$param1][$param2][$param3] = $tmp;
         }
 
         return $dirs;
