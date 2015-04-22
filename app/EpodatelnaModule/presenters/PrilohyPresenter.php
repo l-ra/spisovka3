@@ -5,8 +5,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
     public function downloadSource($file_id, $typ = 2)
     {
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$DownloadFile = new ".$storage_conf->type."();");
+        $DownloadFile = $this->context->getService('storage');
 
         $FileModel = new FileModel();
         $file = $FileModel->getInfo($file_id);
@@ -18,8 +17,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
     public function downloadEpodSource($epodatelna_id, $typ = 2)
     {
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$DownloadFile = new ".$storage_conf->type."();");
+        $DownloadFile = $this->context->getService('storage');
 
         $Epod = new Epodatelna();
         $FileModel = new FileModel();

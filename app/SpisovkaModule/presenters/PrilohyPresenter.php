@@ -43,8 +43,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         if ( $DokumentPrilohy->odebrat($dokument_id, $file_id) ) {
         
-            $storage_conf = Nette\Environment::getConfig('storage');
-            eval("\$UploadFile = new ".$storage_conf->type."();");
+            $UploadFile = $this->context->getService('storage');
             
             try {
                 $UploadFile->remove($file_id);
@@ -119,8 +118,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $data['dir'] = date('Y') .'/DOK-'. sprintf('%06d',$dokument_id) .'-'.date('Y');
 
         // Nacteni rozhrani pro upload dle nastaveni
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$UploadFile = new ".$storage_conf->type."();");
+        $UploadFile = $this->context->getService('storage');
 
         try {
 
@@ -223,8 +221,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         if ( $upload->error == 0 ) {
             // Nacteni rozhrani pro upload dle nastaveni
-            $storage_conf = Nette\Environment::getConfig('storage');
-            eval("\$UploadFile = new ".$storage_conf->type."();");
+            $UploadFile = $this->context->getService('storage');
 
             if ( $file = $UploadFile->uploadDokument($data) ) {
                 $FileModel = new FileModel();

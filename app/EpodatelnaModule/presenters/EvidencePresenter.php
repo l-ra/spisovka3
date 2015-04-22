@@ -713,8 +713,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $EvidencePrilohy = new Epodatelna_PrilohyPresenter();
         $prilohy = $EvidencePrilohy->emailPrilohy($epodatelna_id);
         
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$UploadFile = new ".$storage_conf->type."();");
+        $UploadFile = $this->context->getService('storage');
 
         $DokumentFile = new DokumentPrilohy();
 
@@ -790,8 +789,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $EvidencePrilohy = new Epodatelna_PrilohyPresenter();
         $prilohy = $EvidencePrilohy->isdsPrilohy($epodatelna_id);
 
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$UploadFile = new ".$storage_conf->type."();");
+        $UploadFile = $this->context->getService('storage');
 
         $DokumentFile = new DokumentPrilohy();
 

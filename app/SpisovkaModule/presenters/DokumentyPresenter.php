@@ -1124,8 +1124,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $prilohy = $DokumentPrilohy->prilohy($dokument_id);
         if ( array_key_exists($file_id, $prilohy) ) {
 
-            $storage_conf = Nette\Environment::getConfig('storage');
-            eval("\$DownloadFile = new ".$storage_conf->type."();");
+            $DownloadFile = $this->context->getService('storage');
             $FileModel = new FileModel();
             $file = $FileModel->getInfo($file_id);
             $res = $DownloadFile->download($file);
@@ -1262,8 +1261,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             $nalezeno = 1;
                             
                             // Nacteni originalu DS
-                            $storage_conf = Nette\Environment::getConfig('storage');
-                            eval("\$DownloadFile = new ".$file->real_type."();");
+                            $DownloadFile = $this->context->getService('storage');
                             $source = $DownloadFile->download($file,1);
                             //echo $source;
                             if ( $source ) {
@@ -2042,8 +2040,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ( isset($post_data['prilohy'])) {
             if ( count($post_data['prilohy'])>0 ) {
 
-                $storage_conf = Nette\Environment::getConfig('storage');
-                eval("\$DownloadFile = new ".$storage_conf->type."();");
+                $DownloadFile = $this->context->getService('storage');
 
                 foreach ($post_data['prilohy'] as $file_id => $status) {
                     $priloha = $File->getInfo($file_id);
@@ -2307,8 +2304,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             // Do epodatelny
-            $storage_conf = Nette\Environment::getConfig('storage');
-            eval("\$UploadFile = new ".$storage_conf->type."();");
+            $UploadFile = $this->context->getService('storage');
 
             // nacist email z ImapClient
             $imap = new ImapClientFile();
@@ -2522,8 +2518,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitlePoint ."\n";//  =
 
             // Do epodatelny
-            $storage_conf = Nette\Environment::getConfig('storage');
-            eval("\$UploadFile = new ".$storage_conf->type."();");
+            $UploadFile = $this->context->getService('storage');
 
             $Epodatelna = new Epodatelna();
             $config = $isds->getConfig();

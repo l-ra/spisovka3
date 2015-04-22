@@ -539,8 +539,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $tmp = array();
             $user = $this->user->getIdentity();
 
-            $storage_conf = Nette\Environment::getConfig('storage');
-            eval("\$UploadFile = new ".$storage_conf->type."();");
+            $UploadFile = $this->context->getService('storage');
             
             $pocet_novych_zprav = 0;
             $zpravy = $isds->seznamPrichozichZprav($od, $do);
@@ -840,8 +839,7 @@ dmFormat =
                 $tmp = array();
                 $user = $this->user->getIdentity();
 
-                $storage_conf = Nette\Environment::getConfig('storage');
-                eval("\$UploadFile = new ".$storage_conf->type."();");
+                $UploadFile = $this->context->getService('storage');
 
                 foreach($zpravy as $mess) {
 
@@ -972,8 +970,7 @@ dmFormat =
         $tmp = array();
         $user = $this->user->getIdentity();
 
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$UploadFile = new ".$storage_conf->type."();");
+        $UploadFile = $this->context->getService('storage');
 
         $zpravy = $imap->get_head_messages();
         
@@ -1120,8 +1117,7 @@ dmFormat =
 
     public function nactiISDS($file_id)
     {
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$DownloadFile = new ".$storage_conf->type."();");
+        $DownloadFile = $this->context->getService('storage');
 
         if ( strpos($file_id,"-") !== false ) {
             list($file_id, $part) = explode("-",$file_id);
@@ -1142,8 +1138,7 @@ dmFormat =
     public function nactiEmail($file_id, $output = 0)
     {
 
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$DownloadFile = new ".$storage_conf->type."();");
+        $DownloadFile = $this->context->getService('storage');
 
         if ( strpos($file_id,"-") !== false ) {
             list($file_id,$part) = explode("-",$file_id);
@@ -1198,8 +1193,7 @@ dmFormat =
                     if ( $file ) {
                     
                         // Nacteni originalu DS
-                        $storage_conf = Nette\Environment::getConfig('storage');
-                        eval("\$DownloadFile = new ".$file->real_type."();");
+                        $DownloadFile = $this->context->getService('storage');
                         $source = $DownloadFile->download($file,1);
                         
                         if ( $source ) {

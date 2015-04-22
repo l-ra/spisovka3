@@ -15,18 +15,19 @@ parameters:
         user_rdn = "uid=%%username%%"
         search_dn =
         search_password =
-        search_filter = '(objectClass=inetOrgPerson)'
+        search_filter = "(objectClass=inetOrgPerson)"
+        attribute_map:
 
-    storage:
-        type = Storage_Basic
-        dokument_dir = /files/dokumenty
-        epodatelna_dir = /files/epodatelna
+    storage_configuration:
+        path_documents = files/dokumenty
+        path_epodatelna = files/epodatelna
 
 services:
     authorizator = Acl
     authenticator = Authenticator_Basic
     authenticatorUI = Authenticator_UI
-#    userImport = Import_LDAP
+    # userImport = Import_LDAP
     ldap = Spisovka_LDAP(%ldap%)
     nette.presenterFactory = PresenterFactory(%appDir%, ...)
+    storage = Storage_Basic(%storage_configuration%)
     

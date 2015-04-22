@@ -21,10 +21,8 @@ class Admin_PrilohyPresenter extends BasePresenter
 
     public function actionDownload()
     {
-
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$DownloadFile = new ".$storage_conf->type."();");
-
+        $DownloadFile = $this->context->getService('storage');
+                
         $FileModel = new FileModel();
         $file_id = $this->getParameter('id',null);
         if( strpos($file_id,'-') !== false ) {
@@ -91,8 +89,7 @@ class Admin_PrilohyPresenter extends BasePresenter
         $upload = $data['file'];
 
         // Nacteni rozhrani pro upload dle nastaveni
-        $storage_conf = Nette\Environment::getConfig('storage');
-        eval("\$UploadFile = new ".$storage_conf->type."();");
+        $UploadFile = $this->context->getService('storage');
 
         if ( $file = $UploadFile->uploadDokument($data) ) {
             $this->flashMessage('Soubor "'. $file->nazev .'" úspěšně nahrán.');

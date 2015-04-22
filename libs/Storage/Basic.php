@@ -3,21 +3,23 @@
 
 class Storage_Basic extends FileModel {
 
-    private $dokument_dir = '';
-    private $epodatelna_dir = '';
+    private $dokument_dir;
+    private $epodatelna_dir;
 
     private $error_message;
     private $error_code;
 
 
-    public function  __construct() {
+    public function  __construct(array $params) {
 
         parent::__construct();
 
-        $storage_conf = Nette\Environment::getConfig('storage');
-        $this->dokument_dir = $storage_conf->dokument_dir;
-        $this->epodatelna_dir = $storage_conf->epodatelna_dir;
-        
+        $this->dokument_dir = $params['path_documents'];
+        $this->epodatelna_dir = $params['path_epodatelna'];
+        if ($this->dokument_dir{0} != '/')
+            $this->dokument_dir = CLIENT_DIR . "/" . $this->dokument_dir;
+        if ($this->epodatelna_dir{0} != '/')
+            $this->epodatelna_dir = CLIENT_DIR . "/" . $this->epodatelna_dir;
     }
 
     public function remove($file_id) {
@@ -37,24 +39,24 @@ class Storage_Basic extends FileModel {
 
         if ( isset($data['dir']) ) {
 
-            if ( !file_exists(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
+            if ( !file_exists($this->dokument_dir . "/" .$data['dir']) ) {
                 $old = umask(0);
-                mkdir(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir'], 0777, true);
+                mkdir($this->dokument_dir . "/" .$data['dir'], 0777, true);
                 umask($old);
             }
-            if ( is_writeable(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
-                $file_dir = CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir'];
+            if ( is_writeable($this->dokument_dir . "/" .$data['dir']) ) {
+                $file_dir = $this->dokument_dir . "/" .$data['dir'];
             } else {
-                $file_dir = CLIENT_DIR .''. $this->dokument_dir;
+                $file_dir = $this->dokument_dir;
             }
         } else {
-            if ( !file_exists(CLIENT_DIR .''. $this->dokument_dir . "") ) {
+            if ( !file_exists($this->dokument_dir . "") ) {
                 $old = umask(0);
-                mkdir(CLIENT_DIR .''. $this->dokument_dir . "", 0777, true);
+                mkdir($this->dokument_dir . "", 0777, true);
                 umask($old);
             }
-            if ( is_writeable(CLIENT_DIR .''. $this->dokument_dir) ) {
-                $file_dir = CLIENT_DIR .''. $this->dokument_dir;
+            if ( is_writeable($this->dokument_dir) ) {
+                $file_dir = $this->dokument_dir;
             } else {
                 $this->error_code = '0';
                 $this->error_message = 'Soubor nelze uložit do adresáře.';
@@ -64,7 +66,7 @@ class Storage_Basic extends FileModel {
 
         $file = Nette\Utils\Strings::webalize($upload->getName(),'.');
         $fileName = $file_dir . "/" . $file;
-        //$fileName = CLIENT_DIR .''. $this->dokument_dir . "/" . Nette\Utils\Strings::webalize($upload->getName(),'.');
+        //$fileName = $this->dokument_dir . "/" . Nette\Utils\Strings::webalize($upload->getName(),'.');
 
         // test existence souboru
         $fileName = $this->fileExists($fileName);
@@ -126,24 +128,24 @@ class Storage_Basic extends FileModel {
 
         if ( isset($data['dir']) ) {
 
-            if ( !file_exists(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
+            if ( !file_exists($this->dokument_dir . "/" .$data['dir']) ) {
                 $old = umask(0);
-                mkdir(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir'], 0777, true);
+                mkdir($this->dokument_dir . "/" .$data['dir'], 0777, true);
                 umask($old);
             }
-            if ( is_writeable(CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir']) ) {
-                $file_dir = CLIENT_DIR .''. $this->dokument_dir . "/" .$data['dir'];
+            if ( is_writeable($this->dokument_dir . "/" .$data['dir']) ) {
+                $file_dir = $this->dokument_dir . "/" .$data['dir'];
             } else {
-                $file_dir = CLIENT_DIR .''. $this->dokument_dir;
+                $file_dir = $this->dokument_dir;
             }
         } else {
-            if ( !file_exists(CLIENT_DIR .''. $this->dokument_dir . "") ) {
+            if ( !file_exists($this->dokument_dir . "") ) {
                 $old = umask(0);
-                mkdir(CLIENT_DIR .''. $this->dokument_dir . "", 0777, true);
+                mkdir($this->dokument_dir . "", 0777, true);
                 umask($old);
             }
-            if ( is_writeable(CLIENT_DIR .''. $this->dokument_dir) ) {
-                $file_dir = CLIENT_DIR .''. $this->dokument_dir;
+            if ( is_writeable($this->dokument_dir) ) {
+                $file_dir = $this->dokument_dir;
             } else {
                 $this->error_code = '0';
                 $this->error_message = 'Soubor nelze uložit do adresáře.';
@@ -213,24 +215,24 @@ class Storage_Basic extends FileModel {
     public function uploadEpodatelna($source, $data) {
 
         if ( isset($data['dir']) ) {
-            if ( !file_exists(CLIENT_DIR .''. $this->epodatelna_dir . "/" .$data['dir']) ) {
+            if ( !file_exists($this->epodatelna_dir . "/" .$data['dir']) ) {
                 $old = umask(0);
-                mkdir(CLIENT_DIR .''. $this->epodatelna_dir . "/" .$data['dir'], 0777, true);
+                mkdir($this->epodatelna_dir . "/" .$data['dir'], 0777, true);
                 umask($old);
             }
-            if ( is_writeable(CLIENT_DIR .''. $this->epodatelna_dir . "/" .$data['dir']) ) {
-                $file_dir = CLIENT_DIR .''. $this->epodatelna_dir . "/" .$data['dir'];
+            if ( is_writeable($this->epodatelna_dir . "/" .$data['dir']) ) {
+                $file_dir = $this->epodatelna_dir . "/" .$data['dir'];
             } else {
-                $file_dir = CLIENT_DIR .''. $this->epodatelna_dir;
+                $file_dir = $this->epodatelna_dir;
             }
         } else {
-            if ( !file_exist(CLIENT_DIR .''. $this->epodatelna_dir . "") ) {
+            if ( !file_exist($this->epodatelna_dir . "") ) {
                 $old = umask(0);
-                mkdir(CLIENT_DIR .''. $this->epodatelna_dir . "", 0777, true);
+                mkdir($this->epodatelna_dir . "", 0777, true);
                 umask($old);                
             }
-            if ( is_writeable(CLIENT_DIR .''. $this->epodatelna_dir) ) {
-                $file_dir = CLIENT_DIR .''. $this->epodatelna_dir;
+            if ( is_writeable($this->epodatelna_dir) ) {
+                $file_dir = $this->epodatelna_dir;
             } else {
                 $this->error_code = '0';
                 $this->error_message = 'Soubor nelze uložit do adresáře.';
