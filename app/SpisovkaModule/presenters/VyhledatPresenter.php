@@ -16,7 +16,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
     {
         $this->template->form = $this['searchForm'];
         
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
         $this->template->muzeHledatDlePrideleni = 
             $user->isAllowed(NULL, 'is_vedouci')
             || $user->isAllowed('Dokument', 'cist_moje_oj')

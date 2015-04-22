@@ -13,17 +13,17 @@ class MyLatteMacros {
     }
 
     // Ignoruj pripadnou polozku view (__array[3] ) v parametru makra, protoze v aplikaci se prideluje pristup pouze na urovni presenteru
-    public static function access($param) {
+    public static function access($user, $param) {
 
         $__array = explode(":",$param);
         $__resource = $__array[1] ."_". $__array[2] . "Presenter";
         
-        return Nette\Environment::getUser()->isAllowed($__resource);        
+        return $user->isAllowed($__resource);        
     }
 
-    public static function isAllowed($resource, $privilege)
+    public static function isAllowed($user, $resource, $privilege)
     {
-        return Nette\Environment::getUser()->isAllowed($resource, $privilege);
+        return $user->isAllowed($resource, $privilege);
     }
     
     public static function CSS($publicUrl, $filename, $media = 'screen') {

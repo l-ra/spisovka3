@@ -10,7 +10,7 @@ class Admin_SupportPresenter extends BasePresenter
    
     protected function isUserAllowed()
     {
-        return Nette\Environment::getUser()->isInRole('admin');
+        return $this->user->isInRole('admin');
     }
 
     
@@ -48,7 +48,7 @@ class Admin_SupportPresenter extends BasePresenter
         echo "--------------------\n\n";
         unset($config->user_config);  // toto jsme jiz zobrazili
         unset($config->database->password);
-        unset($config->authenticator->ldap->pass);
+        unset($config->ldap->search_password);
         print_r($config);
         echo "\n";
         

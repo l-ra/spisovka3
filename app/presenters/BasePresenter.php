@@ -11,7 +11,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         if ( !defined('APPLICATION_INSTALL') ):
 
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
         // $user->setNamespace(KLIENT);
 
         // Je uzivatel prihlasen?
@@ -56,7 +56,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function isUserAllowed()
     {
-        return Nette\Environment::getUser()->isAllowed($this->reflection->name, $this->getAction());
+        return $this->user->isAllowed($this->reflection->name, $this->getAction());
     }
     
     protected function beforeRender()
@@ -156,7 +156,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             $this->template->presenter = substr($this->name, $a + 1);
         }
 
-        if (DEBUG_ENABLE && in_array('programator', Nette\Environment::getUser()->getRoles())) {
+        if (DEBUG_ENABLE && in_array('programator', $this->user->getRoles())) {
             $this->template->debugger = TRUE;
         } else {
             $this->template->debugger = FALSE;
@@ -255,7 +255,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
          * Uzivatel
          */
         $this->template->is_authenticated = false;
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
         if ( $this->name != 'Error' && $user->isLoggedIn() ) {
             $this->template->userobj = $user;
             $identity = $user->getIdentity();
@@ -291,8 +291,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $set->addMacro('css', 'echo MyLatteMacros::CSS($publicUrl, %node.args);');
         $set->addMacro('js', 'echo MyLatteMacros::JavaScript(%node.word, $publicUrl);');
 
-        $set->addMacro('access', 'if (MyLatteMacros::access(%node.word)) {', '}');
-        $set->addMacro('isAllowed', 'if (MyLatteMacros::isAllowed(%node.args)) {', '}');
+        $set->addMacro('access', 'if (MyLatteMacros::access($userobj, %node.word)) {', '}');
+        $set->addMacro('isAllowed', 'if (MyLatteMacros::isAllowed($userobj, %node.args)) {', '}');
 
         $set->addMacro('input2', 'echo MyLatteMacros::input($form, %node.args)');
         

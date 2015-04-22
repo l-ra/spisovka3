@@ -216,7 +216,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             
             if ( isset($user_config->cislo_jednaci->typ_deniku) && $user_config->cislo_jednaci->typ_deniku == "org" ) {        
 
-                    $user = Nette\Environment::getUser()->getIdentity();
+                    $user = $this->user->getIdentity();
                     $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 
                     if ( empty($orgjednotka_id) ) {
@@ -328,7 +328,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->form = $this['newForm'];
         $this->template->nadpis = 'Nová sestava';
                
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
         $this->setView('form');
     }
@@ -346,7 +346,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->form = $this['upravitForm'];
         $this->template->nadpis = 'Upravit sestavu';
         
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');        
         $this->setView('form');
     }

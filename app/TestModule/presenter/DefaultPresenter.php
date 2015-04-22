@@ -5,7 +5,7 @@ class Test_DefaultPresenter extends BasePresenter
 
     protected function isUserAllowed()
     {
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
         return $user->isInRole('admin') || $user->isInRole('programator');
     }
     

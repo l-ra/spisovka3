@@ -13,7 +13,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     protected function isUserAllowed()
     {
-        return Nette\Environment::getUser()->isAllowed('Spisovna', 'cist_dokumenty');
+        return $this->user->isAllowed('Spisovna', 'cist_dokumenty');
     }
     
     public function startup()
@@ -58,7 +58,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->display_name);
+                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
                     $mpdf->SetTitle('Spisová služba - Detail dokumentu');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -68,7 +68,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     $mpdf->SetHeader('||'.$this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".$this->user->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                 
@@ -86,7 +86,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->display_name);
+                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
                     $mpdf->SetTitle('Spisová služba - Spisovna - Tisk');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -96,7 +96,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     $mpdf->SetHeader($this->template->title .'||'.$this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".$this->user->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                     $mpdf->Output('spisovna.pdf', 'I');
@@ -281,7 +281,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function renderPrijem()
     {
-        if (!Nette\Environment::getUser()->isAllowed('Spisovna', 'prijem_dokumentu'))
+        if (!$this->user->isAllowed('Spisovna', 'prijem_dokumentu'))
             $this->forward(':NoAccess:default');
             
         $post = $this->getRequest()->getPost();
@@ -303,7 +303,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function renderKeskartaciseznam()
     {
-        if (!Nette\Environment::getUser()->isAllowed('Spisovna', 'skartacni_navrh'))
+        if (!$this->user->isAllowed('Spisovna', 'skartacni_navrh'))
             $this->forward(':NoAccess:default');
 
         $post = $this->getRequest()->getPost();
@@ -324,7 +324,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function renderSkartace()
     {
-        if (!Nette\Environment::getUser()->isAllowed('Spisovna', 'skartacni_rizeni'))
+        if (!$this->user->isAllowed('Spisovna', 'skartacni_rizeni'))
             $this->forward(':NoAccess:default');
 
         $post = $this->getRequest()->getPost();
@@ -373,7 +373,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $this->template->Lze_zapujcit = $this->template->Zapujcka === null;
             }
             
-            $user = Nette\Environment::getUser();
+            $user = $this->user;
 
             $this->template->Lze_menit_skartacni_rezim = 
                     $dokument->stav_dokumentu == 7
@@ -434,7 +434,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         if ( isset($data['hromadna_akce']) ) {
             $Workflow = new Workflow();
             $Dokument = new Dokument();
-            $user = Nette\Environment::getUser();
+            $user = $this->user;
             switch ($data['hromadna_akce']) {
                 /* Prevzeti vybranych dokumentu */
                 case 'prevzit_spisovna':
@@ -563,7 +563,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     {
 
         $dokument_id = $this->getParameter('id',null);
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
 
         $Workflow = new Workflow();
         if ($user->isAllowed('Spisovna', 'skartacni_navrh') ) {
@@ -582,7 +582,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     public function renderArchivovat()
     {
         $dokument_id = $this->getParameter('id',null);
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
 
         $Workflow = new Workflow();
         if ( $user->isAllowed('Spisovna', 'skartacni_rizeni') ) {
@@ -600,7 +600,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     public function renderSkartovat()
     {
         $dokument_id = $this->getParameter('id',null);
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
 
         $Workflow = new Workflow();
         if ( $user->isAllowed('Spisovna', 'skartacni_rizeni') ) {
@@ -707,7 +707,7 @@ protected function createComponentVyrizovaniForm()
 
     public function upravitVyrizeniClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        if (!Nette\Environment::getUser()->isAllowed('Spisovna', 'zmenit_skartacni_rezim')) {
+        if (!$this->user->isAllowed('Spisovna', 'zmenit_skartacni_rezim')) {
             $this->forward(':NoAccess:default');
         }
         

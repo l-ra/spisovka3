@@ -193,7 +193,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         }
 
-        $user = UserModel::getUser(Nette\Environment::getUser()->getIdentity()->id, 1);
+        $user = UserModel::getUser($this->user->getIdentity()->id, 1);
         $this->template->Prideleno = Osoba::displayName($user->identity);
 
         $CJ = new CisloJednaci();
@@ -575,7 +575,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         $predano = @$orgjednotka->ciselna_rada ." - ". @$orgjednotka->plny_nazev;
                     }
                 } else {
-                    $predano = Osoba::displayName(@Nette\Environment::getUser()->getIdentity()->identity);
+                    $predano = Osoba::displayName(@$this->user->getIdentity()->identity);
                 }
                 
                 if ( !empty($zprava->email_id) ) {
@@ -682,7 +682,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         $predano = @$orgjednotka->ciselna_rada ." - ". @$orgjednotka->plny_nazev;
                     }
                 } else {
-                    $predano = Osoba::displayName(@Nette\Environment::getUser()->getIdentity()->identity);
+                    $predano = Osoba::displayName(@$this->user->getIdentity()->identity);
                 }
 
                 if ( !empty($zprava->email_id) ) {

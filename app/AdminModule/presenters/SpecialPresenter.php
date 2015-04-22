@@ -10,7 +10,7 @@ class Admin_SpecialPresenter extends BasePresenter
 
     protected function isUserAllowed()
     {
-        return Nette\Environment::getUser()->isInRole('admin');
+        return $this->user->isInRole('admin');
     }
 
     protected function error($msg)
@@ -38,7 +38,7 @@ class Admin_SpecialPresenter extends BasePresenter
             foreach ($data as $spis) {
                 dibi::query("INSERT INTO :PREFIX:spis (parent_id, nazev, popis, date_created, user_created) VALUES (%i, %s, LEFT(%s, 199), NOW(), %i)",
                     $parent_id, $spis[0], $spis[1], 
-                    Environment::getUser()->getIdentity()->id);
+                    $this->user->getIdentity()->id);
                     
                 $id = dibi::getConnection()->getInsertId();
                 

@@ -50,7 +50,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 $app_info = explode("#",$app_info);
                 $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                 $mpdf->SetCreator($app_name);
-                $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->display_name);
+                $mpdf->SetAuthor($this->user->getIdentity()->display_name);
                 $mpdf->SetTitle('Spisová služba - Zápůjčky');                
                 
                 $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -60,7 +60,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                 $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                 $mpdf->SetHeader('Zápůjčky||'.$this->template->Urad->nazev);
-                $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                $mpdf->SetFooter("{DATE j.n.Y}/".$this->user->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                 
                 
@@ -131,7 +131,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         }
         $this->template->seradit = $seradit;        
         
-        if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
+        if ( Acl::isInRole('spisovna') || $this->user->isInRole('superadmin') ) {
             $this->template->akce_select = array(
                 'vratit' => 'Vrátit vybrané zápůjčky',
                 'schvalit' => 'Schválit vybrané zápůjčky',
@@ -184,7 +184,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $zapujcka = $Zapujcka->getInfo($zapujcka_id);
         if ( $zapujcka ) {
             $this->template->Opravnen_schvalit_zapujcku = 
-                Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin');
+                Acl::isInRole('spisovna') || $this->user->isInRole('superadmin');
                 
             $this->template->Zapujcka = $zapujcka;
 
@@ -202,7 +202,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         if ( isset($data['hromadna_akce']) ) {
             $Zapujcka = new Zapujcka();
-            $user = Nette\Environment::getUser();
+            $user = $this->user;
             switch ($data['hromadna_akce']) {
                 /* Schvaleni vybranych zapujcek  */
                 case 'schvalit':
@@ -286,7 +286,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         
         $zapujcka_id = $this->getParameter('id');
         if ( !empty($zapujcka_id) && is_numeric($zapujcka_id) ) {
-            if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
+            if ( Acl::isInRole('spisovna') || $this->user->isInRole('superadmin') ) {
                 
                 $Zapujcka = new Zapujcka();
                 if ( $Zapujcka->schvalit($zapujcka_id) ) {
@@ -309,7 +309,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         
         $zapujcka_id = $this->getParameter('id');
         if ( !empty($zapujcka_id) && is_numeric($zapujcka_id) ) {
-            if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
+            if ( Acl::isInRole('spisovna') || $this->user->isInRole('superadmin') ) {
                 
                 $Zapujcka = new Zapujcka();
                 if ( $Zapujcka->odmitnout($zapujcka_id) ) {
@@ -390,7 +390,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $user_info = UserModel::getIdentity($user_id);
             $osoba = Osoba::displayName($user_info);
         } else {
-            $user = Nette\Environment::getUser();
+            $user = $this->user;
             if ( Acl::isInRole('spisovna') || $user->isInRole('superadmin') ) {
                 $osoba = "";
                 $user_id = null;
@@ -524,7 +524,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     protected function createComponentFiltrForm()
     {
 
-        if ( Acl::isInRole('spisovna') || Nette\Environment::getUser()->isInRole('superadmin') ) {
+        if ( Acl::isInRole('spisovna') || $this->user->isInRole('superadmin') ) {
             $filtr =  !is_null($this->filtr)?$this->filtr:'vse';
             $select = array(
                 'aktualni'=>'Zobrazit aktuální zápůjčky',

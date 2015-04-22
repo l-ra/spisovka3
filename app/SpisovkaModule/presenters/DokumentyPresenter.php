@@ -229,7 +229,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->display_name);
+                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
                     $mpdf->SetTitle('Spisová služba - Detail dokumentu');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -239,7 +239,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     $mpdf->SetHeader('||'.$this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".$this->user->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                 
@@ -257,7 +257,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $app_info = explode("#",$app_info);
                     $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->display_name);
+                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
                     $mpdf->SetTitle('Spisová služba - Tisk');                
                 
                     $mpdf->defaultheaderfontsize = 10;	/* in pts */
@@ -267,7 +267,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = '';	/* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
                     $mpdf->SetHeader('Seznam dokumentů||'.$this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/".$this->user->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
                 
                     $mpdf->WriteHTML($content);
                 
@@ -296,7 +296,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             
             $this->template->Dok = $dokument;
 
-            $user = Nette\Environment::getUser();
+            $user = $this->user;
             $user_id = $user->getIdentity()->id;
             
             $this->template->Pridelen = 0;
@@ -836,7 +836,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = array(
                 array('stav=%i',0),
-                array('user_created=%i',Nette\Environment::getUser()->getIdentity()->id),
+                array('user_created=%i',$this->user->getIdentity()->id),
         );
         
         $args_rozd['order'] = array('date_created'=>'DESC');
@@ -923,7 +923,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         }
 
-        $user = UserModel::getUser(Nette\Environment::getUser()->getIdentity()->id, 1);
+        $user = UserModel::getUser($this->user->getIdentity()->id, 1);
         $this->template->Prideleno = Osoba::displayName($user->identity);
 
         $CJ = new CisloJednaci();
@@ -956,7 +956,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 array('stav=%i',0),
                 array('dokument_typ_id=%i',2),
                 array('cislo_jednaci=%s',$dok->cislo_jednaci),
-                array('user_created=%i',Nette\Environment::getUser()->getIdentity()->id)
+                array('user_created=%i',$this->user->getIdentity()->id)
             );
             $args_rozd['order'] = array('date_created'=>'DESC');
 
@@ -978,7 +978,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $prilohy  = $DokumentPrilohy->prilohy($dok_odpoved->id);
                 $this->template->Prilohy = $prilohy;
 
-                $user = UserModel::getUser(Nette\Environment::getUser()->getIdentity()->id, 1);
+                $user = UserModel::getUser($this->user->getIdentity()->id, 1);
                 $this->template->Prideleno = Osoba::displayName($user->identity);
 
                 $CJ = new CisloJednaci();
@@ -1072,7 +1072,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $prilohy_new  = $DokumentPrilohy->prilohy($dok_odpoved->id);
                     $this->template->Prilohy = $prilohy_new;
 
-                    $user = UserModel::getUser(Nette\Environment::getUser()->getIdentity()->id, 1);
+                    $user = UserModel::getUser($this->user->getIdentity()->id, 1);
                     $this->template->Prideleno = Osoba::displayName($user->identity);
 
                     $CJ = new CisloJednaci();
@@ -1214,7 +1214,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->addComponent(new VyberPostovniZasilky(), 'druhZasilky');
 
-            $this->template->OpravnenOdeslatDZ = Nette\Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani');
+            $this->template->OpravnenOdeslatDZ = $this->user->isAllowed('DatovaSchranka', 'odesilani');
 
             $this->template->ZpusobyOdeslani = ZpusobOdeslani::getZpusoby();
             
@@ -1662,7 +1662,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         //Nette\Diagnostics\Debugger::dump($data);
         
-        if ( !($dok->stav_dokumentu == 1 || Nette\Environment::getUser()->isInRole('superadmin')) ) {
+        if ( !($dok->stav_dokumentu == 1 || $this->user->isInRole('superadmin')) ) {
             // needitovatelne skryte polozky
             $data['datum_vzniku'] = $dok->datum_vzniku;
             $data['dokument_typ_id'] = $dok->typ_dokumentu->id;
@@ -1945,7 +1945,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
             }
         }
-        $user_info = Nette\Environment::getUser()->getIdentity();
+        $user_info = $this->user->getIdentity();
         if ( !empty($user_info->identity->email) ) {
             $key = "user#". Osoba::displayName($user_info->identity, 'jmeno') ."#". $user_info->identity->email;
             $odesilatele[$key] = Osoba::displayName($user_info->identity, 'jmeno') ." <". $user_info->identity->email ."> [zaměstnanec]";
@@ -2118,7 +2118,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
                 } elseif ( $metoda_odeslani == 2 ) {
                     // isds
-                    if (!Nette\Environment::getUser()->isAllowed('DatovaSchranka', 'odesilani')) {
+                    if (!$this->user->isAllowed('DatovaSchranka', 'odesilani')) {
                         $this->flashMessage('Nemáte oprávnění odesílat datové zprávy.','warning');
                         continue;                    
                     }
@@ -2333,7 +2333,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
             $adresat_popis = $email_config['ucet'] .' ['. $email_config['email'] .']';
             
-            $user = Nette\Environment::getUser()->getIdentity();
+            $user = $this->user->getIdentity();
 
             // zapis do epodatelny
             $Epodatelna = new Epodatelna();
@@ -2527,7 +2527,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $Epodatelna = new Epodatelna();
             $config = $isds->getConfig();
-            $user = Nette\Environment::getUser()->getIdentity();
+            $user = $this->user->getIdentity();
 
             $zprava = array();
             $zprava['epodatelna_typ'] = 1;
@@ -2731,7 +2731,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // Zde by se melo kontrolovat opravneni a podle nej pripadne Input vlozit jako Hidden pole
         // Pokud uzivatel neni v zadne org. jednotce,  na hodnote filtru "jen_moje" nezalezi
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
-        $user = Nette\Environment::getUser();
+        $user = $this->user;
          
         if (($orgjednotka_id === null || !$user->isAllowed('Dokument', 'cist_moje_oj'))
             && !$user->isAllowed('Dokument', 'cist_vse'))
