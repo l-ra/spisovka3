@@ -10,7 +10,7 @@ class SpisovyZnak extends TreeModel
 
     public function __construct() {
 
-        $prefix = Nette\Environment::getConfig('database')->prefix;
+        $prefix = self::getDbPrefix();
         $this->name = $prefix . $this->name;
         $this->tb_spoudalost = $prefix . $this->tb_spoudalost;
         
@@ -180,7 +180,7 @@ class SpisovyZnak extends TreeModel
         $result = DbCache::get('s3_Spousteci_udalost');
         
         if ($result === null) {           
-            $prefix = Nette\Environment::getConfig('database')->prefix;
+            $prefix = self::getDbPrefix();
             $tb_spoudalost = $prefix .'spousteci_udalost';
             $result = dibi::query('SELECT * FROM %n', $tb_spoudalost, 'WHERE stav<>0')->fetchAssoc('id');
             

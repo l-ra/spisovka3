@@ -385,7 +385,7 @@ class Subjekt extends BaseModel
     public static function stat($kod = null, $select = 0) {
 
 
-        $prefix = Nette\Environment::getConfig('database')->prefix;
+        $prefix = self::getDbPrefix();
         $tb_staty = $prefix .'stat';
 
         $result = dibi::query('SELECT nazev,kod FROM %n', $tb_staty,'WHERE stav=1 ORDER BY nazev')->fetchAll();        

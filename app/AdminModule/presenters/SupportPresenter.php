@@ -40,7 +40,7 @@ class Admin_SupportPresenter extends BasePresenter
         
         echo "Konfigurace klienta:\n";
         echo "--------------------\n\n";
-        $config = Nette\Environment::getConfig();
+        $config = Nette\Utils\ArrayHash::from($this->context->parameters);
         print_r($config->user_config);
         echo "\n";
         

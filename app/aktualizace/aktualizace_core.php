@@ -146,8 +146,8 @@ class Client_To_Update {
             // neprovadej autoload tridy, abychom poznali, jestli jsme volani ze spisovky
             // nebo z aktualizacniho skriptu
             if (class_exists('\Nette\Environment', false)) {
-                $config = \Nette\Environment::getConfig();
-                $this->db_config = $config->database;
+                $config = \Nette\Environment::getConfig('database');
+                $this->db_config = $config;
             }
             else if (is_file("{$this->path}/configs/database.neon")) {
                 $data = (new Spisovka\ConfigDatabase($this->path))->get();

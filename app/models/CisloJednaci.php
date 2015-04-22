@@ -18,7 +18,7 @@ class CisloJednaci extends BaseModel
 
     public function  __construct() {
 
-        $prefix = Nette\Environment::getConfig('database')->prefix;
+        $prefix = self::getDbPrefix();
         $this->name = $prefix . $this->name;
         $this->tb_dokument = $prefix . $this->tb_dokument;
 

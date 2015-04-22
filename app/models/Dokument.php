@@ -1909,7 +1909,7 @@ class Dokument extends BaseModel
     
     public static function typDokumentu( $kod = null, $select = 0 ) {
 
-        $prefix = Nette\Environment::getConfig('database')->prefix;
+        $prefix = self::getDbPrefix();
         $tb_dokument_typ = $prefix .'dokument_typ';
 
         $result = dibi::query('SELECT * FROM %n', $tb_dokument_typ )->fetchAssoc('id');
@@ -1964,7 +1964,7 @@ class Dokument extends BaseModel
 
     public static function zpusobVyrizeni( $kod = null, $select = 0 ) {
 
-        $prefix = Nette\Environment::getConfig('database')->prefix;
+        $prefix = self::getDbPrefix();
         $tb_zpusob_vyrizeni = $prefix .'zpusob_vyrizeni';
 
         $result = dibi::query('SELECT * FROM %n', $tb_zpusob_vyrizeni )->fetchAssoc('id');
@@ -2003,7 +2003,7 @@ class Dokument extends BaseModel
 
     public static function zpusobDoruceni( $kod = null, $select = 0 ) {
 
-        $prefix = Nette\Environment::getConfig('database')->prefix;
+        $prefix = self::getDbPrefix();
         $tb_zpusob_doruceni = $prefix .'zpusob_doruceni';
 
         $result = dibi::query('SELECT * FROM %n', $tb_zpusob_doruceni )->fetchAssoc('id');
@@ -2043,7 +2043,7 @@ class Dokument extends BaseModel
 
     public static function zpusobOdeslani( $kod = null, $select = 0 ) {
 
-        $prefix = Nette\Environment::getConfig('database')->prefix;
+        $prefix = self::getDbPrefix();
         $tb_zpusob_odeslani = $prefix .'zpusob_odeslani';
 
         $result = dibi::query('SELECT * FROM %n', $tb_zpusob_odeslani )->fetchAssoc('id');
