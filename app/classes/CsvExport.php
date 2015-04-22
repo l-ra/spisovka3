@@ -6,14 +6,10 @@
  * @author blue.point Solutions
  * @author Tomas Vancura
  */
-class Export {
-    
-    
-    
-    
+class CsvExport {
+                
     public static function csv($data, $ignore_cols=null, $code='UTF-8', $break='\r\n', $separator=',', $quote='"')
-    {
-        
+    {        
         if ( !$data ) return null;
         if ( count($data)==0 ) return null;
         
@@ -51,10 +47,7 @@ class Export {
         
         return $export_data;
         
-    }
-    
-    
-    
+    }    
     
 }
 

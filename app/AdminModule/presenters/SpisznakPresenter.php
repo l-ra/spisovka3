@@ -112,7 +112,7 @@ class Admin_SpisznakPresenter extends BasePresenter
                     // export do CSV
                     $ignore_cols = array("date_created","user_created","date_modified","user_modified",
                                          "sekvence_string");
-                    $export_data = Export::csv(
+                    $export_data = CsvExport::csv(
                                     $seznam, 
                                     $ignore_cols, 
                                     $post_data['csv_code'], 
