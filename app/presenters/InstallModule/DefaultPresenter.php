@@ -526,7 +526,7 @@ class Install_DefaultPresenter extends BasePresenter
 
             $db_tables = dibi::getDatabaseInfo()->getTableNames();
 
-            $sql_template_source = file_get_contents(APP_DIR .'/InstallModule/mysql.sql');
+            $sql_template_source = file_get_contents(__DIR__ . 'mysql.sql');
             $sql_queries = explode(";",$sql_template_source);
 
             // pridej SQL prikazy z aktualizaci
