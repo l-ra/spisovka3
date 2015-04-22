@@ -14,7 +14,7 @@
     Presenter: {$presenter}
     View:      {$view}
 
-    User:      {=print_r(Nette\Environment::getUser()->getIdentity())}
+    User:      {=print_r($userobj->getIdentity())}
 
     Server:
     {foreach $_SERVER as $sname => $svalue}

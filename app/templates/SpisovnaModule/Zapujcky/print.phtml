@@ -77,7 +77,7 @@
         &nbsp;<br />
         Vytištěno dne: {=date("j.n.Y G:i")}
         <br />
-        Vytiskl: {=Nette\Environment::getUser()->getIdentity()->display_name}
+        Vytiskl: {=$userobj->getIdentity()->display_name}
     </div>    
     {else}
         <div>&nbsp;</div>

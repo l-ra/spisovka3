@@ -23,7 +23,7 @@
 
             $pdf = new mPDF('', 'A4-L',9,'Helvetica');
             $pdf->SetCreator($app_name);
-            $pdf->SetAuthor(Nette\Environment::getUser()->getIdentity()->display_name);
+            $pdf->SetAuthor($userobj->getIdentity()->display_name);
             $pdf->SetTitle('Sestava');
             
             $pdf->defaultheaderfontsize = 10;	/* in pts */
@@ -36,7 +36,7 @@
 
 
             $pdf->SetHeader($Sestava->nazev.'||'.$Urad->nazev .', '. $rok);
-            $pdf->SetFooter("{DATE j.n.Y}/".Nette\Environment::getUser()->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+            $pdf->SetFooter("{DATE j.n.Y}/".$userobj->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
             
             $pdf->WriteHTML($html_out);
             $pdf->Output('sestava.pdf', 'I');
