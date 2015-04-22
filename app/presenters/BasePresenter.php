@@ -216,7 +216,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // [P.L.] Slouží pouze jako pojistka proti případné chybě v šabloně
         // Ajax šablony nemají definovat žádný blok, pak se layout nepoužije
-        if (Nette\Environment::getHttpRequest()->isAjax())
+        if ($this->getHttpRequest()->isAjax())
             $this->setLayout(false);
         
         if (IS_SIMPLE_ROUTER == 1) {

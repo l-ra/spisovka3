@@ -31,7 +31,7 @@ class ErrorPresenter extends BasePresenter
 
         } else {
             $this->template->robots = 'noindex,noarchive';
-            $httpResponse = Nette\Environment::getHttpResponse();
+            $httpResponse = $this->getHttpResponse();
             
             if ($exception instanceof Nette\Application\BadRequestException) {
                 if (!$httpResponse->isSent())

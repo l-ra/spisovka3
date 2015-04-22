@@ -69,7 +69,8 @@ Nette\Environment::loadConfig(CLIENT_DIR . '/configs/system.neon');
 
 // dynamicky uprav protokol v nastaveni PUBLIC_URL
 $publicUrl = $public_url;
-if (Nette\Environment::getHttpRequest()->isSecured())
+$httpRequest = Nette\Environment::getHttpRequest();
+if ($httpRequest->isSecured())
     $publicUrl = str_replace('http:', 'https:', $publicUrl);
 Nette\Environment::setVariable('publicUrl', $publicUrl);
 unset($publicUrl);
@@ -184,7 +185,7 @@ catch(DibiException $e) {
     // ignoruj
 }
 
-if ($force_https || Nette\Environment::getHttpRequest()->isSecured())
+if ($force_https || $httpRequest->isSecured())
     Nette\Application\Routers\Route::$defaultFlags |= Nette\Application\Routers\Route::SECURED;
 
 // Get router
@@ -320,7 +321,7 @@ if ( $clean_url ) {
 } else {
         define('IS_SIMPLE_ROUTER',1);
         
-        $path = Nette\Environment::getHttpRequest()->getUrl()->getPath();
+        $path = $httpRequest->getUrl()->getPath();
         if ( strpos($path,"/instalace.php") !== false ) {
             $router[] = new Nette\Application\Routers\SimpleRouter('Install:Default:uvod');
         } else if ( strpos($path,"/kontrola.php") !== false ) {

@@ -17,9 +17,7 @@
     {/if}
 {/capture}<?php
 
-            $app_info = Nette\Environment::getVariable('app_info');
-            $app_info = explode("#",$app_info);
-            $app_name = (isset($app_info[2]))?$app_info[2]:'OSS Spisová služba v3';
+            $app_name = (isset($AppInfo[2])) ? $AppInfo[2] : 'OSS Spisová služba v3';
 
             $pdf = new mPDF('', 'A4-L',9,'Helvetica');
             $pdf->SetCreator($app_name);

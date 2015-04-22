@@ -486,7 +486,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
-        $post_data = Nette\Environment::getHttpRequest()->post;
+        $post_data = $this->getHttpRequest()->post;
         $subjekty = isset($post_data['subjekt'])?$post_data['subjekt']:null;
 
         // predani

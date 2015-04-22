@@ -2031,7 +2031,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->redirect(':Spisovka:Dokumenty:');            
         }
         
-        $post_data = Nette\Environment::getHttpRequest()->getPost();
+        $post_data = $this->getHttpRequest()->getPost();
 
         // Nette\Diagnostics\Debugger::dump($post_data);
         // Nette\Diagnostics\Debugger::dump($data);

@@ -122,7 +122,7 @@ class Admin_SpisznakPresenter extends BasePresenter
                     
                     //echo "<pre>"; echo $export_data; echo "</pre>"; exit;
                 
-                    $httpResponse = Nette\Environment::getHttpResponse();
+                    $httpResponse = $this->getHttpResponse();
                     $httpResponse->setContentType('application/octetstream');
                     $httpResponse->setHeader('Content-Description', 'File Transfer');
                     $httpResponse->setHeader('Content-Disposition', 'attachment; filename="export_subjektu.csv"');

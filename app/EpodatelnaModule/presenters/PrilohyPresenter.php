@@ -228,7 +228,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
             if ( !empty($tmp_file['file']) ) {
 
-                $httpResponse = Nette\Environment::getHttpResponse();
+                $httpResponse = $this->getHttpResponse();
                 $httpResponse->setContentType($tmp_file['mime-type']);
                 $httpResponse->setHeader('Content-Description', 'File Transfer');
                 $httpResponse->setHeader('Content-Disposition', 'attachment; filename="' . $tmp_file['file_name'] . '"');
@@ -249,7 +249,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
             $tmp_file = $this->downloadISDSPrilohu($res, $part);
 
-            $httpResponse = Nette\Environment::getHttpResponse();
+            $httpResponse = $this->getHttpResponse();
             $httpResponse->setContentType($tmp_file['mime-type']);
             $httpResponse->setHeader('Content-Description', 'File Transfer');
             $httpResponse->setHeader('Content-Disposition', 'attachment; filename="' . $tmp_file['file_name'] . '"');

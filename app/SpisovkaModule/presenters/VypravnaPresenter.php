@@ -193,7 +193,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $DokumentOdeslani = new DokumentOdeslani();
         $id = $this->getParameter('id');
         
-        $post_data = Nette\Environment::getHttpRequest()->getPost();
+        $post_data = $this->getHttpRequest()->getPost();
         if ( isset($post_data['datum_odeslani']) ) {
             // Ulozit data
             
@@ -316,7 +316,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     
     public function actionFiltrovat()
     {
-        $post_data = Nette\Environment::getHttpRequest()->getPost();
+        $post_data = $this->getHttpRequest()->getPost();
         
         // hidden element zajisti, ze detekujeme odeslani formulare, kde neni zadny checkbox zaskrtnuty
         if ( !empty($post_data) ) {
