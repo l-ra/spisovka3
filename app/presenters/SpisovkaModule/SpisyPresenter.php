@@ -343,7 +343,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->template->Editovat = $opravneni['lze_menit'] && $this->getParameter('upravit') == 'info';
 
         if (!$opravneni['lze_cist']) {
-            $this->setView('dok-noaccess');
+            $this->setView('noaccess');
             return;
         }
         
