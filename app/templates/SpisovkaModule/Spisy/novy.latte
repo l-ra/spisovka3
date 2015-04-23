@@ -1,12 +1,15 @@
 {var Select2 => true}
 {block title}Nový spis{/block}
 {block javascript}
-{include ../../@vlozSpisZnak.phtml}
+{include ../../@vlozSpisZnak.latte}
 {/block}
 {block content}
     <div class="navigate">
-    <a href="{link :Admin:Spisy:seznam}">Spisy</a> - Nový spis
-    </div>
+    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> -
+    <a href="{link :Spisovka:Spisy:default}">Seznam spisů</a> -
+    nový spis
+    </div>        
+
     <h2>Nový spis</h2>
 
     <div class="detail_blok">

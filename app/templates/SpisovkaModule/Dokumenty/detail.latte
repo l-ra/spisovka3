@@ -49,7 +49,7 @@
 
     var typ_dokumentu_id = {$Dok->typ_dokumentu->id};    
 	</script>
-    {include ../../@vlozSpisZnak.phtml}
+    {include ../../@vlozSpisZnak.latte}
 {/block}
 {block debug}
 <?php echo "\n\nDokument: "; print_r($Dok); ?>
@@ -781,9 +781,9 @@
     </div>
 
     {if count($Dok->odeslani)>0}
-    {include 'detail-odeslani.phtml'}
+    {include 'detail-odeslani.latte'}
     {/if}
 
-    {include 'detail-historie.phtml'}
+    {include 'detail-historie.latte'}
 
     <div id="dialog"></div>

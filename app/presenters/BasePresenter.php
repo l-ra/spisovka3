@@ -311,8 +311,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         // $dir = is_dir("$dir/templates") ? $dir : dirname($dir);
         $templates = APP_DIR . '/templates';
         return array(
-            "$templates/$dir/$this->view.phtml",
             "$templates/$dir/$this->view.latte",
+            "$templates/$dir/$this->view.phtml",
         );
     }
     

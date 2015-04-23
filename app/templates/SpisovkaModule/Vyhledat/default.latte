@@ -1,11 +1,11 @@
     {$form->render('begin')}
-    {include form_common.phtml}
+    {include form_common.latte}
 
     {if $muzeHledatDlePrideleni}
-    {include form_predani.phtml}
+    {include form_predani.latte}
     {/if}
 
-    {include form_subjekt.phtml}
+    {include form_subjekt.latte}
 
     <div id="dokument_blok_akce">
         {$form['vyhledat']->control}

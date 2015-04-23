@@ -16,10 +16,17 @@
             <dt>JID:</dt>
             <dd>{$Dok->jid}&nbsp;</dd>
         </dl>
+        {if empty($Dok->cislo_jednaci)}
+        <dl class="detail_item">
+            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
+            <dd>Dokument není evidován!</dd>
+        </dl>
+        {else}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
             <dd class="nadpis">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
+        {/if}
         <dl class="detail_item">
             <dt>Název spisu:</dt>
             <dd>
@@ -136,6 +143,7 @@
         {/if}
         {/if}
     </div>
+    {if $Vyrizovani == 1 }
     <div id="dokument_blok_vyrizeni">
         <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
@@ -183,9 +191,10 @@
         </dl>
         </div>
     </div>
+    {/if}
 
     <div id="dokument_blok_poznamka">
-        <div class="h2">Vytvořil a vyřídil</div>
+        <div class="h2">Předání</div>
         {if $Dok->typ_dokumentu->smer == 1}
         {foreach $Dok->workflow as $workflow}
         {if $workflow->stav_dokumentu==1}
@@ -210,12 +219,12 @@
         <?php break; ?>
         {/if}
         {/foreach}
-        {/if}        
+        {/if}         
         {if !isset($Dok->prideleno)}
         <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
         {else}
         <dl class="detail_item">
-            <dt>Vyřídil:</dt>
+            <dt>Přiděleno:</dt>
             <dd>
             {if empty($Dok->prideleno->prideleno_id) }
                 organizační jednotce
@@ -229,13 +238,46 @@
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>Datum vyřízení:</dt>
-            <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
-        </dl>           
+            <dt>Přiděleno dne:</dt>
+            <dd>{$Dok->prideleno->date|edatetime}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka pro přiděleného:</dt>
+            <dd>{!$Dok->prideleno->poznamka|enl2br}&nbsp;</dd>
+        </dl>
         {/if}
+
+        {if isset($Dok->predano)}
+        <dl class="detail_item">
+            <dt>Předáno:</dt>
+            <dd>
+            {if empty($Dok->predano->prideleno_id) }
+                organizační jednotce
+                <br />
+                {$Dok->predano->orgjednotka_info->zkraceny_nazev}
+            {else}
+                {$Dok->predano->prideleno_jmeno}
+                <br />
+                {=@$Dok->predano->orgjednotka_info->zkraceny_nazev}
+            {/if}
+            </dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Předáno dne:</dt>
+            <dd>{$Dok->predano->date|edatetime}</dd>
+        </dl>
+        <dl class="detail_item">
+            <dt>Poznámka pro příjemce:</dt>
+            <dd>{!$Dok->predano->poznamka|enl2br}&nbsp;</dd>
+        </dl>
+        {/if}
+        <dl class="detail_item">
+            <dt>Lhůta k vyřízení:</dt>
+            <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd>
+        </dl>
     </div>
     
-    {if $Zapujcka != null}
+    {if !empty($Zapujcka->id)}
     <div id="dokument_blok_poznamka">
         <div class="h2">Zápůjčka</div>
         <dl class="detail_item">
@@ -255,7 +297,7 @@
         <dl class="detail_item">
             <dt>Datum vrácení:</dt>
             <dd>{$Zapujcka->date_do|edate}</dd>
-        </dl>          
+        </dl>           
     </div>
     {/if}    
 
@@ -315,6 +357,7 @@
         Přílohy
     </div>
     <div id="dok-prilohy">
+    {if $AccessView==1}
     {if count($Dok->prilohy)>0}
     <table class="seznam">
         {foreach $Dok->prilohy as $file}
@@ -346,14 +389,17 @@
     {else}
         <div class="prazdno">K tomuto dokumentu nejsou připojené žádné elektronické přílohy.</div>
     {/if}
+    {else}
+        <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
+    {/if}
     </div>
     </div>
 
     {if count($Dok->odeslani)>0}
-    {include '../../SpisovkaModule/Dokumenty/detail-odeslani.phtml'}
+    {include 'detail-odeslani.latte'}
     {/if}
 
-    {include '../../SpisovkaModule/Dokumenty/detail-historie.phtml'}
+    {include 'detail-historie.latte'}
     
 </div>
 </body>
