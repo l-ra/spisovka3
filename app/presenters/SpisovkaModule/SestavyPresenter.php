@@ -2,6 +2,39 @@
 
 class Spisovka_SestavyPresenter extends BasePresenter
 {
+    protected function shutdown($response)
+    {        
+        if ($this->view != 'pdf')
+            return;
+        ob_start();
+        $response->send($this->getHttpRequest(), $this->getHttpResponse());
+        $content = ob_get_clean();
+        if (!$content)
+            return;
+        
+        $AppInfo = $this->template->AppInfo;
+        $app_name = (isset($AppInfo[2])) ? $AppInfo[2] : 'OSS Spisová služba v3';
+
+        $pdf = new mPDF('', 'A4-L',9,'Helvetica');
+        $pdf->SetCreator($app_name);
+        $pdf->SetAuthor($this->user->getIdentity()->display_name);
+        $pdf->SetTitle('Sestava');
+
+        $pdf->defaultheaderfontsize = 10;	/* in pts */
+        $pdf->defaultheaderfontstyle = B;	/* blank, B, I, or BI */
+        $pdf->defaultheaderline = 1; 	/* 1 to include line below header/above footer */
+
+        $pdf->defaultfooterfontsize = 9;	/* in pts */
+        $pdf->defaultfooterfontstyle = B;	/* blank, B, I, or BI */
+        $pdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
+
+        $pdf->SetHeader($this->template->Sestava->nazev . '||' . $this->template->Urad->nazev . ', ' . $this->template->rok);
+        $pdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
+
+        $pdf->WriteHTML($content);
+        $pdf->Output('sestava.pdf', 'I');
+    }
+    
     protected function isUserAllowed()
     {
         return Sestava::isUserAllowed();

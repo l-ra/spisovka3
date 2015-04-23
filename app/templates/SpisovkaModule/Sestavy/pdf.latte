@@ -1,4 +1,3 @@
-{capture $html_out}
     {if count($seznam)>0}
     <style type="text/css" media="screen, print">
         table { 
@@ -15,28 +14,3 @@
         Tato sestava neobsahuje žádné dokumenty.
     </div>
     {/if}
-{/capture}<?php
-
-            $app_name = (isset($AppInfo[2])) ? $AppInfo[2] : 'OSS Spisová služba v3';
-
-            $pdf = new mPDF('', 'A4-L',9,'Helvetica');
-            $pdf->SetCreator($app_name);
-            $pdf->SetAuthor($userobj->getIdentity()->display_name);
-            $pdf->SetTitle('Sestava');
-            
-            $pdf->defaultheaderfontsize = 10;	/* in pts */
-            $pdf->defaultheaderfontstyle = B;	/* blank, B, I, or BI */
-            $pdf->defaultheaderline = 1; 	/* 1 to include line below header/above footer */
-
-            $pdf->defaultfooterfontsize = 9;	/* in pts */
-            $pdf->defaultfooterfontstyle = B;	/* blank, B, I, or BI */
-            $pdf->defaultfooterline = 1; 	/* 1 to include line below header/above footer */
-
-
-            $pdf->SetHeader($Sestava->nazev.'||'.$Urad->nazev .', '. $rok);
-            $pdf->SetFooter("{DATE j.n.Y}/".$userobj->getIdentity()->display_name."||{PAGENO}/{nb}");	/* defines footer for Odd and Even Pages - placed at Outer margin */
-            
-            $pdf->WriteHTML($html_out);
-            $pdf->Output('sestava.pdf', 'I');
-            
-?>
