@@ -20,13 +20,13 @@
         <dl class="detail_item">
             <dt>&nbsp;</dt>
             <dd>
-                <input type="checkbox" name="d_today" /> dnešní (<?php echo date("j.n.Y"); ?>)
+                <input type="checkbox" name="d_today" /> dnešní ({date("j.n.Y")})
             </dd>            
         </dl>        
         <dl class="detail_item">
             <dt>Rok:</dt>
             <dd>
-                <select name="rok"><?php $rok = date("Y"); ?>
+                <select name="rok">{var $rok = date("Y")}
                     {for $r=($rok-10);$r<($rok+2);$r++}
                     <option value="{$r}"{if $r==$rok} selected{/if}>{$r}</option>
                     {/for}

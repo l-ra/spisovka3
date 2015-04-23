@@ -11,7 +11,7 @@
     {if count($sestavy)>0}
     <table class="seznam">
         {foreach $sestavy as $sestava}
-        <?php $filtr = ($sestava->filtr == 1)?'onclick="return filtrSestavy(this);"':" target='_blank'"; ?>
+        {var $filtr = ($sestava->filtr == 1) ? 'onclick="return filtrSestavy(this);"' : " target='_blank'"}
         <tr>
             <td class="icon">
                 <img src="{$publicUrl}images/icons/book.png" alt="book.png" width="32" height="32" />

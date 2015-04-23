@@ -6,7 +6,7 @@
 {foreach $seznam as $dok}
 <tr>
 {foreach $sloupce as $sl}
-<td <?php switch ($sl) {
+<td {? switch ($sl) {
 	case "smer":
 	case "pocet_listu":
 	case "pocet_priloh":
@@ -14,7 +14,7 @@
 	case "skartacni_znak":
 	case "skartacni_lhuta":
 		echo 'align="center"';
-  } ?>>{if $sl=='spis'}
+  } }>{if $sl=='spis'}
 	{if isset($dok->spisy)}
 	{foreach $dok->spisy as $spis}
 	{$spis->nazev}
