@@ -150,10 +150,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $a = strrpos($this->name, ':');
         if ($a === FALSE) {
             $this->template->module = '';
-            $this->template->presenter = $this->name;
+            $this->template->presenter_name = $this->name;
         } else {
             $this->template->module = substr($this->name, 0, $a + 0);
-            $this->template->presenter = substr($this->name, $a + 1);
+            $this->template->presenter_name = substr($this->name, $a + 1);
         }
 
         if (DEBUG_ENABLE && in_array('programator', $this->user->getRoles())) {
@@ -200,11 +200,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             case "Spisovka":
                 $this->template->module_name = 'Spisová služba';
                 
-                if ($this->template->presenter == "Napoveda") {
+                if ($this->name == "Spisovka:Napoveda") {
                     $this->setLayout('napoveda');
                     $this->template->module_name = 'Nápověda';
                 }
-                else if ($this->template->presenter == "Zpravy")
+                else if ($this->name == "Spisovka:Zpravy")
                     $this->setLayout('zpravy');
                 else
                     $this->setLayout('spisovka');
@@ -221,10 +221,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         
         if (IS_SIMPLE_ROUTER == 1) {
             $helpUri = "?presenter=Spisovka:Napoveda&";
-            $helpUri .= strtolower("param1={$this->template->module}&param2={$this->template->presenter}&param3={$this->view}");
+            $helpUri .= strtolower("param1={$this->template->module}&param2={$this->template->presenter_name}&param3={$this->view}");
         }
         else {
-            $helpUri = "napoveda/". strtolower("{$this->template->module}/{$this->template->presenter}/{$this->view}");
+            $helpUri = "napoveda/". strtolower("{$this->template->module}/{$this->template->presenter_name}/{$this->view}");
         }
         $this->template->helpUri = $helpUri;
 

@@ -476,7 +476,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
     public function vytvoritUcet($osoba_data, $user_data, $silent = false)
     {
         $osoba_vytvorena = false;
-//return false; // testovani        
+        
         try {
             if (is_array($osoba_data)) {
                 $osoba_model = new Osoba;

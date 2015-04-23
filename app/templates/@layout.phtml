@@ -35,7 +35,7 @@
     {include #menu}
     </div>
 
-    {if isset($zpravy_pocet_neprectenych) && $zpravy_pocet_neprectenych > 0 && $presenter != "Zpravy"}
+    {if isset($zpravy_pocet_neprectenych) && $zpravy_pocet_neprectenych > 0 && $presenter->name != "Spisovka:Zpravy"}
     <div id="upozorneni_na_nove_zpravy">
         Máte {$zpravy_pocet_neprectenych}
         {if $zpravy_pocet_neprectenych < 2}
@@ -52,7 +52,7 @@
     <div n:if="count($flashes)>0" id="flash">
         {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message}{/if}</div>{/foreach}
     </div>
-    <div id="{if $presenter == 'Napoveda'}help_content{else}content{/if}">
+    <div id="{if $presenter->name == 'Spisovka:Napoveda'}help_content{else}content{/if}">
         {include #content}
     </div>
     {if isset($debugger) && $debugger}

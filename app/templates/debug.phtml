@@ -1,7 +1,7 @@
 <div id="debug">
     <div id="debug_head">
         <div id="debug_info">Debug Info</div>
-        <div id="debug_route"><strong>{$module}:{$presenter}:{$view}</strong></div>
+        <div id="debug_route"><strong>{$presenter->name}:{$view}</strong></div>
         <div id="debug_time">Čas: <strong><?php echo sprintf('%0.3f', (microtime(TRUE) - Nette\Diagnostics\Debugger::$time) * 1000); ?> ms</strong></div>
         <div id="debug_memory">Paměť: <strong title="špička: <?php echo Nette\Templating\Helpers::bytes(memory_get_peak_usage());  ?>"><?php echo Nette\Templating\Helpers::bytes(memory_get_usage()); ?></strong></div>
         <div id="debug_sql">SQL: <strong><?php echo (dibi::$numOfQueries-1) ." / ". number_format( (dibi::$totalTime)*1000,3,'.',' '); ?> ms</strong></div>
@@ -10,8 +10,7 @@
     </div>
     <div id="debug_body">
         <div id="debug_body_route">
-    Module:    {$module}
-    Presenter: {$presenter}
+    Presenter: {$presenter->name}
     View:      {$view}
 
     User:      {=print_r($userobj->getIdentity())}

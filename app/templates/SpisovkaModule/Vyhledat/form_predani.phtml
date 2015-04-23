@@ -2,7 +2,7 @@
         <div class="h2">
             Přiděleno / předáno
         </div>
-    {if $presenter == 'Sestavy'}
+    {if $presenter->name == 'Spisovka:Sestavy'}
         <span n:if="!$vidiVsechnyDokumenty">Poznámka: Sestava bude zahrnovat jen dokumenty, ke kterým máte přístup.</span>
     {else}
         {if $module == "Spisovka"}Poznámka: Při použití tohoto hledání se dočasně deaktivuje filtr dokumentů.<br/>{/if}
