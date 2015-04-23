@@ -39,7 +39,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         if ($this->pdf_output == 1 || $this->pdf_output == 2) {
 
             ob_start();
-            $response->send();
+            $response->send($this->getHttpRequest(), $this->getHttpResponse());
             $content = ob_get_clean();
             if ($content) {
         

@@ -88,7 +88,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         if ($this->pdf_output) {
 
             ob_start();
-            $response->send();
+            $response->send($this->getHttpRequest(), $this->getHttpResponse());
             $content = ob_get_clean();
             if ($content) {
                 

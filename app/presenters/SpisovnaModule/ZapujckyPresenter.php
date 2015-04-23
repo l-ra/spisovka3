@@ -34,7 +34,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         if ($this->pdf_output == 1) {
             
             ob_start();
-            $response->send();
+            $response->send($this->getHttpRequest(), $this->getHttpResponse());
             $content = ob_get_clean();
             if ($content) {
                 

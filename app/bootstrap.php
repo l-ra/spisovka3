@@ -43,6 +43,8 @@ $loader->setCacheStorage(new Nette\Caching\Storages\FileStorage($cacheDir));
 //$loader->addClass('mPDF', LIBS_DIR . '/mpdf/mpdf.php');
 $loader->register();
 
+spl_autoload_register('mPDFautoloader');
+
 
 // Step 2: Configure environment
 
@@ -343,6 +345,11 @@ catch (Exception $e) {
 // Step 5: Run the application!
 $application->run();
 
+function mPDFautoloader($class)
+{
+    if ($class == 'mPDF')
+        require LIBS_DIR . '/mpdf/mpdf.php';
+}
 
 function createIniFiles()
 {
