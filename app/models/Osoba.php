@@ -158,26 +158,22 @@ class Osoba extends BaseModel
             }
         }
 
+        $jmeno_prijmeni = $jmeno ? "$jmeno $prijmeni" : $prijmeni;
+        $prijmeni_jmeno = $jmeno ? "$prijmeni $jmeno" : $prijmeni;
+        
         // Sestaveni jmena
         switch ($display) {
             case 'full':
-                return $titul_pred . $jmeno ." ". $prijmeni . $titul_za;
-                break;
+            default:
+                return "$titul_pred$jmeno_prijmeni$titul_za";
             case 'basic':
-                return $jmeno ." ". $prijmeni;
-                break;
+                return $jmeno_prijmeni;
             case 'full_item':
-                return $prijmeni ." ". $jmeno . $titul_pred_item . $titul_za;
-                break;
+                return $prijmeni_jmeno . $titul_pred_item . $titul_za;
             case 'basic_item':
-                return $prijmeni ." ". $jmeno;
-                break;
+                return $prijmeni_jmeno;
             case 'last_name':
                 return $prijmeni;
-                break;
-            default:
-                return $titul_pred . $jmeno ." ". $prijmeni . $titul_za;
-                break;
         }
 
 
