@@ -47,7 +47,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                      ));
     }
 
-    public function actionTisk()
+    public function renderTisk()
     {
         $pc_od = $this->getParameter('pc_od',null);
         $pc_do = $this->getParameter('pc_do',null);  

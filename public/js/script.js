@@ -889,9 +889,11 @@ filtrSestavy = function (elm) {
         var matched = re.exec(elm.href);
         var url = BASE_URL + '?presenter=Spisovka%3Asestavy&id='+ matched[1] +'&action=filtr';
     } else {         
-        re = /sestavy\/([0-9]+)/;
+        re = /sestavy\/([0-9]+)\/(.*)/;
         var matched = re.exec(elm.href);
         var url = BASE_URL + 'sestavy/'+ matched[1] +'/filtr/';
+        if (matched[2])
+            url += '?tisk=' + matched[2];
     }
 
     return dialog(elm, 'Filtr', url);

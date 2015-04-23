@@ -1,5 +1,6 @@
     <form action="" method="get" onsubmit="return zobrazSestavu(this);">
-        <input type="hidden" name="url" value="{link detail, id => $id}">
+        {var new_view = $presenter->getParameter('tisk') ?: 'detail'}
+        <input type="hidden" name="url" value="{link $new_view, id => $id}">
         <dl class="detail_item">
             <dt>Pořadové číslo:</dt>
             <dd>
