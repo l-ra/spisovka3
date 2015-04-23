@@ -55,10 +55,6 @@
     <div id="{if $presenter->name == 'Spisovka:Napoveda'}help_content{else}content{/if}">
         {include #content}
     </div>
-    {if isset($debugger) && $debugger}
-    {capture $debug_data}{block debug}{/block}{/capture}
-    {include debug.phtml, extra_data => $debug_data}    
-    {/if}
 </div>
 
 <div id="layout_bottom">

@@ -156,26 +156,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             $this->template->presenter_name = substr($this->name, $a + 1);
         }
 
+        /** Toto jiz k nicemu neni. Spisovka pouziva standardne Tracy.
         if (DEBUG_ENABLE && in_array('programator', $this->user->getRoles())) {
             $this->template->debugger = TRUE;
         } else {
             $this->template->debugger = FALSE;
         }
-
-        /**
-         *  Servisni mod
-         *     - aplikace verejne odstavena
-         *     - provadi se udrzba
-         */
-        /* [P.L.] Tuto funkci aplikace je treba predelat
-           - toto je potreba kontrolovat jiz v startup(), tady je prilis pozde
-           
-           if (file_exists(APP_DIR ."/configs/servicemode") ) {
-            $service_mode = 1;    
-        } else {
-            $service_mode = 0;
-        } */
-
+        */
+        
         /**
          * Nastaveni layoutu podle modulu
          */
