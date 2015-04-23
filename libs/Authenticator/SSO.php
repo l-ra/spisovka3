@@ -373,7 +373,7 @@ class Auth_Component_SSO extends Authenticator_UI
         $user_data = array(
             'username'=> $_SESSION['s3_auth_remoteuser'],
             'heslo'=> uniqid(),
-            'local' => 1
+            'external_auth' => 1
         );
 
         $this->vytvoritUcet($osoba_data, $user_data);

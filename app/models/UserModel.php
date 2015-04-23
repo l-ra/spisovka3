@@ -85,7 +85,7 @@ class UserModel extends BaseModel
         $rown = array('username'=>$data['username'],
                       'password'=>sha1($data['username'] . $data['heslo']),
                       'date_created'=> new DateTime(),
-                      'local' => (isset($data['local']) ? $data['local'] : 0),
+                      'external_auth' => (isset($data['external_auth']) ? $data['external_auth'] : 0),
                       'orgjednotka_id' => isset($data['orgjednotka_id']) && !empty($data['orgjednotka_id']) ? $data['orgjednotka_id'] : NULL,
                       'active'=>1
                 );
@@ -101,8 +101,8 @@ class UserModel extends BaseModel
         );
         if (isset($data['orgjednotka_id']))
             $insert_data['orgjednotka_id'] = $data['orgjednotka_id'];
-        if (isset($data['local']))
-            $insert_data['local'] = $data['local'];
+        if (isset($data['external_auth']))
+            $insert_data['external_auth'] = $data['external_auth'];
         
         $role_id = $data['role'];
 
@@ -194,7 +194,7 @@ class UserModel extends BaseModel
 
     public function changeAuthType($user_id, $auth_type) {
         
-        $change = ['local' => $auth_type];
+        $change = ['external_auth' => $auth_type];
         $change['last_modified'] = new DateTime();
         $this->update($change, array('id=%i', $user_id));        
     }

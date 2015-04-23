@@ -59,16 +59,10 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
 
     protected function verifyPassword($user, $credentials)
     {
-        $login_type = isset($user->local) ? $user->local : 0;
-        
-        if ($login_type === 0)
+        if (!$user->external_auth)
             return $this->verifyLocalPassword($user, $credentials);
-        
-        if ($this->verifyRemotePassword($credentials))
-            return true;
-
-        return $login_type === 2 ? 
-                $this->verifyLocalPassword($user, $credentials) : false;
+        else
+            return $this->verifyRemotePassword($credentials);
     }
     
     protected function verifyLocalPassword($user, $credentials)

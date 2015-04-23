@@ -119,13 +119,13 @@ class Authenticator_UI extends Nette\Application\UI\Control
             $form['heslo_potvrzeni']->addRule(Nette\Forms\Form::FILLED, 'Potvrzení hesla musí být vyplněné.');
         }
         else {
-            $form['heslo']->addConditionOn($form["local"], Nette\Forms\Form::NOT_EQUAL, 1)
+            $form['heslo']->addConditionOn($form["external_auth"], Nette\Forms\Form::NOT_EQUAL, 1)
                 ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné.');
             if (!$form['heslo']->getValue()) {
                 $form['heslo']->setDisabled();
                 $form['heslo_potvrzeni']->setDisabled();
             }
-            $form['local']->controlPrototype->onchange(
+            $form['external_auth']->controlPrototype->onchange(
                 'var dis = $(this).val() == 1; $("[name=heslo]").prop("disabled", dis);'
                 . '$("[name=heslo_potvrzeni]").prop("disabled", dis);');
         }
@@ -300,7 +300,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
         if (isset($params['user_id'])) {
             $form['user_id']->setValue($params['user_id']);
             $user_info = UserModel::getUser($params['user_id']);
-            $auth_type = $user_info->local;
+            $auth_type = $user_info->external_auth;
         }
         
         $this->formAddAuthSelect($form, $auth_type);
@@ -351,13 +351,12 @@ class Authenticator_UI extends Nette\Application\UI\Control
     protected function formAddAuthSelect(Nette\Forms\Container $form, $value = null)
     {
         if ($this->authenticator->supportsRemoteAuth()) {
-            $form->addSelect('local', "Způsob ověření hesla:",
-                    array(1 => 'pouze externí ověření',
-                          0 => 'pouze lokální ověření spisovkou',
-                          2 => 'pokud selže externí ověření, použij lokální'
+            $form->addSelect('external_auth', "Způsob ověření hesla:",
+                    array(1 => 'externí ověření',
+                          0 => 'lokální ověření spisovkou'
                     ));
             if ($value !== null)
-                $form['local']->setDefaultValue($value);
+                $form['external_auth']->setDefaultValue($value);
         }
     }
 
@@ -422,7 +421,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
     {
         $data = $button->getForm()->getValues();
         $model = new UserModel();
-        $model->changeAuthType($data['user_id'], $data['local']);
+        $model->changeAuthType($data['user_id'], $data['external_auth']);
         $this->presenter->flashMessage('Nastavení změněno.');
         $this->presenter->redirect('this', array('id' => $data['osoba_id']));                
     }
@@ -441,7 +440,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
                 $user_data = ['username' => $user['username'],
                     'heslo' => $user['email'],
-                    'local' => 1,
+                    'external_auth' => 1,
                     'role' => $user['role'],
                     'orgjednotka_id' => $user['orgjednotka_id']
                     ];

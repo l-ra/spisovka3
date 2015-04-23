@@ -56,7 +56,7 @@
         {elseif $remote_auth_supported}
         <dl class="detail_item">
             <dt>Ověření hesla:</dt>
-            <dd>{$u->local ? 'externí' : 'lokální'}&nbsp;</dd>
+            <dd>{$u->external_auth ? 'externí' : 'lokální'}&nbsp;</dd>
         </dl>
         {/if}
         <dl class="detail_item">
@@ -110,7 +110,7 @@
         <dl class="detail_item">
             <dt>&nbsp;</dt>
             <dd>
-                {if $u->local != 1}
+                {if $u->external_auth != 1}
                 <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'heslo'}">Změnit {if $remote_auth_supported}lokální {/if}heslo</a>
                 &nbsp;&nbsp;&nbsp;
                 {/if}
