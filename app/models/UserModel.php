@@ -83,7 +83,8 @@ class UserModel extends BaseModel
     public function insert($data)
     {       
         $rown = array('username'=>$data['username'],
-                      'password'=>sha1($data['username'] . $data['heslo']),
+                      'password' => isset($data['heslo']) 
+                            ? sha1($data['username'] . $data['heslo']) : null,
                       'date_created'=> new DateTime(),
                       'external_auth' => (isset($data['external_auth']) ? $data['external_auth'] : 0),
                       'orgjednotka_id' => isset($data['orgjednotka_id']) && !empty($data['orgjednotka_id']) ? $data['orgjednotka_id'] : NULL,

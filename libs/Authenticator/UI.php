@@ -437,9 +437,16 @@ class Authenticator_UI extends Nette\Application\UI\Control
                     'prijmeni' => $user['prijmeni'],
                     'email' => $user['email']
                     ];
-
+                
+                if (isset($user['titul_pred']))
+                    $osoba['titul_pred'] = $user['titul_pred'];
+                if (isset($user['telefon']))
+                    $osoba['telefon'] = $user['telefon'];
+                if (isset($user['pozice']))
+                    $osoba['pozice'] = $user['pozice'];
+                
                 $user_data = ['username' => $user['username'],
-                    'heslo' => $user['email'],
+                    'heslo' => null,
                     'external_auth' => 1,
                     'role' => $user['role'],
                     'orgjednotka_id' => $user['orgjednotka_id']
