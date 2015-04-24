@@ -67,18 +67,8 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         $this->template->no_items = 0;
         $args = null;
         if ( isset($hledat) ) {
-            $args = array( 'where'=>array(array(
-                    'nazev_subjektu LIKE %s OR','%'.$hledat.'%',
-                    'ic LIKE %s OR','%'.$hledat.'%',
-                    'email LIKE %s OR','%'.$hledat.'%',
-                    'telefon LIKE %s OR','%'.$hledat.'%',
-                    'id_isds LIKE %s OR','%'.$hledat.'%',
-                    'adresa_mesto LIKE %s OR','%'.$hledat.'%',
-                    'adresa_psc LIKE %s OR','%'.$hledat.'%',
-                    "CONCAT(jmeno,' ',prijmeni) LIKE %s OR",'%'.$hledat.'%',
-                    "CONCAT(prijmeni,' ',jmeno) LIKE %s",'%'.$hledat.'%'
-                ))
-            );
+            $args = array('where' => [ [ "LOWER(CONCAT_WS('', nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)",
+                                            "%$hledat%" ] ]);
 
             $this->hledat = $hledat;
             $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani

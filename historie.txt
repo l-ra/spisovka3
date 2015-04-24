@@ -18,6 +18,7 @@ Jiné změny:
 - sjednocen layout nápovědy se zbytkem aplikace
 - proveden upgrade staré knihovny pro připojení k databázi
 - nový modul pro vývojáře pro základní automatické testování aplikace
+- hledání v subjektech v administraci nyní hledá i podle ulice
   
 Opravy:
 
