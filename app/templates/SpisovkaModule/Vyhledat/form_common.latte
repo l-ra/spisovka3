@@ -72,12 +72,10 @@
             <dd>od: {$form['datum_odeslani_od']->control} {$form['datum_odeslani_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
             <dd>do: {$form['datum_odeslani_do']->control} {$form['datum_odeslani_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
         </dl>
-        <?php if (1) { ?>
         <dl class="detail_item">
             <dt>Druh zásilky:</dt>
             <dd>{$form['druh_zasilky']->render()}</dd>
         </dl>     
-        <?php }//if 0 ?>        
         <dl class="detail_item">
             <dt>Spisový znak:</dt>
             <dd>{$form['spisovy_znak_id']->control}</dd>

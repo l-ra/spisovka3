@@ -9,7 +9,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         $this->no_install = $this->getParameter("no_install", false);
         $this->template->no_install = $this->no_install;
-        
+
         if ( $this->action == "kontrola" && $this->no_install ) {
             $this->setLayout("install");
         } else if ( file_exists(CLIENT_DIR .'/configs/install') ) {

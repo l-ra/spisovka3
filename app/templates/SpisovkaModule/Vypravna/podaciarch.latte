@@ -6,11 +6,11 @@
     <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
     <title>Podací arch</title>
     <style type="text/css" media="screen, print">
-        <?php include(APP_DIR .'/../public/css/podaci_arch.css'); ?>
+        {= include(APP_DIR .'/../public/css/podaci_arch.css')}
     </style>
 </head>
 <body>
-{for $p=1;$p<=$count_page;$p++}     
+{for $p=1;$p<=$count_page;$p++}
 <table class="header">
     <tr>
         <td><h1>Podací arch</h1></td>

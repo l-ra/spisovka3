@@ -6,7 +6,7 @@
     <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
     <title>Spisová služba - Zápůjčky</title>
     <style type="text/css" media="screen, print">
-        <?php echo file_get_contents(APP_DIR .'/../public/css/print_site.css'); ?>
+        {file_get_contents(APP_DIR .'/../public/css/print_site.css')|noescape}
     </style>
 </head>
 <body>

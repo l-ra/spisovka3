@@ -51,10 +51,6 @@
 	</script>
     {include ../../@vlozSpisZnak.latte}
 {/block}
-{block debug}
-<?php echo "\n\nDokument: "; print_r($Dok); ?>
-
-{/block}
 {block content}
 
     <div class="navigate">
@@ -79,9 +75,9 @@
        {if $AccessEdit==1}
        {if $Pridelen==1 }
        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
-       <?php if ( isset($nutnyNadpis) ) { ?>
+       {if isset($nutnyNadpis)}
        <script type="text/javascript"> alert("Název dokumentu (věc) je prázdný. Je nutné ho vyplnit!"); </script>     
-       <?php } ?>
+       {/if}
        {/if}
        {if ($Pridelen==1 && $Vyrizovani == 1 ) }
        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }">Upravit vyřízení</a>
@@ -517,25 +513,25 @@
         {if $Dok->typ_dokumentu->smer == 1}
         {foreach $Dok->workflow as $workflow}
         {if $workflow->stav_dokumentu==1}
-        <dl class="detail_item">
-            <dt>Vytvořil:</dt>
-            <dd>
-            {if empty($workflow->prideleno_id) }
-                organizační jednotce
-                <br />
-                {$workflow->orgjednotka_info->zkraceny_nazev}
-            {else}
-                {$workflow->prideleno_jmeno}
-                <br />
-                {=@$workflow->orgjednotka_info->zkraceny_nazev}
-            {/if}
-            </dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Vytvořil dne:</dt>
-            <dd>{$workflow->date|edatetime}</dd>
-        </dl>        
-        <?php break; ?>
+            <dl class="detail_item">
+                <dt>Vytvořil:</dt>
+                <dd>
+                {if empty($workflow->prideleno_id) }
+                    organizační jednotce
+                    <br />
+                    {$workflow->orgjednotka_info->zkraceny_nazev}
+                {else}
+                    {$workflow->prideleno_jmeno}
+                    <br />
+                    {=@$workflow->orgjednotka_info->zkraceny_nazev}
+                {/if}
+                </dd>
+            </dl>
+            <dl class="detail_item">
+                <dt>Vytvořil dne:</dt>
+                <dd>{$workflow->date|edatetime}</dd>
+            </dl>        
+            {breakIf true}
         {/if}
         {/foreach}
         {/if}

@@ -1,7 +1,4 @@
 {block title}Dokument{/block}
-{block debug}
-<?php echo "\n\nDokument: "; print_r($Dok); ?>
-{/block}
 {block content}
 
     <div class="navigate">
@@ -19,13 +16,12 @@
             Adresáti
         </div>
         <div id="dok-subjekty">
-        <?php $existuje_adresat = 0; ?>
+        {var $existuje_adresat = 0}
         {if count($Dok->subjekty)>0}
         <table class="seznam">
             {foreach $Dok->subjekty as $subjekt}
-            <?php if ( $subjekt->rezim_subjektu == 'O' ) { continue; } 
-                  $existuje_adresat = 1;
-            ?>
+            {continueIf $subjekt->rezim_subjektu == 'O'}
+            {var $existuje_adresat = 1}
             <tr style="border-top: 2px solid;" class="dokument_blok2">
             <td class="icon">
                 <img src="{$publicUrl}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />

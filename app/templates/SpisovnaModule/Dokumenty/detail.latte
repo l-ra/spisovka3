@@ -3,11 +3,6 @@
 {block javascript}
 {include ../../@vlozSpisZnak.latte}
 {/block}
-{block debug}
-<?php echo "\n\nDokument: "; print_r($Dok); ?>
-<?php echo "\n\nZapujcky: "; print_r($Zapujcka); ?>
-
-{/block}
 {block content}
 
     <div class="navigate">
@@ -322,7 +317,7 @@
             <dt>Vytvořil dne:</dt>
             <dd>{$workflow->date|edatetime}</dd>
         </dl>         
-        <?php break; ?>
+        {breakIf true}
         {/if}
         {/foreach}
         {/if}        

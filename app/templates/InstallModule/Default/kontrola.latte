@@ -21,92 +21,89 @@ příjem a odesílání emailů, ověření pravosti apod. V neposlední řadě 
 pro některé konfigurační soubory a zápisu pro dočasné soubory.</p>
 
 <div id="kontrola">
-<?php if ($errors): ?>
+{if ($errors)}
     <div class="failed result">
         <h2>Omlováme se, ale konfigurace serveru nesplňuje požadavky pro použití aplikace!</h2>
         <p>Není možné pokračovat v instalaci.</p>
         <p>Podívejte se do detailu a u vyznačených bodů zjednejte nápravu. Poté <a href="?">znovu ověřte</a>.</p>
     </div>
-<?php else: ?>
+{else}
     <div class="passed result">
         <h2>Blahopřeji! Konfigurace serveru splňuje minimální požadavky pro použití aplikace.</h2>
         {if !$no_install}
         <p>Můžete pokračovat v instalaci.</p>
-	<?php if ($warnings):?><p>Byly zjištěny nesrovnalosti, které mohou ovlivnit chod aplikace. Podívejte se do detailu a u vyznačených bodů se rozhodněte,
-            zda je daná položka nutná pro běh aplikace nebo ne.</p><?php endif ?>
+	{if ($warnings)}<p>Byly zjištěny nesrovnalosti, které mohou ovlivnit chod aplikace. Podívejte se do detailu a u vyznačených bodů se rozhodněte,
+            zda je daná položka nutná pro běh aplikace nebo ne.</p>{/if}
 
         <p><a href="{link :Install:Default:databaze}">Pokračovat v instalaci</a></p>
         {/if}
     </div>
-<?php endif ?>
+{/if}
 
     <h2>Detail kontroly:</h2>
 
     <table>
-    <?php foreach ($requirements_ess as $id => $requirement):?>
-    <?php $class = isset($requirement->passed) ? ($requirement->passed ? 'passed' : ($requirement->required ? 'failed' : 'warning')) : 'info' ?>
-    <tr id="res<?php echo $id ?>" class="<?php echo $class ?>">
-    	<td class="th"><?php echo htmlSpecialChars($requirement->title) ?></td>
+    {foreach $requirements_ess as $id => $requirement}
+    {var $class = isset($requirement->passed) ? ($requirement->passed ? 'passed' : ($requirement->required ? 'failed' : 'warning')) : 'info'}
+    <tr id="res{$id}" class="{$class}">
+    	<td class="th">{($requirement->title)}</td>
 
-        <?php if (empty($requirement->passed) && isset($requirement->errorMessage)): ?>
-	<td><?php echo htmlSpecialChars($requirement->errorMessage) ?></td>
-	<?php elseif (isset($requirement->message)): ?>
-	<td><?php echo htmlSpecialChars($requirement->message) ?></td>
-	<?php elseif (isset($requirement->passed)): ?>
-	<td><?php echo $requirement->passed ? 'Enabled' : 'Disabled' ?></td>
-	<?php else: ?>
+        {if (empty($requirement->passed) && isset($requirement->errorMessage))}
+	<td>{($requirement->errorMessage)}</td>
+	{elseif (isset($requirement->message))}
+	<td>{($requirement->message)}</td>
+	{elseif (isset($requirement->passed))}
+	<td>{$requirement->passed ? 'Enabled' : 'Disabled'}</td>
+	{else}
 	<td></td>
-	<?php endif ?>
+	{/if}
     </tr>
 
-    <?php if (isset($requirement->passed) && !$requirement->passed): ?>
-    <tr class="<?php echo $class ?> description">
-        <td colspan="2"><?php echo $requirement->description ?></td>
+    {if (isset($requirement->passed) && !$requirement->passed)}
+    <tr class="{$class} description">
+        <td colspan="2">{$requirement->description}</td>
     </tr>
-    <?php endif ?>
+    {/if}
 
-    <?php if (isset($requirement->script)): ?>
-    <script type="text/javascript"><?php echo $requirement->script ?></script>
-    <?php endif ?>
+    {if (isset($requirement->script))}
+    <script type="text/javascript">{$requirement->script}</script>
+    {/if}
 
-    <?php endforeach ?>
+    {/foreach}
     </table>
 
     <br />
     <h2>Detaily jádra aplikace (Nette Framework)</h2>
 
     <table>
-    <?php foreach ($requirements as $id => $requirement):?>
-    <?php $class = isset($requirement->passed) ? ($requirement->passed ? 'passed' : ($requirement->required ? 'failed' : 'warning')) : 'info';
+    {foreach $requirements as $id => $requirement}
+    {var $class = isset($requirement->passed) ? ($requirement->passed ? 'passed' : ($requirement->required ? 'failed' : 'warning')) : 'info'}
+    {continueIf $class == "passed" || $class == "info"}
+    <tr id="res{$id}" class="{$class}">
+    	<td class="th">{($requirement->title)}</td>
 
-            if( $class == "passed" || $class == "info" ) continue;
-
-    ?>
-    <tr id="res<?php echo $id ?>" class="<?php echo $class ?>">
-    	<td class="th"><?php echo htmlSpecialChars($requirement->title) ?></td>
-
-        <?php if (empty($requirement->passed) && isset($requirement->errorMessage)): ?>
-	<td><?php echo htmlSpecialChars($requirement->errorMessage) ?></td>
-	<?php elseif (isset($requirement->message)): ?>
-	<td><?php echo htmlSpecialChars($requirement->message) ?></td>
-	<?php elseif (isset($requirement->passed)): ?>
-	<td><?php echo $requirement->passed ? 'Enabled' : 'Disabled' ?></td>
-	<?php else: ?>
+        {if (empty($requirement->passed) && isset($requirement->errorMessage))}
+	<td>{($requirement->errorMessage)}</td>
+	{elseif (isset($requirement->message))}
+	<td>{($requirement->message)}</td>
+	{elseif (isset($requirement->passed))}
+	<td>{$requirement->passed ? 'Enabled' : 'Disabled'}</td>
+	{else}
 	<td></td>
-	<?php endif ?>
+	{/if}
     </tr>
 
-    <?php if (isset($requirement->passed) && !$requirement->passed): ?>
-    <tr class="<?php echo $class ?> description">
-        <td colspan="2"><?php echo $requirement->description ?></td>
+    {if (isset($requirement->passed) && !$requirement->passed)}
+    <tr class="{$class} description">
+        <td colspan="2">{$requirement->description}</td>
     </tr>
-    <?php endif ?>
+    {/if}
 
-    <?php if (isset($requirement->script)): ?>
-    <script type="text/javascript"><?php echo $requirement->script ?></script>
-    <?php endif ?>
+    {if (isset($requirement->script))}
+    <script type="text/javascript">{$requirement->script}</script>
+    {/if}
 
-    <?php endforeach ?>
+    {/foreach}
     </table>
 
 </div>

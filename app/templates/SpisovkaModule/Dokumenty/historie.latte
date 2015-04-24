@@ -6,7 +6,7 @@
             <dt>{$h->date|edatetime}</dt>
             <dd>{!=LogModel::typ($h->typ)}</dd>
             {if !empty($h->poznamka)}<dd class="normal">{$h->poznamka}</dd>{/if}
-            <dd class="normal">provedl: <?php echo Osoba::displayName($h); ?></dd>
+            <dd class="normal">provedl: {Osoba::displayName($h)}</dd>
         </dl>
         {/foreach}
     </div>

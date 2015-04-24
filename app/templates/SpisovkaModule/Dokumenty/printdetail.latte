@@ -6,7 +6,7 @@
     <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
     <title>Spisová služba</title>
     <style type="text/css" media="screen, print">
-        <?php echo file_get_contents(APP_DIR .'/../public/css/printdetail_site.css'); ?>
+        {file_get_contents(APP_DIR .'/../public/css/printdetail_site.css')|noescape}
     </style>
 </head>
 <body>
@@ -216,7 +216,7 @@
             <dt>Vytvořil dne:</dt>
             <dd>{$workflow->date|edatetime}</dd>
         </dl>         
-        <?php break; ?>
+        {breakIf true}
         {/if}
         {/foreach}
         {/if}         

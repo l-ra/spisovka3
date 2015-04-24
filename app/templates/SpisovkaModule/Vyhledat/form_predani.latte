@@ -16,7 +16,6 @@
             <br />{$form['prideleno_na_organizacni_jednotku']->control} Přiděleno na mou organizační jednotku
 
         <script type="text/javascript">
-        <!--
         function pridelenoPredanoSearchHandler(type, payload) {
             $('#'+type).remove();
 
@@ -42,19 +41,16 @@
         $('input[name=prideleno_text]').keyup(function(event) {
             keyUpHandler('prideleno', this);
         });
-        <?php if ( isset($params['prideleno_text']) && !empty($params['prideleno_text']) ) { 
-                $prideleno_checked = "''"; $prideleno_org_checked = "''";
-                if ( isset($params['prideleno']) ) {
-                    $prideleno_checked = "'". implode(",",$params['prideleno']) ."'";
-                }
-                if ( isset($params['prideleno_org']) ) {
-                    $prideleno_org_checked = "'". implode(",",$params['prideleno_org']) ."'";
-                }                        
-        ?>
-        $.getJSON({link autoComplete!}, { typ: 1, text: '<?php echo $params['prideleno_text'] ."', user: $prideleno_checked, org: $prideleno_org_checked"; ?>}, pridelenoSearchHandler);
-        <?php } ?>
-                
-        -->
+        {if isset($params['prideleno_text']) && !empty($params['prideleno_text'])}        
+            {var $prideleno_checked = ""; $prideleno_org_checked = ""}
+            {if isset($params['prideleno'])}
+                {? $prideleno_checked = implode(",", $params['prideleno'])}
+            {/if}
+            {if isset($params['prideleno_org'])}
+                {? $prideleno_org_checked = implode(",",$params['prideleno_org'])}
+            {/if}                                
+            $.getJSON({link autoComplete!}, { typ: 1, text: {$params['prideleno_text']}, user: {$prideleno_checked}, org: {$prideleno_org_checked} }, pridelenoSearchHandler);
+        {/if}                
         </script>
             </dd>
         </dl>
@@ -65,23 +61,20 @@
             <br />{$form['predano_osobne']->control} Předáno na mé jméno
             <br />{$form['predano_na_organizacni_jednotku']->control} Předáno na mou organizační jednotku
         <script type="text/javascript">
-        <!--
         $('input[name=predano_text]').keyup(function(event) {
             keyUpHandler('predano', this);
         });
-        <?php if ( isset($params['predano_text']) && !empty($params['predano_text']) ) { 
-                $predano_checked = "''"; $predano_org_checked = "''";
-                if ( isset($params['predano']) ) {
-                    $predano_checked = "'". implode(",",$params['predano']) ."'";
-                }
-                if ( isset($params['predano_org']) ) {
-                    $predano_org_checked = "'". implode(",",$params['predano_org']) ."'";
-                }                        
-        ?>
-        $.getJSON({link autoComplete!}, { typ: 2, text: '<?php echo $params['predano_text'] ."', user: $predano_checked, org: $predano_org_checked"; ?>}, predanoSearchHandler);
-        <?php } ?>
                 
-        -->
+        {if isset($params['predano_text']) && !empty($params['predano_text'])}        
+            {var $predano_checked = ""; $predano_org_checked = ""}
+            {if isset($params['predano'])}
+                {? $predano_checked = implode(",", $params['predano'])}
+            {/if}
+            {if isset($params['predano_org'])}
+                {? $predano_org_checked = implode(",",$params['predano_org'])}
+            {/if}                                
+            $.getJSON({link autoComplete!}, { typ: 2, text: {$params['predano_text']}, user: {$predano_checked}, org: {$predano_org_checked} }, predanoSearchHandler);
+        {/if}
         </script>
             </dd>
         </dl>

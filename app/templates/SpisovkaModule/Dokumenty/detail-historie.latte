@@ -14,17 +14,13 @@
             <dd class="normal">vytvořil a přiděleno {$wf->prideleno_jmeno}</dd>
             {elseif $wf->stav_dokumentu == 2}
             <dd>dokument předán</dd>
-            <?php
-
-                if ( empty($wf->prideleno_id) ) {
-                    $wf_jmeno = $wf->orgjednotka_info->zkraceny_nazev;
-                    $wf_neprijato = 'předáno organizační jednotce '. $wf_jmeno .'. Ta dokument zatím nepřijala.';
-                } else {
-                    $wf_jmeno = $wf->prideleno_jmeno;
-                    $wf_neprijato = 'předáno '. $wf_jmeno .', ale zaměstnanec dokument zatím nepřijal';
-                }
-
-            ?>
+            {if empty($wf->prideleno_id)}
+                {var $wf_jmeno = $wf->orgjednotka_info->zkraceny_nazev}
+                {var $wf_neprijato = 'předáno organizační jednotce '. $wf_jmeno .'. Ta dokument zatím nepřijala.'}
+            {else}
+                {var $wf_jmeno = $wf->prideleno_jmeno}
+                {var $wf_neprijato = 'předáno '. $wf_jmeno .', ale zaměstnanec dokument zatím nepřijal'}
+            {/if}
             {if $wf->stav_osoby == 0}
             <dd class="normal">{$wf_neprijato}</dd>
             {elseif $wf->stav_osoby >= 100}

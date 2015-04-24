@@ -1,11 +1,4 @@
 {block title}Zaevidovat dokument{/block}
-{block debug}
-<?php /*print_r($Subjekt);*/ ?>
-<?php /*print_r($Prilohy);*/ ?>
-<?php print_r($Dok); ?>
-<?php /*print_r($Identifikator);*/ ?>
-<?php /*print_r($Original);*/ ?>
-{/block}
 {block content}
 
     <div class="navigate">
@@ -212,7 +205,7 @@
                 <dt>&nbsp;</dt>
                 <dd>
                     <script type="text/javascript">
-                        var subjekt_original = <?php echo json_encode($Subjekt['original']); ?>;
+                        var subjekt_original = {=json_encode($Subjekt['original'])};
                     </script>
                     <a href="" id="epod_evid_novysubjekt_click">Vytvořit nový subjekt z odesílatele</a>
                 </dd>
