@@ -1,0 +1,23 @@
+# Toto je priklad, jak muze vypadat specificka konfigurace instalace spisovky
+# Zde konkretne vidite konfiguraci pripojeni na LDAP adresar
+
+php:
+    # Tato casova zona je vychozi, neni ji potreba nastavovat
+    date.timezone = "Europe/Prague"
+
+parameters:
+
+    ldap:
+        server = localhost
+        port = 389
+        base_dn = "ou=people,dc=company,dc=cz"
+        user_rdn = "uid=%%username%%"
+        search_dn =
+        search_password =
+        search_filter = "(objectClass=inetOrgPerson)"
+        attribute_map:
+
+services:
+    authenticator = Authenticator_LDAP
+    userImport = Import_LDAP
+    ldap = Spisovka_LDAP(%ldap%)

@@ -68,7 +68,10 @@ $configurator = new Nette\Configurator;
 $configurator
     ->setDebugMode((bool)DEBUG_ENABLE)
     ->setTempDirectory(TEMP_DIR)
-    ->addConfig(CLIENT_DIR . '/configs/system.neon');
+    ->addConfig(APP_DIR . '/configs/system.neon')
+    ->addConfig(CLIENT_DIR . '/configs/database.neon');
+if (is_file(CLIENT_DIR . '/configs/system.neon'))
+    $configurator->addConfig(CLIENT_DIR . '/configs/system.neon');
 
 $container = $configurator->createContainer();
 
@@ -350,7 +353,6 @@ function mPDFautoloader($class)
 function createIniFiles()
 {
     $dir = CLIENT_DIR .'/configs';
-    createIniFile("$dir/system.neon");
     createIniFile("$dir/klient.ini");
     createIniFile("$dir/epodatelna.ini");
 }

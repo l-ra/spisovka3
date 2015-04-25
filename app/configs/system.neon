@@ -1,33 +1,24 @@
-includes:
-    - database.neon
-
 php:
     date.timezone = "Europe/Prague"
 
 parameters:
 
+    # demo = true
     # clean_url = true
-
-    ldap:
-        server = localhost
-        port = 389
-        base_dn = "ou=people,dc=company,dc=cz"
-        user_rdn = "uid=%%username%%"
-        search_dn =
-        search_password =
-        search_filter = "(objectClass=inetOrgPerson)"
-        attribute_map:
-
+ 
     storage_configuration:
         path_documents = files/dokumenty
         path_epodatelna = files/epodatelna
 
+nette:
+    application:
+        errorPresenter: Error
+        
 services:
     authorizator = Acl
     authenticator = Authenticator_Basic
     authenticatorUI = Authenticator_UI
-    # userImport = Import_LDAP
-    ldap = Spisovka_LDAP(%ldap%)
+#    userImport = Import_LDAP
+#    ldap = Spisovka_LDAP(%ldap%)
     nette.presenterFactory = PresenterFactory(%appDir%, ...)
     storage = Storage_Basic(%storage_configuration%)
-    
