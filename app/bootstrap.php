@@ -83,9 +83,6 @@ unset($publicUrl);
 
 // konfigurace spisovky
 
-// Promennou logDir pouziva nyni jen SupportPresenter
-Nette\Environment::setVariable('logDir', LOG_DIR);
-
 Nette\Environment::setVariable('user_config', 
         (new Spisovka\ConfigClient())->get());
 
