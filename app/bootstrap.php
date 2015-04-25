@@ -1,5 +1,7 @@
 <?php
 
+use Tracy\Debugger;
+
 if ( !defined('KLIENT') ) {
     echo "<h1>Chyba aplikace. Nebyl zjisten klient!</h1>";
     exit;
@@ -27,7 +29,7 @@ require VENDOR_DIR . '/autoload.php';
 define('TEMP_DIR', CLIENT_DIR . '/temp');
 
 // check if directory /app/temp is writable
-if (@file_put_contents(TEMP_DIR . '/_check', '') === FALSE) {
+if (file_put_contents(TEMP_DIR . '/_check', '') === FALSE) {
     throw new Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
 }
 
@@ -52,26 +54,27 @@ spl_autoload_register('mPDFautoloader');
 
 define('LOG_DIR', dirname(APP_DIR) . '/log');
 
-if ( !defined('DEBUG_ENABLE') )
+if (!defined('DEBUG_ENABLE'))
     define('DEBUG_ENABLE', 0);
-if ( DEBUG_ENABLE ) {
-    Nette\Environment::setProductionMode(false);
-    Nette\Diagnostics\Debugger::enable(Nette\Diagnostics\Debugger::DEVELOPMENT, LOG_DIR); 
-    // '%logDir%/php_error_'.date('Ym').'.log');
-} else {
-    Nette\Environment::setProductionMode(true);
-    Nette\Diagnostics\Debugger::enable(Nette\Diagnostics\Debugger::PRODUCTION, LOG_DIR); 
-}
+Debugger::enable(DEBUG_ENABLE ? Debugger::DEVELOPMENT : Debugger::PRODUCTION, LOG_DIR); 
+// '%logDir%/php_error_'.date('Ym').'.log' - stary nazev souboru s logy
+Nette\Bridges\Framework\TracyBridge::initialize();
 
-// 2b) load configuration from config.ini file
+// 2b) vytvor DI kontejner
 
 createIniFiles();
 
-Nette\Environment::loadConfig(CLIENT_DIR . '/configs/system.neon');
+$configurator = new Nette\Configurator;
+$configurator
+    ->setDebugMode((bool)DEBUG_ENABLE)
+    ->setTempDirectory(TEMP_DIR)
+    ->addConfig(CLIENT_DIR . '/configs/system.neon');
+
+$container = $configurator->createContainer();
 
 // dynamicky uprav protokol v nastaveni PUBLIC_URL
 $publicUrl = $public_url;
-$httpRequest = Nette\Environment::getHttpRequest();
+$httpRequest = $container->getByType('Nette\Http\IRequest');
 if ($httpRequest->isSecured())
     $publicUrl = str_replace('http:', 'https:', $publicUrl);
 Nette\Environment::setVariable('publicUrl', $publicUrl);
@@ -87,7 +90,7 @@ Nette\Environment::setVariable('user_config',
         (new Spisovka\ConfigClient())->get());
 
 // version information
-$app_info = @file_get_contents(APP_DIR .'/configs/version');
+$app_info = file_get_contents(APP_DIR .'/configs/version');
 $app_info = trim($app_info); // trim the EOL character
 Nette\Environment::setVariable('app_info', $app_info);
 unset($app_info);
@@ -104,21 +107,18 @@ unset($unique_info);
 
 // 2e) setup sessions
 $session_dir = CLIENT_DIR . '/sessions';
-if (@file_put_contents("$session_dir/_check", '') === FALSE) {
+if (file_put_contents("$session_dir/_check", '') === FALSE) {
     throw new Exception("Nelze zapisovat do adresare '$session_dir'");
 }
-$session = Nette\Environment::getSession();
+$session = $container->getByType('Nette\Http\Session');
 $session->setName('SpisovkaSessionID');
 $session->setSavePath($session_dir);
 
 $cookie_path = str_replace('index.php', '', $_SERVER['PHP_SELF']);
 $session->setCookieParameters($cookie_path);
 
-
 // Step 3: Configure application
-$application = Nette\Environment::getApplication();
-$application->errorPresenter = 'Error';
-$application->catchExceptions = Nette\Environment::isProduction();
+$application = $container->getByType('Nette\Application\Application');
 
 register_shutdown_function(array('ShutdownHandler', '_handler'));
 
@@ -140,14 +140,14 @@ Nette\Forms\Form::extensionMethod('Nette\Forms\Form::addDateTimePicker', 'Form_a
 
 // 3b) Load database
 try {
-    $db_config = Nette\Environment::getConfig('database');
+    $db_config = $container->parameters['database'];
 
     if (empty($db_config['driver']) || $db_config['driver'] == 'mysql')
         $db_config['driver'] = 'mysqli';
     
     // oprava chybne konfigurace na hostingu
     // profiler je bez DEBUG modu k nicemu, jen plytva pameti (memory leak)
-    if (Nette\Environment::isProduction())
+    if (!$configurator->isDebugMode())
         $db_config['profiler'] = false;
     else if ($db_config['profiler']) {
         $db_config['profiler'] = array(
@@ -156,7 +156,7 @@ try {
     }
         
     $connection = dibi::connect($db_config);
-    if (DEBUG_ENABLE) {
+    if ($configurator->isDebugMode()) {
         // false - Neni treba explain SELECT dotazu
         $panel = new Dibi\Bridges\Tracy\Panel(false, DibiEvent::ALL); 
         $panel->register($connection);
@@ -166,7 +166,6 @@ try {
     if (!$db_config['prefix'])
         $db_config['prefix'] = '';  // nahrad pripadnou null hodnotu za prazdny retezec
     dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];
-    define('DB_PREFIX', $db_config['prefix']);
 }
 catch (DibiDriverException $e) {
     echo 'Aplikaci se nepodarilo pripojit do databaze.<br>';
