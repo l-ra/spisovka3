@@ -167,6 +167,7 @@ class SubjektyPresenter extends BasePresenter
             'titul_za' => ( !empty($data['subjekt_titulza'][$id])?$data['subjekt_titulza'][$id]:"" ),
             'adresa_ulice' => ( !empty($data['subjekt_ulice'][$id])?$data['subjekt_ulice'][$id]:"" ),
             'adresa_cp' => ( !empty($data['subjekt_cp'][$id])?$data['subjekt_cp'][$id]:"" ),
+            'adresa_co' => ( !empty($data['subjekt_co'][$id])?$data['subjekt_co'][$id]:"" ),
             'adresa_mesto' => ( !empty($data['subjekt_mesto'][$id])?$data['subjekt_mesto'][$id]:"" ),
             'adresa_psc' => ( !empty($data['subjekt_psc'][$id])?$data['subjekt_psc'][$id]:"" ),
             'email' => ( !empty($data['subjekt_email'][$id])?$data['subjekt_email'][$id]:"" ),

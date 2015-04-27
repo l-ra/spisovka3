@@ -579,8 +579,8 @@ subjektNovy = function(event) {
 '                        <dd><input type="text" name="subjekt_nazev['+id+']" value="" size="60" /></dd>'+
 '                        <dt>Titul před, jméno, příjmení, titul za:</dt>'+
 '                        <dd><input type="text" name="subjekt_titulpred['+id+']" value="" size="5" /><input type="text" name="subjekt_jmeno['+id+']" value="" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="" size="40" /><input type="text" name="subjekt_titulza['+id+']" value="" size="5" /></dd>'+
-'                        <dt>Ulice a číslo popisné:</dt>'+
-'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="10" /></dd>'+
+'                        <dt>Ulice, číslo popisné a orientační:</dt>'+
+'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="5" /><input type="text" name="subjekt_co['+id+']" value="" size="5" /></dd>'+
 '                        <dt>PSČ a Město:</dt>'+
 '                        <dd><input type="text" name="subjekt_psc['+id+']" value="" size="6" /><input type="text" name="subjekt_mesto['+id+']" value="" size="50" /></dd>'+
 '                        <dt>Stát:</dt>'+

@@ -65,8 +65,8 @@ $(function() {
 '                        <dd><input type="text" name="subjekt_nazev['+id+']" value="'+ ((typeof subjekt_original['nazev_subjektu'] != 'undefined')?htmlspecialchars(subjekt_original['nazev_subjektu']):"") +'" size="60" /></dd>'+
 '                        <dt>Titul před, jméno, příjmení, titul za:</dt>'+
 '                        <dd><input type="text" name="subjekt_titulpred['+id+']" value="" size="5" /><input type="text" name="subjekt_jmeno['+id+']" value="" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="'+ ((typeof subjekt_original['prijmeni'] != 'undefined')?htmlspecialchars(subjekt_original['prijmeni']):"") +'" size="40" /><input type="text" name="subjekt_titulza['+id+']" value="" size="5" /></dd>'+
-'                        <dt>Ulice a číslo popisné:</dt>'+
-'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="'+ ((typeof subjekt_original['adresa_ulice'] != 'undefined')?htmlspecialchars(subjekt_original['adresa_ulice']):"") +'" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="10" /></dd>'+
+'                        <dt>Ulice, číslo popisné a orientační:</dt>'+
+'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="'+ ((typeof subjekt_original['adresa_ulice'] != 'undefined')?htmlspecialchars(subjekt_original['adresa_ulice']):"") +'" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="5" /><input type="text" name="subjekt_co['+id+']" value="" size="5" /></dd>'+
 '                        <dt>PSČ a Město:</dt>'+
 '                        <dd><input type="text" name="subjekt_psc['+id+']" value="" size="6" /><input type="text" name="subjekt_mesto['+id+']" value="" size="50" /></dd>'+
 '                        <dt>Stát:</dt>'+
@@ -508,8 +508,8 @@ form_odmitnout +
 '                        <dd><input type="text" name="subjekt_nazev['+id+']" value="'+ ((typeof data['subjekt']['original']['nazev_subjektu'] != 'undefined')?data['subjekt']['original']['nazev_subjektu']:"") +'" size="60" /></dd>'+
 '                        <dt>Jméno Příjmení:</dt>'+
 '                        <dd><input type="text" name="subjekt_jmeno['+id+']" value="" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="'+ ((typeof data['subjekt']['original']['prijmeni'] != 'undefined')?data['subjekt']['original']['prijmeni']:"") +'" size="40" /></dd>'+
-'                        <dt>Ulice a číslo popisné:</dt>'+
-'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="'+ ((typeof data['subjekt']['original']['adresa_ulice'] != 'undefined')?data['subjekt']['original']['adresa_ulice']:"") +'" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="10" /></dd>'+
+'                        <dt>Ulice, číslo popisné a orientační:</dt>'+
+'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="'+ ((typeof data['subjekt']['original']['adresa_ulice'] != 'undefined')?data['subjekt']['original']['adresa_ulice']:"") +'" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="5" /><input type="text" name="subjekt_co['+id+']" value="" size="10" /></dd>'+
 '                        <dt>PSČ a Město:</dt>'+
 '                        <dd><input type="text" name="subjekt_psc['+id+']" value="" size="6" /><input type="text" name="subjekt_mesto['+id+']" value="" size="50" /></dd>'+
 '                        <dt>Stát:</dt>'+
