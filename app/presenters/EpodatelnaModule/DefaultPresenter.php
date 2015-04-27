@@ -5,7 +5,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     private $Epodatelna;
     private $pdf_output = 0;
-
+    protected $storage;
+    
     public function actionDefault()
     {
         $this->redirect('nove');
@@ -240,7 +241,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             if ( !empty($zprava->email_id) ) {
                 // Nacteni originalu emailu
                 if ( !empty( $zprava->file_id ) ) {
-                    $original = $this->nactiEmail($zprava->file_id);
+                    $original = self::nactiEmail($this->storage, $zprava->file_id);
 
                     if ( $original['signature']['signed'] == 3 ) {
 
@@ -279,7 +280,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             } else if ( !empty($zprava->isds_id) ) {
                 // Nacteni originalu DS
                 if ( !empty( $zprava->file_id ) ) {
-                    $source = $this->nactiISDS($zprava->file_id);
+                    $source = self::nactiISDS($this->storage, $zprava->file_id);
                     if ( $source ) {
                         $original = unserialize($source);
                     } else {
@@ -461,8 +462,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 if ( !empty($zprava->email_id) ) {
                     // Nacteni originalu emailu
                     if ( !empty( $zprava->file_id ) ) {
-                        $DefaultPresenter = new Epodatelna_DefaultPresenter();
-                        $original = $DefaultPresenter->nactiEmail($zprava->file_id);
+                        $original = self::nactiEmail($this->storage, $zprava->file_id);
                     }
 
                     $subjekt->nazev_subjektu = $zprava->odesilatel;
@@ -486,9 +486,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 } else if ( !empty($zprava->isds_id) ) {
                     // Nacteni originalu DS
                     if ( !empty( $zprava->file_id ) ) {
-                        $DefaultPresenter = new Epodatelna_DefaultPresenter();
                         $file_id = explode("-",$zprava->file_id);
-                        $original = $DefaultPresenter->nactiISDS($file_id[0]);
+                        $original = self::nactiISDS($this->storage, $file_id[0]);
                         $original = unserialize($original);
 
                         // odebrat obsah priloh, aby to neotravovalo
@@ -1115,9 +1114,14 @@ dmFormat =
         return count($tmp);
     }
 
-    public function nactiISDS($file_id)
+    public function injectStorage(Storage_Basic $storage)
     {
-        $DownloadFile = $this->context->getService('storage');
+        $this->storage = $storage;
+    }
+    
+    public static function nactiISDS($storage, $file_id)
+    {
+        $DownloadFile = $storage;
 
         if ( strpos($file_id,"-") !== false ) {
             list($file_id, $part) = explode("-",$file_id);
@@ -1135,10 +1139,9 @@ dmFormat =
 
     }
 
-    public function nactiEmail($file_id, $output = 0)
+    public static function nactiEmail($storage, $file_id, $output = 0)
     {
-
-        $DownloadFile = $this->context->getService('storage');
+        $DownloadFile = $storage;
 
         if ( strpos($file_id,"-") !== false ) {
             list($file_id,$part) = explode("-",$file_id);

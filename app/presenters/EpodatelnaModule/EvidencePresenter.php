@@ -8,6 +8,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     private $Epodatelna;
     private $typ_evidence = null;
     private $odpoved = null;
+    protected $storage;
 
     public function startup()
     {
@@ -74,8 +75,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             if ( !empty($zprava->email_id) ) {
                 // Nacteni originalu emailu
                 if ( !empty( $zprava->file_id ) ) {
-                    $DefaultPresenter = new Epodatelna_DefaultPresenter();
-                    $original = $DefaultPresenter->nactiEmail($zprava->file_id);
+                    $original = Epodatelna_DefaultPresenter::nactiEmail($this->storage, $zprava->file_id);
                 }
 
                 $subjekt->nazev_subjektu = $zprava->odesilatel;
@@ -99,9 +99,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             } else if ( !empty($zprava->isds_id) ) {
                 // Nacteni originalu DS
                 if ( !empty( $zprava->file_id ) ) {
-                    $DefaultPresenter = new Epodatelna_DefaultPresenter();
                     $file_id = explode("-",$zprava->file_id);
-                    $original = $DefaultPresenter->nactiISDS($file_id[0]);
+                    $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_id[0]);
                     $original = unserialize($original);
 
                     // odebrat obsah priloh, aby to neotravovalo
@@ -223,9 +222,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         if ( !empty($zprava->isds_id) ) {
             if ( !empty( $zprava->file_id ) ) {
-                $DefaultPresenter = new Epodatelna_DefaultPresenter();
                 $file_id = explode("-",$zprava->file_id);
-                $original = $DefaultPresenter->nactiISDS($file_id[0]);
+                $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_id[0]);
                 $original = unserialize($original);
                 // odebrat obsah priloh, aby to neotravovalo
                 unset($original->dmDm->dmFiles);
@@ -723,8 +721,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $source = explode("-",$info->file_id);
         if ( isset($source[0]) ) {
 
-            $DefaultPresenter = new Epodatelna_DefaultPresenter();
-            $res = $DefaultPresenter->nactiEmail($source[0],1);
+            $res = Epodatelna_DefaultPresenter::nactiEmail($this->storage, $source[0],1);
             if ($fp = @fopen($res,'rb') ) {
                 $res_data = fread($fp, filesize($res));
                 @fclose($fp);
@@ -798,12 +795,10 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $info = $this->Epodatelna->getInfo($epodatelna_id);
         if ( $info ) {
 
-            $DefaultPresenter = new Epodatelna_DefaultPresenter();
-
             $FileModel = new FileModel();
             $file_info = $FileModel->select(array(array('real_name=%s','ep-isds-'.$epodatelna_id.'.zfo')))->fetch();
             if ( $file_info ) {
-                $res = $DefaultPresenter->nactiISDS($file_info->id);
+                $res = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_info->id);
 
                 $data = array(
                     'filename'=>'datova_zprava_'.$info->isds_id.'.zfo',
@@ -1120,6 +1115,10 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         }*/
     }
 
-
+    public function injectStorage(Storage_Basic $storage)
+    {
+        $this->storage = $storage;
+    }
+    
 }
 
