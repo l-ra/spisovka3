@@ -344,6 +344,8 @@ catch (Exception $e) {
 // Step 5: Run the application!
 $application->run();
 
+
+
 function mPDFautoloader($class)
 {
     if ($class == 'mPDF')
@@ -355,6 +357,9 @@ function createIniFiles()
     $dir = CLIENT_DIR .'/configs';
     createIniFile("$dir/klient.ini");
     createIniFile("$dir/epodatelna.ini");
+    
+    if (!is_file("$dir/database.neon") && is_file("$dir/system.ini"))
+        migrateSystemIni();
 }
 
 function createIniFile($filename)
@@ -366,6 +371,24 @@ function createIniFile($filename)
     if (!copy($template, $filename))
         throw new Exception("Nemohu vytvorit soubor $filename.");
     
-    $perm = strstr($filename, 'system.neon') !== FALSE ? 0440 : 0640;
+    $perm = 0640;
     @chmod($filename, $perm);
+}
+
+// Migrace na 3.5.0
+// Prenese se to nejdulezitejsi - prihlasovaci udaje do databaze
+// Ostatni pripadne upravy musi uzivatel provest rucne,
+// konfigurace autentizace se tak jako tak zmenila
+function migrateSystemIni()
+{
+    $dir = CLIENT_DIR . '/configs';
+    $loader = new \Nette\DI\Config\Loader();
+    $old_config = $loader->load("$dir/system.ini");
+    
+    $new_config = [ 'parameters' => [ 'database' => $old_config['common']['database'] ] ];
+    $loader->save($new_config, "$dir/database.neon");
+    
+    // Uklid. Prejmenovani pojisti, ze se konfigurace zmigruje jen jednou.
+    unlink("$dir/system.in");
+    rename("$dir/system.ini", "$dir/system.old");
 }
