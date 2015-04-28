@@ -458,6 +458,14 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $zpravy[ $zprava->id ]->odesilatel = htmlspecialchars($zprava->odesilatel);
 
                 $subjekt = new stdClass();
+                $subjekt->mesto = '';
+                $subjekt->psc = '';
+                $subjekt->ulice = '';
+                $subjekt->cp = '';
+                $subjekt->co = '';
+                $subjekt->jmeno = '';
+                $subjekt->prijmeni = '';
+                
                 $original = null;
                 if ( !empty($zprava->email_id) ) {
                     // Nacteni originalu emailu
@@ -468,6 +476,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $subjekt->nazev_subjektu = $zprava->odesilatel;
                     $subjekt->prijmeni = @$original['zprava']->from->personal;
                     $subjekt->email = @$original['zprava']->from->email;
+                    if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
+                        $subjekt->jmeno = $matches[1];
+                        $subjekt->prijmeni = $matches[2];
+                    }
 
                     if ( $original['signature']['signed'] >= 0 ) {
 
@@ -476,7 +488,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         if ( !empty($original['signature']['cert_info']['email']) && $subjekt->email != $original['signature']['cert_info']['email'] ) {
                             $subjekt->email = $subjekt->email ."; ". $original['signature']['cert_info']['email'];
                         }
-                        $subjekt->adresa_ulice = $original['signature']['cert_info']['adresa'];
+                        $subjekt->ulice = $original['signature']['cert_info']['adresa'];
                     }
 
                     $SubjektModel = new Subjekt();
@@ -500,8 +512,21 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $subjekt->id_isds = @$original->dmDm->dbIDSender;
                     $subjekt->nazev_subjektu = @$original->dmDm->dmSender;
                     $subjekt->type = ISDS_Spisovka::typDS(@$original->dmDm->dmSenderType);
-                    $subjekt->adresa_ulice = @$original->dmDm->dmSenderAddress;
+                    if (isset($original->dmDm->dmSenderAddress))
+                        $subjekt->ulice = $original->dmDm->dmSenderAddress;
 
+                    if (preg_match('/(.*), ([0-9]*) (.*), (.*)/', $subjekt->ulice, $matches)) {
+                        $subjekt->ulice = $matches[1];
+                        $subjekt->psc = $matches[2];
+                        $subjekt->mesto = $matches[3];
+                        if (preg_match('#(.*) ([\d]*)/([\d]*)#', $subjekt->ulice, $matches)) {
+                            $subjekt->ulice = $matches[1];
+                            $subjekt->cp = $matches[2];
+                            $subjekt->co = $matches[3];                            
+                        }
+
+                    }
+                    
                     $SubjektModel = new Subjekt();
                     $subjekt_databaze = $SubjektModel->hledat($subjekt,'isds');
                     $zpravy[ $zprava->id ]->subjekt = array('original'=>$subjekt,'databaze'=>$subjekt_databaze);

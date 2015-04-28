@@ -24,6 +24,8 @@ Opravy:
 
 - E-podatelna - na stránce stahování zpráv nepracovala funkce "vytvořit nový
                 subjekt z odesilatele"
+              - vytváření nového subjektu z datové zprávy automaticky rozdělí
+                adresu do jednotlivých políček
               - pokud v datové schránce nebyla žádná nová zpráva, aplikace
                 při kontrole schránky místo zprávy zobrazila nulu
                 
