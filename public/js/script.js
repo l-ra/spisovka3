@@ -1,3 +1,5 @@
+/* global BASE_URL, is_simple, DOKUMENT_ID, typ_dokumentu_id, smer_typu_dokumentu */
+
 var stop_timer = 0;
 var url;
 var cache = Array();
@@ -267,18 +269,35 @@ dialog = function ( elm, title, url ) {
     });
     $('#dialog').dialog('open');
 
-    if (typeof url == 'undefined') {
+    var postdata = false;
+    if (elm) {
         if (!(elm instanceof jQuery))       
             elm = $(elm);
         
-        url = elm.attr('href');
+        postdata = elm.attr('data-postdata');
+        if (postdata)
+            postdata = $.parseJSON(postdata);
     }
-    $.get(url, function(data) {
-        $('#dialog').html(data);
+    if (typeof url == 'undefined')        
+        url = elm.attr('href');        
+
+    var jqXHR;
+    var successFunction = function(data) {
+            $('#dialog').html(data);
+        };
+    if (postdata)
+        jqXHR = $.post(url, $.param(postdata), successFunction);
+    else
+        jqXHR = $.get(url, successFunction);
+            
+    jqXHR.fail(function(jqXHR) {
+        $('#dialog').html('');
+        alert('Při načítání obsahu okna došlo k vážné chybě.');
+        $('#dialog').html('<pre>' + jqXHR.responseText);
     });
     
     return false;
-}
+};
 
 reloadDialog = function (elm) {
 
@@ -288,7 +307,7 @@ reloadDialog = function (elm) {
     });
     
     return false;
-}
+};
 
 /*
  * ARES
@@ -331,7 +350,7 @@ aresSubjekt = function ( formName ) {
     });
 
     return false;
-}
+};
 
 /*
  * ISDS - vyhledat subjekt na zaklade id  schranky
@@ -382,7 +401,7 @@ isdsSubjekt = function ( formName ) {
 
     return false;
 
-}
+};
 
 /*
  * CRON - zpracovani na pozadi
@@ -405,7 +424,7 @@ ajaxcron = function () {
 
     return false;
 
-}
+};
 
 
 
@@ -417,7 +436,7 @@ toggleWindow = function (elm) {
 
     return false;
 
-}
+};
 
 spisVybran = function (elm) {
 
@@ -434,7 +453,7 @@ spisVybran = function (elm) {
     });
 
     return false;
-}
+};
 
 subjektVybran = function (elm) {
 
@@ -450,7 +469,7 @@ subjektVybran = function (elm) {
     });
 
     return false;
-}
+};
 
 
 renderPrilohy = function (dokument_id) {
@@ -468,7 +487,7 @@ renderPrilohy = function (dokument_id) {
     });
 
     return false;
-}
+};
 
 renderSubjekty = function () {
 
@@ -485,24 +504,24 @@ renderSubjekty = function () {
     });
 
     return false;
-}
+};
 
 
 dialogVyberSubjektu = function () {
 
     dialog($('#dialog-subjekt'), 'Seznam subjektů');   
     return false;
-}
+};
 
 dialogNovySubjekt = function (elm) {
 
     return dialog(elm, 'Nový subjekt');
-}
+};
 
 dialogUpravitSubjekt = function(elm){
 
     return dialog(elm, 'Upravit subjekt');
-}
+};
 
 subjektUpravitSubmit = function () {
     postFormJ($("#subjekt-vytvorit"), function(data) {
@@ -515,131 +534,40 @@ subjektUpravitSubmit = function () {
         }
     });
     return false;    
-}
+};
 
 subjektUpravitStorno = function () {
     $('#dialog').dialog('close');
     return false;
-}
+};
 
-subjektNovySubmit = function () {
+handleNovySubjekt = function (okFunc) {
     postFormJ($("#subjekt-vytvorit"), function(data) {
-        if (data == "OK") {
-            alert('Subjekt byl úspěšně vytvořen.');
-            dialogVyberSubjektu();
+        if (typeof data == "object") {
+            if (data.status == "OK") {
+                okFunc(data);
+            } else
+                alert(data.status);
         } else {
-            // chyba
+            // formular neprosel validaci
             $('#dialog').html(data);            
         }
     });
     return false;    
-}
+    
+};
 
-subjektNovy = function(event) {
+novySubjektOk = function () {
+    alert('Subjekt byl úspěšně vytvořen a přidán.');
+    $('#dialog').dialog('close');
+    renderSubjekty();
+};
 
-        id = DOKUMENT_ID;
-
-        if ( is_simple == 1 ) {
-            url_ajaxtyp = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamtypusubjektu';
-        } else { 
-            url_ajaxtyp = BASE_URL + 'subjekty/0/seznamtypusubjektu';
-        }
-        $.getJSON(url_ajaxtyp, function(data){
-            var typ_select = '<select name="subjekt_typ['+id+']">';
-
-            $.each(data, function(key, val) {
-                typ_select = typ_select + '<option value="' + key + '">' + val + '</option>';
-            });
-            
-            typ_select = typ_select + "</select>";
-            $('#typ_subjektu').html(typ_select);
-        });            
-
-        if ( is_simple == 1 ) {
-            url_ajaxtyp = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamstatuajax';
-        } else { 
-            url_ajaxtyp = BASE_URL + 'subjekty/0/seznamstatuajax';
-        }
-        $.getJSON(url_ajaxtyp, function(data){
-            var select = '<select name="stat['+id+']">';
-
-            $.each(data, function(key, val) {
-                select = select + '<option value="' + key + '">' + val + '</option>';
-            });
-            
-            select = select + "</select>";
-            $('#novy_subjekt_stat').html(select);
-        });            
-        
-        
-        novy_subjekt = ''+
-'                        <dt>Typ subjektu:</dt>'+
-'                        <dd id="typ_subjektu"></dd>'+
-'                        <dt>Název subjektu:</dt>'+
-'                        <dd><input type="text" name="subjekt_nazev['+id+']" value="" size="60" /></dd>'+
-'                        <dt>Titul před, jméno, příjmení, titul za:</dt>'+
-'                        <dd><input type="text" name="subjekt_titulpred['+id+']" value="" size="5" /><input type="text" name="subjekt_jmeno['+id+']" value="" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="" size="40" /><input type="text" name="subjekt_titulza['+id+']" value="" size="5" /></dd>'+
-'                        <dt>Ulice, číslo popisné a orientační:</dt>'+
-'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="5" /><input type="text" name="subjekt_co['+id+']" value="" size="5" /></dd>'+
-'                        <dt>PSČ a Město:</dt>'+
-'                        <dd><input type="text" name="subjekt_psc['+id+']" value="" size="6" /><input type="text" name="subjekt_mesto['+id+']" value="" size="50" /></dd>'+
-'                        <dt>Stát:</dt>'+
-'                        <dd id="novy_subjekt_stat"></dd>'+
-'                        <dt>Email:</dt>'+
-'                        <dd><input type="text" name="subjekt_email['+id+']" value="" size="60" /></dd>'+
-'                        <dt>ID datové schránky:</dt>'+
-'                        <dd><input type="text" name="subjekt_isds['+id+']" value="" size="30" /></dd>'+
-'                        <dt>&nbsp;</dt>'+
-'                        <input type="hidden" name="dokument_id" value="'+id+'" />'+
-'                        <dd><input type="submit" name="subjekt_pridat['+id+']" value="Vytvořit a přidat" id="subjekt_pridat" /></dd>';
-
-        if ( typeof document.forms["frm-novyForm"] == "undefined" ) {
-            novy_subjekt = '<form action="" method="POST" name="frm-novySubjekt">'+novy_subjekt+'</form>';
-        }
-
-        $('#subjekt_novy').html(novy_subjekt);
-
-        $("#subjekt_pridat").click(function() {
-
-            var form = document.forms["frm-novyForm"];
-            if ( typeof form == "undefined" )
-                form = document.forms["frm-odpovedForm"];
-            if ( typeof form == "undefined" )
-                form = document.forms["frm-novySubjekt"];
-                
-            var formdata = '';                
-            if ( typeof form != "undefined" )
-                formdata = 'id='+id+'&' + $(form).serialize();
-            
-            var url;
-            if ( is_simple == 1 ) {
-                url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=vytvoritAjax';
-            } else { 
-                url = BASE_URL + 'subjekty/0/vytvoritAjax';
-            }
-            
-            $.post(url, formdata, function (text) {
-                if ( text[0] == "#" ) {
-                    text = text.substr(1);
-                    alert(text);
-                } else {
-                    $('#subjekt_novy').html(
-                        '<dt>&nbsp;</dt>'+
-                        '<dd><a href="" id="novysubjekt_click">Vytvořit nový subjekt</a></dd>'
-                    );
-                    $('#novysubjekt_click').click( subjektNovy );
-                    renderSubjekty();
-
-                    alert('Subjekt byl vytvořen a přidán.');
-
-                }                
-            });
-            
-            return false;
-        });
-
-        return false;
-    }
+subjektNovy = function() {
+    
+    dialog(this, 'Nový subjekt');    
+    return false;
+};
 
 spisVytvoritSubmit = function () {
 
@@ -648,13 +576,13 @@ spisVytvoritSubmit = function () {
     });
 
     return false;
-}
+};
 
 spisVytvoritStorno = function (doc_id) {
 
     $('#spis_novy').hide();
     return false;
-}
+};
 
 osobaVybrana = function (elm) {
 
@@ -683,13 +611,13 @@ osobaVybrana = function (elm) {
     });
 
     return false;
-}
+};
 
 
 prilohazmenit = function(elm){
 
     return dialog(elm, 'Upravit přílohu');
-}
+};
 
 odebratPrilohu = function(elm, dok_id){
 
@@ -701,7 +629,7 @@ odebratPrilohu = function(elm, dok_id){
     }
 
     return false;
-}
+};
 
 odebratSubjekt = function(elm){
 
@@ -713,7 +641,7 @@ odebratSubjekt = function(elm){
     }
     
     return false;
-}
+};
 
 vyber_odes_form = function ( elm, subjekt_id ) {
     
@@ -726,7 +654,7 @@ vyber_odes_form = function ( elm, subjekt_id ) {
     
     return false;
     
-}
+};
 
 odes_form_reset = function ( subjekt_id ) {
     
@@ -740,15 +668,15 @@ odes_form_reset = function ( subjekt_id ) {
     }
     
     
-}
+};
 
 zobrazFax = function (elm) {
     return dialog(elm,'Zobrazit zprávu faxu');
-}
+};
 
 vypravnaDetail = function (elm) {
     return dialog(elm,'Detail záznamu');
-}
+};
 vypravnaSubmit = function () {
     postFormJ($("#vypravna_form"), function(text) {
         if ( text.indexOf('###provedeno###') != -1 ) {
@@ -760,11 +688,11 @@ vypravnaSubmit = function () {
         }        
     });
     return false;
-}
+};
 vypravnaZrusit = function () {
     $('#dialog').dialog('close');
     return false;
-}
+};
 
 
 hledejDokument = function (input, typ) {
@@ -792,7 +720,7 @@ hledejDokument = function (input, typ) {
 
     return false;
 
-}
+};
 
 hledejDokumentAjax = function (vyraz, typ) {
 
@@ -818,7 +746,7 @@ hledejDokumentAjax = function (vyraz, typ) {
     });
     
     return false;
-}
+};
 
 spojitDokument = function (elm) {
 
@@ -835,7 +763,7 @@ spojitDokument = function (elm) {
     });
 
     return false;
-}
+};
 
 pripojitDokument = function (elm) {
 
@@ -867,20 +795,20 @@ pripojitDokument = function (elm) {
     });
 
     return false;                
-}
+};
 
 
 overitISDS = function (elm) {
     
     return dialog(elm,'Ověření datové zprávy');
     
-}
+};
 
 
 selectReadOnly = function ( select ) {
     select.selectedIndex = 1;
     return false;
-}
+};
 
 filtrSestavy = function (elm) {
 
@@ -897,18 +825,18 @@ filtrSestavy = function (elm) {
     }
 
     return dialog(elm, 'Filtr', url);
-}
+};
 
 zobrazSestavu = function (elm) {
 
     var param = is_simple == 1 ? '&' : '?';
     
-    if ( elm.pc_od.value != '' ) {param = param + 'pc_od=' + elm.pc_od.value + '&'}
-    if ( elm.pc_do.value != '' ) {param = param + 'pc_do=' + elm.pc_do.value + '&'}
-    if ( elm.d_od.value != '' )  {param = param + 'd_od=' + elm.d_od.value + '&'}
-    if ( elm.d_do.value != '' )  {param = param + 'd_do=' + elm.d_do.value + '&'}
-    if ( elm.d_today.checked )  {param = param + 'd_today=' + elm.d_today.value + '&'}
-    if ( elm.rok.value != '' )   {param = param + 'rok=' + elm.rok.value}
+    if ( elm.pc_od.value != '' ) {param = param + 'pc_od=' + elm.pc_od.value + '&'; }
+    if ( elm.pc_do.value != '' ) {param = param + 'pc_do=' + elm.pc_do.value + '&'; }
+    if ( elm.d_od.value != '' )  {param = param + 'd_od=' + elm.d_od.value + '&'; }
+    if ( elm.d_do.value != '' )  {param = param + 'd_do=' + elm.d_do.value + '&'; }
+    if ( elm.d_today.checked )  {param = param + 'd_today=' + elm.d_today.value + '&'; }
+    if ( elm.rok.value != '' )   {param = param + 'rok=' + elm.rok.value; }
 
     //window.location.href = elm.url.value + param;
     window.open(elm.url.value + param);
@@ -916,12 +844,12 @@ zobrazSestavu = function (elm) {
     $('#dialog').dialog('close');
 
     return false;
-}
+};
 
 zrusitFiltrSestavy = function () {
     $('#dialog').dialog('close');
     return false;
-}
+};
 
 function nastylovat(data,typ) {
 
@@ -1082,7 +1010,7 @@ zmen_rezim_subjektu = function() {
         renderSubjekty();
     }, 'text');
     
-}
+};
 /**
  * Initializuje Select2 widgety na prvcich select s atributem data-widget-select2=1
  * kontroluje zda je funkce dostupna
@@ -1118,4 +1046,4 @@ postFormJ = function (form, callback) {
         form = $(form);
     
     $.post(form.attr('action'), form.serialize(), callback);
-}
+};

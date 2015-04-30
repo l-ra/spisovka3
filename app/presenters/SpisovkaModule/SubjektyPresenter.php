@@ -31,12 +31,45 @@ class SubjektyPresenter extends BasePresenter
         exit;
     }
     
+    public function renderIsdsid()
+    {
+        $id = $this->getParameter('id',null);
+        
+        if ( is_null($id) ) {
+            exit;
+        }
+        
+        $isds = new ISDS_Spisovka();
+        try {
+            $isds->pripojit();
+            $filtr['dbID'] = $id;
+            $prijemci = $isds->FindDataBoxEx($filtr);
+            if ( isset($prijemci->dbOwnerInfo) ) {
+                
+                $info = $prijemci->dbOwnerInfo[0];
+                
+                /*echo "<pre>";
+                print_r($info);
+                echo "</pre>";*/
+                
+                echo json_encode($info);
+            } else {
+                echo json_encode(array("error"=>$isds->error()));
+            }
+            
+            exit;
+                                    
+        } catch (Exception $e) {
+            echo json_encode(array("error"=>$e->getMessage()));
+            exit;
+        }
+    }    
+
     public function renderNovy()
     {
-        $this->template->title = " - Nový subjekt";
         $this->template->subjektForm = $this['novyForm'];
     }
-    
+        
     protected function vytvorFormular()
     {
         $typ_select = Subjekt::typ_subjektu();
@@ -63,7 +96,7 @@ class SubjektyPresenter extends BasePresenter
         $form1->addText('narodnost', 'Národnost / Stát registrace:', 50, 48);
         $form1->addSelect('stat_narozeni', 'Stát narození:', $stat_select)
                 ->setValue('CZE');
-
+        
         $form1->addText('adresa_ulice', 'Ulice / část obce:', 50, 48);
         $form1->addText('adresa_cp', 'číslo popisné:', 10, 10);
         $form1->addText('adresa_co', 'Číslo orientační:', 10, 10);
@@ -147,61 +180,6 @@ class SubjektyPresenter extends BasePresenter
         return $form1;
     }
 
-    public function actionVytvoritAjax()
-    {
-        $data = $this->getHttpRequest()->getPost();
-
-        if ( !isset($data['id']) ) {
-            echo "#Subjekt nebyl vytvořen! Chyba aplikace.";
-            exit;
-        }
-        $id = $data['id'];
-        
-        $vytvorit = array(
-            'type'=> ( !empty($data['subjekt_typ'][$id])?$data['subjekt_typ'][$id]:"" ),
-            'ic'=>'',
-            'nazev_subjektu' => ( !empty($data['subjekt_nazev'][$id])?$data['subjekt_nazev'][$id]:"" ),
-            'prijmeni' => ( !empty($data['subjekt_prijmeni'][$id])?$data['subjekt_prijmeni'][$id]:"" ),
-            'jmeno' => ( !empty($data['subjekt_jmeno'][$id])?$data['subjekt_jmeno'][$id]:"" ),
-            'titul_pred' => ( !empty($data['subjekt_titulpred'][$id])?$data['subjekt_titulpred'][$id]:"" ),
-            'titul_za' => ( !empty($data['subjekt_titulza'][$id])?$data['subjekt_titulza'][$id]:"" ),
-            'adresa_ulice' => ( !empty($data['subjekt_ulice'][$id])?$data['subjekt_ulice'][$id]:"" ),
-            'adresa_cp' => ( !empty($data['subjekt_cp'][$id])?$data['subjekt_cp'][$id]:"" ),
-            'adresa_co' => ( !empty($data['subjekt_co'][$id])?$data['subjekt_co'][$id]:"" ),
-            'adresa_mesto' => ( !empty($data['subjekt_mesto'][$id])?$data['subjekt_mesto'][$id]:"" ),
-            'adresa_psc' => ( !empty($data['subjekt_psc'][$id])?$data['subjekt_psc'][$id]:"" ),
-            'email' => ( !empty($data['subjekt_email'][$id])?$data['subjekt_email'][$id]:"" ),
-            'id_isds' => ( !empty($data['subjekt_isds'][$id])?$data['subjekt_isds'][$id]:"" ),
-            'adresa_stat' => ( !empty($data['stat'][$id])?$data['stat'][$id]:"" ),
-            'telefon'=>'',
-        );
-
-        $Subjekt = new Subjekt();
-
-        try {
-            // vytvor subjekt
-            $subjekt_id = $Subjekt->ulozit($vytvorit);
-            $subjekt_info = $Subjekt->getInfo($subjekt_id);
-            
-            try {
-                if (isset($data['dokument_id'])) {
-                    // byli jsme zavolani z dokumentu modulu spisovka
-                    $DokumentSubjekt = new DokumentSubjekt();
-                    $DokumentSubjekt->pripojit($data['dokument_id'], $subjekt_id, 'AO');
-                }
-
-                echo $subjekt_info->id ."#". Subjekt::displayName($subjekt_info, 'full');
-            }
-            catch (Exception $e) {
-                echo "#Subjekt byl vytvořen ale nepodařilo se jej připojit k dokumentu.";
-            }
-        } catch (Exception $e) {
-            echo "#Subjekt se nepodařil vytvořit.";
-        }
-
-        exit;
-    }
-
 }
 
 
@@ -213,6 +191,12 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $this->template->dokument_id = $this->getParameter('dok_id',null);
     }
 
+    public function renderNovy()
+    {
+        // Pouzij novy, zkraceny formular
+        $this->view = 'form2';
+    }
+        
     // Volano pouze pres Ajax
     public function renderNacti()
     {
@@ -350,40 +334,6 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
  *
  */
 
-    public function renderIsdsid()
-    {
-        $id = $this->getParameter('id',null);
-        
-        if ( is_null($id) ) {
-            exit;
-        }
-        
-        $isds = new ISDS_Spisovka();
-        try {
-            $isds->pripojit();
-            $filtr['dbID'] = $id;
-            $prijemci = $isds->FindDataBoxEx($filtr);
-            if ( isset($prijemci->dbOwnerInfo) ) {
-                
-                $info = $prijemci->dbOwnerInfo[0];
-                
-                /*echo "<pre>";
-                print_r($info);
-                echo "</pre>";*/
-                
-                echo json_encode($info);
-            } else {
-                echo json_encode(array("error"=>$isds->error()));
-            }
-            
-            exit;
-                                    
-        } catch (Exception $e) {
-            echo json_encode(array("error"=>$e->getMessage()));
-            exit;
-        }
-    }    
-
     protected function createComponentUpravitForm()
     {
         $form1 = parent::createComponentUpravitForm();
@@ -421,27 +371,78 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
     
     protected function createComponentNovyForm()
     {
-        $form1 = parent::createComponentNovyForm();
+        $form = parent::createComponentNovyForm();
         
         // formulář je odesílán přes Ajax, nelze tedy navázat událost na submit tlačítko
-        $form1->onSuccess[] = array($this, 'novyFormSucceeded');
-        $form1['novy']->controlPrototype->onclick("return subjektNovySubmit();");
-        $form1['storno']->controlPrototype->onclick("return dialogVyberSubjektu();");
+        $form->onSuccess[] = array($this, 'novyFormSucceeded');
+        
+        $callback = $this->getParameter('f', 'novySubjektOk');
+        $form['novy']->controlPrototype->onclick("return handleNovySubjekt($callback);");
+        $form['storno']->controlPrototype->onclick("$('#dialog').dialog('close'); return false;");
+        
+        $form->addHidden('dokument_id');
+        $dok_id = $this->getParameter('dok_id');
+        if ($dok_id)
+            $form['dokument_id']->setValue($dok_id);
 
-        return $form1;
+        $form->addHidden('extra_data', $this->getParameter('extra_data'));
+        
+        $form['stat_narozeni']->setDisabled(true);
+                
+        $form['jmeno']->setAttribute('size', 20);
+        $form['prijmeni']->setAttribute('size', 30);
+        $form['titul_pred']->setAttribute('size', 5);
+        $form['titul_za']->setAttribute('size', 5);
+        $form['adresa_ulice']->setAttribute('size', 40);
+
+        // nastaveni pripadnych vychozich hodnot
+        $form['type']->setValue($this->getParameter('type'));
+        $form['nazev_subjektu']->setValue($this->getParameter('nazev_subjektu'));
+        $form['jmeno']->setValue($this->getParameter('jmeno'));
+        $form['prijmeni']->setValue($this->getParameter('prijmeni'));
+        
+        $form['adresa_ulice']->setValue($this->getParameter('adresa_ulice'));
+        $form['adresa_cp']->setValue($this->getParameter('adresa_cp'));
+        $form['adresa_co']->setValue($this->getParameter('adresa_co'));
+        $form['adresa_psc']->setValue($this->getParameter('adresa_psc'));
+        $form['adresa_mesto']->setValue($this->getParameter('adresa_mesto'));
+        $form['email']->setValue($this->getParameter('email'));
+        $form['id_isds']->setValue($this->getParameter('id_isds'));
+        
+        return $form;
     }
 
     public function novyFormSucceeded(Nette\Application\UI\Form $form, $data)
     {
+        $dokument_id = isset($data['dokument_id']) ? $data['dokument_id'] : null;
+        $extra_data = isset($data['extra_data']) ? $data['extra_data'] : null;
+        $payload = ['status' => 'OK', 'extra_data' => $extra_data];
+        
         try {
             $Subjekt = new Subjekt();
-            $Subjekt->ulozit((array)$data);
-            echo "OK";
+            unset($data->dokument_id);
+            unset($data->extra_data);
+            $subjekt_id = $Subjekt->ulozit((array)$data);
+
+            try {
+                if ($dokument_id) {
+                    // byli jsme zavolani z dokumentu modulu spisovka
+                    $DokumentSubjekt = new DokumentSubjekt();
+                    $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'AO');
+                }
+                $payload['id'] = $subjekt_id;
+                $payload['name'] = Subjekt::displayName($data, 'full');
+
+            }
+            catch (Exception $e) {
+                $payload['status'] = "Subjekt byl vytvořen ale nepodařilo se jej připojit k dokumentu.";
+            }
             
         } catch (Exception $e) {
-            echo "Chyba! Subjekt se nepodařilo vytvořit.<br/>" . $e->getMessage();
+            $payload['status'] = "Chyba! Subjekt se nepodařilo vytvořit.\n" . $e->getMessage();
         }
-        $this->terminate();
+        
+        $this->sendJson($payload);
     }
 
     // Volano pouze pres Ajax

@@ -10,14 +10,4 @@ class Epodatelna_SubjektyPresenter extends SubjektyPresenter
         $this->template->subjekt = $Subjekt->getInfo($subjekt_id);
     }
 
-    protected function createComponentNovyForm()
-    {
-        $form1 = parent::createComponentNovyForm();
-
-        $form1['novy']->onClick[] = array($this, 'vytvoritClicked');
-        $form1['novy']->controlPrototype->onclick("return epodSubjektNovySubmit(this);");
-        $form1['storno']->controlPrototype->onclick("return epodSubjektNovyStorno();");
-
-        return $form1;
-    }
 }

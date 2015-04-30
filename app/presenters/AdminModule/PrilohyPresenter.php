@@ -21,7 +21,7 @@ class Admin_PrilohyPresenter extends BasePresenter
 
     public function actionDownload()
     {
-        $DownloadFile = $this->context->getService('storage');
+        $DownloadFile = $this->storage;
                 
         $FileModel = new FileModel();
         $file_id = $this->getParameter('id',null);
@@ -89,7 +89,7 @@ class Admin_PrilohyPresenter extends BasePresenter
         $upload = $data['file'];
 
         // Nacteni rozhrani pro upload dle nastaveni
-        $UploadFile = $this->context->getService('storage');
+        $UploadFile = $this->storage;
 
         if ( $file = $UploadFile->uploadDokument($data) ) {
             $this->flashMessage('Soubor "'. $file->nazev .'" úspěšně nahrán.');

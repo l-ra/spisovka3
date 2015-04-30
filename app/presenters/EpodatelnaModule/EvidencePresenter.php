@@ -78,9 +78,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $original = Epodatelna_DefaultPresenter::nactiEmail($this->storage, $zprava->file_id);
                 }
 
-                $subjekt->nazev_subjektu = $zprava->odesilatel;
+                $subjekt->nazev_subjektu = isset($original['zprava']->from->personal) 
+                        ? $original['zprava']->from->personal : $zprava->odesilatel;
                 $subjekt->prijmeni = @$original['zprava']->from->personal;
                 $subjekt->email = @$original['zprava']->from->email;
+                if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
+                    $subjekt->jmeno = $matches[1];
+                    $subjekt->prijmeni = $matches[2];
+                }
 
                 if ( $original['signature']['signed'] >= 0 ) {
 
@@ -113,7 +118,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $subjekt->id_isds = $original->dmDm->dbIDSender;
                 $subjekt->nazev_subjektu = $original->dmDm->dmSender;
                 $subjekt->type = ISDS_Spisovka::typDS($original->dmDm->dmSenderType);
-                $subjekt->adresa_ulice = $original->dmDm->dmSenderAddress;
+                if (isset($original->dmDm->dmSenderAddress)) {
+                    $res = ISDS_Spisovka::parseAddress($original->dmDm->dmSenderAddress);
+                    foreach ($res as $key => $value)
+                        $subjekt->$key = $value;                                                    
+                }
 
                 $SubjektModel = new Subjekt();
                 $subjekt_databaze = $SubjektModel->hledat($subjekt,'isds');
@@ -281,13 +290,13 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                             }
                         }
 
-                        try {
+                        // try {
                             $cislo = $this->vytvorit($evidence);
                             echo '<div class="evidence_report">Zpráva byla zaevidována ve spisové službě pod číslem "<a href="'. $this->link(':Spisovka:Dokumenty:detail', array("id"=>$cislo['id'])) .'" target="_blank">'.$cislo['jid'].'</a>".</div>';
-                        } catch (Exception $e) {
+                        /* } catch (Exception $e) {
                             echo '###Zprávu číslo '.$id.' se nepodařilo zaevidovat do spisové služby.';
                             echo ' CHYBA: '. $e->getMessage();
-                        }
+                        }*/
 
                         break;
                     case 2: // evidovat v jinem evidenci
@@ -708,10 +717,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function emailPrilohy($epodatelna_id, $dokument_id)
     {
-        $EvidencePrilohy = new Epodatelna_PrilohyPresenter();
-        $prilohy = $EvidencePrilohy->emailPrilohy($epodatelna_id);
+        $prilohy = Epodatelna_PrilohyPresenter::emailPrilohy($this->storage, $epodatelna_id);
         
-        $UploadFile = $this->context->getService('storage');
+        $UploadFile = $this->storage;
 
         $DokumentFile = new DokumentPrilohy();
 
@@ -783,10 +791,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function isdsPrilohy($epodatelna_id, $dokument_id)
     {
-        $EvidencePrilohy = new Epodatelna_PrilohyPresenter();
-        $prilohy = $EvidencePrilohy->isdsPrilohy($epodatelna_id);
+        $prilohy = Epodatelna_PrilohyPresenter::isdsPrilohy($this->storage, $epodatelna_id);
 
-        $UploadFile = $this->context->getService('storage');
+        $UploadFile = $this->storage;
 
         $DokumentFile = new DokumentPrilohy();
 
@@ -1115,10 +1122,5 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         }*/
     }
 
-    public function injectStorage(Storage_Basic $storage)
-    {
-        $this->storage = $storage;
-    }
-    
 }
 

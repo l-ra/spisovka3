@@ -1,0 +1,25 @@
+{form novyForm}
+{if $form->hasErrors()}
+    <div class="flash_message flash_warning" n:foreach="$form->errors as $error">{$error}</div>
+{/if}
+<dl id="form_novy_subjekt2">
+<dt>Typ subjektu:</dt>
+<dd>{input type}</dd>
+<dt>Název subjektu:</dt>
+<dd>{input nazev_subjektu}</dd>
+<dt>Titul před, jméno, příjmení, titul za:</dt>
+<dd>{input titul_pred}{input jmeno}{input prijmeni}{input titul_za}</dd>
+<dt>Ulice, číslo popisné a orientační:</dt>
+<dd>{input adresa_ulice}{input adresa_cp}{input adresa_co}</dd>
+<dt>PSČ a Město:</dt>
+<dd>{input adresa_psc}{input adresa_mesto}</dd>
+<dt>Stát:</dt>
+<dd>{input adresa_stat}</dd>
+<dt>Email:</dt>
+<dd>{input email}</dd>
+<dt>ID datové schránky:</dt>
+<dd>{input id_isds}</dd>                        
+<br /><dt>&nbsp;</dt>
+<dd>{input novy} {input storno}</dd>
+</dl>
+{/form}

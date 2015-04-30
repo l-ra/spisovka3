@@ -198,22 +198,15 @@
                 <dt>Vyhledat subjekt:</dt>
                 <dd>
                     <input type="text" name="subjekt_autocomplete" id="subjekt_epod_autocomplete" size="60" />
-                    <a href="{link :Epodatelna:Subjekty:vyber}" id="dialog-subjekt">Seznam</a>
+                    <a href="{link :Spisovka:Subjekty:vyber, epodatelna => 1}" id="dialog-subjekt">Seznam</a>
                 </dd>
             </dl>
             <dl class="detail_item" id="subjekt_novy">
                 <dt>&nbsp;</dt>
                 <dd>
-                    <script type="text/javascript">
-                        var subjekt_original = {json_encode($Subjekt['original'])|noescape};
-                    </script>
-                    <a href="" id="epod_evid_novysubjekt_click">Vytvořit nový subjekt z odesílatele</a>
+                    <a href={link :Spisovka:Subjekty:novy, f => evidNovySubjektOk} id="epod_evid_novysubjekt_click" data-postdata="{json_encode($Subjekt['original'])}">Vytvořit nový subjekt z odesílatele</a>
                 </dd>
-            </dl>
-
-
-            
-
+            </dl>           
 
         </div>
         <div id="dok-subjekty">

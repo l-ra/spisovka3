@@ -170,7 +170,6 @@ class ISDS_Spisovka extends ISDS {
             $this->debug_return('error','Prázdný či neplatný parametr!');
             $this->debug_return('return',false);
             throw new InvalidArgumentException("Prázdný či neplatný parametr!");
-            return false;
         }
 
         // Komu
@@ -179,7 +178,6 @@ class ISDS_Spisovka extends ISDS {
             $this->debug_return('error','Není k dispozici adresát!');
             $this->debug_return('return',false);
             throw new InvalidArgumentException("Není k dispozici adresát!");
-            return false;
         }
 
         // nacteni zpravy
@@ -350,8 +348,34 @@ class ISDS_Spisovka extends ISDS {
         } else {
             return null;
         }
-
     }
 
+    /** 
+     * 
+     * @param string $addr
+     * @return array
+     */
+    public static function parseAddress($addr)
+    {
+        $ret = [];
+        $matches = [];
+        if (preg_match('/(.*), ([0-9]*) (.*), (.*)/', $addr, $matches)) {
+            $ret['adresa_ulice'] = $matches[1];
+            $ret['adresa_psc'] = $matches[2];
+            $ret['adresa_mesto'] = $matches[3];
+            // Bohuzel spisovka pouziva 3 znakove kody statu, ne 2 jako DS.
+            // Ale vsechny datove schranky by mely byt v CR.
+            // $ret['adresa_stat'] = $matches[4];
+            if (preg_match('#(.*) ([\d]*)/([\d]*)#', $ret['adresa_ulice'], $matches)) {
+                $ret['adresa_ulice'] = $matches[1];
+                $ret['adresa_cp'] = $matches[2];
+                $ret['adresa_co'] = $matches[3];                            
+            }
+        }
+        else
+            $ret['adresa_ulice'] = $addr;
+        
+        return $ret;
+    }
 }
 

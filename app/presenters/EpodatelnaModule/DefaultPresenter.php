@@ -473,7 +473,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $original = self::nactiEmail($this->storage, $zprava->file_id);
                     }
 
-                    $subjekt->nazev_subjektu = $zprava->odesilatel;
+                    $subjekt->nazev_subjektu = isset($original['zprava']->from->personal) 
+                        ? $original['zprava']->from->personal : $zprava->odesilatel;
                     $subjekt->prijmeni = @$original['zprava']->from->personal;
                     $subjekt->email = @$original['zprava']->from->email;
                     if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
@@ -512,19 +513,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $subjekt->id_isds = @$original->dmDm->dbIDSender;
                     $subjekt->nazev_subjektu = @$original->dmDm->dmSender;
                     $subjekt->type = ISDS_Spisovka::typDS(@$original->dmDm->dmSenderType);
-                    if (isset($original->dmDm->dmSenderAddress))
-                        $subjekt->ulice = $original->dmDm->dmSenderAddress;
-
-                    if (preg_match('/(.*), ([0-9]*) (.*), (.*)/', $subjekt->ulice, $matches)) {
-                        $subjekt->ulice = $matches[1];
-                        $subjekt->psc = $matches[2];
-                        $subjekt->mesto = $matches[3];
-                        if (preg_match('#(.*) ([\d]*)/([\d]*)#', $subjekt->ulice, $matches)) {
-                            $subjekt->ulice = $matches[1];
-                            $subjekt->cp = $matches[2];
-                            $subjekt->co = $matches[3];                            
-                        }
-
+                    if (isset($original->dmDm->dmSenderAddress)) {
+                        $res = ISDS_Spisovka::parseAddress($original->dmDm->dmSenderAddress);
+                        foreach ($res as $key => $value)
+                            $subjekt->$key = $value;                                                    
                     }
                     
                     $SubjektModel = new Subjekt();
@@ -563,7 +555,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $tmp = array();
             $user = $this->user->getIdentity();
 
-            $UploadFile = $this->context->getService('storage');
+            $UploadFile = $this->storage;
             
             $pocet_novych_zprav = 0;
             $zpravy = $isds->seznamPrichozichZprav($od, $do);
@@ -863,7 +855,7 @@ dmFormat =
                 $tmp = array();
                 $user = $this->user->getIdentity();
 
-                $UploadFile = $this->context->getService('storage');
+                $UploadFile = $this->storage;
 
                 foreach($zpravy as $mess) {
 
@@ -994,7 +986,7 @@ dmFormat =
         $tmp = array();
         $user = $this->user->getIdentity();
 
-        $UploadFile = $this->context->getService('storage');
+        $UploadFile = $this->storage;
 
         $zpravy = $imap->get_head_messages();
         
@@ -1139,11 +1131,6 @@ dmFormat =
         return count($tmp);
     }
 
-    public function injectStorage(Storage_Basic $storage)
-    {
-        $this->storage = $storage;
-    }
-    
     public static function nactiISDS($storage, $file_id)
     {
         $DownloadFile = $storage;
@@ -1221,7 +1208,7 @@ dmFormat =
                     if ( $file ) {
                     
                         // Nacteni originalu DS
-                        $DownloadFile = $this->context->getService('storage');
+                        $DownloadFile = $this->storage;
                         $source = $DownloadFile->download($file,1);
                         
                         if ( $source ) {

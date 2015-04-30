@@ -1,15 +1,7 @@
-    {if isset($chyba)}
-    <div class="flash_message flash_warning">Subjekt se nepodařilo připojit k dokumentu. Zkuste to znovu.</div>
-    {/if}
-
-    <div class="blok_menu">
-        <a href="{link :Spisovka:Subjekty:novy}" onclick="return dialogNovySubjekt(this);">Nový subjekt</a>
-    </div>
-
     {control abc}
     
     {if count($seznam)>0}
-    
+    {var epod = $presenter->getParameter('epodatelna', false)}
     <table class="seznam">
         {foreach $seznam as $subjekt}
         <tr>
@@ -17,13 +9,14 @@
                 <img src="{$publicUrl}images/subjekt/{if empty($subjekt->type)}fo{else}{$subjekt->type|lower}{/if}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
             </td>
             <td class="meta">
-                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>&nbsp;
+                <strong>{if $epod}<a href="" onclick="epodSubjektVybran(this, {$subjekt->id}); return false;">{/if}{=Subjekt::displayName($subjekt,'jmeno_item')}{if $epod}</a>{/if}
+                </strong>
                 <div class="info">
                 <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
                 <br />
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
-                <div class="vyber">
+                <div class="vyber" n:if="!$epod">
                     <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id, 'typ'=>'A' }" onclick="subjektVybran(this); return false;">adresát</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id, 'typ'=>'O' }" onclick="subjektVybran(this); return false;">odesilatel</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id, 'typ'=>'AO' }" onclick="subjektVybran(this); return false;">adresát i odesilatel</a>

@@ -2,10 +2,13 @@
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
-
-    public $oldLayoutMode = FALSE;
-    public $oldModuleMode = TRUE;
-
+    protected $storage;
+    
+    public function injectStorage(Storage_Basic $storage)
+    {
+        $this->storage = $storage;
+    }
+    
     public function startup()
     {
 

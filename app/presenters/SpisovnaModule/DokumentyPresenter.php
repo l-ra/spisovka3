@@ -625,7 +625,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $prilohy = $DokumentPrilohy->prilohy($dokument_id);
         if ( array_key_exists($file_id, $prilohy) ) {
 
-            $DownloadFile = $this->context->getService('storage');
+            $DownloadFile = $this->storage;
             $FileModel = new FileModel();
             $file = $FileModel->getInfo($file_id);
             $res = $DownloadFile->download($file);

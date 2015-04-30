@@ -43,7 +43,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         if ( $DokumentPrilohy->odebrat($dokument_id, $file_id) ) {
         
-            $UploadFile = $this->context->getService('storage');
+            $UploadFile = $this->storage;
             
             try {
                 $UploadFile->remove($file_id);
@@ -118,7 +118,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $data['dir'] = date('Y') .'/DOK-'. sprintf('%06d',$dokument_id) .'-'.date('Y');
 
         // Nacteni rozhrani pro upload dle nastaveni
-        $UploadFile = $this->context->getService('storage');
+        $UploadFile = $this->storage;
 
         try {
 
@@ -221,7 +221,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         if ( $upload->error == 0 ) {
             // Nacteni rozhrani pro upload dle nastaveni
-            $UploadFile = $this->context->getService('storage');
+            $UploadFile = $this->storage;
 
             if ( $file = $UploadFile->uploadDokument($data) ) {
                 $FileModel = new FileModel();

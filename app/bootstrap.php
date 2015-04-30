@@ -304,7 +304,7 @@ if ( $clean_url ) {
                 
     $router[] = new Nette\Application\Routers\Route('test/<action>', 'Test:Default:');
 
-    $router[] = new Nette\Application\Routers\Route('<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|reset|filtrovat|spustit>', array(
+    $router[] = new Nette\Application\Routers\Route('<presenter>/<action>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
                 'action' => 'default',

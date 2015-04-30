@@ -2,22 +2,11 @@
 
 class Epodatelna_PrilohyPresenter extends BasePresenter
 {
+    protected $storage;
 
-    public function downloadSource($file_id, $typ = 2)
+    private static function downloadEpodSource($storage, $epodatelna_id, $typ = 2)
     {
-        $DownloadFile = $this->context->getService('storage');
-
-        $FileModel = new FileModel();
-        $file = $FileModel->getInfo($file_id);
-        $res = $DownloadFile->download($file,$typ);
-
-        return $res;
-
-    }
-
-    public function downloadEpodSource($epodatelna_id, $typ = 2)
-    {
-        $DownloadFile = $this->context->getService('storage');
+        $DownloadFile = $storage;
 
         $Epod = new Epodatelna();
         $FileModel = new FileModel();
@@ -31,7 +20,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
     }
 
-    public function downloadISDSPrilohu( $source_file , $part = null , $output = 0 )
+    private static function downloadISDSPrilohu( $source_file , $part = null , $output = 0 )
     {
 
         if ( $fp = fopen($source_file,'rb') ) {
@@ -83,7 +72,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
     }
 
-    public function downloadEmailPrilohu( $source , $part = null , $output = 0 )
+    private static function downloadEmailPrilohu( $source , $part = null , $output = 0 )
     {
 
         $imap = new ImapClientFile();
@@ -186,16 +175,16 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
     }
 
 
-    public function emailPrilohy( $epodatelna_id )
+    public static function emailPrilohy($storage, $epodatelna_id )
     {
-        $res = $this->downloadEpodSource($epodatelna_id,2);
-        return $this->downloadEmailPrilohu($res);
+        $res = self::downloadEpodSource($storage, $epodatelna_id, 2);
+        return self::downloadEmailPrilohu($res);
     }
 
-    public function isdsPrilohy( $epodatelna_id )
+    public static function isdsPrilohy($storage, $epodatelna_id )
     {
-        $res = $this->downloadEpodSource($epodatelna_id,2);
-        $prilohy = $this->downloadISDSPrilohu($res);
+        $res = self::downloadEpodSource($storage, $epodatelna_id, 2);
+        $prilohy = self::downloadISDSPrilohu($res);
 
         return $prilohy;
     }
@@ -207,7 +196,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         $part = $this->getParameter('file',null);
         $string = $this->getParameter('string',null);
 
-        $res = $this->downloadEpodSource($epodatelna_id,2);
+        $res = self::downloadEpodSource($this->storage, $epodatelna_id,2);
         $filename = basename($res);
 
         if ( strpos($filename,'.eml')!==false ) {
@@ -222,7 +211,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                 $part = 0;
             }
 
-            $tmp_file = $this->downloadEmailPrilohu($res, $part);
+            $tmp_file = self::downloadEmailPrilohu($res, $part);
 
             if ( !empty($tmp_file['file']) ) {
 
@@ -245,7 +234,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         } elseif ( strpos($filename,'.bsr')!==false ) {
             // jde o ds
 
-            $tmp_file = $this->downloadISDSPrilohu($res, $part);
+            $tmp_file = self::downloadISDSPrilohu($res, $part);
 
             $httpResponse = $this->getHttpResponse();
             $httpResponse->setContentType($tmp_file['mime-type']);

@@ -1,3 +1,5 @@
+/* global BASE_URL, is_simple, PUBLIC_URL */
+
 var loaded_data = new Array();
 
 $(function() {
@@ -32,128 +34,30 @@ $(function() {
     $('#subjekt_novy').on('click', '#epod_evid_novysubjekt_click', function(event) {    
         event.preventDefault();
 
-        id = document.getElementById('frmnovyForm-epodatelna_id').value;
+        dialog(this, 'Nový subjekt');
 
-        if ( is_simple == 1 ) {
-            url_ajaxtyp = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamtypusubjektu';
-        } else { 
-            url_ajaxtyp = BASE_URL + 'subjekty/0/seznamtypusubjektu';
-        }
-        $.getJSON(url_ajaxtyp, function(data){
-            var typ_select = '<select name="subjekt_typ['+id+']">';
-
-            $.each(data, function(key, val) {
-                typ_select = typ_select + '<option value="' + key + '">' + val + '</option>';
-            });
-            
-            typ_select = typ_select + "</select>";
-            $('#typ_subjektu').html(typ_select);
-        });   
-
-        //alert('subjekt_original');
-
-        var select_stat = '<select name="stat['+id+']">';
-        $.each(seznamStatu, function(key, val) {
-            select_stat = select_stat + '<option value="' + key + '">' + val + '</option>';
-        });       
-        select_stat = select_stat + "</select>";
-
-        novy_subjekt = ''+
-'                        <dt>Typ subjektu:</dt>'+
-'                        <dd id="typ_subjektu"></dd>'+
-'                        <dt>Název subjektu:</dt>'+
-'                        <dd><input type="text" name="subjekt_nazev['+id+']" value="'+ ((typeof subjekt_original['nazev_subjektu'] != 'undefined')?htmlspecialchars(subjekt_original['nazev_subjektu']):"") +'" size="60" /></dd>'+
-'                        <dt>Titul před, jméno, příjmení, titul za:</dt>'+
-'                        <dd><input type="text" name="subjekt_titulpred['+id+']" value="" size="5" /><input type="text" name="subjekt_jmeno['+id+']" value="" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="'+ ((typeof subjekt_original['prijmeni'] != 'undefined')?htmlspecialchars(subjekt_original['prijmeni']):"") +'" size="40" /><input type="text" name="subjekt_titulza['+id+']" value="" size="5" /></dd>'+
-'                        <dt>Ulice, číslo popisné a orientační:</dt>'+
-'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="'+ ((typeof subjekt_original['adresa_ulice'] != 'undefined')?htmlspecialchars(subjekt_original['adresa_ulice']):"") +'" size="20" /><input type="text" name="subjekt_cp['+id+']" value="" size="5" /><input type="text" name="subjekt_co['+id+']" value="" size="5" /></dd>'+
-'                        <dt>PSČ a Město:</dt>'+
-'                        <dd><input type="text" name="subjekt_psc['+id+']" value="" size="6" /><input type="text" name="subjekt_mesto['+id+']" value="" size="50" /></dd>'+
-'                        <dt>Stát:</dt>'+
-'                        <dd>'+select_stat+'</dd>'+
-'                        <dt>Email:</dt>'+
-'                        <dd><input type="text" name="subjekt_email['+id+']" value="'+ ((typeof subjekt_original['email'] != 'undefined')?htmlspecialchars(subjekt_original['email']):"") +'" size="60" /></dd>'+
-'                        <dt>ID datové schránky:</dt>'+
-'                        <dd><input type="text" name="subjekt_isds['+id+']" value="'+ ((typeof subjekt_original['id_isds'] != 'undefined')?htmlspecialchars(subjekt_original['id_isds']):"") +'" size="30" /></dd>'+
-'                        <dt>&nbsp;</dt>'+
-'                        <dd><input type="submit" name="subjekt_pridat['+id+']" value="Vytvořit a přidat" id="subjekt_pridat" /></dd>';
-
-        $('#subjekt_novy').html(novy_subjekt);
-
-        $("#subjekt_pridat").click(function() {
-
-            var formdata = 'id='+id+'&' + $(document.forms["frm-novyForm"]).serialize();
-
-            if ( is_simple == 1 ) {
-                url = BASE_URL + '?presenter=Epodatelna%3Asubjekty&action=vytvoritAjax';
-            } else {  
-                url = BASE_URL + 'epodatelna/subjekty/vytvoritAjax';
-            }
-            
-            $.post(url, formdata, function (text) {
-                if ( text[0] == "#" ) {
-                    text = text.substr(1);
-                    alert(text);
-                } else {
-                    part = text.split("#");
-                    $('#subjekt_novy').html(
-                        '<dt>&nbsp;</dt>'+
-                        '<dd><a href="" id="epod_evid_novysubjekt_click">Vytvořit nový subjekt z odesílatele</a></dd>'
-                    );
-
-                    renderEpodSubjekty(part[0]);
-
-                    alert('Subjekt byl vytvořen a přidán mezi nalezené subjekty.');
-
-                }
-            });
-
-            return false;
-        });
-
-        return false;
+        return false;        
     });
 
 
 });
 
+evidNovySubjektOk = function (data) {
+    alert('Subjekt byl úspěšně vytvořen.');
+    $('#dialog').dialog('close');
+    renderEpodSubjekty(data.id);
+};
 
-epodSubjektVytvorit = function (elm) {
-
-    postFormJ($("#subjekt-vytvorit"), function (data) {
-        if ( data.indexOf('###zmeneno###') != -1 ) {
-            data = data.replace('###zmeneno###','');
-            $('#dialog').dialog('close');
-            renderEpodSubjekty(data);
-        } else {
-            $('#dialog').html(data);
-        }        
-    });
-
-    return false;
-}
-
-epodSubjektNovySubmit = function (elm) {
-    epodSubjektVytvorit(elm);
-    return false;    
-}
-
-epodSubjektNovyStorno = function () {
-
-    $('#dialog').html(dialogSpinner());
-
-    if ( is_simple == 1 ) {
-        url = BASE_URL + '?presenter=Epodatelna%3Asubjekty&action=vyber';
-    } else {    
-        url = BASE_URL + 'epodatelna/subjekty/vyber';
-    }
+zpravyNovySubjektOk = function (data) {
+    alert('Subjekt byl úspěšně vytvořen.');
+    $('#dialog').dialog('close');
     
-    $.get(url, function(data) {
-        $('#dialog').html(data);
-    });
-    
-    return false;
-}
+    var id = data.extra_data;
+
+    var checkbox = '<input type="checkbox" name="subjekt['+id+']['+data.id+']" />';
+    checkbox += data.name +'<br/>';
+    $('#subjekt_seznam_'+id).append(checkbox);
+};
 
 renderEpodSubjekty = function (subjekt_id) {
 
@@ -194,14 +98,14 @@ renderEpodSubjekty = function (subjekt_id) {
     });
     
     return false;
-}
+};
 
 epodSubjektVybran = function (elm, subjekt_id) {
 
     $('#dialog').dialog('close');
     elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
     renderEpodSubjekty(subjekt_id);
-}
+};
 
 zkontrolovatSchranku = function (elm) {
 
@@ -218,9 +122,9 @@ zkontrolovatSchranku = function (elm) {
         // nacteni novych zprav z database se musi provest az po stazeni vsech zprav z emailove schranky
         nactiZpravy();
     }).fail(function(data) {
-        $('#zkontrolovat_status').html('Při kontrole zpráv došlo k chybě ' + x.status);
+        $('#zkontrolovat_status').html('Při kontrole zpráv došlo k chybě.');
     });    
-}
+};
 
 zkontrolovatOdchoziSchranku = function (elm) {
 
@@ -232,7 +136,7 @@ zkontrolovatOdchoziSchranku = function (elm) {
 
     // zde není potřeba žádná zpětná vazba
     $.get(url);
-}
+};
 
 
 nactiZpravy = function () {
@@ -248,7 +152,7 @@ nactiZpravy = function () {
         var zpravy = eval("(" + data + ")");
         if ( zpravy != '' ) {
             
-            for(index in zpravy) {
+            for(var index in zpravy) {
                 if ( in_array(index, loaded_data) == true ) {
                     continue;
                 }
@@ -257,7 +161,7 @@ nactiZpravy = function () {
             }
         }
     });    
-}
+};
 
 function in_array (needle, haystack)
 {
@@ -269,7 +173,7 @@ function in_array (needle, haystack)
         }
     }
     return false;
-}
+};
 
 function bytesToSize (bytes) {
   var sizes = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -313,7 +217,7 @@ generujZpravu = function ( id, data ) {
 
     prilohy = '';
     if ( data['prilohy'].length > 0 ) {
-        for ( key in data['prilohy'] ) {
+        for ( var key in data['prilohy'] ) {
             if ( is_simple == 1 ) {
                 prilohy = prilohy + '                    <li><a href="'+BASE_URL+'?presenter=Epodatelna%3Aprilohy&action=download&id='+id+'&file='+ data['prilohy'][key]['id'] +'">'+ data['prilohy'][key]['name'] +'</a> [ '+ bytesToSize(data['prilohy'][key]['size']) +' ]</li>';
             } else { 
@@ -324,7 +228,7 @@ generujZpravu = function ( id, data ) {
     subjekt_seznam = '';
     //alert(data['subjekt']['databaze']);
     if ( typeof data['subjekt']['databaze'] != 'null' ) {
-        for ( key in data['subjekt']['databaze'] ) {
+        for ( var key in data['subjekt']['databaze'] ) {
                 subjekt_seznam = subjekt_seznam + '<input type="checkbox" name="subjekt['+id+']['+data['subjekt']['databaze'][key]['id']+']" />';
                 subjekt_seznam = subjekt_seznam + data['subjekt']['databaze'][key]['full_name'] +'<br/>';
         }
@@ -376,7 +280,7 @@ subjekt_seznam +
 '                    </dl>'+
 '                    <dl id="subjekt_novy_'+id+'">'+
 '                        <dt>&nbsp;</dt>'+
-'                        <dd><a href="" id="novysubjekt_click_'+id+'">Vytvořit nový subjekt z odesílatele</a></dd>'+
+'                        <dd><a href="' + linkNovySubjekt + '" id="novysubjekt_click_'+id+'">Vytvořit nový subjekt z odesílatele</a></dd>'+
 '                    </dl>'+
 '                    <span>Zaevidovat do spisové služby.</span>'+
 '                    <dl>'+
@@ -475,92 +379,13 @@ form_odmitnout +
         }
     });
     
-    //$('#subjekt_novy_'+id).delegate('click', '#novysubjekt_click_'+id, function(event) {    
+    // $.parseJSON(postdata);
+    var postdata = JSON.stringify(data['subjekt']['original']);
+
     $('#novysubjekt_click_'+id).click(function(event) {    
-        event.preventDefault();
-
-        if ( is_simple == 1 ) {
-            url_ajaxtyp = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=0&action=seznamtypusubjektu';
-        } else { 
-            url_ajaxtyp = BASE_URL + 'subjekty/0/seznamtypusubjektu';
-        }
-        $.getJSON(url_ajaxtyp, function(typ_data){
-            var typ_select = '<select name="subjekt_typ['+id+']">';
-
-            $.each(typ_data, function(key, val) {
-                typ_select = typ_select + '<option value="' + key + '">' + val + '</option>';
-            });
-            
-            typ_select = typ_select + "</select>";
-            $('#typ_subjektu_'+id).html(typ_select);
-            
-            if ((typeof data['subjekt']['original']['type']) != 'undefined')
-                $('[name="subjekt_typ['+id+']"]').val(data['subjekt']['original']['type']);
-        });   
-
-        var select = '<select name="stat['+id+']">';
-        $.each(seznamStatu, function(key, val) {
-            select = select + '<option value="' + key + '">' + val + '</option>';
-        });       
-        select = select + "</select>";
-
-        novy_subjekt = ''+
-'                        <dt>Typ subjektu:</dt>'+
-'                        <dd id="typ_subjektu_'+id+'"></dd>'+
-'                        <dt>Název subjektu:</dt>'+
-'                        <dd><input type="text" name="subjekt_nazev['+id+']" value="'+ ((typeof data['subjekt']['original']['nazev_subjektu'] != 'undefined')?data['subjekt']['original']['nazev_subjektu']:"") +'" size="60" /></dd>'+
-'                        <dt>Jméno Příjmení:</dt>'+
-'                        <dd><input type="text" name="subjekt_jmeno['+id+']" value="'+ data['subjekt']['original']['jmeno'] +'" size="20" /><input type="text" name="subjekt_prijmeni['+id+']" value="'+ ((typeof data['subjekt']['original']['prijmeni'] != 'undefined')?data['subjekt']['original']['prijmeni']:"") +'" size="40" /></dd>'+
-'                        <dt>Ulice, číslo popisné a orientační:</dt>'+
-'                        <dd><input type="text" name="subjekt_ulice['+id+']" value="'+ ((typeof data['subjekt']['original']['ulice'] != 'undefined')?data['subjekt']['original']['ulice']:"") +'" size="20" /><input type="text" name="subjekt_cp['+id+']" value="'+data['subjekt']['original']['cp']+'" size="5" /><input type="text" name="subjekt_co['+id+']" value="'+data['subjekt']['original']['co']+'" size="5" /></dd>'+
-'                        <dt>PSČ a Město:</dt>'+
-'                        <dd><input type="text" name="subjekt_psc['+id+']" value="' + data['subjekt']['original']['psc'] + '" size="6" /><input type="text" name="subjekt_mesto['+id+']" value="'+data['subjekt']['original']['mesto']+'" size="50" /></dd>'+
-'                        <dt>Stát:</dt>'+
-'                        <dd>'+select+'</dd>'+
-'                        <dt>Email:</dt>'+
-'                        <dd><input type="text" name="subjekt_email['+id+']" value="'+ ((typeof data['subjekt']['original']['email'] != 'undefined')?data['subjekt']['original']['email']:"") +'" size="60" /></dd>'+
-'                        <dt>ID datové schránky:</dt>'+
-'                        <dd><input type="text" name="subjekt_isds['+id+']" value="'+ ((typeof data['subjekt']['original']['id_isds'] != 'undefined')?data['subjekt']['original']['id_isds']:"") +'" size="30" /></dd>'+
-'                        <dt>&nbsp;</dt>'+
-'                        <dd><input type="submit" name="subjekt_pridat['+id+']" value="Vytvořit a přidat" id="subjekt_pridat_'+id+'" /></dd>';
-
-
-        $('#subjekt_novy_'+id).html(novy_subjekt);
-                
-        $("#subjekt_pridat_"+id).click(function() {
-
-            var formdata = 'id='+id+'&' + $('#h_evidence').serialize();
-
-            if ( is_simple == 1 ) {
-                url = BASE_URL + '?presenter=Epodatelna%3Asubjekty&action=vytvoritAjax';
-            } else { 
-                url = BASE_URL + 'epodatelna/subjekty/vytvoritAjax';
-            }
-
-            $.post(url, formdata, function (text) {
-                if ( text[0] == "#" ) {
-                    text = text.substr(1);
-                    alert(text);
-                } else {
-
-                    part = text.split("#");
-
-                    $('#subjekt_novy_'+id).html('');
-
-                    subjekt_seznam = '<input type="checkbox" name="subjekt['+id+']['+part[0]+']" />';
-                    subjekt_seznam = subjekt_seznam + part[1] +'<br/>';
-                    $('#subjekt_seznam_'+id).append(subjekt_seznam);
-
-                    alert('Subjekt byl vytvořen a přidán mezi nalezené subjekty.');
-                }                    
-            });
-
-            return false;
-        });
-
-        return false;
-    });
-
+        dialog(this, 'Nový subjekt', $(this).attr('href') + '&extra_data='+id);    
+        return false;                
+    }).attr('data-postdata', postdata);
 
     $('#evidence_form_evidovat_'+id).css('display','none');
     $('#evidence_form_jina_evidence_'+id).css('display','none');
@@ -575,7 +400,7 @@ form_odmitnout +
         var element_id = $(this).attr('name');
         var value = $(this).val();
         //the initial starting point of the substring is based on "myboxes["
-        var id = element_id.substring(15,element_id.length - 1)
+        var id = element_id.substring(15,element_id.length - 1);
 
         $('#evidence_form_evidovat_'+id).css('display','none');
         $('#evidence_form_jina_evidence_'+id).css('display','none');
