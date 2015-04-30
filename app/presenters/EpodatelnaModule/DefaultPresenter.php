@@ -1079,6 +1079,7 @@ dmFormat =
                                 // obsahuje - pokracujeme
                             } else {
                                 // neobsahuje kvalifikovany epodpis
+                                $zprava['stav'] = 100;
                                 $zprava['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje kvalifikovaný elektronický podpis';
                                 $this->Epodatelna->insert($zprava);
                                 continue;
@@ -1086,6 +1087,7 @@ dmFormat =
                         }
                     } else {
                         // email neobsahuje epodpis
+                        $zprava['stav'] = 100;
                         $zprava['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje elektronický podpis';
                         $this->Epodatelna->insert($zprava);
                         continue;
