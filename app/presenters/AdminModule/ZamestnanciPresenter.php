@@ -18,7 +18,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         // hledani
         $this->hledat = "";
         $this->template->no_items = 0;
-        $args = null;
+        $args = [];
         if ( isset($hledat) ) {
             $args = array(array(
                     "CONCAT(jmeno,' ',prijmeni) LIKE %s OR",'%'.$hledat.'%',
@@ -35,20 +35,11 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         // zobrazit podle pismena
         $abc = $abcPaginator->getParameter('abc');
         if ( !empty($abc) ) {
-            if ( is_array($args) ) {
-                $args[] = array("prijmeni LIKE %s",$abc.'%');
-            } else {
-                $args = array(array("prijmeni LIKE %s",$abc.'%'));
-            }
+            $args[] = array("prijmeni LIKE %s", $abc.'%');
         }
 
-        // pouze aktivni
-        if ( is_array($args) ) {
-            $args[] = array('stav=0');
-        } else {
-            $args = array('stav=0');
-        }
-
+        // [P.L.] stav neni pouzit v aplikaci
+        $args[] = 'stav=0';
 
         // nacteni
         $Osoba = new Osoba();
