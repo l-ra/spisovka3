@@ -45,7 +45,8 @@ class Spisovka_SpojitPresenter extends BasePresenter
             $tmp = array();
             foreach ( $seznam as $dokument_id ) {
 
-                if (is_object($dokument_id) ) { $dokument_id = $dokument_id->dokument_id; }
+                if (is_object($dokument_id))
+                    $dokument_id = $dokument_id->id;
 
                 $dok = $Dokument->getBasicInfo($dokument_id);
 

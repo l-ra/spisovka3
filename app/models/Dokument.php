@@ -43,7 +43,7 @@ class Dokument extends BaseModel
         
             'distinct'=>1,
             'from' => array($this->tb_workflow => 'wf'),
-            'cols' => array('wf.dokument_id','wf.dokument_id'=>'id'),
+            'cols' => array('wf.dokument_id' => 'id'),
             'where' => $where,
             'where_or' => $where_or,
             'order' => $order,
