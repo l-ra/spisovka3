@@ -187,7 +187,7 @@ generujZpravu = function ( id, data ) {
     typ = 0;
     if ( typeof data['email_id'] == "string" ) {
         typ = 1;
-        typ_string = '<img src="'+BASE_URL+'images/icons/typdok1.png" alt="Email" title="Email" width="24" height="16" />';
+        typ_string = '<img src="'+PUBLIC_URL+'images/icons/typdok1.png" alt="Email" title="Email" width="24" height="16" />';
 
         form_odmitnout = '                    <dl>'+
 '                        <dt>&nbsp;</dt>'+
@@ -208,7 +208,7 @@ generujZpravu = function ( id, data ) {
 
     } else if ( typeof data['isds_id'] == "string" ) {
         typ = 2;
-        typ_string = '<img src="'+BASE_URL+'images/icons/typdok2.png" alt="ISDS" title="ISDS" width="24" height="16" />';
+        typ_string = '<img src="'+PUBLIC_URL+'images/icons/typdok2.png" alt="ISDS" title="ISDS" width="24" height="16" />';
         form_odmitnout = '';
     } else {
         typ_string = '';
