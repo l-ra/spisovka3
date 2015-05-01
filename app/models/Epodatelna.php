@@ -52,21 +52,12 @@ class Epodatelna extends BaseModel
         
         $sql = array(
         
-            'distinct'=>1,
             'from' => array($this->name => 'ep'),
             'where' => $where,
             'where_or' => $where_or,
             'order' => $order,
             'limit' => $limit,
             'offset' => $offset,
-            'leftJoin' => array(
-                'dokument' => array(
-                    'from' => array($this->tb_file => 'f'),
-                    'on' => array('f.id=ep.file_id'),
-                    'cols' => array('real_path')
-                )
-            )
-        
         );
 
         //echo "<pre>";
