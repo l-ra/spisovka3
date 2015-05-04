@@ -2508,7 +2508,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             } else {
                 $popis .= "Datum a čas doručení : ". date("j.n.Y G:i:s",$dt_doruceni) ." (". $mess->dmAcceptanceTime .")\n";//  =                    
             }
-            $popis .= "Přiblížná velikost všech příloh : ". $mess->dmAttachmentSize ."kB\n";//  =
+            $popis .= "Přibližná velikost všech příloh : ". $mess->dmAttachmentSize ."kB\n";//  =
 
 
             //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleLaw ."\n";//  =

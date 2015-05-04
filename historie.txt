@@ -19,6 +19,8 @@ Jiné změny:
 - proveden upgrade staré knihovny pro připojení k databázi
 - nový modul pro vývojáře pro základní automatické testování aplikace
 - hledání v subjektech v administraci nyní hledá i podle ulice
+- zrychlení zobrazení seznamu zpráv v e-podatelně
+- zrychlení načtení nových zpráv po kontrole schránky/schránek
   
 Opravy:
 
@@ -28,7 +30,6 @@ Opravy:
                 při kontrole schránky místo zprávy zobrazila nulu
               - vytváření nového subjektu z datové zprávy automaticky rozdělí
                 adresu do jednotlivých políček
-              - zrychlení zobrazení seznamu zpráv v e-podatelně
               
 - zápis chybných hodnot do formuláře při hledání dokumentu podle datumů nezpůsobí
   chybu aplikace

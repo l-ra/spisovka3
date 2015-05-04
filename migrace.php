@@ -329,7 +329,7 @@ if (TEST_KONTROLA==1) {
     
     echo "\n\n";
     echo "  Celkový odhadovaný čas trvání migrace: <strong>". number_format($cas,3,","," ") ." sekund (". number_format($cas/60,0) ." minut a ". number_format($cas%60,0) ." sekund)</strong>.\n";
-    echo "  (* celkový čas je pouze hrubý odhad. Může se lišit v závislosti na výkonu serveru a zatížení. Rozpětí přiblížně +- 50%)\n";
+    echo "  (* celkový čas je pouze hrubý odhad. Může se lišit v závislosti na výkonu serveru a zatížení. Rozpětí přibližně +- 50%)\n";
     
     
     

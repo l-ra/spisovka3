@@ -420,8 +420,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     
     public function actionNactiNoveAjax()
     {
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
-
+        if ( is_null($this->Epodatelna) )
+            $this->Epodatelna = new Epodatelna();
+        $SubjektModel = new Subjekt();
+        $isds_subjekt_cache = [];
+        $email_subjekt_cache = [];
+        
         //$user_config = Environment::getVariable('user_config');
         //$vp = new VisualPaginator($this, 'vp');
         //$paginator = $vp->getPaginator();
@@ -434,10 +438,13 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         //$paginator->itemCount = count($result);
         $seznam = $result->fetchAll();//$paginator->offset, $paginator->itemsPerPage);
 
+        
         if ( $seznam ) {
             $zpravy = array();
             foreach ( $seznam as $zprava ) {
 
+                unset($zprava->identifikator);
+                
                 $zpravy[ $zprava->id ] = $zprava;
                 $prilohy = unserialize($zprava->prilohy);
                 if ( $prilohy ) {
@@ -447,11 +454,13 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $zpravy[ $zprava->id ]->prilohy = array();
                     $prilohy = null;
                 }
+                
+                /* neni potreba
                 $identifikator = unserialize($zprava->identifikator);
                 if ( $identifikator ) {
                     $zpravy[ $zprava->id ]->identifikator = $identifikator;
                     $identifikator = null;
-                }
+                } */
                 $doruceno_dne = strtotime($zprava->doruceno_dne);
                 $zpravy[ $zprava->id ]->doruceno_dne_datum = date("j.n.Y", $doruceno_dne);
                 $zpravy[ $zprava->id ]->doruceno_dne_cas = date("G:i:s", $doruceno_dne);
@@ -467,64 +476,63 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $subjekt->prijmeni = '';
                 
                 $original = null;
+                $nalezene_subjekty = null;
                 if ( !empty($zprava->email_id) ) {
                     // Nacteni originalu emailu
-                    if ( !empty( $zprava->file_id ) ) {
+                    if (!empty( $zprava->file_id)) {
                         $original = self::nactiEmail($this->storage, $zprava->file_id);
-                    }
-
-                    $subjekt->nazev_subjektu = isset($original['zprava']->from->personal) 
-                        ? $original['zprava']->from->personal : $zprava->odesilatel;
-                    $subjekt->prijmeni = @$original['zprava']->from->personal;
-                    $subjekt->email = @$original['zprava']->from->email;
-                    if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
-                        $subjekt->jmeno = $matches[1];
-                        $subjekt->prijmeni = $matches[2];
-                    }
-
-                    if ( $original['signature']['signed'] >= 0 ) {
-
-                        $subjekt->nazev_subjektu = $original['signature']['cert_info']['organizace'];
-                        $subjekt->prijmeni = $original['signature']['cert_info']['jmeno'];
-                        if ( !empty($original['signature']['cert_info']['email']) && $subjekt->email != $original['signature']['cert_info']['email'] ) {
-                            $subjekt->email = $subjekt->email ."; ". $original['signature']['cert_info']['email'];
+                        
+                        $subjekt->nazev_subjektu = isset($original['zprava']->from->personal) 
+                            ? $original['zprava']->from->personal : $zprava->odesilatel;
+                        $subjekt->prijmeni = $original['zprava']->from->personal;
+                        $subjekt->email = $original['zprava']->from->email;
+                        $matches = [];
+                        if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
+                            $subjekt->jmeno = $matches[1];
+                            $subjekt->prijmeni = $matches[2];
                         }
-                        $subjekt->ulice = $original['signature']['cert_info']['adresa'];
+
+                        if ( $original['signature']['signed'] >= 0 ) {
+
+                            $subjekt->nazev_subjektu = $original['signature']['cert_info']['organizace'];
+                            $subjekt->prijmeni = $original['signature']['cert_info']['jmeno'];
+                            if ( !empty($original['signature']['cert_info']['email']) && $subjekt->email != $original['signature']['cert_info']['email'] ) {
+                                $subjekt->email = $subjekt->email ."; ". $original['signature']['cert_info']['email'];
+                            }
+                            $subjekt->ulice = $original['signature']['cert_info']['adresa'];
+                        }
+
+                        if (!isset($email_subjekt_cache[$subjekt->email]))
+                            $email_subjekt_cache[$subjekt->email] = $SubjektModel->hledat($subjekt, 'email', true);
+                        $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];                       
                     }
-
-                    $SubjektModel = new Subjekt();
-                    $subjekt_databaze = $SubjektModel->hledat($subjekt,'email');
-                    $zpravy[ $zprava->id ]->subjekt = array('original'=>$subjekt,'databaze'=>$subjekt_databaze);
-
-                } else if ( !empty($zprava->isds_id) ) {
+                    
+                } else if (!empty($zprava->isds_id)) {
                     // Nacteni originalu DS
-                    if ( !empty( $zprava->file_id ) ) {
-                        $file_id = explode("-",$zprava->file_id);
+                    if (!empty($zprava->file_id)) {
+                        $file_id = explode("-", $zprava->file_id);
                         $original = self::nactiISDS($this->storage, $file_id[0]);
                         $original = unserialize($original);
 
                         // odebrat obsah priloh, aby to neotravovalo
                         unset($original->dmDm->dmFiles);
 
-                        //echo "<pre>"; print_r($original); exit;
-
-                    }
-
-                    $subjekt->id_isds = @$original->dmDm->dbIDSender;
-                    $subjekt->nazev_subjektu = @$original->dmDm->dmSender;
-                    $subjekt->type = ISDS_Spisovka::typDS(@$original->dmDm->dmSenderType);
-                    if (isset($original->dmDm->dmSenderAddress)) {
-                        $res = ISDS_Spisovka::parseAddress($original->dmDm->dmSenderAddress);
-                        foreach ($res as $key => $value)
-                            $subjekt->$key = $value;                                                    
-                    }
-                    
-                    $SubjektModel = new Subjekt();
-                    $subjekt_databaze = $SubjektModel->hledat($subjekt,'isds');
-                    $zpravy[ $zprava->id ]->subjekt = array('original'=>$subjekt,'databaze'=>$subjekt_databaze);
-
+                        $subjekt->id_isds = $original->dmDm->dbIDSender;
+                        $subjekt->nazev_subjektu = $original->dmDm->dmSender;
+                        $subjekt->type = ISDS_Spisovka::typDS($original->dmDm->dmSenderType);
+                        if (isset($original->dmDm->dmSenderAddress)) {
+                            $res = ISDS_Spisovka::parseAddress($original->dmDm->dmSenderAddress);
+                            foreach ($res as $key => $value)
+                                $subjekt->$key = $value;                                                    
+                        }
+                        
+                        if (!isset($isds_subjekt_cache[$subjekt->id_isds]))
+                            $isds_subjekt_cache[$subjekt->id_isds] = $SubjektModel->hledat($subjekt, 'isds', true);
+                        $nalezene_subjekty = $isds_subjekt_cache[$subjekt->id_isds];
+                    }                    
                 }
-
+                
+                $zpravy[$zprava->id]->subjekt = ['original'=>$subjekt, 'databaze'=>$nalezene_subjekty];
             }
         } else {
             $zpravy = null;
@@ -667,7 +675,7 @@ dmFiles = objekt
                     $dt_doruceni = strtotime($mess->dmAcceptanceTime);
                     $popis .= "Datum a čas dodání   : ". date("j.n.Y G:i:s",$dt_dodani) ." (". $mess->dmDeliveryTime .")\n";//  =
                     $popis .= "Datum a čas doručení : ". date("j.n.Y G:i:s",$dt_doruceni) ." (". $mess->dmAcceptanceTime .")\n";//  =
-                    $popis .= "Přiblížná velikost všech příloh : ". $mess->dmAttachmentSize ."kB\n";//  =
+                    $popis .= "Přibližná velikost všech příloh : ". $mess->dmAttachmentSize ."kB\n";//  =
 
 
                     //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleLaw ."\n";//  =
@@ -898,7 +906,7 @@ dmFormat =
                     } else {
                         $popis .= "Datum a čas doručení : ". date("j.n.Y G:i:s",$dt_doruceni) ." (". $mess->dmAcceptanceTime .")\n";//  =                    
                     }                    
-                    $popis .= "Přiblížná velikost všech příloh : ". $mess->dmAttachmentSize ."kB\n";//  =
+                    $popis .= "Přibližná velikost všech příloh : ". $mess->dmAttachmentSize ."kB\n";//  =
 
                     $zprava = array();
                     $zprava['popis'] = $popis;

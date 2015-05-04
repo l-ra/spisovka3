@@ -76,7 +76,7 @@ class Subjekt extends BaseModel
         }
     }
 
-    public function hledat($data, $typ = 'all') {
+    public function hledat($data, $typ, $only_name = false) {
 
         $result = array();
         $cols = array('id');
@@ -86,7 +86,6 @@ class Subjekt extends BaseModel
             if ( !empty($data->email) ) {
 
                 $sql = array(
-                    'distinct'=>1,
                     'cols'=>$cols,
                     /*'order'=> array('nazev_subjektu','prijmeni','jmeno')*/
                     /* P.L. nechapu, proc se zde zabyvat komplikovanym razenim. Subjekt s danou emailovou adresou bude obvykle jeden, ne? */
@@ -125,14 +124,13 @@ class Subjekt extends BaseModel
                     $sql['where'] = array( array('email LIKE %s','%'.$data->email.'%') );
                 }
 
-                $fetch = $this->selectComplex($sql)->fetchAll();
+                $fetch = $this->selectComplex($sql)->fetchPairs('id', 'id');
                 $result = array_merge($result, $fetch);
             }
 
             // hledani podle nazvu, prijmeni nebo jmena
             if ( !empty($data->nazev_subjektu) ) {
                 $sql = array(
-                    'distinct'=>1,
                     'cols'=>$cols,
                     'where_or'=> array( 
                         array('nazev_subjektu LIKE %s','%'.$data->nazev_subjektu.'%'),
@@ -141,29 +139,26 @@ class Subjekt extends BaseModel
                     ),
                     'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
-                $fetch = $this->selectComplex($sql)->fetchAll();
+                $fetch = $this->selectComplex($sql)->fetchPairs('id', 'id');
                 $result = array_merge($result, $fetch);
             }
 
 
         } else if ( $typ == 'isds' ) {
 
-            // hledani podle emailu
+            // hledani podle ISDS ID
             if ( !empty($data->id_isds) ) {
                 $sql = array(
-                    'distinct'=>1,
                     'cols'=>$cols,
                     'where'=> array( array('id_isds LIKE %s','%'.$data->id_isds.'%') ),
                     'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
-                $fetch = $this->selectComplex($sql)->fetchAll();
-                $result = array_merge($result, $fetch);
+                $result = $this->selectComplex($sql)->fetchPairs('id', 'id');
             }
 
             // hledani podle nazvu, prijmeni nebo jmena
             if ( !empty($data->nazev_subjektu) ) {
                 $sql = array(
-                    'distinct'=>1,
                     'cols'=>$cols,
                     'where_or'=> array(
                         array('nazev_subjektu LIKE %s','%'.$data->nazev_subjektu.'%'),
@@ -172,23 +167,29 @@ class Subjekt extends BaseModel
                     ),
                     'order'=> array('nazev_subjektu','prijmeni','jmeno')
                 );
-                $fetch = $this->selectComplex($sql)->fetchAll();
-                $result = array_merge($result, $fetch);
+                $fetch = $this->selectComplex($sql)->fetchPairs('id', 'id');
+                $result = $result + $fetch;
             }
 
         }
 
-        $tmp = array();
-        if ( count($result)>0 ) {
-            foreach ($result as $subjekt) {
-                $tmp[ $subjekt->id ] = $this->getInfo($subjekt->id);
-                $tmp[ $subjekt->id ]->full_name = Subjekt::displayName($tmp[ $subjekt->id ],'full');
-            }
-            return $tmp;
-        } else {
+        $ids = array_unique($result);
+        if (!count($ids))
             return null;
-        }
 
+        $subjekty = $this->select([['id IN %in', $ids]])->fetchAll();
+        foreach ($subjekty as $subjekt) {
+            $subjekt->full_name = Subjekt::displayName($subjekt, 'full');
+        }
+        
+        if (!$only_name)
+            return $subjekty;
+        
+        $res = [];
+        foreach ($subjekty as $subjekt)
+            $res[] = ['id' => $subjekt->id, 'full_name' =>  $subjekt->full_name];
+        
+        return $res;
     }
 
     public function seznam($args = null)

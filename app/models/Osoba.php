@@ -94,8 +94,9 @@ class Osoba extends BaseModel
     public static function displayName($data, $display = 'full')
     {
 
-        if ( is_string($data) ) return $data;
-        if ( is_array($data) ) {
+        if (is_string($data))
+            return $data;
+        if (is_array($data)) {
             $tmp = new stdClass();
             $tmp->jmeno = $data['jmeno'];
             $tmp->prijmeni = $data['prijmeni'];
@@ -104,9 +105,10 @@ class Osoba extends BaseModel
             $data = $tmp;
             unset($tmp);
         }
-        if ( !is_object($data) ) return "";
+        if (!is_object($data))
+            return "";
 
-        if ( isset($data->osoba_prijmeni) ) {
+        if (isset($data->osoba_prijmeni)) {
             $tmp = new stdClass();
             $tmp->jmeno = $data->osoba_jmeno;
             $tmp->prijmeni = $data->osoba_prijmeni;
@@ -115,8 +117,8 @@ class Osoba extends BaseModel
             $data = $tmp;
             unset($tmp);
         }
-        
-        if ( isset($data->user_prijmeni) && $display == 'user' ) {
+
+        if (isset($data->user_prijmeni) && $display == 'user') {
             $tmp = new stdClass();
             $tmp->jmeno = $data->user_jmeno;
             $tmp->prijmeni = $data->user_prijmeni;
@@ -124,37 +126,37 @@ class Osoba extends BaseModel
             $tmp->titul_za = $data->user_titul_za;
             $data = $tmp;
             unset($tmp);
-        }        
+        }
 
         // Sestaveni prvku z jmena
 
         $titul_pred = "";
         $titul_pred_item = "";
-        if ( isset( $data->titul_pred ) ) {
-            if ( !empty( $data->titul_pred ) ) {
-                $titul_pred = $data->titul_pred ." ";
-                $titul_pred_item = ", ". $data->titul_pred;
+        if (isset($data->titul_pred)) {
+            if (!empty($data->titul_pred)) {
+                $titul_pred = $data->titul_pred . " ";
+                $titul_pred_item = ", " . $data->titul_pred;
             }
         }
 
         $jmeno = "";
-        if ( isset( $data->jmeno ) ) {
-            if ( !empty( $data->jmeno ) ) {
+        if (isset($data->jmeno)) {
+            if (!empty($data->jmeno)) {
                 $jmeno = $data->jmeno;
             }
         }
 
         $prijmeni = "";
-        if ( isset( $data->prijmeni ) ) {
-            if ( !empty( $data->prijmeni ) ) {
+        if (isset($data->prijmeni)) {
+            if (!empty($data->prijmeni)) {
                 $prijmeni = $data->prijmeni;
             }
         }
 
         $titul_za = "";
-        if ( isset( $data->titul_za ) ) {
-            if ( !empty( $data->titul_za ) ) {
-                $titul_za = ', '. $data->titul_za;
+        if (isset($data->titul_za)) {
+            if (!empty($data->titul_za)) {
+                $titul_za = ', ' . $data->titul_za;
             }
         }
 

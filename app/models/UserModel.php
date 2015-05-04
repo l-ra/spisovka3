@@ -62,12 +62,17 @@ class UserModel extends BaseModel
 
     public static function getIdentity($user_id)
     {
+        static $cache = [];
+        
+        if (isset($cache[$user_id]))
+            return $cache[$user_id];
+        
         $row = dibi::fetch('SELECT o.*
-                            FROM [:PREFIX:'. self::OSOBA2USER_TABLE . '] ou
-                            LEFT JOIN [:PREFIX:'. self::OSOBA_TABLE .'] o ON (o.id = ou.osoba_id)
-                            WHERE ou.user_id=%i AND o.stav<10',$user_id);
+                            FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
+                            LEFT JOIN [:PREFIX:' . self::OSOBA_TABLE . '] o ON (o.id = ou.osoba_id)
+                            WHERE ou.user_id=%i AND o.stav<10', $user_id);
 
-        return ($row) ? $row : NULL;
+        return $cache[$user_id] = $row ? $row : NULL;
     }
 
     public static function getRoles($user_id)
