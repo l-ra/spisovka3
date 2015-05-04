@@ -336,16 +336,16 @@ aresSubjekt = function ( formName ) {
         if ( data == null ) {
             alert('Záznam neexistuje nebo bylo zadáno chybné IČ.');
         } else {
-            document.getElementById('frm'+formName+'-ic').value = data.ico;
-            document.getElementById('frm'+formName+'-dic').value = data.dic;
-            document.getElementById('frm'+formName+'-nazev_subjektu').value = data.nazev;
-            document.getElementById('frm'+formName+'-adresa_ulice').value = data.ulice;
-            document.getElementById('frm'+formName+'-adresa_cp').value = data.cislo_popisne;
-            document.getElementById('frm'+formName+'-adresa_co').value = data.cislo_orientacni;
-            document.getElementById('frm'+formName+'-adresa_mesto').value = data.mesto;
-            document.getElementById('frm'+formName+'-adresa_psc').value = data.psc;
-            document.getElementById('frm'+formName+'-adresa_stat').value = 'CZE';
-            document.getElementById('frm'+formName+'-stat_narozeni').value = 'CZE';
+            $("#frm"+formName+"-ic").val(data.ico);
+            $("#frm"+formName+"-dic").val(data.dic);
+            $("#frm"+formName+"-nazev_subjektu").val(data.nazev);
+            $("#frm"+formName+"-adresa_ulice").val(data.ulice);
+            $("#frm"+formName+"-adresa_cp").val(data.cislo_popisne);
+            $("#frm"+formName+"-adresa_co").val(data.cislo_orientacni);
+            $("#frm"+formName+"-adresa_mesto").val(data.mesto);
+            $("#frm"+formName+"-adresa_psc").val(data.psc);            
+            $("#frm"+formName+"-adresa_stat").val('CZE');            
+            $("#frm"+formName+"-stat_narozeni").val('CZE');                        
         }
     });
 
