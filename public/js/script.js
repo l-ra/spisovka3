@@ -383,16 +383,16 @@ isdsSubjekt = function ( formName ) {
             
             $("#frm"+formName+"-type option[value="+data.dbType+"]").prop('selected', true);
             
-            document.getElementById('frm'+formName+'-ic').value = data.ic;
-            document.getElementById('frm'+formName+'-nazev_subjektu').value = data.firmName;
-            document.getElementById('frm'+formName+'-jmeno').value = data.pnFirstName;
-            document.getElementById('frm'+formName+'-prostredni_jmeno').value = data.pnMiddleName;
-            document.getElementById('frm'+formName+'-prijmeni').value = data.pnLastName;
-            document.getElementById('frm'+formName+'-adresa_ulice').value = data.adStreet;
-            document.getElementById('frm'+formName+'-adresa_cp').value = data.adNumberInMunicipality;
-            document.getElementById('frm'+formName+'-adresa_co').value = data.adNumberInStreet;
-            document.getElementById('frm'+formName+'-adresa_mesto').value = data.adCity;
-            document.getElementById('frm'+formName+'-adresa_psc').value = data.adZipCode;
+            $("#frm"+formName+"-ic").val(data.ic);
+            $("#frm"+formName+"-nazev_subjektu").val(data.firmName);
+            $("#frm"+formName+"-jmeno").val(data.pnFirstName);
+            $("#frm"+formName+"-prostredni_jmeno").val(data.pnMiddleName);
+            $("#frm"+formName+"-prijmeni").val(data.pnLastName);
+            $("#frm"+formName+"-adresa_ulice").val(data.adStreet);
+            $("#frm"+formName+"-adresa_cp").val(data.adNumberInMunicipality);
+            $("#frm"+formName+"-adresa_co").val(data.adNumberInStreet);
+            $("#frm"+formName+"-adresa_mesto").val(data.adCity);
+            $("#frm"+formName+"-adresa_psc").val(data.adZipCode);            
         }
         
     });
