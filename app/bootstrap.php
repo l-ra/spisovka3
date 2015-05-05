@@ -212,26 +212,13 @@ if ($clean_url === null)
         $clean_url = false;
 
 if ( $clean_url ) {
-    define('IS_SIMPLE_ROUTER',0);
-    
+    define('IS_SIMPLE_ROUTER', 0);
+
     $router[] = new Nette\Application\Routers\Route('index.php', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
                 'action' => 'default',
                 ), Nette\Application\Routers\Route::ONE_WAY);
-        
-    $router[] = new Nette\Application\Routers\Route('instalace.php', array(
-                'module'    => 'Install',
-                'presenter' => 'Default',
-                'action' => 'uvod',
-                ), Nette\Application\Routers\Route::ONE_WAY); 
-    
-    $router[] = new Nette\Application\Routers\Route('kontrola.php', array(
-                'module'    => 'Install',
-                'presenter' => 'Default',
-                'action' => 'kontrola',
-                'no_install' => 1
-                ), Nette\Application\Routers\Route::ONE_WAY);        
 
     // Uzivatel
     $router[] = new Nette\Application\Routers\Route('uzivatel/<action>/<id>', array(
@@ -311,7 +298,6 @@ if ( $clean_url ) {
                 'id' => NULL,
                 ));
 
-    // Basic router
     $router[] = new Nette\Application\Routers\Route('<presenter>/<id>/<action>', array(
                 'module'    => 'Spisovka',
                 'presenter' => 'Default',
@@ -320,18 +306,8 @@ if ( $clean_url ) {
                 ));
         
 } else {
-        define('IS_SIMPLE_ROUTER',1);
-        
-        $path = $httpRequest->getUrl()->getPath();
-        if ( strpos($path,"/instalace.php") !== false ) {
-            $router[] = new Nette\Application\Routers\SimpleRouter('Install:Default:uvod');
-        } else if ( strpos($path,"/kontrola.php") !== false ) {
-            Nette\Environment::setVariable('no_install', 1);
-            $router[] = new Nette\Application\Routers\SimpleRouter('Install:Default:kontrola');
-        } else {
-            $router[] = new Nette\Application\Routers\SimpleRouter('Spisovka:Default:default');
-        }
-    
+    define('IS_SIMPLE_ROUTER',1);        
+    $router[] = new Nette\Application\Routers\SimpleRouter('Spisovka:Default:default');    
 }
 
 }

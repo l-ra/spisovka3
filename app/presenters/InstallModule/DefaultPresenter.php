@@ -2,27 +2,17 @@
 
 class Install_DefaultPresenter extends BasePresenter
 {
-
-    private $no_install = false;
     
     public function startup() {
 
-        $this->no_install = $this->getParameter("no_install", false);
-        $this->template->no_install = $this->no_install;
-
-        if ( $this->action == "kontrola" && $this->no_install ) {
-            $this->setLayout("install");
-        } else if ( file_exists(CLIENT_DIR .'/configs/install') ) {
-            // instalovano
+        if (!defined('APPLICATION_INSTALL') && $this->action != "kontrola")
             $this->setView('instalovano');
-        }
+        
         $session = Nette\Environment::getSession('s3_install');
 
         parent::startup();
 
-        //Nette\Diagnostics\Debugger::dump($session->step);
         $this->template->step = $session->step;
-
     }
 
     public function renderDefault()
@@ -44,8 +34,9 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderKontrola()
     {
-
-        if ( !$this->no_install ) {
+        $installed = !defined('APPLICATION_INSTALL');
+        $this->template->installed = $installed;
+        if ( !$installed ) {
             $session = Nette\Environment::getSession('s3_install');
             if ( !isset($session->step) ) {
                 $session->step = array();
@@ -496,7 +487,7 @@ class Install_DefaultPresenter extends BasePresenter
         $this->template->requirements = $requirements_nette;
         $this->template->requirements_ess = $requirements_ess;
 
-        if ( !$this->no_install ) {
+        if ( !$installed ) {
             if ( !$this->template->errors ){
                 @$session->step['kontrola'] = 1;
             }

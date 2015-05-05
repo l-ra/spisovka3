@@ -1,6 +1,6 @@
 {block title}Instalace - kontrola{/block}
 {block menu}
-{if !$no_install}
+{if !$installed}
 <a href="{link :Install:Default:uvod}">Úvod</a> >
 <strong>Kontrola</strong> >
 <span>Nahrání databáze</span> >
@@ -11,7 +11,7 @@
 {/if}
 {/block}
 {block content}
-<h1>{if !$no_install}Instalace - {/if}Kontrola serveru na minimální požadavky aplikace</h1>
+<h1>{if !$installed}Instalace - {/if}Kontrola serveru na minimální požadavky aplikace</h1>
 
 <p>
 V tomto kroku se zkontrolují minimální požadavky na provoz spisové služby. Jedná se především o kontrolu
@@ -30,7 +30,7 @@ pro některé konfigurační soubory a zápisu pro dočasné soubory.</p>
 {else}
     <div class="passed result">
         <h2>Blahopřeji! Konfigurace serveru splňuje minimální požadavky pro použití aplikace.</h2>
-        {if !$no_install}
+        {if !$installed}
         <p>Můžete pokračovat v instalaci.</p>
 	{if ($warnings)}<p>Byly zjištěny nesrovnalosti, které mohou ovlivnit chod aplikace. Podívejte se do detailu a u vyznačených bodů se rozhodněte,
             zda je daná položka nutná pro běh aplikace nebo ne.</p>{/if}

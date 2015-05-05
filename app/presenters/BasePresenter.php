@@ -11,13 +11,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     
     public function startup()
     {
+        if (defined('APPLICATION_INSTALL')) {
+            if (strncmp($this->name, 'Install', 7) != 0)
+                $this->redirect(':Install:Default:default');
+        }
+        else {
+            $user = $this->user;
 
-        if ( !defined('APPLICATION_INSTALL') ):
-
-        $user = $this->user;
-        // $user->setNamespace(KLIENT);
-
-        // Je uzivatel prihlasen?
+            // Je uzivatel prihlasen?
             if (!$user->isLoggedIn()) {
                 if ($user->getLogoutReason() === Nette\Security\User::INACTIVITY) {
                     $this->flashMessage('Uplynula doba neaktivity! Systém vás z bezpečnostních důvodů odhlásil.', 'warning');
@@ -28,9 +29,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     $alternative = $this->getParameter('alternativelogin');
                     $this->forward(':Spisovka:Uzivatel:login', array('_asession'=>$asession, 'alternativelogin'=>$alternative));
                 }
-
             } else {
-
                 if ($this->name == "Spisovka:Uzivatel") {
                     // Tento presenter je vzdy pristupny
                     if ($this->view == "login")
@@ -43,16 +42,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     $this->forward(':NoAccess:default');
                 }
             }
-
-        else:
-
-            if ( strncmp($this->name, 'Install', 7) != 0 ) {
-                $this->redirect(':Install:Default:default');
-            }
-
-            //echo $this->reflection->name ." - ". $this->getAction();
-
-        endif; // application_install
+        }
 
         parent::startup();
     }

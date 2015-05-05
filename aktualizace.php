@@ -19,8 +19,8 @@
     define('MULTISITE', 0); // 0 - standalone, 1 - multisite
     
     
-    define("APP_DIR", dirname(__FILE__) . "/app");
-    define("LIBS_DIR", dirname(__FILE__) . "/libs");
+    define("APP_DIR", __DIR__ . "/app");
+    define("LIBS_DIR", __DIR__ . "/libs");
     define("PUBLIC_URI", "public/");
     
 /* ************************************************************************** */    
