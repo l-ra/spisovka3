@@ -337,7 +337,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             }
         }
 
-        $form1->addCheckbox("add_role", 'Přidat roli')
+        $form1->addCheckbox("add_role", 'Přidat roli:')
                         ->setValue(0);
         $form1->addSelect('role', 'Role:', $role_select);
 
