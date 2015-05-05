@@ -7,6 +7,8 @@
 <dd>{input type}</dd>
 <dt>Název subjektu:</dt>
 <dd>{input nazev_subjektu}</dd>
+<dt>IČ, DIČ:</dt>
+<dd>{input ic}{input dic} <a href="#" onclick="return aresSubjekt({$form->name});">Vyhledat pomocí systému ARES</a></dd>
 <dt>Titul před, jméno, příjmení, titul za:</dt>
 <dd>{input titul_pred}{input jmeno}{input prijmeni}{input titul_za}</dd>
 <dt>Ulice, číslo popisné a orientační:</dt>
@@ -18,7 +20,11 @@
 <dt>Email:</dt>
 <dd>{input email}</dd>
 <dt>ID datové schránky:</dt>
-<dd>{input id_isds}</dd>                        
+<dd>{input id_isds} <a href="#" onclick="return isdsSubjekt({$form->name});">Vyhledat pomocí systému ISDS</a></dd>                        
+<dt>Telefon:</dt>
+<dd>{input telefon}</dd>
+<dt>Poznámka:</dt>
+<dd>{input poznamka}</dd>
 <br /><dt>&nbsp;</dt>
 <dd>{input novy} {input storno}</dd>
 </dl>
