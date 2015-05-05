@@ -409,6 +409,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $form['email']->setValue($this->getParameter('email'));
         $form['id_isds']->setValue($this->getParameter('id_isds'));       
         $form['poznamka']->setAttribute('rows', 1)
+                ->setAttribute('style', 'width: 400px')
                 ->controlPrototype->onfocus("$(this).attr('rows', 5)");
         
         return $form;
