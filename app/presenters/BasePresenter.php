@@ -160,11 +160,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         /**
          * Nastaveni layoutu podle modulu
          */
-        if ( defined('APPLICATION_INSTALL') ) {
-            $this->setLayout('install');
-        } else if ( $this->name == "Spisovka:Uzivatel" && $this->view == "login" ) {
-            $this->setLayout('login');
-        }
+        if ($this->name == "Spisovka:Uzivatel" && $this->view == "login")
+            $this->setLayout('login');        
         else switch ($this->template->module) {
             case "Admin":
                 $this->setLayout('admin');
@@ -191,6 +188,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     $this->setLayout('spisovka');
                 break;
             case "Install":
+                $this->template->module_name = 'Spisová služba';
+                if ($this->view == 'kontrola')
+                    $this->template->module = 'Spisovka';
                 $this->setLayout('install');
                 break;
         }
