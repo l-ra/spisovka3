@@ -160,6 +160,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         /**
          * Nastaveni layoutu podle modulu
          */
+        if ($this->template->module == 'Install' && $this->view == 'kontrola'
+                && !defined('APPLICATION_INSTALL'))
+            $this->template->module = 'Admin';   // specialni pripad
+
         if ($this->name == "Spisovka:Uzivatel" && $this->view == "login")
             $this->setLayout('login');        
         else switch ($this->template->module) {
@@ -188,9 +192,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     $this->setLayout('spisovka');
                 break;
             case "Install":
-                $this->template->module_name = 'Spisová služba';
-                if ($this->view == 'kontrola')
-                    $this->template->module = 'Spisovka';
                 $this->setLayout('install');
                 break;
         }
@@ -274,6 +275,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         $set->addMacro('access', 'if (MyLatteMacros::access($userobj, %node.word)) {', '}');
         $set->addMacro('isAllowed', 'if (MyLatteMacros::isAllowed($userobj, %node.args)) {', '}');
+        $set->addMacro('isInRole', 'if (MyLatteMacros::isInRole($userobj, %node.args)) {', '}');
 
         $set->addMacro('input2', 'echo MyLatteMacros::input($form, %node.args)');
         

@@ -7,7 +7,7 @@
 Nové funkce:
 
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
-  podporu. Funkce je dostupná na adrese /admin/support/
+  podporu
 - v ladicím módu (DEBUG_ENABLE 1 v index.php) aplikace zobrazuje vpravo dole
   lištu s užitečnými informacemi: čas zpracování stránky, použitá paměť
   a databázové dotazy

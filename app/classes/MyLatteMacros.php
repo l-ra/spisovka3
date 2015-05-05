@@ -26,6 +26,11 @@ class MyLatteMacros {
         return $user->isAllowed($resource, $privilege);
     }
     
+    public static function isInRole($user, $role)
+    {
+        return $user->isInRole($role);        
+    }
+    
     public static function CSS($publicUrl, $filename, $media = 'screen') {
 
         // $filename = Nette\Latte\Engine::fetchToken($content); // filename [,] [media]
