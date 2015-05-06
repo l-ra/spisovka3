@@ -375,7 +375,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $spisy = $Spisy->selectBox(1, @$spis->id, $session_spisplan->spis_id, $params);
         
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('id')
                 ->setValue(@$spis->id);
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu)

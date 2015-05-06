@@ -117,25 +117,9 @@ $session->setSavePath($session_dir);
 $cookie_path = str_replace('index.php', '', $_SERVER['PHP_SELF']);
 $session->setCookieParameters($cookie_path);
 
-// Step 3: Configure application
-$application = $container->getByType('Nette\Application\Application');
+
 
 register_shutdown_function(array('ShutdownHandler', '_handler'));
-
-
-// 3a) Load components
-require_once APP_DIR . '/components/DatePicker/DatePicker.php';
-function Form_addDatePicker(Nette\Forms\Form $_this, $name, $label, $cols = NULL, $maxLength = NULL)
-{
-    return $_this[$name] = new DatePicker($label, $cols, $maxLength);
-}
-require_once APP_DIR . '/components/DatePicker/DatePicker.php';
-function Form_addDateTimePicker(Nette\Forms\Form $_this, $name, $label, $cols = NULL, $maxLength = NULL)
-{
-  return $_this[$name] = new DateTimePicker($label, $cols, $maxLength);
-}
-Nette\Forms\Form::extensionMethod('Nette\Forms\Form::addDatePicker', 'Form_addDatePicker');
-Nette\Forms\Form::extensionMethod('Nette\Forms\Form::addDateTimePicker', 'Form_addDateTimePicker');
 
 
 // 3b) Load database
@@ -190,6 +174,7 @@ if ($force_https || $httpRequest->isSecured())
     Nette\Application\Routers\Route::$defaultFlags |= Nette\Application\Routers\Route::SECURED;
 
 // Get router
+$application = $container->getByType('Nette\Application\Application');
 $router = $application->getRouter();
 
 // Cool URL detection

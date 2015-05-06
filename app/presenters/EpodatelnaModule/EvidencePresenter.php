@@ -379,7 +379,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $typ_dokumentu = Dokument::typDokumentu(null,2);
         $typ_dokumentu_extra = Dokument::typDokumentu();
 
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('dokument_id')
                 ->setValue($dokument_id);
         $form->addHidden('epodatelna_id')

@@ -614,7 +614,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $params = array('where'=> array("tb.typ = 'VS'") );
         $spisy = $Spisy->selectBox(1, @$spis->id, 1, $params);
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('id')
                 ->setValue(@$spis->id);
         $form1->addHidden('typ')
@@ -700,7 +700,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('typ')
                 ->setValue('S');
         $form1->addText('nazev', 'Název spisu:', 50, 80)
@@ -758,7 +758,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             }
         }        
         
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->getElementPrototype()->id('spis-vytvorit');
         $form1->getElementPrototype()->onsubmit('return false;');        
         

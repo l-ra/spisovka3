@@ -75,7 +75,7 @@ class SubjektyPresenter extends BasePresenter
         $typ_select = Subjekt::typ_subjektu();
         $stat_select = array("" => "Neuveden") + Subjekt::stat();
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->getElementPrototype()->id('subjekt-vytvorit');
 
         $form1->addSelect('type', 'Typ subjektu:', $typ_select);

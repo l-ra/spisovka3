@@ -354,7 +354,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     protected function createComponentNovyForm()
     {
         
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         
         $dokument_id = $this->getParameter('dokument_id');
         $user_id = $this->getParameter('user_id');

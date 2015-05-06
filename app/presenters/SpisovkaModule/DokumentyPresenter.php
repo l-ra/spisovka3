@@ -1355,7 +1355,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
         
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('id')
                 ->setValue($dokument_id);
         $form->addHidden('odpoved')

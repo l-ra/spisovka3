@@ -158,7 +158,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         // Nette\Diagnostics\Debugger::dump($hledat);
         unset($hledat['prideleno'],$hledat['predano'],$hledat['prideleno_org'],$hledat['predano_org']);
         
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
 
         $form->addText('nazev', 'Věc:', 80, 100)
                 ->setValue(@$hledat['nazev']);

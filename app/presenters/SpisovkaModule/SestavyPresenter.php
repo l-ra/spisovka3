@@ -429,7 +429,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $pridelen = array('0'=>'kdokoli','2'=>'přidělen','1'=>'předán');
 
 
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
 
         $form->addText('sestava_nazev', 'Název sestavy:', 80, 100);
         $form->addTextArea('sestava_popis', 'Popis sestavy:', 80, 3);
