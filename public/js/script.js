@@ -408,7 +408,7 @@ isdsSubjekt = function ( formName ) {
  *
  */
 ajaxcron = function () {
-    
+
     if (!(Math.random() < 0.1))
         return false;
     
@@ -417,11 +417,12 @@ ajaxcron = function () {
     } else {    
         var url = BASE_URL + 'cron/spustit';
     }
-    //alert( url );
 
-    $.get(url, function(data) {
+    $.ajax({
+        url: url,
+        timeout: 1000
     });
-
+    
     return false;
 
 };
