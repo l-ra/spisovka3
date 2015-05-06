@@ -1,15 +1,2 @@
-<script type="text/javascript">
-var spisz_skart = new Array();
-var spisz_lhuta = new Array();
-var spisz_udalost = new Array();
-spisz_skart['0'] = '';
-spisz_lhuta['0'] = '';
-spisz_udalost['0'] = ''; 
-{if isset( $SpisoveZnaky) && count($SpisoveZnaky)>0}
-    {foreach $SpisoveZnaky as $sznak}
-        spisz_skart[{$sznak->id}] = {$sznak->skartacni_znak};
-        spisz_lhuta[{$sznak->id}] = {$sznak->skartacni_lhuta};
-        spisz_udalost[{$sznak->id}] = {$sznak->spousteci_udalost_id};
-    {/foreach}
-{/if} 
-</script>
+{* Tento zde puvodne trapny zpusob predavani vsech spisovych znaku
+  jsem nahradil AJAX technikou *}

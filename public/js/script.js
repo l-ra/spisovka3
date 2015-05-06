@@ -1029,14 +1029,20 @@ initSelect2 = function() {
 
 vybratSpisovyZnak = function(element) {
 
-    var formName = $(element).parents('form').first().attr('name');
-   
-    var key = document.forms[formName].spisovy_znak_id.selectedIndex;
-    var value = document.forms[formName].spisovy_znak_id.options[key].value;
-    document.forms[formName].skartacni_znak.value = spisz_skart[value];
-    document.forms[formName].skartacni_lhuta.value = spisz_lhuta[value];
-    //document.forms['frm-novyForm'].spousteci_udalost.value = spisz_udalost[value];
-    select_set_value(document.forms[formName].spousteci_udalost_id, spisz_udalost[value]);
+    // ziskej DOM element <form>
+    var form = $(element).parents('form').first()[0];
+
+    var key = form.spisovy_znak_id.selectedIndex;
+    var sz_id = form.spisovy_znak_id.options[key].value;
+    
+    var url = is_simple == 1 ? BASE_URL + '?presenter=Spisovka%3ASpisznak&id=' + sz_id
+            : BASE_URL + 'spisznak/' + sz_id + '/';
+    $.get(url, function(data) {
+        form.skartacni_znak.value = data.skartacni_znak;
+        form.skartacni_lhuta.value = data.skartacni_lhuta;
+        select_set_value(form.spousteci_udalost_id, data.spousteci_udalost_id);
+    });
+
     return true;
 };
 
