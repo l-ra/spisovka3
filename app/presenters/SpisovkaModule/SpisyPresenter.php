@@ -311,8 +311,11 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     }
     
     public function actionDetail()
+    {                    
+    }
+
+    public function renderDetail()
     {
-        
         $spis_id = $this->getParameter('id',null);
         // Info o spisu
         $Spisy = new Spis();
@@ -369,11 +372,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $this->setLayout(false);
             $this->setView('printdetail');
         }  
-            
-    }
 
-    public function renderDetail()
-    {
         $this->template->upravitForm = $this['upravitForm'];
     }
 
