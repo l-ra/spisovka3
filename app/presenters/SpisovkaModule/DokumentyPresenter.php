@@ -1572,7 +1572,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $zpusob_doruceni = Dokument::zpusobDoruceni(null,2);
 
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
         
@@ -1712,7 +1712,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Dok = @$this->template->Dok;
 
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
         $form->addSelect('zpusob_vyrizeni_id', 'Způsob vyřízení:', $zpusob_vyrizeni)
@@ -1827,7 +1827,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Dok = @$this->template->Dok;
 
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
 
