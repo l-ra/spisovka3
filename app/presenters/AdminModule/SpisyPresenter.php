@@ -470,7 +470,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
         $form1->addText('nazev', 'Název spisu/složky:', 50, 80)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
