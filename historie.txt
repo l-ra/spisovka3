@@ -6,6 +6,7 @@
 
 Nové funkce:
 
+- usnadněn a zrychlen výběr spisu při vkládání dokumentu do spisu
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
   podporu
 - v ladicím módu (DEBUG_ENABLE 1 v index.php) aplikace zobrazuje vpravo dole
@@ -24,7 +25,7 @@ Jiné změny:
 - hledání v subjektech v administraci nyní hledá i podle ulice
 - formulář pro vytváření nových subjektů je nyní společný. Ale jelikož webová
   aplikace nemůže mít formulář uvnitř jiného formuláře, je nutné jej zobrazit
-  v novém dialogovém okně.
+  v dialogovém okně.
 - zrychlení zobrazení seznamu zpráv v e-podatelně
 - zrychlení načtení nových zpráv po kontrole schránky/schránek
   

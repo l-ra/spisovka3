@@ -91,7 +91,7 @@ $(function() {
 
     // Dialog - Vyber spisu
     $('#dialog-spis').click(function(event){
-        dialog(this,'Spisy');
+        dialog(this,'Výběr spisu');
         return false;
     });
 
@@ -182,10 +182,6 @@ $(function() {
         source: (is_simple==1) ? BASE_URL + '?presenter=Spisovka%3Asubjekty&action=seznamAjax'
                             : BASE_URL + 'subjekty/0/seznamAjax',
 
-        focus: function(event, ui) {
-            $('#subjekt_autocomplete').val(ui.item.nazev);
-            return false;
-        },
         select: function(event, ui) {
             $('#subjekt_autocomplete').val('');
 
@@ -308,6 +304,13 @@ reloadDialog = function (elm) {
     
     return false;
 };
+
+closeDialog = function () {
+
+    $('#dialog').dialog('close');
+    return false;
+};
+
 
 /*
  * ARES
@@ -439,15 +442,18 @@ toggleWindow = function (elm) {
 
 };
 
-spisVybran = function (elm) {
+spisVybran = function (spis_id) {
 
     showSpinner();
-    
-    $.get(elm.href, function(data) {
+    var href = is_simple == 1
+        ? BASE_URL + '?presenter=Spisovka%3Aspisy&action=vybrano&id=' + spis_id + '&dok_id=' + DOKUMENT_ID 
+        : BASE_URL + 'spisy/' + spis_id + '/vybrano?dok_id=' + DOKUMENT_ID;
+
+    $.get(href, function(data) {
         if ( data.indexOf('###vybrano###') != -1 ) {
             data = data.replace('###vybrano###','');
             $('#dok_spis').html(data);
-            $('#dialog').dialog('close');
+            closeDialog();
         } else {
             alert(data);
         }
@@ -462,7 +468,7 @@ subjektVybran = function (elm) {
     
     $.get(elm.href, function(data) {
         if ( data.indexOf('###vybrano###') != -1 ) {
-            $('#dialog').dialog('close');
+            closeDialog();
             renderSubjekty();
         } else {
             alert(data);
@@ -527,7 +533,7 @@ dialogUpravitSubjekt = function(elm){
 subjektUpravitSubmit = function () {
     postFormJ($("#subjekt-vytvorit"), function(data) {
         if ( data.indexOf('###zmeneno###') != -1 ) {
-            $('#dialog').dialog('close');
+            closeDialog();
             renderSubjekty();
         } else {
             // chyba
@@ -535,11 +541,6 @@ subjektUpravitSubmit = function () {
         }
     });
     return false;    
-};
-
-subjektUpravitStorno = function () {
-    $('#dialog').dialog('close');
-    return false;
 };
 
 handleNovySubjekt = function (okFunc) {
@@ -560,7 +561,7 @@ handleNovySubjekt = function (okFunc) {
 
 novySubjektOk = function () {
     alert('Subjekt byl úspěšně vytvořen a přidán.');
-    $('#dialog').dialog('close');
+    closeDialog();
     renderSubjekty();
 };
 
@@ -570,18 +571,17 @@ subjektNovy = function() {
     return false;
 };
 
-spisVytvoritSubmit = function () {
+spisVytvoritSubmit = function (button) {
 
-    postFormJ($("#spis-vytvorit"), function(data) {
-        $('#dialog').html(data);        
+    var form = $(button).parents('form');
+    postFormJ(form, function(data) {
+        if (typeof data == 'object') {
+            spisVybran(data.id);
+        }
+        else
+            $('#dialog').html(data);        
     });
 
-    return false;
-};
-
-spisVytvoritStorno = function (doc_id) {
-
-    $('#spis_novy').hide();
     return false;
 };
 
@@ -596,7 +596,7 @@ osobaVybrana = function (elm) {
     $.get(url, function(data) {
         if ( data.indexOf('###vybrano###') != -1 ) {
             data = data.replace('###vybrano###','');
-            $('#dialog').dialog('close');
+            closeDialog();
             location.href = data;
         } else if ( data.indexOf('###predano###') != -1 ) {
             data = data.replace('###predano###','');
@@ -605,7 +605,7 @@ osobaVybrana = function (elm) {
             $('#frmnovyForm-predano_org').val(part[2]);
             $('#frmnovyForm-predano_poznamka').val(part[3]);
             $('#predano').html("<dl class=\"detail_item\"><dt>Předáno:</dt><dd>"+part[5]+"<br />"+part[4]+"</dd></dl><dl class=\"detail_item\"><dt>Poznámka pro předávajícího:</dt><dd>"+part[3]+"&nbsp;</dd></dl>");
-            $('#dialog').dialog('close');
+            closeDialog();
         } else {
             $('#dialog').html(data);
         }
@@ -681,20 +681,15 @@ vypravnaDetail = function (elm) {
 vypravnaSubmit = function () {
     postFormJ($("#vypravna_form"), function(text) {
         if ( text.indexOf('###provedeno###') != -1 ) {
-            $('#dialog').dialog('close');
+            closeDialog();
             alert('Záznam byl úspěšně upraven.');
-            window.top.location = window.top.location;
+            window.location.reload();
         } else {
             $('#dialog').html(text);
         }        
     });
     return false;
 };
-vypravnaZrusit = function () {
-    $('#dialog').dialog('close');
-    return false;
-};
-
 
 hledejDokument = function (input, typ) {
     
@@ -757,7 +752,7 @@ spojitDokument = function (elm) {
         if ( data.indexOf('###vybrano###') != -1 ) {
             data = data.replace('###vybrano###','');
             $('#dok_spojit').html(data);
-            $('#dialog').dialog('close');
+            closeDialog();
         } else {
             $('#dialog').html(data);
         }
@@ -783,12 +778,12 @@ pripojitDokument = function (elm) {
             document.getElementById('frmnovyForm-odpoved').value = part[2];
 
             //elm.href = url;
-            $('#dialog').dialog('close');
+            closeDialog();
         } else if ( data.indexOf('###zaevidovano###') != -1 ) {
             data = data.replace('###zaevidovano###','');
             window.location = data;
             //elm.href = url;
-            $('#dialog').dialog('close');
+            closeDialog();
 
         } else {
             $('#dialog').html(data);
@@ -842,13 +837,8 @@ zobrazSestavu = function (elm) {
     //window.location.href = elm.url.value + param;
     window.open(elm.url.value + param);
 
-    $('#dialog').dialog('close');
+    closeDialog();
 
-    return false;
-};
-
-zrusitFiltrSestavy = function () {
-    $('#dialog').dialog('close');
     return false;
 };
 
@@ -1053,4 +1043,27 @@ postFormJ = function (form, callback) {
         form = $(form);
     
     $.post(form.attr('action'), form.serialize(), callback);
+};
+
+initSpisAutocomplete = function() {
+    $('.spis_autocomplete').select2({
+        width: '500px',
+        minimumInputLength: 3,
+        ajax: {
+            url: (is_simple==1) ? BASE_URL + '?presenter=Spisovka%3Aspisy&action=seznamAjax'
+                            : BASE_URL + 'spisy/seznamAjax',
+            dataType: 'json',
+            quietMillis: 400,
+            data: function (term, page) {
+                return {
+                    q: term // search term
+                };
+            },
+            results: function (data, page) { 
+                // parse the results into the format expected by Select2.
+                return { results: data };
+            },
+            cache: true
+        }
+    });
 };

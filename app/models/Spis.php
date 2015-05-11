@@ -744,5 +744,14 @@ class Spis extends TreeModel
                     'lze_prevzit' => $Lze_prevzit);
     
     }
-    
+
+    public function search($search)
+    {
+        $args = ['where' => [["nazev LIKE %s", "%$search%"]]];
+        $args = $this->spisovka($args);
+
+        $res = dibi::query('SELECT id, nazev as text FROM %n as tb WHERE %and ORDER by nazev',
+                $this->name, $args['where']);
+        return $res->fetchAll();
+    }
 }

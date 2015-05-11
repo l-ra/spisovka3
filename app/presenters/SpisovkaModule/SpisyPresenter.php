@@ -146,21 +146,16 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         
     }    
     
-    public function actionVyber()
-    {
-        $this->template->dokument_id = $this->getParameter('id',$this->getParameter('dokument_id',null));
-        if ( empty($this->template->dokument_id) ) {
-            if ( isset($_POST['dokument_id']) ) {
-                $this->template->dokument_id = $_POST['dokument_id'];
-            }
-        }
-    }
-    
     public function renderVyber()
     {
+        $this->template->dokument_id = $this->getParameter('id');        
+    }
+    
+    public function renderSeznam()
+    {
+        $this->template->dokument_id = $this->getParameter('dokument_id');
 
         $Spisy = new Spis();
-        $spis_id = null;
 
         $args = null;
         if ( !empty($hledat) ) {
@@ -178,14 +173,18 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         $this->template->seznam = $seznam;*/
 
-        $result = $Spisy->seznam($args, 5, $spis_id);
-        $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->seznam(null);
-        $this->template->SpisoveZnaky = $spisove_znaky;
+        $result = $Spisy->seznam($args, 5);
         $this->template->seznam = $result->fetchAll();
-
     }
 
+    public function renderSeznamAjax($q)
+    {
+        $Spisy = new Spis();
+        $result = $Spisy->search($q);
+        
+        $this->sendJson($result);
+    }
+    
     // TODO: Zcela chybi kontrola opravneni
     public function renderVybrano()
     {
@@ -738,85 +737,31 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     protected function createComponentNovyajaxForm()
     {
-
-        $Spisy = new Spis();
-
-        $spousteci = SpisovyZnak::spousteci_udalost(null,1);
-        $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
-
-        $params = array('where'=> array("tb.typ = 'VS'") );
-        $spisy = $Spisy->selectBox(11, null, 1, $params);
-
-        $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->selectBox(2);
-
-        $dokument_id = $this->getParameter('id',$this->getParameter('dokument_id',null));
-        if ( empty($dokument_id) ) {
-            if ( isset($_POST['dokument_id']) ) {
-                $dokument_id = $_POST['dokument_id'];
-            }
-        }        
+        $form1 = $this->createComponentNovyForm();
         
-        $form1 = new Spisovka\Form();
-        $form1->getElementPrototype()->id('spis-vytvorit');
-        $form1->getElementPrototype()->onsubmit('return false;');        
-        
-        $form1->addHidden('dokument_id')
-                ->setValue($dokument_id);
-        $form1->addHidden('typ')
-                ->setValue('S');
-        $form1->addText('nazev', 'Název spisu:', 50, 80)
-                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
-        $form1->addText('popis', 'Popis:', 50, 200);
-        $form1->addSelect('parent_id', 'Složka:', $spisy);
-                //->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
-        $form1->addComponent( new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
         $form1->getComponent('spisovy_znak_id')
-            ->setSelect2Option('width', '75%') // pri ajaxu nefunguje width resolve
-            ->controlPrototype->onchange("vybratSpisovyZnak(this);")
-            ;
-        
-        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
-        $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
-        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
-        $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10)
-                ->setValue( date('d.m.Y') );
-        $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10);
-
-        $form1->addSubmit('vytvorit', 'Vytvořit');
-        $form1['vytvorit']->controlPrototype->onclick("return spisVytvoritSubmit();");
-        $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->controlPrototype->onclick("return spisVytvoritStorno('$dokument_id');");
+            ->setSelect2Option('width', '75%'); // pri ajaxu nefunguje width resolve
+                
+        $form1['vytvorit']->controlPrototype->onclick("return spisVytvoritSubmit(this);");
+        $form1['storno']->controlPrototype->onclick("return closeDialog();");
         $form1->onSuccess[] = array($this, 'vytvoritAjaxClicked');
 
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
+        return $form1;        
     }
 
     public function vytvoritAjaxClicked(Nette\Application\UI\Form $form, $data)
     {
         $Spisy = new Spis();
-
-        $dokument_id = @$data['dokument_id'];
-        $this->template->dokument_id = $dokument_id;
-        unset($data['dokument_id']);
         
         try {
             $spis_id = $Spisy->vytvorit($data);
-            echo '<div class="flash_message flash_info">Spis "'. $data['nazev'] .'"  byl vytvořen.</div>';
-            
         } catch (Exception $e) {
             echo '<div class="flash_message flash_error">Spis "'. $data['nazev'] .'" se nepodařilo vytvořit.</div>';
             echo '<div class="flash_message flash_error">'. $e->getMessage() .'</div>';
+            return;
         }
         
-        $this->setLayout(false);
+        $this->sendJson(['status' => 'OK', 'id' => $spis_id, 'name' => $data['nazev']]);
     }
 
     public function stornoAjaxClicked(Nette\Forms\Controls\SubmitButton $button)

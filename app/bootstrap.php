@@ -142,11 +142,11 @@ try {
     $connection = dibi::connect($db_config);
     if ($configurator->isDebugMode()) {
         // false - Neni treba explain SELECT dotazu
-        $panel = new Dibi\Bridges\Tracy\Panel(false, DibiEvent::ALL); 
+        $panel = new Dibi\Bridges\Tracy\Panel(true, DibiEvent::ALL); 
         $panel->register($connection);
         unset($panel);
     }
-    
+dibi::query('SET SESSION query_cache_type = OFF');
     if (!$db_config['prefix'])
         $db_config['prefix'] = '';  // nahrad pripadnou null hodnotu za prazdny retezec
     dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];

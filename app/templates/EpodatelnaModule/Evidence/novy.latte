@@ -20,29 +20,6 @@
             <dt>Typ dokumentu:</dt>
             <dd>{$novyForm['dokument_typ_id']->control}</dd>
         </dl>
-        {if 0}
-        <dl class="detail_item">
-            <dt>Název spisu:</dt>
-            <dd>
-                {if $Typ_evidence == 'sberny_arch'}
-                &nbsp;
-                {else}
-                <span id="dok_spis">
-                {if count($Spisy)>0 }
-                    {foreach $Spisy as $s}
-                    {$s->nazev}<br />
-                    {/foreach}
-                {else}
-                    nepřidělen k žádnému spisu
-                {/if}
-
-                </span>
-
-                <a href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}" id="dialog-spis">Připojit spis</a>
-                {/if}
-            </dd>
-        </dl>
-        {/if}
         <dl class="detail_item">
             <dt>Věc:</dt>
             <dd>{$novyForm['nazev']->control}</dd>

@@ -284,14 +284,11 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
             $seznam_subjektu = $Subjekt->seznam();
         }
 
-        if ( count($seznam_subjektu)>0 ) {
-            foreach( $seznam_subjektu as $subjekt ) {
-                $seznam[ ] = array(
-                    "id"=> $subjekt->id,
-                    "value"=> Subjekt::displayName($subjekt,'full'),
-                    "nazev"=> Subjekt::displayName($subjekt,'full'),
-                    "full"=> Subjekt::displayName($subjekt,'full'),
-                    "item"=>$subjekt
+        if (count($seznam_subjektu) > 0) {
+            foreach ($seznam_subjektu as $subjekt) {
+                $seznam[] = array(
+                    "id" => $subjekt->id,
+                    "value" => Subjekt::displayName($subjekt, 'full'),
                 );
             }
         }
@@ -341,7 +338,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $form1->getElementPrototype()->onsubmit('return false;');
         $form1->onSuccess[] = array($this, 'upravitFormSucceeded');
         $form1['upravit']->controlPrototype->onclick("return subjektUpravitSubmit();");
-        $form1['storno']->controlPrototype->onclick("return subjektUpravitStorno();");
+        $form1['storno']->controlPrototype->onclick("return closeDialog();");
                 
         return $form1;
     }

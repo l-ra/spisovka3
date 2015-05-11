@@ -1,0 +1,36 @@
+{if count($seznam)>0}
+<table>
+    {foreach $seznam as $spis}
+{continueIf $spis->stav != 1}
+{?  $str = $spis->sekvence;
+    $a = explode('.', $str);
+    if (count($a) > 2) {
+        array_shift($a);
+        array_pop($a);
+        $str = '';
+        foreach ($a as $ae)
+            $str .= "item$ae ";
+    }
+}
+<tr class="{$str}">
+<td>
+{!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
+{if $spis->typ=='VS'}
+<div class="icon_slozka" onclick="$('.item{!$spis->id}').toggle();"></div>
+&nbsp;&nbsp;
+{$spis->nazev}
+{elseif $spis->typ=='SP'}
+<img src="{$publicUrl}images/icons/folder_green.png" alt="Hlavní spis" title="Hlavní spis" width="16" height="16" onclick="$('.item{!$spis->id}').toggle();" />
+&nbsp;&nbsp;
+{$spis->nazev}
+{else}
+<div class="icon_spis"></div>&nbsp;&nbsp;
+<a href="" onclick="return spisVybran({$spis->id})">{$spis->nazev}</a>
+{/if}                
+</td>
+</tr>
+{/foreach}
+</table>
+{else}
+    <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
+{/if}

@@ -1131,3 +1131,12 @@ tr.odes_form input.poznamka {
     width: 500px;
 }
 
+div.icon_spis, div.icon_slozka {
+    background: url('../images/icons/spisy.png') no-repeat right;    
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
+div.icon_slozka {
+    background: url('../images/icons/folder_yellow.png') no-repeat right;
+}

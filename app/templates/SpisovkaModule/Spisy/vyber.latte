@@ -1,53 +1,18 @@
-    {if isset($chyba)}
-    <div class="flash_message flash_warning">Spis se nepodařilo připojit k dokumentu. Zkuste to znovu.</div>
-    {/if}
-    
-    <div id="spis_novy" class="dokument_blok2" style="display:none;">
-    <h2>Vytvořit nový spis</h2>
-    {control novyajaxForm}
-    </div>    
-    
-    <h2>Seznam spisů</h2>
+<br/>
+<a href="{link novyform}" onclick="return dialog(this, 'Nový spis');">
+Vytvořit nový spis</a>
+&nbsp;&nbsp;
+<a href="{link seznam}" onclick="return dialog(this, 'Seznam spisů');">
+Zobrazit seznam všech spisů</a>
+<br/><br/><br/>
+Vyhledat spis: &nbsp;
+<input type="hidden" class="spis_autocomplete" id='vyber_spisu_254' />
 
-    <div id="spis_novy_click" class="dokument_blok2"><a href="javascript:void(0);" onclick="return novySpis();">Vytvořit nový spis</a></div>
-    
-    {if count($seznam)>0}
-    <table>
-        {foreach $seznam as $spis}
-        {continueIf $spis->stav != 1}
-        <tr class="item{=str_replace("."," item",$spis->sekvence)}" id="sitem{$spis->id}">
-            <td>
-                {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
-                {if $spis->typ=='VS'}
-                <img src="{$publicUrl}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
-                &nbsp;&nbsp;
-                {$spis->nazev}
-                {elseif $spis->typ=='SP'}
-                <img src="{$publicUrl}images/icons/folder_green.png" alt="Hlavní spis" title="Hlavní spis" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
-                &nbsp;&nbsp;
-                {$spis->nazev}
-                {else}
-                <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
-                &nbsp;&nbsp;
-                <a href="{link :Spisovka:Spisy:vybrano, 'id'=>$spis->id, 'dok_id'=>$dokument_id  }" onclick="spisVybran(this); return false;">{$spis->nazev}</a>
-                {/if}                
-            </td>
-        </tr>
-        {/foreach}
-    </table>
-    {else}
-    <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
-    {/if}
-    {include ../../@vlozSpisZnak.latte}
-    <script type="text/javascript">
-    
-        initSelect2();
-        InstallDatePicker();
-        function novySpis() 
-        {
-            $('#spis_novy').show();
-            $('#spis_novy_click').hide();
-            return false;
-        }
+<script type="text/javascript">    
+    initSpisAutocomplete();
+    $('#vyber_spisu_254').on("change", function(e) {
+        spisVybran(e.val);
+    });
+</script>
 
-    </script>
+
