@@ -39,4 +39,12 @@ Dulezite upozorneni:
 Pri aktualizaci vzdy prepiste stare soubory novymi. Zalohu ulozte mimo
 adresar spisovky. Nevytvarejte zadne soubory typu SpisyPresenter.php.bak apod.
 Mohlo by potom dojit ke znefunkcneni cele aplikace.
- 
+
+3) Aktualizace na verzi 3.5
+
+V této verzi došlo ke změně v konfiguračních souborech aplikace. Soubor
+system.ini se již nepoužívá. Nastavení připojení do databáze je nyní
+v souboru database.neon, který aplikace při prvním spuštění vytvoří. 
+Konfiguraci aplikace lze přizpůsobit vytvořením souboru system.neon,
+viz ukázku v system.neon.sample.
+
