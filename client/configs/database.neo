@@ -1,0 +1,13 @@
+parameters:
+
+    database:
+        driver   = mysqli
+        host     = localhost
+        username = 
+        password = 
+        database = 
+        charset  = utf8
+        prefix   = 
+        profiler = false
+        cache    = true
+        sqlmode  = STRICT_TRANS_TABLES

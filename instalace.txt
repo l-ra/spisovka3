@@ -40,13 +40,14 @@ nastaveni overte, aby nebylo mozne se neopravnene dostat k citlivym datum.
 $public_url = absolutni nebo relativni URL mapujici adresar /public
 
 
-4. V adresari /client/configs/ zkopirujte soubor system.in do system.ini. V souboru system.ini nastavte spravne hodnoty pro pristup k databazi:
+4. V adresari /client/configs/ zkopirujte soubor database.neo do database.neon. V novem souboru nastavte spravne hodnoty pro pripojeni do databaze:
 
-database.host = localhost        ; adresa serveru
-database.username =              ; prihlasovaci jmeno k databazi
-database.password =              ; prihlasovaci heslo k databazi
-database.database =              ; databaze (musi existovat!)
-database.prefix  =               ; prefix tabulek ( priklad: "s3_". Pouzijte, pokud v databazi jiz existuje aplikace spisovky nebo jakekoli jine tabulky)
+host = localhost        ; adresa serveru
+username =              ; prihlasovaci jmeno k databazi
+password =              ; prihlasovaci heslo k databazi
+database =              ; jmeno databaze (musi existovat!)
+prefix  =               ; prefix tabulek - je mozne nastavit, ale pro prehlednost
+                          se doporucuje spise vytvorit prazdnou databazi
 
 
 5. Provedte instalacni proceduru aplikace.
