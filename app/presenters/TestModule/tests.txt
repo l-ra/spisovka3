@@ -1,7 +1,7 @@
-:Spisovka:Default:
+:Spisovka:Default: RedirectResponse
 :Spisovka:Dokumenty:
 :Spisovka:Dokumenty:novy
-:Spisovka:Dokumenty:novy { "cisty": 1 }
+:Spisovka:Dokumenty:novy RedirectResponse { "cisty": 1 }
 :Spisovka:Dokumenty:detail { "id": 190 }
 :Spisovka:Prilohy:pridat { "id": 1234 }
 :Spisovka:Spisy:
@@ -13,8 +13,8 @@
 :Spisovka:Sestavy:nova
 :Spisovka:Sestavy:detail { "id": 1 }
 :Spisovka:Sestavy:upravit { "id": 4 }
-:Spisovka:Sestavy:tisk { "id": 6 }
-:Spisovka:Sestavy:pdf { "id": 6 }
+:Spisovka:Sestavy:tisk ForwardResponse { "id": 6 }
+:Spisovka:Sestavy:pdf ForwardResponse { "id": 6 }
 :Spisovka:Sestavy:detail { "id": 6, "view": "tisk" }
 :Spisovka:Subjekty:novy { "dok_id": 1234 }
 :Spisovka:Subjekty:vyber { "dok_id": 1234 }
@@ -23,11 +23,11 @@
 :Spisovka:Vypravna:detail { "id": 26 }
 :Spisovka:Vyhledat:
 :Spisovka:Uzivatel:vyber { "dok_id": 1234 }
-:Epodatelna:Default:
+:Epodatelna:Default: RedirectResponse
 :Epodatelna:Default:nove
 :Epodatelna:Default:prichozi
 :Epodatelna:Default:odchozi
-:Spisovna:Default:
+:Spisovna:Default: RedirectResponse
 :Spisovna:Dokumenty:
 :Spisovna:Dokumenty:prijem
 :Spisovna:Dokumenty:keskartaciseznam

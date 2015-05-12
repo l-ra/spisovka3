@@ -22,16 +22,17 @@ class Test_DefaultPresenter extends BasePresenter
         
         foreach($input as $line)
             if (substr($line, 0, 1) != '#') {
-                $line = trim($line);
-                if (($pos = strpos($line, " ")) === false) {
-                    $address = $line;
-                    $params = null;
-                } else {
-                    $address = substr($line, 0, $pos);
-                    $params = json_decode(substr($line, $pos + 1), true /* vrat pole, ne objekt */);
-                }
                 
-                $test = array('address' => $address, 'params' => $params);                
+                $matches = [];
+                preg_match('%^([^ ]+)( ([\w]+))?( ({.*))?%', trim($line), $matches);
+                
+                $address = $matches[1];
+                $expected = !empty($matches[3]) ? $matches[3] : 'OK';
+                $params = isset($matches[5]) 
+                        ? json_decode($matches[5], true /* vrat pole, ne objekt */) 
+                        : null;
+                
+                $test = array('address' => $address, 'params' => $params, 'expected_result' => $expected);
                 $tests[] = $test;
             }
             
@@ -46,7 +47,9 @@ class Test_DefaultPresenter extends BasePresenter
         echo "Spouštím testy\n\n";
 
         $tests = $this->getTests();
-        
+//        dump($tests); die;
+
+        $n_ok = 0;
         foreach ($tests as $test) {
                         
             $result = $this->runTest($test);
@@ -56,7 +59,14 @@ class Test_DefaultPresenter extends BasePresenter
                 $test_name .= " " . json_encode($test['params']);
             printf("%-60s %s\n", $test_name, $result);
             flush();
+            if ($result == $test['expected_result'])
+                $n_ok++;
         }
+        
+        if ($n_ok == count($tests))
+            echo "\nVšechny testy proběhly úspěšně.";
+        else
+            printf("\n%d z %d testů bylo úspěšných.", $n_ok, count($tests));
         
         $this->terminate();
     }
