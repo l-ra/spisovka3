@@ -570,5 +570,51 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->forward(':Spisovna:Zapujcky:default', array('filtr'=>$data) );
     }
     
-    
+    public function actionSeznamAjax()
+    {
+        
+        $Dokument = new Dokument();
+        
+        $args = null;
+        $seznam = array();
+
+        // Pripojit aktivni zapujcky
+        $Zapujcka = new Zapujcka();
+        $zapujcky = $Zapujcka->aktivniSeznam();        
+        
+        
+        $term = $this->getParameter('term');
+
+        if ( !empty($term) ) {
+            $args = $Dokument->hledat($term);
+            $args = $Dokument->spisovna($args);            
+            $result = $Dokument->seznam($args);
+            $seznam_dok = $result->fetchAll();
+        } else {
+            $args = $Dokument->spisovna($args);            
+            $result = $Dokument->seznam($args);
+            $seznam_dok = $result->fetchAll();
+        }
+
+        if ( count($seznam_dok)>0 ) {
+            foreach( $seznam_dok as $row ) {
+                if ( isset($zapujcky[$row->id]) ) continue; // je zapujcen
+                $dok = $Dokument->getBasicInfo($row->id);
+                
+                //if ( $dok->stav_dokumentu > 7 ) continue; // vyradime dokumenty po skartacnim rizeni
+                
+                $seznam[ ] = array(
+                    "id"=> $dok->id,
+                    "type" => 'item',
+                    "value"=> $dok->cislo_jednaci.' - '.$dok->nazev,
+                    "nazev"=> $dok->cislo_jednaci ." - ". $dok->nazev
+                );
+            }
+        }
+
+        echo json_encode($seznam);
+
+        exit;
+    }
+       
 }

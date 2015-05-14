@@ -217,13 +217,6 @@ if ( $clean_url ) {
                 'param2' => 'param2',
                 'param3' => 'param3'
                 ));
-    // Error
-    $router[] = new Nette\Application\Routers\Route('error/<action>/<id>', array(
-                /*'module'    => 'Spisovka',*/
-                'presenter' => 'Error',
-                'action' => 'default',
-                'id' => NULL,
-                ));
 
     // Admin module
     $router[] = new Nette\Application\Routers\Route('admin/<presenter>/<action>/<id>/<params>', array(
@@ -242,7 +235,7 @@ if ( $clean_url ) {
                 'id'        => null
                 ));
     // Spisovna module
-    $router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<action novy|nova|upravit|seznam|vyber|pridat|odeslat|odpoved|prijem|keskartaciseznam|skartace|reset>', array(
+    $router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<action>', array(
                 'module'    => 'Spisovna',
                 'presenter' => 'Default',
                 'action' => 'default',
