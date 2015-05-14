@@ -15,10 +15,13 @@ Nové funkce:
   
 Jiné změny:
 
-- aplikace je nyní podporována na PHP verze 5.4 a 5.5
-- z důvodu upgrade frameworku, na kterém aplikace běží, došlo k rozsáhlým
-  změnám v kódu aplikace. V ideálním případě by uživatel změnu neměl poznat,
-  ale je zde určité riziko vzniku nových chyb, které testování nemusí odhalit.
+- aplikace je nyní podporována na PHP verze 5.4 a 5.5. Na staré 5.3 nepoběží.
+- aplikace nyní vyžaduje přepis URL. To není problém u webového serveru Apache.
+  Pro Microsoft IIS je nutné ručně přepis URL nakonfigurovat.
+- z důvodu upgrade frameworku, na kterém aplikace běží a kvůli větší čistotě
+  zdrojového kódu aplikace v něm došlo k rozsáhlým změnám. V ideálním případě by
+  uživatel změnu neměl poznat, ale je zde určité riziko vzniku nových chyb,
+  které testování nemusí odhalit.
 - pro informace o změně konfiguračních souborů viz soubor aktualizace.txt
 - přepsána velká část Javascriptu starající se o dynamické změny na stránce.
   Tzv. rotující kolečko by se nyní mělo spolehlivě zobrazovat a skrývat, když

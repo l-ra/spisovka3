@@ -45,10 +45,7 @@ class Spisovka_NapovedaPresenter extends BasePresenter {
             $param1 = strtolower(str_replace("Module", "", $file_part[1]));
             $param2 = strtolower($file_part[2]);
             $param3 = strtolower(str_replace(".phtml", "", $file_part[3]));
-            if (IS_SIMPLE_ROUTER)
-                $tmp->url = "?presenter=Spisovka:Napoveda&param1=$param1&param2=$param2&param3=$param3";
-            else 
-                $tmp->url = "napoveda/$param1/$param2/$param3";                
+            $tmp->url = "napoveda/$param1/$param2/$param3";                
             $tmp->code = "$param1/$param2/$param3";
 
             $dirs[$param1][$param2][$param3] = $tmp;

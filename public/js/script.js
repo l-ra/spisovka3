@@ -1,4 +1,4 @@
-/* global BASE_URL, is_simple, DOKUMENT_ID, typ_dokumentu_id, smer_typu_dokumentu */
+/* global BASE_URL, DOKUMENT_ID, typ_dokumentu_id, smer_typu_dokumentu */
 
 var stop_timer = 0;
 var url;
@@ -150,7 +150,7 @@ $(function() {
     $('#predat_autocomplete').autocomplete({
         minLength: 3,
         /*source: seznam_uzivatelu,*/
-        source: (is_simple==1)?BASE_URL + '?presenter=Spisovka%3Auzivatel&action=seznamAjax':BASE_URL + 'uzivatel/seznamAjax',
+        source: BASE_URL + 'uzivatel/seznamAjax',
 
         focus: function(event, ui) {
             $('#predat_autocomplete').val(ui.item.nazev);
@@ -179,8 +179,7 @@ $(function() {
 
     $('#subjekt_autocomplete').autocomplete({
         minLength: 3,
-        source: (is_simple==1) ? BASE_URL + '?presenter=Spisovka%3Asubjekty&action=seznamAjax'
-                            : BASE_URL + 'subjekty/0/seznamAjax',
+        source: BASE_URL + 'subjekty/0/seznamAjax',
 
         select: function(event, ui) {
             $('#subjekt_autocomplete').val('');
@@ -204,11 +203,7 @@ $(function() {
                 typ_code = 'AO';
             }
             
-            if ( is_simple == 1 ) {
-                url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+ui.item.id+'&action=vybrano&dok_id='+DOKUMENT_ID+'&typ=' + typ_code + '&autocomplete=1';                    
-            } else {
-                url = BASE_URL + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+DOKUMENT_ID+'&typ=' + typ_code + '&autocomplete=1';
-            }
+            url = BASE_URL + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+DOKUMENT_ID+'&typ=' + typ_code + '&autocomplete=1';
             
             $.get(url, function(data) {
                 if ( data.indexOf('###vybrano###') != -1 ) {
@@ -325,12 +320,7 @@ aresSubjekt = function ( formName ) {
         return false; // Je-li pole IC prázdné, nevolej neplatné URL
     }
     
-    if ( is_simple == 1 ) {
-        var url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=' + IC +'&action=ares';
-    } else {    
-        var url = BASE_URL + 'subjekty/' + IC +'/ares';
-    }
-    //alert( url );
+    var url = BASE_URL + 'subjekty/' + IC +'/ares';
     
     showSpinner();
 
@@ -368,13 +358,7 @@ isdsSubjekt = function ( formName ) {
         return false;
     }
 
-    //var url = BASE_URL + '/subjekty/ares/' + frmIC.value;
-    if ( is_simple == 1 ) {
-        var url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id=' + frmID.value +'&action=isdsid';
-    } else {    
-        var url = BASE_URL + 'subjekty/' + frmID.value +'/isdsid';
-    }
-    //alert( url );
+    var url = BASE_URL + 'subjekty/' + frmID.value +'/isdsid';
 
     $.getJSON(url, function(data) {
 
@@ -415,11 +399,7 @@ ajaxcron = function () {
     if (!(Math.random() < 0.1))
         return false;
     
-    if ( is_simple == 1 ) {
-        var url = BASE_URL + '?presenter=Spisovka%3Acron&action=spustit';
-    } else {    
-        var url = BASE_URL + 'cron/spustit';
-    }
+    var url = BASE_URL + 'cron/spustit';
 
     $.ajax({
         url: url,
@@ -445,9 +425,7 @@ toggleWindow = function (elm) {
 spisVybran = function (spis_id) {
 
     showSpinner();
-    var href = is_simple == 1
-        ? BASE_URL + '?presenter=Spisovka%3Aspisy&action=vybrano&id=' + spis_id + '&dok_id=' + DOKUMENT_ID 
-        : BASE_URL + 'spisy/' + spis_id + '/vybrano?dok_id=' + DOKUMENT_ID;
+    var href = BASE_URL + 'spisy/' + spis_id + '/vybrano?dok_id=' + DOKUMENT_ID;
 
     $.get(href, function(data) {
         if ( data.indexOf('###vybrano###') != -1 ) {
@@ -483,11 +461,7 @@ renderPrilohy = function (dokument_id) {
 
     showSpinner();
 
-    if ( is_simple == 1 ) {
-        url = BASE_URL + '?presenter=Spisovka%3Aprilohy&id='+ dokument_id +'&action=nacti';
-    } else {    
-        url = BASE_URL + 'prilohy/'+ dokument_id +'/nacti';
-    }
+    url = BASE_URL + 'prilohy/'+ dokument_id +'/nacti';
 
     $.get(url, function(data) {
         $('#dok-prilohy').html(data);
@@ -500,11 +474,7 @@ renderSubjekty = function () {
 
     showSpinner();
 
-    if ( is_simple == 1 ) {
-        url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+ DOKUMENT_ID +'&action=nacti';
-    } else {    
-        url = BASE_URL + 'subjekty/'+ DOKUMENT_ID +'/nacti';
-    }
+    url = BASE_URL + 'subjekty/'+ DOKUMENT_ID +'/nacti';
 
     $.get(url, function(data) {
         $('#dok-subjekty').html(data);
@@ -722,10 +692,7 @@ hledejDokumentAjax = function (vyraz, typ) {
 
     showSpinner();
 
-    if ( is_simple == 1 ) {
-        var url = BASE_URL + '?presenter=Spisovka%3Aspojit&id=0&action=nacti&q=' + vyraz;
-    } else
-        var url = BASE_URL + 'spojit/0/nacti?q=' + vyraz;
+    var url = BASE_URL + 'spojit/0/nacti?q=' + vyraz;
     
     $.get(url, function(data) {
         var vysledek = document.getElementById('vysledek');
@@ -808,24 +775,18 @@ selectReadOnly = function ( select ) {
 
 filtrSestavy = function (elm) {
 
-    if ( is_simple == 1 ) {
-        re = /id=([0-9]+)/;
-        var matched = re.exec(elm.href);
-        var url = BASE_URL + '?presenter=Spisovka%3Asestavy&id='+ matched[1] +'&action=filtr';
-    } else {         
-        re = /sestavy\/([0-9]+)\/(.*)/;
-        var matched = re.exec(elm.href);
-        var url = BASE_URL + 'sestavy/'+ matched[1] +'/filtr/';
-        if (matched[2])
-            url += '?tisk=' + matched[2];
-    }
+    re = /sestavy\/([0-9]+)\/(.*)/;
+    var matched = re.exec(elm.href);
+    var url = BASE_URL + 'sestavy/'+ matched[1] +'/filtr/';
+    if (matched[2])
+        url += '?tisk=' + matched[2];
 
     return dialog(elm, 'Filtr', url);
 };
 
 zobrazSestavu = function (elm) {
 
-    var param = is_simple == 1 ? '&' : '?';
+    var param = '?';
     
     if ( elm.pc_od.value != '' ) {param = param + 'pc_od=' + elm.pc_od.value + '&'; }
     if ( elm.pc_do.value != '' ) {param = param + 'pc_do=' + elm.pc_do.value + '&'; }
@@ -860,19 +821,10 @@ function nastylovat(data,typ) {
     }
 
     if ( typ == 1 ) {
-
-        if ( is_simple == 1 ) {
-            var url = BASE_URL + '?presenter=Spisovka%3Adokumenty&id='+ dokument_id +'&action=vlozitdosbernehoarchu&vlozit_do=';
-        } else {         
-            var url = BASE_URL + 'dokumenty/'+ dokument_id +'/vlozitdosbernehoarchu?vlozit_do=';
-        }
+        var url = BASE_URL + 'dokumenty/'+ dokument_id +'/vlozitdosbernehoarchu?vlozit_do=';
         var fnc = "pripojitDokument(this)";
     } else {
-        if ( is_simple == 1 ) {
-            var url = BASE_URL + '?presenter=Spisovka%3Aspojit&id='+ dokument_id +'&action=vybrano&spojit_s=';
-        } else {            
-            var url = BASE_URL + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
-        }
+        var url = BASE_URL + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
         var fnc = "spojitDokument(this)";
     }
 
@@ -990,11 +942,7 @@ zmen_rezim_subjektu = function() {
     // this.src = url;
 
     var subjekt_id = this.id.replace(/subjekt_ikona_/, '');
-    var url;
-    if ( is_simple == 1 )
-        url = BASE_URL + '?presenter=Spisovka%3Asubjekty&id='+subjekt_id+'&action=zmenrezim&';        
-    else
-        url = BASE_URL + 'subjekty/'+subjekt_id+'/zmenrezim?';
+    var url = BASE_URL + 'subjekty/'+subjekt_id+'/zmenrezim?';
     url += 'dok_id='+DOKUMENT_ID+'&typ='+rezim;    
 
     $.get(url, '', function(data) {
@@ -1026,8 +974,7 @@ vybratSpisovyZnak = function(element) {
     var key = form.spisovy_znak_id.selectedIndex;
     var sz_id = form.spisovy_znak_id.options[key].value;
     
-    var url = is_simple == 1 ? BASE_URL + '?presenter=Spisovka%3ASpisznak&id=' + sz_id
-            : BASE_URL + 'spisznak/' + sz_id + '/';
+    var url = BASE_URL + 'spisznak/' + sz_id + '/';
     $.get(url, function(data) {
         form.skartacni_znak.value = data.skartacni_znak;
         form.skartacni_lhuta.value = data.skartacni_lhuta;
@@ -1050,8 +997,7 @@ initSpisAutocomplete = function() {
         width: '500px',
         minimumInputLength: 3,
         ajax: {
-            url: (is_simple==1) ? BASE_URL + '?presenter=Spisovka%3Aspisy&action=seznamAjax'
-                            : BASE_URL + 'spisy/seznamAjax',
+            url: BASE_URL + 'spisy/seznamAjax',
             dataType: 'json',
             quietMillis: 400,
             data: function (term, page) {

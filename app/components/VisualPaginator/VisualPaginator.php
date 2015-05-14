@@ -89,8 +89,7 @@ class VisualPaginator extends Nette\Application\UI\Control
         $query_params = substr($query_params, 1);
 
         if ( !empty($query_params) ) {
-            $symbol = IS_SIMPLE_ROUTER ? '&' : '?';
-            $this->template->query_first = "$symbol$query_params";
+            $this->template->query_first = "?$query_params";
             $this->template->other_params = "&". $query_params;
         } else {
             $this->template->query_first = "";

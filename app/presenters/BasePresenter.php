@@ -201,13 +201,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         if ($this->getHttpRequest()->isAjax())
             $this->setLayout(false);
         
-        if (IS_SIMPLE_ROUTER == 1) {
-            $helpUri = "?presenter=Spisovka:Napoveda&";
-            $helpUri .= strtolower("param1={$this->template->module}&param2={$this->template->presenter_name}&param3={$this->view}");
-        }
-        else {
-            $helpUri = "napoveda/". strtolower("{$this->template->module}/{$this->template->presenter_name}/{$this->view}");
-        }
+        $helpUri = "napoveda/". strtolower("{$this->template->module}/{$this->template->presenter_name}/{$this->view}");
         $this->template->helpUri = $helpUri;
 
         /**

@@ -2,9 +2,6 @@ php:
     date.timezone = "Europe/Prague"
 
 parameters:
-
-    # demo = true
-    # clean_url = true
  
     storage_configuration:
         path_documents = files/dokumenty

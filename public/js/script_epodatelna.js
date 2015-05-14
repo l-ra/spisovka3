@@ -1,4 +1,4 @@
-/* global BASE_URL, is_simple, PUBLIC_URL */
+/* global BASE_URL, PUBLIC_URL, linkNovySubjekt */
 
 var loaded_data = new Array();
 
@@ -16,7 +16,7 @@ $(function() {
 
     $('#subjekt_epod_autocomplete').autocomplete({
         minLength: 3,
-        source: (is_simple==1)?BASE_URL + '?presenter=Spisovka%3Asubjekty&action=seznamAjax':BASE_URL + 'subjekty/0/seznamAjax',
+        source: BASE_URL + 'subjekty/0/seznamAjax',
 
         focus: function(event, ui) {
             $('#subjekt_epod_autocomplete').val(ui.item.nazev);
@@ -63,11 +63,7 @@ renderEpodSubjekty = function (subjekt_id) {
 
     showSpinner();
     
-    if ( is_simple == 1 ) {
-        url = BASE_URL + '?presenter=Epodatelna%3Asubjekty&action=nacti&id=' + subjekt_id;
-    } else {  
-        url = BASE_URL + 'epodatelna/subjekty/nacti/'+ subjekt_id;
-    }
+    url = BASE_URL + 'epodatelna/subjekty/nacti/'+ subjekt_id;
 
     $.get(url, function(data) {
         subjekty_table = document.getElementById('subjekty-table');
@@ -111,11 +107,7 @@ zkontrolovatSchranku = function (elm) {
 
     $('#zkontrolovat_status').html('<img src="'+PUBLIC_URL+'images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
 
-    if ( is_simple == 1 ) {
-        url = BASE_URL + '?presenter=Epodatelna%3Adefault&action=zkontrolovatAjax';
-    } else {  
-        url = BASE_URL + 'epodatelna/default/zkontrolovatAjax';
-    }
+    url = BASE_URL + 'epodatelna/default/zkontrolovatAjax';
 
     $.get(url, function(data) {
         $('#zkontrolovat_status').html(data);
@@ -128,11 +120,7 @@ zkontrolovatSchranku = function (elm) {
 
 zkontrolovatOdchoziSchranku = function (elm) {
 
-    if ( is_simple == 1 ) {
-        url = BASE_URL + '?presenter=Epodatelna%3Adefault&action=zkontrolovatOdchoziISDS';
-    } else {  
-        url = BASE_URL + 'epodatelna/default/zkontrolovatOdchoziISDS';
-    }
+    url = BASE_URL + 'epodatelna/default/zkontrolovatOdchoziISDS';
 
     // zde není potřeba žádná zpětná vazba
     $.get(url);
@@ -143,11 +131,7 @@ nactiZpravy = function () {
 
     showSpinner();
     
-    if ( is_simple == 1 ) {
-        url = BASE_URL + '?presenter=Epodatelna%3Adefault&action=nactiNoveAjax';
-    } else {  
-        url = BASE_URL + 'epodatelna/default/nactiNoveAjax';
-    }
+    url = BASE_URL + 'epodatelna/default/nactiNoveAjax';
     $.get(url, function(data) {
         var zpravy = eval("(" + data + ")");
         if ( zpravy != '' ) {
@@ -218,11 +202,7 @@ generujZpravu = function ( id, data ) {
     prilohy = '';
     if ( data['prilohy'].length > 0 ) {
         for ( var key in data['prilohy'] ) {
-            if ( is_simple == 1 ) {
-                prilohy = prilohy + '                    <li><a href="'+BASE_URL+'?presenter=Epodatelna%3Aprilohy&action=download&id='+id+'&file='+ data['prilohy'][key]['id'] +'">'+ data['prilohy'][key]['name'] +'</a> [ '+ bytesToSize(data['prilohy'][key]['size']) +' ]</li>';
-            } else { 
-                prilohy = prilohy + '                    <li><a href="'+BASE_URL+'epodatelna/prilohy/download/'+id+'?file='+ data['prilohy'][key]['id'] +'">'+ data['prilohy'][key]['name'] +'</a> [ '+ bytesToSize(data['prilohy'][key]['size']) +' ]</li>';
-            }
+            prilohy = prilohy + '                    <li><a href="' + BASE_URL + 'epodatelna/prilohy/download/' + id + '?file=' + data['prilohy'][key]['id'] + '">' + data['prilohy'][key]['name'] + '</a> [ ' + bytesToSize(data['prilohy'][key]['size']) + ' ]</li>';
         }
     }
     subjekt_seznam = '';
@@ -347,7 +327,7 @@ form_odmitnout +
 
     $('#predat_autocomplete_'+id).autocomplete({
         minLength: 3,
-        source: (is_simple==1)?BASE_URL + '?presenter=Spisovka%3Auzivatel&action=seznamAjax':BASE_URL + 'uzivatel/seznamAjax',
+        source: BASE_URL + 'uzivatel/seznamAjax',
 
         focus: function(event, ui) {
             $('#predat_autocomplete_'+id).val(ui.item.nazev);
@@ -361,7 +341,7 @@ form_odmitnout +
 
     $('#subjekt_autocomplete_'+id).autocomplete({
         minLength: 3,
-        source: (is_simple==1)?BASE_URL + '?presenter=Spisovka%3Asubjekty&action=seznamAjax':BASE_URL + 'subjekty/0/seznamAjax',
+        source: BASE_URL + 'subjekty/0/seznamAjax',
 
         focus: function(event, ui) {
             $('#subjekt_autocomplete_'+id).val(ui.item.nazev);

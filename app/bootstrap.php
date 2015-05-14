@@ -173,117 +173,90 @@ if ($force_https || $httpRequest->isSecured())
 $application = $container->getByType('Nette\Application\Application');
 $router = $application->getRouter();
 
-// Cool URL detection
-// Detekce je nespolehliva, bez mod_env nefunguje
-// Proto je zde moznost specifikovat nastaveni primo v system.ini
+$router[] = new Nette\Application\Routers\Route('index.php', array(
+            'module'    => 'Spisovka',
+            'presenter' => 'Default',
+            'action' => 'default',
+            ), Nette\Application\Routers\Route::ONE_WAY);
 
-$clean_url = Nette\Environment::getVariable('clean_url', null);
+// Uzivatel
+$router[] = new Nette\Application\Routers\Route('uzivatel/<action>/<id>', array(
+            'module'    => 'Spisovka',
+            'presenter' => 'Uzivatel',
+            'action' => 'default',
+            'id' => NULL,
+            ));
+// Help
+$router[] = new Nette\Application\Routers\Route('napoveda/<param1>/<param2>/<param3>', array(
+            'module'    => 'Spisovka',
+            'presenter' => 'Napoveda',
+            'action' => 'default',
+            'param1' => 'obsah',
+            'param2' => 'param2',
+            'param3' => 'param3'
+            ));
 
-if ($clean_url === null)
-    if ( isset($_SERVER['HTTP_MOD_REWRITE']) && $_SERVER['HTTP_MOD_REWRITE'] == 'On' )
-        // Detect in $_SERVER['HTTP_MOD_REWRITE'] 
-        // Apache => .htaccess directive SetEnv HTTP_MOD_REWRITE On
-        // Nginx  => nginx.conf directive fastcgi_param HTTP_MOD_REWRITE On;
-        $clean_url = true;
-        
-    else if ( isset($_SERVER['REDIRECT_HTTP_MOD_REWRITE']) 
-                && $_SERVER['REDIRECT_HTTP_MOD_REWRITE'] == 'On' )
-        $clean_url = true;
-    else
-        $clean_url = false;
+// Admin module
+$router[] = new Nette\Application\Routers\Route('admin/<presenter>/<action>/<id>/<params>', array(
+            'module'    => 'Admin',
+            'presenter' => 'Default',
+            'action'    => 'default',
+            'id'        => null,
+            'params'    => null
+            ));
 
-if ( $clean_url ) {
-    define('IS_SIMPLE_ROUTER', 0);
+// E-podatelna module
+$router[] = new Nette\Application\Routers\Route('epodatelna/<presenter>/<action>/<id>', array(
+            'module'    => 'Epodatelna',
+            'presenter' => 'Default',
+            'action'    => 'default',
+            'id'        => null
+            ));
+// Spisovna module
+$router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<action>', array(
+            'module'    => 'Spisovna',
+            'presenter' => 'Default',
+            'action' => 'default',
+            'id' => NULL,
+            ));
+$router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<id>/<action>', array(
+            'module'    => 'Spisovna',
+            'presenter' => 'Default',
+            'action'    => 'detail',
+            'id'        => null
+            ));
+// Install module
+$router[] = new Nette\Application\Routers\Route('install/<action>/<id>/<params>', array(
+            'module'    => 'Install',
+            'presenter' => 'Default',
+            'action'    => 'default',
+            'id'        => null,
+            'params'    => null
+            ));
 
-    $router[] = new Nette\Application\Routers\Route('index.php', array(
-                'module'    => 'Spisovka',
-                'presenter' => 'Default',
-                'action' => 'default',
-                ), Nette\Application\Routers\Route::ONE_WAY);
+$router[] = new Nette\Application\Routers\Route('zpravy/<action>/<id>', array(
+            'module'    => 'Spisovka',
+            'presenter' => 'Zpravy',
+            'action' => 'default',
+            'id' => NULL,
+            ));
 
-    // Uzivatel
-    $router[] = new Nette\Application\Routers\Route('uzivatel/<action>/<id>', array(
-                'module'    => 'Spisovka',
-                'presenter' => 'Uzivatel',
-                'action' => 'default',
-                'id' => NULL,
-                ));
-    // Help
-    $router[] = new Nette\Application\Routers\Route('napoveda/<param1>/<param2>/<param3>', array(
-                'module'    => 'Spisovka',
-                'presenter' => 'Napoveda',
-                'action' => 'default',
-                'param1' => 'obsah',
-                'param2' => 'param2',
-                'param3' => 'param3'
-                ));
+$router[] = new Nette\Application\Routers\Route('test/<action>', 'Test:Default:');
 
-    // Admin module
-    $router[] = new Nette\Application\Routers\Route('admin/<presenter>/<action>/<id>/<params>', array(
-                'module'    => 'Admin',
-                'presenter' => 'Default',
-                'action'    => 'default',
-                'id'        => null,
-                'params'    => null
-                ));
-                        
-    // E-podatelna module
-    $router[] = new Nette\Application\Routers\Route('epodatelna/<presenter>/<action>/<id>', array(
-                'module'    => 'Epodatelna',
-                'presenter' => 'Default',
-                'action'    => 'default',
-                'id'        => null
-                ));
-    // Spisovna module
-    $router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<action>', array(
-                'module'    => 'Spisovna',
-                'presenter' => 'Default',
-                'action' => 'default',
-                'id' => NULL,
-                ));
-    $router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<id>/<action>', array(
-                'module'    => 'Spisovna',
-                'presenter' => 'Default',
-                'action'    => 'detail',
-                'id'        => null
-                ));
-    // Install module
-    $router[] = new Nette\Application\Routers\Route('install/<action>/<id>/<params>', array(
-                'module'    => 'Install',
-                'presenter' => 'Default',
-                'action'    => 'default',
-                'id'        => null,
-                'params'    => null
-                ));
+$router[] = new Nette\Application\Routers\Route('<presenter>/<action>', array(
+            'module'    => 'Spisovka',
+            'presenter' => 'Default',
+            'action' => 'default',
+            'id' => NULL,
+            ));
 
-    $router[] = new Nette\Application\Routers\Route('zpravy/<action>/<id>', array(
-                'module'    => 'Spisovka',
-                'presenter' => 'Zpravy',
-                'action' => 'default',
-                'id' => NULL,
-                ));
-                
-    $router[] = new Nette\Application\Routers\Route('test/<action>', 'Test:Default:');
-
-    $router[] = new Nette\Application\Routers\Route('<presenter>/<action>', array(
-                'module'    => 'Spisovka',
-                'presenter' => 'Default',
-                'action' => 'default',
-                'id' => NULL,
-                ));
-
-    $router[] = new Nette\Application\Routers\Route('<presenter>/<id>/<action>', array(
-                'module'    => 'Spisovka',
-                'presenter' => 'Default',
-                'action' => 'detail',
-                'id' => NULL,
-                ));
-        
-} else {
-    define('IS_SIMPLE_ROUTER',1);        
-    $router[] = new Nette\Application\Routers\SimpleRouter('Spisovka:Default:default');    
-}
-
+$router[] = new Nette\Application\Routers\Route('<presenter>/<id>/<action>', array(
+            'module'    => 'Spisovka',
+            'presenter' => 'Default',
+            'action' => 'detail',
+            'id' => NULL,
+            ));
+       
 }
 catch (Exception $e) {
     echo 'Behem inicializace aplikace doslo k vyjimce. Podrobnejsi informace lze nalezt v aplikacnim logu.<br>'

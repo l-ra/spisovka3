@@ -4,13 +4,7 @@ Options -Indexes
 # mod_rewrite
 <IfModule mod_rewrite.c>
 
-    <IfModule env_module>
-        # set mod_rewrite detecting
-        SetEnv HTTP_MOD_REWRITE On
-    </IfModule>
-
 	RewriteEngine On
-	# RewriteBase /
 
 	# front controller
 	RewriteCond %{REQUEST_FILENAME} !-f
