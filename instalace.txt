@@ -52,8 +52,8 @@ prefix  =               ; prefix tabulek - je mozne nastavit, ale pro prehlednos
 
 5. Provedte instalacni proceduru aplikace.
 
-Spustte internetovy prohlizec a zadejte adresu aplikace + instalace.php
-Priklad: http://demo.mojespisovka.cz/instalace.php
+Spustte internetovy prohlizec a zadejte adresu aplikace. Po nacteni stranky do adresniho radku
+pripiste na konec "uvod" (bez uvozovek) a stisknete klavesu enter.
 
 Ridte se nyni pokyny uvedenymi na strankach instalace.
 
