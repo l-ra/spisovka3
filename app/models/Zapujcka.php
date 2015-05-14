@@ -442,7 +442,7 @@ class Zapujcka extends BaseModel
 
         $stavy = array('1'=>'čeká na schválení',
                        '2'=>'zapůjčena',
-                       '3'=>'vracena',
+                       '3'=>'vrácena',
                        '4'=>'odmítnuta'
             );
 
