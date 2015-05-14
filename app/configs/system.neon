@@ -13,6 +13,11 @@ parameters:
 nette:
     application:
         errorPresenter: Error
+    session:
+        name: SpisovkaSessionID
+        savePath: "%clientDir%/sessions"
+        cookiePath: %cookiePath%
+        autoStart: true
         
 services:
     authorizator = Acl

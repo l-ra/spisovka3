@@ -28,9 +28,16 @@ require VENDOR_DIR . '/autoload.php';
 
 define('TEMP_DIR', CLIENT_DIR . '/temp');
 
-// check if directory /app/temp is writable
+// check if temp directory is writable
 if (file_put_contents(TEMP_DIR . '/_check', '') === FALSE) {
     throw new Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
+}
+
+// Toto kontroluje standardni umisteni, prestoze uzivatel muze nadefinovat
+// ukladani session do jineho adresare
+$session_dir = CLIENT_DIR . '/sessions';
+if (file_put_contents("$session_dir/_check", '') === FALSE) {
+    throw new Exception("Nelze zapisovat do adresare '$session_dir'");
 }
 
 // enable RobotLoader - this allows load all classes automatically
@@ -50,6 +57,8 @@ spl_autoload_register('mPDFautoloader');
 
 // Step 2: Configure environment
 
+register_shutdown_function(array('ShutdownHandler', '_handler'));
+
 // 2a) enable Nette\Debug for better exception and error visualisation
 
 define('LOG_DIR', dirname(APP_DIR) . '/log');
@@ -64,10 +73,14 @@ Nette\Bridges\Framework\TracyBridge::initialize();
 
 createIniFiles();
 
+$cookie_path = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+
 $configurator = new Nette\Configurator;
 $configurator
     ->setDebugMode((bool)DEBUG_ENABLE)
     ->setTempDirectory(TEMP_DIR)
+    ->addParameters(['clientDir' => CLIENT_DIR,
+                     'cookiePath' => $cookie_path])
     ->addConfig(APP_DIR . '/configs/system.neon')
     ->addConfig(CLIENT_DIR . '/configs/database.neon');
 if (is_file(CLIENT_DIR . '/configs/system.neon'))
@@ -103,23 +116,6 @@ if ( $unique_info === FALSE ) {
     Nette\Environment::setVariable('unique_info', $unique_info);
 }
 unset($unique_info);
-
-
-// 2e) setup sessions
-$session_dir = CLIENT_DIR . '/sessions';
-if (file_put_contents("$session_dir/_check", '') === FALSE) {
-    throw new Exception("Nelze zapisovat do adresare '$session_dir'");
-}
-$session = $container->getByType('Nette\Http\Session');
-$session->setName('SpisovkaSessionID');
-$session->setSavePath($session_dir);
-
-$cookie_path = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-$session->setCookieParameters($cookie_path);
-
-
-
-register_shutdown_function(array('ShutdownHandler', '_handler'));
 
 
 // 3b) Load database
