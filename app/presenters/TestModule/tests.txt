@@ -6,9 +6,11 @@
 :Spisovka:Prilohy:pridat { "id": 1234 }
 :Spisovka:Spisy:
 :Spisovka:Spisy:novy
+:Spisovka:Spisy:novyform
 :Spisovka:Spisy:detail { "id": 8 }
 :Spisovka:Spisy:detail { "id": 8, "upravit": "info" }
-:Spisovka:Spisy:vyber { "id": 1234 }
+:Spisovka:Spisy:seznam
+:Spisovka:Spisy:vyber
 :Spisovka:Sestavy:
 :Spisovka:Sestavy:nova
 :Spisovka:Sestavy:detail { "id": 1 }
