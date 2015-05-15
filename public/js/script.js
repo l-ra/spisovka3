@@ -978,7 +978,8 @@ vybratSpisovyZnak = function(element) {
     $.get(url, function(data) {
         form.skartacni_znak.value = data.skartacni_znak;
         form.skartacni_lhuta.value = data.skartacni_lhuta;
-        select_set_value(form.spousteci_udalost_id, data.spousteci_udalost_id);
+        if (typeof form.spousteci_udalost_id != 'undefined')
+            select_set_value(form.spousteci_udalost_id, data.spousteci_udalost_id);
     });
 
     return true;
