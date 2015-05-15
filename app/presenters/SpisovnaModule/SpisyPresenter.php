@@ -255,9 +255,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
             
     }
 
-    public function actionDetail()
+    public function renderDetail()
     {
-
         $spis_id = $this->getParameter('id',null);
         // Info o spisu
         $Spisy = new Spis();
@@ -376,16 +375,12 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
             $this->template->FormUpravit = $formUpravit;
             
-            
-            
-            
-            
-            
+            $this->template->upravitForm = $this['upravitForm'];
+                                                            
         } else {
             // spis neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');            
         }
-
         
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
@@ -401,12 +396,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $this->setView('printdetail');
         }           
 
-    }
-
-
-    public function renderDetail()
-    {
-        $this->template->upravitForm = $this['upravitForm'];
     }
 
     public function actionAkce($data)
@@ -487,27 +476,26 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     protected function createComponentUpravitForm()
     {
-
-        $Spisy = new Spis();
-
-        $spis = @$this->template->Spis;
-        
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->selectBox(2);
 
         $form1 = new Nette\Application\UI\Form();
-        $form1->addHidden('id')
-                ->setValue(@$spis->id);
+        $form1->addHidden('id');
         $form1->addSelect('spisovy_znak_id', 'Spisový znak:', $spisznak_seznam)
-                ->setValue(@$spis->spisovy_znak_id)
                 ->controlPrototype->onchange("vybratSpisovyZnak();");        
-        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
-                ->setValue(@$spis->skartacni_znak);
-        $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5)
-                ->setValue(@$spis->skartacni_lhuta);
+        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
+        $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
 
+        if (isset($this->template->Spis)) {
+            $spis = $this->template->Spis;
+            $form1['id']->setValue($spis->id);
+            $form1['spisovy_znak_id']->setValue($spis->spisovy_znak_id);
+            $form1['skartacni_znak']->setValue($spis->skartacni_znak);
+            $form1['skartacni_lhuta']->setValue($spis->skartacni_lhuta);            
+        }
+        
         $form1->addSubmit('upravit', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
         $form1->addSubmit('storno', 'Zrušit')
