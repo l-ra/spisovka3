@@ -363,9 +363,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
         
-        $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->selectBox(2);
-
         $session_spisplan = Nette\Environment::getSession('s3_spisplan');
         if ( empty($session_spisplan->spis_id) ) {
             $session_spisplan->spis_id = 1;
@@ -390,9 +387,9 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $form1->addHidden('parent_id_old')
                 ->setValue(@$spis->parent_id);    
 
-        $form1->addComponent( new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form1->addComponent( new SpisovyZnakComponent(), 'spisovy_znak_id');
         $form1->getComponent('spisovy_znak_id')->setValue(@$spis->spisovy_znak_id)
-            ->controlPrototype->onchange("vybratSpisovyZnak(this);");
+            ;
         
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$spis->skartacni_znak)
@@ -467,9 +464,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $params = array('where'=> array("tb.typ = 'VS'") );
         $spisy = $Spisy->selectBox(11, null, $session_spisplan->spis_id, $params);
 
-        $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->selectBox(2);
-
         $form1 = new Spisovka\Form();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
         $form1->addText('nazev', 'Název spisu/složky:', 50, 80)
@@ -478,8 +472,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $form1->addSelect('parent_id', 'Složka:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
 
-        $form1->addComponent( new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
-        $form1->getComponent('spisovy_znak_id')->controlPrototype->onchange("vybratSpisovyZnak(this);");
+        $form1->addComponent( new SpisovyZnakComponent(), 'spisovy_znak_id');
+        $form1->getComponent('spisovy_znak_id');
 
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);

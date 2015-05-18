@@ -957,11 +957,16 @@ zmen_rezim_subjektu = function() {
  */
 initSelect2 = function() {
     if (typeof $().select2 !== 'undefined') {
+        // Poznamka: nasledujici neni pouzito, nahrazeno widgetem spisoveho znaku
         $('select:not(has-select2-widget)[data-widget-select2=1]').each(function() {
 
             var options = $(this).data('widget-select2-options') || {};
 
             $(this).select2(options).attr('has-select2-widget', 1);
+        });
+        
+        $('.widget_spisovy_znak').select2({
+            width: 'resolve'
         });
     }
 };

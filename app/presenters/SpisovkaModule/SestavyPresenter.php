@@ -478,10 +478,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         $form->addComponent(new VyberPostovniZasilky(), 'druh_zasilky');
         
-        $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->selectBox(2);
-
-        $form->addComponent(new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
+        $form['spisovy_znak_id']->controlPrototype->onchange('');
+                
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 4);
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 4);
         $form->addSelect('skartacni_znak','Skartační znak: ', $skartacni_znak);

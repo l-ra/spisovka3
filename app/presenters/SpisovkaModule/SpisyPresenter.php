@@ -606,9 +606,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $spousteci = SpisovyZnak::spousteci_udalost(null,1);
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
-        $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->selectBox(2);
-        
         $params = array('where'=> array("tb.typ = 'VS'") );
         $spisy = $Spisy->selectBox(1, @$spis->id, 1, $params);
 
@@ -627,9 +624,9 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $form1->addHidden('parent_id_old')
                 ->setValue(@$spis->parent_id);     
 
-        $form1->addComponent( new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form1->addComponent( new SpisovyZnakComponent(), 'spisovy_znak_id');
         $form1->getComponent('spisovy_znak_id')->setValue(@$spis->spisovy_znak_id)
-            ->controlPrototype->onchange("vybratSpisovyZnak(this);");
+            ;
         
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)                
                 ->setValue(@$spis->skartacni_znak)
@@ -695,9 +692,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $params = array('where'=> array("tb.typ = 'VS'") );
         $spisy = $Spisy->selectBox(11, null, 1, $params);
 
-        $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->selectBox(2);
-
         $form1 = new Spisovka\Form();
         $form1->addHidden('typ')
                 ->setValue('S');
@@ -707,9 +701,9 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $form1->addSelect('parent_id', 'Složka:', $spisy)
                 ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
         
-        $form1->addComponent( new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form1->addComponent( new SpisovyZnakComponent(), 'spisovy_znak_id');
         $form1->getComponent('spisovy_znak_id')
-            ->controlPrototype->onchange("vybratSpisovyZnak(this);");
+            ;
                 
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
@@ -739,9 +733,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     {
         $form1 = $this->createComponentNovyForm();
         
-        $form1->getComponent('spisovy_znak_id')
-            ->setSelect2Option('width', '75%'); // pri ajaxu nefunguje width resolve
-                
         $form1['vytvorit']->controlPrototype->onclick("return spisVytvoritSubmit(this);");
         $form1['storno']->controlPrototype->onclick("return closeDialog();");
         $form1->onSuccess[] = array($this, 'vytvoritAjaxClicked');

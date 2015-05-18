@@ -106,8 +106,6 @@ class TreeModel extends BaseModel
             $result[$null_id] = '(hlavní větev)';
         } else if ( $type == 2 ) {
             $result[$null_id] = 'vyberte z nabídky ...';
-        } else if ( $type == "2x" ) {
-            $result[$null_id] = 'vyberte z nabídky ...';
         } else if ( $type == 3 ) {
             $result[$null_id] = 'všechny ...';
         }
@@ -138,14 +136,6 @@ class TreeModel extends BaseModel
                     $result[ $row->id ] = $row->{$this->nazev} .$popis;
                 } else if ( $type == 11 ) {
                     $result[ $row->id ] = $row;
-                } else if ( $type == "2x" ) {
-                    if ( isset($row->selected) && $row->selected == 0 ) {
-                        $result[ $row->id ] = Nette\Utils\Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis)->disabled(TRUE);
-                    } else if ( $row->stav == 0 ) {    
-                        $result[ $row->id ] = Nette\Utils\Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' [neaktivní] '. $row->{$this->nazev}.$popis)->disabled(TRUE);
-                    } else {
-                        $result[ $row->id ] = Nette\Utils\Html::el('option')->value($row->id)->setHtml(str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis);
-                    }
                 } else {
                     $result[ $row->id ] = str_repeat("...", $row->uroven) .' '. $row->{$this->nazev}.$popis;
                 }

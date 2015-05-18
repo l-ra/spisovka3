@@ -478,13 +478,10 @@ class Spisovna_SpisyPresenter extends BasePresenter
     {
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
-        $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->selectBox(2);
-
         $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id');
-        $form1->addComponent(new Select2Component('Spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
-        $form1['spisovy_znak_id']->controlPrototype->onchange("vybratSpisovyZnak(this);");        
+        $form1->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
+        $form1['spisovy_znak_id'];        
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta','Skartační lhuta: ', 5, 5);
 

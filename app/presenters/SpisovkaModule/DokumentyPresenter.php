@@ -1706,9 +1706,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 1);
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisznak_seznam = $SpisovyZnak->selectBox("2x");
         $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null, 1);
-        $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
         $Dok = @$this->template->Dok;
 
@@ -1732,10 +1730,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('datum_vyrizeni_cas', 'Čas vyřízení:', 10, 15)
                 ->setValue($cas);
 
-        //pouziti preddefinovane komponenty
-        $form->addComponent( new Select2Component('spisový znak:', $spisznak_seznam), 'spisovy_znak_id');
+        $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
         $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id)
-            ->controlPrototype->onchange("vybratSpisovyZnak(this);");
+            ;
 
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
                 ->setValue(@$Dok->ulozeni_dokumentu);
