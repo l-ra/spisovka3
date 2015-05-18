@@ -55,8 +55,13 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         // Volba vystupu - web/tisk/pdf
         if ($this->getParameter('print') || $this->getParameter('print_balik')) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $filtr_tisk = $this->getParameter('print_balik') ? "balik" : "doporucene";
-            $seznam = $Dokument->kOdeslani($seradit, $hledat, $filtr_tisk);
+            if ($vyber = $this->getParameter('vyber')) {
+                $seznam = $Dokument->kOdeslani($seradit, explode('-', $vyber));
+            }
+            else {
+                $filtr_tisk = $this->getParameter('print_balik') ? "balik" : "doporucene";
+                $seznam = $Dokument->kOdeslani($seradit, $hledat, $filtr_tisk);
+            }
             $this->pdf_output = true;
             $this->template->count_page = ceil(count($seznam)/10);
             $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
@@ -114,55 +119,52 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     
     public function actionAkce($data)
     {
-
-        //echo "<pre>"; print_r($data); echo "</pre>"; exit;
-
-        if ( isset($data['hromadna_akce']) ) {
+        if (isset($data['hromadna_akce'])) {
+            if (!isset($data['dokument_vyber'])) {
+                $this->flashMessage('Nevybrali jste žádný dokument.', 'warning');                
+                return;
+            }
+            
             $DokumentOdeslani = new DokumentOdeslani();
             switch ($data['hromadna_akce']) {
                 /* odeslat */
                 case 'odeslat':
-                    if ( isset($data['dokument_vyber']) ) {
-                        $count_ok = $count_failed = 0;
-                        foreach ( $data['dokument_vyber'] as $dokument_odeslani_id ) {
-                            if ( $DokumentOdeslani->odeslano($dokument_odeslani_id) ) {
-                                $count_ok++;
-                            } else {
-                                $count_failed++;
-                            }
-                        }
-                        if ( $count_ok > 0 ) {
-                            $this->flashMessage('Úspěšně jste odeslal '.$count_ok.' dokumentů.');
-                        }
-                        if ( $count_failed > 0 ) {
-                            $this->flashMessage(''.$count_failed.' dokumentů se nepodařilo odeslat!','warning');
-                        }
-                        if ( $count_ok > 0 && $count_failed > 0 ) {
-                            $this->redirect('this');
-                        }
-                    }
+                    $count_ok = $count_failed = 0;
+                    foreach ($data['dokument_vyber'] as $dokument_odeslani_id)
+                        if ($DokumentOdeslani->odeslano($dokument_odeslani_id))
+                            $count_ok++;
+                        else
+                            $count_failed++;
+                        
+                    if ($count_ok > 0)
+                        $this->flashMessage('Úspěšně jste odeslal ' . $count_ok . ' dokumentů.');
+                    if ($count_failed > 0)
+                        $this->flashMessage('' . $count_failed . ' dokumentů se nepodařilo odeslat!', 'warning');
+                    if ($count_ok > 0 && $count_failed > 0)
+                        $this->redirect('this');
                     break;
+                    
                 case 'vratit':
-                    if ( isset($data['dokument_vyber']) ) {
-                        $count_ok = $count_failed = 0;
-                        foreach ( $data['dokument_vyber'] as $dokument_odeslani_id ) {
-                            if ( $DokumentOdeslani->vraceno($dokument_odeslani_id) ) {
-                                $count_ok++;
-                            } else {
-                                $count_failed++;
-                            }
-                        }
-                        if ( $count_ok > 0 ) {
-                            $this->flashMessage('Úspěšně jste vrátil '.$count_ok.' dokumentů.');
-                        }
-                        if ( $count_failed > 0 ) {
-                            $this->flashMessage(''.$count_failed.' dokumentů se nepodařilo vrátit!','warning');
-                        }
-                        if ( $count_ok > 0 && $count_failed > 0 ) {
-                            $this->redirect('this');
-                        }
-                    }
+                    $count_ok = $count_failed = 0;
+                    foreach ($data['dokument_vyber'] as $dokument_odeslani_id)
+                        if ($DokumentOdeslani->vraceno($dokument_odeslani_id))
+                            $count_ok++;
+                        else
+                            $count_failed++;
+
+                    if ($count_ok > 0)
+                        $this->flashMessage('Úspěšně jste vrátil ' . $count_ok . ' dokumentů.');
+                    if ($count_failed > 0)
+                        $this->flashMessage('' . $count_failed . ' dokumentů se nepodařilo vrátit!', 'warning');
+                    if ($count_ok > 0 && $count_failed > 0)
+                        $this->redirect('this');
                     break;                    
+                    
+                case 'podaci_arch':
+                    $vyber = $data['dokument_vyber'];
+                    $this->redirect('this', ['print' => 1, 'vyber' => implode('-', $vyber)]);
+                    break;
+                
                 default:
                     break;
             }

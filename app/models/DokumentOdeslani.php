@@ -95,7 +95,7 @@ class DokumentOdeslani extends BaseModel
     }
     
     
-    public function kOdeslani($volba_razeni, $hledani, $filtr) {
+    public function kOdeslani($volba_razeni, $hledani, $filtr = null) {
 
         switch ($volba_razeni) {
             case 'datum_desc':
@@ -154,12 +154,15 @@ class DokumentOdeslani extends BaseModel
             $sql['where'][] = array('ds.zpusob_odeslani_id=3');
         }
 
-        if (!empty($hledani))
+        if (is_string($hledani))
             $sql['where_or'] = array(
                 array('CONCAT(s.nazev_subjektu,s.prijmeni) LIKE %s','%'.$hledani.'%'),            
                 array('osoba.prijmeni LIKE %s','%'.$hledani.'%'),
                 array('cislo_jednaci LIKE %s','%'.$hledani.'%'),
             );
+
+        if (is_array($hledani))
+            $sql['where'] = [['ds.id in %in', $hledani]];
                 
         $dokumenty = array();
         $result = $this->selectComplex($sql)->fetchAll();
