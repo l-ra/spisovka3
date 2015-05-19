@@ -28,7 +28,8 @@ Jiné změny:
 - pro informace o změně konfiguračních souborů viz soubor aktualizace.txt
 - přepsána velká část Javascriptu starající se o dynamické změny na stránce.
   Tzv. rotující kolečko by se nyní mělo spolehlivě zobrazovat a skrývat, když
-  aplikace zpracovává požadavek nebo nahrává data na pozadí.
+  aplikace zpracovává požadavek nebo nahrává data na pozadí. Též je uživatel
+  informován, pokud při provádění požadavku na pozadí dojde k chybě.
 - sjednocen layout nápovědy se zbytkem aplikace
 - proveden upgrade staré knihovny pro připojení k databázi
 - nový modul pro vývojáře pro základní automatické testování aplikace

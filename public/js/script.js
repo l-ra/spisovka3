@@ -78,6 +78,10 @@ $(function() {
         hideSpinner();
     });
     
+    $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
+        alert('Je nám líto, asynchronní požadavek skončil s chybou:\n' + thrownError);
+    });
+    
     // Povinne polozky
     $('label.required').attr('title','Povinná položka').append(' <span class="star">*</span>');
 
@@ -282,8 +286,8 @@ dialog = function ( elm, title, url ) {
         jqXHR = $.get(url, successFunction);
             
     jqXHR.fail(function(jqXHR) {
-        $('#dialog').html('');
-        alert('Při načítání obsahu okna došlo k vážné chybě.');
+        // Alert uživateli zobrazí globální handler
+        // alert('Při načítání obsahu okna došlo k vážné chybě.');
         $('#dialog').html('<pre>' + jqXHR.responseText);
     });
     
