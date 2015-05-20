@@ -17,7 +17,7 @@
             <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
         </a>        
     </div>
-    <div id="dokument_blok_volby">
+    <div class="dokument_blok_volby">
         {if $Lze_menit_skartacni_rezim}
         <a href="{link :Spisovna:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'skart_rezim' }">Upravit skartační režim</a>
         {/if}
@@ -70,7 +70,7 @@
 
 
 
-    <div id="dokument_blok_hlavni">
+    <div class="dokument_blok_hlavni">
         <div class="h2">{$Dok->typ_dokumentu->nazev}</div>
         <dl class="detail_item">
             <dt>JID:</dt>
@@ -194,7 +194,7 @@
         {/if}
     </div>
     
-    <div id="dokument_blok_vyrizeni">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Vyřízení <span class='toggler' onclick='toggleWindow(this);'>&nbsp;</span></div>
         <div class="dokument_blok">
         {if $Lze_menit_skartacni_rezim && $Upravit_param == 'skart_rezim'}
@@ -294,7 +294,7 @@
         </div>
     </div>
 
-    <div id="dokument_blok_poznamka">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Vytvořil a vyřídil</div>
         {if $Dok->typ_dokumentu->smer == 1}
         {foreach $Dok->workflow as $workflow}
@@ -346,7 +346,7 @@
     </div>
     
     {if $Zapujcka != null}
-    <div id="dokument_blok_poznamka">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Zápůjčka</div>
         <dl class="detail_item">
             <dt>Zapůjčeno:</dt>
@@ -369,7 +369,7 @@
     </div>
     {/if}
 
-    <div id="dokument_blok_subjekty">
+    <div class="dokument_blok_subjekty">
         <div class="h2">
             Adresáti / odesílatelé
         </div>
@@ -429,7 +429,7 @@
         </div>
     </div>
 
-    <div id="dokument_blok_prilohy">
+    <div class="dokument_blok_poznamka">
     <div class="h2">
         Přílohy
     </div>

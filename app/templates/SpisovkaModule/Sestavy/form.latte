@@ -9,7 +9,7 @@
     <h2>{$nadpis}</h2>
 
     {$form->render('begin')}
-    <div id="dokument_blok_hlavni">
+    <div class="dokument_blok_hlavni">
         <div class="h2">
             Sestava
         </div>
@@ -21,8 +21,8 @@
             <dd>{$form['sestava_filtr']->controlPart} (zobrazit výběr rozsahu podle pořadového čísla nebo data)</dd>
         </dl>
     </div>
-    
-    <div id="dokument_blok_poznamka">
+
+    <div class="dokument_blok_poznamka">
         <div class="h2">
             Zobrazované údaje
         </div>
@@ -41,7 +41,7 @@
  
     {include ../Vyhledat/form_subjekt.latte}
 
-    <div id="dokument_blok_akce">
+    <div class="dokument_blok_akce">
         {$form['odeslat']->control}
         &nbsp;&nbsp;
         {$form['storno']->control}

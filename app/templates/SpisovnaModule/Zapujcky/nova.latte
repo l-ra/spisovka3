@@ -7,7 +7,7 @@
     <h2>Žádanka o zápůjčku</h2>
     
     {$novyForm->render('begin')}
-    <div id="dokument_blok_hlavni">
+    <div class="dokument_blok_hlavni">
         <dl class="detail_item">
             <dt><strong>{$novyForm['dokument_text']->label} *</strong></dt>
             <dd>
@@ -35,7 +35,7 @@
         
     </div>
     
-    <div id="dokument_blok_akce">
+    <div class="dokument_blok_akce">
         {$novyForm['novy']->control}
         &nbsp;&nbsp;
         {$novyForm['storno']->control}

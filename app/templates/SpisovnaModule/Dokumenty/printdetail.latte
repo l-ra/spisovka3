@@ -11,7 +11,7 @@
 </head>
 <body>
 <div id="content">
-    <div id="dokument_blok_hlavni">
+    <div class="dokument_blok_hlavni">
         <dl class="detail_item">
             <dt>JID:</dt>
             <dd>{$Dok->jid}&nbsp;</dd>
@@ -136,7 +136,7 @@
         {/if}
         {/if}
     </div>
-    <div id="dokument_blok_vyrizeni">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
         <dl class="detail_item">
@@ -184,7 +184,7 @@
         </div>
     </div>
 
-    <div id="dokument_blok_poznamka">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Vytvořil a vyřídil</div>
         {if $Dok->typ_dokumentu->smer == 1}
         {foreach $Dok->workflow as $workflow}
@@ -236,7 +236,7 @@
     </div>
     
     {if $Zapujcka != null}
-    <div id="dokument_blok_poznamka">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Zápůjčka</div>
         <dl class="detail_item">
             <dt>Zapůjčeno:</dt>
@@ -259,7 +259,7 @@
     </div>
     {/if}    
 
-    <div id="dokument_blok_subjekty">
+    <div class="dokument_blok_subjekty">
         <div class="h2">
             Adresáti / odesílatelé
         </div>
@@ -310,7 +310,7 @@
         </div>
     </div>
 
-    <div id="dokument_blok_prilohy">
+    <div class="dokument_blok_poznamka">
     <div class="h2">
         Přílohy
     </div>

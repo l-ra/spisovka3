@@ -6,7 +6,7 @@
     </div>
 
     {$novyForm->render('begin')}
-    <div id="dokument_blok_hlavni">
+    <div class="dokument_blok_hlavni">
         {if 0}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
@@ -98,7 +98,7 @@
 
     </div>
 
-    <div id="dokument_blok_poznamka">
+    <div class="dokument_blok_poznamka">
         <div>Předání / vyřízení</div>
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
@@ -126,7 +126,7 @@
 
     </div>
     
-    <div id="dokument_blok_subjekty">
+    <div class="dokument_blok_subjekty">
         <div class="h2">
             Odesílatel zprávy
         </div>
@@ -251,7 +251,7 @@
         
     </div>
 
-    <div id="dokument_blok_prilohy">
+    <div class="dokument_blok_poznamka">
     <div class="h2">
         Přílohy
     </div>
@@ -282,7 +282,7 @@
     </div>
     </div>
 
-    <div id="dokument_blok_akce">
+    <div class="dokument_blok_akce">
         {$novyForm['novy']->control}
         &nbsp;&nbsp;
         {$novyForm['storno']->control}

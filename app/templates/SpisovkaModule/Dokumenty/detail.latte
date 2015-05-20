@@ -71,7 +71,7 @@
         </a>        
     </div>
 
-    <div id="dokument_blok_volby">
+    <div class="dokument_blok_volby">
        {if $AccessEdit==1}
        {if $Pridelen==1 }
        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
@@ -107,7 +107,7 @@
        <a href="{link this, 'id'=>$Dok->id, 'udalost'=>1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
     </div>
     {if $Zapujcka}
-    <div id="dokument_blok_volby">
+    <div class="dokument_blok_volby">
        {if !empty($Dok->predano->prideleno_id) }
        <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument k zapůjčení</a>
        {/if}
@@ -146,7 +146,7 @@
     </div>
     {/if}
 
-    <div id="dokument_blok_hlavni">
+    <div class="dokument_blok_hlavni">
         {if ($FormUpravit=='metadata')}
         {$metadataForm->render('begin')}
         <dl class="detail_item">
@@ -410,7 +410,7 @@
         {/if}
     </div>
     {if $Vyrizovani == 1 }
-    <div id="dokument_blok_vyrizeni">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Vyřízení <span class='toggler' onclick='toggleWindow(this);'>&nbsp;</span></div>
         <div class="dokument_blok">
         {if ($FormUpravit=='vyrizeni')}
@@ -508,7 +508,7 @@
     </div>
     {/if}
 
-    <div id="dokument_blok_poznamka">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Předání</div>
         {if $Dok->typ_dokumentu->smer == 1}
         {foreach $Dok->workflow as $workflow}
@@ -593,7 +593,7 @@
     </div>
     
     {if !empty($Zapujcka->id)}
-    <div id="dokument_blok_poznamka">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Zápůjčka</div>
         <dl class="detail_item">
             <dt>Zapůjčeno:</dt>
@@ -616,7 +616,7 @@
     </div>
     {/if}    
 
-    <div id="dokument_blok_subjekty">
+    <div class="dokument_blok_subjekty">
         <div class="h2">
             Adresáti / odesílatelé
         </div>
@@ -645,7 +645,7 @@
         <script type="text/javascript">
         // viz o par radku nize
         // pouzij Javascript jen pokud je uzivatel opravnen menit subjekty
-        $('#dokument_blok_subjekty').on('click', '#dok-subjekty td.icon img', zmen_rezim_subjektu);
+        $('.dokument_blok_subjekty').on('click', '#dok-subjekty td.icon img', zmen_rezim_subjektu);
         </script>
         {/if}
         <div id="dok-subjekty">
@@ -710,7 +710,7 @@
         </div>
     </div>
 
-    <div id="dokument_blok_prilohy">
+    <div class="dokument_blok_poznamka">
     <div class="h2">
         Přílohy
     </div>

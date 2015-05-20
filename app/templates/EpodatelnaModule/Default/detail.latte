@@ -14,7 +14,7 @@
         </a>        
     </div>
 
-    <div id="dokument_blok_volby">
+    <div class="dokument_blok_volby">
        {if $Zprava->stav >=10}
        {if $Dokument}
        Zpráva přidána do spisové služby jako <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dokument->id}" target="_blank">{$Dokument->jid}</a>
@@ -30,7 +30,7 @@
     </div>
 
 
-    <div id="dokument_blok_hlavni">
+    <div class="dokument_blok_hlavni">
         <dl class="detail_item">
             <dt>Identifikátor DZ v e-podatelně:</dt>
             <dd>OSS-EP-I-{$Zprava->poradi}-{$Zprava->rok}&nbsp;</dd>
@@ -114,12 +114,12 @@
 
     </div>
 
-    <div id="dokument_blok_poznamka">
+    <div class="dokument_blok_poznamka">
         <div class="h2">Obsah zprávy</div>
         {!$Zprava->popis|html2br}
     </div>
 
-    <div id="dokument_blok_prilohy">
+    <div class="dokument_blok_poznamka">
     <div class="h2">
         Přílohy
     </div>

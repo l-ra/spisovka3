@@ -79,46 +79,30 @@ body {
     border: 1px #134E09 solid;
 }
 
-#dokument_blok_hlavni {
+.dokument_blok_hlavni {
     border: 1px #5FBC50 solid;
     background: #9FCE98 ;
 }
 
-#dokument_blok_poznamka {
-    border: 1px #f0f0f0 solid;
-    background: #f0f0f0 ;
-}
-
-#dokument_blok_poznamka .h2 {
-    border-bottom: 1px #e0e0e0 solid;
-}
-
-#dokument_blok_subjekty .h2 {
+.dokument_blok_subjekty .h2 {
     border-bottom: 1px #e0e0e0 solid;
 }
 
 
-#dokument_blok_prilohy {
-    background: #f0f0f0 ;
-}
-#dokument_blok_prilohy .h2 {
-    border-bottom: 1px #e0e0e0 solid;
-}
-
-#dokument_blok_akce {
+.dokument_blok_akce {
     border: 1px #e0e0e0 solid;
     background: #8FBAD9 ;
 }
 
-#dokument_blok_volby {
+.dokument_blok_volby {
     background: #f0f0f0 ;
 }
 
-#dokument_blok_volby a {
+.dokument_blok_volby a {
     color: #000088;
 }
 
-#dokument_blok_volby a:hover {
+.dokument_blok_volby a:hover {
     color: #ff0000;
 }
 

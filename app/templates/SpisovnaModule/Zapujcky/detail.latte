@@ -5,7 +5,7 @@
     <a href="{link :Spisovna:Zapujcky:default}">Zápůjčky</a> - detail zápůjčky
     </div>
 
-    <div id="dokument_blok_volby">
+    <div class="dokument_blok_volby">
         {if $Zapujcka->stav == 1 && $Opravnen_schvalit_zapujcku}
         <a href="{link :Spisovna:Zapujcky:schvalit, 'id'=>$Zapujcka->id}">Schválení zápůjčky</a>
         <a href="{link :Spisovna:Zapujcky:odmitnuti, 'id'=>$Zapujcka->id}">Odmítnutí zápůjčky</a>
@@ -15,7 +15,7 @@
         {/if}
     </div>
 
-    <div id="dokument_blok_hlavni">
+    <div class="dokument_blok_hlavni">
         <dl class="detail_item">
             <dt>Zapůjčený dokument:</dt>
             <dd><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Zapujcka->dokument_id}">{$Zapujcka->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$Zapujcka->poradi}{/if} - {$Zapujcka->nazev}</a></dd>

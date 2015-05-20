@@ -58,7 +58,7 @@
     </div>
 
     {$novyForm->render('begin')}
-    <div id="dokument_blok_hlavni">
+    <div class="dokument_blok_hlavni">
         <dl class="detail_item">
             <dt>JID:</dt>
             <dd>{$cjednaci->app_id}-ESS-{$Dok->id}&nbsp;</dd>
@@ -149,7 +149,7 @@
         </dl>
     </div>
 
-    <div n:if="!isset($odpoved_na_dokument)" id="dokument_blok_poznamka">
+    <div n:if="!isset($odpoved_na_dokument)" class="dokument_blok_poznamka">
         <div>Předání / vyřízení</div>
         <dl class="detail_item">
             <dt>Přiděleno:</dt>
@@ -176,7 +176,7 @@
         <div id="predano"></div>
     </div>
     
-    <div id="dokument_blok_subjekty">
+    <div class="dokument_blok_subjekty">
         <div class="h2">
             Adresáti / odesílatelé
         </div>
@@ -198,7 +198,7 @@
         </div>
         <script type="text/javascript">
         // viz o par radku nize
-        $('#dokument_blok_subjekty').on('click', '#dok-subjekty td.icon img', zmen_rezim_subjektu);
+        $('.dokument_blok_subjekty').on('click', '#dok-subjekty td.icon img', zmen_rezim_subjektu);
         </script>
         <div id="dok-subjekty">
         {if count($Subjekty)>0}
@@ -260,7 +260,7 @@
         </div>
     </div>
 
-    <div id="dokument_blok_prilohy">
+    <div class="dokument_blok_poznamka">
     <div class="h2">
         Přílohy
     </div>
@@ -313,7 +313,7 @@
     </div>
     </div>
 
-    <div id="dokument_blok_akce">
+    <div class="dokument_blok_akce">
         {$novyForm['novy']->control}
         &nbsp;&nbsp;
         {if !isset($odpoved_na_dokument)}{$novyForm['novy_pridat']->control}
