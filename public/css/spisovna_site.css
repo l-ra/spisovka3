@@ -89,15 +89,15 @@ body {
 }
 
 
-.dokument_blok_volby {
+.dokument_blok_menu {
     background: #f0f0f0 ;
 }
 
-.dokument_blok_volby a {
+.dokument_blok_menu a {
     color: #000088;
 }
 
-.dokument_blok_volby a:hover {
+.dokument_blok_menu a:hover {
     color: #ff0000;
 }
 

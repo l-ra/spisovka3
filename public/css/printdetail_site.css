@@ -153,14 +153,14 @@ body {
     background: #8FBAD9 ;
 }
 
-.dokument_blok_volby {
+.dokument_blok_menu {
     position: relative;
     padding: 10px 10px;
     margin: 0px; margin-bottom: 10px;
     background: #f0f0f0 ;
 }
 
-.dokument_blok_volby a {
+.dokument_blok_menu a {
     color: #000088;
     font-weight: bold;
     font-size: 12px;
@@ -168,7 +168,7 @@ body {
     margin: 0px 10px;
 }
 
-.dokument_blok_volby a:hover {
+.dokument_blok_menu a:hover {
     color: #ff0000;
     text-decoration: underline;
 }
@@ -294,7 +294,7 @@ body {
 #seradit { display:none; }
 #tisk { display:none; }
 #hromadna_akce { display:none; }
-.dokument_blok_volby { display: none; }
+.dokument_blok_menu { display: none; }
 #layout_bottom { display:none; }
 .paginator { display: none; }
 .checkbox { display: none; }

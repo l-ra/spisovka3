@@ -5,7 +5,7 @@
     <a href="{link :Spisovna:Zapujcky:default}">Zápůjčky</a> - detail zápůjčky
     </div>
 
-    <div class="dokument_blok_volby">
+    <div class="dokument_blok_menu">
         {if $Zapujcka->stav == 1 && $Opravnen_schvalit_zapujcku}
         <a href="{link :Spisovna:Zapujcky:schvalit, 'id'=>$Zapujcka->id}">Schválení zápůjčky</a>
         <a href="{link :Spisovna:Zapujcky:odmitnuti, 'id'=>$Zapujcka->id}">Odmítnutí zápůjčky</a>

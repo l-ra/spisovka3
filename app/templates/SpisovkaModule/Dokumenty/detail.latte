@@ -71,7 +71,7 @@
         </a>        
     </div>
 
-    <div class="dokument_blok_volby">
+    <div class="dokument_blok_menu">
        {if $AccessEdit==1}
        {if $Pridelen==1 }
        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
@@ -107,7 +107,7 @@
        <a href="{link this, 'id'=>$Dok->id, 'udalost'=>1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
     </div>
     {if $Zapujcka}
-    <div class="dokument_blok_volby">
+    <div class="dokument_blok_menu">
        {if !empty($Dok->predano->prideleno_id) }
        <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument k zapůjčení</a>
        {/if}
