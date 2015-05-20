@@ -412,98 +412,48 @@ label.required {
 /* ***************************************************************** */
 /* *** DOKUMENT DETAIL *** */
 
-.dokument_blok2 {
+/* dokument_blok_subjekty jsou bez výplně pozadí - tedy pozadí bude bílé */
+
+.dokument_blok_hlavni, .dokument_blok_sedy, .dokument_blok_subjekty {
     position: relative;
-    border: 1px #f0f0f0 solid;
-    padding: 5px; margin-bottom: 10px;
+    padding: 5px; margin-bottom: 10px;    
+}
+
+.dokument_blok_hlavni {
+    border: 1px #e0e0e0 solid;
+    background: #8FBAD9 ;
+}
+
+.dokument_blok_sedy {
     background: #f0f0f0 ;
 }
 
-.dokument_blok2 .h2 {
+.dokument_blok_hlavni .h2, .dokument_blok_sedy .h2, .dokument_blok_subjekty .h2 {
     margin: 0px; padding: 5px;
     margin-bottom: 10px;
     font-weight: bold;
     border-bottom: 1px #e0e0e0 solid;
 }
 
-.dokument_blok2 p {
-    padding: 5px 20px;
-}
-
-.dokument_blok2 pre {
-    padding: 5px 20px 0px 20px;
-    overflow: auto;
-}
-
-
-.dokument_blok3 {
-    position: relative;
-    border: 1px #e0e0e0 solid;
-    padding: 5px; margin-bottom: 10px;
-    background: #8FBAD9 ;
-}
-
-.dokument_blok3 .h2 {
-    margin: 0px; padding: 5px;
-    margin-bottom: 10px;
-    font-weight: bold;
+.dokument_blok_hlavni .h2 {
     border-bottom: 1px #03406A solid;
 }
 
-
-.dokument_blok_hlavni {
-    position: relative;
-    border: 1px #e0e0e0 solid;
-    padding: 5px; margin-bottom: 10px;
-    background: #8FBAD9 ;
-}
-
-.dokument_blok_hlavni .nadpis {
+.dokument_blok_hlavni .velke_pismo {
     text-decoration: underline;
     font-size: 12pt;
 }
 
-.dokument_blok_hlavni .h2 {
-    margin: 0px; padding: 5px;
-    margin-bottom: 10px;
-    font-weight: bold;
-    border-bottom: 1px #03406A solid;
-}
-
-.dokument_blok_poznamka {
-    position: relative;
-    /*border: 1px #f0f0f0 solid;*/
-    padding: 5px; margin-bottom: 10px;
-    background: #f0f0f0 ;
-}
-
-.dokument_blok_poznamka .h2 {
-    margin: 0px; padding: 5px;
-    margin-bottom: 10px;
-    font-weight: bold;
-    border-bottom: 1px #e0e0e0 solid;
-}
-
-.dokument_blok_poznamka p {
+.dokument_blok_sedy p {
     padding: 5px 20px;
 }
 
-.dokument_blok_poznamka pre {
+.dokument_blok_sedy pre {
     padding: 5px 20px 0px 20px;
     overflow: auto;
 }
 
-.dokument_blok_subjekty {
-    position: relative;
-    padding: 5px; margin-bottom: 10px;
-}
-.dokument_blok_subjekty .h2 {
-    margin: 0px; padding: 5px;
-    margin-bottom: 10px;
-    font-weight: bold;
-    border-bottom: 1px #e0e0e0 solid;
-}
-
+/* ***************************************************************** */
 
 .dokument_blok_submit {
     border: 1px #e0e0e0 solid;

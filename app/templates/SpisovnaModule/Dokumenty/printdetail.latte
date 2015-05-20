@@ -18,7 +18,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
-            <dd class="nadpis">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
+            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Název spisu:</dt>
@@ -34,7 +34,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Věc:</dt>
-            <dd class="nadpis"><u>{$Dok->nazev}</u>&nbsp;</dd>
+            <dd class="velke_pismo"><u>{$Dok->nazev}</u>&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Popis:</dt>
@@ -136,7 +136,7 @@
         {/if}
         {/if}
     </div>
-    <div class="dokument_blok_poznamka">
+    <div class="dokument_blok_sedy">
         <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
         <dl class="detail_item">
@@ -184,7 +184,7 @@
         </div>
     </div>
 
-    <div class="dokument_blok_poznamka">
+    <div class="dokument_blok_sedy">
         <div class="h2">Vytvořil a vyřídil</div>
         {if $Dok->typ_dokumentu->smer == 1}
         {foreach $Dok->workflow as $workflow}
@@ -236,7 +236,7 @@
     </div>
     
     {if $Zapujcka != null}
-    <div class="dokument_blok_poznamka">
+    <div class="dokument_blok_sedy">
         <div class="h2">Zápůjčka</div>
         <dl class="detail_item">
             <dt>Zapůjčeno:</dt>
@@ -310,7 +310,7 @@
         </div>
     </div>
 
-    <div class="dokument_blok_poznamka">
+    <div class="dokument_blok_sedy">
     <div class="h2">
         Přílohy
     </div>

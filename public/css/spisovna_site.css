@@ -84,22 +84,6 @@ body {
     background: #9FCE98 ;
 }
 
-.dokument_blok_subjekty .h2 {
-    border-bottom: 1px #e0e0e0 solid;
-}
-
-
-.dokument_blok_menu {
-    background: #f0f0f0 ;
-}
-
-.dokument_blok_menu a {
-    color: #000088;
-}
-
-.dokument_blok_menu a:hover {
-    color: #ff0000;
-}
 
 #hromadna_akce {
     position: relative;

@@ -22,7 +22,7 @@
             {foreach $Dok->subjekty as $subjekt}
             {continueIf $subjekt->rezim_subjektu == 'O'}
             {var $existuje_adresat = 1}
-            <tr style="border-top: 2px solid;" class="dokument_blok2">
+            <tr style="border-top: 2px solid;" class="dokument_blok_sedy">
             <td class="icon">
                 <img src="{$publicUrl}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
             </td>
@@ -202,7 +202,7 @@
         </div>
     </div>
     
-    <div class="dokument_blok_poznamka">
+    <div class="dokument_blok_sedy">
     <div class="h2">
         Připojit přílohy k odeslání
     </div>
