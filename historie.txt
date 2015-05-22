@@ -7,6 +7,7 @@
 Nové funkce:
 
 - usnadněn a zrychlen výběr spisu při vkládání dokumentu do spisu
+- sestavy je možné řadit dle zadaných kritérií
 - ve výpravně je možné vytvořit podací arch s dokumenty, které uživatel
   ručně vybere (funkce se použije, pokud pracovník chce odeslat dokumenty
   na poště, ale nemá ještě všechny fyzicky u sebe)

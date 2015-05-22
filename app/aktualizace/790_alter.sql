@@ -1,0 +1,3 @@
+-- ;
+
+ALTER TABLE `{tbls3}sestava` ADD COLUMN seradit VARCHAR(50) NULL DEFAULT NULL AFTER filtr;

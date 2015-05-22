@@ -202,9 +202,58 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $this->redirect('default');
         }
 
-        if ( !isset($args['order']) ) {
-            $args['order'] = array('d.podaci_denik_poradi','d.nazev');
+        if (isset($sestava->seradit))
+            $criteria = explode(',', $sestava->seradit);
+        else
+            $criteria = $this->vychoziRazeni();
+
+        $order_by = [];
+        foreach ($criteria as $criterion) {                
+
+            $desc = strpos($criterion, "desc") !== false;
+            $criterion = str_replace("_desc", "", $criterion);
+
+            switch ($criterion) {
+                case 'cj':
+                    $col = 'd.cislo_jednaci';
+                    break;
+                case 'jid':
+                    $col = 'd.id';
+                    break;
+                case 'dvzniku':
+                    $col = 'd.datum_vzniku';
+                    break;
+                case 'dvyrizeni':
+                    $col = 'd.datum_vyrizeni';
+                    break;
+                case 'denik':
+                    $col = 'd.podaci_denik';
+                    break;
+                case 'rok':
+                    $col = 'd.podaci_denik_rok';
+                    break;
+                case 'poradovecislo':
+                    $col = 'd.podaci_denik_poradi';
+                    break;
+                case 'vec':
+                    $col = 'd.nazev';
+                    break;
+                case 'stav':
+                    $col = 'wf.stav_dokumentu';
+                    break;
+                default:
+                    $col = null;
+                    break;
+            }
+            if ($col)
+                $order_by[$col] = $desc ? 'desc' : 'asc';
         }
+
+        // Pozor, Dokument::seznam() neumi neradit vysledek dotazu.
+        // Je-li "order" parametr prazdny, pouzije vychozi razeni.
+        // Nasledujici podminka pouze osetri SQL chybu syntaxe.
+        if (!empty($order_by))
+            $args['order'] = $order_by;
 
         // vstup
         $pc_od = $this->getParameter('pc_od');
@@ -249,7 +298,6 @@ class Spisovka_SestavyPresenter extends BasePresenter
             
             if ( isset($user_config->cislo_jednaci->typ_deniku) && $user_config->cislo_jednaci->typ_deniku == "org" ) {        
 
-                    $user = $this->user->getIdentity();
                     $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 
                     if ( empty($orgjednotka_id) ) {
@@ -415,19 +463,40 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $spudalost_seznam = array();
         $spudalost_seznam = SpisovyZnak::spousteci_udalost(null, 3);
 
-        $skartacni_znak = array('0'=>'jakýkoli znak','A'=>'A','V'=>'V','S'=>'S');
+        $skartacni_znak = ['0' => 'jakýkoli znak', 'A' => 'A', 'V' => 'V', 'S' => 'S'];
 
         $stav_dokumentu = array(
-            ''=>'jakýkoli stav',
-            '1'=>'nový / rozpracovaný',
-            '2'=>'přidělen / předán',
-            '3'=>'vyřizuje se',
-            '4'=>'vyřízen',
-            '5'=>'vyřazen'
-            );
+            '' => 'jakýkoli stav',
+            '1' => 'nový / rozpracovaný',
+            '2' => 'přidělen / předán',
+            '3' => 'vyřizuje se',
+            '4' => 'vyřízen',
+            '5' => 'vyřazen'
+        );
 
-        $pridelen = array('0'=>'kdokoli','2'=>'přidělen','1'=>'předán');
-
+        $order_by = array(
+            '' => 'není určeno',
+            'stav' => 'stavu dokumentu (vzestupně)',
+            'stav_desc' => 'stavu dokumentu (sestupně)',
+            'cj' => 'čísla jednacího (vzestupně)',
+            'cj_desc' => 'čísla jednacího (sestupně)',
+            'jid' => 'JID (vzestupně)',
+            'jid_desc' => 'JID (sestupně)',
+            'dvzniku' => 'data přijetí/vzniku (vzestupně)',
+            'dvzniku_desc' => 'data přijetí/vzniku (sestupně)',
+            'dvyrizeni' => 'data vyřízení (vzestupně)',
+            'dvyrizeni_desc' => 'data vyřízení (sestupně)',
+            
+            'denik' => 'podací deník (vzestupně)',
+            'denik_desc' => 'podací deník (sestupně)',            
+            'rok' => 'rok přijetí/vzniku (vzestupně)',
+            'rok_desc' => 'rok přijetí/vzniku (sestupně)',
+            'poradovecislo' => 'pořadové číslo (vzestupně)',
+            'poradovecislo_desc' => 'pořadové číslo (sestupně)',
+            
+            'vec' => 'věci (vzestupně)',
+            'vec_desc' => 'věci (sestupně)',
+        );
 
         $form = new Spisovka\Form();
 
@@ -443,6 +512,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addCheckbox('sloupce_smer_dokumentu', 'Typ dokumentu (příchozí / vlastní):');
         $form->addCheckbox('sloupce_prazdny', 'Prázdný sloupec:');
 
+        $form->addSelect('razeni1', '1. kritérium', $order_by);
+        $form->addSelect('razeni2', '2. kritérium', $order_by);
+        $form->addSelect('razeni3', '3. kritérium', $order_by);
+        
         $form->addText('nazev', 'Věc:', 80, 100);
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50);
@@ -589,6 +662,17 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 catch (Exception $e) {
                 }
                 
+        if (empty($sestava->seradit))
+            $order_by = $this->vychoziRazeni();
+        else
+            $order_by = explode(',', $sestava->seradit);
+        
+        $form['razeni1']->setDefaultValue($order_by[0]);
+        if (!empty($order_by[1]))
+            $form['razeni2']->setDefaultValue($order_by[1]);
+        if (!empty($order_by[2]))
+            $form['razeni3']->setDefaultValue($order_by[2]);
+        
         $form->addSubmit('odeslat', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
         $form->addSubmit('storno', 'Zrušit')
@@ -597,7 +681,12 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         return $form;
     }
-
+    
+    /**
+     * 
+     * @param array $data
+     * @return array
+     */
     protected function handleSubmit($data)
     {
         $sestava = array();
@@ -606,36 +695,44 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $sestava['typ'] = $data['sestava_typ'];
         $sestava['filtr'] = ($data['sestava_filtr'])?1:0;
 
-        unset($data['id'],$data['sestava_nazev'],$data['sestava_popis'],
-              $data['sestava_typ'],$data['sestava_filtr']);
+        $a = [];
+        if (!empty($data['razeni1']))
+            $a[] = $data['razeni1'];
+        if (!empty($data['razeni2']))
+            $a[] = $data['razeni2'];
+        if (!empty($data['razeni3']))
+            $a[] = $data['razeni3'];
+        $sestava['seradit'] = implode(',', $a);
+        
+        $unset_keys = ['id', 'sestava_nazev', 'sestava_popis', 'sestava_typ', 'sestava_filtr',
+            'razeni1', 'razeni2', 'razeni3'];
+        foreach ($unset_keys as $key) {
+            unset($data[$key]);
+        }
 
         // pro sestaveni sloupce
         $sloupce = '';
         $sestava['sloupce'] = $sloupce;
 
-        // pro sestaveni parametru
-        if ( isset($_POST['prideleno']) ) {
-            $data['prideleno'] = $_POST['prideleno'];
-        }
-        if ( isset($_POST['predano']) ) {
-            $data['predano'] = $_POST['predano'];
-        }
-        if ( isset($_POST['prideleno_org']) ) {
-            $data['prideleno_org'] = $_POST['prideleno_org'];
-        }
-        if ( isset($_POST['predano_org']) ) {
-            $data['predano_org'] = $_POST['predano_org'];
-        }
-        if ( isset($_POST['druh_zasilky']) ) {
-            if ( count($_POST['druh_zasilky'])>0 ) {
-                $druh_sql = array();
-                foreach ( $_POST['druh_zasilky'] as $druh_id => $druh_zasilky ) {
-                    $druh_sql[] = $druh_id;
-                }
-                $data['druh_zasilky'] = serialize($druh_sql);            
-            }
-        }          
+        $postdata = $this->getHttpRequest()->getPost();
         
+        // pro sestaveni parametru
+        if ( isset($postdata['prideleno']) ) {
+            $data['prideleno'] = $postdata['prideleno'];
+        }
+        if ( isset($postdata['predano']) ) {
+            $data['predano'] = $postdata['predano'];
+        }
+        if ( isset($postdata['prideleno_org']) ) {
+            $data['prideleno_org'] = $postdata['prideleno_org'];
+        }
+        if ( isset($postdata['predano_org']) ) {
+            $data['predano_org'] = $postdata['predano_org'];
+        }
+        if (isset($postdata['druh_zasilky']))
+            if (count($postdata['druh_zasilky']) > 0)
+                $data['druh_zasilky'] = serialize(array_keys($postdata['druh_zasilky']));
+
         $zobrazeni_dat = array();
         $nazvy_poli = array('zobrazeni_cas', 'zobrazeni_adresa', 'sloupce_poznamka',
             'sloupce_poznamka_predani', 'sloupce_smer_dokumentu', 'sloupce_prazdny');
@@ -667,7 +764,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $this->flashMessage("Sestava '$sestava->nazev' byla upravena.");
         }
         catch (Exception $e) {
-            $this->flashMessage("Sestavu '$sestava->nazev' se nepodařilo upravit.", 'warning');
+            $this->flashMessage("Sestavu '$sestava_data[nazev]' se nepodařilo upravit.", 'warning');
             $this->flashMessage('Popis chyby: '. $e->getMessage(),'warning');
         }
         
@@ -675,7 +772,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     }
 
 
-    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoClicked()
     {
         $this->redirect(':Spisovka:Sestavy:default');
     }
@@ -700,5 +797,13 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->id = $this->getParameter('id');
     }
 
+    protected function vychoziRazeni()
+    {
+        // vychozi razeni zaznamu - vzdy pouzito ve spisovce starsi nez 3.5.0
+        // tam byla ale chyba, ze se neradilo dle roku
+        // vychozi razeni se pouzije, dokud uzivatel neupravi sestavu
+        // nebo pro pevnou sestavu Podaci denik
+        return ['rok', 'poradovecislo', 'vec'];        
+    }
 }
 
