@@ -450,7 +450,7 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['zpusob_doruceni'] = array(
                     'from'=> array($this->tb_epodatelna => 'epod'),
-                    'on' => array('epod.dokument_id=d.id'),
+                    'on' => array('epod.dokument_id = d.id', 'epod.epodatelna_typ = 0'),
                     'cols' => null
                 );
                 switch ($params['typ_doruceni']) {
@@ -1275,8 +1275,8 @@ class Dokument extends BaseModel
                 ),
                 'epod' => array(
                     'from' => array($this->tb_epodatelna => 'epod'),
-                    'on' => array('epod.dokument_id=dok.id'),
-                    'cols' => array('identifikator','email_id'=>'epod_is_email','isds_id'=>'epod_is_isds')
+                    'on' => array('epod.dokument_id = dok.id', 'epod.epodatelna_typ = 0'),
+                    'cols' => array('identifikator', 'email_id' => 'epod_is_email', 'isds_id' => 'epod_is_isds')
                 ),
                 'spisovy_znak' => array(
                     'from' => array($this->tb_spisovy_znak => 'spisznak'),

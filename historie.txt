@@ -49,6 +49,8 @@ Opravy:
                 při kontrole schránky místo zprávy zobrazila nulu
               - vytváření nového subjektu z datové zprávy automaticky rozdělí
                 adresu do jednotlivých políček
+              - dokument přijatý datovou schránkou a odeslaný e-mailem
+                se mohl tvářit jako přijatý e-mailem
               
 - zápis chybných hodnot do formuláře při hledání dokumentu podle datumů nezpůsobí
   chybu aplikace
