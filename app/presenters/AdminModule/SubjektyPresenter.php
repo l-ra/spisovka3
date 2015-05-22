@@ -214,21 +214,23 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
     protected function createComponentStavForm()
     {
-
-        $subjekt = $this->template->Subjekt;
         $stav_select = Subjekt::stav();
 
         $form1 = new Nette\Application\UI\Form();
-        $form1->addHidden('id')
-                ->setValue(@$subjekt->id);
-        $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
-                ->setValue(@$subjekt->stav);
+        $form1->addHidden('id');
+        $form1->addSelect('stav', 'Změnit stav na:', $stav_select);                
         $form1->addSubmit('zmenit_stav', 'Změnit stav')
                  ->onClick[] = array($this, 'zmenitStavClicked');
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoClicked');
 
+        if (isset($this->template->Subjekt)) {
+            $subjekt = $this->template->Subjekt;
+            $form1['id']->setValue($subjekt->id);
+            $form1['stav']->setValue($subjekt->stav);
+        }
+        
         $renderer = $form1->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = 'dl';
@@ -241,16 +243,15 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     public function zmenitStavClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-
         $subjekt_id = $data['id'];
         $Subjekt = new Subjekt();
 
         try {
             $Subjekt->zmenitStav($data);
             $this->flashMessage('Stav subjektu byl změněn.');
-            $this->redirect(':Admin:Subjekty:detail',array('id'=>$subjekt_id));
+            $this->redirect(':Admin:Subjekty:detail', array('id' => $subjekt_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Stav subjektu se nepodařilo změnit.','warning');
+            $this->flashMessage('Stav subjektu se nepodařilo změnit.', 'warning');
         }
     }
 

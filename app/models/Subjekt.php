@@ -60,20 +60,14 @@ class Subjekt extends BaseModel
 
     public function zmenitStav($data) {
 
-        if ( is_array($data) ) {
-            
-            $subjekt_id = $data['id'];
-            unset($data['id']);
-            $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
+        $subjekt_id = $data['id'];
+        unset($data['id']);
+        $data['date_modified'] = new DateTime();
+        $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
 
-            $this->update($data, array(array('id=%i',$subjekt_id)) );
+        $this->update($data, array(array('id=%i', $subjekt_id)) );
 
-            return true;
-            
-        } else {
-            return false;
-        }
+        return true;            
     }
 
     public function hledat($data, $typ, $only_name = false) {
