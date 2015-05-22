@@ -35,6 +35,8 @@ Jiné změny:
 - proveden upgrade staré knihovny pro připojení k databázi
 - nový modul pro vývojáře pro základní automatické testování aplikace
 - hledání v subjektech v administraci nyní hledá i podle ulice
+- mezi stavy subjektu "neaktivní" a "zrušený" nebyl z hlediska fungování
+  programu rozdíl. Stav "zrušený" byl odstraněn.
 - formulář pro vytváření nových subjektů je nyní společný. Ale jelikož webová
   aplikace nemůže mít formulář uvnitř jiného formuláře, je nutné jej zobrazit
   v dialogovém okně.

@@ -432,25 +432,16 @@ class Subjekt extends BaseModel
         
     }
 
-    public static function stav($subjekt = null) {
+    public static function stav($stav = null) {
 
-        $stavy = array('1'=>'aktivní',
-                       '2'=>'neaktivní',
-                       '3'=>'zrušený'
-            );
+        $stavy = ['1' => 'aktivní', '2' => 'neaktivní'];
 
-        if ( is_null( $subjekt ) ) {
+        if (is_null($stav))
             return $stavy;
-        } else if ( !is_numeric($subjekt) ) {
+        if (!is_numeric($stav))
             return null;
-        }
 
-        $index = ($subjekt>=100)?$subjekt-100:$subjekt;
-        if ( array_key_exists($index, $stavy) ) {
-         return $stavy[ $index ];
-        } else {
-            return null;
-        }
+        return $stav == 1 ? $stavy[1] : $stavy[2];
     }
 
     public function  deleteAll() {
