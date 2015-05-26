@@ -71,34 +71,13 @@ class VisualPaginator extends Nette\Application\UI\Control
             sort($arr);
             $steps = array_values(array_unique($arr));
         }
-
-        $request = Nette\Environment::getHttpRequest();
-        $url = $request->getUrl()->getPath();
-        $query_string = $request->getUrl()->getQuery();
-        $query_params = "";
-        parse_str($query_string, $query);
-        //echo "<pre>"; print_r($query); echo "</pre>";
-        unset($query['vp-page'],$query['seradit'],$query['filtr'],$query['hledat'],$query['do'], $query['presenter'], $query['action']);
-        //echo "<pre>"; print_r($query); echo "</pre>";
-        if ( count($query)>0 ) {
-            foreach ( $query as $key=>$value ) {
-                if ( empty($key) ) continue;
-                $query_params .= "&". $key ."=". @urlencode($value);
-            }
-        }
-        $query_params = substr($query_params, 1);
-
-        if ( !empty($query_params) ) {
-            $this->template->query_first = "?$query_params";
-            $this->template->other_params = "&". $query_params;
-        } else {
-            $this->template->query_first = "";
-            $this->template->other_params = "";
-        }
                 
         $this->template->steps = $steps;
         $this->template->paginator = $paginator;
-        $this->template->onclick = '';
+        
+        // [P.L.] Pridano
+        $this->template->onclick = '';        
+        $request = Nette\Environment::getHttpRequest();
         if ($request->isAjax())
             $this->template->onclick = 'onclick="reloadDialog(this); return false;"';
 
