@@ -526,7 +526,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
     {
         $data = $button->getForm()->getValues();
 
-        $this->forward('this', array('hledat'=>$data['dotaz']));
+        $this->redirect('this', array('hledat'=>$data['dotaz']));
 
     }
 

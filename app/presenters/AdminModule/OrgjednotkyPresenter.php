@@ -246,7 +246,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $this->forward('this', array('hledat'=>$data['dotaz']));
+        $this->redirect('this', array('hledat'=>$data['dotaz']));
 
     }
 
