@@ -16,7 +16,7 @@ $(function() {
 
     $('#subjekt_epod_autocomplete').autocomplete({
         minLength: 3,
-        source: BASE_URL + 'subjekty/0/seznamAjax',
+        source: BASE_URL + 'subjekty/seznamAjax',
 
         focus: function(event, ui) {
             $('#subjekt_epod_autocomplete').val(ui.item.nazev);
@@ -341,7 +341,7 @@ form_odmitnout +
 
     $('#subjekt_autocomplete_'+id).autocomplete({
         minLength: 3,
-        source: BASE_URL + 'subjekty/0/seznamAjax',
+        source: BASE_URL + 'subjekty/seznamAjax',
 
         focus: function(event, ui) {
             $('#subjekt_autocomplete_'+id).val(ui.item.nazev);

@@ -52,11 +52,11 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     
     
     
-    public function renderSeznam($hledat = null)
+    public function renderSeznam($hledat = null, $abc = null)
     {
 
         // paginator
-        $abcPaginator = new AbcPaginator($this, 'abc');
+        new AbcFilter($this, 'abc');
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -65,32 +65,23 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         // hledani
         $this->hledat = "";
         $this->template->no_items = 0;
-        $args = null;
-        if ( isset($hledat) ) {
-            $args = array('where' => [ [ "LOWER(CONCAT_WS('', nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)",
-                                            "%$hledat%" ] ]);
+        $args = [];
+        if (isset($hledat) && empty($abc)) {
+            $args['where'][] = [ "LOWER(CONCAT_WS('', nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)",
+                    "%$hledat%"];
 
             $this->hledat = $hledat;
             $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
         }
         
         // zobrazit podle pismena
-        $abc = $abcPaginator->getParameter('abc');
-        if ( !empty($abc) ) {
-            if ( isset($args['where']) ) {
-                $args['where'][] = array("nazev_subjektu LIKE %s OR prijmeni LIKE %s",$abc.'%',$abc.'%');
-            } else {
-                $args = array('where'=>array(array("nazev_subjektu LIKE %s OR prijmeni LIKE %s",$abc.'%',$abc.'%')));
-            }
-        }
+        if (!empty($abc))
+            $args['where'][] = ["nazev_subjektu LIKE %s OR prijmeni LIKE %s", "$abc%", "$abc%"];
 
-        // nesmysl, jakmile by uzivatel oznacil subjekt za neaktivni, uz by jej v administraci nikdy normalne nevidel
-        // if ( isset($args['where']) ) {
-            // $args['where'][] = array('stav=1');
-        // } else {
-            // $args = array('where'=>array('stav=1'));
-        // }
-
+        $filter = UserSettings::get('admin_subjekty_filtr');
+        if ($filter != 'V')
+            $args['where'][] = "stav = " . ($filter == 'A' ? 1 : 2);
+        
         // nacteni
         $Subjekt = new Subjekt();
         $result = $Subjekt->seznam($args);
@@ -207,7 +198,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         $this->redirect('this',array('id'=>$subjekt_id));
     }
 
-    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoSeznamClicked()
     {
         $this->redirect(':Admin:Subjekty:seznam');
     }
@@ -282,9 +273,31 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     {
         $data = $button->getForm()->getValues();
 
-        $this->forward('this', array('hledat'=>$data['dotaz']));
+        $this->redirect('seznam', array('hledat'=>$data['dotaz']));
 
+    }  
+
+    protected function createComponentFilterForm()
+    {
+        $form = new Nette\Application\UI\Form();
+        $items = ['V' => 'všechny', 'A' => 'aktivní', 'N' => 'neaktivní'];
+        $form->addSelect('filter', 'Filtr:', $items)
+                ->setDefaultValue(UserSettings::get('admin_subjekty_filtr'))
+                ->getControlPrototype()->style('width: 150px;')
+                ->onchange("return document.forms['frm-filterForm'].submit();");
+        
+        $form->onSuccess[] = array($this, 'filterChanged');
+
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+
+        return $form;
     }
-  
 
+    public function filterChanged(Nette\Application\UI\Form $form)
+    {
+        $filter = $form->getValues()->filter;
+        UserSettings::set('admin_subjekty_filtr', $filter);
+        $this->redirect('seznam');
+    }
 }

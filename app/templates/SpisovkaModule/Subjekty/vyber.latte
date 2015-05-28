@@ -1,7 +1,6 @@
     {control abc}
     
     {if count($seznam)>0}
-    {var epod = $presenter->getParameter('epodatelna', false)}
     <table class="seznam">
         {foreach $seznam as $subjekt}
         <tr>
@@ -9,17 +8,20 @@
                 <img src="{$publicUrl}images/subjekt/{if empty($subjekt->type)}fo{else}{$subjekt->type|lower}{/if}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
             </td>
             <td class="meta">
-                <strong>{if $epod}<a href="" onclick="epodSubjektVybran(this, {$subjekt->id}); return false;">{/if}{=Subjekt::displayName($subjekt,'jmeno_item')}{if $epod}</a>{/if}
+                <strong>{if $module == 'Epodatelna'}<a href="" onclick="epodSubjektVybran(this, {$subjekt->id}); return false;">
+                        {elseif $module == 'Admin'}<a href="{link detail, id => $subjekt->id}" {if $subjekt->stav > 1}style="text-decoration:line-through;"{/if}>{/if}
+                        {=Subjekt::displayName($subjekt,'jmeno_item')}
+                        {if $module != 'Spisovka'}</a>{/if}
                 </strong>
                 <div class="info">
                 <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
                 <br />
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
-                <div class="vyber" n:if="!$epod">
-                    <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id, 'typ'=>'A' }" onclick="subjektVybran(this); return false;">adresát</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id, 'typ'=>'O' }" onclick="subjektVybran(this); return false;">odesilatel</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:vybrano, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id, 'typ'=>'AO' }" onclick="subjektVybran(this); return false;">adresát i odesilatel</a>
+                <div class="vyber" n:if="$module == 'Spisovka'">
+                    <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'A' }" onclick="subjektVybran(this); return false;">adresát</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'O' }" onclick="subjektVybran(this); return false;">odesilatel</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'AO' }" onclick="subjektVybran(this); return false;">adresát i odesilatel</a>
                 </div>
             </td>
             <td class="meta_plus">

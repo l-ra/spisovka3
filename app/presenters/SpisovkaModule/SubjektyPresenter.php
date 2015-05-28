@@ -3,19 +3,18 @@
 class SubjektyPresenter extends BasePresenter
 {
 
-    public function renderVyber()
+    public function renderVyber($abc = null)
     {
-        $abcFilter = new AbcFilter($this, 'abc');
-        $abc = $abcFilter->letter;
+        new AbcFilter($this, 'abc');
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
         
-        $args = array( 'where' => array("stav=1") );
-        if ( !empty($abc) )
-            $args['where'][] = array("nazev_subjektu LIKE %s OR prijmeni LIKE %s",$abc.'%',$abc.'%');
-            
+        $args = array('where' => array("stav = 1"));
+        if (!empty($abc))
+            $args['where'][] = array("nazev_subjektu LIKE %s OR prijmeni LIKE %s", $abc . '%', $abc . '%');
+
         $Subjekt = new Subjekt();
         $result = $Subjekt->seznam($args);   
         $paginator->itemCount = count($result);
@@ -185,12 +184,6 @@ class SubjektyPresenter extends BasePresenter
 
 class Spisovka_SubjektyPresenter extends SubjektyPresenter
 {
-    public function renderVyber()
-    {
-        parent::renderVyber();
-        $this->template->dokument_id = $this->getParameter('dok_id',null);
-    }
-
     public function renderNovy()
     {
         // Pouzij novy, zkraceny formular

@@ -630,7 +630,7 @@
                 <dt>Vyhledat a připojit subjekt:</dt>
                 <dd>
                     <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
-                    <a href="{link :Spisovka:Subjekty:vyber, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
+                    <a href="{link :Spisovka:Subjekty:vyber, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
                 </dd>
             </dl>
             <dl class="detail_item_adress" id="subjekt_novy">
@@ -716,7 +716,7 @@
     </div>
     {if 0 }
     <div class="blok_akce">
-        <a href="{link :Spisovka:Prilohy:pridat, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+        <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
         &nbsp;&nbsp;&nbsp;
         <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
     </div>
@@ -724,7 +724,7 @@
     {if $Pridelen==1 }
     <div id="dok-prilohy-form">
         <div class="blok_akce">
-            <a href="{link :Spisovka:Prilohy:pridat, 'id'=>0, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+            <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
         </div>
     </div>
     <div class="blok_akce">

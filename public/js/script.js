@@ -183,7 +183,7 @@ $(function() {
 
     $('#subjekt_autocomplete').autocomplete({
         minLength: 3,
-        source: BASE_URL + 'subjekty/0/seznamAjax',
+        source: BASE_URL + 'subjekty/seznamAjax',
 
         select: function(event, ui) {
             $('#subjekt_autocomplete').val('');
@@ -448,7 +448,9 @@ subjektVybran = function (elm) {
 
     showSpinner();
     
-    $.get(elm.href, function(data) {
+    var url = elm.href + '&dok_id=' + DOKUMENT_ID;
+    
+    $.get(url, function(data) {
         if ( data.indexOf('###vybrano###') != -1 ) {
             closeDialog();
             renderSubjekty();
@@ -696,7 +698,7 @@ hledejDokumentAjax = function (vyraz, typ) {
 
     showSpinner();
 
-    var url = BASE_URL + 'spojit/0/nacti?q=' + vyraz;
+    var url = BASE_URL + 'spojit/nacti?q=' + vyraz;
     
     $.get(url, function(data) {
         var vysledek = document.getElementById('vysledek');
