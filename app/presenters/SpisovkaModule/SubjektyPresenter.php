@@ -5,8 +5,8 @@ class SubjektyPresenter extends BasePresenter
 
     public function renderVyber()
     {
-        $abcPaginator = new AbcPaginator($this, 'abc');
-        $abc = $abcPaginator->getParameter('abc');
+        $abcFilter = new AbcFilter($this, 'abc');
+        $abc = $abcFilter->letter;
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();

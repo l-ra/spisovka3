@@ -5,11 +5,11 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     private $hledat;
 
-    public function renderSeznam($hledat = null)
+    public function renderSeznam($hledat = null, $abc = null)
     {
 
         // paginator
-        $abcPaginator = new AbcPaginator($this, 'abc');
+        new AbcFilter($this, 'abc');
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -33,7 +33,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         }
 
         // zobrazit podle pismena
-        $abc = $abcPaginator->getParameter('abc');
         if ( !empty($abc) ) {
             $args[] = array("prijmeni LIKE %s", $abc.'%');
         }
@@ -456,7 +455,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $this->redirect('this', array('hledat'=>$data['dotaz']));
+        $this->redirect('seznam', array('hledat'=>$data['dotaz']));
 
     }
 

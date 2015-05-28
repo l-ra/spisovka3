@@ -1,9 +1,0 @@
-<div class="paginator">
-{for $chr=97;$chr<=122;$chr++}
-{if chr($chr) == $current_letter}
-<span class="current">{=strtoupper(chr($chr))}</span>
-{else}
-<a href="{$url}?abc-abc={=chr($chr)}{$query}" {if $js_function}onclick="{!$js_function}(this); return false;"{/if}>{=strtoupper(chr($chr))}</a>
-{/if}
-{/for}
-</div>

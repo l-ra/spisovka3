@@ -1,0 +1,9 @@
+<div class="paginator">
+{for $chr = ord('A'); $chr <= ord('Z'); $chr++}
+{if chr($chr) == $current_letter}
+<span class="current">{=chr($chr)}</span>
+{else}
+<a href={plink $presenter->view abc => chr($chr)} {if $js_function}onclick="{!$js_function}(this); return false;"{/if}>{= chr($chr)}</a>
+{/if}
+{/for}
+</div>
