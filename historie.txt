@@ -11,6 +11,7 @@ Nové funkce:
 - ve výpravně je možné vytvořit podací arch s dokumenty, které uživatel
   ručně vybere (funkce se použije, pokud pracovník chce odeslat dokumenty
   na poště, ale nemá ještě všechny fyzicky u sebe)
+- v administraci lze fitrovat subjekty podle stavu
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
   podporu
 - v ladicím módu (DEBUG_ENABLE 1 v index.php) aplikace zobrazuje vpravo dole
