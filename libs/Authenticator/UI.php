@@ -97,9 +97,16 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $form['username']->addRule(Nette\Forms\Form::FILLED, 
                 'Uživatelské jméno musí být vyplněno!');
         
-        $user_list = $this->getPossibleUsers();
+        try {
+            $user_list = $this->getPossibleUsers();
+            if (!empty($user_list))
+                $user_list = ['' => 'můžete vybrat ze seznamu'] + $user_list;
+        }
+        catch (Exception $e) {
+            $user_list = ['' => $e->getMessage()];            
+        }
+        
         if (!empty($user_list)) {
-            $user_list = ['' => 'můžete vybrat ze seznamu'] + $user_list;
             $form->addSelect('username_list', "Uživatelé z externího zdroje:", $user_list)
                 ->controlPrototype->onchange('$("[name=username]").val($(this).val())');
         }
