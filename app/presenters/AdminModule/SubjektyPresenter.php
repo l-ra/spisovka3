@@ -78,7 +78,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         if (!empty($abc))
             $args['where'][] = ["nazev_subjektu LIKE %s OR prijmeni LIKE %s", "$abc%", "$abc%"];
 
-        $filter = UserSettings::get('admin_subjekty_filtr');
+        $filter = UserSettings::get('admin_subjekty_filtr', 'V');
         if ($filter != 'V')
             $args['where'][] = "stav = " . ($filter == 'A' ? 1 : 2);
         
