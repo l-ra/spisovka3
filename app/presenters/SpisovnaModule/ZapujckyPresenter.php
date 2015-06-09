@@ -429,7 +429,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         
         $submit = $form->addSubmit('novy', 'Vytvořit zápůjčku');
         $submit->onClick[] = array($this, 'vytvoritClicked');
-        $submit->onInvalidClick[] = array($this, 'vytvoritClickedChyba');
                  
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
@@ -444,15 +443,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         return $form;           
 
     }
-    
-    public function vytvoritClickedChyba(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $errors = $button->getForm()->getErrors();
-        foreach($errors as $error)
-            $this->flashMessage($error, 'warning');
-        // Neni treba provadet redirect, formular se vykresli nyni znovu
-    }
-    
+        
     public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();

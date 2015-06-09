@@ -1322,7 +1322,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addSubmit('novy_pridat', 'Vytvořit dokument a založit nový');
         $form['novy_pridat']->onClick[] = array($this, 'vytvoritClicked');
-        $form['novy_pridat']->onInvalidClick[] = array($this, 'vytvoritClickedChyba');
 
         return $form;
     }
@@ -1410,7 +1409,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addSubmit('novy', 'Vytvořit dokument');
         $form['novy']->onClick[] = array($this, 'vytvoritClicked');
-        $form['novy']->onInvalidClick[] = array($this, 'vytvoritClickedChyba');
                 
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
@@ -1426,12 +1424,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    public function vytvoritClickedChyba(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $this->displayFormErrors($button);
-        $this->redirect(':Spisovka:Dokumenty:default');
-    }
-    
     public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -1622,7 +1614,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         
         $submit = $form->addSubmit('upravit', 'Uložit');
         $submit->onClick[] = array($this, 'upravitMetadataClicked');
-        $submit->onInvalidClick[] = array($this, 'upravitMetadataChyba');
         
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
@@ -1638,16 +1629,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
-    }
-
-    public function upravitMetadataChyba(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $errors = $button->getForm()->getErrors();
-        foreach($errors as $error)
-            $this->flashMessage($error, 'warning');
-            
-        $data = $button->getForm()->getValues();
-        $this->redirect(':Spisovka:Dokumenty:detail',array('id' => $data['id']));
     }
     
     public function upravitMetadataClicked(Nette\Forms\Controls\SubmitButton $button)
@@ -1948,7 +1929,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->template->odesilatele = $odesilatele;
         
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
         $form->addSelect('email_from', 'Odesílatel:', $odesilatele)
@@ -1981,8 +1962,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoClicked');
 
-        $form->onError[] = array($this, 'odeslatError');
-
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
@@ -1991,18 +1970,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
-    }
-
-    public function odeslatError(Nette\Application\UI\Form $form)
-    {
-        $dokument_id = $form->getValues()->id;
-        $this->flashMessage('Validace formuláře odeslání selhala.', 'warning');
-        $errors = $form->getErrors();
-        foreach ($errors as $error)
-            $this->flashMessage($error, 'warning');
-        
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id'=>$dokument_id));
-        
     }
 
     public function odeslatClicked(Nette\Forms\Controls\SubmitButton $button)

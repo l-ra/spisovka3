@@ -281,14 +281,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $filter->handler->macros['/accessrole'] =
                 '<?php } ?>'; */                
     }
-    
-    protected function displayFormErrors(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $errors = $button->getForm()->getErrors();
-        foreach($errors as $error)
-            $this->flashMessage($error, 'warning');
-    }
-    
+        
     /**
      * Formats view template file names.
      * @return array

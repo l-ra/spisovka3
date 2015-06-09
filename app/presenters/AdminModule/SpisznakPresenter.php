@@ -168,7 +168,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
 
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('id')
                 ->setValue(@$spisznak->id);
 
@@ -195,7 +195,6 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         $submit = $form1->addSubmit('upravit', 'Upravit');
         $submit->onClick[] = array($this, 'upravitClicked');
-        $submit->onInvalidClick[] = array($this, 'upravitClickedChyba');
         
         $form1->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
@@ -208,14 +207,6 @@ class Admin_SpisznakPresenter extends BasePresenter
         $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
-    }
-
-
-    public function upravitClickedChyba(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $this->flashMessage('Při ověřování formuláře došlo k chybě.','warning');
-        $data = $button->getForm()->getValues();
-        $this->redirect('this',array('id'=>$data['id']));
     }
     
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
