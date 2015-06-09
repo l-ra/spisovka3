@@ -972,3 +972,29 @@ div.icon_spis, div.icon_slozka {
 div.icon_slozka {
     background: url('../images/icons/folder_yellow.png') no-repeat right;
 }
+
+.sestava_vyber_sloupcu {
+    overflow: auto;
+}
+.sestava_vyber_sloupcu div {
+    float: left;
+    margin: 0px 20px;
+}
+.sestava_vyber_sloupcu select {
+    width: 200px;
+}
+.sestava_vyber_sloupcu input[type="button"] {
+    width: 70px;
+    /*margin-top: 15px;*/
+}
+.sestava_vyber_sloupcu .vybrat_sloupec {
+    margin-top: 70px;    
+}
+#content .sestava_vyber_sloupcu dt {
+    float: none;
+    width: auto;
+    text-align: left;
+}
+#content .sestava_vyber_sloupcu dd {
+    margin: 0px;
+}

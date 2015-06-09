@@ -8,7 +8,7 @@
 
     <h2>{$nadpis}</h2>
 
-    {$form->render('begin')}
+    {form $form}
     <div class="dokument_blok_hlavni">
         <div class="h2">
             Sestava
@@ -28,11 +28,44 @@
         </div>
         {input2 zobrazeni_cas}
         {input2 zobrazeni_adresa}
-        <p><strong>Výběr sloupců:</strong></p>
-        {input2 sloupce_smer_dokumentu}
-        {input2 sloupce_poznamka}
-        {input2 sloupce_poznamka_predani}
-        {input2 sloupce_prazdny}
+        
+        <div class="sestava_vyber_sloupcu">
+            <div>{input2 vybrane_sloupce}</div>
+            <div>
+                <input type="button" class="vybrat_sloupec" value="&lt;&lt;" /><br /><br />
+                <input type="button" class="odstranit_sloupec" value="odstranit">
+            </div>            
+            <div>{input2 dostupne_sloupce}</div>
+        </div>
+        <script type="text/javascript">
+            $('.vybrat_sloupec').click(function () {
+                var parent = $(this).parent().parent();
+                var selected = parent.find('[name="vybrane_sloupce[]"]');
+                var available = parent.find('[name="dostupne_sloupce[]"]');
+                
+                var selectedItems = available.children("option:selected");
+                selected.append(selectedItems.clone());
+            });
+            $('.odstranit_sloupec').click(function () {
+                var parent = $(this).parent().parent();
+                var selected = parent.find('[name="vybrane_sloupce[]"]');
+                
+                var selectedItems = selected.children("option:selected");
+                selectedItems.remove();
+            });
+            
+            sestavaFormSubmit = function (form) {
+                var selected = $(form).find('[name="vybrane_sloupce[]"]');
+                var available = $(form).find('[name="dostupne_sloupce[]"]');
+
+                // přenes výběr uživatele v datech formuláře a naopak ignoruj vybrané
+                // položky v selectu dostupných sloupců
+                selected.children().prop('selected', true);
+                available.children().prop('selected', false);
+                // Je nutné zvolit jednu položku, aby Nette validace Selectboxu prošla
+                available.children().first().prop('selected', true);
+            };
+        </script>
     </div>
     
     <div class="dokument_blok_sedy">
@@ -55,6 +88,6 @@
         &nbsp;&nbsp;
         {$form['storno']->control}
     </div>
-    {$form->render('end')}
+    {/form}
 
     <div id="dialog"></div>

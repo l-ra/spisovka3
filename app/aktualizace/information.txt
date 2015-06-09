@@ -50,3 +50,5 @@ Aktualizace probíhá na pozadí, výstup pouze informuje.
 - nová oprávnění pro přístup k sestavám
 [750]
 - uživatelům s oprávněním vedoucího přiděl oprávnění "Změny dokumentů svojí org. jednotky"
+[810]
+- migrace definice sloupců sestav

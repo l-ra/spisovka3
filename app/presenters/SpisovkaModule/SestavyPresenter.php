@@ -2,6 +2,29 @@
 
 class Spisovka_SestavyPresenter extends BasePresenter
 {
+    static protected $sloupce_nazvy = array(
+        'smer' => 'Směr',
+        'cislo_jednaci' => 'Číslo jednací',
+        'spis' => 'Název spisu',
+        'datum_vzniku' => 'Datum doruč./vzniku',
+        'subjekty' => 'Odesílatel / adresát',
+        'cislo_jednaci_odesilatele' => 'Č.j. odesílatele',
+        'pocet_listu' => 'Počet listů',
+        'pocet_priloh' => 'Počet příloh',
+        'pocet_nelistu' => 'Počet nelistů',
+        'nazev' => 'Věc',
+        'vyridil' => 'Přiděleno / Vyřídil',
+        'zpusob_vyrizeni' => 'Způsob vyřízení',
+        'datum_odeslani' => 'Datum odeslání',
+        'spisovy_znak' => 'Spis. znak',
+        'skartacni_znak' => 'Skart. znak',
+        'skartacni_lhuta' => 'Skart. lhůta',
+        'zaznam_vyrazeni' => 'Záznam vyřazení',
+        'popis' => 'Popis',
+        'poznamka_predani' => 'Poznámka k předání',
+        'prazdny_sloupec' => 'Prázdný sloupec',
+    );
+
     protected function shutdown($response)
     {        
         if ($this->view != 'pdf')
@@ -108,84 +131,21 @@ class Spisovka_SestavyPresenter extends BasePresenter
         // info
         $this->template->view = $view;
 
-
         // sloupce
-        $sloupce_nazvy = array(
-                'smer'=>'Směr',
-                'cislo_jednaci'=>'Číslo jednací',
-                'spis'=>'Název spisu',
-                'datum_vzniku'=>'Datum doruč./vzniku',
-                'subjekty'=>'Odesílatel / adresát',
-                'cislo_jednaci_odesilatele'=>'Č.j. odesílatele',
-                'pocet_listu'=>'Počet listů',
-                'pocet_priloh'=>'Počet příloh',
-                'pocet_nelistu'=>'Počet nelistů',
-                'nazev'=>'Věc',
-                'vyridil'=>'Přiděleno / Vyřídil',
-                'zpusob_vyrizeni'=>'Způsob vyřízení',
-                'datum_odeslani'=>'Datum odeslání',
-                'spisovy_znak'=>'Spis. znak',
-                'skartacni_znak'=>'Skart. znak',
-                'skartacni_lhuta'=>'Skart. lhůta',
-                'zaznam_vyrazeni'=>'Záznam vyřazení',
-                'popis'=>'Popis',
-                'poznamka_predani'=>'Poznámka k předání',
-                'prazdny_sloupec'=>'',
-            );
-        $this->template->sloupce_nazvy = $sloupce_nazvy;
+        $this->template->sloupce_nazvy = self::$sloupce_nazvy;
 
-
-        $sloupce = array(
-                '-1'=>'smer',
-                '0'=>'cislo_jednaci',
-                '1'=>'spis',
-                '2'=>'datum_vzniku',
-                '3'=>'subjekty',
-                '4'=>'cislo_jednaci_odesilatele',
-                '5'=>'pocet_listu',
-                '6'=>'pocet_priloh',
-                '7'=>'pocet_nelistu',
-                '8'=>'nazev',
-                '9'=>'vyridil',
-                '10'=>'zpusob_vyrizeni',
-                '11'=>'datum_odeslani',
-                '12'=>'spisovy_znak',
-                '13'=>'skartacni_znak',
-                '14'=>'skartacni_lhuta',
-                '15'=>'zaznam_vyrazeni',
-                '16'=>'popis',
-                '17'=>'poznamka_predani',
-                '18'=>'prazdny_sloupec'
-            );
 
         $zobr = isset($sestava->zobrazeni_dat) ? unserialize($sestava->zobrazeni_dat) : false;
         if ($zobr === false)
             $zobr = array();
-        // nastav vychozi hodnoty
-        if (!isset($zobr['sloupce_poznamka']))
-            $zobr['sloupce_poznamka'] = false;
-        if (!isset($zobr['sloupce_poznamka_predani']))
-            $zobr['sloupce_poznamka_predani'] = false;
-        if (!isset($zobr['sloupce_smer_dokumentu']))
-            $zobr['sloupce_smer_dokumentu'] = true;
-        if (!isset($zobr['sloupce_prazdny']))
-            $zobr['sloupce_prazdny'] = false;
 
+        // nastav vychozi hodnoty
         if (!isset($zobr['zobrazeni_cas']))
             $zobr['zobrazeni_cas'] = false;
         if (!isset($zobr['zobrazeni_adresa']))
             $zobr['zobrazeni_adresa'] = false;
-
-        if (!$zobr['sloupce_poznamka'])
-            unset($sloupce[16]);
-        if (!$zobr['sloupce_smer_dokumentu'])
-            unset($sloupce[-1]);
-        if (!$zobr['sloupce_poznamka_predani'])
-            unset($sloupce[17]);
-        if (!$zobr['sloupce_prazdny'])
-            unset($sloupce[18]);
             
-        $this->template->sloupce = $sloupce;
+        $this->template->sloupce = explode(',', $sestava->sloupce);
         $this->template->zobrazeni = $zobr;
         
         try {
@@ -499,6 +459,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         );
 
         $form = new Spisovka\Form();
+        $form->elementPrototype->onSubmit('sestavaFormSubmit(this)');
 
         $form->addText('sestava_nazev', 'Název sestavy:', 80, 100);
         $form->addTextArea('sestava_popis', 'Popis sestavy:', 80, 3);
@@ -507,14 +468,13 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         $form->addCheckbox('zobrazeni_cas', 'U datumů zobrazit i čas:');
         $form->addCheckbox('zobrazeni_adresa', 'Zobrazit adresy u subjektů:');
-        $form->addCheckbox('sloupce_poznamka', 'Popis:');
-        $form->addCheckbox('sloupce_poznamka_predani', 'Poznámka k předání:');
-        $form->addCheckbox('sloupce_smer_dokumentu', 'Typ dokumentu (příchozí / vlastní):');
-        $form->addCheckbox('sloupce_prazdny', 'Prázdný sloupec:');
 
-        $form->addSelect('razeni1', '1. kritérium', $order_by);
-        $form->addSelect('razeni2', '2. kritérium', $order_by);
-        $form->addSelect('razeni3', '3. kritérium', $order_by);
+        $form->addMultiSelect('vybrane_sloupce', 'Vybrané sloupce:', null, 10);
+        $form->addMultiSelect('dostupne_sloupce', 'Dostupné sloupce:', self::$sloupce_nazvy, 10);
+        
+        $form->addSelect('razeni1', '1. kritérium:', $order_by);
+        $form->addSelect('razeni2', '2. kritérium:', $order_by);
+        $form->addSelect('razeni3', '3. kritérium:', $order_by);
         
         $form->addText('nazev', 'Věc:', 80, 100);
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
@@ -605,9 +565,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
+        $form = $button->getForm();
+        $data = $form->getValues();
 
-        $sestava_data = $this->handleSubmit($data);
+        $sestava_data = $this->handleSubmit($form, $data);
 
         try {
             Sestava::create($sestava_data);
@@ -673,12 +634,20 @@ class Spisovka_SestavyPresenter extends BasePresenter
         if (!empty($order_by[2]))
             $form['razeni3']->setDefaultValue($order_by[2]);
         
+        if (!empty($sestava->sloupce)) {
+            $column_keys = explode(',', $sestava->sloupce);
+            $items = [];
+            foreach ($column_keys as $key)
+                $items[$key] = self::$sloupce_nazvy[$key];                
+            $form['vybrane_sloupce']->setItems($items);
+        }
+        
         $form->addSubmit('odeslat', 'Upravit')
                  ->onClick[] = array($this, 'upravitClicked');
         $form->addSubmit('storno', 'Zrušit')
                  ->setValidationScope(FALSE)
                  ->onClick[] = array($this, 'stornoClicked');
-
+        
         return $form;
     }
     
@@ -687,7 +656,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
      * @param array $data
      * @return array
      */
-    protected function handleSubmit($data)
+    protected function handleSubmit(Spisovka\Form $form, $data)
     {
         $sestava = array();
         $sestava['nazev'] = $data['sestava_nazev'];
@@ -711,9 +680,11 @@ class Spisovka_SestavyPresenter extends BasePresenter
         }
 
         // pro sestaveni sloupce
-        $sloupce = '';
-        $sestava['sloupce'] = $sloupce;
-
+        $sloupce = $form['vybrane_sloupce']->getRawValue();
+        $sestava['sloupce'] = implode(',', $sloupce);
+        unset($data['vybrane_sloupce']);
+        unset($data['dostupne_sloupce']);
+        
         $postdata = $this->getHttpRequest()->getPost();
         
         // pro sestaveni parametru
@@ -734,8 +705,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 $data['druh_zasilky'] = serialize(array_keys($postdata['druh_zasilky']));
 
         $zobrazeni_dat = array();
-        $nazvy_poli = array('zobrazeni_cas', 'zobrazeni_adresa', 'sloupce_poznamka',
-            'sloupce_poznamka_predani', 'sloupce_smer_dokumentu', 'sloupce_prazdny');
+        $nazvy_poli = array('zobrazeni_cas', 'zobrazeni_adresa');
         foreach($nazvy_poli as $key) {
             $zobrazeni_dat[$key] = $data[$key];
             unset($data[$key]);
@@ -752,9 +722,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
     
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
+        $form = $button->getForm();
+        $data = $form->getValues();
         $id = $data['id'];
-        $sestava_data = $this->handleSubmit($data);
+        $sestava_data = $this->handleSubmit($form, $data);
 
         try {
             $sestava = new Sestava($id);

@@ -7,6 +7,8 @@
 Nové funkce:
 
 - usnadněn a zrychlen výběr spisu při vkládání dokumentu do spisu
+- sloupce, které se mají v sestavách zobrazit je nyní možné přesně určit,
+  včetně jejich pořadí
 - sestavy je možné řadit dle zadaných kritérií
 - ve výpravně je možné vytvořit podací arch s dokumenty, které uživatel
   ručně vybere (funkce se použije, pokud pracovník chce odeslat dokumenty
@@ -15,12 +17,12 @@ Nové funkce:
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
   podporu
 - v ladicím módu (DEBUG_ENABLE 1 v index.php) aplikace zobrazuje vpravo dole
-  lištu s užitečnými informacemi: čas zpracování stránky, použitá paměť
+  lištu s užitečnými informacemi: čas zpracování stránky, použitou paměť
   a databázové dotazy
   
 Jiné změny:
 
-- aplikace je nyní podporována na PHP verze 5.4 a 5.5. Na staré 5.3 nepoběží.
+- aplikace je nyní podporována na PHP verze 5.4 a 5.5. Na starém 5.3 nepoběží.
 - aplikace nyní vyžaduje přepis URL. To není problém u webového serveru Apache.
   Pro Microsoft IIS je nutné ručně přepis URL nakonfigurovat.
 - z důvodu upgrade frameworku, na kterém aplikace běží a kvůli větší čistotě
