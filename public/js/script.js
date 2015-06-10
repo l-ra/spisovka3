@@ -96,6 +96,13 @@ $(function() {
         modal: true
     });
 
+    $('#napoveda').dialog({
+        autoOpen: false,
+        width: 900,
+        height: 700,
+        modal: true
+    });
+
     // Dialog - Vyber spisu
     $('#dialog-spis').click(function(event){
         dialog(this,'Výběr spisu');
@@ -1026,5 +1033,26 @@ initSpisAutocomplete = function() {
             },
             cache: true
         }
+    });
+};
+
+openHelpWindow = function(url) {    
+    $('#napoveda').dialog( "option", "title", "Nápověda" );
+    
+    // Interni spinner v dialogu - bude nahrazen, az se obsah dialogu nahraje
+    $('#napoveda').html(dialogSpinner());
+    $('#napoveda').dialog('open');
+    
+    displayHelpPage(url);
+    return false;
+};
+
+displayHelpPage = function (url) {
+    $.get(url, function (html) {
+        $('#napoveda').html(html);
+        $('#napoveda a').click(function () {
+            displayHelpPage(this.href);
+            return false;
+        });
     });
 };

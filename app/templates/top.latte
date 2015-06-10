@@ -12,7 +12,7 @@
             <a href="{link :Spisovna:Default:}">Spisovna</a>&nbsp;&nbsp;{/if}
             {access :Admin:Default:}<a href="{link :Admin:Default:}">Administrace</a>&nbsp;&nbsp;{/access}
 {*            {access :Spisovka:Zpravy:}<a href="{link :Spisovka:Zpravy:default}">Zprávy</a>&nbsp;&nbsp;{/access} *}
-            <a href="{$baseUrl}{$helpUri}">Nápověda</a>&nbsp;&nbsp;
+            <a href="{$baseUrl}{$helpUri}" onclick="return openHelpWindow(this.href);">Nápověda</a>&nbsp;&nbsp;
             <a href="{link :Spisovka:Uzivatel:logout}">Odhlásit</a>
         </div>
         <div id="top_jmeno">

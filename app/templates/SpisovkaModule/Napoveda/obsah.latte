@@ -1,4 +1,4 @@
-{block help_module}
+{define help_module}
     <h2 class="seznam">{$title}</h2>
     {foreach $helpContents[$module] as $pres_action => $actions}
     <h3>{=isset($helpTitles[$module.'/'.$pres_action]) ? $helpTitles[$module.'/'.$pres_action] : $pres_action}</h3>
@@ -14,7 +14,7 @@
         </ul>
     {/if}
     {/foreach}
-{/block}
+{/define}
 
 {block content}
 

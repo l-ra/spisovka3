@@ -34,7 +34,7 @@ Jiné změny:
   Tzv. rotující kolečko by se nyní mělo spolehlivě zobrazovat a skrývat, když
   aplikace zpracovává požadavek nebo nahrává data na pozadí. Též je uživatel
   informován, pokud při provádění požadavku na pozadí dojde k chybě.
-- sjednocen layout nápovědy se zbytkem aplikace
+- upraven vzhled nápovědy a nyní se nápověda zobrazuje v modálním okně
 - proveden upgrade staré knihovny pro připojení k databázi
 - nový modul pro vývojáře pro základní automatické testování aplikace
 - hledání v subjektech v administraci nyní hledá i podle ulice
