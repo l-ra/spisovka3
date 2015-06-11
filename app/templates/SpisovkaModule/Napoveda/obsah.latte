@@ -7,8 +7,6 @@
         {foreach $actions as $action}
             {if isset($helpTitles[$action->code])}
             <li><a href="{$baseUrl}{$action->url}">{$helpTitles[$action->code]}</a></li>
-            {else}
-            <li>{$action->name}</li>
             {/if}
         {/foreach}
         </ul>
