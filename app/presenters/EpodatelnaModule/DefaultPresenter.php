@@ -185,9 +185,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
 
         $args = null;
-        $args = array(
-            'where' => array('ep.epodatelna_typ=1')
-        );
+        $args = [
+            'where' => ['ep.epodatelna_typ = 1'],
+            'order' => ['doruceno_dne' => 'DESC']
+        ];
         $result = $this->Epodatelna->seznam($args);
         $paginator->itemCount = count($result);
         
@@ -428,35 +429,25 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         );
         $result = $this->Epodatelna->seznam($args);
         //$paginator->itemCount = count($result);
-        $seznam = $result->fetchAll();//$paginator->offset, $paginator->itemsPerPage);
-
+        $zpravy = $result->fetchAll(); //$paginator->offset, $paginator->itemsPerPage);
         
-        if ( $seznam ) {
-            $zpravy = array();
-            foreach ( $seznam as $zprava ) {
+        if (!$zpravy)
+            $zpravy = null;
+        else
+            foreach ($zpravy as $zprava) {
 
                 unset($zprava->identifikator);
-                
-                $zpravy[ $zprava->id ] = $zprava;
+
                 $prilohy = unserialize($zprava->prilohy);
-                if ( $prilohy ) {
-                    $zpravy[ $zprava->id ]->prilohy = $prilohy;
-                    $prilohy = null;
-                } else if ( $zprava->prilohy == 'a:0:{}' ) {
-                    $zpravy[ $zprava->id ]->prilohy = array();
-                    $prilohy = null;
-                }
-                
+                if ($prilohy !== false)
+                    $zprava->prilohy = $prilohy;
+
                 /* neni potreba
-                $identifikator = unserialize($zprava->identifikator);
-                if ( $identifikator ) {
-                    $zpravy[ $zprava->id ]->identifikator = $identifikator;
-                    $identifikator = null;
-                } */
-                $doruceno_dne = strtotime($zprava->doruceno_dne);
-                $zpravy[ $zprava->id ]->doruceno_dne_datum = date("j.n.Y", $doruceno_dne);
-                $zpravy[ $zprava->id ]->doruceno_dne_cas = date("G:i:s", $doruceno_dne);
-                $zpravy[ $zprava->id ]->odesilatel = htmlspecialchars($zprava->odesilatel);
+                  $identifikator = unserialize($zprava->identifikator);
+                  if ( $identifikator ) {
+                  $zpravy[ $zprava->id ]->identifikator = $identifikator;
+                  $identifikator = null;
+                  } */
 
                 $subjekt = new stdClass();
                 $subjekt->mesto = '';
@@ -466,16 +457,15 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $subjekt->co = '';
                 $subjekt->jmeno = '';
                 $subjekt->prijmeni = '';
-                
+
                 $original = null;
                 $nalezene_subjekty = null;
-                if ( !empty($zprava->email_id) ) {
+                if (!empty($zprava->email_id)) {
                     // Nacteni originalu emailu
-                    if (!empty( $zprava->file_id)) {
+                    if (!empty($zprava->file_id)) {
                         $original = self::nactiEmail($this->storage, $zprava->file_id);
-                        
-                        $subjekt->nazev_subjektu = isset($original['zprava']->from->personal) 
-                            ? $original['zprava']->from->personal : $zprava->odesilatel;
+
+                        $subjekt->nazev_subjektu = isset($original['zprava']->from->personal) ? $original['zprava']->from->personal : $zprava->odesilatel;
                         $subjekt->prijmeni = $original['zprava']->from->personal;
                         $subjekt->email = $original['zprava']->from->email;
                         $matches = [];
@@ -484,21 +474,20 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             $subjekt->prijmeni = $matches[2];
                         }
 
-                        if ( $original['signature']['signed'] >= 0 ) {
+                        if ($original['signature']['signed'] >= 0) {
 
                             $subjekt->nazev_subjektu = $original['signature']['cert_info']['organizace'];
                             $subjekt->prijmeni = $original['signature']['cert_info']['jmeno'];
-                            if ( !empty($original['signature']['cert_info']['email']) && $subjekt->email != $original['signature']['cert_info']['email'] ) {
-                                $subjekt->email = $subjekt->email ."; ". $original['signature']['cert_info']['email'];
+                            if (!empty($original['signature']['cert_info']['email']) && $subjekt->email != $original['signature']['cert_info']['email']) {
+                                $subjekt->email = $subjekt->email . "; " . $original['signature']['cert_info']['email'];
                             }
                             $subjekt->ulice = $original['signature']['cert_info']['adresa'];
                         }
 
                         if (!isset($email_subjekt_cache[$subjekt->email]))
                             $email_subjekt_cache[$subjekt->email] = $SubjektModel->hledat($subjekt, 'email', true);
-                        $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];                       
+                        $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];
                     }
-                    
                 } else if (!empty($zprava->isds_id)) {
                     // Nacteni originalu DS
                     if (!empty($zprava->file_id)) {
@@ -515,20 +504,22 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         if (isset($original->dmDm->dmSenderAddress)) {
                             $res = ISDS_Spisovka::parseAddress($original->dmDm->dmSenderAddress);
                             foreach ($res as $key => $value)
-                                $subjekt->$key = $value;                                                    
+                                $subjekt->$key = $value;
                         }
-                        
+
                         if (!isset($isds_subjekt_cache[$subjekt->id_isds]))
                             $isds_subjekt_cache[$subjekt->id_isds] = $SubjektModel->hledat($subjekt, 'isds', true);
                         $nalezene_subjekty = $isds_subjekt_cache[$subjekt->id_isds];
-                    }                    
+                    }
                 }
-                
-                $zpravy[$zprava->id]->subjekt = ['original'=>$subjekt, 'databaze'=>$nalezene_subjekty];
+
+                $zprava->subjekt = ['original' => $subjekt, 'databaze' => $nalezene_subjekty];
+
+                $doruceno_dne = strtotime($zprava->doruceno_dne);
+                $zprava->doruceno_dne_datum = date("j.n.Y", $doruceno_dne);
+                $zprava->doruceno_dne_cas = date("G:i:s", $doruceno_dne);
+                $zprava->odesilatel = htmlspecialchars($zprava->odesilatel);
             }
-        } else {
-            $zpravy = null;
-        }
 
         // Funkce nekdy loguje varovani, ze vstup neni ve formatu utf-8
         echo @json_encode($zpravy);

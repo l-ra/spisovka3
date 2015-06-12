@@ -37,7 +37,7 @@ class Epodatelna extends BaseModel
         if ( isset($args['order']) ) {
             $order = $args['order'];
         } else {
-            $order = array('id'=>'DESC');
+            $order = ['doruceno_dne' => 'DESC'];
         } 
         if ( isset($args['limit']) ) {
             $limit = $args['limit'];
