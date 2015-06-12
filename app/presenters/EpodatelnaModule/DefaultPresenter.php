@@ -3,9 +3,15 @@
 class Epodatelna_DefaultPresenter extends BasePresenter
 {
 
-    private $Epodatelna;
-    private $pdf_output = 0;
+    protected $Epodatelna;
+    protected $pdf_output = 0;
     protected $storage;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->Epodatelna = new Epodatelna();
+    }
     
     public function actionDefault()
     {
@@ -93,9 +99,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     
     public function renderNove()
     {
-
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
-
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -135,9 +138,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderPrichozi()
     {
-
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
-
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -178,9 +178,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderOdchozi()
     {
-
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
-
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -221,9 +218,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function actionDetail()
     {
-
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
-
         $epodatelna_id = $this->getParameter('id',null);
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
@@ -420,8 +414,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     
     public function actionNactiNoveAjax()
     {
-        if ( is_null($this->Epodatelna) )
-            $this->Epodatelna = new Epodatelna();
         $SubjektModel = new Subjekt();
         $isds_subjekt_cache = [];
         $email_subjekt_cache = [];
@@ -548,9 +540,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     {
         $isds = new ISDS_Spisovka();
 
-        if (is_null($this->Epodatelna))
-            $this->Epodatelna = new Epodatelna();
-            
         try {
             $isds->pripojit($config);
 
@@ -797,8 +786,6 @@ dmFormat =
 
     public function zkontrolujOdchoziISDS($zprava = null)
     {
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
-        
         $ep_zpravy = array();
         $now = getdate();
         $od = mktime(0,0,0,$now['mon'],$now['mday']-1,$now['year']);
@@ -973,8 +960,6 @@ dmFormat =
     
     private function zkontrolujEmail($config)
     {
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
-
         $imap = new ImapClient();
         $email_mailbox = '{'. $config['server'] .':'. $config['port'] .''. $config['typ'] .'}'. $config['inbox'];
 
