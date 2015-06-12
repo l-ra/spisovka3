@@ -56,6 +56,7 @@ Opravy:
                 adresu do jednotlivých políček
               - dokument přijatý datovou schránkou a odeslaný e-mailem
                 se mohl tvářit jako přijatý e-mailem
+              - seznam zpráv je nyní řazen sestupně dle data doručení
               
 - zápis chybných hodnot do formuláře při hledání dokumentu podle datumů nezpůsobí
   chybu aplikace
