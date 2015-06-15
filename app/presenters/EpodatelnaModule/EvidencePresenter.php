@@ -1014,9 +1014,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $mail->send();
 
                     if ($hromadna) {
-                        echo 'Upozornění odesílateli na adresu "'. $data['email'] .'" bylo úspěšně odesláno.';    
+                        echo 'Upozornění odesílateli na adresu "'. htmlentities($data['email']) .'" bylo úspěšně odesláno.';    
                     } else {
-                        $this->flashMessage('Upozornění odesílateli na adresu "'. $data['email'] .'" bylo úspěšně odesláno.');    
+                        $this->flashMessage('Upozornění odesílateli na adresu "'. htmlentities($data['email']) .'" bylo úspěšně odesláno.');    
                     }
                 }
             } else {

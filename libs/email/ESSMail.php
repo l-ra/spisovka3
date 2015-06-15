@@ -62,7 +62,7 @@ class ESSMail extends Nette\Mail\Message {
 
         // Uzivatel
         $user_system = Nette\Environment::getUser();
-        if ( $user_system->isAuthenticated() ) {
+        if ($user_system->isLoggedIn()) {
             $user = $user_system->getIdentity();
         } else {
             $user = new stdClass();
