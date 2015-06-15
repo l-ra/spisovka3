@@ -1,7 +1,5 @@
 /* global BASE_URL, PUBLIC_URL, linkNovySubjekt */
 
-var loaded_data = new Array();
-
 $(function() {
 
     $('#dialog-evidence').click(function(event){
@@ -118,9 +116,9 @@ zkontrolovatSchranku = function (elm) {
     });    
 };
 
-zkontrolovatOdchoziSchranku = function (elm) {
+zkontrolovatOdchoziSchranku = function () {
 
-    url = BASE_URL + 'epodatelna/default/zkontrolovatOdchoziISDS';
+    var url = BASE_URL + 'epodatelna/default/zkontrolovatOdchoziISDS';
 
     // zde není potřeba žádná zpětná vazba
     $.get(url);
@@ -131,20 +129,14 @@ nactiZpravy = function () {
 
     showSpinner();
     
-    url = BASE_URL + 'epodatelna/default/nactiNoveAjax';
-    $.get(url, function(data) {
-        var zpravy = eval("(" + data + ")");
-        if ( zpravy != '' ) {
-            
-            for(var index in zpravy) {
-                if ( in_array(index, loaded_data) == true ) {
-                    continue;
-                }
-                generujZpravu( index, zpravy[index] );
-                loaded_data[ index ] = index;
-            }
+    var url = BASE_URL + 'epodatelna/default/nactiNoveAjax';
+    $.getJSON(url, function (zpravy) {
+        if (zpravy != '') {
+            var len = zpravy.length;
+            for (var i = 0; i < len; i++)
+                generujZpravu(zpravy[i]);
         }
-    });    
+    });
 };
 
 function in_array (needle, haystack)
@@ -166,10 +158,13 @@ function bytesToSize (bytes) {
   return ((i == 0)? (bytes / Math.pow(1024, i)) : (bytes / Math.pow(1024, i)).toFixed(1)) + ' ' + sizes[i];
 };
 
-generujZpravu = function ( id, data ) {
+generujZpravu = function (data) {
 
-    typ = 0;
-    if ( typeof data['email_id'] == "string" ) {
+    var id = data.id;
+    var typ = 0;
+    var typ_string, form_odmitnout;
+    
+    if (typeof data['email_id'] == "string") {
         typ = 1;
         typ_string = '<img src="'+PUBLIC_URL+'images/icons/typdok1.png" alt="Email" title="Email" width="24" height="16" />';
 
@@ -190,32 +185,31 @@ generujZpravu = function ( id, data ) {
 '                        <dd><textarea name="zprava_odmitnuti['+id+']" rows="3" cols="60"></textarea></dd>'+
 '                    </dl>';
 
-    } else if ( typeof data['isds_id'] == "string" ) {
+    } else if (typeof data['isds_id'] == "string") {
         typ = 2;
-        typ_string = '<img src="'+PUBLIC_URL+'images/icons/typdok2.png" alt="ISDS" title="ISDS" width="24" height="16" />';
+        typ_string = '<img src="' + PUBLIC_URL + 'images/icons/typdok2.png" alt="ISDS" title="ISDS" width="24" height="16" />';
         form_odmitnout = '';
     } else {
         typ_string = '';
         form_odmitnout = '';
     }
 
-    prilohy = '';
-    if ( data['prilohy'].length > 0 ) {
-        for ( var key in data['prilohy'] ) {
+    var prilohy = '';
+    if (data['prilohy'].length > 0) {
+        for (var key in data['prilohy']) {
             prilohy = prilohy + '                    <li><a href="' + BASE_URL + 'epodatelna/prilohy/download/' + id + '?file=' + data['prilohy'][key]['id'] + '">' + data['prilohy'][key]['name'] + '</a> [ ' + bytesToSize(data['prilohy'][key]['size']) + ' ]</li>';
         }
     }
-    subjekt_seznam = '';
-    //alert(data['subjekt']['databaze']);
-    if ( typeof data['subjekt']['databaze'] != 'null' ) {
-        for ( var key in data['subjekt']['databaze'] ) {
-                subjekt_seznam = subjekt_seznam + '<input type="checkbox" name="subjekt['+id+']['+data['subjekt']['databaze'][key]['id']+']" />';
-                subjekt_seznam = subjekt_seznam + data['subjekt']['databaze'][key]['full_name'] +'<br/>';
+    
+    var subjekt_seznam = '';
+    if (typeof data['subjekt']['databaze'] != 'null') {
+        for (var key in data['subjekt']['databaze']) {
+            subjekt_seznam = subjekt_seznam + '<input type="checkbox" name="subjekt[' + id + '][' + data['subjekt']['databaze'][key]['id'] + ']" />';
+            subjekt_seznam = subjekt_seznam + data['subjekt']['databaze'][key]['full_name'] + '<br/>';
         }
     }
-    //alert(subjekt_seznam);
 
-    zprava = '   <div class="evidence_item"> '+
+    var zprava = '   <div class="evidence_item"> '+
 '       <div class="evidence_item_header">'+
 '           '+ typ_string +
 '           <div class="evidence_item_cas">'+
