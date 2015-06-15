@@ -343,11 +343,11 @@ form_odmitnout +
         },
         select: function(event, ui) {
             //$('#subjekt_'+id).val(ui.item.id);
-            $('#subjekt_autocomplete_'+id).val('');
+            $('#subjekt_autocomplete_' + id).val('');
 
-            subjekt_seznam = '<input type="checkbox" name="subjekt['+id+']['+ui.item.id+']" />';
-            subjekt_seznam = subjekt_seznam + ui.item.full +'<br/>';
-            $('#subjekt_seznam_'+id).append(subjekt_seznam);
+            subjekt_seznam = '<input type="checkbox" name="subjekt[' + id + '][' + ui.item.id + ']" />';
+            subjekt_seznam = subjekt_seznam + ui.item.value + '<br/>';
+            $('#subjekt_seznam_' + id).append(subjekt_seznam);
 
             return false;
         }
