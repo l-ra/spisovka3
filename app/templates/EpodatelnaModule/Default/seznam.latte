@@ -56,17 +56,17 @@
             </td>
             <td class="stav" title="{$ep->stav_info}">
                 {if ($ep->stav==0)}
-                nový
+                nová
                 {elseif ($ep->stav==1)}
-                nový přijatý
+                nová přijatá
                 {elseif ($ep->stav==10)}
-                evidovaný
+                evidovaná
                 {elseif ($ep->stav==11)}
                 jiná evidence:
                 <br />
                 {$ep->evidence}
                 {elseif ($ep->stav==100)}
-                zamítnutý
+                zamítnutá
                 {else}
                 nelze zjístit stav
                 {/if}
