@@ -19,7 +19,7 @@
        {if $Dokument}
        Zpráva přidána do spisové služby jako <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dokument->id}" target="_blank">{$Dokument->jid}</a>
        {else}
-       {$Zprava->stav_info}
+           <span n:if="$Zprava->stav == 100">Důvod odmítnutí: </span>{$Zprava->stav_info}
        {/if}
        {else}
        <a href="{link :Epodatelna:Evidence:novy, 'id'=>$Zprava->id}">Zaevidovat do spisové služby</a>

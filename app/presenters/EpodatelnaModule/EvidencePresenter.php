@@ -915,13 +915,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function zaevidovat($data)
     {
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
+        if (is_null($this->Epodatelna))
+            $this->Epodatelna = new Epodatelna();
         $info = array(
-                'evidence'=>$data['evidence'],
-                'stav'=>'11',
-                'stav_info'=>'Zpráva zaevidována v evidenci '.$data['evidence']
+            'evidence' => $data['evidence'],
+            'stav' => '11',
+            'stav_info' => 'Zpráva zaevidována v evidenci: ' . $data['evidence']
         );
-        return $this->Epodatelna->update($info, array( array('id=%i',$data['id']) ));
+        return $this->Epodatelna->update($info, array(array('id = %i', $data['id'])));
     }
 
     protected function createComponentOdmitnoutEmailForm()
@@ -971,39 +972,36 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         try {
-
             $this->odmitnoutEmail($data);
 
             $this->flashMessage('Zpráva byla odmítnuta.');
-            $this->redirect(':Epodatelna:Default:detail',array('id'=>$data['id']));
+            $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
             if (!$this->isAjax()) {
                 //$this->redirect('this');
             } else {
                 $this->invalidateControl('epododmitnuti');
             }
-
-            //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Zprávu se nepodařilo odmítnout.','warning');
+            $this->flashMessage('Zprávu se nepodařilo odmítnout.', 'warning');
         }
-
     }
 
     private function odmitnoutEmail($data, $hromadna = false)
     {
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
+        if (is_null($this->Epodatelna))
+            $this->Epodatelna = new Epodatelna();
         $info = array(
-                    'stav'=>'100',
-                    'stav_info'=>$data['stav_info']
+            'stav' => '100',
+            'stav_info' => $data['stav_info']
         );
-        $this->Epodatelna->update($info, array( array('id=%i',$data['id']) ));
+        $this->Epodatelna->update($info, array(array('id=%i', $data['id'])));
 
         // odeslat email odesilateli?
-        if ( $data['upozornit'] == true ) {
+        if ($data['upozornit'] == true) {
 
             $ep = (new Spisovka\ConfigEpodatelna())->get();
-            if ( isset($ep['odeslani'][0]) ) {
-                if ( $ep['odeslani'][0]['aktivni'] == '1' ) {
+            if (isset($ep['odeslani'][0])) {
+                if ($ep['odeslani'][0]['aktivni'] == '1') {
 
                     $mail = new ESSMail;
                     $mail->setFromConfig();
@@ -1014,16 +1012,16 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $mail->send();
 
                     if ($hromadna) {
-                        echo 'Upozornění odesílateli na adresu "'. htmlentities($data['email']) .'" bylo úspěšně odesláno.';    
+                        echo 'Upozornění odesílateli na adresu "' . htmlentities($data['email']) . '" bylo úspěšně odesláno.';
                     } else {
-                        $this->flashMessage('Upozornění odesílateli na adresu "'. htmlentities($data['email']) .'" bylo úspěšně odesláno.');    
+                        $this->flashMessage('Upozornění odesílateli na adresu "' . htmlentities($data['email']) . '" bylo úspěšně odesláno.');
                     }
                 }
             } else {
-                if ( $hromadna ) {
+                if ($hromadna) {
                     echo '###Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání emailových zpráv ze spisové služby.';
                 } else {
-                    $this->flashMessage('Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání emailových zpráv ze spisové služby.','warning');
+                    $this->flashMessage('Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání emailových zpráv ze spisové služby.', 'warning');
                 }
             }
         }
