@@ -2,6 +2,7 @@
 
 class Epodatelna_PrilohyPresenter extends BasePresenter
 {
+
     protected $storage;
 
     private static function downloadEpodSource($storage, $epodatelna_id, $typ = 2)
@@ -12,73 +13,69 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         $FileModel = new FileModel();
 
         $epod = $Epod->getInfo($epodatelna_id);
-        $file_id = @explode("-",$epod->file_id);
+        $file_id = @explode("-", $epod->file_id);
         $file = $FileModel->getInfo($file_id[0]);
-        $res = $DownloadFile->download($file,$typ);
+        $res = $DownloadFile->download($file, $typ);
 
         return $res;
-
     }
 
-    private static function downloadISDSPrilohu( $source_file , $part = null , $output = 0 )
+    private static function downloadISDSPrilohu($source_file, $part = null, $output = 0)
     {
 
-        if ( $fp = fopen($source_file,'rb') ) {
+        if ($fp = fopen($source_file, 'rb')) {
 
-            $source = fread($fp,filesize($source_file));
+            $source = fread($fp, filesize($source_file));
             fclose($fp);
-
         } else {
             return null;
         }
 
         $mess = unserialize($source);
 
-        if ( is_null($part) ) {
+        if (is_null($part)) {
 
-            if ( isset($mess->dmDm->dmFiles->dmFile) ) {
+            if (isset($mess->dmDm->dmFiles->dmFile)) {
                 $files = array();
-                foreach( $mess->dmDm->dmFiles->dmFile as $index => $file ) {
+                foreach ($mess->dmDm->dmFiles->dmFile as $index => $file) {
                     $file_name = $file->dmFileDescr;
                     $file_size = strlen($file->dmEncodedContent);
                     $mime_type = $file->dmMimeType;
-                    $files[] = array('file'=>$file->dmEncodedContent,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
+                    $files[] = array('file' => $file->dmEncodedContent, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type);
                 }
                 return $files;
             } else {
                 return null;
             }
-
         } else {
 
-            if ( isset($mess->dmDm->dmFiles->dmFile) ) {
-                foreach( $mess->dmDm->dmFiles->dmFile as $index => $file ) {
-                    if ( $part == $index ) {
+            if (isset($mess->dmDm->dmFiles->dmFile)) {
+                foreach ($mess->dmDm->dmFiles->dmFile as $index => $file) {
+                    if ($part == $index) {
 
-                        if ( $output == 1 ) {
+                        if ($output == 1) {
                             return $file->dmEncodedContent;
                         } else {
                             $file_name = $file->dmFileDescr;
                             $file_size = strlen($file->dmEncodedContent);
                             $mime_type = $file->dmMimeType;
-                            return array('file'=>$file->dmEncodedContent,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
+                            return array('file' => $file->dmEncodedContent, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type);
                         }
                         break;
                     }
                 }
             }
-            return null;// array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
+            return null; // array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
         }
-
     }
 
-    private static function downloadEmailPrilohu( $source , $part = null , $output = 0 )
+    private static function downloadEmailPrilohu($source, $part = null, $output = 0)
     {
 
         $imap = new ImapClientFile();
-        if ( $imap->open($source) ) {
+        if ($imap->open($source)) {
 
-            if ( is_null($part) ) {
+            if (is_null($part)) {
 
                 $zprava = $imap->analyze_message();
                 //Nette\Diagnostics\Debugger::dump($zprava); exit;
@@ -87,79 +84,78 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                 // Hlavni zprava
                 $tmp_file = $zprava['DataFile'];
                 $file_size = filesize($tmp_file);
-                if ( $zprava['Type'] == 'html' ) {
+                if ($zprava['Type'] == 'html') {
                     $file_name = 'zprava.html';
                     $mime_type = 'text/html';
                 } else {
                     $file_name = 'zprava.txt';
                     $mime_type = 'text/plain';
                 }
-                $files[] = array('file'=>$tmp_file, 'file_name'=>$file_name, 'size'=>$file_size, 'mime-type'=>$mime_type,'charset'=>@$zprava['Encoding'] );
+                $files[] = array('file' => $tmp_file, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type, 'charset' => @$zprava['Encoding']);
 
                 // Alternativni Zpravy
-                if ( isset($zprava['Alternative']) ) {
+                if (isset($zprava['Alternative'])) {
                     // zpravy
                     foreach ($zprava['Alternative'] as $fid => $file) {
                         $tmp_file = $file['DataFile'];
                         $file_size = filesize($tmp_file);
 
-                        if ( $file['Type'] == 'text' ) {
-                            $file_name = 'zprava_'.$fid.'.txt';
+                        if ($file['Type'] == 'text') {
+                            $file_name = 'zprava_' . $fid . '.txt';
                             $mime_type = 'text/plain';
                         } else if ($file['Type'] == 'html') {
-                            $file_name = 'zprava_'.$fid.'.html';
+                            $file_name = 'zprava_' . $fid . '.html';
                             $mime_type = 'text/html';
                         } else {
-                            $file_name = 'zprava_'.$fid.'.txt';
+                            $file_name = 'zprava_' . $fid . '.txt';
                             $mime_type = 'text/plain';
                         }
-                        $files[] = array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type,'charset'=>@$zprava['Encoding']);
+                        $files[] = array('file' => $tmp_file, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type, 'charset' => @$zprava['Encoding']);
                     }
                 }
                 // Prilohy
-                if ( isset($zprava['Attachments']) ) {
+                if (isset($zprava['Attachments'])) {
                     // zprava + prilohy
                     foreach ($zprava['Attachments'] as $fid => $file) {
                         $tmp_file = $file['DataFile'];
                         $file_size = filesize($tmp_file);
-                        if ( $file['Type'] == 'text' ) {
-                            $file_name = 'soubor_'.$fid.'.txt';
+                        if ($file['Type'] == 'text') {
+                            $file_name = 'soubor_' . $fid . '.txt';
                             $mime_type = 'text/plain';
                         } else if ($file['Type'] == 'html') {
-                            $file_name = 'soubor_'.$fid.'.html';
+                            $file_name = 'soubor_' . $fid . '.html';
                             $mime_type = 'text/html';
                         } else {
-                            $file_name = empty($file['FileName'])?"file_$fid":$file['FileName'];
+                            $file_name = empty($file['FileName']) ? "file_$fid" : $file['FileName'];
                             $mime_type = FileModel::mimeType($file_name);
                         }
                         $files[] = array(
-                                    'file'=>$tmp_file,
-                                    'file_name'=>$file_name,
-                                    'size'=>$file_size,
-                                    'mime-type'=>$mime_type,
-                                    'charset'=>$zprava['Encoding'],
-                                   );
+                            'file' => $tmp_file,
+                            'file_name' => $file_name,
+                            'size' => $file_size,
+                            'mime-type' => $mime_type,
+                            'charset' => $zprava['Encoding'],
+                        );
                     }
                 }
                 return $files;
-
             } else {
 
                 $zprava = $imap->decode_message();
                 //echo "<pre>$part :"; print_r($zprava); exit;
-                if ( strpos($part,".")!==false ) {
-                    $part_i = str_replace(".","]['Parts'][",$part);
-                    eval("\$part_info = \$zprava[0]['Parts'][".$part_i."];");
-                    eval("\$tmp_file = \$zprava[0]['Parts'][".$part_i."]['BodyFile'];");
+                if (strpos($part, ".") !== false) {
+                    $part_i = str_replace(".", "]['Parts'][", $part);
+                    eval("\$part_info = \$zprava[0]['Parts'][" . $part_i . "];");
+                    eval("\$tmp_file = \$zprava[0]['Parts'][" . $part_i . "]['BodyFile'];");
                 } else {
                     $part_info = @$zprava[0]['Parts'][$part];
                     $tmp_file = @$zprava[0]['Parts'][$part]['BodyFile'];
                 }
 
 
-                if ( $output == 1 ) {
-                    if ( $fp = fopen($tmp_file,'rb') ) {
-                        return fread($fp, filesize($tmp_file) );
+                if ($output == 1) {
+                    if ($fp = fopen($tmp_file, 'rb')) {
+                        return fread($fp, filesize($tmp_file));
                     } else {
                         return null;
                     }
@@ -167,21 +163,19 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
                     $file_name = @$part_info['FileName'];
                     $file_size = @$part_info['BodyLength'];
                     $mime_type = FileModel::mimeType($tmp_file);
-                    return array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
+                    return array('file' => $tmp_file, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type);
                 }
             }
         }
-
     }
 
-
-    public static function emailPrilohy($storage, $epodatelna_id )
+    public static function emailPrilohy($storage, $epodatelna_id)
     {
         $res = self::downloadEpodSource($storage, $epodatelna_id, 2);
         return self::downloadEmailPrilohu($res);
     }
 
-    public static function isdsPrilohy($storage, $epodatelna_id )
+    public static function isdsPrilohy($storage, $epodatelna_id)
     {
         $res = self::downloadEpodSource($storage, $epodatelna_id, 2);
         $prilohy = self::downloadISDSPrilohu($res);
@@ -191,19 +185,19 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
     public function actionDownload()
     {
-        $epodatelna_id = $this->getParameter('id',null);
-        $part = $this->getParameter('file',null);
+        $epodatelna_id = $this->getParameter('id', null);
+        $part = $this->getParameter('file', null);
 
-        $res = self::downloadEpodSource($this->storage, $epodatelna_id,2);
+        $res = self::downloadEpodSource($this->storage, $epodatelna_id, 2);
         $filename = basename($res);
 
-        if ( strpos($filename,'.eml')!==false ) {
+        if (strpos($filename, '.eml') !== false) {
             // jde o email
-            if ( !is_null($part) ) {
-                if ( strpos($part,'.')!==false ) {
-                    $part_a = explode(".",$part);
+            if (!is_null($part)) {
+                if (strpos($part, '.') !== false) {
+                    $part_a = explode(".", $part);
                     unset($part_a[0]);
-                    $part = implode('.',$part_a);
+                    $part = implode('.', $part_a);
                 }
             } else {
                 $part = 0;
@@ -211,7 +205,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
             $tmp_file = self::downloadEmailPrilohu($res, $part);
 
-            if ( !empty($tmp_file['file']) ) {
+            if (!empty($tmp_file['file'])) {
 
                 $httpResponse = $this->getHttpResponse();
                 $httpResponse->setContentType($tmp_file['mime-type']);
@@ -228,8 +222,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
                 $this->terminate();
             }
-                
-        } elseif ( strpos($filename,'.bsr')!==false ) {
+        } elseif (strpos($filename, '.bsr') !== false) {
             // jde o ds
 
             $tmp_file = self::downloadISDSPrilohu($res, $part);
@@ -250,8 +243,6 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
             $this->terminate();
         }
-
     }
-
 
 }
