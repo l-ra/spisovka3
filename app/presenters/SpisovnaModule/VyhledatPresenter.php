@@ -2,6 +2,7 @@
 
 class Spisovna_VyhledatPresenter extends Spisovka_VyhledatPresenter
 {
+
     public function getCookieName()
     {
         return 's3_spisovna_hledat';
@@ -16,5 +17,5 @@ class Spisovna_VyhledatPresenter extends Spisovka_VyhledatPresenter
     {
         return $this->user->isAllowed('Spisovna', 'cist_dokumenty');
     }
-}
 
+}
