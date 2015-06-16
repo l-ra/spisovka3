@@ -27,8 +27,6 @@ class Select2Component extends Nette\Forms\Controls\SelectBox implements Nette\C
         $options->$name = $value;
         $this->controlPrototype->attrs['data-widget-select2-options'] = json_encode($options);
         return $this;
-    }
-    
-   
+    }       
     
 }

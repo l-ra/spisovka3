@@ -7,6 +7,8 @@ class VyberPostovniZasilky extends Nette\Application\UI\Control
     
     public function __construct($init = null)
     {
+        parent::__construct();
+
         if ($init !== null)
             $this->setValue($init);
     }
