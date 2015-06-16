@@ -10,7 +10,8 @@ class Admin_OpravneniPresenter extends BasePresenter
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+                    : 20;
 
         $RoleModel = new RoleModel();
         $params = array(
@@ -20,18 +21,16 @@ class Admin_OpravneniPresenter extends BasePresenter
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         $this->template->seznam = $seznam;
-
     }
 
     public function actionNovy()
     {
         $this->template->title = " - Nová role";
-
     }
 
     public function actionDetail()
     {
-        $role_id = $this->getParameter('id',null);
+        $role_id = $this->getParameter('id', null);
         $RoleModel = new RoleModel();
 
         $role = $role_id === null ? null : $RoleModel->getInfo($role_id);
@@ -44,13 +43,13 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->template->seznamOpravneni = $opravneni;
         $this->template->seznamPravidel = $pravidla;
     }
-    
+
     public function renderDetail()
     {
         $this->template->title = " - Detail role";
 
         // Zmena udaju role
-        $this->template->FormUpravit = $this->getParameter('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit', null);
 
         $this->template->lzeMenitOpravneni = self::lzeMenitRoli($this->template->Role);
         $this->template->opravneniForm = $this['opravneniForm'];
@@ -59,24 +58,23 @@ class Admin_OpravneniPresenter extends BasePresenter
     public function actionSmazat()
     {
         $RoleModel = new RoleModel();
-        $role_id = $this->getParameter('id',null);
-        
+        $role_id = $this->getParameter('id', null);
+
         try {
             $RoleModel->smazat(array("id = %i", $role_id));
             $this->flashMessage('Role byla smazána.');
         } catch (DibiException $e) {
-            $this->flashMessage('Roli nebylo možné smazat.','error');        
+            $this->flashMessage('Roli nebylo možné smazat.', 'error');
         }
 
         $this->redirect(':Admin:Opravneni:seznam');
     }
 
-/**
- *
- * Formular a zpracovani pro zmenu udaju role
- *
- */
-
+    /**
+     *
+     * Formular a zpracovani pro zmenu udaju role
+     *
+     */
     protected function createComponentUpravitForm()
     {
 
@@ -86,12 +84,12 @@ class Admin_OpravneniPresenter extends BasePresenter
         // hack - udaje ze sablony jsou dostupne jen pri vykresleni formulare, ne kdyz se zpracovava odeslany formular
         // pri zpracovani submitu musime pouzit nadmnozinu roli, co byla pouzita pro vykresleni
         $role_select = $RoleModel->seznamProDedeni($role->id);
-            
-        if ( isset($role->id) ) {
+
+        if (isset($role->id)) {
             unset($role_select[$role->id]);
         }
         $role_select[0] = "(nedědí)";
-        
+
         $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
@@ -102,22 +100,22 @@ class Admin_OpravneniPresenter extends BasePresenter
                 ->addRule(Nette\Forms\Form::FILLED, 'Název role musí být vyplněno!');
         $input = $form1->addText('code', 'Kódové označení role:', 50, 150)
                 ->setValue(@$role->code);
-                // ->addRule(Form::FILLED, 'Kódové označení musí být vyplněno!');
+        // ->addRule(Form::FILLED, 'Kódové označení musí být vyplněno!');
         if (isset($role->fixed) && $role->fixed != 0)
             $input->setDisabled();
-            
+
         $form1->addTextArea('note', 'Popis role:', 50, 5)
                 ->setValue(@$role->note);
         $form1->addSelect('parent_id', 'Dědí z role:', $role_select)
-                ->setValue( is_null(@$role->parent_id)?0:@$role->parent_id   );
+                ->setValue(is_null(@$role->parent_id) ? 0 : @$role->parent_id );
         $form1->addHidden('parent_id_old')
                 ->setValue(@$role->parent_id);
 
         $form1->addSubmit('upravit', 'Upravit')
-                 ->onClick[] = array($this, 'upravitClicked');
+                ->onClick[] = array($this, 'upravitClicked');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
 
 
 
@@ -132,7 +130,6 @@ class Admin_OpravneniPresenter extends BasePresenter
         return $form1;
     }
 
-
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -141,41 +138,38 @@ class Admin_OpravneniPresenter extends BasePresenter
         $role_id = $data['id'];
         $data['date_modified'] = date('Y-m-d H:i:s');
         unset($data['id']);
-        
+
         // Zabran menit kod preddefinovanych roli
         if ($data['fixed'] != 0)
             unset($data['code']);
-        else if (empty ($data['code'])) {
+        else if (empty($data['code'])) {
             // Uzivatel se snazi shodit program zadanim prazdneho kodu uzivatelske role
             //$this->flashMessage('Chyba - kódové označení role musí být vyplněno', 'warning');
             //$this->redirect('this',array('id'=>$role_id, 'upravit'=>'info'));
             //return;
-
             // ignoruj uzivateluv pokus a ponechej v db puvodni kod
             unset($data['code']);
         }
-        
-        try
-        {
+
+        try {
             if (!isset($data['code'])) {
                 // 'code' prvek nemuze byt prazdny i kdyz nema byt zmenen. Slouzi pro vypocet 'sekvence_string'
                 $old_role = $RoleModel->getInfo($role_id);
                 $data['code'] = $old_role->code;
             }
-            $RoleModel->upravit($data,$role_id);
-            $this->flashMessage('Role  "'. $data['name'] .'"  byla upravena.');
-        }
-        catch (Exception $e) {
+            $RoleModel->upravit($data, $role_id);
+            $this->flashMessage('Role  "' . $data['name'] . '"  byla upravena.');
+        } catch (Exception $e) {
             $this->flashMessage('Chyba - ' . $e->getMessage(), 'warning');
         }
-        $this->redirect('this',array('id'=>$role_id));
+        $this->redirect('this', array('id' => $role_id));
     }
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $role_id = $data['id'];
-        $this->redirect('this',array('id'=>$role_id));
+        $this->redirect('this', array('id' => $role_id));
     }
 
     public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
@@ -197,12 +191,12 @@ class Admin_OpravneniPresenter extends BasePresenter
                 ->addRule(Nette\Forms\Form::FILLED, 'Kódové označení role musí být vyplněno!');
         $form1->addTextArea('note', 'Popis role:', 50, 5);
         $form1->addSelect('parent_id', 'Dědí z role:', $role_select)
-            ->setValue(0);
+                ->setValue(0);
         $form1->addSubmit('novy', 'Vytvořit')
-                 ->onClick[] = array($this, 'vytvoritClicked');
+                ->onClick[] = array($this, 'vytvoritClicked');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoSeznamClicked');
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoSeznamClicked');
 
         $renderer = $form1->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
@@ -219,25 +213,25 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         $RoleModel = new RoleModel();
         $data['active'] = 1;
-        if ( empty($data['parent_id']) ) $data['parent_id'] = null;
+        if (empty($data['parent_id']))
+            $data['parent_id'] = null;
         $data['date_created'] = new DateTime();
 
         try {
             $role_id = $RoleModel->vlozit($data);
-            $this->flashMessage('Role  "'. $data['name'] .'" byla vytvořena.');
-            $this->redirect(':Admin:Opravneni:detail',array('id'=>$role_id));
+            $this->flashMessage('Role  "' . $data['name'] . '" byla vytvořena.');
+            $this->redirect(':Admin:Opravneni:detail', array('id' => $role_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Roli "'. $data['name'] .'" se nepodařilo vytvořit.','warning');
-            $this->flashMessage('Chyba - ' . $e->getMessage(),'warning');
+            $this->flashMessage('Roli "' . $data['name'] . '" se nepodařilo vytvořit.', 'warning');
+            $this->flashMessage('Chyba - ' . $e->getMessage(), 'warning');
         }
     }
 
-/**
- *
- * Formular a zpracovani pro zmenu opraveni role
- *
- */
-
+    /**
+     *
+     * Formular a zpracovani pro zmenu opraveni role
+     *
+     */
     protected function createComponentOpravneniForm()
     {
 
@@ -254,11 +248,11 @@ class Admin_OpravneniPresenter extends BasePresenter
             foreach ($blok['pravidla'] as $rule_id => $rule) {
 
                 $form1->addGroup('rule_id_' . $rule_id);
-                $subForm = $form1->addContainer('perm'.$rule_id);
-                $subForm->addCheckbox("opravneni_allow" /*, 'povolit'*/)
-                        ->setValue( (@$opravneni[$rule_id]->allowed == 'Y')?1:0 );
-                $chk = $subForm->addCheckbox("opravneni_deny" /*, 'zakázat'*/)
-                        ->setValue( (@$opravneni[$rule_id]->allowed == 'N')?1:0 );
+                $subForm = $form1->addContainer('perm' . $rule_id);
+                $subForm->addCheckbox("opravneni_allow" /* , 'povolit' */)
+                        ->setValue((@$opravneni[$rule_id]->allowed == 'Y') ? 1 : 0 );
+                $chk = $subForm->addCheckbox("opravneni_deny" /* , 'zakázat' */)
+                        ->setValue((@$opravneni[$rule_id]->allowed == 'N') ? 1 : 0 );
                 // zakaž možnost odepřít oprávnění administátora a vedoucího
                 if ($rule['resource'] == NULL) {
                     $chk->setDisabled();
@@ -267,11 +261,10 @@ class Admin_OpravneniPresenter extends BasePresenter
         }
 
         $form1->addSubmit('upravit', 'Upravit oprávnění')
-                 ->onClick[] = array($this, 'upravitOpravneniClicked');
+                ->onClick[] = array($this, 'upravitOpravneniClicked');
 
         return $form1;
     }
-
 
     public function upravitOpravneniClicked(Nette\Forms\Controls\SubmitButton $button)
     {
@@ -280,7 +273,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $AclModel = new AclModel();
         $role_id = (int) $data['id'];
         unset($data['id']);
-        
+
         $RoleModel = new RoleModel();
         $role = $RoleModel->getInfo($role_id);
         $opravneni = $AclModel->seznamOpravneni($role->code);
@@ -288,7 +281,7 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         // Zkontroluj, zda lze roli menit
         if (!self::lzeMenitRoli($role)) {
-            $this->redirect('this',array('id'=>$role_id));
+            $this->redirect('this', array('id' => $role_id));
             return;
         }
 
@@ -298,64 +291,62 @@ class Admin_OpravneniPresenter extends BasePresenter
             $rule_id = (int) substr($id, 4);
 
             // porovnat s puvodnim daty = opravneni, ktere se nemenily, vyradime
-            if ( isset($opravneni[ $rule_id ]) ) {
-                $bool = ($opravneni[ $rule_id ]->allowed=='Y');
-                if ( ($bool == TRUE) && ($stav['opravneni_allow']==TRUE) ) {
+            if (isset($opravneni[$rule_id])) {
+                $bool = ($opravneni[$rule_id]->allowed == 'Y');
+                if (($bool == TRUE) && ($stav['opravneni_allow'] == TRUE)) {
                     unset($data[$id]);
-                    unset($opravneni[ $rule_id ]);
+                    unset($opravneni[$rule_id]);
                     continue;
-                } else if ( ($bool == FALSE) && ($stav['opravneni_deny']==TRUE) ) {
+                } else if (($bool == FALSE) && ($stav['opravneni_deny'] == TRUE)) {
                     unset($data[$id]);
-                    unset($opravneni[ $rule_id ]);
+                    unset($opravneni[$rule_id]);
                     continue;
                 }
             }
 
             // Vyradime FALSE data - nebyly vybrany
-            if ( $stav['opravneni_allow']==FALSE && $stav['opravneni_deny']==FALSE ) {
-                    unset($data[$id]);
-                    continue;
+            if ($stav['opravneni_allow'] == FALSE && $stav['opravneni_deny'] == FALSE) {
+                unset($data[$id]);
+                continue;
             }
-
         }
 
         // Odebrani zbyvajicich opravneni = oznaceny k odebrani
-        if ( count($opravneni) > 0 ) {
+        if (count($opravneni) > 0) {
             foreach ($opravneni as $orid => $oo) {
                 $AclModel->deleteAcl(array(
-                                    array('rule_id=%i',$orid),
-                                    array('role_id=%i',$role_id)
-                                    )
-                                 );
+                    array('rule_id=%i', $orid),
+                    array('role_id=%i', $role_id)
+                        )
+                );
             }
         }
 
         // Pridani novych opravneni
-        if ( count($data) > 0 ) {
+        if (count($data) > 0) {
             foreach ($data as $id => $stav) {
                 $rule_id = (int) substr($id, 4);
 
-                if ( $stav['opravneni_allow'] == TRUE ) {
+                if ($stav['opravneni_allow'] == TRUE) {
                     $allowed = 'Y';
                 } else {
                     $allowed = 'N';
                 }
-                $new = array('role_id'=>$role_id,
-                             'rule_id'=>$rule_id,
-                             'allowed'=>$allowed);
+                $new = array('role_id' => $role_id,
+                    'rule_id' => $rule_id,
+                    'allowed' => $allowed);
 
                 $AclModel->insertAcl($new);
-
             }
         }
 
-        $this->flashMessage('Oprávnění role "'.$role->name.'" bylo upraveno.');
-        $this->redirect('this',array('id'=>$role_id));
+        $this->flashMessage('Oprávnění role "' . $role->name . '" bylo upraveno.');
+        $this->redirect('this', array('id' => $role_id));
     }
 
-/**
- * Formulare pro programatory
- */
+    /**
+     * Formulare pro programatory
+     */
     protected function createComponentNovyResourceForm()
     {
 
@@ -371,10 +362,10 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1->addTextArea('note', 'Popis zdroje:', 50, 5);
 
         $form1->addSubmit('novyresource', 'Vytvořit')
-                 ->onClick[] = array($this, 'novyResourceClicked');
+                ->onClick[] = array($this, 'novyResourceClicked');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
 
@@ -397,12 +388,11 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         try {
             $resource_id = $AclModel->insertResource($data);
-            $this->flashMessage('Resource  "'. $data['name'] .'" byl vytvořen.');
-            $this->redirect(':Admin:Opravneni:detail',array('id'=>$role_id));
+            $this->flashMessage('Resource  "' . $data['name'] . '" byl vytvořen.');
+            $this->redirect(':Admin:Opravneni:detail', array('id' => $role_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Resource "'. $data['name'] .'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage('Resource "' . $data['name'] . '" se nepodařilo vytvořit.', 'warning');
         }
-
     }
 
     protected function createComponentNovePravidloForm()
@@ -414,7 +404,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $resource_data = $AclModel->getResources(1);
         $resource = array();
         foreach ($resource_data as $r) {
-            $resource[ $r->id ] = $r->code;
+            $resource[$r->id] = $r->code;
         }
 
         $form1 = new Nette\Application\UI\Form();
@@ -426,10 +416,10 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1->addSelect('resource_id', 'Resource:', $resource);
         $form1->addText('privilege', 'Privilege:', 50, 100);
         $form1->addSubmit('novepravidlo', 'Vytvořit')
-                 ->onClick[] = array($this, 'novePravidloClicked');
+                ->onClick[] = array($this, 'novePravidloClicked');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
 
@@ -452,13 +442,11 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         try {
             $rule_id = $AclModel->insertRule($data);
-            $this->flashMessage('Pravidlo  "'. $data['name'] .'" bylo vytvořeno.');
-            $this->redirect(':Admin:Opravneni:detail',array('id'=>$role_id));
+            $this->flashMessage('Pravidlo  "' . $data['name'] . '" bylo vytvořeno.');
+            $this->redirect(':Admin:Opravneni:detail', array('id' => $role_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Pravidlo "'. $data['name'] .'" se nepodařilo vytvořit.','warning');
+            $this->flashMessage('Pravidlo "' . $data['name'] . '" se nepodařilo vytvořit.', 'warning');
         }
-
-
     }
 
     // Vraci:  0 - nelze menit
@@ -468,7 +456,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     {
         if (!is_object($role))
             throw new InvalidArgumentException("Parametr 'role' není objekt.");
-        return in_array($role->code, array("admin", "superadmin"))
-            ? 2 : 1;
+        return in_array($role->code, array("admin", "superadmin")) ? 2 : 1;
     }
+
 }

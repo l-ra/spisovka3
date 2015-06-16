@@ -17,11 +17,7 @@ class Admin_ProtokolPresenter extends BasePresenter
         $user_id = null;
         $LogModel = new LogModel();
 
-        $this->template->seznam = $LogModel->seznamPristupu($limit,$offset,$user_id);
-
-
+        $this->template->seznam = $LogModel->seznamPristupu($limit, $offset, $user_id);
     }
-
-
 
 }

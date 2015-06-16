@@ -12,45 +12,43 @@ class Admin_SpisznakPresenter extends BasePresenter
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+                    : 20;
 
-        $where = null;// array( array('ciselna_rada LIKE %s','ORG_12%') );
+        $where = null; // array( array('ciselna_rada LIKE %s','ORG_12%') );
 
         $SpisovyZnak = new SpisovyZnak();
-        $result = $SpisovyZnak->seznam($where,5);
+        $result = $SpisovyZnak->seznam($where, 5);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        
-/*        $seznam = $result->fetchAll();//($paginator->offset, $paginator->itemsPerPage);
-        //natsort($seznam);
-        echo "<pre>";
-        //print_r($seznam);
-        foreach ( $seznam as $s ) {
-            echo $s->nazev ."\n";
-        }
-        echo "</pre>";
-        exit;
-*/        
-        $this->template->seznam = $seznam;
 
+        /*        $seznam = $result->fetchAll();//($paginator->offset, $paginator->itemsPerPage);
+          //natsort($seznam);
+          echo "<pre>";
+          //print_r($seznam);
+          foreach ( $seznam as $s ) {
+          echo $s->nazev ."\n";
+          }
+          echo "</pre>";
+          exit;
+         */
+        $this->template->seznam = $seznam;
     }
 
     public function actionNovy()
     {
         $this->template->title = " - Nový spisový znak";
-
     }
-
 
     public function renderDetail()
     {
-        $this->template->FormUpravit = $this->getParameter('upravit',null);
-        $id = $this->getParameter('id',null);
+        $this->template->FormUpravit = $this->getParameter('upravit', null);
+        $id = $this->getParameter('id', null);
 
         $SpisovyZnak = new SpisovyZnak();
         $this->spisznak = $SpisovyZnak->getInfo($id);
         $this->template->SpisZnak = $this->spisznak;
-        
+
         $this->template->has_children = $SpisovyZnak->ma_podrizene_spisove_znaky($id);
 
         $this->template->title = " - Detail spisového znaku";
@@ -59,19 +57,20 @@ class Admin_SpisznakPresenter extends BasePresenter
 
     protected function _odebrat($odebrat_strom)
     {
-        $spisznak_id = $this->getParameter('id',null);
+        $spisznak_id = $this->getParameter('id', null);
         $SpisovyZnak = new SpisovyZnak();
         $res = $SpisovyZnak->odstranit($spisznak_id, $odebrat_strom);
-        if ( !$res )
-            $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.','warning_ext');                    
-        else 
+        if (!$res)
+            $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.',
+                    'warning_ext');
+        else
             $this->flashMessage('Spisový znak byl úspěšně odstraněn.');
-            
+
         $this->redirect(':Admin:Spisznak:seznam');
     }
 
     public function actionOdebrat()
-    {   
+    {
         $this->_odebrat(false);
     }
 
@@ -79,82 +78,78 @@ class Admin_SpisznakPresenter extends BasePresenter
     {
         $this->_odebrat(true);
     }
-    
+
     public function renderNovy()
     {
         $this->template->novyForm = $this['novyForm'];
     }
-    
+
     public function renderImport()
     {
-    }    
-    
+        
+    }
+
     public function renderExport()
     {
-        
-        if ( $this->getHttpRequest()->isPost() ) {
+
+        if ($this->getHttpRequest()->isPost()) {
             // Exportovani
             $post_data = $this->getHttpRequest()->getPost();
             //Nette\Diagnostics\Debugger::dump($post_data);
-            
+
             $SpisovyZnak = new SpisovyZnak();
             $args = null;
-            if ( $post_data['export_co'] == 2 ) {
+            if ($post_data['export_co'] == 2) {
                 // pouze aktivni
-                $args['where'] = array( array('stav=1') );
+                $args['where'] = array(array('stav=1'));
             }
-            
-            $seznam = $SpisovyZnak->seznam($args,5)->fetchAll();
-            
-            if ( $seznam ) {
-                
-                if ( $post_data['export_do'] == "csv" ) {
+
+            $seznam = $SpisovyZnak->seznam($args, 5)->fetchAll();
+
+            if ($seznam) {
+
+                if ($post_data['export_do'] == "csv") {
                     // export do CSV
-                    $ignore_cols = array("date_created","user_created","date_modified","user_modified",
-                                         "sekvence_string");
+                    $ignore_cols = array("date_created", "user_created", "date_modified", "user_modified",
+                        "sekvence_string");
                     $export_data = CsvExport::csv(
-                                    $seznam, 
-                                    $ignore_cols, 
-                                    $post_data['csv_code'], 
-                                    $post_data['csv_radek'], 
-                                    $post_data['csv_sloupce'], 
+                                    $seznam, $ignore_cols, $post_data['csv_code'],
+                                    $post_data['csv_radek'], $post_data['csv_sloupce'],
                                     $post_data['csv_hodnoty']);
-                    
+
                     //echo "<pre>"; echo $export_data; echo "</pre>"; exit;
-                
+
                     $httpResponse = $this->getHttpResponse();
                     $httpResponse->setContentType('application/octetstream');
                     $httpResponse->setHeader('Content-Description', 'File Transfer');
-                    $httpResponse->setHeader('Content-Disposition', 'attachment; filename="export_subjektu.csv"');
+                    $httpResponse->setHeader('Content-Disposition',
+                            'attachment; filename="export_subjektu.csv"');
                     $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
                     $httpResponse->setHeader('Expires', '0');
-                    $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+                    $httpResponse->setHeader('Cache-Control',
+                            'must-revalidate, post-check=0, pre-check=0');
                     $httpResponse->setHeader('Pragma', 'public');
                     $httpResponse->setHeader('Content-Length', strlen($export_data));
-                    echo $export_data;  
+                    echo $export_data;
                     exit;
-                
                 }
-                
             } else {
                 $this->flashMessage('Nebyly nalezany žádné data k exportu!', 'warning');
             }
         }
-        
-    }    
-    
-/**
- *
- * Formular a zpracovani pro zmenu spisoveho znaku
- *
- */
+    }
 
+    /**
+     *
+     * Formular a zpracovani pro zmenu spisoveho znaku
+     *
+     */
     protected function createComponentUpravitForm()
     {
 
         $SpisovyZnak = new SpisovyZnak();
-        if ( empty($this->spisznak) ) {
-            $id = $this->getParameter('id',null);
+        if (empty($this->spisznak)) {
+            $id = $this->getParameter('id', null);
             if ($id !== null)
                 $spisznak = $SpisovyZnak->getInfo($id);
             else
@@ -164,8 +159,8 @@ class Admin_SpisznakPresenter extends BasePresenter
         }
         $spisznak_seznam = $SpisovyZnak->selectBox(1, @$spisznak->id);
         $stav_select = SpisovyZnak::stav();
-        $spousteci = SpisovyZnak::spousteci_udalost(null,1);
-        $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
+        $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
+        $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
 
         $form1 = new Spisovka\Form();
@@ -188,17 +183,17 @@ class Admin_SpisznakPresenter extends BasePresenter
                 ->setValue(@$spisznak->parent_id);
         $form1->addHidden('parent_id_old')
                 ->setValue(@$spisznak->parent_id);
-        $form1->addSelect('selected', 'Možnost vybrat:', array("1"=>"ano","0"=>"ne"))
-                ->setValue(@$spisznak->selected);        
+        $form1->addSelect('selected', 'Možnost vybrat:', array("1" => "ano", "0" => "ne"))
+                ->setValue(@$spisznak->selected);
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
                 ->setValue(@$spisznak->stav);
 
         $submit = $form1->addSubmit('upravit', 'Upravit');
         $submit->onClick[] = array($this, 'upravitClicked');
-        
+
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
 
         $renderer = $form1->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
@@ -208,7 +203,7 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         return $form1;
     }
-    
+
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -220,20 +215,20 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         try {
             $SpisovyZnak->upravit($data, $spisznak_id);
-            $this->flashMessage('Spisový znak  "'. $data['nazev'] .'"  byl upraven.');
-            
+            $this->flashMessage('Spisový znak  "' . $data['nazev'] . '"  byl upraven.');
         } catch (Exception $e) {
-            $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo upravit.','warning');
-            $this->flashMessage($e->getMessage(),'warning');
+            $this->flashMessage('Spisový znak "' . $data['nazev'] . '" se nepodařilo upravit.',
+                    'warning');
+            $this->flashMessage($e->getMessage(), 'warning');
         }
 
-        $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
+        $this->redirect(':Admin:Spisznak:detail', array('id' => $spisznak_id));
     }
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $this->redirect('this',array('id'=>$data['id']));
+        $this->redirect('this', array('id' => $data['id']));
     }
 
     public function stornoNovyClicked(Nette\Forms\Controls\SubmitButton $button)
@@ -246,8 +241,8 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->selectBox(1);
-        $spousteci = SpisovyZnak::spousteci_udalost(null,1);
-        $skar_znak = array('A'=>'A','S'=>'S','V'=>'V');
+        $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
+        $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
         $form1 = new Nette\Application\UI\Form();
         $form1->addText('nazev', 'Spisový znak:', 50, 80)
@@ -256,16 +251,16 @@ class Admin_SpisznakPresenter extends BasePresenter
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta', 'Skartační lhůta:', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci)
-            ->setValue(3); // Standardni udalost je "Skartační lhůta začíná plynout po uzavření dokumentu."
+                ->setValue(3); // Standardni udalost je "Skartační lhůta začíná plynout po uzavření dokumentu."
         $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
-        $form1->addSelect('selected', 'Možnost vybrat:', array("1"=>"ano","0"=>"ne"));
+        $form1->addSelect('selected', 'Možnost vybrat:', array("1" => "ano", "0" => "ne"));
         $form1->addSubmit('vytvorit', 'Vytvořit')
-                 ->onClick[] = array($this, 'vytvoritClicked');
+                ->onClick[] = array($this, 'vytvoritClicked');
         $form1->addSubmit('vytvorit_a_novy', 'Vytvořit spisový znak a založit nový')
-                 ->onClick[] = array($this, 'vytvoritanovyClicked');
+                ->onClick[] = array($this, 'vytvoritanovyClicked');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoNovyClicked');
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoNovyClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
 
@@ -286,20 +281,22 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         try {
             $spisznak_id = $SpisovyZnak->vytvorit($data);
-            if ( is_object($spisznak_id) ) {
-                $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
-                $this->flashMessage($spisznak_id->getMessage(),'warning');
+            if (is_object($spisznak_id)) {
+                $this->flashMessage('Spisový znak "' . $data['nazev'] . '" se nepodařilo vytvořit.',
+                        'warning');
+                $this->flashMessage($spisznak_id->getMessage(), 'warning');
                 //$this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
             } else {
-                $this->flashMessage('Spisový znak  "'. $data['nazev'] .'" byl vytvořen.');
-                $this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
-            }              
+                $this->flashMessage('Spisový znak  "' . $data['nazev'] . '" byl vytvořen.');
+                $this->redirect(':Admin:Spisznak:detail', array('id' => $spisznak_id));
+            }
         } catch (DibiException $e) {
-            $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
-            $this->flashMessage($e->getMessage(),'warning');
+            $this->flashMessage('Spisový znak "' . $data['nazev'] . '" se nepodařilo vytvořit.',
+                    'warning');
+            $this->flashMessage($e->getMessage(), 'warning');
         }
     }
-    
+
     public function vytvoritanovyClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -308,12 +305,13 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         try {
             $spisznak_id = $SpisovyZnak->vytvorit($data);
-            $this->flashMessage('Spisový znak "'. $data['nazev'] .'"  byl vytvořen.');
+            $this->flashMessage('Spisový znak "' . $data['nazev'] . '"  byl vytvořen.');
             $this->redirect(':Admin:Spisznak:novy');
         } catch (DibiException $e) {
-            $this->flashMessage('Spisový znak "'. $data['nazev'] .'" se nepodařilo vytvořit.','warning');
-            $this->flashMessage($e->getMessage(),'warning');
+            $this->flashMessage('Spisový znak "' . $data['nazev'] . '" se nepodařilo vytvořit.',
+                    'warning');
+            $this->flashMessage($e->getMessage(), 'warning');
         }
-    }    
+    }
 
 }

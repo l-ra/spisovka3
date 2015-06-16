@@ -10,17 +10,18 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+                    : 20;
 
         // hledani
         $this->hledat = "";
         $this->template->no_items = 0;
         $args = null;
-        if ( isset($hledat) ) {
+        if (isset($hledat)) {
             $args = array(array(
-                    'plny_nazev LIKE %s OR','%'.$hledat.'%',
-                    'zkraceny_nazev LIKE %s OR','%'.$hledat.'%',
-                    'ciselna_rada LIKE %s','%'.$hledat.'%'
+                    'plny_nazev LIKE %s OR', '%' . $hledat . '%',
+                    'zkraceny_nazev LIKE %s OR', '%' . $hledat . '%',
+                    'ciselna_rada LIKE %s', '%' . $hledat . '%'
                 )
             );
 
@@ -29,47 +30,43 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         }
 
         $OrgJednotka = new Orgjednotka();
-       
-        $result = $OrgJednotka->seznam($args,1);
+
+        $result = $OrgJednotka->seznam($args, 1);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
 
         $this->template->seznam = $seznam;
-
     }
 
     public function actionNovy()
     {
         $this->template->title = " - Nová organizační jednotka";
-
     }
-
 
     public function actionDetail()
     {
+        
     }
 
     public function renderDetail()
     {
         $this->template->title = " - Detail organizační jednotky";
 
-        $orgjednotka_id = $this->getParameter('id',null);
+        $orgjednotka_id = $this->getParameter('id', null);
         $OrgJednotka = new Orgjednotka();
 
         $org = $OrgJednotka->getInfo($orgjednotka_id);
         $this->template->OrgJednotka = $org;
 
         // Zmena udaju organizacni jednotky
-        $this->template->FormUpravit = $this->getParameter('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit', null);
     }
 
-
-/**
- *
- * Formular a zpracovani pro zmenu udaju org. jednotky
- *
- */
-
+    /**
+     *
+     * Formular a zpracovani pro zmenu udaju org. jednotky
+     *
+     */
     protected function createComponentUpravitForm()
     {
 
@@ -90,7 +87,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
                 ->addRule(Nette\Forms\Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
         $form1->addTextArea('note', 'Informace:', 50, 5)
                 ->setValue(@$org->note);
-        $form1->addSelect('stav', 'Stav:', array(0=>'neaktivní',1=>'aktivní'))
+        $form1->addSelect('stav', 'Stav:', array(0 => 'neaktivní', 1 => 'aktivní'))
                 ->setValue(@$org->stav);
         $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam)
                 ->setValue(@$org->parent_id);
@@ -98,10 +95,10 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
                 ->setValue(@$org->parent_id);
 
         $form1->addSubmit('upravit', 'Upravit')
-                 ->onClick[] = array($this, 'upravitClicked');
+                ->onClick[] = array($this, 'upravitClicked');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
 
 
 
@@ -116,7 +113,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         return $form1;
     }
 
-
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -127,25 +123,25 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         try {
             $res = $OrgJednotka->ulozit($data, $orgjednotka_id);
-            
-            if ( is_object($res) ) {
-                $this->flashMessage('Organizační jednotku  "'. $data['zkraceny_nazev'] .'" se nepodařilo upravit.','warning');
-                $this->flashMessage($res->getMessage(),'warning');
+
+            if (is_object($res)) {
+                $this->flashMessage('Organizační jednotku  "' . $data['zkraceny_nazev'] . '" se nepodařilo upravit.', 'warning');
+                $this->flashMessage($res->getMessage(), 'warning');
             } else {
-                $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'"  byla upravena.');
-            }            
+                $this->flashMessage('Organizační jednotka  "' . $data['zkraceny_nazev'] . '"  byla upravena.');
+            }
         } catch (DibiException $e) {
-            $this->flashMessage('Organizační jednotku  "'. $data['zkraceny_nazev'] .'" se nepodařilo upravit.','warning');
-            $this->flashMessage($e->getMessage(),'warning');
+            $this->flashMessage('Organizační jednotku  "' . $data['zkraceny_nazev'] . '" se nepodařilo upravit.', 'warning');
+            $this->flashMessage($e->getMessage(), 'warning');
         }
-        $this->redirect('this',array('id'=>$orgjednotka_id));
+        $this->redirect('this', array('id' => $orgjednotka_id));
     }
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         $orgjednotka_id = $data['id'];
-        $this->redirect('this',array('id'=>$orgjednotka_id));
+        $this->redirect('this', array('id' => $orgjednotka_id));
     }
 
     public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
@@ -168,10 +164,10 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $form1->addTextArea('note', 'Informace:', 50, 5);
         $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam);
         $form1->addSubmit('novy', 'Vytvořit')
-                 ->onClick[] = array($this, 'vytvoritClicked');
+                ->onClick[] = array($this, 'vytvoritClicked');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoSeznamClicked');
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoSeznamClicked');
 
 
 
@@ -194,16 +190,16 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         try {
             $orgjednotka_id = $OrgJednotka->ulozit($data);
-            if ( is_object($orgjednotka_id) ) {
-                $this->flashMessage('Organizační jednotku "'. $data['zkraceny_nazev'] .'" se nepodařilo vytvořit.','warning');
-                $this->flashMessage($orgjednotka_id->getMessage(),'warning');
+            if (is_object($orgjednotka_id)) {
+                $this->flashMessage('Organizační jednotku "' . $data['zkraceny_nazev'] . '" se nepodařilo vytvořit.', 'warning');
+                $this->flashMessage($orgjednotka_id->getMessage(), 'warning');
             } else {
-                $this->flashMessage('Organizační jednotka  "'. $data['zkraceny_nazev'] .'" byla vytvořena.');
-                $this->redirect(':Admin:Orgjednotky:detail',array('id'=>$orgjednotka_id));
-            }               
+                $this->flashMessage('Organizační jednotka  "' . $data['zkraceny_nazev'] . '" byla vytvořena.');
+                $this->redirect(':Admin:Orgjednotky:detail', array('id' => $orgjednotka_id));
+            }
         } catch (DibiException $e) {
-            $this->flashMessage('Organizační jednotku "'. $data['zkraceny_nazev'] .'" se nepodařilo vytvořit.','warning');
-            $this->flashMessage($e->getMessage(),'warning');
+            $this->flashMessage('Organizační jednotku "' . $data['zkraceny_nazev'] . '" se nepodařilo vytvořit.', 'warning');
+            $this->flashMessage($e->getMessage(), 'warning');
         }
     }
 
@@ -222,15 +218,15 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     protected function createComponentSearchForm()
     {
 
-        $hledat =  !is_null($this->hledat)?$this->hledat:'';
+        $hledat = !is_null($this->hledat) ? $this->hledat : '';
 
         $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)
-                 ->setValue($hledat);
+                ->setValue($hledat);
         $form['dotaz']->getControlPrototype()->title = "Hledat lze názvu organizační jednotky (plný, zkrácený, zkratka)";
 
         $form->addSubmit('hledat', 'Hledat')
-                 ->onClick[] = array($this, 'hledatSimpleClicked');
+                ->onClick[] = array($this, 'hledatSimpleClicked');
 
         //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
@@ -246,8 +242,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $this->redirect('this', array('hledat'=>$data['dotaz']));
-
+        $this->redirect('this', array('hledat' => $data['dotaz']));
     }
 
 }
