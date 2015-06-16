@@ -9,7 +9,6 @@ class ShutdownHandler
         if (strpos($error['message'], 'aximum execution time') !== false) {
             echo 'Zpracování požadavku bylo přerušeno z důvodu překročení povoleného časového limitu.';
         }
-
     }
 
 }

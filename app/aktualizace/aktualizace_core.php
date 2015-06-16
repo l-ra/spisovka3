@@ -1,22 +1,23 @@
 <?php
 
-
-class Updates {
+class Updates
+{
 
     public static $update_dir;
     public static $alter_scripts = array();
     public static $revisions = array();
     public static $descriptions = array();
     public static $clients = array();
-    
-    public static function init() {
+
+    public static function init()
+    {
         self::$update_dir = APP_DIR . '/aktualizace/';
     }
-    
+
     /**
      *  $contents bude obsahovat obsah souboru v pripade, ze je soubor v ZIP archivu
      */
-    protected static function _process_file($filename, $contents) 
+    protected static function _process_file($filename, $contents)
     {
         if ($filename == 'information.txt') {
             $info = file(self::$update_dir . $filename);
@@ -24,31 +25,28 @@ class Updates {
                 self::$descriptions = self::_parse_info_file($info);
             return;
         }
-        
+
         $parts = explode("_", $filename);
         if (is_numeric($parts[0])) {
-        
+
             $revision = $parts[0];
             self::$revisions[$revision] = $revision;
-            
-            if (strpos($filename,"_alter.sql") !== false) {
-                $sql_source = $contents ? $contents 
-                                        : file_get_contents(self::$update_dir . $filename);
+
+            if (strpos($filename, "_alter.sql") !== false) {
+                $sql_source = $contents ? $contents : file_get_contents(self::$update_dir . $filename);
                 $sql_queries = explode(";", $sql_source);
                 // odstran komentar na zacatku souboru, ktery je oddelen strednikem
                 unset($sql_queries[0]);
                 self::$alter_scripts[$revision] = $sql_queries;
-            }                
-            
+            }
         }
-        
     }
-    
+
     public static function find_updates()
     {
         self::$alter_scripts = array();
         self::$revisions = array();
-        
+
         $dir_handle = opendir(self::$update_dir);
         if ($dir_handle === FALSE)
             throw new Exception(__METHOD__ . "() - nemohu otevřít adresář " . self::$update_dir);
@@ -63,55 +61,55 @@ class Updates {
             $filename = $stat['name'];
             self::_process_file($filename, $zip->getFromName($filename));
         }
-        
+
         while (($filename = readdir($dir_handle)) !== false) {
             self::_process_file($filename, null);
         }
-        
+
         closedir($dir_handle);
-        
-        ksort( self::$revisions, SORT_NUMERIC ); //setridit pole, aby se alter skripty spoustely ve spravnem poradi
-        
-        return array('revisions' => self::$revisions, 'alter_scripts' => self::$alter_scripts, 
-                'descriptions' => self::$descriptions);
+
+        ksort(self::$revisions, SORT_NUMERIC); //setridit pole, aby se alter skripty spoustely ve spravnem poradi
+
+        return array('revisions' => self::$revisions, 'alter_scripts' => self::$alter_scripts,
+            'descriptions' => self::$descriptions);
     }
 
     protected static function _parse_info_file($info)
-    {    
+    {
         $rev = 0;
         $a = array();
-        
+
         foreach ($info as $line) {
             if ($line{0} == '[')
                 if (preg_match('/^\[(\d+)\]/', $line, $matches) == 1) {
                     $rev = $matches[1];
                     continue;
                 }
-                
+
             // ignoruj prazdny radek
             /* if (trim($line) === '')
-                continue; */
-                
+              continue; */
+
             if (!isset($a[$rev]))
                 $a[$rev] = '';
             $a[$rev] .= $line;
         }
-        
+
         return $a;
     }
-    
+
     public static function find_clients()
-    {    
+    {
         $clients = array();
-        if ( defined('MULTISITE') && MULTISITE == 1 ) {
+        if (defined('MULTISITE') && MULTISITE == 1) {
             $clients_dir = dirname(APP_DIR) . "/clients";
             $dh = opendir($clients_dir);
             if ($dh !== false)
                 while (($filename = readdir($dh)) !== false) {
                     if ($filename == "." || $filename == ".." || $filename[0] == '@')
-                        // Adresáře začínající na @ jsou speciální adresáře, není tam instalace klienta
+                    // Adresáře začínající na @ jsou speciální adresáře, není tam instalace klienta
                         continue;
-                        
+
                     if (is_dir("$clients_dir/$filename"))
                         $clients["$clients_dir/$filename"] = "$filename ($clients_dir/$filename)";
                 }
@@ -119,7 +117,7 @@ class Updates {
             $client_dir = dirname(APP_DIR) . "/client";
             $clients[$client_dir] = "STANDALONE ($client_dir)";
         }
-        
+
         asort($clients);     // Setrid klienty podle abeceny  
         self::$clients = $clients;
         return $clients;
@@ -127,36 +125,34 @@ class Updates {
 
 }
 
-
-class Client_To_Update {
+class Client_To_Update
+{
 
     private $db_config;
     private $path;   // cesta k adresari klienta v souborovem systemu
     private $revision_filename;
-    
+
     public function __construct($path_to_client)
-    {   
+    {
         $this->path = $path_to_client;
-        $this->revision_filename = "{$this->path}/configs/_aktualizace";        
+        $this->revision_filename = "{$this->path}/configs/_aktualizace";
     }
 
     public function get_db_config()
     {
         if (!$this->db_config)
-            // neprovadej autoload tridy, abychom poznali, jestli jsme volani ze spisovky
-            // nebo z aktualizacniho skriptu
+        // neprovadej autoload tridy, abychom poznali, jestli jsme volani ze spisovky
+        // nebo z aktualizacniho skriptu
             if (class_exists('\Nette\Environment', false)) {
                 $config = \Nette\Environment::getConfig('database');
                 $this->db_config = $config;
-            }
-            else if (is_file("{$this->path}/configs/database.neon")) {
+            } else if (is_file("{$this->path}/configs/database.neon")) {
                 $data = (new Spisovka\ConfigDatabase($this->path))->get();
                 $this->db_config = $data->parameters->database;
                 $this->db_config->profiler = false;
-            }
-            else {
+            } else {
                 $ini = parse_ini_file("{$this->path}/configs/system.ini", true);
-                if ($ini !== FALSE)            
+                if ($ini !== FALSE)
                     $this->db_config = array(
                         "driver" => $ini['common']['database.driver'],
                         "host" => $ini['common']['database.host'],
@@ -185,28 +181,26 @@ class Client_To_Update {
         try {
             dibi::connect($db_config);
             dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];
-        }
-        catch(DibiException $e) {
+        } catch (DibiException $e) {
             throw new Exception("Nepodařilo se připojit k databázi. Klienta nelze aktualizovat.");
         }
     }
-    
+
     function get_revision_number()
     {
         $revision = 0;
-        
+
         try {
             $result = dibi::query("SELECT [value] FROM %n WHERE [name] = 'db_revision'",
-                $this->db_config['prefix'] . 'settings');
+                            $this->db_config['prefix'] . 'settings');
             if (count($result) > 0) {
                 $revision = $result->fetchSingle();
                 return $revision;
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             // V databazi pravdepodobne neexistuje zminena tabulka
         }
-        
+
         if (file_exists($this->revision_filename)) {
             $revision = trim(file_get_contents($this->revision_filename));
             if (empty($revision))
@@ -218,25 +212,22 @@ class Client_To_Update {
     function update_revision_number($revision)
     {
         try {
-            dibi::query('UPDATE %n', $this->db_config['prefix'] . 'settings', 'SET [value] = %i',
-                $revision, "WHERE [name] = 'db_revision'");
-            
+            dibi::query('UPDATE %n', $this->db_config['prefix'] . 'settings',
+                    'SET [value] = %i', $revision, "WHERE [name] = 'db_revision'");
+
             // pokud je cislo revize v databazi, je soubor nadbytecny
             // ingoruj, pokud soubor neexistuje
             @unlink($this->revision_filename);
-            
+
             return true;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             // V databazi pravdepodobne neexistuje zminena tabulka
             // fall through
         }
-        
+
         return file_put_contents($this->revision_filename, $revision);
     }
-    
-    
-}
 
+}
 
 ?>

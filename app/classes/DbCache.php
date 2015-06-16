@@ -1,14 +1,15 @@
 <?php
 
-class DBCache {
+class DBCache
+{
 
     protected static $cache = null;
-    
-    protected static function init() {
-    
+
+    protected static function init()
+    {
         static $initialized = false;
         if (!$initialized) {
-        
+
             $initialized = true;
             $setting = Nette\Environment::getConfig('database')->cache;
             $should_cache = $setting == 1;
@@ -18,21 +19,21 @@ class DBCache {
         }
     }
 
-    public static function get($key) {
-    
+    public static function get($key)
+    {
         self::init();
         return self::$cache !== null ? self::$cache[$key] : null;
     }
 
-    public static function set($key, $value) {
-    
+    public static function set($key, $value)
+    {
         self::init();
         if (self::$cache !== null)
             self::$cache[$key] = $value;
     }
 
-    public static function delete($key) {
-    
+    public static function delete($key)
+    {
         self::init();
         if (self::$cache !== null)
             unset(self::$cache[$key]);

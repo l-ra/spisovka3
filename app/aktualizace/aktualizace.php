@@ -41,7 +41,7 @@ try {
     ini_set('display_errors', 1);
     set_time_limit(0);
 
-    define ('VENDOR_DIR', dirname(APP_DIR) . '/vendor');
+    define('VENDOR_DIR', dirname(APP_DIR) . '/vendor');
     require VENDOR_DIR . '/autoload.php';
 
     $loader = new Nette\Loaders\RobotLoader();
@@ -49,11 +49,11 @@ try {
     // neukladej nikam cache
     $loader->setCacheStorage(new Nette\Caching\Storages\DevNullStorage());
     $loader->register();
-        
-    define('UPDATE_DIR', APP_DIR . '/aktualizace/');    
-    
+
+    define('UPDATE_DIR', APP_DIR . '/aktualizace/');
+
     require 'is_installed.php';
-    
+
     Updates::init();
 
     $res = Updates::find_updates();
@@ -61,10 +61,9 @@ try {
     $alter_scripts = $res['alter_scripts'];
     $descriptions = $res['descriptions'];
     assert('count($revisions) > 0');
-    
+
     $clients = Updates::find_clients();
-}
-catch (Exception $e) {
+} catch (Exception $e) {
     error($e->getMessage());
     die;
 }
@@ -77,49 +76,49 @@ catch (Exception $e) {
         
 <?php    
 
-    $do_update = isset($_GET['go']);     
-      
-    foreach ( $clients as $site_path => $site_name ) {
-        
-        echo "<div class='update_site'>";
-        echo "<h1>$site_name</h1>";
+$do_update = isset($_GET['go']);
 
-        try {        
-            $client = new Client_To_Update($site_path);
-            
-            $config = $client->get_db_config();
-            
-            echo '<div class="dokument_blok">';
-            echo '<dl class="detail_item">';
-            echo '    <dt>Databáze:</dt>';
-            echo '    <dd>'. $config['driver'] .'://'. $config['username'] .'@'. $config['host'] .'/'. $config['database'] .'&nbsp;</dd>';
-            echo '</dl>';        
+foreach ($clients as $site_path => $site_name) {
 
-            $client->connect_to_db();
-            
-            $client_revision = $client->get_revision_number();
-        }
-        catch(Exception $e) {
-            error($e->getMessage());
-            continue;  // jdi na dalsiho klienta
-        }
-        
-        // dibi::getProfiler()->setFile(UPDATE_DIR.'log.sql');   nefunkcni, v adresari s db aktualizacemi nelze zapisovat
-        
+    echo "<div class='update_site'>";
+    echo "<h1>$site_name</h1>";
+
+    try {
+        $client = new Client_To_Update($site_path);
+
+        $config = $client->get_db_config();
+
+        echo '<div class="dokument_blok">';
         echo '<dl class="detail_item">';
-        echo '    <dt>Poslední zjištěná revize klienta:</dt>';
-        echo '    <dd>'. $client_revision .'&nbsp;</dd>';
-        echo '</dl>';        
-                    
-        echo '</div>';
-        echo '<br />';
+        echo '    <dt>Databáze:</dt>';
+        echo '    <dd>' . $config['driver'] . '://' . $config['username'] . '@' . $config['host'] . '/' . $config['database'] . '&nbsp;</dd>';
+        echo '</dl>';
 
-        $found_update = false; $rev_error = false;
-            
-        foreach( $revisions as $rev ) {
-            if ( $rev > $client_revision) {
-                
-                try {
+        $client->connect_to_db();
+
+        $client_revision = $client->get_revision_number();
+    } catch (Exception $e) {
+        error($e->getMessage());
+        continue;  // jdi na dalsiho klienta
+    }
+
+    // dibi::getProfiler()->setFile(UPDATE_DIR.'log.sql');   nefunkcni, v adresari s db aktualizacemi nelze zapisovat
+
+    echo '<dl class="detail_item">';
+    echo '    <dt>Poslední zjištěná revize klienta:</dt>';
+    echo '    <dd>' . $client_revision . '&nbsp;</dd>';
+    echo '</dl>';
+
+    echo '</div>';
+    echo '<br />';
+
+    $found_update = false;
+    $rev_error = false;
+
+    foreach ($revisions as $rev) {
+        if ($rev > $client_revision) {
+
+            try {
 
                 // Check skripty se pouzivaly v minulosti, kdy nebylo mozne spolehlive urcit revizi klienta
                 $function_name = "is_installed_{$rev}";
@@ -127,8 +126,7 @@ catch (Exception $e) {
                     try {
                         if ($function_name())
                             continue; // aktualizace byla jiz provedena a pokracuje se dalsi aktualizaci
-                    }
-                    catch (Exception $e) {
+                    } catch (Exception $e) {
                         error("Při provádění kontrolního skriptu došlo k chybě!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
                         // Je pravděpodobné, že tuto revizi nemá klient nainstalovánu
                         $found_update = true;
@@ -136,18 +134,18 @@ catch (Exception $e) {
                         break;
                     }
                 }
-                
+
                 $found_update = true;
-                
+
                 echo "<div class='update_rev'>";
 
                 // poznamka: transakce nefunguji ocekavanym zpusobem, meni-li se pri nich databazova struktura (coz dela vetsina aktualizaci)
-                if ( $do_update )
+                if ($do_update)
                     dibi::begin();
-                
+
                 // Info
                 echo "<div class='update_title'>Informace o této aktualizaci:</div>";
-                echo "<div class='update_info'><strong>Revize #". $rev ."</strong></div>";
+                echo "<div class='update_info'><strong>Revize #" . $rev . "</strong></div>";
 
                 if (isset($descriptions[$rev]))
                     echo "<div class='update_info'>{$descriptions[$rev]}</div>";
@@ -159,74 +157,73 @@ catch (Exception $e) {
                 if (function_exists($function_name)) {
                     try {
                         $function_name();
-                    }
-                    catch (Exception $e) {
+                    } catch (Exception $e) {
                         $msg = "Při provádění kontroly došlo k chybě! Aktualizaci není možné provést.<br />Popis chyby: ";
                         if ($e->getCode())
                             $msg .= $e->getCode() . ' - ';
                         $msg .= $e->getMessage();
                         error($msg);
-                        
+
                         // Pokud je spuštěna aktualizace, ukonči ji a přeskoč na dalšího klienta
                         // Pokud není, pokračuj v zobrazení a případné kontrole dalších db aktualizací
                         if ($do_update)
                             break;
-
                     }
                 }
-                
+
                 // PRE script
                 $function_name = "revision_{$rev}_before";
                 if (function_exists($function_name)) {
-                    if ( $do_update ) {
+                    if ($do_update) {
                         echo "<div class='update_title'>Provedení PHP skriptu (před aktualizaci databáze)</div>";
                         echo "<pre>";
                         $function_name();
                         echo "</pre>";
-                        
                     } else {
                         echo "<div class='update_title'>Bude proveden PHP skript (před aktualizaci databáze)</div>";
                     }
                 }
-                
+
                 // SQL
-                if ( isset($alter_scripts[$rev]) && count($alter_scripts[$rev])>0 ) {
-                    
-                    if ( $do_update ) {
+                if (isset($alter_scripts[$rev]) && count($alter_scripts[$rev]) > 0) {
+
+                    if ($do_update) {
                         echo "<div class='update_title'>Aktualizace databáze:</div>";
                     } else {
                         echo "<div class='update_title'>Bude provedena aktualizace databáze s následujícími SQL příkazy:</div>";
                     }
-                    
+
                     echo "<pre>";
-                    foreach ( $alter_scripts[$rev] as $query ) {
+                    foreach ($alter_scripts[$rev] as $query) {
                         $query = str_replace("\r", "", $query);
                         $query = str_replace("\n", " ", $query);
                         $query = str_replace("\t", " ", $query);
                         $query = str_replace("{tbls3}", $config['prefix'], $query);
                         $query = trim($query);
-                        if ( empty($query) ) continue;
-                        if ( $query[0] == "-" ) continue;
+                        if (empty($query))
+                            continue;
+                        if ($query[0] == "-")
+                            continue;
 
-                        if ( $do_update ) {
+                        if ($do_update) {
                             try {
                                 dibi::query($query);
-                                echo "<span style='color:green'> >> ". $query ."</span>\n";
-                            } catch ( DibiException $e ) {
-                                echo "<span style='color:red'> >> ". $query ."</span>\n";
+                                echo "<span style='color:green'> >> " . $query . "</span>\n";
+                            } catch (DibiException $e) {
+                                echo "<span style='color:red'> >> " . $query . "</span>\n";
                                 throw $e;
                             }
                         } else {
-                            echo "". $query .";\n";
+                            echo "" . $query . ";\n";
                         }
                     }
                     echo "</pre>";
                 }
-                
+
                 // AFTER source
                 $function_name = "revision_{$rev}_after";
                 if (function_exists($function_name)) {
-                    if ( $do_update ) {
+                    if ($do_update) {
                         echo "<div class='update_title'>Provedení PHP skriptu (po aktualizaci databáze)</div>";
                         echo "<pre>";
                         $function_name();
@@ -234,106 +231,98 @@ catch (Exception $e) {
                     } else {
                         echo "<div class='update_title'>Bude proveden PHP skript (po aktualizaci databáze)</div>";
                     }
-                } 
-                
-                if ( $do_update ) { 
+                }
+
+                if ($do_update) {
                     dibi::commit();
                     // Je nutne provest zaznam po kazde uspesne aktualizaci pro pripad, ze by nektera z aktualizaci byla neuspesna
                     $client->update_revision_number($rev);
                 }
-                
-                } catch (DibiException $e) {
-                    if ( $do_update ) {
-                        dibi::rollback();
-                        error("Došlo k databázové chybě, aktualizace neproběhla úspěšně!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
-                        $rev_error = true;
-                    }
-                    break;
+            } catch (DibiException $e) {
+                if ($do_update) {
+                    dibi::rollback();
+                    error("Došlo k databázové chybě, aktualizace neproběhla úspěšně!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
+                    $rev_error = true;
                 }
-                catch (Exception $e) {
-                    if ( $do_update )
-                        dibi::rollback();
-                    error("Došlo k neočekávané výjimce, ukončuji program.<br />Popis chyby: " . $e->getMessage());
-                    die();
-                }
-                
-                echo "</div>";
+                break;
+            } catch (Exception $e) {
+                if ($do_update)
+                    dibi::rollback();
+                error("Došlo k neočekávané výjimce, ukončuji program.<br />Popis chyby: " . $e->getMessage());
+                die();
             }
-        }
-        
-        if (!$found_update) {
-            echo "<div class='update_no'>Nebyla zjištěna žádná aktualizace. Spisová služba je aktuální.</div>";
-        }
-        
-        if ( $do_update ) {
-            if ( !$rev_error ) 
-                if (!$client->update_revision_number($rev))
-                    error("Upozornění: nepodařilo se zapsat nové číslo verze do souboru _aktualizace");
-                    
-            
-            // vymazeme temp od robotloader, templates a cache
-            // Nemazat temp, pokud zadna aktualizace nebyla provedena
-            if ($found_update)
-                deleteDir($client->get_path() . "/temp/");
-        }
 
-
-        dibi::disconnect();        
-        
-        if ($rev_error)
-    	    break; // Preskoc ostatni klienty - chyba muze byt vazna
-    	    
-        if ($do_update && !$rev_error && $found_update)
-            echo "<p>Aktualizace klienta proběhla úspěšně.</p>";
-            
-        echo "</div>\n\n";
+            echo "</div>";
+        }
     }
 
-    // Konec php programu
+    if (!$found_update) {
+        echo "<div class='update_no'>Nebyla zjištěna žádná aktualizace. Spisová služba je aktuální.</div>";
+    }
+
+    if ($do_update) {
+        if (!$rev_error)
+            if (!$client->update_revision_number($rev))
+                error("Upozornění: nepodařilo se zapsat nové číslo verze do souboru _aktualizace");
 
 
-function deleteDir($dir, $dir_parent = null) 
-{ 
-    if (substr($dir, strlen($dir)-1, 1) != '/') 
-       $dir .= '/'; 
+        // vymazeme temp od robotloader, templates a cache
+        // Nemazat temp, pokud zadna aktualizace nebyla provedena
+        if ($found_update)
+            deleteDir($client->get_path() . "/temp/");
+    }
 
-    if ( empty($dir) || $dir == "/" || $dir == "." || $dir == ".." ) {
-       // zamezeni aspon zakladnich adresaru, ktere mohou delat neplechu
-       return false;
+
+    dibi::disconnect();
+
+    if ($rev_error)
+        break; // Preskoc ostatni klienty - chyba muze byt vazna
+
+    if ($do_update && !$rev_error && $found_update)
+        echo "<p>Aktualizace klienta proběhla úspěšně.</p>";
+
+    echo "</div>\n\n";
+}
+
+// Konec php programu
+
+
+function deleteDir($dir, $dir_parent = null)
+{
+    if (substr($dir, strlen($dir) - 1, 1) != '/')
+        $dir .= '/';
+
+    if (empty($dir) || $dir == "/" || $dir == "." || $dir == "..") {
+        // zamezeni aspon zakladnich adresaru, ktere mohou delat neplechu
+        return false;
     }
 
     // potlac pripadne varovani, je mozne, ze do adresare nemame pristup (pripad hostingu)
-    if ($handle = @opendir($dir)) 
-    { 
-        while ($obj = readdir($handle)) 
-        { 
+    if ($handle = @opendir($dir)) {
+        while ($obj = readdir($handle)) {
             // git neumi spravovat prazdne adresare, proto v adresari temp je stub soubor .gitignore
-            if ($obj != '.' && $obj != '..' && $obj != '.gitignore') 
-            { 
-               if (is_dir($dir.$obj)) 
-               { 
-                   if (!deleteDir($dir.$obj,$dir)) 
-                       return false; 
-               } 
-               elseif (is_file($dir.$obj)) 
-               { 
-                   if (!@unlink($dir.$obj)) 
-                       return false; 
-               } 
-            } 
-        } 
-        closedir($handle); 
-
-        if ( !is_null($dir_parent) ) {
-           if (!@rmdir($dir)) 
-               return false; 
+            if ($obj != '.' && $obj != '..' && $obj != '.gitignore') {
+                if (is_dir($dir . $obj)) {
+                    if (!deleteDir($dir . $obj, $dir))
+                        return false;
+                }
+                elseif (is_file($dir . $obj)) {
+                    if (!@unlink($dir . $obj))
+                        return false;
+                }
+            }
         }
-        return true; 
-    } 
-    return false; 
-}      
-    
-    
+        closedir($handle);
+
+        if (!is_null($dir_parent)) {
+            if (!@rmdir($dir))
+                return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 ?>
     </div>
 </div>
