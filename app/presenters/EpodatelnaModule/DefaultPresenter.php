@@ -536,11 +536,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
             $od = $this->Epodatelna->getLastISDS();
             $do = time() + 7200;
-            //echo $od ." ". date("j.n.Y",$od) ."<br />";
-            //echo $do ." ". date("j.n.Y",$do);
-            //exit;
 
-            $tmp = array();
             $user = $this->user->getIdentity();
 
             $UploadFile = $this->storage;
@@ -839,7 +835,6 @@ dmFormat =
             
             if ( count( $zpravy )>0 ) {
                 $tmp = array();
-                $user = $this->user->getIdentity();
 
                 $UploadFile = $this->storage;
 
@@ -1058,6 +1053,8 @@ dmFormat =
                             $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
                             $tmp_email = CLIENT_DIR .'/temp/emailtest_'. sha1($mess->message_id).'.tmp';
                             file_put_contents($tmp_email,$mess->source);
+                            $esign_cert = null;
+                            $esign_status = null;
                             $esigned = $esign->verifySignature($tmp_email, $esign_cert, $esign_status);
                             if ( @$esigned['cert_info']['CA_is_qualified'] == 1 ) {
                                 // obsahuje - pokracujeme
@@ -1122,7 +1119,7 @@ dmFormat =
         $DownloadFile = $storage;
 
         if ( strpos($file_id,"-") !== false ) {
-            list($file_id, $part) = explode("-",$file_id);
+            $file_id = reset(explode("-",$file_id));
         }
 
         $FileModel = new FileModel();
@@ -1142,7 +1139,7 @@ dmFormat =
         $DownloadFile = $storage;
 
         if ( strpos($file_id,"-") !== false ) {
-            list($file_id,$part) = explode("-",$file_id);
+            $file_id = reset(explode("-",$file_id));
         }
 
         $FileModel = new FileModel();
@@ -1157,6 +1154,8 @@ dmFormat =
         // Kontrola epodpisu
         $esign = new esignature();
         $esign->setCACert(LIBS_DIR .'/email/ca_certifikaty');
+        $esign_cert = null;
+        $esign_status = null;
         $esigned = $esign->verifySignature($res, $esign_cert, $esign_status);
 
         //Nette\Diagnostics\Debugger::dump($esigned); exit;

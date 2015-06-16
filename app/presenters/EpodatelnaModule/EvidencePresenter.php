@@ -25,9 +25,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function renderPridelitcj()
     {
-
         $dokument_id = $this->getParameter('id',null);
-        $user_id = $this->getParameter('user',null);
 
         $Dokument = new Dokument();
 
@@ -41,12 +39,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
         $data['podaci_denik_rok'] = $cjednaci->rok;
 
-
-        $dokument = $Dokument->update($data, array(array('id=%i',$dokument_id)));//   array('dokument_id'=>0);// $Dokument->ulozit($data);
+        $Dokument->update($data, [['id=%i',$dokument_id]]);
         $this->flashMessage('číslo jednací přiděleno');
         $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
-
     }
 
     public function renderNovy()
@@ -64,8 +59,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             $this->template->Zprava = $zprava;
             $subjekt = new stdClass();
-
-            if ($prilohy = unserialize($zprava->prilohy) ) {
+            $prilohy = unserialize($zprava->prilohy);
+            if ($prilohy ) {
                 $this->template->Prilohy = $prilohy;
             } else {
                 $this->template->Prilohy = null;
@@ -82,6 +77,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         ? $original['zprava']->from->personal : $zprava->odesilatel;
                 $subjekt->prijmeni = @$original['zprava']->from->personal;
                 $subjekt->email = @$original['zprava']->from->email;
+                $matches = [];
                 if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
                     $subjekt->jmeno = $matches[1];
                     $subjekt->prijmeni = $matches[2];
@@ -163,7 +159,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             $DokumentSpis = new DokumentSpis();
             $DokumentSubjekt = new DokumentSubjekt();
-            $DokumentPrilohy = new DokumentPrilohy();
 
             $spisy = $DokumentSpis->spisy($dokument->id);
             $this->template->Spisy = $spisy;
@@ -328,7 +323,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                                     'id' => $id,
                                     'stav_info' => $data['duvod_odmitnuti'][$id]
                                 );
-                                $this->odmitnoutISDS($evidence, true);
+                                $this->odmitnoutISDS($evidence);
                             }
                             echo '<div class="evidence_report">Zpráva byla odmítnuta.</div>';
                         } catch (Exception $e) {
@@ -375,7 +370,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         }
 
         $typ_dokumentu = Dokument::typDokumentu(null,2);
-        $typ_dokumentu_extra = Dokument::typDokumentu();
 
         $form = new Spisovka\Form();
         $form->addHidden('dokument_id')
@@ -703,11 +697,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             } else {
                 throw new Exception('Dokument se nepodařilo vytvořit!');
-                return false;
             }
         } else {
             throw new Exception('Nelze získat informace o zprávě!');
-            return false;
         }
 
     }
@@ -858,7 +850,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $this->redirect('this',array('id'=>$dokument_id));
     }
 
-    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoSeznamClicked()
     {
         $this->redirect(':Epodatelna:Default:nove');
     }
@@ -1081,7 +1073,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     }
 
-    private function odmitnoutISDS($data, $hromadna = false)
+    private function odmitnoutISDS($data)
     {
         if (is_null($this->Epodatelna))
             $this->Epodatelna = new Epodatelna();
