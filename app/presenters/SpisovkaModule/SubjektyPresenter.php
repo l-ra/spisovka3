@@ -9,66 +9,67 @@ class SubjektyPresenter extends BasePresenter
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
-        
+        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+                    : 20;
+
         $args = array('where' => array("stav = 1"));
         if (!empty($abc))
             $args['where'][] = array("nazev_subjektu LIKE %s OR prijmeni LIKE %s", $abc . '%', $abc . '%');
 
         $Subjekt = new Subjekt();
-        $result = $Subjekt->seznam($args);   
+        $result = $Subjekt->seznam($args);
         $paginator->itemCount = count($result);
-        $this->template->seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        $this->template->seznam = $result->fetchAll($paginator->offset,
+                $paginator->itemsPerPage);
     }
 
     public function renderAres()
     {
-        $ic = $this->getParameter('id',null);
+        $ic = $this->getParameter('id', null);
         $ares = new Ares($ic);
         $data = $ares->get();
         echo json_encode($data);
         exit;
     }
-    
+
     public function renderIsdsid()
     {
-        $id = $this->getParameter('id',null);
-        
-        if ( is_null($id) ) {
+        $id = $this->getParameter('id', null);
+
+        if (is_null($id)) {
             exit;
         }
-        
+
         $isds = new ISDS_Spisovka();
         try {
             $isds->pripojit();
             $filtr['dbID'] = $id;
             $prijemci = $isds->FindDataBoxEx($filtr);
-            if ( isset($prijemci->dbOwnerInfo) ) {
-                
+            if (isset($prijemci->dbOwnerInfo)) {
+
                 $info = $prijemci->dbOwnerInfo[0];
-                
-                /*echo "<pre>";
-                print_r($info);
-                echo "</pre>";*/
-                
+
+                /* echo "<pre>";
+                  print_r($info);
+                  echo "</pre>"; */
+
                 echo json_encode($info);
             } else {
-                echo json_encode(array("error"=>$isds->error()));
+                echo json_encode(array("error" => $isds->error()));
             }
-            
+
             exit;
-                                    
         } catch (Exception $e) {
-            echo json_encode(array("error"=>$e->getMessage()));
+            echo json_encode(array("error" => $e->getMessage()));
             exit;
         }
-    }    
+    }
 
     public function renderNovy()
     {
         $this->template->subjektForm = $this['novyForm'];
     }
-        
+
     protected function vytvorFormular()
     {
         $typ_select = Subjekt::typ_subjektu();
@@ -95,7 +96,7 @@ class SubjektyPresenter extends BasePresenter
         $form1->addText('narodnost', 'Národnost / Stát registrace:', 50, 48);
         $form1->addSelect('stat_narozeni', 'Stát narození:', $stat_select)
                 ->setValue('CZE');
-        
+
         $form1->addText('adresa_ulice', 'Ulice / část obce:', 50, 48);
         $form1->addText('adresa_cp', 'číslo popisné:', 10, 10);
         $form1->addText('adresa_co', 'Číslo orientační:', 10, 10);
@@ -118,16 +119,16 @@ class SubjektyPresenter extends BasePresenter
 
         return $form1;
     }
-    
+
     protected function createComponentNovyForm()
     {
         $form1 = $this->vytvorFormular();
-        
-        $form1->getElementPrototype()->onsubmit('return false;');      
+
+        $form1->getElementPrototype()->onsubmit('return false;');
         $form1->addSubmit('novy', 'Vytvořit');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE);
-        
+                ->setValidationScope(FALSE);
+
         return $form1;
     }
 
@@ -138,11 +139,11 @@ class SubjektyPresenter extends BasePresenter
         $subjekt = @$this->template->Subjekt;
         $form1->addHidden('id')
                 ->setValue(@$subjekt->id);
-        
+
         $form1->addSubmit('upravit', 'Upravit');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE);
-                 
+                ->setValidationScope(FALSE);
+
         if ($subjekt !== null) {
             $form1['type']->setValue(@$subjekt->type);
             $form1['nazev_subjektu']->setValue(@$subjekt->nazev_subjektu);
@@ -181,19 +182,19 @@ class SubjektyPresenter extends BasePresenter
 
 }
 
-
 class Spisovka_SubjektyPresenter extends SubjektyPresenter
 {
+
     public function renderNovy()
     {
         // Pouzij novy, zkraceny formular
         $this->view = 'form2';
     }
-        
+
     // Volano pouze pres Ajax
     public function renderNacti()
     {
-        $dokument_id = $this->getParameter('id',null); // tady jako dokument_id
+        $dokument_id = $this->getParameter('id', null); // tady jako dokument_id
 
         $DokumentSubjekt = new DokumentSubjekt();
         $seznam = $DokumentSubjekt->subjekty($dokument_id);
@@ -204,59 +205,57 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
     // Volano pouze pres Ajax
     public function actionVybrano()
     {
-        try {            
-            $subjekt_id = $this->getParameter('id',null);
-            $dokument_id = $this->getParameter('dok_id',null);
-            $typ = $this->getParameter('typ',null);
-            $autocomplete = $this->getParameter('autocomplete',0);
-            
+        try {
+            $subjekt_id = $this->getParameter('id', null);
+            $dokument_id = $this->getParameter('dok_id', null);
+            $typ = $this->getParameter('typ', null);
+            $autocomplete = $this->getParameter('autocomplete', 0);
+
             $Subjekt = new Subjekt();
-            $subjekt = $Subjekt->getInfo($subjekt_id);            
-            if ( $subjekt ) {
+            $subjekt = $Subjekt->getInfo($subjekt_id);
+            if ($subjekt) {
 
                 // Propojit s dokumentem
                 $DokumentSubjekt = new DokumentSubjekt();
                 $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, $typ);
 
                 $Log = new LogModel();
-                $Log->logDokument($dokument_id, LogModel::SUBJEKT_PRIDAN,'Přidán subjekt "'. Subjekt::displayName($subjekt,'jmeno') .'"');
+                $Log->logDokument($dokument_id, LogModel::SUBJEKT_PRIDAN,
+                        'Přidán subjekt "' . Subjekt::displayName($subjekt, 'jmeno') . '"');
 
-                echo '###vybrano###'. $dokument_id;
-
+                echo '###vybrano###' . $dokument_id;
             } else {
                 // chyba            
                 echo 'Zvolený subjekt se nepodařilo načíst.';
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             echo 'Chyba ' . $e->getCode() . ' - ' . $e->getMessage();
         }
-        
+
         $this->terminate();
     }
 
     public function renderOdebrat()
     {
-        $subjekt_id = $this->getParameter('id',null);
-        $dokument_id = $this->getParameter('dok_id',null);
+        $subjekt_id = $this->getParameter('id', null);
+        $dokument_id = $this->getParameter('dok_id', null);
 
         $DokumentSubjekt = new DokumentSubjekt();
-        $param = array( array('subjekt_id=%i',$subjekt_id),array('dokument_id=%i',$dokument_id) );
+        $param = array(array('subjekt_id=%i', $subjekt_id), array('dokument_id=%i', $dokument_id));
 
-        if ( $seznam = $DokumentSubjekt->odebrat($param) ) {
+        if ($seznam = $DokumentSubjekt->odebrat($param)) {
 
             $Log = new LogModel();
             $Subjekt = new Subjekt();
             $subjekt_info = $Subjekt->getInfo($subjekt_id);
-            $Log->logDokument($dokument_id, LogModel::SUBJEKT_ODEBRAN,'Odebrán subjekt "'. Subjekt::displayName($subjekt_info,'jmeno') .'"');
+            $Log->logDokument($dokument_id, LogModel::SUBJEKT_ODEBRAN,
+                    'Odebrán subjekt "' . Subjekt::displayName($subjekt_info, 'jmeno') . '"');
 
             $this->flashMessage('Subjekt byl úspěšně odebrán.');
         } else {
-            $this->flashMessage('Subjekt se nepodařilo odebrat. Zkuste to znovu.','warning');
+            $this->flashMessage('Subjekt se nepodařilo odebrat. Zkuste to znovu.', 'warning');
         }
-        $this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-
-
+        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
     }
 
     public function actionSeznamAjax()
@@ -268,9 +267,9 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
 
         $term = $this->getParameter('term');
 
-        if ( !empty($term) ) {
-            $args = array('where'=>array(array("LOWER(CONCAT_WS('', nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)",'%'.$term.'%'),
-                'stav = 1'
+        if (!empty($term)) {
+            $args = array('where' => array(array("LOWER(CONCAT_WS('', nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)", '%' . $term . '%'),
+                    'stav = 1'
             ));
             $seznam_subjektu = $Subjekt->seznam($args);
         } else {
@@ -296,34 +295,33 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $typy_subjektu = Subjekt::typ_subjektu();
         echo json_encode($typy_subjektu);
         exit;
-    }    
-    
+    }
+
     public function actionSeznamStatuAjax()
     {
         echo json_encode(Subjekt::stat());
         exit;
-    }    
+    }
 
     public function renderUpravit()
     {
-        $subjekt_id = $this->getParameter('id',null);
-        $dokument_id = $this->getParameter('dok_id',null);
+        $subjekt_id = $this->getParameter('id', null);
+        $dokument_id = $this->getParameter('dok_id', null);
 
         $model = new Subjekt();
         $subjekt = $subjekt_id === null ? null : $model->getInfo($subjekt_id);
 
         $this->template->Subjekt = $subjekt;
         $this->template->dokument_id = $dokument_id;
-        $this->template->FormUpravit = $this->getParameter('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit', null);
         $this->template->subjektForm = $this['upravitForm'];
     }
 
-/**
- *
- * Formular a zpracovani pro udaju osoby
- *
- */
-
+    /**
+     *
+     * Formular a zpracovani pro udaju osoby
+     *
+     */
     protected function createComponentUpravitForm()
     {
         $form1 = parent::createComponentUpravitForm();
@@ -332,10 +330,10 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $form1->onSuccess[] = array($this, 'upravitFormSucceeded');
         $form1['upravit']->controlPrototype->onclick("return subjektUpravitSubmit();");
         $form1['storno']->controlPrototype->onclick("return closeDialog();");
-                
+
         return $form1;
     }
-    
+
     public function upravitFormSucceeded(Nette\Application\UI\Form $form, $data)
     {
         $subjekt_id = $data['id'];
@@ -348,37 +346,35 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         try {
             $Subjekt = new Subjekt();
             $Subjekt->ulozit($data, $subjekt_id);
-            
-            echo "###zmeneno###";
 
+            echo "###zmeneno###";
         } catch (Exception $e) {
             echo "Chyba! Subjekt se nepodařilo upravit.<br/>" . $e->getMessage();
         }
-        
+
         $this->terminate();
     }
 
-    
     protected function createComponentNovyForm()
     {
         $form = parent::createComponentNovyForm();
-        
+
         // formulář je odesílán přes Ajax, nelze tedy navázat událost na submit tlačítko
         $form->onSuccess[] = array($this, 'novyFormSucceeded');
-        
+
         $callback = $this->getParameter('f', 'novySubjektOk');
         $form['novy']->controlPrototype->onclick("return handleNovySubjekt($callback);");
         $form['storno']->controlPrototype->onclick("$('#dialog').dialog('close'); return false;");
-        
+
         $form->addHidden('dokument_id');
         $dok_id = $this->getParameter('dok_id');
         if ($dok_id)
             $form['dokument_id']->setValue($dok_id);
 
         $form->addHidden('extra_data', $this->getParameter('extra_data'));
-        
+
         $form['stat_narozeni']->setDisabled(true);
-                
+
         $form['jmeno']->setAttribute('size', 20);
         $form['prijmeni']->setAttribute('size', 30);
         $form['titul_pred']->setAttribute('size', 5);
@@ -390,18 +386,18 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $form['nazev_subjektu']->setValue($this->getParameter('nazev_subjektu'));
         $form['jmeno']->setValue($this->getParameter('jmeno'));
         $form['prijmeni']->setValue($this->getParameter('prijmeni'));
-        
+
         $form['adresa_ulice']->setValue($this->getParameter('adresa_ulice'));
         $form['adresa_cp']->setValue($this->getParameter('adresa_cp'));
         $form['adresa_co']->setValue($this->getParameter('adresa_co'));
         $form['adresa_psc']->setValue($this->getParameter('adresa_psc'));
         $form['adresa_mesto']->setValue($this->getParameter('adresa_mesto'));
         $form['email']->setValue($this->getParameter('email'));
-        $form['id_isds']->setValue($this->getParameter('id_isds'));       
+        $form['id_isds']->setValue($this->getParameter('id_isds'));
         $form['poznamka']->setAttribute('rows', 1)
                 ->setAttribute('style', 'width: 400px')
-                ->controlPrototype->onfocus("$(this).attr('rows', 5)");
-        
+        ->controlPrototype->onfocus("$(this).attr('rows', 5)");
+
         return $form;
     }
 
@@ -410,12 +406,12 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $dokument_id = isset($data['dokument_id']) ? $data['dokument_id'] : null;
         $extra_data = isset($data['extra_data']) ? $data['extra_data'] : null;
         $payload = ['status' => 'OK', 'extra_data' => $extra_data];
-        
+
         try {
             $Subjekt = new Subjekt();
             unset($data->dokument_id);
             unset($data->extra_data);
-            $subjekt_id = $Subjekt->ulozit((array)$data);
+            $subjekt_id = $Subjekt->ulozit((array) $data);
 
             try {
                 if ($dokument_id) {
@@ -425,16 +421,13 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
                 }
                 $payload['id'] = $subjekt_id;
                 $payload['name'] = Subjekt::displayName($data, 'full');
-
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $payload['status'] = "Subjekt byl vytvořen ale nepodařilo se jej připojit k dokumentu.";
             }
-            
         } catch (Exception $e) {
             $payload['status'] = "Chyba! Subjekt se nepodařilo vytvořit.\n" . $e->getMessage();
         }
-        
+
         $this->sendJson($payload);
     }
 
@@ -442,10 +435,10 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
     // Nevraci zpet informaci (krome HTTP stavoveho kodu), predpoklada se, ze operace se vzdy provede uspesne
     public function actionZmenRezim()
     {
-        $subjekt_id = $this->getParameter('id',null);
-        $dokument_id = $this->getParameter('dok_id',null);
-        $typ = $this->getParameter('typ',null);
-        
+        $subjekt_id = $this->getParameter('id', null);
+        $dokument_id = $this->getParameter('dok_id', null);
+        $typ = $this->getParameter('typ', null);
+
         // Zmen typ propojeni
         $DokumentSubjekt = new DokumentSubjekt();
         $DokumentSubjekt->zmenit($dokument_id, $subjekt_id, $typ);

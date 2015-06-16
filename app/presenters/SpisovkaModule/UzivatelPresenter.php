@@ -1,7 +1,7 @@
 <?php
 
-
-class Spisovka_UzivatelPresenter extends BasePresenter {
+class Spisovka_UzivatelPresenter extends BasePresenter
+{
 
     public function actionLogin()
     {
@@ -29,8 +29,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
             $uri = new Nette\Http\Url($referer);
             $uri->setQuery('');
             $this->redirectUrl($uri);
-        }
-        else
+        } else
             $this->redirect('login');
     }
 
@@ -39,12 +38,12 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $Osoba = new Osoba();
 
         $user = $this->user->getIdentity();
-        
+
         $osoba_id = $user->identity->id;
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
 
         // Zmena osobnich udaju
-        $this->template->FormUpravit = $this->getParameter('upravit',null);
+        $this->template->FormUpravit = $this->getParameter('upravit', null);
 
         $uzivatel = UserModel::getUser($user->id, true);
         if ($uzivatel->org_nazev === '')
@@ -52,7 +51,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->template->Uzivatel = $uzivatel;
 
         // Zmena hesla
-        $this->template->ZmenaHesla = $this->getParameter('zmenitheslo',null);
+        $this->template->ZmenaHesla = $this->getParameter('zmenitheslo', null);
 
         $Auth1 = $this->context->createService('authenticatorUI');
         $Auth1->setAction('change_password');
@@ -63,12 +62,11 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $this->template->Role = $role;
     }
 
-/**
- *
- * Formular a zpracovani pro udaju osoby
- *
- */
-
+    /**
+     *
+     * Formular a zpracovani pro udaju osoby
+     *
+     */
     protected function createComponentUpravitForm()
     {
 
@@ -92,10 +90,10 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $form1->addText('pozice', 'Funkce:', 50, 150)
                 ->setValue(@$osoba->pozice);
         $form1->addSubmit('upravit', 'Upravit')
-                 ->onClick[] = array($this, 'upravitClicked');
+                ->onClick[] = array($this, 'upravitClicked');
         $form1->addSubmit('storno', 'Zrušit')
-                 ->setValidationScope(FALSE)
-                 ->onClick[] = array($this, 'stornoClicked');
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
 
 
 
@@ -110,7 +108,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         return $form1;
     }
 
-
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
@@ -122,9 +119,10 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
         try {
             $osoba_id = $Osoba->ulozit($data, $osoba_id);
-            $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  byl upraven.');
+            $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  byl upraven.');
         } catch (DibiException $e) {
-            $this->flashMessage('Zaměstnanec  "'. Osoba::displayName($data) .'"  se nepodařilo upravit.','warning');
+            $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  se nepodařilo upravit.',
+                    'warning');
         }
         $this->redirect('this');
     }
@@ -137,10 +135,10 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
 
     protected function _renderVyber()
     {
-        if ($this->getParameter('chyba',null))
+        if ($this->getParameter('chyba', null))
             $this->template->chyba = 1;
-            
-        $this->template->novy = $this->getParameter('novy',0);
+
+        $this->template->novy = $this->getParameter('novy', 0);
 
         $Zamestnanci = new Osoba2User();
         $seznam = $Zamestnanci->seznam();
@@ -150,26 +148,25 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
         $oseznam = $OrgJednotky->linearniSeznam();
         $this->template->org_seznam = $oseznam;
     }
-    
+
     public function renderVyber()
-    {            
-        $this->template->dokument_id = $dok_id = $this->getParameter('dok_id',null);
+    {
+        $this->template->dokument_id = $dok_id = $this->getParameter('dok_id', null);
 
         $model = new Dokument();
         $dok = $model->getInfo($dok_id);
         $this->template->dokument_je_ve_spisu = isset($dok->spisy);
-        
-        $this->_renderVyber();
 
+        $this->_renderVyber();
     }
-    
+
     public function renderVyberspis()
     {
-        $this->template->spis_id = $spis_id = $this->getParameter('spis_id',null);
+        $this->template->spis_id = $spis_id = $this->getParameter('spis_id', null);
         $this->_renderVyber();
         // Zvazit do budoucna - jednotnou sablonu pro predani dokumentu i spisu
         // $this->setView('vyber');
-    }    
+    }
 
     // Autocomplete callback
     // Hleda jak uzivatele, tak org. jednotky
@@ -189,33 +186,33 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     // Hleda pouze uzivatele, ne org. jednotky
     // Volano z modulu spisovna
     public function actionUserSeznamAjax()
-    {        
+    {
         $term = $this->getParameter('term');
 
         echo json_encode($this->_userSeznam($term));
         exit;
     }
-    
+
     protected function _ojSeznam($term)
     {
         $OrgJednotky = new Orgjednotka();
 
-        if ( !empty($term) )
-            $seznam_orgjednotek = $OrgJednotky->nacti(null, true, true, 
-                    array('where'=>array( array('LOWER(tb.ciselna_rada) LIKE LOWER(%s)','%'.$term.'%',' OR LOWER(tb.zkraceny_nazev) LIKE LOWER(%s)','%'.$term.'%') )));
+        if (!empty($term))
+            $seznam_orgjednotek = $OrgJednotky->nacti(null, true, true,
+                    array('where' => array(array('LOWER(tb.ciselna_rada) LIKE LOWER(%s)', '%' . $term . '%', ' OR LOWER(tb.zkraceny_nazev) LIKE LOWER(%s)', '%' . $term . '%'))));
         else
             $seznam_orgjednotek = $OrgJednotky->nacti();
-    
+
         $seznam = array();
-        
-        if ( count($seznam_orgjednotek)>0 ) {
+
+        if (count($seznam_orgjednotek) > 0) {
             //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat organizační jednotce');
-            foreach( $seznam_orgjednotek as $org )
-                $seznam[ ] = array(
-                    "id"=> 'o'. $org->id,
+            foreach ($seznam_orgjednotek as $org)
+                $seznam[] = array(
+                    "id" => 'o' . $org->id,
                     "type" => 'item',
-                    "value"=> $org->ciselna_rada.' - '.$org->zkraceny_nazev,
-                    "nazev"=> $org->ciselna_rada ." - ". $org->zkraceny_nazev
+                    "value" => $org->ciselna_rada . ' - ' . $org->zkraceny_nazev,
+                    "nazev" => $org->ciselna_rada . " - " . $org->zkraceny_nazev
                 );
         }
 
@@ -226,70 +223,70 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
     {
         $Zamestnanci = new Osoba2User();
 
-        if ( !empty($term) )
+        if (!empty($term))
             $seznam_zamestnancu = $Zamestnanci->hledat($term);
         else
             $seznam_zamestnancu = $Zamestnanci->seznam();
-    
+
         $seznam = array();
 
-        if ( count($seznam_zamestnancu)>0 ) {
+        if (count($seznam_zamestnancu) > 0) {
             //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat zaměstnanci');
-            foreach( $seznam_zamestnancu as $user ) {
+            foreach ($seznam_zamestnancu as $user) {
                 $additional_info = '';
-                if ( $user->pocet_uctu > 1 )
+                if ($user->pocet_uctu > 1)
                     $additional_info = " ( {$user->username} )";
-                $seznam[ ] = array(
-                    "id"=> 'u'. $user->user_id,
+                $seznam[] = array(
+                    "id" => 'u' . $user->user_id,
                     "type" => 'item',
                     "value" => (Osoba::displayName($user, 'full_item') . "$additional_info"),
                     "nazev" => Osoba::displayName($user, 'full_item')
                 );
             }
         }
-        
+
         return $seznam;
     }
-    
+
     public function renderSpisvybrano()
     {
 
-        $osoba_id = $this->getParameter('id',null);
-        $spis_id = $this->getParameter('spis_id',null);
-        $user_id = $this->getParameter('user',null);
-        $role_id = $this->getParameter('role',null);
-        $orgjednotka_id = $this->getParameter('orgjednotka',null);
-        $poznamka = $this->getParameter('poznamka',null);
-        $novy = $this->getParameter('novy',0);
+        $osoba_id = $this->getParameter('id', null);
+        $spis_id = $this->getParameter('spis_id', null);
+        $user_id = $this->getParameter('user', null);
+        $role_id = $this->getParameter('role', null);
+        $orgjednotka_id = $this->getParameter('orgjednotka', null);
+        $poznamka = $this->getParameter('poznamka', null);
+        $novy = $this->getParameter('novy', 0);
 
         if ($orgjednotka_id === null)
             $orgjednotka_id = OrgJednotka::dejOrgUzivatele($user_id);
-        
-        if ( $novy == 1 ) {
-            echo '###predano###'. $spis_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
+
+        if ($novy == 1) {
+            echo '###predano###' . $spis_id . '#' . $user_id . '#' . $orgjednotka_id . '#' . $poznamka;
 
             $osoba = UserModel::getIdentity($user_id);
             $Orgjednotka = new Orgjednotka();
             $org = $Orgjednotka->getInfo($orgjednotka_id);
 
-            echo '#'. Osoba::displayName($osoba) .'#'. @$org->zkraceny_nazev;
+            echo '#' . Osoba::displayName($osoba) . '#' . @$org->zkraceny_nazev;
 
             $this->terminate();
         } else {
             $Workflow = new Workflow();
-            
+
             // Predat Spis
-            
+
             $DokSpis = new DokumentSpis();
             $dokumenty = $DokSpis->dokumenty($spis_id);
-            
-            if ( count($dokumenty)>0 ) {
+
+            if (count($dokumenty) > 0) {
                 // obsahuje dokumenty - predame i dokumenty
                 $dokument = current($dokumenty);
-                
-                if ( $Workflow->predat($dokument->id, $user_id, $orgjednotka_id, $poznamka) ) {
-                    $link = $this->link(':Spisovka:Spisy:detail',array('id'=>$spis_id));
-                    echo '###vybrano###'. $link;
+
+                if ($Workflow->predat($dokument->id, $user_id, $orgjednotka_id, $poznamka)) {
+                    $link = $this->link(':Spisovka:Spisy:detail', array('id' => $spis_id));
+                    echo '###vybrano###' . $link;
                     $this->terminate();
                 } else {
                     $this->forward('vyberspis', array('chyba' => 1, 'spis_id' => $spis_id));
@@ -297,46 +294,45 @@ class Spisovka_UzivatelPresenter extends BasePresenter {
             } else {
                 // pouze spis
                 $Spis = new Spis;
-                if ( $Spis->predatOrg($spis_id, $orgjednotka_id) ) {
-                    $link = $this->link(':Spisovka:Spisy:detail',array('id'=>$spis_id));
-                    echo '###vybrano###'. $link;
+                if ($Spis->predatOrg($spis_id, $orgjednotka_id)) {
+                    $link = $this->link(':Spisovka:Spisy:detail', array('id' => $spis_id));
+                    echo '###vybrano###' . $link;
                     $this->terminate();
                 } else {
                     // forwarduj pozadavek na novy render dialogu a dej mu informaci, ze ma upozornit uzivatele, ze doslo k chybe
                     $this->forward('vyberspis', array('chyba' => 1, 'spis_id' => $spis_id));
-                }                
+                }
             }
         }
-
     }
 
     public function renderVybrano()
     {
-        $dokument_id = $this->getParameter('dok_id',null);
-        $user_id = $this->getParameter('user',null);
-        $orgjednotka_id = $this->getParameter('orgjednotka',null);
-        $poznamka = $this->getParameter('poznamka',null);
-        $novy = $this->getParameter('novy',0);
+        $dokument_id = $this->getParameter('dok_id', null);
+        $user_id = $this->getParameter('user', null);
+        $orgjednotka_id = $this->getParameter('orgjednotka', null);
+        $poznamka = $this->getParameter('poznamka', null);
+        $novy = $this->getParameter('novy', 0);
 
-        if ( $novy == 1 ) {
-          echo '###predano###'. $dokument_id .'#'.$user_id.'#'.$orgjednotka_id.'#'.$poznamka;
+        if ($novy == 1) {
+            echo '###predano###' . $dokument_id . '#' . $user_id . '#' . $orgjednotka_id . '#' . $poznamka;
 
-          $osoba = UserModel::getIdentity($user_id);
-          $Orgjednotka = new Orgjednotka();
+            $osoba = UserModel::getIdentity($user_id);
+            $Orgjednotka = new Orgjednotka();
 
-          echo '#'. Osoba::displayName($osoba) .'#';
-          try {
-            $org = $Orgjednotka->getInfo($orgjednotka_id);
-            echo $org->zkraceny_nazev;
-          }
-          catch(Exception $e) {
-          }
-          $this->terminate();
+            echo '#' . Osoba::displayName($osoba) . '#';
+            try {
+                $org = $Orgjednotka->getInfo($orgjednotka_id);
+                echo $org->zkraceny_nazev;
+            } catch (Exception $e) {
+                
+            }
+            $this->terminate();
         } else {
             $Workflow = new Workflow();
-            if ( $Workflow->predat($dokument_id, $user_id, $orgjednotka_id, $poznamka) ) {
-                $link = $this->link(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
-                echo '###vybrano###'. $link;
+            if ($Workflow->predat($dokument_id, $user_id, $orgjednotka_id, $poznamka)) {
+                $link = $this->link(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+                echo '###vybrano###' . $link;
                 $this->terminate();
             } else {
                 // forwarduj pozadavek na novy render dialogu a dej mu informaci, ze ma upozornit uzivatele, ze doslo k chybe
