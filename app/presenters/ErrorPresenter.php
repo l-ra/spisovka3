@@ -4,10 +4,10 @@ class ErrorPresenter extends BasePresenter
 {
 
     public function startup()
-       {
-           // P.L. Preskoc startup kod v BasePresenteru
-           Nette\Application\UI\Presenter::startup();
-       }
+    {
+        // P.L. Preskoc startup kod v BasePresenteru
+        Nette\Application\UI\Presenter::startup();
+    }
 
     public function beforeRender()
     {
@@ -28,11 +28,10 @@ class ErrorPresenter extends BasePresenter
         if ($this->isAjax()) {
             echo $exception->getMessage();
             $this->terminate();
-
         } else {
             $this->template->robots = 'noindex,noarchive';
             $httpResponse = $this->getHttpResponse();
-            
+
             if ($exception instanceof Nette\Application\BadRequestException) {
                 if (!$httpResponse->isSent())
                     $httpResponse->setCode($exception->getCode());
@@ -50,8 +49,6 @@ class ErrorPresenter extends BasePresenter
                 // Nette\Diagnostics\Debugger::processException($exception);
             }
         }
-
     }
-
 
 }
