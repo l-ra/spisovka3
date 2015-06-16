@@ -222,16 +222,15 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function renderOdmitnout()
     {
-
         /* Nacteni zpravy */
         $Epodatelna = new Epodatelna();
 
-        $epodatelna_id = $this->getParameter('id',null);
+        $epodatelna_id = $this->getParameter('id', null);
         $zprava = $Epodatelna->getInfo($epodatelna_id);
 
-        if ( !empty($zprava->isds_id) ) {
-            if ( !empty( $zprava->file_id ) ) {
-                $file_id = explode("-",$zprava->file_id);
+        if (!empty($zprava->isds_id)) {
+            if (!empty($zprava->file_id)) {
+                $file_id = explode("-", $zprava->file_id);
                 $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_id[0]);
                 $original = unserialize($original);
                 // odebrat obsah priloh, aby to neotravovalo
@@ -243,7 +242,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         }
 
         $this->template->Zprava = $zprava;
-        
     }
 
     public function actionHromadna()
@@ -1029,11 +1027,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function createComponentOdmitnoutISDSForm()
     {
-
         $epodatelna_id = $this->getParameter('id',null);
-        $zprava = @$this->template->Zprava;
-        $original = @$this->template->original;
-
+//        $zprava = @$this->template->Zprava;
+//        $original = @$this->template->original;
 
         $form = new Nette\Application\UI\Form();
         $form->addHidden('id')
@@ -1041,20 +1037,16 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
                 ->addRule(Nette\Forms\Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
 
-
-        $form->addCheckbox('upozornit', 'Poslat upozornění odesilateli?')
+        /* $form->addCheckbox('upozornit', 'Poslat upozornění odesilateli?')
                 ->setValue(false);
-        $form->addText('isds','Komu:',80,100)
+        $form->addText('isds', 'Komu:', 80, 100)
                 ->setValue(@$original->dbIDSender);
-        $form->addText('predmet','Předmět:',80,100)
-                ->setValue('[odmítnuto] '. @$zprava->predmet);
+        $form->addText('predmet', 'Předmět:', 80, 100)
+                ->setValue('[odmítnuto] ' . @$zprava->predmet); */
 
         $form->addSubmit('odmitnout', 'Provést')
-                 // ->setRendered(TRUE)
-                 ->onClick[] = array($this, 'odmitnoutISDSClicked');
+                ->onClick[] = array($this, 'odmitnoutISDSClicked');
 
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = 'dl';
@@ -1091,33 +1083,13 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function odmitnoutISDS($data, $hromadna = false)
     {
-        if ( is_null($this->Epodatelna) ) $this->Epodatelna = new Epodatelna();
+        if (is_null($this->Epodatelna))
+            $this->Epodatelna = new Epodatelna();
         $info = array(
-                    'stav'=>'100',
-                    'stav_info'=>$data['stav_info']
+            'stav' => '100',
+            'stav_info' => $data['stav_info']
         );
-        $this->Epodatelna->update($info, array( array('id=%i',$data['id']) ));
-
-        // odeslat ISDS odesilateli?
-        /*if ( $data['upozornit'] == true ) {
-
-            $ep = (new Spisovka\ConfigEpodatelna())->get();
-            if ( isset($ep['isds'][0]) ) {
-                if ( $ep['isds'][0]['aktivni'] == '1' ) {
-                    if ($hromadna) {
-                        echo 'Upozornění odesílateli bylo úspěšně odesláno.';
-                    } else {
-                        $this->flashMessage('Upozornění odesílateli bylo úspěšně odesláno.');
-                    }
-                }
-            } else {
-                if ($hromadna) {
-                    echo 'Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání datových zpráv ze spisové služby.';
-                } else {
-                    $this->flashMessage('Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání datových zpráv ze spisové služby.');
-                }
-            }
-        }*/
+        $this->Epodatelna->update($info, array(array('id=%i', $data['id'])));
     }
 
 }
