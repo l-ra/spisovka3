@@ -209,7 +209,6 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
             $subjekt_id = $this->getParameter('id', null);
             $dokument_id = $this->getParameter('dok_id', null);
             $typ = $this->getParameter('typ', null);
-            $autocomplete = $this->getParameter('autocomplete', 0);
 
             $Subjekt = new Subjekt();
             $subjekt = $Subjekt->getInfo($subjekt_id);

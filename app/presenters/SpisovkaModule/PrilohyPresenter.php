@@ -46,6 +46,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             try {
                 $UploadFile->remove($file_id);
             } catch (Exception $e) {
+                $e->getCode();
                 // Priloha muze byt sdilena mezi dokumentem a odpovedi, tudiz nemusi
                 // byt mozne ji fyzicky smazat
             }
@@ -101,14 +102,12 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     public function uploadClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $upload = $data['file'];
 
         $dokument_id = $data['dokument_id'];
 
         $data['nazev'] = $data['priloha_nazev'];
         $data['popis'] = $data['priloha_popis'];
         $data['typ'] = $data['priloha_typ'];
-        $typ = $data['typ'];
         unset($data['dokument_id'], $data['priloha_nazev'], $data['priloha_popis'],
                 $data['priloha_typ']);
 
@@ -206,7 +205,6 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $data['nazev'] = $data['priloha_nazev'];
         $data['popis'] = $data['priloha_popis'];
         $data['typ'] = $data['priloha_typ'];
-        $typ = $data['typ'];
         unset($data['priloha_nazev'], $data['priloha_popis'], $data['priloha_typ']);
         unset($data['dokument_id']);
         unset($data['file_id']);

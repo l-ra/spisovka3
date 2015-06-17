@@ -129,17 +129,16 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
         $skartacni_znak = array('0' => 'jakýkoli znak', 'A' => 'A', 'V' => 'V', 'S' => 'S');
 
-        $stav_dokumentu = array(
-            '' => 'jakýkoli stav',
-            '1' => 'nový / rozpracovaný',
-            '2' => 'přidělen / předán',
-            '3' => 'vyřizuje se',
-            '4' => 'vyřízen',
-            '5' => 'vyřazen'
-        );
-
-        $pridelen = array('0' => 'kdokoli', '2' => 'přidělen', '1' => 'předán');
-
+        /** Hledání podle stavu bylo z nějakého důvodu z programu odstraněno
+            $stav_dokumentu = array(
+                '' => 'jakýkoli stav',
+                '1' => 'nový / rozpracovaný',
+                '2' => 'přidělen / předán',
+                '3' => 'vyřizuje se',
+                '4' => 'vyřízen',
+                '5' => 'vyřazen'
+            );
+        */
 
         $hledat = $this->getHttpRequest()->getCookie($this->getCookieName());
 
@@ -287,7 +286,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
 
         if (count($hledat)) {
-            foreach ($hledat as $hledat_index => $hledat_value) {
+            foreach (array_keys($hledat) as $hledat_index) {
                 $controlPrototype = $form[$hledat_index]->getControlPrototype();
                 $controlPrototype->style(array('background-color' => '#ccffcc', 'border' => '1px #c0c0c0 solid'));
             }
@@ -307,27 +306,23 @@ class Spisovka_VyhledatPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $Dokument = new Dokument();
-
-        if (isset($_POST['prideleno'])) {
-            $data['prideleno'] = $_POST['prideleno'];
+        $post = $this->getHttpRequest()->getPost();
+        
+        if (isset($post['prideleno'])) {
+            $data['prideleno'] = $post['prideleno'];
         }
-        if (isset($_POST['predano'])) {
-            $data['predano'] = $_POST['predano'];
+        if (isset($post['predano'])) {
+            $data['predano'] = $post['predano'];
         }
-        if (isset($_POST['prideleno_org'])) {
-            $data['prideleno_org'] = $_POST['prideleno_org'];
+        if (isset($post['prideleno_org'])) {
+            $data['prideleno_org'] = $post['prideleno_org'];
         }
-        if (isset($_POST['predano_org'])) {
-            $data['predano_org'] = $_POST['predano_org'];
+        if (isset($post['predano_org'])) {
+            $data['predano_org'] = $post['predano_org'];
         }
-        if (isset($_POST['druh_zasilky'])) {
-            if (count($_POST['druh_zasilky']) > 0) {
-                $druh_sql = array();
-                foreach ($_POST['druh_zasilky'] as $druh_id => $druh_zasilky) {
-                    $druh_sql[] = $druh_id;
-                }
-                $data['druh_zasilky'] = serialize($druh_sql);
+        if (isset($post['druh_zasilky'])) {
+            if (count($post['druh_zasilky']) > 0) {
+                $data['druh_zasilky'] = serialize(array_keys($post['druh_zasilky']));
             }
         } else {
             $data['druh_zasilky'] = null;

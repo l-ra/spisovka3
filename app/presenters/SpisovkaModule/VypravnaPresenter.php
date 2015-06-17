@@ -201,11 +201,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
             $druh_zasilky_form = @$post_data['druh_zasilky'];
             if (count($druh_zasilky_form) > 0) {
-                $druh_zasilky_a = array();
-                foreach ($druh_zasilky_form as $druh_id => $druh_status) {
-                    $druh_zasilky_a[] = $druh_id;
-                }
-                $row['druh_zasilky'] = serialize($druh_zasilky_a);
+                $row['druh_zasilky'] = serialize(array_keys($druh_zasilky_form));
             } else {
                 $row['druh_zasilky'] = null;
             }
@@ -327,12 +323,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         if (!empty($post_data)) {
             if (isset($post_data['druh_zasilky'])) {
                 // nastav filtrovani               
-                $druh_zasilky_a = array();
-                foreach ($post_data['druh_zasilky'] as $druh_id => $druh_status) {
-                    $druh_zasilky_a[] = $druh_id;
-                }
-
-                UserSettings::set('vypravna_filtr', $druh_zasilky_a);
+                UserSettings::set('vypravna_filtr', array_keys($post_data['druh_zasilky']));
             } else {
                 // zrus filtrovani
                 UserSettings::remove('vypravna_filtr');

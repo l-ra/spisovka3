@@ -169,9 +169,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         if (count($seznam) > 0) {
-
-            $dataplus = array();
-
             $dokument_ids = array();
             foreach ($seznam as $row) {
                 $dokument_ids[] = $row->id;
@@ -639,7 +636,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             "skartacni_lhuta" => $spis->skartacni_lhuta,
                             "spousteci_udalost_id" => $spis->spousteci_udalost_id
                         );
-                        $dokument = $Dokument->ulozit($data, $dokument_id);
+                        $Dokument->ulozit($data, $dokument_id);
                         unset($data);
                     }
                 }
@@ -657,10 +654,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function actionVyrizeno()
     {
-
         $dokument_id = $this->getParameter('id', null);
-        $user_id = $this->getParameter('user', null);
-        $orgjednotka_id = $this->getParameter('org', null);
 
         $Workflow = new Workflow();
         if ($Workflow->prirazeny($dokument_id)) {
@@ -752,14 +746,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function actionPridelitcj()
     {
-
         $dokument_id = $this->getParameter('id', null);
         $cjednaci_id = $this->getParameter('cislo_jednaci_id', null);
 
         $Dokument = new Dokument();
         $dokument_info = $Dokument->getInfo($dokument_id);
         if (empty($dokument_info))
-            throw new Exception("Přidělení č.j. - nemohu načíst dokument id $dokument.");
+            throw new Exception("Přidělení č.j. - nemohu načíst dokument id $dokument_id.");
 
         // Je treba zkontrolovat, jestli dokument uz cislo jednaci nema prideleno
         if (!empty($dokument_info['cislo_jednaci_id'])) {
@@ -1533,7 +1526,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
     }
 
-    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoSeznamClicked()
     {
         $this->redirect(':Spisovka:Dokumenty:default');
     }
@@ -1660,8 +1653,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         //Nette\Diagnostics\Debugger::dump($dok); exit;
 
         try {
-
-            $dokument = $Dokument->ulozit($data, $dokument_id);
+            $Dokument->ulozit($data, $dokument_id);
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN,
@@ -1776,8 +1768,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $dok = $Dokument->getInfo($dokument_id);
 
         try {
-
-            $dokument = $Dokument->ulozit($data, $dokument_id);
+            $Dokument->ulozit($data, $dokument_id);
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN, 'Upravena data vyřízení.');
@@ -1879,15 +1870,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function createComponentOdeslatForm()
     {
-
-        $typ_dokumentu = Dokument::typDokumentu(null, 1);
         $Dok = @$this->template->Dok;
-
-
         $zprava = "";
-
-
         $sznacka = "";
+        
         if (isset($this->template->Dok->spisy) && is_array($this->template->Dok->spisy)) {
             $sznacka_A = array();
             foreach ($this->template->Dok->spisy as $spis) {
@@ -1997,7 +1983,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 $DownloadFile = $this->storage;
 
-                foreach ($post_data['prilohy'] as $file_id => $status) {
+                foreach (array_keys($post_data['prilohy']) as $file_id) {
                     $priloha = $File->getInfo($file_id);
                     $priloha->tmp_file = $DownloadFile->download($priloha, 2);
 
@@ -2142,11 +2128,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                     $druh_zasilky_form = @$post_data['druh_zasilky'][$subjekt_id];
                     if (count($druh_zasilky_form) > 0) {
-                        $druh_zasilky_a = array();
-                        foreach ($druh_zasilky_form as $druh_id => $druh_status) {
-                            $druh_zasilky_a[] = $druh_id;
-                        }
-                        $druh_zasilky = serialize($druh_zasilky_a);
+                        $druh_zasilky = serialize(array_keys($druh_zasilky_form));
                     }
 
                     $cena = floatval($post_data['cena_zasilky'][$subjekt_id]);
@@ -2327,7 +2309,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $prilohy = array();
         if (isset($email_mess->attachments)) {
-            foreach ($email_mess->attachments as $ipr => $pr) {
+            foreach ($email_mess->attachments as $pr) {
 
                 $base_name = basename($pr['DataFile']);
                 //echo $base_name ."<br>";
@@ -2401,8 +2383,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function odeslatISDS($adresat, $data, $prilohy)
     {
+        $id_mess = null;
+        $mess = null;
+        $epod_id = null;
+        $zprava = null;
+        $popis = null;
+        
         try {
-
             $isds = new ISDS_Spisovka();
             $isds->pripojit();
 
@@ -2431,8 +2418,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             sleep(3);
             $odchozi_zpravy = $isds->seznamOdeslanychZprav(time() - 3600, time() + 3600);
-            //Nette\Diagnostics\Debugger::dump($odchozi_zpravy);
-            $mess = null;
             if (count($odchozi_zpravy) > 0) {
                 foreach ($odchozi_zpravy as $oz) {
                     if ($oz->dmID == $id_mess) {

@@ -120,14 +120,14 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         try {
             $osoba_id = $Osoba->ulozit($data, $osoba_id);
             $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  byl upraven.');
-        } catch (DibiException $e) {
-            $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  se nepodařilo upravit.',
+        } catch (DibiException $e) {                
+            $this->flashMessage('Zaměstnance  "' . Osoba::displayName($data) . '"  se nepodařilo upravit. ' . $e->getMessage(),
                     'warning');
         }
         $this->redirect('this');
     }
 
-    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoClicked()
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $this->redirect('this');
@@ -250,11 +250,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     public function renderSpisvybrano()
     {
-
-        $osoba_id = $this->getParameter('id', null);
         $spis_id = $this->getParameter('spis_id', null);
         $user_id = $this->getParameter('user', null);
-        $role_id = $this->getParameter('role', null);
         $orgjednotka_id = $this->getParameter('orgjednotka', null);
         $poznamka = $this->getParameter('poznamka', null);
         $novy = $this->getParameter('novy', 0);
@@ -325,7 +322,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
                 $org = $Orgjednotka->getInfo($orgjednotka_id);
                 echo $org->zkraceny_nazev;
             } catch (Exception $e) {
-                
+                $e->getMessage();
             }
             $this->terminate();
         } else {

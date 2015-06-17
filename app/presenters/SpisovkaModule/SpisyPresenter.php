@@ -154,28 +154,15 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->template->dokument_id = $this->getParameter('id');
     }
 
+    /** 
+     * Zobraz seznam vsech spisu, bez hledani, bez strankovani
+     */
     public function renderSeznam()
     {
         $this->template->dokument_id = $this->getParameter('dokument_id');
 
         $Spisy = new Spis();
-
-        $args = null;
-        if (!empty($hledat)) {
-            $args = array('where' => array(array("tb.nazev LIKE %s", '%' . $hledat . '%')));
-        }
-
-        /* $user_config = Environment::getVariable('user_config');
-          $vp = new VisualPaginator($this, 'vp');
-          $paginator = $vp->getPaginator();
-          $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20; */
-
-        $args = $Spisy->spisovka($args);
-        /* $result = $Spisy->seznam($args, 5, $spis_id);
-          $paginator->itemCount = count($result);
-          $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-          $this->template->seznam = $seznam; */
-
+        $args = $Spisy->spisovka(null);
         $result = $Spisy->seznam($args, 5);
         $this->template->seznam = $result->fetchAll();
     }
@@ -532,12 +519,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function actionAkce($data)
     {
-
-        //echo "<pre>"; print_r($data); echo "</pre>"; exit;
-
         if (isset($data['hromadna_akce'])) {
             $Spis = new Spis();
-            $user = $this->user->getIdentity();
             switch ($data['hromadna_akce']) {
                 /* Predani vybranych spisu do spisovny  */
                 case 'predat_spisovna':
@@ -803,9 +786,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function renderPrideleni()
     {
-
-        $user = $this->user;
-
         // tento nefunkční hack by se měl z programu odstranit
         $this->flashMessage('Funkce byla z programu odstraněna.', 'error');
         $this->redirect(':Spisovka:Spisy:default');

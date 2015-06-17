@@ -680,7 +680,6 @@ class Install_DefaultPresenter extends BasePresenter
         if ($dokonceno == 1) {
 
             $user_config = (new Spisovka\ConfigClient())->get();
-            $Urad = $user_config->urad;
             $zerotime = mktime(0, 0, 0, 8, 20, 2008);
             $diff = time() - $zerotime;
             $diff = round($diff / 3600);
@@ -951,9 +950,6 @@ class Install_DefaultPresenter extends BasePresenter
     public function spravceClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-
-        $Osoba = new Osoba();
-        $User = new UserModel();
 
         dibi::query("SET sql_mode = ''");
         dibi::query("SET foreign_key_checks = 0");

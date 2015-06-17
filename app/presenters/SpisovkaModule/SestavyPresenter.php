@@ -621,7 +621,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
                     // $value = $value ? true : false;
                     $input->setValue($value);
                 } catch (Exception $e) {
-                    
+                    // ignoruj
+                    $e->getMessage();
                 }
 
         if (empty($sestava->seradit))
