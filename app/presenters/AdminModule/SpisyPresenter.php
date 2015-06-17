@@ -356,7 +356,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
         $spis = $this->template->Spis;
         $typ_spisu = Spis::typSpisu();
-        $stav_select = Spis::stav();
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
@@ -439,18 +438,16 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->redirect('this', array('id' => $spis_id));
     }
 
-    public function stornoNovyClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoNovyClicked()
     {
         $this->redirect(':Admin:Spisy:seznam');
     }
 
     protected function createComponentNovyForm()
     {
-
         $Spisy = new Spis();
 
         $typ_spisu = Spis::typSpisu();
-        $stav_select = Spis::stav();
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 

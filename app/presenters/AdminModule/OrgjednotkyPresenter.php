@@ -144,7 +144,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $this->redirect('this', array('id' => $orgjednotka_id));
     }
 
-    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoSeznamClicked()
     {
         $this->redirect(':Admin:Orgjednotky:seznam');
     }

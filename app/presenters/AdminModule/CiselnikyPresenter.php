@@ -389,10 +389,4 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $this->setView('detail');
     }
 
-    public function ciselnikFormHandler(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $form = $button->getParent();
-        $cislenik = $this->getComponent('ciselnik');
-    }
-
 }

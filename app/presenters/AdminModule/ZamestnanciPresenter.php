@@ -227,7 +227,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->redirect('this', array('id' => $osoba_id));
     }
 
-    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoSeznamClicked()
     {
         $this->redirect(':Admin:Zamestnanci:seznam');
     }
@@ -275,6 +275,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  byl vytvořen.');
             $this->redirect(':Admin:Zamestnanci:detail', array('id' => $osoba_id));
         } catch (DibiException $e) {
+            $e->getMessage();
             $this->flashMessage('Zaměstnance "' . Osoba::displayName($data) . '" se nepodařilo vytvořit.',
                     'warning');
             //$this->flashMessage('Chyba: '. $e->getMessage(),'warning');
@@ -295,9 +296,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         $osoba = $this->template->Osoba;
 
-        if (isset($_POST['user_id'])) {
-            $user_id = $_POST['user_id'];
-        } else {
+        $user_id = $this->getHttpRequest()->getPost('user_id', null);
+        if ($user_id === null) {
             $user_id = $this->getParameter('role', null);
         }
 
@@ -408,12 +408,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         $this->flashMessage('Role uživatele byly upraveny.');
         $this->redirect('this', array('id' => $osoba_id));
-    }
-
-    public function changePasswordFormHandler(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $form = $button->getParent();
-        $changePasswordForm = $this->getComponent('changePasswordForm');
     }
 
     protected function createComponentSearchForm()

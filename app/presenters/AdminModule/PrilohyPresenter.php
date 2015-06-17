@@ -81,7 +81,6 @@ class Admin_PrilohyPresenter extends BasePresenter
     public function uploadClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $upload = $data['file'];
 
         // Nacteni rozhrani pro upload dle nastaveni
         $UploadFile = $this->storage;

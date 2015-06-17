@@ -184,7 +184,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $ep = self::nactiNastaveni();
 
         $id = $this->getParameter('id', null);
-        $typ = substr($id, 0, 1);
         $index = substr($id, 1);
         $isds = !empty($id) ? $ep['isds'][$index] : array();
 
@@ -373,12 +372,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     protected function createComponentZmenitHesloISDSForm()
     {
-        $ep = self::nactiNastaveni();
-
         $id = $this->getParameter('id', null);
         $index = substr($id, 1);
-        $isds = !empty($id) ? $ep['isds'][$index] : array();
-
 
         $id = $this->getParameter('id', null);
         $index = substr($id, 1);
@@ -484,7 +479,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                     $this->redirect(':Admin:Epodatelna:detail', array('id' => ('i' . $data['index'])));
                 }
             } catch (Exception $e) {
-                //$this->flashMessage('Nelze se připojit k ISDS! '. $e->getMessage(),"warning");
+                $this->flashMessage('Při pokusu o změnu hesla došlo k chybě: '. $e->getMessage(), "warning");
             }
         }
     }
@@ -494,7 +489,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $ep = self::nactiNastaveni();
 
         $id = $this->getParameter('id', null);
-        $typ = substr($id, 0, 1);
         $index = substr($id, 1);
         $email = !empty($id) ? $ep['email'][$index] : array();
 

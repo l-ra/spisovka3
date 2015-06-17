@@ -64,6 +64,7 @@ class Admin_OpravneniPresenter extends BasePresenter
             $RoleModel->smazat(array("id = %i", $role_id));
             $this->flashMessage('Role byla smazána.');
         } catch (DibiException $e) {
+            $e->getMessage();
             $this->flashMessage('Roli nebylo možné smazat.', 'error');
         }
 
@@ -83,7 +84,7 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         // hack - udaje ze sablony jsou dostupne jen pri vykresleni formulare, ne kdyz se zpracovava odeslany formular
         // pri zpracovani submitu musime pouzit nadmnozinu roli, co byla pouzita pro vykresleni
-        $role_select = $RoleModel->seznamProDedeni($role->id);
+        $role_select = $RoleModel->seznamProDedeni(isset($role->id) ? $role->id : null);
 
         if (isset($role->id)) {
             unset($role_select[$role->id]);
@@ -172,7 +173,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->redirect('this', array('id' => $role_id));
     }
 
-    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoSeznamClicked()
     {
         $this->redirect(':Admin:Opravneni:seznam');
     }
@@ -277,7 +278,6 @@ class Admin_OpravneniPresenter extends BasePresenter
         $RoleModel = new RoleModel();
         $role = $RoleModel->getInfo($role_id);
         $opravneni = $AclModel->seznamOpravneni($role->code);
-        $pravidla = $AclModel->seznamPravidel($role->code);
 
         // Zkontroluj, zda lze roli menit
         if (!self::lzeMenitRoli($role)) {
@@ -313,7 +313,7 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         // Odebrani zbyvajicich opravneni = oznaceny k odebrani
         if (count($opravneni) > 0) {
-            foreach ($opravneni as $orid => $oo) {
+            foreach (array_keys($opravneni) as $orid) {
                 $AclModel->deleteAcl(array(
                     array('rule_id=%i', $orid),
                     array('role_id=%i', $role_id)
@@ -387,10 +387,11 @@ class Admin_OpravneniPresenter extends BasePresenter
         $AclModel = new AclModel();
 
         try {
-            $resource_id = $AclModel->insertResource($data);
+            $AclModel->insertResource($data);
             $this->flashMessage('Resource  "' . $data['name'] . '" byl vytvořen.');
             $this->redirect(':Admin:Opravneni:detail', array('id' => $role_id));
         } catch (DibiException $e) {
+            $e->getMessage();
             $this->flashMessage('Resource "' . $data['name'] . '" se nepodařilo vytvořit.', 'warning');
         }
     }
@@ -441,10 +442,11 @@ class Admin_OpravneniPresenter extends BasePresenter
         $AclModel = new AclModel();
 
         try {
-            $rule_id = $AclModel->insertRule($data);
+            $AclModel->insertRule($data);
             $this->flashMessage('Pravidlo  "' . $data['name'] . '" bylo vytvořeno.');
             $this->redirect(':Admin:Opravneni:detail', array('id' => $role_id));
         } catch (DibiException $e) {
+            $e->getMessage();
             $this->flashMessage('Pravidlo "' . $data['name'] . '" se nepodařilo vytvořit.', 'warning');
         }
     }

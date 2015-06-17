@@ -231,7 +231,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->redirect('this', array('id' => $data['id']));
     }
 
-    public function stornoNovyClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoNovyClicked()
     {
         $this->redirect(':Admin:Spisznak:seznam');
     }
@@ -304,7 +304,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $SpisovyZnak = new SpisovyZnak();
 
         try {
-            $spisznak_id = $SpisovyZnak->vytvorit($data);
+            $SpisovyZnak->vytvorit($data);
             $this->flashMessage('Spisový znak "' . $data['nazev'] . '"  byl vytvořen.');
             $this->redirect(':Admin:Spisznak:novy');
         } catch (DibiException $e) {

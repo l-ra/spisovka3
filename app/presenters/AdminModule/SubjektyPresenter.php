@@ -236,6 +236,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
             $this->flashMessage('Stav subjektu byl změněn.');
             $this->redirect(':Admin:Subjekty:detail', array('id' => $subjekt_id));
         } catch (DibiException $e) {
+            $e->getMessage();
             $this->flashMessage('Stav subjektu se nepodařilo změnit.', 'warning');
         }
     }

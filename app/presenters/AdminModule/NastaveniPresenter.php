@@ -127,7 +127,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $this->redirect('this');
     }
 
-    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoClicked()
     {
         $this->redirect('this');
     }
@@ -213,11 +213,6 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         $form1->addCheckBox('force_https', 'Vynutit zabezpečené připojení protokolem HTTPS')
                 ->setValue(Settings::get('router_force_https', false));
-
-        $typ = array(
-            0 => 'dokument/spis může upravovat pouze zvolená osoba',
-            1 => 'dokument/spis může upravovat kdokoli z dané organizační jednotky'
-        );
 
         $form1->addText('cislo_zakaznicke_karty', 'Číslo Zákaznické karty:', 13, 13)
                 ->setValue(Settings::get('Ceska_posta_cislo_zakaznicke_karty', ''))
