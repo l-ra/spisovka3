@@ -5,9 +5,9 @@
  *
  * @author Pavel
  */
-
 interface IUserImport
 {
+
     /**
      * @return array
      */

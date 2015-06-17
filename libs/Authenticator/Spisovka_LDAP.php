@@ -37,25 +37,25 @@ class Spisovka_LDAP extends LDAP_Connection
             if ($e->getCode() == 49) // LDAP_INVALID_CREDENTIALS
                 return false;
             throw $e;
-        }        
+        }
     }
-    
+
     public function get_users()
     {
         if ($this->params->search_dn)
             $this->bind($this->params->search_dn, $this->params->search_password);
-        
+
         $result = $this->search($this->params->base_dn, $this->params->search_filter);
 
         $users = $this->parse_users($result);
         return $users;
     }
-    
+
     protected function parse_users($info)
     {
         $user = array();
 
-        for($i = 0; $i < $info["count"]; $i++) {
+        for ($i = 0; $i < $info["count"]; $i++) {
             foreach ($this->attribute_map as $from => $to) {
                 if (isset($info[$i][$from][0]))
                     $user[$i][$to] = $info[$i][$from][0];
@@ -64,6 +64,7 @@ class Spisovka_LDAP extends LDAP_Connection
             }
         }
 
-        return $user ?: null;
-    }    
+        return $user ? : null;
+    }
+
 }
