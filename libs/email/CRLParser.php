@@ -1,11 +1,11 @@
 <?php
 
-class CRLParser extends DERParser {
+class CRLParser extends DERParser
+{
 
     private $cached = 0;
     private $cache_dir = "";
     private $cache_time = 24; // hour
-
 
     public function cache($enable = 1, $cache_dir = "", $cache_time = 24)
     {
@@ -19,12 +19,11 @@ class CRLParser extends DERParser {
 
         $der = $this->parse($data);
         return $this->decode($der);
-
     }
 
     public function fromFile($filename)
     {
-        if ( file_exists($filename) ) {
+        if (file_exists($filename)) {
             $data = file_get_contents($filename);
             $der = $this->parse($data);
             return $this->decode($der);
@@ -38,16 +37,15 @@ class CRLParser extends DERParser {
 
         if ($res = openssl_x509_read($cert)) {
             $cert_info = openssl_x509_parse($res);
-            $uri_crl = explode("\n", str_replace("URI:","",$cert_info['extensions']['crlDistributionPoints']));
+            $uri_crl = explode("\n",
+                    str_replace("URI:", "", $cert_info['extensions']['crlDistributionPoints']));
             $data = $this->sourceCRL($uri_crl[0]);
             $der = $this->parse($data);
             return $this->decode($der);
-
         } else {
             new Exception(openssl_error_string());
             return null;
         }
-
     }
 
     public function fromCA()
@@ -58,17 +56,16 @@ class CRLParser extends DERParser {
         $data = $this->sourceCRL($uri);
         $der = $this->parse($data);
         return $this->decode($der);
-
     }
 
     public function fromUrl($url)
     {
 
-        if ( $this->cached ) {
-            $file = $this->cache_dir ."crl_". md5($url) .".tmp";
-            if (file_exists($file) ) {
+        if ($this->cached) {
+            $file = $this->cache_dir . "crl_" . md5($url) . ".tmp";
+            if (file_exists($file)) {
                 $mtime = filemtime($file) + (3600 * $this->cache_time);
-                if ( time() < $mtime ) {
+                if (time() < $mtime) {
                     $in = file_get_contents($file);
                     return unserialize($in);
                 }
@@ -79,20 +76,20 @@ class CRLParser extends DERParser {
         $der = $this->parse($data);
 
         $out = $this->decode($der);
-        if ( $this->cached ) {
+        if ($this->cached) {
             $hash = md5($url);
-            $file = $this->cache_dir ."crl_". $hash .".tmp";
+            $file = $this->cache_dir . "crl_" . $hash . ".tmp";
             file_put_contents($file, serialize($out));
         }
         return $out;
-        
     }
 
-    private function decode( $der )
+    private function decode($der)
     {
 
-        if ( empty($der) ) return null;
-        
+        if (empty($der))
+            return null;
+
         $info = new stdClass();
         // $der[0]['data'][0]['data'][XXX]['data']
         // 2 = CA
@@ -105,12 +102,11 @@ class CRLParser extends DERParser {
          */
         $tmp = $der[0]['data'][0]['data'][2]['data'];
         $info->CA = array();
-        foreach( $tmp as $item ) {
-            
+        foreach ($tmp as $item) {
+
             $identifier = $item['data'][0]['data'][0]['data'];
             $value = $item['data'][0]['data'][1]['data'];
             $info->CA[$identifier] = $value;
-            
         }
 
         /*
@@ -128,41 +124,40 @@ class CRLParser extends DERParser {
          */
         $tmp = $der[0]['data'][0]['data'][5]['data'];
         $crl_items = array();
-        foreach ( $tmp as $item ) {
+        foreach ($tmp as $item) {
 
             $crl = new stdClass();
-            foreach ( $item['data'] as $i ) {
+            foreach ($item['data'] as $i) {
 
-                if ( $i['tag'] == '02' ) {
+                if ($i['tag'] == '02') {
                     // Seriove cislo certifikatu
                     $crl->id = $i['data'];
                     $crl->hex = sprintf("%06X", $i['data']);
                 }
-                if ( $i['tag'] == '17' ) {
+                if ($i['tag'] == '17') {
                     // Datum zneplatneni
                     $crl->datum = $i['data'];
                 }
 
-                if ( $i['tag'] == '30' ) {
+                if ($i['tag'] == '30') {
                     //$crl->add_info = array();
-                    foreach ( $i['data'] as $crl_addinfo ) {
+                    foreach ($i['data'] as $crl_addinfo) {
                         $key = $crl_addinfo['data'][0]['data'];
                         $value = $crl_addinfo['data'][1]['data'][0]['data'];
 
-                        if ( $key == "55 1D 15 " ) {
+                        if ($key == "55 1D 15 ") {
                             $crl->duvod = $value;
                         }
                         //$crl->add_info[$key] = $value;
                     }
                 }
             }
-            if ( !isset($crl->duvod) ) {
+            if (!isset($crl->duvod)) {
                 $crl->duvod = '00';
             }
 
-            $crl_items[ $crl->id ] = $crl;
+            $crl_items[$crl->id] = $crl;
             unset($crl);
-
         }
         $info->seznam = $crl_items;
 
@@ -170,15 +165,17 @@ class CRLParser extends DERParser {
         return $info;
     }
 
-    private function sourceCRL($zdroj) {
+    private function sourceCRL($zdroj)
+    {
 
         $zdroj = trim($zdroj);
-        
-        if ( empty($zdroj) ) return null;
-        if ( @ini_get("allow_url_fopen") ) {
+
+        if (empty($zdroj))
+            return null;
+        if (@ini_get("allow_url_fopen")) {
             return @file_get_contents($zdroj);
-        } else if ( function_exists('curl_init') ) {
-            if ( $ch = curl_init($zdroj) ) {
+        } else if (function_exists('curl_init')) {
+            if ($ch = curl_init($zdroj)) {
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_HEADER, 0);
                 $response = curl_exec($ch);
@@ -192,6 +189,4 @@ class CRLParser extends DERParser {
         }
     }
 
-
 }
-
