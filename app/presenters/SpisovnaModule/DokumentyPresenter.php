@@ -231,9 +231,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
 
         if (count($seznam) > 0) {
-
-            $dataplus = array();
-
             $dokument_ids = array();
             foreach ($seznam as $row) {
                 $dokument_ids[] = $row->id;
@@ -428,7 +425,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         if (isset($data['hromadna_akce'])) {
             $Workflow = new Workflow();
-            $Dokument = new Dokument();
             $user = $this->user;
             switch ($data['hromadna_akce']) {
                 /* Prevzeti vybranych dokumentu */
@@ -665,9 +661,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     protected function createComponentVyrizovaniForm()
     {
-
-        $SpisovyZnak = new SpisovyZnak();
-        $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
         $Dok = @$this->template->Dok;
@@ -680,8 +673,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 ->setValue(@$Dok->ulozeni_dokumentu);
 
         $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
-        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id)
-        ;
+        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id);
+        
         $form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$Dok->skartacni_znak);
         $form->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5)
@@ -693,9 +686,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
 
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = 'dl';
@@ -722,8 +712,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $dok = $Dokument->getInfo($dokument_id);
 
         try {
-
-            $dokument = $Dokument->ulozit($data, $dokument_id);
+            $Dokument->ulozit($data, $dokument_id);
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN, 'Upraven skartační režim.');
@@ -748,7 +737,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
     }
 
-    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoSeznamClicked()
     {
         $this->redirect(':Spisovna:Dokumenty:default');
     }

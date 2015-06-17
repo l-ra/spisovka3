@@ -112,6 +112,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     $datetime = new DateTime($string);
                 } catch (Exception $e) {
                     // datum je neplatné (možná $string vůbec není datum), tak vrať argument
+                    $e->getMessage();
                     return $string;
                 }
 

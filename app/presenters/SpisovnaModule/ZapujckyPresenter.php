@@ -192,12 +192,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function actionAkce($data)
     {
-
-        //echo "<pre>"; print_r($data); echo "</pre>"; exit;
-
         if (isset($data['hromadna_akce'])) {
             $Zapujcka = new Zapujcka();
-            $user = $this->user;
             switch ($data['hromadna_akce']) {
                 /* Schvaleni vybranych zapujcek  */
                 case 'schvalit':
@@ -416,7 +412,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $form->addDatePicker('date_od', 'Datum výpůjčky:', 10)
                 ->setValue($datum_od)
                 ->setRequired('Datum výpůjčky musí být vyplněné!');
-        $datum_do = date('d.m.Y');
         $form->addDatePicker('date_do', 'Datum vrácení:', 10)
                 ->setRequired('Datum vrácení musí být vyplněné! Zadejte alespoň předpokládané datum vrácení.')
                 ->forbidPastDates()
@@ -450,9 +445,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $Zapujcka = new Zapujcka();
 
         try {
-
-            $zapujcka_id = $Zapujcka->ulozit($data);
-
+            $Zapujcka->ulozit($data);
             $this->flashMessage('Zápůjčka byla vytvořena.');
             $this->redirect(':Spisovna:Zapujcky:default');
         } catch (DibiException $e) {
@@ -468,7 +461,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->redirect(':Spisovna:Zapujcky:detail', array('id' => $zapujcka_id));
     }
 
-    public function stornoSeznamClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoSeznamClicked()
     {
         $this->redirect(':Spisovna:Zapujcky:default');
     }

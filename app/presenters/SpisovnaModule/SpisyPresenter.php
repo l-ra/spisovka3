@@ -187,7 +187,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         );
     }
 
-    public function renderPrijem()
+    public function renderPrijem($hledat)
     {
         if (!$this->user->isAllowed('Spisovna', 'prijem_dokumentu'))
             $this->forward(':NoAccess:default');
@@ -301,7 +301,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
             }
 
             if (count($spis->workflow) > 0) {
-                $prideleno = $predano = 0;
                 $wf_orgjednotka_prideleno = $spis->orgjednotka_id;
                 $wf_orgjednotka_predano = $spis->orgjednotka_id_predano;
                 $org_cache = array();
@@ -398,12 +397,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     public function actionAkce($data)
     {
-
-        //echo "<pre>"; print_r($data); echo "</pre>"; exit;
-
         if (isset($data['hromadna_akce'])) {
             $Spis = new Spis();
-            $user = $this->user->getIdentity();
             switch ($data['hromadna_akce']) {
                 /* Predani vybranych spisu do spisovny  */
                 case 'prevzit_spisovna':
@@ -475,7 +470,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $form1 = new Nette\Application\UI\Form();
         $form1->addHidden('id');
         $form1->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
-        $form1['spisovy_znak_id'];
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5);
 
@@ -578,7 +572,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $data['user_created'] = $this->user->getIdentity()->user_id;
 
         try {
-            $spis_id = $Spisy->vytvorit($data);
+            $Spisy->vytvorit($data);
             $this->flashMessage('Spis "' . $data['nazev'] . '"  byl vytvořen.');
             unset($data['dokument_id']);
             if (!$this->isAjax()) {
@@ -589,7 +583,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
             //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Spis "' . $data['nazev'] . '" se nepodařilo vytvořit.',
+            $this->flashMessage('Spis "' . $data['nazev'] . '" se nepodařilo vytvořit. ' . $e->getMessage(),
                     'warning');
         }
     }
