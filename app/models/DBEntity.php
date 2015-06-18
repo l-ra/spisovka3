@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * @author Pavel Lastovicka
  * @created 02-IX-2014 13:06:54
@@ -9,43 +8,44 @@ abstract class DBEntity
 {
 
     const TBL_NAME = 'dbentity';
+
     /**
      * integer primary key
      */
     protected $id;
     protected $data = null;
     protected $data_changed = false;
-    
+
     /**
      * @param id    int
      */
     public function __construct($param)
-    {       
+    {
         if (!is_integer($param))
             if (!is_string($param) || !ctype_digit($param) || $param == 0)
                 throw new InvalidArgumentException(__METHOD__ . "() - neplatný parametr");
-            
-        $this->id = (int)$param;
+
+        $this->id = (int) $param;
     }
 
     private function _errorStr($method, $message)
     {
         return "$method() - entita $message";
     }
-    
+
     protected function _load()
     {
         $id = $this->id;
         $result = dibi::query("SELECT * FROM %n WHERE id = $id", ':PREFIX:' . $this::TBL_NAME);
         if (!count($result))
             throw new Exception(__METHOD__ . "() - entita " . get_class($this) . " ID $id neexistuje");
-            
+
         $this->data = $result->fetch();
     }
 
     protected function _setData(DibiRow $data)
     {
-        $this->data = $data;        
+        $this->data = $data;
     }
 
     /**
@@ -55,10 +55,10 @@ abstract class DBEntity
     {
         if (!$this->data)
             $this->_load();
-            
+
         if (array_key_exists($name, $this->data))
             return $this->data[$name];
-            
+
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
 
@@ -66,13 +66,13 @@ abstract class DBEntity
     {
         if (!$this->data)
             $this->_load();
-            
+
         if (array_key_exists($name, $this->data))
             return isset($this->data[$name]);
-            
+
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
-    
+
     /**
      * 
      * @param name    string
@@ -82,14 +82,14 @@ abstract class DBEntity
     {
         if (!$this->data)
             $this->_load();
-            
+
         if (!array_key_exists($name, $this->data))
             throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
-        
+
         if (strcasecmp($name, 'id') == 0)
-            // simply ignore setting id column by mistake
+        // simply ignore setting id column by mistake
             return;
-            
+
         if ($this->data[$name] !== $value) {
             $this->data[$name] = $value;
             $this->data_changed = true;
@@ -100,16 +100,16 @@ abstract class DBEntity
     {
         if (!$this->data)
             $this->_load();
-            
+
         return $this->data;
     }
 
     public function modify(array $data)
-    {           
-        foreach($data as $key => $value)
+    {
+        foreach ($data as $key => $value)
             $this->__set($key, $value);
     }
-    
+
     public function save()
     {
         if (!$this->canUserModify())
@@ -126,7 +126,7 @@ abstract class DBEntity
     {
         if (!$this->canUserDelete())
             throw new Exception("Smazání entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
-            
+
         dibi::query("DELETE FROM %n WHERE id = {$this->id}", ':PREFIX:' . $this::TBL_NAME);
     }
 
@@ -134,12 +134,12 @@ abstract class DBEntity
     {
         return true;
     }
-    
+
     public function canUserDelete()
     {
         return true;
     }
-    
+
     /**
      * @param class   string    classname of instantiated elements
      * @param params
@@ -147,32 +147,32 @@ abstract class DBEntity
     public static function getAll(array $params = array())
     {
         $query = array('SELECT * FROM %n', ':PREFIX:' . static::TBL_NAME);
-        
+
         if (isset($params['where']))
             array_push($query, 'WHERE %and', $params['where']);
-            
+
         if (isset($params['order']))
             array_push($query, 'ORDER BY %by', $params['order']);
-            
+
         if (isset($params['limit']))
             array_push($query, 'LIMIT %i', $params['limit']);
-            
+
         if (isset($params['offset']))
             array_push($query, 'OFFSET %i', $params['offset']);
-            
+
         $resultSet = dibi::query($query);
-        
+
         $a = array();
-        
+
         foreach ($resultSet as $row) {
-            $o = new static((int)$row->id);
+            $o = new static((int) $row->id);
             $o->_setData($row);
             $a[] = $o;
         }
-        
+
         return $a;
     }
-    
+
     /**
      * creates an instance and returns it
      * 
@@ -182,7 +182,7 @@ abstract class DBEntity
     public static function create(array $data)
     {
         $id = dibi::insert(':PREFIX:' . static::TBL_NAME, $data)->execute(dibi::IDENTIFIER);
-        
+
         return new static($id);
     }
 

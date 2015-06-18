@@ -12,34 +12,33 @@ class UserModel extends BaseModel
      * @param int|string $mixed 
      * @return DibiRow
      */
-
-    public static function getUser($mixed,$identity = FALSE)
+    public static function getUser($mixed, $identity = FALSE)
     {
         $instance = new self;
 
         /*
          * Ziskání uzivatele
          */
-        if ( is_numeric($mixed) ) {
+        if (is_numeric($mixed)) {
             // $mixed is numeric -> ID
-            $row = $instance->select(array(array('id=%i',$mixed)))->fetch();
+            $row = $instance->select(array(array('id=%i', $mixed)))->fetch();
         } else {
             // $mixed is string -> username
-            $row = $instance->select(array(array('username=%s',$mixed)))->fetch();
+            $row = $instance->select(array(array('username=%s', $mixed)))->fetch();
         }
 
-        if ( is_null($row) || !$row)
+        if (is_null($row) || !$row)
             return null;
 
         /*
          * Nacteni identity uzivatele
          */
-        if ( $identity == TRUE ) {
+        if ($identity == TRUE) {
             $row->identity = self::getIdentity($row->id);
             $row->display_name = Osoba::displayName($row->identity);
-            
-            $row->org_nazev = $row->orgjednotka_id !== null 
-                ? Orgjednotka::getName($row->orgjednotka_id) : '';
+
+            $row->org_nazev = $row->orgjednotka_id !== null ? Orgjednotka::getName($row->orgjednotka_id)
+                        : '';
         } else {
             $row->display_name = $row->username;
         }
@@ -52,21 +51,19 @@ class UserModel extends BaseModel
         return $row;
     }
 
-
     /**
      * Zjisti osobni informace o uzivateli na základe ID
      *
      * @param int|string $mixed
      * @return DibiRow
      */
-
     public static function getIdentity($user_id)
     {
         static $cache = [];
-        
+
         if (isset($cache[$user_id]))
             return $cache[$user_id];
-        
+
         $row = dibi::fetch('SELECT o.*
                             FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
                             LEFT JOIN [:PREFIX:' . self::OSOBA_TABLE . '] o ON (o.id = ou.osoba_id)
@@ -78,28 +75,29 @@ class UserModel extends BaseModel
     public static function getRoles($user_id)
     {
         $rows = dibi::fetchAll('SELECT r.*
-                                 FROM [:PREFIX:'. self::USER2ROLE_TABLE . '] ur
-                                 LEFT JOIN [:PREFIX:'. self::ROLE_TABLE .'] r ON (r.id = ur.role_id)
-                                 WHERE ur.user_id=%i',$user_id);
+                                 FROM [:PREFIX:' . self::USER2ROLE_TABLE . '] ur
+                                 LEFT JOIN [:PREFIX:' . self::ROLE_TABLE . '] r ON (r.id = ur.role_id)
+                                 WHERE ur.user_id=%i', $user_id);
 
         return ($rows) ? $rows : NULL;
     }
 
     public function insert($data)
-    {       
-        $rown = array('username'=>$data['username'],
-                      'password' => isset($data['heslo']) 
-                            ? sha1($data['username'] . $data['heslo']) : null,
-                      'date_created'=> new DateTime(),
-                      'external_auth' => (isset($data['external_auth']) ? $data['external_auth'] : 0),
-                      'orgjednotka_id' => isset($data['orgjednotka_id']) && !empty($data['orgjednotka_id']) ? $data['orgjednotka_id'] : NULL,
-                      'active'=>1
-                );
+    {
+        $rown = array('username' => $data['username'],
+            'password' => isset($data['heslo']) ? sha1($data['username'] . $data['heslo']) : null,
+            'date_created' => new DateTime(),
+            'external_auth' => (isset($data['external_auth']) ? $data['external_auth'] : 0),
+            'orgjednotka_id' => isset($data['orgjednotka_id']) && !empty($data['orgjednotka_id'])
+                        ? $data['orgjednotka_id'] : NULL,
+            'active' => 1
+        );
 
         return parent::insert($rown);
     }
 
-    public static function pridatUcet($osoba_id, $data) {
+    public static function pridatUcet($osoba_id, $data)
+    {
 
         $insert_data = array(
             'username' => $data['username'],
@@ -109,7 +107,7 @@ class UserModel extends BaseModel
             $insert_data['orgjednotka_id'] = $data['orgjednotka_id'];
         if (isset($data['external_auth']))
             $insert_data['external_auth'] = $data['external_auth'];
-        
+
         $role_id = $data['role'];
 
         if (empty($osoba_id))
@@ -117,38 +115,38 @@ class UserModel extends BaseModel
 
         try {
             dibi::begin();
-            
+
             $UserModel = new UserModel();
             $user_id = $UserModel->insert($insert_data);
-            
+
             $Osoba2User = new Osoba2User();
-            $rowou = array( 'osoba_id'=>$osoba_id, 
-                            'user_id'=>$user_id,
-                            'date_added'=>new DateTime()
-                    );
+            $rowou = array('osoba_id' => $osoba_id,
+                'user_id' => $user_id,
+                'date_added' => new DateTime()
+            );
             $Osoba2User->insert_basic($rowou);
 
             if (!empty($role_id)) {
                 // přiřad účtu roli, jen pokud byla zadána
                 $User2Role = new User2Role();
-                $rowur = array( 'role_id'=>$role_id,
-                                'user_id'=>$user_id,
-                                'date_added'=>new DateTime()
-                        );
+                $rowur = array('role_id' => $role_id,
+                    'user_id' => $user_id,
+                    'date_added' => new DateTime()
+                );
                 $User2Role->insert_basic($rowur);
             }
-            
+
             dibi::commit();
-            
+
             return true;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             dibi::rollback();
             throw $e;
         }
     }
 
-    public function odebratUcet($osoba_id, $user_id) {
+    public function odebratUcet($osoba_id, $user_id)
+    {
 
         if ($user_id == Nette\Environment::getUser()->id) {
             throw new Exception('Nemůžete smazat účet, pod kterým jste přihlášen!');
@@ -157,40 +155,39 @@ class UserModel extends BaseModel
         dibi::begin();
         try {
             $Osoba2User = new Osoba2User();
-            $Osoba2User->update(array('active'=>0),
-                                array(
-                                   array('user_id=%i',$user_id),
-                                   array('osoba_id=%i',$osoba_id)
-                                ));
+            $Osoba2User->update(array('active' => 0),
+                    array(
+                array('user_id=%i', $user_id),
+                array('osoba_id=%i', $osoba_id)
+            ));
 
             $this->update(array(
-                            'active'=>0,
-                            'username%sql'=>"CONCAT(username,'_',".time().")"
-                          ),
-                          array('id=%i',$user_id)
-                    );
+                'active' => 0,
+                'username%sql' => "CONCAT(username,'_'," . time() . ")"
+                    ), array('id=%i', $user_id)
+            );
 
             dibi::commit();
-        }
-        catch(Exception $e) {
+        } catch (Exception $e) {
             dibi::rollback();
             throw $e;
         }
     }
 
-    public function changePassword($user_id, $password) {
+    public function changePassword($user_id, $password)
+    {
 
         $user = $this->select([['id=%i', $user_id]])->fetch();
 
         // zabran, aby uzivatel mohl u dema menit heslo k urcitym uctum
         if (Demo::isDemo() && !Demo::canChangePassword($user))
             return false;
-            
+
         $row = array();
         $row['last_modified'] = new DateTime();
 
         // pokud je heslo prazdne = zadna zmena, jinak zmena
-        if ( !empty($password) ) {
+        if (!empty($password)) {
             $row['password'] = sha1($user->username . $password);
         }
 
@@ -198,42 +195,41 @@ class UserModel extends BaseModel
         return true;
     }
 
-    public function changeAuthType($user_id, $auth_type) {
-        
+    public function changeAuthType($user_id, $auth_type)
+    {
+
         $change = ['external_auth' => $auth_type];
         $change['last_modified'] = new DateTime();
-        $this->update($change, array('id=%i', $user_id));        
+        $this->update($change, array('id=%i', $user_id));
     }
-    
-    public function zalogovan($user_id) {
+
+    public function zalogovan($user_id)
+    {
 
         $row = array('last_login' => new DateTime(),
-                     'last_ip' => Nette\Environment::getHttpRequest()->getRemoteAddress()
-                );
-        return $this->update($row,array('id=%i',$user_id));
-
+            'last_ip' => Nette\Environment::getHttpRequest()->getRemoteAddress()
+        );
+        return $this->update($row, array('id=%i', $user_id));
     }
 
-    public function  deleteAll() {
+    public function deleteAll()
+    {
 
         $Workflow = new Workflow();
         $Workflow->update(
-                array('user_id'=>null,'prideleno_id'=>null),
-                array('1')
+                array('user_id' => null, 'prideleno_id' => null), array('1')
         );
 
         $CJ = new CisloJednaci();
-        $CJ->update(array('user_id'=>null),array('user_id IS NOT NULL'));
+        $CJ->update(array('user_id' => null), array('user_id IS NOT NULL'));
 
         $Dokument = new Dokument();
         $Dokument->update(
-                array('user_created'=>null,'user_modified'=>null),
-                array('1')
+                array('user_created' => null, 'user_modified' => null), array('1')
         );
         $DokumentH = new DokumentHistorie();
         $DokumentH->update(
-                array('user_created'=>null,'user_modified'=>null),
-                array('1')
+                array('user_created' => null, 'user_modified' => null), array('1')
         );
 
 
@@ -243,11 +239,13 @@ class UserModel extends BaseModel
 
         parent::deleteAll();
     }
+
 }
 
 class User2Role extends BaseModel
 {
+
     protected $name = 'user_to_role';
     protected $autoIncrement = false;
-}
 
+}

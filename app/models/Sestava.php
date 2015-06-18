@@ -8,7 +8,7 @@ class Sestava extends DBEntity
 {
 
     const TBL_NAME = 'sestava';
-    
+
     public function isDeletable()
     {
         return $this->id != 1;
@@ -30,8 +30,7 @@ class Sestava extends DBEntity
         $allowed = Nette\Environment::getUser()->isAllowed('Sestava', 'menit');
         return $this->isModifiable() && $allowed;
     }
-    
-    
+
     /**
      * check if user has read access to reports
      */
@@ -39,5 +38,5 @@ class Sestava extends DBEntity
     {
         return Nette\Environment::getUser()->isAllowed('Sestava', 'zobrazit');
     }
+
 }
-?>

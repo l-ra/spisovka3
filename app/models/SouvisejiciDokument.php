@@ -5,42 +5,43 @@ class SouvisejiciDokument extends BaseModel
 
     protected $name = 'souvisejici_dokument';
 
-    public function souvisejici($dokument_id) {
+    public function souvisejici($dokument_id)
+    {
 
         $param = array();
         $param['where_or'] = array();
-        $param['where_or'][] = array('dokument_id=%i',$dokument_id);
-        $param['where_or'][] = array('spojit_s_id=%i',$dokument_id);
+        $param['where_or'][] = array('dokument_id=%i', $dokument_id);
+        $param['where_or'][] = array('spojit_s_id=%i', $dokument_id);
 
         $dokumenty = array();
         $result = $this->selectComplex($param)->fetchAll();
-        if ( count($result)>0 ) {
+        if (count($result) > 0) {
             $Dokument = new Dokument();
             foreach ($result as $joinDok) {
-                if ( $joinDok->spojit_s_id == $dokument_id ) {
+                if ($joinDok->spojit_s_id == $dokument_id) {
                     // zpetne spojeny s
                     $dok = $Dokument->getBasicInfo($joinDok->dokument_id);
                     $dok->spojeni = 'zpetne_spojen';
-                    $dokumenty[ $joinDok->dokument_id ] = $dok;
+                    $dokumenty[$joinDok->dokument_id] = $dok;
                 } else {
                     // spojen s
                     $dok = $Dokument->getBasicInfo($joinDok->spojit_s_id);
                     $dok->spojeni = 'spojen';
-                    $dokumenty[ $joinDok->spojit_s_id ] = $dok;
+                    $dokumenty[$joinDok->spojit_s_id] = $dok;
                 }
             }
             return $dokumenty;
         } else {
             return null;
         }
-
     }
 
-    public function spojit($dokument_id, $spojit_s) {
+    public function spojit($dokument_id, $spojit_s)
+    {
 
         $odebrat = array(
-                        array('dokument_id=%i',$dokument_id)
-                   );
+            array('dokument_id=%i', $dokument_id)
+        );
         $this->odebrat($odebrat);
 
         $row = array();
@@ -51,10 +52,10 @@ class SouvisejiciDokument extends BaseModel
         $row['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
 
         return $this->insert_basic($row);
-
     }
 
-    public function odebrat($param) {
+    public function odebrat($param)
+    {
         return $this->delete($param);
     }
 

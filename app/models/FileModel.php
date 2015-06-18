@@ -8,14 +8,13 @@ class FileModel extends BaseModel
     protected $name = 'file';
     protected $primary = 'id';
 
-
     public function getInfo($file_id, $file_version = null)
     {
 
-        $result = $this->select(array(array('id=%i',$file_id)));
+        $result = $this->select(array(array('id=%i', $file_id)));
         $row = $result->fetch();
 
-        if ( $row ) {
+        if ($row) {
 
             $user = UserModel::getIdentity($row->user_created);
             $row->user_name = Osoba::displayName($user);
@@ -24,29 +23,29 @@ class FileModel extends BaseModel
             $row->mime_type = FileModel::mimeType($row->real_path);
             // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
             $mime_type_webalize = Nette\Utils\Strings::webalize($row->mime_type);
-            $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
-            if ( @file_exists($mime_type_icon) ) {
-                $row->mime_type_icon = Nette\Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";
+            $mime_type_icon = APP_DIR . "/../public/images/mimetypes/" . $mime_type_webalize . ".png";
+            if (@file_exists($mime_type_icon)) {
+                $row->mime_type_icon = Nette\Environment::getVariable('publicUrl') . "images/mimetypes/" . $mime_type_webalize . ".png";
             } else {
-                $row->mime_type_icon = Nette\Environment::getVariable('publicUrl') ."images/mimetypes/application-octet-stream.png";
-            }            
-            
-            
+                $row->mime_type_icon = Nette\Environment::getVariable('publicUrl') . "images/mimetypes/application-octet-stream.png";
+            }
+
+
             return $row;
         } else {
             return null;
         }
-
     }
 
-    public function seznam($vse=0, $dokument_id=null, $dokument_version=null) {
+    public function seznam($vse = 0, $dokument_id = null, $dokument_version = null)
+    {
 
         $select = $this->select(null, array('nazev'));
         $rows = $select->fetchAll();
 
         $tmp = array();
         foreach ($rows as $file) {
-            
+
             $user = UserModel::getIdentity($file->user_created);
             $file->user_name = Osoba::displayName($user);
             $file->typ_name = FileModel::typPrilohy($file->typ, 1);
@@ -54,36 +53,34 @@ class FileModel extends BaseModel
             $file->mime_type = FileModel::mimeType($file->real_path);
             // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
             $mime_type_webalize = Nette\Utils\Strings::webalize($file->mime_type);
-            $mime_type_icon = APP_DIR ."/../public/images/mimetypes/". $mime_type_webalize .".png" ;
-            if ( @file_exists($mime_type_icon) ) {
-                $file->mime_type_icon = Nette\Environment::getVariable('publicUrl') ."images/mimetypes/". $mime_type_webalize .".png";
+            $mime_type_icon = APP_DIR . "/../public/images/mimetypes/" . $mime_type_webalize . ".png";
+            if (@file_exists($mime_type_icon)) {
+                $file->mime_type_icon = Nette\Environment::getVariable('publicUrl') . "images/mimetypes/" . $mime_type_webalize . ".png";
             } else {
-                $file->mime_type_icon = Nette\Environment::getVariable('publicUrl') ."images/mimetypes/application-octet-stream.png";
-            }             
-            
-            $tmp[ $file->id ] = $file;
+                $file->mime_type_icon = Nette\Environment::getVariable('publicUrl') . "images/mimetypes/application-octet-stream.png";
+            }
 
-
+            $tmp[$file->id] = $file;
         }
 
         return ($rows) ? $rows : NULL;
-
     }
 
-    public function vlozit($data) {
+    public function vlozit($data)
+    {
 
         $row = array();
-        $row['typ'] = isset($data['typ'])?$data['typ']:1;
+        $row['typ'] = isset($data['typ']) ? $data['typ'] : 1;
         $row['nazev'] = $data['nazev'];
-        $row['popis'] = isset($data['popis'])?$data['popis']:'';
+        $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
         $row['real_name'] = $data['real_name'];
         $row['real_path'] = $data['real_path'];
-        $row['real_type'] = isset($data['real_type'])?$data['real_type']:'UploadFile_Basic';
+        $row['real_type'] = isset($data['real_type']) ? $data['real_type'] : 'UploadFile_Basic';
 
         $row['mime_type'] = FileModel::mimeType($row['real_path']);
 
-        if ( !isset($data['md5_hash']) ) {
-            if ( file_exists($data['real_path']) ) {
+        if (!isset($data['md5_hash'])) {
+            if (file_exists($data['real_path'])) {
                 $row['md5_hash'] = md5_file($data['real_path']);
             } else {
                 $row['md5_hash'] = '';
@@ -92,8 +89,8 @@ class FileModel extends BaseModel
             $row['md5_hash'] = $data['md5_hash'];
         }
 
-        if ( !isset($data['size']) ) {
-            if ( file_exists($data['real_path']) ) {
+        if (!isset($data['size'])) {
+            if (file_exists($data['real_path'])) {
                 $row['size'] = filesize($data['real_path']);
             } else {
                 $row['size'] = -1;
@@ -116,44 +113,45 @@ class FileModel extends BaseModel
 
         $file_id = $this->insert($row);
 
-        if ( $file_id ) {
+        if ($file_id) {
             return $this->getInfo($file_id);
         } else {
             return false;
         }
-
     }
 
-    public function upravitMetadata($data, $file_id) {
+    public function upravitMetadata($data, $file_id)
+    {
 
 
-        $file_info = $this->select(array(array('id=%i',$file_id)))->fetch();
-        if ( !$file_info ) return false;
+        $file_info = $this->select(array(array('id=%i', $file_id)))->fetch();
+        if (!$file_info)
+            return false;
 
         $file_info = $this->obj2array($file_info);
 
         $row = $file_info;
-        $row['typ'] = isset($data['typ'])?$data['typ']:1;
+        $row['typ'] = isset($data['typ']) ? $data['typ'] : 1;
         $row['nazev'] = $data['nazev'];
-        $row['popis'] = isset($data['popis'])?$data['popis']:'';
+        $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
 
         $row['date_modified'] = new DateTime();
         $row['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
 
-        if ( $this->update($row, array('id=%i',$file_id)) ) {
+        if ($this->update($row, array('id=%i', $file_id))) {
             return $this->getInfo($file_id);
         } else {
             return false;
         }
-
-
     }
 
-    protected function odebrat($data) {
+    protected function odebrat($data)
+    {
         
     }
 
-    public function  deleteAll() {
+    public function deleteAll()
+    {
 
         $DokumentPrilohy = new DokumentPrilohy();
         $DokumentPrilohy->deleteAll();
@@ -164,35 +162,36 @@ class FileModel extends BaseModel
         parent::deleteAll();
     }
 
-    public static function typPrilohy($typ=null , $out=0) {
+    public static function typPrilohy($typ = null, $out = 0)
+    {
 
-        $enum_orig = array('1'=>'main',
-                           '2'=>'enclosure',
-                           '3'=>'signature',
-                           '4'=>'meta',
-                           '5'=>'source'
-                     );
-        $enum_popis = array('1'=>'hlavní soubor',
-                            '2'=>'příloha',
-                            '3'=>'podpis',
-                            '4'=>'metadata',
-                            '5'=>'zdrojový soubor'
-                     );
+        $enum_orig = array('1' => 'main',
+            '2' => 'enclosure',
+            '3' => 'signature',
+            '4' => 'meta',
+            '5' => 'source'
+        );
+        $enum_popis = array('1' => 'hlavní soubor',
+            '2' => 'příloha',
+            '3' => 'podpis',
+            '4' => 'metadata',
+            '5' => 'zdrojový soubor'
+        );
 
-        if ( is_null($typ) ) {
+        if (is_null($typ)) {
             return $enum_popis;
         }
-        if ( $out == 0 ) {
-            return ( array_key_exists($typ, $enum_orig) )?$enum_orig[ $typ ]:null;
-        } else if ( $out == 1 ) {
-            return ( array_key_exists($typ, $enum_popis) )?$enum_popis[ $typ ]:null;
+        if ($out == 0) {
+            return ( array_key_exists($typ, $enum_orig) ) ? $enum_orig[$typ] : null;
+        } else if ($out == 1) {
+            return ( array_key_exists($typ, $enum_popis) ) ? $enum_popis[$typ] : null;
         } else {
             return null;
         }
-
     }
 
-    public static function copy($source, $destination) {
+    public static function copy($source, $destination)
+    {
 
         if (!($handle_src = fopen($src, "rb")))
             return false;
@@ -207,14 +206,12 @@ class FileModel extends BaseModel
                 if ($data = fread($handle_src, 1024)) {
                     if (!fwrite($handle_dst, $data))
                         return false;
-                }
-                else
+                } else
                     return false;
             }
             if (!flock($handle_dst, LOCK_UN))
-            return false;
-        }
-        else
+                return false;
+        } else
             return false;
 
         if (!fclose($handle_src) || !fclose($handle_dst))
@@ -223,9 +220,10 @@ class FileModel extends BaseModel
         return true;
     }
 
-    public static function mimeType($filename) {
+    public static function mimeType($filename)
+    {
 
-        $mime_types = array (
+        $mime_types = array(
             '' => 'application/octet-stream',
             '%' => 'application/x-trash',
             '3gp' => 'video/3gpp',
@@ -780,26 +778,27 @@ class FileModel extends BaseModel
             '~' => 'application/x-trash',
             '323' => 'text/h323',
         );
-        
-        if ( preg_match("|\.([a-z0-9]{2,4})$|i", $filename, $fileSuffix) ) {
+
+        if (preg_match("|\.([a-z0-9]{2,4})$|i", $filename, $fileSuffix)) {
             $ext = strtolower($fileSuffix[1]);
         } else {
-            $ext = @strtolower(array_pop(explode('.',$filename)));
+            $ext = @strtolower(array_pop(explode('.', $filename)));
         }
 
-        if ( array_key_exists($ext, $mime_types) ) 
+        if (array_key_exists($ext, $mime_types))
             return $mime_types[$ext];
-            
+
         // if ( function_exists('finfo_open') ) {
         //    $finfo = finfo_open(FILEINFO_MIME);
         //    $mimetype = finfo_file($finfo, $filename);
         //    finfo_close($finfo);
         //    return $mimetype;
-        
+
         if (function_exists("mime_content_type"))
             $fileSuffix = @mime_content_type($filename);
-            return $fileSuffix ? trim($fileSuffix[0]) : 'application/octet-stream';
-        
-        return 'application/octet-stream';       
+        return $fileSuffix ? trim($fileSuffix[0]) : 'application/octet-stream';
+
+        return 'application/octet-stream';
     }
+
 }

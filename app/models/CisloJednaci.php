@@ -5,9 +5,7 @@ class CisloJednaci extends BaseModel
 
     protected $name = 'cislo_jednaci';
     protected $primary = 'id';
-
     protected $tb_dokument = 'dokument';
-
     protected $info;
     protected $unique;
     protected $urad;
@@ -16,7 +14,8 @@ class CisloJednaci extends BaseModel
     protected $pocatek_cisla;
     protected $pouzij_minuly_rok;
 
-    public function  __construct() {
+    public function __construct()
+    {
 
         $prefix = self::getDbPrefix();
         $this->name = $prefix . $this->name;
@@ -28,22 +27,23 @@ class CisloJednaci extends BaseModel
 
         // pocatek cisla
         $this->pocatek_cisla = 1;
-        if ( @$this->info->pocatek_cisla > 1 ) {
-             $count = $this->select()->count();
-             if ( $count == 0 ) {
-                 $this->pocatek_cisla = isset($this->info->pocatek_cisla)?$this->info->pocatek_cisla:1;
-             }
+        if (@$this->info->pocatek_cisla > 1) {
+            $count = $this->select()->count();
+            if ($count == 0) {
+                $this->pocatek_cisla = isset($this->info->pocatek_cisla) ? $this->info->pocatek_cisla
+                            : 1;
+            }
         }
 
         $unique_info = Nette\Environment::getVariable('unique_info');
-        $unique_part = explode('#',$unique_info);
-        $this->unique = 'OSS-'. $unique_part[0];
+        $unique_part = explode('#', $unique_info);
+        $this->unique = 'OSS-' . $unique_part[0];
 
         $this->user_info = Nette\Environment::getUser()->getIdentity();
 
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 
-        if ( empty($orgjednotka_id) ) {
+        if (empty($orgjednotka_id)) {
             $this->org = null;
         } else {
             $Org = new Orgjednotka();
@@ -53,29 +53,32 @@ class CisloJednaci extends BaseModel
         $this->pouzij_minuly_rok = isset($this->info->minuly_rok) && $this->info->minuly_rok == 1;
     }
 
-    public function dejAppId() {
-    
-        return $this->unique;    
+    public function dejAppId()
+    {
+
+        return $this->unique;
     }
-    
+
     /**
      * Vygeneruje cislo jednaci
      * @return string
      */
-    public function generuj($ulozit = 0, $info = null) {
+    public function generuj($ulozit = 0, $info = null)
+    {
 
         $maska = $this->info->maska;
         $cislo_jednaci = $maska;
 
-        if ( is_null($info) ) {
+        if (is_null($info)) {
             $info = array();
 
-            if ( isset($this->info->typ_deniku) && $this->info->typ_deniku == "org" ) {
-                $info['podaci_denik'] = $this->info->podaci_denik . (!empty($this->org)?"_".$this->org->ciselna_rada:"");
+            if (isset($this->info->typ_deniku) && $this->info->typ_deniku == "org") {
+                $info['podaci_denik'] = $this->info->podaci_denik . (!empty($this->org) ? "_" . $this->org->ciselna_rada
+                                    : "");
             } else {
                 $info['podaci_denik'] = $this->info->podaci_denik;
             }
-            
+
             $info['rok'] = date('Y');
             if ($this->pouzij_minuly_rok)
                 --$info['rok'];
@@ -84,8 +87,8 @@ class CisloJednaci extends BaseModel
             $info['urad_zkratka'] = $this->urad->zkratka;
             $info['urad_poradi'] = $this->max('urad');
 
-            $info['orgjednotka_id'] = !empty($this->org)?$this->org->id:null;
-            $info['org'] = !empty($this->org)?$this->org->ciselna_rada:"";
+            $info['orgjednotka_id'] = !empty($this->org) ? $this->org->id : null;
+            $info['org'] = !empty($this->org) ? $this->org->ciselna_rada : "";
             $info['org_poradi'] = $this->max('org');
 
             $info['user_id'] = $this->user_info->id;
@@ -98,65 +101,71 @@ class CisloJednaci extends BaseModel
         $cislo_jednaci = str_replace("{podaci_denik}", $info['podaci_denik'], $cislo_jednaci);
         $cislo_jednaci = str_replace("{evidence}", $info['podaci_denik'], $cislo_jednaci);
         $cislo_jednaci = str_replace("{rok}", $info['rok'], $cislo_jednaci);
-        $cislo_jednaci = str_replace("{poradove_cislo}", $info['poradove_cislo'], $cislo_jednaci);
+        $cislo_jednaci = str_replace("{poradove_cislo}", $info['poradove_cislo'],
+                $cislo_jednaci);
 
-        if (preg_match('/{poradove_cislo\|(\d{1,6})}/', $cislo_jednaci, $matches) ) {
-            if ( isset($matches[1]) ) {
-                $poradove_cislo = sprintf('%0'.$matches[1].'d', $info['poradove_cislo']);
-                $cislo_jednaci = preg_replace('/{poradove_cislo\|(\d{1,6})}/', $poradove_cislo, $cislo_jednaci);
+        if (preg_match('/{poradove_cislo\|(\d{1,6})}/', $cislo_jednaci, $matches)) {
+            if (isset($matches[1])) {
+                $poradove_cislo = sprintf('%0' . $matches[1] . 'd', $info['poradove_cislo']);
+                $cislo_jednaci = preg_replace('/{poradove_cislo\|(\d{1,6})}/', $poradove_cislo,
+                        $cislo_jednaci);
                 unset($poradove_cislo);
             }
         }
-        
+
         $cislo_jednaci = str_replace("{urad}", $info['urad_zkratka'], $cislo_jednaci);
         $cislo_jednaci = str_replace("{urad_poradi}", $info['urad_poradi'], $cislo_jednaci);
-        if (preg_match('/{urad_poradi\|(\d{1,6})}/', $cislo_jednaci, $matches) ) {
-            if ( isset($matches[1]) ) {
-                $poradove_cislo = sprintf('%0'.$matches[1].'d', $info['urad_poradi']);
-                $cislo_jednaci = preg_replace('/{urad_poradi\|(\d{1,6})}/', $poradove_cislo, $cislo_jednaci);
+        if (preg_match('/{urad_poradi\|(\d{1,6})}/', $cislo_jednaci, $matches)) {
+            if (isset($matches[1])) {
+                $poradove_cislo = sprintf('%0' . $matches[1] . 'd', $info['urad_poradi']);
+                $cislo_jednaci = preg_replace('/{urad_poradi\|(\d{1,6})}/', $poradove_cislo,
+                        $cislo_jednaci);
                 unset($poradove_cislo);
             }
         }
 
         $cislo_jednaci = str_replace("{org}", $info['org'], $cislo_jednaci);
         $cislo_jednaci = str_replace("{org_id}", $info['orgjednotka_id'], $cislo_jednaci);
-        if (preg_match('/{org_id\|(\d{1,6})}/', $cislo_jednaci, $matches) ) {
-            if ( isset($matches[1]) ) {
-                $cislo = sprintf('%0'.$matches[1].'d', $info['orgjednotka_id']);
+        if (preg_match('/{org_id\|(\d{1,6})}/', $cislo_jednaci, $matches)) {
+            if (isset($matches[1])) {
+                $cislo = sprintf('%0' . $matches[1] . 'd', $info['orgjednotka_id']);
                 $cislo_jednaci = preg_replace('/{org_id\|(\d{1,6})}/', $cislo, $cislo_jednaci);
                 unset($cislo);
             }
         }
         $cislo_jednaci = str_replace("{org_poradi}", $info['org_poradi'], $cislo_jednaci);
-        if (preg_match('/{org_poradi\|(\d{1,6})}/', $cislo_jednaci, $matches) ) {
-            if ( isset($matches[1]) ) {
-                $poradove_cislo = sprintf('%0'.$matches[1].'d', $info['org_poradi']);
-                $cislo_jednaci = preg_replace('/{org_poradi\|(\d{1,6})}/', $poradove_cislo, $cislo_jednaci);
+        if (preg_match('/{org_poradi\|(\d{1,6})}/', $cislo_jednaci, $matches)) {
+            if (isset($matches[1])) {
+                $poradove_cislo = sprintf('%0' . $matches[1] . 'd', $info['org_poradi']);
+                $cislo_jednaci = preg_replace('/{org_poradi\|(\d{1,6})}/', $poradove_cislo,
+                        $cislo_jednaci);
                 unset($poradove_cislo);
             }
         }
 
         $cislo_jednaci = str_replace("{user_id}", $info['user_id'], $cislo_jednaci);
-        if (preg_match('/{user_id\|(\d{1,6})}/', $cislo_jednaci, $matches) ) {
-            if ( isset($matches[1]) ) {
-                $poradove_cislo = sprintf('%0'.$matches[1].'d', $info['user_id']);
-                $cislo_jednaci = preg_replace('/{user_id\|(\d{1,6})}/', $poradove_cislo, $cislo_jednaci);
+        if (preg_match('/{user_id\|(\d{1,6})}/', $cislo_jednaci, $matches)) {
+            if (isset($matches[1])) {
+                $poradove_cislo = sprintf('%0' . $matches[1] . 'd', $info['user_id']);
+                $cislo_jednaci = preg_replace('/{user_id\|(\d{1,6})}/', $poradove_cislo,
+                        $cislo_jednaci);
                 unset($poradove_cislo);
             }
         }
         $cislo_jednaci = str_replace("{user}", $info['user'], $cislo_jednaci);
         $cislo_jednaci = str_replace("{prijmeni}", $info['prijmeni'], $cislo_jednaci);
         $cislo_jednaci = str_replace("{user_poradi}", $info['user_poradi'], $cislo_jednaci);
-        if (preg_match('/{user_poradi\|(\d{1,6})}/', $cislo_jednaci, $matches) ) {
-            if ( isset($matches[1]) ) {
-                $poradove_cislo = sprintf('%0'.$matches[1].'d', $info['user_poradi']);
-                $cislo_jednaci = preg_replace('/{user_poradi\|(\d{1,6})}/', $poradove_cislo, $cislo_jednaci);
+        if (preg_match('/{user_poradi\|(\d{1,6})}/', $cislo_jednaci, $matches)) {
+            if (isset($matches[1])) {
+                $poradove_cislo = sprintf('%0' . $matches[1] . 'd', $info['user_poradi']);
+                $cislo_jednaci = preg_replace('/{user_poradi\|(\d{1,6})}/', $poradove_cislo,
+                        $cislo_jednaci);
                 unset($poradove_cislo);
             }
         }
 
-        if ( $ulozit == 1 ) {
-            unset($info['user'],$info['prijmeni'],$info['org']  );
+        if ($ulozit == 1) {
+            unset($info['user'], $info['prijmeni'], $info['org']);
             $cjednaci_id = $this->insert($info);
 
             $tmp = new stdClass();
@@ -169,8 +178,8 @@ class CisloJednaci extends BaseModel
             $tmp->urad = $this->urad->zkratka;
             $tmp->urad_nazev = $this->urad->nazev;
             $tmp->urad_poradi = $info['urad_poradi'];
-            $tmp->orgjednotka_id = !is_null($this->org)?$this->org->id:null;
-            $tmp->orgjednotka = !is_null($this->org)?$this->org->ciselna_rada:"";
+            $tmp->orgjednotka_id = !is_null($this->org) ? $this->org->id : null;
+            $tmp->orgjednotka = !is_null($this->org) ? $this->org->ciselna_rada : "";
             $tmp->orgjednotka_poradi = $info['org_poradi'];
             $tmp->user_id = $this->user_info->id;
             $tmp->user = $this->user_info->username;
@@ -181,7 +190,7 @@ class CisloJednaci extends BaseModel
         } else {
 
             $tmp = new stdClass();
-            $tmp->id = isset($info['id'])?$info['id']:null;
+            $tmp->id = isset($info['id']) ? $info['id'] : null;
             $tmp->cislo_jednaci = $cislo_jednaci;
             $tmp->rok = $info['rok'];
             $tmp->poradove_cislo = $info['poradove_cislo'];
@@ -190,8 +199,8 @@ class CisloJednaci extends BaseModel
             $tmp->urad = $this->urad->zkratka;
             $tmp->urad_nazev = $this->urad->nazev;
             $tmp->urad_poradi = $info['urad_poradi'];
-            $tmp->orgjednotka_id = !is_null($this->org)?$this->org->id:null;
-            $tmp->orgjednotka = !is_null($this->org)?$this->org->ciselna_rada:"";
+            $tmp->orgjednotka_id = !is_null($this->org) ? $this->org->id : null;
+            $tmp->orgjednotka = !is_null($this->org) ? $this->org->ciselna_rada : "";
             $tmp->orgjednotka_poradi = $info['org_poradi'];
             $tmp->user_id = $this->user_info->id;
             $tmp->user = $this->user_info->username;
@@ -201,16 +210,16 @@ class CisloJednaci extends BaseModel
 
             return $tmp;
         }
-        
     }
 
-    public function nacti($cjednaci_id, $generuj = 0) {
+    public function nacti($cjednaci_id, $generuj = 0)
+    {
 
-            
-        $row = $this->select(array(array('id=%i',$cjednaci_id)))->fetch();
 
-        if ( $row ) {
-            
+        $row = $this->select(array(array('id=%i', $cjednaci_id)))->fetch();
+
+        if ($row) {
+
             $info = array();
             $info['id'] = $cjednaci_id;
 
@@ -227,15 +236,14 @@ class CisloJednaci extends BaseModel
                 $OrgJednotka = new Orgjednotka();
                 $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                 $info['org'] = $org_info->ciselna_rada;
-            }
-            else {
+            } else {
                 $info['org'] = null;
             }
-            
+
             $info['org_poradi'] = $row->org_poradi;
 
             $info['user_id'] = $row->user_id;
-            $user_info = UserModel::getUser($row->user_id,true);
+            $user_info = UserModel::getUser($row->user_id, true);
 
             $info['user'] = $user_info->username;
             $info['prijmeni'] = Nette\Utils\Strings::webalize($user_info->identity->prijmeni);
@@ -245,60 +253,62 @@ class CisloJednaci extends BaseModel
         } else {
             return $this->generuj($generuj);
         }
-
     }
 
-    private function max($typ) {
+    private function max($typ)
+    {
 
         $where = array();
-        $where[] = array('rok=%i', $this->pouzij_minuly_rok ? date('Y')-1 : date('Y'));
+        $where[] = array('rok=%i', $this->pouzij_minuly_rok ? date('Y') - 1 : date('Y'));
 
         $pocatek_cisla = $this->pocatek_cisla;
         $cislo = null;
         switch ($typ) {
             case "poradove_cislo":
-                
-                if ( isset($this->info->typ_deniku) && $this->info->typ_deniku == "org" ) {
-                    $where[] = array('podaci_denik=%s',$this->info->podaci_denik . (!empty($this->org)?"_".$this->org->ciselna_rada:""));
+
+                if (isset($this->info->typ_deniku) && $this->info->typ_deniku == "org") {
+                    $where[] = array('podaci_denik=%s', $this->info->podaci_denik . (!empty($this->org)
+                                    ? "_" . $this->org->ciselna_rada : ""));
                 } else {
-                    $where[] = array('podaci_denik=%s',$this->info->podaci_denik);
-                }                
-                
-                $result = $this->select($where, array('poradove_cislo'=>'DESC'),null,1);
+                    $where[] = array('podaci_denik=%s', $this->info->podaci_denik);
+                }
+
+                $result = $this->select($where, array('poradove_cislo' => 'DESC'), null, 1);
                 $row = $result->fetch();
-                $cislo = (@$row->poradove_cislo)?($row->poradove_cislo)+1 : $pocatek_cisla;
+                $cislo = (@$row->poradove_cislo) ? ($row->poradove_cislo) + 1 : $pocatek_cisla;
                 break;
             case "urad":
-                $where[] = array('urad_zkratka=%s',$this->urad->zkratka);
-                $result = $this->select($where, array('urad_poradi'=>'DESC'),null,1);
+                $where[] = array('urad_zkratka=%s', $this->urad->zkratka);
+                $result = $this->select($where, array('urad_poradi' => 'DESC'), null, 1);
                 $row = $result->fetch();
-                $cislo = (@$row->urad_poradi)?($row->urad_poradi)+1 : $pocatek_cisla;
+                $cislo = (@$row->urad_poradi) ? ($row->urad_poradi) + 1 : $pocatek_cisla;
                 break;
             case "org":
-                if ( is_null($this->org) ) {
+                if (is_null($this->org)) {
                     $where[] = array('orgjednotka_id IS NULL');
                 } else {
-                    $where[] = array('orgjednotka_id=%i',$this->org->id);
+                    $where[] = array('orgjednotka_id=%i', $this->org->id);
                 }
-                $result = $this->select($where, array('org_poradi'=>'DESC'),null,1);
+                $result = $this->select($where, array('org_poradi' => 'DESC'), null, 1);
                 $row = $result->fetch();
-                $cislo = (@$row->org_poradi)?($row->org_poradi)+1 : $pocatek_cisla;
+                $cislo = (@$row->org_poradi) ? ($row->org_poradi) + 1 : $pocatek_cisla;
                 break;
             case "user":
-                $where[] = array('user_id=%i',$this->user_info->id);
-                $result = $this->select($where, array('user_poradi'=>'DESC'),null,1);
+                $where[] = array('user_id=%i', $this->user_info->id);
+                $result = $this->select($where, array('user_poradi' => 'DESC'), null, 1);
                 $row = $result->fetch();
-                $cislo = (@$row->user_poradi)?($row->user_poradi)+1 : $pocatek_cisla;
+                $cislo = (@$row->user_poradi) ? ($row->user_poradi) + 1 : $pocatek_cisla;
                 break;
-                
+
             default: break;
         }
         return $cislo;
     }
 
-    public function  get_minuly_rok() {
-        
+    public function get_minuly_rok()
+    {
+
         return $this->pouzij_minuly_rok;
     }
-    
+
 }
