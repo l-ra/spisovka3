@@ -72,7 +72,7 @@ class DokumentPrilohy extends BaseModel
         }
     }
 
-    public function pripojit($dokument_id, $file_id, $dokument_version = null, $file_version = null)
+    public function pripojit($dokument_id, $file_id)
     {
 
         $row = array();

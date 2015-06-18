@@ -445,7 +445,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $Zapujcka = new Zapujcka();
 
         try {
-            $Zapujcka->ulozit($data);
+            $Zapujcka->vytvorit($data);
             $this->flashMessage('Zápůjčka byla vytvořena.');
             $this->redirect(':Spisovna:Zapujcky:default');
         } catch (DibiException $e) {

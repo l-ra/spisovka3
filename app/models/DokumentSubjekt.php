@@ -7,8 +7,6 @@ class DokumentSubjekt extends BaseModel
 
     public function subjekty($dokument_id)
     {
-
-
         $sql = array(
             'distinct' => null,
             'from' => array($this->name => 'ds'),
@@ -20,7 +18,6 @@ class DokumentSubjekt extends BaseModel
             ),
             'order_sql' => 'CONCAT(s.nazev_subjektu,s.prijmeni,s.jmeno)'
         );
-
 
         if (is_array($dokument_id)) {
             $sql['where'] = array(array('dokument_id IN %in', $dokument_id));

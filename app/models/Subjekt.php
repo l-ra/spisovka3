@@ -336,22 +336,16 @@ class Subjekt extends BaseModel
                     $res .= ', ' . $data->id_isds;
                 }
                 return $res;
-                break;
             case 'jmeno':
                 return $d_nazev;
-                break;
             case 'osoba':
                 return $d_osoba;
-                break;
             case 'jmeno_item':
                 return $d_nazev_item;
-                break;
             case 'osoba_item':
                 return $d_osoba_item;
-                break;
             case 'adresa':
                 return $d_adresa;
-                break;
             case 'plna_adresa':
                 $res = $d_nazev;
                 if (!empty($d_adresa))
@@ -360,29 +354,21 @@ class Subjekt extends BaseModel
             case 'formalni_adresa':
                 return $d_ulice . '<br />' . $data->adresa_psc . ' ' . $data->adresa_mesto . '<br />' . Subjekt::stat($data->adresa_stat,
                                 10);
-                break;
             case 'plna_formalni_adresa':
                 return $d_nazev . '<br />' . $d_ulice . '<br />' . $data->adresa_psc . ' ' . $data->adresa_mesto . '<br />' . Subjekt::stat($data->adresa_stat,
                                 10);
-                break;
             case 'ulice':
                 return $d_ulice;
-                break;
             case 'mesto':
                 return $data->adresa_psc . ' ' . $data->adresa_mesto;
-                break;
             case 'email':
                 return $d_nazev . ' (' . ( empty($data->email) ? 'nemá email' : $data->email ) . ')';
-                break;
             case 'isds':
                 return $d_nazev . ' (' . ( empty($data->id_isds) ? 'nemá datovou schránku' : $data->id_isds ) . ')';
-                break;
             case 'telefon':
                 return $d_nazev . ' (' . ( empty($data->telefon) ? 'nemá telefon' : $data->telefon ) . ')';
-                break;
             default:
                 return $d_nazev . ', ' . $d_adresa;
-                break;
         }
     }
 

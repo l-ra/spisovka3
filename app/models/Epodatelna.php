@@ -4,27 +4,16 @@
 
 class Epodatelna extends BaseModel
 {
-
     protected $name = 'epodatelna';
     protected $primary = 'id';
-    protected $tb_file = 'file';
-
-    public function __construct()
-    {
-
-        $prefix = self::getDbPrefix();
-        $this->name = $prefix . $this->name;
-        $this->tb_file = $prefix . $this->tb_file;
-    }
 
     /**
      * Seznam dokumentu s zivotnim cyklem
      * 
      * @param <type> $args 
      */
-    public function seznam($args = array(), $detail = 0)
+    public function seznam($args = array())
     {
-
         if (isset($args['where'])) {
             $where = $args['where'];
         } else {
@@ -101,15 +90,13 @@ class Epodatelna extends BaseModel
         return $query->count();
     }
 
-    public function getInfo($epodatelna_id, $detail = 0)
+    public function getInfo($epodatelna_id)
     {
-
         $args = array(
             'where' => array(
                 array('id=%i', $epodatelna_id)
             )
         );
-
 
         $query = $this->selectComplex($args);
         return $query->fetch();

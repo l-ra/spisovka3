@@ -187,5 +187,3 @@ abstract class DBEntity
     }
 
 }
-
-?>

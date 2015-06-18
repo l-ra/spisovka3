@@ -28,9 +28,6 @@ class Spis extends TreeModel
     {
         $OrgJednotka = new Orgjednotka();
 
-        $user = Nette\Environment::getUser();
-        $user_id = $user->getIdentity()->id;
-
         if (!empty($row->orgjednotka_id)) {
             $row->orgjednotka_prideleno = $OrgJednotka->getInfo($row->orgjednotka_id);
         } else {
@@ -300,8 +297,8 @@ class Spis extends TreeModel
             }
 
             return true;
-        } catch (exception $e) {
-            $Log->logSpis($spis_id, 48, 'Nepodařilo se změnit stav spisu.');
+        } catch (Exception $e) {
+            $Log->logSpis($spis_id, 48, 'Nepodařilo se změnit stav spisu. ' . $e->getMessage());
             return false;
         }
     }
@@ -321,6 +318,7 @@ class Spis extends TreeModel
             );
             return true;
         } catch (Exception $e) {
+            $e->getMessage();
             return false;
         }
     }
@@ -340,6 +338,7 @@ class Spis extends TreeModel
             );
             return true;
         } catch (Exception $e) {
+            $e->getMessage();
             return false;
         }
     }
@@ -356,6 +355,7 @@ class Spis extends TreeModel
             );
             return true;
         } catch (Exception $e) {
+            $e->getMessage();
             return false;
         }
     }
@@ -491,7 +491,7 @@ class Spis extends TreeModel
 
         // Prenest vsechny dokumenty do spisovny spolu se spisem
         $DokumentSpis = new DokumentSpis();
-        $dokumenty = $DokumentSpis->dokumenty($spis_id, 1);
+        $dokumenty = $DokumentSpis->dokumenty($spis_id);
         if (count($dokumenty) > 0) {
             $Workflow = new Workflow();
             foreach ($dokumenty as $dok) {
@@ -548,7 +548,7 @@ class Spis extends TreeModel
 
         // Pripojit vsechny dokumenty do spisovny spolu se spisem
         $DokumentSpis = new DokumentSpis();
-        $dokumenty = $DokumentSpis->dokumenty($spis_id, 1);
+        $dokumenty = $DokumentSpis->dokumenty($spis_id);
         if (count($dokumenty) > 0) {
             $Workflow = new Workflow();
             foreach ($dokumenty as $dok) {
@@ -608,7 +608,7 @@ class Spis extends TreeModel
         }
 
         $DokumentSpis = new DokumentSpis();
-        $dokumenty = $DokumentSpis->dokumenty($data->id, 1);
+        $dokumenty = $DokumentSpis->dokumenty($data->id);
 
         // stav nad 5 (4?)
         if (count($dokumenty) > 0) {

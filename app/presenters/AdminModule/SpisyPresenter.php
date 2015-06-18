@@ -202,7 +202,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         }
 
         $DokumentSpis = new DokumentSpis();
-        $result = $DokumentSpis->dokumenty($spis_id, 1);
+        $result = $DokumentSpis->dokumenty($spis_id);
         $this->template->seznam = $result;
 
         $this->template->spisForm = $this['upravitForm'];

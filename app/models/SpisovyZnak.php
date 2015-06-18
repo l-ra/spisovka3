@@ -7,14 +7,6 @@ class SpisovyZnak extends TreeModel
     protected $primary = 'id';
     protected $tb_spoudalost = 'spousteci_udalost';
 
-    public function __construct()
-    {
-
-        $prefix = self::getDbPrefix();
-        $this->name = $prefix . $this->name;
-        $this->tb_spoudalost = $prefix . $this->tb_spoudalost;
-    }
-
     public function seznam($args = null, $select = 0, $spisznak_parent = null)
     {
 
@@ -31,9 +23,8 @@ class SpisovyZnak extends TreeModel
         return $this->nacti($spisznak_parent, true, true, $params);
     }
 
-    public function seznamNativ($args = null, $select = 0, $spisznak_parent = null)
+    /* public function seznamNativ($args = null, $select = 0)
     {
-
         $sql = array(
             'from' => array($this->name => 'tb'),
             'cols' => array('*'),
@@ -57,7 +48,8 @@ class SpisovyZnak extends TreeModel
             return ($rows) ? $rows : NULL;
         }
     }
-
+    */
+    
     public function ma_podrizene_spisove_znaky($id)
     {
         $sql = array(
@@ -79,7 +71,7 @@ class SpisovyZnak extends TreeModel
             'cols' => array('*'),
             'leftJoin' => array(
                 'spousteci_udalost' => array(
-                    'from' => array($this->tb_spoudalost => 'udalost'),
+                    'from' => array($this->tb_spousteci_udalost => 'udalost'),
                     'on' => array('udalost.id=sz.spousteci_udalost_id'),
                     'cols' => array('nazev' => 'spousteci_udalost_nazev', 'stav' => 'spousteci_udalost_stav', 'poznamka_k_datumu' => 'spousteci_udalost_dtext')
                 ),

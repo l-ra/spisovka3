@@ -682,8 +682,6 @@ class Workflow extends BaseModel
                 // Deaktivujeme starsi zaznamy
                 $this->deaktivovat($dokument_id);
 
-                $user_info = UserModel::getUser($user->getIdentity()->id, 1);
-
                 $data = array();
                 $data['dokument_id'] = $dokument_info->id;
                 $data['stav_dokumentu'] = 8;
@@ -735,8 +733,6 @@ class Workflow extends BaseModel
 
                 // Deaktivujeme starsi zaznamy
                 $this->deaktivovat($dokument_id);
-
-                $user_info = UserModel::getUser($user->getIdentity()->id, 1);
 
                 $data = array();
                 $data['dokument_id'] = $dokument_info->id;
@@ -790,8 +786,6 @@ class Workflow extends BaseModel
                 // Deaktivujeme starsi zaznamy
                 $this->deaktivovat($dokument_id);
 
-                $user_info = UserModel::getUser($user->getIdentity()->id, 1);
-
                 $data = array();
                 $data['dokument_id'] = $dokument_info->id;
                 $data['stav_dokumentu'] = 10;
@@ -837,10 +831,6 @@ class Workflow extends BaseModel
                 //$transaction = (! dibi::inTransaction());
                 //if ($transaction)
                 //dibi::begin();
-                //$Dokument = new Dokument();
-                //$dokument_info = $Dokument->getInfo($dokument_id);
-                $DokumentSpis = new DokumentSpis();
-                $spis = $DokumentSpis->spis($dokument_id);
 
                 // Deaktivujeme starsi zaznamy
                 //$this->deaktivovat($dokument_id);
@@ -1051,9 +1041,8 @@ class Workflow extends BaseModel
         return $row->prideleno_id == $user_id;
     }
 
-    protected function deaktivovat($dokument_id, $dokument_version = null)
+    protected function deaktivovat($dokument_id)
     {
-
         dibi::query("UPDATE {$this->name} SET aktivni = 0 WHERE dokument_id = %i", $dokument_id);
     }
 

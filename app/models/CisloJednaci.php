@@ -5,7 +5,6 @@ class CisloJednaci extends BaseModel
 
     protected $name = 'cislo_jednaci';
     protected $primary = 'id';
-    protected $tb_dokument = 'dokument';
     protected $info;
     protected $unique;
     protected $urad;
@@ -16,10 +15,7 @@ class CisloJednaci extends BaseModel
 
     public function __construct()
     {
-
-        $prefix = self::getDbPrefix();
-        $this->name = $prefix . $this->name;
-        $this->tb_dokument = $prefix . $this->tb_dokument;
+        parent::__construct();
 
         $user_config = Nette\Environment::getVariable('user_config');
         $this->info = $user_config->cislo_jednaci;
@@ -104,6 +100,7 @@ class CisloJednaci extends BaseModel
         $cislo_jednaci = str_replace("{poradove_cislo}", $info['poradove_cislo'],
                 $cislo_jednaci);
 
+        $matches = [];
         if (preg_match('/{poradove_cislo\|(\d{1,6})}/', $cislo_jednaci, $matches)) {
             if (isset($matches[1])) {
                 $poradove_cislo = sprintf('%0' . $matches[1] . 'd', $info['poradove_cislo']);

@@ -227,9 +227,8 @@ class Dokument extends BaseModel
         return ($rows) ? $rows : NULL;
     }
 
-    public function hledat($query, $typ = 'zakladni')
+    public function hledat($query)
     {
-
         $args = array(
             'where_or' => array(
                 array('d.nazev LIKE %s', '%' . $query . '%'),
@@ -336,8 +335,8 @@ class Dokument extends BaseModel
 
         if (isset($params[$name]) && !empty($params[$name])) {
             $date = $params[$name];
-            if (isset($params["$name_cas"]) && !empty($params["$name_cas"]))
-                $date .= ' ' . $params["$name_cas"];
+            if (isset($params["{$name}_cas"]) && !empty($params["{$name}_cas"]))
+                $date .= ' ' . $params["{$name}_cas"];
 
             new DateTime($date);
             $args['where'][] = array("$tableref.$name = %d", $date);
@@ -497,8 +496,8 @@ class Dokument extends BaseModel
             }
         }
 
+        $what = 'vzniku';
         try {
-            $what = 'vzniku';
             $this->_datum_param_to_sql('datum_vzniku', $params, $args);
             $what = 'vyřízení';
             $this->_datum_param_to_sql('datum_vyrizeni', $params, $args);

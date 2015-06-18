@@ -4,20 +4,6 @@ class AclModel extends BaseModel
 {
 
     protected $name = 'user_acl';
-    protected $tb_role = 'user_role';
-    protected $tb_resource = 'user_resource';
-    protected $tb_rule = 'user_rule';
-
-    public function __construct()
-    {
-
-        $prefix = self::getDbPrefix();
-
-        $this->name = $prefix . $this->name;
-        $this->tb_role = $prefix . $this->tb_role;
-        $this->tb_resource = $prefix . $this->tb_resource;
-        $this->tb_rule = $prefix . $this->tb_rule;
-    }
 
     public function getRoles()
     {

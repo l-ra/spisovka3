@@ -82,7 +82,7 @@ class Zapujcka extends BaseModel
             $result = $select->fetchAll();
             if (count($result) > 0) {
                 $tmp = array();
-                foreach ($result as $index => $row) {
+                foreach ($result as $row) {
                     $zapujcka = new stdClass();
                     $tmp[$row->id] = $zapujcka;
                 }
@@ -311,45 +311,32 @@ class Zapujcka extends BaseModel
         return $result;
     }
 
-    public function ulozit($data, $zapujcka_id = null)
+    public function vytvorit($data)
     {
-
         $is_in_role = isset($data['is_in_role']) ? 1 : null;
         unset($data['user_text'], $data['dokument_text'], $data['is_in_role']);
 
-        if (is_null($data)) {
+        if (is_null($data))
             return false;
-        } else if (is_null($zapujcka_id)) {
-            // nova zapujcka
 
-            $data['user_vytvoril_id'] = Nette\Environment::getUser()->getIdentity()->id;
-            $data['date_created'] = new DateTime();
+        $data['user_vytvoril_id'] = Nette\Environment::getUser()->getIdentity()->id;
+        $data['date_created'] = new DateTime();
 
-            if ($is_in_role) {
-                // prijat a schvalen
-                $data['stav'] = 2;
-                $data['user_schvalil_id'] = Nette\Environment::getUser()->getIdentity()->id;
-                $data['date_schvaleni'] = new DateTime();
-            } else {
-                // prijat
-                $data['stav'] = 1;
-            }
-
-            $zapujcka_id = $this->insert($data);
-
-            // Zaneseni do logu a dokumentu
-
-            return $zapujcka_id;
+        if ($is_in_role) {
+            // prijat a schvalen
+            $data['stav'] = 2;
+            $data['user_schvalil_id'] = Nette\Environment::getUser()->getIdentity()->id;
+            $data['date_schvaleni'] = new DateTime();
         } else {
-            // uprava existujici zapujcky
-            unset($data['id'], $data['user_id'], $data['dokument_id'], $data['date_od']);
-            $update = $this->update($update_data,
-                    array(
-                array('id=%i', $zapujcka_id)
-                    )
-            );
-            return $update;
+            // prijat
+            $data['stav'] = 1;
         }
+
+        $zapujcka_id = $this->insert($data);
+
+        // Zaneseni do logu a dokumentu
+
+        return $zapujcka_id;
     }
 
     public function osobni($args)
@@ -379,7 +366,7 @@ class Zapujcka extends BaseModel
         );
 
         try {
-            $update = $this->update($data, array(array('id=%i', $zapujcka_id)));
+            $this->update($data, array(array('id=%i', $zapujcka_id)));
 
             $Workflow = new Workflow();
             $zapujcka_info = $this->getInfo($zapujcka_id);
@@ -405,29 +392,29 @@ class Zapujcka extends BaseModel
         );
 
         try {
-            $update = $this->update($data, array(array('id=%i', $zapujcka_id)));
+            $this->update($data, array(array('id=%i', $zapujcka_id)));
             return true;
         } catch (Exception $e) {
+            $e->getMessage();
             return false;
         }
     }
 
     public function vraceno($zapujcka_id, $datum_vraceni)
     {
-
-        $date = new DateTime();
         $data = array(
             'stav' => 3,
             'date_do_skut' => $datum_vraceni,
         );
         try {
-            $update = $this->update($data, array(array('id=%i', $zapujcka_id)));
+            $this->update($data, array(array('id=%i', $zapujcka_id)));
             $Workflow = new Workflow();
             $dokument_id = $this->getDokumentID($zapujcka_id);
             $Workflow->zapujcka_vratit($dokument_id,
                     Nette\Environment::getUser()->getIdentity()->id);
             return true;
         } catch (Exception $e) {
+            $e->getMessage();
             return false;
         }
     }

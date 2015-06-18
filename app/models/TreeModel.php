@@ -378,38 +378,6 @@ class TreeModel extends BaseModel
         }
     }
 
-    public function rand($pocet)
-    {
-
-        $this->deleteAll();
-
-        function make_seed()
-        {
-            list($usec, $sec) = explode(' ', microtime());
-            return (float) $sec + ((float) $usec * 100000);
-        }
-
-        mt_srand(make_seed());
-
-        /* for ( $i = 0; $i <= $pocet; $i++ ) {
-
-          $data = array(
-          'nazev' =>  $this->make_string(15),
-          'parent_id' => mt_rand(0, $i)
-          );
-          $this->vlozit($data);
-          } */
-
-        for ($i = 0; $i < 26; $i++) {
-
-            $data = array(
-                'nazev' => chr($i + 65),
-                'parent_id' => mt_rand(0, $i)
-            );
-            $this->vlozit($data);
-        }
-    }
-
     private function make_string($pass_len = 8)
     {
         $salt = 'abcdefghijklmnopqrstuvwxyz';

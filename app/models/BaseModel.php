@@ -52,6 +52,9 @@ abstract class BaseModel extends Nette\Object
     protected $tb_stat = 'stat';
     protected $tb_zprava = 'zprava';
     protected $tb_zprava_osoba = 'zprava_osoba';
+    protected $tb_role = 'user_role';
+    protected $tb_resource = 'user_resource';
+    protected $tb_rule = 'user_rule';
 
     public static function getDbPrefix()
     {
@@ -109,8 +112,8 @@ abstract class BaseModel extends Nette\Object
 
     /**
      * Selects rows from the table in specified order
-     * @param array $order
      * @param array $where
+     * @param array $order
      * @param array $offset
      * @param array $limit
      * @return DibiResult
@@ -498,7 +501,7 @@ abstract class BaseModel extends Nette\Object
                 $start = ($offset == 0) ? 0 : ($offset + 1);
                 $stop = $offset + $limit;
                 $inc = 0;
-                foreach ($array as $index => $value) {
+                foreach (array_keys($array) as $index) {
                     if ((!(($start <= $inc) && ($inc <= $stop)))) {
                         unset($array[$index]);
                     }

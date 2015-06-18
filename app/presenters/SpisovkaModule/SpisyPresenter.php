@@ -348,7 +348,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         //$result = $DokumentSpis->dokumenty($spis_id, 1, $paginator);
 
         $DokumentSpis = new DokumentSpis();
-        $this->template->seznam = $opravneni['lze_cist'] ? $DokumentSpis->dokumenty($spis_id, 1)
+        $this->template->seznam = $opravneni['lze_cist'] ? $DokumentSpis->dokumenty($spis_id)
                     : null;
 
         // Volba vystupu - web/tisk/pdf

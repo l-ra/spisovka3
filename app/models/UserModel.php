@@ -54,7 +54,7 @@ class UserModel extends BaseModel
     /**
      * Zjisti osobni informace o uzivateli na základe ID
      *
-     * @param int|string $mixed
+     * @param int $user_id
      * @return DibiRow
      */
     public static function getIdentity($user_id)

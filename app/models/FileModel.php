@@ -8,9 +8,8 @@ class FileModel extends BaseModel
     protected $name = 'file';
     protected $primary = 'id';
 
-    public function getInfo($file_id, $file_version = null)
+    public function getInfo($file_id)
     {
-
         $result = $this->select(array(array('id=%i', $file_id)));
         $row = $result->fetch();
 
@@ -37,7 +36,7 @@ class FileModel extends BaseModel
         }
     }
 
-    public function seznam($vse = 0, $dokument_id = null, $dokument_version = null)
+    public function seznam()
     {
 
         $select = $this->select(null, array('nazev'));
@@ -145,11 +144,6 @@ class FileModel extends BaseModel
         }
     }
 
-    protected function odebrat($data)
-    {
-        
-    }
-
     public function deleteAll()
     {
 
@@ -190,13 +184,14 @@ class FileModel extends BaseModel
         }
     }
 
+    /**
+     * Neni v programu pouzito
     public static function copy($source, $destination)
     {
-
-        if (!($handle_src = fopen($src, "rb")))
+        if (!($handle_src = fopen($source, "rb")))
             return false;
 
-        if (!($handle_dst = fopen($dst, "wb"))) {
+        if (!($handle_dst = fopen($destination, "wb"))) {
             fclose($handle_src);
             return false;
         }
@@ -219,7 +214,8 @@ class FileModel extends BaseModel
 
         return true;
     }
-
+    */
+    
     public static function mimeType($filename)
     {
 
@@ -779,6 +775,7 @@ class FileModel extends BaseModel
             '323' => 'text/h323',
         );
 
+        $fileSuffix = [];
         if (preg_match("|\.([a-z0-9]{2,4})$|i", $filename, $fileSuffix)) {
             $ext = strtolower($fileSuffix[1]);
         } else {
@@ -796,9 +793,8 @@ class FileModel extends BaseModel
 
         if (function_exists("mime_content_type"))
             $fileSuffix = @mime_content_type($filename);
+        
         return $fileSuffix ? trim($fileSuffix[0]) : 'application/octet-stream';
-
-        return 'application/octet-stream';
     }
 
 }

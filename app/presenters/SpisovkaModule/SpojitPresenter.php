@@ -28,7 +28,7 @@ class Spisovka_SpojitPresenter extends BasePresenter
         $query = $this->getParameter('q', null);
 
         $Dokument = new Dokument();
-        $args = $Dokument->hledat($query, 'dokument');
+        $args = $Dokument->hledat($query);
         $args['order'] = array('d.podaci_denik_rok', 'd.podaci_denik_poradi', 'd.poradi');
 
         // nehledej mezi dokumenty ve spisovně

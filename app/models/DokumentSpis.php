@@ -31,7 +31,7 @@ class DokumentSpis extends BaseModel
         return $spis;
     }
 
-    public function dokumenty($spis_id, $detail = 0, &$paginator = null)
+    public function dokumenty($spis_id)
     {
 
         $param = array();
@@ -41,12 +41,7 @@ class DokumentSpis extends BaseModel
         $dokumenty = array();
 
         $query = $this->selectComplex($param);
-        if (!is_null($paginator)) {
-            $paginator->itemCount = $query->count();
-            $result = $query->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        } else {
-            $result = $query->fetchAll();
-        }
+        $result = $query->fetchAll();
 
         if (count($result) > 0) {
             $Dokument = new Dokument();
@@ -86,7 +81,6 @@ class DokumentSpis extends BaseModel
         $param['where'] = array();
         $param['where'][] = array('spis_id=%i', $spis_id);
 
-        $dokumenty = array();
         $result = $this->selectComplex($param)->fetchAll();
         if (count($result) > 0) {
             return count($result);

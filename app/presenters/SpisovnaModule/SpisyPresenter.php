@@ -358,7 +358,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
             if ($accessview) {
                 $DokumentSpis = new DokumentSpis();
-                $result = $DokumentSpis->dokumenty($spis_id, 1);
+                $result = $DokumentSpis->dokumenty($spis_id);
                 $this->template->seznam = $result;
             } else {
                 $this->template->seznam = null;

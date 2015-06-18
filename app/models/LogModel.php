@@ -153,24 +153,9 @@ class LogModel extends BaseModel
                         ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
     }
 
-    public function historieSpisu($spis_id = null, $limit = 50, $offset = 0)
-    {
-
-        $res = dibi::query(
-                        'SELECT * FROM %n ld', $this->tb_logspis, 'LEFT JOIN %n ou',
-                        $this->tb_osoba_to_user, 'ON ou.user_id=ld.user_id', 'LEFT JOIN %n o',
-                        $this->tb_osoba, 'ON o.id=ou.osoba_id', '%if', !is_null($dokument_id),
-                        'WHERE %and',
-                        !is_null($dokument_id) ? array(array('ld.dokument_id=%i', $dokument_id))
-                                    : array(), '%end', 'ORDER BY ld.date'
-        );
-        return $res->fetchAll($offset, $limit);
-    }
-
-    /*     * **********************************************************************
+    /** **********************************************************************
      * Logovani pristupu
      */
-
     public function logAccess($user_id, $stav = 1)
     {
 
@@ -178,7 +163,8 @@ class LogModel extends BaseModel
         $row['user_id'] = $user_id;
         $row['date'] = new DateTime();
         $row['ip'] = Nette\Environment::getHttpRequest()->getRemoteAddress();
-        $row['user_agent'] = substr($_SERVER['HTTP_USER_AGENT'], 0, 190);
+        $user_agent = filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
+        $row['user_agent'] = substr($user_agent, 0, 190);
         $row['stav'] = $stav;
 
         return dibi::insert($this->tb_logaccess, $row)

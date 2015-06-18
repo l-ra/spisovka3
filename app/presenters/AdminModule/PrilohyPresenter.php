@@ -25,12 +25,7 @@ class Admin_PrilohyPresenter extends BasePresenter
 
         $FileModel = new FileModel();
         $file_id = $this->getParameter('id', null);
-        if (strpos($file_id, '-') !== false) {
-            list($file_id, $file_version) = explode('-', $file_id);
-            $file = $FileModel->getInfo($file_id, $file_version);
-        } else {
-            $file = $FileModel->getInfo($file_id);
-        }
+        $file = $FileModel->getInfo($file_id);
 
         //Nette\Diagnostics\Debugger::dump($file);
 
