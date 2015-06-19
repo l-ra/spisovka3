@@ -21,7 +21,11 @@ class Config
         $this->name = $name;
         $this->data = \Spisovka\ArrayHash::from($array);
     }
-
+    
+    /**
+     * 
+     * @return Spisovka\ArrayHash
+     */
     public function get()
     {
         return $this->data;

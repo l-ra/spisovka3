@@ -67,7 +67,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         // Klientske nastaveni
         $ep = self::nactiNastaveni();
-
+        $ep = $ep->toArray(); // Je nutne kvuli zpusobu modifikace objektu nastaveni
+        
         $id_alter = null;
         $do = $this->getParameter('do');
         if ($do) {
@@ -106,8 +107,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
                 $this->info = @$ep['email'][$index];
                 break;
+            
             case 'o':
-
                 $typ_odeslani = array(
                     '0' => 'klasicky bez kvalifikovaného podpisu/značky',
                     '1' => 's kvalifikovaným podpisem/značkou'
@@ -199,41 +200,44 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             '2' => 'Hostovaná spisovka (certifikátem + jménem a heslem)'
         );
 
-
         $form1 = new Nette\Application\UI\Form();
-        $form1->addHidden('index')
-                ->setValue($index);
+        $form1->addHidden('index');
+                
         $form1->addHidden('ep_typ')
                 ->setValue('i');
         $form1->addText('ucet', 'Název účtu:', 50, 100)
-                ->setValue($isds['ucet'])
                 ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
-        $form1->addCheckbox('aktivni', ' aktivní účet?')
-                ->setValue($isds['aktivni']);
+        $form1->addCheckbox('aktivni', ' aktivní účet?');
 
-        $form1->addSelect('typ_pripojeni', 'Typ přihlášení:', $connect_type)
-                ->setValue($isds['typ_pripojeni']);
-
+        $form1->addSelect('typ_pripojeni', 'Typ přihlášení:', $connect_type);
 
         $form1->addText('login', 'Přihlašovací jméno od ISDS:', 50, 100)
-                ->setValue($isds['login'])
                 ->addRule(Nette\Forms\Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
         $form1->addPassword('password', 'Přihlašovací heslo ISDS:', 50, 100);
         // ->setValue($isds['password'])
         // ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
 
         $form1->addUpload('certifikat_file', 'Cesta k certifikátu (formát X.509):');
-        $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100)
-                ->setValue($isds['cert_pass']);
+        $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100);
 
-        $form1->addSelect('test', 'Režim:', array('0' => 'Reálný provoz (mojedatovaschranka.cz)',
-            '1' => 'Testovací režim (czebox.cz)'
-                )
-        )->setValue($isds['test']);
+        $form1->addSelect('test', 'Režim:',
+                ['0' => 'Reálný provoz (mojedatovaschranka.cz)',
+                 '1' => 'Testovací režim (czebox.cz)']
+        );
 
-        $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select)
-                ->setValue($isds['podatelna']);
+        $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select);
 
+        if ($isds) {
+            $form1['index']->setValue($index);
+            $form1['ucet']->setValue($isds['ucet']);
+            $form1['aktivni']->setValue($isds['aktivni']);
+            $form1['typ_pripojeni']->setValue($isds['typ_pripojeni']);
+            $form1['login']->setValue($isds['login']);
+            $form1['cert_pass']->setValue($isds['cert_pass']);
+            $form1['test']->setValue($isds['test']);
+            $form1['podatelna']->setValue($isds['podatelna']);
+        }
+        
         $form1->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'nastavitISDSClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -506,44 +510,45 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         );
 
         $form1 = new Nette\Application\UI\Form();
-        $form1->addHidden('index')
-                ->setValue($index);
+        $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue('e');
 
         $form1->addText('ucet', 'Název účtu:', 50, 100)
-                ->setValue($email['ucet'])
                 ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
-        $form1->addCheckbox('aktivni', ' aktivní účet?')
-                ->setValue($email['aktivni']);
+        $form1->addCheckbox('aktivni', ' aktivní účet?');
         $form1->addSelect('typ', 'Protokol:', $typ_serveru)
-                ->setValue($email['typ'])
                 ->addRule(Nette\Forms\Form::FILLED, 'Vyberte protokol pro připojení k emailové schránce.');
         $form1->addText('server', 'Adresa serveru:', 50, 100)
-                ->setValue($email['server'])
                 ->addRule(Nette\Forms\Form::FILLED, 'Adresa poštovního serveru musí být vyplněna.');
         $form1->addText('port', 'Port:', 5, 50)
-                ->setValue($email['port'])
                 ->addRule(Nette\Forms\Form::FILLED, 'Port serveru musí být vyplněno.');
-        $form1->addText('inbox', 'Složka:', 50, 100)
-                ->setValue($email['inbox']);
+        $form1->addText('inbox', 'Složka:', 50, 100);
 
         $form1->addText('login', 'Přihlašovací jméno:', 50, 100)
-                ->setValue($email['login'])
                 ->addRule(Nette\Forms\Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
         $form1->addPassword('password', 'Přihlašovací heslo:', 50, 100);
         // ->setValue($email['password'])
         // ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
 
+        $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select);
 
-        $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select)
-                ->setValue($email['podatelna']);
+        $form1->addCheckbox('only_signature', 'přijímat pouze emaily s elektronickým podpisem/značkou');
+        $form1->addCheckbox('qual_signature', 'přijímat pouze emaily s uznávaným elektronickým podpisem/značkou');
 
-        $form1->addCheckbox('only_signature', 'přijímat pouze emaily s elektronickým podpisem/značkou')
-                ->setValue($email['only_signature']);
-        $form1->addCheckbox('qual_signature', 'přijímat pouze emaily s uznávaným elektronickým podpisem/značkou')
-                ->setValue($email['qual_signature']);
-
+        if ($email) {
+            $form1['index']->setValue($index);
+            $form1['ucet']->setValue($email['ucet']);
+            $form1['aktivni']->setValue($email['aktivni']);
+            $form1['typ']->setValue($email['typ']);
+            $form1['server']->setValue($email['server']);
+            $form1['port']->setValue($email['port']);
+            $form1['inbox']->setValue($email['inbox']);
+            $form1['login']->setValue($email['login']);
+            $form1['podatelna']->setValue($email['podatelna']);
+            $form1['only_signature']->setValue($email['only_signature']);
+            $form1['qual_signature']->setValue($email['qual_signature']);
+        }
 
         $form1->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'nastavitEmailClicked');
@@ -599,28 +604,32 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $odes = !empty($id) ? $ep['odeslani'][$index] : array();
 
         $form1 = new Nette\Application\UI\Form();
-        $form1->addHidden('index')
-                ->setValue($index);
+        $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue($typ);
         $form1->addText('ucet', 'Název účtu:', 50, 100)
-                ->setValue($odes['ucet'])
                 ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
-        $form1->addCheckbox('aktivni', ' aktivní účet?')
-                ->setValue($odes['aktivni']);
-        $form1->addSelect('typ_odeslani', 'Jak odesílat:', array('0' => 'klasicky bez kvalifikovaného podpisu/značky',
-            '1' => 's kvalifikovaným podpisem/značkou'
-                )
-        )->setValue($odes['typ_odeslani']);
+        $form1->addCheckbox('aktivni', ' aktivní účet?');
+        $form1->addSelect('typ_odeslani', 'Jak odesílat:',
+                ['0' => 'klasicky bez kvalifikovaného podpisu/značky',
+                 '1' => 's kvalifikovaným podpisem/značkou'
+                ]
+        );
 
-        $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100)
-                ->setValue($odes['email']);
+        $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100);
 
         $form1->addUpload('cert_file', 'Cesta k certifikátu:');
         $form1->addUpload('cert_key_file', 'Cesta k privátnímu klíči:');
-        $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100)
-                ->setValue($odes['cert_pass']);
+        $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100);
 
+        if ($odes) {
+            $form1['index']->setValue($index);
+            $form1['ucet']->setValue($odes['ucet']);
+            $form1['aktivni']->setValue($odes['aktivni']);
+            $form1['typ_odeslani']->setValue($odes['typ_odeslani']);
+            $form1['email']->setValue($odes['email']);
+            $form1['cert_pass']->setValue($odes['cert_pass']);
+        }
 
         $form1->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'nastavitOdesClicked');
@@ -804,6 +813,10 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $this->redirect('detail', array('id' => "$typ$index"));
     }
 
+    /**
+     * 
+     * @return Spisovka\ArrayHash
+     */
     public static function nactiNastaveni()
     {
         $res = (new Spisovka\ConfigEpodatelna())->get();
