@@ -297,7 +297,8 @@ class Admin_OpravneniPresenter extends BasePresenter
                     unset($data[$id]);
                     unset($opravneni[$rule_id]);
                     continue;
-                } else if (($bool == FALSE) && ($stav['opravneni_deny'] == TRUE)) {
+                } else if ($bool == FALSE && isset($stav['opravneni_deny'])
+                        && $stav['opravneni_deny'] == TRUE) {
                     unset($data[$id]);
                     unset($opravneni[$rule_id]);
                     continue;
@@ -305,7 +306,8 @@ class Admin_OpravneniPresenter extends BasePresenter
             }
 
             // Vyradime FALSE data - nebyly vybrany
-            if ($stav['opravneni_allow'] == FALSE && $stav['opravneni_deny'] == FALSE) {
+            if ($stav['opravneni_allow'] == FALSE && isset($stav['opravneni_deny']) 
+                    && $stav['opravneni_deny'] == FALSE) {
                 unset($data[$id]);
                 continue;
             }
