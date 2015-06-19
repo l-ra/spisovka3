@@ -34,7 +34,10 @@
                 <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 {/if}
                 &nbsp;&nbsp;
+                {if $spis->id != 1}
                 <a href="{link :Admin:Spisy:detail, id => $spis->id}">{$spis->nazev}</a>
+                {else}{$spis->nazev}                   
+                {/if}
             </td>
         </tr>
         {/foreach}
