@@ -83,6 +83,13 @@
 :Admin:Ciselniky:zpusobdoruceni
 :Admin:Ciselniky:staty
 :Admin:Ciselniky:druhzasilky
+:Admin:Ciselniky:typdokumentu { "ciselnik_new": 1 }
+:Admin:Ciselniky:spousteciudalost { "ciselnik_new": 1 }
+:Admin:Ciselniky:zpusobvyrizeni { "ciselnik_new": 1 }
+:Admin:Ciselniky:zpusobodeslani { "ciselnik_new": 1 }
+:Admin:Ciselniky:zpusobdoruceni { "ciselnik_new": 1 }
+:Admin:Ciselniky:staty { "ciselnik_new": 1 }
+:Admin:Ciselniky:druhzasilky { "ciselnik_new": 1 }
 :Admin:Protokol:
 :Admin:Protokol:prihlaseni
 :Spisovka:Napoveda:
