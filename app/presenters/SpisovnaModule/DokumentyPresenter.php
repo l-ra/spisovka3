@@ -360,14 +360,14 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->template->Dok = $dokument;
 
             $Zapujcka = new Zapujcka();
-            if (!in_array($dokument->stav_dokumentu, [7, 8])) {
-                // stav neni "ve spisovne" nebo "ve skartacnim rizeni"
-                $this->template->Zapujcka = null;
-                $this->template->Lze_zapujcit = false;
-            } else {
+            if (in_array($dokument->stav_dokumentu, [7])) {
+                // dokument musi byt prevzat do spisovny a nesmi byt zahajeno skartacni rizeni
                 $this->template->Zapujcka = $Zapujcka->getDokument($dokument_id);
                 // lze zapujcit, pokud uz neni zapujcen
                 $this->template->Lze_zapujcit = $this->template->Zapujcka === null;
+            } else {
+                $this->template->Zapujcka = null;
+                $this->template->Lze_zapujcit = false;
             }
 
             $user = $this->user;

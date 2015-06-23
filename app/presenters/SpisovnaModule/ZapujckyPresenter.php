@@ -359,6 +359,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 $dokument_id = null;
                 $this->flashMessage('Vybraný dokument nelze zapůjčit! Je již zapůjčen jiným zaměstnancem.',
                         'warning');
+                $this->redirect('default');
             } else {
                 $dokument_info = $Dokument->getInfo($dokument_id);
                 if ($dokument_info->stav_dokumentu > 7) {
@@ -366,6 +367,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                     $dokument_id = null;
                     $this->flashMessage('Vybraný dokument nelze zapůjčit! Dokument prochází nebo již prošel skartačním řízením a je tudíž nedostupný.',
                             'warning');
+                    $this->redirect('default');
                 } else {
                     if ($this->typ_evidence != 'priorace') {
                         $dokument_text = $dokument_info->cislo_jednaci . "" . $this->oddelovac_poradi . "" . $dokument_info->poradi . " - " . $dokument_info->nazev;
