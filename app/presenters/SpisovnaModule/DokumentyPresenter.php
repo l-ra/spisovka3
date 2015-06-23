@@ -664,7 +664,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $Dok = @$this->template->Dok;
 
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
 
@@ -676,7 +676,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         
         $form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$Dok->skartacni_znak);
-        $form->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5)
+        $form->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
+                ->addRule(Spisovka\Form::INTEGER, 'Skartační lhůta musí být celé číslo.')
                 ->setValue(@$Dok->skartacni_lhuta);
 
         $form->addSubmit('upravit', 'Uložit')
