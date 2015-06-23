@@ -361,8 +361,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->template->Dok = $dokument;
 
             $Zapujcka = new Zapujcka();
-            if ($dokument->stav_dokumentu == 9 || $dokument->stav_dokumentu == 10) {
-                // stav archivovan nebo skartovan
+            if (!in_array($dokument->stav_dokumentu, [7, 8])) {
+                // stav neni "ve spisovne" nebo "ve skartacnim rizeni"
                 $this->template->Zapujcka = null;
                 $this->template->Lze_zapujcit = false;
             } else {
