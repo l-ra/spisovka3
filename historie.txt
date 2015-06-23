@@ -50,16 +50,17 @@ Jiné změny:
   
 Opravy:
 
-- E-podatelna - na stránce stahování zpráv nepracovala funkce "vytvořit nový
-                subjekt z odesilatele"
-              - pokud v datové schránce nebyla žádná nová zpráva, aplikace
-                při kontrole schránky místo zprávy zobrazila nulu
-              - vytváření nového subjektu z datové zprávy automaticky rozdělí
-                adresu do jednotlivých políček
-              - dokument přijatý datovou schránkou a odeslaný e-mailem
-                se mohl tvářit jako přijatý e-mailem
-              - seznam zpráv je nyní řazen sestupně dle data doručení
-              
+E-podatelna:
+- na stránce stahování zpráv nepracovala funkce "vytvořit nový subjekt z odesilatele"
+- pokud v datové schránce nebyla žádná nová zpráva, aplikace při kontrole
+  schránky místo zprávy zobrazila nulu
+- vytváření nového subjektu z datové zprávy automaticky rozdělí adresu
+  do jednotlivých políček
+- dokument přijatý datovou schránkou a odeslaný e-mailem se mohl tvářit
+  jako přijatý e-mailem
+- seznam zpráv je nyní řazen sestupně dle data doručení
+
+Spisová služba:              
 - zápis chybných hodnot do formuláře při hledání dokumentu podle datumů nezpůsobí
   chybu aplikace
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 
@@ -69,8 +70,13 @@ Opravy:
   a informuje uživatele. Limit je obvykle zhruba 55 adresátů.
 - převzetí dokumentu ve spisu za specifických okolností vedlo ke zmizení ostatních 
   dokumentů ve spisu (dokumenty přestaly být v aplikaci vidět)
+
+Spisovna:  
 - hledání spisů při příjmu do spisovny bylo nefunkční
+- program chybně nabízel možnost vytvořit zápůjčku ve fázi příjmu do spisovny
 - opraveno nefunkční vytvoření zápůjčky pro obyčejného pracovníka
+
+Administrace:
 - smazání uživatelského účtu vyžaduje nyní potvrzení uživatele
 - uživatel si nyní nemůže smazat svůj vlastní účet
 - při editaci ostatních nastavení v administraci program chybně neumožňoval 
