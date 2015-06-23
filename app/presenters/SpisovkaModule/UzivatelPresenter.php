@@ -176,7 +176,11 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
         $a1 = $this->_ojSeznam($term);
         $a2 = $this->_userSeznam($term);
-
+        foreach ($a1 as &$value)
+            $value['id'] = 'o' . $value['id'];
+        foreach ($a2 as &$value)
+            $value['id'] = 'u' . $value['id'];
+        
         echo json_encode(array_merge($a1, $a2));
 
         exit;
@@ -209,7 +213,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat organizační jednotce');
             foreach ($seznam_orgjednotek as $org)
                 $seznam[] = array(
-                    "id" => 'o' . $org->id,
+                    "id" => $org->id,
                     "type" => 'item',
                     "value" => $org->ciselna_rada . ' - ' . $org->zkraceny_nazev,
                     "nazev" => $org->ciselna_rada . " - " . $org->zkraceny_nazev
@@ -237,7 +241,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
                 if ($user->pocet_uctu > 1)
                     $additional_info = " ( {$user->username} )";
                 $seznam[] = array(
-                    "id" => 'u' . $user->user_id,
+                    "id" => $user->user_id,
                     "type" => 'item',
                     "value" => (Osoba::displayName($user, 'full_item') . "$additional_info"),
                     "nazev" => Osoba::displayName($user, 'full_item')

@@ -74,7 +74,7 @@ Spisová služba:
 Spisovna:  
 - hledání spisů při příjmu do spisovny bylo nefunkční
 - program chybně nabízel možnost vytvořit zápůjčku ve fázi příjmu do spisovny
-- opraveno nefunkční vytvoření zápůjčky pro obyčejného pracovníka
+- opraveno nefunkční vytváření zápůjček
 
 Administrace:
 - smazání uživatelského účtu vyžaduje nyní potvrzení uživatele
