@@ -808,8 +808,15 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $form = new Nette\Application\UI\Form();
         $form->addSelect('filtr', 'Filtr:', $select)
-                ->setValue($filtr)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
+        try {
+            $form['filtr']->setValue($filtr);
+        } catch (Exception $e) {
+            $e->getMessage();
+            // stavy "archivován" a "skartován" neplatí na stránce příjmu dokumentů
+            $form['filtr']->setValue('stav_77');            
+        }
+
         $form->addSubmit('go_filtr', 'Filtrovat');
 
         $form->onSuccess[] = array($this, 'filtrClicked');
