@@ -173,16 +173,15 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $args = $Dokument->spojitAgrs(@$args_f, @$args_h);
 
         if (isset($seradit)) {
-            $Dokument->seradit($args, $seradit);
             $this->getHttpResponse()->setCookie('s3_spisovna_seradit', $seradit,
                     strtotime('90 day'));
         } else {
+            // pouzij razeni dle predchoziho vyberu uzivatele nebo definuj vychozi razeni
             $seradit = $this->getHttpRequest()->getCookie('s3_spisovna_seradit');
-            if ($seradit) {
-                // zjisteno razeni v cookie, tak vezmeme z nej
-                $Dokument->seradit($args, $seradit);
-            }
+            if (!$seradit)
+                $seradit = 'cj';
         }
+        $Dokument->seradit($args, $seradit);
         $this->seradit = $seradit;
         $this->template->s3_seradit = $seradit;
         $this->template->seradit = $seradit;
