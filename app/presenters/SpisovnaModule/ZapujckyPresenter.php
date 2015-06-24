@@ -94,7 +94,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
         if (isset($filtr)) {
             // zjisten filtr
-            $args = $Zapujcka->filtr($filtr['filtr']);
             $this->filtr = $filtr['filtr'];
             $this->template->no_items = 2; // indikator pri nenalezeni zapujcky po filtraci
         } else {
@@ -103,14 +102,13 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             if ($cookie_filtr) {
                 // zjisten filtr v cookie, tak vezmeme z nej
                 $filtr = unserialize($cookie_filtr);
-                $args = $Zapujcka->filtr($filtr['filtr']);
                 $this->filtr = $filtr['filtr'];
                 $this->template->no_items = 2; // indikator pri nenalezeni zapujcky po filtraci
             } else {
-                $args = null; // $Zapujcka->filtr('');
-                $this->filtr = 'aktualni';
+                $this->filtr = 'vse';
             }
         }
+        $args = $Zapujcka->filtr($this->filtr);
 
         if (isset($hledat)) {
             if (is_array($hledat)) {
