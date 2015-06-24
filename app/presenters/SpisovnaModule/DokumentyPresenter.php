@@ -243,7 +243,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $dok = $Dokument->getInfo($row->id, '');
                 $id = $dok->id;
                 $dok->subjekty = isset($subjekty[$id]) ? $subjekty[$id] : null;
-                $dok->prilohy = isset($prilohy[$id]) ? $prilohy[$id] : null;
                 $dok->pocet_souboru = isset($pocty_souboru[$id]) ? $pocty_souboru[$id] : 0;
                 $seznam[$index] = $dok;
             }
