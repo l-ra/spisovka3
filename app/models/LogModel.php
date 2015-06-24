@@ -95,7 +95,7 @@ class LogModel extends BaseModel
         '51' => 'Zápůjčka vytvořena',
         '52' => 'Zápůjčka schválena',
         '53' => 'Dokument zapůjčen',
-        '54' => 'Zapůjčený dokument vracen',
+        '54' => 'Zapůjčený dokument vrácen',
         '55' => 'Zápůjčka odmítnuta'
     );
 
