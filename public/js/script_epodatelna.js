@@ -17,7 +17,6 @@ $(function() {
         source: BASE_URL + 'subjekty/seznamAjax',
 
         focus: function(event, ui) {
-            $('#subjekt_epod_autocomplete').val(ui.item.nazev);
             return false;
         },
         select: function(event, ui) {
@@ -324,12 +323,10 @@ form_odmitnout +
         source: BASE_URL + 'uzivatel/seznamAjax',
 
         focus: function(event, ui) {
-            $('#predat_autocomplete_'+id).val(ui.item.nazev);
             return false;
         },
         select: function(event, ui) {
             $('#predat_'+id).val(ui.item.id);
-            return false;
         }
     });
 
@@ -338,7 +335,6 @@ form_odmitnout +
         source: BASE_URL + 'subjekty/seznamAjax',
 
         focus: function(event, ui) {
-            $('#subjekt_autocomplete_'+id).val(ui.item.nazev);
             return false;
         },
         select: function(event, ui) {

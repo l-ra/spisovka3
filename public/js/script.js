@@ -167,7 +167,6 @@ $(function() {
         source: BASE_URL + 'uzivatel/seznamAjax',
 
         focus: function(event, ui) {
-            $('#predat_autocomplete').val(ui.item.nazev);
             return false;
         },
         select: function(event, ui) {
@@ -181,7 +180,6 @@ $(function() {
                 $('#frmnovyForm-predano_org').val(ui.item.id.substr(1));
                 $('#predano').html("<dl class=\"detail_item\"><dt>Předáno:</dt><dd>organizační jednotce<br />"+ui.item.nazev+"</dd></dl>");
             }
-            return false;
         }
     });
     $("#predat_autocomplete").keypress(function(event) {
@@ -195,8 +193,11 @@ $(function() {
         minLength: 3,
         source: BASE_URL + 'subjekty/seznamAjax',
 
+        focus: function(event, ui) {
+            return false;
+        },
         select: function(event, ui) {
-            $('#subjekt_autocomplete').val('');
+            $(this).val('');
 
             // Nasledujici kod zajistuje automaticke urceni typu pripojeni subjektu
             var typ_id = $('#frmnovyForm-dokument_typ_id').val();
