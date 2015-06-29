@@ -56,6 +56,8 @@ E-podatelna:
   schránky místo zprávy zobrazila nulu
 - vytváření nového subjektu z datové zprávy automaticky rozdělí adresu
   do jednotlivých políček
+- vytváření nového subjektu z e-mailu s diakritikou ve jménu odesilatele, který
+  nebyl v kódování utf-8, mohlo v minulosti selhat
 - dokument přijatý datovou schránkou a odeslaný e-mailem se mohl tvářit
   jako přijatý e-mailem
 - seznam zpráv je nyní řazen sestupně dle data doručení
