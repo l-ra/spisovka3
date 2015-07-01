@@ -14,10 +14,6 @@ if (file_exists(APP_DIR . "/configs/servicemode")) {
 
 try {
 
-// setting memory_limit for PDF generation
-    define('PDF_MEMORY_LIMIT', '512M');
-
-
 // Step 1: Configure automatic loading
     if (!defined('LIBS_DIR'))
         define('LIBS_DIR', dirname(APP_DIR) . '/libs');
@@ -98,9 +94,15 @@ try {
 
 
 // konfigurace spisovky
-
     Nette\Environment::setVariable('user_config', (new Spisovka\ConfigClient())->get());
-
+    // bohuzel musime nakonfigurovat PDF export zde, protoze pro nej neexistuje spolecna funkce
+    define('PDF_MEMORY_LIMIT', '512M');
+    $mpdf_dir = TEMP_DIR . '/mpdf/';
+    define('_MPDF_TEMP_PATH', $mpdf_dir);
+    define('_MPDF_TTFONTDATAPATH', $mpdf_dir);
+    if (!is_dir($mpdf_dir))
+        @mkdir($mpdf_dir);
+    
 // version information
     $app_info = file_get_contents(APP_DIR . '/configs/version');
     $app_info = trim($app_info); // trim the EOL character
