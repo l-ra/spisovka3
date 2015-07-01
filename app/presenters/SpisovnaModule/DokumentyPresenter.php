@@ -136,7 +136,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             }
         }
         $this->filtr = $filtr['filtr'];
-        if ($this->view != 'default' && strpos($filtr['filtr'], 'stav_') == 0)
+        if ($this->view != 'default' && strpos($filtr['filtr'], 'stav_') === 0)
             $filtr['filtr'] = 'stav_77';
 
         $this->template->no_items = ($filtr['filtr'] == 'stav_77') ? 1 : 2; // indikator pri nenalezeni dokumentu

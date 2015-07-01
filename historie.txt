@@ -75,6 +75,8 @@ Spisová služba:
 
 Spisovna:  
 - hledání spisů při příjmu do spisovny bylo nefunkční
+- filtrování dokumentů funguje ve všech seznamech ve spisovně,
+  nejen v seznamu "Dokumenty"
 - program chybně nabízel možnost vytvořit zápůjčku ve fázi příjmu do spisovny
 - opraveno nefunkční vytváření zápůjček
 
