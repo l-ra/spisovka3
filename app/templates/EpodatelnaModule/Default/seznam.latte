@@ -45,7 +45,7 @@
                 </a></strong>
             </td>
             <td class="vec">
-                <strong title="{$ep->popis}"><a href="{link :Epodatelna:Default:detail, 'id'=>$ep->id}">
+                <strong title="{html_entity_decode($ep->popis)}"><a href="{link :Epodatelna:Default:detail, 'id'=>$ep->id}">
                     {$ep->predmet}
                 </a></strong>
                 <br />
