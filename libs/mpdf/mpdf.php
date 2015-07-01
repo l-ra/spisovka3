@@ -8756,7 +8756,7 @@ class mPDF
         $interval = 3600;
         if ($handle = opendir(preg_replace('/\/$/', '', _MPDF_TEMP_PATH))) {
             while (false !== ($file = readdir($handle))) {
-                if (!is_dir($file) && ((filemtime(_MPDF_TEMP_PATH . $file) + $interval) < time()) && ($file != "..") && ($file != ".") && (substr($file,
+                if (($file != "..") && ($file != ".") && !is_dir($file) && ((filemtime(_MPDF_TEMP_PATH . $file) + $interval) < time()) && (substr($file,
                                 0, 1) !== '.') && ($file != 'dummy.txt')) { // mPDF 5.7
                     unlink(_MPDF_TEMP_PATH . $file);
                 }
