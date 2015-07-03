@@ -32,8 +32,8 @@
 :Spisovna:Default: RedirectResponse
 :Spisovna:Dokumenty:
 :Spisovna:Dokumenty:prijem
-:Spisovna:Dokumenty:keskartaciseznam
-:Spisovna:Dokumenty:skartace
+:Spisovna:Dokumenty:skartacniNavrh
+:Spisovna:Dokumenty:skartacniRizeni
 :Spisovna:Dokumenty:detail { "id": 2289 }
 :Spisovna:Dokumenty:detail { "id": 2289, "upravit": "skart_rezim" }
 :Spisovna:Spisy:

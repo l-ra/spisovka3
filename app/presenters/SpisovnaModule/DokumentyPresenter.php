@@ -298,7 +298,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->seznam(1, $filtr, $hledat, $seradit);
     }
 
-    public function renderKeskartaciseznam()
+    public function renderSkartacniNavrh()
     {
         if (!$this->user->isAllowed('Spisovna', 'skartacni_navrh'))
             $this->forward(':NoAccess:default');
@@ -319,7 +319,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->seznam(2, $filtr, $hledat, $seradit);
     }
 
-    public function renderSkartace()
+    public function renderSkartacniRizeni()
     {
         if (!$this->user->isAllowed('Spisovna', 'skartacni_rizeni'))
             $this->forward(':NoAccess:default');
