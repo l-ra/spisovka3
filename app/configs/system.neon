@@ -2,6 +2,7 @@ php:
     date.timezone = "Europe/Prague"
 
 parameters:
+    send_survey = true
  
     storage_configuration:
         path_documents = files/dokumenty
