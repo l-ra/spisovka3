@@ -299,7 +299,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     }
 
     public function renderSkartacniNavrh()
-    {
+    {        
         if (!$this->user->isAllowed('Spisovna', 'skartacni_navrh'))
             $this->forward(':NoAccess:default');
 
@@ -552,7 +552,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function renderKeskartaci()
+    public function actionKeskartaci()
     {
 
         $dokument_id = $this->getParameter('id', null);
@@ -573,7 +573,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
     }
 
-    public function renderArchivovat()
+    public function actionArchivovat()
     {
         $dokument_id = $this->getParameter('id', null);
         $user = $this->user;
@@ -592,7 +592,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
     }
 
-    public function renderSkartovat()
+    public function actionSkartovat()
     {
         $dokument_id = $this->getParameter('id', null);
         $user = $this->user;

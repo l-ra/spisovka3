@@ -52,8 +52,8 @@
         <tr>
             <td class="akce">
                 {if $view == 'prijem'
-                 || $view == 'keskartaciseznam' && !isset($zapujcky[$dok->id])
-                 || $view == 'skartace'}
+                 || $view == 'skartacniNavrh' && !isset($zapujcky[$dok->id])
+                 || $view == 'skartacniRizeni'}
                 <input type="checkbox" class="checkbox" name="dokument_vyber[]" value="{$dok->id}" title="Vybrat tento dokument" />
                 {/if}
             </td>
@@ -119,7 +119,11 @@
                 {$dok->skartacni_znak} / {$dok->skartacni_lhuta}
                 <br />
                 {if isset($zapujcky[$dok->id])}
-                zapůjčen
+                    {if $zapujcky[$dok->id] == 1}
+                        žádost o zapůjčení 
+                    {else}
+                        zapůjčen
+                    {/if}
                 {elseif $dok->stav_dokumentu==6}
                 předán do spisovny
                 {elseif $dok->stav_dokumentu==7}

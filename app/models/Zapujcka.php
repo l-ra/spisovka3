@@ -102,7 +102,7 @@ class Zapujcka extends BaseModel
         $result = $this->select(array('stav=1 OR stav=2'))->fetchAll();
         if (count($result) > 0) {
             foreach ($result as $zapujcka) {
-                $seznam[$zapujcka->dokument_id] = $zapujcka->dokument_id;
+                $seznam[$zapujcka->dokument_id] = $zapujcka->stav;
             }
         }
         return $seznam;
@@ -430,6 +430,17 @@ class Zapujcka extends BaseModel
         } else {
             return false;
         }
+    }
+
+    /**
+     *  Vrati ciselny stav posledni zapucky nebo 0, pokud zapujcka neexistuje
+     */
+    public function stavZapujcky($dokument_id)
+    {
+        $result = dibi::query("SELECT [stav] FROM %n", $this->name, "WHERE [dokument_id] = %i ORDER BY [id] DESC",
+                        $dokument_id);
+        $stav = $result->fetch();
+        return $stav === false ? 0 : $stav->stav;
     }
 
     public static function stav($stav = null)

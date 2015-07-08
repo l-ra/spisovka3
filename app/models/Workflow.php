@@ -665,53 +665,62 @@ class Workflow extends BaseModel
         }
     }
 
+    /**
+     *   Vraci true, i kdyz existuje neschvalena zapujcka
+     */
+    protected function jeZapujcen($dokument_id)
+    {
+        $z = new Zapujcka();
+        $stav = $z->stavZapujcky($dokument_id);
+        return in_array($stav, [1, 2]);
+    }
+    
     public function keskartaci($dokument_id)
     {
-        if (is_numeric($dokument_id)) {
+        if (!is_numeric($dokument_id))
+            return false;
 
-            $user = Nette\Environment::getUser();
-            if ($user->isAllowed('Spisovna', 'skartacni_navrh')) {
+        $user = Nette\Environment::getUser();
+        if (!$user->isAllowed('Spisovna', 'skartacni_navrh'))
+            return false;
 
-                //$transaction = (! dibi::inTransaction());
-                //if ($transaction)
-                //dibi::begin();
+        //$transaction = (! dibi::inTransaction());
+        //if ($transaction)
+        //dibi::begin();
 
-                $Dokument = new Dokument();
-                $dokument_info = $Dokument->getInfo($dokument_id);
+        $Dokument = new Dokument();
+        $dokument_info = $Dokument->getInfo($dokument_id);
 
-                // Deaktivujeme starsi zaznamy
-                $this->deaktivovat($dokument_id);
+        if ($this->jeZapujcen($dokument_id))
+            return false;
+                        
+        // Deaktivujeme starsi zaznamy
+        $this->deaktivovat($dokument_id);
 
-                $data = array();
-                $data['dokument_id'] = $dokument_info->id;
-                $data['stav_dokumentu'] = 8;
-                $data['stav_osoby'] = 1;
-                $data['aktivni'] = 1;
-                $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
-                $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
+        $data = array();
+        $data['dokument_id'] = $dokument_info->id;
+        $data['stav_dokumentu'] = 8;
+        $data['stav_osoby'] = 1;
+        $data['aktivni'] = 1;
+        $data['prideleno_id'] = $dokument_info->prideleno->prideleno_id;
+        $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
 
-                $data['date'] = new DateTime();
-                $data['user_id'] = $user->getIdentity()->id;
-                $data['poznamka'] = $dokument_info->prideleno->poznamka;
+        $data['date'] = new DateTime();
+        $data['user_id'] = $user->getIdentity()->id;
+        $data['poznamka'] = $dokument_info->prideleno->poznamka;
 
-                $result_insert = $this->insert($data);
+        $result_insert = $this->insert($data);
 
-                //if ($transaction)
-                //dibi::commit();
+        //if ($transaction)
+        //dibi::commit();
 
-                if ($result_insert) {
+        if ($result_insert) {
 
-                    $Log = new LogModel();
-                    $Log->logDokument($dokument_id, LogModel::DOK_KESKARTACI,
-                            'Dokument přidán do skartačního řízení.');
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_KESKARTACI,
+                    'Dokument přidán do skartačního řízení.');
 
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
+            return true;
         } else {
             return false;
         }
@@ -731,6 +740,9 @@ class Workflow extends BaseModel
                 $Dokument = new Dokument();
                 $dokument_info = $Dokument->getInfo($dokument_id);
 
+                if ($this->jeZapujcen($dokument_id))
+                    return false;
+                
                 // Deaktivujeme starsi zaznamy
                 $this->deaktivovat($dokument_id);
 
@@ -783,6 +795,9 @@ class Workflow extends BaseModel
                 $Dokument = new Dokument();
                 $dokument_info = $Dokument->getInfo($dokument_id);
 
+                if ($this->jeZapujcen($dokument_id))
+                    return false;
+                
                 // Deaktivujeme starsi zaznamy
                 $this->deaktivovat($dokument_id);
 
