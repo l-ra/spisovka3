@@ -286,6 +286,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ($dokument) {
             // dokument zobrazime
 
+            if ($dokument->stav === 0) {
+                $this->flashMessage("Pokoušel jste se zobrazit dokument, který je rozepsaný. V menu zvolte \"Nový dokument\" a vytvoření dokumentu prosím dokončete.",
+                        'warning');
+                $this->redirect('default');
+            }
+            
             if (!empty($dokument->identifikator)) {
                 $Epodatelna = new Epodatelna();
                 $dokument->identifikator = $Epodatelna->identifikator(unserialize($dokument->identifikator));
@@ -430,13 +436,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 if (count($stejne_dokumenty) > 0) {
                     // nelze jiz vytvorit odpoved - jedno cislo jednaci muze mit maximalne jen 2 JID
                     $this->template->povolitOdpoved = false;
-                    foreach ($stejne_dokumenty as $dok) {
-                        // odpoved pripojime do souvisejici
-                        if (!isset($souvisejici_dokumenty[$dok->id])) {
-                            $this->template->SouvisejiciDokumenty[] = $dok;
-                            $souvisejici_dokumenty[$dok->id] = $dok->id;
-                        }
-                    }
                 }
             }
 

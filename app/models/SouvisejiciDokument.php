@@ -21,11 +21,16 @@ class SouvisejiciDokument extends BaseModel
                 if ($joinDok->spojit_s_id == $dokument_id) {
                     // zpetne spojeny s
                     $dok = $Dokument->getBasicInfo($joinDok->dokument_id);
+                    // spojeni s rozepsanym dokumentem musime ignorovat
+                    if ($dok->stav == 0)
+                        continue;
                     $dok->spojeni = 'zpetne_spojen';
                     $dokumenty[$joinDok->dokument_id] = $dok;
                 } else {
                     // spojen s
                     $dok = $Dokument->getBasicInfo($joinDok->spojit_s_id);
+                    if ($dok->stav == 0)
+                        continue;
                     $dok->spojeni = 'spojen';
                     $dokumenty[$joinDok->spojit_s_id] = $dok;
                 }
