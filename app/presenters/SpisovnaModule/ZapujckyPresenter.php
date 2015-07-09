@@ -501,14 +501,14 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         if (Acl::isInRole('spisovna') || $this->user->isInRole('superadmin')) {
             $filtr = !is_null($this->filtr) ? $this->filtr : 'vse';
-            $select = array(
-                'aktualni' => 'Zobrazit aktuální zápůjčky',
-                'zapujcene' => 'Zobrazit zapůjčené zápůjčky',
-                'ke_schvaleni' => 'Zobrazit zápůjčky ke schválení',
-                'vracene' => 'Zobrazit historii zápůjček (již vracené)',
-                'odmitnute' => 'Zobrazit odmítnuté zápůjčky',
+            $select = [
+                'ke_schvaleni' => 'Žádosti čekající na schválení',
+                'zapujcene' => 'Aktuálně zapůjčené dokumenty',
+                'aktualni' => 'Ke schválení + zapůjčené',
+                'odmitnute' => 'Odmítnuté žádosti',
+                'vracene' => 'Vrácené dokumenty',
                 'vse' => 'Zobrazit vše',
-            );
+                ];
             $this->template->zobrazit_filtr = 1;
         } else {
             $filtr = !is_null($this->filtr) ? $this->filtr : '';
