@@ -653,8 +653,8 @@ class Workflow extends BaseModel
                 $result_insert = $this->insert($workflow_data);
                 if ($result_insert) {
                     $Log = new LogModel();
-                    $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN,
-                            'Dokument předán do spisovny.');
+                    $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PRIPOJEN,
+                            'Dokument přijat do spisovny.');
                     return true;
                 } else {
                     return false;
