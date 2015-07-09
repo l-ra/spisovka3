@@ -108,9 +108,6 @@
     </div>
     {if $Zapujcka}
     <div class="dokument_blok_menu">
-       {if !empty($Dok->predano->prideleno_id) }
-       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument k zapůjčení</a>
-       {/if}
        <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}">Vrátit dokument</a>
     </div>
     {/if}    

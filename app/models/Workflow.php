@@ -838,52 +838,44 @@ class Workflow extends BaseModel
 
     public function zapujcka_pridelit($dokument_id, $user_id)
     {
-        if (is_numeric($dokument_id)) {
+        if (!is_numeric($dokument_id))
+            return false;
 
-            $user = Nette\Environment::getUser();
-            if (Acl::isInRole('spisovna') || $user->isInRole('superadmin')) {
+        $user = Nette\Environment::getUser();
+        if (!Acl::isInRole('spisovna') && !$user->isInRole('superadmin'))
+            return false;
+        
+        try {
+            dibi::begin();
 
-                //$transaction = (! dibi::inTransaction());
-                //if ($transaction)
-                //dibi::begin();
+            // Deaktivujeme starsi zaznamy
+            $this->deaktivovat($dokument_id);
 
-                // Deaktivujeme starsi zaznamy
-                //$this->deaktivovat($dokument_id);
+            $data = array();
+            $data['dokument_id'] = $dokument_id;
+            $data['stav_dokumentu'] = 11;
+            $data['stav_osoby'] = 1;
+            $data['aktivni'] = 1;
+            $data['prideleno_id'] = $user_id;
+            $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
 
-                $data = array();
-                $data['dokument_id'] = $dokument_id;
-                $data['stav_dokumentu'] = 11;
-                $data['stav_osoby'] = 0;
-                $data['aktivni'] = 1;
-                $data['prideleno_id'] = $user_id;
-                $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
+            $data['date'] = new DateTime();
+            $data['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
 
-                $data['date'] = new DateTime();
-                $data['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
-                $data['poznamka'] = "Přidělen k zapůjčení.";
+            $this->insert($data);
 
-                $result_insert = $this->insert($data);
+            $Dokument = new Dokument();
+            $Dokument->update(array('stav' => 1), array(array('id=%i', $dokument_id)));
 
-                //if ($transaction)
-                //dibi::commit();
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::ZAPUJCKA_PRIDELENA,
+                    'Dokument byl zapůjčen.');
 
-                if ($result_insert) {
-
-                    $Dokument = new Dokument();
-                    $Dokument->update(array('stav' => 1), array(array('id=%i', $dokument_id)));
-
-                    $Log = new LogModel();
-                    $Log->logDokument($dokument_id, LogModel::ZAPUJCKA_PRIDELENA,
-                            'Dokument byl přidělen k zapůjčení.');
-
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        } else {
+            dibi::commit();
+            return true;
+        } catch (Exception $e) {
+            $e->getCode();
+            dibi::rollback();
             return false;
         }
     }

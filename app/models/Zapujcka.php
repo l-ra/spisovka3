@@ -374,8 +374,8 @@ class Zapujcka extends BaseModel
 
             return true;
         } catch (DibiException $e) {
-            echo $e->getMessage();
-            echo $e->getSql();
+            $e->getMessage();
+            // $e->getSql();
             return false;
         }
     }
