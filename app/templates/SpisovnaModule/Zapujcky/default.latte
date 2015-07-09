@@ -96,16 +96,17 @@
 
 
     </table>
-    <div id="hromadna_akce">
+    <div id="hromadna_akce" n:if="!empty($akce_select)">
         <span id="checkbox_all_on">Zaškrtnout vše</span> / <span id="checkbox_all_off">Odškrtnout vše</span>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         Vybrané položky:&nbsp;&nbsp;
         <select name="hromadna_akce">
-            <option value="">(žádná akce)</option>
+            <option value="" n:if="count($akce_select) > 1">(žádná akce)</option>
             {if isset($akce_select)}{foreach $akce_select as $as_index => $as_value}
             <option value="{$as_index}">{$as_value}</option>
             {/foreach}{/if}
         </select>
+        &nbsp;
         <input type="submit" name="hromadna_submit" value="Provést" />
     </div>
     </form>

@@ -291,7 +291,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $seradit = $this->getParameter('seradit');
 
         $this->template->akce_select = array(
-            'prevzit_spisovna' => 'převzetí seznamu dokumentů do spisovny'
+            'prevzit_spisovna' => 'převzetí dokumentů do spisovny'
         );
 
         $this->template->title = "Seznam dokumentů pro příjem do spisovny";

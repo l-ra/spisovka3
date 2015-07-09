@@ -254,7 +254,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $this->template->SpisoveZnaky = $spisove_znaky;
 
         $this->template->akce_select = array(
-            'prevzit_spisovna' => 'převzetí vybraných spisů do spisovny'
+            'prevzit_spisovna' => 'převzetí spisů do spisovny'
         );
     }
 

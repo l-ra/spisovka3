@@ -129,11 +129,26 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->template->seradit = $seradit;
 
         if (Acl::isInRole('spisovna') || $this->user->isInRole('superadmin')) {
-            $this->template->akce_select = array(
-                'vratit' => 'Vrátit vybrané zápůjčky',
-                'schvalit' => 'Schválit vybrané zápůjčky',
-                'odmitnout' => 'Odmítnout vybrané zápůjčky'
-            );
+            $akce = ['vratit' => 'Vrátit dokumenty',
+                'schvalit' => 'Schválit žádosti',
+                'odmitnout' => 'Odmítnout žádosti'
+            ];
+            switch ($this->filtr) {
+                case 'ke_schvaleni':
+                    unset($akce['vratit']);
+                    break;
+                case 'zapujcene':
+                    unset($akce['schvalit']);
+                    unset($akce['odmitnout']);
+                    break;
+
+                case 'odmitnute':
+                case 'vracene':
+                    $akce = [];
+                    break;
+            }
+                
+            $this->template->akce_select = $akce;
         } else {
             $args = $Zapujcka->osobni($args);
             $this->template->akce_select = array(
