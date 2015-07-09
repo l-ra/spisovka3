@@ -246,7 +246,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                             }
                         }
                         if ($count_ok > 0) {
-                            $this->flashMessage('Úspěšně jste vrátil ' . $count_ok . ' dokumentů k zapůjčení.');
+                            $this->flashMessage('Úspěšně jste vrátil ' . $count_ok . ' dokument(ů).');
                         }
                         if ($count_failed > 0) {
                             $this->flashMessage($count_failed . ' dokumentů k zapůjčení se nepodařilo vrátit!',
