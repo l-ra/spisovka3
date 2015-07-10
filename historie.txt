@@ -80,10 +80,12 @@ Spisová služba:
 
 Spisovna:  
 - hledání spisů při příjmu do spisovny bylo nefunkční
+- přijetí dokumentu do spisovny se v transakčním logu zaznamenalo jako 
+  předání do spisovny
 - filtrování dokumentů funguje ve všech seznamech ve spisovně,
   nejen v seznamu "Dokumenty"
 - program chybně nabízel možnost vytvořit zápůjčku ve fázi příjmu do spisovny
-- opraveno nefunkční vytváření zápůjček
+- opraveny chyby ve funkci zápůjček
 
 Administrace:
 - smazání uživatelského účtu vyžaduje nyní potvrzení uživatele
