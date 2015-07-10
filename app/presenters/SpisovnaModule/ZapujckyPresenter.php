@@ -360,7 +360,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $form = new Spisovka\Form();
 
         $dokument_id = $this->getParameter('dokument_id');
-        $user_id = $this->getParameter('user_id');
 
         if ($dokument_id) {
             $Dokument = new Dokument();
@@ -393,34 +392,19 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $dokument_text = "";
         }
 
-        if ($user_id) {
-            $user_info = UserModel::getIdentity($user_id);
-            $osoba = Osoba::displayName($user_info);
-        } else {
-            $user = $this->user;
-            if (Acl::isInRole('spisovna') || $user->isInRole('superadmin')) {
-                $osoba = "";
-                $user_id = null;
-                $form->addHidden('is_in_role')->setValue(1);
-            } else {
-                $osoba = Osoba::displayName($user->getIdentity()->identity);
-                $user_id = $user->getIdentity()->id;
-            }
-        }
-
         $form->addText('dokument_text', 'Zapůjčený dokument:', 80)
                 ->setValue($dokument_text);
         $form->addText('dokument_id')
                 ->setValue($dokument_id)
                 ->setRequired('Musí být vybrán dokument k zapůjčení!');
 
-
-        $form->addText('user_text', 'Zapůjčeno komu:', 80)
-                ->setValue($osoba);
-        $form->addText('user_id')
-                ->setValue($user_id)
-                ->setRequired('Musí být vybrána osoba, které se bude zapůjčovat!');
-
+        $pracovnik_spisovny = Acl::isInRole('spisovna') || $this->user->isInRole('superadmin');
+        if ($pracovnik_spisovny) {
+            $form->addText('user_text', 'Zapůjčeno komu:', 80);
+            $form->addText('user_id')
+                    ->setRequired('Musí být vybrána osoba, které se bude zapůjčovat!');
+        }
+        
         $form->addTextArea('duvod', "Důvod zapůjčení:", 80, 5);
 
         $datum_od = date('d.m.Y');
@@ -452,10 +436,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-
-        //Nette\Diagnostics\Debugger::dump($data);
-        //Nette\Diagnostics\Debugger::dump($this->getHttpRequest()->getPost());
-        //exit;
 
         $Zapujcka = new Zapujcka();
 

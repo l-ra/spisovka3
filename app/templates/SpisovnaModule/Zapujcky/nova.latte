@@ -14,7 +14,7 @@
                 {$novyForm['dokument_text']->control}{$novyForm['dokument_id']->control}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item" n:if="isset($novyForm['user_text'])">
             <dt><strong>{$novyForm['user_text']->label} *</strong></dt>
             <dd>
                 {$novyForm['user_text']->control}{$novyForm['user_id']->control}

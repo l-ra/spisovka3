@@ -313,29 +313,27 @@ class Zapujcka extends BaseModel
 
     public function vytvorit($data)
     {
-        $is_in_role = isset($data['is_in_role']) ? 1 : null;
-        unset($data['user_text'], $data['dokument_text'], $data['is_in_role']);
+        unset($data['user_text'], $data['dokument_text']);
 
         if (is_null($data))
             return false;
 
-        $data['user_vytvoril_id'] = Nette\Environment::getUser()->getIdentity()->id;
+        $user = Nette\Environment::getUser();
+        $user_id = $user->getIdentity()->id;
+        $data['user_vytvoril_id'] = $user_id;
         $data['date_created'] = new DateTime();
+        $data['stav'] = 1;
 
-        if ($is_in_role) {
-            // prijat a schvalen
-            $data['stav'] = 2;
-            $data['user_schvalil_id'] = Nette\Environment::getUser()->getIdentity()->id;
-            $data['date_schvaleni'] = new DateTime();
-        } else {
-            // prijat
-            $data['stav'] = 1;
-        }
+        // pracovnik spisovny pujcuje dokument jinym uzivatelum,
+        // obycejny pracovnik zada o pujceni svym jmenem
+        $pracovnik_spisovny = Acl::isInRole('spisovna') || $user->isInRole('superadmin');        
+        if (!$pracovnik_spisovny)
+            $data['user_id'] = $user_id;
 
         $zapujcka_id = $this->insert($data);
-
-        // Zaneseni do logu a dokumentu
-
+        if ($pracovnik_spisovny)        
+            $this->schvalit($zapujcka_id, true);
+        
         return $zapujcka_id;
     }
 
@@ -353,17 +351,16 @@ class Zapujcka extends BaseModel
         return $args;
     }
 
-    public function schvalit($zapujcka_id)
+    public function schvalit($zapujcka_id, $automaticke_schvaleni = false)
     {
-
         if (empty($zapujcka_id) || !is_numeric($zapujcka_id))
             return null;
 
-        $data = array(
-            'stav' => 2,
-            'user_schvalil_id' => Nette\Environment::getUser()->getIdentity()->id,
-            'date_schvaleni' => new DateTime()
-        );
+        $data = ['stav' => 2];
+        if (!$automaticke_schvaleni) {
+            $data['user_schvalil_id'] = Nette\Environment::getUser()->getIdentity()->id;
+            $data['date_schvaleni'] = new DateTime();
+        }
 
         try {
             $this->update($data, array(array('id=%i', $zapujcka_id)));
