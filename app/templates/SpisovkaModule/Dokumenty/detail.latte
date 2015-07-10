@@ -105,12 +105,8 @@
        &nbsp;
        {/if}
        <a href="{link this, 'id'=>$Dok->id, 'udalost'=>1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
+       <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}" n:if="$Zapujcka">Vrátit dokument</a>
     </div>
-    {if $Zapujcka}
-    <div class="dokument_blok_menu">
-       <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}">Vrátit dokument</a>
-    </div>
-    {/if}    
 
     {if ($FormUdalost)}
     <div class="dokument_blok_sedy">
