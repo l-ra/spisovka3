@@ -195,15 +195,7 @@ foreach ($clients as $site_path => $site_name) {
 
                     echo "<pre>";
                     foreach ($alter_scripts[$rev] as $query) {
-                        $query = str_replace("\r", "", $query);
-                        $query = str_replace("\n", " ", $query);
-                        $query = str_replace("\t", " ", $query);
                         $query = str_replace("{tbls3}", $config['prefix'], $query);
-                        $query = trim($query);
-                        if (empty($query))
-                            continue;
-                        if ($query[0] == "-")
-                            continue;
 
                         if ($do_update) {
                             try {
@@ -214,7 +206,7 @@ foreach ($clients as $site_path => $site_name) {
                                 throw $e;
                             }
                         } else {
-                            echo "" . $query . ";\n";
+                            echo "$query\n";
                         }
                     }
                     echo "</pre>";

@@ -33,15 +33,34 @@ class Updates
             self::$revisions[$revision] = $revision;
 
             if (strpos($filename, "_alter.sql") !== false) {
-                $sql_source = $contents ? $contents : file_get_contents(self::$update_dir . $filename);
-                $sql_queries = explode(";", $sql_source);
-                // odstran komentar na zacatku souboru, ktery je oddelen strednikem
-                unset($sql_queries[0]);
-                self::$alter_scripts[$revision] = $sql_queries;
+                $sql_source = $contents ? : file_get_contents(self::$update_dir . $filename);
+                self::$alter_scripts[$revision] = self::_parse_sql($sql_source);
             }
         }
     }
 
+    /**
+     * 
+     * @param string $data
+     * @return array SQL commands, including comments
+     */
+    protected static function _parse_sql($data)
+    {
+        $queries = [];
+        $query = '';
+        $lines = explode("\n", $data);
+        foreach ($lines as $line) {
+            $line = rtrim($line);
+            $query .= $line . "\n";
+            if (substr($line, -1) == ';') {
+                $queries[] = trim($query);
+                $query = '';
+            }
+        }
+
+        return $queries;
+    }
+    
     public static function find_updates()
     {
         self::$alter_scripts = array();
@@ -78,7 +97,8 @@ class Updates
     {
         $rev = 0;
         $a = array();
-
+        $matches = [];
+        
         foreach ($info as $line) {
             if ($line{0} == '[')
                 if (preg_match('/^\[(\d+)\]/', $line, $matches) == 1) {
@@ -229,5 +249,3 @@ class Client_To_Update
     }
 
 }
-
-?>

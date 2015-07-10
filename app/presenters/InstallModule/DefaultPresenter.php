@@ -529,14 +529,7 @@ class Install_DefaultPresenter extends BasePresenter
 
             foreach ($sql_queries as $query) {
 
-                $query = str_replace("\r", "", $query);
-                $query = str_replace("\n", "", $query);
-                $query = str_replace("\t", " ", $query);
                 $query = str_replace("{tbls3}", $db_config->prefix, $query);
-                $query = trim($query);
-
-                if (empty($query))
-                    continue;
 
                 if ($this->getParameter('install', null)) {
                     // provedeni SQL skriptu

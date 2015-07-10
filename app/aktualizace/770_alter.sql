@@ -1,5 +1,3 @@
--- ;
-
 -- SET FOREIGN_KEY_CHECKS=0;
 
 ALTER TABLE `{tbls3}user_to_role`
