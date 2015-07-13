@@ -320,7 +320,6 @@ class Zapujcka extends BaseModel
 
         $user = Nette\Environment::getUser();
         $user_id = $user->getIdentity()->id;
-        $data['user_vytvoril_id'] = $user_id;
         $data['date_created'] = new DateTime();
         $data['stav'] = 1;
 
@@ -358,8 +357,6 @@ class Zapujcka extends BaseModel
 
         $data = ['stav' => 2];
         if (!$automaticke_schvaleni) {
-            $data['user_schvalil_id'] = Nette\Environment::getUser()->getIdentity()->id;
-            $data['date_schvaleni'] = new DateTime();
         }
 
         try {
@@ -383,8 +380,6 @@ class Zapujcka extends BaseModel
         $date = new DateTime();
         $data = array(
             'stav' => 4,
-            'user_schvalil_id' => Nette\Environment::getUser()->getIdentity()->id,
-            'date_schvaleni' => $date,
             'date_do_skut' => $date,
         );
 

@@ -52,3 +52,7 @@ Aktualizace probíhá na pozadí, výstup pouze informuje.
 - uživatelům s oprávněním vedoucího přiděl oprávnění "Změny dokumentů svojí org. jednotky"
 [810]
 - migrace definice sloupců sestav
+[830]
+Zápůjčky:
+- přidána kontrola pole user_id
+- odstranění některých sloupců z tabulky
