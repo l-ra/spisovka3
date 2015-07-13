@@ -159,7 +159,7 @@
         {if empty($Dok->cislo_jednaci)}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
-            <dd>Dokument není evidován!
+            <dd>Dokument nemá přiděleno číslo jednací.
             </dd>
         </dl>
         {else}
@@ -270,13 +270,13 @@
         {if empty($Dok->cislo_jednaci)}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
-            <dd>Dokument není evidován!
+            <dd>Dokument nemá přiděleno číslo jednací.
                 {if $Pridelen==1}
                 {if $Typ_evidence == 'sberny_arch'}
                 <br />Zaevidovat do spisové služby:&nbsp;&nbsp;<a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
                 &nbsp;&nbsp;<a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
                 {else}
-                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Zaevidovat do spis. služby</a>
+                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Přidělit číslo jednací</a>
                 {/if}
                 {/if}
             </dd>
