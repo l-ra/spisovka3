@@ -1759,30 +1759,28 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $data['datum_vyrizeni'] = $data['datum_vyrizeni'] . " " . $data['datum_vyrizeni_cas'];
         unset($data['datum_vzniku_cas']);
 
-        // spisovy znak
-        //Nette\Diagnostics\Debugger::dump($data); exit;
-
         $Dokument = new Dokument();
 
         $dok = $Dokument->getInfo($dokument_id);
 
         try {
+            if (empty($data->skartacni_znak))
+                $data->skartacni_znak = null;
+            if ($data->skartacni_lhuta === '')
+                $data->skartacni_lhuta = null;
+            
             $Dokument->ulozit($data, $dokument_id);
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN, 'Upravena data vyřízení.');
 
             $this->flashMessage('Dokument "' . $dok->cislo_jednaci . '"  byl upraven.');
-            $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
         } catch (DibiException $e) {
             $this->flashMessage('Dokument "' . $dok->cislo_jednaci . '" se nepodařilo upravit.',
                     'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
-
-            Nette\Diagnostics\Debugger::dump($e);
-            exit;
-            //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
         }
+        $this->redirect('detail', array('id' => $dokument_id));
     }
 
     protected function createComponentUdalostForm()
