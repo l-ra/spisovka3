@@ -3,7 +3,10 @@
 class Spisovka_NapovedaPresenter extends BasePresenter
 {
 
-    public $backlink = '';
+    protected function isUserAllowed()
+    {
+        return true;
+    }
 
     public function actionDefault($param1, $param2, $param3)
     {

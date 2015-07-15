@@ -56,3 +56,5 @@ Aktualizace probíhá na pozadí, výstup pouze informuje.
 Zápůjčky:
 - přidána kontrola pole user_id
 - odstranění některých sloupců z tabulky
+[840]
+Odstranění oprávnění pro nápovědu
