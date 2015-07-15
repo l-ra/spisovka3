@@ -296,20 +296,14 @@ class Admin_OpravneniPresenter extends BasePresenter
                 if (($bool == TRUE) && ($stav['opravneni_allow'] == TRUE)) {
                     unset($data[$id]);
                     unset($opravneni[$rule_id]);
-                    continue;
-                } else if ($bool == FALSE && isset($stav['opravneni_deny'])
-                        && $stav['opravneni_deny'] == TRUE) {
+                } else if ($bool == FALSE && isset($stav['opravneni_deny']) && $stav['opravneni_deny'] == TRUE) {
                     unset($data[$id]);
                     unset($opravneni[$rule_id]);
-                    continue;
                 }
             }
-
-            // Vyradime FALSE data - nebyly vybrany
-            if ($stav['opravneni_allow'] == FALSE && isset($stav['opravneni_deny']) 
-                    && $stav['opravneni_deny'] == FALSE) {
+            if ($stav['opravneni_allow'] == FALSE && (!isset($stav['opravneni_deny']) || $stav['opravneni_deny'] == FALSE)) {
+                // Vyradime opravneni, ktera nejsou ani udelena ani odeprena
                 unset($data[$id]);
-                continue;
             }
         }
 
