@@ -998,3 +998,8 @@ div.icon_slozka {
 #content .sestava_vyber_sloupcu dd {
     margin: 0px;
 }
+
+/* Uprava jQuery tematu */
+.ui-widget-content {
+    border-width: 2px;
+}
