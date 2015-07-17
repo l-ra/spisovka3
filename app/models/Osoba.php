@@ -197,7 +197,7 @@ class Osoba2User extends BaseModel
     {
 
         $result = dibi::query('SELECT ou.osoba_id, ou.user_id, o.*, u.username, sq.pocet_uctu' .
-                        ' FROM %n ou', $this->name, ' JOIN %n o', $this->osoba,
+                        ' FROM %n ou', $this->name, ' JOIN %n o', $this->tb_osoba,
                         'ON o.id=ou.osoba_id' .
                         ' JOIN %n u', $this->tb_user,
                         'ON u.id=ou.user_id' .
@@ -214,7 +214,7 @@ class Osoba2User extends BaseModel
     {
 
         $result = dibi::query('SELECT ou.osoba_id, ou.user_id, o.*, u.username, sq.pocet_uctu' .
-                        ' FROM %n ou', $this->name, ' JOIN %n o', $this->osoba,
+                        ' FROM %n ou', $this->name, ' JOIN %n o', $this->tb_osoba,
                         'ON o.id=ou.osoba_id' .
                         ' JOIN %n u', $this->tb_user,
                         'ON u.id=ou.user_id' .
