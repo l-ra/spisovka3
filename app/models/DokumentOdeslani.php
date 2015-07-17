@@ -242,11 +242,12 @@ class DokumentOdeslani extends BaseModel
         $row['datum_odeslani'] = new DateTime();
 
         $info = $this->get($id);
-        if ($info) {
-            $Log = new LogModel();
-            $Log->logDokument($info->dokument_id, LogModel::DOK_ODESLAN,
-                    "Dokument odeslán " . $info->zpusob_odeslani_nazev);
-        }
+        if (!$info)
+            return null;
+        
+        $Log = new LogModel();
+        $Log->logDokument($info->dokument_id, LogModel::DOK_ODESLAN,
+                "Dokument odeslán " . $info->zpusob_odeslani_nazev);
 
         return $this->update($row, array(array('id=%i', $id)));
     }
@@ -263,11 +264,12 @@ class DokumentOdeslani extends BaseModel
         $row['datum_odeslani'] = new DateTime();
 
         $info = $this->get($id);
-        if ($info) {
-            $Log = new LogModel();
-            $Log->logDokument($info->dokument_id, LogModel::DOK_NEODESLAN,
-                    "Dokument nebyl odeslán " . $info->zpusob_odeslani_nazev);
-        }
+        if (!$info)
+            return null;
+        
+        $Log = new LogModel();
+        $Log->logDokument($info->dokument_id, LogModel::DOK_NEODESLAN,
+                "Dokument nebyl odeslán " . $info->zpusob_odeslani_nazev);
 
         return $this->update($row, array(array('id=%i', $id)));
     }

@@ -177,6 +177,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $id = $this->getParameter('id');
 
         $dokument = $DokumentOdeslani->get($id);
+        if (!$dokument)
+            throw new Exception("Záznam o odeslání ID $id neexistuje.");
 
         $this->template->dokument = $dokument;
         $this->template->isPrint = $this->getParameter('print');
@@ -232,6 +234,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         }
 
         $odes = $DokumentOdeslani->get($id);
+        if (!$odes)
+            throw new Exception("Záznam o odeslání ID $id neexistuje.");
 
         $this->template->dokument = $odes;
 
