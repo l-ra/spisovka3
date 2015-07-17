@@ -21,44 +21,41 @@ abstract class BaseModel extends Nette\Object
 
     /** @var bool autoincrement? */
     protected $autoIncrement = TRUE;
+    
+    protected $tb_dok_file = 'dokument_to_file';
+    protected $tb_dok_odeslani = 'dokument_odeslani';
+    protected $tb_dok_subjekt = 'dokument_to_subjekt';
+    protected $tb_dokspis = 'dokument_to_spis';
     protected $tb_dokument = 'dokument';
-    protected $tb_file = 'file';
-    protected $tb_user = 'user';
-    protected $tb_osoba = 'osoba';
-    protected $tb_orgjednotka = 'orgjednotka';
-    protected $tb_spis = 'spis';
-    protected $tb_spisovy_znak = 'spisovy_znak';
-    protected $tb_subjekt = 'subjekt';
-    protected $tb_subjekt_historie = 'subjekt';
+    protected $tb_dokumenttyp = 'dokument_typ';
     protected $tb_epodatelna = 'epodatelna';
-    protected $tb_zapujcka = 'zapujcka';
+    protected $tb_file = 'file';
     protected $tb_logaccess = 'log_access';
     protected $tb_logdokument = 'log_dokument';
     protected $tb_logspis = 'log_spis';
-    protected $tb_dokumenttyp = 'dokument_typ';
-    protected $tb_workflow = 'workflow';
-    protected $tb_dokspis = 'dokument_to_spis';
-    protected $tb_dok_subjekt = 'dokument_to_subjekt';
-    protected $tb_dok_file = 'dokument_to_file';
-    protected $tb_dok_odeslani = 'dokument_odeslani';
-    protected $tb_spousteci_udalost = 'spousteci_udalost';
-    protected $user_to_role = 'user_to_role';
-    protected $osoba = 'osoba';
+    protected $tb_orgjednotka = 'orgjednotka';
+    protected $tb_osoba = 'osoba';
     protected $tb_osoba_to_user = 'osoba_to_user';
-    protected $tbl_role = 'user_role';
-    protected $tb_zpusob_doruceni = 'zpusob_doruceni';
-    protected $tb_zpusob_vyrizeni = 'zpusob_vyrizeni';
-    protected $tb_zpusob_odeslani = 'zpusob_odeslani';
+    protected $tb_resource = 'user_resource';
+    protected $tb_role = 'user_role';
+    protected $tb_rule = 'user_rule';
+    protected $tb_spis = 'spis';
+    protected $tb_spisovy_znak = 'spisovy_znak';
+    protected $tb_spousteci_udalost = 'spousteci_udalost';
     protected $tb_stat = 'stat';
+    protected $tb_subjekt = 'subjekt';
+    protected $tb_subjekt_historie = 'subjekt';
+    protected $tb_user = 'user';
+    protected $tb_workflow = 'workflow';
+    protected $tb_zapujcka = 'zapujcka';
     protected $tb_zprava = 'zprava';
     protected $tb_zprava_osoba = 'zprava_osoba';
-    protected $tb_role = 'user_role';
-    protected $tb_resource = 'user_resource';
-    protected $tb_rule = 'user_rule';
-
+    protected $tb_zpusob_doruceni = 'zpusob_doruceni';
+    protected $tb_zpusob_odeslani = 'zpusob_odeslani';
+    protected $tb_zpusob_vyrizeni = 'zpusob_vyrizeni';
+    
     public static function getDbPrefix()
     {
-
         static $prefix = null;
 
         if ($prefix === null)
@@ -69,47 +66,14 @@ abstract class BaseModel extends Nette\Object
 
     public function __construct()
     {
-
         $prefix = self::getDbPrefix();
         $this->name = $prefix . $this->name;
 
-        $this->tb_dokument = $prefix . $this->tb_dokument;
-        $this->tb_file = $prefix . $this->tb_file;
-        $this->tb_user = $prefix . $this->tb_user;
-        $this->tb_osoba = $prefix . $this->tb_osoba;
-        $this->tb_orgjednotka = $prefix . $this->tb_orgjednotka;
-        $this->tb_workflow = $prefix . $this->tb_workflow;
-        $this->tb_epodatelna = $prefix . $this->tb_epodatelna;
-        $this->tb_zapujcka = $prefix . $this->tb_zapujcka;
-        $this->tb_spis = $prefix . $this->tb_spis;
-        $this->tb_spisovy_znak = $prefix . $this->tb_spisovy_znak;
-        $this->tb_subjekt = $prefix . $this->tb_subjekt;
-        $this->tb_subjekt_historie = $prefix . $this->tb_subjekt_historie;
-        $this->tb_spousteci_udalost = $prefix . $this->tb_spousteci_udalost;
-
-        $this->tb_dokumenttyp = $prefix . $this->tb_dokumenttyp;
-        $this->tb_dokspis = $prefix . $this->tb_dokspis;
-        $this->tb_dok_subjekt = $prefix . $this->tb_dok_subjekt;
-        $this->tb_dok_file = $prefix . $this->tb_dok_file;
-        $this->tb_dok_odeslani = $prefix . $this->tb_dok_odeslani;
-        $this->user_to_role = $prefix . $this->user_to_role;
-        $this->osoba = $prefix . $this->osoba;
-        $this->tb_osoba_to_user = $prefix . $this->tb_osoba_to_user;
-        $this->tbl_role = $prefix . $this->tbl_role;
-        $this->tb_logaccess = $prefix . $this->tb_logaccess;
-        $this->tb_logdokument = $prefix . $this->tb_logdokument;
-        $this->tb_logspis = $prefix . $this->tb_logspis;
-
-        $this->tb_zpusob_doruceni = $prefix . $this->tb_zpusob_doruceni;
-        $this->tb_zpusob_vyrizeni = $prefix . $this->tb_zpusob_vyrizeni;
-        $this->tb_zpusob_odeslani = $prefix . $this->tb_zpusob_odeslani;
-
-        $this->tb_stat = $prefix . $this->tb_stat;
-
-        $this->tb_zprava = $prefix . $this->tb_zprava;
-        $this->tb_zprava_osoba = $prefix . $this->tb_zprava_osoba;
+        foreach (get_object_vars($this) as $prop => $name)
+            if (substr($prop, 0, 3) == 'tb_')
+                    $this->$prop = $prefix . $name;            
     }
-
+    
     /**
      * Selects rows from the table in specified order
      * @param array $where
