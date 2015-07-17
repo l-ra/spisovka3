@@ -108,9 +108,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
     }
 
-    protected function seznam($typ = 0, $filtr = null, $hledat = null, $seradit = null)
+    protected function seznam($typ = 0)
     {
-
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -119,22 +118,15 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $Dokument = new Dokument();
 
-        if (isset($filtr['filtr'])) {
-            // zjisten filtr
-            $this->getHttpResponse()->setCookie('s3_spisovna_filtr', serialize($filtr),
-                    strtotime('90 day'));
+        $filtr = UserSettings::get('spisovna_dokumenty_filtr'); 
+        if ($filtr) {
+            $filtr = unserialize($filtr);
         } else {
-            $cookie_filtr = $this->getHttpRequest()->getCookie('s3_spisovna_filtr');
-            if ($cookie_filtr) {
-                // zjisten filtr v cookie, tak vezmeme z nej
-                $filtr = unserialize($cookie_filtr);
-            }
-            if (!isset($filtr['filtr'])) {
-                // filtr nezjisten - pouzijeme filtr Vse
-                $filtr = array();
-                $filtr['filtr'] = 'stav_77';
-            }
+            // filtr nezjisten - pouzijeme filtr Vse
+            $filtr = array();
+            $filtr['filtr'] = 'stav_77';
         }
+        
         $this->filtr = $filtr['filtr'];
         if ($this->view != 'default' && strpos($filtr['filtr'], 'stav_') === 0)
             $filtr['filtr'] = 'stav_77';
@@ -143,15 +135,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $args_f = $Dokument->spisovnaFiltr($filtr['filtr']);
 
         $args_h = array();
-        if (isset($hledat))
-            $this->getHttpResponse()->setCookie('s3_spisovna_hledat', serialize($hledat),
-                    strtotime('90 day'));
-        else {
-            $cookie_hledat = $this->getHttpRequest()->getCookie('s3_spisovna_hledat');
-            if ($cookie_hledat)
-            // zjisteno hladaci filtr v cookie, tak vezmeme z nej
-                $hledat = unserialize($cookie_hledat);
-        }
+        $hledat = UserSettings::get('spisovna_dokumenty_hledat'); 
+        if ($hledat)
+            $hledat = unserialize($hledat);
         try {
             if (isset($hledat))
                 if (is_array($hledat)) {
@@ -166,21 +152,13 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 }
         } catch (Exception $e) {
             $this->flashMessage($e->getMessage() . " Hledání bylo zrušeno.", 'warning');
-            $this->forward(':Spisovka:Vyhledat:reset');
+            $this->forward(':Spisovna:Vyhledat:reset');
         }
         $this->template->s3_hledat = $hledat;
 
         $args = $Dokument->spojitAgrs(@$args_f, @$args_h);
 
-        if (isset($seradit)) {
-            $this->getHttpResponse()->setCookie('s3_spisovna_seradit', $seradit,
-                    strtotime('90 day'));
-        } else {
-            // pouzij razeni dle predchoziho vyberu uzivatele nebo definuj vychozi razeni
-            $seradit = $this->getHttpRequest()->getCookie('s3_spisovna_seradit');
-            if (!$seradit)
-                $seradit = 'cj';
-        }
+        $seradit = UserSettings::get('spisovna_dokumenty_seradit', 'cj');         
         $Dokument->seradit($args, $seradit);
         $this->seradit = $seradit;
         $this->template->s3_seradit = $seradit;
@@ -268,12 +246,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $this->template->akce_select = array();
 
-        $filtr = $this->getParameter('filtr');
-        $hledat = $this->getParameter('hledat');
-        $seradit = $this->getParameter('seradit');
-
         $this->template->title = "Seznam dokumentů ve spisovně";
-        $this->seznam(0, $filtr, $hledat, $seradit);
+        $this->seznam(0);
     }
 
     public function renderPrijem()
@@ -286,16 +260,12 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
-        $filtr = $this->getParameter('filtr');
-        $hledat = $this->getParameter('hledat');
-        $seradit = $this->getParameter('seradit');
-
         $this->template->akce_select = array(
             'prevzit_spisovna' => 'převzetí dokumentů do spisovny'
         );
 
         $this->template->title = "Seznam dokumentů pro příjem do spisovny";
-        $this->seznam(1, $filtr, $hledat, $seradit);
+        $this->seznam(1);
     }
 
     public function renderSkartacniNavrh()
@@ -308,15 +278,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
-        $filtr = $this->getParameter('filtr');
-        $hledat = $this->getParameter('hledat');
-        $seradit = $this->getParameter('seradit');
-
         $this->template->akce_select = array(
             'ke_skartaci' => 'předat do skartačního řízení'
         );
         $this->template->title = "Seznam dokumentů, kterým uplynula skartační lhůta";
-        $this->seznam(2, $filtr, $hledat, $seradit);
+        $this->seznam(2);
     }
 
     public function renderSkartacniRizeni()
@@ -329,16 +295,12 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
-        $filtr = $this->getParameter('filtr');
-        $hledat = $this->getParameter('hledat');
-        $seradit = $this->getParameter('seradit');
-
         $this->template->akce_select = array(
             'archivovat' => 'archivovat vybrané dokumenty',
             'skartovat' => 'skartovat vybrané dokumenty',
         );
         $this->template->title = "Seznam dokumentů ve skartačním řízení";
-        $this->seznam(3, $filtr, $hledat, $seradit);
+        $this->seznam(3);
     }
 
     public function renderDetail()
@@ -723,9 +685,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
             $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
-            //Nette\Diagnostics\Debugger::dump($e);
-            //exit;
-            //$this->redirect(':Spisovka:Dokumenty:detail',array('id'=>$dokument_id));
         }
     }
 
@@ -750,8 +709,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $form->addText('dotaz', 'Hledat:', 20, 100)
                 ->setValue($hledat);
 
-        $cookie_hledat = $this->getHttpRequest()->getCookie('s3_spisovna_hledat');
-        $s3_hledat = unserialize($cookie_hledat);
+        $s3_hledat = UserSettings::get('spisovna_dokumenty_hledat');
+        $s3_hledat = unserialize($s3_hledat);
         if (is_array($s3_hledat)) {
             $controlPrototype = $form['dotaz']->getControlPrototype();
             $controlPrototype->style(array('background-color' => '#ccffcc', 'border' => '1px #c0c0c0 solid'));
@@ -781,8 +740,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        //$this->forward('this', array('hledat'=>$data['dotaz']));
-        $this->redirect(':Spisovna:Dokumenty:' . $this->view, array('hledat' => $data['dotaz']));
+        UserSettings::set('spisovna_dokumenty_hledat', serialize($data['dotaz']));
+        $this->redirect($this->view);
     }
 
     protected function createComponentFiltrForm()
@@ -832,10 +791,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     public function filtrClicked(Nette\Application\UI\Form $form, $form_data)
     {
         $data = array('filtr' => $form_data['filtr']);
-        $this->getHttpResponse()->setCookie('s3_spisovna_filtr', serialize($data),
-                strtotime('90 day'));
+        UserSettings::set('spisovna_dokumenty_filtr', serialize($data));
 
-        $this->redirect(':Spisovna:Dokumenty:' . $this->view, array('filtr' => $data));
+        $this->redirect($this->view);
     }
 
     protected function createComponentSeraditForm()
@@ -878,9 +836,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function seraditFormSucceeded(Nette\Application\UI\Form $form, $form_data)
     {
-        $this->getHttpResponse()->setCookie('s3_spisovna_seradit', $form_data['seradit'],
-                strtotime('90 day'));
-        $this->redirect(':Spisovna:Dokumenty:default', array('seradit' => $form_data['seradit']));
+        UserSettings::set('spisovna_dokumenty_seradit', $form_data['seradit']);
+        $this->redirect('default');
     }
 
 }

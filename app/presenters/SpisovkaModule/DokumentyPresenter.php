@@ -44,10 +44,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->template->Typ_evidence = $this->typ_evidence;
 
-        $filtr = $this->getParameter('filtr');
-        $hledat = $this->getParameter('hledat');
-        $seradit = $this->getParameter('seradit');
-
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -56,27 +52,17 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Dokument = new Dokument();
 
-        $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
-        if (isset($filtr['filtr'])) {
-            // zjisten filtr
-            $this->getHttpResponse()->setCookie('s3_filtr', serialize($filtr),
-                    strtotime('90 day'));
+        $filtr = UserSettings::get('spisovka_dokumenty_filtr'); 
+        if ($filtr) {
+            $filtr = unserialize($filtr);
         } else {
-            $cookie_filtr = $this->getHttpRequest()->getCookie('s3_filtr');
-            if ($cookie_filtr) {
-                // zjisten filtr v cookie, tak vezmeme z nej
-                $filtr = unserialize($cookie_filtr);
-            } else {
-                // filtr nezjisten - pouzijeme nejaky
-                $filtr = array();
-                $filtr['filtr'] = 'pridelene';
-                $filtr['bez_vyrizenych'] = false;
-                $filtr['jen_moje'] = false;
-            }
-        }
-        // Pri prechodu ze starsi verze nebude tento parametr nastaven
-        if (!isset($filtr['jen_moje']))
+            // filtr nezjisten - pouzijeme nejaky
+            $filtr = array();
+            $filtr['filtr'] = 'pridelene';
+            $filtr['bez_vyrizenych'] = false;
             $filtr['jen_moje'] = false;
+        }
+            
         $args_f = $Dokument->fixedFiltr($filtr['filtr'], $filtr['bez_vyrizenych'],
                 $filtr['jen_moje']);
         $this->filtr = $filtr['filtr'];
@@ -85,18 +71,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->no_items = 2; // indikator pri nenalezeni dokumentu po filtraci
 
         $args_h = array();
-        if (isset($hledat))
-            $this->getHttpResponse()->setCookie('s3_hledat', serialize($hledat),
-                    strtotime('90 day'));
-        else {
-            $cookie_hledat = $this->getHttpRequest()->getCookie('s3_hledat');
-            if ($cookie_hledat)
-            // zjisteno hladaci filtr v cookie, tak vezmeme z nej
-                $hledat = unserialize($cookie_hledat);
-        }
+        $hledat = UserSettings::get('spisovka_dokumenty_hledat'); 
+        if ($hledat)
+            $hledat = unserialize($hledat);
+
         try {
             if (isset($hledat))
-                if (is_array($hledat)) {
+                if (is_array($hledat) ) {
                     // podrobne hledani = array
                     $args_h = $Dokument->paramsFiltr($hledat);
                     $this->template->no_items = 4; // indikator pri nenalezeni dokumentu pri pokorčilem hledani
@@ -130,16 +111,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     array('d.[id] IN (%i)', $this->hromadny_tisk_vyber)));
         }
 
-        if (isset($seradit)) {
+        $seradit = UserSettings::get('spisovka_dokumenty_seradit'); 
+        if ($seradit) {
             $Dokument->seradit($args, $seradit);
-            $this->getHttpResponse()->setCookie('s3_seradit', $seradit, strtotime('90 day'));
-        } else {
-            $seradit = $this->getHttpRequest()->getCookie('s3_seradit');
-            if ($seradit) {
-                // zjisteno razeni v cookie, tak vezmeme z nej
-                $Dokument->seradit($args, $seradit);
-            }
         }
+            
         $this->seradit = $seradit;
         $this->template->s3_seradit = $seradit;
         $this->template->seradit = $seradit;
@@ -2595,9 +2571,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)
                 ->setValue($hledat);
-
-        $cookie_hledat = $this->getHttpRequest()->getCookie('s3_hledat');
-        $s3_hledat = unserialize($cookie_hledat);
+        
+        $s3_hledat = UserSettings::get('spisovka_dokumenty_hledat');
+        $s3_hledat = unserialize($s3_hledat);
         if (is_array($s3_hledat)) {
             $controlPrototype = $form['dotaz']->getControlPrototype();
             $controlPrototype->style(array('background-color' => '#ccffcc', 'border' => '1px #c0c0c0 solid'));
@@ -2630,8 +2606,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        //$this->redirect('this', array('hledat'=>$data['dotaz']));
-        $this->redirect(':Spisovka:Dokumenty:default', array('hledat' => $data['dotaz']));
+        UserSettings::set('spisovka_dokumenty_hledat', serialize($data['dotaz']));
+        $this->redirect('default');
     }
 
     protected function createComponentFiltrForm()
@@ -2704,9 +2680,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             'bez_vyrizenych' => $data['bez_vyrizenych'],
             'jen_moje' => $data['jen_moje']);
 
-        $this->getHttpResponse()->setCookie('s3_filtr', serialize($data2), strtotime('90 day'));
+        UserSettings::set('spisovka_dokumenty_filtr', serialize($data2));
 
-        $this->redirect(':Spisovka:Dokumenty:default', array('filtr' => $data2));
+        $this->redirect('default');
     }
 
     protected function createComponentSeraditForm()
@@ -2746,10 +2722,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function seraditFormSucceeded(Nette\Application\UI\Form $form, $form_data)
     {
-        $this->getHttpResponse()->setCookie('s3_seradit', $form_data['seradit'],
-                strtotime('90 day'));
-        $this->redirect(':Spisovka:Dokumenty:default',
-                array('seradit' => $form_data['seradit']));
+        UserSettings::set('spisovka_dokumenty_seradit', $form_data['seradit']);
+        $this->redirect('default');
     }
 
 }

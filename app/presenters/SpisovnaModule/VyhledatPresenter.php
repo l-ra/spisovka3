@@ -3,9 +3,9 @@
 class Spisovna_VyhledatPresenter extends Spisovka_VyhledatPresenter
 {
 
-    public function getCookieName()
+    public function getSettingName()
     {
-        return 's3_spisovna_hledat';
+        return 'spisovna_dokumenty_hledat';
     }
 
     public function getRedirectPath()

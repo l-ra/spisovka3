@@ -3,9 +3,9 @@
 class Spisovka_VyhledatPresenter extends BasePresenter
 {
 
-    public function getCookieName()
+    public function getSettingName()
     {
-        return 's3_hledat';
+        return 'spisovka_dokumenty_hledat';
     }
 
     public function getRedirectPath()
@@ -91,7 +91,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
     public function actionReset()
     {
-        $this->getHttpResponse()->deleteCookie($this->getCookieName());
+        UserSettings::set($this->getSettingName(), serialize(null));
         $this->redirect($this->getRedirectPath());
     }
 
@@ -140,7 +140,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             );
         */
 
-        $hledat = $this->getHttpRequest()->getCookie($this->getCookieName());
+        $hledat = UserSettings::get($this->getSettingName());
 
         if (!empty($hledat)) {
             $hledat = unserialize($hledat);
@@ -304,7 +304,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
     public function vyhledatClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
+        $data = $button->getForm()->getValues(true /* jako pole, ne ArrayHash */);
 
         $post = $this->getHttpRequest()->getPost();
         
@@ -328,7 +328,6 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             $data['druh_zasilky'] = null;
         }
 
-        //Nette\Diagnostics\Debugger::dump($data); 
         // eliminujeme prazdne hodnoty
         foreach ($data as $d_index => $d_value) {
             if (is_array($d_value)) {
@@ -342,10 +341,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             }
         }
 
-        //Nette\Diagnostics\Debugger::dump($_POST);
-        //Nette\Diagnostics\Debugger::dump($data); exit;
-        //$this->forward(':Spisovka:Dokumenty:default',array('hledat'=>$data));
-        $this->redirect($this->getRedirectPath(), array('hledat' => $data));
+        UserSettings::set($this->getSettingName(), serialize($data));
+        $this->redirect($this->getRedirectPath());
     }
 
 }

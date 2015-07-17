@@ -71,17 +71,13 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         }
     }
 
-    public function renderDefault()
+    public function renderDefault($hledat)
     {
 
         $post = $this->getRequest()->getPost();
         if (isset($post['hromadna_submit'])) {
             $this->actionAkce($post);
         }
-
-        $filtr = $this->getParameter('filtr');
-        $hledat = $this->getParameter('hledat');
-        $seradit = $this->getParameter('seradit');
 
         $user_config = Nette\Environment::getVariable('user_config');
         $vp = new VisualPaginator($this, 'vp');
@@ -91,42 +87,23 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         $Zapujcka = new Zapujcka();
 
-        $this->template->no_items = 1; // indikator pri nenalezeni dokumentu
-        if (isset($filtr)) {
-            // zjisten filtr
-            $this->filtr = $filtr['filtr'];
+        $this->template->no_items = 1; // indikator pri nenalezeni zapujcky
+
+        $this->filtr = UserSettings::get('spisovna_zapujcky_filtr', 'vse');
+        if ($this->filtr != 'vse')
             $this->template->no_items = 2; // indikator pri nenalezeni zapujcky po filtraci
-        } else {
-            // filtr nezjisten - pouzijeme default
-            $cookie_filtr = $this->getHttpRequest()->getCookie('s3_zapujcka_filtr');
-            if ($cookie_filtr) {
-                // zjisten filtr v cookie, tak vezmeme z nej
-                $filtr = unserialize($cookie_filtr);
-                $this->filtr = $filtr['filtr'];
-                $this->template->no_items = 2; // indikator pri nenalezeni zapujcky po filtraci
-            } else {
-                $this->filtr = 'vse';
-            }
-        }
+        
         $args = $Zapujcka->filtr($this->filtr);
 
         if (isset($hledat)) {
-            if (is_array($hledat)) {
-                // podrobne hledani = array
-                $args = $hledat;
-                $this->template->no_items = 4; // indikator pri nenalezeni zapujcky pri pokorčilem hledani
-            } else {
-                // rychle hledani = string
-                $args = $Zapujcka->hledat($hledat);
-                $this->hledat = $hledat;
-                $this->template->no_items = 3; // indikator pri nenalezeni zypujcky pri hledani
-            }
+            // rychle hledani = string
+            $args = $Zapujcka->hledat($hledat);
+            $this->hledat = $hledat;
+            $this->template->no_items = 3; // indikator pri nenalezeni zypujcky pri hledani
         }
 
-        if (isset($seradit)) {
-            $Zapujcka->seradit($args, $seradit);
-        }
-        $this->template->seradit = $seradit;
+        /* $Zapujcka->seradit($args, $seradit);
+        $this->template->seradit = $seradit; */
 
         if (Acl::isInRole('spisovna') || $this->user->isInRole('superadmin')) {
             $akce = ['vratit' => 'Vrátit dokumenty',
@@ -488,7 +465,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $this->forward('this', array('hledat' => $data['dotaz']));
+        $this->redirect('this', array('hledat' => $data['dotaz']));
     }
 
     protected function createComponentFiltrForm()
@@ -535,10 +512,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function filtrClicked(Nette\Application\UI\Form $form, $form_data)
     {
-        $data = array('filtr' => $form_data['filtr']);
-        $this->getHttpResponse()->setCookie('s3_zapujcka_filtr', serialize($data),
-                strtotime('90 day'));
-        $this->forward(':Spisovna:Zapujcky:default', array('filtr' => $data));
+        UserSettings::set('spisovna_zapujcky_filtr', $form_data['filtr']);
+        $this->redirect('this');
     }
 
     public function actionSeznamAjax()
