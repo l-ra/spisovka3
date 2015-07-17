@@ -25,7 +25,9 @@ Nové funkce:
   
 Jiné změny:
 
-- aplikace je nyní podporována na PHP verze 5.4 a 5.5. Na starém 5.3 nepoběží.
+- aplikace je nyní podporována na PHP verze 5.4 až 5.6. Na starém 5.3 nepoběží.
+  Doporučujeme 5.5 a vyšší se Zend OPcache pro významné zvýšení rychlosti
+  na straně serveru.
 - aplikace nyní vyžaduje přepis URL. To není problém u webového serveru Apache.
   Pro Microsoft IIS je nutné ručně přepis URL nakonfigurovat.
 - z důvodu upgrade frameworku, na kterém aplikace běží a kvůli větší čistotě
