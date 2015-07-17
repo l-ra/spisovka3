@@ -108,17 +108,16 @@ class Zapujcka extends BaseModel
         return $seznam;
     }
 
-    public function hledat($query)
+    public function hledat($query, $args)
     {
+        if (!$args)
+            $args = [];
+        $args['where_or'] = [['d.nazev LIKE %s', "%$query%"],
+            ['d.popis LIKE %s', "%$query%"],
+            ['d.cislo_jednaci LIKE %s', "%$query%"],
+            ['d.jid LIKE %s', "%$query%"]
+        ];
 
-        $args = array(
-            'where_or' => array(
-                array('d.nazev LIKE %s', '%' . $query . '%'),
-                array('d.popis LIKE %s', '%' . $query . '%'),
-                array('d.cislo_jednaci LIKE %s', '%' . $query . '%'),
-                array('d.jid LIKE %s', '%' . $query . '%')
-            )
-        );
         return $args;
     }
 

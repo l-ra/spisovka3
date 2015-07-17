@@ -97,7 +97,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         if (isset($hledat)) {
             // rychle hledani = string
-            $args = $Zapujcka->hledat($hledat);
+            $args = $Zapujcka->hledat($hledat, $args);
             $this->hledat = $hledat;
             $this->template->no_items = 3; // indikator pri nenalezeni zypujcky pri hledani
         }
