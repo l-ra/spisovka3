@@ -46,46 +46,5 @@ class Admin_PrilohyPresenter extends BasePresenter
         }
     }
 
-    /**
-     *
-     * Formular pro nahrani priloh
-     *
-     */
-    protected function createComponentUploadForm()
-    {
-
-        $form1 = new Nette\Application\UI\Form();
-        $form1->addText('nazev', 'Název přílohy:', 50, 150);
-        $form1->addTextArea('popis', 'Popis:', 80, 5);
-        $form1->addSelect('typ', 'Typ souboru', FileModel::typPrilohy());
-        $form1->addUpload('file', 'Soubor:');
-        $form1->addSubmit('upload', 'Upload')
-                ->onClick[] = array($this, 'uploadClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
-    }
-
-    public function uploadClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        // Nacteni rozhrani pro upload dle nastaveni
-        $UploadFile = $this->storage;
-
-        if ($file = $UploadFile->uploadDokument($data)) {
-            $this->flashMessage('Soubor "' . $file->nazev . '" úspěšně nahrán.');
-            $this->redirect('this');
-        } else {
-            $this->flashMessage($UploadFile->errorMessage(), 'warning');
-        }
-    }
 
 }

@@ -78,15 +78,14 @@ class Storage_Basic extends FileModel
             $this->error_code = 0;
             return null;
         } else if ($upload->isOk()) {
-            $dest = $upload->move($fileName);
+            $upload->move($fileName);
 
             $file = new stdClass();
             $file->type = $this->getReflection()->getName();
             $file->real_name = Nette\Utils\Strings::webalize($upload->getName(), '.');
-            $file->real_path = str_replace(CLIENT_DIR, '', $dest->getTemporaryFile());
-            $file->size = $dest->getSize();
-            $file->content_type = $dest->getContentType();
-            $file->md5_hash = md5_file($dest->getTemporaryFile());
+            $file->real_path = str_replace(CLIENT_DIR, '', $upload->getTemporaryFile());
+            $file->size = $upload->getSize();
+            $file->md5_hash = md5_file($upload->getTemporaryFile());
 
             $row = array();
             $row['nazev'] = empty($data['nazev']) ? $file->real_name : $data['nazev'];
@@ -188,7 +187,6 @@ class Storage_Basic extends FileModel
         $file->real_name = $filename;
         $file->real_path = str_replace(CLIENT_DIR, '', $filepath);
         $file->size = filesize($filepath);
-        $file->content_type = FileModel::mimeType($filename);
         $file->md5_hash = md5_file($filepath);
 
         $row = array();
@@ -260,7 +258,6 @@ class Storage_Basic extends FileModel
         $file->real_name = $filename;
         $file->real_path = str_replace(CLIENT_DIR, '', $filepath);
         $file->size = filesize($filepath);
-        $file->content_type = FileModel::mimeType($filename);
         $file->md5_hash = md5_file($filepath);
 
         $row = array();
@@ -311,11 +308,7 @@ class Storage_Basic extends FileModel
                     // primy stream - poslat ven
 
                     $httpResponse = Nette\Environment::getHttpResponse();
-                    if (!empty($file->mime_type)) {
-                        $httpResponse->setContentType($file->mime_type);
-                    } else {
-                        $httpResponse->setContentType('application/octetstream');
-                    }
+                    $httpResponse->setContentType($file->mime_type ?: 'application/octetstream');
                     $httpResponse->setHeader('Content-Description', 'File Transfer');
                     $httpResponse->setHeader('Content-Disposition',
                             'attachment; filename="' . $basename . '"');

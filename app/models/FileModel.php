@@ -775,26 +775,28 @@ class FileModel extends BaseModel
             '323' => 'text/h323',
         );
 
-        $fileSuffix = [];
-        if (preg_match("|\.([a-z0-9]{2,4})$|i", $filename, $fileSuffix)) {
-            $ext = strtolower($fileSuffix[1]);
-        } else {
-            $ext = @strtolower(array_pop(explode('.', $filename)));
+        // Cesta v databazi se tvari jako absolutni, ale je to pouze relativni cesta
+        // do adresare s daty klienta
+        if (strncmp($filename, '/files/', 7) === 0)
+            $filename = CLIENT_DIR . $filename;
+        
+        if (function_exists('finfo_open') && @is_file($filename)) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimetype = finfo_file($finfo, $filename);
+            finfo_close($finfo);
+            return $mimetype;
         }
 
+        if (strpos($filename, '.') === false)
+            $ext = '';
+        else
+            $ext = strtolower(array_pop(explode('.', $filename)));
+        
         if (array_key_exists($ext, $mime_types))
             return $mime_types[$ext];
 
-        // if ( function_exists('finfo_open') ) {
-        //    $finfo = finfo_open(FILEINFO_MIME);
-        //    $mimetype = finfo_file($finfo, $filename);
-        //    finfo_close($finfo);
-        //    return $mimetype;
-
-        if (function_exists("mime_content_type"))
-            $fileSuffix = @mime_content_type($filename);
-        
-        return $fileSuffix ? trim($fileSuffix[0]) : 'application/octet-stream';
+        // Kdyz vse ostatni selze
+        return 'application/octet-stream';
     }
 
 }

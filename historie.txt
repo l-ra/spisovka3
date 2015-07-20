@@ -45,7 +45,9 @@ Jiné změny:
 - zformátování PHP kódu aplikace pro mnohem lepší přehlednost
   (ocení programátoři)
 - nová funkce pro vývojáře pro základní automatické testování aplikace
-  
+
+- aplikace se nyní snaží zjistit MIME typ přímo ze souborů. V předchozích
+  verzích se typ určoval zjednodušeně pouze podle přípony souboru.
 - upraven vzhled nápovědy a nyní se nápověda zobrazuje v modálním okně
 - oprávnění pro nápovědu bylo odstraněno, nápověda je vždy přístupná
 - hledání v subjektech v administraci nyní hledá i podle ulice
