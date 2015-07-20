@@ -32,11 +32,10 @@ pro některé konfigurační soubory a zápisu pro dočasné soubory.</p>
 {else}
     <div class="passed result">
         <h2>Blahopřeji! Konfigurace serveru splňuje minimální požadavky pro použití aplikace.</h2>
+	    <p n:if="$warnings">Byly zjištěny nesrovnalosti, které mohou ovlivnit chod aplikace. Podívejte se do detailu a u vyznačených bodů se rozhodněte,
+            zda je daná položka nutná pro běh aplikace nebo ne.</p>
         {if !$installed}
         <p>Můžete pokračovat v instalaci.</p>
-	{if ($warnings)}<p>Byly zjištěny nesrovnalosti, které mohou ovlivnit chod aplikace. Podívejte se do detailu a u vyznačených bodů se rozhodněte,
-            zda je daná položka nutná pro běh aplikace nebo ne.</p>{/if}
-
         <p><a href="{link :Install:Default:databaze}">Pokračovat v instalaci</a></p>
         {/if}
     </div>

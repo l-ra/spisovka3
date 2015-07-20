@@ -182,7 +182,7 @@ class Install_DefaultPresenter extends BasePresenter
                 'title' => 'Podpora SOAP',
                 'required' => FALSE,
                 'passed' => $soap_support,
-                'message' => '',
+                'message' => 'Ano',
                 'errorMessage' => 'Není zapnuta podpora knihovny SOAP (SoapClient)',
                 'description' => 'Je potřeba pro komunikaci a práci s ISDS a CzechPoint.',
             ),
@@ -209,6 +209,14 @@ class Install_DefaultPresenter extends BasePresenter
                 'message' => $imap_version,
                 'errorMessage' => 'Není zapnuta podpora knihovny IMAP',
                 'description' => 'Je potřeba pro příjem emailových zpráv.',
+            ),
+            array(
+                'title' => 'Rozšíření Fileinfo',
+                'required' => FALSE,
+                'passed' => extension_loaded('fileinfo'),
+                'message' => 'Ano',
+                'errorMessage' => 'Ne',
+                'description' => 'Chybí rozšíření Fileinfo. Detekce MIME typů souborů bude omezena, jen podle přípony souboru.',
             ),
             array(
                 'title' => 'Zápis do dočasné složky',
@@ -409,12 +417,6 @@ class Install_DefaultPresenter extends BasePresenter
               'passed' => @exec('identify -format "%w,%h,%m" ' . addcslashes(dirname(__FILE__) . '/assets/logo.gif', ' ')) === '176,104,GIF', // intentionally @
               'description' => 'ImageMagick server library is absent. You will not be able to use <code>Nette\ImageMagick</code>.',
               ), */
-            array(
-                'title' => 'Fileinfo extension or mime_content_type()',
-                'required' => FALSE,
-                'passed' => extension_loaded('fileinfo') || function_exists('mime_content_type'),
-                'description' => 'Fileinfo extension or function <code>mime_content_type()</code> are absent. You will not be able to determine mime type of uploaded files.',
-            ),
             array(
                 'title' => 'HTTP extension',
                 'required' => FALSE,
