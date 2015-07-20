@@ -19,29 +19,35 @@ Nové funkce:
 - v administraci lze fitrovat subjekty podle stavu
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
   podporu
+- instalační kontrolu je možné kdykoliv znovu spustit z administrace  
 - v ladicím módu (DEBUG_ENABLE 1 v index.php) aplikace zobrazuje vpravo dole
   lištu s užitečnými informacemi: čas zpracování stránky, použitou paměť
   a databázové dotazy
   
 Jiné změny:
 
+- pro informace o změně konfiguračních souborů viz soubor aktualizace.txt
+- konfigurace LDAP autentizace je mírně odlišná
 - aplikace je nyní podporována na PHP verze 5.4 až 5.6. Na starém 5.3 nepoběží.
   Doporučujeme 5.5 a vyšší se Zend OPcache pro významné zvýšení rychlosti
   na straně serveru.
 - aplikace nyní vyžaduje přepis URL. To není problém u webového serveru Apache.
   Pro Microsoft IIS je nutné ručně přepis URL nakonfigurovat.
 - z důvodu upgrade frameworku, na kterém aplikace běží a kvůli větší čistotě
-  zdrojového kódu aplikace v něm došlo k rozsáhlým změnám. V ideálním případě by
+  zdrojového kódu aplikace v ní došlo k rozsáhlým změnám. V ideálním případě by
   uživatel změnu neměl poznat, ale je zde určité riziko vzniku nových chyb,
   které testování nemusí odhalit.
-- pro informace o změně konfiguračních souborů viz soubor aktualizace.txt
 - přepsána velká část Javascriptu starající se o dynamické změny na stránce.
   Tzv. rotující kolečko by se nyní mělo spolehlivě zobrazovat a skrývat, když
   aplikace zpracovává požadavek nebo nahrává data na pozadí. Též je uživatel
   informován, pokud při provádění požadavku na pozadí dojde k chybě.
-- upraven vzhled nápovědy a nyní se nápověda zobrazuje v modálním okně
 - proveden upgrade staré knihovny pro připojení k databázi
-- nový modul pro vývojáře pro základní automatické testování aplikace
+- zformátování PHP kódu aplikace pro mnohem lepší přehlednost
+  (ocení programátoři)
+- nová funkce pro vývojáře pro základní automatické testování aplikace
+  
+- upraven vzhled nápovědy a nyní se nápověda zobrazuje v modálním okně
+- oprávnění pro nápovědu bylo odstraněno, nápověda je vždy přístupná
 - hledání v subjektech v administraci nyní hledá i podle ulice
 - mezi stavy subjektu "neaktivní" a "zrušený" nebyl z hlediska fungování
   programu rozdíl. Stav "zrušený" byl odstraněn.
@@ -55,9 +61,6 @@ Jiné změny:
 - přehlednější názvy filtrů zápůjček
 - je-li ve spisovně dostupná jediná akce na vybraných záznamech, není nyní nutné
   ji ručně vybírat ze seznamu
-- oprávnění pro nápovědu bylo odstraněno, nápověda je vždy přístupná
-- zformátování PHP kódu aplikace pro mnohem lepší přehlednost
-  (ocení programátoři)
   
 Opravy:
 
