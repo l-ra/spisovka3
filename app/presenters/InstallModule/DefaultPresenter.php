@@ -674,7 +674,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         if ($dokonceno == 1) {
 
-            $user_config = (new Spisovka\ConfigClient())->get();
+            // $user_config = (new Spisovka\ConfigClient())->get();
             $zerotime = mktime(0, 0, 0, 8, 20, 2008);
             $diff = time() - $zerotime;
             $diff = round($diff / 3600);
@@ -1038,6 +1038,7 @@ class Install_DefaultPresenter extends BasePresenter
         $pi = array();
         foreach ($sections as $section) {
             $n = substr($section, 0, strpos($section, '</h2>'));
+            $askapache = [];
             preg_match_all(
                     '#%S%(?:<td>(.*?)</td>)?(?:<td>(.*?)</td>)?(?:<td>(.*?)</td>)?%E%#',
                     $section, $askapache, PREG_SET_ORDER);
