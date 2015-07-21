@@ -243,23 +243,23 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $form->addText('vyrizeni_pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$hledat['vyrizeni_pocet_priloh']);
 
-        $form->addText('prideleno_text', 'Přiděleno:', 50, 255)
+        $form->addText('prideleno_text', 'Přidělen:', 50, 255)
                         ->setValue(@$hledat['prideleno_text'])
                         ->getControlPrototype()->autocomplete = 'off';
 
-        $form->addText('predano_text', 'Předáno:', 50, 255)
+        $form->addText('predano_text', 'Předán:', 50, 255)
                         ->setValue(@$hledat['predano_text'])
                         ->getControlPrototype()->autocomplete = 'off';
 
-        $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno')
+        $form->addCheckbox('prideleno_osobne', 'Přidělen na mé jméno')
                 ->setValue((@$hledat['prideleno_osobne']) ? 1 : 0);
         $form->addCheckbox('prideleno_na_organizacni_jednotku',
-                        'Přiděleno na mou organizační jednotku')
+                        'Přidělen na mou organizační jednotku')
                 ->setValue((@$hledat['prideleno_na_organizacni_jednotku']) ? 1 : 0);
-        $form->addCheckbox('predano_osobne', 'Předáno na mé jméno')
+        $form->addCheckbox('predano_osobne', 'Předán na mé jméno')
                 ->setValue((@$hledat['predano_osobne']) ? 1 : 0);
         $form->addCheckbox('predano_na_organizacni_jednotku',
-                        'Předáno na mou organizační jednotku')
+                        'Předán na mou organizační jednotku')
                 ->setValue((@$hledat['predano_na_organizacni_jednotku']) ? 1 : 0);
 
 

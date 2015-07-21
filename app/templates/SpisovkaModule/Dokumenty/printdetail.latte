@@ -19,7 +19,7 @@
         {if empty($Dok->cislo_jednaci)}
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
-            <dd>Dokument nemá přiděleno číslo jednací.</dd>
+            <dd>Dokument nemá přidělen číslo jednací.</dd>
         </dl>
         {else}
         <dl class="detail_item">
@@ -224,7 +224,7 @@
         <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
         {else}
         <dl class="detail_item">
-            <dt>Přiděleno:</dt>
+            <dt>Přidělen:</dt>
             <dd>
             {if empty($Dok->prideleno->prideleno_id) }
                 organizační jednotce
@@ -238,7 +238,7 @@
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>Přiděleno dne:</dt>
+            <dt>Přidělen dne:</dt>
             <dd>{$Dok->prideleno->date|edatetime}</dd>
         </dl>
         <dl class="detail_item">
@@ -249,7 +249,7 @@
 
         {if isset($Dok->predano)}
         <dl class="detail_item">
-            <dt>Předáno:</dt>
+            <dt>Předán:</dt>
             <dd>
             {if empty($Dok->predano->prideleno_id) }
                 organizační jednotce
@@ -263,7 +263,7 @@
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>Předáno dne:</dt>
+            <dt>Předán dne:</dt>
             <dd>{$Dok->predano->date|edatetime}</dd>
         </dl>
         <dl class="detail_item">

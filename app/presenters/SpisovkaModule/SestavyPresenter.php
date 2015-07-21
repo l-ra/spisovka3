@@ -14,7 +14,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         'pocet_priloh' => 'Počet příloh',
         'pocet_nelistu' => 'Počet nelistů',
         'nazev' => 'Věc',
-        'vyridil' => 'Přiděleno / Vyřídil',
+        'vyridil' => 'Přidělen / Vyřídil',
         'zpusob_vyrizeni' => 'Způsob vyřízení',
         'datum_odeslani' => 'Datum odeslání',
         'spisovy_znak' => 'Spis. znak',
@@ -517,17 +517,17 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5);
         $form->addSelect('spousteci_udalost', 'Spouštěcí událost: ', $spudalost_seznam);
 
-        $form->addText('prideleno_text', 'Přiděleno:', 50, 255)
+        $form->addText('prideleno_text', 'Přidělen:', 50, 255)
                         ->getControlPrototype()->autocomplete = 'off';
-        $form->addText('predano_text', 'Předáno:', 50, 255)
+        $form->addText('predano_text', 'Předán:', 50, 255)
                         ->getControlPrototype()->autocomplete = 'off';
 
-        $form->addCheckbox('prideleno_osobne', 'Přiděleno na mé jméno');
+        $form->addCheckbox('prideleno_osobne', 'Přidělen na mé jméno');
         $form->addCheckbox('prideleno_na_organizacni_jednotku',
-                'Přiděleno na mou organizační jednotku');
-        $form->addCheckbox('predano_osobne', 'Předáno na mé jméno');
+                'Přidělen na mou organizační jednotku');
+        $form->addCheckbox('predano_osobne', 'Předán na mé jméno');
         $form->addCheckbox('predano_na_organizacni_jednotku',
-                'Předáno na mou organizační jednotku');
+                'Předán na mou organizační jednotku');
 
 
         $form->addSelect('subjekt_type', 'Typ subjektu:', $typ_select);

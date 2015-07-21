@@ -10,8 +10,8 @@
         <tr>
             <th>Spis</th>
             <th>Počet dokumentů</th>
-            <th>Přiděleno</th>
-            <th>Předáno</th>            
+            <th>Přidělen</th>
+            <th>Předán</th>            
         </tr>
         {foreach $seznam as $spis}
         <tr>
@@ -36,7 +36,7 @@
                     {if !empty($spis->orgjednotka_prideleno)}
                     {$spis->orgjednotka_prideleno}
                     {else}
-                    <span style="color:#880000;">(nepřiděleno k žádné organizační jednotce!)</span>
+                    <span style="color:#880000;">(nepřidělen k žádné organizační jednotce!)</span>
                     {/if}
                     
                 </strong></td>              

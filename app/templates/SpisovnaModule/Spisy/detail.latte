@@ -60,8 +60,8 @@
             <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Přiděleno organizační jednotce:</dt>
-            <dd>{if !empty($Spis->orgjednotka_prideleno)}{$Spis->orgjednotka_prideleno->zkraceny_nazev}{else}(není přiděleno k žádné organizační jednotce){/if}&nbsp;</dd>
+            <dt>Přidělen organizační jednotce:</dt>
+            <dd>{if !empty($Spis->orgjednotka_prideleno)}{$Spis->orgjednotka_prideleno->zkraceny_nazev}{else}(není přidělen k žádné organizační jednotce){/if}&nbsp;</dd>
         </dl>         
         <dl class="detail_item">
             <dt>Stav:</dt>
@@ -83,10 +83,10 @@
 
         <tr>
             <th class="typ">Typ dokumentu</th>
-            <th class="prijato">Přijato<br />Vyřízeno</th>
+            <th class="prijato">Přijato<br />Vyřízen</th>
             <th class="cislo_jadnaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
-            <th class="prideleno">Přiděleno</th>
+            <th class="prideleno">Přidělen</th>
             <th class="stav">Spisový znak<br/>Skartační znak<br/>Skartační lhůta</th>
         </tr>
 

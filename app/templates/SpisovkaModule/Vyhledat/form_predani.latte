@@ -1,6 +1,6 @@
     <div class="dokument_blok_sedy">
         <div class="h2">
-            Přiděleno / předáno
+            Přidělen / předán
         </div>
     {if $presenter->name == 'Spisovka:Sestavy'}
         <span n:if="!$vidiVsechnyDokumenty">Poznámka: Sestava bude zahrnovat jen dokumenty, ke kterým máte přístup.</span>
@@ -9,11 +9,11 @@
         <span n:if="!$vidiVsechnyDokumenty">Poznámka: Nemáte právo vidět všechny dokumenty, výsledek hledání bude omezen.</span>
     {/if}
         <dl class="detail_item">
-            <dt>Přiděleno:</dt>
+            <dt>Přidělen:</dt>
             <dd>
             {$form['prideleno_text']->control}
-            <br />{$form['prideleno_osobne']->control} Přiděleno na mé jméno
-            <br />{$form['prideleno_na_organizacni_jednotku']->control} Přiděleno na mou organizační jednotku
+            <br />{$form['prideleno_osobne']->control} Přidělen na mé jméno
+            <br />{$form['prideleno_na_organizacni_jednotku']->control} Přidělen na mou organizační jednotku
 
         <script type="text/javascript">
         function pridelenoPredanoSearchHandler(type, payload) {
@@ -55,11 +55,11 @@
             </dd>
         </dl>
         <dl class="detail_item">
-            <dt>Předáno:</dt>
+            <dt>Předán:</dt>
             <dd>
             {$form['predano_text']->control}
-            <br />{$form['predano_osobne']->control} Předáno na mé jméno
-            <br />{$form['predano_na_organizacni_jednotku']->control} Předáno na mou organizační jednotku
+            <br />{$form['predano_osobne']->control} Předán na mé jméno
+            <br />{$form['predano_na_organizacni_jednotku']->control} Předán na mou organizační jednotku
         <script type="text/javascript">
         $('input[name=predano_text]').keyup(function(event) {
             keyUpHandler('predano', this);

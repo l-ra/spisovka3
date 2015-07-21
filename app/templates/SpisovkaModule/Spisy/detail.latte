@@ -76,12 +76,12 @@
             <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
-            <dt>Přiděleno organizační jednotce:</dt>
-            <dd>{if !empty($Spis->orgjednotka_prideleno)}{$Spis->orgjednotka_prideleno->zkraceny_nazev}{else}(není přiděleno k žádné organizační jednotce){/if}&nbsp;</dd>
+            <dt>Přidělen organizační jednotce:</dt>
+            <dd>{if !empty($Spis->orgjednotka_prideleno)}{$Spis->orgjednotka_prideleno->zkraceny_nazev}{else}(není přidělen k žádné organizační jednotce){/if}&nbsp;</dd>
         </dl>  
         {if !empty($Spis->orgjednotka_predano)}
         <dl class="detail_item">
-            <dt>Předáno organizační jednotce:</dt>
+            <dt>Předán organizační jednotce:</dt>
             <dd>{$Spis->orgjednotka_predano->zkraceny_nazev}&nbsp;</dd>
         </dl> 
         {/if}
@@ -115,7 +115,7 @@
             <th class="prijato">Přijato</th>
             <th class="cislo_jadnaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
-            <th class="prideleno">Přiděleno</th>
+            <th class="prideleno">Přidělen</th>
             <th class="stav">Stav</th>
         </tr>
 
@@ -197,7 +197,7 @@
             {/if}
             </td>
             <td class="stav">
-                předáno
+                předán
                 <br />
                 {$dok->predano->date_predani|edate}
             </td>
@@ -212,7 +212,7 @@
             {/if}            
             </td>
             <td class="stav">
-                přiděleno
+                přidělen
                 <br />
                 {$dok->prideleno->date|edate}
             </td>
@@ -240,7 +240,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}                  
             </td>
             <td class="stav">
-                vyřízeno
+                vyřízen
                 <br />
                 {$dok->datum_vyrizeni|edate}
             </td>
@@ -251,7 +251,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                vyřízeno
+                vyřízen
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
@@ -262,7 +262,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                vyřízeno<br />předáno do spisovny
+                vyřízen<br />předán do spisovny
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
@@ -273,7 +273,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                vyřízeno<br />ve spisovně
+                vyřízen<br />ve spisovně
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
@@ -309,7 +309,7 @@
                 &nbsp;
             </td>
             <td class="stav">
-                nepřiřazeno!
+                nepřiřazen!
                 <br />
                 lhůta {$dok->lhuta} dní
             </td>

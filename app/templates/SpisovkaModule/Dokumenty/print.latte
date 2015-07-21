@@ -24,7 +24,7 @@
             <th class="prijato">Přijato</th>
             <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
-            <th class="prideleno">Přiděleno / Vyřídil<br />> Předáno</th>
+            <th class="prideleno">Přidělen / Vyřídil<br />> Předán</th>
             <th class="stav">Stav</th>
         </tr>
         {foreach $seznam as $dok}
@@ -109,7 +109,7 @@
             
             </td>
             <td class="stav {if $dok->lhuta_stav==2}stav_red{elseif $dok->lhuta_stav==1}stav_yellow{else}stav{/if}">
-                předáno
+                předán
                 <br />
                 <span title="{$dok->predano->date_predani|edatetime}">{$dok->predano->date_predani|edate}</span>
             </td>
@@ -124,7 +124,7 @@
             {/if}
             </td>
             <td>
-                přiděleno
+                přidělen
                 <br />
                 <span title="{$dok->prideleno->date|edatetime}">{$dok->prideleno->date|edate}</span>
             </td>
@@ -146,7 +146,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                vyřízeno
+                vyřízen
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
@@ -157,7 +157,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                vyřízeno
+                vyřízen
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
@@ -167,7 +167,7 @@
                 &nbsp;
             </td>
             <td class="stav">
-                nepřiřazeno!
+                nepřiřazen!
                 <br />
                 lhůta {$dok->lhuta} dní
             </td>

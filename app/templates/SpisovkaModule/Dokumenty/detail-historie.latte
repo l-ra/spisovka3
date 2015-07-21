@@ -16,17 +16,17 @@
             <dd>dokument předán</dd>
             {if empty($wf->prideleno_id)}
                 {var $wf_jmeno = $wf->orgjednotka_info->zkraceny_nazev}
-                {var $wf_neprijato = 'předáno organizační jednotce '. $wf_jmeno .'. Ta dokument zatím nepřijala.'}
+                {var $wf_neprijato = 'předán organizační jednotce '. $wf_jmeno .'. Ta dokument zatím nepřijala.'}
             {else}
                 {var $wf_jmeno = $wf->prideleno_jmeno}
-                {var $wf_neprijato = 'předáno '. $wf_jmeno .', ale zaměstnanec dokument zatím nepřijal'}
+                {var $wf_neprijato = 'předán '. $wf_jmeno .', ale zaměstnanec dokument zatím nepřijal'}
             {/if}
             {if $wf->stav_osoby == 0}
             <dd class="normal">{$wf_neprijato}</dd>
             {elseif $wf->stav_osoby >= 100}
-            <dd class="normal">předáno {$wf_jmeno}, ale převzetí bylo zrušeno</dd>
+            <dd class="normal">předán {$wf_jmeno}, ale převzetí bylo zrušeno</dd>
             {else}
-            <dd class="normal">předáno {$wf_jmeno}</dd>
+            <dd class="normal">předán {$wf_jmeno}</dd>
             {/if}
 
             {elseif $wf->stav_dokumentu == 3}

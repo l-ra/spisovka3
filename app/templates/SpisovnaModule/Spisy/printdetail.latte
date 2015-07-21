@@ -58,7 +58,7 @@
             <th class="prijato">Přijato</th>
             <th class="cislo_jadnaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
-            <th class="prideleno">Přiděleno</th>
+            <th class="prideleno">Přidělen</th>
             <th class="stav">Stav</th>
         </tr>
 
@@ -128,7 +128,7 @@
                 {/if}&nbsp;
             </td>
             <td class="stav">
-                předáno
+                předán
                 <br />
                 {$dok->predano->date_predani|edate}
             </td>
@@ -139,7 +139,7 @@
                 {/if}&nbsp;
             </td>
             <td class="stav">
-                přiděleno
+                přidělen
                 <br />
                 {$dok->prideleno->date|edate}
             </td>
@@ -163,7 +163,7 @@
                 {/if}&nbsp;
             </td>
             <td class="stav">
-                vyřízeno
+                vyřízen
                 <br />
                 {$dok->datum_vyrizeni|edate}
             </td>
@@ -174,7 +174,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                vyřízeno
+                vyřízen
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
@@ -185,7 +185,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                vyřízeno<br />předáno do spisovny
+                vyřízen<br />předán do spisovny
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
@@ -196,7 +196,7 @@
                 {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
             </td>
             <td class="stav">
-                vyřízeno<br />ve spisovně
+                vyřízen<br />ve spisovně
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
@@ -232,7 +232,7 @@
                 &nbsp;
             </td>
             <td class="stav">
-                nepřiřazeno!
+                nepřiřazen!
                 <br />
                 lhůta {$dok->lhuta} dní
             </td>
