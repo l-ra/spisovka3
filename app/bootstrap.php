@@ -315,7 +315,8 @@ function migrateSystemIni()
 
     $new_config = [ 'parameters' => [ 'database' => $old_config['common']['database']]];
     $loader->save($new_config, "$dir/database.neon");
-
+    @chmod("$dir/database.neon", 400);
+    
     // Uklid. Prejmenovani pojisti, ze se konfigurace zmigruje jen jednou.
     unlink("$dir/system.in");
     rename("$dir/system.ini", "$dir/system.old");
