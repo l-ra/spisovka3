@@ -26,8 +26,10 @@ class Admin_SupportPresenter extends BasePresenter
         $max = DokumentPrilohy::maxVelikostUploadu(true);
         echo "$max\n\n";
 
-        echo "Nastavení uložená v databázi:\n\n";
+        echo "Nastavení uložená v databázi:\n";
+        echo "-----------------------------\n\n";
         $db_settings = Settings::getAll();
+        unset($db_settings['epodatelna']); // Zobrazime pozdeji
         foreach ($db_settings as $key => $val) {
             if ($val === true)
                 $val = 'true';
@@ -43,8 +45,19 @@ class Admin_SupportPresenter extends BasePresenter
         print_r($config['user_config']);
         echo "\n";
 
+        echo "Konfigurace e-podatelny:\n";
+        echo "------------------------\n\n";
+        $config = (new \Spisovka\ConfigEpodatelna)->get();
+        foreach ($config->isds as &$box)
+            unset($box->password);
+        foreach ($config->email as &$mailbox)
+            unset($mailbox->password);
+        print_r($config);
+        echo "\n";
+        
         echo "Konfigurace systému:\n";
         echo "--------------------\n\n";
+        $config = $this->context->parameters;
         unset($config['user_config']);  // toto jsme jiz zobrazili
         unset($config['database']['password']);
         unset($config['ldap']['search_password']);
