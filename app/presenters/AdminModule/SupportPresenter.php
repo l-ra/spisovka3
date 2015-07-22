@@ -39,6 +39,14 @@ class Admin_SupportPresenter extends BasePresenter
         }
         echo "\n";
 
+        echo "Nastavení uživatele:\n";
+        echo "--------------------\n\n";
+        $user_settings = UserSettings::getAll();
+        // print_r($user_settings);
+        foreach ($user_settings as $key => $val)
+            printf("%-35s  %s\n", $key, $val);
+        echo "\n";
+
         echo "Konfigurace klienta:\n";
         echo "--------------------\n\n";
         $config = $this->context->parameters;

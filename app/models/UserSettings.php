@@ -15,23 +15,26 @@ class UserSettings
         return self::$instance;
     }
 
+    public static function getAll()
+    {
+        $i = self::_getInstance();
+        return $i->_getAll();        
+    }
+
     public static function get($key, $default = null)
     {
-
         $i = self::_getInstance();
         return $i->_get($key, $default);
     }
 
     public static function set($key, $value)
     {
-
         $i = self::_getInstance();
         $i->_set($key, $value);
     }
 
     public static function remove($key)
     {
-
         $i = self::_getInstance();
         $i->_set($key, null);
     }
@@ -58,6 +61,11 @@ class UserSettings
         } else
             dibi::query('INSERT INTO %n', $this->table_prefix . self::TABLE_NAME,
                     'VALUES (%i, %s)', $this->user_id, serialize(array()));
+    }
+
+    protected function _getAll()
+    {
+        return $this->settings;
     }
 
     protected function _get($key, $default = null)
