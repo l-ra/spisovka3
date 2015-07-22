@@ -48,3 +48,9 @@ v souboru database.neon, který aplikace při prvním spuštění vytvoří.
 Konfiguraci aplikace lze přizpůsobit vytvořením souboru system.neon,
 viz ukázku v system.neon.sample.
 
+Informace ze souboru epodatelna.ini se při prvním spuštění překopírují
+do databáze.
+
+Po ověření, že aplikace včetně e-podatelny funguje správně, smažte prosím
+soubory system.old a epodatelna.old.
+

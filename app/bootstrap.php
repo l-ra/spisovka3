@@ -151,7 +151,10 @@ try {
         echo 'Aplikaci se nepodarilo pripojit do databaze.<br>';
         throw $e;
     }
-
+    
+// 3c) Konfiguruj e-podatelnu - musí být provedeno po připojení do databáze
+    createEpodatelnaConfig();
+    
 // Step 4: Setup application router
 // 
 // Detect and set HTTP protocol => HTTP(80) or HTTPS(443)
@@ -274,6 +277,7 @@ try {
 // Step 5: Run the application!
 $application->run();
 
+
 function mPDFautoloader($class)
 {
     if ($class == 'mPDF')
@@ -284,7 +288,6 @@ function createIniFiles()
 {
     $dir = CLIENT_DIR . '/configs';
     createIniFile("$dir/klient.ini");
-    createIniFile("$dir/epodatelna.ini");
 
     if (!is_file("$dir/database.neon") && is_file("$dir/system.ini"))
         migrateSystemIni();
@@ -315,9 +318,27 @@ function migrateSystemIni()
 
     $new_config = [ 'parameters' => [ 'database' => $old_config['common']['database']]];
     $loader->save($new_config, "$dir/database.neon");
-    @chmod("$dir/database.neon", 400);
+    @chmod("$dir/database.neon", 0400);
     
     // Uklid. Prejmenovani pojisti, ze se konfigurace zmigruje jen jednou.
     unlink("$dir/system.in");
     rename("$dir/system.ini", "$dir/system.old");
+}
+
+function createEpodatelnaConfig()
+{    
+    // nejprve zkontroluj, zda migrace uz byla provedena
+    if (Settings::get('epodatelna'))
+        return;
+    
+    // potom zjisti, zda se jedna o novou instalaci ci nikoliv
+    $dir = CLIENT_DIR . '/configs';
+    if (!is_file("$dir/epodatelna.ini"))
+        createIniFile("$dir/epodatelna.ini");       
+    
+    $config = (new Spisovka\ConfigEpodatelnaOld())->get();
+    (new Spisovka\ConfigEpodatelna())->save($config);
+
+    rename("$dir/epodatelna.ini", "$dir/epodatelna.old");    
+    @chmod("$dir/epodatelna.old", 0400);
 }

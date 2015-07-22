@@ -77,7 +77,9 @@ class Settings
 
     protected function _set($key, $value)
     {
-
+        if (!is_scalar($value))
+            throw new Exception (__METHOD__ . '() - $value has to be a scalar');
+        
         if ($value === false)
             $db_value = 'false';
         else if ($value === true)

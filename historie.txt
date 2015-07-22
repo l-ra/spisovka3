@@ -27,6 +27,7 @@ Nové funkce:
 Jiné změny:
 
 - pro informace o změně konfiguračních souborů viz soubor aktualizace.txt
+- z bezpečnostních důvodů se nyní konfigurace e-podatelny ukládá do databáze
 - konfigurace LDAP autentizace je mírně odlišná
 - aplikace je nyní podporována na PHP verze 5.4 až 5.6. Na starém 5.3 nepoběží.
   Doporučujeme 5.5 a vyšší se Zend OPcache pro významné zvýšení rychlosti
