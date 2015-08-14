@@ -116,6 +116,7 @@
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
+        {var $udalostForm = $presenter->getComponent('udalostForm')}
         {$udalostForm->render('begin')}
         <dl class="detail_item">
             <dt>Určete rozhodný okamžik:</dt>
@@ -141,6 +142,7 @@
 
     <div class="dokument_blok_hlavni">
         {if ($FormUpravit=='metadata')}
+        {var $metadataForm = $presenter->getComponent('metadataForm')}
         {$metadataForm->render('begin')}
         <dl class="detail_item">
             <dt>JID:</dt>
@@ -150,7 +152,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Typ dokumentu:</dt>
-            {if $isRozdelany}
+            {if isset($metadataForm['dokument_typ_id'])}
             <dd>{$metadataForm['dokument_typ_id']->control}</dd>
             {else}
             <dd>{$Dok->typ_dokumentu->nazev}</dd>
@@ -201,7 +203,7 @@
             <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
             {/if}
         </dl>
-        {if $isRozdelany && $Dok->typ_dokumentu->smer == 0}
+        {if isset($metadataForm['zpusob_doruceni_id'])}
         <dl class="detail_item">
             <dt>{$metadataForm['zpusob_doruceni_id']->label}</dt>
             <dd>{$metadataForm['zpusob_doruceni_id']->control}</dd>
@@ -407,6 +409,7 @@
         <div class="h2">Vyřízení <span class='toggler' onclick='toggleWindow(this);'>&nbsp;</span></div>
         <div class="dokument_blok">
         {if ($FormUpravit=='vyrizeni')}
+        {var $vyrizovaniForm = $presenter->getComponent('vyrizovaniForm')}
         {$vyrizovaniForm->render('begin')}
         <dl class="detail_item">
             <dt>Způsob vyřízení:</dt>

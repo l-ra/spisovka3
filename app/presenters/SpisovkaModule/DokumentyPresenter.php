@@ -252,12 +252,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function actionDetail()
     {
-
         $Dokument = new Dokument();
 
         // Nacteni parametru
         $dokument_id = $this->getParameter('id', null);
-
+        if ($dokument_id === null)
+            $dokument_id = $this->getHttpRequest()->getPost('id');
+        
         $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
         if ($dokument) {
             // dokument zobrazime
@@ -459,10 +460,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderDetail()
     {
-        $this->template->metadataForm = $this['metadataForm'];
-        $this->template->vyrizovaniForm = $this['vyrizovaniForm'];
-        $this->template->udalostForm = $this['udalostForm'];
-
         $this->template->typy_dokumentu = Dokument::typDokumentu();
     }
 
@@ -1300,15 +1297,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dokument_id = 0;
         }
 
-        if (Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,spisovna')) {
-            $typ_dokumentu = Dokument::typDokumentu(null, 4);
-        } else if (Acl::isInRole('podatelna')) {
-            $typ_dokumentu = Dokument::typDokumentu(null, 2);
-        } else if (Acl::isInRole('admin')) {
-            $typ_dokumentu = Dokument::typDokumentu(null, 4);
-        } else {
-            $typ_dokumentu = Dokument::typDokumentu(null, 1);
-        }
+        if (Acl::isInRole('admin,superadmin'))
+            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 4);
+        else if (Acl::isInRole('podatelna'))
+            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 2);
+        else
+            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 1);
 
         $zpusob_doruceni = Dokument::zpusobDoruceni(null, 2);
 
@@ -1338,7 +1332,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$dok->popis);
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
+        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu)
                 ->setValue(@$dok->typ_dokumentu->id);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$dok->cislo_jednaci_odesilatele);
@@ -1508,72 +1502,80 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function createComponentMetadataForm()
     {
-
-        $Dok = @$this->template->Dok;
-
-        if (Acl::isInRole('podatelna') && Acl::isInRole('referent,vedouci,spisovna')) {
-            $typ_dokumentu = Dokument::typDokumentu(null, 4);
-        } else if (Acl::isInRole('podatelna')) {
-            $typ_dokumentu = Dokument::typDokumentu(null, 2);
-        } else if (Acl::isInRole('admin')) {
-            $typ_dokumentu = Dokument::typDokumentu(null, 4);
-        } else {
-            $typ_dokumentu = Dokument::typDokumentu(null, 1);
-        }
+        $Dok = $this->template->Dok;
 
         $zpusob_doruceni = Dokument::zpusobDoruceni(null, 2);
 
         $form = new Spisovka\Form();
-        $form->addHidden('id')
-                ->setValue(@$Dok->id);
+        $form->addHidden('id');
 
-        $nazev = (@$Dok->nazev == "(bez názvu)") ? "" : @$Dok->nazev;
-
-        $nazev_control = $form->addText('nazev', 'Věc:', 80, 250)
-                ->setValue($nazev);
+        $nazev_control = $form->addText('nazev', 'Věc:', 80, 250);                
         if (!Acl::isInRole('podatelna')) {
             $nazev_control->addRule(Nette\Forms\Form::FILLED,
                     'Název dokumentu (věc) musí být vyplněno!');
         }
 
-        $form->addTextArea('popis', 'Stručný popis:', 80, 3)
-                ->setValue(@$Dok->popis);
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
-                ->setValue(@$Dok->typ_dokumentu->id);
-        $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
-                ->setValue(@$Dok->cislo_jednaci_odesilatele);
+        $form->addTextArea('popis', 'Stručný popis:', 80, 3);
+        
+        if (Acl::isInRole('admin,superadmin'))
+            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 4);
+        else if (Acl::isInRole('podatelna'))
+            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 2);
+        else
+            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 1);
 
-        $unixtime = strtotime(@$Dok->datum_vzniku);
-        if ($unixtime == 0) {
-            $datum = date('d.m.Y');
-            $cas = date('H:i:s');
-        } else {
-            $datum = date('d.m.Y', $unixtime);
-            $cas = date('H:i:s', $unixtime);
+        if (in_array($Dok->typ_dokumentu->id, array_keys($povolene_typy_dokumentu))
+            && count($povolene_typy_dokumentu) > 1) {
+            $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu);
         }
+        
+        $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
+        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10);
+        $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
+        if ($this->template->isRozdelany && $Dok->typ_dokumentu->smer == 0)
+            $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
 
-        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10)
-                ->setValue($datum);
-        $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
-                ->setValue($cas);
-        $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni)
-                ->setValue(@$Dok->zpusob_doruceni_id);
-
-        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50)
-                ->setValue(@$Dok->cislo_doporuceneho_dopisu);
-
-        $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
-                ->setValue(@$Dok->poznamka);
+        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50);
+        $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$Dok->pocet_listu)->addRule(Nette\Forms\Form::NUMERIC,
+                ->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet listů musí být číslo');
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$Dok->pocet_priloh)->addRule(Nette\Forms\Form::NUMERIC,
+                ->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet příloh musí být číslo');
-        $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
-                ->setValue(@$Dok->typ_prilohy);
-
+        $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50);
+                
+        if ($Dok) {
+            $nazev = ($Dok->nazev == "(bez názvu)") ? "" : $Dok->nazev;
+            
+            $unixtime = strtotime($Dok->datum_vzniku);
+            if ($unixtime == 0) {
+                $datum = date('d.m.Y');
+                $cas = date('H:i:s');
+            } else {
+                $datum = date('d.m.Y', $unixtime);
+                $cas = date('H:i:s', $unixtime);
+                            
+            }
+            
+            $form['id']->setDefaultValue($Dok->id);
+            $form['nazev']->setDefaultValue($nazev);
+            $form['popis']->setDefaultValue($Dok->popis);
+            $form['cislo_jednaci_odesilatele']->setDefaultValue($Dok->cislo_jednaci_odesilatele);
+            $form['datum_vzniku']->setDefaultValue($datum);
+            $form['datum_vzniku_cas']->setDefaultValue($cas);
+            if (isset($form['zpusob_doruceni_id']))
+                $form['zpusob_doruceni_id']->setDefaultValue($Dok->zpusob_doruceni_id);
+            $form['cislo_doporuceneho_dopisu']->setDefaultValue($Dok->cislo_doporuceneho_dopisu);
+            $form['poznamka']->setDefaultValue($Dok->poznamka);
+            $form['pocet_listu']->setDefaultValue($Dok->pocet_listu);
+            $form['pocet_priloh']->setDefaultValue($Dok->pocet_priloh);
+            $form['typ_prilohy']->setDefaultValue($Dok->typ_prilohy);
+            if (isset($form['dokument_typ_id']))
+                $form['dokument_typ_id']->setDefaultValue($Dok->typ_dokumentu->id);
+        }
+        
         $submit = $form->addSubmit('upravit', 'Uložit');
         $submit->onClick[] = array($this, 'upravitMetadataClicked');
 
