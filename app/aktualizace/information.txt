@@ -58,3 +58,5 @@ Zápůjčky:
 - odstranění některých sloupců z tabulky
 [840]
 Odstranění oprávnění pro nápovědu
+[870]
+Smazání adresáře client/sessions
