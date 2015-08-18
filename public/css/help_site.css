@@ -9,6 +9,9 @@
 .help_content br {
     display: none;
 }
+.help_content p br, .help_content dl br {
+    display: initial;
+}
 
 .help_content p {
     text-align: justify;
