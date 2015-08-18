@@ -313,8 +313,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                     if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky))
                         $this->template->Pridelen = 1;
-                    else
+                    else {
                         $this->template->Predan = 1;
+                        $this->template->AccessEdit = 0;
+                    }
                 }
             }
 
@@ -328,7 +330,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             } else if (@$dokument->predano->prideleno_id == $user_id || (Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id) && $user->isAllowed('Dokument',
                             'menit_moje_oj'))) {
                 // predany
-                $this->template->AccessEdit = 1;
+                $this->template->AccessEdit = 0;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;
             } else if ($user->isAllowed('Dokument', 'cist_moje_oj') && (Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) || Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id))) {
@@ -337,33 +339,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             if ($user->isAllowed('Dokument', 'cist_vse'))
                 $this->template->AccessView = 1;
-
-            // Dokument se vyrizuje
-            if ($dokument->stav_dokumentu >= 3) {
-                $this->template->Vyrizovani = 1;
-            } else {
-                $this->template->Vyrizovani = 0;
-            }
-            // Dokument je vyrizeny, ale nespusten
-            if ($dokument->stav_dokumentu == 4 || $dokument->stav_dokumentu == 5) {
+            
+            // Dokument je vyrizeny nebo v pozdejsim stavu workflow
+            if ($dokument->stav_dokumentu >= 4) {
                 $this->template->AccessEdit = 0;
-                $this->template->Pridelen = 0;
-                $this->template->Predan = 0;
-                $this->template->SpousteciUdalost = 1;
-            }
-            // Dokument je vyrizeny a spusteny
-            if ($dokument->stav_dokumentu >= 5) {
-                $this->template->AccessEdit = 0;
-                $this->template->Pridelen = 0;
-                $this->template->Predan = 0;
-                $this->template->SpousteciUdalost = 0;
             }
 
             // Dokument je zapujcen
             if ($dokument->stav_dokumentu == 11) {
                 $this->template->Pridelen = 0;
-                $this->template->Predan = 0;
-                $this->template->Vyrizovani = 0;
                 $this->template->AccessEdit = 0;
                 $Zapujcka = new Zapujcka();
                 $this->template->Zapujcka = $Zapujcka->getDokument($dokument_id);
@@ -371,22 +355,23 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->Zapujcka = null;
             }
 
+            // Pokud uzivatel dokument nekomu predal, zakaz docasne praci s dokumentem
+            if ($this->template->Pridelen && !empty($dokument->predano))
+                $this->template->AccessEdit = 0;
+                
             // SuperAdmin - moznost zasahovat do dokumentu
             if (Acl::isInRole('superadmin')) {
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
             }
-
-            if ($dokument->stav_dokumentu == 1) {
-                $this->template->isRozdelany = true;
-            } else {
-                $this->template->isRozdelany = false;
-            }
-            if ($user->isInRole('superadmin')) {
-                // muze editovat vse
-                $this->template->isRozdelany = true;
-            }
+            
+            $lzePredatVyrizeneDokumenty = Settings::get('spisovka_allow_forward_finished_documents', false);
+            $this->template->LzePredatDokument = $this->template->Pridelen
+                    && ($dokument->stav_dokumentu <= 3 || $lzePredatVyrizeneDokumenty);
+            
+            $this->template->isRozdelany = $dokument->stav_dokumentu == 1
+                                            || $user->isInRole('superadmin');
 
             $this->template->FormUpravit = $this->template->AccessEdit ? $formUpravit : null;
 

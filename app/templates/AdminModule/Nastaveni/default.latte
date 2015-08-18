@@ -4,7 +4,7 @@
 
 
     <div class="detail_blok">
-        <div class="detail_hlavicka">Informace o sobě</div>
+        <div class="detail_hlavicka">Informace o organizaci</div>
         {if ($FormUpravit=='info')}
         {control nastaveniUraduForm}
         {else}
@@ -195,6 +195,10 @@
             <dt>Vynutit protokol HTTPS:</dt>
             <dd>{!$force_https ? 'ano' : 'ne'}</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Povolit předání vyřízeného dokumentu:</dt>
+            <dd>{!$povolit_predani_vyrizeneho_dokumentu ? 'ano' : 'ne'}</dd>
+        </dl><br />
         <div class="detail_hlavicka">Odeslání Českou poštou</div>
         <dl class="detail_item">
             <dt>Číslo zákaznické karty:</dt>

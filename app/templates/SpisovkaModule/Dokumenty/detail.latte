@@ -72,38 +72,31 @@
     </div>
 
     <div class="dokument_blok_menu">
-       {if $AccessEdit==1}
-       {if $Pridelen==1 }
-       <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
-       {if isset($nutnyNadpis)}
-       <script type="text/javascript"> alert("Název dokumentu (věc) je prázdný. Je nutné ho vyplnit!"); </script>     
-       {/if}
-       {/if}
-       {if ($Pridelen==1 && $Vyrizovani == 1 ) }
-       <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }">Upravit vyřízení</a>
-       {/if}
-       <a href="{link :Spisovka:Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
        {if $Predan==1 }
        <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument</a>
        <a href="{link :Spisovka:Dokumenty:odmitnoutprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
-       {/if}
-       {if ($Pridelen==1 && !empty($Dok->predano) ) }
+       {elseif $LzePredatDokument}
+       {if empty($Dok->predano)}
+       <a href="{link :Spisovka:Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
+       {else}
        <a href="{link :Spisovka:Dokumenty:zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit předání dokumentu</a>
        {/if}
-       {if ($Pridelen==1 && $Vyrizovani == 0 ) }
-       <a href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id}" id="kvyrizenidokument">Označit k vyřízení</a>
        {/if}
-       {if ($povolitOdpoved && $Pridelen==1 && !empty($Dok->cislo_jednaci)) }
-       <a href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
-       {/if}
-       {if ($Pridelen==1 && $Vyrizovani == 1 ) }
+       
+       {if $AccessEdit==1}
+       <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
+       <script n:if="isset($nutnyNadpis)" type="text/javascript"> alert("Název dokumentu (věc) je prázdný. Je nutné ho vyplnit!"); </script>
+              
+       <a n:if="$Dok->stav_dokumentu < 3" href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id}" id="kvyrizenidokument">Označit k vyřízení</a>
+       
+       {if $Dok->stav_dokumentu == 3}
+       <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }">Upravit vyřízení</a>
+       <a n:if="$povolitOdpoved && !empty($Dok->cislo_jednaci)" href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
        <a href="{link :Spisovka:Dokumenty:odeslat , 'id'=>$Dok->id }">Odeslat dokument</a>
-       {/if}
-       {if ($Pridelen==1 && $Vyrizovani == 1 ) }
        <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
        {/if}
        &nbsp;
-       {/if}
+       {/if}{* $AccessEdit==1 *}
        <a href="{link this, 'id'=>$Dok->id, 'udalost'=>1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
        <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}" n:if="$Zapujcka">Vrátit dokument</a>
     </div>
@@ -273,7 +266,7 @@
         <dl class="detail_item">
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
             <dd>Dokument nemá přiděleno číslo jednací.
-                {if $Pridelen==1}
+                {if $AccessEdit==1}
                 {if $Typ_evidence == 'sberny_arch'}
                 <br />Zaevidovat do spisové služby:&nbsp;&nbsp;<a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
                 &nbsp;&nbsp;<a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
@@ -404,7 +397,7 @@
         {/if}
         {/if}
     </div>
-    {if $Vyrizovani == 1 }
+    {if $Dok->stav_dokumentu >= 3}
     <div class="dokument_blok_sedy">
         <div class="h2">Vyřízení <span class='toggler' onclick='toggleWindow(this);'>&nbsp;</span></div>
         <div class="dokument_blok">
@@ -616,7 +609,7 @@
         <div class="h2">
             Adresáti / odesílatelé
         </div>
-        {if $Pridelen==1 }
+        {if $AccessEdit==1 }
         <div class="blok_akce">
             <a href="#" id="subjekt_pripojit_click">Připojit subjekt</a>
         </div>        
@@ -672,7 +665,7 @@
                 <br />
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
-                {if $Pridelen==1 }
+                {if $AccessEdit==1 }
                 <div class="vyber">
                     <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this);">odebrat</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>&nbsp;&nbsp;
@@ -717,7 +710,7 @@
         <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
     </div>
     {/if}
-    {if $Pridelen==1 }
+    {if $AccessEdit==1 }
     <div id="dok-prilohy-form">
         <div class="blok_akce">
             <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
@@ -748,7 +741,7 @@
                 </span>
                 </div>
                 {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
-                {if $Pridelen==1 }
+                {if $AccessEdit==1 }
                 <div class="vyber">
                     <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return odebratPrilohu(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;

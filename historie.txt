@@ -19,7 +19,8 @@ Nové funkce:
 - v administraci lze fitrovat subjekty podle stavu
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
   podporu
-- instalační kontrolu je možné kdykoliv znovu spustit z administrace  
+- instalační kontrolu je možné kdykoliv znovu spustit z administrace
+- v administraci je možné povolit předávání vyřízených dokumentů, viz nápověda
 - v ladicím módu (DEBUG_ENABLE 1 v index.php) aplikace zobrazuje vpravo dole
   lištu s užitečnými informacemi: čas zpracování stránky, použitou paměť
   a databázové dotazy
@@ -61,6 +62,9 @@ Jiné změny:
 - zrychlení načtení nových zpráv po kontrole schránky/schránek
 - v detailu dokumentu byla informace "Dokument není evidován" změněna
   na "Dokument nemá přiděleno číslo jednací"
+- v detailu dokumentu mohou být položky v seznamu příkazů jinak seřazeny. Dále
+  pokud je dokument ve stavu předání, není možné s ním provádět operace. Předání
+  je potřeba nejprve dokončit anebo zrušit.
 - přehlednější názvy filtrů zápůjček
 - je-li ve spisovně dostupná jediná akce na vybraných záznamech, není nyní nutné
   ji ručně vybírat ze seznamu
@@ -91,7 +95,8 @@ Spisová služba:
   a informuje uživatele. Limit je obvykle zhruba 55 adresátů.
 - převzetí dokumentu ve spisu za specifických okolností vedlo ke zmizení ostatních 
   dokumentů ve spisu (dokumenty přestaly být v aplikaci vidět)
-
+- předání a přijetí spisu už nezpůsobí otevření už vyřízených dokumentů ve spisu
+  
 Spisovna:  
 - hledání spisů při příjmu do spisovny bylo nefunkční
 - přijetí dokumentu do spisovny se v transakčním logu zaznamenalo jako 

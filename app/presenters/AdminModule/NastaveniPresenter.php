@@ -28,7 +28,8 @@ class Admin_NastaveniPresenter extends BasePresenter
         $this->template->Ukazka = $CJ->generuj();
 
         $this->template->force_https = Settings::get('router_force_https', false);
-
+        $this->template->povolit_predani_vyrizeneho_dokumentu = Settings::get('spisovka_allow_forward_finished_documents', false);
+                
         $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
         $this->template->zpusob_uhrady = Settings::get('Ceska_posta_zpusob_uhrady', '');
 
@@ -213,6 +214,8 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         $form1->addCheckBox('force_https', 'Vynutit zabezpečené připojení protokolem HTTPS')
                 ->setValue(Settings::get('router_force_https', false));
+        $form1->addCheckBox('povolit_predani', 'Povolit předání vyřízeného dokumentu')
+                ->setValue(Settings::get('spisovka_allow_forward_finished_documents', false));
 
         $form1->addText('cislo_zakaznicke_karty', 'Číslo Zákaznické karty:', 13, 13)
                 ->setValue(Settings::get('Ceska_posta_cislo_zakaznicke_karty', ''))
@@ -249,6 +252,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         (new Spisovka\ConfigClient())->save($config_data);
 
         Settings::set('router_force_https', $data['force_https']);
+        Settings::set('spisovka_allow_forward_finished_documents', $data['povolit_predani']);
 
         Settings::set('Ceska_posta_cislo_zakaznicke_karty', $data['cislo_zakaznicke_karty']);
         Settings::set('Ceska_posta_zpusob_uhrady', $data['zpusob_uhrady'] === '' ? '' : self::$ciselnik_zpusoby_uhrad[$data['zpusob_uhrady']]);

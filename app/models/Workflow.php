@@ -23,7 +23,7 @@ class Workflow extends BaseModel
      * 
      */
 
-    public function dokument($dokument_id, $stav = null)
+    protected function dokument($dokument_id, $stav)
     {
 
         $param = array();
@@ -43,11 +43,11 @@ class Workflow extends BaseModel
         if (count($rows) > 0) {
 
             $Orgjednotka = new Orgjednotka();
-            foreach ($rows as $index => &$wf) {
+            foreach ($rows as &$wf) {
                 if (!empty($wf->prideleno_id)) {
                     $osoba = UserModel::getUser($wf->prideleno_id, 1);
                     if ($osoba) {
-                        $rows[$index]->prideleno_jmeno = Osoba::displayName($osoba->identity);
+                        $wf->prideleno_jmeno = Osoba::displayName($osoba->identity);
                         $wf->prideleno_info = $osoba->identity;
                     }
                 }
@@ -121,7 +121,7 @@ class Workflow extends BaseModel
 
             $data = array();
             $data['dokument_id'] = $dokument_info->id;
-            $data['stav_dokumentu'] = 2;
+            $data['stav_dokumentu'] = max(2, $dokument_info->stav_dokumentu);
             $data['aktivni'] = 1;
 
             $data['stav_osoby'] = 0;
@@ -187,7 +187,7 @@ class Workflow extends BaseModel
 
                     $data_other = array();
                     $data_other['dokument_id'] = $dokument_other->id;
-                    $data_other['stav_dokumentu'] = 2;
+                    $data_other['stav_dokumentu'] = max(2, $dokument_other->stav_dokumentu);;
                     $data_other['aktivni'] = 1;
                     $data_other['stav_osoby'] = 0;
                     $data_other['prideleno_id'] = $data['prideleno_id'];
@@ -361,7 +361,13 @@ class Workflow extends BaseModel
             throw $e;
         }
     }
-
+    
+    /**
+     * Prevezme dokument k vyrizeni
+     * @param int $dokument_id
+     * @return boolean
+     * @throws Exception
+     */
     public function vyrizuje($dokument_id)
     {
         $user_identity = Nette\Environment::getUser()->getIdentity();
@@ -424,7 +430,13 @@ class Workflow extends BaseModel
 
         return true;
     }
-
+    
+    /**
+     * Oznaci dokument za vyrizeny
+     * @param int $dokument_id
+     * @return boolean|string
+     * @throws Exception
+     */
     public function vyrizeno($dokument_id)
     {
         $user_identity = Nette\Environment::getUser()->getIdentity();
