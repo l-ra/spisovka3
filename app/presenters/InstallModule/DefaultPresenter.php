@@ -236,10 +236,10 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'Zápis do konfigurační složky',
                 'required' => TRUE,
-                'passed' => is_writable(CLIENT_DIR . '/configs/') && is_writable(CLIENT_DIR . '/configs/epodatelna.ini') && is_writable(CLIENT_DIR . '/configs/klient.ini'),
+                'passed' => is_writable(CLIENT_DIR . '/configs/') && is_writable(CLIENT_DIR . '/configs/klient.ini'),
                 'message' => 'Povoleno',
                 'errorMessage' => 'Není možné zapisovat do konfigurační složky.',
-                'description' => 'Povolte zápis do složky /client/configs/ a do souborů klient.ini a epodatelna.ini, které se v ní nacházejí. Tato složka slouží k uživateskému ukládání nastavení klienta, e-podatelny apod.',
+                'description' => 'Povolte zápis do složky /client/configs/ a do souboru klient.ini, který se v ní nachází. Tato složka slouží k uložení některých nastavení aplikace.',
             ),
             array(
                 'title' => 'Zápis do složky sessions',
