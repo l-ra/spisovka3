@@ -70,30 +70,34 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     protected function createComponentUpravitForm()
     {
 
-        $org = $this->template->OrgJednotka;
+        $org = isset($this->template->OrgJednotka) ? $this->template->OrgJednotka : null;
         $OrgJednotka = new Orgjednotka();
         $org_seznam = $OrgJednotka->selectBox(1, @$org->id);
 
         $form1 = new Nette\Application\UI\Form();
-        $form1->addHidden('id')
-                ->setValue(@$org->id);
+        $form1->addHidden('id');
+                
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)
-                ->setValue(@$org->zkraceny_nazev)
                 ->addRule(Nette\Forms\Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
-        $form1->addText('plny_nazev', 'Plný název jednotky:', 50, 200)
-                ->setValue(@$org->plny_nazev);
+        $form1->addText('plny_nazev', 'Plný název jednotky:', 50, 200);
         $form1->addText('ciselna_rada', 'Zkratka / číselná řada:', 15, 30)
-                ->setValue(@$org->ciselna_rada)
                 ->addRule(Nette\Forms\Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
-        $form1->addTextArea('note', 'Informace:', 50, 5)
-                ->setValue(@$org->note);
-        $form1->addSelect('stav', 'Stav:', array(0 => 'neaktivní', 1 => 'aktivní'))
-                ->setValue(@$org->stav);
-        $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam)
-                ->setValue(@$org->parent_id);
-        $form1->addHidden('parent_id_old')
-                ->setValue(@$org->parent_id);
+        $form1->addTextArea('note', 'Informace:', 50, 5);
+        $form1->addSelect('stav', 'Stav:', array(0 => 'neaktivní', 1 => 'aktivní'));
+        $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam);
+        $form1->addHidden('parent_id_old');
 
+        if ($org !== null) {
+            $form1['id']->setValue($org->id);
+            $form1['zkraceny_nazev']->setValue($org->zkraceny_nazev);
+            $form1['plny_nazev']->setValue($org->plny_nazev);
+            $form1['ciselna_rada']->setValue($org->ciselna_rada);
+            $form1['note']->setValue($org->note);
+            $form1['stav']->setValue($org->stav);
+            $form1['parent_id']->setValue($org->parent_id);
+            $form1['parent_id_old']->setValue($org->parent_id);
+        }
+        
         $form1->addSubmit('upravit', 'Upravit')
                 ->onClick[] = array($this, 'upravitClicked');
         $form1->addSubmit('storno', 'Zrušit')
