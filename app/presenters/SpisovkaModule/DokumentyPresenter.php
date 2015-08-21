@@ -393,11 +393,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         $souvisejici_dokumenty[$souvisejici_dok->id] = $souvisejici_dok->id;
                     }
                 }
-                $this->template->povolitOdpoved = true;
-                $stejne_dokumenty = $Dokument->stejne($dokument->cislo_jednaci, $dokument->id);
-                if (count($stejne_dokumenty) > 0) {
-                    // nelze jiz vytvorit odpoved - jedno cislo jednaci muze mit maximalne jen 2 JID
-                    $this->template->povolitOdpoved = false;
+                if (!empty($dokument->cislo_jednaci) && $dokument->typ_dokumentu->smer == 0) {
+                    $this->template->povolitOdpoved = true;
+                    $stejne_dokumenty = $Dokument->stejne($dokument->cislo_jednaci, $dokument->id);
+                    if (count($stejne_dokumenty) > 0) {
+                        // nelze jiz vytvorit odpoved - jedno cislo jednaci muze mit maximalne jen 2 JID
+                        $this->template->povolitOdpoved = false;
+                    }
                 }
             }
 
