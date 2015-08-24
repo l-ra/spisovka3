@@ -28,6 +28,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $this->template->Ukazka = $CJ->generuj();
 
         $this->template->force_https = Settings::get('router_force_https', false);
+        $this->template->kopirovat_email_do_poznamky = Settings::get('epodatelna_copy_email_into_documents_note');
         $this->template->povolit_predani_vyrizeneho_dokumentu = Settings::get('spisovka_allow_forward_finished_documents', false);
                 
         $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
@@ -214,6 +215,8 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         $form1->addCheckBox('force_https', 'Vynutit zabezpečené připojení protokolem HTTPS')
                 ->setValue(Settings::get('router_force_https', false));
+        $form1->addCheckBox('kopirovat_email_do_poznamky', 'Kopírovat obsah e-mailu do poznámky dokumentu')
+                ->setValue(Settings::get('epodatelna_copy_email_into_documents_note'));
         $form1->addCheckBox('povolit_predani', 'Povolit předání vyřízeného dokumentu')
                 ->setValue(Settings::get('spisovka_allow_forward_finished_documents', false));
 
@@ -252,6 +255,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         (new Spisovka\ConfigClient())->save($config_data);
 
         Settings::set('router_force_https', $data['force_https']);
+        Settings::set('epodatelna_copy_email_into_documents_note', $data['kopirovat_email_do_poznamky']);
         Settings::set('spisovka_allow_forward_finished_documents', $data['povolit_predani']);
 
         Settings::set('Ceska_posta_cislo_zakaznicke_karty', $data['cislo_zakaznicke_karty']);

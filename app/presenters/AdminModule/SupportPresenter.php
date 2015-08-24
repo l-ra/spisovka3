@@ -35,7 +35,7 @@ class Admin_SupportPresenter extends BasePresenter
                 $val = 'true';
             if ($val === false)
                 $val = 'false';
-            printf("%-35s  %s\n", $key, $val);
+            printf("%-42s  %s\n", $key, $val);
         }
         echo "\n";
 

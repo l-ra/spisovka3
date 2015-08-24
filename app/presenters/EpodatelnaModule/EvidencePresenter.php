@@ -427,13 +427,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->setValue('30')->addRule(Nette\Forms\Form::NUMERIC, 'Lhůta k vyřízení musí být číslo');
 
-        if (!empty($zprava->isds_id)) {
-            $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
-        } else {
-            $form->addTextArea('poznamka', 'Poznámka:', 80, 6)
-                    ->setValue(@html_entity_decode($zprava->popis));
-        }
-
+        $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
+        if (!empty($zprava->email_id) && Settings::get('epodatelna_copy_email_into_documents_note'))
+            $form['poznamka']->setValue(@html_entity_decode($zprava->popis));
 
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3)
                 ->setValue('Předáno z e-podatelny');

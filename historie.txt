@@ -60,6 +60,10 @@ Jiné změny:
   v dialogovém okně.
 - zrychlení zobrazení seznamu zpráv v e-podatelně
 - zrychlení načtení nových zpráv po kontrole schránky/schránek
+- v administraci je možné vypnout kopírování obsahu e-mailu do poznámky
+  dokumentu, což se standardně děje při evidování e-mailu v e-podatelně.
+  E-mail je součástí dokumentu v příloze, takže je zbytečné, aby byl
+  ještě v poznámce.
 - v detailu dokumentu byla informace "Dokument není evidován" změněna
   na "Dokument nemá přiděleno číslo jednací"
 - v detailu dokumentu mohou být položky v seznamu příkazů jinak seřazeny. Dále

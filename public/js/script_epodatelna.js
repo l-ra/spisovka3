@@ -266,7 +266,7 @@ subjekt_seznam +
 '                    </dl>'+
 '                    <dl>'+
 '                        <dt>Poznámka:</dt>'+
-'                        <dd><textarea name="poznamka['+id+']" rows="5" cols="60">'+ data['popis'] +'</textarea></dd>'+
+'                        <dd><textarea name="poznamka['+id+']" rows="5" cols="60">'+'</textarea></dd>'+
 '                    </dl>'+
 '                    <dl>'+
 '                        <dt>Předat:</dt>'+
@@ -317,6 +317,8 @@ form_odmitnout +
 '    </div>';
 
     $('#h_evidence').append(zprava);
+    if (data.isds_id || kopirovatEmailDoPoznamky)
+        $('textarea[name="poznamka['+id+']"]').html(data['popis']);
 
     $('#predat_autocomplete_'+id).autocomplete({
         minLength: 3,
