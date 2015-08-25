@@ -340,18 +340,36 @@ class Authenticator_UI extends Nette\Application\UI\Control
         try {
             $this->presenter->user->login($data['username'], $data['password']);
 
+            $this->afterLogin();
             $redirect_home = (bool) Settings::get('login_redirect_homepage', false);
-            if (!$redirect_home && isset($data['backlink']) && !empty($data['backlink']))
-                $this->presenter->redirectUrl($data['backlink']);
+            $url = isset($data['backlink']) ? $data['backlink'] : '';
+            if (!$redirect_home && !empty($url)) {
+                $this->presenter->redirectUrl($url);
+            }
             else
-                $this->presenter->redirect('this');
-            // $this->presenter->redirect(':Spisovka:Default:default');
+                $this->presenter->redirect(':Spisovka:Default:default');
         } catch (Nette\Security\AuthenticationException $e) {
             $this->presenter->flashMessage($e->getMessage(), 'warning');
             sleep(2); // sniz riziko brute force utoku
         }
     }
 
+    protected function afterLogin()
+    {
+        /* Pokus o pridani upozorneni se nezdaril, protoze je problem zobrazit jakoukoli
+         * flash zpravu (kvuli pouziti redirectUrl() po prihlaseni)
+        // Zkontroluj, zda ma uzivatel predane dokumenty
+        $Dokument = new Dokument;
+        $args_f = $Dokument->fixedFiltr('kprevzeti', false, false);
+        $args = $Dokument->spisovka($args_f);
+        $result = $Dokument->seznam($args);
+
+        if (count($result))
+            $this->presenter->flashMessage('Máte dokument(y) k převzetí. Počet dokumentů: ' . count($result), 'info');
+         
+        */
+    }
+    
     protected function formAddAuthSelect(Nette\Forms\Container $form, $value = null)
     {
         if ($this->authenticator->supportsRemoteAuth()) {
