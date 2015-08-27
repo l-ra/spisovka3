@@ -34,7 +34,7 @@ class Admin_SupportPresenter extends BasePresenter
             if ($val === true)
                 $val = 'true';
             if ($val === false)
-                $val = 'false';
+                $val = 'false';            
             printf("%-42s  %s\n", $key, $val);
         }
         echo "\n";
@@ -42,9 +42,16 @@ class Admin_SupportPresenter extends BasePresenter
         echo "Nastavení uživatele:\n";
         echo "--------------------\n\n";
         $user_settings = UserSettings::getAll();
-        // print_r($user_settings);
-        foreach ($user_settings as $key => $val)
-            printf("%-35s  %s\n", $key, $val);
+        ksort($user_settings);
+        foreach ($user_settings as $key => $val) {
+            if ($val === true)
+                $val = 'true';
+            if ($val === false)
+                $val = 'false';
+            if ($val === null)
+                $val = 'null';
+            printf("%-37s  %s\n", $key, $val);
+        }
         echo "\n";
 
         echo "Konfigurace klienta:\n";
