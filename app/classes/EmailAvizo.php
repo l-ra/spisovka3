@@ -32,12 +32,21 @@ class EmailAvizo {
         }                
     }    */
     
+    /**
+     * Metoda vytvoří email, ale nikam jej neposílá!
+     * @param string $komu - emailová adresa
+     * @param array $data - název emailu?
+     * @return boolean
+     */
     public static function epodatelna_zaevidovana($komu, $data)
     {
+        // Rovnou se můžeme vrátit zpět. Návratová hodnota se nekontroluje.
+        return;
+        
         try {
             // Urad
-            $user_config = Nette\Environment::getVariable('user_config');
-            $urad = $user_config->urad;
+            // $user_config = Nette\Environment::getVariable('user_config');
+            // $urad = $user_config->urad;
 
             $mail = new ESSMail;
             $mail->signed(1);
