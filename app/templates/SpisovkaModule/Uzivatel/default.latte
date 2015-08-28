@@ -23,7 +23,7 @@
             <dt>funkce:</dt>
             <dd>{$Osoba->pozice}&nbsp;</dd>
         </dl>
-        <a href="{link :Spisovka:Uzivatel:default, 'id'=>$Osoba->id, 'upravit'=>'info'}">Upravit osobní údaje</a>
+        <a href="{link this, 'upravit' => 'info'}">Upravit osobní údaje</a>
         {/if}
     </div>
 
@@ -33,7 +33,7 @@
             <dt>Uživatelské jméno:</dt>
             <dd>{$Uzivatel->username}&nbsp;</dd>
         </dl>
-        {if ($ZmenaHesla==1)}
+        {if $FormUpravit == 'heslo'}
         {control auth_change_password}
         {/if}
         <dl class="detail_item">
@@ -56,10 +56,19 @@
                 {/if}
             </dd>
         </dl>
-        <dl class="detail_item">
-            <dt>&nbsp;</dt>
-            <dd>
-                <a href="{link :Spisovka:Uzivatel:default, 'zmenitheslo'=>1}">Změnit heslo</a>
-            </dd>
-        </dl>
+        <br /><a href="{link this, 'upravit' => 'heslo'}">Změnit heslo</a>
+    </div>
+
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Nastavení upozornění</div>
+        <p>Poznámka: Toto je pouze osobní nastavení. Administrátor může upozorňování globálně vypnout.</p>
+        {if $FormUpravit == 'upozorneni'}
+        {control notificationsForm}
+        {else}
+            <dl class="detail_item">
+                <dt>Poslat e-mail při předání dokumentu:</dt>
+                <dd>{$notification_receive_document ? 'ano' : 'ne'}</dd>
+            </dl>
+            <br /><a href="{link this, 'upravit' => 'upozorneni'}">Upravit</a>
+        {/if}
     </div>

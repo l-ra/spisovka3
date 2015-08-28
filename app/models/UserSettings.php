@@ -9,7 +9,6 @@ class UserSettings
 
     protected static function _getInstance()
     {
-
         if (self::$instance === null)
             self::$instance = new self;
         return self::$instance;
@@ -18,7 +17,7 @@ class UserSettings
     public static function getAll()
     {
         $i = self::_getInstance();
-        return $i->_getAll();        
+        return $i->_getAll();
     }
 
     public static function get($key, $default = null)
@@ -45,10 +44,9 @@ class UserSettings
     protected $settings = array();
     protected $table_prefix;
 
-    protected function __construct()
+    protected function __construct($user_id = null)
     {
-
-        $this->user_id = Nette\Environment::getUser()->getIdentity()->id;
+        $this->user_id = $user_id !== null ? $user_id : Nette\Environment::getUser()->getIdentity()->id;
         $this->table_prefix = BaseModel::getDbPrefix();
 
         $result = dibi::query('SELECT [settings] FROM %n',
@@ -75,7 +73,6 @@ class UserSettings
 
     protected function _set($key, $value)
     {
-
         if ($value === null)
             unset($this->settings[$key]);
         else
@@ -85,9 +82,31 @@ class UserSettings
 
     protected function _flush()
     {
-
         dibi::query('UPDATE %n', $this->table_prefix . self::TABLE_NAME, 'SET [settings] = %s',
                 serialize($this->settings), 'WHERE [id] = %i', $this->user_id);
+    }
+
+}
+
+/**
+ *  Zpristupnuje nastaveni jineho uzivatele, pouze pro cteni
+ */
+class OtherUserSettings extends UserSettings
+{
+
+    public function __construct($user_id)
+    {
+        parent::__construct($user_id);
+    }
+
+    public function _getAll()
+    {
+        return parent::_getAll();
+    }
+
+    public function _get($key, $default = null)
+    {
+        return parent::_get($key, $default);
     }
 
 }

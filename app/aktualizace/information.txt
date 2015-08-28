@@ -60,3 +60,5 @@ Zápůjčky:
 Odstranění oprávnění pro nápovědu
 [870]
 Smazání adresáře client/sessions
+[880]
+Přidáno výchozí nastavení nových funkcí

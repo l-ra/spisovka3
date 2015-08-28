@@ -4,11 +4,10 @@ class ESSMail extends Nette\Mail\Message
 {
 
     public $signed = 0;
-    public $config;
 
     public function __construct()
     {
-        $ret = parent::__construct();
+        parent::__construct();
 
         // Nastaveni identifikace maileru
         $app_info = Nette\Environment::getVariable('app_info');
@@ -17,15 +16,13 @@ class ESSMail extends Nette\Mail\Message
         } else {
             $app_info = array('3.x', 'rev.X', 'OSS Spisová služba v3', '1270716764');
         }
+        
         $this->setHeader('X-Mailer', Nette\Utils\Strings::webalize($app_info[2], '. ', 0));
-
-        return $ret;
     }
 
     // pro kompatibilitu s kodem napsanym pro stare Nette
     public function send()
     {
-
         // $mailer = new Nette\Mail\SendmailMailer;
         $mailer = new ESSMailer();
         $mailer->send($this);

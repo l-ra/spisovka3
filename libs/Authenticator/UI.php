@@ -327,12 +327,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
     public function handleCancel(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
-
-        if (isset($data['osoba_id']))
-            $this->presenter->redirect('this', array('id' => $data['osoba_id']));
-        else
-            $this->presenter->redirect('this');
+        $this->presenter->redirect('this');
     }
 
     public function handleLogin(Nette\Application\UI\Form $form, $data)
@@ -423,7 +418,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
         $this->vytvoritUcet($data['osoba_id'], $data);
 
-        $this->presenter->redirect('this', array('id' => $data['osoba_id']));
+        $this->presenter->redirect('this');
     }
 
     public function handleChangePassword(Nette\Forms\Controls\SubmitButton $button)
@@ -432,11 +427,11 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
         $User = new UserModel();
         if ($User->changePassword($data['user_id'], $data['heslo']))
-            $this->presenter->flashMessage('Úspěšně provedeno.');
+            $this->presenter->flashMessage('Heslo úspěšně změněno.');
         else
-            $this->presenter->flashMessage('Heslo není možné změnit.');
-
-        $this->presenter->redirect('this', array('id' => $data['osoba_id']));
+            $this->presenter->flashMessage('Heslo není možné změnit.', 'warning');
+        
+        $this->presenter->redirect('this');
     }
 
     public function handleChangeAuthType(Nette\Forms\Controls\SubmitButton $button)
@@ -445,7 +440,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $model = new UserModel();
         $model->changeAuthType($data['user_id'], $data['external_auth']);
         $this->presenter->flashMessage('Nastavení změněno.');
-        $this->presenter->redirect('this', array('id' => $data['osoba_id']));
+        $this->presenter->redirect('this');
     }
 
     public function handleSync(Nette\Application\UI\Form $form, $data)

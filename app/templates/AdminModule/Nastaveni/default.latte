@@ -45,10 +45,11 @@
         </dl>
 
 
-        {access :Admin:Nastaveni:}<a href="{link :Admin:Nastaveni:default, 'upravit'=>'info'}">Upravit</a>{/access}
+        {access :Admin:Nastaveni:}<a href="{link this, 'upravit'=>'info'}">Upravit</a>{/access}
         {/if}
     </div>
 
+    <a name="cj">
     <div class="detail_blok">
         <div class="detail_hlavicka">Číslo jednací</div>
         {if ($FormUpravit=='cjednaci')}
@@ -76,7 +77,7 @@
             <dt>Podací deník:</dt>
             <dd>{if $CisloJednaci->typ_deniku == 'org'}samostatný pro každou organizační jednotku{else}společný pro celý úřad{/if}&nbsp;</dd>
         </dl>        
-        {access :Admin:Nastaveni:}<a href="{link :Admin:Nastaveni:default, 'upravit'=>'cjednaci'}">Upravit</a>{/access}
+        {access :Admin:Nastaveni:}<a href="{link this, 'upravit'=>'cjednaci'}#cj">Upravit</a>{/access}
         {/if}
         <dl n:if="$FormUpravit=='cjednaci'" class="detail_item">
             <dt>Masky:</dt>
@@ -182,6 +183,7 @@
         </dl>
     </div>
     
+    <a name="na">
     <div class="detail_blok">
         <div class="detail_hlavicka">Ostatní nastavení</div>
         {if ($FormUpravit=='nastaveni')}
@@ -213,7 +215,21 @@
             <dd>{$zpusob_uhrady}&nbsp;</dd>
         </dl>
 
-        {access :Admin:Nastaveni:}<a href="{link :Admin:Nastaveni:default, 'upravit'=>'nastaveni'}">Upravit</a>{/access}
+        {access :Admin:Nastaveni:}<a href="{link this, 'upravit' => 'nastaveni'}#na">Upravit</a>{/access}
         {/if}
     </div>
-    
+
+    <a name="up">
+    <div class="detail_blok">
+        <div class="detail_hlavicka">Upozornění</div>
+        {if ($FormUpravit=='upozorneni')}
+        {control notificationsForm}
+        {else}
+        <dl class="detail_item">
+            <dt>Poslat e-mail při předání dokumentu:</dt>
+            <dd>{$notification_receive_document ? 'ano' : 'ne'}</dd>
+        </dl>
+        
+        {access :Admin:Nastaveni:}<a href="{link this, 'upravit' => 'upozorneni'}#up">Upravit</a>{/access}
+        {/if}
+    </div>

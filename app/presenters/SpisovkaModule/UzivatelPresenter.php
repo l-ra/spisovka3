@@ -42,16 +42,13 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $osoba_id = $user->identity->id;
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
 
-        // Zmena osobnich udaju
-        $this->template->FormUpravit = $this->getParameter('upravit', null);
+        // Kterou sekci editovat
+        $this->template->FormUpravit = $this->getParameter('upravit', '');
 
         $uzivatel = UserModel::getUser($user->id, true);
         if ($uzivatel->org_nazev === '')
             $uzivatel->org_nazev = 'žádná';
         $this->template->Uzivatel = $uzivatel;
-
-        // Zmena hesla
-        $this->template->ZmenaHesla = $this->getParameter('zmenitheslo', null);
 
         $Auth1 = $this->context->createService('authenticatorUI');
         $Auth1->setAction('change_password');
@@ -60,6 +57,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
         $role = UserModel::getRoles($uzivatel->id);
         $this->template->Role = $role;
+
+        $this->template->notification_receive_document = Notifications::isUserNotificationEnabled(Notifications::RECEIVE_DOCUMENT);
     }
 
     /**
@@ -119,9 +118,9 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
         try {
             $osoba_id = $Osoba->ulozit($data, $osoba_id);
-            $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  byl upraven.');
+            $this->flashMessage('Informace o uživateli byly upraveny.');
         } catch (DibiException $e) {                
-            $this->flashMessage('Zaměstnance  "' . Osoba::displayName($data) . '"  se nepodařilo upravit. ' . $e->getMessage(),
+            $this->flashMessage('Informace o uživateli se nepodařilo upravit. ' . $e->getMessage(),
                     'warning');
         }
         $this->redirect('this');
@@ -129,7 +128,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     public function stornoClicked()
     {
-        // Ulozi hodnoty a vytvori dalsi verzi
         $this->redirect('this');
     }
 
@@ -342,4 +340,39 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         }
     }
 
+    protected function createComponentNotificationsForm()
+    {
+        $osoba = $this->template->Osoba;
+
+        $form1 = new Nette\Application\UI\Form();
+
+        $form1->addCheckBox(Notifications::RECEIVE_DOCUMENT, 'Poslat e-mail, když mně je předán dokument')
+                ->setValue(Notifications::isUserNotificationEnabled(Notifications::RECEIVE_DOCUMENT));
+        
+        $form1->addSubmit('upravit', 'Upravit')
+                ->onClick[] = array($this, 'upravitNotificationsClicked');
+        $form1->addSubmit('storno', 'Zrušit')
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
+        
+        $renderer = $form1->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form1;
+    }
+    
+    public function upravitNotificationsClicked(Nette\Forms\Controls\SubmitButton $button)
+    {
+        // Ulozi hodnoty a vytvori dalsi verzi
+        $data = $button->getForm()->getValues();
+
+        Notifications::enableUserNotification(Notifications::RECEIVE_DOCUMENT, 
+                $data[Notifications::RECEIVE_DOCUMENT]);
+        
+        $this->flashMessage('Nastavení bylo upraveno.');
+        $this->redirect('this');
+    }
 }

@@ -55,14 +55,14 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->template->title = " - Nový zaměstnanec";
     }
 
-    public function actionDetail()
+    public function actionDetail($id)
     {
         $this->template->title = " - Detail zaměstnance";
 
         $Osoba = new Osoba();
         $User = new UserModel();
 
-        $osoba_id = $this->getParameter('id', null);
+        $osoba_id = $id;
         $this->template->Osoba = $Osoba->getInfo($osoba_id);
 
         // Parametr urcuje, co budeme editovat (jaky zobrazime formular)

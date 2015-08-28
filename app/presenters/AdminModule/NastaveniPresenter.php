@@ -14,7 +14,6 @@ class Admin_NastaveniPresenter extends BasePresenter
 
     public function renderDefault()
     {
-
         $CJ = new CisloJednaci();
 
         // Klientske nastaveni
@@ -33,6 +32,8 @@ class Admin_NastaveniPresenter extends BasePresenter
                 
         $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
         $this->template->zpusob_uhrady = Settings::get('Ceska_posta_zpusob_uhrady', '');
+
+        $this->template->notification_receive_document = Notifications::isNotificationEnabled(Notifications::RECEIVE_DOCUMENT);
 
         // Zmena udaju
         $this->template->FormUpravit = $this->getParameter('upravit', null);
@@ -261,7 +262,39 @@ class Admin_NastaveniPresenter extends BasePresenter
         Settings::set('Ceska_posta_cislo_zakaznicke_karty', $data['cislo_zakaznicke_karty']);
         Settings::set('Ceska_posta_zpusob_uhrady', $data['zpusob_uhrady'] === '' ? '' : self::$ciselnik_zpusoby_uhrad[$data['zpusob_uhrady']]);
 
-        $this->flashMessage('Obecné nastavení bylo upraveno.');
+        $this->flashMessage('Obecná nastavení byla upravena.');
+        $this->redirect('this');
+    }
+
+    public function createComponentNotificationsForm()
+    {
+        $form = new Nette\Application\UI\Form();
+
+        $form->addCheckBox(Notifications::RECEIVE_DOCUMENT, 'Poslat e-mail při předání dokumentu')
+                ->setValue(Notifications::isNotificationEnabled(Notifications::RECEIVE_DOCUMENT));
+
+        $form->addSubmit('upravit', 'Uložit')
+                ->onClick[] = array($this, 'nastavitNotificationsClicked');
+        $form->addSubmit('storno', 'Zrušit')
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
+
+        $renderer = $form->getRenderer();
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';
+
+        return $form;
+    }
+
+    public function nastavitNotificationsClicked(Nette\Forms\Controls\SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+
+        Notifications::enableNotification(Notifications::RECEIVE_DOCUMENT,
+                $data[Notifications::RECEIVE_DOCUMENT]);
+        $this->flashMessage('Nastavení upozornění bylo upraveno.');
         $this->redirect('this');
     }
 

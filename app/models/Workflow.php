@@ -206,11 +206,18 @@ class Workflow extends BaseModel
             }
 
             dibi::commit();
-            return true;
         } catch (Exception $e) {
             dibi::rollback();
             throw $e;
         }
+        
+        // posli upozorneni emailem
+        if (empty($orgjednotka_id)) {
+            Notifications::notifyUser($user_id, Notifications::RECEIVE_DOCUMENT,
+                    ['document_name' => $dokument_info->nazev,
+                'reference_number' => $dokument_info->cislo_jednaci]);
+        }
+        return true;
     }
 
     // Funkce je volána z více míst v programu, tudíž je problém zde vytvořit položku v transakčním logu dokumentu
