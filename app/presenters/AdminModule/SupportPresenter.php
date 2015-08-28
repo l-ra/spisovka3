@@ -57,7 +57,7 @@ class Admin_SupportPresenter extends BasePresenter
         echo "Konfigurace klienta:\n";
         echo "--------------------\n\n";
         $config = $this->context->parameters;
-        print_r($config['user_config']);
+        print_r($config['client_config']);
         echo "\n";
 
         echo "Konfigurace e-podatelny:\n";
@@ -73,7 +73,7 @@ class Admin_SupportPresenter extends BasePresenter
         echo "Konfigurace systému:\n";
         echo "--------------------\n\n";
         $config = $this->context->parameters;
-        unset($config['user_config']);  // toto jsme jiz zobrazili
+        unset($config['client_config']);  // toto jsme jiz zobrazili
         unset($config['database']['password']);
         unset($config['ldap']['search_password']);
         print_r($config);

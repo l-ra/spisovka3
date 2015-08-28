@@ -6,10 +6,10 @@ class SubjektyPresenter extends BasePresenter
     public function renderVyber($abc = null)
     {
         new AbcFilter($this, 'abc');
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
         $args = array('where' => array("stav = 1"));

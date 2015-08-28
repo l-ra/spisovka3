@@ -56,17 +56,17 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function startup()
     {
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $this->typ_evidence = 0;
-        if (isset($user_config->cislo_jednaci->typ_evidence)) {
-            $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
+        if (isset($client_config->cislo_jednaci->typ_evidence)) {
+            $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         } else {
             $this->typ_evidence = 'priorace';
         }
         $this->template->Typ_evidence = $this->typ_evidence;
 
-        if (isset($user_config->cislo_jednaci->oddelovac)) {
-            $this->oddelovac_poradi = $user_config->cislo_jednaci->oddelovac;
+        if (isset($client_config->cislo_jednaci->oddelovac)) {
+            $this->oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
         } else {
             $this->oddelovac_poradi = '/';
         }
@@ -251,10 +251,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $this->hledat = $hledat;
         }
 
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
         $args = $Spisy->spisovka($args);
@@ -341,10 +341,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             return;
         }
 
-        //$user_config = Environment::getVariable('user_config');
+        //$client_config = Environment::getVariable('client_config');
         //$vp = new VisualPaginator($this, 'vp');
         //$paginator = $vp->getPaginator();
-        //$paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+        //$paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek)?$client_config->nastaveni->pocet_polozek:20;
         //$result = $DokumentSpis->dokumenty($spis_id, 1, $paginator);
 
         $DokumentSpis = new DokumentSpis();

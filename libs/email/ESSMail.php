@@ -55,8 +55,8 @@ class ESSMail extends Nette\Mail\Message
     {
 
         // Urad
-        $user_config = Nette\Environment::getVariable('user_config');
-        $urad = $user_config->urad;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $urad = $client_config->urad;
 
         // Uzivatel
         $user_system = Nette\Environment::getUser();

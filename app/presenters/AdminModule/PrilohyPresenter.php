@@ -5,10 +5,10 @@ class Admin_PrilohyPresenter extends BasePresenter
 
     public function renderDefault()
     {
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
         $FileModel = new FileModel();

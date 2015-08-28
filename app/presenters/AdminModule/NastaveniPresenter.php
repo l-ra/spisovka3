@@ -17,12 +17,12 @@ class Admin_NastaveniPresenter extends BasePresenter
         $CJ = new CisloJednaci();
 
         // Klientske nastaveni
-        $user_config = Nette\Environment::getVariable('user_config');
-        $this->template->Urad = $user_config->urad;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $this->template->Urad = $client_config->urad;
 
-        $this->template->CisloJednaci = $user_config->cislo_jednaci;
+        $this->template->CisloJednaci = $client_config->cislo_jednaci;
 
-        $this->template->Nastaveni = $user_config->nastaveni;
+        $this->template->Nastaveni = $client_config->nastaveni;
 
         $this->template->Ukazka = $CJ->generuj();
 
@@ -47,8 +47,8 @@ class Admin_NastaveniPresenter extends BasePresenter
     protected function createComponentNastaveniUraduForm()
     {
 
-        $user_config = Nette\Environment::getVariable('user_config');
-        $Urad = $user_config->urad;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $Urad = $client_config->urad;
         $stat_select = Subjekt::stat();
 
 
@@ -106,7 +106,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config_data = Nette\Environment::getVariable('user_config');
+        $config_data = Nette\Environment::getVariable('client_config');
 
         $config_data['urad']['nazev'] = $data['nazev'];
         $config_data['urad']['plny_nazev'] = $data['plny_nazev'];
@@ -138,8 +138,8 @@ class Admin_NastaveniPresenter extends BasePresenter
     protected function createComponentNastaveniCJForm()
     {
 
-        $user_config = Nette\Environment::getVariable('user_config');
-        $CJ = $user_config->cislo_jednaci;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $CJ = $client_config->cislo_jednaci;
 
         $form1 = new Nette\Application\UI\Form();
         $form1->addText('maska', 'Maska:', 50, 100)
@@ -183,7 +183,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config_data = Nette\Environment::getVariable('user_config');
+        $config_data = Nette\Environment::getVariable('client_config');
 
         $config_data['cislo_jednaci']['maska'] = $data['maska'];
 
@@ -205,8 +205,8 @@ class Admin_NastaveniPresenter extends BasePresenter
     protected function createComponentNastaveniForm()
     {
 
-        $user_config = Nette\Environment::getVariable('user_config');
-        $nastaveni = $user_config->nastaveni;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $nastaveni = $client_config->nastaveni;
 
         $form1 = new Nette\Application\UI\Form();
         $form1->addText('pocet_polozek', 'Počet položek v seznamu:', 10, 10)
@@ -250,7 +250,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config_data = Nette\Environment::getVariable('user_config');
+        $config_data = Nette\Environment::getVariable('client_config');
         $config_data['nastaveni']['pocet_polozek'] = $data['pocet_polozek'];
 
         (new Spisovka\ConfigClient())->save($config_data);

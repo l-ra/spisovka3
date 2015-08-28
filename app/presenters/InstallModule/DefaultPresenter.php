@@ -614,8 +614,8 @@ class Install_DefaultPresenter extends BasePresenter
             $session->step = array();
         }
 
-        $user_config = (new Spisovka\ConfigClient())->get();
-        $this->template->Urad = $user_config->urad;
+        $client_config = (new Spisovka\ConfigClient())->get();
+        $this->template->Urad = $client_config->urad;
     }
 
     public function renderEvidence()
@@ -626,8 +626,8 @@ class Install_DefaultPresenter extends BasePresenter
         }
         @$session->step['evidence'] = 0;
 
-        $user_config = (new Spisovka\ConfigClient())->get();
-        $this->template->CisloJednaci = $user_config->cislo_jednaci;
+        $client_config = (new Spisovka\ConfigClient())->get();
+        $this->template->CisloJednaci = $client_config->cislo_jednaci;
     }
 
     public function renderSpravce()
@@ -681,7 +681,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         if ($dokonceno == 1) {
 
-            // $user_config = (new Spisovka\ConfigClient())->get();
+            // $client_config = (new Spisovka\ConfigClient())->get();
             $zerotime = mktime(0, 0, 0, 8, 20, 2008);
             $diff = time() - $zerotime;
             $diff = round($diff / 3600);
@@ -763,8 +763,8 @@ class Install_DefaultPresenter extends BasePresenter
     protected function createComponentNastaveniUraduForm()
     {
 
-        $user_config = Nette\Environment::getVariable('user_config');
-        $Urad = $user_config->urad;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $Urad = $client_config->urad;
         $stat_select = Subjekt::stat();
 
 
@@ -856,8 +856,8 @@ class Install_DefaultPresenter extends BasePresenter
     protected function createComponentNastaveniCJForm()
     {
 
-        $user_config = Nette\Environment::getVariable('user_config');
-        $CJ = $user_config->cislo_jednaci;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $CJ = $client_config->cislo_jednaci;
 
         $evidence = array("priorace" => "Priorace", "sberny_arch" => "Sběrný arch");
 

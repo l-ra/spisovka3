@@ -15,8 +15,8 @@ class SurveyAgent
             $version = 'unknown';
         }
 
-        $user_config = Nette\Environment::getVariable('user_config');
-        $klient_info = $user_config->urad;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $klient_info = $client_config->urad;
 
         $unique_info = Nette\Environment::getVariable('unique_info');
         $unique_part = explode('#', $unique_info);

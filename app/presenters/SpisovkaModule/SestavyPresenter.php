@@ -66,11 +66,11 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderDefault()
     {
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
 
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
         $seznam = Sestava::getAll(array('offset' => $paginator->offset,
@@ -254,9 +254,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
             // P.L. V podacim deniku nemohou byt dokumenty, ktere nemaji c.j.
             $args['where'][] = 'd.cislo_jednaci IS NOT NULL';
 
-            $user_config = Nette\Environment::getVariable('user_config');
+            $client_config = Nette\Environment::getVariable('client_config');
 
-            if (isset($user_config->cislo_jednaci->typ_deniku) && $user_config->cislo_jednaci->typ_deniku == "org") {
+            if (isset($client_config->cislo_jednaci->typ_deniku) && $client_config->cislo_jednaci->typ_deniku == "org") {
 
                 $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 
@@ -268,7 +268,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 }
 
                 // jen zaznamy z vlastniho podaciho deniku organizacni jednotky
-                $args['where'][] = array('d.podaci_denik=%s', $user_config->cislo_jednaci->podaci_denik . (!empty($org)
+                $args['where'][] = array('d.podaci_denik=%s', $client_config->cislo_jednaci->podaci_denik . (!empty($org)
                                 ? "_" . $org->ciselna_rada : ""));
             }
         } // if sestava->id == 1

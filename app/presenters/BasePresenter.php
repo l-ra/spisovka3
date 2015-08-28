@@ -248,8 +248,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         /**
          * Informace o Klientovi
          */
-        $user_config = Nette\Environment::getVariable('user_config');
-        $this->template->Urad = $user_config->urad;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $this->template->Urad = $client_config->urad;
 
         /**
          * Uzivatel

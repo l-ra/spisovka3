@@ -11,15 +11,15 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function startup()
     {
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $this->typ_evidence = 0;
-        if (isset($user_config->cislo_jednaci->typ_evidence)) {
-            $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
+        if (isset($client_config->cislo_jednaci->typ_evidence)) {
+            $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         } else {
             $this->typ_evidence = 'priorace';
         }
-        if (isset($user_config->cislo_jednaci->oddelovac)) {
-            $this->oddelovac_poradi = $user_config->cislo_jednaci->oddelovac;
+        if (isset($client_config->cislo_jednaci->oddelovac)) {
+            $this->oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
         } else {
             $this->oddelovac_poradi = '/';
         }
@@ -79,10 +79,10 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $this->actionAkce($post);
         }
 
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
         $Zapujcka = new Zapujcka();

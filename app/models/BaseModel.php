@@ -453,8 +453,8 @@ abstract class BaseModel extends Nette\Object
         if (count($array) > 0) {
 
             if (is_null($limit)) {
-                $user_config = Nette\Environment::getVariable('user_config');
-                $limit = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek
+                $client_config = Nette\Environment::getVariable('client_config');
+                $limit = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                             : 20;
             }
 

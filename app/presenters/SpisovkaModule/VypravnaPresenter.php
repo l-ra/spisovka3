@@ -12,15 +12,15 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     public function startup()
     {
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $this->typ_evidence = 0;
-        if (isset($user_config->cislo_jednaci->typ_evidence)) {
-            $this->typ_evidence = $user_config->cislo_jednaci->typ_evidence;
+        if (isset($client_config->cislo_jednaci->typ_evidence)) {
+            $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         } else {
             $this->typ_evidence = 'priorace';
         }
-        if (isset($user_config->cislo_jednaci->oddelovac)) {
-            $this->oddelovac_poradi = $user_config->cislo_jednaci->oddelovac;
+        if (isset($client_config->cislo_jednaci->oddelovac)) {
+            $this->oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
         } else {
             $this->oddelovac_poradi = '/';
         }

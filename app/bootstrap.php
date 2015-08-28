@@ -94,7 +94,7 @@ try {
 
 
 // konfigurace spisovky
-    Nette\Environment::setVariable('user_config', (new Spisovka\ConfigClient())->get());
+    Nette\Environment::setVariable('client_config', (new Spisovka\ConfigClient())->get());
     // bohuzel musime nakonfigurovat PDF export zde, protoze pro nej neexistuje spolecna funkce
     define('PDF_MEMORY_LIMIT', '512M');
     $mpdf_dir = TEMP_DIR . '/mpdf/';

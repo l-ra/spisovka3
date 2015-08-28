@@ -17,9 +17,9 @@ class CisloJednaci extends BaseModel
     {
         parent::__construct();
 
-        $user_config = Nette\Environment::getVariable('user_config');
-        $this->info = $user_config->cislo_jednaci;
-        $this->urad = $user_config->urad;
+        $client_config = Nette\Environment::getVariable('client_config');
+        $this->info = $client_config->cislo_jednaci;
+        $this->urad = $client_config->urad;
 
         // pocatek cisla
         $this->pocatek_cisla = 1;

@@ -363,14 +363,14 @@ class Spis extends TreeModel
     public static function spisovyZnak($spis, $simple = 0)
     {
 
-        $user_config = Nette\Environment::getVariable('user_config');
-        if (!isset($user_config->spisovy_znak)) {
+        $client_config = Nette\Environment::getVariable('client_config');
+        if (!isset($client_config->spisovy_znak)) {
             $maska = ".";
             $cifernik = 3;
         } else {
-            $maska = $user_config->spisovy_znak->oddelovac;
-            if ($user_config->spisovy_znak->pocatecni_nuly == 1) {
-                $cifernik = $user_config->spisovy_znak->pocet_znaku;
+            $maska = $client_config->spisovy_znak->oddelovac;
+            if ($client_config->spisovy_znak->pocatecni_nuly == 1) {
+                $cifernik = $client_config->spisovy_znak->pocet_znaku;
             } else {
                 $cifernik = 0;
             }

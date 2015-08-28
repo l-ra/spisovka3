@@ -98,10 +98,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderNove()
     {
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek : 20;
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek : 20;
 
 
         $args = array(
@@ -136,10 +136,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderPrichozi()
     {
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek : 20;
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek : 20;
 
 
         $args = null;
@@ -175,10 +175,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderOdchozi()
     {
-        $user_config = Nette\Environment::getVariable('user_config');
+        $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek) ? $user_config->nastaveni->pocet_polozek : 20;
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek : 20;
 
 
         $args = null;
@@ -407,10 +407,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $isds_subjekt_cache = [];
         $email_subjekt_cache = [];
 
-        //$user_config = Environment::getVariable('user_config');
+        //$client_config = Environment::getVariable('client_config');
         //$vp = new VisualPaginator($this, 'vp');
         //$paginator = $vp->getPaginator();
-        //$paginator->itemsPerPage = 2;// isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+        //$paginator->itemsPerPage = 2;// isset($client_config->nastaveni->pocet_polozek)?$client_config->nastaveni->pocet_polozek:20;
 
         $args = array(
             'where' => array('(ep.stav=0 OR ep.stav=1) AND (ep.epodatelna_typ=0)')

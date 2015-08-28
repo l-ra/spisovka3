@@ -20,10 +20,10 @@ class Spisovka_ZpravyPresenter extends BasePresenter
 
     protected function zobrazZpravy($jen_neprectene)
     {
-        /* $user_config = Environment::getVariable('user_config');
+        /* $client_config = Environment::getVariable('client_config');
           $vp = new VisualPaginator($this, 'vp');
           $paginator = $vp->getPaginator();
-          $paginator->itemsPerPage = isset($user_config->nastaveni->pocet_polozek)?$user_config->nastaveni->pocet_polozek:20;
+          $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek)?$client_config->nastaveni->pocet_polozek:20;
 
           $result = Zpravy::nacti();
           $paginator->itemCount = count($result);
