@@ -33,7 +33,7 @@
             <dt>Uživatelské jméno:</dt>
             <dd>{$Uzivatel->username}&nbsp;</dd>
         </dl>
-        {if $FormUpravit == 'heslo'}
+        {if $FormUpravit == 'heslo' && Settings::get('users_can_change_their_password', true)}
         {control auth_change_password}
         {/if}
         <dl class="detail_item">
@@ -56,7 +56,7 @@
                 {/if}
             </dd>
         </dl>
-        <br /><a href="{link this, 'upravit' => 'heslo'}">Změnit heslo</a>
+        <br /><a n:if="Settings::get('users_can_change_their_password', true)" href="{link this, 'upravit' => 'heslo'}">Změnit heslo</a>
     </div>
 
     <div class="detail_blok">

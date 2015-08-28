@@ -21,14 +21,17 @@ Nové funkce:
 - nastavení uživatele jako filtr, řazení a hledání se již neukládají 
   do prohlížeče ve formě cookies, ale do databáze. To ocení uživatelé, kteří
   pracují s více instalacemi aplikace, případně používají více počítačů.
-- v administraci lze fitrovat subjekty podle stavu
-- administrátor má možnost vytvořit protokol s informacemi pro technickou
-  podporu
-- instalační kontrolu je možné kdykoliv znovu spustit z administrace
-- v administraci je možné povolit předávání vyřízených dokumentů, viz nápověda
 - v ladicím módu (DEBUG_ENABLE 1 v index.php) aplikace zobrazuje vpravo dole
   lištu s užitečnými informacemi: čas zpracování stránky, použitou paměť
   a databázové dotazy
+
+  V administraci:
+- je možné nastavit, zda si uživatelé mohou měnit svoje hesla
+- je možné povolit předávání vyřízených dokumentů, viz nápověda
+- lze fitrovat subjekty podle stavu
+- administrátor má možnost vytvořit protokol s informacemi pro technickou
+  podporu
+- instalační kontrolu je možné kdykoliv znovu spustit
   
 Jiné změny:
 
