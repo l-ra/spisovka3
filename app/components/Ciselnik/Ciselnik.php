@@ -10,21 +10,13 @@
 class Ciselnik extends Nette\Application\UI\Control
 {
 
-    /** @var string */
-    protected $receivedSignal;
-
-    /** @var bool  was method render() called? */
-    protected $wasRendered = FALSE;
-    
     protected $action;
     
-    private $table;
-    private $primary;
-    private $link;
-    private $_params;
+    private $tableName;
     private $cols = array();
-    private $order;
+    private $orderBy;
     private $data;
+    protected $enableDelete = true;
 
     public function __construct()
     {
@@ -33,20 +25,15 @@ class Ciselnik extends Nette\Application\UI\Control
 
     public function setTable($table)
     {
-        $this->table = $table;
+        $this->tableName = $table;
     }
 
-    public function setPrimaryID($col_id)
+    public function disableDelete()
     {
-        $this->primary = $col_id;
+        $this->enableDelete = false;
     }
-
-    public function setLink($link)
-    {
-        $this->link = $link;
-    }
-
-    public function setParams($params)
+    
+    /* public function setParams($params)
     {
         if (empty($this->_params)) {
             $this->_params = $params;
@@ -62,7 +49,7 @@ class Ciselnik extends Nette\Application\UI\Control
         } else {
             $this->_params[$name] = $value;
         }
-    }
+    } */
 
     public function addColumn($col, $params)
     {
@@ -76,35 +63,23 @@ class Ciselnik extends Nette\Application\UI\Control
 
     public function orderBy($col)
     {
-        $this->order = $col;
+        $this->orderBy = $col;
 
         return $this;
-    }
-
-    public static function alink($link, $params)
-    {
-
-        if (strpos($link, "?") !== false) {
-            return $link . "&" . $params;
-        } else {
-            return $link . "?" . $params;
-        }
     }
 
     public function render()
     {
 
-        $model = new Model($this->table);
+        $model = new Model($this->tableName);
 
-        $this->template->params = $this->_params;
-
-        if (isset($this->_params['primary'])) {
+        if ($this->getParameter('edit')) {
             // form - uprava
             $this->action = 'edit';
 
             $this->template->setFile(dirname(__FILE__) . '/template_form.phtml');
             $this->template->render();
-        } else if (isset($this->_params['ciselnik_new'])) {
+        } else if ($this->getParameter('novy')) {
             // form - nova polozka
             $this->action = 'new';
             $this->template->setFile(dirname(__FILE__) . '/template_form.phtml');
@@ -123,12 +98,11 @@ class Ciselnik extends Nette\Application\UI\Control
                 }
             }
 
-            $data = $model->fetchAll($cols, $this->order);
+            $data = $model->fetchAll($cols, $this->orderBy);
             $this->template->data = $data->fetchAll();
             $this->template->cols = $this->cols;
 
-            $this->template->primary = !empty($this->primary) ? $this->primary : 'id';
-            $this->template->link = $this->link;
+            $this->template->primaryKeyName = 'id';
 
             $this->template->setFile(dirname(__FILE__) . '/template.phtml');
             $this->template->render();
@@ -137,28 +111,14 @@ class Ciselnik extends Nette\Application\UI\Control
 
     protected function createComponentForm($name)
     {
-        if (!$this->wasRendered) {
-            $this->receivedSignal = 'submit';
-        }
-
         $form = new Nette\Application\UI\Form($this, $name);
         $form->onSubmit[] = array($this, 'formSubmitHandler');
 
         if (count($this->cols) > 0) {
 
             if ($this->action == 'edit') {
-                $model = new Model($this->table);
-                $id = !empty($this->primary) ? $this->primary : 'id';
-                $this->data = $model->select(array(array("$id = ", $this->_params['primary'])))->fetch();
-
-                $can_delete = true;
-                if (isset($this->data->fixed)) {
-                    if ($this->data->fixed == 1) {
-                        $can_delete = false;
-                    }
-                }
-                if (isset($this->_params['no_delete']) && isset($this->_params['no_delete']))
-                    $can_delete = false;
+                $model = new Model($this->tableName);
+                $this->data = $model->select([["[id] = ", $this->getParameter('edit')]])->fetch();
             }
 
             foreach ($this->cols as $col_name => $col_params) {
@@ -261,8 +221,9 @@ class Ciselnik extends Nette\Application\UI\Control
                 $form->addHidden('ciselnik_new')->setValue(1);
                 $form->addSubmit('novyCiselnik', 'Vytvořit');
             } else if ($this->action == 'edit') {
-                $form->addHidden('primary')->setValue($this->data->$id);
+                $form->addHidden('primaryKey')->setValue($this->data->id);
                 $form->addSubmit('upravitCiselnik', 'Upravit');
+                $can_delete = $this->enableDelete && (!isset($this->data->fixed) || !$this->data->fixed);
                 if ($can_delete) {
                     $form->addSubmit('odstranitCiselnik', 'Odstranit')
                                     ->getControlPrototype()->onclick = "return confirm('Opravdu chcete smazat tento záznam?');";
@@ -282,19 +243,6 @@ class Ciselnik extends Nette\Application\UI\Control
         return $form;
     }
 
-    /**
-     * Checks if component is signal receiver.
-     * @param  string  signal name
-     * @return bool
-     */
-    public function isSignalReceiver($signal = TRUE)
-    {
-        if ($signal == 'submit') {
-            return $this->receivedSignal === 'submit';
-        } else {
-            return $this->getPresenter()->isSignalReceiver($this, $signal);
-        }
-    }
 
     /**
      * Ciselnik form submit handler.
@@ -303,15 +251,12 @@ class Ciselnik extends Nette\Application\UI\Control
      */
     public function formSubmitHandler(Nette\Application\UI\Form $form)
     {
-        $this->receivedSignal = 'submit';
-
         // was form submitted?
         if ($form->isSubmitted()) {
 
             $values = $form->getValues();
             $data = $form->getHttpData();
 
-            // stav fixed
             if (isset($values['stav']) && isset($data['stav'])) {
                 if ($values['stav'] != $data['stav']) {
                     $values['stav'] = $data['stav'];
@@ -321,9 +266,9 @@ class Ciselnik extends Nette\Application\UI\Control
             if (isset($data['novyCiselnik'])) {
                 $this->handleNew($values);
             } else if (isset($data['upravitCiselnik'])) {
-                $this->handleEdit($values, $data['primary']);
+                $this->handleEdit($values, $data['primaryKey']);
             } else if (isset($data['odstranitCiselnik'])) {
-                $this->handleDelete($data['primary']);
+                $this->handleDelete($data['primaryKey']);
             } else if (isset($data['stornoCiselnik'])) {
                 $this->handleStorno();
             } else {
@@ -339,7 +284,7 @@ class Ciselnik extends Nette\Application\UI\Control
     {
         try {
 
-            $model = new Model($this->table);
+            $model = new Model($this->tableName);
             $model->insert($values);
             $this->dataChangedHandler();
 
@@ -358,10 +303,8 @@ class Ciselnik extends Nette\Application\UI\Control
     public function handleEdit($values, $id)
     {
         try {
-
-            $model = new Model($this->table);
-            $id_name = !empty($this->primary) ? $this->primary : 'id';
-            $model->update($values, array(array('%and', array($id_name => $id))));
+            $model = new Model($this->tableName);
+            $model->update($values, [['%and', ['id' => $id]]]);
             $this->dataChangedHandler();
 
             $this->presenter->flashMessage('Záznam byl úspěšně upraven.');
@@ -379,10 +322,8 @@ class Ciselnik extends Nette\Application\UI\Control
     public function handleDelete($id)
     {
         try {
-
-            $model = new Model($this->table);
-            $id_name = !empty($this->primary) ? $this->primary : 'id';
-            $model->delete(array(array('%and', array($id_name => $id))));
+            $model = new Model($this->tableName);
+            $model->delete([['%and', ['id' => $id]]]);
             $this->dataChangedHandler();
 
             $this->presenter->flashMessage('Záznam byl úspěšně odstraněn.');

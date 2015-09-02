@@ -1,22 +1,22 @@
 <div class="ciselnik">
 
     <div class="blok_menu">
-        <a href="{=Ciselnik::alink($link,'ciselnik_new=1')}">Nový záznam</a>
+        <a n:href="this, novy => 1">Nový záznam</a>
     </div>
 
 {if count($data)>0}
     <table>
         <tr>
-    {foreach $cols as $col_name => $col_params}
+            {foreach $cols as $col_name => $col_params}
             <th>{$col_params['title']}</th>
-    {/foreach}
+            {/foreach}
         </tr>
-    {foreach $data as $row}
+        {foreach $data as $row}
         <tr>
-    {foreach $cols as $col_name => $col_params}
+            {foreach $cols as $col_name => $col_params}
             <td>
             {if $col_params['link']}
-                <a href="{=Ciselnik::alink($link,'primary='.$row->$primary)}">
+            <a n:href="this, edit => $row->$primaryKeyName" {if isset($row->fixed) && $row->fixed}onclick="return confirm('Záznam by neměl být nikdy měněn! Pokračujte pouze pokud opravdu víte, co děláte.')"{/if}>
             {/if}
             {if $col_params['form'] == "checkbox" }
                 {if $row->$col_name == 1}ano{else}ne{/if}
@@ -35,12 +35,9 @@
                 </a>
             {/if}
             </td>
-    {/foreach}
+            {/foreach}
         </tr>
-    {/foreach}
-
-        
-        
+        {/foreach}        
     </table>
 {else}    
 <div class="ciselnik_noresult">Nenalezena žádná data.</div>    
