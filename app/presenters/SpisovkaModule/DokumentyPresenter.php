@@ -1262,6 +1262,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue('30');
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
 
+        $form['zpusob_doruceni_id']->setDefaultValue(5); // v listinné podobě
+
         $form->addSubmit('novy_pridat', 'Vytvořit dokument a založit nový');
         $form['novy_pridat']->onClick[] = array($this, 'vytvoritClicked');
 
@@ -1291,7 +1293,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         else
             $povolene_typy_dokumentu = Dokument::typDokumentu(null, 1);
 
-        $zpusob_doruceni = Dokument::zpusobDoruceni(null, 2);
+        $zpusob_doruceni = Dokument::zpusobDoruceni(2);
 
         $form = new Spisovka\Form();
         $form->addHidden('id')
@@ -1491,8 +1493,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $Dok = $this->template->Dok;
 
-        $zpusob_doruceni = Dokument::zpusobDoruceni(null, 2);
-
+        $zpusob_doruceni = Dokument::zpusobDoruceni(2);
+        $zpusob_doruceni[0] = '(není zadán)';
+        ksort($zpusob_doruceni);
+        
         $form = new Spisovka\Form();
         $form->addHidden('id');
 
@@ -1515,11 +1519,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             && count($povolene_typy_dokumentu) > 1) {
             $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu);
         }
-        
+
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
         $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10);
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
-        if ($this->template->isRozdelany && $Dok->typ_dokumentu->smer == 0)
+        // doručení emailem a DS nastavuje systém, to uživatel nesmí měnit
+        if ($this->template->isRozdelany && $Dok->typ_dokumentu->smer == 0
+                && !in_array($Dok->zpusob_doruceni_id, [1, 2]))
             $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
 
         $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50);
@@ -1635,7 +1641,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     protected function createComponentVyrizovaniForm()
     {
 
-        $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 1);
+        $zpusob_vyrizeni = Dokument::zpusobVyrizeni(1);
 
         $SpisovyZnak = new SpisovyZnak();
         $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null, 1);

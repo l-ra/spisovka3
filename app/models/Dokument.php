@@ -1523,11 +1523,10 @@ class Dokument extends BaseModel
 
     public function ulozit($data, $dokument_id = null)
     {
-
-
-        if (is_null($data)) {
+        if (is_null($data))
             return false;
-        } else if (is_null($dokument_id)) {
+
+        if (is_null($dokument_id)) {
             // novy dokument
 
             if (empty($data['zmocneni_id']))
@@ -1621,7 +1620,12 @@ class Dokument extends BaseModel
             if (empty($data['zpusob_doruceni_id'])) {
                 $data['zpusob_doruceni_id'] = null;
             } else {
-                $data['zpusob_doruceni_id'] = (int) $data['zpusob_doruceni_id'];
+                // zajisti, aby zpusob doruceni se ulozil pouze u prichozich dokumentu
+                $typy_dokumentu = self::typDokumentu();
+                if ($typy_dokumentu[$data['dokument_typ_id']]['smer'] == 1) //odchozi
+                    $data['zpusob_doruceni_id'] = null;
+                else
+                    $data['zpusob_doruceni_id'] = (int) $data['zpusob_doruceni_id'];
             }
             if (empty($data['zpusob_vyrizeni_id'])) {
                 $data['zpusob_vyrizeni_id'] = null;
@@ -1990,121 +1994,65 @@ class Dokument extends BaseModel
         }
     }
 
-    public static function zpusobVyrizeni($kod = null, $select = 0)
+    public static function zpusobVyrizeni($select)
     {
-
-        $prefix = self::getDbPrefix();
-        $tb_zpusob_vyrizeni = $prefix . 'zpusob_vyrizeni';
-
-        $result = dibi::query('SELECT * FROM %n', $tb_zpusob_vyrizeni)->fetchAssoc('id');
-
-        if (is_null($kod)) {
-            if ($select == 1) {
-                $tmp = array();
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    $tmp[$dt->id] = $dt->nazev;
-                }
-                return $tmp;
-            } else if ($select == 3) {
-                $tmp = array();
-                $tmp[0] = 'jakýkoli způsob vyřízení';
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    $tmp[$dt->id] = Nette\Utils\Strings::truncate($dt->nazev, 90);
-                }
-                return $tmp;
-            } else if ($select == 4) {
-                $tmp = array();
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    $tmp['zpusob_vyrizeni_' . $dt->id] = $dt->nazev;
-                }
-                return $tmp;
-            } else {
+        $result = dibi::query('SELECT [id], [nazev] FROM [:PREFIX:zpusob_vyrizeni] WHERE [stav] != 0')->fetchPairs();
+ 
+        switch ($select) {
+            case 1:
                 return $result;
-            }
-        } else {
-            return ( array_key_exists($kod, $result) ) ? $result[$kod] : null;
+
+            case 3:
+                $result[0] = 'jakýkoli způsob vyřízení';
+                ksort($result);
+                return $result;
+
+            case 4:
+               $tmp = [];
+               foreach ($result as $id => $nazev)
+                    $tmp['zpusob_vyrizeni_' . $id] = $nazev;
+                return $tmp;
+
+            default: // neni pouzito
+                return $result;
         }
     }
 
-    public static function zpusobDoruceni($kod = null, $select = 0)
+    /**
+     * Vrátí seznam způsobů doručení, volitelně s přidanou jednou položkou
+     * @param int $select  2 = při editaci metadat. 3 = při hledání
+     * @return array
+     */
+    public static function zpusobDoruceni($select)
     {
+        $result = dibi::query('SELECT [id], [nazev] FROM [:PREFIX:zpusob_doruceni]')->fetchPairs();
 
-        $prefix = self::getDbPrefix();
-        $tb_zpusob_doruceni = $prefix . 'zpusob_doruceni';
-
-        $result = dibi::query('SELECT * FROM %n', $tb_zpusob_doruceni)->fetchAssoc('id');
-
-        if (is_null($kod)) {
-            if ($select == 1) {
-                $tmp = array();
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    $tmp[$dt->id] = $dt->nazev;
-                }
-                return $tmp;
-            } else if ($select == 2) {
-                $tmp = array();
-                $tmp[0] = '(vlastní)';
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    $tmp[$dt->id] = $dt->nazev;
-                }
-                return $tmp;
-            } else if ($select == 3) {
-                $tmp = array();
-                $tmp[0] = 'jakýkoli způsob doručení';
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    $tmp[$dt->id] = $dt->nazev;
-                }
-                return $tmp;
-            } else {
-                return $result;
-            }
-        } else {
-            return ( array_key_exists($kod, $result) ) ? $result[$kod] : null;
+        if ($select == 2) {
+            // definujeme výchozí hodnotu (listinná podoba) při vytvoření dokumentu
+            // hodnotu "není zadán" již nelze později při editaci metadat nastavit
+            unset($result[1]); // odeber položky mailem a datovou schránkou
+            unset($result[2]);
+        } else if ($select == 3) {
+            $result[0] = 'jakýkoli způsob doručení';
         }
+
+        ksort($result);
+        return $result;
     }
 
-    public static function zpusobOdeslani($kod = null, $select = 0)
+    /**
+     * @param int $select  Jediná použitá hodnota je 3
+     * @return array
+     */
+    public static function zpusobOdeslani($select)
     {
+        $result = dibi::query('SELECT [id], [nazev] FROM [:PREFIX:zpusob_odeslani]')->fetchPairs();
 
-        $prefix = self::getDbPrefix();
-        $tb_zpusob_odeslani = $prefix . 'zpusob_odeslani';
+        if ($select == 3)
+            $result[0] = 'jakýkoli způsob odeslání';
 
-        $result = dibi::query('SELECT * FROM %n', $tb_zpusob_odeslani)->fetchAssoc('id');
-
-        if (is_null($kod)) {
-            if ($select == 1) {
-                $tmp = array();
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    $tmp[$dt->id] = $dt->nazev;
-                }
-                return $tmp;
-            } else if ($select == 3) {
-                $tmp = array();
-                $tmp[0] = 'jakýkoli způsob odeslani';
-                foreach ($result as $dt) {
-                    $tmp[$dt->id] = Nette\Utils\Strings::truncate($dt->nazev, 90);
-                }
-                return $tmp;
-            } else {
-                return $result;
-            }
-        } else {
-            return ( array_key_exists($kod, $result) ) ? $result[$kod] : null;
-        }
+        ksort($result);
+        return $result;
     }
 
     protected static function uzivatelVidiVsechnyDokumenty()

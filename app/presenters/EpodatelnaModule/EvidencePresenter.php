@@ -507,6 +507,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             //$data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
             //$data['podaci_denik_rok'] = $cjednaci->rok;
 
+            // 1-email, 2-isds
+            $data['zpusob_doruceni_id'] = $zprava->email_id ? 1 : 2;
+                    
             $dokument = $Dokument->ulozit($data, $dokument_id, 1); //   array('dokument_id'=>0);// $Dokument->ulozit($data);
 
             if ($dokument) {
@@ -588,6 +591,13 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         }
     }
 
+    /**
+     * Zaeviduje zprávu po odeslání hromadného formuláře.
+     * Aplikační logika je duplikovaná v metodě vytvoritClicked()
+     * @param array $data
+     * @return array informace o čísle, pod kterým byl vytvořen dokument v modulu spisovka
+     * @throws Exception
+     */
     public function vytvorit($data)
     {
 
@@ -597,9 +607,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
         if ($zprava) {
-
-            //echo "<pre>"; print_r($zprava); echo "</pre>"; exit;
-            //echo "<pre>"; print_r($data); echo "</pre>"; exit;
 
             $Dokument = new Dokument();
 
@@ -612,6 +619,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 "datum_vzniku" => $zprava['doruceno_dne'],
                 "lhuta" => "30",
                 "poznamka" => $data['poznamka'],
+                'zpusob_doruceni_id' => $zprava->email_id ? 1 : 2
             );
             $dokument = $Dokument->ulozit($dokument_data);
 

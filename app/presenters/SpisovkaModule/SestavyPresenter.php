@@ -396,9 +396,11 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $typ_doruceni = array(
             '0' => 'všechny',
             '1' => 'pouze doručené přes elektronickou podatelnu',
-            '2' => 'pouze doručené přes email',
-            '3' => 'pouze doručené přes datovou schránkou',
-            '4' => 'doručené mimo epodatelnu',
+            /** Tato informace je nyní v metadatech dokumentu ve zpusobu doruceni
+             * '2' => 'pouze doručené přes email',
+             * '3' => 'pouze doručené přes datovou schránkou',
+             */
+            '4' => 'doručené mimo e-podatelnu',
         );
 
         $typ_select = array();
@@ -408,13 +410,13 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $stat_select = Subjekt::stat(null, 3);
 
         $zpusob_doruceni = array();
-        $zpusob_doruceni = Dokument::zpusobDoruceni(null, 3);
+        $zpusob_doruceni = Dokument::zpusobDoruceni(3);
 
         $zpusob_odeslani = array();
-        $zpusob_odeslani = Dokument::zpusobOdeslani(null, 3);
+        $zpusob_odeslani = Dokument::zpusobOdeslani(3);
 
         $zpusob_vyrizeni = array();
-        $zpusob_vyrizeni = Dokument::zpusobVyrizeni(null, 3);
+        $zpusob_vyrizeni = Dokument::zpusobVyrizeni(3);
 
         $spudalost_seznam = array();
         $spudalost_seznam = SpisovyZnak::spousteci_udalost(null, 3);

@@ -759,7 +759,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 'skartacni_znak_V' => 'V',
                 'skartacni_znak_S' => 'S',
             ),
-            'Podle způsobu vyřízení' => Dokument::zpusobVyrizeni(null, 4)
+            'Podle způsobu vyřízení' => Dokument::zpusobVyrizeni(4)
         );
         if (isset($this->template->view) && $this->template->view != 'default')
             unset($select['Podle stavu']);
