@@ -289,7 +289,7 @@ class Epodatelna extends BaseModel
             if (empty($identifikator['cert_signed'])) {
                 $identifikator['cert_signed'] = -1;
                 $identifikator['cert_status'] = "Email není podepsán.";
-            } elseif ((int) $identifikator['cert_signed'] >= 0) {
+            } elseif ((int) $identifikator['cert_signed'] > 0) {
                 //$identifikator['cert_info']['platnost_do'] = time() - (86400*2);
                 $od = $identifikator['cert_info']['platnost_od'];
                 $do = $identifikator['cert_info']['platnost_do'];

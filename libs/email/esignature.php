@@ -236,7 +236,7 @@ class esignature
         $tmp_cert = $this->tempnam("", "crt");
         $res = openssl_pkcs7_verify($filename, 0, $tmp_cert, $lCertT);
 
-        if ($res == 1) {
+        if ($res === true) {
             // email overen
             $cert = openssl_x509_parse("file://$tmp_cert");
 
@@ -250,7 +250,7 @@ class esignature
 
             @unlink($tmp_cert);
             return array(
-                'return' => $res,
+                'return' => 1,
                 'status' => $status,
                 'cert' => $cert,
                 'cert_info' => $this->getInfo($cert)
@@ -266,10 +266,9 @@ class esignature
                     $status = "Email není podepsán.";
                 } else {
                     $status = "Email nelze ověřit! Email je buď poškozený nebo není kompletní nebo nelze ověřit podpis.";
-                    //$status = "Email nelze ověřit! Chyba aplikace! ". openssl_error_string();
                 }
                 return array(
-                    'return' => $res,
+                    'return' => -1,
                     'status' => $status,
                 );
             } else {
