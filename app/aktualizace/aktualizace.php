@@ -216,12 +216,12 @@ foreach ($clients as $site_path => $site_name) {
                 $function_name = "revision_{$rev}_after";
                 if (function_exists($function_name)) {
                     if ($do_update) {
-                        echo "<div class='update_title'>Provedení PHP skriptu (po aktualizaci databáze)</div>";
+                        echo "<div class='update_title'>Provedení PHP skriptu</div>";
                         echo "<pre>";
                         $function_name();
                         echo "</pre>";
                     } else {
-                        echo "<div class='update_title'>Bude proveden PHP skript (po aktualizaci databáze)</div>";
+                        echo "<div class='update_title'>Bude proveden PHP skript</div>";
                     }
                 }
 
