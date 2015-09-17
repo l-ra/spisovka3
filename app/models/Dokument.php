@@ -1528,7 +1528,9 @@ class Dokument extends BaseModel
 
         if (is_null($dokument_id)) {
             // novy dokument
-
+            // [P.L.] 2015-09-17  Tuto vetev kodu uz jsem nemel cas prepsat
+            //     ale toto snad nenapacha tolik skody jako byvaly kod
+            //     pro zmenu existujiciho zaznamu v databazi
             if (empty($data['zmocneni_id']))
                 $data['zmocneni_id'] = null;
             if (empty($data['cislo_jednaci_id'])) {
@@ -1598,7 +1600,6 @@ class Dokument extends BaseModel
             $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
 
             $data['stav'] = isset($data['stav']) ? $data['stav'] : 1;
-            $data['md5_hash'] = $this->generujHash($data);
             $dokument_id_new = $this->insert($data);
             $new_row = $this->getInfo($dokument_id_new);
 
@@ -1610,65 +1611,24 @@ class Dokument extends BaseModel
         } else {
             // uprava existujiciho dokumentu
 
-            if (empty($data['zmocneni_id']))
-                $data['zmocneni_id'] = null;
-            if (empty($data['cislo_jednaci_id'])) {
-                $data['cislo_jednaci_id'] = null;
-            } else {
-                $data['cislo_jednaci_id'] = (int) $data['cislo_jednaci_id'];
-            }
-            if (empty($data['zpusob_doruceni_id'])) {
-                $data['zpusob_doruceni_id'] = null;
-            } else {
+            if (isset($data['zpusob_doruceni_id']) && isset($data['dokument_typ_id'])) {
                 // zajisti, aby zpusob doruceni se ulozil pouze u prichozich dokumentu
                 $typy_dokumentu = self::typDokumentu();
                 if ($typy_dokumentu[$data['dokument_typ_id']]['smer'] == 1) //odchozi
                     $data['zpusob_doruceni_id'] = null;
-                else
-                    $data['zpusob_doruceni_id'] = (int) $data['zpusob_doruceni_id'];
-            }
-            if (empty($data['zpusob_vyrizeni_id'])) {
-                $data['zpusob_vyrizeni_id'] = null;
-            } else {
-                $data['zpusob_vyrizeni_id'] = (int) $data['zpusob_vyrizeni_id'];
-            }
-            if (empty($data['spousteci_udalost_id'])) {
-                $data['spousteci_udalost_id'] = null;
-            } else {
-                $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
-            }
-            if (empty($data['spisovy_znak_id'])) {
-                $data['spisovy_znak_id'] = null;
-            } else {
-                $data['spisovy_znak_id'] = (int) $data['spisovy_znak_id'];
             }
 
-            if (empty($data['datum_vzniku'])) {
-                $data['datum_vzniku'] = null;
-            }
             if (isset($data['pocet_listu'])) {
-                if (empty($data['pocet_listu'])) {
-                    $data['pocet_listu'] = 0;
-                } else {
-                    $data['pocet_listu'] = (int) $data['pocet_listu'];
-                }
-                if (empty($data['pocet_priloh'])) {
-                    $data['pocet_priloh'] = 0;
-                } else {
-                    $data['pocet_priloh'] = (int) $data['pocet_priloh'];
-                }
+                if ($data->pocet_listu === "")
+                    $data->pocet_listu = null;
+                if ($data->pocet_priloh === "")
+                    $data->pocet_priloh = null;
             }
             if (isset($data['vyrizeni_pocet_listu'])) {
-                if (empty($data['vyrizeni_pocet_listu'])) {
-                    $data['vyrizeni_pocet_listu'] = 0;
-                } else {
-                    $data['vyrizeni_pocet_listu'] = (int) $data['vyrizeni_pocet_listu'];
-                }
-                if (empty($data['vyrizeni_pocet_priloh'])) {
-                    $data['vyrizeni_pocet_priloh'] = 0;
-                } else {
-                    $data['vyrizeni_pocet_priloh'] = (int) $data['vyrizeni_pocet_priloh'];
-                }
+                if ($data->vyrizeni_pocet_listu === "")
+                    $data->vyrizeni_pocet_listu = null;
+                if ($data->vyrizeni_pocet_priloh === "")
+                    $data->vyrizeni_pocet_priloh = null;
             }
 
             if (empty($data['jid'])) {
@@ -1677,72 +1637,19 @@ class Dokument extends BaseModel
                 $app_id = 'OSS-' . $unique_part[0];
                 $data['jid'] = $app_id . '-ESS-' . $dokument_id;
             }
-            if (isset($data['skartacni_lhuta']) && empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0)
-                $data['skartacni_lhuta'] = null;
+            
+            if (array_key_exists('skartacni_lhuta', $data) && $data->skartacni_lhuta === '')
+                $data->skartacni_lhuta = null;
+            if (array_key_exists('skartacni_znak', $data) && $data->skartacni_znak === '')
+                $data->skartacni_znak = null;
 
-            $old_dokument = $this->getBasicInfo($dokument_id);
+            unset($data['id']);
+            $success = $this->update($data, [['id=%i', $dokument_id]]);
+            if (!$success)
+                return false;
 
-            if ($old_dokument) {
-
-                //Nette\Diagnostics\Debugger::dump($data); //exit;
-                // sestaveni upravenych dat
-                $update_data = array();
-                foreach ($old_dokument as $key => $value) {
-                    $update_data[$key] = $value;
-                    if (isset($data[$key])) {
-                        $update_data[$key] = $data[$key];
-                    }
-                }
-                $md5_hash = $this->generujHash($update_data);
-
-                //Nette\Diagnostics\Debugger::dump($update_data);
-                //Nette\Diagnostics\Debugger::dump($md5_hash);
-                //exit;
-
-                if ($md5_hash != $old_dokument->md5_hash) {
-                    // zjistena zmena - vytvorime zaznam do historie
-                    if (empty($old_dokument['zmocneni_id']))
-                        $old_dokument['zmocneni_id'] = null;
-                    if (empty($old_dokument['zpusob_doruceni_id']))
-                        $old_dokument['zpusob_doruceni_id'] = null;
-                    if (empty($old_dokument['zpusob_vyrizeni_id'])) {
-                        $old_dokument['zpusob_vyrizeni_id'] = null;
-                    } else {
-                        $old_dokument['zpusob_vyrizeni_id'] = (int) $old_dokument['zpusob_vyrizeni_id'];
-                    }
-                    if (isset($old_dokument['skartacni_lhuta']) && empty($old_dokument['skartacni_lhuta']) && $old_dokument['skartacni_lhuta'] != 0)
-                        $old_dokument['skartacni_lhuta'] = null;
-                    if (empty($old_dokument['spousteci_udalost_id']))
-                        $old_dokument['spousteci_udalost_id'] = null;
-                    $old_dokument = (array) $old_dokument;
-                    $old_dokument['dokument_id'] = $dokument_id;
-                    $old_dokument['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
-                    $old_dokument['date_created'] = new DateTime();
-                    unset($old_dokument['id'], $old_dokument['user_modified'],
-                            $old_dokument['date_modified'], $old_dokument['spousteci_udalost']);
-                    //Nette\Diagnostics\Debugger::dump($old_dokument);
-                    $DokumentHistorie = new DokumentHistorie();
-                    $DokumentHistorie->insert($old_dokument);
-                }
-
-                $update_data['date_modified'] = new DateTime();
-                $update_data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
-                $update_data['md5_hash'] = $md5_hash;
-                unset($update_data['id']);
-                $updateres = $this->update($update_data,
-                        array(
-                    array('id=%i', $dokument_id)
-                        )
-                );
-                if ($updateres) {
-                    $update_row = $this->getInfo($dokument_id);
-                    return $update_row;
-                } else {
-                    return false;
-                }
-            } else {
-                return false; // id dokumentu neexistuje
-            }
+            $update_row = $this->getInfo($dokument_id);
+            return $update_row;
         }
     }
 
@@ -1762,23 +1669,6 @@ class Dokument extends BaseModel
         } else {
             return false;
         }
-    }
-
-    protected function generujHash($data)
-    {
-
-        $data = Dokument::obj2array($data);
-
-        unset($data['id'], $data['md5_hash'], $data['date_created'], $data['user_created'],
-                $data['date_modified'], $data['user_modified']
-        );
-
-        $data_implode = implode('#', $data);
-
-        // věc#popis#1##2010-05-23#30##0#9#OUV-9/2010#denik#9#2010
-        // věc#popis#1##2010-05-23#věc#popis#1##2010-05-23#
-        //echo $data_implode;
-        return md5($data_implode);
     }
 
     public function kontrola($data, $typ = "komplet")
@@ -1801,8 +1691,7 @@ class Dokument extends BaseModel
                 $mess[] = "Není zvolen spisový znak!";
             if (empty($data->skartacni_znak))
                 $mess[] = "Není vyplněn skartační znak!";
-            //if ( empty($data->skartacni_lhuta) || $data->skartacni_lhuta !== 0 ) $mess[] = "Není vyplněna skartační lhůta!";
-            if ($data->skartacni_lhuta == null || $data->skartacni_lhuta == "")
+            if ($data->skartacni_lhuta === null)
                 $mess[] = "Není vyplněna skartační lhůta!";
             if (empty($data->spousteci_udalost_id))
                 $mess[] = "Není zvolena spouštěcí událost!";
@@ -1886,29 +1775,6 @@ class Dokument extends BaseModel
                         array('id != %i', $dokument_id)
                             ), array('id'))->fetchAll();
         }
-    }
-
-    public function deleteAll()
-    {
-
-        $DokumentHistorie = new DokumentHistorie();
-        $DokumentHistorie->deleteAll();
-
-        $Dokument2Subjekt = new DokumentSubjekt();
-        $Dokument2Subjekt->deleteAll();
-        $Dokument2Prilohy = new DokumentPrilohy();
-        $Dokument2Prilohy->deleteAll();
-        $Dokument2Odeslani = new DokumentOdeslani();
-        $Dokument2Odeslani->deleteAll();
-        $Dokument2Spis = new DokumentSpis();
-        $Dokument2Spis->deleteAll();
-        $DokumentLog = new LogModel();
-        $DokumentLog->deleteAllDokument();
-
-        parent::deleteAll();
-
-        $CisloJednaci = new CisloJednaci();
-        $CisloJednaci->deleteAll();
     }
 
     public function spojitAgrs($args1, $args2)

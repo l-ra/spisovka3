@@ -212,10 +212,10 @@ class UserModel extends BaseModel
         );
         return $this->update($row, array('id=%i', $user_id));
     }
-
+    
+    /* Nebezpecne funkci nechat v programu, prestoze se nikde nevola
     public function deleteAll()
     {
-
         $Workflow = new Workflow();
         $Workflow->update(
                 array('user_id' => null, 'prideleno_id' => null), array('1')
@@ -233,14 +233,12 @@ class UserModel extends BaseModel
                 array('user_created' => null, 'user_modified' => null), array('1')
         );
 
-
         $User2Role = new User2Role();
         $User2Role->deleteAll();
 
-
         parent::deleteAll();
     }
-
+    */
 }
 
 class User2Role extends BaseModel

@@ -1339,8 +1339,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50)
                 ->setValue(@$dok->cislo_doporuceneho_dopisu);
 
-        $form->addHidden('zmocneni')->setValue(0);
-
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
                 ->setValue(@$dok->pocet_listu)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet listů musí být číslo');
@@ -1406,7 +1404,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $CJ = new CisloJednaci();
             $data['jid'] = $CJ->dejAppId() . "-ESS-$dokument_id";
 
-            $dokument = $Dokument->ulozit($data, $dokument_id); //   array('dokument_id'=>0);// $Dokument->ulozit($data);
+            $dd = clone $data; // document data
+            unset($dd['odpoved'], $dd['predano_user'], $dd['predano_org'], $dd['predano_poznamka']);
+            $dokument = $Dokument->ulozit($dd, $dokument_id);
 
             if ($dokument) {
                 $Workflow = new Workflow();
@@ -1532,10 +1532,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
-                ->addRule(Nette\Forms\Form::NUMERIC,
+                ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet listů musí být číslo');
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
-                ->addRule(Nette\Forms\Form::NUMERIC,
+                ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet příloh musí být číslo');
         $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50);
                 
@@ -1728,18 +1728,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         // uprava casu
         $data['datum_vyrizeni'] = $data['datum_vyrizeni'] . " " . $data['datum_vyrizeni_cas'];
-        unset($data['datum_vzniku_cas']);
+        unset($data['datum_vyrizeni_cas']);
 
         $Dokument = new Dokument();
 
         $dok = $Dokument->getInfo($dokument_id);
 
-        try {
-            if (empty($data->skartacni_znak))
-                $data->skartacni_znak = null;
-            if ($data->skartacni_lhuta === '')
-                $data->skartacni_lhuta = null;
-            
+        try {            
             $Dokument->ulozit($data, $dokument_id);
 
             $Log = new LogModel();
@@ -2369,11 +2364,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 "vase_sznak" => $data['isds_spis_adres'],
                 "k_rukam" => $data['isds_dvr'],
                 "anotace" => $data['isds_predmet'],
-                //"zmocneni_law"=>$_POST['dok_zmo_law'],
-                //"zmocneni_year"=>$_POST['dok_zmo_year'],
-                //"zmocneni_sect"=>$_POST['dok_zmo_sect'],
-                //"zmocneni_par"=>$_POST['dok_zmo_par'],
-                //"zmocneni_point"=>$_POST['dok_zmo_point'],
                 "do_vlastnich" => ($data['isds_dvr'] == true) ? 1 : 0,
                 "doruceni_fikci" => ($data['isds_fikce'] == true) ? 0 : 1
             );
