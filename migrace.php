@@ -1057,7 +1057,6 @@ if ( count($S2_dok)>0 ) {
                 'skartacni_znak' => empty($S2_d->skartacni_znak)?null:$S2_d->skartacni_znak,
                 'skartacni_lhuta' => empty($S2_d->skartacni_lhuta)?null:$S2_d->skartacni_lhuta,
                 'poznamka' => '',
-                'zmocneni_id' => null,
                 'lhuta' => (int) $S2_d->lhuta,
                 'epodatelna_id' => null,
                 'stav' => 1,

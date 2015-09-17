@@ -339,11 +339,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         exit;
     }
 
-    public function renderZmocneni()
-    {
-        
-    }
-
     protected function createComponentNovyForm()
     {
         if (isset($this->template->Dok)) {
@@ -433,8 +428,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3)
                 ->setValue('Předáno z e-podatelny');
-
-        $form->addHidden('zmocneni')->setValue(0);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet listů musí být číslo');
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet příloh musí být číslo');

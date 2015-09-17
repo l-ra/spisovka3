@@ -1531,8 +1531,6 @@ class Dokument extends BaseModel
             // [P.L.] 2015-09-17  Tuto vetev kodu uz jsem nemel cas prepsat
             //     ale toto snad nenapacha tolik skody jako byvaly kod
             //     pro zmenu existujiciho zaznamu v databazi
-            if (empty($data['zmocneni_id']))
-                $data['zmocneni_id'] = null;
             if (empty($data['cislo_jednaci_id'])) {
                 $data['cislo_jednaci_id'] = null;
             } else {

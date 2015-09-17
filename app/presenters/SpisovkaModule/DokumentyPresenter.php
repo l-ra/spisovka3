@@ -968,7 +968,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     "datum_vzniku" => date('Y-m-d H:i:s'),
                     "lhuta" => "30",
                     "poznamka" => $dok->poznamka,
-                    "zmocneni_id" => null,
                     "spisovy_znak_id" => $dok->spisovy_znak_id,
                     "skartacni_znak" => $dok->skartacni_znak,
                     "skartacni_lhuta" => $dok->skartacni_lhuta,
@@ -1091,11 +1090,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'warning');
             $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
         }
-    }
-
-    public function renderZmocneni()
-    {
-        
     }
 
     public function renderHistorie()

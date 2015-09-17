@@ -109,11 +109,6 @@ $(function() {
         return false;
     });
 
-    $('#dialog-zmocneni').click(function(event){
-        dialog(this,'Připojit zmocnění');
-        return false;
-    });
-
     $('#dialog-subjekt').click(dialogVyberSubjektu);
     
     $('#subjekt_pripojit_click').click(function(event){

@@ -64,3 +64,5 @@ Smazání adresáře client/sessions
 Přidáno výchozí nastavení nových funkcí
 [890]
 Naplnění metadata "způsob doručení" u dokumentů vytvořených e-podatelnou
+[900]
+Smazání nepoužívané tabulky zmocnění

@@ -202,13 +202,13 @@ class ISDS_Spisovka extends ISDS
             'dmSenderIdent' => empty($zprava['spisovy_znak']) ? null : $zprava['spisovy_znak'],
             'dmToHands' => empty($zprava['k_rukam']) ? null : $zprava['k_rukam'],
             'dmAnnotation' => empty($zprava['anotace']) ? null : $zprava['anotace'],
-            'dmLegalTitleLaw' => empty($zprava['zmocneni_law']) ? null : $zprava['zmocneni_law'],
-            'dmLegalTitleYear' => empty($zprava['zmocneni_year']) ? null : $zprava['zmocneni_year'],
-            'dmLegalTitleSect' => empty($zprava['zmocneni_sect']) ? null : $zprava['zmocneni_sect'],
-            'dmLegalTitlePar' => empty($zprava['zmocneni_par']) ? null : $zprava['zmocneni_par'],
-            'dmLegalTitlePoint' => empty($zprava['zmocneni_point']) ? null : $zprava['zmocneni_point'],
-            'dmPersonalDelivery' => empty($zprava['do_vlastnich']) ? null : $zprava['do_vlastnich'],
-            'dmAllowSubstDelivery' => empty($zprava['doruceni_fikci']) ? null : $zprava['doruceni_fikci']
+            'dmLegalTitleLaw' => null,
+            'dmLegalTitleYear' => null,
+            'dmLegalTitleSect' => null, 
+            'dmLegalTitlePar' => null, 
+            'dmLegalTitlePoint' => null, 
+            'dmPersonalDelivery' => null,
+            'dmAllowSubstDelivery' => null
         );
 
         // Nacteni priloh
