@@ -1076,16 +1076,6 @@ if ( count($S2_dok)>0 ) {
 
             );
 
-            $data = $dokument;
-            unset( $data['id'],$data['version'],$data['md5_hash'],
-                   $data['date_created'],$data['user_created'],$data['date_modified'],$data['user_modified']
-            );
-            $data_implode = implode('#', $data);
-            $dokument['md5_hash'] = md5($data_implode);
-            unset($data, $data_implode);
-
-            //debug($dokument);
-
             $S2_cjednaci = $S2_d->cislo_jednaci;
 
             if (MIGRACE) $S3->insert(S3_.'dokument', $dokument)->execute();
