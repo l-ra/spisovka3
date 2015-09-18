@@ -119,7 +119,9 @@ class esignature
      */
     public function setCACert($mixed)
     {
-
+        if (!function_exists('openssl_x509_read'))
+            throw new Exception('Není dostupné PHP rozšíření OpenSSL.');
+        
         if (is_array($mixed)) {
             /* Param is array - items CA certificates */
             foreach ($mixed as $param) {
