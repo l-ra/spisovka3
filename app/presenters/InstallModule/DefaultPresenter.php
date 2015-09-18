@@ -57,25 +57,23 @@ class Install_DefaultPresenter extends BasePresenter
         $phpinfo = $this->phpinfo_array(1);
 
         // cURL supprot
+        $curl_support = 0;
+        $curl_ssl = 0;
+        $curl_ssl_version = "";
+        $curl_version = "";
         if (function_exists('curl_version')) {
             $curl_support = 1;
             $curli = curl_version();
-            $user_agent = "";
             if (isset($curli['version'])) {
-                $user_agent .= " libcurl " . $curli['version'] . "";
+                $curl_version .= " libcurl " . $curli['version'] . "";
             }
             if (isset($curli['host'])) {
-                $user_agent .= " (" . $curli['host'] . ")";
+                $curl_version .= " (" . $curli['host'] . ")";
             }
             if (isset($curli['ssl_version'])) {
                 $curl_ssl = 1;
                 $curl_ssl_version = $curli['ssl_version'];
-            } else {
-                $curl_ssl = 0;
-                $curl_ssl_version = "";
             }
-        } else {
-            $curl_support = 0;
         }
 
         // SOAP support
@@ -173,25 +171,25 @@ class Install_DefaultPresenter extends BasePresenter
                 'title' => 'Rozšíření cURL',
                 'required' => FALSE,
                 'passed' => $curl_support,
-                'message' => $user_agent,
-                'errorMessage' => 'Není zapnuta podpora knihovny cURL.',
-                'description' => 'Je nutná pro vzdálenou komunikaci. Používá se pro komunikaci s ISDS, CzechPoint a hledání v systému ARES.',
+                'message' => $curl_version,
+                'errorMessage' => 'Není zapnuto rozšíření cURL.',
+                'description' => 'Je vyžadováno pro komunikaci se systémy ISDS a ARES.',
             ),
             array(
-                'title' => 'Podpora cURL SSL',
+                'title' => 'Implementace cURL SSL',
                 'required' => FALSE,
-                'passed' => $curl_support,
+                'passed' => !empty($curl_ssl_version),
                 'message' => $curl_ssl_version,
-                'errorMessage' => ($curl_support == 1) ? 'Není možné použít cURL k zabezpečené komunikaci přes SSL'
-                            : 'Není zapnuta podpora cURL.',
-                'description' => 'Pro vzdálenou komunikaci s ISDS a CzechPoint je potřeba šifrovaného spojení (SSL).',
+                'errorMessage' => ($curl_support == 1) ? 'Není možné použít cURL k zabezpečené komunikaci protokoly SSL/TLS'
+                            : '',
+                'description' => 'Pro komunikaci s ISDS je potřeba šifrovaného spojení.',
             ),
             array(
                 'title' => 'Rozšíření SOAP',
                 'required' => FALSE,
                 'passed' => $soap_support,
                 'message' => 'Ano',
-                'errorMessage' => 'Není zapnuta podpora knihovny SOAP (SoapClient)',
+                'errorMessage' => 'Není zapnuto rozšíření SOAP (SoapClient)',
                 'description' => 'Je potřeba pro komunikaci a práci s ISDS a CzechPoint.',
             ),
             array(
@@ -207,7 +205,7 @@ class Install_DefaultPresenter extends BasePresenter
                 'required' => FALSE,
                 'passed' => $imap_support,
                 'message' => $imap_version,
-                'errorMessage' => 'Není zapnuta podpora knihovny IMAP',
+                'errorMessage' => 'Není zapnuto rozšíření IMAP',
                 'description' => 'Je potřeba pro příjem emailových zpráv.',
             ),
             array(
@@ -256,7 +254,7 @@ class Install_DefaultPresenter extends BasePresenter
                 'message' => 'Povoleno',
                 'errorMessage' => 'Není možné zapisovat do logovací složky.',
                 'description' => 'Povolte zápis do složky /log/. Tato složka slouží k ukládání různých logovacích a chybových hlášek.<br / >
-                                  Není nutná. Pokud však chcete zaznamenávat chybové hlášky, je potřeba tuto složku k zápisu povolit.',
+                                  Není nutné. Pokud však chcete zaznamenávat chybové hlášky, je potřeba tuto složku k zápisu povolit.',
             ),
             array(
                 'title' => 'Zápis do složky dokumentů',
