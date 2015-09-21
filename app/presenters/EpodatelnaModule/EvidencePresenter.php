@@ -9,7 +9,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     private $hledat;
     private $Epodatelna;
     private $typ_evidence = null;
-    private $odpoved = null;
     protected $storage;
 
     public function startup()
@@ -73,7 +72,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             if (!empty($zprava->email_id)) {
                 // Nacteni originalu emailu
                 if (!empty($zprava->file_id)) {
-                    $original = Epodatelna_DefaultPresenter::nactiEmail($this->storage, $zprava->file_id);
+                    $original = Epodatelna_DefaultPresenter::nactiEmail($this->storage,
+                                    $zprava->file_id);
                 }
 
                 $subjekt->nazev_subjektu = isset($original['zprava']->from->personal) ? $original['zprava']->from->personal
@@ -103,7 +103,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 // Nacteni originalu DS
                 if (!empty($zprava->file_id)) {
                     $file_id = explode("-", $zprava->file_id);
-                    $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_id[0]);
+                    $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage,
+                                    $file_id[0]);
                     $original = unserialize($original);
 
                     // odebrat obsah priloh, aby to neotravovalo
@@ -129,7 +130,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
             $this->template->Original = $original;
 
-            $this->template->Identifikator = $this->Epodatelna->identifikator($zprava, $original);
+            $this->template->Identifikator = $this->Epodatelna->identifikator($zprava,
+                    $original);
         } else {
             $this->flashMessage('Požadovaná zpráva neexistuje!', 'warning');
             $this->redirect(':Epodatelna:Default:nove');
@@ -236,8 +238,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function actionHromadna()
     {
-        //echo "<pre>Vystupy \n\n\n\n";
-
         $data = $this->getHttpRequest()->getPost();
 
         $seznam = array();
@@ -249,9 +249,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             // vsechny
             $seznam = $data['volba_evidence'];
         }
-
-        //echo "<pre>"; print_r($data); exit;
-        //print_r($seznam); exit;
 
         if (count($seznam) > 0) {
             foreach ($seznam as $id => $typ_evidence) {
@@ -267,14 +264,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                             'predano_poznamka' => $data['predat_poznamka'][$id],
                             'predano_user' => null,
                             'predano_org' => null,
-                            'subjekt' => isset($data['subjekt'][$id]) ? $data['subjekt'][$id]
-                                        : null,
+                            'subjekt' => isset($data['subjekt'][$id]) ? $data['subjekt'][$id] : null,
                         );
 
                         if (isset($data['predat'][$id])) {
                             $predat_typ = substr($data['predat'][$id], 0, 1);
                             if ($predat_typ == "u") {
-                                $evidence['predano_user'] = (int) substr($data['predat'][$id], 1);
+                                $evidence['predano_user'] = (int) substr($data['predat'][$id],
+                                                1);
                             } else if ($predat_typ == "o") {
                                 $evidence['predano_org'] = (int) substr($data['predat'][$id], 1);
                             }
@@ -282,7 +279,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                         // try {
                         $cislo = $this->vytvorit($evidence);
-                        echo '<div class="evidence_report">Zpráva byla zaevidována ve spisové službě pod číslem "<a href="' . $this->link(':Spisovka:Dokumenty:detail', array("id" => $cislo['id'])) . '" target="_blank">' . $cislo['jid'] . '</a>".</div>';
+                        echo '<div class="evidence_report">Zpráva byla zaevidována ve spisové službě pod číslem "<a href="' . $this->link(':Spisovka:Dokumenty:detail',
+                                array("id" => $cislo['id'])) . '" target="_blank">' . $cislo['jid'] . '</a>".</div>';
                         /* } catch (Exception $e) {
                           echo '###Zprávu číslo '.$id.' se nepodařilo zaevidovat do spisové služby.';
                           echo ' CHYBA: '. $e->getMessage();
@@ -369,8 +367,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addHidden('predano_org');
         $form->addHidden('predano_poznamka');
 
-        $form->addHidden('odpoved')
-                ->setValue($this->odpoved);
         if ($this->typ_evidence == 'sberny_arch') {
             $form->addText('poradi', 'Pořadí dokumentu ve sberném archu:', 4, 4)
                             ->setValue(1)
@@ -420,7 +416,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 ->setValue($cas);
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
-                ->setValue('30')->addRule(Nette\Forms\Form::NUMERIC, 'Lhůta k vyřízení musí být číslo');
+                ->setValue('30')->addRule(Nette\Forms\Form::NUMERIC,
+                'Lhůta k vyřízení musí být číslo');
 
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
         if (!empty($zprava->email_id) && Settings::get('epodatelna_copy_email_into_documents_note'))
@@ -429,8 +426,10 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3)
                 ->setValue('Předáno z e-podatelny');
 
-        $form->addText('pocet_listu', 'Počet listů:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet listů musí být číslo');
-        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC, 'Počet příloh musí být číslo');
+        $form->addText('pocet_listu', 'Počet listů:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
+                'Počet listů musí být číslo');
+        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
+                'Počet příloh musí být číslo');
 
 
         $form->addSubmit('novy', 'Vytvořit')
@@ -478,50 +477,32 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         unset($data['predani_poznamka'], $data['dokument_id'], $data['epodatelna_id']);
 
         try {
-
-            //Nette\Diagnostics\Debugger::dump($_POST);
-            //Nette\Diagnostics\Debugger::dump($data); exit;
-
-            $CJ = new CisloJednaci();
-            //if ( !empty($data['odpoved']) ) {
-            //    $cjednaci = $CJ->nacti($data['odpoved']);
-            //    unset($data['odpoved']);
-            //} else {
-            //$cjednaci = $CJ->generuj(1); - z epodatelny
-            $cjednaci = $CJ->generuj(); // ve spisovkce
-            //}
-            //Nette\Diagnostics\Debugger::dump($cjednaci); exit;
-
-            $data['jid'] = $cjednaci->app_id . '-ESS-' . $dokument_id;
             $data['poradi'] = 1;
-            //$data['cislojednaci_id'] = $cjednaci->id;
-            //$data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
-            //$data['podaci_denik'] = $cjednaci->podaci_denik;
-            //$data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
-            //$data['podaci_denik_rok'] = $cjednaci->rok;
 
             // 1-email, 2-isds
             $data['zpusob_doruceni_id'] = $zprava->email_id ? 1 : 2;
-                    
-            $dokument = $Dokument->ulozit($data, $dokument_id, 1); //   array('dokument_id'=>0);// $Dokument->ulozit($data);
+
+            $predani = ['predano_user' => $data->predano_user, 'predano_org' => $data->predano_org,
+                'predano_poznamka' => $data->predano_poznamka];
+            unset($data->predano_user, $data->predano_org, $data->predano_poznamka);
+
+            $dokument = $Dokument->ulozit($data, $dokument_id);
 
             if ($dokument) {
 
                 // Ulozeni prilohy
-                if (!empty($zprava->email_id)) {
+                if ($zprava->email_id) {
                     $this->emailPrilohy($epodatelna_id, $dokument_id);
-                } else if (!empty($zprava->isds_id)) {
+                } else if ($zprava->isds_id) {
                     $this->isdsPrilohy($epodatelna_id, $dokument_id);
                 }
 
                 // Ulozeni adresy
                 if ($subjekty) {
                     $DokumentSubjekt = new DokumentSubjekt();
-                    foreach ($subjekty as $subjekt_id => $subjekt_status) {
-                        if ($subjekt_status == 'on') {
+                    foreach ($subjekty as $subjekt_id => $subjekt_status)
+                        if ($subjekt_status == 'on')
                             $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'O');
-                        }
-                    }
                 }
 
                 // Pridani informaci do epodatelny
@@ -535,8 +516,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 );
                 $this->Epodatelna->update($info, array(array('id=%i', $epodatelna_id)));
 
-
-                // Vytvoreni cyklu
                 $Workflow = new Workflow();
                 $Workflow->vytvorit($dokument_id, $predani_poznamka);
 
@@ -548,26 +527,27 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $rozdelany = Nette\Environment::getSession('s3_rozdelany');
                 unset($rozdelany->is, $rozdelany->dokument_id, $rozdelany);
 
-                if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
+                if (!empty($predani['predano_user']) || !empty($predani['predano_org'])) {
                     /* Dokument predan */
-                    $Workflow->predat($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
+                    $Workflow->predat($dokument_id, $predani['predano_user'],
+                            $predani['predano_org'], $predani['predano_poznamka']);
                     $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
 
-                    if (!empty($data['predano_user'])) {
-                        $user_info = UserModel::getIdentity($data['predano_user']);
+                    if (!empty($predani['predano_user'])) {
+                        $user_info = UserModel::getIdentity($predani['predano_user']);
                         $predano = Osoba::displayName($user_info);
-                    } else if (!empty($data['predano_org'])) {
+                    } else if (!empty($predani['predano_org'])) {
                         $Org = new Orgjednotka();
-                        $orgjednotka = $Org->getInfo($data['predano_org']);
+                        $orgjednotka = $Org->getInfo($predani['predano_org']);
                         $predano = @$orgjednotka->ciselna_rada . " - " . @$orgjednotka->plny_nazev;
                     }
                 } else {
-                    $predano = Osoba::displayName(@$this->user->getIdentity()->identity);
+                    $predano = Osoba::displayName($this->user->getIdentity()->identity);
                 }
 
                 if (!empty($zprava->email_id)) {
                     $email_info = array(
-                        'jid' => $data['jid'],
+                        'jid' => $dokument->jid,
                         'nazev' => $zprava->predmet,
                         'predano' => $predano
                     );
@@ -593,104 +573,94 @@ class Epodatelna_EvidencePresenter extends BasePresenter
      */
     public function vytvorit($data)
     {
-
         if (is_null($this->Epodatelna))
             $this->Epodatelna = new Epodatelna();
         $epodatelna_id = $data['epodatelna_id'];
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
-        if ($zprava) {
+        if (!$zprava)
+            throw new Exception('Nelze získat informace o zprávě!');
 
-            $Dokument = new Dokument();
+        $Dokument = new Dokument();
 
-            $dokument_data = array(
-                "nazev" => $data['nazev'],
-                "popis" => $data['popis'],
-                "stav" => 1,
-                "dokument_typ_id" => "1",
-                /* "cislo_jednaci_odesilatele" => $data['cislo_jednaci_odesilatele'], */
-                "datum_vzniku" => $zprava['doruceno_dne'],
-                "lhuta" => "30",
-                "poznamka" => $data['poznamka'],
-                'zpusob_doruceni_id' => $zprava->email_id ? 1 : 2
-            );
-            $dokument = $Dokument->ulozit($dokument_data);
+        $dokument_data = array(
+            "nazev" => $data['nazev'],
+            "popis" => $data['popis'],
+            "stav" => 1,
+            "dokument_typ_id" => "1",
+            /* "cislo_jednaci_odesilatele" => $data['cislo_jednaci_odesilatele'], */
+            "datum_vzniku" => $zprava['doruceno_dne'],
+            "lhuta" => "30",
+            "poznamka" => $data['poznamka'],
+            'zpusob_doruceni_id' => $zprava->email_id ? 1 : 2
+        );
+        $dokument = $Dokument->ulozit($dokument_data);
 
-            if ($dokument) {
+        if (!$dokument)
+            throw new Exception('Dokument se nepodařilo vytvořit!');
 
-                $dokument_id = $dokument->id;
+        $dokument_id = $dokument->id;
 
-                // Ulozeni prilohy
-                if (!empty($zprava->email_id)) {
-                    $this->emailPrilohy($epodatelna_id, $dokument_id);
-                } else if (!empty($zprava->isds_id)) {
-                    $this->isdsPrilohy($epodatelna_id, $dokument_id);
+        // Ulozeni prilohy
+        if (!empty($zprava->email_id)) {
+            $this->emailPrilohy($epodatelna_id, $dokument_id);
+        } else if (!empty($zprava->isds_id)) {
+            $this->isdsPrilohy($epodatelna_id, $dokument_id);
+        }
+
+        // Ulozeni adresy
+        if ($data['subjekt']) {
+            $DokumentSubjekt = new DokumentSubjekt();
+            foreach ($data['subjekt'] as $subjekt_id => $subjekt_status) {
+                if ($subjekt_status == 'on') {
+                    $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'O');
                 }
+            }
+        }
 
-                // Ulozeni adresy
-                if ($data['subjekt']) {
-                    $DokumentSubjekt = new DokumentSubjekt();
-                    foreach ($data['subjekt'] as $subjekt_id => $subjekt_status) {
-                        if ($subjekt_status == 'on') {
-                            $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'O');
-                        }
-                    }
-                }
+        // Pridani informaci do epodatelny
+        $epod_info = array(
+            'dokument_id' => $dokument_id,
+            'evidence' => 'spisovka',
+            'stav' => '10',
+            'stav_info' => 'Zpráva přidána do spisové služby jako ' . $dokument->jid
+        );
+        $this->Epodatelna->update($epod_info, array(array('id=%i', $epodatelna_id)));
 
-                // Pridani informaci do epodatelny
-                $epod_info = array(
-                    'dokument_id' => $dokument_id,
-                    'evidence' => 'spisovka',
-                    'stav' => '10',
-                    'stav_info' => 'Zpráva přidána do spisové služby jako ' . $dokument->jid
-                );
-                $this->Epodatelna->update($epod_info, array(array('id=%i', $epodatelna_id)));
+        $Workflow = new Workflow();
+        $Workflow->vytvorit($dokument_id, '');
 
-                // Pridani identifikatoru dokumentu
-                $CJ = new CisloJednaci();
-                $cjednaci = $CJ->generuj();
-                $data_after = array('jid' => $cjednaci->app_id . '-ESS-' . $dokument_id);
-                $Dokument->ulozit($data_after, $dokument_id); //
-                // Vytvoreni cyklu
-                $Workflow = new Workflow();
-                $Workflow->vytvorit($dokument_id, '');
+        $Log = new LogModel();
+        $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
-                $Log = new LogModel();
-                $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
+        if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
+            /* Dokument predan */
+            $Workflow->predat($dokument_id, $data['predano_user'], $data['predano_org'],
+                    $data['predano_poznamka']);
+            $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
 
-                if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
-                    /* Dokument predan */
-                    $Workflow->predat($dokument_id, $data['predano_user'], $data['predano_org'], $data['predano_poznamka']);
-                    $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
-
-                    if (!empty($data['predano_user'])) {
-                        $user_info = UserModel::getIdentity($data['predano_user']);
-                        $predano = Osoba::displayName($user_info);
-                    } else if (!empty($data['predano_org'])) {
-                        $Org = new Orgjednotka();
-                        $orgjednotka = $Org->getInfo($data['predano_org']);
-                        $predano = @$orgjednotka->ciselna_rada . " - " . @$orgjednotka->plny_nazev;
-                    }
-                } else {
-                    $predano = Osoba::displayName(@$this->user->getIdentity()->identity);
-                }
-
-                if (!empty($zprava->email_id)) {
-                    $email_info = array(
-                        'jid' => $data_after['jid'],
-                        'nazev' => $zprava->predmet,
-                        'predano' => $predano
-                    );
-                    EmailAvizo::epodatelna_zaevidovana($zprava->odesilatel, $email_info);
-                }
-
-                return array('jid' => $data_after['jid'], 'id' => $dokument_id);
-            } else {
-                throw new Exception('Dokument se nepodařilo vytvořit!');
+            if (!empty($data['predano_user'])) {
+                $user_info = UserModel::getIdentity($data['predano_user']);
+                $predano = Osoba::displayName($user_info);
+            } else if (!empty($data['predano_org'])) {
+                $Org = new Orgjednotka();
+                $orgjednotka = $Org->getInfo($data['predano_org']);
+                $predano = @$orgjednotka->ciselna_rada . " - " . @$orgjednotka->plny_nazev;
             }
         } else {
-            throw new Exception('Nelze získat informace o zprávě!');
+            $predano = Osoba::displayName(@$this->user->getIdentity()->identity);
         }
+
+        if (!empty($zprava->email_id)) {
+            $email_info = array(
+                'jid' => $dokument->jid,
+                'nazev' => $zprava->predmet,
+                'predano' => $predano
+            );
+            EmailAvizo::epodatelna_zaevidovana($zprava->odesilatel, $email_info);
+        }
+
+        return array('jid' => $dokument->jid, 'id' => $dokument_id);
     }
 
     private function emailPrilohy($epodatelna_id, $dokument_id)
@@ -997,7 +967,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 if ($hromadna) {
                     echo '###Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání emailových zpráv ze spisové služby.';
                 } else {
-                    $this->flashMessage('Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání emailových zpráv ze spisové služby.', 'warning');
+                    $this->flashMessage('Upozornění odesílateli se nepodařilo odeslat. Nebyl zjištěn adresát pro odesílání emailových zpráv ze spisové služby.',
+                            'warning');
                 }
             }
         }

@@ -1583,12 +1583,7 @@ class Dokument extends BaseModel
                     $data['vyrizeni_pocet_priloh'] = (int) $data['vyrizeni_pocet_priloh'];
                 }
             }
-            if (empty($data['jid'])) {
-                $unique_info = Nette\Environment::getVariable('unique_info');
-                $unique_part = explode('#', $unique_info);
-                $app_id = 'OSS-' . $unique_part[0];
-                $data['jid'] = $app_id . '-ESS-' . $dokument_id;
-            }
+                        
             if (isset($data['skartacni_lhuta']) && empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0)
                 $data['skartacni_lhuta'] = null;
 
@@ -1598,14 +1593,18 @@ class Dokument extends BaseModel
             $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
 
             $data['stav'] = isset($data['stav']) ? $data['stav'] : 1;
-            $dokument_id_new = $this->insert($data);
-            $new_row = $this->getInfo($dokument_id_new);
+            $data['jid'] = '';
+            
+            $dokument_id = $this->insert($data);
 
-            if ($new_row) {
-                return $new_row;
-            } else {
-                return false;
-            }
+            $unique_info = Nette\Environment::getVariable('unique_info');
+            $unique_part = explode('#', $unique_info);
+            $jid = "OSS-{$unique_part[0]}-ESS-$dokument_id";
+            $this->update(['jid' => $jid], "id = '$dokument_id'");
+            
+            $new_row = $this->getInfo($dokument_id);
+            return $new_row ?: false;
+            
         } else {
             // uprava existujiciho dokumentu
 
@@ -1629,13 +1628,6 @@ class Dokument extends BaseModel
                     $data->vyrizeni_pocet_priloh = null;
             }
 
-            if (empty($data['jid'])) {
-                $unique_info = Nette\Environment::getVariable('unique_info');
-                $unique_part = explode('#', $unique_info);
-                $app_id = 'OSS-' . $unique_part[0];
-                $data['jid'] = $app_id . '-ESS-' . $dokument_id;
-            }
-            
             if (array_key_exists('skartacni_lhuta', $data) && $data->skartacni_lhuta === '')
                 $data->skartacni_lhuta = null;
             if (array_key_exists('skartacni_znak', $data) && $data->skartacni_znak === '')

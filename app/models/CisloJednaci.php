@@ -6,7 +6,6 @@ class CisloJednaci extends BaseModel
     protected $name = 'cislo_jednaci';
     protected $primary = 'id';
     protected $info;
-    protected $unique;
     protected $urad;
     protected $user_info;
     protected $org;
@@ -23,17 +22,13 @@ class CisloJednaci extends BaseModel
 
         // pocatek cisla
         $this->pocatek_cisla = 1;
-        if (@$this->info->pocatek_cisla > 1) {
+        if ($this->info->pocatek_cisla > 1) {
             $count = $this->select()->count();
             if ($count == 0) {
                 $this->pocatek_cisla = isset($this->info->pocatek_cisla) ? $this->info->pocatek_cisla
                             : 1;
             }
         }
-
-        $unique_info = Nette\Environment::getVariable('unique_info');
-        $unique_part = explode('#', $unique_info);
-        $this->unique = 'OSS-' . $unique_part[0];
 
         $this->user_info = Nette\Environment::getUser()->getIdentity();
 
@@ -47,12 +42,6 @@ class CisloJednaci extends BaseModel
         }
 
         $this->pouzij_minuly_rok = isset($this->info->minuly_rok) && $this->info->minuly_rok == 1;
-    }
-
-    public function dejAppId()
-    {
-
-        return $this->unique;
     }
 
     /**
@@ -161,52 +150,31 @@ class CisloJednaci extends BaseModel
             }
         }
 
+        $tmp = new stdClass();
         if ($ulozit == 1) {
             unset($info['user'], $info['prijmeni'], $info['org']);
             $cjednaci_id = $this->insert($info);
-
-            $tmp = new stdClass();
             $tmp->id = $cjednaci_id;
-            $tmp->cislo_jednaci = $cislo_jednaci;
-            $tmp->rok = $info['rok'];
-            $tmp->poradove_cislo = $info['poradove_cislo'];
-            $tmp->podaci_denik = $info['podaci_denik'];
-            $tmp->app_id = $this->unique;
-            $tmp->urad = $this->urad->zkratka;
-            $tmp->urad_nazev = $this->urad->nazev;
-            $tmp->urad_poradi = $info['urad_poradi'];
-            $tmp->orgjednotka_id = !is_null($this->org) ? $this->org->id : null;
-            $tmp->orgjednotka = !is_null($this->org) ? $this->org->ciselna_rada : "";
-            $tmp->orgjednotka_poradi = $info['org_poradi'];
-            $tmp->user_id = $this->user_info->id;
-            $tmp->user = $this->user_info->username;
-            $tmp->user_poradi = $info['user_poradi'];
-            $tmp->prijmeni = Nette\Utils\Strings::webalize(@$this->user_info->identity->prijmeni);
-
-            return $tmp;
         } else {
-
-            $tmp = new stdClass();
             $tmp->id = isset($info['id']) ? $info['id'] : null;
-            $tmp->cislo_jednaci = $cislo_jednaci;
-            $tmp->rok = $info['rok'];
-            $tmp->poradove_cislo = $info['poradove_cislo'];
-            $tmp->podaci_denik = $info['podaci_denik'];
-            $tmp->app_id = $this->unique;
-            $tmp->urad = $this->urad->zkratka;
-            $tmp->urad_nazev = $this->urad->nazev;
-            $tmp->urad_poradi = $info['urad_poradi'];
-            $tmp->orgjednotka_id = !is_null($this->org) ? $this->org->id : null;
-            $tmp->orgjednotka = !is_null($this->org) ? $this->org->ciselna_rada : "";
-            $tmp->orgjednotka_poradi = $info['org_poradi'];
-            $tmp->user_id = $this->user_info->id;
-            $tmp->user = $this->user_info->username;
-            $tmp->user_poradi = $info['user_poradi'];
-            $tmp->prijmeni = Nette\Utils\Strings::webalize($this->user_info->identity->prijmeni);
-
-
-            return $tmp;
         }
+        
+        $tmp->cislo_jednaci = $cislo_jednaci;
+        $tmp->rok = $info['rok'];
+        $tmp->poradove_cislo = $info['poradove_cislo'];
+        $tmp->podaci_denik = $info['podaci_denik'];
+        $tmp->urad = $this->urad->zkratka;
+        $tmp->urad_nazev = $this->urad->nazev;
+        $tmp->urad_poradi = $info['urad_poradi'];
+        $tmp->orgjednotka_id = !is_null($this->org) ? $this->org->id : null;
+        $tmp->orgjednotka = !is_null($this->org) ? $this->org->ciselna_rada : "";
+        $tmp->orgjednotka_poradi = $info['org_poradi'];
+        $tmp->user_id = $this->user_info->id;
+        $tmp->user = $this->user_info->username;
+        $tmp->user_poradi = $info['user_poradi'];
+        $tmp->prijmeni = Nette\Utils\Strings::webalize(@$this->user_info->identity->prijmeni);
+
+        return $tmp;
     }
 
     public function nacti($cjednaci_id, $generuj = 0)

@@ -1395,8 +1395,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             // Poznamka: c.j. se v pripade noveho dokumentu generuje az na pokyn uzivatele
             // a u odpovedi jsou sloupce c.j. vyplneny uz pri vytvareni odpovedi
-            $CJ = new CisloJednaci();
-            $data['jid'] = $CJ->dejAppId() . "-ESS-$dokument_id";
 
             $dd = clone $data; // document data
             unset($dd['odpoved'], $dd['predano_user'], $dd['predano_org'], $dd['predano_poznamka']);
