@@ -109,14 +109,15 @@ try {
     Nette\Environment::setVariable('app_info', $app_info);
     unset($app_info);
 
-    $unique_info = @file_get_contents(CLIENT_DIR . '/configs/install');
-    if ($unique_info === FALSE) {
+    $install_info = @file_get_contents(CLIENT_DIR . '/configs/install');
+    if ($install_info === FALSE) {
         define('APPLICATION_INSTALL', 1);
         @ini_set('memory_limit', '128M');
     } else {
-        Nette\Environment::setVariable('unique_info', $unique_info);
+        $app_id = substr($install_info, 0, strpos($install_info, '#'));
+        Nette\Environment::setVariable('app_id', $app_id);
     }
-    unset($unique_info);
+    unset($install_info);
 
 
 // 3b) Load database

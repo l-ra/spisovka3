@@ -18,10 +18,11 @@ class SurveyAgent
         $client_config = Nette\Environment::getVariable('client_config');
         $klient_info = $client_config->urad;
 
-        $unique_info = Nette\Environment::getVariable('unique_info');
-        $unique_part = explode('#', $unique_info);
+        // je to ID instalace, bohuzel neni moc jedinecne
+        // pokud jsou dve spisovky instalovany behem hodiny, budou mit stejne toto ID
+        $app_id = Nette\Environment::getVariable('app_id'); 
 
-        $zprava = "id={$unique_part[0]}\n" . // je to install_id
+        $zprava = "id={$app_id}\n" . 
                 "zkratka={$klient_info->zkratka}\n" .
                 "name={$klient_info->nazev}\n" .
                 "ic={$klient_info->firma->ico}\n" .

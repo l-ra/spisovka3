@@ -1597,9 +1597,8 @@ class Dokument extends BaseModel
             
             $dokument_id = $this->insert($data);
 
-            $unique_info = Nette\Environment::getVariable('unique_info');
-            $unique_part = explode('#', $unique_info);
-            $jid = "OSS-{$unique_part[0]}-ESS-$dokument_id";
+            $app_id = Nette\Environment::getVariable('app_id');
+            $jid = "OSS-{$app_id}-ESS-$dokument_id";
             $this->update(['jid' => $jid], "id = '$dokument_id'");
             
             $new_row = $this->getInfo($dokument_id);
