@@ -403,15 +403,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
             }
 
-
-            // Kontrola lhuty a skartace
-            if ($dokument->lhuta_stav == 2 && $dokument->stav_dokumentu < 4) {
-                $this->flashMessage('Vypršela lhůta k vyřízení! Vyřiďte neprodleně tento dokument.',
-                        'warning');
-            } else if ($dokument->lhuta_stav == 1 && $dokument->stav_dokumentu < 4) {
-                $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyřiďte co nejrychleji tento dokument.');
-            }
-
             // Kontrola existence nazvu
             if ($this->template->Pridelen && $this->template->AccessEdit) {
                 if ($dokument->stav_dokumentu >= 2 && !Acl::isInRole('podatelna') && (empty($dokument->nazev) || $dokument->nazev == "(bez názvu)" )) {
@@ -448,6 +439,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function renderDetail()
     {
         $this->template->typy_dokumentu = Dokument::typDokumentu();
+        
+        $dokument = $this->template->Dok;
+        // Kontrola lhuty a skartace
+        if ($dokument->lhuta_stav == 2 && $dokument->stav_dokumentu < 4) {
+            $this->flashMessage('Vypršela lhůta k vyřízení! Vyřiďte neprodleně tento dokument.',
+                    'warning');
+        } else if ($dokument->lhuta_stav == 1 && $dokument->stav_dokumentu < 4) {
+            $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyřiďte co nejrychleji tento dokument.');
+        }
     }
 
     protected function actionAkce($data)
