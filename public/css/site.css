@@ -909,7 +909,7 @@ td.seznam-sestav-pruh-ikon a {
 
 #tisk {
     position: absolute;
-    width: 480px;
+    width: 470px;
     top: 0px;
     left: 500px;
     margin: 10px -50px 0px 0px;
@@ -918,7 +918,9 @@ td.seznam-sestav-pruh-ikon a {
 
 #tisk a {
     text-decoration: none;
-    margin-right: 10px;
+    margin: 0px;
+    padding: 0px 5px;
+    background-color: white;
 }
 
 /* ******************************************************************* */
