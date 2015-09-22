@@ -314,19 +314,19 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $novy = $this->getParameter('novy', 0);
 
         if ($novy == 1) {
-            echo '###predano###' . $dokument_id . '#' . $user_id . '#' . $orgjednotka_id . '#' . $poznamka;
+            echo "###predano###$dokument_id#$user_id#$orgjednotka_id#";
 
-            $osoba = UserModel::getIdentity($user_id);
-            $Orgjednotka = new Orgjednotka();
-
-            echo '#' . Osoba::displayName($osoba) . '#';
-            try {
+            if ($user_id !== null) {
+                $osoba = UserModel::getIdentity($user_id);
+                echo Osoba::displayName($osoba);
+            }
+            else {
+                $Orgjednotka = new Orgjednotka();
                 $org = $Orgjednotka->getInfo($orgjednotka_id);
-                echo $org->zkraceny_nazev;
-            } catch (Exception $e) {
-                $e->getMessage();
+                echo "organizační jednotce<br/>" . $org->zkraceny_nazev;
             }
             $this->terminate();
+            
         } else {
             $Workflow = new Workflow();
             if ($Workflow->predat($dokument_id, $user_id, $orgjednotka_id, $poznamka)) {

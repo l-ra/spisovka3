@@ -193,9 +193,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->template->Typ_evidence = $this->typ_evidence;
         }
 
-        $user = UserModel::getUser($this->user->getIdentity()->id, 1);
-        $this->template->Prideleno = Osoba::displayName($user->identity);
-
         $CJ = new CisloJednaci();
         $this->template->cjednaci = $CJ->generuj();
 
@@ -423,8 +420,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         if (!empty($zprava->email_id) && Settings::get('epodatelna_copy_email_into_documents_note'))
             $form['poznamka']->setValue(@html_entity_decode($zprava->popis));
 
-        $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3)
-                ->setValue('Předáno z e-podatelny');
+        $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet listů musí být číslo');

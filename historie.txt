@@ -72,6 +72,7 @@ Jiné změny:
   dokumentu, což se standardně děje při evidování e-mailu v e-podatelně.
   E-mail je součástí dokumentu v příloze, takže je zbytečné, aby byl
   ještě v poznámce.
+- drobné úpravy formuláře detailu dokumentu
 - v detailu dokumentu byla informace "Dokument není evidován" změněna
   na "Dokument nemá přiděleno číslo jednací"
 - v detailu dokumentu mohou být položky v seznamu příkazů jinak seřazeny. Dále

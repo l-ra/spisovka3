@@ -147,22 +147,16 @@
                 <span style="font-weight: normal;">Typ přílohy: </span>{$novyForm['typ_prilohy']->control}
             </dd>
         </dl>
-    </div>
-
-    <div n:if="!isset($odpoved_na_dokument)" class="dokument_blok_sedy">
-        <div>Předání / vyřízení</div>
-        <dl class="detail_item">
-            <dt>Přidělen:</dt>
-            <dd>
-                {$Prideleno}
-            </dd>
-        </dl>
-        <dl class="detail_item">
+        <dl class="detail_item" n:if="isset($novyForm['lhuta'])">
             <dt>{$novyForm['lhuta']->label}</dt>
             <dd>{$novyForm['lhuta']->control} dní</dd>
         </dl>
+    </div>
+
+    <div n:if="!isset($odpoved_na_dokument)" class="dokument_blok_sedy">
+        <div class="h2">Předání</div>
         <dl class="detail_item">
-            <dt>Poznámka:</dt>
+            <dt>Poznámka pro příjemce:</dt>
             <dd>{$novyForm['predani_poznamka']->control}</dd>
         </dl>
         <dl class="detail_item">

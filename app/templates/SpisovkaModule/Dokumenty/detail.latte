@@ -348,6 +348,10 @@
             <dt>Počet listů / příloh / typ přílohy:</dt>
             <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd>
         </dl>
+        <dl class="detail_item">
+            <dt>Lhůta k vyřízení:</dt>
+            <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd>
+        </dl>
         {if !empty($Dok->identifikator)}
         <dl class="detail_item">
             <dt>Identifikátor epodatelny:</dt>
@@ -498,7 +502,7 @@
     {/if}
 
     <div class="dokument_blok_sedy">
-        <div class="h2">Předání</div>
+        <div class="h2">Vlastnictví</div>
         {if $Dok->typ_dokumentu->smer == 1}
         {foreach $Dok->workflow as $workflow}
         {if $workflow->stav_dokumentu==1}
@@ -545,8 +549,8 @@
             <dt>Přidělen dne:</dt>
             <dd>{$Dok->prideleno->date|edatetime}</dd>
         </dl>
-        <dl class="detail_item">
-            <dt>Poznámka pro přiděleného:</dt>
+        <dl class="detail_item" n:if="$Dok->prideleno->poznamka">
+            <dt>Poznámka:</dt>
             <dd>{!$Dok->prideleno->poznamka|enl2br}&nbsp;</dd>
         </dl>
         {/if}
@@ -570,15 +574,11 @@
             <dt>Předán dne:</dt>
             <dd>{$Dok->predano->date|edatetime}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl class="detail_item" n:if="$Dok->predano->poznamka">
             <dt>Poznámka pro příjemce:</dt>
             <dd>{!$Dok->predano->poznamka|enl2br}&nbsp;</dd>
         </dl>
         {/if}
-        <dl class="detail_item">
-            <dt>Lhůta k vyřízení:</dt>
-            <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd>
-        </dl>
     </div>
     
     {if !empty($Zapujcka->id)}

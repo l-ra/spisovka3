@@ -1250,11 +1250,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     protected function createComponentNovyForm()
     {
         $form = $this->createNovyOrOdpovedForm();
+        
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->addRule(Nette\Forms\Form::FILLED, 'Lhůta k vyřízení musí být vyplněna!')
                 ->addRule(Nette\Forms\Form::NUMERIC, 'Lhůta k vyřízení musí být číslo')
                 ->setValue('30');
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
+        $form->addHidden('predano_user');
+        $form->addHidden('predano_org');
 
         $form['zpusob_doruceni_id']->setDefaultValue(5); // v listinné podobě
 
@@ -1294,9 +1297,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue($dokument_id);
         $form->addHidden('odpoved')
                 ->setValue($this->odpoved === true ? 1 : 0);
-        $form->addHidden('predano_user');
-        $form->addHidden('predano_org');
-        $form->addHidden('predano_poznamka');
 
         if ($this->typ_evidence == 'sberny_arch') {
             $form->addText('poradi', 'Pořadí dokumentu ve sberném archu:', 4, 4)
@@ -1373,11 +1373,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $data['datum_vzniku'] = $data['datum_vzniku'] . " " . $data['datum_vzniku_cas'];
         unset($data['datum_vzniku_cas']);
 
-        // predani - neni ve formulari odpovedi
-        $predani_poznamka = isset($data['predani_poznamka']) ? $data['predani_poznamka'] : '';
-
-        unset($data['predani_poznamka'], $data['id'], $data['version']);
-
         try {
 
             // [P.L.] 2012-04-13   Pridany zakladni kontroly
@@ -1397,12 +1392,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             // a u odpovedi jsou sloupce c.j. vyplneny uz pri vytvareni odpovedi
 
             $dd = clone $data; // document data
-            unset($dd['odpoved'], $dd['predano_user'], $dd['predano_org'], $dd['predano_poznamka']);
+            unset($dd['id'], $dd['odpoved'], $dd['predano_user'], $dd['predano_org'], $dd['predani_poznamka']);
             $dokument = $Dokument->ulozit($dd, $dokument_id);
 
             if ($dokument) {
                 $Workflow = new Workflow();
-                $Workflow->vytvorit($dokument_id, $predani_poznamka);
+                $Workflow->vytvorit($dokument_id);
 
                 $Log = new LogModel();
                 $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
@@ -1444,7 +1439,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
                         /* Dokument predan */
                         $Workflow->predat($dokument_id, $data['predano_user'],
-                                $data['predano_org'], $data['predano_poznamka']);
+                                $data['predano_org'], $data['predani_poznamka']);
                         $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
                     }
 

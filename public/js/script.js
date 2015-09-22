@@ -169,7 +169,7 @@ $(function() {
             if ( ui.item.id.substring(0,1) == "u" ) {
                 $('#frmnovyForm-predano_user').val(ui.item.id.substr(1));
                 $('#frmnovyForm-predano_org').val('');
-                $('#predano').html("<dl class=\"detail_item\"><dt>Předán:</dt><dd>"+ui.item.nazev+"<br />&nbsp;</dd></dl>");
+                $('#predano').html("<dl class=\"detail_item\"><dt>Předán:</dt><dd>"+ui.item.nazev+"</dd></dl>");
             } else if ( ui.item.id.substring(0,1) == "o" ) {
                 $('#frmnovyForm-predano_user').val('');
                 $('#frmnovyForm-predano_org').val(ui.item.id.substr(1));
@@ -569,9 +569,11 @@ spisVytvoritSubmit = function (button) {
 
 osobaVybrana = function (elm) {
 
-    poznamka = document.getElementById('frmpred-poznamka').value;
-    poznamka = encodeURI(poznamka);
-    url = elm.href + '&poznamka='+ poznamka;
+    url = elm.href;
+    poznamka = $('#frmpred-poznamka').val();
+    if (poznamka) {
+        url = url + '&poznamka=' + encodeURI(poznamka);
+    }
 
     showSpinner();
     
@@ -585,8 +587,7 @@ osobaVybrana = function (elm) {
             part = data.split('#');
             $('#frmnovyForm-predano_user').val(part[1]);
             $('#frmnovyForm-predano_org').val(part[2]);
-            $('#frmnovyForm-predano_poznamka').val(part[3]);
-            $('#predano').html("<dl class=\"detail_item\"><dt>Předán:</dt><dd>"+part[5]+"<br />"+part[4]+"</dd></dl><dl class=\"detail_item\"><dt>Poznámka pro předávajícího:</dt><dd>"+part[3]+"&nbsp;</dd></dl>");
+            $('#predano').html("<dl class=\"detail_item\"><dt>Předán:</dt><dd>"+part[3]+"</dd></dl>");
             closeDialog();
         } else {
             $('#dialog').html(data);
