@@ -3,7 +3,7 @@
 class Admin_SubjektyPresenter extends SubjektyPresenter
 {
 
-    private $hledat;
+    public $hledat;
 
     // Nejpreve prepsane metody z parent tridy
 

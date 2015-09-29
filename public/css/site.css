@@ -890,7 +890,7 @@ td.seznam-sestav-pruh-ikon a {
     text-align: right;
 }
 #search form {
-    margin: 0px;
+    margin: 0px 0px 5px 0px;
 }
 
 #search #frmsearchForm-dotaz {
@@ -903,7 +903,7 @@ td.seznam-sestav-pruh-ikon a {
     color: white; font-weight: bold;
 }
 #search_advanced {
-    margin: 5px !important;
+    margin: 5px 0px;
     margin: 0px;
 }
 

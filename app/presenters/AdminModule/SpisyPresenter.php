@@ -6,7 +6,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
     private $spis_plan;
-    private $hledat;
+    public $hledat;
     private $pdf_output = 0;
 
     public function startup()
@@ -113,7 +113,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     public function renderSeznam($hledat = null)
     {
-
+        $this->hledat = $hledat;
+        
         $Spisy = new Spis();
         $spis_id = null;
 
@@ -495,8 +496,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     protected function createComponentSearchForm()
     {
-
-        $hledat = !is_null($this->hledat) ? $this->hledat : '';
+        $hledat = $this->hledat ?: '';
 
         $form = new Nette\Application\UI\Form();
         $form->addText('dotaz', 'Hledat:', 20, 100)

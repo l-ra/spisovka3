@@ -68,12 +68,6 @@
     #kontrola .failed td.th {
         background-image: url('../images/assets/failed.gif');
     }
-
-    #kontrola .description td {
-        border-top: none !important;
-        padding: 0 10px 10px 50px;
-        color: #555;
-    }
         
     .update_site {
         border: 1px #000000 solid;

@@ -60,6 +60,8 @@ Jiné změny:
   verzích se typ určoval zjednodušeně pouze podle přípony souboru.
 - upraven vzhled nápovědy a nyní se nápověda zobrazuje v modálním okně
 - oprávnění pro nápovědu bylo odstraněno, nápověda je vždy přístupná
+- v administraci přidáno zrušení hledání, podobně jako tomu je v seznamu
+  dokumentů
 - hledání v subjektech v administraci nyní hledá i podle ulice
 - mezi stavy subjektu "neaktivní" a "zrušený" nebyl z hlediska fungování
   programu rozdíl. Stav "zrušený" byl odstraněn.

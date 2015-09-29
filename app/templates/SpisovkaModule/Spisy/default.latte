@@ -16,6 +16,7 @@
 
     <div id="search">
         {control searchForm}
+        <a n:if="$presenter->getParameter('hledat')" n:href="this" style="color:#ff0000;">Zrušit vyhledávání</a>    
     </div>
     <br class="clear" />
     <div id="dokumenty">

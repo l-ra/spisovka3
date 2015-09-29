@@ -3,7 +3,7 @@
 class Admin_OrgjednotkyPresenter extends BasePresenter
 {
 
-    private $hledat;
+    public $hledat;
 
     public function renderSeznam($hledat = null)
     {
