@@ -28,6 +28,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         $this->template->force_https = Settings::get('router_force_https', false);
         $this->template->users_can_change_their_password = Settings::get('users_can_change_their_password', true);
+        $this->template->login_redirect_homepage = Settings::get('login_redirect_homepage', false);
         $this->template->kopirovat_email_do_poznamky = Settings::get('epodatelna_copy_email_into_documents_note');
         $this->template->povolit_predani_vyrizeneho_dokumentu = Settings::get('spisovka_allow_forward_finished_documents', false);
                 
@@ -219,6 +220,8 @@ class Admin_NastaveniPresenter extends BasePresenter
                 ->setValue(Settings::get('router_force_https', false));
         $form1->addCheckBox('users_can_change_their_password', 'Uživatelé mohou měnit své heslo')
                 ->setValue(Settings::get('users_can_change_their_password', true));
+        $form1->addCheckBox('login_redirect_homepage', 'Po přihlášení přesměrovat na domovskou stránku')
+                ->setValue(Settings::get('login_redirect_homepage', false));
         $form1->addCheckBox('kopirovat_email_do_poznamky', 'Kopírovat obsah e-mailu do poznámky dokumentu')
                 ->setValue(Settings::get('epodatelna_copy_email_into_documents_note'));
         $form1->addCheckBox('povolit_predani', 'Povolit předání vyřízeného dokumentu')
@@ -260,6 +263,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         Settings::set('router_force_https', $data['force_https']);
         Settings::set('users_can_change_their_password', $data['users_can_change_their_password']);
+        Settings::set('login_redirect_homepage', $data['login_redirect_homepage']);
         Settings::set('epodatelna_copy_email_into_documents_note', $data['kopirovat_email_do_poznamky']);
         Settings::set('spisovka_allow_forward_finished_documents', $data['povolit_predani']);
 

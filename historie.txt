@@ -27,6 +27,7 @@ Nové funkce:
 
   V administraci:
 - je možné nastavit, zda si uživatelé mohou měnit svoje hesla
+- je možné nastavit, jak se má provést přesměrování po přihlášení, viz nápověda
 - je možné povolit předávání vyřízených dokumentů, viz nápověda
 - lze fitrovat subjekty podle stavu
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
