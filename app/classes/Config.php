@@ -107,8 +107,15 @@ class ConfigClient extends Config
     public function __construct()
     {
         parent::__construct('klient');
+        
+        if (!in_array($this->data->cislo_jednaci->typ_evidence, ['priorace', 'sberny_arch']))
+            throw new \Exception (__METHOD__ . '() - chybné nastavení typu evidence');
+        
+        // Toto nastaveni nebylo v config.ini při instalaci aplikace
+        // Týká se pouze sběrného archu
+        if (empty($this->data->cislo_jednaci->oddelovac))
+            $this->data->cislo_jednaci->oddelovac = '/';
     }
-
 }
 
 class ConfigDatabase extends Config

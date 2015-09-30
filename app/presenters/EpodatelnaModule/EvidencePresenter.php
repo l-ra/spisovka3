@@ -14,12 +14,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     public function startup()
     {
         $client_config = Nette\Environment::getVariable('client_config');
-        $this->typ_evidence = 0;
-        if (isset($client_config->cislo_jednaci->typ_evidence)) {
-            $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
-        } else {
-            $this->typ_evidence = 'priorace';
-        }
+        $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
 
         parent::startup();
     }

@@ -150,7 +150,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         if ($CJ->typ_evidence != 'priorace') {
             $form1->addText('oddelovac', 'Znak oddělovače pořadového čísla:', 3, 1)
-                    ->setValue(!isset($CJ->oddelovac) ? '/' : $CJ->oddelovac );
+                    ->setValue($CJ->oddelovac);
         }
 
         $form1->addRadioList('typ_deniku', 'Podací deník:', array('urad' => 'společný pro celý úřad', 'org' => 'samostatný pro každou organizační jednotku'))

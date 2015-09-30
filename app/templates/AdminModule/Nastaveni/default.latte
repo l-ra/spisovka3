@@ -67,7 +67,7 @@
         {/if}
         <dl class="detail_item">
             <dt>Ukázka podoby:</dt>
-            <dd>{$Ukazka->cislo_jednaci}{if $CisloJednaci->typ_evidence == 'sberny_arch'}{if isset($CisloJednaci->oddelovac)}{$CisloJednaci->oddelovac}{else}/{/if}1{/if}&nbsp;</dd>
+            <dd>{$Ukazka->cislo_jednaci}{if $CisloJednaci->typ_evidence == 'sberny_arch'}{$CisloJednaci->oddelovac}1{/if}&nbsp;</dd>
         </dl>
         <dl class="detail_item">
             <dt>Typ evidence:</dt>
