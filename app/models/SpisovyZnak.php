@@ -89,30 +89,20 @@ class SpisovyZnak extends TreeModel
 
     public function vytvorit($data)
     {
-
         $data['stav'] = 1;
+        $user_id = Nette\Environment::getUser()->getIdentity()->id;
         $data['date_created'] = new DateTime();
-        $data['user_created'] = (int) Nette\Environment::getUser()->getIdentity()->id;
+        $data['user_created'] = $user_id;
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = (int) Nette\Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = $user_id;
 
-        if (empty($data['spousteci_udalost_id']))
-            $data['spousteci_udalost_id'] = 3;
-        if (!isset($data['parent_id']))
-            $data['parent_id'] = null;
         if (empty($data['parent_id']))
             $data['parent_id'] = null;
 
-        if (!empty($data['skartacni_lhuta']))
-            $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
-        if (empty($data['skartacni_lhuta']))
+        if ($data['skartacni_lhuta'] === '')
             $data['skartacni_lhuta'] = null;
-        if (!empty($data['spousteci_udalost_id']))
-            $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
-        if (!empty($data['stav']))
-            $data['stav'] = (int) $data['stav'];
-        if (!empty($data['selected']))
-            $data['selected'] = (int) $data['selected'];
+        if (!isset($data['spousteci_udalost_id']))
+            $data['spousteci_udalost_id'] = 3;
 
         $part = explode(".", $data['nazev']);
         if (count($part) > 0) {

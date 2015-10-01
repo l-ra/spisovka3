@@ -222,7 +222,7 @@ class Admin_SpisznakPresenter extends BasePresenter
             $this->flashMessage($e->getMessage(), 'warning');
         }
 
-        $this->redirect(':Admin:Spisznak:detail', array('id' => $spisznak_id));
+        $this->redirect('detail', array('id' => $spisznak_id));
     }
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
@@ -233,7 +233,7 @@ class Admin_SpisznakPresenter extends BasePresenter
 
     public function stornoNovyClicked()
     {
-        $this->redirect(':Admin:Spisznak:seznam');
+        $this->redirect('seznam');
     }
 
     protected function createComponentNovyForm()
@@ -254,15 +254,14 @@ class Admin_SpisznakPresenter extends BasePresenter
                 ->setValue(3); // Standardni udalost je "Skartační lhůta začíná plynout po uzavření dokumentu."
         $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
         $form1->addSelect('selected', 'Možnost vybrat:', array("1" => "ano", "0" => "ne"));
-        $form1->addSubmit('vytvorit', 'Vytvořit')
-                ->onClick[] = array($this, 'vytvoritClicked');
-        $form1->addSubmit('vytvorit_a_novy', 'Vytvořit spisový znak a založit nový')
-                ->onClick[] = array($this, 'vytvoritanovyClicked');
+
+        $form1->addSubmit('vytvorit', 'Vytvořit');
+        $form1->addSubmit('vytvorit_a_novy', 'Vytvořit spisový znak a založit nový');
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoNovyClicked');
 
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
+        $form1->onSuccess[] = array($this, 'vytvoritSucceeded');
 
         $renderer = $form1->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
@@ -273,40 +272,18 @@ class Admin_SpisznakPresenter extends BasePresenter
         return $form1;
     }
 
-    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function vytvoritSucceeded(Nette\Application\UI\Form $form, $data)
     {
-        $data = $button->getForm()->getValues();
-
         $SpisovyZnak = new SpisovyZnak();
 
         try {
             $spisznak_id = $SpisovyZnak->vytvorit($data);
-            if (is_object($spisznak_id)) {
-                $this->flashMessage('Spisový znak "' . $data['nazev'] . '" se nepodařilo vytvořit.',
-                        'warning');
-                $this->flashMessage($spisznak_id->getMessage(), 'warning');
-                //$this->redirect(':Admin:Spisznak:detail',array('id'=>$spisznak_id));
-            } else {
-                $this->flashMessage('Spisový znak  "' . $data['nazev'] . '" byl vytvořen.');
-                $this->redirect(':Admin:Spisznak:detail', array('id' => $spisznak_id));
-            }
-        } catch (DibiException $e) {
-            $this->flashMessage('Spisový znak "' . $data['nazev'] . '" se nepodařilo vytvořit.',
-                    'warning');
-            $this->flashMessage($e->getMessage(), 'warning');
-        }
-    }
-
-    public function vytvoritanovyClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $SpisovyZnak = new SpisovyZnak();
-
-        try {
-            $SpisovyZnak->vytvorit($data);
-            $this->flashMessage('Spisový znak "' . $data['nazev'] . '"  byl vytvořen.');
-            $this->redirect(':Admin:Spisznak:novy');
+            $this->flashMessage('Spisový znak  "' . $data['nazev'] . '" byl vytvořen.');
+            $submit = $form->isSubmitted();
+            if ($submit->name == 'vytvorit_a_novy')
+                $this->redirect('novy');
+            else
+                $this->redirect('detail', ['id' => $spisznak_id]);
         } catch (DibiException $e) {
             $this->flashMessage('Spisový znak "' . $data['nazev'] . '" se nepodařilo vytvořit.',
                     'warning');
