@@ -54,7 +54,7 @@
         <tr>
             <td colspan="5">
                 {!=str_repeat("&nbsp;", (5*$spis->uroven)+15)}
-                <strong>{$dok->cislo_jednaci}</strong> - {$dok->nazev}
+                <strong>{$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}</strong> - {$dok->nazev}
             </td>
         </tr>
         {/foreach}
