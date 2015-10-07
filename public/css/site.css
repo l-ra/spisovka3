@@ -159,7 +159,7 @@ form {
 }
 
 #content h2 {
-    margin: 0px 20px 20px 20px;
+    margin: 0px 0px 20px 0px;
 
 }
 
@@ -172,7 +172,8 @@ form {
 
 #dialog .blok_menu,
 #content .blok_menu {
-    padding: 20px;
+    padding: 20px 20px 0px 20px;
+    margin-bottom: 20px;
     border-top: 1px dotted #c0c0c0;
 }
 
@@ -254,7 +255,6 @@ form {
 
 #content dt {
     float: left;
-    position: relative;
     width: 200px;
     text-align: right;
     margin-right: 20px;
@@ -262,7 +262,6 @@ form {
 
 #dialog dt {
     float: left;
-    position: relative;
     width: 120px;
     text-align: right;
     margin-right: 20px;
@@ -275,7 +274,6 @@ form {
 #dialog dt.dt_dialog,
 #content dt.dt_dialog {
     float: left;
-    position: static;
     width: 200px;
     text-align: right;
     margin-right: 20px;
@@ -300,20 +298,17 @@ form {
 #content dd.pravidlo {
     margin-left: 220px;
     font-weight: normal;
-    position: relative;
     padding-bottom: 5px;
     border-bottom: 1px #c0c0c0 dashed;
 }
 
 #content dd.pravidlo .opravneni_volba_head {
     float: right;
-    position: relative;
     width: 150px;
     text-align: right;
 }
 #content dd.pravidlo .opravneni_volba {
     float: right;
-    position: relative;
     width: 50px;
     text-align: right;
 }
@@ -415,7 +410,6 @@ label.required {
 /* dokument_blok_subjekty jsou bez výplně pozadí - tedy pozadí bude bílé */
 
 .dokument_blok_hlavni, .dokument_blok_sedy, .dokument_blok_subjekty {
-    position: relative;
     padding: 5px; margin-bottom: 10px;    
 }
 
@@ -462,7 +456,6 @@ label.required {
 }
 
 .dokument_blok_menu {
-    position: relative;
     padding: 10px 10px;
     margin: 0px; margin-bottom: 10px;
     background: #f0f0f0 ;
@@ -482,7 +475,6 @@ label.required {
 }
 
 #hromadna_akce {
-    position: relative;
     padding: 10px 10px;
     margin: 0px; margin-bottom: 10px;
     background-color: #03406A;
@@ -499,25 +491,6 @@ label.required {
     cursor: pointer;
 }
 
-/* tlacitko na ovladani okna */
-/* Opravovano pro IE6 v externim .css */
-.toggler, .toogler_max {
-  position: absolute;
-  right: 10px; /* posunuto pro IE6 kvuli okrajum */
-  top: 6px;
-  width: 15px;
-  height: 15px;
-  background: transparent none no-repeat center center;
-  font-size: 0px;
-}
-
-/* tlacitko minimalizovat */
-.toggler {
-  background-image: url('../images/icons/window-minimize.png');
-}
-.toggler_max {
-  background-image: url('../images/icons/window-maximize.png');
-}
 
 /* ***************************************************************** */
 /* *** BOTTOM LAYOUT *** */
@@ -663,7 +636,6 @@ label.required {
 #form_login label {
     text-align: right;
     display: inline-block;
-    /*position: relative;*/
     width: 150px;
     padding-right: 10px;
     padding-bottom: 10px;
@@ -790,7 +762,6 @@ td.seznam-sestav-pruh-ikon a {
     float: left;
     width: 40px;
     text-align: right;
-    position: static;
     color: #808080;
     margin: 0px; padding: 0px;
     margin-right: 5px;
@@ -849,9 +820,7 @@ td.seznam-sestav-pruh-ikon a {
 /* *** FILTR cONTROL *** */
 #filtr {
     float: left;
-    width: 45%;
-    position: relative;
-    margin: 20px 0px;
+    margin-bottom: 15px;
     text-align: left;
 }
 #filtr #frmfiltrForm-filtr {
@@ -885,8 +854,7 @@ td.seznam-sestav-pruh-ikon a {
 /* *** SEARCH cONTROL *** */
 #search {
     float: right;
-    position: relative;
-    margin: 20px 0px;
+    margin-bottom: 15px;
     text-align: right;
 }
 #search form {
@@ -909,11 +877,8 @@ td.seznam-sestav-pruh-ikon a {
 
 #tisk {
     position: absolute;
-    width: 470px;
-    top: 0px;
-    left: 500px;
-    margin: 10px -50px 0px 0px;
-    text-align: right;
+    top: 10px;
+    right: 0px;
 }
 
 #tisk a {

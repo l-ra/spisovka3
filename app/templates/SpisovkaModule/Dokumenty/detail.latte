@@ -403,7 +403,7 @@
     </div>
     {if $Dok->stav_dokumentu >= 3}
     <div class="dokument_blok_sedy">
-        <div class="h2">Vyřízení <span class='toggler' onclick='toggleWindow(this);'>&nbsp;</span></div>
+        <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
         {if ($FormUpravit=='vyrizeni')}
         {var $vyrizovaniForm = $presenter->getComponent('vyrizovaniForm')}

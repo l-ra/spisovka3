@@ -17,6 +17,10 @@
         {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
         {$filtrForm['go_filtr']->control}
         {$filtrForm->render('end')}
+        
+        <div style="margin: 5px 0px 0px 0px;" id="seradit">
+        {control seraditForm}
+        </div>
     </div>
     <div id="search">
         {control searchForm}
@@ -26,13 +30,8 @@
         {if is_array($s3_hledat)}<br/><br/>Aplikováno pokročilé vyhledávání{/if}
         </div>
     </div>
-    
-    
-    <br style="clear:both;" />
-
-    <div style="margin: 3px 0px;" id="seradit">
-    {control seraditForm}
-    </div>
+        
+    <div style="clear:both;" />
 
     <div id="dokumenty">
     {if count($seznam)>0}

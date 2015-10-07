@@ -16,17 +16,16 @@
         
     </div>
     
-    <div id="filtr" style="margin-bottom: 0px">
-        <a href="{link :Spisovka:Vypravna:filtrovat}" onclick="return dialog(this, 'Výběr filtrování');">Filtrovat</a>{if $zobraz_zrusit_filtr}&nbsp;&nbsp;<a href="{link :Spisovka:Vypravna:reset, 'reset' => 'filtr'}" >Zrušit filtr</a>&nbsp;&nbsp;&nbsp;{/if}   
-    </div>
-    <div id="search" style="margin-bottom: 0px">
+    <div id="search">
         {control searchForm}
         <div id="search_advanced">
         {if !empty($zobraz_zrusit_hledani)}<a href="{link :Spisovka:Vypravna:reset, 'reset' => 'hledat'}" style="color:#ff0000;">Zrušit vyhledávání</a>&nbsp;&nbsp;&nbsp;{/if}        
         </div>
     </div>    
+    <div style="margin-bottom: 15px">
+        <a href="{link :Spisovka:Vypravna:filtrovat}" onclick="return dialog(this, 'Výběr filtrování');">Filtrovat</a>{if $zobraz_zrusit_filtr}&nbsp;&nbsp;<a href="{link :Spisovka:Vypravna:reset, 'reset' => 'filtr'}" >Zrušit filtr</a>&nbsp;&nbsp;&nbsp;{/if}   
+    </div>
     
-    <br style="clear:both;" />
     
     <div id="seradit" style="margin: 3px 0px;">
     {control seraditForm}

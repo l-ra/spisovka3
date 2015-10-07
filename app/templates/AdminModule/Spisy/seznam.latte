@@ -1,7 +1,15 @@
 {block title}Spisy{/block}
 {block content}
 
-    <div class="dokument_blok_menu">
+    <div class="navigate">Spisy</div>
+    <h2>Seznam spisů</h2>
+    
+    <div id="search" style="margin-top: 20px">
+        {control searchForm}
+        <a n:if="$presenter->hledat" n:href="seznam" style="color:#ff0000;">Zrušit vyhledávání</a>    
+    </div>
+
+    <div class="blok_menu">
         <a href="{link :Admin:Spisy:novy}">Nový spis</a>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <a href="{link :Admin:Spisy:export}">Export</a>          
@@ -14,11 +22,6 @@
         <a href="{link this, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
             <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
         </a>        
-    </div>
-
-    <div id="search">
-        {control searchForm}
-        <a n:if="$presenter->hledat" n:href="seznam" style="color:#ff0000;">Zrušit vyhledávání</a>    
     </div>
 
     {if count($seznam)>0}
