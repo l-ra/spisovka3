@@ -51,6 +51,9 @@ viz ukázku v system.neon.sample.
 Informace ze souboru epodatelna.ini se při prvním spuštění překopírují
 do databáze.
 
+Též je potřeba vytvořit nový soubor index.php ze souboru index.ph. V něm 
+případně nastavit definici $public_url a KLIENT.
+
 Po ověření, že aplikace včetně e-podatelny funguje správně, smažte prosím
 soubory system.old a epodatelna.old.
 
