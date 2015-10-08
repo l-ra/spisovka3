@@ -66,3 +66,5 @@ Přidáno výchozí nastavení nových funkcí
 Naplnění metadata "způsob doručení" u dokumentů vytvořených e-podatelnou
 [900]
 Smazání nepoužívané tabulky zmocnění
+[930]
+Oprava znakové sady u tabulky user_settings
