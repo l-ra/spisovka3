@@ -700,7 +700,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $s3_hledat = UserSettings::get('spisovna_dokumenty_hledat');
         $s3_hledat = unserialize($s3_hledat);
-        if (is_array($s3_hledat)) {
+        if (is_array($s3_hledat) && !empty($s3_hledat)) {
             $controlPrototype = $form['dotaz']->getControlPrototype();
             $controlPrototype->style(array('background-color' => '#ccffcc', 'border' => '1px #c0c0c0 solid'));
             $controlPrototype->title = "Aplikováno pokročilé vyhledávání. Pro detail klikněte na odkaz \"Pokročilé vyhledávání\". Zadáním hodnoty do tohoto pole, se pokročilé vyhledávání zruší a aplikuje se rychlé vyhledávání.";

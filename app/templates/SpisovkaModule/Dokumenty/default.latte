@@ -26,7 +26,7 @@
         <div id="search_advanced">
         {if !empty($s3_hledat)}<a href="{link :Spisovka:Vyhledat:reset}" style="color:#ff0000;">Zrušit vyhledávání</a>&nbsp;&nbsp;&nbsp;{/if}
         {access :Spisovka:Vyhledat:}<a href="{link :Spisovka:Vyhledat:default}" id="dialog-search">Pokročilé vyhledávání</a>{/access}
-        {if is_array($s3_hledat)}<br/><br/>Aplikováno pokročilé vyhledávání{/if}
+        {if !empty($s3_hledat) && is_array($s3_hledat)}<br/><br/>Aplikováno pokročilé vyhledávání{/if}
         </div>
     </div>
     
