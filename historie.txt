@@ -118,6 +118,7 @@ Spisová služba:
 - převzetí dokumentu ve spisu za specifických okolností vedlo ke zmizení ostatních 
   dokumentů ve spisu (dokumenty přestaly být v aplikaci vidět)
 - předání a přijetí spisu už nezpůsobí otevření už vyřízených dokumentů ve spisu
+- hledání dle způsobu vyřízení nefungovalo
 - pouze u sběrného archu: při tisku seznamu spisů chyběl v čísle jednacím
   oddělovač a pořadové číslo ve spisu
   

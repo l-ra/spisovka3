@@ -554,11 +554,8 @@ class Dokument extends BaseModel
         }
 
         // zpusob vyrizeni
-        if (isset($params['zpusob_vyrizeni_id'])) {
-            if (!empty($params['zpusob_vyrizeni_id']) || $params['zpusob_vyrizeni_id'] != '0') {
-                $args['where'][] = array('d.zpusob_vyrizeni_id = %i', $params['zpusob_vyrizeni_id']);
-            }
-        }
+        if (!empty($params['zpusob_vyrizeni']))
+            $args['where'][] = array('d.zpusob_vyrizeni_id = %i', $params['zpusob_vyrizeni']);
 
         // zpusob odeslani
         if (isset($params['zpusob_odeslani'])) {
@@ -1086,7 +1083,7 @@ class Dokument extends BaseModel
             return $this->paramsFiltr(array('skartacni_znak' => $skartacni_znak));
         } else if (strpos($params, 'zpusob_vyrizeni_') !== false) {
             $zpusob_vyrizeni = substr($params, 16);
-            return $this->paramsFiltr(array('zpusob_vyrizeni_id' => $zpusob_vyrizeni));
+            return $this->paramsFiltr(array('zpusob_vyrizeni' => $zpusob_vyrizeni));
         } else {
             return $this->paramsFiltr(array('stav_dokumentu' => 77));
         }
