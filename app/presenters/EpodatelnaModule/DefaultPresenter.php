@@ -81,11 +81,13 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
 
-                    if ($this->getParameter('typ') == 'odchozi') {
-                        $mpdf->SetHeader('Seznam odchozích zpráv||' . $this->template->Urad->nazev);
-                    } else {
-                        $mpdf->SetHeader('Seznam příchozích zpráv||' . $this->template->Urad->nazev);
-                    }
+                    if ($this->getParameter('typ') == 'odchozi')
+                        $header = 'Seznam odchozích zpráv';
+                    else if ($this->template->view == 'prichozi')
+                        $header = 'Seznam příchozích zpráv';
+                    else
+                        $header = 'Seznam nových zpráv';
+                    $mpdf->SetHeader("$header||{$this->template->Urad->nazev}");
                     $mpdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
                     $mpdf->WriteHTML($content);

@@ -1,7 +1,7 @@
 {block title}Seznam zpráv{/block}
 {block content}
 
-<h2>Seznam příchozích zpráv</h2>
+<h2>Seznam {if $view == 'prichozi'}příchozích{else}nových{/if} zpráv</h2>
 
     <div id="tisk">
         <a href="{link this, 'print' => 1, 'typ'=> 'prichozi'}" title="vytisknout tuto stránku" target="_blank">

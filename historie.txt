@@ -100,6 +100,8 @@ E-podatelna:
 - dokument přijatý datovou schránkou a odeslaný e-mailem se mohl tvářit
   jako přijatý e-mailem
 - seznam zpráv je nyní řazen sestupně dle data doručení
+- v nadpisu seznamu zpráv je nyní odlišeno, jedná-li se o nové nebo všechny
+  příchozí zprávy
 - aplikace automaticky vyplní pole "způsob doručení" pro dokumenty vytvořené
   e-podatelnou. Pro dokumenty vytvořené mimo e-podatelnu je nyní výchozí
   hodnota "v listinné podobě".
