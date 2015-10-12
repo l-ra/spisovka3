@@ -85,6 +85,19 @@ class TreeModel extends BaseModel
         }
     }
 
+    /**
+     * Vytvoří uspořádaný seznam položek pro select box
+     * @param int $type   0 - 
+     *                    1 -
+     *                    2 - výběr spis. znaku
+     *                    3 - nepoužito
+     *                    10 - nepoužito
+     *                    11 - vrať pole objektů
+     * @param int $id
+     * @param int $parent_id
+     * @param array $params
+     * @return array
+     */
     public function selectBox($type = 0, $id = null, $parent_id = null, $params = null)
     {
 
@@ -136,6 +149,12 @@ class TreeModel extends BaseModel
                     $result[$row->id] = $row->{$this->nazev} . $popis;
                 } else if ($type == 11) {
                     $result[$row->id] = $row;
+                } else if ($type == 2) {
+                    $html = str_repeat("...", $row->uroven) . ' ' . $row->{$this->nazev} . $popis;
+                    $el = \Nette\Utils\Html::el('option')->value($row->id)->setHtml($html);
+                    if ($row->stav == 0)
+                        $el->disabled(true); 
+                    $result[$row->id] = $el;
                 } else {
                     $result[$row->id] = str_repeat("...", $row->uroven) . ' ' . $row->{$this->nazev} . $popis;
                 }
