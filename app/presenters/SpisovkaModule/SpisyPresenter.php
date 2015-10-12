@@ -282,7 +282,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->template->seznam = $seznam;
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->selectBox(11);
+        $spisove_znaky = $SpisovyZnak->select()->fetchAssoc('id');
         $this->template->SpisoveZnaky = $spisove_znaky;
     }
 
@@ -304,16 +304,12 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             return;
         }
 
-        $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->selectBox(11);
-        $this->template->SpisoveZnaky = $spisove_znaky;
 
-        if (isset($spisove_znaky[$spis->spisovy_znak_id])) {
-            $this->template->SpisZnak_popis = $spisove_znaky[$spis->spisovy_znak_id]->popis;
-            $this->template->SpisZnak_nazev = $spisove_znaky[$spis->spisovy_znak_id]->nazev;
-        } else {
-            $this->template->SpisZnak_popis = "";
-            $this->template->SpisZnak_nazev = "";
+        $this->template->SpisZnak_nazev = "";
+        if (!empty($spis->spisovy_znak_id)) {
+            $SpisovyZnak = new SpisovyZnak();
+            $sz = $SpisovyZnak->select(["[id] = $spis->spisovy_znak_id"])->fetch();
+            $this->template->SpisZnak_nazev = $sz->nazev;
         }
 
         $opravneni = Spis::zjistiOpravneniUzivatele($spis);
@@ -668,7 +664,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
         $params = array('where' => array("tb.typ = 'VS'"));
-        $spisy = $Spisy->selectBox(11, null, 1, $params);
+        $spisy = $Spisy->selectBox(1, null, 1, $params);
 
         $form1 = new Spisovka\Form();
         $form1->addHidden('typ')

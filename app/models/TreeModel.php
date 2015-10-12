@@ -87,47 +87,30 @@ class TreeModel extends BaseModel
 
     /**
      * Vytvoří uspořádaný seznam položek pro select box
-     * @param int $type   0 - 
-     *                    1 -
+     * @param int $type   0 - žádné další úpravy
+     *                    1 - přidání položky '(hlavní větev)'
      *                    2 - výběr spis. znaku
-     *                    3 - nepoužito
-     *                    10 - nepoužito
-     *                    11 - vrať pole objektů
-     * @param int $id
-     * @param int $parent_id
-     * @param array $params
+     * @param int $exclude_id   slouží k vynechání položky z tímto ID ze seznamu
+     * @param int $parent_id    je též vynecháno. Omezí výsledek na podstrom.
+     * @param array $params     slouží k filtrování položek (např. k výběru složek v tabulce "spisů")
      * @return array
      */
-    public function selectBox($type = 0, $id = null, $parent_id = null, $params = null)
+    public function selectBox($type = 0, $exclude_id = null, $parent_id = null, $params = null)
     {
-
         $result = array();
-        $parent_sekvence = null;
-
-        if ($type >= 10 && !empty($parent_id)) {
-            $type = $type - 10;
-            $null_id = $parent_id;
-        } else {
-            if (!empty($parent_id)) {
-                $null_id = $parent_id;
-            } else {
-                $null_id = 0;
-            }
-        }
-
+            
         if ($type == 1) {
-            $result[$null_id] = '(hlavní větev)';
+            $result[$parent_id ?: 0] = '(hlavní větev)';
         } else if ($type == 2) {
-            $result[$null_id] = 'vyberte z nabídky ...';
-        } else if ($type == 3) {
-            $result[$null_id] = 'všechny ...';
+            $result[0] = 'vyberte z nabídky ...';
         }
 
         $rows = $this->nacti($parent_id, true, true, $params);
         if (count($rows)) {
+            $parent_sekvence = null;
+            
             foreach ($rows as $row) {
-
-                if ($row->id == $id) {
+                if ($row->id == $exclude_id) {
                     $parent_sekvence = $row->sekvence;
                     continue;
                 }
@@ -142,21 +125,19 @@ class TreeModel extends BaseModel
                 }
 
                 $popis = "";
-                if (!empty($row->popis)) {
+                if (!empty($row->popis))
                     $popis = " - " . \Nette\Utils\Strings::truncate($row->popis, 90);
-                }
-                if ($type == 10) {
-                    $result[$row->id] = $row->{$this->nazev} . $popis;
-                } else if ($type == 11) {
-                    $result[$row->id] = $row;
-                } else if ($type == 2) {
-                    $html = str_repeat("...", $row->uroven) . ' ' . $row->{$this->nazev} . $popis;
-                    $el = \Nette\Utils\Html::el('option')->value($row->id)->setHtml($html);
+                $text = str_repeat("...", $row->uroven) . ' ' . $row->{$this->nazev} . $popis;
+                
+                if ($type == 2) {
+                    // spisové znaky
+                    // vrať pole HTML elementů kvůli funkci znemožnění výběru neaktivních položek
+                    $option = \Nette\Utils\Html::el('option')->value($row->id)->setHtml($text);
                     if ($row->stav == 0)
-                        $el->disabled(true); 
-                    $result[$row->id] = $el;
+                        $option->disabled(true); 
+                    $result[$row->id] = $option;
                 } else {
-                    $result[$row->id] = str_repeat("...", $row->uroven) . ' ' . $row->{$this->nazev} . $popis;
+                    $result[$row->id] = $text;
                 }
             }
         }

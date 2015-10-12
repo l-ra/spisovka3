@@ -163,7 +163,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $this->template->seznam = $seznam;
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->selectBox(11);
+        $spisove_znaky = $SpisovyZnak->select()->fetchAssoc('id');
         $this->template->SpisoveZnaky = $spisove_znaky;
 
         //$seznam = $Spisy->seznam(null, 0, $spis_id);
@@ -236,7 +236,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $this->template->seznam = $seznam;
 
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->selectBox(11);
+        $spisove_znaky = $SpisovyZnak->select()->fetchAssoc('id');
         $this->template->SpisoveZnaky = $spisove_znaky;
 
         $this->template->akce_select = array(
@@ -253,16 +253,11 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
         if ($spis) {
 
-            $SpisovyZnak = new SpisovyZnak();
-            $spisove_znaky = $SpisovyZnak->selectBox(11);
-            $this->template->SpisoveZnaky = $spisove_znaky;
-
-            if (isset($spisove_znaky[$spis->spisovy_znak_id])) {
-                $this->template->SpisZnak_popis = $spisove_znaky[$spis->spisovy_znak_id]->popis;
-                $this->template->SpisZnak_nazev = $spisove_znaky[$spis->spisovy_znak_id]->nazev;
-            } else {
-                $this->template->SpisZnak_popis = "";
-                $this->template->SpisZnak_nazev = "";
+            $this->template->SpisZnak_nazev = "";
+            if (!empty($spis->spisovy_znak_id)) {
+                $SpisovyZnak = new SpisovyZnak();
+                $sz = $SpisovyZnak->select(["[id] = $spis->spisovy_znak_id"])->fetch();
+                $this->template->SpisZnak_nazev = $sz->nazev;
             }
 
             $user = $this->user;

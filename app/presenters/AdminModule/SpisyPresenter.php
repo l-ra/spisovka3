@@ -3,7 +3,6 @@
 class Admin_SpisyPresenter extends SpisyPresenter
 {
 
-    private $spis_plan;
     public $hledat;
     private $pdf_output = 0;
 
@@ -157,10 +156,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         }
 
         $this->template->seznam = $seznam;
-
-        $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->selectBox(11);
-        $this->template->SpisoveZnaky = $spisove_znaky;
     }
 
     public function renderDetail()
@@ -176,16 +171,11 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->template->SpisyNad = null; // $Spisy->seznam_nad($spis_id,1);
         $this->template->SpisyPod = null; //$Spisy->seznam_pod($spis_id,1);
 
-        $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->selectBox(11);
-        $this->template->SpisoveZnaky = $spisove_znaky;
-
-        if (isset($spisove_znaky[@$spis->spisovy_znak_id])) {
-            $this->template->SpisZnak_popis = $spisove_znaky[$spis->spisovy_znak_id]->popis;
-            $this->template->SpisZnak_nazev = $spisove_znaky[$spis->spisovy_znak_id]->nazev;
-        } else {
-            $this->template->SpisZnak_popis = "";
-            $this->template->SpisZnak_nazev = "";
+        $this->template->SpisZnak_nazev = "";
+        if (!empty($spis->spisovy_znak_id)) {
+            $SpisovyZnak = new SpisovyZnak();
+            $sz = $SpisovyZnak->select(["[id] = $spis->spisovy_znak_id"])->fetch();
+            $this->template->SpisZnak_nazev = $sz->nazev;
         }
 
         $DokumentSpis = new DokumentSpis();
@@ -207,21 +197,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
             $this->setLayout(false);
             $this->setView('printdetail');
         }
-    }
-
-    public function actionUpravit()
-    {
-        $session_spisplan = Nette\Environment::getSession('s3_spisplan');
-        $spis_id = $this->getParameter('id', null);
-        if (!is_null($spis_id)) {
-            // spis_id
-        } else if (!empty($session_spisplan->spis_id)) {
-            $spis_id = $session_spisplan->spis_id;
-        } else {
-            $this->flashMessage('Spisový plán nenalezen!', 'warning');
-            $this->redirect(':Admin:Spisy:seznam');
-        }
-        $this->spis_plan = $spis_id;
     }
 
     public function renderUpravit()
@@ -346,13 +321,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
-        $session_spisplan = Nette\Environment::getSession('s3_spisplan');
-        if (empty($session_spisplan->spis_id)) {
-            $session_spisplan->spis_id = 1;
-        }
         $params = array('where' => array("tb.typ = 'VS'"));
-        //$spisy = $Spisy->selectBox(11, null, $session_spisplan->spis_id, $params);
-        $spisy = $Spisy->selectBox(1, @$spis->id, $session_spisplan->spis_id, $params);
+        $spisy = $Spisy->selectBox(1, @$spis->id, 1, $params);
 
 
         $form1 = new Spisovka\Form();
@@ -438,12 +408,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
-        $session_spisplan = Nette\Environment::getSession('s3_spisplan');
-        if (empty($session_spisplan->spis_id)) {
-            $session_spisplan->spis_id = 1;
-        }
         $params = array('where' => array("tb.typ = 'VS'"));
-        $spisy = $Spisy->selectBox(11, null, $session_spisplan->spis_id, $params);
+        $spisy = $Spisy->selectBox(1, null, 1, $params);
 
         $form1 = new Spisovka\Form();
         $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
