@@ -83,6 +83,8 @@ Jiné změny:
   je potřeba nejprve dokončit anebo zrušit.
 - v detailu dokumentu v sekci odeslání se zobrazuje poznámka, byla-li
   při odeslání uvedena
+- při zadávání vyřízení dokumentu prohlížeč automaticky posune obrazovku
+  na sekci vyřízení
 - přehlednější názvy filtrů zápůjček
 - je-li ve spisovně dostupná jediná akce na vybraných záznamech, není nyní nutné
   ji ručně vybírat ze seznamu

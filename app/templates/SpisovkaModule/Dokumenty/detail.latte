@@ -90,7 +90,7 @@
        <a n:if="$Dok->stav_dokumentu < 3" href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id}" id="kvyrizenidokument">Označit k vyřízení</a>
        
        {if $Dok->stav_dokumentu == 3}
-       <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }">Upravit vyřízení</a>
+       <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }#vr">Upravit vyřízení</a>
        <a n:if="$povolitOdpoved" href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
        <a href="{link :Spisovka:Dokumenty:odeslat , 'id'=>$Dok->id }">Odeslat dokument</a>
        <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
@@ -402,6 +402,7 @@
         {/if}
     </div>
     {if $Dok->stav_dokumentu >= 3}
+    <a name="vr">
     <div class="dokument_blok_sedy">
         <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
