@@ -991,6 +991,8 @@ vybratSpisovyZnak = function(element) {
 
     var key = form.spisovy_znak_id.selectedIndex;
     var sz_id = form.spisovy_znak_id.options[key].value;
+    if (sz_id == 0) // položka "vyberte z nabídky"
+        return true;
     
     var url = BASE_URL + 'spisznak/' + sz_id + '/';
     $.get(url, function(data) {
