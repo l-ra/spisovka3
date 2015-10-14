@@ -385,8 +385,7 @@ if ( count($S2_spisove_znaky)>0 ) {
                 'stav' => (int) $S2_sz->stav,
                 'spousteci_udalost_id' => 3,
                 'date_created' => new DateTime($S2_sz->vytvoreno),
-                'user_created' => 1,
-                'selected' => 1
+                'user_created' => 1
             ))->execute();
             echo "\n   => <span style='color:green'>přeneseno</span>";
         } catch ( DibiException $e ) {

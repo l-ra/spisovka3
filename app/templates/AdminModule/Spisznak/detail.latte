@@ -1,4 +1,4 @@
-{block title}Seznam dokumentů{/block}
+{block title}Seznam spisových znaků{/block}
 {block content}
     <div class="navigate">
     <a href="{link :Admin:Spisznak:seznam}">Seznam spisových znaků</a> - Detail
@@ -34,10 +34,6 @@
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($SpisZnak->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
-            <dt>Možnost vybrat:</dt>
-            <dd>{if $SpisZnak->selected==1}ano{else}ne{/if}&nbsp;</dd>
-        </dl>        
         <dl class="detail_item">
             <dt>Stav:</dt>
             <dd>{=SpisovyZnak::stav($SpisZnak->stav)}&nbsp;</dd>

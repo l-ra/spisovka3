@@ -70,3 +70,5 @@ Smazání nepoužívané tabulky zmocnění
 Oprava znakové sady u tabulky user_settings
 [940]
 Smazání nepoužitých typů dokumentů "příchozí - doručeno ..." (pozůstatek po upgradu z verze 3.0.x)
+[950]
+Smazání sloupce spisovy_znak.selected

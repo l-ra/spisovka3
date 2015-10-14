@@ -970,3 +970,7 @@ div.icon_slozka {
 .ui-widget-content {
     border-width: 2px;
 }
+
+.spis_znak_neaktivni, .spis_znak_neaktivni a {
+    color: #c0c0c0;
+}

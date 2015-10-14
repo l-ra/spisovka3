@@ -183,8 +183,6 @@ class Admin_SpisznakPresenter extends BasePresenter
                 ->setValue(@$spisznak->parent_id);
         $form1->addHidden('parent_id_old')
                 ->setValue(@$spisznak->parent_id);
-        $form1->addSelect('selected', 'Možnost vybrat:', array("1" => "ano", "0" => "ne"))
-                ->setValue(@$spisznak->selected);
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
                 ->setValue(@$spisznak->stav);
 
@@ -253,10 +251,11 @@ class Admin_SpisznakPresenter extends BasePresenter
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci)
                 ->setValue(3); // Standardni udalost je "Skartační lhůta začíná plynout po uzavření dokumentu."
         $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
-        $form1->addSelect('selected', 'Možnost vybrat:', array("1" => "ano", "0" => "ne"));
+        $form1->addSelect('stav', 'Stav:', SpisovyZnak::stav())
+                ->setDefaultValue(1);
 
         $form1->addSubmit('vytvorit', 'Vytvořit');
-        $form1->addSubmit('vytvorit_a_novy', 'Vytvořit spisový znak a založit nový');
+        $form1->addSubmit('vytvorit_a_novy', 'Vytvořit a vložit další');
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoNovyClicked');

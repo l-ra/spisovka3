@@ -144,8 +144,6 @@ class SpisovyZnak extends TreeModel
             $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
         if (!empty($data['stav']))
             $data['stav'] = (int) $data['stav'];
-        if (!empty($data['selected']))
-            $data['selected'] = (int) $data['selected'];
 
         $part = explode(".", $data['nazev']);
         if (count($part) > 0) {
