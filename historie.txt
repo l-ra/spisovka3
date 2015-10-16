@@ -57,7 +57,8 @@ Jiné změny:
   (ocení programátoři)
 - nová funkce pro vývojáře pro základní automatické testování aplikace
 - Internet Explorer - aplikace se nyní snaží vypnout "kompatibilní zobrazení",
-  se kterým nemůže pracovat správně
+  se kterým nemůže pracovat správně. Též uživateli zobrazí upozornění, pokud
+  je prohlížeč příliš starý.
 
 - aplikace se nyní snaží zjistit MIME typ přímo ze souborů. V předchozích
   verzích se typ určoval zjednodušeně pouze podle přípony souboru.

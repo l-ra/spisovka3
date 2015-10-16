@@ -35,6 +35,8 @@
     <div id="menu">
     {include #menu}
     </div>
+    
+    {include browserCheck.latte}
 
     {if isset($zpravy_pocet_neprectenych) && $zpravy_pocet_neprectenych > 0 && $presenter->name != "Spisovka:Zpravy"}
     <div id="upozorneni_na_nove_zpravy">
