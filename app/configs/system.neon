@@ -23,5 +23,6 @@ services:
     authenticatorUI = Authenticator_UI
 #    userImport = Import_LDAP
 #    ldap = Spisovka_LDAP(%ldap%)
+    httpResponse = Spisovka\IEHttpResponse
     nette.presenterFactory = PresenterFactory(%appDir%, ...)
     storage = Storage_Basic(%storage_configuration%)
