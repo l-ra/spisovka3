@@ -1,5 +1,7 @@
 <?php
 
+use Spisovka\Form;
+
 class Admin_ZamestnanciPresenter extends BasePresenter
 {
 
@@ -154,42 +156,23 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     }
 
     /**
-     *
-     * Formular a zpracovani pro udaju osoby
-     *
+     * 
+     * @return Form
      */
-    protected function createComponentUpravitForm()
+    public static function createOsobaForm()
     {
-        $osoba = $this->template->Osoba;
-
-        $form1 = new Nette\Application\UI\Form();
-        $form1->addHidden('id')
-                ->setValue(@$osoba->id);
-        $form1->addText('jmeno', 'Jméno:', 50, 150)
-                ->setValue(@$osoba->jmeno);
+        $form1 = new Form();
+        $form1->addText('jmeno', 'Jméno:', 50, 150);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
-                ->setValue(@$osoba->prijmeni)
-                ->addRule(Nette\Forms\Form::FILLED, 'Příjmení musí být vyplněno!');
-        $form1->addText('titul_pred', 'Titul před:', 50, 150)
-                ->setValue(@$osoba->titul_pred);
-        $form1->addText('titul_za', 'Titul za:', 50, 150)
-                ->setValue(@$osoba->titul_za);
+                ->addRule(Form::FILLED, 'Příjmení musí být vyplněno!');
+        $form1->addText('titul_pred', 'Titul před:', 50, 150);
+        $form1->addText('titul_za', 'Titul za:', 50, 150);
         $form1->addText('email', 'Email:', 50, 150)
-                ->setValue(@$osoba->email);
-        $form1->addText('telefon', 'Telefon:', 50, 150)
-                ->setValue(@$osoba->telefon);
-        $form1->addText('pozice', 'Funkce:', 50, 150)
-                ->setValue(@$osoba->pozice);
-        $form1->addSubmit('upravit', 'Upravit')
-                ->onClick[] = array($this, 'upravitClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                        ->setValidationScope(FALSE)
-                ->onClick[] = array($this, 'stornoClicked');
-
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
+                ->addCondition(Form::FILLED)
+                    ->addRule(Form::EMAIL);
+        $form1->addText('telefon', 'Telefon:', 50, 150);
+        $form1->addText('pozice', 'Funkce:', 50, 150);
+        
         $renderer = $form1->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = 'dl';
@@ -197,6 +180,45 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
+    }
+    
+    protected function createComponentNovyForm()
+    {
+        $form1 = self::createOsobaForm();
+        
+        $form1->addSubmit('novy', 'Vytvořit')
+                ->onClick[] = array($this, 'vytvoritClicked');
+        $form1->addSubmit('storno', 'Zrušit')
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoSeznamClicked');
+
+        return $form1;
+    }
+
+    protected function createComponentUpravitForm()
+    {
+        $form = self::createOsobaForm();
+        $form->addHidden('id');
+        
+        $osoba = $this->template->Osoba;
+        if ($osoba) {
+            $form['id']->setValue($osoba->id);
+            $form['jmeno']->setValue($osoba->jmeno);
+            $form['prijmeni']->setValue($osoba->prijmeni);
+            $form['titul_pred']->setValue($osoba->titul_pred);
+            $form['titul_za']->setValue($osoba->titul_za);
+            $form['email']->setValue($osoba->email);
+            $form['telefon']->setValue($osoba->telefon);
+            $form['pozice']->setValue($osoba->pozice);
+        }        
+        
+        $form->addSubmit('upravit', 'Upravit')
+                ->onClick[] = array($this, 'upravitClicked');
+        $form->addSubmit('storno', 'Zrušit')
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
+
+        return $form;
     }
 
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
@@ -230,37 +252,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     public function stornoSeznamClicked()
     {
         $this->redirect(':Admin:Zamestnanci:seznam');
-    }
-
-    protected function createComponentNovyForm()
-    {
-
-        $form1 = new Nette\Application\UI\Form();
-        $form1->addText('jmeno', 'Jméno:', 50, 150);
-        $form1->addText('prijmeni', 'Příjmení:', 50, 150)
-                ->addRule(Nette\Forms\Form::FILLED, 'Příjmení musí být vyplněno!');
-        $form1->addText('titul_pred', 'Titul před:', 50, 150);
-        $form1->addText('titul_za', 'Titul za:', 50, 150);
-        $form1->addText('email', 'Email:', 50, 150);
-        $form1->addText('telefon', 'Telefon:', 50, 150);
-        $form1->addText('pozice', 'Funkce:', 50, 150);
-        $form1->addSubmit('novy', 'Vytvořit')
-                ->onClick[] = array($this, 'vytvoritClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                        ->setValidationScope(FALSE)
-                ->onClick[] = array($this, 'stornoSeznamClicked');
-
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
     }
 
     public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)

@@ -68,43 +68,28 @@ class Spisovka_UzivatelPresenter extends BasePresenter
      */
     protected function createComponentUpravitForm()
     {
-
+        $form = Admin_ZamestnanciPresenter::createOsobaForm();
+        $form->addHidden('osoba_id');
+        
         $osoba = $this->template->Osoba;
-
-        $form1 = new Nette\Application\UI\Form();
-        $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->id);
-        $form1->addText('jmeno', 'Jméno:', 50, 150)
-                ->setValue(@$osoba->jmeno);
-        $form1->addText('prijmeni', 'Příjmení:', 50, 150)
-                ->setValue(@$osoba->prijmeni);
-        $form1->addText('titul_pred', 'Titul před:', 50, 150)
-                ->setValue(@$osoba->titul_pred);
-        $form1->addText('titul_za', 'Titul za:', 50, 150)
-                ->setValue(@$osoba->titul_za);
-        $form1->addText('email', 'Email:', 50, 150)
-                ->setValue(@$osoba->email);
-        $form1->addText('telefon', 'Telefon:', 50, 150)
-                ->setValue(@$osoba->telefon);
-        $form1->addText('pozice', 'Funkce:', 50, 150)
-                ->setValue(@$osoba->pozice);
-        $form1->addSubmit('upravit', 'Upravit')
+        if ($osoba) {
+            $form['osoba_id']->setValue($osoba->id);
+            $form['jmeno']->setValue($osoba->jmeno);
+            $form['prijmeni']->setValue($osoba->prijmeni);
+            $form['titul_pred']->setValue($osoba->titul_pred);
+            $form['titul_za']->setValue($osoba->titul_za);
+            $form['email']->setValue($osoba->email);
+            $form['telefon']->setValue($osoba->telefon);
+            $form['pozice']->setValue($osoba->pozice);
+        }        
+                
+        $form->addSubmit('upravit', 'Upravit')
                 ->onClick[] = array($this, 'upravitClicked');
-        $form1->addSubmit('storno', 'Zrušit')
+        $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
 
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
+        return $form;
     }
 
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)

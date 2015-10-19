@@ -143,6 +143,7 @@ Administrace:
 - uživatel si nyní nemůže smazat svůj vlastní účet
 - při editaci ostatních nastavení v administraci program chybně neumožňoval 
   nezadat číslo zákaznické karty
+- aplikace nyní při zadávání e-mailové adresy kontroluje její formát
 - opraven skript pro migraci ze spisové služby verze 2
 
 === Verze 3.4.1 ================================================================

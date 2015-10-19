@@ -1,5 +1,7 @@
 <?php
 
+use Spisovka\Form;
+
 class Admin_EpodatelnaPresenter extends BasePresenter
 {
 
@@ -603,7 +605,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $index = substr($id, 1);
         $odes = !empty($id) ? $ep['odeslani'][$index] : array();
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Form();
         $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue($typ);
@@ -616,7 +618,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 ]
         );
 
-        $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100);
+        $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100)
+                ->addCondition(Form::FILLED)
+                    ->addRule(Form::EMAIL);
 
         $form1->addUpload('cert_file', 'Cesta k certifikátu:');
         $form1->addUpload('cert_key_file', 'Cesta k privátnímu klíči:');
