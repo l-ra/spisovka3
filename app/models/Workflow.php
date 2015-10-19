@@ -212,11 +212,17 @@ class Workflow extends BaseModel
         }
         
         // posli upozorneni emailem
-        if (empty($orgjednotka_id)) {
-            Notifications::notifyUser($user_id, Notifications::RECEIVE_DOCUMENT,
-                    ['document_name' => $dokument_info->nazev,
-                'reference_number' => $dokument_info->cislo_jednaci]);
+        try {
+            if (empty($orgjednotka_id)) {
+                Notifications::notifyUser($user_id, Notifications::RECEIVE_DOCUMENT,
+                        ['document_name' => $dokument_info->nazev,
+                    'reference_number' => $dokument_info->cislo_jednaci]);
+            }
+        } catch (Exception $e) {
+            throw new Exception("Předání proběhlo v pořádku, ale nepodařilo se upozornit příjemce e-mailem: \n"
+                    . $e->getMessage(), 0, $e);
         }
+        
         return true;
     }
 

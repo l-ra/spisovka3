@@ -48,7 +48,12 @@ class ESSMail extends Nette\Mail\Message
         $odes = reset($ep['odeslani']);
         $email = $odes['email'];
         if ($email)
-            $this->setFrom($email);
+            try {
+                $this->setFrom($email);                
+            } catch (Exception $e) {
+                $e->getMessage();
+                throw new Exception("E-mailová adresa pro odesílání \"$email\" je neplatná.");
+            }
     }
 
     public function setBodySign($body)
