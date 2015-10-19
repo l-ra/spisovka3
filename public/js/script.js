@@ -83,6 +83,10 @@ $(function() {
         if (thrownError == 'timeout' && ajaxSettings.url.indexOf('/cron/') != -1)
             return;
         alert('Je nám líto, asynchronní požadavek skončil s chybou:\n' + thrownError);
+        
+        if (jqXHR.responseText
+                && $("#dialog").dialog( "isOpen" ) === true)
+            $('#dialog').html('<pre>' + jqXHR.responseText);
     });
     
     // Povinne polozky
