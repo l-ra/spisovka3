@@ -1,5 +1,7 @@
 <?php
 
+use Nette\Forms\Form;
+
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
 
@@ -47,7 +49,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             }
         }
 
-        parent::startup();
+        parent::startup();        
     }
 
     protected function isUserAllowed()
@@ -57,7 +59,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function beforeRender()
     {
-        //$this->template->registerFilter('Nette\Templates\CurlyBracketsFilter::invoke');
         // Helper escapovaný nl2br
         if (!function_exists('enl2br')) {
 
@@ -68,12 +69,12 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         }
         $this->template->registerHelper('enl2br', 'enl2br');
+        
         // Helper escapovaný nl2br + html parser
         if (!function_exists('html2br')) {
 
             function html2br($string)
             {
-
                 if (strpos($string, "&lt;") !== false) {
                     $string = html_entity_decode($string);
                 }
@@ -91,9 +92,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
                 return nl2br($string);
             }
-
         }
         $this->template->registerHelper('html2br', 'html2br');
+        
         // Helper vlastni datovy format
         if (!function_exists('edate')) {
 
@@ -159,6 +160,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         }
         $this->template->registerHelper('num', 'num');
 
+        /** Toto jiz k nicemu neni. Spisovka pouziva standardne Tracy.
+          if (DEBUG_ENABLE && in_array('programator', $this->user->getRoles())) {
+          $this->template->debugger = TRUE;
+          } else {
+          $this->template->debugger = FALSE;
+          }
+         */
+        
         // Nastaveni title
         if (!isset($this->template->title)) {
             $this->template->title = "";
@@ -174,14 +183,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             $this->template->module = substr($this->name, 0, $a + 0);
             $this->template->presenter_name = substr($this->name, $a + 1);
         }
-
-        /** Toto jiz k nicemu neni. Spisovka pouziva standardne Tracy.
-          if (DEBUG_ENABLE && in_array('programator', $this->user->getRoles())) {
-          $this->template->debugger = TRUE;
-          } else {
-          $this->template->debugger = FALSE;
-          }
-         */
+        
         /**
          * Nastaveni layoutu podle modulu
          */
@@ -280,6 +282,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // Nastav, aby Nette generovalo ID prvku formulare jako ve stare verzi
         Nette\Forms\Controls\BaseControl::$idMask = 'frm%s';
+        
+        $this->translateFormRules();
     }
 
     public function templatePrepareFilters($template)
@@ -322,4 +326,13 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         );
     }
 
+    protected function translateFormRules()
+    {
+        $messages = [
+            Form::EMAIL => 'Zadejte prosím platnou e-mailovou adresu.'
+        ];
+        
+        foreach ($messages as $id => $message)
+            \Nette\Forms\Rules::$defaultMessages[$id] = $message;
+    }
 }

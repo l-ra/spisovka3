@@ -205,8 +205,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
                     $cont->addText('email', 'Email:')
                             ->setValue($user['email'])
                             ->addCondition(Nette\Forms\Form::FILLED)
-                            ->addRule(Nette\Forms\Form::EMAIL,
-                                    'Zadejte platnou e-mailovou adresu.');
+                                ->addRule(Nette\Forms\Form::EMAIL);
 
                     $this->formAddRoleSelect($cont);
                     $this->formAddOrgSelect($cont);
