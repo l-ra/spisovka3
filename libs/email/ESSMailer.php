@@ -23,27 +23,22 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
 
         $tmp->setHeader('Subject', NULL);
         $tmp->setHeader('To', NULL);
-        $linux = strncasecmp(PHP_OS, 'win', 3);
 
-        if (is_null($tmp->getFrom()))
-            if (!empty($tmp->config['jmeno']))
-                $tmp->setFrom($tmp->config['email'], $tmp->config['jmeno']);
-            else
-                $tmp->setFrom($tmp->config['email']);
-
-        if ($tmp->signed != 1 || $tmp->config['typ_odeslani'] != 1) {
+        $config = (new Spisovka\ConfigEpodatelna())->get();
+        
+        if ($tmp->signed != 1 || $config['typ_odeslani'] != 1) {
             $mail_source = $tmp->generateMessage();
             $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
             $header = $parts[0];
             $mess = $parts[1];
         } else {
             $esign = new esignature();
-            if (file_exists($tmp->config['cert_key'])) {
-                $cert_status = $esign->setUserCert($tmp->config['cert'],
-                        $tmp->config['cert_key'], $tmp->config['cert_pass']);
+            if (file_exists($config['cert_key'])) {
+                $cert_status = $esign->setUserCert($config['cert'],
+                        $config['cert_key'], $config['cert_pass']);
             } else {
-                $cert_status = $esign->setUserCert($tmp->config['cert'], null,
-                        $tmp->config['cert_pass']);
+                $cert_status = $esign->setUserCert($config['cert'], null,
+                        $config['cert_pass']);
             }
 
             $cert_info = $esign->getInfo();
@@ -85,7 +80,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             $mess_part = explode("\n\n", $mail_source, 2);
             $part_header = explode("\n", $mess_part[0]);
             $headers = array();
-            foreach ($part_header as $index => $row) {
+            foreach ($part_header as $row) {
                 $row_part = explode(":", $row, 2);
                 if (count($row_part) < 1) {
                     $headers['Content-Type'] = $row;
@@ -134,6 +129,8 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             restore_error_handler();
             throw new Exception("Došlo k problému při odesílání mailu: $message");
         }, E_WARNING);
+        
+        $linux = strncasecmp(PHP_OS, 'win', 3);
         if ($linux) {
             $to = str_replace(Nette\Mail\Message::EOL, "\n", $to);
             $subject = str_replace(Nette\Mail\Message::EOL, "\n", $subject);
