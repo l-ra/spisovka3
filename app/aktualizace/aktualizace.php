@@ -144,7 +144,7 @@ foreach ($clients as $site_path => $site_name) {
                     dibi::begin();
 
                 // Info
-                echo "<div class='update_title'>Informace o této aktualizaci:</div>";
+                echo "<div class='update_title'>Informace o tomto aktualizačním kroku:</div>";
                 echo "<div class='update_info'><strong>Revize #" . $rev . "</strong></div>";
 
                 if (isset($descriptions[$rev]))
