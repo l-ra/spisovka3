@@ -85,8 +85,10 @@ $(function() {
         alert('Je nám líto, asynchronní požadavek skončil s chybou:\n' + thrownError);
         
         if (jqXHR.responseText
-                && $("#dialog").dialog( "isOpen" ) === true)
+                && $("#dialog").dialog( "isOpen" ) === true) {
             $('#dialog').html('<pre>' + jqXHR.responseText);
+            dialogScrollUp();
+        }
     });
     
     // Povinne polozky
@@ -296,9 +298,9 @@ dialog = function ( elm, title, url ) {
         jqXHR = $.get(url, successFunction);
             
     jqXHR.fail(function(jqXHR) {
-        // Alert uživateli zobrazí globální handler
+        // Následující akce nyní provádí globální handler:
         // alert('Při načítání obsahu okna došlo k vážné chybě.');
-        $('#dialog').html('<pre>' + jqXHR.responseText);
+        // $('#dialog').html('<pre>' + jqXHR.responseText);
     });
     
     return false;
@@ -320,6 +322,10 @@ closeDialog = function () {
     return false;
 };
 
+dialogScrollUp = function () {
+    
+    $("#dialog").scrollTop("0");    
+};
 
 /*
  * ARES
@@ -524,6 +530,7 @@ subjektUpravitSubmit = function () {
         } else {
             // chyba
             $('#dialog').html(data);            
+            dialogScrollUp();
         }
     });
     return false;    
@@ -539,6 +546,7 @@ handleNovySubjekt = function (okFunc) {
         } else {
             // formular neprosel validaci
             $('#dialog').html(data);            
+            dialogScrollUp();
         }
     });
     return false;    
@@ -564,8 +572,10 @@ spisVytvoritSubmit = function (button) {
         if (typeof data == 'object') {
             spisVybran(data.id);
         }
-        else
+        else {
             $('#dialog').html(data);        
+            dialogScrollUp();
+        }
     });
 
     return false;
@@ -595,6 +605,7 @@ osobaVybrana = function (elm) {
             closeDialog();
         } else {
             $('#dialog').html(data);
+            dialogScrollUp();
         }
     });
 
@@ -673,6 +684,7 @@ vypravnaSubmit = function () {
             window.location.reload();
         } else {
             $('#dialog').html(text);
+            dialogScrollUp();
         }        
     });
     return false;
@@ -739,6 +751,7 @@ spojitDokument = function (elm) {
             closeDialog();
         } else {
             $('#dialog').html(data);
+            dialogScrollUp();
         }
     });
 
@@ -771,6 +784,7 @@ pripojitDokument = function (elm) {
 
         } else {
             $('#dialog').html(data);
+            dialogScrollUp();
         }
     });
 
