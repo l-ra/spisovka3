@@ -427,7 +427,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderDetail()
     {
-        $this->template->typy_dokumentu = Dokument::typDokumentu();
+        $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
         
         $dokument = $this->template->Dok;
         // Kontrola lhuty a skartace
@@ -869,7 +869,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $CJ = new CisloJednaci();
         $this->template->cjednaci = $CJ->generuj();
 
-        $this->template->typy_dokumentu = Dokument::typDokumentu();
+        $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
 
         if ($dokument) {
             $this->template->Dok = $dokument;
@@ -1034,7 +1034,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->odpoved = true;
             $this->template->odpoved_na_dokument = true;
 
-            $this->template->typy_dokumentu = Dokument::typDokumentu();
+            $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
 
             $this->template->novyForm = $this['odpovedForm'];
             $this->setView('novy');
@@ -1271,13 +1271,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dokument_id = 0;
         }
 
-        if (Acl::isInRole('admin,superadmin'))
-            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 4);
-        else if (Acl::isInRole('podatelna'))
-            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 2);
-        else
-            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 1);
-
+        $povolene_typy_dokumentu = TypDokumentu::dostupneUzivateli();
+        
         $zpusob_doruceni = Dokument::zpusobDoruceni(2);
 
         $form = new Spisovka\Form();
@@ -1303,8 +1298,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addTextArea('popis', 'Stručný popis:', 80, 3)
                 ->setValue(@$dok->popis);
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu)
-                ->setValue(@$dok->typ_dokumentu->id);
+        
+        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu);
+        try {
+            $form['dokument_typ_id']->setValue(@$dok->typ_dokumentu->id);
+        } catch (Exception $e) {
+            $e->getMessage();
+            // ignoruj chybu - uživatel má chybně nastavený číselník
+        }
+        
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
                 ->setValue(@$dok->cislo_jednaci_odesilatele);
 
@@ -1483,13 +1485,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
         
-        if (Acl::isInRole('admin,superadmin'))
-            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 4);
-        else if (Acl::isInRole('podatelna'))
-            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 2);
-        else
-            $povolene_typy_dokumentu = Dokument::typDokumentu(null, 1);
-
+        $povolene_typy_dokumentu = TypDokumentu::dostupneUzivateli();
+                
         if (in_array($Dok->typ_dokumentu->id, array_keys($povolene_typy_dokumentu))
             && count($povolene_typy_dokumentu) > 1) {
             $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu);

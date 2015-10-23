@@ -348,7 +348,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $original = null;
         }
 
-        $typ_dokumentu = Dokument::typDokumentu(null, 2);
+        $typy_dokumentu = TypDokumentu::dostupneUzivateli();
 
         $form = new Spisovka\Form();
         $form->addHidden('dokument_id')
@@ -370,8 +370,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 ->setValue(@$zprava->predmet);
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
 
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu);
-        //->setValue(1);
+        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typy_dokumentu);
+        if (isset($typy_dokumentu[1]))
+            $form['dokument_typ_id']->setDefaultValue(1);
 
         /* if ( !empty($zprava->email_id) ) {
           foreach ($typ_dokumentu_extra as $tde) {

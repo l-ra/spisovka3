@@ -97,9 +97,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
     protected function createComponentSearchForm()
     {
-
-        $typ_dokumentu = array();
-        $typ_dokumentu = Dokument::typDokumentu(null, 3);
+        $typ_dokumentu = [0 => 'jakýkoli typ dokumentu'] + TypDokumentu::vsechny();
 
         $typ_doruceni = array(
             '0' => 'všechny',

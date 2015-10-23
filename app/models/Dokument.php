@@ -1,6 +1,6 @@
 <?php
 
-//netteloader=Dokument
+//netteloader=Dokument,DokumentHistorie
 
 class Dokument extends BaseModel
 {
@@ -1606,7 +1606,7 @@ class Dokument extends BaseModel
 
             if (isset($data['zpusob_doruceni_id']) && isset($data['dokument_typ_id'])) {
                 // zajisti, aby zpusob doruceni se ulozil pouze u prichozich dokumentu
-                $typy_dokumentu = self::typDokumentu();
+                $typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
                 if ($typy_dokumentu[$data['dokument_typ_id']]['smer'] == 1) //odchozi
                     $data['zpusob_doruceni_id'] = null;
             }
@@ -1787,65 +1787,6 @@ class Dokument extends BaseModel
         return $tmp;
     }
 
-    public static function typDokumentu($kod = null, $select = 0)
-    {
-
-        $prefix = self::getDbPrefix();
-        $tb_dokument_typ = $prefix . 'dokument_typ';
-
-        $result = dibi::query('SELECT * FROM %n', $tb_dokument_typ)->fetchAssoc('id');
-
-        if (is_null($kod)) {
-            if ($select == 1) { // referent
-                $tmp = array();
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    if ($dt->referent == 1) {
-                        $tmp[$dt->id] = $dt->nazev;
-                    }
-                }
-                return $tmp;
-            } else if ($select == 2) { // podatelna
-                $tmp = array();
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    if ($dt->podatelna == 1) {
-                        $tmp[$dt->id] = $dt->nazev;
-                    }
-                }
-                return $tmp;
-            } else if ($select == 4) { // podatelna + referent
-                $tmp = array();
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    if ($dt->podatelna == 1) {
-                        $tmp[$dt->id] = $dt->nazev;
-                    }
-                    if ($dt->referent == 1) {
-                        $tmp[$dt->id] = $dt->nazev;
-                    }
-                }
-                return $tmp;
-            } else if ($select == 3) {
-                $tmp = array();
-                $tmp[0] = 'jakýkoli typ dokumentu';
-                foreach ($result as $dt) {
-                    if ($dt->stav == 0)
-                        continue;
-                    $tmp[$dt->id] = $dt->nazev;
-                }
-                return $tmp;
-            } else {
-                return $result;
-            }
-        } else {
-            return ( array_key_exists($kod, $result) ) ? $result[$kod] : null;
-        }
-    }
-
     public static function zpusobVyrizeni($select)
     {
         $result = dibi::query('SELECT [id], [nazev] FROM [:PREFIX:zpusob_vyrizeni] WHERE [stav] != 0')->fetchPairs();
@@ -1923,3 +1864,4 @@ class DokumentHistorie extends BaseModel
     protected $primary = 'id';
 
 }
+
