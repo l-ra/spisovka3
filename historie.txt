@@ -117,6 +117,7 @@ Spisová služba:
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 
   serveru zobrazoval nesprávně
 - aplikace nyní umožňuje vytvořit odpověď pouze pro příchozí / doručené dokumenty
+- při vytváření odpovědi aplikace už nenabídne "příchozí" typy dokumentu
 - aplikace lépe ošetří chybu uživatele, když odpověď na dokument vytvoří "napůl",
   to je když uživatel začně vytvářet odpověď a proces nedokončí
 - odebrání přílohy u odpovědi na dokument zaznamenalo výjimku v aplikačním logu

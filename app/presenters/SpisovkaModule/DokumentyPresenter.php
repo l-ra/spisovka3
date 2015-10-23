@@ -1258,6 +1258,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     protected function createComponentOdpovedForm()
     {
         $form = $this->createNovyOrOdpovedForm();
+        
+        // Task #443 - Vytváření odpovědi umožňuje chybně typ dokumentu "příchozí"
+        $items = $form['dokument_typ_id']->items;
+        $all_types = TypDokumentu::vsechnyJakoTabulku();
+        foreach (array_keys($items) as $id) {
+            if ($all_types[$id]->smer == 0)
+                unset($items[$id]); // odstraň příchozí typy dokumentu ze seznamu
+        }
+        $form['dokument_typ_id']->setItems($items);
+        
         return $form;
     }
 
