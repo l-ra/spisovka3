@@ -21,6 +21,8 @@ Nové funkce:
 - nastavení uživatele jako filtr, řazení a hledání se již neukládají 
   do prohlížeče ve formě cookies, ale do databáze. To ocení uživatelé, kteří
   pracují s více instalacemi aplikace, případně používají více počítačů.
+- aplikace nyní automaticky čistí staré session soubory v adresáři
+  client/sessions, takže už by jich tam neměly být tisíce
 - v ladicím módu (DEBUG_ENABLE 1 v index.php) aplikace zobrazuje vpravo dole
   lištu s užitečnými informacemi: čas zpracování stránky, použitou paměť
   a databázové dotazy

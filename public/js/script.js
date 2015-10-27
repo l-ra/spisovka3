@@ -80,7 +80,7 @@ $(function() {
     
     $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
         // Při spouštění plánovače nečekáme na odpověď
-        if (thrownError == 'timeout' && ajaxSettings.url.indexOf('/cron/') != -1)
+        if (ajaxSettings.url.indexOf('/cron/') != -1)
             return;
         alert('Je nám líto, asynchronní požadavek skončil s chybou:\n' + thrownError);
         
@@ -416,7 +416,7 @@ isdsSubjekt = function ( formName ) {
  */
 ajaxcron = function () {
 
-    if (!(Math.random() < 0.1))
+    if (Math.random() > 0.1)
         return false;
     
     var url = BASE_URL + 'cron/spustit';
