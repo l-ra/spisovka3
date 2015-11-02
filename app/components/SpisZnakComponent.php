@@ -6,7 +6,7 @@ class SpisovyZnakComponent extends Nette\Forms\Controls\SelectBox
     {
         $m = new SpisovyZnak();
         $items = $m->selectBox(2);
-        parent::__construct('Spisový znak', $items);
+        parent::__construct('Spisový znak:', $items);
         
         $proto = $this->controlPrototype;
         $proto->attrs['class'] = 'widget_spisovy_znak';

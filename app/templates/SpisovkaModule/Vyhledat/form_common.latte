@@ -2,98 +2,52 @@
         <div class="h2">
             Filtr dokumentu
         </div>
-        <dl class="detail_item">
-            <dt>Typ dokumentu:</dt>
-            <dd>{$form['dokument_typ_id']->control}</dd>
-        </dl>
+        {input2 dokument_typ_id}
         {if isset($form['stav_dokumentu'])}
-        <dl class="detail_item">
-            <dt>Stav dokumentu:</dt>
-            <dd>{$form['stav_dokumentu']->control}</dd>
-        </dl>
+            {input2 stav_dokumentu}
         {/if}
+        {input2 cislo_jednaci}
+        {input2 spisova_znacka}
+        {input2 nazev}
+        {input2 popis}
+        {input2 typ_doruceni}
+        {input2 zpusob_doruceni_id}
         <dl class="detail_item">
-            <dt>Číslo jednací:</dt>
-            <dd>{$form['cislo_jednaci']->control}</dd>
+            <dt>Datum doručení/vzniku:</dt>
+            <dd>od: {$form['datum_vzniku_od']->control} {$form['datum_vzniku_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)<br />
+            do: {$form['datum_vzniku_do']->control} {$form['datum_vzniku_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
         </dl>
-        <dl class="detail_item">
-            <dt>Název spisu:</dt>
-            <dd>{$form['spisova_znacka']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Věc:</dt>
-            <dd>{$form['nazev']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Popis:</dt>
-            <dd>{$form['popis']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Způsob doručení přes epodatelnu:</dt>
-            <dd>{$form['typ_doruceni']->control}</dd>
-        </dl>        
-        <dl class="detail_item">
-            <dt>Způsob doručení:</dt>
-            <dd>{$form['zpusob_doruceni_id']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Datum doručení/vzniku </dt>
-            <dd>od: {$form['datum_vzniku_od']->control} {$form['datum_vzniku_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
-            <dd>do: {$form['datum_vzniku_do']->control} {$form['datum_vzniku_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Číslo jednací odesilatele:</dt>
-            <dd>{$form['cislo_jednaci_odesilatele']->control}</dd>
-        </dl>
+        
+        {input2 cislo_jednaci_odesilatele}
         <dl class="detail_item">
             <dt>Číslo doporučeného dopisu:</dt>
-            <dd>{$form['cislo_doporuceneho_dopisu']->control}</dd>
-            <dd>{$form['cislo_doporuceneho_dopisu_pouze']->control}</dd>
+            <dd>{$form['cislo_doporuceneho_dopisu']->control}<br />
+            {$form['cislo_doporuceneho_dopisu_pouze']->control}</dd>
         </dl>         
-        <dl class="detail_item">
-            <dt>Poznámka:</dt>
-            <dd>{$form['poznamka']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Způsob vyřízení:</dt>
-            <dd>{$form['zpusob_vyrizeni']->control}</dd>
-        </dl>
+        {input2 poznamka}
+        
+        {input2 zpusob_vyrizeni}
         <dl class="detail_item">
             <dt>Datum vyřízení:</dt>
-            <dd>od: {$form['datum_vyrizeni_od']->control} {$form['datum_vyrizeni_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
-            <dd>do: {$form['datum_vyrizeni_do']->control} {$form['datum_vyrizeni_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
+            <dd>od: {$form['datum_vyrizeni_od']->control} {$form['datum_vyrizeni_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)<br />
+            do: {$form['datum_vyrizeni_do']->control} {$form['datum_vyrizeni_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
         </dl>
-        <dl class="detail_item">
-            <dt>Způsob odeslání:</dt>
-            <dd>{$form['zpusob_odeslani']->control}</dd>
-        </dl>
+        
+        {input2 zpusob_odeslani}
         <dl class="detail_item">
             <dt>Datum odeslání:</dt>
-            <dd>od: {$form['datum_odeslani_od']->control} {$form['datum_odeslani_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
-            <dd>do: {$form['datum_odeslani_do']->control} {$form['datum_odeslani_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
+            <dd>od: {$form['datum_odeslani_od']->control} {$form['datum_odeslani_cas_od']->control}&nbsp; datum (d.m.r) / čas (h:m:s)<br />
+            do: {$form['datum_odeslani_do']->control} {$form['datum_odeslani_cas_do']->control}&nbsp; datum (d.m.r) / čas (h:m:s)</dd>
         </dl>
+        
         <dl class="detail_item">
             <dt>Druh zásilky:</dt>
-            <dd>{$form['druh_zasilky']->render()}</dd>
-        </dl>     
-        <dl class="detail_item">
-            <dt>Spisový znak:</dt>
-            <dd>{$form['spisovy_znak_id']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Skartační znak:</dt>
-            <dd>{$form['skartacni_znak']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Skartační lhůta:</dt>
-            <dd>{$form['skartacni_lhuta']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Spouštěcí událost:</dt>
-            <dd>{$form['spousteci_udalost']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Poznámka k vyřízení:</dt>
-            <dd>{$form['poznamka_vyrizeni']->control}&nbsp;</dd>
-        </dl>
+            <dd>{control $form['druh_zasilky']}</dd>
+        </dl> 
+        
+        {input2 spisovy_znak_id}
+        {input2 skartacni_znak}
+        {input2 skartacni_lhuta}
+        {input2 spousteci_udalost}
+        {input2 poznamka_vyrizeni}
     </div>

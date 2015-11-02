@@ -159,15 +159,15 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
         $form->addText('nazev', 'Věc:', 80, 100)
                 ->setValue(@$hledat['nazev']);
-        $form->addTextArea('popis', 'Stručný popis:', 80, 3)
+        $form->addTextArea('popis', 'Popis:', 80, 3)
                 ->setValue(@$hledat['popis']);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50)
                 ->setValue(@$hledat['cislo_jednaci']);
         $form->addText('spisova_znacka', 'Název spisu:', 50, 50)
                 ->setValue(@$hledat['spisova_znacka']);
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
+        $form->addSelect('dokument_typ_id', 'Typ dokumentu:', $typ_dokumentu)
                 ->setValue(@$hledat['dokument_typ_id']);
-        $form->addSelect('typ_doruceni', 'Způsob doručení:', $typ_doruceni)
+        $form->addSelect('typ_doruceni', 'Způsob doručení před e-podatelnu:', $typ_doruceni)
                 ->setValue(@$hledat['typ_doruceni']);
         $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni)
                 ->setValue(@$hledat['zpusob_doruceni_id']);
@@ -234,7 +234,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 ->setValue(@$hledat['poznamka_vyrizeni']);
         $form->addSelect('skartacni_znak', 'Skartační znak: ', $skartacni_znak)
                 ->setValue(@$hledat['skartacni_znak']);
-        $form->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5)
+        $form->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
                 ->setValue(@$hledat['skartacni_lhuta']);
         $form->addSelect('spousteci_udalost', 'Spouštěcí událost: ', $spudalost_seznam)
                 ->setValue(@$hledat['spousteci_udalost']);
@@ -291,13 +291,6 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 $controlPrototype->style(array('background-color' => '#ccffcc', 'border' => '1px #c0c0c0 solid'));
             }
         }
-
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }

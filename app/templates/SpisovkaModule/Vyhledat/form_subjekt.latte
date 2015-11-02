@@ -2,21 +2,9 @@
         <div class="h2">
             Adresáti / odesílatelé
         </div>
-        <dl class="detail_item">
-            <dt>Typ subjektu:</dt>
-            <dd>{$form['subjekt_type']->control}</dd>
-        </dl>
-
-        <dl class="detail_item">
-            <dt>Název subjektu, jméno, IČ:</dt>
-            <dd>{$form['subjekt_nazev']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>Ulice</dt>
-            <dd>
-                {$form['adresa_ulice']->control}
-            </dd>
-        </dl>
+        {input2 subjekt_type}
+        {input2 subjekt_nazev}
+        {input2 adresa_ulice}
         <dl class="detail_item">
             <dt>PSČ a město:</dt>
             <dd>
@@ -24,16 +12,7 @@
                 {$form['adresa_mesto']->control}
             </dd>
         </dl>
-        <dl class="detail_item">
-            <dt>{$form['subjekt_email']->label}:</dt>
-            <dd>{$form['subjekt_email']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>{$form['subjekt_telefon']->label}:</dt>
-            <dd>{$form['subjekt_telefon']->control}</dd>
-        </dl>
-        <dl class="detail_item">
-            <dt>{$form['subjekt_isds']->label}:</dt>
-            <dd>{$form['subjekt_isds']->control}</dd>
-        </dl>
+        {input2 subjekt_email}
+        {input2 subjekt_telefon}
+        {input2 subjekt_isds}
     </div>

@@ -15,6 +15,7 @@ class Form extends Nette\Application\UI\Form
     {
         parent::__construct($parent, $name);
         $this->onError[] = [$this, 'validationFailed'];
+        $this->setupRendering();
     }
     
     public function validationFailed($form)
@@ -37,5 +38,15 @@ class Form extends Nette\Application\UI\Form
     public function addDateTimePicker($name, $label, $cols = NULL, $maxLength = NULL)
     {
         return $this[$name] = new \DateTimePicker($label, $cols, $maxLength);        
+    }
+    
+    protected function setupRendering()
+    {
+        $renderer = $this->getRenderer();
+        
+        $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = 'dl';
+        $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['control']['container'] = 'dd';        
     }
 }

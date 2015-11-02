@@ -60,13 +60,18 @@ class MyLatteMacros
     // Vykresli standardni prvek formulare
     public static function input($form, $name)
     {
-
         $caption = $form[$name]->caption;
         $control = isset($form[$name]->controlPart) ? $form[$name]->controlPart : $form[$name]->control;
-        return "<dl class=\"detail_item\">
-            <dt>$caption</dt>
-            <dd>$control</dd>
-        </dl>";
+        
+        $renderer = $form->getRenderer();
+        $tpair = $renderer->wrappers['pair']['container'];
+        $tlabel = $renderer->wrappers['label']['container'];
+        $tcontrol = $renderer->wrappers['control']['container'];
+        
+        return "<$tpair>
+            <$tlabel>$caption</$tlabel>
+            <$tcontrol>$control</$tcontrol>
+        </$tpair>";
     }
 
 }
