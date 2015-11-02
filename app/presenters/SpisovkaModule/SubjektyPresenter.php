@@ -111,12 +111,6 @@ class SubjektyPresenter extends BasePresenter
 
         $form1->addTextArea('poznamka', 'Poznámka:', 50, 6);
 
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form1;
     }
 

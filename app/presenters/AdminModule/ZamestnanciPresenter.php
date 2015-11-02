@@ -173,12 +173,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $form1->addText('telefon', 'Telefon:', 50, 150);
         $form1->addText('pozice', 'Funkce:', 50, 150);
         
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form1;
     }
     
@@ -297,7 +291,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $Role = new RoleModel();
         $role_select = $Role->seznam();
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('osoba_id')
                 ->setValue(@$osoba->id);
         $form1->addHidden('user_id')
@@ -311,7 +305,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
                 $form1->addGroup('role_id_' . $ur->id);
                 $subForm = $form1->addContainer('role' . $ur->id);
-                $subForm->addCheckbox("user_role", 'povolit')
+                $subForm->addCheckbox("user_role")
                         ->setValue(1);
 
                 // zamez tomu, aby uživatel mohl stejnou roli mít přiřazenu několikrát
@@ -328,14 +322,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -433,7 +419,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     protected function createComponentOJForm()
     {
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
 
         $m = new Orgjednotka;
         $seznam = $m->linearniSeznam();
@@ -460,12 +446,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }

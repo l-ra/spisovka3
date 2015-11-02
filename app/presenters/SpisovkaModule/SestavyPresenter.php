@@ -541,12 +541,6 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('subjekt_telefon', 'Telefon:', 50, 150);
         $form->addText('subjekt_isds', 'ID datové schránky:', 10, 50);
 
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form;
     }
 

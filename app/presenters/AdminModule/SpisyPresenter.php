@@ -313,7 +313,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
      */
     protected function createComponentUpravitForm()
     {
-
         $Spisy = new Spis();
 
         $spis = $this->template->Spis;
@@ -370,20 +369,11 @@ class Admin_SpisyPresenter extends SpisyPresenter
                     ->setValue(date('d.m.Y', $unixtime));
         }
 
-
         $form1->addSubmit('upravit', 'Upravit')
                 ->onClick[] = array($this, 'upravitClicked');
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -434,14 +424,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoNovyClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }

@@ -1350,13 +1350,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoSeznamClicked');
 
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form;
     }
 
@@ -1558,15 +1551,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
 
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form;
     }
 
@@ -1651,8 +1635,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue($cas);
 
         $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
-        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id)
-        ;
+        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id);
 
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
                 ->setValue(@$Dok->ulozeni_dokumentu);
@@ -1681,23 +1664,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('vyrizeni_typ_prilohy', 'Typ přílohy:', 20, 50)
                 ->setValue(@$Dok->vyrizeni_typ_prilohy);
 
-
-//                ->addRule(Form::FILLED, 'Název dokumentu (věc) musí být vyplněno!');
-
         $form->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'upravitVyrizeniClicked');
         $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }
@@ -1755,15 +1726,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addSubmit('ok', 'Potvrdit')
                 ->onClick[] = array($this, 'udalostClicked');
-        // $form->addSubmit('storno', 'Zrušit vyřízení')
-        // ->setValidationScope(FALSE)
-        // ->onClick[] = array($this, 'stornoClicked');
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }
@@ -1877,19 +1839,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(true);
 
 
-
         $form->addSubmit('odeslat', 'Předat podatelně či Odeslat')
                 ->onClick[] = array($this, 'odeslatClicked');
         $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }

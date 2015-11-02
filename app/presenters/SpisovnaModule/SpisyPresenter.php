@@ -469,14 +469,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
 
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form1;
     }
 
@@ -513,66 +505,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $this->redirect(':Spisovna:Spisy:detail', array('id' => $spis_id));
     }
 
-    protected function createComponentNovyForm()
-    {
-
-        $Spisy = new Spis();
-
-        $typ_spisu = Spis::typSpisu();
-        $spisy = $Spisy->seznam(null, 1);
-
-        $form1 = new Nette\Application\UI\Form();
-        $form1->getElementPrototype()->id('spis-vytvorit');
-        $form1->addHidden('dokument_id', $this->template->dokument_id);
-        $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
-        $form1->addText('nazev', 'Název spisu:', 50, 80)
-                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
-        $form1->addText('popis', 'Popis:', 50, 200);
-        $form1->addSelect('spis_parent_id', 'Připojit k:', $spisy);
-
-        $form1->addSubmit('vytvorit', 'Vytvořit')
-                ->onClick[] = array($this, 'vytvoritClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
-        return $form1;
-    }
-
-    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $Spisy = new Spis();
-        $data['stav'] = 1;
-        $data['date_created'] = new DateTime();
-        $data['user_created'] = $this->user->getIdentity()->user_id;
-
-        try {
-            $Spisy->vytvorit($data);
-            $this->flashMessage('Spis "' . $data['nazev'] . '"  byl vytvořen.');
-            unset($data['dokument_id']);
-            if (!$this->isAjax()) {
-                //$this->redirect('this');
-            } else {
-                $this->invalidateControl('dokspis');
-            }
-
-            //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
-        } catch (DibiException $e) {
-            $this->flashMessage('Spis "' . $data['nazev'] . '" se nepodařilo vytvořit. ' . $e->getMessage(),
-                    'warning');
-        }
-    }
-
     protected function createComponentSearchForm()
     {
-
         $hledat = !is_null($this->hledat) ? $this->hledat : '';
 
         $form = new Nette\Application\UI\Form();

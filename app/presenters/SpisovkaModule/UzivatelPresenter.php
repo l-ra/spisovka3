@@ -327,9 +327,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     protected function createComponentNotificationsForm()
     {
-        $osoba = $this->template->Osoba;
-
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
 
         $form1->addCheckBox(Notifications::RECEIVE_DOCUMENT, 'Poslat e-mail, když mně je předán dokument')
                 ->setValue(Notifications::isUserNotificationEnabled(Notifications::RECEIVE_DOCUMENT));
@@ -340,12 +338,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
         
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form1;
     }
     

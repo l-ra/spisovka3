@@ -54,7 +54,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $stat_select = Subjekt::stat();
 
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addText('nazev', 'Název:', 50, 100)
                 ->setValue($Urad->nazev)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název úřadu musí být vyplněn.');
@@ -72,7 +72,6 @@ class Admin_NastaveniPresenter extends BasePresenter
                 ->setValue($Urad->adresa->psc);
         $form1->addSelect('stat', 'Stát:', $stat_select)
                 ->setValue($Urad->adresa->stat);
-
 
         $form1->addText('ic', 'IČ:', 20, 50)
                 ->setValue($Urad->firma->ico);
@@ -92,14 +91,6 @@ class Admin_NastaveniPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -139,11 +130,10 @@ class Admin_NastaveniPresenter extends BasePresenter
 
     protected function createComponentNastaveniCJForm()
     {
-
         $client_config = Nette\Environment::getVariable('client_config');
         $CJ = $client_config->cislo_jednaci;
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addText('maska', 'Maska:', 50, 100)
                 ->setValue($CJ->maska)
                 ->addRule(Nette\Forms\Form::FILLED, 'Maska čísla jednacího musí být vyplněna.');
@@ -156,9 +146,6 @@ class Admin_NastaveniPresenter extends BasePresenter
         $form1->addRadioList('typ_deniku', 'Podací deník:', array('urad' => 'společný pro celý úřad', 'org' => 'samostatný pro každou organizační jednotku'))
                 ->setValue(isset($CJ->typ_deniku) ? $CJ->typ_deniku : 'urad' );
 
-        //$form1->addText('typ', 'Metoda přičítání:', 50, 200)
-        //        ->setValue($CJ->typ);
-
         $CJ = new CisloJednaci;
         $form1->addCheckbox('minuly_rok', 'Evidovat dokumenty do minulého roku')
                 ->setValue($CJ->get_minuly_rok())
@@ -169,14 +156,6 @@ class Admin_NastaveniPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -206,11 +185,10 @@ class Admin_NastaveniPresenter extends BasePresenter
 
     protected function createComponentNastaveniForm()
     {
-
         $client_config = Nette\Environment::getVariable('client_config');
         $nastaveni = $client_config->nastaveni;
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addText('pocet_polozek', 'Počet položek v seznamu:', 10, 10)
                 ->setValue($nastaveni->pocet_polozek)
                 ->addRule(Nette\Forms\Form::INTEGER, 'Počet položek v seznamu musí být číslo.')
@@ -241,14 +219,6 @@ class Admin_NastaveniPresenter extends BasePresenter
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
 
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form1;
     }
 
@@ -276,7 +246,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
     public function createComponentNotificationsForm()
     {
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
 
         $form->addCheckBox(Notifications::RECEIVE_DOCUMENT, 'Poslat e-mail při předání dokumentu')
                 ->setValue(Notifications::isNotificationEnabled(Notifications::RECEIVE_DOCUMENT));
@@ -286,12 +256,6 @@ class Admin_NastaveniPresenter extends BasePresenter
         $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }

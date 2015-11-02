@@ -193,12 +193,6 @@ class Admin_SpisznakPresenter extends BasePresenter
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
 
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form1;
     }
 
@@ -236,13 +230,12 @@ class Admin_SpisznakPresenter extends BasePresenter
 
     protected function createComponentNovyForm()
     {
-
         $SpisovyZnak = new SpisovyZnak();
         $spisznak_seznam = $SpisovyZnak->selectBox(1);
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addText('nazev', 'Spisový znak:', 50, 80)
                 ->addRule(Nette\Forms\Form::FILLED, 'Spisový znak musí být vyplněn!');
         $form1->addText('popis', 'Popis:', 50, 200);
@@ -261,12 +254,6 @@ class Admin_SpisznakPresenter extends BasePresenter
                 ->onClick[] = array($this, 'stornoNovyClicked');
 
         $form1->onSuccess[] = array($this, 'vytvoritSucceeded');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }

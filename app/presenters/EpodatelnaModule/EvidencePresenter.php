@@ -430,15 +430,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoSeznamClicked');
 
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form;
     }
 
@@ -806,25 +797,15 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function createComponentEvidenceForm()
     {
-
         $epodatelna_id = $this->getParameter('id', null);
 
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addText('evidence', 'Evidence:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název evidence musí být vyplněno!');
         $form->addSubmit('evidovat', 'Zaevidovat')
-                // ->setRendered(TRUE)
                 ->onClick[] = array($this, 'zaevidovatClicked');
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }
@@ -865,20 +846,17 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function createComponentOdmitnoutEmailForm()
     {
-
         $epodatelna_id = $this->getParameter('id', null);
         $zprava = @$this->template->Zprava;
 
         $mess = "\n\n--------------------\n";
         $mess .= @$zprava->popis;
 
-
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
                 ->addRule(Nette\Forms\Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
-
 
         $form->addCheckbox('upozornit', 'Poslat upozornění odesilateli?')
                 ->setValue(true);
@@ -889,18 +867,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addTextArea('zprava', 'Zpráva pro odesilatele:', 80, 6)
                 ->setValue($mess);
 
-
         $form->addSubmit('odmitnout', 'Provést')
-                // ->setRendered(TRUE)
                 ->onClick[] = array($this, 'odmitnoutEmailClicked');
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }
@@ -972,7 +940,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 //        $zprava = @$this->template->Zprava;
 //        $original = @$this->template->original;
 
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
@@ -987,12 +955,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $form->addSubmit('odmitnout', 'Provést')
                 ->onClick[] = array($this, 'odmitnoutISDSClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }

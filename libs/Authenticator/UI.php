@@ -86,7 +86,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
     protected function createComponentNewUserForm($name)
     {
-        $form = new Nette\Application\UI\Form($this, $name);
+        $form = new Spisovka\Form($this, $name);
 
         $form->addHidden('osoba_id');
         if (isset($this->form_params['osoba_id']))
@@ -140,12 +140,6 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'handleCancel');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }
@@ -256,7 +250,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
     protected function createComponentChangePasswordForm($name)
     {
-        $form = new Nette\Application\UI\Form($this, $name);
+        $form = new Spisovka\Form($this, $name);
 
         $form->addHidden('osoba_id');
         $form->addHidden('user_id');
@@ -280,18 +274,12 @@ class Authenticator_UI extends Nette\Application\UI\Control
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'handleCancel');
 
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
-
         return $form;
     }
 
     protected function createComponentChangeAuthTypeForm($name)
     {
-        $form = new Nette\Application\UI\Form($this, $name);
+        $form = new Spisovka\Form($this, $name);
 
         $form->addHidden('osoba_id');
         $form->addHidden('user_id');
@@ -314,12 +302,6 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'handleCancel');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }

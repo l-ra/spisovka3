@@ -111,7 +111,7 @@ class Ciselnik extends Nette\Application\UI\Control
 
     protected function createComponentForm($name)
     {
-        $form = new Nette\Application\UI\Form($this, $name);
+        $form = new Spisovka\Form($this, $name);
         $form->onSubmit[] = array($this, 'formSubmitHandler');
 
         if (count($this->cols) > 0) {
@@ -233,12 +233,6 @@ class Ciselnik extends Nette\Application\UI\Control
 
         $form->addSubmit('stornoCiselnik', 'Zrušit')
                 ->setValidationScope(FALSE);
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }

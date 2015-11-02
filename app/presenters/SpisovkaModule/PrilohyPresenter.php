@@ -68,8 +68,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
      */
     protected function createComponentUploadForm()
     {
-
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
         $form1->getElementPrototype()->onSubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
 
@@ -87,14 +86,6 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $form1->addUpload('file', 'Soubor:');
         $form1->addSubmit('upload', 'Nahrát')
                 ->onClick[] = array($this, 'uploadClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -154,11 +145,10 @@ class Spisovka_PrilohyPresenter extends BasePresenter
      */
     protected function createComponentReUploadForm()
     {
-
         $File = new FileModel();
         $file_info = $File->getInfo($this->file_id);
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
         $form1->getElementPrototype()->onSubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
 
@@ -181,14 +171,6 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $form1->addUpload('file', 'Soubor:');
         $form1->addSubmit('upload', 'Nahrát')
                 ->onClick[] = array($this, 'reUploadClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }

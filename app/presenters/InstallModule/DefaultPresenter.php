@@ -760,13 +760,11 @@ class Install_DefaultPresenter extends BasePresenter
 
     protected function createComponentNastaveniUraduForm()
     {
-
         $client_config = Nette\Environment::getVariable('client_config');
         $Urad = $client_config->urad;
         $stat_select = Subjekt::stat();
 
-
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addText('nazev', 'Název:', 50, 100)
                 ->setValue($Urad->nazev)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název úřadu musí být vyplněn.');
@@ -785,7 +783,6 @@ class Install_DefaultPresenter extends BasePresenter
         $form1->addSelect('stat', 'Stát:', $stat_select)
                 ->setValue($Urad->adresa->stat);
 
-
         $form1->addText('ic', 'IČ:', 20, 50)
                 ->setValue($Urad->firma->ico);
         $form1->addText('dic', 'DIČ:', 20, 50)
@@ -801,12 +798,6 @@ class Install_DefaultPresenter extends BasePresenter
 
         $form1->addSubmit('upravit', 'Uložit a pokračovat v instalaci')
                 ->onClick[] = array($this, 'nastavitUradClicked');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -859,7 +850,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         $evidence = array("priorace" => "Priorace", "sberny_arch" => "Sběrný arch");
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addRadioList('typ_evidence', 'Typ evidence:', $evidence)
                 ->setValue($CJ->typ_evidence)
                 ->addRule(Nette\Forms\Form::FILLED, 'Volba evidence musí být vybrána.');
@@ -871,14 +862,6 @@ class Install_DefaultPresenter extends BasePresenter
 
         $form1->addSubmit('upravit', 'Uložit a pokračovat v instalaci')
                 ->onClick[] = array($this, 'nastavitCJClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -913,7 +896,7 @@ class Install_DefaultPresenter extends BasePresenter
     protected function createComponentSpravceForm()
     {
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addText('jmeno', 'Jméno:', 50, 150);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
                 ->addRule(Nette\Forms\Form::FILLED,
@@ -937,12 +920,6 @@ class Install_DefaultPresenter extends BasePresenter
 
         $form1->addSubmit('novy', 'Vytvořit správce')
                 ->onClick[] = array($this, 'spravceClicked');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }

@@ -324,7 +324,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     protected function createComponentNovyForm()
     {
-
         $form = new Spisovka\Form();
 
         $dokument_id = $this->getParameter('dokument_id');
@@ -391,12 +390,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoSeznamClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }

@@ -236,7 +236,7 @@ class Auth_Component_SSO extends Authenticator_UI
 
     protected function createComponentUserRegistrationForm($name)
     {
-        $form = new Nette\Application\UI\Form($this, $name);
+        $form = new Spisovka\Form($this, $name);
 
         $form->addText('jmeno', 'Jméno:', 50, 150);
         $form->addText('prijmeni', 'Příjmení:', 50, 150)
@@ -251,12 +251,6 @@ class Auth_Component_SSO extends Authenticator_UI
         //$form->addSubmit('storno', 'Zrušit')
         //         ->setValidationScope(FALSE);
         $form->onSubmit[] = array($this, 'formSubmitHandler');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }

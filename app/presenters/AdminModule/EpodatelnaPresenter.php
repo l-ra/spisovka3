@@ -202,7 +202,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             '2' => 'Hostovaná spisovka (certifikátem + jménem a heslem)'
         );
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('index');
                 
         $form1->addHidden('ep_typ')
@@ -245,14 +245,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -384,7 +376,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $id = $this->getParameter('id', null);
         $index = substr($id, 1);
 
-        $form = new Nette\Application\UI\Form();
+        $form = new Spisovka\Form();
         $form->addHidden('index')
                 ->setValue($index);
         $form->addHidden('zmenit_heslo_isds')
@@ -413,12 +405,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form;
     }
@@ -511,7 +497,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             '/imap/ssl/novalidate-cert' => 'IMAP+SSL',
         );
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue('e');
@@ -557,14 +543,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -640,14 +618,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }

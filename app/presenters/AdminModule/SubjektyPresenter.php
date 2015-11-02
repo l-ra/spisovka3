@@ -201,7 +201,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     {
         $stav_select = Subjekt::stav();
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('id');
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select);
         $form1->addSubmit('zmenit_stav', 'Změnit stav')
@@ -215,12 +215,6 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
             $form1['id']->setValue($subjekt->id);
             $form1['stav']->setValue($subjekt->stav);
         }
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }

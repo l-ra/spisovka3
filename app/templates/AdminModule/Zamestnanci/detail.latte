@@ -78,15 +78,15 @@
             <dd>
                 {if count($Role[$u->id])>0}
                 {if $RoleUpravit == $u->id}
-                    {$roleForm->render('begin')}
+                    {form $roleForm}
 
                     {foreach $Role[$u->id] as $r}
-                        {$roleForm['role'.$r->id.'-user_role']->control} {$r->name}<br />
+                        {input 'role'.$r->id.'-user_role'} {$r->name}<br />
                     {/foreach}
-                    {$roleForm['add_role']->control} &nbsp;  {$roleForm['role']->control}
+                    {input add_role} &nbsp;  {input role}
                     <br /> <br />
-                    {$roleForm['zmenitRole']->control} {$roleForm['storno']->control}
-                    {$roleForm->render('end')}
+                    {input zmenitRole} {input storno}
+                    {/form}
                 {else}
                     {foreach $Role[$u->id] as $r}
                         {$r->name}<br />

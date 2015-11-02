@@ -91,7 +91,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         }
         $role_select[0] = "(nedědí)";
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
         $form1->addHidden('fixed')
@@ -117,16 +117,6 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -185,7 +175,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $role_select = $RoleModel->seznamProDedeni();
         $role_select[0] = "(nedědí)";
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addText('name', 'Název role:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název role musí být vyplněno!');
         $form1->addText('code', 'Kódové označení role:', 50, 150)
@@ -198,12 +188,6 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoSeznamClicked');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -345,10 +329,9 @@ class Admin_OpravneniPresenter extends BasePresenter
      */
     protected function createComponentNovyResourceForm()
     {
-
         $role = $this->template->Role;
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
         $form1->addText('name', 'Název zdroje:', 50, 100)
@@ -362,14 +345,6 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
@@ -404,7 +379,7 @@ class Admin_OpravneniPresenter extends BasePresenter
             $resource[$r->id] = $r->code;
         }
 
-        $form1 = new Nette\Application\UI\Form();
+        $form1 = new Spisovka\Form();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
         $form1->addText('name', 'Název pravidla:', 50, 100)
@@ -417,14 +392,6 @@ class Admin_OpravneniPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
-
-        $renderer = $form1->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = 'dl';
-        $renderer->wrappers['label']['container'] = 'dt';
-        $renderer->wrappers['control']['container'] = 'dd';
 
         return $form1;
     }
