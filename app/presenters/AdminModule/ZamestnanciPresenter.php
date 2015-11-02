@@ -389,7 +389,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     protected function createComponentSearchForm()
     {
-
         $hledat = !is_null($this->hledat) ? $this->hledat : '';
 
         $form = new Nette\Application\UI\Form();
@@ -400,7 +399,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $form->addSubmit('hledat', 'Hledat')
                 ->onClick[] = array($this, 'hledatSimpleClicked');
 
-        //$form1->onSubmit[] = array($this, 'upravitFormSubmitted');
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = null;
