@@ -8,7 +8,7 @@
         {if $module == "Spisovka"}Poznámka: Při použití tohoto hledání se dočasně deaktivuje filtr dokumentů.<br/>{/if}
         <span n:if="!$vidiVsechnyDokumenty">Poznámka: Nemáte právo vidět všechny dokumenty, výsledek hledání bude omezen.</span>
     {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>Přidělen:</dt>
             <dd>
             {$form['prideleno_text']->control}
@@ -54,7 +54,7 @@
         </script>
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Předán:</dt>
             <dd>
             {$form['predano_text']->control}

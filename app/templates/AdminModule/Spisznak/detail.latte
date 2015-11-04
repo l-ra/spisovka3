@@ -14,27 +14,27 @@
     <div class="detail_blok">
         <div class="detail_hlavicka">Info</div>
 
-        <dl class="detail_item">
+        <dl>
             <dt>Spisový znak:</dt>
             <dd>{$SpisZnak->nazev}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Popis:</dt>
             <dd>{$SpisZnak->popis}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační znak:</dt>
             <dd>{$SpisZnak->skartacni_znak}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační lhůta:</dt>
             <dd>{$SpisZnak->skartacni_lhuta}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($SpisZnak->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Stav:</dt>
             <dd>{=SpisovyZnak::stav($SpisZnak->stav)}&nbsp;</dd>
         </dl>

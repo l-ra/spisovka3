@@ -89,7 +89,7 @@ foreach ($clients as $site_path => $site_name) {
         $config = $client->get_db_config();
 
         echo '<div class="dokument_blok">';
-        echo '<dl class="detail_item">';
+        echo '<dl>';
         echo '    <dt>Databáze:</dt>';
         echo '    <dd>' . $config['driver'] . '://' . $config['username'] . '@' . $config['host'] . '/' . $config['database'] . '&nbsp;</dd>';
         echo '</dl>';
@@ -104,7 +104,7 @@ foreach ($clients as $site_path => $site_name) {
 
     // dibi::getProfiler()->setFile(UPDATE_DIR.'log.sql');   nefunkcni, v adresari s db aktualizacemi nelze zapisovat
 
-    echo '<dl class="detail_item">';
+    echo '<dl>';
     echo '    <dt>Poslední zjištěná revize klienta:</dt>';
     echo '    <dd>' . $client_revision . '&nbsp;</dd>';
     echo '</dl>';

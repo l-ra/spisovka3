@@ -1,37 +1,23 @@
 <form action="{link :Spisovka:Vypravna:detail, 'id'=>$dokument->dokodes_id}" method="post" id="vypravna_form" onsubmit="return false;">
     <dl>
         <dt>Datum odeslání:</dt>
-        <dd><input type="text" class="datepicker" name="datum_odeslani" value="{$dokument->datum_odeslani|edate}" /></dd>
-    </dl> 
+        <dd><input type="text" class="datepicker" name="datum_odeslani" value="{$dokument->datum_odeslani|edate}" /></dd><br />
     {if $dokument->zpusob_odeslani_id == 3}
-    <dl>
         <dt>Druh zásilky:</dt>
-        <dd>{control druhZasilky}</dd>
-    </dl>
-    <dl>
+        <dd>{control druhZasilky}</dd><br />
         <dt>Cena Kč:</dt>
-        <dd><input type="text" name="cena_zasilky" value="{$dokument->cena}" size="10" /></dd>
-    </dl>                
-    <dl>
+        <dd><input type="text" name="cena_zasilky" value="{$dokument->cena}" size="10" /></dd><br />
         <dt>Hmotnost:</dt>
-        <dd><input type="text" name="hmotnost_zasilky" value="{$dokument->hmotnost}" size="10" /></dd>
-    </dl>
-    <dl>
+        <dd><input type="text" name="hmotnost_zasilky" value="{$dokument->hmotnost}" size="10" /></dd><br />
         <dt>Poznámka:</dt>
-        <dd><input type="text" name="poznamka" value="{$dokument->poznamka}" /></dd>
-    </dl>
+        <dd><input type="text" name="poznamka" value="{$dokument->poznamka}" /></dd><br />
     {/if}
     {if $dokument->zpusob_odeslani_id == 4}
-    <dl>
         <dt>Číslo faxu:</dt>
-        <dd><input type="text" name="cislo_faxu" value="{$dokument->cislo_faxu}" size="20" /></dd>
-    </dl>
-    <dl>
+        <dd><input type="text" name="cislo_faxu" value="{$dokument->cislo_faxu}" size="20" /></dd><br />
         <dt>Zpráva pro příjemce:</dt>
-        <dd><textarea name="zprava" rows="5" cols="80">{$dokument->zprava}</textarea></dd>
-    </dl>    
+        <dd><textarea name="zprava" rows="5" cols="80">{$dokument->zprava}</textarea></dd><br />
     {/if}
-    <dl>
         <dt>&nbsp;</dt>
         <dd>
             <input type="submit" name="vypravna_upravit" value="Uložit" onclick="return vypravnaSubmit()" />

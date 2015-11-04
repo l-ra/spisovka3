@@ -15,31 +15,31 @@
     <h2>{$Spis->nazev}</h2>
     
     <div class="detail_blok">
-        <dl class="detail_item">
+        <dl>
             <dt>Název spisu:</dt>
             <dd>{$Spis->nazev}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Popis:</dt>
             <dd>{$Spis->popis}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Spisový znak:</dt>
             <dd>{$SpisZnak_nazev}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační znak:</dt>
             <dd>{$Spis->skartacni_znak}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační lhůta:</dt>
             <dd>{$Spis->skartacni_lhuta}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Stav:</dt>
             <dd>
                 {=Spis::stav($Spis->stav)}

@@ -8,7 +8,7 @@
     {if count($n_isds)>0}
     {foreach $n_isds as $index => $isds}
     <div class="detail_blok">
-        <dl class="detail_item">
+        <dl>
             <dt>&nbsp;</dt>
             <dd>
                 {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id'=>'i'.$index}">
@@ -16,19 +16,19 @@
             </a>{/access}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>ID datové schránky:</dt>
             <dd>{$isds['idbox']}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Vlastník DS:</dt>
             <dd>{$isds['vlastnik']}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Stav DS:</dt>
             <dd>{$isds['stav']}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Podatelna pro příjem této DS:</dt>
             <dd>{if empty($isds['podatelna'])}kterákoli{else}{=Orgjednotka::getName($isds['podatelna'])}{/if}&nbsp;</dd>
         </dl>
@@ -46,7 +46,7 @@
     {if count($n_email)>0}
     {foreach $n_email as $index => $email}
     <div class="detail_blok">
-        <dl class="detail_item">
+        <dl>
             <dt>&nbsp;</dt>
             <dd>
                 {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id'=>'e'.$index}">
@@ -54,11 +54,11 @@
             </a>{/access}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Server:</dt>
             <dd>{$email['protokol']} - {$email['server']}:{$email['port']} / {$email['inbox']}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Příjem:</dt>
             <dd>
                 {if $email['only_signature']==1}
@@ -72,7 +72,7 @@
                 {/if}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Podatelna pro příjem této schránky:</dt>
             <dd>{if empty($email['podatelna'])}kterákoli{else}{=Orgjednotka::getName($email['podatelna'])}{/if}&nbsp;</dd>
         </dl>
@@ -87,7 +87,7 @@
     {if count($n_odeslani)>0}
     {foreach $n_odeslani as $index => $odes}
     <div class="detail_blok">
-        <dl class="detail_item">
+        <dl>
             <dt>&nbsp;</dt>
             <dd>
                 {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id'=>'o'.$index}">
@@ -95,11 +95,11 @@
             </a>{/access}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Způsob odeslání:</dt>
             <dd>{$odes['zpusob_odeslani']}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>E-mailová adresa odesilatele:</dt>
             <dd>{$odes['email']}&nbsp;</dd>
         </dl>
@@ -114,7 +114,7 @@
     {if count($n_ca)>0}
     <div class="detail_blok">
     {foreach $n_ca as $index => $ca}
-        <dl class="detail_item">
+        <dl>
             <dt>&nbsp;</dt>
             <dd>
                 {$index}<br />

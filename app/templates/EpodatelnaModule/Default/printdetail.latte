@@ -12,11 +12,11 @@
 <body>
 <div id="content">
     <div class="dokument_blok_hlavni">
-        <dl class="detail_item">
+        <dl>
             <dt>Identifikátor DZ v e-podatelně:</dt>
             <dd>OSS-EP-I-{$Zprava->poradi}-{$Zprava->rok}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Typ zprávy:</dt>
             <dd>
             {if !empty($Zprava->email_id) }
@@ -28,33 +28,33 @@
             {/if}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Schránka:</dt>
             <dd>{$Zprava->adresat}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Věc:</dt>
             <dd class="velke_pismo"><u>{$Zprava->predmet}</u>&nbsp;</dd>
         </dl>
 
-        <dl class="detail_item">
+        <dl>
             <dt>Odesílatel:</dt>
             <dd>{$Zprava->odesilatel}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Doručeno:</dt>
             <dd>{$Zprava->doruceno_dne|edatetime}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Přijato epodatelnou:</dt>
             <dd>{$Zprava->prijato_dne|edatetime}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Identifikátor epodatelny:</dt>
             <dd><pre>{$Identifikator['popis']}</pre></dd>
         </dl>
         {if $Identifikator['typ'] == "email" }
-        <dl class="detail_item">
+        <dl>
             <dt>Ověření identifikátoru:</dt>
             <dd>
             {if $Identifikator['cert_signed'] >= 0 }

@@ -11,24 +11,24 @@
         {if ($FormUpravit=='info')}
         {control upravitForm}
         {else}
-        <dl class="detail_item">
+        <dl>
             <dt>Zkrácený název:</dt>
             <dd>{$OrgJednotka->zkraceny_nazev}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Plný název:</dt>
             <dd>{$OrgJednotka->plny_nazev}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Zkratka / číselná řada:</dt>
             <dd>{$OrgJednotka->ciselna_rada}&nbsp;</dd>
         </dl>
 
-        <dl class="detail_item">
+        <dl>
             <dt>Informace:</dt>
             <dd>{!$OrgJednotka->note|enl2br}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Stav:</dt>
             <dd>{if $OrgJednotka->stav!=1}neaktivní{else}aktivní{/if}&nbsp;</dd>
         </dl>

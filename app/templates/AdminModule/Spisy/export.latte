@@ -7,13 +7,13 @@
     
     <form action="{link :Admin:Spisy:export}" method="post">
     <div class="detail_blok">
-        <dl class="detail_item">
+        <dl>
             <dt>Exportovat do formátu:</dt>
             <dd>
                 <input type="radio" name="export_do" value="csv" checked="checked" /> CSV <br />
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Exportovat co:</dt>
             <dd>
                 <select name="export_co">
@@ -25,7 +25,7 @@
 
         <br /><br />
         <div class="detail_hlavicka">Parametry pro export do CSV</div>
-        <dl class="detail_item">
+        <dl>
             <dt>Výstupní kódování:</dt>
             <dd>
                 <select name="csv_code">
@@ -36,15 +36,15 @@
                 </select>    
             </dd>
         </dl>          
-        <dl class="detail_item">
+        <dl>
             <dt>Oddělovač řádků:</dt>
             <dd><input type="text" name="csv_radek" value="\r\n" size="5" /></dd>
         </dl>            
-        <dl class="detail_item">
+        <dl>
             <dt>Oddělovač sloupců:</dt>
             <dd><input type="text" name="csv_sloupce" value="," size="5" /></dd>
         </dl>            
-        <dl class="detail_item">
+        <dl>
             <dt>Ohraničení hodnot:</dt>
             <dd><input type="text" name="csv_hodnoty" value='"' size="5" /></dd>
         </dl>            

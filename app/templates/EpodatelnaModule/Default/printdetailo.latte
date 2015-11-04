@@ -12,11 +12,11 @@
 <body>
 <div id="content">
     <div class="dokument_blok_hlavni">
-        <dl class="detail_item">
+        <dl>
             <dt>Pořadí DZ v e-podatelně:</dt>
             <dd>OSS-EP-O-{$Zprava->poradi}-{$Zprava->rok}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Typ zprávy:</dt>
             <dd>
             {if !empty($Zprava->email_id) }
@@ -28,20 +28,20 @@
             {/if}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Schránka:</dt>
             <dd>{$Zprava->adresat}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Věc:</dt>
             <dd class="velke_pismo"><u>{$Zprava->predmet}</u>&nbsp;</dd>
         </dl>
 
-        <dl class="detail_item">
+        <dl>
             <dt>Adresát:</dt>
             <dd>{$Zprava->odesilatel}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Odesláno:</dt>
             <dd>{$Zprava->doruceno_dne|edatetime}&nbsp;</dd>
         </dl>

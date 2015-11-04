@@ -8,7 +8,7 @@
         {if ($FormUpravit=='info')}
         {control nastaveniUraduForm}
         {else}
-        <dl class="detail_item">
+        <dl>
             <dt>Název:</dt>
             <dd>{$Urad->nazev}&nbsp;</dd><br />
             <dt>Plný název:</dt>
@@ -55,7 +55,7 @@
         </dl>        
         {access :Admin:Nastaveni:}<a href="{link this, 'upravit'=>'cjednaci'}#cj">Upravit</a>{/access}
         {/if}
-        <dl n:if="$FormUpravit=='cjednaci'" class="detail_item">
+        <dl n:if="$FormUpravit=='cjednaci'">
             <dt>Masky:</dt>
             <dd class="normal-font">
                 <table>
@@ -165,7 +165,7 @@
         {if ($FormUpravit=='nastaveni')}
         {control nastaveniForm}
         {else}
-        <dl class="detail_item">
+        <dl>
             <dt>Počet položek v seznamu:</dt>
             <dd>{$Nastaveni->pocet_polozek}&nbsp;</dd><br />
             <dt>Vynutit protokol HTTPS:</dt>
@@ -181,7 +181,7 @@
         </dl>
         
         <div class="detail_hlavicka">Odeslání Českou poštou</div>
-        <dl class="detail_item">
+        <dl>
             <dt>Číslo zákaznické karty:</dt>
             <dd>{$cislo_zakaznicke_karty}&nbsp;</dd><br />
             <dt>Způsob úhrady:</dt>
@@ -198,7 +198,7 @@
         {if ($FormUpravit=='upozorneni')}
         {control notificationsForm}
         {else}
-        <dl class="detail_item">
+        <dl>
             <dt>Poslat e-mail při předání dokumentu:</dt>
             <dd>{$notification_receive_document ? 'ano' : 'ne'}</dd>
         </dl>

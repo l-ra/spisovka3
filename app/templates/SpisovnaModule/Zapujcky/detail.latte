@@ -16,27 +16,27 @@
     </div>
 
     <div class="dokument_blok_hlavni">
-        <dl class="detail_item">
+        <dl>
             <dt>Zapůjčený dokument:</dt>
             <dd><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Zapujcka->dokument_id}">{$Zapujcka->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$Zapujcka->poradi}{/if} - {$Zapujcka->nazev}</a></dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Zapůjčeno komu:</dt>
             <dd>{=Osoba::displayName($Zapujcka)}</dd>
         </dl>        
-        <dl class="detail_item">
+        <dl>
             <dt>Důvod zapůjčení:</dt>
             <dd>{!$Zapujcka->duvod|enl2br}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum výpůjčky:</dt>
             <dd>{$Zapujcka->date_od|edate}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum vrácení:</dt>
             <dd>{$Zapujcka->date_do|edate}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Stav:</dt>
             <dd>{=Zapujcka::stav($Zapujcka->stav)}</dd>
         </dl>        

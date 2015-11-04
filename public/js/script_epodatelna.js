@@ -286,7 +286,7 @@ subjekt_seznam +
 '                </div>'+
 '                <div id="evidence_form_jina_evidence_'+id+'">'+
 '                    <span>Zaevidovat zprávu do jiné evidence.</span>'+
-'                    <dl class="detail_item">'+
+'                    <dl>'+
 '                        <dt>Evidence:</dt>'+
 '                        <dd><textarea name="evidence['+id+']" rows="3" cols="60"></textarea></dd>'+
 '                    </dl>'+

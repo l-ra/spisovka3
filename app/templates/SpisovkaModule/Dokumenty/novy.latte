@@ -59,12 +59,12 @@
 
     {$novyForm->render('begin')}
     <div class="dokument_blok_hlavni">
-        <dl class="detail_item">
+        <dl>
             <dt>JID:</dt>
             <dd>{$Dok->jid}&nbsp;</dd>
         </dl>
         {if $Typ_evidence != 'sberny_arch'}
-        <dl class="detail_item">
+        <dl>
             <dt>Číslo jednací:</dt>
             <dd style="color: #808080;">
                 <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;                
@@ -72,12 +72,12 @@
             </dd>
         </dl>
         {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>Typ dokumentu:</dt>
             <dd>{$novyForm['dokument_typ_id']->control}</dd>
         </dl>
         {if $Typ_evidence != 'sberny_arch'}
-        <dl class="detail_item">
+        <dl>
             <dt>Název spisu:</dt>
             <dd>
                 <span id="dok_spis">
@@ -95,35 +95,35 @@
             </dd>
         </dl>
         {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>{$novyForm['nazev']->label}</dt>
             <dd>{$novyForm['nazev']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Popis:</dt>
             <dd>{$novyForm['popis']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>{$novyForm['datum_vzniku']->label}</dt>
             <dd>{$novyForm['datum_vzniku']->control} {$novyForm['datum_vzniku_cas']->control}</dd>
         </dl>
         {* tyto prvky jsou zobrazovany / skryvany Javascriptem *}
         <div class="pouze_prichozi_dokument">
-        <dl class="detail_item">
+        <dl>
             <dt>{$novyForm['zpusob_doruceni_id']->label}</dt>
             <dd>{$novyForm['zpusob_doruceni_id']->control}</dd>
         </dl>        
-        <dl class="detail_item">
+        <dl>
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$novyForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Číslo doporučeného dopisu:</dt>
             <dd>{$novyForm['cislo_doporuceneho_dopisu']->control}</dd>
         </dl>
         </div>
         {if $Typ_evidence == 'priorace'}
-        <dl class="detail_item">
+        <dl>
             <dt>Spojit s dokumentem:</dt>
             <dd>
                 <span id="dok_spojit">
@@ -138,7 +138,7 @@
             </dd>
         </dl>
         {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>Počet listů:</dt>
             <dd>{$novyForm['pocet_listu']->control}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
@@ -147,7 +147,7 @@
                 <span style="font-weight: normal;">Typ přílohy: </span>{$novyForm['typ_prilohy']->control}
             </dd>
         </dl>
-        <dl class="detail_item" n:if="isset($novyForm['lhuta'])">
+        <dl n:if="isset($novyForm['lhuta'])">
             <dt>{$novyForm['lhuta']->label}</dt>
             <dd>{$novyForm['lhuta']->control} dní</dd>
         </dl>
@@ -155,11 +155,11 @@
 
     <div n:if="!isset($odpoved_na_dokument)" class="dokument_blok_sedy">
         <div class="h2">Předání</div>
-        <dl class="detail_item">
+        <dl>
             <dt>Poznámka pro příjemce:</dt>
             <dd>{$novyForm['predani_poznamka']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Předat:</dt>
             <dd>
                 <input type="text" name="predano_autocomplete" id="predat_autocomplete" size="40" />
@@ -175,14 +175,14 @@
             Adresáti / odesílatelé
         </div>
         <div class="blok_akce">
-            <dl class="detail_item">
+            <dl>
                 <dt>Připojit subjekt:</dt>
                 <dd>
                     <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
                     <a href="{link :Spisovka:Subjekty:vyber, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
                 </dd>
             </dl>
-            <dl class="detail_item_adress" id="subjekt_novy">
+            <dl id="subjekt_novy">
                 <dt>&nbsp;</dt>
                 <dd>
                     <a href={link Subjekty:novy, dok_id => $Dok->id} id="novysubjekt_click">Vytvořit nový subjekt</a>

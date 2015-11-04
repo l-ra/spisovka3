@@ -29,15 +29,15 @@
     {if $Lze_zaradit_do_skartacniho_rizeni}
     <div class="dokument_blok_sedy">
         <div class="h2">Připojit dokument do skartačního řízení k posouzení</div>
-        <dl class="detail_item">
+        <dl>
             <dt>Spisový znak:</dt>
             <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační znak:</dt>
             <dd>{$Dok->skartacni_znak}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>&nbsp;</dt>
             <dd>
                 <a href="{link :Spisovna:Dokumenty:keskartaci, 'id'=>$Dok->id}" id="keskartacidokument">Přidat do skartačního řízení</a>
@@ -49,15 +49,15 @@
     {if $Lze_provest_skartacni_rizeni==1}
     <div class="dokument_blok_sedy">
         <div class="h2">Rozhodnutí o skartaci dokumentu</div>
-        <dl class="detail_item">
+        <dl>
             <dt>Spisový znak:</dt>
             <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační znak:</dt>
             <dd>{$Dok->skartacni_znak}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Rozhodnutí:</dt>
             <dd>
                 <a href="{link :Spisovna:Dokumenty:archivovat, 'id'=>$Dok->id}" id="archivovatdokument">Archivovat</a>
@@ -72,15 +72,15 @@
 
     <div class="dokument_blok_hlavni">
         <div class="h2">{$Dok->typ_dokumentu->nazev}</div>
-        <dl class="detail_item">
+        <dl>
             <dt>JID:</dt>
             <dd>{$Dok->jid}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
             <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Název spisu:</dt>
             <dd>
             {if isset($Dok->spisy) }
@@ -92,44 +92,44 @@
             {/if}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Věc:</dt>
             <dd class="velke_pismo"><u>{$Dok->nazev}</u>&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Popis:</dt>
             <dd>{!$Dok->popis|enl2br}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum doručení/vzniku:</dt>
             <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
         </dl>
         {if !empty($Dok->zpusob_doruceni)}
-        <dl class="detail_item">
+        <dl>
             <dt>Způsob doručení:</dt>
             <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
         </dl>        
         {/if}        
         {if !empty($Dok->cislo_jednaci_odesilatele)}
-        <dl class="detail_item">
+        <dl>
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$Dok->cislo_jednaci_odesilatele}&nbsp;</dd>
         </dl>
         {/if}
         {if !empty($Dok->cislo_doporuceneho_dopisu)}
-        <dl class="detail_item">
+        <dl>
             <dt>Číslo doporučeného dopisu:</dt>
             <dd>{$Dok->cislo_doporuceneho_dopisu}&nbsp;</dd>
         </dl>
         {/if}        
         {if !empty($Dok->poznamka)}
-        <dl class="detail_item">
+        <dl>
             <dt>Poznámka:</dt>
             <dd>{!$Dok->poznamka|html2br}&nbsp;</dd>
         </dl>
         {/if}
         {if $Typ_evidence=='priorace'}
-        <dl class="detail_item">
+        <dl>
             <dt>Spojeno s dokumentem:</dt>
             <dd>
                 <span id="dok_spojit">
@@ -144,17 +144,17 @@
             </dd>
         </dl>
         {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>Počet listů / příloh:</dt>
             <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num}</dd>
         </dl>
         {if !empty($Dok->identifikator)}
-        <dl class="detail_item">
+        <dl>
             <dt>Identifikátor epodatelny:</dt>
             <dd><pre>{$Dok->identifikator['popis']}</pre></dd>
         </dl>
         {if $Dok->identifikator['typ'] == "email" }
-        <dl class="detail_item">
+        <dl>
             <dt>Ověření identifikátoru:</dt>
             <dd>
             {if $Dok->identifikator['cert_signed'] >= 0 }
@@ -193,45 +193,45 @@
         <div class="dokument_blok">
         {if $Lze_menit_skartacni_rezim && $Upravit_param == 'skart_rezim'}
         {$vyrizovaniForm->render('begin')}
-        <dl class="detail_item">
+        <dl>
             <dt>Způsob vyřízení:</dt>
             <dd>{$Dok->zpusob_vyrizeni}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum vyřízení:</dt>
             <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Spisový znak:</dt>
             <dd>{$vyrizovaniForm['spisovy_znak_id']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační znak:</dt>
             <dd>{$vyrizovaniForm['skartacni_znak']->control}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační lhůta:</dt>
             <dd>{$vyrizovaniForm['skartacni_lhuta']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         {if $Dok->stav_dokumentu>=5}
-        <dl class="detail_item">
+        <dl>
             <dt>Datum spouštěcí události:</dt>
             <dd>{$Dok->datum_spousteci_udalosti|edate}&nbsp;</dd>
         </dl>
         {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>Počet listů / příloh:</dt>
             <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Uložení dokumentu:</dt>
             <dd>{$vyrizovaniForm['ulozeni_dokumentu']->control}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Poznámka k vyřízení:</dt>
             <dd>{!$Dok->poznamka_vyrizeni|enl2br}&nbsp;</dd>
         </dl>        
@@ -242,45 +242,45 @@
         </div>
         {$vyrizovaniForm->render('end')}
         {else}        
-        <dl class="detail_item">
+        <dl>
             <dt>Způsob vyřízení:</dt>
             <dd>{$Dok->zpusob_vyrizeni}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum vyřízení:</dt>
             <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Spisový znak:</dt>
             <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační znak:</dt>
             <dd>{$Dok->skartacni_znak}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační lhůta:</dt>
             <dd class="normal-font"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
         {if $Dok->stav_dokumentu>=5}
-        <dl class="detail_item">
+        <dl>
             <dt>Datum spouštěcí události:</dt>
             <dd>{$Dok->datum_spousteci_udalosti|edate}&nbsp;</dd>
         </dl>
         {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>Počet listů / příloh:</dt>
             <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Uložení dokumentu:</dt>
             <dd>{!$Dok->ulozeni_dokumentu|enl2br}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Poznámka k vyřízení:</dt>
             <dd>{!$Dok->poznamka_vyrizeni|enl2br}&nbsp;</dd>
         </dl>
@@ -293,7 +293,7 @@
         {if $Dok->typ_dokumentu->smer == 1}
         {foreach $Dok->workflow as $workflow}
         {if $workflow->stav_dokumentu==1}
-        <dl class="detail_item">
+        <dl>
             <dt>Vytvořil:</dt>
             <dd>
             {if empty($workflow->prideleno_id) }
@@ -307,7 +307,7 @@
             {/if}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Vytvořil dne:</dt>
             <dd>{$workflow->date|edatetime}</dd>
         </dl>         
@@ -318,7 +318,7 @@
         {if !isset($Dok->prideleno)}
         <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
         {else}
-        <dl class="detail_item">
+        <dl>
             <dt>Vyřídil:</dt>
             <dd>
             {if empty($Dok->prideleno->prideleno_id) }
@@ -332,7 +332,7 @@
             {/if}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum vyřízení:</dt>
             <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
         </dl>           
@@ -342,21 +342,21 @@
     {if $Zapujcka != null}
     <div class="dokument_blok_sedy">
         <div class="h2">Zápůjčka</div>
-        <dl class="detail_item">
+        <dl>
             <dt>Zapůjčeno:</dt>
             <dd>
                 {=Osoba::displayName($Zapujcka)}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Důvod zapůjčení:</dt>
             <dd>{!$Zapujcka->duvod|enl2br}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum výpůjčky:</dt>
             <dd>{$Zapujcka->date_od|edate}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum vrácení:</dt>
             <dd>{$Zapujcka->date_do|edate}</dd>
         </dl>          

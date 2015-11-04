@@ -7,7 +7,7 @@
         {/if}
         
         {foreach $Dok->workflow as $wf}
-        <dl class="detail_item">
+        <dl>
             <dt>{$wf->date|edatetime}</dt>
             <dd>
             {if $wf->stav_dokumentu == 1}

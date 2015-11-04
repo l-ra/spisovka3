@@ -1,7 +1,7 @@
     <form action="" method="get" onsubmit="return zobrazSestavu(this);">
         {var new_view = $presenter->getParameter('tisk') ?: 'detail'}
         <input type="hidden" name="url" value="{link $new_view, id => $id}">
-        <dl class="detail_item">
+        <dl>
             <dt>Pořadové číslo:</dt>
             <dd>
                 od: <input type="text" name="pc_od" size="10" />
@@ -9,7 +9,7 @@
                 <span class="normal-font">(celočíselná kladná hodnota)</span>
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum:</dt>
             <dd>
                 od: <input type="text" name="d_od" size="10" class="datepicker" />
@@ -17,13 +17,13 @@
                 <span class="normal-font">(platný formát data včetně dne, měsíce a roku)</span>
            </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>&nbsp;</dt>
             <dd>
                 <input type="checkbox" name="d_today" /> dnešní ({date("j.n.Y")})
             </dd>            
         </dl>        
-        <dl class="detail_item">
+        <dl>
             <dt>Rok:</dt>
             <dd>
                 <select name="rok">{var $rok = date("Y")}
@@ -33,7 +33,7 @@
                 </select>
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>&nbsp;</dt>
             <dd>
                 <input type="submit" name="filtrovat" value="Zobrazit" />

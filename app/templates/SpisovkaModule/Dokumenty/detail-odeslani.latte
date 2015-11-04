@@ -1,7 +1,7 @@
     <div class="dokument_blok_sedy">
         <div class="h2">Odesílání</div>
         {foreach $Dok->odeslani as $odes}
-        <dl class="detail_item">
+        <dl>
             <dt>
             {if $odes->zpusob_odeslani_id <= 2}
                 {$odes->datum_odeslani|edatetime}

@@ -11,15 +11,15 @@
         {if ($FormUpravit=='info')}
         {control upravitForm}
         {else}
-        <dl class="detail_item">
+        <dl>
             <dt>email:</dt>
             <dd>{$Osoba->email}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>telefon:</dt>
             <dd>{$Osoba->telefon}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>funkce:</dt>
             <dd>{$Osoba->pozice}&nbsp;</dd>
         </dl>
@@ -44,7 +44,7 @@
 
         {if count($Accounts)>0}
         {foreach $Accounts as $u}
-        <dl class="detail_item">
+        <dl>
             <dt>Uživatelské jméno:</dt>
             <dd>{$u->username}&nbsp;</dd>
         </dl>
@@ -54,12 +54,12 @@
         {if ($ZmenaPrihlaseni === $u->id)}
         {control changeAuthTypeForm}
         {elseif $remote_auth_supported}
-        <dl class="detail_item">
+        <dl>
             <dt>Ověření hesla:</dt>
             <dd>{$u->external_auth ? 'externí' : 'lokální'}&nbsp;</dd>
         </dl>
         {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>Poslední přihlášení:</dt>
             <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}&nbsp;</dd>
         </dl>
@@ -67,13 +67,13 @@
         {if ($FormUpravit == 'org' && $UpravitUserId == $u->id)}
         {control oJForm}
         {else}
-        <dl class="detail_item">
+        <dl>
             <dt>Organizační jednotka:</dt>
             <dd>{$u->org_nazev}&nbsp;</dd>
         </dl>
         {/if}
         
-        <dl class="detail_item">
+        <dl>
             <dt>Role:</dt>
             <dd>
                 {if count($Role[$u->id])>0}
@@ -107,7 +107,7 @@
                 {/if}
             </dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>&nbsp;</dt>
             <dd>
                 {if $u->external_auth != 1}
@@ -131,7 +131,7 @@
         <br />
         {/foreach}
         {else}
-        <dl class="detail_item">
+        <dl>
             <dt>&nbsp;</dt>
             <dd>Zaměstnanec nemá uživatelský účet</dd>
         </dl>

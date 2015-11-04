@@ -8,27 +8,27 @@
     
     {$novyForm->render('begin')}
     <div class="dokument_blok_hlavni">
-        <dl class="detail_item">
+        <dl>
             <dt><strong>{$novyForm['dokument_text']->label} *</strong></dt>
             <dd>
                 {$novyForm['dokument_text']->control}{$novyForm['dokument_id']->control}
             </dd>
         </dl>
-        <dl class="detail_item" n:if="isset($novyForm['user_text'])">
+        <dl n:if="isset($novyForm['user_text'])">
             <dt><strong>{$novyForm['user_text']->label} *</strong></dt>
             <dd>
                 {$novyForm['user_text']->control}{$novyForm['user_id']->control}
             </dd>
         </dl>        
-        <dl class="detail_item">
+        <dl>
             <dt>{$novyForm['duvod']->label}</dt>
             <dd>{$novyForm['duvod']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>{$novyForm['date_od']->label}</dt>
             <dd>{$novyForm['date_od']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>{$novyForm['date_do']->label}</dt>
             <dd>{$novyForm['date_do']->control}</dd>
         </dl>

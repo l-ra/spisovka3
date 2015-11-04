@@ -8,7 +8,7 @@
     {$novyForm->render('begin')}
     <div class="dokument_blok_hlavni">
         {if 0}
-        <dl class="detail_item">
+        <dl>
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
             <dd>
                 <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;
@@ -16,32 +16,32 @@
             </dd>
         </dl>
         {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>Typ dokumentu:</dt>
             <dd>{$novyForm['dokument_typ_id']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Věc:</dt>
             <dd>{$novyForm['nazev']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Popis:</dt>
             <dd>{$novyForm['popis']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Datum a čas doručení:</dt>
             <dd>{$novyForm['datum_vzniku']->control} {$novyForm['datum_vzniku_cas']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$novyForm['cislo_jednaci_odesilatele']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Poznámka:</dt>
             <dd>{$novyForm['poznamka']->control}</dd>
         </dl>
         {if $Typ_evidence == 'priorace'}
-        <dl class="detail_item">
+        <dl>
             <dt>Spojit s dokumentem:</dt>
             <dd>
                 <span id="dok_spojit">
@@ -56,16 +56,16 @@
             </dd>
         </dl>
         {/if}
-        <dl class="detail_item">
+        <dl>
             <dt>Počet listů:</dt>
             <dd>{$novyForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$novyForm['pocet_priloh']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Identifikátor epodatelny:</dt>
             <dd><pre>{$Identifikator['popis']}</pre></dd>
         </dl>
         {if $Identifikator['typ'] == "email" }
-        <dl class="detail_item">
+        <dl>
             <dt>Ověření identifikátoru:</dt>
             <dd>
             {if $Identifikator['cert_signed'] >= 0 }
@@ -100,15 +100,15 @@
 
     <div class="dokument_blok_sedy">
         <div>Předání / vyřízení</div>
-        <dl class="detail_item">
+        <dl>
             <dt>Lhůta k vyřízení:</dt>
             <dd>{$novyForm['lhuta']->control} dní</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Poznámka:</dt>
             <dd>{$novyForm['predani_poznamka']->control}</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Předat:</dt>
             <dd>
                 <input type="text" name="predano_autocomplete" id="predat_autocomplete" size="40" />
@@ -165,14 +165,14 @@
             Nalezené shody s odesilatelem zprávy
         </div>
         <div class="blok_akce">
-            <dl class="detail_item">
+            <dl>
                 <dt>Vyhledat subjekt:</dt>
                 <dd>
                     <input type="text" name="subjekt_autocomplete" id="subjekt_epod_autocomplete" size="60" />
                     <a href="{link Subjekty:vyber}" id="dialog-subjekt">Seznam</a>
                 </dd>
             </dl>
-            <dl class="detail_item" id="subjekt_novy">
+            <dl id="subjekt_novy">
                 <dt>&nbsp;</dt>
                 <dd>
                     <a href={link :Spisovka:Subjekty:novy, f => evidNovySubjektOk} id="epod_evid_novysubjekt_click" data-postdata="{json_encode($Subjekt['original'])}">Vytvořit nový subjekt z odesílatele</a>

@@ -175,11 +175,11 @@ $(function() {
             if ( ui.item.id.substring(0,1) == "u" ) {
                 $('#frmnovyForm-predano_user').val(ui.item.id.substr(1));
                 $('#frmnovyForm-predano_org').val('');
-                $('#predano').html("<dl class=\"detail_item\"><dt>Předán:</dt><dd>"+ui.item.nazev+"</dd></dl>");
+                $('#predano').html("<dl><dt>Předán:</dt><dd>"+ui.item.nazev+"</dd></dl>");
             } else if ( ui.item.id.substring(0,1) == "o" ) {
                 $('#frmnovyForm-predano_user').val('');
                 $('#frmnovyForm-predano_org').val(ui.item.id.substr(1));
-                $('#predano').html("<dl class=\"detail_item\"><dt>Předán:</dt><dd>organizační jednotce<br />"+ui.item.nazev+"</dd></dl>");
+                $('#predano').html("<dl><dt>Předán:</dt><dd>organizační jednotce<br />"+ui.item.nazev+"</dd></dl>");
             }
         }
     });
@@ -601,7 +601,7 @@ osobaVybrana = function (elm) {
             part = data.split('#');
             $('#frmnovyForm-predano_user').val(part[1]);
             $('#frmnovyForm-predano_org').val(part[2]);
-            $('#predano').html("<dl class=\"detail_item\"><dt>Předán:</dt><dd>"+part[3]+"</dd></dl>");
+            $('#predano').html("<dl><dt>Předán:</dt><dd>"+part[3]+"</dd></dl>");
             closeDialog();
         } else {
             $('#dialog').html(data);

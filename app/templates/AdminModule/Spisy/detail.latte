@@ -27,37 +27,37 @@
         {else}
     <div class="detail_blok">
         <div class="detail_hlavicka">Info</div>
-        <dl class="detail_item">
+        <dl>
             <dt>Typ spisu:</dt>
             <dd>{=Spis::typSpisu($Spis->typ)}&nbsp;</dd>
         </dl>
 
-        <dl class="detail_item">
+        <dl>
             <dt>Název:</dt>
             <dd>{$Spis->nazev}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Popis:</dt>
             <dd>{!$Spis->popis|enl2br}&nbsp;</dd>
         </dl>
 
-        <dl class="detail_item">
+        <dl>
             <dt>Spisový znak:</dt>
             <dd>{$SpisZnak_nazev}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační znak:</dt>
             <dd>{$Spis->skartacni_znak}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Skartační lhůta:</dt>
             <dd>{$Spis->skartacni_lhuta}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}&nbsp;</dd>
         </dl>
-        <dl class="detail_item">
+        <dl>
             <dt>Stav:</dt>
             <dd>
                 {=Spis::stav($Spis->stav)}
