@@ -42,9 +42,14 @@
 
 .help_content dt {
     font-weight: bold;
+    display: block;
+    margin: 8px 0px 5px 0px;
+    width: auto;
+    text-align: left;
 }
 
 .help_content dd {
-    padding: 5px 0px;
-    margin-left: 30px;
+    margin: 5px 0px 8px 30px;
+    display: block;
+    font-weight: normal;
 }
