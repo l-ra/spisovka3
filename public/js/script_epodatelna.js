@@ -100,8 +100,12 @@ epodSubjektVybran = function (elm, subjekt_id) {
     renderEpodSubjekty(subjekt_id);
 };
 
-zkontrolovatSchranku = function (elm) {
+zkontrolovatSchranku = function (nacist_nove_zpravy) {
 
+    // pro jistotu. Ošetři případ, že by byl parametr neuveden.
+    if (typeof nacist_nove_zpravy === 'undefined')
+        nacist_nove_zpravy = true;
+    
     $('#zkontrolovat_status').html('<img src="'+PUBLIC_URL+'images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
 
     url = BASE_URL + 'epodatelna/default/zkontrolovatAjax';
@@ -109,7 +113,10 @@ zkontrolovatSchranku = function (elm) {
     $.get(url, function(data) {
         $('#zkontrolovat_status').html(data);
         // nacteni novych zprav z database se musi provest az po stazeni vsech zprav z emailove schranky
-        nactiZpravy();
+        if (nacist_nove_zpravy)
+            nactiZpravy();
+        else
+            $('#zkontrolovat_status').append('<br /><input type="button" value="Načíst nové zprávy" onclick="nactiZpravy()" />');
     }).fail(function(data) {
         $('#zkontrolovat_status').html('Při kontrole zpráv došlo k chybě.');
     });    

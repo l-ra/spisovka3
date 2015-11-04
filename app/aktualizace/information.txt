@@ -75,3 +75,5 @@ Smazání sloupce spisovy_znak.selected
 [960]
 Kontrola e-mailových adres zaměstnanců
 (pokud je adresa zadána, musí být platná)
+[970]
+Nové nastavení "Automaticky načíst zprávy po kontrole schránek"

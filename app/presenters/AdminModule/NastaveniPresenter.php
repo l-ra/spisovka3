@@ -29,9 +29,11 @@ class Admin_NastaveniPresenter extends BasePresenter
         $this->template->force_https = Settings::get('router_force_https', false);
         $this->template->users_can_change_their_password = Settings::get('users_can_change_their_password', true);
         $this->template->login_redirect_homepage = Settings::get('login_redirect_homepage', false);
-        $this->template->kopirovat_email_do_poznamky = Settings::get('epodatelna_copy_email_into_documents_note');
         $this->template->povolit_predani_vyrizeneho_dokumentu = Settings::get('spisovka_allow_forward_finished_documents', false);
-                
+
+        $this->template->automaticky_nacist_zpravy = Settings::get('epodatelna_auto_load_new_messages');
+        $this->template->kopirovat_email_do_poznamky = Settings::get('epodatelna_copy_email_into_documents_note');
+        
         $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
         $this->template->zpusob_uhrady = Settings::get('Ceska_posta_zpusob_uhrady', '');
 
@@ -190,6 +192,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $nastaveni = $client_config->nastaveni;
 
         $form1 = new Spisovka\Form();
+        $form1->addGroup('Ostatní nastavení');
         $form1->addText('pocet_polozek', 'Počet položek v seznamu:', 10, 10)
                 ->setValue($nastaveni->pocet_polozek)
                 ->addRule(Nette\Forms\Form::INTEGER, 'Počet položek v seznamu musí být číslo.')
@@ -201,11 +204,16 @@ class Admin_NastaveniPresenter extends BasePresenter
                 ->setValue(Settings::get('users_can_change_their_password', true));
         $form1->addCheckBox('login_redirect_homepage', 'Po přihlášení přesměrovat na domovskou stránku')
                 ->setValue(Settings::get('login_redirect_homepage', false));
-        $form1->addCheckBox('kopirovat_email_do_poznamky', 'Kopírovat obsah e-mailu do poznámky dokumentu')
-                ->setValue(Settings::get('epodatelna_copy_email_into_documents_note'));
         $form1->addCheckBox('povolit_predani', 'Povolit předání vyřízeného dokumentu')
                 ->setValue(Settings::get('spisovka_allow_forward_finished_documents', false));
 
+        $form1->addGroup('E-podatelna');
+        $form1->addCheckBox('automaticky_nacist_zpravy', 'Automaticky načíst zprávy po kontrole schránek')
+                ->setValue(Settings::get('epodatelna_auto_load_new_messages'));
+        $form1->addCheckBox('kopirovat_email_do_poznamky', 'Kopírovat obsah e-mailu do poznámky dokumentu')
+                ->setValue(Settings::get('epodatelna_copy_email_into_documents_note'));
+        
+        $form1->addGroup('Odeslání Českou poštou');
         $form1->addText('cislo_zakaznicke_karty', 'Číslo Zákaznické karty:', 13, 13)
                 ->setValue(Settings::get('Ceska_posta_cislo_zakaznicke_karty', ''))
                 ->addCondition(Nette\Forms\Form::FILLED)
@@ -220,6 +228,10 @@ class Admin_NastaveniPresenter extends BasePresenter
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
 
+        $renderer = $form1->getRenderer();
+        $renderer->wrappers['group']['container'] = null;
+        $renderer->wrappers['group']['label'] = 'div class="detail_hlavicka"';
+        
         return $form1;
     }
 
@@ -235,9 +247,11 @@ class Admin_NastaveniPresenter extends BasePresenter
         Settings::set('router_force_https', $data['force_https']);
         Settings::set('users_can_change_their_password', $data['users_can_change_their_password']);
         Settings::set('login_redirect_homepage', $data['login_redirect_homepage']);
-        Settings::set('epodatelna_copy_email_into_documents_note', $data['kopirovat_email_do_poznamky']);
         Settings::set('spisovka_allow_forward_finished_documents', $data['povolit_predani']);
 
+        Settings::set('epodatelna_auto_load_new_messages', $data['automaticky_nacist_zpravy']);
+        Settings::set('epodatelna_copy_email_into_documents_note', $data['kopirovat_email_do_poznamky']);
+        
         Settings::set('Ceska_posta_cislo_zakaznicke_karty', $data['cislo_zakaznicke_karty']);
         Settings::set('Ceska_posta_zpusob_uhrady', $data['zpusob_uhrady'] === '' ? '' : self::$ciselnik_zpusoby_uhrad[$data['zpusob_uhrady']]);
 
