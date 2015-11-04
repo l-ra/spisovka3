@@ -2,7 +2,26 @@
 
 class Admin_NastaveniPresenter extends BasePresenter
 {
+    /* array indices */
 
+    const ST_DB_NAME = 0;
+    const ST_DEFAULT_VALUE = 1;
+    const ST_DESCRIPTION = 2;
+
+    static protected $settings = [
+        'force_https' =>
+        [ 'router_force_https', false, 'Vynutit zabezpečené připojení protokolem HTTPS'],
+        'users_can_change_their_password' =>
+        [ 'users_can_change_their_password', true, 'Uživatelé mohou měnit své heslo'],
+        'login_redirect_homepage' =>
+        [ 'login_redirect_homepage', false, 'Po přihlášení přesměrovat na domovskou stránku'],
+        'povolit_predani' =>
+        [ 'spisovka_allow_forward_finished_documents', false, 'Povolit předání vyřízeného dokumentu'],
+        'automaticky_nacist_zpravy' =>
+        [ 'epodatelna_auto_load_new_messages', null, 'Automaticky načíst zprávy po kontrole schránek'],
+        'kopirovat_email_do_poznamky' =>
+        [ 'epodatelna_copy_email_into_documents_note', null, 'Kopírovat obsah e-mailu do poznámky dokumentu'],
+    ];
     static public $ciselnik_zpusoby_uhrad = array(
         '' => 'neurčeno - vyplním ručně na každém archu',
         'v hotovosti',
@@ -26,15 +45,14 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         $this->template->Ukazka = $CJ->generuj();
 
-        $this->template->force_https = Settings::get('router_force_https', false);
-        $this->template->users_can_change_their_password = Settings::get('users_can_change_their_password', true);
-        $this->template->login_redirect_homepage = Settings::get('login_redirect_homepage', false);
-        $this->template->povolit_predani_vyrizeneho_dokumentu = Settings::get('spisovka_allow_forward_finished_documents', false);
+        $this->template->settings = self::$settings;
 
-        $this->template->automaticky_nacist_zpravy = Settings::get('epodatelna_auto_load_new_messages');
-        $this->template->kopirovat_email_do_poznamky = Settings::get('epodatelna_copy_email_into_documents_note');
-        
-        $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty', '');
+        foreach (array_keys(self::$settings) as $short_name) {
+            $this->stTemplateVar($short_name);
+        }
+
+        $this->template->cislo_zakaznicke_karty = Settings::get('Ceska_posta_cislo_zakaznicke_karty',
+                        '');
         $this->template->zpusob_uhrady = Settings::get('Ceska_posta_zpusob_uhrady', '');
 
         $this->template->notification_receive_document = Notifications::isNotificationEnabled(Notifications::RECEIVE_DOCUMENT);
@@ -145,13 +163,15 @@ class Admin_NastaveniPresenter extends BasePresenter
                     ->setValue($CJ->oddelovac);
         }
 
-        $form1->addRadioList('typ_deniku', 'Podací deník:', array('urad' => 'společný pro celý úřad', 'org' => 'samostatný pro každou organizační jednotku'))
+        $form1->addRadioList('typ_deniku', 'Podací deník:',
+                        array('urad' => 'společný pro celý úřad', 'org' => 'samostatný pro každou organizační jednotku'))
                 ->setValue(isset($CJ->typ_deniku) ? $CJ->typ_deniku : 'urad' );
 
         $CJ = new CisloJednaci;
         $form1->addCheckbox('minuly_rok', 'Evidovat dokumenty do minulého roku')
                 ->setValue($CJ->get_minuly_rok())
-                ->setOption('description', Nette\Utils\Html::el()
+                ->setOption('description',
+                        Nette\Utils\Html::el()
                         ->setHtml('<br /><small>Tuto volbu použijte jen ve výjimečných případech. Zaškrtnutí ovlivní generování všech č.j. v aplikaci.</small>'));
 
         $form1->addSubmit('upravit', 'Uložit')
@@ -196,23 +216,15 @@ class Admin_NastaveniPresenter extends BasePresenter
         $form1->addText('pocet_polozek', 'Počet položek v seznamu:', 10, 10)
                 ->setValue($nastaveni->pocet_polozek)
                 ->addRule(Nette\Forms\Form::INTEGER, 'Počet položek v seznamu musí být číslo.')
-                ->addRule(Nette\Forms\Form::RANGE, 'Počet položek v seznamu musí být v rozsahu od 1 do 500', array(1, 500));
+                ->addRule(Nette\Forms\Form::RANGE,
+                        'Počet položek v seznamu musí být v rozsahu od 1 do 500', array(1, 500));
 
-        $form1->addCheckBox('force_https', 'Vynutit zabezpečené připojení protokolem HTTPS')
-                ->setValue(Settings::get('router_force_https', false));
-        $form1->addCheckBox('users_can_change_their_password', 'Uživatelé mohou měnit své heslo')
-                ->setValue(Settings::get('users_can_change_their_password', true));
-        $form1->addCheckBox('login_redirect_homepage', 'Po přihlášení přesměrovat na domovskou stránku')
-                ->setValue(Settings::get('login_redirect_homepage', false));
-        $form1->addCheckBox('povolit_predani', 'Povolit předání vyřízeného dokumentu')
-                ->setValue(Settings::get('spisovka_allow_forward_finished_documents', false));
+        foreach (array_keys(self::$settings) as $short_name) {
+            if ($short_name == 'automaticky_nacist_zpravy')
+                $form1->addGroup('E-podatelna');
+            $this->stCheckBox($form1, $short_name);
+        }
 
-        $form1->addGroup('E-podatelna');
-        $form1->addCheckBox('automaticky_nacist_zpravy', 'Automaticky načíst zprávy po kontrole schránek')
-                ->setValue(Settings::get('epodatelna_auto_load_new_messages'));
-        $form1->addCheckBox('kopirovat_email_do_poznamky', 'Kopírovat obsah e-mailu do poznámky dokumentu')
-                ->setValue(Settings::get('epodatelna_copy_email_into_documents_note'));
-        
         $form1->addGroup('Odeslání Českou poštou');
         $form1->addText('cislo_zakaznicke_karty', 'Číslo Zákaznické karty:', 13, 13)
                 ->setValue(Settings::get('Ceska_posta_cislo_zakaznicke_karty', ''))
@@ -220,7 +232,8 @@ class Admin_NastaveniPresenter extends BasePresenter
                 ->addRule(Nette\Forms\Form::INTEGER, 'Chybné číslo karty.');
 
         $form1->addRadioList('zpusob_uhrady', 'Způsob úhrady:', self::$ciselnik_zpusoby_uhrad)
-                ->setValue(array_search(Settings::get('Ceska_posta_zpusob_uhrady', ''), self::$ciselnik_zpusoby_uhrad));
+                ->setValue(array_search(Settings::get('Ceska_posta_zpusob_uhrady', ''),
+                                self::$ciselnik_zpusoby_uhrad));
 
         $form1->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'nastavitClicked');
@@ -231,7 +244,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $renderer = $form1->getRenderer();
         $renderer->wrappers['group']['container'] = null;
         $renderer->wrappers['group']['label'] = 'div class="detail_hlavicka"';
-        
+
         return $form1;
     }
 
@@ -244,16 +257,13 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         (new Spisovka\ConfigClient())->save($config_data);
 
-        Settings::set('router_force_https', $data['force_https']);
-        Settings::set('users_can_change_their_password', $data['users_can_change_their_password']);
-        Settings::set('login_redirect_homepage', $data['login_redirect_homepage']);
-        Settings::set('spisovka_allow_forward_finished_documents', $data['povolit_predani']);
+        foreach (self::$settings as $short_name => $set) {
+            Settings::set($set[self::ST_DB_NAME], $data[$short_name]);
+        }
 
-        Settings::set('epodatelna_auto_load_new_messages', $data['automaticky_nacist_zpravy']);
-        Settings::set('epodatelna_copy_email_into_documents_note', $data['kopirovat_email_do_poznamky']);
-        
         Settings::set('Ceska_posta_cislo_zakaznicke_karty', $data['cislo_zakaznicke_karty']);
-        Settings::set('Ceska_posta_zpusob_uhrady', $data['zpusob_uhrady'] === '' ? '' : self::$ciselnik_zpusoby_uhrad[$data['zpusob_uhrady']]);
+        Settings::set('Ceska_posta_zpusob_uhrady',
+                $data['zpusob_uhrady'] === '' ? '' : self::$ciselnik_zpusoby_uhrad[$data['zpusob_uhrady']]);
 
         $this->flashMessage('Obecná nastavení byla upravena.');
         $this->redirect('this');
@@ -263,7 +273,8 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $form = new Spisovka\Form();
 
-        $form->addCheckBox(Notifications::RECEIVE_DOCUMENT, 'Poslat e-mail při předání dokumentu')
+        $form->addCheckBox(Notifications::RECEIVE_DOCUMENT,
+                        'Poslat e-mail při předání dokumentu')
                 ->setValue(Notifications::isNotificationEnabled(Notifications::RECEIVE_DOCUMENT));
 
         $form->addSubmit('upravit', 'Uložit')
@@ -283,6 +294,31 @@ class Admin_NastaveniPresenter extends BasePresenter
                 $data[Notifications::RECEIVE_DOCUMENT]);
         $this->flashMessage('Nastavení upozornění bylo upraveno.');
         $this->redirect('this');
+    }
+
+    /**
+     * Adds a checkbox to the form
+     * @param Spisovka\Form $form
+     * @param string $short_name
+     */
+    protected function stCheckBox(Spisovka\Form $form, $short_name)
+    {
+        $s = self::$settings[$short_name];
+
+        $form->addCheckBox($short_name, $s[self::ST_DESCRIPTION])
+                ->setValue(Settings::get($s[self::ST_DB_NAME], $s[self::ST_DEFAULT_VALUE]));
+    }
+
+    /**
+     * Sets template variable for display
+     * @param string $short_name
+     */
+    protected function stTemplateVar($short_name)
+    {
+        $s = self::$settings[$short_name];
+
+        $this->template->$short_name = Settings::get($s[self::ST_DB_NAME],
+                        $s[self::ST_DEFAULT_VALUE]);
     }
 
 }

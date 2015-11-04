@@ -168,20 +168,12 @@
             <div class="detail_hlavicka">Ostatní nastavení</div>
             <dt>Počet položek v seznamu:</dt>
             <dd>{$Nastaveni->pocet_polozek}&nbsp;</dd><br />
-            <dt>Vynutit protokol HTTPS:</dt>
-            <dd>{!$force_https ? 'ano' : 'ne'}</dd><br />
-            <dt>Uživatelé mohou měnit své heslo:</dt>
-            <dd>{!$users_can_change_their_password ? 'ano' : 'ne'}</dd><br />
-            <dt>Po přihlášení přesměrovat na domovskou stránku:</dt>
-            <dd>{!$login_redirect_homepage ? 'ano' : 'ne'}</dd><br />
-            <dt>Povolit předání vyřízeného dokumentu:</dt>
-            <dd>{!$povolit_predani_vyrizeneho_dokumentu ? 'ano' : 'ne'}</dd>
-
-            <div class="detail_hlavicka">E-podatelna</div>
-            <dt>Automaticky načíst zprávy po kontrole schránek:</dt>
-            <dd>{!$automaticky_nacist_zpravy ? 'ano' : 'ne'}</dd><br />
-            <dt>Kopírovat obsah e-mailu do poznámky dokumentu:</dt>
-            <dd>{!$kopirovat_email_do_poznamky ? 'ano' : 'ne'}</dd><br />
+            
+            {foreach $settings as $short_name => $setting}
+                <div class="detail_hlavicka" n:if="$short_name == 'automaticky_nacist_zpravy'">E-podatelna</div>
+                <dt>{$setting[$presenter::ST_DESCRIPTION]}:</dt>
+                <dd>{!$$short_name ? 'ano' : 'ne'}</dd><br />
+            {/foreach}
         
             <div class="detail_hlavicka">Odeslání Českou poštou</div>
             <dt>Číslo zákaznické karty:</dt>
