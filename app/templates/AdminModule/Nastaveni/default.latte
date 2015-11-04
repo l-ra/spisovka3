@@ -10,70 +10,46 @@
         {else}
         <dl class="detail_item">
             <dt>Název:</dt>
-            <dd>{$Urad->nazev}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{$Urad->nazev}&nbsp;</dd><br />
             <dt>Plný název:</dt>
-            <dd>{$Urad->plny_nazev}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{$Urad->plny_nazev}&nbsp;</dd><br />
             <dt>Zkratka:</dt>
-            <dd>{$Urad->zkratka}&nbsp;</dd>
-        </dl>
-
-
-
-        <dl class="detail_item">
+            <dd>{$Urad->zkratka}&nbsp;</dd><br />
             <dt>Adresa:</dt>
             <dd>
                 {$Urad->adresa->ulice}&nbsp;<br />
                 {$Urad->adresa->psc} {$Urad->adresa->mesto}&nbsp;<br />
                 {$Urad->adresa->stat}&nbsp;<br />
-            </dd>
-        </dl>
-        <dl class="detail_item">
+            </dd><br />
             <dt>Telefon:</dt>
-            <dd>{$Urad->kontakt->telefon}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{$Urad->kontakt->telefon}&nbsp;</dd><br />
             <dt>Email:</dt>
-            <dd>{$Urad->kontakt->email}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{$Urad->kontakt->email}&nbsp;</dd><br />
             <dt>URL:</dt>
             <dd>{$Urad->kontakt->www}&nbsp;</dd>
         </dl>
-
 
         {access :Admin:Nastaveni:}<a href="{link this, 'upravit'=>'info'}">Upravit</a>{/access}
         {/if}
     </div>
 
-    <a name="cj">
+    <a name="cj" />
     <div class="detail_blok">
         <div class="detail_hlavicka">Číslo jednací</div>
         {if ($FormUpravit=='cjednaci')}
         {control nastaveniCJForm}
         {else}
-        <dl class="detail_item">
+            <dl>    
             <dt>Maska čísla jednacího:</dt>
-            <dd>{$CisloJednaci->maska}&nbsp;</dd>
-        </dl>
-        {if $CisloJednaci->typ_evidence == 'sberny_arch'}
-        <dl class="detail_item">
+            <dd>{$CisloJednaci->maska}&nbsp;</dd><br />
+            {if $CisloJednaci->typ_evidence == 'sberny_arch'}
             <dt>Znak oddělovače pořadového čísla:</dt>
-            <dd>{if isset($CisloJednaci->oddelovac)}{$CisloJednaci->oddelovac}{else}/{/if}&nbsp;</dd>
-        </dl>
-        {/if}
-        <dl class="detail_item">
+            <dd>{if isset($CisloJednaci->oddelovac)}{$CisloJednaci->oddelovac}{else}/{/if}&nbsp;</dd><br />
+            {/if}
             <dt>Ukázka podoby:</dt>
-            <dd>{$Ukazka->cislo_jednaci}{if $CisloJednaci->typ_evidence == 'sberny_arch'}{$CisloJednaci->oddelovac}1{/if}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{$Ukazka->cislo_jednaci}{if $CisloJednaci->typ_evidence == 'sberny_arch'}{$CisloJednaci->oddelovac}1{/if}&nbsp;</dd><br />
             <dt>Typ evidence:</dt>
-            <dd>{if $CisloJednaci->typ_evidence == 'sberny_arch'}sběrný arch{else}{$CisloJednaci->typ_evidence}{/if}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{if $CisloJednaci->typ_evidence == 'sberny_arch'}sběrný arch{else}{$CisloJednaci->typ_evidence}{/if}&nbsp;</dd><br />
             <dt>Podací deník:</dt>
             <dd>{if $CisloJednaci->typ_deniku == 'org'}samostatný pro každou organizační jednotku{else}společný pro celý úřad{/if}&nbsp;</dd>
         </dl>        
@@ -81,7 +57,7 @@
         {/if}
         <dl n:if="$FormUpravit=='cjednaci'" class="detail_item">
             <dt>Masky:</dt>
-            <dd class="normal">
+            <dd class="normal-font">
                 <table>
                     <tr>
                         <th><strong>maska</strong></th>
@@ -183,7 +159,7 @@
         </dl>
     </div>
     
-    <a name="na">
+    <a name="na" />
     <div class="detail_blok">
         <div class="detail_hlavicka">Ostatní nastavení</div>
         {if ($FormUpravit=='nastaveni')}
@@ -191,34 +167,23 @@
         {else}
         <dl class="detail_item">
             <dt>Počet položek v seznamu:</dt>
-            <dd>{$Nastaveni->pocet_polozek}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{$Nastaveni->pocet_polozek}&nbsp;</dd><br />
             <dt>Vynutit protokol HTTPS:</dt>
-            <dd>{!$force_https ? 'ano' : 'ne'}</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{!$force_https ? 'ano' : 'ne'}</dd><br />
             <dt>Uživatelé mohou měnit své heslo:</dt>
-            <dd>{!$users_can_change_their_password ? 'ano' : 'ne'}</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{!$users_can_change_their_password ? 'ano' : 'ne'}</dd><br />
             <dt>Po přihlášení přesměrovat na domovskou stránku:</dt>
-            <dd>{!$login_redirect_homepage ? 'ano' : 'ne'}</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{!$login_redirect_homepage ? 'ano' : 'ne'}</dd><br />
             <dt>Kopírovat obsah e-mailu do poznámky dokumentu:</dt>
-            <dd>{!$kopirovat_email_do_poznamky ? 'ano' : 'ne'}</dd>
-        </dl><br />
-        <dl class="detail_item">
+            <dd>{!$kopirovat_email_do_poznamky ? 'ano' : 'ne'}</dd><br />
             <dt>Povolit předání vyřízeného dokumentu:</dt>
             <dd>{!$povolit_predani_vyrizeneho_dokumentu ? 'ano' : 'ne'}</dd>
-        </dl><br />
+        </dl>
+        
         <div class="detail_hlavicka">Odeslání Českou poštou</div>
         <dl class="detail_item">
             <dt>Číslo zákaznické karty:</dt>
-            <dd>{$cislo_zakaznicke_karty}&nbsp;</dd>
-        </dl>
-        <dl class="detail_item">
+            <dd>{$cislo_zakaznicke_karty}&nbsp;</dd><br />
             <dt>Způsob úhrady:</dt>
             <dd>{$zpusob_uhrady}&nbsp;</dd>
         </dl>
@@ -227,7 +192,7 @@
         {/if}
     </div>
 
-    <a name="up">
+    <a name="up" />
     <div class="detail_blok">
         <div class="detail_hlavicka">Upozornění</div>
         {if ($FormUpravit=='upozorneni')}

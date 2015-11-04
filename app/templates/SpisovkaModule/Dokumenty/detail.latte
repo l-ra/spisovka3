@@ -402,7 +402,7 @@
         {/if}
     </div>
     {if $Dok->stav_dokumentu >= 3}
-    <a name="vr">
+    <a name="vr" />
     <div class="dokument_blok_sedy">
         <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
@@ -473,7 +473,7 @@
         </dl>
         <dl class="detail_item">
             <dt>Skartační lhůta:</dt>
-            <dd class="normal"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
+            <dd class="normal-font"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
         </dl>
         <dl class="detail_item">
             <dt>Spouštěcí událost:</dt>

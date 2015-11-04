@@ -2,11 +2,12 @@
         <div class="h2">Transakční protokol</div>
 
         {foreach $historie as $h}
-        <dl class="detail_item2">
+        <dl>
             <dt>{$h->date|edatetime}</dt>
-            <dd>{!=LogModel::typ($h->typ)}</dd>
-            {if !empty($h->poznamka)}<dd class="normal">{$h->poznamka}</dd>{/if}
-            <dd class="normal">provedl: {Osoba::displayName($h)}</dd>
+            <dd>{!=LogModel::typ($h->typ)}<br />
+            {if !empty($h->poznamka)}<span class="normal-font">{$h->poznamka}</span><br />{/if}
+            <span class="normal-font">provedl: {Osoba::displayName($h)}</span>
+            </dd>
         </dl>
         {/foreach}
     </div>

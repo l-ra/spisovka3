@@ -149,7 +149,8 @@ class Admin_NastaveniPresenter extends BasePresenter
         $CJ = new CisloJednaci;
         $form1->addCheckbox('minuly_rok', 'Evidovat dokumenty do minulého roku')
                 ->setValue($CJ->get_minuly_rok())
-                ->setOption('description', 'Tuto volbu použijte jen ve výjimečných případech. Zaškrtnutí ovlivní generování všech č.j. v aplikaci.');
+                ->setOption('description', Nette\Utils\Html::el()
+                        ->setHtml('<br /><small>Tuto volbu použijte jen ve výjimečných případech. Zaškrtnutí ovlivní generování všech č.j. v aplikaci.</small>'));
 
         $form1->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'nastavitCJClicked');

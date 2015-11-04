@@ -168,7 +168,7 @@ body {
 }
 
 #h_evidence .evidence_form {
-    margin-left: 250px;
+    margin-left: 230px;
     margin-top: 10px;
 }
 
@@ -190,4 +190,12 @@ body {
 
 #h_evidence .evidence_report {
     padding: 15px;
+}
+
+#h_evidence dt {
+    width: 160px;
+}
+
+#h_evidence textarea {
+    width: 500px;
 }

@@ -230,43 +230,38 @@ form {
     border-top: 1px dotted #c0c0c0;
 }
 
-#dialog .detail_hlavicka,
-#content .detail_hlavicka {
+.detail_hlavicka {
     font-weight: bold;
     font-size: 11pt;
+    margin-bottom: 10px;
 }
 
-#dialog .detail_subhlavicka,
-#content .detail_subhlavicka {
-    font-weight: bold;
-    margin-left: 40px;
+.detail_item {
+/*    margin-top: 8px;
+    margin-bottom: 8px; */
 }
 
-#dialog .detail_item,
-#content .detail_item {
-    margin-top: 8px;
-    margin-bottom: 8px;
+dl {
+    margin: 0px 0px;
 }
-
-#dialog dl,
-#content dl {
-    clear: both;
-}
-
-#content dt {
-    float: left;
+dt {
     width: 200px;
     text-align: right;
-    margin-right: 20px;
+    margin: 0px 20px 8px 0px;
+    display: inline-block;
+    vertical-align: top;
 }
+dd {
+    font-weight: bold;
+    display: inline-block;
+    margin: 0px 0px 8px 0px;
+    max-width: 680px;
+}
+
 
 #dialog dt {
-    float: left;
     width: 120px;
-    text-align: right;
-    margin-right: 20px;
 }
-
 #form_novy_subjekt2 dt {
     width: 200px;    
 }
@@ -279,38 +274,30 @@ form {
     margin-right: 20px;
 }
 
-#content dd {
-    margin-left: 220px;
-    font-weight: bold;
-}
 
-#dialog dd {
-    margin-left: 140px;
-    font-weight: bold;
-}
-
-#dialog dd.normal,
-#content dd.normal {
-    margin-left: 220px;
+.normal-font {
     font-weight: normal;
 }
 
-#content dd.pravidlo {
-    margin-left: 220px;
-    font-weight: normal;
+
+/* Nastaveni opravneni v administraci */
+.resource {
+    font-weight: bold;
+    margin: 7px 0px 7px 40px;
+}
+.privilege {
     padding-bottom: 5px;
     border-bottom: 1px #c0c0c0 dashed;
+    margin: 5px 0px 8px 200px;    
 }
-
-#content dd.pravidlo .opravneni_volba_head {
-    float: right;
-    width: 150px;
-    text-align: right;
+.privilege-icon {
+    width: 16px;
+    display: inline-block;
+    margin-right: 15px;
+    vertical-align: top;
 }
-#content dd.pravidlo .opravneni_volba {
+.privilege-checkboxes {
     float: right;
-    width: 50px;
-    text-align: right;
 }
 
 label.required {

@@ -39,37 +39,25 @@
         {if $lzeMenitOpravneni == 2}
         <p style="color:red">Oprávnění této role doporučujeme neměnit.</p>
         {/if}
-        {$opravneniForm->render('begin')}
-        <dl class="detail_item">
-            <dt>&nbsp;</dt>
-            <dd class="pravidlo">
-                <span class="opravneni_volba_head">
-                    povolit / zakázat
-                </span>
-                &nbsp;
-            </dd>
-        </dl>
-
+        {form $opravneniForm}        
+        &nbsp;<div class="privilege-checkboxes">povolit / zakázat</div>        
         {foreach $seznamPravidel as $blok}
-        <div class="detail_subhlavicka">{$blok['name']}</div>
+        <div class="resource">{$blok['name']}</div>
         {foreach $blok['pravidla'] as $rule_id => $pravidlo}
-        <dl class="detail_item">
-            <dt class="ikona_{$pravidlo['opravneni']}">&nbsp;</dt>
-            <dd class="pravidlo">
-                <span class="opravneni_volba">
-                    {$opravneniForm['perm'.$rule_id.'-opravneni_allow']->control}
-                    {$opravneniForm['perm'.$rule_id.'-opravneni_deny']->control}
-                </span>
+            <div class="privilege">
+                <div class="privilege-icon ikona_{$pravidlo['opravneni']}">&nbsp;</div>
                 {$pravidlo['name']}
-            </dd>
-        </dl>
+                <div class="privilege-checkboxes">
+                    {input "perm$rule_id-opravneni_allow"}
+                    {input "perm$rule_id-opravneni_deny"}
+                </div>
+            </div>
         {/foreach}
         {/foreach}
         <div style="text-align: right">
-        {$opravneniForm['upravit']->control}
-        </div>
-        
-        {$opravneniForm->render('end')}
+        {input upravit}
+        </div>        
+        {/form}
         {/if}
     </div>
 
