@@ -187,7 +187,8 @@ class Workflow extends BaseModel
 
                     $data_other = array();
                     $data_other['dokument_id'] = $dokument_other->id;
-                    $data_other['stav_dokumentu'] = max(2, $dokument_other->stav_dokumentu);;
+                    $data_other['stav_dokumentu'] = max(2, $dokument_other->stav_dokumentu);
+                    ;
                     $data_other['aktivni'] = 1;
                     $data_other['stav_osoby'] = 0;
                     $data_other['prideleno_id'] = $data['prideleno_id'];
@@ -210,7 +211,7 @@ class Workflow extends BaseModel
             dibi::rollback();
             throw $e;
         }
-        
+
         // posli upozorneni emailem
         try {
             if (empty($orgjednotka_id)) {
@@ -220,9 +221,9 @@ class Workflow extends BaseModel
             }
         } catch (Exception $e) {
             throw new Exception("Předání proběhlo v pořádku, ale nepodařilo se upozornit příjemce e-mailem: \n"
-                    . $e->getMessage(), 0, $e);
+            . $e->getMessage(), 0, $e);
         }
-        
+
         return true;
     }
 
@@ -374,7 +375,7 @@ class Workflow extends BaseModel
             throw $e;
         }
     }
-    
+
     /**
      * Prevezme dokument k vyrizeni
      * @param int $dokument_id
@@ -443,7 +444,7 @@ class Workflow extends BaseModel
 
         return true;
     }
-    
+
     /**
      * Oznaci dokument za vyrizeny
      * @param int $dokument_id
@@ -634,38 +635,46 @@ class Workflow extends BaseModel
         }
     }
 
-    public function prevzitDoSpisovny($dokument_id, $samostatny = 0)
+    /**
+     * 
+     * @param int $dokument_id
+     * @param boolean $samostatny  false = voláno při přezetí celého spisu
+     *                             true = voláno při přezetí jednoho dokumentu
+     * @return boolean|string
+     */
+    public function prevzitDoSpisovny($dokument_id, $samostatny)
     {
-
-        // kontrola uzivatele
-
         $Dokument = new Dokument();
         $dokument_info = $Dokument->getInfo($dokument_id, "subjekty");
 
-        if ($samostatny == 1 && isset($dokument_info->spisy)) {
-            return 'Dokument ' . $dokument_info->jid . ' nelze příjmout do spisovny! Dokument je součásti spisu.';
+        $error_msg = "Dokument $dokument_info->jid nelze přijmout do spisovny!";
+
+        if ($samostatny && isset($dokument_info->spisy)) {
+            return "$error_msg Dokument je součásti spisu.";
         }
 
         // Test na uplnost dat
         if ($kontrola = $Dokument->kontrola($dokument_info)) {
             // nejsou kompletni data - neprenasim
-            return 'Dokument ' . $dokument_info->jid . ' nelze příjmout do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
+            return "$error_msg Nejsou vyřízeny všechny potřebné údaje.";
         }
 
         // Kontrola stavu - vyrizen a spusten 5 <
-        if ($dokument_info->stav_dokumentu < 4) {
-            return 'Dokument ' . $dokument_info->jid . ' nelze příjmout do spisovny! Není označen jako vyřízený.';
-        } else if ($dokument_info->stav_dokumentu < 5) {
-            return 'Dokument ' . $dokument_info->jid . ' nelze příjmout do spisovny! Není spuštěna událost.';
-        }
+        if ($dokument_info->stav_dokumentu < 4)
+            return "$error_msg Není označen jako vyřízený.";
+        if ($dokument_info->stav_dokumentu < 5)
+            return "$error_msg Není spuštěna událost.";
+
 
         // Pripojit do spisovny
-        $workflow_data = $this->select(array(array('id=%i', $dokument_info['prideleno']->id)))->fetch();
-        if ($workflow_data) {
+        $workflow_data = $this->select(array(array('[id] = %i', $dokument_info['prideleno']->id)))->fetch();
+        if (!$workflow_data)
+            return false;
 
-            $dokument_update = array(
-                'stav' => 2
-            );
+        $success = false;
+        dibi::begin();
+        try {
+            $dokument_update = ['stav' => 2];
             if ($Dokument->ulozit($dokument_update, $dokument_id)) {
 
                 $workflow_data = (array) $workflow_data;
@@ -675,19 +684,25 @@ class Workflow extends BaseModel
                 $workflow_data['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
 
                 $this->deaktivovat($dokument_id);
-                $result_insert = $this->insert($workflow_data);
-                if ($result_insert) {
+                if ($this->insert($workflow_data)) {
                     $Log = new LogModel();
                     $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PRIPOJEN,
                             'Dokument přijat do spisovny.');
-                    return true;
-                } else {
-                    return false;
+
+                    $success = true;
                 }
             }
-        } else {
-            return false;
+        } catch (Exception $e) {
+            dibi::rollback();
+            return "Při převzetí dokumentu $dokument_info->jid došlo k výjimce: " . $e->getMessage();
         }
+
+        if ($success)
+            dibi::commit();
+        else
+            dibi::rollback();
+
+        return $success;
     }
 
     /**
@@ -699,7 +714,7 @@ class Workflow extends BaseModel
         $stav = $z->stavZapujcky($dokument_id);
         return in_array($stav, [1, 2]);
     }
-    
+
     public function keskartaci($dokument_id)
     {
         if (!is_numeric($dokument_id))
@@ -718,7 +733,7 @@ class Workflow extends BaseModel
 
         if ($this->jeZapujcen($dokument_id))
             return false;
-                        
+
         // Deaktivujeme starsi zaznamy
         $this->deaktivovat($dokument_id);
 
@@ -767,7 +782,7 @@ class Workflow extends BaseModel
 
                 if ($this->jeZapujcen($dokument_id))
                     return false;
-                
+
                 // Deaktivujeme starsi zaznamy
                 $this->deaktivovat($dokument_id);
 
@@ -822,7 +837,7 @@ class Workflow extends BaseModel
 
                 if ($this->jeZapujcen($dokument_id))
                     return false;
-                
+
                 // Deaktivujeme starsi zaznamy
                 $this->deaktivovat($dokument_id);
 
@@ -869,7 +884,7 @@ class Workflow extends BaseModel
         $user = Nette\Environment::getUser();
         if (!Acl::isInRole('spisovna') && !$user->isInRole('superadmin'))
             return false;
-        
+
         try {
             dibi::begin();
 
