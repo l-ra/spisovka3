@@ -398,7 +398,6 @@ class Dokument extends BaseModel
 
     public function paramsFiltr($params)
     {
-
         $args = array();
 
         if (isset($params['nazev'])) {
@@ -525,17 +524,12 @@ class Dokument extends BaseModel
         }
 
         // stav dokumentu
-        if (isset($params['stav_dokumentu'])) {
-            if (!empty($params['stav_dokumentu'])) {
-
-                if ($params['stav_dokumentu'] == 4) {
-                    // vyrizene - 4,5,6
-                    $args['where'][] = array('wf.stav_dokumentu IN (4,5,6) AND wf.aktivni=1 AND wf.stav_osoby=1');
-                } else if ($params['stav_dokumentu'] == 77) {
-                    $args['where'][] = array('wf.stav_dokumentu IN (6,7,8) AND wf.aktivni=1 AND wf.stav_osoby=1');
-                } else {
-                    $args['where'][] = array('wf.stav_dokumentu = %i AND wf.aktivni=1 AND wf.stav_osoby=1', $params['stav_dokumentu']);
-                }
+        if (!empty($params['stav_dokumentu'])) {
+            if ($params['stav_dokumentu'] == 4) {
+                // vyrizene - 4,5,6
+                $args['where'][] = array('wf.stav_dokumentu IN (4,5,6) AND wf.aktivni=1 AND wf.stav_osoby=1');
+            } else {
+                $args['where'][] = array('wf.stav_dokumentu = %i AND wf.aktivni=1 AND wf.stav_osoby=1', $params['stav_dokumentu']);
             }
         }
 
@@ -894,8 +888,6 @@ class Dokument extends BaseModel
             }
         }
 
-        //Nette\Diagnostics\Debugger::dump($args); exit;
-
         return $args;
     }
 
@@ -1069,24 +1061,22 @@ class Dokument extends BaseModel
         return $args;
     }
 
-    public function spisovnaFiltr($params = null)
+    public function spisovnaFiltr($params)
     {
-
-        if (strpos($params, 'stav_') !== false) {
-            $stav = substr($params, 5);
-            return $this->paramsFiltr(array('stav_dokumentu' => $stav));
-        } else if ($params == 'vlastni') {
-            return $this->paramsFiltr(array('stav_dokumentu' => 77));
-            //return $this->paramsFiltr(array('stav_dokumentu'=>77,'prideleno_osobne'=>1));
-        } else if (strpos($params, 'skartacni_znak_') !== false) {
-            $skartacni_znak = substr($params, 15);
-            return $this->paramsFiltr(array('skartacni_znak' => $skartacni_znak));
-        } else if (strpos($params, 'zpusob_vyrizeni_') !== false) {
-            $zpusob_vyrizeni = substr($params, 16);
-            return $this->paramsFiltr(array('zpusob_vyrizeni' => $zpusob_vyrizeni));
-        } else {
-            return $this->paramsFiltr(array('stav_dokumentu' => 77));
-        }
+        if (strpos($params, 'stav_') === 0) {
+            $p = ['stav_dokumentu' => substr($params, 5)];
+            
+        } else if (strpos($params, 'skartacni_znak_') === 0) {
+            $p = ['skartacni_znak' => substr($params, strlen('skartacni_znak_'))];
+            
+        } else if (strpos($params, 'zpusob_vyrizeni_') === 0) {
+            $p = ['zpusob_vyrizeni' => substr($params, strlen('zpusob_vyrizeni_'))];
+            
+        } else
+            // filtr "vse" nebo chyba
+            return array();
+        
+        return $this->paramsFiltr($p);
     }
 
     public function sestavaOmezeniOrg($args)
@@ -1132,68 +1122,54 @@ class Dokument extends BaseModel
 
     public function spisovka($args)
     {
-
-        if (isset($args['where'])) {
-            $args['where'][] = array('d.stav = 1');
-        } else {
-            $args['where'] = array(array('d.stav = 1'));
-        }
-
+        if (!isset($args['where']))
+            $args['where'] = [];
+        
+        $args['where'][] = array('d.stav = 1');
         return $args;
     }
 
+    /** Filtr pro seznam všech dokumentů ve spisovně
+     * 
+     * @param array $args
+     * @return array
+     */
     public function spisovna($args)
     {
-
-        if (isset($args['where'])) {
-            $args['where'][] = array('d.stav > 1');
-            $args['where'][] = array('NOT (wf.stav_dokumentu = 6 AND wf.aktivni = 1)');
-        } else {
-            $args['where'] = array(
-                array('d.stav > 1'),
-                array('NOT (wf.stav_dokumentu = 6 AND wf.aktivni = 1)')
-            );
-        }
+        if (!isset($args['where']))
+            $args['where'] = [];
+        
+        $args['where'][] = array('wf.stav_dokumentu IN (7,8,9,10,11) AND wf.aktivni = 1');
 
         return $this->spisovnaOmezeniOrg($args);
     }
 
     public function spisovna_prijem($args)
     {
-
-        if (isset($args['where'])) {
-            $args['where'][] = array('wf.stav_dokumentu = 6 AND wf.aktivni = 1');
-        } else {
-            $args['where'] = array(array('wf.stav_dokumentu = 6 AND wf.aktivni = 1'));
-        }
+        if (!isset($args['where']))
+            $args['where'] = [];
+        
+        $args['where'][] = array('wf.stav_dokumentu = 6 AND wf.aktivni = 1');
 
         return $this->spisovnaOmezeniOrg($args);
     }
 
     public function spisovna_keskartaci($args)
     {
+        if (!isset($args['where']))
+            $args['where'] = [];
 
-        if (isset($args['where'])) {
-            $args['where'][] = array('d.stav > 1');
-            $args['where'][] = array('wf.stav_dokumentu < 8 AND wf.aktivni=1');
-        } else {
-            $args['where'] = array(
-                array('d.stav > 1'),
-                array('wf.stav_dokumentu < 8 AND wf.aktivni=1'),
-            );
-        }
+        $args['where'][] = array('wf.stav_dokumentu = 7 AND wf.aktivni=1');
 
         return $this->spisovnaOmezeniOrg($args);
     }
 
     public function spisovna_skartace($args)
     {
+        if (!isset($args['where']))
+            $args['where'] = [];
 
-        if (isset($args['where'])) {
-            $args['where'][] = array('wf.stav_dokumentu = 8 AND wf.aktivni = 1');
-        } else {
-            $args['where'] = array(array('wf.stav_dokumentu = 8 AND wf.aktivni = 1'));
-        }
+        $args['where'][] = array('wf.stav_dokumentu = 8 AND wf.aktivni = 1');
 
         return $this->spisovnaOmezeniOrg($args);
     }

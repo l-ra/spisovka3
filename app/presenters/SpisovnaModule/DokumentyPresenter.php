@@ -97,7 +97,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
     }
 
-    protected function seznam($typ)
+    protected function seznam()
     {
         $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
@@ -107,22 +107,28 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $Dokument = new Dokument();
 
-        $filtr = UserSettings::get('spisovna_dokumenty_filtr');
-        if ($filtr) {
-            $filtr = unserialize($filtr);
-        } else {
-            // filtr nezjisten - pouzijeme filtr Vse
-            $filtr = array();
-            $filtr['filtr'] = 'stav_77';
+        $filtr = UserSettings::get('spisovna_dokumenty_filtr', '');
+        $this->filtr = $filtr;
+        if ($this->view != 'default' && strpos($filtr, 'stav_') === 0)
+            $filtr = '';
+        $this->template->no_items = $filtr ? 2 : 1; // indikator pri nenalezeni dokumentu
+        $args_f = $Dokument->spisovnaFiltr($filtr);
+
+        switch ($this->view) {
+            case 'prijem':
+                $args_f = $Dokument->spisovna_prijem($args_f);
+                break;            
+            case 'skartacniNavrh':
+                $args_f = $Dokument->spisovna_keskartaci($args_f);
+                break;
+            case 'skartacniRizeni':
+                $args_f = $Dokument->spisovna_skartace($args_f);
+                break;
+            default:
+                $args_f = $Dokument->spisovna($args_f);
+                break;
         }
-
-        $this->filtr = $filtr['filtr'];
-        if ($this->view != 'default' && strpos($filtr['filtr'], 'stav_') === 0)
-            $filtr['filtr'] = 'stav_77';
-
-        $this->template->no_items = ($filtr['filtr'] == 'stav_77') ? 1 : 2; // indikator pri nenalezeni dokumentu
-        $args_f = $Dokument->spisovnaFiltr($filtr['filtr']);
-
+        
         $args_h = array();
         $hledat = UserSettings::get('spisovna_dokumenty_hledat');
         if ($hledat)
@@ -153,21 +159,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->template->s3_seradit = $seradit;
         $this->template->seradit = $seradit;
 
-        if ($typ == 1) {
-            // prijem
-            $args = $Dokument->spisovna_prijem($args);
-        } else if ($typ == 2) {
-            // ke skartaci
-            $args = $Dokument->spisovna_keskartaci($args);
-        } else if ($typ == 3) {
-            // skartacni rizeni
-            $args = $Dokument->spisovna_skartace($args);
-        } else {
-            // seznam
-            $args = $Dokument->spisovna($args);
-        }
-
-        if ($typ == 2) {
+        if ($this->view == 'skartacniNavrh') {
             $result = $Dokument->seznamKeSkartaci($args);
         } else {
             $result = $Dokument->seznam($args);
@@ -236,7 +228,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->template->akce_select = array();
 
         $this->template->title = "Seznam dokumentů ve spisovně";
-        $this->seznam(0);
+        $this->seznam();
     }
 
     public function renderPrijem()
@@ -254,7 +246,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         );
 
         $this->template->title = "Seznam dokumentů pro příjem do spisovny";
-        $this->seznam(1);
+        $this->seznam();
     }
 
     public function renderSkartacniNavrh()
@@ -271,7 +263,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             'ke_skartaci' => 'předat do skartačního řízení'
         );
         $this->template->title = "Seznam dokumentů, kterým uplynula skartační lhůta";
-        $this->seznam(2);
+        $this->seznam();
     }
 
     public function renderSkartacniRizeni()
@@ -289,7 +281,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             'skartovat' => 'skartovat vybrané dokumenty',
         );
         $this->template->title = "Seznam dokumentů ve skartačním řízení";
-        $this->seznam(3);
+        $this->seznam();
     }
 
     public function renderDetail()
@@ -727,10 +719,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     protected function createComponentFiltrForm()
     {
-        // pracovnik spisovny
-        $filtr = !is_null($this->filtr) ? $this->filtr : 'stav_77';
         $select = array(
-            'stav_77' => 'Zobrazit vše',
+            '' => 'Zobrazit vše',
             'Podle stavu' => array(
                 'stav_9' => 'archivován',
                 'stav_10' => 'skartován',
@@ -749,11 +739,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $form->addSelect('filtr', 'Filtr:', $select)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
         try {
-            $form['filtr']->setValue($filtr);
+            $form['filtr']->setValue($this->filtr);
         } catch (Exception $e) {
             $e->getMessage();
             // stavy "archivován" a "skartován" neplatí na stránce příjmu dokumentů
-            $form['filtr']->setValue('stav_77');
+            $form['filtr']->setValue('');
         }
 
         $form->addSubmit('go_filtr', 'Filtrovat');
@@ -771,8 +761,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function filtrClicked(Nette\Application\UI\Form $form, $form_data)
     {
-        $data = array('filtr' => $form_data['filtr']);
-        UserSettings::set('spisovna_dokumenty_filtr', serialize($data));
+        UserSettings::set('spisovna_dokumenty_filtr', $form_data['filtr']);
 
         $this->redirect($this->view);
     }

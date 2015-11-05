@@ -501,30 +501,19 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function actionSeznamAjax()
     {
-
         $Dokument = new Dokument();
-
-        $args = null;
-        $seznam = array();
 
         // Pripojit aktivni zapujcky
         $Zapujcka = new Zapujcka();
         $zapujcky = $Zapujcka->aktivniSeznam();
 
+        $term = $this->getParameter('term');            
+        $args = $term ? $Dokument->hledat($term) : null;        
+        $args = $Dokument->spisovna($args);
+        $result = $Dokument->seznam($args);
+        $seznam_dok = $result->fetchAll();
 
-        $term = $this->getParameter('term');
-
-        if (!empty($term)) {
-            $args = $Dokument->hledat($term);
-            $args = $Dokument->spisovna($args);
-            $result = $Dokument->seznam($args);
-            $seznam_dok = $result->fetchAll();
-        } else {
-            $args = $Dokument->spisovna($args);
-            $result = $Dokument->seznam($args);
-            $seznam_dok = $result->fetchAll();
-        }
-
+        $seznam = array();
         if (count($seznam_dok) > 0) {
             foreach ($seznam_dok as $row) {
                 if (isset($zapujcky[$row->id]))
