@@ -139,6 +139,8 @@ Spisovna:
   předání do spisovny
 - filtrování dokumentů funguje ve všech seznamech ve spisovně,
   nejen v seznamu "Dokumenty"
+- po použití funkcí pokročilého vyhledávání a zrušení hledání program nepřejde
+  na seznam všech dokumentů, ale zůstane na stránce, kde byl předtím
 - program chybně nabízel možnost vytvořit zápůjčku ve fázi příjmu do spisovny
 - opraveny chyby ve funkci zápůjček
 

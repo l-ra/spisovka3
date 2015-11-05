@@ -8,7 +8,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         return 'spisovka_dokumenty_hledat';
     }
 
-    public function getRedirectPath()
+    public function getRedirectPath($backlink = null)
     {
         return ':Spisovka:Dokumenty:default';
     }
@@ -157,6 +157,9 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
         $form = new Spisovka\Form();
 
+        $form->addHidden('backlink')
+                ->setValue($this->getParameter('zpet', ''));
+        
         $form->addText('nazev', 'Věc:', 80, 100)
                 ->setValue(@$hledat['nazev']);
         $form->addTextArea('popis', 'Popis:', 80, 3)
@@ -299,6 +302,9 @@ class Spisovka_VyhledatPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues(true /* jako pole, ne ArrayHash */);
 
+        $backlink = $data['backlink'];
+        unset($data['backlink']);
+
         $post = $this->getHttpRequest()->getPost();
         
         if (isset($post['prideleno'])) {
@@ -335,7 +341,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         }
 
         UserSettings::set($this->getSettingName(), serialize($data));
-        $this->redirect($this->getRedirectPath());
+        $this->redirect($this->getRedirectPath($backlink));
     }
 
 }

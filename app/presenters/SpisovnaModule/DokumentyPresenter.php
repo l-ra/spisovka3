@@ -97,7 +97,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
     }
 
-    protected function seznam($typ = 0)
+    protected function seznam($typ)
     {
         $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');

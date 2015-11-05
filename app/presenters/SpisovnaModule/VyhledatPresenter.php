@@ -8,9 +8,10 @@ class Spisovna_VyhledatPresenter extends Spisovka_VyhledatPresenter
         return 'spisovna_dokumenty_hledat';
     }
 
-    public function getRedirectPath()
+    public function getRedirectPath($backlink = null)
     {
-        return ':Spisovna:Dokumenty:default';
+        $view = $backlink ?: $this->getParameter('zpet', 'default');
+        return ":Spisovna:Dokumenty:$view";
     }
 
     protected function isUserAllowed()
