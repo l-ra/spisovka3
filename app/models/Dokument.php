@@ -58,13 +58,13 @@ class Dokument extends BaseModel
                     'cols' => null
                 ),
                 'dokspisy' => array(
-                    'from' => array($this->tb_dokspis => 'sp'),
-                    'on' => array('sp.dokument_id=wf.dokument_id'),
+                    'from' => array($this->tb_dokspis => 'ds'),
+                    'on' => array('ds.dokument_id=wf.dokument_id'),
                     'cols' => null
                 ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
-                    'on' => array('spis.id=sp.spis_id'),
+                    'on' => array('spis.id=ds.spis_id'),
                     'cols' => null
                 ),
                 'typ_dokumentu' => array(
@@ -148,13 +148,13 @@ class Dokument extends BaseModel
                     'cols' => null
                 ),
                 'dokspisy' => array(
-                    'from' => array($this->tb_dokspis => 'sp'),
-                    'on' => array('sp.dokument_id=wf.dokument_id'),
+                    'from' => array($this->tb_dokspis => 'ds'),
+                    'on' => array('ds.dokument_id=wf.dokument_id'),
                     'cols' => null
                 ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
-                    'on' => array('spis.id=sp.spis_id'),
+                    'on' => array('spis.id=ds.spis_id'),
                     'cols' => null
                 ),
                 'dokspis' => array(
@@ -1149,7 +1149,8 @@ class Dokument extends BaseModel
         if (!isset($args['where']))
             $args['where'] = [];
         
-        $args['where'][] = array('wf.stav_dokumentu = 6 AND wf.aktivni = 1');
+        $args['where'][] = array(
+            'wf.stav_dokumentu = 6 AND wf.aktivni = 1 AND ds.spis_id IS NULL');
 
         return $this->spisovnaOmezeniOrg($args);
     }
@@ -1190,8 +1191,8 @@ class Dokument extends BaseModel
             'cols' => array('*', 'id' => 'dokument_id', '%sqlCASE WHEN dok.skartacni_lhuta > 1900 THEN dok.skartacni_lhuta ELSE YEAR(dok.datum_spousteci_udalosti)+1+dok.skartacni_lhuta END' => 'skartacni_rok'),
             'leftJoin' => array(
                 'dokspisy' => array(
-                    'from' => array($this->tb_dokspis => 'sp'),
-                    'on' => array('sp.dokument_id=dok.id'),
+                    'from' => array($this->tb_dokspis => 'ds'),
+                    'on' => array('ds.dokument_id=dok.id'),
                     'cols' => array('poradi' => 'poradi_spisu')
                 ),
                 'typ_dokumentu' => array(
@@ -1237,7 +1238,7 @@ class Dokument extends BaseModel
                 ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
-                    'on' => array('spis.id=sp.spis_id'),
+                    'on' => array('spis.id=ds.spis_id'),
                     'cols' => array('id' => 'spis_id', 'nazev' => 'nazev_spisu', 'popis' => 'popis_spisu')
                 ),
                 'epod' => array(

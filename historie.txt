@@ -137,6 +137,8 @@ Spisovna:
 - hledání spisů při příjmu do spisovny bylo nefunkční
 - přijetí dokumentu do spisovny se v transakčním logu zaznamenalo jako 
   předání do spisovny
+- dokumenty ve spisu předané do spisovny se nesprávně zobrazily na stránce
+  příjmu jednotlivých dokumentů (které nejsou ve spisu)
 - filtrování dokumentů funguje ve všech seznamech ve spisovně,
   nejen v seznamu "Dokumenty"
 - po použití funkcí pokročilého vyhledávání a zrušení hledání program nepřejde
