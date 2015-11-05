@@ -509,7 +509,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         $term = $this->getParameter('term');            
         $args = $term ? $Dokument->hledat($term) : null;        
-        $args = $Dokument->spisovna($args);
+        $args = $Dokument->filtrSpisovna($args);
         $result = $Dokument->seznam($args);
         $seznam_dok = $result->fetchAll();
 

@@ -116,16 +116,16 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         switch ($this->view) {
             case 'prijem':
-                $args_f = $Dokument->spisovna_prijem($args_f);
+                $args_f = $Dokument->filtrSpisovnaPrijem($args_f);
                 break;            
             case 'skartacniNavrh':
-                $args_f = $Dokument->spisovna_keskartaci($args_f);
+                $args_f = $Dokument->filtrSpisovnaKeskartaci($args_f);
                 break;
             case 'skartacniRizeni':
-                $args_f = $Dokument->spisovna_skartace($args_f);
+                $args_f = $Dokument->filtrSpisovnaSkartace($args_f);
                 break;
             default:
-                $args_f = $Dokument->spisovna($args_f);
+                $args_f = $Dokument->filtrSpisovna($args_f);
                 break;
         }
         

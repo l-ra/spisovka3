@@ -27,7 +27,7 @@ class Spisovka_SpojitPresenter extends BasePresenter
         $args['order'] = array('d.podaci_denik_rok', 'd.podaci_denik_poradi', 'd.poradi');
 
         // nehledej mezi dokumenty ve spisovně
-        $args = $Dokument->spisovka($args);
+        $args = $Dokument->filtrSpisovka($args);
         $seznam = $Dokument->seznam($args);
 
         if (count($seznam) > 0) {

@@ -109,7 +109,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->s3_seradit = $seradit;
         $this->template->seradit = $seradit;
 
-        $args = $Dokument->spisovka($args);
+        $args = $Dokument->filtrSpisovka($args);
         $result = $Dokument->seznam($args);
         $paginator->itemCount = count($result);
 

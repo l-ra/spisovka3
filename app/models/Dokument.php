@@ -1120,7 +1120,7 @@ class Dokument extends BaseModel
         return $args;
     }
 
-    public function spisovka($args)
+    public function filtrSpisovka($args)
     {
         if (!isset($args['where']))
             $args['where'] = [];
@@ -1134,7 +1134,7 @@ class Dokument extends BaseModel
      * @param array $args
      * @return array
      */
-    public function spisovna($args)
+    public function filtrSpisovna($args)
     {
         if (!isset($args['where']))
             $args['where'] = [];
@@ -1144,7 +1144,7 @@ class Dokument extends BaseModel
         return $this->spisovnaOmezeniOrg($args);
     }
 
-    public function spisovna_prijem($args)
+    public function filtrSpisovnaPrijem($args)
     {
         if (!isset($args['where']))
             $args['where'] = [];
@@ -1154,7 +1154,7 @@ class Dokument extends BaseModel
         return $this->spisovnaOmezeniOrg($args);
     }
 
-    public function spisovna_keskartaci($args)
+    public function filtrSpisovnaKeskartaci($args)
     {
         if (!isset($args['where']))
             $args['where'] = [];
@@ -1164,7 +1164,7 @@ class Dokument extends BaseModel
         return $this->spisovnaOmezeniOrg($args);
     }
 
-    public function spisovna_skartace($args)
+    public function filtrSpisovnaSkartace($args)
     {
         if (!isset($args['where']))
             $args['where'] = [];
