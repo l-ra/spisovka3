@@ -276,6 +276,9 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
         $renderer = $form->getRenderer();
         $renderer->wrappers['controls']['container'] = null;
+        $renderer->wrappers['pair']['container'] = null;
+        $renderer->wrappers['label']['container'] = null;
+        $renderer->wrappers['control']['container'] = null;        
 
         return $form;
     }
