@@ -51,7 +51,7 @@
             <th class="stav">Stav</th>
         </tr>
         {foreach $seznam as $dok}
-        <tr{if $dok->lhuta_stav==2} class="red"{elseif $dok->lhuta_stav==1} class="yellow"{/if}">
+        <tr{if $dok->lhuta_stav==2} class="red"{elseif $dok->lhuta_stav==1} class="yellow"{/if}>
             <td class="akce">
                 <input type="checkbox" class="checkbox" name="dokument_vyber[]" value="{$dok->id}" title="Vybrat tento dokument" />
             </td>
