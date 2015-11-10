@@ -804,7 +804,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dokument = $Dokumenty->getInfo($dokument->id);
 
             $this->flashMessage('Byl detekován a načten rozepsaný dokument.<p>Pokud chcete založit úplně nový dokument, klikněte na následující odkaz. <a href="' . $this->link(':Spisovka:Dokumenty:novy',
-                            array('cisty' => 1)) . '">Vytvořit nový nerozepsaný dokument.</a>',
+                            array('cisty' => 1)) . '">Vytvořit nový nerozepsaný dokument.</a></p>',
                     'info_ext');
 
             $DokumentSpis = new DokumentSpis();
