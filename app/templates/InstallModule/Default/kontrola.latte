@@ -1,4 +1,7 @@
 {block title}Instalace - kontrola{/block}
+{block header}
+    {css install_site}
+{/block}
 {block menu}
 {if !$installed}
 <a href="{link :Install:Default:uvod}">Úvod</a> >
@@ -11,7 +14,6 @@
 {/if}
 {/block}
 {block content}
-{css install_site}
 
 <h1>{if !$installed}Instalace - {/if}Kontrola serveru na minimální požadavky aplikace</h1>
 
