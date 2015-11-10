@@ -456,7 +456,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         );
 
         $form = new Spisovka\Form();
-        $form->elementPrototype->onSubmit('sestavaFormSubmit(this)');
+        $form->elementPrototype->onsubmit('sestavaFormSubmit(this)');
 
         $form->addText('sestava_nazev', 'Název sestavy:', 80, 100);
         $form->addTextArea('sestava_popis', 'Popis sestavy:', 80, 3);

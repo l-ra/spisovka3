@@ -70,7 +70,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     {
         $form1 = new Spisovka\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
-        $form1->getElementPrototype()->onSubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
+        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
 
         if (isset($this->dokument_id)) {
             $form1->addHidden('dokument_id')
@@ -108,8 +108,6 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $UploadFile = $this->storage;
 
         try {
-
-
             if ($file = $UploadFile->uploadDokument($data)) {
                 // pripojit k dokumentu
                 $this->template->chyba = $file;
@@ -132,6 +130,8 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                 $this->template->chyba = 2;
                 $this->template->error_message = $UploadFile->errorMessage();
             }
+        } catch (Nette\Application\AbortException $e) {
+            throw $e;
         } catch (Exception $e) {
             $this->template->chyba = 2;
             $this->template->error_message = $e->getMessage();
@@ -150,7 +150,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         $form1 = new Spisovka\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
-        $form1->getElementPrototype()->onSubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
+        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
 
         if (isset($this->dokument_id)) {
             $form1->addHidden('dokument_id')
