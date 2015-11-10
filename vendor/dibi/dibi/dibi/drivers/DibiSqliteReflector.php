@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * The dibi reflector for SQLite database.
  *
- * @author     David Grudl
  * @package    dibi\drivers
  * @internal
  */
@@ -52,12 +51,6 @@ class DibiSqliteReflector extends DibiObject implements IDibiReflector
 	 */
 	public function getColumns($table)
 	{
-		$meta = $this->driver->query("
-			SELECT sql FROM sqlite_master WHERE type = 'table' AND name = {$this->driver->escape($table, dibi::TEXT)}
-			UNION ALL
-			SELECT sql FROM sqlite_temp_master WHERE type = 'table' AND name = {$this->driver->escape($table, dibi::TEXT)}
-		")->fetch(TRUE);
-
 		$res = $this->driver->query("PRAGMA table_info({$this->driver->escape($table, dibi::IDENTIFIER)})");
 		$columns = array();
 		while ($row = $res->fetch(TRUE)) {

@@ -83,13 +83,13 @@ class Form extends Container implements Nette\Utils\IHtmlString
 	/** @internal protection token ID */
 	const PROTECTOR_ID = '_token_';
 
-	/** @var callable[]  function(Form $sender); Occurs when the form is submitted and successfully validated */
+	/** @var callable[]  function (Form $sender); Occurs when the form is submitted and successfully validated */
 	public $onSuccess;
 
-	/** @var callable[]  function(Form $sender); Occurs when the form is submitted and is not valid */
+	/** @var callable[]  function (Form $sender); Occurs when the form is submitted and is not valid */
 	public $onError;
 
-	/** @var callable[]  function(Form $sender); Occurs when the form is submitted */
+	/** @var callable[]  function (Form $sender); Occurs when the form is submitted */
 	public $onSubmit;
 
 	/** @var mixed or NULL meaning: not detected yet */
@@ -409,19 +409,20 @@ class Form extends Container implements Nette\Utils\IHtmlString
 			}
 		}
 
-		if ($this->onSuccess) {
+		if (!$this->isValid()) {
+			$this->onError($this);
+		} elseif ($this->onSuccess) {
 			foreach ($this->onSuccess as $handler) {
+				$params = Nette\Utils\Callback::toReflection($handler)->getParameters();
+				$values = isset($params[1]) ? $this->getValues($params[1]->isArray()) : NULL;
+				Nette\Utils\Callback::invoke($handler, $this, $values);
 				if (!$this->isValid()) {
 					$this->onError($this);
 					break;
 				}
-				$params = Nette\Utils\Callback::toReflection($handler)->getParameters();
-				$values = isset($params[1]) ? $this->getValues($params[1]->isArray()) : NULL;
-				Nette\Utils\Callback::invoke($handler, $this, $values);
 			}
-		} elseif (!$this->isValid()) {
-			$this->onError($this);
 		}
+
 		$this->onSubmit($this);
 	}
 

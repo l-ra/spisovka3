@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
@@ -19,9 +19,9 @@ require_once dirname(__FILE__) . '/DibiSqliteReflector.php';
  *   - password (or pass)
  *   - options (array) => driver specific options {@see PDO::__construct}
  *   - resource (PDO) => existing connection
+ *   - version
  *   - lazy, profiler, result, substitutes, ... => see DibiConnection options
  *
- * @author     David Grudl
  * @package    dibi\drivers
  */
 class DibiPdoDriver extends DibiObject implements IDibiDriver, IDibiResultDriver
@@ -67,18 +67,21 @@ class DibiPdoDriver extends DibiObject implements IDibiDriver, IDibiResultDriver
 		if ($config['resource'] instanceof PDO) {
 			$this->connection = $config['resource'];
 
-		} else try {
-			$this->connection = new PDO($config['dsn'], $config['username'], $config['password'], $config['options']);
-
-		} catch (PDOException $e) {
-			if ($e->getMessage() === 'could not find driver') {
-				throw new DibiNotSupportedException("PHP extension for PDO is not loaded.");
+		} else {
+			try {
+				$this->connection = new PDO($config['dsn'], $config['username'], $config['password'], $config['options']);
+			} catch (PDOException $e) {
+				if ($e->getMessage() === 'could not find driver') {
+					throw new DibiNotSupportedException('PHP extension for PDO is not loaded.');
+				}
+				throw new DibiDriverException($e->getMessage(), $e->getCode());
 			}
-			throw new DibiDriverException($e->getMessage(), $e->getCode());
 		}
 
 		$this->driverName = $this->connection->getAttribute(PDO::ATTR_DRIVER_NAME);
-		$this->serverVersion = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
+		$this->serverVersion = isset($config['version'])
+			? $config['version']
+			: @$this->connection->getAttribute(PDO::ATTR_SERVER_VERSION); // @ - may be not supported
 	}
 
 
@@ -102,7 +105,7 @@ class DibiPdoDriver extends DibiObject implements IDibiDriver, IDibiResultDriver
 	{
 		// must detect if SQL returns result set or num of affected rows
 		$cmd = strtoupper(substr(ltrim($sql), 0, 6));
-		static $list = array('UPDATE'=>1, 'DELETE'=>1, 'INSERT'=>1, 'REPLAC'=>1);
+		static $list = array('UPDATE' => 1, 'DELETE' => 1, 'INSERT' => 1, 'REPLAC' => 1);
 		$this->affectedRows = FALSE;
 
 		if (isset($list[$cmd])) {
@@ -272,6 +275,7 @@ class DibiPdoDriver extends DibiObject implements IDibiDriver, IDibiResultDriver
 					case 'mssql':
 						return '[' . str_replace(array('[', ']'), array('[[', ']]'), $value) . ']';
 
+					case 'dblib':
 					case 'sqlsrv':
 						return '[' . str_replace(']', ']]', $value) . ']';
 
@@ -292,7 +296,7 @@ class DibiPdoDriver extends DibiObject implements IDibiDriver, IDibiResultDriver
 					$value = new DibiDateTime($value);
 				}
 				if ($this->driverName === 'odbc') {
-					return $value->format($type === dibi::DATETIME ? "#m/d/Y H:i:s#" : "#m/d/Y#");
+					return $value->format($type === dibi::DATETIME ? '#m/d/Y H:i:s#' : '#m/d/Y#');
 				} else {
 					return $value->format($type === dibi::DATETIME ? "'Y-m-d H:i:s'" : "'Y-m-d'");
 				}
@@ -334,6 +338,7 @@ class DibiPdoDriver extends DibiObject implements IDibiDriver, IDibiResultDriver
 
 			case 'odbc':
 			case 'mssql':
+			case 'dblib':
 			case 'sqlsrv':
 				$value = strtr($value, array("'" => "''", '%' => '[%]', '_' => '[_]', '[' => '[[]'));
 				return ($pos <= 0 ? "'%" : "'") . $value . ($pos >= 0 ? "%'" : "'");
@@ -451,8 +456,8 @@ class DibiPdoDriver extends DibiObject implements IDibiDriver, IDibiResultDriver
 
 	/**
 	 * Moves cursor position without fetching row.
-	 * @param  int      the 0-based cursor pos to seek to
-	 * @return boolean  TRUE on success, FALSE if unable to seek to specified record
+	 * @param  int   the 0-based cursor pos to seek to
+	 * @return bool  TRUE on success, FALSE if unable to seek to specified record
 	 */
 	public function seek($row)
 	{

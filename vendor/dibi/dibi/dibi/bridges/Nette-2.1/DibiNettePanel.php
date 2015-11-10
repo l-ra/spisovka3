@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 use Nette\Diagnostics\Debugger;
@@ -11,7 +11,6 @@ use Nette\Diagnostics\Debugger;
 /**
  * Dibi panel for Nette\Diagnostics.
  *
- * @author     David Grudl
  * @package    dibi\nette
  */
 class DibiNettePanel extends DibiObject implements Nette\Diagnostics\IBarPanel
@@ -104,9 +103,10 @@ class DibiNettePanel extends DibiObject implements Nette\Diagnostics\IBarPanel
 				try {
 					$backup = array($event->connection->onEvent, dibi::$numOfQueries, dibi::$totalTime);
 					$event->connection->onEvent = NULL;
-					$cmd = is_string($this->explain) ? $this->explain : ($event->connection->getConfig('driver') === 'oracle' ? 'EXPLAIN PLAN' : 'EXPLAIN');
+					$cmd = is_string($this->explain) ? $this->explain : ($event->connection->getConfig('driver') === 'oracle' ? 'EXPLAIN PLAN FOR' : 'EXPLAIN');
 					$explain = dibi::dump($event->connection->nativeQuery("$cmd $event->sql"), TRUE);
-				} catch (DibiException $e) {}
+				} catch (DibiException $e) {
+				}
 				list($event->connection->onEvent, dibi::$numOfQueries, dibi::$totalTime) = $backup;
 			}
 

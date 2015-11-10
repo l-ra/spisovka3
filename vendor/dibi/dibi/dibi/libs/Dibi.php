@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
@@ -10,7 +10,6 @@
  * This class is static container class for creating DB objects and
  * store connections info.
  *
- * @author     David Grudl
  * @package    dibi
  */
 class dibi
@@ -29,18 +28,18 @@ class dibi
 		AFFECTED_ROWS = 'a';
 
 	/** @deprecated */
-	const FIELD_TEXT = dibi::TEXT,
-		FIELD_BINARY = dibi::BINARY,
-		FIELD_BOOL = dibi::BOOL,
-		FIELD_INTEGER = dibi::INTEGER,
-		FIELD_FLOAT = dibi::FLOAT,
-		FIELD_DATE = dibi::DATE,
-		FIELD_DATETIME = dibi::DATETIME,
-		FIELD_TIME = dibi::TIME;
+	const FIELD_TEXT = self::TEXT,
+		FIELD_BINARY = self::BINARY,
+		FIELD_BOOL = self::BOOL,
+		FIELD_INTEGER = self::INTEGER,
+		FIELD_FLOAT = self::FLOAT,
+		FIELD_DATE = self::DATE,
+		FIELD_DATETIME = self::DATETIME,
+		FIELD_TIME = self::TIME;
 
 	/** version */
-	const VERSION = '2.3.1',
-		REVISION = 'released on 2015-02-25';
+	const VERSION = '2.3.4',
+		REVISION = 'released on 2015-10-26';
 
 	/** sorting order */
 	const ASC = 'ASC',
@@ -76,7 +75,7 @@ class dibi
 	 */
 	final public function __construct()
 	{
-		throw new LogicException("Cannot instantiate static class " . get_class($this));
+		throw new LogicException('Cannot instantiate static class ' . get_class($this));
 	}
 
 
@@ -294,7 +293,7 @@ class dibi
 	 * @return int
 	 * @throws DibiException
 	 */
-	public static function getInsertId($sequence=NULL)
+	public static function getInsertId($sequence = NULL)
 	{
 		return self::getConnection()->getInsertId($sequence);
 	}
@@ -306,7 +305,7 @@ class dibi
 	 * @return int
 	 * @throws DibiException
 	 */
-	public static function insertId($sequence=NULL)
+	public static function insertId($sequence = NULL)
 	{
 		return self::getConnection()->getInsertId($sequence);
 	}
@@ -366,18 +365,6 @@ class dibi
 	public static function loadFile($file)
 	{
 		return self::getConnection()->loadFile($file);
-	}
-
-
-	/**
-	 * Replacement for majority of dibi::methods() in future.
-	 */
-	public static function __callStatic($name, $args)
-	{
-		//if ($name = 'select', 'update', ...') {
-		// return self::command()->$name($args);
-		//}
-		return call_user_func_array(array(self::getConnection(), $name), $args);
 	}
 
 
@@ -477,7 +464,7 @@ class dibi
 			$sql = preg_replace("#(?<=[\\s,(])($keywords1)(?=[\\s,)])#i", "\n\$1", $sql);
 
 			// reduce spaces
-			$sql = preg_replace('#[ \t]{2,}#', " ", $sql);
+			$sql = preg_replace('#[ \t]{2,}#', ' ', $sql);
 
 			$sql = wordwrap($sql, 100);
 			$sql = preg_replace("#([ \t]*\r?\n){2,}#", "\n", $sql);

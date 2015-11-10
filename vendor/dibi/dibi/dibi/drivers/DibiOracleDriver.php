@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
@@ -21,7 +21,6 @@
  *   - persistent => Creates persistent connections with oci_pconnect instead of oci_new_connect
  *   - lazy, profiler, result, substitutes, ... => see DibiConnection options
  *
- * @author     David Grudl
  * @package    dibi\drivers
  */
 class DibiOracleDriver extends DibiObject implements IDibiDriver, IDibiResultDriver, IDibiReflector
@@ -103,7 +102,7 @@ class DibiOracleDriver extends DibiObject implements IDibiDriver, IDibiResultDri
 	{
 		$res = oci_parse($this->connection, $sql);
 		if ($res) {
-			oci_execute($res, $this->autocommit ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT);
+			@oci_execute($res, $this->autocommit ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT);
 			$err = oci_error($res);
 			if ($err) {
 				throw new DibiDriverException($err['message'], $err['code'], $sql);
@@ -336,8 +335,8 @@ class DibiOracleDriver extends DibiObject implements IDibiDriver, IDibiResultDri
 
 	/**
 	 * Moves cursor position without fetching row.
-	 * @param  int      the 0-based cursor pos to seek to
-	 * @return boolean  TRUE on success, FALSE if unable to seek to specified record
+	 * @param  int   the 0-based cursor pos to seek to
+	 * @return bool  TRUE on success, FALSE if unable to seek to specified record
 	 */
 	public function seek($row)
 	{
@@ -365,11 +364,12 @@ class DibiOracleDriver extends DibiObject implements IDibiDriver, IDibiResultDri
 		$count = oci_num_fields($this->resultSet);
 		$columns = array();
 		for ($i = 1; $i <= $count; $i++) {
+			$type = oci_field_type($this->resultSet, $i);
 			$columns[] = array(
 				'name' => oci_field_name($this->resultSet, $i),
 				'table' => NULL,
 				'fullname' => oci_field_name($this->resultSet, $i),
-				'nativetype'=> oci_field_type($this->resultSet, $i),
+				'nativetype' => $type === 'NUMBER' && oci_field_scale($this->resultSet, $i) === 0 ? 'INTEGER' : $type,
 			);
 		}
 		return $columns;

@@ -48,6 +48,7 @@ return array(
     'DibiSqlite3Driver' => $vendorDir . '/dibi/dibi/dibi/drivers/DibiSqlite3Driver.php',
     'DibiSqliteDriver' => $vendorDir . '/dibi/dibi/dibi/drivers/DibiSqliteDriver.php',
     'DibiSqliteReflector' => $vendorDir . '/dibi/dibi/dibi/drivers/DibiSqliteReflector.php',
+    'DibiSqlsrvDriver' => $vendorDir . '/dibi/dibi/dibi/drivers/DibiSqlsrvDriver.php',
     'DibiTableInfo' => $vendorDir . '/dibi/dibi/dibi/libs/DibiDatabaseInfo.php',
     'DibiTranslator' => $vendorDir . '/dibi/dibi/dibi/libs/DibiTranslator.php',
     'Dibi\\Bridges\\Nette\\DibiExtension22' => $vendorDir . '/dibi/dibi/dibi/bridges/Nette-2.2/DibiNette22Extension.php',

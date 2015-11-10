@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (http://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (http://davidgrudl.com)
  */
 
 namespace Latte;
@@ -48,10 +48,10 @@ class PhpWriter extends Object
 	{
 		$mask = preg_replace('#%(node|\d+)\.#', '%$1_', $mask);
 		$me = $this;
-		$mask = preg_replace_callback('#%escape(\(([^()]*+|(?1))+\))#', function($m) use ($me) {
+		$mask = preg_replace_callback('#%escape(\(([^()]*+|(?1))+\))#', function ($m) use ($me) {
 			return $me->escapeFilter(new MacroTokens(substr($m[1], 1, -1)))->joinAll();
 		}, $mask);
-		$mask = preg_replace_callback('#%modify(\(([^()]*+|(?1))+\))#', function($m) use ($me) {
+		$mask = preg_replace_callback('#%modify(\(([^()]*+|(?1))+\))#', function ($m) use ($me) {
 			return $me->formatModifiers(substr($m[1], 1, -1));
 		}, $mask);
 
@@ -60,7 +60,7 @@ class PhpWriter extends Object
 		$word = strpos($mask, '%node_word') === FALSE ? NULL : $this->tokens->fetchWord();
 
 		$code = preg_replace_callback('#([,+]\s*)?%(node_|\d+_|)(word|var|raw|array|args)(\?)?(\s*\+\s*)?()#',
-		function($m) use ($me, $word, & $args) {
+		function ($m) use ($me, $word, & $args) {
 			list(, $l, $source, $format, $cond, $r) = $m;
 
 			switch ($source) {

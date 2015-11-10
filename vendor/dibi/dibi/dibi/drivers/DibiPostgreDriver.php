@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
@@ -18,7 +18,6 @@
  *   - resource (resource) => existing connection resource
  *   - lazy, profiler, result, substitutes, ... => see DibiConnection options
  *
- * @author     David Grudl
  * @package    dibi\drivers
  */
 class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDriver, IDibiReflector
@@ -67,7 +66,7 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 				$string = '';
 				DibiConnection::alias($config, 'user', 'username');
 				DibiConnection::alias($config, 'dbname', 'database');
-				foreach (array('host','hostaddr','port','dbname','user','password','connect_timeout','options','sslmode','service') as $key) {
+				foreach (array('host', 'hostaddr', 'port', 'dbname', 'user', 'password', 'connect_timeout', 'options', 'sslmode', 'service') as $key) {
 					if (isset($config[$key])) {
 						$string .= $key . '=' . $config[$key] . ' ';
 					}
@@ -115,7 +114,7 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 
 	/**
 	 * Pings database.
-	 * @return boolean
+	 * @return bool
 	 */
 	public function ping()
 	{
@@ -164,7 +163,7 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 	{
 		if ($sequence === NULL) {
 			// PostgreSQL 8.1 is needed
-			$res = $this->query("SELECT LASTVAL()");
+			$res = $this->query('SELECT LASTVAL()');
 		} else {
 			$res = $this->query("SELECT CURRVAL('$sequence')");
 		}
@@ -385,8 +384,8 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 
 	/**
 	 * Moves cursor position without fetching row.
-	 * @param  int      the 0-based cursor pos to seek to
-	 * @return boolean  TRUE on success, FALSE if unable to seek to specified record
+	 * @param  int   the 0-based cursor pos to seek to
+	 * @return bool  TRUE on success, FALSE if unable to seek to specified record
 	 */
 	public function seek($row)
 	{
@@ -415,9 +414,9 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 		$columns = array();
 		for ($i = 0; $i < $count; $i++) {
 			$row = array(
-				'name'      => pg_field_name($this->resultSet, $i),
-				'table'     => pg_field_table($this->resultSet, $i),
-				'nativetype'=> pg_field_type($this->resultSet, $i),
+				'name' => pg_field_name($this->resultSet, $i),
+				'table' => pg_field_table($this->resultSet, $i),
+				'nativetype' => pg_field_type($this->resultSet, $i),
 			);
 			$row['fullname'] = $row['table'] ? $row['table'] . '.' . $row['name'] : $row['name'];
 			$columns[] = $row;
@@ -464,14 +463,14 @@ class DibiPostgreDriver extends DibiObject implements IDibiDriver, IDibiResultDr
 				table_schema = ANY (current_schemas(false))";
 
 		if ($version >= 9.3) {
-			$query .= "
+			$query .= '
 				UNION ALL
 				SELECT
 					matviewname, 1
 				FROM
 					pg_matviews
 				WHERE
-					schemaname = ANY (current_schemas(false))";
+					schemaname = ANY (current_schemas(false))';
 		}
 
 		$res = $this->query($query);

@@ -414,9 +414,9 @@ class Url extends Nette\Object
 	{
 		$url = new self($url);
 		parse_str($url->query, $query);
-		sort($query);
+		ksort($query);
 		parse_str($this->query, $query2);
-		sort($query2);
+		ksort($query2);
 		$http = in_array($this->scheme, array('http', 'https'), TRUE);
 		return $url->scheme === $this->scheme
 			&& !strcasecmp(rawurldecode($url->host), rawurldecode($this->host))
@@ -465,7 +465,7 @@ class Url extends Nette\Object
 		if ($reserved !== '') {
 			$s = preg_replace_callback(
 				'#%(' . substr(chunk_split(bin2hex($reserved), 2, '|'), 0, -1) . ')#i',
-				function($m) { return '%25' . strtoupper($m[1]); },
+				function ($m) { return '%25' . strtoupper($m[1]); },
 				$s
 			);
 		}

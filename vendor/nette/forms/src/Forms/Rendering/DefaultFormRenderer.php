@@ -7,8 +7,8 @@
 
 namespace Nette\Forms\Rendering;
 
-use Nette,
-	Nette\Utils\Html;
+use Nette;
+use Nette\Utils\Html;
 
 
 /**
@@ -467,7 +467,7 @@ class DefaultFormRenderer extends Nette\Object implements Nette\Forms\IFormRende
 
 	/**
 	 * @param  string
-	 * @return Nette\Utils\Html
+	 * @return Html
 	 */
 	protected function getWrapper($name)
 	{

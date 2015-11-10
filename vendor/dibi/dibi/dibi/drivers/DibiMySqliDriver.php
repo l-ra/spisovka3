@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
@@ -28,7 +28,6 @@ require_once dirname(__FILE__) . '/DibiMySqlReflector.php';
  *   - resource (mysqli) => existing connection resource
  *   - lazy, profiler, result, substitutes, ... => see DibiConnection options
  *
- * @author     David Grudl
  * @package    dibi\drivers
  */
 class DibiMySqliDriver extends DibiObject implements IDibiDriver, IDibiResultDriver
@@ -389,8 +388,8 @@ class DibiMySqliDriver extends DibiObject implements IDibiDriver, IDibiResultDri
 
 	/**
 	 * Moves cursor position without fetching row.
-	 * @param  int      the 0-based cursor pos to seek to
-	 * @return boolean  TRUE on success, FALSE if unable to seek to specified record
+	 * @param  int   the 0-based cursor pos to seek to
+	 * @return bool  TRUE on success, FALSE if unable to seek to specified record
 	 * @throws DibiException
 	 */
 	public function seek($row)

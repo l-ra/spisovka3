@@ -7,9 +7,9 @@
 
 namespace Nette\Forms;
 
-use Nette,
-	Nette\Utils\Strings,
-	Nette\Utils\Html;
+use Nette;
+use Nette\Utils\Strings;
+use Nette\Utils\Html;
 
 
 /**
@@ -125,7 +125,7 @@ class Helpers extends Nette\Object
 
 
 	/**
-	 * @return Nette\Utils\Html
+	 * @return Html
 	 */
 	public static function createSelectBox(array $items, array $optionAttrs = NULL)
 	{

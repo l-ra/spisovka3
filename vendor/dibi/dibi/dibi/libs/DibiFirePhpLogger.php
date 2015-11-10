@@ -2,14 +2,13 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 
 /**
  * dibi FirePHP logger.
  *
- * @author     David Grudl
  * @package    dibi
  */
 class DibiFirePhpLogger extends DibiObject
@@ -72,7 +71,7 @@ class DibiFirePhpLogger extends DibiObject
 			sprintf('%0.3f', $event->time * 1000),
 			strlen($event->sql) > self::$maxLength ? substr($event->sql, 0, self::$maxLength) . '...' : $event->sql,
 			$event->result instanceof Exception ? 'ERROR' : (string) $event->count,
-			$event->connection->getConfig('driver') . '/' . $event->connection->getConfig('name')
+			$event->connection->getConfig('driver') . '/' . $event->connection->getConfig('name'),
 		);
 
 		$payload = json_encode(array(

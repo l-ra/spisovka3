@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (http://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (http://davidgrudl.com)
  */
 
 namespace Latte;
@@ -45,7 +45,7 @@ class CompileException extends \Exception
  */
 class RegexpException extends \Exception
 {
-	static public $messages = array(
+	public static $messages = array(
 		PREG_INTERNAL_ERROR => 'Internal error',
 		PREG_BACKTRACK_LIMIT_ERROR => 'Backtrack limit was exhausted',
 		PREG_RECURSION_LIMIT_ERROR => 'Recursion limit was exhausted',

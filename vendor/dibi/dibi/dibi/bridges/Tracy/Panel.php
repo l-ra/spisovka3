@@ -2,19 +2,18 @@
 
 /**
  * This file is part of the "dibi" - smart database abstraction layer.
- * Copyright (c) 2005 David Grudl (http://davidgrudl.com)
+ * Copyright (c) 2005 David Grudl (https://davidgrudl.com)
  */
 
 namespace Dibi\Bridges\Tracy;
 
-use dibi,
-	Tracy;
+use dibi;
+use Tracy;
 
 
 /**
  * Dibi panel for Tracy.
- *
- * @author     David Grudl
+ * @package    dibi\nette
  */
 class Panel extends \DibiObject implements Tracy\IBarPanel
 {
@@ -85,7 +84,7 @@ class Panel extends \DibiObject implements Tracy\IBarPanel
 		foreach ($this->events as $event) {
 			$totalTime += $event->time;
 		}
-		return '<span title="dibi"><svg viewBox="0 0 2048 2048" style="vertical-align: bottom; width:1.23em; height:1.55em"><path fill="' . ( $count ? '#b079d6' : '#aaa') . '" d="M1024 896q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0 768q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0-384q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0-1152q208 0 385 34.5t280 93.5 103 128v128q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-128q0-69 103-128t280-93.5 385-34.5z"/></svg><span class="tracy-label">'
+		return '<span title="dibi"><svg viewBox="0 0 2048 2048" style="vertical-align: bottom; width:1.23em; height:1.55em"><path fill="' . ($count ? '#b079d6' : '#aaa') . '" d="M1024 896q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0 768q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0-384q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0-1152q208 0 385 34.5t280 93.5 103 128v128q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-128q0-69 103-128t280-93.5 385-34.5z"/></svg><span class="tracy-label">'
 			. $count . ' queries'
 			. ($totalTime ? sprintf(' / %0.1f ms', $totalTime * 1000) : '')
 			. '</span></span>';
@@ -107,9 +106,10 @@ class Panel extends \DibiObject implements Tracy\IBarPanel
 				try {
 					$backup = array($event->connection->onEvent, dibi::$numOfQueries, dibi::$totalTime);
 					$event->connection->onEvent = NULL;
-					$cmd = is_string($this->explain) ? $this->explain : ($event->connection->getConfig('driver') === 'oracle' ? 'EXPLAIN PLAN' : 'EXPLAIN');
+					$cmd = is_string($this->explain) ? $this->explain : ($event->connection->getConfig('driver') === 'oracle' ? 'EXPLAIN PLAN FOR' : 'EXPLAIN');
 					$explain = dibi::dump($event->connection->nativeQuery("$cmd $event->sql"), TRUE);
-				} catch (\DibiException $e) {}
+				} catch (\DibiException $e) {
+				}
 				list($event->connection->onEvent, dibi::$numOfQueries, dibi::$totalTime) = $backup;
 			}
 

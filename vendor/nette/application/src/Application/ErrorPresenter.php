@@ -7,9 +7,9 @@
 
 namespace NetteModule;
 
-use Nette,
-	Nette\Application,
-	Tracy\Debugger;
+use Nette;
+use Nette\Application;
+use Tracy\Debugger;
 
 
 /**
@@ -30,7 +30,7 @@ class ErrorPresenter extends Nette\Object implements Application\IPresenter
 			$code = $e->getCode();
 		} else {
 			$code = 500;
-			Debugger::log($e, Debugger::ERROR);
+			Debugger::log($e, Debugger::EXCEPTION);
 		}
 		ob_start();
 		require __DIR__ . '/templates/error.phtml';

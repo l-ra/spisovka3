@@ -7,12 +7,12 @@
 
 namespace Nette\Bridges\ApplicationLatte;
 
-use Nette,
-	Latte,
-	Latte\MacroNode,
-	Latte\PhpWriter,
-	Latte\CompileException,
-	Nette\Utils\Strings;
+use Nette;
+use Latte;
+use Latte\MacroNode;
+use Latte\PhpWriter;
+use Latte\CompileException;
+use Nette\Utils\Strings;
 
 
 /**
@@ -32,7 +32,7 @@ class UIMacros extends Latte\Macros\MacroSet
 		$me = new static($compiler);
 		$me->addMacro('control', array($me, 'macroControl'));
 
-		$me->addMacro('href', NULL, NULL, function(MacroNode $node, PhpWriter $writer) use ($me) {
+		$me->addMacro('href', NULL, NULL, function (MacroNode $node, PhpWriter $writer) use ($me) {
 			return ' ?> href="<?php ' . $me->macroLink($node, $writer) . ' ?>"<?php ';
 		});
 		$me->addMacro('plink', array($me, 'macroLink'));
@@ -73,7 +73,7 @@ if (empty($_l->extends) && !empty($_control->snippetMode)) {
 		$method = Strings::match($method, '#^\w*\z#') ? "render$method" : "{\"render$method\"}";
 		$param = $writer->formatArray();
 		if (!Strings::contains($node->args, '=>')) {
-			$param = substr($param, 6, -1); // removes array()
+			$param = substr($param, $param[0] === '[' ? 1 : 6, -1); // removes array() or []
 		}
 		return ($name[0] === '$' ? "if (is_object($name)) \$_l->tmp = $name; else " : '')
 			. '$_l->tmp = $_control->getComponent(' . $name . '); '
@@ -116,13 +116,13 @@ if (empty($_l->extends) && !empty($_control->snippetMode)) {
 		$payload = $control->getPresenter()->getPayload();
 		if (isset($local->blocks)) {
 			foreach ($local->blocks as $name => $function) {
-				if ($name[0] !== '_' || !$control->isControlInvalid(substr($name, 1))) {
+				if ($name[0] !== '_' || !$control->isControlInvalid((string) substr($name, 1))) {
 					continue;
 				}
 				ob_start();
 				$function = reset($function);
 				$snippets = $function($local, $params + array('_snippetMode' => TRUE));
-				$payload->snippets[$id = $control->getSnippetId(substr($name, 1))] = ob_get_clean();
+				$payload->snippets[$id = $control->getSnippetId((string) substr($name, 1))] = ob_get_clean();
 				if ($snippets !== NULL) { // pass FALSE from snippetArea
 					if ($snippets) {
 						$payload->snippets += $snippets;

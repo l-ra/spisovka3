@@ -4,7 +4,7 @@
 
 <h1>Tracy | dibi</h1>
 
-<p>Dibi can log queries and dump variables to the <a href="http://tracy.nette.org">Tracy</a>.</p>
+<p>Dibi can log queries and dump variables to the <a href="https://tracy.nette.org">Tracy</a>.</p>
 
 <?php
 
@@ -18,11 +18,11 @@ Tracy\Debugger::enable();
 
 
 $connection = dibi::connect(array(
-	'driver'   => 'sqlite3',
+	'driver' => 'sqlite3',
 	'database' => 'data/sample.s3db',
 	'profiler' => array(
 		'run' => TRUE,
-	)
+	),
 ));
 
 
@@ -35,4 +35,4 @@ $panel->register($connection);
 dibi::query('SELECT 123');
 
 // result set will be dumped
-Tracy\Debugger::barDump( dibi::fetchAll('SELECT * FROM customers WHERE customer_id < ?', 38), '[customers]' );
+Tracy\Debugger::barDump(dibi::fetchAll('SELECT * FROM customers WHERE customer_id < ?', 38), '[customers]');
