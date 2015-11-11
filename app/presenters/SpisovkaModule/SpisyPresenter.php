@@ -162,58 +162,44 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     }
 
     // TODO: Zcela chybi kontrola opravneni
-    public function renderVybrano()
+    public function actionVlozitDokument()
     {
-
-        $spis_id = $this->getParameter('id', null);
-        $dokument_id = $this->getParameter('dok_id', null);
-        $Spisy = new Spis();
-
-        try {
-            $spis = $Spisy->getInfo($spis_id);
-            if (!$spis || !$dokument_id)
-                throw new Exception('Neplatný parametr');
-
-            // Propojit s dokumentem
-            $DokumentSpis = new DokumentSpis();
-            $DokumentSpis->pripojit($dokument_id, $spis_id);
-
-            echo '###vybrano###' . $spis->nazev;
-        } catch (Exception $e) {
-            echo "Chyba: " . $e->getMessage();
-        }
-
-        $this->terminate();
-    }
-
-    // TODO: Zcela chybi kontrola opravneni
-    public function actionOdebratspis()
-    {
-
         $spis_id = $this->getParameter('id', null);
         $dokument_id = $this->getParameter('dok_id', null);
         $Spisy = new Spis();
 
         $spis = $Spisy->getInfo($spis_id);
-        if ($spis && $dokument_id) {
+        if (!$spis || !$dokument_id)
+            throw new Exception('Neplatný parametr');
 
-            // Propojit s dokumentem
-            $DokumentSpis = new DokumentSpis();
-            $where = array(array('dokument_id=%i', $dokument_id), array('spis_id=%i', $spis_id));
+        // Propojit s dokumentem
+        $DokumentSpis = new DokumentSpis();
+        $DokumentSpis->pripojit($dokument_id, $spis_id);
+
+        $this->sendJson($spis);
+    }
+
+    // TODO: Zcela chybi kontrola opravneni
+    public function actionVyjmoutDokument()
+    {
+        $ok = false;
+        $dokument_id = $this->getParameter('dok_id', null);
+        $DokumentSpis = new DokumentSpis();
+        $spis = $DokumentSpis->spis($dokument_id);
+        
+        if ($spis) {
+            $where = array(array('dokument_id=%i', $dokument_id));
             $DokumentSpis->odebrat($where);
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::SPIS_DOK_ODEBRAN,
                     'Dokument vyjmut ze spisu "' . $spis->nazev . '"');
-            $Log->logSpis($spis_id, LogModel::SPIS_DOK_ODEBRAN,
+            $Log->logSpis($spis->id, LogModel::SPIS_DOK_ODEBRAN,
                     'Dokument "' . $dokument_id . '" odebran ze spisu');
-
-            $this->flashMessage('Dokument byl úspěšně vyjmut ze spisu "' . $spis->nazev . '"');
-        } else {
-            $this->flashMessage('Dokument se nepodařilo vyjmout ze spisu.', 'warning');
+            $ok = true;
         }
-
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+        
+        $this->sendJson(['ok' => $ok]);
     }
 
     public function actionDefault()

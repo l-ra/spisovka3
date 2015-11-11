@@ -771,8 +771,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderNovy()
     {
-
         $Dokumenty = new Dokument();
+        $cisty = $this->getParameter('cisty', false);
+        if ($cisty) {
+            $Dokumenty->odstranit_rozepsane();
+            $this->redirect(':Spisovka:Dokumenty:novy');
+        }
 
         $args_rozd = array();
         $args_rozd['where'] = array(
@@ -783,20 +787,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $args_rozd['order'] = array('date_created' => 'DESC');
 
         $this->template->Typ_evidence = $this->typ_evidence;
-
-        $cisty = $this->getParameter('cisty', 0);
-        $spis_id = $this->getParameter('spis_id', null);
-        $rozdelany_dokument = null;
-
-        if ($cisty == 1) {
-            $Dokumenty->odstranit_rozepsane();
-            $this->redirect(':Spisovka:Dokumenty:novy');
-            //$rozdelany_dokument = null;
-        } else if ($spis_id) {
-            $Dokumenty->odstranit_rozepsane();
-        } else {
-            $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
-        }
+        
+        $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
 
         if (count($rozdelany_dokument) > 0) {
             $dokument = $rozdelany_dokument[0];
@@ -848,15 +840,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             );
             $dokument = $Dokumenty->ulozit($pred_priprava);
 
-            if ($spis_id) {
-                $DokumentSpis = new DokumentSpis();
-                $DokumentSpis->pripojit($dokument->id, $spis_id);
-                $spisy = $DokumentSpis->spisy($dokument->id);
-                $this->template->Spisy = $spisy;
-            } else {
-                $this->template->Spisy = null;
-            }
-
+            $this->template->Spisy = null;
 
             $this->template->Subjekty = null;
             $this->template->Prilohy = null;

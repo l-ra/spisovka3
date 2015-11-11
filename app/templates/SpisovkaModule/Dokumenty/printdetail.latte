@@ -27,18 +27,7 @@
             <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
         {/if}
-        <dl>
-            <dt>Název spisu:</dt>
-            <dd>
-            {if isset($Dok->spisy) }
-                {foreach $Dok->spisy as $s}
-                {$s->nazev}<br />
-                {/foreach}
-            {else}
-                nezařazen do žádného spisu
-            {/if}
-            </dd>
-        </dl>
+        {include 'detail-spis.latte'}
         <dl>
             <dt>Věc:</dt>
             <dd class="velke_pismo"><u>{$Dok->nazev}</u>&nbsp;</dd>
@@ -351,7 +340,7 @@
         Přílohy
     </div>
     <div id="dok-prilohy">
-    {if $AccessView==1}
+    {if $AccessView}
     {if count($Dok->prilohy)>0}
     <table class="seznam">
         {foreach $Dok->prilohy as $file}

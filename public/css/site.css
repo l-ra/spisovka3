@@ -76,6 +76,7 @@ form {
     font-weight: bold;
     font-size: 10pt;
     text-decoration: none;
+    margin-left: 6px;
 }
 
 #top_menu a:hover {
@@ -472,7 +473,11 @@ label.required {
     text-decoration: underline;
     cursor: pointer;
 }
-
+ 
+#dok_spojit a,
+#dok-spis-nazev, #dok-spis-vyjmout {
+    margin-right: 7px;    
+}
 
 /* ***************************************************************** */
 /* *** BOTTOM LAYOUT *** */
@@ -704,6 +709,7 @@ td.seznam-sestav-pruh-ikon a {
 #content .seznam td.meta .vyber a {
     font-size: 8pt;
     color: #000088;
+    margin-right: 5px;
 }
 
 #dialog .seznam td.meta .vyber a:hover,

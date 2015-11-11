@@ -82,11 +82,20 @@ $(function() {
         // Při spouštění plánovače nečekáme na odpověď
         if (ajaxSettings.url.indexOf('/cron/') != -1)
             return;
-        alert('Je nám líto, asynchronní požadavek skončil s chybou:\n' + thrownError);
+        
+        // při chybě též spinner schovám, protože jQuery zdá se nevyvolá událost stop
+        hideSpinner();
+        
+        var msg = 'Je nám líto, asynchronní požadavek skončil s chybou:\n' + thrownError;
+        if (jqXHR.responseText
+                && $("#dialog").dialog( "isOpen" ) === false)
+            msg = msg + '\n' + jqXHR.responseText;
+        
+        alert(msg);
         
         if (jqXHR.responseText
                 && $("#dialog").dialog( "isOpen" ) === true) {
-            $('#dialog').html('<pre>' + jqXHR.responseText);
+            $('#dialog').html('<pre>' + jqXHR.responseText + '</pre>');
             dialogScrollUp();
         }
     });
@@ -445,18 +454,31 @@ toggleWindow = function (elm) {
 spisVybran = function (spis_id) {
 
     showSpinner();
-    var href = BASE_URL + 'spisy/' + spis_id + '/vybrano?dok_id=' + DOKUMENT_ID;
+    var href = BASE_URL + 'spisy/' + spis_id + '/vlozit-dokument?dok_id=' + DOKUMENT_ID;
 
-    $.get(href, function(data) {
-        if ( data.indexOf('###vybrano###') != -1 ) {
-            data = data.replace('###vybrano###','');
-            $('#dok_spis').html(data);
-            closeDialog();
-        } else {
-            alert(data);
-        }
+    $.get(href, function(spis) {
+        $('#dok-spis-nazev').html(spis.nazev);
+        $('#dok-spis-vyjmout').show();
+        closeDialog();
     });
 
+    return false;
+};
+
+spisVyjmoutDokument = function () {
+    
+    if (confirm('Opravdu chcete vyjmout tento dokument ze spisu?')) {    
+        showSpinner();
+        var url = BASE_URL + 'spisy/vyjmout-dokument?dok_id=' + DOKUMENT_ID;
+
+        $.getJSON(url, function(data) {
+            if (data.ok) {
+                $('#dok-spis-nazev').html('nezařazen do žádného spisu');
+                $('#dok-spis-vyjmout').hide();
+            }
+        });
+    }
+    
     return false;
 };
 

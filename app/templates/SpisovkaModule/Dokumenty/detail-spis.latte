@@ -1,0 +1,23 @@
+<dl>
+    <dt>Název spisu:</dt>
+    <dd>
+        <span id="dok-spis-nazev">
+            {if isset($Dok->spis)}
+                {if $view != 'printdetail'}
+                    <a href="{link :Spisovka:Spisy:detail, 'id' => $Dok->spis->id}">{$Dok->spis->nazev}</a>
+                {else}
+                    {$Dok->spis->nazev}
+                {/if}
+            {else}
+                nezařazen do žádného spisu
+            {/if}
+        </span>
+        {if $AccessEdit && $Typ_evidence != 'sberny_arch' && $view != 'printdetail'}
+            <a id="dok-spis-vyjmout" href="javascript:;" 
+               style="display: {isset($Dok->spis) ? 'initial' : 'none'}"
+               onclick="return spisVyjmoutDokument();">Vyjmout ze spisu</a>
+            <a id="dialog-spis" n:if="$Typ_evidence != 'sberny_arch'"
+               href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}">Vložit do spisu</a>
+        {/if}
+    </dd>
+</dl>    

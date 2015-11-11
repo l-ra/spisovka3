@@ -8,7 +8,7 @@
                 <img src="{$publicUrl}images/subjekt/{if empty($subjekt->type)}fo{else}{$subjekt->type|lower}{/if}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
             </td>
             <td class="meta">
-                <strong>{if $module == 'Epodatelna'}<a href="" onclick="epodSubjektVybran(this, {$subjekt->id}); return false;">
+                <strong>{if $module == 'Epodatelna'}<a href="#" onclick="epodSubjektVybran(this, {$subjekt->id}); return false;">
                         {elseif $module == 'Admin'}<a href="{link detail, id => $subjekt->id}" {if $subjekt->stav > 1}style="text-decoration:line-through;"{/if}>{/if}
                         {=Subjekt::displayName($subjekt,'jmeno_item')}
                         {if $module != 'Spisovka'}</a>{/if}
