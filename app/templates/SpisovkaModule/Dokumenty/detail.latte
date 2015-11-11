@@ -95,7 +95,6 @@
        <a href="{link :Spisovka:Dokumenty:odeslat , 'id'=>$Dok->id }">Odeslat dokument</a>
        <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
        {/if}
-       &nbsp;
        {/if}{* $AccessEdit==1 *}
        <a href="{link this, 'id'=>$Dok->id, 'udalost'=>1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
        <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}" n:if="$Zapujcka">Vrátit dokument</a>
@@ -107,7 +106,7 @@
         <p><strong>Poznámka:</strong> Spouštěcí událost je okamžik rozhodný pro počátek plynutí skartační lhůty. Skartační lhůta se určuje počtem celých roků počítaných od 1. ledna kalendářního roku následujícího po kalendářním roce, v němž nastala spouštěcí událost.</p>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
         </dl>
         {var $udalostForm = $presenter->getComponent('udalostForm')}
         {$udalostForm->render('begin')}
@@ -124,7 +123,7 @@
             </dd>
         </dl>
         <dl>
-            <dt>&nbsp;</dt>
+            <dt></dt>
             <dd>
                 {$udalostForm['ok']->control}
             </dd>
@@ -140,7 +139,7 @@
         <dl>
             <dt>JID:</dt>
             <dd>
-                {$Dok->jid}&nbsp;
+                {$Dok->jid}
             </dd>
         </dl>
         <dl>
@@ -160,7 +159,7 @@
         {else}
         <dl>
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
-            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
+            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}</dd>
         </dl>
         {/if}
         <dl>
@@ -169,7 +168,7 @@
                 <span id="dok_spis">
                 {if isset($Dok->spisy) }
                     {foreach $Dok->spisy as $s}
-                    <a href="{link :Spisovka:Spisy:detail, 'id'=>$s->id}">{$s->nazev}</a>&nbsp;&nbsp;&nbsp;&nbsp; <a href="{link :Spisovka:Spisy:odebratspis, 'dok_id'=>$Dok->id, 'id'=>$s->id}" onclick="return confirm('Opravdu chcete vyjmout tento dokument ze spisu?');">Vyjmout ze spisu</a><br />
+                    <a href="{link :Spisovka:Spisy:detail, 'id'=>$s->id}">{$s->nazev}</a> <a href="{link :Spisovka:Spisy:odebratspis, 'dok_id'=>$Dok->id, 'id'=>$s->id}" onclick="return confirm('Opravdu chcete vyjmout tento dokument ze spisu?');">Vyjmout ze spisu</a><br />
                     {/foreach}
                 {else}
                     nezařazen do žádného spisu
@@ -193,7 +192,7 @@
             {if $isRozdelany}
             <dd>{$metadataForm['datum_vzniku']->control} {$metadataForm['datum_vzniku_cas']->control}</dd>
             {else}
-            <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
+            <dd>{$Dok->datum_vzniku|edatetime}</dd>
             {/if}
         </dl>
         {if isset($metadataForm['zpusob_doruceni_id'])}
@@ -204,7 +203,7 @@
         {elseif !empty($Dok->zpusob_doruceni)}
         <dl>
             <dt>Způsob doručení:</dt>
-            <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
+            <dd>{$Dok->zpusob_doruceni}</dd>
         </dl>        
         {/if}
         {if $Dok->typ_dokumentu->smer == 0}
@@ -231,15 +230,15 @@
                     {foreach $SouvisejiciDokumenty as $s}
                     <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
                     {if $s->spojeni == "zpetne_spojen"}
-                    &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'zpetne_spojeny'=>$s->id}">odebrat spojení</a>]
+                    [<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'zpetne_spojeny'=>$s->id}">odebrat spojení</a>]
                     {else}
-                    &nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->id}">odebrat spojení</a>]
+                    [<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->id}">odebrat spojení</a>]
                     {/if}
                     <br />
                     {/foreach}
                 {/if}
                 </span>
-                &nbsp;[<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->id}" id="dialog-spojit">spojit s dokumentem</a>]
+                [<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->id}" id="dialog-spojit">spojit s dokumentem</a>]
             </dd>
         </dl>
         {/if}
@@ -252,7 +251,6 @@
         </dl>
         <div>
             {$metadataForm['upravit']->control}
-            &nbsp;&nbsp;
             {$metadataForm['storno']->control}
         </div>
         {$metadataForm->render('end')}
@@ -260,7 +258,7 @@
         <div class="h2">{$Dok->typ_dokumentu->nazev}</div>
         <dl>
             <dt>JID:</dt>
-            <dd>{$Dok->jid}&nbsp;</dd>
+            <dd>{$Dok->jid}</dd>
         </dl>
         {if empty($Dok->cislo_jednaci)}
         <dl>
@@ -268,8 +266,8 @@
             <dd>Dokument nemá přiděleno číslo jednací.
                 {if $AccessEdit==1}
                 {if $Typ_evidence == 'sberny_arch'}
-                <br />Zaevidovat do spisové služby:&nbsp;&nbsp;<a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
-                &nbsp;&nbsp;<a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
+                <br />Zaevidovat do spisové služby: <a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
+                <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
                 {else}
                 <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Přidělit číslo jednací</a>
                 {/if}
@@ -279,7 +277,7 @@
         {else}
         <dl>
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
-            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
+            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}</dd>
         </dl>
         {/if}
         <dl>
@@ -296,39 +294,39 @@
         </dl>
         <dl>
             <dt>Věc:</dt>
-            <dd class="velke_pismo"><u>{$Dok->nazev}</u>&nbsp;</dd>
+            <dd class="velke_pismo"><u>{$Dok->nazev}</u></dd>
         </dl>
         <dl>
             <dt>Popis:</dt>
-            <dd>{!$Dok->popis|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->popis|enl2br}</dd>
         </dl>
         <dl>
             <dt>Datum doručení/vzniku:</dt>
-            <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
+            <dd>{$Dok->datum_vzniku|edatetime}</dd>
         </dl>
         {if !empty($Dok->zpusob_doruceni)}
         <dl>
             <dt>Způsob doručení:</dt>
-            <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
+            <dd>{$Dok->zpusob_doruceni}</dd>
         </dl>        
         {/if}
         {if !empty($Dok->cislo_jednaci_odesilatele)}
         <dl>
             <dt>Číslo jednací odesilatele:</dt>
-            <dd>{$Dok->cislo_jednaci_odesilatele}&nbsp;</dd>
+            <dd>{$Dok->cislo_jednaci_odesilatele}</dd>
         </dl>
         {/if}
         {if !empty($Dok->cislo_doporuceneho_dopisu)}
         <dl>
             <dt>Číslo doporučeného dopisu:</dt>
-            <dd>{$Dok->cislo_doporuceneho_dopisu}&nbsp;</dd>
+            <dd>{$Dok->cislo_doporuceneho_dopisu}</dd>
         </dl>
         {/if}
         
         {if !empty($Dok->poznamka)}
         <dl>
             <dt>Poznámka:</dt>
-            <dd>{!$Dok->poznamka|html2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka|html2br}</dd>
         </dl>
         {/if}
         {if count($SouvisejiciDokumenty)>0 }
@@ -340,7 +338,6 @@
                     <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a><br />
                 {/foreach}
                 </span>
-                &nbsp;
             </dd>
         </dl>
         {/if}
@@ -362,21 +359,21 @@
             <dt>Ověření identifikátoru:</dt>
             <dd>
             {if $Dok->identifikator['cert_signed'] >= 0 }
-                {$Dok->identifikator['cert_log']['aktualne']['date']} &nbsp;
+                {$Dok->identifikator['cert_log']['aktualne']['date']} 
                 {if $Dok->identifikator['cert_log']['aktualne']['status']==1 }
                 <span style="color:#009900;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
                 {else}
                 <span style="color:#990000;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
                 {/if}
                 <br />
-                {$Dok->identifikator['cert_log']['prijato']['date']} &nbsp;
+                {$Dok->identifikator['cert_log']['prijato']['date']} 
                 {if $Dok->identifikator['cert_log']['prijato']['status']==1 }
                 <span style="color:#009900;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
                 {else}
                 <span style="color:#990000;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
                 {/if}
                 <br />
-                {$Dok->identifikator['cert_log']['doruceno']['date']} &nbsp;
+                {$Dok->identifikator['cert_log']['doruceno']['date']} 
                 {if $Dok->identifikator['cert_log']['doruceno']['status']==1 }
                 <span style="color:#009900;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
                 {else}
@@ -385,7 +382,7 @@
             {else}
                 <span style="color:#990000;">{$Dok->identifikator['cert_status']}</span>
             {/if}
-            &nbsp;</dd>
+            </dd>
         </dl>
         {/if}
         {if $Dok->identifikator['typ'] == "isds" }
@@ -402,7 +399,7 @@
         {/if}
     </div>
     {if $Dok->stav_dokumentu >= 3}
-    <a name="vr" />
+    <a name="vr" class="anchor" />
     <div class="dokument_blok_sedy">
         <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
@@ -415,7 +412,7 @@
         </dl>
         <dl>
             <dt>Datum vyřízení:</dt>
-            <dd>{$vyrizovaniForm['datum_vyrizeni']->control} {$vyrizovaniForm['datum_vyrizeni_cas']->control}&nbsp;</dd>
+            <dd>{$vyrizovaniForm['datum_vyrizeni']->control} {$vyrizovaniForm['datum_vyrizeni_cas']->control}</dd>
         </dl>
         <dl>
             <dt>Spisový znak:</dt>
@@ -442,47 +439,46 @@
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
-            <dd>{$vyrizovaniForm['ulozeni_dokumentu']->control}&nbsp;</dd>
+            <dd>{$vyrizovaniForm['ulozeni_dokumentu']->control}</dd>
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{$vyrizovaniForm['poznamka_vyrizeni']->control}&nbsp;</dd>
+            <dd>{$vyrizovaniForm['poznamka_vyrizeni']->control}</dd>
         </dl>
         <div>
             {$vyrizovaniForm['upravit']->control}
-            &nbsp;&nbsp;
             {$vyrizovaniForm['storno']->control}
         </div>
         {$vyrizovaniForm->render('end')}
         {else}
         <dl>
             <dt>Způsob vyřízení:</dt>
-            <dd>{$Dok->zpusob_vyrizeni}&nbsp;</dd>
+            <dd>{$Dok->zpusob_vyrizeni}</dd>
         </dl>
         <dl>
             <dt>Datum vyřízení:</dt>
-            <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
+            <dd>{$Dok->datum_vyrizeni|edatetime}</dd>
         </dl>
         <dl>
             <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
+            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
+            <dd>{$Dok->skartacni_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační lhůta:</dt>
-            <dd class="normal-font"><strong>{$Dok->skartacni_lhuta}</strong>&nbsp;{if $Dok->stav_dokumentu>4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
+            <dd class="normal-font"><strong>{$Dok->skartacni_lhuta}</strong> {if $Dok->stav_dokumentu > 4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
         </dl>
         {if $Dok->stav_dokumentu>=5}
         <dl>
             <dt>Datum spouštěcí události:</dt>
-            <dd>{$Dok->datum_spousteci_udalosti|edate}&nbsp;</dd>
+            <dd>{$Dok->datum_spousteci_udalosti|edate}</dd>
         </dl>
         {/if}
         <dl>
@@ -491,11 +487,11 @@
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
-            <dd>{!$Dok->ulozeni_dokumentu|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->ulozeni_dokumentu|enl2br}</dd>
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka_vyrizeni|enl2br}</dd>
         </dl>
         {/if}
         </div>
@@ -552,7 +548,7 @@
         </dl>
         <dl n:if="$Dok->prideleno->poznamka">
             <dt>Poznámka:</dt>
-            <dd>{!$Dok->prideleno->poznamka|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->prideleno->poznamka|enl2br}</dd>
         </dl>
         {/if}
 
@@ -577,7 +573,7 @@
         </dl>
         <dl n:if="$Dok->predano->poznamka">
             <dt>Poznámka pro příjemce:</dt>
-            <dd>{!$Dok->predano->poznamka|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->predano->poznamka|enl2br}</dd>
         </dl>
         {/if}
     </div>
@@ -593,7 +589,7 @@
         </dl>
         <dl>
             <dt>Důvod zapůjčení:</dt>
-            <dd>{!$Zapujcka->duvod|enl2br}&nbsp;</dd>
+            <dd>{!$Zapujcka->duvod|enl2br}</dd>
         </dl>
         <dl>
             <dt>Datum výpůjčky:</dt>
@@ -624,7 +620,7 @@
                 </dd>
             </dl>
             <dl id="subjekt_novy">
-                <dt>&nbsp;</dt>
+                <dt></dt>
                 <dd>
                     <a href={link Subjekty:novy, dok_id => $Dok->id} id="novysubjekt_click">Vytvořit nový subjekt</a>
                 </dd>
@@ -668,25 +664,24 @@
                 </div>
                 {if $AccessEdit==1 }
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this);">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this);">odebrat</a>
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>
                 </div>
                 {/if}
             </td>
-            <td class="meta_plus">
-                &nbsp;
+            <td class="meta_plus">                
                 <div class="info">
                 <dl>
                     <dt>email:</dt>
-                    <dd>{$subjekt->email}&nbsp;</dd>
+                    <dd>{$subjekt->email}</dd>
                 </dl>
                 <dl>
                     <dt>telefon:</dt>
-                    <dd>{$subjekt->telefon}&nbsp;</dd>
+                    <dd>{$subjekt->telefon}</dd>
                 </dl>
                 <dl>
                     <dt>isds:</dt>
-                    <dd>{$subjekt->id_isds}&nbsp;</dd>
+                    <dd>{$subjekt->id_isds}</dd>
                 </dl>
 
                 </div>
@@ -707,7 +702,6 @@
     {if 0 }
     <div class="blok_akce">
         <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
-        &nbsp;&nbsp;&nbsp;
         <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
     </div>
     {/if}
@@ -744,8 +738,8 @@
                 {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
                 {if $AccessEdit==1 }
                 <div class="vyber">
-                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return odebratPrilohu(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return odebratPrilohu(this, {!$Dok->id});">odebrat</a>
+                    <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return prilohazmenit(this);">změnit</a>
                 </div>
                 {/if}
             </td>

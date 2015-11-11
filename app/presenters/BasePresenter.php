@@ -4,7 +4,11 @@ use Nette\Forms\Form;
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
-
+    /** hack for automated application testing
+     *  avoids sending Content-Type header
+     */     
+    static public $testMode = false;
+    
     protected $storage;
 
     public function injectStorage(Storage_Basic $storage)
@@ -57,6 +61,17 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         return $this->user->isAllowed($this->reflection->name, $this->getAction());
     }
 
+    protected function afterRender()
+    {
+        $request = $this->getHttpRequest();
+        $accept = $request->getHeader('Accept', '');
+        $xhtml_browser = strpos($accept, 'application/xhtml+xml') !== false;
+        $response = $this->getHttpResponse();
+        
+        if ($xhtml_browser && !$this->isAjax() && !self::$testMode)
+            $response->setContentType('application/xhtml+xml', 'utf-8');                
+    }
+    
     protected function beforeRender()
     {
         // Helper escapovaný nl2br
@@ -283,7 +298,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         // Nastav, aby Nette generovalo ID prvku formulare jako ve stare verzi
         Nette\Forms\Controls\BaseControl::$idMask = 'frm%s';
         
-        $this->translateFormRules();
+        $this->translateFormRules();             
     }
 
     public function templatePrepareFilters($template)

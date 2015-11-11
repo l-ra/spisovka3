@@ -16,6 +16,8 @@ nette:
         savePath: "%clientDir%/sessions"
         cookiePath: %cookiePath%
         autoStart: true
+    latte:
+        xhtml: true
         
 services:
     authorizator = Acl

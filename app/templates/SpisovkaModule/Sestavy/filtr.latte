@@ -18,7 +18,7 @@
            </dd>
         </dl>
         <dl>
-            <dt>&nbsp;</dt>
+            <dt></dt>
             <dd>
                 <input type="checkbox" name="d_today" /> dnešní ({date("j.n.Y")})
             </dd>            
@@ -28,17 +28,16 @@
             <dd>
                 <select name="rok">{var $rok = date("Y")}
                     {for $r=($rok-10);$r<($rok+2);$r++}
-                    <option value="{$r}"{if $r==$rok} selected{/if}>{$r}</option>
+                    <option value="{$r}"{if $r==$rok} selected="selected"{/if}>{$r}</option>
                     {/for}
                 </select>
             </dd>
         </dl>
         <dl>
-            <dt>&nbsp;</dt>
+            <dt></dt>
             <dd>
                 <input type="submit" name="filtrovat" value="Zobrazit" />
                 <input type="button" name="storno" value="Zrušit" onclick="return closeDialog();" />
             </dd>
         </dl>
-
     </form>

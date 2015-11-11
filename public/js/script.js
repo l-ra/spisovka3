@@ -873,6 +873,8 @@ function nastylovat(data,typ) {
         html = html + "<td>"+ a + data[zaznam]['nazev'] +"</a></td>";
         html = html + "</tr>";
     }
+    
+    html = html + "</table>";
     return html;
 
 }

@@ -69,9 +69,9 @@ renderEpodSubjekty = function (subjekt_id) {
             html =        '        <table class="seznam" id="subjekty-table">';
             html = html + '           <tr>';
             html = html + '               <td class="icon">Použít</td>';
-            html = html + '               <td class="icon">&nbsp;</td>';
-            html = html + '               <td class="meta">&nbsp;</td>';
-            html = html + '               <td class="meta_plus">&nbsp;</td>';
+            html = html + '               <td class="icon"></td>';
+            html = html + '               <td class="meta"></td>';
+            html = html + '               <td class="meta_plus"></td>';
             html = html + '           </tr>';
             html = html + data;
             html = html + '        </table>';
@@ -106,7 +106,7 @@ zkontrolovatSchranku = function (nacist_nove_zpravy) {
     if (typeof nacist_nove_zpravy === 'undefined')
         nacist_nove_zpravy = true;
     
-    $('#zkontrolovat_status').html('<img src="'+PUBLIC_URL+'images/spinner.gif" width="14" height="14" />&nbsp;&nbsp;&nbsp;Kontroluji schránky ...');
+    $('#zkontrolovat_status').html('<img src="'+PUBLIC_URL+'images/spinner.gif" width="14" height="14" /> Kontroluji schránky ...');
 
     url = BASE_URL + 'epodatelna/default/zkontrolovatAjax';
 
@@ -175,16 +175,16 @@ generujZpravu = function (data) {
         typ_string = '<img src="'+PUBLIC_URL+'images/icons/typdok1.png" alt="Email" title="Email" width="24" height="16" />';
 
         form_odmitnout = '                    <dl>'+
-'                        <dt>&nbsp;</dt>'+
+'                        <dt></dt>'+
 '                        <dd><input type="checkbox" name="odmitnout['+id+']" /> Poslat upozornění odesilateli?</dd>'+
 '                    </dl>'+
 '                    <dl>'+
 '                        <dt>Email odesílatele:</dt>'+
-'                        <dd><input type="text" name="zprava_email['+id+']" value="'+ data['odesilatel'] +'" size=60 /></dd>'+
+'                        <dd><input type="text" name="zprava_email['+id+']" value="'+ data['odesilatel'] +'" size="60" /></dd>'+
 '                    </dl>'+
 '                    <dl>'+
 '                        <dt>Předmět pro odesílatele:</dt>'+
-'                        <dd><input type="text" name="zprava_predmet['+id+']" value="RE: '+ data['predmet'] +'" size=60 /></dd>'+
+'                        <dd><input type="text" name="zprava_predmet['+id+']" value="RE: '+ data['predmet'] +'" size="60" /></dd>'+
 '                    </dl>'+
 '                    <dl>'+
 '                        <dt>Zpráva pro odesilatele:</dt>'+
@@ -239,7 +239,7 @@ generujZpravu = function (data) {
 '                <div class="evidence_zprava_toogle" id="evidence_zprava_toogle_'+id+'">Zobrazit zprávu >></div>'+
 '                <div class="evidence_zprava" id="evidence_zprava_'+id+'">'+
 data['popis'] +
-'                </div><p>'+
+'                </div>'+
 '                <span>Přílohy:</span>'+
 '                <ul id="evidence_prilohy_'+id+'">'+
 prilohy +
@@ -250,7 +250,7 @@ prilohy +
 '                        <dt>Nalezené subjekty:</dt>'+
 '                        <dd id="subjekt_seznam_'+id+'">'+
 subjekt_seznam +
-'                        &nbsp;</dd>'+
+'                        </dd>'+
 '                    </dl>'+
 '                    <dl>'+
 '                        <dt>Hledat subjekt:</dt>'+
@@ -259,7 +259,7 @@ subjekt_seznam +
 '                        </dd>'+
 '                    </dl>'+
 '                    <dl id="subjekt_novy_'+id+'">'+
-'                        <dt>&nbsp;</dt>'+
+'                        <dt></dt>'+
 '                        <dd><a href="' + linkNovySubjekt + '" id="novysubjekt_click_'+id+'">Vytvořit nový subjekt z odesílatele</a></dd>'+
 '                    </dl>'+
 '                    <span>Zaevidovat do spisové služby.</span>'+
@@ -287,7 +287,7 @@ subjekt_seznam +
 '                        <dd><textarea name="predat_poznamka['+id+']" rows="3" cols="60"></textarea></dd>'+
 '                    </dl>'+
 '                    <dl>'+
-'                        <dt>&nbsp;</dt>'+
+'                        <dt></dt>'+
 '                        <dd><input type="submit" name="evidovat['+id+']" value="Zaevidovat tuto zprávu" id="submit_evidovat_'+id+'" /></dd>'+
 '                    </dl>'+
 '                </div>'+
@@ -298,7 +298,7 @@ subjekt_seznam +
 '                        <dd><textarea name="evidence['+id+']" rows="3" cols="60"></textarea></dd>'+
 '                    </dl>'+
 '                    <dl>'+
-'                        <dt>&nbsp;</dt>'+
+'                        <dt></dt>'+
 '                        <dd><input type="submit" name="evidovat_jinam['+id+']" value="Zaevidovat tuto zprávu do jiné evidence" id="submit_evidovat_jinam_'+id+'" /></dd>'+
 '                    </dl>'+
 '                </div>'+
@@ -310,7 +310,7 @@ subjekt_seznam +
 '                    </dl>'+
 form_odmitnout +
 '                    <dl>'+
-'                        <dt>&nbsp;</dt>'+
+'                        <dt></dt>'+
 '                        <dd>'+
 '                           <input type="hidden" name="odmitnout_typ['+id+']" value="'+typ+'" />'+
 '                           <input type="submit" name="odmitnout['+id+']" value="Odmítnout tuto zprávu" id="submit_odmitnout_'+id+'" />'+

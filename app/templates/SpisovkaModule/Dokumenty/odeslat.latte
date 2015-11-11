@@ -195,7 +195,7 @@
     </div>
     <div id="dok-prilohy">
     {if count($Dok->prilohy)>0}
-    <table class="seznam">
+        <table class="seznam">
         {foreach $Dok->prilohy as $file}
         <tr>
             <td class="icon">
@@ -220,7 +220,8 @@
             </td>
         </tr>
         {/foreach}
-    </table>
+        </table>
+        <br />
         <dl>
             <dt>Celková velikost příloh :</dt>
             <dd>{$PrilohyCelkovaVelikost|bytes}&nbsp;</dd>

@@ -225,7 +225,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
             echo 'Chyba ' . $e->getCode() . ' - ' . $e->getMessage();
         }
 
-        $this->terminate();
+		$this->terminate();
     }
 
     public function renderOdebrat()

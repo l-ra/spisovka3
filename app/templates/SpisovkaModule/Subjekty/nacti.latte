@@ -26,24 +26,23 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id }" onclick="return odebratSubjekt(this);">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id }" onclick="return odebratSubjekt(this);">odebrat</a>
+                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>
                 </div>
             </td>
-            <td class="meta_plus">
-                &nbsp;
+            <td class="meta_plus">                
                 <div class="info">
                 <dl>
                     <dt>email:</dt>
-                    <dd>{$subjekt->email}&nbsp;</dd>
+                    <dd>{$subjekt->email}</dd>
                 </dl>
                 <dl>
                     <dt>telefon:</dt>
-                    <dd>{$subjekt->telefon}&nbsp;</dd>
+                    <dd>{$subjekt->telefon}</dd>
                 </dl>
                 <dl>
                     <dt>isds:</dt>
-                    <dd>{$subjekt->id_isds}&nbsp;</dd>
+                    <dd>{$subjekt->id_isds}</dd>
                 </dl>
 
                 </div>

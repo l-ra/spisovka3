@@ -2,17 +2,17 @@
     <div id="top">
     {if isset($no_top_menu)}
         <h1>Spisová služba<span id="top_urad">{if $module == "Install"}Instalace{else}{$Urad->nazev}{/if}</span></h1>
-        <div id="top_jmeno">&nbsp;</div>
+        <div id="top_jmeno"> </div>
     {else}
         <h1><a href="{link :$module:Default:}">{$module_name}</a> <span id="top_urad">{$Urad->nazev}</span></h1>
         <div id="top_menu">
-            {access :Spisovka:Default:}<a href="{link :Spisovka:Default:}">Spisová služba</a>&nbsp;&nbsp;{/access}
-            {access :Epodatelna:Default:}<a href="{link :Epodatelna:Default:}">E-podatelna</a>&nbsp;&nbsp;{/access}
+            {access :Spisovka:Default:}<a href="{link :Spisovka:Default:}">Spisová služba</a>{/access}
+            {access :Epodatelna:Default:}<a href="{link :Epodatelna:Default:}">E-podatelna</a>{/access}
             {if $userobj->isAllowed('Spisovna', 'cist_dokumenty') || $userobj->isAllowed('Spisovna_ZapujckyPresenter')}
-            <a href="{link :Spisovna:Default:}">Spisovna</a>&nbsp;&nbsp;{/if}
-            {access :Admin:Default:}<a href="{link :Admin:Default:}">Administrace</a>&nbsp;&nbsp;{/access}
-{*            {access :Spisovka:Zpravy:}<a href="{link :Spisovka:Zpravy:default}">Zprávy</a>&nbsp;&nbsp;{/access} *}
-            <a href="{$baseUrl}{$helpUri}" onclick="return openHelpWindow(this.href);">Nápověda</a>&nbsp;&nbsp;
+            <a href="{link :Spisovna:Default:}">Spisovna</a>{/if}
+            {access :Admin:Default:}<a href="{link :Admin:Default:}">Administrace</a>{/access}
+{*            {access :Spisovka:Zpravy:}<a href="{link :Spisovka:Zpravy:default}">Zprávy</a>{/access} *}
+            <a href="{$baseUrl}{$helpUri}" onclick="return openHelpWindow(this.href);">Nápověda</a>
             <a href="{link :Spisovka:Uzivatel:logout}">Odhlásit</a>
         </div>
         <div id="top_jmeno">

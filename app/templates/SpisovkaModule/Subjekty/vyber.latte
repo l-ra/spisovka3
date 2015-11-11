@@ -19,25 +19,25 @@
                 {=Subjekt::displayName($subjekt,'adresa')}
                 </div>
                 <div class="vyber" n:if="$module == 'Spisovka'">
-                    <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'A' }" onclick="subjektVybran(this); return false;">adresát</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'O' }" onclick="subjektVybran(this); return false;">odesilatel</a>&nbsp;&nbsp;
+                    <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'A' }" onclick="subjektVybran(this); return false;">adresát</a>
+                    <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'O' }" onclick="subjektVybran(this); return false;">odesilatel</a>
                     <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'AO' }" onclick="subjektVybran(this); return false;">adresát i odesilatel</a>
                 </div>
             </td>
             <td class="meta_plus">
-                &nbsp;
+                
                 <div class="info">
                 <dl>
                     <dt>email:</dt>
-                    <dd>{$subjekt->email}&nbsp;</dd>
+                    <dd>{$subjekt->email}</dd>
                 </dl>
                 <dl>
                     <dt>telefon:</dt>
-                    <dd>{$subjekt->telefon}&nbsp;</dd>
+                    <dd>{$subjekt->telefon}</dd>
                 </dl>
                 <dl>
                     <dt>isds:</dt>
-                    <dd>{$subjekt->id_isds}&nbsp;</dd>
+                    <dd>{$subjekt->id_isds}</dd>
                 </dl>
 
                 </div>

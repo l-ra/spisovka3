@@ -14,18 +14,16 @@
 }
 <tr class="{$str}">
 <td>
-{!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
+<div style="display: inline-block; width: {25*($spis->uroven-1)}px" />
 {if $spis->typ=='VS'}
 <div class="icon_slozka" onclick="$('.item{!$spis->id}').toggle();"></div>
-&nbsp;&nbsp;
 {$spis->nazev}
 {elseif $spis->typ=='SP'}
 <img src="{$publicUrl}images/icons/folder_green.png" alt="Hlavní spis" title="Hlavní spis" width="16" height="16" onclick="$('.item{!$spis->id}').toggle();" />
-&nbsp;&nbsp;
 {$spis->nazev}
 {else}
-<div class="icon_spis"></div>&nbsp;&nbsp;
-<a href="" onclick="return spisVybran({$spis->id})">{$spis->nazev}</a>
+<div class="icon_spis"></div>
+<a href="" onclick="return spisVybran({$spis->id});">{$spis->nazev}</a>
 {/if}                
 </td>
 </tr>

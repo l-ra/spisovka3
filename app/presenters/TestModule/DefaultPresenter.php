@@ -40,6 +40,9 @@ class Test_DefaultPresenter extends BasePresenter
 
     public function renderRun()
     {
+        // avoid sending extra HTTP headers
+        BasePresenter::$testMode = true;
+                
         ob_end_clean();
 
         echo "<pre>";

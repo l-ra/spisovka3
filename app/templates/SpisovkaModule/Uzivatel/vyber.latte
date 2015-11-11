@@ -27,15 +27,13 @@
             <td>
                 <a href="{link :Spisovka:Uzivatel:vybrano, 'orgjednotka'=>$org->id, 'dok_id'=>$dokument_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
                    {$org->ciselna_rada}
-               </a>&nbsp;&nbsp;
+                </a>
             </td>
             <td>
                 {if !empty($org->plny_nazev)}{$org->plny_nazev}
                 {else}{$org->zkraceny_nazev}
-                {/if}
-                &nbsp;
+                {/if}                
             </td>
-
         </tr>
         {/foreach}
     </table>
@@ -55,13 +53,12 @@
             <td>
                 <a href="{link :Spisovka:Uzivatel:vybrano, 'id'=>$user->id, 'user'=>$user->user_id, 'dok_id'=>$dokument_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
                    {=Osoba::displayName($user,'full_item')}
-               </a>&nbsp;&nbsp;
+               </a>
             </td>
             <td>
                 {if $user->pocet_uctu > 1}
                 {$user->username}
-                {/if}
-                &nbsp;
+                {/if}                
             </td>
         </tr>
         {/foreach}
