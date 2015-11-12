@@ -314,6 +314,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
             $user = $this->user;
 
+            $this->template->AccessEdit = 0;
+            
             $this->template->Lze_menit_skartacni_rezim = $dokument->stav_dokumentu == 7 && $user->isAllowed('Spisovna',
                             'zmenit_skartacni_rezim');
             $this->template->Upravit_param = $this->getParameter('upravit', null);
