@@ -63,6 +63,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function afterRender()
     {
+        $this->template->view = $this->view;
+        
         $request = $this->getHttpRequest();
         $accept = $request->getHeader('Accept', '');
         $xhtml_browser = strpos($accept, 'application/xhtml+xml') !== false;
@@ -189,7 +191,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         }
 
         // module : presenter : view
-        $this->template->view = $this->view;
         $a = strrpos($this->name, ':');
         if ($a === FALSE) {
             $this->template->module = '';
