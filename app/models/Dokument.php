@@ -396,36 +396,39 @@ class Dokument extends BaseModel
         }
     }
 
+    private function joinSubjekt(&$args)
+    {
+        $args['leftJoin']['dok_subjekt'] = array(
+            'from' => array($this->tb_dok_subjekt => 'd2sub'),
+            'on' => array('d2sub.dokument_id = d.id'),
+            'cols' => null
+        );
+        $args['leftJoin']['subjekt'] = array(
+            'from' => array($this->tb_subjekt => 's'),
+            'on' => array('s.id = d2sub.subjekt_id'),
+            'cols' => null
+        );
+    }
+
     public function paramsFiltr($params)
     {
         $args = array();
 
-        if (isset($params['nazev'])) {
-            if (!empty($params['nazev'])) {
-                $args['where'][] = array('d.nazev LIKE %s', '%' . $params['nazev'] . '%');
-            }
-        }
+        if (!empty($params['nazev']))
+            $args['where'][] = array('d.nazev LIKE %s', '%' . $params['nazev'] . '%');
 
         // popis
-        if (isset($params['popis'])) {
-            if (!empty($params['popis'])) {
-                $args['where'][] = array('d.popis LIKE %s', '%' . $params['popis'] . '%');
-            }
+        if (!empty($params['popis'])) {
+            $args['where'][] = array('d.popis LIKE %s', '%' . $params['popis'] . '%');
         }
 
         // cislo jednaci
-        if (isset($params['cislo_jednaci'])) {
-            if (!empty($params['cislo_jednaci'])) {
-                $args['where'][] = array('d.cislo_jednaci LIKE %s', '%' . $params['cislo_jednaci'] . '%');
-            }
-        }
+        if (!empty($params['cislo_jednaci']))
+            $args['where'][] = array('d.cislo_jednaci LIKE %s', '%' . $params['cislo_jednaci'] . '%');
 
         // spisova znacka - nazev spisu
-        if (isset($params['spisova_znacka'])) {
-            if (!empty($params['spisova_znacka'])) {
-                $args['where'][] = array('spis.nazev LIKE %s', '%' . $params['spisova_znacka'] . '%');
-            }
-        }
+        if (!empty($params['spisova_znacka']))
+            $args['where'][] = array('spis.nazev LIKE %s', '%' . $params['spisova_znacka'] . '%');
 
         // typ dokumentu
         if (isset($params['dokument_typ_id'])) {
@@ -469,17 +472,13 @@ class Dokument extends BaseModel
         }
 
         // CJ odesilatele
-        if (isset($params['cislo_jednaci_odesilatele'])) {
-            if (!empty($params['cislo_jednaci_odesilatele'])) {
-                $args['where'][] = array('d.cislo_jednaci_odesilatele LIKE %s', '%' . $params['cislo_jednaci_odesilatele'] . '%');
-            }
+        if (!empty($params['cislo_jednaci_odesilatele'])) {
+            $args['where'][] = array('d.cislo_jednaci_odesilatele LIKE %s', '%' . $params['cislo_jednaci_odesilatele'] . '%');
         }
 
         // cislo doporuceneho dopisu
-        if (isset($params['cislo_doporuceneho_dopisu'])) {
-            if (!empty($params['cislo_doporuceneho_dopisu'])) {
-                $args['where'][] = array('d.cislo_doporuceneho_dopisu LIKE %s', '%' . $params['cislo_doporuceneho_dopisu'] . '%');
-            }
+        if (!empty($params['cislo_doporuceneho_dopisu'])) {
+            $args['where'][] = array('d.cislo_doporuceneho_dopisu LIKE %s', '%' . $params['cislo_doporuceneho_dopisu'] . '%');
         }
         // pouze doporucene
         if (isset($params['cislo_doporuceneho_dopisu_pouze'])) {
@@ -510,18 +509,10 @@ class Dokument extends BaseModel
         }
 
         // pocet listu
-        if (isset($params['pocet_listu'])) {
-            if (!empty($params['pocet_listu'])) {
-                $args['where'][] = array('d.pocet_listu = %i', $params['pocet_listu']);
-            }
-        }
-
-        //
-        if (isset($params['pocet_priloh'])) {
-            if (!empty($params['pocet_priloh'])) {
-                $args['where'][] = array('d.pocet_priloh = %i', $params['pocet_priloh']);
-            }
-        }
+        if (isset($params['pocet_listu']))
+            $args['where'][] = array('d.pocet_listu = %i', $params['pocet_listu']);
+        if (isset($params['pocet_priloh']))
+            $args['where'][] = array('d.pocet_priloh = %i', $params['pocet_priloh']);
 
         // stav dokumentu
         if (!empty($params['stav_dokumentu'])) {
@@ -534,18 +525,12 @@ class Dokument extends BaseModel
         }
 
         // lhuta
-        if (isset($params['lhuta'])) {
-            if (!empty($params['lhuta'])) {
-                $args['where'][] = array('d.lhuta = %i', $params['lhuta']);
-            }
-        }
+        if (isset($params['lhuta']))
+            $args['where'][] = array('d.lhuta = %i', $params['lhuta']);
 
         // poznamka k dokumentu
-        if (isset($params['poznamka'])) {
-            if (!empty($params['poznamka'])) {
-                $args['where'][] = array('d.poznamka LIKE %s', '%' . $params['poznamka'] . '%');
-            }
-        }
+        if (!empty($params['poznamka']))
+            $args['where'][] = array('d.poznamka LIKE %s', '%' . $params['poznamka'] . '%');
 
         // zpusob vyrizeni
         if (!empty($params['zpusob_vyrizeni']))
@@ -589,248 +574,86 @@ class Dokument extends BaseModel
             }
         }
 
-        if (isset($params['spisovy_znak'])) {
-            if (!empty($params['spisovy_znak'])) {
-                $args['where'][] = array('d.spisovy_znak LIKE %s', '%' . $params['spisovy_znak'] . '%');
-            }
+        if (!empty($params['spisovy_znak'])) {
+            $args['where'][] = array('d.spisovy_znak LIKE %s', '%' . $params['spisovy_znak'] . '%');
         }
-        if (isset($params['spisovy_znak_id'])) {
-            if (!empty($params['spisovy_znak_id'])) {
-                $args['where'][] = array('d.spisovy_znak_id = %i', $params['spisovy_znak_id']);
-            }
+        if (!empty($params['spisovy_znak_id'])) {
+            $args['where'][] = array('d.spisovy_znak_id = %i', $params['spisovy_znak_id']);
         }
-        if (isset($params['ulozeni_dokumentu'])) {
-            if (!empty($params['ulozeni_dokumentu'])) {
-                $args['where'][] = array('d.ulozeni_dokumentu LIKE %s', '%' . $params['ulozeni_dokumentu'] . '%');
-            }
+        if (!empty($params['ulozeni_dokumentu'])) {
+            $args['where'][] = array('d.ulozeni_dokumentu LIKE %s', '%' . $params['ulozeni_dokumentu'] . '%');
         }
-        if (isset($params['poznamka_vyrizeni'])) {
-            if (!empty($params['poznamka_vyrizeni'])) {
-                $args['where'][] = array('d.poznamka_vyrizeni LIKE %s', '%' . $params['poznamka_vyrizeni'] . '%');
-            }
+        if (!empty($params['poznamka_vyrizeni'])) {
+            $args['where'][] = array('d.poznamka_vyrizeni LIKE %s', '%' . $params['poznamka_vyrizeni'] . '%');
         }
-        if (isset($params['skartacni_znak'])) {
-            if (!empty($params['skartacni_znak'])) {
-                $args['where'][] = array('d.skartacni_znak = %s', $params['skartacni_znak']);
-            }
+        if (!empty($params['skartacni_znak'])) {
+            $args['where'][] = array('d.skartacni_znak = %s', $params['skartacni_znak']);
         }
-        if (isset($params['spousteci_udalost'])) {
-            if (!empty($params['spousteci_udalost'])) {
-                $args['where'][] = array('d.spousteci_udalost_id = %s', $params['spousteci_udalost']);
-            }
+        if (!empty($params['spousteci_udalost'])) {
+            $args['where'][] = array('d.spousteci_udalost_id = %s', $params['spousteci_udalost']);
         }
-        if (isset($params['spousteci_udalost_id'])) {
-            if (!empty($params['spousteci_udalost_id'])) {
-                $args['where'][] = array('d.spousteci_udalost_id = %i', $params['spousteci_udalost_id']);
-            }
+        if (!empty($params['spousteci_udalost_id'])) {
+            $args['where'][] = array('d.spousteci_udalost_id = %i', $params['spousteci_udalost_id']);
         }
 
-        if (isset($params['vyrizeni_pocet_listu'])) {
-            if (!empty($params['vyrizeni_pocet_listu'])) {
-                $args['where'][] = array('d.vyrizeni_pocet_listu = %i', $params['vyrizeni_pocet_listu']);
-            }
+        if (!empty($params['vyrizeni_pocet_listu'])) {
+            $args['where'][] = array('d.vyrizeni_pocet_listu = %i', $params['vyrizeni_pocet_listu']);
         }
-        if (isset($params['vyrizeni_pocet_priloh'])) {
-            if (!empty($params['vyrizeni_pocet_priloh'])) {
-                $args['where'][] = array('d.vyrizeni_pocet_priloh = %i', $params['vyrizeni_pocet_priloh']);
-            }
+        if (!empty($params['vyrizeni_pocet_priloh'])) {
+            $args['where'][] = array('d.vyrizeni_pocet_priloh = %i', $params['vyrizeni_pocet_priloh']);
         }
-        if (isset($params['subjekt_type'])) {
-            if (!empty($params['subjekt_type'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.type = %s', $params['subjekt_type']);
-            }
+        if (!empty($params['subjekt_type'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.type = %s', $params['subjekt_type']);
         }
-        if (isset($params['subjekt_nazev'])) {
-            if (!empty($params['subjekt_nazev'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array(
-                    's.nazev_subjektu LIKE %s OR', '%' . $params['subjekt_nazev'] . '%',
-                    's.ic LIKE %s OR', '%' . $params['subjekt_nazev'] . '%',
-                    "CONCAT(s.jmeno,' ',s.prijmeni) LIKE %s OR", '%' . $params['subjekt_nazev'] . '%',
-                    "CONCAT(s.prijmeni,' ',s.jmeno) LIKE %s", '%' . $params['subjekt_nazev'] . '%'
-                );
-            }
+        if (!empty($params['subjekt_nazev'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array(
+                's.nazev_subjektu LIKE %s OR', '%' . $params['subjekt_nazev'] . '%',
+                's.ic LIKE %s OR', '%' . $params['subjekt_nazev'] . '%',
+                "CONCAT(s.jmeno,' ',s.prijmeni) LIKE %s OR", '%' . $params['subjekt_nazev'] . '%',
+                "CONCAT(s.prijmeni,' ',s.jmeno) LIKE %s", '%' . $params['subjekt_nazev'] . '%'
+            );
         }
-        if (isset($params['subjekt_ic'])) {
-            if (!empty($params['subjekt_ic'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.ic LIKE %s', '%' . $params['ic'] . '%');
-            }
+        if (!empty($params['subjekt_ic'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.ic LIKE %s', '%' . $params['ic'] . '%');
         }
-        if (isset($params['adresa_ulice'])) {
-            if (!empty($params['adresa_ulice'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.adresa_ulice LIKE %s', '%' . $params['adresa_ulice'] . '%');
-            }
+        if (!empty($params['adresa_ulice'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.adresa_ulice LIKE %s', '%' . $params['adresa_ulice'] . '%');
         }
-        if (isset($params['adresa_cp'])) {
-            if (!empty($params['adresa_cp'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.adresa_cp LIKE %s', '%' . $params['adresa_cp'] . '%');
-            }
+        if (!empty($params['adresa_cp'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.adresa_cp LIKE %s', '%' . $params['adresa_cp'] . '%');
         }
-        if (isset($params['adresa_co'])) {
-            if (!empty($params['adresa_co'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.adresa_co LIKE %s', '%' . $params['adresa_co'] . '%');
-            }
+        if (!empty($params['adresa_co'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.adresa_co LIKE %s', '%' . $params['adresa_co'] . '%');
         }
-        if (isset($params['adresa_mesto'])) {
-            if (!empty($params['adresa_mesto'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.adresa_mesto LIKE %s', '%' . $params['adresa_mesto'] . '%');
-            }
+        if (!empty($params['adresa_mesto'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.adresa_mesto LIKE %s', '%' . $params['adresa_mesto'] . '%');
         }
-        if (isset($params['adresa_psc'])) {
-            if (!empty($params['adresa_psc'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.adresa_psc LIKE %s', '%' . $params['adresa_psc'] . '%');
-            }
+        if (!empty($params['adresa_psc'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.adresa_psc LIKE %s', '%' . $params['adresa_psc'] . '%');
         }
-        if (isset($params['adresa_stat'])) {
-            if (!empty($params['adresa_stat'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.adresa_stat = %s', $params['adresa_stat']);
-            }
+        if (!empty($params['adresa_stat'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.adresa_stat = %s', $params['adresa_stat']);
         }
-        if (isset($params['subjekt_email'])) {
-            if (!empty($params['subjekt_email'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.email LIKE %s', '%' . $params['subjekt_email'] . '%');
-            }
+        if (!empty($params['subjekt_email'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.email LIKE %s', '%' . $params['subjekt_email'] . '%');
         }
-        if (isset($params['subjekt_telefon'])) {
-            if (!empty($params['subjekt_telefon'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.telefon LIKE %s', '%' . $params['subjekt_telefon'] . '%');
-            }
+        if (!empty($params['subjekt_telefon'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.telefon LIKE %s', '%' . $params['subjekt_telefon'] . '%');
         }
-        if (isset($params['subjekt_isds'])) {
-            if (!empty($params['subjekt_isds'])) {
-
-                $args['leftJoin']['dok_subjekt'] = array(
-                    'from' => array($this->tb_dok_subjekt => 'ds'),
-                    'on' => array('ds.dokument_id=d.id'),
-                    'cols' => null
-                );
-                $args['leftJoin']['subjekt'] = array(
-                    'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
-                    'cols' => null
-                );
-                $args['where'][] = array('s.id_isds LIKE %s', '%' . $params['subjekt_isds'] . '%');
-            }
+        if (!empty($params['subjekt_isds'])) {
+            $this->joinSubjekt($args);
+            $args['where'][] = array('s.id_isds LIKE %s', '%' . $params['subjekt_isds'] . '%');
         }
 
 
@@ -1065,17 +888,14 @@ class Dokument extends BaseModel
     {
         if (strpos($params, 'stav_') === 0) {
             $p = ['stav_dokumentu' => substr($params, 5)];
-            
         } else if (strpos($params, 'skartacni_znak_') === 0) {
             $p = ['skartacni_znak' => substr($params, strlen('skartacni_znak_'))];
-            
         } else if (strpos($params, 'zpusob_vyrizeni_') === 0) {
             $p = ['zpusob_vyrizeni' => substr($params, strlen('zpusob_vyrizeni_'))];
-            
         } else
-            // filtr "vse" nebo chyba
+        // filtr "vse" nebo chyba
             return array();
-        
+
         return $this->paramsFiltr($p);
     }
 
@@ -1124,7 +944,7 @@ class Dokument extends BaseModel
     {
         if (!isset($args['where']))
             $args['where'] = [];
-        
+
         $args['where'][] = array('d.stav = 1');
         return $args;
     }
@@ -1138,7 +958,7 @@ class Dokument extends BaseModel
     {
         if (!isset($args['where']))
             $args['where'] = [];
-        
+
         $args['where'][] = array('wf.stav_dokumentu IN (7,8,9,10,11) AND wf.aktivni = 1');
 
         return $this->spisovnaOmezeniOrg($args);
@@ -1148,7 +968,7 @@ class Dokument extends BaseModel
     {
         if (!isset($args['where']))
             $args['where'] = [];
-        
+
         $args['where'][] = array(
             'wf.stav_dokumentu = 6 AND wf.aktivni = 1 AND ds.spis_id IS NULL');
 
@@ -1557,7 +1377,7 @@ class Dokument extends BaseModel
                     $data['vyrizeni_pocet_priloh'] = (int) $data['vyrizeni_pocet_priloh'];
                 }
             }
-                        
+
             if (isset($data['skartacni_lhuta']) && empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0)
                 $data['skartacni_lhuta'] = null;
 
@@ -1568,16 +1388,15 @@ class Dokument extends BaseModel
 
             $data['stav'] = isset($data['stav']) ? $data['stav'] : 1;
             $data['jid'] = '';
-            
+
             $dokument_id = $this->insert($data);
 
             $app_id = Nette\Environment::getVariable('app_id');
             $jid = "OSS-{$app_id}-ESS-$dokument_id";
             $this->update(['jid' => $jid], "id = '$dokument_id'");
-            
+
             $new_row = $this->getInfo($dokument_id);
-            return $new_row ?: false;
-            
+            return $new_row ? : false;
         } else {
             // uprava existujiciho dokumentu
 
@@ -1767,7 +1586,7 @@ class Dokument extends BaseModel
     public static function zpusobVyrizeni($select)
     {
         $result = dibi::query('SELECT [id], [nazev] FROM [:PREFIX:zpusob_vyrizeni] WHERE [stav] != 0')->fetchPairs();
- 
+
         switch ($select) {
             case 1:
                 return $result;
@@ -1778,8 +1597,8 @@ class Dokument extends BaseModel
                 return $result;
 
             case 4:
-               $tmp = [];
-               foreach ($result as $id => $nazev)
+                $tmp = [];
+                foreach ($result as $id => $nazev)
                     $tmp['zpusob_vyrizeni_' . $id] = $nazev;
                 return $tmp;
 
@@ -1841,4 +1660,3 @@ class DokumentHistorie extends BaseModel
     protected $primary = 'id';
 
 }
-
