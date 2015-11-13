@@ -113,7 +113,8 @@ zkontrolovatSchranku = function (nacist_nove_zpravy) {
         if (nacist_nove_zpravy)
             nactiZpravy();
         else
-            $('#zkontrolovat_status').append('<br /><input type="button" value="Načíst nové zprávy" onclick="nactiZpravy()" />');
+            $('#zkontrolovat_status').append('<br /><input type="button" value="Načíst nové zprávy"\n\
+                onclick="' + "nactiZpravy(); $('#zkontrolovat_status').hide()" + '" />');
     }).fail(function(data) {
         $('#zkontrolovat_status').html('Při kontrole zpráv došlo k chybě.');
     });    
