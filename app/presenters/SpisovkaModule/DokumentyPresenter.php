@@ -1939,8 +1939,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             $zprava_odes = $zprava['zprava'];
                         }
                     } else {
-                        $this->flashMessage('Subjekt "' . Subjekt::displayName($adresat,
-                                        'email') . '" nemá emailovou adresu. Zprávu tomuto adresátovi nelze poslat přes email!',
+                        $this->flashMessage('Subjekt "' . Subjekt::displayName($adresat, 'jmeno')
+                                . '" nemá emailovou adresu. Zprávu tomuto adresátovi nelze poslat přes email!',
                                 'warning');
                         continue;
                     }
@@ -2018,11 +2018,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $poznamka = $post_data['poznamka'][$subjekt_id];
                     $stav = 1;
 
-                    $this->flashMessage('Dokument předán na podatelnu k odeslání poštou na adresu "' . Subjekt::displayName($adresat) . '".');
+                    $this->flashMessage('Dokument předán na podatelnu k odeslání poštou na adresu "' . Subjekt::displayName($adresat, 'plna_adresa') . '".');
 
                     $Log = new LogModel();
                     $Log->logDokument($dokument_id, LogModel::DOK_PREDODESLAN,
-                            'Dokument předán na podatelnu k odeslání poštou na adresu "' . Subjekt::displayName($adresat) . '".');
+                            'Dokument předán na podatelnu k odeslání poštou na adresu "' . Subjekt::displayName($adresat, 'plna_adresa') . '".');
                 } else if ($metoda_odeslani == 4) {
                     // faxem
                     if (isset($post_data['datum_odeslani_faxu'][$subjekt_id])) {

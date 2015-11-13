@@ -211,9 +211,8 @@ class Subjekt extends BaseModel
         return ($res) ? $res : NULL;
     }
 
-    public static function displayName($data, $display = 'basic')
+    public static function displayName($data, $display)
     {
-
         if (is_string($data))
             return $data;
         if (is_array($data))
@@ -336,8 +335,6 @@ class Subjekt extends BaseModel
                     $res .= ', ' . $data->id_isds;
                 }
                 return $res;
-            case 'jmeno':
-                return $d_nazev;
             case 'osoba':
                 return $d_osoba;
             case 'jmeno_item':
@@ -367,15 +364,15 @@ class Subjekt extends BaseModel
                 return $d_nazev . ' (' . ( empty($data->id_isds) ? 'nemá datovou schránku' : $data->id_isds ) . ')';
             case 'telefon':
                 return $d_nazev . ' (' . ( empty($data->telefon) ? 'nemá telefon' : $data->telefon ) . ')';
+                
+            case 'jmeno':
             default:
-                return $d_nazev . ', ' . $d_adresa;
+                return $d_nazev;
         }
     }
 
     public static function stat($kod = null, $select = 0)
     {
-
-
         $prefix = self::getDbPrefix();
         $tb_staty = $prefix . 'stat';
 
