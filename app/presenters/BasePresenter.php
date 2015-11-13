@@ -69,8 +69,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $accept = $request->getHeader('Accept', '');
         $xhtml_browser = strpos($accept, 'application/xhtml+xml') !== false;
         $response = $this->getHttpResponse();
+        $enable_xhtml = Settings::get('xhtml', true);
         
-        if ($xhtml_browser && !$this->isAjax() && !self::$testMode)
+        if ($enable_xhtml && $xhtml_browser && !$this->isAjax() && !self::$testMode)
             $response->setContentType('application/xhtml+xml', 'utf-8');                
     }
     
