@@ -1,17 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
-    <title>Spisová služba</title>
-    <style type="text/css" media="screen, print">
-        {file_get_contents(APP_DIR .'/../public/css/printdetail_site.css')|noescape}
-    </style>
-</head>
-<body>
+{block title}Dokument{/block}
+{block content}
 <div id="content">
     <div class="dokument_blok_hlavni">
+        {include 'detailSpis.latte'}
+        {include 'detailSpojeni.latte'}
         <dl>
             <dt>JID:</dt>
             <dd>{$Dok->jid}&nbsp;</dd>
@@ -27,12 +19,11 @@
             <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
         {/if}
-        {include 'detail-spis.latte'}
         <dl>
             <dt>Věc:</dt>
             <dd class="velke_pismo"><u>{$Dok->nazev}</u>&nbsp;</dd>
         </dl>
-        <dl>
+        <dl n:if="!empty($Dok->popis)">
             <dt>Popis:</dt>
             <dd>{!$Dok->popis|enl2br}&nbsp;</dd>
         </dl>
@@ -44,46 +35,22 @@
             <dt>Datum doručení/vzniku:</dt>
             <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
         </dl>
-        {if !empty($Dok->zpusob_doruceni)}
-        <dl>
+        <dl n:if="!empty($Dok->zpusob_doruceni)">
             <dt>Způsob doručení:</dt>
             <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
         </dl>        
-        {/if}
-        {if !empty($Dok->cislo_jednaci_odesilatele)}
-        <dl>
+        <dl n:if="!empty($Dok->cislo_jednaci_odesilatele)">
             <dt>Číslo jednací odesilatele:</dt>
             <dd>{$Dok->cislo_jednaci_odesilatele}&nbsp;</dd>
         </dl>
-        {/if}
-        {if !empty($Dok->cislo_doporuceneho_dopisu)}
-        <dl>
+        <dl n:if="!empty($Dok->cislo_doporuceneho_dopisu)">
             <dt>Číslo doporučeného dopisu:</dt>
             <dd>{$Dok->cislo_doporuceneho_dopisu}&nbsp;</dd>
-        </dl>
-        {/if}
-        
-        {if !empty($Dok->poznamka)}
-        <dl>
+        </dl>        
+        <dl n:if="!empty($Dok->poznamka)">
             <dt>Poznámka:</dt>
             <dd>{!$Dok->poznamka|html2br}&nbsp;</dd>
         </dl>
-        {/if}
-        {if $Typ_evidence=='priorace'}
-        {if count($SouvisejiciDokumenty)>0 }
-        <dl>
-            <dt>Spojeno s dokumentem:</dt>
-            <dd>
-                <span id="dok_spojit">
-                {foreach $SouvisejiciDokumenty as $s}
-                    {$s->cislo_jednaci} ({$s->jid})
-                {/foreach}
-                </span>
-                &nbsp;
-            </dd>
-        </dl>
-        {/if}
-        {/if}
         <dl>
             <dt>Počet listů / příloh / typ přílohy:</dt>
             <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd>
@@ -97,8 +64,7 @@
             <dt>Identifikátor epodatelny:</dt>
             <dd><pre>{$Dok->identifikator['popis']}</pre></dd>
         </dl>
-        {if $Dok->identifikator['typ'] == "email" }
-        <dl>
+        <dl n:if="$Dok->identifikator['typ'] == 'email'">
             <dt>Ověření identifikátoru:</dt>
             <dd>
             {if $Dok->identifikator['cert_signed'] >= 0 }
@@ -127,7 +93,6 @@
             {/if}
             &nbsp;</dd>
         </dl>
-        {/if}
         {/if}
     </div>
     {if $Dok->stav_dokumentu >= 3}
@@ -385,5 +350,3 @@
     {include 'detail-historie.latte'}
     
 </div>
-</body>
-</html>    

@@ -72,6 +72,8 @@
 
     <div class="dokument_blok_hlavni">
         <div class="h2">{$Dok->typ_dokumentu->nazev}</div>
+        {include '../../SpisovkaModule/Dokumenty/detailSpis.latte'}
+        {include '../../SpisovkaModule/Dokumenty/detailSpojeni.latte'}
         <dl>
             <dt>JID:</dt>
             <dd>{$Dok->jid}&nbsp;</dd>
@@ -80,7 +82,6 @@
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
             <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
         </dl>
-        {include '../../SpisovkaModule/Dokumenty/detail-spis.latte'}
         <dl>
             <dt>Věc:</dt>
             <dd class="velke_pismo"><u>{$Dok->nazev}</u>&nbsp;</dd>
@@ -115,22 +116,6 @@
         <dl>
             <dt>Poznámka:</dt>
             <dd>{!$Dok->poznamka|html2br}&nbsp;</dd>
-        </dl>
-        {/if}
-        {if $Typ_evidence=='priorace'}
-        <dl>
-            <dt>Spojeno s dokumentem:</dt>
-            <dd>
-                <span id="dok_spojit">
-                {if count($SouvisejiciDokumenty)>0 }
-                    {foreach $SouvisejiciDokumenty as $s}
-                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
-                    <br>
-                    {/foreach}
-                {/if}
-                </span>
-                &nbsp;
-            </dd>
         </dl>
         {/if}
         <dl>

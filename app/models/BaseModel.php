@@ -389,9 +389,8 @@ abstract class BaseModel extends Nette\Object
      * @param array $where
      * @return
      */
-    public function delete($where = null)
+    public function delete($where)
     {
-
         if (is_null($where)) {
             return null;
         } else if (!is_array($where)) {

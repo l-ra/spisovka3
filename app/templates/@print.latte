@@ -6,10 +6,11 @@
     <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
     <title>Spisová služba - {block #title}{/block}</title>
     <style type="text/css" media="screen, print">
-        {file_get_contents(APP_DIR .'/../public/css/print_site.css')|noescape}
+        {var $css_file = strpos($view, 'printdetail') !== false ? 'printdetail_site' : 'print_site'}
+        {file_get_contents(APP_DIR . "/../public/css/$css_file.css")|noescape}
     </style>
 </head>
-<body{if $view=='tisk'} onload="window.print();"{/if}>
+<body {if true}onload="window.print();"{/if}>
 {include #content}
 </body>
 </html>

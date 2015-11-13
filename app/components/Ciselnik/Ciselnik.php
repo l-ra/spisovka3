@@ -288,7 +288,7 @@ class Ciselnik extends Nette\Application\UI\Control
             $this->presenter->flashMessage($e->getMessage(), 'error');
         }
 
-        $this->invalidateControl();
+        $this->redrawControl();
 
         if (!$this->presenter->isAjax())
             $this->redirect('this');
@@ -307,7 +307,7 @@ class Ciselnik extends Nette\Application\UI\Control
             $this->presenter->flashMessage($e->getMessage(), 'error');
         }
 
-        $this->invalidateControl();
+        $this->redrawControl();
 
         if (!$this->presenter->isAjax())
             $this->redirect('this');
@@ -326,14 +326,14 @@ class Ciselnik extends Nette\Application\UI\Control
             $this->presenter->flashMessage($e->getMessage(), 'error');
         }
 
-        $this->invalidateControl();
+        $this->redrawControl();
         if (!$this->presenter->isAjax())
             $this->redirect('this');
     }
 
     public function handleStorno()
     {
-        $this->invalidateControl();
+        $this->redrawControl();
         if (!$this->presenter->isAjax())
             $this->redirect('this');
     }

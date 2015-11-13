@@ -15,10 +15,10 @@ class Spisovka_SpojitPresenter extends BasePresenter
 
     public function renderVyber()
     {
-        $this->template->dokument_id = $this->getParameter('id', null);
+        $this->template->dokument_id = $this->getParameter('id');
     }
 
-    public function renderNacti()
+    public function actionHledat()
     {
         $query = $this->getParameter('q', null);
 
@@ -30,38 +30,37 @@ class Spisovka_SpojitPresenter extends BasePresenter
         $args = $Dokument->filtrSpisovka($args);
         $seznam = $Dokument->seznam($args);
 
-        if (count($seznam) > 0) {
-
-            if (count($seznam) > 200) {
-                echo "prilis_mnoho";
-                $this->terminate();
-            }
-
-            $tmp = array();
-            foreach ($seznam as $dokument_id) {
-
-                if (is_object($dokument_id))
-                    $dokument_id = $dokument_id->id;
-
-                $dok = $Dokument->getBasicInfo($dokument_id);
-
-                // Tomášovina - kód je použit též u sběrného archu pro zařazení dokumentu do spisu
-                if ($this->typ_evidence == "sberny_arch") {
-                    if ($dok->poradi != 1 || empty($dok->cislo_jednaci))
-                        continue;
-                }
-
-                $tmp[$dok->id]['dokument_id'] = $dok->id;
-                $tmp[$dok->id]['cislo_jednaci'] = $dok->cislo_jednaci;
-                $tmp[$dok->id]['jid'] = $dok->jid;
-                $tmp[$dok->id]['nazev'] = $dok->nazev;
-            }
-            echo json_encode($tmp);
-        } else {
-            echo "";
+        if (count($seznam) == 0) {
+            // prazdna odpoved
+            $this->terminate();
+        }
+        
+        if (count($seznam) > 200) {
+            echo "prilis_mnoho";
+            $this->terminate();
         }
 
-        $this->terminate();
+        $tmp = array();
+        foreach ($seznam as $dokument_id) {
+
+            if (is_object($dokument_id))
+                $dokument_id = $dokument_id->id;
+
+            $dok = $Dokument->getBasicInfo($dokument_id);
+
+            // Tomášovina - kód je použit též u sběrného archu pro zařazení dokumentu do spisu
+            if ($this->typ_evidence == "sberny_arch") {
+                if ($dok->poradi != 1 || empty($dok->cislo_jednaci))
+                    continue;
+            }
+
+            $tmp[$dok->id]['dokument_id'] = $dok->id;
+            $tmp[$dok->id]['cislo_jednaci'] = $dok->cislo_jednaci;
+            $tmp[$dok->id]['jid'] = $dok->jid;
+            $tmp[$dok->id]['nazev'] = $dok->nazev;
+        }
+
+        $this->sendJson($tmp);
     }
 
     public function actionVybrano()
@@ -71,45 +70,27 @@ class Spisovka_SpojitPresenter extends BasePresenter
 
         $Dokument = new Dokument();
 
-        try {
-            $dok_in = $Dokument->getBasicInfo($dokument_id);
-            $dok_out = $Dokument->getBasicInfo($dokument_spojit);
-            if (!$dok_in || !$dok_out)
-                throw new Exception('Neplatný parametr');
+        $dok_in = $Dokument->getBasicInfo($dokument_id);
+        $dok_out = $Dokument->getBasicInfo($dokument_spojit);
+        if (!$dok_in || !$dok_out)
+            throw new Exception('Neplatný parametr');
 
-            // spojit s dokumentem
-            $SouvisejiciDokument = new SouvisejiciDokument();
-            $SouvisejiciDokument->spojit($dokument_id, $dokument_spojit);
+        // spojit s dokumentem
+        $SouvisejiciDokument = new SouvisejiciDokument();
+        $SouvisejiciDokument->spojit($dokument_id, $dokument_spojit);
 
-            echo '###vybrano###' . $dok_out->cislo_jednaci . ' (' . $dok_out->jid . ')'; //. $spis->nazev;
-        } catch (Exception $e) {
-            echo 'Při pokusu o spojení dokumentů došlo k chybě - ' . $e->getMessage();
-        }
         $this->terminate();
     }
 
-    public function renderOdebrat()
+    public function actionOdebrat()
     {
-        $dokument_id = $this->getParameter('id', null);
-        $spojit_s = $this->getParameter('spojeny', null);
-        $zpetne_spojeny = $this->getParameter('zpetne_spojeny', null);
+        $dokument1_id = $this->getParameter('id', null);
+        $dokument2_id = $this->getParameter('spojeny', null);
 
         $Souvisejici = new SouvisejiciDokument();
-
-        if ($zpetne_spojeny) {
-            $param = array(array('spojit_s_id=%i', $dokument_id), array('dokument_id=%i', $zpetne_spojeny));
-        } else {
-            $param = array(array('dokument_id=%i', $dokument_id), array('spojit_s_id=%i', $spojit_s));
-        }
-
-
-        if ($Souvisejici->odebrat($param)) {
-            $this->flashMessage('Spojený dokument byl odebrán z dokumentu.');
-        } else {
-            $this->flashMessage('Spojený dokument se nepodařilo odebrat. Zkuste to znovu.',
-                    'warning');
-        }
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+        $Souvisejici->odebrat($dokument1_id, $dokument2_id);
+        
+        $this->terminate();
     }
 
 }

@@ -314,8 +314,10 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
             $user = $this->user;
 
-            $this->template->AccessEdit = 0;
-            
+            // nektere sablony jsou sdilene s modulem Spisovka
+            $this->template->AccessEdit = false;
+            $this->template->AccessView = true;
+
             $this->template->Lze_menit_skartacni_rezim = $dokument->stav_dokumentu == 7 && $user->isAllowed('Spisovna',
                             'zmenit_skartacni_rezim');
             $this->template->Upravit_param = $this->getParameter('upravit', null);
@@ -340,21 +342,18 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             // Volba vystupu - web/tisk/pdf
             $tisk = $this->getParameter('print');
             $pdf = $this->getParameter('pdfprint');
-            if ($tisk) {
+            if ($tisk || $pdf) {
+                $this->template->AccessEdit = false;
                 @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-                $this->setLayout(false);
+                $this->setLayout('print');
                 $this->setView('printdetail');
-            } elseif ($pdf) {
-                @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-                $this->pdf_output = 2;
-                $this->setLayout(false);
-                $this->setView('printdetail');
+                if ($pdf)
+                    $this->pdf_output = 2;
             }
 
             if ($this->template->Lze_menit_skartacni_rezim)
                 $this->template->vyrizovaniForm = $this['vyrizovaniForm'];
-
-            $this->invalidateControl('dokspis');
+            
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');

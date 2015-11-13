@@ -29,10 +29,7 @@ $(function() {
     });
 
     $('#subjekt_novy').on('click', '#epod_evid_novysubjekt_click', function(event) {    
-        event.preventDefault();
-
         dialog(this, 'Nový subjekt');
-
         return false;        
     });
 

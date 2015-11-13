@@ -103,22 +103,6 @@
             <dd>{$novyForm['cislo_doporuceneho_dopisu']->control}</dd>
         </dl>
         </div>
-        {if $Typ_evidence == 'priorace'}
-        <dl>
-            <dt>Spojit s dokumentem:</dt>
-            <dd>
-                <span id="dok_spojit">
-                {if count($SouvisejiciDokumenty)>0 }
-                    {foreach $SouvisejiciDokumenty as $s}
-                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
-                    {if 0}&nbsp;&nbsp;&nbsp;[<a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->id}">odebrat spojení</a>]{/if}
-                    {/foreach}
-                {/if}
-                </span>
-                &nbsp;[<a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->id}" id="dialog-spojit">spojit s dokumentem</a>]
-            </dd>
-        </dl>
-        {/if}
         <dl>
             <dt>Počet listů:</dt>
             <dd>{$novyForm['pocet_listu']->control}

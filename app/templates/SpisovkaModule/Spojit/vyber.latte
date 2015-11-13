@@ -1,16 +1,11 @@
-{if isset($chyba)}
-    <div class="flash_message flash_warning">Související dokument se nepodařilo spojit s dokumentem. Zkuste to znovu.</div>
-{/if}
-
-    <p>Zadejte sekvenci minimálně dvou znaků čísla jednacího nebo JID nebo věci, aby se zobrazil seznam odpovidajících dokumentů.
-    <br />
-    Poté potvrďte kliknutím na odkaz daného dokumentu.</p>
-    <form action="" method="get" onsubmit="return false;">
-        <input type="hidden" name="id" value="{$dokument_id}" id="dokumentid">
+<p>Zadejte sekvenci minimálně dvou znaků čísla jednacího nebo JID nebo věci, aby se zobrazil seznam odpovidajících dokumentů.
+    <br />Poté potvrďte kliknutím na odkaz daného dokumentu.</p>
+<form action="" method="get" onsubmit="return false;">
+    <input type="hidden" name="id" value="{$dokument_id}" id="dokumentid">
     <dl>
         <dt class="dt_dialog">Sekvence znaků:</dt>
         <dd><input type="text" name="query" value="" size="60" onkeyup="return hledejDokument(this);" /></dd>
     </dl>
-    </form>
+</form>
 
-    <div id="vysledek"></div>
+<div id="vysledek"></div>

@@ -182,31 +182,10 @@
         </dl>
         {/if}
         
-        {if !empty($Dok->poznamka)}<dl>
+        <dl n:if="!empty($Dok->poznamka)">
             <dt>Poznámka:</dt>
             <dd>{$metadataForm['poznamka']->control}</dd>
-        </dl>{/if}
-        {if $Typ_evidence == 'priorace'}
-        <dl>
-            <dt>Spojit s dokumentem:</dt>
-            <dd>
-                <span id="dok_spojit">
-                {if count($SouvisejiciDokumenty)>0 }
-                    {foreach $SouvisejiciDokumenty as $s}
-                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
-                    {if $s->spojeni == "zpetne_spojen"}
-                    <a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'zpetne_spojeny'=>$s->id}">
-                    {else}
-                    <a href="{link :Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->id}">
-                    {/if}odebrat spojení</a>
-                    <br />
-                    {/foreach}
-                {/if}
-                </span>
-                <a href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->id}" id="dialog-spojit">spojit s dokumentem</a>
-            </dd>
-        </dl>
-        {/if}
+        </dl>                
         <dl>
             <dt>Počet listů:</dt>
             <dd>{$metadataForm['pocet_listu']->control}
@@ -221,6 +200,9 @@
         {$metadataForm->render('end')}
         {else}
         <div class="h2">{$Dok->typ_dokumentu->nazev}</div>
+        {include 'detailSpis.latte'}
+        {include 'detailSpojeni.latte'}
+        
         <dl>
             <dt>JID:</dt>
             <dd>{$Dok->jid}</dd>
@@ -244,10 +226,7 @@
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
             <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}</dd>
         </dl>
-        {/if}
-        
-        {include 'detail-spis.latte'}
-        
+        {/if}        
         <dl>
             <dt>Věc:</dt>
             <dd class="velke_pismo"><u>{$Dok->nazev}</u></dd>
@@ -283,18 +262,6 @@
         <dl>
             <dt>Poznámka:</dt>
             <dd>{!$Dok->poznamka|html2br}</dd>
-        </dl>
-        {/if}
-        {if count($SouvisejiciDokumenty)>0 }
-        <dl>
-            <dt>Spojeno s dokumentem:</dt>
-            <dd>
-                <span id="dok_spojit">
-                {foreach $SouvisejiciDokumenty as $s}
-                    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a><br />
-                {/foreach}
-                </span>
-            </dd>
         </dl>
         {/if}
         <dl>

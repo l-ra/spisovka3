@@ -400,23 +400,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
             }
 
-
-            // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParameter('print');
-            $pdf = $this->getParameter('pdfprint');
-            if ($tisk) {
-                @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-                $this->setLayout(false);
-                $this->setView('printdetail');
-            } elseif ($pdf) {
-                @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-                $this->pdf_output = 2;
-                $this->setLayout(false);
-                $this->setView('printdetail');
-            }
-
-            $this->invalidateControl('dokspis');
-
             if (!$this->template->AccessView)
                 $this->setView('noaccess');
         } else {
@@ -437,8 +420,26 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } else if ($dokument->lhuta_stav == 1 && $dokument->stav_dokumentu < 4) {
             $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyřiďte co nejrychleji tento dokument.');
         }
+
+        // Volba vystupu - web/tisk/pdf
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
+        if ($tisk || $pdf) {
+            $this->template->AccessEdit = false;
+            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
+            $this->setLayout('print');
+            $this->setView('printdetail');
+            if ($pdf)
+                $this->pdf_output = 2;
+        }
     }
 
+    public function renderDetailSpojeni()
+    {
+        // Napln promenne sablony daty
+        $this->actionDetail();
+    }
+    
     protected function actionAkce($data)
     {
         if (!isset($data['hromadna_akce']) || !isset($data['dokument_vyber']))
@@ -1127,8 +1128,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'odesilani');
 
             $this->template->ZpusobyOdeslani = ZpusobOdeslani::getZpusoby();
-
-            $this->invalidateControl('dokspis');
 
             $max_vars = ini_get('max_input_vars');
             $safe_recipient_count = floor(($max_vars - 10) / 17);

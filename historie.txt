@@ -83,7 +83,10 @@ Jiné změny:
   ještě v poznámce.
 - dokument již není možné začít vytvářet přímo ze spisu. Uživatel dokument musí
   nejprve vytvořit, poté jej teprve může vložit do spisu.
-- drobné úpravy formuláře detailu dokumentu
+- to samé platí pro funkci spojení dokumentů
+- nyní je možné dokument spojit s více dokumenty najednou, jak bylo původně
+  v aplikaci zamýšleno
+- úpravy formuláře detailu dokumentu
 - v detailu dokumentu byla informace "Dokument není evidován" změněna
   na "Dokument nemá přiděleno číslo jednací"
 - v detailu dokumentu mohou být položky v seznamu příkazů jinak seřazeny. Dále

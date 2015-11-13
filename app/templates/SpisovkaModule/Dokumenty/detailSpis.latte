@@ -4,7 +4,7 @@
         <span id="dok-spis-nazev">
             {if isset($Dok->spis)}
                 {if $view != 'printdetail'}
-                    <a href="{link :Spisovka:Spisy:detail, 'id' => $Dok->spis->id}">{$Dok->spis->nazev}</a>
+                    <a href="{link Spisy:detail, 'id' => $Dok->spis->id}">{$Dok->spis->nazev}</a>
                 {else}
                     {$Dok->spis->nazev}
                 {/if}

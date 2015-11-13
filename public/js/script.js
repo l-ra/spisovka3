@@ -89,7 +89,7 @@ $(function() {
         var msg = 'Je nám líto, asynchronní požadavek skončil s chybou:\n' + thrownError;
         if (jqXHR.responseText
                 && $("#dialog").dialog( "isOpen" ) === false)
-            msg = msg + '\n' + jqXHR.responseText;
+            msg = msg + '\n\n' + jqXHR.responseText;
         
         alert(msg);
         
@@ -147,9 +147,9 @@ $(function() {
         return false;
     });    
 
-    $('#dialog-spojit').click(function(event){
-        dialog(this,'Spojit s dokumentem');
-        return false;
+    $(document).on('click', '#dialog-spojit', function(event) {    
+        dialog(this, 'Spojit s dokumentem');
+        return false;        
     });
 
     // Dialog - Historie
@@ -712,6 +712,53 @@ vypravnaSubmit = function () {
     return false;
 };
 
+function renderVysledekHledaniDokumentu(data,typ) {
+
+    var html = "<table class='seznam' border='1'>";
+        html = html + "<tr>";
+        html = html + "<th>číslo jednací</th>";
+        html = html + "<th>JID</th>";
+        html = html + "<th>věc</th>";
+        html = html + "</tr>";
+
+    dokument_id = document.getElementById('dokumentid').value;
+    evidence = document.getElementById('evidence');
+    if ( evidence == null ) {
+        evidence = 0;
+    } else {
+        evidence = evidence.value;
+    }
+
+    if ( typ == 1 ) {
+        var url = BASE_URL + 'dokumenty/'+ dokument_id +'/vlozitdosbernehoarchu?vlozit_do=';
+        var fnc = "pripojitDokument(this)";
+    } else {
+        var url = BASE_URL + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
+        var fnc = "spojitDokument(this)";
+    }
+
+    for (var zaznam in data){
+        if ( evidence == 1 ) {
+            uevidence = '&evidence=1';
+        } else {
+            uevidence = '';
+        }
+
+        a = '<a href="'+ url + data[zaznam]['dokument_id'] + uevidence +'" onclick="'+fnc+'; return false;">';
+        html = html + "<tr>";
+        var cj = data[zaznam]['cislo_jednaci'];
+        if (cj === null)
+            cj = '';
+        html = html + "<td>" + a + cj + "</a></td>";
+        html = html + "<td>" + a + data[zaznam]['jid'] + "</a></td>";
+        html = html + "<td>" + a + data[zaznam]['nazev'] + "</a></td>";
+        html = html + "</tr>";
+    }
+    
+    html = html + "</table>";
+    return html;
+}
+
 hledejDokument = function (input, typ) {
     
     // nacteme hodnotu
@@ -720,18 +767,16 @@ hledejDokument = function (input, typ) {
     if (vyraz.length < 2) return false;
 
     // cache
-    var nalezeno = 0;
+    var nalezeno = false;
     for (var index in cache){
         if ( index == vyraz ) {
-            nalezeno = 1;
-            var seznam = eval('(' + cache[index] + ')');
-            vysledek = document.getElementById('vysledek');
-            vysledek.innerHTML = nastylovat(seznam, typ);
+            nalezeno = true;
+            $('#vysledek').html(renderVysledekHledaniDokumentu(cache[index], typ));
             break;
         }
     }
 
-    if(nalezeno==0) {
+    if (!nalezeno) {
         hledejDokumentAjax(vyraz, typ);
     }
 
@@ -743,42 +788,52 @@ hledejDokumentAjax = function (vyraz, typ) {
 
     showSpinner();
 
-    var url = BASE_URL + 'spojit/nacti?q=' + vyraz;
+    var url = BASE_URL + 'spojit/hledat?q=' + vyraz;
     
     $.get(url, function(data) {
-        var vysledek = document.getElementById('vysledek');
+        var vysledek = $('#vysledek');
         
         if ( data == '' ) {
-            vysledek.innerHTML = '<div class="prazdno">Nebyly nalezeny žádné dokumenty odpovídající dané sekvenci.</div>';
+            vysledek.html('<div class="prazdno">Nebyly nalezeny žádné dokumenty odpovídající dané sekvenci.</div>');
         } else if ( data == 'prilis_mnoho' ) {
-            vysledek.innerHTML = '<div class="prazdno">Daná sekvence obsahuje příliš mnoho záznamů. Zkuste zvolit přesnější sekvenci.</div>';                    
+            vysledek.html('<div class="prazdno">Daná sekvence obsahuje příliš mnoho záznamů. Zkuste zvolit přesnější sekvenci.</div>');
         } else {
-            var seznam = eval('(' + data + ')');
             cache[vyraz] = data;
-            vysledek.innerHTML = nastylovat(seznam, typ);
+            vysledek.html(renderVysledekHledaniDokumentu(data, typ));
         }
     });
     
     return false;
+};
+
+renderSpojeni = function () {
+    
+    var href = BASE_URL + 'dokumenty/' + DOKUMENT_ID + '/detail-spojeni';
+    $.get(href, function(html) {
+        $('#snippet-spojeni').replaceWith(html);
+    });    
 };
 
 spojitDokument = function (elm) {
 
-    showSpinner();
-    
-    $.get(elm.href, function(data) {
-        if ( data.indexOf('###vybrano###') != -1 ) {
-            data = data.replace('###vybrano###','');
-            $('#dok_spojit').html(data);
-            closeDialog();
-        } else {
-            $('#dialog').html(data);
-            dialogScrollUp();
-        }
+    showSpinner();    
+    $.get(elm.href, function() {
+        closeDialog();
+        renderSpojeni();
     });
 
     return false;
 };
+
+odebratSpojeni  = function (elm) {
+  
+    showSpinner();    
+    $.get(elm.href, function() {
+        renderSpojeni();
+    });
+
+    return false;    
+};    
 
 pripojitDokument = function (elm) {
 
@@ -855,51 +910,6 @@ zobrazSestavu = function (elm) {
 
     return false;
 };
-
-function nastylovat(data,typ) {
-
-    var html = "<table class='seznam' border='1'>";
-        html = html + "<tr>";
-        html = html + "<th>číslo jednací</th>";
-        html = html + "<th>JID</th>";
-        html = html + "<th>věc</th>";
-        html = html + "</tr>";
-
-    dokument_id = document.getElementById('dokumentid').value;
-    evidence = document.getElementById('evidence');
-    if ( evidence == null ) {
-        evidence = 0;
-    } else {
-        evidence = evidence.value;
-    }
-
-    if ( typ == 1 ) {
-        var url = BASE_URL + 'dokumenty/'+ dokument_id +'/vlozitdosbernehoarchu?vlozit_do=';
-        var fnc = "pripojitDokument(this)";
-    } else {
-        var url = BASE_URL + 'spojit/'+ dokument_id +'/vybrano?spojit_s=';
-        var fnc = "spojitDokument(this)";
-    }
-
-    for (var zaznam in data){
-        if ( evidence == 1 ) {
-            uevidence = '&evidence=1';
-        } else {
-            uevidence = '';
-        }
-
-        a = '<a href="'+ url + data[zaznam]['dokument_id'] + uevidence +'" onclick="'+fnc+'; return false;">';
-        html = html + "<tr>";
-        html = html + "<td>"+ a + data[zaznam]['cislo_jednaci'] +"</a></td>";
-        html = html + "<td>"+ a + data[zaznam]['jid'] +"</a></td>";
-        html = html + "<td>"+ a + data[zaznam]['nazev'] +"</a></td>";
-        html = html + "</tr>";
-    }
-    
-    html = html + "</table>";
-    return html;
-
-}
 
 function select_set_value(SelectObject, Value) {
   for(index = 0; 

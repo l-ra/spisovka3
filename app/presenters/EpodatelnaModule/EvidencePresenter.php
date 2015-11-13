@@ -324,8 +324,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
         }
 
-        //print_r($data);
-        //echo "</pre>";
         exit;
     }
 
@@ -815,21 +813,13 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         try {
-
             $this->zaevidovat($data);
-
             $this->flashMessage('Zpráva byla zaevidována v evidenci "' . $data['evidence'] . '".');
-            $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
-            if (!$this->isAjax()) {
-                //$this->redirect('this');
-            } else {
-                $this->invalidateControl('epodevidence');
-            }
-
-            //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
         } catch (DibiException $e) {
             $this->flashMessage('Zprávu se nepodařilo zaevidovat do jiné evidence.', 'warning');
         }
+        
+        $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
     }
 
     private function zaevidovat($data)
@@ -879,17 +869,12 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         try {
             $this->odmitnoutEmail($data);
-
             $this->flashMessage('Zpráva byla odmítnuta.');
-            $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
-            if (!$this->isAjax()) {
-                //$this->redirect('this');
-            } else {
-                $this->invalidateControl('epododmitnuti');
-            }
         } catch (DibiException $e) {
             $this->flashMessage('Zprávu se nepodařilo odmítnout.', 'warning');
         }
+        
+        $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
     }
 
     private function odmitnoutEmail($data, $hromadna = false)
@@ -963,24 +948,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        //Nette\Diagnostics\Debugger::dump($data); exit;
-
         try {
-
             $this->odmitnoutISDS($data);
-
             $this->flashMessage('Zpráva byla odmítnuta.');
-            $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
-            if (!$this->isAjax()) {
-                //$this->redirect('this');
-            } else {
-                $this->invalidateControl('epododmitnuti');
-            }
-
-            //$this->redirect(':Admin:Spisy:detail',array('id'=>$spis_id));
         } catch (DibiException $e) {
             $this->flashMessage('Zprávu se nepodařilo odmítnout.', 'warning');
         }
+        
+        $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
     }
 
     private function odmitnoutISDS($data)
