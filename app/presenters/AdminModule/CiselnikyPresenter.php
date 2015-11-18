@@ -80,10 +80,17 @@ class Admin_CiselnikyPresenter extends BasePresenter
         );
 
         $this->addComponent($ciselnik, 'ciselnik');
-
-        $this->setView('detail');
     }
 
+    /**
+     *   setView musí být v render metodě, aby byla funkční nápověda
+     *   pro jednotlivé číselníky
+     */
+    public function renderTypdokumentu()
+    {
+        $this->setView('detail');        
+    }
+    
     public function actionZpusobvyrizeni()
     {
         $this->template->ciselnik_title = "Způsob vyřízení";
@@ -129,10 +136,13 @@ class Admin_CiselnikyPresenter extends BasePresenter
         );
 
         $this->addComponent($ciselnik, 'ciselnik');
-
-        $this->setView('detail');
     }
 
+    public function renderZpusobvyrizeni()
+    {
+        $this->setView('detail');        
+    }
+    
     public function actionZpusobodeslani()
     {
         $this->template->ciselnik_title = "Způsob odeslání";
@@ -177,10 +187,13 @@ class Admin_CiselnikyPresenter extends BasePresenter
         );
 
         $this->addComponent($ciselnik, 'ciselnik');
-
-        $this->setView('detail');
     }
 
+    public function renderZpusobodeslani()
+    {
+        $this->setView('detail');
+    }
+    
     public function actionZpusobdoruceni()
     {
         $this->template->ciselnik_title = "Způsob doručení";
@@ -233,10 +246,13 @@ class Admin_CiselnikyPresenter extends BasePresenter
         );
 
         $this->addComponent($ciselnik, 'ciselnik');
-
-        $this->setView('detail');
     }
 
+    public function renderZpusobdoruceni()
+    {
+        $this->setView('detail');        
+    }
+    
     public function actionSpousteciudalost()
     {
         $this->template->ciselnik_title = "Spouštěcí událost";
@@ -283,10 +299,13 @@ class Admin_CiselnikyPresenter extends BasePresenter
         );
 
         $this->addComponent($ciselnik, 'ciselnik');
-
-        $this->setView('detail');
     }
 
+    public function renderSpousteciudalost()
+    {
+        $this->setView('detail');        
+    }
+    
     public function actionStaty()
     {
         $this->template->ciselnik_title = "Státy";
@@ -326,10 +345,13 @@ class Admin_CiselnikyPresenter extends BasePresenter
         );
 
         $this->addComponent($ciselnik, 'ciselnik');
-
-        $this->setView('detail');
     }
 
+    public function renderStaty()
+    {
+        $this->setView('detail');        
+    }
+    
     public function actionDruhzasilky()
     {
         $this->template->ciselnik_title = "Druh zásilky";
@@ -371,8 +393,10 @@ class Admin_CiselnikyPresenter extends BasePresenter
         );
 
         $this->addComponent($ciselnik, 'ciselnik');
-
-        $this->setView('detail');
     }
 
+    public function renderDruhzasilky()
+    {
+        $this->setView('detail');        
+    }
 }
