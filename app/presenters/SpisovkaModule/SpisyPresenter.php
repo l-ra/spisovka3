@@ -141,15 +141,16 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     }
 
     /** 
-     * Zobraz seznam vsech spisu, bez hledani, bez strankovani
+     * Zobraz seznam spisu ve stavu "otevren", bez hledani, bez strankovani
      */
     public function renderSeznam()
     {
         $this->template->dokument_id = $this->getParameter('dokument_id');
 
         $Spisy = new Spis();
-        $args = $Spisy->spisovka(null);
-        $result = $Spisy->seznam($args, 5);
+        $args = ['where' => ['tb.stav = 1']];
+        $args = $Spisy->spisovka($args);
+        $result = $Spisy->seznam($args);
         $this->template->seznam = $result->fetchAll();
     }
 
@@ -230,7 +231,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                     : 20;
 
         $args = $Spisy->spisovka($args);
-        $result = $Spisy->seznam($args, 5);
+        $result = $Spisy->seznam($args);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf

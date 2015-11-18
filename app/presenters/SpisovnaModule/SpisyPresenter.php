@@ -125,7 +125,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                     : 20;
 
         $args = $Spisy->spisovna($args);
-        $result = $Spisy->seznam($args, 5, $spis_id);
+        $result = $Spisy->seznam($args, $spis_id);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
@@ -198,7 +198,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                     : 20;
 
         $args = $Spisy->spisovna_prijem($args);
-        $result = $Spisy->seznam($args, 5, $spis_id);
+        $result = $Spisy->seznam($args, $spis_id);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf

@@ -114,7 +114,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
-        $result = $Spisy->seznam($args, 5, $spis_id);
+        $result = $Spisy->seznam($args, $spis_id);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
@@ -271,7 +271,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
                 $args['where'] = array(array('stav=1'));
             }
 
-            $seznam = $Spis->seznam($args, 5)->fetchAll();
+            $seznam = $Spis->seznam($args)->fetchAll();
 
             if ($seznam) {
 

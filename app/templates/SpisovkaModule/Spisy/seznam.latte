@@ -1,7 +1,6 @@
 {if count($seznam)>0}
 <table>
     {foreach $seznam as $spis}
-{continueIf $spis->stav != 1}
 {?  $str = $spis->sekvence;
     $a = explode('.', $str);
     if (count($a) > 2) {

@@ -50,16 +50,15 @@ class Spis extends TreeModel
         return $row;
     }
 
-    public function seznam($args = null, $select = 0, $parent_id = null)
+    /**
+     * @return DibiResult
+     */
+    public function seznam($args = null, $parent_id = null)
     {
-
-        $params = null;
-        if (!is_null($args)) {
+        $params = ['paginator' => 1];
+        
+        if (!empty($args['where']))
             $params['where'] = $args['where'];
-        }
-        if ($select == 5) {
-            $params['paginator'] = 1;
-        }
 
         $params['leftJoin'] = array(
             'orgjednotka1' => array(
@@ -760,9 +759,14 @@ class Spis extends TreeModel
             'lze_prevzit' => $Lze_prevzit);
     }
 
-    public function search($search)
+    /**
+     *  Hledá v otevřených spisech (stav = 1)
+     * @param string $title  část názvu spisu
+     * @return DibiRow[]
+     */
+    public function search($title)
     {
-        $args = ['where' => [["nazev LIKE %s", "%$search%"]]];
+        $args = ['where' => [["nazev LIKE %s", "%$title%"], 'stav = 1']];
         $args = $this->spisovka($args);
 
         $res = dibi::query('SELECT id, nazev as text FROM %n as tb WHERE %and ORDER by nazev',
