@@ -80,7 +80,7 @@ renderEpodSubjekty = function (subjekt_id) {
                 $(subjekt_tr).replaceWith(data);
             } else {
                 // append
-                $('#subjekty-table tbody').append(data);
+                $('#subjekty-table').append(data);
             }
 
             
