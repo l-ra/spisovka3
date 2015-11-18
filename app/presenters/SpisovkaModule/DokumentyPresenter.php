@@ -367,7 +367,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->FormUdalost = $this->getParameter('udalost', false) && $dokument->stav_dokumentu == 4;
 
             $SpisovyZnak = new SpisovyZnak();
-            $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
+            $this->template->SpisoveZnaky = $SpisovyZnak->seznam()->fetchAll();
 
             $this->template->Typ_evidence = $this->typ_evidence;
             $this->template->SouvisejiciDokumenty = array();
@@ -1120,7 +1120,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->FormUpravit = $this->getParameter('upravit', null);
 
             $SpisovyZnak = new SpisovyZnak();
-            $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
+            $this->template->SpisoveZnaky = $SpisovyZnak->seznam()->fetchAll();
 
             $this->addComponent(new VyberPostovniZasilky(), 'druhZasilky');
 

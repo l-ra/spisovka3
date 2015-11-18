@@ -23,44 +23,33 @@ class TreeModel extends BaseModel
         return $result;
     }
 
-    public function nacti($parent_id = null, $child = true, $sort_by_name = true, $params = null)
+    /**
+     * @param array $params
+     * @return DibiResult
+     */
+    public function nacti($params = null)
     {
-
         $sql = array(
             'from' => array($this->name => 'tb'),
             'cols' => array('*', "%sqlLENGTH(tb.sekvence) - LENGTH(REPLACE(tb.sekvence, '.', ''))" => 'uroven'),
             'leftJoin' => array()
         );
 
-        if ($child) {
-            if (!empty($parent_id)) {
-
-                $sql['leftJoin'] = array(
-                    'parent' => array(
-                        'from' => array($this->name => 'tbp'),
-                        'on' => array(array('tbp.id=%i', $parent_id))
-                    )
-                );
-                $sql['where'] = array(
-                    array("tb.sekvence LIKE CONCAT(tbp.sekvence,'.%')"),
-                    array("tb.id <> %i", $parent_id)
-                );
-            }
-        } else {
-            if (!empty($parent_id)) {
-                $sql['where'] = array(array('tb.parent_id=%i', $parent_id));
-            } else {
-                $sql['where'] = array(array('tb.parent_id IS NULL'));
-            }
+        if (!empty($params['parent_id'])) {
+            $parent_id = $params['parent_id'];            
+            $sql['leftJoin'] = array(
+                'parent' => array(
+                    'from' => array($this->name => 'tbp'),
+                    'on' => array(array('tbp.id=%i', $parent_id))
+                )
+            );
+            $sql['where'] = array(
+                array("tb.sekvence LIKE CONCAT(tbp.sekvence,'.%')"),
+                array("tb.id <> %i", $parent_id)
+            );
         }
 
-        if (!$child) {
-            $sql['order'] = array('tb.nazev');
-        } else if ($sort_by_name) {
-            $sql['order'] = array('tb.sekvence_string');
-        } else {
-            $sql['order'] = array('tb.sekvence');
-        }
+        $sql['order'] = array('tb.sekvence_string');
 
         if (is_array($params)) {
             if (isset($params['where'])) {
@@ -77,12 +66,7 @@ class TreeModel extends BaseModel
         }
 
         $result = $this->selectComplex($sql);
-        if (isset($params['paginator'])) {
-            return $result;
-        } else {
-            $rows = $result->fetchAll();
-            return ($rows) ? $rows : NULL;
-        }
+        return $result;
     }
 
     /**
@@ -105,7 +89,10 @@ class TreeModel extends BaseModel
             $result[0] = 'vyberte z nabídky ...';
         }
 
-        $rows = $this->nacti($parent_id, true, true, $params);
+        if ($parent_id !== null)
+            $params['parent_id'] = $parent_id;
+        
+        $rows = $this->nacti($params);
         if (count($rows)) {
             $parent_sekvence = null;
             

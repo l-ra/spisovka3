@@ -55,8 +55,6 @@ class Spis extends TreeModel
      */
     public function seznam($args = null, $parent_id = null)
     {
-        $params = ['paginator' => 1];
-        
         if (!empty($args['where']))
             $params['where'] = $args['where'];
 
@@ -73,7 +71,10 @@ class Spis extends TreeModel
             ),
         );
 
-        return $this->nacti($parent_id, true, true, $params);
+        if ($parent_id !== null)
+            $params['parent_id'] = $parent_id;
+        
+        return $this->nacti($params);
     }
 
     public function seznamDokumentu($spis_id)

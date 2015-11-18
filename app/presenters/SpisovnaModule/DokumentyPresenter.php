@@ -330,7 +330,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                             'skartacni_rizeni');
 
             $SpisovyZnak = new SpisovyZnak();
-            $this->template->SpisoveZnaky = $SpisovyZnak->seznam(null);
+            $this->template->SpisoveZnaky = $SpisovyZnak->seznam()->fetchAll();
 
             $this->template->Typ_evidence = $this->typ_evidence;
             if ($this->typ_evidence == 'priorace') {

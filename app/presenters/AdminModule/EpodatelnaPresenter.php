@@ -192,7 +192,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $org_select = array('0' => 'Kterákoli podatelna');
         $OrgJednotky = new Orgjednotka();
-        if ($orgjednotky_data = $OrgJednotky->seznam())
+        if ($orgjednotky_data = $OrgJednotky->seznam()->fetchAll())
             foreach ($orgjednotky_data as $oj)
                 $org_select[$oj->id] = $oj->ciselna_rada . ' - ' . $oj->zkraceny_nazev;
 
@@ -486,7 +486,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $org_select = array('0' => 'Kterákoli podatelna');
         $OrgJednotky = new Orgjednotka();
-        if ($orgjednotky_data = $OrgJednotky->seznam())
+        if ($orgjednotky_data = $OrgJednotky->seznam()->fetchAll())
             foreach ($orgjednotky_data as $oj)
                 $org_select[$oj->id] = $oj->ciselna_rada . ' - ' . $oj->zkraceny_nazev;
 

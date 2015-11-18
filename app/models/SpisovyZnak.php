@@ -7,20 +7,19 @@ class SpisovyZnak extends TreeModel
     protected $primary = 'id';
     protected $tb_spoudalost = 'spousteci_udalost';
 
-    public function seznam($args = null, $select = 0, $spisznak_parent = null)
+    /**
+     * @return DibiResult
+     */
+    public function seznam($args = null)
     {
-
         $params = null;
-        if (!is_null($args)) {
+        if (!empty($args['where'])) {
             $params['where'] = $args['where'];
         } else {
             //$params['where'] = array(array('stav=1'));
         }
-        if ($select == 5) {
-            $params['paginator'] = 1;
-        }
 
-        return $this->nacti($spisznak_parent, true, true, $params);
+        return $this->nacti($params);
     }
 
     /* public function seznamNativ($args = null, $select = 0)

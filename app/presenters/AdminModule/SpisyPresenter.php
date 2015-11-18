@@ -202,7 +202,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
     public function renderUpravit()
     {
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->seznam(null);
+        $spisove_znaky = $SpisovyZnak->seznam()->fetchAll();
         $this->template->SpisoveZnaky = $spisove_znaky;
         $this->template->spisForm = $this['upravitSpisovyPlanForm'];
     }
@@ -246,7 +246,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
     public function renderNovy()
     {
         $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->seznam(null);
+        $spisove_znaky = $SpisovyZnak->seznam()->fetchAll();
         $this->template->SpisoveZnaky = $spisove_znaky;
         $this->template->spisForm = $this['novyForm'];
     }

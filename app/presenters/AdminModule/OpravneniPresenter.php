@@ -14,10 +14,7 @@ class Admin_OpravneniPresenter extends BasePresenter
                     : 20;
 
         $RoleModel = new RoleModel();
-        $params = array(
-            'paginator' => 1
-        );
-        $result = $RoleModel->nacti(null, true, true, $params);
+        $result = $RoleModel->nacti();
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         $this->template->seznam = $seznam;

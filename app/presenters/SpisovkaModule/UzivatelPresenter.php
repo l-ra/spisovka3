@@ -70,7 +70,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
     {
         $form = Admin_ZamestnanciPresenter::createOsobaForm();
         $form->addHidden('osoba_id');
-        
+
         $osoba = $this->template->Osoba;
         if ($osoba) {
             $form['osoba_id']->setValue($osoba->id);
@@ -81,8 +81,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             $form['email']->setValue($osoba->email);
             $form['telefon']->setValue($osoba->telefon);
             $form['pozice']->setValue($osoba->pozice);
-        }        
-                
+        }
+
         $form->addSubmit('upravit', 'Upravit')
                 ->onClick[] = array($this, 'upravitClicked');
         $form->addSubmit('storno', 'Zrušit')
@@ -104,7 +104,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         try {
             $osoba_id = $Osoba->ulozit($data, $osoba_id);
             $this->flashMessage('Informace o uživateli byly upraveny.');
-        } catch (DibiException $e) {                
+        } catch (DibiException $e) {
             $this->flashMessage('Informace o uživateli se nepodařilo upravit. ' . $e->getMessage(),
                     'warning');
         }
@@ -163,7 +163,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             $value['id'] = 'o' . $value['id'];
         foreach ($a2 as &$value)
             $value['id'] = 'u' . $value['id'];
-        
+
         echo json_encode(array_merge($a1, $a2));
 
         exit;
@@ -184,16 +184,13 @@ class Spisovka_UzivatelPresenter extends BasePresenter
     {
         $OrgJednotky = new Orgjednotka();
 
-        if (!empty($term))
-            $seznam_orgjednotek = $OrgJednotky->nacti(null, true, true,
-                    array('where' => array(array('LOWER(tb.ciselna_rada) LIKE LOWER(%s)', '%' . $term . '%', ' OR LOWER(tb.zkraceny_nazev) LIKE LOWER(%s)', '%' . $term . '%'))));
-        else
-            $seznam_orgjednotek = $OrgJednotky->nacti();
+        $args = empty($term) ? null : ['where' => [['LOWER(tb.ciselna_rada) LIKE LOWER(%s)', '%' . $term . '%', ' OR LOWER(tb.zkraceny_nazev) LIKE LOWER(%s)', '%' . $term . '%']]];
+        $seznam_orgjednotek = $OrgJednotky->nacti($args);
 
         $seznam = array();
 
         if (count($seznam_orgjednotek) > 0) {
-            //$seznam[ ] = array('id'=>'o',"type" => 'part','name'=>'Předat organizační jednotce');
+            //$seznam[] = array('id' => 'o', "type" => 'part', 'name' => 'Předat organizační jednotce');
             foreach ($seznam_orgjednotek as $org)
                 $seznam[] = array(
                     "id" => $org->id,
@@ -304,14 +301,12 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             if ($user_id !== null) {
                 $osoba = UserModel::getIdentity($user_id);
                 echo Osoba::displayName($osoba);
-            }
-            else {
+            } else {
                 $Orgjednotka = new Orgjednotka();
                 $org = $Orgjednotka->getInfo($orgjednotka_id);
                 echo "organizační jednotce<br/>" . $org->zkraceny_nazev;
             }
             $this->terminate();
-            
         } else {
             $Workflow = new Workflow();
             if ($Workflow->predat($dokument_id, $user_id, $orgjednotka_id, $poznamka)) {
@@ -329,27 +324,29 @@ class Spisovka_UzivatelPresenter extends BasePresenter
     {
         $form1 = new Spisovka\Form();
 
-        $form1->addCheckBox(Notifications::RECEIVE_DOCUMENT, 'Poslat e-mail, když mně je předán dokument')
+        $form1->addCheckBox(Notifications::RECEIVE_DOCUMENT,
+                        'Poslat e-mail, když mně je předán dokument')
                 ->setValue(Notifications::isUserNotificationEnabled(Notifications::RECEIVE_DOCUMENT));
-        
+
         $form1->addSubmit('upravit', 'Upravit')
                 ->onClick[] = array($this, 'upravitNotificationsClicked');
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-        
+
         return $form1;
     }
-    
+
     public function upravitNotificationsClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $data = $button->getForm()->getValues();
 
-        Notifications::enableUserNotification(Notifications::RECEIVE_DOCUMENT, 
+        Notifications::enableUserNotification(Notifications::RECEIVE_DOCUMENT,
                 $data[Notifications::RECEIVE_DOCUMENT]);
-        
+
         $this->flashMessage('Nastavení bylo upraveno.');
         $this->redirect('this');
     }
+
 }

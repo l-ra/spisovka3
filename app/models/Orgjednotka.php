@@ -17,28 +17,29 @@ class Orgjednotka extends TreeModel
         return $result->fetch();
     }
 
-    public function seznam($args = null, $no_result = 0)
+    /**
+     * @return DibiResult
+     */
+    public function seznam($args = null)
     {
-
         $params = null;
-        if (!is_null($args)) {
+        if (!empty($args)) {
             $params['where'] = $args;
         }
-        if ($no_result == 1) {
-            $params['paginator'] = 1;
-        }
 
-        return $this->nacti(null, true, true, $params);
+        return $this->nacti($params);
     }
 
+    /**
+     * @return DibiRow[]
+     */
     public function linearniSeznam()
     {
-        $result = $this->nacti(null, true, true,
-                array(
-            'order' => 'ciselna_rada',
-            'where' => array('stav != 0')
-        ));
-        return $result !== NULL ? $result : array();
+        $result = $this->nacti(['order' => 'ciselna_rada',
+                    'where' => ['stav != 0']
+                ])->fetchAll();
+
+        return $result ? : array();
     }
 
     public function ulozit($data, $orgjednotka_id = null)

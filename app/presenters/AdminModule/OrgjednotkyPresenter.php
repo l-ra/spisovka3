@@ -31,7 +31,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         $OrgJednotka = new Orgjednotka();
 
-        $result = $OrgJednotka->seznam($args, 1);
+        $result = $OrgJednotka->seznam($args);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
 

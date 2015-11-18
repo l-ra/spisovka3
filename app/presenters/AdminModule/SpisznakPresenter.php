@@ -18,20 +18,9 @@ class Admin_SpisznakPresenter extends BasePresenter
         $where = null; // array( array('ciselna_rada LIKE %s','ORG_12%') );
 
         $SpisovyZnak = new SpisovyZnak();
-        $result = $SpisovyZnak->seznam($where, 5);
+        $result = $SpisovyZnak->seznam($where);
         $paginator->itemCount = count($result);
         $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-
-        /*        $seznam = $result->fetchAll();//($paginator->offset, $paginator->itemsPerPage);
-          //natsort($seznam);
-          echo "<pre>";
-          //print_r($seznam);
-          foreach ( $seznam as $s ) {
-          echo $s->nazev ."\n";
-          }
-          echo "</pre>";
-          exit;
-         */
         $this->template->seznam = $seznam;
     }
 
@@ -104,7 +93,7 @@ class Admin_SpisznakPresenter extends BasePresenter
                 $args['where'] = array(array('stav=1'));
             }
 
-            $seznam = $SpisovyZnak->seznam($args, 5)->fetchAll();
+            $seznam = $SpisovyZnak->seznam($args)->fetchAll();
 
             if ($seznam) {
 

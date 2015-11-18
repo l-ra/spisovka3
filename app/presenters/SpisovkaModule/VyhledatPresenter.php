@@ -54,7 +54,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                     'ciselna_rada LIKE %s', '%' . $text . '%'
                 )
             );
-            $seznam = $OrgJednotka->seznam($args);
+            $seznam = $OrgJednotka->seznam($args)->fetchAll();
             if (count($seznam) > 0) {
                 foreach ($seznam as $org) {
                     $checked_org = ( in_array($org->id, $org_a) ) ? ' checked="checked"' : '';
