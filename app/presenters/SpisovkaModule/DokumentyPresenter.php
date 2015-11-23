@@ -413,6 +413,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
         
         $dokument = $this->template->Dok;
+        $this->template->dokument_id = $dokument->id;
+        
         // Kontrola lhuty a skartace
         if ($dokument->lhuta_stav == 2 && $dokument->stav_dokumentu < 4) {
             $this->flashMessage('Vypršela lhůta k vyřízení! Vyřiďte neprodleně tento dokument.',
@@ -858,6 +860,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         if ($dokument) {
             $this->template->Dok = $dokument;
+            $this->template->dokument_id = $dokument->id;
         } else {
             $this->template->Dok = null;
             $this->flashMessage('Dokument není připraven k vytvoření', 'warning');

@@ -53,25 +53,15 @@
         <div class="detail_hlavicka">Kontakt</div>
         <dl>
             <dt>Subjekt:</dt>
-            <dd>{=Subjekt::displayName($Subjekt,'jmeno')}&nbsp;</dd>
-        </dl>
-        <dl>
+            <dd>{=Subjekt::displayName($Subjekt,'jmeno')}&nbsp;</dd><br />
             <dt>Adresa:</dt>
-            <dd>
-                {!=Subjekt::displayName($Subjekt,'formalni_adresa')}&nbsp;
-            </dd>
-        </dl>
-        <dl>
+            <dd>{!=Subjekt::displayName($Subjekt,'formalni_adresa')}</dd><br />
             <dt>Email:</dt>
-            <dd>{$Subjekt->email}&nbsp;</dd>
-        </dl>
-        <dl>
+            <dd>{$Subjekt->email}</dd><br />
             <dt>Telefon:</dt>
-            <dd>{$Subjekt->telefon}&nbsp;</dd>
-        </dl>
-        <dl>
+            <dd>{$Subjekt->telefon}</dd><br />
             <dt>ID datové schránky:</dt>
-            <dd>{$Subjekt->id_isds}&nbsp;</dd>
+            <dd>{$Subjekt->id_isds}</dd>
         </dl>
     </div>
     <div class="detail_blok">

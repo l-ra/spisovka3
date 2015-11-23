@@ -14,12 +14,12 @@
 
     <div id="dokumenty">
     {if count(@$seznam)>0}
-    <table>
+    <table class="seznam">
 
         <tr>
             <th class="typ">Typ zprávy</th>
             <th class="prijato">Odesláno</th>
-            <th class="cislo_jadnaci">ID</th>
+            <th class="cislo_jednaci">ID</th>
             <th class="vec">Věc<br />Adresát</th>
             <th class="prideleno">Schránka</th>
             <th class="stav">Stav</th>
@@ -37,7 +37,7 @@
             <td class="prijato">
                 <span title="{$ep->doruceno_dne|edatetime}">{$ep->doruceno_dne|edate}</span>
             </td>
-            <td class="cislo_jadnaci">
+            <td class="cislo_jednaci">
                 &nbsp;<strong><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->id}">
                    OSS-EP-O-{$ep->poradi}-{$ep->rok}
                 </a></strong>
@@ -58,7 +58,7 @@
                 {elseif ($ep->stav==1)}
                 odesláno
                 {else}
-                nelze zjístit stav
+                nelze zjistit stav
                 {/if}
             </td>
         </tr>

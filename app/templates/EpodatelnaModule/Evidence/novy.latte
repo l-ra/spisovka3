@@ -168,55 +168,11 @@
         {if count($Subjekt['databaze'])>0}
         <table class="seznam" id="subjekty-table">
             <tr>
-            <td class="icon">
-                Použít
-            </td>
-            <td class="icon">
-                &nbsp;
-            </td>
-            <td class="meta">
-                &nbsp;
-            </td>
-            <td class="meta_plus">
-                &nbsp;
-            </td>
+                <td colspan="4">Použít</td>
             </tr>
             {foreach $Subjekt['databaze'] as $subjekt}
-            <tr id="epodsubjekt-{$subjekt->id}">
-            <td class="icon">
-                <input type="checkbox" name="subjekt[{$subjekt->id}]" />
-            </td>
-            <td class="icon">
-                <img src="{$publicUrl}images/subjekt/{$subjekt->type|lower}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
-            </td>
-            <td class="meta">
-                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
-                <div class="info">
-                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
-                <br />
-                {=Subjekt::displayName($subjekt,'adresa')}
-                </div>
-            </td>
-            <td class="meta_plus">
-                &nbsp;
-                <div class="info">
-                <dl>
-                    <dt>email:</dt>
-                    <dd>{$subjekt->email}&nbsp;</dd>
-                </dl>
-                <dl>
-                    <dt>telefon:</dt>
-                    <dd>{$subjekt->telefon}&nbsp;</dd>
-                </dl>
-                <dl>
-                    <dt>isds:</dt>
-                    <dd>{$subjekt->id_isds}&nbsp;</dd>
-                </dl>
-
-                </div>
-            </td>
-        </tr>
-        {/foreach}
+                {include '../../SpisovkaModule/Subjekty/subjekt.latte', subjekt => $subjekt, epodatelna_evidence => true}
+            {/foreach}
         </table>
         {else}
         <div class="prazdno">

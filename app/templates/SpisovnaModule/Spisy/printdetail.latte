@@ -52,11 +52,11 @@
     </div>
 
     {if count($seznam)>0}
-    <table>
+    <table class="spisovka">
         <tr>
             <th class="typ">Typ dokumentu</th>
             <th class="prijato">Přijato</th>
-            <th class="cislo_jadnaci">Číslo jednací<br />JID<br />Název spisu</th>
+            <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
             <th class="prideleno">Přidělen</th>
             <th class="stav">Stav</th>
@@ -79,7 +79,7 @@
             <td class="prijato">
                 {$dok->datum_vzniku|edate}
             </td>
-            <td class="cislo_jadnaci">
+            <td class="cislo_jednaci">
                 <strong>
                    {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
                 </strong>&nbsp;

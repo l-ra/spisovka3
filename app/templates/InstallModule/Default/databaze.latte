@@ -69,7 +69,7 @@
 
     <h2>Detail kontroly:</h2>
 
-    <table>
+    <table class="spisovka">
     {foreach $database as $id => $requirement}
     {var $class = isset($requirement->passed) ? ($requirement->passed ? 'passed' : ($requirement->required ? 'failed' : 'warning')) : 'info'}
     <tr id="res{$id}" class="{$class}">

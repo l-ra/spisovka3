@@ -45,7 +45,7 @@ pro některé konfigurační soubory a zápisu pro dočasné soubory.</p>
 
     <h2>Detail kontroly:</h2>
 
-    <table>
+    <table class="spisovka">
     {foreach $requirements_ess as $id => $requirement}
     {var $class = isset($requirement->passed) ? ($requirement->passed ? 'passed' : ($requirement->required ? 'failed' : 'warning')) : 'info'}
     <tr id="res{$id}" class="{$class}">
@@ -78,7 +78,7 @@ pro některé konfigurační soubory a zápisu pro dočasné soubory.</p>
     <br />
     <h2>Detaily jádra aplikace (Nette Framework)</h2>
 
-    <table>
+    <table class="spisovka">
     {foreach $requirements as $id => $requirement}
     {var $class = isset($requirement->passed) ? ($requirement->passed ? 'passed' : ($requirement->required ? 'failed' : 'warning')) : 'info'}
     {continueIf $class == "passed" || $class == "info"}

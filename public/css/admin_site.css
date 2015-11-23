@@ -66,44 +66,36 @@ body {
     display: inline-block;
 }
 
-#content {
-    background: #ffffff ;
-    min-height: 500px;
-}
-
-#dialog table th,
-#content table th {
+table.spisovka th,
+table.seznam th {
     background-color: #681203;
-    padding: 5px 5px;
-    text-align: left;
-    color: #ffffff;
-    border: 1px #681203 solid;
+    border-color: #681203;
 }
 
 
-#content table.ciselnik_seznam {
+table.ciselnik_seznam {
     border: 0px;
     margin: 20px;
 }
 
-#content table.ciselnik_seznam td {
+table.ciselnik_seznam td {
     border: 0px;
 }
 
-#content table.ciselnik_seznam .icon {
+table.ciselnik_seznam .icon {
     width: 42px;
 }
 
-#content table.ciselnik_seznam .meta {
+table.ciselnik_seznam .meta {
     padding: 10px;
 }
 
-#content table.ciselnik_seznam .meta a {
+table.ciselnik_seznam .meta a {
     font-weight: bold;
     text-decoration: underline;
 }
 
-#content table.ciselnik_seznam .meta div {
+table.ciselnik_seznam .meta div {
     margin: 5px 0px;
 }
 

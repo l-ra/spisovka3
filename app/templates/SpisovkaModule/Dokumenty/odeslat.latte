@@ -18,63 +18,26 @@
         <div id="dok-subjekty">
         {var $existuje_adresat = 0}
         {if count($Dok->subjekty)>0}
-        <table class="seznam">
+        <table class="seznam odeslat-subjekty">
             {foreach $Dok->subjekty as $subjekt}
-            {continueIf $subjekt->rezim_subjektu == 'O'}
-            {var $existuje_adresat = 1}
-            <tr style="border-top: 2px solid;" class="dokument_blok_sedy">
-            <td class="icon">
-                <img src="{$publicUrl}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
-            </td>
-            <td class="meta">
-                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
-                <div class="info">
-                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
-                <br />
-                <span>
-                    {if $subjekt->rezim_subjektu == 'O'}
-                    odesílatel
-                    {elseif $subjekt->rezim_subjektu == 'A'}
-                    adresát
-                    {elseif $subjekt->rezim_subjektu == 'AO'}
-                    odesílatel i adresát
-                    {else}
-                    nespecifikováno
-                    {/if}
-                </span>
-                <br />
-                {=Subjekt::displayName($subjekt,'adresa')}
-                </div>
-                {if count($Dok->odeslani)>0}
+                {continueIf $subjekt->rezim_subjektu == 'O'}
+                {var $existuje_adresat = 1}
+                {* <tr style="border-top: 2px solid;" class="dokument_blok_sedy"> *}
+
+                {include '../Subjekty/subjekt.latte', subjekt => $subjekt}
+                
+                {if count($Dok->odeslani) > 0}
                     {foreach $Dok->odeslani as $dokodes}
-                        {if $dokodes->subjekt_id == $subjekt->id  }
-                <div class="vyber" style="color:#008800;">
-                    Tomuto adresátovi byl dokument již odeslán
-                </div>
-                        {?break}
+                        {if $dokodes->subjekt_id == $subjekt->id}
+                            <tr>
+                                <td></td>
+                                <td><div class="vyber" style="color:#008800;">Tomuto adresátovi byl dokument již odeslán</div></td>
+                            </tr>
+                            {?break}
                         {/if}
                     {/foreach}
                 {/if}
-            </td>
-            <td class="meta_plus">
-                &nbsp;
-                <div class="info">
-                <dl>
-                    <dt>email:</dt>
-                    <dd>{$subjekt->email}&nbsp;</dd>
-                </dl>
-                <dl>
-                    <dt>telefon:</dt>
-                    <dd>{$subjekt->telefon}&nbsp;</dd>
-                </dl>
-                <dl>
-                    <dt>isds:</dt>
-                    <dd>{$subjekt->id_isds}&nbsp;</dd>
-                </dl>
 
-                </div>
-            </td>
-        </tr>
         <tr>
             <td class="icon">&nbsp;</td>
             <td colspan="2">
@@ -180,7 +143,8 @@
                     <dd><input type="checkbox" checked="checked" name="isds_fikce[{$subjekt->id}]" /></dd>
                 </dl>
             </td>
-        </tr>         
+        </tr>
+        <tr><td colspan="3" class="odeslat-subjekty-separator"></td></tr>
         {/foreach}
         </table>
         {else}

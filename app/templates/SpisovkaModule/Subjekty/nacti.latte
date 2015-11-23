@@ -1,56 +1,10 @@
-    {if count($seznamSubjektu)>0}
+{if count($subjekty) > 0}
+    {var povolit_zmeny = isset($AccessEdit) ? $AccessEdit : true}
     <table class="seznam">
-        {foreach $seznamSubjektu as $subjekt}
-        <tr>
-            <td class="icon">
-                <img id="subjekt_ikona_{$subjekt->id}" src="{$publicUrl}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
-            </td>
-            <td class="meta">
-                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
-                <div class="info">
-                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
-                <br />
-                <span>
-                    {if $subjekt->rezim_subjektu == 'O'}
-                    odesílatel
-                    {elseif $subjekt->rezim_subjektu == 'A'}
-                    adresát
-                    {elseif $subjekt->rezim_subjektu == 'AO'}
-                    odesílatel i adresát
-                    {else}
-                    nespecifikováno
-                    {/if}
-                </span>
-
-                <br />
-                {=Subjekt::displayName($subjekt,'adresa')}
-                </div>
-                <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$dokument_id }" onclick="return odebratSubjekt(this);">odebrat</a>
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>
-                </div>
-            </td>
-            <td class="meta_plus">                
-                <div class="info">
-                <dl>
-                    <dt>email:</dt>
-                    <dd>{$subjekt->email}</dd>
-                </dl>
-                <dl>
-                    <dt>telefon:</dt>
-                    <dd>{$subjekt->telefon}</dd>
-                </dl>
-                <dl>
-                    <dt>isds:</dt>
-                    <dd>{$subjekt->id_isds}</dd>
-                </dl>
-
-                </div>
-            </td>
-        </tr>
+        {foreach $subjekty as $subjekt}
+            {include 'subjekt.latte', subjekt => $subjekt, akce_odebrat_zmenit => $povolit_zmeny}
         {/foreach}
     </table>
-    {else}
-    <div class="prazdno">Nebyly zjištěny žádné subjekty.</div>
-    {/if}
-    
+{else}
+    <div class="prazdno">K tomuto dokumentu nejsou připojeni žádní odesílatelé nebo adresáti.</div>
+{/if}

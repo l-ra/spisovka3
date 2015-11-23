@@ -192,7 +192,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
 
         $DokumentSubjekt = new DokumentSubjekt();
         $seznam = $DokumentSubjekt->subjekty($dokument_id);
-        $this->template->seznamSubjektu = $seznam;
+        $this->template->subjekty = $seznam;
         $this->template->dokument_id = $dokument_id;
     }
 

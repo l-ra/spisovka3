@@ -25,7 +25,7 @@
     </div>
 
     {if count($seznam)>0}
-    <table>
+    <table class="spisovka">
         {foreach $seznam as $spis}
         <tr class="item{=str_replace("."," item",$spis->sekvence)}" id="sitem{$spis->id}">
             <td>

@@ -159,9 +159,8 @@ form {
     margin: 0px;
 }
 
-#content h2 {
+h2 {
     margin: 0px 0px 20px 0px;
-
 }
 
 #content .navigate {
@@ -171,62 +170,69 @@ form {
     border-bottom: 1px dotted #c0c0c0;
 }
 
-#dialog .blok_menu,
-#content .blok_menu {
+.blok_menu {
     padding: 20px 20px 0px 20px;
     margin-bottom: 20px;
     border-top: 1px dotted #c0c0c0;
 }
 
-#dialog .blok_akce,
-#content .blok_akce {
+.blok_akce {
     padding: 0px 0px 10px 10px;
 }
 
-#content .ikona_ano {
+.ikona_ano {
     background: url('../images/icons/status_ano.png') no-repeat right;
 }
-#content .ikona_ne {
+.ikona_ne {
     background: url('../images/icons/status_ne.png') no-repeat right;
 }
-#content .ikona_nejiste {
+.ikona_nejiste {
     background: url('../images/icons/status_nejiste.png') no-repeat right;
 }
 
 
 /* Tabulka */
 
-#dialog table,
-#content table {
+table {
     border-collapse: collapse;
-    border: 1px #e0e0e0 solid;
+}
+
+table.spisovka {
     width: 100%;
+    border: 1px #e0e0e0 solid;
+}
+table.seznam {
+    width: 100%;
+    border: 0px;
 }
 
-#dialog table th,
-#content table th {
-    background-color: #03406A;
+table.spisovka th,
+table.seznam th {
     padding: 5px 5px;
-    text-align: left;
+    background-color: #03406A;
     color: #ffffff;
-    border: 1px #3E94D1 solid;
+    text-align: left;  /* fix pro M$ IE */
+    vertical-align: top;
 }
 
-#dialog table td,
-#content table td {
+table.spisovka td {
     padding: 5px 5px;
     border: 1px #e0e0e0 solid;
 }
+table.seznam td {
+    padding: 5px 5px;
+    vertical-align: top;
+    border-bottom: 1px #e0e0e0 solid;
+}
+
 
 /* Polozky */
-#dialog .prazdno,
-#content .prazdno {
+.prazdno {
     text-align: center;
     padding: 30px;
 }
 
-#dialog  .detail_blok,
-#content .detail_blok {
+.detail_blok {
     padding: 20px;
     border-top: 1px dotted #c0c0c0;
 }
@@ -262,8 +268,7 @@ dd {
     width: 200px;    
 }
 
-#dialog dt.dt_dialog,
-#content dt.dt_dialog {
+dt.dt_dialog {
     float: left;
     width: 200px;
     text-align: right;
@@ -306,36 +311,22 @@ label.required {
 /* ***************************************************************** */
 /* *** DOKUMENTY *** */
 
-#dokumenty table {
-    border-collapse: collapse;
-    border: 0px;
-    width: 100%;
-}
+/* Bohužel prvek #dokumenty se používá i pro seznam zpráv v e-podatelně, spisy,
+   výpravnu a zápůjčky...
+   Chtělo by to předělat a vytvořit styl přímo pro tabulku */
 
-#dokumenty table a {
+#dokumenty table a,
+table.zapujcky a {
     color: #000088;
 }
-
-#dokumenty table a:hover {
+#dokumenty table a:hover,
+table.zapujcky a:hover {
     color: #ff0000;
 }
 
-
-#dokumenty table th {
-    background-color: #03406A;
-    vertical-align: top;
-    padding: 5px 5px;
-    text-align: left;
+#dokumenty table th,
+table.zapujcky th {
     font-size: 7pt;
-    color: #ffffff;
-    border: 1px #03406A solid;
-}
-
-#dokumenty table td {
-    padding: 5px 5px;
-    border: 0px;
-    border-bottom: 1px #e0e0e0 solid;
-    vertical-align: top;
 }
 
 #dokumenty .akce {
@@ -348,20 +339,13 @@ label.required {
     width: 70px;
     text-align: right;
 }
-#dokumenty .cislo_jednaci {
-    width: 160px;
-    text-align: right;
-}
-#dokumenty .cislo_jadnaci {/*docasny fix*/
+#dokumenty .cislo_jednaci,
+table.zapujcky .cislo_jednaci {
     width: 160px;
     text-align: right;
 }
 #dokumenty .vec {
-
-}
-/* Styl pouzit v seznamu dokumentu ve vypravne */
-#dokumenty .uzel {
-    width: 150px;
+    /* Automaticky vypočítaná šířka */
 }
 #dokumenty .prideleno {
     width: 150px;
@@ -385,6 +369,24 @@ label.required {
 
 #dokumenty .stav_yellow {
     background: #ffffcc url('../images/icons/warning.png') no-repeat left center;
+}
+
+table.zapujcky .datum {
+    width: 60px;
+}
+table.zapujcky .prideleno {
+    width: 105px;
+}
+table.zapujcky .stav {
+    width: 65px;
+    text-align: right;
+}
+
+table.vypravna .predal {
+    width: 150px;    
+}
+table.vypravna .druh-zasilky {
+    width: 150px;    
 }
 
 /* ***************************************************************** */
@@ -639,26 +641,9 @@ label.required {
 
 /* ***************************************************************** */
 /* *** SEZNAM *** */
+/* table.seznam je pouzit i pro seznam dokumentu */
 
-#dialog .seznam,
-#content .seznam {
-    border-collapse: collapse;
-    border: 0px;
-    width: 100%;
-}
-
-#content .seznam tr {
-}
-
-#dialog .seznam td,
-#content .seznam td {
-    vertical-align: top;
-    border: 0px;
-    border-bottom: 1px #e0e0e0 solid;
-}
-
-#dialog .seznam td.icon,
-#content .seznam td.icon {
+table.seznam td.icon {
     text-align: center;
     width: 38px;
 }
@@ -674,79 +659,61 @@ td.seznam-sestav-pruh-ikon a {
     text-decoration: none;
 }
 
-#dialog .seznam td.meta,
-#content .seznam td.meta {
-    
-}
-
-#dialog .seznam td.meta a,
-#content .seznam td.meta a {
+table.seznam td.meta a {
     font-weight: bold;
 }
 
-#dialog .seznam td.meta div.info,
-#content .seznam td.meta div.info {
+table.seznam td.meta div.info {
     font-size: 8pt;
 }
 
-#dialog .seznam td.meta span,
-#content .seznam td.meta span {
+table.seznam td.meta span {
     color: #808080;
 }
 
-#dialog .seznam td.meta div.popis,
-#content .seznam td.meta div.popis {
+table.seznam td.meta div.popis {
     padding: 2px 5px;
 }
 
-#dialog .seznam td.meta .vyber,
-#content .seznam td.meta .vyber {
+table.seznam td.meta .vyber {
     font-size: 8pt;
     padding-top: 10px;
 }
 
-#dialog .seznam td.meta .vyber a,
-#content .seznam td.meta .vyber a {
+table.seznam td.meta .vyber a {
     font-size: 8pt;
     color: #000088;
     margin-right: 5px;
 }
 
-#dialog .seznam td.meta .vyber a:hover,
-#content .seznam td.meta .vyber a:hover {
+table.seznam td.meta .vyber a:hover {
     font-size: 8pt;
     color: #ff0000;
 }
 
-#dialog .seznam td.meta_plus,
-#content .seznam td.meta_plus {
+table.seznam td.meta_plus {
     text-align: left;
     width: 50%;
 }
 
-#dialog .seznam td.meta_plus div.info,
-#content .seznam td.meta_plus div.info {
+table.seznam td.meta_plus div.info {
     font-size: 8pt;
 }
 
-#dialog .seznam td.meta_plus span,
-#content .seznam td.meta_plus span {
+table.seznam td.meta_plus span {
     color: #808080;
 }
 
-#dialog .seznam td.meta_plus div.popis,
-#content .seznam td.meta_plus div.popis {
+table.seznam td.meta_plus div.popis {
     padding: 2px 5px;
 }
 
-#dialog .seznam td.meta_plus dl,
-#content .seznam td.meta_plus dl {
+table.seznam td.meta_plus dl {
     clear: both;
     margin: 0px; padding: 0px;
 }
 
-#dialog .seznam td.meta_plus dt,
-#content .seznam td.meta_plus dt {
+table.seznam td.meta_plus dt {
     float: left;
     width: 40px;
     text-align: right;
@@ -755,21 +722,29 @@ td.seznam-sestav-pruh-ikon a {
     margin-right: 5px;
 }
 
-#dialog .seznam td.meta_plus dd,
-#content .seznam td.meta_plus dd {
+table.seznam td.meta_plus dd {
     margin: 0px; padding: 0px;
     margin-left: 45px;
     font-weight: normal;
 }
 
-
-#dialog .seznam td.user,
-#content .seznam td.user {
+table.seznam td.user {
     border: 0px;
     border-bottom: 1px #e0e0e0 solid;
     text-align: right;
     width: 120px;
 }
+
+
+table.odeslat-subjekty td {
+    border-width: 0px;
+}
+
+table.odeslat-subjekty td.odeslat-subjekty-separator {
+    border-bottom-width: 1px;
+    padding: 0px;
+}
+
 
 #ajax-spinner,
 .dialog-spinner {
@@ -945,12 +920,12 @@ div.icon_slozka {
 .sestava_vyber_sloupcu .vybrat_sloupec {
     margin-top: 70px;    
 }
-#content .sestava_vyber_sloupcu dt {
+.sestava_vyber_sloupcu dt {
     float: none;
     width: auto;
     text-align: left;
 }
-#content .sestava_vyber_sloupcu dd {
+.sestava_vyber_sloupcu dd {
     margin: 0px;
 }
 

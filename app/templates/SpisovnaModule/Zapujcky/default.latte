@@ -29,15 +29,14 @@
     
     <div style="clear:both;">&nbsp;</div>    
 
-    <div id="dokumenty">
     {if count($seznam)>0}
     <form action="{link this}" method="post">
         <input type="hidden" name="url_referer" value="">
-    <table>
+    <table class="seznam zapujcky">
         <tr>
             <th class="akce">&nbsp;</th>
-            <th class="prijato">Od</th>
-            <th class="prijato">Do</th>
+            <th class="datum">Od</th>
+            <th class="datum">Do</th>
             <th class="cislo_jednaci">Číslo jednací<br />JID</th>
             <th class="vec">Věc</th>
             <th class="vec">Důvod</th>
@@ -51,17 +50,17 @@
                 <input type="checkbox" class="checkbox" name="zapujcka_vyber[]" value="{$zapujcka->id}" title="Vybrat tuto zápůjčku" />
                 {/if}
             </td>
-            <td class="prijato">
+            <td class="datum">
                 {$zapujcka->date_od|edate}
             </td>
-            <td class="prijato">
+            <td class="datum">
                 {if !empty($zapujcka->date_do_skut)}
                 <span title="">{$zapujcka->date_do_skut|edate}</span>
                 {else}
                 {$zapujcka->date_do|edate}
                 {/if}
             </td>
-            <td class="cislo_jadnaci">
+            <td class="cislo_jednaci">
                 &nbsp;<strong><a href="{link :Spisovna:Zapujcky:detail, 'id'=>$zapujcka->id}">
                    {$zapujcka->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$zapujcka->poradi}{/if}
                 </a></strong>
@@ -127,6 +126,5 @@
     <div class="prazdno">Nebyly zjištěny žádné zápůjčky.</div>
         {/if}
     {/if}
-    </div>
 
     <div id="dialog"></div>

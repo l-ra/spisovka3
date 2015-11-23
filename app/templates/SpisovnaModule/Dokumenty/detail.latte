@@ -342,58 +342,7 @@
             Adresáti / odesílatelé
         </div>
         <div id="dok-subjekty">
-        {if count($Dok->subjekty)>0}
-        <table class="seznam">
-            {foreach $Dok->subjekty as $subjekt}
-            <tr>
-            <td class="icon">
-                <img src="{$publicUrl}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
-            </td>
-            <td class="meta">
-                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
-                <div class="info">
-                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
-                <br />
-                <span>
-                    {if $subjekt->rezim_subjektu == 'O'}
-                    odesílatel
-                    {elseif $subjekt->rezim_subjektu == 'A'}
-                    adresát
-                    {elseif $subjekt->rezim_subjektu == 'AO'}
-                    odesílatel i adresát
-                    {else}
-                    nespecifikováno
-                    {/if}
-                </span>
-
-                <br />
-                {=Subjekt::displayName($subjekt,'adresa')}
-                </div>
-            </td>
-            <td class="meta_plus">
-                &nbsp;
-                <div class="info">
-                <dl>
-                    <dt>email:</dt>
-                    <dd>{$subjekt->email}&nbsp;</dd>
-                </dl>
-                <dl>
-                    <dt>telefon:</dt>
-                    <dd>{$subjekt->telefon}&nbsp;</dd>
-                </dl>
-                <dl>
-                    <dt>isds:</dt>
-                    <dd>{$subjekt->id_isds}&nbsp;</dd>
-                </dl>
-
-                </div>
-            </td>
-        </tr>
-        {/foreach}
-        </table>
-        {else}
-        <div class="prazdno">K tomuto dokumentu nejsou připojeni žádní odesílatelé nebo adresáti.</div>
-        {/if}
+            {include '../../SpisovkaModule/Subjekty/nacti.latte', subjekty => $Dok->subjekty}
         </div>
     </div>
 

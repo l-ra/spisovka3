@@ -79,12 +79,12 @@
     {if $AccessView}        
     <div id="dokumenty">
     {if count($seznam)>0}
-    <table>
+    <table class="seznam">
 
         <tr>
             <th class="typ">Typ dokumentu</th>
             <th class="prijato">Přijato<br />Vyřízen</th>
-            <th class="cislo_jadnaci">Číslo jednací<br />JID<br />Název spisu</th>
+            <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
             <th class="prideleno">Přidělen</th>
             <th class="stav">Spisový znak<br/>Skartační znak<br/>Skartační lhůta</th>
@@ -105,7 +105,7 @@
                 <br />
                 <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
             </td>
-            <td class="cislo_jadnaci">
+            <td class="cislo_jednaci">
                 &nbsp;<strong><a href="{link :Spisovna:Dokumenty:detail, 'id'=>$dok->id}">
                    {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
                 </a></strong>

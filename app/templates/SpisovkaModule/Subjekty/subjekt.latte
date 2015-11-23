@@ -1,0 +1,64 @@
+<tr id="subjekt-{$subjekt->id}">
+    <td n:if="!empty($epodatelna_evidence)" class="icon">
+        <input type="checkbox" name="subjekt[{$subjekt->id}]" />
+    </td>
+    <td class="icon">
+        {if isset($subjekt->rezim_subjektu)}
+           <img id="subjekt_ikona_{$subjekt->id}" src="{$publicUrl}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
+        {else}
+           <img src="{$publicUrl}images/subjekt/{if empty($subjekt->type)}fo{else}{$subjekt->type|lower}{/if}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
+        {/if}
+    </td>
+    <td class="meta">
+        <strong>
+            {if $module == 'Epodatelna' && $view == 'vyber'}
+                <a href="#" onclick="epodSubjektVybran(this, {$subjekt->id}); return false;">{=Subjekt::displayName($subjekt, 'jmeno_item')}</a>
+            {elseif $module == 'Admin'}
+                <a href="{link detail, id => $subjekt->id}" {if $subjekt->stav > 1}style="text-decoration:line-through;"{/if}>{=Subjekt::displayName($subjekt, 'jmeno_item')}</a>
+            {else}
+                {=Subjekt::displayName($subjekt, 'jmeno_item')}
+            {/if}
+        </strong>
+        <div class="info">
+            <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span><br />            
+            <span n:if="isset($subjekt->rezim_subjektu)">
+                {if $subjekt->rezim_subjektu == 'O'}
+                odesílatel
+                {elseif $subjekt->rezim_subjektu == 'A'}
+                adresát
+                {elseif $subjekt->rezim_subjektu == 'AO'}
+                odesílatel i adresát
+                {else}
+                nespecifikováno
+                {/if}
+                <br />
+            </span>
+            {=Subjekt::displayName($subjekt, 'adresa')}
+        </div>
+        <div class="vyber" n:if="!empty($akce_odebrat_zmenit)">
+            <a href="{link :Spisovka:Subjekty:odebrat, 'id' => $subjekt->id, 'dok_id' => $dokument_id}" onclick="return odebratSubjekt(this);">odebrat</a>
+            <a href="{link :Spisovka:Subjekty:upravit, 'id' => $subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>
+        </div>
+        <div class="vyber" n:if="!empty($akce_adresat_odesilatel)">
+            <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'A' }" onclick="subjektVybran(this); return false;">adresát</a>
+            <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'O' }" onclick="subjektVybran(this); return false;">odesilatel</a>
+            <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'AO' }" onclick="subjektVybran(this); return false;">adresát i odesilatel</a>
+        </div>
+    </td>
+    <td class="meta_plus">
+        <div class="info">
+            <dl>
+                <dt>email:</dt>
+                <dd>{$subjekt->email}</dd>
+            </dl>
+            <dl>
+                <dt>telefon:</dt>
+                <dd>{$subjekt->telefon}</dd>
+            </dl>
+            <dl>
+                <dt>isds:</dt>
+                <dd>{$subjekt->id_isds}</dd>
+            </dl>
+        </div>
+    </td>
+</tr>

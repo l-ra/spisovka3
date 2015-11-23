@@ -65,18 +65,8 @@ body {
     margin: 0px 10px;
 }
 
-#content {
-    background: #ffffff ;
-    min-height: 500px;
-}
-
-#dialog table th,
-#content table th {
+table.seznam th {
     background-color: #134E09;
-    padding: 5px 5px;
-    text-align: left;
-    color: #ffffff;
-    border: 1px #134E09 solid;
 }
 
 .dokument_blok_hlavni {

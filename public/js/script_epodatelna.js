@@ -59,31 +59,24 @@ renderEpodSubjekty = function (subjekt_id) {
     
     url = BASE_URL + 'epodatelna/subjekty/nacti/'+ subjekt_id;
 
-    $.get(url, function(data) {
-        subjekty_table = document.getElementById('subjekty-table');
-        
-        if ( subjekty_table == null ) {
-            html =        '        <table class="seznam" id="subjekty-table">';
-            html = html + '           <tr>';
-            html = html + '               <td class="icon">Použít</td>';
-            html = html + '               <td class="icon"></td>';
-            html = html + '               <td class="meta"></td>';
-            html = html + '               <td class="meta_plus"></td>';
-            html = html + '           </tr>';
-            html = html + data;
-            html = html + '        </table>';
+    $.get(url, function(subjekt) {
+        if ($('#subjekty-table').length == 0) {
+            var html =        '<table class="seznam" id="subjekty-table">';
+            html = html + '    <tr>';
+            html = html + '        <td colspan="4">Použít</td>';
+            html = html + '    </tr>';
+            html = html + subjekt;
+            html = html + '</table>';
             $('#dok-subjekty').html(html);
         } else {
-
-            subjekt_tr = document.getElementById('epodsubjekt-'+subjekt_id);
-            if ( subjekt_tr != null ) {
-                $(subjekt_tr).replaceWith(data);
-            } else {
-                // append
-                $('#subjekty-table').append(data);
-            }
-
-            
+            // Musime se ujistit, ze nevybirame HTML z Ajax odpovedi, 
+            // ale ze zobrazene stranky
+            var subjekt_tr = $('#subjekty-table #subjekt-' + subjekt_id);
+            // Pokud subjekt neni v seznamu u vytvareneho dokumentu, pridej jej
+            // (kontrola zabrani, aby tentyz subjekt byl v seznamu vicekrat,
+            // coz by zpusobilo problem s formularem)
+            if (subjekt_tr.length == 0)
+                $('#subjekty-table').append(subjekt);
         }
     });
     

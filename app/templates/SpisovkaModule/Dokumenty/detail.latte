@@ -558,63 +558,7 @@
         </script>
         {/if}
         <div id="dok-subjekty">
-        {if count($Dok->subjekty)>0}
-        <table class="seznam">
-            {foreach $Dok->subjekty as $subjekt}
-            <tr>
-            <td class="icon">
-                <img id="subjekt_ikona_{$subjekt->id}" src="{$publicUrl}images/icons/subjekt_{$subjekt->rezim_subjektu|lower}.png" alt="{$subjekt->rezim_subjektu}" title="{$subjekt->rezim_subjektu}" width="32" height="32" />
-            </td>
-            <td class="meta">
-                <strong>{=Subjekt::displayName($subjekt,'jmeno_item')}</strong>
-                <div class="info">
-                <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
-                <br />
-                <span>
-                    {if $subjekt->rezim_subjektu == 'O'}
-                    odesílatel
-                    {elseif $subjekt->rezim_subjektu == 'A'}
-                    adresát
-                    {elseif $subjekt->rezim_subjektu == 'AO'}
-                    odesílatel i adresát
-                    {else}
-                    nespecifikováno
-                    {/if}
-                </span>
-
-                <br />
-                {=Subjekt::displayName($subjekt,'adresa')}
-                </div>
-                {if $AccessEdit }
-                <div class="vyber">
-                    <a href="{link :Spisovka:Subjekty:odebrat, 'id'=>$subjekt->id, 'dok_id'=>$Dok->id }" onclick="return odebratSubjekt(this);">odebrat</a>
-                    <a href="{link :Spisovka:Subjekty:upravit, 'id'=>$subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>
-                </div>
-                {/if}
-            </td>
-            <td class="meta_plus">                
-                <div class="info">
-                <dl>
-                    <dt>email:</dt>
-                    <dd>{$subjekt->email}</dd>
-                </dl>
-                <dl>
-                    <dt>telefon:</dt>
-                    <dd>{$subjekt->telefon}</dd>
-                </dl>
-                <dl>
-                    <dt>isds:</dt>
-                    <dd>{$subjekt->id_isds}</dd>
-                </dl>
-
-                </div>
-            </td>
-        </tr>
-        {/foreach}
-        </table>
-        {else}
-        <div class="prazdno">K tomuto dokumentu nejsou připojeni žádní odesílatelé nebo adresáti.</div>
-        {/if}
+            {include '../Subjekty/nacti.latte', subjekty => $Dok->subjekty}
         </div>
     </div>
 
@@ -622,12 +566,6 @@
     <div class="h2">
         Přílohy
     </div>
-    {if 0 }
-    <div class="blok_akce">
-        <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
-        <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
-    </div>
-    {/if}
     {if $AccessEdit }
     <div id="dok-prilohy-form">
         <div class="blok_akce">
