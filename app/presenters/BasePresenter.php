@@ -77,6 +77,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     
     protected function beforeRender()
     {
+        $this->template->registerHelper('decPoint', function ($s) {
+            return str_replace('.', ',', $s);
+        });
+        
         // Helper escapovaný nl2br
         if (!function_exists('enl2br')) {
 

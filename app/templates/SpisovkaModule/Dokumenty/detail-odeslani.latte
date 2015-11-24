@@ -33,7 +33,7 @@
                     předán k odeslání poštou
                     {if !empty($odes->druh_zasilky)}<br />druh zásilky: {!=DruhZasilky::vypis($odes->druh_zasilky)}{/if}
                     {if !empty($odes->cena)}<br />cena: {$odes->cena} Kč{/if}
-                    {if !empty($odes->hmotnost)}<br />hmotnost: {$odes->hmotnost}{/if}
+                    {if !empty($odes->hmotnost)}<br />hmotnost: {$odes->hmotnost|decPoint} kg{/if}
                 
             {elseif $odes->zpusob_odeslani_id == 3 && $odes->stav_odeslani == 2}
                 <strong>{=Subjekt::displayName($odes,'plna_adresa')}</strong>

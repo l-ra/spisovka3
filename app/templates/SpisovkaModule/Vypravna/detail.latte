@@ -5,10 +5,10 @@
     {if $dokument->zpusob_odeslani_id == 3}
         <dt>Druh zásilky:</dt>
         <dd>{control druhZasilky}</dd><br />
-        <dt>Cena Kč:</dt>
-        <dd><input type="text" name="cena_zasilky" value="{$dokument->cena}" size="10" /></dd><br />
+        <dt>Cena:</dt>
+        <dd><input type="text" name="cena_zasilky" value="{$dokument->cena}" size="10" />  Kč</dd><br />
         <dt>Hmotnost:</dt>
-        <dd><input type="text" name="hmotnost_zasilky" value="{$dokument->hmotnost}" size="10" /></dd><br />
+        <dd><input type="text" name="hmotnost_zasilky" value="{$dokument->hmotnost}" size="10" /> kg</dd><br />
         <dt>Poznámka:</dt>
         <dd><input type="text" name="poznamka" value="{$dokument->poznamka}" /></dd><br />
     {/if}

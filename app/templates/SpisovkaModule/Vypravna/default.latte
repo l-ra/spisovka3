@@ -42,7 +42,7 @@
             <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Adresát<br /><br />Poznámka</th>
             <th class="predal">Předal</th>
-            <th class="druh-zasilky">Druh zásilky/cena/hmotnost/zpráva</th>
+            <th class="druh-zasilky">Druh zásilky / cena / hmotnost / zpráva</th>
         </tr>
         {foreach $seznam as $dok}
         <tr>
@@ -85,8 +85,8 @@
             <td class="druh-zasilky">
                 {if $dok->zpusob_odeslani_id == 3 }    
                 {!=DruhZasilky::vypis($dok->druh_zasilky)}
-                {if !empty($dok->cena_zasilky)}<br />cena: {$dok->cena_zasilky} Kč{/if}
-                {if !empty($dok->hmotnost_zasilky)}<br />hmotnost: {$dok->hmotnost_zasilky} Kč{/if}
+                {if !empty($dok->cena)}<br />cena: {$dok->cena} Kč{/if}
+                {if !empty($dok->hmotnost)}<br />hmotnost: {$dok->hmotnost|decPoint} kg{/if}
                 {elseif $dok->zpusob_odeslani_id == 4 }    
                 <a href="{link :Spisovka:Vypravna:zobrazfax, 'id'=>$dok->dokodes_id}" onclick="return zobrazFax(this);" title="Zobrazit zprávu pro příjemce">zobrazit zprávu</a>
                 {/if}                 
