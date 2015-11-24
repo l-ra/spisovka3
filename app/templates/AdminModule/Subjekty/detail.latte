@@ -12,40 +12,40 @@
         <div class="detail_hlavicka">Info</div>
         <dl>
             <dt>Typ subjektu:</dt>
-            <dd>{$Subjekt->type} - {=Subjekt::typ_subjektu($Subjekt->type)}&nbsp;</dd>
+            <dd>{$Subjekt->type} - {=Subjekt::typ_subjektu($Subjekt->type)}</dd>
         </dl>
 
         {if (strpos($Subjekt->type,'OVM')!==false)||(strpos($Subjekt->type,'PO')!==false)||(strpos($Subjekt->type,'PFO')!==false)  }
         <dl>
             <dt>IČ:</dt>
-            <dd>{$Subjekt->ic}&nbsp;</dd>
+            <dd>{$Subjekt->ic}</dd>
         </dl>
         <dl>
             <dt>DIČ:</dt>
-            <dd>{$Subjekt->dic}&nbsp;</dd>
+            <dd>{$Subjekt->dic}</dd>
         </dl>
         {/if}
         {if (strpos($Subjekt->type,'FO')!==false)||(strpos($Subjekt->type,'PFO')!==false)  }
         <dl>
             <dt>Rodné jméno:</dt>
-            <dd>{$Subjekt->rodne_jmeno}&nbsp;</dd>
+            <dd>{$Subjekt->rodne_jmeno}</dd>
         </dl>
 
         <dl>
             <dt>Datum narození:</dt>
-            <dd>{$Subjekt->datum_narozeni|edate}&nbsp;</dd>
+            <dd>{$Subjekt->datum_narozeni|edate}</dd>
         </dl>
         <dl>
             <dt>Místo narození:</dt>
-            <dd>{$Subjekt->misto_narozeni}&nbsp;</dd>
+            <dd>{$Subjekt->misto_narozeni}</dd>
         </dl>
         <dl>
             <dt>Okres narození:</dt>
-            <dd>{$Subjekt->okres_narozeni}&nbsp;</dd>
+            <dd>{$Subjekt->okres_narozeni}</dd>
         </dl>
         <dl>
             <dt>Stát narození:</dt>
-            <dd>{$Subjekt->stat_narozeni} - {=Subjekt::stat($Subjekt->stat_narozeni,10)}&nbsp;</dd>
+            <dd>{$Subjekt->stat_narozeni} - {=Subjekt::stat($Subjekt->stat_narozeni,10)}</dd>
         </dl>
         {/if}
     </div>
@@ -53,7 +53,7 @@
         <div class="detail_hlavicka">Kontakt</div>
         <dl>
             <dt>Subjekt:</dt>
-            <dd>{=Subjekt::displayName($Subjekt,'jmeno')}&nbsp;</dd><br />
+            <dd>{=Subjekt::displayName($Subjekt,'jmeno')}</dd><br />
             <dt>Adresa:</dt>
             <dd>{!=Subjekt::displayName($Subjekt,'formalni_adresa')}</dd><br />
             <dt>Email:</dt>
@@ -68,8 +68,8 @@
         {if !empty($Subjekt->poznamka)}
         <div class="detail_hlavicka">Poznámka</div>
         <dl>
-            <dt>&nbsp;</dt>
-            <dd>{!$Subjekt->poznamka|enl2br}&nbsp;</dd>
+            <dt></dt>
+            <dd>{!$Subjekt->poznamka|escape|nl2br}</dd>
         </dl>
         {/if}
         <a href="{link :Admin:Subjekty:detail, 'id'=>$Subjekt->id, 'upravit'=>'info'}">Upravit</a>
@@ -80,8 +80,8 @@
         {control stavForm}
         {else}
         <dl>
-            <dt>&nbsp;</dt>
-            <dd>{=Subjekt::stav($Subjekt->stav)}&nbsp;</dd>
+            <dt></dt>
+            <dd>{=Subjekt::stav($Subjekt->stav)}</dd>
         </dl>
         <a href="{link :Admin:Subjekty:detail, 'id'=>$Subjekt->id, 'upravit'=>'stav'}">Změnit stav</a>
         {/if}

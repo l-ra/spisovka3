@@ -12,7 +12,7 @@
   <body>
 {/if}
 <div>
-{!$dokument->zprava|enl2br}
+{!$dokument->zprava|escape|nl2br}
 </div>
 {if $isPrint}
   </body>

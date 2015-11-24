@@ -59,9 +59,9 @@
 	{$dok->typ_dokumentu->smer == 1 ? 'V' : 'P'}
 {elseif $sl=='poznamka_predani'}
 	{if !empty($dok->predano->poznamka)}
-	{!$dok->predano->poznamka|enl2br}
+	{!$dok->predano->poznamka|escape|nl2br}
 	{else}
-	{!$dok->prideleno->poznamka|enl2br}
+	{!$dok->prideleno->poznamka|escape|nl2br}
 	{/if}
 {else}
 {$dok->$sl}{/if}</td>

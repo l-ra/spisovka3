@@ -88,7 +88,7 @@
         </dl>
         <dl>
             <dt>Popis:</dt>
-            <dd>{!$Dok->popis|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->popis|escape|nl2br}&nbsp;</dd>
         </dl>
         <dl>
             <dt>Datum doručení/vzniku:</dt>
@@ -207,7 +207,7 @@
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}&nbsp;</dd>
         </dl>        
         <div>
             {$vyrizovaniForm['upravit']->control}
@@ -252,11 +252,11 @@
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
-            <dd>{!$Dok->ulozeni_dokumentu|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}&nbsp;</dd>
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}&nbsp;</dd>
         </dl>
         {/if}
         </div>
@@ -324,7 +324,7 @@
         </dl>
         <dl>
             <dt>Důvod zapůjčení:</dt>
-            <dd>{!$Zapujcka->duvod|enl2br}&nbsp;</dd>
+            <dd>{!$Zapujcka->duvod|escape|nl2br}&nbsp;</dd>
         </dl>
         <dl>
             <dt>Datum výpůjčky:</dt>
@@ -369,7 +369,7 @@
                     MD5 hash: {$file->md5_hash}
                 </span>
                 </div>
-                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
             </td>
             <td class="user">
                 nahráno {$file->date_created|edate}

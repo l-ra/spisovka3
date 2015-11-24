@@ -29,33 +29,33 @@
         <div class="detail_hlavicka">Info</div>
         <dl>
             <dt>Typ spisu:</dt>
-            <dd>{=Spis::typSpisu($Spis->typ)}&nbsp;</dd>
+            <dd>{=Spis::typSpisu($Spis->typ)}</dd>
         </dl>
 
         <dl>
             <dt>Název:</dt>
-            <dd>{$Spis->nazev}&nbsp;</dd>
+            <dd>{$Spis->nazev}</dd>
         </dl>
         <dl>
             <dt>Popis:</dt>
-            <dd>{!$Spis->popis|enl2br}&nbsp;</dd>
+            <dd>{!$Spis->popis|escape|nl2br}</dd>
         </dl>
 
         <dl>
             <dt>Spisový znak:</dt>
-            <dd>{$SpisZnak_nazev}&nbsp;</dd>
+            <dd>{$SpisZnak_nazev}</dd>
         </dl>
         <dl>
             <dt>Skartační znak:</dt>
-            <dd>{$Spis->skartacni_znak}&nbsp;</dd>
+            <dd>{$Spis->skartacni_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační lhůta:</dt>
-            <dd>{$Spis->skartacni_lhuta}&nbsp;</dd>
+            <dd>{$Spis->skartacni_lhuta}</dd>
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd>
         </dl>
         <dl>
             <dt>Stav:</dt>

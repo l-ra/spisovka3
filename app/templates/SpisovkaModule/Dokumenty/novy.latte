@@ -197,7 +197,7 @@
                     MD5 hash: {$file->md5_hash}
                 </span>
                 </div>
-                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
                 <div class="vyber">
                     <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return odebratPrilohu(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
                     <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;

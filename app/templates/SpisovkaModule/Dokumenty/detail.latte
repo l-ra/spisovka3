@@ -233,7 +233,7 @@
         </dl>
         <dl>
             <dt>Popis:</dt>
-            <dd>{!$Dok->popis|enl2br}</dd>
+            <dd>{!$Dok->popis|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Datum doručení/vzniku:</dt>
@@ -410,11 +410,11 @@
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
-            <dd>{!$Dok->ulozeni_dokumentu|enl2br}</dd>
+            <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|enl2br}</dd>
+            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
         </dl>
         {/if}
         </div>
@@ -471,7 +471,7 @@
         </dl>
         <dl n:if="$Dok->prideleno->poznamka">
             <dt>Poznámka:</dt>
-            <dd>{!$Dok->prideleno->poznamka|enl2br}</dd>
+            <dd>{!$Dok->prideleno->poznamka|escape|nl2br}</dd>
         </dl>
         {/if}
 
@@ -496,7 +496,7 @@
         </dl>
         <dl n:if="$Dok->predano->poznamka">
             <dt>Poznámka pro příjemce:</dt>
-            <dd>{!$Dok->predano->poznamka|enl2br}</dd>
+            <dd>{!$Dok->predano->poznamka|escape|nl2br}</dd>
         </dl>
         {/if}
     </div>
@@ -512,7 +512,7 @@
         </dl>
         <dl>
             <dt>Důvod zapůjčení:</dt>
-            <dd>{!$Zapujcka->duvod|enl2br}</dd>
+            <dd>{!$Zapujcka->duvod|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Datum výpůjčky:</dt>
@@ -596,7 +596,7 @@
                     MD5 hash: {$file->md5_hash}
                 </span>
                 </div>
-                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
                 {if $AccessEdit }
                 <div class="vyber">
                     <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return odebratPrilohu(this, {!$Dok->id});">odebrat</a>

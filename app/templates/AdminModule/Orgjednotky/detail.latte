@@ -13,24 +13,24 @@
         {else}
         <dl>
             <dt>Zkrácený název:</dt>
-            <dd>{$OrgJednotka->zkraceny_nazev}&nbsp;</dd>
+            <dd>{$OrgJednotka->zkraceny_nazev}</dd>
         </dl>
         <dl>
             <dt>Plný název:</dt>
-            <dd>{$OrgJednotka->plny_nazev}&nbsp;</dd>
+            <dd>{$OrgJednotka->plny_nazev}</dd>
         </dl>
         <dl>
             <dt>Zkratka / číselná řada:</dt>
-            <dd>{$OrgJednotka->ciselna_rada}&nbsp;</dd>
+            <dd>{$OrgJednotka->ciselna_rada}</dd>
         </dl>
 
         <dl>
             <dt>Informace:</dt>
-            <dd>{!$OrgJednotka->note|enl2br}&nbsp;</dd>
+            <dd>{!$OrgJednotka->note|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Stav:</dt>
-            <dd>{if $OrgJednotka->stav!=1}neaktivní{else}aktivní{/if}&nbsp;</dd>
+            <dd>{if $OrgJednotka->stav!=1}neaktivní{else}aktivní{/if}</dd>
         </dl>
         <a href="{link :Admin:Orgjednotky:detail, 'id'=>$OrgJednotka->id, 'upravit'=>'info'}">Upravit</a>
         {/if}

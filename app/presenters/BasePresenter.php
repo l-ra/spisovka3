@@ -234,11 +234,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             return str_replace('.', ',', $s);
         });
 
-        $template->registerHelper('enl2br',
-                function ($string) {
-            return nl2br(htmlspecialchars($string));
-        });
-
         // Helper escapovaný nl2br + html parser
         $template->registerHelper('html2br',
                 function ($string) {

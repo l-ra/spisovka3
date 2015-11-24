@@ -175,7 +175,7 @@
                 <br />
                 <span>{$file->typ_name}, {$file->size|bytes}, {$file->mime_type}</span>
                 </div>
-                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
             </td>
             <td class="user">
                 nahráno {$file->date_created|edate}

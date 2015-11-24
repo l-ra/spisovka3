@@ -25,7 +25,7 @@
         </dl>
         <dl n:if="!empty($Dok->popis)">
             <dt>Popis:</dt>
-            <dd>{!$Dok->popis|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->popis|escape|nl2br}&nbsp;</dd>
         </dl>
         <dl>
             <dt>Typ dokumentu:</dt>
@@ -135,11 +135,11 @@
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
-            <dd>{!$Dok->ulozeni_dokumentu|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}&nbsp;</dd>
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}&nbsp;</dd>
         </dl>
         </div>
     </div>
@@ -195,7 +195,7 @@
         </dl>
         <dl n:if="$Dok->prideleno->poznamka">
             <dt>Poznámka:</dt>
-            <dd>{!$Dok->prideleno->poznamka|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->prideleno->poznamka|escape|nl2br}&nbsp;</dd>
         </dl>
         {/if}
 
@@ -220,7 +220,7 @@
         </dl>
         <dl n:if="$Dok->predano->poznamka">
             <dt>Poznámka pro příjemce:</dt>
-            <dd>{!$Dok->predano->poznamka|enl2br}&nbsp;</dd>
+            <dd>{!$Dok->predano->poznamka|escape|nl2br}&nbsp;</dd>
         </dl>
         {/if}
     </div>
@@ -236,7 +236,7 @@
         </dl>
         <dl>
             <dt>Důvod zapůjčení:</dt>
-            <dd>{!$Zapujcka->duvod|enl2br}&nbsp;</dd>
+            <dd>{!$Zapujcka->duvod|escape|nl2br}&nbsp;</dd>
         </dl>
         <dl>
             <dt>Datum výpůjčky:</dt>
@@ -324,7 +324,7 @@
                     MD5 hash: {$file->md5_hash}
                 </span>
                 </div>
-                {if !empty($file->popis)}<div class="popis">{!$file->popis|enl2br}</div>{/if}
+                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
             </td>
             <td class="user">
                 nahráno {$file->date_created|edate}
