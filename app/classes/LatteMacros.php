@@ -1,8 +1,10 @@
 <?php
 
-// Pomocna trida pro uzivatelska Latte makra
+namespace Spisovka;
 
-class MyLatteMacros
+/** Pomocna trida pro uzivatelska Latte makra
+ */
+class LatteMacros
 {
 
     public static function vlink($__param, $__link)

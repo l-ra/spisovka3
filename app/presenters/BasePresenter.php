@@ -77,8 +77,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function beforeRender()
     {
-        $this->registerLatteFilters($this->template);
-        
         /** Toto jiz k nicemu neni. Spisovka pouziva standardne Tracy.
           if (DEBUG_ENABLE && in_array('programator', $this->user->getRoles())) {
           $this->template->debugger = TRUE;
@@ -208,15 +206,15 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $latte = $template->getLatte();
 
         $set = new Nette\Latte\Macros\MacroSet($latte->getCompiler());
-        $set->addMacro('css', 'echo MyLatteMacros::CSS($publicUrl, %node.args);');
-        $set->addMacro('js', 'echo MyLatteMacros::JavaScript(%node.word, $publicUrl);');
+        $set->addMacro('css', 'echo \Spisovka\LatteMacros::CSS($publicUrl, %node.args);');
+        $set->addMacro('js', 'echo \Spisovka\LatteMacros::JavaScript(%node.word, $publicUrl);');
 
-        $set->addMacro('access', 'if (MyLatteMacros::access($userobj, %node.word)) {', '}');
-        $set->addMacro('isAllowed', 'if (MyLatteMacros::isAllowed($userobj, %node.args)) {',
+        $set->addMacro('access', 'if (\Spisovka\LatteMacros::access($userobj, %node.word)) {', '}');
+        $set->addMacro('isAllowed', 'if (\Spisovka\LatteMacros::isAllowed($userobj, %node.args)) {',
                 '}');
-        $set->addMacro('isInRole', 'if (MyLatteMacros::isInRole($userobj, %node.args)) {', '}');
+        $set->addMacro('isInRole', 'if (\Spisovka\LatteMacros::isInRole($userobj, %node.args)) {', '}');
 
-        $set->addMacro('input2', 'echo MyLatteMacros::input($form, %node.args)');
+        $set->addMacro('input2', 'echo \Spisovka\LatteMacros::input($form, %node.args)');
 
         /* Neni momentalne pouzito:
           // $set->addMacro('accessrole', '{', '}');
@@ -227,67 +225,13 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
           '<?php } ?>'; */        
     }
 
-    protected function registerLatteFilters($template)
+    protected function createTemplate($class = null)
     {
-        // Filtr pro zobrazení čísel s desetinnou čárkou
-        $template->registerHelper('decPoint',
-                function ($s) {
-            return str_replace('.', ',', $s);
-        });
+        $template = parent::createTemplate($class);
 
-        // Filtr odstraní vybrané značky, zbytek HTML projde neošetřen
-        // Použito pro zobrazení HTML e-mailu
-        $template->registerHelper('html2br',
-                function ($string) {
-            if (strpos($string, "&lt;") !== false) {
-                $string = html_entity_decode($string);
-            }
-
-            $string = preg_replace('#<body.*?>#i', "", $string);
-            $string = preg_replace('#<\!doctype.*?>#i', "", $string);
-            $string = preg_replace('#</body.*?>#i', "", $string);
-            $string = preg_replace('#<html.*?>#i', "", $string);
-            $string = preg_replace('#<script.*?>.*?</script>#is', "[javascript blokováno!]",
-                    $string);
-            $string = preg_replace('#<head.*?>.*?</head>#is', "", $string);
-            $string = preg_replace('#<iframe.*?>#i', "[iframe blokováno!]", $string);
-            $string = preg_replace('#</iframe>#i', "", $string);
-            $string = preg_replace('#src=".*?"#i', "[externí zdroj blokováno!]", $string);
-
-            return nl2br($string);
-        });
-
-        // Filtr pro vlastní formátování datumu, příp. i času
-        if (!function_exists('edate')) {
-
-            function edate($string, $format = null)
-            {
-                if (empty($string))
-                    return "";
-                if ($string == "0000-00-00 00:00:00")
-                    return "";
-                if ($string == "0000-00-00")
-                    return "";
-                if (is_numeric($string)) {
-                    return date($format == null ? 'j.n.Y' : $format, $string);
-                }
-                try {
-                    $datetime = new DateTime($string);
-                } catch (Exception $e) {
-                    // datum je neplatné (možná $string vůbec není datum), tak vrať argument
-                    $e->getMessage();
-                    return $string;
-                }
-
-                return $datetime->format($format == null ? 'j.n.Y' : $format);
-            }
-        }
-        $template->registerHelper('edate', 'edate');
-
-        $template->registerHelper('edatetime',
-                function ($string) {
-            return edate($string, 'j.n.Y G:i:s');
-        });
+        \Spisovka\LatteFilters::register($template);        
+        
+        return $template;
     }
     
     /**
