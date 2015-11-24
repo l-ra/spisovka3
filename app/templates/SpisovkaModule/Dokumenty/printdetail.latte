@@ -53,7 +53,7 @@
         </dl>
         <dl>
             <dt>Počet listů / příloh / typ přílohy:</dt>
-            <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd>
+            <dd>{$Dok->pocet_listu} / {$Dok->pocet_priloh} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd>
         </dl>
         <dl>
             <dt>Lhůta k vyřízení:</dt>
@@ -131,7 +131,7 @@
         {/if}
         <dl>
             <dt>Počet listů / příloh / typ příloh:</dt>
-            <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num} {if !empty($Dok->vyrizeni_typ_prilohy)}/ {$Dok->vyrizeni_typ_prilohy}{/if}</dd>
+            <dd>{$Dok->vyrizeni_pocet_listu} / {$Dok->vyrizeni_pocet_priloh} {if !empty($Dok->vyrizeni_typ_prilohy)}/ {$Dok->vyrizeni_typ_prilohy}{/if}</dd>
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>

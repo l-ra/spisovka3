@@ -229,12 +229,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function registerLatteFilters($template)
     {
+        // Filtr pro zobrazení čísel s desetinnou čárkou
         $template->registerHelper('decPoint',
                 function ($s) {
             return str_replace('.', ',', $s);
         });
 
-        // Helper escapovaný nl2br + html parser
+        // Filtr odstraní vybrané značky, zbytek HTML projde neošetřen
+        // Použito pro zobrazení HTML e-mailu
         $template->registerHelper('html2br',
                 function ($string) {
             if (strpos($string, "&lt;") !== false) {
@@ -255,7 +257,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             return nl2br($string);
         });
 
-        // Helper vlastni datovy format
+        // Filtr pro vlastní formátování datumu, příp. i času
         if (!function_exists('edate')) {
 
             function edate($string, $format = null)
@@ -285,23 +287,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $template->registerHelper('edatetime',
                 function ($string) {
             return edate($string, 'j.n.Y G:i:s');
-        });
-
-        $template->registerHelper('eyear',
-                function ($string) {
-            if (empty($string))
-                return "";
-            if ($string == "0000-00-00 00:00:00")
-                return "";
-            if (is_numeric($string) && $string > 1800 && $string < 2200)
-                return $string;
-            $datetime = new DateTime($string);
-            return $datetime->format('Y');
-        });
-
-        $template->registerHelper('num',
-                function ($string) {
-            return (int) $string;
         });
     }
     

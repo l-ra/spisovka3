@@ -120,7 +120,7 @@
         {/if}
         <dl>
             <dt>Počet listů / příloh:</dt>
-            <dd>{!$Dok->pocet_listu|num} / {!$Dok->pocet_priloh|num}</dd>
+            <dd>{$Dok->pocet_listu} / {$Dok->pocet_priloh}</dd>
         </dl>
         {if !empty($Dok->identifikator)}
         <dl>
@@ -199,7 +199,7 @@
         {/if}
         <dl>
             <dt>Počet listů / příloh:</dt>
-            <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num}</dd>
+            <dd>{$Dok->vyrizeni_pocet_listu} / {$Dok->vyrizeni_pocet_priloh}</dd>
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
@@ -248,7 +248,7 @@
         {/if}
         <dl>
             <dt>Počet listů / příloh:</dt>
-            <dd>{!$Dok->vyrizeni_pocet_listu|num} / {!$Dok->vyrizeni_pocet_priloh|num}</dd>
+            <dd>{$Dok->vyrizeni_pocet_listu} / {$Dok->vyrizeni_pocet_priloh}</dd>
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
