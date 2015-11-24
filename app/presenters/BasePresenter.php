@@ -4,11 +4,11 @@ use Nette\Forms\Form;
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
+
     /** hack for automated application testing
      *  avoids sending Content-Type header
-     */     
+     */
     static public $testMode = false;
-    
     protected $storage;
 
     public function injectStorage(Storage_Basic $storage)
@@ -53,7 +53,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             }
         }
 
-        parent::startup();        
+        parent::startup();
     }
 
     protected function isUserAllowed()
@@ -64,124 +64,21 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected function afterRender()
     {
         $this->template->view = $this->view;
-        
+
         $request = $this->getHttpRequest();
         $accept = $request->getHeader('Accept', '');
         $xhtml_browser = strpos($accept, 'application/xhtml+xml') !== false;
         $response = $this->getHttpResponse();
         $enable_xhtml = Settings::get('xhtml', true);
-        
+
         if ($enable_xhtml && $xhtml_browser && !$this->isAjax() && !self::$testMode)
-            $response->setContentType('application/xhtml+xml', 'utf-8');                
+            $response->setContentType('application/xhtml+xml', 'utf-8');
     }
-    
+
     protected function beforeRender()
     {
-        $this->template->registerHelper('decPoint', function ($s) {
-            return str_replace('.', ',', $s);
-        });
+        $this->registerLatteFilters($this->template);
         
-        // Helper escapovaný nl2br
-        if (!function_exists('enl2br')) {
-
-            function enl2br($string)
-            {
-                return nl2br(htmlspecialchars($string));
-            }
-
-        }
-        $this->template->registerHelper('enl2br', 'enl2br');
-        
-        // Helper escapovaný nl2br + html parser
-        if (!function_exists('html2br')) {
-
-            function html2br($string)
-            {
-                if (strpos($string, "&lt;") !== false) {
-                    $string = html_entity_decode($string);
-                }
-
-                $string = preg_replace('#<body.*?>#i', "", $string);
-                $string = preg_replace('#<\!doctype.*?>#i', "", $string);
-                $string = preg_replace('#</body.*?>#i', "", $string);
-                $string = preg_replace('#<html.*?>#i', "", $string);
-                $string = preg_replace('#<script.*?>.*?</script>#is',
-                        "[javascript blokováno!]", $string);
-                $string = preg_replace('#<head.*?>.*?</head>#is', "", $string);
-                $string = preg_replace('#<iframe.*?>#i', "[iframe blokováno!]", $string);
-                $string = preg_replace('#</iframe>#i', "", $string);
-                $string = preg_replace('#src=".*?"#i', "[externí zdroj blokováno!]", $string);
-
-                return nl2br($string);
-            }
-        }
-        $this->template->registerHelper('html2br', 'html2br');
-        
-        // Helper vlastni datovy format
-        if (!function_exists('edate')) {
-
-            function edate($string, $format = null)
-            {
-                if (empty($string))
-                    return "";
-                if ($string == "0000-00-00 00:00:00")
-                    return "";
-                if ($string == "0000-00-00")
-                    return "";
-                if (is_numeric($string)) {
-                    return date($format == null ? 'j.n.Y' : $format, $string);
-                }
-                try {
-                    $datetime = new DateTime($string);
-                } catch (Exception $e) {
-                    // datum je neplatné (možná $string vůbec není datum), tak vrať argument
-                    $e->getMessage();
-                    return $string;
-                }
-
-                return $datetime->format($format == null ? 'j.n.Y' : $format);
-            }
-
-        }
-        $this->template->registerHelper('edate', 'edate');
-
-        if (!function_exists('edatetime')) {
-
-            function edatetime($string)
-            {
-                return edate($string, 'j.n.Y G:i:s');
-            }
-
-        }
-        $this->template->registerHelper('edatetime', 'edatetime');
-
-        if (!function_exists('eyear')) {
-
-            function eyear($string)
-            {
-                if (empty($string))
-                    return "";
-                if ($string == "0000-00-00 00:00:00")
-                    return "";
-                if (is_numeric($string) && $string > 1800 && $string < 2200)
-                    return $string;
-                $datetime = new DateTime($string);
-                return $datetime->format('Y');
-            }
-
-        }
-        $this->template->registerHelper('eyear', 'eyear');
-
-        if (!function_exists('num')) {
-
-            function num($string)
-            {
-                return (int) $string;
-            }
-
-        }
-        $this->template->registerHelper('num', 'num');
-
         /** Toto jiz k nicemu neni. Spisovka pouziva standardne Tracy.
           if (DEBUG_ENABLE && in_array('programator', $this->user->getRoles())) {
           $this->template->debugger = TRUE;
@@ -189,7 +86,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
           $this->template->debugger = FALSE;
           }
          */
-        
         // Nastaveni title
         if (!isset($this->template->title)) {
             $this->template->title = "";
@@ -204,7 +100,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             $this->template->module = substr($this->name, 0, $a + 0);
             $this->template->presenter_name = substr($this->name, $a + 1);
         }
-        
+
         /**
          * Nastaveni layoutu podle modulu
          */
@@ -303,8 +199,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // Nastav, aby Nette generovalo ID prvku formulare jako ve stare verzi
         Nette\Forms\Controls\BaseControl::$idMask = 'frm%s';
-        
-        $this->translateFormRules();             
+
+        $this->translateFormRules();
     }
 
     public function templatePrepareFilters($template)
@@ -328,9 +224,92 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
           $filter->handler->macros['accessrole'] =
           '<?php if ( Acl::isInRole("%%")) { ?>';
           $filter->handler->macros['/accessrole'] =
-          '<?php } ?>'; */
+          '<?php } ?>'; */        
     }
 
+    protected function registerLatteFilters($template)
+    {
+        $template->registerHelper('decPoint',
+                function ($s) {
+            return str_replace('.', ',', $s);
+        });
+
+        $template->registerHelper('enl2br',
+                function ($string) {
+            return nl2br(htmlspecialchars($string));
+        });
+
+        // Helper escapovaný nl2br + html parser
+        $template->registerHelper('html2br',
+                function ($string) {
+            if (strpos($string, "&lt;") !== false) {
+                $string = html_entity_decode($string);
+            }
+
+            $string = preg_replace('#<body.*?>#i', "", $string);
+            $string = preg_replace('#<\!doctype.*?>#i', "", $string);
+            $string = preg_replace('#</body.*?>#i', "", $string);
+            $string = preg_replace('#<html.*?>#i', "", $string);
+            $string = preg_replace('#<script.*?>.*?</script>#is', "[javascript blokováno!]",
+                    $string);
+            $string = preg_replace('#<head.*?>.*?</head>#is', "", $string);
+            $string = preg_replace('#<iframe.*?>#i', "[iframe blokováno!]", $string);
+            $string = preg_replace('#</iframe>#i', "", $string);
+            $string = preg_replace('#src=".*?"#i', "[externí zdroj blokováno!]", $string);
+
+            return nl2br($string);
+        });
+
+        // Helper vlastni datovy format
+        if (!function_exists('edate')) {
+
+            function edate($string, $format = null)
+            {
+                if (empty($string))
+                    return "";
+                if ($string == "0000-00-00 00:00:00")
+                    return "";
+                if ($string == "0000-00-00")
+                    return "";
+                if (is_numeric($string)) {
+                    return date($format == null ? 'j.n.Y' : $format, $string);
+                }
+                try {
+                    $datetime = new DateTime($string);
+                } catch (Exception $e) {
+                    // datum je neplatné (možná $string vůbec není datum), tak vrať argument
+                    $e->getMessage();
+                    return $string;
+                }
+
+                return $datetime->format($format == null ? 'j.n.Y' : $format);
+            }
+        }
+        $template->registerHelper('edate', 'edate');
+
+        $template->registerHelper('edatetime',
+                function ($string) {
+            return edate($string, 'j.n.Y G:i:s');
+        });
+
+        $template->registerHelper('eyear',
+                function ($string) {
+            if (empty($string))
+                return "";
+            if ($string == "0000-00-00 00:00:00")
+                return "";
+            if (is_numeric($string) && $string > 1800 && $string < 2200)
+                return $string;
+            $datetime = new DateTime($string);
+            return $datetime->format('Y');
+        });
+
+        $template->registerHelper('num',
+                function ($string) {
+            return (int) $string;
+        });
+    }
+    
     /**
      * Formats view template file names.
      * @return array
@@ -352,8 +331,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $messages = [
             Form::EMAIL => 'Zadejte prosím platnou e-mailovou adresu.'
         ];
-        
+
         foreach ($messages as $id => $message)
             \Nette\Forms\Rules::$defaultMessages[$id] = $message;
     }
+
 }
