@@ -13,15 +13,15 @@
         {else}
         <dl>
             <dt>email:</dt>
-            <dd>{$Osoba->email}&nbsp;</dd>
+            <dd>{$Osoba->email}</dd>
         </dl>
         <dl>
             <dt>telefon:</dt>
-            <dd>{$Osoba->telefon}&nbsp;</dd>
+            <dd>{$Osoba->telefon}</dd>
         </dl>
         <dl>
             <dt>funkce:</dt>
-            <dd>{$Osoba->pozice}&nbsp;</dd>
+            <dd>{$Osoba->pozice}</dd>
         </dl>
         <a href="{link this, 'id'=>$Osoba->id, 'upravit'=>'info'}">Upravit</a>
         {/if}
@@ -46,7 +46,7 @@
         {foreach $Accounts as $u}
         <dl>
             <dt>Uživatelské jméno:</dt>
-            <dd>{$u->username}&nbsp;</dd>
+            <dd>{$u->username}</dd>
         </dl>
         {if ($ZmenaHesla === $u->id)}
         {control changePasswordForm}
@@ -56,12 +56,12 @@
         {elseif $remote_auth_supported}
         <dl>
             <dt>Ověření hesla:</dt>
-            <dd>{$u->external_auth ? 'externí' : 'lokální'}&nbsp;</dd>
+            <dd>{$u->external_auth ? 'externí' : 'lokální'}</dd>
         </dl>
         {/if}
         <dl>
             <dt>Poslední přihlášení:</dt>
-            <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}&nbsp;</dd>
+            <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}</dd>
         </dl>
         
         {if ($FormUpravit == 'org' && $UpravitUserId == $u->id)}
@@ -69,7 +69,7 @@
         {else}
         <dl>
             <dt>Organizační jednotka:</dt>
-            <dd>{$u->org_nazev}&nbsp;</dd>
+            <dd>{$u->org_nazev}</dd>
         </dl>
         {/if}
         
@@ -108,7 +108,7 @@
             </dd>
         </dl>
         <dl>
-            <dt>&nbsp;</dt>
+            <dt></dt>
             <dd>
                 {if $u->external_auth != 1}
                 <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'heslo'}">Změnit {if $remote_auth_supported}lokální {/if}heslo</a>
@@ -132,7 +132,7 @@
         {/foreach}
         {else}
         <dl>
-            <dt>&nbsp;</dt>
+            <dt></dt>
             <dd>Zaměstnanec nemá uživatelský účet</dd>
         </dl>
         <br />

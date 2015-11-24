@@ -16,27 +16,27 @@
 
         <dl>
             <dt>Spisový znak:</dt>
-            <dd>{$SpisZnak->nazev}&nbsp;</dd>
+            <dd>{$SpisZnak->nazev}</dd>
         </dl>
         <dl>
             <dt>Popis:</dt>
-            <dd>{$SpisZnak->popis}&nbsp;</dd>
+            <dd>{$SpisZnak->popis}</dd>
         </dl>
         <dl>
             <dt>Skartační znak:</dt>
-            <dd>{$SpisZnak->skartacni_znak}&nbsp;</dd>
+            <dd>{$SpisZnak->skartacni_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační lhůta:</dt>
-            <dd>{$SpisZnak->skartacni_lhuta}&nbsp;</dd>
+            <dd>{$SpisZnak->skartacni_lhuta}</dd>
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($SpisZnak->spousteci_udalost_id,10)}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($SpisZnak->spousteci_udalost_id,10)}</dd>
         </dl>
         <dl>
             <dt>Stav:</dt>
-            <dd>{=SpisovyZnak::stav($SpisZnak->stav)}&nbsp;</dd>
+            <dd>{=SpisovyZnak::stav($SpisZnak->stav)}</dd>
         </dl>
         <a href="{link :Admin:Spisznak:detail, 'id'=>$SpisZnak->id, 'upravit'=>'info'}">Upravit</a>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

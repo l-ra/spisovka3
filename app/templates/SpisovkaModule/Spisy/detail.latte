@@ -53,36 +53,36 @@
         <div class="detail_hlavicka">Informace o spisu</div>
         <dl>
             <dt>Název spisu:</dt>
-            <dd>{$Spis->nazev}&nbsp;</dd>
+            <dd>{$Spis->nazev}</dd>
         </dl>
         <dl>
             <dt>Popis:</dt>
-            <dd>{$Spis->popis}&nbsp;</dd>
+            <dd>{$Spis->popis}</dd>
         </dl>
         <dl>
             <dt>Spisový znak:</dt>
-            <dd>{$SpisZnak_nazev}&nbsp;</dd>
+            <dd>{$SpisZnak_nazev}</dd>
         </dl>
         <dl>
             <dt>Skartační znak:</dt>
-            <dd>{$Spis->skartacni_znak}&nbsp;</dd>
+            <dd>{$Spis->skartacni_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační lhůta:</dt>
-            <dd>{$Spis->skartacni_lhuta}&nbsp;</dd>
+            <dd>{$Spis->skartacni_lhuta}</dd>
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd>
         </dl>
         <dl>
             <dt>Přidělen organizační jednotce:</dt>
-            <dd>{if !empty($Spis->orgjednotka_prideleno)}{$Spis->orgjednotka_prideleno->zkraceny_nazev}{else}(není přidělen k žádné organizační jednotce){/if}&nbsp;</dd>
+            <dd>{if !empty($Spis->orgjednotka_prideleno)}{$Spis->orgjednotka_prideleno->zkraceny_nazev}{else}(není přidělen k žádné organizační jednotce){/if}</dd>
         </dl>  
         {if !empty($Spis->orgjednotka_predano)}
         <dl>
             <dt>Předán organizační jednotce:</dt>
-            <dd>{$Spis->orgjednotka_predano->zkraceny_nazev}&nbsp;</dd>
+            <dd>{$Spis->orgjednotka_predano->zkraceny_nazev}</dd>
         </dl> 
         {/if}
         <dl>

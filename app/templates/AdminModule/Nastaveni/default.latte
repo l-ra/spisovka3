@@ -10,11 +10,11 @@
         {else}
         <dl>
             <dt>Název:</dt>
-            <dd>{$Urad->nazev}&nbsp;</dd><br />
+            <dd>{$Urad->nazev}</dd><br />
             <dt>Plný název:</dt>
-            <dd>{$Urad->plny_nazev}&nbsp;</dd><br />
+            <dd>{$Urad->plny_nazev}</dd><br />
             <dt>Zkratka:</dt>
-            <dd>{$Urad->zkratka}&nbsp;</dd><br />
+            <dd>{$Urad->zkratka}</dd><br />
             <dt>Adresa:</dt>
             <dd>
                 {$Urad->adresa->ulice}&nbsp;<br />
@@ -22,11 +22,11 @@
                 {$Urad->adresa->stat}&nbsp;<br />
             </dd><br />
             <dt>Telefon:</dt>
-            <dd>{$Urad->kontakt->telefon}&nbsp;</dd><br />
+            <dd>{$Urad->kontakt->telefon}</dd><br />
             <dt>Email:</dt>
-            <dd>{$Urad->kontakt->email}&nbsp;</dd><br />
+            <dd>{$Urad->kontakt->email}</dd><br />
             <dt>URL:</dt>
-            <dd>{$Urad->kontakt->www}&nbsp;</dd>
+            <dd>{$Urad->kontakt->www}</dd>
         </dl>
 
         {access :Admin:Nastaveni:}<a href="{link this, 'upravit'=>'info'}">Upravit</a>{/access}
@@ -41,17 +41,17 @@
         {else}
             <dl>    
             <dt>Maska čísla jednacího:</dt>
-            <dd>{$CisloJednaci->maska}&nbsp;</dd><br />
+            <dd>{$CisloJednaci->maska}</dd><br />
             {if $CisloJednaci->typ_evidence == 'sberny_arch'}
             <dt>Znak oddělovače pořadového čísla:</dt>
-            <dd>{if isset($CisloJednaci->oddelovac)}{$CisloJednaci->oddelovac}{else}/{/if}&nbsp;</dd><br />
+            <dd>{if isset($CisloJednaci->oddelovac)}{$CisloJednaci->oddelovac}{else}/{/if}</dd><br />
             {/if}
             <dt>Ukázka podoby:</dt>
-            <dd>{$Ukazka->cislo_jednaci}{if $CisloJednaci->typ_evidence == 'sberny_arch'}{$CisloJednaci->oddelovac}1{/if}&nbsp;</dd><br />
+            <dd>{$Ukazka->cislo_jednaci}{if $CisloJednaci->typ_evidence == 'sberny_arch'}{$CisloJednaci->oddelovac}1{/if}</dd><br />
             <dt>Typ evidence:</dt>
-            <dd>{if $CisloJednaci->typ_evidence == 'sberny_arch'}sběrný arch{else}{$CisloJednaci->typ_evidence}{/if}&nbsp;</dd><br />
+            <dd>{if $CisloJednaci->typ_evidence == 'sberny_arch'}sběrný arch{else}{$CisloJednaci->typ_evidence}{/if}</dd><br />
             <dt>Podací deník:</dt>
-            <dd>{if $CisloJednaci->typ_deniku == 'org'}samostatný pro každou organizační jednotku{else}společný pro celý úřad{/if}&nbsp;</dd>
+            <dd>{if $CisloJednaci->typ_deniku == 'org'}samostatný pro každou organizační jednotku{else}společný pro celý úřad{/if}</dd>
         </dl>        
         {access :Admin:Nastaveni:}<a href="{link this, 'upravit'=>'cjednaci'}#cj">Upravit</a>{/access}
         {/if}
@@ -167,7 +167,7 @@
         <dl>
             <div class="detail_hlavicka">Ostatní nastavení</div>
             <dt>Počet položek v seznamu:</dt>
-            <dd>{$Nastaveni->pocet_polozek}&nbsp;</dd><br />
+            <dd>{$Nastaveni->pocet_polozek}</dd><br />
             
             {foreach $settings as $short_name => $setting}
                 <div class="detail_hlavicka" n:if="$short_name == 'automaticky_nacist_zpravy'">E-podatelna</div>
@@ -177,9 +177,9 @@
         
             <div class="detail_hlavicka">Odeslání Českou poštou</div>
             <dt>Číslo zákaznické karty:</dt>
-            <dd>{$cislo_zakaznicke_karty}&nbsp;</dd><br />
+            <dd>{$cislo_zakaznicke_karty}</dd><br />
             <dt>Způsob úhrady:</dt>
-            <dd>{$zpusob_uhrady}&nbsp;</dd>
+            <dd>{$zpusob_uhrady}</dd>
         </dl>
 
         {access :Admin:Nastaveni:}<a href="{link this, 'upravit' => 'nastaveni'}#na">Upravit</a>{/access}

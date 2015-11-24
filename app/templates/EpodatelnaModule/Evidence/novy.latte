@@ -131,11 +131,11 @@
                 <div class="info">
                 <dl>
                     <dt>email:</dt>
-                    <dd>{if !empty($Subjekt['original']->email)}{$Subjekt['original']->email}{/if}&nbsp;</dd>
+                    <dd>{if !empty($Subjekt['original']->email)}{$Subjekt['original']->email}{/if}</dd>
                 </dl>
                 <dl>
                     <dt>isds:</dt>
-                    <dd>{if !empty($Subjekt['original']->id_isds)}{$Subjekt['original']->id_isds}{/if}&nbsp;</dd>
+                    <dd>{if !empty($Subjekt['original']->id_isds)}{$Subjekt['original']->id_isds}{/if}</dd>
                 </dl>
 
                 </div>
@@ -157,7 +157,7 @@
                 </dd>
             </dl>
             <dl id="subjekt_novy">
-                <dt>&nbsp;</dt>
+                <dt></dt>
                 <dd>
                     <a href={link :Spisovka:Subjekty:novy, f => evidNovySubjektOk} id="epod_evid_novysubjekt_click" data-postdata="{json_encode($Subjekt['original'])}">Vytvořit nový subjekt z odesílatele</a>
                 </dd>

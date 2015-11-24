@@ -6,7 +6,7 @@
         {include 'detailSpojeni.latte'}
         <dl>
             <dt>JID:</dt>
-            <dd>{$Dok->jid}&nbsp;</dd>
+            <dd>{$Dok->jid}</dd>
         </dl>
         {if empty($Dok->cislo_jednaci)}
         <dl>
@@ -16,40 +16,40 @@
         {else}
         <dl>
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
-            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
+            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}</dd>
         </dl>
         {/if}
         <dl>
             <dt>Věc:</dt>
-            <dd class="velke_pismo"><u>{$Dok->nazev}</u>&nbsp;</dd>
+            <dd class="velke_pismo"><u>{$Dok->nazev}</u></dd>
         </dl>
         <dl n:if="!empty($Dok->popis)">
             <dt>Popis:</dt>
-            <dd>{!$Dok->popis|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Dok->popis|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Typ dokumentu:</dt>
-            <dd>{$Dok->typ_dokumentu->nazev}&nbsp;</dd>
+            <dd>{$Dok->typ_dokumentu->nazev}</dd>
         </dl>        
         <dl>
             <dt>Datum doručení/vzniku:</dt>
-            <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
+            <dd>{$Dok->datum_vzniku|edatetime}</dd>
         </dl>
         <dl n:if="!empty($Dok->zpusob_doruceni)">
             <dt>Způsob doručení:</dt>
-            <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
+            <dd>{$Dok->zpusob_doruceni}</dd>
         </dl>        
         <dl n:if="!empty($Dok->cislo_jednaci_odesilatele)">
             <dt>Číslo jednací odesilatele:</dt>
-            <dd>{$Dok->cislo_jednaci_odesilatele}&nbsp;</dd>
+            <dd>{$Dok->cislo_jednaci_odesilatele}</dd>
         </dl>
         <dl n:if="!empty($Dok->cislo_doporuceneho_dopisu)">
             <dt>Číslo doporučeného dopisu:</dt>
-            <dd>{$Dok->cislo_doporuceneho_dopisu}&nbsp;</dd>
+            <dd>{$Dok->cislo_doporuceneho_dopisu}</dd>
         </dl>        
         <dl n:if="!empty($Dok->poznamka)">
             <dt>Poznámka:</dt>
-            <dd>{!$Dok->poznamka|html2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka|html2br}</dd>
         </dl>
         <dl>
             <dt>Počet listů / příloh / typ přílohy:</dt>
@@ -91,7 +91,7 @@
             {else}
                 <span style="color:#990000;">{$Dok->identifikator['cert_status']}</span>
             {/if}
-            &nbsp;</dd>
+            </dd>
         </dl>
         {/if}
     </div>
@@ -101,19 +101,19 @@
         <div class="dokument_blok">
         <dl>
             <dt>Způsob vyřízení:</dt>
-            <dd>{$Dok->zpusob_vyrizeni}&nbsp;</dd>
+            <dd>{$Dok->zpusob_vyrizeni}</dd>
         </dl>
         <dl>
             <dt>Datum vyřízení:</dt>
-            <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
+            <dd>{$Dok->datum_vyrizeni|edatetime}</dd>
         </dl>
         <dl>
             <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
+            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
+            <dd>{$Dok->skartacni_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační lhůta:</dt>
@@ -121,12 +121,12 @@
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
         </dl>
         {if $Dok->stav_dokumentu>=5}
         <dl>
             <dt>Datum spouštěcí události:</dt>
-            <dd>{$Dok->datum_spousteci_udalosti|edate}&nbsp;</dd>
+            <dd>{$Dok->datum_spousteci_udalosti|edate}</dd>
         </dl>
         {/if}
         <dl>
@@ -135,11 +135,11 @@
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
-            <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
         </dl>
         </div>
     </div>
@@ -195,7 +195,7 @@
         </dl>
         <dl n:if="$Dok->prideleno->poznamka">
             <dt>Poznámka:</dt>
-            <dd>{!$Dok->prideleno->poznamka|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Dok->prideleno->poznamka|escape|nl2br}</dd>
         </dl>
         {/if}
 
@@ -220,7 +220,7 @@
         </dl>
         <dl n:if="$Dok->predano->poznamka">
             <dt>Poznámka pro příjemce:</dt>
-            <dd>{!$Dok->predano->poznamka|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Dok->predano->poznamka|escape|nl2br}</dd>
         </dl>
         {/if}
     </div>
@@ -236,7 +236,7 @@
         </dl>
         <dl>
             <dt>Důvod zapůjčení:</dt>
-            <dd>{!$Zapujcka->duvod|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Zapujcka->duvod|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Datum výpůjčky:</dt>

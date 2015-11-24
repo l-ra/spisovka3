@@ -31,14 +31,14 @@
         <div class="h2">Připojit dokument do skartačního řízení k posouzení</div>
         <dl>
             <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
+            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
+            <dd>{$Dok->skartacni_znak}</dd>
         </dl>
         <dl>
-            <dt>&nbsp;</dt>
+            <dt></dt>
             <dd>
                 <a href="{link :Spisovna:Dokumenty:keskartaci, 'id'=>$Dok->id}" id="keskartacidokument">Přidat do skartačního řízení</a>
             </dd>
@@ -51,11 +51,11 @@
         <div class="h2">Rozhodnutí o skartaci dokumentu</div>
         <dl>
             <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
+            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
+            <dd>{$Dok->skartacni_znak}</dd>
         </dl>
         <dl>
             <dt>Rozhodnutí:</dt>
@@ -76,46 +76,46 @@
         {include '../../SpisovkaModule/Dokumenty/detailSpojeni.latte'}
         <dl>
             <dt>JID:</dt>
-            <dd>{$Dok->jid}&nbsp;</dd>
+            <dd>{$Dok->jid}</dd>
         </dl>
         <dl>
             <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
-            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}&nbsp;</dd>
+            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}</dd>
         </dl>
         <dl>
             <dt>Věc:</dt>
-            <dd class="velke_pismo"><u>{$Dok->nazev}</u>&nbsp;</dd>
+            <dd class="velke_pismo"><u>{$Dok->nazev}</u></dd>
         </dl>
         <dl>
             <dt>Popis:</dt>
-            <dd>{!$Dok->popis|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Dok->popis|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Datum doručení/vzniku:</dt>
-            <dd>{$Dok->datum_vzniku|edatetime}&nbsp;</dd>
+            <dd>{$Dok->datum_vzniku|edatetime}</dd>
         </dl>
         {if !empty($Dok->zpusob_doruceni)}
         <dl>
             <dt>Způsob doručení:</dt>
-            <dd>{$Dok->zpusob_doruceni}&nbsp;</dd>
+            <dd>{$Dok->zpusob_doruceni}</dd>
         </dl>        
         {/if}        
         {if !empty($Dok->cislo_jednaci_odesilatele)}
         <dl>
             <dt>Číslo jednací odesilatele:</dt>
-            <dd>{$Dok->cislo_jednaci_odesilatele}&nbsp;</dd>
+            <dd>{$Dok->cislo_jednaci_odesilatele}</dd>
         </dl>
         {/if}
         {if !empty($Dok->cislo_doporuceneho_dopisu)}
         <dl>
             <dt>Číslo doporučeného dopisu:</dt>
-            <dd>{$Dok->cislo_doporuceneho_dopisu}&nbsp;</dd>
+            <dd>{$Dok->cislo_doporuceneho_dopisu}</dd>
         </dl>
         {/if}        
         {if !empty($Dok->poznamka)}
         <dl>
             <dt>Poznámka:</dt>
-            <dd>{!$Dok->poznamka|html2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka|html2br}</dd>
         </dl>
         {/if}
         <dl>
@@ -155,7 +155,7 @@
             {else}
                 <span style="color:#990000;">{$Dok->identifikator['cert_status']}</span>
             {/if}
-            &nbsp;</dd>
+            </dd>
         </dl>
         {/if}
 
@@ -169,11 +169,11 @@
         {$vyrizovaniForm->render('begin')}
         <dl>
             <dt>Způsob vyřízení:</dt>
-            <dd>{$Dok->zpusob_vyrizeni}&nbsp;</dd>
+            <dd>{$Dok->zpusob_vyrizeni}</dd>
         </dl>
         <dl>
             <dt>Datum vyřízení:</dt>
-            <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
+            <dd>{$Dok->datum_vyrizeni|edatetime}</dd>
         </dl>
         <dl>
             <dt>Spisový znak:</dt>
@@ -181,7 +181,7 @@
         </dl>
         <dl>
             <dt>Skartační znak:</dt>
-            <dd>{$vyrizovaniForm['skartacni_znak']->control}&nbsp;</dd>
+            <dd>{$vyrizovaniForm['skartacni_znak']->control}</dd>
         </dl>
         <dl>
             <dt>Skartační lhůta:</dt>
@@ -189,12 +189,12 @@
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
         </dl>
         {if $Dok->stav_dokumentu>=5}
         <dl>
             <dt>Datum spouštěcí události:</dt>
-            <dd>{$Dok->datum_spousteci_udalosti|edate}&nbsp;</dd>
+            <dd>{$Dok->datum_spousteci_udalosti|edate}</dd>
         </dl>
         {/if}
         <dl>
@@ -203,11 +203,11 @@
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
-            <dd>{$vyrizovaniForm['ulozeni_dokumentu']->control}&nbsp;</dd>
+            <dd>{$vyrizovaniForm['ulozeni_dokumentu']->control}</dd>
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
         </dl>        
         <div>
             {$vyrizovaniForm['upravit']->control}
@@ -218,19 +218,19 @@
         {else}        
         <dl>
             <dt>Způsob vyřízení:</dt>
-            <dd>{$Dok->zpusob_vyrizeni}&nbsp;</dd>
+            <dd>{$Dok->zpusob_vyrizeni}</dd>
         </dl>
         <dl>
             <dt>Datum vyřízení:</dt>
-            <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
+            <dd>{$Dok->datum_vyrizeni|edatetime}</dd>
         </dl>
         <dl>
             <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}&nbsp;</dd>
+            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}&nbsp;</dd>
+            <dd>{$Dok->skartacni_znak}</dd>
         </dl>
         <dl>
             <dt>Skartační lhůta:</dt>
@@ -238,12 +238,12 @@
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}&nbsp;</dd>
+            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
         </dl>
         {if $Dok->stav_dokumentu>=5}
         <dl>
             <dt>Datum spouštěcí události:</dt>
-            <dd>{$Dok->datum_spousteci_udalosti|edate}&nbsp;</dd>
+            <dd>{$Dok->datum_spousteci_udalosti|edate}</dd>
         </dl>
         {/if}
         <dl>
@@ -252,11 +252,11 @@
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
-            <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
         </dl>
         {/if}
         </div>
@@ -308,7 +308,7 @@
         </dl>
         <dl>
             <dt>Datum vyřízení:</dt>
-            <dd>{$Dok->datum_vyrizeni|edatetime}&nbsp;</dd>
+            <dd>{$Dok->datum_vyrizeni|edatetime}</dd>
         </dl>           
         {/if}
     </div>
@@ -324,7 +324,7 @@
         </dl>
         <dl>
             <dt>Důvod zapůjčení:</dt>
-            <dd>{!$Zapujcka->duvod|escape|nl2br}&nbsp;</dd>
+            <dd>{!$Zapujcka->duvod|escape|nl2br}</dd>
         </dl>
         <dl>
             <dt>Datum výpůjčky:</dt>

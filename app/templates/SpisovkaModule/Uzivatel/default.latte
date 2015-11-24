@@ -9,19 +9,19 @@
         {else}
         <dl>
             <dt>Jméno:</dt>
-            <dd>{=Osoba::displayName($Osoba)}&nbsp;</dd>
+            <dd>{=Osoba::displayName($Osoba)}</dd>
         </dl>
         <dl>
             <dt>email:</dt>
-            <dd>{$Osoba->email}&nbsp;</dd>
+            <dd>{$Osoba->email}</dd>
         </dl>
         <dl>
             <dt>telefon:</dt>
-            <dd>{$Osoba->telefon}&nbsp;</dd>
+            <dd>{$Osoba->telefon}</dd>
         </dl>
         <dl>
             <dt>funkce:</dt>
-            <dd>{$Osoba->pozice}&nbsp;</dd>
+            <dd>{$Osoba->pozice}</dd>
         </dl>
         <a href="{link this, 'upravit' => 'info'}">Upravit osobní údaje</a>
         {/if}
@@ -31,18 +31,18 @@
         <div class="detail_hlavicka">Uživatelský účet</div>
         <dl>
             <dt>Uživatelské jméno:</dt>
-            <dd>{$Uzivatel->username}&nbsp;</dd>
+            <dd>{$Uzivatel->username}</dd>
         </dl>
         {if $FormUpravit == 'heslo' && Settings::get('users_can_change_their_password', true)}
         {control auth_change_password}
         {/if}
         <dl>
             <dt>Poslední přihlášení:</dt>
-            <dd>{if $Uzivatel->last_login}{$Uzivatel->last_login|edatetime}  z  {$Uzivatel->last_ip}{/if}&nbsp;</dd>
+            <dd>{if $Uzivatel->last_login}{$Uzivatel->last_login|edatetime}  z  {$Uzivatel->last_ip}{/if}</dd>
         </dl>
         <dl>
             <dt>Organizační jednotka:</dt>
-            <dd>{$Uzivatel->org_nazev}&nbsp;</dd>
+            <dd>{$Uzivatel->org_nazev}</dd>
         </dl>
         <dl>
             <dt>Role:</dt>

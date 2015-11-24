@@ -13,15 +13,15 @@
         {else}
         <dl>
             <dt>Kódové označení role:</dt>
-            <dd>{$Role->code}&nbsp;</dd>
+            <dd>{$Role->code}</dd>
         </dl>
         <dl>
             <dt>Dědí z role:</dt>
-            <dd>{$Role->parent_name}&nbsp;</dd>
+            <dd>{$Role->parent_name}</dd>
         </dl>
         <dl>
             <dt>Popis role:</dt>
-            <dd>{!$Role->note|replace:'\n','<br />'}&nbsp;</dd>
+            <dd>{!$Role->note|replace:'\n','<br />'}</dd>
         </dl>
         <a href="{link :Admin:Opravneni:detail, 'id'=>$Role->id, 'upravit'=>'info'}">Upravit</a>
         {if $Role->fixed == 0}
