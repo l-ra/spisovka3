@@ -887,7 +887,7 @@ table.odeslat-subjekty td.odeslat-subjekty-separator {
 /* ***************************************************************** */
 /* *** Ruzne *** */
 
-#vypravna_form input[name=poznamka],
+#frm-odeslaniForm input[name=poznamka],
 tr.odes_form input.poznamka {
 
     width: 500px;

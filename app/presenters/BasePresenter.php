@@ -253,7 +253,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected function translateFormRules()
     {
         $messages = [
-            Form::EMAIL => 'Zadejte prosím platnou e-mailovou adresu.'
+            Form::EMAIL => 'Zadejte prosím platnou e-mailovou adresu.',
+            Form::INTEGER => 'Zadejte prosím celé číslo.',
+            Form::FLOAT => 'Zadejte prosím číslo.'
         ];
 
         foreach ($messages as $id => $message)

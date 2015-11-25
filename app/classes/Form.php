@@ -20,14 +20,17 @@ class Form extends Nette\Application\UI\Form
     
     public function validationFailed($form)
     {
-        $id = $form->getValues()->id;
         $presenter = $this->getPresenter();
         $presenter->flashMessage('Validace formuláře selhala.', 'warning');
         $errors = $form->getErrors();
         foreach ($errors as $error)
             $presenter->flashMessage($error, 'warning');
         
-        $presenter->redirect('this', ['id' => $id]);
+        $values = $form->getValues();
+        if (isset($values->id))
+            $presenter->redirect('this', ['id' => $values->id]);
+        else
+            $presenter->redirect('this');
     }
     
     public function addDatePicker($name, $label)

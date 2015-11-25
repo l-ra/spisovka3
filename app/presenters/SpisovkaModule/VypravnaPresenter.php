@@ -1,5 +1,7 @@
 <?php
 
+use Spisovka\Form;
+
 class Spisovka_VypravnaPresenter extends BasePresenter
 {
 
@@ -175,67 +177,24 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->setLayout(false);
     }
 
-    public function actionDetail()
+    public function actionDetail($id)
     {
-
         $DokumentOdeslani = new DokumentOdeslani();
-        $id = $this->getParameter('id');
-
-        $post_data = $this->getHttpRequest()->getPost();
-        if (isset($post_data['datum_odeslani'])) {
-            // Ulozit data
-
-            $row = array();
-            if (isset($post_data['datum_odeslani'])) {
-                $row['datum_odeslani'] = new DateTime($post_data['datum_odeslani']);
-            }
-
-            $druh_zasilky_form = @$post_data['druh_zasilky'];
-            if (count($druh_zasilky_form) > 0) {
-                $row['druh_zasilky'] = serialize(array_keys($druh_zasilky_form));
-            } else {
-                $row['druh_zasilky'] = null;
-            }
-
-            if (isset($post_data['cena_zasilky'])) {
-                $row['cena'] = floatval($post_data['cena_zasilky']);
-            }
-            if (isset($post_data['hmotnost_zasilky'])) {
-                $row['hmotnost'] = floatval($post_data['hmotnost_zasilky']);
-            }
-            if (isset($post_data['cislo_faxu'])) {
-                $row['cislo_faxu'] = $post_data['cislo_faxu'];
-            }
-            if (isset($post_data['zprava'])) {
-                $row['zprava'] = $post_data['zprava'];
-            }
-            if (isset($post_data['poznamka'])) {
-                $row['poznamka'] = $post_data['poznamka'];
-            }
-
-            try {
-                $DokumentOdeslani->update($row, array(array("id=%i", $id)));
-                echo "###provedeno###";
-                exit;
-            } catch (Exception $e) {
-                echo $e->getMessage();
-            }
-        }
 
         $odes = $DokumentOdeslani->get($id);
         if (!$odes)
             throw new Exception("Záznam o odeslání ID $id neexistuje.");
 
         $this->template->dokument = $odes;
-
-        $this->addComponent(new VyberPostovniZasilky($odes->druh_zasilky), 'druhZasilky');
-
-        $this->setLayout(false);
     }
 
+    public function renderDetail($id)
+    {
+        // $this->addComponent(new VyberPostovniZasilky($odes->druh_zasilky), 'druhZasilky');
+    }
+    
     protected function createComponentSeraditForm()
     {
-
         $select = array(
             'datum' => 'data odeslání (vzestupně)',
             'datum_desc' => 'data odeslání (sestupně)',
@@ -265,7 +224,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     public function seraditSucceeded(Nette\Application\UI\Form $form, $form_data)
     {
         UserSettings::set('vypravna_seradit', $form_data['seradit']);
-        $this->redirect(':Spisovka:Vypravna:default');
+        $this->redirect('this');
     }
 
     protected function createComponentSearchForm()
@@ -295,7 +254,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
         UserSettings::set('vypravna_hledat', $data['dotaz']);
-        $this->redirect(':Spisovka:Vypravna:' . $this->view);
+        $this->redirect('this');
     }
 
     public function actionReset()
@@ -305,7 +264,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             UserSettings::remove('vypravna_hledat');
         elseif ($what == 'filtr')
             UserSettings::remove('vypravna_filtr');
-        $this->redirect(':Spisovka:Vypravna:default');
+        $this->redirect('default');
     }
 
     public function actionFiltrovat()
@@ -322,7 +281,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 UserSettings::remove('vypravna_filtr');
             }
             // v obou pripadech prejdi na vychozi stranku vypravny
-            $this->redirect(':Spisovka:Vypravna:default');
+            $this->redirect('default');
         }
     }
 
@@ -333,4 +292,65 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->setLayout(false);
     }
 
+    protected function createComponentOdeslaniForm()
+    {
+        $dokument = $this->template->dokument;
+
+        $form = new Spisovka\Form();
+
+        $form->addDatePicker('datum_odeslani', 'Datum odeslání:')
+                ->setDefaultValue($dokument->datum_odeslani);
+
+        if ($dokument->zpusob_odeslani_id == 3) {
+            $form->addComponent(new VyberPostovniZasilky(), 'druhZasilky');
+            $form->addText('cena', 'Cena:', 10)
+                    ->setDefaultValue($dokument->cena)
+                    ->setOption('description', 'Kč')
+                    ->addRule(Form::INTEGER);
+            $form->addText('hmotnost', 'Hmotnost:', 10)
+                    ->setDefaultValue($dokument->hmotnost)
+                    ->setOption('description', 'kg')
+                    ->addRule(Form::FLOAT);
+            $form->addText('poznamka', 'Poznámka:')
+                    ->setDefaultValue($dokument->poznamka);
+            
+        } else if ($dokument->zpusob_odeslani_id == 4) {
+            $form->addText('cislo_faxu', 'Číslo faxu:', 20)
+                    ->setDefaultValue($dokument->cislo_faxu);
+            $form->addTextArea('zprava', 'Zpráva pro příjemce:', 80, 5)
+                    ->setDefaultValue($dokument->zprava);
+        }
+
+        $form->addSubmit('vypravna_upravit', 'Uložit')
+                ->onClick[] = array($this, 'ulozitClicked');
+        $form->addSubmit('vypravna_storno', 'Zrušit')
+                ->setValidationScope(false)
+                ->onClick[] = array($this, 'stornoClicked');
+                
+        return $form;
+    }
+
+    public function stornoClicked()
+    {
+        $this->redirect('default');
+    }
+
+    public function ulozitClicked(Nette\Forms\Controls\SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+        $id = $this->getParameter('id');
+
+        /*   $druh_zasilky_form = @$post_data['druh_zasilky'];
+            if (count($druh_zasilky_form) > 0) {
+                $row['druh_zasilky'] = serialize(array_keys($druh_zasilky_form));
+            } else {
+                $row['druh_zasilky'] = null;
+            } */
+        
+        $DokumentOdeslani = new DokumentOdeslani();
+        $DokumentOdeslani->update($data, [["id=%i", $id]]);
+
+        $this->flashMessage('Záznam byl úspěšně upraven.');
+        $this->redirect('default');        
+    }
 }

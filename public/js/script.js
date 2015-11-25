@@ -695,23 +695,6 @@ zobrazFax = function (elm) {
     return dialog(elm,'Zobrazit zprávu faxu');
 };
 
-vypravnaDetail = function (elm) {
-    return dialog(elm,'Detail záznamu');
-};
-vypravnaSubmit = function () {
-    postFormJ($("#vypravna_form"), function(text) {
-        if ( text.indexOf('###provedeno###') != -1 ) {
-            closeDialog();
-            alert('Záznam byl úspěšně upraven.');
-            window.location.reload();
-        } else {
-            $('#dialog').html(text);
-            dialogScrollUp();
-        }        
-    });
-    return false;
-};
-
 function renderVysledekHledaniDokumentu(data,typ) {
 
     var html = "<table class='seznam' border='1'>";

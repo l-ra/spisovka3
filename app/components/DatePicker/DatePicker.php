@@ -7,8 +7,6 @@
  *             Pavel Laštovička - upraveno pro spisovku
  * @copyright  Copyright (c) 2009
  * @license    New BSD License
- * @example    http://nettephp.com/extras/datepicker
- * @package    Nette\Extras\DatePicker
  */
 class DatePicker extends Nette\Forms\Controls\TextInput
 {
@@ -39,14 +37,9 @@ class DatePicker extends Nette\Forms\Controls\TextInput
                 $tmp = new DateTime($this->value);
                 return $tmp->format('Y-m-d');
             } catch (Exception $e) {
-                Nette\Environment::getApplication()->getPresenter()->flashMessage('Formát data "' . strip_tags($this->getLabel()) . '" je neplatný!',
-                        'error');
-                return null;
+                $e->getMessage();
+                throw new Exception("Neplatné datum: {$this->value}");
             }
-
-            //$tmp = explode('.', $tmp);
-            // database format Y-m-d
-            //return $tmp[2] . '-' . $tmp[1] . '-' . $tmp[0];
         }
 
         return $this->value;
@@ -59,9 +52,13 @@ class DatePicker extends Nette\Forms\Controls\TextInput
      */
     public function setValue($value)
     {
-        // [P.L.] Použij formátování datumu spisovky
-        // $value = preg_replace('~([0-9]{4})-([0-9]{2})-([0-9]{2})~', '$3.$2.$1', $value);
-        $value = \Spisovka\LatteFilters::edate($value);
+        try {
+            $datetime = new DateTime($value);
+        } catch (Exception $e) {
+            $e->getMessage();
+            throw new Exception("Neplatné datum: $value");
+        }
+        $value = $datetime->format('j.n.Y');
         parent::setValue($value);
 
         return $this;

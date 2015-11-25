@@ -63,7 +63,7 @@
                 <div class="small">&nbsp;{$dok->dok_jid}</div>
             </td>
             <td class="vec">
-                <strong><a href="{link :Spisovka:Vypravna:detail, 'id'=>$dok->dokodes_id}" title="Zobrazit detail záznamu" onclick="return vypravnaDetail(this);">{=Subjekt::displayName($dok,'jmeno_item')}</a></strong>
+                <strong><a href="{link :Spisovka:Vypravna:detail, 'id'=>$dok->dokodes_id}" title="Zobrazit detail záznamu">{=Subjekt::displayName($dok,'jmeno_item')}</a></strong>
                 <div class="mezera">
                 {if $dok->zpusob_odeslani_id == 1 }    
                 {=Subjekt::displayName($dok,'email')}

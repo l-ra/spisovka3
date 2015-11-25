@@ -63,7 +63,7 @@ class LatteFilters
         }
         try {
             $datetime = new \DateTime($string);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // datum je neplatné (možná $string vůbec není datum), tak vrať argument
             $e->getMessage();
             return $string;
