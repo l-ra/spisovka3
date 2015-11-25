@@ -401,7 +401,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $unixtime = strtotime(@$zprava->doruceno_dne);
         $datum = date('d.m.Y', $unixtime);
         $cas = date('H:i:s', $unixtime);
-        $form->addDatePicker('datum_vzniku', 'Datum doručení:', 10)
+        $form->addDatePicker('datum_vzniku', 'Datum doručení:')
                 ->setValue($datum);
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
                 ->setValue($cas);

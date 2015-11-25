@@ -600,17 +600,17 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
         $unixtime = strtotime(@$spis->datum_otevreni);
         if ($unixtime == 0) {
-            $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10);
+            $form1->addDatePicker('datum_otevreni', 'Datum otevření:');
         } else {
-            $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10)
+            $form1->addDatePicker('datum_otevreni', 'Datum otevření:')
                     ->setValue(date('d.m.Y', $unixtime));
         }
 
         $unixtime = strtotime(@$spis->datum_uzavreni);
         if ($unixtime == 0) {
-            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10);
+            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:');
         } else {
-            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10)
+            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:')
                     ->setValue(date('d.m.Y', $unixtime));
         }
 
@@ -660,9 +660,9 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
-        $form1->addDatePicker('datum_otevreni', 'Datum otevření:', 10)
+        $form1->addDatePicker('datum_otevreni', 'Datum otevření:')
                 ->setValue(date('d.m.Y'));
-        $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:', 10);
+        $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:');
 
         $form1->addSubmit('vytvorit', 'Vytvořit')
                 ->onClick[] = array($this, 'vytvoritClicked');

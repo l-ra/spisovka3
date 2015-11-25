@@ -180,11 +180,11 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 ->setValue(@$hledat['cislo_doporuceneho_dopisu']);
         $form->addCheckbox('cislo_doporuceneho_dopisu_pouze', 'Pouze doporučené dopisy')
                 ->setValue((@$hledat['cislo_doporuceneho_dopisu_pouze']) ? 1 : 0);
-        $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):', 10)
+        $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):')
                 ->setValue(@$hledat['datum_vzniku_od']);
         $form->addText('datum_vzniku_cas_od', 'Čas doručení (od):', 10, 15)
                 ->setValue(@$hledat['datum_vzniku_cas_od']);
-        $form->addDatePicker('datum_vzniku_do', 'Datum doručení/vzniku do:', 10)
+        $form->addDatePicker('datum_vzniku_do', 'Datum doručení/vzniku do:')
                 ->setValue(@$hledat['datum_vzniku_do']);
         $form->addText('datum_vzniku_cas_do', 'Čas doručení do:', 10, 15)
                 ->setValue(@$hledat['datum_vzniku_cas_do']);
@@ -203,22 +203,22 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
         $form->addSelect('zpusob_vyrizeni', 'Způsob vyřízení:', $zpusob_vyrizeni)
                 ->setValue(@$hledat['zpusob_vyrizeni']);
-        $form->addDatePicker('datum_vyrizeni_od', 'Datum vyřízení od:', 10)
+        $form->addDatePicker('datum_vyrizeni_od', 'Datum vyřízení od:')
                 ->setValue(@$hledat['datum_vyrizeni_od']);
         $form->addText('datum_vyrizeni_cas_od', 'Čas vyřízení od:', 10, 15)
                 ->setValue(@$hledat['datum_vyrizeni_cas_od']);
-        $form->addDatePicker('datum_vyrizeni_do', 'Datum vyřízení do:', 10)
+        $form->addDatePicker('datum_vyrizeni_do', 'Datum vyřízení do:')
                 ->setValue(@$hledat['datum_vyrizeni_do']);
         $form->addText('datum_vyrizeni_cas_do', 'Čas vyřízení do:', 10, 15)
                 ->setValue(@$hledat['datum_vyrizeni_cas_do']);
 
         $form->addSelect('zpusob_odeslani', 'Způsob odeslání:', $zpusob_odeslani)
                 ->setValue(@$hledat['zpusob_odeslani']);
-        $form->addDatePicker('datum_odeslani_od', 'Datum odeslání (od):', 10)
+        $form->addDatePicker('datum_odeslani_od', 'Datum odeslání (od):')
                 ->setValue(@$hledat['datum_odeslani_od']);
         $form->addText('datum_odeslani_cas_od', 'Čas odeslání (od):', 10, 15)
                 ->setValue(@$hledat['datum_odeslani_cas_od']);
-        $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:', 10)
+        $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:')
                 ->setValue(@$hledat['datum_odeslani_do']);
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15)
                 ->setValue(@$hledat['datum_odeslani_cas_do']);

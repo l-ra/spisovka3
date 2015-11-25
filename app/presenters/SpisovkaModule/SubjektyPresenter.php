@@ -90,7 +90,7 @@ class SubjektyPresenter extends BasePresenter
         $form1->addText('titul_pred', 'Titul před:', 20, 35);
         $form1->addText('titul_za', 'Titul za:', 20, 10);
 
-        $form1->addDatePicker('datum_narozeni', 'Datum narození:', 10);
+        $form1->addDatePicker('datum_narozeni', 'Datum narození:');
         $form1->addText('misto_narozeni', 'Místo narození:', 50, 48);
         $form1->addText('okres_narozeni', 'Okres narození:', 50, 48);
         $form1->addText('narodnost', 'Národnost / Stát registrace:', 50, 48);

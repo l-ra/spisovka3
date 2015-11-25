@@ -22,12 +22,11 @@ class DateTimePicker extends /* Nette\Forms\ */Nette\Forms\Controls\TextInput
      * @access public
      *
      * @param string $label label
-     * @param int $cols šířka elementu input
      * @param int $maxLenght parametr maximální počet znaků
      */
-    public function __construct($label, $cols = null, $maxLenght = null)
+    public function __construct($label)
     {
-        parent::__construct($label, $cols, $maxLenght);
+        parent::__construct($label, 19);
     }
 
     /**
@@ -79,6 +78,7 @@ class DateTimePicker extends /* Nette\Forms\ */Nette\Forms\Controls\TextInput
         $control = parent::getControl();
 
         $control->class = 'datetimepicker';
+        $control->size = 19;
 
         return $control;
     }

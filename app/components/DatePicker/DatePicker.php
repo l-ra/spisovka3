@@ -4,11 +4,11 @@
  * DatePicker input control.
  *
  * @author     Tomáš Kraina, Roman Sklenář
+ *             Pavel Laštovička - upraveno pro spisovku
  * @copyright  Copyright (c) 2009
  * @license    New BSD License
  * @example    http://nettephp.com/extras/datepicker
  * @package    Nette\Extras\DatePicker
- * @version    0.1
  */
 class DatePicker extends Nette\Forms\Controls\TextInput
 {
@@ -20,9 +20,10 @@ class DatePicker extends Nette\Forms\Controls\TextInput
      * @param  int  width of the control
      * @param  int  maximum number of characters the user may enter
      */
-    public function __construct($label, $cols = NULL, $maxLenght = NULL)
+    public function __construct($label)
     {
-        parent::__construct($label, $cols, $maxLenght);
+        // 10 characters are enough for a date
+        parent::__construct($label, 10);
     }
 
     /**
@@ -74,14 +75,13 @@ class DatePicker extends Nette\Forms\Controls\TextInput
     {
         $control = parent::getControl();
         $control->class = $this->forbidPastDates ? 'datepicker DPNoPast' : 'datepicker';
-
+        $control->size = 10;
         return $control;
     }
 
     public function forbidPastDates()
     {
         $this->forbidPastDates = true;
-
         return $this;
     }
 

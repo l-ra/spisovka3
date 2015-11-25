@@ -484,9 +484,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
         $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50);
         $form->addCheckbox('cislo_doporuceneho_dopisu_pouze', 'Pouze doporučené dopisy');
-        $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):', 10);
+        $form->addDatePicker('datum_vzniku_od', 'Datum doručení/vzniku (od):');
         $form->addText('datum_vzniku_cas_od', 'Čas doručení (od):', 10, 15);
-        $form->addDatePicker('datum_vzniku_do', 'Datum doručení/vzniku do:', 10);
+        $form->addDatePicker('datum_vzniku_do', 'Datum doručení/vzniku do:');
         $form->addText('datum_vzniku_cas_do', 'Čas doručení do:', 10, 15);
 //nepouzito v sablone
 //        $form->addText('pocet_listu', 'Počet listů:', 5, 10);
@@ -496,15 +496,15 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addTextArea('poznamka', 'Poznámka:', 80, 4);
 
         $form->addSelect('zpusob_vyrizeni', 'Způsob vyřízení:', $zpusob_vyrizeni);
-        $form->addDatePicker('datum_vyrizeni_od', 'Datum vyřízení od:', 10);
+        $form->addDatePicker('datum_vyrizeni_od', 'Datum vyřízení od:');
         $form->addText('datum_vyrizeni_cas_od', 'Čas vyřízení od:', 10, 15);
-        $form->addDatePicker('datum_vyrizeni_do', 'Datum vyřízení do:', 10);
+        $form->addDatePicker('datum_vyrizeni_do', 'Datum vyřízení do:');
         $form->addText('datum_vyrizeni_cas_do', 'Čas vyřízení do:', 10, 15);
 
         $form->addSelect('zpusob_odeslani', 'Způsob odeslání:', $zpusob_odeslani);
-        $form->addDatePicker('datum_odeslani_od', 'Datum odeslání (od):', 10);
+        $form->addDatePicker('datum_odeslani_od', 'Datum odeslání (od):');
         $form->addText('datum_odeslani_cas_od', 'Čas odeslání (od):', 10, 15);
-        $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:', 10);
+        $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:');
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15);
 
         $form->addComponent(new VyberPostovniZasilky(), 'druh_zasilky');

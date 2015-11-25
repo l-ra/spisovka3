@@ -1309,7 +1309,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $datum = date('d.m.Y');
         $cas = date('H:i:s');
 
-        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10)
+        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:')
                 ->setValue($datum);
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
                 ->setValue($cas);
@@ -1482,7 +1482,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
-        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:', 10);
+        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:');
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
         // doručení emailem a DS nastavuje systém, to uživatel nesmí měnit
         if ($this->template->isRozdelany && $Dok->typ_dokumentu->smer == 0
@@ -1615,7 +1615,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $cas = date('H:i:s', $unixtime);
         }
 
-        $form->addDatePicker('datum_vyrizeni', 'Datum vyřízení:', 10)
+        $form->addDatePicker('datum_vyrizeni', 'Datum vyřízení:')
                 ->setValue($datum);
         $form->addText('datum_vyrizeni_cas', 'Čas vyřízení:', 10, 15)
                 ->setValue($cas);

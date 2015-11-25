@@ -30,15 +30,16 @@ class Form extends Nette\Application\UI\Form
         $presenter->redirect('this', ['id' => $id]);
     }
     
-    public function addDatePicker($name, $label, $cols = NULL, $maxLength = NULL)
+    public function addDatePicker($name, $label)
     {
-        return $this[$name] = new \DatePicker($label, $cols, $maxLength);        
+        return $this[$name] = new \DatePicker($label);        
     }
 
-    public function addDateTimePicker($name, $label, $cols = NULL, $maxLength = NULL)
+    /* Není v aplikaci použito
+    public function addDateTimePicker($name, $label)
     {
-        return $this[$name] = new \DateTimePicker($label, $cols, $maxLength);        
-    }
+        return $this[$name] = new \DateTimePicker($label);
+    } */
     
     protected function setupRendering()
     {

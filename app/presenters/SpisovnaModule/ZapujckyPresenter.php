@@ -375,10 +375,10 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $form->addTextArea('duvod', "Důvod zapůjčení:", 80, 5);
 
         $datum_od = date('d.m.Y');
-        $form->addDatePicker('date_od', 'Datum výpůjčky:', 10)
+        $form->addDatePicker('date_od', 'Datum výpůjčky:')
                 ->setValue($datum_od)
                 ->setRequired('Datum výpůjčky musí být vyplněné!');
-        $form->addDatePicker('date_do', 'Datum vrácení:', 10)
+        $form->addDatePicker('date_do', 'Datum vrácení:')
                 ->setRequired('Datum vrácení musí být vyplněné! Zadejte alespoň předpokládané datum vrácení.')
                 ->forbidPastDates()
                 ->addRule(Nette\Forms\Form::VALID, 'Datum vrácení nemůže být v minulosti.');
