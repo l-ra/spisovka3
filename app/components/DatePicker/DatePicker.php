@@ -58,7 +58,9 @@ class DatePicker extends Nette\Forms\Controls\TextInput
      */
     public function setValue($value)
     {
-        $value = preg_replace('~([0-9]{4})-([0-9]{2})-([0-9]{2})~', '$3.$2.$1', $value);
+        // [P.L.] Použij formátování datumu spisovky
+        // $value = preg_replace('~([0-9]{4})-([0-9]{2})-([0-9]{2})~', '$3.$2.$1', $value);
+        $value = \Spisovka\LatteFilters::edate($value);
         parent::setValue($value);
 
         return $this;
