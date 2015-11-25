@@ -129,14 +129,16 @@ Spisová služba:
 - aplikace lépe ošetří chybu uživatele, když odpověď na dokument vytvoří "napůl",
   to je když uživatel začně vytvářet odpověď a proces nedokončí
 - odebrání přílohy u odpovědi na dokument zaznamenalo výjimku v aplikačním logu
-- odeslání dokumentu je limitováno počtem adresátů. Program nyní limit kontroluje
-  a informuje uživatele. Limit je obvykle zhruba 55 adresátů.
 - převzetí dokumentu ve spisu za specifických okolností vedlo ke zmizení ostatních 
   dokumentů ve spisu (dokumenty přestaly být v aplikaci vidět)
 - předání a přijetí spisu už nezpůsobí otevření už vyřízených dokumentů ve spisu
 - hledání dle způsobu vyřízení nefungovalo
+- odeslání dokumentu je limitováno počtem adresátů. Program nyní limit kontroluje
+  a informuje uživatele. Limit je obvykle zhruba 55 adresátů.
 - v seznamu dokumentů k odeslání se nyní zobrazuje cena a hmotnost zásilky,
   pokud byla zadána
+- u hmotnosti zásilky program správně akceptuje a zobrazuje čísla s desetinnou
+  čárkou
 - pouze u sběrného archu: při tisku seznamu spisů chyběl v čísle jednacím
   oddělovač a pořadové číslo ve spisu
   

@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka\Controls;
+
 /**
  * DatePicker input control.
  *
@@ -8,7 +10,7 @@
  * @copyright  Copyright (c) 2009
  * @license    New BSD License
  */
-class DatePicker extends Nette\Forms\Controls\TextInput
+class DatePicker extends \Nette\Forms\Controls\TextInput
 {
 
     protected $forbidPastDates = false;
@@ -34,11 +36,11 @@ class DatePicker extends Nette\Forms\Controls\TextInput
             $tmp = preg_replace('~([[:space:]])~', '', $this->value);
 
             try {
-                $tmp = new DateTime($this->value);
+                $tmp = new \DateTime($this->value);
                 return $tmp->format('Y-m-d');
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $e->getMessage();
-                throw new Exception("Neplatné datum: {$this->value}");
+                throw new \Exception("Neplatné datum: {$this->value}");
             }
         }
 
@@ -53,10 +55,10 @@ class DatePicker extends Nette\Forms\Controls\TextInput
     public function setValue($value)
     {
         try {
-            $datetime = new DateTime($value);
-        } catch (Exception $e) {
+            $datetime = new \DateTime($value);
+        } catch (\Exception $e) {
             $e->getMessage();
-            throw new Exception("Neplatné datum: $value");
+            throw new \Exception("Neplatné datum: $value");
         }
         $value = $datetime->format('j.n.Y');
         parent::setValue($value);
@@ -85,7 +87,7 @@ class DatePicker extends Nette\Forms\Controls\TextInput
     /**
      * Vyzaduje, aby control byl vyplnen.
      */
-    public static function validateValid(Nette\Forms\IControl $control)
+    public static function validateValid(\Nette\Forms\IControl $control)
     {
         $value = $control->getValue();
         if (is_null($value))

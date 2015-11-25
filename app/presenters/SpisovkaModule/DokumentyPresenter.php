@@ -2017,7 +2017,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
 
                     $cena = floatval($post_data['cena_zasilky'][$subjekt_id]);
-                    $hmotnost = floatval($post_data['hmotnost_zasilky'][$subjekt_id]);
+                    $hmotnost = $post_data['hmotnost_zasilky'][$subjekt_id];
+                    $hmotnost = str_replace(',', '.', $hmotnost);
+                    $hmotnost = floatval($hmotnost);
                     $poznamka = $post_data['poznamka'][$subjekt_id];
                     $stav = 1;
 

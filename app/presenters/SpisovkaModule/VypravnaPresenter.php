@@ -307,10 +307,9 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                     ->setDefaultValue($dokument->cena)
                     ->setOption('description', 'Kč')
                     ->addRule(Form::INTEGER);
-            $form->addText('hmotnost', 'Hmotnost:', 10)
+            $form->addFloat('hmotnost', 'Hmotnost:', 10)
                     ->setDefaultValue($dokument->hmotnost)
-                    ->setOption('description', 'kg')
-                    ->addRule(Form::FLOAT);
+                    ->setOption('description', 'kg');
             $form->addText('poznamka', 'Poznámka:')
                     ->setDefaultValue($dokument->poznamka);
             
