@@ -842,7 +842,7 @@ class Dokument extends BaseModel
             case 'predane_k_odeslani':
             case 'odeslane':
 
-                $args['leftJoin'] = array('odeslani1' => array(
+                $args['leftJoin'] = array('zpusob_odeslani' => array(
                         'from' => array($this->tb_dok_odeslani => 'dok_odeslani'),
                         'on' => array('dok_odeslani.dokument_id=d.id'),
                         'cols' => null
