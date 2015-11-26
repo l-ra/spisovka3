@@ -4,11 +4,6 @@ namespace Spisovka\Controls;
 
 /**
  * DatePicker input control.
- *
- * @author     Tomáš Kraina, Roman Sklenář
- *             Pavel Laštovička - upraveno pro spisovku
- * @copyright  Copyright (c) 2009
- * @license    New BSD License
  */
 class DatePicker extends \Nette\Forms\Controls\TextInput
 {
@@ -17,8 +12,6 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
 
     /**
      * @param  string  label
-     * @param  int  width of the control
-     * @param  int  maximum number of characters the user may enter
      */
     public function __construct($label)
     {
@@ -32,19 +25,18 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
      */
     public function getValue()
     {
-        if (strlen($this->value)) {
-            $tmp = preg_replace('~([[:space:]])~', '', $this->value);
+        $value = parent::getValue();
+        if (empty($value))
+            return $value;
 
-            try {
-                $tmp = new \DateTime($this->value);
-                return $tmp->format('Y-m-d');
-            } catch (\Exception $e) {
-                $e->getMessage();
-                throw new \Exception("Neplatné datum: {$this->value}");
-            }
+        try {
+            $value = trim($value);
+            $date = new \DateTime($value);
+            return $date->format('Y-m-d');
+        } catch (\Exception $e) {
+            $e->getMessage();
+            throw new \Exception("Neplatné datum: {$value}");
         }
-
-        return $this->value;
     }
 
     /**
@@ -54,13 +46,15 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
      */
     public function setValue($value)
     {
-        try {
-            $datetime = new \DateTime($value);
-        } catch (\Exception $e) {
-            $e->getMessage();
-            throw new \Exception("Neplatné datum: $value");
+        if (!empty($value)) {
+            try {
+                $datetime = new \DateTime($value);
+            } catch (\Exception $e) {
+                $e->getMessage();
+                throw new \Exception("Neplatné datum: $value");
+            }
+            $value = $datetime->format('j.n.Y');
         }
-        $value = $datetime->format('j.n.Y');
         parent::setValue($value);
 
         return $this;
