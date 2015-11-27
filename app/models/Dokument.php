@@ -570,7 +570,7 @@ class Dokument extends BaseModel
                     'on' => array('dok_odeslani.dokument_id=d.id'),
                     'cols' => null
                 );
-                $args['where'][] = array('dok_odeslani.druh_zasilky = %s', $druh_sql);
+                $args['where'][] = array('dok_odeslani.druh_zasilky = %s', serialize($druh_sql));
             }
         }
 

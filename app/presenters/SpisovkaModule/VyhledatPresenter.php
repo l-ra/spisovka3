@@ -223,8 +223,9 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15)
                 ->setValue(@$hledat['datum_odeslani_cas_do']);
 
-        $vyber = isset($hledat['druh_zasilky']) ? unserialize($hledat['druh_zasilky']) : null;
-        $form->addComponent(new VyberPostovniZasilky($vyber), 'druh_zasilky');
+        $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
+        if (isset($hledat['druh_zasilky']))
+            $form['druh_zasilky']->setDefaultValue($hledat['druh_zasilky']);
         unset($hledat['druh_zasilky']);
 
         $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
@@ -319,14 +320,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         if (isset($post['predano_org'])) {
             $data['predano_org'] = $post['predano_org'];
         }
-        if (isset($post['druh_zasilky'])) {
-            if (count($post['druh_zasilky']) > 0) {
-                $data['druh_zasilky'] = serialize(array_keys($post['druh_zasilky']));
-            }
-        } else {
-            $data['druh_zasilky'] = null;
-        }
-
+        
         // eliminujeme prazdne hodnoty
         foreach ($data as $d_index => $d_value) {
             if (is_array($d_value)) {

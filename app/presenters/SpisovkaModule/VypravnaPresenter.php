@@ -187,11 +187,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
         $this->template->dokument = $odes;
     }
-
-    public function renderDetail($id)
-    {
-        // $this->addComponent(new VyberPostovniZasilky($odes->druh_zasilky), 'druhZasilky');
-    }
     
     protected function createComponentSeraditForm()
     {
@@ -267,31 +262,38 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->redirect('default');
     }
 
-    public function actionFiltrovat()
+    protected function createComponentFiltrovatForm()
     {
-        $post_data = $this->getHttpRequest()->getPost();
-
-        // hidden element zajisti, ze detekujeme odeslani formulare, kde neni zadny checkbox zaskrtnuty
-        if (!empty($post_data)) {
-            if (isset($post_data['druh_zasilky'])) {
-                // nastav filtrovani               
-                UserSettings::set('vypravna_filtr', array_keys($post_data['druh_zasilky']));
-            } else {
-                // zrus filtrovani
-                UserSettings::remove('vypravna_filtr');
-            }
-            // v obou pripadech prejdi na vychozi stranku vypravny
-            $this->redirect('default');
-        }
-    }
-
-    public function renderFiltrovat()
-    {
+        $form = new Spisovka\Form();
+        
         $filtr = UserSettings::get('vypravna_filtr');
-        $this->addComponent(new VyberPostovniZasilky($filtr), 'druhZasilky');
-        $this->setLayout(false);
-    }
+        $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
+        $form['druh_zasilky']->setDefaultValue($filtr);
 
+        $form->addSubmit('filtrovat', 'Filtrovat')
+                ->onClick[] = array($this, 'filtrovatClicked');
+        $form->addSubmit('storno', 'Zrušit')
+                ->setValidationScope(false)
+                ->controlPrototype->onclick = 'return closeDialog();';
+        
+        return $form;
+    }
+    
+    public function filtrovatClicked(Nette\Forms\Controls\SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+        if (!empty($data->druh_zasilky)) {
+            // nastav filtrovani               
+            UserSettings::set('vypravna_filtr', $data->druh_zasilky);
+        } else {
+            // zrus filtrovani
+            UserSettings::remove('vypravna_filtr');
+        }
+        
+        // v obou pripadech prejdi na vychozi stranku vypravny
+        $this->redirect('default');        
+    }
+    
     protected function createComponentOdeslaniForm()
     {
         $dokument = $this->template->dokument;
@@ -302,7 +304,11 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 ->setDefaultValue($dokument->datum_odeslani);
 
         if ($dokument->zpusob_odeslani_id == 3) {
-            $form->addComponent(new VyberPostovniZasilky(), 'druhZasilky');
+            $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
+            $form['druh_zasilky']->setDefaultValue($dokument->druh_zasilky);
+            // $test = [5 => 'prvni polozka', 3=>'druha', 2=>'treti'];
+            // $form->addComponent(new Nette\Forms\Controls\CheckboxList('Druh zásilky:', $test), 'druhZasilky');
+            
             $form->addText('cena', 'Cena:', 10)
                     ->setDefaultValue($dokument->cena)
                     ->setOption('description', 'Kč')
@@ -339,12 +345,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
         $id = $this->getParameter('id');
 
-        /*   $druh_zasilky_form = @$post_data['druh_zasilky'];
-            if (count($druh_zasilky_form) > 0) {
-                $row['druh_zasilky'] = serialize(array_keys($druh_zasilky_form));
-            } else {
-                $row['druh_zasilky'] = null;
-            } */
+        $data->druh_zasilky = serialize($data->druh_zasilky);
         
         $DokumentOdeslani = new DokumentOdeslani();
         $DokumentOdeslani->update($data, [["id=%i", $id]]);

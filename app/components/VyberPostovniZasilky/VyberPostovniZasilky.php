@@ -2,9 +2,10 @@
 
 class VyberPostovniZasilky extends Nette\Application\UI\Control
 {
+
     protected $value = array();
     protected $input_name = "druh_zasilky";
-    
+
     public function __construct($init = null)
     {
         parent::__construct();
@@ -27,7 +28,7 @@ class VyberPostovniZasilky extends Nette\Application\UI\Control
     {
         $this->input_name = $name;
     }
-    
+
     public function setValue($value)
     {
         if (is_string($value))
@@ -35,4 +36,5 @@ class VyberPostovniZasilky extends Nette\Application\UI\Control
         if (is_array($value))
             $this->value = $value;
     }
+
 }

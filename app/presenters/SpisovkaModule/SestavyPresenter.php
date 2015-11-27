@@ -507,7 +507,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:');
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15);
 
-        $form->addComponent(new VyberPostovniZasilky(), 'druh_zasilky');
+        $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
 
         $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
         $form['spisovy_znak_id']->controlPrototype->onchange('');
@@ -603,7 +603,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         }
 
         if (isset($params['druh_zasilky']))
-            $form['druh_zasilky']->setValue($params['druh_zasilky']);
+            $form['druh_zasilky']->setDefaultValue($params['druh_zasilky']);
         unset($params['druh_zasilky']);
 
         if (!empty($params))
@@ -697,9 +697,6 @@ class Spisovka_SestavyPresenter extends BasePresenter
         if (isset($postdata['predano_org'])) {
             $data['predano_org'] = $postdata['predano_org'];
         }
-        if (isset($postdata['druh_zasilky']))
-            if (count($postdata['druh_zasilky']) > 0)
-                $data['druh_zasilky'] = serialize(array_keys($postdata['druh_zasilky']));
 
         $zobrazeni_dat = array();
         $nazvy_poli = array('zobrazeni_cas', 'zobrazeni_adresa');
