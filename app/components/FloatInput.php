@@ -12,7 +12,8 @@ class FloatInput extends \Nette\Forms\Controls\TextInput
     public function __construct($label = NULL, $maxLength = NULL)
     {
         parent::__construct($label, $maxLength);
-        $this->addRule(\Nette\Forms\Form::FLOAT);
+        $this->addCondition(\Nette\Forms\Form::FILLED)
+            ->addRule(\Nette\Forms\Form::FLOAT);
     }
     
 	/**
@@ -28,11 +29,14 @@ class FloatInput extends \Nette\Forms\Controls\TextInput
     
 	/**
 	 * Returns control's value.
-	 * @return float
+	 * @return float|null
 	 */
     public function getValue()
     {
         $value = parent::getValue();
+        if (empty($value))
+            return null;
+        
         $value = str_replace(',', '.', $value);
         return floatval($value);
     }
