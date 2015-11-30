@@ -16,15 +16,19 @@ class FloatInput extends \Nette\Forms\Controls\TextInput
             ->addRule(\Nette\Forms\Form::FLOAT);
     }
     
-	/**
-	 * Sets control's value.
-	 * @param  int|float|string
-	 * @return self
-	 */
-	public function setValue($value)
-	{
-        $value = str_replace('.', ',', $value);
-        return parent::setValue($value);
+    /**
+     * Generates control's HTML element.
+     * @return Nette\Utils\Html
+     */
+    public function getControl()
+    {
+        $input = parent::getControl();
+        $value = $this->getValue();
+        if ($value !== null) {
+            $input->value = str_replace('.', ',', $value);
+        }
+        
+        return $input;
     }
     
 	/**
@@ -34,10 +38,6 @@ class FloatInput extends \Nette\Forms\Controls\TextInput
     public function getValue()
     {
         $value = parent::getValue();
-        if (empty($value))
-            return null;
-        
-        $value = str_replace(',', '.', $value);
-        return floatval($value);
+        return $value === '' ? null : $value;
     }
 }
