@@ -54,6 +54,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         }
 
         parent::startup();
+
+        $this->translateFormRulesMessages();
     }
 
     protected function isUserAllowed()
@@ -197,8 +199,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // Nastav, aby Nette generovalo ID prvku formulare jako ve stare verzi
         Nette\Forms\Controls\BaseControl::$idMask = 'frm%s';
-
-        $this->translateFormRules();
     }
 
     public function templatePrepareFilters($template)
@@ -250,7 +250,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         );
     }
 
-    protected function translateFormRules()
+    /**
+     * Nahradí zprávy při chybě validace vlastními zprávami v češtině.
+     */
+    protected function translateFormRulesMessages()
     {
         $messages = [
             Form::EMAIL => 'Zadejte prosím platnou e-mailovou adresu.',
