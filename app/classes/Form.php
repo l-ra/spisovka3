@@ -31,6 +31,11 @@ class Form extends \Nette\Application\UI\Form
             $presenter->redirect('this');
     }
     
+    /**
+     * @param string $name
+     * @param string $label
+     * @return \Spisovka\Controls\DatePicker
+     */
     public function addDatePicker($name, $label)
     {
         return $this[$name] = new Controls\DatePicker($label);        

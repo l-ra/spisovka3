@@ -380,9 +380,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 ->setRequired('Datum výpůjčky musí být vyplněné!');
         $form->addDatePicker('date_do', 'Datum vrácení:')
                 ->setRequired('Datum vrácení musí být vyplněné! Zadejte alespoň předpokládané datum vrácení.')
-                ->forbidPastDates()
-                ->addRule(Nette\Forms\Form::VALID, 'Datum vrácení nemůže být v minulosti.');
-
+                ->forbidPastDates();
 
         $submit = $form->addSubmit('novy', 'Vytvořit zápůjčku');
         $submit->onClick[] = array($this, 'vytvoritClicked');

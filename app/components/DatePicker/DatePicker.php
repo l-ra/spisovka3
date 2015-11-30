@@ -7,6 +7,7 @@ namespace Spisovka\Controls;
  */
 class DatePicker extends \Nette\Forms\Controls\TextInput
 {
+	const NO_PAST_DATE = ':noPastDate';
 
     protected $forbidPastDates = false;
 
@@ -21,28 +22,18 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
 
     /**
      * Returns control's value.
-     * @return mixed 
+     * @return string|null  2015-12-30
      */
     public function getValue()
     {
         $value = parent::getValue();
-        if (empty($value))
-            return $value;
-
-        try {
-            $value = trim($value);
-            $date = new \DateTime($value);
-            return $date->format('Y-m-d');
-        } catch (\Exception $e) {
-            $e->getMessage();
-            throw new \Exception("Neplatné datum: {$value}");
-        }
+        return $value === '' ? null : $value;
     }
 
     /**
      * Sets control's value.
      * @param  string
-     * @return void
+     * @return self
      */
     public function setValue($value)
     {
@@ -53,7 +44,7 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
                 $e->getMessage();
                 throw new \Exception("Neplatné datum: $value");
             }
-            $value = $datetime->format('j.n.Y');
+            $value = $datetime->format('Y-m-d');
         }
         parent::setValue($value);
 
@@ -61,36 +52,37 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
     }
 
     /**
-     * Generates control's HTML element.
+     * Generates control's HTML element. Displays date in local format.
      * @return Nette\Utils\Html
      */
     public function getControl()
     {
-        $control = parent::getControl();
-        $control->class = $this->forbidPastDates ? 'datepicker DPNoPast' : 'datepicker';
-        $control->size = 10;
-        return $control;
+        $input = parent::getControl();
+        $input->class = $this->forbidPastDates ? 'datepicker DPNoPast' : 'datepicker';
+        $input->size = 10;
+        $value = $this->getValue();
+        if ($value !== null) {
+            $datetime = new \DateTime($value);
+            $input->value = $datetime->format('j.n.Y');
+        }
+        
+        return $input;
     }
 
     public function forbidPastDates()
     {
         $this->forbidPastDates = true;
+        $this->addRule(self::NO_PAST_DATE, 'Zadané datum nemůže být v minulosti: %label');
         return $this;
     }
 
-    /**
-     * Vyzaduje, aby control byl vyplnen.
-     */
-    public static function validateValid(\Nette\Forms\IControl $control)
+    public static function validateNoPastDate(\Nette\Forms\IControl $control)
     {
         $value = $control->getValue();
-        if (is_null($value))
-            return false;
-        if (!$control->forbidPastDates)
+        if ($value === null)
             return true;
-
+        
         $today = date('Y-m-d');
         return strcmp($value, $today) >= 0;
     }
-
 }
