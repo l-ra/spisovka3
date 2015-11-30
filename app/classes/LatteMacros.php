@@ -69,10 +69,15 @@ class LatteMacros
         $tpair = $renderer->wrappers['pair']['container'];
         $tlabel = $renderer->wrappers['label']['container'];
         $tcontrol = $renderer->wrappers['control']['container'];
+        $tdesc = $renderer->wrappers['control']['description'];
+        
+        $description = $form[$name]->getOption('description');
+        if (!empty($description))
+            $description = " <$tdesc>$description</$tdesc>";
         
         return "<$tpair>
             <$tlabel>$caption</$tlabel>
-            <$tcontrol>$control</$tcontrol>
+            <$tcontrol>$control$description</$tcontrol>
         </$tpair>";
     }
 
