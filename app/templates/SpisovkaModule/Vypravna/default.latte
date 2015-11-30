@@ -39,6 +39,7 @@
         <tr>
             <th class="akce">&nbsp;</th>
             <th class="typ">Způsob odeslání</th>
+            <th class="datum">Datum odeslání</th>
             <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Adresát<br /><br />Poznámka</th>
             <th class="predal">Předal</th>
@@ -51,6 +52,9 @@
             </td>
             <td class="typ">
                 {$dok->zpusob_odeslani_nazev}
+            </td>
+            <td class="datum">
+                {$dok->datum_odeslani|edate}
             </td>
             <td class="cislo_jednaci">
                 &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}" title="Zobrazit detail dokumentu">

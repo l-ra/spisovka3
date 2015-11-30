@@ -382,6 +382,9 @@ table.zapujcky .stav {
     text-align: right;
 }
 
+table.vypravna .datum {
+    width: 60px;
+}
 table.vypravna .predal {
     width: 150px;    
 }
