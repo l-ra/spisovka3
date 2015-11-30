@@ -3,6 +3,9 @@
 class DruhZasilky
 {
 
+    const OBYCEJNE = 1;
+    const DOPORUCENE = 2;
+    
     public static function get()
     {
 

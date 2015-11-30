@@ -79,4 +79,12 @@ class VyberPostovniZasilkyControl extends \Nette\Forms\Controls\BaseControl
         return $selection;
     }
 
+	/**
+	 * Is any item selected?
+	 * @return bool
+	 */
+	public function isFilled()
+	{
+		return $this->getValue() !== array();
+	}
 }

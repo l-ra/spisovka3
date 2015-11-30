@@ -305,7 +305,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
         if ($dokument->zpusob_odeslani_id == 3) {
             $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
-            $form['druh_zasilky']->setDefaultValue($dokument->druh_zasilky);
+            $form['druh_zasilky']->setDefaultValue($dokument->druh_zasilky)
+                    ->setRequired();
             // $test = [5 => 'prvni polozka', 3=>'druha', 2=>'treti'];
             // $form->addComponent(new Nette\Forms\Controls\CheckboxList('Druh zásilky:', $test), 'druhZasilky');
             

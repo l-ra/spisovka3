@@ -1796,6 +1796,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 // vytvoří bohužel novou instanci pro každý subjekt
                 $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(),
                         "druh_zasilky_$sid");
+                $form["druh_zasilky_$sid"]->setDefaultValue([DruhZasilky::OBYCEJNE]);
                 $form->addFloat("cena_zasilky_$sid", 'Cena:', 10)
                         ->setOption('description', 'Kč');
                 $form->addFloat("hmotnost_zasilky_$sid", 'Hmotnost:', 10)
