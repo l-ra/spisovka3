@@ -15,6 +15,8 @@ Nové funkce:
   E-mail je v současnosti odeslán, pouze je-li dokument předán na uživatele,
   ne pokud je předán na org. jednotku.
   Upozornění je možné v administraci globálně vypnout.
+- nyní je možné dokument spojit s více dokumenty najednou, jak bylo původně
+  v aplikaci zamýšleno
 - ve výpravně je možné vytvořit podací arch s dokumenty, které uživatel
   ručně vybere (funkce se použije, pokud pracovník chce odeslat dokumenty
   na poště, ale nemá ještě všechny fyzicky u sebe)
@@ -84,8 +86,6 @@ Jiné změny:
 - dokument již není možné začít vytvářet přímo ze spisu. Uživatel dokument musí
   nejprve vytvořit, poté jej teprve může vložit do spisu.
 - to samé platí pro funkci spojení dokumentů
-- nyní je možné dokument spojit s více dokumenty najednou, jak bylo původně
-  v aplikaci zamýšleno
 - úpravy formuláře detailu dokumentu
 - v detailu dokumentu byla informace "Dokument není evidován" změněna
   na "Dokument nemá přiděleno číslo jednací"
