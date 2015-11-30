@@ -309,10 +309,9 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             // $test = [5 => 'prvni polozka', 3=>'druha', 2=>'treti'];
             // $form->addComponent(new Nette\Forms\Controls\CheckboxList('Druh zásilky:', $test), 'druhZasilky');
             
-            $form->addText('cena', 'Cena:', 10)
+            $form->addFloat('cena', 'Cena:', 10)
                     ->setDefaultValue($dokument->cena)
-                    ->setOption('description', 'Kč')
-                    ->addRule(Form::INTEGER);
+                    ->setOption('description', 'Kč');
             $form->addFloat('hmotnost', 'Hmotnost:', 10)
                     ->setDefaultValue($dokument->hmotnost)
                     ->setOption('description', 'kg');

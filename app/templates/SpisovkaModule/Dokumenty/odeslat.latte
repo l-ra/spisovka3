@@ -9,7 +9,7 @@
 
     <h2>Odeslat dokument</h2>
 
-    {$odeslatForm->render('begin')}
+    {form odeslatForm}
 
     <div class="dokument_blok_subjekty">
         <div class="h2">
@@ -17,7 +17,7 @@
         </div>
         <div id="dok-subjekty">
         {var $existuje_adresat = 0}
-        {if count($Dok->subjekty)>0}
+        {if !empty($Dok->subjekty)}
         <table class="seznam odeslat-subjekty">
             {foreach $Dok->subjekty as $subjekt}
                 {continueIf $subjekt->rezim_subjektu == 'O'}
@@ -31,7 +31,7 @@
                         {if $dokodes->subjekt_id == $subjekt->id}
                             <tr>
                                 <td></td>
-                                <td><div class="vyber" style="color:#008800;">Tomuto adresátovi byl dokument již odeslán</div></td>
+                                <td><div class="vyber" style="color:#008800;">Tomuto adresátovi již byl dokument odeslán.</div></td>
                             </tr>
                             {?break}
                         {/if}
@@ -58,16 +58,11 @@
             <td class="icon">&nbsp;</td>
             <td colspan="2">
                 <dl>
-                    <dt>Datum odeslání:</dt>
-                    <dd><input type="text" class="datepicker" name="datum_odeslani_postou[{$subjekt->id}]" value="{=date('d.m.Y')}" /></dd><br />
-                    <dt>Druh zásilky:</dt>
-                    <dd>{control druhZasilky "druh_zasilky[$subjekt->id]"}</dd><br />
-                    <dt>Cena Kč:</dt>
-                    <dd><input type="text" name="cena_zasilky[{$subjekt->id}]" size="10" /></dd><br />
-                    <dt>Hmotnost:</dt>
-                    <dd><input type="text" name="hmotnost_zasilky[{$subjekt->id}]" size="10" /></dd><br />
-                    <dt>Poznámka:</dt>
-                    <dd><input type="text" name="poznamka[{$subjekt->id}]" class="poznamka" /></dd>
+                    {input2 "datum_odeslani_postou_$subjekt->id"}
+                    {input2 "druh_zasilky_$subjekt->id"}
+                    {input2 "cena_zasilky_$subjekt->id"}
+                    {input2 "hmotnost_zasilky_$subjekt->id"}
+                    {input2 "poznamka_$subjekt->id"}
                 </dl>
             </td>
         </tr> 
@@ -209,12 +204,12 @@
 
     <div class="dokument_blok_submit">
         {if $existuje_adresat}
-        {$odeslatForm['odeslat']->control}
+        {input odeslat}
         {/if}
         &nbsp;&nbsp;
-        {$odeslatForm['storno']->control}
+        {input storno}
     </div>
-    {$odeslatForm->render('end')}
+    {/form}
 
     <div id="dialog"></div>
     <script type="text/javascript">odes_form_reset();</script>
