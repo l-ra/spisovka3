@@ -119,7 +119,8 @@ E-podatelna:
   e-podatelnou. Pro dokumenty vytvořené mimo e-podatelnu je nyní výchozí
   hodnota "v listinné podobě".
 
-Spisová služba:              
+Spisová služba:
+- při výběru datumu v aplikaci se nyní týden zobrazuje správně od pondělí do neděle
 - zápis chybných hodnot do formuláře při hledání dokumentu podle datumů nezpůsobí
   chybu aplikace
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 

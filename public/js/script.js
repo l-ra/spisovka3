@@ -33,12 +33,13 @@ function InstallDatePicker() {
         monthNamesShort:["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"],
         //monthNamesShort:["Led","Úno","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
         dayNames:["Neděle","Pondělí","Úterý","Středa","Čtvrtek","Pátek","Sobota"],
-        dayNamesMin:["Ne","Po","Út","St","Čt","Pá","So"]
+        dayNamesMin:["Ne","Po","Út","St","Čt","Pá","So"],
+        firstDay: 1
     });
     
     $("input.DPNoPast").datepicker("option", "minDate", 0);
     
-    $('input.datetimepicker').datepicker(
+    /* $('input.datetimepicker').datepicker(
     {
         duration: '',
         changeMonth: true,
@@ -48,7 +49,7 @@ function InstallDatePicker() {
         time24h: true,
         currentText: 'Dnes',
         closeText: 'OK'
-    });
+    }); */
 }
 
 function showSpinner() {
