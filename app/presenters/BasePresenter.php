@@ -256,6 +256,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected function translateFormRulesMessages()
     {
         $messages = [
+    		Form::FILLED => '"%label" je povinné vyplnit.',
             Form::EMAIL => 'Zadejte prosím platnou e-mailovou adresu.',
             Form::INTEGER => 'Zadejte prosím celé číslo.',
             Form::FLOAT => 'Zadejte prosím číslo.'
