@@ -230,26 +230,29 @@ class DokumentOdeslani extends BaseModel
         return null;
     }
 
+    /**
+     * 
+     * @param int $id
+     * @return boolean
+     */
     public function odeslano($id)
     {
-
-        if (empty($id)) {
-            return null;
-        }
-
-        $row = array();
-        $row['stav'] = 2;
-        $row['datum_odeslani'] = new DateTime();
-
+        if (empty($id))
+            return false;
         $info = $this->get($id);
         if (!$info)
-            return null;
+            return false;
         
-        $Log = new LogModel();
-        $Log->logDokument($info->dokument_id, LogModel::DOK_ODESLAN,
-                "Dokument odeslán " . $info->zpusob_odeslani_nazev);
+        $row = ['stav' => 2, 'datum_odeslani' => new DateTime()];
 
-        return $this->update($row, array(array('id=%i', $id)));
+        $ok = $this->update($row, array(array('id=%i', $id)));
+        if ($ok) {
+            $Log = new LogModel();
+            $Log->logDokument($info->dokument_id, LogModel::DOK_ODESLAN,
+                    "Dokument odeslán " . $info->zpusob_odeslani_nazev);
+        }
+        
+        return $ok;
     }
 
     public function vraceno($id)

@@ -115,7 +115,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
             $DokumentOdeslani = new DokumentOdeslani();
             switch ($data['hromadna_akce']) {
-                /* odeslat */
                 case 'odeslat':
                     $count_ok = $count_failed = 0;
                     foreach ($data['dokument_vyber'] as $dokument_odeslani_id)
@@ -124,13 +123,23 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                         else
                             $count_failed++;
 
-                    if ($count_ok > 0)
-                        $this->flashMessage('Úspěšně jste odeslal ' . $count_ok . ' dokumentů.');
+                    if ($count_ok > 0) {
+                        switch ($count_ok) {
+                            case 1: $msg = "Záznam byl označen jako odeslaný.";
+                                break;
+                            case 2:
+                            case 3:
+                            case 4: $msg = "$count_ok záznamy byly označeny jako odeslané.";
+                                break;
+                            default:
+                                $msg = "$count_ok záznamů bylo označeno jako odeslané.";
+                        }
+                        $this->flashMessage($msg);
+                    }
                     if ($count_failed > 0)
-                        $this->flashMessage('' . $count_failed . ' dokumentů se nepodařilo odeslat!',
+                        // K tomuto nikdy nedojde, jelikož při chybě je hozena výjimka
+                        $this->flashMessage("$count_failed záznamů se nepodařilo označit jako odeslané!",
                                 'warning');
-                    if ($count_ok > 0 && $count_failed > 0)
-                        $this->redirect('this');
                     break;
 
                 case 'vratit':
@@ -146,8 +155,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                     if ($count_failed > 0)
                         $this->flashMessage('' . $count_failed . ' dokumentů se nepodařilo vrátit!',
                                 'warning');
-                    if ($count_ok > 0 && $count_failed > 0)
-                        $this->redirect('this');
                     break;
 
                 case 'podaci_arch':
