@@ -362,26 +362,23 @@ abstract class BaseModel extends Nette\Object
      * Updates a row
      * @param array $values to insert
      * @param array $where
-     * @return mixed  zavisi na databazovem ovladaci, nepouzivat!
+     * @return boolean
      */
-    public function update($values, $where = null)
+    public function update($values, $where)
     {
-
-        if (is_null($where)) {
-            return null;
-        } else if (!is_array($where)) {
+        // ochrana pred zmenou cele tabulky kvuli chybe v kodu
+        if ($where === null)
+            return false;
+        
+        if (!is_array($where))
             $where = array($where);
-        } else {
-            if (!is_array(current($where))) {
-                $where = array($where);
-            }
-        }
+        else if (!is_array(current($where)))
+            $where = array($where);
 
-        //dibi::update($this->name, $values)->where($where)
-        //    ->test();        
 
-        return dibi::update($this->name, $values)->where($where)
+        dibi::update($this->name, $values)->where($where)
                         ->execute();
+        return true;
     }
 
     /**
