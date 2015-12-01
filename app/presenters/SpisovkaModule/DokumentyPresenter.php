@@ -1647,7 +1647,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         //$form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
         //        ->setValue(@$Dok->skartacni_znak)
         //        //->controlPrototype->onchange("selectReadOnly(this);");
-        $form->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5)
+        $form->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
                         ->setValue(@$Dok->skartacni_lhuta)
                 ->controlPrototype->readonly = TRUE;
         $form->addSelect('spousteci_udalost_id', 'Spouštěcí událost: ', $spousteci_udalost)

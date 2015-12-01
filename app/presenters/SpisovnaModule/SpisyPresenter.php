@@ -452,7 +452,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $form1->addHidden('id');
         $form1->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
-        $form1->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5)
+        $form1->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
                 ->addRule(Spisovka\Form::INTEGER, 'Skartační lhůta musí být celé číslo.');
 
         if (isset($this->template->Spis)) {

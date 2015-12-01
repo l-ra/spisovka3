@@ -515,7 +515,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 4);
         $form->addTextArea('poznamka_vyrizeni', 'Poznámka k vyřízení:', 80, 4);
         $form->addSelect('skartacni_znak', 'Skartační znak: ', $skartacni_znak);
-        $form->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5);
+        $form->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5);
         $form->addSelect('spousteci_udalost', 'Spouštěcí událost: ', $spudalost_seznam);
 
         $form->addText('prideleno_text', 'Přidělen:', 50, 255)

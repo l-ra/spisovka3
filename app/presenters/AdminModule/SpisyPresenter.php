@@ -346,7 +346,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                         ->setValue(@$spis->skartacni_znak)
                 ->controlPrototype->readonly = TRUE;
-        $form1->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5)
+        $form1->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
                         ->setValue(@$spis->skartacni_lhuta)
                 ->controlPrototype->readonly = TRUE;
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci)
@@ -413,7 +413,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $form1->getComponent('spisovy_znak_id');
 
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
-        $form1->addText('skartacni_lhuta', 'Skartační lhuta: ', 5, 5);
+        $form1->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5);
         $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
         $form1->addDatePicker('datum_otevreni', 'Datum otevření:')
                 ->setValue(date('d.m.Y'));
