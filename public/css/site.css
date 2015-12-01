@@ -265,7 +265,7 @@ dd {
     width: 120px;
 }
 #form_novy_subjekt2 dt {
-    width: 200px;    
+    width: 200px;
 }
 
 dt.dt_dialog {
@@ -289,7 +289,7 @@ dt.dt_dialog {
 .privilege {
     padding-bottom: 5px;
     border-bottom: 1px #c0c0c0 dashed;
-    margin: 5px 0px 8px 200px;    
+    margin: 5px 0px 8px 200px;
 }
 .privilege-icon {
     width: 16px;
@@ -386,10 +386,17 @@ table.vypravna .datum {
     width: 60px;
 }
 table.vypravna .predal {
-    width: 150px;    
+    width: 150px;
 }
 table.vypravna .druh-zasilky {
-    width: 150px;    
+    width: 150px;
+}
+
+table.hledani-dokumentu .cislo-jednaci {
+    min-width: 160px;
+}
+table.hledani-dokumentu .jid {
+    min-width: 140px;
 }
 
 /* ***************************************************************** */
@@ -398,7 +405,7 @@ table.vypravna .druh-zasilky {
 /* dokument_blok_subjekty jsou bez výplně pozadí - tedy pozadí bude bílé */
 
 .dokument_blok_hlavni, .dokument_blok_sedy, .dokument_blok_subjekty {
-    padding: 5px; margin-bottom: 10px;    
+    padding: 5px; margin-bottom: 10px;
 }
 
 .dokument_blok_hlavni {
@@ -478,10 +485,10 @@ table.vypravna .druh-zasilky {
     text-decoration: underline;
     cursor: pointer;
 }
- 
+
 #dok_spojit a,
 #dok-spis-nazev, #dok-spis-vyjmout {
-    margin-right: 7px;    
+    margin-right: 7px;
 }
 
 /* ***************************************************************** */
@@ -576,7 +583,7 @@ table.vypravna .druh-zasilky {
 }
 
 #flash_version {
-    
+
     /*width: 960px;*/
     margin: 0 auto 0 auto;
     padding: 15px 5px 15px 50px;
@@ -867,20 +874,20 @@ table.odeslat-subjekty td.odeslat-subjekty-separator {
     color: #03406A;
 }
 .paginator a,
-.paginator span { 
+.paginator span {
     margin-right: 0.1em;
     padding: 0.2em 0.5em;
     color: #999999;
 }
-.paginator a { 
+.paginator a {
     border: 1px solid #03406A;
     text-decoration: none;
     color: #03406A;
 }
-.paginator span.button { 
+.paginator span.button {
     border: 1px solid #DDDDDD;
 }
-.paginator .current { 
+.paginator .current {
     background: #03406A;
     border: 1px solid #03406A;
     color: white; font-weight: bold;
@@ -897,7 +904,7 @@ tr.odes_form input.poznamka {
 }
 
 div.icon_spis, div.icon_slozka {
-    background: url('../images/icons/spisy.png') no-repeat right;    
+    background: url('../images/icons/spisy.png') no-repeat right;
     width: 16px;
     height: 16px;
     display: inline-block;
@@ -921,7 +928,7 @@ div.icon_slozka {
     /*margin-top: 15px;*/
 }
 .sestava_vyber_sloupcu .vybrat_sloupec {
-    margin-top: 70px;    
+    margin-top: 70px;
 }
 .sestava_vyber_sloupcu dt {
     float: none;

@@ -698,10 +698,10 @@ zobrazFax = function (elm) {
 
 function renderVysledekHledaniDokumentu(data,typ) {
 
-    var html = "<table class='seznam' border='1'>";
+    var html = "<table class='seznam hledani-dokumentu'>";
         html = html + "<tr>";
-        html = html + "<th>číslo jednací</th>";
-        html = html + "<th>JID</th>";
+        html = html + "<th class='cislo-jednaci'>číslo jednací</th>";
+        html = html + "<th class='jid'>JID</th>";
         html = html + "<th>věc</th>";
         html = html + "</tr>";
 
@@ -733,8 +733,8 @@ function renderVysledekHledaniDokumentu(data,typ) {
         var cj = data[zaznam]['cislo_jednaci'];
         if (cj === null)
             cj = '';
-        html = html + "<td>" + a + cj + "</a></td>";
-        html = html + "<td>" + a + data[zaznam]['jid'] + "</a></td>";
+        html = html + "<td class='cislo-jednaci'>" + a + cj + "</a></td>";
+        html = html + "<td class='jid'>" + a + data[zaznam]['jid'] + "</a></td>";
         html = html + "<td>" + a + data[zaznam]['nazev'] + "</a></td>";
         html = html + "</tr>";
     }
