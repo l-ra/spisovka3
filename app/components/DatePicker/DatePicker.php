@@ -7,7 +7,9 @@ namespace Spisovka\Controls;
  */
 class DatePicker extends \Nette\Forms\Controls\TextInput
 {
-	const NO_PAST_DATE = ':noPastDate';
+
+    const NO_PAST_DATE = ':noPastDate';
+    const DATE = ':date';
 
     protected $forbidPastDates = false;
 
@@ -18,6 +20,8 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
     {
         // 10 characters are enough for a date
         parent::__construct($label, 10);
+        $this->addCondition(\Nette\Forms\Form::FILLED)
+                ->addRule(self::DATE, 'Zadané datum je neplatné.');
     }
 
     /**
@@ -40,11 +44,14 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
         if (!empty($value)) {
             try {
                 $datetime = new \DateTime($value);
+                $value = $datetime->format('Y-m-d');
             } catch (\Exception $e) {
                 $e->getMessage();
-                throw new \Exception("Neplatné datum: $value");
+                $form = $this->getForm();
+                // Nehazej vyjimku pri submitu formulare, chybu uzivatele osetri validaci
+                if (!$form->isSubmitted())
+                    throw new \Exception("Neplatné datum: $value");
             }
-            $value = $datetime->format('Y-m-d');
         }
         parent::setValue($value);
 
@@ -62,10 +69,15 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
         $input->size = 10;
         $value = $this->getValue();
         if ($value !== null) {
-            $datetime = new \DateTime($value);
-            $input->value = $datetime->format('j.n.Y');
+            try {
+                $datetime = new \DateTime($value);
+                $input->value = $datetime->format('j.n.Y');
+            } catch (\Exception $e) {
+                // nic nedelej, zobraz neplatny udaj uzivateli, aby jej opravil
+                $e->getMessage();
+            }
         }
-        
+
         return $input;
     }
 
@@ -81,8 +93,23 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
         $value = $control->getValue();
         if ($value === null)
             return true;
-        
+
         $today = date('Y-m-d');
         return strcmp($value, $today) >= 0;
     }
+
+    public static function validateDate(\Nette\Forms\IControl $control)
+    {
+        $value = $control->getValue();
+        try {
+            $ok = false;
+            new \DateTime($value);
+            $ok = true;
+        } catch (\Exception $e) {
+            $e->getMessage();
+        }
+
+        return $ok;
+    }
+
 }
