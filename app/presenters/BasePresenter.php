@@ -214,7 +214,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                 '}');
         $set->addMacro('isInRole', 'if (\Spisovka\LatteMacros::isInRole($userobj, %node.args)) {', '}');
 
-        $set->addMacro('input2', 'echo \Spisovka\LatteMacros::input($form, %node.args)');
+        $set->addMacro('input2', 'echo \Spisovka\LatteMacros::input2($form, %node.args)');
 
         /* Neni momentalne pouzito:
           // $set->addMacro('accessrole', '{', '}');

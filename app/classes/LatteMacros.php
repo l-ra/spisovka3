@@ -59,10 +59,15 @@ class LatteMacros
         return $res;
     }
 
-    // Vykresli standardni prvek formulare
-    public static function input($form, $name)
+    /**
+     * Vykresli prvek formulare temer tak, jako DefaultFormRenderer
+     * @param Form $form
+     * @param string $name
+     * @return string 
+     */
+    public static function input2($form, $name)
     {
-        $caption = $form[$name]->caption;
+        $label = $form[$name]->getLabel();
         $control = isset($form[$name]->controlPart) ? $form[$name]->controlPart : $form[$name]->control;
         
         $renderer = $form->getRenderer();
@@ -76,7 +81,7 @@ class LatteMacros
             $description = " <$tdesc>$description</$tdesc>";
         
         return "<$tpair>
-            <$tlabel>$caption</$tlabel>
+            <$tlabel>$label</$tlabel>
             <$tcontrol>$control$description</$tcontrol>
         </$tpair>";
     }
