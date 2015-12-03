@@ -70,7 +70,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     {
         $form1 = new Spisovka\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
-        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
+        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : completeCallback})";
 
         if (isset($this->dokument_id)) {
             $form1->addHidden('dokument_id')
@@ -80,7 +80,8 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                     ->setValue(0);
         }
 
-        $form1->addText('priloha_nazev', 'Název přílohy:', 50, 150);
+        $form1->addText('priloha_nazev', 'Název přílohy:', 50, 150)
+                ->setRequired();
         $form1->addTextArea('priloha_popis', 'Popis:', 80, 5);
         $form1->addSelect('priloha_typ', 'Typ souboru', FileModel::typPrilohy());
         $form1->addUpload('file', 'Soubor:');
@@ -150,7 +151,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         $form1 = new Spisovka\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
-        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onStart' : startCallback, 'onComplete' : completeCallback})";
+        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : completeCallback})";
 
         if (isset($this->dokument_id)) {
             $form1->addHidden('dokument_id')
