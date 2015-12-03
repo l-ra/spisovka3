@@ -60,13 +60,18 @@ class LatteMacros
     }
 
     /**
-     * Vykresli prvek formulare temer tak, jako DefaultFormRenderer
+     * Zavola DefaultFormRenderer pro vykresleni paru label/control.
+     * Formular musi pouzivat vychozi renderer.
      * @param Form $form
      * @param string $name
      * @return string 
      */
     public static function input2($form, $name)
     {
+        $renderer = $form->getRenderer();
+        return $renderer->renderPair($form[$name]);
+
+        /* Toto byl muj starsi kod:
         $label = $form[$name]->getLabel();
         $control = isset($form[$name]->controlPart) ? $form[$name]->controlPart : $form[$name]->control;
         
@@ -83,7 +88,7 @@ class LatteMacros
         return "<$tpair>
             <$tlabel>$label</$tlabel>
             <$tcontrol>$control$description</$tcontrol>
-        </$tpair>";
+        </$tpair>"; */
     }
 
 }
