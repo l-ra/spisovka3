@@ -301,7 +301,7 @@ dt.dt_dialog {
     float: right;
 }
 
-label.required {
+.required label {
     color: #080808;
     font-weight: bold;
     text-decoration: underline;
