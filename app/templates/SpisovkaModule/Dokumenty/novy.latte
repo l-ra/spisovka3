@@ -17,21 +17,21 @@
                 $('#dialog').html(response);
             }
 		}
-        
+
         var DOKUMENT_ID = {$Dok->id};
-        
+
         var smer_typu_dokumentu = new Array();
         {foreach $typy_dokumentu as $t}
         smer_typu_dokumentu[{$t->id}] = {$t->smer};
         {/foreach}
-        
+
         $(document).ready(function() {
             var typ_id = $('[name="dokument_typ_id"]').val();
             if (smer_typu_dokumentu[typ_id] == 0)
                 $('.pouze_prichozi_dokument').show();
             else
                 $('.pouze_prichozi_dokument').hide();
-                
+
             $('[name="dokument_typ_id"]').change(function() {
                 var val = $(this).val();
                 if (smer_typu_dokumentu[val] == 0)
@@ -39,7 +39,7 @@
                 else
                     $('.pouze_prichozi_dokument').hide();
             });
-        });        
+        });
 	</script>
 {/block}
 {block content}
@@ -53,7 +53,7 @@
     {/if}
     </div>
 
-    {$novyForm->render('begin')}
+    {form novyForm}
     <div class="dokument_blok_hlavni">
         <dl>
             <dt>JID:</dt>
@@ -63,65 +63,46 @@
         <dl>
             <dt>Číslo jednací:</dt>
             <dd style="color: #808080;">
-                <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;                
+                <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;
                 <span style="color:#000000; font-weight: normal;">(jedná se pouze o předběžný údaj)</span>
             </dd>
         </dl>
         {/if}
+        {input2 dokument_typ_id}
+        {input2 nazev}
+        {input2 popis}
         <dl>
-            <dt>Typ dokumentu:</dt>
-            <dd>{$novyForm['dokument_typ_id']->control}</dd>
-        </dl>
-        <dl>
-            <dt>{$novyForm['nazev']->label}</dt>
-            <dd>{$novyForm['nazev']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Popis:</dt>
-            <dd>{$novyForm['popis']->control}</dd>
-        </dl>
-        <dl>
-            <dt>{$novyForm['datum_vzniku']->label}</dt>
-            <dd>{$novyForm['datum_vzniku']->control} {$novyForm['datum_vzniku_cas']->control}</dd>
+            <dt>{label datum_vzniku /}</dt>
+            <dd>{input datum_vzniku} {input datum_vzniku_cas} {inputError datum_vzniku}</dd>
         </dl>
         {* tyto prvky jsou zobrazovany / skryvany Javascriptem *}
         <div class="pouze_prichozi_dokument">
-        <dl>
-            <dt>{$novyForm['zpusob_doruceni_id']->label}</dt>
-            <dd>{$novyForm['zpusob_doruceni_id']->control}</dd>
-        </dl>        
-        <dl>
-            <dt>Číslo jednací odesilatele:</dt>
-            <dd>{$novyForm['cislo_jednaci_odesilatele']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Číslo doporučeného dopisu:</dt>
-            <dd>{$novyForm['cislo_doporuceneho_dopisu']->control}</dd>
-        </dl>
+            {input2 zpusob_doruceni_id}
+            {input2 cislo_jednaci_odesilatele}
+            {input2 cislo_doporuceneho_dopisu}
         </div>
         <dl>
-            <dt>Počet listů:</dt>
-            <dd>{$novyForm['pocet_listu']->control}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-                <span style="font-weight: normal;">Počet listů příloh: </span>{$novyForm['pocet_priloh']->control}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-                <span style="font-weight: normal;">Typ přílohy: </span>{$novyForm['typ_prilohy']->control}
+            <dt>{label pocet_listu /}</dt>
+            <dd><span style="font-weight: normal;">
+                {input pocet_listu}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {label pocet_priloh /} {input pocet_priloh}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {label typ_prilohy /} {input typ_prilohy}
+                </span>
+                &nbsp;&nbsp;{inputError pocet_listu} {inputError pocet_priloh}
             </dd>
         </dl>
-        <dl n:if="isset($novyForm['lhuta'])">
-            <dt>{$novyForm['lhuta']->label}</dt>
-            <dd>{$novyForm['lhuta']->control} dní</dd>
-        </dl>
+        {if isset($form['lhuta'])}
+            {input2 lhuta}
+        {/if}            
     </div>
 
     <div n:if="!isset($odpoved_na_dokument)" class="dokument_blok_sedy">
         <div class="h2">Předání</div>
+        {input2 predani_poznamka}
         <dl>
-            <dt>Poznámka pro příjemce:</dt>
-            <dd>{$novyForm['predani_poznamka']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Předat:</dt>
+            <dt><label for="predat_autocomplete">Předat:</label></dt>
             <dd>
                 <input type="text" name="predano_autocomplete" id="predat_autocomplete" size="40" />
                 &nbsp;&nbsp;&nbsp;
@@ -130,7 +111,7 @@
         </dl>
         <div id="predano"></div>
     </div>
-    
+
     <div class="dokument_blok_subjekty">
         <div class="h2">
             Adresáti / odesílatelé
@@ -174,7 +155,7 @@
     </div>
     <div id="dok-prilohy">
 
-    
+
     {if count($Prilohy)>0}
     <table class="seznam">
         {foreach $Prilohy as $file}
@@ -214,12 +195,10 @@
     </div>
 
     <div class="dokument_blok_submit">
-        {$novyForm['novy']->control}
-        &nbsp;&nbsp;
-        {if !isset($odpoved_na_dokument)}{$novyForm['novy_pridat']->control}
-        &nbsp;&nbsp;{/if}
-        {$novyForm['storno']->control}
+        {input novy}&nbsp;&nbsp;
+        {if !isset($odpoved_na_dokument)}{input novy_pridat}&nbsp;&nbsp;{/if}
+        {input storno}
     </div>
-    {$novyForm->render('end')}
+    {/form}
 
     <div id="dialog"></div>

@@ -122,6 +122,8 @@ E-podatelna:
 
 Spisová služba:
 - při výběru datumu v aplikaci se nyní týden zobrazuje správně od pondělí do neděle
+- údaj metadat "počet příloh" byl zobrazen chybně jako "počet listů příloh".
+  Znamená počet příloh v listinné nebo jiné podobě (ne počet souborů).
 - zápis chybných hodnot do formuláře při hledání dokumentu podle datumů nezpůsobí
   chybu aplikace
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 

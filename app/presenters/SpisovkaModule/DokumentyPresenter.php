@@ -865,8 +865,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Dok = null;
             $this->flashMessage('Dokument není připraven k vytvoření', 'warning');
         }
-
-        $this->template->novyForm = $this['novyForm'];
     }
 
     public function renderOdpoved()
@@ -1240,8 +1238,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->addRule(Nette\Forms\Form::FILLED, 'Lhůta k vyřízení musí být vyplněna!')
                 ->addRule(Nette\Forms\Form::NUMERIC, 'Lhůta k vyřízení musí být číslo')
-                ->setValue('30');
-        $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
+                ->setValue('30')
+                ->setOption('description', 'dní');
+        $form->addTextArea('predani_poznamka', 'Poznámka pro příjemce:', 80, 3);
         $form->addHidden('predano_user');
         $form->addHidden('predano_org');
 
@@ -1304,10 +1303,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'Název dokumentu (věc) musí být vyplněno!');
         }
 
-        $form->addTextArea('popis', 'Stručný popis:', 80, 3)
+        $form->addTextArea('popis', 'Popis:', 80, 3)
                 ->setValue(@$dok->popis);
 
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu);
+        $form->addSelect('dokument_typ_id', 'Typ dokumentu:', $povolene_typy_dokumentu);
         try {
             $form['dokument_typ_id']->setValue(@$dok->typ_dokumentu->id);
         } catch (Exception $e) {
@@ -1333,10 +1332,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
                 ->setValue(@$dok->pocet_listu)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
-                'Počet listů musí být číslo');
+                'Počet listů musí být číslo.');
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
                 ->setValue(@$dok->pocet_priloh)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
-                'Počet příloh musí být číslo');
+                'Počet příloh musí být číslo.');
         $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
                 ->setValue(@$dok->typ_prilohy);
 
