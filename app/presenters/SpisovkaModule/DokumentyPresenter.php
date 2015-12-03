@@ -1101,8 +1101,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->redirect('detail', ['id' => $dokument_id]);
         }
 
-        $this->addComponent(new VyberPostovniZasilky(), 'druhZasilky');
-
         $this->template->Dok = $dokument;
     }
 

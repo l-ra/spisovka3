@@ -1,6 +1,0 @@
-{var last_order => 0}
-{foreach $DruhyZasilek as $id => $druh}
-    <br n:if="floor($druh->order / 100) > floor($last_order / 100)" />
-    {var last_order => $druh->order}
-    <input type="checkbox" name="{$InputName}[{$id}]" {if in_array($id, $Checked)}checked="checked"{/if} />{$druh->nazev}
-{/foreach}
