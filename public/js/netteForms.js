@@ -497,6 +497,12 @@ Nette.toggle = function(id, visible, srcElement) {
  * Setup handlers.
  */
 Nette.initForm = function(form) {
+    // [P.L.] ochrana proti dvojimu zavolani na konkretnim formulari
+    var o = $(form);
+    if (o.data('nette-form-handlers-set') == 1)
+        return;
+    o.data('nette-form-handlers-set', 1);
+    
 	form.noValidate = 'novalidate';
 
 	Nette.addEvent(form, 'submit', function(e) {
