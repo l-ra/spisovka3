@@ -91,4 +91,24 @@ class LatteMacros
         </$tpair>"; */
     }
 
+    /**
+     * Zavola DefaultFormRenderer pro vykresleni label.
+     * Formular musi pouzivat vychozi renderer.
+     * @param Form $form
+     * @param string $name
+     * @return string 
+     */
+    public static function label2($form, $name)
+    {
+        $renderer = $form->getRenderer();
+        $html = $renderer->renderLabel($form[$name]);
+        // odstran zapouzdrujici element
+        return $html->getHtml();
+    }
+    
+    public static function inputError2($form, $name)
+    {
+        $renderer = $form->getRenderer();
+        return $renderer->renderErrors($form[$name]);
+    }
 }
