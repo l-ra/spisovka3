@@ -562,15 +562,12 @@ table.hledani-dokumentu .jid {
     background: #ffffcc url('../images/icons/dialog-warning.png') 10px 5px no-repeat;
 }
 
-.flash_warning, .flash_warning_ext {
+/* Aplikace zcela nekonzistentně používá warning a error, že lepší pokaždé použít
+   stejný vzhled */
+.flash_warning, .flash_warning_ext, .flash_error, .flash_error_ext {
     color: #681203;
     border: 1px #681203 solid;
     background: #ffcccc url('../images/icons/dialog-warning.png') 10px 5px no-repeat;
-}
-.flash_error, .flash_error_ext {
-    color: #681203;
-    border: 1px #681203 solid;
-    background: #ffcccc url('../images/icons/dialog-error.png') 10px 5px no-repeat;
 }
 
 #upozorneni_na_nove_zpravy {

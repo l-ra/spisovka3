@@ -65,6 +65,8 @@ Jiné změny:
   se kterým nemůže pracovat správně. Též uživateli zobrazí upozornění, pokud
   je prohlížeč příliš starý.
 
+- aplikace při zobrazování zpráv uživateli nekonzistentně používala ikony
+  varování a chyby. Nyní je použit pouze obrázek značky s vykřičníkem.
 - aplikace se nyní snaží zjistit MIME typ přímo ze souborů. V předchozích
   verzích se typ určoval zjednodušeně pouze podle přípony souboru.
 - upraven vzhled nápovědy a nyní se nápověda zobrazuje v modálním okně
