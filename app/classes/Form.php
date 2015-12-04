@@ -19,18 +19,27 @@ class Form extends \Nette\Application\UI\Form
     public function validationFailed($form)
     {
         $presenter = $this->getPresenter();
-        $presenter->flashMessage('Validace formuláře selhala.', 'warning');
-        $errors = $form->getErrors();
-        foreach ($errors as $error)
-            $presenter->flashMessage($error, 'warning');
-        
-        $values = $form->getValues();
-        if (isset($values->id))
-            $presenter->redirect('this', ['id' => $values->id]);
-        else
-            $presenter->redirect('this');
+        // Zpracování při Ajaxu musí být odlišné
+        // Redirect by vrátil JSON s URL v atributu redirect
+        if ($presenter->isAjax()) {
+            // Nedělej nic a doufej, že se formulář vykreslí znovu.
+            // U formulářů renderovaných Nette by se mělo objevit hlášení
+            // vedle prvku, který neprošel validací
+        } else {
+            $presenter->flashMessage('Validace formuláře selhala.', 'warning');
+            $errors = $form->getErrors();
+            foreach ($errors as $error)
+                $presenter->flashMessage($error, 'warning');
+
+            /* Zkouska - NEprovadej redirect
+            $values = $form->getValues();
+            if (isset($values->id))
+                $presenter->redirect('this', ['id' => $values->id]);
+            else
+                $presenter->redirect('this'); */
+        }
     }
-    
+
     /**
      * @param string $name
      * @param string $label
@@ -40,12 +49,6 @@ class Form extends \Nette\Application\UI\Form
     {
         return $this[$name] = new Controls\DatePicker($label);        
     }
-
-    /* Není v aplikaci použito
-    public function addDateTimePicker($name, $label)
-    {
-        return $this[$name] = new \DateTimePicker($label);
-    } */
     
 	/**
 	 * Adds single-line text input control to the form. Its content should be 
@@ -70,6 +73,7 @@ class Form extends \Nette\Application\UI\Form
         $renderer->wrappers['controls']['container'] = null;
         $renderer->wrappers['pair']['container'] = 'dl';
         $renderer->wrappers['label']['container'] = 'dt';
+        $renderer->wrappers['label']['suffix'] = ':';
         $renderer->wrappers['control']['container'] = 'dd';        
     }
 }
