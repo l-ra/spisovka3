@@ -75,6 +75,9 @@ class Form extends \Nette\Application\UI\Form
         $renderer->wrappers['label']['container'] = 'dt';
         // tato změna by vyžadovala enormní množství práce, přepsat všechny formuláře
         // $renderer->wrappers['label']['suffix'] = ':';
-        $renderer->wrappers['control']['container'] = 'dd';        
+        $renderer->wrappers['control']['container'] = 'dd';
+        
+        $renderer->wrappers['error']['container'] = null;
+        $renderer->wrappers['error']['item'] = 'div class="flash_message flash_warning"';                
     }
 }
