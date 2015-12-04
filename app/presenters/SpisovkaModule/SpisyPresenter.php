@@ -676,8 +676,9 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     protected function createComponentNovyajaxForm()
     {
         $form1 = $this->createComponentNovyForm();
-
-        $form1['vytvorit']->controlPrototype->onclick("return spisVytvoritSubmit(this);");
+        
+        $form1->getElementPrototype()->onsubmit("return spisVytvoritSubmit(this);");
+        // $form1['vytvorit']->controlPrototype->onclick("return spisVytvoritSubmit(this);");
         $form1['storno']->controlPrototype->onclick("return closeDialog();");
         $form1->onSuccess[] = array($this, 'vytvoritAjaxClicked');
 

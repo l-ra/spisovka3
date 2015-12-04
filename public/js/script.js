@@ -1,10 +1,10 @@
-/* global BASE_URL, DOKUMENT_ID, typ_dokumentu_id, smer_typu_dokumentu */
+/* global BASE_URL, DOKUMENT_ID, typ_dokumentu_id, smer_typu_dokumentu, Nette */
 
 var stop_timer = 0;
 var url;
 var cache = Array();
 
-function InstallDatePicker() {
+function installDatePicker() {
 
     /*
      * DatePicter - volba datumu z kalendare
@@ -66,7 +66,7 @@ function dialogSpinner()
 
 $(function() {
 
-    InstallDatePicker();
+    installDatePicker();
     initSelect2();
     
     /*
@@ -77,6 +77,15 @@ $(function() {
     $(document).ajaxStop(function () {
         // při události ajaxStop spinner schovám
         hideSpinner();
+    });
+    
+    $(document).ajaxSuccess(function (event, jqXHR, ajaxSettings) {
+        var ct = jqXHR.getResponseHeader("content-type") || "";
+        if (ct.indexOf('text/html' > -1)) {
+        	$('#dialog').find('form').each(function() {
+				// window.Nette.initForm(this);
+			});
+        }
     });
     
     $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
@@ -101,9 +110,6 @@ $(function() {
         }
     });
     
-    // Povinne polozky
-    $('label.required').attr('title','Povinná položka').append(' <span class="star">*</span>');
-
     // Dialog
     $('#dialog').dialog({
         autoOpen: false,
@@ -588,12 +594,12 @@ subjektNovy = function() {
     return false;
 };
 
-spisVytvoritSubmit = function (button) {
+spisVytvoritSubmit = function (form) {
 
-    var form = $(button).parents('form');
     postFormJ(form, function(data) {
         if (typeof data == 'object') {
-            spisVybran(data.id);
+            if (data.status == "OK")
+                spisVybran(data.id);
         }
         else {
             $('#dialog').html(data);        
