@@ -3,6 +3,58 @@
 class SpisyPresenter extends BasePresenter
 {
 
+    protected function createComponentNovyForm()
+    {
+        $admin = strpos($this->name, 'Admin') !== false;
+        
+        $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
+        $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
+
+        $Spisy = new Spis();
+        $params = array('where' => array("tb.typ = 'VS'"));
+        $spisy = $Spisy->selectBox(1, null, 1, $params);
+
+        $form1 = new Spisovka\Form();
+        
+        if ($admin) {
+            $form1->addSelect('typ', 'Typ spisu:', Spis::typSpisu());            
+        } else
+            $form1->addHidden('typ')
+                    ->setValue('S');
+        
+        $form1->addText('nazev', $admin ? 'Název spisu/složky:' : 'Název spisu:', 50, 80)
+                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
+        $form1->addText('popis', 'Popis:', 50, 200);
+        $form1->addSelect('parent_id', 'Složka:', $spisy)
+                ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
+
+        $form1->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
+        $form1->getComponent('spisovy_znak_id');
+
+        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
+        $form1->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
+                ->addCondition(Spisovka\Form::FILLED)
+                ->addRule(Spisovka\Form::INTEGER);
+        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
+        $form1->addDatePicker('datum_otevreni', 'Datum otevření:')
+                ->setValue(date('d.m.Y'));
+        $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:');
+
+        $form1->addSubmit('vytvorit', 'Vytvořit');
+        $form1->addSubmit('storno', 'Zrušit')
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
+
+        if ($this->isAjax()) {
+            $form1->getElementPrototype()->onsubmit("return spisVytvoritSubmit(this);");
+            $form1['storno']->controlPrototype->onclick("return closeDialog();");
+            $form1->onSuccess[] = array($this, 'vytvoritAjaxClicked');            
+        } else
+            $form1->onSuccess[] = array($this, 'vytvoritClicked');                        
+        
+        return $form1;
+    }
+    
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -24,23 +76,21 @@ class SpisyPresenter extends BasePresenter
         $this->redirect(":{$this->name}:detail", array('id' => $spis_id));
     }
 
-    public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function vytvoritClicked(Nette\Application\UI\Form $form, $data)
     {
-        $data = $button->getForm()->getValues();
-
         $Spisy = new Spis();
 
         try {
-            $spis_id = $Spisy->vytvorit($data);
+            $Spisy->vytvorit($data);
             $this->flashMessage('Spis "' . $data['nazev'] . '"  byl vytvořen.');
         } catch (Exception $e) {
             $this->flashMessage('Spis "' . $data['nazev'] . '" se nepodařilo vytvořit.',
                     'warning');
             $this->flashMessage($e->getMessage(), 'warning');
-            $this->redirect(":{$this->name}:");
+            return;
         }
 
-        $this->redirect(":{$this->name}:detail", array('id' => $spis_id));
+        $this->redirect("default");
     }
 
 }
@@ -478,14 +528,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->redirect(':Spisovka:spisy:detail', array('id' => $spis_id));
     }
 
-    public function renderNovy()
-    {
-        $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->seznam()->fetchAll();
-        $this->template->SpisoveZnaky = $spisove_znaky;
-        $this->template->spisForm = $this['novyForm'];
-    }
-
     public function actionAkce($data)
     {
         if (isset($data['hromadna_akce'])) {
@@ -633,58 +675,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         }
     }
 
-    protected function createComponentNovyForm()
-    {
-
-        $Spisy = new Spis();
-
-        $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
-        $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
-
-        $params = array('where' => array("tb.typ = 'VS'"));
-        $spisy = $Spisy->selectBox(1, null, 1, $params);
-
-        $form1 = new Spisovka\Form();
-        $form1->addHidden('typ')
-                ->setValue('S');
-        $form1->addText('nazev', 'Název spisu:', 50, 80)
-                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
-        $form1->addText('popis', 'Popis:', 50, 200);
-        $form1->addSelect('parent_id', 'Složka:', $spisy)
-                ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
-
-        $form1->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
-        $form1->getComponent('spisovy_znak_id')
-        ;
-
-        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
-        $form1->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5);
-        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
-        $form1->addDatePicker('datum_otevreni', 'Datum otevření:')
-                ->setValue(date('d.m.Y'));
-        $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:');
-
-        $form1->addSubmit('vytvorit', 'Vytvořit')
-                ->onClick[] = array($this, 'vytvoritClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                        ->setValidationScope(FALSE)
-                ->onClick[] = array($this, 'stornoClicked');
-
-        return $form1;
-    }
-
-    protected function createComponentNovyajaxForm()
-    {
-        $form1 = $this->createComponentNovyForm();
-        
-        $form1->getElementPrototype()->onsubmit("return spisVytvoritSubmit(this);");
-        // $form1['vytvorit']->controlPrototype->onclick("return spisVytvoritSubmit(this);");
-        $form1['storno']->controlPrototype->onclick("return closeDialog();");
-        $form1->onSuccess[] = array($this, 'vytvoritAjaxClicked');
-
-        return $form1;
-    }
-
     public function vytvoritAjaxClicked(Nette\Application\UI\Form $form, $data)
     {
         $Spisy = new Spis();
@@ -692,19 +682,12 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         try {
             $spis_id = $Spisy->vytvorit($data);
         } catch (Exception $e) {
-            echo '<div class="flash_message flash_error">Spis "' . $data['nazev'] . '" se nepodařilo vytvořit.</div>';
-            echo '<div class="flash_message flash_error">' . $e->getMessage() . '</div>';
+            $form->addError("Spis se nepodařilo vytvořit.");
+            $form->addError($e->getMessage());
             return;
         }
 
         $this->sendJson(['status' => 'OK', 'id' => $spis_id, 'name' => $data['nazev']]);
-    }
-
-    public function stornoAjaxClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-        $dokument_id = @$data['dokument_id'];
-        $this->redirect(':Spisovka:Spisy:vyber', array('id' => $dokument_id));
     }
 
     protected function createComponentSearchForm()

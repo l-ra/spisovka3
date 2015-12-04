@@ -91,11 +91,11 @@ class Admin_SpisyPresenter extends SpisyPresenter
         }
     }
 
-    public function actionSeznam()
+    public function renderDefault()
     {
-        
+        $this->forward('seznam');        
     }
-
+    
     public function renderSeznam($hledat = null)
     {
         $this->hledat = $hledat;
@@ -388,44 +388,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
     public function stornoNovyClicked()
     {
         $this->redirect(':Admin:Spisy:seznam');
-    }
-
-    protected function createComponentNovyForm()
-    {
-        $Spisy = new Spis();
-
-        $typ_spisu = Spis::typSpisu();
-        $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
-        $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
-
-        $params = array('where' => array("tb.typ = 'VS'"));
-        $spisy = $Spisy->selectBox(1, null, 1, $params);
-
-        $form1 = new Spisovka\Form();
-        $form1->addSelect('typ', 'Typ spisu:', $typ_spisu);
-        $form1->addText('nazev', 'Název spisu/složky:', 50, 80)
-                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
-        $form1->addText('popis', 'Popis:', 50, 200);
-        $form1->addSelect('parent_id', 'Složka:', $spisy)
-                ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
-
-        $form1->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
-        $form1->getComponent('spisovy_znak_id');
-
-        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
-        $form1->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5);
-        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
-        $form1->addDatePicker('datum_otevreni', 'Datum otevření:')
-                ->setValue(date('d.m.Y'));
-        $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:');
-
-        $form1->addSubmit('vytvorit', 'Vytvořit')
-                ->onClick[] = array($this, 'vytvoritClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                        ->setValidationScope(FALSE)
-                ->onClick[] = array($this, 'stornoNovyClicked');
-
-        return $form1;
     }
 
     protected function createComponentSearchForm()
