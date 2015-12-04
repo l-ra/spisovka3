@@ -1,63 +1,47 @@
 {var Select2 => true}
 {block title}Detail spisu{/block}
 {block javascript}{if ($FormUpravit=='info')}
-{include ../../@vlozSpisZnak.latte}
+    {include ../../@vlozSpisZnak.latte}
 {/if}
 {/block}
 {block content}
-    <div class="navigate">
+<div class="navigate">
     <a href="{link :Admin:Spisy:seznam}">Spisy</a> - Detail
-    </div>
-    <h2>{$Spis->nazev}</h2>
+</div>
+<h2>{$Spis->nazev}</h2>
 
-    <div id="tisk">
-        <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-        </a>
-        <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
-        </a>        
-    </div>     
-    
-        {if ($FormUpravit=='info')}
+<div id="tisk">
+    <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
+        <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+    </a>
+    <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
+        <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+    </a>        
+</div>     
+
+{if ($FormUpravit=='info')}
     <div class="detail_blok">
         <div class="detail_hlavicka">Info</div>
-        {control $spisForm}
+        {control upravitForm}
     </div>
-        {else}
+{else}
     <div class="detail_blok">
         <div class="detail_hlavicka">Info</div>
         <dl>
             <dt>Typ spisu:</dt>
-            <dd>{=Spis::typSpisu($Spis->typ)}</dd>
-        </dl>
-
-        <dl>
+            <dd>{=Spis::typSpisu($Spis->typ)}</dd><br />
             <dt>Název:</dt>
-            <dd>{$Spis->nazev}</dd>
-        </dl>
-        <dl>
+            <dd>{$Spis->nazev}</dd><br />
             <dt>Popis:</dt>
-            <dd>{!$Spis->popis|escape|nl2br}</dd>
-        </dl>
-
-        <dl>
+            <dd>{!$Spis->popis|escape|nl2br}</dd><br />
             <dt>Spisový znak:</dt>
-            <dd>{$SpisZnak_nazev}</dd>
-        </dl>
-        <dl>
+            <dd>{$SpisZnak_nazev}</dd><br />
             <dt>Skartační znak:</dt>
-            <dd>{$Spis->skartacni_znak}</dd>
-        </dl>
-        <dl>
+            <dd>{$Spis->skartacni_znak}</dd><br />
             <dt>Skartační lhůta:</dt>
-            <dd>{$Spis->skartacni_lhuta}</dd>
-        </dl>
-        <dl>
+            <dd>{$Spis->skartacni_lhuta}</dd><br />
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd>
-        </dl>
-        <dl>
+            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd><br />
             <dt>Stav:</dt>
             <dd>
                 {=Spis::stav($Spis->stav)}
@@ -69,11 +53,11 @@
         </dl>
         <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit</a>
         {if 0}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="{link :Admin:Spisy:odebrat2, 'id'=>$Spis->id}" title="Odstraní tento spis/složku. Všechny jeho podřízené spisy odstraněny nebudou, ale budou přiřazeny nadřazenému spisu/složce." onclick="return confirm('Opravdu chcete odstranit tento spis/složku? Všechny podřízené spisy odstraněny nebudou, ale budou přiřazeny nadřazenému spisu/složce.');">Odebrat</a>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="{link :Admin:Spisy:odebrat1, 'id'=>$Spis->id}" title="Odstraní tento spis/složku včetně všech jeho podřízených spisů." onclick="return confirm('Opravdu chcete odstranit tento spis/složku včetně všech podřízených spisů?');">Odebrat včetně podřízených spisů</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="{link :Admin:Spisy:odebrat2, 'id'=>$Spis->id}" title="Odstraní tento spis/složku. Všechny jeho podřízené spisy odstraněny nebudou, ale budou přiřazeny nadřazenému spisu/složce." onclick="return confirm('Opravdu chcete odstranit tento spis/složku? Všechny podřízené spisy odstraněny nebudou, ale budou přiřazeny nadřazenému spisu/složce.');">Odebrat</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="{link :Admin:Spisy:odebrat1, 'id'=>$Spis->id}" title="Odstraní tento spis/složku včetně všech jeho podřízených spisů." onclick="return confirm('Opravdu chcete odstranit tento spis/složku včetně všech podřízených spisů?');">Odebrat včetně podřízených spisů</a>
         {/if}
-        
+
     </div>
-        {/if}
+{/if}

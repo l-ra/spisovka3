@@ -1,15 +1,1 @@
-{var Select2 => true}
-{block title}Nový spis{/block}
-{block javascript}
-{include ../../@vlozSpisZnak.latte}
-{/block}
-{block content}
-    <div class="navigate">
-    <a href="{link :Admin:Spisy:seznam}">Spisy</a> - Nový spis
-    </div>
-    <h2>Nový spis</h2>
-
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Info</div>
-        {control $spisForm}
-    </div>
+{include '../../SpisovkaModule/Spisy/novy.latte'}

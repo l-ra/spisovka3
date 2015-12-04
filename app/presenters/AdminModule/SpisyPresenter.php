@@ -158,11 +158,11 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->template->seznam = $seznam;
     }
 
-    public function renderDetail()
+    public function renderDetail($id, $upravit)
     {
-        $this->template->FormUpravit = $this->getParameter('upravit', null);
-
-        $spis_id = $this->getParameter('id', null);
+        $this->template->FormUpravit = $upravit;
+        $spis_id = $id;
+        
         $Spisy = new Spis();
 
         $spis = $Spisy->getInfo($spis_id);
@@ -243,14 +243,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->redirect(':Admin:Spisy:detail', array('id' => $spis_id));
     }
 
-    public function renderNovy()
-    {
-        $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->seznam()->fetchAll();
-        $this->template->SpisoveZnaky = $spisove_znaky;
-        $this->template->spisForm = $this['novyForm'];
-    }
-
     public function renderImport()
     {
         
@@ -258,7 +250,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     public function renderExport()
     {
-
         if ($this->getHttpRequest()->isPost()) {
             // Exportovani
             $post_data = $this->getHttpRequest()->getPost();
@@ -304,90 +295,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
                 $this->flashMessage('Nebyly nalezany žádné data k exportu!', 'warning');
             }
         }
-    }
-
-    /**
-     *
-     * Formular a zpracovani pro udaju osoby
-     *
-     */
-    protected function createComponentUpravitForm()
-    {
-        $Spisy = new Spis();
-
-        $spis = $this->template->Spis;
-        $typ_spisu = Spis::typSpisu();
-        $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
-        $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
-
-        $params = array('where' => array("tb.typ = 'VS'"));
-        $spisy = $Spisy->selectBox(1, @$spis->id, 1, $params);
-
-
-        $form1 = new Spisovka\Form();
-        $form1->addHidden('id')
-                ->setValue(@$spis->id);
-        $form1->addSelect('typ', 'Typ spisu:', $typ_spisu)
-                ->setValue(@$spis->typ);
-        $form1->addText('nazev', 'Název spisu:', 50, 80)
-                ->setValue(@$spis->nazev)
-                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
-        $form1->addText('popis', 'Popis:', 50, 200)
-                ->setValue(@$spis->popis);
-        $form1->addSelect('parent_id', 'Složka:', $spisy)
-                ->setValue(@$spis->parent_id);
-        $form1->addHidden('parent_id_old')
-                ->setValue(@$spis->parent_id);
-
-        $form1->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
-        $form1->getComponent('spisovy_znak_id')->setValue(@$spis->spisovy_znak_id)
-        ;
-
-        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
-                        ->setValue(@$spis->skartacni_znak)
-                ->controlPrototype->readonly = TRUE;
-        $form1->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
-                        ->setValue(@$spis->skartacni_lhuta)
-                ->controlPrototype->readonly = TRUE;
-        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci)
-                        ->setValue(@$spis->spousteci_udalost_id)
-                ->controlPrototype->readonly = TRUE;
-
-        $unixtime = strtotime(@$spis->datum_otevreni);
-        if ($unixtime == 0) {
-            $form1->addDatePicker('datum_otevreni', 'Datum otevření:');
-        } else {
-            $form1->addDatePicker('datum_otevreni', 'Datum otevření:')
-                    ->setValue(date('d.m.Y', $unixtime));
-        }
-
-        $unixtime = strtotime(@$spis->datum_uzavreni);
-        if ($unixtime == 0) {
-            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:');
-        } else {
-            $form1->addDatePicker('datum_uzavreni', 'Datum uzavření:')
-                    ->setValue(date('d.m.Y', $unixtime));
-        }
-
-        $form1->addSubmit('upravit', 'Upravit')
-                ->onClick[] = array($this, 'upravitClicked');
-        $form1->addSubmit('storno', 'Zrušit')
-                        ->setValidationScope(FALSE)
-                ->onClick[] = array($this, 'stornoClicked');
-
-        return $form1;
-    }
-
-    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-        $spis_id = $data['id'];
-        $this->redirect('this', array('id' => $spis_id));
-    }
-
-    public function stornoNovyClicked()
-    {
-        $this->redirect(':Admin:Spisy:seznam');
     }
 
     protected function createComponentSearchForm()
