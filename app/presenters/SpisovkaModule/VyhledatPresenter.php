@@ -285,9 +285,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $form->addText('subjekt_isds', 'ID datové schránky:', 10, 50)
                 ->setValue(@$hledat['subjekt_isds']);
 
-        $form->addSubmit('vyhledat', 'Vyhledat')
-                ->onClick[] = array($this, 'vyhledatClicked');
-
+        $form->addSubmit('vyhledat', 'Vyhledat');
+        $form->onSuccess[] = array($this, 'vyhledatClicked');
 
         if (count($hledat)) {
             foreach (array_keys($hledat) as $hledat_index) {
@@ -299,10 +298,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         return $form;
     }
 
-    public function vyhledatClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function vyhledatClicked(Spisovka\Form $form, array $data)
     {
-        $data = $button->getForm()->getValues(true /* jako pole, ne ArrayHash */);
-
         $backlink = $data['backlink'];
         unset($data['backlink']);
 

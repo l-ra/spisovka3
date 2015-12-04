@@ -36,9 +36,9 @@ function installDatePicker() {
         dayNamesMin:["Ne","Po","Út","St","Čt","Pá","So"],
         firstDay: 1
     });
-    
+
     $("input.DPNoPast").datepicker("option", "minDate", 0);
-    
+
     /* $('input.datetimepicker').datepicker(
     {
         duration: '',
@@ -60,7 +60,7 @@ function hideSpinner() {
 }
 function dialogSpinner()
 {
-    return $('<div class="dialog-spinner"></div>');    
+    return $('<div class="dialog-spinner"></div>');
 }
 
 
@@ -68,17 +68,23 @@ $(function() {
 
     installDatePicker();
     initSelect2();
-    
+
     /*
      * Nastaveni spinneru. Je vzdy pritomen, standarne ale je schovan.
      */
     $('<div id="ajax-spinner"></div>').appendTo("body").hide();
-    
+
+    /**
+     * AJAX
+     */
+    // Nepouzito a zatim jsem neotestoval pripadne vedlejsi ucinky
+    // $.nette.init();
+
     $(document).ajaxStop(function () {
         // při události ajaxStop spinner schovám
         hideSpinner();
     });
-    
+
     $(document).ajaxSuccess(function (event, jqXHR, ajaxSettings) {
         var ct = jqXHR.getResponseHeader("content-type") || "";
         if (ct.indexOf('text/html' > -1)) {
@@ -87,29 +93,29 @@ $(function() {
 			});
         }
     });
-    
+
     $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
         // Při spouštění plánovače nečekáme na odpověď
         if (ajaxSettings.url.indexOf('/cron/') != -1)
             return;
-        
+
         // při chybě též spinner schovám, protože jQuery zdá se nevyvolá událost stop
         hideSpinner();
-        
+
         var msg = 'Je nám líto, asynchronní požadavek skončil s chybou:\n' + thrownError;
         if (jqXHR.responseText
                 && $("#dialog").dialog( "isOpen" ) === false)
             msg = msg + '\n\n' + jqXHR.responseText;
-        
+
         alert(msg);
-        
+
         if (jqXHR.responseText
                 && $("#dialog").dialog( "isOpen" ) === true) {
             $('#dialog').html('<pre>' + jqXHR.responseText + '</pre>');
             dialogScrollUp();
         }
     });
-    
+
     // Dialog
     $('#dialog').dialog({
         autoOpen: false,
@@ -132,12 +138,12 @@ $(function() {
     });
 
     $('#dialog-subjekt').click(dialogVyberSubjektu);
-    
+
     $('#subjekt_pripojit_click').click(function(event){
         $('#subjekt_pripojit').show();
-        $('#subjekt_autocomplete').focus();        
+        $('#subjekt_autocomplete').focus();
         return false;
-    });    
+    });
 
     $('#dialog-pridat-prilohu').click(function(event){
         dialog(this,'Přidat přílohu');
@@ -148,35 +154,45 @@ $(function() {
         dialog(this,'Předat dokument organizační jednotce nebo zaměstnanci');
         return false;
     });
-    
+
     $('#dialog-predatspis').click(function(event){
         dialog(this,'Předat spis organizační jednotce nebo zaměstnanci');
         return false;
-    });    
+    });
 
-    $(document).on('click', '#dialog-spojit', function(event) {    
+    $(document).on('click', '#dialog-spojit', function(event) {
         dialog(this, 'Spojit s dokumentem');
-        return false;        
+        return false;
     });
 
     // Dialog - Historie
     $('#dialog-historie').click(function(event){
-        dialog(this,'Historie - Transakční protokol');
-        return false;        
+        dialog(this, 'Historie - Transakční protokol');
+        return false;
     });
 
     // Dialog - pripojit k archu
     $('#dialog-cjednaci').click(function(event){
-        dialog(this,'Vložit do spisu');
+        dialog(this, 'Vložit do spisu');
         return false;
     });
 
     // Dialog - hledat
     $('#dialog-search').click(function(event){
-        dialog(this,'Pokročilé vyhledávání');
+        dialog(this, 'Pokročilé vyhledávání');
         return false;
     });
-
+    $('#dialog').on('submit', '#frm-searchForm', function (event){
+        postFormJ(this, function (data) {
+            if (data.redirect)
+                window.location.href = data.redirect;
+            else {
+                $('#dialog').html(data);
+                dialogScrollUp();
+            }
+        });
+        return false;
+    });
 
     $('#predat_autocomplete').autocomplete({
         minLength: 3,
@@ -203,8 +219,8 @@ $(function() {
         if ( event.which == 13 ) {
             event.preventDefault();
         }
-    });    
-    
+    });
+
 
     $('#subjekt_autocomplete').autocomplete({
         minLength: 3,
@@ -224,7 +240,7 @@ $(function() {
                 typ_id = $('#frmodpovedForm-dokument_typ_id').val();
             if (typeof typ_id == 'undefined')
                 typ_id = typ_dokumentu_id;
-                
+
             var typ_code;
             if (typeof typ_id != 'undefined'
                 && typeof smer_typu_dokumentu != 'undefined')
@@ -234,9 +250,9 @@ $(function() {
                 // window.alert('chyba programu');
                 typ_code = 'AO';
             }
-            
+
             url = BASE_URL + 'subjekty/'+ui.item.id+'/vybrano?dok_id='+DOKUMENT_ID+'&typ=' + typ_code + '&autocomplete=1';
-            
+
             $.get(url, function(data) {
                 if ( data.indexOf('###vybrano###') != -1 ) {
                     alert('Subjekt připojen.');
@@ -244,7 +260,7 @@ $(function() {
                 } else {
                     alert(data);
                 }
-            });                
+            });
 
             return false;
         }
@@ -253,7 +269,7 @@ $(function() {
         if ( event.which == 13 ) {
             event.preventDefault();
         }
-    });    
+    });
 
     $('#novysubjekt_click').click( subjektNovy );
 
@@ -267,7 +283,7 @@ $(function() {
         $('input[name^=spis_vyber]').prop('checked',false);
         $('input[name^=zapujcka_vyber]').prop('checked',false);
     });
-    
+
 });
 
 /*
@@ -279,9 +295,9 @@ dialog = function ( elm, title, url ) {
 
     if ( typeof title == 'null' )
         title = 'Dialogové okno';
-        
+
     $('#dialog').dialog( "option", "title", title );
-    
+
     // Interni spinner v dialogu - bude nahrazen, az se obsah dialogu nahraje
     $('#dialog').html(dialogSpinner());
     $('#dialog').bind('dialogclose', function(event) {
@@ -294,15 +310,15 @@ dialog = function ( elm, title, url ) {
 
     var postdata = false;
     if (elm) {
-        if (!(elm instanceof jQuery))       
+        if (!(elm instanceof jQuery))
             elm = $(elm);
-        
+
         postdata = elm.attr('data-postdata');
         if (postdata)
             postdata = $.parseJSON(postdata);
     }
-    if (typeof url == 'undefined')        
-        url = elm.attr('href');        
+    if (typeof url == 'undefined')
+        url = elm.attr('href');
 
     var jqXHR;
     var successFunction = function(data) {
@@ -312,13 +328,13 @@ dialog = function ( elm, title, url ) {
         jqXHR = $.post(url, $.param(postdata), successFunction);
     else
         jqXHR = $.get(url, successFunction);
-            
+
     jqXHR.fail(function(jqXHR) {
         // Následující akce nyní provádí globální handler:
         // alert('Při načítání obsahu okna došlo k vážné chybě.');
         // $('#dialog').html('<pre>' + jqXHR.responseText);
     });
-    
+
     return false;
 };
 
@@ -328,7 +344,7 @@ reloadDialog = function (elm) {
     $.get(elm.href, function(data) {
         $('#dialog').html(data);
     });
-    
+
     return false;
 };
 
@@ -339,8 +355,8 @@ closeDialog = function () {
 };
 
 dialogScrollUp = function () {
-    
-    $("#dialog").scrollTop("0");    
+
+    $("#dialog").scrollTop("0");
 };
 
 /*
@@ -355,13 +371,13 @@ aresSubjekt = function ( formName ) {
         alert('Vyplňte IČ subjektu.');
         return false; // Je-li pole IC prázdné, nevolej neplatné URL
     }
-    
+
     var url = BASE_URL + 'subjekty/' + IC +'/ares';
-    
+
     showSpinner();
 
     $.getJSON(url, function(data) {
-        
+
         if ( data == null ) {
             alert('Záznam neexistuje nebo bylo zadáno chybné IČ.');
         } else {
@@ -372,9 +388,9 @@ aresSubjekt = function ( formName ) {
             $("#frm"+formName+"-adresa_cp").val(data.cislo_popisne);
             $("#frm"+formName+"-adresa_co").val(data.cislo_orientacni);
             $("#frm"+formName+"-adresa_mesto").val(data.mesto);
-            $("#frm"+formName+"-adresa_psc").val(data.psc);            
-            $("#frm"+formName+"-adresa_stat").val('CZE');            
-            $("#frm"+formName+"-stat_narozeni").val('CZE');                        
+            $("#frm"+formName+"-adresa_psc").val(data.psc);
+            $("#frm"+formName+"-adresa_stat").val('CZE');
+            $("#frm"+formName+"-stat_narozeni").val('CZE');
         }
     });
 
@@ -403,9 +419,9 @@ isdsSubjekt = function ( formName ) {
         } else if ( data.error ) {
             alert(data.error);
         } else {
-            
+
             $("#frm"+formName+"-type option[value="+data.dbType+"]").prop('selected', true);
-            
+
             $("#frm"+formName+"-ic").val(data.ic);
             $("#frm"+formName+"-nazev_subjektu").val(data.firmName);
             $("#frm"+formName+"-jmeno").val(data.pnFirstName);
@@ -415,9 +431,9 @@ isdsSubjekt = function ( formName ) {
             $("#frm"+formName+"-adresa_cp").val(data.adNumberInMunicipality);
             $("#frm"+formName+"-adresa_co").val(data.adNumberInStreet);
             $("#frm"+formName+"-adresa_mesto").val(data.adCity);
-            $("#frm"+formName+"-adresa_psc").val(data.adZipCode);            
+            $("#frm"+formName+"-adresa_psc").val(data.adZipCode);
         }
-        
+
     });
 
     showSpinner();
@@ -434,14 +450,14 @@ ajaxcron = function () {
 
     if (Math.random() > 0.1)
         return false;
-    
+
     var url = BASE_URL + 'cron/spustit';
 
     $.ajax({
         url: url,
         timeout: 1000
     });
-    
+
     return false;
 
 };
@@ -473,8 +489,8 @@ spisVybran = function (spis_id) {
 };
 
 spisVyjmoutDokument = function () {
-    
-    if (confirm('Opravdu chcete vyjmout tento dokument ze spisu?')) {    
+
+    if (confirm('Opravdu chcete vyjmout tento dokument ze spisu?')) {
         showSpinner();
         var url = BASE_URL + 'spisy/vyjmout-dokument?dok_id=' + DOKUMENT_ID;
 
@@ -485,16 +501,16 @@ spisVyjmoutDokument = function () {
             }
         });
     }
-    
+
     return false;
 };
 
 subjektVybran = function (elm) {
 
     showSpinner();
-    
+
     var url = elm.href + '&dok_id=' + DOKUMENT_ID;
-    
+
     $.get(url, function(data) {
         if ( data.indexOf('###vybrano###') != -1 ) {
             closeDialog();
@@ -537,7 +553,7 @@ renderSubjekty = function () {
 
 dialogVyberSubjektu = function () {
 
-    dialog($('#dialog-subjekt'), 'Seznam subjektů');   
+    dialog($('#dialog-subjekt'), 'Seznam subjektů');
     return false;
 };
 
@@ -558,11 +574,11 @@ subjektUpravitSubmit = function () {
             renderSubjekty();
         } else {
             // chyba
-            $('#dialog').html(data);            
+            $('#dialog').html(data);
             dialogScrollUp();
         }
     });
-    return false;    
+    return false;
 };
 
 handleNovySubjekt = function (okFunc) {
@@ -574,12 +590,12 @@ handleNovySubjekt = function (okFunc) {
                 alert(data.status);
         } else {
             // formular neprosel validaci
-            $('#dialog').html(data);            
+            $('#dialog').html(data);
             dialogScrollUp();
         }
     });
-    return false;    
-    
+    return false;
+
 };
 
 novySubjektOk = function () {
@@ -589,8 +605,8 @@ novySubjektOk = function () {
 };
 
 subjektNovy = function() {
-    
-    dialog(this, 'Nový subjekt');    
+
+    dialog(this, 'Nový subjekt');
     return false;
 };
 
@@ -602,7 +618,7 @@ spisVytvoritSubmit = function (form) {
                 spisVybran(data.id);
         }
         else {
-            $('#dialog').html(data);        
+            $('#dialog').html(data);
             dialogScrollUp();
         }
     });
@@ -619,7 +635,7 @@ osobaVybrana = function (elm) {
     }
 
     showSpinner();
-    
+
     $.get(url, function(data) {
         if ( data.indexOf('###vybrano###') != -1 ) {
             data = data.replace('###vybrano###','');
@@ -667,25 +683,25 @@ odebratSubjekt = function(elm){
             renderSubjekty();
         });
     }
-    
+
     return false;
 };
 
 vyber_odes_form = function ( elm, subjekt_id ) {
-    
+
     var volba = elm.options[elm.selectedIndex].value;
-    
+
     odes_form_reset(subjekt_id);
-    
+
     $('#odes_'+subjekt_id+'_'+volba).show();
-    
-    
+
+
     return false;
-    
+
 };
 
 odes_form_reset = function ( subjekt_id ) {
-    
+
     if ( typeof subjekt_id != "undefined" ) {
         $('#odes_'+subjekt_id+'_1').hide();
         $('#odes_'+subjekt_id+'_2').hide();
@@ -694,8 +710,8 @@ odes_form_reset = function ( subjekt_id ) {
     } else {
         $('.odes_form').hide();
     }
-    
-    
+
+
 };
 
 zobrazFax = function (elm) {
@@ -744,13 +760,13 @@ function renderVysledekHledaniDokumentu(data,typ) {
         html = html + "<td>" + a + data[zaznam]['nazev'] + "</a></td>";
         html = html + "</tr>";
     }
-    
+
     html = html + "</table>";
     return html;
 }
 
 hledejDokument = function (input, typ) {
-    
+
     // nacteme hodnotu
     var vyraz = input.value;
     // vezmeme jen nad tri znaky
@@ -779,10 +795,10 @@ hledejDokumentAjax = function (vyraz, typ) {
     showSpinner();
 
     var url = BASE_URL + 'spojit/hledat?q=' + vyraz;
-    
+
     $.get(url, function(data) {
         var vysledek = $('#vysledek');
-        
+
         if ( data == '' ) {
             vysledek.html('<div class="prazdno">Nebyly nalezeny žádné dokumenty odpovídající dané sekvenci.</div>');
         } else if ( data == 'prilis_mnoho' ) {
@@ -792,21 +808,21 @@ hledejDokumentAjax = function (vyraz, typ) {
             vysledek.html(renderVysledekHledaniDokumentu(data, typ));
         }
     });
-    
+
     return false;
 };
 
 renderSpojeni = function () {
-    
+
     var href = BASE_URL + 'dokumenty/' + DOKUMENT_ID + '/detail-spojeni';
     $.get(href, function(html) {
         $('#snippet-spojeni').replaceWith(html);
-    });    
+    });
 };
 
 spojitDokument = function (elm) {
 
-    showSpinner();    
+    showSpinner();
     $.get(elm.href, function() {
         closeDialog();
         renderSpojeni();
@@ -816,19 +832,19 @@ spojitDokument = function (elm) {
 };
 
 odebratSpojeni  = function (elm) {
-  
-    showSpinner();    
+
+    showSpinner();
     $.get(elm.href, function() {
         renderSpojeni();
     });
 
-    return false;    
-};    
+    return false;
+};
 
 pripojitDokument = function (elm) {
 
     showSpinner();
-    
+
     $.get(elm.href, function(data) {
         if ( data.indexOf('###vybrano###') != -1 ) {
             data = data.replace('###vybrano###','');
@@ -855,14 +871,14 @@ pripojitDokument = function (elm) {
         }
     });
 
-    return false;                
+    return false;
 };
 
 
 overitISDS = function (elm) {
-    
+
     return dialog(elm,'Ověření datové zprávy');
-    
+
 };
 
 
@@ -885,7 +901,7 @@ filtrSestavy = function (elm) {
 zobrazSestavu = function (elm) {
 
     var param = '?';
-    
+
     if ( elm.pc_od.value != '' ) {param = param + 'pc_od=' + elm.pc_od.value + '&'; }
     if ( elm.pc_do.value != '' ) {param = param + 'pc_do=' + elm.pc_do.value + '&'; }
     if ( elm.d_od.value != '' )  {param = param + 'd_od=' + elm.d_od.value + '&'; }
@@ -902,8 +918,8 @@ zobrazSestavu = function (elm) {
 };
 
 function select_set_value(SelectObject, Value) {
-  for(index = 0; 
-    index < SelectObject.length; 
+  for(index = 0;
+    index < SelectObject.length;
     index++) {
    if(SelectObject[index].value == Value)
      SelectObject.selectedIndex = index;
@@ -937,7 +953,7 @@ function htmlspecialchars (string, quote_style, charset, double_encode) {
     if (typeof quote_style === 'undefined' || quote_style === null) {
         quote_style = 2;
     }
-    
+
     if ( typeof string == "object" ) return "";
 
     string = string.toString();
@@ -989,21 +1005,21 @@ zmen_rezim_subjektu = function() {
         rezim = 'AO';
     else
         rezim = 'A';
-        
+
     // zmen element obrazku
-    // this.title = this.alt = rezim;    
+    // this.title = this.alt = rezim;
     // var url = this.src;
     // url = url.replace(/subjekt_[^\.]*/, 'subjekt_' + rezim.toLowerCase());
     // this.src = url;
 
     var subjekt_id = this.id.replace(/subjekt_ikona_/, '');
     var url = BASE_URL + 'subjekty/'+subjekt_id+'/zmenrezim?';
-    url += 'dok_id='+DOKUMENT_ID+'&typ='+rezim;    
+    url += 'dok_id='+DOKUMENT_ID+'&typ='+rezim;
 
     $.get(url, '', function(data) {
         renderSubjekty();
     }, 'text');
-    
+
 };
 /**
  * Initializuje Select2 widgety na prvcich select s atributem data-widget-select2=1
@@ -1019,7 +1035,7 @@ initSelect2 = function() {
 
             $(this).select2(options).attr('has-select2-widget', 1);
         });
-        
+
         $('.widget_spisovy_znak').select2({
             width: 'resolve'
         });
@@ -1035,7 +1051,7 @@ vybratSpisovyZnak = function(element) {
     var sz_id = form.spisovy_znak_id.options[key].value;
     if (sz_id == 0) // položka "vyberte z nabídky"
         return true;
-    
+
     var url = BASE_URL + 'spisznak/' + sz_id + '/';
     $.get(url, function(data) {
         form.skartacni_znak.value = data.skartacni_znak;
@@ -1051,7 +1067,7 @@ postFormJ = function (form, callback) {
 
     if (!(form instanceof jQuery))
         form = $(form);
-    
+
     $.post(form.attr('action'), form.serialize(), callback);
 };
 
@@ -1068,7 +1084,7 @@ initSpisAutocomplete = function() {
                     q: term // search term
                 };
             },
-            results: function (data, page) { 
+            results: function (data, page) {
                 // parse the results into the format expected by Select2.
                 return { results: data };
             },
@@ -1077,13 +1093,13 @@ initSpisAutocomplete = function() {
     });
 };
 
-openHelpWindow = function(url) {    
+openHelpWindow = function(url) {
     $('#napoveda').dialog( "option", "title", "Nápověda" );
-    
+
     // Interni spinner v dialogu - bude nahrazen, az se obsah dialogu nahraje
     $('#napoveda').html(dialogSpinner());
     $('#napoveda').dialog('open');
-    
+
     displayHelpPage(url);
     return false;
 };

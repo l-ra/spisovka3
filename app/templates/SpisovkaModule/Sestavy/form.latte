@@ -77,11 +77,11 @@
         {input2 razeni3}
     </div>
     
-    {include ../Vyhledat/form_common.latte}
+    {include ../Vyhledat/form_common.latte, _form => $form}
 
-    {include ../Vyhledat/form_predani.latte}
+    {include ../Vyhledat/form_predani.latte, _form => $form}
  
-    {include ../Vyhledat/form_subjekt.latte}
+    {include ../Vyhledat/form_subjekt.latte, _form => $form}
 
     <div class="dokument_blok_submit">
         {$form['odeslat']->control}

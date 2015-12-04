@@ -1,17 +1,16 @@
     {form $form}
-    {include form_common.latte}
+    {include form_common.latte, _form => $form}
 
     {if $muzeHledatDlePrideleni}
-    {include form_predani.latte}
+    {include form_predani.latte, _form => $form}
     {/if}
 
-    {include form_subjekt.latte}
+    {include form_subjekt.latte, _form => $form}
 
     <div class="dokument_blok_submit">
-        {$form['vyhledat']->control}
+        {input vyhledat}
     </div>
     {/form}
-
 
 <script type="text/javascript">
     installDatePicker();

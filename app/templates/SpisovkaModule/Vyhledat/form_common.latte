@@ -14,30 +14,30 @@
         {input2 zpusob_doruceni_id}
         <dl>
             <dt>Datum doručení/vzniku:</dt>
-            <dd>od: {$form['datum_vzniku_od']->control} {$form['datum_vzniku_cas_od']->control} datum (d.m.r) / čas (h:m:s)<br />
-            do: {$form['datum_vzniku_do']->control} {$form['datum_vzniku_cas_do']->control} datum (d.m.r) / čas (h:m:s)</dd>
+            <dd>od: {input datum_vzniku_od} {input datum_vzniku_cas_od} datum (d.m.r) / čas (h:m:s) {inputError2 datum_vzniku_od}<br />
+                do: {input datum_vzniku_do} {input datum_vzniku_cas_do} datum (d.m.r) / čas (h:m:s) {inputError2 datum_vzniku_do}</dd>
         </dl>
         
         {input2 cislo_jednaci_odesilatele}
         <dl>
             <dt>Číslo doporučeného dopisu:</dt>
-            <dd>{$form['cislo_doporuceneho_dopisu']->control}<br />
-            {$form['cislo_doporuceneho_dopisu_pouze']->control}</dd>
+            <dd>{input cislo_doporuceneho_dopisu}<br />
+                {input cislo_doporuceneho_dopisu_pouze}</dd>
         </dl>         
         {input2 poznamka}
         
         {input2 zpusob_vyrizeni}
         <dl>
             <dt>Datum vyřízení:</dt>
-            <dd>od: {$form['datum_vyrizeni_od']->control} {$form['datum_vyrizeni_cas_od']->control} datum (d.m.r) / čas (h:m:s)<br />
-            do: {$form['datum_vyrizeni_do']->control} {$form['datum_vyrizeni_cas_do']->control} datum (d.m.r) / čas (h:m:s)</dd>
+            <dd>od: {input datum_vyrizeni_od} {input datum_vyrizeni_cas_od} datum (d.m.r) / čas (h:m:s) {inputError2 datum_vyrizeni_od}<br />
+            do: {input datum_vyrizeni_do} {input datum_vyrizeni_cas_do} datum (d.m.r) / čas (h:m:s) {inputError2 datum_vyrizeni_do}</dd>
         </dl>
         
         {input2 zpusob_odeslani}
         <dl>
             <dt>Datum odeslání:</dt>
-            <dd>od: {$form['datum_odeslani_od']->control} {$form['datum_odeslani_cas_od']->control} datum (d.m.r) / čas (h:m:s)<br />
-            do: {$form['datum_odeslani_do']->control} {$form['datum_odeslani_cas_do']->control} datum (d.m.r) / čas (h:m:s)</dd>
+            <dd>od: {input datum_odeslani_od} {input datum_odeslani_cas_od} datum (d.m.r) / čas (h:m:s) {inputError2 datum_odeslani_od}<br />
+            do: {input datum_odeslani_do} {input datum_odeslani_cas_do} datum (d.m.r) / čas (h:m:s) {inputError2 datum_odeslani_do}</dd>
         </dl>
         
         {input2 druh_zasilky}

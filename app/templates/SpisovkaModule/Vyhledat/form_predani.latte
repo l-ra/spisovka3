@@ -13,9 +13,9 @@
         <dl>
             <dt>Přidělen:</dt>
             <dd>
-            {$form['prideleno_text']->control}
-            <br />{$form['prideleno_osobne']->control}
-            <br />{$form['prideleno_na_organizacni_jednotku']->control}
+            {input prideleno_text}<br />
+            {input prideleno_osobne}<br />
+            {input prideleno_na_organizacni_jednotku}
 
         <script type="text/javascript">
         function pridelenoPredanoSearchHandler(type, payload) {
@@ -59,9 +59,9 @@
         <dl>
             <dt>Předán:</dt>
             <dd>
-            {$form['predano_text']->control}
-            <br />{$form['predano_osobne']->control}
-            <br />{$form['predano_na_organizacni_jednotku']->control}
+            {input predano_text}<br />
+            {input predano_osobne}<br />
+            {input predano_na_organizacni_jednotku}
         <script type="text/javascript">
         $('input[name=predano_text]').keyup(function(event) {
             keyUpHandler('predano', this);
