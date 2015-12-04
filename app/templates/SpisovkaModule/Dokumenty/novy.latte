@@ -72,8 +72,8 @@
         {input2 nazev}
         {input2 popis}
         <dl>
-            <dt>{label datum_vzniku /}</dt>
-            <dd>{input datum_vzniku} {input datum_vzniku_cas} {inputError datum_vzniku}</dd>
+            <dt>{label2 datum_vzniku}</dt>
+            <dd>{input datum_vzniku} {input datum_vzniku_cas} {inputError2 datum_vzniku}</dd>
         </dl>
         {* tyto prvky jsou zobrazovany / skryvany Javascriptem *}
         <div class="pouze_prichozi_dokument">
@@ -82,15 +82,15 @@
             {input2 cislo_doporuceneho_dopisu}
         </div>
         <dl>
-            <dt>{label pocet_listu /}</dt>
+            <dt>{label2 pocet_listu}</dt>
             <dd><span style="font-weight: normal;">
                 {input pocet_listu}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {label pocet_priloh /} {input pocet_priloh}
+                {label2 pocet_priloh} {input pocet_priloh}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {label typ_prilohy /} {input typ_prilohy}
+                {label2 typ_prilohy} {input typ_prilohy}
                 </span>
-                &nbsp;&nbsp;{inputError pocet_listu} {inputError pocet_priloh}
+                &nbsp;&nbsp;{inputError2 pocet_listu} {inputError2 pocet_priloh}
             </dd>
         </dl>
         {if isset($form['lhuta'])}
