@@ -301,12 +301,16 @@ dt.dt_dialog {
     float: right;
 }
 
-.required label {
+.required dt label {
     color: #080808;
     font-weight: bold;
     text-decoration: underline;
 }
 
+/* chyba validace prvku ve formulari */
+span.error {
+    color: red;
+}
 
 /* ***************************************************************** */
 /* *** DOKUMENTY *** */
