@@ -25,7 +25,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         $tmp->setHeader('To', NULL);
 
         $config = (new Spisovka\ConfigEpodatelna())->get();
-        
+        $config = $config->odeslani[0];
         if ($tmp->signed != 1 || $config['typ_odeslani'] != 1) {
             $mail_source = $tmp->generateMessage();
             $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
