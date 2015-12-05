@@ -12,5 +12,11 @@ class SpisovyZnakComponent extends Nette\Forms\Controls\SelectBox
         $proto->attrs['class'] = 'widget_spisovy_znak';
         $proto->onchange('vybratSpisovyZnak(this);');
     }
+    
+	public function isFilled()
+	{
+        $value = $this->getValue();
+		return $value !== NULL && $value != 0;
+	}
 
 }
