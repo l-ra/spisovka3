@@ -1452,7 +1452,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $dokument_id = $data['id'];
+        $dokument_id = isset($data['id']) ? $data['id'] : $this->getParameter('id');
         $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
     }
 
@@ -1470,7 +1470,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         ksort($zpusob_doruceni);
 
         $form = new Spisovka\Form();
-        $form->addHidden('id');
 
         $nazev_control = $form->addText('nazev', 'Věc:', 80, 250);
         if (!Acl::isInRole('podatelna')) {
@@ -1517,7 +1516,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $cas = date('H:i:s', $unixtime);
             }
 
-            $form['id']->setDefaultValue($Dok->id);
             $form['nazev']->setDefaultValue($nazev);
             $form['popis']->setDefaultValue($Dok->popis);
             $form['cislo_jednaci_odesilatele']->setDefaultValue($Dok->cislo_jednaci_odesilatele);
@@ -1549,10 +1547,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         $Dokument = new Dokument();
-        $dokument_id = $data['id'];
+        $dokument_id = $this->getParameter('id');
         $dok = $Dokument->getInfo($dokument_id);
-
-        //Nette\Diagnostics\Debugger::dump($data);
 
         if (!($dok->stav_dokumentu == 1 || $this->user->isInRole('superadmin'))) {
             // needitovatelne skryte polozky
@@ -1575,9 +1571,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             unset($data['datum_vzniku_cas']);
         }
 
-        //Nette\Diagnostics\Debugger::dump($data); exit;
-        //Nette\Diagnostics\Debugger::dump($dok); exit;
-
         try {
             $Dokument->ulozit($data, $dokument_id);
 
@@ -1596,7 +1589,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function createComponentVyrizovaniForm()
     {
-
         $zpusob_vyrizeni = Dokument::zpusobVyrizeni(1);
 
         $SpisovyZnak = new SpisovyZnak();
@@ -1605,8 +1597,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Dok = @$this->template->Dok;
 
         $form = new Spisovka\Form();
-        $form->addHidden('id')
-                ->setValue(@$Dok->id);
+        
         $form->addSelect('zpusob_vyrizeni_id', 'Způsob vyřízení:', $zpusob_vyrizeni)
                 ->setValue(@$Dok->zpusob_vyrizeni_id);
 
@@ -1625,7 +1616,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue($cas);
 
         $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
-        $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id);
+        $form->getComponent('spisovy_znak_id')
+//                ->setRequired()
+                ->setValue(@$Dok->spisovy_znak_id);
 
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
                 ->setValue(@$Dok->ulozeni_dokumentu);
@@ -1633,12 +1626,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$Dok->poznamka_vyrizeni);
 
         $form->addText('skartacni_znak', 'Skartační znak: ', 3, 3)
+//                        ->setRequired('Vyberte platný spisový znak.')
                         ->setValue(@$Dok->skartacni_znak)
                 ->controlPrototype->readonly = TRUE;
-        //$form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
-        //        ->setValue(@$Dok->skartacni_znak)
-        //        //->controlPrototype->onchange("selectReadOnly(this);");
         $form->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
+//                        ->setRequired('Vyberte platný spisový znak.')
                         ->setValue(@$Dok->skartacni_lhuta)
                 ->controlPrototype->readonly = TRUE;
         $form->addSelect('spousteci_udalost_id', 'Spouštěcí událost: ', $spousteci_udalost)
@@ -1667,7 +1659,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $dokument_id = $data['id'];
+        $dokument_id = $this->getParameter('id');
 
         // uprava casu
         $data['datum_vyrizeni'] = $data['datum_vyrizeni'] . " " . $data['datum_vyrizeni_cas'];

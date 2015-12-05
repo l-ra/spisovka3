@@ -254,93 +254,52 @@
     <div class="dokument_blok_sedy">
         <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
-            {if ($FormUpravit=='vyrizeni')}
-                {var $vyrizovaniForm = $presenter->getComponent('vyrizovaniForm')}
-                {$vyrizovaniForm->render('begin')}
-                <dl>
-                    <dt>Způsob vyřízení:</dt>
-                    <dd>{$vyrizovaniForm['zpusob_vyrizeni_id']->control}</dd>
-                </dl>
-                <dl>
-                    <dt>Datum vyřízení:</dt>
-                    <dd>{$vyrizovaniForm['datum_vyrizeni']->control} {$vyrizovaniForm['datum_vyrizeni_cas']->control}</dd>
-                </dl>
-                <dl>
-                    <dt>Spisový znak:</dt>
-                    <dd>{$vyrizovaniForm['spisovy_znak_id']->control}</dd>
-                </dl>
-                <dl>
-                    <dt>Skartační znak:</dt>
-                    <dd>{$vyrizovaniForm['skartacni_znak']->control}</dd>
-                </dl>
-                <dl>
-                    <dt>Skartační lhůta:</dt>
-                    <dd>{$vyrizovaniForm['skartacni_lhuta']->control}</dd>
-                </dl>
-                <dl>
-                    <dt>Spouštěcí událost:</dt>
-                    <dd>{$vyrizovaniForm['spousteci_udalost_id']->control}</dd>
-                </dl>
-                <dl>
-                    <dt>Počet listů:</dt>
-                    <dd>{$vyrizovaniForm['vyrizeni_pocet_listu']->control}
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$vyrizovaniForm['vyrizeni_pocet_priloh']->control}
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Typ přílohy: </span>{$vyrizovaniForm['vyrizeni_typ_prilohy']->control}
-                    </dd>
-                </dl>
-                <dl>
-                    <dt>Uložení dokumentu:</dt>
-                    <dd>{$vyrizovaniForm['ulozeni_dokumentu']->control}</dd>
-                </dl>
-                <dl>
-                    <dt>Poznámka k vyřízení:</dt>
-                    <dd>{$vyrizovaniForm['poznamka_vyrizeni']->control}</dd>
-                </dl>
-                <div>
-                    {$vyrizovaniForm['upravit']->control}
-                    {$vyrizovaniForm['storno']->control}
-                </div>
-                {$vyrizovaniForm->render('end')}
+            {if ($FormUpravit == 'vyrizeni')}
+                {form vyrizovaniForm}
+                    {input2 zpusob_vyrizeni_id}
+                    <dl>
+                        <dt>{label2 datum_vyrizeni}</dt>
+                        <dd>{input datum_vyrizeni} {input datum_vyrizeni_cas}</dd>
+                    </dl>
+                    {input2 spisovy_znak_id}
+                    {input2 skartacni_znak}
+                    {input2 skartacni_lhuta}
+                    {input2 spousteci_udalost_id}                    
+                    <dl>
+                        <dt>{label2 vyrizeni_pocet_listu}</dt>
+                        <dd>{input vyrizeni_pocet_listu} {inputError2 vyrizeni_pocet_listu}
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 vyrizeni_pocet_priloh} {input vyrizeni_pocet_priloh} {inputError2 vyrizeni_pocet_priloh}
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 vyrizeni_typ_prilohy} {input vyrizeni_typ_prilohy}
+                        </dd>
+                    </dl>
+                    {input2 ulozeni_dokumentu}
+                    {input2 poznamka_vyrizeni}
+                    <div>
+                        {input upravit} {input storno}
+                    </div>
+                {/form}
             {else}
                 <dl>
                     <dt>Způsob vyřízení:</dt>
-                    <dd>{$Dok->zpusob_vyrizeni}</dd>
-                </dl>
-                <dl>
+                    <dd>{$Dok->zpusob_vyrizeni}</dd><br />
                     <dt>Datum vyřízení:</dt>
-                    <dd>{$Dok->datum_vyrizeni|edatetime}</dd>
-                </dl>
-                <dl>
+                    <dd>{$Dok->datum_vyrizeni|edatetime}</dd><br />
                     <dt>Spisový znak:</dt>
-                    <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}</dd>
-                </dl>
-                <dl>
+                    <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}</dd><br />
                     <dt>Skartační znak:</dt>
-                    <dd>{$Dok->skartacni_znak}</dd>
-                </dl>
-                <dl>
+                    <dd>{$Dok->skartacni_znak}</dd><br />
                     <dt>Skartační lhůta:</dt>
-                    <dd class="normal-font"><strong>{$Dok->skartacni_lhuta}</strong> {if $Dok->stav_dokumentu > 4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
-                </dl>
-                <dl>
+                    <dd class="normal-font"><strong>{$Dok->skartacni_lhuta}</strong> {if $Dok->stav_dokumentu > 4}(rok skartace {$Dok->skartacni_rok}){/if}</dd><br />
                     <dt>Spouštěcí událost:</dt>
-                    <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
-                </dl>
-                {if $Dok->stav_dokumentu>=5}
-                    <dl>
+                    <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd><br />
+                    {if $Dok->stav_dokumentu>=5}
                         <dt>Datum spouštěcí události:</dt>
-                        <dd>{$Dok->datum_spousteci_udalosti|edate}</dd>
-                    </dl>
-                {/if}
-                <dl>
+                        <dd>{$Dok->datum_spousteci_udalosti|edate}</dd><br />
+                    {/if}
                     <dt>Počet listů / příloh / typ příloh:</dt>
-                    <dd>{$Dok->vyrizeni_pocet_listu} / {$Dok->vyrizeni_pocet_priloh} {if !empty($Dok->vyrizeni_typ_prilohy)}/ {$Dok->vyrizeni_typ_prilohy}{/if}</dd>
-                </dl>
-                <dl>
+                    <dd>{$Dok->vyrizeni_pocet_listu} / {$Dok->vyrizeni_pocet_priloh} {if !empty($Dok->vyrizeni_typ_prilohy)}/ {$Dok->vyrizeni_typ_prilohy}{/if}</dd><br />
                     <dt>Uložení dokumentu:</dt>
-                    <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}</dd>
-                </dl>
-                <dl>
+                    <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}</dd><br />
                     <dt>Poznámka k vyřízení:</dt>
                     <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
                 </dl>
