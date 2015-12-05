@@ -308,6 +308,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $form = new Spisovka\Form();
 
         $form->addDatePicker('datum_odeslani', 'Datum odeslání:')
+                ->setRequired()
                 ->setDefaultValue($dokument->datum_odeslani);
 
         if ($dokument->zpusob_odeslani_id == 3) {

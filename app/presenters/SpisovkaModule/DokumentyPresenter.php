@@ -1136,27 +1136,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $sznacka = implode(", ", $sznacka_A);
         }
         $this->template->SpisovaZnacka = $sznacka;
-
-        // odesilatele
-        $ep = (new Spisovka\ConfigEpodatelna())->get();
-        $odesilatele = array();
-        if (count($ep['odeslani']) > 0) {
-            foreach ($ep['odeslani'] as $odes_id => $odes) {
-                if ($odes['aktivni'] == 1) {
-                    if (empty($odes['jmeno'])) {
-                        $odesilatele['epod' . $odes_id] = $odes['email'] . "[" . $odes['ucet'] . "]";
-                    } else {
-                        $odesilatele['epod' . $odes_id] = $odes['jmeno'] . " <" . $odes['email'] . "> [" . $odes['ucet'] . "]";
-                    }
-                }
-            }
-        }
-        $user_info = $this->user->getIdentity();
-        if (!empty($user_info->identity->email)) {
-            $key = "user#" . Osoba::displayName($user_info->identity, 'jmeno') . "#" . $user_info->identity->email;
-            $odesilatele[$key] = Osoba::displayName($user_info->identity, 'jmeno') . " <" . $user_info->identity->email . "> [zaměstnanec]";
-        }
-        $this->template->odesilatele = $odesilatele;
     }
 
     public function actionIsdsovereni()
@@ -1755,6 +1734,26 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $Dok = $this->template->Dok;
 
+        // odesilatele
+        $ep = (new Spisovka\ConfigEpodatelna())->get();
+        $odesilatele = array();
+        if (count($ep['odeslani']) > 0) {
+            foreach ($ep['odeslani'] as $odes_id => $odes) {
+                if ($odes['aktivni'] == 1) {
+                    if (empty($odes['jmeno'])) {
+                        $odesilatele['epod' . $odes_id] = $odes['email'] . "[" . $odes['ucet'] . "]";
+                    } else {
+                        $odesilatele['epod' . $odes_id] = $odes['jmeno'] . " <" . $odes['email'] . "> [" . $odes['ucet'] . "]";
+                    }
+                }
+            }
+        }
+        $user_info = $this->user->getIdentity();
+        if (!empty($user_info->identity->email)) {
+            $key = "user#" . Osoba::displayName($user_info->identity, 'jmeno') . "#" . $user_info->identity->email;
+            $odesilatele[$key] = Osoba::displayName($user_info->identity, 'jmeno') . " <" . $user_info->identity->email . "> [zaměstnanec]";
+        }
+
         $form = new Spisovka\Form();
         
         if (!empty($Dok->subjekty))
@@ -1763,18 +1762,38 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     continue;
 
                 $form->addDatePicker("datum_odeslani_postou_$sid", 'Datum odeslání:')
+                        ->setRequired()
                         ->setDefaultValue("now")
                         ->forbidPastDates();
                         
-                // vytvoří bohužel novou instanci pro každý subjekt
+                // vytvoří novou instanci pro každý subjekt
                 $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(),
                         "druh_zasilky_$sid");
-                $form["druh_zasilky_$sid"]->setDefaultValue([DruhZasilky::OBYCEJNE]);
+                $form["druh_zasilky_$sid"]->setRequired()
+                        ->setDefaultValue([DruhZasilky::OBYCEJNE]);
                 $form->addFloat("cena_zasilky_$sid", 'Cena:', 10)
                         ->setOption('description', 'Kč');
                 $form->addFloat("hmotnost_zasilky_$sid", 'Hmotnost:', 10)
                         ->setOption('description', 'kg');
                 $form->addText("poznamka_$sid", 'Poznámka:');
+
+                // faxem
+                $form->addDatePicker("datum_odeslani_faxu_$sid", 'Datum odeslání:')
+                        ->setRequired()
+                        ->setDefaultValue("now")
+                        ->forbidPastDates();
+                $form->addText("cislo_faxu_$sid", 'Číslo faxu:', 20);
+                $form->addTextArea("zprava_faxu_$sid", 'Zpráva pro příjemce:', 80, 5);
+
+                // e-mailem
+                if (count($odesilatele)) {
+                    $form->addSelect("email_from_$sid", 'Odesílatel:', $odesilatele)
+                            ->setRequired();
+                    $form->addText("email_predmet_$sid", 'Předmět zprávy:', 80)
+                            ->setRequired()
+                            ->setDefaultValue($Dok->nazev);
+                    $form->addTextArea("email_text_$sid", 'Text zprávy:', 80, 10);
+                }
             }
             
         $form->addSubmit('odeslat', 'Předat podatelně či Odeslat')
@@ -1789,7 +1808,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function odeslatClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        // Nette\Diagnostics\Debugger::dump($data); exit;
 
         $dokument_id = $this->getParameter('id');
         $Dokument = new Dokument();
@@ -1837,13 +1855,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     continue;
                 } elseif ($metoda_odeslani == 1) {
                     // emailem
+                    if (!isset($data['email_from_' . $subjekt_id]))
+                            // neposilej mail, kdyz nemame adresu odesilatele
+                            // (podformular odeslani mailem neexistuje)
+                            continue;
+                    
                     if (!empty($adresat->email)) {
 
                         $data = array(
                             'dokument_id' => $dokument_id,
-                            'email_from' => $post_data['email_from'][$subjekt_id],
-                            'email_predmet' => $post_data['email_predmet'][$subjekt_id],
-                            'email_text' => $post_data['email_text'][$subjekt_id],
+                            'email_from' => $data['email_from_' . $subjekt_id],
+                            'email_predmet' => $data['email_predmet_' . $subjekt_id],
+                            'email_text' => $data['email_text_' . $subjekt_id],
                         );
 
                         if ($zprava = $this->odeslatEmailem($adresat, $data, $prilohy)) {
@@ -1961,12 +1984,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                                     'plna_adresa') . '".');
                 } else if ($metoda_odeslani == 4) {
                     // faxem
-                    if (isset($post_data['datum_odeslani_faxu'][$subjekt_id])) {
-                        $datum_odeslani = new DateTime($post_data['datum_odeslani_faxu'][$subjekt_id]);
-                    }
+                    $c = "datum_odeslani_faxu_" . $subjekt_id;
+                    $datum_odeslani = new DateTime($data->$c);
 
-                    $cislo_faxu = $post_data['cislo_faxu'][$subjekt_id];
-                    $zprava_odes = $post_data['zprava_faxu'][$subjekt_id];
+                    $cislo_faxu = $data['cislo_faxu_' . $subjekt_id];
+                    $zprava_odes = $data['zprava_faxu_' . $subjekt_id];
                     $stav = 1;
 
                     $this->flashMessage('Dokument předán na podatelnu k odeslání faxem na číslo "' . $cislo_faxu . '".');
