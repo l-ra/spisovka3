@@ -101,7 +101,11 @@ class LatteMacros
     public static function label2($form, $name)
     {
         $renderer = $form->getRenderer();
-        $html = $renderer->renderLabel($form[$name]);
+        $control = $form[$name];
+        if ($control->isRequired()) {
+            $control->getLabelPrototype()->class('required', TRUE);
+        }
+        $html = $renderer->renderLabel($control);
         // odstran zapouzdrujici element
         return $html->getHtml();
     }
