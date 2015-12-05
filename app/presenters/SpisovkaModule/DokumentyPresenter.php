@@ -239,14 +239,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function actionDetail()
+    public function actionDetail($id, $udalost)
     {
         $Dokument = new Dokument();
 
         // Nacteni parametru
-        $dokument_id = $this->getParameter('id', null);
-        if ($dokument_id === null)
-            $dokument_id = $this->getHttpRequest()->getPost('id');
+        $dokument_id = $id;
 
         $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
         if ($dokument) {
@@ -363,7 +361,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->template->FormUpravit = $this->template->AccessEdit ? $formUpravit : null;
 
-            $this->template->FormUdalost = $this->getParameter('udalost', false) && $dokument->stav_dokumentu == 4;
+            $this->template->FormUdalost = $udalost && $dokument->stav_dokumentu == 4;
 
             $SpisovyZnak = new SpisovyZnak();
             $this->template->SpisoveZnaky = $SpisovyZnak->seznam()->fetchAll();
@@ -408,12 +406,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function renderDetail()
+    public function renderDetail($id)
     {
+        $this->template->dokument_id = $id;
         $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
 
         $dokument = $this->template->Dok;
-        $this->template->dokument_id = $dokument->id;
 
         // Kontrola lhuty a skartace
         if ($dokument->lhuta_stav == 2 && $dokument->stav_dokumentu < 4) {
@@ -1700,25 +1698,22 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function createComponentUdalostForm()
     {
-
-        $Dok = @$this->template->Dok;
-
         $form = new Spisovka\Form();
-        $form->addHidden('id')
-                ->setValue(@$Dok->id);
 
         $options = array(
             '1' => 'Dnešní den',
             '2' => 'Zadám datum',
             '3' => 'Datum určím až v budoucnu',
         );
-        $form->addRadioList('udalost_typ', 'Jak spustit událost:', $options)
+        $form->addRadioList('udalost_typ', 'Určete rozhodný okamžik:', $options)
                 ->setValue(1)
         ->controlPrototype->onclick("onChangeRadioButtonSpousteciUdalost();");
 
         $form->addDatePicker('datum_spousteci_udalosti', 'Datum spouštěcí události:')
                 //->setDisabled() - nelze volat pri zpracovani odeslaneho formulare, vyresil jsem tedy v Javascriptu
-                ->forbidPastDates();
+                ->forbidPastDates()
+                ->addConditionOn($form['udalost_typ'], Spisovka\Form::EQUAL, 2)
+                    ->addRule(Spisovka\Form::FILLED, 'Nebylo zadáno datum spuštění.');
 
         $form->addSubmit('ok', 'Potvrdit')
                 ->onClick[] = array($this, 'udalostClicked');
@@ -1730,8 +1725,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $dokument_id = $data['id'];
-        $redir_params = array('id' => $dokument_id);
+        $dokument_id = $this->getParameter('id');
         $datum = null;
 
         $Dokumenty = new Dokument();
@@ -1747,14 +1741,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     break;
 
                 case 2 :
-                    if (empty($data['datum_spousteci_udalosti'])) {
-                        $this->flashMessage('Nebyla zadáno datum spuštění.', 'warning');
-                        // znovu zobraz formular
-                        $redir_params['udalost'] = 1;
-                    } else {
-                        $datum = $data['datum_spousteci_udalosti'];
-                        $zprava = 'Datum spuštění bylo nastaveno.';
-                    }
+                    $datum = $data['datum_spousteci_udalosti'];
+                    $zprava = 'Datum spuštění bylo nastaveno.';
                     break;
 
                 case 3 :
@@ -1768,7 +1756,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } else
             $this->flashMessage('Nemáte oprávnění spustit událost.', 'warning');
 
-        $this->redirect(':Spisovka:Dokumenty:detail', $redir_params);
+        $this->redirect('detail', ['id' => $dokument_id]);
     }
     /**
      * Vytvoří část formuláře pro odeslání dokumentu. Jedinné, co nyní ošetřuje

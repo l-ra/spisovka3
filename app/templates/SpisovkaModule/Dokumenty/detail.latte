@@ -104,27 +104,7 @@
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
         </dl>
-        {var $udalostForm = $presenter->getComponent('udalostForm')}
-        {$udalostForm->render('begin')}
-        <dl>
-            <dt>Určete rozhodný okamžik:</dt>
-            <dd>
-                {$udalostForm['udalost_typ']->control}
-            </dd>
-        </dl>
-        <dl>
-            <dt>Datum spouštěcí události:</dt>
-            <dd>
-                {$udalostForm['datum_spousteci_udalosti']->control}
-            </dd>
-        </dl>
-        <dl>
-            <dt></dt>
-            <dd>
-                {$udalostForm['ok']->control}
-            </dd>
-        </dl>
-        {$udalostForm->render('end')}
+        {control udalostForm}
     </div>
     {/if}
 
