@@ -84,7 +84,7 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
     public function forbidPastDates()
     {
         $this->forbidPastDates = true;
-        $this->addRule(self::NO_PAST_DATE, 'Zadané datum nemůže být v minulosti: %label');
+        $this->addRule(self::NO_PAST_DATE, 'Zadané datum nemůže být v minulosti.');
         return $this;
     }
 
