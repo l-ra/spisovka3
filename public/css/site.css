@@ -259,7 +259,9 @@ dd {
     margin: 0px 0px 8px 0px;
     max-width: 680px;
 }
-
+dd label {
+    font-weight: initial;    
+}
 
 #dialog dt {
     width: 120px;

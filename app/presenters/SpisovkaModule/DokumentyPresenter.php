@@ -239,7 +239,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function actionDetail($id, $udalost)
+    public function actionDetail($id, $upravit = null, $udalost = null)
     {
         $Dokument = new Dokument();
 
@@ -270,7 +270,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Predan = 0;
             $this->template->AccessEdit = 0;
             $this->template->AccessView = 0;
-            $formUpravit = $this->getParameter('upravit', null);
 
             if (count($dokument->workflow) > 0) {
                 // uzivatel na dokumentu nekdy pracoval, tak mu dame moznost aspon nahlizet
@@ -359,12 +358,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->template->isRozdelany = $dokument->stav_dokumentu == 1 || $user->isInRole('superadmin');
 
-            $this->template->FormUpravit = $this->template->AccessEdit ? $formUpravit : null;
+            $this->template->FormUpravit = $this->template->AccessEdit ? $upravit : null;
 
             $this->template->FormUdalost = $udalost && $dokument->stav_dokumentu == 4;
-
-            $SpisovyZnak = new SpisovyZnak();
-            $this->template->SpisoveZnaky = $SpisovyZnak->seznam()->fetchAll();
 
             $this->template->Typ_evidence = $this->typ_evidence;
             $this->template->SouvisejiciDokumenty = array();
@@ -434,10 +430,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function renderDetailSpojeni()
+    public function renderDetailSpojeni($id)
     {
         // Napln promenne sablony daty
-        $this->actionDetail();
+        $this->actionDetail($id);
     }
 
     protected function actionAkce($data)
@@ -1479,10 +1475,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $nazev_control = $form->addText('nazev', 'Věc:', 80, 250);
         if (!Acl::isInRole('podatelna')) {
             $nazev_control->addRule(Nette\Forms\Form::FILLED,
-                    'Název dokumentu (věc) musí být vyplněno!');
+                    'Název dokumentu (věc) musí být vyplněn.');
         }
 
-        $form->addTextArea('popis', 'Stručný popis:', 80, 3);
+        $form->addTextArea('popis', 'Popis:', 80, 3);
 
         $povolene_typy_dokumentu = TypDokumentu::dostupneUzivateli();
 

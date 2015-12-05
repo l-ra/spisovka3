@@ -1,22 +1,22 @@
 {var Select2 => true}
 {block title}Dokument{/block}
 {block javascript}
-	<script type="text/javascript" src="{$publicUrl}js/webtoolkit.aim.js"></script>
-	<script type="text/javascript">
-		function completeCallback(response) {
+<script type="text/javascript" src="{$publicUrl}js/webtoolkit.aim.js"></script>
+<script type="text/javascript">
+    function completeCallback(response) {
 
-            if ( response.indexOf('###vybrano###') != -1) {
-                alert('Příloha byl nahrána.');
-                $('#dialog').dialog('close');
-                renderPrilohy({$Dok->id});
-            } else if (response.indexOf('###zmemeno###') != -1) {
-                alert('Příloha byla upravena.');
-                $('#dialog').dialog('close');
-                renderPrilohy({$Dok->id});
-            } else {
-                $('#dialog').html(response);
-            }
+        if (response.indexOf('###vybrano###') != -1) {
+            alert('Příloha byl nahrána.');
+            $('#dialog').dialog('close');
+            renderPrilohy({$Dok->id});
+        } else if (response.indexOf('###zmemeno###') != -1) {
+            alert('Příloha byla upravena.');
+            $('#dialog').dialog('close');
+            renderPrilohy({$Dok->id});
+        } else {
+            $('#dialog').html(response);
         }
+    }
 
 
     function onChangeRadioButtonSpousteciUdalost(elm) {
@@ -31,72 +31,71 @@
         }
     }
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#frmudalostForm-datum_spousteci_udalosti').prop('disabled', true);
-    });   
+    });
 
-    
+
     var DOKUMENT_ID = {$Dok->id};
-    
+
     var smer_typu_dokumentu = new Array();
     {foreach $typy_dokumentu as $t}
     smer_typu_dokumentu[{$t->id}] = {$t->smer};
     {/foreach}
 
-    var typ_dokumentu_id = {$Dok->typ_dokumentu->id};    
-	</script>
-    {include ../../@vlozSpisZnak.latte}
+    var typ_dokumentu_id = {$Dok->typ_dokumentu->id};
+</script>
 {/block}
 {block content}
 
-    <div class="navigate">
+<div class="navigate">
     <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> - Detail dokumentu
     {if ($FormUpravit=='metadata')}
-    - Úprava metadat
+        - Úprava metadat
     {elseif ($FormUpravit=='vyrizeni')}
-    - Úprava vyřízení
+        - Úprava vyřízení
     {/if}
-    </div>
+</div>
 
-    <div id="tisk">
-        <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-        </a>
-        <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
-        </a>        
-    </div>
+<div id="tisk">
+    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
+        <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+    </a>
+    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
+        <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+    </a>        
+</div>
 
-    <div class="dokument_blok_menu">
-       {if $Predan==1 }
-       <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument</a>
-       <a href="{link :Spisovka:Dokumenty:odmitnoutprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
-       {elseif $LzePredatDokument}
-       {if empty($Dok->predano)}
-       <a href="{link :Spisovka:Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
-       {else}
-       <a href="{link :Spisovka:Dokumenty:zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit předání dokumentu</a>
-       {/if}
-       {/if}
-       
-       {if $AccessEdit}
-       <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
-       <script n:if="isset($nutnyNadpis)" type="text/javascript"> alert("Název dokumentu (věc) je prázdný. Je nutné ho vyplnit!"); </script>
-              
-       <a n:if="$Dok->stav_dokumentu < 3" href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id}" id="kvyrizenidokument">Označit k vyřízení</a>
-       
-       {if $Dok->stav_dokumentu == 3}
-       <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }#vr">Upravit vyřízení</a>
-       <a n:if="$povolitOdpoved" href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
-       <a href="{link :Spisovka:Dokumenty:odeslat , 'id'=>$Dok->id }">Odeslat dokument</a>
-       <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
-       {/if}
-       {/if}{* $AccessEdit *}
-       <a href="{link this, 'id'=>$Dok->id, 'udalost'=>1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
-       <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}" n:if="$Zapujcka">Vrátit dokument</a>
-    </div>
+<div class="dokument_blok_menu">
+    {if $Predan==1 }
+        <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument</a>
+        <a href="{link :Spisovka:Dokumenty:odmitnoutprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
+    {elseif $LzePredatDokument}
+        {if empty($Dok->predano)}
+            <a href="{link :Spisovka:Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
+        {else}
+            <a href="{link :Spisovka:Dokumenty:zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit předání dokumentu</a>
+        {/if}
+    {/if}
 
-    {if ($FormUdalost)}
+    {if $AccessEdit}
+        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
+        <script n:if="isset($nutnyNadpis)" type="text/javascript"> alert("Název dokumentu (věc) je prázdný. Je nutné ho vyplnit!");</script>
+
+        <a n:if="$Dok->stav_dokumentu < 3" href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id}" id="kvyrizenidokument">Označit k vyřízení</a>
+
+        {if $Dok->stav_dokumentu == 3}
+            <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }#vr">Upravit vyřízení</a>
+            <a n:if="$povolitOdpoved" href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
+            <a href="{link :Spisovka:Dokumenty:odeslat , 'id'=>$Dok->id }">Odeslat dokument</a>
+            <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
+        {/if}
+    {/if}{* $AccessEdit *}
+    <a href="{link this, 'id'=>$Dok->id, 'udalost'=>1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
+    <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}" n:if="$Zapujcka">Vrátit dokument</a>
+</div>
+
+{if ($FormUdalost)}
     <div class="dokument_blok_sedy">
         <div class="h2">Vyberte datum spouštěcí události</div>
         <p><strong>Poznámka:</strong> Spouštěcí událost je okamžik rozhodný pro počátek plynutí skartační lhůty. Skartační lhůta se určuje počtem celých roků počítaných od 1. ledna kalendářního roku následujícího po kalendářním roce, v němž nastala spouštěcí událost.</p>
@@ -106,337 +105,292 @@
         </dl>
         {control udalostForm}
     </div>
-    {/if}
+{/if}
 
-    <div class="dokument_blok_hlavni">
-        {if ($FormUpravit=='metadata')}
-        {var $metadataForm = $presenter->getComponent('metadataForm')}
-        {$metadataForm->render('begin')}
-        <dl>
-            <dt>Typ dokumentu:</dt>
-            {if isset($metadataForm['dokument_typ_id'])}
-            <dd>{$metadataForm['dokument_typ_id']->control}</dd>
-            {else}
-            <dd>{$Dok->typ_dokumentu->nazev}</dd>
+<div class="dokument_blok_hlavni">
+    {if ($FormUpravit=='metadata')}
+        {form metadataForm}
+            <dl>
+                <dt>Typ dokumentu:</dt>
+                {if isset($form['dokument_typ_id'])}
+                    <dd>{input dokument_typ_id}</dd>
+                {else}
+                    <dd>{$Dok->typ_dokumentu->nazev}</dd>
+                {/if}
+            </dl>
+            {input2 nazev}
+            {input2 popis}
+            <dl>
+                <dt>Datum doručení/vzniku:</dt>
+                {if $isRozdelany}
+                    <dd>{input datum_vzniku} {input datum_vzniku_cas}</dd>
+                {else}
+                    <dd>{$Dok->datum_vzniku|edatetime}</dd>
+                {/if}
+            </dl>
+            {if isset($form['zpusob_doruceni_id'])}
+                {input2 zpusob_doruceni_id}
+            {elseif !empty($Dok->zpusob_doruceni)}
+                <dl>
+                    <dt>Způsob doručení:</dt>
+                    <dd>{$Dok->zpusob_doruceni}</dd>
+                </dl>        
             {/if}
-        </dl>
-        <dl>
-            <dt>{$metadataForm['nazev']->label}</dt>
-            <dd>{$metadataForm['nazev']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Popis:</dt>
-            <dd>{$metadataForm['popis']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Datum doručení/vzniku:</dt>
-            {if $isRozdelany}
-            <dd>{$metadataForm['datum_vzniku']->control} {$metadataForm['datum_vzniku_cas']->control}</dd>
-            {else}
-            <dd>{$Dok->datum_vzniku|edatetime}</dd>
+            {if $Dok->typ_dokumentu->smer == 0}
+                {input2 cislo_doporuceneho_dopisu}
+                {input2 cislo_jednaci_odesilatele}
             {/if}
-        </dl>
-        {if isset($metadataForm['zpusob_doruceni_id'])}
-        <dl>
-            <dt>{$metadataForm['zpusob_doruceni_id']->label}</dt>
-            <dd>{$metadataForm['zpusob_doruceni_id']->control}</dd>
-        </dl> 
-        {elseif !empty($Dok->zpusob_doruceni)}
-        <dl>
-            <dt>Způsob doručení:</dt>
-            <dd>{$Dok->zpusob_doruceni}</dd>
-        </dl>        
-        {/if}
-        {if $Dok->typ_dokumentu->smer == 0}
-        <dl>
-            <dt>Číslo doporučeného dopisu:</dt>
-            <dd>{$metadataForm['cislo_doporuceneho_dopisu']->control}</dd>
-        </dl>    
-        <dl>
-            <dt>Číslo jednací odesilatele:</dt>
-            <dd>{$metadataForm['cislo_jednaci_odesilatele']->control}</dd>
-        </dl>
-        {/if}
-        
-        <dl n:if="!empty($Dok->poznamka)">
-            <dt>Poznámka:</dt>
-            <dd>{$metadataForm['poznamka']->control}</dd>
-        </dl>                
-        <dl>
-            <dt>Počet listů:</dt>
-            <dd>{$metadataForm['pocet_listu']->control}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$metadataForm['pocet_priloh']->control}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Typ přílohy: </span>{$metadataForm['typ_prilohy']->control}
-            </dd>
-        </dl>
-        <div>
-            {$metadataForm['upravit']->control}
-            {$metadataForm['storno']->control}
-        </div>
-        {$metadataForm->render('end')}
-        {else}
+
+            {if !empty($Dok->poznamka)}
+                {input poznamka}
+            {/if}
+            <dl>
+                <dt>{label2 pocet_listu}</dt>
+                <dd>{input pocet_listu} {inputError2 pocet_listu}
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 pocet_priloh} {input pocet_priloh} {inputError2 pocet_priloh}
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 typ_prilohy} {input typ_prilohy}
+                </dd>
+            </dl>
+            <div>
+                {input upravit} {input storno}
+            </div>
+        {/form}
+    {else}
         <div class="h2">{$Dok->typ_dokumentu->nazev}</div>
         {include 'detailSpis.latte'}
         {include 'detailSpojeni.latte'}
-        
+
         <dl>
             <dt>JID:</dt>
-            <dd>{$Dok->jid}</dd>
-        </dl>
-        {if empty($Dok->cislo_jednaci)}
-        <dl>
-            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
-            <dd>Dokument nemá přiděleno číslo jednací.
-                {if $AccessEdit}
-                {if $Typ_evidence == 'sberny_arch'}
-                <br />Zaevidovat do spisové služby: <a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
-                <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
-                {else}
-                <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Přidělit číslo jednací</a>
-                {/if}
-                {/if}
-            </dd>
-        </dl>
-        {else}
-        <dl>
-            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
-            <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}</dd>
-        </dl>
-        {/if}        
-        <dl>
-            <dt>Věc:</dt>
-            <dd class="velke_pismo"><u>{$Dok->nazev}</u></dd>
-        </dl>
-        <dl>
-            <dt>Popis:</dt>
-            <dd>{!$Dok->popis|escape|nl2br}</dd>
-        </dl>
-        <dl>
-            <dt>Datum doručení/vzniku:</dt>
-            <dd>{$Dok->datum_vzniku|edatetime}</dd>
-        </dl>
-        {if !empty($Dok->zpusob_doruceni)}
-        <dl>
-            <dt>Způsob doručení:</dt>
-            <dd>{$Dok->zpusob_doruceni}</dd>
-        </dl>        
-        {/if}
-        {if !empty($Dok->cislo_jednaci_odesilatele)}
-        <dl>
-            <dt>Číslo jednací odesilatele:</dt>
-            <dd>{$Dok->cislo_jednaci_odesilatele}</dd>
-        </dl>
-        {/if}
-        {if !empty($Dok->cislo_doporuceneho_dopisu)}
-        <dl>
-            <dt>Číslo doporučeného dopisu:</dt>
-            <dd>{$Dok->cislo_doporuceneho_dopisu}</dd>
-        </dl>
-        {/if}
-        
-        <dl n:if="!empty($Dok->poznamka)">
-            <dt>Poznámka:</dt>
-            <dd>{!$Dok->poznamka|html2br}</dd>
-        </dl>
-        <dl>
-            <dt>Počet listů / příloh / typ přílohy:</dt>
-            <dd>{$Dok->pocet_listu} / {$Dok->pocet_priloh} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd>
-        </dl>
-        <dl>
-            <dt>Lhůta k vyřízení:</dt>
-            <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd>
-        </dl>
-        {if !empty($Dok->identifikator)}
-        <dl>
-            <dt>Identifikátor epodatelny:</dt>
-            <dd><pre>{$Dok->identifikator['popis']}</pre></dd>
-        </dl>
-        {if $Dok->identifikator['typ'] == "email" }
-        <dl>
-            <dt>Ověření identifikátoru:</dt>
-            <dd>
-            {if $Dok->identifikator['cert_signed'] >= 0 }
-                {$Dok->identifikator['cert_log']['aktualne']['date']} 
-                {if $Dok->identifikator['cert_log']['aktualne']['status']==1 }
-                <span style="color:#009900;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
-                {/if}
-                <br />
-                {$Dok->identifikator['cert_log']['prijato']['date']} 
-                {if $Dok->identifikator['cert_log']['prijato']['status']==1 }
-                <span style="color:#009900;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
-                {/if}
-                <br />
-                {$Dok->identifikator['cert_log']['doruceno']['date']} 
-                {if $Dok->identifikator['cert_log']['doruceno']['status']==1 }
-                <span style="color:#009900;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
-                {/if}
+            <dd>{$Dok->jid}</dd><br />
+            {if empty($Dok->cislo_jednaci)}
+                <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
+                <dd>Dokument nemá přiděleno číslo jednací.
+                    {if $AccessEdit}
+                        {if $Typ_evidence == 'sberny_arch'}
+                            <br />Zaevidovat do spisové služby: <a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
+                            <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
+                        {else}
+                            <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Přidělit číslo jednací</a>
+                        {/if}
+                    {/if}
+                </dd><br />
             {else}
-                <span style="color:#990000;">{$Dok->identifikator['cert_status']}</span>
+                <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} {$Oddelovac_poradi} pořadí{/if}:</dt>
+                <dd class="velke_pismo">{$Dok->cislo_jednaci}{if $Typ_evidence == 'sberny_arch'}{$Oddelovac_poradi}{$Dok->poradi}{/if}</dd><br />
+            {/if}        
+            <dt>Věc:</dt>
+            <dd class="velke_pismo"><u>{$Dok->nazev}</u></dd><br />
+            <dt>Popis:</dt>
+            <dd>{!$Dok->popis|escape|nl2br}</dd><br />
+            <dt>Datum doručení/vzniku:</dt>
+            <dd>{$Dok->datum_vzniku|edatetime}</dd><br />
+            {if !empty($Dok->zpusob_doruceni)}
+                <dt>Způsob doručení:</dt>
+                <dd>{$Dok->zpusob_doruceni}</dd><br />
             {/if}
-            </dd>
-        </dl>
-        {/if}
-        {if $Dok->identifikator['typ'] == "isds" }
-        <dl>
-            <dt>Ověření identifikátoru:</dt>
-            <dd id="isds_overeni">
-                <a href="{link :Spisovka:Dokumenty:isdsovereni, 'id'=>$Dok->id}" onclick="return overitISDS(this);">Ověřit datovou zprávu</a>
-            </dd>
-        </dl>
-        {/if}
+            {if !empty($Dok->cislo_jednaci_odesilatele)}
+                <dt>Číslo jednací odesilatele:</dt>
+                <dd>{$Dok->cislo_jednaci_odesilatele}</dd><br />
+            {/if}
+            {if !empty($Dok->cislo_doporuceneho_dopisu)}
+                <dt>Číslo doporučeného dopisu:</dt>
+                <dd>{$Dok->cislo_doporuceneho_dopisu}</dd><br />
+            {/if}
 
-        
-        {/if}
-        {/if}
-    </div>
-    {if $Dok->stav_dokumentu >= 3}
+            {if !empty($Dok->poznamka)}
+                <dt>Poznámka:</dt>
+                <dd>{!$Dok->poznamka|html2br}</dd><br />
+            {/if}
+            <dt>Počet listů / příloh / typ přílohy:</dt>
+            <dd>{$Dok->pocet_listu} / {$Dok->pocet_priloh} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd><br />
+            <dt>Lhůta k vyřízení:</dt>
+            <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd><br />
+
+            {if !empty($Dok->identifikator)}
+                <dt>Identifikátor epodatelny:</dt>
+                <dd><pre>{$Dok->identifikator['popis']}</pre></dd><br />
+                {if $Dok->identifikator['typ'] == "email" }
+                    <dt>Ověření identifikátoru:</dt>
+                    <dd>
+                        {if $Dok->identifikator['cert_signed'] >= 0 }
+                            {$Dok->identifikator['cert_log']['aktualne']['date']} 
+                            {if $Dok->identifikator['cert_log']['aktualne']['status']==1 }
+                                <span style="color:#009900;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
+                            {else}
+                                <span style="color:#990000;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
+                            {/if}
+                            <br />
+                            {$Dok->identifikator['cert_log']['prijato']['date']} 
+                            {if $Dok->identifikator['cert_log']['prijato']['status']==1 }
+                                <span style="color:#009900;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
+                            {else}
+                                <span style="color:#990000;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
+                            {/if}
+                            <br />
+                            {$Dok->identifikator['cert_log']['doruceno']['date']} 
+                            {if $Dok->identifikator['cert_log']['doruceno']['status']==1 }
+                                <span style="color:#009900;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
+                            {else}
+                                <span style="color:#990000;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
+                            {/if}
+                        {else}
+                            <span style="color:#990000;">{$Dok->identifikator['cert_status']}</span>
+                        {/if}
+                    </dd><br />
+                {/if}
+                {if $Dok->identifikator['typ'] == "isds" }
+                    <dt>Ověření identifikátoru:</dt>
+                    <dd id="isds_overeni">
+                        <a href="{link :Spisovka:Dokumenty:isdsovereni, 'id'=>$Dok->id}" onclick="return overitISDS(this);">Ověřit datovou zprávu</a>
+                    </dd><br />
+                {/if}
+            {/if}
+        </dl>
+    {/if}
+</div>
+{if $Dok->stav_dokumentu >= 3}
     <a name="vr" class="anchor" />
     <div class="dokument_blok_sedy">
         <div class="h2">Vyřízení</div>
         <div class="dokument_blok">
-        {if ($FormUpravit=='vyrizeni')}
-        {var $vyrizovaniForm = $presenter->getComponent('vyrizovaniForm')}
-        {$vyrizovaniForm->render('begin')}
-        <dl>
-            <dt>Způsob vyřízení:</dt>
-            <dd>{$vyrizovaniForm['zpusob_vyrizeni_id']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Datum vyřízení:</dt>
-            <dd>{$vyrizovaniForm['datum_vyrizeni']->control} {$vyrizovaniForm['datum_vyrizeni_cas']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Spisový znak:</dt>
-            <dd>{$vyrizovaniForm['spisovy_znak_id']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Skartační znak:</dt>
-            <dd>{$vyrizovaniForm['skartacni_znak']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Skartační lhůta:</dt>
-            <dd>{$vyrizovaniForm['skartacni_lhuta']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Spouštěcí událost:</dt>
-            <dd>{$vyrizovaniForm['spousteci_udalost_id']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Počet listů:</dt>
-            <dd>{$vyrizovaniForm['vyrizeni_pocet_listu']->control}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$vyrizovaniForm['vyrizeni_pocet_priloh']->control}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Typ přílohy: </span>{$vyrizovaniForm['vyrizeni_typ_prilohy']->control}
-            </dd>
-        </dl>
-        <dl>
-            <dt>Uložení dokumentu:</dt>
-            <dd>{$vyrizovaniForm['ulozeni_dokumentu']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Poznámka k vyřízení:</dt>
-            <dd>{$vyrizovaniForm['poznamka_vyrizeni']->control}</dd>
-        </dl>
-        <div>
-            {$vyrizovaniForm['upravit']->control}
-            {$vyrizovaniForm['storno']->control}
-        </div>
-        {$vyrizovaniForm->render('end')}
-        {else}
-        <dl>
-            <dt>Způsob vyřízení:</dt>
-            <dd>{$Dok->zpusob_vyrizeni}</dd>
-        </dl>
-        <dl>
-            <dt>Datum vyřízení:</dt>
-            <dd>{$Dok->datum_vyrizeni|edatetime}</dd>
-        </dl>
-        <dl>
-            <dt>Spisový znak:</dt>
-            <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}</dd>
-        </dl>
-        <dl>
-            <dt>Skartační znak:</dt>
-            <dd>{$Dok->skartacni_znak}</dd>
-        </dl>
-        <dl>
-            <dt>Skartační lhůta:</dt>
-            <dd class="normal-font"><strong>{$Dok->skartacni_lhuta}</strong> {if $Dok->stav_dokumentu > 4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
-        </dl>
-        <dl>
-            <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
-        </dl>
-        {if $Dok->stav_dokumentu>=5}
-        <dl>
-            <dt>Datum spouštěcí události:</dt>
-            <dd>{$Dok->datum_spousteci_udalosti|edate}</dd>
-        </dl>
-        {/if}
-        <dl>
-            <dt>Počet listů / příloh / typ příloh:</dt>
-            <dd>{$Dok->vyrizeni_pocet_listu} / {$Dok->vyrizeni_pocet_priloh} {if !empty($Dok->vyrizeni_typ_prilohy)}/ {$Dok->vyrizeni_typ_prilohy}{/if}</dd>
-        </dl>
-        <dl>
-            <dt>Uložení dokumentu:</dt>
-            <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}</dd>
-        </dl>
-        <dl>
-            <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
-        </dl>
-        {/if}
+            {if ($FormUpravit=='vyrizeni')}
+                {var $vyrizovaniForm = $presenter->getComponent('vyrizovaniForm')}
+                {$vyrizovaniForm->render('begin')}
+                <dl>
+                    <dt>Způsob vyřízení:</dt>
+                    <dd>{$vyrizovaniForm['zpusob_vyrizeni_id']->control}</dd>
+                </dl>
+                <dl>
+                    <dt>Datum vyřízení:</dt>
+                    <dd>{$vyrizovaniForm['datum_vyrizeni']->control} {$vyrizovaniForm['datum_vyrizeni_cas']->control}</dd>
+                </dl>
+                <dl>
+                    <dt>Spisový znak:</dt>
+                    <dd>{$vyrizovaniForm['spisovy_znak_id']->control}</dd>
+                </dl>
+                <dl>
+                    <dt>Skartační znak:</dt>
+                    <dd>{$vyrizovaniForm['skartacni_znak']->control}</dd>
+                </dl>
+                <dl>
+                    <dt>Skartační lhůta:</dt>
+                    <dd>{$vyrizovaniForm['skartacni_lhuta']->control}</dd>
+                </dl>
+                <dl>
+                    <dt>Spouštěcí událost:</dt>
+                    <dd>{$vyrizovaniForm['spousteci_udalost_id']->control}</dd>
+                </dl>
+                <dl>
+                    <dt>Počet listů:</dt>
+                    <dd>{$vyrizovaniForm['vyrizeni_pocet_listu']->control}
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$vyrizovaniForm['vyrizeni_pocet_priloh']->control}
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Typ přílohy: </span>{$vyrizovaniForm['vyrizeni_typ_prilohy']->control}
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>Uložení dokumentu:</dt>
+                    <dd>{$vyrizovaniForm['ulozeni_dokumentu']->control}</dd>
+                </dl>
+                <dl>
+                    <dt>Poznámka k vyřízení:</dt>
+                    <dd>{$vyrizovaniForm['poznamka_vyrizeni']->control}</dd>
+                </dl>
+                <div>
+                    {$vyrizovaniForm['upravit']->control}
+                    {$vyrizovaniForm['storno']->control}
+                </div>
+                {$vyrizovaniForm->render('end')}
+            {else}
+                <dl>
+                    <dt>Způsob vyřízení:</dt>
+                    <dd>{$Dok->zpusob_vyrizeni}</dd>
+                </dl>
+                <dl>
+                    <dt>Datum vyřízení:</dt>
+                    <dd>{$Dok->datum_vyrizeni|edatetime}</dd>
+                </dl>
+                <dl>
+                    <dt>Spisový znak:</dt>
+                    <dd title="{$Dok->spisovy_znak_popis}">{$Dok->spisovy_znak}</dd>
+                </dl>
+                <dl>
+                    <dt>Skartační znak:</dt>
+                    <dd>{$Dok->skartacni_znak}</dd>
+                </dl>
+                <dl>
+                    <dt>Skartační lhůta:</dt>
+                    <dd class="normal-font"><strong>{$Dok->skartacni_lhuta}</strong> {if $Dok->stav_dokumentu > 4}(rok skartace {$Dok->skartacni_rok}){/if}</dd>
+                </dl>
+                <dl>
+                    <dt>Spouštěcí událost:</dt>
+                    <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
+                </dl>
+                {if $Dok->stav_dokumentu>=5}
+                    <dl>
+                        <dt>Datum spouštěcí události:</dt>
+                        <dd>{$Dok->datum_spousteci_udalosti|edate}</dd>
+                    </dl>
+                {/if}
+                <dl>
+                    <dt>Počet listů / příloh / typ příloh:</dt>
+                    <dd>{$Dok->vyrizeni_pocet_listu} / {$Dok->vyrizeni_pocet_priloh} {if !empty($Dok->vyrizeni_typ_prilohy)}/ {$Dok->vyrizeni_typ_prilohy}{/if}</dd>
+                </dl>
+                <dl>
+                    <dt>Uložení dokumentu:</dt>
+                    <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}</dd>
+                </dl>
+                <dl>
+                    <dt>Poznámka k vyřízení:</dt>
+                    <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
+                </dl>
+            {/if}
         </div>
     </div>
-    {/if}
+{/if}
 
-    <div class="dokument_blok_sedy">
-        <div class="h2">Vlastnictví</div>
-        {if $Dok->typ_dokumentu->smer == 1}
+<div class="dokument_blok_sedy">
+    <div class="h2">Vlastnictví</div>
+    {if $Dok->typ_dokumentu->smer == 1}
         {foreach $Dok->workflow as $workflow}
-        {if $workflow->stav_dokumentu==1}
-            <dl>
-                <dt>Vytvořil:</dt>
-                <dd>
-                {if empty($workflow->prideleno_id) }
-                    organizační jednotce
-                    <br />
-                    {$workflow->orgjednotka_info->zkraceny_nazev}
-                {else}
-                    {$workflow->prideleno_jmeno}
-                    <br />
-                    {=@$workflow->orgjednotka_info->zkraceny_nazev}
-                {/if}
-                </dd>
-            </dl>
-            <dl>
-                <dt>Vytvořil dne:</dt>
-                <dd>{$workflow->date|edatetime}</dd>
-            </dl>        
-            {breakIf true}
-        {/if}
+            {if $workflow->stav_dokumentu==1}
+                <dl>
+                    <dt>Vytvořil:</dt>
+                    <dd>
+                        {if empty($workflow->prideleno_id) }
+                            organizační jednotce
+                            <br />
+                            {$workflow->orgjednotka_info->zkraceny_nazev}
+                        {else}
+                            {$workflow->prideleno_jmeno}
+                            <br />
+                            {=@$workflow->orgjednotka_info->zkraceny_nazev}
+                        {/if}
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>Vytvořil dne:</dt>
+                    <dd>{$workflow->date|edatetime}</dd>
+                </dl>        
+                {breakIf true}
+            {/if}
         {/foreach}
-        {/if}
-        {if !isset($Dok->prideleno)}
+    {/if}
+    {if !isset($Dok->prideleno)}
         <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
-        {else}
+    {else}
         <dl>
             <dt>Přidělen:</dt>
             <dd>
-            {if empty($Dok->prideleno->prideleno_id) }
-                organizační jednotce
-                <br />
-                {$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            {else}
-                {$Dok->prideleno->prideleno_jmeno}
-                <br />
-                {=@$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            {/if}
+                {if empty($Dok->prideleno->prideleno_id) }
+                    organizační jednotce
+                    <br />
+                    {$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
+                {else}
+                    {$Dok->prideleno->prideleno_jmeno}
+                    <br />
+                    {=@$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
+                {/if}
             </dd>
         </dl>
         <dl>
@@ -447,21 +401,21 @@
             <dt>Poznámka:</dt>
             <dd>{!$Dok->prideleno->poznamka|escape|nl2br}</dd>
         </dl>
-        {/if}
+    {/if}
 
-        {if isset($Dok->predano)}
+    {if isset($Dok->predano)}
         <dl>
             <dt>Předán:</dt>
             <dd>
-            {if empty($Dok->predano->prideleno_id) }
-                organizační jednotce
-                <br />
-                {$Dok->predano->orgjednotka_info->zkraceny_nazev}
-            {else}
-                {$Dok->predano->prideleno_jmeno}
-                <br />
-                {=@$Dok->predano->orgjednotka_info->zkraceny_nazev}
-            {/if}
+                {if empty($Dok->predano->prideleno_id) }
+                    organizační jednotce
+                    <br />
+                    {$Dok->predano->orgjednotka_info->zkraceny_nazev}
+                {else}
+                    {$Dok->predano->prideleno_jmeno}
+                    <br />
+                    {=@$Dok->predano->orgjednotka_info->zkraceny_nazev}
+                {/if}
             </dd>
         </dl>
         <dl>
@@ -472,10 +426,10 @@
             <dt>Poznámka pro příjemce:</dt>
             <dd>{!$Dok->predano->poznamka|escape|nl2br}</dd>
         </dl>
-        {/if}
-    </div>
-    
-    {if !empty($Zapujcka->id)}
+    {/if}
+</div>
+
+{if !empty($Zapujcka->id)}
     <div class="dokument_blok_sedy">
         <div class="h2">Zápůjčka</div>
         <dl>
@@ -497,108 +451,110 @@
             <dd>{$Zapujcka->date_do|edate}</dd>
         </dl>          
     </div>
-    {/if}    
+{/if}    
 
-    <div class="dokument_blok_subjekty">
-        <div class="h2">
-            Adresáti / odesílatelé
-        </div>
-        {if $AccessEdit }
+<div class="dokument_blok_subjekty">
+    <div class="h2">
+        Adresáti / odesílatelé
+    </div>
+    {if $AccessEdit }
         <div class="blok_akce">
             <a href="#" id="subjekt_pripojit_click">Připojit subjekt</a>
         </div>        
         <div class="blok_akce">
             <div id="subjekt_pripojit" style="display:none;">
-            <dl>
-                <dt>Vyhledat a připojit subjekt:</dt>
-                <dd>
-                    <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
-                    <a href="{link :Spisovka:Subjekty:vyber, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
-                </dd>
-            </dl>
-            <dl id="subjekt_novy">
-                <dt></dt>
-                <dd>
-                    <a href={link Subjekty:novy, dok_id => $Dok->id} id="novysubjekt_click">Vytvořit nový subjekt</a>
-                </dd>
-            </dl>
+                <dl>
+                    <dt>Vyhledat a připojit subjekt:</dt>
+                    <dd>
+                        <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
+                        <a href="{link :Spisovka:Subjekty:vyber, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
+                    </dd>
+                </dl>
+                <dl id="subjekt_novy">
+                    <dt></dt>
+                    <dd>
+                        <a href={link Subjekty:novy, dok_id => $Dok->id} id="novysubjekt_click">Vytvořit nový subjekt</a>
+                    </dd>
+                </dl>
             </div>
-            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id}); return false;">Obnovit seznam subjektů</a>
+            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id});
+                    return false;">Obnovit seznam subjektů</a>
         </div>
         <script type="text/javascript">
-        // viz o par radku nize
-        // pouzij Javascript jen pokud je uzivatel opravnen menit subjekty
-        $('.dokument_blok_subjekty').on('click', '#dok-subjekty td.icon img', zmen_rezim_subjektu);
+            // viz o par radku nize
+            // pouzij Javascript jen pokud je uzivatel opravnen menit subjekty
+            $('.dokument_blok_subjekty').on('click', '#dok-subjekty td.icon img', zmen_rezim_subjektu);
         </script>
-        {/if}
-        <div id="dok-subjekty">
-            {include '../Subjekty/nacti.latte', subjekty => $Dok->subjekty}
-        </div>
+    {/if}
+    <div id="dok-subjekty">
+        {include '../Subjekty/nacti.latte', subjekty => $Dok->subjekty}
     </div>
+</div>
 
-    <div class="dokument_blok_sedy">
+<div class="dokument_blok_sedy">
     <div class="h2">
         Přílohy
     </div>
     {if $AccessEdit }
-    <div id="dok-prilohy-form">
-        <div class="blok_akce">
-            <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+        <div id="dok-prilohy-form">
+            <div class="blok_akce">
+                <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+            </div>
         </div>
-    </div>
-    <div class="blok_akce">
-        <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
-    </div>
+        <div class="blok_akce">
+            <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id});
+                    return false;">Obnovit seznam příloh</a>
+        </div>
     {/if}
     <div id="dok-prilohy">
-    {if $AccessView}
-    {if count($Dok->prilohy)>0}
-    <table class="seznam">
-        {foreach $Dok->prilohy as $file}
-        <tr>
-            <td class="icon">
-                <img src="{$file->mime_type_icon}" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
-            </td>
-            <td class="meta">
-                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->id, 'file'=>$file->id}">{$file->nazev}</a>
-                <div class="info">
-                {$file->real_name}
-                <br />
-                <span>
-                    {$file->typ_name}, {$file->size|bytes}, {$file->mime_type}
-                    <br />
-                    MD5 hash: {$file->md5_hash}
-                </span>
-                </div>
-                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
-                {if $AccessEdit }
-                <div class="vyber">
-                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return odebratPrilohu(this, {!$Dok->id});">odebrat</a>
-                    <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return prilohazmenit(this);">změnit</a>
-                </div>
-                {/if}
-            </td>
-            <td class="user">
-                nahráno {$file->date_created|edate}
-                <br />
-                {$file->user_name}
-            </td>
-        </tr>
-        {/foreach}
-    </table>
-    {else}
-        <div class="prazdno">K tomuto dokumentu nejsou připojené žádné elektronické přílohy.</div>
-    {/if}
-    {else}
-        <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
-    {/if}
+        {if $AccessView}
+            {if count($Dok->prilohy)>0}
+                <table class="seznam">
+                    {foreach $Dok->prilohy as $file}
+                        <tr>
+                            <td class="icon">
+                                <img src="{$file->mime_type_icon}" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
+                            </td>
+                            <td class="meta">
+                                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->id, 'file'=>$file->id}">{$file->nazev}</a>
+                                <div class="info">
+                                    {$file->real_name}
+                                    <br />
+                                    <span>
+                                        {$file->typ_name}, {$file->size|bytes}, {$file->mime_type}
+                                        <br />
+                                        MD5 hash: {$file->md5_hash}
+                                    </span>
+                                </div>
+                                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
+                                {if $AccessEdit }
+                                    <div class="vyber">
+                                        <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return odebratPrilohu(this, {!$Dok->id});">odebrat</a>
+                                        <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return prilohazmenit(this);">změnit</a>
+                                    </div>
+                                {/if}
+                            </td>
+                            <td class="user">
+                                nahráno {$file->date_created|edate}
+                                <br />
+                                {$file->user_name}
+                            </td>
+                        </tr>
+                    {/foreach}
+                </table>
+            {else}
+                <div class="prazdno">K tomuto dokumentu nejsou připojené žádné elektronické přílohy.</div>
+            {/if}
+        {else}
+            <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
+        {/if}
     </div>
-    </div>
+</div>
 
-    {if count($Dok->odeslani)>0}
+{if count($Dok->odeslani)>0}
     {include 'detail-odeslani.latte'}
-    {/if}
+{/if}
 
-    {include 'detail-historie.latte'}
+{include 'detail-historie.latte'}
 
-    <div id="dialog"></div>
+<div id="dialog"></div>
