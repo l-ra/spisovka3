@@ -329,9 +329,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->template->Lze_provest_skartacni_rizeni = $dokument->stav_dokumentu == 8 && $user->isAllowed('Spisovna',
                             'skartacni_rizeni');
 
-            $SpisovyZnak = new SpisovyZnak();
-            $this->template->SpisoveZnaky = $SpisovyZnak->seznam()->fetchAll();
-
             $this->template->Typ_evidence = $this->typ_evidence;
             if ($this->typ_evidence == 'priorace') {
                 // Nacteni souvisejicicho dokumentu
