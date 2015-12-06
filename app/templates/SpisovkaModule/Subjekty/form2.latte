@@ -1,31 +1,27 @@
 {form novyForm}
-{if $form->hasErrors()}
-    <div class="flash_message flash_warning" n:foreach="$form->errors as $error">{$error}</div>
-{/if}
-<dl id="form_novy_subjekt2">
-<dt>Typ subjektu:</dt>
-<dd>{input type}</dd><br />
-<dt>Název subjektu:</dt>
-<dd>{input nazev_subjektu}</dd><br />
-<dt>IČ, DIČ:</dt>
-<dd>{input ic}{input dic} <a href="#" onclick="return aresSubjekt({$form->name});">Vyhledat pomocí systému ARES</a></dd><br />
-<dt>Titul před, jméno, příjmení, titul za:</dt>
-<dd>{input titul_pred}{input jmeno}{input prijmeni}{input titul_za}</dd><br />
-<dt>Ulice, číslo popisné a orientační:</dt>
-<dd>{input adresa_ulice}{input adresa_cp}{input adresa_co}</dd><br />
-<dt>PSČ a Město:</dt>
-<dd>{input adresa_psc}{input adresa_mesto}</dd><br />
-<dt>Stát:</dt>
-<dd>{input adresa_stat}</dd><br />
-<dt>Email:</dt>
-<dd>{input email}</dd><br />
-<dt>ID datové schránky:</dt>
-<dd>{input id_isds} <a href="#" onclick="return isdsSubjekt({$form->name});">Vyhledat pomocí systému ISDS</a></dd><br />                        
-<dt>Telefon:</dt>
-<dd>{input telefon}</dd><br />
-<dt>Poznámka:</dt>
-<dd>{input poznamka}</dd><br />
-<br /><dt></dt>
-<dd>{input novy} {input storno}</dd><br />
-</dl>
+    {if $form->hasErrors()}
+        <div class="flash_message flash_warning" n:foreach="$form->errors as $error">{$error}</div>
+    {/if}
+    <div id="form_novy_subjekt2">
+        {input2 type}
+        {input2 nazev_subjektu}
+        <dl>
+            <dt>IČO, DIČ:</dt>
+            <dd>{input ic} {$form['ic']->getOption('description')}
+                <span style="margin-left: 30px" /> {input dic}</dd><br />
+            <dt>Titul před, jméno, příjmení, titul za:</dt>
+            <dd>{input titul_pred}{input jmeno}{input prijmeni}{input titul_za}</dd><br />
+            <dt>Ulice, číslo popisné a orientační:</dt>
+            <dd>{input adresa_ulice}{input adresa_cp}{input adresa_co}</dd><br />
+            <dt>PSČ a Město:</dt>
+            <dd>{input adresa_psc}{input adresa_mesto}</dd><br />
+        </dl>
+        {input2 adresa_stat}
+        {input2 email}
+        {input2 id_isds}
+        {input2 telefon}
+        {input2 poznamka}
+        <br /><dt></dt>
+        <dd>{input novy} {input storno}</dd><br />
+    </div>
 {/form}

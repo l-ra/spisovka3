@@ -363,34 +363,35 @@ dialogScrollUp = function () {
  * ARES
  *
  */
-aresSubjekt = function ( formName ) {
+aresSubjekt = function ( link ) {
 
-    var frmIC = document.getElementById('frm'+formName+'-ic');
-    IC = frmIC.value;
+    var inputEl = $(link).prev();
+    var IC = inputEl.val();
     if (!IC) {
         alert('Vyplňte IČ subjektu.');
-        return false; // Je-li pole IC prázdné, nevolej neplatné URL
+        return false;
     }
+    var inputSelector = inputEl.attr('id');
+    inputSelector = '#' + inputSelector.replace('-ic', '');
 
-    var url = BASE_URL + 'subjekty/' + IC +'/ares';
+    var url = BASE_URL + 'subjekty/ares?ic=' + IC;
 
     showSpinner();
 
     $.getJSON(url, function(data) {
-
-        if ( data == null ) {
-            alert('Záznam neexistuje nebo bylo zadáno chybné IČ.');
+        if (data.error) {
+            alert(data.error);
         } else {
-            $("#frm"+formName+"-ic").val(data.ico);
-            $("#frm"+formName+"-dic").val(data.dic);
-            $("#frm"+formName+"-nazev_subjektu").val(data.nazev);
-            $("#frm"+formName+"-adresa_ulice").val(data.ulice);
-            $("#frm"+formName+"-adresa_cp").val(data.cislo_popisne);
-            $("#frm"+formName+"-adresa_co").val(data.cislo_orientacni);
-            $("#frm"+formName+"-adresa_mesto").val(data.mesto);
-            $("#frm"+formName+"-adresa_psc").val(data.psc);
-            $("#frm"+formName+"-adresa_stat").val('CZE');
-            $("#frm"+formName+"-stat_narozeni").val('CZE');
+            $(inputSelector + "-ic").val(data.ico);
+            $(inputSelector + "-dic").val(data.dic);
+            $(inputSelector + "-nazev_subjektu").val(data.nazev);
+            $(inputSelector + "-adresa_ulice").val(data.ulice);
+            $(inputSelector + "-adresa_cp").val(data.cislo_popisne);
+            $(inputSelector + "-adresa_co").val(data.cislo_orientacni);
+            $(inputSelector + "-adresa_mesto").val(data.mesto);
+            $(inputSelector + "-adresa_psc").val(data.psc);
+            $(inputSelector + "-adresa_stat").val('CZE');
+            $(inputSelector + "-stat_narozeni").val('CZE');
         }
     });
 
@@ -401,16 +402,18 @@ aresSubjekt = function ( formName ) {
  * ISDS - vyhledat subjekt na zaklade id  schranky
  *
  */
-isdsSubjekt = function ( formName ) {
+isdsSubjekt = function ( link ) {
 
-    var frmID = document.getElementById('frm'+formName+'-id_isds');
-    ID = frmID.value;
+    var inputEl = $(link).prev();
+    var ID = inputEl.val();
     if (!ID) {
         alert('Zadejte ID datové schránky.');
         return false;
     }
-
-    var url = BASE_URL + 'subjekty/' + frmID.value +'/isdsid';
+    var inputSelector = inputEl.attr('id');
+    inputSelector = '#' + inputSelector.replace('-id_isds', '');
+    
+    var url = BASE_URL + 'subjekty/isds?box=' + ID;
 
     $.getJSON(url, function(data) {
 
@@ -420,20 +423,19 @@ isdsSubjekt = function ( formName ) {
             alert(data.error);
         } else {
 
-            $("#frm"+formName+"-type option[value="+data.dbType+"]").prop('selected', true);
+            $(inputSelector + "-type option[value="+data.dbType+"]").prop('selected', true);
 
-            $("#frm"+formName+"-ic").val(data.ic);
-            $("#frm"+formName+"-nazev_subjektu").val(data.firmName);
-            $("#frm"+formName+"-jmeno").val(data.pnFirstName);
-            $("#frm"+formName+"-prostredni_jmeno").val(data.pnMiddleName);
-            $("#frm"+formName+"-prijmeni").val(data.pnLastName);
-            $("#frm"+formName+"-adresa_ulice").val(data.adStreet);
-            $("#frm"+formName+"-adresa_cp").val(data.adNumberInMunicipality);
-            $("#frm"+formName+"-adresa_co").val(data.adNumberInStreet);
-            $("#frm"+formName+"-adresa_mesto").val(data.adCity);
-            $("#frm"+formName+"-adresa_psc").val(data.adZipCode);
+            $(inputSelector + "-ic").val(data.ic);
+            $(inputSelector + "-nazev_subjektu").val(data.firmName);
+            $(inputSelector + "-jmeno").val(data.pnFirstName);
+            $(inputSelector + "-prostredni_jmeno").val(data.pnMiddleName);
+            $(inputSelector + "-prijmeni").val(data.pnLastName);
+            $(inputSelector + "-adresa_ulice").val(data.adStreet);
+            $(inputSelector + "-adresa_cp").val(data.adNumberInMunicipality);
+            $(inputSelector + "-adresa_co").val(data.adNumberInStreet);
+            $(inputSelector + "-adresa_mesto").val(data.adCity);
+            $(inputSelector + "-adresa_psc").val(data.adZipCode);
         }
-
     });
 
     showSpinner();
