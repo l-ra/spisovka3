@@ -3,116 +3,114 @@
 class Ares
 {
 
-    const URL = 'http://wwwinfo.mfcr.cz/cgi-bin/ares/darv_bas.cgi?';
-
-    private $data;
-
     public function get($ic)
     {
-        if (!$this->validateIC($ic))
+        if (!self::validateICO($ic))
             return "$ic není platné IČO.";
 
-        $url = self::URL . "ico=" . $ic . "&jazyk=cz&xml=0";
-        $data = $this->doRequest($url);
+        $url = 'http://wwwinfo.mfcr.cz/cgi-bin/ares/darv_bas.cgi?';
+        $url = $url . "ico=" . $ic . "&jazyk=cz&xml=0";
+        $data = self::doRequest($url);
         if (empty($data))
             return "Došlo k neznámé chybě.";
         if (is_string($data))
             return $data;
 
         // P.L. - toto zabrani tomu, aby se do formulare subjektu zapsal retezec "undefined"
-        $this->data = new stdClass();
-        $this->data->dic = '';
-        $this->data->ulice = '';
-        $this->data->cislo_popisne = '';
-        $this->data->cislo_orientacni = '';
+        $result = new stdClass();
+        $result->dic = '';
+        $result->ulice = '';
+        $result->cislo_popisne = '';
+        $result->cislo_orientacni = '';
 
         foreach ($data as $radek) {
             $radek = trim($radek);
 
             /* ICO */
             if (strpos($radek, "</D:ICO>") !== false) {
-                $this->data->ico = strip_tags($radek);
+                $result->ico = strip_tags($radek);
             }
             /* DIC */
             if (strpos($radek, "</D:DIC>") !== false) {
-                $this->data->dic = strip_tags($radek);
+                $result->dic = strip_tags($radek);
             }
             /* Nazev */
             if (strpos($radek, "</D:OF>") !== false) {
-                $this->data->nazev = strip_tags($radek);
+                $result->nazev = strip_tags($radek);
             }
             /* Ulice + cislo */
             if (strpos($radek, "</D:UC>") !== false) {
-                $this->data->ulice_str = strip_tags($radek);
+                $result->ulice_str = strip_tags($radek);
             }
             /* Ulice */
             if (strpos($radek, "</D:NU>") !== false) {
-                $this->data->ulice = strip_tags($radek);
+                $result->ulice = strip_tags($radek);
             }
             /* cislo ulice */
             if (strpos($radek, "</D:CA>") !== false) {
-                $this->data->cislo_str = strip_tags($radek);
+                $result->cislo_str = strip_tags($radek);
             }
             /* cislo popisne */
             if (strpos($radek, "</D:CD>") !== false) {
-                $this->data->cislo_popisne = strip_tags($radek);
+                $result->cislo_popisne = strip_tags($radek);
             }
             /* cislo orientacni */
             if (strpos($radek, "</D:CO>") !== false) {
-                $this->data->cislo_orientacni = strip_tags($radek);
+                $result->cislo_orientacni = strip_tags($radek);
             }
             /* PSC + mesto */
             if (strpos($radek, "</D:PB>") !== false) {
-                $this->data->mesto_str = strip_tags($radek);
+                $result->mesto_str = strip_tags($radek);
             }
             /* mesto */
             if (strpos($radek, "</D:N>") !== false) {
-                $this->data->mesto = strip_tags($radek);
+                $result->mesto = strip_tags($radek);
             }
             /* psc */
             if (strpos($radek, "</D:PSC>") !== false) {
-                $this->data->psc = strip_tags($radek);
+                $result->psc = strip_tags($radek);
             }
             /* stat */
             if (strpos($radek, "</D:NS>") !== false) {
-                $this->data->stat = strip_tags($radek);
+                $result->stat = strip_tags($radek);
             }
 
             /* obchodni rejstrik - soud */
             if (strpos($radek, "</D:T>") !== false) {
-                if (!isset($this->data->registrace_soud)) {
-                    $this->data->registrace_soud = strip_tags($radek);
+                if (!isset($result->registrace_soud)) {
+                    $result->registrace_soud = strip_tags($radek);
                 }
             }
             /* obchodni rejstrik - spis */
             if (strpos($radek, "</D:OV>") !== false) {
-                $this->data->registrace_spis = strip_tags($radek);
+                $result->registrace_spis = strip_tags($radek);
             }
             /* obchodni rejstrik - datum */
             if (strpos($radek, "</D:DV>") !== false) {
-                $this->data->registrace_datum = strip_tags($radek);
+                $result->registrace_datum = strip_tags($radek);
             }
             /* obchodni rejstrik - typ */
             if (strpos($radek, "</D:NPF>") !== false) {
-                $this->data->registrace_typ = strip_tags($radek);
+                $result->registrace_typ = strip_tags($radek);
             }
             /* zivnostensky urad - misto */
             if (strpos($radek, "</D:NZU>") !== false) {
-                $this->data->zivnostensky_urad = strip_tags($radek);
+                $result->zivnostensky_urad = strip_tags($radek);
             }
             /* zivnostensky urad - kod */
             if (strpos($radek, "</D:NFU>") !== false) {
-                $this->data->financni_urad = strip_tags($radek);
+                $result->financni_urad = strip_tags($radek);
             }
         }
         
-        return $this->data;
+        return $result;
     }
 
-    private function doRequest($url)
+    private static function doRequest($url)
     {
         if (@ini_get("allow_url_fopen")) {
-            $context = stream_context_create(['http' => ['timeout' => 5]]);
+            // Ares je velmi pomalý
+            $context = stream_context_create(['http' => ['timeout' => 7]]);
             $result = @file($url, false, $context);
             if ($result === false) {
                 $error = error_get_last();
@@ -143,7 +141,7 @@ class Ares
      * @param string $ic
      * @return boolean
      */
-    public function validateIC($ic)
+    public static function validateICO($ic)
     {
         if (!$ic || !is_numeric($ic))
             return false;
