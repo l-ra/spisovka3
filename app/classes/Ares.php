@@ -3,66 +3,30 @@
 class Ares
 {
 
-    //const URL = 'http://wwwinfo.mfcr.cz/cgi-bin/ares/darv_res.cgi?';
     const URL = 'http://wwwinfo.mfcr.cz/cgi-bin/ares/darv_bas.cgi?';
 
-    private $ic;
     private $data;
-    private $zdroj;
-    private $source;
 
-    public function __construct($ic = null)
+    public function get($ic)
     {
+        if (!$this->validateIC($ic))
+            return "$ic není platné IČO.";
 
-        $this->data = new stdClass();
-        $this->ic = $ic;
-        $this->zdroj = "";
-
-        if (!is_null($ic)) {
-            $data = $this->get();
-            return (is_null($data)) ? $this : $data;
-        } else {
-            return $this;
-        }
-    }
-
-    public function get()
-    {
-
-        if ($this->zpracuj()) {
-            return $this->data;
-        } else {
-            return null;
-        }
-    }
-
-    public function nastavIC($ic)
-    {
-        $this->ic = $ic;
-        return true;
-    }
-
-    public function zpracuj()
-    {
-
-        if (!$this->jetoIC($this->ic))
-            return false;
-
-        $pozadavek = self::URL . "ico=" . $this->ic . "&jazyk=cz&xml=0";
-
-        $this->zdroj .= $pozadavek . "\n\n";
-        $this->source = $data = $this->getSource($pozadavek);
-
-        if (is_null($data))
-            return false;
+        $url = self::URL . "ico=" . $ic . "&jazyk=cz&xml=0";
+        $data = $this->doRequest($url);
+        if (empty($data))
+            return "Došlo k neznámé chybě.";
+        if (is_string($data))
+            return $data;
 
         // P.L. - toto zabrani tomu, aby se do formulare subjektu zapsal retezec "undefined"
+        $this->data = new stdClass();
         $this->data->dic = '';
         $this->data->ulice = '';
         $this->data->cislo_popisne = '';
         $this->data->cislo_orientacni = '';
 
-        foreach ($data as $ir => $radek) {
+        foreach ($data as $radek) {
             $radek = trim($radek);
 
             /* ICO */
@@ -141,64 +105,50 @@ class Ares
                 $this->data->financni_urad = strip_tags($radek);
             }
         }
-        return true;
+        
+        return $this->data;
     }
 
-    public function xml()
+    private function doRequest($url)
     {
-
-        if ($this->jetoIC($this->ic)) {
-
-            $pozadavek = self::URL . "ico=" . $this->ic . "&jazyk=cz&xml=0";
-
-            $this->zdroj .= $pozadavek . "\n\n";
-            $data = $this->getSource($pozadavek);
-            if (!is_null($data)) {
-
-                $data = implode("\n", $data);
-                $xml = simplexml_load_string($data);
-
-                return $xml;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    private function getSource($zdroj)
-    {
-
         if (@ini_get("allow_url_fopen")) {
-            return file($zdroj);
+            $context = stream_context_create(['http' => ['timeout' => 5]]);
+            $result = @file($url, false, $context);
+            if ($result === false) {
+                $error = error_get_last();
+                $msg = $error['message'];
+                if (stripos($msg, 'timed out') !== false)
+                    $msg = 'Registr ARES neodpověděl v časovém limitu.';
+                return $msg;
+            }            
+            return $result;
+            
         } else if (function_exists('curl_init')) {
-            if ($ch = curl_init($zdroj)) {
+            if ($ch = curl_init($url)) {
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_HEADER, 0);
                 $response = curl_exec($ch);
                 curl_close($ch);
                 return explode("\n", $response);
             } else {
-                return null;
+                return 'Funkce curl_init() neproběhla úspěšně.';
             }
         } else {
-            return null;
+            return 'Chybí PHP rozšíření curl.';
         }
     }
 
-    public function jetoIC($ic)
+    /**
+     * 
+     * @param string $ic
+     * @return boolean
+     */
+    public function validateIC($ic)
     {
-
-        // odstranime vsemozne mezery
-        $ic = preg_replace('#\s+#', '', $ic);
-        // je to cislo?
-        if (!is_numeric($ic))
+        if (!$ic || !is_numeric($ic))
             return false;
-        // toto nechapu, ale vsude se uvadi
-        if (strlen($ic) == 0)
-            return true;
-
+        
+        $ic = trim($ic);
         $pocet = strlen($ic);
         // doplnime nuly pokud je cifra < 8
         if ($pocet < 8) {
@@ -223,7 +173,7 @@ class Ares
         else
             $c = 11 - $a;
 
-        return (int) $ic[7] === $c;
+        return ((int) $ic[7]) === $c;
     }
 
 }

@@ -124,6 +124,7 @@ E-podatelna:
 
 Spisová služba:
 - při výběru datumu v aplikaci se nyní týden zobrazuje správně od pondělí do neděle
+- lepší ošetření chyb při hledání v ARESu (někdy registr nereaguje a nevrací odpověď)
 - údaj metadat "počet příloh" byl zobrazen chybně jako "počet listů příloh".
   Znamená počet příloh v listinné nebo jiné podobě (ne počet souborů).
 - zápis chybných hodnot do formuláře při hledání dokumentu podle datumů nezpůsobí
