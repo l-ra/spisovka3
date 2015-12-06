@@ -462,7 +462,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addTextArea('sestava_popis', 'Popis sestavy:', 80, 3);
         $form->addSelect('sestava_typ', 'Lze měnit? :',
                 array('1' => 'upravitelná sestava', '2' => 'pevná sestava'));
-        $form->addCheckbox('sestava_filtr', 'Filtrovat? :');
+        $form->addCheckbox('sestava_filtr', 'Filtrovat? (zobrazit výběr rozsahu podle pořadového čísla nebo data)');
 
         $form->addCheckbox('zobrazeni_cas', 'U datumů zobrazit i čas:');
         $form->addCheckbox('zobrazeni_adresa', 'Zobrazit adresy u subjektů:');
