@@ -359,16 +359,16 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $dokument_text = "";
         }
 
-        $form->addText('dokument_text', 'Zapůjčený dokument:', 80)
+        $form->addText('dokument_text', '', 80)
                 ->setValue($dokument_text);
-        $form->addText('dokument_id')
+        $form->addText('dokument_id', 'Zapůjčený dokument:')
                 ->setValue($dokument_id)
                 ->setRequired('Musí být vybrán dokument k zapůjčení!');
 
         $pracovnik_spisovny = Acl::isInRole('spisovna') || $this->user->isInRole('superadmin');
         if ($pracovnik_spisovny) {
-            $form->addText('user_text', 'Zapůjčeno komu:', 80);
-            $form->addText('user_id')
+            $form->addText('user_text', '', 80);
+            $form->addText('user_id', 'Zapůjčeno komu:')
                     ->setRequired('Musí být vybrána osoba, které se bude zapůjčovat!');
         }
         

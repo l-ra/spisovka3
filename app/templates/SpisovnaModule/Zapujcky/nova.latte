@@ -6,40 +6,30 @@
 
     <h2>Žádanka o zápůjčku</h2>
     
-    {$novyForm->render('begin')}
+    {form $novyForm}
     <div class="dokument_blok_hlavni">
         <dl>
-            <dt><strong>{$novyForm['dokument_text']->label}</strong></dt>
+            <dt>{label2 dokument_id}</dt>
             <dd>
-                {$novyForm['dokument_text']->control}{$novyForm['dokument_id']->control}
+                {input dokument_text}{input dokument_id}
             </dd>
         </dl>
         <dl n:if="isset($novyForm['user_text'])">
-            <dt><strong>{$novyForm['user_text']->label}</strong></dt>
+            <dt>{label2 user_id}</dt>
             <dd>
-                {$novyForm['user_text']->control}{$novyForm['user_id']->control}
+                {input user_text}{input user_id}
             </dd>
         </dl>        
-        <dl>
-            <dt>{$novyForm['duvod']->label}</dt>
-            <dd>{$novyForm['duvod']->control}</dd>
-        </dl>
-        <dl>
-            <dt>{$novyForm['date_od']->label}</dt>
-            <dd>{$novyForm['date_od']->control}</dd>
-        </dl>
-        <dl>
-            <dt>{$novyForm['date_do']->label}</dt>
-            <dd>{$novyForm['date_do']->control}</dd>
-        </dl>
-        
+        {input2 duvod}
+        {input2 date_od}
+        {input2 date_do}
     </div>
     
     <div class="dokument_blok_submit">
-        {$novyForm['novy']->control}
+        {input novy}
         &nbsp;&nbsp;
-        {$novyForm['storno']->control}
+        {input storno}
     </div>
-    {$novyForm->render('end')}
+    {/form}
 
         
