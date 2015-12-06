@@ -40,14 +40,13 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
     }
 
-    public function renderNovy()
+    public function renderNovy($id)
     {
-
         /* Nacteni zpravy */
         if (is_null($this->Epodatelna))
             $this->Epodatelna = new Epodatelna();
 
-        $epodatelna_id = $this->getParameter('id', null);
+        $epodatelna_id = $id;
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
         $this->template->Typ_evidence = $this->typ_evidence;
@@ -204,7 +203,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         new SeznamStatu($this, 'seznamstatu');
     }
 
-    public function renderOdmitnout()
+    public function renderOdmitnout($id)
     {
         /* Nacteni zpravy */
         $Epodatelna = new Epodatelna();
@@ -366,9 +365,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $form->addText('nazev', 'Věc:', 80, 100)
                 ->setValue(@$zprava->predmet);
-        $form->addTextArea('popis', 'Stručný popis:', 80, 3);
+        $form->addTextArea('popis', 'Popis:', 80, 3);
 
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typy_dokumentu);
+        $form->addSelect('dokument_typ_id', 'Typ dokumentu:', $typy_dokumentu);
         if (isset($typy_dokumentu[1]))
             $form['dokument_typ_id']->setDefaultValue(1);
 
@@ -407,7 +406,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 ->setValue($cas);
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
-                ->setValue('30')->addRule(Nette\Forms\Form::NUMERIC,
+                ->setValue('30')
+                ->setOption('description', 'dní')
+                ->addRule(Nette\Forms\Form::NUMERIC,
                 'Lhůta k vyřízení musí být číslo');
 
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
@@ -417,9 +418,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
-                'Počet listů musí být číslo');
+                'Počet listů musí být číslo.');
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
-                'Počet příloh musí být číslo');
+                'Počet příloh musí být číslo.');
 
 
         $form->addSubmit('novy', 'Vytvořit')
@@ -795,19 +796,23 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function createComponentEvidenceForm()
     {
-        $epodatelna_id = $this->getParameter('id', null);
-
         $form = new Spisovka\Form();
         $form->addHidden('id')
-                ->setValue($epodatelna_id);
+                ->setValue($this->getParameter('id'));
         $form->addText('evidence', 'Evidence:', 50, 100)
-                ->addRule(Nette\Forms\Form::FILLED, 'Název evidence musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Název evidence musí být vyplněn!');
         $form->addSubmit('evidovat', 'Zaevidovat')
                 ->onClick[] = array($this, 'zaevidovatClicked');
-
+        $form->onError[] = array($this, 'validationFailed');
+        
         return $form;
     }
 
+    public function validationFailed()
+    {
+        $this->redirect('Default:detail', ['id' => $this->getParameter('id')]);
+    }
+    
     public function zaevidovatClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -816,6 +821,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->zaevidovat($data);
             $this->flashMessage('Zpráva byla zaevidována v evidenci "' . $data['evidence'] . '".');
         } catch (DibiException $e) {
+            $e->getMessage();
             $this->flashMessage('Zprávu se nepodařilo zaevidovat do jiné evidence.', 'warning');
         }
         
@@ -846,7 +852,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
-                ->addRule(Nette\Forms\Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Důvod odmítnutí musí být vyplněn!');
 
         $form->addCheckbox('upozornit', 'Poslat upozornění odesilateli?')
                 ->setValue(true);
@@ -859,6 +865,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $form->addSubmit('odmitnout', 'Provést')
                 ->onClick[] = array($this, 'odmitnoutEmailClicked');
+        $form->onError[] = array($this, 'validationFailed');
 
         return $form;
     }
@@ -871,6 +878,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->odmitnoutEmail($data);
             $this->flashMessage('Zpráva byla odmítnuta.');
         } catch (DibiException $e) {
+            $e->getMessage();
             $this->flashMessage('Zprávu se nepodařilo odmítnout.', 'warning');
         }
         
@@ -929,7 +937,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
-                ->addRule(Nette\Forms\Form::FILLED, 'Důvod odmítnutí musí být vyplněno!');
+                ->addRule(Nette\Forms\Form::FILLED, 'Důvod odmítnutí musí být vyplněn!');
 
         /* $form->addCheckbox('upozornit', 'Poslat upozornění odesilateli?')
           ->setValue(false);
@@ -940,6 +948,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $form->addSubmit('odmitnout', 'Provést')
                 ->onClick[] = array($this, 'odmitnoutISDSClicked');
+        $form->onError[] = array($this, 'validationFailed');
 
         return $form;
     }
@@ -952,6 +961,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->odmitnoutISDS($data);
             $this->flashMessage('Zpráva byla odmítnuta.');
         } catch (DibiException $e) {
+            $e->getMessage();
             $this->flashMessage('Zprávu se nepodařilo odmítnout.', 'warning');
         }
         
@@ -969,4 +979,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $this->Epodatelna->update($info, array(array('id=%i', $data['id'])));
     }
 
+    public function renderJiny($id)
+    {
+        
+    }
 }

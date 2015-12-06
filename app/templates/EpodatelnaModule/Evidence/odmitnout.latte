@@ -1,9 +1,4 @@
-    {if isset($chyba)}
-    <div class="flash_message flash_warning">Zprávu se nepodařilo odmítnout.</div>
-    {/if}
-
-    <h2>Odmítnout zprávu</h2>
-    
+    <h2>Odmítnout zprávu</h2>    
     {if !empty($Zprava->email_id)}
     {control odmitnoutEmailForm}
     {elseif !empty($Zprava->isds_id)}

@@ -5,44 +5,21 @@
     <a href="{link Default:}">E-podatelna</a> - Nový dokument
     </div>
 
-    {$novyForm->render('begin')}
+    {form $novyForm}
     <div class="dokument_blok_hlavni">
-        {if 0}
-        <dl>
-            <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
-            <dd>
-                <span id="dok_cjednaci">{$cjednaci->cislo_jednaci}</span>&nbsp;
-                {if $Typ_evidence == 'sberny_arch'} / {$novyForm['poradi']->control} &nbsp; <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">Vložit do existujícího spisu</a> {/if}
-            </dd>
-        </dl>
-        {/if}
-        <dl>
-            <dt>Typ dokumentu:</dt>
-            <dd>{$novyForm['dokument_typ_id']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Věc:</dt>
-            <dd>{$novyForm['nazev']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Popis:</dt>
-            <dd>{$novyForm['popis']->control}</dd>
-        </dl>
+        {input2 dokument_typ_id}
+        {input2 nazev}
+        {input2 popis}
         <dl>
             <dt>Datum a čas doručení:</dt>
-            <dd>{$novyForm['datum_vzniku']->control} {$novyForm['datum_vzniku_cas']->control}</dd>
+            <dd>{input datum_vzniku} {input datum_vzniku_cas} {inputError2 datum_vzniku}</dd>
         </dl>
+        {input2 cislo_jednaci_odesilatele}
+        {input2 poznamka}
         <dl>
-            <dt>Číslo jednací odesilatele:</dt>
-            <dd>{$novyForm['cislo_jednaci_odesilatele']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Poznámka:</dt>
-            <dd>{$novyForm['poznamka']->control}</dd>
-        </dl>
-        <dl>
-            <dt>Počet listů:</dt>
-            <dd>{$novyForm['pocet_listu']->control}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="font-weight: normal;">Počet listů příloh: </span>{$novyForm['pocet_priloh']->control}</dd>
+            <dt>{label2 pocet_listu}</dt>
+            <dd>{input pocet_listu} {inputError2 pocet_listu}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {label2 pocet_priloh} {input pocet_priloh} {inputError2 pocet_priloh}</dd>
         </dl>
         <dl>
             <dt>Identifikátor epodatelny:</dt>
@@ -84,14 +61,8 @@
 
     <div class="dokument_blok_sedy">
         <div>Předání / vyřízení</div>
-        <dl>
-            <dt>Lhůta k vyřízení:</dt>
-            <dd>{$novyForm['lhuta']->control} dní</dd>
-        </dl>
-        <dl>
-            <dt>Poznámka:</dt>
-            <dd>{$novyForm['predani_poznamka']->control}</dd>
-        </dl>
+        {input2 lhuta}
+        {input2 predani_poznamka}
         <dl>
             <dt>Předat:</dt>
             <dd>
@@ -217,10 +188,10 @@
     </div>
 
     <div class="dokument_blok_submit">
-        {$novyForm['novy']->control}
+        {input novy}
         &nbsp;&nbsp;
-        {$novyForm['storno']->control}
+        {input storno}
     </div>
-    {$novyForm->render('end')}
+    {/form}
     
     {control seznamstatu}
