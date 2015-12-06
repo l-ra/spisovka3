@@ -1,23 +1,21 @@
-    {if isset($chyba)}
-
-    {if $chyba==1}
-    <div class="flash_message flash_warning">Přílohu se nepodařilo připojit k dokumentu. Zkuste to znovu.</div>
-    {elseif $chyba==2}
-    <div class="flash_message flash_warning">Přílohu se nepodařilo nahrát. Zkuste to znovu.</div>
-    <div class="flash_message flash_warning">{$error_message}</div>
-    {elseif $chyba==3}
-    <div class="flash_message flash_warning">Nějak se to zaseklo</div>
+{if isset($chyba)}
+    {if $chyba == 1}
+        <div class="flash_message flash_warning">Přílohu se nepodařilo připojit k dokumentu. Zkuste to znovu.</div>
+    {elseif $chyba == 2}
+        <div class="flash_message flash_warning">Přílohu se nepodařilo nahrát. Zkuste to znovu.</div>
+        <div class="flash_message flash_warning">{$error_message}</div>
+    {elseif $chyba == 3}
+        <div class="flash_message flash_warning">Metadata přílohy se nepodařilo upravit.</div>
     {/if}
+{/if}
 
-    {/if}
-
-
-
-    <h2>Upravit přílohu</h2>
+{if $presenter->view == 'pridat'}
+    {control uploadForm}
+{else}    
     {control reUploadForm}
-
-        <dl>
-            <dt></dt>
-            <dd class="normal-font">Maximální možná velikost souboru, kterou je možné nahrát: {DokumentPrilohy::maxVelikostUploadu(true)}</dd>
-        </dl>
+{/if}
+<dl>
+    <dt></dt>
+    <dd class="normal-font">Maximální možná velikost souboru, kterou je možné nahrát: {DokumentPrilohy::maxVelikostUploadu(true)}</dd>
+</dl>
 

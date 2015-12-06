@@ -111,7 +111,6 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         try {
             if ($file = $UploadFile->uploadDokument($data)) {
                 // pripojit k dokumentu
-                $this->template->chyba = $file;
                 $DokumentPrilohy = new DokumentPrilohy();
 
                 if ($DokumentPrilohy->pripojit($dokument_id, $file->id)) {
@@ -204,7 +203,6 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                 $file_info2 = $FileModel->getInfo($file->id);
 
                 // pripojit k dokumentu
-                $this->template->chyba = $file;
                 $DokumentPrilohy = new DokumentPrilohy();
                 if ($DokumentPrilohy->pripojit($dokument_id, $file->id)) {
                     // tady by se melo mozna kontrolovat nejake uzivatelske nastaveni, jak se ma reupload prilohy chovat
@@ -232,18 +230,10 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             // zadny soubor
             $File = new FileModel();
             if ($file = $File->upravitMetadata($data, $file_id)) {
-                // pripojit k dokumentu
-                $this->template->chyba = $file;
-                //$DokumentPrilohy = new DokumentPrilohy();
-                //if ($DokumentPrilohy->pripojit($dokument_id, $file->file_id)) {
                 echo '###zmemeno###' . $dokument_id;
                 $this->terminate();
-                //} else {
-                //    $this->template->chyba = 1;
-                //}
             } else {
-                $this->template->chyba = 2;
-                $this->template->error_message = "Metadata přílohy se nepodařilo upravit.";
+                $this->template->chyba = 3;
             }
         }
     }
