@@ -2,6 +2,12 @@ body {
     background: white ;
 }
 
+/* Pokud by uzivatel chtel, muze si obarvit zahlavi tabulky jinak
+
+table.spisovka th, table.seznam th {
+    background-color: gray;
+} */
+
 #layout_top { display: none; }
 #menu { display: none; }
 #flash { display: none; }
