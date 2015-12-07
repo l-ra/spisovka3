@@ -120,9 +120,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
-        if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
             if (count($seznam) > 0) {
                 $spis_ids = array();
@@ -133,29 +131,17 @@ class Admin_SpisyPresenter extends SpisyPresenter
             } else {
                 $this->template->seznam_dokumentu = array();
             }
-            $this->setLayout(false);
-            $this->setView('print');
-        } elseif ($pdf) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->pdf_output = 1;
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $seznam = $result->fetchAll();
-            if (count($seznam) > 0) {
-                $spis_ids = array();
-                foreach ($seznam as $spis) {
-                    $spis_ids[] = $spis->id;
-                }
-                $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-            } else {
-                $this->template->seznam_dokumentu = array();
-            }
-            $this->setLayout(false);
             $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
 
         $this->template->seznam = $seznam;
+        
+        if ($pdf) {
+            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
+            $this->pdf_output = 1;            
+        }
     }
 
     public function renderDetail($id, $upravit)
@@ -185,15 +171,12 @@ class Admin_SpisyPresenter extends SpisyPresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
-        if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->setLayout(false);
+        if ($tisk || $pdf) {
             $this->setView('printdetail');
-        } elseif ($pdf) {
+        }
+        if ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 2;
-            $this->setLayout(false);
-            $this->setView('printdetail');
         }
     }
 

@@ -134,14 +134,12 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('print');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 1;
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);

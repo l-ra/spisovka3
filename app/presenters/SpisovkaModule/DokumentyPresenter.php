@@ -120,14 +120,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('print');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 1;
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -420,7 +418,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if ($tisk || $pdf) {
             $this->template->AccessEdit = false;
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->setLayout('print');
             $this->setView('printdetail');
             if ($pdf)
                 $this->pdf_output = 2;

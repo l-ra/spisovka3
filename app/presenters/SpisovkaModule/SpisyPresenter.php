@@ -327,7 +327,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
 
-            $this->setLayout(false);
             $this->setView('print');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
@@ -335,7 +334,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
 
-            $this->setLayout(false);
             $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -403,13 +401,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
         if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->setLayout(false);
             $this->setView('printdetail');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 2;
-            $this->setLayout(false);
             $this->setView('printdetail');
         }
     }

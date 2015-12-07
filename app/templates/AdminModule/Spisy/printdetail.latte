@@ -1,17 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
-    <title>Spisová služba</title>
-    <style type="text/css" media="screen, print">
-        {file_get_contents(APP_DIR .'/../public/css/print_site.css')|noescape}
-        {file_get_contents(APP_DIR .'/../public/css/printdetail_site.css')|noescape}
-    </style>
-</head>
-<body>
-<div id="content">
+{block title}Dokument{/block}
+{block content}
     <h2>{$Spis->nazev}</h2>
     
     <div class="detail_blok">
@@ -105,7 +93,7 @@
                 <span style="font-size: 8pt;">přílohy:
                 {=($dok->pocet_listu)+0} listů,
                 {=($dok->pocet_priloh)+0} list. příloh,
-                {=(count($dok->prilohy)+0)} příloh</span>
+                {isset($dok->prilohy) ? $dok->prilohy : 0} příloh</span>
             </td>
 
 
@@ -256,6 +244,3 @@
         {/if}
     {/if}
     
-</div>        
-</body>
-</html>    

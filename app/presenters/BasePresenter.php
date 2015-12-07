@@ -67,6 +67,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         $this->template->view = $this->view;
 
+        // Není nutné toto duplikovat pro každou funkci, která umožňuje tisk
+        if ($this->getParameter('print') || $this->getParameter('pdfprint'))
+            $this->setLayout('print');
+        
+        /* Následuje XHTML magie */
         $request = $this->getHttpRequest();
         $accept = $request->getHeader('Accept', '');
         $xhtml_browser = strpos($accept, 'application/xhtml+xml') !== false;

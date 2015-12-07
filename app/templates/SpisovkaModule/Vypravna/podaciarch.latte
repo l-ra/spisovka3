@@ -11,65 +11,69 @@
 </head>
 <body>
 {for $p=1;$p<=$count_page;$p++}
-<table class="header">
-    <tr>
-        <td><h1>Podací arch</h1></td>
-        <td class="d1"><img src="{$publicUrl}images/ceska_posta1.png" widht="146" height="20" /></td>
-    </tr>
-</table>
+    <table class="header">
+        <tr>
+            <td><h1>Podací arch</h1></td>
+            <td class="d1"><img src="{$publicUrl}images/ceska_posta1.png" widht="146" height="20" /></td>
+        </tr>
+    </table>
 
-<p>Podavatel:&nbsp;&nbsp;<strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
-<p>Odesílatel:&nbsp;&nbsp;<strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
+    <p>Podavatel:&nbsp;&nbsp;<strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
+    <p>Odesílatel:&nbsp;&nbsp;<strong>{$Urad->plny_nazev}, {$Urad->adresa->ulice}, {$Urad->adresa->psc} {$Urad->adresa->mesto}</strong></p>
 
-<div class="spacer"></div>
-<p>Číslo Zákaznické karty odesílatele:&nbsp;&nbsp;<span class="cislo_karty">{$cislo_zakaznicke_karty}</span></p>
-<p class="placeno">
-Úhrada:&nbsp;&nbsp;{if $zpusob_uhrady != ''}<span id="zpusob_uhrady">{$zpusob_uhrady}</span>{else}
-{foreach $zpusoby_uhrad as $z}□&nbsp;{$z}&nbsp;&nbsp;&nbsp;{/foreach}{/if}
-</p>
-<div class="spacer"></div>
-    
-<table>
-    <tr>
-        <th class="w1">Poř. číslo</th>
-        <th class="w2">Podací znaky</th>
-        <th class="w3">Adresát - jméno, příjmení, ulice, číslo domu, PSČ, místo určení, tel. kontakt, email</th>
-        <th class="w4">Dobírka</th>
-        <th class="w5">Udaná cena<sup>*</sup></th>
-        <th class="w6">Poznámka,<br> doplňkové služby</th>
-    </tr>
-{for $i=(($p-1)*10);$i < (($p)*10);$i++}  
-    <tr>
-        <td class="w1 height">&nbsp;</td>
-        <td class="w2">&nbsp;</td>
-        {if isset($seznam[$i])}
-        <td class="w3">
-            {=Subjekt::displayName($seznam[$i],'jmeno_item')}&nbsp;<br/>
-            {=Subjekt::displayName($seznam[$i],'ulice')}&nbsp;<br />
-            {=Subjekt::displayName($seznam[$i],'mesto')}&nbsp;
-        </td>
-        <td class="w4 right">{if !empty($seznam[$i]['cena']) && in_array(9, $seznam[$i]['druh_zasilky'])}{=$seznam[$i]['cena']}{/if}</td>
-        <td class="w5 right">{if !empty($seznam[$i]['cena']) && !in_array(9, $seznam[$i]['druh_zasilky'])}{=$seznam[$i]['cena']}{/if}</td>
-        <td class="w6">{!=DruhZasilky::vypis($seznam[$i]['druh_zasilky'], true)}</td>
+    <div class="spacer"></div>
+    <p>Číslo Zákaznické karty odesílatele:&nbsp;&nbsp;<span class="cislo_karty">{$cislo_zakaznicke_karty}</span></p>
+    <p class="placeno">
+        Úhrada:&nbsp;
+        {if $zpusob_uhrady != ''}
+            <span id="zpusob_uhrady">{$zpusob_uhrady}</span>
         {else}
-        <td class="w3"></td>
-        <td class="w4 right"></td>
-        <td class="w5 right">&nbsp;</td>
-        <td class="w6"></td>
+            {foreach $zpusoby_uhrad as $z}□&nbsp;{$z}&nbsp;&nbsp;&nbsp;{/foreach}
         {/if}
-    </tr>
-{/for}
-</table>
+    </p>
+    <div class="spacer"></div>
 
-<table class="footer">
-    <tr>
-        <td class="d2">* V případě zásilek, u kterých v souladu se zněním Poštovních nebo
-Obchodních podmínek České pošty odesílatel neuvádí udanou cenu,
-se sloupec Udaná cena nevyplňuje.</td>
-        <td>Potvrzení pošty:</td>
-    </tr>
-</table>
-{if $p!=$count_page}<pagebreak />{/if}
+    <table>
+        <tr>
+            <th class="w1">Poř. číslo</th>
+            <th class="w2">Podací znaky</th>
+            <th class="w3">Adresát - jméno, příjmení, ulice, číslo domu, PSČ, místo určení, tel. kontakt, email</th>
+            <th class="w4">Dobírka</th>
+            <th class="w5">Udaná cena<sup>*</sup></th>
+            <th class="w6">Poznámka,<br> doplňkové služby</th>
+        </tr>
+    {for $i=(($p-1)*10);$i < (($p)*10);$i++}  
+        <tr>
+            <td class="w1 height">&nbsp;</td>
+            <td class="w2">&nbsp;</td>
+            {if isset($seznam[$i])}
+                <td class="w3">
+                    {=Subjekt::displayName($seznam[$i],'jmeno_item')}&nbsp;<br/>
+                    {=Subjekt::displayName($seznam[$i],'ulice')}&nbsp;<br />
+                    {=Subjekt::displayName($seznam[$i],'mesto')}&nbsp;
+                </td>
+                <td class="w4 right">{if !empty($seznam[$i]['cena']) && in_array(9, $seznam[$i]['druh_zasilky'])}{=$seznam[$i]['cena']}{/if}</td>
+                <td class="w5 right">{if !empty($seznam[$i]['cena']) && !in_array(9, $seznam[$i]['druh_zasilky'])}{=$seznam[$i]['cena']}{/if}</td>
+                <td class="w6">{!=DruhZasilky::vypis($seznam[$i]['druh_zasilky'], true)}</td>
+            {else}
+                <td class="w3"></td>
+                <td class="w4 right"></td>
+                <td class="w5 right">&nbsp;</td>
+                <td class="w6"></td>
+            {/if}
+        </tr>
+    {/for}
+    </table>
+
+    <table class="footer">
+        <tr>
+            <td class="d2">* V případě zásilek, u kterých v souladu se zněním Poštovních nebo
+    Obchodních podmínek České pošty odesílatel neuvádí udanou cenu,
+    se sloupec Udaná cena nevyplňuje.</td>
+            <td>Potvrzení pošty:</td>
+        </tr>
+    </table>
+    {if $p!=$count_page}<pagebreak />{/if}
 {/for}
 </body>
 </html>

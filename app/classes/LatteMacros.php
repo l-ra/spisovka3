@@ -36,7 +36,7 @@ class LatteMacros
         return $user->isInRole($role);
     }
 
-    public static function CSS($publicUrl, $filename, $media = 'screen')
+    public static function CSS($publicUrl, $filename, $media = 'screen, print')
     {
 
         // $filename = Nette\Latte\Engine::fetchToken($content); // filename [,] [media]

@@ -62,7 +62,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             array_shift($ciselnik);
             $this->template->zpusoby_uhrad = $ciselnik;
 
-            $this->setLayout(false);
             $this->setView('podaciarch');
         } else {
             $seznam = $Dokument->kOdeslani($seradit, $hledat, $filtr);
@@ -180,8 +179,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
         $this->template->dokument = $dokument;
         $this->template->isPrint = $this->getParameter('print');
-
-        $this->setLayout(false);
     }
 
     public function actionDetail($id)

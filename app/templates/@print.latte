@@ -1,16 +1,25 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
-    <title>Spisová služba - {block #title}{/block}</title>
-    <style type="text/css" media="screen, print">
-        {var $css_file = strpos($view, 'printdetail') !== false ? 'printdetail_site' : 'print_site'}
-        {file_get_contents(APP_DIR . "/../public/css/$css_file.css")|noescape}
-    </style>
-</head>
-<body {if true}onload="window.print();"{/if}>
-{include #content}
-</body>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <title>Spisová služba - {block #title}{/block}</title>
+        <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
+        {if $presenter->getParameter('pdfprint')}
+            <style type="text/css" media="screen, print">
+                {file_get_contents(APP_DIR . "/../public/css/site.css")|noescape}
+                {file_get_contents(APP_DIR . "/../public/css/print.css")|noescape}
+                {file_get_contents(APP_DIR . "/../public/css/pdf.css")|noescape}
+            </style>
+        {else}
+            {css site}
+            {css print}
+        {/if}
+
+    </head>
+    <body {if false}onload="window.print();"{/if}>
+        <div>
+            {include #content}
+        </div>
+    </body>
 </html>

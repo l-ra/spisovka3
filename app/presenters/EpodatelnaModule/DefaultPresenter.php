@@ -119,14 +119,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('print');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 1;
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -155,17 +153,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
         if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('print');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 1;
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -198,14 +191,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('printo');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 1;
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-            $this->setLayout(false);
             $this->setView('printo');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
@@ -291,23 +282,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $this->template->Dokument = null;
             }
 
-
-            // Volba vystupu - web/tisk/pdf
-            $tisk = $this->getParameter('print');
-            $pdf = $this->getParameter('pdfprint');
-            if ($tisk) {
-                @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-                $this->setLayout(false);
-                $this->setView('printdetail');
-            } elseif ($pdf) {
-                @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-                $this->pdf_output = 2;
-                $this->setLayout(false);
-                $this->setView('printdetail');
-            }
-
-
-
             $this->template->Original = $original;
             $this->template->Identifikator = $this->Epodatelna->identifikator($zprava, $original);
         } else {
@@ -316,7 +290,21 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
     }
 
-    public function actionOdetail()
+    public function renderDetail()
+    {
+        // Volba vystupu - web/tisk/pdf
+        $tisk = $this->getParameter('print');
+        $pdf = $this->getParameter('pdfprint');
+        if ($tisk) {
+            $this->setView('printdetail');
+        } elseif ($pdf) {
+            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
+            $this->pdf_output = 2;
+            $this->setView('printdetail');
+        }        
+    }
+    
+    public function renderOdetail()
     {
         $this->actionDetail();
 
@@ -324,13 +312,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
         if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->setLayout(false);
             $this->setView('printdetailo');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 2;
-            $this->setLayout(false);
             $this->setView('printdetailo');
         }
     }
