@@ -24,21 +24,22 @@ body {
 }
 
 #content dl {
-    clear: both;
-    margin: 5px;
+    margin: 0px 0px;
 }
 
 #content dt {
-    float: left;
     width: 200px;
     text-align: right;
-    /*padding-right: 20px;*/
-    margin-right: 20px;
+    margin: 0px 20px 8px 0px;
+    display: inline-block;
+    vertical-align: top;
 }
 
 #content dd {
-    margin-left: 220px;
     font-weight: bold;
+    display: inline-block;
+    margin: 0px 0px 8px 0px;
+    max-width: 680px;
 }
 
 #content dd.normal {
@@ -122,6 +123,7 @@ body {
 }
 
 #content .seznam td {
+    padding: 5px 5px;
     vertical-align: top;
     border: 0px;
     border-bottom: 1px #e0e0e0 solid;
