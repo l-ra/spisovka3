@@ -254,49 +254,7 @@
             Adresáti / odesílatelé
         </div>
         <div id="dok-subjekty">
-        {if count($Dok->subjekty)>0}
-        <table class="seznam">
-            {foreach $Dok->subjekty as $subjekt}
-            <tr>
-            <td class="icon">
-                &nbsp;
-            </td>
-            <td class="meta">
-                <div style="font-weight: bold; padding:5px 0px;">{=Subjekt::displayName($subjekt,'jmeno_item')}</div>
-                <div class="info">
-                {=Subjekt::displayName($subjekt,'adresa')}
-                <br />
-                <span style="color:#c0c0c0; font-size: 8pt;">{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span>
-                <br />
-                <span style="color:#c0c0c0; font-size: 8pt;">
-                    {if $subjekt->rezim_subjektu == 'O'}
-                    odesílatel
-                    {elseif $subjekt->rezim_subjektu == 'A'}
-                    adresát
-                    {elseif $subjekt->rezim_subjektu == 'AO'}
-                    odesílatel i adresát
-                    {else}
-                    nespecifikováno
-                    {/if}
-                </span>
-                </div>
-            </td>
-            <td class="meta_plus">
-                <div style="font-weight: bold; padding:5px 0px;">&nbsp;</div>
-                <div class="info">
-                    email:&nbsp;&nbsp;&nbsp;<strong>{$subjekt->email}</strong>
-                <br />
-                telefon:&nbsp;&nbsp;&nbsp;<strong>{$subjekt->telefon}</strong>
-                <br>
-                isds:&nbsp;&nbsp;&nbsp;<strong>{$subjekt->id_isds}</strong>
-                </div>
-            </td>
-        </tr>
-        {/foreach}
-        </table>
-        {else}
-        <div class="prazdno">K tomuto dokumentu nejsou připojeni žádní odesílatelé nebo adresáti.</div>
-        {/if}
+            {include '../Subjekty/nacti.latte', subjekty => $Dok->subjekty}
         </div>
     </div>
 
