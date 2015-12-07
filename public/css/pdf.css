@@ -1,5 +1,15 @@
 /* 
+    Nutné pro export pomocí knihovny mPDF
     Created on : 7.12.2015, 20:15:55
     Author     : Pavel Laštovička
 */
 
+dl {
+    clear: both;
+}
+dt {
+    float: left;
+}
+dd {
+    margin-left: 200px;
+}
