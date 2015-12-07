@@ -198,8 +198,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->flashMessage('Dokument není připraven k vytvoření', 'warning');
         }
 
-        $this->template->novyForm = $this['novyForm'];
-
         new SeznamStatu($this, 'seznamstatu');
     }
 

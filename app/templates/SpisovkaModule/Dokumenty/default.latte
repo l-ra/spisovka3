@@ -13,13 +13,11 @@
     </div>
     
     <div id="filtr">
-        {$filtrForm->render('begin')}
-        {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
-        {$filtrForm['go_filtr']->control}
-        <br/>
-        {$filtrForm['bez_vyrizenych']->control}{$filtrForm['bez_vyrizenych']->label}<br/>
-        {$filtrForm['jen_moje']->control}{$filtrForm['jen_moje']->label}
-        {$filtrForm->render('end')}
+        {form filtrForm}
+            {label filtr /} {input filtr} {input go_filtr} <br />
+            {input bez_vyrizenych}<br />
+            {input jen_moje}
+        {/form}
     </div>
     <div id="search">
         {control searchForm}

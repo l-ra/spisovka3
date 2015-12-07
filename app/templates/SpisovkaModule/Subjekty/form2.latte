@@ -1,20 +1,17 @@
 {form novyForm}
-    {if $form->hasErrors()}
-        <div class="flash_message flash_warning" n:foreach="$form->errors as $error">{$error}</div>
-    {/if}
     <div id="form_novy_subjekt2">
         {input2 type}
         {input2 nazev_subjektu}
         <dl>
             <dt>IČO, DIČ:</dt>
-            <dd>{input ic} {$form['ic']->getOption('description')}
-                <span style="margin-left: 30px" /> {input dic}</dd><br />
+            <dd>{input ic} {inputError2 ic} {$form['ic']->getOption('description')}
+                <span style="margin-left: 30px" /> {input dic} {inputError2 dic}</dd><br />
             <dt>Titul před, jméno, příjmení, titul za:</dt>
             <dd>{input titul_pred}{input jmeno}{input prijmeni}{input titul_za}</dd><br />
             <dt>Ulice, číslo popisné a orientační:</dt>
-            <dd>{input adresa_ulice}{input adresa_cp}{input adresa_co}</dd><br />
+            <dd>{input adresa_ulice}{input adresa_cp}{inputError2 adresa_cp}{input adresa_co}{inputError2 adresa_co}</dd><br />
             <dt>PSČ a Město:</dt>
-            <dd>{input adresa_psc}{input adresa_mesto}</dd><br />
+            <dd>{input adresa_psc}{inputError2 adresa_psc}{input adresa_mesto}</dd><br />
         </dl>
         {input2 adresa_stat}
         {input2 email}

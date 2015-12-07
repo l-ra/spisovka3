@@ -354,8 +354,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
             }
 
             $this->template->FormUpravit = $formUpravit;
-
-            $this->template->upravitForm = $this['upravitForm'];
         } else {
             // spis neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');

@@ -1,16 +1,16 @@
 {block title}Seznam dokumentů{/block}
 {block content}
-    <div class="navigate">
+<div class="navigate">
     <a href="{link :Admin:Zamestnanci:seznam}">Seznam zaměstnanců</a> - Detail zaměstnance
-    </div>
-    <h2>{=Osoba::displayName($Osoba)}</h2>
+</div>
+<h2>{=Osoba::displayName($Osoba)}</h2>
 
 
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Info</div>
-        {if ($FormUpravit=='info')}
+<div class="detail_blok">
+    <div class="detail_hlavicka">Info</div>
+    {if ($FormUpravit=='info')}
         {control upravitForm}
-        {else}
+    {else}
         <dl>
             <dt>email:</dt>
             <dd>{$Osoba->email}</dd>
@@ -24,117 +24,103 @@
             <dd>{$Osoba->pozice}</dd>
         </dl>
         <a href="{link this, 'id'=>$Osoba->id, 'upravit'=>'info'}">Upravit</a>
-        {/if}
-    </div>
+    {/if}
+</div>
 
 
-    <div id="zamestnanec_role">
+<div id="zamestnanec_role">
 
 
-    </div>
-    
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Uživatelské účty</div>
-        <br />
-        <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'new_user'=>'1'}">Přidat účet</a>
+</div>
 
-        {if isset($vytvoritUcet)}
+<div class="detail_blok">
+    <div class="detail_hlavicka">Uživatelské účty</div>
+    <br />
+    <a href="{link :Admin:Zamestnanci:detail, 'id'=>$Osoba->id, 'new_user'=>'1'}">Přidat účet</a>
+
+    {if isset($vytvoritUcet)}
         {control newUserForm}
-        {/if}
+    {/if}
 
-        {if count($Accounts)>0}
+    {if count($Accounts)>0}
         {foreach $Accounts as $u}
-        <dl>
-            <dt>Uživatelské jméno:</dt>
-            <dd>{$u->username}</dd>
-        </dl>
-        {if ($ZmenaHesla === $u->id)}
-        {control changePasswordForm}
-        {/if}
-        {if ($ZmenaPrihlaseni === $u->id)}
-        {control changeAuthTypeForm}
-        {elseif $remote_auth_supported}
-        <dl>
-            <dt>Ověření hesla:</dt>
-            <dd>{$u->external_auth ? 'externí' : 'lokální'}</dd>
-        </dl>
-        {/if}
-        <dl>
-            <dt>Poslední přihlášení:</dt>
-            <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}</dd>
-        </dl>
-        
-        {if ($FormUpravit == 'org' && $UpravitUserId == $u->id)}
-        {control oJForm}
-        {else}
-        <dl>
-            <dt>Organizační jednotka:</dt>
-            <dd>{$u->org_nazev}</dd>
-        </dl>
-        {/if}
-        
-        <dl>
-            <dt>Role:</dt>
-            <dd>
-                {if count($Role[$u->id])>0}
-                {if $RoleUpravit == $u->id}
-                    {form $roleForm}
+            <dl>
+                <dt>Uživatelské jméno:</dt>
+                <dd>{$u->username}</dd>
+            </dl>
+            {if ($ZmenaHesla === $u->id)}
+                {control changePasswordForm}
+            {/if}
+            {if ($ZmenaPrihlaseni === $u->id)}
+                {control changeAuthTypeForm}
+            {elseif $remote_auth_supported}
+                <dl>
+                    <dt>Ověření hesla:</dt>
+                    <dd>{$u->external_auth ? 'externí' : 'lokální'}</dd>
+                </dl>
+            {/if}
+            <dl>
+                <dt>Poslední přihlášení:</dt>
+                <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}</dd>
+            </dl>
 
-                    {foreach $Role[$u->id] as $r}
-                        {input 'role'.$r->id.'-user_role'} {$r->name}<br />
-                    {/foreach}
-                    {input add_role} &nbsp;  {input role}
-                    <br /> <br />
-                    {input zmenitRole} {input storno}
-                    {/form}
-                {else}
-                    {foreach $Role[$u->id] as $r}
-                        {$r->name}<br />
-                    {/foreach}
-                {/if}
-                {else}
-                {if $RoleUpravit == $u->id}
-                    {$roleForm->render('begin')}
-                    {$roleForm['add_role']->control} přidat roli: {$roleForm['role']->control}
-                    <br /> <br />
-                    {$roleForm['zmenitRole']->control} {$roleForm['storno']->control}
-                    {$roleForm->render('end')}
-                {else}
-                    Tento uživatel není přiřazen k žádné roli
-                {/if}
+            {if ($FormUpravit == 'org' && $UpravitUserId == $u->id)}
+                {control oJForm}
+            {else}
+                <dl>
+                    <dt>Organizační jednotka:</dt>
+                    <dd>{$u->org_nazev}</dd>
+                </dl>
+            {/if}
 
-                
-                {/if}
-            </dd>
-        </dl>
-        <dl>
-            <dt></dt>
-            <dd>
-                {if $u->external_auth != 1}
-                <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'heslo'}">Změnit {if $remote_auth_supported}lokální {/if}heslo</a>
-                &nbsp;&nbsp;&nbsp;
-                {/if}
-                {if $remote_auth_supported}
-                <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'typ_auth'}">Změnit ověření hesla</a>
-                &nbsp;&nbsp;&nbsp;
-                {/if}
-                <a href="{link this, 'id'=>$Osoba->id, 'role'=>$u->id}">Změnit role</a>
-                &nbsp;&nbsp;&nbsp;
-                <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'org'}">Změnit organizační jednotku</a>
-                &nbsp;&nbsp;&nbsp;
-                <a href="{link this, 'id'=>$Osoba->id, 'odebrat'=>$u->id}" onclick="return confirm('Opravdu chcete smazat tento účet?');">Smazat účet</a>
+            <dl>
+                <dt>Role:</dt>
+                <dd>
+                    {if $RoleUpravit == $u->id}
+                        {form roleForm}
+                            {foreach $Role[$u->id] as $r}
+                                {input 'role'.$r->id.'-user_role'} {$r->name}<br />
+                            {/foreach}
+                            {input add_role} {input role}
+                            <br /><br />
+                            {input zmenitRole} {input storno}
+                        {/form}
+                    {else}
+                        {foreach $Role[$u->id] as $r}
+                            {$r->name}<br />
+                        {/foreach}                    
+                        <span n:if="empty($Role[$u->id])">Tomuto uživateli není přiřazena žádná role.</span>
+                    {/if}
+                </dd>
+            </dl>
+            <dl>
+                <dt></dt>
+                <dd>
+                    {if $u->external_auth != 1}
+                        <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'heslo'}">Změnit {if $remote_auth_supported}lokální {/if}heslo</a>
+                        &nbsp;&nbsp;&nbsp;
+                    {/if}
+                    {if $remote_auth_supported}
+                        <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'typ_auth'}">Změnit ověření hesla</a>
+                        &nbsp;&nbsp;&nbsp;
+                    {/if}
+                    <a href="{link this, 'id'=>$Osoba->id, 'role'=>$u->id}">Změnit role</a>
+                    &nbsp;&nbsp;&nbsp;
+                    <a href="{link this, 'id'=>$Osoba->id, 'user'=>$u->id, 'upravit'=>'org'}">Změnit organizační jednotku</a>
+                    &nbsp;&nbsp;&nbsp;
+                    <a href="{link this, 'id'=>$Osoba->id, 'odebrat'=>$u->id}" onclick="return confirm('Opravdu chcete smazat tento účet?');">Smazat účet</a>
 
-            </dd>
-        </dl>
+                </dd>
+            </dl>
 
 
-        <br />
+            <br />
         {/foreach}
-        {else}
+    {else}
         <dl>
             <dt></dt>
             <dd>Zaměstnanec nemá uživatelský účet</dd>
         </dl>
         <br />
-        {/if}
-    </div>
+    {/if}
+</div>

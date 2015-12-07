@@ -134,18 +134,18 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                 else
                     $uziv->org_nazev = "žádná";
 
-                $role[$uziv->id] = UserModel::getRoles($uziv->id);
+                $user_roles = UserModel::getRoles($uziv->id);
+                $role[$uziv->id] = $user_roles ?: [];
             }
 
             $this->template->Role = $role;
         } else {
-            $this->template->Role = null;
+            $this->template->Role = [];
         }
     }
 
     public function renderDetail()
     {
-        $this->template->roleForm = $this['roleForm'];
     }
 
     public function actionSync()

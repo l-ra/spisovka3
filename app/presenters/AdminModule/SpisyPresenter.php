@@ -182,8 +182,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $result = $DokumentSpis->dokumenty($spis_id);
         $this->template->seznam = $result;
 
-        $this->template->spisForm = $this['upravitForm'];
-
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
@@ -197,14 +195,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
             $this->setLayout(false);
             $this->setView('printdetail');
         }
-    }
-
-    public function renderUpravit()
-    {
-        $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->seznam()->fetchAll();
-        $this->template->SpisoveZnaky = $spisove_znaky;
-        $this->template->spisForm = $this['upravitSpisovyPlanForm'];
     }
 
     /* P.L. Pro pripad pridani funkce mazani spisu viz kod v SpisznakPresenter. */

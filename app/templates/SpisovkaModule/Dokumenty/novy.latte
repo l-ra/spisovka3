@@ -53,7 +53,7 @@
     {/if}
     </div>
 
-    {form novyForm}
+    {form $novyForm}
     <div class="dokument_blok_hlavni">
         <dl>
             <dt>JID:</dt>
@@ -83,14 +83,9 @@
         </div>
         <dl>
             <dt>{label2 pocet_listu}</dt>
-            <dd><span style="font-weight: normal;">
-                {input pocet_listu}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {label2 pocet_priloh} {input pocet_priloh}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {label2 typ_prilohy} {input typ_prilohy}
-                </span>
-                &nbsp;&nbsp;{inputError2 pocet_listu} {inputError2 pocet_priloh}
+            <dd>{input pocet_listu} {inputError2 pocet_listu}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 pocet_priloh} {input pocet_priloh} {inputError2 pocet_priloh}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 typ_prilohy} {input typ_prilohy}
             </dd>
         </dl>
         {if isset($form['lhuta'])}

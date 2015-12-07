@@ -39,7 +39,7 @@
         {if $lzeMenitOpravneni == 2}
         <p style="color:red">Oprávnění této role doporučujeme neměnit.</p>
         {/if}
-        {form $opravneniForm}        
+        {form opravneniForm}        
         &nbsp;<div class="privilege-checkboxes">povolit / zakázat</div>        
         {foreach $seznamPravidel as $blok}
         <div class="resource">{$blok['name']}</div>

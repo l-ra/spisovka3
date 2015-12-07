@@ -49,7 +49,6 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->template->FormUpravit = $this->getParameter('upravit', null);
 
         $this->template->lzeMenitOpravneni = self::lzeMenitRoli($this->template->Role);
-        $this->template->opravneniForm = $this['opravneniForm'];
     }
 
     public function actionSmazat()

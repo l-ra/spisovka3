@@ -159,9 +159,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $this->template->seznam = $seznam;
-
-        $this->template->filtrForm = $this['filtrForm'];
-        $this->template->seraditForm = $this['seraditForm'];
     }
 
     protected function shutdown($response)
@@ -851,6 +848,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->cjednaci = $CJ->generuj();
 
         $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
+
+        $this->template->novyForm = $this['novyForm'];
 
         if ($dokument) {
             $this->template->Dok = $dokument;

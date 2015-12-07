@@ -113,7 +113,7 @@
             <dl>
                 <dt>Typ dokumentu:</dt>
                 {if isset($form['dokument_typ_id'])}
-                    <dd>{input dokument_typ_id}</dd>
+                    <dd>{input dokument_typ_id} {inputError2 dokument_typ_id}</dd>
                 {else}
                     <dd>{$Dok->typ_dokumentu->nazev}</dd>
                 {/if}
@@ -123,7 +123,7 @@
             <dl>
                 <dt>Datum doručení/vzniku:</dt>
                 {if $isRozdelany}
-                    <dd>{input datum_vzniku} {input datum_vzniku_cas}</dd>
+                    <dd>{input datum_vzniku} {input datum_vzniku_cas} {inputError2 datum_vzniku}</dd>
                 {else}
                     <dd>{$Dok->datum_vzniku|edatetime}</dd>
                 {/if}
@@ -142,7 +142,7 @@
             {/if}
 
             {if !empty($Dok->poznamka)}
-                {input poznamka}
+                {input2 poznamka}
             {/if}
             <dl>
                 <dt>{label2 pocet_listu}</dt>
@@ -259,7 +259,7 @@
                     {input2 zpusob_vyrizeni_id}
                     <dl>
                         <dt>{label2 datum_vyrizeni}</dt>
-                        <dd>{input datum_vyrizeni} {input datum_vyrizeni_cas}</dd>
+                        <dd>{input datum_vyrizeni} {input datum_vyrizeni_cas} {inputError2 datum_vyrizeni}</dd>
                     </dl>
                     {input2 spisovy_znak_id}
                     {input2 skartacni_znak}

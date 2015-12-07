@@ -41,7 +41,6 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->template->has_children = $SpisovyZnak->ma_podrizene_spisove_znaky($id);
 
         $this->template->title = " - Detail spisového znaku";
-        $this->template->upravitForm = $this['upravitForm'];
     }
 
     protected function _odebrat($odebrat_strom)
@@ -70,7 +69,6 @@ class Admin_SpisznakPresenter extends BasePresenter
 
     public function renderNovy()
     {
-        $this->template->novyForm = $this['novyForm'];
     }
 
     public function renderImport()

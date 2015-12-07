@@ -148,7 +148,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         }
 
         $this->template->seznam = $seznam;
-        $this->template->filtrForm = $this['filtrForm'];
     }
 
     public function actionDetail()
@@ -319,7 +318,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function renderNova()
     {
-        $this->template->novyForm = $this['novyForm'];
     }
 
     protected function createComponentNovyForm()
@@ -462,21 +460,21 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 'vracene' => 'Vrácené dokumenty',
                 'vse' => 'Zobrazit vše',
                 ];
-            $this->template->zobrazit_filtr = 1;
         } else {
             $filtr = !is_null($this->filtr) ? $this->filtr : '';
             $select = array(
                 '' => 'Zobrazit vše',
             );
-            $this->template->zobrazit_filtr = 0;
         }
 
         $form = new Nette\Application\UI\Form();
         $form->addSelect('filtr', 'Filtr:', $select)
                 // ->setValue($filtr)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
-        if ($this->template->zobrazit_filtr)
+        if (count($select) > 1)
             $form['filtr']->setValue($filtr);
+        else
+            $form['filtr']->setDisabled();
 
         $form->addSubmit('go_filtr', 'Filtrovat');
 

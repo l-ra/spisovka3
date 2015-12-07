@@ -13,10 +13,9 @@
     </div>    
     
     <div id="filtr">
-        {$filtrForm->render('begin')}
-        {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
-        {$filtrForm['go_filtr']->control}
-        {$filtrForm->render('end')}
+        {form filtrForm}
+            {label filtr /} {input filtr} {input go_filtr}
+        {/form}
         
         <div style="margin: 5px 0px 0px 0px;" id="seradit">
         {control seraditForm}

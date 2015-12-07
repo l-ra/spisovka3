@@ -15,14 +15,11 @@
         </a>        
     </div>    
     
-    {if $zobrazit_filtr==1}
     <div id="filtr">
-        {$filtrForm->render('begin')}
-        {$filtrForm['filtr']->label} {$filtrForm['filtr']->control}
-        {$filtrForm['go_filtr']->control}
-        {$filtrForm->render('end')}
+        {form filtrForm}
+            {label filtr /} {input filtr} {input go_filtr}
+        {/form}
     </div>
-    {/if}
     <div id="search">
         {control searchForm}
     </div>

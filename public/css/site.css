@@ -260,7 +260,8 @@ dd {
     max-width: 680px;
 }
 dd label {
-    font-weight: initial;    
+    /* Mělo by to být správně "initial", ale to nepodporuje Internet Explorer */
+    font-weight: normal;    
 }
 
 #dialog dt {

@@ -209,9 +209,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $this->template->seznam = $seznam;
 
-        $this->template->filtrForm = $this['filtrForm'];
-        $this->template->seraditForm = $this['seraditForm'];
-
         // Pripojit aktivni zapujcky
         $Zapujcka = new Zapujcka();
         $this->template->zapujcky = $Zapujcka->aktivniSeznam();
@@ -346,11 +343,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $this->setView('printdetail');
                 if ($pdf)
                     $this->pdf_output = 2;
-            }
-
-            if ($this->template->Lze_menit_skartacni_rezim)
-                $this->template->vyrizovaniForm = $this['vyrizovaniForm'];
-            
+            }            
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');
