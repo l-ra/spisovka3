@@ -22,21 +22,25 @@ class Form extends \Nette\Application\UI\Form
         // Zpracování při Ajaxu musí být odlišné
         // Redirect by vrátil JSON s URL v atributu redirect
         if ($presenter->isAjax()) {
-            // Nedělej nic a doufej, že se formulář vykreslí znovu.
-            // U formulářů renderovaných Nette by se mělo objevit hlášení
-            // vedle prvku, který neprošel validací
+            // Nedělej nic a doufej, že Javascript kód vykreslí formulář
+            // znovu do dialogového okna.
+            // Následující řádek by zobrazil zprávu pouze v automaticky
+            // vykreslených formulářích, proto je lépe jej nepoužít.
+            // Uživatel není tak jako tak slepý.
+            //$this->addError('Validace formuláře selhala.');
+            
         } else {
+            // Upozorni uživatele, aby nepřehlédl, že něco zadal do formuláře chybně
             $presenter->flashMessage('Validace formuláře selhala.', 'warning');
+            
+            /* [P.L.] Přepsal jsem všechny formuláře v aplikaci, u validovaných
+             * prvků by se nyní měla zobrazit zpráva přímo vedle nich.
+             * Následující kód je už zbytečný
             $errors = $form->getErrors();
             foreach ($errors as $error)
                 $presenter->flashMessage($error, 'warning');
-
-            /* Zkouska - NEprovadej redirect
-            $values = $form->getValues();
-            if (isset($values->id))
-                $presenter->redirect('this', ['id' => $values->id]);
-            else
-                $presenter->redirect('this'); */
+            */
+            /* Redirect už neprovádíme */
         }
     }
 
