@@ -159,6 +159,12 @@ form {
     margin: 0px;
 }
 
+#table_top {
+    font-size: 13px;
+    font-weight: bold;
+    width: 100%;
+}
+
 h2 {
     margin: 0px 0px 20px 0px;
 }
