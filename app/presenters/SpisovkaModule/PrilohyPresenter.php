@@ -20,12 +20,13 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
     public function renderNacti()
     {
-        $dokument_id = $this->getParameter('id', null); // tady jako dokument_id
+        $dokument_id = $this->getParameter('id'); // tady jako dokument_id
 
         $DokumentPrilohy = new DokumentPrilohy();
         $seznam = $DokumentPrilohy->prilohy($dokument_id);
-        $this->template->seznamPriloh = $seznam;
+        $this->template->prilohy = $seznam;
         $this->template->dokument_id = $dokument_id;
+        $this->template->AccessEdit = true;
     }
 
     // Je volano pres AJAX, takze volani flashMessage() postradaji smysl

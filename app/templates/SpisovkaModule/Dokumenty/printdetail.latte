@@ -263,37 +263,7 @@
     </div>
     <div id="dok-prilohy">
     {if $AccessView}
-    {if count($Dok->prilohy)>0}
-    <table class="seznam">
-        {foreach $Dok->prilohy as $file}
-        <tr>
-            <td class="icon">
-                <img src="{$file->mime_type_icon}" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
-            </td>
-            <td class="meta">
-                <strong>{$file->nazev}</strong>
-                <div class="info">
-                {$file->real_name}
-                <br />
-                <span style="color:#c0c0c0; font-size: 8pt;">
-                    {$file->typ_name}, {$file->size|bytes}, {$file->mime_type}
-                    <br />
-                    MD5 hash: {$file->md5_hash}
-                </span>
-                </div>
-                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
-            </td>
-            <td class="user">
-                nahráno {$file->date_created|edate}
-                <br />
-                {$file->user_name}
-            </td>
-        </tr>
-        {/foreach}
-    </table>
-    {else}
-        <div class="prazdno">K tomuto dokumentu nejsou připojené žádné elektronické přílohy.</div>
-    {/if}
+        {include '../Prilohy/nacti.latte', prilohy => $Dok->prilohy}
     {else}
         <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
     {/if}

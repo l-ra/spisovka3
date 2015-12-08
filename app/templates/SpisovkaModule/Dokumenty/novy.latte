@@ -140,52 +140,11 @@
     <div class="h2">
         Přílohy
     </div>
-    <div id="dok-prilohy-form">
-        <div class="blok_akce">
-            <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
-        </div>
-    </div>
     <div class="blok_akce">
-        <a href="{link :Spisovka:Prilohy:nacti, 'id'=>$Dok->id}" onclick="renderPrilohy({!$Dok->id}); return false;">Obnovit seznam příloh</a>
+        <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
     </div>
     <div id="dok-prilohy">
-
-
-    {if count($Prilohy)>0}
-    <table class="seznam">
-        {foreach $Prilohy as $file}
-        <tr>
-            <td class="icon">
-                <img src="{$file->mime_type_icon}" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
-            </td>
-            <td class="meta">
-                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->id, 'file'=>$file->id}">{$file->nazev}</a>
-                <div class="info">
-                {$file->real_name}
-                <br />
-                <span>
-                    {$file->typ_name}, {$file->size|bytes}, {$file->mime_type}
-                    <br />
-                    MD5 hash: {$file->md5_hash}
-                </span>
-                </div>
-                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
-                <div class="vyber">
-                    <a href="{link :Spisovka:Prilohy:odebrat, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return odebratPrilohu(this, {!$Dok->id});">odebrat</a>&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Prilohy:upravit, 'id'=>$file->id, 'dok_id'=>$Dok->id }" onclick="return prilohazmenit(this);">změnit</a>&nbsp;&nbsp;
-                </div>
-            </td>
-            <td class="user">
-                nahráno {$file->date_created|edate}
-                <br />
-                {$file->user_name}
-            </td>
-        </tr>
-        {/foreach}
-    </table>
-    {else}
-        <div class="prazdno">K tomuto dokumentu nejsou připojené žádné elektronické přílohy.</div>
-    {/if}
+        {include '../Prilohy/nacti.latte', prilohy => $Prilohy, AccessEdit => true}
     </div>
     </div>
 

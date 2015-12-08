@@ -131,33 +131,8 @@
             Připojit přílohy k odeslání
         </div>
         <div id="dok-prilohy">
-            {if count($Dok->prilohy)>0}
-                <table class="seznam">
-                    {foreach $Dok->prilohy as $file}
-                        <tr>
-                            <td class="icon">
-                                <input type="checkbox" name="prilohy[{$file->id}]" />
-                            </td>
-                            <td class="icon">
-                                <img src="{$file->mime_type_icon}" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
-                            </td>
-                            <td class="meta">
-                                <a href="{link :Spisovka:Dokumenty:download, 'id'=>$Dok->id, 'file'=>$file->id}">{$file->nazev}</a>
-                                <div class="info">
-                                    {$file->real_name}
-                                    <br />
-                                    <span>{$file->typ_name}, {$file->size|bytes}, {$file->mime_type}</span>
-                                </div>
-                                {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
-                            </td>
-                            <td class="user">
-                                nahráno {$file->date_created|edate}
-                                <br />
-                                {$file->user_name}
-                            </td>
-                        </tr>
-                    {/foreach}
-                </table>
+            {if count($Dok->prilohy) > 0}
+                {include '../Prilohy/nacti.latte', prilohy => $Dok->prilohy, prilohy_checkboxes => true}
                 <br />
                 <dl>
                     <dt>Celková velikost příloh :</dt>
