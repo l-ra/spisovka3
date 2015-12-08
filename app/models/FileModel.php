@@ -789,8 +789,10 @@ class FileModel extends BaseModel
 
         if (strpos($filename, '.') === false)
             $ext = '';
-        else
-            $ext = strtolower(array_pop(explode('.', $filename)));
+        else {
+            $a = explode('.', $filename);
+            $ext = strtolower(array_pop($a));
+        }
         
         if (array_key_exists($ext, $mime_types))
             return $mime_types[$ext];
