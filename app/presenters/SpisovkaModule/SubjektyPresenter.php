@@ -83,8 +83,9 @@ class SubjektyPresenter extends BasePresenter
                 ->onclick("return aresSubjekt(this);")
                 ->setText('Vyhledat pomocí systému ARES');
         $form1->addText('ic', 'IČO:', 12, 8)
-                ->addRule(Spisovka\Form::INTEGER)
-                ->setOption('description', $description);
+                ->setOption('description', $description)
+                ->addCondition(Spisovka\Form::FILLED)
+                ->addRule(Spisovka\Form::INTEGER);
         $form1->addText('dic', 'DIČ:', 12, 12);
 
         $form1->addText('jmeno', 'Jméno:', 50, 24);
