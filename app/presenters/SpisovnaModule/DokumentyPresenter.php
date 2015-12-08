@@ -295,6 +295,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             }
 
             $this->template->Dok = $dokument;
+            $this->template->dokument_id = $dokument_id;
 
             $Zapujcka = new Zapujcka();
             if (in_array($dokument->stav_dokumentu, [7])) {
