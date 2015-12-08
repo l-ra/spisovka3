@@ -420,24 +420,20 @@
         <div class="blok_akce">
             <a href="#" id="subjekt_pripojit_click">Připojit subjekt</a>
         </div>        
-        <div class="blok_akce">
-            <div id="subjekt_pripojit" style="display:none;">
-                <dl>
-                    <dt>Vyhledat a připojit subjekt:</dt>
-                    <dd>
-                        <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
-                        <a href="{link :Spisovka:Subjekty:vyber, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
-                    </dd>
-                </dl>
-                <dl id="subjekt_novy">
-                    <dt></dt>
-                    <dd>
-                        <a href={link Subjekty:novy, dok_id => $Dok->id} id="novysubjekt_click">Vytvořit nový subjekt</a>
-                    </dd>
-                </dl>
-            </div>
-            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id});
-                    return false;">Obnovit seznam subjektů</a>
+        <div id="subjekt_pripojit" style="display:none;">
+            <dl>
+                <dt>Vyhledat a připojit subjekt:</dt>
+                <dd>
+                    <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
+                    <a href="{link :Spisovka:Subjekty:vyber, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
+                </dd>
+            </dl>
+            <dl id="subjekt_novy">
+                <dt></dt>
+                <dd>
+                    <a href={link Subjekty:novy, dok_id => $Dok->id} id="novysubjekt_click">Vytvořit nový subjekt</a>
+                </dd>
+            </dl>
         </div>
         <script type="text/javascript">
             // viz o par radku nize

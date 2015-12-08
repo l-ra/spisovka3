@@ -111,7 +111,7 @@
         <div class="h2">
             Adresáti / odesílatelé
         </div>
-        <div class="blok_akce">
+        <div>
             <dl>
                 <dt>Připojit subjekt:</dt>
                 <dd>
@@ -125,7 +125,6 @@
                     <a href={link Subjekty:novy, dok_id => $Dok->id} id="novysubjekt_click">Vytvořit nový subjekt</a>
                 </dd>
             </dl>
-            <a href="{link :Spisovka:Subjekty:nacti, 'id'=>$Dok->id}" onclick="renderSubjekty({!$Dok->id}); return false;">Obnovit seznam subjektů</a>
         </div>
         <script type="text/javascript">
         // viz o par radku nize
