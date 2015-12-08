@@ -255,7 +255,6 @@ $(function() {
 
             $.get(url, function(data) {
                 if ( data.indexOf('###vybrano###') != -1 ) {
-                    alert('Subjekt připojen.');
                     renderSubjekty();
                 } else {
                     alert(data);
@@ -601,7 +600,8 @@ handleNovySubjekt = function (okFunc) {
 };
 
 novySubjektOk = function () {
-    alert('Subjekt byl úspěšně vytvořen a přidán.');
+    // Neobtezuj uzivatele
+    // alert('Subjekt byl úspěšně vytvořen a přidán.');
     closeDialog();
     renderSubjekty();
 };
