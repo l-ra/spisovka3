@@ -351,8 +351,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             false);
             $this->template->LzePredatDokument = $this->template->Pridelen && ($dokument->stav_dokumentu <= 3 || $lzePredatVyrizeneDokumenty);
 
-            $this->template->isRozdelany = $dokument->stav_dokumentu == 1 || $user->isInRole('superadmin');
-
             $this->template->FormUpravit = $this->template->AccessEdit ? $upravit : null;
 
             $this->template->FormUdalost = $udalost && $dokument->stav_dokumentu == 4;
@@ -385,6 +383,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ($this->template->Pridelen && $this->template->AccessEdit) {
                 if ($dokument->stav_dokumentu >= 2 && !Acl::isInRole('podatelna') && (empty($dokument->nazev) || $dokument->nazev == "(bez názvu)" )) {
                     $this->template->nutnyNadpis = 1;
+                    // vyvolej zobrazeni formulare editace metadat
                     $this->template->FormUpravit = 'metadata';
                 }
             }
@@ -1095,7 +1094,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function renderOdeslat($id)
     {
         $dokument = $this->template->Dok;
-        
+
         $max_vars = ini_get('max_input_vars');
         $safe_recipient_count = floor(($max_vars - 10) / 17);
         $recipient_count = 0;
@@ -1108,7 +1107,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->flashMessage("Limit je ovlivněn PHP nastavením \"max_input_vars\" na serveru.");
             $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $id));
         }
-        
+
         // Prilohy
         $prilohy_celkem = 0;
         if (count($dokument->prilohy) > 0) {
@@ -1122,7 +1121,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 'odesilani');
 
         $this->template->ZpusobyOdeslani = ZpusobOdeslani::getZpusoby();
-        
+
         $sznacka = "";
         if (isset($this->template->Dok->spisy) && is_array($this->template->Dok->spisy)) {
             $sznacka_A = array();
@@ -1440,36 +1439,44 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $Dok = $this->template->Dok;
 
-        $zpusob_doruceni = Dokument::zpusobDoruceni(2);
-        $zpusob_doruceni[0] = '(není zadán)';
-        ksort($zpusob_doruceni);
-
         $form = new Spisovka\Form();
 
-        $nazev_control = $form->addText('nazev', 'Věc:', 80, 250);
-        if (!Acl::isInRole('podatelna')) {
-            $nazev_control->addRule(Nette\Forms\Form::FILLED,
+        $form->addText('nazev', 'Věc:', 80, 250);
+        if (!Acl::isInRole('podatelna'))
+            $form['nazev']->addRule(Nette\Forms\Form::FILLED,
                     'Název dokumentu (věc) musí být vyplněn.');
-        }
 
         $form->addTextArea('popis', 'Popis:', 80, 3);
 
         $povolene_typy_dokumentu = TypDokumentu::dostupneUzivateli();
 
-        if (in_array($Dok->typ_dokumentu->id, array_keys($povolene_typy_dokumentu)) && count($povolene_typy_dokumentu) > 1) {
+        $lze_menit_urcita_pole = $Dok->stav_dokumentu == 1 || $this->user->isInRole('superadmin');
+        if ($lze_menit_urcita_pole && in_array($Dok->typ_dokumentu->id,
+                        array_keys($povolene_typy_dokumentu)) && count($povolene_typy_dokumentu) > 1) {
             $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu);
         }
 
-        $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
-        $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:');
-        $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
-        // doručení emailem a DS nastavuje systém, to uživatel nesmí měnit
-        if ($this->template->isRozdelany && $Dok->typ_dokumentu->smer == 0 && !in_array($Dok->zpusob_doruceni_id,
-                        [1, 2]))
-            $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
+        if ($lze_menit_urcita_pole) {
+            $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:');
+            $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
+        }
 
-        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50);
-        $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
+        // doručení emailem a DS nastavuje systém, to uživatel nesmí měnit
+        if ($lze_menit_urcita_pole && $Dok->typ_dokumentu->smer == 0 && !in_array($Dok->zpusob_doruceni_id,
+                        [1, 2])) {
+            $zpusob_doruceni = Dokument::zpusobDoruceni(2);
+            $zpusob_doruceni[0] = '(není zadán)';
+            ksort($zpusob_doruceni);
+            $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
+        }
+
+        if ($Dok->typ_dokumentu->smer == 0) {
+            $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50);
+            $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
+        }
+
+        if (!empty($Dok->poznamka))
+            $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
                 ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
@@ -1479,33 +1486,28 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 'Počet příloh musí být číslo');
         $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50);
 
-        if ($Dok) {
-            $nazev = ($Dok->nazev == "(bez názvu)") ? "" : $Dok->nazev;
 
-            $unixtime = strtotime($Dok->datum_vzniku);
-            if ($unixtime == 0) {
-                $datum = date('d.m.Y');
-                $cas = date('H:i:s');
-            } else {
-                $datum = date('d.m.Y', $unixtime);
-                $cas = date('H:i:s', $unixtime);
-            }
-
-            $form['nazev']->setDefaultValue($nazev);
-            $form['popis']->setDefaultValue($Dok->popis);
-            $form['cislo_jednaci_odesilatele']->setDefaultValue($Dok->cislo_jednaci_odesilatele);
-            $form['datum_vzniku']->setDefaultValue($datum);
+        if (isset($form['dokument_typ_id']))
+            $form['dokument_typ_id']->setDefaultValue($Dok->typ_dokumentu->id);
+        $form['nazev']->setDefaultValue($Dok->nazev);
+        $form['popis']->setDefaultValue($Dok->popis);
+        if (isset($form['datum_vzniku'])) {
+            $d = new DateTime($Dok->datum_vzniku);
+            $cas = $d->format('H:i:s');
+            $form['datum_vzniku']->setDefaultValue($Dok->datum_vzniku);
             $form['datum_vzniku_cas']->setDefaultValue($cas);
-            if (isset($form['zpusob_doruceni_id']))
-                $form['zpusob_doruceni_id']->setDefaultValue($Dok->zpusob_doruceni_id);
-            $form['cislo_doporuceneho_dopisu']->setDefaultValue($Dok->cislo_doporuceneho_dopisu);
-            $form['poznamka']->setDefaultValue($Dok->poznamka);
-            $form['pocet_listu']->setDefaultValue($Dok->pocet_listu);
-            $form['pocet_priloh']->setDefaultValue($Dok->pocet_priloh);
-            $form['typ_prilohy']->setDefaultValue($Dok->typ_prilohy);
-            if (isset($form['dokument_typ_id']))
-                $form['dokument_typ_id']->setDefaultValue($Dok->typ_dokumentu->id);
         }
+        if (isset($form['zpusob_doruceni_id']))
+            $form['zpusob_doruceni_id']->setDefaultValue($Dok->zpusob_doruceni_id);
+        if (isset($form['cislo_doporuceneho_dopisu'])) {
+            $form['cislo_doporuceneho_dopisu']->setDefaultValue($Dok->cislo_doporuceneho_dopisu);
+            $form['cislo_jednaci_odesilatele']->setDefaultValue($Dok->cislo_jednaci_odesilatele);
+        }
+        if (isset($form['poznamka']))
+            $form['poznamka']->setDefaultValue($Dok->poznamka);
+        $form['pocet_listu']->setDefaultValue($Dok->pocet_listu);
+        $form['pocet_priloh']->setDefaultValue($Dok->pocet_priloh);
+        $form['typ_prilohy']->setDefaultValue($Dok->typ_prilohy);
 
         $submit = $form->addSubmit('upravit', 'Uložit');
         $submit->onClick[] = array($this, 'upravitMetadataClicked');
@@ -1525,24 +1527,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $dokument_id = $this->getParameter('id');
         $dok = $Dokument->getInfo($dokument_id);
 
-        if (!($dok->stav_dokumentu == 1 || $this->user->isInRole('superadmin'))) {
-            // needitovatelne skryte polozky
-            $data['datum_vzniku'] = $dok->datum_vzniku;
-            $data['dokument_typ_id'] = $dok->typ_dokumentu->id;
-            $data['zpusob_doruceni_id'] = $dok->zpusob_doruceni_id;
-
-            // P.L. ne kazdy uzivatel ma pravo menit tyto udaje a pole formulare v tom pripade pak bude prazdne
-            if (empty($data['cislo_doporuceneho_dopisu']))
-                unset($data['cislo_doporuceneho_dopisu']);
-            if (empty($data['cislo_jednaci_odesilatele']))
-                unset($data['cislo_jednaci_odesilatele']);
-
-            unset($data['datum_vzniku_cas']);
-        } else {
-            // uprava casu
-            if (isset($data['datum_vzniku'])) {
-                $data['datum_vzniku'] = $data['datum_vzniku'] . " " . $data['datum_vzniku_cas'];
-            }
+        // V aplikaci chybi DateTimePicker
+        if (isset($data['datum_vzniku'])) {
+            $data['datum_vzniku'] = $data['datum_vzniku'] . " " . $data['datum_vzniku_cas'];
             unset($data['datum_vzniku_cas']);
         }
 
@@ -1553,13 +1540,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN,
                     'Upravena metadata dokumentu.');
 
-            $this->flashMessage('Dokument "' . $dok->cislo_jednaci . '"  byl upraven.');
-            $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
-        } catch (DibiException $e) {
-            $this->flashMessage('Dokument "' . $dok->cislo_jednaci . '" se nepodařilo upravit.',
+            $this->flashMessage('Dokument "' . $data->nazev . '"  byl upraven.');
+        } catch (Exception $e) {
+            $this->flashMessage('Dokument "' . $data->nazev . '" se nepodařilo upravit.',
                     'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
         }
+        
+        $this->redirect('detail', ['id' => $dokument_id]);
     }
 
     protected function createComponentVyrizovaniForm()
@@ -1572,7 +1560,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Dok = @$this->template->Dok;
 
         $form = new Spisovka\Form();
-        
+
         $form->addSelect('zpusob_vyrizeni_id', 'Způsob vyřízení:', $zpusob_vyrizeni)
                 ->setValue(@$Dok->zpusob_vyrizeni_id);
 
@@ -1676,7 +1664,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 //->setDisabled() - nelze volat pri zpracovani odeslaneho formulare, vyresil jsem tedy v Javascriptu
                 ->forbidPastDates()
                 ->addConditionOn($form['udalost_typ'], Spisovka\Form::EQUAL, 2)
-                    ->addRule(Spisovka\Form::FILLED, 'Nebylo zadáno datum spuštění.');
+                ->addRule(Spisovka\Form::FILLED, 'Nebylo zadáno datum spuštění.');
 
         $form->addSubmit('ok', 'Potvrdit')
                 ->onClick[] = array($this, 'udalostClicked');
@@ -1721,6 +1709,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $this->redirect('detail', ['id' => $dokument_id]);
     }
+
     /**
      * Vytvoří část formuláře pro odeslání dokumentu. Jedinné, co nyní ošetřuje
      * Nette framework je část odeslání poštou.
@@ -1751,7 +1740,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $form = new Spisovka\Form();
-        
+
         if (!empty($Dok->subjekty))
             foreach ($Dok->subjekty as $sid => $subjekt) {
                 if ($subjekt->rezim_subjektu == 'O')
@@ -1761,7 +1750,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         ->setRequired()
                         ->setDefaultValue("now")
                         ->forbidPastDates();
-                        
+
                 // vytvoří novou instanci pro každý subjekt
                 $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(),
                         "druh_zasilky_$sid");
@@ -1791,7 +1780,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $form->addTextArea("email_text_$sid", 'Text zprávy:', 80, 10);
                 }
             }
-            
+
         $form->addSubmit('odeslat', 'Předat podatelně či Odeslat')
                 ->onClick[] = array($this, 'odeslatClicked');
         $form->addSubmit('storno', 'Zrušit')
@@ -1852,10 +1841,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 } elseif ($metoda_odeslani == 1) {
                     // emailem
                     if (!isset($data['email_from_' . $subjekt_id]))
-                            // neposilej mail, kdyz nemame adresu odesilatele
-                            // (podformular odeslani mailem neexistuje)
-                            continue;
-                    
+                    // neposilej mail, kdyz nemame adresu odesilatele
+                    // (podformular odeslani mailem neexistuje)
+                        continue;
+
                     if (!empty($adresat->email)) {
 
                         $data = array(

@@ -122,7 +122,7 @@
             {input2 popis}
             <dl>
                 <dt>Datum doručení/vzniku:</dt>
-                {if $isRozdelany}
+                {if isset($form['datum_vzniku'])}
                     <dd>{input datum_vzniku} {input datum_vzniku_cas} {inputError2 datum_vzniku}</dd>
                 {else}
                     <dd>{$Dok->datum_vzniku|edatetime}</dd>
@@ -136,7 +136,7 @@
                     <dd>{$Dok->zpusob_doruceni}</dd>
                 </dl>        
             {/if}
-            {if $Dok->typ_dokumentu->smer == 0}
+            {if isset($form['cislo_doporuceneho_dopisu'])}
                 {input2 cislo_doporuceneho_dopisu}
                 {input2 cislo_jednaci_odesilatele}
             {/if}
