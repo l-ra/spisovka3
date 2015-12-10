@@ -24,8 +24,8 @@
     <div id="search">
         {control searchForm}
         <div id="search_advanced">
-        {if !empty($s3_hledat)}<a href="{link :Spisovna:Vyhledat:reset zpet => $view}" style="color:#ff0000;">Zrušit vyhledávání</a>&nbsp;&nbsp;&nbsp;{/if}
-        <a href="{link :Spisovna:Vyhledat:default zpet => $view}" id="dialog-search">Pokročilé vyhledávání</a>
+        {if !empty($s3_hledat)}<a href="{link :Spisovna:Vyhledat:reset zpet => $dokument_view}" style="color:#ff0000;">Zrušit vyhledávání</a>&nbsp;&nbsp;&nbsp;{/if}
+        <a href="{link :Spisovna:Vyhledat:default zpet => $dokument_view}" id="dialog-search">Pokročilé vyhledávání</a>
         {if !empty($s3_hledat) && is_array($s3_hledat)}<br/><br/>Aplikováno pokročilé vyhledávání{/if}
         </div>
     </div>
@@ -49,9 +49,9 @@
         {foreach $seznam as $dok}
         <tr>
             <td class="akce">
-                {if $view == 'prijem'
-                 || $view == 'skartacniNavrh' && !isset($zapujcky[$dok->id])
-                 || $view == 'skartacniRizeni'}
+                {if $dokument_view == 'prijem'
+                 || $dokument_view == 'skartacniNavrh' && !isset($zapujcky[$dok->id])
+                 || $dokument_view == 'skartacniRizeni'}
                 <input type="checkbox" class="checkbox" name="dokument_vyber[]" value="{$dok->id}" title="Vybrat tento dokument" />
                 {/if}
             </td>

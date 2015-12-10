@@ -13,6 +13,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->Epodatelna = new Epodatelna();
     }
 
+    public function startup()
+    {
+        parent::startup();
+        $this->template->original_view = $this->view;
+    }
+    
     public function actionDefault()
     {
         $this->redirect('nove');

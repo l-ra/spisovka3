@@ -3,7 +3,7 @@
     <dd>
         <span id="dok_spojit">
             {foreach $SouvisejiciDokumenty as $s}
-                {if $view != 'printdetail'}
+                {if $presenter->view != 'printdetail'}
                     <a href="{link detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
                 {else}
                     {$s->cislo_jednaci} ({$s->jid})

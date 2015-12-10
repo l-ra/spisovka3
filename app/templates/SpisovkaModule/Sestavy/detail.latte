@@ -19,7 +19,7 @@
     {elseif isset($prilis_mnoho)}
     <div style="text-align: center; margin-top: 15px; color: red;">
         Tato sestava obsahuje mnoho dokumentů. Její zobrazení může trvat dlouho.<p>
-        {if $view == 'pdf'}Export do PDF je mnohem pomalejší, zde je limit několik set dokumentů (při stadardním časovém limitu 30 sekund).<p>{/if}        
+        {if $output == 'pdf'}Export do PDF je mnohem pomalejší, zde je limit několik set dokumentů (při stadardním časovém limitu 30 sekund).<p>{/if}        
         Chcete-li přesto zobrazit všech {$pocet_dokumentu} dokumentů, klikněte na odkaz pokračovat a vyčkejte dokud se sestava celá nenačte.<p>
         Časový limit je {= ini_get('max_execution_time')} sekund.
 

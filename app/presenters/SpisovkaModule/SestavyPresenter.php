@@ -131,7 +131,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->template->Sestava = $sestava;
 
         // info
-        $this->template->view = $view;
+        $this->template->output = $view;
 
         // sloupce
         $this->template->sloupce_nazvy = self::$sloupce_nazvy;

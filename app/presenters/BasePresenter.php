@@ -65,8 +65,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function afterRender()
     {
-        $this->template->view = $this->view;
-
         // Není nutné toto duplikovat pro každou funkci, která umožňuje tisk
         if ($this->getParameter('print') || $this->getParameter('pdfprint'))
             $this->setLayout('print');

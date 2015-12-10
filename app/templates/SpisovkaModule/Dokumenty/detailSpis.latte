@@ -3,7 +3,7 @@
     <dd>
         <span id="dok-spis-nazev">
             {if isset($Dok->spis)}
-                {if $view != 'printdetail'}
+                {if $presenter->view != 'printdetail'}
                     <a href="{link Spisy:detail, 'id' => $Dok->spis->id}">{$Dok->spis->nazev}</a>
                 {else}
                     {$Dok->spis->nazev}
@@ -12,7 +12,7 @@
                 nezařazen do žádného spisu
             {/if}
         </span>
-        {if $AccessEdit && $Typ_evidence != 'sberny_arch' && $view != 'printdetail'}
+        {if $AccessEdit && $Typ_evidence != 'sberny_arch' && $presenter->view != 'printdetail'}
             <a id="dok-spis-vyjmout" href="javascript:;" 
                style="display: {isset($Dok->spis) ? 'initial' : 'none'}"
                onclick="return spisVyjmoutDokument();">Vyjmout ze spisu</a>

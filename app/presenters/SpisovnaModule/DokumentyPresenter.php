@@ -167,6 +167,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $paginator->itemCount = count($result);
 
+        $this->template->dokument_view = $this->view;
+        
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
