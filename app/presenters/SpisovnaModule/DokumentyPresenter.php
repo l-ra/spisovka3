@@ -117,7 +117,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         switch ($this->view) {
             case 'prijem':
                 $args_f = $Dokument->filtrSpisovnaPrijem($args_f);
-                break;            
+                break;
             case 'skartacniNavrh':
                 $args_f = $Dokument->filtrSpisovnaKeskartaci($args_f);
                 break;
@@ -128,7 +128,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $args_f = $Dokument->filtrSpisovna($args_f);
                 break;
         }
-        
+
         $args_h = array();
         $hledat = UserSettings::get('spisovna_dokumenty_hledat');
         if ($hledat)
@@ -168,7 +168,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $paginator->itemCount = count($result);
 
         $this->template->dokument_view = $this->view;
-        
+
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
@@ -216,14 +216,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function renderDefault()
     {
-
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
-        $this->template->akce_select = array();
-
         $this->template->title = "Seznam dokumentů ve spisovně";
         $this->seznam();
     }
@@ -232,15 +224,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     {
         if (!$this->user->isAllowed('Spisovna', 'prijem_dokumentu'))
             $this->forward(':NoAccess:default');
-
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
-        $this->template->akce_select = array(
-            'prevzit_spisovna' => 'převzetí dokumentů do spisovny'
-        );
 
         $this->template->title = "Seznam dokumentů pro příjem do spisovny";
         $this->seznam();
@@ -251,14 +234,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         if (!$this->user->isAllowed('Spisovna', 'skartacni_navrh'))
             $this->forward(':NoAccess:default');
 
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
-        $this->template->akce_select = array(
-            'ke_skartaci' => 'předat do skartačního řízení'
-        );
         $this->template->title = "Seznam dokumentů, kterým uplynula skartační lhůta";
         $this->seznam();
     }
@@ -268,15 +243,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         if (!$this->user->isAllowed('Spisovna', 'skartacni_rizeni'))
             $this->forward(':NoAccess:default');
 
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
-        $this->template->akce_select = array(
-            'archivovat' => 'archivovat vybrané dokumenty',
-            'skartovat' => 'skartovat vybrané dokumenty',
-        );
         $this->template->title = "Seznam dokumentů ve skartačním řízení";
         $this->seznam();
     }
@@ -343,145 +309,10 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 $this->setView('printdetail');
                 if ($pdf)
                     $this->pdf_output = 2;
-            }            
+            }
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');
-        }
-    }
-
-    public function actionAkce($data)
-    {
-        if (!isset($data['hromadna_akce']))
-            return;
-
-        $Workflow = new Workflow();
-        $user = $this->user;
-        switch ($data['hromadna_akce']) {
-            /* Prevzeti vybranych dokumentu */
-            case 'prevzit_spisovna':
-                if (!isset($data['dokument_vyber']))
-                    return;
-
-                $count_ok = $count_failed = 0;
-                foreach ($data['dokument_vyber'] as $dokument_id) {
-                    $stav = $Workflow->prevzitDoSpisovny($dokument_id, true);
-                    if ($stav === true) {
-                        $count_ok++;
-                    } else {
-                        if (is_string($stav)) {
-                            $this->flashMessage($stav, 'warning');
-                        }
-                        $count_failed++;
-                    }
-                }
-                if ($count_ok > 0) {
-                    $this->flashMessage('Úspěšně jste přijal ' . $count_ok . ' dokumentů do spisovny.');
-                }
-                if ($count_failed > 0) {
-                    $this->flashMessage($count_failed . ' dokumentů se nepodařilo příjmout do spisovny!',
-                            'warning');
-                }
-                if ($count_ok > 0 && $count_failed > 0) {
-                    $this->redirect('this');
-                }
-                break;
-
-            case 'ke_skartaci':
-                if (isset($data['dokument_vyber'])) {
-                    $count_ok = $count_failed = 0;
-                    if ($user->isAllowed('Spisovna', 'skartacni_navrh')) {
-                        foreach ($data['dokument_vyber'] as $dokument_id) {
-                            if ($Workflow->keskartaci($dokument_id, $user->getIdentity()->id)) {
-                                //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
-                                $count_ok++;
-                            } else {
-                                $count_failed++;
-                                //$this->flashMessage('Dokument  se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
-                            }
-                        }
-                        if ($count_ok > 0) {
-                            $this->flashMessage('Úspěšně jste předal ' . $count_ok . ' dokumentů do skartačního řízení.');
-                        }
-                        if ($count_failed > 0) {
-                            $this->flashMessage($count_failed . ' dokumentů se nepodařilo předat do skartačního řízení!',
-                                    'warning');
-                        }
-                    } else {
-                        $this->flashMessage('Nemáte oprávnění převádět dokumenty do skartačního řízení.',
-                                'warning');
-                        $count_failed++;
-                    }
-
-                    if ($count_ok > 0 && $count_failed > 0) {
-                        $this->redirect('this');
-                    }
-                }
-                break;
-            case 'archivovat':
-                if (isset($data['dokument_vyber'])) {
-                    $count_ok = $count_failed = 0;
-                    if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
-                        foreach ($data['dokument_vyber'] as $dokument_id) {
-                            if ($Workflow->archivovat($dokument_id)) {
-                                //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
-                                $count_ok++;
-                            } else {
-                                $count_failed++;
-                                //$this->flashMessage('Dokument  se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
-                            }
-                        }
-                        if ($count_ok > 0) {
-                            $this->flashMessage($count_ok . ' dokumentů bylo úspěšně archivováno.');
-                        }
-                        if ($count_failed > 0) {
-                            $this->flashMessage($count_failed . ' dokumentů se nepodařilo zařadit do archivu. Zkuste to znovu.',
-                                    'warning');
-                        }
-                    } else {
-                        $this->flashMessage('Nemáte oprávnění rozhodovat o skartačním řízení.',
-                                'warning');
-                        $count_failed++;
-                    }
-
-                    if ($count_ok > 0 && $count_failed > 0) {
-                        $this->redirect('this');
-                    }
-                }
-                break;
-            case 'skartovat':
-                if (isset($data['dokument_vyber'])) {
-                    $count_ok = $count_failed = 0;
-                    if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
-                        foreach ($data['dokument_vyber'] as $dokument_id) {
-                            if ($Workflow->skartovat($dokument_id)) {
-                                //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
-                                $count_ok++;
-                            } else {
-                                $count_failed++;
-                                //$this->flashMessage('Dokument  se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
-                            }
-                        }
-                        if ($count_ok > 0) {
-                            $this->flashMessage($count_ok . ' dokumentů bylo úspěšně skartováno.');
-                        }
-                        if ($count_failed > 0) {
-                            $this->flashMessage($count_failed . ' dokumentů se nepodařilo skartovat. Zkuste to znovu.',
-                                    'warning');
-                        }
-                    } else {
-                        $this->flashMessage('Nemáte oprávnění rozhodovat o skartačním řízení.',
-                                'warning');
-                        $count_failed++;
-                    }
-
-                    if ($count_ok > 0 && $count_failed > 0) {
-                        $this->redirect('this');
-                    }
-                }
-                break;
-            default:
-                break;
         }
     }
 
@@ -799,6 +630,177 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     {
         UserSettings::set('spisovna_dokumenty_seradit', $form_data['seradit']);
         $this->redirect('default');
+    }
+
+    public function createComponentBulkAction()
+    {
+        $BA = new Spisovka\Components\BulkAction();
+
+        $actions = [];
+        if (isset($this->template->dokument_view))
+            switch ($this->template->dokument_view) {
+                case 'prijem':
+                    $actions = ['prevzit_spisovna' => 'převzetí dokumentů do spisovny',
+                        'vratit' => 'vrátit (nepřevzít) dokumenty'
+                    ];
+                    break;
+                case 'skartacniNavrh':
+                    $actions = ['ke_skartaci' => 'předat do skartačního řízení'];
+                    break;
+                case 'skartacniRizeni':
+                    $actions = ['archivovat' => 'archivovat vybrané dokumenty',
+                        'skartovat' => 'skartovat vybrané dokumenty'
+                    ];
+                default:
+                    break;
+            }
+
+        $BA->setActions($actions);
+        $BA->setCallback([$this, 'bulkAction']);
+
+        return $BA;
+    }
+
+    public function bulkAction($action, $documents)
+    {
+        $Workflow = new Workflow();
+        $user = $this->user;
+
+        switch ($action) {
+            case 'vratit':
+                foreach ($documents as $dokument_id) {
+                    
+                }
+                if (count($documents) == 1)
+                    $msg = 'Dokument byl vrácen.';
+                else
+                    $msg = 'Dokumenty byly vráceny.';
+                $this->flashMessage($msg);
+                break;
+
+            /* Prevzeti vybranych dokumentu */
+            case 'prevzit_spisovna':
+                $count_ok = $count_failed = 0;
+                foreach ($documents as $dokument_id) {
+                    $stav = $Workflow->prevzitDoSpisovny($dokument_id, true);
+                    if ($stav === true) {
+                        $count_ok++;
+                    } else {
+                        if (is_string($stav)) {
+                            $this->flashMessage($stav, 'warning');
+                        }
+                        $count_failed++;
+                    }
+                }
+                if ($count_ok > 0) {
+                    $this->flashMessage('Úspěšně jste přijal ' . $count_ok . ' dokumentů do spisovny.');
+                }
+                if ($count_failed > 0) {
+                    $this->flashMessage($count_failed . ' dokumentů se nepodařilo příjmout do spisovny!',
+                            'warning');
+                }
+                if ($count_ok > 0 && $count_failed > 0) {
+                    $this->redirect('this');
+                }
+                break;
+
+            case 'ke_skartaci': {
+                    $count_ok = $count_failed = 0;
+                    if ($user->isAllowed('Spisovna', 'skartacni_navrh')) {
+                        foreach ($documents as $dokument_id) {
+                            if ($Workflow->keskartaci($dokument_id, $user->getIdentity()->id)) {
+                                //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
+                                $count_ok++;
+                            } else {
+                                $count_failed++;
+                                //$this->flashMessage('Dokument  se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
+                            }
+                        }
+                        if ($count_ok > 0) {
+                            $this->flashMessage('Úspěšně jste předal ' . $count_ok . ' dokumentů do skartačního řízení.');
+                        }
+                        if ($count_failed > 0) {
+                            $this->flashMessage($count_failed . ' dokumentů se nepodařilo předat do skartačního řízení!',
+                                    'warning');
+                        }
+                    } else {
+                        $this->flashMessage('Nemáte oprávnění převádět dokumenty do skartačního řízení.',
+                                'warning');
+                        $count_failed++;
+                    }
+
+                    if ($count_ok > 0 && $count_failed > 0) {
+                        $this->redirect('this');
+                    }
+                }
+                break;
+
+            case 'archivovat': {
+                    $count_ok = $count_failed = 0;
+                    if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
+                        foreach ($documents as $dokument_id) {
+                            if ($Workflow->archivovat($dokument_id)) {
+                                //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
+                                $count_ok++;
+                            } else {
+                                $count_failed++;
+                                //$this->flashMessage('Dokument  se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
+                            }
+                        }
+                        if ($count_ok > 0) {
+                            $this->flashMessage($count_ok . ' dokumentů bylo úspěšně archivováno.');
+                        }
+                        if ($count_failed > 0) {
+                            $this->flashMessage($count_failed . ' dokumentů se nepodařilo zařadit do archivu. Zkuste to znovu.',
+                                    'warning');
+                        }
+                    } else {
+                        $this->flashMessage('Nemáte oprávnění rozhodovat o skartačním řízení.',
+                                'warning');
+                        $count_failed++;
+                    }
+
+                    if ($count_ok > 0 && $count_failed > 0) {
+                        $this->redirect('this');
+                    }
+                }
+                break;
+
+            case 'skartovat': {
+                    $count_ok = $count_failed = 0;
+                    if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
+                        foreach ($documents as $dokument_id) {
+                            if ($Workflow->skartovat($dokument_id)) {
+                                //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
+                                $count_ok++;
+                            } else {
+                                $count_failed++;
+                                //$this->flashMessage('Dokument  se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
+                            }
+                        }
+                        if ($count_ok > 0) {
+                            $this->flashMessage($count_ok . ' dokumentů bylo úspěšně skartováno.');
+                        }
+                        if ($count_failed > 0) {
+                            $this->flashMessage($count_failed . ' dokumentů se nepodařilo skartovat. Zkuste to znovu.',
+                                    'warning');
+                        }
+                    } else {
+                        $this->flashMessage('Nemáte oprávnění rozhodovat o skartačním řízení.',
+                                'warning');
+                        $count_failed++;
+                    }
+
+                    if ($count_ok > 0 && $count_failed > 0) {
+                        $this->redirect('this');
+                    }
+                }
+                break;
+
+            default:
+                $this->flashMessage('Neznámá akce.', 'warning');
+                break;
+        }
     }
 
 }
