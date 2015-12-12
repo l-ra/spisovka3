@@ -19,8 +19,7 @@
     
     <div id="dokumenty">
     {if count($seznam)>0}
-    <form action="{link this}" method="post">
-        <input type="hidden" name="url_referer" value="">
+    {control bulkAction:start}
     <table class="seznam">
         <tr>
             <th class="akce">&nbsp;</th>
@@ -35,7 +34,7 @@
         <tr id="sitem{$spis->id}">
             <td class="akce">
                 {if $spis->typ=='S'}
-                <input type="checkbox" class="checkbox" name="spis_vyber[]" value="{$spis->id}" title="Vybrat tento spis" />
+                    {control bulkAction:checkbox $spis->id}
                 {/if}&nbsp;
             </td>
             {if $spis->typ=='VS'}
@@ -69,18 +68,7 @@
         {/foreach}
 
     </table>
-    <div id="hromadna_akce">
-        <span id="checkbox_all_on">Zaškrtnout vše</span> / <span id="checkbox_all_off">Odškrtnout vše</span>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        Vybrané položky:&nbsp;&nbsp;
-        <select name="hromadna_akce">
-            {if isset($akce_select)}{foreach $akce_select as $as_index => $as_value}
-            <option value="{$as_index}">{$as_value}</option>
-            {/foreach}{/if}
-        </select>
-        <input type="submit" name="hromadna_submit" value="Provést" />
-    </div>
-    </form>
+    {control bulkAction:end}            
     {control vp}
     {else}
     <br class="clear">

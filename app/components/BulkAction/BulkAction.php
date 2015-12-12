@@ -10,9 +10,10 @@ class BulkAction extends Nette\Application\UI\Control
     protected $actions;
     protected $callback;
     
-    public $text_checkbox_title = 'Vybrat tento dokument';
-    public $text_empty_selection = 'Nebyl vybrán žádný dokument.';
-
+    public $text_checkbox_title = 'Vybrat tento %s';
+    public $text_empty_selection = 'Nebyl vybrán žádný %s.';
+    public $text_object = 'dokument';
+    
     public function setActions(array $actions)
     {
         $this->actions = $actions;
@@ -41,7 +42,7 @@ class BulkAction extends Nette\Application\UI\Control
             throw new \Exception(__METHOD__ . '() - missing parameter "id"');
 
         $this->template->id = $id;
-        $this->template->title = $this->text_checkbox_title;
+        $this->template->title = sprintf($this->text_checkbox_title, $this->text_object);
         $this->template->setFile(dirname(__FILE__) . '/checkbox.latte');
         $this->template->render();
     }
@@ -65,7 +66,7 @@ class BulkAction extends Nette\Application\UI\Control
             return;
         
         if (empty($data['selection'])) {
-            $presenter->flashMessage($this->text_empty_selection);
+            $presenter->flashMessage(sprintf($this->text_empty_selection, $this->text_object));
             $presenter->redirect('this');
         }
         $selection = $data['selection'];

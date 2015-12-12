@@ -102,12 +102,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     public function renderDefault()
     {
-
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
         $Spisy = new Spis();
         $spis_id = null;
 
@@ -174,11 +168,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
         if (!$this->user->isAllowed('Spisovna', 'prijem_dokumentu'))
             $this->forward(':NoAccess:default');
 
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
         $Spisy = new Spis();
         $spis_id = null;
 
@@ -232,10 +221,54 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $SpisovyZnak = new SpisovyZnak();
         $spisove_znaky = $SpisovyZnak->select()->fetchAssoc('id');
         $this->template->SpisoveZnaky = $spisove_znaky;
+    }
 
-        $this->template->akce_select = array(
-            'prevzit_spisovna' => 'převzetí spisů do spisovny'
-        );
+    public function createComponentBulkAction()
+    {
+        $BA = new Spisovka\Components\BulkAction();
+
+        $actions = [];
+        switch ($this->view) {
+            case 'prijem':
+                $actions = ['prevzit_spisovna' => 'převzetí spisů do spisovny',
+                    'vratit' => 'vrátit (nepřevzít) spisy'
+                ];
+                break;
+            default:
+                break;
+        }
+
+        $BA->setActions($actions);
+        $BA->setCallback([$this, 'bulkAction']);
+        $BA->text_object = 'spis';
+        return $BA;
+    }
+
+    public function bulkAction($action, $spisy)
+    {
+        $Spis = new Spis();
+        switch ($action) {
+            /* Predani vybranych spisu do spisovny  */
+            case 'prevzit_spisovna':
+                $count_ok = $count_failed = 0;
+                foreach ($spisy as $spis_id) {
+                    $stav = $Spis->pripojitDoSpisovny($spis_id);
+                    if ($stav === true) {
+                        $count_ok++;
+                    } else {
+                        if (is_string($stav)) {
+                            $this->flashMessage($stav, 'warning');
+                        }
+                        $count_failed++;
+                    }
+                }
+                if ($count_ok > 0)
+                    $this->flashMessage('Úspěšně jste přijal ' . $count_ok . ' spisů do spisovny.');
+                if ($count_failed > 0)
+                    $this->flashMessage($count_failed . ' spisů se nepodařilo příjmout do spisovny!',
+                            'warning');
+                break;
+        }
     }
 
     public function renderDetail()
@@ -362,44 +395,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 2;
             $this->setView('printdetail');
-        }
-    }
-
-    public function actionAkce($data)
-    {
-        if (isset($data['hromadna_akce'])) {
-            $Spis = new Spis();
-            switch ($data['hromadna_akce']) {
-                /* Predani vybranych spisu do spisovny  */
-                case 'prevzit_spisovna':
-                    if (isset($data['spis_vyber'])) {
-                        $count_ok = $count_failed = 0;
-                        foreach ($data['spis_vyber'] as $spis_id) {
-                            $stav = $Spis->pripojitDoSpisovny($spis_id);
-                            if ($stav === true) {
-                                $count_ok++;
-                            } else {
-                                if (is_string($stav)) {
-                                    $this->flashMessage($stav, 'warning');
-                                }
-                                $count_failed++;
-                            }
-                        }
-                        if ($count_ok > 0) {
-                            $this->flashMessage('Úspěšně jste přijal ' . $count_ok . ' spisů do spisovny.');
-                        }
-                        if ($count_failed > 0) {
-                            $this->flashMessage($count_failed . ' spisů se nepodařilo příjmout do spisovny!',
-                                    'warning');
-                        }
-                        if ($count_ok > 0 && $count_failed > 0) {
-                            $this->redirect('this');
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
         }
     }
 
