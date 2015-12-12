@@ -4,7 +4,7 @@ class SeznamStatu extends Nette\Application\UI\Control
 {
 
     /**
-     * Renders paginator.
+     * Renders component.
      * @return void
      */
     public function render()

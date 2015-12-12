@@ -1,0 +1,26 @@
+{* Latte template *}
+
+<div id="hromadna_akce" n:if="isset($actions) && !empty($actions)">
+    <a id="bulk_select_all" href="#">Zaškrtnout vše</a>
+    / <a id="bulk_select_none" href="#">Odškrtnout vše</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Vybrané položky:&nbsp;&nbsp;
+    <select name="action">
+        <option value="" n:if="count($actions) > 1">(žádná akce)</option>
+        {if isset($actions)}{foreach $actions as $action => $title}
+                <option value="{$action}">{$title}</option>
+        {/foreach}{/if}
+    </select>
+    <input type="submit" name="bulk_submit" value="Provést" />
+</div>
+</form>
+<script type="text/javascript">
+    $('form#{!$component_name} #bulk_select_all').click(function(){
+        $('form#{!$component_name} input[name^=selection]').prop('checked', true);
+        return false;
+    });
+    $('form#{!$component_name} #bulk_select_none').click(function(){
+        $('form#{!$component_name} input[name^=selection]').prop('checked', false);
+        return false;
+    });
+</script>

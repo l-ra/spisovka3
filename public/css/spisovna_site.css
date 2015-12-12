@@ -82,16 +82,6 @@ table.seznam th {
     background-color: #134E09;
     color: #ffffff;
 }
-#checkbox_all_on {
-    color: #FFC273;
-    text-decoration: underline;
-    cursor: pointer;
-}
-#checkbox_all_off {
-    color: #FFC273;
-    text-decoration: underline;
-    cursor: pointer;
-}
 
 #frmnovyForm-user_id {
     visibility: hidden;
