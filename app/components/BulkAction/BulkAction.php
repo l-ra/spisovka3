@@ -8,6 +8,7 @@ class BulkAction extends Nette\Application\UI\Control
 {
 
     protected $actions;
+    protected $default_action;
     protected $callback;
     
     public $text_checkbox_title = 'Vybrat tento %s';
@@ -22,6 +23,11 @@ class BulkAction extends Nette\Application\UI\Control
     public function setCallback(callable $callback)
     {
         $this->callback = $callback;
+    }
+    
+    public function setDefaultAction($action)
+    {
+        $this->default_action = $action;
     }
     
     public function render()
@@ -50,7 +56,11 @@ class BulkAction extends Nette\Application\UI\Control
     public function renderEnd()
     {
         $this->template->component_name = $this->getName();
-        $this->template->actions = $this->actions;
+        $actions = $this->actions;
+        if (count($actions) > 1 && !$this->default_action)
+            $actions = ['' => '(žádná akce)'] + $actions;
+        $this->template->actions = $actions;
+        $this->template->default_action = $this->default_action;
         $this->template->setFile(dirname(__FILE__) . '/formEnd.latte');
         $this->template->render();
     }

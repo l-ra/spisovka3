@@ -643,6 +643,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $actions = ['prevzit_spisovna' => 'převzetí dokumentů do spisovny',
                         'vratit' => 'vrátit (nepřevzít) dokumenty'
                     ];
+                    $BA->setDefaultAction('prevzit_spisovna');
                     break;
                 case 'skartacniNavrh':
                     $actions = ['ke_skartaci' => 'předat do skartačního řízení'];

@@ -6,9 +6,8 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     Vybrané položky:&nbsp;&nbsp;
     <select name="action">
-        <option value="" n:if="count($actions) > 1">(žádná akce)</option>
         {if isset($actions)}{foreach $actions as $action => $title}
-                <option value="{$action}">{$title}</option>
+            <option value="{$action}" {if $action == $default_action}selected="selected"{/if}>{$title}</option>
         {/foreach}{/if}
     </select>
     <input type="submit" name="bulk_submit" value="Provést" />

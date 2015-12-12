@@ -239,6 +239,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
 
         $BA->setActions($actions);
+        $BA->setDefaultAction('prevzit_spisovna');
         $BA->setCallback([$this, 'bulkAction']);
         $BA->text_object = 'spis';
         return $BA;
