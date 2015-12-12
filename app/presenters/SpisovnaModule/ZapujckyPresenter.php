@@ -12,7 +12,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     public function startup()
     {
         $client_config = Nette\Environment::getVariable('client_config');
-        $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;        
+        $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         $this->oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
         $this->template->Oddelovac_poradi = $this->oddelovac_poradi;
         $this->template->Typ_evidence = $this->typ_evidence;
@@ -64,12 +64,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function renderDefault($hledat)
     {
-
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
         $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
         $paginator = $vp->getPaginator();
@@ -83,7 +77,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->filtr = UserSettings::get('spisovna_zapujcky_filtr', 'vse');
         if ($this->filtr != 'vse')
             $this->template->no_items = 2; // indikator pri nenalezeni zapujcky po filtraci
-        
+
         $args = $Zapujcka->filtr($this->filtr);
 
         if (isset($hledat)) {
@@ -94,35 +88,10 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         }
 
         /* $Zapujcka->seradit($args, $seradit);
-        $this->template->seradit = $seradit; */
+          $this->template->seradit = $seradit; */
 
-        if (Acl::isInRole('spisovna') || $this->user->isInRole('superadmin')) {
-            $akce = ['vratit' => 'Vrátit dokumenty',
-                'schvalit' => 'Schválit žádosti',
-                'odmitnout' => 'Odmítnout žádosti'
-            ];
-            switch ($this->filtr) {
-                case 'ke_schvaleni':
-                    unset($akce['vratit']);
-                    break;
-                case 'zapujcene':
-                    unset($akce['schvalit']);
-                    unset($akce['odmitnout']);
-                    break;
-
-                case 'odmitnute':
-                case 'vracene':
-                    $akce = [];
-                    break;
-            }
-                
-            $this->template->akce_select = $akce;
-        } else {
+        if (!Acl::isInRole('spisovna') && !$this->user->isInRole('superadmin'))
             $args = $Zapujcka->osobni($args);
-            $this->template->akce_select = array(
-                'vratit' => 'Vrátit vybrané zápůjčky'
-            );
-        }
 
         $result = $Zapujcka->seznam($args);
         $paginator->itemCount = count($result);
@@ -148,6 +117,119 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->template->seznam = $seznam;
     }
 
+    public function createComponentBulkAction()
+    {
+        $BA = new Spisovka\Components\BulkAction();
+
+        if (Acl::isInRole('spisovna') || $this->user->isInRole('superadmin')) {
+            $actions = ['vratit' => 'Vrátit dokumenty',
+                'schvalit' => 'Schválit žádosti',
+                'odmitnout' => 'Odmítnout žádosti'
+            ];
+            switch ($this->filtr) {
+                case 'ke_schvaleni':
+                    unset($actions['vratit']);
+                    break;
+                case 'zapujcene':
+                    unset($actions['schvalit']);
+                    unset($actions['odmitnout']);
+                    break;
+
+                case 'odmitnute':
+                case 'vracene':
+                    $actions = [];
+                    break;
+            }
+        } else {
+            $actions = ['vratit' => 'Vrátit vybrané zápůjčky'];
+        }
+
+        $BA->setActions($actions);
+        $BA->setCallback([$this, 'bulkAction']);
+        $BA->text_checkbox_title = 'Vybrat tuto zápůjčku';
+
+        return $BA;
+    }
+
+    public function bulkAction($action, $selection)
+    {
+        $Zapujcka = new Zapujcka();
+        switch ($action) {
+            /* Schvaleni vybranych zapujcek  */
+            case 'schvalit':
+                $count_ok = $count_failed = 0;
+                foreach ($selection as $zapujcka_id) {
+                    $stav = $Zapujcka->schvalit($zapujcka_id);
+                    if ($stav) {
+                        $count_ok++;
+                    } else {
+                        $count_failed++;
+                    }
+                }
+                if ($count_ok > 0) {
+                    $this->flashMessage('Úspěšně jste schválil ' . $count_ok . ' zápůjček.');
+                }
+                if ($count_failed > 0) {
+                    $this->flashMessage($count_failed . ' zápůjček se nepodařilo schválit!',
+                            'warning');
+                }
+                if ($count_ok > 0 && $count_failed > 0) {
+                    $this->redirect(':Spisovna:Zapujcky:default');
+                }
+                break;
+
+            /* Vraceni vybranych zapujcek  */
+            case 'vratit':
+                $count_ok = $count_failed = 0;
+                $dnes = new DateTime();
+                foreach ($selection as $zapujcka_id) {
+                    $stav = $Zapujcka->vraceno($zapujcka_id, $dnes);
+                    if ($stav) {
+                        $count_ok++;
+                    } else {
+                        $count_failed++;
+                    }
+                }
+                if ($count_ok > 0) {
+                    $this->flashMessage('Úspěšně jste vrátil ' . $count_ok . ' dokument(ů).');
+                }
+                if ($count_failed > 0) {
+                    $this->flashMessage($count_failed . ' dokumentů k zapůjčení se nepodařilo vrátit!',
+                            'warning');
+                }
+                if ($count_ok > 0 && $count_failed > 0) {
+                    $this->redirect(':Spisovna:Zapujcky:default');
+                }
+                break;
+
+            /* Odmitnuti vybranych zapujcek  */
+            case 'odmitnout':
+                $count_ok = $count_failed = 0;
+                foreach ($selection as $zapujcka_id) {
+                    $stav = $Zapujcka->odmitnout($zapujcka_id);
+                    if ($stav) {
+                        $count_ok++;
+                    } else {
+                        $count_failed++;
+                    }
+                }
+                if ($count_ok > 0) {
+                    $this->flashMessage('Úspěšně jste odmítnul ' . $count_ok . ' zápůjček.');
+                }
+                if ($count_failed > 0) {
+                    $this->flashMessage($count_failed . ' zápůjček se nepodařilo odmítnout!',
+                            'warning');
+                }
+                if ($count_ok > 0 && $count_failed > 0) {
+                    $this->redirect(':Spisovna:Zapujcky:default');
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
     public function actionDetail()
     {
 
@@ -165,91 +247,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         } else {
             // zapujcka neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');
-        }
-    }
-
-    public function actionAkce($data)
-    {
-        if (isset($data['hromadna_akce'])) {
-            $Zapujcka = new Zapujcka();
-            switch ($data['hromadna_akce']) {
-                /* Schvaleni vybranych zapujcek  */
-                case 'schvalit':
-                    if (isset($data['zapujcka_vyber'])) {
-                        $count_ok = $count_failed = 0;
-                        foreach ($data['zapujcka_vyber'] as $zapujcka_id) {
-                            $stav = $Zapujcka->schvalit($zapujcka_id);
-                            if ($stav) {
-                                $count_ok++;
-                            } else {
-                                $count_failed++;
-                            }
-                        }
-                        if ($count_ok > 0) {
-                            $this->flashMessage('Úspěšně jste schválil ' . $count_ok . ' zápůjček.');
-                        }
-                        if ($count_failed > 0) {
-                            $this->flashMessage($count_failed . ' zápůjček se nepodařilo schválit!',
-                                    'warning');
-                        }
-                        if ($count_ok > 0 && $count_failed > 0) {
-                            $this->redirect(':Spisovna:Zapujcky:default');
-                        }
-                    }
-                    break;
-                /* Vraceni vybranych zapujcek  */
-                case 'vratit':
-                    if (isset($data['zapujcka_vyber'])) {
-                        $count_ok = $count_failed = 0;
-                        $dnes = new DateTime();
-                        foreach ($data['zapujcka_vyber'] as $zapujcka_id) {
-                            $stav = $Zapujcka->vraceno($zapujcka_id, $dnes);
-                            if ($stav) {
-                                $count_ok++;
-                            } else {
-                                $count_failed++;
-                            }
-                        }
-                        if ($count_ok > 0) {
-                            $this->flashMessage('Úspěšně jste vrátil ' . $count_ok . ' dokument(ů).');
-                        }
-                        if ($count_failed > 0) {
-                            $this->flashMessage($count_failed . ' dokumentů k zapůjčení se nepodařilo vrátit!',
-                                    'warning');
-                        }
-                        if ($count_ok > 0 && $count_failed > 0) {
-                            $this->redirect(':Spisovna:Zapujcky:default');
-                        }
-                    }
-                    break;
-                /* Odmitnuti vybranych zapujcek  */
-                case 'odmitnout':
-                    if (isset($data['zapujcka_vyber'])) {
-                        $count_ok = $count_failed = 0;
-                        foreach ($data['zapujcka_vyber'] as $zapujcka_id) {
-                            $stav = $Zapujcka->odmitnout($zapujcka_id);
-                            if ($stav) {
-                                $count_ok++;
-                            } else {
-                                $count_failed++;
-                            }
-                        }
-                        if ($count_ok > 0) {
-                            $this->flashMessage('Úspěšně jste odmítnul ' . $count_ok . ' zápůjček.');
-                        }
-                        if ($count_failed > 0) {
-                            $this->flashMessage($count_failed . ' zápůjček se nepodařilo odmítnout!',
-                                    'warning');
-                        }
-                        if ($count_ok > 0 && $count_failed > 0) {
-                            $this->redirect(':Spisovna:Zapujcky:default');
-                        }
-                    }
-                    break;
-
-                default:
-                    break;
-            }
         }
     }
 
@@ -316,6 +313,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function renderNova()
     {
+        
     }
 
     protected function createComponentNovyForm()
@@ -367,7 +365,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $form->addText('user_id', 'Zapůjčeno komu:')
                     ->setRequired('Musí být vybrána osoba, které se bude zapůjčovat!');
         }
-        
+
         $form->addTextArea('duvod', "Důvod zapůjčení:", 80, 5);
 
         $datum_od = date('d.m.Y');
@@ -457,7 +455,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 'odmitnute' => 'Odmítnuté žádosti',
                 'vracene' => 'Vrácené dokumenty',
                 'vse' => 'Zobrazit vše',
-                ];
+            ];
         } else {
             $filtr = !is_null($this->filtr) ? $this->filtr : '';
             $select = array(
@@ -501,8 +499,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $Zapujcka = new Zapujcka();
         $zapujcky = $Zapujcka->aktivniSeznam();
 
-        $term = $this->getParameter('term');            
-        $args = $term ? $Dokument->hledat($term) : null;        
+        $term = $this->getParameter('term');
+        $args = $term ? $Dokument->hledat($term) : null;
         $args = $Dokument->filtrSpisovna($args);
         $result = $Dokument->seznam($args);
         $seznam_dok = $result->fetchAll();
