@@ -72,11 +72,11 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
+        $paginator->itemCount = Sestava::getCount();
 
         $seznam = Sestava::getAll(array('offset' => $paginator->offset,
                     'limit' => $paginator->itemsPerPage,
                     'order' => array('typ' => 'DESC', 'nazev')));
-        $paginator->itemCount = count($seznam);
         $this->template->sestavy = $seznam;
     }
 

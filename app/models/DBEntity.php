@@ -141,8 +141,7 @@ abstract class DBEntity
     }
 
     /**
-     * @param class   string    classname of instantiated elements
-     * @param params
+     * @param params array
      */
     public static function getAll(array $params = array())
     {
@@ -173,6 +172,17 @@ abstract class DBEntity
         return $a;
     }
 
+    public static function getCount(array $where = array())
+    {
+        $query = array('SELECT COUNT(*) FROM %n', ':PREFIX:' . static::TBL_NAME);
+
+        if (!empty($where))
+            array_push($query, 'WHERE %and', $where);
+
+        $result = dibi::query($query);
+        return $result->fetchSingle();
+    }
+    
     /**
      * creates an instance and returns it
      * 
