@@ -146,6 +146,8 @@ Spisová služba:
   pokud byla zadána
 - u hmotnosti zásilky program správně akceptuje a zobrazuje čísla s desetinnou
   čárkou
+- v seznamu sestav byla vidět pouze první stránka, ve výchozím nastavení tedy
+  prvních dvacet sestav
 - pouze u sběrného archu: při tisku seznamu spisů chyběl v čísle jednacím
   oddělovač a pořadové číslo ve spisu
   
