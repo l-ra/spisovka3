@@ -15,7 +15,7 @@ table.spisovka th, table.seznam th {
 #search { display: none; }
 #seradit { display: none; }
 #tisk { display: none; }
-#hromadna_akce { display: none; }
+#bulk-action { display: none; }
 .dokument_blok_menu { display: none; }
 #layout_bottom { display: none; }
 #upozorneni_na_nove_zpravy{ display: none; }

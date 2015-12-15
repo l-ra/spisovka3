@@ -482,13 +482,13 @@ table.hledani-dokumentu .jid {
     text-decoration: underline;
 }
 
-#hromadna_akce {
+#bulk-action {
     padding: 10px 10px;
     margin: 0px; margin-bottom: 10px;
     background-color: #03406A;
     color: #ffffff;
 }
-a#bulk_select_all, a#bulk_select_none {
+a#bulk-select-all, a#bulk-select-none {
     color: #FFC273;
 }
 

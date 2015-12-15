@@ -1,8 +1,8 @@
 {* Latte template *}
 
-<div id="hromadna_akce" n:if="isset($actions) && !empty($actions)">
-    <a id="bulk_select_all" href="#">Zaškrtnout vše</a>
-    / <a id="bulk_select_none" href="#">Odškrtnout vše</a>
+<div id="bulk-action" n:if="isset($actions) && !empty($actions)">
+    <a id="bulk-select-all" href="#">Zaškrtnout vše</a>
+    / <a id="bulk-select-none" href="#">Odškrtnout vše</a>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     Vybrané položky:&nbsp;&nbsp;
     <select name="action">
@@ -14,11 +14,11 @@
 </div>
 </form>
 <script type="text/javascript">
-    $('form#{!$component_name} #bulk_select_all').click(function(){
+    $('form#{!$component_name} #bulk-select-all').click(function(){
         $('form#{!$component_name} input[name^=selection]').prop('checked', true);
         return false;
     });
-    $('form#{!$component_name} #bulk_select_none').click(function(){
+    $('form#{!$component_name} #bulk-select-none').click(function(){
         $('form#{!$component_name} input[name^=selection]').prop('checked', false);
         return false;
     });

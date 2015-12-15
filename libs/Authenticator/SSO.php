@@ -326,7 +326,7 @@ class Auth_Component_SSO extends Authenticator_UI
                 }
             }
             echo "</table>\n";
-            echo "<div id='hromadna_akce'>\n";
+            echo "<div id='bulk-action'>\n";
             echo "<input type='submit' name='usersych_gosynch' value='Synchronizovat' />";
             echo "</div>\n";
             echo "</form>\n";
