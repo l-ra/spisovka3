@@ -12,8 +12,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     private $odpoved = false;
     private $typ_evidence = null;
     private $pdf_output = 0;
-    private $hromadny_tisk = false;
-    private $hromadny_tisk_vyber;
 
     public function startup()
     {
@@ -88,11 +86,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->zakaz_filtr = true;
         }
 
-        if (!$this->hromadny_tisk)
+        $vybrane_dokumenty = $this->getParameter('vybrane_dokumenty', false);
+        if (!$vybrane_dokumenty)
             $args = $Dokument->spojitAgrs(@$args_f, @$args_h);
         else {
-            $args = array('where' => array(
-                    array('d.[id] IN (%i)', $this->hromadny_tisk_vyber)));
+            $args = ['where' => [['d.[id] IN (%i)', explode('-', $vybrane_dokumenty)]]];
         }
 
         $seradit = UserSettings::get('spisovka_dokumenty_seradit');
@@ -111,7 +109,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
-        if ($tisk || $this->hromadny_tisk) {
+        if ($tisk) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
@@ -446,9 +444,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         switch ($action) {
             case 'tisk':
-                $this->hromadny_tisk = 1;
-                $this->hromadny_tisk_vyber = $documents;
-                break;
+                $this->redirect('this', ['print' => 1,
+                    'vybrane_dokumenty' => implode('-', $documents)]);
 
             /* Prevzeti vybranych dokumentu */
             case 'prevzit':
