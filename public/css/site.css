@@ -488,11 +488,6 @@ table.hledani-dokumentu .jid {
     background-color: #03406A;
     color: #ffffff;
 }
-#checkbox_all_on, #checkbox_all_off {
-    color: #FFC273;
-    text-decoration: underline;
-    cursor: pointer;
-}
 a#bulk_select_all, a#bulk_select_none {
     color: #FFC273;
 }
