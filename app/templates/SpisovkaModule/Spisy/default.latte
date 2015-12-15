@@ -40,8 +40,6 @@
             <td class="akce">
                 {if $spis->typ=='S' && $spis->stav == 0}
                     {control bulkAction:checkbox $spis->id}
-                {else}
-                    <input type="checkbox" name="off_spis_vyber[]" value="{$spis->id}" disabled="disabled" />
                 {/if}
             </td>
             {if $spis->typ=='VS'}
