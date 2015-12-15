@@ -26,11 +26,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderDefault()
     {
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
         $this->template->Typ_evidence = $this->typ_evidence;
 
         $client_config = Nette\Environment::getVariable('client_config');
@@ -429,24 +424,37 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->actionDetail($id);
     }
 
-    protected function actionAkce($data)
+    public function createComponentBulkAction()
     {
-        if (!isset($data['hromadna_akce']) || !isset($data['dokument_vyber']))
-            return;
+        $BA = new Spisovka\Components\BulkAction();
 
+        $actions = [
+            'prevzit' => 'převzít',
+            'predat_spisovna' => 'předat do spisovny',
+            'tisk' => 'tisknout'
+        ];
+
+        $BA->setActions($actions);
+        $BA->setCallback([$this, 'bulkAction']);
+
+        return $BA;
+    }
+    
+    public function bulkAction($action, $documents)
+    {
         $Workflow = new Workflow();
 
-        switch ($data['hromadna_akce']) {
+        switch ($action) {
             case 'tisk':
                 $this->hromadny_tisk = 1;
-                $this->hromadny_tisk_vyber = $data['dokument_vyber'];
+                $this->hromadny_tisk_vyber = $documents;
                 break;
 
             /* Prevzeti vybranych dokumentu */
             case 'prevzit':
 
                 $count_ok = $count_failed = 0;
-                foreach ($data['dokument_vyber'] as $dokument_id) {
+                foreach ($documents as $dokument_id) {
                     if ($Workflow->predany($dokument_id)) {
                         if ($Workflow->prevzit($dokument_id))
                             $count_ok++;
@@ -465,7 +473,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             case 'predat_spisovna':
 
                 $count_ok = $count_failed = 0;
-                foreach ($data['dokument_vyber'] as $dokument_id) {
+                foreach ($documents as $dokument_id) {
                     $stav = $Workflow->predatDoSpisovny($dokument_id, 1);
                     if ($stav === true) {
                         $count_ok++;

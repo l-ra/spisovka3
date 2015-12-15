@@ -22,11 +22,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     public function renderDefault()
     {
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
         $this->template->Typ_evidence = $this->typ_evidence;
 
         $Dokument = new DokumentOdeslani();
@@ -104,66 +99,74 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         }
     }
 
-    public function actionAkce($data)
+    public function createComponentBulkAction()
     {
-        if (isset($data['hromadna_akce'])) {
-            if (!isset($data['dokument_vyber'])) {
-                $this->flashMessage('Nevybrali jste žádný dokument.', 'warning');
-                return;
-            }
+        $BA = new Spisovka\Components\BulkAction();
 
-            $DokumentOdeslani = new DokumentOdeslani();
-            switch ($data['hromadna_akce']) {
-                case 'odeslat':
-                    $count_ok = $count_failed = 0;
-                    foreach ($data['dokument_vyber'] as $dokument_odeslani_id)
-                        if ($DokumentOdeslani->odeslano($dokument_odeslani_id))
-                            $count_ok++;
-                        else
-                            $count_failed++;
+        $actions = ['odeslat' => 'odesláno',
+            'vratit' => 'vrátit',
+            'podaci_arch' => 'vytisknout podací arch'
+        ];
+        $BA->setActions($actions);
+        $BA->setCallback([$this, 'bulkAction']);
+        $BA->text_object = 'záznam';
 
-                    if ($count_ok > 0) {
-                        switch ($count_ok) {
-                            case 1: $msg = "Záznam byl označen jako odeslaný.";
-                                break;
-                            case 2:
-                            case 3:
-                            case 4: $msg = "$count_ok záznamy byly označeny jako odeslané.";
-                                break;
-                            default:
-                                $msg = "$count_ok záznamů bylo označeno jako odeslané.";
-                        }
-                        $this->flashMessage($msg);
+        return $BA;
+    }
+
+    public function bulkAction($action, $items)
+    {
+        $DokumentOdeslani = new DokumentOdeslani();
+        switch ($action) {
+            case 'odeslat':
+                $count_ok = $count_failed = 0;
+                foreach ($items as $dokument_odeslani_id)
+                    if ($DokumentOdeslani->odeslano($dokument_odeslani_id))
+                        $count_ok++;
+                    else
+                        $count_failed++;
+
+                if ($count_ok > 0) {
+                    switch ($count_ok) {
+                        case 1: $msg = "Záznam byl označen jako odeslaný.";
+                            break;
+                        case 2:
+                        case 3:
+                        case 4: $msg = "$count_ok záznamy byly označeny jako odeslané.";
+                            break;
+                        default:
+                            $msg = "$count_ok záznamů bylo označeno jako odeslané.";
                     }
-                    if ($count_failed > 0)
-                        // K tomuto nikdy nedojde, jelikož při chybě je hozena výjimka
-                        $this->flashMessage("$count_failed záznamů se nepodařilo označit jako odeslané!",
-                                'warning');
-                    break;
+                    $this->flashMessage($msg);
+                }
+                if ($count_failed > 0)
+                // K tomuto nikdy nedojde, jelikož při chybě je hozena výjimka
+                    $this->flashMessage("$count_failed záznamů se nepodařilo označit jako odeslané!",
+                            'warning');
+                break;
 
-                case 'vratit':
-                    $count_ok = $count_failed = 0;
-                    foreach ($data['dokument_vyber'] as $dokument_odeslani_id)
-                        if ($DokumentOdeslani->vraceno($dokument_odeslani_id))
-                            $count_ok++;
-                        else
-                            $count_failed++;
+            case 'vratit':
+                $count_ok = $count_failed = 0;
+                foreach ($items as $dokument_odeslani_id)
+                    if ($DokumentOdeslani->vraceno($dokument_odeslani_id))
+                        $count_ok++;
+                    else
+                        $count_failed++;
 
-                    if ($count_ok > 0)
-                        $this->flashMessage('Úspěšně jste vrátil ' . $count_ok . ' dokumentů.');
-                    if ($count_failed > 0)
-                        $this->flashMessage('' . $count_failed . ' dokumentů se nepodařilo vrátit!',
-                                'warning');
-                    break;
+                if ($count_ok > 0)
+                    $this->flashMessage('Úspěšně jste vrátil ' . $count_ok . ' dokumentů.');
+                if ($count_failed > 0)
+                    $this->flashMessage('' . $count_failed . ' dokumentů se nepodařilo vrátit!',
+                            'warning');
+                break;
 
-                case 'podaci_arch':
-                    $vyber = $data['dokument_vyber'];
-                    $this->redirect('this', ['print' => 1, 'vyber' => implode('-', $vyber)]);
-                    break;
+            case 'podaci_arch':
+                $vyber = $items;
+                $this->redirect('this', ['print' => 1, 'vyber' => implode('-', $vyber)]);
+                break;
 
-                default:
-                    break;
-            }
+            default:
+                break;
         }
     }
 

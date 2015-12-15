@@ -32,9 +32,8 @@
     </div>    
     
     <div id="dokumenty">
-    {if count($seznam)>0}
-    <form action="{link this}" method="post">
-        <input type="hidden" name="url_referer" value="">
+    {if count($seznam) > 0}
+    {control bulkAction:start}
     <table class="seznam vypravna">
         <tr>
             <th class="akce">&nbsp;</th>
@@ -48,7 +47,7 @@
         {foreach $seznam as $dok}
         <tr>
             <td class="akce">
-                <input type="checkbox" class="checkbox" name="dokument_vyber[]" value="{$dok->dokodes_id}" title="Vybrat tento záznam" />
+                {control bulkAction:checkbox $dok->dokodes_id}
             </td>
             <td class="typ">
                 {$dok->zpusob_odeslani_nazev}
@@ -101,19 +100,7 @@
 
 
     </table>
-    <div id="hromadna_akce">
-        <span id="checkbox_all_on">Zaškrtnout vše</span> / <span id="checkbox_all_off">Odškrtnout vše</span>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        Vybrané položky:&nbsp;&nbsp;
-        <select name="hromadna_akce">
-            <option value="">(žádná akce)</option>
-            <option value="odeslat">odesláno</option>
-            <option value="vratit">vrátit</option>
-            <option value="podaci_arch">vytisknout podací arch</option>
-        </select>
-        <input type="submit" name="hromadna_submit" value="Provést" />
-    </div>
-    </form>
+    {control bulkAction:end}            
     {else}
         <div>&nbsp;</div>
         <div class="prazdno">Nebyly zjištěny žádné dokumenty k odeslání.</div>

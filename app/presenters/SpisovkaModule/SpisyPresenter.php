@@ -290,17 +290,11 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function actionDefault()
     {
-
+        
     }
 
     public function renderDefault($hledat = null)
     {
-
-        $post = $this->getRequest()->getPost();
-        if (isset($post['hromadna_submit'])) {
-            $this->actionAkce($post);
-        }
-
         $Spisy = new Spis();
 
         $args = null;
@@ -394,8 +388,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         //$result = $DokumentSpis->dokumenty($spis_id, 1, $paginator);
 
         $DokumentSpis = new DokumentSpis();
-        $this->template->seznam = $opravneni['lze_cist'] ? $DokumentSpis->dokumenty($spis_id)
-                    : null;
+        $this->template->seznam = $opravneni['lze_cist'] ? $DokumentSpis->dokumenty($spis_id) : null;
 
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
@@ -550,41 +543,49 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->redirect(':Spisovka:spisy:detail', array('id' => $spis_id));
     }
 
-    public function actionAkce($data)
+    public function createComponentBulkAction()
     {
-        if (isset($data['hromadna_akce'])) {
-            $Spis = new Spis();
-            switch ($data['hromadna_akce']) {
-                /* Predani vybranych spisu do spisovny  */
-                case 'predat_spisovna':
-                    if (isset($data['spis_vyber'])) {
-                        $count_ok = $count_failed = 0;
-                        foreach ($data['spis_vyber'] as $spis_id) {
-                            $stav = $Spis->predatDoSpisovny($spis_id);
-                            if ($stav === true) {
-                                $count_ok++;
-                            } else {
-                                if (is_string($stav)) {
-                                    $this->flashMessage($stav, 'warning');
-                                }
-                                $count_failed++;
-                            }
+        $BA = new Spisovka\Components\BulkAction();
+
+        $actions = ['predat_spisovna' => 'předat do spisovny'];
+        $BA->setActions($actions);
+        $BA->setCallback([$this, 'bulkAction']);
+        $BA->text_object = 'spis';
+
+        return $BA;
+    }
+
+    public function bulkAction($action, $spisy)
+    {
+        $Spis = new Spis();
+        switch ($action) {
+            /* Predani vybranych spisu do spisovny  */
+            case 'predat_spisovna':
+                $count_ok = $count_failed = 0;
+                foreach ($spisy as $spis_id) {
+                    $stav = $Spis->predatDoSpisovny($spis_id);
+                    if ($stav === true) {
+                        $count_ok++;
+                    } else {
+                        if (is_string($stav)) {
+                            $this->flashMessage($stav, 'warning');
                         }
-                        if ($count_ok > 0) {
-                            $this->flashMessage('Úspěšně jste předal ' . $count_ok . ' spisů do spisovny.');
-                        }
-                        if ($count_failed > 0) {
-                            $this->flashMessage($count_failed . ' spisů se nepodařilo předat do spisovny!',
-                                    'warning');
-                        }
-                        if ($count_ok > 0 && $count_failed > 0) {
-                            $this->redirect('this');
-                        }
+                        $count_failed++;
                     }
-                    break;
-                default:
-                    break;
-            }
+                }
+                if ($count_ok > 0) {
+                    $this->flashMessage('Úspěšně jste předal ' . $count_ok . ' spisů do spisovny.');
+                }
+                if ($count_failed > 0) {
+                    $this->flashMessage($count_failed . ' spisů se nepodařilo předat do spisovny!',
+                            'warning');
+                }
+                if ($count_ok > 0 && $count_failed > 0) {
+                    $this->redirect('this');
+                }
+                break;
+            default:
+                break;
         }
     }
 
