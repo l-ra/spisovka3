@@ -121,7 +121,9 @@ class Updates
     public static function find_clients()
     {
         $clients = array();
-        if (defined('MULTISITE') && MULTISITE == 1) {
+        // detekuj hosting mojespisovka.cz
+        $hosting = file_exists(dirname(APP_DIR) . "/clients/.htaccess");
+        if ($hosting) {
             $clients_dir = dirname(APP_DIR) . "/clients";
             $dh = opendir($clients_dir);
             if ($dh !== false)
