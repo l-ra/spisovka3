@@ -119,18 +119,16 @@ class LogModel extends BaseModel
                         ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
     }
 
-    public function historieDokumentu($dokument_id = null, $limit = 50, $offset = 0)
+    public function historieDokumentu($dokument_id, $limit = 500)
     {
-
         $res = dibi::query(
                         'SELECT * FROM %n ld', $this->tb_logdokument, 'LEFT JOIN %n ou',
                         $this->tb_osoba_to_user, 'ON ou.user_id=ld.user_id', 'LEFT JOIN %n o',
-                        $this->tb_osoba, 'ON o.id=ou.osoba_id', '%if', !is_null($dokument_id),
-                        'WHERE %and',
-                        !is_null($dokument_id) ? array(array('ld.dokument_id=%i', $dokument_id))
-                                    : array(), '%end', 'ORDER BY ld.date'
+                        $this->tb_osoba, 'ON o.id=ou.osoba_id', 'WHERE ld.dokument_id = %i',
+                        $dokument_id, 'ORDER BY ld.date DESC, ld.id DESC LIMIT %i', $limit
         );
-        return $res->fetchAll($offset, $limit);
+        $rows = $res->fetchAll();
+        return array_reverse($rows);
     }
 
     /*     * **********************************************************************
@@ -190,11 +188,6 @@ class LogModel extends BaseModel
         return (isset(self::$typy[$typ])) ? self::$typy[$typ] : "";
     }
 
-    public function deleteAllDokument()
-    {
-        return dibi::query('TRUNCATE [' . $this->tb_logdokument . '];');
-    }
-
     public function deleteDokument($dokument_id)
     {
         return dibi::delete($this->tb_logdokument)->where(array(array('dokument_id=%i', $dokument_id)))->execute();
@@ -203,11 +196,6 @@ class LogModel extends BaseModel
     public function deleteAllSpis()
     {
         return dibi::query('TRUNCATE [' . $this->tb_logspis . '];');
-    }
-
-    public function deleteSpis($spis_id)
-    {
-        return dibi::delete($this->tb_logspis)->where(array(array('spis_id=%i', $spis_id)))->execute();
     }
 
 }

@@ -410,17 +410,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function renderHistorie()
-    {
-
-        $dokument_id = $this->getParameter('id', null);
-
-        $Log = new LogModel();
-        $historie = $Log->historieDokumentu($dokument_id, 1000);
-
-        $this->template->historie = $historie;
-    }
-
     protected function createComponentVyrizovaniForm()
     {
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');

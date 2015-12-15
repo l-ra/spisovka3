@@ -1060,14 +1060,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function renderHistorie()
+    public function renderHistorie($id)
     {
-
-        $dokument_id = $this->getParameter('id', null);
-
         $Log = new LogModel();
-        $historie = $Log->historieDokumentu($dokument_id, 1000);
-
+        $historie = $Log->historieDokumentu($id);
         $this->template->historie = $historie;
     }
 
