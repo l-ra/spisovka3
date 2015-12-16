@@ -25,6 +25,7 @@ class LogModel extends BaseModel
     const DOK_SPISOVNA_PRIPOJEN = 106;
     const DOK_PREDANI_ZRUSENO = 108;
     const DOK_PREVZETI_ODMITNUTO = 109;
+    const DOK_SPISOVNA_VRACEN = 110;
     const SUBJEKT_VYTVOREN = 21;
     const SUBJEKT_ZMENEN = 22;
     const SUBJEKT_SMAZAN = 23;
@@ -72,6 +73,7 @@ class LogModel extends BaseModel
         '106' => 'Dokument umístěn ve spisovně',
         '108' => 'Předání zrušeno',
         '109' => 'Převzetí odmítnuto',
+        self::DOK_SPISOVNA_VRACEN => 'Dokument vrácen ze spisovny',
         '21' => 'Vytvořen nový subjekt',
         '22' => 'Subjekt změněn',
         '23' => 'Subjekt smazán',
@@ -103,7 +105,7 @@ class LogModel extends BaseModel
      * Logovani aktivity dokumentu
      */
 
-    public function logDokument($dokument_id, $typ, $poznamka = "")
+    public function logDokument($dokument_id, $typ, $poznamka = null)
     {
 
         $row = array();

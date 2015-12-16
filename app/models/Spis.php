@@ -510,8 +510,6 @@ class Spis extends TreeModel
         // Predat do spisovny
         $result = $this->zmenitStav($spis_id, 2);
         if ($result) {
-            //$Log = new LogModel();
-            //$Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN, 'Dokument předán do spisovny.');
             return true;
         } else {
             return false;

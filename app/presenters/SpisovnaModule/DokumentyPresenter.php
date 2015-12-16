@@ -659,7 +659,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         switch ($action) {
             case 'vratit':
                 foreach ($documents as $dokument_id) {
-                    
+                    $Workflow->vratitZeSpisovny($dokument_id);
                 }
                 if (count($documents) == 1)
                     $msg = 'Dokument byl vrácen.';

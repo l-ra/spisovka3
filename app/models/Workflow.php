@@ -624,8 +624,7 @@ class Workflow extends BaseModel
             if ($result_insert) {
                 //$Dokument->ulozit(array('stav'=>2), $dokument_id);
                 $Log = new LogModel();
-                $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN,
-                        'Dokument předán do spisovny.');
+                $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN);
                 return true;
             } else {
                 return false;
@@ -1109,6 +1108,43 @@ class Workflow extends BaseModel
         dibi::query("UPDATE {$this->name} w, {$this->tb_dokspis} ds SET $update "
                 . "WHERE w.dokument_id = ds.dokument_id AND ds.spis_id = %i AND $where",
                 $spis_id);
+    }
+
+    public function vratitZeSpisovny($dokument_id)
+    {
+        $Dokument = new Dokument();
+        if (!is_numeric($dokument_id))
+            return false;
+        $old_data = $this->select(["dokument_id = $dokument_id", 'aktivni = 1'])->fetch();
+        if (!$old_data)
+            return false;
+
+        $workflow_data = [];
+        $workflow_data['dokument_id'] = $old_data['dokument_id'];
+        $workflow_data['prideleno_id'] = $old_data['prideleno_id'];
+        $workflow_data['orgjednotka_id'] = $old_data['orgjednotka_id'];
+        $workflow_data['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
+        $workflow_data['stav_dokumentu'] = 5;
+        $workflow_data['stav_osoby'] = 1;
+        $workflow_data['date'] = new DateTime();
+        $workflow_data['aktivni'] = 1;
+
+        dibi::begin();
+        try {
+            $this->deaktivovat($dokument_id);
+            $this->insert($workflow_data);
+
+            $Dokument->ulozit(array('stav' => 1), $dokument_id);
+
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_VRACEN);
+            
+            dibi::commit();
+            return true;
+        } catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
     }
 
 }
