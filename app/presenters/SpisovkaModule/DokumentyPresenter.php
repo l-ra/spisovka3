@@ -849,9 +849,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->cjednaci = $CJ->generuj();
 
         $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
-
-        $this->template->novyForm = $this['novyForm'];
-
+       
         if ($dokument) {
             $this->template->Dok = $dokument;
             $this->template->dokument_id = $dokument->id;
@@ -859,6 +857,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Dok = null;
             $this->flashMessage('Dokument není připraven k vytvoření', 'warning');
         }
+        
+        $this->template->form_name = 'novyForm';
     }
 
     public function renderOdpoved()
@@ -1016,7 +1016,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
 
-            $this->template->novyForm = $this['odpovedForm'];
+            $this->template->form_name = 'odpovedForm';
             $this->setView('novy');
         } else {
             $this->template->Dok = null;
