@@ -726,11 +726,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $dokument = $Dokument->update($data, array(array('id=%i', $dokument_id))); //   array('dokument_id'=>0);// $Dokument->ulozit($data);
         if ($dokument) {
 
-            $this->flashMessage('Dokument připojen do evidence.');
+            $this->flashMessage('Číslo jednací přiděleno.');
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_UNDEFINED,
-                    'Dokument připojen do evidence. Přiděleno číslo jednací: ' . $cjednaci->cislo_jednaci);
+                    'Přiděleno číslo jednací: ' . $cjednaci->cislo_jednaci);
 
             if ($this->typ_evidence == 'sberny_arch') {
 
