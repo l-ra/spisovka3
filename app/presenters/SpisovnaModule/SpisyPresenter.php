@@ -264,10 +264,26 @@ class Spisovna_SpisyPresenter extends BasePresenter
                     }
                 }
                 if ($count_ok > 0)
-                    $this->flashMessage('Úspěšně jste přijal ' . $count_ok . ' spisů do spisovny.');
+                    $this->flashMessage(sprintf("Úspěšně jste přijal $count_ok %s do spisovny.",
+                            Spis::cislovat($count_ok)));
                 if ($count_failed > 0)
-                    $this->flashMessage($count_failed . ' spisů se nepodařilo příjmout do spisovny!',
-                            'warning');
+                    $this->flashMessage(sprintf("$count_failed %s se nepodařilo přijmout do spisovny.",
+                            Spis::cislovat($count_failed)), 'warning');
+                break;
+                
+            case 'vratit':
+                $workflow = new Workflow();
+                $all_ok = true;
+                foreach ($spisy as $spis_id) {
+                    $ok = $workflow->vratitSpisZeSpisovny($spis_id);
+                    if (!$ok)
+                        $all_ok = false;
+                }
+                if (count($spisy) == 1)
+                    $msg = $ok ? 'Spis byl vrácen.' : 'Spis se nepodařilo vrátit.';
+                else
+                    $msg = $all_ok ? 'Spisy byly vráceny.' : 'Některé spisy se nepodařilo vrátit.';
+                $this->flashMessage($msg, $all_ok ? 'info' : 'warning');
                 break;
         }
     }

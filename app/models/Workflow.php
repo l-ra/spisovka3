@@ -1110,7 +1110,7 @@ class Workflow extends BaseModel
                 $spis_id);
     }
 
-    public function vratitZeSpisovny($dokument_id)
+    public function vratitZeSpisovny($dokument_id, $use_transaction = true)
     {
         $Dokument = new Dokument();
         if (!is_numeric($dokument_id))
@@ -1129,7 +1129,8 @@ class Workflow extends BaseModel
         $workflow_data['date'] = new DateTime();
         $workflow_data['aktivni'] = 1;
 
-        dibi::begin();
+        if ($use_transaction)
+            dibi::begin();
         try {
             $this->deaktivovat($dokument_id);
             $this->insert($workflow_data);
@@ -1138,7 +1139,43 @@ class Workflow extends BaseModel
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_VRACEN);
-            
+
+            if ($use_transaction)
+                dibi::commit();
+            return true;
+        } catch (Exception $e) {
+            if ($use_transaction)
+                dibi::rollback();
+            throw $e;
+        }
+    }
+
+    public function vratitSpisZeSpisovny($spis_id)
+    {
+        // kontrola na stav spisu
+        $spis_model = new Spis;
+        $spis_info = $spis_model->getInfo($spis_id);
+        if ($spis_info->stav != 2) {
+            return false;
+        }
+
+        dibi::begin();
+        try {
+            $DokumentSpis = new DokumentSpis();
+            $dokumenty = $DokumentSpis->dokumenty($spis_id);
+            if (count($dokumenty) > 0) {
+                foreach ($dokumenty as $dok) {
+                    $ok = $this->vratitZeSpisovny($dok->id, false);
+                    if (!$ok) {
+                        dibi::rollback();
+                        return false;
+                    }
+                }
+            }
+
+            // Predat do spisovny
+            $spis_model->zmenitStav($spis_id, 0);
+
             dibi::commit();
             return true;
         } catch (Exception $e) {

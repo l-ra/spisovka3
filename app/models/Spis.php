@@ -773,4 +773,16 @@ class Spis extends TreeModel
         return $res->fetchAll();
     }
 
+    /**
+     * Cisluje podstatne jmeno spis.
+     * @param int $pocet
+     */
+    public static function cislovat($pocet)
+    {
+        if ($pocet == 1)
+            return 'spis';
+        if ($pocet >= 2 && $pocet <= 4)
+            return 'spisy';
+        return 'spisů';
+    }
 }
