@@ -154,7 +154,8 @@ try {
     }
     
 // 3c) Konfiguruj e-podatelnu - musí být provedeno po připojení do databáze
-    createEpodatelnaConfig();
+    if (!defined('APPLICATION_INSTALL'))
+        createEpodatelnaConfig();
     
 // Step 4: Setup application router
 // 
