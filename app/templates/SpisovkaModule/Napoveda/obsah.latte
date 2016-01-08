@@ -15,8 +15,9 @@
 {/define}
 
 {block content}
-
-{include #help_module, title => 'Spisová služba', module => 'spisovka' }
-{include #help_module, title => 'E-podatelna', module => 'epodatelna' }
-{include #help_module, title => 'Spisovna', module => 'spisovna' }
-{include #help_module, title => 'Administrace', module => 'admin' }
+<div class="help-contents">
+    {include #help_module, title => 'Spisová služba', module => 'spisovka' }
+    {include #help_module, title => 'E-podatelna', module => 'epodatelna' }
+    {include #help_module, title => 'Spisovna', module => 'spisovna' }
+    {include #help_module, title => 'Administrace', module => 'admin' }
+</div>
