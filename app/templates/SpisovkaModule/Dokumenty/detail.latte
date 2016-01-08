@@ -49,7 +49,7 @@
 {block content}
 
 <div class="navigate">
-    <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> - Detail dokumentu
+    <a href="{link default}">Seznam dokumentů</a> - Detail dokumentu
     {if ($FormUpravit=='metadata')}
         - Úprava metadat
     {elseif ($FormUpravit=='vyrizeni')}
@@ -58,40 +58,41 @@
 </div>
 
 <div id="tisk">
-    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
+    <a href="{link detail, 'id'=>$Dok->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
         <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
     </a>
-    <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dok->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
+    <a href="{link detail, 'id'=>$Dok->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
         <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
     </a>        
 </div>
 
 <div class="dokument_blok_menu">
     {if $Predan==1 }
-        <a href="{link :Spisovka:Dokumenty:prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument</a>
-        <a href="{link :Spisovka:Dokumenty:odmitnoutprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
+        <a href="{link prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument</a>
+        <a href="{link odmitnoutprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
     {elseif $LzePredatDokument}
         {if empty($Dok->predano)}
             <a href="{link :Spisovka:Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
         {else}
-            <a href="{link :Spisovka:Dokumenty:zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit předání dokumentu</a>
+            <a href="{link zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit předání dokumentu</a>
         {/if}
     {/if}
 
     {if $AccessEdit}
-        <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
+        <a href="{link detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
         <script n:if="isset($nutnyNadpis)" type="text/javascript"> alert("Název dokumentu (věc) je prázdný. Je nutné ho vyplnit!");</script>
 
-        <a n:if="$Dok->stav_dokumentu < 3" href="{link :Spisovka:Dokumenty:kvyrizeni, 'id'=>$Dok->id}" id="kvyrizenidokument">Označit k vyřízení</a>
+        <a n:if="$Dok->stav_dokumentu < 3" href="{link kvyrizeni, 'id'=>$Dok->id}" id="kvyrizenidokument">Označit k vyřízení</a>
 
         {if $Dok->stav_dokumentu == 3}
-            <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }#vr">Upravit vyřízení</a>
-            <a n:if="$povolitOdpoved" href="{link :Spisovka:Dokumenty:odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
-            <a href="{link :Spisovka:Dokumenty:odeslat , 'id'=>$Dok->id }">Odeslat dokument</a>
-            <a href="{link :Spisovka:Dokumenty:vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
+            <a href="{link detail , 'id'=>$Dok->id , 'upravit'=>'vyrizeni'  }#vr">Upravit vyřízení</a>
+            <a n:if="$povolitOdpoved" href="{link odpoved, 'id'=>$Dok->id}" >Vytvořit odpověď</a>
+            <a href="{link odeslat , 'id'=>$Dok->id }">Odeslat dokument</a>
+            <a href="{link vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
         {/if}
     {/if}{* $AccessEdit *}
-    <a href="{link this, 'id'=>$Dok->id, 'udalost'=>1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
+    <a href="{link this, 'udalost' => 1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
+    <a href="{link predatDoSpisovny, 'id' => $Dok->id}" n:if="$Dok->stav_dokumentu == 5">Předat do spisovny</a>
     <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}" n:if="$Zapujcka">Vrátit dokument</a>
 </div>
 
@@ -168,10 +169,10 @@
                 <dd>Dokument nemá přiděleno číslo jednací.
                     {if $AccessEdit}
                         {if $Typ_evidence == 'sberny_arch'}
-                            <br />Zaevidovat do spisové služby: <a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
-                            <a href="{link :Spisovka:Dokumenty:cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
+                            <br />Zaevidovat do spisové služby: <a href="{link pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
+                            <a href="{link cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
                         {else}
-                            <br /><a href="{link :Spisovka:Dokumenty:pridelitcj, 'id'=>$Dok->id}">Přidělit číslo jednací</a>
+                            <br /><a href="{link pridelitcj, 'id'=>$Dok->id}">Přidělit číslo jednací</a>
                         {/if}
                     {/if}
                 </dd><br />
@@ -242,7 +243,7 @@
                 {if $Dok->identifikator['typ'] == "isds" }
                     <dt>Ověření identifikátoru:</dt>
                     <dd id="isds_overeni">
-                        <a href="{link :Spisovka:Dokumenty:isdsovereni, 'id'=>$Dok->id}" onclick="return overitISDS(this);">Ověřit datovou zprávu</a>
+                        <a href="{link isdsovereni, 'id'=>$Dok->id}" onclick="return overitISDS(this);">Ověřit datovou zprávu</a>
                     </dd><br />
                 {/if}
             {/if}

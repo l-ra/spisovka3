@@ -495,7 +495,7 @@ class Spis extends TreeModel
         if (count($dokumenty) > 0) {
             $Workflow = new Workflow();
             foreach ($dokumenty as $dok) {
-                $stav = $Workflow->predatDoSpisovny($dok->id);
+                $stav = $Workflow->predatDoSpisovny($dok->id, true);
                 if ($stav === true) {
                     
                 } else {

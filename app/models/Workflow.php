@@ -582,37 +582,32 @@ class Workflow extends BaseModel
         }
     }
 
-    public function predatDoSpisovny($dokument_id, $samostatny = 0)
+    public function predatDoSpisovny($dokument_id, $volano_ze_spisu)
     {
-
         // kontrola uzivatele
-
         $Dokument = new Dokument();
         $dokument_info = $Dokument->getInfo($dokument_id, "subjekty");
 
-        //echo "<pre>"; print_r($dokument_info); echo "</pre>"; exit;
-
-        if ($samostatny == 1 && isset($dokument_info->spisy)) {
-            return 'Dokument ' . $dokument_info->jid . ' nelze přenést do spisovny! Dokument je součásti spisu.';
+        if (!$volano_ze_spisu && isset($dokument_info->spisy)) {
+            return 'Dokument ' . $dokument_info->cislo_jednaci . ' nelze přenést do spisovny samostatně, je součástí spisu.';
         }
 
         // Test na uplnost dat
         if ($kontrola = $Dokument->kontrola($dokument_info)) {
             // nejsou kompletni data - neprenasim
-            return 'Dokument ' . $dokument_info->jid . ' nelze přenést do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
+            return 'Dokument ' . $dokument_info->cislo_jednaci . ' nelze přenést do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
         }
 
         // Kontrola stavu - vyrizen a spusten 5 <
         if ($dokument_info->stav_dokumentu < 4) {
-            return 'Dokument ' . $dokument_info->jid . ' nelze přenést do spisovny! Není označen jako vyřízený.';
+            return 'Dokument ' . $dokument_info->cislo_jednaci . ' nelze přenést do spisovny! Není označen jako vyřízený.';
         } else if ($dokument_info->stav_dokumentu < 5) {
-            return 'Dokument ' . $dokument_info->jid . ' nelze přenést do spisovny! Není spuštěna událost.';
+            return 'Dokument ' . $dokument_info->cislo_jednaci . ' nelze přenést do spisovny! Není spuštěna událost.';
         }
 
         // Predat do spisovny
         $workflow_data = $this->select(array(array('id=%i', $dokument_info['prideleno']->id)))->fetch();
         if ($workflow_data) {
-
             $workflow_data = (array) $workflow_data;
             unset($workflow_data['id']);
             $workflow_data['stav_dokumentu'] = 6;

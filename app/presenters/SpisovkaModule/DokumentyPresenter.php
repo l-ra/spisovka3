@@ -468,16 +468,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             /* Predani vybranych dokumentu do spisovny  */
             case 'predat_spisovna':
-
                 $count_ok = $count_failed = 0;
                 foreach ($documents as $dokument_id) {
-                    $stav = $Workflow->predatDoSpisovny($dokument_id, 1);
+                    $stav = $Workflow->predatDoSpisovny($dokument_id, false);
                     if ($stav === true) {
                         $count_ok++;
                     } else {
-                        if (is_string($stav)) {
+                        if (is_string($stav))
                             $this->flashMessage($stav, 'warning');
-                        }
                         $count_failed++;
                     }
                 }
@@ -495,6 +493,20 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
     }
 
+    public function actionPredatDoSpisovny($id)
+    {
+        $w = new Workflow();
+        $res = $w->predatDoSpisovny($id, false);
+        if ($res === true)
+            $this->flashMessage('Dokument byl předán do spisovny.');
+        else {
+            if (is_string($res))
+                $this->flashMessage($res, 'warning');
+            $this->flashMessage('Dokument se nepodařilo předat do spisovny.');
+        }
+        $this->redirect('default');
+    }
+    
     public function actionPrevzit()
     {
         $dokument_id = $this->getParameter('id', null);
@@ -1526,7 +1538,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Dokument = new Dokument();
         $dokument_id = $this->getParameter('id');
-        $dok = $Dokument->getInfo($dokument_id);
+        $Dokument->getInfo($dokument_id);
 
         // V aplikaci chybi DateTimePicker
         if (isset($data['datum_vzniku'])) {

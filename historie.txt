@@ -20,6 +20,8 @@ Nové funkce:
 - ve výpravně je možné vytvořit podací arch s dokumenty, které uživatel
   ručně vybere (funkce se použije, pokud pracovník chce odeslat dokumenty
   na poště, ale nemá ještě všechny fyzicky u sebe)
+- jeden vyřízený dokument je možné jednodušeji předat do spisovny přímo
+  z detailu dokumentu
 - ve spisovně při příjmu je možné vrátit omylem předané dokumenty a spisy
 - nastavení uživatele jako filtr, řazení a hledání se již neukládají 
   do prohlížeče ve formě cookies, ale do databáze. To ocení uživatelé, kteří
