@@ -885,7 +885,7 @@ class Dokument extends BaseModel
     }
 
     public function spisovnaFiltr($params)
-    {
+    {        
         if (strpos($params, 'stav_') === 0) {
             $p = ['stav_dokumentu' => substr($params, 5)];
         } else if (strpos($params, 'skartacni_znak_') === 0) {
@@ -894,9 +894,14 @@ class Dokument extends BaseModel
             $p = ['zpusob_vyrizeni' => substr($params, strlen('zpusob_vyrizeni_'))];
         } else
         // filtr "vse" nebo chyba
-            return array();
+            $p = null;
 
-        return $this->paramsFiltr($p);
+        $ret = $p ? $this->paramsFiltr($p) : [];
+        $display_borrowed = Settings::get('spisovna_display_borrowed_documents');
+        if (!$display_borrowed)
+            $ret['where'][] = 'stav_dokumentu != 11';
+        
+        return $ret;
     }
 
     public function sestavaOmezeniOrg($args)

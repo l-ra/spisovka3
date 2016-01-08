@@ -36,6 +36,7 @@ Nové funkce:
 - je možné nastavit, zda si uživatelé mohou měnit svoje hesla
 - je možné nastavit, jak se má provést přesměrování po přihlášení, viz nápověda
 - je možné povolit předávání vyřízených dokumentů, viz nápověda
+- je možné skrýt zapůjčené dokumenty ve spisovně
 - lze fitrovat subjekty podle stavu
 - je možné vypnout automatické načtení zpráv po kontrole schránek v e-podatelně
 - administrátor má možnost vytvořit protokol s informacemi pro technickou

@@ -77,3 +77,5 @@ Kontrola e-mailových adres zaměstnanců
 (pokud je adresa zadána, musí být platná)
 [970]
 Nové nastavení "Automaticky načíst zprávy po kontrole schránek"
+[980]
+Nové nastavení "Zobrazit zapůjčené dokumenty ve spisovně"
