@@ -1051,7 +1051,6 @@ if ( count($S2_dok)>0 ) {
                 'podaci_denik_poradi' => $S2_d->poradove_cislo,
                 'podaci_denik_rok' => $podaci_rok,
                 'dokument_typ_id' => $typ_dokumentu,
-                'spisovy_plan' => '',
                 'spisovy_znak_id' => $S2_d->id_spisznak,
                 'skartacni_znak' => empty($S2_d->skartacni_znak)?null:$S2_d->skartacni_znak,
                 'skartacni_lhuta' => empty($S2_d->skartacni_lhuta)?null:$S2_d->skartacni_lhuta,
