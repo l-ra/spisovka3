@@ -131,6 +131,7 @@ Spisová služba:
 - lepší ošetření chyb při hledání v ARESu (někdy registr nereaguje a nevrací odpověď)
 - údaj metadat "počet příloh" byl zobrazen chybně jako "počet listů příloh".
   Znamená počet příloh v listinné nebo jiné podobě (ne počet souborů).
+- v databázi chyběla kontrola spisového znaku u dokumentu
 - zápis chybných hodnot do formuláře při hledání dokumentu podle datumů nezpůsobí
   chybu aplikace
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 

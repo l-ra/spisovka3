@@ -79,3 +79,5 @@ Kontrola e-mailových adres zaměstnanců
 Nové nastavení "Automaticky načíst zprávy po kontrole schránek"
 [980]
 Nové nastavení "Zobrazit zapůjčené dokumenty ve spisovně"
+[990]
+Přidání kontroly vazby mezi dokumentem a spisovým znakem.

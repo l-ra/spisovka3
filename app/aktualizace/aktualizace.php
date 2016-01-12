@@ -154,24 +154,27 @@ foreach ($clients as $site_path => $site_name) {
                 @include_once UPDATE_DIR . $rev . '_code.php';
 
                 $function_name = "revision_{$rev}_check";
-                if (function_exists($function_name)) {
+                if (function_exists($function_name) && $do_update) {
                     try {
-                        $function_name();
+                        echo "<pre>";
+                        $res = $function_name();
+                        echo "</pre>";
                     } catch (Exception $e) {
                         $msg = "Při provádění kontroly došlo k chybě! Aktualizaci není možné provést.<br />Popis chyby: ";
                         if ($e->getCode())
                             $msg .= $e->getCode() . ' - ';
                         $msg .= $e->getMessage();
                         error($msg);
-
-                        // Pokud je spuštěna aktualizace, ukonči ji a přeskoč na dalšího klienta
-                        // Pokud není, pokračuj v zobrazení a případné kontrole dalších db aktualizací
-                        if ($do_update)
-                            break;
+                        $res = false;
+                    }
+                    if ($res === false) {
+                        // Ukonči aktualizaci a přeskoč na dalšího klienta
+                        $rev_error = true;
+                        break;
                     }
                 }
 
-                // PRE script
+                // PRE script - není aktuálně použito. Též chybí ošetření případných chyb
                 $function_name = "revision_{$rev}_before";
                 if (function_exists($function_name)) {
                     if ($do_update) {
@@ -270,8 +273,11 @@ foreach ($clients as $site_path => $site_name) {
     if ($rev_error)
         break; // Preskoc ostatni klienty - chyba muze byt vazna
 
-    if ($do_update && !$rev_error && $found_update)
-        echo "<p>Aktualizace klienta proběhla úspěšně.</p>";
+    if ($do_update && $found_update)
+        if (!$rev_error)
+            echo "<p>Aktualizace klienta proběhla úspěšně.</p>";
+        else
+            echo "<p>Aktualizace klienta nebyla dokončena.</p>";
 
     echo "</div>\n\n";
 }
