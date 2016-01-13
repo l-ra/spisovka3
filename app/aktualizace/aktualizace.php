@@ -67,17 +67,17 @@ try {
     error($e->getMessage());
     die;
 }
-?>    
-    <div id="menu">
-    &nbsp;
-    <a href="aktualizace.php?go=1" onclick="return confirm('Opravdu chcete provést aktualizaci spisové služby?');">Spustit aktualizaci</a>
-    </div>
-    <div id="content"> 
-        
-<?php    
 
 $do_update = isset($_GET['go']);
 
+echo '    <div id="menu">';
+if ($do_update)
+    echo '<a href="aktualizace.php">Znovu zkontrolovat</a>';
+else
+    echo '<a href="aktualizace.php?go=1" onclick="return confirm(\'Opravdu chcete provést aktualizaci spisové služby?\');">Spustit aktualizaci</a>';
+echo '    </div>
+    <div id="content">';
+        
 foreach ($clients as $site_path => $site_name) {
 
     echo "<div class='update_site'>";
