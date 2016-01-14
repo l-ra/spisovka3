@@ -81,3 +81,5 @@ Nové nastavení "Automaticky načíst zprávy po kontrole schránek"
 Nové nastavení "Zobrazit zapůjčené dokumenty ve spisovně"
 [990]
 Přidání kontroly vazby mezi dokumentem a spisovým znakem.
+[1010]
+Zrušení tabulek dokument_historie, osoba_historie a subjekt_historie.

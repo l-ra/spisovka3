@@ -56,13 +56,13 @@ class Osoba extends BaseModel
         if (!is_null($osoba_id)) {
 
             // ulozit do historie
-            $old_data = (array) $this->getInfo($osoba_id);
+            /* $old_data = (array) $this->getInfo($osoba_id);
             $old_data['osoba_id'] = $osoba_id;
             $old_data['user_created'] = $user_id;
             $old_data['date_created'] = new DateTime();
             unset($old_data['id'], $old_data['user_modified'], $old_data['date_modified']);
             $OsobaHistorie = new OsobaHistorie();
-            $OsobaHistorie->insert($old_data);
+            $OsobaHistorie->insert($old_data); */
 
             // aktualizovat
             $data['date_modified'] = new DateTime();
@@ -176,10 +176,6 @@ class Osoba extends BaseModel
 
     public function deleteAll()
     {
-
-        $OsobaHistorie = new OsobaHistorie();
-        $OsobaHistorie->deleteAll();
-
         $Osoba2User = new Osoba2User();
         $Osoba2User->deleteAll();
 
@@ -229,13 +225,5 @@ class Osoba2User extends BaseModel
 
         return $result->fetchAll();
     }
-
-}
-
-class OsobaHistorie extends BaseModel
-{
-
-    protected $name = 'osoba_historie';
-    protected $primary = 'id';
 
 }

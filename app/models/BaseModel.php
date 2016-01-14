@@ -44,7 +44,6 @@ abstract class BaseModel extends Nette\Object
     protected $tb_spousteci_udalost = 'spousteci_udalost';
     protected $tb_stat = 'stat';
     protected $tb_subjekt = 'subjekt';
-    protected $tb_subjekt_historie = 'subjekt';
     protected $tb_user = 'user';
     protected $tb_workflow = 'workflow';
     protected $tb_zapujcka = 'zapujcka';

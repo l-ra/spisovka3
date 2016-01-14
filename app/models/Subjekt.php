@@ -29,13 +29,13 @@ class Subjekt extends BaseModel
         if (!is_null($subjekt_id)) {
 
             // ulozit do historie
-            $old_data = (array) $this->getInfo($subjekt_id);
+            /* $old_data = (array) $this->getInfo($subjekt_id);
             $old_data['subjekt_id'] = $subjekt_id;
             $old_data['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
             $old_data['date_created'] = new DateTime();
             unset($old_data['id'], $old_data['user_modified'], $old_data['date_modified']);
             $SubjektHistorie = new SubjektHistorie();
-            $SubjektHistorie->insert($old_data);
+            $SubjektHistorie->insert($old_data); */
 
             // aktualizovat
             $data['date_modified'] = new DateTime();
@@ -445,18 +445,7 @@ class Subjekt extends BaseModel
         $DokumentSubjekt = new DokumentSubjekt();
         $DokumentSubjekt->deleteAll();
 
-        $SubjektHistorie = new SubjektHistorie();
-        $SubjektHistorie->deleteAll();
-
         parent::deleteAll();
     }
-
-}
-
-class SubjektHistorie extends BaseModel
-{
-
-    protected $name = 'subjekt_historie';
-    protected $primary = 'id';
 
 }

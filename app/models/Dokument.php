@@ -1657,11 +1657,3 @@ class Dokument extends BaseModel
     }
 
 }
-
-class DokumentHistorie extends BaseModel
-{
-
-    protected $name = 'dokument_historie';
-    protected $primary = 'id';
-
-}
