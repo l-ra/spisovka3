@@ -414,6 +414,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ($pdf)
                 $this->pdf_output = 2;
         }
+        
+        $Log = new LogModel();
+        $historie = $Log->historieDokumentu($id, $tisk || $pdf);
+        $this->template->historie = $historie;        
     }
 
     public function renderDetailSpojeni($id)
@@ -1077,6 +1081,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Log = new LogModel();
         $historie = $Log->historieDokumentu($id);
         $this->template->historie = $historie;
+        $this->template->kompletni_historie = true;
+        $this->setView('detail-historie');
     }
 
     public function actionOdeslat($id)

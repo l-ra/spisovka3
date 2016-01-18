@@ -104,6 +104,10 @@ Jiné změny:
   je potřeba nejprve dokončit anebo zrušit.
 - v detailu dokumentu v sekci odeslání se zobrazuje poznámka, byla-li
   při odeslání uvedena
+- aplikace v minulosti zobrazovala dvě různé historie dokumentu. Nyní zobrazuje
+  pouze historii určenou pro uživatele, která je podrobnější (dříve pojmenovanou
+  jako transakční protokol). Standardně se zobrazuje několik posledních záznamů
+  z historie, ale uživatel má možnost zobrazit historii celou.
 - výpravna nyní zobrazuje v seznamu i datum odeslání
 - při zadávání vyřízení dokumentu prohlížeč automaticky posune obrazovku
   na sekci vyřízení

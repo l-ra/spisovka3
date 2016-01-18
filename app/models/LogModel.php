@@ -121,8 +121,9 @@ class LogModel extends BaseModel
                         ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
     }
 
-    public function historieDokumentu($dokument_id, $limit = 500)
+    public function historieDokumentu($dokument_id, $show_all = true)
     {
+        $limit = $show_all ? 500 : 5;
         $res = dibi::query(
                         'SELECT * FROM %n ld', $this->tb_logdokument, 'LEFT JOIN %n ou',
                         $this->tb_osoba_to_user, 'ON ou.user_id=ld.user_id', 'LEFT JOIN %n o',

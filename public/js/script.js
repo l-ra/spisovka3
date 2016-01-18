@@ -167,7 +167,7 @@ $(function() {
 
     // Dialog - Historie
     $('#dialog-historie').click(function(event){
-        dialog(this, 'Historie - Transakční protokol');
+        dialog(this, 'Historie dokumentu');
         return false;
     });
 

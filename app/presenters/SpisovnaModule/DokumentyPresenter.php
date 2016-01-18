@@ -310,6 +310,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 if ($pdf)
                     $this->pdf_output = 2;
             }
+            
+            $Log = new LogModel();
+            $historie = $Log->historieDokumentu($dokument_id, $tisk || $pdf);
+            $this->template->historie = $historie;
+
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');

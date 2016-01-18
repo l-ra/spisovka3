@@ -1,64 +1,15 @@
     <div class="dokument_blok_sedy">
         <div class="h2">Historie</div>
-        <div class="blok_akce" n:if="$presenter->view != 'printdetail'">
-            <a href="{link :Spisovka:Dokumenty:historie, 'id'=>$Dok->id}" id="dialog-historie">Transakční protokol</a>
+        <div class="blok_akce" n:if="$presenter->view != 'printdetail' && !isset($kompletni_historie)">
+            <a href="{link :Spisovka:Dokumenty:historie, 'id' => $Dok->id}" id="dialog-historie">Zobrazit celou historii</a>
         </div>
-        
-        {foreach $Dok->workflow as $wf}
-        <dl>
-            <dt>{$wf->date|edatetime}</dt>
-            <dd>
-            {if $wf->stav_dokumentu == 1}
-            dokument vytvořen<br />
-            <span class="normal-font">vytvořil a přiděleno {$wf->prideleno_jmeno}</span>
-            {elseif $wf->stav_dokumentu == 2}
-            dokument předán<br />
-            {if empty($wf->prideleno_id)}
-                {var $wf_jmeno = $wf->orgjednotka_info->zkraceny_nazev}
-                {var $wf_neprijato = 'předán organizační jednotce '. $wf_jmeno .'. Ta dokument zatím nepřijala.'}
-            {else}
-                {var $wf_jmeno = $wf->prideleno_jmeno}
-                {var $wf_neprijato = 'předán '. $wf_jmeno .', ale zaměstnanec dokument zatím nepřijal'}
-            {/if}
-            {if $wf->stav_osoby == 0}
-            <span class="normal-font">{$wf_neprijato}</span>
-            {elseif $wf->stav_osoby >= 100}
-            <span class="normal-font">předán {$wf_jmeno}, ale převzetí bylo zrušeno</span>
-            {else}
-            <span class="normal-font">předán {$wf_jmeno}</span>
-            {/if}
 
-            {elseif $wf->stav_dokumentu == 3}
-            dokument označen k vyřízení<br />
-            <span class="normal-font">vyřizuje {$wf->prideleno_jmeno}</span>
-            {elseif $wf->stav_dokumentu == 4}
-            dokument vyřízen, ale není spuštěna událost<br />
-            <span class="normal-font">vyřídil {$wf->prideleno_jmeno}</span>
-            {elseif $wf->stav_dokumentu == 5}
-            dokument vyřízen a běží skartační lhůta<br />
-            <span class="normal-font">vyřídil {$wf->prideleno_jmeno}</span>
-            {elseif $wf->stav_dokumentu == 6}
-            dokument předán do spisovny<br />
-            <span class="normal-font">předal {$wf->user_jmeno}</span>
-            {elseif $wf->stav_dokumentu == 7}
-            dokument přijat do spisovny
-            {elseif $wf->stav_dokumentu == 8}
-            dokument předán do skartačního řízení<br />
-            <span class="normal-font">provedl {$wf->user_jmeno}</span>
-            {elseif $wf->stav_dokumentu == 9}
-            dokument přidán do archivu<br />
-            <span class="normal-font">rozhodl {$wf->prideleno_jmeno}</span>
-            {elseif $wf->stav_dokumentu == 10}
-            dokument byl skartován<br />
-            <span class="normal-font">rozhodl {$wf->prideleno_jmeno}</span>
-            {elseif $wf->stav_dokumentu == 11}
-            dokument byl zapůjčen<br />
-            <span class="normal-font">uživateli {$wf->prideleno_jmeno}</span>
-            {else}
-            {/if}
-            {if !empty($wf->poznamka)}
-                <br /><span class="normal-font">poznámka: {$wf->poznamka}</span>
-            {/if}
+        {foreach $historie as $h}
+        <dl>
+            <dt>{$h->date|edatetime}</dt>
+            <dd>{!=LogModel::typ($h->typ)}<br />
+            {if !empty($h->poznamka)}<span class="normal-font">{$h->poznamka}</span><br />{/if}
+            <span class="normal-font">provedl: {Osoba::displayName($h)}</span>
             </dd>
         </dl>
         {/foreach}
