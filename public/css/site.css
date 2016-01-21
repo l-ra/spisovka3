@@ -177,9 +177,10 @@ h2 {
 }
 
 .blok_menu {
-    padding: 20px 20px 0px 20px;
-    margin-bottom: 20px;
-    border-top: 1px dotted #c0c0c0;
+    margin: 15px 0px 20px;
+}
+.blok_menu a {
+    margin-right: 10px;
 }
 
 .blok_akce {
@@ -913,7 +914,15 @@ div.icon_spis, div.icon_slozka {
     display: inline-block;
 }
 div.icon_slozka {
-    background: url('../images/icons/folder_yellow.png') no-repeat right;
+    background-image: url('../images/icons/folder_yellow.png');    
+}
+.jstree-default .icon-folder {
+    background-image: url('../images/icons/folder_yellow.png');
+    background-position: center;
+}
+.jstree-default .icon-spis {
+    background-image: url('../images/icons/spisy.png');
+    background-position: center;
 }
 
 .sestava_vyber_sloupcu {

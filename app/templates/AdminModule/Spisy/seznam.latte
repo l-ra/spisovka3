@@ -4,14 +4,13 @@
     <div class="navigate">Spisy</div>
     <h2>Seznam spisů</h2>
     
-    <div id="search" style="margin-top: 20px">
+    <div id="search">
         {control searchForm}
         <a n:if="$presenter->hledat" n:href="seznam" style="color:#ff0000;">Zrušit vyhledávání</a>    
     </div>
 
     <div class="blok_menu">
         <a href="{link :Admin:Spisy:novy}">Nový spis</a>
-        &nbsp;&nbsp;&nbsp;&nbsp;
         <a href="{link :Admin:Spisy:export}">Export</a>          
     </div>
 
