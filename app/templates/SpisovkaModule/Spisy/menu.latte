@@ -5,4 +5,9 @@
     {else}
         <a href="{link strom2}">Zobrazit ve stromu</a>
     {/if}
+    {if $presenter->getParameter('do_spisovny')}
+        <a href="{link default}">Zobrazit všechny spisy</a>
+    {else}
+        <a href="{link default, do_spisovny => 1}">Předat do spisovny</a>
+    {/if}
 </div>    

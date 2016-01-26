@@ -252,7 +252,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $result->setRowClass(null);
         $this->template->spisy = $result->fetchAll();
     }
-    
+
     public function renderSeznamAjax($q)
     {
         $Spisy = new Spis();
@@ -324,7 +324,13 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                     : 20;
 
         $args = $Spisy->spisovka($args);
-        $result = $Spisy->seznam($args);
+        $predat_do_spisovny = $this->getParameter('do_spisovny', false);
+        $order_by = null;
+        if ($predat_do_spisovny) {
+            $args['where'][] = 'tb.stav = ' . Spis::UZAVREN;
+            $order_by = 'nazev';
+        }
+        $result = $Spisy->seznam($args, null, $order_by);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
@@ -349,8 +355,11 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
         if (count($seznam) > 0) {
             $spis_ids = array();
-            foreach ($seznam as $spis) {
+            foreach ($seznam as &$spis) {
                 $spis_ids[] = $spis->id;
+                // v seznamu uzavřených spisů je zobraz zarovnaně, ignoruj umístění ve stromu
+                if ($predat_do_spisovny)
+                    $spis->uroven = 1;
             }
             $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
         } else {
@@ -577,30 +586,39 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             case 'predat_spisovna':
                 $count_ok = $count_failed = 0;
                 foreach ($spisy as $spis_id) {
-                    $stav = $Spis->predatDoSpisovny($spis_id);
-                    if ($stav === true) {
+                    $result = $Spis->predatDoSpisovny($spis_id);
+                    if ($result === true) {
                         $count_ok++;
                     } else {
-                        if (is_string($stav)) {
-                            $this->flashMessage($stav, 'warning');
-                        }
                         $count_failed++;
+                        foreach ($result as $msg)
+                            $this->flashMessage($msg, 'warning');
                     }
                 }
-                if ($count_ok > 0) {
-                    $this->flashMessage('Úspěšně jste předal ' . $count_ok . ' spisů do spisovny.');
-                }
-                if ($count_failed > 0) {
-                    $this->flashMessage($count_failed . ' spisů se nepodařilo předat do spisovny!',
-                            'warning');
-                }
-                if ($count_ok > 0 && $count_failed > 0) {
-                    $this->redirect('this');
-                }
-                break;
-            default:
+
+                if ($count_ok > 0)
+                    $this->flashMessage(sprintf("Úspěšně jste předal $count_ok %s do spisovny.",
+                                    Spis::cislovat($count_ok)));
+                if ($count_failed > 0)
+                    $this->flashMessage(sprintf($count_failed . ' %s se nepodařilo předat do spisovny.',
+                                    Spis::cislovat($count_failed)), 'warning');
                 break;
         }
+    }
+
+    public function actionPredatDoSpisovny($id)
+    {
+        $m = new Spis;
+        $result = $m->predatDoSpisovny($id);
+        if ($result === true)
+            $this->flashMessage('Spis byl předán do spisovny.');
+        else {
+            foreach ($result as $msg)
+                $this->flashMessage($msg, 'warning');
+            $this->flashMessage('Spis se nepodařilo předat do spisovny.', 'warning');
+        }
+
+        $this->redirect('default');
     }
 
     public function actionStav()

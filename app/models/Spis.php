@@ -3,6 +3,9 @@
 class Spis extends TreeModel
 {
 
+    const OTEVREN = 1;
+    const UZAVREN = 0;
+
     protected $name = 'spis';
     protected $primary = 'id';
 
@@ -53,7 +56,7 @@ class Spis extends TreeModel
     /**
      * @return DibiResult
      */
-    public function seznam($args = null, $parent_id = null)
+    public function seznam($args = null, $parent_id = null, $order_by = null)
     {
         if (!empty($args['where']))
             $params['where'] = $args['where'];
@@ -73,7 +76,9 @@ class Spis extends TreeModel
 
         if ($parent_id !== null)
             $params['parent_id'] = $parent_id;
-        
+        if ($order_by)
+            $params['order'] = $order_by;
+
         return $this->nacti($params);
     }
 
@@ -82,7 +87,7 @@ class Spis extends TreeModel
         $args = array('SELECT id, parent_id, typ, nazev FROM %n AS tb', $this->name, 'WHERE %and', $where, 'ORDER BY sekvence_string');
         return dibi::query($args);
     }
-    
+
     public function seznamDokumentu($spis_id)
     {
         if (empty($spis_id))
@@ -154,7 +159,7 @@ class Spis extends TreeModel
     private function spisovka_spisovna($args, $podminka)
     {
         // Zrus prvni "slozku" nazvanou SPISY
-        $args['where'][] = 'NOT (tb.id = 1)'; 
+        $args['where'][] = 'NOT (tb.id = 1)';
         $args['where'][] = $podminka;
         return $this->omezeni_org($args);
     }
@@ -277,7 +282,7 @@ class Spis extends TreeModel
 
         if ($stav != 1) {
             // Kontrola
-            if ($kontrola = $this->kontrolaDokumentu($spis_id)) {
+            if ($kontrola = $this->kontrolaVyrizeniDokumentu($spis_id)) {
                 foreach ($kontrola as $kmess) {
                     Nette\Environment::getApplication()->getPresenter()->flashMessage($kmess,
                             'warning');
@@ -464,60 +469,60 @@ class Spis extends TreeModel
 
     public function predatDoSpisovny($spis_id)
     {
-
-        // kontrola uzivatele
         $spis_info = $this->getInfo($spis_id);
 
-        //echo "<pre>"; print_r($dokument_info); echo "</pre>"; exit;
         // Test na uplnost dat
         if ($kontrola = $this->kontrola($spis_info)) {
             // nejsou kompletni data - neprenasim
-            foreach ($kontrola as $kmess) {
-                Nette\Environment::getApplication()->getPresenter()->flashMessage('Spis ' . $spis_info->nazev . ' - ' . $kmess,
-                        'warning');
-            }
-            return 'Spis ' . $spis_info->nazev . ' nelze přenést do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
+            $res = [];
+            foreach ($kontrola as $zprava)
+                $res[] = "Spis \"$spis_info->nazev\" - $zprava";
+            // $res[] = 'Spis ' . $spis_info->nazev . ' nelze přenést do spisovny! Nejsou vyřízeny všechny potřebné údaje.';
+            return $res;
         }
 
-        // Kontrola stavu - uzavren = krome 1
-        if ($spis_info->stav == 1) {
-            return 'Spis ' . $spis_info->nazev . ' nelze přenést do spisovny! Spis není uzavřen.';
+        // Kontrola stavu
+        if ($spis_info->stav !== self::UZAVREN) {
+            return ['Spis "' . $spis_info->nazev . '" nelze přenést do spisovny! Spis není uzavřen.'];
         }
 
-        // Kontrola kompletnosti vlozenych dokumentu (musi byt vyrizene)
-        if ($kontrola = $this->kontrolaDokumentu($spis_info)) {
-            // nejsou kompletni - neprenasim
-            foreach ($kontrola as $kmess) {
-                Nette\Environment::getApplication()->getPresenter()->flashMessage('Spis ' . $spis_info->nazev . ' - ' . $kmess,
-                        'warning');
-            }
-            return 'Spis ' . $spis_info->nazev . ' nelze přenést do spisovny! Jeden nebo více dokumentů spisu nejsou vyřízeny.';
+        // Kontrola vlozenych dokumentu (musi byt vyrizene)
+        if ($kontrola = $this->kontrolaVyrizeniDokumentu($spis_info)) {
+            $res = [];
+            foreach ($kontrola as $zprava)
+                $res[] = "Spis \"$spis_info->nazev\" - $zprava";
+            // $res[] = 'Spis ' . $spis_info->nazev . ' nelze přenést do spisovny! Jeden nebo více dokumentů spisu nejsou vyřízeny.';
+            return $res;
         }
 
         // Prenest vsechny dokumenty do spisovny spolu se spisem
         $DokumentSpis = new DokumentSpis();
         $dokumenty = $DokumentSpis->dokumenty($spis_id);
-        if (count($dokumenty) > 0) {
-            $Workflow = new Workflow();
-            foreach ($dokumenty as $dok) {
-                $stav = $Workflow->predatDoSpisovny($dok->id, true);
-                if ($stav === true) {
-                    
-                } else {
-                    if (is_string($stav)) {
-                        Nette\Environment::getApplication()->getPresenter()->flashMessage($stav,
-                                'warning');
-                    }
+
+        dibi::begin();
+        try {
+            if (count($dokumenty) > 0) {
+                $Workflow = new Workflow();
+                foreach ($dokumenty as $dok) {
+                    $stav = $Workflow->predatDoSpisovny($dok->id, true);
+                    if ($stav !== true)
+                        throw new Exception($stav);
                 }
             }
-        }
 
-        // Predat do spisovny
-        $result = $this->zmenitStav($spis_id, 2);
-        if ($result) {
+            // Predat do spisovny
+            $result = $this->zmenitStav($spis_id, 2);
+            if (!$result)
+                throw new Exception();
+
+            dibi::commit();
             return true;
-        } else {
-            return false;
+        } catch (Exception $e) {
+            dibi::rollback();
+            $msg = $e->getMessage();
+            if (!$msg)
+                $msg = 'Došlo k neznámé chybě.';
+            return [$msg];
         }
     }
 
@@ -540,7 +545,7 @@ class Spis extends TreeModel
         }
 
         // Kontrola kompletnosti vlozenych dokumentu (musi byt vyrizene)
-        if ($kontrola = $this->kontrolaDokumentu($spis_info)) {
+        if ($kontrola = $this->kontrolaVyrizeniDokumentu($spis_info)) {
             // nejsou kompletni - neprenasim
             foreach ($kontrola as $kmess) {
                 Nette\Environment::getApplication()->getPresenter()->flashMessage('Spis ' . $spis_info->nazev . ' - ' . $kmess,
@@ -578,31 +583,42 @@ class Spis extends TreeModel
         }
     }
 
-    public function kontrola($data)
+    /**
+     * @param DibiRow $spis
+     * @return array|null
+     */
+    public function kontrola($spis)
     {
-
         $mess = array();
-        if (empty($data->nazev))
-            $mess[] = "Název spisu nemůže být prázdný!";
-        if (empty($data->spisovy_znak_id))
-            $mess[] = "Spisový znak nemůže být prázdný!";
-        if (empty($data->skartacni_znak))
-            $mess[] = "Skartační znak nemůže být prázdný!";
-        if ($data->skartacni_lhuta === "")
-            $mess[] = "Skartační lhůta musí obsahovat hodnotu!";
-        //if ( empty($data->datum_otevreni) ) $mess[] = "Spis nemá uveden datum otevření spisu!";
-        //if ( empty($data->datum_uzavreni) ) $mess[] = "Spis nemá uveden datum uzavření spisu!";
+        if (empty($spis->nazev))
+            $mess[] = "Název spisu nemůže být prázdný.";
+        if (empty($spis->spisovy_znak_id))
+            $mess[] = "Spisový znak nemůže být prázdný.";
+        if (empty($spis->skartacni_znak))
+            $mess[] = "Skartační znak nemůže být prázdný.";
+        if ($spis->skartacni_lhuta === "")
+            $mess[] = "Skartační lhůta musí obsahovat hodnotu.";
 
-        if (count($mess) > 0) {
-            return $mess;
-        } else {
-            return null;
-        }
+        return $mess ? : null;
     }
 
-    public function kontrolaDokumentu($data)
+    /**
+     * @param int $spis_id
+     * @return boolean
+     */
+    public static function lzePredatDoSpisovny($spis_id)
     {
+        $model = new static;
+        $spis = $model->getInfo($spis_id);
+        return $model->kontrola($spis) === null;
+    }
 
+    /**
+     * @param int|DibiRow $data
+     * @return array|null
+     */
+    public function kontrolaVyrizeniDokumentu($data)
+    {
         $mess = array();
 
         if (is_numeric($data)) {
@@ -613,20 +629,12 @@ class Spis extends TreeModel
         $DokumentSpis = new DokumentSpis();
         $dokumenty = $DokumentSpis->dokumenty($data->id);
 
-        // stav nad 5 (4?)
-        if (count($dokumenty) > 0) {
-            foreach ($dokumenty as $dok) {
-                if ($dok->stav_dokumentu < 5) {
+        if (count($dokumenty) > 0)
+            foreach ($dokumenty as $dok)
+                if ($dok->stav_dokumentu < 5)
                     $mess[] = "Spis \"" . $data->nazev . "\" - Dokument \"" . $dok->cislo_jednaci . "\" není vyřízen.";
-                }
-            }
-        }
 
-        if (count($mess) > 0) {
-            return $mess;
-        } else {
-            return null;
-        }
+        return $mess ? : null;
     }
 
     public static function typSpisu($typ = null, $sklonovat = 0)
@@ -790,4 +798,5 @@ class Spis extends TreeModel
             return 'spisy';
         return 'spisů';
     }
+
 }

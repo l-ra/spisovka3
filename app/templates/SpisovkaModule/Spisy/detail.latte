@@ -2,40 +2,38 @@
 {block title}Detail spisu{/block}
 {block content}
     <div class="navigate">
-    <a href="{link :Spisovka:Spisy:default}">Seznam spisů</a> -
+    <a href="{link default}">Seznam spisů</a> -
     Detail spisu
     </div>
 
     <h2>{$Spis->nazev}</h2>
 
     <div id="tisk">
-        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
+        <a href="{link detail, 'id'=>$Spis->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
             <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
         </a>
-        <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
+        <a href="{link detail, 'id'=>$Spis->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
             <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
         </a>        
     </div>
         
     <div class="dokument_blok_menu">
        {if $Lze_menit }
-       <a href="{link :Spisovka:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit spis</a>
+       <a href="{link detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit spis</a>
        <a href="{link :Spisovka:Uzivatel:vyberspis, 'id'=>$user->id, 'spis_id'=>$Spis->id}" id="dialog-predatspis">Předat spis</a>
        {/if}
        {if $Lze_prevzit }
-       <a href="{link :Spisovka:Spisy:prevzit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis</a>
-       <a href="{link :Spisovka:Spisy:odmitnoutprevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
+       <a href="{link prevzit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis</a>
+       <a href="{link odmitnoutprevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
        {/if}
-       {if ($Lze_menit && !empty($Spis->orgjednotka_id_predano) ) }
-       <a href="{link :Spisovka:Spisy:zrusitprevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Zrušit převzetí spisu</a>
-       {/if}
-       {if empty($Spis->orgjednotka_id)}
-       <a href="{link :Spisovka:Spisy:privlastnit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis do vlastnictví</a>
-       {/if}
+       <a n:if="$Lze_menit && !empty($Spis->orgjednotka_id_predano)" href="{link zrusitprevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Zrušit převzetí spisu</a>
+       <a n:if="empty($Spis->orgjednotka_id)" href="{link privlastnit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis do vlastnictví</a>
        
        {if $Lze_menit }
-       {if $Spis->stav==1}<a href="{link :Spisovka:Spisy:stav, 'id'=>$Spis->id, 'stav'=>'uzavrit'}" onclick="return confirm('Opravdu chcete uzavřít tento spis?');">Uzavřít spis</a>{/if}
-       {if $Spis->stav==0}<a href="{link :Spisovka:Spisy:stav, 'id'=>$Spis->id, 'stav'=>'otevrit'}" onclick="return confirm('Opravdu chcete otevřít tento spis?');">Otevřít spis</a>{/if}
+       <a n:if="$Spis->stav == Spis::OTEVREN" href="{link stav, 'id' => $Spis->id, 'stav' => 'uzavrit'}" onclick="return confirm('Opravdu chcete uzavřít tento spis?');">Uzavřít spis</a>
+       <a n:if="$Spis->stav == Spis::UZAVREN" href="{link stav, 'id' => $Spis->id, 'stav' => 'otevrit'}" onclick="return confirm('Opravdu chcete otevřít tento spis?');">Otevřít spis</a>
+       <a n:if="$Spis->stav == Spis::UZAVREN && Spis::lzePredatDoSpisovny($Spis->id)"
+          href="{link predatDoSpisovny, 'id' => $Spis->id}">Předat do spisovny</a>
        {/if}        
     </div>
     
@@ -111,7 +109,7 @@
                 <div class="small">&nbsp;{$dok->jid}</div>
                 {if isset($dok->spisy)}
                 {foreach $dok->spisy as $spis}
-                <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
+                <a href="{link detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
                 {/foreach}
                 {/if}
             </td>
