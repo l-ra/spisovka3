@@ -36,8 +36,8 @@ class Admin_SpecialPresenter extends BasePresenter
         try {
             dibi::begin();
 
-            $parent_id = 4;
-            $parent_sequence = "SPISY.1#Slozka.$parent_id";
+            $parent_id = 3911;
+            $parent_sequence_string = dibi::query("SELECT sekvence_string FROM :PREFIX:spis WHERE id = $parent_id")->fetchSingle();
 //            $counter = 0;
 
             foreach ($data as $spis) {
@@ -47,7 +47,7 @@ class Admin_SpecialPresenter extends BasePresenter
                 $id = dibi::getConnection()->getInsertId();
 
                 dibi::query("UPDATE :PREFIX:spis SET sekvence = %s, sekvence_string = %s WHERE [id] = %i",
-                        "1.$parent_id.$id", "$parent_sequence#{$spis[0]}.$id", $id);
+                        "1.$parent_id.$id", "$parent_sequence_string#{$spis[0]}.$id", $id);
 
                 // if (++$counter >= 10)
                 // break;
@@ -71,6 +71,12 @@ class Admin_SpecialPresenter extends BasePresenter
     {
         $result = array();
 
+        /* Vygeneruj spisy pro testování
+        for ($i = 1; $i <= 1000; $i++)
+            $result[] = ["Spis H-$i", 'popis'];
+        
+        return $result; */
+        
         $a = file(CLIENT_DIR . "/spisy.csv");
         if (!$a)
             $this->myError('Nepodařilo se přečíst soubor s daty pro import.');

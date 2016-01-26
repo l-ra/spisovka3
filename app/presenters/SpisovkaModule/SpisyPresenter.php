@@ -226,19 +226,33 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     }
 
     /**
-     * Zobraz seznam spisu ve stavu "otevren", bez hledani, bez strankovani
+     * Zobraz seznam spisu ve stavu "otevren", bez hledani, bez strankovani.
+     * Vlozeni dokumentu do spisu.
      */
-    public function renderSeznam()
+    public function renderStrom()
     {
         $this->template->dokument_id = $this->getParameter('dokument_id');
 
         $Spisy = new Spis();
-        $args = ['where' => ['tb.stav = 1']];
+        $args = ['where' => ['stav = 1']];
         $args = $Spisy->spisovka($args);
-        $result = $Spisy->seznam($args);
-        $this->template->seznam = $result->fetchAll();
+        $result = $Spisy->seznamRychly($args['where']);
+        $result->setRowClass(null);
+        $this->template->spisy = $result->fetchAll();
     }
 
+    /**
+     * Jako renderStrom(), ale neomezuj stav
+     */
+    public function renderStrom2()
+    {
+        $Spisy = new Spis();
+        $args = $Spisy->spisovka(null);
+        $result = $Spisy->seznamRychly($args['where']);
+        $result->setRowClass(null);
+        $this->template->spisy = $result->fetchAll();
+    }
+    
     public function renderSeznamAjax($q)
     {
         $Spisy = new Spis();

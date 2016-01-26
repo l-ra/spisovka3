@@ -77,6 +77,12 @@ class Spis extends TreeModel
         return $this->nacti($params);
     }
 
+    public function seznamRychly($where)
+    {
+        $args = array('SELECT id, parent_id, typ, nazev FROM %n AS tb', $this->name, 'WHERE %and', $where, 'ORDER BY sekvence_string');
+        return dibi::query($args);
+    }
+    
     public function seznamDokumentu($spis_id)
     {
         if (empty($spis_id))
@@ -147,20 +153,19 @@ class Spis extends TreeModel
 
     private function spisovka_spisovna($args, $podminka)
     {
+        // Zrus prvni "slozku" nazvanou SPISY
+        $args['where'][] = 'NOT (tb.id = 1)'; 
         $args['where'][] = $podminka;
-
         return $this->omezeni_org($args);
     }
 
     public function spisovka($args)
     {
-
         return $this->spisovka_spisovna($args, "NOT (tb.typ = 'S' AND tb.stav > 2)");
     }
 
     public function spisovna($args)
     {
-
         return $this->spisovka_spisovna($args, "NOT (tb.typ = 'S' AND tb.stav < 3)");
     }
 

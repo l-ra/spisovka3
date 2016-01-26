@@ -6,19 +6,21 @@
     <title>Spisová služba - {block #title}{/block}</title>
     <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
     {css 'redmond/jquery-ui.min'}
+    {css 'jstree/default/style.min'}
     {css site}
     {css print, print}
     {css help_site}
 
     {js jquery-1.11.1.min}
     {js jquery-ui.min}
-    {js nette.ajax}
+    {js nette.ajax} {* nejsem si jist, jestli je vůbec někde použito *}
     <script type="text/javascript">
         var BASE_URL = '{!$baseUrl}';
         var PUBLIC_URL = '{!$publicUrl}';
     </script>
     {js script}
     {* js netteForms *}
+    
     {if isset($Select2)}
         {css select2}
         {js select2.min}

@@ -1,3 +1,4 @@
+{* Šablona pro vložení dokumentu do spisu *}
 <div class="blok_menu">
     <a href="{link novyform}" onclick="return dialog(this, 'Nový spis');">
     Vytvořit nový spis</a>
@@ -5,12 +6,12 @@
     Zobrazit seznam všech spisů</a>
 </div>
 Vyhledat spis: 
-<input type="hidden" class="spis_autocomplete" id='vyber_spisu_254' />
+<input type="hidden" class="spis_autocomplete" id='vyber_latte_1' />
 
 <script type="text/javascript">    
     initSpisAutocomplete();
-    $('#vyber_spisu_254').on("change", function(e) {
-        spisVybran(e.val);
+    $('#vyber_latte_1').on("change", function(e) {
+        spisVlozitDokument(e.val);
     });
 </script>
 

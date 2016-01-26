@@ -463,7 +463,11 @@ toggleWindow = function (elm) {
 
 };
 
-spisVybran = function (spis_id) {
+spisZobrazit = function (spis_id) {
+    window.location.href  = BASE_URL + 'spisy/' + spis_id + '/';
+};
+    
+spisVlozitDokument = function (spis_id) {
 
     showSpinner();
     var href = BASE_URL + 'spisy/' + spis_id + '/vlozit-dokument?dok_id=' + DOKUMENT_ID;
@@ -605,7 +609,7 @@ spisVytvoritSubmit = function (form) {
     postFormJ(form, function(data) {
         if (typeof data == 'object') {
             if (data.status == "OK")
-                spisVybran(data.id);
+                spisVlozitDokument(data.id);
         }
         else {
             $('#dialog').html(data);
