@@ -9,7 +9,8 @@
 :Spisovka:Spisy:novyform
 :Spisovka:Spisy:detail { "id": 8 }
 :Spisovka:Spisy:detail { "id": 8, "upravit": "info" }
-:Spisovka:Spisy:seznam
+:Spisovka:Spisy:strom
+:Spisovka:Spisy:strom2
 :Spisovka:Spisy:vyber
 :Spisovka:Sestavy:
 :Spisovka:Sestavy:nova
