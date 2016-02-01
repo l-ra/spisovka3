@@ -5,6 +5,8 @@ class Spis extends TreeModel
 
     const OTEVREN = 1;
     const UZAVREN = 0;
+    const PREDAN_DO_SPISOVNY = 2;
+    const VE_SPISOVNE = 3;
 
     protected $name = 'spis';
     protected $primary = 'id';
@@ -225,12 +227,11 @@ class Spis extends TreeModel
         }
 
         $data['stav'] = isset($data['stav']) ? $data['stav'] : 1;
-        //Nette\Diagnostics\Debugger::dump($data); exit;
 
         $spis_id = $this->vlozitH($data);
 
         $Log = new LogModel();
-        $Log->logSpis($spis_id, 41);
+        $Log->logSpis($spis_id, LogModel::SPIS_VYTVOREN);
 
         return $spis_id;
     }
@@ -267,26 +268,26 @@ class Spis extends TreeModel
 
         try {
             $this->upravitH($data, $spis_id);
-            $Log->logSpis($spis_id, 42);
+            $Log->logSpis($spis_id, LogModel::SPIS_ZMENEN);
         } catch (Exception $e) {
-            $Log->logSpis($spis_id, 48, 'Hodnoty spisu se nepodarilo upravit.');
+            $Log->logSpis($spis_id, LogModel::SPIS_CHYBA,
+                    'Hodnoty spisu se nepodarilo upravit.');
             throw $e;
         }
     }
 
     public function zmenitStav($spis_id, $stav)
     {
-
         if (!is_numeric($spis_id) || !is_numeric($stav))
-            return null;
+            return false;
 
-        if ($stav != 1) {
+        if ($stav === self::UZAVREN) {
             // Kontrola
             if ($kontrola = $this->kontrolaVyrizeniDokumentu($spis_id)) {
-                foreach ($kontrola as $kmess) {
-                    Nette\Environment::getApplication()->getPresenter()->flashMessage($kmess,
-                            'warning');
-                }
+                /* foreach ($kontrola as $kmess) {
+                  Nette\Environment::getApplication()->getPresenter()->flashMessage($kmess,
+                  'warning');
+                  } */
                 return -1;
             }
         }
@@ -298,17 +299,15 @@ class Spis extends TreeModel
 
         $Log = new LogModel();
         try {
-            $this->update($data, array('id=%i', $spis_id));
-
-            if ($stav == 1) {
-                $Log->logSpis($spis_id, 46);
-            } else {
-                $Log->logSpis($spis_id, 47);
-            }
-
+            $this->update($data, array('id = %i', $spis_id));
+            // Logování operací se spisy je nedodělané. Zde logování pracuje chybně
+            // při předávání do spisovny
+            $Log->logSpis($spis_id,
+                    $stav === self::OTEVREN ? LogModel::SPIS_OTEVREN : LogModel::SPIS_UZAVREN);
             return true;
         } catch (Exception $e) {
-            $Log->logSpis($spis_id, 48, 'Nepodařilo se změnit stav spisu. ' . $e->getMessage());
+            $Log->logSpis($spis_id, LogModel::SPIS_CHYBA,
+                    'Nepodařilo se změnit stav spisu. ' . $e->getMessage());
             return false;
         }
     }
@@ -511,7 +510,7 @@ class Spis extends TreeModel
             }
 
             // Predat do spisovny
-            $result = $this->zmenitStav($spis_id, 2);
+            $result = $this->zmenitStav($spis_id, self::PREDAN_DO_SPISOVNY);
             if (!$result)
                 throw new Exception();
 
@@ -573,14 +572,8 @@ class Spis extends TreeModel
         }
 
         // Pripojit do spisovny
-        $result = $this->zmenitStav($spis_id, 3);
-        if ($result) {
-            //$Log = new LogModel();
-            //$Log->logDokument($dokument_id, LogModel::DOK_SPISOVNA_PREDAN, 'Dokument předán do spisovny.');
-            return true;
-        } else {
-            return false;
-        }
+        $result = $this->zmenitStav($spis_id, self::VE_SPISOVNE);
+        return (bool) $result;
     }
 
     /**

@@ -140,7 +140,6 @@ class LogModel extends BaseModel
 
     public function logSpis($spis_id, $typ, $poznamka = "")
     {
-
         $row = array();
         $row['spis_id'] = (int) $spis_id;
         $row['typ'] = $typ;
@@ -150,11 +149,10 @@ class LogModel extends BaseModel
         $row['user_id'] = $user->id;
         $row['date'] = new DateTime();
 
-        return dibi::insert($this->tb_logspis, $row)
-                        ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
+        dibi::insert($this->tb_logspis, $row)->execute();
     }
 
-    /** **********************************************************************
+    /**     * *********************************************************************
      * Logovani pristupu
      */
     public function logAccess($user_id, $stav = 1)

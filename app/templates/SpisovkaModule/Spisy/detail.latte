@@ -30,8 +30,10 @@
        <a n:if="empty($Spis->orgjednotka_id)" href="{link privlastnit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis do vlastnictví</a>
        
        {if $Lze_menit }
-       <a n:if="$Spis->stav == Spis::OTEVREN" href="{link stav, 'id' => $Spis->id, 'stav' => 'uzavrit'}" onclick="return confirm('Opravdu chcete uzavřít tento spis?');">Uzavřít spis</a>
-       <a n:if="$Spis->stav == Spis::UZAVREN" href="{link stav, 'id' => $Spis->id, 'stav' => 'otevrit'}" onclick="return confirm('Opravdu chcete otevřít tento spis?');">Otevřít spis</a>
+       <a n:if="$Spis->stav == Spis::OTEVREN" href="{link stav, 'id' => $Spis->id, 'stav' => 'uzavrit'}"
+          {* onclick="return confirm('Opravdu chcete uzavřít tento spis?');" *}>Uzavřít spis</a>
+       <a n:if="$Spis->stav == Spis::UZAVREN" href="{link stav, 'id' => $Spis->id, 'stav' => 'otevrit'}"
+          {* onclick="return confirm('Opravdu chcete otevřít tento spis?');" *}>Otevřít spis</a>
        <a n:if="$Spis->stav == Spis::UZAVREN && Spis::lzePredatDoSpisovny($Spis->id)"
           href="{link predatDoSpisovny, 'id' => $Spis->id}">Předat do spisovny</a>
        {/if}        

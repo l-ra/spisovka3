@@ -1169,7 +1169,7 @@ class Workflow extends BaseModel
             }
 
             // Predat do spisovny
-            $spis_model->zmenitStav($spis_id, 0);
+            $spis_model->zmenitStav($spis_id, Spis::UZAVREN);
 
             dibi::commit();
             return true;

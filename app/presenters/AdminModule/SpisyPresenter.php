@@ -184,7 +184,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     public function actionStav()
     {
-
         $spis_id = $this->getParameter('id');
         $stav = $this->getParameter('stav');
 
@@ -192,18 +191,18 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
         switch ($stav) {
             case 'uzavrit':
-                $stav = $Spis->zmenitStav($spis_id, 0);
+                $stav = $Spis->zmenitStav($spis_id, Spis::UZAVREN);
                 if ($stav === -1) {
                     $this->flashMessage('Spis nelze uzavřít. Jeden nebo více dokumentů nejsou vyřízeny.',
                             'warning');
                 } else if ($stav) {
                     $this->flashMessage('Spis byl uzavřen.');
                 } else {
-                    $this->flashMessage('Spis se nepodařilo uzavřit.', 'error');
+                    $this->flashMessage('Spis se nepodařilo uzavřít.', 'error');
                 }
                 break;
             case 'otevrit':
-                if ($Spis->zmenitStav($spis_id, 1)) {
+                if ($Spis->zmenitStav($spis_id, Spis::OTEVREN)) {
                     $this->flashMessage('Spis byl otevřen.');
                 } else {
                     $this->flashMessage('Spis se nepodařilo otevřít.', 'error');

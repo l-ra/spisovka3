@@ -415,36 +415,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
     }
 
-    public function actionStav()
-    {
-
-        $spis_id = $this->getParameter('id');
-        $stav = $this->getParameter('stav');
-
-        $Spis = new Spis();
-
-        switch ($stav) {
-            case 'uzavrit':
-                if ($Spis->zmenitStav($spis_id, 0)) {
-                    $this->flashMessage('Spis byl uzavřen.');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo uzavřit.', 'error');
-                }
-                break;
-            case 'otevrit':
-                if ($Spis->zmenitStav($spis_id, 1)) {
-                    $this->flashMessage('Spis byl otevřen.');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo otevřít.', 'error');
-                }
-                break;
-            default:
-                break;
-        }
-
-        $this->redirect(':Spisovka:Spisy:detail', array('id' => $spis_id));
-    }
-
     protected function createComponentUpravitForm()
     {
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');

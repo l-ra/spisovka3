@@ -621,38 +621,39 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->redirect('default');
     }
 
-    public function actionStav()
+    public function actionStav($id, $stav)
     {
-
-        $spis_id = $this->getParameter('id');
-        $stav = $this->getParameter('stav');
+        $spis_id = $id;
 
         $Spis = new Spis();
 
         switch ($stav) {
             case 'uzavrit':
-                $stav = $Spis->zmenitStav($spis_id, 0);
+                $spis = $Spis->getInfo($spis_id);
+                $kontrola = $Spis->kontrola($spis);
+                if ($kontrola)
+                    $this->flashMessage('Upozornění: Spis nemá vyplněny všechny povinné údaje.', 'warning');
+                
+                $stav = $Spis->zmenitStav($spis_id, Spis::UZAVREN);
                 if ($stav === -1) {
                     $this->flashMessage('Spis nelze uzavřít. Jeden nebo více dokumentů nejsou vyřízeny.',
                             'warning');
                 } else if ($stav) {
                     $this->flashMessage('Spis byl uzavřen.');
                 } else {
-                    $this->flashMessage('Spis se nepodařilo uzavřit.', 'error');
+                    $this->flashMessage('Spis se nepodařilo uzavřít.', 'error');
                 }
                 break;
             case 'otevrit':
-                if ($Spis->zmenitStav($spis_id, 1)) {
+                if ($Spis->zmenitStav($spis_id, Spis::OTEVREN)) {
                     $this->flashMessage('Spis byl otevřen.');
                 } else {
                     $this->flashMessage('Spis se nepodařilo otevřít.', 'error');
                 }
                 break;
-            default:
-                break;
         }
 
-        $this->redirect(':Spisovka:Spisy:detail', array('id' => $spis_id));
+        $this->redirect('detail', array('id' => $spis_id));
     }
 
     public function vytvoritAjaxClicked(Nette\Application\UI\Form $form, $data)
