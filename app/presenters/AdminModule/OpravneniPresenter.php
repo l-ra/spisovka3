@@ -105,8 +105,6 @@ class Admin_OpravneniPresenter extends BasePresenter
                 ->setValue(@$role->note);
         $form1->addSelect('parent_id', 'Dědí z role:', $role_select)
                 ->setValue(is_null(@$role->parent_id) ? 0 : @$role->parent_id );
-        $form1->addHidden('parent_id_old')
-                ->setValue(@$role->parent_id);
 
         $form1->addSubmit('upravit', 'Upravit')
                 ->onClick[] = array($this, 'upravitClicked');

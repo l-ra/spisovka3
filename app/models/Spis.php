@@ -222,10 +222,6 @@ class Spis extends TreeModel
             $data['parent_id'] = 1;
         if (empty($data['parent_id']))
             $data['parent_id'] = 1;
-        if (!isset($data['parent_id_old']))
-            $data['parent_id_old'] = 1;
-        if (empty($data['parent_id_old']))
-            $data['parent_id_old'] = 1;
 
         if (empty($data['skartacni_lhuta']))
             $data['skartacni_lhuta'] = 10;

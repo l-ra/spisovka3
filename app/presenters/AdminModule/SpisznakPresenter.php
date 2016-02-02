@@ -168,8 +168,6 @@ class Admin_SpisznakPresenter extends BasePresenter
 
         $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam)
                 ->setValue(@$spisznak->parent_id);
-        $form1->addHidden('parent_id_old')
-                ->setValue(@$spisznak->parent_id);
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select)
                 ->setValue(@$spisznak->stav);
 

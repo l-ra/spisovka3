@@ -188,10 +188,10 @@ class TreeModel extends BaseModel
             $sekvence_string = isset($data['sekvence_string']) ? $data['sekvence_string'] : $data[$this->nazev_sekvence];
             unset($data['sekvence_string']);
 
-            $info = $this->select(array(array('id=%i', $id)))->fetch();
+            $old_record = $this->select([['id = %i', $id]])->fetch();
 
             if (isset($data['spisovy_znak_format'])) {
-                $part = explode(".", $info->{$this->nazev_sekvence});
+                $part = explode(".", $old_record->{$this->nazev_sekvence});
                 if (count($part) > 0) {
                     foreach ($part as $pi => $pn) {
                         if (is_numeric($pn)) {
@@ -203,14 +203,8 @@ class TreeModel extends BaseModel
                 $info_nazev_sekvence = implode(".", $part);
                 unset($data['spisovy_znak_format']);
             } else {
-                $info_nazev_sekvence = $info->{$this->nazev_sekvence};
+                $info_nazev_sekvence = $old_record->{$this->nazev_sekvence};
             }
-
-            $parent_id_old = null;
-            if (isset($data['parent_id_old']) && !empty($data['parent_id_old'])) {
-                $parent_id_old = $data['parent_id_old'];
-            }
-            unset($data['parent_id_old']);
 
             if ($data['parent_id'] == 0)
                 $data['parent_id'] = null;
@@ -220,6 +214,7 @@ class TreeModel extends BaseModel
             // 2. update tree
             $parent_id = $data['parent_id'];
 
+            $parent_id_old = $old_record->parent_id;
             if (empty($parent_id) && empty($parent_id_old)) {
                 $parent_id = 999;
                 $parent_id_old = 999;
@@ -287,9 +282,9 @@ class TreeModel extends BaseModel
                 // nochange parent
 
                 $data_node = array();
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'" . $info_nazev_sekvence . "." . $info->id . "','" . $sekvence_string . "." . $info->id . "')";
+                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'" . $info_nazev_sekvence . "." . $id . "','" . $sekvence_string . "." . $id . "')";
                 $this->update($data_node,
-                        array(array("sekvence_string LIKE %s", "%" . $info_nazev_sekvence . "." . $info->id . "%")));
+                        array(array("sekvence_string LIKE %s", "%" . $info_nazev_sekvence . "." . $id . "%")));
             }
 
             dibi::commit();

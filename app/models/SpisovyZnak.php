@@ -131,10 +131,6 @@ class SpisovyZnak extends TreeModel
             $data['parent_id'] = null;
         if (empty($data['parent_id']))
             $data['parent_id'] = null;
-        if (!isset($data['parent_id_old']))
-            $data['parent_id_old'] = null;
-        if (empty($data['parent_id_old']))
-            $data['parent_id_old'] = null;
 
         if ($data['skartacni_lhuta'] === '')
             $data['skartacni_lhuta'] = null;

@@ -85,7 +85,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $form1->addTextArea('note', 'Informace:', 50, 5);
         $form1->addSelect('stav', 'Stav:', array(0 => 'neaktivní', 1 => 'aktivní'));
         $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam);
-        $form1->addHidden('parent_id_old');
 
         if ($org !== null) {
             $form1['id']->setValue($org->id);
@@ -95,7 +94,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
             $form1['note']->setValue($org->note);
             $form1['stav']->setValue($org->stav);
             $form1['parent_id']->setValue($org->parent_id);
-            $form1['parent_id_old']->setValue($org->parent_id);
         }
         
         $form1->addSubmit('upravit', 'Upravit')
