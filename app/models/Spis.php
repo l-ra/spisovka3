@@ -192,8 +192,6 @@ class Spis extends TreeModel
     {
         $data['date_created'] = new DateTime();
         $data['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
-        $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
 
         $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
 
