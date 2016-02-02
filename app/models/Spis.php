@@ -190,8 +190,6 @@ class Spis extends TreeModel
 
     public function vytvorit($data)
     {
-
-        $data['datum_otevreni'] = new DateTime();
         $data['date_created'] = new DateTime();
         $data['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
         $data['date_modified'] = new DateTime();
@@ -205,10 +203,6 @@ class Spis extends TreeModel
             $data['parent_id'] = 1;
         if (empty($data['spisovy_znak']))
             $data['spisovy_znak'] = '';
-        if (empty($data['datum_uzavreni']))
-            $data['datum_uzavreni'] = null;
-        if (empty($data['datum_otevreni']))
-            $data['datum_otevreni'] = null;
 
         if (empty($data['skartacni_lhuta']))
             $data['skartacni_lhuta'] = 10;
@@ -259,8 +253,6 @@ class Spis extends TreeModel
             $data['skartacni_lhuta'] = 10;
         if (!empty($data['skartacni_lhuta']))
             $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
-        if (empty($data['datum_otevreni']))
-            $data['datum_otevreni'] = null;
         if (empty($data['datum_uzavreni']))
             $data['datum_uzavreni'] = null;
 
@@ -293,8 +285,11 @@ class Spis extends TreeModel
         }
 
         $data = array();
-        $data['date_modified'] = new DateTime();
+        $now = new DateTime();
+        $data['date_modified'] = $now;
         $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
+        if ($stav === self::UZAVREN)
+            $data['datum_uzavreni'] = $now;
         $data['stav'] = $stav;
 
         $Log = new LogModel();

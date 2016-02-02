@@ -31,41 +31,7 @@
     </div>
         {else}    
     <div class="detail_blok">
-        <div class="detail_hlavicka">Informace o spisu</div>
-        <dl>
-            <dt>Název spisu:</dt>
-            <dd>{$Spis->nazev}</dd>
-        </dl>
-        <dl>
-            <dt>Popis:</dt>
-            <dd>{$Spis->popis}</dd>
-        </dl>
-        <dl>
-            <dt>Spisový znak:</dt>
-            <dd>{$SpisZnak_nazev}</dd>
-        </dl>
-        <dl>
-            <dt>Skartační znak:</dt>
-            <dd>{$Spis->skartacni_znak}</dd>
-        </dl>
-        <dl>
-            <dt>Skartační lhůta:</dt>
-            <dd>{$Spis->skartacni_lhuta}</dd>
-        </dl>
-        <dl>
-            <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd>
-        </dl>
-        <dl>
-            <dt>Přidělen organizační jednotce:</dt>
-            <dd>{if !empty($Spis->orgjednotka_prideleno)}{$Spis->orgjednotka_prideleno->zkraceny_nazev}{else}(není přidělen k žádné organizační jednotce){/if}</dd>
-        </dl>         
-        <dl>
-            <dt>Stav:</dt>
-            <dd>
-                {=Spis::stav($Spis->stav)}
-            </dd>
-        </dl>
+        {include '../../SpisovkaModule/Spisy/detail-spis.latte'}
     </div>
         {/if}        
 

@@ -37,9 +37,6 @@ class SpisyPresenter extends BasePresenter
                 ->addCondition(Spisovka\Form::FILLED)
                 ->addRule(Spisovka\Form::INTEGER);
         $form->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
-        $form->addDatePicker('datum_otevreni', 'Datum otevření:')
-                ->setValue(date('d.m.Y'));
-        $form->addDatePicker('datum_uzavreni', 'Datum uzavření:');
 
         return $form;
     }
@@ -621,39 +618,38 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->redirect('default');
     }
 
-    public function actionStav($id, $stav)
+    public function actionOtevrit($id)
     {
-        $spis_id = $id;
-
-        $Spis = new Spis();
-
-        switch ($stav) {
-            case 'uzavrit':
-                $spis = $Spis->getInfo($spis_id);
-                $kontrola = $Spis->kontrola($spis);
-                if ($kontrola)
-                    $this->flashMessage('Upozornění: Spis nemá vyplněny všechny povinné údaje.', 'warning');
-                
-                $stav = $Spis->zmenitStav($spis_id, Spis::UZAVREN);
-                if ($stav === -1) {
-                    $this->flashMessage('Spis nelze uzavřít. Jeden nebo více dokumentů nejsou vyřízeny.',
-                            'warning');
-                } else if ($stav) {
-                    $this->flashMessage('Spis byl uzavřen.');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo uzavřít.', 'error');
-                }
-                break;
-            case 'otevrit':
-                if ($Spis->zmenitStav($spis_id, Spis::OTEVREN)) {
-                    $this->flashMessage('Spis byl otevřen.');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo otevřít.', 'error');
-                }
-                break;
+        $m = new Spis();
+        if ($m->zmenitStav($id, Spis::OTEVREN)) {
+            $this->flashMessage('Spis byl otevřen.');
+        } else {
+            $this->flashMessage('Spis se nepodařilo otevřít.', 'error');
         }
 
-        $this->redirect('detail', array('id' => $spis_id));
+        $this->redirect('detail', ['id' => $id]);
+    }
+
+    public function actionUzavrit($id)
+    {
+        $m = new Spis();
+        $spis = $m->getInfo($id);
+        $kontrola = $m->kontrola($spis);
+        if ($kontrola)
+            $this->flashMessage('Upozornění: Spis nemá vyplněny všechny povinné údaje.',
+                    'warning');
+
+        $stav = $m->zmenitStav($id, Spis::UZAVREN);
+        if ($stav === -1) {
+            $this->flashMessage('Spis nelze uzavřít. Jeden nebo více dokumentů nejsou vyřízeny.',
+                    'warning');
+        } else if ($stav) {
+            $this->flashMessage('Spis byl uzavřen.');
+        } else {
+            $this->flashMessage('Spis se nepodařilo uzavřít.', 'error');
+        }
+
+        $this->redirect('detail', ['id' => $id]);
     }
 
     public function vytvoritAjaxClicked(Nette\Application\UI\Form $form, $data)

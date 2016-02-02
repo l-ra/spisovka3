@@ -180,52 +180,11 @@ class Admin_SpisyPresenter extends SpisyPresenter
         }
     }
 
-    /* P.L. Pro pripad pridani funkce mazani spisu viz kod v SpisznakPresenter. */
-
-    public function actionStav()
-    {
-        $spis_id = $this->getParameter('id');
-        $stav = $this->getParameter('stav');
-
-        $Spis = new Spis();
-
-        switch ($stav) {
-            case 'uzavrit':
-                $stav = $Spis->zmenitStav($spis_id, Spis::UZAVREN);
-                if ($stav === -1) {
-                    $this->flashMessage('Spis nelze uzavřít. Jeden nebo více dokumentů nejsou vyřízeny.',
-                            'warning');
-                } else if ($stav) {
-                    $this->flashMessage('Spis byl uzavřen.');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo uzavřít.', 'error');
-                }
-                break;
-            case 'otevrit':
-                if ($Spis->zmenitStav($spis_id, Spis::OTEVREN)) {
-                    $this->flashMessage('Spis byl otevřen.');
-                } else {
-                    $this->flashMessage('Spis se nepodařilo otevřít.', 'error');
-                }
-                break;
-            default:
-                break;
-        }
-
-        $this->redirect(':Admin:Spisy:detail', array('id' => $spis_id));
-    }
-
-    public function renderImport()
-    {
-        
-    }
-
     public function renderExport()
     {
         if ($this->getHttpRequest()->isPost()) {
             // Exportovani
             $post_data = $this->getHttpRequest()->getPost();
-            //Nette\Diagnostics\Debugger::dump($post_data);
 
             $Spis = new Spis();
             $args = null;
@@ -237,7 +196,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
             $seznam = $Spis->seznam($args)->fetchAll();
 
             if ($seznam) {
-
                 if ($post_data['export_do'] == "csv") {
                     // export do CSV
                     $ignore_cols = array("date_created", "user_created", "date_modified", "user_modified",

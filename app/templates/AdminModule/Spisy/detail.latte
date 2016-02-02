@@ -15,45 +15,23 @@
     </a>        
 </div>     
 
-{if ($FormUpravit=='info')}
+{if ($FormUpravit == 'info')}
     <div class="detail_blok">
         <div class="detail_hlavicka">Info</div>
         {control upravitForm}
     </div>
 {else}
     <div class="detail_blok">
-        <div class="detail_hlavicka">Info</div>
-        <dl>
-            <dt>Typ spisu:</dt>
-            <dd>{=Spis::typSpisu($Spis->typ)}</dd><br />
-            <dt>Název:</dt>
-            <dd>{$Spis->nazev}</dd><br />
-            <dt>Popis:</dt>
-            <dd>{!$Spis->popis|escape|nl2br}</dd><br />
-            <dt>Spisový znak:</dt>
-            <dd>{$SpisZnak_nazev}</dd><br />
-            <dt>Skartační znak:</dt>
-            <dd>{$Spis->skartacni_znak}</dd><br />
-            <dt>Skartační lhůta:</dt>
-            <dd>{$Spis->skartacni_lhuta}</dd><br />
-            <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd><br />
-            <dt>Stav:</dt>
-            <dd>
-                {=Spis::stav($Spis->stav)}
-                &nbsp;&nbsp;
-                {if $Spis->stav==1}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{link :Admin:Spisy:stav, 'id'=>$Spis->id, 'stav'=>'uzavrit'}" onclick="return confirm('Opravdu chcete uzavřít tento spis?');">Uzavřít spis/složku</a>{/if}
-                {if $Spis->stav==0}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{link :Admin:Spisy:stav, 'id'=>$Spis->id, 'stav'=>'otevrit'}" onclick="return confirm('Opravdu chcete otevřít tento spis?');">Otevřít spis/složku</a>{/if}
-
-            </dd>
-        </dl>
-        <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit</a>
-        {if 0}
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="{link :Admin:Spisy:odebrat2, 'id'=>$Spis->id}" title="Odstraní tento spis/složku. Všechny jeho podřízené spisy odstraněny nebudou, ale budou přiřazeny nadřazenému spisu/složce." onclick="return confirm('Opravdu chcete odstranit tento spis/složku? Všechny podřízené spisy odstraněny nebudou, ale budou přiřazeny nadřazenému spisu/složce.');">Odebrat</a>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="{link :Admin:Spisy:odebrat1, 'id'=>$Spis->id}" title="Odstraní tento spis/složku včetně všech jeho podřízených spisů." onclick="return confirm('Opravdu chcete odstranit tento spis/složku včetně všech podřízených spisů?');">Odebrat včetně podřízených spisů</a>
+        {if $Spis->typ == 'S'}
+            {include '../../SpisovkaModule/Spisy/detail-spis.latte'}
+        {else}
+            <div class="detail_hlavicka">Složka</div>
+            <dl>
+                <dt>Název:</dt>
+                <dd>{$Spis->nazev}</dd><br />
+            </dl>
         {/if}
 
+        <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit</a>
     </div>
 {/if}

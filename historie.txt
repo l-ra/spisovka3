@@ -155,6 +155,9 @@ Spisová služba:
 - převzetí dokumentu ve spisu za specifických okolností vedlo ke zmizení ostatních 
   dokumentů ve spisu (dokumenty přestaly být v aplikaci vidět)
 - předání a přijetí spisu už nezpůsobí otevření už vyřízených dokumentů ve spisu
+- ve spisu již není údaj "datum otevření", aplikace místo toho zobrazuje datum
+  vytvoření spisu. Rovněž "datum uzavření" již nezadává uživatel, ale aplikace
+  jej nyní nastaví sama.
 - hledání dle způsobu vyřízení nefungovalo
 - odeslání dokumentu je limitováno počtem adresátů. Program nyní limit kontroluje
   a informuje uživatele. Limit je obvykle zhruba 55 adresátů.
