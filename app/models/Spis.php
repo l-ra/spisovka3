@@ -197,30 +197,10 @@ class Spis extends TreeModel
 
         $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
 
-        if (!isset($data['parent_id']))
-            $data['parent_id'] = 1;
         if (empty($data['parent_id']))
             $data['parent_id'] = 1;
-        if (empty($data['spisovy_znak']))
-            $data['spisovy_znak'] = '';
 
-        if (empty($data['skartacni_lhuta']))
-            $data['skartacni_lhuta'] = 10;
-        if (!empty($data['skartacni_lhuta']))
-            $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
-
-        if (empty($data['spisovy_znak_id'])) {
-            $data['spisovy_znak_id'] = null;
-        } else {
-            $data['spisovy_znak_id'] = (int) $data['spisovy_znak_id'];
-        }
-        if (empty($data['spousteci_udalost_id'])) {
-            $data['spousteci_udalost_id'] = null;
-        } else {
-            $data['spousteci_udalost_id'] = (int) $data['spousteci_udalost_id'];
-        }
-
-        $data['stav'] = isset($data['stav']) ? $data['stav'] : 1;
+        $data['stav'] = self::OTEVREN;
 
         $spis_id = $this->vlozitH($data);
 

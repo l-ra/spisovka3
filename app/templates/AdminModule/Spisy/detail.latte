@@ -17,8 +17,11 @@
 
 {if ($FormUpravit == 'info')}
     <div class="detail_blok">
-        <div class="detail_hlavicka">Info</div>
-        {control upravitForm}
+        {if $Spis->typ == 'S'}
+            {control upravitForm}
+        {else}
+            {control upravitSlozkuForm}
+        {/if}
     </div>
 {else}
     <div class="detail_blok">
@@ -27,8 +30,10 @@
         {else}
             <div class="detail_hlavicka">Složka</div>
             <dl>
-                <dt>Název:</dt>
+                <dt>Název složky:</dt>
                 <dd>{$Spis->nazev}</dd><br />
+                <dt>Popis:</dt>
+                <dd>{$Spis->popis}</dd><br />
             </dl>
         {/if}
 

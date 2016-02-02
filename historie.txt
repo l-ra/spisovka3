@@ -190,6 +190,7 @@ Administrace:
   nezadat číslo zákaznické karty
 - aplikace nyní při zadávání e-mailové adresy kontroluje její formát. Navíc 
   aktualizační skript adresy zkontroluje a chyby vypíše na obrazovku.
+- rozlišeno vytváření a editace spisů a složek pro spisy
 - opraven skript pro migraci ze spisové služby verze 2
 
 === Verze 3.4.1 ================================================================

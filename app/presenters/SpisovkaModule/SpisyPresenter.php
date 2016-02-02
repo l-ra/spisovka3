@@ -9,25 +9,22 @@ class SpisyPresenter extends BasePresenter
      */
     protected function createForm()
     {
-        $admin = strpos($this->name, 'Admin') !== false;
-
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
-        $Spisy = new Spis();
-        $params = array('where' => array("tb.typ = 'VS'"));
-        $spisy = $Spisy->selectBox(1, null, 1, $params);
+        $m = new Spis();
+        $params = ['where' => ["tb.typ = 'VS'"]];
+        $folders = $m->selectBox(1, null, 1, $params);
 
         $form = new Spisovka\Form();
 
-        if ($admin)
-            $form->addSelect('typ', 'Typ spisu:', Spis::typSpisu());
+        /* if ($admin)
+            $form->addSelect('typ', 'Typ spisu:', Spis::typSpisu()); */
 
-        $form->addText('nazev', $admin ? 'Název spisu/složky:' : 'Název spisu:', 50, 80)
+        $form->addText('nazev', /* $admin ? 'Název spisu/složky:' : */ 'Název spisu:', 50, 80)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
         $form->addText('popis', 'Popis:', 50, 200);
-        $form->addSelect('parent_id', 'Složka:', $spisy)
-                ->getControlPrototype()->onchange("return zmenitSpisovyZnak('novy');");
+        $form->addSelect('parent_id', 'Složka:', $folders);
 
         $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
         $form->getComponent('spisovy_znak_id');
@@ -95,7 +92,7 @@ class SpisyPresenter extends BasePresenter
         $this->redirect("default");
     }
 
-    public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
+    public function stornoClicked()
     {
         $id = $this->getParameter('id');
         if ($id !== null) {
@@ -125,6 +122,55 @@ class SpisyPresenter extends BasePresenter
         return $form;
     }
 
+    protected function createFolderForm()
+    {
+        $form = new Spisovka\Form();
+        
+        $m = new Spis();
+        $params = ['where' => ["tb.typ = 'VS'"]];
+        $folders = $m->selectBox(1, null, 1, $params);
+
+        $form->addHidden('typ', 'VS');
+        $form->addText('nazev', 'Název složky:', 50, 80)
+                ->addRule(Nette\Forms\Form::FILLED);
+        $form->addText('popis', 'Popis:', 50, 200);
+        $form->addSelect('parent_id', 'Složka:', $folders);
+        
+        return $form;
+    }
+    
+    protected function createComponentNovaSlozkaForm()
+    {
+        $form = $this->createFolderForm();
+
+        $form->addSubmit('vytvorit', 'Vytvořit');
+        $form->addSubmit('storno', 'Zrušit')
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
+
+        $form->onSuccess[] = array($this, 'vytvoritClicked');
+
+        return $form;
+    }
+    protected function createComponentUpravitSlozkuForm()
+    {
+        $form = $this->createFolderForm();
+        
+        $spis = isset($this->template->Spis) ? $this->template->Spis : null;
+        if ($spis)
+            foreach ($spis as $key => $value) {
+                if (isset($form[$key]))
+                    $form[$key]->setDefaultValue($value);
+            }
+            
+        $form->addSubmit('upravit', 'Upravit')
+                ->onClick[] = array($this, 'upravitClicked');
+        $form->addSubmit('storno', 'Zrušit')
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
+
+        return $form;
+    }
 }
 
 class Spisovka_SpisyPresenter extends SpisyPresenter
