@@ -31,11 +31,9 @@
             <td>
                 {!=str_repeat("&nbsp;", 10*$spis->uroven)}
                 {if $spis->typ=='VS'}
-                <img src="{$publicUrl}images/icons/folder_yellow.png" alt="Složka" title="Složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
-                {elseif $spis->typ=='SP'}
-                <img src="{$publicUrl}images/icons/folder_green.png" alt="Hlavní spis" title="Hlavní spis" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                    <img src="{$publicUrl}images/icons/folder_yellow.png" alt="Složka" title="Složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 {else}
-                <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
+                    <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 {/if}
                 &nbsp;&nbsp;
                 {if $spis->id != 1}

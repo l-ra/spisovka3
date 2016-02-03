@@ -38,21 +38,14 @@
             </td>
             {if $spis->typ=='VS'}
             <td colspan="6">
-                {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
+                {!=@str_repeat("&nbsp;", 10*($spis->uroven))}
                 <img src="{$publicUrl}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
-                &nbsp;&nbsp;
-                {$spis->nazev}                
-            </td>
-            {elseif $spis->typ=='SP'}
-            <td colspan="6">
-                {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
-                <img src="{$publicUrl}images/icons/folder_green.png" alt="Hlavní spis" title="Hlavní spis" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
                 {$spis->nazev}                
             </td>
             {else}
             <td>
-                {!=@str_repeat("&nbsp;", 10*($spis->uroven-1))}
+                {!=@str_repeat("&nbsp;", 10*($spis->uroven))}
                 <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 &nbsp;&nbsp;
                 <a href="{link :Spisovna:Spisy:detail, id => $spis->id}">{$spis->nazev}</a>

@@ -17,12 +17,16 @@ class TreeModel extends BaseModel
 
     public function getInfo($id)
     {
-
         $row = $this->select(array(array('id=%i', $id)));
         $result = $row->fetch();
         return $result;
     }
 
+    protected function getLevelExpression()
+    {
+        return "%sqlLENGTH(tb.sekvence) - LENGTH(REPLACE(tb.sekvence, '.', ''))";
+    }
+    
     /**
      * @param array $params
      * @return DibiResult
@@ -31,7 +35,7 @@ class TreeModel extends BaseModel
     {
         $sql = array(
             'from' => array($this->name => 'tb'),
-            'cols' => array('*', "%sqlLENGTH(tb.sekvence) - LENGTH(REPLACE(tb.sekvence, '.', ''))" => 'uroven'),
+            'cols' => array('*', $this->getLevelExpression() => 'uroven'),
             'leftJoin' => array()
         );
 

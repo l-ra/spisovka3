@@ -55,6 +55,11 @@ class Spis extends TreeModel
         return $row;
     }
 
+    protected function getLevelExpression()
+    {
+        return parent::getLevelExpression() . ' - 1';
+    }
+    
     /**
      * @return DibiResult
      */
@@ -63,6 +68,9 @@ class Spis extends TreeModel
         if (!empty($args['where']))
             $params['where'] = $args['where'];
 
+        // Zrus prvni "slozku" nazvanou SPISY
+        $params['where'][] = 'tb.id <> 1';
+        
         $params['leftJoin'] = array(
             'orgjednotka1' => array(
                 'from' => array($this->tb_orgjednotka => 'org1'),
@@ -160,8 +168,6 @@ class Spis extends TreeModel
 
     private function spisovka_spisovna($args, $podminka)
     {
-        // Zrus prvni "slozku" nazvanou SPISY
-        $args['where'][] = 'NOT (tb.id = 1)';
         $args['where'][] = $podminka;
         return $this->omezeni_org($args);
     }
