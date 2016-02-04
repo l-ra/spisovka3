@@ -1275,12 +1275,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addHidden('odpoved')
                 ->setValue($this->odpoved === true ? 1 : 0);
 
-        if ($this->typ_evidence == 'sberny_arch') {
-            $form->addText('poradi', 'Pořadí dokumentu ve sberném archu:', 4, 4)
-                            ->setValue(@$dok->poradi)
-                    ->controlPrototype->readonly = TRUE;
-        }
-
         if (isset($dok->nazev) && $dok->nazev == "(bez názvu)")
             $dok->nazev = "";
         $form->addText('nazev', 'Věc:', 80, 250)
