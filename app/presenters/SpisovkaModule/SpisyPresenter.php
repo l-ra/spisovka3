@@ -10,7 +10,7 @@ class SpisyPresenter extends BasePresenter
     protected function createForm()
     {
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
-        $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
+        $skar_znak = array('' => 'nezadán', 'A' => 'A', 'S' => 'S', 'V' => 'V');
 
         $m = new Spis();
         $params = ['where' => ["tb.typ = 'VS'"]];

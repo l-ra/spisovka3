@@ -198,8 +198,14 @@ class Spis extends TreeModel
     {
         $data['date_created'] = new DateTime();
         $data['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
-
         $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
+
+        if (empty($data['spisovy_znak_id']))
+            unset($data['spisovy_znak_id']);
+        if (empty($data['skartacni_znak']))
+            unset($data['skartacni_znak']);
+        if (isset($data['skartacni_lhuta']) && $data['skartacni_lhuta'] === '')
+            unset($data['skartacni_lhuta']);
 
         if (empty($data['parent_id']))
             $data['parent_id'] = 1;
@@ -216,25 +222,15 @@ class Spis extends TreeModel
 
     public function upravit($data, $spis_id)
     {
-
         $data['date_modified'] = new DateTime();
         $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
-
-        if (empty($data['spousteci_udalost_id']))
-            $data['spousteci_udalost_id'] = null;
-        if (empty($data['spisovy_znak_id']))
+        
+        if (isset($data['spisovy_znak_id']) && !$data['spisovy_znak_id'])
             $data['spisovy_znak_id'] = null;
-        if (!isset($data['parent_id']))
-            $data['parent_id'] = 1;
-        if (empty($data['parent_id']))
-            $data['parent_id'] = 1;
-
-        if (empty($data['skartacni_lhuta']))
-            $data['skartacni_lhuta'] = 10;
-        if (!empty($data['skartacni_lhuta']))
-            $data['skartacni_lhuta'] = (int) $data['skartacni_lhuta'];
-        if (empty($data['datum_uzavreni']))
-            $data['datum_uzavreni'] = null;
+        if (isset($data['skartacni_znak']) && !$data['skartacni_znak'])
+            $data['skartacni_znak'] = null;
+        if (isset($data['skartacni_lhuta']) && $data['skartacni_lhuta'] === '')
+            $data['skartacni_lhuta'] = null;
 
         $Log = new LogModel();
 
@@ -564,8 +560,8 @@ class Spis extends TreeModel
             $mess[] = "Spisový znak nemůže být prázdný.";
         if (empty($spis->skartacni_znak))
             $mess[] = "Skartační znak nemůže být prázdný.";
-        if ($spis->skartacni_lhuta === "")
-            $mess[] = "Skartační lhůta musí obsahovat hodnotu.";
+        if ($spis->skartacni_lhuta === null)
+            $mess[] = "Skartační lhůta musí být zadána.";
 
         return $mess ? : null;
     }

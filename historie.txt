@@ -155,6 +155,10 @@ Spisová služba:
 - převzetí dokumentu ve spisu za specifických okolností vedlo ke zmizení ostatních 
   dokumentů ve spisu (dokumenty přestaly být v aplikaci vidět)
 - předání a přijetí spisu už nezpůsobí otevření už vyřízených dokumentů ve spisu
+- spis byl dříve vytvářen s výchozím skartačním režimem A/10 nebo S/10. Nyní
+  pokud uživatel skartační režim nezadá, zůstane nevyplněn. Je potřeba jej 
+  vyplnit až před uzavřením spisu a jeho předáním do spisovny.
+  Poznámka: nevyplněná lhůta není to samé jako lhůta nula.
 - ve spisu již není údaj "datum otevření", aplikace místo toho zobrazuje datum
   vytvoření spisu. Rovněž "datum uzavření" již nezadává uživatel, ale aplikace
   jej nyní nastaví sama.

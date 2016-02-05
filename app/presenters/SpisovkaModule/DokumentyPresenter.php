@@ -757,13 +757,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                     $spis_new = array(
                         'nazev' => $cjednaci->cislo_jednaci,
-                        'popis' => "",
-                        /* 'spousteci_udalost_id' => 3, */
-                        'skartacni_znak' => 'S',
-                        'skartacni_lhuta' => '10',
+                        'popis' => '',
                         'typ' => 'S',
-                        'stav' => 1,
-                        'parent_id' => 1
                     );
                     $spis_id = $Spis->vytvorit($spis_new);
                     $spis = $Spis->getInfo($spis_id);
@@ -1373,34 +1368,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 $Log = new LogModel();
                 $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
-
-                // Vytvoreni spisu noveho archu
-                if ($this->typ_evidence == 'sberny_arch' && isset($data['cislo_jednaci'])) {
-
-                    $Spis = new Spis();
-                    $spis = $Spis->findByName($data['cislo_jednaci']);
-                    if (!$spis) {
-                        // vytvorime spis
-                        $spis_new = array(
-                            'parent_id' => 1,
-                            'nazev' => $data['cislo_jednaci'],
-                            'popis' => $data['popis'],
-                            'spousteci_udalost_id' => 3,
-                            'skartacni_znak' => 'S',
-                            'skartacni_lhuta' => '10',
-                            'typ' => 'S',
-                            'stav' => 1
-                        );
-                        $spis_id = $Spis->vytvorit($spis_new);
-                        $spis = $Spis->getInfo($spis_id);
-                    }
-
-                    // pripojime
-                    if ($spis) {
-                        $DokumentSpis = new DokumentSpis();
-                        $DokumentSpis->pripojit($dokument_id, $spis->id);
-                    }
-                }
 
                 if ($data['odpoved'] == 1) {
                     $this->flashMessage('Odpověď byla vytvořena.');
