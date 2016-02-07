@@ -144,7 +144,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         } else {
             $spisznak = $this->spisznak;
         }
-        $spisznak_seznam = $SpisovyZnak->selectBox(1, @$spisznak->id);
+        $spisznak_seznam = $SpisovyZnak->selectBox(1, ['exclude_id' => @$spisznak->id]);
         $stav_select = SpisovyZnak::stav();
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');

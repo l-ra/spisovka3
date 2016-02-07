@@ -72,7 +72,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         $org = isset($this->template->OrgJednotka) ? $this->template->OrgJednotka : null;
         $OrgJednotka = new Orgjednotka();
-        $org_seznam = $OrgJednotka->selectBox(1, @$org->id);
+        $org_seznam = $OrgJednotka->selectBox(1, ['exclude_id' => @$org->id]);
 
         $form1 = new Spisovka\Form();
         $form1->addHidden('id');

@@ -14,7 +14,7 @@ class SpisyPresenter extends BasePresenter
 
         $m = new Spis();
         $params = ['where' => ["tb.typ = 'VS'"]];
-        $folders = $m->selectBox(0, null, null, $params);
+        $folders = $m->selectBox(0, $params);
         $folders = [1 => '(hlavní větev)'] + $folders;
 
         $form = new Spisovka\Form();
@@ -133,15 +133,13 @@ class SpisyPresenter extends BasePresenter
         
         $m = new Spis();
         $params = ['where' => ["tb.typ = 'VS'"]];
-        $exclude_id = null;
         if ($upravit) {
             $folder_id = $this->getParameter('id');
             if (!is_numeric($folder_id))
                 return null; // ochrana před útokem
-            $params['where'][] = "sekvence NOT LIKE '%.$folder_id.%'";
-            $exclude_id = $folder_id;
+            $params['exclude_id'] = $folder_id;
         }
-        $folders = $m->selectBox(0, $exclude_id, null, $params);
+        $folders = $m->selectBox(0, $params);
         $folders = [1 => '(hlavní větev)'] + $folders;
         
         $form->addHidden('typ', 'VS');

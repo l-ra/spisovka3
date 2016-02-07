@@ -26,7 +26,7 @@ class TreeModel extends BaseModel
     {
         return "%sqlLENGTH(tb.sekvence) - LENGTH(REPLACE(tb.sekvence, '.', ''))";
     }
-    
+
     /**
      * @param array $params
      * @return DibiResult
@@ -40,7 +40,7 @@ class TreeModel extends BaseModel
         );
 
         if (!empty($params['parent_id'])) {
-            $parent_id = $params['parent_id'];            
+            $parent_id = $params['parent_id'];
             $sql['leftJoin'] = array(
                 'parent' => array(
                     'from' => array($this->name => 'tbp'),
@@ -78,59 +78,47 @@ class TreeModel extends BaseModel
      * @param int $type   0 - žádné další úpravy
      *                    1 - přidání položky '(hlavní větev)'
      *                    2 - výběr spis. znaku
-     * @param int $exclude_id   slouží k vynechání položky z tímto ID ze seznamu
-     * @param int $parent_id    je též vynecháno. Omezí výsledek na podstrom.
-     *                          NEPOUŽITO v současnosti v aplikaci
-     * @param array $params     slouží k filtrování položek (např. k výběru složek v tabulce "spisů")
+     * @param array $params    slouží k filtrování položek (např. k výběru složek v tabulce "spisů")
+     *                 $params['exclude_id]  slouží k vynechání položky z tímto ID ze seznamu
+     *                 $params['parent_id']
      * @return array
      */
-    public function selectBox($type = 0, $exclude_id = null, $parent_id = null, $params = null)
+    public function selectBox($type = 0, $params = [])
     {
         $result = array();
-            
+
         if ($type == 1) {
-            $result[$parent_id ?: 0] = '(hlavní větev)';
+            $result[0] = '(hlavní větev)';
         } else if ($type == 2) {
             $result[0] = 'vyberte z nabídky ...';
         }
 
-        if ($parent_id !== null)
-            $params['parent_id'] = $parent_id;
-        
-        $rows = $this->nacti($params);
-        if (count($rows)) {
-            $parent_sekvence = null;
-            
-            foreach ($rows as $row) {
-                if ($row->id == $exclude_id) {
-                    $parent_sekvence = $row->sekvence;
-                    continue;
-                }
+        $dibi_result = $this->nacti($params);
 
-                if ($row->id == $parent_id) {
-                    $parent_sekvence = $row->sekvence;
-                    continue;
-                }
+        $parent_sekvence = null;
+        foreach ($dibi_result as $row) {
+            if (isset($params['exclude_id']) && $row->id == $params['exclude_id']) {
+                $parent_sekvence = $row->sekvence;
+                continue;
+            }
 
-                if (!empty($parent_sekvence) && strpos($row->sekvence, $parent_sekvence) !== false) {
-                    continue;
-                }
+            if ($parent_sekvence && strpos($row->sekvence, $parent_sekvence) !== false)
+                continue;
 
-                $popis = "";
-                if (!empty($row->popis))
-                    $popis = " - " . \Nette\Utils\Strings::truncate($row->popis, 90);
-                $text = str_repeat("...", $row->uroven) . ' ' . $row->{$this->nazev} . $popis;
-                
-                if ($type == 2) {
-                    // spisové znaky
-                    // vrať pole HTML elementů kvůli funkci znemožnění výběru neaktivních položek
-                    $option = \Nette\Utils\Html::el('option')->value($row->id)->setHtml($text);
-                    if ($row->stav == 0)
-                        $option->disabled(true); 
-                    $result[$row->id] = $option;
-                } else {
-                    $result[$row->id] = $text;
-                }
+            $popis = "";
+            if (!empty($row->popis))
+                $popis = " - " . \Nette\Utils\Strings::truncate($row->popis, 90);
+            $text = str_repeat("...", $row->uroven) . ' ' . $row->{$this->nazev} . $popis;
+
+            if ($type == 2) {
+                // spisové znaky
+                // vrať pole HTML elementů kvůli funkci znemožnění výběru neaktivních položek
+                $option = \Nette\Utils\Html::el('option')->value($row->id)->setHtml($text);
+                if ($row->stav == 0)
+                    $option->disabled(true);
+                $result[$row->id] = $option;
+            } else {
+                $result[$row->id] = $text;
             }
         }
 
