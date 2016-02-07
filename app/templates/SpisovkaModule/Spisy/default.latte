@@ -40,7 +40,7 @@
                     {control bulkAction:checkbox $spis->id}
                 {/if}
             </td>
-            {if $spis->typ=='VS'}
+            {if $spis->typ == 'F'}
             <td colspan="7">
                 {!=@str_repeat("&nbsp;", 10 * ($spis->uroven))}
                 <img src="{$publicUrl}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />

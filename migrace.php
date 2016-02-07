@@ -456,7 +456,7 @@ if ( count($S2_spisy)>0 ) {
                 'spisovy_znak_id' => null,
                 'nazev' => 'SPISY',
                 'popis' => '',
-                'typ' => 'VS',
+                'typ' => 'F',
                 'sekvence' => 1,
                 'sekvence_string' => 'SPISY.1',
                 'skartacni_znak' => 'V',

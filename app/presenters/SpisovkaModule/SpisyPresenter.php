@@ -13,16 +13,13 @@ class SpisyPresenter extends BasePresenter
         $skar_znak = array('' => 'nezadán', 'A' => 'A', 'S' => 'S', 'V' => 'V');
 
         $m = new Spis();
-        $params = ['where' => ["tb.typ = 'VS'"]];
+        $params = ['where' => ["tb.typ = 'F'"]];
         $folders = $m->selectBox(0, $params);
         $folders = [1 => '(hlavní větev)'] + $folders;
 
         $form = new Spisovka\Form();
 
-        /* if ($admin)
-            $form->addSelect('typ', 'Typ spisu:', Spis::typSpisu()); */
-
-        $form->addText('nazev', /* $admin ? 'Název spisu/složky:' : */ 'Název spisu:', 50, 80)
+        $form->addText('nazev', 'Název spisu:', 50, 80)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
         $form->addText('popis', 'Popis:', 50, 200);
         $form->addSelect('parent_id', 'Složka:', $folders);
@@ -132,7 +129,7 @@ class SpisyPresenter extends BasePresenter
         $form = new Spisovka\Form();
         
         $m = new Spis();
-        $params = ['where' => ["tb.typ = 'VS'"]];
+        $params = ['where' => ["tb.typ = 'F'"]];
         if ($upravit) {
             $folder_id = $this->getParameter('id');
             if (!is_numeric($folder_id))
@@ -142,7 +139,7 @@ class SpisyPresenter extends BasePresenter
         $folders = $m->selectBox(0, $params);
         $folders = [1 => '(hlavní větev)'] + $folders;
         
-        $form->addHidden('typ', 'VS');
+        $form->addHidden('typ', 'F');
         $form->addText('nazev', 'Název složky:', 50, 80)
                 ->addRule(Nette\Forms\Form::FILLED);
         $form->addText('popis', 'Popis:', 50, 200);

@@ -20,7 +20,7 @@
         <tr>
             <td>
                 {!=str_repeat("&nbsp;", 5*$spis->uroven)}
-                {if $spis->typ=='VS'}
+                {if $spis->typ == 'F'}
                 <img src="{$publicUrl}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
                 {$spis->nazev}

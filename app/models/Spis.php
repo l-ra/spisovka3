@@ -601,25 +601,6 @@ class Spis extends TreeModel
         return $mess ? : null;
     }
 
-    public static function typSpisu($typ = null, $sklonovat = 0)
-    {
-
-        $typ_array1 = array('S' => 'spis',
-            'VS' => 'složka'
-        );
-        $typ_array2 = array('S' => 'spisu',
-            'VS' => 'složky'
-        );
-
-        $typ_array = ($sklonovat == 1) ? $typ_array2 : $typ_array1;
-
-        if (is_null($typ)) {
-            return $typ_array;
-        } else {
-            return array_key_exists($typ, $typ_array) ? $typ_array[$typ] : null;
-        }
-    }
-
     public static function stav($stav = null)
     {
 

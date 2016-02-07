@@ -83,3 +83,5 @@ Nové nastavení "Zobrazit zapůjčené dokumenty ve spisovně"
 Přidání kontroly vazby mezi dokumentem a spisovým znakem.
 [1010]
 Zrušení tabulek dokument_historie, osoba_historie a subjekt_historie.
+[1050]
+Jiný znakový kód pro složky spisů.

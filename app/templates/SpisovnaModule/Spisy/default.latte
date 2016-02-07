@@ -36,16 +36,16 @@
             <td class="akce">
                 &nbsp;
             </td>
-            {if $spis->typ=='VS'}
+            {if $spis->typ == 'F'}
             <td colspan="6">
-                {!=@str_repeat("&nbsp;", 10*($spis->uroven))}
+                {!=@str_repeat("&nbsp;", 10 * ($spis->uroven))}
                 <img src="{$publicUrl}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
                 &nbsp;&nbsp;
                 {$spis->nazev}                
             </td>
             {else}
             <td>
-                {!=@str_repeat("&nbsp;", 10*($spis->uroven))}
+                {!=@str_repeat("&nbsp;", 10 * ($spis->uroven))}
                 <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 &nbsp;&nbsp;
                 <a href="{link :Spisovna:Spisy:detail, id => $spis->id}">{$spis->nazev}</a>
