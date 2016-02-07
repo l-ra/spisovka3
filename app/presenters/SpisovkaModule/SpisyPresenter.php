@@ -14,7 +14,8 @@ class SpisyPresenter extends BasePresenter
 
         $m = new Spis();
         $params = ['where' => ["tb.typ = 'VS'"]];
-        $folders = $m->selectBox(1, null, 1, $params);
+        $folders = $m->selectBox(0, null, null, $params);
+        $folders = [1 => '(hlavní větev)'] + $folders;
 
         $form = new Spisovka\Form();
 
@@ -122,14 +123,27 @@ class SpisyPresenter extends BasePresenter
         return $form;
     }
 
-    protected function createFolderForm()
+    /**
+     * @param boolean $upravit - formulář upravit složku nebo nová složka
+     * @return \Spisovka\Form
+     */
+    protected function createFolderForm($upravit)
     {
         $form = new Spisovka\Form();
         
         $m = new Spis();
         $params = ['where' => ["tb.typ = 'VS'"]];
-        $folders = $m->selectBox(1, null, 1, $params);
-
+        $exclude_id = null;
+        if ($upravit) {
+            $folder_id = $this->getParameter('id');
+            if (!is_numeric($folder_id))
+                return null; // ochrana před útokem
+            $params['where'][] = "sekvence NOT LIKE '%.$folder_id.%'";
+            $exclude_id = $folder_id;
+        }
+        $folders = $m->selectBox(0, $exclude_id, null, $params);
+        $folders = [1 => '(hlavní větev)'] + $folders;
+        
         $form->addHidden('typ', 'VS');
         $form->addText('nazev', 'Název složky:', 50, 80)
                 ->addRule(Nette\Forms\Form::FILLED);
@@ -141,7 +155,7 @@ class SpisyPresenter extends BasePresenter
     
     protected function createComponentNovaSlozkaForm()
     {
-        $form = $this->createFolderForm();
+        $form = $this->createFolderForm(false);
 
         $form->addSubmit('vytvorit', 'Vytvořit');
         $form->addSubmit('storno', 'Zrušit')
@@ -152,9 +166,10 @@ class SpisyPresenter extends BasePresenter
 
         return $form;
     }
+    
     protected function createComponentUpravitSlozkuForm()
     {
-        $form = $this->createFolderForm();
+        $form = $this->createFolderForm(true);
         
         $spis = isset($this->template->Spis) ? $this->template->Spis : null;
         if ($spis)

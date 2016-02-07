@@ -80,6 +80,7 @@ class TreeModel extends BaseModel
      *                    2 - výběr spis. znaku
      * @param int $exclude_id   slouží k vynechání položky z tímto ID ze seznamu
      * @param int $parent_id    je též vynecháno. Omezí výsledek na podstrom.
+     *                          NEPOUŽITO v současnosti v aplikaci
      * @param array $params     slouží k filtrování položek (např. k výběru složek v tabulce "spisů")
      * @return array
      */
