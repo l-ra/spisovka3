@@ -93,7 +93,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     public function renderDefault()
     {
-        $this->forward('seznam');        
+        $this->redirect('seznam');        
     }
     
     public function renderSeznam($hledat = null)
@@ -255,4 +255,11 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->redirect('this', array('hledat' => $data['dotaz']));
     }
 
+    public function renderRebuild()
+    {
+        $m = new Spis();
+        $m->rebuildIndex();
+        $this->flashMessage('Operace proběhla úspěšně.');
+        $this->redirect('default');
+    }
 }

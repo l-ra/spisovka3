@@ -1,19 +1,21 @@
 <?php
 
-class TreeModel extends BaseModel
+abstract class TreeModel extends BaseModel
 {
 
+    const ORDERING_MAX_LENGTH = 30;
+
     protected $name;
-    protected $nazev = "nazev";
-    protected $nazev_sekvence = "nazev";
-    protected $primary = 'id';
 
-    /* public function  __construct($table) {
+    /**
+     *  Slouží pro generování seznamu pro select box
+     */
+    protected $column_name = "nazev";
 
-      $this->name = $table;
-
-      parent::__construct();
-      } */
+    /**
+     *  Slouží pro generování pole sekvence_string
+     */
+    protected $column_ordering = "nazev";
 
     public function getInfo($id)
     {
@@ -108,7 +110,7 @@ class TreeModel extends BaseModel
             $popis = "";
             if (!empty($row->popis))
                 $popis = " - " . \Nette\Utils\Strings::truncate($row->popis, 90);
-            $text = str_repeat("...", $row->uroven) . ' ' . $row->{$this->nazev} . $popis;
+            $text = str_repeat("...", $row->uroven) . ' ' . $row->{$this->column_name} . $popis;
 
             if ($type == 2) {
                 // spisové znaky
@@ -127,13 +129,14 @@ class TreeModel extends BaseModel
 
     public function vlozitH($data)
     {
-
         if (empty($data['parent_id']))
             $data['parent_id'] = null;
 
         dibi::begin();
         try {
-            $sekvence_string = isset($data['sekvence_string']) ? $data['sekvence_string'] : $data[$this->nazev_sekvence];
+            // vlastní $data['sekvence_string'] určuje pouze model spisového znaku
+            $sekvence_string = isset($data['sekvence_string']) ? $data['sekvence_string'] : substr($data[$this->column_ordering],
+                            0, self::ORDERING_MAX_LENGTH);
             unset($data['sekvence_string']);
 
             // 1. clasic insert
@@ -169,7 +172,6 @@ class TreeModel extends BaseModel
 
     public function upravitH($data, $id)
     {
-
         // 0. control param
         if (empty($id) || !is_numeric($id))
             throw new InvalidArgumentException('TreeModel::upravitH() - neplatný parameter "id"');
@@ -177,14 +179,14 @@ class TreeModel extends BaseModel
         // 1. clasic update
         dibi::begin();
         try {
-
-            $sekvence_string = isset($data['sekvence_string']) ? $data['sekvence_string'] : $data[$this->nazev_sekvence];
+            $sekvence_string = isset($data['sekvence_string']) ? $data['sekvence_string'] : substr($data[$this->column_ordering],
+                            0, self::ORDERING_MAX_LENGTH);
             unset($data['sekvence_string']);
 
             $old_record = $this->select([['id = %i', $id]])->fetch();
 
             if (isset($data['spisovy_znak_format'])) {
-                $part = explode(".", $old_record->{$this->nazev_sekvence});
+                $part = explode(".", $old_record->{$this->column_ordering});
                 if (count($part) > 0) {
                     foreach ($part as $pi => $pn) {
                         if (is_numeric($pn)) {
@@ -196,7 +198,8 @@ class TreeModel extends BaseModel
                 $info_nazev_sekvence = implode(".", $part);
                 unset($data['spisovy_znak_format']);
             } else {
-                $info_nazev_sekvence = $old_record->{$this->nazev_sekvence};
+                $info_nazev_sekvence = substr($old_record->{$this->column_ordering},
+                        0, self::ORDERING_MAX_LENGTH);
             }
 
             if ($data['parent_id'] == 0)
@@ -369,6 +372,59 @@ class TreeModel extends BaseModel
             $pass .= substr($salt, mt_rand() % $salt_len, 1);
         }
         return $pass;
+    }
+
+    /**
+     * Opraví případné chyby v zobrazení stromu tím, že znovu vytvoří pomocné informace
+     * v polích "sekvence" a "sekvence_string".
+     * @return boolean
+     * @throws Exception
+     */
+    public function rebuildIndex()
+    {
+        try {
+            dibi::begin();
+            $res = dibi::query("SELECT id, parent_id, {$this->column_ordering} AS order_by FROM {$this->name}");
+            $data = $res->fetchAssoc('id');
+
+            $processed = [];
+
+            foreach ($data as $id => &$row) {
+                if ($row->parent_id !== null)
+                    continue;
+                $processed[$id] = true;
+                $row->sekvence = $id;
+                $row->sekvence_string = substr($row->order_by, 0, self::ORDERING_MAX_LENGTH) . '.' . $id;
+            }
+
+            do {
+                $found_one = false;
+                foreach ($data as $id => &$row) {
+                    if (isset($processed[$id]))
+                        continue;
+                    if (!isset($processed[$row->parent_id]))
+                        continue; // parent node has not been processed
+                    $processed[$id] = true;
+                    $found_one = true;
+                    $row->sekvence = $data[$row->parent_id]->sekvence . '.' . $id;
+                    $row->sekvence_string = $data[$row->parent_id]->sekvence_string . '#'
+                            . substr($row->order_by, 0, self::ORDERING_MAX_LENGTH) . '.' . $id;
+                }
+            } while ($found_one);
+
+            foreach ($data as $id => $row) {
+                dibi::query("UPDATE [{$this->name}] SET [sekvence] = %s, [sekvence_string] = %s WHERE [id] = $id",
+                        $row->sekvence, $row->sekvence_string);
+            }
+            
+            dibi::commit();
+            
+            return true;
+        } catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
+
     }
 
 }

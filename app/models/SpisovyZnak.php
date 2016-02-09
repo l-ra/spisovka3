@@ -4,7 +4,6 @@ class SpisovyZnak extends TreeModel
 {
 
     protected $name = 'spisovy_znak';
-    protected $primary = 'id';
     protected $tb_spoudalost = 'spousteci_udalost';
 
     /**

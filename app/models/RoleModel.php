@@ -4,9 +4,8 @@ class RoleModel extends TreeModel
 {
 
     protected $name = 'user_role';
-    protected $nazev = 'name';
-    protected $nazev_sekvence = 'code';
-    protected $primary = 'id';
+    protected $column_name = 'name';
+    protected $column_ordering = 'code';
 
     public function getDefaultRole()
     {

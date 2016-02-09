@@ -4,9 +4,8 @@ class Orgjednotka extends TreeModel
 {
 
     protected $name = 'orgjednotka';
-    protected $nazev = 'zkraceny_nazev';
-    protected $nazev_sekvence = 'zkraceny_nazev';
-    protected $primary = 'id';
+    protected $column_name = 'zkraceny_nazev';
+    protected $column_ordering = 'zkraceny_nazev';
 
     public function getInfo($orgjednotka_id)
     {
