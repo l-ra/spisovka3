@@ -9,7 +9,6 @@ class Spis extends TreeModel
     const VE_SPISOVNE = 3;
 
     protected $name = 'spis';
-    protected $primary = 'id';
 
     public function getInfo($spis_id, $detail = false)
     {
@@ -94,6 +93,7 @@ class Spis extends TreeModel
 
     public function seznamRychly($where)
     {
+        $where[] = 'id <> 1'; // nepoužíváme metodu nacti(), takže musíme uvést podmínku zde ručně
         $args = array('SELECT id, parent_id, typ, nazev FROM %n AS tb', $this->name, 'WHERE %and', $where, 'ORDER BY sekvence_string');
         return dibi::query($args);
     }
