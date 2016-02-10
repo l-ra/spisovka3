@@ -101,7 +101,6 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->hledat = $hledat;
         
         $Spisy = new Spis();
-        $spis_id = null;
 
         $args = null;
         if (!empty($hledat)) {
@@ -114,7 +113,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
-        $result = $Spisy->seznam($args, $spis_id);
+        $result = $Spisy->seznam($args);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf

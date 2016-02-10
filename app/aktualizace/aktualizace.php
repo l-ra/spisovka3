@@ -86,12 +86,12 @@ foreach ($clients as $site_path => $site_name) {
     try {
         $client = new Client_To_Update($site_path);
 
-        $config = $client->get_db_config();
+        $db_config = $client->get_db_config();
 
         echo '<div class="dokument_blok">';
         echo '<dl>';
         echo '    <dt>Databáze:</dt>';
-        echo '    <dd>' . $config['driver'] . '://' . $config['username'] . '@' . $config['host'] . '/' . $config['database'] . '&nbsp;</dd>';
+        echo '    <dd>' . $db_config['driver'] . '://' . $db_config['username'] . '@' . $db_config['host'] . '/' . $db_config['database'] . '&nbsp;</dd>';
         echo '</dl>';
 
         $client->connect_to_db();
@@ -198,7 +198,7 @@ foreach ($clients as $site_path => $site_name) {
 
                     echo "<pre>";
                     foreach ($alter_scripts[$rev] as $query) {
-                        $query = str_replace("{tbls3}", $config['prefix'], $query);
+                        $query = str_replace("{tbls3}", $db_config['prefix'], $query);
 
                         if ($do_update) {
                             try {

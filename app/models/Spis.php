@@ -54,21 +54,20 @@ class Spis extends TreeModel
         return $row;
     }
 
+    /* Opraveno odstraněním "hlavního spisu".
+     * 
     protected function getLevelExpression()
     {
         return parent::getLevelExpression() . ' - 1';
-    }
+    } */
     
     /**
      * @return DibiResult
      */
-    public function seznam($args = null, $parent_id = null, $order_by = null)
+    public function seznam($args = null, $order_by = null)
     {
         if (!empty($args['where']))
             $params['where'] = $args['where'];
-
-        // Zrus prvni "slozku" nazvanou SPISY
-        $params['where'][] = 'tb.id <> 1';
         
         $params['leftJoin'] = array(
             'orgjednotka1' => array(
@@ -83,8 +82,6 @@ class Spis extends TreeModel
             ),
         );
 
-        if ($parent_id !== null)
-            $params['parent_id'] = $parent_id;
         if ($order_by)
             $params['order'] = $order_by;
 
@@ -93,7 +90,6 @@ class Spis extends TreeModel
 
     public function seznamRychly($where)
     {
-        $where[] = 'id <> 1'; // nepoužíváme metodu nacti(), takže musíme uvést podmínku zde ručně
         $args = array('SELECT id, parent_id, typ, nazev FROM %n AS tb', $this->name, 'WHERE %and', $where, 'ORDER BY sekvence_string');
         return dibi::query($args);
     }
@@ -200,15 +196,15 @@ class Spis extends TreeModel
         $data['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
         $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
 
+        if (empty($data['parent_id']))
+            unset($data['parent_id']);
+        
         if (empty($data['spisovy_znak_id']))
             unset($data['spisovy_znak_id']);
         if (empty($data['skartacni_znak']))
             unset($data['skartacni_znak']);
         if (isset($data['skartacni_lhuta']) && $data['skartacni_lhuta'] === '')
             unset($data['skartacni_lhuta']);
-
-        if (empty($data['parent_id']))
-            $data['parent_id'] = 1;
 
         $data['stav'] = self::OTEVREN;
 

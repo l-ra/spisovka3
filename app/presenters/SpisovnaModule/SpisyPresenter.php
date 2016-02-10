@@ -95,15 +95,9 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
     }
 
-    public function actionDefault()
-    {
-        
-    }
-
     public function renderDefault()
     {
         $Spisy = new Spis();
-        $spis_id = null;
 
         $args = null;
         $this->hledat = $this->getParameter('hledat', null);
@@ -119,7 +113,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                     : 20;
 
         $args = $Spisy->spisovna($args);
-        $result = $Spisy->seznam($args, $spis_id);
+        $result = $Spisy->seznam($args);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
@@ -169,7 +163,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $this->forward(':NoAccess:default');
 
         $Spisy = new Spis();
-        $spis_id = null;
 
         $args = null;
         if (!empty($hledat)) {
@@ -183,7 +176,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                     : 20;
 
         $args = $Spisy->spisovna_prijem($args);
-        $result = $Spisy->seznam($args, $spis_id);
+        $result = $Spisy->seznam($args);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf

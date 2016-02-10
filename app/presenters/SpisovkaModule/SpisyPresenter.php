@@ -15,7 +15,7 @@ class SpisyPresenter extends BasePresenter
         $m = new Spis();
         $params = ['where' => ["tb.typ = 'F'"]];
         $folders = $m->selectBox(0, $params);
-        $folders = [1 => '(hlavní větev)'] + $folders;
+        $folders = [0 => '(hlavní větev)'] + $folders;
 
         $form = new Spisovka\Form();
 
@@ -137,7 +137,7 @@ class SpisyPresenter extends BasePresenter
             $params['exclude_id'] = $folder_id;
         }
         $folders = $m->selectBox(0, $params);
-        $folders = [1 => '(hlavní větev)'] + $folders;
+        $folders = [0 => '(hlavní větev)'] + $folders;
         
         $form->addHidden('typ', 'F');
         $form->addText('nazev', 'Název složky:', 50, 80)
@@ -383,7 +383,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $args['where'][] = 'tb.stav = ' . Spis::UZAVREN;
             $order_by = 'nazev';
         }
-        $result = $Spisy->seznam($args, null, $order_by);
+        $result = $Spisy->seznam($args, $order_by);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf

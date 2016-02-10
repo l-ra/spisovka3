@@ -18,7 +18,7 @@
             'multiple' : false,
             'data' : [
         {foreach $spisy as $spis}
-{ id: {!$spis['id']}, parent: {!$spis['parent_id'] == 1 ? '"#"' : $spis['parent_id']}, text: {$spis['nazev']},
+{ id: {!$spis['id']}, parent: {$spis['parent_id'] ?: '#'}, text: {$spis['nazev']},
 icon: {!$spis['typ'] == 'F' ? '"icon-folder"' : '"icon-spis"'}},
         {/foreach}
             ]

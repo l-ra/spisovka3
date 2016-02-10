@@ -63,9 +63,13 @@ abstract class BaseModel extends Nette\Object
         return $prefix;
     }
 
-    public function __construct()
+    /**
+     * @param type $db_prefix  nutné pro volání z update skriptu, jinak
+     *                          aplikace spadne při volání Environmentu
+     */
+    public function __construct($db_prefix = null)
     {
-        $prefix = self::getDbPrefix();
+        $prefix = $db_prefix !== null ? $db_prefix : self::getDbPrefix();
         $this->name = $prefix . $this->name;
 
         foreach (get_object_vars($this) as $prop => $name)

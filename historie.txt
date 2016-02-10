@@ -96,6 +96,7 @@ Jiné změny:
   dokumentu, což se standardně děje při evidování e-mailu v e-podatelně.
   E-mail je součástí dokumentu v příloze, takže je zbytečné, aby byl
   ještě v poznámce.
+- z aplikace byl odstraněn tzv. "hlavní spis" s názvem SPISY
 - dokument již není možné začít vytvářet přímo ze spisu. Uživatel dokument musí
   nejprve vytvořit, poté jej teprve může vložit do spisu.
 - to samé platí pro funkci spojení dokumentů
