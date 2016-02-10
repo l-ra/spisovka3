@@ -79,10 +79,10 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
                 
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
-        $form1->addText('plny_nazev', 'Plný název jednotky:', 50, 200);
+        $form1->addText('plny_nazev', 'Úplný název jednotky:', 50, 200);
         $form1->addText('ciselna_rada', 'Zkratka / číselná řada:', 15, 30)
                 ->addRule(Nette\Forms\Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
-        $form1->addTextArea('note', 'Informace:', 50, 5);
+        $form1->addTextArea('note', 'Poznámka:', 50, 5);
         $form1->addSelect('stav', 'Stav:', array(0 => 'neaktivní', 1 => 'aktivní'));
         $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam);
 
@@ -149,10 +149,10 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $form1 = new Spisovka\Form();
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
-        $form1->addText('plny_nazev', 'Plný název jednotky:', 50, 200);
+        $form1->addText('plny_nazev', 'Úplný název jednotky:', 50, 200);
         $form1->addText('ciselna_rada', 'Zkratka / číselná řada:', 15, 30)
                 ->addRule(Nette\Forms\Form::FILLED, 'Číselná řada org. jednotky musí být vyplněno.');
-        $form1->addTextArea('note', 'Informace:', 50, 5);
+        $form1->addTextArea('note', 'Poznámka:', 50, 5);
         $form1->addSelect('parent_id', 'Nadřazená složka:', $org_seznam);
         $form1->addSubmit('novy', 'Vytvořit')
                 ->onClick[] = array($this, 'vytvoritClicked');
