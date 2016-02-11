@@ -412,7 +412,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                 $spis_ids[] = $spis->id;
                 // v seznamu uzavřených spisů je zobraz zarovnaně, ignoruj umístění ve stromu
                 if ($predat_do_spisovny)
-                    $spis->uroven = 1;
+                    $spis->uroven = 0;
             }
             $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
         } else {
