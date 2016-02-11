@@ -175,12 +175,14 @@ class Spis extends TreeModel
 
     public function spisovna($args)
     {
-        return $this->spisovka_spisovna($args, "NOT (tb.typ = 'S' AND tb.stav < 3)");
+        $ret = ['where' => ["NOT (tb.typ = 'S' AND tb.stav < 3)"]];
+        if ($args)
+            $ret['where'] = array_merge($ret['where'], $args['where']);
+        return $ret;
     }
 
     public function spisovna_prijem($args)
     {
-
         if (isset($args['where'])) {
             $args['where'][] = array("NOT (tb.typ = 'S' AND tb.stav <> 2)");
         } else {
