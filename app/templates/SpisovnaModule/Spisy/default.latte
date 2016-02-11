@@ -3,6 +3,12 @@
 
     <h2>Seznam spisů</h2>
 
+    <div id="search">
+        {control searchForm}
+    </div>
+    
+    {include 'menu.latte'}
+    
     <div id="tisk">
         <a href="{link this, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
             <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
@@ -12,10 +18,7 @@
         </a>        
     </div>    
     
-    <div id="search">
-        {control searchForm}
-    </div>
-    <br style="clear:both;" />
+    <div style="clear:both;" />
 
     <div id="dokumenty">
     {if count($seznam)>0}

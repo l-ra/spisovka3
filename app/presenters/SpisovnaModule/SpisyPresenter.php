@@ -496,4 +496,12 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $this->redirect('this', array('hledat' => $data['dotaz']));
     }
 
+    public function renderStrom()
+    {
+        $Spisy = new Spis();
+        $args = $Spisy->spisovna(null);
+        $result = $Spisy->seznamRychly($args['where']);
+        $result->setRowClass(null);
+        $this->template->spisy = $result->fetchAll();
+    }
 }

@@ -1,0 +1,6 @@
+{* Latte template *}
+
+{block content}
+<h2>Seznam spisů</h2>
+{include 'menu.latte'}
+{include '../../SpisovkaModule/Spisy/strom.latte', on_select => 'spisZobrazitSpisovna'}

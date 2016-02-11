@@ -2,7 +2,7 @@
 {block content}
 
     <h2>Seznam spisů</h2>
-    <div id="search" style="margin-top: 20px">
+    <div id="search">
         {control searchForm}
         <a n:if="$presenter->getParameter('hledat')" n:href="this" style="color:#ff0000;">Zrušit vyhledávání</a>    
     </div>

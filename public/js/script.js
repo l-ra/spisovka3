@@ -466,6 +466,9 @@ toggleWindow = function (elm) {
 spisZobrazit = function (spis_id) {
     window.location.href  = BASE_URL + 'spisy/' + spis_id + '/';
 };
+spisZobrazitSpisovna = function (spis_id) {
+    window.location.href  = BASE_URL + 'spisovna/spisy/' + spis_id + '/';
+};
     
 spisVlozitDokument = function (spis_id) {
 
