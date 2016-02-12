@@ -36,6 +36,8 @@ class Admin_SpecialPresenter extends BasePresenter
         try {
             dibi::begin();
 
+            /* Takto už import nikdy neřešit! Příště přepsat a volat metody modelu
+             * 
             $parent_id = 3911;
             $parent_sequence_string = dibi::query("SELECT sekvence_string FROM :PREFIX:spis WHERE id = $parent_id")->fetchSingle();
 //            $counter = 0;
@@ -52,7 +54,7 @@ class Admin_SpecialPresenter extends BasePresenter
                 // if (++$counter >= 10)
                 // break;
             }
-
+            */
             dibi::commit();
         } catch (Exception $e) {
             dibi::rollback();

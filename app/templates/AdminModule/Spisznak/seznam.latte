@@ -17,7 +17,7 @@
             <th>Spisový znak</th>
         </tr>
         {foreach $seznam as $spisznak}
-        <tr class="item{=str_replace("."," item",$spisznak->sekvence)}" id="sitem{$spisznak->id}">
+        <tr>
             <td>
                 {!=str_repeat("&nbsp;", 5*$spisznak->uroven)}
                 <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />

@@ -23,7 +23,7 @@
             <th>Zkratka / číselná řada</th>
         </tr>
         {foreach $seznam as $org}
-        <tr class="item{=str_replace(".", " item", $org->sekvence)}{if $org->stav != 1} item-noactive{/if}" id="sitem{$org->id}">
+        <tr {if $org->stav != 1}class="item-noactive"{/if}>
             <td>{!=str_repeat("&nbsp;", 5 * $org->uroven)}<a href="{link detail, 'id' => $org->id}"{if $org->stav != 1} style="color:#c0c0c0;"{/if}>{$org->zkraceny_nazev}</a></td>
             <td{if $org->stav != 1} style="color:#c0c0c0;"{/if}>{$org->plny_nazev}</td>
             <td{if $org->stav != 1} style="color:#c0c0c0;"{/if}>{$org->ciselna_rada}</td>

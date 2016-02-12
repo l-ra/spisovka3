@@ -114,7 +114,6 @@ class Orgjednotka extends TreeModel
 
     public static function childOrg($orgjednotka_id)
     {
-
         if (empty($orgjednotka_id))
             return null;
 
@@ -124,7 +123,7 @@ class Orgjednotka extends TreeModel
         $OrgJednotka = new Orgjednotka();
         $org_info = $OrgJednotka->getInfo($orgjednotka_id);
         if ($org_info) {
-            $fetch = $OrgJednotka->select(array(array('sekvence LIKE %s', $org_info->sekvence . '.%'), array('sekvence')));
+            $fetch = $OrgJednotka->select([['sekvence LIKE %s', $org_info->sekvence . '.%'], ['sekvence']]);
             $result = $fetch->fetchAll();
             if (count($result) > 0) {
                 foreach ($result as $res) {

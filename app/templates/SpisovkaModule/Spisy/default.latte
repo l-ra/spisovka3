@@ -34,7 +34,7 @@
             <th>Stav</th>            
         </tr>
         {foreach $seznam as $spis}
-        <tr class="item{=str_replace("."," item",$spis->sekvence)}" id="sitem{$spis->id}">
+        <tr>
             <td class="akce">
                 {if $spis->typ=='S' && $spis->stav == 0}
                     {control bulkAction:checkbox $spis->id}
