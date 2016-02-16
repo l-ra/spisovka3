@@ -139,6 +139,9 @@ abstract class TreeModel extends BaseModel
                             0, self::ORDERING_MAX_LENGTH);
             unset($data['sekvence_string']);
 
+            // Tato pole nemohou být prázdná, ale můžeme je naplnit až po vložení záznamu
+            $data['sekvence'] = $data['sekvence_string'] = '?';
+            
             // 1. clasic insert
             $id = $this->insert($data);
 
