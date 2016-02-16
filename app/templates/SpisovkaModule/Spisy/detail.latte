@@ -17,7 +17,7 @@
         </a>        
     </div>
         
-    <div class="dokument_blok_menu">
+    <div class="dokument_blok_menu" n:ifcontent>
        {if $Lze_menit }
        <a href="{link detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit spis</a>
        <a href="{link :Spisovka:Uzivatel:vyberspis, 'id'=>$user->id, 'spis_id'=>$Spis->id}" id="dialog-predatspis">Předat spis</a>
