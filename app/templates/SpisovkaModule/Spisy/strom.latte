@@ -1,4 +1,4 @@
-{default $on_select = 'spisVlozitDokument'}
+{default select_folders = false}
 {if count($spisy) == 0}
     <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
 {else}
@@ -11,8 +11,10 @@
     <script type="text/javascript">
         $('#tree-spisy').on('select_node.jstree', function (e, data) {
             // var id = data.selected;
-            if (data.node.icon == 'icon-spis')
-                {!$on_select}(data.node.id);
+            {if !empty($on_select)}
+                if (data.node.icon == 'icon-spis' || {$select_folders})
+                    {!$on_select}(data.node.id);
+            {/if}
         }).jstree({ 'core' : {
             'animation' : false,
             'multiple' : false,

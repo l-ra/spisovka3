@@ -88,9 +88,13 @@ class Spis extends TreeModel
         return $this->nacti($params);
     }
 
-    public function seznamRychly($where)
+    public function seznamRychly($where = null)
     {
-        $args = array('SELECT id, parent_id, typ, nazev FROM %n AS tb', $this->name, 'WHERE %and', $where, 'ORDER BY sekvence_string');
+        $args = ['SELECT id, parent_id, typ, nazev FROM %n AS tb', $this->name];
+        if (!empty($where))
+            array_push($args, 'WHERE %and', $where);
+        $args[] = 'ORDER BY sekvence_string';
+
         return dibi::query($args);
     }
 
@@ -138,7 +142,7 @@ class Spis extends TreeModel
         }
     }
 
-    private function omezeni_org($args)
+    private function omezeni_org(array $filter)
     {
         $user = Nette\Environment::getUser();
         $oj_id = Orgjednotka::dejOrgUzivatele();
@@ -146,7 +150,7 @@ class Spis extends TreeModel
         if ($user->isAllowed('Dokument', 'cist_vse'))
             ; // vsechny spisy bez ohledu na organizacni jednotku
         else if ($oj_id === null)
-            $args['where'][] = array("0");
+            $filter[] = array("0");
         else {
             if ($user->isAllowed(NULL, 'is_vedouci'))
                 $org_jednotky = Orgjednotka::childOrg($oj_id);
@@ -154,42 +158,30 @@ class Spis extends TreeModel
                 $org_jednotky = array($oj_id);
 
             if (count($org_jednotky) > 1)
-                $args['where'][] = array('tb.orgjednotka_id IN %in OR tb.orgjednotka_id_predano IN %in OR tb.orgjednotka_id IS NULL', $org_jednotky, $org_jednotky);
+                $filter[] = array('tb.orgjednotka_id IN %in OR tb.orgjednotka_id_predano IN %in OR tb.orgjednotka_id IS NULL', $org_jednotky, $org_jednotky);
             else
-                $args['where'][] = array('tb.orgjednotka_id = %i OR tb.orgjednotka_id_predano = %i OR tb.orgjednotka_id IS NULL', $org_jednotky, $org_jednotky);
+                $filter[] = array('tb.orgjednotka_id = %i OR tb.orgjednotka_id_predano = %i OR tb.orgjednotka_id IS NULL', $org_jednotky, $org_jednotky);
         }
 
-        return $args;
+        return $filter;
     }
 
-    private function spisovka_spisovna($args, $podminka)
+    public function spisovka(array $filter = [])
     {
-        $args['where'][] = $podminka;
-        return $this->omezeni_org($args);
+        $filter[] = "NOT (tb.typ = 'S' AND tb.stav > 2)";
+        return $this->omezeni_org($filter);
     }
 
-    public function spisovka($args)
+    public function spisovna(array $filter = [])
     {
-        return $this->spisovka_spisovna($args, "NOT (tb.typ = 'S' AND tb.stav > 2)");
+        $filter[] = "tb.stav = " . self::VE_SPISOVNE;
+        return $filter;
     }
 
-    public function spisovna($args)
+    public function spisovna_prijem(array $filter = [])
     {
-        $ret = ['where' => ["NOT (tb.typ = 'S' AND tb.stav < 3)"]];
-        if ($args)
-            $ret['where'] = array_merge($ret['where'], $args['where']);
-        return $ret;
-    }
-
-    public function spisovna_prijem($args)
-    {
-        if (isset($args['where'])) {
-            $args['where'][] = array("NOT (tb.typ = 'S' AND tb.stav <> 2)");
-        } else {
-            $args['where'] = array(array("NOT (tb.typ = 'S' AND tb.stav <> 2)"));
-        }
-
-        return $args;
+        $filter[] = "tb.stav = " . self::PREDAN_DO_SPISOVNY;
+        return $filter;
     }
 
     public function vytvorit($data)
@@ -715,17 +707,23 @@ class Spis extends TreeModel
     }
 
     /**
-     *  Hledá v otevřených spisech (stav = 1)
+     *  Hledá ve spisech podle zadaného filtru
      * @param string $title  část názvu spisu
+     * @param string $filter    spisovka|admin
      * @return DibiRow[]
      */
-    public function search($title)
-    {
-        $args = ['where' => [["nazev LIKE %s", "%$title%"], 'stav = 1']];
-        $args = $this->spisovka($args);
+    public function search($title, $filter)
+    {   
+        $args = [["nazev LIKE %s", "%$title%"]];
+        $user = \Nette\Environment::getUser();
+        $admin = $filter == 'admin' && $user->isAllowed('Admin_SpisyPresenter');
+        if (!$admin) {
+            $args[] = 'stav = ' . self::OTEVREN;
+            $args = $this->spisovka($args);
+        }
 
         $res = dibi::query('SELECT id, nazev as text FROM %n as tb WHERE %and ORDER by nazev',
-                        $this->name, $args['where']);
+                        $this->name, $args);
         return $res->fetchAll();
     }
 

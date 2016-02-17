@@ -99,11 +99,10 @@ class Spisovna_SpisyPresenter extends BasePresenter
     {
         $Spisy = new Spis();
 
-        $args = null;
+        $filter = [];
         $this->hledat = $this->getParameter('hledat', null);
-
         if (!empty($this->hledat)) {
-            $args = array('where' => array(array("tb.nazev LIKE %s", '%' . $this->hledat . '%')));
+            $filter = [["tb.nazev LIKE %s", '%' . $this->hledat . '%']];
         }
 
         $client_config = Nette\Environment::getVariable('client_config');
@@ -112,8 +111,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
-        $args = $Spisy->spisovna($args);
-        $result = $Spisy->seznam($args);
+        $filter = $Spisy->spisovna($filter);
+        $result = $Spisy->seznam(['where' => $filter]);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
@@ -164,10 +163,9 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
         $Spisy = new Spis();
 
-        $args = null;
-        if (!empty($hledat)) {
-            $args = array('where' => array(array("tb.nazev LIKE %s", '%' . $hledat . '%')));
-        }
+        $filter = [];
+        if (!empty($hledat))
+            $filter = [["tb.nazev LIKE %s", '%' . $hledat . '%']];
 
         $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
@@ -175,8 +173,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
-        $args = $Spisy->spisovna_prijem($args);
-        $result = $Spisy->seznam($args);
+        $filter = $Spisy->spisovna_prijem($filter);
+        $result = $Spisy->seznam(['where' => $filter]);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
@@ -499,8 +497,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
     public function renderStrom()
     {
         $Spisy = new Spis();
-        $args = $Spisy->spisovna(null);
-        $result = $Spisy->seznamRychly($args['where']);
+        $filter = $Spisy->spisovna();
+        $result = $Spisy->seznamRychly($filter);
         $result->setRowClass(null);
         $this->template->spisy = $result->fetchAll();
     }

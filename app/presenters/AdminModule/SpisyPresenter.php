@@ -98,6 +98,12 @@ class Admin_SpisyPresenter extends SpisyPresenter
     
     public function renderSeznam($hledat = null)
     {
+        $Spisy = new Spis();
+        $result = $Spisy->seznamRychly();
+        $result->setRowClass(null);
+        $this->template->spisy = $result->fetchAll();
+        
+        /*
         $this->hledat = $hledat;
         
         $Spisy = new Spis();
@@ -141,6 +147,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 1;            
         }
+         * 
+         */
     }
 
     public function renderDetail($id, $upravit)

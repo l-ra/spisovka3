@@ -5,14 +5,5 @@
     <a href="{link strom}" onclick="return dialog(this, 'Seznam spisů');">
     Zobrazit seznam všech spisů</a>
 </div>
-Vyhledat spis: 
-<input type="hidden" class="spis_autocomplete" id='vyber_latte_1' />
 
-<script type="text/javascript">    
-    initSpisAutocomplete();
-    $('#vyber_latte_1').on("change", function(e) {
-        spisVlozitDokument(e.val);
-    });
-</script>
-
-
+{include 'vyhledat-control.latte', action => 'spisVlozitDokument'}

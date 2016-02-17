@@ -1,20 +1,28 @@
+{var Select2 => true}
 {block title}Spisy{/block}
 {block content}
 
     <div class="navigate">Spisy</div>
     <h2>Seznam spisů</h2>
     
-    <div id="search">
+    {* <div id="search">
         {control searchForm}
         <a n:if="$presenter->hledat" n:href="seznam" style="color:#ff0000;">Zrušit vyhledávání</a>    
-    </div>
+    </div> *}
 
     <div class="blok_menu">
         <a href="{link :Admin:Spisy:novy}">Nový spis</a>
         <a href="{link :Admin:Spisy:novaSlozka}">Nová složka</a>
         <a href="{link :Admin:Spisy:export}">Export</a>          
     </div>
-
+    
+    {include '../../SpisovkaModule/Spisy/vyhledat-control.latte', 
+        action => 'spisZobrazitAdministrace', filter => 'admin'}
+    
+    {include '../../SpisovkaModule/Spisy/strom.latte',
+        on_select => 'spisZobrazitAdministrace', select_folders => true}
+    
+    {*
     <div id="tisk">
         <a href="{link this, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
             <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
@@ -49,3 +57,4 @@
     {else}
     <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
     {/if}
+    *}

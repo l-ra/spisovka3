@@ -469,6 +469,9 @@ spisZobrazit = function (spis_id) {
 spisZobrazitSpisovna = function (spis_id) {
     window.location.href  = BASE_URL + 'spisovna/spisy/' + spis_id + '/';
 };
+spisZobrazitAdministrace = function (spis_id) {
+    window.location.href  = BASE_URL + 'admin/spisy/detail/' + spis_id + '/';
+};
     
 spisVlozitDokument = function (spis_id) {
 
@@ -1068,12 +1071,14 @@ postFormJ = function (form, callback) {
     $.post(form.attr('action'), form.serialize(), callback);
 };
 
-initSpisAutocomplete = function() {
+initSpisAutocomplete = function(filter) {
+    filter = filter || 'spisovka';
+    var url = BASE_URL + 'spisy/seznamAjax?filter=' + filter;
     $('.spis_autocomplete').select2({
         width: '500px',
         minimumInputLength: 3,
         ajax: {
-            url: BASE_URL + 'spisy/seznamAjax',
+            url: url,
             dataType: 'json',
             quietMillis: 400,
             data: function (term, page) {

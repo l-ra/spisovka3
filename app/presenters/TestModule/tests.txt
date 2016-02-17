@@ -39,6 +39,7 @@
 :Spisovna:Dokumenty:detail { "id": 2289, "upravit": "skart_rezim" }
 :Spisovna:Spisy:
 :Spisovna:Spisy:prijem
+:Spisovna:Spisy:strom
 :Spisovna:Zapujcky:
 :Spisovna:Zapujcky:nova
 :Spisovna:Zapujcky:detail { "id": 21 }

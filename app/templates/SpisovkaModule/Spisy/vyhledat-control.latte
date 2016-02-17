@@ -1,0 +1,10 @@
+{default filter = 'spisovka'}
+Vyhledat spis: 
+<input type="hidden" class="spis_autocomplete" id='vyber_latte_1' />
+
+<script type="text/javascript">
+    initSpisAutocomplete({$filter});
+    $('#vyber_latte_1').on("change", function (e) {
+    {!$action}(e.val);
+    });
+</script>

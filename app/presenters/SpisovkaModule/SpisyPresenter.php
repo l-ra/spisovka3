@@ -287,11 +287,12 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->template->dokument_id = $this->getParameter('dokument_id');
 
         $Spisy = new Spis();
-        $args = ['where' => ['stav = 1']];
+        $args = ['stav = ' . Spis::OTEVREN];
         $args = $Spisy->spisovka($args);
-        $result = $Spisy->seznamRychly($args['where']);
+        $result = $Spisy->seznamRychly($args);
         $result->setRowClass(null);
         $this->template->spisy = $result->fetchAll();
+        $this->template->on_select = 'spisVlozitDokument';
     }
 
     /**
@@ -300,16 +301,16 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     public function renderStrom2()
     {
         $Spisy = new Spis();
-        $args = $Spisy->spisovka(null);
-        $result = $Spisy->seznamRychly($args['where']);
+        $args = $Spisy->spisovka();
+        $result = $Spisy->seznamRychly($args);
         $result->setRowClass(null);
         $this->template->spisy = $result->fetchAll();
     }
 
-    public function renderSeznamAjax($q)
+    public function renderSeznamAjax($q, $filter)
     {
         $Spisy = new Spis();
-        $result = $Spisy->search($q);
+        $result = $Spisy->search($q, $filter);
 
         $this->sendJson($result);
     }
@@ -364,9 +365,9 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     {
         $Spisy = new Spis();
 
-        $args = null;
+        $args = [];
         if (!empty($hledat)) {
-            $args = array('where' => array(array("tb.nazev LIKE %s", '%' . $hledat . '%')));
+            $args = [["tb.nazev LIKE %s", '%' . $hledat . '%']];
             $this->hledat = $hledat;
         }
 
@@ -380,10 +381,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $predat_do_spisovny = $this->getParameter('do_spisovny', false);
         $order_by = null;
         if ($predat_do_spisovny) {
-            $args['where'][] = 'tb.stav = ' . Spis::UZAVREN;
+            $args[] = 'tb.stav = ' . Spis::UZAVREN;
             $order_by = 'nazev';
         }
-        $result = $Spisy->seznam($args, $order_by);
+        $result = $Spisy->seznam(['where' => $args], $order_by);
         $paginator->itemCount = count($result);
 
         // Volba vystupu - web/tisk/pdf
