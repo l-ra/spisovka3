@@ -168,19 +168,19 @@ class Spis extends TreeModel
 
     public function spisovka(array $filter = [])
     {
-        $filter[] = "NOT (tb.typ = 'S' AND tb.stav > 2)";
+        $filter[] = "tb.typ = 'F' OR tb.stav <= 2";
         return $this->omezeni_org($filter);
     }
 
     public function spisovna(array $filter = [])
     {
-        $filter[] = "tb.stav = " . self::VE_SPISOVNE;
+        $filter[] = "tb.typ = 'F' OR tb.stav = " . self::VE_SPISOVNE;
         return $filter;
     }
 
     public function spisovna_prijem(array $filter = [])
     {
-        $filter[] = "tb.stav = " . self::PREDAN_DO_SPISOVNY;
+        $filter[] = "tb.typ = 'F' OR tb.stav = " . self::PREDAN_DO_SPISOVNY;
         return $filter;
     }
 
