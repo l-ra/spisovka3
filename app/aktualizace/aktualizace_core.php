@@ -26,13 +26,11 @@ class Updates
             return;
         }
 
-        $parts = explode("_", $filename);
-        if (is_numeric($parts[0])) {
-
-            $revision = $parts[0];
+        $revision = array_shift(explode(strpos($filename, '_') !== false ? "_" : ".", $filename));
+        if (is_numeric($revision)) {
             self::$revisions[$revision] = $revision;
 
-            if (strpos($filename, "_alter.sql") !== false) {
+            if (substr($filename, -4) == ".sql") {
                 $sql_source = $contents ? : file_get_contents(self::$update_dir . $filename);
                 self::$alter_scripts[$revision] = self::_parse_sql($sql_source);
             }
