@@ -1,0 +1,77 @@
+{default bulk_action = false}
+{block title}{$title}{/block}
+{block content}
+
+<h2>{$title}</h2>
+
+<div id="tisk">
+    <a href="{link this, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
+        <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+    </a>
+    <a href="{link this, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
+        <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+    </a>        
+</div>    
+
+<div id="search">
+    {control searchForm}
+    <a n:if="$pouzito_hledani" href="{link this, hledat => null}" style="color:#ff0000;">Zrušit vyhledávání</a>
+</div>
+
+{include 'menu.latte'}
+
+<div style="clear: both;" />
+
+<div id="dokumenty">
+    {if count($seznam) > 0}
+        {if $bulk_action}
+            {control bulkAction:start}
+        {/if}
+        <table class="seznam">
+            <tr>
+                <th class="akce"></th>
+                <th>Spis</th>
+                <th>Počet dokumentů</th>
+                <th>Přidělen</th>
+                <th>Spisový znak</th>
+                <th>Skartační znak/lhůta</th>
+                <th>Stav</th>            
+            </tr>   
+            {foreach $seznam as $spis}
+                <tr id="sitem{$spis->id}">
+                    <td class="akce">
+                        {if $spis->typ == 'S' && $bulk_action}
+                            {control bulkAction:checkbox $spis->id}
+                        {/if}
+                    </td>
+                    {if $spis->typ == 'F'}
+                        <td colspan="6">
+                            {!=@str_repeat("&nbsp;", 10 * ($spis->uroven))}
+                            <img src="{$publicUrl}images/icons/folder_yellow.png" alt="složka" title="složka" width="16" height="16" onclick="return toggle('item{!$spis->id}');" />
+                            &nbsp;&nbsp;
+                            {$spis->nazev}                
+                        </td>
+                    {else}
+                        <td>
+                            {!=@str_repeat("&nbsp;", 10 * ($spis->uroven))}
+                            <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
+                            &nbsp;&nbsp;
+                            <a href="{link :Spisovna:Spisy:detail, id => $spis->id}">{$spis->nazev}</a>
+                        </td>
+                        <td>{if isset($seznam_dokumentu[$spis->id])}{=count($seznam_dokumentu[$spis->id])}{else}0{/if}</td>
+                        <td>{$spis->orgjednotka_prideleno}</td>              
+                        <td>{if isset($SpisoveZnaky[$spis->spisovy_znak_id])}{$SpisoveZnaky[$spis->spisovy_znak_id]->nazev}{/if} </td>
+                        <td>{$spis->skartacni_znak} / {$spis->skartacni_lhuta}</td>
+                        <td>{=Spis::stav($spis->stav)}</td>      
+                    {/if}
+                </tr>
+            {/foreach}
+        </table>
+        {if $bulk_action}
+            {control bulkAction:end}            
+        {/if}
+        {control vp}
+    {else}
+        <div class="prazdno">Nebyly zjištěny žádné spisy.</div>
+    {/if}
+</div>

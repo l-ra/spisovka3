@@ -3,7 +3,6 @@
 class Spisovna_SpisyPresenter extends BasePresenter
 {
 
-    private $spis_plan;
     private $hledat;
     private $pdf_output = 0;
 
@@ -95,77 +94,27 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
     }
 
-    public function renderDefault()
-    {
-        $Spisy = new Spis();
-
-        $filter = [];
-        $this->hledat = $this->getParameter('hledat', null);
-        if (!empty($this->hledat)) {
-            $filter = [["tb.nazev LIKE %s", '%' . $this->hledat . '%']];
-        }
-
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
-        $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
-                    : 20;
-
-        $filter = $Spisy->spisovna($filter);
-        $result = $Spisy->seznam(['where' => $filter]);
-        $paginator->itemCount = count($result);
-
-        // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParameter('print');
-        $pdf = $this->getParameter('pdfprint');
-        if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $seznam = $result->fetchAll();
-            $this->setView('print');
-        } elseif ($pdf) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->pdf_output = 1;
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $seznam = $result->fetchAll();
-            $this->setView('print');
-        } else {
-            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        }
-
-        if (count($seznam) > 0) {
-            $spis_ids = array();
-            foreach ($seznam as $spis) {
-                $spis_ids[] = $spis->id;
-            }
-            $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-        } else {
-            $this->template->seznam_dokumentu = array();
-        }
-
-        $this->template->seznam = $seznam;
-
-        $SpisovyZnak = new SpisovyZnak();
-        $spisove_znaky = $SpisovyZnak->select()->fetchAssoc('id');
-        $this->template->SpisoveZnaky = $spisove_znaky;
-
-        //$seznam = $Spisy->seznam(null, 0, $spis_id);
-        //$this->template->seznam = $seznam;
-
-        $this->template->akce_select = array(
-        );
-    }
-
     public function renderPrijem($hledat)
     {
         if (!$this->user->isAllowed('Spisovna', 'prijem_dokumentu'))
             $this->forward(':NoAccess:default');
 
+        $this->_renderSeznam($hledat, true);
+    }
+    
+    public function renderDefault($hledat)
+    {
+        $this->_renderSeznam($hledat, false);
+    }
+    
+    public function _renderSeznam($hledat, $prijem)
+    {
         $Spisy = new Spis();
 
         $filter = [];
         if (!empty($hledat))
             $filter = [["tb.nazev LIKE %s", '%' . $hledat . '%']];
+        $this->template->pouzito_hledani = !empty($hledat);
 
         $client_config = Nette\Environment::getVariable('client_config');
         $vp = new VisualPaginator($this, 'vp');
@@ -173,7 +122,11 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
-        $filter = $Spisy->spisovna_prijem($filter);
+        if ($prijem)
+            $filter = $Spisy->spisovna_prijem($filter);
+        else
+            $filter = $Spisy->spisovna($filter);
+        
         $result = $Spisy->seznam(['where' => $filter]);
         $paginator->itemCount = count($result);
 
@@ -184,14 +137,12 @@ class Spisovna_SpisyPresenter extends BasePresenter
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-
             $this->setView('print');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 1;
             //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
-
             $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);

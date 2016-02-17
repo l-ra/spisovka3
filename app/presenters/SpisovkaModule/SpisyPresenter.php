@@ -186,7 +186,6 @@ class SpisyPresenter extends BasePresenter
 class Spisovka_SpisyPresenter extends SpisyPresenter
 {
 
-    private $spis_plan;
     private $hledat;
     private $pdf_output = 0;
 
