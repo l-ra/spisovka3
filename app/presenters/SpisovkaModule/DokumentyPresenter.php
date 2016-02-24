@@ -2059,8 +2059,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $source = "";
-        if (file_exists(CLIENT_DIR . '/temp/tmp_email.eml')) {
-            $source = CLIENT_DIR . '/temp/tmp_email.eml';
+        if (file_exists(TEMP_DIR . '/tmp_email.eml')) {
+            $source = TEMP_DIR . '/tmp_email.eml';
         }
 
         // Do epodatelny

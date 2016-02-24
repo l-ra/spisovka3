@@ -226,7 +226,7 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'Zápis do dočasné složky',
                 'required' => TRUE,
-                'passed' => is_writable(CLIENT_DIR . '/temp/'),
+                'passed' => is_writable(TEMP_DIR),
                 'message' => 'Povoleno',
                 'errorMessage' => 'Není možné zapisovat do dočasné složky.',
                 'description' => 'Povolte zápis do složky /client/temp/',

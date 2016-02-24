@@ -30,7 +30,7 @@ class Admin_ExportPresenter extends BasePresenter
     
     protected function openExportFile()
     {
-        $this->file = fopen(CLIENT_DIR . "/temp/export_dat.csv", "w");
+        $this->file = fopen(TEMP_DIR . "/export_dat.csv", "w");
         if (!$this->file)
             $this->_error("Nepodařilo se otevřít soubor pro export.");
     }

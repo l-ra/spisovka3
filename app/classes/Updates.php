@@ -10,7 +10,7 @@ class UpdateAgent
     // a po uplynuti urcite lhuty od posledni aktualizace ji provede znovu   
     public static function update($what)
     {
-        $directory = CLIENT_DIR . '/temp';
+        $directory = TEMP_DIR;
 
         switch ($what) {
             case self::CHECK_NEW_VERSION:
@@ -59,7 +59,7 @@ class UpdateAgent
         if (isset($xml->channel->item))
             foreach ($xml->channel->item as $item) {
                 $title = trim((string) $item->title);
-                file_put_contents(CLIENT_DIR . '/temp/aktualni_verze', $title);
+                file_put_contents(TEMP_DIR . '/aktualni_verze', $title);
             }
     }
 
@@ -73,7 +73,7 @@ class UpdateAgent
             $soucasna_verze = '0.0.0';
 
 
-        $dostupna_verze = @file_get_contents(CLIENT_DIR . '/temp/aktualni_verze');
+        $dostupna_verze = @file_get_contents(TEMP_DIR . '/aktualni_verze');
 
         if (!$dostupna_verze)
         // Nepodarilo se zjistit, zda je dostupna nova verze programu,

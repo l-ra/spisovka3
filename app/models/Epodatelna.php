@@ -298,7 +298,7 @@ class Epodatelna extends BaseModel
                 //$identifikator['cert_info']['serial_number'] = 1002891;
 
                 $CRL = new CRLParser();
-                $CRL->cache(1, CLIENT_DIR . "/temp/");
+                $CRL->cache(1, TEMP_DIR . "/");
                 //$CRL->setDateFormat('j.n.Y G:i:s');
                 if (isset($identifikator['cert_info']['CRL']) && count($identifikator['cert_info']['CRL']) > 0) {
                     foreach ($identifikator['cert_info']['CRL'] as $crl_url) {

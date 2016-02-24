@@ -500,11 +500,11 @@ class esignature
     public function signMessage($message, $header = array())
     {
 
-        $tmp_mess = CLIENT_DIR . '/temp/send_message_plain.txt';
+        $tmp_mess = TEMP_DIR . '/send_message_plain.txt';
         $fp = fopen($tmp_mess, "w");
         fwrite($fp, $message);
         fclose($fp);
-        $tmp_signed = CLIENT_DIR . '/temp/send_message_signed.txt';
+        $tmp_signed = TEMP_DIR . '/send_message_signed.txt';
         $fp = fopen($tmp_signed, "w");
         fwrite($fp, "");
         fclose($fp);
@@ -560,9 +560,9 @@ class esignature
     {
 
         if (empty($dir)) {
-            $file = CLIENT_DIR . '/temp/esign_' . $prefix . '.tmp';
+            $file = TEMP_DIR . '/esign_' . $prefix . '.tmp';
         } else {
-            $file = CLIENT_DIR . '/temp/' . $dir . '/esign_' . $prefix . '.tmp';
+            $file = TEMP_DIR . '/' . $dir . '/esign_' . $prefix . '.tmp';
         }
 
 

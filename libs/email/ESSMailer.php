@@ -109,17 +109,17 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         $tmp_mail = str_replace("\r\n", "\n", $tmp_mail);
 
         // Uschovej posledni odesilany mail pro ucely ladeni
-        @file_put_contents(CLIENT_DIR . '/temp/tmp_email.eml', $tmp_mail);
+        @file_put_contents(TEMP_DIR . '/tmp_email.eml', $tmp_mail);
 
         if ($test_mode === 1) {
             // test - neodesila se
             // vytvor adresar, pokud neexistuje
-            if (!file_exists(CLIENT_DIR . '/temp/test_emails')) {
+            if (!file_exists(TEMP_DIR . '/test_emails')) {
                 $oldumask = umask(0);
-                mkdir(CLIENT_DIR . '/temp/test_emails', 0777);
+                mkdir(TEMP_DIR . '/test_emails', 0777);
                 umask($oldumask);
             }
-            @file_put_contents(CLIENT_DIR . '/temp/test_emails/' . date('Y-m-d-H-i-s') . "-$to.eml",
+            @file_put_contents(TEMP_DIR . '/test_emails/' . date('Y-m-d-H-i-s') . "-$to.eml",
                             $tmp_mail);
 
             return true;

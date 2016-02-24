@@ -530,7 +530,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     if (!$this->Epodatelna->existuje($z->dmID, 'isds')) {
                         // nova zprava, ktera neni nahrana v epodatelne
                         // [P.L.] - cache neni vubec funkcni, neukladaly se tam vysledky
-                        // $storage = new FileStorage(CLIENT_DIR .'/temp');
+                        // $storage = new FileStorage(TEMP_DIR);
                         // $cache = new Cache($storage); // nebo $cache = Environment::getCache()
                         // if (isset($cache['zkontrolovat_isds_'.$z->dmID])):
                         // $mess = $cache['zkontrolovat_isds_'.$z->dmID];
@@ -1023,7 +1023,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             // pouze kvalifikovane
                             $esign = new esignature();
                             $esign->setCACert(LIBS_DIR . '/email/ca_certifikaty');
-                            $tmp_email = CLIENT_DIR . '/temp/emailtest_' . sha1($mess->message_id) . '.tmp';
+                            $tmp_email = TEMP_DIR . '/emailtest_' . sha1($mess->message_id) . '.tmp';
                             file_put_contents($tmp_email, $mess->source);
                             $esign_cert = null;
                             $esign_status = null;

@@ -60,7 +60,7 @@ class DERParser
             $data = $this->pemraw2der($data);
         }
 
-        //file_put_contents(CLIENT_DIR .'/temp/test.crl', $data);
+        //file_put_contents(TEMP_DIR .'/test.crl', $data);
 
         $this->data = $this->_parse($data);
         return $this->data;
