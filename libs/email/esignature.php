@@ -554,9 +554,6 @@ class esignature
 
     function __destruct()
     {
-
-        @unlink($this->user_prikey_path);
-        @unlink($this->user_cert_path);
     }
 
     private function tempnam($dir, $prefix)
