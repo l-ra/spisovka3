@@ -42,7 +42,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             }
 
             $cert_info = $esign->getInfo();
-            if (is_array($cert_info))
+            if (!is_array($cert_info))
                 throw new Exception('Email nelze podepsat. Neplatný certifikát!');
 
             $mail_source = $tmp->generateMessage();
