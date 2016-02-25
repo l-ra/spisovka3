@@ -179,26 +179,12 @@
             <dd>{$Info['email']}</dd>
         </dl>
         <dl>
-            <dt>Elektronický podpis/značka:</dt>
-            <dd>
-                {if $Info['certifikat']['stav']==0}
-                Elektronický podpis/značka není nahrán nebo není potřeba.
-                {elseif $Info['certifikat']['stav']==1}
-                <span style="color:red;">Uložený certifikát není certifikát nebo je neplatný</span>
-                {elseif $Info['certifikat']['stav']==2}
-                Certifikát je nahrán ale není ověřen.
-                {elseif $Info['certifikat']['stav']==3}
-                <span style="color:red;">Certifikát je neplatný! Vypršela jeho platnost.</span>
-                {elseif $Info['certifikat']['stav']==4}
-                Certifikát je nahrán a je ověřen.
-                {else}
-                Nelze zjístit stav e-podpisu.
-                {/if}
-            </dd>
+            <dt>Stav elektronického podepisování:</dt>
+            <dd>{!$Info['certifikat']['stav']|escape|nl2br}</dd>
         </dl>
         {if !empty($Info['certifikat']['info'])}
         <dl>
-            <dt>Informace o podpisu/značce:</dt>
+            <dt>Informace o certifikátu:</dt>
             <dd>
                 {$Info['certifikat']['info']['email']} <br />
                 {if !empty($Info['certifikat']['info']['jmeno'])}{$Info['certifikat']['info']['jmeno']}<br />{/if}

@@ -5,104 +5,90 @@
 /**
  * eSignature - trida pro praci s elektronickym podpisem
  *
- * @author Tomas Vancura
+ * @author Tomas Vancura, Pavel Lastovicka
  */
 class esignature
 {
 
-    protected $user_cert;
-    protected $user_cert_data;
-    protected $user_cert_path;
-    protected $user_prikey;
-    protected $user_prikey_data;
-    protected $user_prikey_path;
-    protected $user_passphrase;
+    /**
+     * Certifikat pro podepisovani
+     * @var string 
+     */
+    protected $certificate;
+    private $private_key;
+    private $passphrase;
+    
     protected $ca_cert = array();
     protected $ca_cert_real = array();
     protected $ca_info = array();
-    public $error_string;
+    
+    protected $error_string;
+
+    public function getError()
+    {
+        return $this->error_string;
+    }
 
     /**
-     * Nastavi uzivatelsky certifikat
+     * Nastavi certifikat.
      *
-     * Vstupnim parametrem $certificate muze byt
-     *  - cesta k certifikatu X.509
-     *    - pak je vyzadovan privatni klic
-     *    - a pripadne heslo privatniho klice
-     *  - cesta k certifikatu PFX (pkcs12)
-     *    - $private_key ma hodnotu NULL
-     *    - $passphrase pak predstavuje chranene heslo PFX
-
-     * @param string $certificate cesta k uzivatelskemu certifikatu
-     * @param string $private_key cesta k privatnimu klici
-     * @param string $passphrase heslo k privatnimu klici nebo PFX
+     * @param string $certificate_path cesta k souboru PKCS #12
+     * @param string $passphrase       heslo k soukromemu klici
      * @return bool
      */
-    public function setUserCert($certificate, $private_key = null, $passphrase = null)
+    public function setUserCert($certificate_path, $passphrase)
     {
+        $certificate_path = realpath($certificate_path);
+        if (!file_exists($certificate_path)) {
+            $this->error_string = "Soubor s certifikátem nenalezen";
+            return false;
+        }
 
-        if (file_exists(realpath($certificate))) {
-
-            $this->user_cert_path = realpath($certificate);
-            $this->user_cert_data = file_get_contents($this->user_cert_path);
-
-            $pkcs12_enable = function_exists('openssl_pkcs12_read') ? TRUE : FALSE;
-
-            if ($pkcs12_enable && @openssl_pkcs12_read($this->user_cert_data, $tmp_cert,
-                            $passphrase)) {
-                /* PFX */
-                $this->user_cert_data = $tmp_cert['cert'];
-                $tmp_ucert = $this->tempnam("", "user_cert");
-                $fp = fopen($tmp_ucert, "w");
-                fwrite($fp, $tmp_cert['cert']);
-                fclose($fp);
-                $this->user_cert_path = realpath($tmp_ucert);
-
-
-                if ($res = openssl_x509_read($tmp_cert['cert'])) {
-                    $this->user_cert = openssl_x509_parse($res);
-                    $this->user_prikey_data = $tmp_cert['pkey'];
-                    $tmp_ukey = $this->tempnam("", "user_pkey");
-                    $fp = fopen($tmp_ukey, "w");
-                    fwrite($fp, $tmp_cert['pkey']);
-                    fclose($fp);
-                    $this->user_prikey_path = realpath($tmp_ukey);
-                    $this->user_passphrase = $passphrase;
-                    return true;
-                } else {
-                    $this->error_string = openssl_error_string();
-                    return false;
-                }
+        $certificate = file_get_contents($certificate_path);
+        $cert_info = [];
+        if (openssl_pkcs12_read($certificate, $cert_info, $passphrase)) {
+            // Uživatel dodal certifikát ve formátu PKCS 12
+            // Následující kontrola je asi zbytečná, ale ponechme ji v programu
+            if ($res = openssl_x509_read($cert_info['cert'])) {
+                $this->certificate = $cert_info['cert'];
+                $this->private_key = $cert_info['pkey'];
+                $this->passphrase = $passphrase;
+                return true;
             } else {
-                /* X.509 */
-
-                if (strpos($this->user_cert_data, "BEGIN") === false) {
-                    /* convert to PEM format */
-                    $this->user_cert_data = $this->der2pem($this->user_cert_data);
-                }
-
-                if ($res = @openssl_x509_read($this->user_cert_data)) {
-                    $this->user_cert = openssl_x509_parse($res);
-                    if (!is_null($private_key)) {
-                        $this->user_prikey_path = realpath($private_key);
-                        $this->user_prikey_data = @file_get_contents($this->user_prikey_path);
-                        if ($this->user_prikey = @openssl_pkey_get_private($this->user_prikey_data,
-                                        $passphrase)) {
-                            $this->user_passphrase = $passphrase;
-                            return true;
-                        } else {
-                            $this->error_string = openssl_error_string();
-                            return false;
-                        }
-                    }
-                } else {
-                    $this->error_string = openssl_error_string();
-                    return false;
-                }
+                $this->error_string = openssl_error_string();
+                return false;
             }
         } else {
-            $this->error_string = "Certificate not found";
+            $this->error_string = openssl_error_string();
             return false;
+
+            /* Separátní soukromý klíč už nepodporujeme, protože by to žádný
+             * uživatel nepoužil, je to zbytečné.
+
+              if (strpos($certificate, "BEGIN") === false) {
+              // convert to PEM format
+              $certificate = $this->der2pem($certificate);
+              }
+
+              if ($res = openssl_x509_read($certificate)) {
+              if (!is_null($private_key_path)) {
+              $this->user_prikey_path = realpath($private_key_path);
+              $this->user_prikey_data = file_get_contents($this->user_prikey_path);
+              if ($this->user_prikey = openssl_pkey_get_private($this->user_prikey_data,
+              $passphrase)) {
+              $this->passphrase = $passphrase;
+              return true;
+              } else {
+              $this->error_string = openssl_error_string();
+              return false;
+              }
+              }
+              } else {
+              $this->error_string = openssl_error_string();
+              return false;
+              }
+             * 
+             */
         }
     }
 
@@ -121,7 +107,7 @@ class esignature
     {
         if (!function_exists('openssl_x509_read'))
             throw new Exception('Není dostupné PHP rozšíření OpenSSL.');
-        
+
         if (is_array($mixed)) {
             /* Param is array - items CA certificates */
             foreach ($mixed as $param) {
@@ -235,13 +221,14 @@ class esignature
 
         $Cert = new Cert();
 
-        $tmp_cert = $this->tempnam("", "crt");
+        $tmp_cert = tempnam(TEMP_DIR, "sender_certificate");
         $res = openssl_pkcs7_verify($filename, 0, $tmp_cert, $lCertT);
 
         if ($res === true) {
             // email overen
             $cert = openssl_x509_parse("file://$tmp_cert");
-
+            unlink($tmp_cert);
+            $email_cert = $email_real = null;
             $res2 = $this->verifyEmailAddress($cert, $filename, $email_cert, $email_real);
             $status = "Podpis je ověřen a platný";
             if ($res2 === false) {
@@ -250,15 +237,15 @@ class esignature
                 $status .= ", ale z certifikátu se nepodařilo zjistit emailovou adresu.";
             }
 
-            @unlink($tmp_cert);
             return array(
                 'return' => 1,
                 'status' => $status,
                 'cert' => $cert,
-                'cert_info' => $this->getInfo($cert)
+                'cert_info' => $this->parseCertificate($cert)
             );
         } else {
             // email neprosel overenim
+            unlink($tmp_cert);
             $status = openssl_error_string();
             if ($res == -1) {
                 // Chyba
@@ -296,7 +283,6 @@ class esignature
                     $res = 0;
                 }
 
-                @unlink($tmp_cert);
                 return array(
                     'return' => $res,
                     'status' => $status,
@@ -309,9 +295,9 @@ class esignature
 
     // $email_cert - adresa v certifikatu
     // $email_real - skutecna adresa odesilatele
-    private function verifyEmailAddress($cert, $filename, &$email_cert = null, &$email_real = null)
+    protected function verifyEmailAddress($cert, $filename, &$email_cert = null, &$email_real = null)
     {
-
+        $matches = [];
         if (!isset($cert['extensions']['subjectAltName']) || !preg_match("/email:(.*?),/",
                         $cert['extensions']['subjectAltName'], $matches))
             return -1; // K tomuto by nemělo nikdy dojít
@@ -326,15 +312,12 @@ class esignature
         return $email_cert == $email_real;
     }
 
-    public function getInfo($cert = null)
+    public function parseCertificate($cert = null)
     {
-
         if (is_null($cert)) {
-            if (!is_null($this->user_cert)) {
-                $cert = $this->user_cert;
-            } else {
+            if (!$this->certificate)
                 return null;
-            }
+            $cert = openssl_x509_parse($this->certificate);
         }
 
         $info = array();
@@ -356,8 +339,9 @@ class esignature
         if (!empty($cert['subject']['emailAddress'])) {
             $info['email'] = $cert['subject']['emailAddress'];
         } else if (isset($cert['extensions']['subjectAltName'])) {
-            if (preg_match("/email:(.*?),/", $cert['extensions']['subjectAltName'], $mathes)) {
-                $info['email'] = trim($mathes[1]);
+            $matches = [];
+            if (preg_match("/email:(.*?),/", $cert['extensions']['subjectAltName'], $matches)) {
+                $info['email'] = trim($matches[1]);
             }
         }
         $info['platnost_od'] = @$cert['validFrom_time_t'];
@@ -377,9 +361,8 @@ class esignature
         return $info;
     }
 
-    public function getInfoCert($cert = null)
+    protected function getInfoCert($cert)
     {
-
         if (is_null($cert) || !is_object($cert)) {
             return null;
         }
@@ -413,114 +396,34 @@ class esignature
 
     public function is_qualified($ca_name)
     {
-        if (isset($this->ca_info[$ca_name])) {
+        if (isset($this->ca_info[$ca_name]))
             return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 
     /**
-     * Vypise informaci o certifikatu
+     * Podepise zpravu
      *
-     * @param string $certificate path to certificate
-     * @return array
-     */
-    public function certificateInfo($certificate = null)
-    {
-
-        if (!is_null($certificate)) {
-            if (file_exists(realpath($certificate))) {
-                $cert_data = file_get_contents(realpath($certificate));
-                if ($res = openssl_x509_read($cert_data)) {
-                    return openssl_x509_parse($res);
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        } else {
-            if ($res = openssl_x509_read($this->user_cert_data)) {
-                return openssl_x509_parse($res);
-            } else {
-                return null;
-            }
-        }
-    }
-
-    public function getUserCertificate($out = 'F')
-    {
-        switch ($out) {
-            case 'F':
-                return empty($this->user_cert_path) ? null : 'file://' . $this->user_cert_path;
-                break;
-            case 'D':
-                return empty($this->user_cert_data) ? null : $this->user_cert_data;
-                break;
-            case 'I':
-                return empty($this->user_cert) ? null : $this->user_cert;
-                break;
-            default:
-                return empty($this->user_cert_path) ? null : 'file://' . $this->user_cert_path;
-                break;
-        }
-    }
-
-    public function getUserPrivateKey($out = 'F')
-    {
-        switch ($out) {
-            case 'F':
-                return empty($this->user_prikey_path) ? null : 'file://' . $this->user_prikey_path;
-                break;
-            case 'D':
-                return empty($this->user_prikey_data) ? null : $this->user_prikey_data;
-                break;
-            case 'I':
-                return empty($this->user_prikey) ? null : $this->user_prikey;
-                break;
-            default:
-                return empty($this->user_prikey_path) ? null : 'file://' . $this->user_prikey_path;
-                break;
-        }
-    }
-
-    public function getUserPassphrase()
-    {
-        return empty($this->user_passphrase) ? null : $this->user_passphrase;
-    }
-
-    /**
-     * Podepise obsah zpravy
-     *
-     * @param string $message obsah zpravy
+     * @param string $message zprava
      * @param string $header pole obsahujici hlavicku
-     * @return array  podepsana zprava
+     * @return string  podepsana zprava
      */
     public function signMessage($message, $header = array())
     {
+        $tmp_mess = tempnam(TEMP_DIR, 'outgoing_message');
+        file_put_contents($tmp_mess, $message);
+        $tmp_signed = tempnam(TEMP_DIR, 'outgoing_message_signed');
 
-        $tmp_mess = TEMP_DIR . '/send_message_plain.txt';
-        $fp = fopen($tmp_mess, "w");
-        fwrite($fp, $message);
-        fclose($fp);
-        $tmp_signed = TEMP_DIR . '/send_message_signed.txt';
-        $fp = fopen($tmp_signed, "w");
-        fwrite($fp, "");
-        fclose($fp);
-
-        if (openssl_pkcs7_sign(realpath($tmp_mess), realpath($tmp_signed),
-                        'file://' . $this->user_cert_path,
-                        array('file://' . $this->user_prikey_path, $this->user_passphrase),
-                        $header, PKCS7_DETACHED)) {
-            $signedo = file_get_contents(realpath($tmp_signed));
-            @unlink($tmp_mess);
-            @unlink($tmp_signed);
-            return $signedo;
-        } else {
-            throw new Nette\InvalidStateException('Email se nepodaril podepsat. SSL: ' . openssl_error_string());
-            return null;
-        }
+        $ok = openssl_pkcs7_sign($tmp_mess, $tmp_signed, $this->certificate,
+                        [$this->private_key, $this->passphrase], $header, PKCS7_DETACHED);
+        if ($ok)
+            $signed_msg = file_get_contents($tmp_signed);
+        // unlink($tmp_mess);
+        // unlink($tmp_signed);
+        if ($ok)
+            return $signed_msg;
+        
+        throw new Exception('Email se nepodařilo podepsat. SSL: ' . openssl_error_string());
     }
 
     /**
@@ -529,7 +432,7 @@ class esignature
      * @param string $pem_data
      * @return string
      */
-    private function pem2der($pem_data)
+    protected function pem2der($pem_data)
     {
         $begin = "CERTIFICATE-----";
         $end = "-----END";
@@ -545,36 +448,11 @@ class esignature
      * @param string $der_data
      * @return string
      */
-    private function der2pem($der_data)
+    protected function der2pem($der_data)
     {
         $pem = chunk_split(base64_encode($der_data), 64, "\n");
         $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
         return $pem;
     }
 
-    function __destruct()
-    {
-    }
-
-    private function tempnam($dir, $prefix)
-    {
-
-        if (empty($dir)) {
-            $file = TEMP_DIR . '/esign_' . $prefix . '.tmp';
-        } else {
-            $file = TEMP_DIR . '/' . $dir . '/esign_' . $prefix . '.tmp';
-        }
-
-
-
-        if ($fp = fopen($file, 'wb')) {
-            fclose($fp);
-            return $file;
-        } else {
-            return null;
-        }
-    }
-
 }
-
-?>

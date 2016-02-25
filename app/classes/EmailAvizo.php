@@ -43,13 +43,12 @@ class EmailAvizo {
         // Rovnou se můžeme vrátit zpět. Návratová hodnota se nekontroluje.
         return;
         
-        try {
+        /* try {
             // Urad
             // $client_config = Nette\Environment::getVariable('client_config');
             // $urad = $client_config->urad;
 
             $mail = new ESSMail;
-            $mail->signed(1);
 
             $mail->addTo($komu);
 
@@ -72,7 +71,7 @@ class EmailAvizo {
         } catch (Exception $e) {
             //throw new InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
             return false;
-        }
+        } */
     }
 
 }

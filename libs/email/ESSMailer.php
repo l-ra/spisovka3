@@ -26,22 +26,16 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
 
         $config = (new Spisovka\ConfigEpodatelna())->get();
         $config = $config->odeslani[0];
-        if ($tmp->signed != 1 || $config['typ_odeslani'] != 1) {
+        if ($config['typ_odeslani'] != 1) {
             $mail_source = $tmp->generateMessage();
             $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
             $header = $parts[0];
             $mess = $parts[1];
         } else {
             $esign = new esignature();
-            if (file_exists($config['cert_key'])) {
-                $cert_status = $esign->setUserCert($config['cert'],
-                        $config['cert_key'], $config['cert_pass']);
-            } else {
-                $cert_status = $esign->setUserCert($config['cert'], null,
-                        $config['cert_pass']);
-            }
+            $esign->setUserCert($config['cert'], $config['cert_pass']);
 
-            $cert_info = $esign->getInfo();
+            $cert_info = $esign->parseCertificate();
             if (!is_array($cert_info))
                 throw new Exception('Email nelze podepsat. Neplatný certifikát!');
 

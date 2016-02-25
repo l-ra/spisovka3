@@ -3,8 +3,6 @@
 class ESSMail extends Nette\Mail\Message
 {
 
-    public $signed = 0;
-
     public function __construct()
     {
         parent::__construct();
@@ -29,20 +27,9 @@ class ESSMail extends Nette\Mail\Message
     }
 
     /**
-     * Povolit podepisovani emailu?
-     *
-     * @param int $signed hodnoty 0|1
-     * @return return int stejny jako vstup
+     * Nastavi e-mail adresu odesilatele mailu dle nastaveni v administraci
      */
-    public function signed($signed = 1)
-    {
-        return $this->signed = $signed;
-    }
-
-    /**
-     * Nastavi e-mail adresu odesilatele dle uzivatelske nastaveni e-podatelny
-     */
-    public function setFromConfig($foo = null)
+    public function setFromConfig()
     {
         $ep = (new Spisovka\ConfigEpodatelna())->get();
         $odes = reset($ep['odeslani']);

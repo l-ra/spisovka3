@@ -2001,30 +2001,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function odeslatEmailem($adresat, $data, $prilohy)
     {
-
         $mail = new ESSMail;
-        $mail->signed(1);
+        $mail->setFromConfig();
 
         try {
-            if (!empty($data['email_from'])) {
-
-                if (strpos($data['email_from'], "epod") !== false) {
-                    $id_odes = substr($data['email_from'], 4);
-                    $ep = (new Spisovka\ConfigEpodatelna())->get();
-                    if (isset($ep['odeslani'][$id_odes])) {
-                        $mail->setFromConfig($ep['odeslani'][$id_odes]);
-                    } else {
-                        $mail->setFromConfig();
-                    }
-                } else if (strpos($data['email_from'], "user") !== false) {
-
-                    $user_part = explode("#", $data['email_from']);
-                    $mail->setFrom($user_part[2], $user_part[1]);
-                } else {
-                    $mail->setFromConfig();
-                }
-            } else {
-                $mail->setFromConfig();
+            if (strpos($data['email_from'], "user") !== false) {
+                $user_part = explode("#", $data['email_from']);
+                $mail->setFrom($user_part[2], $user_part[1]);
             }
 
             if (strpos($adresat->email, ';') !== false) {

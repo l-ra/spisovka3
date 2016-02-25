@@ -902,7 +902,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                     $mail = new ESSMail;
                     $mail->setFromConfig();
-                    $mail->signed(1);
                     $mail->addTo($data['email']);
                     $mail->setSubject($data['predmet']);
                     $mail->setBodySign($data['zprava']);

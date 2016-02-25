@@ -117,40 +117,38 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 );
                 $ep['odeslani'][$index]['typ'] = $typ_odeslani[$ep['odeslani'][$index]['typ_odeslani']];
 
-                if (file_exists($ep['odeslani'][$index]['cert'])) {
-
+                if ($ep['odeslani'][$index]['typ_odeslani'] == 0)
+                    $stav = 'vypnuto';
+                else if (file_exists($ep['odeslani'][$index]['cert'])) {
                     $esign = new esignature();
 
-                    if (file_exists($ep['odeslani'][$index]['cert_key'])) {
-                        $cert_status = $esign->setUserCert($ep['odeslani'][$index]['cert'], $ep['odeslani'][$index]['cert_key'], $ep['odeslani'][$index]['cert_pass']);
-                    } else {
-                        $cert_status = $esign->setUserCert($ep['odeslani'][$index]['cert'], null, $ep['odeslani'][$index]['cert_pass']);
-                    }
+                    $ok = $esign->setUserCert($ep['odeslani'][$index]['cert'], $ep['odeslani'][$index]['cert_pass']);
+                    $error_message = $esign->getError(); 
 
-                    if ($cert_status) {
-                        $ep['odeslani'][$index]['certifikat']['stav'] = 2; // existuje a je to certifikat, ale neni overen
+                    if ($ok) {
+                        $stav = 'Certifikát je nahrán.';
 
-                        $cert_info = $esign->getInfo();
+                        $cert_info = $esign->parseCertificate();
                         if (is_array($cert_info)) {
-
                             if (($cert_info['platnost_od'] <= time()) && ($cert_info['platnost_do'] >= time())) {
-                                $ep['odeslani'][$index]['certifikat']['stav'] = 4; // overen
+                                $stav = 'Certifikát je platný.';
                             } else {
-                                $ep['odeslani'][$index]['certifikat']['stav'] = 3; // vyprsela platnost
+                                $stav = 'Certifikát je neplatný! Vypršela jeho platnost.';
                             }
                             $ep['odeslani'][$index]['certifikat']['info'] = $cert_info;
                         }
                     } else {
-                        $ep['odeslani'][$index]['certifikat']['stav'] = 1; // existuje, ale neni to certifikat
+                        $stav = "Uložený soubor s certifikátem je neplatný nebo nesouhlasí heslo.\n" . $error_message;
                     }
                 } else {
-                    $ep['odeslani'][$index]['certifikat']['stav'] = 0; // neexistuje
+                    $stav = 'Certifikát není nahrán.';
                 }
 
-
-                $this->info = @$ep['odeslani'][$index];
+                $this->info = $ep['odeslani'][$index];
+                $this->info['certifikat']['stav'] = $stav;
                 break;
-            default: $this->info = null;
+            default:
+                $this->info = null;
                 break;
         }
 
@@ -590,19 +588,18 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addText('ucet', 'Název účtu:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
         $form1->addCheckbox('aktivni', ' aktivní účet?');
+        $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100)
+                ->addCondition(Form::FILLED)
+                    ->addRule(Form::EMAIL);
+
         $form1->addSelect('typ_odeslani', 'Jak odesílat:',
                 ['0' => 'klasicky bez kvalifikovaného podpisu/značky',
                  '1' => 's kvalifikovaným podpisem/značkou'
                 ]
         );
 
-        $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100)
-                ->addCondition(Form::FILLED)
-                    ->addRule(Form::EMAIL);
-
-        $form1->addUpload('cert_file', 'Cesta k certifikátu:');
-        $form1->addUpload('cert_key_file', 'Cesta k privátnímu klíči:');
-        $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100);
+        $form1->addUpload('cert_file', 'Soubor s certifikátem a klíčem ve formátu PKCS #12:');
+        $form1->addText('cert_pass', 'Heslo k souboru:', 50, 100);
 
         if ($odes) {
             $form1['index']->setValue($index);
@@ -646,6 +643,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 $upload->move($fileName);
                 $data['cert'] = $fileName;
             } catch (Exception $e) {
+                $e->getMessage();
                 $chyba_pri_uploadu = 1;
                 $this->flashMessage('Certifikát se nepodařilo přenést na cílové místo.', 'warning');
             }
@@ -663,37 +661,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             }
         }
         unset($data['cert_file']);
-
-        $data['cert_key'] = "";
-        //nahrani privatniho klice
-        $upload = $data['cert_key_file'];
-        {
-            $fileName = CLIENT_DIR . "/configs/files/certifikat_email_" . $index . ".key";
-            if (!$upload instanceof Nette\Http\FileUpload) {
-                $this->flashMessage('Soubor privátního klíče se nepodařilo nahrát.', 'warning');
-            } else if ($upload->isOk()) {
-                try {
-                    $upload->move($fileName);
-                    $data['cert_key'] = $fileName;
-                } catch (Exception $e) {
-                    $chyba_pri_uploadu = 1;
-                    $this->flashMessage('Soubor privátního klíče se nepodařilo přenést na cílové místo.', 'warning');
-                }
-            } else {
-                switch ($upload->error) {
-                    case UPLOAD_ERR_INI_SIZE:
-                        $this->flashMessage('Překročena velikost pro nahrání souboru privátního klíče.', 'warning');
-                        break;
-                    case UPLOAD_ERR_NO_FILE:
-                        //$this->flashMessage('Nebyl vybrán žádný soubor.','warning');
-                        break;
-                    default:
-                        $this->flashMessage('Soubor privátního klíče se nepodařilo nahrát.', 'warning');
-                        break;
-                }
-            }
-        }
-        unset($data['cert_key_file']);
 
         if ($chyba_pri_uploadu && !is_writeable(CLIENT_DIR . '/configs/files'))
             $this->flashMessage('Nemohu zapisovat do adresáře client/configs/files/.', 'warning');
