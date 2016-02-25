@@ -701,61 +701,6 @@ class Install_DefaultPresenter extends BasePresenter
         $this->template->errors = $errors;
     }
 
-    // Toto se snad ani vubec nevola
-    public function renderEpodatelna()
-    {
-        // Klientske nastaveni
-        $ep = (new Spisovka\ConfigEpodatelna())->get();
-
-        // ISDS
-        $this->template->n_isds = $ep['isds'];
-
-        // Email
-        if (count($ep['email']) > 0) {
-            $e_mail = array();
-
-            $typ_serveru = array(
-                '' => '',
-                '/pop3/novalidate-cert' => 'POP3',
-                '/pop3/ssl/novalidate-cert' => 'POP3-SSL',
-                '/imap/novalidate-cert' => 'IMAP',
-                '/imap/ssl/novalidate-cert' => 'IMAP+SSL',
-                '/nntp' => 'NNTP'
-            );
-            foreach ($ep['email'] as $ei => $email) {
-                $email['protokol'] = $typ_serveru[$email['typ']];
-                $e_mail[$ei] = $email;
-            }
-
-            $this->template->n_email = $e_mail;
-        } else {
-            $this->template->n_email = null;
-        }
-
-        // Odeslani
-        if (count($ep['odeslani']) > 0) {
-            $e_odes = array();
-            $typ_odes = array(
-                '0' => 'klasicky bez kvalifikovaného podpisu/značky',
-                '1' => 's kvalifikovaným podpisem/značky'
-            );
-            foreach ($ep['odeslani'] as $eo => $odes) {
-
-                $odes['zpusob_odeslani'] = $typ_odes[$odes['typ_odeslani']];
-                $e_odes[$eo] = $odes;
-            }
-
-            $this->template->n_odeslani = $e_odes;
-        } else {
-            $this->template->n_odeslani = null;
-        }
-
-        // CA
-        $esign = new esignature();
-        $esign->setCACert(LIBS_DIR . '/email/ca_certifikaty');
-        $this->template->n_ca = $esign->getCA();
-    }
-
     /*     * */
 
     protected function createComponentNastaveniUraduForm()
