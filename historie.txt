@@ -96,6 +96,9 @@ Jiné změny:
   dokumentu, což se standardně děje při evidování e-mailu v e-podatelně.
   E-mail je součástí dokumentu v příloze, takže je zbytečné, aby byl
   ještě v poznámce.
+- aplikace nyní akceptuje pro podepisování e-mailů pouze certifikát s klíčem
+  v jednom souboru ve formátu PKCS #12. Může být zapotřebí certifikát nahrát
+  znovu.
 - z aplikace byl odstraněn tzv. "hlavní spis" s názvem SPISY
 - dokument již není možné začít vytvářet přímo ze spisu. Uživatel dokument musí
   nejprve vytvořit, poté jej teprve může vložit do spisu.
@@ -137,7 +140,8 @@ E-podatelna:
 - aplikace automaticky vyplní pole "způsob doručení" pro dokumenty vytvořené
   e-podatelnou. Pro dokumenty vytvořené mimo e-podatelnu je nyní výchozí
   hodnota "v listinné podobě".
-- opravena chyba, která bránila elektronickému podepisování odchozích e-mailů.
+- opravena chyba, která bránila elektronickému podepisování odchozích e-mailů
+- v nastavení podepisování se už nezobrazuje heslo k souboru s certifikátem
   
 Spisová služba:
 - při výběru datumu v aplikaci se nyní týden zobrazuje správně od pondělí do neděle

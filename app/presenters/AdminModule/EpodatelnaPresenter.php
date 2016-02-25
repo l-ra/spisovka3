@@ -579,7 +579,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $form1['aktivni']->setValue($odes['aktivni']);
             $form1['podepisovat']->setValue($odes['podepisovat']);
             $form1['email']->setValue($odes['email']);
-            $form1['cert_pass']->setValue($odes['cert_pass']);
         }
 
         $form1->addSubmit('upravit', 'Uložit')
@@ -643,7 +642,10 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $config_data['odeslani'][$index]['cert'] = $data['cert'];
             $config_data['odeslani'][$index]['cert_key'] = $data['cert_key'];
         }
-        $config_data['odeslani'][$index]['cert_pass'] = $data['cert_pass'];
+        // heslo měň, pouze když jej uživatel zadá
+        // současné heslo ve formuláři nezobrazuj
+        if (!empty($data['cert_pass']))
+            $config_data['odeslani'][$index]['cert_pass'] = $data['cert_pass'];
 
         self::ulozNastaveni($config_data);
 
