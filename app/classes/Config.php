@@ -91,14 +91,29 @@ class ConfigEpodatelna implements IConfig
         if (!$data)
             throw new Exception(__METHOD__ . '() - v databázi chybí nastavení e-podatelny');
         
-        return \Spisovka\ArrayHash::from(unserialize($data));
+        return $this->upgrade(\Spisovka\ArrayHash::from(unserialize($data)));
     }
     
     public function save($data)
     {
         Config::_saveCheckParameter($data);
         \Settings::set('epodatelna', serialize($data));
-    }                
+    }
+    
+    /** 
+     * Aktualizuje strukturu nastavení podle změn v aplikaci.
+     * @param \Spisovka\ArrayHash $data
+     * @return \Spisovka\ArrayHash
+     */
+    protected function upgrade($data)
+    {
+        if (!isset($data->odeslani[0]->podepisovat)) {
+            $data->odeslani[0]->podepisovat = $data->odeslani[0]->typ_odeslani == 1;
+            unset($data->odeslani[0]->typ_odeslani);
+        }
+
+        return $data;
+    }
 }
 
 class ConfigClient extends Config

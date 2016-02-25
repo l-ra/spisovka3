@@ -39,22 +39,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
 
         // Odeslani
-        if (count($ep['odeslani']) > 0) {
-            $e_odes = array();
-            $typ_odes = array(
-                '0' => 'klasicky bez kvalifikovaného podpisu/značky',
-                '1' => 's kvalifikovaným podpisem/značky'
-            );
-            foreach ($ep['odeslani'] as $eo => $odes) {
-
-                $odes['zpusob_odeslani'] = $typ_odes[$odes['typ_odeslani']];
-                $e_odes[$eo] = $odes;
-            }
-
-            $this->template->n_odeslani = $e_odes;
-        } else {
-            $this->template->n_odeslani = null;
-        }
+        $this->template->n_odeslani = $ep['odeslani'];
 
         // CA
         $esign = new esignature();
@@ -111,13 +96,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 break;
             
             case 'o':
-                $typ_odeslani = array(
-                    '0' => 'klasicky bez kvalifikovaného podpisu/značky',
-                    '1' => 's kvalifikovaným podpisem/značkou'
-                );
-                $ep['odeslani'][$index]['typ'] = $typ_odeslani[$ep['odeslani'][$index]['typ_odeslani']];
-
-                if ($ep['odeslani'][$index]['typ_odeslani'] == 0)
+                if (!$ep['odeslani'][$index]['podepisovat'])
                     $stav = 'vypnuto';
                 else if (file_exists($ep['odeslani'][$index]['cert'])) {
                     $esign = new esignature();
@@ -138,7 +117,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                             $ep['odeslani'][$index]['certifikat']['info'] = $cert_info;
                         }
                     } else {
-                        $stav = "Uložený soubor s certifikátem je neplatný nebo nesouhlasí heslo.\n" . $error_message;
+                        $stav = "Nahraný soubor s certifikátem je neplatný nebo nesouhlasí heslo.\n" . $error_message;
                     }
                 } else {
                     $stav = 'Certifikát není nahrán.';
@@ -589,11 +568,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 ->addCondition(Form::FILLED)
                     ->addRule(Form::EMAIL);
 
-        $form1->addSelect('typ_odeslani', 'Jak odesílat:',
-                ['0' => 'klasicky bez kvalifikovaného podpisu/značky',
-                 '1' => 's kvalifikovaným podpisem/značkou'
-                ]
-        );
+        $form1->addCheckbox('podepisovat', 'Elektronicky podepisovat:');
 
         $form1->addUpload('cert_file', 'Soubor s certifikátem a klíčem ve formátu PKCS #12:');
         $form1->addText('cert_pass', 'Heslo k souboru:', 50, 100);
@@ -602,7 +577,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $form1['index']->setValue($index);
             $form1['ucet']->setValue($odes['ucet']);
             $form1['aktivni']->setValue($odes['aktivni']);
-            $form1['typ_odeslani']->setValue($odes['typ_odeslani']);
+            $form1['podepisovat']->setValue($odes['podepisovat']);
             $form1['email']->setValue($odes['email']);
             $form1['cert_pass']->setValue($odes['cert_pass']);
         }
@@ -661,7 +636,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $config_data['odeslani'][$index]['ucet'] = $data['ucet'];
         $config_data['odeslani'][$index]['aktivni'] = $data['aktivni'];
-        $config_data['odeslani'][$index]['typ_odeslani'] = $data['typ_odeslani'];
+        $config_data['odeslani'][$index]['podepisovat'] = $data['podepisovat'];
         $config_data['odeslani'][$index]['email'] = $data['email'];
 
         if (!empty($data['cert'])) {
@@ -672,7 +647,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         self::ulozNastaveni($config_data);
 
-        $this->flashMessage('Nastavení odeslání emailu bylo upraveno.');
+        $this->flashMessage('Nastavení odesílání emailů bylo upraveno.');
         $this->redirect('this', array('id' => ('o' . $data['index'])));
     }
 

@@ -1,203 +1,199 @@
 {block title}Nastavení e-podatelny{/block}
 {block content}
 
-    <div class="navigate">
+<div class="navigate">
     <a href="{link :Admin:Epodatelna:default}">E-podatelna</a> - Detail položky
-    </div>
+</div>
 
-    {if $Typ == 'i'}
+{if $Typ == 'i'}
     <h2>{$Info['ucet']} - datová schránka</h2>
-    {elseif $Typ == 'e'}
+{elseif $Typ == 'e'}
     <h2>{$Info['ucet']} - emailová schránka</h2>
-    {elseif $Typ == 'o'}
-    <h2>{$Info['ucet']} - odeslání přes email</h2>
-    {else}
+{elseif $Typ == 'o'}
+    <h2>{$Info['ucet']} - odesílání přes email</h2>
+{else}
     <h2>{$Info['ucet']}</h2>
+{/if}
+
+<div class="detail_blok">
+    <div class="detail_hlavicka">Nastavení účtu</div>
+    {if $Typ == 'i'}
+        {if ($FormUpravit=='1')}
+            {control nastavitISDSForm}
+            <dl>
+                <dt>Certifikát:</dt>
+                <dd>
+                    {if $Info['certifikat_stav']==0}
+                        Certifikát není nahrán nebo není potřeba.
+                    {elseif $Info['certifikat_stav']==1}
+                        Certifikát je nahrán.
+                    {elseif $Info['certifikat_stav']==2}
+                        Certifikát je nahrán a je platný.
+                    {else}
+                        Nelze zjístit stav certifikátu.
+                    {/if}
+                </dd>
+            </dl>
+        {elseif ($FormHesloISDS=='1')}
+            <dl>
+                <dt>ID datové schránky:</dt>
+                <dd>{$Info['idbox']}</dd>
+            </dl>
+            <dl>
+                <dt>Vlastník DS:</dt>
+                <dd>{$Info['vlastnik']}</dd>
+            </dl>
+            <dl>
+                <dt>Stav DS:</dt>
+                <dd>{$Info['stav']}</dd>
+            </dl>        
+            <dl>
+                <dt>Přihlašovací jméno do ISDS:</dt>
+                <dd>{$Info['login']}</dd>
+            </dl>
+            <br />
+            <div class="detail_hlavicka">Změna hesla ISDS</div>
+            {control zmenitHesloISDSForm}
+            <br />
+            <div class="blok_form">
+                Pravidla pro vytvoření hesla jsou daná vyhláškou MV (a ještě zpřísněna) a jsou shodná
+                s vytvářením hesel na Portálu ISDS:
+                <ul>
+                    <li>Heslo do datové schránky musí být minimálně 8 a maximálně 32 znaků dlouhé.</li>
+                    <li>Heslo musí obsahovat minimálně jedno velké písmeno, jedno malé písmeno a jedno
+                        číslo. Povolené znaky jsou písmena (a-z, A-Z), číslice (0-9) a speciální znaky (! # $
+                        % & ( ) * + , - . : = ? @ [ ] _ { | } ~). </li>
+                    <li>Není povoleno heslo shodné s jedním z posledních použitých 255 hesel.</li>
+                    <li>Nesmí obsahovat id (login) uživatele, jemuž se heslo mění.</li>
+                    <li>V hesle se nesmí opakovat za sebou 3 a více stejných znaků. </li>
+                    <li>Heslo nesmí začínat na "qwert", "asdgf", "12345". </li>
+                </ul>
+            </div>        
+
+        {else}
+            <dl>
+                <dt>ID datové schránky:</dt>
+                <dd>{$Info['idbox']}</dd>
+            </dl>
+            <dl>
+                <dt>Vlastník DS:</dt>
+                <dd>{$Info['vlastnik']}</dd>
+            </dl>
+            <dl>
+                <dt>Stav DS:</dt>
+                <dd>{$Info['stav']}</dd>
+            </dl>
+            <dl>
+                <dt>Přihlašovací jméno do ISDS:</dt>
+                <dd>{$Info['login']}</dd>
+            </dl>
+            <dl>
+                <dt>Informace o expiraci hesla:</dt>
+                <dd>{$Info['stav_hesla']}</dd>
+            </dl>
+            <dl>
+                <dt>Režim:</dt>
+                <dd>{if $Info['test']==1}Testovací režim (czebox.cz){else}Reálný provoz (mojedatovaschranka.cz){/if}</dd>
+            </dl>
+            <dl>
+                <dt>Podatelna pro příjem:</dt>
+                <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}</dd>
+            </dl>
+            <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+            &nbsp;&nbsp;&nbsp;
+            {if $vice_datovych_schranek}
+                <a href="{link :Admin:Epodatelna:smazat, 'id'=>$Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
+                &nbsp;&nbsp;&nbsp;
+            {/if}
+            <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'zmenit_heslo_isds'=>1}">Změnit heslo k ISDS</a>
+        {/if}
+    {elseif $Typ == 'e'}
+        {if ($FormUpravit=='1')}
+            {control nastavitEmailForm}
+            <script type="text/javascript">
+
+                $('#frmnastavitEmailForm-typ').change(function () {
+                    value = $("#frmnastavitEmailForm-typ").val();
+                    port = $("#frmnastavitEmailForm-port");
+                    ssl = value.indexOf('/ssl') >= 0;
+
+                    if (value.indexOf('/pop3') >= 0) {
+                        port.val(ssl ? 995 : 110);
+                    } else if (value.indexOf('/imap') >= 0) {
+                        port.val(ssl ? 993 : 143);
+                    }
+                })
+                $('#frmnastavitEmailForm-only_signature').change(function () {
+                    checkbox2 = $("#frmnastavitEmailForm-qual_signature");
+                    checkbox2.prop('disabled', !this.checked);
+                })
+
+                $("#frmnastavitEmailForm-qual_signature").prop('disabled', $('#frmnastavitEmailForm-only_signature').prop('checked') == false)
+
+            </script>    
+        {else}
+            <dl>
+                <dt>Protokol:</dt>
+                <dd>{$Info['protokol']}</dd>
+            </dl>
+            <dl>
+                <dt>Server:</dt>
+                <dd>{$Info['server']}:{$Info['port']} / {$Info['inbox']}</dd>
+            </dl>
+            <dl>
+                <dt>Přihlašovací jméno:</dt>
+                <dd>{$Info['login']}</dd>
+            </dl>
+            <dl>
+                <dt>Příjem:</dt>
+                <dd>
+                    {if $Info['only_signature']==1}
+                        {if $Info['qual_signature']==1}
+                            pouze zprávy s ověřeným kvalifikovaným podpisem
+                        {else}
+                            pouze zprávy obsahující e-podpis (jakákoli certifikační autorita)
+                        {/if}
+                    {else}
+                        jakékoli emailové zprávy
+                    {/if}
+                </dd>
+            </dl>
+            <dl>
+                <dt>Podatelna pro příjem této schránky:</dt>
+                <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}</dd>
+            </dl>
+            <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+            &nbsp;&nbsp;&nbsp;
+            <a href="{link :Admin:Epodatelna:smazat, 'id'=>$Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
+        {/if}
+    {elseif $Typ == 'o'}
+        {if ($FormUpravit=='1')}
+            {control nastavitOdesForm}
+        {else}
+            <dl>
+                <dt>Emailová adresa odesilatele:</dt>
+                <dd>{$Info['email']}</dd><br/>
+                <dt>Elektronicky podepisovat:</dt>
+                <dd>{$Info['podepisovat'] ? 'ano' : 'ne'}</dd><br />
+                {if $Info['podepisovat']}
+                    <dt>Stav elektronického podepisování:</dt>
+                    <dd>{!$Info['certifikat']['stav']|escape|nl2br}</dd><br />
+                    {if !empty($Info['certifikat']['info'])}
+                        <dt>Informace o certifikátu:</dt>
+                        <dd>
+                            {$Info['certifikat']['info']['email']} <br />
+                            {if !empty($Info['certifikat']['info']['jmeno'])}{$Info['certifikat']['info']['jmeno']}<br />{/if}
+                            {if !empty($Info['certifikat']['info']['organizace'])}{$Info['certifikat']['info']['organizace']}<br />{/if}
+                            {if !empty($Info['certifikat']['info']['jednotka'])}{$Info['certifikat']['info']['jednotka']}<br />{/if}
+                            Platnost: {$Info['certifikat']['info']['platnost_od']|date} - {$Info['certifikat']['info']['platnost_do']|date} <br />
+                            CA: {$Info['certifikat']['info']['CA']}
+                        </dd>
+                    {/if}
+                {/if}
+            </dl>
+            <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+        {/if}
+    {else}
     {/if}
 
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Nastavení účtu</div>
-        {if $Typ == 'i'}
-        {if ($FormUpravit=='1')}
-        {control nastavitISDSForm}
-        <dl>
-            <dt>Certifikát:</dt>
-            <dd>
-                {if $Info['certifikat_stav']==0}
-                Certifikát není nahrán nebo není potřeba.
-                {elseif $Info['certifikat_stav']==1}
-                Certifikát je nahrán.
-                {elseif $Info['certifikat_stav']==2}
-                Certifikát je nahrán a je platný.
-                {else}
-                Nelze zjístit stav certifikátu.
-                {/if}
-            </dd>
-        </dl>
-        {elseif ($FormHesloISDS=='1')}
-        <dl>
-            <dt>ID datové schránky:</dt>
-            <dd>{$Info['idbox']}</dd>
-        </dl>
-        <dl>
-            <dt>Vlastník DS:</dt>
-            <dd>{$Info['vlastnik']}</dd>
-        </dl>
-        <dl>
-            <dt>Stav DS:</dt>
-            <dd>{$Info['stav']}</dd>
-        </dl>        
-        <dl>
-            <dt>Přihlašovací jméno do ISDS:</dt>
-            <dd>{$Info['login']}</dd>
-        </dl>
-        <br />
-        <div class="detail_hlavicka">Změna hesla ISDS</div>
-        {control zmenitHesloISDSForm}
-        <br />
-        <div class="blok_form">
-        Pravidla pro vytvoření hesla jsou daná vyhláškou MV (a ještě zpřísněna) a jsou shodná
-        s vytvářením hesel na Portálu ISDS:
-        <ul>
-            <li>Heslo do datové schránky musí být minimálně 8 a maximálně 32 znaků dlouhé.</li>
-            <li>Heslo musí obsahovat minimálně jedno velké písmeno, jedno malé písmeno a jedno
-            číslo. Povolené znaky jsou písmena (a-z, A-Z), číslice (0-9) a speciální znaky (! # $
-            % & ( ) * + , - . : = ? @ [ ] _ { | } ~). </li>
-            <li>Není povoleno heslo shodné s jedním z posledních použitých 255 hesel.</li>
-            <li>Nesmí obsahovat id (login) uživatele, jemuž se heslo mění.</li>
-            <li>V hesle se nesmí opakovat za sebou 3 a více stejných znaků. </li>
-            <li>Heslo nesmí začínat na "qwert", "asdgf", "12345". </li>
-        </ul>
-        </div>        
-      
-        {else}
-        <dl>
-            <dt>ID datové schránky:</dt>
-            <dd>{$Info['idbox']}</dd>
-        </dl>
-        <dl>
-            <dt>Vlastník DS:</dt>
-            <dd>{$Info['vlastnik']}</dd>
-        </dl>
-        <dl>
-            <dt>Stav DS:</dt>
-            <dd>{$Info['stav']}</dd>
-        </dl>
-        <dl>
-            <dt>Přihlašovací jméno do ISDS:</dt>
-            <dd>{$Info['login']}</dd>
-        </dl>
-        <dl>
-            <dt>Informace o expiraci hesla:</dt>
-            <dd>{$Info['stav_hesla']}</dd>
-        </dl>
-        <dl>
-            <dt>Režim:</dt>
-            <dd>{if $Info['test']==1}Testovací režim (czebox.cz){else}Reálný provoz (mojedatovaschranka.cz){/if}</dd>
-        </dl>
-        <dl>
-            <dt>Podatelna pro příjem:</dt>
-            <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}</dd>
-        </dl>
-        <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
-        &nbsp;&nbsp;&nbsp;
-        {if $vice_datovych_schranek}
-        <a href="{link :Admin:Epodatelna:smazat, 'id'=>$Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
-        &nbsp;&nbsp;&nbsp;
-        {/if}
-        <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'zmenit_heslo_isds'=>1}">Změnit heslo k ISDS</a>
-        {/if}
-        {elseif $Typ == 'e'}
-        {if ($FormUpravit=='1')}
-        {control nastavitEmailForm}
-        <script type="text/javascript">
-
-            $('#frmnastavitEmailForm-typ').change(function () {
-                value = $("#frmnastavitEmailForm-typ").val();
-                port = $("#frmnastavitEmailForm-port");
-                ssl = value.indexOf('/ssl') >= 0;
-                
-                if ( value.indexOf('/pop3') >= 0) {
-                    port.val(ssl ? 995 : 110);
-                } else if ( value.indexOf('/imap') >= 0) {
-                    port.val(ssl ? 993 : 143);
-                }
-            })
-            $('#frmnastavitEmailForm-only_signature').change(function () {
-                checkbox2 = $("#frmnastavitEmailForm-qual_signature");
-                checkbox2.prop('disabled', !this.checked);
-            })
-            
-            $("#frmnastavitEmailForm-qual_signature").prop('disabled', $('#frmnastavitEmailForm-only_signature').prop('checked') == false)
-
-        </script>    
-        {else}
-        <dl>
-            <dt>Protokol:</dt>
-            <dd>{$Info['protokol']}</dd>
-        </dl>
-        <dl>
-            <dt>Server:</dt>
-            <dd>{$Info['server']}:{$Info['port']} / {$Info['inbox']}</dd>
-        </dl>
-        <dl>
-            <dt>Přihlašovací jméno:</dt>
-            <dd>{$Info['login']}</dd>
-        </dl>
-        <dl>
-            <dt>Příjem:</dt>
-            <dd>
-                {if $Info['only_signature']==1}
-                    {if $Info['qual_signature']==1}
-                    pouze zprávy s ověřeným kvalifikovaným podpisem
-                    {else}
-                    pouze zprávy obsahující e-podpis (jakákoli certifikační autorita)
-                    {/if}
-                {else}
-                jakékoli emailové zprávy
-                {/if}
-            </dd>
-        </dl>
-        <dl>
-            <dt>Podatelna pro příjem této schránky:</dt>
-            <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}</dd>
-        </dl>
-        <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
-        &nbsp;&nbsp;&nbsp;
-        <a href="{link :Admin:Epodatelna:smazat, 'id'=>$Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
-        {/if}
-        {elseif $Typ == 'o'}
-        {if ($FormUpravit=='1')}
-        {control nastavitOdesForm}
-        {else}
-        <dl>
-            <dt>Způsob odeslání:</dt>
-            <dd>{$Info['typ']}</dd>
-        </dl>
-        <dl>
-            <dt>Emailová adresa odesilatele:</dt>
-            <dd>{$Info['email']}</dd>
-        </dl>
-        <dl>
-            <dt>Stav elektronického podepisování:</dt>
-            <dd>{!$Info['certifikat']['stav']|escape|nl2br}</dd>
-        </dl>
-        {if !empty($Info['certifikat']['info'])}
-        <dl>
-            <dt>Informace o certifikátu:</dt>
-            <dd>
-                {$Info['certifikat']['info']['email']} <br />
-                {if !empty($Info['certifikat']['info']['jmeno'])}{$Info['certifikat']['info']['jmeno']}<br />{/if}
-                {if !empty($Info['certifikat']['info']['organizace'])}{$Info['certifikat']['info']['organizace']}<br />{/if}
-                {if !empty($Info['certifikat']['info']['jednotka'])}{$Info['certifikat']['info']['jednotka']}<br />{/if}
-                Platnost: {$Info['certifikat']['info']['platnost_od']|date} - {$Info['certifikat']['info']['platnost_do']|date} <br />
-                CA: {$Info['certifikat']['info']['CA']}
-            </dd>
-        </dl>
-        {/if}
-        <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
-        {/if}
-        {else}
-        {/if}
-        
-    </div>
+</div>

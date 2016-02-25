@@ -25,8 +25,9 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         $tmp->setHeader('To', NULL);
 
         $config = (new Spisovka\ConfigEpodatelna())->get();
-        $config = $config->odeslani[0];
-        if ($config['typ_odeslani'] != 1) {
+        // použij první / hlavní účet, pokud by jich v budoucnu mělo být více
+        $config = $config->odeslani[0]; 
+        if ($config['podepisovat']) {
             $mail_source = $tmp->generateMessage();
             $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
             $header = $parts[0];
