@@ -3,7 +3,7 @@
 /client/configs/install
 /client/configs/*.ini
 /client/configs/*.neon
-/client/configs/files/*
+/client/configs/cert*
 /client/files/*
 /client/files/dokumenty/*
 /client/files/epodatelna/*

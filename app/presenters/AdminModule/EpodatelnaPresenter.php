@@ -261,12 +261,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         if ($data['typ_pripojeni'] == 1 || $data['typ_pripojeni'] == 2) {
             //nahrani certifikatu
             $upload = $data['certifikat_file'];
-            if (!file_exists(CLIENT_DIR . "/configs/files")) {
-                mkdir(CLIENT_DIR . "/configs/files");
-            }
 
-            if (is_writeable(CLIENT_DIR . "/configs/files")) {
-                $fileName = CLIENT_DIR . "/configs/files/certifikat_isds" . $index . ".crt";
+            if (is_writeable(CLIENT_DIR . "/configs")) {
+                $fileName = CLIENT_DIR . "/configs/certifikat_isds" . $index . ".crt";
                 if (!$upload instanceof Nette\Http\FileUpload) {
                     $this->flashMessage('Certifikát se nepodařilo nahrát.', 'warning');
                 } else if ($upload->isOk()) {
@@ -630,12 +627,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $data['cert'] = "";
         //nahrani certifikatu
         $upload = $data['cert_file'];
-        if (!file_exists(CLIENT_DIR . '/configs/files')) {
-            mkdir(CLIENT_DIR . '/configs/files');
-        }
 
         $chyba_pri_uploadu = 0;
-        $fileName = CLIENT_DIR . "/configs/files/certifikat_email_" . $index . ".crt";
+        $fileName = CLIENT_DIR . "/configs/certifikat_email_" . $index . ".crt";
         if (!$upload instanceof Nette\Http\FileUpload) {
             $this->flashMessage('Certifikát se nepodařilo nahrát.', 'warning');
         } else if ($upload->isOk()) {
@@ -662,8 +656,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
         unset($data['cert_file']);
 
-        if ($chyba_pri_uploadu && !is_writeable(CLIENT_DIR . '/configs/files'))
-            $this->flashMessage('Nemohu zapisovat do adresáře client/configs/files/.', 'warning');
+        if ($chyba_pri_uploadu && !is_writeable(CLIENT_DIR . '/configs'))
+            $this->flashMessage('Nemohu zapisovat do adresáře client/configs/.', 'warning');
 
         $config_data['odeslani'][$index]['ucet'] = $data['ucet'];
         $config_data['odeslani'][$index]['aktivni'] = $data['aktivni'];
