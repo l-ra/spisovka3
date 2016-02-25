@@ -196,53 +196,6 @@ if (MIGRACE) debug($S3_nastaveni_klient);
 if (MIGRACE) echo "\n   => <span style='color:green'>nastavení klienta přeneseno</span>";
 
 
-$S3_nastaveni_epod = parse_ini_file(CLIENT_DIR .'/configs/epodatelna.ini',TRUE);
-
-include S2_DIR .'/email/nastaveni.php';
-$S3_nastaveni_epod['email']['0.ucet'] = "Centrální podatelna";
-$S3_nastaveni_epod['email']['0.aktivni'] = EMAIL_ENABLE;
-$S3_nastaveni_epod['email']['0.typ'] = EMAIL_TYP;
-$S3_nastaveni_epod['email']['0.server'] = EMAIL_SERVER;
-$S3_nastaveni_epod['email']['0.port'] = EMAIL_PORT;
-$S3_nastaveni_epod['email']['0.inbox'] = EMAIL_INBOX;
-$S3_nastaveni_epod['email']['0.login'] = EMAIL_LOGIN;
-$S3_nastaveni_epod['email']['0.password'] = EMAIL_PASS;
-$S3_nastaveni_epod['email']['0.podatelna'] = EMAIL_PODATELNA;
-$S3_nastaveni_epod['email']['0.only_signature'] = EMAIL_SIGNATURE;
-$S3_nastaveni_epod['email']['0.qual_signature'] = EMAIL_QSIGNATURE;
-
-$S3_nastaveni_epod['odeslani']['0.ucet'] = "Primární email";
-$S2_email = EMAIL_ADDRESS;
-$S3_nastaveni_epod['odeslani']['0.aktivni'] = empty($S2_email)?0:1;
-$S3_nastaveni_epod['odeslani']['0.typ_odeslani'] = EMAIL_TYPE_SEND;
-$S3_nastaveni_epod['odeslani']['0.jmeno'] = "";
-$S3_nastaveni_epod['odeslani']['0.email'] = EMAIL_ADDRESS;
-if ( EMAIL_TYPE_SEND == 1 ) {
-    $S2cert = S2_DIR ."/". EMAIL_CERT;
-    $S3cert = CLIENT_DIR ."/configs/files/certifikat_email_0.crt";
-    $S3_nastaveni_epod['odeslani']['0.cert'] = $S3cert;
-    $S3_nastaveni_epod['odeslani']['0.cert_key'] = "";
-    $S3_nastaveni_epod['odeslani']['0.cert_pass'] =EMAIL_CERTPASSPHRASE;
-} else {
-    $S3_nastaveni_epod['odeslani']['0.cert'] = "";
-    $S3_nastaveni_epod['odeslani']['0.cert_key'] = "";
-    $S3_nastaveni_epod['odeslani']['0.cert_pass'] = "";
-}
-
-include S2_DIR .'/isds/nastaveni.php';
-$S3_nastaveni_epod['isds']['0.ucet'] = "Centrální podatelna";
-$S3_nastaveni_epod['isds']['0.aktivni'] = SPIS_ISDS;
-$S3_nastaveni_epod['isds']['0.idbox'] = ISDS_IDBOX;
-$S3_nastaveni_epod['isds']['0.login'] = ISDS_LOGIN;
-$S3_nastaveni_epod['isds']['0.password'] = ISDS_PASS;
-$S3_nastaveni_epod['isds']['0.podatelna'] = ISDS_PODATELNA;
-$S3_nastaveni_epod['isds']['0.test'] = ISDS_TEST;
-$S3_nastaveni_epod['isds']['0.typ_pripojeni'] = 0;
-
-if (MIGRACE) write_ini_file(CLIENT_DIR .'/configs/epodatelna.ini', $S3_nastaveni_epod);
-if (MIGRACE) debug($S3_nastaveni_epod);
-if (MIGRACE) echo "\n   => <span style='color:green'>nastavení e-podatelny přeneseno</span>";
-
 if (TEST_KONTROLA==1) {
     
     echo "****************************************************************************************************\n";
