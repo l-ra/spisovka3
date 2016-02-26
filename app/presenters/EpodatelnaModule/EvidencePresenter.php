@@ -898,20 +898,18 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             $ep = (new Spisovka\ConfigEpodatelna())->get();
             if (isset($ep['odeslani'][0])) {
-                if ($ep['odeslani'][0]['aktivni'] == '1') {
 
-                    $mail = new ESSMail;
-                    $mail->setFromConfig();
-                    $mail->addTo($data['email']);
-                    $mail->setSubject($data['predmet']);
-                    $mail->setBodySign($data['zprava']);
-                    $mail->send();
+                $mail = new ESSMail;
+                $mail->setFromConfig();
+                $mail->addTo($data['email']);
+                $mail->setSubject($data['predmet']);
+                $mail->setBodySign($data['zprava']);
+                $mail->send();
 
-                    if ($hromadna) {
-                        echo 'Upozornění odesílateli na adresu "' . htmlentities($data['email']) . '" bylo úspěšně odesláno.';
-                    } else {
-                        $this->flashMessage('Upozornění odesílateli na adresu "' . htmlentities($data['email']) . '" bylo úspěšně odesláno.');
-                    }
+                if ($hromadna) {
+                    echo 'Upozornění odesílateli na adresu "' . htmlentities($data['email']) . '" bylo úspěšně odesláno.';
+                } else {
+                    $this->flashMessage('Upozornění odesílateli na adresu "' . htmlentities($data['email']) . '" bylo úspěšně odesláno.');
                 }
             } else {
                 if ($hromadna) {

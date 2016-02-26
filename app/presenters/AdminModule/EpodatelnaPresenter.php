@@ -569,7 +569,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 ->setValue($typ);
         $form1->addText('ucet', 'Název účtu:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
-        $form1->addCheckbox('aktivni', ' aktivní účet?');
+        // $form1->addCheckbox('aktivni', ' aktivní účet?');
         $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100)
                 ->addCondition(Form::FILLED)
                 ->addRule(Form::EMAIL);
@@ -582,7 +582,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         if ($odes) {
             $form1['index']->setValue($index);
             $form1['ucet']->setValue($odes['ucet']);
-            $form1['aktivni']->setValue($odes['aktivni']);
+            // $form1['aktivni']->setValue($odes['aktivni']);
             $form1['podepisovat']->setValue($odes['podepisovat']);
             $form1['email']->setValue($odes['email']);
         }
@@ -642,7 +642,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $this->flashMessage('Nemohu zapisovat do adresáře client/configs/.', 'warning');
 
         $config_data['odeslani'][$index]['ucet'] = $data['ucet'];
-        $config_data['odeslani'][$index]['aktivni'] = $data['aktivni'];
+        $config_data['odeslani'][$index]['aktivni'] = true;
         $config_data['odeslani'][$index]['podepisovat'] = $data['podepisovat'];
         $config_data['odeslani'][$index]['email'] = $data['email'];
 

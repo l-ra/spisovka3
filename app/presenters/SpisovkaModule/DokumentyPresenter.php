@@ -1704,7 +1704,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $odesilatele = array();
         if (count($ep['odeslani']) > 0) {
             foreach ($ep['odeslani'] as $odes_id => $odes) {
-                if ($odes['aktivni'] == 1) {
+                if (true /* $odes['aktivni'] == 1 */) {
                     if (empty($odes['jmeno'])) {
                         $odesilatele['epod' . $odes_id] = $odes['email'] . "[" . $odes['ucet'] . "]";
                     } else {
