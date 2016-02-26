@@ -48,14 +48,14 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $this->template->n_ca = $esign->getCASimple();
     }
 
-    public function renderDetail()
+    public function renderDetail($id, $upravit)
     {
         $this->template->vice_datovych_schranek = ISDS_Spisovka::vice_datovych_schranek();
 
         // Klientske nastaveni
         $ep = self::nactiNastaveni();
         $ep = $ep->toArray(); // Je nutne kvuli zpusobu modifikace objektu nastaveni
-        
+
         $id_alter = null;
         $do = $this->getParameter('do');
         if ($do) {
@@ -94,15 +94,16 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
                 $this->info = @$ep['email'][$index];
                 break;
-            
+
             case 'o':
                 if (!$ep['odeslani'][$index]['podepisovat'])
                     $stav = 'vypnuto';
                 else if (file_exists($ep['odeslani'][$index]['cert'])) {
                     $esign = new esignature();
 
-                    $ok = $esign->setUserCert($ep['odeslani'][$index]['cert'], $ep['odeslani'][$index]['cert_pass']);
-                    $error_message = $esign->getError(); 
+                    $ok = $esign->setUserCert($ep['odeslani'][$index]['cert'],
+                            $ep['odeslani'][$index]['cert_pass']);
+                    $error_message = $esign->getError();
 
                     if ($ok) {
                         $stav = 'Certifikát je nahrán.';
@@ -181,7 +182,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $form1 = new Spisovka\Form();
         $form1->addHidden('index');
-                
+
         $form1->addHidden('ep_typ')
                 ->setValue('i');
         $form1->addText('ucet', 'Název účtu:', 50, 100)
@@ -201,7 +202,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $form1->addSelect('test', 'Režim:',
                 ['0' => 'Reálný provoz (mojedatovaschranka.cz)',
-                 '1' => 'Testovací režim (czebox.cz)']
+            '1' => 'Testovací režim (czebox.cz)']
         );
 
         $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select);
@@ -216,7 +217,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $form1['test']->setValue($isds['test']);
             $form1['podatelna']->setValue($isds['podatelna']);
         }
-        
+
         $form1->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'nastavitISDSClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -229,8 +230,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     public function nastavitISDSClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-
-        $chyba = 0;
 
         $index = $data['index'];
 
@@ -249,12 +248,14 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                     if ($upload->move($fileName)) {
                         $data['certifikat'] = $fileName;
                     } else {
-                        $this->flashMessage('Certifikát se nepodařilo přenést na cílové místo.', 'warning');
+                        $this->flashMessage('Certifikát se nepodařilo přenést na cílové místo.',
+                                'warning');
                     }
                 } else {
                     switch ($upload->error) {
                         case UPLOAD_ERR_INI_SIZE:
-                            $this->flashMessage('Překročena velikost pro nahrání certifikátu.', 'warning');
+                            $this->flashMessage('Překročena velikost pro nahrání certifikátu.',
+                                    'warning');
                             break;
                         case UPLOAD_ERR_NO_FILE:
                             //$this->flashMessage('Nebyl vybrán žádný soubor.','warning');
@@ -271,65 +272,56 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
         unset($data['certifikat_file']);
 
-        if ($chyba == 0) {
+        $config_data['isds'][$index]['ucet'] = $data['ucet'];
+        $config_data['isds'][$index]['aktivni'] = $data['aktivni'];
+        $config_data['isds'][$index]['typ_pripojeni'] = $data['typ_pripojeni'];
+        $config_data['isds'][$index]['login'] = $data['login'];
+        if (!empty($data['password']))
+            $config_data['isds'][$index]['password'] = $data['password'];
+        if (!empty($data['certifikat']))
+            $config_data['isds'][$index]['certifikat'] = $data['certifikat'];
+        $config_data['isds'][$index]['cert_pass'] = $data['cert_pass'];
+        $config_data['isds'][$index]['test'] = $data['test'];
+        $config_data['isds'][$index]['podatelna'] = $data['podatelna'];
 
-            $config_data['isds'][$index]['ucet'] = $data['ucet'];
-            $config_data['isds'][$index]['aktivni'] = $data['aktivni'];
-            $config_data['isds'][$index]['typ_pripojeni'] = $data['typ_pripojeni'];
-            $config_data['isds'][$index]['login'] = $data['login'];
-            if (!empty($data['password']))
-                $config_data['isds'][$index]['password'] = $data['password'];
-            if (!empty($data['certifikat']))
-                $config_data['isds'][$index]['certifikat'] = $data['certifikat'];
-            $config_data['isds'][$index]['cert_pass'] = $data['cert_pass'];
-            $config_data['isds'][$index]['test'] = $data['test'];
-            $config_data['isds'][$index]['podatelna'] = $data['podatelna'];
+        $idbox = "";
+        $vlastnik = "";
+        $stav = "";
+        try {
+            $ISDS = new ISDS_Spisovka();
+            if ($ISDS->pripojit($config_data['isds'][$index])) {
+                $info = $ISDS->informaceDS();
+                if (!empty($info)) {
 
-            $idbox = "";
-            $vlastnik = "";
-            $stav = "";
-            $chyba = 0;
-            try {
-                $ISDS = new ISDS_Spisovka();
-                if ($ISDS->pripojit($config_data['isds'][$index])) {
-                    $info = $ISDS->informaceDS();
-                    if (!empty($info)) {
-
-                        $idbox = $info->dbID;
-                        if (empty($info->firmName)) {
-                            // jmeno prijmeni
-                            $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
-                        } else {
-                            // firma urad
-                            $vlastnik = $info->firmName . " [" . $info->dbType . "]";
-                        }
-                        $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
-                        $stav_hesla = $ISDS->GetPasswordInfo();
+                    $idbox = $info->dbID;
+                    if (empty($info->firmName)) {
+                        // jmeno prijmeni
+                        $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
+                    } else {
+                        // firma urad
+                        $vlastnik = $info->firmName . " [" . $info->dbType . "]";
                     }
-                } else {
-                    $this->flashMessage('Nelze se připojit k ISDS! Chyba: ' . $ISDS->error(), "warning");
-                    //$this->redirect('this',array('id'=>('i' . $data['index']),'upravit'=>1));
-                    $chyba = 1;
+                    $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
+                    $stav_hesla = $ISDS->GetPasswordInfo();
                 }
-            } catch (Exception $e) {
-                $this->flashMessage('Nelze se připojit k ISDS! ' . $e->getMessage(), "warning");
-                //$this->redirect('this',array('id'=>('i' . $data['index']),'upravit'=>1));
-                //$chyba = 1;
+            } else {
+                $this->flashMessage('Nelze se připojit k ISDS! Chyba: ' . $ISDS->error(),
+                        "warning");
             }
-
-            $config_data['isds'][$index]['idbox'] = $idbox;
-            $config_data['isds'][$index]['vlastnik'] = $vlastnik;
-            $config_data['isds'][$index]['stav'] = $stav;
-            $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla)) ? "(bez omezení)"
-                        : date("j.n.Y G:i", strtotime($stav_hesla));
-
-            self::ulozNastaveni($config_data);
-
-            //if ( $chyba == 0 ) {
-            $this->flashMessage('Nastavení datové schránky bylo upraveno.');
-            $this->redirect('this', array('id' => ('i' . $data['index'])));
-            //}
+        } catch (Exception $e) {
+            $this->flashMessage('Nelze se připojit k ISDS! ' . $e->getMessage(), "warning");
         }
+
+        $config_data['isds'][$index]['idbox'] = $idbox;
+        $config_data['isds'][$index]['vlastnik'] = $vlastnik;
+        $config_data['isds'][$index]['stav'] = $stav;
+        $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla)) ? "(bez omezení)" : date("j.n.Y G:i",
+                        strtotime($stav_hesla));
+
+        self::ulozNastaveni($config_data);
+
+        $this->flashMessage('Nastavení datové schránky bylo upraveno.');
+        $this->redirect('detail', ['id' => 'i' . $data['index']]);
     }
 
     function ruleContains($item, $args)
@@ -359,9 +351,12 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 ->setValue('i');
 
         $form->addPassword('password', 'Přihlašovací heslo ISDS:', 30, 30)
-                ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addRule(Nette\Forms\Form::MIN_LENGTH, 'Heslo do datové schránky musí být minimálně %d znaků dlouhé.', 8)
-                ->addRule(Nette\Forms\Form::MAX_LENGTH, 'Heslo do datové schránky musí být maximálně %d znaků dlouhé.', 32)
+                ->addRule(Nette\Forms\Form::FILLED,
+                        'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+                ->addRule(Nette\Forms\Form::MIN_LENGTH,
+                        'Heslo do datové schránky musí být minimálně %d znaků dlouhé.', 8)
+                ->addRule(Nette\Forms\Form::MAX_LENGTH,
+                        'Heslo do datové schránky musí být maximálně %d znaků dlouhé.', 32)
         /* ->addRule(callback($this, 'ruleNoEqual'),'Heslo mesmí obsahovat id (login) uživatele, jemuž se heslo mění.',$isds['login'])
           ->addRule(callback($this, 'ruleNoEqual'),'Heslo se nesmí shodovat s původním heslem.',$isds['password'])
           ->addRule(callback($this, 'ruleContains'),'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','qwert')
@@ -370,9 +365,11 @@ class Admin_EpodatelnaPresenter extends BasePresenter
          */;
 
         $form->addPassword('password_confirm', 'Přihlašovací heslo ještě jednou:', 30, 30)
-                ->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+                ->addRule(Nette\Forms\Form::FILLED,
+                        'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
                 ->addConditionOn($form["password"], Nette\Forms\Form::FILLED)
-                ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !", $form["password"]);
+                ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !",
+                        $form["password"]);
 
         $form->addSubmit('zmenit', 'Změnit heslo')
                 ->onClick[] = array($this, 'zmenitHesloISDSClicked');
@@ -434,18 +431,23 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                         self::ulozNastaveni($config_data);
 
                         $this->flashMessage('Heslo k datové schránky bylo úspěšně změněno.');
-                        $this->redirect(':Admin:Epodatelna:detail', array('id' => ('i' . $data['index'])));
+                        $this->redirect(':Admin:Epodatelna:detail',
+                                array('id' => ('i' . $data['index'])));
                     } else {
-                        $this->flashMessage('Heslo k datové schránky se nepodařilo změnit.', 'warning');
+                        $this->flashMessage('Heslo k datové schránky se nepodařilo změnit.',
+                                'warning');
                         $this->flashMessage('Chyba ISDS: ' . $ISDS->error(), 'warning');
                         //$this->redirect(':Admin:Epodatelna:detail',array('id'=>('i' . $data['index']),'zmenit_heslo_isds'=>'1' ));
                     }
                 } else {
-                    $this->flashMessage('Nelze se připojit k ISDS! Chyba: ' . $ISDS->error(), "warning");
-                    $this->redirect(':Admin:Epodatelna:detail', array('id' => ('i' . $data['index'])));
+                    $this->flashMessage('Nelze se připojit k ISDS! Chyba: ' . $ISDS->error(),
+                            "warning");
+                    $this->redirect(':Admin:Epodatelna:detail',
+                            array('id' => ('i' . $data['index'])));
                 }
             } catch (Exception $e) {
-                $this->flashMessage('Při pokusu o změnu hesla došlo k chybě: '. $e->getMessage(), "warning");
+                $this->flashMessage('Při pokusu o změnu hesla došlo k chybě: ' . $e->getMessage(),
+                        "warning");
             }
         }
     }
@@ -480,9 +482,11 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
         $form1->addCheckbox('aktivni', ' aktivní účet?');
         $form1->addSelect('typ', 'Protokol:', $typ_serveru)
-                ->addRule(Nette\Forms\Form::FILLED, 'Vyberte protokol pro připojení k emailové schránce.');
+                ->addRule(Nette\Forms\Form::FILLED,
+                        'Vyberte protokol pro připojení k emailové schránce.');
         $form1->addText('server', 'Adresa serveru:', 50, 100)
-                ->addRule(Nette\Forms\Form::FILLED, 'Adresa poštovního serveru musí být vyplněna.');
+                ->addRule(Nette\Forms\Form::FILLED,
+                        'Adresa poštovního serveru musí být vyplněna.');
         $form1->addText('port', 'Port:', 5, 50)
                 ->addRule(Nette\Forms\Form::FILLED, 'Port serveru musí být vyplněno.');
         $form1->addText('inbox', 'Složka:', 50, 100);
@@ -495,8 +499,10 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select);
 
-        $form1->addCheckbox('only_signature', 'přijímat pouze emaily s elektronickým podpisem/značkou');
-        $form1->addCheckbox('qual_signature', 'přijímat pouze emaily s uznávaným elektronickým podpisem/značkou');
+        $form1->addCheckbox('only_signature',
+                'přijímat pouze emaily s elektronickým podpisem/značkou');
+        $form1->addCheckbox('qual_signature',
+                'přijímat pouze emaily s uznávaným elektronickým podpisem/značkou');
 
         if ($email) {
             $form1['index']->setValue($index);
@@ -545,7 +551,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         self::ulozNastaveni($config_data);
 
         $this->flashMessage('Nastavení emailové schránky bylo upraveno.');
-        $this->redirect('this', array('id' => ('e' . $data['index'])));
+        $this->redirect('detail', array('id' => ('e' . $data['index'])));
     }
 
     protected function createComponentNastavitOdesForm()
@@ -566,7 +572,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addCheckbox('aktivni', ' aktivní účet?');
         $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100)
                 ->addCondition(Form::FILLED)
-                    ->addRule(Form::EMAIL);
+                ->addRule(Form::EMAIL);
 
         $form1->addCheckbox('podepisovat', 'Elektronicky podepisovat:');
 
@@ -613,12 +619,14 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             } catch (Exception $e) {
                 $e->getMessage();
                 $chyba_pri_uploadu = 1;
-                $this->flashMessage('Certifikát se nepodařilo přenést na cílové místo.', 'warning');
+                $this->flashMessage('Certifikát se nepodařilo přenést na cílové místo.',
+                        'warning');
             }
         } else {
             switch ($upload->error) {
                 case UPLOAD_ERR_INI_SIZE:
-                    $this->flashMessage('Překročena velikost pro nahrání certifikátu.', 'warning');
+                    $this->flashMessage('Překročena velikost pro nahrání certifikátu.',
+                            'warning');
                     break;
                 case UPLOAD_ERR_NO_FILE:
                     //$this->flashMessage('Nebyl vybrán žádný soubor.','warning');
@@ -650,13 +658,13 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         self::ulozNastaveni($config_data);
 
         $this->flashMessage('Nastavení odesílání emailů bylo upraveno.');
-        $this->redirect('this', array('id' => ('o' . $data['index'])));
+        $this->redirect('detail', array('id' => ('o' . $data['index'])));
     }
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $this->redirect('this', array('id' => ($data['ep_typ'] . $data['index'])));
+        $this->redirect('detail', ['id' => ($data['ep_typ'] . $data['index'])]);
     }
 
     public function actionSmazat()
