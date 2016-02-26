@@ -418,8 +418,8 @@ class esignature
                         [$this->private_key, $this->passphrase], $header, PKCS7_DETACHED);
         if ($ok)
             $signed_msg = file_get_contents($tmp_signed);
-        // unlink($tmp_mess);
-        // unlink($tmp_signed);
+        unlink($tmp_mess);
+        unlink($tmp_signed);
         if ($ok)
             return $signed_msg;
         
