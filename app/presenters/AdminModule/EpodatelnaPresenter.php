@@ -558,12 +558,15 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
         $ep = self::nactiNastaveni();
 
-        $id = $this->getParameter('id', null);
+        $id = $this->getParameter('id');
         $typ = substr($id, 0, 1);
         $index = substr($id, 1);
-        $odes = !empty($id) ? $ep['odeslani'][$index] : array();
 
         $form1 = new Form();
+        
+        $group = $form1->addGroup();
+        $group->setOption('container', '');
+        
         $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue($typ);
@@ -574,16 +577,27 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 ->addCondition(Form::FILLED)
                 ->addRule(Form::EMAIL);
 
-        $form1->addCheckbox('podepisovat', 'Elektronicky podepisovat:');
+        $form1->addCheckbox('podepisovat', 'Elektronicky podepisovat:')
+                ->setHtmlId('odes-form-podepisovat')
+                ->getControlPrototype()->onchange(
+                        'var el = $("#odes-form-certificate-group");'
+                        . '$("#odes-form-podepisovat").prop("checked") ? el.show() : el.hide();');
 
+        $group = $form1->addGroup();
+        $group->setOption('container', Nette\Utils\Html::el('div id=odes-form-certificate-group'));
+        
         $form1->addUpload('cert_file', 'Soubor s certifikátem a klíčem ve formátu PKCS #12:');
         $form1->addText('cert_pass', 'Heslo k souboru:', 50, 100);
-
+        $form1->setCurrentGroup(null);
+        
+        $odes = $ep['odeslani'][$index];
         if ($odes) {
             $form1['index']->setValue($index);
             $form1['ucet']->setValue($odes['ucet']);
             // $form1['aktivni']->setValue($odes['aktivni']);
             $form1['podepisovat']->setValue($odes['podepisovat']);
+            if (!$odes->podepisovat)
+                $group->getOption('container')->style('display: none');
             $form1['email']->setValue($odes['email']);
         }
 
@@ -592,7 +606,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-
+        
         return $form1;
     }
 

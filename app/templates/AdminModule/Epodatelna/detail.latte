@@ -167,7 +167,7 @@
             <a href="{link :Admin:Epodatelna:smazat, 'id'=>$Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
         {/if}
     {elseif $Typ == 'o'}
-        {if ($FormUpravit=='1')}
+        {if $FormUpravit}
             {control nastavitOdesForm}
         {else}
             <dl>
