@@ -143,7 +143,7 @@
         <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
     </div>
     <div id="dok-prilohy">
-        {include '../Prilohy/nacti.latte', prilohy => $Prilohy, AccessEdit => true}
+        {include '../Prilohy/nacti.latte', prilohy => $Prilohy, dokument_id => $dokument_id, AccessEdit => true}
     </div>
     </div>
 

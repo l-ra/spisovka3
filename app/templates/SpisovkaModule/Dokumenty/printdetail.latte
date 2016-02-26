@@ -263,7 +263,7 @@
     </div>
     <div id="dok-prilohy">
     {if $AccessView}
-        {include '../Prilohy/nacti.latte', prilohy => $Dok->prilohy}
+        {include '../Prilohy/nacti.latte', prilohy => $Dok->prilohy, dokument_id => $dokument_id}
     {else}
         <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
     {/if}

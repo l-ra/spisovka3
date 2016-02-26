@@ -3,7 +3,7 @@
 
 <div class="navigate">
     <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a> -
-    <a href="{link :Spisovka:Dokumenty:detail , 'id'=>$Dok->id }">Detail dokumentu</a> -
+    <a href="{link :Spisovka:Dokumenty:detail , 'id' => $Dok->id }">Detail dokumentu</a> -
     Odeslání dokumentu
 </div>
 
@@ -132,7 +132,7 @@
         </div>
         <div id="dok-prilohy">
             {if count($Dok->prilohy) > 0}
-                {include '../Prilohy/nacti.latte', prilohy => $Dok->prilohy, prilohy_checkboxes => true}
+                {include '../Prilohy/nacti.latte', prilohy => $Dok->prilohy, dokument_id => $Dok->id, prilohy_checkboxes => true}
                 <br />
                 <dl>
                     <dt>Celková velikost příloh :</dt>
