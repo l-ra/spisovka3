@@ -43,9 +43,7 @@ class Storage_Basic extends FileModel
         if (isset($data['dir'])) {
 
             if (!file_exists($this->dokument_dir . "/" . $data['dir'])) {
-                $old = umask(0);
                 mkdir($this->dokument_dir . "/" . $data['dir'], 0777, true);
-                umask($old);
             }
             if (is_writeable($this->dokument_dir . "/" . $data['dir'])) {
                 $file_dir = $this->dokument_dir . "/" . $data['dir'];
@@ -54,9 +52,7 @@ class Storage_Basic extends FileModel
             }
         } else {
             if (!file_exists($this->dokument_dir . "")) {
-                $old = umask(0);
                 mkdir($this->dokument_dir . "", 0777, true);
-                umask($old);
             }
             if (is_writeable($this->dokument_dir)) {
                 $file_dir = $this->dokument_dir;
@@ -129,9 +125,7 @@ class Storage_Basic extends FileModel
         if (isset($data['dir'])) {
 
             if (!file_exists($this->dokument_dir . "/" . $data['dir'])) {
-                $old = umask(0);
                 mkdir($this->dokument_dir . "/" . $data['dir'], 0777, true);
-                umask($old);
             }
             if (is_writeable($this->dokument_dir . "/" . $data['dir'])) {
                 $file_dir = $this->dokument_dir . "/" . $data['dir'];
@@ -140,9 +134,7 @@ class Storage_Basic extends FileModel
             }
         } else {
             if (!file_exists($this->dokument_dir . "")) {
-                $old = umask(0);
                 mkdir($this->dokument_dir . "", 0777, true);
-                umask($old);
             }
             if (is_writeable($this->dokument_dir)) {
                 $file_dir = $this->dokument_dir;
@@ -214,9 +206,7 @@ class Storage_Basic extends FileModel
 
         if (isset($data['dir'])) {
             if (!file_exists($this->epodatelna_dir . "/" . $data['dir'])) {
-                $old = umask(0);
                 mkdir($this->epodatelna_dir . "/" . $data['dir'], 0777, true);
-                umask($old);
             }
             if (is_writeable($this->epodatelna_dir . "/" . $data['dir'])) {
                 $file_dir = $this->epodatelna_dir . "/" . $data['dir'];
@@ -225,9 +215,7 @@ class Storage_Basic extends FileModel
             }
         } else {
             if (!file_exist($this->epodatelna_dir . "")) {
-                $old = umask(0);
                 mkdir($this->epodatelna_dir . "", 0777, true);
-                umask($old);
             }
             if (is_writeable($this->epodatelna_dir)) {
                 $file_dir = $this->epodatelna_dir;
