@@ -3,13 +3,13 @@
 class CRLParser extends DERParser
 {
 
-    private $cached = 0;
-    private $cache_dir = "";
-    private $cache_time = 24; // hour
+    private $cache_enabled;
+    private $cache_dir;
+    private $cache_time;    // in hours
 
-    public function cache($enable = 1, $cache_dir = "", $cache_time = 24)
+    public function enableCache($cache_dir, $cache_time = 24)
     {
-        $this->cached = $enable;
+        $this->cache_enabled = true;
         $this->cache_dir = $cache_dir;
         $this->cache_time = $cache_time;
     }
@@ -60,15 +60,13 @@ class CRLParser extends DERParser
 
     public function fromUrl($url)
     {
-
-        if ($this->cached) {
-            $file = $this->cache_dir . "crl_" . md5($url) . ".tmp";
-            if (file_exists($file)) {
-                $mtime = filemtime($file) + (3600 * $this->cache_time);
-                if (time() < $mtime) {
-                    $in = file_get_contents($file);
-                    return unserialize($in);
-                }
+        $hash = md5($url);
+        $cache_filename = $this->cache_dir . "/crl_" . $hash . ".tmp";
+        if ($this->cache_enabled && file_exists($cache_filename)) {
+            $mtime = filemtime($cache_filename) + (3600 * $this->cache_time);
+            if (time() < $mtime) {
+                $in = file_get_contents($cache_filename);
+                return unserialize($in);
             }
         }
 
@@ -76,11 +74,9 @@ class CRLParser extends DERParser
         $der = $this->parse($data);
 
         $out = $this->decode($der);
-        if ($this->cached) {
-            $hash = md5($url);
-            $file = $this->cache_dir . "crl_" . $hash . ".tmp";
-            file_put_contents($file, serialize($out));
-        }
+        if ($this->cache_enabled)
+            file_put_contents($cache_filename, serialize($out));
+
         return $out;
     }
 
