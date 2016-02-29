@@ -47,7 +47,7 @@ class Orgjednotka extends TreeModel
         if (!empty($orgjednotka_id)) {
             // aktualizovat
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = (int) Nette\Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = (int) Nette\Environment::getUser()->id;
 
             if (!isset($data['parent_id']))
                 $data['parent_id'] = null;
@@ -60,9 +60,9 @@ class Orgjednotka extends TreeModel
         } else {
             // insert
             $data['date_created'] = new DateTime();
-            $data['user_created'] = (int) Nette\Environment::getUser()->getIdentity()->id;
+            $data['user_created'] = (int) Nette\Environment::getUser()->id;
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = (int) Nette\Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = (int) Nette\Environment::getUser()->id;
             $data['stav'] = (int) 1;
 
             if (!isset($data['parent_id']))

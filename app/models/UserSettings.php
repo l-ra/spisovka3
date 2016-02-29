@@ -46,7 +46,7 @@ class UserSettings
 
     protected function __construct($user_id = null)
     {
-        $this->user_id = $user_id !== null ? $user_id : Nette\Environment::getUser()->getIdentity()->id;
+        $this->user_id = $user_id !== null ? $user_id : Nette\Environment::getUser()->id;
         $this->table_prefix = BaseModel::getDbPrefix();
 
         $result = dibi::query('SELECT [settings] FROM %n',

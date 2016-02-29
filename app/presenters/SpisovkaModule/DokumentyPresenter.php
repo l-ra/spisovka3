@@ -252,7 +252,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Dok = $dokument;
 
             $user = $this->user;
-            $user_id = $user->getIdentity()->id;
+            $user_id = $user->id;
 
             $this->template->Pridelen = 0;
             $this->template->Predan = 0;
@@ -787,7 +787,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = array(
             array('stav=%i', 0),
-            array('user_created=%i', $this->user->getIdentity()->id),
+            array('user_created=%i', $this->user->id),
         );
 
         $args_rozd['order'] = array('date_created' => 'DESC');
@@ -853,7 +853,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->SouvisejiciDokumenty = null;
         }
 
-        $user = UserModel::getUser($this->user->getIdentity()->id, 1);
+        $user = UserModel::getUser($this->user->id, 1);
         $this->template->Prideleno = Osoba::displayName($user->identity);
 
         $CJ = new CisloJednaci();
@@ -887,7 +887,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 array('stav=%i', 0),
                 array('dokument_typ_id=%i', 2),
                 array('cislo_jednaci=%s', $dok->cislo_jednaci),
-                array('user_created=%i', $this->user->getIdentity()->id)
+                array('user_created=%i', $this->user->id)
             );
             $args_rozd['order'] = array('date_created' => 'DESC');
 
@@ -909,7 +909,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $prilohy = $DokumentPrilohy->prilohy($dok_odpoved->id);
                 $this->template->Prilohy = $prilohy;
 
-                $user = UserModel::getUser($this->user->getIdentity()->id, 1);
+                $user = UserModel::getUser($this->user->id, 1);
                 $this->template->Prideleno = Osoba::displayName($user->identity);
 
                 $CJ = new CisloJednaci();
@@ -998,7 +998,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $prilohy_new = $DokumentPrilohy->prilohy($dok_odpoved->id);
                     $this->template->Prilohy = $prilohy_new;
 
-                    $user = UserModel::getUser($this->user->getIdentity()->id, 1);
+                    $user = UserModel::getUser($this->user->id, 1);
                     $this->template->Prideleno = Osoba::displayName($user->identity);
 
                     $CJ = new CisloJednaci();

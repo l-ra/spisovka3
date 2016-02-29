@@ -88,7 +88,7 @@ class SpisovyZnak extends TreeModel
     public function vytvorit($data)
     {
         $data['stav'] = 1;
-        $user_id = Nette\Environment::getUser()->getIdentity()->id;
+        $user_id = Nette\Environment::getUser()->id;
         $data['date_created'] = new DateTime();
         $data['user_created'] = $user_id;
         $data['date_modified'] = new DateTime();
@@ -122,7 +122,7 @@ class SpisovyZnak extends TreeModel
     {
 
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = (int) Nette\Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = (int) Nette\Environment::getUser()->id;
 
         if (empty($data['spousteci_udalost_id']))
             $data['spousteci_udalost_id'] = 3;

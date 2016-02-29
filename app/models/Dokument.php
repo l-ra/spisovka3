@@ -658,14 +658,14 @@ class Dokument extends BaseModel
 
 
         if (isset($params['prideleno_osobne']) && $params['prideleno_osobne']) {
-            $user_id = Nette\Environment::getUser()->getIdentity()->id;
+            $user_id = Nette\Environment::getUser()->id;
             if (!isset($params['prideleno'])) {
                 $params['prideleno'] = array();
             }
             $params['prideleno'][] = $user_id;
         }
         if (isset($params['predano_osobne']) && $params['predano_osobne']) {
-            $user_id = Nette\Environment::getUser()->getIdentity()->id;
+            $user_id = Nette\Environment::getUser()->id;
             if (!isset($params['predano'])) {
                 $params['predano'] = array();
             }
@@ -721,7 +721,7 @@ class Dokument extends BaseModel
     {
 
         $user = Nette\Environment::getUser();
-        $user_id = $user->getIdentity()->id;
+        $user_id = $user->id;
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
         $vyrusit_bezvyrizeni = false;
 
@@ -907,7 +907,7 @@ class Dokument extends BaseModel
     public function sestavaOmezeniOrg($args)
     {
         $user = Nette\Environment::getUser();
-        $user_id = $user->getIdentity()->id;
+        $user_id = $user->id;
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
         $vidi_vsechny_dokumenty = self::uzivatelVidiVsechnyDokumenty();
 
@@ -1387,9 +1387,9 @@ class Dokument extends BaseModel
                 $data['skartacni_lhuta'] = null;
 
             $data['date_created'] = new DateTime();
-            $data['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
+            $data['user_created'] = Nette\Environment::getUser()->id;
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = Nette\Environment::getUser()->id;
 
             $data['stav'] = isset($data['stav']) ? $data['stav'] : 1;
             $data['jid'] = '';
@@ -1448,7 +1448,7 @@ class Dokument extends BaseModel
             $dokument_id = $data['id'];
             unset($data['id']);
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
+            $data['user_modified'] = Nette\Environment::getUser()->id;
 
             $this->update($data, array(array('id=%i', $dokument_id)));
 
@@ -1505,7 +1505,7 @@ class Dokument extends BaseModel
     {
 
         $where = array('stav=0',
-            array('user_created=%i', Nette\Environment::getUser()->getIdentity()->id)
+            array('user_created=%i', Nette\Environment::getUser()->id)
         );
 
         $seznam = $this->seznamKlasicky(array('where' => $where));

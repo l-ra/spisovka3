@@ -612,7 +612,7 @@ class Workflow extends BaseModel
             unset($workflow_data['id']);
             $workflow_data['stav_dokumentu'] = 6;
             $workflow_data['date'] = new DateTime();
-            $workflow_data['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
+            $workflow_data['user_id'] = Nette\Environment::getUser()->id;
 
             $this->deaktivovat($dokument_id);
             $result_insert = $this->insert($workflow_data);
@@ -675,7 +675,7 @@ class Workflow extends BaseModel
                 unset($workflow_data['id']);
                 $workflow_data['stav_dokumentu'] = 7;
                 $workflow_data['date'] = new DateTime();
-                $workflow_data['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
+                $workflow_data['user_id'] = Nette\Environment::getUser()->id;
 
                 $this->deaktivovat($dokument_id);
                 if ($this->insert($workflow_data)) {
@@ -740,7 +740,7 @@ class Workflow extends BaseModel
         $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
 
         $data['date'] = new DateTime();
-        $data['user_id'] = $user->getIdentity()->id;
+        $data['user_id'] = $user->id;
         $data['poznamka'] = $dokument_info->prideleno->poznamka;
 
         $result_insert = $this->insert($data);
@@ -789,7 +789,7 @@ class Workflow extends BaseModel
                 $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
 
                 $data['date'] = new DateTime();
-                $data['user_id'] = $user->getIdentity()->id;
+                $data['user_id'] = $user->id;
                 $data['poznamka'] = $dokument_info->prideleno->poznamka;
 
                 $result_insert = $this->insert($data);
@@ -844,7 +844,7 @@ class Workflow extends BaseModel
                 $data['orgjednotka_id'] = $dokument_info->prideleno->orgjednotka_id;
 
                 $data['date'] = new DateTime();
-                $data['user_id'] = $user->getIdentity()->id;
+                $data['user_id'] = $user->id;
                 $data['poznamka'] = $dokument_info->prideleno->poznamka;
 
                 $result_insert = $this->insert($data);
@@ -894,7 +894,7 @@ class Workflow extends BaseModel
             $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
 
             $data['date'] = new DateTime();
-            $data['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
+            $data['user_id'] = Nette\Environment::getUser()->id;
 
             $this->insert($data);
 
@@ -998,7 +998,7 @@ class Workflow extends BaseModel
     public function prirazeny($dokument_id)
     {
         $user = Nette\Environment::getUser();
-        $user_id = $user->getIdentity()->id;
+        $user_id = $user->id;
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
 
@@ -1047,7 +1047,7 @@ class Workflow extends BaseModel
         $param = array();
 
         $user = Nette\Environment::getUser();
-        $user_id = $user->getIdentity()->id;
+        $user_id = $user->id;
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
 
@@ -1118,7 +1118,7 @@ class Workflow extends BaseModel
         $workflow_data['dokument_id'] = $old_data['dokument_id'];
         $workflow_data['prideleno_id'] = $old_data['prideleno_id'];
         $workflow_data['orgjednotka_id'] = $old_data['orgjednotka_id'];
-        $workflow_data['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
+        $workflow_data['user_id'] = Nette\Environment::getUser()->id;
         $workflow_data['stav_dokumentu'] = 5;
         $workflow_data['stav_osoby'] = 1;
         $workflow_data['date'] = new DateTime();

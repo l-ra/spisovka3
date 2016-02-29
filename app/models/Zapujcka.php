@@ -318,7 +318,7 @@ class Zapujcka extends BaseModel
             return false;
 
         $user = Nette\Environment::getUser();
-        $user_id = $user->getIdentity()->id;
+        $user_id = $user->id;
         $data['date_created'] = new DateTime();
         $data['stav'] = 1;
 
@@ -402,7 +402,7 @@ class Zapujcka extends BaseModel
             $Workflow = new Workflow();
             $dokument_id = $this->getDokumentID($zapujcka_id);
             $Workflow->zapujcka_vratit($dokument_id,
-                    Nette\Environment::getUser()->getIdentity()->id);
+                    Nette\Environment::getUser()->id);
             return true;
         } catch (Exception $e) {
             $e->getMessage();

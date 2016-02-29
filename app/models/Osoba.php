@@ -49,7 +49,7 @@ class Osoba extends BaseModel
     public function ulozit($data, $osoba_id = null)
     {
 
-        $user_id = Nette\Environment::getUser()->getIdentity()->id;
+        $user_id = Nette\Environment::getUser()->id;
         if (empty($user_id))
             $user_id = 1;
 

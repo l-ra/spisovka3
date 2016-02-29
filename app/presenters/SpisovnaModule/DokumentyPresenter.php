@@ -703,7 +703,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $count_ok = $count_failed = 0;
                     if ($user->isAllowed('Spisovna', 'skartacni_navrh')) {
                         foreach ($documents as $dokument_id) {
-                            if ($Workflow->keskartaci($dokument_id, $user->getIdentity()->id)) {
+                            if ($Workflow->keskartaci($dokument_id, $user->id)) {
                                 //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
                                 $count_ok++;
                             } else {

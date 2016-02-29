@@ -247,7 +247,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
             }
 
             $user = $this->user;
-            $user_id = $user->getIdentity()->id;
+            $user_id = $user->id;
             $pridelen = $predan = $accessview = false;
             $formUpravit = null;
 
@@ -395,7 +395,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
         unset($data['id']);
 
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = $this->user->getIdentity()->id;
+        $data['user_modified'] = $this->user->id;
 
         //Nette\Diagnostics\Debugger::dump($data); exit;
 

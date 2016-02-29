@@ -48,7 +48,7 @@ class SouvisejiciDokument extends BaseModel
         $row['spojit_s_id'] = (int) $spojit_s;
         $row['type'] = 1;
         $row['date_added'] = new DateTime();
-        $row['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
+        $row['user_id'] = Nette\Environment::getUser()->id;
 
         return $this->insert_basic($row);
     }

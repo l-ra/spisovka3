@@ -99,9 +99,9 @@ class FileModel extends BaseModel
         }
 
         $row['date_created'] = new DateTime();
-        $row['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
+        $row['user_created'] = Nette\Environment::getUser()->id;
         $row['date_modified'] = new DateTime();
-        $row['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
+        $row['user_modified'] = Nette\Environment::getUser()->id;
 
         $row['guid'] = UUID::v4();
 
@@ -135,7 +135,7 @@ class FileModel extends BaseModel
         $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
 
         $row['date_modified'] = new DateTime();
-        $row['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
+        $row['user_modified'] = Nette\Environment::getUser()->id;
 
         if ($this->update($row, array('id=%i', $file_id))) {
             return $this->getInfo($file_id);

@@ -187,7 +187,7 @@ class Spis extends TreeModel
     public function vytvorit($data)
     {
         $data['date_created'] = new DateTime();
-        $data['user_created'] = Nette\Environment::getUser()->getIdentity()->id;
+        $data['user_created'] = Nette\Environment::getUser()->id;
         $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
 
         if (empty($data['parent_id']))
@@ -213,7 +213,7 @@ class Spis extends TreeModel
     public function upravit($data, $spis_id)
     {
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = Nette\Environment::getUser()->id;
         
         if (isset($data['spisovy_znak_id']) && !$data['spisovy_znak_id'])
             $data['spisovy_znak_id'] = null;
@@ -253,7 +253,7 @@ class Spis extends TreeModel
         $data = array();
         $now = new DateTime();
         $data['date_modified'] = $now;
-        $data['user_modified'] = Nette\Environment::getUser()->getIdentity()->id;
+        $data['user_modified'] = Nette\Environment::getUser()->id;
         if ($stav === self::UZAVREN)
             $data['datum_uzavreni'] = $now;
         $data['stav'] = $stav;
@@ -530,7 +530,7 @@ class Spis extends TreeModel
     {
 
         $user = Nette\Environment::getUser();
-        $user_id = $user->getIdentity()->id;
+        $user_id = $user->id;
         $oj_uzivatele = OrgJednotka::dejOrgUzivatele();
         $Lze_cist = $Lze_menit = $Lze_prevzit = false;
 

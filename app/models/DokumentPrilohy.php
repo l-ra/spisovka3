@@ -79,7 +79,7 @@ class DokumentPrilohy extends BaseModel
         $row['dokument_id'] = $dokument_id;
         $row['file_id'] = $file_id;
         $row['date_added'] = new DateTime();
-        $row['user_id'] = Nette\Environment::getUser()->getIdentity()->id;
+        $row['user_id'] = Nette\Environment::getUser()->id;
 
         return $this->insert($row);
     }
