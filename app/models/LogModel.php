@@ -113,8 +113,7 @@ class LogModel extends BaseModel
         $row['typ'] = $typ;
         $row['poznamka'] = $poznamka;
 
-        $user = Nette\Environment::getUser()->getIdentity();
-        $row['user_id'] = $user->id;
+        $row['user_id'] = Nette\Environment::getUser()->id;
         $row['date'] = new DateTime();
 
         return dibi::insert($this->tb_logdokument, $row)
@@ -145,7 +144,7 @@ class LogModel extends BaseModel
         $row['typ'] = $typ;
         $row['poznamka'] = $poznamka;
 
-        $user = Nette\Environment::getUser()->getIdentity();
+        $user = Nette\Environment::getUser();
         $row['user_id'] = $user->id;
         $row['date'] = new DateTime();
 

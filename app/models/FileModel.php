@@ -15,8 +15,8 @@ class FileModel extends BaseModel
 
         if ($row) {
 
-            $user = UserModel::getIdentity($row->user_created);
-            $row->user_name = Osoba::displayName($user);
+            $osoba = UserModel::getPerson($row->user_created);
+            $row->user_name = Osoba::displayName($osoba);
             $row->typ_name = FileModel::typPrilohy($row->typ, 1);
             // Ignoruj mime-type ulozeny v databazi (nastaveny pri nahrani prilohy) a zjisti jej pokazde znovu
             $row->mime_type = FileModel::mimeType($row->real_path);
@@ -45,8 +45,8 @@ class FileModel extends BaseModel
         $tmp = array();
         foreach ($rows as $file) {
 
-            $user = UserModel::getIdentity($file->user_created);
-            $file->user_name = Osoba::displayName($user);
+            $osoba = UserModel::getPerson($file->user_created);
+            $file->user_name = Osoba::displayName($osoba);
             $file->typ_name = FileModel::typPrilohy($file->typ, 1);
             // Nahrazeni online mime-type
             $file->mime_type = FileModel::mimeType($file->real_path);

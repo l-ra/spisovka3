@@ -36,6 +36,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
                 @ini_set("memory_limit", PDF_MEMORY_LIMIT);
 
+                $person_name = $this->user->displayName;
+                
                 if ($this->pdf_output == 2) {
                     $content = str_replace("<td", "<td valign='top'", $content);
                     $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
@@ -49,7 +51,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $app_info = explode("#", $app_info);
                     $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
+                    $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Epodatelna - Detail zprávy');
 
                     $mpdf->defaultheaderfontsize = 10; /* in pts */
@@ -59,7 +61,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
                     $mpdf->SetHeader('||' . $this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
                     $mpdf->WriteHTML($content);
 
@@ -77,7 +79,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $app_info = explode("#", $app_info);
                     $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
+                    $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Tisk');
 
                     $mpdf->defaultheaderfontsize = 10; /* in pts */
@@ -94,7 +96,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     else
                         $header = 'Seznam nových zpráv';
                     $mpdf->SetHeader("$header||{$this->template->Urad->nazev}");
-                    $mpdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
                     $mpdf->WriteHTML($content);
 
@@ -517,8 +519,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $od = $this->Epodatelna->getLastISDS();
             $do = time() + 7200;
 
-            $user = $this->user->getIdentity();
-
             $UploadFile = $this->storage;
 
             $pocet_novych_zprav = 0;
@@ -646,7 +646,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $zprava['adresat'] = $config['ucet'] . ' [' . $config['idbox'] . ']';
                         $zprava['prijato_dne'] = new DateTime();
                         $zprava['doruceno_dne'] = new DateTime($z->dmAcceptanceTime);
-                        $zprava['prijal_kdo'] = $user->id;
+                        $zprava['prijal_kdo'] = $this->user->id;
                         //$zprava['prijal_info'] = serialize($user->identity);
 
                         $zprava['sha1_hash'] = '';
@@ -936,7 +936,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
 
         $tmp = array();
-        $user = $this->user->getIdentity();
 
         $UploadFile = $this->storage;
 
@@ -988,7 +987,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $zprava['adresat'] = $config['ucet'] . ' [' . $config['login'] . ']';
                 $zprava['prijato_dne'] = new DateTime();
                 $zprava['doruceno_dne'] = new DateTime(date('Y-m-d H:i:s', $z->udate));
-                $zprava['prijal_kdo'] = $user->id;
+                $zprava['prijal_kdo'] = $this->user->id;
                 //$zprava['prijal_info'] = serialize($user->identity);
 
                 $zprava['sha1_hash'] = sha1($mess->source);

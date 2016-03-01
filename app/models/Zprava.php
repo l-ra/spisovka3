@@ -8,10 +8,11 @@ class Zpravy extends BaseModel
     
     /* public static function prectena($zprava_id)
     {
-        
+        $user_id = Environment::getUser()->id;
+        $osoba_id = ...
         $data = array(
             'zprava_id' => (int)$zprava_id,
-            'osoba_id' => Environment::getUser()->getIdentity()->identity->id,
+            'osoba_id' => $osoba_id,
         );
         
         $ZpravaOsoba = new ZpravaOsoba();

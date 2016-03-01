@@ -28,3 +28,4 @@ services:
     httpResponse = Spisovka\IEHttpResponse
     nette.presenterFactory = PresenterFactory(%appDir%, ...)
     storage = Storage_Basic(%storage_configuration%)
+    user = Spisovka\User

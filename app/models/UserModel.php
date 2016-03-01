@@ -9,45 +9,20 @@ class UserModel extends BaseModel
     /**
      * Zjisti informace o uzivateli na základe ID nebo username
      *
-     * @param int|string $mixed 
+     * @param int|string $param_user 
      * @return DibiRow
      */
-    public static function getUser($mixed, $identity = FALSE)
+    public static function getUser($param_user)
     {
         $instance = new self;
 
         /*
          * Ziskání uzivatele
          */
-        if (is_numeric($mixed)) {
-            // $mixed is numeric -> ID
-            $row = $instance->select(array(array('id=%i', $mixed)))->fetch();
-        } else {
-            // $mixed is string -> username
-            $row = $instance->select(array(array('username=%s', $mixed)))->fetch();
-        }
-
-        if (is_null($row) || !$row)
+        $where = is_numeric($param_user) ? [['id = %i', $param_user]] : [['username = %s', $param_user]];
+        $row = $instance->select($where)->fetch();
+        if (!$row)
             return null;
-
-        /*
-         * Nacteni identity uzivatele
-         */
-        if ($identity == TRUE) {
-            $row->identity = self::getIdentity($row->id);
-            $row->osoba = $row->identity;
-            $row->display_name = Osoba::displayName($row->identity);
-
-            $row->org_nazev = $row->orgjednotka_id !== null ? Orgjednotka::getName($row->orgjednotka_id)
-                        : '';
-        } else {
-            $row->display_name = $row->username;
-        }
-
-        /*
-         * Nacteni roli uzivatele
-         */
-        $row->user_roles = self::getRoles($row->id);
 
         return $row;
     }
@@ -58,7 +33,7 @@ class UserModel extends BaseModel
      * @param int $user_id
      * @return DibiRow
      */
-    public static function getIdentity($user_id)
+    public static function getPerson($user_id)
     {
         static $cache = [];
 
@@ -68,7 +43,7 @@ class UserModel extends BaseModel
         $row = dibi::fetch('SELECT o.*
                             FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
                             LEFT JOIN [:PREFIX:' . self::OSOBA_TABLE . '] o ON (o.id = ou.osoba_id)
-                            WHERE ou.user_id=%i AND o.stav<10', $user_id);
+                            WHERE ou.user_id = %i AND o.stav < 10', $user_id);
 
         return $cache[$user_id] = $row ? $row : NULL;
     }
@@ -78,7 +53,7 @@ class UserModel extends BaseModel
         $rows = dibi::fetchAll('SELECT r.*
                                  FROM [:PREFIX:' . self::USER2ROLE_TABLE . '] ur
                                  LEFT JOIN [:PREFIX:' . self::ROLE_TABLE . '] r ON (r.id = ur.role_id)
-                                 WHERE ur.user_id=%i', $user_id);
+                                 WHERE ur.user_id = %i', $user_id);
 
         return ($rows) ? $rows : NULL;
     }

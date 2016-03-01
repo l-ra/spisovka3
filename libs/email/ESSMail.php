@@ -43,34 +43,23 @@ class ESSMail extends Nette\Mail\Message
             }
     }
 
-    public function setBodySign($body)
+    /**
+     * Připojí podpis přihlášené osoby a organizace.
+     * Je voláno pouze při odmítnutí e-mailu v e-podatelně.
+     * @param string $message
+     * @return string
+     */
+    public static function appendSignature($message)
     {
-
         // Urad
         $client_config = Nette\Environment::getVariable('client_config');
         $urad = $client_config->urad;
 
-        // Uzivatel
-        $user_system = Nette\Environment::getUser();
-        if ($user_system->isLoggedIn()) {
-            $user = $user_system->getIdentity();
-        } else {
-            $user = new stdClass();
-            $user->name = "";
-            $user->user_roles = array();
-            $user->user_roles = array();
-        }
-
-        $tmp = $body;
+        $tmp = $message;
 
         // Podpis
-        $tmp .= "\n";
-        $tmp .= "\n";
-        $tmp .= "--\n";
-        if (!empty($user->name)) {
-            $tmp .= "Zpracoval: " . $user->name . "\n";
-        }
-        $tmp .= "\n";
+        $tmp .= "\n\n--\n";
+        $tmp .= "Zpracoval: " . Nette\Environment::getUser()->displayName . "\n\n";
         $tmp .= $urad->nazev . "\n";
         if (!empty($urad->adresa->ulice)) {
             $tmp .= $urad->adresa->ulice . "\n";
@@ -89,7 +78,6 @@ class ESSMail extends Nette\Mail\Message
             $tmp .= "url: " . $urad->kontakt->www . " \n";
         }
 
-        $this->setBody($tmp);
         return $tmp;
     }
 

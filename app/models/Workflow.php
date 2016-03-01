@@ -45,10 +45,10 @@ class Workflow extends BaseModel
             $Orgjednotka = new Orgjednotka();
             foreach ($rows as &$wf) {
                 if (!empty($wf->prideleno_id)) {
-                    $osoba = UserModel::getUser($wf->prideleno_id, 1);
+                    $osoba = UserModel::getPerson($wf->prideleno_id);
                     if ($osoba) {
-                        $wf->prideleno_jmeno = Osoba::displayName($osoba->identity);
-                        $wf->prideleno_info = $osoba->identity;
+                        $wf->prideleno_jmeno = Osoba::displayName($osoba);
+                        $wf->prideleno_info = $osoba;
                     }
                 }
                 if (!empty($wf->orgjednotka_id)) {
@@ -75,7 +75,7 @@ class Workflow extends BaseModel
     {
         if (is_numeric($dokument_id)) {
 
-            $user = Nette\Environment::getUser()->getIdentity();
+            $user = Nette\Environment::getUser();
 
             $data = array();
             $data['dokument_id'] = $dokument_id;
@@ -108,7 +108,7 @@ class Workflow extends BaseModel
             $Dokument = new Dokument();
             $dokument_info = $Dokument->getInfo($dokument_id);
 
-            $user = Nette\Environment::getUser()->getIdentity();
+            $user = Nette\Environment::getUser();
 
             // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
             $update = array('stav_osoby%sql' => 'stav_osoby+100', 'aktivni' => 0);
@@ -129,10 +129,10 @@ class Workflow extends BaseModel
             $log = "";
             $log_spis = "";
             if ($user_id) {
-                $prideleno_info = UserModel::getUser($user_id, 1);
-                $data['prideleno_id'] = $prideleno_info->id;
-                $log = 'Dokument předán zaměstnanci ' . Osoba::displayName($prideleno_info->identity) . '.';
-                $log_spis = 'Spis predan zamestnanci ' . Osoba::displayName($prideleno_info->identity) . '.';
+                $person = UserModel::getPerson($user_id);
+                $data['prideleno_id'] = $user_id;
+                $log = 'Dokument předán zaměstnanci ' . Osoba::displayName($person) . '.';
+                $log_spis = 'Spis predan zamestnanci ' . Osoba::displayName($person) . '.';
             } else {
                 $data['prideleno_id'] = null;
             }
@@ -253,7 +253,6 @@ class Workflow extends BaseModel
 
                 $Spis = new Spis();
                 $Spis->zrusitPredani($spis->id);
-                //$Log->logSpis($spis->id, LogModel::SPIS_, 'Zaměstnanec '. Osoba::displayName($user_info->identity) .' přijal spis'.$log_plus);
             }
         }
 
@@ -272,7 +271,7 @@ class Workflow extends BaseModel
         if (!$predan)
             return false;
 
-        $user = Nette\Environment::getUser()->getIdentity();
+        $user = Nette\Environment::getUser();
 
         // test predaneho
         // pokud neni predana osoba, tak test na vedouciho org.jednotky
@@ -323,7 +322,7 @@ class Workflow extends BaseModel
                 $result_update = $this->update($data, $where);
 
                 $Log->logDokument($dokument_id, LogModel::DOK_PRIJAT,
-                        'Zaměstnanec ' . Osoba::displayName($user->identity) . ' přijal dokument' . $log_plus);
+                        'Zaměstnanec ' . $user->displayName . ' přijal dokument' . $log_plus);
             }
 
             // Prevzeti i ostatnim dokumentum ve spisu
@@ -360,12 +359,12 @@ class Workflow extends BaseModel
                     $result_update = $this->update($data_other, $where);
 
                     $Log->logDokument($dokument_other->id, LogModel::DOK_PRIJAT,
-                            'Zaměstnanec ' . Osoba::displayName($user->identity) . ' přijal dokument' . $log_plus);
+                            'Zaměstnanec ' . $user->displayName . ' přijal dokument' . $log_plus);
                 }
 
                 $Spis->zmenitOrg($spis->id, $predan->orgjednotka_id);
                 $Log->logSpis($spis->id, LogModel::SPIS_PRIJAT,
-                        'Zaměstnanec ' . Osoba::displayName($user->identity) . ' přijal spis' . $log_plus);
+                        'Zaměstnanec ' . $user->displayName . ' přijal spis' . $log_plus);
             }
 
             dibi::commit();
@@ -384,8 +383,8 @@ class Workflow extends BaseModel
      */
     public function vyrizuje($dokument_id)
     {
-        $user_identity = Nette\Environment::getUser()->getIdentity();
-        $user_id = $user_identity->id;
+        $user = Nette\Environment::getUser();
+        $user_id = $user->id;
 
         if (!is_numeric($dokument_id))
             return false;
@@ -434,7 +433,7 @@ class Workflow extends BaseModel
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_KVYRIZENI,
-                    'Zaměstnanec ' . $user_identity->display_name . ' převzal dokument k vyřízení.');
+                    'Zaměstnanec ' . $user->displayName . ' převzal dokument k vyřízení.');
 
             dibi::commit();
         } catch (Exception $e) {
@@ -453,8 +452,7 @@ class Workflow extends BaseModel
      */
     public function vyrizeno($dokument_id)
     {
-        $user_identity = Nette\Environment::getUser()->getIdentity();
-        $user_id = $user_identity->id;
+        $user_id = Nette\Environment::getUser()->id;
 
         if (!is_numeric($dokument_id))
             return false;
@@ -535,8 +533,7 @@ class Workflow extends BaseModel
     // Kontrola opravneni se provadi uz v presenteru
     public function spustitUdalost($dokument_id, $datum_spusteni)
     {
-        $user_identity = Nette\Environment::getUser()->getIdentity();
-        $user_id = $user_identity->id;
+        $user_id = Nette\Environment::getUser()->id;
 
         try {
             dibi::begin();
@@ -973,16 +970,6 @@ class Workflow extends BaseModel
         $row = $row->fetch();
 
         if ($row) {
-
-            /*
-              if ( !empty($row->prideleno_id) ) {
-              $osoba = UserModel::getUser($row->prideleno_id, 1);
-              if ( $osoba ) {
-              $row->prideleno_jmeno = Osoba::displayName($osoba->identity);
-              $row->prideleno_info = $osoba->identity;
-              }
-              } */
-
             return $row;
         }
 

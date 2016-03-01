@@ -15,11 +15,11 @@ class Spisovka_UzivatelPresenter extends BasePresenter
     public function renderLogout()
     {
         $user = $this->user;
-        $username = $user->getIdentity()->username;
         $user->logout();
-        // Hack - cookie kontroluji nektere alternativni autentikatory pri zobrazovani prihlasovaciho dialogu
-        $this->getHttpResponse()->setCookie('s3_logout', $username, strtotime('10 minute'));
         $this->flashMessage('Byl jste úspěšně odhlášen.');
+        
+        // Hack - cookie v minulosti kontroloval SSO autentikator. Nyni neni reseno vubec.
+        // $this->getHttpResponse()->setCookie('s3_logout', $username, strtotime('10 minute'));        
 
         // P.L. Je-li to mozne, vrat se presne na stranku, kde byl uzivatel, nez kliknul na odhlasit
         // Zpravu o uspesnem odhlaseni nebude mozne v tom pripade zobrazit
@@ -35,27 +35,24 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     public function actionDefault()
     {
-        $Osoba = new Osoba();
-
-        $user = $this->user->getIdentity();
-
-        $osoba_id = $user->identity->id;
-        $this->template->Osoba = $Osoba->getInfo($osoba_id);
+        $user = $this->user;
+        $osoba = UserModel::getPerson($user->id);
+        $this->template->Osoba = $osoba;
 
         // Kterou sekci editovat
         $this->template->FormUpravit = $this->getParameter('upravit', '');
 
-        $uzivatel = UserModel::getUser($user->id, true);
-        if ($uzivatel->org_nazev === '')
-            $uzivatel->org_nazev = 'žádná';
-        $this->template->Uzivatel = $uzivatel;
+        $account = UserModel::getUser($user->id);
+        $this->template->Uzivatel = $account;
+        $this->template->Org_jednotka = $account->orgjednotka_id !== null ? Orgjednotka::getName($account->orgjednotka_id)
+                        : 'žádná';
 
         $Auth1 = $this->context->createService('authenticatorUI');
         $Auth1->setAction('change_password');
-        $Auth1->setParams(['osoba_id' => $osoba_id, 'user_id' => $user->id]);
+        $Auth1->setParams(['osoba_id' => $osoba->id, 'user_id' => $user->id]);
         $this->addComponent($Auth1, 'auth_change_password');
 
-        $role = UserModel::getRoles($uzivatel->id);
+        $role = UserModel::getRoles($account->id);
         $this->template->Role = $role;
 
         $this->template->notification_receive_document = Notifications::isUserNotificationEnabled(Notifications::RECEIVE_DOCUMENT);
@@ -246,7 +243,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         if ($novy == 1) {
             echo '###predano###' . $spis_id . '#' . $user_id . '#' . $orgjednotka_id . '#' . $poznamka;
 
-            $osoba = UserModel::getIdentity($user_id);
+            $osoba = UserModel::getPerson($user_id);
             $Orgjednotka = new Orgjednotka();
             $org = $Orgjednotka->getInfo($orgjednotka_id);
 
@@ -299,7 +296,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             echo "###predano###$dokument_id#$user_id#$orgjednotka_id#";
 
             if ($user_id !== null) {
-                $osoba = UserModel::getIdentity($user_id);
+                $osoba = UserModel::getPerson($user_id);
                 echo Osoba::displayName($osoba);
             } else {
                 $Orgjednotka = new Orgjednotka();

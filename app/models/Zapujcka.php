@@ -337,8 +337,7 @@ class Zapujcka extends BaseModel
 
     public function osobni($args)
     {
-
-        $user = Nette\Environment::getUser()->getIdentity();
+        $user = Nette\Environment::getUser();
 
         if (isset($args['where'])) {
             $args['where'][] = array(array('z.user_id = %i AND z.stav < 3', $user->id));

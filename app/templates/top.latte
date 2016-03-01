@@ -17,11 +17,11 @@
         </div>
         <div id="top_jmeno">
             <span title="Role uživatele:
-{foreach $user->user_roles as $role}{$role->name}
+{foreach UserModel::getRoles($user->id) as $role}{$role->name}
 {/foreach}">
-            <a href="{link :Spisovka:Uzivatel:}"><strong>{$user->display_name}</strong></a><br />
-            {if $user->org_nazev != ''}
-            {$user->org_nazev}<br />
+            <a href="{link :Spisovka:Uzivatel:}"><strong>{$userobj->displayName}</strong></a><br />
+            {if $user->orgjednotka_id}
+            {OrgJednotka::getName($user->orgjednotka_id)}<br />
             {/if}
             </span>
             

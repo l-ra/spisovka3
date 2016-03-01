@@ -26,6 +26,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
                 @ini_set("memory_limit", PDF_MEMORY_LIMIT);
 
+                $person_name = $this->user->displayName;
+                
                 if ($this->pdf_output == 2) {
                     $content = str_replace("<td", "<td valign='top'", $content);
                     $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
@@ -41,7 +43,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
                     $app_info = explode("#", $app_info);
                     $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
+                    $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Detail spisu');
 
                     $mpdf->defaultheaderfontsize = 10; /* in pts */
@@ -51,7 +53,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
                     $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
                     $mpdf->SetHeader('||' . $this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
                     $mpdf->WriteHTML($content);
 
@@ -71,7 +73,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
                     $app_info = explode("#", $app_info);
                     $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
+                    $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Tisk');
 
                     $mpdf->defaultheaderfontsize = 10; /* in pts */
@@ -81,7 +83,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
                     $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
                     $mpdf->SetHeader('Seznam spisů||' . $this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
                     $mpdf->WriteHTML($content);
 

@@ -7,7 +7,8 @@ class CisloJednaci extends BaseModel
     protected $primary = 'id';
     protected $info;
     protected $urad;
-    protected $user_info;
+    protected $user_account;
+    protected $person;
     protected $org;
     protected $pocatek_cisla;
     protected $pouzij_minuly_rok;
@@ -30,7 +31,9 @@ class CisloJednaci extends BaseModel
             }
         }
 
-        $this->user_info = Nette\Environment::getUser()->getIdentity();
+        $user = Nette\Environment::getUser();
+        $this->user_account = UserModel::getUser($user->id);
+        $this->person = UserModel::getPerson($user->id);
 
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 
@@ -76,9 +79,9 @@ class CisloJednaci extends BaseModel
             $info['org'] = !empty($this->org) ? $this->org->ciselna_rada : "";
             $info['org_poradi'] = $this->max('org');
 
-            $info['user_id'] = $this->user_info->id;
-            $info['user'] = $this->user_info->username;
-            $info['prijmeni'] = Nette\Utils\Strings::webalize(@$this->user_info->identity->prijmeni);
+            $info['user_id'] = $this->user_account->id;
+            $info['user'] = $this->user_account->username;
+            $info['prijmeni'] = Nette\Utils\Strings::webalize($this->person->prijmeni);
             $info['user_poradi'] = $this->max('user');
         }
 
@@ -169,10 +172,10 @@ class CisloJednaci extends BaseModel
         $tmp->orgjednotka_id = !is_null($this->org) ? $this->org->id : null;
         $tmp->orgjednotka = !is_null($this->org) ? $this->org->ciselna_rada : "";
         $tmp->orgjednotka_poradi = $info['org_poradi'];
-        $tmp->user_id = $this->user_info->id;
-        $tmp->user = $this->user_info->username;
+        $tmp->user_id = $this->user_account->id;
+        $tmp->user = $this->user_account->username;
         $tmp->user_poradi = $info['user_poradi'];
-        $tmp->prijmeni = Nette\Utils\Strings::webalize(@$this->user_info->identity->prijmeni);
+        $tmp->prijmeni = Nette\Utils\Strings::webalize($this->person->prijmeni);
 
         return $tmp;
     }
@@ -208,10 +211,10 @@ class CisloJednaci extends BaseModel
             $info['org_poradi'] = $row->org_poradi;
 
             $info['user_id'] = $row->user_id;
-            $user_info = UserModel::getUser($row->user_id, true);
-
+            $user_info = UserModel::getUser($row->user_id);
+            $person = UserModel::getPerson($row->user_id);
             $info['user'] = $user_info->username;
-            $info['prijmeni'] = Nette\Utils\Strings::webalize($user_info->identity->prijmeni);
+            $info['prijmeni'] = Nette\Utils\Strings::webalize($person->prijmeni);
             $info['user_poradi'] = $row->user_poradi;
 
             return $this->generuj($generuj, $info);
@@ -259,7 +262,7 @@ class CisloJednaci extends BaseModel
                 $cislo = (@$row->org_poradi) ? ($row->org_poradi) + 1 : $pocatek_cisla;
                 break;
             case "user":
-                $where[] = array('user_id=%i', $this->user_info->id);
+                $where[] = array('user_id=%i', $this->user_account->id);
                 $result = $this->select($where, array('user_poradi' => 'DESC'), null, 1);
                 $row = $result->fetch();
                 $cislo = (@$row->user_poradi) ? ($row->user_poradi) + 1 : $pocatek_cisla;

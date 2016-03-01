@@ -164,6 +164,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 @ini_set("memory_limit", PDF_MEMORY_LIMIT);
 
+                $person_name = $this->user->displayName;
+                
                 if ($this->pdf_output == 2) {
                     $content = str_replace("<td", "<td valign='top'", $content);
                     $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
@@ -178,7 +180,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $app_info = explode("#", $app_info);
                     $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
+                    $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Detail dokumentu');
 
                     $mpdf->defaultheaderfontsize = 10; /* in pts */
@@ -188,7 +190,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
                     $mpdf->SetHeader('||' . $this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
                     $mpdf->WriteHTML($content);
 
@@ -207,7 +209,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $app_info = explode("#", $app_info);
                     $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
                     $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor($this->user->getIdentity()->display_name);
+                    $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Tisk');
 
                     $mpdf->defaultheaderfontsize = 10; /* in pts */
@@ -217,7 +219,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
                     $mpdf->SetHeader('Seznam dokumentů||' . $this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+                    $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
                     $mpdf->WriteHTML($content);
 
@@ -853,8 +855,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->SouvisejiciDokumenty = null;
         }
 
-        $user = UserModel::getUser($this->user->id, 1);
-        $this->template->Prideleno = Osoba::displayName($user->identity);
+        $person = UserModel::getPerson($this->user->id);
+        $this->template->Prideleno = Osoba::displayName($person);
 
         $CJ = new CisloJednaci();
         $this->template->cjednaci = $CJ->generuj();
@@ -909,8 +911,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $prilohy = $DokumentPrilohy->prilohy($dok_odpoved->id);
                 $this->template->Prilohy = $prilohy;
 
-                $user = UserModel::getUser($this->user->id, 1);
-                $this->template->Prideleno = Osoba::displayName($user->identity);
+                $person = UserModel::getPerson($this->user->id);
+                $this->template->Prideleno = Osoba::displayName($person);
 
                 $CJ = new CisloJednaci();
                 $this->template->Typ_evidence = $this->typ_evidence;
@@ -998,8 +1000,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $prilohy_new = $DokumentPrilohy->prilohy($dok_odpoved->id);
                     $this->template->Prilohy = $prilohy_new;
 
-                    $user = UserModel::getUser($this->user->id, 1);
-                    $this->template->Prideleno = Osoba::displayName($user->identity);
+                    $person = UserModel::getPerson($this->user->id);
+                    $this->template->Prideleno = Osoba::displayName($person);
 
                     $CJ = new CisloJednaci();
                     $this->template->Typ_evidence = $this->typ_evidence;
@@ -1713,10 +1715,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
             }
         }
-        $user_info = $this->user->getIdentity();
-        if (!empty($user_info->identity->email)) {
-            $key = "user#" . Osoba::displayName($user_info->identity, 'jmeno') . "#" . $user_info->identity->email;
-            $odesilatele[$key] = Osoba::displayName($user_info->identity, 'jmeno') . " <" . $user_info->identity->email . "> [zaměstnanec]";
+        
+        $person = UserModel::getPerson($this->user->id);
+        if (!empty($person->email)) {
+            $key = "user#" . Osoba::displayName($person, 'jmeno') . "#" . $person->email;
+            $odesilatele[$key] = Osoba::displayName($person, 'jmeno') . " <" . $person->email . "> [zaměstnanec]";
         }
 
         $form = new Spisovka\Form();
@@ -2072,8 +2075,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
         $adresat_popis = $email_config['ucet'] . ' [' . $email_config['email'] . ']';
 
-        $user = $this->user->getIdentity();
-
         // zapis do epodatelny
         $Epodatelna = new Epodatelna();
         $zprava = array();
@@ -2090,8 +2091,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zprava['adresat'] = $adresat_popis;
         $zprava['prijato_dne'] = new DateTime();
         $zprava['doruceno_dne'] = new DateTime();
-        $zprava['prijal_kdo'] = $user->id;
-        $zprava['prijal_info'] = serialize($user->identity);
+        $zprava['prijal_kdo'] = $this->user->id;
+        $zprava['prijal_info'] = serialize(UserModel::getUser($this->user->id));
 
         $zprava['sha1_hash'] = $source ? sha1_file($source) : '';
 
@@ -2260,7 +2261,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $Epodatelna = new Epodatelna();
             $config = $isds->getConfig();
-            $user = $this->user->getIdentity();
 
             $zprava = array();
             $zprava['epodatelna_typ'] = 1;
@@ -2276,8 +2276,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $zprava['doruceno_dne'] = new DateTime($mess->dmAcceptanceTime);
 
-            $zprava['prijal_kdo'] = $user->id;
-            $zprava['prijal_info'] = serialize($user->identity);
+            $zprava['prijal_kdo'] = $this->user->id;
+            $zprava['prijal_info'] = serialize(UserModel::getUser($this->user->id));
 
             $zprava['sha1_hash'] = '';
 

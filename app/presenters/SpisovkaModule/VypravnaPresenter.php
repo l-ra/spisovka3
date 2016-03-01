@@ -91,7 +91,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 $app_info = explode("#", $app_info);
                 $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
                 $mpdf->SetCreator($app_name);
-                $mpdf->SetAuthor($this->user->getIdentity()->display_name);
+                $person_name = $this->user->displayName;
+                $mpdf->SetAuthor($person_name);
                 $mpdf->SetTitle('Podací arch');
                 $mpdf->WriteHTML($content);
                 $mpdf->Output('podaci_arch.pdf', 'I');

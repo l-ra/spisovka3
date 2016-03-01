@@ -180,9 +180,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $user = $this->user;
         if ($this->name != 'Error' && $user->isLoggedIn()) {
             $this->template->userobj = $user;
-            $identity = $user->getIdentity();
-            // var_dump($identity);
-            $this->template->user = $identity;
+            $this->template->user = UserModel::getUser($user->id);
             $this->template->is_authenticated = true;
 
             /**

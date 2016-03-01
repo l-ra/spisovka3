@@ -514,15 +514,15 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
 
                     if (!empty($predani['predano_user'])) {
-                        $user_info = UserModel::getIdentity($predani['predano_user']);
-                        $predano = Osoba::displayName($user_info);
+                        $osoba = UserModel::getPerson($predani['predano_user']);
+                        $predano = Osoba::displayName($osoba);
                     } else if (!empty($predani['predano_org'])) {
                         $Org = new Orgjednotka();
                         $orgjednotka = $Org->getInfo($predani['predano_org']);
                         $predano = @$orgjednotka->ciselna_rada . " - " . @$orgjednotka->plny_nazev;
                     }
                 } else {
-                    $predano = Osoba::displayName($this->user->getIdentity()->identity);
+                    $predano = $this->user->displayName;
                 }
 
                 if (!empty($zprava->email_id)) {
@@ -620,15 +620,15 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
 
             if (!empty($data['predano_user'])) {
-                $user_info = UserModel::getIdentity($data['predano_user']);
-                $predano = Osoba::displayName($user_info);
+                $osoba = UserModel::getPerson($data['predano_user']);
+                $predano = Osoba::displayName($osoba);
             } else if (!empty($data['predano_org'])) {
                 $Org = new Orgjednotka();
                 $orgjednotka = $Org->getInfo($data['predano_org']);
                 $predano = @$orgjednotka->ciselna_rada . " - " . @$orgjednotka->plny_nazev;
             }
         } else {
-            $predano = Osoba::displayName(@$this->user->getIdentity()->identity);
+            $predano = $this->user->displayName;
         }
 
         if (!empty($zprava->email_id)) {
@@ -903,7 +903,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $mail->setFromConfig();
                 $mail->addTo($data['email']);
                 $mail->setSubject($data['predmet']);
-                $mail->setBodySign($data['zprava']);
+                $zprava = ESSMail::appendSignature($data['zprava']);
+                $mail->setBody($zprava);
                 $mail->send();
 
                 if ($hromadna) {

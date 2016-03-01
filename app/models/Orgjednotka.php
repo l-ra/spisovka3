@@ -139,14 +139,14 @@ class Orgjednotka extends TreeModel
     // nebo null, neni-li uzivatel zarazen do zadne jednotky nebo kdyz nema identitu
     public static function dejOrgUzivatele($user_id = null)
     {
-
         if ($user_id === null) {
-            $identity = Nette\Environment::getUser()->getIdentity();
-            if ($identity === null)
+            $user = Nette\Environment::getUser();
+
+            // zjisti z databáze
+            $user_id = $user->id;
+            if ($user_id === null)
             // nepřihlášený uživatel
                 return null;
-
-            return $identity->orgjednotka_id;
         }
 
         $user = UserModel::getUser($user_id);

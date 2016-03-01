@@ -42,7 +42,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 $app_info = explode("#", $app_info);
                 $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
                 $mpdf->SetCreator($app_name);
-                $mpdf->SetAuthor($this->user->getIdentity()->display_name);
+                $person_name = $this->user->displayName;
+                $mpdf->SetAuthor($person_name);
                 $mpdf->SetTitle('Spisová služba - Zápůjčky');
 
                 $mpdf->defaultheaderfontsize = 10; /* in pts */
@@ -52,7 +53,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
                 $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
                 $mpdf->SetHeader('Zápůjčky||' . $this->template->Urad->nazev);
-                $mpdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+                $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
 
 

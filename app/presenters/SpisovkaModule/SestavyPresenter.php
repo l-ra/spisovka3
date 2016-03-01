@@ -41,7 +41,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         $pdf = new mPDF('', 'A4-L', 9, 'Helvetica');
         $pdf->SetCreator($app_name);
-        $pdf->SetAuthor($this->user->getIdentity()->display_name);
+        $person_name = $this->user->displayName;
+        $pdf->SetAuthor($person_name);
         $pdf->SetTitle('Sestava');
 
         $pdf->defaultheaderfontsize = 10; /* in pts */
@@ -53,7 +54,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $pdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
 
         $pdf->SetHeader($this->template->Sestava->nazev . '||' . $this->template->Urad->nazev . ', ' . $this->template->rok);
-        $pdf->SetFooter("{DATE j.n.Y}/" . $this->user->getIdentity()->display_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+        $pdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
         $pdf->WriteHTML($content);
         $pdf->Output('sestava.pdf', 'I');
