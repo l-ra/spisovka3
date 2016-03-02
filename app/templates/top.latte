@@ -8,20 +8,21 @@
         <div id="top_menu">
             {access :Spisovka:Default:}<a href="{link :Spisovka:Default:}">Spisová služba</a>{/access}
             {access :Epodatelna:Default:}<a href="{link :Epodatelna:Default:}">E-podatelna</a>{/access}
-            {if $userobj->isAllowed('Spisovna', 'cist_dokumenty') || $userobj->isAllowed('Spisovna_ZapujckyPresenter')}
+            {if $user->isAllowed('Spisovna', 'cist_dokumenty') || $user->isAllowed('Spisovna_ZapujckyPresenter')}
             <a href="{link :Spisovna:Default:}">Spisovna</a>{/if}
             {access :Admin:Default:}<a href="{link :Admin:Default:}">Administrace</a>{/access}
 {*            {access :Spisovka:Zpravy:}<a href="{link :Spisovka:Zpravy:default}">Zprávy</a>{/access} *}
             <a href="{$baseUrl}{$helpUri}" onclick="return openHelpWindow(this.href);">Nápověda</a>
             <a href="{link :Spisovka:Uzivatel:logout}">Odhlásit</a>
         </div>
-        <div id="top_jmeno">
+        <div n:if="true" id="top_jmeno">
             <span title="Role uživatele:
-{foreach UserModel::getRoles($user->id) as $role}{$role->name}
+{foreach (new UserAccount($user->id))->getRoles() as $role}{$role->name}
 {/foreach}">
-            <a href="{link :Spisovka:Uzivatel:}"><strong>{$userobj->displayName}</strong></a><br />
-            {if $user->orgjednotka_id}
-            {OrgJednotka::getName($user->orgjednotka_id)}<br />
+            <a href="{link :Spisovka:Uzivatel:}"><strong>{$user->displayName}</strong></a><br />
+            {var account = new UserAccount($user->id)}
+            {if $account->orgjednotka_id}
+            {OrgJednotka::getName($account->orgjednotka_id)}<br />
             {/if}
             </span>
             

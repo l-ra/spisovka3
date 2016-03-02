@@ -2092,7 +2092,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zprava['prijato_dne'] = new DateTime();
         $zprava['doruceno_dne'] = new DateTime();
         $zprava['prijal_kdo'] = $this->user->id;
-        $zprava['prijal_info'] = serialize(UserModel::getUser($this->user->id));
+        // $zprava['prijal_info'] = serialize(UserModel::getUser($this->user->id));
 
         $zprava['sha1_hash'] = $source ? sha1_file($source) : '';
 
@@ -2277,7 +2277,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['doruceno_dne'] = new DateTime($mess->dmAcceptanceTime);
 
             $zprava['prijal_kdo'] = $this->user->id;
-            $zprava['prijal_info'] = serialize(UserModel::getUser($this->user->id));
+            // $zprava['prijal_info'] = serialize(UserModel::getUser($this->user->id));
 
             $zprava['sha1_hash'] = '';
 

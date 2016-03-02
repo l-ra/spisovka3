@@ -13,8 +13,9 @@ abstract class DBEntity
      * integer primary key
      */
     protected $id;
-    protected $data = null;
-    protected $data_changed = false;
+    protected $_data = null;
+    protected $_data_changed = false;
+    private $_columns_changed = [];
 
     /**
      * @param id    int
@@ -40,12 +41,12 @@ abstract class DBEntity
         if (!count($result))
             throw new Exception(__METHOD__ . "() - entita " . get_class($this) . " ID $id neexistuje");
 
-        $this->data = $result->fetch();
+        $this->_data = $result->fetch();
     }
 
     protected function _setData(DibiRow $data)
     {
-        $this->data = $data;
+        $this->_data = $data;
     }
 
     /**
@@ -53,22 +54,22 @@ abstract class DBEntity
      */
     public function __get($name)
     {
-        if (!$this->data)
+        if (!$this->_data)
             $this->_load();
 
-        if (array_key_exists($name, $this->data))
-            return $this->data[$name];
+        if (array_key_exists($name, $this->_data))
+            return $this->_data[$name];
 
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
 
     public function __isset($name)
     {
-        if (!$this->data)
+        if (!$this->_data)
             $this->_load();
 
-        if (array_key_exists($name, $this->data))
-            return isset($this->data[$name]);
+        if (array_key_exists($name, $this->_data))
+            return isset($this->_data[$name]);
 
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
@@ -80,28 +81,29 @@ abstract class DBEntity
      */
     public function __set($name, $value)
     {
-        if (!$this->data)
+        if (!$this->_data)
             $this->_load();
 
-        if (!array_key_exists($name, $this->data))
+        if (!array_key_exists($name, $this->_data))
             throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
 
         if (strcasecmp($name, 'id') == 0)
         // simply ignore setting id column by mistake
             return;
 
-        if ($this->data[$name] !== $value) {
-            $this->data[$name] = $value;
-            $this->data_changed = true;
+        if ($this->_data[$name] !== $value) {
+            $this->_data[$name] = $value;
+            $this->_data_changed = true;
+            $this->_columns_changed[] = $name;
         }
     }
 
     public function getData()
     {
-        if (!$this->data)
+        if (!$this->_data)
             $this->_load();
 
-        return $this->data;
+        return $this->_data;
     }
 
     public function modify(array $data)
@@ -114,8 +116,15 @@ abstract class DBEntity
     {
         if (!$this->canUserModify())
             throw new Exception("Uložení entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
-        if ($this->data_changed) {
-            dibi::update(':PREFIX:' . $this::TBL_NAME, $this->data)->where("id = {$this->id}")->execute();
+        
+        if ($this->_data_changed) {
+            $update_data = [];
+            foreach ($this->_columns_changed as $col)
+                $update_data[$col] = $this->_data[$col];
+
+            dibi::update(':PREFIX:' . $this::TBL_NAME, $update_data)->where("id = {$this->id}")->execute();
+            $this->_data_changed = false;
+            $this->_columns_changed = [];
         }
     }
 
@@ -196,4 +205,12 @@ abstract class DBEntity
         return new static($id);
     }
 
+    /**
+     * Utility function. So getting user is at one place.
+     * @return Nette\Security\User
+     */
+    public static function getUser()
+    {
+        return Nette\Environment::getUser();
+    }
 }

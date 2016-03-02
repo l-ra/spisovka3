@@ -172,8 +172,8 @@ class Authenticator_UI extends Nette\Application\UI\Control
                 . " jejich roli.<br /><br /></div><br />";
             }
 
-            $User = new UserModel();
-            $user_seznam = $User->select()->fetchAssoc('username');
+            $m = new UserModel();
+            $user_seznam = $m->select()->fetchAssoc('username');
 
             foreach ($seznam as $id => $user) {
 
@@ -291,7 +291,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $auth_type = null;
         if (isset($params['user_id'])) {
             $form['user_id']->setValue($params['user_id']);
-            $user_info = UserModel::getUser($params['user_id']);
+            $user_info = new UserAccount($params['user_id']);
             $auth_type = $user_info->external_auth;
         }
 
@@ -406,8 +406,8 @@ class Authenticator_UI extends Nette\Application\UI\Control
     {
         $data = $button->getForm()->getValues();
 
-        $User = new UserModel();
-        if ($User->changePassword($data['user_id'], $data['heslo']))
+        $ua = new UserAccount($data['user_id']);
+        if ($ua->changePassword($data['heslo']))
             $this->presenter->flashMessage('Heslo úspěšně změněno.');
         else
             $this->presenter->flashMessage('Heslo není možné změnit.', 'warning');
@@ -418,8 +418,11 @@ class Authenticator_UI extends Nette\Application\UI\Control
     public function handleChangeAuthType(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $model = new UserModel();
-        $model->changeAuthType($data['user_id'], $data['external_auth']);
+        $ua = new UserAccount($data['user_id']);
+        $ua->external_auth = $data['external_auth'];
+        $ua->last_modified = new DateTime();
+        $ua->save();
+        
         $this->presenter->flashMessage('Nastavení změněno.');
         $this->presenter->redirect('this');
     }
@@ -479,8 +482,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
         try {
             if (is_array($osoba_data)) {
-                $osoba_model = new Osoba;
-                $osoba_id = $osoba_model->ulozit($osoba_data);
+                $osoba_id = Person::create($osoba_data)->id; 
                 $osoba_vytvorena = true;
             } else
                 $osoba_id = $osoba_data;
@@ -516,8 +518,8 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $remote_users = $this->userImport ? $this->userImport->getRemoteUsers() : null;
         $users = array();
         if (is_array($remote_users)) {
-            $User = new UserModel();
-            $existing_users = $User->select()->fetchAssoc('username');
+            $m = new UserModel();
+            $existing_users = $m->select()->fetchAssoc('username');
 
             foreach ($remote_users as $user) {
                 $username = $user['username'];

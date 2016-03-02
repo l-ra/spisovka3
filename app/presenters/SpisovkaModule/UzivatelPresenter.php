@@ -42,7 +42,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         // Kterou sekci editovat
         $this->template->FormUpravit = $this->getParameter('upravit', '');
 
-        $account = UserModel::getUser($user->id);
+        $account = new UserAccount($user->id);
         $this->template->Uzivatel = $account;
         $this->template->Org_jednotka = $account->orgjednotka_id !== null ? Orgjednotka::getName($account->orgjednotka_id)
                         : 'žádná';
@@ -52,8 +52,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $Auth1->setParams(['osoba_id' => $osoba->id, 'user_id' => $user->id]);
         $this->addComponent($Auth1, 'auth_change_password');
 
-        $role = UserModel::getRoles($account->id);
-        $this->template->Role = $role;
+        $roles = $account->getRoles();
+        $this->template->Role = $roles;
 
         $this->template->notification_receive_document = Notifications::isUserNotificationEnabled(Notifications::RECEIVE_DOCUMENT);
     }
@@ -91,15 +91,15 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        // Ulozi hodnoty a vytvori dalsi verzi
-        $data = $button->getForm()->getValues();
+        $data = $button->getForm()->getValues(true);
 
-        $Osoba = new Osoba();
         $osoba_id = $data['osoba_id'];
         unset($data['osoba_id']);
 
         try {
-            $osoba_id = $Osoba->ulozit($data, $osoba_id);
+            $osoba = new Person($osoba_id);
+            $osoba->modify($data);
+            $osoba->save();
             $this->flashMessage('Informace o uživateli byly upraveny.');
         } catch (DibiException $e) {
             $this->flashMessage('Informace o uživateli se nepodařilo upravit. ' . $e->getMessage(),

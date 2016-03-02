@@ -40,9 +40,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $args[] = array("prijmeni LIKE %s", $abc . '%');
         }
 
-        // [P.L.] stav neni pouzit v aplikaci
-        $args[] = 'stav=0';
-
         // nacteni
         $Osoba = new Osoba();
         $result = $Osoba->seznam($args);
@@ -61,11 +58,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         $this->template->title = " - Detail zaměstnance";
 
-        $Osoba = new Osoba();
-        $User = new UserModel();
-
         $osoba_id = $id;
-        $this->template->Osoba = $Osoba->getInfo($osoba_id);
+        $this->template->Osoba = $person = new Person($osoba_id);
 
         // Parametr urcuje, co budeme editovat (jaky zobrazime formular)
         $this->template->FormUpravit = $this->getParameter('upravit', null);
@@ -74,7 +68,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         // Zmena roli
         $this->template->RoleUpravit = $this->getParameter('role', null);
 
-        $accounts = $Osoba->getUser($osoba_id, 1);
+        $accounts = $person->getAccounts();
         $this->template->Accounts = $accounts;
 
         // Zmena hesla
@@ -118,7 +112,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $odebrat_ucet = $this->getParameter('odebrat', false);
         if ($odebrat_ucet) {
             try {
-                $User->odebratUcet($osoba_id, $odebrat_ucet);
+                $m = new UserModel();
+                $m->odebratUcet($osoba_id, $odebrat_ucet);
                 $this->flashMessage('Účet uživatele byl odebrán.');
             } catch (Exception $e) {
                 $this->flashMessage($e->getMessage(), 'warning');
@@ -128,14 +123,15 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         if (count($accounts)) {
             $role = array();
-            foreach ($accounts as &$uziv) {
-                if ($uziv->orgjednotka_id !== null)
-                    $uziv->org_nazev = Orgjednotka::getName($uziv->orgjednotka_id);
+            foreach ($accounts as &$account) {
+                if ($account->orgjednotka_id !== null)
+                    $account->org_nazev = Orgjednotka::getName($account->orgjednotka_id);
                 else
-                    $uziv->org_nazev = "žádná";
+                    $account->org_nazev = "žádná";
 
-                $user_roles = UserModel::getRoles($uziv->id);
-                $role[$uziv->id] = $user_roles ?: [];
+                $accountObj = new UserAccount($account->id);
+                $user_roles = $accountObj->getRoles();
+                $role[$account->id] = $user_roles ?: [];
             }
 
             $this->template->Role = $role;
@@ -218,14 +214,14 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
-        $data = $button->getForm()->getValues();
-
-        $Osoba = new Osoba();
+        $data = $button->getForm()->getValues(true);
         $osoba_id = $data['id'];
         unset($data['id']);
 
         try {
-            $osoba_id = $Osoba->ulozit($data, $osoba_id);
+            $osoba = new Person($osoba_id);
+            $osoba->modify($data);
+            $osoba->save();
             $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  byl upraven.');
             $this->redirect('this', array('id' => $osoba_id));
         } catch (DibiException $e) {
@@ -251,14 +247,12 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         // Ulozi hodnoty a vytvori dalsi verzi
-        $data = $button->getForm()->getValues();
-
-        $Osoba = new Osoba();
+        $data = $button->getForm()->getValues(true);
 
         try {
-            $osoba_id = $Osoba->ulozit($data);
-            $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  byl vytvořen.');
-            $this->redirect(':Admin:Zamestnanci:detail', array('id' => $osoba_id));
+            $person = Person::create($data);
+            $this->flashMessage('Zaměstnanec  "' . $person->displayName() . '"  byl vytvořen.');
+            $this->redirect(':Admin:Zamestnanci:detail', ['id' => $person->id]);
         } catch (DibiException $e) {
             $e->getMessage();
             $this->flashMessage('Zaměstnance "' . Osoba::displayName($data) . '" se nepodařilo vytvořit.',
@@ -286,7 +280,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $user_id = $this->getParameter('role', null);
         }
 
-        $user_role = UserModel::getRoles($user_id);
+        $user_role = (new UserAccount($user_id))->getRoles();
 
         $Role = new RoleModel();
         $role_select = $Role->seznam();
@@ -339,7 +333,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         $UserRole = new User2Role();
 
-        $user_role = UserModel::getRoles($user_id);
+        $user_role = (new UserAccount($user_id))->getRoles();
 
         //Nette\Diagnostics\Debugger::dump($data);
         //Nette\Diagnostics\Debugger::dump($user_role);
@@ -455,9 +449,9 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ($orgjednotka_id === 0)
             $orgjednotka_id = null;
 
-        $model = new UserModel();
-        $model->update(array('orgjednotka_id' => $orgjednotka_id),
-                array(array('id = %i', $data['id'])));
+        $a = new UserAccount($data['id']);
+        $a->orgjednotka_id = $orgjednotka_id;
+        $a->save();
         $this->flashMessage('Organizační jednotka byla změněna.');
 
         $this->redirect('this', array('id' => $data['osoba_id']));

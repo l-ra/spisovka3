@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * Description of Person
+ *
+ * @author Pavel Laštovička
+ */
+class Person extends CachedDBEntity
+{
+
+    const TBL_NAME = 'osoba';
+
+    public function save()
+    {
+        $this->date_modified = new DateTime();
+        $this->user_modified = $this->getUser()->id;
+        parent::save();
+    }
+    
+    public static function create(array $data)
+    {
+        $user_id = self::getUser()->id;
+        if (!$user_id)
+            $user_id = 1;   // pripad instalace aplikace
+        
+        $data['date_created'] = new DateTime();
+        $data['user_created'] = $user_id;
+        $data['date_modified'] = new DateTime();
+        $data['user_modified'] = $user_id;
+        $data['stav'] = 0;
+
+        return parent::create($data);
+    }
+            
+    public function displayName()
+    {
+        return Osoba::displayName($this);
+    }
+
+    /**
+     * Vrati pole uzivatelskych uctu osoby.
+     * @return DibiRow[]
+     */
+    public function getAccounts()
+    {
+        $res = dibi::query('SELECT u.* FROM [:PREFIX:' . BaseModel::OSOBA2USER_TABLE . '] ou' .
+                        ' LEFT JOIN [:PREFIX:' . BaseModel::USER_TABLE . '] u ON (u.id = ou.user_id)' .
+                        ' WHERE ou.osoba_id = %i', $this->id, ' AND ou.active=1');
+
+        return $res->fetchAssoc('id');
+    }
+}

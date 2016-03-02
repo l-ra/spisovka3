@@ -178,9 +178,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
          */
         $this->template->is_authenticated = false;
         $user = $this->user;
+        $this->template->user = $user;
         if ($this->name != 'Error' && $user->isLoggedIn()) {
-            $this->template->userobj = $user;
-            $this->template->user = UserModel::getUser($user->id);
             $this->template->is_authenticated = true;
 
             /**
@@ -191,13 +190,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                 // zjisti kolik ma uzivatel neprectenych zprav                
                 $this->template->zpravy_pocet_neprectenych = Zpravy::dej_pocet_neprectenych_zprav();
             }
-        } else {
-            $ident = new stdClass();
-            $ident->name = "Nepřihlášen";
-            $ident->user_roles = array();
-            $this->template->user = $ident;
         }
-
+        
         // Nastav, aby Nette generovalo ID prvku formulare jako ve stare verzi
         Nette\Forms\Controls\BaseControl::$idMask = 'frm%s';
     }
@@ -210,10 +204,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $set->addMacro('css', 'echo \Spisovka\LatteMacros::CSS($publicUrl, %node.args);');
         $set->addMacro('js', 'echo \Spisovka\LatteMacros::JavaScript(%node.word, $publicUrl);');
 
-        $set->addMacro('access', 'if (\Spisovka\LatteMacros::access($userobj, %node.word)) {', '}');
-        $set->addMacro('isAllowed', 'if (\Spisovka\LatteMacros::isAllowed($userobj, %node.args)) {',
+        $set->addMacro('access', 'if (\Spisovka\LatteMacros::access($user, %node.word)) {', '}');
+        $set->addMacro('isAllowed', 'if (\Spisovka\LatteMacros::isAllowed($user, %node.args)) {',
                 '}');
-        $set->addMacro('isInRole', 'if (\Spisovka\LatteMacros::isInRole($userobj, %node.args)) {', '}');
+        $set->addMacro('isInRole', 'if (\Spisovka\LatteMacros::isInRole($user, %node.args)) {', '}');
 
         $set->addMacro('label2', 'echo \Spisovka\LatteMacros::label2($form, %node.args)');
         $set->addMacro('input2', 'echo \Spisovka\LatteMacros::input2($form, %node.args)');

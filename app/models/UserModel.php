@@ -7,24 +7,24 @@ class UserModel extends BaseModel
     protected $primary = 'id';
 
     /**
-     * Zjisti informace o uzivateli na základe ID nebo username
+     * Zjisti informace o uzivateli na základe username.
+     * Použito pouze pro přihlášení.
      *
-     * @param int|string $param_user 
-     * @return DibiRow
+     * @param string $username 
+     * @return UserAccount
      */
-    public static function getUser($param_user)
+    public static function searchUser($username)
     {
-        $instance = new self;
-
         /*
          * Ziskání uzivatele
          */
-        $where = is_numeric($param_user) ? [['id = %i', $param_user]] : [['username = %s', $param_user]];
+        $where = [['username = %s', $username]];
+        $instance = new self;
         $row = $instance->select($where)->fetch();
         if (!$row)
             return null;
 
-        return $row;
+        return new UserAccount($row->id);
     }
 
     /**
@@ -35,49 +35,33 @@ class UserModel extends BaseModel
      */
     public static function getPerson($user_id)
     {
-        static $cache = [];
+        /*        static $cache = [];
 
-        if (isset($cache[$user_id]))
-            return $cache[$user_id];
+          if (isset($cache[$user_id]))
+          return $cache[$user_id];
 
-        $row = dibi::fetch('SELECT o.*
-                            FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
-                            LEFT JOIN [:PREFIX:' . self::OSOBA_TABLE . '] o ON (o.id = ou.osoba_id)
-                            WHERE ou.user_id = %i AND o.stav < 10', $user_id);
+          $row = dibi::fetch('SELECT o.*
+          FROM [:PREFIX:' . self::OSOBA2USER_TABLE . '] ou
+          LEFT JOIN [:PREFIX:' . self::OSOBA_TABLE . '] o ON (o.id = ou.osoba_id)
+          WHERE ou.user_id = %i AND o.stav < 10', $user_id);
 
-        return $cache[$user_id] = $row ? $row : NULL;
+          return $cache[$user_id] = $row ? $row : NULL; */
+
+        // docasne reseni, nez se tato tabulka zrusi
+        $res = dibi::query("SELECT [osoba_id] FROM [:PREFIX:" . self::OSOBA2USER_TABLE . "] WHERE [user_id] = %i",
+                        $user_id);
+        $osoba_id = $res->fetchSingle();
+
+        return new Person($osoba_id);
     }
 
-    public static function getRoles($user_id)
-    {
-        $rows = dibi::fetchAll('SELECT r.*
-                                 FROM [:PREFIX:' . self::USER2ROLE_TABLE . '] ur
-                                 LEFT JOIN [:PREFIX:' . self::ROLE_TABLE . '] r ON (r.id = ur.role_id)
-                                 WHERE ur.user_id = %i', $user_id);
-
-        return ($rows) ? $rows : NULL;
-    }
-
-    public function insert($data)
-    {
-        $rown = array('username' => $data['username'],
-            'password' => isset($data['heslo']) ? sha1($data['username'] . $data['heslo']) : null,
-            'date_created' => new DateTime(),
-            'external_auth' => (isset($data['external_auth']) ? $data['external_auth'] : 0),
-            'orgjednotka_id' => isset($data['orgjednotka_id']) && !empty($data['orgjednotka_id'])
-                        ? $data['orgjednotka_id'] : NULL,
-            'active' => 1
-        );
-
-        return parent::insert($rown);
-    }
-
+    // TODO: prepsat
     public static function pridatUcet($osoba_id, $data)
     {
-
         $insert_data = array(
             'username' => $data['username'],
-            'heslo' => $data['heslo'],
+            // heslo chybí při externí autentizaci
+            'heslo' => isset($data['heslo']) ? $data['heslo'] : null,
         );
         if (isset($data['orgjednotka_id']))
             $insert_data['orgjednotka_id'] = $data['orgjednotka_id'];
@@ -92,8 +76,18 @@ class UserModel extends BaseModel
         try {
             dibi::begin();
 
-            $UserModel = new UserModel();
-            $user_id = $UserModel->insert($insert_data);
+            $rown = array('username' => $insert_data['username'],
+                'password' => isset($insert_data['heslo']) ? sha1($insert_data['username'] . $insert_data['heslo'])
+                            : null,
+                'date_created' => new DateTime(),
+                'external_auth' => (isset($insert_data['external_auth']) ? $insert_data['external_auth']
+                            : 0),
+                'orgjednotka_id' => isset($insert_data['orgjednotka_id']) && !empty($insert_data['orgjednotka_id'])
+                            ? $insert_data['orgjednotka_id'] : NULL,
+                'active' => 1
+            );
+            $UserModel = new self;
+            $user_id = $UserModel->insert($rown);
 
             $Osoba2User = new Osoba2User();
             $rowou = array('osoba_id' => $osoba_id,
@@ -137,11 +131,10 @@ class UserModel extends BaseModel
                 array('osoba_id=%i', $osoba_id)
             ));
 
-            $this->update(array(
-                'active' => 0,
-                'username%sql' => "CONCAT(username,'_'," . time() . ")"
-                    ), array('id=%i', $user_id)
-            );
+            $account = new UserAccount($user_id);
+            $account->active = 0;
+            $account->username = $account->username . "_" . time();
+            $account->save();
 
             dibi::commit();
         } catch (Exception $e) {
@@ -150,70 +143,32 @@ class UserModel extends BaseModel
         }
     }
 
-    public function changePassword($user_id, $password)
-    {
-
-        $user = $this->select([['id=%i', $user_id]])->fetch();
-
-        // zabran, aby uzivatel mohl u dema menit heslo k urcitym uctum
-        if (Demo::isDemo() && !Demo::canChangePassword($user))
-            return false;
-
-        $row = array();
-        $row['last_modified'] = new DateTime();
-
-        // pokud je heslo prazdne = zadna zmena, jinak zmena
-        if (!empty($password)) {
-            $row['password'] = sha1($user->username . $password);
-        }
-
-        $this->update($row, array('id=%i', $user_id));
-        return true;
-    }
-
-    public function changeAuthType($user_id, $auth_type)
-    {
-
-        $change = ['external_auth' => $auth_type];
-        $change['last_modified'] = new DateTime();
-        $this->update($change, array('id=%i', $user_id));
-    }
-
-    public function zalogovan($user_id)
-    {
-
-        $row = array('last_login' => new DateTime(),
-            'last_ip' => Nette\Environment::getHttpRequest()->getRemoteAddress()
-        );
-        return $this->update($row, array('id=%i', $user_id));
-    }
-    
     /* Nebezpecne funkci nechat v programu, prestoze se nikde nevola
-    public function deleteAll()
-    {
-        $Workflow = new Workflow();
-        $Workflow->update(
-                array('user_id' => null, 'prideleno_id' => null), array('1')
-        );
+      public function deleteAll()
+      {
+      $Workflow = new Workflow();
+      $Workflow->update(
+      array('user_id' => null, 'prideleno_id' => null), array('1')
+      );
 
-        $CJ = new CisloJednaci();
-        $CJ->update(array('user_id' => null), array('user_id IS NOT NULL'));
+      $CJ = new CisloJednaci();
+      $CJ->update(array('user_id' => null), array('user_id IS NOT NULL'));
 
-        $Dokument = new Dokument();
-        $Dokument->update(
-                array('user_created' => null, 'user_modified' => null), array('1')
-        );
-        $DokumentH = new DokumentHistorie();
-        $DokumentH->update(
-                array('user_created' => null, 'user_modified' => null), array('1')
-        );
+      $Dokument = new Dokument();
+      $Dokument->update(
+      array('user_created' => null, 'user_modified' => null), array('1')
+      );
+      $DokumentH = new DokumentHistorie();
+      $DokumentH->update(
+      array('user_created' => null, 'user_modified' => null), array('1')
+      );
 
-        $User2Role = new User2Role();
-        $User2Role->deleteAll();
+      $User2Role = new User2Role();
+      $User2Role->deleteAll();
 
-        parent::deleteAll();
-    }
-    */
+      parent::deleteAll();
+      }
+     */
 }
 
 class User2Role extends BaseModel

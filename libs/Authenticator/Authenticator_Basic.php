@@ -14,9 +14,8 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
         $username = $credentials[self::USERNAME];
 
         // Vyhledani uzivatele
-        $user = new UserModel();
         $log = new LogModel();
-        $account = UserModel::getUser($username);
+        $account = UserModel::searchUser($username);
 
         // Overeni uzivatele
         if (!$account)
@@ -28,7 +27,7 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
             self::NOT_APPROVED);
 
         // Role
-        $roles = UserModel::getRoles($account->id);
+        $roles = $account->getRoles();
         if (!count($roles))
             throw new Nette\Security\AuthenticationException("Uživatel '$username' nemá přiřazenou žádnou roli. Není možné ho připustit k aplikaci. Kontaktujte svého správce.",
             self::NOT_APPROVED);
@@ -51,13 +50,16 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
             self::INVALID_CREDENTIAL);
         }
 
-        $user->zalogovan($account->id);
+        $account->last_login = new DateTime();
+        $account->last_ip = Nette\Environment::getHttpRequest()->getRemoteAddress();
+        $account->save();
+        
         $log->logAccess($account->id, 1);
 
         // Odstraneni hesla v identite
         unset($account->password);
 
-        return new Nette\Security\Identity($account->id, $role_codes, $account);
+        return new Nette\Security\Identity($account->id, $role_codes);
     }
 
     protected function verifyPassword($user, $credentials)

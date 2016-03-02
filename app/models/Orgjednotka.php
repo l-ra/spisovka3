@@ -149,8 +149,8 @@ class Orgjednotka extends TreeModel
                 return null;
         }
 
-        $user = UserModel::getUser($user_id);
-        return $user === null ? null : $user->orgjednotka_id;
+        $user = new UserAccount($user_id);
+        return $user->orgjednotka_id;
     }
 
     public static function getName($id)

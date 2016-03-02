@@ -1,5 +1,9 @@
 <?php
 
+/**
+ *  POZOR, tento kod je nefunkcni.
+ */
+
 class Authenticator_SSO extends Authenticator_Basic
 {
 
