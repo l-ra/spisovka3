@@ -326,7 +326,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->Pridelen = 0;
                 $this->template->AccessEdit = 0;
                 $Zapujcka = new Zapujcka();
-                $this->template->Zapujcka = $Zapujcka->getDokument($dokument_id);
+                $this->template->Zapujcka = $Zapujcka->getFromDokumentId($dokument_id);
             } else {
                 $this->template->Zapujcka = null;
             }
@@ -855,8 +855,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->SouvisejiciDokumenty = null;
         }
 
-        $person = UserModel::getPerson($this->user->id);
-        $this->template->Prideleno = Osoba::displayName($person);
+        $this->template->Prideleno = $this->user->displayName;
 
         $CJ = new CisloJednaci();
         $this->template->cjednaci = $CJ->generuj();
@@ -911,8 +910,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $prilohy = $DokumentPrilohy->prilohy($dok_odpoved->id);
                 $this->template->Prilohy = $prilohy;
 
-                $person = UserModel::getPerson($this->user->id);
-                $this->template->Prideleno = Osoba::displayName($person);
+                $this->template->Prideleno = $this->user->displayName;
 
                 $CJ = new CisloJednaci();
                 $this->template->Typ_evidence = $this->typ_evidence;
@@ -1000,8 +998,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $prilohy_new = $DokumentPrilohy->prilohy($dok_odpoved->id);
                     $this->template->Prilohy = $prilohy_new;
 
-                    $person = UserModel::getPerson($this->user->id);
-                    $this->template->Prideleno = Osoba::displayName($person);
+                    $this->template->Prideleno = $this->user->displayName;
 
                     $CJ = new CisloJednaci();
                     $this->template->Typ_evidence = $this->typ_evidence;
@@ -1716,7 +1713,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
         }
         
-        $person = UserModel::getPerson($this->user->id);
+        $person = Person::fromUserId($this->user->id);
         if (!empty($person->email)) {
             $key = "user#" . Osoba::displayName($person, 'jmeno') . "#" . $person->email;
             $odesilatele[$key] = Osoba::displayName($person, 'jmeno') . " <" . $person->email . "> [zaměstnanec]";

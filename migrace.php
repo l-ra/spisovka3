@@ -662,7 +662,6 @@ $S2_usr = $S2->query('SELECT * FROM [:S2:zamestnanci]')->fetchAll();
 if ( count($S2_usr)>0 ) {
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'user');
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'osoba');
-    if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'osoba_to_user');
     if (MIGRACE) $S3->query('TRUNCATE TABLE '.S3_.'user_to_role');
 
     $S3_role = $S3->query('SELECT r.id, r.code, r.orgjednotka_id, r1.code AS pcode FROM [:S3:user_role] AS r LEFT JOIN [:S3:user_role] AS r1 ON r1.id=r.parent_id')->fetchAll();
@@ -711,6 +710,7 @@ if ( count($S2_usr)>0 ) {
                 // Pridani jako uzivatele
                 $user_id = $S3->insert(S3_.'user', array(
                     'id' => $S2_u->id_zamestnanec,
+                    'osoba_id' => $osoba_id,
                     'username' => $S2_u->login,
                     'password' => $S2_u->heslo,
                     'active' => $aktivni,
@@ -720,21 +720,6 @@ if ( count($S2_usr)>0 ) {
                 if ( $user_id ) {
                     
                     echo "\n   => <span style='color:green'>uživatel přidán - ". htmlspecialchars($S2_u->login) ."</span>";
-
-                    // Pripojeni uzivatele k osobe
-                    if ( $S3->insert(S3_.'osoba_to_user', array(
-                        'osoba_id' => $osoba_id,
-                        'user_id' => $user_id,
-                        'active' => $aktivni,
-                        'date_added' => new DateTime()
-                    ))->execute() ) {
-                        echo "\n   => <span style='color:green'>Uživatel připojen k osobě</span>";
-                    } else {
-                        echo "\n   => <span style='color:red'>uživatel nepřipojen k osobě</span>";
-                        echo "\n   <span style='color:red'>Chyba: ".htmlspecialchars($e->getMessage())."</span>";
-                        echo "\n   <span style='color:red'>SQL: ".htmlspecialchars($e->getSql())."</span>";
-                        $ERROR_LOG[] = $e->getMessage();
-                    }
 
                     // Nastaveni role dle puvodniho
                     if ( $S2_u->role == "spravce" ) {

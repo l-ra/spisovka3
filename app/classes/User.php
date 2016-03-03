@@ -14,7 +14,7 @@ class User extends \Nette\Security\User
 
     public function getDisplayName()
     {
-        $person = \UserModel::getPerson($this->getId());
+        $person = \Person::fromUserId($this->getId());
         return \Osoba::displayName($person);
     }
 }

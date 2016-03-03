@@ -87,3 +87,5 @@ Zrušení tabulek dokument_historie, osoba_historie a subjekt_historie.
 Jiný znakový kód pro složky spisů.
 [1060]
 Odstranění "hlavního spisu" a přeindexování stromové struktury spisů.
+[1100]
+Oprava vazby mezi uživatelem a jeho účtem.

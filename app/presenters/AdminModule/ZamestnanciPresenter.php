@@ -113,7 +113,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ($odebrat_ucet) {
             try {
                 $m = new UserModel();
-                $m->odebratUcet($osoba_id, $odebrat_ucet);
+                $m->odebratUcet($odebrat_ucet);
                 $this->flashMessage('Účet uživatele byl odebrán.');
             } catch (Exception $e) {
                 $this->flashMessage($e->getMessage(), 'warning');
@@ -123,14 +123,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         if (count($accounts)) {
             $role = array();
-            foreach ($accounts as &$account) {
-                if ($account->orgjednotka_id !== null)
-                    $account->org_nazev = Orgjednotka::getName($account->orgjednotka_id);
-                else
-                    $account->org_nazev = "žádná";
-
-                $accountObj = new UserAccount($account->id);
-                $user_roles = $accountObj->getRoles();
+            foreach ($accounts as $account) {
+                $user_roles = $account->getRoles();
                 $role[$account->id] = $user_roles ?: [];
             }
 

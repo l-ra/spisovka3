@@ -10,6 +10,14 @@ class UserAccount extends CachedDBEntity
 
     const TBL_NAME = 'user';
 
+    public function __construct($param)
+    {
+        if ($param instanceof \Nette\Security\User)
+            $param = $param->getId();
+        
+        parent::__construct($param);
+    }
+    
     public function changePassword($password)
     {
         // zabran, aby uzivatel mohl u dema menit heslo k urcitym uctum
@@ -26,6 +34,11 @@ class UserAccount extends CachedDBEntity
         return true;
     }
         
+    public function getPerson()
+    {
+        return new Person($this->osoba_id);
+    }
+    
     /**
      * 
      * @return DibiRow[] | null

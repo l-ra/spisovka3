@@ -298,8 +298,8 @@ class Dokument extends BaseModel
                 break;
             case 'prideleno':
                 $args['leftJoin']['wf_user'] = array(
-                    'from' => array($this->tb_osoba_to_user => 'wf_user'),
-                    'on' => array('wf_user.user_id=wf.prideleno_id'),
+                    'from' => array($this->tb_user => 'wf_user'),
+                    'on' => array('wf_user.id = wf.prideleno_id'),
                     'cols' => null
                 );
                 $args['leftJoin']['wf_osoba'] = array(
@@ -311,8 +311,8 @@ class Dokument extends BaseModel
                 break;
             case 'prideleno_desc':
                 $args['leftJoin']['wf_user'] = array(
-                    'from' => array($this->tb_osoba_to_user => 'wf_user'),
-                    'on' => array('wf_user.user_id=wf.prideleno_id'),
+                    'from' => array($this->tb_user => 'wf_user'),
+                    'on' => array('wf_user.id = wf.prideleno_id'),
                     'cols' => null
                 );
                 $args['leftJoin']['wf_osoba'] = array(
@@ -1032,8 +1032,8 @@ class Dokument extends BaseModel
                         'stav_osoby', 'date' => 'date_prideleni', 'date_predani', 'poznamka' => 'poznamka_predani', 'aktivni' => 'wf_aktivni')
                 ),
                 'workflow_prideleno' => array(
-                    'from' => array($this->tb_osoba_to_user => 'wf_o2u'),
-                    'on' => array('wf_o2u.user_id=wf.prideleno_id'),
+                    'from' => array($this->tb_user => 'wf_o2u'),
+                    'on' => array('wf_o2u.id=wf.prideleno_id'),
                     'cols' => array('osoba_id' => 'prideleno_osoba_id')
                 ),
                 'workflow_prideleno_osoba' => array(
@@ -1050,9 +1050,9 @@ class Dokument extends BaseModel
                         'plny_nazev' => 'org_plny_nazev', 'zkraceny_nazev' => 'org_zkraceny_nazev', 'ciselna_rada' => 'org_ciselna_rada')
                 ),
                 'workflow_user' => array(
-                    'from' => array($this->tb_osoba_to_user => 'wf_o2user'),
-                    'on' => array('wf_o2user.user_id=wf.user_id'),
-                    'cols' => array('osoba_id' => 'user_osoba_id', 'user_id' => 'wf_user_id')
+                    'from' => array($this->tb_user => 'wf_o2user'),
+                    'on' => array('wf_o2user.id = wf.user_id'),
+                    'cols' => array('osoba_id' => 'user_osoba_id', 'id' => 'wf_user_id')
                 ),
                 'workflow_user_osoba' => array(
                     'from' => array($this->tb_osoba => 'wf_user_osoba'),

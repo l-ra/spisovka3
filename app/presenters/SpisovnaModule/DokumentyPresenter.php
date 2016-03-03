@@ -270,7 +270,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $Zapujcka = new Zapujcka();
             if (in_array($dokument->stav_dokumentu, [7])) {
                 // dokument musi byt prevzat do spisovny a nesmi byt zahajeno skartacni rizeni
-                $this->template->Zapujcka = $Zapujcka->getDokument($dokument_id);
+                $this->template->Zapujcka = $Zapujcka->getFromDokumentId($dokument_id);
                 // lze zapujcit, pokud uz neni zapujcen
                 $this->template->Lze_zapujcit = $this->template->Zapujcka === null;
             } else {

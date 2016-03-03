@@ -514,7 +514,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
 
                     if (!empty($predani['predano_user'])) {
-                        $osoba = UserModel::getPerson($predani['predano_user']);
+                        $osoba = Person::fromUserId($predani['predano_user']);
                         $predano = Osoba::displayName($osoba);
                     } else if (!empty($predani['predano_org'])) {
                         $Org = new Orgjednotka();
@@ -620,7 +620,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
 
             if (!empty($data['predano_user'])) {
-                $osoba = UserModel::getPerson($data['predano_user']);
+                $osoba = Person::fromUserId($data['predano_user']);
                 $predano = Osoba::displayName($osoba);
             } else if (!empty($data['predano_org'])) {
                 $Org = new Orgjednotka();

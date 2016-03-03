@@ -157,7 +157,7 @@ abstract class DBEntity
         $query = array('SELECT * FROM %n', ':PREFIX:' . static::TBL_NAME);
 
         if (isset($params['where']))
-            array_push($query, 'WHERE %and', $params['where']);
+            array_push($query, is_array($params['where']) ? 'WHERE %and' : 'WHERE', $params['where']);
 
         if (isset($params['order']))
             array_push($query, 'ORDER BY %by', $params['order']);

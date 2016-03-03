@@ -10,7 +10,6 @@ abstract class BaseModel extends Nette\Object
     const OSOBA_TABLE = 'osoba';
     const ROLE_TABLE = 'user_role';
     const USER2ROLE_TABLE = 'user_to_role';
-    const OSOBA2USER_TABLE = 'osoba_to_user';
     const ORGJEDNOTKA_TABLE = 'orgjednotka';
 
     /** @var string object name */
@@ -35,7 +34,6 @@ abstract class BaseModel extends Nette\Object
     protected $tb_logspis = 'log_spis';
     protected $tb_orgjednotka = 'orgjednotka';
     protected $tb_osoba = 'osoba';
-    protected $tb_osoba_to_user = 'osoba_to_user';
     protected $tb_resource = 'user_resource';
     protected $tb_role = 'user_role';
     protected $tb_rule = 'user_rule';

@@ -14,6 +14,28 @@ class Osoba extends BaseModel
         return $select;
     }
 
+    public function seznamOsobSUcty($search = null)
+    {
+        $where = ['u.active = 1'];
+        if ($search)
+            $where[] = ["CONCAT(o.jmeno,' ',o.prijmeni) LIKE %s", "%$search%"];
+
+        $result = dibi::query('SELECT u.osoba_id, u.id AS user_id, o.*, u.username, sq.pocet_uctu' .
+                        ' FROM %n o JOIN %n u ON o.id = u.osoba_id' .
+                        ' JOIN (SELECT osoba_id, COUNT(*) AS pocet_uctu FROM %n WHERE active = 1 GROUP BY osoba_id) AS sq ON o.id = sq.osoba_id' .
+                        ' WHERE %and' .
+                        ' ORDER BY o.prijmeni, o.jmeno', $this->name, $this->tb_user,
+                        $this->tb_user, $where
+        );
+
+        return $result->fetchAll();
+    }
+
+    public function hledat($search)
+    {
+        return $this->seznamOsobSUcty($search);
+    }
+
     public static function displayName($data, $display = 'full')
     {
         if (is_string($data))
@@ -108,48 +130,4 @@ class Osoba extends BaseModel
 
       parent::deleteAll();
       } */
-}
-
-class Osoba2User extends BaseModel
-{
-
-    protected $name = 'osoba_to_user';
-
-    public function seznam()
-    {
-
-        $result = dibi::query('SELECT ou.osoba_id, ou.user_id, o.*, u.username, sq.pocet_uctu' .
-                        ' FROM %n ou', $this->name, ' JOIN %n o', $this->tb_osoba,
-                        'ON o.id=ou.osoba_id' .
-                        ' JOIN %n u', $this->tb_user,
-                        'ON u.id=ou.user_id' .
-                        ' JOIN (SELECT osoba_id, COUNT(*) as pocet_uctu FROM %n', $this->name,
-                        ' WHERE active=1 GROUP BY osoba_id) AS sq ON o.id = sq.osoba_id' .
-                        ' WHERE ou.active=1' .
-                        ' ORDER BY o.prijmeni, o.jmeno'
-        );
-
-        return $result->fetchAll();
-    }
-
-    public function hledat($text)
-    {
-
-        $result = dibi::query('SELECT ou.osoba_id, ou.user_id, o.*, u.username, sq.pocet_uctu' .
-                        ' FROM %n ou', $this->name, ' JOIN %n o', $this->tb_osoba,
-                        'ON o.id=ou.osoba_id' .
-                        ' JOIN %n u', $this->tb_user,
-                        'ON u.id=ou.user_id' .
-                        ' JOIN (SELECT osoba_id, COUNT(*) as pocet_uctu FROM %n', $this->name,
-                        ' WHERE active=1 GROUP BY osoba_id) AS sq ON o.id = sq.osoba_id' .
-                        " WHERE ou.active=1 AND" .
-                        " ( LOWER(CONCAT(o.jmeno,' ',o.prijmeni)) LIKE LOWER(%s)", "%$text%",
-                        " OR LOWER(CONCAT(o.prijmeni,' ',o.jmeno)) LIKE LOWER(%s)", "%$text%",
-                        " ) " .
-                        ' ORDER BY o.prijmeni, o.jmeno'
-        );
-
-        return $result->fetchAll();
-    }
-
 }

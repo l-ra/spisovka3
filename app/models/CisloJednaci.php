@@ -33,7 +33,7 @@ class CisloJednaci extends BaseModel
 
         $user = Nette\Environment::getUser();
         $this->user_account = new UserAccount($user->id);
-        $this->person = UserModel::getPerson($user->id);
+        $this->person = $this->user_account->getPerson();
 
         $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
 
@@ -211,9 +211,9 @@ class CisloJednaci extends BaseModel
             $info['org_poradi'] = $row->org_poradi;
 
             $info['user_id'] = $row->user_id;
-            $user_info = new UserAccount($row->user_id);
-            $person = UserModel::getPerson($row->user_id);
-            $info['user'] = $user_info->username;
+            $account = new UserAccount($row->user_id);
+            $person = $account->getPerson();
+            $info['user'] = $account->username;
             $info['prijmeni'] = Nette\Utils\Strings::webalize($person->prijmeni);
             $info['user_poradi'] = $row->user_poradi;
 

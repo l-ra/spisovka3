@@ -59,13 +59,13 @@ class Zapujcka extends BaseModel
                     'cols' => array('nazev', 'popis', 'cislo_jednaci', 'jid', 'poradi')
                 ),
                 'prideleno_user' => array(
-                    'from' => array($this->tb_osoba_to_user => 'ou'),
-                    'on' => array('ou.user_id=z.user_id'),
+                    'from' => array($this->tb_user => 'u'),
+                    'on' => array('u.id = z.user_id'),
                     'cols' => null
                 ),
                 'prideleno_osoba' => array(
                     'from' => array($this->tb_osoba => 'o'),
-                    'on' => array('o.id=ou.osoba_id'),
+                    'on' => array('o.id = u.osoba_id'),
                     'cols' => array('jmeno' => 'osoba_jmeno', 'prijmeni' => 'osoba_prijmeni', 'titul_pred' => 'osoba_titul_pred', 'titul_za' => 'osoba_titul_za')
                 ),
             )
@@ -211,7 +211,6 @@ class Zapujcka extends BaseModel
 
     public function getInfo($zapujcka_id)
     {
-
         $sql = array(
             'distinct' => 1,
             'from' => array($this->name => 'z'),
@@ -221,32 +220,23 @@ class Zapujcka extends BaseModel
                     'from' => array($this->tb_dokument => 'd'),
                     'on' => array('d.id=z.dokument_id'),
                     'cols' => array('nazev', 'popis', 'cislo_jednaci', 'jid', 'poradi')
-                ),
-                'prideleno_user' => array(
-                    'from' => array($this->tb_osoba_to_user => 'ou'),
-                    'on' => array('ou.user_id=z.user_id'),
-                    'cols' => null
-                ),
-                'prideleno_osoba' => array(
-                    'from' => array($this->tb_osoba => 'o'),
-                    'on' => array('o.id=ou.osoba_id'),
-                    'cols' => array('jmeno' => 'osoba_jmeno', 'prijmeni' => 'osoba_prijmeni', 'titul_pred' => 'osoba_titul_pred', 'titul_za' => 'osoba_titul_za')
-                ),
+                )
             )
         );
-        $sql['where'] = array(array('z.id=%i', $zapujcka_id));
+        $sql['where'] = array(array('z.id = %i', $zapujcka_id));
 
         $select = $this->selectComplex($sql);
         $result = $select->fetch();
-        if ($result)
+        if ($result) {
+            $result->person = Person::fromUserId($result->user_id);
             return $result;
+        }
 
         return null;
     }
 
     public function getDokumentID($zapujcka_id)
     {
-
         $sql = array(
             'distinct' => 1,
             'from' => array($this->name => 'z'),
@@ -263,11 +253,9 @@ class Zapujcka extends BaseModel
         }
     }
 
-    public function getDokument($dokument_id)
+    public function getFromDokumentId($dokument_id)
     {
-
         $sql = array(
-            'distinct' => 1,
             'from' => array($this->name => 'z'),
             'cols' => array('*'),
             'leftJoin' => array(
@@ -275,26 +263,18 @@ class Zapujcka extends BaseModel
                     'from' => array($this->tb_dokument => 'd'),
                     'on' => array('d.id=z.dokument_id'),
                     'cols' => array('nazev', 'popis', 'cislo_jednaci', 'jid', 'poradi')
-                ),
-                'prideleno_user' => array(
-                    'from' => array($this->tb_osoba_to_user => 'ou'),
-                    'on' => array('ou.user_id=z.user_id'),
-                    'cols' => null
-                ),
-                'prideleno_osoba' => array(
-                    'from' => array($this->tb_osoba => 'o'),
-                    'on' => array('o.id=ou.osoba_id'),
-                    'cols' => array('jmeno' => 'osoba_jmeno', 'prijmeni' => 'osoba_prijmeni', 'titul_pred' => 'osoba_titul_pred', 'titul_za' => 'osoba_titul_za')
-                ),
+                )
             )
         );
-        $sql['where'] = array(array('z.dokument_id=%i AND z.stav=2', $dokument_id));
+        $sql['where'] = array(array('z.dokument_id = %i AND z.stav = 2', $dokument_id));
 
         $select = $this->selectComplex($sql);
         $result = $select->fetch();
-        if ($result)
+        if ($result) {
+            $result->person = Person::fromUserId($result->user_id);
             return $result;
-
+        }
+        
         return null;
     }
 

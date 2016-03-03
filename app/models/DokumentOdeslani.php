@@ -133,8 +133,8 @@ class DokumentOdeslani extends BaseModel
                     'cols' => array('nazev' => 'dok_nazev', 'jid' => 'dok_jid', 'cislo_jednaci' => 'dok_cislo_jednaci', 'poradi' => 'dok_poradi')
                 ),
                 'o2user' => array(
-                    'from' => array($this->tb_osoba_to_user => 'o2user'),
-                    'on' => array('o2user.user_id=ds.user_id'),
+                    'from' => array($this->tb_user => 'o2user'),
+                    'on' => array('o2user.id = ds.user_id'),
                     'cols' => array()
                 ),
                 'osoba' => array(

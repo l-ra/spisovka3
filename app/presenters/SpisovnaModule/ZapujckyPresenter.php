@@ -233,7 +233,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function actionDetail()
     {
-
         $Zapujcka = new Zapujcka();
 
         // Nacteni parametru
@@ -243,7 +242,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $zapujcka = $Zapujcka->getInfo($zapujcka_id);
         if ($zapujcka) {
             $this->template->Opravnen_schvalit_zapujcku = Acl::isInRole('spisovna') || $this->user->isInRole('superadmin');
-
             $this->template->Zapujcka = $zapujcka;
         } else {
             // zapujcka neexistuje nebo se nepodarilo nacist

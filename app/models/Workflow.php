@@ -45,7 +45,7 @@ class Workflow extends BaseModel
             $Orgjednotka = new Orgjednotka();
             foreach ($rows as &$wf) {
                 if (!empty($wf->prideleno_id)) {
-                    $osoba = UserModel::getPerson($wf->prideleno_id);
+                    $osoba = Person::fromUserId($wf->prideleno_id);
                     if ($osoba) {
                         $wf->prideleno_jmeno = Osoba::displayName($osoba);
                         $wf->prideleno_info = $osoba;
@@ -129,7 +129,7 @@ class Workflow extends BaseModel
             $log = "";
             $log_spis = "";
             if ($user_id) {
-                $person = UserModel::getPerson($user_id);
+                $person = Person::fromUserId($user_id);
                 $data['prideleno_id'] = $user_id;
                 $log = 'Dokument předán zaměstnanci ' . Osoba::displayName($person) . '.';
                 $log_spis = 'Spis predan zamestnanci ' . Osoba::displayName($person) . '.';

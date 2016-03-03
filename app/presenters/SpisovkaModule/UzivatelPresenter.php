@@ -35,21 +35,19 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     public function actionDefault()
     {
-        $user = $this->user;
-        $osoba = UserModel::getPerson($user->id);
-        $this->template->Osoba = $osoba;
-
         // Kterou sekci editovat
         $this->template->FormUpravit = $this->getParameter('upravit', '');
 
-        $account = new UserAccount($user->id);
+        $user = $this->user;
+        $account = new UserAccount($user);
+        $this->template->Osoba = $person = $account->getPerson();
         $this->template->Uzivatel = $account;
         $this->template->Org_jednotka = $account->orgjednotka_id !== null ? Orgjednotka::getName($account->orgjednotka_id)
                         : 'žádná';
 
         $Auth1 = $this->context->createService('authenticatorUI');
         $Auth1->setAction('change_password');
-        $Auth1->setParams(['osoba_id' => $osoba->id, 'user_id' => $user->id]);
+        $Auth1->setParams(['osoba_id' => $person->id, 'user_id' => $user->id]);
         $this->addComponent($Auth1, 'auth_change_password');
 
         $roles = $account->getRoles();
@@ -120,8 +118,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
         $this->template->novy = $this->getParameter('novy', 0);
 
-        $Zamestnanci = new Osoba2User();
-        $seznam = $Zamestnanci->seznam();
+        $Zamestnanci = new Osoba();
+        $seznam = $Zamestnanci->seznamOsobSUcty();
         $this->template->seznam = $seznam;
 
         $OrgJednotky = new Orgjednotka();
@@ -202,12 +200,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     protected function _userSeznam($term)
     {
-        $Zamestnanci = new Osoba2User();
-
-        if (!empty($term))
-            $seznam_zamestnancu = $Zamestnanci->hledat($term);
-        else
-            $seznam_zamestnancu = $Zamestnanci->seznam();
+        $Zamestnanci = new Osoba();
+        $seznam_zamestnancu = $Zamestnanci->seznamOsobSUcty($term);
 
         $seznam = array();
 
@@ -243,11 +237,11 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         if ($novy == 1) {
             echo '###predano###' . $spis_id . '#' . $user_id . '#' . $orgjednotka_id . '#' . $poznamka;
 
-            $osoba = UserModel::getPerson($user_id);
+            $person = Person::fromUserId($user_id);
             $Orgjednotka = new Orgjednotka();
             $org = $Orgjednotka->getInfo($orgjednotka_id);
 
-            echo '#' . Osoba::displayName($osoba) . '#' . @$org->zkraceny_nazev;
+            echo '#' . $person->displayName() . '#' . @$org->zkraceny_nazev;
 
             $this->terminate();
         } else {
@@ -296,8 +290,8 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             echo "###predano###$dokument_id#$user_id#$orgjednotka_id#";
 
             if ($user_id !== null) {
-                $osoba = UserModel::getPerson($user_id);
-                echo Osoba::displayName($osoba);
+                $osoba = Person::fromUserId($user_id);
+                echo $osoba->displayName();
             } else {
                 $Orgjednotka = new Orgjednotka();
                 $org = $Orgjednotka->getInfo($orgjednotka_id);

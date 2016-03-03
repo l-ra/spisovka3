@@ -66,7 +66,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
                 }
             }
 
-            $Zamestnanci = new Osoba2User();
+            $Zamestnanci = new Osoba();
             $seznam = $Zamestnanci->hledat($text);
             if (count($seznam) > 0) {
                 foreach ($seznam as $user) {

@@ -39,14 +39,23 @@ class Person extends CachedDBEntity
 
     /**
      * Vrati pole uzivatelskych uctu osoby.
-     * @return DibiRow[]
+     * @return UserAccount[]
      */
     public function getAccounts()
     {
-        $res = dibi::query('SELECT u.* FROM [:PREFIX:' . BaseModel::OSOBA2USER_TABLE . '] ou' .
-                        ' LEFT JOIN [:PREFIX:' . BaseModel::USER_TABLE . '] u ON (u.id = ou.user_id)' .
-                        ' WHERE ou.osoba_id = %i', $this->id, ' AND ou.active=1');
-
-        return $res->fetchAssoc('id');
+        return UserAccount::getAll(['where' => "osoba_id = $this->id AND active = 1"]);
     }
+    
+    /**
+     * Creates instance from account ID
+     *
+     * @param int $account_id
+     * @return Person
+     */
+    public static function fromUserId($account_id)
+    {
+        $account = new UserAccount($account_id);
+        return new static($account->osoba_id);
+    }
+    
 }

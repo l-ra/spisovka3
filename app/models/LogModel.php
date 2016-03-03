@@ -124,9 +124,9 @@ class LogModel extends BaseModel
     {
         $limit = $show_all ? 500 : 5;
         $res = dibi::query(
-                        'SELECT * FROM %n ld', $this->tb_logdokument, 'LEFT JOIN %n ou',
-                        $this->tb_osoba_to_user, 'ON ou.user_id=ld.user_id', 'LEFT JOIN %n o',
-                        $this->tb_osoba, 'ON o.id=ou.osoba_id', 'WHERE ld.dokument_id = %i',
+                        'SELECT * FROM %n ld', $this->tb_logdokument, 'LEFT JOIN %n u',
+                        $this->tb_user, 'ON u.id = ld.user_id', 'LEFT JOIN %n o',
+                        $this->tb_osoba, 'ON o.id = u.osoba_id', 'WHERE ld.dokument_id = %i',
                         $dokument_id, 'ORDER BY ld.date DESC, ld.id DESC LIMIT %i', $limit
         );
         $rows = $res->fetchAll();

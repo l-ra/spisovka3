@@ -77,13 +77,13 @@ class Notifications
      */
     static protected function getUserEmail($user_id)
     {
-        $person = UserModel::getPerson($user_id);
+        $person = Person::fromUserId($user_id);
         return $person->email;
     }
 
     static protected function getUserName($user_id)
     {
-        $person = UserModel::getPerson($user_id);
+        $person = Person::fromUserId($user_id);
         return Osoba::displayName($person);
     }
     
