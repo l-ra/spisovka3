@@ -48,15 +48,10 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         
     }
 
-    public function renderDetail()
+    public function renderDetail($id)
     {
         $this->template->title = " - Detail organizační jednotky";
-
-        $orgjednotka_id = $this->getParameter('id', null);
-        $OrgJednotka = new Orgjednotka();
-
-        $org = $OrgJednotka->getInfo($orgjednotka_id);
-        $this->template->OrgJednotka = $org;
+        $this->template->OrgJednotka = new OrgUnit($id);
 
         // Zmena udaju organizacni jednotky
         $this->template->FormUpravit = $this->getParameter('upravit', null);
@@ -114,15 +109,9 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         unset($data['id']);
 
         try {
-            $res = $OrgJednotka->ulozit($data, $orgjednotka_id);
-
-            if (is_object($res)) {
-                $this->flashMessage('Organizační jednotku  "' . $data['zkraceny_nazev'] . '" se nepodařilo upravit.', 'warning');
-                $this->flashMessage($res->getMessage(), 'warning');
-            } else {
-                $this->flashMessage('Organizační jednotka  "' . $data['zkraceny_nazev'] . '"  byla upravena.');
-            }
-        } catch (DibiException $e) {
+            $OrgJednotka->ulozit($data, $orgjednotka_id);
+            $this->flashMessage('Organizační jednotka  "' . $data['zkraceny_nazev'] . '"  byla upravena.');
+        } catch (Exception $e) {
             $this->flashMessage('Organizační jednotku  "' . $data['zkraceny_nazev'] . '" se nepodařilo upravit.', 'warning');
             $this->flashMessage($e->getMessage(), 'warning');
         }
@@ -167,10 +156,9 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $OrgJednotka = new Orgjednotka();
-
         try {
-            $orgjednotka_id = $OrgJednotka->ulozit($data);
+            $OrgJednotka = new Orgjednotka();
+            $orgjednotka_id = $OrgJednotka->vytvorit($data);
             if (is_object($orgjednotka_id)) {
                 $this->flashMessage('Organizační jednotku "' . $data['zkraceny_nazev'] . '" se nepodařilo vytvořit.', 'warning');
                 $this->flashMessage($orgjednotka_id->getMessage(), 'warning');

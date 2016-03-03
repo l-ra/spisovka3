@@ -257,16 +257,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
             $client_config = Nette\Environment::getVariable('client_config');
 
-            if (isset($client_config->cislo_jednaci->typ_deniku) && $client_config->cislo_jednaci->typ_deniku == "org") {
-
+            if ($client_config->cislo_jednaci->typ_deniku == "org") {
                 $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
-
-                if (empty($orgjednotka_id)) {
-                    $org = null;
-                } else {
-                    $Org = new Orgjednotka();
-                    $org = $Org->getInfo($orgjednotka_id);
-                }
+                $org = $orgjednotka_id === null ?: new OrgUnit($orgjednotka_id);
 
                 // jen zaznamy z vlastniho podaciho deniku organizacni jednotky
                 $args['where'][] = array('d.podaci_denik=%s', $client_config->cislo_jednaci->podaci_denik . (!empty($org)

@@ -142,30 +142,28 @@ abstract class TreeModel extends BaseModel
             // Tato pole nemohou být prázdná, ale můžeme je naplnit až po vložení záznamu
             $data['sekvence'] = $data['sekvence_string'] = '?';
             
-            // 1. clasic insert
             $id = $this->insert($data);
 
-            // 2. update tree
+            // Aktualizuj pomocna pole
             $parent_id = $data['parent_id'];
-            $data_tree = array();
-            if (empty($parent_id) || $parent_id == 0) {
+            $update_data = array();
+            if (!$parent_id) {
                 // is root node
-                $data_tree['sekvence'] = $id;
-                $data_tree['sekvence_string'] = $sekvence_string . '.' . $id;
+                $update_data['sekvence'] = $id;
+                $update_data['sekvence_string'] = $sekvence_string . '.' . $id;
             } else {
                 // is subnode
-                $parent = $this->select(array(array('id=%i', $parent_id)))->fetch();
-                if (!$parent) {
-                    dibi::rollback();
+                $parent = $this->select([['id=%i', $parent_id]])->fetch();
+                if (!$parent)
                     throw new InvalidArgumentException("TreeModel::vlozitH() - záznam ID $parent_id neexistuje.");
-                }
 
-                $data_tree['sekvence'] = $parent->sekvence . '.' . $id;
-                $data_tree['sekvence_string'] = $parent->sekvence_string . '#' . $sekvence_string . '.' . $id;
+                $update_data['sekvence'] = $parent->sekvence . '.' . $id;
+                $update_data['sekvence_string'] = $parent->sekvence_string . '#' . $sekvence_string . '.' . $id;
             }
-            $this->update($data_tree, array(array('id=%i', $id)));
-
+            
+            $this->update($update_data, ["id = $id"]);
             dibi::commit();
+            
             return $id;
         } catch (Exception $e) {
             dibi::rollback();

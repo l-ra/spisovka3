@@ -7,13 +7,19 @@ class Orgjednotka extends TreeModel
     protected $column_name = 'zkraceny_nazev';
     protected $column_ordering = 'zkraceny_nazev';
 
+    /**
+     * @param int $orgjednotka_id
+     * @return \OrgUnit
+     */
     public function getInfo($orgjednotka_id)
     {
-        $result = $this->select(array(array('id=%i', $orgjednotka_id)));
-        if (count($result) == 0)
-            throw new InvalidArgumentException("Organizační jednotka id '$orgjednotka_id' neexistuje.");
+        return new OrgUnit($orgjednotka_id);
+    }
 
-        return $result->fetch();
+    public static function getName($id)
+    {
+        $o = new OrgUnit($id);
+        return $o->zkraceny_nazev;
     }
 
     /**
@@ -41,44 +47,39 @@ class Orgjednotka extends TreeModel
         return $result ? : array();
     }
 
-    public function ulozit($data, $orgjednotka_id = null)
+    public function ulozit($data, $orgjednotka_id)
     {
+        if (!isset($data['parent_id']))
+            $data['parent_id'] = null;
+        if (empty($data['parent_id']))
+            $data['parent_id'] = null;
+        if (!empty($data['stav']))
+            $data['stav'] = (int) $data['stav'];
 
-        if (!empty($orgjednotka_id)) {
-            // aktualizovat
-            $data['date_modified'] = new DateTime();
-            $data['user_modified'] = (int) Nette\Environment::getUser()->id;
+        $this->upravitH($data, $orgjednotka_id);
+        
+        // je nutne ulozenim vynutit smazani polozky v cache
+        $o = new OrgUnit($orgjednotka_id);
+        $o->date_modified = new DateTime();
+        $o->user_modified = Nette\Environment::getUser()->id;
+        $o->save();
+    }
 
-            if (!isset($data['parent_id']))
-                $data['parent_id'] = null;
-            if (empty($data['parent_id']))
-                $data['parent_id'] = null;
-            if (!empty($data['stav']))
-                $data['stav'] = (int) $data['stav'];
+    public function vytvorit($data)
+    {
+        $data['date_created'] = new DateTime();
+        $data['user_created'] =  Nette\Environment::getUser()->id;
+        $data['date_modified'] = new DateTime();
+        $data['user_modified'] =  Nette\Environment::getUser()->id;
+        $data['stav'] = 1;
 
-            $this->upravitH($data, $orgjednotka_id);
-        } else {
-            // insert
-            $data['date_created'] = new DateTime();
-            $data['user_created'] = (int) Nette\Environment::getUser()->id;
-            $data['date_modified'] = new DateTime();
-            $data['user_modified'] = (int) Nette\Environment::getUser()->id;
-            $data['stav'] = (int) 1;
+        if (!isset($data['parent_id']))
+            $data['parent_id'] = null;
+        if (empty($data['parent_id']))
+            $data['parent_id'] = null;
 
-            if (!isset($data['parent_id']))
-                $data['parent_id'] = null;
-            if (empty($data['parent_id']))
-                $data['parent_id'] = null;
-
-            //$orgjednotka_id = $this->insert($data);
-            $orgjednotka_id = $this->vlozitH($data);
-        }
-
-        if ($orgjednotka_id) {
-            return $orgjednotka_id;
-        } else {
-            return false;
-        }
+        $orgjednotka_id = $this->vlozitH($data);        
+        return $orgjednotka_id;
     }
 
     public function deleteAllOrg()
@@ -99,11 +100,10 @@ class Orgjednotka extends TreeModel
     // TODO: Testovat na opravneni vedouciho
     public static function isInOrg($orgjednotka_id)
     {
-
-        if (empty($orgjednotka_id))
+        if (!$orgjednotka_id)
             return false;
 
-        // docasne omezeni, ze uzivatel muze byt jen v jedne o.j.
+        // omezeni, ze uzivatel muze byt jen v jedne o.j.
         $oj_uzivatele = self::dejOrgUzivatele();
         if ($oj_uzivatele === false)
             return false;
@@ -151,14 +151,6 @@ class Orgjednotka extends TreeModel
 
         $user = new UserAccount($user_id);
         return $user->orgjednotka_id;
-    }
-
-    public static function getName($id)
-    {
-
-        $o = new self;
-        $oj = $o->getInfo($id);
-        return $oj->zkraceny_nazev;
     }
 
 }

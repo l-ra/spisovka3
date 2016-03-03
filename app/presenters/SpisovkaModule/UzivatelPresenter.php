@@ -238,10 +238,12 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             echo '###predano###' . $spis_id . '#' . $user_id . '#' . $orgjednotka_id . '#' . $poznamka;
 
             $person = Person::fromUserId($user_id);
-            $Orgjednotka = new Orgjednotka();
-            $org = $Orgjednotka->getInfo($orgjednotka_id);
-
-            echo '#' . $person->displayName() . '#' . @$org->zkraceny_nazev;
+            echo '#' . $person->displayName() . '#';
+            
+            if ($orgjednotka_id !== null) {
+                $org = new OrgUnit($orgjednotka_id);
+                echo $org->zkraceny_nazev;
+            }
 
             $this->terminate();
         } else {
@@ -293,8 +295,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
                 $osoba = Person::fromUserId($user_id);
                 echo $osoba->displayName();
             } else {
-                $Orgjednotka = new Orgjednotka();
-                $org = $Orgjednotka->getInfo($orgjednotka_id);
+                $org = new OrgUnit($orgjednotka_id);
                 echo "organizační jednotce<br/>" . $org->zkraceny_nazev;
             }
             $this->terminate();
