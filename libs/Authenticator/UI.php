@@ -41,16 +41,19 @@ class Authenticator_UI extends Nette\Application\UI\Control
                 $t = '/auth_login.phtml';
                 break;
             case 'change_auth':
-                $form = $this->createComponentChangeAuthTypeForm('changeAuthTypeForm');
+                $form = $this->getComponent('changeAuthTypeForm');
                 break;
             case 'change_password':
-                $form = $this->createComponentChangePasswordForm('changePasswordForm');
+                // Toto byla zásadní chyba: Metodu createComponent... nevolat ručně,
+                // protože může dojít k pokusu o dvounásobné vytvoření (např. při submitu)
+                // $form = $this->createComponentChangePasswordForm('changePasswordForm');
+                $form = $this->getComponent('changePasswordForm');
                 break;
             case 'new_user':
-                $form = $this->createComponentNewUserForm('newUserForm');
+                $form = $this->getComponent('newUserForm');
                 break;
             case 'sync':
-                $form = $this->createComponentSyncForm('syncForm');
+                $form = $this->getComponent('syncForm');
                 break;
             default:
                 break;
@@ -308,7 +311,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
     public function handleCancel(Nette\Forms\Controls\SubmitButton $button)
     {
-        $this->presenter->redirect('this');
+        $this->presenter->redirect('this', ['upravit' => null]);
     }
 
     public function handleLogin(Nette\Application\UI\Form $form, $data)
@@ -412,7 +415,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
         else
             $this->presenter->flashMessage('Heslo není možné změnit.', 'warning');
         
-        $this->presenter->redirect('this');
+        $this->presenter->redirect('this', ['upravit' => null]);
     }
 
     public function handleChangeAuthType(Nette\Forms\Controls\SubmitButton $button)

@@ -33,10 +33,10 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             $this->redirect('login');
     }
 
-    public function actionDefault()
+    public function actionDefault($upravit)
     {
         // Kterou sekci editovat
-        $this->template->FormUpravit = $this->getParameter('upravit', '');
+        $this->template->FormUpravit = $upravit;
 
         $user = $this->user;
         $account = new UserAccount($user);
@@ -103,12 +103,12 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             $this->flashMessage('Informace o uživateli se nepodařilo upravit. ' . $e->getMessage(),
                     'warning');
         }
-        $this->redirect('this');
+        $this->redirect('default');
     }
 
     public function stornoClicked()
     {
-        $this->redirect('this');
+        $this->redirect('default');
     }
 
     protected function _renderVyber()
@@ -338,7 +338,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
                 $data[Notifications::RECEIVE_DOCUMENT]);
 
         $this->flashMessage('Nastavení bylo upraveno.');
-        $this->redirect('this');
+        $this->redirect('default');
     }
 
 }
