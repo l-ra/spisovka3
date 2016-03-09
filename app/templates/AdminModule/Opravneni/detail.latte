@@ -5,7 +5,6 @@
     </div>
     <h2>{$Role->name}</h2>
 
-
     <div class="detail_blok">
         <div class="detail_hlavicka">Info</div>
         {if ($FormUpravit=='info')}
@@ -17,7 +16,7 @@
         </dl>
         <dl>
             <dt>Dědí z role:</dt>
-            <dd>{$Role->parent_name}</dd>
+            <dd>{if $Role->parent_id !== null}{(new Role($Role->parent_id))->name}{/if}</dd>
         </dl>
         <dl>
             <dt>Popis role:</dt>

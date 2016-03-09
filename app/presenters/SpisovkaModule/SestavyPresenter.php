@@ -259,7 +259,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
             if ($client_config->cislo_jednaci->typ_deniku == "org") {
                 $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
-                $org = $orgjednotka_id === null ?: new OrgUnit($orgjednotka_id);
+                $org = $orgjednotka_id === null ? null : new OrgUnit($orgjednotka_id);
 
                 // jen zaznamy z vlastniho podaciho deniku organizacni jednotky
                 $args['where'][] = array('d.podaci_denik=%s', $client_config->cislo_jednaci->podaci_denik . (!empty($org)

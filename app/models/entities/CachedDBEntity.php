@@ -5,7 +5,7 @@
  *
  * @author Pavel Laštovička
  */
-class CachedDBEntity extends DBEntity
+abstract class CachedDBEntity extends DBEntity
 {
 
     private function _getCacheEntryName()

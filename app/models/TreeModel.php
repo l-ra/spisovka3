@@ -127,6 +127,12 @@ abstract class TreeModel extends BaseModel
         return $result;
     }
 
+    /**
+     * @param array $data
+     * @return int ID vytvoreneho zaznamu
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
     public function vlozitH($data)
     {
         if (empty($data['parent_id']))

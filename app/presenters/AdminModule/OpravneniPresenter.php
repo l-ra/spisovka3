@@ -25,12 +25,9 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->template->title = " - Nová role";
     }
 
-    public function actionDetail()
+    public function actionDetail($id)
     {
-        $role_id = $this->getParameter('id', null);
-        $RoleModel = new RoleModel();
-
-        $role = $role_id === null ? null : $RoleModel->getInfo($role_id);
+        $role = new Role($id);
         $this->template->Role = $role;
 
         // Opravneni
@@ -51,13 +48,11 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->template->lzeMenitOpravneni = self::lzeMenitRoli($this->template->Role);
     }
 
-    public function actionSmazat()
+    public function actionSmazat($id)
     {
-        $RoleModel = new RoleModel();
-        $role_id = $this->getParameter('id', null);
-
         try {
-            $RoleModel->smazat(array("id = %i", $role_id));
+            $role = new Role($id);
+            $role->delete();
             $this->flashMessage('Role byla smazána.');
         } catch (DibiException $e) {
             $e->getMessage();
@@ -117,9 +112,8 @@ class Admin_OpravneniPresenter extends BasePresenter
 
     public function upravitClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
+        $data = $button->getForm()->getValues(true);
 
-        $RoleModel = new RoleModel();
         $role_id = $data['id'];
         $data['date_modified'] = date('Y-m-d H:i:s');
         unset($data['id']);
@@ -139,10 +133,12 @@ class Admin_OpravneniPresenter extends BasePresenter
         try {
             if (!isset($data['code'])) {
                 // 'code' prvek nemuze byt prazdny i kdyz nema byt zmenen. Slouzi pro vypocet 'sekvence_string'
-                $old_role = $RoleModel->getInfo($role_id);
+                $old_role = new Role($role_id);
                 $data['code'] = $old_role->code;
             }
-            $RoleModel->upravit($data, $role_id);
+            $role = new Role($role_id);
+            $role->modify($data);
+            $role->save();
             $this->flashMessage('Role  "' . $data['name'] . '"  byla upravena.');
         } catch (Exception $e) {
             $this->flashMessage('Chyba - ' . $e->getMessage(), 'warning');
@@ -188,18 +184,17 @@ class Admin_OpravneniPresenter extends BasePresenter
 
     public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
+        $data = $button->getForm()->getValues(true);
 
-        $RoleModel = new RoleModel();
         $data['active'] = 1;
         if (empty($data['parent_id']))
             $data['parent_id'] = null;
         $data['date_created'] = new DateTime();
 
         try {
-            $role_id = $RoleModel->vlozit($data);
+            $role = Role::create($data);
             $this->flashMessage('Role  "' . $data['name'] . '" byla vytvořena.');
-            $this->redirect(':Admin:Opravneni:detail', array('id' => $role_id));
+            $this->redirect('detail', ['id' => $role->id]);
         } catch (DibiException $e) {
             $this->flashMessage('Roli "' . $data['name'] . '" se nepodařilo vytvořit.', 'warning');
             $this->flashMessage('Chyba - ' . $e->getMessage(), 'warning');
@@ -253,8 +248,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $role_id = (int) $data['id'];
         unset($data['id']);
 
-        $RoleModel = new RoleModel();
-        $role = $RoleModel->getInfo($role_id);
+        $role = new Role($role_id);
         $opravneni = $AclModel->seznamOpravneni($role->code);
 
         // Zkontroluj, zda lze roli menit

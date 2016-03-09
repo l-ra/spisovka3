@@ -175,7 +175,7 @@ abstract class DBEntity
         foreach ($resultSet as $row) {
             $o = new static((int) $row->id);
             $o->_setData($row);
-            $a[] = $o;
+            $a[$o->id] = $o;
         }
 
         return $a;

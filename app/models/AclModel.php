@@ -5,27 +5,8 @@ class AclModel extends BaseModel
 
     protected $name = 'user_acl';
 
-    public function getRoles()
-    {
-
-        $res = DbCache::get('s3_Role');
-        if ($res !== null)
-            return $res;
-
-        $res = dibi::fetchAll('SELECT r1.code, r2.code as parent_code
-                               FROM [' . $this->tb_role . '] r1
-                               LEFT JOIN [' . $this->tb_role . '] r2 ON (r1.parent_id = r2.id)
-                               ORDER BY r1.parent_id ASC
-        ');
-
-        DbCache::set('s3_Role', $res);
-
-        return $res;
-    }
-
     public function getResources($all = 0)
     {
-
         $cols = ($all == 1) ? '*' : 'code';
 
         $res = DbCache::get('s3_Resource_' . $cols);

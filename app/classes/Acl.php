@@ -18,9 +18,9 @@ class Acl extends Nette\Security\Permission
             return;
 
         $model = new AclModel();
-
+        
         // roles
-        $this->addAllRoles($model->getRoles());
+        $this->addAllRoles(Role::getAll());
 
         // resources
         foreach ($model->getResources() as $resource)
@@ -73,24 +73,26 @@ class Acl extends Nette\Security\Permission
     // Prochazi seznam vsech roli a vklada je ve spravnem poradi
     protected function addAllRoles($roles)
     {
+        $added = [];
         // Nejdrive pridej koreny stromu
-        foreach ($roles as &$role) {
-            $role->added = false;
-            if (empty($role->parent_code)) {
-                $role->added = true;
+        foreach ($roles as $role) {
+            if ($role->parent_id === null) {
+                $added[] = $role->id;
                 $this->addRole($role->code);
             }
         }
 
         do {
             $continue = false;
-            foreach ($roles as &$role) {
-                if ($role->added === true)
+            foreach ($roles as $role) {
+                // echo $role->id . "   ";
+                if (in_array($role->id, $added))
                     continue;
                 $continue = true;
-                if ($this->hasRole($role->parent_code)) {
-                    $role->added = true;
-                    $this->addRole($role->code, $role->parent_code);
+                $parent_code = $roles[$role->parent_id]->code;
+                if ($this->hasRole($parent_code)) {
+                    $this->addRole($role->code, $parent_code);
+                    $added[] = $role->id;
                 }
             }
         } while ($continue);

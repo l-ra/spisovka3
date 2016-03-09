@@ -15,17 +15,12 @@
             <a href="{$baseUrl}{$helpUri}" onclick="return openHelpWindow(this.href);">Nápověda</a>
             <a href="{link :Spisovka:Uzivatel:logout}">Odhlásit</a>
         </div>
-        <div n:if="true" id="top_jmeno">
-            <span title="Role uživatele:
-{foreach (new UserAccount($user->id))->getRoles() as $role}{$role->name}
-{/foreach}">
+        <div id="top_jmeno">
             <a href="{link :Spisovka:Uzivatel:}"><strong>{$user->displayName}</strong></a><br />
             {var account = new UserAccount($user->id)}
             {if $account->orgjednotka_id}
             {OrgJednotka::getName($account->orgjednotka_id)}<br />
             {/if}
-            </span>
-            
         </div>
     {/if}
     </div>
