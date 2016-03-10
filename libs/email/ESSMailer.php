@@ -15,10 +15,10 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
     protected function setHeaderMailer(Nette\Mail\Message $mail)
     {
         $app_info = Nette\Environment::getVariable('app_info');
-        $app_info = explode("#", $app_info);        
-        $mail->setHeader('X-Mailer', Nette\Utils\Strings::webalize($app_info[2], '. ', false));        
+        $app_info = explode("#", $app_info);
+        $mail->setHeader('X-Mailer', Nette\Utils\Strings::webalize($app_info[2], '. ', false));
     }
-    
+
     /**
      * Sends e-mail.
      * @param  Nette\Mail\Message
@@ -37,13 +37,8 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
 
         $config = (new Spisovka\ConfigEpodatelna())->get();
         // použij první / hlavní účet, pokud by jich v budoucnu mělo být více
-        $config = $config->odeslani[0]; 
+        $config = $config->odeslani[0];
         if ($config['podepisovat']) {
-            $mail_source = $mail->generateMessage();
-            $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
-            $headers = $parts[0];
-            $mess = $parts[1];
-        } else {
             $esign = new esignature();
             $esign->setUserCert($config['cert'], $config['cert_pass']);
 
@@ -100,8 +95,13 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
                 $headers .= $key . ": " . $value . Nette\Mail\Message::EOL;
             }
             $mess = $mess_part[1];
+        } else {
+            $mail_source = $mail->generateMessage();
+            $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
+            $headers = $parts[0];
+            $mess = $parts[1];
         }
-
+        
         $tmp_mail = "To: $to\n";
         $tmp_mail .= "Subject: $subject\n";
         $tmp_mail .= $headers;
@@ -130,7 +130,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             restore_error_handler();
             throw new Exception("Došlo k problému při odesílání mailu: $message");
         }, E_WARNING);
-        
+
         $linux = strncasecmp(PHP_OS, 'win', 3);
         if ($linux) {
             $to = str_replace(Nette\Mail\Message::EOL, "\n", $to);
@@ -138,7 +138,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             $mess = str_replace(Nette\Mail\Message::EOL, "\n", $mess);
             $headers = str_replace(Nette\Mail\Message::EOL, "\n", $headers);
         }
-        
+
         $res = mail($to, $subject, $mess, $headers);
         restore_error_handler();
 
