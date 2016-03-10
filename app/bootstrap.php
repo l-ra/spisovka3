@@ -44,8 +44,6 @@ try {
     if (!is_dir($cacheDir))
         mkdir($cacheDir);
     $loader->setCacheStorage(new Nette\Caching\Storages\FileStorage($cacheDir));
-// mPDF nelze nacitat pres RobotLoader, protoze PHP by dosla pamet
-//$loader->addClass('mPDF', LIBS_DIR . '/mpdf/mpdf.php');
     $loader->register();
 
     spl_autoload_register('mPDFautoloader');
@@ -94,14 +92,7 @@ try {
 
 // konfigurace spisovky
     Nette\Environment::setVariable('client_config', (new Spisovka\ConfigClient())->get());
-    // bohuzel musime nakonfigurovat PDF export zde, protoze pro nej neexistuje spolecna funkce
-    define('PDF_MEMORY_LIMIT', '512M');
-    $mpdf_dir = TEMP_DIR . '/mpdf/';
-    define('_MPDF_TEMP_PATH', $mpdf_dir);
-    define('_MPDF_TTFONTDATAPATH', $mpdf_dir);
-    if (!is_dir($mpdf_dir))
-        @mkdir($mpdf_dir);
-    
+        
 // version information
     $app_info = file_get_contents(APP_DIR . '/configs/version');
     $app_info = trim($app_info); // trim the EOL character
@@ -116,6 +107,7 @@ try {
         Nette\Environment::setVariable('app_id', $app_id);
     }
 
+    configurePdfExport();
 
 // 3b) Load database
     try {
@@ -346,4 +338,22 @@ function createEpodatelnaConfig()
 
     rename("$dir/epodatelna.ini", "$dir/epodatelna.old");    
     @chmod("$dir/epodatelna.old", 0400);
+}
+
+function configurePdfExport()
+{
+    // bohuzel musime nakonfigurovat PDF export zde, protoze pro nej neexistuje spolecna funkce
+    define('PDF_MEMORY_LIMIT', '512M');
+    $mpdf_dir = TEMP_DIR . '/mpdf/';
+    $mpdf_tmp_dir = $mpdf_dir . 'tmp/';
+    $mpdf_fontdata_dir = $mpdf_dir . 'ttfontdata/';
+    define('_MPDF_TEMP_PATH', $mpdf_tmp_dir);
+    define('_MPDF_TTFONTDATAPATH', $mpdf_fontdata_dir);
+    
+    if (!is_dir($mpdf_dir))
+        mkdir($mpdf_dir);
+    if (!is_dir($mpdf_tmp_dir))
+        mkdir($mpdf_tmp_dir);
+    if (!is_dir($mpdf_fontdata_dir))
+        mkdir($mpdf_fontdata_dir);    
 }
