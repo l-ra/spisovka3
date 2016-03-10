@@ -154,11 +154,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
          * Informace o Aplikaci
          */
         $app_info = Nette\Environment::getVariable('app_info');
-        if (!empty($app_info)) {
-            $app_info = explode("#", $app_info);
-        } else {
-            $app_info = array('3.x', 'rev.X', 'OSS Spisová služba v3', '1270716764');
-        }
+        $app_info = explode("#", $app_info);
         $this->template->AppInfo = $app_info;
         $this->template->KontrolaNovychVerzi = UpdateAgent::je_aplikace_aktualni();
 

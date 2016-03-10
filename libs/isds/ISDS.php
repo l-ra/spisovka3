@@ -1509,14 +1509,9 @@ class ISDS
      */
     public function userAgent()
     {
-
         $app_info = Nette\Environment::getVariable('app_info');
-        if (!empty($app_info)) {
-            $app_info = explode("#", $app_info);
-            $user_agent = "OSS Spisova sluzba v" . $app_info[0];
-        } else {
-            $user_agent = "OSS Spisova sluzba v3";
-        }
+        $app_info = explode("#", $app_info);
+        $user_agent = "OSS Spisova sluzba v" . $app_info[0];
 
         $curli = @curl_version();
         // OSS Spisovka v3.0 (i686-pc-linux-gnu) libcurl 7.7.3 (OpenSSL 0.9.6)
@@ -1802,14 +1797,9 @@ class ISDSSoapClient extends SoapClient
 
     public function userAgent()
     {
-
         $app_info = Nette\Environment::getVariable('app_info');
-        if (!empty($app_info)) {
-            $app_info = explode("#", $app_info);
-            $user_agent = "OSS Spisova sluzba v" . $app_info[0];
-        } else {
-            $user_agent = "OSS Spisova sluzba v3";
-        }
+        $app_info = explode("#", $app_info);
+        $user_agent = "OSS Spisova sluzba v" . $app_info[0];
 
         $curli = @curl_version();
         // OSS Spisovka v3.0 (i686-pc-linux-gnu) libcurl 7.7.3 (OpenSSL 0.9.6)

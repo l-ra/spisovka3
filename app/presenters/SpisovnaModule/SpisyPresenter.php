@@ -45,7 +45,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
                     $app_info = Nette\Environment::getVariable('app_info');
                     $app_info = explode("#", $app_info);
-                    $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
+                    $app_name = $app_info[2];
                     $mpdf->SetCreator($app_name);
                     $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Detail spisu');
@@ -74,7 +74,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
                     $app_info = Nette\Environment::getVariable('app_info');
                     $app_info = explode("#", $app_info);
-                    $app_name = (isset($app_info[2])) ? $app_info[2] : 'OSS Spisová služba v3';
+                    $app_name = $app_info[2];
                     $mpdf->SetCreator($app_name);
                     $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Tisk');

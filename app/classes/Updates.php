@@ -66,12 +66,8 @@ class UpdateAgent
     public static function je_aplikace_aktualni()
     {
         $app_info = Nette\Environment::getVariable('app_info');
-        if (!empty($app_info)) {
-            $a = explode("#", $app_info);
-            $soucasna_verze = trim($a[0]);
-        } else
-            $soucasna_verze = '0.0.0';
-
+        $a = explode("#", $app_info);
+        $soucasna_verze = trim($a[0]);
 
         $dostupna_verze = @file_get_contents(TEMP_DIR . '/aktualni_verze');
 

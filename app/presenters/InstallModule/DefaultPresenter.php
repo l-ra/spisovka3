@@ -125,14 +125,9 @@ class Install_DefaultPresenter extends BasePresenter
 
         // Appliaction info
         $app_info = Nette\Environment::getVariable('app_info');
-        if (!empty($app_info)) {
-            $app_info = explode("#", $app_info);
-        } else {
-            $app_info = array('3.x', 'rev.X', 'OSS Spisová služba v3', '1283292000');
-        }
+        $app_info = explode("#", $app_info);
 
         define('CHECKER_VERSION', '1.4');
-
 
         $requirements_ess = $this->paint(array(
             array(

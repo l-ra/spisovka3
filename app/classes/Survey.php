@@ -8,12 +8,8 @@ class SurveyAgent
     public static function send()
     {
         $app_info = Nette\Environment::getVariable('app_info');
-        if (!empty($app_info)) {
-            $app_info = explode("#", $app_info);
-            $version = $app_info[0];
-        } else {
-            $version = 'unknown';
-        }
+        $app_info = explode("#", $app_info);
+        $version = $app_info[0];
 
         $client_config = Nette\Environment::getVariable('client_config');
         $klient_info = $client_config->urad;
