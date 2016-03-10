@@ -87,9 +87,8 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
                 $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica', 7, 9, 8, 6, 0, 0);
 
-                $app_info = Nette\Environment::getVariable('app_info');
-                $app_info = explode("#", $app_info);
-                $app_name = $app_info[2];
+                $app_info = new VersionInformation();
+                $app_name = $app_info->name;
                 $mpdf->SetCreator($app_name);
                 $person_name = $this->user->displayName;
                 $mpdf->SetAuthor($person_name);

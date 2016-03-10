@@ -153,9 +153,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         /**
          * Informace o Aplikaci
          */
-        $app_info = Nette\Environment::getVariable('app_info');
-        $app_info = explode("#", $app_info);
-        $this->template->AppInfo = $app_info;
         $this->template->KontrolaNovychVerzi = UpdateAgent::je_aplikace_aktualni();
 
         $this->template->baseUrl = $this->getHttpRequest()->getUrl()->getBasePath();

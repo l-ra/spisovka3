@@ -176,9 +176,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                     $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica');
 
-                    $app_info = Nette\Environment::getVariable('app_info');
-                    $app_info = explode("#", $app_info);
-                    $app_name = $app_info[2];
+                    $app_info = new VersionInformation();
+                    $app_name = $app_info->name;
                     $mpdf->SetCreator($app_name);
                     $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Detail dokumentu');
@@ -205,9 +204,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                     $mpdf = new mPDF('iso-8859-2', 'A4-L', 9, 'Helvetica');
 
-                    $app_info = Nette\Environment::getVariable('app_info');
-                    $app_info = explode("#", $app_info);
-                    $app_name = $app_info[2];
+                    $app_info = new VersionInformation();
+                    $app_name = $app_info->name;
                     $mpdf->SetCreator($app_name);
                     $mpdf->SetAuthor($person_name);
                     $mpdf->SetTitle('Spisová služba - Tisk');

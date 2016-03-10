@@ -19,7 +19,8 @@ class Admin_SupportPresenter extends BasePresenter
         echo "Informace pro technickou podporu\n";
         echo "================================\n\n";
 
-        $verze = $this->template->AppInfo[0];
+        $app_info = new VersionInformation();
+        $verze = $app_info->name;
         echo "Verze aplikace:  $verze\n\n";
 
         echo "Maximální velikost nahraného souboru:  ";

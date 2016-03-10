@@ -93,11 +93,6 @@ try {
 // konfigurace spisovky
     Nette\Environment::setVariable('client_config', (new Spisovka\ConfigClient())->get());
         
-// version information
-    $app_info = file_get_contents(APP_DIR . '/configs/version');
-    $app_info = trim($app_info); // trim the EOL character
-    Nette\Environment::setVariable('app_info', $app_info);
-
     $install_info = @file_get_contents(CLIENT_DIR . '/configs/install');
     if ($install_info === FALSE) {
         define('APPLICATION_INSTALL', 1);

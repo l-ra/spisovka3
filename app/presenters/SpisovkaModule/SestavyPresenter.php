@@ -36,8 +36,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         if (!$content)
             return;
 
-        $AppInfo = $this->template->AppInfo;
-        $app_name = (isset($AppInfo[2])) ? $AppInfo[2] : 'OSS Spisová služba v3';
+        $app_info = new VersionInformation();
+        $app_name = $app_info->name;
 
         $pdf = new mPDF('', 'A4-L', 9, 'Helvetica');
         $pdf->SetCreator($app_name);

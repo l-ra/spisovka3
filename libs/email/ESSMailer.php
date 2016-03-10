@@ -14,9 +14,8 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
 
     protected function setHeaderMailer(Nette\Mail\Message $mail)
     {
-        $app_info = Nette\Environment::getVariable('app_info');
-        $app_info = explode("#", $app_info);
-        $mail->setHeader('X-Mailer', Nette\Utils\Strings::webalize($app_info[2], '. ', false));
+        $app_info = new VersionInformation();
+        $mail->setHeader('X-Mailer', Nette\Utils\Strings::webalize($app_info->name, '. ', false));
     }
 
     /**

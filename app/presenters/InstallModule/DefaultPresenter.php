@@ -124,15 +124,14 @@ class Install_DefaultPresenter extends BasePresenter
         }
 
         // Appliaction info
-        $app_info = Nette\Environment::getVariable('app_info');
-        $app_info = explode("#", $app_info);
+        $app_info = new VersionInformation();
 
         define('CHECKER_VERSION', '1.4');
 
         $requirements_ess = $this->paint(array(
             array(
                 'title' => 'Aplikace',
-                'message' => ( $app_info[2] )
+                'message' => ( $app_info->name )
             ),
             array(
                 'title' => 'Web server',
