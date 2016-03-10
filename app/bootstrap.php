@@ -90,7 +90,6 @@ try {
     if ($httpRequest->isSecured())
         $publicUrl = str_replace('http:', 'https:', $publicUrl);
     Nette\Environment::setVariable('publicUrl', $publicUrl);
-    unset($publicUrl);
 
 
 // konfigurace spisovky
@@ -107,7 +106,6 @@ try {
     $app_info = file_get_contents(APP_DIR . '/configs/version');
     $app_info = trim($app_info); // trim the EOL character
     Nette\Environment::setVariable('app_info', $app_info);
-    unset($app_info);
 
     $install_info = @file_get_contents(CLIENT_DIR . '/configs/install');
     if ($install_info === FALSE) {
@@ -117,7 +115,6 @@ try {
         $app_id = substr($install_info, 0, strpos($install_info, '#'));
         Nette\Environment::setVariable('app_id', $app_id);
     }
-    unset($install_info);
 
 
 // 3b) Load database
@@ -142,7 +139,6 @@ try {
             // false - Neni treba explain SELECT dotazu
             $panel = new Dibi\Bridges\Tracy\Panel(false, DibiEvent::ALL);
             $panel->register($connection);
-            unset($panel);
         }
 
         if (!$db_config['prefix'])
@@ -275,6 +271,13 @@ try {
     . 'Podrobnosti: ' . $e->getMessage();
     throw $e;
 }
+
+// unset all global variables except PHP superglobals
+$vars = array_keys(get_defined_vars());
+foreach ($vars as $var)
+    if ($var != 'application' && $var[0] != '_')
+        unset($$var);
+unset($vars, $var);
 
 // Step 5: Run the application!
 $application->run();
