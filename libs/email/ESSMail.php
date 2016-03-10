@@ -3,21 +3,6 @@
 class ESSMail extends Nette\Mail\Message
 {
 
-    public function __construct()
-    {
-        parent::__construct();
-
-        // Nastaveni identifikace maileru
-        $app_info = Nette\Environment::getVariable('app_info');
-        if (!empty($app_info)) {
-            $app_info = explode("#", $app_info);
-        } else {
-            $app_info = array('3.x', 'rev.X', 'OSS Spisová služba v3', '1270716764');
-        }
-        
-        $this->setHeader('X-Mailer', Nette\Utils\Strings::webalize($app_info[2], '. ', 0));
-    }
-
     // pro kompatibilitu s kodem napsanym pro stare Nette
     public function send()
     {

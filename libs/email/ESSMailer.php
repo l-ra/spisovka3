@@ -12,6 +12,13 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
 
     static $test_mode = 0;
 
+    protected function setHeaderMailer(Nette\Mail\Message $mail)
+    {
+        $app_info = Nette\Environment::getVariable('app_info');
+        $app_info = explode("#", $app_info);        
+        $mail->setHeader('X-Mailer', Nette\Utils\Strings::webalize($app_info[2], '. ', false));        
+    }
+    
     /**
      * Sends e-mail.
      * @param  Nette\Mail\Message
@@ -19,18 +26,22 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
      */
     public function send(Nette\Mail\Message $mail)
     {
-        $tmp = clone $mail;
+        $mail = clone $mail;
 
-        $tmp->setHeader('Subject', NULL);
-        $tmp->setHeader('To', NULL);
+        $test_mode = self::$test_mode;
+        $to = is_string($test_mode) ? $test_mode : $mail->getEncodedHeader('To');
+        $subject = $mail->getEncodedHeader('Subject');
+        $mail->setHeader('Subject', NULL);
+        $mail->setHeader('To', NULL);
+        $this->setHeaderMailer($mail);
 
         $config = (new Spisovka\ConfigEpodatelna())->get();
         // použij první / hlavní účet, pokud by jich v budoucnu mělo být více
         $config = $config->odeslani[0]; 
         if ($config['podepisovat']) {
-            $mail_source = $tmp->generateMessage();
+            $mail_source = $mail->generateMessage();
             $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
-            $header = $parts[0];
+            $headers = $parts[0];
             $mess = $parts[1];
         } else {
             $esign = new esignature();
@@ -40,65 +51,60 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             if (!is_array($cert_info))
                 throw new Exception('Email nelze podepsat. Neplatný certifikát!');
 
-            $mail_source = $tmp->generateMessage();
+            $mail_source = $mail->generateMessage();
             $in_parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL,
                     $mail_source, 2);
             $header_parts = explode(Nette\Mail\Message::EOL, $in_parts[0]);
-            foreach ($header_parts as $iheader => $header) {
-                if (strpos($header, 'X-Mailer') !== false) {
+            foreach ($header_parts as $iheader => $headers) {
+                if (strpos($headers, 'X-Mailer') !== false) {
                     unset($header_parts[$iheader]);
                 }
-                if (strpos($header, 'Date') !== false) {
+                if (strpos($headers, 'Date') !== false) {
                     unset($header_parts[$iheader]);
                 }
-                if (strpos($header, 'Message-ID') !== false) {
+                if (strpos($headers, 'Message-ID') !== false) {
                     unset($header_parts[$iheader]);
                 }
-                if (strpos($header, 'From') !== false) {
+                if (strpos($headers, 'From') !== false) {
                     unset($header_parts[$iheader]);
                 }
-                if (strpos($header, 'Content-type') !== false) {
+                if (strpos($headers, 'Content-type') !== false) {
                     unset($header_parts[$iheader]);
                 }
             }
             $in_parts[0] = implode(Nette\Mail\Message::EOL, $header_parts);
             $mess = implode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $in_parts);
 
-            $headers = $tmp->headers;
-            $headers['From'] = $tmp->getEncodedHeader('From');
+            $headers_array = $mail->headers;
+            $headers_array['From'] = $mail->getEncodedHeader('From');
 
-            $mail_source = $esign->signMessage($mess, $headers);
+            $mail_source = $esign->signMessage($mess, $headers_array);
 
             if (is_null($mail_source))
                 throw new Exception('Email se nepodařilo podepsat.');
 
             $mess_part = explode("\n\n", $mail_source, 2);
             $part_header = explode("\n", $mess_part[0]);
-            $headers = array();
+            $headers_array = array();
             foreach ($part_header as $row) {
                 $row_part = explode(":", $row, 2);
                 if (count($row_part) < 1) {
-                    $headers['Content-Type'] = $row;
+                    $headers_array['Content-Type'] = $row;
                 } else {
-                    $headers[$row_part[0]] = @$row_part[1];
+                    $headers_array[$row_part[0]] = @$row_part[1];
                 }
             }
-            unset($headers['Content-Transfer-Encoding']);
-            $header = "";
-            foreach ($headers as $key => $value) {
-                $header .= $key . ": " . $value . Nette\Mail\Message::EOL;
+            unset($headers_array['Content-Transfer-Encoding']);
+            $headers = "";
+            foreach ($headers_array as $key => $value) {
+                $headers .= $key . ": " . $value . Nette\Mail\Message::EOL;
             }
             $mess = $mess_part[1];
         }
 
-
-        $test_mode = self::$test_mode;
-        $to = is_string($test_mode) ? $test_mode : $mail->getEncodedHeader('To');
-        $subject = $mail->getEncodedHeader('Subject');
-
         $tmp_mail = "To: $to\n";
         $tmp_mail .= "Subject: $subject\n";
-        $tmp_mail .= $header;
+        $tmp_mail .= $headers;
         $tmp_mail .= "\n\n";
         $tmp_mail .= $mess;
         $tmp_mail = str_replace("\r\n", "\n", $tmp_mail);
@@ -130,9 +136,10 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             $to = str_replace(Nette\Mail\Message::EOL, "\n", $to);
             $subject = str_replace(Nette\Mail\Message::EOL, "\n", $subject);
             $mess = str_replace(Nette\Mail\Message::EOL, "\n", $mess);
-            $header = str_replace(Nette\Mail\Message::EOL, "\n", $header);
+            $headers = str_replace(Nette\Mail\Message::EOL, "\n", $headers);
         }
-        $res = mail($to, $subject, $mess, $header);
+        
+        $res = mail($to, $subject, $mess, $headers);
         restore_error_handler();
 
         if (!$res)
