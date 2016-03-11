@@ -10,6 +10,7 @@ Nové funkce:
 - sloupce, které se mají v sestavách zobrazit je nyní možné přesně určit,
   včetně jejich pořadí
 - sestavy je možné řadit dle zadaných kritérií
+- pro hledání a sestavy je možné použít kritérium "spisový znak nevyplněn"
 - uživatelé mohou být upozorňováni e-mailem, je-li jim předán dokument.
   Podmínkou samozřejmě je, že mají v aplikaci vyplněnou svoji e-mailovou adresu.
   E-mail je v současnosti odeslán, pouze je-li dokument předán na uživatele,

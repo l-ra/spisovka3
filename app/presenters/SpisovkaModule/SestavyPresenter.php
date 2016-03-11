@@ -503,6 +503,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
 
+        $form->addCheckbox('spisovy_znak_prazdny', 'Spisový znak nevyplněn');
         $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
         $form['spisovy_znak_id']->controlPrototype->onchange('');
 

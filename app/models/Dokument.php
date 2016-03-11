@@ -574,12 +574,11 @@ class Dokument extends BaseModel
             }
         }
 
-        if (!empty($params['spisovy_znak'])) {
-            $args['where'][] = array('d.spisovy_znak LIKE %s', '%' . $params['spisovy_znak'] . '%');
-        }
-        if (!empty($params['spisovy_znak_id'])) {
+        if (!empty($params['spisovy_znak_prazdny']))
+            $args['where'][] = array('d.spisovy_znak_id IS NULL');
+        if (!empty($params['spisovy_znak_id']))
             $args['where'][] = array('d.spisovy_znak_id = %i', $params['spisovy_znak_id']);
-        }
+            
         if (!empty($params['ulozeni_dokumentu'])) {
             $args['where'][] = array('d.ulozeni_dokumentu LIKE %s', '%' . $params['ulozeni_dokumentu'] . '%');
         }

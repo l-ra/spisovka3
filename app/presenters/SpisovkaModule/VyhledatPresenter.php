@@ -228,6 +228,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             $form['druh_zasilky']->setDefaultValue($hledat['druh_zasilky']);
         unset($hledat['druh_zasilky']);
 
+        $form->addCheckbox('spisovy_znak_prazdny', 'Spisový znak nevyplněn')
+                ->setValue(@$hledat['spisovy_znak_prazdny']);
         $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
         $form->getComponent('spisovy_znak_id')->setValue(@$hledat['spisovy_znak_id'])
         ->controlPrototype->onchange('');
