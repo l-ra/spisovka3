@@ -197,6 +197,9 @@ Spisovna:
 Administrace:
 - smazání uživatelského účtu vyžaduje nyní potvrzení uživatele
 - uživatel si nyní nemůže smazat svůj vlastní účet
+- změna údajů uživatele a zařazení do organizační jednotky se nyní projeví
+  okamžitě. Nicméně aby se projevila změna rolí uživatele, je stále nutné,
+  aby se daný uživatel odhlásil a přihlásil znovu.
 - při editaci ostatních nastavení v administraci program chybně neumožňoval 
   nezadat číslo zákaznické karty
 - aplikace nyní při zadávání e-mailové adresy kontroluje její formát. Navíc 

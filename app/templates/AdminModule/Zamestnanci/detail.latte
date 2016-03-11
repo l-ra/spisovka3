@@ -77,6 +77,7 @@
                 <dt>Role:</dt>
                 <dd>
                     {if $RoleUpravit == $u->id}
+                        Upozornění: Aby se změna rolí projevila, musí se uživatel odhlásit a přihlásit znovu.<br />
                         {form roleForm}
                             {foreach $Role[$u->id] as $r}
                                 {input 'role'.$r->id.'-user_role'} {$r->name}<br />
