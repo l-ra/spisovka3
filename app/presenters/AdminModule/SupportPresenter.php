@@ -68,6 +68,8 @@ class Admin_SupportPresenter extends BasePresenter
             unset($box->password);
         foreach ($config->email as &$mailbox)
             unset($mailbox->password);
+        foreach ($config->odeslani as &$mailbox)
+            unset($mailbox->cert_pass);
         print_r($config);
         echo "\n";
         
