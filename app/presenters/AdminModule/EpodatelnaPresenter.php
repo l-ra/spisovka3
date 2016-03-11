@@ -662,7 +662,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         if (!empty($data['cert'])) {
             $config_data['odeslani'][$index]['cert'] = $data['cert'];
-            $config_data['odeslani'][$index]['cert_key'] = $data['cert_key'];
         }
         // heslo měň, pouze když jej uživatel zadá
         // současné heslo ve formuláři nezobrazuj
@@ -759,8 +758,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         // kvuli bugu v parse_ini_file()
         $i = reset($res->isds);
         $i->aktivni = (bool) $i->aktivni;
-        $o = reset($res->odeslani);
-        $o->aktivni = (bool) $o->aktivni;
         foreach ($res->email as $e) {
             $e->aktivni = (bool) $e->aktivni;
             $e->only_signature = (bool) $e->only_signature;

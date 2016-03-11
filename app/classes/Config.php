@@ -107,11 +107,21 @@ class ConfigEpodatelna implements IConfig
      */
     protected function upgrade($data)
     {
+        $changed = false;
         if (!isset($data->odeslani[0]->podepisovat)) {
             $data->odeslani[0]->podepisovat = $data->odeslani[0]->typ_odeslani == 1;
             unset($data->odeslani[0]->typ_odeslani);
+            $changed = true;
         }
-
+        if (isset($data->odeslani[0]->aktivni)) {
+            unset($data->odeslani[0]->aktivni);
+            unset($data->odeslani[0]->cert_key);            
+            $changed = true;
+        }
+        
+        if ($changed)
+            $this->save($data);
+        
         return $data;
     }
 }
