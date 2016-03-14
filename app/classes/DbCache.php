@@ -1,8 +1,13 @@
 <?php
 
+use Nette\Caching\Cache;
+
 class DBCache
 {
 
+    /**
+     * @var Nette\Caching\IStorage
+     */
     protected static $cache = null;
 
     protected static function init()
@@ -38,7 +43,31 @@ class DBCache
         if (self::$cache !== null)
             unset(self::$cache[$key]);
     }
+    
+    public static function clearCache()
+    {
+        self::init();
+        // let Nette itself clear the cache
+        if (self::$cache !== null)
+            self::$cache->clean([Cache::ALL => true]);
 
+/*        $dir = self::getCacheDirectory();
+        $ok = true;
+        
+        if ($handle = opendir($dir)) {
+            while ($obj = readdir($handle)) {
+                if ($obj != '.' && $obj != '..')
+                    if (!unlink("$dir/$obj"))
+                        $ok = false;
+            }
+            closedir($handle);
+        }
+        else
+            $ok = false;
+        
+        return $ok;
+ */
+    }
 }
 
 ?>
