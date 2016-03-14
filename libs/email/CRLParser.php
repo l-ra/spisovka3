@@ -168,7 +168,7 @@ class CRLParser extends DERParser
 
         if (empty($zdroj))
             return null;
-        if (@ini_get("allow_url_fopen")) {
+        if (ini_get("allow_url_fopen")) {
             return @file_get_contents($zdroj);
         } else if (function_exists('curl_init')) {
             if ($ch = curl_init($zdroj)) {

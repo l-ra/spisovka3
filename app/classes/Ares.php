@@ -108,7 +108,7 @@ class Ares
 
     private static function doRequest($url)
     {
-        if (@ini_get("allow_url_fopen")) {
+        if (ini_get("allow_url_fopen")) {
             // Ares je velmi pomalý
             $context = stream_context_create(['http' => ['timeout' => 7]]);
             $result = @file($url, false, $context);
