@@ -6,7 +6,7 @@ class DBCache
 {
 
     /**
-     * @var Nette\Caching\IStorage
+     * @var Nette\Caching\Cache
      */
     protected static $cache = null;
 
@@ -27,21 +27,21 @@ class DBCache
     public static function get($key)
     {
         self::init();
-        return self::$cache !== null ? self::$cache[$key] : null;
+        return self::$cache !== null ? self::$cache->load($key) : null;
     }
 
     public static function set($key, $value)
     {
         self::init();
         if (self::$cache !== null)
-            self::$cache[$key] = $value;
+            self::$cache->save($key, $value, []);
     }
 
     public static function delete($key)
     {
         self::init();
         if (self::$cache !== null)
-            unset(self::$cache[$key]);
+            self::$cache->remove($key);
     }
     
     public static function clearCache()
