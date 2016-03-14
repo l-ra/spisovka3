@@ -1,7 +1,11 @@
 {
+    "name": "goodsailors/spisovka",
+    "description": "OSS Spisová služba",
+    "license": "EUPL-1.1",
     "require": {
-        "php": ">=5.3.7",
+        "php": ">=5.4.0",
         "dibi/dibi": "2.*",
-        "nette/nette": "2.2.*"
+        "nette/nette": "2.2.*",
+        "ext-zip": "*"
     }
 }

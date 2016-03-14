@@ -6,6 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    $vendorDir . '/tracy/tracy/src/shortcuts.php',
-    $vendorDir . '/nette/nette/Nette/loader.php',
+    '7745382c92b7799bf1294b1f43023ba2' => $vendorDir . '/tracy/tracy/src/shortcuts.php',
+    '8dddc82a60314295bfdfb12ee19b0aa8' => $vendorDir . '/nette/nette/Nette/loader.php',
 );

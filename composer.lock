@@ -1,10 +1,11 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "14226abd15d8e87104ec90730df929de",
+    "hash": "37a881663c5ae2d9d7fe394380b1af0d",
+    "content-hash": "b9999153189b31fc0f71ad57d3adc02d",
     "packages": [
         {
             "name": "dibi/dibi",
@@ -1210,7 +1211,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.3.7"
+        "php": ">=5.4.0",
+        "ext-zip": "*"
     },
     "platform-dev": []
 }
