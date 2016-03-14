@@ -215,7 +215,7 @@ class Install_DefaultPresenter extends BasePresenter
                 'required' => TRUE,
                 'passed' => extension_loaded('zip'),
                 'message' => 'Ano',
-                'errorMessage' => 'Chybí rozšíření Fileinfo. Aplikaci není možné nainstalovat.',
+                'errorMessage' => 'Chybí rozšíření ZIP. Aplikaci není možné nainstalovat.',
             ),
             array(
                 'title' => 'Zápis do dočasné složky',
