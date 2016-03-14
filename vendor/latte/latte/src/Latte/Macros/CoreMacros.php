@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Latte (http://latte.nette.org)
- * Copyright (c) 2008 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte\Macros;
@@ -283,7 +283,7 @@ class CoreMacros extends MacroSet
 	 */
 	public function macroClass(MacroNode $node, PhpWriter $writer)
 	{
-		return $writer->write('if ($_l->tmp = array_filter(%node.array)) echo \' class="\' . %escape(implode(" ", array_unique($_l->tmp))) . \'"\'');
+		return $writer->write('if ($_l->tmp = array_filter(%node.array)) echo \' class="\', %escape(implode(" ", array_unique($_l->tmp))), \'"\'');
 	}
 
 

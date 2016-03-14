@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Bridges\ApplicationLatte;
@@ -62,7 +62,10 @@ class Template extends Nette\Object implements Nette\Application\UI\ITemplate
 	{
 		try {
 			return $this->latte->renderToString($this->file, $this->params);
+		} catch (\Throwable $e) {
 		} catch (\Exception $e) {
+		}
+		if (isset($e)) {
 			if (func_num_args()) {
 				throw $e;
 			}

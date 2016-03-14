@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\Responses;
@@ -15,9 +15,6 @@ use Nette\Http;
  * Redirects to new URI.
  *
  * @author     David Grudl
- *
- * @property-read string $url
- * @property-read int $code
  */
 class RedirectResponse extends Nette\Object implements Nette\Application\IResponse
 {

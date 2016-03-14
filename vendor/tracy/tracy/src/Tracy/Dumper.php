@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Tracy (http://tracy.nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Tracy (https://tracy.nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Tracy;
@@ -222,7 +222,7 @@ class Dumper
 		$rc = $var instanceof \Closure ? new \ReflectionFunction($var) : new \ReflectionClass($var);
 		$out = '<span class="tracy-dump-object"'
 			. ($options[self::LOCATION] && ($editor = Helpers::editorUri($rc->getFileName(), $rc->getStartLine())) ? ' data-tracy-href="' . htmlspecialchars($editor) . '"' : '')
-			. '>' . get_class($var) . '</span> <span class="tracy-dump-hash">#' . substr(md5(spl_object_hash($var)), 0, 4) . '</span>';
+			. '>' . htmlspecialchars(Helpers::getClass($var)) . '</span> <span class="tracy-dump-hash">#' . substr(md5(spl_object_hash($var)), 0, 4) . '</span>';
 
 		if (empty($fields)) {
 			return $out . "\n";

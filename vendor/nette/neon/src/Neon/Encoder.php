@@ -1,13 +1,11 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Neon;
-
-use Nette;
 
 
 /**
@@ -54,9 +52,9 @@ class Encoder
 				foreach ($var as $k => $v) {
 					$v = $this->encode($v, self::BLOCK);
 					$s .= ($isList ? '-' : $this->encode($k) . ':')
-						. (strpos($v, "\n") === FALSE ? ' ' . $v : "\n\t" . str_replace("\n", "\n\t", $v))
-						. "\n";
-					continue;
+						. (strpos($v, "\n") === FALSE
+							? ' ' . $v . "\n"
+							: "\n" . preg_replace('#^(?=.)#m', "\t", $v) . (substr($v, -2, 1) === "\n" ? '' : "\n"));
 				}
 				return $s;
 

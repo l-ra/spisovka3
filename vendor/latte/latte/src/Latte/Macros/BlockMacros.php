@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Latte (http://latte.nette.org)
- * Copyright (c) 2008 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte\Macros;
@@ -89,7 +89,10 @@ class BlockMacros extends MacroSet
 				. ($this->extends ? $this->extends : 'empty($_g->extended) && isset($_control) && $_control instanceof Nette\Application\UI\Presenter ? $_control->findLayoutTemplateFile() : NULL')
 				. '; $_g->extended = TRUE;';
 
-			$prolog[] = 'if ($_l->extends) { ' . ($this->namedBlocks ? 'ob_start();' : 'return $template->renderChildTemplate($_l->extends, get_defined_vars());') . '}';
+			$prolog[] = 'if ($_l->extends) { ob_start();}';
+			if (!$this->namedBlocks) {
+				$epilog[] = 'if ($_l->extends) { ob_end_clean(); return $template->renderChildTemplate($_l->extends, get_defined_vars());}';
+			}
 		}
 
 		return array(implode("\n\n", $prolog), implode("\n", $epilog));
@@ -289,7 +292,7 @@ class BlockMacros extends MacroSet
 				if ($node->name === 'snippetArea') {
 					$node->content .= '<?php return FALSE; ?>';
 				}
-				$this->namedBlocks[$node->data->name] = $tmp = rtrim(ltrim($node->content, "\n"), " \t");
+				$this->namedBlocks[$node->data->name] = $tmp = preg_replace('#^\n+|(?<=\n)[ \t]+\z#', '', $node->content);
 				$node->content = substr_replace($node->content, $node->openingCode . "\n", strspn($node->content, "\n"), strlen($tmp));
 				$node->openingCode = '<?php ?>';
 			}

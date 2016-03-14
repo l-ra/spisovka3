@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Forms;
@@ -15,10 +15,7 @@ use Nette;
  *
  * @author     David Grudl
  *
- * @property-write $defaults
  * @property   Nette\Utils\ArrayHash $values
- * @property-read bool $valid
- * @property   ControlGroup $currentGroup
  * @property-read \ArrayIterator $controls
  * @property-read Form $form
  */

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Latte (http://latte.nette.org)
- * Copyright (c) 2008 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte;
@@ -16,7 +16,7 @@ namespace Latte;
 class Parser extends Object
 {
 	/** @internal regular expression for single & double quoted PHP string */
-	const RE_STRING = '\'(?:\\\\.|[^\'\\\\])*\'|"(?:\\\\.|[^"\\\\])*"';
+	const RE_STRING = '\'(?:\\\\.|[^\'\\\\])*+\'|"(?:\\\\.|[^"\\\\])*+"';
 
 	/** @internal special HTML attribute prefix */
 	const N_PREFIX = 'n:';
@@ -79,6 +79,8 @@ class Parser extends Object
 	 */
 	public function parse($input)
 	{
+		$this->offset = 0;
+
 		if (substr($input, 0, 3) === "\xEF\xBB\xBF") { // BOM
 			$input = substr($input, 3);
 		}
@@ -88,7 +90,6 @@ class Parser extends Object
 		$input = str_replace("\r\n", "\n", $input);
 		$this->input = $input;
 		$this->output = array();
-		$this->offset = 0;
 
 		$this->setSyntax($this->defaultSyntax);
 		$this->setContext(self::CONTEXT_HTML_TEXT);
@@ -356,7 +357,7 @@ class Parser extends Object
 				(?P<name>\?|/?[a-z]\w*+(?:[.:]\w+)*+(?!::|\(|\\\\))|   ## ?, name, /name, but not function( or class:: or namespace\
 				(?P<noescape>!?)(?P<shortname>/?[=\~#%^&_]?)      ## !expression, !=expression, ...
 			)(?P<args>.*?)
-			(?P<modifiers>\|[a-z](?:' . self::RE_STRING . '|[^\'"])*(?<!/))?
+			(?P<modifiers>\|[a-z](?:' . self::RE_STRING . '|[^\'"/]|/(?=.))*+)?
 			(?P<empty>/?\z)
 		()\z~isx', $tag, $match)) {
 			if (preg_last_error()) {
@@ -389,7 +390,9 @@ class Parser extends Object
 
 	private function getLine()
 	{
-		return substr_count($this->input, "\n", 0, max(1, $this->offset - 1)) + 1;
+		return $this->offset
+			? substr_count(substr($this->input, 0, $this->offset - 1), "\n") + 1
+			: 0;
 	}
 
 

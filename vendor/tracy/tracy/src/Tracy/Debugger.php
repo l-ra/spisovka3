@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Tracy (http://tracy.nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Tracy (https://tracy.nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Tracy;
@@ -22,7 +22,7 @@ use ErrorException;
  */
 class Debugger
 {
-	const VERSION = '2.2.8';
+	const VERSION = '2.2.9';
 
 	/** @deprecated */
 	public static $version = self::VERSION;
@@ -313,12 +313,12 @@ class Debugger
 		}
 
 		$exceptionFilename = NULL;
-		if ($message instanceof \Exception) {
+		if ($message instanceof \Exception || $message instanceof \Throwable) {
 			$exception = $message;
 			while ($exception) {
 				$tmp[] = ($exception instanceof ErrorException
 					? 'Fatal error: ' . $exception->getMessage()
-					: get_class($exception) . ': ' . $exception->getMessage())
+					: Helpers::getClass($exception) . ': ' . $exception->getMessage())
 					. ' in ' . $exception->getFile() . ':' . $exception->getLine();
 				$exception = $exception->getPrevious();
 			}
@@ -384,11 +384,11 @@ class Debugger
 
 	/**
 	 * Handler to catch uncaught exception.
-	 * @param  \Exception
+	 * @param  \Exception|\Throwable
 	 * @return void
 	 * @internal
 	 */
-	public static function _exceptionHandler(\Exception $exception, $exit = TRUE)
+	public static function _exceptionHandler($exception, $exit = TRUE)
 	{
 		if (self::$done) {
 			return;
@@ -407,6 +407,7 @@ class Debugger
 		if (self::$productionMode) {
 			try {
 				self::log($exception, self::EXCEPTION);
+			} catch (\Throwable $e) {
 			} catch (\Exception $e) {
 			}
 
@@ -432,18 +433,25 @@ class Debugger
 				if ($file && self::$browser) {
 					exec(self::$browser . ' ' . escapeshellarg($file));
 				}
+			} catch (\Throwable $e) {
+				echo "$s\nUnable to log error: {$e->getMessage()}\n";
 			} catch (\Exception $e) {
 				echo "$exception\nUnable to log error: {$e->getMessage()}\n";
 			}
 		}
 
 		try {
+			$e = NULL;
 			foreach (self::$onFatalError as $handler) {
 				call_user_func($handler, $exception);
 			}
+		} catch (\Throwable $e) {
 		} catch (\Exception $e) {
+		}
+		if ($e) {
 			try {
 				self::log($e, self::EXCEPTION);
+			} catch (\Throwable $e) {
 			} catch (\Exception $e) {
 			}
 		}
@@ -473,7 +481,7 @@ class Debugger
 
 		if ($severity === E_RECOVERABLE_ERROR || $severity === E_USER_ERROR) {
 			if (Helpers::findTrace(debug_backtrace(PHP_VERSION_ID >= 50306 ? DEBUG_BACKTRACE_IGNORE_ARGS : FALSE), '*::__toString')) {
-				$previous = isset($context['e']) && $context['e'] instanceof \Exception ? $context['e'] : NULL;
+				$previous = isset($context['e']) && ($context['e'] instanceof \Exception || $context['e'] instanceof \Throwable) ? $context['e'] : NULL;
 				$e = new ErrorException($message, 0, $severity, $file, $line, $previous);
 				$e->context = $context;
 				self::_exceptionHandler($e);

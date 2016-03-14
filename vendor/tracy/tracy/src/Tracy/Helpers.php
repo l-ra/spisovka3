@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Tracy (http://tracy.nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Tracy (https://tracy.nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Tracy;
@@ -25,17 +25,15 @@ class Helpers
 	public static function editorLink($file, $line = NULL)
 	{
 		if ($editor = self::editorUri($file, $line)) {
-			$dir = dirname(strtr($file, '/', DIRECTORY_SEPARATOR));
-			$base = isset($_SERVER['SCRIPT_FILENAME'])
-				? dirname(dirname(strtr($_SERVER['SCRIPT_FILENAME'], '/', DIRECTORY_SEPARATOR)))
-				: dirname($dir);
-			if (substr($dir, 0, strlen($base)) === $base) {
-				$dir = '...' . substr($dir, strlen($base));
+			$file = strtr($file, '\\', '/');
+			if (preg_match('#(^[a-z]:)?/.{1,50}$#i', $file, $m) && strlen($file) > strlen($m[0])) {
+				$file = '...' . $m[0];
 			}
+			$file = strtr($file, '/', DIRECTORY_SEPARATOR);
 			return self::createHtml('<a href="%" title="%">%<b>%</b>%</a>',
 				$editor,
 				$file . ($line ? ":$line" : ''),
-				rtrim($dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR,
+				rtrim(dirname($file), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR,
 				basename($file),
 				$line ? ":$line" : ''
 			);
@@ -52,7 +50,7 @@ class Helpers
 	public static function editorUri($file, $line = NULL)
 	{
 		if (Debugger::$editor && $file && is_file($file)) {
-			return strtr(Debugger::$editor, array('%file' => rawurlencode($file), '%line' => $line ? (int) $line : ''));
+			return strtr(Debugger::$editor, array('%file' => rawurlencode($file), '%line' => $line ? (int) $line : 1));
 		}
 	}
 
@@ -78,6 +76,15 @@ class Helpers
 				return $item;
 			}
 		}
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public static function getClass($obj)
+	{
+		return current(explode("\x00", get_class($obj)));
 	}
 
 

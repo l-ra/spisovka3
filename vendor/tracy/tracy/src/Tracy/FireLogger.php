@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Tracy (http://tracy.nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Tracy (https://tracy.nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Tracy;
@@ -53,7 +53,7 @@ class FireLogger
 			$item['template'] = array_shift($args);
 		}
 
-		if (isset($args[0]) && $args[0] instanceof \Exception) {
+		if (isset($args[0]) && ($args[0] instanceof \Exception || $args[0] instanceof \Throwable)) {
 			$e = array_shift($args);
 			$trace = $e->getTrace();
 			if (isset($trace[0]['class']) && $trace[0]['class'] === 'Tracy\Debugger'
@@ -63,7 +63,7 @@ class FireLogger
 			}
 
 			$file = str_replace(dirname(dirname(dirname($e->getFile()))), "\xE2\x80\xA6", $e->getFile());
-			$item['template'] = ($e instanceof \ErrorException ? '' : get_class($e) . ': ')
+			$item['template'] = ($e instanceof \ErrorException ? '' : Helpers::getClass($e) . ': ')
 				. $e->getMessage() . ($e->getCode() ? ' #' . $e->getCode() : '') . ' in ' . $file . ':' . $e->getLine();
 			$item['pathname'] = $e->getFile();
 			$item['lineno'] = $e->getLine();
@@ -156,7 +156,7 @@ class FireLogger
 
 			} elseif ($level < Debugger::$maxDepth || !Debugger::$maxDepth) {
 				$list[] = $var;
-				$res = array("\x00" => '(object) ' . get_class($var));
+				$res = array("\x00" => '(object) ' . Helpers::getClass($var));
 				foreach ($arr as $k => & $v) {
 					if ($k[0] === "\x00") {
 						$k = substr($k, strrpos($k, "\x00") + 1);

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Latte (http://latte.nette.org)
- * Copyright (c) 2008 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte\Runtime;
@@ -55,7 +55,11 @@ class Filters
 		if ($s && ($s[0] === '-' || $s[0] === '>' || $s[0] === '!')) {
 			$s = ' ' . $s;
 		}
-		return str_replace('-', '- ', $s); // dash is very problematic character in comments
+		$s = str_replace('--', '- - ', $s);
+		if (substr($s, -1) === '-') {
+			$s .= ' ';
+		}
+		return $s;
 	}
 
 
@@ -112,7 +116,7 @@ class Filters
 	 */
 	public static function escapeICal($s)
 	{
-		// http://www.ietf.org/rfc/rfc5545.txt
+		// https://www.ietf.org/rfc/rfc5545.txt
 		return addcslashes(preg_replace('#[\x00-\x08\x0B\x0C-\x1F]+#', '', $s), "\";\\,:\n");
 	}
 
@@ -170,7 +174,7 @@ class Filters
 
 	/**
 	 * Date/time formatting.
-	 * @param  string|int|DateTime|DateInterval
+	 * @param  string|int|\DateTime|\DateInterval
 	 * @param  string
 	 * @return string
 	 */

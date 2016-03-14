@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Utils;
@@ -219,7 +219,7 @@ class Image extends Nette\Object
 		$image = imagecreatetruecolor($width, $height);
 		if (is_array($color)) {
 			$color += array('alpha' => 0);
-			$color = imagecolorallocatealpha($image, $color['red'], $color['green'], $color['blue'], $color['alpha']);
+			$color = imagecolorresolvealpha($image, $color['red'], $color['green'], $color['blue'], $color['alpha']);
 			imagealphablending($image, FALSE);
 			imagefilledrectangle($image, 0, 0, $width - 1, $height - 1, $color);
 			imagealphablending($image, TRUE);
@@ -569,7 +569,10 @@ class Image extends Nette\Object
 	{
 		try {
 			return $this->toString();
+		} catch (\Throwable $e) {
 		} catch (\Exception $e) {
+		}
+		if (isset($e)) {
 			if (func_num_args()) {
 				throw $e;
 			}
@@ -605,25 +608,28 @@ class Image extends Nette\Object
 	public function __call($name, $args)
 	{
 		$function = 'image' . $name;
-		if (function_exists($function)) {
-			foreach ($args as $key => $value) {
-				if ($value instanceof self) {
-					$args[$key] = $value->getImageResource();
-
-				} elseif (is_array($value) && isset($value['red'])) { // rgb
-					$args[$key] = imagecolorallocatealpha(
-						$this->image,
-						$value['red'], $value['green'], $value['blue'], $value['alpha']
-					);
-				}
-			}
-			array_unshift($args, $this->image);
-
-			$res = call_user_func_array($function, $args);
-			return is_resource($res) && get_resource_type($res) === 'gd' ? $this->setImageResource($res) : $res;
+		if (!function_exists($function)) {
+			return parent::__call($name, $args);
 		}
 
-		return parent::__call($name, $args);
+		foreach ($args as $key => $value) {
+			if ($value instanceof self) {
+				$args[$key] = $value->getImageResource();
+
+			} elseif (is_array($value) && isset($value['red'])) { // rgb
+				$args[$key] = imagecolorallocatealpha(
+					$this->image,
+					$value['red'], $value['green'], $value['blue'], $value['alpha']
+				) ?: imagecolorresolvealpha(
+					$this->image,
+					$value['red'], $value['green'], $value['blue'], $value['alpha']
+				);
+			}
+		}
+		array_unshift($args, $this->image);
+
+		$res = call_user_func_array($function, $args);
+		return is_resource($res) && get_resource_type($res) === 'gd' ? $this->setImageResource($res) : $res;
 	}
 
 

@@ -37,7 +37,7 @@ foreach ($iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterato
 				curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($curl, CURLOPT_POST, 1);
 				curl_setopt($curl, CURLOPT_POSTFIELDS, 'output_info=compiled_code&js_code=' . urlencode($s));
-				$s = curl_exec($curl);
+				$s = curl_exec($curl) ?: $s;
 				curl_close($curl);
 
 			} elseif ($type === 'style') {

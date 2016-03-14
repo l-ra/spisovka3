@@ -1,13 +1,11 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Neon;
-
-use Nette;
 
 
 /**
@@ -249,6 +247,8 @@ class Decoder
 					$value = NULL;
 				} elseif (is_numeric($t)) {
 					$value = $t * 1;
+				} elseif (preg_match('#0x[0-9a-fA-F]+\z#A', $t)) {
+					$value = hexdec($t);
 				} elseif (preg_match('#\d\d\d\d-\d\d?-\d\d?(?:(?:[Tt]| +)\d\d?:\d\d:\d\d(?:\.\d*)? *(?:Z|[-+]\d\d?(?::\d\d)?)?)?\z#A', $t)) {
 					$value = new \DateTime($t);
 				} else { // literal

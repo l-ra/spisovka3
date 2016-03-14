@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Utils;
@@ -393,6 +393,29 @@ class ObjectMixin
 			}
 		}
 		return $cache = FALSE;
+	}
+
+
+	/**
+	 * Finds the best suggestion (for 8-bit encoding).
+	 * @return string|NULL
+	 * @internal
+	 */
+	public static function getSuggestion(array $items, $value)
+	{
+		$norm = preg_replace($re = '#^(get|set|has|is|add)(?=[A-Z])#', '', $value);
+		$best = NULL;
+		$min = (strlen($value) / 4 + 1) * 10 + .1;
+		foreach (array_unique($items) as $item) {
+			if ($item !== $value && (
+				($len = levenshtein($item, $value, 10, 11, 10)) < $min
+				|| ($len = levenshtein(preg_replace($re, '', $item), $norm, 10, 11, 10) + 20) < $min
+			)) {
+				$min = $len;
+				$best = $item;
+			}
+		}
+		return $best;
 	}
 
 }

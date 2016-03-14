@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Latte (http://latte.nette.org)
- * Copyright (c) 2008 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte\Runtime;
@@ -23,9 +23,6 @@ use Latte;
  * @property-read int $counter
  * @property-read mixed $nextKey
  * @property-read mixed $nextValue
- * @property-read $innerIterator
- * @property   $flags
- * @property-read $cache
  * @internal
  */
 class CachingIterator extends \CachingIterator implements \Countable

@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Application\UI;
@@ -20,14 +20,10 @@ use Nette\Reflection;
  * @author     David Grudl
  *
  * @property-read Nette\Application\Request $request
- * @property-read array|NULL $signal
  * @property-read string $action
  * @property      string $view
  * @property      string $layout
  * @property-read \stdClass $payload
- * @property-read bool $ajax
- * @property-read Nette\Application\Request $lastCreatedRequest
- * @property-read Nette\Http\SessionSection $flashSession
  * @property-read \SystemContainer|Nette\DI\Container $context
  * @property-read Nette\Http\Session $session
  * @property-read Nette\Security\User $user
@@ -761,7 +757,7 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 	/**
 	 * Attempts to cache the sent entity by its last modification date.
-	 * @param  string|int|DateTime  last modified time
+	 * @param  string|int|\DateTime  last modified time
 	 * @param  string strong entity tag validator
 	 * @param  mixed  optional expiration time
 	 * @return void

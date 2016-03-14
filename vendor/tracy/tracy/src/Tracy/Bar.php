@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Tracy (http://tracy.nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Tracy (https://tracy.nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Tracy;
@@ -73,7 +73,10 @@ class Bar
 				}
 				$panels[] = array('id' => $idHtml, 'tab' => $tab, 'panel' => $panelHtml);
 
+			} catch (\Throwable $e) {
 			} catch (\Exception $e) {
+			}
+			if (isset($e)) {
 				$panels[] = array(
 					'id' => "error-$idHtml",
 					'tab' => "Error in $id",

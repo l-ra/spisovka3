@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Latte (http://latte.nette.org)
- * Copyright (c) 2008 David Grudl (http://davidgrudl.com)
+ * This file is part of the Latte (https://latte.nette.org)
+ * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
 namespace Latte;
@@ -15,7 +15,7 @@ namespace Latte;
  */
 class Engine extends Object
 {
-	const VERSION = '2.2.7';
+	const VERSION = '2.2.9';
 
 	/** Content types */
 	const CONTENT_HTML = 'html',
@@ -104,6 +104,9 @@ class Engine extends Object
 		ob_start();
 		try {
 			$this->render($name, $params);
+		} catch (\Throwable $e) {
+			ob_end_clean();
+			throw $e;
 		} catch (\Exception $e) {
 			ob_end_clean();
 			throw $e;

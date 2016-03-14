@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Caching;
@@ -15,9 +15,6 @@ use Nette\Utils\Callback;
  * Implements the cache for a application.
  *
  * @author     David Grudl
- *
- * @property-read IStorage $storage
- * @property-read string $namespace
  */
 class Cache extends Nette\Object implements \ArrayAccess
 {
@@ -130,7 +127,15 @@ class Cache extends Nette\Object implements \ArrayAccess
 
 		if ($data instanceof Nette\Callback || $data instanceof \Closure) {
 			$this->storage->lock($key);
-			$data = call_user_func_array($data, array(& $dependencies));
+			try {
+				$data = call_user_func_array($data, array(& $dependencies));
+			} catch (\Throwable $e) {
+				$this->storage->remove($key);
+				throw $e;
+			} catch (\Exception $e) {
+				$this->storage->remove($key);
+				throw $e;
+			}
 		}
 
 		if ($data === NULL) {
