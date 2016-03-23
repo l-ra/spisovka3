@@ -297,14 +297,14 @@ class Zapujcka extends BaseModel
         if (is_null($data))
             return false;
 
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         $user_id = $user->id;
         $data['date_created'] = new DateTime();
         $data['stav'] = 1;
 
         // pracovnik spisovny pujcuje dokument jinym uzivatelum,
         // obycejny pracovnik zada o pujceni svym jmenem
-        $pracovnik_spisovny = Acl::isInRole('spisovna') || $user->isInRole('superadmin');        
+        $pracovnik_spisovny = $user->inheritsFromRole('spisovna') || $user->isInRole('superadmin');        
         if (!$pracovnik_spisovny)
             $data['user_id'] = $user_id;
 
@@ -317,7 +317,7 @@ class Zapujcka extends BaseModel
 
     public function osobni($args)
     {
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
 
         if (isset($args['where'])) {
             $args['where'][] = array(array('z.user_id = %i AND z.stav < 3', $user->id));
@@ -381,7 +381,7 @@ class Zapujcka extends BaseModel
             $Workflow = new Workflow();
             $dokument_id = $this->getDokumentID($zapujcka_id);
             $Workflow->zapujcka_vratit($dokument_id,
-                    Nette\Environment::getUser()->id);
+                    self::getUser()->id);
             return true;
         } catch (Exception $e) {
             $e->getMessage();

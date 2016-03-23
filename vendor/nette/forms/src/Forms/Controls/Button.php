@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Push button control with no default behavior.
- *
- * @author     David Grudl
  */
 class Button extends BaseControl
 {
@@ -60,7 +58,6 @@ class Button extends BaseControl
 		$el = clone $this->control;
 		return $el->addAttributes(array(
 			'name' => $this->getHtmlName(),
-			'id' => $this->getHtmlId(),
 			'disabled' => $this->isDisabled(),
 			'value' => $this->translate($caption === NULL ? $this->caption : $caption),
 		));

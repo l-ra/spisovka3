@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Sends emails via the PHP internal mail() function.
- *
- * @author     David Grudl
  */
 class SendmailMailer extends Nette\Object implements IMailer
 {
@@ -24,6 +22,7 @@ class SendmailMailer extends Nette\Object implements IMailer
 	/**
 	 * Sends email.
 	 * @return void
+	 * @throws SendException
 	 */
 	public function send(Message $mail)
 	{
@@ -46,7 +45,7 @@ class SendmailMailer extends Nette\Object implements IMailer
 			$info = ": $message";
 		});
 		if ($res === FALSE) {
-			throw new Nette\InvalidStateException("Unable to send email$info.");
+			throw new SendException("Unable to send email$info.");
 		}
 	}
 

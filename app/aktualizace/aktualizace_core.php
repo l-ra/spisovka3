@@ -160,11 +160,10 @@ class Client_To_Update
 
     public function get_db_config()
     {
-        if (!$this->db_config)
-        // neprovadej autoload tridy, abychom poznali, jestli jsme volani ze spisovky
-        // nebo z aktualizacniho skriptu
-            if (class_exists('\Nette\Environment', false)) {
-                $config = \Nette\Environment::getConfig('database');
+        if (!$this->db_config) {
+            // pri volani z aktualizacniho skriptu nebude promenna nastavena
+            $config = GlobalVariables::get('database');
+            if ($config) {
                 $this->db_config = $config;
             } else if (is_file("{$this->path}/configs/database.neon")) {
                 $data = (new Spisovka\ConfigDatabase($this->path))->get();
@@ -186,7 +185,8 @@ class Client_To_Update
                 else
                     throw new Exception("Nemohu přečíst konfigurační soubor system.ini");
             }
-
+        }
+        
         return $this->db_config;
     }
 

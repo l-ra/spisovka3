@@ -10,8 +10,6 @@ namespace Latte;
 
 /**
  * Latte helpers.
- *
- * @author     David Grudl
  * @internal
  */
 class Helpers
@@ -110,6 +108,25 @@ class Helpers
 			}
 		}
 		return $res . $php;
+	}
+
+
+	/**
+	 * Finds the best suggestion.
+	 * @return string|NULL
+	 */
+	public static function getSuggestion(array $items, $value)
+	{
+		$best = NULL;
+		$min = (strlen($value) / 4 + 1) * 10 + .1;
+		foreach (array_unique($items, SORT_REGULAR) as $item) {
+			$item = is_object($item) ? $item->getName() : $item;
+			if (($len = levenshtein($item, $value, 10, 11, 10)) > 0 && $len < $min) {
+				$min = $len;
+				$best = $item;
+			}
+		}
+		return $best;
 	}
 
 }

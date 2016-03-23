@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Web form adapted for Presenter.
- *
- * @author     David Grudl
  */
 class Form extends Nette\Forms\Form implements ISignalReceiver
 {

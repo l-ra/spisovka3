@@ -88,7 +88,7 @@ class SpisovyZnak extends TreeModel
     public function vytvorit($data)
     {
         $data['stav'] = 1;
-        $user_id = Nette\Environment::getUser()->id;
+        $user_id = self::getUser()->id;
         $data['date_created'] = new DateTime();
         $data['user_created'] = $user_id;
         $data['date_modified'] = new DateTime();
@@ -122,7 +122,7 @@ class SpisovyZnak extends TreeModel
     {
 
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = (int) Nette\Environment::getUser()->id;
+        $data['user_modified'] = (int) self::getUser()->id;
 
         if (empty($data['spousteci_udalost_id']))
             $data['spousteci_udalost_id'] = 3;
@@ -170,12 +170,10 @@ class SpisovyZnak extends TreeModel
 
     public static function spousteci_udalost($kod = null, $select = 0)
     {
-
         $result = DbCache::get('s3_Spousteci_udalost');
 
         if ($result === null) {
-            $prefix = self::getDbPrefix();
-            $tb_spoudalost = $prefix . 'spousteci_udalost';
+            $tb_spoudalost = ':PREFIX:spousteci_udalost';
             $result = dibi::query('SELECT * FROM %n', $tb_spoudalost, 'WHERE stav<>0')->fetchAssoc('id');
 
             DbCache::set('s3_Spousteci_udalost', $result);

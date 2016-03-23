@@ -14,14 +14,15 @@ use Nette\Utils\Html;
 /**
  * Set of radio button controls.
  *
- * @author     David Grudl
- *
  * @property-read Html $separatorPrototype
  * @property-read Html $containerPrototype
  * @property-read Html $itemLabelPrototype
  */
 class RadioList extends ChoiceControl
 {
+	/** @var bool */
+	public $generateId = FALSE;
+
 	/** @var Html  separator element template */
 	protected $separator;
 
@@ -50,27 +51,25 @@ class RadioList extends ChoiceControl
 	 * Generates control's HTML element.
 	 * @return Html
 	 */
-	public function getControl($key = NULL)
+	public function getControl()
 	{
-		if ($key !== NULL) {
-			trigger_error(sprintf('Partial %s() is deprecated; use getControlPart() instead.', __METHOD__), E_USER_DEPRECATED);
-			return $this->getControlPart($key);
-		}
-
 		$input = parent::getControl();
+		$items = $this->getItems();
 		$ids = array();
-		foreach ($this->getItems() as $value => $label) {
-			$ids[$value] = $input->id . '-' . $value;
+		if ($this->generateId) {
+			foreach ($items as $value => $label) {
+				$ids[$value] = $input->id . '-' . $value;
+			}
 		}
 
 		return $this->container->setHtml(
 			Nette\Forms\Helpers::createInputList(
-				$this->translate($this->getItems()),
+				$this->translate($items),
 				array_merge($input->attrs, array(
 					'id:' => $ids,
 					'checked?' => $this->value,
 					'disabled:' => $this->disabled,
-					'data-nette-rules:' => array(key($ids) => $input->attrs['data-nette-rules']),
+					'data-nette-rules:' => array(key($items) => $input->attrs['data-nette-rules']),
 				)),
 				array('for:' => $ids) + $this->itemLabel->attrs,
 				$this->separator
@@ -84,12 +83,8 @@ class RadioList extends ChoiceControl
 	 * @param  string
 	 * @return Html
 	 */
-	public function getLabel($caption = NULL, $key = NULL)
+	public function getLabel($caption = NULL)
 	{
-		if ($key !== NULL) {
-			trigger_error(sprintf('Partial %s() is deprecated; use getLabelPart() instead.', __METHOD__), E_USER_DEPRECATED);
-			return $this->getLabelPart($key);
-		}
 		return parent::getLabel($caption)->for(NULL);
 	}
 
@@ -112,9 +107,11 @@ class RadioList extends ChoiceControl
 	/**
 	 * @return Html
 	 */
-	public function getLabelPart($key)
+	public function getLabelPart($key = NULL)
 	{
-		return parent::getLabel($this->items[$key])->for($this->getHtmlId() . '-' . $key);
+		return func_num_args()
+			? parent::getLabel($this->items[$key])->for($this->getHtmlId() . '-' . $key)
+			: $this->getLabel();
 	}
 
 

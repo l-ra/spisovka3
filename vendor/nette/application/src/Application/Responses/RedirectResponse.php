@@ -13,8 +13,6 @@ use Nette\Http;
 
 /**
  * Redirects to new URI.
- *
- * @author     David Grudl
  */
 class RedirectResponse extends Nette\Object implements Nette\Application\IResponse
 {

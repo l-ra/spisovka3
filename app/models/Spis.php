@@ -30,7 +30,7 @@ class Spis extends TreeModel
 
     private function spisDetail($row)
     {
-        $OrgJednotka = new Orgjednotka();
+        $OrgJednotka = new OrgJednotka();
 
         if (!empty($row->orgjednotka_id)) {
             $row->orgjednotka_prideleno = $OrgJednotka->getInfo($row->orgjednotka_id);
@@ -56,11 +56,11 @@ class Spis extends TreeModel
 
     /* Opraveno odstraněním "hlavního spisu".
      * 
-    protected function getLevelExpression()
-    {
-        return parent::getLevelExpression() . ' - 1';
-    } */
-    
+      protected function getLevelExpression()
+      {
+      return parent::getLevelExpression() . ' - 1';
+      } */
+
     /**
      * @return DibiResult
      */
@@ -68,7 +68,7 @@ class Spis extends TreeModel
     {
         if (!empty($args['where']))
             $params['where'] = $args['where'];
-        
+
         $params['leftJoin'] = array(
             'orgjednotka1' => array(
                 'from' => array($this->tb_orgjednotka => 'org1'),
@@ -144,8 +144,8 @@ class Spis extends TreeModel
 
     private function omezeni_org(array $filter)
     {
-        $user = Nette\Environment::getUser();
-        $oj_id = Orgjednotka::dejOrgUzivatele();
+        $user = self::getUser();
+        $oj_id = OrgJednotka::dejOrgUzivatele();
 
         if ($user->isAllowed('Dokument', 'cist_vse'))
             ; // vsechny spisy bez ohledu na organizacni jednotku
@@ -153,7 +153,7 @@ class Spis extends TreeModel
             $filter[] = array("0");
         else {
             if ($user->isAllowed(NULL, 'is_vedouci'))
-                $org_jednotky = Orgjednotka::childOrg($oj_id);
+                $org_jednotky = OrgJednotka::childOrg($oj_id);
             else
                 $org_jednotky = array($oj_id);
 
@@ -187,12 +187,12 @@ class Spis extends TreeModel
     public function vytvorit($data)
     {
         $data['date_created'] = new DateTime();
-        $data['user_created'] = Nette\Environment::getUser()->id;
+        $data['user_created'] = self::getUser()->id;
         $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
 
         if (empty($data['parent_id']))
             unset($data['parent_id']);
-        
+
         if (empty($data['spisovy_znak_id']))
             unset($data['spisovy_znak_id']);
         if (empty($data['skartacni_znak']))
@@ -213,8 +213,8 @@ class Spis extends TreeModel
     public function upravit($data, $spis_id)
     {
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Nette\Environment::getUser()->id;
-        
+        $data['user_modified'] = self::getUser()->id;
+
         if (isset($data['spisovy_znak_id']) && !$data['spisovy_znak_id'])
             $data['spisovy_znak_id'] = null;
         if (isset($data['skartacni_znak']) && !$data['skartacni_znak'])
@@ -242,10 +242,6 @@ class Spis extends TreeModel
         if ($stav === self::UZAVREN) {
             // Kontrola
             if ($kontrola = $this->kontrolaVyrizeniDokumentu($spis_id)) {
-                /* foreach ($kontrola as $kmess) {
-                  Nette\Environment::getApplication()->getPresenter()->flashMessage($kmess,
-                  'warning');
-                  } */
                 return -1;
             }
         }
@@ -253,7 +249,7 @@ class Spis extends TreeModel
         $data = array();
         $now = new DateTime();
         $data['date_modified'] = $now;
-        $data['user_modified'] = Nette\Environment::getUser()->id;
+        $data['user_modified'] = self::getUser()->id;
         if ($stav === self::UZAVREN)
             $data['datum_uzavreni'] = $now;
         $data['stav'] = $stav;
@@ -391,7 +387,6 @@ class Spis extends TreeModel
 
     public function pripojitDoSpisovny($spis_id)
     {
-
         // kontrola uzivatele
         $spis_info = $this->getInfo($spis_id);
 
@@ -410,11 +405,11 @@ class Spis extends TreeModel
         // Kontrola kompletnosti vlozenych dokumentu (musi byt vyrizene)
         if ($kontrola = $this->kontrolaVyrizeniDokumentu($spis_info)) {
             // nejsou kompletni - neprenasim
+            $msg = '';
             foreach ($kontrola as $kmess) {
-                Nette\Environment::getApplication()->getPresenter()->flashMessage('Spis ' . $spis_info->nazev . ' - ' . $kmess,
-                        'warning');
+                $msg .= 'Spis ' . $spis_info->nazev . ' - ' . $kmess . "\n";
             }
-            return 'Spis ' . $spis_info->nazev . ' nelze připojit do spisovny! Jeden nebo více dokumentů spisu nejsou vyřízeny.';
+            return $msg . 'Spis ' . $spis_info->nazev . ' nelze připojit do spisovny! Jeden nebo více dokumentů spisu nejsou vyřízeny.';
         }
 
         // Pripojit vsechny dokumenty do spisovny spolu se spisem
@@ -422,16 +417,11 @@ class Spis extends TreeModel
         $dokumenty = $DokumentSpis->dokumenty($spis_id);
         if (count($dokumenty) > 0) {
             $Workflow = new Workflow();
+            $errors = '';
             foreach ($dokumenty as $dok) {
                 $stav = $Workflow->prevzitDoSpisovny($dok->id, false);
-                if ($stav === true) {
-                    
-                } else {
-                    if (is_string($stav)) {
-                        Nette\Environment::getApplication()->getPresenter()->flashMessage($stav,
-                                'warning');
-                    }
-                }
+                if (is_string($stav))
+                    $errors .= $stav . "\n";
             }
         }
 
@@ -529,7 +519,7 @@ class Spis extends TreeModel
     public static function zjistiOpravneniUzivatele($spis)
     {
 
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         $user_id = $user->id;
         $oj_uzivatele = OrgJednotka::dejOrgUzivatele();
         $Lze_cist = $Lze_menit = $Lze_prevzit = false;
@@ -537,7 +527,7 @@ class Spis extends TreeModel
         if ($oj_uzivatele === null)
             $org_jednotky = array();
         else if ($user->isAllowed(NULL, 'is_vedouci'))
-            $org_jednotky = Orgjednotka::childOrg($oj_uzivatele);
+            $org_jednotky = OrgJednotka::childOrg($oj_uzivatele);
         else
             $org_jednotky = array($oj_uzivatele);
 
@@ -568,7 +558,7 @@ class Spis extends TreeModel
                 if (isset($org_cache[$wf->orgjednotka_id])) {
                     $orgjednotka_expr = $org_cache[$wf->orgjednotka_id];
                 } else {
-                    $orgjednotka_expr = Orgjednotka::isInOrg($wf->orgjednotka_id);
+                    $orgjednotka_expr = OrgJednotka::isInOrg($wf->orgjednotka_id);
                     $org_cache[$wf->orgjednotka_id] = $orgjednotka_expr;
                 }
 
@@ -616,9 +606,9 @@ class Spis extends TreeModel
      * @return DibiRow[]
      */
     public function search($title, $filter)
-    {   
+    {
         $args = [["nazev LIKE %s", "%$title%"]];
-        $user = \Nette\Environment::getUser();
+        $user = self::getUser();
         $admin = $filter == 'admin' && $user->isAllowed('Admin_SpisyPresenter');
         if (!$admin) {
             $args[] = 'stav = ' . self::OTEVREN;

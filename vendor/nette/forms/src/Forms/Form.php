@@ -13,8 +13,6 @@ use Nette;
 /**
  * Creates, validates and renders HTML forms.
  *
- * @author     David Grudl
- *
  * @property-read array $errors
  * @property-read Nette\Utils\Html $elementPrototype
  */
@@ -24,6 +22,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 	const EQUAL = ':equal',
 		IS_IN = self::EQUAL,
 		NOT_EQUAL = ':notEqual',
+		IS_NOT_IN = self::NOT_EQUAL,
 		FILLED = ':filled',
 		BLANK = ':blank',
 		REQUIRED = self::FILLED,
@@ -114,13 +113,14 @@ class Form extends Container implements Nette\Utils\IHtmlString
 	 */
 	public function __construct($name = NULL)
 	{
+		parent::__construct();
 		if ($name !== NULL) {
 			$this->getElementPrototype()->id = 'frm-' . $name;
 			$tracker = new Controls\HiddenField($name);
 			$tracker->setOmitted();
 			$this[self::TRACKER_ID] = $tracker;
+			$this->setParent(NULL, $name);
 		}
-		parent::__construct(NULL, $name);
 	}
 
 
@@ -150,7 +150,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 
 	/**
 	 * Returns self.
-	 * @return Form
+	 * @return self
 	 */
 	public function getForm($need = TRUE)
 	{
@@ -402,7 +402,11 @@ class Form extends Container implements Nette\Utils\IHtmlString
 
 		if (!$this->isValid()) {
 			$this->onError($this);
-		} elseif ($this->onSuccess) {
+
+		} elseif ($this->onSuccess !== NULL) {
+			if (!is_array($this->onSuccess) && !$this->onSuccess instanceof \Traversable) {
+				throw new Nette\UnexpectedValueException('Property Form::$onSuccess must be array or Traversable, ' . gettype($this->onSuccess) . ' given.');
+			}
 			foreach ($this->onSuccess as $handler) {
 				$params = Nette\Utils\Callback::toReflection($handler)->getParameters();
 				$values = isset($params[1]) ? $this->getValues($params[1]->isArray()) : NULL;
@@ -474,7 +478,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 			$maxSize <<= $units[$ch];
 		}
 		if ($maxSize > 0 && $maxSize < $_SERVER['CONTENT_LENGTH']) {
-			$this->addError(sprintf(Rules::$defaultMessages[self::MAX_FILE_SIZE], $maxSize));
+			$this->addError(sprintf(Validator::$messages[self::MAX_FILE_SIZE], $maxSize));
 		}
 	}
 
@@ -525,14 +529,6 @@ class Form extends Container implements Nette\Utils\IHtmlString
 	public function getOwnErrors()
 	{
 		return array_unique($this->errors);
-	}
-
-
-	/** @deprecated */
-	public function getAllErrors()
-	{
-		trigger_error(__METHOD__ . '() is deprecated; use getErrors() instead.', E_USER_DEPRECATED);
-		return $this->getErrors();
 	}
 
 

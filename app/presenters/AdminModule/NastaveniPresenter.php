@@ -38,7 +38,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $CJ = new CisloJednaci();
 
         // Klientske nastaveni
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->template->Urad = $client_config->urad;
 
         $this->template->CisloJednaci = $client_config->cislo_jednaci;
@@ -71,7 +71,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     protected function createComponentNastaveniUraduForm()
     {
 
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $Urad = $client_config->urad;
         $stat_select = Subjekt::stat();
 
@@ -121,7 +121,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config_data = Nette\Environment::getVariable('client_config');
+        $config_data = GlobalVariables::get('client_config');
 
         $config_data['urad']['nazev'] = $data['nazev'];
         $config_data['urad']['plny_nazev'] = $data['plny_nazev'];
@@ -152,7 +152,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
     protected function createComponentNastaveniCJForm()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $CJ = $client_config->cislo_jednaci;
 
         $form1 = new Spisovka\Form();
@@ -189,7 +189,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config_data = Nette\Environment::getVariable('client_config');
+        $config_data = GlobalVariables::get('client_config');
 
         $config_data['cislo_jednaci']['maska'] = $data['maska'];
 
@@ -210,7 +210,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
     protected function createComponentNastaveniForm()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $nastaveni = $client_config->nastaveni;
 
         $form1 = new Spisovka\Form();
@@ -254,7 +254,7 @@ class Admin_NastaveniPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config_data = Nette\Environment::getVariable('client_config');
+        $config_data = GlobalVariables::get('client_config');
         $config_data['nastaveni']['pocet_polozek'] = $data['pocet_polozek'];
 
         (new Spisovka\ConfigClient())->save($config_data);

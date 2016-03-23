@@ -4,8 +4,25 @@
     "license": "EUPL-1.1",
     "require": {
         "php": ">=5.4.0",
+        "ext-zip": "*",
         "dibi/dibi": "2.*",
-        "nette/nette": "2.2.*",
-        "ext-zip": "*"
-    }
+        "latte/latte": "2.3.*",
+        "nette/application": "2.3.*",
+        "nette/bootstrap": "2.3.*",
+        "nette/caching": "2.3.*",
+        "nette/forms": "2.3.*",
+        "nette/http": "2.3.*",
+        "nette/mail": "2.3.*",
+        "nette/robot-loader": "2.3.*",
+        "nette/security": "2.3.*",
+        "nette/utils": "2.3.*",
+        "tracy/tracy": "2.3.*"
+    },
+	"suggest": {
+        "ext-curl": "Komunikace se vzdálenými servery. Datová schránka.",
+        "ext-fileinfo": "Rozpoznávání typu souborů dle obsahu",
+		"ext-imap": "Příjem e-mailů",
+		"ext-openssl": "E-podatelna",
+		"ext-soap": "Datová schránka"
+	}
 }

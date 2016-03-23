@@ -8,6 +8,18 @@ class AbcFilter extends Nette\Application\UI\Control
 {
 
     /**
+     *
+     * @var Nette\Http\Request 
+     */
+    protected $httpRequest;
+    
+    public function __construct($parent, $name, Nette\Http\Request $httpRequest)
+    {
+        $this->httpRequest = $httpRequest;
+        parent::__construct($parent, $name);
+    }
+    
+    /**
      * Renders component.
      * @return void
      */
@@ -16,8 +28,7 @@ class AbcFilter extends Nette\Application\UI\Control
         $this->template->current_letter = $this->presenter->getParameter('abc');
 
         $this->template->js_function = false;
-        $request = Nette\Environment::getHttpRequest();
-        if ($request->isAjax())
+        if ($this->httpRequest->isAjax())
             $this->template->js_function = 'reloadDialog';
 
         $this->template->setFile(dirname(__FILE__) . '/template.phtml');

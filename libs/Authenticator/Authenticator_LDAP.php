@@ -5,8 +5,9 @@ class Authenticator_LDAP extends Authenticator_Basic
 
     protected $ldap;
 
-    public function __construct(Spisovka_LDAP $ldap)
+    public function __construct(Nette\Http\Request $request, Spisovka_LDAP $ldap)
     {
+        parent::__construct($request);
         $this->ldap = $ldap;
     }
 

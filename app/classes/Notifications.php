@@ -91,7 +91,7 @@ class Notifications
     {
         $subject = "Upozornění ze Spisové služby";
         
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $org_name = $client_config->urad->plny_nazev ? : $client_config->urad->nazev;
         $template = "Dobrý den,\n\n"
                 . "<message>\n\n"

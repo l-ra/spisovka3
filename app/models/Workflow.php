@@ -42,7 +42,7 @@ class Workflow extends BaseModel
 
         if (count($rows) > 0) {
 
-            $Orgjednotka = new Orgjednotka();
+            $Orgjednotka = new OrgJednotka();
             foreach ($rows as &$wf) {
                 if (!empty($wf->prideleno_id)) {
                     $osoba = Person::fromUserId($wf->prideleno_id);
@@ -75,7 +75,7 @@ class Workflow extends BaseModel
     {
         if (is_numeric($dokument_id)) {
 
-            $user = Nette\Environment::getUser();
+            $user = self::getUser();
 
             $data = array();
             $data['dokument_id'] = $dokument_id;
@@ -108,7 +108,7 @@ class Workflow extends BaseModel
             $Dokument = new Dokument();
             $dokument_info = $Dokument->getInfo($dokument_id);
 
-            $user = Nette\Environment::getUser();
+            $user = self::getUser();
 
             // Vyradime ty zamestanance, kterym byl dokument v minulosti predan
             $update = array('stav_osoby%sql' => 'stav_osoby+100', 'aktivni' => 0);
@@ -138,7 +138,7 @@ class Workflow extends BaseModel
             }
 
             if ($orgjednotka_id) {
-                $OrgJednotka = new Orgjednotka();
+                $OrgJednotka = new OrgJednotka();
                 $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                 $data['orgjednotka_id'] = $orgjednotka_id;
                 if ($org_info) {
@@ -271,7 +271,7 @@ class Workflow extends BaseModel
         if (!$predan)
             return false;
 
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
 
         // test predaneho
         // pokud neni predana osoba, tak test na vedouciho org.jednotky
@@ -279,12 +279,12 @@ class Workflow extends BaseModel
         $log = "";
         $log_plus = ".";
         if (empty($predan->prideleno_id)) {
-            if (Orgjednotka::isInOrg($predan->orgjednotka_id)) {
+            if (OrgJednotka::isInOrg($predan->orgjednotka_id)) {
                 $access = 1;
                 $log_plus = " určený organizační jednotce " . @$predan->orgjednotka_info->zkraceny_nazev . ".";
             }
         } else {
-            if ($predan->prideleno_id == $user->id || Orgjednotka::isInOrg($predan->orgjednotka_id)) {
+            if ($predan->prideleno_id == $user->id || OrgJednotka::isInOrg($predan->orgjednotka_id)) {
                 $access = 1;
             }
         }
@@ -383,7 +383,7 @@ class Workflow extends BaseModel
      */
     public function vyrizuje($dokument_id)
     {
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         $user_id = $user->id;
 
         if (!is_numeric($dokument_id))
@@ -397,11 +397,11 @@ class Workflow extends BaseModel
 
         $access = 0;
         if (empty($predan->prideleno_id)) {
-            if (Orgjednotka::isInOrg($predan->orgjednotka_id)) {
+            if (OrgJednotka::isInOrg($predan->orgjednotka_id)) {
                 $access = 1;
             }
         } else {
-            if ($predan->prideleno_id == $user_id || Orgjednotka::isInOrg($predan->orgjednotka_id)) {
+            if ($predan->prideleno_id == $user_id || OrgJednotka::isInOrg($predan->orgjednotka_id)) {
                 $access = 1;
             }
         }
@@ -450,9 +450,9 @@ class Workflow extends BaseModel
      * @return boolean|string
      * @throws Exception
      */
-    public function vyrizeno($dokument_id)
+    public function vyridit($dokument_id, BasePresenter $presenter)
     {
-        $user_id = Nette\Environment::getUser()->id;
+        $user_id = self::getUser()->id;
 
         if (!is_numeric($dokument_id))
             return false;
@@ -462,7 +462,7 @@ class Workflow extends BaseModel
             return 'neprideleno';
 
         $wf = $wf_array[0];
-        if ($wf->prideleno_id != $user_id && !Orgjednotka::isInOrg($wf->orgjednotka_id))
+        if ($wf->prideleno_id != $user_id && !OrgJednotka::isInOrg($wf->orgjednotka_id))
             return 'neprideleno';
 
         try {
@@ -473,10 +473,8 @@ class Workflow extends BaseModel
 
             // Test na uplnost dat
             if ($kontrola = $Dokument->kontrola($dokument_info)) {
-                foreach ($kontrola as $kmess) {
-                    Nette\Environment::getApplication()->getPresenter()->flashMessage($kmess,
-                            'warning');
-                }
+                foreach ($kontrola as $kmess)
+                    $presenter->flashMessage($kmess, 'warning');
                 dibi::rollback();
                 return false;
             }
@@ -533,7 +531,7 @@ class Workflow extends BaseModel
     // Kontrola opravneni se provadi uz v presenteru
     public function spustitUdalost($dokument_id, $datum_spusteni)
     {
-        $user_id = Nette\Environment::getUser()->id;
+        $user_id = self::getUser()->id;
 
         try {
             dibi::begin();
@@ -609,7 +607,7 @@ class Workflow extends BaseModel
             unset($workflow_data['id']);
             $workflow_data['stav_dokumentu'] = 6;
             $workflow_data['date'] = new DateTime();
-            $workflow_data['user_id'] = Nette\Environment::getUser()->id;
+            $workflow_data['user_id'] = self::getUser()->id;
 
             $this->deaktivovat($dokument_id);
             $result_insert = $this->insert($workflow_data);
@@ -672,7 +670,7 @@ class Workflow extends BaseModel
                 unset($workflow_data['id']);
                 $workflow_data['stav_dokumentu'] = 7;
                 $workflow_data['date'] = new DateTime();
-                $workflow_data['user_id'] = Nette\Environment::getUser()->id;
+                $workflow_data['user_id'] = self::getUser()->id;
 
                 $this->deaktivovat($dokument_id);
                 if ($this->insert($workflow_data)) {
@@ -711,7 +709,7 @@ class Workflow extends BaseModel
         if (!is_numeric($dokument_id))
             return false;
 
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         if (!$user->isAllowed('Spisovna', 'skartacni_navrh'))
             return false;
 
@@ -761,7 +759,7 @@ class Workflow extends BaseModel
     {
         if (is_numeric($dokument_id)) {
 
-            $user = Nette\Environment::getUser();
+            $user = self::getUser();
             if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
 
                 //$transaction = (! dibi::inTransaction());
@@ -816,7 +814,7 @@ class Workflow extends BaseModel
     {
         if (is_numeric($dokument_id)) {
 
-            $user = Nette\Environment::getUser();
+            $user = self::getUser();
             if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
 
                 //$transaction = (! dibi::inTransaction());
@@ -872,8 +870,8 @@ class Workflow extends BaseModel
         if (!is_numeric($dokument_id))
             return false;
 
-        $user = Nette\Environment::getUser();
-        if (!Acl::isInRole('spisovna') && !$user->isInRole('superadmin'))
+        $user = self::getUser();
+        if (!$user->inheritsFromRole('spisovna') && !$user->isInRole('superadmin'))
             return false;
 
         try {
@@ -891,7 +889,7 @@ class Workflow extends BaseModel
             $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele($user_id);
 
             $data['date'] = new DateTime();
-            $data['user_id'] = Nette\Environment::getUser()->id;
+            $data['user_id'] = self::getUser()->id;
 
             $this->insert($data);
 
@@ -984,9 +982,9 @@ class Workflow extends BaseModel
      */
     public function prirazeny($dokument_id)
     {
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         $user_id = $user->id;
-        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+        $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
 
         $param = array();
@@ -1003,7 +1001,7 @@ class Workflow extends BaseModel
         if (!$row)
             return false; // chyba integrity dat nebo parametr dokument_id je neplatny
 
-        if (Acl::isInRole('superadmin'))
+        if ($user->isInRole('superadmin'))
             return true;
 
         if ($orgjednotka_id !== null && $user->isAllowed('Dokument', 'menit_moje_oj') && $orgjednotka_id == $row->orgjednotka_id)
@@ -1033,9 +1031,9 @@ class Workflow extends BaseModel
     {
         $param = array();
 
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         $user_id = $user->id;
-        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+        $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
 
         $param['where'] = array(
@@ -1051,7 +1049,7 @@ class Workflow extends BaseModel
         if (!$row)
             return false; // zaznam nenalezen, dokument neni ve stavu predani
 
-        if (Acl::isInRole('superadmin'))
+        if ($user->isInRole('superadmin'))
             return true;
 
         if ($orgjednotka_id !== null && $user->isAllowed('Dokument', 'menit_moje_oj') && $orgjednotka_id == $row->orgjednotka_id)
@@ -1061,7 +1059,7 @@ class Workflow extends BaseModel
             // Dokument predany pouze na org. jednotku
 
             if ($isVedouci && $orgjednotka_id !== null)
-                return Orgjednotka::dejOrgUzivatele() == $row->orgjednotka_id;
+                return OrgJednotka::dejOrgUzivatele() == $row->orgjednotka_id;
 
             return false;
         }
@@ -1105,7 +1103,7 @@ class Workflow extends BaseModel
         $workflow_data['dokument_id'] = $old_data['dokument_id'];
         $workflow_data['prideleno_id'] = $old_data['prideleno_id'];
         $workflow_data['orgjednotka_id'] = $old_data['orgjednotka_id'];
-        $workflow_data['user_id'] = Nette\Environment::getUser()->id;
+        $workflow_data['user_id'] = self::getUser()->id;
         $workflow_data['stav_dokumentu'] = 5;
         $workflow_data['stav_osoby'] = 1;
         $workflow_data['date'] = new DateTime();

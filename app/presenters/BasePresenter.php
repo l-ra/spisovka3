@@ -9,13 +9,12 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
      *  avoids sending Content-Type header
      */
     static public $testMode = false;
-    protected $storage;
 
-    public function injectStorage(Storage_Basic $storage)
+    public function getStorage()
     {
-        $this->storage = $storage;
+        return $this->context->getService('storage');
     }
-
+    
     public function startup()
     {
         if (defined('APPLICATION_INSTALL')) {
@@ -156,14 +155,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->KontrolaNovychVerzi = UpdateAgent::je_aplikace_aktualni();
 
         $this->template->baseUrl = $this->getHttpRequest()->getUrl()->getBasePath();
-        $this->template->publicUrl = Nette\Environment::getVariable('publicUrl');
+        $this->template->publicUrl = GlobalVariables::get('publicUrl');
 
         $this->template->licence = '<a href="http://joinup.ec.europa.eu/software/page/eupl/licence-eupl">EUPL v.1.1</a>';
 
         /**
          * Informace o Klientovi
          */
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->template->Urad = $client_config->urad;
 
         /**
@@ -193,7 +192,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         $latte = $template->getLatte();
 
-        $set = new Nette\Latte\Macros\MacroSet($latte->getCompiler());
+        $set = new Latte\Macros\MacroSet($latte->getCompiler());
         $set->addMacro('css', 'echo \Spisovka\LatteMacros::CSS($publicUrl, %node.args);');
         $set->addMacro('js', 'echo \Spisovka\LatteMacros::JavaScript(%node.word, $publicUrl);');
 

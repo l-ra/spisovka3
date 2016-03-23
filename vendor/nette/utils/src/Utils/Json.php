@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * JSON encoder and decoder.
- *
- * @author     David Grudl
  */
 class Json
 {
@@ -91,19 +89,11 @@ class Json
 		}
 		$value = call_user_func_array('json_decode', $args);
 
-		if ($value === NULL && $json !== '' && strcasecmp($json, 'null')) { // '' is not clearing json_last_error
+		if ($value === NULL && $json !== '' && strcasecmp(trim($json, " \t\n\r"), 'null') !== 0) { // '' is not clearing json_last_error
 			$error = json_last_error();
 			throw new JsonException(isset(static::$messages[$error]) ? static::$messages[$error] : 'Unknown error', $error);
 		}
 		return $value;
 	}
 
-}
-
-
-/**
- * The exception that indicates error of JSON encoding/decoding.
- */
-class JsonException extends \Exception
-{
 }

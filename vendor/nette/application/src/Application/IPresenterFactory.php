@@ -10,8 +10,6 @@ namespace Nette\Application;
 
 /**
  * Responsible for creating a new instance of given presenter.
- *
- * @author Jan Tichý <tichy@medio.cz>
  */
 interface IPresenterFactory
 {

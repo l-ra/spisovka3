@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Select box control that allows single item selection.
- *
- * @author     David Grudl
  */
 class SelectBox extends ChoiceControl
 {
@@ -102,8 +100,8 @@ class SelectBox extends ChoiceControl
 	public function validate()
 	{
 		parent::validate();
-		if (!$this->isDisabled() && $this->prompt === FALSE && $this->getValue() === NULL && $this->options) {
-			$this->addError(Nette\Forms\Rules::$defaultMessages[self::VALID]);
+		if (!$this->isDisabled() && $this->prompt === FALSE && $this->getValue() === NULL && $this->options && $this->control->size < 2) {
+			$this->addError(Nette\Forms\Validator::$messages[self::VALID]);
 		}
 	}
 

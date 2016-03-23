@@ -46,7 +46,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $text = trim($text);
         if ($text !== '') {
 
-            $OrgJednotka = new Orgjednotka();
+            $OrgJednotka = new OrgJednotka();
             $args = array(
                 array(
                     'zkraceny_nazev LIKE %s OR', '%' . $text . '%',

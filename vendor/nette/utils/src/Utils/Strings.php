@@ -12,11 +12,12 @@ use Nette;
 
 /**
  * String tools library.
- *
- * @author     David Grudl
  */
 class Strings
 {
+
+	const TRIM_CHARACTERS = " \t\n\r\0\x0B\xC2\xA0";
+
 
 	/**
 	 * Static class - cannot be instantiated.
@@ -34,9 +35,6 @@ class Strings
 	 */
 	public static function checkEncoding($s)
 	{
-		if (func_num_args() > 1 && strcasecmp(func_get_arg(1), 'UTF-8')) {
-			trigger_error(__METHOD__ . ' supports only UTF-8 encoding.', E_USER_DEPRECATED);
-		}
 		return $s === self::fixEncoding($s);
 	}
 
@@ -48,12 +46,9 @@ class Strings
 	 */
 	public static function fixEncoding($s)
 	{
-		if (func_num_args() > 1 && strcasecmp(func_get_arg(1), 'UTF-8')) {
-			trigger_error(__METHOD__ . ' supports only UTF-8 encoding.', E_USER_DEPRECATED);
-		}
 		// removes xD800-xDFFF, x110000 and higher
 		if (PHP_VERSION_ID < 50400) {
-			return @iconv('UTF-16', 'UTF-8//IGNORE', iconv('UTF-8', 'UTF-16//IGNORE', $s)); // intentionally @
+			return @iconv('UTF-16', 'UTF-8//IGNORE', iconv('UTF-8', 'UTF-16//IGNORE', $s)); // @ - ignore encoding errors
 		} else {
 			return htmlspecialchars_decode(htmlspecialchars($s, ENT_NOQUOTES | ENT_IGNORE, 'UTF-8'), ENT_NOQUOTES);
 		}
@@ -62,13 +57,14 @@ class Strings
 
 	/**
 	 * Returns a specific character in UTF-8.
-	 * @param  int     codepoint
+	 * @param  int     code point (0x0 to 0xD7FF or 0xE000 to 0x10FFFF)
 	 * @return string
+	 * @throws Nette\InvalidArgumentException if code point is not in valid range
 	 */
 	public static function chr($code)
 	{
-		if (func_num_args() > 1 && strcasecmp(func_get_arg(1), 'UTF-8')) {
-			trigger_error(__METHOD__ . ' supports only UTF-8 encoding.', E_USER_DEPRECATED);
+		if ($code < 0 || ($code >= 0xD800 && $code <= 0xDFFF) || $code > 0x10FFFF) {
+			throw new Nette\InvalidArgumentException('Code point must be in range 0x0 to 0xD7FF or 0xE000 to 0x10FFFF.');
 		}
 		return iconv('UTF-32BE', 'UTF-8//IGNORE', pack('N', $code));
 	}
@@ -135,7 +131,7 @@ class Strings
 
 	/**
 	 * Removes special controls characters and normalizes line endings and spaces.
-	 * @param  string  UTF-8 encoding or 8-bit
+	 * @param  string  UTF-8 encoding
 	 * @return string
 	 */
 	public static function normalize($s)
@@ -143,7 +139,7 @@ class Strings
 		$s = self::normalizeNewLines($s);
 
 		// remove control characters; leave \t + \n
-		$s = preg_replace('#[\x00-\x08\x0B-\x1F\x7F]+#', '', $s);
+		$s = preg_replace('#[\x00-\x08\x0B-\x1F\x7F-\x9F]+#u', '', $s);
 
 		// right trim
 		$s = preg_replace('#[\t ]+$#m', '', $s);
@@ -173,12 +169,20 @@ class Strings
 	 */
 	public static function toAscii($s)
 	{
+		static $transliterator = NULL;
+		if ($transliterator === NULL && class_exists('Transliterator', FALSE)) {
+			$transliterator = \Transliterator::create('Any-Latin; Latin-ASCII');
+		}
+
 		$s = preg_replace('#[^\x09\x0A\x0D\x20-\x7E\xA0-\x{2FF}\x{370}-\x{10FFFF}]#u', '', $s);
 		$s = strtr($s, '`\'"^~?', "\x01\x02\x03\x04\x05\x06");
 		$s = str_replace(
 			array("\xE2\x80\x9E", "\xE2\x80\x9C", "\xE2\x80\x9D", "\xE2\x80\x9A", "\xE2\x80\x98", "\xE2\x80\x99", "\xC2\xB0"),
 			array("\x03", "\x03", "\x03", "\x02", "\x02", "\x02", "\x04"), $s
 		);
+		if ($transliterator !== NULL) {
+			$s = $transliterator->transliterate($s);
+		}
 		if (ICONV_IMPL === 'glibc') {
 			$s = str_replace(
 				array("\xC2\xBB", "\xC2\xAB", "\xE2\x80\xA6", "\xE2\x84\xA2", "\xC2\xA9", "\xC2\xAE"),
@@ -272,6 +276,17 @@ class Strings
 
 
 	/**
+	 * Convert first character to lower case.
+	 * @param  string  UTF-8 encoding
+	 * @return string
+	 */
+	public static function firstLower($s)
+	{
+		return self::lower(self::substring($s, 0, 1)) . self::substring($s, 1);
+	}
+
+
+	/**
 	 * Convert to upper case.
 	 * @param  string  UTF-8 encoding
 	 * @return string
@@ -338,7 +353,7 @@ class Strings
 		for ($i = 0; $i < strlen($first); $i++) {
 			foreach ($strings as $s) {
 				if (!isset($s[$i]) || $first[$i] !== $s[$i]) {
-					while ($i && $first[$i-1] >= "\x80" && $first[$i] >= "\x80" && $first[$i] < "\xC0") {
+					while ($i && $first[$i - 1] >= "\x80" && $first[$i] >= "\x80" && $first[$i] < "\xC0") {
 						$i--;
 					}
 					return substr($first, 0, $i);
@@ -367,7 +382,7 @@ class Strings
 	 * @param  string
 	 * @return string
 	 */
-	public static function trim($s, $charlist = " \t\n\r\0\x0B\xC2\xA0")
+	public static function trim($s, $charlist = self::TRIM_CHARACTERS)
 	{
 		$charlist = preg_quote($charlist, '#');
 		return self::replace($s, '#^['.$charlist.']+|['.$charlist.']+\z#u', '');
@@ -422,6 +437,68 @@ class Strings
 	public static function random($length = 10, $charlist = '0-9a-z')
 	{
 		return Random::generate($length, $charlist);
+	}
+
+
+	/**
+	 * Returns part of $haystack before $nth occurence of $needle.
+	 * @param  string
+	 * @param  string
+	 * @param  int  negative value means searching from the end
+	 * @return string|FALSE  returns FALSE if the needle was not found
+	 */
+	public static function before($haystack, $needle, $nth = 1)
+	{
+		$pos = self::pos($haystack, $needle, $nth);
+		return $pos === FALSE
+			? FALSE
+			: substr($haystack, 0, $pos);
+	}
+
+
+	/**
+	 * Returns part of $haystack after $nth occurence of $needle.
+	 * @param  string
+	 * @param  string
+	 * @param  int  negative value means searching from the end
+	 * @return string|FALSE  returns FALSE if the needle was not found
+	 */
+	public static function after($haystack, $needle, $nth = 1)
+	{
+		$pos = self::pos($haystack, $needle, $nth);
+		return $pos === FALSE
+			? FALSE
+			: (string) substr($haystack, $pos + strlen($needle));
+	}
+
+
+	/**
+	 * Returns position of $nth occurence of $needle in $haystack.
+	 * @return int|FALSE  offset in bytes or FALSE if the needle was not found
+	 */
+	private static function pos($haystack, $needle, $nth = 1)
+	{
+		if (!$nth) {
+			return FALSE;
+		} elseif ($nth > 0) {
+			if (strlen($needle) === 0) {
+				return 0;
+			}
+			$pos = 0;
+			while (FALSE !== ($pos = strpos($haystack, $needle, $pos)) && --$nth) {
+				$pos++;
+			}
+		} else {
+			$len = strlen($haystack);
+			if (strlen($needle) === 0) {
+				return $len;
+			}
+			$pos = $len - 1;
+			while (FALSE !== ($pos = strrpos($haystack, $needle, $pos - $len)) && ++$nth) {
+				$pos--;
+			}
+		}
+		return $pos;
 	}
 
 
@@ -511,6 +588,14 @@ class Strings
 	/** @internal */
 	public static function pcre($func, $args)
 	{
+		static $messages = array(
+			PREG_INTERNAL_ERROR => 'Internal error',
+			PREG_BACKTRACK_LIMIT_ERROR => 'Backtrack limit was exhausted',
+			PREG_RECURSION_LIMIT_ERROR => 'Recursion limit was exhausted',
+			PREG_BAD_UTF8_ERROR => 'Malformed UTF-8 data',
+			PREG_BAD_UTF8_OFFSET_ERROR => 'Offset didn\'t correspond to the begin of a valid UTF-8 code point',
+			6 => 'Failed due to limited JIT stack space', // PREG_JIT_STACKLIMIT_ERROR
+		);
 		$res = Callback::invokeSafe($func, $args, function ($message) use ($args) {
 			// compile-time error, not detectable by preg_last_error
 			throw new RegexpException($message . ' in pattern: ' . implode(' or ', (array) $args[0]));
@@ -519,33 +604,10 @@ class Strings
 		if (($code = preg_last_error()) // run-time error, but preg_last_error & return code are liars
 			&& ($res === NULL || !in_array($func, array('preg_filter', 'preg_replace_callback', 'preg_replace')))
 		) {
-			throw new RegexpException(NULL, $code, implode(' or ', (array) $args[0]));
+			throw new RegexpException((isset($messages[$code]) ? $messages[$code] : 'Unknown error')
+				. ' (pattern: ' . implode(' or ', (array) $args[0]) . ')', $code);
 		}
 		return $res;
-	}
-
-}
-
-
-/**
- * The exception that indicates error of the last Regexp execution.
- */
-class RegexpException extends \Exception
-{
-	static public $messages = array(
-		PREG_INTERNAL_ERROR => 'Internal error',
-		PREG_BACKTRACK_LIMIT_ERROR => 'Backtrack limit was exhausted',
-		PREG_RECURSION_LIMIT_ERROR => 'Recursion limit was exhausted',
-		PREG_BAD_UTF8_ERROR => 'Malformed UTF-8 data',
-		5 => 'Offset didn\'t correspond to the begin of a valid UTF-8 code point', // PREG_BAD_UTF8_OFFSET_ERROR
-	);
-
-	public function __construct($message, $code = NULL, $pattern = NULL)
-	{
-		if (!$message) {
-			$message = (isset(self::$messages[$code]) ? self::$messages[$code] : 'Unknown error') . ($pattern ? " (pattern: $pattern)" : '');
-		}
-		parent::__construct($message, $code);
 	}
 
 }

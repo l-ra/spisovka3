@@ -10,8 +10,6 @@ namespace Nette\Application\UI;
 
 /**
  * Link generation exception.
- *
- * @author     David Grudl
  */
 class InvalidLinkException extends \Exception
 {

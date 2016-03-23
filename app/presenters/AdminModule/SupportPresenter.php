@@ -57,8 +57,8 @@ class Admin_SupportPresenter extends BasePresenter
 
         echo "Konfigurace klienta:\n";
         echo "--------------------\n\n";
-        $config = $this->context->parameters;
-        print_r($config['client_config']);
+        $config = GlobalVariables::get('client_config');
+        print_r($config);
         echo "\n";
 
         echo "Konfigurace e-podatelny:\n";

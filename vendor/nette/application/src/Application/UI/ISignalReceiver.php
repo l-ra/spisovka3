@@ -10,8 +10,6 @@ namespace Nette\Application\UI;
 
 /**
  * Component with ability to receive signal.
- *
- * @author     David Grudl
  */
 interface ISignalReceiver
 {

@@ -15,7 +15,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function startup()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         $this->template->Oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
 
@@ -26,8 +26,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $this->template->Typ_evidence = $this->typ_evidence;
 
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -272,10 +272,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
             if ($isVedouci) {
                 // Uzivatel muze byt vedoucim jenom jednoho utvaru
-                $id = Orgjednotka::dejOrgUzivatele();
+                $id = OrgJednotka::dejOrgUzivatele();
                 $povoleneOrgJednotky = array();
                 if ($id)
-                    $povoleneOrgJednotky = Orgjednotka::childOrg($id);
+                    $povoleneOrgJednotky = OrgJednotka::childOrg($id);
 
                 if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky) || in_array(@$dokument->predano->orgjednotka_id,
                                 $povoleneOrgJednotky)) {
@@ -295,19 +295,19 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             // Prideleny nebo predany uzivatel
-            if (@$dokument->prideleno->prideleno_id == $user_id || (Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) && $user->isAllowed('Dokument',
+            if (@$dokument->prideleno->prideleno_id == $user_id || (OrgJednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) && $user->isAllowed('Dokument',
                             'menit_moje_oj'))) {
                 // prideleny
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
-            } else if (@$dokument->predano->prideleno_id == $user_id || (Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id) && $user->isAllowed('Dokument',
+            } else if (@$dokument->predano->prideleno_id == $user_id || (OrgJednotka::isInOrg(@$dokument->predano->orgjednotka_id) && $user->isAllowed('Dokument',
                             'menit_moje_oj'))) {
                 // predany
                 $this->template->AccessEdit = 0;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;
-            } else if ($user->isAllowed('Dokument', 'cist_moje_oj') && (Orgjednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) || Orgjednotka::isInOrg(@$dokument->predano->orgjednotka_id))) {
+            } else if ($user->isAllowed('Dokument', 'cist_moje_oj') && (OrgJednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) || OrgJednotka::isInOrg(@$dokument->predano->orgjednotka_id))) {
                 $this->template->AccessView = 1;
             }
 
@@ -334,7 +334,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->AccessEdit = 0;
 
             // SuperAdmin - moznost zasahovat do dokumentu
-            if (Acl::isInRole('superadmin')) {
+            if ($this->user->inheritsFromRole('superadmin')) {
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
@@ -374,7 +374,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             // Kontrola existence nazvu
             if ($this->template->Pridelen && $this->template->AccessEdit) {
-                if ($dokument->stav_dokumentu >= 2 && !Acl::isInRole('podatelna') && (empty($dokument->nazev) || $dokument->nazev == "(bez názvu)" )) {
+                if ($dokument->stav_dokumentu >= 2 && !$this->user->inheritsFromRole('podatelna') && (empty($dokument->nazev) || $dokument->nazev == "(bez názvu)" )) {
                     $this->template->nutnyNadpis = 1;
                     // vyvolej zobrazeni formulare editace metadat
                     $this->template->FormUpravit = 'metadata';
@@ -617,7 +617,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Workflow = new Workflow();
         if ($Workflow->prirazeny($dokument_id)) {
-            $ret = $Workflow->vyrizeno($dokument_id);
+            $ret = $Workflow->vyridit($dokument_id, $this);
             if ($ret === "udalost") {
                 // manualni udalost
                 $this->flashMessage('Označil jste tento dokument za vyřízený!');
@@ -825,7 +825,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
         } else {
 
-            if (Acl::isInRole('podatelna')) {
+            if ($this->user->inheritsFromRole('podatelna')) {
                 $dokument_typ_id = 1;
             } else {
                 $dokument_typ_id = 2;
@@ -1271,7 +1271,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dok->nazev = "";
         $form->addText('nazev', 'Věc:', 80, 250)
                 ->setValue(@$dok->nazev);
-        if (!Acl::isInRole('podatelna')) {
+        if (!$this->user->inheritsFromRole('podatelna')) {
             $form['nazev']->addRule(Nette\Forms\Form::FILLED,
                     'Název dokumentu (věc) musí být vyplněno!');
         }
@@ -1419,7 +1419,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form = new Spisovka\Form();
 
         $form->addText('nazev', 'Věc:', 80, 250);
-        if (!Acl::isInRole('podatelna'))
+        if (!$this->user->inheritsFromRole('podatelna'))
             $form['nazev']->addRule(Nette\Forms\Form::FILLED,
                     'Název dokumentu (věc) musí být vyplněn.');
 
@@ -2447,7 +2447,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         // Zde by se melo kontrolovat opravneni a podle nej pripadne Input vlozit jako Hidden pole
         // Pokud uzivatel neni v zadne org. jednotce,  na hodnote filtru "jen_moje" nezalezi
-        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+        $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
         $user = $this->user;
 
         if (($orgjednotka_id === null || !$user->isAllowed('Dokument', 'cist_moje_oj')) && !$user->isAllowed('Dokument',

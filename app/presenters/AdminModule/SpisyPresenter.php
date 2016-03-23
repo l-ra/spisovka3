@@ -8,7 +8,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     public function startup()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->template->Typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         $this->template->Oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
         parent::startup();
@@ -113,8 +113,8 @@ class Admin_SpisyPresenter extends SpisyPresenter
             $args = array('where' => array(array("tb.nazev LIKE %s", '%' . $hledat . '%')));
         }
 
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;

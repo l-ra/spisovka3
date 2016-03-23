@@ -13,8 +13,6 @@ use Nette\Forms\Form;
 
 /**
  * Single line text input control.
- *
- * @author     David Grudl
  */
 class TextInput extends TextBase
 {

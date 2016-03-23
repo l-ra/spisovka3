@@ -87,11 +87,11 @@ try {
     $httpRequest = $container->getByType('Nette\Http\IRequest');
     if ($httpRequest->isSecured())
         $publicUrl = str_replace('http:', 'https:', $publicUrl);
-    Nette\Environment::setVariable('publicUrl', $publicUrl);
+    GlobalVariables::set('publicUrl', $publicUrl);
 
 
 // konfigurace spisovky
-    Nette\Environment::setVariable('client_config', (new Spisovka\ConfigClient())->get());
+    GlobalVariables::set('client_config', (new Spisovka\ConfigClient())->get());
         
     $install_info = @file_get_contents(CLIENT_DIR . '/configs/install');
     if ($install_info === FALSE) {
@@ -99,14 +99,15 @@ try {
         @ini_set('memory_limit', '128M');
     } else {
         $app_id = substr($install_info, 0, strpos($install_info, '#'));
-        Nette\Environment::setVariable('app_id', $app_id);
+        GlobalVariables::set('app_id', $app_id);
     }
 
-    configurePdfExport();
+    setupPdfExport();
 
 // 3b) Load database
     try {
         $db_config = $container->parameters['database'];
+        GlobalVariables::set('database', Nette\Utils\ArrayHash::from($db_config));
 
         if (empty($db_config['driver']) || $db_config['driver'] == 'mysql')
             $db_config['driver'] = 'mysqli';
@@ -142,117 +143,9 @@ try {
     
 // Step 4: Setup application router
 // 
-// Detect and set HTTP protocol => HTTP(80) or HTTPS(443)
-// 
-    $force_https = false;
-    try {
-        // Nasledujici prikaz funguje az pote, co je provedena instalace
-        $force_https = Settings::get('router_force_https', false);
-    } catch (DibiException $e) {
-        // ignoruj
-    }
-
-    if ($force_https || $httpRequest->isSecured())
-        Nette\Application\Routers\Route::$defaultFlags |= Nette\Application\Routers\Route::SECURED;
-
-// Get router
-    $application = $container->getByType('Nette\Application\Application');
-    $router = $application->getRouter();
-
-    $router[] = new Nette\Application\Routers\Route('index.php',
-            array(
-        'module' => 'Spisovka',
-        'presenter' => 'Default',
-        'action' => 'default',
-            ), Nette\Application\Routers\Route::ONE_WAY);
-
-// Uzivatel
-    $router[] = new Nette\Application\Routers\Route('uzivatel/<action>/<id>',
-            array(
-        'module' => 'Spisovka',
-        'presenter' => 'Uzivatel',
-        'action' => 'default',
-        'id' => NULL,
-    ));
-// Help
-    $router[] = new Nette\Application\Routers\Route('napoveda/<param1>/<param2>/<param3>',
-            array(
-        'module' => 'Spisovka',
-        'presenter' => 'Napoveda',
-        'action' => 'default',
-        'param1' => 'obsah',
-        'param2' => 'param2',
-        'param3' => 'param3'
-    ));
-
-// Admin module
-    $router[] = new Nette\Application\Routers\Route('admin/<presenter>/<action>/<id>/<params>',
-            array(
-        'module' => 'Admin',
-        'presenter' => 'Default',
-        'action' => 'default',
-        'id' => null,
-        'params' => null
-    ));
-
-// E-podatelna module
-    $router[] = new Nette\Application\Routers\Route('epodatelna/<presenter>/<action>/<id>',
-            array(
-        'module' => 'Epodatelna',
-        'presenter' => 'Default',
-        'action' => 'default',
-        'id' => null
-    ));
-// Spisovna module
-    $router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<action>',
-            array(
-        'module' => 'Spisovna',
-        'presenter' => 'Default',
-        'action' => 'default',
-        'id' => NULL,
-    ));
-    $router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<id>/<action>',
-            array(
-        'module' => 'Spisovna',
-        'presenter' => 'Default',
-        'action' => 'detail',
-        'id' => null
-    ));
-// Install module
-    $router[] = new Nette\Application\Routers\Route('install/<action>/<id>/<params>',
-            array(
-        'module' => 'Install',
-        'presenter' => 'Default',
-        'action' => 'default',
-        'id' => null,
-        'params' => null
-    ));
-
-    $router[] = new Nette\Application\Routers\Route('zpravy/<action>/<id>',
-            array(
-        'module' => 'Spisovka',
-        'presenter' => 'Zpravy',
-        'action' => 'default',
-        'id' => NULL,
-    ));
-
-    $router[] = new Nette\Application\Routers\Route('test/<action>', 'Test:Default:');
-
-    $router[] = new Nette\Application\Routers\Route('<presenter>/<action>',
-            array(
-        'module' => 'Spisovka',
-        'presenter' => 'Default',
-        'action' => 'default',
-        'id' => NULL,
-    ));
-
-    $router[] = new Nette\Application\Routers\Route('<presenter>/<id>/<action>',
-            array(
-        'module' => 'Spisovka',
-        'presenter' => 'Default',
-        'action' => 'detail',
-        'id' => NULL,
-    ));
+    $router = $container->getByType('Nette\Application\IRouter');
+    setupRouting($httpRequest, $router);
+    
 } catch (Exception $e) {
     echo 'Behem inicializace aplikace doslo k vyjimce. Podrobnejsi informace lze nalezt v aplikacnim logu.<br>'
     . 'Podrobnosti: ' . $e->getMessage();
@@ -260,6 +153,8 @@ try {
 }
 
 // unset all global variables except PHP superglobals
+$application = $container->getByType('Nette\Application\Application');
+
 $vars = array_keys(get_defined_vars());
 foreach ($vars as $var)
     if ($var != 'application' && $var[0] != '_')
@@ -335,7 +230,7 @@ function createEpodatelnaConfig()
     @chmod("$dir/epodatelna.old", 0400);
 }
 
-function configurePdfExport()
+function setupPdfExport()
 {
     // bohuzel musime nakonfigurovat PDF export zde, protoze pro nej neexistuje spolecna funkce
     define('PDF_MEMORY_LIMIT', '512M');
@@ -351,4 +246,111 @@ function configurePdfExport()
         mkdir($mpdf_tmp_dir);
     if (!is_dir($mpdf_fontdata_dir))
         mkdir($mpdf_fontdata_dir);    
+}
+
+function setupRouting(Nette\Http\IRequest $httpRequest, Nette\Application\IRouter $router)
+{
+    $force_https = false;
+    try {
+        // Nasledujici prikaz funguje az pote, co je provedena instalace
+        $force_https = Settings::get('router_force_https', false);
+    } catch (DibiException $e) {
+        // ignoruj
+    }
+
+    if ($force_https || $httpRequest->isSecured())
+        Nette\Application\Routers\Route::$defaultFlags |= Nette\Application\Routers\Route::SECURED;
+
+    $router[] = new Nette\Application\Routers\Route('index.php',
+            array(
+        'module' => 'Spisovka',
+        'presenter' => 'Default',
+        'action' => 'default',
+            ), Nette\Application\Routers\Route::ONE_WAY);
+
+    $router[] = new Nette\Application\Routers\Route('uzivatel/<action>/<id>',
+            array(
+        'module' => 'Spisovka',
+        'presenter' => 'Uzivatel',
+        'action' => 'default',
+        'id' => NULL,
+    ));
+    
+    $router[] = new Nette\Application\Routers\Route('napoveda/<param1>/<param2>/<param3>',
+            array(
+        'module' => 'Spisovka',
+        'presenter' => 'Napoveda',
+        'action' => 'default',
+        'param1' => 'obsah',
+        'param2' => 'param2',
+        'param3' => 'param3'
+    ));
+
+    $router[] = new Nette\Application\Routers\Route('admin/<presenter>/<action>/<id>/<params>',
+            array(
+        'module' => 'Admin',
+        'presenter' => 'Default',
+        'action' => 'default',
+        'id' => null,
+        'params' => null
+    ));
+
+    $router[] = new Nette\Application\Routers\Route('epodatelna/<presenter>/<action>/<id>',
+            array(
+        'module' => 'Epodatelna',
+        'presenter' => 'Default',
+        'action' => 'default',
+        'id' => null
+    ));
+
+    $router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<action>',
+            array(
+        'module' => 'Spisovna',
+        'presenter' => 'Default',
+        'action' => 'default',
+        'id' => NULL,
+    ));
+    $router[] = new Nette\Application\Routers\Route('spisovna/<presenter>/<id>/<action>',
+            array(
+        'module' => 'Spisovna',
+        'presenter' => 'Default',
+        'action' => 'detail',
+        'id' => null
+    ));
+
+    $router[] = new Nette\Application\Routers\Route('install/<action>/<id>/<params>',
+            array(
+        'module' => 'Install',
+        'presenter' => 'Default',
+        'action' => 'default',
+        'id' => null,
+        'params' => null
+    ));
+
+    $router[] = new Nette\Application\Routers\Route('zpravy/<action>/<id>',
+            array(
+        'module' => 'Spisovka',
+        'presenter' => 'Zpravy',
+        'action' => 'default',
+        'id' => NULL,
+    ));
+
+    $router[] = new Nette\Application\Routers\Route('test/<action>', 'Test:Default:');
+
+    $router[] = new Nette\Application\Routers\Route('<presenter>/<action>',
+            array(
+        'module' => 'Spisovka',
+        'presenter' => 'Default',
+        'action' => 'default',
+        'id' => NULL,
+    ));
+
+    $router[] = new Nette\Application\Routers\Route('<presenter>/<id>/<action>',
+            array(
+        'module' => 'Spisovka',
+        'presenter' => 'Default',
+        'action' => 'detail',
+        'id' => NULL,
+    ));
+    
 }

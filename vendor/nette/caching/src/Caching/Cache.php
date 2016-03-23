@@ -13,8 +13,6 @@ use Nette\Utils\Callback;
 
 /**
  * Implements the cache for a application.
- *
- * @author     David Grudl
  */
 class Cache extends Nette\Object implements \ArrayAccess
 {
@@ -122,7 +120,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function save($key, $data, array $dependencies = NULL)
 	{
-		$this->release();
+		$this->key = $this->data = NULL;
 		$key = $this->generateKey($key);
 
 		if ($data instanceof Nette\Callback || $data instanceof \Closure) {
@@ -203,7 +201,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function clean(array $conditions = NULL)
 	{
-		$this->release();
+		$this->key = $this->data = NULL;
 		$this->storage->clean((array) $conditions);
 	}
 
@@ -283,6 +281,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function offsetSet($key, $data)
 	{
+		trigger_error('Using [] is deprecated; use Cache::save(key, data) instead.', E_USER_DEPRECATED);
 		$this->save($key, $data);
 	}
 
@@ -292,6 +291,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function offsetGet($key)
 	{
+		trigger_error('Using [] is deprecated; use Cache::load(key) instead.', E_USER_DEPRECATED);
 		$key = is_scalar($key) ? (string) $key : serialize($key);
 		if ($this->key !== $key) {
 			$this->key = $key;
@@ -306,7 +306,8 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function offsetExists($key)
 	{
-		$this->release();
+		trigger_error('Using [] is deprecated; use Cache::load(key) !== NULL instead.', E_USER_DEPRECATED);
+		$this->key = $this->data = NULL;
 		return $this->offsetGet($key) !== NULL;
 	}
 
@@ -316,6 +317,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function offsetUnset($key)
 	{
+		trigger_error('Using [] is deprecated; use Cache::remove(key) instead.', E_USER_DEPRECATED);
 		$this->save($key, NULL);
 	}
 
@@ -325,6 +327,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function release()
 	{
+		trigger_error(__METHOD__ . '() is deprecated.', E_USER_DEPRECATED);
 		$this->key = $this->data = NULL;
 	}
 

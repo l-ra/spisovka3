@@ -13,8 +13,6 @@ use Nette;
 /**
  * Container for form controls.
  *
- * @author     David Grudl
- *
  * @property   Nette\Utils\ArrayHash $values
  * @property-read \ArrayIterator $controls
  * @property-read Form $form
@@ -133,10 +131,19 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function validate(array $controls = NULL)
 	{
-		foreach ($controls === NULL ? $this->getControls() : $controls as $control) {
+		foreach ($controls === NULL ? $this->getComponents() : $controls as $control) {
 			$control->validate();
 		}
-		$this->onValidate($this);
+		if ($this->onValidate !== NULL) {
+			if (!is_array($this->onValidate) && !$this->onValidate instanceof \Traversable) {
+				throw new Nette\UnexpectedValueException('Property Form::$onValidate must be array or Traversable, ' . gettype($this->onValidate) . ' given.');
+			}
+			foreach ($this->onValidate as $handler) {
+				$params = Nette\Utils\Callback::toReflection($handler)->getParameters();
+				$values = isset($params[1]) ? $this->getValues($params[1]->isArray()) : NULL;
+				Nette\Utils\Callback::invoke($handler, $this, $values);
+			}
+		}
 		$this->validated = TRUE;
 	}
 

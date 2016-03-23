@@ -657,14 +657,14 @@ class Dokument extends BaseModel
 
 
         if (isset($params['prideleno_osobne']) && $params['prideleno_osobne']) {
-            $user_id = Nette\Environment::getUser()->id;
+            $user_id = self::getUser()->id;
             if (!isset($params['prideleno'])) {
                 $params['prideleno'] = array();
             }
             $params['prideleno'][] = $user_id;
         }
         if (isset($params['predano_osobne']) && $params['predano_osobne']) {
-            $user_id = Nette\Environment::getUser()->id;
+            $user_id = self::getUser()->id;
             if (!isset($params['predano'])) {
                 $params['predano'] = array();
             }
@@ -683,7 +683,7 @@ class Dokument extends BaseModel
 
         // Tyto parametry znamenaji prideleno / predano na MOJI org. jednotku
         if (isset($params['prideleno_na_organizacni_jednotku']) && $params['prideleno_na_organizacni_jednotku']) {
-            $oj_id = Orgjednotka::dejOrgUzivatele();
+            $oj_id = OrgJednotka::dejOrgUzivatele();
             if ($oj_id) {
                 if (!isset($params['prideleno_org']))
                     $params['prideleno_org'] = array();
@@ -691,7 +691,7 @@ class Dokument extends BaseModel
             }
         }
         if (isset($params['predano_na_organizacni_jednotku']) && $params['predano_na_organizacni_jednotku']) {
-            $oj_id = Orgjednotka::dejOrgUzivatele();
+            $oj_id = OrgJednotka::dejOrgUzivatele();
             if ($oj_id) {
                 if (!isset($params['predano_org']))
                     $params['predano_org'] = array();
@@ -719,12 +719,12 @@ class Dokument extends BaseModel
     public function fixedFiltr($nazev, $bez_vyrizenych, $pouze_dokumenty_na_osobu)
     {
 
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         $user_id = $user->id;
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
         $vyrusit_bezvyrizeni = false;
 
-        $oj_id = Orgjednotka::dejOrgUzivatele();
+        $oj_id = OrgJednotka::dejOrgUzivatele();
         $org_jednotka = array();
         if ($oj_id !== null && $user->isAllowed('Dokument', 'cist_moje_oj'))
             $org_jednotka[] = $oj_id;
@@ -809,7 +809,7 @@ class Dokument extends BaseModel
             case 'vse':
                 $a = array();
                 if ($isVedouci && $oj_id !== null)
-                    $org_jednotka = Orgjednotka::childOrg($oj_id);
+                    $org_jednotka = OrgJednotka::childOrg($oj_id);
                 break;
 
             case 'doporucene':
@@ -905,20 +905,20 @@ class Dokument extends BaseModel
 
     public function sestavaOmezeniOrg($args)
     {
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         $user_id = $user->id;
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
         $vidi_vsechny_dokumenty = self::uzivatelVidiVsechnyDokumenty();
 
         if (!$vidi_vsechny_dokumenty) {
 
-            $org_jednotka_id = Orgjednotka::dejOrgUzivatele();
+            $org_jednotka_id = OrgJednotka::dejOrgUzivatele();
 
             $org_jednotky = array();
             if ($org_jednotka_id === null)
                 ;
             else if ($isVedouci)
-                $org_jednotky = Orgjednotka::childOrg($org_jednotka_id);
+                $org_jednotky = OrgJednotka::childOrg($org_jednotka_id);
             else if ($user->isAllowed('Dokument', 'cist_moje_oj'))
                 $org_jednotky = array($org_jednotka_id);
 
@@ -1386,16 +1386,16 @@ class Dokument extends BaseModel
                 $data['skartacni_lhuta'] = null;
 
             $data['date_created'] = new DateTime();
-            $data['user_created'] = Nette\Environment::getUser()->id;
+            $data['user_created'] = self::getUser()->id;
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Nette\Environment::getUser()->id;
+            $data['user_modified'] = self::getUser()->id;
 
             $data['stav'] = isset($data['stav']) ? $data['stav'] : 1;
             $data['jid'] = '';
 
             $dokument_id = $this->insert($data);
 
-            $app_id = Nette\Environment::getVariable('app_id');
+            $app_id = GlobalVariables::get('app_id');
             $jid = "OSS-{$app_id}-ESS-$dokument_id";
             $this->update(['jid' => $jid], "id = '$dokument_id'");
 
@@ -1447,7 +1447,7 @@ class Dokument extends BaseModel
             $dokument_id = $data['id'];
             unset($data['id']);
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Nette\Environment::getUser()->id;
+            $data['user_modified'] = self::getUser()->id;
 
             $this->update($data, array(array('id=%i', $dokument_id)));
 
@@ -1504,7 +1504,7 @@ class Dokument extends BaseModel
     {
 
         $where = array('stav=0',
-            array('user_created=%i', Nette\Environment::getUser()->id)
+            array('user_created=%i', self::getUser()->id)
         );
 
         $seznam = $this->seznamKlasicky(array('where' => $where));
@@ -1652,7 +1652,7 @@ class Dokument extends BaseModel
     {
         // takto to bylo ve starem systemu
         // return ACL::isInRole('admin,podatelna,skartacni_dohled'); 
-        return Nette\Environment::getUser()->isAllowed('Dokument', 'cist_vse');
+        return self::getUser()->isAllowed('Dokument', 'cist_vse');
     }
 
 }

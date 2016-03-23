@@ -31,7 +31,7 @@ class Subjekt extends BaseModel
             // ulozit do historie
             /* $old_data = (array) $this->getInfo($subjekt_id);
             $old_data['subjekt_id'] = $subjekt_id;
-            $old_data['user_created'] = Nette\Environment::getUser()->id;
+            $old_data['user_created'] = self::getUser()->id;
             $old_data['date_created'] = new DateTime();
             unset($old_data['id'], $old_data['user_modified'], $old_data['date_modified']);
             $SubjektHistorie = new SubjektHistorie();
@@ -39,15 +39,15 @@ class Subjekt extends BaseModel
 
             // aktualizovat
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Nette\Environment::getUser()->id;
+            $data['user_modified'] = self::getUser()->id;
             $this->update($data, array(array('id = %i', $subjekt_id)));
         } else {
 
             // insert
             $data['date_created'] = new DateTime();
-            $data['user_created'] = Nette\Environment::getUser()->id;
+            $data['user_created'] = self::getUser()->id;
             $data['date_modified'] = new DateTime();
-            $data['user_modified'] = Nette\Environment::getUser()->id;
+            $data['user_modified'] = self::getUser()->id;
             $subjekt_id = $this->insert($data);
         }
 
@@ -64,7 +64,7 @@ class Subjekt extends BaseModel
         $subjekt_id = $data['id'];
         unset($data['id']);
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = Nette\Environment::getUser()->id;
+        $data['user_modified'] = self::getUser()->id;
 
         $this->update($data, array(array('id=%i', $subjekt_id)));
 
@@ -373,8 +373,7 @@ class Subjekt extends BaseModel
 
     public static function stat($kod = null, $select = 0)
     {
-        $prefix = self::getDbPrefix();
-        $tb_staty = $prefix . 'stat';
+        $tb_staty = ':PREFIX:stat';
 
         $result = dibi::query('SELECT nazev,kod FROM %n', $tb_staty,
                         'WHERE stav=1 ORDER BY nazev')->fetchAll();

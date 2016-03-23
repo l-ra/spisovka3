@@ -7,8 +7,8 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
     public function renderSeznam($hledat = null)
     {
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -29,7 +29,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
             $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
         }
 
-        $OrgJednotka = new Orgjednotka();
+        $OrgJednotka = new OrgJednotka();
 
         $result = $OrgJednotka->seznam($args);
         $paginator->itemCount = count($result);
@@ -66,7 +66,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     {
 
         $org = isset($this->template->OrgJednotka) ? $this->template->OrgJednotka : null;
-        $OrgJednotka = new Orgjednotka();
+        $OrgJednotka = new OrgJednotka();
         $org_seznam = $OrgJednotka->selectBox(1, ['exclude_id' => @$org->id]);
 
         $form1 = new Spisovka\Form();
@@ -104,7 +104,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $OrgJednotka = new Orgjednotka();
+        $OrgJednotka = new OrgJednotka();
         $orgjednotka_id = $data['id'];
         unset($data['id']);
 
@@ -132,7 +132,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
     protected function createComponentNovyForm()
     {
-        $OrgJednotka = new Orgjednotka();
+        $OrgJednotka = new OrgJednotka();
         $org_seznam = $OrgJednotka->selectBox(1);
 
         $form1 = new Spisovka\Form();
@@ -157,7 +157,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
 
         try {
-            $OrgJednotka = new Orgjednotka();
+            $OrgJednotka = new OrgJednotka();
             $orgjednotka_id = $OrgJednotka->vytvorit($data);
             if (is_object($orgjednotka_id)) {
                 $this->flashMessage('Organizační jednotku "' . $data['zkraceny_nazev'] . '" se nepodařilo vytvořit.', 'warning');
@@ -177,7 +177,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
 
         set_time_limit(600);
 
-        $Org = new Orgjednotka();
+        $Org = new OrgJednotka();
         $Org->deleteAllOrg();
 
         echo "smazano";

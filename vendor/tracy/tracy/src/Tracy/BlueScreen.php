@@ -7,13 +7,9 @@
 
 namespace Tracy;
 
-use Tracy;
-
 
 /**
  * Red BlueScreen.
- *
- * @author     David Grudl
  */
 class BlueScreen
 {
@@ -58,7 +54,16 @@ class BlueScreen
 	{
 		$panels = $this->panels;
 		$info = array_filter($this->info);
-		require __DIR__ . '/templates/bluescreen.phtml';
+		$source = Helpers::getSource();
+		$sourceIsUrl = preg_match('#^https?://#', $source);
+		$title = $exception instanceof \ErrorException
+			? Helpers::errorTypeToString($exception->getSeverity())
+			: Helpers::getClass($exception);
+		$skipError = $sourceIsUrl && $exception instanceof \ErrorException && !empty($exception->skippable)
+			? $source . (strpos($source, '?') ? '&' : '?') . '_tracy_skip_error'
+			: NULL;
+
+		require __DIR__ . '/assets/BlueScreen/bluescreen.phtml';
 	}
 
 
@@ -67,11 +72,11 @@ class BlueScreen
 	 * @param  string
 	 * @param  int
 	 * @param  int
-	 * @return string
+	 * @return string|NULL
 	 */
 	public static function highlightFile($file, $line, $lines = 15, array $vars = NULL)
 	{
-		$source = @file_get_contents($file); // intentionally @
+		$source = @file_get_contents($file); // @ file may not exist
 		if ($source) {
 			$source = static::highlightPhp($source, $line, $lines, $vars);
 			if ($editor = Helpers::editorUri($file, $line)) {
@@ -172,8 +177,10 @@ class BlueScreen
 	 */
 	public function isCollapsed($file)
 	{
+		$file = strtr($file, '\\', '/') . '/';
 		foreach ($this->collapsePaths as $path) {
-			if (strpos(strtr($file, '\\', '/'), strtr("$path/", '\\', '/')) === 0) {
+			$path = strtr($path, '\\', '/') . '/';
+			if (strncmp($file, $path, strlen($path)) === 0) {
 				return TRUE;
 			}
 		}

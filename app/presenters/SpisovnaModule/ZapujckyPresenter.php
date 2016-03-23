@@ -11,7 +11,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function startup()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         $this->oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
         $this->template->Oddelovac_poradi = $this->oddelovac_poradi;
@@ -64,8 +64,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function renderDefault($hledat)
     {
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -90,7 +90,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         /* $Zapujcka->seradit($args, $seradit);
           $this->template->seradit = $seradit; */
 
-        if (!Acl::isInRole('spisovna') && !$this->user->isInRole('superadmin'))
+        if (!$this->user->inheritsFromRole('spisovna') && !$this->user->isInRole('superadmin'))
             $args = $Zapujcka->osobni($args);
 
         $result = $Zapujcka->seznam($args);
@@ -121,7 +121,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     {
         $BA = new Spisovka\Components\BulkAction();
 
-        if (Acl::isInRole('spisovna') || $this->user->isInRole('superadmin')) {
+        if ($this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin')) {
             $actions = ['vratit' => 'Vrátit dokumenty',
                 'schvalit' => 'Schválit žádosti',
                 'odmitnout' => 'Odmítnout žádosti'
@@ -240,7 +240,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->template->Zapujcka = null;
         $zapujcka = $Zapujcka->getInfo($zapujcka_id);
         if ($zapujcka) {
-            $this->template->Opravnen_schvalit_zapujcku = Acl::isInRole('spisovna') || $this->user->isInRole('superadmin');
+            $this->template->Opravnen_schvalit_zapujcku = $this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin');
             $this->template->Zapujcka = $zapujcka;
         } else {
             // zapujcka neexistuje nebo se nepodarilo nacist
@@ -253,7 +253,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         $zapujcka_id = $this->getParameter('id');
         if (!empty($zapujcka_id) && is_numeric($zapujcka_id)) {
-            if (Acl::isInRole('spisovna') || $this->user->isInRole('superadmin')) {
+            if ($this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin')) {
 
                 $Zapujcka = new Zapujcka();
                 if ($Zapujcka->schvalit($zapujcka_id)) {
@@ -275,7 +275,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
         $zapujcka_id = $this->getParameter('id');
         if (!empty($zapujcka_id) && is_numeric($zapujcka_id)) {
-            if (Acl::isInRole('spisovna') || $this->user->isInRole('superadmin')) {
+            if ($this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin')) {
 
                 $Zapujcka = new Zapujcka();
                 if ($Zapujcka->odmitnout($zapujcka_id)) {
@@ -357,7 +357,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 ->setValue($dokument_id)
                 ->setRequired('Musí být vybrán dokument k zapůjčení!');
 
-        $pracovnik_spisovny = Acl::isInRole('spisovna') || $this->user->isInRole('superadmin');
+        $pracovnik_spisovny = $this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin');
         if ($pracovnik_spisovny) {
             $form->addText('user_text', '', 80);
             $form->addText('user_id', 'Zapůjčeno komu:')
@@ -444,7 +444,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     protected function createComponentFiltrForm()
     {
 
-        if (Acl::isInRole('spisovna') || $this->user->isInRole('superadmin')) {
+        if ($this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin')) {
             $filtr = !is_null($this->filtr) ? $this->filtr : 'vse';
             $select = [
                 'ke_schvaleni' => 'Žádosti čekající na schválení',

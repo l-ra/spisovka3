@@ -10,8 +10,6 @@ namespace Nette\Neon;
 
 /**
  * Simple generator for Nette Object Notation.
- *
- * @author     David Grudl
  */
 class Encoder
 {
@@ -30,6 +28,9 @@ class Encoder
 			return $var->format('Y-m-d H:i:s O');
 
 		} elseif ($var instanceof Entity) {
+			if ($var->value === Neon::CHAIN) {
+				return implode('', array_map(array($this, 'encode'), $var->attributes));
+			}
 			return $this->encode($var->value) . '('
 				. (is_array($var->attributes) ? substr($this->encode($var->attributes), 1, -1) : '') . ')';
 		}

@@ -14,8 +14,6 @@ use Nette\Utils\Strings;
 /**
  * MIME message part.
  *
- * @author     David Grudl
- *
  * @property   mixed $body
  */
 class MimePart extends Nette\Object
@@ -204,11 +202,7 @@ class MimePart extends Nette\Object
 	 */
 	public function setBody($body)
 	{
-		if ($body instanceof Nette\Templating\ITemplate || $body instanceof Nette\Application\UI\ITemplate) {
-			$body->mail = $this;
-			$body = $body->__toString(TRUE);
-		}
-		$this->body = $body;
+		$this->body = (string) $body;
 		return $this;
 	}
 

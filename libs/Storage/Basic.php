@@ -7,14 +7,16 @@ class Storage_Basic extends FileModel
 
     private $dokument_dir;
     private $epodatelna_dir;
+    private $httpResponse;
     private $error_message;
     private $error_code;
 
-    public function __construct(array $params)
+    public function __construct(array $params, Nette\Http\IResponse $httpResponse)
     {
-
         parent::__construct();
 
+        $this->httpResponse = $httpResponse;
+        
         $this->dokument_dir = $params['path_documents'];
         $this->epodatelna_dir = $params['path_epodatelna'];
         if ($this->dokument_dir{0} != '/')
@@ -295,7 +297,7 @@ class Storage_Basic extends FileModel
                 } else {
                     // primy stream - poslat ven
 
-                    $httpResponse = Nette\Environment::getHttpResponse();
+                    $httpResponse = $this->httpResponse;
                     $httpResponse->setContentType($file->mime_type ?: 'application/octetstream');
                     $httpResponse->setHeader('Content-Description', 'File Transfer');
                     $httpResponse->setHeader('Content-Disposition',

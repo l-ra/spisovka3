@@ -3,6 +3,16 @@
 class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthenticator
 {
 
+    /**
+     * @var Nette\Http\Request 
+     */
+    protected $httpRequest;
+    
+    public function __construct(Nette\Http\Request $request)
+    {
+        $this->httpRequest = $request;
+    }
+    
     public function supportsRemoteAuth()
     {
         return false;
@@ -44,17 +54,18 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
             throw new Nette\Security\AuthenticationException(
             "Při ověřování hesla došlo k problému: " . $e->getMessage(), self::FAILURE);
         }
+        $ip_address = $this->httpRequest->getRemoteAddress();
         if (!$success) {
-            $log->logAccess($account->id, 0);
+            $log->logAccess($account->id, 0, $ip_address);
             throw new Nette\Security\AuthenticationException("Neplatné heslo.",
             self::INVALID_CREDENTIAL);
         }
 
         $account->last_login = new DateTime();
-        $account->last_ip = Nette\Environment::getHttpRequest()->getRemoteAddress();
+        $account->last_ip = 
         $account->save();
         
-        $log->logAccess($account->id, 1);
+        $log->logAccess($account->id, 1, $ip_address);
 
         // Odstraneni hesla v identite
         unset($account->password);

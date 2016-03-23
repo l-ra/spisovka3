@@ -13,8 +13,6 @@ use Nette\Application\UI;
 
 /**
  * Latte powered template factory.
- *
- * @author     David Grudl
  */
 class TemplateFactory extends Nette\Object implements UI\ITemplateFactory
 {
@@ -48,11 +46,11 @@ class TemplateFactory extends Nette\Object implements UI\ITemplateFactory
 	/**
 	 * @return Template
 	 */
-	public function createTemplate(UI\Control $control)
+	public function createTemplate(UI\Control $control = NULL)
 	{
 		$latte = $this->latteFactory->create();
 		$template = new Template($latte);
-		$presenter = $control->getPresenter(FALSE);
+		$presenter = $control ? $control->getPresenter(FALSE) : NULL;
 
 		if ($control instanceof UI\Presenter) {
 			$latte->setLoader(new Loader($control));
@@ -69,7 +67,9 @@ class TemplateFactory extends Nette\Object implements UI\ITemplateFactory
 			if (class_exists('Nette\Bridges\FormsLatte\FormMacros')) {
 				Nette\Bridges\FormsLatte\FormMacros::install($latte->getCompiler());
 			}
-			$control->templatePrepareFilters($template);
+			if ($control) {
+				$control->templatePrepareFilters($template);
+			}
 		});
 
 		$latte->addFilter('url', 'rawurlencode'); // back compatiblity
@@ -83,6 +83,12 @@ class TemplateFactory extends Nette\Object implements UI\ITemplateFactory
 		$latte->addFilter('modifyDate', function ($time, $delta, $unit = NULL) {
 			return $time == NULL ? NULL : Nette\Utils\DateTime::from($time)->modify($delta . $unit); // intentionally ==
 		});
+
+		if (!array_key_exists('translate', $latte->getFilters())) {
+			$latte->addFilter('translate', function () {
+				throw new Nette\InvalidStateException('Translator has not been set. Set translator using $template->setTranslator().');
+			});
+		}
 
 		// default parameters
 		$template->control = $template->_control = $control;

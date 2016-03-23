@@ -16,7 +16,7 @@ abstract class CachedDBEntity extends DBEntity
 
     private function _invalidateCacheEntry()
     {
-        DBCache::delete($this->_getCacheEntryName());        
+        DbCache::delete($this->_getCacheEntryName());        
     }
     
     protected function _load()

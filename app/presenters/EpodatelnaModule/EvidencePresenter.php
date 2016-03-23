@@ -9,11 +9,10 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     private $hledat;
     private $Epodatelna;
     private $typ_evidence = null;
-    protected $storage;
 
     public function startup()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
 
         parent::startup();
@@ -136,7 +135,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         /* Priprava dokumentu */
         $Dokumenty = new Dokument();
 
-        $rozdelany = Nette\Environment::getSession('s3_rozdelany');
+        $rozdelany = $this->getSession('s3_rozdelany');
         $rozdelany_dokument = null;
 
         if (isset($rozdelany->is)) {
@@ -504,7 +503,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                 $this->flashMessage('Dokument byl vytvořen.');
 
-                $rozdelany = Nette\Environment::getSession('s3_rozdelany');
+                $rozdelany = $this->getSession('s3_rozdelany');
                 unset($rozdelany->is, $rozdelany->dokument_id, $rozdelany);
 
                 if (!empty($predani['predano_user']) || !empty($predani['predano_org'])) {
@@ -517,7 +516,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         $osoba = Person::fromUserId($predani['predano_user']);
                         $predano = Osoba::displayName($osoba);
                     } else if (!empty($predani['predano_org'])) {
-                        $Org = new Orgjednotka();
+                        $Org = new OrgJednotka();
                         $orgjednotka = $Org->getInfo($predani['predano_org']);
                         $predano = @$orgjednotka->ciselna_rada . " - " . @$orgjednotka->plny_nazev;
                     }
@@ -623,7 +622,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $osoba = Person::fromUserId($data['predano_user']);
                 $predano = Osoba::displayName($osoba);
             } else if (!empty($data['predano_org'])) {
-                $Org = new Orgjednotka();
+                $Org = new OrgJednotka();
                 $orgjednotka = $Org->getInfo($data['predano_org']);
                 $predano = @$orgjednotka->ciselna_rada . " - " . @$orgjednotka->plny_nazev;
             }
@@ -903,7 +902,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $mail->setFromConfig();
                 $mail->addTo($data['email']);
                 $mail->setSubject($data['predmet']);
-                $zprava = ESSMail::appendSignature($data['zprava']);
+                $zprava = ESSMail::appendSignature($data['zprava'], $this->user);
                 $mail->setBody($zprava);
                 $mail->send();
 

@@ -13,8 +13,6 @@ use Latte;
 /**
  * Smarter caching iterator.
  *
- * @author     David Grudl
- *
  * @property-read bool $first
  * @property-read bool $last
  * @property-read bool $empty
@@ -198,7 +196,7 @@ class CachingIterator extends \CachingIterator implements \Countable
 			$ret = $this->$m();
 			return $ret;
 		}
-		throw new \LogicException(sprintf('Cannot read an undeclared property %s::$%s.', get_class($this), $name));
+		throw new \LogicException(sprintf('Attempt to read undeclared property %s::$%s.', get_class($this), $name));
 	}
 
 
@@ -208,7 +206,7 @@ class CachingIterator extends \CachingIterator implements \Countable
 	 */
 	public function __set($name, $value)
 	{
-		throw new \LogicException(sprintf('Cannot write to an undeclared property %s::$%s.', get_class($this), $name));
+		throw new \LogicException(sprintf('Attempt to write to undeclared property %s::$%s.', get_class($this), $name));
 	}
 
 
@@ -228,7 +226,7 @@ class CachingIterator extends \CachingIterator implements \Countable
 	 */
 	public function __unset($name)
 	{
-		throw new \LogicException(sprintf('Cannot unset the property %s::$%s.', get_class($this), $name));
+		throw new \LogicException(sprintf('Attempt to unset undeclared property %s::$%s.', get_class($this), $name));
 	}
 
 }

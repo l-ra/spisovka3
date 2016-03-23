@@ -10,8 +10,6 @@ namespace Latte;
 
 /**
  * Macro tag tokenizer.
- *
- * @author     David Grudl
  */
 class MacroTokens extends TokenIterator
 {
@@ -108,6 +106,12 @@ class MacroTokens extends TokenIterator
 		do {
 			$words[] = $this->joinUntil(self::T_WHITESPACE, ',', ':');
 		} while ($this->nextToken(':'));
+
+		if (count($words) === 1 && ($space = $this->nextValue(self::T_WHITESPACE))
+			&& (($dot = $this->nextValue('.')) || $this->isPrev('.')))
+		{
+			$words[0] .= $space . $dot . $this->joinUntil(',');
+		}
 		$this->nextToken(',');
 		$this->nextAll(self::T_WHITESPACE, self::T_COMMENT);
 		return $words === array('') ? array() : $words;

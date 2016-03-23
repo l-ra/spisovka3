@@ -17,7 +17,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function startup()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         $this->template->Oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
         $this->template->Typ_evidence = $this->typ_evidence;
@@ -99,8 +99,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     protected function seznam()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;

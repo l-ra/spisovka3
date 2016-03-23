@@ -381,7 +381,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
         static $select;
 
         if (!$select) {
-            $m = new Orgjednotka;
+            $m = new OrgJednotka;
             $seznam = $m->linearniSeznam();
             $select = array(0 => 'žádná');
             foreach ($seznam as $org)

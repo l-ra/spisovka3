@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * File download response.
- *
- * @author     David Grudl
  */
 class FileResponse extends Nette\Object implements Nette\Application\IResponse
 {

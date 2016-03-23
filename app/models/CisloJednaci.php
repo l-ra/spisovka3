@@ -17,7 +17,7 @@ class CisloJednaci extends BaseModel
     {
         parent::__construct();
 
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->info = $client_config->cislo_jednaci;
         $this->urad = $client_config->urad;
 
@@ -31,16 +31,16 @@ class CisloJednaci extends BaseModel
             }
         }
 
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         $this->user_account = new UserAccount($user->id);
         $this->person = $this->user_account->getPerson();
 
-        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+        $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
 
         if (empty($orgjednotka_id)) {
             $this->org = null;
         } else {
-            $Org = new Orgjednotka();
+            $Org = new OrgJednotka();
             $this->org = $Org->getInfo($orgjednotka_id);
         }
 
@@ -201,7 +201,7 @@ class CisloJednaci extends BaseModel
             $orgjednotka_id = $row->orgjednotka_id;
             $info['orgjednotka_id'] = $orgjednotka_id;
             if ($orgjednotka_id !== null) {
-                $OrgJednotka = new Orgjednotka();
+                $OrgJednotka = new OrgJednotka();
                 $org_info = $OrgJednotka->getInfo($orgjednotka_id);
                 $info['org'] = $org_info->ciselna_rada;
             } else {

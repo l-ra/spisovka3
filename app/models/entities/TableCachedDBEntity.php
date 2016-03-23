@@ -31,7 +31,7 @@ abstract class TableCachedDBEntity extends DBEntity
     
     protected static function _invalidateCache()
     {
-        DBCache::delete(static::_getCacheEntryName());        
+        DbCache::delete(static::_getCacheEntryName());        
     }
 
     public static function create(array $data)

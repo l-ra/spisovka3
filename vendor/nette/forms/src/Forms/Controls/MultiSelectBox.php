@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Select box control that allows multiple items selection.
- *
- * @author     David Grudl
  */
 class MultiSelectBox extends MultiChoiceControl
 {
@@ -64,14 +62,6 @@ class MultiSelectBox extends MultiChoiceControl
 				'disabled:' => is_array($this->disabled) ? $this->disabled : NULL,
 			)
 		)->addAttributes(parent::getControl()->attrs)->multiple(TRUE);
-	}
-
-
-	/** @deprecated */
-	function getSelectedItem()
-	{
-		trigger_error(__METHOD__ . '(TRUE) is deprecated; use getSelectedItems() instead.', E_USER_DEPRECATED);
-		return $this->getSelectedItems();
 	}
 
 }

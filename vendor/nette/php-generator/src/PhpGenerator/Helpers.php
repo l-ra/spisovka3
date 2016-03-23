@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\PhpGenerator;
@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * PHP code generator utils.
- *
- * @author     David Grudl
  */
 class Helpers
 {
@@ -58,6 +56,9 @@ class Helpers
 			}
 			return '"' . strtr($var, $table) . '"';
 
+		} elseif (is_string($var)) {
+			return "'" . preg_replace('#\'|\\\\(?=[\'\\\\]|\z)#', '\\\\$0', $var) . "'";
+
 		} elseif (is_array($var)) {
 			$space = str_repeat("\t", $level);
 
@@ -92,7 +93,13 @@ class Helpers
 			$var = serialize($var);
 			return 'unserialize(' . self::_dump($var, $level) . ')';
 
+		} elseif ($var instanceof \Closure) {
+			throw new Nette\InvalidArgumentException('Cannot dump closure.');
+
 		} elseif (is_object($var)) {
+			if (PHP_VERSION_ID >= 70000 && ($rc = new \ReflectionObject($var)) && $rc->isAnonymous()) {
+				throw new Nette\InvalidArgumentException('Cannot dump anonymous class.');
+			}
 			$arr = (array) $var;
 			$space = str_repeat("\t", $level);
 			$class = get_class($var);
@@ -157,15 +164,22 @@ class Helpers
 				if (!is_array($arg)) {
 					throw new Nette\InvalidArgumentException('Argument must be an array.');
 				}
-				$arg = implode(', ', array_map(array(__CLASS__, 'dump'), $arg));
-				$statement = substr_replace($statement, $arg, $a, 2);
+				$s = substr($statement, 0, $a);
+				$sep = '';
+				foreach ($arg as $tmp) {
+					$s .= $sep . self::dump($tmp);
+					$sep = strlen($s) - strrpos($s, "\n") > 100 ? ",\n\t" : ', ';
+				}
+				$statement = $s . substr($statement, $a + 2);
+				$a = strlen($s);
 
 			} else {
 				$arg = substr($statement, $a - 1, 1) === '$' || in_array(substr($statement, $a - 2, 2), array('->', '::'), TRUE)
 					? self::formatMember($arg) : self::_dump($arg);
 				$statement = substr_replace($statement, $arg, $a, 1);
+				$a += strlen($arg);
 			}
-			$a = strpos($statement, '?', $a + strlen($arg));
+			$a = strpos($statement, '?', $a);
 		}
 		return $statement;
 	}
@@ -196,6 +210,26 @@ class Helpers
 	public static function createObject($class, array $props)
 	{
 		return unserialize('O' . substr(serialize((string) $class), 1, -1) . substr(serialize($props), 1));
+	}
+
+
+	/**
+	 * @param  string
+	 * @return string
+	 */
+	public static function extractNamespace($name)
+	{
+		return ($pos = strrpos($name, '\\')) ? substr($name, 0, $pos) : '';
+	}
+
+
+	/**
+	 * @param  string
+	 * @return string
+	 */
+	public static function extractShortName($name)
+	{
+		return ($pos = strrpos($name, '\\')) === FALSE ? $name : substr($name, $pos + 1);
 	}
 
 }

@@ -42,7 +42,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $account = new UserAccount($user);
         $this->template->Osoba = $person = $account->getPerson();
         $this->template->Uzivatel = $account;
-        $this->template->Org_jednotka = $account->orgjednotka_id !== null ? Orgjednotka::getName($account->orgjednotka_id)
+        $this->template->Org_jednotka = $account->orgjednotka_id !== null ? OrgJednotka::getName($account->orgjednotka_id)
                         : 'žádná';
 
         $Auth1 = $this->context->createService('authenticatorUI');
@@ -122,7 +122,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $seznam = $Zamestnanci->seznamOsobSUcty();
         $this->template->seznam = $seznam;
 
-        $OrgJednotky = new Orgjednotka();
+        $OrgJednotky = new OrgJednotka();
         $oseznam = $OrgJednotky->linearniSeznam();
         $this->template->org_seznam = $oseznam;
     }
@@ -177,7 +177,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     protected function _ojSeznam($term)
     {
-        $OrgJednotky = new Orgjednotka();
+        $OrgJednotky = new OrgJednotka();
 
         $args = empty($term) ? null : ['where' => [['LOWER(tb.ciselna_rada) LIKE LOWER(%s)', '%' . $term . '%', ' OR LOWER(tb.zkraceny_nazev) LIKE LOWER(%s)', '%' . $term . '%']]];
         $seznam_orgjednotek = $OrgJednotky->nacti($args);

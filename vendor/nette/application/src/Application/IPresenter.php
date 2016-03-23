@@ -10,8 +10,6 @@ namespace Nette\Application;
 
 /**
  * Presenter converts Request to IResponse.
- *
- * @author     David Grudl
  */
 interface IPresenter
 {

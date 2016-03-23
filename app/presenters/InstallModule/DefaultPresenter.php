@@ -9,7 +9,7 @@ class Install_DefaultPresenter extends BasePresenter
         if (!defined('APPLICATION_INSTALL') && $this->action != "kontrola")
             $this->setView('instalovano');
 
-        $session = Nette\Environment::getSession('s3_install');
+        $session = $this->getSession('s3_install');
 
         parent::startup();
 
@@ -19,7 +19,7 @@ class Install_DefaultPresenter extends BasePresenter
     public function renderDefault()
     {
 
-        $session = Nette\Environment::getSession('s3_install');
+        $session = $this->getSession('s3_install');
         unset($session->step);
 
         //$this->redirect('uvod');
@@ -27,7 +27,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderUvod()
     {
-        $session = Nette\Environment::getSession('s3_install');
+        $session = $this->getSession('s3_install');
         if (!isset($session->step)) {
             $session->step = array();
         }
@@ -38,7 +38,7 @@ class Install_DefaultPresenter extends BasePresenter
         $installed = !defined('APPLICATION_INSTALL');
         $this->template->installed = $installed;
         if (!$installed) {
-            $session = Nette\Environment::getSession('s3_install');
+            $session = $this->getSession('s3_install');
             if (!isset($session->step)) {
                 $session->step = array();
             }
@@ -114,7 +114,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         // DB test
         try {
-            $db_info = Nette\Environment::getConfig('database');
+            $db_info = GlobalVariables::get('database');
             dibi::connect($db_info);
             $database_support = 1;
             $database_info = $db_info['driver'] . '://' . $db_info['username'] . '@' . $db_info['host'] . '/' . $db_info['database'];
@@ -474,7 +474,7 @@ class Install_DefaultPresenter extends BasePresenter
     public function renderDatabaze()
     {
 
-        $session = Nette\Environment::getSession('s3_install');
+        $session = $this->getSession('s3_install');
         if (!isset($session->step)) {
             $session->step = array();
         }
@@ -486,7 +486,7 @@ class Install_DefaultPresenter extends BasePresenter
         $this->template->tabulka_jiz_existuje = false;
 
         try {
-            $db_config = Nette\Environment::getConfig('database');
+            $db_config = GlobalVariables::get('database');
             dibi::connect($db_config);
 
             $db_tables = dibi::getDatabaseInfo()->getTableNames();
@@ -601,7 +601,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderUrad()
     {
-        $session = Nette\Environment::getSession('s3_install');
+        $session = $this->getSession('s3_install');
         if (!isset($session->step)) {
             $session->step = array();
         }
@@ -612,7 +612,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderEvidence()
     {
-        $session = Nette\Environment::getSession('s3_install');
+        $session = $this->getSession('s3_install');
         if (!isset($session->step)) {
             $session->step = array();
         }
@@ -624,7 +624,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderSpravce()
     {
-        $session = Nette\Environment::getSession('s3_install');
+        $session = $this->getSession('s3_install');
         if (!isset($session->step)) {
             $session->step = array();
         }
@@ -637,7 +637,7 @@ class Install_DefaultPresenter extends BasePresenter
     public function renderKonec()
     {
 
-        $session = Nette\Environment::getSession('s3_install');
+        $session = $this->getSession('s3_install');
 
         $dokonceno = 1;
         $errors = array();
@@ -699,7 +699,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     protected function createComponentNastaveniUraduForm()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $Urad = $client_config->urad;
         $stat_select = Subjekt::stat();
 
@@ -766,7 +766,7 @@ class Install_DefaultPresenter extends BasePresenter
         try {
             (new Spisovka\ConfigClient())->save($config_data);
 
-            $session = Nette\Environment::getSession('s3_install');
+            $session = $this->getSession('s3_install');
             if (!isset($session->step)) {
                 $session->step = array();
             }
@@ -784,7 +784,7 @@ class Install_DefaultPresenter extends BasePresenter
     protected function createComponentNastaveniCJForm()
     {
 
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $CJ = $client_config->cislo_jednaci;
 
         $evidence = array("priorace" => "Priorace", "sberny_arch" => "Sběrný arch");
@@ -818,7 +818,7 @@ class Install_DefaultPresenter extends BasePresenter
         try {
             (new Spisovka\ConfigClient())->save($config_data);
 
-            $session = Nette\Environment::getSession('s3_install');
+            $session = $this->getSession('s3_install');
             if (!isset($session->step)) {
                 $session->step = array();
             }
@@ -889,7 +889,7 @@ class Install_DefaultPresenter extends BasePresenter
         if (!$auth->vytvoritUcet((array) $data, $user_data, true)) {
             $this->flashMessage('Správce se nepodařilo vytvořit.', 'warning');
         } else {
-            $session = Nette\Environment::getSession('s3_install');
+            $session = $this->getSession('s3_install');
             if (!isset($session->step)) {
                 $session->step = array();
             }

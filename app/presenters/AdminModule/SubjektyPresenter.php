@@ -54,11 +54,10 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
     public function renderSeznam($hledat = null, $abc = null)
     {
-
         // paginator
-        new AbcFilter($this, 'abc');
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        new AbcFilter($this, 'abc', $this->getHttpRequest());
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;

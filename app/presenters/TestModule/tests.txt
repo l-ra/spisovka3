@@ -30,6 +30,7 @@
 :Epodatelna:Default:nove
 :Epodatelna:Default:prichozi
 :Epodatelna:Default:odchozi
+:Epodatelna:Default:zkontrolovatAjax NULL
 :Spisovna:Default: RedirectResponse
 :Spisovna:Dokumenty:
 :Spisovna:Dokumenty:prijem
@@ -98,3 +99,4 @@
 :Spisovka:Uzivatel:
 :Spisovka:Uzivatel: { "id": 1, "upravit": "info" }
 :Spisovka:Uzivatel: { "zmenitheslo": 1 }
+:Install:Default:kontrola

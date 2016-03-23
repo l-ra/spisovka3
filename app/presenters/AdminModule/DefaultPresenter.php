@@ -14,7 +14,7 @@ class Admin_DefaultPresenter extends BasePresenter
             $this->redirect('default');
         }
         
-        DBCache::clearCache();
+        DbCache::clearCache();
 
         $this->flashMessage('Databázová cache byla smazána.');
         $this->redirect(':Admin:default:ostatni');

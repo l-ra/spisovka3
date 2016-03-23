@@ -10,8 +10,6 @@ namespace Nette\Caching;
 
 /**
  * Cache storage.
- *
- * @author     David Grudl
  */
 interface IStorage
 {

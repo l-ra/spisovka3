@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Forwards to new request.
- *
- * @author     David Grudl
  */
 class ForwardResponse extends Nette\Object implements Nette\Application\IResponse
 {

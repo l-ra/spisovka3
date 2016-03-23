@@ -3,12 +3,19 @@
 class Admin_OpravneniPresenter extends BasePresenter
 {
 
+    protected $authorizator;
+    
+    public function __construct(\Nette\Security\IAuthorizator $authorizator)
+    {
+        parent::__construct();
+        $this->authorizator = $authorizator;        
+    }
     public function renderSeznam()
     {
         $this->template->title = " - Seznam rolí";
 
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -32,8 +39,8 @@ class Admin_OpravneniPresenter extends BasePresenter
 
         // Opravneni
         $AclModel = new AclModel();
-        $opravneni = $AclModel->seznamOpravneni($role !== null ? $role->code : null);
-        $pravidla = $AclModel->seznamPravidel($role !== null ? $role->code : null);
+        $opravneni = $AclModel->seznamOpravneni($role->code);
+        $pravidla = $AclModel->seznamPravidel($role, $this->authorizator);
         $this->template->seznamOpravneni = $opravneni;
         $this->template->seznamPravidel = $pravidla;
     }

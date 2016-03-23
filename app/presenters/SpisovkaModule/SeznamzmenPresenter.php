@@ -13,6 +13,7 @@ class Spisovka_SeznamzmenPresenter extends BasePresenter
         }
 
         $this->template->changelog = $log;
+        // $this->setLayout('admin');
     }
 
 }

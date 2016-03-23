@@ -10,8 +10,6 @@ namespace Nette\Mail;
 
 /**
  * Mailer interface.
- *
- * @author     David Grudl
  */
 interface IMailer
 {
@@ -19,6 +17,7 @@ interface IMailer
 	/**
 	 * Sends email.
 	 * @return void
+	 * @throws SendException
 	 */
 	function send(Message $mail);
 

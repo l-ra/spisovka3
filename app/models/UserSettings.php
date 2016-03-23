@@ -5,12 +5,14 @@ class UserSettings
 
     const TABLE_NAME = 'user_settings';
 
-    protected static $instance = null;
+    private static $instance = null;
 
-    protected static function _getInstance()
+    private static function _getInstance()
     {
-        if (self::$instance === null)
-            self::$instance = new self;
+        if (self::$instance === null) {
+            $user_id = Nette\Environment::getUser()->id;
+            self::$instance = new self($user_id);
+        }
         return self::$instance;
     }
 
@@ -42,22 +44,20 @@ class UserSettings
 
     protected $user_id;
     protected $settings = array();
-    protected $table_prefix;
 
-    protected function __construct($user_id = null)
+    protected function __construct($user_id)
     {
-        $this->user_id = $user_id !== null ? $user_id : Nette\Environment::getUser()->id;
-        $this->table_prefix = BaseModel::getDbPrefix();
+        $this->user_id = $user_id;
 
         $result = dibi::query('SELECT [settings] FROM %n',
-                        $this->table_prefix . self::TABLE_NAME, 'WHERE [id] = %i',
+                        ':PREFIX:' . self::TABLE_NAME, 'WHERE [id] = %i',
                         $this->user_id);
         if (count($result) > 0) {
             $value = unserialize($result->fetchSingle());
             if ($value !== false)
                 $this->settings = $value;
         } else
-            dibi::query('INSERT INTO %n', $this->table_prefix . self::TABLE_NAME,
+            dibi::query('INSERT INTO %n', ':PREFIX:' . self::TABLE_NAME,
                     'VALUES (%i, %s)', $this->user_id, serialize(array()));
     }
 
@@ -82,7 +82,7 @@ class UserSettings
 
     protected function _flush()
     {
-        dibi::query('UPDATE %n', $this->table_prefix . self::TABLE_NAME, 'SET [settings] = %s',
+        dibi::query('UPDATE %n', ':PREFIX:' . self::TABLE_NAME, 'SET [settings] = %s',
                 serialize($this->settings), 'WHERE [id] = %i', $this->user_id);
     }
 
@@ -93,11 +93,6 @@ class UserSettings
  */
 class OtherUserSettings extends UserSettings
 {
-
-    public function __construct($user_id)
-    {
-        parent::__construct($user_id);
-    }
 
     public function _getAll()
     {

@@ -46,14 +46,10 @@ class Settings
     // ------------------------------------------------------------
 
     protected $settings = array();
-    protected $table_prefix;
 
     protected function __construct()
     {
-
-        $this->table_prefix = BaseModel::getDbPrefix();
-
-        $result = dibi::query('SELECT * FROM %n', $this->table_prefix . self::TABLE_NAME);
+        $result = dibi::query('SELECT * FROM %n', ':PREFIX:' . self::TABLE_NAME);
         if (count($result) > 0)
             foreach ($result as $row) {
                 $value = $row->value;
@@ -89,18 +85,18 @@ class Settings
 
         if ($value === null) {
             unset($this->settings[$key]);
-            dibi::query('DELETE FROM %n', $this->table_prefix . self::TABLE_NAME,
+            dibi::query('DELETE FROM %n', ':PREFIX:' . self::TABLE_NAME,
                     'WHERE [name] = %s', $key);
         } else if (isset($this->settings[$key])) {
             // Je-li promenna jiz nastavena na stejnou hodnotu, pak nic neprovadej
             if ($this->settings[$key] != $value) {
                 $this->settings[$key] = $value;
-                dibi::query('UPDATE %n', $this->table_prefix . self::TABLE_NAME,
+                dibi::query('UPDATE %n', ':PREFIX:' . self::TABLE_NAME,
                         'SET [value] = %s', $db_value, 'WHERE [name] = %s', $key);
             }
         } else {
             $this->settings[$key] = $value;
-            dibi::query('INSERT INTO %n', $this->table_prefix . self::TABLE_NAME,
+            dibi::query('INSERT INTO %n', ':PREFIX:' . self::TABLE_NAME,
                     '([name], [value]) VALUES (%s, %s)', $key, $db_value);
         }
     }

@@ -67,9 +67,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderDefault()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
 
-        $vp = new VisualPaginator($this, 'vp');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -255,10 +255,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
             // P.L. V podacim deniku nemohou byt dokumenty, ktere nemaji c.j.
             $args['where'][] = 'd.cislo_jednaci IS NOT NULL';
 
-            $client_config = Nette\Environment::getVariable('client_config');
+            $client_config = GlobalVariables::get('client_config');
 
             if ($client_config->cislo_jednaci->typ_deniku == "org") {
-                $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+                $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
                 $org = $orgjednotka_id === null ? null : new OrgUnit($orgjednotka_id);
 
                 // jen zaznamy z vlastniho podaciho deniku organizacni jednotky

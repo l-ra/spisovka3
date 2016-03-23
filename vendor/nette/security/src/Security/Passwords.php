@@ -12,12 +12,9 @@ use Nette;
 
 /**
  * Passwords tools. Requires PHP >= 5.3.7.
- *
- * @author     David Grudl
  */
 class Passwords
 {
-	const PASSWORD_MAX_LENGTH = 4096;
 	const BCRYPT_COST = 10;
 
 

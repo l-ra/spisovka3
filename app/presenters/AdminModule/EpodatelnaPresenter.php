@@ -133,7 +133,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
 
         if (isset($this->info['podatelna']) && !empty($this->info['podatelna'])) {
-            $this->info['podatelna'] = Orgjednotka::getName($this->info['podatelna']);
+            $this->info['podatelna'] = OrgJednotka::getName($this->info['podatelna']);
         }
 
         $this->template->Info = $this->info;
@@ -169,7 +169,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $isds = !empty($id) ? $ep['isds'][$index] : array();
 
         $org_select = array('0' => 'Kterákoli podatelna');
-        $OrgJednotky = new Orgjednotka();
+        $OrgJednotky = new OrgJednotka();
         if ($orgjednotky_data = $OrgJednotky->seznam()->fetchAll())
             foreach ($orgjednotky_data as $oj)
                 $org_select[$oj->id] = $oj->ciselna_rada . ' - ' . $oj->zkraceny_nazev;
@@ -461,7 +461,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $email = !empty($id) ? $ep['email'][$index] : array();
 
         $org_select = array('0' => 'Kterákoli podatelna');
-        $OrgJednotky = new Orgjednotka();
+        $OrgJednotky = new OrgJednotka();
         if ($orgjednotky_data = $OrgJednotky->seznam()->fetchAll())
             foreach ($orgjednotky_data as $oj)
                 $org_select[$oj->id] = $oj->ciselna_rada . ' - ' . $oj->zkraceny_nazev;

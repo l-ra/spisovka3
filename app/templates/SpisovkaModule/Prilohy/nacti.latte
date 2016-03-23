@@ -6,7 +6,7 @@
                     <input type="checkbox" name="prilohy[{$file->id}]" />
                 </td>
                 <td class="icon">
-                    <img src="{$file->mime_type_icon}" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
+                    <img src="{$publicUrl}{$file->mime_type_icon}" alt="{$file->mime_type}" title="{$file->mime_type}" width="32" height="32" />
                 </td>
                 <td class="meta">
                     <a href="{link :Spisovka:Dokumenty:download, 'id'=>$dokument_id, 'file'=>$file->id}">{$file->nazev}</a>

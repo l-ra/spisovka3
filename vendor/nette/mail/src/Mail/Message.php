@@ -14,8 +14,6 @@ use Nette\Utils\Strings;
 /**
  * Mail provides functionality to compose and send both text and MIME-compliant multipart email messages.
  *
- * @author     David Grudl
- *
  * @property   string $subject
  * @property   mixed $htmlBody
  */
@@ -210,27 +208,28 @@ class Message extends MimePart
 
 	/**
 	 * Sets HTML body.
-	 * @param  string|Nette\Templating\ITemplate
-	 * @param  mixed base-path or FALSE to disable parsing
+	 * @param  string
+	 * @param  mixed base-path
 	 * @return self
 	 */
 	public function setHtmlBody($html, $basePath = NULL)
 	{
-		if ($html instanceof Nette\Templating\ITemplate || $html instanceof Nette\Application\UI\ITemplate) {
-			$html->mail = $this;
-			if ($basePath === NULL && ($html instanceof Nette\Templating\IFileTemplate || $html instanceof Nette\Application\UI\ITemplate)) {
-				$basePath = dirname($html->getFile());
-			}
-			$html = $html->__toString(TRUE);
+		if ($basePath === NULL && ($html instanceof Nette\Templating\IFileTemplate || $html instanceof Nette\Application\UI\ITemplate)) {
+			$basePath = dirname($html->getFile());
+			$bc = TRUE;
 		}
+		$html = (string) $html;
 
-		if ($basePath !== FALSE) {
+		if ($basePath) {
 			$cids = array();
 			$matches = Strings::matchAll(
 				$html,
 				'#(src\s*=\s*|background\s*=\s*|url\()(["\']?)(?![a-z]+:|[/\\#])([^"\')\s]+)#i',
 				PREG_OFFSET_CAPTURE
 			);
+			if ($matches && isset($bc)) {
+				trigger_error(__METHOD__ . '() missing second argument with image base path.', E_USER_WARNING);
+			}
 			foreach (array_reverse($matches) as $m) {
 				$file = rtrim($basePath, '/\\') . '/' . urldecode($m[3][0]);
 				if (!isset($cids[$file])) {
@@ -242,15 +241,20 @@ class Message extends MimePart
 				);
 			}
 		}
-		$this->html = $html;
 
-		if ($this->getSubject() == NULL && $matches = Strings::match($html, '#<title>(.+?)</title>#is')) { // intentionally ==
-			$this->setSubject(html_entity_decode($matches[1], ENT_QUOTES, 'UTF-8'));
+		if ($this->getSubject() == NULL) { // intentionally ==
+			$html = Strings::replace($html, '#<title>(.+?)</title>#is', function ($m) use (& $title) {
+				$title = $m[1];
+			});
+			$this->setSubject(html_entity_decode($title, ENT_QUOTES, 'UTF-8'));
 		}
+
+		$this->html = ltrim(str_replace("\r", '', $html), "\n");
 
 		if ($this->getBody() == NULL && $html != NULL) { // intentionally ==
 			$this->setBody($this->buildText($html));
 		}
+
 		return $this;
 	}
 
@@ -289,6 +293,16 @@ class Message extends MimePart
 	public function addAttachment($file, $content = NULL, $contentType = NULL)
 	{
 		return $this->attachments[] = $this->createAttachment($file, $content, $contentType, 'attachment');
+	}
+
+
+	/**
+	 * Gets all email attachments.
+	 * @return MimePart[]
+	 */
+	public function getAttachments()
+	{
+		return $this->attachments;
 	}
 
 
@@ -385,6 +399,7 @@ class Message extends MimePart
 		$text = Strings::replace($html, array(
 			'#<(style|script|head).*</\\1>#Uis' => '',
 			'#<t[dh][ >]#i' => ' $0',
+			'#<a [^>]*href=(?|"([^"]+)"|\'([^\']+)\')[^>]*>(.*?)</a>#i' =>  '$2 &lt;$1&gt;',
 			'#[\r\n]+#' => ' ',
 			'#<(/?p|/?h\d|li|br|/tr)[ >/]#i' => "\n$0",
 		));

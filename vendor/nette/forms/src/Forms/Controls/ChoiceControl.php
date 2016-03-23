@@ -13,14 +13,14 @@ use Nette;
 /**
  * Choice control that allows single item selection.
  *
- * @author     David Grudl
- *
  * @property   array $items
  * @property-read mixed $selectedItem
- * @property-read mixed $rawValue
  */
 abstract class ChoiceControl extends BaseControl
 {
+	/** @var bool */
+	public $checkAllowedValues = TRUE;
+
 	/** @var array */
 	private $items = array();
 
@@ -53,12 +53,12 @@ abstract class ChoiceControl extends BaseControl
 
 	/**
 	 * Sets selected item (by key).
-	 * @param  scalar
+	 * @param  string|int
 	 * @return self
 	 */
 	public function setValue($value)
 	{
-		if ($value !== NULL && !array_key_exists((string) $value, $this->items)) {
+		if ($this->checkAllowedValues && $value !== NULL && !array_key_exists((string) $value, $this->items)) {
 			$set = Nette\Utils\Strings::truncate(implode(', ', array_map(function ($s) { return var_export($s, TRUE); }, array_keys($this->items))), 70, '...');
 			throw new Nette\InvalidArgumentException("Value '$value' is out of allowed set [$set] in field '{$this->name}'.");
 		}
@@ -69,7 +69,7 @@ abstract class ChoiceControl extends BaseControl
 
 	/**
 	 * Returns selected key.
-	 * @return scalar
+	 * @return string|int
 	 */
 	public function getValue()
 	{
@@ -79,7 +79,7 @@ abstract class ChoiceControl extends BaseControl
 
 	/**
 	 * Returns selected key (not checked).
-	 * @return scalar
+	 * @return string|int
 	 */
 	public function getRawValue()
 	{

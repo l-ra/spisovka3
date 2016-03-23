@@ -113,7 +113,7 @@ class LogModel extends BaseModel
         $row['typ'] = $typ;
         $row['poznamka'] = $poznamka;
 
-        $row['user_id'] = Nette\Environment::getUser()->id;
+        $row['user_id'] = self::getUser()->id;
         $row['date'] = new DateTime();
 
         return dibi::insert($this->tb_logdokument, $row)
@@ -144,7 +144,7 @@ class LogModel extends BaseModel
         $row['typ'] = $typ;
         $row['poznamka'] = $poznamka;
 
-        $user = Nette\Environment::getUser();
+        $user = self::getUser();
         $row['user_id'] = $user->id;
         $row['date'] = new DateTime();
 
@@ -154,13 +154,13 @@ class LogModel extends BaseModel
     /**     * *********************************************************************
      * Logovani pristupu
      */
-    public function logAccess($user_id, $stav = 1)
+    public function logAccess($user_id, $stav, $ip_address)
     {
 
         $row = array();
         $row['user_id'] = $user_id;
         $row['date'] = new DateTime();
-        $row['ip'] = Nette\Environment::getHttpRequest()->getRemoteAddress();
+        $row['ip'] = $ip_address;
         $user_agent = filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
         $row['user_agent'] = substr($user_agent, 0, 190);
         $row['stav'] = $stav;

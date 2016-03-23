@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\DI;
@@ -13,7 +13,7 @@ use Nette;
 /**
  * DI container generator.
  *
- * @author     David Grudl
+ * @deprecated
  */
 class ContainerFactory extends Nette\Object
 {
@@ -44,6 +44,7 @@ class ContainerFactory extends Nette\Object
 
 	public function __construct($tempDirectory)
 	{
+		trigger_error(__CLASS__ . ' is deprecated; use ContainerLoader.', E_USER_DEPRECATED);
 		$this->tempDirectory = $tempDirectory;
 	}
 

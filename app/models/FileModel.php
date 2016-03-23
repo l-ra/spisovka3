@@ -24,9 +24,9 @@ class FileModel extends BaseModel
             $mime_type_webalize = Nette\Utils\Strings::webalize($row->mime_type);
             $mime_type_icon = APP_DIR . "/../public/images/mimetypes/" . $mime_type_webalize . ".png";
             if (@file_exists($mime_type_icon)) {
-                $row->mime_type_icon = Nette\Environment::getVariable('publicUrl') . "images/mimetypes/" . $mime_type_webalize . ".png";
+                $row->mime_type_icon = "images/mimetypes/" . $mime_type_webalize . ".png";
             } else {
-                $row->mime_type_icon = Nette\Environment::getVariable('publicUrl') . "images/mimetypes/application-octet-stream.png";
+                $row->mime_type_icon = "images/mimetypes/application-octet-stream.png";
             }
 
 
@@ -54,9 +54,9 @@ class FileModel extends BaseModel
             $mime_type_webalize = Nette\Utils\Strings::webalize($file->mime_type);
             $mime_type_icon = APP_DIR . "/../public/images/mimetypes/" . $mime_type_webalize . ".png";
             if (@file_exists($mime_type_icon)) {
-                $file->mime_type_icon = Nette\Environment::getVariable('publicUrl') . "images/mimetypes/" . $mime_type_webalize . ".png";
+                $file->mime_type_icon = "images/mimetypes/" . $mime_type_webalize . ".png";
             } else {
-                $file->mime_type_icon = Nette\Environment::getVariable('publicUrl') . "images/mimetypes/application-octet-stream.png";
+                $file->mime_type_icon = "images/mimetypes/application-octet-stream.png";
             }
 
             $tmp[$file->id] = $file;
@@ -99,9 +99,9 @@ class FileModel extends BaseModel
         }
 
         $row['date_created'] = new DateTime();
-        $row['user_created'] = Nette\Environment::getUser()->id;
+        $row['user_created'] = self::getUser()->id;
         $row['date_modified'] = new DateTime();
-        $row['user_modified'] = Nette\Environment::getUser()->id;
+        $row['user_modified'] = self::getUser()->id;
 
         $row['guid'] = UUID::v4();
 
@@ -135,7 +135,7 @@ class FileModel extends BaseModel
         $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
 
         $row['date_modified'] = new DateTime();
-        $row['user_modified'] = Nette\Environment::getUser()->id;
+        $row['user_modified'] = self::getUser()->id;
 
         if ($this->update($row, array('id=%i', $file_id))) {
             return $this->getInfo($file_id);

@@ -13,8 +13,6 @@ use Nette\MemberAccessException;
 
 /**
  * Nette\Object behaviour mixin.
- *
- * @author     David Grudl
  */
 class ObjectMixin
 {
@@ -90,10 +88,16 @@ class ObjectMixin
 			return Callback::invokeArgs($cb, $args);
 
 		} else {
+			$hint = self::getSuggestion(array_merge(
+				get_class_methods($class),
+				self::parseFullDoc($class, '~^[ \t*]*@method[ \t]+(?:\S+[ \t]+)??(\w+)\(~m'),
+				array_keys(self::getExtensionMethods($class))
+			), $name);
+
 			if (method_exists($class, $name)) { // called parent::$name()
 				$class = 'parent';
 			}
-			throw new MemberAccessException("Call to undefined method $class::$name().");
+			throw new MemberAccessException("Call to undefined method $class::$name()" . ($hint ? ", did you mean $hint()?" : '.'));
 		}
 	}
 
@@ -108,7 +112,11 @@ class ObjectMixin
 	 */
 	public static function callStatic($class, $method, $args)
 	{
-		throw new MemberAccessException("Call to undefined static method $class::$method().");
+		$hint = self::getSuggestion(array_filter(
+			get_class_methods($class),
+			function ($m) use ($class) { $rm = new \ReflectionMethod($class, $m); return $rm->isStatic(); }
+		), $method);
+		throw new MemberAccessException("Call to undefined static method $class::$method()" . ($hint ? ", did you mean $hint()?" : '.'));
 	}
 
 
@@ -141,17 +149,28 @@ class ObjectMixin
 			}
 
 		} elseif (isset($methods[$name])) { // public method as closure getter
-			if (PHP_VERSION_ID >= 50400) {
-				$rm = new \ReflectionMethod($class, $name);
-				$val = $rm->getClosure($_this);
-			} else {
-				$val = Callback::closure($_this, $name);
+			if (preg_match('#^(is|get|has)([A-Z]|$)#', $name) && ($rm = new \ReflectionMethod($class, $name)) && !$rm->getNumberOfRequiredParameters()) {
+				$source = '';
+				foreach (debug_backtrace(PHP_VERSION_ID >= 50306 ? DEBUG_BACKTRACE_IGNORE_ARGS : FALSE) as $item) {
+					if (isset($item['file']) && dirname($item['file']) !== __DIR__) {
+						$source = " in $item[file]:$item[line]";
+						break;
+					}
+				}
+				trigger_error("Did you forgot parentheses after $name$source?", E_USER_WARNING);
 			}
+			$val = Callback::closure($_this, $name);
 			return $val;
 
+		} elseif (isset($methods['set' . $uname])) { // strict class
+			throw new MemberAccessException("Cannot read a write-only property $class::\$$name.");
+
 		} else { // strict class
-			$type = isset($methods['set' . $uname]) ? 'a write-only' : 'an undeclared';
-			throw new MemberAccessException("Cannot read $type property $class::\$$name.");
+			$hint = self::getSuggestion(array_merge(
+				array_keys(get_class_vars($class)),
+				self::parseFullDoc($class, '~^[ \t*]*@property(?:-read)?[ \t]+(?:\S+[ \t]+)??\$(\w+)~m')
+			), $name);
+			throw new MemberAccessException("Cannot read an undeclared property $class::\$$name" . ($hint ? ", did you mean \$$hint?" : '.'));
 		}
 	}
 
@@ -179,10 +198,15 @@ class ObjectMixin
 		} elseif (isset($methods[$m = 'set' . $uname])) { // property setter
 			$_this->$m($value);
 
+		} elseif (isset($methods['get' . $uname]) || isset($methods['is' . $uname])) { // strict class
+			throw new MemberAccessException("Cannot write to a read-only property $class::\$$name.");
+
 		} else { // strict class
-			$type = isset($methods['get' . $uname]) || isset($methods['is' . $uname])
-				? 'a read-only' : 'an undeclared';
-			throw new MemberAccessException("Cannot write to $type property $class::\$$name.");
+			$hint = self::getSuggestion(array_merge(
+				array_keys(get_class_vars($class)),
+				self::parseFullDoc($class, '~^[ \t*]*@property(?:-write)?[ \t]+(?:\S+[ \t]+)??\$(\w+)~m')
+			), $name);
+			throw new MemberAccessException("Cannot write to an undeclared property $class::\$$name" . ($hint ? ", did you mean \$$hint?" : '.'));
 		}
 	}
 
@@ -368,7 +392,7 @@ class ObjectMixin
 	public static function setExtensionMethod($class, $name, $callback)
 	{
 		$name = strtolower($name);
-		self::$extMethods[$name][$class] = Callback::closure($callback);
+		self::$extMethods[$name][$class] = Callback::check($callback);
 		self::$extMethods[$name][''] = NULL;
 	}
 
@@ -397,6 +421,23 @@ class ObjectMixin
 
 
 	/**
+	 * Returns extension methods.
+	 * @param  string
+	 * @return array
+	 */
+	public static function getExtensionMethods($class)
+	{
+		$res = array();
+		foreach (array_keys(self::$extMethods) as $name) {
+			if ($cb = self::getExtensionMethod($class, $name)) {
+				$res[$name] = $cb;
+			}
+		}
+		return $res;
+	}
+
+
+	/**
 	 * Finds the best suggestion (for 8-bit encoding).
 	 * @return string|NULL
 	 * @internal
@@ -416,6 +457,16 @@ class ObjectMixin
 			}
 		}
 		return $best;
+	}
+
+
+	private static function parseFullDoc($class, $pattern)
+	{
+		$rc = new \ReflectionClass($class);
+		do {
+			$doc[] = $rc->getDocComment();
+		} while ($rc = $rc->getParentClass());
+		return preg_match_all($pattern, implode($doc), $m) ? $m[1] : array();
 	}
 
 }

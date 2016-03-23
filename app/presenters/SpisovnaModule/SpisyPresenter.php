@@ -13,7 +13,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     public function startup()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->template->Typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         $this->template->Oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
         parent::startup();
@@ -116,8 +116,8 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $filter = [["tb.nazev LIKE %s", '%' . $hledat . '%']];
         $this->template->pouzito_hledani = !empty($hledat);
 
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -252,12 +252,12 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $formUpravit = null;
 
             // prideleno
-            if (Orgjednotka::isInOrg($spis->orgjednotka_id)) {
+            if (OrgJednotka::isInOrg($spis->orgjednotka_id)) {
                 $pridelen = true;
                 $accessview = true;
             }
             // predano
-            if (Orgjednotka::isInOrg($spis->orgjednotka_id_predano)) {
+            if (OrgJednotka::isInOrg($spis->orgjednotka_id_predano)) {
                 $predan = true;
                 $accessview = true;
             }
@@ -276,7 +276,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                     if (isset($org_cache[$wf->orgjednotka_id])) {
                         $orgjednotka_expr = $org_cache[$wf->orgjednotka_id];
                     } else {
-                        $orgjednotka_expr = Orgjednotka::isInOrg($wf->orgjednotka_id);
+                        $orgjednotka_expr = OrgJednotka::isInOrg($wf->orgjednotka_id);
                         $org_cache[$wf->orgjednotka_id] = $orgjednotka_expr;
                     }
 
@@ -313,7 +313,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $this->template->Predan = $predan;
             $this->template->AccessView = $accessview;
 
-            $Orgjednotka = new Orgjednotka();
+            $Orgjednotka = new OrgJednotka();
             if (empty($spis->orgjednotka_id) && !empty($wf_orgjednotka_prideleno)) {
                 $spis->orgjendotka_id = $wf_orgjednotka_prideleno;
                 $spis->orgjendotka_prideleno = $Orgjednotka->getInfo($wf_orgjednotka_prideleno);

@@ -10,8 +10,6 @@ namespace Nette\Caching\Storages;
 
 /**
  * Cache journal provider.
- *
- * @author     Jan Smitka
  */
 interface IJournal
 {

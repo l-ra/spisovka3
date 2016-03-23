@@ -20,12 +20,15 @@ nette:
         xhtml: true
         
 services:
-    authorizator = Acl
+    authorizator = Authorizator
     authenticator = Authenticator_Basic
     authenticatorUI = Authenticator_UI
 #    userImport = Import_LDAP
 #    ldap = Spisovka_LDAP(%ldap%)
     httpResponse = Spisovka\IEHttpResponse
-    nette.presenterFactory = PresenterFactory(%appDir%, ...)
+    nette.presenterFactory:
+        class: Spisovka\PresenterFactory
+        arguments:
+            - Nette\Bridges\ApplicationDI\PresenterFactoryCallback(..., 0, NULL)
     storage = Storage_Basic(%storage_configuration%)
     user = Spisovka\User

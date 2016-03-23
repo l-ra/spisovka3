@@ -1,6 +1,6 @@
 {block content}
 <div class="help_content">
-    {if \Nette\Environment::getHttpRequest()->isAjax()}
+    {if $presenter->isAjax()}
         <button onclick="displayHelpPage($(this).data('url'));" data-url="{link :Spisovka:Napoveda:}">Obsah nápovědy</button>
         <p></p>
     {/if}

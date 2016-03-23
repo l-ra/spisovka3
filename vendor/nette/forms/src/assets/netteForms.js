@@ -5,7 +5,23 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
-var Nette = Nette || {};
+(function(global, factory) {
+	if (typeof define === 'function' && define.amd) {
+		define(function() {
+			return factory(global);
+		});
+	} else if (typeof module === 'object' && typeof module.exports === 'object') {
+		module.exports = factory(global);
+	} else {
+		global.Nette = factory(global);
+		global.Nette.initOnLoad();
+	}
+
+}(typeof window !== 'undefined' ? window : this, function(window) {
+
+'use strict';
+
+var Nette = {};
 
 /**
  * Attaches a handler to an event for the element.
@@ -259,7 +275,7 @@ Nette.validators = {
 	filled: function(elem, arg, val) {
 		return val !== '' && val !== false && val !== null
 			&& (!Nette.isArray(val) || !!val.length)
-			&& (!window.FileList || !(val instanceof FileList) || val.length);
+			&& (!window.FileList || !(val instanceof window.FileList) || val.length);
 	},
 
 	blank: function(elem, arg, val) {
@@ -338,7 +354,7 @@ Nette.validators = {
 
 	pattern: function(elem, arg, val) {
 		try {
-			return typeof arg === 'string' ? (new RegExp('^(' + arg + ')$')).test(val) : null;
+			return typeof arg === 'string' ? (new RegExp('^(?:' + arg + ')$')).test(val) : null;
 		} catch (e) {}
 	},
 
@@ -384,7 +400,7 @@ Nette.validators = {
 	},
 
 	image: function (elem, arg, val) {
-		if (window.FileList && val instanceof FileList) {
+		if (window.FileList && val instanceof window.FileList) {
 			for (var i = 0; i < val.length; i++) {
 				var type = val[i].type;
 				if (type && type !== 'image/gif' && type !== 'image/png' && type !== 'image/jpeg') {
@@ -528,6 +544,24 @@ Nette.initForm = function(form) {
 
 
 /**
+ * @private
+ */
+Nette.initOnLoad = function() {
+	Nette.addEvent(window, 'load', function() {
+		for (var i = 0; i < document.forms.length; i++) {
+			var form = document.forms[i];
+			for (var j = 0; j < form.elements.length; j++) {
+				if (form.elements[j].getAttribute('data-nette-rules')) {
+					Nette.initForm(form);
+					break;
+				}
+			}
+		}
+	});
+};
+
+
+/**
  * Determines whether the argument is an array.
  */
 Nette.isArray = function(arg) {
@@ -552,13 +586,6 @@ Nette.inArray = function(arr, val) {
 };
 
 
-Nette.addEvent(window, 'load', function() {
-	for (var i = 0; i < document.forms.length; i++) {
-		Nette.initForm(document.forms[i]);
-	}
-});
-
-
 /**
  * Converts string to web safe characters [a-z0-9-] text.
  */
@@ -573,3 +600,6 @@ Nette.webalize = function(s) {
 };
 
 Nette.webalizeTable = {\u00e1: 'a', \u00e4: 'a', \u010d: 'c', \u010f: 'd', \u00e9: 'e', \u011b: 'e', \u00ed: 'i', \u013e: 'l', \u0148: 'n', \u00f3: 'o', \u00f4: 'o', \u0159: 'r', \u0161: 's', \u0165: 't', \u00fa: 'u', \u016f: 'u', \u00fd: 'y', \u017e: 'z'};
+
+return Nette;
+}));

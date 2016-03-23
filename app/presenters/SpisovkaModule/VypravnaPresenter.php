@@ -13,7 +13,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     public function startup()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;        
         $this->template->Oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
 

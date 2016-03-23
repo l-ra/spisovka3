@@ -120,7 +120,7 @@ class DokumentSpis extends BaseModel
             $row['spis_id'] = $spis_id;
             $row['poradi'] = $poradi + 1;
             $row['date_added'] = new DateTime();
-            $row['user_id'] = Nette\Environment::getUser()->id;
+            $row['user_id'] = self::getUser()->id;
 
             $this->insert($row);
 

@@ -3,8 +3,6 @@
 class Epodatelna_PrilohyPresenter extends BasePresenter
 {
 
-    protected $storage;
-
     private static function downloadEpodSource($storage, $epodatelna_id, $typ = 2)
     {
         $DownloadFile = $storage;

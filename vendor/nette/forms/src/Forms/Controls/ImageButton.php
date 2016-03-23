@@ -10,8 +10,6 @@ namespace Nette\Forms\Controls;
 
 /**
  * Submittable image button form control.
- *
- * @author     David Grudl
  */
 class ImageButton extends SubmitButton
 {

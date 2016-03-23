@@ -36,6 +36,17 @@ class VisualPaginator extends Nette\Application\UI\Control
     public $page = 1;
 
 
+    /**
+     *
+     * @var Nette\Http\Request 
+     */
+    protected $httpRequest;
+    
+    public function __construct($parent, $name, Nette\Http\Request $httpRequest)
+    {
+        $this->httpRequest = $httpRequest;
+        parent::__construct($parent, $name);
+    }
 
     /**
      * @return Nette\Paginator
@@ -77,8 +88,7 @@ class VisualPaginator extends Nette\Application\UI\Control
         
         // [P.L.] Pridano
         $this->template->onclick = '';        
-        $request = Nette\Environment::getHttpRequest();
-        if ($request->isAjax())
+        if ($this->httpRequest->isAjax())
             $this->template->onclick = 'onclick="reloadDialog(this); return false;"';
 
         $this->template->setFile(dirname(__FILE__) . '/template.phtml');

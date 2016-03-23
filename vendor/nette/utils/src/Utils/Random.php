@@ -7,13 +7,9 @@
 
 namespace Nette\Utils;
 
-use Nette;
-
 
 /**
  * Secure random string generator.
- *
- * @author     David Grudl
  */
 class Random
 {

@@ -98,7 +98,7 @@ zkontrolovatSchranku = function (nacist_nove_zpravy) {
     
     $('#zkontrolovat_status').html('<img src="'+PUBLIC_URL+'images/spinner.gif" width="14" height="14" /> Kontroluji schránky ...');
 
-    url = BASE_URL + 'epodatelna/default/zkontrolovatAjax';
+    url = BASE_URL + 'epodatelna/default/zkontrolovat-ajax';
 
     $.get(url, function(data) {
         $('#zkontrolovat_status').html(data);
@@ -115,7 +115,7 @@ zkontrolovatSchranku = function (nacist_nove_zpravy) {
 
 zkontrolovatOdchoziSchranku = function () {
 
-    var url = BASE_URL + 'epodatelna/default/zkontrolovatOdchoziISDS';
+    var url = BASE_URL + 'epodatelna/default/zkontrolovat-odchozi-isds';
 
     // zde není potřeba žádná zpětná vazba
     $.get(url);
@@ -126,7 +126,7 @@ nactiZpravy = function () {
 
     showSpinner();
     
-    var url = BASE_URL + 'epodatelna/default/nactiNoveAjax';
+    var url = BASE_URL + 'epodatelna/default/nacti-nove-ajax';
     $.getJSON(url, function (zpravy) {
         if (zpravy != '') {
             var len = zpravy.length;

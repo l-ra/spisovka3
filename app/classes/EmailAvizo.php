@@ -6,7 +6,7 @@ class EmailAvizo {
     {        
         try {            
             // Urad
-            $client_config = Nette\Environment::getVariable('client_config');
+            $client_config = GlobalVariables::get('client_config');
             $urad = $client_config->urad;
             
             $mail = new ESSMail;
@@ -45,7 +45,7 @@ class EmailAvizo {
         
         /* try {
             // Urad
-            // $client_config = Nette\Environment::getVariable('client_config');
+            // $client_config = GlobalVariables::get('client_config');
             // $urad = $client_config->urad;
 
             $mail = new ESSMail;

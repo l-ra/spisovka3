@@ -10,30 +10,22 @@ namespace Nette\Forms\Controls;
 use Nette;
 use Nette\Forms\IControl;
 use Nette\Utils\Html;
-use Nette\Utils\Validators;
 use Nette\Forms\Form;
 
 
 /**
  * Base class that implements the basic functionality common to form controls.
  *
- * @author     David Grudl
- *
  * @property-read Form $form
  * @property-read string $htmlName
  * @property   string $htmlId
- * @property-read array $options
- * @property   Nette\Localization\ITranslator|NULL $translator
  * @property   mixed $value
- * @property-read bool $filled
- * @property-write $defaultValue
  * @property   bool $disabled
  * @property   bool $omitted
  * @property-read Html $control
  * @property-read Html $label
  * @property-read Html $controlPrototype
  * @property-read Html $labelPrototype
- * @property-read Nette\Forms\Rules $rules
  * @property   bool $required
  * @property-read array $errors
  */
@@ -254,7 +246,7 @@ abstract class BaseControl extends Nette\ComponentModel\Component implements ICo
 			'id' => $this->getHtmlId(),
 			'required' => $this->isRequired(),
 			'disabled' => $this->isDisabled(),
-			'data-nette-rules' => self::exportRules($this->rules) ?: NULL,
+			'data-nette-rules' => Nette\Forms\Helpers::exportRules($this->rules) ?: NULL,
 		));
 	}
 
@@ -514,180 +506,11 @@ abstract class BaseControl extends Nette\ComponentModel\Component implements ICo
 	}
 
 
-	/**
-	 * @return array
-	 */
+	/** @deprecated */
 	protected static function exportRules($rules)
 	{
-		$payload = array();
-		foreach ($rules as $rule) {
-			if (!is_string($op = $rule->validator)) {
-				if (!Nette\Utils\Callback::isStatic($op)) {
-					continue;
-				}
-				$op = Nette\Utils\Callback::toString($op);
-			}
-			if ($rule->branch) {
-				$item = array(
-					'op' => ($rule->isNegative ? '~' : '') . $op,
-					'rules' => static::exportRules($rule->branch, FALSE),
-					'control' => $rule->control->getHtmlName()
-				);
-				if ($rule->branch->getToggles()) {
-					$item['toggle'] = $rule->branch->getToggles();
-				}
-			} else {
-				$item = array('op' => ($rule->isNegative ? '~' : '') . $op, 'msg' => $rules->formatMessage($rule, FALSE));
-			}
-
-			if (is_array($rule->arg)) {
-				foreach ($rule->arg as $key => $value) {
-					$item['arg'][$key] = $value instanceof IControl ? array('control' => $value->getHtmlName()) : $value;
-				}
-			} elseif ($rule->arg !== NULL) {
-				$item['arg'] = $rule->arg instanceof IControl ? array('control' => $rule->arg->getHtmlName()) : $rule->arg;
-			}
-
-			$payload[] = $item;
-		}
-		return $payload;
-	}
-
-
-	/********************* validators ****************d*g**/
-
-
-	/**
-	 * Is control's value equal with second parameter?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateEqual(IControl $control, $arg)
-	{
-		$value = $control->getValue();
-		foreach ((is_array($value) ? $value : array($value)) as $val) {
-			foreach ((is_array($arg) ? $arg : array($arg)) as $item) {
-				if ((string) $val === (string) $item) {
-					continue 2;
-				}
-			}
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-
-	/**
-	 * Is control's value not equal with second parameter?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateNotEqual(IControl $control, $arg)
-	{
-		return !static::validateEqual($control, $arg);
-	}
-
-
-	/**
-	 * Is control filled?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateFilled(IControl $control)
-	{
-		return $control->isFilled();
-	}
-
-
-	/**
-	 * Is control not filled?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateBlank(IControl $control)
-	{
-		return !$control->isFilled();
-	}
-
-
-	/**
-	 * Is control valid?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateValid(IControl $control)
-	{
-		return $control->getRules()->validate();
-	}
-
-
-	/**
-	 * Is a control's value number in specified range?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateRange(IControl $control, $range)
-	{
-		return Validators::isInRange($control->getValue(), $range);
-	}
-
-
-	/**
-	 * Is a control's value number greater than or equal to the specified minimum?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateMin(IControl $control, $minimum)
-	{
-		return Validators::isInRange($control->getValue(), array($minimum, NULL));
-	}
-
-
-	/**
-	 * Is a control's value number less than or equal to the specified maximum?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateMax(IControl $control, $maximum)
-	{
-		return Validators::isInRange($control->getValue(), array(NULL, $maximum));
-	}
-
-
-	/**
-	 * Count/length validator. Range is array, min and max length pair.
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateLength(IControl $control, $range)
-	{
-		if (!is_array($range)) {
-			$range = array($range, $range);
-		}
-		$value = $control->getValue();
-		return Validators::isInRange(is_array($value) ? count($value) : Nette\Utils\Strings::length($value), $range);
-	}
-
-
-	/**
-	 * Has control's value minimal count/length?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateMinLength(IControl $control, $length)
-	{
-		return static::validateLength($control, array($length, NULL));
-	}
-
-
-	/**
-	 * Is control's value count/length in limit?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateMaxLength(IControl $control, $length)
-	{
-		return static::validateLength($control, array(NULL, $length));
+		trigger_error(__METHOD__ . '() is deprecated; use Nette\Forms\Helpers::exportRules() instead.', E_USER_DEPRECATED);
+		return Nette\Forms\Helpers::exportRules($rules);
 	}
 
 

@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * JSON response used mainly for AJAX requests.
- *
- * @author     David Grudl
  */
 class JsonResponse extends Nette\Object implements Nette\Application\IResponse
 {

@@ -34,17 +34,17 @@ class ESSMail extends Nette\Mail\Message
      * @param string $message
      * @return string
      */
-    public static function appendSignature($message)
+    public static function appendSignature($message, Spisovka\User $user)
     {
         // Urad
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $urad = $client_config->urad;
 
         $tmp = $message;
 
         // Podpis
         $tmp .= "\n\n--\n";
-        $tmp .= "Zpracoval: " . Nette\Environment::getUser()->displayName . "\n\n";
+        $tmp .= "Zpracoval: " . $user->displayName . "\n\n";
         $tmp .= $urad->nazev . "\n";
         if (!empty($urad->adresa->ulice)) {
             $tmp .= $urad->adresa->ulice . "\n";

@@ -7,17 +7,13 @@
 
 namespace Tracy;
 
-use Tracy;
-
 
 /**
  * Debug Bar.
- *
- * @author     David Grudl
  */
 class Bar
 {
-	/** @var string[] */
+	/** @deprecated */
 	public $info = array();
 
 	/** @var IBarPanel[] */
@@ -60,6 +56,14 @@ class Bar
 	 */
 	public function render()
 	{
+		@session_start(); // @ session may be already started or it is not possible to start session
+		$session = & $_SESSION['__NF']['debuggerbar'];
+		$redirect = preg_match('#^Location:#im', implode("\n", headers_list()));
+		if ($redirect) {
+			Dumper::fetchLiveData();
+			Dumper::$livePrefix = count($session) . 'p';
+		}
+
 		$obLevel = ob_get_level();
 		$panels = array();
 		foreach ($this->panels as $id => $panel) {
@@ -89,28 +93,28 @@ class Bar
 			}
 		}
 
-		@session_start();
-		$session = & $_SESSION['__NF']['debuggerbar'];
-		if (preg_match('#^Location:#im', implode("\n", headers_list()))) {
-			$session[] = $panels;
+		if ($redirect) {
+			$session[] = array('panels' => $panels, 'liveData' => Dumper::fetchLiveData());
 			return;
 		}
 
-		foreach (array_reverse((array) $session) as $reqId => $oldpanels) {
+		$liveData = Dumper::fetchLiveData();
+
+		foreach (array_reverse((array) $session) as $reqId => $info) {
 			$panels[] = array(
 				'tab' => '<span title="Previous request before redirect">previous</span>',
 				'panel' => NULL,
 				'previous' => TRUE,
 			);
-			foreach ($oldpanels as $panel) {
+			foreach ($info['panels'] as $panel) {
 				$panel['id'] .= '-' . $reqId;
 				$panels[] = $panel;
 			}
+			$liveData += $info['liveData'];
 		}
 		$session = NULL;
 
-		$info = array_filter($this->info);
-		require __DIR__ . '/templates/bar.phtml';
+		require __DIR__ . '/assets/Bar/bar.phtml';
 	}
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-class TypDokumentu
+class TypDokumentu extends BaseModel
 {
     /**
      * Vrátí typy dokumentů, které má uživatel povolené v administraci
@@ -11,10 +11,11 @@ class TypDokumentu
         $typy = dibi::query('SELECT * FROM [:PREFIX:dokument_typ] WHERE [stav] = 1')
                 ->fetchAssoc('id');
 
-        if (Acl::isInRole('admin,superadmin')) {
+        $user = self::getUser();
+        if ($user->inheritsFromRole('admin,superadmin')) {
             $referent = true;
             $podatelna = true;
-        } else if (Acl::isInRole('podatelna')) {
+        } else if ($user->inheritsFromRole('podatelna')) {
             $referent = false;
             $podatelna = true;
         } else {

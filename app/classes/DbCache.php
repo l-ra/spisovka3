@@ -1,8 +1,6 @@
 <?php
 
-use Nette\Caching\Cache;
-
-class DBCache
+class DbCache
 {
 
     /**
@@ -16,11 +14,14 @@ class DBCache
         if (!$initialized) {
 
             $initialized = true;
-            $setting = Nette\Environment::getConfig('database')->cache;
+            $setting = GlobalVariables::get('database')->cache;
             $should_cache = $setting == 1;
 
-            if ($should_cache)
-                self::$cache = Nette\Environment::getCache('db_cache');
+            if ($should_cache) {
+                $context = Nette\Environment::getContext();
+                self::$cache = new Nette\Caching\Cache($context->getByType('Nette\Caching\IStorage'),
+                        'db_cache');
+            }
         }
     }
 
@@ -43,7 +44,7 @@ class DBCache
         if (self::$cache !== null)
             self::$cache->remove($key);
     }
-    
+
     public static function clearCache()
     {
         self::init();
@@ -51,23 +52,24 @@ class DBCache
         if (self::$cache !== null)
             self::$cache->clean([Cache::ALL => true]);
 
-/*        $dir = self::getCacheDirectory();
-        $ok = true;
-        
-        if ($handle = opendir($dir)) {
-            while ($obj = readdir($handle)) {
-                if ($obj != '.' && $obj != '..')
-                    if (!unlink("$dir/$obj"))
-                        $ok = false;
-            }
-            closedir($handle);
-        }
-        else
-            $ok = false;
-        
-        return $ok;
- */
+        /*        $dir = self::getCacheDirectory();
+          $ok = true;
+
+          if ($handle = opendir($dir)) {
+          while ($obj = readdir($handle)) {
+          if ($obj != '.' && $obj != '..')
+          if (!unlink("$dir/$obj"))
+          $ok = false;
+          }
+          closedir($handle);
+          }
+          else
+          $ok = false;
+
+          return $ok;
+         */
     }
+
 }
 
 ?>

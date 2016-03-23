@@ -5,7 +5,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     protected $Epodatelna;
     protected $pdf_output = 0;
-    protected $storage;
 
     public function __construct()
     {
@@ -106,8 +105,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderNove()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek : 20;
 
@@ -142,8 +141,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderPrichozi()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek : 20;
 
@@ -176,8 +175,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderOdchozi()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek : 20;
 
@@ -352,7 +351,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             foreach ($config_data['isds'] as $index => $isds_config) {
                 if ($isds_config['aktivni'] != 1)
                     continue;
-                if ($isds_config['podatelna'] && !Orgjednotka::isInOrg($isds_config['podatelna']))
+                if ($isds_config['podatelna'] && !OrgJednotka::isInOrg($isds_config['podatelna']))
                     continue;
 
                 $nalezena_aktivni_schranka = 1;
@@ -366,7 +365,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             foreach ($config_data['email'] as $index => $email_config) {
                 if ($email_config['aktivni'] != 1)
                     continue;
-                if ($email_config['podatelna'] && !Orgjednotka::isInOrg($email_config['podatelna']))
+                if ($email_config['podatelna'] && !OrgJednotka::isInOrg($email_config['podatelna']))
                     continue;
 
                 $nalezena_aktivni_schranka = 1;
@@ -384,7 +383,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         if (!$nalezena_aktivni_schranka)
             echo 'Žádná schránka není definována nebo nastavena jako aktivní.<br />';
 
-        exit;
+        $this->terminate();
     }
 
     public function actionZkontrolovatOdchoziISDS()
@@ -401,7 +400,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $email_subjekt_cache = [];
 
         //$client_config = Environment::getVariable('client_config');
-        //$vp = new VisualPaginator($this, 'vp');
+        //$vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         //$paginator = $vp->getPaginator();
         //$paginator->itemsPerPage = 2;// isset($client_config->nastaveni->pocet_polozek)?$client_config->nastaveni->pocet_polozek:20;
 

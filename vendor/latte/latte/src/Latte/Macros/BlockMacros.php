@@ -11,13 +11,10 @@ use Latte;
 use Latte\MacroNode;
 use Latte\PhpWriter;
 use Latte\CompileException;
-use Latte\RuntimeException;
 
 
 /**
  * Block macros.
- *
- * @author     David Grudl
  */
 class BlockMacros extends MacroSet
 {
@@ -126,7 +123,7 @@ class BlockMacros extends MacroSet
 		if (isset($this->namedBlocks[$destination]) && !$parent) {
 			$cmd = "call_user_func(reset(\$_b->blocks[$name]), \$_b, %node.array? + get_defined_vars())";
 		} else {
-			$cmd = 'Latte\Macros\BlockMacros::callBlock' . ($parent ? 'Parent' : '') . "(\$_b, $name, %node.array? + " . ($parent ? 'get_defined_vars' : '$template->getParameters') . '())';
+			$cmd = 'Latte\Macros\BlockMacrosRuntime::callBlock' . ($parent ? 'Parent' : '') . "(\$_b, $name, %node.array? + " . ($parent ? 'get_defined_vars' : '$template->getParameters') . '())';
 		}
 
 		if ($node->modifiers) {
@@ -142,8 +139,13 @@ class BlockMacros extends MacroSet
 	 */
 	public function macroIncludeBlock(MacroNode $node, PhpWriter $writer)
 	{
-		return $writer->write('ob_start(); $_b->templates[%var]->renderChildTemplate(%node.word, %node.array? + get_defined_vars()); echo rtrim(ob_get_clean())',
-			$this->getCompiler()->getTemplateId());
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
+		return $writer->write(
+			'ob_start(); $_b->templates[%var]->renderChildTemplate(%node.word, %node.array? + get_defined_vars()); echo rtrim(ob_get_clean())',
+			$this->getCompiler()->getTemplateId()
+		);
 	}
 
 
@@ -152,6 +154,9 @@ class BlockMacros extends MacroSet
 	 */
 	public function macroExtends(MacroNode $node, PhpWriter $writer)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		if (!$node->args) {
 			throw new CompileException("Missing destination in {{$node->name}}");
 		}
@@ -283,7 +288,7 @@ class BlockMacros extends MacroSet
 			}
 
 			if (empty($node->data->leave)) {
-				if ($node->name === 'snippetArea') {
+				if ($node->name === 'snippetArea' && empty($node->data->dynamic)) {
 					$node->content = "<?php \$_control->snippetMode = isset(\$_snippetMode) && \$_snippetMode; ?>{$node->content}<?php \$_control->snippetMode = FALSE; ?>";
 				}
 				if (!empty($node->data->dynamic)) {
@@ -309,46 +314,20 @@ class BlockMacros extends MacroSet
 	 */
 	public function macroIfset(MacroNode $node, PhpWriter $writer)
 	{
-		if (strpos($node->args, '#') === FALSE) {
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
+		if (!preg_match('~#|[\w-]+\z~A', $node->args)) {
 			return FALSE;
 		}
 		$list = array();
 		while (($name = $node->tokenizer->fetchWord()) !== FALSE) {
-			$list[] = $name[0] === '#' ? '$_b->blocks["' . substr($name, 1) . '"]' : $name;
+			$list[] = preg_match('~#|[\w-]+\z~A', $name)
+				? '$_b->blocks["' . ltrim($name, '#') . '"]'
+				: $writer->formatArgs(new Latte\MacroTokens($name));
 		}
 		return ($node->name === 'elseifset' ? '} else' : '')
 			. 'if (isset(' . implode(', ', $list) . ')) {';
-	}
-
-
-	/********************* run-time helpers ****************d*g**/
-
-
-	/**
-	 * Calls block.
-	 * @return void
-	 */
-	public static function callBlock(\stdClass $context, $name, array $params)
-	{
-		if (empty($context->blocks[$name])) {
-			throw new RuntimeException("Cannot include undefined block '$name'.");
-		}
-		$block = reset($context->blocks[$name]);
-		$block($context, $params);
-	}
-
-
-	/**
-	 * Calls parent block.
-	 * @return void
-	 */
-	public static function callBlockParent(\stdClass $context, $name, array $params)
-	{
-		if (empty($context->blocks[$name]) || ($block = next($context->blocks[$name])) === FALSE) {
-			throw new RuntimeException("Cannot include undefined parent block '$name'.");
-		}
-		$block($context, $params);
-		prev($context->blocks[$name]);
 	}
 
 }

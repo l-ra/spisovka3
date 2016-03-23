@@ -2,7 +2,17 @@
 
 class Test_DefaultPresenter extends BasePresenter
 {
-
+    /**
+     * @var Nette\Application\IPresenterFactory 
+     */
+    protected $presenterFactory;
+    
+    public function __construct(Nette\Application\IPresenterFactory $presenterFactory)
+    {
+        parent::__construct();
+        $this->presenterFactory = $presenterFactory;
+    }
+        
     protected function isUserAllowed()
     {
         $user = $this->user;
@@ -55,14 +65,16 @@ class Test_DefaultPresenter extends BasePresenter
         foreach ($tests as $test) {
 
             $result = $this->runTest($test);
-
+            if ($result == $test['expected_result']) {
+                $n_ok++;
+                if ($result != 'OK')
+                    $result = "OK  $result";
+            }
             $test_name = $test['address'];
             if ($test['params'])
                 $test_name .= " " . json_encode($test['params']);
             printf("%-60s %s\n", $test_name, $result);
             flush();
-            if ($result == $test['expected_result'])
-                $n_ok++;
         }
 
         if ($n_ok == count($tests))
@@ -90,9 +102,7 @@ class Test_DefaultPresenter extends BasePresenter
             $request = new Nette\Application\Request(
                     $presenter, 'GET', $params);
 
-            $application = Nette\Environment::getApplication();
-
-            $presenter = $application->presenterFactory->createPresenter($request->getPresenterName());
+            $presenter = $this->presenterFactory->createPresenter($request->getPresenterName());
             $presenter->autoCanonicalize = false;
 
             $response = $presenter->run($request);
@@ -111,9 +121,13 @@ class Test_DefaultPresenter extends BasePresenter
                 return 'OK';
             }
 
+            if ($response === null)
+                return 'NULL';
             $classname = get_class($response);
             // Odstran z nazvu namespace
-            $classname = substr($classname, strrpos($classname, '\\') + 1);
+            if (strpos($classname, '\\') !== false)
+                $classname = substr($classname, strrpos($classname, '\\') + 1);
+            
             return $classname;
         } catch (Exception $e) {
             @ob_end_clean();

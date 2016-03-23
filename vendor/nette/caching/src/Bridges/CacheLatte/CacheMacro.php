@@ -13,8 +13,6 @@ use Latte;
 
 /**
  * Macro {cache} ... {/cache}
- *
- * @author     David Grudl
  */
 class CacheMacro extends Nette\Object implements Latte\IMacro
 {
@@ -50,6 +48,9 @@ class CacheMacro extends Nette\Object implements Latte\IMacro
 	 */
 	public function nodeOpened(Latte\MacroNode $node)
 	{
+		if ($node->modifiers) {
+			trigger_error("Modifiers are not allowed in {{$node->name}}", E_USER_WARNING);
+		}
 		$this->used = TRUE;
 		$node->isEmpty = FALSE;
 		$node->openingCode = Latte\PhpWriter::using($node)
@@ -105,6 +106,9 @@ class CacheMacro extends Nette\Object implements Latte\IMacro
 
 		$cache = new Nette\Caching\Cache($cacheStorage, 'Nette.Templating.Cache');
 		if ($helper = $cache->start($key)) {
+			if (isset($args['dependencies'])) {
+				$args += call_user_func($args['dependencies']);
+			}
 			if (isset($args['expire'])) {
 				$args['expiration'] = $args['expire']; // back compatibility
 			}

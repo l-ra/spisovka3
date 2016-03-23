@@ -191,7 +191,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function startup()
     {
-        $client_config = Nette\Environment::getVariable('client_config');
+        $client_config = GlobalVariables::get('client_config');
         $this->template->Typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         $this->template->Oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
         parent::startup();
@@ -370,8 +370,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $this->hledat = $hledat;
         }
 
-        $client_config = Nette\Environment::getVariable('client_config');
-        $vp = new VisualPaginator($this, 'vp');
+        $client_config = GlobalVariables::get('client_config');
+        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -458,7 +458,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         }
 
         //$client_config = Environment::getVariable('client_config');
-        //$vp = new VisualPaginator($this, 'vp');
+        //$vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
         //$paginator = $vp->getPaginator();
         //$paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek)?$client_config->nastaveni->pocet_polozek:20;
         //$result = $DokumentSpis->dokumenty($spis_id, 1, $paginator);
@@ -504,7 +504,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                 $this->flashMessage('Nemáte oprávnění k převzetí spisu.', 'warning');
             }
         } else {
-            $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+            $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
 
             if ($Spisy->zmenitOrg($spis_id, $orgjednotka_id)) {
                 $this->flashMessage('Úspěšně jste si převzal tento spis.');
@@ -523,7 +523,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     {
         $spis_id = $this->getParameter('id', null);
 
-        $orgjednotka_id = Orgjednotka::dejOrgUzivatele();
+        $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
 
         $Spis = new Spis;
         $sp = $Spis->getInfo($spis_id);

@@ -68,9 +68,8 @@ class AclModel extends BaseModel
         return ($rows) ? $rows : null;
     }
 
-    public function seznamPravidel($role = null)
+    public function seznamPravidel(Role $role, \Nette\Security\IAuthorizator $authorizator)
     {
-
         $rows = dibi::fetchAll('
             SELECT
                 ru.*,
@@ -109,23 +108,16 @@ class AclModel extends BaseModel
             $tmp[$resource_id]['pravidla'][$pravidlo->id]['resource'] = $pravidlo->resource_code;
             $tmp[$resource_id]['pravidla'][$pravidlo->id]['privilege'] = $pravidlo->privilege;
 
-            if (!is_null($role)) {
-
-                $authz = Nette\Environment::getService('authorizator');
-                $povoleno = $authz->isAllowed($role, $pravidlo->resource_code,
-                        $pravidlo->privilege);
-                if ($povoleno) {
-                    $povoleno = "ano";
-                } else {
-                    $povoleno = "ne";
-                }
-
-                $tmp[$resource_id]['pravidla'][$pravidlo->id]['opravneni'] = $povoleno;
-                $tmp[$resource_id]['pravidla'][$pravidlo->id]['role_id'] = null;
+            $povoleno = $authorizator->isAllowed($role->code, $pravidlo->resource_code,
+                    $pravidlo->privilege);
+            if ($povoleno) {
+                $povoleno = "ano";
             } else {
-                $tmp[$resource_id]['pravidla'][$pravidlo->id]['opravneni'] = "nejiste";
-                $tmp[$resource_id]['pravidla'][$pravidlo->id]['role_id'] = null;
+                $povoleno = "ne";
             }
+
+            $tmp[$resource_id]['pravidla'][$pravidlo->id]['opravneni'] = $povoleno;
+            $tmp[$resource_id]['pravidla'][$pravidlo->id]['role_id'] = null;
         }
 
         return $tmp;

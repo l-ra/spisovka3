@@ -1,8 +1,8 @@
 <?php
 
 /**
- * This file is part of the Nette Framework (http://nette.org)
- * Copyright (c) 2004 David Grudl (http://davidgrudl.com)
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
 namespace Nette\Http;
@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * HttpRequest provides access scheme for request sent via HTTP.
- *
- * @author     David Grudl
  *
  * @property-read UrlScript $url
  * @property-read array $query
@@ -27,7 +25,7 @@ use Nette;
  * @property-read bool $ajax
  * @property-read string|NULL $remoteAddress
  * @property-read string|NULL $remoteHost
- * @property-read string $rawBody
+ * @property-read string|NULL $rawBody
  */
 class Request extends Nette\Object implements IRequest
 {
@@ -36,9 +34,6 @@ class Request extends Nette\Object implements IRequest
 
 	/** @var UrlScript */
 	private $url;
-
-	/** @var array */
-	private $query;
 
 	/** @var array */
 	private $post;
@@ -58,26 +53,26 @@ class Request extends Nette\Object implements IRequest
 	/** @var string|NULL */
 	private $remoteHost;
 
-	/** @var string */
-	private $rawBody;
+	/** @var callable|NULL */
+	private $rawBodyCallback;
 
 
 	public function __construct(UrlScript $url, $query = NULL, $post = NULL, $files = NULL, $cookies = NULL,
-		$headers = NULL, $method = NULL, $remoteAddress = NULL, $remoteHost = NULL)
+		$headers = NULL, $method = NULL, $remoteAddress = NULL, $remoteHost = NULL, $rawBodyCallback = NULL)
 	{
 		$this->url = $url;
-		if ($query === NULL) {
-			parse_str($url->getQuery(), $this->query);
-		} else {
-			$this->query = (array) $query;
+		if ($query !== NULL) {
+			trigger_error('Nette\Http\Request::__construct(): parameter $query is deprecated.', E_USER_DEPRECATED);
+			$url->setQuery($query);
 		}
 		$this->post = (array) $post;
 		$this->files = (array) $files;
 		$this->cookies = (array) $cookies;
 		$this->headers = array_change_key_case((array) $headers, CASE_LOWER);
-		$this->method = $method;
+		$this->method = $method ?: 'GET';
 		$this->remoteAddress = $remoteAddress;
 		$this->remoteHost = $remoteHost;
+		$this->rawBodyCallback = $rawBodyCallback;
 	}
 
 
@@ -87,7 +82,7 @@ class Request extends Nette\Object implements IRequest
 	 */
 	public function getUrl()
 	{
-		return $this->url;
+		return clone $this->url;
 	}
 
 
@@ -104,13 +99,9 @@ class Request extends Nette\Object implements IRequest
 	public function getQuery($key = NULL, $default = NULL)
 	{
 		if (func_num_args() === 0) {
-			return $this->query;
-
-		} elseif (isset($this->query[$key])) {
-			return $this->query[$key];
-
+			return $this->url->getQueryParameters();
 		} else {
-			return $default;
+			return $this->url->getQueryParameter($key, $default);
 		}
 	}
 
@@ -138,12 +129,17 @@ class Request extends Nette\Object implements IRequest
 
 	/**
 	 * Returns uploaded file.
-	 * @param  string key (or more keys)
+	 * @param  string key
 	 * @return FileUpload|NULL
 	 */
 	public function getFile($key)
 	{
-		return Nette\Utils\Arrays::get($this->files, func_get_args(), NULL);
+		if (func_num_args() > 1) {
+			trigger_error('Calling getFile() with multiple keys is deprecated.', E_USER_DEPRECATED);
+			return Nette\Utils\Arrays::get($this->files, func_get_args(), NULL);
+		}
+
+		return isset($this->files[$key]) ? $this->files[$key] : NULL;
 	}
 
 
@@ -204,8 +200,7 @@ class Request extends Nette\Object implements IRequest
 
 
 	/**
-	 * Checks if the request method is POST.
-	 * @return bool
+	 * @deprecated
 	 */
 	public function isPost()
 	{
@@ -283,8 +278,8 @@ class Request extends Nette\Object implements IRequest
 	 */
 	public function getRemoteHost()
 	{
-		if (!$this->remoteHost) {
-			$this->remoteHost = $this->remoteAddress ? getHostByAddr($this->remoteAddress) : NULL;
+		if ($this->remoteHost === NULL && $this->remoteAddress !== NULL) {
+			$this->remoteHost = getHostByAddr($this->remoteAddress);
 		}
 		return $this->remoteHost;
 	}
@@ -292,18 +287,11 @@ class Request extends Nette\Object implements IRequest
 
 	/**
 	 * Returns raw content of HTTP request body.
-	 * @return string
+	 * @return string|NULL
 	 */
 	public function getRawBody()
 	{
-		if (PHP_VERSION_ID >= 50600) {
-			return file_get_contents('php://input');
-
-		} elseif ($this->rawBody === NULL) { // can be read only once in PHP < 5.6
-			$this->rawBody = (string) file_get_contents('php://input');
-		}
-
-		return $this->rawBody;
+		return $this->rawBodyCallback ? call_user_func($this->rawBodyCallback) : NULL;
 	}
 
 

@@ -83,7 +83,7 @@ class UserModel extends BaseModel
 
     public function odebratUcet($user_id)
     {
-        if ($user_id == Nette\Environment::getUser()->id) {
+        if ($user_id == self::getUser()->id) {
             throw new Exception('Nemůžete smazat účet, pod kterým jste přihlášen!');
         }
 

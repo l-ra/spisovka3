@@ -51,12 +51,12 @@ abstract class BaseModel extends Nette\Object
     protected $tb_zpusob_odeslani = 'zpusob_odeslani';
     protected $tb_zpusob_vyrizeni = 'zpusob_vyrizeni';
     
-    public static function getDbPrefix()
+    protected static function getDbPrefix()
     {
         static $prefix = null;
 
         if ($prefix === null)
-            $prefix = Nette\Environment::getConfig('database')->prefix;
+            $prefix = GlobalVariables::get('database')->prefix;
 
         return $prefix;
     }
@@ -70,9 +70,14 @@ abstract class BaseModel extends Nette\Object
         $prefix = $db_prefix !== null ? $db_prefix : self::getDbPrefix();
         $this->name = $prefix . $this->name;
 
-        foreach (get_object_vars($this) as $prop => $name)
+        foreach (get_object_vars($this) as $prop => $value)
             if (substr($prop, 0, 3) == 'tb_')
-                    $this->$prop = $prefix . $name;            
+                    $this->$prop = $prefix . $value;            
+    }
+    
+    protected static function getUser()
+    {
+        return Nette\Environment::getUser();
     }
     
     /**
@@ -450,7 +455,7 @@ abstract class BaseModel extends Nette\Object
         if (count($array) > 0) {
 
             if (is_null($limit)) {
-                $client_config = Nette\Environment::getVariable('client_config');
+                $client_config = GlobalVariables::get('client_config');
                 $limit = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                             : 20;
             }

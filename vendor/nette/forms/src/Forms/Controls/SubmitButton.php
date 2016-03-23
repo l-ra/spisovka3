@@ -13,8 +13,6 @@ use Nette;
 /**
  * Submittable button control.
  *
- * @author     David Grudl
- *
  * @property-read bool $submittedBy
  */
 class SubmitButton extends Button implements Nette\Forms\ISubmitterControl
@@ -119,17 +117,6 @@ class SubmitButton extends Button implements Nette\Forms\ISubmitterControl
 			'formnovalidate' => $this->validationScope !== NULL,
 			'data-nette-validation-scope' => $scope ?: NULL,
 		));
-	}
-
-
-	/**
-	 * Submitted validator: has been button pressed?
-	 * @return bool
-	 * @internal
-	 */
-	public static function validateSubmitted(SubmitButton $control)
-	{
-		return $control->isSubmittedBy();
 	}
 
 }

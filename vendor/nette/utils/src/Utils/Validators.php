@@ -12,8 +12,6 @@ use Nette;
 
 /**
  * Validation utilities.
- *
- * @author     David Grudl
  */
 class Validators extends Nette\Object
 {
@@ -302,12 +300,4 @@ class Validators extends Nette\Object
 		return is_string($value) && preg_match('#^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\z#', $value);
 	}
 
-}
-
-
-/**
- * The exception that indicates assertion error.
- */
-class AssertionException extends \Exception
-{
 }
