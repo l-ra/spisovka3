@@ -6,6 +6,9 @@ class Workflow extends BaseModel
     protected $name = 'workflow';
     protected $primary = 'id';
 
+    const STAV_PREDAN_DO_SPISOVNY = 6;
+    const STAV_VE_SPISOVNE = 7;
+    
     /*
      * 0 - mimo evidenci
      * 1 - novy
@@ -1097,6 +1100,9 @@ class Workflow extends BaseModel
             return false;
         $old_data = $this->select(["dokument_id = $dokument_id", 'aktivni = 1'])->fetch();
         if (!$old_data)
+            return false;
+        if (!in_array($old_data->stav_dokumentu,
+                        [self::STAV_PREDAN_DO_SPISOVNY, self::STAV_VE_SPISOVNE]))
             return false;
 
         $workflow_data = [];
