@@ -71,9 +71,14 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
             $function = 'task' . $name;
             echo "Task $task ";
             flush();
-            $result = $this->$function();
-            if ($result !== null)
-                echo $result ? 'OK' : 'error';
+            try {
+                $result = $this->$function();
+                if ($result !== null)
+                    echo $result ? 'OK' : 'error';
+            } catch (Exception $e) {
+                $msg = $e->getMessage();
+                echo 'exception: ' . $msg;
+            }
             echo "\n";
         }
 
