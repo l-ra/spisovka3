@@ -102,38 +102,27 @@ class Ares
                 $result->financni_urad = strip_tags($radek);
             }
         }
-        
+
         return $result;
     }
 
     private static function doRequest($url)
     {
-        if (ini_get("allow_url_fopen")) {
-            // Ares je velmi pomalý
-            $context = stream_context_create(['http' => ['timeout' => 7]]);
-            $result = @file($url, false, $context);
-            if ($result === false) {
-                $error = error_get_last();
-                $msg = $error['message'];
-                if (stripos($msg, 'timed out') !== false)
-                    $msg = 'Registr ARES neodpověděl v časovém limitu.';
-                return $msg;
-            }            
-            return $result;
+        $timeout = 7;             // Ares je velmi pomalý
+
+        try {
+            $response = HttpClient::get($url, $timeout);
+            if (!$response)
+                return 'Registr ARES neodpověděl správně.';
+        } catch (Exception $e) {
+            $msg = $e->getMessage();
+            if (stripos($msg, 'časový limit') !== false)
+                $msg = 'Registr ARES neodpověděl v časovém limitu.';
             
-        } else if (function_exists('curl_init')) {
-            if ($ch = curl_init($url)) {
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HEADER, 0);
-                $response = curl_exec($ch);
-                curl_close($ch);
-                return explode("\n", $response);
-            } else {
-                return 'Funkce curl_init() neproběhla úspěšně.';
-            }
-        } else {
-            return 'Chybí PHP rozšíření curl.';
+            return $msg;
         }
+
+        return explode("\n", $response);
     }
 
     /**
@@ -145,7 +134,7 @@ class Ares
     {
         if (!$ic || !is_numeric($ic))
             return false;
-        
+
         $ic = trim($ic);
         $pocet = strlen($ic);
         // doplnime nuly pokud je cifra < 8

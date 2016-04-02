@@ -48,16 +48,6 @@ class CRLParser extends DERParser
         }
     }
 
-    public function fromCA()
-    {
-
-        $uri = "asn/qica09_crl1256.crl";
-
-        $data = $this->sourceCRL($uri);
-        $der = $this->parse($data);
-        return $this->decode($der);
-    }
-
     public function fromUrl($url)
     {
         $hash = md5($url);
@@ -161,26 +151,18 @@ class CRLParser extends DERParser
         return $info;
     }
 
-    private function sourceCRL($zdroj)
+    private function sourceCRL($url)
     {
+        $url = trim($url);
 
-        $zdroj = trim($zdroj);
-
-        if (empty($zdroj))
+        if (empty($url))
             return null;
-        if (ini_get("allow_url_fopen")) {
-            return @file_get_contents($zdroj);
-        } else if (function_exists('curl_init')) {
-            if ($ch = curl_init($zdroj)) {
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HEADER, 0);
-                $response = curl_exec($ch);
-                curl_close($ch);
-                return $response;
-            } else {
-                return null;
-            }
-        } else {
+        
+        try {
+            $response = HttpClient::get($url);
+            return $response;
+        } catch (Exception $e) {
+            $e->getMessage();
             return null;
         }
     }
