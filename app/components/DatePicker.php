@@ -8,9 +8,6 @@ namespace Spisovka\Controls;
 class DatePicker extends \Nette\Forms\Controls\TextInput
 {
 
-    const NO_PAST_DATE = ':noPastDate';
-    const DATE = ':date';
-
     protected $forbidPastDates = false;
 
     /**
@@ -21,7 +18,7 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
         // 10 characters are enough for a date
         parent::__construct($label, 10);
         $this->addCondition(\Nette\Forms\Form::FILLED)
-                ->addRule(self::DATE, 'Zadané datum je neplatné.');
+                ->addRule([$this, 'validateDate'], 'Zadané datum je neplatné.');
     }
 
     /**
@@ -84,11 +81,11 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
     public function forbidPastDates()
     {
         $this->forbidPastDates = true;
-        $this->addRule(self::NO_PAST_DATE, 'Zadané datum nemůže být v minulosti.');
+        $this->addRule([$this, 'validateNoPastDate'], 'Zadané datum nemůže být v minulosti.');
         return $this;
     }
 
-    public static function validateNoPastDate(\Nette\Forms\IControl $control)
+    public static function validateNoPastDate(DatePicker $control)
     {
         $value = $control->getValue();
         if ($value === null)
@@ -98,7 +95,7 @@ class DatePicker extends \Nette\Forms\Controls\TextInput
         return strcmp($value, $today) >= 0;
     }
 
-    public static function validateDate(\Nette\Forms\IControl $control)
+    public static function validateDate(DatePicker $control)
     {
         $value = $control->getValue();
         try {
