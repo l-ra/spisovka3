@@ -4,7 +4,7 @@ $(function () {
 
     $('#frmnovyForm-user_text').autocomplete({
         minLength: 3,
-        source: BASE_URL + 'uzivatel/userSeznamAjax',
+        source: BASE_URL + 'uzivatel/user-seznam-ajax',
         focus: function (event, ui) {
             return false;
         },
@@ -15,7 +15,7 @@ $(function () {
 
     $('#frmnovyForm-dokument_text').autocomplete({
         minLength: 3,
-        source: BASE_URL + 'spisovna/zapujcky/seznamAjax',
+        source: BASE_URL + 'spisovna/zapujcky/seznam-ajax',
         focus: function (event, ui) {
             return false;
         },

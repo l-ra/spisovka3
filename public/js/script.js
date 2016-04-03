@@ -197,7 +197,7 @@ $(function() {
     $('#predat_autocomplete').autocomplete({
         minLength: 3,
         /*source: seznam_uzivatelu,*/
-        source: BASE_URL + 'uzivatel/seznamAjax',
+        source: BASE_URL + 'uzivatel/seznam-ajax',
 
         focus: function(event, ui) {
             return false;
@@ -1073,7 +1073,7 @@ postFormJ = function (form, callback) {
 
 initSpisAutocomplete = function(filter) {
     filter = filter || 'spisovka';
-    var url = BASE_URL + 'spisy/seznamAjax?filter=' + filter;
+    var url = BASE_URL + 'spisy/seznam-ajax?filter=' + filter;
     $('.spis_autocomplete').select2({
         width: '500px',
         minimumInputLength: 3,
