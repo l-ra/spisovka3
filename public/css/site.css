@@ -927,6 +927,7 @@ div.icon_slozka {
 
 .sestava_vyber_sloupcu {
     overflow: auto;
+    margin-top: 15px;
 }
 .sestava_vyber_sloupcu div {
     float: left;
@@ -949,6 +950,9 @@ div.icon_slozka {
 }
 .sestava_vyber_sloupcu dd {
     margin: 0px;
+}
+.sestava_vyber_sloupcu .error {
+    display: block;
 }
 
 /* Uprava jQuery tematu */

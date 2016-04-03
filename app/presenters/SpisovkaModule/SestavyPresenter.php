@@ -363,9 +363,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->setView('form');
     }
 
-    public function renderUpravit()
+    public function renderUpravit($id)
     {
-        $sestava = new Sestava($this->getParameter('id'));
+        $sestava = new Sestava($id);
         $this->template->sestava = $sestava;
 
         if (!$sestava->isModifiable()) {
@@ -452,7 +452,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form = new Spisovka\Form();
         $form->elementPrototype->onsubmit('sestavaFormSubmit(this)');
 
-        $form->addText('sestava_nazev', 'Název sestavy:', 80, 100);
+        $form->addText('sestava_nazev', 'Název sestavy:', 80, 100)
+                ->setRequired();
         $form->addTextArea('sestava_popis', 'Popis sestavy:', 80, 3);
         $form->addSelect('sestava_typ', 'Lze měnit? :',
                 array('1' => 'upravitelná sestava', '2' => 'pevná sestava'));
@@ -463,7 +464,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
         $form->addMultiSelect('vybrane_sloupce', 'Vybrané sloupce:', null, 10);
         $form->addMultiSelect('dostupne_sloupce', 'Dostupné sloupce:', self::$sloupce_nazvy, 10);
-
+        $form->onValidate[] = array($this, 'validateVybraneSloupce');
+        
         $form->addSelect('razeni1', '1. kritérium:', $order_by);
         $form->addSelect('razeni2', '2. kritérium:', $order_by);
         $form->addSelect('razeni3', '3. kritérium:', $order_by);
@@ -472,7 +474,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addTextArea('popis', 'Stručný popis:', 80, 3);
         $form->addText('cislo_jednaci', 'Číslo jednací:', 50, 50);
         $form->addText('spisova_znacka', 'Název spisu:', 50, 50);
-        $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu);
+        $form->addSelect('dokument_typ_id', 'Typ dokumentu:', $typ_dokumentu);
         $form->addSelect('typ_doruceni', 'Způsob doručení:', $typ_doruceni);
         $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
         $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
@@ -539,6 +541,18 @@ class Spisovka_SestavyPresenter extends BasePresenter
         return $form;
     }
 
+    public function validateVybraneSloupce(Spisovka\Form $form)
+    {
+        // Nette "feature". onValidate se vola, prestoze pouziji setValidationScope()
+        $submit = $form->isSubmitted();
+        if ($submit->name == 'storno')
+            return;
+        
+        $columns = $form['vybrane_sloupce']->getRawValue();
+        if (empty($columns))
+            $form['vybrane_sloupce']->addError('Vyberte sloupce sestavy.');
+    }
+    
     protected function createComponentNewForm()
     {
         $form = $this->createForm();
