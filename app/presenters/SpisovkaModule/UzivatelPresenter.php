@@ -63,6 +63,9 @@ class Spisovka_UzivatelPresenter extends BasePresenter
      */
     protected function createComponentUpravitForm()
     {
+        if (Settings::get('users_can_change_their_data') == false)
+            throw new Exception('neoprávněný přístup');
+        
         $form = Admin_ZamestnanciPresenter::createOsobaForm();
         $form->addHidden('osoba_id');
 

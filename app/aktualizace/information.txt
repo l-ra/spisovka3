@@ -89,3 +89,5 @@ Jiný znakový kód pro složky spisů.
 Odstranění "hlavního spisu" a přeindexování stromové struktury spisů.
 [1100]
 Oprava vazby mezi uživatelem a jeho účtem.
+[1120]
+Nové nastavení "Uživatelé mohou měnit své osobní údaje"

@@ -4,7 +4,7 @@
 
     <div class="detail_blok">
         <div class="detail_hlavicka">Informace o uživateli</div>
-        {if ($FormUpravit=='info')}
+        {if $FormUpravit == 'info'}
         {control upravitForm}
         {else}
         <dl>
@@ -23,7 +23,7 @@
             <dt>funkce:</dt>
             <dd>{$Osoba->pozice}</dd>
         </dl>
-        <a href="{link this, 'upravit' => 'info'}">Upravit osobní údaje</a>
+        <a n:if="Settings::get('users_can_change_their_data')" href="{link this, 'upravit' => 'info'}">Upravit osobní údaje</a>
         {/if}
     </div>
 

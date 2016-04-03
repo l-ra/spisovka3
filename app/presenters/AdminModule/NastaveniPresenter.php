@@ -11,6 +11,8 @@ class Admin_NastaveniPresenter extends BasePresenter
     static protected $settings = [
         'force_https' =>
         [ 'router_force_https', false, 'Vynutit zabezpečené připojení protokolem HTTPS'],
+        'users_can_change_their_data' =>
+        [ 'users_can_change_their_data', null, 'Uživatelé mohou měnit své osobní údaje'],
         'users_can_change_their_password' =>
         [ 'users_can_change_their_password', true, 'Uživatelé mohou měnit své heslo'],
         'login_redirect_homepage' =>
