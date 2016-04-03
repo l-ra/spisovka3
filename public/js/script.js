@@ -224,7 +224,7 @@ $(function() {
 
     $('#subjekt_autocomplete').autocomplete({
         minLength: 3,
-        source: BASE_URL + 'subjekty/seznamAjax',
+        source: BASE_URL + 'subjekty/seznam-ajax',
 
         focus: function(event, ui) {
             return false;
