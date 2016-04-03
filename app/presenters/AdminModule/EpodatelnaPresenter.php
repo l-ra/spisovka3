@@ -357,11 +357,11 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                         'Heslo do datové schránky musí být minimálně %d znaků dlouhé.', 8)
                 ->addRule(Nette\Forms\Form::MAX_LENGTH,
                         'Heslo do datové schránky musí být maximálně %d znaků dlouhé.', 32)
-        /* ->addRule(callback($this, 'ruleNoEqual'),'Heslo mesmí obsahovat id (login) uživatele, jemuž se heslo mění.',$isds['login'])
-          ->addRule(callback($this, 'ruleNoEqual'),'Heslo se nesmí shodovat s původním heslem.',$isds['password'])
-          ->addRule(callback($this, 'ruleContains'),'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','qwert')
-          ->addRule(callback($this, 'ruleContains'),'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','asdgf')
-          ->addRule(callback($this, 'ruleContains'),'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','12345')
+        /* ->addRule([$this, 'ruleNoEqual'], 'Heslo mesmí obsahovat id (login) uživatele, jemuž se heslo mění.',$isds['login'])
+          ->addRule([$this, 'ruleNoEqual'], 'Heslo se nesmí shodovat s původním heslem.',$isds['password'])
+          ->addRule([$this, 'ruleContains'], 'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','qwert')
+          ->addRule([$this, 'ruleContains'], 'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','asdgf')
+          ->addRule([$this, 'ruleContains'], 'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','12345')
          */;
 
         $form->addPassword('password_confirm', 'Přihlašovací heslo ještě jednou:', 30, 30)
