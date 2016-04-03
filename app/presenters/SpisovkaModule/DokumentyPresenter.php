@@ -1634,9 +1634,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             '3' => 'Datum určím až v budoucnu',
         );
         $form->addRadioList('udalost_typ', 'Určete rozhodný okamžik:', $options)
+                ->setHtmlId('radio-udalost-typ')
                 ->setValue(1)
         ->controlPrototype->onclick("onChangeRadioButtonSpousteciUdalost();");
-
+        $form['udalost_typ']->generateId = true;    // Nette 2.3
+        
         $form->addDatePicker('datum_spousteci_udalosti', 'Datum spouštěcí události:')
                 //->setDisabled() - nelze volat pri zpracovani odeslaneho formulare, vyresil jsem tedy v Javascriptu
                 ->forbidPastDates()
