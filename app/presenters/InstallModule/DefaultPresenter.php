@@ -491,7 +491,7 @@ class Install_DefaultPresenter extends BasePresenter
 
             $db_tables = dibi::getDatabaseInfo()->getTableNames();
 
-            $sql_template_source = file_get_contents(__DIR__ . 'mysql.sql');
+            $sql_template_source = file_get_contents(__DIR__ . '/mysql.sql');
             $sql_queries = explode(";", $sql_template_source);
 
             // pridej SQL prikazy z aktualizaci
@@ -531,6 +531,9 @@ class Install_DefaultPresenter extends BasePresenter
             foreach ($sql_queries as $query) {
 
                 $query = str_replace("{tbls3}", $db_config->prefix, $query);
+                
+                $query_t = trim($query);
+                if ( empty($query_t) ) continue; // vyloucit prazdne SQL
 
                 if ($this->getParameter('install', null)) {
                     // provedeni SQL skriptu
@@ -884,7 +887,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         unset($data['username'], $data['heslo'], $data['heslo_potvrzeni']);
 
-        $auth = new Authenticator_UI();
+        $auth = $this->context->getService('authenticatorUI');
 
         if (!$auth->vytvoritUcet((array) $data, $user_data, true)) {
             $this->flashMessage('Správce se nepodařilo vytvořit.', 'warning');

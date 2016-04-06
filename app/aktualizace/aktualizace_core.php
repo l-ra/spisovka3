@@ -26,7 +26,8 @@ class Updates
             return;
         }
 
-        $revision = array_shift(explode(strpos($filename, '_') !== false ? "_" : ".", $filename));
+        $revision_a = explode(strpos($filename, '_') !== false ? "_" : ".", $filename);
+        $revision = array_shift( $revision_a );
         if (is_numeric($revision)) {
             self::$revisions[$revision] = $revision;
 
