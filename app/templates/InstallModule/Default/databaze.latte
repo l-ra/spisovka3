@@ -83,14 +83,14 @@
 	<td>{$requirement->passed ? 'Enabled' : 'Disabled'}</td>
 	{else}
 	<td></td>
-	{/if}>
+	{/if}
     </tr>
 
     {if (isset($requirement->passed) && !$requirement->passed)}
     <tr class="{$class} description">
-        <td colspan="2">{$requirement->description}</td>
+        <td colspan="2">{$requirement->description|noescape}</td>
     </tr>
-    {/if}>
+    {/if}
 
     {/foreach}
     </table>
