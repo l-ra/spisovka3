@@ -64,10 +64,7 @@
                 <br />
                 {/if}
                 </div>
-                <span class="small">přílohy:
-                {=($dok->pocet_listu)+0} listů,
-                {=($dok->pocet_priloh)+0} list. příloh,
-                {$dok->pocet_souboru} příloh</span>
+                {include '../../SpisovkaModule/Dokumenty/seznam-pocty-priloh.latte', dokument => $dok}
                 <br/>
                 <span class="small">způsob vyřízení:
                 {$dok->zpusob_vyrizeni}</span>
