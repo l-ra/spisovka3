@@ -14,7 +14,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         return $this->context->getService('storage');
     }
-    
+
     public function startup()
     {
         if (defined('APPLICATION_INSTALL')) {
@@ -67,17 +67,20 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         // Není nutné toto duplikovat pro každou funkci, která umožňuje tisk
         if ($this->getParameter('print') || $this->getParameter('pdfprint'))
             $this->setLayout('print');
-        
+
         /* Následuje XHTML magie */
         $request = $this->getHttpRequest();
         $accept = $request->getHeader('Accept', '');
         $xhtml_browser = strpos($accept, 'application/xhtml+xml') !== false;
         $response = $this->getHttpResponse();
-        
-        $enable_xhtml = false;
-        if (!defined('APPLICATION_INSTALL')) {
-            $enable_xhtml = Settings::get('xhtml', true);
-        }        
+
+        try {
+            $enable_xhtml = Settings::get('xhtml', false);
+        } catch (Exception $e) {
+            // ošetři výjimku při instalaci aplikace
+            $e->getMessage();
+            $enable_xhtml = false;
+        }
 
         if ($enable_xhtml && $xhtml_browser && !$this->isAjax() && !self::$testMode)
             $response->setContentType('application/xhtml+xml', 'utf-8');
@@ -187,7 +190,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                 $this->template->zpravy_pocet_neprectenych = Zpravy::dej_pocet_neprectenych_zprav();
             }
         }
-        
+
         // Nastav, aby Nette generovalo ID prvku formulare jako ve stare verzi
         Nette\Forms\Controls\BaseControl::$idMask = 'frm%s';
     }
@@ -201,13 +204,15 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $set->addMacro('js', 'echo \Spisovka\LatteMacros::JavaScript(%node.word, $publicUrl);');
 
         $set->addMacro('access', 'if (\Spisovka\LatteMacros::access($user, %node.word)) {', '}');
-        $set->addMacro('isAllowed', 'if (\Spisovka\LatteMacros::isAllowed($user, %node.args)) {',
+        $set->addMacro('isAllowed',
+                'if (\Spisovka\LatteMacros::isAllowed($user, %node.args)) {', '}');
+        $set->addMacro('isInRole', 'if (\Spisovka\LatteMacros::isInRole($user, %node.args)) {',
                 '}');
-        $set->addMacro('isInRole', 'if (\Spisovka\LatteMacros::isInRole($user, %node.args)) {', '}');
 
         $set->addMacro('label2', 'echo \Spisovka\LatteMacros::label2($form, %node.args)');
         $set->addMacro('input2', 'echo \Spisovka\LatteMacros::input2($form, %node.args)');
-        $set->addMacro('inputError2', 'echo \Spisovka\LatteMacros::inputError2($form, %node.args)');
+        $set->addMacro('inputError2',
+                'echo \Spisovka\LatteMacros::inputError2($form, %node.args)');
 
         /* Neni momentalne pouzito:
           // $set->addMacro('accessrole', '{', '}');
@@ -215,18 +220,18 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
           $filter->handler->macros['accessrole'] =
           '<?php if ( Acl::isInRole("%%")) { ?>';
           $filter->handler->macros['/accessrole'] =
-          '<?php } ?>'; */        
+          '<?php } ?>'; */
     }
 
     protected function createTemplate($class = null)
     {
         $template = parent::createTemplate($class);
 
-        \Spisovka\LatteFilters::register($template);        
-        
+        \Spisovka\LatteFilters::register($template);
+
         return $template;
     }
-    
+
     /**
      * Formats view template file names.
      * @return array
@@ -251,7 +256,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $messages = [
             // Form::FILLED se použije pouze pro prohlížeče,
             // které neumí HTML5 validaci
-    		Form::FILLED => 'Vyplňte prosím toto pole.',
+            Form::FILLED => 'Vyplňte prosím toto pole.',
             Form::EMAIL => 'Zadejte prosím platnou e-mailovou adresu.',
             Form::INTEGER => 'Zadejte prosím celé číslo.',
             Form::FLOAT => 'Zadejte prosím číslo.'

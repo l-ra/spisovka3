@@ -493,6 +493,7 @@ class Install_DefaultPresenter extends BasePresenter
 
             $sql_template_source = file_get_contents(__DIR__ . '/mysql.sql');
             $sql_queries = explode(";", $sql_template_source);
+            array_pop($sql_queries); // prázdný prvek za posledním středníkem
 
             // pridej SQL prikazy z aktualizaci
             Updates::init();
@@ -532,9 +533,6 @@ class Install_DefaultPresenter extends BasePresenter
 
                 $query = str_replace("{tbls3}", $db_config->prefix, $query);
                 
-                $query_t = trim($query);
-                if ( empty($query_t) ) continue; // vyloucit prazdne SQL
-
                 if ($this->getParameter('install', null)) {
                     // provedeni SQL skriptu
                     $this->template->db_install = 1;
@@ -887,7 +885,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         unset($data['username'], $data['heslo'], $data['heslo_potvrzeni']);
 
-        $auth = $this->context->getService('authenticatorUI');
+        $auth = $this->context->createService('authenticatorUI');
 
         if (!$auth->vytvoritUcet((array) $data, $user_data, true)) {
             $this->flashMessage('Správce se nepodařilo vytvořit.', 'warning');
