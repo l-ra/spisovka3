@@ -77,9 +77,13 @@ else
     echo '<a href="aktualizace.php?go=1" onclick="return confirm(\'Opravdu chcete provést aktualizaci spisové služby?\');">Spustit aktualizaci</a>';
 echo '    </div>
     <div id="content">';
-        
+
+ob_end_flush();
+
 foreach ($clients as $site_path => $site_name) {
 
+    flush(); // zobraz výsledek po aktualizaci každého klienta
+    
     echo "<div class='update_site'>";
     echo "<h1>$site_name</h1>";
 
