@@ -242,13 +242,12 @@ class Install_DefaultPresenter extends BasePresenter
                 'description' => 'Povolte zápis do složky /client/sessions/. Tato složka slouží k ukládání různých stavů aplikace.',
             ),
             array(
-                'title' => 'Zápis do logovací složky',
+                'title' => 'Zápis do složky s protokoly',
                 'required' => FALSE,
                 'passed' => is_writable(LOG_DIR),
                 'message' => 'Povoleno',
-                'errorMessage' => 'Není možné zapisovat do logovací složky.',
-                'description' => 'Povolte zápis do složky /log/. Tato složka slouží k ukládání různých logovacích a chybových hlášek.<br / >
-                                  Není nutné. Pokud však chcete zaznamenávat chybové hlášky, je potřeba tuto složku k zápisu povolit.',
+                'errorMessage' => 'Není možné zapisovat do složky s protokoly.',
+                'description' => 'Povolte <code>zápis</code> do složky /log/. Tato složka slouží k ukládání ladicích informací a protokolů o chybách aplikace.',
             ),
             array(
                 'title' => 'Zápis do složky dokumentů',
@@ -284,12 +283,6 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'Memory limit',
                 'message' => ini_get('memory_limit'),
-            ),
-            'ha' => array(
-                'title' => '.htaccess file protection',
-                'required' => FALSE,
-                'description' => 'File protection by <code>.htaccess</code> is optional. If it is absent, you must be careful to put files into document_root folder.',
-                'script' => "var el = document.getElementById('resha');\nel.className = typeof checkerScript == 'undefined' ? 'passed' : 'warning';\nel.parentNode.removeChild(el.nextSibling.nodeType === 1 ? el.nextSibling : el.nextSibling.nextSibling);",
             ),
             array(
                 'title' => 'Function ini_set',

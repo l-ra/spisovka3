@@ -1,7 +1,0 @@
-<IfModule !authz_host_module>
-Order Allow,Deny
-Deny from all
-</IfModule>
-<IfModule authz_host_module>
-Require local
-</IfModule>
