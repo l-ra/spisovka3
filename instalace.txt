@@ -9,7 +9,8 @@ Instalace OSS Spisove sluzby v3
 Poznamka: Tento navod resi pouze instalaci pro jednoho klienta (organizaci). Pro
 pripadny hosting vice klientu je potreba se obratit na dodavatele aplikace.
 
-Predtim, nez zacnete s instalaci, si overte zakladni pozadavky pro spusteni aplikace:
+Predtim, nez zacnete s instalaci, si overte zakladni pozadavky pro spusteni
+aplikace:
 
 Apache 2
 PHP 5.2 a vyssi
@@ -29,31 +30,38 @@ dostupne PHP knihovny iconv, mbstring, curl, open_ssl, soap, mail,
     /temp/        = slozka pro ukladani docasnych souboru
 /log/        = slozka pro logovani chyb
 
-V ostatnych adresarich by se zapisovat nemelo.
-Adresare /client/ (vcetne podadresaru) a /log/ nesmi byt pres webovy server pristupne.
-Pro server Apache to zajistuji soubory .htaccess, pokud jsou povoleny. Spravnost tohoho
-nastaveni overte, aby nebylo mozne se neopravnene dostat k citlivym datum.
+Doporucujeme pouzit skript set-permissions.sh, ktery to provede za vas. K jeho
+spusteni je nutne opravneni superuzivatele. V ostatnich adresarich by se
+zapisovat nemelo.
+Adresare /client/ (vcetne podadresaru) a /log/ nesmi byt pres webovy server
+pristupne. Pro server Apache to zajistuji soubory .htaccess, pokud jsou
+povoleny. Spravnost tohoho nastaveni overte, aby nebylo mozne se neopravnene 
+dostat k citlivym datum.
 
 
-3. V korenovem adresari prejmenujte soubor index.ph na index.php. V souboru index.php zkontrolujte nastaveni. V typicke instalaci pro jednoho klienta je jedine nastaveni, ktere je nekdy potreba zadat $public_url.
+3. V korenovem adresari prejmenujte soubor index.ph na index.php. V souboru
+index.php zkontrolujte nastaveni. V typicke instalaci pro jednoho klienta
+je jedine nastaveni, ktere je nekdy potreba zadat $public_url.
 
 $public_url = absolutni nebo relativni URL mapujici adresar /public
 
 
-4. V adresari /client/configs/ zkopirujte soubor database.neo do database.neon. V novem souboru nastavte spravne hodnoty pro pripojeni do databaze:
+4. V adresari /client/configs/ zkopirujte soubor database.neo do database.neon.
+V novem souboru nastavte spravne hodnoty pro pripojeni do databaze:
 
 host = localhost        ; adresa serveru
 username =              ; prihlasovaci jmeno k databazi
 password =              ; prihlasovaci heslo k databazi
 database =              ; jmeno databaze (musi existovat!)
-prefix  =               ; prefix tabulek - je mozne nastavit, ale pro prehlednost
-                          se doporucuje spise vytvorit prazdnou databazi
+prefix  =               ; prefix tabulek - je mozne nastavit, ale pro prehled-
+                          nost se doporucuje spise vytvorit prazdnou databazi
 
 
 5. Provedte instalacni proceduru aplikace.
 
-Spustte internetovy prohlizec a zadejte adresu aplikace. Po nacteni stranky do adresniho radku
-pripiste na konec "uvod" (bez uvozovek) a stisknete klavesu enter.
+Spustte internetovy prohlizec a zadejte adresu aplikace. Po nacteni stranky
+do adresniho radku pripiste na konec "uvod" (bez uvozovek) a stisknete klavesu
+enter.
 
 Ridte se nyni pokyny uvedenymi na strankach instalace.
 
@@ -61,7 +69,8 @@ Ridte se nyni pokyny uvedenymi na strankach instalace.
 - provede kontrolu na dostupnost komponent a minimalnich pozadavku na provoz
 
 5b Nahrani databaze
-- provede predkontrolu na existenci tabulek a nasledne nahrani vsech tabulek a dat
+- provede predkontrolu na existenci tabulek a nasledne nahrani vsech tabulek
+a dat
 
 5c Nastaveni klienta
 - zde nastavite informace o svem uradu
@@ -77,11 +86,11 @@ Po uspesnem dokonceni je aplikace pripravena k pouziti.
 
 ================================================================================
 
-Jakekoli chyby behem instalace jsou oznameny chybovou hlaskou.
+Jakekoli chyby behem instalace jsou oznameny chybovou zpravou.
 Pokud je to ve Vasich silach, muzete chybu opravit. Jinak kontaktujte
 odpovidajici osoby nebo navstivte stranku http://www.mojespisovka.cz.
 
 ================================================================================
 UPOZORNENI:
-Ve vlastnim zajmu se doporucuje pred instalaci spisove sluzby provest na serveru zalohu.
-Jak souboru, tak i databaze. Neni to nutne, ale clovek nikdy nevi.
+Ve vlastnim zajmu se doporucuje pred instalaci spisove sluzby provest
+na serveru zalohu. Jak souboru, tak i databaze.
