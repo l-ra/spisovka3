@@ -294,14 +294,13 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function actionVratit()
     {
-
         $zapujcka_id = $this->getParameter('id');
         if (!empty($zapujcka_id) && is_numeric($zapujcka_id)) {
             $Zapujcka = new Zapujcka();
             if ($Zapujcka->vraceno($zapujcka_id, new Datetime())) {
-                $this->flashMessage('Zápůjčka byla vrácena.');
+                $this->flashMessage('Zapůjčený dokument byl vrácen.');
             } else {
-                $this->flashMessage('Zápůjčku se nepodařilo vrátit!.', 'error');
+                $this->flashMessage('Dokument se nepodařilo vrátit!', 'error');
             }
         } else {
             $this->flashMessage('Zápůjčku nelze vrátit! Neplatná zápůjčka.', 'error');
