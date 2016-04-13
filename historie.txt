@@ -18,6 +18,7 @@ Nové funkce:
   Upozornění je možné v administraci globálně vypnout.
 - nyní je možné dokument spojit s více dokumenty najednou, jak bylo původně
   v aplikaci zamýšleno
+- nový filtr pro snadné zobrazení zapůjčených dokumentů  
 - ve výpravně je možné vytvořit podací arch s dokumenty, které uživatel
   ručně vybere (funkce se použije, pokud pracovník chce odeslat dokumenty
   na poště, ale nemá ještě všechny fyzicky u sebe)

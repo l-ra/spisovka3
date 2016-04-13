@@ -806,6 +806,10 @@ class Dokument extends BaseModel
                 }
                 break;
 
+            case 'zapujcene':
+                $a = ['wf.stav_dokumentu = ' . Workflow::STAV_ZAPUJCEN];
+                break;
+            
             case 'vse':
                 $a = array();
                 if ($isVedouci && $oj_id !== null)
@@ -856,6 +860,7 @@ class Dokument extends BaseModel
             case 'predane':
             case 'kvyrizeni':
             case 'vyrizene':
+            case 'zapujcene':
             case 'vse':
 
                 $a[] = 'wf.aktivni=1';

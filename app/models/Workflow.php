@@ -8,6 +8,7 @@ class Workflow extends BaseModel
 
     const STAV_PREDAN_DO_SPISOVNY = 6;
     const STAV_VE_SPISOVNE = 7;
+    const STAV_ZAPUJCEN = 11;
     
     /*
      * 0 - mimo evidenci

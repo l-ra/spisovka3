@@ -2422,6 +2422,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             'vyrizene' => 'Vyřízené',
             'pracoval' => 'Na kterých jsem kdy pracoval',
             'org_pracoval' => 'Na kterých pracovala moje o.j.',
+            'zapujcene' => 'Zapůjčené',
             'vse' => 'Všechny',
             'Výpravna' => array(
                 'doporucene' => 'Doporučené',
