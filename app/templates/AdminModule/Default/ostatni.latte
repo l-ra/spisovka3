@@ -1,7 +1,7 @@
 {block title}Administrace{/block}
 {block content}
 <div class="navigate">
-Ostatní
+    Ostatní
 </div>
 
 <h3><a href={link :Install:Default:kontrola}>Instalační kontrola</a><br/></h3>
@@ -14,3 +14,14 @@ Protokol může obsahovat citlivé údaje. Hesla budou z protokolu odstraněna.
 <h3><a href={link Default:smazatDbCache}>Smazat databázovou cache</a><br/></h3>
 Cache je nutné smazat po ručním zásahu do databáze, aby se změny projevily. Též
 je ji možné smazat, pokud máte podezření, že nepracuje správně.
+
+{if $DU_available}
+    <br/><br/>
+    <h3>Velikost použitého diskového prostoru v MB</h3>
+    <table class="disk-usage">
+        <tr><td>E-podatelna:</td><td class="align-right">{$DU_epodatelna}</td></tr>
+        <tr><td>Dokumenty:</td><td class="align-right">{$DU_documents}</td></tr>
+        <tr><td>Celkem:</td><td class="align-right">{$DU_total}</td></tr>
+    </table>
+    <p>Spočítáno {$DU_date|edate}</p>    
+{/if}

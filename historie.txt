@@ -46,6 +46,9 @@ Nové funkce:
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
   podporu
 - instalační kontrolu je možné kdykoliv znovu spustit
+- v části "ostatní" se zobrazuje diskový prostor zabraný uživatelskými daty,
+  pokud to konfigurace serveru umožňuje (z bezpečnostních důvodů může být 
+  spouštění externích programů z PHP zakázáno)
   
 Jiné změny:
 

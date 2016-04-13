@@ -147,3 +147,11 @@ table.ciselnik_seznam .meta div {
     color: #FFC273;
     text-decoration: underline;
 }
+
+table.disk-usage td {
+    padding-right: 20px;
+}
+
+.align-right {
+    text-align: right;
+}

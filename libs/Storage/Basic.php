@@ -25,6 +25,16 @@ class Storage_Basic extends FileModel
             $this->epodatelna_dir = CLIENT_DIR . "/" . $this->epodatelna_dir;
     }
 
+    public function getDocumentDirectory()
+    {
+        return $this->dokument_dir;        
+    }
+    
+    public function getEpodatelnaDirectory()
+    {
+        return $this->epodatelna_dir;
+    }
+    
     public function remove($file_id)
     {
 

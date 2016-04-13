@@ -10,6 +10,7 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
         'UpdateAgent',
         'SurveyAgent',
         'CleanSessionFiles',
+        'DiskUsage'
     ];
 
     /**
@@ -139,6 +140,50 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
                 SurveyAgent::send();
             }
         }
+    }
+
+    public function taskDiskUsage()
+    {
+        if (Hosting::detect())
+            return;
+        
+        $filename = TEMP_DIR . '/disk_usage';
+        $update_needed = true;
+
+        if (file_exists($filename)) {
+            $cachetime = filemtime($filename);
+            if (date("Ymd") == date("Ymd", $cachetime))
+            // dnes uz operace probehla
+                $update_needed = false;
+        }
+
+        if (!$update_needed)
+            return;
+
+        $storage = $this->context->getService('storage');
+
+        $dir = $storage->getEpodatelnaDirectory();
+        $output = false;
+        if (function_exists('shell_exec'))
+            $output = `du -ms $dir`;
+        if (!$output) {
+            // Nevytvarej soubor, muze byt generovan jinym zpusobem externe
+            // file_put_contents($filename, 'error');
+            return false;
+        }
+        
+        $a = explode("\t", $output);
+        $usage_epodatelna = array_shift($a);
+        
+        $dir = $storage->getDocumentDirectory();
+        $output = `du -ms $dir`;
+        $a = explode("\t", $output);
+        $usage_documents = array_shift($a);
+        
+        $data = "$usage_epodatelna:$usage_documents";
+        file_put_contents($filename, $data);
+        
+        return true;
     }
 
 }
