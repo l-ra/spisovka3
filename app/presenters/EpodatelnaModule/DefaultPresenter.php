@@ -1022,6 +1022,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             $esign_cert = null;
                             $esign_status = null;
                             $esigned = $esign->verifySignature($tmp_email, $esign_cert, $esign_status);
+                            unlink($tmp_email);
                             if (@$esigned['cert_info']['CA_is_qualified'] == 1) {
                                 // obsahuje - pokracujeme
                             } else {
