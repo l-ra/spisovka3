@@ -38,6 +38,17 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                             array('_asession' => $asession, 'alternativelogin' => $alternative));
                 }
             } else {
+                $acc = new UserAccount($user);
+                if ($acc->force_logout) {
+                    $user->logout();
+                    $acc->force_logout = false;
+                    $acc->save();
+                    
+                    $this->flashMessage('Byl jste odhlášen administrátorem.', 'warning');
+                    // Presmeruj, chceme pote uzivatel na vychozi/domovske strance
+                    $this->redirect(':Spisovka:Uzivatel:login');
+                }
+                
                 if ($this->name == "Spisovka:Uzivatel") {
                     // Tento presenter je vzdy pristupny
                     if ($this->view == "login")

@@ -91,3 +91,5 @@ Odstranění "hlavního spisu" a přeindexování stromové struktury spisů.
 Oprava vazby mezi uživatelem a jeho účtem.
 [1120]
 Nové nastavení "Uživatelé mohou měnit své osobní údaje"
+[1130]
+Nový flag "vynutit odhlášení" u uživatelského účtu

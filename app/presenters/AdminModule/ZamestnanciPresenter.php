@@ -370,6 +370,11 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $UserRole->insert($rowur);
         }
 
+        // Odhlaš uživatele, aby se změny rolí okamžitě projevily
+        $account = new UserAccount($user_id);
+        $account->force_logout = true;
+        $account->save();
+        
         $this->flashMessage('Role uživatele byly upraveny.');
         $this->redirect('this', array('id' => $osoba_id));
     }
