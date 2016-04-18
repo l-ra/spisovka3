@@ -883,11 +883,12 @@ if ( count($S2_dok)>0 ) {
                 
                 if (MIGRACE):
                 $S3->insert(S3_.'epodatelna', array(
-                        'epodatelna_typ' => 0,
+                        'odchozi' => 0,
                         'poradi' => $epodatelna_poradi[$podaci_rok],
                         'rok' => $podaci_rok,
-                        'email_id' => !empty($S2_d->id_email)?$S2_d->id_email:null,
-                        'isds_id' => !empty($S2_d->id_isds)?$S2_d->id_isds:null,
+                        'typ' => !empty($S2_d->id_isds) ? 'I' : 'E',
+                        'email_id' => !empty($S2_d->id_email) ? $S2_d->id_email : null,
+                        'isds_id' => !empty($S2_d->id_isds) ? $S2_d->id_isds : null,
                         'identifikator' => null,
                         'predmet' => (empty($S2_d->strucny_obsah))?"Dokument ".$S2_d->cislo_jednaci:$S2_d->strucny_obsah,
                         'popis' => ''.$S2_d->poznamka,
@@ -1235,9 +1236,10 @@ if ( count($S2_dok)>0 ) {
                             $epodatelna_poradi[$podaci_rok] = 1;
                         }
                         $S3->insert(S3_.'epodatelna', array(
-                            'epodatelna_typ' => 0,
+                            'odchozi' => 0,
                             'poradi' => $epodatelna_poradi[$podaci_rok],
                             'rok' => $podaci_rok,
+                            'typ' => !empty($S2_d->id_isds) ? 'I' : 'E',
                             'email_id' => !empty($S2_d->id_email)?$S2_d->id_email:null,
                             'isds_id' => !empty($S2_d->id_isds)?$S2_d->id_isds:null,
                             'identifikator' => null,

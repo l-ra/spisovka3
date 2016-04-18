@@ -22,18 +22,14 @@
         <dl>
             <dt>Typ zprávy:</dt>
             <dd>
-            {if !empty($Zprava->email_id) }
+            {if $Zprava->typ == 'E'}
                 Emailová zpráva
-            {elseif !empty($Zprava->isds_id) }
+            {elseif $Zprava->typ == 'I'}
                 Datová zpráva z ISDS
             {else}
                 Typ nezjištěn
             {/if}
             </dd>
-        </dl>
-        <dl>
-            <dt>Schránka:</dt>
-            <dd>{$Zprava->adresat}</dd>
         </dl>
         <dl>
             <dt>Věc:</dt>

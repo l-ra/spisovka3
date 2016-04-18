@@ -112,7 +112,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
 
         $args = array(
-            'where' => array('(ep.stav=1) AND (ep.epodatelna_typ=0)')
+            'where' => array('ep.stav = 1 AND ep.odchozi = 0')
         );
         $result = $this->Epodatelna->seznam($args);
         $paginator->itemCount = count($result);
@@ -149,7 +149,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         $args = null;
         $args = array(
-            'where' => array('(ep.stav>=1) AND (ep.epodatelna_typ=0)')
+            'where' => array('ep.stav >= 1 AND ep.odchozi = 0')
         );
         $result = $this->Epodatelna->seznam($args);
         $paginator->itemCount = count($result);
@@ -183,7 +183,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         $args = null;
         $args = [
-            'where' => ['ep.epodatelna_typ = 1'],
+            'where' => ['ep.odchozi = 1'],
             'order' => ['doruceno_dne' => 'DESC']
         ];
         $result = $this->Epodatelna->seznam($args);
@@ -227,7 +227,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             }
 
             $original = null;
-            if (!empty($zprava->email_id)) {
+            if ($zprava->typ == 'E') {
                 // Nacteni originalu emailu
                 if (!empty($zprava->file_id)) {
                     $original = self::nactiEmail($this->storage, $zprava->file_id);
@@ -263,7 +263,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         }
                     }
                 }
-            } else if (!empty($zprava->isds_id)) {
+            } else if ($zprava->typ == 'I') {
                 // Nacteni originalu DS
                 if (!empty($zprava->file_id)) {
                     $source = self::nactiISDS($this->storage, $zprava->file_id);
@@ -405,7 +405,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         //$paginator->itemsPerPage = 2;// isset($client_config->nastaveni->pocet_polozek)?$client_config->nastaveni->pocet_polozek:20;
 
         $args = array(
-            'where' => array('(ep.stav=0 OR ep.stav=1) AND (ep.epodatelna_typ=0)')
+            'where' => array('(ep.stav = 0 OR ep.stav = 1) AND ep.odchozi = 0')
         );
         $result = $this->Epodatelna->seznam($args);
         //$paginator->itemCount = count($result);
@@ -440,7 +440,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
                 $original = null;
                 $nalezene_subjekty = null;
-                if (!empty($zprava->email_id)) {
+                if ($zprava->typ == 'E') {
                     // Nacteni originalu emailu
                     if (!empty($zprava->file_id)) {
                         $original = self::nactiEmail($this->storage, $zprava->file_id);
@@ -468,7 +468,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             $email_subjekt_cache[$subjekt->email] = $SubjektModel->hledat($subjekt, 'email', true);
                         $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];
                     }
-                } else if (!empty($zprava->isds_id)) {
+                } else if ($zprava->typ == 'I') {
                     // Nacteni originalu DS
                     if (!empty($zprava->file_id)) {
                         $file_id = explode("-", $zprava->file_id);
@@ -633,6 +633,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitlePoint ."\n";//  =
 
                         $zprava = array();
+                        $zprava['odchozi'] = 0;
+                        $zprava['typ'] = 'I';
                         $zprava['poradi'] = $this->Epodatelna->getMax();
                         $zprava['rok'] = date('Y');
                         $zprava['isds_id'] = $z->dmID;
@@ -749,7 +751,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         if (is_null($zprava)) {
             // Nacti zpravy, ktere nemaji datum doruceni
             $args = array(
-                'where' => array('ep.epodatelna_typ=1', 'ep.isds_id IS NOT NULL', 'ep.prijato_dne=ep.doruceno_dne')
+                'where' => array('ep.odchozi = 1', 'ep.typ = \'I\'', 'ep.prijato_dne = ep.doruceno_dne')
             );
             $epod = $this->Epodatelna->seznam($args)->fetchAll();
             if (count($epod) > 0) {
@@ -913,7 +915,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     // Vrátí počet nových zpráv nebo řetězec s popisem chyby
 
-    private function zkontrolujEmail($config)
+    protected function zkontrolujEmail($config)
     {
         $imap = new ImapClient();
         $email_mailbox = '{' . $config['server'] . ':' . $config['port'] . '' . $config['typ'] . '}' . $config['inbox'];
@@ -973,6 +975,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
 
                 $zprava = array();
+                $zprava['odchozi'] = 0;
+                $zprava['typ'] = 'E';
                 $zprava['poradi'] = $this->Epodatelna->getMax();
                 $zprava['rok'] = date('Y');
                 $zprava['email_id'] = $z->message_id;

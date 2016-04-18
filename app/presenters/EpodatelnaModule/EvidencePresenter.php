@@ -62,7 +62,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
 
             $original = null;
-            if (!empty($zprava->email_id)) {
+            if ($zprava->typ == 'E') {
                 // Nacteni originalu emailu
                 if (!empty($zprava->file_id)) {
                     $original = Epodatelna_DefaultPresenter::nactiEmail($this->storage,
@@ -92,7 +92,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $SubjektModel = new Subjekt();
                 $subjekt_databaze = $SubjektModel->hledat($subjekt, 'email');
                 $this->template->Subjekt = array('original' => $subjekt, 'databaze' => $subjekt_databaze);
-            } else if (!empty($zprava->isds_id)) {
+            } else if ($zprava->typ == 'I') {
                 // Nacteni originalu DS
                 if (!empty($zprava->file_id)) {
                     $file_id = explode("-", $zprava->file_id);
@@ -208,7 +208,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $epodatelna_id = $this->getParameter('id', null);
         $zprava = $Epodatelna->getInfo($epodatelna_id);
 
-        if (!empty($zprava->isds_id)) {
+        if ($zprava->typ == 'I') {
             if (!empty($zprava->file_id)) {
                 $file_id = explode("-", $zprava->file_id);
                 $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_id[0]);
@@ -368,7 +368,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         if (isset($typy_dokumentu[1]))
             $form['dokument_typ_id']->setDefaultValue(1);
 
-        /* if ( !empty($zprava->email_id) ) {
+        /* if ($zprava->typ == 'E') {
           foreach ($typ_dokumentu_extra as $tde) {
           if ( $tde->typ == 1 && $tde->smer == 0 ) {
           $id_tde = $tde->id;
@@ -377,7 +377,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
           }
           $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
           ->setValue($id_tde);
-          } else if ( !empty($zprava->isds_id) ) {
+          } else if ($zprava->typ == 'I') {
           foreach ($typ_dokumentu_extra as $tde) {
           if ( $tde->typ == 2 && $tde->smer == 0 ) {
           $id_tde = $tde->id;
@@ -409,7 +409,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'Lhůta k vyřízení musí být číslo');
 
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
-        if (!empty($zprava->email_id) && Settings::get('epodatelna_copy_email_into_documents_note'))
+        if ($zprava->typ == 'E' && Settings::get('epodatelna_copy_email_into_documents_note'))
             $form['poznamka']->setValue(@html_entity_decode($zprava->popis));
 
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
@@ -459,7 +459,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $data['poradi'] = 1;
 
             // 1-email, 2-isds
-            $data['zpusob_doruceni_id'] = $zprava->email_id ? 1 : 2;
+            $data['zpusob_doruceni_id'] = $zprava->typ == 'E' ? 1 : 2;
 
             $predani = ['predano_user' => $data->predano_user, 'predano_org' => $data->predano_org,
                 'predano_poznamka' => $data->predano_poznamka];
@@ -470,9 +470,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             if ($dokument) {
 
                 // Ulozeni prilohy
-                if ($zprava->email_id) {
+                if ($zprava->typ == 'E') {
                     $this->emailPrilohy($epodatelna_id, $dokument_id);
-                } else if ($zprava->isds_id) {
+                } else if ($zprava->typ == 'I') {
                     $this->isdsPrilohy($epodatelna_id, $dokument_id);
                 }
 
@@ -524,7 +524,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     $predano = $this->user->displayName;
                 }
 
-                if (!empty($zprava->email_id)) {
+                if ($zprava->typ == 'E') {
                     $email_info = array(
                         'jid' => $dokument->jid,
                         'nazev' => $zprava->predmet,
@@ -571,7 +571,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             "datum_vzniku" => $zprava['doruceno_dne'],
             "lhuta" => "30",
             "poznamka" => $data['poznamka'],
-            'zpusob_doruceni_id' => $zprava->email_id ? 1 : 2
+            'zpusob_doruceni_id' => $zprava->typ == 'E' ? 1 : 2
         );
         $dokument = $Dokument->ulozit($dokument_data);
 
@@ -581,9 +581,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $dokument_id = $dokument->id;
 
         // Ulozeni prilohy
-        if (!empty($zprava->email_id)) {
+        if ($zprava->typ == 'E') {
             $this->emailPrilohy($epodatelna_id, $dokument_id);
-        } else if (!empty($zprava->isds_id)) {
+        } else if ($zprava->typ == 'I') {
             $this->isdsPrilohy($epodatelna_id, $dokument_id);
         }
 
@@ -630,7 +630,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $predano = $this->user->displayName;
         }
 
-        if (!empty($zprava->email_id)) {
+        if ($zprava->typ == 'E') {
             $email_info = array(
                 'jid' => $dokument->jid,
                 'nazev' => $zprava->predmet,

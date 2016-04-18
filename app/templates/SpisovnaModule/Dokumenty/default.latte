@@ -56,9 +56,9 @@
             </td>
             <td class="typ">
                 <img src="{$publicUrl}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
-                {if !empty($dok->epod_is_email)}
+                {if $dok->epod_typ == 'E'}
                 <img src="{$publicUrl}images/icons/typdok1.png" alt="přijato emailem" title="přijato emailem" width="24" height="16" />
-                {elseif !empty($dok->epod_is_isds)}
+                {elseif $dok->epod_typ == 'I'}
                 <img src="{$publicUrl}images/icons/typdok2.png" alt="přijato datovou schránkou" title="přijato datovou schránkou" width="24" height="16" />
                 {/if}
             </td>

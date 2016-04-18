@@ -102,13 +102,16 @@ class Epodatelna extends BaseModel
         return $query->fetch();
     }
 
+    /**
+     * @param int $smer  0 - prichozi, 1 - odchozi
+     * @return int 
+     */
     public function getMax($smer = 0)
     {
-
-        $result = $this->select(array('rok' => date('Y'), array('epodatelna_typ=%i', $smer)),
+        $result = $this->select(array('rok' => date('Y'), array('odchozi = %i', $smer)),
                 array('poradi' => 'DESC'), null, 1);
         $row = $result->fetch();
-        return ($row) ? ($row->poradi + 1) : 1;
+        return $row ? $row->poradi + 1 : 1;
     }
 
     public function identifikator($zprava, $original = null)
@@ -135,7 +138,7 @@ class Epodatelna extends BaseModel
             $identifikator['doruceno_dne'] = $doruceno;
             $identifikator['prijato_dne'] = $prijato;
 
-            if (!empty($zprava->email_id)) {
+            if ($zprava->typ == 'E') {
 
                 $identifikator['typ'] = "email";
                 $identifikator['odesilatel'] = $zprava->odesilatel;
@@ -183,7 +186,7 @@ class Epodatelna extends BaseModel
                 $identifikator['cert_signed'] = $original['signature']['signed'];
 
                 $identifikator['popis'] = $popis;
-            } else if (!empty($zprava->isds_id)) {
+            } else if ($zprava->typ == 'I') {
 
                 if (!empty($original->dmDm->dmID)) {
 
@@ -372,8 +375,7 @@ class Epodatelna extends BaseModel
 
     public function getLastISDS()
     {
-
-        $data = $this->select(array('epodatelna_typ=0', 'isds_id IS NOT NULL'),
+        $data = $this->select(array('odchozi = 0 AND typ = \'I\''),
                         array('doruceno_dne' => 'DESC'), 0, 1)->fetch();
         if ($data) {
             $do = strtotime($data->doruceno_dne);

@@ -13,7 +13,7 @@
             <th class="typ">Typ zprávy</th>
             <th class="prijato">Doručeno<br />Přijato EP</th>
             <th class="cislo_jednaci">ID</th>
-            <th class="vec">Věc<br />Odesilatel/-é</th>
+            <th class="vec">Věc<br />Odesilatel</th>
             <th class="prideleno">Schránka</th>
             <th class="stav">Stav</th>
         </tr>
@@ -21,9 +21,9 @@
         {foreach $seznam as $ep}
         <tr>
             <td class="typ">
-                {if !empty($ep->email_id)}
+                {if $ep->typ == 'E'}
                 <img src="{$publicUrl}images/icons/typdok1.png" alt="Email" title="Email" width="24" height="16" />
-                {elseif !empty($ep->isds_id)}
+                {elseif $ep->typ == 'I'}
                 <img src="{$publicUrl}images/icons/typdok2.png" alt="ISDS" title="ISDS" width="24" height="16" />
                 {/if}
             </td>

@@ -449,7 +449,7 @@ class Dokument extends BaseModel
 
                 $args['leftJoin']['zpusob_doruceni'] = array(
                     'from' => array($this->tb_epodatelna => 'epod'),
-                    'on' => array('epod.dokument_id = d.id', 'epod.epodatelna_typ = 0'),
+                    'on' => array('epod.dokument_id = d.id', 'epod.odchozi = 0'),
                     'cols' => null
                 );
                 switch ($params['typ_doruceni']) {
@@ -457,10 +457,10 @@ class Dokument extends BaseModel
                         $args['where'][] = array('epod.id IS NOT NULL');
                         break;
                     case 2: // email
-                        $args['where'][] = array('epod.email_id IS NOT NULL');
+                        $args['where'][] = array("epod.typ = 'E'");
                         break;
                     case 3: // isds
-                        $args['where'][] = array('epod.isds_id IS NOT NULL');
+                        $args['where'][] = array("epod.typ = 'I'");
                         break;
                     case 4: // mimo epod
                         $args['where'][] = array('epod.id IS NULL');
@@ -1072,8 +1072,8 @@ class Dokument extends BaseModel
                 ),
                 'epod' => array(
                     'from' => array($this->tb_epodatelna => 'epod'),
-                    'on' => array('epod.dokument_id = dok.id', 'epod.epodatelna_typ = 0'),
-                    'cols' => array('identifikator', 'email_id' => 'epod_is_email', 'isds_id' => 'epod_is_isds')
+                    'on' => array('epod.dokument_id = dok.id', 'epod.odchozi = 0'),
+                    'cols' => array('identifikator', 'typ' => 'epod_typ')
                 ),
                 'spisovy_znak' => array(
                     'from' => array($this->tb_spisovy_znak => 'spisznak'),
@@ -1181,6 +1181,9 @@ class Dokument extends BaseModel
 
             $dokument = $row;
 
+            if (!isset($dokument->epod_typ))
+                $dokument->epod_typ = ''; // definuj "epod_typ", pokud dokument nebyl vytvořen e-podatelnou
+            
             $dokument->typ_dokumentu = $typ;
             if (isset($spis)) {
                 $dokument->spis = $spis;

@@ -34,9 +34,11 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         $mail->setHeader('To', NULL);
         $this->setHeaderMailer($mail);
 
+        $mail_source = $mail->generateMessage();
+
         $config = (new Spisovka\ConfigEpodatelna())->get();
         // použij první / hlavní účet, pokud by jich v budoucnu mělo být více
-        $config = $config->odeslani[0];
+        $config = $config->odeslani[0];        
         if ($config['podepisovat']) {
             $esign = new esignature();
             $esign->setUserCert($config['cert'], $config['cert_pass']);
@@ -44,8 +46,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             $cert_info = $esign->parseCertificate();
             if (!is_array($cert_info))
                 throw new Exception('Email nelze podepsat. Neplatný certifikát!');
-
-            $mail_source = $mail->generateMessage();
+           
             $in_parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL,
                     $mail_source, 2);
             $header_parts = explode(Nette\Mail\Message::EOL, $in_parts[0]);
@@ -66,13 +67,14 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
                     unset($header_parts[$iheader]);
                 }
             }
+            
             $in_parts[0] = implode(Nette\Mail\Message::EOL, $header_parts);
-            $mess = implode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $in_parts);
+            $mess1 = implode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $in_parts);
 
             $headers_array = $mail->headers;
             $headers_array['From'] = $mail->getEncodedHeader('From');
 
-            $mail_source = $esign->signMessage($mess, $headers_array);
+            $mail_source = $esign->signMessage($mess1, $headers_array);
 
             if (is_null($mail_source))
                 throw new Exception('Email se nepodařilo podepsat.');
@@ -93,24 +95,13 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             foreach ($headers_array as $key => $value) {
                 $headers .= $key . ": " . $value . Nette\Mail\Message::EOL;
             }
-            $mess = $mess_part[1];
-        } else {
-            $mail_source = $mail->generateMessage();
+            $body = $mess_part[1];
+        } else {            
             $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
             $headers = $parts[0];
-            $mess = $parts[1];
+            $body = $parts[1];
         }
         
-        $tmp_mail = "To: $to\n";
-        $tmp_mail .= "Subject: $subject\n";
-        $tmp_mail .= $headers;
-        $tmp_mail .= "\n\n";
-        $tmp_mail .= $mess;
-        $tmp_mail = str_replace("\r\n", "\n", $tmp_mail);
-
-        // Uschovej posledni odesilany mail pro ucely ladeni
-        @file_put_contents(TEMP_DIR . '/tmp_email.eml', $tmp_mail);
-
         if ($test_mode === 1) {
             // test - neodesila se
             // vytvor adresar, pokud neexistuje
@@ -134,11 +125,11 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         if ($linux) {
             $to = str_replace(Nette\Mail\Message::EOL, "\n", $to);
             $subject = str_replace(Nette\Mail\Message::EOL, "\n", $subject);
-            $mess = str_replace(Nette\Mail\Message::EOL, "\n", $mess);
+            $body = str_replace(Nette\Mail\Message::EOL, "\n", $body);
             $headers = str_replace(Nette\Mail\Message::EOL, "\n", $headers);
         }
 
-        $res = mail($to, $subject, $mess, $headers);
+        $res = mail($to, $subject, $body, $headers);
         restore_error_handler();
 
         if (!$res)

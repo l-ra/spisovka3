@@ -1,6 +1,6 @@
     <h2>Odmítnout zprávu</h2>    
-    {if !empty($Zprava->email_id)}
+    {if $Zprava->typ == 'E'}
     {control odmitnoutEmailForm}
-    {elseif !empty($Zprava->isds_id)}
+    {elseif $Zprava->typ == 'I'}
     {control odmitnoutISDSForm}
     {/if}

@@ -58,9 +58,9 @@
                 {else}
                 příchozí
                 {/if}
-                {if !empty($dok->epod_is_email)}
+                {if $dok->epod_typ == 'E'}
                 <br>přijato emailem
-                {elseif !empty($dok->epod_is_isds)}
+                {elseif $dok->epod_typ == 'I'}
                 <br>přijato ISDS
                 {/if}
             </td>

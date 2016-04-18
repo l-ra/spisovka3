@@ -165,7 +165,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 @ini_set("memory_limit", PDF_MEMORY_LIMIT);
 
                 $person_name = $this->user->displayName;
-                
+
                 if ($this->pdf_output == 2) {
                     $content = str_replace("<td", "<td valign='top'", $content);
                     $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
@@ -414,10 +414,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ($pdf)
                 $this->pdf_output = 2;
         }
-        
+
         $Log = new LogModel();
         $historie = $Log->historieDokumentu($id, $tisk || $pdf);
-        $this->template->historie = $historie;        
+        $this->template->historie = $historie;
     }
 
     public function renderDetailSpojeni($id)
@@ -441,14 +441,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         return $BA;
     }
-    
+
     public function bulkAction($action, $documents)
     {
         $Workflow = new Workflow();
 
         switch ($action) {
             case 'tisk':
-                $this->redirect('this', ['print' => 1,
+                $this->redirect('this',
+                        ['print' => 1,
                     'vybrane_dokumenty' => implode('-', $documents)]);
 
             /* Prevzeti vybranych dokumentu */
@@ -510,7 +511,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
         $this->redirect('default');
     }
-    
+
     public function actionPrevzit()
     {
         $dokument_id = $this->getParameter('id', null);
@@ -859,7 +860,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->cjednaci = $CJ->generuj();
 
         $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
-       
+
         if ($dokument) {
             $this->template->Dok = $dokument;
             $this->template->dokument_id = $dokument->id;
@@ -867,7 +868,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->Dok = null;
             $this->flashMessage('Dokument není připraven k vytvoření', 'warning');
         }
-        
+
         $this->template->form_name = 'novyForm';
     }
 
@@ -1523,7 +1524,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
         }
-        
+
         $this->redirect('detail', ['id' => $dokument_id]);
     }
 
@@ -1638,7 +1639,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(1)
         ->controlPrototype->onclick("onChangeRadioButtonSpousteciUdalost();");
         $form['udalost_typ']->generateId = true;    // Nette 2.3
-        
+
         $form->addDatePicker('datum_spousteci_udalosti', 'Datum spouštěcí události:')
                 //->setDisabled() - nelze volat pri zpracovani odeslaneho formulare, vyresil jsem tedy v Javascriptu
                 ->forbidPastDates()
@@ -1712,7 +1713,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
             }
         }
-        
+
         $person = Person::fromUserId($this->user->id);
         if (!empty($person->email)) {
             $key = "user#" . Osoba::displayName($person, 'jmeno') . "#" . $person->email;
@@ -1892,7 +1893,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         'isds_fikce' => isset($post_data['isds_fikce'][$subjekt_id]) ? true : false,
                     );
 
-                    if ($zprava = $this->odeslatISDS($adresat, $data, $prilohy)) {
+                    if ($result = $this->odeslatISDS($adresat, $data, $prilohy)) {
                         $Log = new LogModel();
                         $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,
                                 'Dokument odeslán datovou zprávou na adresu "' . Subjekt::displayName($adresat,
@@ -1900,7 +1901,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         $this->flashMessage('Datová zpráva pro "' . Subjekt::displayName($adresat,
                                         'isds') . '" byla úspěšně odeslána do systému ISDS.');
                         $stav = 2;
-                        if (!is_array($zprava)) {
+                        if (!is_array($result)) {
                             $this->flashMessage('Datovou zprávu pro "' . Subjekt::displayName($adresat,
                                             'isds') . '" se nepodařilo uložit do e-podatelny.',
                                     'warning');
@@ -1918,11 +1919,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         continue;
                     }
 
-                    if (isset($zprava['epodatelna_id'])) {
-                        $epodatelna_id = $zprava['epodatelna_id'];
+                    if (isset($result['epodatelna_id'])) {
+                        $epodatelna_id = $result['epodatelna_id'];
                     }
-                    if (isset($zprava['zprava'])) {
-                        $zprava_odes = $zprava['zprava'];
+                    if (isset($result['zprava'])) {
+                        $zprava_odes = $result['zprava'];
                     }
                 } else if ($metoda_odeslani == 3) {
                     // postou
@@ -2006,8 +2007,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         try {
             if (strpos($data['email_from'], "user") !== false) {
-                $user_part = explode("#", $data['email_from']);
-                $mail->setFrom($user_part[2], $user_part[1]);
+                $a = explode("#", $data['email_from']);
+                $mail->setFrom($a[2], $a[1]);
             }
 
             if (strpos($adresat->email, ';') !== false) {
@@ -2041,129 +2042,52 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             return false;
         }
 
-        $source = "";
-        if (file_exists(TEMP_DIR . '/tmp_email.eml')) {
-            $source = TEMP_DIR . '/tmp_email.eml';
-        }
-
-        // Do epodatelny
-        $UploadFile = $this->storage;
-
-        // nacist email z ImapClient
-        $imap = new ImapClientFile();
-        if ($imap->open($source)) {
-            $email_mess = $imap->get_head_message(0);
-        } else {
-            $email_mess = new stdClass();
-            $email_mess->from_address = @$user_part[2];
-            $mid = sha1(@$data['email_predmet'] . "#" . time() . "#" . @$user_part[2] . "#" . @$adresat->email);
-            $email_mess->message_id = "<$mid@mail>";
-            $email_mess->subject = $data['email_predmet'];
-            $email_mess->to_address = $adresat->email;
-        }
-
-
-        if (isset($user_part)) {
-            $email_config['ucet'] = $user_part[1];
-            $email_config['email'] = $user_part[2];
-        } else {
-            $email_config['ucet'] = "uživatel";
-            $email_config['email'] = $email_mess->from_address;
-        }
-        $adresat_popis = $email_config['ucet'] . ' [' . $email_config['email'] . ']';
 
         // zapis do epodatelny
         $Epodatelna = new Epodatelna();
         $zprava = array();
-        $zprava['epodatelna_typ'] = 1;
+        $zprava['odchozi'] = 1;
+        $zprava['typ'] = 'E';
         $zprava['poradi'] = $Epodatelna->getMax(1);
         $zprava['rok'] = date('Y');
-        $zprava['email_id'] = $email_mess->message_id;
-        $zprava['predmet'] = empty($email_mess->subject) ? $data['email_predmet'] : $email_mess->subject;
+        $zprava['email_id'] = '<nezalezi@na.tom>';
+        $zprava['predmet'] = $mail->getSubject();
         if (empty($zprava['predmet']))
             $zprava['predmet'] = "(bez předmětu)";
         $zprava['popis'] = $data['email_text'];
-        $zprava['odesilatel'] = $email_mess->to_address;
+        // V databázi je prohozen adresát a odesilatel!!
+        $zprava['odesilatel'] = $adresat->email;
         $zprava['odesilatel_id'] = $adresat->id;
-        $zprava['adresat'] = $adresat_popis;
+        $zprava['adresat'] = '';
         $zprava['prijato_dne'] = new DateTime();
         $zprava['doruceno_dne'] = new DateTime();
         $zprava['prijal_kdo'] = $this->user->id;
+        $zprava['sha1_hash'] = '';  // nesmysl toto nastavovat, nemáme z čeho hash počítat
 
-        $zprava['sha1_hash'] = $source ? sha1_file($source) : '';
-
-        $prilohy = array();
-        if (isset($email_mess->attachments)) {
-            foreach ($email_mess->attachments as $pr) {
-
-                $base_name = basename($pr['DataFile']);
-                //echo $base_name ."<br>";
-
-                $prilohy[] = array(
-                    'name' => $pr['FileName'],
-                    'size' => filesize($pr['DataFile']),
-                    'mimetype' => FileModel::mimeType($pr['FileName']),
-                    'id' => $base_name
-                );
-            }
+        $zprava_prilohy = array();
+        foreach ($prilohy as $pr) {
+            $zprava_prilohy[] = array(
+                'name' => $pr->real_name,
+                'size' => $pr->size,
+                'mimetype' => $pr->mime_type
+            );
         }
-        $zprava['prilohy'] = serialize($prilohy);
+
+        $zprava['prilohy'] = serialize($zprava_prilohy);
 
         $zprava['evidence'] = 'spisovka';
         $zprava['dokument_id'] = $data['dokument_id'];
-        $zprava['stav'] = 0;
+        // 1 = odesláno, neodeslané e-maily a datové zprávy se v e-podatelně vůbec neobjeví
+        $zprava['stav'] = 1;
         $zprava['stav_info'] = '';
-        //$zprava['source'] = $z;
-        //unset($mess->source);
-        //$zprava['source'] = $mess;
         $zprava['file_id'] = null;
 
-        if ($epod_id = $Epodatelna->insert($zprava)) {
-
-            $data_file = array(
-                'filename' => 'ep_email_' . $epod_id . '.eml',
-                'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
-                'typ' => '5',
-                'popis' => 'Emailová zpráva z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
-                    //'popis'=>'Emailová zpráva'
-            );
-
-            $mess_source = "";
-            if ($fp = @fopen($source, 'rb')) {
-                $mess_source = fread($fp, filesize($source));
-                @fclose($fp);
-            }
-
-            if ($file = $UploadFile->uploadEpodatelna($mess_source, $data_file)) {
-                // ok
-                $zprava['stav_info'] = 'Zpráva byla uložena';
-                $zprava['file_id'] = $file->id;
-                $Epodatelna->update(
-                        array('stav' => 1,
-                    'stav_info' => $zprava['stav_info'],
-                    'file_id' => $file->id
-                        ), array(array('id=%i', $epod_id))
-                );
-            } else {
-                $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
-                // false
-            }
-        } else {
-            $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
-        }
-
-
-
+        $epod_id = $Epodatelna->insert($zprava);
 
         return array(
-            'source' => $source,
             'epodatelna_id' => $epod_id,
-            'email_id' => $email_mess->message_id,
             'zprava' => $data['email_text']
         );
-        //} else {
-        //    return false;
-        //}
     }
 
     protected function odeslatISDS($adresat, $data, $prilohy)
@@ -2259,7 +2183,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $config = $isds->getConfig();
 
             $zprava = array();
-            $zprava['epodatelna_typ'] = 1;
+            $zprava['odchozi'] = 1;
+            $zprava['typ'] = 'I';
             $zprava['poradi'] = $Epodatelna->getMax(1);
             $zprava['rok'] = date('Y');
             $zprava['isds_id'] = $mess->dmID;
@@ -2307,8 +2232,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 if ($file_o = $UploadFile->uploadEpodatelna($signedmess, $data)) {
                     // ok
                 } else {
-                    $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
-                    // false
+                    // $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
                 }
 
                 /* Ulozeni reprezentace zpravy */
@@ -2326,37 +2250,28 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     //$zprava['file_id'] = $file->id ."-". $file_o->id;
                     $zprava['file_id'] = $file->id;
                     $Epodatelna->update(
-                            array('stav' => 1,
+                            ['stav' => 1,
                         'stav_info' => $zprava['stav_info'],
                         'file_id' => $file->id
-                            ), array(array('id=%i', $epod_id))
+                            ], "id = $epod_id"
                     );
                 } else {
-                    $zprava['stav_info'] = 'Reprezentace zprávy se nepodařilo uložit';
-                    // false
+                    // $zprava['stav_info'] = 'Reprezentace zprávy se nepodařilo uložit';
                 }
             } else {
-                $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
+                // $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
             }
 
             return array(
-                'source' => $mess,
                 'epodatelna_id' => $epod_id,
-                'isds_id' => $zprava,
                 'zprava' => $popis
             );
         } catch (DibiException $e) {
-            if (!empty($id_mess)) {
-                $this->flashMessage('Chyba v DB: ' . $e->getMessage(), 'warning_ext');
-                return array(
-                    'source' => $mess,
-                    'epodatelna_id' => $epod_id,
-                    'isds_id' => $zprava,
+            $this->flashMessage('Chyba v DB: ' . $e->getMessage(), 'warning_ext');
+            if (!empty($id_mess))
+                return ['epodatelna_id' => $epod_id,
                     'zprava' => $popis
-                );
-            } else {
-                $this->flashMessage('Chyba v DB: ' . $e->getMessage(), 'warning_ext');
-            }
+                ];
         } catch (Exception $e) {
             // chyba v pripojeni k datove schrance
             $this->flashMessage('Chyba ISDS: ' . $e->getMessage(), 'warning_ext');
