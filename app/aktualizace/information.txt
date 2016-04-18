@@ -93,3 +93,5 @@ Oprava vazby mezi uživatelem a jeho účtem.
 Nové nastavení "Uživatelé mohou měnit své osobní údaje"
 [1130]
 Nový flag "vynutit odhlášení" u uživatelského účtu
+[1160]
+Údaj o uživateli u odchozích zpráv v e-podatelně

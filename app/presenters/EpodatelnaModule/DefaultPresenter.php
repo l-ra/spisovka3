@@ -645,7 +645,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $zprava['adresat'] = $config['ucet'] . ' [' . $config['idbox'] . ']';
                         $zprava['prijato_dne'] = new DateTime();
                         $zprava['doruceno_dne'] = new DateTime($z->dmAcceptanceTime);
-                        $zprava['prijal_kdo'] = $this->user->id;
+                        $zprava['user_id'] = $this->user->id;
 
                         $zprava['sha1_hash'] = '';
 
@@ -987,7 +987,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $zprava['adresat'] = $config['ucet'] . ' [' . $config['login'] . ']';
                 $zprava['prijato_dne'] = new DateTime();
                 $zprava['doruceno_dne'] = new DateTime(date('Y-m-d H:i:s', $z->udate));
-                $zprava['prijal_kdo'] = $this->user->id;
+                $zprava['user_id'] = $this->user->id;
 
                 $zprava['sha1_hash'] = sha1($mess->source);
 

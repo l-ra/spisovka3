@@ -6,6 +6,8 @@
 
 Nové funkce:
 
+- u odeslaných zpráv v e-podatelně se nyní zobrazuje jméno uživatele, který
+  zprávu odeslal
 - usnadněn a zrychlen výběr spisu při vkládání dokumentu do spisu
 - sloupce, které se mají v sestavách zobrazit je nyní možné přesně určit,
   včetně jejich pořadí

@@ -21,7 +21,7 @@
             <th class="prijato">Odesláno</th>
             <th class="cislo_jednaci">ID</th>
             <th>Věc<br />Adresát</th>
-            {* <th class="prideleno">Odesilatel</th> *}
+            <th class="prideleno">Odeslal</th>
         </tr>
 
         {foreach $seznam as $ep}
@@ -48,8 +48,9 @@
                 <br />
                 {$ep->odesilatel}
             </td>
-            {* <td class="prideleno">
-            </td> *}
+            <td class="prideleno">
+                {Person::fromUserId($ep->user_id)->displayName()}
+            </td>
         </tr>
         {/foreach}
     </table>

@@ -2061,7 +2061,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zprava['adresat'] = '';
         $zprava['prijato_dne'] = new DateTime();
         $zprava['doruceno_dne'] = new DateTime();
-        $zprava['prijal_kdo'] = $this->user->id;
+        $zprava['user_id'] = $this->user->id;
         $zprava['sha1_hash'] = '';  // nesmysl toto nastavovat, nemáme z čeho hash počítat
 
         $zprava_prilohy = array();
@@ -2195,7 +2195,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['adresat'] = $config['ucet'] . ' [' . $config['idbox'] . ']';
             $zprava['prijato_dne'] = new DateTime();
             $zprava['doruceno_dne'] = new DateTime($mess->dmAcceptanceTime);
-            $zprava['prijal_kdo'] = $this->user->id;
+            $zprava['user_id'] = $this->user->id;
             $zprava['sha1_hash'] = '';
 
             $aprilohy = array();
