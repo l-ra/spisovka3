@@ -163,7 +163,7 @@ generujZpravu = function (data) {
     
     if (data['typ'] == "E") {
         typ = 1;
-        typ_string = '<img src="'+PUBLIC_URL+'images/icons/typdok1.png" alt="Email" title="Email" width="24" height="16" />';
+        typ_string = '<img src="'+PUBLIC_URL+'images/icons/email.png" alt="Email" title="Email" width="24" height="16" />';
 
         form_odmitnout = '                    <dl>'+
 '                        <dt></dt>'+
@@ -184,7 +184,7 @@ generujZpravu = function (data) {
 
     } else if (data['typ'] == "I") {
         typ = 2;
-        typ_string = '<img src="' + PUBLIC_URL + 'images/icons/typdok2.png" alt="ISDS" title="ISDS" width="24" height="16" />';
+        typ_string = '<img src="' + PUBLIC_URL + 'images/icons/isds.png" alt="ISDS" title="ISDS" width="24" height="16" />';
         form_odmitnout = '';
     } else {
         typ_string = '';

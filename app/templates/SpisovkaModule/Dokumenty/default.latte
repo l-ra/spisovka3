@@ -55,9 +55,9 @@
             <td class="typ">
                 <img src="{$publicUrl}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
                 {if $dok->epod_typ == 'E'}
-                <img src="{$publicUrl}images/icons/typdok1.png" alt="přijato emailem" title="přijato nebo odesláno emailem" width="24" height="16" />
+                <img src="{$publicUrl}images/icons/email.png" alt="přijato emailem" title="přijato nebo odesláno emailem" width="24" height="16" />
                 {elseif $dok->epod_typ == 'I'}
-                <img src="{$publicUrl}images/icons/typdok2.png" alt="přijato datovou schránkou" title="přijato nebo odesláno datovou schránkou" width="24" height="16" />
+                <img src="{$publicUrl}images/icons/isds.png" alt="přijato datovou schránkou" title="přijato nebo odesláno datovou schránkou" width="24" height="16" />
                 {/if}
             </td>
             <td class="prijato" title="{$dok->datum_vzniku|edatetime}">
