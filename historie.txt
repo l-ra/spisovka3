@@ -80,7 +80,8 @@ Jiné změny:
   a subjektů. Tyto informace nebyly nikdy v aplikaci uživateli přístupné.
   Chcete-li tyto informace uchovat, proveďte před aktualizací aplikace
   zálohu databáze.
-  
+
+- modré pozadí bloku je při tisku nyní světlejší  
 - aplikace při zobrazování zpráv uživateli nekonzistentně používala ikony
   varování a chyby. Nyní je použit pouze obrázek značky s vykřičníkem.
 - aplikace se nyní snaží zjistit MIME typ přímo ze souborů. V předchozích

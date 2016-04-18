@@ -27,3 +27,7 @@ th.akce { display: none; }
 @media print {
    thead { display: table-header-group; }
 }
+
+.dokument_blok_hlavni {
+    background: #A8DBFF ;
+}
