@@ -18,27 +18,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         parent::startup();
     }
 
-    public function renderPridelitcj()
-    {
-        $dokument_id = $this->getParameter('id', null);
-
-        $Dokument = new Dokument();
-
-        $CJ = new CisloJednaci();
-        $cjednaci = $CJ->generuj(1);
-
-        $data = array();
-        $data['cislojednaci_id'] = $cjednaci->id;
-        $data['cislo_jednaci'] = $cjednaci->cislo_jednaci;
-        $data['podaci_denik'] = $cjednaci->podaci_denik;
-        $data['podaci_denik_poradi'] = $cjednaci->poradove_cislo;
-        $data['podaci_denik_rok'] = $cjednaci->rok;
-
-        $Dokument->update($data, [['id=%i', $dokument_id]]);
-        $this->flashMessage('číslo jednací přiděleno');
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
-    }
-
     public function renderNovy($id)
     {
         /* Nacteni zpravy */
@@ -325,30 +304,13 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function createComponentNovyForm()
     {
-        if (isset($this->template->Dok)) {
-            $dokument_id = isset($this->template->Dok->id) ? $this->template->Dok->id : 0;
-        } else {
-            $dokument_id = 0;
-        }
-
-        if (isset($this->template->Zprava)) {
-            $zprava = isset($this->template->Zprava) ? $this->template->Zprava : null;
-        } else {
-            $zprava = null;
-        }
-        if (isset($this->template->Original)) {
-            $original = isset($this->template->Original) ? $this->template->Original : null;
-        } else {
-            $original = null;
-        }
-
-        $typy_dokumentu = TypDokumentu::dostupneUzivateli();
-
         $form = new Spisovka\Form();
-        $form->addHidden('dokument_id')
-                ->setValue($dokument_id);
-        $form->addHidden('epodatelna_id')
-                ->setValue(@$zprava->id);
+
+        $form->addHidden('dokument_id');
+        if (isset($this->template->Dok))
+            $form['dokument_id']->setValue($this->template->Dok->id);
+        
+        $form->addHidden('epodatelna_id');
         $form->addHidden('predano_user');
         $form->addHidden('predano_org');
         $form->addHidden('predano_poznamka');
@@ -359,58 +321,25 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     ->controlPrototype->readonly = TRUE;
         }
 
-
-        $form->addText('nazev', 'Věc:', 80, 100)
-                ->setValue(@$zprava->predmet);
+        $form->addText('nazev', 'Věc:', 80, 100);
         $form->addTextArea('popis', 'Popis:', 80, 3);
 
+        $typy_dokumentu = TypDokumentu::dostupneUzivateli();
         $form->addSelect('dokument_typ_id', 'Typ dokumentu:', $typy_dokumentu);
         if (isset($typy_dokumentu[1]))
             $form['dokument_typ_id']->setDefaultValue(1);
 
-        /* if ($zprava->typ == 'E') {
-          foreach ($typ_dokumentu_extra as $tde) {
-          if ( $tde->typ == 1 && $tde->smer == 0 ) {
-          $id_tde = $tde->id;
-          break;
-          }
-          }
-          $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $typ_dokumentu)
-          ->setValue($id_tde);
-          } else if ($zprava->typ == 'I') {
-          foreach ($typ_dokumentu_extra as $tde) {
-          if ( $tde->typ == 2 && $tde->smer == 0 ) {
-          $id_tde = $tde->id;
-          break;
-          }
-          }
-          $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu)
-          ->setValue($id_tde);
-          } else {
-          $form->addSelect('typ_dokumentu_id', 'Typ Dokumentu:', $typ_dokumentu)
-          ->setValue(1);
-          } */
+        $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
 
-        $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
-                ->setValue(@$original->zprava['cislo_jednaci_odesilatele']);
-
-        $unixtime = strtotime(@$zprava->doruceno_dne);
-        $datum = date('d.m.Y', $unixtime);
-        $cas = date('H:i:s', $unixtime);
-        $form->addDatePicker('datum_vzniku', 'Datum doručení:')
-                ->setValue($datum);
-        $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15)
-                ->setValue($cas);
+        $form->addDatePicker('datum_vzniku', 'Datum doručení:');
+        $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->setValue('30')
                 ->setOption('description', 'dní')
-                ->addRule(Nette\Forms\Form::NUMERIC,
-                'Lhůta k vyřízení musí být číslo');
+                ->addRule(Nette\Forms\Form::NUMERIC, 'Lhůta k vyřízení musí být číslo');
 
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
-        if ($zprava->typ == 'E' && Settings::get('epodatelna_copy_email_into_documents_note'))
-            $form['poznamka']->setValue(@html_entity_decode($zprava->popis));
 
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
 
@@ -419,6 +348,20 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet příloh musí být číslo.');
 
+        $zprava = isset($this->template->Zprava) ? $this->template->Zprava : null;
+        if ($zprava) {
+            $form['epodatelna_id']->setValue($zprava->id);
+            $form['nazev']->setValue($zprava->predmet);
+            if ($zprava->typ == 'E' && Settings::get('epodatelna_copy_email_into_documents_note'))
+                $form['poznamka']->setValue(@html_entity_decode($zprava->popis));
+            $unixtime = strtotime($zprava->doruceno_dne);
+            $datum = date('d.m.Y', $unixtime);
+            $cas = date('H:i:s', $unixtime);
+            $form['datum_vzniku']
+                    ->setValue($datum);
+            $form['datum_vzniku_cas']
+                    ->setValue($cas);
+        }
 
         $form->addSubmit('novy', 'Vytvořit')
                 ->onClick[] = array($this, 'vytvoritClicked');
@@ -644,8 +587,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function emailPrilohy($epodatelna_id, $dokument_id)
     {
-        $prilohy = Epodatelna_PrilohyPresenter::emailPrilohy($this->storage, $epodatelna_id);
-
+        $prilohy = Epodatelna_PrilohyPresenter::getEmailPrilohy($this->storage, $epodatelna_id);
+        
         $UploadFile = $this->storage;
 
         $DokumentFile = new DokumentPrilohy();
@@ -680,44 +623,36 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
         }
 
-
-        // nahrani prilohy
-        if (count($prilohy) > 0) {
-            foreach ($prilohy as $file) {
-
-                // prekopirovani na pozadovane misto
-                $data = array(
-                    'filename' => $file['file_name'],
-                    'nazev' => $file['file_name'],
-                    'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
-                    'typ' => '2',
-                    'popis' => '',
-                    'charset' => $file['charset'],
-                        //'popis'=>'Emailová zpráva'
-                );
-
-                if ($fp = fopen($file['file'], 'rb')) {
-                    $source = fread($fp, filesize($file['file']));
-                    if ($file = $UploadFile->uploadDokumentSource($source, $data)) {
-                        // zapiseme i do
-                        $DokumentFile->pripojit($dokument_id, $file->id);
-                    } else {
-                        // false
-                    }
-                    @fclose($fp);
-                } else {
-                    // nelze kopirovat
-                }
-            }
-            return true;
-        } else {
+        if (count($prilohy) == 0)
             return null;
+
+        foreach ($prilohy as $filedata) {
+
+            // prekopirovani na pozadovane misto
+            $data = array(
+                'filename' => $filedata['file_name'],
+                'nazev' => $filedata['file_name'],
+                'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
+                'typ' => '2',
+                'popis' => '',
+                'charset' => $filedata['charset'],
+                    //'popis'=>'Emailová zpráva'
+            );
+
+            if ($uploaded = $UploadFile->uploadDokumentSource($filedata['file'], $data)) {
+                // zapiseme i do
+                $DokumentFile->pripojit($dokument_id, $uploaded->id);
+            } else {
+                // false
+            }
         }
+
+        return true;
     }
 
     private function isdsPrilohy($epodatelna_id, $dokument_id)
     {
-        $prilohy = Epodatelna_PrilohyPresenter::isdsPrilohy($this->storage, $epodatelna_id);
+        $prilohy = Epodatelna_PrilohyPresenter::getIsdsPrilohy($this->storage, $epodatelna_id);
 
         $UploadFile = $this->storage;
 
@@ -801,7 +736,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addSubmit('evidovat', 'Zaevidovat')
                 ->onClick[] = array($this, 'zaevidovatClicked');
         $form->onError[] = array($this, 'validationFailed');
-        
+
         return $form;
     }
 
@@ -809,7 +744,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $this->redirect('Default:detail', ['id' => $this->getParameter('id')]);
     }
-    
+
     public function zaevidovatClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -821,7 +756,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $e->getMessage();
             $this->flashMessage('Zprávu se nepodařilo zaevidovat do jiné evidence.', 'warning');
         }
-        
+
         $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
     }
 
@@ -878,7 +813,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $e->getMessage();
             $this->flashMessage('Zprávu se nepodařilo odmítnout.', 'warning');
         }
-        
+
         $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
     }
 
@@ -959,7 +894,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $e->getMessage();
             $this->flashMessage('Zprávu se nepodařilo odmítnout.', 'warning');
         }
-        
+
         $this->redirect(':Epodatelna:Default:detail', array('id' => $data['id']));
     }
 
@@ -978,4 +913,5 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         
     }
+
 }

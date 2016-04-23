@@ -92,14 +92,8 @@ class Epodatelna extends BaseModel
 
     public function getInfo($epodatelna_id)
     {
-        $args = array(
-            'where' => array(
-                array('id=%i', $epodatelna_id)
-            )
-        );
-
-        $query = $this->selectComplex($args);
-        return $query->fetch();
+        $res = $this->select([['id = %i', $epodatelna_id]]);
+        return $res->fetch();
     }
 
     /**
@@ -114,9 +108,9 @@ class Epodatelna extends BaseModel
         return $row ? $row->poradi + 1 : 1;
     }
 
-    public function identifikator($zprava, $original = null)
+    public function identifikator($zprava, $param = null)
     {
-        if (empty($zprava) && empty($original)) {
+        if (empty($zprava) && empty($param)) {
             return null;
         } else if (!empty($zprava->identifikator)
                 // Bugfix: Pokud identifikátor obsahuje tento řetězec, je nutné jej sestavit znovu
@@ -142,73 +136,73 @@ class Epodatelna extends BaseModel
 
                 $identifikator['typ'] = "email";
                 $identifikator['odesilatel'] = $zprava->odesilatel;
-                $identifikator['email'] = @$original['zprava']->from->email;
-                $identifikator['adresat'] = @$original['zprava']->to_address;
+                $identifikator['email'] = @$param['zprava']->from->email;
+                $identifikator['adresat'] = @$param['zprava']->to_address;
 
                 $popis = "";
                 $popis .= "Předmět     : " . $zprava->predmet . "\n";
                 $popis .= "Odesílatel  : " . $zprava->odesilatel . "\n";
-                $popis .= "Adresát     : " . @$original['zprava']->to_address . "\n";
+                $popis .= "Adresát     : " . @$param['zprava']->to_address . "\n";
                 $popis .= "\n";
                 $popis .= "Datum a čas doručení            : " . date("d.m.Y H:i:s", $doruceno) . "\n";
                 $popis .= "Datum a čas přijetí e-podatelnou : " . date("d.m.Y H:i:s", $prijato) . "\n";
                 $popis .= "\n";
 
-                if ((int) $original['signature']['signed'] >= 0 && !empty($original['signature']['signed'])) {
+                if ((int) $param['signature']['signed'] >= 0 && !empty($param['signature']['signed'])) {
 
-                    if (!empty($original['signature']['cert_info']['organizace'])) {
-                        $popis .= "Certifikát  : " . $original['signature']['cert_info']['organizace'] . "\n";
-                        if (!empty($original['signature']['cert_info']['jednotka'])) {
-                            $popis .= "              " . $original['signature']['cert_info']['jednotka'] . "\n";
+                    if (!empty($param['signature']['cert_info']['organizace'])) {
+                        $popis .= "Certifikát  : " . $param['signature']['cert_info']['organizace'] . "\n";
+                        if (!empty($param['signature']['cert_info']['jednotka'])) {
+                            $popis .= "              " . $param['signature']['cert_info']['jednotka'] . "\n";
                         }
-                        $popis .= "              " . $original['signature']['cert_info']['jmeno'] . "\n";
+                        $popis .= "              " . $param['signature']['cert_info']['jmeno'] . "\n";
                     } else {
-                        $popis .= "Certifikát  : " . $original['signature']['cert_info']['jmeno'] . "\n";
+                        $popis .= "Certifikát  : " . $param['signature']['cert_info']['jmeno'] . "\n";
                     }
 
-                    if (!empty($original['signature']['cert_info']['adresa'])) {
-                        $popis .= "              " . $original['signature']['cert_info']['adresa'] . "\n";
+                    if (!empty($param['signature']['cert_info']['adresa'])) {
+                        $popis .= "              " . $param['signature']['cert_info']['adresa'] . "\n";
                     }
-                    if (!empty($original['signature']['cert_info']['email'])) {
-                        $popis .= "              " . $original['signature']['cert_info']['email'] . "\n";
+                    if (!empty($param['signature']['cert_info']['email'])) {
+                        $popis .= "              " . $param['signature']['cert_info']['email'] . "\n";
                     }
                     $popis .= "              platnost: " .
                             date("j.n.Y G:i:s",
-                                    $original['signature']['cert_info']['platnost_od']) . " - " .
+                                    $param['signature']['cert_info']['platnost_od']) . " - " .
                             date("j.n.Y G:i:s",
-                                    $original['signature']['cert_info']['platnost_do']) . "\n";
-                    $popis .= "              CA: " . $original['signature']['cert_info']['CA'] . "\n";
-                    $popis .= "                  " . $original['signature']['cert_info']['CA_org'] . "\n";
+                                    $param['signature']['cert_info']['platnost_do']) . "\n";
+                    $popis .= "              CA: " . $param['signature']['cert_info']['CA'] . "\n";
+                    $popis .= "                  " . $param['signature']['cert_info']['CA_org'] . "\n";
                 }
 
-                $identifikator['cert_info'] = @$original['signature']['cert_info'];
-                $identifikator['cert_status'] = $original['signature']['status'];
-                $identifikator['cert_signed'] = $original['signature']['signed'];
+                $identifikator['cert_info'] = @$param['signature']['cert_info'];
+                $identifikator['cert_status'] = $param['signature']['status'];
+                $identifikator['cert_signed'] = $param['signature']['signed'];
 
                 $identifikator['popis'] = $popis;
             } else if ($zprava->typ == 'I') {
 
-                if (!empty($original->dmDm->dmID)) {
+                if (!empty($param->dmDm->dmID)) {
 
                     $identifikator['typ'] = "isds";
-                    $identifikator['id_datove_zpravy'] = $original->dmDm->dmID;
-                    $identifikator['odesilatel'] = $original->dmDm->dbIDSender;
-                    $identifikator['adresat'] = $original->dmDm->dbIDRecipient;
+                    $identifikator['id_datove_zpravy'] = $param->dmDm->dmID;
+                    $identifikator['odesilatel'] = $param->dmDm->dbIDSender;
+                    $identifikator['adresat'] = $param->dmDm->dbIDRecipient;
 
-                    $popis = "ID datové zprávy  : " . $original->dmDm->dmID . "\n";
-                    $popis .= "Předmět    : " . $original->dmDm->dmAnnotation . "\n";
+                    $popis = "ID datové zprávy  : " . $param->dmDm->dmID . "\n";
+                    $popis .= "Předmět    : " . $param->dmDm->dmAnnotation . "\n";
                     $popis .= "\n";
-                    $popis .= "Odesílatel : " . $original->dmDm->dbIDSender . "\n";
-                    $popis .= "             " . $original->dmDm->dmSender . "\n";
-                    $popis .= "             " . $original->dmDm->dmSenderAddress . "\n";
+                    $popis .= "Odesílatel : " . $param->dmDm->dbIDSender . "\n";
+                    $popis .= "             " . $param->dmDm->dmSender . "\n";
+                    $popis .= "             " . $param->dmDm->dmSenderAddress . "\n";
                     $popis .= "\n";
-                    $popis .= "Adresát    : " . $original->dmDm->dbIDRecipient . "\n";
-                    $popis .= "             " . $original->dmDm->dmRecipient . "\n";
-                    $popis .= "             " . $original->dmDm->dmRecipientAddress . "\n";
+                    $popis .= "Adresát    : " . $param->dmDm->dbIDRecipient . "\n";
+                    $popis .= "             " . $param->dmDm->dmRecipient . "\n";
+                    $popis .= "             " . $param->dmDm->dmRecipientAddress . "\n";
                     $popis .= "\n";
 
-                    $dt_dodani = strtotime($original->dmDeliveryTime);
-                    $dt_doruceni = strtotime($original->dmAcceptanceTime);
+                    $dt_dodani = strtotime($param->dmDeliveryTime);
+                    $dt_doruceni = strtotime($param->dmAcceptanceTime);
                     $popis .= "Datum a čas dodání              : " . date("d.m.Y H:i:s",
                                     $dt_dodani) . "\n";
                     $popis .= "Datum a čas doručení            : " . date("d.m.Y H:i:s",
@@ -217,41 +211,41 @@ class Epodatelna extends BaseModel
                                     $prijato) . "\n";
                     $popis .= "\n";
 
-                    $popis .= "Číslo jednací odesílatele   : " . $original->dmDm->dmSenderRefNumber . "\n";
-                    $popis .= "Spisová značka odesílatele : " . $original->dmDm->dmSenderIdent . "\n";
-                    $popis .= "Číslo jednací příjemce     : " . $original->dmDm->dmRecipientRefNumber . "\n";
-                    $popis .= "Spisová značka příjemce    : " . $original->dmDm->dmRecipientIdent . "\n";
+                    $popis .= "Číslo jednací odesílatele   : " . $param->dmDm->dmSenderRefNumber . "\n";
+                    $popis .= "Spisová značka odesílatele : " . $param->dmDm->dmSenderIdent . "\n";
+                    $popis .= "Číslo jednací příjemce     : " . $param->dmDm->dmRecipientRefNumber . "\n";
+                    $popis .= "Spisová značka příjemce    : " . $param->dmDm->dmRecipientIdent . "\n";
                     $popis .= "\n";
-                    $popis .= "Do vlastních rukou? : " . (!empty($original->dmDm->dmPersonalDelivery)
+                    $popis .= "Do vlastních rukou? : " . (!empty($param->dmDm->dmPersonalDelivery)
                                         ? "ano" : "ne") . "\n";
-                    $popis .= "Doručeno fikcí?     : " . (!empty($original->dmDm->dmAllowSubstDelivery)
+                    $popis .= "Doručeno fikcí?     : " . (!empty($param->dmDm->dmAllowSubstDelivery)
                                         ? "ano" : "ne") . "\n";
-                    $popis .= "Zpráva určena pro   : " . $original->dmDm->dmToHands . "\n";
+                    $popis .= "Zpráva určena pro   : " . $param->dmDm->dmToHands . "\n";
                     //$popis .= "\n";
                     //$popis .= "Status: ". $original->dmMessageStatus ." - ". ISDS_Spisovka::stavZpravy($original->dmMessageStatus) ."\n";
 
                     $identifikator['popis'] = $popis;
-                } else if (!empty($original)) {
+                } else if (!empty($param)) {
 
                     $identifikator['typ'] = "isds";
-                    $identifikator['id_datove_zpravy'] = $original->dmID;
-                    $identifikator['odesilatel'] = $original->dbIDSender;
-                    $identifikator['adresat'] = $original->dbIDRecipient;
+                    $identifikator['id_datove_zpravy'] = $param->dmID;
+                    $identifikator['odesilatel'] = $param->dbIDSender;
+                    $identifikator['adresat'] = $param->dbIDRecipient;
 
-                    $popis = "ID datové zprávy  : " . $original->dmID . "\n";
-                    $popis .= "Předmět    : " . $original->dmAnnotation . "\n";
+                    $popis = "ID datové zprávy  : " . $param->dmID . "\n";
+                    $popis .= "Předmět    : " . $param->dmAnnotation . "\n";
                     $popis .= "\n";
-                    $popis .= "Odesílatel : " . $original->dbIDSender . "\n";
-                    $popis .= "             " . $original->dmSender . "\n";
-                    $popis .= "             " . $original->dmSenderAddress . "\n";
+                    $popis .= "Odesílatel : " . $param->dbIDSender . "\n";
+                    $popis .= "             " . $param->dmSender . "\n";
+                    $popis .= "             " . $param->dmSenderAddress . "\n";
                     $popis .= "\n";
-                    $popis .= "Adresát    : " . $original->dbIDRecipient . "\n";
-                    $popis .= "             " . $original->dmRecipient . "\n";
-                    $popis .= "             " . $original->dmRecipientAddress . "\n";
+                    $popis .= "Adresát    : " . $param->dbIDRecipient . "\n";
+                    $popis .= "             " . $param->dmRecipient . "\n";
+                    $popis .= "             " . $param->dmRecipientAddress . "\n";
                     $popis .= "\n";
 
-                    $dt_dodani = strtotime($original->dmDeliveryTime);
-                    $dt_doruceni = strtotime($original->dmAcceptanceTime);
+                    $dt_dodani = strtotime($param->dmDeliveryTime);
+                    $dt_doruceni = strtotime($param->dmAcceptanceTime);
                     $popis .= "Datum a čas dodání              : " . date("d.m.Y H:i:s",
                                     $dt_dodani) . "\n";
                     $popis .= "Datum a čas doručení            : " . date("d.m.Y H:i:s",
@@ -260,16 +254,16 @@ class Epodatelna extends BaseModel
                                     $prijato) . "\n";
                     $popis .= "\n";
 
-                    $popis .= "Číslo jednací odesílatele   : " . $original->dmSenderRefNumber . "\n";
-                    $popis .= "Spisová značka odesílatele : " . $original->dmSenderIdent . "\n";
-                    $popis .= "Číslo jednací příjemce     : " . $original->dmRecipientRefNumber . "\n";
-                    $popis .= "Spisová značka příjemce    : " . $original->dmRecipientIdent . "\n";
+                    $popis .= "Číslo jednací odesílatele   : " . $param->dmSenderRefNumber . "\n";
+                    $popis .= "Spisová značka odesílatele : " . $param->dmSenderIdent . "\n";
+                    $popis .= "Číslo jednací příjemce     : " . $param->dmRecipientRefNumber . "\n";
+                    $popis .= "Spisová značka příjemce    : " . $param->dmRecipientIdent . "\n";
                     $popis .= "\n";
-                    $popis .= "Do vlastních rukou? : " . (!empty($original->dmPersonalDelivery)
+                    $popis .= "Do vlastních rukou? : " . (!empty($param->dmPersonalDelivery)
                                         ? "ano" : "ne") . "\n";
-                    $popis .= "Doručeno fikcí?     : " . (!empty($original->dmAllowSubstDelivery)
+                    $popis .= "Doručeno fikcí?     : " . (!empty($param->dmAllowSubstDelivery)
                                         ? "ano" : "ne") . "\n";
-                    $popis .= "Zpráva určena pro   : " . $original->dmToHands . "\n";
+                    $popis .= "Zpráva určena pro   : " . $param->dmToHands . "\n";
                     //$popis .= "\n";
                     //$popis .= "Status: ". $original->dmMessageStatus ." - ". ISDS_Spisovka::stavZpravy($original->dmMessageStatus) ."\n";
 
@@ -362,7 +356,7 @@ class Epodatelna extends BaseModel
 
                 // [P.L.] Oprava problemu z minulosti, kdy aplikace hlasila, ze maily bez podpisu
                 // mely poskozeny podpis. Zobraz aktualni stav overereni, ne text z databaze
-                $identifikator['cert_status'] = $original['signature']['status'];
+                $identifikator['cert_status'] = $param['signature']['status'];
             } else {
                 $identifikator['cert_log']['aktualne']['date'] = date("d.m.Y H:i:s");
                 $identifikator['cert_log']['aktualne']['message'] = $identifikator['cert_status'];

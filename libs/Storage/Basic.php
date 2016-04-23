@@ -16,7 +16,7 @@ class Storage_Basic extends FileModel
         parent::__construct();
 
         $this->httpResponse = $httpResponse;
-        
+
         $this->dokument_dir = $params['path_documents'];
         $this->epodatelna_dir = $params['path_epodatelna'];
         if ($this->dokument_dir{0} != '/')
@@ -27,14 +27,14 @@ class Storage_Basic extends FileModel
 
     public function getDocumentDirectory()
     {
-        return $this->dokument_dir;        
+        return $this->dokument_dir;
     }
-    
+
     public function getEpodatelnaDirectory()
     {
         return $this->epodatelna_dir;
     }
-    
+
     public function remove($file_id)
     {
 
@@ -280,59 +280,64 @@ class Storage_Basic extends FileModel
         }
     }
 
+    public function getFilePath($file)
+    {
+        $file_path = CLIENT_DIR . $file->real_path;
+        return $file_path;
+    }
+    
+    /**
+     * @param object $file   zaznam z tabulky file
+     * @param int $output  0 - posle soubor na vystup
+     *                     1 - vrati jako retezec
+     *                     2 - vrati cestu k souboru
+     * @return string|int  
+     * @throws Nette\Application\BadRequestException
+     */
     public function download($file, $output = 0)
     {
         try {
+            $file_path = CLIENT_DIR . "" . $file->real_path;
 
-            $file_path = CLIENT_DIR . "" . @$file->real_path;
-
-            if (file_exists($file_path)) {
-
-                //if ( empty($file->real_name) ) {
-                $basename = basename($file_path);
-                //} else {
-                //    $basename = $file->real_name;
-                //}
-
-                if ($output == 1) {
-                    // poslat jako retezec
-                    if ($fp = fopen($file_path, 'rb')) {
-                        return fread($fp, filesize($file_path));
-                    } else {
-                        return null;
-                    }
-                } else if ($output == 2) {
-                    // poslat do docasneho souboru
-                    return $file_path;
-                } else {
-                    // primy stream - poslat ven
-
-                    $httpResponse = $this->httpResponse;
-                    $httpResponse->setContentType($file->mime_type ?: 'application/octetstream');
-                    $httpResponse->setHeader('Content-Description', 'File Transfer');
-                    $httpResponse->setHeader('Content-Disposition',
-                            'attachment; filename="' . $basename . '"');
-                    $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
-                    $httpResponse->setHeader('Expires', '0');
-                    $httpResponse->setHeader('Cache-Control',
-                            'must-revalidate, post-check=0, pre-check=0');
-                    $httpResponse->setHeader('Pragma', 'public');
-                    if (!empty($file->size)) {
-                        $httpResponse->setHeader('Content-Length', $file->size);
-                    } else {
-                        $httpResponse->setHeader('Content-Length', filesize($file_path));
-                    }
-
-                    readfile($file_path);
-
-                    return 0;
-                }
-            } else {
+            if (!file_exists($file_path))
                 return 1;
+
+            $basename = basename($file_path);
+
+            if ($output == 1) {
+                if ($fp = fopen($file_path, 'rb'))
+                    return fread($fp, filesize($file_path));
+
+                return null;
+            } else if ($output == 2) {
+                return $file_path;
             }
+
+            // poslat primo na vystup
+
+            $httpResponse = $this->httpResponse;
+            $httpResponse->setContentType($file->mime_type ? : 'application/octetstream');
+            $httpResponse->setHeader('Content-Description', 'File Transfer');
+            $httpResponse->setHeader('Content-Disposition',
+                    'attachment; filename="' . $basename . '"');
+            $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
+            $httpResponse->setHeader('Expires', '0');
+            $httpResponse->setHeader('Cache-Control',
+                    'must-revalidate, post-check=0, pre-check=0');
+            $httpResponse->setHeader('Pragma', 'public');
+            if (!empty($file->size)) {
+                $httpResponse->setHeader('Content-Length', $file->size);
+            } else {
+                $httpResponse->setHeader('Content-Length', filesize($file_path));
+            }
+
+            readfile($file_path);
+
+            return 0;
         } catch (Nette\InvalidStateException $e) {
-            throw new Nette\Application\BadRequestException($e->getMessage());
-            return 2;
+            throw $e;
+            // [P.L.] Toto mi nedava smysl.
+            // throw new Nette\Application\BadRequestException($e->getMessage());
         }
     }
 
