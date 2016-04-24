@@ -398,7 +398,10 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         unset($data['predani_poznamka'], $data['dokument_id'], $data['epodatelna_id']);
 
+        $document_created = false;
         try {
+            dibi::begin();
+            
             $data['poradi'] = 1;
 
             // 1-email, 2-isds
@@ -444,6 +447,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $Log = new LogModel();
                 $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
+                dibi::commit();
+                $document_created = true;
+                
                 $this->flashMessage('Dokument byl vytvořen.');
 
                 $rozdelany = $this->getSession('s3_rozdelany');
@@ -480,7 +486,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             } else {
                 $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
             }
-        } catch (DibiException $e) {
+        }
+        catch (Nette\Application\AbortException $e) {
+            throw $e;
+        }
+        catch (Exception $e) {
+            if (!$document_created)
+                dibi::rollback();
+            throw $e;
             $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
         }
@@ -587,8 +600,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function emailPrilohy($epodatelna_id, $dokument_id)
     {
-        $prilohy = Epodatelna_PrilohyPresenter::getEmailPrilohy($this->storage, $epodatelna_id);
-        
         $UploadFile = $this->storage;
 
         $DokumentFile = new DokumentPrilohy();
@@ -621,8 +632,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             } else {
                 // false
             }
+            
+            unset($res_data);
         }
 
+        $prilohy = Epodatelna_PrilohyPresenter::getEmailPrilohy($this->storage, $epodatelna_id);        
         if (count($prilohy) == 0)
             return null;
 
