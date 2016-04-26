@@ -62,6 +62,7 @@ try {
     Debugger::enable(DEBUG_ENABLE ? Debugger::DEVELOPMENT : Debugger::PRODUCTION, LOG_DIR);
 // '%logDir%/php_error_'.date('Ym').'.log' - stary nazev souboru s logy
     Nette\Bridges\Framework\TracyBridge::initialize();
+    Debugger::$maxDepth = 5;
 
 // 2b) vytvor DI kontejner
 
