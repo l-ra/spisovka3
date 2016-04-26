@@ -381,31 +381,28 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 if ($zprava->typ == 'E') {
                     // Nacteni originalu emailu
                     if (!empty($zprava->file_id)) {
-                        $original = self::nactiEmail($this->storage, $zprava->file_id);
-
-                        $subjekt->nazev_subjektu = isset($original['zprava']->from->personal) ? $original['zprava']->from->personal
-                                    : $zprava->odesilatel;
-                        $subjekt->prijmeni = $original['zprava']->from->personal;
-                        $subjekt->email = $original['zprava']->from->email;
+                        $sender = $zprava->odesilatel;
+                        $matches = [];
+                        if (preg_match('/(.*)<(.*)>/', $sender, $matches)) {
+                            $subjekt->email = $matches[2];
+                            $subjekt->nazev_subjektu = trim($matches[1]);
+                            $subjekt->prijmeni = $subjekt->nazev_subjektu;
+                        } else {
+                            $subjekt->email = $sender;
+                            $subjekt->nazev_subjektu = null;
+                        }
                         $matches = [];
                         if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
                             $subjekt->jmeno = $matches[1];
                             $subjekt->prijmeni = $matches[2];
                         }
 
-                        if ($original['signature']['signed'] >= 0) {
-
-                            $subjekt->nazev_subjektu = $original['signature']['cert_info']['organizace'];
-                            $subjekt->prijmeni = $original['signature']['cert_info']['jmeno'];
-                            if (!empty($original['signature']['cert_info']['email']) && $subjekt->email != $original['signature']['cert_info']['email']) {
-                                $subjekt->email = $subjekt->email . "; " . $original['signature']['cert_info']['email'];
-                            }
-                            $subjekt->ulice = $original['signature']['cert_info']['adresa'];
-                        }
-
-                        if (!isset($email_subjekt_cache[$subjekt->email]))
-                            $email_subjekt_cache[$subjekt->email] = $SubjektModel->hledat($subjekt,
+                        if (!isset($email_subjekt_cache[$subjekt->email])) {
+                            $search = ['email' => $subjekt->email, 'nazev_subjektu' => $subjekt->nazev_subjektu];
+                            $search = \Nette\Utils\ArrayHash::from($search);
+                            $email_subjekt_cache[$subjekt->email] = $SubjektModel->hledat($search,
                                     'email', true);
+                        }
                         $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];
                     }
                 } else if ($zprava->typ == 'I') {
@@ -1034,47 +1031,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
             return $res;
         }
-    }
-
-    public static function nactiEmail($storage, $file_id, $output = 0)
-    {
-        $DownloadFile = $storage;
-
-        if (strpos($file_id, "-") !== false) {
-            $file_id = reset(explode("-", $file_id));
-        }
-
-        $FileModel = new FileModel();
-        $file = $FileModel->getInfo($file_id);
-        $filename = $DownloadFile->download($file, 2);
-
-        if ($output == 1) {
-            return $filename;
-        }
-
-        $tmp = array();
-        // Kontrola epodpisu
-        $esign = new esignature();
-        $esign->setCACert(LIBS_DIR . '/email/ca_certifikaty');
-        $esign_cert = null;
-        $esign_status = null;
-        $esigned = $esign->verifySignature($filename, $esign_cert, $esign_status);
-
-        $tmp['signature']['cert'] = @$esigned['cert'];
-        $tmp['signature']['cert_info'] = @$esigned['cert_info'];
-        $tmp['signature']['status'] = @$esigned['status'];
-        $tmp['signature']['signed'] = @$esigned['return'];
-
-        $imap = new EmailParser();
-
-        if ($imap->open($filename)) {
-            $zprava = $imap->get_message();
-            $tmp['zprava'] = $zprava;
-        } else {
-            $tmp['zprava'] = null;
-        }
-
-        return $tmp;
     }
 
     public function actionIsdsovereni()

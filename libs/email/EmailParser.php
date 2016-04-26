@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Třída čte soubor s e-mailem ve formátu RFC 2822
+ * Třída čte soubor s e-mailem ve formátu RFC 2822.
+ * Použitá knihovna je pro e-maily velikosti desítek MB extrémně pomalá a žere RAM.
  */
 class EmailParser
 {

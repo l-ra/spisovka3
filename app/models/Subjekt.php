@@ -73,52 +73,19 @@ class Subjekt extends BaseModel
 
     public function hledat($data, $typ, $only_name = false)
     {
-
         $result = array();
         $cols = array('id');
+        
         if ($typ == 'email') {
-
             // hledani podle emailu
             if (!empty($data->email)) {
-
                 $sql = array(
                     'cols' => $cols,
                     /* 'order'=> array('nazev_subjektu','prijmeni','jmeno') */
                     /* P.L. nechapu, proc se zde zabyvat komplikovanym razenim. Subjekt s danou emailovou adresou bude obvykle jeden, ne? */
-                    'order_sql' => 'CONCAT(nazev_subjektu,prijmeni,jmeno)'
+                    'order_sql' => 'CONCAT(nazev_subjektu,prijmeni,jmeno)',
+                    'where' => [['email = %s', $data->email]]
                 );
-
-                if (strpos($data->email, ";") !== false) {
-                    $email_a = explode(";", $data->email);
-                    if (count($email_a) > 0) {
-                        $where_or = array();
-                        foreach ($email_a as $ea) {
-                            $ea = trim($ea);
-                            if (!empty($ea)) {
-                                $where_or[] = array('email LIKE %s', '%' . $ea . '%');
-                            }
-                        }
-                        $sql['where_or'] = $where_or;
-                    } else {
-                        $sql['where'] = array(array('email LIKE %s', '%' . $data->email . '%'));
-                    }
-                } else if (strpos($data->email, ",") !== false) {
-                    $email_a = explode(",", $data->email);
-                    if (count($email_a) > 0) {
-                        $where_or = array();
-                        foreach ($email_a as $ea) {
-                            $ea = trim($ea);
-                            if (!empty($ea)) {
-                                $where_or[] = array('email LIKE %s', '%' . $ea . '%');
-                            }
-                        }
-                        $sql['where_or'] = $where_or;
-                    } else {
-                        $sql['where'] = array(array('email LIKE %s', '%' . $data->email . '%'));
-                    }
-                } else {
-                    $sql['where'] = array(array('email LIKE %s', '%' . $data->email . '%'));
-                }
 
                 $fetch = $this->selectComplex($sql)->fetchPairs('id', 'id');
                 $result = array_merge($result, $fetch);
@@ -129,9 +96,9 @@ class Subjekt extends BaseModel
                 $sql = array(
                     'cols' => $cols,
                     'where_or' => array(
-                        array('nazev_subjektu LIKE %s', '%' . $data->nazev_subjektu . '%'),
-                        array("CONCAT(prijmeni,' ',jmeno) LIKE %s", '%' . $data->nazev_subjektu . '%'),
-                        array("CONCAT(jmeno,' ',prijmeni) LIKE %s", '%' . $data->nazev_subjektu . '%')
+                        array('nazev_subjektu LIKE %s', "%$data->nazev_subjektu%"),
+                        array("CONCAT(prijmeni,' ',jmeno) = %s", $data->nazev_subjektu),
+                        array("CONCAT(jmeno,' ',prijmeni) = %s", $data->nazev_subjektu)
                     ),
                     'order' => array('nazev_subjektu', 'prijmeni', 'jmeno')
                 );

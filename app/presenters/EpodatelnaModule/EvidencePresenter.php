@@ -5,110 +5,75 @@
 class Epodatelna_EvidencePresenter extends BasePresenter
 {
 
-    private $filtr;
-    private $hledat;
-    private $Epodatelna;
-    private $typ_evidence = null;
+    private $Epodatelna; // model db tabulky
 
     public function startup()
     {
-        $client_config = GlobalVariables::get('client_config');
-        $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
-
         parent::startup();
+        $this->Epodatelna = new Epodatelna();
     }
 
     public function renderNovy($id)
     {
-        /* Nacteni zpravy */
-        if (is_null($this->Epodatelna))
-            $this->Epodatelna = new Epodatelna();
-
         $epodatelna_id = $id;
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
-
-        $this->template->Typ_evidence = $this->typ_evidence;
-
-        if ($zprava) {
-
-            $this->template->Zprava = $zprava;
-            $subjekt = new stdClass();
-            $prilohy = unserialize($zprava->prilohy);
-            if ($prilohy) {
-                $this->template->Prilohy = $prilohy;
-            } else {
-                $this->template->Prilohy = null;
-            }
-
-            $original = null;
-            if ($zprava->typ == 'E') {
-                // Nacteni originalu emailu
-                if (!empty($zprava->file_id)) {
-                    $original = Epodatelna_DefaultPresenter::nactiEmail($this->storage,
-                                    $zprava->file_id);
-                }
-
-                $subjekt->nazev_subjektu = isset($original['zprava']->from->personal) ? $original['zprava']->from->personal
-                            : $zprava->odesilatel;
-                $subjekt->prijmeni = @$original['zprava']->from->personal;
-                $subjekt->email = @$original['zprava']->from->email;
-                $matches = [];
-                if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
-                    $subjekt->jmeno = $matches[1];
-                    $subjekt->prijmeni = $matches[2];
-                }
-
-                if ($original['signature']['signed'] >= 0) {
-
-                    $subjekt->nazev_subjektu = $original['signature']['cert_info']['organizace'];
-                    $subjekt->prijmeni = $original['signature']['cert_info']['jmeno'];
-                    if (!empty($original['signature']['cert_info']['email']) && $subjekt->email != $original['signature']['cert_info']['email']) {
-                        $subjekt->email = $subjekt->email . "; " . $original['signature']['cert_info']['email'];
-                    }
-                    $subjekt->adresa_ulice = $original['signature']['cert_info']['adresa'];
-                }
-
-                $SubjektModel = new Subjekt();
-                $subjekt_databaze = $SubjektModel->hledat($subjekt, 'email');
-                $this->template->Subjekt = array('original' => $subjekt, 'databaze' => $subjekt_databaze);
-            } else if ($zprava->typ == 'I') {
-                // Nacteni originalu DS
-                if (!empty($zprava->file_id)) {
-                    $file_id = explode("-", $zprava->file_id);
-                    $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage,
-                                    $file_id[0]);
-                    $original = unserialize($original);
-
-                    // odebrat obsah priloh, aby to neotravovalo
-                    unset($original->dmDm->dmFiles);
-
-                    //echo "<pre>"; print_r($original); exit;
-                }
-
-                $subjekt->id_isds = $original->dmDm->dbIDSender;
-                $subjekt->nazev_subjektu = $original->dmDm->dmSender;
-                $subjekt->type = ISDS_Spisovka::typDS($original->dmDm->dmSenderType);
-                if (isset($original->dmDm->dmSenderAddress)) {
-                    $res = ISDS_Spisovka::parseAddress($original->dmDm->dmSenderAddress);
-                    foreach ($res as $key => $value)
-                        $subjekt->$key = $value;
-                }
-
-                $SubjektModel = new Subjekt();
-                $subjekt_databaze = $SubjektModel->hledat($subjekt, 'isds');
-                $this->template->Subjekt = array('original' => $subjekt, 'databaze' => $subjekt_databaze);
-            } else {
-                // zrejme odchozi zprava ven
-            }
-            $this->template->Original = $original;
-
-            $this->template->Identifikator = $this->Epodatelna->identifikator($zprava,
-                    $original);
-        } else {
+        if (!$zprava) {
             $this->flashMessage('Požadovaná zpráva neexistuje!', 'warning');
             $this->redirect(':Epodatelna:Default:nove');
         }
 
+        $this->template->Zprava = $zprava;
+
+        $subjekt = new stdClass();
+        $prilohy = unserialize($zprava->prilohy);
+        if ($prilohy) {
+            $this->template->Prilohy = $prilohy;
+        } else {
+            $this->template->Prilohy = null;
+        }
+
+        if ($zprava->typ == 'E') {
+            $sender = $zprava->odesilatel;
+            $matches = [];
+            if (preg_match('/(.*)<(.*)>/', $sender, $matches)) {
+                $email = $matches[2];
+                $nazev_subjektu = trim($matches[1]);
+            }
+            else {
+                $email = $sender;
+                $nazev_subjektu = null;
+            }
+            $search = ['email' => $email, 'nazev_subjektu' => $nazev_subjektu];
+            $SubjektModel = new Subjekt();
+            $found_subjects = $SubjektModel->hledat(\Nette\Utils\ArrayHash::from($search), 'email');
+            $this->template->Subjekt = array('databaze' => $found_subjects);
+        }
+        if ($zprava->typ == 'I') {
+            // Nacteni originalu DS
+            if (!empty($zprava->file_id)) {
+                $file_id = explode("-", $zprava->file_id);
+                $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_id[0]);
+                $original = unserialize($original);
+
+                // odebrat obsah priloh, aby to neotravovalo
+                unset($original->dmDm->dmFiles);
+            }
+
+            $subjekt->id_isds = $original->dmDm->dbIDSender;
+            $subjekt->nazev_subjektu = $original->dmDm->dmSender;
+            $subjekt->type = ISDS_Spisovka::typDS($original->dmDm->dmSenderType);
+            if (isset($original->dmDm->dmSenderAddress)) {
+                $res = ISDS_Spisovka::parseAddress($original->dmDm->dmSenderAddress);
+                foreach ($res as $key => $value)
+                    $subjekt->$key = $value;
+            }
+
+            $SubjektModel = new Subjekt();
+            $found_subjects = $SubjektModel->hledat($subjekt, 'isds');
+            $this->template->Subjekt = array('original' => $subjekt, 'databaze' => $found_subjects);
+            
+            $this->template->Identifikator = $this->Epodatelna->identifikator($zprava, $original);
+        }
 
 
         /* Priprava dokumentu */
@@ -136,12 +101,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             $subjekty = $DokumentSubjekt->subjekty($dokument->id);
             $this->template->Subjekty = $subjekty;
-
-            if ($this->typ_evidence == 'priorace') {
-                // Nacteni souvisejicicho dokumentu
-                $Souvisejici = new SouvisejiciDokument();
-                $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument->id);
-            }
         } else {
             $pred_priprava = array(
                 "nazev" => '',
@@ -162,7 +121,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->template->Subjekty = null;
             //$this->template->Prilohy = null;
             $this->template->SouvisejiciDokumenty = null;
-            $this->template->Typ_evidence = $this->typ_evidence;
         }
 
         $CJ = new CisloJednaci();
@@ -181,11 +139,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function renderOdmitnout($id)
     {
-        /* Nacteni zpravy */
-        $Epodatelna = new Epodatelna();
-
-        $epodatelna_id = $this->getParameter('id', null);
-        $zprava = $Epodatelna->getInfo($epodatelna_id);
+        $zprava = $this->Epodatelna->getInfo($id);
+        $this->template->Zprava = $zprava;
 
         if ($zprava->typ == 'I') {
             if (!empty($zprava->file_id)) {
@@ -199,8 +154,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         } else {
             $this->template->original = null;
         }
-
-        $this->template->Zprava = $zprava;
     }
 
     public function actionHromadna()
@@ -309,17 +262,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addHidden('dokument_id');
         if (isset($this->template->Dok))
             $form['dokument_id']->setValue($this->template->Dok->id);
-        
+
         $form->addHidden('epodatelna_id');
         $form->addHidden('predano_user');
         $form->addHidden('predano_org');
         $form->addHidden('predano_poznamka');
-
-        if ($this->typ_evidence == 'sberny_arch') {
-            $form->addText('poradi', 'Pořadí dokumentu ve sberném archu:', 4, 4)
-                            ->setValue(1)
-                    ->controlPrototype->readonly = TRUE;
-        }
 
         $form->addText('nazev', 'Věc:', 80, 100);
         $form->addTextArea('popis', 'Popis:', 80, 3);
@@ -386,8 +333,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $data['datum_vzniku'] = $data['datum_vzniku'] . " " . $data['datum_vzniku_cas'];
         unset($data['datum_vzniku_cas']);
 
-        if (is_null($this->Epodatelna))
-            $this->Epodatelna = new Epodatelna();
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
         $post_data = $this->getHttpRequest()->post;
@@ -401,7 +346,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $document_created = false;
         try {
             dibi::begin();
-            
+
             $data['poradi'] = 1;
 
             // 1-email, 2-isds
@@ -417,9 +362,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                 // Ulozeni prilohy
                 if ($zprava->typ == 'E') {
-                    $this->emailPrilohy($epodatelna_id, $dokument_id);
+                    $this->evidujEmailSoubory($epodatelna_id, $dokument_id);
                 } else if ($zprava->typ == 'I') {
-                    $this->isdsPrilohy($epodatelna_id, $dokument_id);
+                    $this->evidujIsdsSoubory($epodatelna_id, $dokument_id);
                 }
 
                 // Ulozeni adresy
@@ -431,8 +376,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 }
 
                 // Pridani informaci do epodatelny
-                if (is_null($this->Epodatelna))
-                    $this->Epodatelna = new Epodatelna();
                 $info = array(
                     'dokument_id' => $dokument_id,
                     'evidence' => 'spisovka',
@@ -449,7 +392,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
                 dibi::commit();
                 $document_created = true;
-                
+
                 $this->flashMessage('Dokument byl vytvořen.');
 
                 $rozdelany = $this->getSession('s3_rozdelany');
@@ -486,14 +429,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             } else {
                 $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
             }
-        }
-        catch (Nette\Application\AbortException $e) {
+        } catch (Nette\Application\AbortException $e) {
             throw $e;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             if (!$document_created)
                 dibi::rollback();
-            throw $e;
             $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
         }
@@ -508,8 +448,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
      */
     public function vytvorit($data)
     {
-        if (is_null($this->Epodatelna))
-            $this->Epodatelna = new Epodatelna();
         $epodatelna_id = $data['epodatelna_id'];
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
@@ -538,9 +476,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         // Ulozeni prilohy
         if ($zprava->typ == 'E') {
-            $this->emailPrilohy($epodatelna_id, $dokument_id);
+            $this->evidujEmailSoubory($epodatelna_id, $dokument_id);
         } else if ($zprava->typ == 'I') {
-            $this->isdsPrilohy($epodatelna_id, $dokument_id);
+            $this->evidujIsdsSoubory($epodatelna_id, $dokument_id);
         }
 
         // Ulozeni adresy
@@ -598,24 +536,23 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         return array('jid' => $dokument->jid, 'id' => $dokument_id);
     }
 
-    private function emailPrilohy($epodatelna_id, $dokument_id)
+    /**
+     *  Metoda zkopíruje email a jeho přílohy do dokumentu.
+     * @param int $epodatelna_id
+     * @param int $dokument_id
+     * @return boolean
+     */
+    private function evidujEmailSoubory($epodatelna_id, $dokument_id)
     {
-        $UploadFile = $this->storage;
-
+        $storage = $this->storage;
         $DokumentFile = new DokumentPrilohy();
+        $FileModel = new FileModel();
 
         // nahrani originalu
-        if (is_null($this->Epodatelna))
-            $this->Epodatelna = new Epodatelna();
         $info = $this->Epodatelna->getInfo($epodatelna_id);
-        $source = explode("-", $info->file_id);
-        if (isset($source[0])) {
-
-            $res = Epodatelna_DefaultPresenter::nactiEmail($this->storage, $source[0], 1);
-            if ($fp = @fopen($res, 'rb')) {
-                $res_data = fread($fp, filesize($res));
-                @fclose($fp);
-            }
+        if ($info->file_id) {
+            $file = $FileModel->getInfo($info->file_id);
+            $email_contents = $storage->download($file, 1);
 
             $data = array(
                 'filename' => 'emailova_zprava.eml',
@@ -623,20 +560,16 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'typ' => '5',
                 'popis' => 'Originální emailová zpráva',
                 'charset' => null
-                    //'popis'=>'Emailová zpráva'
             );
 
-            if ($filep = $UploadFile->uploadDokumentSource($res_data, $data)) {
-                // zapiseme i do
+            if ($filep = $storage->uploadDokumentSource($email_contents, $data)) {
                 $DokumentFile->pripojit($dokument_id, $filep->id);
-            } else {
-                // false
             }
-            
-            unset($res_data);
+
+            unset($email_contents);
         }
 
-        $prilohy = Epodatelna_PrilohyPresenter::getEmailPrilohy($this->storage, $epodatelna_id);        
+        $prilohy = Epodatelna_PrilohyPresenter::getEmailPrilohy($this->storage, $epodatelna_id);
         if (count($prilohy) == 0)
             return null;
 
@@ -653,7 +586,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     //'popis'=>'Emailová zpráva'
             );
 
-            if ($uploaded = $UploadFile->uploadDokumentSource($filedata['file'], $data)) {
+            if ($uploaded = $storage->uploadDokumentSource($filedata['file'], $data)) {
                 // zapiseme i do
                 $DokumentFile->pripojit($dokument_id, $uploaded->id);
             } else {
@@ -664,7 +597,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         return true;
     }
 
-    private function isdsPrilohy($epodatelna_id, $dokument_id)
+    private function evidujIsdsSoubory($epodatelna_id, $dokument_id)
     {
         $prilohy = Epodatelna_PrilohyPresenter::getIsdsPrilohy($this->storage, $epodatelna_id);
 
@@ -672,12 +605,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $DokumentFile = new DokumentPrilohy();
 
-        // nahrani originalu
-        if (is_null($this->Epodatelna))
-            $this->Epodatelna = new Epodatelna();
         $info = $this->Epodatelna->getInfo($epodatelna_id);
         if ($info) {
-
             $FileModel = new FileModel();
             $file_info = $FileModel->select(array(array('real_name=%s', 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();
             if ($file_info) {
@@ -776,8 +705,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function zaevidovat($data)
     {
-        if (is_null($this->Epodatelna))
-            $this->Epodatelna = new Epodatelna();
         $info = array(
             'evidence' => $data['evidence'],
             'stav' => '11',
@@ -833,8 +760,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function odmitnoutEmail($data, $hromadna = false)
     {
-        if (is_null($this->Epodatelna))
-            $this->Epodatelna = new Epodatelna();
         $info = array(
             'stav' => '100',
             'stav_info' => $data['stav_info']
@@ -914,8 +839,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function odmitnoutISDS($data)
     {
-        if (is_null($this->Epodatelna))
-            $this->Epodatelna = new Epodatelna();
         $info = array(
             'stav' => '100',
             'stav_info' => $data['stav_info']

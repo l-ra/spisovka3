@@ -21,41 +21,10 @@
             <dd>{input pocet_listu} {inputError2 pocet_listu}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 {label2 pocet_priloh} {input pocet_priloh} {inputError2 pocet_priloh}</dd>
         </dl>
-        <dl>
+        <dl n:if="isset($Identifikator)">
             <dt>Identifikátor epodatelny:</dt>
             <dd><pre>{$Identifikator['popis']}</pre></dd>
         </dl>
-        {if $Identifikator['typ'] == "email" }
-        <dl>
-            <dt>Ověření identifikátoru:</dt>
-            <dd>
-            {if $Identifikator['cert_signed'] >= 0 }
-                {$Identifikator['cert_log']['aktualne']['date']} &nbsp;
-                {if $Identifikator['cert_log']['aktualne']['status']==1 }
-                <span style="color:#009900;">{$Identifikator['cert_log']['aktualne']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Identifikator['cert_log']['aktualne']['message']}</span>
-                {/if}
-                <br />
-                {$Identifikator['cert_log']['prijato']['date']} &nbsp;
-                {if $Identifikator['cert_log']['prijato']['status']==1 }
-                <span style="color:#009900;">{$Identifikator['cert_log']['prijato']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Identifikator['cert_log']['prijato']['message']}</span>
-                {/if}
-                <br />
-                {$Identifikator['cert_log']['doruceno']['date']} &nbsp;
-                {if $Identifikator['cert_log']['doruceno']['status']==1 }
-                <span style="color:#009900;">{$Identifikator['cert_log']['doruceno']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Identifikator['cert_log']['doruceno']['message']}</span>
-                {/if}
-            {else}
-                <span style="color:#990000;">{$Identifikator['cert_status']}</span>
-            {/if}
-            </dd>
-        </dl>
-        {/if}
 
     </div>
 
@@ -79,12 +48,16 @@
         <div class="h2">
             Odesílatel zprávy
         </div>
-        <div id="dok-subjekty1">
         <table class="seznam">
             <tr>
             <td class="icon">
                 <img src="{$publicUrl}images/subjekt/ovm.png" alt="obrazek" title="obrazek" width="32" height="32" />
             </td>
+            {if $Zprava->typ == 'E'}
+                <td class="meta">
+                    {$Zprava->odesilatel}
+                </td>
+            {else}
             <td class="meta">
                 <strong>
                     {if !empty($Subjekt['original']->nazev_subjektu)}{$Subjekt['original']->nazev_subjektu}<br />{/if}
@@ -98,22 +71,16 @@
                 </div>
             </td>
             <td class="meta_plus">
-                &nbsp;
                 <div class="info">
-                <dl>
-                    <dt>email:</dt>
-                    <dd>{if !empty($Subjekt['original']->email)}{$Subjekt['original']->email}{/if}</dd>
-                </dl>
-                <dl>
-                    <dt>isds:</dt>
-                    <dd>{if !empty($Subjekt['original']->id_isds)}{$Subjekt['original']->id_isds}{/if}</dd>
-                </dl>
-
+                    <dl>
+                        <dt>isds:</dt>
+                        <dd>{if !empty($Subjekt['original']->id_isds)}{$Subjekt['original']->id_isds}{/if}</dd>
+                    </dl>
                 </div>
             </td>
+            {/if}
         </tr>
         </table>
-        </div>
 
         <br />
         <div class="h2">
@@ -130,7 +97,7 @@
             <dl id="subjekt_novy">
                 <dt></dt>
                 <dd>
-                    <a href={link :Spisovka:Subjekty:novy, f => evidNovySubjektOk} id="epod_evid_novysubjekt_click" data-postdata="{json_encode($Subjekt['original'])}">Vytvořit nový subjekt z odesílatele</a>
+                    {* <a href={link :Spisovka:Subjekty:novy, f => evidNovySubjektOk} id="epod_evid_novysubjekt_click" data-postdata="{json_encode($Subjekt['original'])}">Vytvořit nový subjekt z odesílatele</a> *}
                 </dd>
             </dl>           
 

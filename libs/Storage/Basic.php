@@ -297,24 +297,18 @@ class Storage_Basic extends FileModel
     public function download($file, $output = 0)
     {
         try {
-            $file_path = CLIENT_DIR . "" . $file->real_path;
-
+            $file_path = $this->getFilePath($file);
             if (!file_exists($file_path))
                 return 1;
 
-            $basename = basename($file_path);
-
-            if ($output == 1) {
-                if ($fp = fopen($file_path, 'rb'))
-                    return fread($fp, filesize($file_path));
-
-                return null;
-            } else if ($output == 2) {
+            if ($output == 1)
+                return file_get_contents($file_path);
+            
+            if ($output == 2)
                 return $file_path;
-            }
 
             // poslat primo na vystup
-
+            $basename = basename($file_path);
             $httpResponse = $this->httpResponse;
             $httpResponse->setContentType($file->mime_type ? : 'application/octetstream');
             $httpResponse->setHeader('Content-Description', 'File Transfer');
