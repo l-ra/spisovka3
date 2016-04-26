@@ -215,102 +215,47 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         //$this->setView('seznam');
     }
 
-    protected function renderDetailInt($id)
+    public function renderDetail($id)
     {
         $epodatelna_id = $id;
         $zprava = $this->Epodatelna->getInfo($epodatelna_id);
 
-        if ($zprava) {
-            $this->template->Zprava = $zprava;
-
-            if ($prilohy = unserialize($zprava->prilohy)) {
-                $this->template->Prilohy = $prilohy;
-            } else {
-                $this->template->Prilohy = null;
-            }
-
-            $signature_info = null;
-            if ($zprava->typ == 'E') {
-                if (!empty($zprava->file_id)) {
-                    $signature_info = self::nactiEmail($this->storage, $zprava->file_id);
-
-                    if ($signature_info['signature']['signed'] == 3) {
-
-                        $od = $signature_info['signature']['cert_info']['platnost_od'];
-                        $do = $signature_info['signature']['cert_info']['platnost_do'];
-
-                        $signature_info['signature']['log']['aktualne']['date'] = date("d.m.Y H:i:s");
-                        $signature_info['signature']['log']['aktualne']['message'] = $signature_info['signature']['status'];
-                        $signature_info['signature']['log']['aktualne']['status'] = 0;
-
-
-                        $doruceno = strtotime($zprava->doruceno_dne);
-                        $signature_info['signature']['log']['doruceno']['date'] = date("d.m.Y H:i:s",
-                                $doruceno);
-                        if ($od <= $doruceno && $doruceno <= $do) {
-                            $signature_info['signature']['log']['doruceno']['message'] = "Podpis byl v době doručení platný";
-                            $signature_info['signature']['log']['doruceno']['status'] = 1;
-                        } else {
-                            $signature_info['signature']['log']['doruceno']['message'] = "Podpis nebyl v době doručení platný!";
-                            $signature_info['signature']['log']['doruceno']['status'] = 0;
-                        }
-
-                        $prijato = strtotime($zprava->prijato_dne);
-                        $signature_info['signature']['log']['prijato']['date'] = date("d.m.Y H:i:s",
-                                $prijato);
-                        if ($od <= $prijato && $prijato <= $do) {
-                            $signature_info['signature']['log']['prijato']['message'] = "Podpis byl v době přijetí platný";
-                            $signature_info['signature']['log']['prijato']['status'] = 1;
-                        } else {
-                            $signature_info['signature']['log']['prijato']['message'] = "Podpis nebyl v době přijetí platný!";
-                            $signature_info['signature']['log']['prijato']['status'] = 0;
-                        }
-                    }
-                }
-            } else if ($zprava->typ == 'I') {
-                if (!empty($zprava->file_id)) {
-                    $source = self::nactiISDS($this->storage, $zprava->file_id);
-                    if ($source) {
-                        $signature_info = unserialize($source);
-                    } else {
-                        $signature_info = null;
-                    }
-                    if (empty($signature_info->dmAcceptanceTime)) {
-                        $this->zkontrolujOdchoziISDS($zprava);
-                    }
-                }
-            }
-
-            if (!empty($zprava->dokument_id)) {
-                $Dokument = new Dokument();
-                $this->template->Dokument = $Dokument->getInfo($zprava->dokument_id);
-            } else {
-                $this->template->Dokument = null;
-            }
-
-            $this->template->Identifikator = $this->Epodatelna->identifikator($zprava,
-                    $signature_info);
-        } else {
+        if (!$zprava) {
             $this->flashMessage('Požadovaná zpráva neexistuje!', 'warning');
             $this->redirect('nove');
         }
-    }
 
-    public function renderDetail($id)
-    {
-        $this->renderDetailInt($id);
-        
-        // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParameter('print');
-        $pdf = $this->getParameter('pdfprint');
-        $printview = $this->view == 'detail' ? 'printdetail' : 'printdetailo';
-        if ($tisk) {
-            $this->setView($printview);
-        } elseif ($pdf) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->pdf_output = 2;
-            $this->setView($printview);
+        $this->template->Zprava = $zprava;
+
+        $this->template->Prilohy = null;
+        if ($prilohy = unserialize($zprava->prilohy))
+            $this->template->Prilohy = $prilohy;
+
+        if ($zprava->typ == 'I') {
+            if (!empty($zprava->file_id)) {
+                $source = self::nactiISDS($this->storage, $zprava->file_id);
+                if ($source) {
+                    $signature_info = unserialize($source);
+                } else {
+                    $signature_info = null;
+                }
+                if (empty($signature_info->dmAcceptanceTime)) {
+                    $this->zkontrolujOdchoziISDS($zprava);
+                }
+                $this->template->Identifikator = $this->Epodatelna->identifikator($zprava,
+                        $signature_info);
+            }
         }
+
+        if (!empty($zprava->dokument_id)) {
+            $Dokument = new Dokument();
+            $this->template->Dokument = $Dokument->getInfo($zprava->dokument_id);
+        } else {
+            $this->template->Dokument = null;
+        }
+
+        if ($this->getParameter('pdfprint'))
+            $this->pdf_output = 2;
     }
 
     public function renderOdetail($id)

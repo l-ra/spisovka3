@@ -1,43 +1,43 @@
 {block title}Detail zprávy{/block}
 {block content}
 
-    <div class="navigate">
+<div class="navigate">
     <a href="{link :Epodatelna:Default:default}">Seznam příchozích zpráv</a> - Detail zprávy
-    </div>
+</div>
 
-    <div id="tisk">
-        <a href="{link :Epodatelna:Default:detail, 'id'=>$Zprava->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-        </a>
-        <a href="{link :Epodatelna:Default:detail, 'id'=>$Zprava->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
-        </a>        
-    </div>
+<div id="tisk">
+    <a href="{link :Epodatelna:Default:detail, 'id'=>$Zprava->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
+        <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
+    </a>
+    <a href="{link :Epodatelna:Default:detail, 'id'=>$Zprava->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
+        <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
+    </a>        
+</div>
 
-    <div class="dokument_blok_menu">
-       {if $Zprava->stav >=10}
-       {if $Dokument}
-       Zpráva přidána do spisové služby jako <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dokument->id}" target="_blank">{$Dokument->jid}</a>
-       {else}
-           <span n:if="$Zprava->stav == 100">Důvod odmítnutí: </span>{$Zprava->stav_info}
-       {/if}
-       {else}
-       <a href="{link :Epodatelna:Evidence:novy, 'id'=>$Zprava->id}">Zaevidovat do spisové služby</a>
-       <a href="{link :Epodatelna:Evidence:jiny, 'id'=>$Zprava->id}" id="dialog-evidence">Zaevidovat v jiné evidenci</a>
-       <a href="{link :Epodatelna:Evidence:odmitnout, 'id'=>$Zprava->id }" id="dialog-odmitnout">Odmítnout</a>
-       <!--<a href="{link :Epodatelna:Evidence:odpoved, 'id'=>$Zprava->id }">Odpovědět</a>-->
-       {/if}
-    </div>
+<div class="dokument_blok_menu">
+    {if $Zprava->stav >=10}
+        {if $Dokument}
+            Zpráva přidána do spisové služby jako <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dokument->id}" target="_blank">{$Dokument->jid}</a>
+        {else}
+            <span n:if="$Zprava->stav == 100">Důvod odmítnutí: </span>{$Zprava->stav_info}
+        {/if}
+    {else}
+        <a href="{link :Epodatelna:Evidence:novy, 'id'=>$Zprava->id}">Zaevidovat do spisové služby</a>
+        <a href="{link :Epodatelna:Evidence:jiny, 'id'=>$Zprava->id}" id="dialog-evidence">Zaevidovat v jiné evidenci</a>
+        <a href="{link :Epodatelna:Evidence:odmitnout, 'id'=>$Zprava->id }" id="dialog-odmitnout">Odmítnout</a>
+        <!--<a href="{link :Epodatelna:Evidence:odpoved, 'id'=>$Zprava->id }">Odpovědět</a>-->
+    {/if}
+</div>
 
 
-    <div class="dokument_blok_hlavni">
-        <dl>
-            <dt>Identifikátor DZ v e-podatelně:</dt>
-            <dd>OSS-EP-I-{$Zprava->poradi}-{$Zprava->rok}</dd>
-        </dl>
-        <dl>
-            <dt>Typ zprávy:</dt>
-            <dd>
+<div class="dokument_blok_hlavni">
+    <dl>
+        <dt>Identifikátor DZ v e-podatelně:</dt>
+        <dd>OSS-EP-I-{$Zprava->poradi}-{$Zprava->rok}</dd>
+    </dl>
+    <dl>
+        <dt>Typ zprávy:</dt>
+        <dd>
             {if $Zprava->typ == 'E'}
                 Emailová zpráva
             {elseif $Zprava->typ == 'I'}
@@ -45,107 +45,73 @@
             {else}
                 Typ nezjištěn
             {/if}
-            </dd>
-        </dl>
-        <dl>
-            <dt>Schránka:</dt>
-            <dd>{$Zprava->adresat}</dd>
-        </dl>
-        <dl>
-            <dt>Věc:</dt>
-            <dd class="velke_pismo"><u>{$Zprava->predmet}</u></dd>
-        </dl>
+        </dd>
+    </dl>
+    <dl>
+        <dt>Schránka:</dt>
+        <dd>{$Zprava->adresat}</dd>
+    </dl>
+    <dl>
+        <dt>Věc:</dt>
+        <dd class="velke_pismo"><u>{$Zprava->predmet}</u></dd>
+    </dl>
 
-        <dl>
-            <dt>Odesílatel:</dt>
-            <dd>{$Zprava->odesilatel}</dd>
-        </dl>
-        <dl>
-            <dt>Doručeno:</dt>
-            <dd>{$Zprava->doruceno_dne|edatetime}</dd>
-        </dl>
-        <dl>
-            <dt>Přijato e-podatelnou:</dt>
-            <dd>{$Zprava->prijato_dne|edatetime}</dd>
-        </dl>
-        <dl>
-            <dt>Identifikátor e-podatelny:</dt>
-            <dd><pre>{$Identifikator['popis']}</pre></dd>
-        </dl>
-        {if $Identifikator['typ'] == "email" }
-        <dl>
-            <dt>Ověření identifikátoru:</dt>
-            <dd>
-            {if $Identifikator['cert_signed'] >= 0 }
-                {$Identifikator['cert_log']['aktualne']['date']} &nbsp;
-                {if $Identifikator['cert_log']['aktualne']['status']==1 }
-                <span style="color:#009900;">{$Identifikator['cert_log']['aktualne']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Identifikator['cert_log']['aktualne']['message']}</span>
-                {/if}
-                <br />
-                {$Identifikator['cert_log']['prijato']['date']} &nbsp;
-                {if $Identifikator['cert_log']['prijato']['status']==1 }
-                <span style="color:#009900;">{$Identifikator['cert_log']['prijato']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Identifikator['cert_log']['prijato']['message']}</span>
-                {/if}
-                <br />
-                {$Identifikator['cert_log']['doruceno']['date']} &nbsp;
-                {if $Identifikator['cert_log']['doruceno']['status']==1 }
-                <span style="color:#009900;">{$Identifikator['cert_log']['doruceno']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Identifikator['cert_log']['doruceno']['message']}</span>
-                {/if}
-            {else}
-                <span style="color:#990000;">{$Identifikator['cert_status']}</span>
-            {/if}
-            </dd>
-        </dl>
-        {/if}
-        {if $Identifikator['typ'] == "isds" }
-        <dl>
-            <dt>Ověření identifikátoru:</dt>
-            <dd id="isds_overeni">
-                <a href="{link :Epodatelna:Default:isdsovereni, 'id'=>$Zprava->id}" onclick="return overitISDS(this);">Ověřit datovou zprávu</a>
-            </dd>
-        </dl>
-        {/if}        
+    <dl>
+        <dt>Odesílatel:</dt>
+        <dd>{$Zprava->odesilatel}</dd>
+    </dl>
+    <dl>
+        <dt>Doručeno:</dt>
+        <dd>{$Zprava->doruceno_dne|edatetime}</dd>
+    </dl>
+    <dl>
+        <dt>Přijato e-podatelnou:</dt>
+        <dd>{$Zprava->prijato_dne|edatetime}</dd>
+    </dl>
+    <dl n:if="isset($Identifikator)">
+        <dt>Identifikátor e-podatelny:</dt>
+        <dd><pre>{$Identifikator['popis']}</pre></dd>
+    </dl>
+    <dl n:if="$Zprava->typ == 'I'">
+        <dt>Ověření identifikátoru:</dt>
+        <dd id="isds_overeni">
+            <a href="{link :Epodatelna:Default:isdsovereni, 'id'=>$Zprava->id}" onclick="return overitISDS(this);">Ověřit datovou zprávu</a>
+        </dd>
+    </dl>
+</div>
 
-    </div>
+<div class="dokument_blok_sedy">
+    <div class="h2">Obsah zprávy</div>
+    {!$Zprava->popis|html2br}
+</div>
 
-    <div class="dokument_blok_sedy">
-        <div class="h2">Obsah zprávy</div>
-        {!$Zprava->popis|html2br}
-    </div>
-
-    <div class="dokument_blok_sedy">
+<div class="dokument_blok_sedy">
     <div class="h2">
         Přílohy
     </div>
     <div id="dok-prilohy">
-    {if count($Prilohy)>0}
-    <table class="seznam">
-        {foreach $Prilohy as $priloha}
-        <tr>
-            <td class="icon">
-                {if file_exists(APP_DIR ."/../public/images/mimetypes/". Nette\Utils\Strings::webalize($priloha['mimetype']) .".png")}
-                <img src="{$publicUrl}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
-                {else}
-                <img src="{$publicUrl}images/mimetypes/application-octet-stream.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
-                {/if}
-            </td>
-            <td class="meta">
-                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>trim($priloha['id'])}">{$priloha['name']}</a>
-                <div class="info">
-                <span>{$priloha['size']|bytes}, {$priloha['mimetype']}</span>
-                </div>
-            </td>
-        </tr>
-        {/foreach}
-    </table>
-    {else}
-        <div class="prazdno">Zpráva neobsahuje žádné přílohy.</div>
-    {/if}
+        {if count($Prilohy)>0}
+            <table class="seznam">
+                {foreach $Prilohy as $priloha}
+                    <tr>
+                        <td class="icon">
+                            {if file_exists(APP_DIR ."/../public/images/mimetypes/". Nette\Utils\Strings::webalize($priloha['mimetype']) .".png")}
+                                <img src="{$publicUrl}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+                            {else}
+                                <img src="{$publicUrl}images/mimetypes/application-octet-stream.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+                            {/if}
+                        </td>
+                        <td class="meta">
+                            <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>trim($priloha['id'])}">{$priloha['name']}</a>
+                            <div class="info">
+                                <span>{$priloha['size']|bytes}, {$priloha['mimetype']}</span>
+                            </div>
+                        </td>
+                    </tr>
+                {/foreach}
+            </table>
+        {else}
+            <div class="prazdno">Zpráva neobsahuje žádné přílohy.</div>
+        {/if}
     </div>
-    </div>
+</div>
