@@ -136,32 +136,28 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
     }
 
     /**
-     * @param string $filename
-     * @param type $part    
+     * @param string $filename  soubor s e-mailem
+     * @param int $part    
      * @return array        
      */
-    private static function _getEmailPrilohu($filename, $part)
+    private static function _getEmailPrilohu($filename, $part_number)
     {
-        $parser = new EmailParser();
-        if (!$parser->open($filename))
-            return;
+        $imap = new ImapClient();
+        $imap->open($filename);
+        $structure = $imap->get_message_structure(1);
+        $part = $structure->parts[$part_number];
+        
+        $data = $imap->fetch_body_part(1, $part_number + 1);
+        $data = $imap->decode_data($data, $part);
+        $imap->close();
 
-        $zprava = $parser->decode_message(true);
-
-        if (strpos($part, ".") !== false) {
-            $part_i = str_replace(".", "]['Parts'][", $part);
-            eval("\$part_info = \$zprava[0]['Parts'][" . $part_i . "];");
-            eval("\$body = \$zprava[0]['Parts'][" . $part_i . "]['Body'];");
-        } else {
-            $part_info = @$zprava[0]['Parts'][$part];
-            $body = @$zprava[0]['Parts'][$part]['Body'];
+        $filename = $part->dparameters['FILENAME']; // Content-Disposition
+        if (!$filename) {
+            // pri poruseni MIME standardu v e-mailu zkusime jeste tuto moznost
+            $filename = $part->parameters['NAME'];
         }
-
-        $file_name = @$part_info['FileName'];
-        $file_size = @$part_info['BodyLength'];
-        $mime_type = FileModel::mimeType($file_name);
-
-        return array('data' => $body, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type);
+        
+        return ['data' => $data, 'file_name' => $filename];        
     }
 
     /**
@@ -188,56 +184,55 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         return self::_getISDSPrilohu($path);
     }
 
-    public function actionDownload()
+    public function actionDownload($id, $file)
     {
-        $epodatelna_id = $this->getParameter('id', null);
-        $part = $this->getParameter('file', null);
+        $epodatelna_id = $id;
+        $part = $file;
 
-        $res = self::_getMessageSource($this->storage, $epodatelna_id);
-        $filename = basename($res);
+        $path = self::_getMessageSource($this->storage, $epodatelna_id);
+        $model = new Epodatelna();
+        $msg = $model->getInfo($epodatelna_id);
 
-        if (strpos($filename, '.eml') !== false) {
+        if ($msg->typ == 'E') {
             // jde o email
             if (!is_null($part)) {
                 if (strpos($part, '.') !== false) {
                     $part_a = explode(".", $part);
-                    unset($part_a[0]);
+                    array_shift($part_a);
                     $part = implode('.', $part_a);
                 }
             } else {
                 $part = 0;
             }
 
-            $priloha = self::_getEmailPrilohu($res, $part);
+            $priloha = self::_getEmailPrilohu($path, $part);
 
             if (!empty($priloha['data'])) {
+                $data = $priloha['data'];
                 $httpResponse = $this->getHttpResponse();
-                $httpResponse->setContentType($priloha['mime-type']);
+                $mime_type = $this->_getMimeType($data);
+                if ($mime_type)
+                    $httpResponse->setContentType($mime_type);
+                $httpResponse->setHeader('Content-Length', strlen($data));
                 $httpResponse->setHeader('Content-Description', 'File Transfer');
                 $httpResponse->setHeader('Content-Disposition',
                         'attachment; filename="' . $priloha['file_name'] . '"');
-                //$httpResponse->setHeader('Content-Disposition', 'inline; filename="' . $file_name . '"');
                 $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
                 $httpResponse->setHeader('Expires', '0');
                 $httpResponse->setHeader('Cache-Control',
                         'must-revalidate, post-check=0, pre-check=0');
                 $httpResponse->setHeader('Pragma', 'public');
-                $httpResponse->setHeader('Content-Length', $priloha['size']);
 
-                echo $priloha['data'];
-                $this->terminate();
+                $this->sendResponse(new \Nette\Application\Responses\TextResponse($data));
             }
-        } elseif (strpos($filename, '.bsr') !== false) {
-            // jde o ds
-
-            $tmp_file = self::_getISDSPrilohu($res, $part);
+        } elseif ($msg->typ == 'I') {
+            $tmp_file = self::_getISDSPrilohu($path, $part);
 
             $httpResponse = $this->getHttpResponse();
             $httpResponse->setContentType($tmp_file['mime-type']);
             $httpResponse->setHeader('Content-Description', 'File Transfer');
             $httpResponse->setHeader('Content-Disposition',
                     'attachment; filename="' . $tmp_file['file_name'] . '"');
-            //$httpResponse->setHeader('Content-Disposition', 'inline; filename="' . $file_name . '"');
             $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
             $httpResponse->setHeader('Expires', '0');
             $httpResponse->setHeader('Cache-Control',
@@ -245,11 +240,19 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
             $httpResponse->setHeader('Pragma', 'public');
             $httpResponse->setHeader('Content-Length', $tmp_file['size']);
 
-            echo $tmp_file['file'];
-
-
-            $this->terminate();
+            $this->sendResponse(new \Nette\Application\Responses\TextResponse($tmp_file['file']));
         }
     }
 
+    protected function _getMimeType($data)
+    {
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimetype = finfo_buffer($finfo, $data);
+            finfo_close($finfo);
+            return $mimetype;
+        }
+        
+        return null;
+    }
 }

@@ -20,7 +20,7 @@ class ImapClient
      * @param string $password prihlasovaci heslo k uctu
      * @return boolean
      */
-    function connect($mailbox, $user, $password)
+    public function connect($mailbox, $user, $password)
     {
         if (!function_exists('imap_open'))
             throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
@@ -37,6 +37,19 @@ class ImapClient
         }
 
         return false;
+    }
+
+    public function open($filename)
+    {
+        if (!function_exists('imap_open'))
+            throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
+
+        if ($rc = imap_open($filename, '', '')) {
+            $this->stream = $rc;
+            return true;
+        }
+
+        throw new Exception("Nemohu otevřít soubor s e-mailem: $filename");
     }
 
     /**
@@ -167,7 +180,7 @@ class ImapClient
      * @param string $string
      * @return string
      */
-    public function decode_header($string)
+    protected function decode_header($string)
     {
         $result = "";
         $elements = imap_mime_header_decode($string);
@@ -181,7 +194,7 @@ class ImapClient
         return $result;
     }
 
-    public function decode_headers($header_info)
+    protected function decode_headers($header_info)
     {
         $which = ['subject', 'fromaddress', 'toaddress ', 'reply_toaddress', 'ccaddress', 'bccaddress'];
         foreach ($which as $name) {
@@ -247,6 +260,39 @@ class ImapClient
         }
 
         return null;
+    }
+
+    /**
+     *  Vytvori seznam priloh v e-mailu (ne vsech jeho casti )
+     * @param type $structure  vysledek funkce get_message_structure
+     */
+    public function get_attachments($structure, $part_id = '')
+    {
+        $result = [];
+
+        switch ($structure->type) {
+            case TYPEMULTIPART:
+                foreach ($structure->parts as $id => $part) {
+                    $subpart_id = $part_id ? "$part_id." . strval($id + 1) : strval($id + 1);
+                    $ret = $this->get_attachments($part, $subpart_id);
+                    if ($ret)
+                        $result += $ret;
+                }
+                break;
+
+            default:
+                if ($structure->ifdisposition && $structure->disposition == 'ATTACHMENT') {
+                    /*$filename = $structure->dparameters['FILENAME'];
+                    $info = ['filename' => $filename, 'encoding' => $structure->encoding];
+                    if ($structure->ifparameters && isset($structure->parameters['CHARSET']))
+                        $info['char']; */
+                    
+                    $result = [$part_id => $structure];
+                }
+                break;
+        }
+
+        return $result;
     }
 
 }
