@@ -153,6 +153,15 @@ try {
     throw $e;
 }
 
+// Step 5: Perform application upgrade if needed
+
+if (!defined('APPLICATION_INSTALL')) {
+    $upgrade = new Upgrade();
+    $upgrade->check();
+}
+
+// Step 6: Run the application!
+
 // unset all global variables except PHP superglobals
 $application = $container->getByType('Nette\Application\Application');
 
@@ -162,7 +171,6 @@ foreach ($vars as $var)
         unset($$var);
 unset($vars, $var);
 
-// Step 5: Run the application!
 $application->run();
 
 

@@ -95,3 +95,5 @@ Nové nastavení "Uživatelé mohou měnit své osobní údaje"
 Nový flag "vynutit odhlášení" u uživatelského účtu
 [1160]
 Údaj o uživateli u odchozích zpráv v e-podatelně
+[1170]
+Nastavení provedení upgrade procedury při spuštění programu

@@ -901,7 +901,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             // Nacteni kompletni zpravy
             $structure = $imap->get_message_structure($message->Msgno);
             $raw_message = $imap->get_raw_message($message->Msgno);
-
+            // Preved do formatu mailbox, jinak nebude IMAP knihovna fungovat
+            $raw_message = "From unknown  Sat Jan  1 00:00:00 2000\r\n" . $raw_message;
+            
             $popis = $imap->find_plain_text($message->Msgno, $structure);
             if (!$popis)
                 $popis = '';
