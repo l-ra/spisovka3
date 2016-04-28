@@ -226,10 +226,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
 
         $this->template->Zprava = $zprava;
-
-        $this->template->Prilohy = null;
-        if ($prilohy = unserialize($zprava->prilohy))
-            $this->template->Prilohy = $prilohy;
+        $this->template->Prilohy = EpodatelnaPrilohy::getFileList($epodatelna_id, $this->storage);
 
         if ($zprava->typ == 'I') {
             if (!empty($zprava->file_id)) {

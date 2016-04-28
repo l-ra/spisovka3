@@ -5,17 +5,18 @@
 class Epodatelna_PrilohyPresenter extends BasePresenter
 {
 
-    public function actionDownload($id, $file_id)
+    public function actionDownload($id, $file)
     {
         $epodatelna_id = $id;
+        $file_id = $file;
         $model = new Epodatelna();
         $path = $model->getMessageSource($epodatelna_id, $this->storage);
         $msg = $model->getInfo($epodatelna_id);
 
         if ($msg->typ == 'E') {
-            $soubor = EpodatelnaPrilohy::getEmailPrilohu($path, $file_id);
+            $soubor = EpodatelnaPrilohy::getEmailPart($path, $file_id);
         } elseif ($msg->typ == 'I') {
-            $soubor = EpodatelnaPrilohy::getISDSPrilohu($path, $file_id);
+            $soubor = EpodatelnaPrilohy::getIsdsFile($path, $file_id);
         }
 
         if ($soubor) {

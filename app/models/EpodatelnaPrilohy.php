@@ -3,9 +3,14 @@
 class EpodatelnaPrilohy
 {
 
-    public static function getISDSPrilohu($source_file, $priloha_id)
+    /**
+     * @param string $filename
+     * @param int $priloha_id
+     * @return array|null
+     */
+    public static function getIsdsFile($filename, $priloha_id)
     {
-        $contents = file_get_contents($source_file);
+        $contents = file_get_contents($filename);
         if (!$contents)
             return null;
         $mess = unserialize($contents);
@@ -18,7 +23,7 @@ class EpodatelnaPrilohy
         return null;
     }
 
-    private static function _getISDSPrilohy($source_file)
+    private static function _getIsdsFiles($source_file)
     {
         $contents = file_get_contents($source_file);
         if (!$contents)
@@ -38,90 +43,23 @@ class EpodatelnaPrilohy
         return $files;
     }
 
-    private static function _getEmailPrilohy($filename)
-    {
-        $parser = new EmailParser();
-        if (!$parser->open($filename))
-            return;
-
-        $decoded = $parser->decode_message(true);
-        $zprava = $parser->analyze_message($decoded);
-
-        $files = array();
-        // Hlavni zprava
-        $data = $zprava['Data'];
-        $file_size = strlen($data);
-        if ($zprava['Type'] == 'html') {
-            $file_name = 'zprava.html';
-            $mime_type = 'text/html';
-        } else {
-            $file_name = 'zprava.txt';
-            $mime_type = 'text/plain';
-        }
-        $files[] = array('file' => $data, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type, 'charset' => @$zprava['Encoding']);
-
-        // Alternativni Zpravy
-        if (isset($zprava['Alternative'])) {
-            // zpravy
-            foreach ($zprava['Alternative'] as $fid => $file) {
-                $data = $file['Data'];
-                $file_size = strlen($data);
-
-                if ($file['Type'] == 'text') {
-                    $file_name = 'zprava_' . $fid . '.txt';
-                    $mime_type = 'text/plain';
-                } else if ($file['Type'] == 'html') {
-                    $file_name = 'zprava_' . $fid . '.html';
-                    $mime_type = 'text/html';
-                } else {
-                    $file_name = 'zprava_' . $fid . '.txt';
-                    $mime_type = 'text/plain';
-                }
-                $files[] = array('file' => $data, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type, 'charset' => @$zprava['Encoding']);
-            }
-        }
-        // Prilohy
-        if (isset($zprava['Attachments'])) {
-            // zprava + prilohy
-            foreach ($zprava['Attachments'] as $fid => $file) {
-                $data = $file['Data'];
-                $file_size = strlen($data);
-                if ($file['Type'] == 'text') {
-                    $file_name = 'soubor_' . $fid . '.txt';
-                    $mime_type = 'text/plain';
-                } else if ($file['Type'] == 'html') {
-                    $file_name = 'soubor_' . $fid . '.html';
-                    $mime_type = 'text/html';
-                } else {
-                    $file_name = empty($file['FileName']) ? "file_$fid" : $file['FileName'];
-                    $mime_type = FileModel::mimeType($file_name);
-                }
-                $files[] = array(
-                    'file' => $data,
-                    'file_name' => $file_name,
-                    'size' => $file_size,
-                    'mime-type' => $mime_type,
-                    'charset' => $zprava['Encoding'],
-                );
-            }
-        }
-
-        return $files;
-    }
-
     /**
      * @param string $filename  soubor s e-mailem
-     * @param int $part_number    
+     * @param int|string $part_number    
      * @return array        
      */
-    public static function getEmailPrilohu($filename, $part_number)
+    public static function getEmailPart($filename, $part_number)
     {
         $imap = new ImapClient();
         $imap->open($filename);
+        $data = $imap->fetch_body_part(1, $part_number);
+        
         $structure = $imap->get_message_structure(1);
-        $part = $structure->parts[$part_number];
-
-        $data = $imap->fetch_body_part(1, $part_number + 1);
+        $part = $structure;
+        $part_numbers = explode('.', $part_number);
+        foreach ($part_numbers as $pn) {
+            $part = $part->parts[$pn - 1];            
+        }
         $data = $imap->decode_data($data, $part);
         $imap->close();
 
@@ -140,24 +78,46 @@ class EpodatelnaPrilohy
      * @param type $storage
      * @return array
      */
-    public static function getEmailPrilohy($epodatelna_id, $storage)
+    public static function getIsdsFiles($epodatelna_id, $storage)
     {
         $model = new Epodatelna();
         $path = $model->getMessageSource($epodatelna_id, $storage);
-        return self::_getEmailPrilohy($path);
+        return self::_getIsdsFiles($path);
     }
 
     /**
-     *  Obsah příloh se vrátí přímo v poli.
      * @param int $epodatelna_id
-     * @param type $storage
+     * @param object $storage
      * @return array
      */
-    public static function getIsdsPrilohy($epodatelna_id, $storage)
+    public static function getFileList($epodatelna_id, $storage)
     {
         $model = new Epodatelna();
-        $path = $model->getMessageSource($epodatelna_id, $storage);
-        return self::_getISDSPrilohy($path);
+        $msg = $model->getInfo($epodatelna_id);
+        if ($msg->typ == 'I') {
+            // vrat, co uz je v databazi, zde nebyly bugy v kodu
+            return $msg->prilohy;
+        }
+
+        // email
+        $filename = $model->getMessageSource($epodatelna_id, $storage);
+        
+        $imap = new ImapClient();
+        $imap->open($filename);
+        $structure = $imap->get_message_structure(1);
+        $attachments = $imap->get_attachments($structure);
+        $imap->close();
+
+        $result = [];
+        foreach ($attachments as $id => $at) {
+            $filename = $at->dparameters['FILENAME'];
+            $size = $at->bytes;
+            if ($at->encoding == ENCBASE64)
+                $size = floor($size * 3 / 4 * 73 / 74);
+            $result[] = ['id' => $id, 'name' => $filename, 'size' => $size];
+        }
+        
+        return $result;
     }
 
 }

@@ -116,10 +116,6 @@ class ImapClient
     {
         $structure = imap_fetchstructure($this->stream, $id_message);
         $this->decode_structure($structure);
-        if (isset($structure->parts))
-            foreach ($structure->parts as &$part)
-                $this->decode_structure($part);
-
         return $structure;
     }
 
@@ -138,6 +134,10 @@ class ImapClient
                 $params[$p->attribute] = $p->value;
             $structure->dparameters = $params;
         }
+
+        if (isset($structure->parts))
+            foreach ($structure->parts as &$part)
+                $this->decode_structure($part);
 
         return $structure;
     }
@@ -281,12 +281,7 @@ class ImapClient
                 break;
 
             default:
-                if ($structure->ifdisposition && $structure->disposition == 'ATTACHMENT') {
-                    /*$filename = $structure->dparameters['FILENAME'];
-                    $info = ['filename' => $filename, 'encoding' => $structure->encoding];
-                    if ($structure->ifparameters && isset($structure->parameters['CHARSET']))
-                        $info['char']; */
-                    
+                if ($structure->ifdisposition && $structure->disposition == 'ATTACHMENT') {                    
                     $result = [$part_id => $structure];
                 }
                 break;
