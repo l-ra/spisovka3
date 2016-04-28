@@ -25,43 +25,39 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         return $path;
     }
 
-    private static function _getISDSPrilohu($source_file, $part = null)
+    private static function _getISDSPrilohu($source_file, $priloha_id)
     {
-        if ($fp = fopen($source_file, 'rb')) {
-            $source = fread($fp, filesize($source_file));
-            fclose($fp);
-        } else {
+        $contents = file_get_contents($source_file);
+        if (!$contents)
             return null;
-        }
+        $mess = unserialize($contents);
 
-        $mess = unserialize($source);
+        if (isset($mess->dmDm->dmFiles->dmFile))
+            foreach ($mess->dmDm->dmFiles->dmFile as $index => $file)
+                if ($priloha_id == $index)
+                    return ['data' => $file->dmEncodedContent, 'file_name' => $file->dmFileDescr, 'mime_type' => $file->dmMimeType];
 
-        if (is_null($part)) {
-            if (isset($mess->dmDm->dmFiles->dmFile)) {
-                $files = array();
-                foreach ($mess->dmDm->dmFiles->dmFile as $index => $file) {
-                    $file_name = $file->dmFileDescr;
-                    $file_size = strlen($file->dmEncodedContent);
-                    $mime_type = $file->dmMimeType;
-                    $files[] = array('file' => $file->dmEncodedContent, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type);
-                }
-                return $files;
-            } else {
-                return null;
-            }
-        } else {
-            if (isset($mess->dmDm->dmFiles->dmFile)) {
-                foreach ($mess->dmDm->dmFiles->dmFile as $index => $file) {
-                    if ($part == $index) {
-                        $file_name = $file->dmFileDescr;
-                        $file_size = strlen($file->dmEncodedContent);
-                        $mime_type = $file->dmMimeType;
-                        return array('file' => $file->dmEncodedContent, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type);
-                    }
-                }
-            }
-            return null; // array('file'=>$tmp_file,'file_name'=>$file_name,'size'=>$file_size,'mime-type'=>$mime_type);
+        return null;
+    }
+
+    private static function _getISDSPrilohy($source_file)
+    {
+        $contents = file_get_contents($source_file);
+        if (!$contents)
+            return null;
+        $mess = unserialize($contents);
+
+        if (!isset($mess->dmDm->dmFiles->dmFile))
+            return null;
+
+        $files = array();
+        foreach ($mess->dmDm->dmFiles->dmFile as $index => $file) {
+            $file_name = $file->dmFileDescr;
+            $file_size = strlen($file->dmEncodedContent);
+            $mime_type = $file->dmMimeType;
+            $files[] = array('file' => $file->dmEncodedContent, 'file_name' => $file_name, 'size' => $file_size, 'mime-type' => $mime_type);
         }
+        return $files;
     }
 
     private static function _getEmailPrilohy($filename)
@@ -146,7 +142,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         $imap->open($filename);
         $structure = $imap->get_message_structure(1);
         $part = $structure->parts[$part_number];
-        
+
         $data = $imap->fetch_body_part(1, $part_number + 1);
         $data = $imap->decode_data($data, $part);
         $imap->close();
@@ -156,8 +152,8 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
             // pri poruseni MIME standardu v e-mailu zkusime jeste tuto moznost
             $filename = $part->parameters['NAME'];
         }
-        
-        return ['data' => $data, 'file_name' => $filename];        
+
+        return ['data' => $data, 'file_name' => $filename];
     }
 
     /**
@@ -181,66 +177,40 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
     public static function getIsdsPrilohy($storage, $epodatelna_id)
     {
         $path = self::_getMessageSource($storage, $epodatelna_id);
-        return self::_getISDSPrilohu($path);
+        return self::_getISDSPrilohy($path);
     }
 
-    public function actionDownload($id, $file)
+    public function actionDownload($id, $file_id)
     {
         $epodatelna_id = $id;
-        $part = $file;
-
         $path = self::_getMessageSource($this->storage, $epodatelna_id);
         $model = new Epodatelna();
         $msg = $model->getInfo($epodatelna_id);
 
         if ($msg->typ == 'E') {
-            // jde o email
-            if (!is_null($part)) {
-                if (strpos($part, '.') !== false) {
-                    $part_a = explode(".", $part);
-                    array_shift($part_a);
-                    $part = implode('.', $part_a);
-                }
-            } else {
-                $part = 0;
-            }
-
-            $priloha = self::_getEmailPrilohu($path, $part);
-
-            if (!empty($priloha['data'])) {
-                $data = $priloha['data'];
-                $httpResponse = $this->getHttpResponse();
-                $mime_type = $this->_getMimeType($data);
-                if ($mime_type)
-                    $httpResponse->setContentType($mime_type);
-                $httpResponse->setHeader('Content-Length', strlen($data));
-                $httpResponse->setHeader('Content-Description', 'File Transfer');
-                $httpResponse->setHeader('Content-Disposition',
-                        'attachment; filename="' . $priloha['file_name'] . '"');
-                $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
-                $httpResponse->setHeader('Expires', '0');
-                $httpResponse->setHeader('Cache-Control',
-                        'must-revalidate, post-check=0, pre-check=0');
-                $httpResponse->setHeader('Pragma', 'public');
-
-                $this->sendResponse(new \Nette\Application\Responses\TextResponse($data));
-            }
+            $soubor = self::_getEmailPrilohu($path, $file_id);
         } elseif ($msg->typ == 'I') {
-            $tmp_file = self::_getISDSPrilohu($path, $part);
+            $soubor = self::_getISDSPrilohu($path, $file_id);
+        }
 
+        if ($soubor) {
+            $data = $soubor['data'];
             $httpResponse = $this->getHttpResponse();
-            $httpResponse->setContentType($tmp_file['mime-type']);
+            $mime_type = isset($soubor->mime_type) ? $soubor->mime_type : $this->_getMimeType($data);
+            if ($mime_type)
+                $httpResponse->setContentType($mime_type);
+            $httpResponse->setHeader('Content-Length', strlen($data));
             $httpResponse->setHeader('Content-Description', 'File Transfer');
             $httpResponse->setHeader('Content-Disposition',
-                    'attachment; filename="' . $tmp_file['file_name'] . '"');
+                    'attachment; filename="' . $soubor['file_name'] . '"');
             $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
             $httpResponse->setHeader('Expires', '0');
             $httpResponse->setHeader('Cache-Control',
                     'must-revalidate, post-check=0, pre-check=0');
             $httpResponse->setHeader('Pragma', 'public');
-            $httpResponse->setHeader('Content-Length', $tmp_file['size']);
 
-            $this->sendResponse(new \Nette\Application\Responses\TextResponse($tmp_file['file']));
+            echo $data;
+            $this->terminate();
         }
     }
 
@@ -252,7 +222,8 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
             finfo_close($finfo);
             return $mimetype;
         }
-        
+
         return null;
     }
+
 }
