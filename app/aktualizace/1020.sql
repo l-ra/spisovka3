@@ -1,1 +1,1 @@
-ALTER TABLE [{tbls3}spis] DROP COLUMN [datum_otevreni];
+ALTER TABLE [:PREFIX:spis] DROP COLUMN [datum_otevreni];

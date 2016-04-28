@@ -30,7 +30,8 @@ function error($message)
 
 function my_assert_handler($file, $line, $code)
 {
-    error("Kontrola selhala: $code (řádek $line)");
+    $file = basename($file);
+    error("Kontrola selhala: $code (řádek $line, soubor $file)");
 }
 
 try {
@@ -68,7 +69,7 @@ try {
     die;
 }
 
-$do_update = isset($_GET['go']);
+$do_update = (bool)filter_input(INPUT_GET, 'go');
 
 echo '    <div id="menu">';
 if ($do_update)
@@ -213,6 +214,7 @@ foreach ($clients as $site_path => $site_name) {
                                 throw $e;
                             }
                         } else {
+                            $query = str_replace(":PREFIX:", $db_config['prefix'], $query);
                             echo "$query\n";
                         }
                     }

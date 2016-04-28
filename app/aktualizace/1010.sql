@@ -1,5 +1,5 @@
-DROP TABLE [{tbls3}dokument_historie];
+DROP TABLE [:PREFIX:dokument_historie];
 
-DROP TABLE [{tbls3}osoba_historie];
+DROP TABLE [:PREFIX:osoba_historie];
 
-DROP TABLE [{tbls3}subjekt_historie];
+DROP TABLE [:PREFIX:subjekt_historie];

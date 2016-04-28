@@ -1,15 +1,15 @@
-ALTER TABLE [{tbls3}orgjednotka]
+ALTER TABLE [:PREFIX:orgjednotka]
   CHANGE [sekvence] [sekvence] varchar(150) NOT NULL,
   CHANGE [sekvence_string] [sekvence_string] varchar(1000) NOT NULL;
 
-ALTER TABLE [{tbls3}spis]
+ALTER TABLE [:PREFIX:spis]
   CHANGE [sekvence] [sekvence] varchar(150) NOT NULL,
   CHANGE [sekvence_string] [sekvence_string] varchar(1000) NOT NULL;
 
-ALTER TABLE [{tbls3}spisovy_znak]
+ALTER TABLE [:PREFIX:spisovy_znak]
   CHANGE [sekvence] [sekvence] varchar(150) NOT NULL,
   CHANGE [sekvence_string] [sekvence_string] varchar(1000) NOT NULL;
 
-ALTER TABLE [{tbls3}user_role]
+ALTER TABLE [:PREFIX:user_role]
   CHANGE [sekvence] [sekvence] varchar(150) NOT NULL,
   CHANGE [sekvence_string] [sekvence_string] varchar(1000) NOT NULL;

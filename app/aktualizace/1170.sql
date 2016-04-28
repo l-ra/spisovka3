@@ -1,2 +1,2 @@
 
-INSERT INTO [{tbls3}settings] VALUES ('upgrade_needed', 'true');
+INSERT INTO [:PREFIX:settings] VALUES ('upgrade_needed', 'true');

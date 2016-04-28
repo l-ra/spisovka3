@@ -1,1 +1,1 @@
-ALTER TABLE [{tbls3}spis]  ADD INDEX [typ] ([typ]);
+ALTER TABLE [:PREFIX:spis]  ADD INDEX [typ] ([typ]);

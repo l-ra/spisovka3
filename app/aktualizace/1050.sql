@@ -1,1 +1,1 @@
-UPDATE [{tbls3}spis] SET [typ] = 'F' WHERE [typ] = 'VS';
+UPDATE [:PREFIX:spis] SET [typ] = 'F' WHERE [typ] = 'VS';
