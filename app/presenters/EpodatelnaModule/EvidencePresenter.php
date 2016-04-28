@@ -25,12 +25,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $this->template->Zprava = $zprava;
 
         $subjekt = new stdClass();
-        $prilohy = unserialize($zprava->prilohy);
-        if ($prilohy) {
-            $this->template->Prilohy = $prilohy;
-        } else {
-            $this->template->Prilohy = null;
-        }
+        $this->template->Prilohy = EpodatelnaPrilohy::getFileList($epodatelna_id, $this->storage);
 
         if ($zprava->typ == 'E') {
             $sender = $zprava->odesilatel;
