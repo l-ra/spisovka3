@@ -569,7 +569,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             unset($email_contents);
         }
 
-        $prilohy = Epodatelna_PrilohyPresenter::getEmailPrilohy($this->storage, $epodatelna_id);
+        $prilohy = EpodatelnaPrilohy::getEmailPrilohy($epodatelna_id, $this->storage);
         if (count($prilohy) == 0)
             return null;
 
@@ -599,7 +599,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     private function evidujIsdsSoubory($epodatelna_id, $dokument_id)
     {
-        $prilohy = Epodatelna_PrilohyPresenter::getIsdsPrilohy($this->storage, $epodatelna_id);
+        $prilohy = EpodatelnaPrilohy::getIsdsPrilohy($epodatelna_id, $this->storage);
 
         $UploadFile = $this->storage;
 
