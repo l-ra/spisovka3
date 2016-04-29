@@ -354,9 +354,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 unset($zprava->identifikator);
 
                 $prilohy = unserialize($zprava->prilohy);
-                if ($prilohy !== false)
+                if ($zprava->typ == 'I' && $prilohy !== false)
                     $zprava->prilohy = $prilohy;
-
+                else
+                    $zprava->prilohy = false;
+                
                 /* neni potreba
                   $identifikator = unserialize($zprava->identifikator);
                   if ( $identifikator ) {

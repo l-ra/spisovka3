@@ -96,7 +96,7 @@ class EpodatelnaPrilohy
         $msg = $model->getInfo($epodatelna_id);
         if ($msg->typ == 'I') {
             // vrat, co uz je v databazi, zde nebyly bugy v kodu
-            return $msg->prilohy;
+            return unserialize($msg->prilohy);
         }
 
         // email

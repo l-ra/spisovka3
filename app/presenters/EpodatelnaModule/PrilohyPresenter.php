@@ -52,4 +52,11 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         return null;
     }
 
+    public function renderAttachments($id)
+    {
+        $epodatelna_id = $id;
+        $model = new EpodatelnaPrilohy();
+        $attachments = $model->getFileList($epodatelna_id, $this->storage);
+        $this->sendJson($attachments);
+    }
 }
