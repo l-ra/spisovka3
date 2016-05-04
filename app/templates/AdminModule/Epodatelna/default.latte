@@ -106,24 +106,3 @@
     {else}
     <div class="prazdno">Nebyly nalezeny žádné účty datových schránek</div>
     {/if}
-
-<h2>Certifikáty kvalifikovaných certifikačních autorit</h2>
-
-    {if count($n_ca)>0}
-    <div class="detail_blok">
-    {foreach $n_ca as $index => $ca}
-        <dl>
-            <dt></dt>
-            <dd>
-                {$index}<br />
-                <span style="font-weight: normal;">
-                    {$ca}
-                </span>
-
-            </dd>
-        </dl>
-    {/foreach}
-    </div>
-    {else}
-    <div class="prazdno">Nebyly nalezeny žádné certifikáty</div>
-    {/if}

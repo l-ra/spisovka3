@@ -243,7 +243,13 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $signature_info);
             }
         }
-
+        if ($zprava->typ == 'E') {
+            $filename = $this->Epodatelna->getMessageSource($epodatelna_id, $this->storage);
+            $esig = new esignature();
+            $result = $esig->verifySignature($filename);
+            // dump($result);
+        }
+        
         if (!empty($zprava->dokument_id)) {
             $Dokument = new Dokument();
             $this->template->Dokument = $Dokument->getInfo($zprava->dokument_id);
@@ -965,17 +971,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 }
                 if ($mailbox['qual_signature'] == true) {
                     // pouze kvalifikovane
+                    $tmp_filename = tempnam(TEMP_DIR, 'emailtest');
+                    file_put_contents($tmp_filename, $raw_message);
                     $esign = new esignature();
-                    $esign->setCACert(LIBS_DIR . '/email/ca_certifikaty');
-                    $tmp_email = TEMP_DIR . '/emailtest_' . sha1($message->message_id) . '.tmp';
-                    file_put_contents($tmp_email, $raw_message);
-                    $esign_cert = null;
-                    $esign_status = null;
-                    $esigned = $esign->verifySignature($tmp_email, $esign_cert, $esign_status);
-                    unlink($tmp_email);
-                    if (@$esigned['cert_info']['CA_is_qualified'] == 1) {
-                        // obsahuje - pokracujeme
-                    } else {
+                    $result = $esign->verifySignature($tmp_filename);
+                    unlink($tmp_filename);
+                    if (!$result->ok) {
                         // neobsahuje kvalifikovany epodpis
                         $insert['stav'] = 100;
                         $insert['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje kvalifikovaný elektronický podpis';

@@ -40,12 +40,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         // Odeslani
         $this->template->n_odeslani = $ep['odeslani'];
-
-        // CA
-        $esign = new esignature();
-        $esign->setCACert(LIBS_DIR . '/email/ca_certifikaty');
-        //$this->template->n_ca = $esign->getCA();
-        $this->template->n_ca = $esign->getCASimple();
     }
 
     public function renderDetail($id, $upravit)

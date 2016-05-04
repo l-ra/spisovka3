@@ -30,7 +30,7 @@ class esignature
     }
 
     /**
-     * Nastavi certifikat.
+     * Nastavi certifikat pro podepisování odchozí pošty.
      *
      * @param string $certificate_path cesta k souboru PKCS #12
      * @param string $passphrase       heslo k soukromemu klici
@@ -49,7 +49,8 @@ class esignature
         if (openssl_pkcs12_read($certificate, $cert_info, $passphrase)) {
             // Uživatel dodal certifikát ve formátu PKCS 12
             // Následující kontrola je asi zbytečná, ale ponechme ji v programu
-            if ($res = openssl_x509_read($cert_info['cert'])) {
+            if ($x509cert = openssl_x509_read($cert_info['cert'])) {
+                openssl_x509_free($x509cert);
                 $this->certificate = $cert_info['cert'];
                 $this->private_key = $cert_info['pkey'];
                 $this->passphrase = $passphrase;
@@ -61,147 +62,19 @@ class esignature
         } else {
             $this->error_string = openssl_error_string();
             return false;
-
-            /* Separátní soukromý klíč už nepodporujeme, protože by to žádný
-             * uživatel nepoužil, je to zbytečné.
-
-              if (strpos($certificate, "BEGIN") === false) {
-              // convert to PEM format
-              $certificate = $this->der2pem($certificate);
-              }
-
-              if ($res = openssl_x509_read($certificate)) {
-              if (!is_null($private_key_path)) {
-              $this->user_prikey_path = realpath($private_key_path);
-              $this->user_prikey_data = file_get_contents($this->user_prikey_path);
-              if ($this->user_prikey = openssl_pkey_get_private($this->user_prikey_data,
-              $passphrase)) {
-              $this->passphrase = $passphrase;
-              return true;
-              } else {
-              $this->error_string = openssl_error_string();
-              return false;
-              }
-              }
-              } else {
-              $this->error_string = openssl_error_string();
-              return false;
-              }
-             * 
-             */
         }
     }
 
-    /**
-     * Pridat korenovy certifikat
-     *
-     * Vstupnim parametrem muze byt
-     *  - cesta k souboru CA certifikatu ve formatu PEM
-     *  - adresar obsahujici soubory CA certifikatu
-     *  - pole obsahujici seznam cest CA certifikatu
-     *
-     * @param string $mixed
-     * @return mixed
-     */
-    public function setCACert($mixed)
-    {
-        if (!function_exists('openssl_x509_read'))
-            throw new Exception('Není dostupné PHP rozšíření OpenSSL.');
-
-        if (is_array($mixed)) {
-            /* Param is array - items CA certificates */
-            foreach ($mixed as $param) {
-                $this->setCACert($param);
-            }
-            return true;
-        } else if (is_dir($mixed)) {
-            /* Param is dir - CA certifikates is in dir */
-            if ($dh = opendir($mixed)) {
-                while (($file = readdir($dh)) !== false) {
-                    if ($file == "." || $file == "..")
-                        continue;
-                    $this->setCACert($mixed . "/" . $file);
-                }
-                closedir($dh);
-            }
-            return true;
-        } else if (is_file($mixed)) {
-            /* Param is file - CA certifikate file */
-            $cacert_path = realpath($mixed);
-            $cacert_data = file_get_contents($cacert_path);
-            if ($res = @openssl_x509_read($cacert_data)) {
-                $data = openssl_x509_parse($res);
-                $this->ca_cert[] = $mixed;
-                $this->ca_cert_real[] = $cacert_path;
-                $this->ca_info[$data['issuer']['CN']] = $data['issuer']['O'];
-                return $res;
-            } else {
-                $cacert_data = $this->der2pem($cacert_data);
-                if ($res = @openssl_x509_read($cacert_data)) {
-                    $data = openssl_x509_parse($res);
-                    $this->ca_cert[] = $mixed;
-                    $this->ca_cert_real[] = $cacert_path;
-                    $this->ca_info[$data['issuer']['CN']] = $data['issuer']['O'];
-                    return $res;
-                } else {
-                    $this->error_string = openssl_error_string();
-                    return null;
-                }
-            }
-        } else {
-            /* Unknow param type */
-            $this->error_string = "Unknow param type";
-            return null;
-        }
-    }
 
     /**
-     * Vraci informace dostupnych korenovych certifikatech
+     * Vrací seznam souborů s certifikáty autorit akreditovaných v ČR
      * 
-     * @return array[array]
+     * @return array
      */
-    public function getCA()
+    protected function getCAList()
     {
-
-        $out_A = array();
-        foreach ($this->ca_cert_real as $index => $cert) {
-            $cert_data = file_get_contents($cert);
-            $out = array();
-            $out['cert_path'] = $this->ca_cert[$index];
-            $out['cert_path_real'] = $cert;
-            if ($res = openssl_x509_read($cert_data)) {
-                $data = openssl_x509_parse($res);
-                $out['name'] = $data['issuer']['CN'];
-                $out['signature'] = $data['issuer']['CN'];
-                $out['email'] = @$data['issuer']['emailAddress'];
-                $out['platnost_od'] = date("j.n.Y", $data['validFrom_time_t']);
-                $out['platnost_do'] = date("j.n.Y", $data['validTo_time_t']);
-                $info = array();
-                if (isset($data['issuer']['O']))
-                    $info[] = $data['issuer']['O'];
-                if (isset($data['issuer']['L']))
-                    $info[] = $data['issuer']['L'];
-                if (isset($data['issuer']['ST']))
-                    $info[] = $data['issuer']['ST'];
-                if (isset($data['issuer']['C']))
-                    $info[] = $data['issuer']['C'];
-                $out['info'] = implode(", ", $info);
-            } else {
-                
-            }
-            $out_A[] = $out;
-            unset($out);
-        }
-        return $out_A;
-    }
-
-    public function getCASimple()
-    {
-        if (count($this->ca_info) > 0) {
-            return $this->ca_info;
-        } else {
-            return null;
-        }
+        $dir = LIBS_DIR . '/email/ca_certifikaty';
+        return ["$dir/1_CA.pem", "$dir/PostSignum.pem", "$dir/eIdentity.pem"];
     }
 
     /**
@@ -209,88 +82,54 @@ class esignature
      * @param string $filename
      * @return bool
      */
-    public function verifySignature($filename, &$cert = null, &$status = "")
+    public function verifySignature($filename)
     {
-        /* Nacteni CA */
-        $caa = $this->getCA();
-        $lCertT = array();
-
-        foreach ($caa as $ca) {
-            $lCertT[] = $ca['cert_path_real'];
-        }
-
-        $Cert = new Cert();
-
+        $cainfo = $this->getCAList();
         $tmp_cert = tempnam(TEMP_DIR, "sender_certificate");
-        $res = openssl_pkcs7_verify($filename, 0, $tmp_cert, $lCertT);
+        $res = openssl_pkcs7_verify($filename, 0 /*PKCS7_NOVERIFY*/, $tmp_cert, $cainfo);
+        $cert = openssl_x509_parse("file://$tmp_cert");
+        unlink($tmp_cert);
 
         if ($res === true) {
-            // email overen
-            $cert = openssl_x509_parse("file://$tmp_cert");
-            unlink($tmp_cert);
+            // podpis overen
+            $ok = true;
             $email_cert = $email_real = null;
-            $res2 = $this->verifyEmailAddress($cert, $filename, $email_cert, $email_real);
-            $status = "Podpis je ověřen a platný";
-            if ($res2 === false) {
-                $status .= ", ale emailová adresa odesilatele neodpovídá certifikátu! ($email_cert <> $email_real)";
-            } else if ($res2 === -1) {
-                $status .= ", ale z certifikátu se nepodařilo zjistit emailovou adresu.";
+            $res = $this->verifyEmailAddress($cert, $filename, $email_cert, $email_real);
+            $msg = "Podpis je platný.";
+            if ($res === false) {
+                $msg .= " Ale emailová adresa odesilatele neodpovídá adrese v certifikátu.";
+            } else if ($res === -1) {
+                $msg .= " Ale z certifikátu se nepodařilo zjistit emailovou adresu.";
             }
-
-            return array(
-                'return' => 1,
-                'status' => $status,
-                'cert' => $cert,
-                'cert_info' => $this->parseCertificate($cert)
-            );
         } else {
-            // email neprosel overenim
-            unlink($tmp_cert);
-            $status = openssl_error_string();
+            // podpis neprosel overenim
+            $ok = false;
+            $error_string = openssl_error_string();
             if ($res == -1) {
                 // Chyba
-                if (strpos($status, "invalid mime type") !== false) {
-                    $status = "Email není podepsán.";
-                } else if (strpos($status, "no content type") !== false) {
-                    $status = "Email není podepsán.";
+                if (strpos($error_string, "invalid mime type") !== false) {
+                    $msg = "Email není podepsán.";
+                } else if (strpos($error_string, "no content type") !== false) {
+                    $msg = "Email není podepsán.";
                 } else {
-                    $status = "Email nelze ověřit! Email je buď poškozený nebo není kompletní nebo nelze ověřit podpis.";
+                    $msg = "Při ověřování podpisu došlo k chybě";
+                    $msg .= $error_string ? ": $error_string." : '.';
                 }
-                return array(
-                    'return' => -1,
-                    'status' => $status,
-                );
             } else {
-                // Certifikat neprosel kontrolou
-                $Cert = new Cert();
-                $email_data = file_get_contents($filename);
-                $cert_info = $Cert->fromEmail($email_data);
-
-                if (strpos($status, "digest failure") !== false) {
-                    $status = "Email je podepsán, ale je poškozený!";
-                    $res = 0;
-                } else if (strpos($status, "certificate verify error") !== false) {
-
-                    if (@$cert_info->error > 0) {
-                        $status = "Podpis je neplatný! " . $cert_info->error_message;
-                        $res = 3;
-                    } else {
-                        $status = "Email je podepsán, ale není ověřen kvalifikovanou CA!";
-                        $res = 2;
-                    }
-                } else {
-                    $status = "Email je neplatný!";
-                    $res = 0;
-                }
-
-                return array(
-                    'return' => $res,
-                    'status' => $status,
-                    'cert' => $cert_info,
-                    'cert_info' => $this->getInfoCert($cert_info)
-                );
-            }
+                // Podpis nebo certifikat pro podpis neni platny
+                $res = openssl_pkcs7_verify($filename, PKCS7_NOVERIFY);
+                if ($res === true)
+                    $msg = "Zpráva nebyla změněna, ale certifikát není kvalifikovaný. Identita odesílajícího nebyla ověřena.";
+                else
+                    $msg = "Podpis je neplatný! $error_string.";
+            }            
         }
+        
+        return array(
+            'ok' => $ok,
+            'message' => $msg,
+            'cert' => $cert ?: null
+        );        
     }
 
     // $email_cert - adresa v certifikatu
@@ -312,14 +151,14 @@ class esignature
         return $email_cert == $email_real;
     }
 
-    public function parseCertificate($cert = null)
+    public function parseCertificate()
     {
-        if (is_null($cert)) {
-            if (!$this->certificate)
-                return null;
-            $cert = openssl_x509_parse($this->certificate);
-        }
-
+        if (!$this->certificate)
+            return null;
+        $cert = openssl_x509_parse($this->certificate);
+        if (!$cert)
+            return null;
+        
         $info = array();
 
         $info['serial_number'] = sprintf("%X", $cert['serialNumber']);
@@ -348,7 +187,6 @@ class esignature
         $info['platnost_do'] = @$cert['validTo_time_t'];
         $info['CA'] = @$cert['issuer']['CN'];
         $info['CA_org'] = @$cert['issuer']['O'];
-        $info['CA_is_qualified'] = $this->is_qualified(@$cert['issuer']['CN']);
 
         if (!empty($cert['extensions']['crlDistributionPoints'])) {
             $crl_d = str_replace("URI:", "", $cert['extensions']['crlDistributionPoints']);
@@ -361,45 +199,6 @@ class esignature
         return $info;
     }
 
-    protected function getInfoCert($cert)
-    {
-        if (is_null($cert) || !is_object($cert)) {
-            return null;
-        }
-
-        $info = array();
-
-        $info['serial_number'] = sprintf("%X", @$cert->id);
-        $info['id'] = @$cert->id_name;
-        $info['jmeno'] = @$cert->name;
-
-        if (!empty($cert->org)) {
-            $info['organizace'] = $cert->org;
-            $info['jednotka'] = @$cert->subjekt->organizationUnitName;
-        } else {
-            $info['organizace'] = "";
-            $info['jednotka'] = "";
-        }
-
-        $info['adresa'] = @$cert->locality;
-        $info['email'] = @$cert->email;
-        $info['platnost_od'] = @$cert->subjekt->platnost_od_unix;
-        $info['platnost_do'] = @$cert->subjekt->platnost_do_unix;
-        $info['CA'] = @$cert->CA_name;
-        $info['CA_org'] = @$cert->CA_org;
-        $info['CA_is_qualified'] = $this->is_qualified(@$cert->CA_name);
-        $info['CRL'] = @$cert->CRL;
-        $info['error'] = @$cert->error_message;
-
-        return $info;
-    }
-
-    public function is_qualified($ca_name)
-    {
-        if (isset($this->ca_info[$ca_name]))
-            return true;
-        return false;
-    }
 
     /**
      * Podepise zpravu
@@ -432,7 +231,7 @@ class esignature
      * @param string $pem_data
      * @return string
      */
-    protected function pem2der($pem_data)
+    /* protected function pem2der($pem_data)
     {
         $begin = "CERTIFICATE-----";
         $end = "-----END";
@@ -440,7 +239,7 @@ class esignature
         $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
         $der = base64_decode($pem_data);
         return $der;
-    }
+    } */
 
     /**
      * Prevede format DER na format PEM
@@ -448,11 +247,11 @@ class esignature
      * @param string $der_data
      * @return string
      */
-    protected function der2pem($der_data)
+    /* protected function der2pem($der_data)
     {
         $pem = chunk_split(base64_encode($der_data), 64, "\n");
         $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
         return $pem;
-    }
+    } */
 
 }

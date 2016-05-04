@@ -41,10 +41,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         $config = $config->odeslani[0];        
         if ($config['podepisovat']) {
             $esign = new esignature();
-            $esign->setUserCert($config['cert'], $config['cert_pass']);
-
-            $cert_info = $esign->parseCertificate();
-            if (!is_array($cert_info))
+            if (!$esign->setUserCert($config['cert'], $config['cert_pass']))
                 throw new Exception('Email nelze podepsat. Neplatný certifikát!');
            
             $in_parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL,
@@ -111,7 +108,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
                 umask($oldumask);
             }
             @file_put_contents(TEMP_DIR . '/test_emails/' . date('Y-m-d-H-i-s') . "-$to.eml",
-                            $tmp_mail);
+                            $headers . "\n\n" . $body);
 
             return true;
         }
