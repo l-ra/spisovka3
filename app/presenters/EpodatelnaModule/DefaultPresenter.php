@@ -244,12 +244,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             }
         }
         if ($zprava->typ == 'E') {
-            $filename = $this->Epodatelna->getMessageSource($epodatelna_id, $this->storage);
-            $esig = new esignature();
-            $result = $esig->verifySignature($filename);
-            // dump($result);
+            $this->addComponent(new Spisovka\Components\EmailSignature($zprava, $this->storage),
+                    'emailSignature');
         }
-        
+
         if (!empty($zprava->dokument_id)) {
             $Dokument = new Dokument();
             $this->template->Dokument = $Dokument->getInfo($zprava->dokument_id);

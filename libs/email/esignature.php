@@ -17,11 +17,9 @@ class esignature
     protected $certificate;
     private $private_key;
     private $passphrase;
-    
     protected $ca_cert = array();
     protected $ca_cert_real = array();
     protected $ca_info = array();
-    
     protected $error_string;
 
     public function getError()
@@ -65,7 +63,6 @@ class esignature
         }
     }
 
-
     /**
      * Vrací seznam souborů s certifikáty autorit akreditovaných v ČR
      * 
@@ -86,13 +83,13 @@ class esignature
     {
         $cainfo = $this->getCAList();
         $tmp_cert = tempnam(TEMP_DIR, "sender_certificate");
-        $res = openssl_pkcs7_verify($filename, 0 /*PKCS7_NOVERIFY*/, $tmp_cert, $cainfo);
-        $cert = openssl_x509_parse("file://$tmp_cert");
-        unlink($tmp_cert);
+        $res = openssl_pkcs7_verify($filename, 0 /* PKCS7_NOVERIFY */, $tmp_cert, $cainfo);
+        $cert = null;
 
         if ($res === true) {
             // podpis overen
             $ok = true;
+            $cert = openssl_x509_parse("file://$tmp_cert");
             $email_cert = $email_real = null;
             $res = $this->verifyEmailAddress($cert, $filename, $email_cert, $email_real);
             $msg = "Podpis je platný.";
@@ -107,29 +104,33 @@ class esignature
             $error_string = openssl_error_string();
             if ($res == -1) {
                 // Chyba
-                if (strpos($error_string, "invalid mime type") !== false) {
-                    $msg = "Email není podepsán.";
-                } else if (strpos($error_string, "no content type") !== false) {
+                if (strpos($error_string, "invalid mime type") !== false || strpos($error_string,
+                                "no content type") !== false) {
                     $msg = "Email není podepsán.";
                 } else {
-                    $msg = "Při ověřování podpisu došlo k chybě";
-                    $msg .= $error_string ? ": $error_string." : '.';
+                    $msg = "Při ověřování podpisu došlo k chybě.";
+                    if ($error_string)
+                        $msg .= "\n$error_string";
                 }
             } else {
                 // Podpis nebo certifikat pro podpis neni platny
-                $res = openssl_pkcs7_verify($filename, PKCS7_NOVERIFY);
-                if ($res === true)
-                    $msg = "Zpráva nebyla změněna, ale certifikát není kvalifikovaný. Identita odesílajícího nebyla ověřena.";
-                else
-                    $msg = "Podpis je neplatný! $error_string.";
-            }            
+                $msg = "Podpis je neplatný!\n$error_string.";
+                if (strpos($error_string, '21075075' /* certificate verify error */) !== false) {
+                    $res = openssl_pkcs7_verify($filename, 0, $tmp_cert);
+                    if ($res === true) {
+                        $cert = openssl_x509_parse("file://$tmp_cert");
+                        $msg = "Podpis je platný, ale certifikát nepochází od kvalifikovaného poskytovatele certifikačních služeb.";
+                    }
+                }
+            }
         }
-        
+
+        unlink($tmp_cert);
         return array(
             'ok' => $ok,
             'message' => $msg,
-            'cert' => $cert ?: null
-        );        
+            'cert' => $cert ? : null
+        );
     }
 
     // $email_cert - adresa v certifikatu
@@ -158,7 +159,7 @@ class esignature
         $cert = openssl_x509_parse($this->certificate);
         if (!$cert)
             return null;
-        
+
         $info = array();
 
         $info['serial_number'] = sprintf("%X", $cert['serialNumber']);
@@ -199,7 +200,6 @@ class esignature
         return $info;
     }
 
-
     /**
      * Podepise zpravu
      *
@@ -214,14 +214,14 @@ class esignature
         $tmp_signed = tempnam(TEMP_DIR, 'outgoing_message_signed');
 
         $ok = openssl_pkcs7_sign($tmp_mess, $tmp_signed, $this->certificate,
-                        [$this->private_key, $this->passphrase], $header, PKCS7_DETACHED);
+                [$this->private_key, $this->passphrase], $header, PKCS7_DETACHED);
         if ($ok)
             $signed_msg = file_get_contents($tmp_signed);
         unlink($tmp_mess);
         unlink($tmp_signed);
         if ($ok)
             return $signed_msg;
-        
+
         throw new Exception('Email se nepodařilo podepsat. SSL: ' . openssl_error_string());
     }
 
@@ -232,14 +232,14 @@ class esignature
      * @return string
      */
     /* protected function pem2der($pem_data)
-    {
-        $begin = "CERTIFICATE-----";
-        $end = "-----END";
-        $pem_data = substr($pem_data, strpos($pem_data, $begin) + strlen($begin));
-        $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
-        $der = base64_decode($pem_data);
-        return $der;
-    } */
+      {
+      $begin = "CERTIFICATE-----";
+      $end = "-----END";
+      $pem_data = substr($pem_data, strpos($pem_data, $begin) + strlen($begin));
+      $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
+      $der = base64_decode($pem_data);
+      return $der;
+      } */
 
     /**
      * Prevede format DER na format PEM
@@ -248,10 +248,9 @@ class esignature
      * @return string
      */
     /* protected function der2pem($der_data)
-    {
-        $pem = chunk_split(base64_encode($der_data), 64, "\n");
-        $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
-        return $pem;
-    } */
-
+      {
+      $pem = chunk_split(base64_encode($der_data), 64, "\n");
+      $pem = "-----BEGIN CERTIFICATE-----\n" . $pem . "-----END CERTIFICATE-----\n";
+      return $pem;
+      } */
 }
