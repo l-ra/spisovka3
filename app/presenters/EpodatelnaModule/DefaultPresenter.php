@@ -214,16 +214,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderDetail($id)
     {
-        $epodatelna_id = $id;
-        $zprava = $this->Epodatelna->getInfo($epodatelna_id);
-
-        if (!$zprava) {
-            $this->flashMessage('Požadovaná zpráva neexistuje!', 'warning');
-            $this->redirect('nove');
-        }
+        $zprava = new EpodatelnaMessage($id);
 
         $this->template->Zprava = $zprava;
-        $this->template->Prilohy = EpodatelnaPrilohy::getFileList($epodatelna_id, $this->storage);
+        $this->template->Prilohy = EpodatelnaPrilohy::getFileList($zprava, $this->storage);
 
         if ($zprava->typ == 'I') {
             if (!empty($zprava->file_id)) {
@@ -1022,44 +1016,37 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->template->vysledek = "";
         $epodatelna_id = $this->getParameter('id');
         if ($epodatelna_id) {
-            $Epodatelna = new Epodatelna();
-            $epodatelna_info = $Epodatelna->getInfo($epodatelna_id);
+            $msg = new EpodatelnaMessage($epodatelna_id);
+            if (!empty($msg->file_id)) {
+                $FileModel = new FileModel();
+                $file = $FileModel->select(array(array("nazev=%s", 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();
+                if ($file) {
 
-            if ($epodatelna_info) {
-                if (!empty($epodatelna_info->file_id)) {
-                    $FileModel = new FileModel();
-                    $file = $FileModel->select(array(array("nazev=%s", 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();
-                    if ($file) {
+                    // Nacteni originalu DS
+                    $DownloadFile = $this->storage;
+                    $source = $DownloadFile->download($file, 1);
 
-                        // Nacteni originalu DS
-                        $DownloadFile = $this->storage;
-                        $source = $DownloadFile->download($file, 1);
+                    if ($source) {
 
-                        if ($source) {
-
-                            $isds = new ISDS_Spisovka();
-                            try {
-                                $isds->pripojit();
-                                if ($isds->AuthenticateMessage($source)) {
-                                    $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
-                                } else {
-                                    $this->template->error = 4;
-                                    $this->template->vysledek = "Datová zpráva byla ověřena, ale není platná!" .
-                                            "<br />" .
-                                            'ISDS zpráva: ' . $isds->error();
-                                }
-                            } catch (Exception $e) {
-                                $this->template->error = 3;
-                                $this->template->vysledek = "Nepodařilo se připojit k ISDS schránce!" .
+                        $isds = new ISDS_Spisovka();
+                        try {
+                            $isds->pripojit();
+                            if ($isds->AuthenticateMessage($source)) {
+                                $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
+                            } else {
+                                $this->template->error = 4;
+                                $this->template->vysledek = "Datová zpráva byla ověřena, ale není platná!" .
                                         "<br />" .
-                                        'chyba: ' . $e->getMessage();
+                                        'ISDS zpráva: ' . $isds->error();
                             }
+                        } catch (Exception $e) {
+                            $this->template->error = 3;
+                            $this->template->vysledek = "Nepodařilo se připojit k ISDS schránce!" .
+                                    "<br />" .
+                                    'chyba: ' . $e->getMessage();
                         }
                     }
                 }
-            } else {
-                $this->template->vysledek = "Nebyla nalezena zpráva!";
-                $this->template->error = 1;
             }
         } else {
             $this->template->vysledek = "Neplatný parametr!";

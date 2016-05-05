@@ -80,27 +80,25 @@ class EpodatelnaPrilohy
      */
     public static function getIsdsFiles($epodatelna_id, $storage)
     {
-        $model = new Epodatelna();
-        $path = $model->getMessageSource($epodatelna_id, $storage);
+        $msg = new EpodatelnaMessage($epodatelna_id);
+        $path = $msg->getMessageSource($storage);
         return self::_getIsdsFiles($path);
     }
 
     /**
-     * @param int $epodatelna_id
      * @param object $storage
      * @return array
      */
-    public static function getFileList($epodatelna_id, $storage)
+    public static function getFileList(EpodatelnaMessage $message, $storage)
     {
         $model = new Epodatelna();
-        $msg = $model->getInfo($epodatelna_id);
-        if ($msg->typ == 'I') {
+        if ($message->typ == 'I') {
             // vrat, co uz je v databazi, zde nebyly bugy v kodu
-            return unserialize($msg->prilohy);
+            return unserialize($message->prilohy);
         }
 
         // email
-        $filename = $model->getMessageSource($epodatelna_id, $storage);
+        $filename = $message->getMessageSource($storage);
         
         $imap = new ImapClient();
         $imap->open($filename);

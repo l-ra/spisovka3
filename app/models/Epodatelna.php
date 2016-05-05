@@ -90,12 +90,6 @@ class Epodatelna extends BaseModel
         return $query->count();
     }
 
-    public function getInfo($epodatelna_id)
-    {
-        $res = $this->select([['id = %i', $epodatelna_id]]);
-        return $res->fetch();
-    }
-
     /**
      * @param int $smer  0 - prichozi, 1 - odchozi
      * @return int 
@@ -383,20 +377,4 @@ class Epodatelna extends BaseModel
         }
     }
 
-    /**
-     *  Pro e-maily vrátí odkaz na soubor s e-mailem,
-     *  u ISDS zpráv na soubor se serializovaným objektem s informacemi o zprávě.
-     * @param int $epodatelna_id  ID do tabulky epodatelna
-     * @param Storage_Basic $storage
-     * @return string  filename
-     */
-    public function getMessageSource($epodatelna_id, $storage)
-    {
-        $msg = $this->getInfo($epodatelna_id);
-        $FileModel = new FileModel();
-        $file = $FileModel->getInfo($msg->file_id);
-        $path = $storage->getFilePath($file);
-
-        return $path;
-    }
 }

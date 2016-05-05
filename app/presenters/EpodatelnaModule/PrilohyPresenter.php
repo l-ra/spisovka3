@@ -1,17 +1,13 @@
 <?php
 
-//netteloader=Epodatelna_PrilohyPresenter
-
 class Epodatelna_PrilohyPresenter extends BasePresenter
 {
 
     public function actionDownload($id, $file)
     {
-        $epodatelna_id = $id;
         $file_id = $file;
-        $model = new Epodatelna();
-        $path = $model->getMessageSource($epodatelna_id, $this->storage);
-        $msg = $model->getInfo($epodatelna_id);
+        $msg = new EpodatelnaMessage($id);
+        $path = $msg->getMessageSource($this->storage);
 
         if ($msg->typ == 'E') {
             $soubor = EpodatelnaPrilohy::getEmailPart($path, $file_id);

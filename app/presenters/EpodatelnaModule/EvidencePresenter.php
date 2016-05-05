@@ -15,17 +15,11 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function renderNovy($id)
     {
-        $epodatelna_id = $id;
-        $zprava = $this->Epodatelna->getInfo($epodatelna_id);
-        if (!$zprava) {
-            $this->flashMessage('Požadovaná zpráva neexistuje!', 'warning');
-            $this->redirect(':Epodatelna:Default:nove');
-        }
-
+        $zprava = new EpodatelnaMessage($id);
         $this->template->Zprava = $zprava;
 
         $subjekt = new stdClass();
-        $this->template->Prilohy = EpodatelnaPrilohy::getFileList($epodatelna_id, $this->storage);
+        $this->template->Prilohy = EpodatelnaPrilohy::getFileList($zprava, $this->storage);
 
         if ($zprava->typ == 'E') {
             $sender = $zprava->odesilatel;
@@ -134,7 +128,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function renderOdmitnout($id)
     {
-        $zprava = $this->Epodatelna->getInfo($id);
+        $zprava = new EpodatelnaMessage($id);
         $this->template->Zprava = $zprava;
 
         if ($zprava->typ == 'I') {
@@ -328,7 +322,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $data['datum_vzniku'] = $data['datum_vzniku'] . " " . $data['datum_vzniku_cas'];
         unset($data['datum_vzniku_cas']);
 
-        $zprava = $this->Epodatelna->getInfo($epodatelna_id);
+        $zprava = new EpodatelnaMessage($epodatelna_id);
 
         $post_data = $this->getHttpRequest()->post;
         $subjekty = isset($post_data['subjekt']) ? $post_data['subjekt'] : null;
@@ -444,7 +438,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     public function vytvorit($data)
     {
         $epodatelna_id = $data['epodatelna_id'];
-        $zprava = $this->Epodatelna->getInfo($epodatelna_id);
+        $zprava = new EpodatelnaMessage($epodatelna_id);
 
         if (!$zprava)
             throw new Exception('Nelze získat informace o zprávě!');
@@ -544,7 +538,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $FileModel = new FileModel();
 
         // nahrani originalu
-        $info = $this->Epodatelna->getInfo($epodatelna_id);
+        $info = new EpodatelnaMessage($epodatelna_id);
         if ($info->file_id) {
             $file = $FileModel->getInfo($info->file_id);
             $email_contents = $storage->download($file, 1);
@@ -600,7 +594,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $DokumentFile = new DokumentPrilohy();
 
-        $info = $this->Epodatelna->getInfo($epodatelna_id);
+        $info = new EpodatelnaMessage($epodatelna_id);
         if ($info) {
             $FileModel = new FileModel();
             $file_info = $FileModel->select(array(array('real_name=%s', 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();

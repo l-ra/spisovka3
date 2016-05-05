@@ -10,19 +10,15 @@ class EmailSignature extends \Nette\Application\UI\Control
 
     /**
      *  Záznam z tabulky "epodatelna".
-     * @var DibiRow 
+     * @var \EpodatelnaMessage 
      */
     protected $message;
     protected $storage;
 
-    public function __construct($message, $storage)
+    public function __construct(\EpodatelnaMessage $message, $storage)
     {
         parent::__construct();
 
-        if (is_int($message)) {
-            $m = new \Epodatelna();
-            $message = $m->getInfo($message);
-        }
         $this->message = $message;
         $this->storage = $storage;
     }
@@ -42,8 +38,7 @@ class EmailSignature extends \Nette\Application\UI\Control
             return;
         }
         
-        $model = new \Epodatelna;
-        $filename = $model->getMessageSource($this->message->id, $this->storage);
+        $filename = $this->message->getMessageSource($this->storage);
         $esig = new \esignature();
         $result = $esig->verifySignature($filename);
         
@@ -65,8 +60,7 @@ class EmailSignature extends \Nette\Application\UI\Control
 
     protected function checkIfSigned()
     {
-        $model = new \Epodatelna;
-        $filename = $model->getMessageSource($this->message->id, $this->storage);
+        $filename = $this->message->getMessageSource($this->storage);
 
         $imap = new \ImapClient();
         $imap->open($filename);
@@ -74,7 +68,8 @@ class EmailSignature extends \Nette\Application\UI\Control
         $is_signed = $imap->is_signed($structure);
         $imap->close();
         
-        $model->update(['email_signed' => $is_signed], [['id = %i', $this->message->id]]);
+        $this->message->email_signed = $is_signed;
+        $this->message->save();
         
         return $is_signed;
     }
