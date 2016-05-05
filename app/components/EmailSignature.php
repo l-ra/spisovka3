@@ -33,6 +33,15 @@ class EmailSignature extends \Nette\Application\UI\Control
      */
     public function render()
     {
+        $is_signed = $this->message->email_signed;
+        if ($is_signed === null)
+            $is_signed = $this->checkIfSigned();
+
+        if (!$is_signed) {
+            echo "Email není podepsán.";
+            return;
+        }
+        
         $model = new \Epodatelna;
         $filename = $model->getMessageSource($this->message->id, $this->storage);
         $esig = new \esignature();
@@ -54,4 +63,19 @@ class EmailSignature extends \Nette\Application\UI\Control
         echo $out;
     }
 
+    protected function checkIfSigned()
+    {
+        $model = new \Epodatelna;
+        $filename = $model->getMessageSource($this->message->id, $this->storage);
+
+        $imap = new \ImapClient();
+        $imap->open($filename);
+        $structure = $imap->get_message_structure(1);
+        $is_signed = $imap->is_signed($structure);
+        $imap->close();
+        
+        $model->update(['email_signed' => $is_signed], [['id = %i', $this->message->id]]);
+        
+        return $is_signed;
+    }
 }

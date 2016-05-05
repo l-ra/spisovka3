@@ -198,13 +198,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $pdf = $this->getParameter('pdfprint');
         if ($tisk) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
             $this->setView('printo');
         } elseif ($pdf) {
             @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdf_output = 1;
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
             $seznam = $result->fetchAll();
             $this->setView('printo');
         } else {
@@ -212,7 +210,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
 
         $this->template->seznam = $seznam;
-        //$this->setView('seznam');
     }
 
     public function renderDetail($id)
@@ -362,7 +359,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $zprava->prilohy = $prilohy;
                 else
                     $zprava->prilohy = false;
-                
+
                 /* neni potreba
                   $identifikator = unserialize($zprava->identifikator);
                   if ( $identifikator ) {
@@ -906,7 +903,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $raw_message = $imap->get_raw_message($message->Msgno);
             // Preved do formatu mailbox, jinak nebude IMAP knihovna fungovat
             $raw_message = "From unknown  Sat Jan  1 00:00:00 2000\r\n" . $raw_message;
-            
+
             $popis = $imap->find_plain_text($message->Msgno, $structure);
             if (!$popis)
                 $popis = '';
@@ -937,54 +934,40 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             // nejlepe sloupec vyhodit z databaze. Kontrolni soucty by mela pocitac sluzba Storage.
             $insert['sha1_hash'] = '';
 
-            $prilohy = array();
-            // Toto by se melo parsovat pokazde, kdyz je potreba, aby bylo mozno zmenit/opravit
+            // Prilohy zjistujeme pokazde, kdyz je to potreba, aby bylo mozno zmenit/opravit
             // chovani aplikace
-            /* if (isset($structure->attachments)) {
+            $insert['prilohy'] = null;
 
-              foreach ($structure->attachments as $pr) {
-              $prilohy[] = array(
-              'name' => $pr->filename,
-              'size' => $pr->size,
-              'mimetype' => FileModel::mimeType($pr->filename),
-              'id' => $pr->id_part
-              );
-              }
-              } */
-            $insert['prilohy'] = serialize($prilohy);
-
-            //$insert['evidence'] = $z->dmAnnotation;
             $insert['stav'] = 0;
             $insert['stav_info'] = '';
             $insert['file_id'] = null;
 
-            // Test na dostupnost epodpisu
+            // Test na pritomnost digitalniho podpisu
+            $insert['email_signed'] = $imap->is_signed($structure);
             if ($mailbox['only_signature'] == true) {
-                if (!($structure->type == TYPEMULTIPART && $structure->subtype == "SIGNED")) {
+                if (!$insert['email_signed']) {
                     // email neobsahuje epodpis
                     $insert['stav'] = 100;
                     $insert['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje elektronický podpis.';
-                    $this->Epodatelna->insert($insert);
-                    continue;
-                }
-                if ($mailbox['qual_signature'] == true) {
+                } else if ($mailbox['qual_signature'] == true) {
                     // pouze kvalifikovane
                     $tmp_filename = tempnam(TEMP_DIR, 'emailtest');
                     file_put_contents($tmp_filename, $raw_message);
                     $esign = new esignature();
                     $result = $esign->verifySignature($tmp_filename);
                     unlink($tmp_filename);
-                    if (!$result->ok) {
+                    if (!$result['ok']) {
                         // neobsahuje kvalifikovany epodpis
                         $insert['stav'] = 100;
                         $insert['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje kvalifikovaný elektronický podpis';
-                        $this->Epodatelna->insert($insert);
-                        continue;
                     }
                 }
             }
 
             $epod_id = $this->Epodatelna->insert($insert);
+
+            if ($insert['stav'] == 100)
+                continue; // odmitnout, nepokracovat dale. TODO: odeslat upozorneni odesilateli.
 
             $data = array(
                 'filename' => 'ep_email_' . $epod_id . '.eml',

@@ -289,5 +289,10 @@ class ImapClient
 
         return $result;
     }
+    
+    public function is_signed($structure)
+    {
+        return $structure->type == TYPEMULTIPART && $structure->subtype == "SIGNED";
+    }
 
 }
