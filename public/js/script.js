@@ -85,15 +85,6 @@ $(function() {
         hideSpinner();
     });
 
-    $(document).ajaxSuccess(function (event, jqXHR, ajaxSettings) {
-        var ct = jqXHR.getResponseHeader("content-type") || "";
-        if (ct.indexOf('text/html' > -1)) {
-        	$('#dialog').find('form').each(function() {
-				// window.Nette.initForm(this);
-			});
-        }
-    });
-
     $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
         // Při spouštění plánovače nečekáme na odpověď
         if (ajaxSettings.url.indexOf('/cron/') != -1)
