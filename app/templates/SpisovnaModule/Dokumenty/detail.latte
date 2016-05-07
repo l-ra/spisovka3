@@ -119,44 +119,6 @@
             <dt>Počet listů / příloh:</dt>
             <dd>{$Dok->pocet_listu} / {$Dok->pocet_priloh}</dd>
         </dl>
-        {if !empty($Dok->identifikator)}
-        <dl>
-            <dt>Identifikátor epodatelny:</dt>
-            <dd><pre>{$Dok->identifikator['popis']}</pre></dd>
-        </dl>
-        {if $Dok->identifikator['typ'] == "email" }
-        <dl>
-            <dt>Ověření identifikátoru:</dt>
-            <dd>
-            {if $Dok->identifikator['cert_signed'] >= 0 }
-                {$Dok->identifikator['cert_log']['aktualne']['date']} &nbsp;
-                {if $Dok->identifikator['cert_log']['aktualne']['status']==1 }
-                <span style="color:#009900;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
-                {/if}
-                <br />
-                {$Dok->identifikator['cert_log']['prijato']['date']} &nbsp;
-                {if $Dok->identifikator['cert_log']['prijato']['status']==1 }
-                <span style="color:#009900;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
-                {/if}
-                <br />
-                {$Dok->identifikator['cert_log']['doruceno']['date']} &nbsp;
-                {if $Dok->identifikator['cert_log']['doruceno']['status']==1 }
-                <span style="color:#009900;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
-                {else}
-                <span style="color:#990000;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
-                {/if}
-            {else}
-                <span style="color:#990000;">{$Dok->identifikator['cert_status']}</span>
-            {/if}
-            </dd>
-        </dl>
-        {/if}
-
-        {/if}
     </div>
     
     <div class="dokument_blok_sedy">

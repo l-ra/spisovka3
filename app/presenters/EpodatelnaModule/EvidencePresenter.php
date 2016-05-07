@@ -59,9 +59,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             $SubjektModel = new Subjekt();
             $found_subjects = $SubjektModel->hledat($subjekt, 'isds');
-            $this->template->Subjekt = array('original' => $subjekt, 'databaze' => $found_subjects);
-            
-            $this->template->Identifikator = $this->Epodatelna->identifikator($zprava, $original);
+            $this->template->Subjekt = array('original' => $subjekt, 'databaze' => $found_subjects);            
         }
 
 

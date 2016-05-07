@@ -63,14 +63,9 @@ class Admin_ExportPresenter extends BasePresenter
     {
         $SEP = '&tab%';
 
-        $idsd_odesilatel = '';        
+        $idsd_odesilatel = '';  // TODO      
         if ($d->epod_is_isds) { // datova zprava
-            if (!empty($d->identifikator)) {
-                // $Epodatelna = new Epodatelna();
-                // $identifikator = $Epodatelna->identifikator(unserialize($d->identifikator));
-                $identifikator = unserialize($d->identifikator);
-                $idsd_odesilatel = $identifikator['odesilatel'];
-            }            
+            // $idsd_odesilatel = ...
         }
         
         // subjekty

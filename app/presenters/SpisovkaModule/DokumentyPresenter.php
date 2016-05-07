@@ -244,11 +244,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->redirect('default');
             }
 
-            if (!empty($dokument->identifikator)) {
-                $Epodatelna = new Epodatelna();
-                $dokument->identifikator = $Epodatelna->identifikator(unserialize($dokument->identifikator));
-            }
-
             $this->template->Dok = $dokument;
 
             $user = $this->user;
@@ -1143,72 +1138,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $sznacka = implode(", ", $sznacka_A);
         }
         $this->template->SpisovaZnacka = $sznacka;
-    }
-
-    public function actionIsdsovereni()
-    {
-        $this->template->error = 0;
-        $this->template->vysledek = "";
-        $dokument_id = $this->getParameter('id');
-        if ($dokument_id) {
-            $Dokument = new Dokument();
-            $dokument_info = $Dokument->getInfo($dokument_id, "soubory");
-
-            if ($dokument_info) {
-                $nalezeno = 0;
-                foreach ($dokument_info->prilohy as $file) {
-                    if (strpos($file->nazev, "zfo") !== false) {
-                        if (!empty($file->id)) {
-                            // nalezeno ZFO
-                            $nalezeno = 1;
-
-                            // Nacteni originalu DS
-                            $DownloadFile = $this->storage;
-                            $source = $DownloadFile->download($file, 1);
-                            //echo $source;
-                            if ($source) {
-
-                                $isds = new ISDS_Spisovka();
-                                $_pripojeno = false;
-                                try {
-                                    $isds->pripojit();
-                                    $_pripojeno = true;
-                                } catch (Exception $e) {
-                                    $_chyba = $e->getMessage();
-                                }
-                                if ($_pripojeno) {
-
-                                    if ($isds->AuthenticateMessage($source)) {
-                                        $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
-                                    } else {
-                                        $this->template->error = 4;
-                                        $this->template->vysledek = "Datová zpráva byla ověřena, ale není platná!" .
-                                                "<br />" .
-                                                'ISDS zpráva: ' . $isds->error();
-                                    }
-                                } else {
-                                    $this->template->error = 3;
-                                    $this->template->vysledek = "Nepodařilo se připojit k ISDS schránce!" .
-                                            "<br />" . $_chyba;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if ($nalezeno == 0) {
-                    // nenalezena zadna datova zprava
-                    $this->template->error = 2;
-                    $this->template->vysledek = "Nebyla nalezena datová zpráva k ověření!";
-                }
-            } else {
-                $this->template->vysledek = "Nebyl nalezen dokument!";
-                $this->template->error = 1;
-            }
-        } else {
-            $this->template->vysledek = "Neplatný parametr!";
-            $this->template->error = 1;
-        }
     }
 
     protected function createComponentNovyForm()

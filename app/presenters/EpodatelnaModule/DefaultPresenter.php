@@ -222,16 +222,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         if ($zprava->typ == 'I') {
             if (!empty($zprava->file_id)) {
                 $source = self::nactiISDS($this->storage, $zprava->file_id);
-                if ($source) {
-                    $signature_info = unserialize($source);
-                } else {
-                    $signature_info = null;
-                }
+                $signature_info = $source ? unserialize($source) : null;
                 if (empty($signature_info->dmAcceptanceTime)) {
-                    $this->zkontrolujOdchoziISDS($zprava);
+                    $this->zkontrolujOdchoziISDS($zprava); // Co toto dela?
                 }
-                $this->template->Identifikator = $this->Epodatelna->identifikator($zprava,
-                        $signature_info);
             }
         }
         if ($zprava->typ == 'E') {
@@ -353,13 +347,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $zprava->prilohy = $prilohy;
                 else
                     $zprava->prilohy = false;
-
-                /* neni potreba
-                  $identifikator = unserialize($zprava->identifikator);
-                  if ( $identifikator ) {
-                  $zpravy[ $zprava->id ]->identifikator = $identifikator;
-                  $identifikator = null;
-                  } */
 
                 $subjekt = new stdClass();
                 $subjekt->mesto = '';
@@ -920,7 +907,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $insert['predmet'] = $predmet;
             $insert['popis'] = $popis;
             $insert['odesilatel'] = $message->fromaddress;
-            $insert['adresat'] = $mailbox['ucet'] . ' [' . $mailbox['login'] . ']';
+            $insert['adresat'] = $mailbox['ucet']; // označení uživatele pro e-mailovou schránku
             $insert['prijato_dne'] = new DateTime();
             $insert['doruceno_dne'] = new DateTime(date('Y-m-d H:i:s', $message->udate));
             $insert['user_id'] = $this->user->id;
@@ -1010,48 +997,34 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
     }
 
-    public function actionIsdsovereni()
+    public function renderIsdsovereni($id)
     {
-        $this->template->error = 0;
-        $this->template->vysledek = "";
-        $epodatelna_id = $this->getParameter('id');
-        if ($epodatelna_id) {
-            $msg = new EpodatelnaMessage($epodatelna_id);
-            if (!empty($msg->file_id)) {
-                $FileModel = new FileModel();
-                $file = $FileModel->select(array(array("nazev=%s", 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();
-                if ($file) {
-
-                    // Nacteni originalu DS
-                    $DownloadFile = $this->storage;
-                    $source = $DownloadFile->download($file, 1);
-
-                    if ($source) {
-
-                        $isds = new ISDS_Spisovka();
-                        try {
-                            $isds->pripojit();
-                            if ($isds->AuthenticateMessage($source)) {
-                                $this->template->vysledek = "Datová zpráva byla ověřena a je platná.";
-                            } else {
-                                $this->template->error = 4;
-                                $this->template->vysledek = "Datová zpráva byla ověřena, ale není platná!" .
-                                        "<br />" .
-                                        'ISDS zpráva: ' . $isds->error();
-                            }
-                        } catch (Exception $e) {
-                            $this->template->error = 3;
-                            $this->template->vysledek = "Nepodařilo se připojit k ISDS schránce!" .
-                                    "<br />" .
-                                    'chyba: ' . $e->getMessage();
-                        }
+        $output = "Nemohu najít soubor s datovou zprávou.";
+        $epodatelna_id = $id;
+        $FileModel = new FileModel();
+        $file = $FileModel->select(array(array("nazev = %s", 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();
+        if ($file) {
+            // Nacteni originalu DS
+            $DownloadFile = $this->storage;
+            $source = $DownloadFile->download($file, 1);
+            if ($source) {
+                $isds = new ISDS_Spisovka();
+                try {
+                    $isds->pripojit();
+                    if ($isds->AuthenticateMessage($source)) {
+                        $output = "Datová zpráva je platná.";
+                    } else {
+                        $output = "Datová zpráva není platná!<br />" .
+                                'ISDS zpráva: ' . $isds->error();
                     }
+                } catch (Exception $e) {
+                    $output = "Nepodařilo se připojit k ISDS schránce!<br />" .
+                            'chyba: ' . $e->getMessage();
                 }
             }
-        } else {
-            $this->template->vysledek = "Neplatný parametr!";
-            $this->template->error = 1;
         }
+        
+        $this->sendResponse(new \Nette\Application\Responses\TextResponse($output));
     }
 
 }

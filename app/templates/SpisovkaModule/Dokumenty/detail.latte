@@ -207,46 +207,6 @@
             <dd>{$Dok->pocet_listu} / {$Dok->pocet_priloh} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd><br />
             <dt>Lhůta k vyřízení:</dt>
             <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd><br />
-
-            {if !empty($Dok->identifikator)}
-                <dt>Identifikátor epodatelny:</dt>
-                <dd><pre>{$Dok->identifikator['popis']}</pre></dd><br />
-                {if $Dok->identifikator['typ'] == "email" }
-                    <dt>Ověření identifikátoru:</dt>
-                    <dd>
-                        {if $Dok->identifikator['cert_signed'] >= 0 }
-                            {$Dok->identifikator['cert_log']['aktualne']['date']} 
-                            {if $Dok->identifikator['cert_log']['aktualne']['status']==1 }
-                                <span style="color:#009900;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
-                            {else}
-                                <span style="color:#990000;">{$Dok->identifikator['cert_log']['aktualne']['message']}</span>
-                            {/if}
-                            <br />
-                            {$Dok->identifikator['cert_log']['prijato']['date']} 
-                            {if $Dok->identifikator['cert_log']['prijato']['status']==1 }
-                                <span style="color:#009900;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
-                            {else}
-                                <span style="color:#990000;">{$Dok->identifikator['cert_log']['prijato']['message']}</span>
-                            {/if}
-                            <br />
-                            {$Dok->identifikator['cert_log']['doruceno']['date']} 
-                            {if $Dok->identifikator['cert_log']['doruceno']['status']==1 }
-                                <span style="color:#009900;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
-                            {else}
-                                <span style="color:#990000;">{$Dok->identifikator['cert_log']['doruceno']['message']}</span>
-                            {/if}
-                        {else}
-                            <span style="color:#990000;">{$Dok->identifikator['cert_status']}</span>
-                        {/if}
-                    </dd><br />
-                {/if}
-                {if $Dok->identifikator['typ'] == "isds" }
-                    <dt>Ověření identifikátoru:</dt>
-                    <dd id="isds_overeni">
-                        <a href="{link isdsovereni, 'id'=>$Dok->id}" onclick="return overitISDS(this);">Ověřit datovou zprávu</a>
-                    </dd><br />
-                {/if}
-            {/if}
         </dl>
     {/if}
 </div>

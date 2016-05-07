@@ -299,7 +299,7 @@ class Storage_Basic extends FileModel
         try {
             $file_path = $this->getFilePath($file);
             if (!file_exists($file_path))
-                return 1;
+                return $output == 0 ? 1 : null; // kdyz data vracime primo, nemuzeme vratit 1
 
             if ($output == 1)
                 return file_get_contents($file_path);

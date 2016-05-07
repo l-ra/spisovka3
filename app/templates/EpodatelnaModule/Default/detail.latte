@@ -68,15 +68,9 @@
         <dt>Přijato e-podatelnou:</dt>
         <dd>{$Zprava->prijato_dne|edatetime}</dd>
     </dl>
-    <dl n:if="isset($Identifikator)">
-        <dt>Identifikátor e-podatelny:</dt>
-        <dd><pre>{$Identifikator['popis']}</pre></dd>
-    </dl>
     <dl n:if="$Zprava->typ == 'I'">
-        <dt>Ověření identifikátoru:</dt>
-        <dd id="isds_overeni">
-            <a href="{link :Epodatelna:Default:isdsovereni, 'id'=>$Zprava->id}" onclick="return overitISDS(this);">Ověřit datovou zprávu</a>
-        </dd>
+        <dt></dt>
+        <dd><a href="{link isdsovereni, 'id' => $Zprava->id}" onclick="return overitISDS(this);">Ověřit lokální kopii datové zprávy</a></dd>
     </dl>
     <dl n:if="$Zprava->typ == 'E'">
         <dt>Elektronický podpis:</dt>
