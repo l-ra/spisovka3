@@ -50,9 +50,8 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
 
     public function renderAttachments($id)
     {
-        $epodatelna_id = $id;
         $model = new EpodatelnaPrilohy();
-        $attachments = $model->getFileList($epodatelna_id, $this->storage);
+        $attachments = $model->getFileList(new EpodatelnaMessage($id), $this->storage);
         $this->sendJson($attachments);
     }
 }
