@@ -40,12 +40,12 @@
                 <span title="{$ep->prijato_dne|edatetime}">{$ep->prijato_dne|edate}</span>
             </td>
             <td class="cislo_jednaci">
-                &nbsp;<strong><a href="{link :Epodatelna:Default:detail, 'id'=>$ep->id}">
+                &nbsp;<strong><a href="{link detail, 'id' => $ep->id, 'back' => $original_view}">
                    OSS-EP-I-{$ep->poradi}-{$ep->rok}
                 </a></strong>
             </td>
             <td class="vec">
-                <strong title="{html_entity_decode($ep->popis)}"><a href="{link :Epodatelna:Default:detail, 'id'=>$ep->id}">
+                <strong title="{html_entity_decode($ep->popis)}"><a href="{link detail, 'id'=>$ep->id, 'back' => $original_view}">
                     {$ep->predmet}
                 </a></strong>
                 <br />

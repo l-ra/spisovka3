@@ -218,7 +218,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         $this->template->Zprava = $zprava;
         $this->template->Prilohy = EpodatelnaPrilohy::getFileList($zprava, $this->storage);
-
+        $this->template->back = $this->getParameter('back', 'nove');
+        
         if ($zprava->typ == 'I') {
             if (!empty($zprava->file_id)) {
                 $source = self::nactiISDS($this->storage, $zprava->file_id);
