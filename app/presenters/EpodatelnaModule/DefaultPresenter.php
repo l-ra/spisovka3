@@ -571,8 +571,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $zprava['doruceno_dne'] = new DateTime($z->dmAcceptanceTime);
                         $zprava['user_id'] = $this->user->id;
 
-                        $zprava['sha1_hash'] = '';
-
                         /*
                           dmEncodedContent = obsah
                           dmMimeType = application/pdf
@@ -786,7 +784,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 if (!empty($mess->dmAcceptanceTime)) {
                     $zprava['doruceno_dne'] = new DateTime($mess->dmAcceptanceTime);
                 }
-                $zprava['sha1_hash'] = '';
 
                 $epod_id = $ep_zpravy[$mess->dmID]['epodatelna_id'];
                 $this->Epodatelna->update($zprava, array(array('id=%i', $epod_id)));
@@ -911,9 +908,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $insert['prijato_dne'] = new DateTime();
             $insert['doruceno_dne'] = new DateTime(date('Y-m-d H:i:s', $message->udate));
             $insert['user_id'] = $this->user->id;
-
-            // nejlepe sloupec vyhodit z databaze. Kontrolni soucty by mela pocitac sluzba Storage.
-            $insert['sha1_hash'] = '';
 
             // Prilohy zjistujeme pokazde, kdyz je to potreba, aby bylo mozno zmenit/opravit
             // chovani aplikace

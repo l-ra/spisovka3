@@ -1991,7 +1991,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zprava['prijato_dne'] = new DateTime();
         $zprava['doruceno_dne'] = new DateTime();
         $zprava['user_id'] = $this->user->id;
-        $zprava['sha1_hash'] = '';  // nesmysl toto nastavovat, nemáme z čeho hash počítat
 
         $zprava_prilohy = array();
         foreach ($prilohy as $pr) {
@@ -2125,7 +2124,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['prijato_dne'] = new DateTime();
             $zprava['doruceno_dne'] = new DateTime($mess->dmAcceptanceTime);
             $zprava['user_id'] = $this->user->id;
-            $zprava['sha1_hash'] = '';
 
             $aprilohy = array();
             if (count($prilohy) > 0) {
