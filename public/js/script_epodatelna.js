@@ -54,8 +54,6 @@ zpravyNovySubjektOk = function (data) {
 
 renderEpodSubjekty = function (subjekt_id) {
 
-    showSpinner();
-
     url = BASE_URL + 'epodatelna/subjekty/nacti/' + subjekt_id;
 
     $.get(url, function (subjekt) {
@@ -122,8 +120,6 @@ zkontrolovatOdchoziSchranku = function () {
 
 
 nactiZpravy = function () {
-
-    showSpinner();
 
     var url = BASE_URL + 'epodatelna/default/nacti-nove-ajax';
     $.getJSON(url, function (zpravy) {

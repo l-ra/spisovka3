@@ -53,14 +53,10 @@ function installDatePicker() {
 }
 
 function showSpinner() {
-    $("#ajax-spinner").show();
+     $("#ajax-spinner").show();
 }
 function hideSpinner() {
     $("#ajax-spinner").hide();
-}
-function dialogSpinner()
-{
-    return $('<div class="dialog-spinner"></div>');
 }
 
 
@@ -90,6 +86,9 @@ $(function () {
 
     $(document).on('click', 'a.ajax', ajaxAnchor);
 
+    $(document).ajaxStart(function () {
+        showSpinner();
+    });
     $(document).ajaxStop(function () {
         // při události ajaxStop spinner schovám
         hideSpinner();
@@ -288,15 +287,7 @@ dialog = function (elm, title, url) {
         title = 'Dialogové okno';
 
     $('#dialog').dialog("option", "title", title);
-
-    // Interni spinner v dialogu - bude nahrazen, az se obsah dialogu nahraje
-    $('#dialog').html(dialogSpinner());
-    $('#dialog').bind('dialogclose', function (event) {
-        // Dialog pouziva lokalni spinner, takze by nemelo byt treba resit ten globalni.
-        // Ale bohuzel ne vsechen kod zatim pouziva jQuery Ajax interface
-        // Pri zavreni dialogu skryj globalni spinner, aby nebezel donekonecna
-        hideSpinner();
-    });
+    $('#dialog').html('');
     $('#dialog').dialog('open');
 
     var postdata = false;
@@ -331,7 +322,6 @@ dialog = function (elm, title, url) {
 
 reloadDialog = function (elm) {
 
-    $('#dialog').html(dialogSpinner());
     $.get(elm.href, function (data) {
         $('#dialog').html(data);
     });
@@ -366,8 +356,6 @@ aresSubjekt = function (link) {
     inputSelector = '#' + inputSelector.replace('-ic', '');
 
     var url = BASE_URL + 'subjekty/ares?ic=' + IC;
-
-    showSpinner();
 
     $.getJSON(url, function (data) {
         if (data.error) {
@@ -429,10 +417,7 @@ isdsSubjekt = function (link) {
         }
     });
 
-    showSpinner();
-
     return false;
-
 };
 
 /*
@@ -442,7 +427,7 @@ isdsSubjekt = function (link) {
 ajaxcron = function () {
 
     if (Math.random() > 0.1)
-        return false;
+        return;
 
     var url = BASE_URL + 'cron/spustit';
 
@@ -450,9 +435,6 @@ ajaxcron = function () {
         url: url,
         timeout: 1000
     });
-
-    return false;
-
 };
 
 
@@ -479,7 +461,6 @@ spisZobrazitAdministrace = function (spis_id) {
 
 spisVlozitDokument = function (spis_id) {
 
-    showSpinner();
     var href = BASE_URL + 'spisy/' + spis_id + '/vlozit-dokument?dok_id=' + DOKUMENT_ID;
 
     $.get(href, function (spis) {
@@ -494,7 +475,6 @@ spisVlozitDokument = function (spis_id) {
 spisVyjmoutDokument = function () {
 
     if (confirm('Opravdu chcete vyjmout tento dokument ze spisu?')) {
-        showSpinner();
         var url = BASE_URL + 'spisy/vyjmout-dokument?dok_id=' + DOKUMENT_ID;
 
         $.getJSON(url, function (data) {
@@ -509,8 +489,6 @@ spisVyjmoutDokument = function () {
 };
 
 subjektVybran = function (elm) {
-
-    showSpinner();
 
     var url = elm.href + '&dok_id=' + DOKUMENT_ID;
 
@@ -529,8 +507,6 @@ subjektVybran = function (elm) {
 
 renderPrilohy = function (dokument_id) {
 
-    showSpinner();
-
     url = BASE_URL + 'prilohy/' + dokument_id + '/nacti';
 
     $.get(url, function (data) {
@@ -541,8 +517,6 @@ renderPrilohy = function (dokument_id) {
 };
 
 renderSubjekty = function () {
-
-    showSpinner();
 
     url = BASE_URL + 'subjekty/' + DOKUMENT_ID + '/nacti';
 
@@ -637,8 +611,6 @@ osobaVybrana = function (elm) {
     if (poznamka) {
         url = url + '&poznamka=' + encodeURI(poznamka);
     }
-
-    showSpinner();
 
     $.get(url, function (data) {
         if (data.indexOf('###vybrano###') != -1) {
@@ -797,8 +769,6 @@ hledejDokument = function (input, typ) {
 
 hledejDokumentAjax = function (vyraz, typ) {
 
-    showSpinner();
-
     var url = BASE_URL + 'spojit/hledat?q=' + vyraz;
 
     $.get(url, function (data) {
@@ -827,7 +797,6 @@ renderSpojeni = function () {
 
 spojitDokument = function (elm) {
 
-    showSpinner();
     $.get(elm.href, function () {
         closeDialog();
         renderSpojeni();
@@ -838,7 +807,6 @@ spojitDokument = function (elm) {
 
 odebratSpojeni = function (elm) {
 
-    showSpinner();
     $.get(elm.href, function () {
         renderSpojeni();
     });
@@ -847,8 +815,6 @@ odebratSpojeni = function (elm) {
 };
 
 pripojitDokument = function (elm) {
-
-    showSpinner();
 
     $.get(elm.href, function (data) {
         if (data.indexOf('###vybrano###') != -1) {
@@ -1108,9 +1074,7 @@ initSpisAutocomplete = function (filter) {
 
 openHelpWindow = function (url) {
     $('#napoveda').dialog("option", "title", "Nápověda");
-
-    // Interni spinner v dialogu - bude nahrazen, az se obsah dialogu nahraje
-    $('#napoveda').html(dialogSpinner());
+    // $('#napoveda').html('');
     $('#napoveda').dialog('open');
 
     displayHelpPage(url);
@@ -1132,7 +1096,7 @@ ajaxAnchor = function (event) {
         var sel = $('#' + payload.id);
         sel.html(payload.html);
     });
-    showSpinner();
+    
     event.stopPropagation();
     event.preventDefault();
 };
