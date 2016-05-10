@@ -14,7 +14,7 @@ $(function () {
 
     $('#subjekt_epod_autocomplete').autocomplete({
         minLength: 3,
-        source: BASE_URL + 'subjekty/seznamAjax',
+        source: BASE_URL + 'subjekty/seznam-ajax',
         focus: function (event, ui) {
             return false;
         },
@@ -342,7 +342,7 @@ generujZpravu = function (data) {
 
     $('#predat_autocomplete_' + id).autocomplete({
         minLength: 3,
-        source: BASE_URL + 'uzivatel/seznamAjax',
+        source: BASE_URL + 'uzivatel/seznam-ajax',
         focus: function (event, ui) {
             return false;
         },
@@ -353,7 +353,7 @@ generujZpravu = function (data) {
 
     $('#subjekt_autocomplete_' + id).autocomplete({
         minLength: 3,
-        source: BASE_URL + 'subjekty/seznamAjax',
+        source: BASE_URL + 'subjekty/seznam-ajax',
         focus: function (event, ui) {
             return false;
         },
