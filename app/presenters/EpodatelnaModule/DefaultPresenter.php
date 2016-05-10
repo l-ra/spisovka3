@@ -1023,8 +1023,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 }
             }
         }
-        
-        $this->sendResponse(new \Nette\Application\Responses\TextResponse($output));
+
+        $this->sendJson(['id' => 'snippet-isdsovereni', 'html' => $output]);
     }
 
 }
