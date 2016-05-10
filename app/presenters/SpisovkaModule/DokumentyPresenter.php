@@ -2080,14 +2080,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $popis .= "            " . $mess->dmSender . "\n"; //  = Město Milotice
             $popis .= "            " . $mess->dmSenderAddress . "\n"; //  = Kovářská 14/1, 37612 Milotice, CZ
             $popis .= "            " . $mess->dmSenderType . " - " . ISDS_Spisovka::typDS($mess->dmSenderType) . "\n"; //  = 10
-            $popis .= "            org.jednotka: " . $mess->dmSenderOrgUnit . " [" . $mess->dmSenderOrgUnitNum . "]\n"; //  =
             $popis .= "\n";
             $popis .= "Příjemce:\n";
             $popis .= "            " . $mess->dbIDRecipient . "\n"; //  = pksakua
             $popis .= "            " . $mess->dmRecipient . "\n"; //  = Společnost pro výzkum a podporu OpenSource
             $popis .= "            " . $mess->dmRecipientAddress . "\n"; //  = 40501 Děčín, CZ
             //$popis .= "Je příjemce ne-OVM povýšený na OVM: ". $mess->dmDm->dmAmbiguousRecipient ."\n";//  =
-            $popis .= "            org.jednotka: " . $mess->dmRecipientOrgUnit . " [" . $mess->dmRecipientOrgUnitNum . "]\n"; //  =
             $popis .= "\n";
             $popis .= "Status: " . $mess->dmMessageStatus . " - " . ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) . "\n";
             $dt_dodani = strtotime($mess->dmDeliveryTime);
