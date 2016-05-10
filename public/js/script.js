@@ -4,94 +4,28 @@ var stop_timer = 0;
 var url;
 var cache = Array();
 
-function installDatePicker() {
-
-    /*
-     * DatePicter - volba datumu z kalendare
-     */
-    var date = new Date();
-    var year = date.getFullYear();
-    var year_before = year - 15;
-    var year_after = year + 2;
-
-    $("input.datepicker").datepicker(
-            {
-                /*showOn: 'button',
-                 buttonText: 'Choose',
-                 buttonImage: '/images/icons/1day.png',
-                 buttonImageOnly: true,*/
-                showButtonPanel: true,
-                changeMonth: true,
-                changeYear: true,
-                yearRange: year_before + ':' + year_after,
-                dateFormat: "dd.mm.yy",
-                closeText: "Zrušit",
-                prevText: "Předchozí",
-                nextText: "Další",
-                currentText: "Dnes",
-                monthNames: ["Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"],
-                monthNamesShort: ["Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"],
-                //monthNamesShort:["Led","Úno","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-                dayNames: ["Neděle", "Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota"],
-                dayNamesMin: ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"],
-                firstDay: 1
-            });
-
-    $("input.DPNoPast").datepicker("option", "minDate", 0);
-
-    /* $('input.datetimepicker').datepicker(
-     {
-     duration: '',
-     changeMonth: true,
-     changeYear: true,
-     yearRange: '2007:2020',
-     showTime: true,
-     time24h: true,
-     currentText: 'Dnes',
-     closeText: 'OK'
-     }); */
-}
-
-function showSpinner() {
-     $("#ajax-spinner").show();
-}
-function hideSpinner() {
-    $("#ajax-spinner").hide();
-}
-
 
 $(function () {
 
     installDatePicker();
     initSelect2();
 
-    /*
-     * Nastaveni spinneru. Je vzdy pritomen, standarne ale je schovan.
-     */
-    $('<div id="ajax-spinner"></div>').appendTo("body").hide();
-
     /**
      * AJAX
      */
-    /* [P.L.] Rozhodl jsem se po dlouhém trápení nette.ajax.js nepoužít.
-     $.nette.init();
-     // zakaz tyto extension
-     $.nette.ext('forms', null);
-     $.nette.ext('abort', null);
-     $.nette.ext('spinner', {
-     start: function (xhr) {
-     showSpinner();
-     }
-     }, {}); */
+
+    // Nastaveni spinneru. Je vzdy pritomen, standardne ale je schovan.
+    $('<div id="ajax-spinner"></div>').appendTo("body").hide();
 
     $(document).on('click', 'a.ajax', ajaxAnchor);
+    $(document).on('click', 'a.ajax-dialog', ajaxDialog);
 
     $(document).ajaxStart(function () {
-        showSpinner();
+        $("#ajax-spinner").show();
     });
     $(document).ajaxStop(function () {
         // při události ajaxStop spinner schovám
-        hideSpinner();
+        $("#ajax-spinner").hide();
     });
 
     $(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {
@@ -100,7 +34,7 @@ $(function () {
             return;
 
         // při chybě též spinner schovám, protože jQuery zdá se nevyvolá událost stop
-        hideSpinner();
+        $("#ajax-spinner").hide();
 
         // Pozadavek muze byt zrusen bud skriptem nette.ajax.js nebo kdyz uzivatel
         // naviguje na jinou stranku, nez dele bezici pozadavek dokonci
@@ -136,13 +70,9 @@ $(function () {
         modal: true
     });
 
-    // Dialog - Vyber spisu
-    $('#dialog-spis').click(function (event) {
-        dialog(this, 'Výběr spisu');
-        return false;
+    $('#dialog-uzivatel').click(function (event) {
+        return dialog(this, 'Předat dokument organizační jednotce nebo zaměstnanci');
     });
-
-    $('#dialog-subjekt').click(dialogVyberSubjektu);
 
     $('#subjekt_pripojit_click').click(function (event) {
         $('#subjekt_pripojit').show();
@@ -150,43 +80,6 @@ $(function () {
         return false;
     });
 
-    $('#dialog-pridat-prilohu').click(function (event) {
-        dialog(this, 'Přidat přílohu');
-        return false;
-    });
-
-    $('#dialog-uzivatel').click(function (event) {
-        dialog(this, 'Předat dokument organizační jednotce nebo zaměstnanci');
-        return false;
-    });
-
-    $('#dialog-predatspis').click(function (event) {
-        dialog(this, 'Předat spis organizační jednotce nebo zaměstnanci');
-        return false;
-    });
-
-    $(document).on('click', '#dialog-spojit', function (event) {
-        dialog(this, 'Spojit s dokumentem');
-        return false;
-    });
-
-    // Dialog - Historie
-    $('#dialog-historie').click(function (event) {
-        dialog(this, 'Historie dokumentu');
-        return false;
-    });
-
-    // Dialog - pripojit k archu
-    $('#dialog-cjednaci').click(function (event) {
-        dialog(this, 'Vložit do spisu');
-        return false;
-    });
-
-    // Dialog - hledat
-    $('#dialog-search').click(function (event) {
-        dialog(this, 'Pokročilé vyhledávání');
-        return false;
-    });
     $('#dialog').on('submit', '#frm-searchForm', function (event) {
         postFormJ(this, function (data) {
             if (data.redirect)
@@ -272,8 +165,6 @@ $(function () {
             event.preventDefault();
         }
     });
-
-    $('#novysubjekt_click').click(subjektNovy);
 });
 
 /*
@@ -283,7 +174,8 @@ $(function () {
  */
 dialog = function (elm, title, url) {
 
-    if (typeof title == 'null')
+    // jQuery UI bug - je-li title prázdný, rozhodí se layout dialogu
+    if (typeof title == 'null' || title == '')
         title = 'Dialogové okno';
 
     $('#dialog').dialog("option", "title", title);
@@ -527,23 +419,6 @@ renderSubjekty = function () {
     return false;
 };
 
-
-dialogVyberSubjektu = function () {
-
-    dialog($('#dialog-subjekt'), 'Seznam subjektů');
-    return false;
-};
-
-dialogNovySubjekt = function (elm) {
-
-    return dialog(elm, 'Nový subjekt');
-};
-
-dialogUpravitSubjekt = function (elm) {
-
-    return dialog(elm, 'Upravit subjekt');
-};
-
 subjektUpravitSubmit = function () {
     postFormJ($("#subjekt-vytvorit"), function (data) {
         if (data.indexOf('###zmeneno###') != -1) {
@@ -580,12 +455,6 @@ novySubjektOk = function () {
     // alert('Subjekt byl úspěšně vytvořen a přidán.');
     closeDialog();
     renderSubjekty();
-};
-
-subjektNovy = function () {
-
-    dialog(this, 'Nový subjekt');
-    return false;
 };
 
 spisVytvoritSubmit = function (form) {
@@ -633,11 +502,6 @@ osobaVybrana = function (elm) {
     return false;
 };
 
-
-prilohazmenit = function (elm) {
-
-    return dialog(elm, 'Upravit přílohu');
-};
 
 odebratPrilohu = function (elm, dok_id) {
 
@@ -688,10 +552,6 @@ odes_form_reset = function (subjekt_id) {
     }
 
 
-};
-
-zobrazFax = function (elm) {
-    return dialog(elm, 'Zobrazit zprávu faxu');
 };
 
 function renderVysledekHledaniDokumentu(data, typ) {
@@ -1096,7 +956,49 @@ ajaxAnchor = function (event) {
         var sel = $('#' + payload.id);
         sel.html(payload.html);
     });
-    
-    event.stopPropagation();
-    event.preventDefault();
+
+    return false;
 };
+
+ajaxDialog = function (event) {
+    var title = $(this).data('title') || '';
+    dialog(this, title);
+    return false;
+};
+
+installDatePicker = function () {
+
+    /*
+     * DatePicter - volba datumu z kalendare
+     */
+    var date = new Date();
+    var year = date.getFullYear();
+    var year_before = year - 15;
+    var year_after = year + 2;
+
+    $("input.datepicker").datepicker(
+            {
+                /*showOn: 'button',
+                 buttonText: 'Choose',
+                 buttonImage: '/images/icons/1day.png',
+                 buttonImageOnly: true,*/
+                showButtonPanel: true,
+                changeMonth: true,
+                changeYear: true,
+                yearRange: year_before + ':' + year_after,
+                dateFormat: "dd.mm.yy",
+                closeText: "Zrušit",
+                prevText: "Předchozí",
+                nextText: "Další",
+                currentText: "Dnes",
+                monthNames: ["Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"],
+                monthNamesShort: ["Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"],
+                //monthNamesShort:["Led","Úno","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+                dayNames: ["Neděle", "Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota"],
+                dayNamesMin: ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"],
+                firstDay: 1
+            });
+
+    $("input.DPNoPast").datepicker("option", "minDate", 0);
+};
+

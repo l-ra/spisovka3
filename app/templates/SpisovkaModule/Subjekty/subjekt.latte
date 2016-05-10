@@ -37,7 +37,7 @@
         </div>
         <div class="vyber" n:if="!empty($akce_odebrat_zmenit)">
             <a href="{link :Spisovka:Subjekty:odebrat, 'id' => $subjekt->id, 'dok_id' => $dokument_id}" onclick="return odebratSubjekt(this);">odebrat</a>
-            <a href="{link :Spisovka:Subjekty:upravit, 'id' => $subjekt->id}" onclick="return dialogUpravitSubjekt(this);">změnit</a>
+            <a class="ajax-dialog" data-title="Upravit subjekt" href="{link :Spisovka:Subjekty:upravit, 'id' => $subjekt->id}">změnit</a>
         </div>
         <div class="vyber" n:if="!empty($akce_adresat_odesilatel)">
             <a href="{link :Spisovka:Subjekty:vybrano, 'id' => $subjekt->id, 'typ' => 'A' }" onclick="subjektVybran(this); return false;">adresát</a>

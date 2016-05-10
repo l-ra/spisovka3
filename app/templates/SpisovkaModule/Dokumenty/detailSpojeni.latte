@@ -14,7 +14,7 @@
                 odebrat spojení</a><br />
             {/foreach}
         </span>
-        <a n:if="$AccessEdit" href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->id}" id="dialog-spojit">nové spojení</a>
+        <a n:if="$AccessEdit" class="ajax-dialog" data-title="Spojit s dokumentem" href="{link :Spisovka:Spojit:vyber, 'id'=>$Dok->id}">nové spojení</a>
     </dd>
 </dl>
 

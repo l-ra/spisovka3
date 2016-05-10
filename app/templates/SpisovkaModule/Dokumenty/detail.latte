@@ -72,7 +72,7 @@
         <a href="{link odmitnoutprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
     {elseif $LzePredatDokument}
         {if empty($Dok->predano)}
-            <a href="{link :Spisovka:Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
+            <a href="{link Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
         {else}
             <a href="{link zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit předání dokumentu</a>
         {/if}
@@ -170,7 +170,7 @@
                     {if $AccessEdit}
                         {if $Typ_evidence == 'sberny_arch'}
                             <br />Zaevidovat do spisové služby: <a href="{link pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
-                            <a href="{link cjednaci, 'id'=>$Dok->id}" id="dialog-cjednaci">vložit do existujícího spisu</a>
+                            <a class="ajax-dialog" data-title="Vložit do spisu" href="{link cjednaci, 'id'=>$Dok->id}">vložit do existujícího spisu</a>
                         {else}
                             <br /><a href="{link pridelitcj, 'id'=>$Dok->id}">Přidělit číslo jednací</a>
                         {/if}
@@ -386,13 +386,13 @@
                 <dt>Vyhledat a připojit subjekt:</dt>
                 <dd>
                     <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
-                    <a href="{link :Spisovka:Subjekty:vyber, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
+                    <a class="ajax-dialog" data-title="Seznam subjektů" href="{link Subjekty:vyber, 'dok_id'=>$Dok->id}">Seznam</a>
                 </dd>
             </dl>
             <dl id="subjekt_novy">
                 <dt></dt>
                 <dd>
-                    <a href={link Subjekty:novy, dok_id => $Dok->id} id="novysubjekt_click">Vytvořit nový subjekt</a>
+                    <a class="ajax-dialog" data-title="Nový subjekt" href={link Subjekty:novy, dok_id => $Dok->id}>Vytvořit nový subjekt</a>
                 </dd>
             </dl>
         </div>
@@ -413,7 +413,7 @@
     </div>
     {if $AccessEdit }
         <div class="blok_akce">
-            <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+            <a class="ajax-dialog" data-title="Přidat přílohu" href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}">Přidat přílohu</a>
         </div>
     {/if}
     <div id="dok-prilohy">

@@ -23,7 +23,7 @@
                     {if isset($AccessEdit) && $AccessEdit}
                         <div class="vyber">
                             <a href="{link :Spisovka:Prilohy:odebrat, 'id' => $file->id, 'dok_id' => $dokument_id }" onclick="return odebratPrilohu(this, {!$dokument_id});">odebrat</a>
-                            <a href="{link :Spisovka:Prilohy:upravit, 'id' => $file->id, 'dok_id' => $dokument_id }" onclick="return prilohazmenit(this);">změnit</a>
+                            <a class="ajax-dialog" data-title="Upravit přílohu" href="{link Prilohy:upravit, 'id' => $file->id, 'dok_id' => $dokument_id }">změnit</a>
                         </div>
                     {/if}
                 </td>

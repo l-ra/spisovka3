@@ -1,7 +1,7 @@
     <div class="dokument_blok_sedy">
         <div class="h2">Historie</div>
         <div class="blok_akce" n:if="$presenter->view != 'printdetail' && !isset($kompletni_historie)">
-            <a href="{link :Spisovka:Dokumenty:historie, 'id' => $Dok->id}" id="dialog-historie">Zobrazit celou historii</a>
+            <a class="ajax-dialog" data-title="Historie dokumentu" href="{link :Spisovka:Dokumenty:historie, 'id' => $Dok->id}">Zobrazit celou historii</a>
         </div>
 
         {foreach $historie as $h}

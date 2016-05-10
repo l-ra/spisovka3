@@ -101,7 +101,7 @@
             <dd>
                 <input type="text" name="predano_autocomplete" id="predat_autocomplete" size="40" />
                 &nbsp;&nbsp;&nbsp;
-                <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>$user->id, 'dok_id'=>$Dok->id, 'novy'=>1}" id="dialog-uzivatel">Vyhledat ze seznamu</a>
+                <a href="{link Uzivatel:vyber, 'id'=>$user->id, 'dok_id'=>$Dok->id, 'novy'=>1}" id="dialog-uzivatel">Vyhledat ze seznamu</a>
             </dd>
         </dl>
         <div id="predano"></div>
@@ -116,13 +116,13 @@
                 <dt>Připojit subjekt:</dt>
                 <dd>
                     <input type="text" name="subjekt_autocomplete" id="subjekt_autocomplete" size="60" />
-                    <a href="{link :Spisovka:Subjekty:vyber, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
+                    <a class="ajax-dialog" data-title="Seznam subjektů" href="{link Subjekty:vyber, 'dok_id'=>$Dok->id}" id="dialog-subjekt">Seznam</a>
                 </dd>
             </dl>
             <dl id="subjekt_novy">
                 <dt></dt>
                 <dd>
-                    <a href={link Subjekty:novy, dok_id => $Dok->id} id="novysubjekt_click">Vytvořit nový subjekt</a>
+                    <a class="ajax-dialog" data-title="Nový subjekt" href={link Subjekty:novy, dok_id => $Dok->id}>Vytvořit nový subjekt</a>
                 </dd>
             </dl>
         </div>
@@ -140,7 +140,7 @@
         Přílohy
     </div>
     <div class="blok_akce">
-        <a href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}" id="dialog-pridat-prilohu">Přidat přílohu</a>
+        <a class="ajax-dialog" data-title="Přidat přílohu" href="{link :Spisovka:Prilohy:pridat, 'dok_id'=>$Dok->id}">Přidat přílohu</a>
     </div>
     <div id="dok-prilohy">
         {include '../Prilohy/nacti.latte', prilohy => $Prilohy, dokument_id => $dokument_id, AccessEdit => true}
