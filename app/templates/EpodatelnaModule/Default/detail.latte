@@ -79,7 +79,7 @@
 </div>
 
 <div class="dokument_blok_sedy">
-    <div class="h2">Obsah zprávy</div>
+    <div class="h2">{$Zprava->typ == 'I' ? 'Datová zpráva' : 'Obsah zprávy'}</div>
     {!$Zprava->popis|html2br}
 </div>
 

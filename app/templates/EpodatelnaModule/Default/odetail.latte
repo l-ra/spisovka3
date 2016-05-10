@@ -16,7 +16,7 @@
 
     <div class="dokument_blok_hlavni">
         <dl>
-            <dt>Pořadí DZ v e-podatelně:</dt>
+            <dt>Identifikátor DZ v e-podatelně:</dt>
             <dd>OSS-EP-O-{$Zprava->poradi}-{$Zprava->rok}</dd>
         </dl>
         <dl>
@@ -47,7 +47,7 @@
     </div>
 
     <div class="dokument_blok_sedy">
-        <div class="h2">Obsah zprávy</div>
+        <div class="h2">{$Zprava->typ == 'I' ? 'Datová zpráva' : 'Obsah zprávy'}</div>
         <pre>{!$Zprava->popis}</pre>
     </div>
 
