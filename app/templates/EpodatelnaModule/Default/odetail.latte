@@ -71,7 +71,7 @@
                 {if 0}<a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>$priloha['id']}">{$priloha['name']}</a>{/if}
                 <strong>{$priloha['name']}</strong>
                 <div class="info">
-                <span>{$priloha['size']|bytes}, {$priloha['mimetype']}</span>
+                <span>{$priloha['size']|bytes,0}, {$priloha['mimetype']}</span>
                 </div>
             </td>
         </tr>

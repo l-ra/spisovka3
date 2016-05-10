@@ -98,6 +98,10 @@ class EpodatelnaPrilohy
         }
 
         // email
+        // u odchozích zpráv se od verze 3.5.0 neukládá kopie emailu, vrať medatadata z databáze
+        if ($message->odchozi && !$message->file_id)
+            return unserialize($message->prilohy);
+        
         $filename = $message->getMessageSource($storage);
         
         $imap = new ImapClient();
