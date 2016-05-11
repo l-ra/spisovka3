@@ -4,7 +4,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 {
 
     protected $Epodatelna;
-    protected $pdf_output = 0;
 
     public function __construct()
     {
@@ -25,18 +24,15 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     protected function shutdown($response)
     {
-        if ($this->pdf_output == 1 || $this->pdf_output == 2) {
-
+        if ($this->getParameter('pdfprint')) {
             ob_start();
             $response->send($this->getHttpRequest(), $this->getHttpResponse());
             $content = ob_get_clean();
             if ($content) {
-
                 @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-
                 $person_name = $this->user->displayName;
 
-                if ($this->pdf_output == 2) {
+                if ($this->view == "odetail" || $this->view == "detail") {
                     $content = str_replace("<td", "<td valign='top'", $content);
                     $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
                     $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
@@ -87,13 +83,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
                     $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
 
-                    if ($this->getParameter('typ') == 'odchozi')
-                        $header = 'Seznam odchozích zpráv';
-                    else if ($this->template->view == 'prichozi')
-                        $header = 'Seznam příchozích zpráv';
-                    else
-                        $header = 'Seznam nových zpráv';
-                    $mpdf->SetHeader("$header||{$this->template->Urad->nazev}");
+                    $mpdf->SetHeader("||{$this->template->Urad->nazev}");
                     $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
                     $mpdf->WriteHTML($content);
@@ -112,7 +102,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
-
         $args = array(
             'where' => array('ep.stav = 1 AND ep.odchozi = 0')
         );
@@ -122,23 +111,14 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
-        if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
-            $this->setView('print');
-        } elseif ($pdf) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->pdf_output = 1;
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $seznam = $result->fetchAll();
-            $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $this->setView('seznam');
         }
-
         $this->template->seznam = $seznam;
+        
+        $this->setView('seznam');
     }
 
     public function renderPrichozi()
@@ -149,8 +129,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
-
-        $args = null;
         $args = array(
             'where' => array('ep.stav >= 1 AND ep.odchozi = 0')
         );
@@ -160,20 +138,14 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
-        if ($tisk) {
+        if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
-            $this->setView('print');
-        } elseif ($pdf) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->pdf_output = 1;
-            $seznam = $result->fetchAll();
-            $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $this->setView('seznam');
         }
-
         $this->template->seznam = $seznam;
+        
+        $this->setView('seznam');
     }
 
     public function renderOdchozi()
@@ -184,8 +156,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
-
-        $args = null;
         $args = [
             'where' => ['ep.odchozi = 1'],
             'order' => ['doruceno_dne' => 'DESC']
@@ -196,15 +166,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
-        if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
+        if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
-            $this->setView('printo');
-        } elseif ($pdf) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->pdf_output = 1;
-            $seznam = $result->fetchAll();
-            $this->setView('printo');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
@@ -230,9 +193,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $Dokument = new Dokument();
             $this->template->Dokument = $Dokument->getInfo($zprava->dokument_id);
         }
-
-        if ($this->getParameter('pdfprint'))
-            $this->pdf_output = 2;
     }
 
     public function renderOdetail($id)
