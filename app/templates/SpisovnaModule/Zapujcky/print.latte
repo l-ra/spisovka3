@@ -61,12 +61,6 @@
         </tr>
         {/foreach}
     </table>
-    <div id="tisk_podpis">
-        &nbsp;<br />
-        Vytištěno dne: {=date("j.n.Y G:i")}
-        <br />
-        Vytiskl: {$user->displayName}
-    </div>    
     {else}
         <div>&nbsp;</div>
         {if isset($no_items)}

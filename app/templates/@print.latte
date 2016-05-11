@@ -20,6 +20,8 @@
     <body {if true}onload="window.print();"{/if}>
         <div>
             {include #content}
+            <p>Vytvořil: {$user->displayName}<br />
+                Dne: {time()|edatetime}</p>
         </div>
     </body>
 </html>
