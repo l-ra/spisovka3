@@ -97,3 +97,5 @@ Nový flag "vynutit odhlášení" u uživatelského účtu
 Údaj o uživateli u odchozích zpráv v e-podatelně
 [1170]
 Nastavení provedení upgrade procedury při spuštění programu
+[1200]
+Oprava prohozeného adresáta a odesilatele v databázi u odchozích zpráv
