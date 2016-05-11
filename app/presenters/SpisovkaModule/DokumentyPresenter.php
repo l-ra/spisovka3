@@ -2106,7 +2106,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $UploadFile = $this->storage;
 
             $Epodatelna = new Epodatelna();
-            $config = $isds->getConfig();
 
             $zprava = array();
             $zprava['odchozi'] = 1;

@@ -10,14 +10,13 @@
     <div id="zkontrolovat_status"></div>
     <script type="text/javascript">
         zkontrolovatSchranku({Settings::get('epodatelna_auto_load_new_messages')});
-        zkontrolovatOdchoziSchranku();
         var linkNovySubjekt = {link :Spisovka:Subjekty:novy, f => zpravyNovySubjektOk};
         var kopirovatEmailDoPoznamky = {Settings::get('epodatelna_copy_email_into_documents_note')};
     </script>
 
 
     <div id="zkontrolovat_seznam">
-    <form action="{link :Epodatelna:Evidence:hromadna}" method="post" id="h_evidence">
+    <form action="{link Evidence:hromadna}" method="post" id="h_evidence">
         
     </form>
     </div>

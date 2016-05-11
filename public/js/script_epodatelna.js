@@ -110,14 +110,6 @@ zkontrolovatSchranku = function (nacist_nove_zpravy) {
     });
 };
 
-zkontrolovatOdchoziSchranku = function () {
-
-    var url = BASE_URL + 'epodatelna/default/zkontrolovat-odchozi-isds';
-
-    // zde není potřeba žádná zpětná vazba
-    $.get(url);
-};
-
 
 nactiZpravy = function () {
 
