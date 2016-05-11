@@ -1986,7 +1986,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zprava['popis'] = $data['email_text'];
         // V databázi je prohozen adresát a odesilatel!!
         $zprava['adresat'] = $adresat->email;
-        $zprava['odesilatel_id'] = $adresat->id;
+        $zprava['subjekt_id'] = $adresat->id;
         $zprava['odesilatel'] = '';
         $zprava['prijato_dne'] = new DateTime();
         $zprava['doruceno_dne'] = new DateTime();
@@ -2117,7 +2117,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['predmet'] = empty($mess->dmAnnotation) ? "(Datová zpráva bez předmětu)" : $mess->dmAnnotation;
             $zprava['popis'] = $popis;
             $zprava['adresat'] = $mess->dmRecipient . ', ' . $mess->dmRecipientAddress;
-            $zprava['odesilatel_id'] = $adresat->id;
+            $zprava['subjekt_id'] = $adresat->id;
             $zprava['odesilatel'] = '';
             $zprava['prijato_dne'] = new DateTime();
             $zprava['doruceno_dne'] = new DateTime($mess->dmAcceptanceTime);

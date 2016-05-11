@@ -563,7 +563,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $zprava['predmet'] = $annotation;
                         $zprava['popis'] = $popis;
                         $zprava['odesilatel'] = $z->dmSender . ', ' . $z->dmSenderAddress;
-                        //$zprava['odesilatel_id'] = $z->dmAnnotation;
                         $zprava['adresat'] = $ISDS_box['ucet'] . ' [' . $ISDS_box['idbox'] . ']';
                         $zprava['prijato_dne'] = new DateTime();
                         $zprava['doruceno_dne'] = new DateTime($z->dmAcceptanceTime);

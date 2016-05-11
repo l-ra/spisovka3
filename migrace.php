@@ -944,7 +944,7 @@ if (count($S2_dok) > 0) {
                                     : $S2_d->strucny_obsah,
                         'popis' => '' . $S2_d->poznamka,
                         'odesilatel' => $epodatelna_odesilatel,
-                        'odesilatel_id' => $epodatelna_odesilatel_id,
+                        'subjekt_id' => $epodatelna_odesilatel_id,
                         'adresat' => 'Centrální podatelna',
                         'prijato_dne' => $datum_vzniku,
                         'doruceno_dne' => $datum_vzniku,
@@ -1313,7 +1313,7 @@ if (count($S2_dok) > 0) {
                             'popis' => '' . $S2_d->poznamka,
                             'odesilatel' => !empty($epodatelna_odesilatel) ? $epodatelna_odesilatel
                                         : "(nezjišttěno)",
-                            'odesilatel_id' => $epodatelna_odesilatel_id,
+                            'subjekt_id' => $epodatelna_odesilatel_id,
                             'adresat' => 'Centrální podatelna',
                             'prijato_dne' => $datum_vzniku,
                             'doruceno_dne' => $datum_vzniku,
