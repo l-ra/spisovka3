@@ -3,9 +3,8 @@ body {
 }
 
 /* Pokud by uzivatel chtel, muze si obarvit zahlavi tabulky jinak
-
-table.spisovka th, table.seznam th {
-    background-color: gray;
+  table.spisovka th, table.seznam th {
+      background-color: gray;
 } */
 
 #layout_top { display: none; }
@@ -29,6 +28,12 @@ th.akce { display: none; }
    thead { display: table-header-group; }
 }
 
+a {
+    text-decoration: none;
+}
+a, #dokumenty table a {
+    color: black;    
+}
 .dokument_blok_hlavni {
     background: #A8DBFF ;
 }
