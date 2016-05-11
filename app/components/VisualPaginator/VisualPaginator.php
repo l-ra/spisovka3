@@ -9,23 +9,13 @@
  *
  * @copyright  Copyright (c) 2009 David Grudl
  * @license    New BSD License
- * @link       http://extras.nettephp.com
- * @package    Nette Extras
- * @version    $Id: VisualPaginator.php 4 2009-07-14 15:22:02Z david@grudl.com $
  */
-
-/*use Nette\Application\Control;*/
-
-/*use Nette\Paginator;*/
-
 
 
 /**
  * Visual paginator control.
  *
- * @author     David Grudl
  * @copyright  Copyright (c) 2009 David Grudl
- * @package    Nette Extras
  */
 class VisualPaginator extends Nette\Application\UI\Control
 {

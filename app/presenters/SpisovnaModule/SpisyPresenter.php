@@ -230,11 +230,11 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
     }
 
-    public function renderDetail()
+    public function renderDetail($id)
     {
-        $spis_id = $this->getParameter('id', null);
         // Info o spisu
         $Spisy = new Spis();
+        $spis_id = $id;
         $this->template->Spis = $spis = $Spisy->getInfo($spis_id, true);
 
         if ($spis) {

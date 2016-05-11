@@ -6,14 +6,8 @@
     <a href="{link :Spisovna:Dokumenty:default}">Seznam dokumentů ve spisovně</a> - Detail dokumentu
     </div>
 
-    <div id="tisk">
-        <a href="{link :Spisovna:Dokumenty:detail, 'id'=>$Dok->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-        </a>
-        <a href="{link :Spisovna:Dokumenty:detail, 'id'=>$Dok->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
-        </a>        
-    </div>
+    {control print}
+    
     <div class="dokument_blok_menu">
         {if $Lze_menit_skartacni_rezim}
         <a href="{link :Spisovna:Dokumenty:detail , 'id'=>$Dok->id , 'upravit'=>'skart_rezim' }">Upravit skartační režim</a>

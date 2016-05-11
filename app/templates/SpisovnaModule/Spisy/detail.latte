@@ -8,15 +8,8 @@
 
     <h2>{$Spis->nazev}</h2>
 
-    <div id="tisk">
-        <a href="{link :Spisovna:Spisy:detail, 'id'=>$Spis->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-        </a>
-        <a href="{link :Spisovna:Spisy:detail, 'id'=>$Spis->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-            <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
-        </a>        
-    </div>      
-    
+    {control print}
+
     <div class="dokument_blok_menu">
        {if $AccessEdit}
        <a href="{link :Spisovna:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit skartační režim</a>

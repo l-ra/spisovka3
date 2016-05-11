@@ -57,14 +57,7 @@
     {/if}
 </div>
 
-<div id="tisk">
-    <a href="{link detail, 'id'=>$Dok->id, 'print' => 1}" title="vytisknout tuto stránku" target="_blank">
-        <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-    </a>
-    <a href="{link detail, 'id'=>$Dok->id, 'pdfprint' => 1}" title="Vytisknout tuto stránku do PDF" target="_blank">
-        <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
-    </a>        
-</div>
+{control print}
 
 <div class="dokument_blok_menu" n:ifcontent>
     {if $Predan==1 }

@@ -247,12 +247,12 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->seznam();
     }
 
-    public function renderDetail()
+    public function renderDetail($id)
     {
         $Dokument = new Dokument();
 
         // Nacteni parametru
-        $dokument_id = $this->getParameter('id', null);
+        $dokument_id = $id;
 
         $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
         if ($dokument) {

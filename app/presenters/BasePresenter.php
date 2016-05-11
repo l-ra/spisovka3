@@ -277,4 +277,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             \Nette\Forms\Rules::$defaultMessages[$id] = $message;
     }
 
+    protected function createComponentPrint()
+    {
+        $c = new Spisovka\Components\PrintControl();
+        return $c;
+    }
 }
