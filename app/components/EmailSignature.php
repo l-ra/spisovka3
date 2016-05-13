@@ -39,6 +39,11 @@ class EmailSignature extends \Nette\Application\UI\Control
         }
         
         $filename = $this->message->getMessageSource($this->storage);
+        if (!$filename) {
+            echo "Nemohu najít soubor s emailem.";
+            return;
+        }
+        
         $esig = new \esignature();
         $result = $esig->verifySignature($filename);
         

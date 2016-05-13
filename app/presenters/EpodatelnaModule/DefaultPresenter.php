@@ -108,9 +108,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $zprava = new EpodatelnaMessage($id);
 
         $this->template->Zprava = $zprava;
-        $this->template->Prilohy = EpodatelnaPrilohy::getFileList($zprava, $this->storage);
+        $this->template->Prilohy = $zprava->file_id ? EpodatelnaPrilohy::getFileList($zprava,
+                        $this->storage) : [];
         $this->template->back = $this->getParameter('back', 'nove');
-        
+
         if ($zprava->typ == 'E') {
             $this->addComponent(new Spisovka\Components\EmailSignature($zprava, $this->storage),
                     'emailSignature');
