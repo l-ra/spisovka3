@@ -25,17 +25,11 @@ class Spisovka_SestavyPresenter extends BasePresenter
         'poznamka_predani' => 'Poznámka k předání',
         'prazdny_sloupec' => 'Prázdný sloupec',
     );
-
-    protected function shutdown($response)
+    
+    protected function pdfExport($content)
     {
-        if ($this->view != 'pdf')
-            return;
-        ob_start();
-        $response->send($this->getHttpRequest(), $this->getHttpResponse());
-        $content = ob_get_clean();
-        if (!$content)
-            return;
-
+        @ini_set("memory_limit", PDF_MEMORY_LIMIT);
+        
         $app_info = new VersionInformation();
         $app_name = $app_info->name;
 
@@ -54,7 +48,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $pdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
 
         $pdf->SetHeader($this->template->Sestava->nazev . '||' . $this->template->Urad->nazev . ', ' . $this->template->rok);
-        $pdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+        // $pdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
         $pdf->WriteHTML($content);
         $pdf->Output('sestava.pdf', 'I');
@@ -86,57 +80,26 @@ class Spisovka_SestavyPresenter extends BasePresenter
         Spisovka_VyhledatPresenter::autoCompleteHandler($this, $text, $typ, $user, $org);
     }
 
-    public function actionPdf()
+    public function renderPdf($id)
     {
-        $pc_od = $this->getParameter('pc_od', null);
-        $pc_do = $this->getParameter('pc_do', null);
-        $d_od = $this->getParameter('d_od', null);
-        $d_do = $this->getParameter('d_do', null);
-        $today = $this->getParameter('d_today', null);
-        $rok = $this->getParameter('rok', null);
-        $pokracovat = $this->getParameter('pokracovat', false);
-
-        @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-        $sestava_id = $this->getParameter('id', null);
-        $this->forward('detail',
-                array('view' => 'pdf', 'id' => $sestava_id,
-            'pc_od' => $pc_od, 'pc_do' => $pc_do,
-            'd_od' => $d_od, 'd_do' => $d_do,
-            'd_today' => $today, 'rok' => $rok, 'pokracovat' => $pokracovat
-        ));
+        $this->renderDetail($id, true);
     }
 
-    public function renderTisk()
+    public function renderTisk($id)
     {
-        $pc_od = $this->getParameter('pc_od', null);
-        $pc_do = $this->getParameter('pc_do', null);
-        $d_od = $this->getParameter('d_od', null);
-        $d_do = $this->getParameter('d_do', null);
-        $today = $this->getParameter('d_today', null);
-        $rok = $this->getParameter('rok', null);
-
-        $sestava_id = $this->getParameter('id', null);
-        $this->forward('detail',
-                array('view' => 'tisk', 'id' => $sestava_id,
-            'pc_od' => $pc_od, 'pc_do' => $pc_do,
-            'd_od' => $d_od, 'd_do' => $d_do,
-            'd_today' => $today, 'rok' => $rok,
-        ));
+        $this->setView('detail');
+        $this->renderDetail($id);
     }
 
-    public function renderDetail($view)
+    public function renderDetail($id, $pdf = false)
     {
         $Dokument = new Dokument();
 
         $sestava = new Sestava($this->getParameter('id'));
         $this->template->Sestava = $sestava;
 
-        // info
-        $this->template->output = $view;
-
-        // sloupce
+        $this->template->pdf = $pdf;
         $this->template->sloupce_nazvy = self::$sloupce_nazvy;
-
 
         $zobr = isset($sestava->zobrazeni_dat) ? unserialize($sestava->zobrazeni_dat) : false;
         if ($zobr === false)
@@ -302,26 +265,15 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $seznam = $result->fetchAll();
 
         if (count($seznam) > 0) {
-
-            $mnoho = count($seznam) > ($view == 'pdf' ? 100 : 500);
+            $mnoho = count($seznam) > ($pdf ? 100 : 500);
             $this->template->pocet_dokumentu = count($seznam);
 
             if ($mnoho && !$this->getParameter('pokracovat', false)) {
-
                 $this->template->prilis_mnoho = 1;
                 $seznam = array();
-
-                $reload_url = $this->getHttpRequest()->getUrl()->getAbsoluteUrl();
-                if (strpos($reload_url, '?') !== false) {
-                    $reload_url .= "&pokracovat=1";
-                } else {
-                    if (substr($reload_url, -1) != '/')
-                        $reload_url .= '/';
-                    $reload_url .= "?pokracovat=1";
-                }
-                $this->template->reload_url = $reload_url;
+                if ($pdf)
+                    $this->setView('detail');
             } else {
-
                 $dokument_ids = array();
                 foreach ($seznam as $row)
                     $dokument_ids[] = $row->id;
@@ -343,9 +295,6 @@ class Spisovka_SestavyPresenter extends BasePresenter
                                 : '';
                     $seznam[$index] = $dok;
                 }
-
-                if ($view == 'pdf')
-                    $this->setView('pdf');
             }
         }
 

@@ -11,7 +11,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     private $seradit;
     private $odpoved = false;
     private $typ_evidence = null;
-    private $pdf_output = 0;
 
     public function startup()
     {
@@ -109,15 +108,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
-        if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $seznam = $result->fetchAll();
-            $this->setView('print');
-        } elseif ($pdf) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->pdf_output = 1;
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
             $this->setView('print');
         } else {
@@ -150,81 +141,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $this->template->seznam = $seznam;
-    }
-
-    protected function shutdown($response)
-    {
-
-        if ($this->pdf_output == 1 || $this->pdf_output == 2) {
-
-            ob_start();
-            $response->send($this->getHttpRequest(), $this->getHttpResponse());
-            $content = ob_get_clean();
-            if ($content) {
-
-                @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-
-                $person_name = $this->user->displayName;
-
-                if ($this->pdf_output == 2) {
-                    $content = str_replace("<td", "<td valign='top'", $content);
-                    $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
-                    $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
-                    $content = preg_replace('#<div id="tisk_podpis">.*?</div>#s', '', $content);
-                    $content = preg_replace('#<table id="table_top">.*?</table>#s', '',
-                            $content);
-
-                    $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica');
-
-                    $app_info = new VersionInformation();
-                    $app_name = $app_info->name;
-                    $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor($person_name);
-                    $mpdf->SetTitle('Spisová služba - Detail dokumentu');
-
-                    $mpdf->defaultheaderfontsize = 10; /* in pts */
-                    $mpdf->defaultheaderfontstyle = 'B'; /* blank, B, I, or BI */
-                    $mpdf->defaultheaderline = 1;  /* 1 to include line below header/above footer */
-                    $mpdf->defaultfooterfontsize = 9; /* in pts */
-                    $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
-                    $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
-                    $mpdf->SetHeader('||' . $this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
-
-                    $mpdf->WriteHTML($content);
-
-                    $mpdf->Output('dokument.pdf', 'I');
-                } else {
-                    $content = str_replace("<td", "<td valign='top'", $content);
-                    $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
-                    $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
-                    $content = preg_replace('#<div id="tisk_podpis">.*?</div>#s', '', $content);
-                    $content = preg_replace('#<table id="table_top">.*?</table>#s', '',
-                            $content);
-
-                    $mpdf = new mPDF('iso-8859-2', 'A4-L', 9, 'Helvetica');
-
-                    $app_info = new VersionInformation();
-                    $app_name = $app_info->name;
-                    $mpdf->SetCreator($app_name);
-                    $mpdf->SetAuthor($person_name);
-                    $mpdf->SetTitle('Spisová služba - Tisk');
-
-                    $mpdf->defaultheaderfontsize = 10; /* in pts */
-                    $mpdf->defaultheaderfontstyle = 'B'; /* blank, B, I, or BI */
-                    $mpdf->defaultheaderline = 1;  /* 1 to include line below header/above footer */
-                    $mpdf->defaultfooterfontsize = 9; /* in pts */
-                    $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
-                    $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
-                    $mpdf->SetHeader('Seznam dokumentů||' . $this->template->Urad->nazev);
-                    $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
-
-                    $mpdf->WriteHTML($content);
-
-                    $mpdf->Output('spisova_sluzba.pdf', 'I');
-                }
-            }
-        }
     }
 
     public function actionDetail($id, $upravit = null, $udalost = null)
@@ -404,10 +320,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $pdf = $this->getParameter('pdfprint');
         if ($tisk || $pdf) {
             $this->template->AccessEdit = false;
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->setView('printdetail');
-            if ($pdf)
-                $this->pdf_output = 2;
         }
 
         $Log = new LogModel();

@@ -6,7 +6,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 {
 
     private $typ_evidence = null;
-    private $pdf_output = false;
     private $seradit = null;
     // retezec, ktery uzivatel zadal do vyhledavaciho pole
     private $jednoduche_hledani = null;
@@ -14,7 +13,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     public function startup()
     {
         $client_config = GlobalVariables::get('client_config');
-        $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;        
+        $this->typ_evidence = $client_config->cislo_jednaci->typ_evidence;
         $this->template->Oddelovac_poradi = $client_config->cislo_jednaci->oddelovac;
 
         parent::startup();
@@ -40,7 +39,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
         // Volba vystupu - web/tisk/pdf
         if ($this->getParameter('print') || $this->getParameter('print_balik')) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             if ($vyber = $this->getParameter('vyber')) {
                 $seznam = $Dokument->kOdeslani($seradit, explode('-', $vyber));
             } else {
@@ -71,32 +69,22 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->template->seznam = $seznam;
     }
 
-    protected function shutdown($response)
+    protected function pdfExport($content)
     {
+        @ini_set("memory_limit", PDF_MEMORY_LIMIT);
+        $content = str_replace("<td", "<td valign='top'", $content);
 
-        if ($this->pdf_output) {
+        // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
+        // Dulezite zde jde presne nastaveni okraju formulare
+        $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica', 7, 9, 8, 6, 0, 0);
 
-            ob_start();
-            $response->send($this->getHttpRequest(), $this->getHttpResponse());
-            $content = ob_get_clean();
-            if ($content) {
-
-                @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-                $content = str_replace("<td", "<td valign='top'", $content);
-
-                // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
-                $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica', 7, 9, 8, 6, 0, 0);
-
-                $app_info = new VersionInformation();
-                $app_name = $app_info->name;
-                $mpdf->SetCreator($app_name);
-                $person_name = $this->user->displayName;
-                $mpdf->SetAuthor($person_name);
-                $mpdf->SetTitle('Podací arch');
-                $mpdf->WriteHTML($content);
-                $mpdf->Output('podaci_arch.pdf', 'I');
-            }
-        }
+        $app_info = new VersionInformation();
+        $mpdf->SetCreator($app_info->name);
+        $mpdf->SetAuthor($this->user->displayName);
+        $mpdf->SetTitle('Podací arch');
+        
+        $mpdf->WriteHTML($content);
+        $mpdf->Output('podaci_arch.pdf', 'I');
     }
 
     public function createComponentBulkAction()
@@ -194,7 +182,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
         $this->template->dokument = $odes;
     }
-    
+
     protected function createComponentSeraditForm()
     {
         $select = array(
@@ -272,7 +260,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
     protected function createComponentFiltrovatForm()
     {
         $form = new Spisovka\Form();
-        
+
         $filtr = UserSettings::get('vypravna_filtr');
         $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
         $form['druh_zasilky']->setDefaultValue($filtr);
@@ -280,12 +268,12 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $form->addSubmit('filtrovat', 'Filtrovat')
                 ->onClick[] = array($this, 'filtrovatClicked');
         $form->addSubmit('storno', 'Zrušit')
-                ->setValidationScope(false)
+                        ->setValidationScope(false)
                 ->controlPrototype->onclick = 'return closeDialog();';
-        
+
         return $form;
     }
-    
+
     public function filtrovatClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
@@ -296,11 +284,11 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             // zrus filtrovani
             UserSettings::remove('vypravna_filtr');
         }
-        
+
         // v obou pripadech prejdi na vychozi stranku vypravny
-        $this->redirect('default');        
+        $this->redirect('default');
     }
-    
+
     protected function createComponentOdeslaniForm()
     {
         $dokument = $this->template->dokument;
@@ -312,12 +300,13 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 ->setDefaultValue($dokument->datum_odeslani);
 
         if ($dokument->zpusob_odeslani_id == 3) {
-            $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
+            $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(),
+                    'druh_zasilky');
             $form['druh_zasilky']->setDefaultValue($dokument->druh_zasilky)
                     ->setRequired();
             // $test = [5 => 'prvni polozka', 3=>'druha', 2=>'treti'];
             // $form->addComponent(new Nette\Forms\Controls\CheckboxList('Druh zásilky:', $test), 'druhZasilky');
-            
+
             $form->addFloat('cena', 'Cena:', 10)
                     ->setDefaultValue($dokument->cena)
                     ->setOption('description', 'Kč');
@@ -326,7 +315,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                     ->setOption('description', 'kg');
             $form->addText('poznamka', 'Poznámka:')
                     ->setDefaultValue($dokument->poznamka);
-            
         } else if ($dokument->zpusob_odeslani_id == 4) {
             $form->addText('cislo_faxu', 'Číslo faxu:', 20)
                     ->setDefaultValue($dokument->cislo_faxu);
@@ -337,9 +325,9 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $form->addSubmit('vypravna_upravit', 'Uložit')
                 ->onClick[] = array($this, 'ulozitClicked');
         $form->addSubmit('vypravna_storno', 'Zrušit')
-                ->setValidationScope(false)
+                        ->setValidationScope(false)
                 ->onClick[] = array($this, 'stornoClicked');
-                
+
         return $form;
     }
 
@@ -354,11 +342,12 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $id = $this->getParameter('id');
 
         $data->druh_zasilky = serialize($data->druh_zasilky);
-        
+
         $DokumentOdeslani = new DokumentOdeslani();
         $DokumentOdeslani->update($data, [["id=%i", $id]]);
 
         $this->flashMessage('Záznam byl úspěšně upraven.');
-        $this->redirect('default');        
+        $this->redirect('default');
     }
+
 }

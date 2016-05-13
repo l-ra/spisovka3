@@ -1,16 +1,1 @@
-    {if count($seznam)>0}
-    <style type="text/css" media="screen, print">
-        table { 
-            border-spacing: 0;
-            border-collapse: collapse;
-        }
-        td, th { border : 1px solid gray; padding : 3px, 2px; }
-    </style>
-    <table class="spisovka">
-    {include detail_data.latte}    
-    </table>
-    {else}
-    <div style="text-align: center; margin-top: 15px;">
-        Tato sestava neobsahuje žádné dokumenty.
-    </div>
-    {/if}
+{include 'detail.latte'}

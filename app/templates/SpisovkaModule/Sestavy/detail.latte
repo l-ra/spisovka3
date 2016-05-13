@@ -1,33 +1,43 @@
 {block title}{$Sestava->nazev}{/block}
 {block content}
+{if $presenter->view == 'pdf'}
+    <style type="text/css" media="screen, print">
+        table { 
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+        td, th { border : 1px solid gray; padding : 3px, 2px; }
+    </style>
+{else}
     <table id="table_top">
         <tr>
             <td align="left" valign="top">{$Sestava->nazev}</td>
             <td align="right" valign="top">{$Urad->nazev}, {$rok}</td>
         </tr>
     </table>
-    {if count($seznam)>0}
+{/if}
+{if count($seznam)>0}
     <table class="spisovka">
-    {include detail_data.latte}    
+        {include detail_data.latte}    
     </table>
     <div>
         &nbsp;<br />
         Počet dokumentů: {= count($seznam)} <br />
     </div>    
-    {elseif isset($prilis_mnoho)}
+{elseif isset($prilis_mnoho)}
     <div style="text-align: center; margin-top: 15px; color: red;">
         Tato sestava obsahuje mnoho dokumentů. Její zobrazení může trvat dlouho.<p>
-        {if $output == 'pdf'}Export do PDF je mnohem pomalejší, zde je limit několik set dokumentů (při stadardním časovém limitu 30 sekund).<p>{/if}        
-        Chcete-li přesto zobrazit všech {$pocet_dokumentu} dokumentů, klikněte na odkaz pokračovat a vyčkejte dokud se sestava celá nenačte.<p>
-        Časový limit je {= ini_get('max_execution_time')} sekund.
+            {if $pdf}Export do PDF je mnohem pomalejší, zde je limit několik set dokumentů (při stadardním časovém limitu 30 sekund).<p>{/if}        
+            Chcete-li přesto zobrazit všech {$pocet_dokumentu} dokumentů, klikněte na odkaz pokračovat a vyčkejte dokud se sestava celá nenačte.<p>
+            Časový limit je {= ini_get('max_execution_time')} sekund.
 
         <div>
-            <a href="{$reload_url}">Pokračovat</a>
+            <a href="{link this, pokracovat => 1}" style="text-decoration: underline">Pokračovat</a>
         </div>
 
     </div>
-    {else}
+{else}
     <div style="text-align: center; margin-top: 15px;">
         Tato sestava neobsahuje žádné dokumenty.
     </div>
-    {/if}
+{/if}

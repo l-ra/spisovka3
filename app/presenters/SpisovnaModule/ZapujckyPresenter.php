@@ -7,7 +7,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     private $hledat;
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
-    private $pdf_output = 0;
 
     public function startup()
     {
@@ -18,48 +17,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->template->Typ_evidence = $this->typ_evidence;
 
         parent::startup();
-    }
-
-    protected function shutdown($response)
-    {
-
-        if ($this->pdf_output == 1) {
-
-            ob_start();
-            $response->send($this->getHttpRequest(), $this->getHttpResponse());
-            $content = ob_get_clean();
-            if ($content) {
-
-                $content = str_replace("<td", "<td valign='top'", $content);
-                $content = str_replace("Vytištěno dne:", "Vygenerováno dne:", $content);
-                $content = str_replace("Vytiskl: ", "Vygeneroval: ", $content);
-                $content = preg_replace('#<div id="tisk_podpis">.*?</div>#s', '', $content);
-                $content = preg_replace('#<table id="table_top">.*?</table>#s', '', $content);
-
-                $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica');
-
-                $app_info = new VersionInformation();
-                $app_name = $app_info->name;
-                $mpdf->SetCreator($app_name);
-                $person_name = $this->user->displayName;
-                $mpdf->SetAuthor($person_name);
-                $mpdf->SetTitle('Spisová služba - Zápůjčky');
-
-                $mpdf->defaultheaderfontsize = 10; /* in pts */
-                $mpdf->defaultheaderfontstyle = 'B'; /* blank, B, I, or BI */
-                $mpdf->defaultheaderline = 1;  /* 1 to include line below header/above footer */
-                $mpdf->defaultfooterfontsize = 9; /* in pts */
-                $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
-                $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
-                $mpdf->SetHeader('Zápůjčky||' . $this->template->Urad->nazev);
-                $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
-
-
-
-                $mpdf->WriteHTML($content);
-                $mpdf->Output('zapujcky.pdf', 'I');
-            }
-        }
     }
 
     public function renderDefault($hledat)
@@ -99,15 +56,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
-        if ($tisk) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $seznam = $result->fetchAll();
-            $this->setView('print');
-        } elseif ($pdf) {
-            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-            $this->pdf_output = 1;
-            //$seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+        if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
             $this->setView('print');
         } else {

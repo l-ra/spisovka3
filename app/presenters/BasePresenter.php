@@ -10,6 +10,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
      */
     static public $testMode = false;
 
+    protected $pdf_output = false;
+    
     public function getStorage()
     {
         return $this->context->getService('storage');
@@ -43,12 +45,12 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     $user->logout();
                     $acc->force_logout = false;
                     $acc->save();
-                    
+
                     $this->flashMessage('Byl jste odhlášen administrátorem.', 'warning');
                     // Presmeruj, chceme pote uzivatel na vychozi/domovske strance
                     $this->redirect(':Spisovka:Uzivatel:login');
                 }
-                
+
                 if ($this->name == "Spisovka:Uzivatel") {
                     // Tento presenter je vzdy pristupny
                     if ($this->view == "login")
@@ -282,4 +284,47 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $c = new Spisovka\Components\PrintControl();
         return $c;
     }
+
+    protected function shutdown($response)
+    {
+        if ($this->getParameter('pdfprint') || $this->view == 'pdf' || $this->pdf_output) {
+            ob_start();
+            $response->send($this->getHttpRequest(), $this->getHttpResponse());
+            $content = ob_get_clean();
+            $this->pdfExport($content);
+        }
+    }
+
+    protected function pdfExport($content)
+    {
+        @ini_set("memory_limit", PDF_MEMORY_LIMIT);
+
+        $content = str_replace("<td", "<td valign='top'", $content);
+        $content = preg_replace('#<table id="table_top">.*?</table>#s', '', $content);
+
+        $page_format = in_array($this->view, ["detail", "odetail", "printdetail"]) ? 'A4' : 'A4-L';
+        // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
+        $mpdf = new mPDF('iso-8859-2', $page_format, 9, 'Helvetica');
+
+        $app_info = new VersionInformation();
+        $app_name = $app_info->name;
+        $mpdf->SetCreator($app_name);
+        $person_name = $this->user->displayName;
+        $mpdf->SetAuthor($person_name);
+
+        $mpdf->defaultheaderfontsize = 10; /* in pts */
+        $mpdf->defaultheaderfontstyle = 'B'; /* blank, B, I, or BI */
+        $mpdf->defaultheaderline = 1;  /* 1 to include line below header/above footer */
+        $mpdf->defaultfooterfontsize = 9; /* in pts */
+        $mpdf->defaultfooterfontstyle = ''; /* blank, B, I, or BI */
+        $mpdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
+
+        $mpdf->SetHeader("||{$this->template->Urad->nazev}");
+        // $mpdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+
+        $mpdf->WriteHTML($content);
+
+        $mpdf->Output('sestava.pdf', 'I');
+    }
+
 }
