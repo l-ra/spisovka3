@@ -133,9 +133,7 @@ class Storage_Basic extends FileModel
 
     public function uploadDokumentSource($source, $data)
     {
-
         if (isset($data['dir'])) {
-
             if (!file_exists($this->dokument_dir . "/" . $data['dir'])) {
                 mkdir($this->dokument_dir . "/" . $data['dir'], 0777, true);
             }

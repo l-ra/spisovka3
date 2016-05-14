@@ -27,14 +27,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             if (preg_match('/(.*)<(.*)>/', $sender, $matches)) {
                 $email = $matches[2];
                 $nazev_subjektu = trim($matches[1]);
-            }
-            else {
+            } else {
                 $email = $sender;
                 $nazev_subjektu = null;
             }
             $search = ['email' => $email, 'nazev_subjektu' => $nazev_subjektu];
             $SubjektModel = new Subjekt();
-            $found_subjects = $SubjektModel->hledat(\Nette\Utils\ArrayHash::from($search), 'email');
+            $found_subjects = $SubjektModel->hledat(\Nette\Utils\ArrayHash::from($search),
+                    'email');
             $this->template->Subjekt = array('databaze' => $found_subjects);
         }
         if ($zprava->typ == 'I') {
@@ -59,7 +59,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             $SubjektModel = new Subjekt();
             $found_subjects = $SubjektModel->hledat($subjekt, 'isds');
-            $this->template->Subjekt = array('original' => $subjekt, 'databaze' => $found_subjects);            
+            $this->template->Subjekt = array('original' => $subjekt, 'databaze' => $found_subjects);
         }
 
 
@@ -533,11 +533,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $storage = $this->storage;
         $DokumentFile = new DokumentPrilohy();
-        $FileModel = new FileModel();
 
         // nahrani originalu
         $info = new EpodatelnaMessage($epodatelna_id);
-        if ($info->file_id) {
+        if (!$info->file_id)
+            throw new Exception('Chybí originál e-mailu, zprávu nelze evidovat.');
+
+        if (false) { // [P.L.] zruseno
+            $FileModel = new FileModel();
             $file = $FileModel->getInfo($info->file_id);
             $email_contents = $storage->download($file, 1);
 
@@ -545,8 +548,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'filename' => 'emailova_zprava.eml',
                 'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
                 'typ' => '5',
-                'popis' => 'Originální emailová zpráva',
-                'charset' => null
+                'popis' => 'Originální emailová zpráva'
             );
 
             if ($filep = $storage->uploadDokumentSource($email_contents, $data)) {
@@ -556,31 +558,50 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             unset($email_contents);
         }
 
-        $prilohy = EpodatelnaPrilohy::getEmailParts($epodatelna_id, $this->storage);
-        if (count($prilohy) == 0)
-            return null;
+        $message = new EpodatelnaMessage($epodatelna_id);
+        $filename = $message->getMessageSource($storage);
 
-        foreach ($prilohy as $filedata) {
+        $imap = new ImapClient();
+        $imap->open($filename);
+        $structure = $imap->get_message_structure(1);
+        
+        $text = $imap->find_plain_text(1, $structure);
+        if ($text) {
+            $upload_info = array(
+                'filename' => 'zprava.txt',
+                'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
+                'typ' => '1',
+                'popis' => 'Text e-mailové zprávy'
+            );
+            if ($uploaded = $storage->uploadDokumentSource($text, $upload_info))
+                $DokumentFile->pripojit($dokument_id, $uploaded->id);            
+        }
+        
+        $attachments = $imap->get_attachments($structure);
+        foreach ($attachments as $part_number => $attachment) {
+
+            $filename = $attachment->dparameters['FILENAME'];
+            if ($filename == 'smime.p7s')
+                continue;
+            
+            $data = $imap->fetch_body_part(1, $part_number);
+            $data = $imap->decode_data($data, $attachment);            
 
             // prekopirovani na pozadovane misto
-            $data = array(
-                'filename' => $filedata['file_name'],
-                'nazev' => $filedata['file_name'],
+            $upload_info = array(
+                'filename' => $filename,
+                'nazev' => $filename,
                 'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
                 'typ' => '2',
-                'popis' => '',
-                'charset' => $filedata['charset'],
-                    //'popis'=>'Emailová zpráva'
+                'popis' => ''
             );
 
-            if ($uploaded = $storage->uploadDokumentSource($filedata['file'], $data)) {
-                // zapiseme i do
+            if ($uploaded = $storage->uploadDokumentSource($data, $upload_info)) {
                 $DokumentFile->pripojit($dokument_id, $uploaded->id);
-            } else {
-                // false
             }
         }
 
+        $imap->close();
         return true;
     }
 
@@ -656,7 +677,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $this->redirect(':Epodatelna:Default:nove');
     }
 
-    protected function createComponentEvidenceForm()
+    protected function createComponentJinaEvidenceForm()
     {
         $form = new Spisovka\Form();
         $form->addHidden('id')
