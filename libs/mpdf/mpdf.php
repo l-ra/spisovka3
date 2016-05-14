@@ -18212,7 +18212,7 @@ class mPDF
                     $properties = $this->cssmgr->MergeCSS('', $tag, $attr);
                     if (!empty($properties))
                         $this->setCSS($properties, 'INLINE');
-                    $this->HREF = htmlspecialchars_decode(urldecode($attr['HREF']));
+                    // $this->HREF = htmlspecialchars_decode(urldecode($attr['HREF']));
                 }
                 break;
 
