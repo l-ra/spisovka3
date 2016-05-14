@@ -16,9 +16,7 @@
 :Spisovka:Sestavy:nova
 :Spisovka:Sestavy:detail { "id": 1 }
 :Spisovka:Sestavy:upravit { "id": 4 }
-:Spisovka:Sestavy:tisk ForwardResponse { "id": 6 }
-:Spisovka:Sestavy:pdf ForwardResponse { "id": 6 }
-:Spisovka:Sestavy:detail { "id": 6, "view": "tisk" }
+:Spisovka:Sestavy:tisk { "id": 6 }
 :Spisovka:Subjekty:novy { "dok_id": 1234 }
 :Spisovka:Subjekty:vyber { "dok_id": 1234 }
 :Spisovka:Vypravna:
