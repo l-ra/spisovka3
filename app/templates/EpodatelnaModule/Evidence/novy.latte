@@ -55,21 +55,21 @@
                     {else}
                         <td class="meta">
                             <strong>
-                                {if !empty($Subjekt['original']->nazev_subjektu)}{$Subjekt['original']->nazev_subjektu}<br />{/if}
-                                {if !empty($Subjekt['original']->prijmeni)}{$Subjekt['original']->prijmeni}<br />{/if}
+                                {if !empty($Subjekt['message']->nazev_subjektu)}{$Subjekt['message']->nazev_subjektu}<br />{/if}
+                                {if !empty($Subjekt['message']->prijmeni)}{$Subjekt['message']->prijmeni}<br />{/if}
                                 &nbsp;
                             </strong>
                             <div class="info">
-                                <span>{if !empty($Subjekt['original']->type)}{$Subjekt['original']->type} - {=Subjekt::typ_subjektu($Subjekt['original']->type)}{/if}&nbsp;</span>
+                                <span>{if !empty($Subjekt['message']->type)}{$Subjekt['message']->type} - {=Subjekt::typ_subjektu($Subjekt['message']->type)}{/if}&nbsp;</span>
                                 <br />
-                                {=Subjekt::displayName($Subjekt['original'],'adresa')}
+                                {=Subjekt::displayName($Subjekt['message'],'adresa')}
                             </div>
                         </td>
                         <td class="meta_plus">
                             <div class="info">
                                 <dl>
                                     <dt>isds:</dt>
-                                    <dd>{if !empty($Subjekt['original']->id_isds)}{$Subjekt['original']->id_isds}{/if}</dd>
+                                    <dd>{if !empty($Subjekt['message']->id_isds)}{$Subjekt['message']->id_isds}{/if}</dd>
                                 </dl>
                             </div>
                         </td>
@@ -92,7 +92,7 @@
                 <dl id="subjekt_novy">
                     <dt></dt>
                     <dd>
-                        <a href={link :Spisovka:Subjekty:novy, f => evidNovySubjektOk} id="epod_evid_novysubjekt_click" data-postdata="{json_encode($Subjekt['original'])}">Vytvořit nový subjekt z odesílatele</a>
+                        <a href={link :Spisovka:Subjekty:novy, f => evidNovySubjektOk} id="epod_evid_novysubjekt_click" data-postdata="{json_encode($Subjekt['message'])}">Vytvořit nový subjekt z odesílatele</a>
                     </dd>
                 </dl>           
 

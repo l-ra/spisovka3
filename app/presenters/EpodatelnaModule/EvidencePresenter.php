@@ -18,7 +18,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $zprava = new EpodatelnaMessage($id);
         $this->template->Zprava = $zprava;
 
-        $subjekt = new stdClass();
         $this->template->Prilohy = EpodatelnaPrilohy::getFileList($zprava, $this->storage);
 
         if ($zprava->typ == 'E') {
@@ -33,34 +32,28 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
             $search = ['email' => $email, 'nazev_subjektu' => $nazev_subjektu];
             $SubjektModel = new Subjekt();
-            $found_subjects = $SubjektModel->hledat(\Nette\Utils\ArrayHash::from($search),
-                    'email');
-            $this->template->Subjekt = array('databaze' => $found_subjects);
+            $found_subjects = $SubjektModel->hledat($search, 'email');
+            $message_subject = $search;
         }
         if ($zprava->typ == 'I') {
-            // Nacteni originalu DS
-            if (!empty($zprava->file_id)) {
-                $file_id = explode("-", $zprava->file_id);
-                $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_id[0]);
-                $original = unserialize($original);
+            $dm = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $zprava->file_id);
+            $dm = unserialize($dm);
 
-                // odebrat obsah priloh, aby to neotravovalo
-                unset($original->dmDm->dmFiles);
-            }
-
-            $subjekt->id_isds = $original->dmDm->dbIDSender;
-            $subjekt->nazev_subjektu = $original->dmDm->dmSender;
-            $subjekt->type = ISDS_Spisovka::typDS($original->dmDm->dmSenderType);
-            if (isset($original->dmDm->dmSenderAddress)) {
-                $res = ISDS_Spisovka::parseAddress($original->dmDm->dmSenderAddress);
+            $message_subject = new stdClass();
+            $message_subject->id_isds = $dm->dmDm->dbIDSender;
+            $message_subject->nazev_subjektu = $dm->dmDm->dmSender;
+            $message_subject->type = ISDS_Spisovka::typDS($dm->dmDm->dmSenderType);
+            if (isset($dm->dmDm->dmSenderAddress)) {
+                $res = ISDS_Spisovka::parseAddress($dm->dmDm->dmSenderAddress);
                 foreach ($res as $key => $value)
-                    $subjekt->$key = $value;
+                    $message_subject->$key = $value;
             }
 
             $SubjektModel = new Subjekt();
-            $found_subjects = $SubjektModel->hledat($subjekt, 'isds');
-            $this->template->Subjekt = array('original' => $subjekt, 'databaze' => $found_subjects);
+            $found_subjects = $SubjektModel->hledat($message_subject, 'isds');
         }
+        
+        $this->template->Subjekt = array('message' => $message_subject, 'databaze' => $found_subjects);
 
 
         /* Priprava dokumentu */

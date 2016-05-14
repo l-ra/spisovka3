@@ -73,6 +73,8 @@ class Subjekt extends BaseModel
 
     public function hledat($data, $typ, $only_name = false)
     {
+        if (is_array($data))
+            $data = \Nette\Utils\ArrayHash::from($data);
         $result = array();
         $cols = array('id');
         
