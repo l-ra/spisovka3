@@ -150,9 +150,8 @@ class Storage_Basic extends FileModel
         $httpResponse = $this->httpResponse;
         $httpResponse->setContentType($file->mime_type ? : 'application/octetstream');
         $httpResponse->setHeader('Content-Description', 'File Transfer');
-        $basename = basename($file_path);
         $httpResponse->setHeader('Content-Disposition',
-                'attachment; filename="' . $basename . '"');
+                'attachment; filename="' . $file->real_name . '"');
         $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
         $httpResponse->setHeader('Expires', '0');
         $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
