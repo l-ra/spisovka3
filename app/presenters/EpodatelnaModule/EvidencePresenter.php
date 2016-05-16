@@ -541,7 +541,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'popis' => 'Originální emailová zpráva'
             );
 
-            if ($filep = $storage->uploadDokumentSource($email_contents, $data)) {
+            if ($filep = $storage->uploadDocument($email_contents, $data)) {
                 $DokumentFile->pripojit($dokument_id, $filep->id);
             }
 
@@ -563,7 +563,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'typ' => '1',
                 'popis' => 'Text e-mailové zprávy'
             );
-            if ($uploaded = $storage->uploadDokumentSource($text, $upload_info))
+            if ($uploaded = $storage->uploadDocument($text, $upload_info))
                 $DokumentFile->pripojit($dokument_id, $uploaded->id);            
         }
         
@@ -586,7 +586,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'popis' => ''
             );
 
-            if ($uploaded = $storage->uploadDokumentSource($data, $upload_info)) {
+            if ($uploaded = $storage->uploadDocument($data, $upload_info)) {
                 $DokumentFile->pripojit($dokument_id, $uploaded->id);
             }
         }
@@ -618,7 +618,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         //'popis'=>'Emailová zpráva'
                 );
 
-                if ($filep = $UploadFile->uploadDokumentSource($res, $data)) {
+                if ($filep = $UploadFile->uploadDocument($res, $data)) {
                     // zapiseme i do
                     $DokumentFile->pripojit($dokument_id, $filep->id);
                 } else {
@@ -641,7 +641,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                         //'popis'=>'Emailová zpráva'
                 );
 
-                if ($filep = $UploadFile->uploadDokumentSource($file['file'], $data)) {
+                if ($filep = $UploadFile->uploadDocument($file['file'], $data)) {
                     // zapiseme i do
                     $DokumentFile->pripojit($dokument_id, $filep->id);
                 } else {

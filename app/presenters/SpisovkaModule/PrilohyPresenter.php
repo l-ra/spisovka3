@@ -3,19 +3,14 @@
 class Spisovka_PrilohyPresenter extends BasePresenter
 {
 
-    protected $file_id;
-    protected $dokument_id;
+    protected $error_message;
 
     public function renderPridat()
     {
-        $this->file_id = $this->getParameter('id', null);
-        $this->dokument_id = $this->getParameter('dok_id', null);
     }
 
     public function renderUpravit()
     {
-        $this->file_id = $this->getParameter('id', null);
-        $this->dokument_id = $this->getParameter('dok_id', null);
     }
 
     public function renderNacti()
@@ -73,13 +68,10 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         //$form1->getElementPrototype()->id('priloha-upload');
         $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : completeCallback})";
 
-        if (isset($this->dokument_id)) {
-            $form1->addHidden('dokument_id')
-                    ->setValue($this->dokument_id);
-        } else {
-            $form1->addHidden('dokument_id')
-                    ->setValue(0);
-        }
+        $dok_id = $this->getParameter('dok_id');
+        $form1->addHidden('dokument_id');
+        if ($dok_id)
+            $form1['dokument_id']->setValue($dok_id);
 
         $form1->addText('priloha_nazev', 'Název přílohy:', 50, 150)
                 ->setRequired();
@@ -94,7 +86,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
     public function uploadClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
+        $data = $button->getForm()->getValues(true);
 
         $dokument_id = $data['dokument_id'];
 
@@ -106,11 +98,8 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         $data['dir'] = date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y');
 
-        // Nacteni rozhrani pro upload dle nastaveni
-        $UploadFile = $this->storage;
-
         try {
-            if ($file = $UploadFile->uploadDokument($data)) {
+            if ($file = $this->uploadDocumentHttp($data, $data['file'])) {
                 // pripojit k dokumentu
                 $DokumentPrilohy = new DokumentPrilohy();
 
@@ -129,7 +118,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                 }
             } else {
                 $this->template->chyba = 2;
-                $this->template->error_message = $UploadFile->errorMessage();
+                $this->template->error_message = $this->error_message;
             }
         } catch (Nette\Application\AbortException $e) {
             throw $e;
@@ -147,21 +136,18 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     protected function createComponentReUploadForm()
     {
         $File = new FileModel();
-        $file_info = $File->getInfo($this->file_id);
+        $file_info = $File->getInfo($this->getParameter('id'));
 
         $form1 = new Spisovka\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
         $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : completeCallback})";
 
-        if (isset($this->dokument_id)) {
-            $form1->addHidden('dokument_id')
-                    ->setValue($this->dokument_id);
-        } else {
-            $form1->addHidden('dokument_id')
-                    ->setValue(0);
-        }
+        $dok_id = $this->getParameter('dok_id');
+        $form1->addHidden('dokument_id');
+        if ($dok_id)
+            $form1['dokument_id']->setValue($dok_id);
         $form1->addHidden('file_id')
-                ->setValue($this->file_id);
+                ->setValue($this->getParameter('id'));
 
         $form1->addText('priloha_nazev', 'Název přílohy:', 50, 150)
                 ->setValue(@$file_info->nazev);
@@ -178,7 +164,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
     public function reUploadClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
+        $data = $button->getForm()->getValues(true);
 
         $upload = $data['file'];
 
@@ -195,10 +181,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $data['dir'] = date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y');
 
         if ($upload->error == 0) {
-            // Nacteni rozhrani pro upload dle nastaveni
-            $UploadFile = $this->storage;
-
-            if ($file = $UploadFile->uploadDokument($data)) {
+            if ($file = $this->uploadDocumentHttp($data, $data['file'])) {
                 $FileModel = new FileModel();
                 $file_info1 = $FileModel->getInfo($file_id);
                 $file_info2 = $FileModel->getInfo($file->id);
@@ -211,7 +194,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                         $DokumentPrilohy->deaktivovat($dokument_id, $file_id); // deaktivujeme puvodni prilohu
                     } else {
                         $DokumentPrilohy->odebrat($dokument_id, $file_id);
-                        $UploadFile->remove($file_id);
+                        $this->storage->remove($file_id);
                     }
 
                     $Log = new LogModel();
@@ -225,7 +208,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                 }
             } else {
                 $this->template->chyba = 2;
-                $this->template->error_message = $UploadFile->errorMessage();
+                $this->template->error_message = $this->error_message;
             }
         } else {
             // zadny soubor
@@ -239,4 +222,36 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Pro upload přílohy dokumentu z webového prohlížeče.
+     * @param array $data  data formuláře doplněná o další informace
+     * @return DibiRow|null
+     */
+    protected function uploadDocumentHttp(array $data, Nette\Http\FileUpload $upload)
+    {
+        if (!$upload->isOk()) {
+            switch ($upload->error) {
+                case UPLOAD_ERR_INI_SIZE:
+                    $this->error_message = 'Překročena velikost přílohy.';
+                    break;
+                case UPLOAD_ERR_NO_FILE:
+                    $this->error_message = 'Nevybrali jste žádný soubor.';
+                    break;
+                default:
+                    $this->error_message = 'Soubor "' . $upload->getName() . '" se nepodařilo nahrát.';
+                    break;
+            }
+            return null;
+        }
+        
+        $data['filename'] = $upload->getName();
+        $contents = file_get_contents($upload->getTemporaryFile());
+        
+        $storage = $this->storage;
+        $row = $storage->uploadDocument($contents, $data);
+        if (!$row)
+            $this->error_message = $storage->errorMessage();
+        
+        return $row;
+    }
 }

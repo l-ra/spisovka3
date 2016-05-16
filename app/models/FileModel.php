@@ -67,7 +67,6 @@ class FileModel extends BaseModel
 
     public function vlozit($data)
     {
-
         $row = array();
         $row['typ'] = isset($data['typ']) ? $data['typ'] : 1;
         $row['nazev'] = $data['nazev'];
@@ -104,19 +103,10 @@ class FileModel extends BaseModel
         $row['user_modified'] = self::getUser()->id;
 
         $row['guid'] = UUID::v4();
-
-        // ulozeni
         $row['stav'] = 1;
 
-        //Nette\Diagnostics\Debugger::dump($row); exit;
-
         $file_id = $this->insert($row);
-
-        if ($file_id) {
-            return $this->getInfo($file_id);
-        } else {
-            return false;
-        }
+        return $this->getInfo($file_id);
     }
 
     public function upravitMetadata($data, $file_id)
