@@ -9,7 +9,7 @@ class Storage_Basic extends FileModel
     private $epodatelna_dir;
     private $httpResponse;
     private $error_message;
-    private $error_code;
+    private $error_code = 0;
 
     public function __construct(array $params, Nette\Http\IResponse $httpResponse)
     {
@@ -69,7 +69,6 @@ class Storage_Basic extends FileModel
             if (is_writeable($this->dokument_dir)) {
                 $file_dir = $this->dokument_dir;
             } else {
-                $this->error_code = '0';
                 $this->error_message = 'Soubor nelze uložit do adresáře.';
                 return null;
             }
@@ -83,7 +82,6 @@ class Storage_Basic extends FileModel
 
         if (!$upload instanceof Nette\Http\FileUpload) {
             $this->error_message = 'Soubor se nepodařilo nahrát';
-            $this->error_code = 0;
             return null;
         } else if ($upload->isOk()) {
             $upload->move($fileName);
@@ -110,7 +108,6 @@ class Storage_Basic extends FileModel
             if ($file_info = $this->vlozit($row)) {
                 return $file_info;
             } else {
-                $this->error_code = '0';
                 $this->error_message = 'Metadata souboru "' . $row['nazev'] . '" se nepodařilo uložit.';
                 return null;
             }
@@ -149,23 +146,12 @@ class Storage_Basic extends FileModel
             if (is_writeable($this->dokument_dir)) {
                 $file_dir = $this->dokument_dir;
             } else {
-                $this->error_code = '0';
                 $this->error_message = 'Soubor nelze uložit do adresáře.';
                 return null;
             }
         }
 
         $filename = Nette\Utils\Strings::webalize($data['filename'], '.');
-        if (strlen($filename) != strlen($data['filename'])) {
-            if (isset($data['charset']) && strtolower($data['charset']) != 'UTF-8') {
-                $filename = iconv($data['charset'] . "//TRANSLIT", 'utf-8', $data['filename']);
-                $filename = Nette\Utils\Strings::webalize($filename, '.');
-                if (isset($data['nazev'])) {
-                    $data['nazev'] = iconv($data['charset'] . "//TRANSLIT", 'utf-8',
-                            $data['nazev']);
-                }
-            }
-        }
         $filepath = $file_dir . "/" . $filename;
 
         // test existence souboru
@@ -173,13 +159,11 @@ class Storage_Basic extends FileModel
 
         if ($fp = fopen($filepath, 'w')) {
             if (!fwrite($fp, $source, strlen($source))) {
-                $this->error_code = '0';
                 $this->error_message = 'Obsah není možné uložit do souboru.';
                 return null;
             }
             @fclose($fp);
         } else {
-            $this->error_code = '0';
             $this->error_message = 'Obsah není možné uložit do souboru.';
             return null;
         }
@@ -205,7 +189,6 @@ class Storage_Basic extends FileModel
         if ($file_info = $this->vlozit($row)) {
             return $file_info;
         } else {
-            $this->error_code = '0';
             $this->error_message = 'Metadata souboru "' . $row['nazev'] . '" se nepodařilo uložit.';
             return null;
         }
@@ -230,7 +213,6 @@ class Storage_Basic extends FileModel
             if (is_writeable($this->epodatelna_dir)) {
                 $file_dir = $this->epodatelna_dir;
             } else {
-                $this->error_code = '0';
                 $this->error_message = 'Soubor nelze uložit do adresáře.';
                 return null;
             }
@@ -240,13 +222,11 @@ class Storage_Basic extends FileModel
         $filepath = $file_dir . "/" . $filename;
         if ($fp = fopen($filepath, 'w')) {
             if (!fwrite($fp, $source, strlen($source))) {
-                $this->error_code = '0';
                 $this->error_message = 'Obsah není možné uložit do souboru.';
                 return null;
             }
             @fclose($fp);
         } else {
-            $this->error_code = '0';
             $this->error_message = 'Obsah není možné uložit do souboru.';
             return null;
         }
@@ -272,7 +252,6 @@ class Storage_Basic extends FileModel
         if ($file_info = $this->vlozit($row)) {
             return $file_info;
         } else {
-            $this->error_code = '0';
             $this->error_message = 'Metadata souboru "' . $row['nazev'] . '" se nepodařilo uložit.';
             return null;
         }
@@ -283,54 +262,46 @@ class Storage_Basic extends FileModel
         $file_path = CLIENT_DIR . $file->real_path;
         return $file_path;
     }
-    
+
     /**
-     * @param object $file   zaznam z tabulky file
+     * @param int $file_id   ID do tabulky file
      * @param int $output  0 - posle soubor na vystup
      *                     1 - vrati jako retezec
-     *                     2 - vrati cestu k souboru
      * @return string|int  
      * @throws Nette\Application\BadRequestException
      */
-    public function download($file, $output = 0)
+    public function download($file_id, $output = 0)
     {
-        try {
-            $file_path = $this->getFilePath($file);
-            if (!file_exists($file_path))
-                return $output == 0 ? 1 : null; // kdyz data vracime primo, nemuzeme vratit 1
+        $FileModel = new FileModel();
+        $file = $FileModel->getInfo($file_id);
 
-            if ($output == 1)
-                return file_get_contents($file_path);
-            
-            if ($output == 2)
-                return $file_path;
+        $file_path = $this->getFilePath($file);
+        if (!file_exists($file_path))
+            return $output == 0 ? 1 : null; // kdyz data vracime primo, nemuzeme vratit 1
 
-            // poslat primo na vystup
-            $basename = basename($file_path);
-            $httpResponse = $this->httpResponse;
-            $httpResponse->setContentType($file->mime_type ? : 'application/octetstream');
-            $httpResponse->setHeader('Content-Description', 'File Transfer');
-            $httpResponse->setHeader('Content-Disposition',
-                    'attachment; filename="' . $basename . '"');
-            $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
-            $httpResponse->setHeader('Expires', '0');
-            $httpResponse->setHeader('Cache-Control',
-                    'must-revalidate, post-check=0, pre-check=0');
-            $httpResponse->setHeader('Pragma', 'public');
-            if (!empty($file->size)) {
-                $httpResponse->setHeader('Content-Length', $file->size);
-            } else {
-                $httpResponse->setHeader('Content-Length', filesize($file_path));
-            }
+        if ($output == 1)
+            return file_get_contents($file_path);
 
-            readfile($file_path);
-
-            return 0;
-        } catch (Nette\InvalidStateException $e) {
-            throw $e;
-            // [P.L.] Toto mi nedava smysl.
-            // throw new Nette\Application\BadRequestException($e->getMessage());
+        // poslat primo na vystup
+        $basename = basename($file_path);
+        $httpResponse = $this->httpResponse;
+        $httpResponse->setContentType($file->mime_type ? : 'application/octetstream');
+        $httpResponse->setHeader('Content-Description', 'File Transfer');
+        $httpResponse->setHeader('Content-Disposition',
+                'attachment; filename="' . $basename . '"');
+        $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
+        $httpResponse->setHeader('Expires', '0');
+        $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+        $httpResponse->setHeader('Pragma', 'public');
+        if (!empty($file->size)) {
+            $httpResponse->setHeader('Content-Length', $file->size);
+        } else {
+            $httpResponse->setHeader('Content-Length', filesize($file_path));
         }
+
+        readfile($file_path);
+
+        return 0;
     }
 
     protected function fileExists($file, $postfix = 1)
@@ -368,11 +339,5 @@ class Storage_Basic extends FileModel
         return $this->error_message;
     }
 
-    public function errorCode()
-    {
-        return $this->error_code;
-    }
-
 }
 
-?>

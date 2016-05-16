@@ -262,8 +262,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 } else if ($zprava->typ == 'I') {
                     // Nacteni originalu DS
                     if (!empty($zprava->file_id)) {
-                        $file_id = explode("-", $zprava->file_id);
-                        $original = self::nactiISDS($this->storage, $file_id[0]);
+                        $original = self::nactiISDS($this->storage, $zprava->file_id);
                         $original = unserialize($original);
 
                         // odebrat obsah priloh, aby to neotravovalo
@@ -669,21 +668,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public static function nactiISDS($storage, $file_id)
     {
-        $DownloadFile = $storage;
-
-        if (strpos($file_id, "-") !== false) {
-            $file_id = reset(explode("-", $file_id));
-        }
-
-        $FileModel = new FileModel();
-        $file = $FileModel->getInfo($file_id);
-        $res = $DownloadFile->download($file, 1);
-        if ($res >= 1) {
-            return null;
-        } else {
-
-            return $res;
-        }
+        $res = $storage->download($file_id, 1);
+        return $res;
     }
 
     public function renderIsdsovereni($id)
@@ -695,7 +681,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         if ($file) {
             // Nacteni originalu DS
             $DownloadFile = $this->storage;
-            $source = $DownloadFile->download($file, 1);
+            $source = $DownloadFile->download($file->id, 1);
             if ($source) {
                 $isds = new ISDS_Spisovka();
                 try {

@@ -942,20 +942,17 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function renderDownload()
+    public function renderDownload($id, $file)
     {
-
-        $dokument_id = $this->getParameter('id', null);
-        $file_id = $this->getParameter('file', null);
+        $dokument_id = $id;
+        $file_id = $file;
 
         $DokumentPrilohy = new DokumentPrilohy();
         $prilohy = $DokumentPrilohy->prilohy($dokument_id);
         if (array_key_exists($file_id, $prilohy)) {
 
             $DownloadFile = $this->storage;
-            $FileModel = new FileModel();
-            $file = $FileModel->getInfo($file_id);
-            $res = $DownloadFile->download($file);
+            $res = $DownloadFile->download($file_id);
             if ($res == 0) {
                 $this->terminate();
             } else if ($res == 1) {
@@ -1633,12 +1630,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $prilohy = array();
         if (isset($post_data['prilohy']) && count($post_data['prilohy']) > 0) {
-            $DownloadFile = $this->storage;
-
             foreach (array_keys($post_data['prilohy']) as $file_id) {
                 $priloha = $File->getInfo($file_id);
-                $priloha->tmp_file = $DownloadFile->download($priloha, 2);
-
+                $priloha->tmp_file = $this->storage->getFilePath($priloha);
                 $prilohy[$file_id] = $priloha;
             }
         }

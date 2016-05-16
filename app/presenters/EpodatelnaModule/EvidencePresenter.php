@@ -124,8 +124,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         if ($zprava->typ == 'I') {
             if (!empty($zprava->file_id)) {
-                $file_id = explode("-", $zprava->file_id);
-                $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_id[0]);
+                $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $zprava->file_id);
                 $original = unserialize($original);
                 // odebrat obsah priloh, aby to neotravovalo
                 unset($original->dmDm->dmFiles);
@@ -533,9 +532,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             throw new Exception('Chybí originál e-mailu, zprávu nelze evidovat.');
 
         if (false) { // [P.L.] zruseno
-            $FileModel = new FileModel();
-            $file = $FileModel->getInfo($info->file_id);
-            $email_contents = $storage->download($file, 1);
+            $email_contents = $storage->download($info->file_id, 1);
 
             $data = array(
                 'filename' => 'emailova_zprava.eml',

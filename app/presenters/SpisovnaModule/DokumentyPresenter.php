@@ -293,20 +293,15 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
     }
 
-    public function renderDownload()
+    public function renderDownload($id, $file)
     {
-
-        $dokument_id = $this->getParameter('id', null);
-        $file_id = $this->getParameter('file', null);
+        $dokument_id = $id;
+        $file_id = $file;
 
         $DokumentPrilohy = new DokumentPrilohy();
         $prilohy = $DokumentPrilohy->prilohy($dokument_id);
         if (array_key_exists($file_id, $prilohy)) {
-
-            $DownloadFile = $this->storage;
-            $FileModel = new FileModel();
-            $file = $FileModel->getInfo($file_id);
-            $res = $DownloadFile->download($file);
+            $res = $this->storage->download($file_id);
             if ($res == 0) {
                 $this->terminate();
             } else if ($res == 1) {

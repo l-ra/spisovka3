@@ -19,17 +19,9 @@ class Admin_PrilohyPresenter extends BasePresenter
         $this->template->seznam = $seznam;
     }
 
-    public function actionDownload()
+    public function actionDownload($id)
     {
-        $DownloadFile = $this->storage;
-
-        $FileModel = new FileModel();
-        $file_id = $this->getParameter('id', null);
-        $file = $FileModel->getInfo($file_id);
-
-        //Nette\Diagnostics\Debugger::dump($file);
-
-        $res = $DownloadFile->download($file);
+        $res = $this->storage->download($id);
 
         if ($res == 0) {
             $this->terminate();
