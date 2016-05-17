@@ -186,7 +186,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addText('nazev', 'Věc:', 80, 100);
         $form->addTextArea('popis', 'Popis:', 80, 3);
 
-        $typy_dokumentu = TypDokumentu::dostupneUzivateli();
+        $typy_dokumentu = TypDokumentu::prichozi();
         $form->addSelect('dokument_typ_id', 'Typ dokumentu:', $typy_dokumentu);
         if (isset($typy_dokumentu[1]))
             $form['dokument_typ_id']->setDefaultValue(1);

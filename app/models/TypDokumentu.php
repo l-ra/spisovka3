@@ -44,6 +44,14 @@ class TypDokumentu extends BaseModel
         return $typy;
     }
 
+    public static function prichozi()
+    {
+        $typy = dibi::query('SELECT [id], [nazev] FROM [:PREFIX:dokument_typ] WHERE [smer] = 0')
+                ->fetchPairs('id', 'nazev');
+        
+        return $typy;
+    }
+
     /** Vrací všechny, i neaktivní
      * 
      * @return array  pole DibiRow
