@@ -52,69 +52,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $SubjektModel = new Subjekt();
             $found_subjects = $SubjektModel->hledat($message_subject, 'isds');
         }
-        
+
         $this->template->Subjekt = array('message' => $message_subject, 'databaze' => $found_subjects);
-
-
-        /* Priprava dokumentu */
-        $Dokumenty = new Dokument();
-
-        $rozdelany = $this->getSession('s3_rozdelany');
-        $rozdelany_dokument = null;
-
-        if (isset($rozdelany->is)) {
-            $args_rozd = array();
-            $args_rozd['where'] = array(
-                array('id=%i', $rozdelany->dokument_id)
-            );
-            $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
-        }
-
-        if (count($rozdelany_dokument) > 0) {
-            $dokument = $rozdelany_dokument[0];
-
-            $DokumentSpis = new DokumentSpis();
-            $DokumentSubjekt = new DokumentSubjekt();
-
-            $spisy = $DokumentSpis->spisy($dokument->id);
-            $this->template->Spisy = $spisy;
-
-            $subjekty = $DokumentSubjekt->subjekty($dokument->id);
-            $this->template->Subjekty = $subjekty;
-        } else {
-            $pred_priprava = array(
-                "nazev" => '',
-                "popis" => "",
-                "stav" => 0,
-                "dokument_typ_id" => "1",
-                "cislo_jednaci_odesilatele" => "",
-                "datum_vzniku" => $zprava->doruceno_dne,
-                "lhuta" => "30",
-                "poznamka" => "",
-            );
-            $dokument = $Dokumenty->ulozit($pred_priprava);
-
-            $rozdelany->is = 1;
-            $rozdelany->dokument_id = $dokument->id;
-
-            $this->template->Spisy = null;
-            $this->template->Subjekty = null;
-            //$this->template->Prilohy = null;
-            $this->template->SouvisejiciDokumenty = null;
-        }
-
-        $CJ = new CisloJednaci();
-        $this->template->cjednaci = $CJ->generuj();
-
-
-        if ($dokument) {
-            $this->template->Dok = $dokument;
-        } else {
-            $this->template->Dok = null;
-            $this->flashMessage('Dokument není připraven k vytvoření', 'warning');
-        }
-
-        new SeznamStatu($this, 'seznamstatu');
     }
 
     public function renderOdmitnout($id)
@@ -124,7 +63,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         if ($zprava->typ == 'I') {
             if (!empty($zprava->file_id)) {
-                $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $zprava->file_id);
+                $original = Epodatelna_DefaultPresenter::nactiISDS($this->storage,
+                                $zprava->file_id);
                 $original = unserialize($original);
                 // odebrat obsah priloh, aby to neotravovalo
                 unset($original->dmDm->dmFiles);
@@ -238,10 +178,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $form = new Spisovka\Form();
 
-        $form->addHidden('dokument_id');
-        if (isset($this->template->Dok))
-            $form['dokument_id']->setValue($this->template->Dok->id);
-
         $form->addHidden('epodatelna_id');
         $form->addHidden('predano_user');
         $form->addHidden('predano_org');
@@ -302,51 +238,45 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $Dokument = new Dokument();
-
-        $dokument_id = $data['dokument_id'];
-        $epodatelna_id = $data['epodatelna_id'];
-        $data['stav'] = 1;
-
         // uprava casu
         $data['datum_vzniku'] = $data['datum_vzniku'] . " " . $data['datum_vzniku_cas'];
         unset($data['datum_vzniku_cas']);
 
-        $zprava = new EpodatelnaMessage($epodatelna_id);
-
-        $post_data = $this->getHttpRequest()->post;
-        $subjekty = isset($post_data['subjekt']) ? $post_data['subjekt'] : null;
-
         // predani
         $predani_poznamka = $data['predani_poznamka'];
+        unset($data['predani_poznamka']);
+        $predani = ['predano_user' => $data->predano_user, 'predano_org' => $data->predano_org,
+            'predano_poznamka' => $data->predano_poznamka];
+        unset($data->predano_user, $data->predano_org, $data->predano_poznamka);
 
-        unset($data['predani_poznamka'], $data['dokument_id'], $data['epodatelna_id']);
 
         $document_created = false;
         try {
             dibi::begin();
 
-            $data['poradi'] = 1;
+            $zprava = new EpodatelnaMessage($data['epodatelna_id']);
+            unset($data['epodatelna_id']);
 
-            // 1-email, 2-isds
             $data['zpusob_doruceni_id'] = $zprava->typ == 'E' ? 1 : 2;
+            $data['poradi'] = 1;
+            $data['stav'] = 1;
 
-            $predani = ['predano_user' => $data->predano_user, 'predano_org' => $data->predano_org,
-                'predano_poznamka' => $data->predano_poznamka];
-            unset($data->predano_user, $data->predano_org, $data->predano_poznamka);
-
-            $dokument = $Dokument->ulozit($data, $dokument_id);
+            $Dokument = new Dokument();
+            $dokument = $Dokument->ulozit($data);
 
             if ($dokument) {
+                $dokument_id = $dokument->id;
 
-                // Ulozeni prilohy
+                // Ulozeni souboru
                 if ($zprava->typ == 'E') {
-                    $this->evidujEmailSoubory($epodatelna_id, $dokument_id);
+                    $this->evidujEmailSoubory($zprava->id, $dokument_id);
                 } else if ($zprava->typ == 'I') {
-                    $this->evidujIsdsSoubory($epodatelna_id, $dokument_id);
+                    $this->evidujIsdsSoubory($zprava->id, $dokument_id);
                 }
 
-                // Ulozeni adresy
+                // Pripojeni subjektu
+                $post_data = $this->getHttpRequest()->post;
+                $subjekty = isset($post_data['subjekt']) ? $post_data['subjekt'] : null;
                 if ($subjekty) {
                     $DokumentSubjekt = new DokumentSubjekt();
                     foreach ($subjekty as $subjekt_id => $subjekt_status)
@@ -355,13 +285,10 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 }
 
                 // Pridani informaci do epodatelny
-                $info = array(
-                    'dokument_id' => $dokument_id,
-                    'evidence' => 'spisovka',
-                    'stav' => '10',
-                    'stav_info' => 'Zpráva přidána do spisové služby jako ' . $dokument->jid
-                );
-                $this->Epodatelna->update($info, array(array('id=%i', $epodatelna_id)));
+                $zprava->dokument_id = $dokument_id;
+                $zprava->stav = 10;
+                $zprava->stav_info = 'Zpráva přidána do spisové služby jako ' . $dokument->jid;
+                $zprava->save();
 
                 $Workflow = new Workflow();
                 $Workflow->vytvorit($dokument_id, $predani_poznamka);
@@ -373,9 +300,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $document_created = true;
 
                 $this->flashMessage('Dokument byl vytvořen.');
-
-                $rozdelany = $this->getSession('s3_rozdelany');
-                unset($rozdelany->is, $rozdelany->dokument_id, $rozdelany);
 
                 if (!empty($predani['predano_user']) || !empty($predani['predano_org'])) {
                     /* Dokument predan */
@@ -473,7 +397,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         // Pridani informaci do epodatelny
         $epod_info = array(
             'dokument_id' => $dokument_id,
-            'evidence' => 'spisovka',
             'stav' => '10',
             'stav_info' => 'Zpráva přidána do spisové služby jako ' . $dokument->jid
         );
@@ -554,7 +477,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $imap = new ImapClient();
         $imap->open($filename);
         $structure = $imap->get_message_structure(1);
-        
+
         $text = $imap->find_plain_text(1, $structure);
         if ($text) {
             $upload_info = array(
@@ -564,18 +487,18 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'popis' => 'Text e-mailové zprávy'
             );
             if ($uploaded = $storage->uploadDocument($text, $upload_info))
-                $DokumentFile->pripojit($dokument_id, $uploaded->id);            
+                $DokumentFile->pripojit($dokument_id, $uploaded->id);
         }
-        
+
         $attachments = $imap->get_attachments($structure);
         foreach ($attachments as $part_number => $attachment) {
 
             $filename = $attachment->dparameters['FILENAME'];
             if ($filename == 'smime.p7s')
                 continue;
-            
+
             $data = $imap->fetch_body_part(1, $part_number);
-            $data = $imap->decode_data($data, $attachment);            
+            $data = $imap->decode_data($data, $attachment);
 
             // prekopirovani na pozadovane misto
             $upload_info = array(
@@ -846,7 +769,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function renderJiny($id)
     {
-        
+
     }
 
 }

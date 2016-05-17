@@ -461,13 +461,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         }
                         $zprava['prilohy'] = serialize($prilohy);
 
-                        //$zprava['evidence'] = $z->dmAnnotation;
-                        //$zprava['dokument_id'] = $z->dmAnnotation;
                         $zprava['stav'] = 0;
                         $zprava['stav_info'] = '';
-
-                        //print_r($zprava);
-                        //exit;
 
                         if ($epod_id = $this->Epodatelna->insert($zprava)) {
 

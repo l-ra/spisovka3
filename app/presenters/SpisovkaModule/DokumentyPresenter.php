@@ -1910,7 +1910,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $zprava['prilohy'] = serialize($zprava_prilohy);
 
-        $zprava['evidence'] = 'spisovka';
         $zprava['dokument_id'] = $data['dokument_id'];
         // 1 = odesláno, neodeslané e-maily a datové zprávy se v e-podatelně vůbec neobjeví
         $zprava['stav'] = 1;
@@ -2042,7 +2041,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
             $zprava['prilohy'] = serialize($aprilohy);
 
-            $zprava['evidence'] = 'spisovka';
             $zprava['dokument_id'] = $data['dokument_id'];
             $zprava['stav'] = 0;
             $zprava['stav_info'] = '';
