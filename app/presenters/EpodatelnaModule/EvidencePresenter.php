@@ -261,77 +261,72 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $data['poradi'] = 1;
             $data['stav'] = 1;
 
-            $Dokument = new Dokument();
-            $dokument = $Dokument->ulozit($data);
+            $model = new Dokument();
+            $dokument_id = $model->vytvorit($data);
+            $dokument = $model->getInfo($dokument_id);
 
-            if ($dokument) {
-                $dokument_id = $dokument->id;
-
-                // Ulozeni souboru
-                if ($zprava->typ == 'E') {
-                    $this->evidujEmailSoubory($zprava->id, $dokument_id);
-                } else if ($zprava->typ == 'I') {
-                    $this->evidujIsdsSoubory($zprava->id, $dokument_id);
-                }
-
-                // Pripojeni subjektu
-                $post_data = $this->getHttpRequest()->post;
-                $subjekty = isset($post_data['subjekt']) ? $post_data['subjekt'] : null;
-                if ($subjekty) {
-                    $DokumentSubjekt = new DokumentSubjekt();
-                    foreach ($subjekty as $subjekt_id => $subjekt_status)
-                        if ($subjekt_status == 'on')
-                            $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'O');
-                }
-
-                // Pridani informaci do epodatelny
-                $zprava->dokument_id = $dokument_id;
-                $zprava->stav = 10;
-                $zprava->stav_info = 'Zpráva přidána do spisové služby jako ' . $dokument->jid;
-                $zprava->save();
-
-                $Workflow = new Workflow();
-                $Workflow->vytvorit($dokument_id, $predani_poznamka);
-
-                $Log = new LogModel();
-                $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
-
-                dibi::commit();
-                $document_created = true;
-
-                $this->flashMessage('Dokument byl vytvořen.');
-
-                if (!empty($predani['predano_user']) || !empty($predani['predano_org'])) {
-                    /* Dokument predan */
-                    $Workflow->predat($dokument_id, $predani['predano_user'],
-                            $predani['predano_org'], $predani['predano_poznamka']);
-                    $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
-
-                    if (!empty($predani['predano_user'])) {
-                        $osoba = Person::fromUserId($predani['predano_user']);
-                        $predano = Osoba::displayName($osoba);
-                    } else if (!empty($predani['predano_org'])) {
-                        $Org = new OrgJednotka();
-                        $orgjednotka = $Org->getInfo($predani['predano_org']);
-                        $predano = @$orgjednotka->ciselna_rada . " - " . @$orgjednotka->plny_nazev;
-                    }
-                } else {
-                    $predano = $this->user->displayName;
-                }
-
-                if ($zprava->typ == 'E') {
-                    $email_info = array(
-                        'jid' => $dokument->jid,
-                        'nazev' => $zprava->predmet,
-                        'predano' => $predano
-                    );
-                    EmailAvizo::epodatelna_zaevidovana($zprava->odesilatel, $email_info);
-                }
-
-                $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
-            } else {
-                $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
+            // Ulozeni souboru
+            if ($zprava->typ == 'E') {
+                $this->evidujEmailSoubory($zprava->id, $dokument_id);
+            } else if ($zprava->typ == 'I') {
+                $this->evidujIsdsSoubory($zprava->id, $dokument_id);
             }
+
+            // Pripojeni subjektu
+            $post_data = $this->getHttpRequest()->post;
+            $subjekty = isset($post_data['subjekt']) ? $post_data['subjekt'] : null;
+            if ($subjekty) {
+                $DokumentSubjekt = new DokumentSubjekt();
+                foreach ($subjekty as $subjekt_id => $subjekt_status)
+                    if ($subjekt_status == 'on')
+                        $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'O');
+            }
+
+            // Pridani informaci do epodatelny
+            $zprava->dokument_id = $dokument_id;
+            $zprava->stav = 10;
+            $zprava->stav_info = 'Zpráva přidána do spisové služby jako ' . $dokument->jid;
+            $zprava->save();
+
+            $Workflow = new Workflow();
+            $Workflow->vytvorit($dokument_id, $predani_poznamka);
+
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
+
+            dibi::commit();
+            $document_created = true;
+
+            $this->flashMessage('Dokument byl vytvořen.');
+
+            if (!empty($predani['predano_user']) || !empty($predani['predano_org'])) {
+                /* Dokument predan */
+                $Workflow->predat($dokument_id, $predani['predano_user'],
+                        $predani['predano_org'], $predani['predano_poznamka']);
+                $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
+
+                if (!empty($predani['predano_user'])) {
+                    $osoba = Person::fromUserId($predani['predano_user']);
+                    $predano = Osoba::displayName($osoba);
+                } else if (!empty($predani['predano_org'])) {
+                    $Org = new OrgJednotka();
+                    $orgjednotka = $Org->getInfo($predani['predano_org']);
+                    $predano = @$orgjednotka->ciselna_rada . " - " . @$orgjednotka->plny_nazev;
+                }
+            } else {
+                $predano = $this->user->displayName;
+            }
+
+            if ($zprava->typ == 'E') {
+                $email_info = array(
+                    'jid' => $dokument->jid,
+                    'nazev' => $zprava->predmet,
+                    'predano' => $predano
+                );
+                EmailAvizo::epodatelna_zaevidovana($zprava->odesilatel, $email_info);
+            }
+
+            $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
         } catch (Nette\Application\AbortException $e) {
             throw $e;
         } catch (Exception $e) {
@@ -370,12 +365,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             "poznamka" => $data['poznamka'],
             'zpusob_doruceni_id' => $zprava->typ == 'E' ? 1 : 2
         );
-        $dokument = $Dokument->ulozit($dokument_data);
-
-        if (!$dokument)
-            throw new Exception('Dokument se nepodařilo vytvořit!');
-
-        $dokument_id = $dokument->id;
+        $dokument_id = $Dokument->vytvorit($dokument_data);
+        $dokument = $Dokument->getInfo($dokument_id);
 
         // Ulozeni prilohy
         if ($zprava->typ == 'E') {
@@ -769,7 +760,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function renderJiny($id)
     {
-
+        
     }
 
 }
