@@ -120,7 +120,9 @@ class Subjekt extends BaseModel
             }
 
             // hledani podle nazvu, prijmeni nebo jmena
-            if (!empty($data->nazev_subjektu)) {
+            // 2016-05-17  Oprava - pokud jsme nalezli subjekt podle datové schránky,
+            // nevypisuj spoustu falešných výsledků, mohou jich být desítky
+            if (!$result && !empty($data->nazev_subjektu)) {
                 $sql = array(
                     'cols' => $cols,
                     'where_or' => array(
@@ -130,8 +132,7 @@ class Subjekt extends BaseModel
                     ),
                     'order' => array('nazev_subjektu', 'prijmeni', 'jmeno')
                 );
-                $fetch = $this->selectComplex($sql)->fetchPairs('id', 'id');
-                $result = $result + $fetch;
+                $result = $this->selectComplex($sql)->fetchPairs('id', 'id');
             }
         }
 

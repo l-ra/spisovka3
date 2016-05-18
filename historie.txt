@@ -140,6 +140,9 @@ E-podatelna:
   schránky místo zprávy zobrazila nulu
 - vytváření nového subjektu z datové zprávy automaticky rozdělí adresu
   do jednotlivých políček
+- hledání subjektu k datové zprávě hledá nejprve podle ID datové schránky.
+  Teprve když není nalezen odpovídající subjekt, použije se hledání podle 
+  názvu organizace a jména a příjmení.
 - vytváření nového subjektu z e-mailu s diakritikou ve jménu odesilatele, který
   nebyl v kódování utf-8, mohlo v minulosti selhat
 - dokument přijatý datovou schránkou a odeslaný e-mailem se mohl tvářit
