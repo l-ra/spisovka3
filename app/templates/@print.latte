@@ -17,7 +17,8 @@
         {/if}
 
     </head>
-    <body {if true}onload="window.print();"{/if}>
+    {default invoke_print = true}
+    <body {if $invoke_print}onload="window.print();"{/if}>
         <div>
             {include #content}
             <p>Vytvořil: {$user->displayName}<br />

@@ -87,6 +87,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderTisk($id)
     {
+        $this->template->invoke_print = true;
         $this->setView('detail');
         $this->renderDetail($id);
     }
@@ -270,6 +271,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
             if ($mnoho && !$this->getParameter('pokracovat', false)) {
                 $this->template->prilis_mnoho = 1;
+                $this->template->invoke_print = false;
                 $seznam = array();
                 if ($pdf)
                     $this->setView('detail');
@@ -299,6 +301,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         }
 
         $this->template->seznam = $seznam;
+        if (!isset($this->template->invoke_print))
+            $this->template->invoke_print = false;
         $this->setLayout('print');
     }
 

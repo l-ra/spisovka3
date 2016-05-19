@@ -7,7 +7,6 @@ class Subjekt extends BaseModel
 
     protected $name = 'subjekt';
     protected $primary = 'id';
-    private $staty = array();
 
     public function getInfo($subjekt_id)
     {
