@@ -1982,7 +1982,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $popis .= "\n";
             $popis .= "Do vlastních rukou? : " . (!empty($mess->dmPersonalDelivery) ? "ano" : "ne") . "\n"; //  =
             $popis .= "Doručeno fikcí?     : " . (!empty($mess->dmAllowSubstDelivery) ? "ano" : "ne") . "\n"; //  =
-            $popis .= "Zpráva určena pro   : " . $mess->dmToHands . "\n"; //  =
+            $popis .= "Zpráva určena pro   : " . $mess->dmToHands . "\n";
             $popis .= "\n";
             $popis .= "Odesílatel:\n";
             $popis .= "            " . $mess->dbIDSender . "\n"; //  = hjyaavk
@@ -1994,24 +1994,19 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $popis .= "            " . $mess->dbIDRecipient . "\n"; //  = pksakua
             $popis .= "            " . $mess->dmRecipient . "\n"; //  = Společnost pro výzkum a podporu OpenSource
             $popis .= "            " . $mess->dmRecipientAddress . "\n"; //  = 40501 Děčín, CZ
-            //$popis .= "Je příjemce ne-OVM povýšený na OVM: ". $mess->dmDm->dmAmbiguousRecipient ."\n";//  =
+            //$popis .= "Je příjemce ne-OVM povýšený na OVM: ". $mess->dmDm->dmAmbiguousRecipient ."\n";
             $popis .= "\n";
             $popis .= "Status: " . $mess->dmMessageStatus . " - " . ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) . "\n";
             $dt_dodani = strtotime($mess->dmDeliveryTime);
             $dt_doruceni = strtotime($mess->dmAcceptanceTime);
-            $popis .= "Datum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . " (" . $mess->dmDeliveryTime . ")\n"; //  =
+            $popis .= "Datum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
             if ($dt_doruceni == 0) {
-                $popis .= "Datum a čas doručení : (příjemce zprávu zatím nepřijal)\n"; //  =    
+                $popis .= "Datum a čas doručení : (příjemce zprávu zatím nepřijal)\n"; 
             } else {
-                $popis .= "Datum a čas doručení : " . date("j.n.Y G:i:s", $dt_doruceni) . " (" . $mess->dmAcceptanceTime . ")\n"; //  =                    
+                $popis .= "Datum a čas doručení : " . date("j.n.Y G:i:s", $dt_doruceni) . "\n";
             }
-            $popis .= "Přibližná velikost všech příloh : " . $mess->dmAttachmentSize . "kB\n"; //  =
-            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleLaw ."\n";//  =
-            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleYear ."\n";//  =
-            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitleSect ."\n";//  =
-            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitlePar ."\n";//  =
-            //$popis .= "ID datové zprávy: ". $mess->dmDm->dmLegalTitlePoint ."\n";//  =
-            // Do epodatelny
+            $popis .= "Přibližná velikost všech příloh : " . $mess->dmAttachmentSize . "kB\n";
+
             $UploadFile = $this->storage;
 
             $Epodatelna = new Epodatelna();

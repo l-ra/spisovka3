@@ -421,9 +421,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $popis .= "Status: " . $mess->dmMessageStatus . " - " . ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) . "\n";
                         $dt_dodani = strtotime($mess->dmDeliveryTime);
                         $dt_doruceni = strtotime($mess->dmAcceptanceTime);
-                        $popis .= "Datum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . " (" . $mess->dmDeliveryTime . ")\n"; //  =
-                        $popis .= "Datum a čas doručení : " . date("j.n.Y G:i:s", $dt_doruceni) . " (" . $mess->dmAcceptanceTime . ")\n"; //  =
-                        $popis .= "Přibližná velikost všech příloh : " . $mess->dmAttachmentSize . "kB\n"; //  =
+                        $popis .= "Datum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
+                        $popis .= "Datum a čas doručení : " . date("j.n.Y G:i:s", $dt_doruceni) . "\n";
+                        $popis .= "Přibližná velikost všech příloh : " . $mess->dmAttachmentSize . "kB\n";
 
                         $zprava = array();
                         $zprava['odchozi'] = 0;
