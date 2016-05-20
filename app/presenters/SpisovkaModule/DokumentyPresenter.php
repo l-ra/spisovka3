@@ -928,7 +928,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
 
             $this->template->form_name = 'odpovedForm';
-            $this->setView('novy');
         } else {
             $this->template->Dok = null;
             $this->flashMessage('Dokument neexistuje', 'warning');
