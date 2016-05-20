@@ -25,7 +25,10 @@ class Admin_SupportPresenter extends BasePresenter
 
         echo "Maximální velikost nahraného souboru:  ";
         $max = DokumentPrilohy::maxVelikostUploadu(true);
-        echo "$max\n\n";
+        echo "$max\n";
+        echo "Velikost dostupné PHP paměti:  ";
+        $memory_limit = ini_get('memory_limit');
+        echo "$memory_limit\n\n";
 
         echo "Nastavení uložená v databázi:\n";
         echo "-----------------------------\n\n";
