@@ -782,7 +782,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderOdpoved()
     {
-
         $Dokumenty = new Dokument();
 
         $dokument_id = $this->getParameter('id', null);
@@ -1153,7 +1152,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
-                ->onClick[] = array($this, 'stornoSeznamClicked');
+                ->onClick[] = array($this, 'stornoVytvoritClicked');
 
         return $form;
     }
@@ -1239,12 +1238,22 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
         $dokument_id = isset($data['id']) ? $data['id'] : $this->getParameter('id');
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+        $this->redirect('detail', array('id' => $dokument_id));
     }
 
-    public function stornoSeznamClicked()
+    public function stornoVytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $this->redirect(':Spisovka:Dokumenty:default');
+        $data = $button->getForm()->getValues();
+        $dokument_id = $data['id'];
+        if ($dokument_id) {
+            $model = new Dokument();
+            $where = [['id = %i', $dokument_id]];
+            $dok = $model->select($where)->fetch();
+            // ochrana proti útočníkovi
+            if ($dok && $dok->stav === 0)
+                $model->delete($where);
+        }
+        $this->redirect('default');
     }
 
     protected function createComponentMetadataForm()
