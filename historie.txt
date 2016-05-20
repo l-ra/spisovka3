@@ -64,14 +64,16 @@ Jiné změny:
 - aplikace nyní vyžaduje přepis URL. To není problém u webového serveru Apache.
   Pro Microsoft IIS je nutné ručně přepis URL nakonfigurovat.
 - z důvodu upgrade frameworku, na kterém aplikace běží a kvůli větší čistotě
-  zdrojového kódu aplikace v ní došlo k rozsáhlým změnám. V ideálním případě by
-  uživatel změnu neměl poznat, ale je zde určité riziko vzniku nových chyb,
-  které testování nemusí odhalit.
+  zdrojového kódu aplikace v ní došlo k rozsáhlým změnám
 - přepsána velká část Javascriptu starající se o dynamické změny na stránce.
   Tzv. rotující kolečko by se nyní mělo spolehlivě zobrazovat a skrývat, když
   aplikace zpracovává požadavek nebo nahrává data na pozadí. Též je uživatel
   informován, pokud při provádění požadavku na pozadí dojde k chybě.
 - proveden upgrade staré knihovny pro připojení k databázi
+- změna knihovny pro přístup k e-mailům a s tím související nová implementace
+  e-mailové části e-podatelny. Aplikace zvládá větší velikost e-mailových zpráv
+  a zpracování je až několikanásobně rychlejší. (Přesto použití příloh o veli-
+  kosti desítek MB nedoporučujeme.)
 - zformátování PHP kódu aplikace pro mnohem lepší přehlednost
   (ocení programátoři)
 - nová funkce pro vývojáře pro základní automatické testování aplikace
