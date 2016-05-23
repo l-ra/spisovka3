@@ -7,15 +7,6 @@ namespace Spisovka;
 class LatteMacros
 {
 
-    public static function vlink($__param, $__link)
-    {
-
-        //P.L. zrus tuto funkci, protoze:
-        // 1. pristup se kontroluje na cilove adrese odkazu
-        // 2. a pristup se kontroluje v hlavni sablone jiz v momente, kdy se rozhoduje, zda link vubec zobrazit
-        return $__link;
-    }
-
     // Ignoruj pripadnou polozku view (__array[3] ) v parametru makra, protoze v aplikaci se prideluje pristup pouze na urovni presenteru
     public static function access($user, $param)
     {
