@@ -3,7 +3,7 @@
 {block javascript}
 	<script type="text/javascript" src="{$publicUrl}js/webtoolkit.aim.js"></script>
 	<script type="text/javascript">
-		function completeCallback(response) {
+		function attachmentUploadCompleted(response) {
 
             if ( response.indexOf('###vybrano###') != -1 ) {
                 alert('Příloha byl nahrána.');

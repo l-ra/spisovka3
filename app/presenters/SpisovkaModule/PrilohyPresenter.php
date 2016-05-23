@@ -66,7 +66,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     {
         $form1 = new Spisovka\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
-        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : completeCallback})";
+        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : attachmentUploadCompleted})";
 
         $dok_id = $this->getParameter('dok_id');
         $form1->addHidden('dokument_id');
@@ -140,7 +140,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         $form1 = new Spisovka\Form();
         //$form1->getElementPrototype()->id('priloha-upload');
-        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : completeCallback})";
+        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : attachmentUploadCompleted})";
 
         $dok_id = $this->getParameter('dok_id');
         $form1->addHidden('dokument_id');
