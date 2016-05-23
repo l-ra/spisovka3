@@ -94,6 +94,11 @@ class UserSettings
 class OtherUserSettings extends UserSettings
 {
 
+    public function __construct($user_id)
+    {
+        parent::__construct($user_id);
+    }
+    
     public function _getAll()
     {
         return parent::_getAll();
