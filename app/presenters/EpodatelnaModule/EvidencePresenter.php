@@ -360,7 +360,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             "stav" => 1,
             "dokument_typ_id" => "1",
             /* "cislo_jednaci_odesilatele" => $data['cislo_jednaci_odesilatele'], */
-            "datum_vzniku" => $zprava['doruceno_dne'],
+            "datum_vzniku" => $zprava->doruceno_dne,
             "lhuta" => "30",
             "poznamka" => $data['poznamka'],
             'zpusob_doruceni_id' => $zprava->typ == 'E' ? 1 : 2
