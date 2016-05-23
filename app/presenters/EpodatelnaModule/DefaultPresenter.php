@@ -11,6 +11,14 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->Epodatelna = new Epodatelna();
     }
 
+    protected function isUserAllowed()
+    {
+        if ($this->view == "detail")
+            return true;
+        
+        return parent::isUserAllowed();
+    }
+    
     public function startup()
     {
         parent::startup();

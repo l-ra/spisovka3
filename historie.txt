@@ -111,6 +111,8 @@ Jiné změny:
   znovu.
 - kopie e-mailů odeslaných z aplikace se již neukládá na disk. Nicméně v minu-
   losti uložené e-maily aplikace nesmaže, to je na uživateli, pokud bude chtít.
+- informace o příchozí zprávě v e-podatelně již nejsou duplikovány u dokumentu,
+  místo toho lze z dokumentu snadno přejít do odpovídající zprávy v e-podatelně
 - z aplikace byl odstraněn tzv. "hlavní spis" s názvem SPISY
 - dokument již není možné začít vytvářet přímo ze spisu. Uživatel dokument musí
   nejprve vytvořit, poté jej teprve může vložit do spisu.

@@ -1073,7 +1073,7 @@ class Dokument extends BaseModel
                 'epod' => array(
                     'from' => array($this->tb_epodatelna => 'epod'),
                     'on' => array('epod.dokument_id = dok.id', 'epod.odchozi = 0'),
-                    'cols' => array('identifikator', 'typ' => 'epod_typ')
+                    'cols' => array('identifikator', 'typ' => 'epod_typ', 'id' => 'epodatelna_id')
                 ),
                 'spisovy_znak' => array(
                     'from' => array($this->tb_spisovy_znak => 'spisznak'),

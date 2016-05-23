@@ -200,6 +200,9 @@
             <dd>{$Dok->pocet_listu} / {$Dok->pocet_priloh} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd><br />
             <dt>Lhůta k vyřízení:</dt>
             <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd><br />
+            {if $Dok->epodatelna_id}
+                <dt></dt><dd><a href="{link :Epodatelna:Default:detail, id => $Dok->epodatelna_id}">Zobrazit zprávu v e-podatelně</a></dd>
+            {/if}
         </dl>
     {/if}
 </div>

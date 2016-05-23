@@ -1,9 +1,11 @@
 {block title}Detail zprávy{/block}
 {block content}
 
+{access :Epodatelna:Default:}
 <div class="navigate">
     <a href="{link $back}">Seznam {$back == 'prichozi' ? 'příchozích' : 'nových'} zpráv</a> - Detail zprávy
 </div>
+{/access}
 
 {control print}
 
@@ -93,7 +95,11 @@
                             {/if}
                         </td>
                         <td class="meta">
-                            <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>trim($priloha['id'])}">{$priloha['name']}</a>
+                            {if $user->isAllowed('Epodatelna_PrilohyPresenter')}
+                                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>trim($priloha['id'])}">{$priloha['name']}</a>
+                            {else}
+                                {$priloha['name']}                                
+                            {/if}
                             <div class="info">
                                 <span>{$priloha['size']|bytes,0}{if isset($priloha['mimetype'])}, {$priloha['mimetype']}{/if}</span>
                             </div>
