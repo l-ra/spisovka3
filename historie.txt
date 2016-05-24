@@ -159,6 +159,8 @@ E-podatelna:
   hodnota "v listinné podobě".
 - opravena chyba, která bránila elektronickému podepisování odchozích e-mailů
 - v nastavení podepisování se už nezobrazuje heslo k souboru s certifikátem
+- datová zpráva (.zfo soubor) se už nyní nekopíruje do dokumentu (nevytváří se
+  duplikát)
   
 Spisová služba:
 - při výběru datumu v aplikaci se nyní týden zobrazuje správně od pondělí do neděle

@@ -513,59 +513,52 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $prilohy = EpodatelnaPrilohy::getIsdsFiles($epodatelna_id, $this->storage);
 
-        $UploadFile = $this->storage;
+        $storage = $this->storage;
 
         $DokumentFile = new DokumentPrilohy();
 
-        $info = new EpodatelnaMessage($epodatelna_id);
-        if ($info) {
-            $FileModel = new FileModel();
-            $file_info = $FileModel->select(array(array('real_name=%s', 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();
-            if ($file_info) {
-                $res = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_info->id);
-
-                $data = array(
-                    'filename' => 'datova_zprava_' . $info->isds_id . '.zfo',
-                    'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
-                    'typ' => '5',
-                    'popis' => 'Podepsaná originální datová zpráva'
-                        //'popis'=>'Emailová zpráva'
-                );
-
-                if ($filep = $UploadFile->uploadDocument($res, $data)) {
-                    // zapiseme i do
-                    $DokumentFile->pripojit($dokument_id, $filep->id);
-                } else {
-                    // false
-                }
-            }
-        }
-
+//        $message = new EpodatelnaMessage($epodatelna_id);
+//        if ($message) {
+//            $FileModel = new FileModel();
+//            $file_info = $FileModel->select(array(array('real_name=%s', 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();
+//            if ($file_info) {
+//                $res = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_info->id);
+//
+//                $data = array(
+//                    'filename' => 'datova_zprava_' . $message->isds_id . '.zfo',
+//                    'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
+//                    'typ' => '5',
+//                    'popis' => 'Podepsaná originální datová zpráva'
+//                        //'popis'=>'Emailová zpráva'
+//                );
+//
+//                if ($filep = $storage->uploadDocument($res, $data)) {
+//                    // zapiseme i do
+//                    $DokumentFile->pripojit($dokument_id, $filep->id);
+//                } else {
+//                    // false
+//                }
+//            }
+//        }
         // nahrani priloh
-        if (count($prilohy) > 0) {
-
-            foreach ($prilohy as $file) {
-
-                // prekopirovani na pozadovane misto
-                $data = array(
-                    'filename' => $file['file_name'],
-                    'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
-                    'typ' => '2',
-                    'popis' => ''
-                        //'popis'=>'Emailová zpráva'
-                );
-
-                if ($filep = $UploadFile->uploadDocument($file['file'], $data)) {
-                    // zapiseme i do
-                    $DokumentFile->pripojit($dokument_id, $filep->id);
-                } else {
-                    // false
-                }
-            }
-            return true;
-        } else {
+        if (!count($prilohy))
             return null;
+
+        foreach ($prilohy as $file) {
+            // prekopirovani na pozadovane misto
+            $data = array(
+                'filename' => $file['file_name'],
+                'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
+                'typ' => '2',
+                'popis' => ''
+            );
+
+            if ($filep = $storage->uploadDocument($file['file'], $data)) {
+                $DokumentFile->pripojit($dokument_id, $filep->id);
+            }
         }
+        
+        return true;
     }
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
