@@ -3,22 +3,6 @@
 {block javascript}
 <script type="text/javascript" src="{$publicUrl}js/webtoolkit.aim.js"></script>
 <script type="text/javascript">
-    function attachmentUploadCompleted(response) {
-
-        if (response.indexOf('###vybrano###') != -1) {
-            alert('Příloha byl nahrána.');
-            $('#dialog').dialog('close');
-            renderPrilohy({$Dok->id});
-        } else if (response.indexOf('###zmemeno###') != -1) {
-            alert('Příloha byla upravena.');
-            $('#dialog').dialog('close');
-            renderPrilohy({$Dok->id});
-        } else {
-            $('#dialog').html(response);
-        }
-    }
-
-
     function onChangeRadioButtonSpousteciUdalost(elm) {
 
         var isChecked = $('#radio-udalost-typ-2').is(':checked');
@@ -34,7 +18,6 @@
     $(document).ready(function () {
         $('#frmudalostForm-datum_spousteci_udalosti').prop('disabled', true);
     });
-
 
     var DOKUMENT_ID = {$Dok->id};
 

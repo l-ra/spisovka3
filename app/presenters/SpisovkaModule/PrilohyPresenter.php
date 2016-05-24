@@ -108,7 +108,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                     $Log->logDokument($dokument_id, LogModel::PRILOHA_PRIDANA,
                             'Přidána příloha "' . $file_info->nazev . ' (' . $file_info->real_name . ')"');
 
-                    echo '###vybrano###' . $dokument_id;
+                    echo '###nahrano###';
                     $this->terminate();
                 } else {
                     $this->template->chyba = 1;
@@ -195,7 +195,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                     $Log->logDokument($dokument_id, LogModel::PRILOHA_ZMENENA,
                             'Změněna příloha z "' . $file_info1->nazev . ' (' . $file_info1->real_name . ')" na "' . $file_info2->nazev . ' (' . $file_info2->real_name . ')"');
 
-                    echo '###vybrano###' . $dokument_id;
+                    echo '###nahrano###';
                     $this->terminate();
                 } else {
                     $this->template->chyba = 1;
@@ -208,7 +208,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             // zadny soubor
             $File = new FileModel();
             if ($file = $File->upravitMetadata($data, $file_id)) {
-                echo '###zmemeno###' . $dokument_id;
+                echo '###zmemeno###';
                 $this->terminate();
             } else {
                 $this->template->chyba = 3;

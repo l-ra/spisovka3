@@ -397,9 +397,9 @@ subjektVybran = function (elm) {
 };
 
 
-renderPrilohy = function (dokument_id) {
+renderPrilohy = function () {
 
-    url = BASE_URL + 'prilohy/' + dokument_id + '/nacti';
+    url = BASE_URL + 'prilohy/' + DOKUMENT_ID + '/nacti';
 
     $.get(url, function (data) {
         $('#dok-prilohy').html(data);
@@ -503,12 +503,12 @@ osobaVybrana = function (elm) {
 };
 
 
-odebratPrilohu = function (elm, dok_id) {
+odebratPrilohu = function (elm) {
 
     if (confirm('Opravdu chcete odebrat přílohu z dokumentu?')) {
 
         $.get(elm.href, function (data) {
-            renderPrilohy(dok_id);
+            renderPrilohy();
         });
     }
 
@@ -1002,3 +1002,20 @@ installDatePicker = function () {
     $("input.DPNoPast").datepicker("option", "minDate", 0);
 };
 
+attachmentUploadCompleted = function (response) {
+
+    if (response.substring(0, 13) == '###nahrano###') {
+        alert('Příloha byl nahrána.');
+    } else if (response.substring(0, 13) == '###zmemeno###') {
+        alert('Příloha byla upravena.');
+    } else {
+        // Bohuzel nedokazi rozpoznat, jestli response obsahuje HTML formular nebo 
+        // Tracy dump s chybou
+        // Neni dostupna informace, jestli pozadavek skoncil s 200 nebo 500
+        // alert('V aplikaci došlo k problému.');
+        $('#dialog').html(response);
+        return;
+    }
+    $('#dialog').dialog('close');
+    renderPrilohy();
+};
