@@ -89,7 +89,6 @@ class Storage_Basic extends FileModel
         $row['nazev'] = empty($data['nazev']) ? $file->real_name : $data['nazev'];
         $file->name = $row['nazev'];
         $row['popis'] = empty($data['popis']) ? '' : $data['popis'];
-        $row['typ'] = $data['typ'];
         $row['real_name'] = $file->real_name;
         $row['real_path'] = $file->real_path;
         $row['real_type'] = $file->type;

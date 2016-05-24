@@ -76,7 +76,6 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $form1->addText('priloha_nazev', 'Název přílohy:', 50, 150)
                 ->setRequired();
         $form1->addTextArea('priloha_popis', 'Popis:', 80, 5);
-        $form1->addSelect('priloha_typ', 'Typ souboru', FileModel::typPrilohy());
         $form1->addUpload('file', 'Soubor:');
         $form1->addSubmit('upload', 'Nahrát')
                 ->onClick[] = array($this, 'uploadClicked');
@@ -92,9 +91,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         $data['nazev'] = $data['priloha_nazev'];
         $data['popis'] = $data['priloha_popis'];
-        $data['typ'] = $data['priloha_typ'];
-        unset($data['dokument_id'], $data['priloha_nazev'], $data['priloha_popis'],
-                $data['priloha_typ']);
+        unset($data['dokument_id'], $data['priloha_nazev'], $data['priloha_popis']);
 
         $data['dir'] = date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y');
 
@@ -153,8 +150,6 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                 ->setValue(@$file_info->nazev);
         $form1->addTextArea('priloha_popis', 'Popis:', 80, 5)
                 ->setValue(@$file_info->popis);
-        $form1->addSelect('priloha_typ', 'Typ souboru', FileModel::typPrilohy())
-                ->setValue(@$file_info->typ);
         $form1->addUpload('file', 'Soubor:');
         $form1->addSubmit('upload', 'Nahrát')
                 ->onClick[] = array($this, 'reUploadClicked');
@@ -173,8 +168,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         $data['nazev'] = $data['priloha_nazev'];
         $data['popis'] = $data['priloha_popis'];
-        $data['typ'] = $data['priloha_typ'];
-        unset($data['priloha_nazev'], $data['priloha_popis'], $data['priloha_typ']);
+        unset($data['priloha_nazev'], $data['priloha_popis']);
         unset($data['dokument_id']);
         unset($data['file_id']);
 

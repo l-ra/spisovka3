@@ -47,7 +47,6 @@ class DokumentPrilohy extends BaseModel
                 // Nikdo si nestěžoval, nechme to takto být. Tato informace je dostupná ještě v transakčním logu dokumentu.
                 $joinFile->user_name = '';
 
-                $joinFile->typ_name = FileModel::typPrilohy($joinFile->typ);
                 // Nahrazeni online mime-type
                 $joinFile->mime_type = FileModel::mimeType($joinFile->real_path);
                 // Osetreni ikony - pokud neexistuje, pak nahradit defaultni

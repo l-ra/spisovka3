@@ -216,20 +216,20 @@ class ISDS_Spisovka extends ISDS
             if (count($prilohy) > 0) {
                 $SentOutFiles = new ISDSSentOutFiles();
                 foreach ($prilohy as $priloha) {
-
                     if (empty($priloha->mime_type)) {
                         $mime_type = FileModel::mimeType($priloha->tmp_file);
                     } else {
                         $mime_type = $priloha->mime_type;
                     }
 
-                    $metatype = FileModel::typPrilohy($priloha->typ);
-                    $metatype = ( $metatype == 'main' ) ? 'main' : 'enclosure';
+                    // $metatype = FileModel::typPrilohy($priloha->typ);
+                    // $metatype = ( $metatype == 'main' ) ? 'main' : 'enclosure';
+                    $metatype = 'enclosure';
 
                     $SentOutFiles->AddFileSpecFromFile(
                             $priloha->tmp_file, $mime_type, $metatype, $priloha->guid, "",
                             $priloha->real_name, "");
-                } // foreach
+                }
                 $dmFiles = $SentOutFiles->fileInfos();
             } else {
                 $dmFiles = null;

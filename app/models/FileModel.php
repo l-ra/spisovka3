@@ -17,7 +17,6 @@ class FileModel extends BaseModel
 
             $osoba = Person::fromUserId($row->user_created);
             $row->user_name = Osoba::displayName($osoba);
-            $row->typ_name = FileModel::typPrilohy($row->typ, 1);
             // Ignoruj mime-type ulozeny v databazi (nastaveny pri nahrani prilohy) a zjisti jej pokazde znovu
             $row->mime_type = FileModel::mimeType($row->real_path);
             // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
@@ -47,7 +46,6 @@ class FileModel extends BaseModel
 
             $osoba = Person::fromUserId($file->user_created);
             $file->user_name = Osoba::displayName($osoba);
-            $file->typ_name = FileModel::typPrilohy($file->typ, 1);
             // Nahrazeni online mime-type
             $file->mime_type = FileModel::mimeType($file->real_path);
             // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
@@ -68,7 +66,6 @@ class FileModel extends BaseModel
     public function vlozit($data)
     {
         $row = array();
-        $row['typ'] = isset($data['typ']) ? $data['typ'] : 1;
         $row['nazev'] = $data['nazev'];
         $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
         $row['real_name'] = $data['real_name'];
@@ -111,8 +108,6 @@ class FileModel extends BaseModel
 
     public function upravitMetadata($data, $file_id)
     {
-
-
         $file_info = $this->select(array(array('id=%i', $file_id)))->fetch();
         if (!$file_info)
             return false;
@@ -120,7 +115,6 @@ class FileModel extends BaseModel
         $file_info = $this->obj2array($file_info);
 
         $row = $file_info;
-        $row['typ'] = isset($data['typ']) ? $data['typ'] : 1;
         $row['nazev'] = $data['nazev'];
         $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
 
@@ -136,79 +130,41 @@ class FileModel extends BaseModel
 
     public function deleteAll()
     {
-
         $DokumentPrilohy = new DokumentPrilohy();
         $DokumentPrilohy->deleteAll();
-
-        //$FileHistorie = new FileHistorie();
-        //$FileHistorie->deleteAll();
 
         parent::deleteAll();
     }
 
-    public static function typPrilohy($typ = null, $out = 0)
-    {
+//    public static function typPrilohy($typ = null, $out = 0)
+//    {
+//        $enum_orig = array('1' => 'main',
+//            '2' => 'enclosure',
+//            '3' => 'signature',
+//            '4' => 'meta',
+//            '5' => 'source'
+//        );
+//        $enum_popis = array('1' => 'hlavní soubor',
+//            '2' => 'příloha',
+//            '3' => 'podpis',
+//            '4' => 'metadata',
+//            '5' => 'zdrojový soubor'
+//        );
+//
+//        if (is_null($typ)) {
+//            return $enum_popis;
+//        }
+//        if ($out == 0) {
+//            return ( array_key_exists($typ, $enum_orig) ) ? $enum_orig[$typ] : null;
+//        } else if ($out == 1) {
+//            return ( array_key_exists($typ, $enum_popis) ) ? $enum_popis[$typ] : null;
+//        } else {
+//            return null;
+//        }
+//    }
 
-        $enum_orig = array('1' => 'main',
-            '2' => 'enclosure',
-            '3' => 'signature',
-            '4' => 'meta',
-            '5' => 'source'
-        );
-        $enum_popis = array('1' => 'hlavní soubor',
-            '2' => 'příloha',
-            '3' => 'podpis',
-            '4' => 'metadata',
-            '5' => 'zdrojový soubor'
-        );
-
-        if (is_null($typ)) {
-            return $enum_popis;
-        }
-        if ($out == 0) {
-            return ( array_key_exists($typ, $enum_orig) ) ? $enum_orig[$typ] : null;
-        } else if ($out == 1) {
-            return ( array_key_exists($typ, $enum_popis) ) ? $enum_popis[$typ] : null;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Neni v programu pouzito
-    public static function copy($source, $destination)
-    {
-        if (!($handle_src = fopen($source, "rb")))
-            return false;
-
-        if (!($handle_dst = fopen($destination, "wb"))) {
-            fclose($handle_src);
-            return false;
-        }
-
-        if (flock($handle_dst, LOCK_EX)) {
-            while (!feof($handle_src)) {
-                if ($data = fread($handle_src, 1024)) {
-                    if (!fwrite($handle_dst, $data))
-                        return false;
-                } else
-                    return false;
-            }
-            if (!flock($handle_dst, LOCK_UN))
-                return false;
-        } else
-            return false;
-
-        if (!fclose($handle_src) || !fclose($handle_dst))
-            return false;
-
-        return true;
-    }
-    */
-    
     public static function mimeType($filename)
     {
-
         $mime_types = array(
             '' => 'application/octet-stream',
             '%' => 'application/x-trash',
@@ -769,7 +725,7 @@ class FileModel extends BaseModel
         // do adresare s daty klienta
         if (strncmp($filename, '/files/', 7) === 0)
             $filename = CLIENT_DIR . $filename;
-        
+
         if (function_exists('finfo_open') && @is_file($filename)) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mimetype = finfo_file($finfo, $filename);
@@ -783,7 +739,7 @@ class FileModel extends BaseModel
             $a = explode('.', $filename);
             $ext = strtolower(array_pop($a));
         }
-        
+
         if (array_key_exists($ext, $mime_types))
             return $mime_types[$ext];
 
