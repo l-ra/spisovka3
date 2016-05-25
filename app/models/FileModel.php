@@ -70,7 +70,6 @@ class FileModel extends BaseModel
         $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
         $row['real_name'] = $data['real_name'];
         $row['real_path'] = $data['real_path'];
-        $row['real_type'] = isset($data['real_type']) ? $data['real_type'] : 'UploadFile_Basic';
 
         $row['mime_type'] = FileModel::mimeType($row['real_path']);
 

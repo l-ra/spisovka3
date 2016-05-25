@@ -1256,7 +1256,6 @@ if (count($S2_dok) > 0) {
                                 'mime_type' => $mime_type,
                                 'real_name' => $S2_pr->nazev,
                                 'real_path' => $real_path,
-                                'real_type' => 'UploadFile_Basic',
                                 'date_created' => empty($S2_pr->vlozeno) ? new DateTime() : $S2_pr->vlozeno,
                                 'user_created' => empty($S2_pr->vlozil) ? 1 : $S2_pr->vlozil,
                                 'guid' => $quid,

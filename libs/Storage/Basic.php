@@ -78,22 +78,13 @@ class Storage_Basic extends FileModel
             return null;
         }
 
-        $file = new stdClass();
-        $file->type = $this->getReflection()->getName();
-        $file->real_name = $filename;
-        $file->real_path = str_replace(CLIENT_DIR, '', $filepath);
-        $file->size = filesize($filepath);
-        $file->md5_hash = md5_file($filepath);
-
         $row = array();
-        $row['nazev'] = empty($data['nazev']) ? $file->real_name : $data['nazev'];
-        $file->name = $row['nazev'];
+        $row['nazev'] = empty($data['nazev']) ? $filename : $data['nazev'];
         $row['popis'] = empty($data['popis']) ? '' : $data['popis'];
-        $row['real_name'] = $file->real_name;
-        $row['real_path'] = $file->real_path;
-        $row['real_type'] = $file->type;
-        $row['md5_hash'] = $file->md5_hash;
-        $row['size'] = $file->size;
+        $row['real_name'] = $filename;
+        $row['real_path'] = str_replace(CLIENT_DIR, '', $filepath);
+        $row['md5_hash'] = md5_file($filepath);
+        $row['size'] = filesize($filepath);
 
         return $this->vlozit($row);
     }
