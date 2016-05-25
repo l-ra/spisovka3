@@ -136,13 +136,9 @@
                 <br />
                 <dl>
                     <dt>Celková velikost příloh :</dt>
-                    <dd>{$PrilohyCelkovaVelikost|bytes}</dd>
-                    <dd>
-                        {if $PrilohyCelkovaVelikost > 10485760 }
-                            <span style="color: #ff0000;">Celková velikost příloh překročila povolený limit k odeslání 10MB. Odesílejte přílohy po kouscích.</span>
-                        {elseif $PrilohyCelkovaVelikost > 2097152 }
-                            <span style="color: #008888;">Celková velikost příloh překročila limit 2MB. Zprávu je možné odeslat. Pouze v případě odeslání přes email může dojít k limitu ze strany poštovního serveru. Zjistěte si, zda můžete takto velkou přílohu odeslat emailem.</span>
-                        {/if}
+                    <dd>{$PrilohyCelkovaVelikost|bytes,0}</dd><br />
+                    <dt></dt>
+                    <dd class="normal-font">Pro datové zprávy je maximální velikost 20 MB, pro e-maily 19 MB (u e-mailů může být nižší, podle adresáta zprávy).
                     </dd>
                 </dl>
             {else}

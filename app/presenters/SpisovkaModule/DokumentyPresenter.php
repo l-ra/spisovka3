@@ -1008,9 +1008,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $max_vars = ini_get('max_input_vars');
         $safe_recipient_count = floor(($max_vars - 10) / 17);
         $recipient_count = 0;
-        foreach ($dokument->subjekty as $subjekt)
-            if ($subjekt->rezim_subjektu != 'O')
-                $recipient_count++;
+        if ($dokument->subjekty)
+            foreach ($dokument->subjekty as $subjekt)
+                if ($subjekt->rezim_subjektu != 'O')
+                    $recipient_count++;
         if ($recipient_count > $safe_recipient_count) {
             $this->flashMessage("Dokument má příliš mnoho adresátů a není možné jej odeslat. Maximální počet adresátů je $safe_recipient_count.",
                     'warning');
