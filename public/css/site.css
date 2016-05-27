@@ -270,6 +270,9 @@ dd label {
     /* Mělo by to být správně "initial", ale to nepodporuje Internet Explorer */
     font-weight: normal;    
 }
+dd a {
+    margin-right: 10px;
+}
 
 #dialog dt {
     width: 120px;

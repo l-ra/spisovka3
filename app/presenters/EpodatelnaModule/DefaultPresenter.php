@@ -15,10 +15,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     {
         if ($this->view == "detail")
             return true;
-        
+
         return parent::isUserAllowed();
     }
-    
+
     public function startup()
     {
         parent::startup();
@@ -53,7 +53,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
         $this->template->seznam = $seznam;
-        
+
         $this->setView('seznam');
     }
 
@@ -80,7 +80,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
         $this->template->seznam = $seznam;
-        
+
         $this->setView('seznam');
     }
 
@@ -703,6 +703,30 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
 
         $this->sendJson(['id' => 'snippet-isdsovereni', 'html' => $output]);
+    }
+
+    public function actionDownloadDm($id)
+    {
+        $FileModel = new FileModel();
+        $file = $FileModel->select(array(array("real_name = %s", "ep-isds-$id.zfo")))->fetch();
+        if (!$file)
+            $this->terminate();
+
+        $data = $this->storage->download($file->id, 1);
+        
+        $httpResponse = $this->getHttpResponse();
+        $httpResponse->setContentType('application/octet-stream');
+        $httpResponse->setHeader('Content-Length', strlen($data));
+        $httpResponse->setHeader('Content-Description', 'File Transfer');
+        $httpResponse->setHeader('Content-Disposition',
+                'attachment; filename="' . "$id.zfo" . '"');
+        $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
+        $httpResponse->setHeader('Expires', '0');
+        $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+        $httpResponse->setHeader('Pragma', 'public');
+
+        echo $data;
+        $this->terminate();
     }
 
 }
