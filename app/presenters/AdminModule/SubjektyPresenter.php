@@ -29,12 +29,12 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         try {
             $subjekt_id = $Subjekt->ulozit($data);
             $this->flashMessage('Subjekt  "' . Subjekt::displayName($data, 'jmeno') . '"  byl vytvořen.');
-            $this->redirect(':Admin:Subjekty:detail', array('id' => $subjekt_id));
+            $this->redirect('detail', array('id' => $subjekt_id));
         } catch (DibiException $e) {
             $this->flashMessage('Subjekt "' . Subjekt::displayName($data, 'jmeno') . '" se nepodařilo vytvořit.',
                     'warning');
             $this->flashMessage($e->getMessage(), 'warning');
-            $this->redirect(':Admin:Subjekty:novy');
+            $this->redirect('novy');
         }
     }
 
@@ -174,13 +174,13 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
             $Subjekt->ulozit($data, $subjekt_id);
             $this->flashMessage('Subjekt  "' . Subjekt::displayName($data, 'jmeno') . '"  byl upraven.');
 
-            $this->redirect(':Admin:Subjekty:detail', array('id' => $subjekt_id));
+            $this->redirect('detail', array('id' => $subjekt_id));
         } catch (DibiException $e) {
             $this->flashMessage('Subjekt "' . Subjekt::displayName($data, 'jmeno') . '" se nepodařilo upravit.',
                     'warning');
             $this->flashMessage($e->getMessage(), 'warning');
 
-            $this->redirect(':Admin:Subjekty:seznam');
+            $this->redirect('seznam');
         }
     }
 
@@ -193,7 +193,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
     public function stornoSeznamClicked()
     {
-        $this->redirect(':Admin:Subjekty:seznam');
+        $this->redirect('seznam');
     }
 
     protected function createComponentStavForm()
@@ -227,7 +227,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         try {
             $Subjekt->zmenitStav($data);
             $this->flashMessage('Stav subjektu byl změněn.');
-            $this->redirect(':Admin:Subjekty:detail', array('id' => $subjekt_id));
+            $this->redirect('detail', array('id' => $subjekt_id));
         } catch (DibiException $e) {
             $e->getMessage();
             $this->flashMessage('Stav subjektu se nepodařilo změnit.', 'warning');
@@ -286,7 +286,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     {
         $filter = $form->getValues()->filter;
         UserSettings::set('admin_subjekty_filtr', $filter);
-        $this->redirect('seznam');
+        $this->redirect('this');
     }
 
 }
