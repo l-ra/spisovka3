@@ -38,7 +38,7 @@ class EmailSignature extends \Nette\Application\UI\Control
             return;
         }
         
-        $filename = $this->message->getMessageSource($this->storage);
+        $filename = $this->message->getEmailFile($this->storage);
         if (!$filename) {
             echo "Nemohu najít soubor s emailem.";
             return;
@@ -65,7 +65,7 @@ class EmailSignature extends \Nette\Application\UI\Control
 
     protected function checkIfSigned()
     {
-        $filename = $this->message->getMessageSource($this->storage);
+        $filename = $this->message->getEmailFile($this->storage);
 
         $imap = new \ImapClient();
         $imap->open($filename);

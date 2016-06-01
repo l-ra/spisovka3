@@ -81,7 +81,7 @@ class EpodatelnaPrilohy
     public static function getIsdsFiles($epodatelna_id, $storage)
     {
         $msg = new EpodatelnaMessage($epodatelna_id);
-        $path = $msg->getMessageSource($storage);
+        $path = $msg->getIsdsFile($storage);
         return self::_getIsdsFiles($path);
     }
 
@@ -102,7 +102,7 @@ class EpodatelnaPrilohy
         if ($message->odchozi && !$message->file_id)
             return unserialize($message->prilohy);
         
-        $filename = $message->getMessageSource($storage);
+        $filename = $message->getEmailFile($storage);
         
         $imap = new ImapClient();
         $imap->open($filename);

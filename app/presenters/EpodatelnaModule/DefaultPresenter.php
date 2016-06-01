@@ -678,27 +678,21 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     public function renderIsdsovereni($id)
     {
         $output = "Nemohu najít soubor s datovou zprávou.";
-        $epodatelna_id = $id;
-        $FileModel = new FileModel();
-        $file = $FileModel->select(array(array("nazev = %s", 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();
-        if ($file) {
-            // Nacteni originalu DS
-            $DownloadFile = $this->storage;
-            $source = $DownloadFile->download($file->id, 1);
-            if ($source) {
-                $isds = new ISDS_Spisovka();
-                try {
-                    $isds->pripojit();
-                    if ($isds->AuthenticateMessage($source)) {
-                        $output = "Datová zpráva je platná.";
-                    } else {
-                        $output = "Datová zpráva není platná!<br />" .
-                                'ISDS zpráva: ' . $isds->error();
-                    }
-                } catch (Exception $e) {
-                    $output = "Nepodařilo se připojit k ISDS schránce!<br />" .
-                            'chyba: ' . $e->getMessage();
+        $message = new EpodatelnaMessage($id);
+        $zfo = $message->getZfoFile($this->storage);
+        if ($zfo) {
+            $isds = new ISDS_Spisovka();
+            try {
+                $isds->pripojit();
+                if ($isds->AuthenticateMessage($zfo)) {
+                    $output = "Datová zpráva je platná.";
+                } else {
+                    $output = "Datová zpráva není platná!<br />" .
+                            'ISDS zpráva: ' . $isds->error();
                 }
+            } catch (Exception $e) {
+                $output = "Nepodařilo se připojit k ISDS schránce!<br />" .
+                        'chyba: ' . $e->getMessage();
             }
         }
 
@@ -707,13 +701,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function actionDownloadDm($id)
     {
-        $FileModel = new FileModel();
-        $file = $FileModel->select(array(array("real_name = %s", "ep-isds-$id.zfo")))->fetch();
-        if (!$file)
+        $message = new EpodatelnaMessage($id);
+        $data = $message->getZfoFile($this->storage);
+        if (!$data)
             $this->terminate();
 
-        $data = $this->storage->download($file->id, 1);
-        
         $httpResponse = $this->getHttpResponse();
         $httpResponse->setContentType('application/octet-stream');
         $httpResponse->setHeader('Content-Length', strlen($data));

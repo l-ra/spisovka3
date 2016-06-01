@@ -463,7 +463,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         }
 
         $message = new EpodatelnaMessage($epodatelna_id);
-        $filename = $message->getMessageSource($storage);
+        $filename = $message->getEmailFile($storage);
 
         $imap = new ImapClient();
         $imap->open($filename);
@@ -518,12 +518,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $DokumentFile = new DokumentPrilohy();
 
 //        $message = new EpodatelnaMessage($epodatelna_id);
-//        if ($message) {
-//            $FileModel = new FileModel();
-//            $file_info = $FileModel->select(array(array('real_name=%s', 'ep-isds-' . $epodatelna_id . '.zfo')))->fetch();
-//            if ($file_info) {
-//                $res = Epodatelna_DefaultPresenter::nactiISDS($this->storage, $file_info->id);
-//
+//        $zfo = $message->getZfoFile($storage);
+//        
 //                $data = array(
 //                    'filename' => 'datova_zprava_' . $message->isds_id . '.zfo',
 //                    'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
@@ -532,14 +528,12 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 //                        //'popis'=>'Emailová zpráva'
 //                );
 //
-//                if ($filep = $storage->uploadDocument($res, $data)) {
+//                if ($filep = $storage->uploadDocument($zfo, $data)) {
 //                    // zapiseme i do
 //                    $DokumentFile->pripojit($dokument_id, $filep->id);
 //                } else {
 //                    // false
 //                }
-//            }
-//        }
         // nahrani priloh
         if (!count($prilohy))
             return null;
