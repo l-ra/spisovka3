@@ -44,23 +44,16 @@ class SubjektyPresenter extends BasePresenter
             $filtr['dbID'] = $box;
             $prijemci = $isds->FindDataBoxEx($filtr);
             if (isset($prijemci->dbOwnerInfo)) {
-
                 $info = $prijemci->dbOwnerInfo[0];
-
-                /* echo "<pre>";
-                  print_r($info);
-                  echo "</pre>"; */
-
                 echo json_encode($info);
             } else {
                 echo json_encode(array("error" => $isds->error()));
             }
-
-            exit;
         } catch (Exception $e) {
             echo json_encode(array("error" => $e->getMessage()));
-            exit;
         }
+        
+        $this->terminate();
     }
 
     public function renderNovy()

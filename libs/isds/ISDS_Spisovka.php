@@ -3,8 +3,6 @@
 class ISDS_Spisovka extends ISDS
 {
 
-    private $config;
-
     public function __construct()
     {
         parent::__construct();
@@ -19,49 +17,30 @@ class ISDS_Spisovka extends ISDS
         return Settings::get('isds_allow_more_boxes', false);
     }
 
-    /* Vrati true nebo hodi vyjimku s popisem chyby */
-    /* Parametr je zrejme zbytecny. Zda se, ze organizace muze mit pouze jednu datovou schranku */
-
-    public function pripojit($params = null)
+    /** Vrati true nebo hodi vyjimku s popisem chyby */
+    public function pripojit()
     {
-
-        if (is_array($params) || $params instanceof \Nette\Utils\ArrayHash) {
-            // prime hodnoty
-            if (!isset($params['typ_pripojeni']))
-                throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
-
-            $config = $params;
-        } else if (is_object($params)) {
-            // prime hodnoty
-            if (!isset($params->typ_pripojeni))
-                throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
-
-            $config = $params->toArray();
-        } else {
-
-            $ep_config = (new Spisovka\ConfigEpodatelna())->get();
-            $ep_config = $ep_config['isds'];
-
-            if (is_numeric($params)) { // parametrem je index z nastaveni
-                if (!isset($ep_config[$params])) // existuje takove nastaveni?
-                    throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Neplatný parametr.");
-
-                $config = $ep_config[$params];
-            } else { // zadny parametr
-                // Toto nemusí fungovat s ArrayHashem
-                $config = current($ep_config);
-                if ($config === false) // existuje nejake nastaveni?
-                    throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka.");
-            }
-        }
+        $ep_config = (new Spisovka\ConfigEpodatelna())->get();
+        $ep_config = $ep_config['isds'];
+        $config = current($ep_config);
+        if ($config === false) // existuje nejake nastaveni?
+            throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka.");
 
         $isds_portaltype = ($config['test'] == 1) ? 0 : 1;
-        $this->config = $config;
 
-        if ($config['typ_pripojeni'] == 0) {
+        $individual_login = Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN,
+                        false);
+        if ($individual_login) {
+            $login = UserSettings::get('isds_login');
+            $password = UserSettings::get('isds_password');
+            if (!$login || !$password)
+                throw new Exception('Uživatel nemá vyplněny přihlašovací údaje do datové schránky.');
+            
+            $rcISDSBox = $this->ISDSBox($isds_portaltype, 0, $login, $password);
+        } else if ($config['typ_pripojeni'] == 0) {
             // jmenem a heslem
             $rcISDSBox = $this->ISDSBox($isds_portaltype, 0, $config['login'],
-                    $config['password'], "", "");
+                    $config['password']);
         } else if ($config['typ_pripojeni'] == 1) {
             // certifikatem
             if (file_exists($config['certifikat'])) {
@@ -204,9 +183,9 @@ class ISDS_Spisovka extends ISDS
             'dmAnnotation' => empty($zprava['anotace']) ? null : $zprava['anotace'],
             'dmLegalTitleLaw' => null,
             'dmLegalTitleYear' => null,
-            'dmLegalTitleSect' => null, 
-            'dmLegalTitlePar' => null, 
-            'dmLegalTitlePoint' => null, 
+            'dmLegalTitleSect' => null,
+            'dmLegalTitlePar' => null,
+            'dmLegalTitlePoint' => null,
             'dmPersonalDelivery' => null,
             'dmAllowSubstDelivery' => null
         );
@@ -271,11 +250,6 @@ class ISDS_Spisovka extends ISDS
             $this->debug_return('return', false, 1);
             return false;
         }
-    }
-
-    public function getConfig()
-    {
-        return $this->config;
     }
 
     private function unix2time($unixtime)
@@ -350,7 +324,7 @@ class ISDS_Spisovka extends ISDS
     }
 
     /**
-     * 
+     *
      * @param string $addr
      * @return array
      */

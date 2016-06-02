@@ -60,6 +60,15 @@
         {/if}
     </div>
 
+    <div class="detail_blok" n:if="Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)">
+        <div class="detail_hlavicka">Datová schránka</div>
+        {if $FormUpravit == 'datova_schranka'}
+        {control isdsBoxForm}
+        {else}
+            <p><a n:href="this, 'upravit' => 'datova_schranka'">Změnit přístupové údaje</a></p>
+        {/if}
+    </div>
+    
     <div class="detail_blok">
         <div class="detail_hlavicka">Nastavení upozornění</div>
         <p>Poznámka: Toto je pouze osobní nastavení. Administrátor může upozorňování globálně vypnout.</p>

@@ -4,7 +4,11 @@ use Spisovka\Form;
 
 class Admin_EpodatelnaPresenter extends BasePresenter
 {
-
+    /**
+     *  Klíč do globálního nastavení
+     */
+    const ISDS_INDIVIDUAL_LOGIN = 'isds_individual_login';
+    
     private $info;
 
     public function renderDefault()
@@ -156,12 +160,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
      */
     protected function createComponentNastavitISDSForm()
     {
-        $ep = self::nactiNastaveni();
-
-        $id = $this->getParameter('id', null);
-        $index = substr($id, 1);
-        $isds = !empty($id) ? $ep['isds'][$index] : array();
-
         $org_select = array('0' => 'Kterákoli podatelna');
         $OrgJednotky = new OrgJednotka();
         if ($orgjednotky_data = $OrgJednotky->seznam()->fetchAll())
@@ -176,32 +174,51 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $form1 = new Spisovka\Form();
         $form1->addHidden('index');
-
         $form1->addHidden('ep_typ')
                 ->setValue('i');
+
+        $form1->addGroup();
         $form1->addText('ucet', 'Název účtu:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
         $form1->addCheckbox('aktivni', ' aktivní účet?');
 
+        $form1->addRadioList('zpusob_prihlaseni', 'Způsob přihlášení:',
+                        ['společný přístup', 'každý uživatel má své přihlašovací údaje'])
+                ->setHtmlId('isds-form-zpusob-prihlaseni')
+                ->getControlPrototype()->onchange(
+                'var el = $("#isds-form-login-group");'
+                . '$("#isds-form-zpusob-prihlaseni-0").prop(\'checked\') ? el.show() : el.hide();');
+        $form1['zpusob_prihlaseni']->generateId = true;    // Nette 2.3
+
+        $group = $form1->addGroup();
+        $group->setOption('container', Nette\Utils\Html::el('div id=isds-form-login-group'));
+
         $form1->addSelect('typ_pripojeni', 'Typ přihlášení:', $connect_type);
 
-        $form1->addText('login', 'Přihlašovací jméno od ISDS:', 50, 100)
-                ->addRule(Nette\Forms\Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
+        $form1->addText('login', 'Přihlašovací jméno od ISDS:', 50, 100);
+        // ->addRule(Nette\Forms\Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
         $form1->addPassword('password', 'Přihlašovací heslo ISDS:', 50, 100);
-        // ->setValue($isds['password'])
-        // ->addRule(Form::FILLED, 'Přihlašovací heslo musí být vyplněno.');
 
         $form1->addUpload('certifikat_file', 'Cesta k certifikátu (formát X.509):');
         $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100);
 
+        $form1->addGroup();
         $form1->addSelect('test', 'Režim:',
                 ['0' => 'Reálný provoz (mojedatovaschranka.cz)',
             '1' => 'Testovací režim (czebox.cz)']
         );
-
         $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select);
 
-        if ($isds) {
+        $id = $this->getParameter('id');
+        if ($id !== null) {
+            $ep = self::nactiNastaveni();
+            $index = substr($id, 1);
+            $isds = $ep['isds'][$index];
+            $individual_login = Settings::get(self::ISDS_INDIVIDUAL_LOGIN, false);
+            if ($individual_login)
+                $group->getOption('container')->style('display: none');
+            $form1['zpusob_prihlaseni']->setValue((int) $individual_login);
+            
             $form1['index']->setValue($index);
             $form1['ucet']->setValue($isds['ucet']);
             $form1['aktivni']->setValue($isds['aktivni']);
@@ -217,6 +234,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
+
+        $renderer = $form1->getRenderer();
+        $renderer->wrappers['group']['container'] = null;
 
         return $form1;
     }
@@ -268,6 +288,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $config_data['isds'][$index]['ucet'] = $data['ucet'];
         $config_data['isds'][$index]['aktivni'] = $data['aktivni'];
+        $individual_login = (bool) $data['zpusob_prihlaseni'];
+        Settings::set(self::ISDS_INDIVIDUAL_LOGIN, $individual_login);
         $config_data['isds'][$index]['typ_pripojeni'] = $data['typ_pripojeni'];
         $config_data['isds'][$index]['login'] = $data['login'];
         if (!empty($data['password']))
@@ -281,29 +303,31 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $idbox = "";
         $vlastnik = "";
         $stav = "";
-        try {
-            $ISDS = new ISDS_Spisovka();
-            if ($ISDS->pripojit($config_data['isds'][$index])) {
-                $info = $ISDS->informaceDS();
-                if (!empty($info)) {
+        if (!$individual_login) {
+            try {
+                $ISDS = new ISDS_Spisovka();
+                if ($ISDS->pripojit()) {
+                    $info = $ISDS->informaceDS();
+                    if (!empty($info)) {
 
-                    $idbox = $info->dbID;
-                    if (empty($info->firmName)) {
-                        // jmeno prijmeni
-                        $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
-                    } else {
-                        // firma urad
-                        $vlastnik = $info->firmName . " [" . $info->dbType . "]";
+                        $idbox = $info->dbID;
+                        if (empty($info->firmName)) {
+                            // jmeno prijmeni
+                            $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
+                        } else {
+                            // firma urad
+                            $vlastnik = $info->firmName . " [" . $info->dbType . "]";
+                        }
+                        $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
+                        $stav_hesla = $ISDS->GetPasswordInfo();
                     }
-                    $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
-                    $stav_hesla = $ISDS->GetPasswordInfo();
+                } else {
+                    $this->flashMessage('Nelze se připojit k ISDS! Chyba: ' . $ISDS->error(),
+                            "warning");
                 }
-            } else {
-                $this->flashMessage('Nelze se připojit k ISDS! Chyba: ' . $ISDS->error(),
-                        "warning");
+            } catch (Exception $e) {
+                $this->flashMessage('Nelze se připojit k ISDS! ' . $e->getMessage(), "warning");
             }
-        } catch (Exception $e) {
-            $this->flashMessage('Nelze se připojit k ISDS! ' . $e->getMessage(), "warning");
         }
 
         $config_data['isds'][$index]['idbox'] = $idbox;
@@ -394,7 +418,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $stav = "";
             try {
                 $ISDS = new ISDS_Spisovka();
-                if ($ISDS->pripojit($config_data['isds'][$index])) {
+                if ($ISDS->pripojit()) {
 
                     // zmena hesla
                     if ($ISDS->ChangeISDSPassword($old_pass, $data['password'])) {
@@ -557,10 +581,10 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $index = substr($id, 1);
 
         $form1 = new Form();
-        
+
         $group = $form1->addGroup();
         $group->setOption('container', '');
-        
+
         $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue($typ);
@@ -574,16 +598,17 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addCheckbox('podepisovat', 'Elektronicky podepisovat:')
                 ->setHtmlId('odes-form-podepisovat')
                 ->getControlPrototype()->onchange(
-                        'var el = $("#odes-form-certificate-group");'
-                        . '$("#odes-form-podepisovat").prop("checked") ? el.show() : el.hide();');
+                'var el = $("#odes-form-certificate-group");'
+                . '$("#odes-form-podepisovat").prop("checked") ? el.show() : el.hide();');
 
         $group = $form1->addGroup();
-        $group->setOption('container', Nette\Utils\Html::el('div id=odes-form-certificate-group'));
-        
+        $group->setOption('container',
+                Nette\Utils\Html::el('div id=odes-form-certificate-group'));
+
         $form1->addUpload('cert_file', 'Soubor s certifikátem a klíčem ve formátu PKCS #12:');
         $form1->addText('cert_pass', 'Heslo k souboru:', 50, 100);
         $form1->setCurrentGroup(null);
-        
+
         $odes = $ep['odeslani'][$index];
         if ($odes) {
             $form1['index']->setValue($index);
@@ -600,7 +625,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-        
+
         return $form1;
     }
 
@@ -752,6 +777,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         // kvuli bugu v parse_ini_file()
         $i = reset($res->isds);
         $i->aktivni = (bool) $i->aktivni;
+
         foreach ($res->email as $e) {
             $e->aktivni = (bool) $e->aktivni;
             $e->only_signature = (bool) $e->only_signature;

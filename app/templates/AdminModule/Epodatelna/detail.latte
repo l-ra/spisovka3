@@ -71,26 +71,28 @@
             </div>        
 
         {else}
-            <dl>
-                <dt>ID datové schránky:</dt>
-                <dd>{$Info['idbox']}</dd>
-            </dl>
-            <dl>
-                <dt>Vlastník DS:</dt>
-                <dd>{$Info['vlastnik']}</dd>
-            </dl>
-            <dl>
-                <dt>Stav DS:</dt>
-                <dd>{$Info['stav']}</dd>
-            </dl>
-            <dl>
-                <dt>Přihlašovací jméno do ISDS:</dt>
-                <dd>{$Info['login']}</dd>
-            </dl>
-            <dl>
-                <dt>Informace o expiraci hesla:</dt>
-                <dd>{$Info['stav_hesla']}</dd>
-            </dl>
+            {if !Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
+                <dl>
+                    <dt>ID datové schránky:</dt>
+                    <dd>{$Info['idbox']}</dd>
+                </dl>
+                <dl>
+                    <dt>Vlastník DS:</dt>
+                    <dd>{$Info['vlastnik']}</dd>
+                </dl>
+                <dl>
+                    <dt>Stav DS:</dt>
+                    <dd>{$Info['stav']}</dd>
+                </dl>
+                <dl>
+                    <dt>Přihlašovací jméno do ISDS:</dt>
+                    <dd>{$Info['login']}</dd>
+                </dl>
+                <dl>
+                    <dt>Informace o expiraci hesla:</dt>
+                    <dd>{$Info['stav_hesla']}</dd>
+                </dl>
+            {/if}
             <dl>
                 <dt>Režim:</dt>
                 <dd>{if $Info['test']==1}Testovací režim (czebox.cz){else}Reálný provoz (mojedatovaschranka.cz){/if}</dd>

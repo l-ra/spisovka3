@@ -1,108 +1,110 @@
 {block title}Nastavení e-podatelny{/block}
 {block content}
 
-<h2>Datové schránky</h2>
+<h2>Datová schránka</h2>
 
-    <p n:if="$vice_datovych_schranek"><a href="{link novaschranka, 'typ' => 'i'}">Přidat schránku</a></p>
-    
-    {if count($n_isds)}
+<p n:if="$vice_datovych_schranek"><a href="{link novaschranka, 'typ' => 'i'}">Přidat schránku</a></p>
+
+{if count($n_isds)}
     {foreach $n_isds as $index => $isds}
-    <div class="detail_blok">
-        <dl>
-            <dt></dt>
-            <dd>
-                {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id' => 'i'.$index}">
-                {$isds['ucet']}
-            </a>{/access}
-            </dd>
-        </dl>
-        <dl>
-            <dt>ID datové schránky:</dt>
-            <dd>{$isds['idbox']}</dd>
-        </dl>
-        <dl>
-            <dt>Vlastník DS:</dt>
-            <dd>{$isds['vlastnik']}</dd>
-        </dl>
-        <dl>
-            <dt>Stav DS:</dt>
-            <dd>{$isds['stav']}</dd>
-        </dl>
-        <dl>
-            <dt>Podatelna pro příjem této DS:</dt>
-            <dd>{if empty($isds['podatelna'])}kterákoli{else}{=Orgjednotka::getName($isds['podatelna'])}{/if}</dd>
-        </dl>
-    </div>
+        <div class="detail_blok">
+            <dl>
+                <dt></dt>
+                <dd>
+                    {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id' => 'i'.$index}">
+                        {$isds['ucet']}
+                    </a>{/access}
+                </dd>
+            </dl>
+            {if !Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
+                <dl>
+                    <dt>ID datové schránky:</dt>
+                    <dd>{$isds['idbox']}</dd>
+                </dl>
+                <dl>
+                    <dt>Vlastník DS:</dt>
+                    <dd>{$isds['vlastnik']}</dd>
+                </dl>
+                <dl>
+                    <dt>Stav DS:</dt>
+                    <dd>{$isds['stav']}</dd>
+                </dl>
+            {/if}
+            <dl>
+                <dt>Podatelna pro příjem této DS:</dt>
+                <dd>{if empty($isds['podatelna'])}kterákoli{else}{=Orgjednotka::getName($isds['podatelna'])}{/if}</dd>
+            </dl>
+        </div>
     {/foreach}
-    {else}
+{else}
     <div class="prazdno">Nebyly nalezeny žádné účty datových schránek.</div>
-    {/if}
+{/if}
 
 
 <h2>Emailové schránky</h2>
 
-    <p><a href="{link novaschranka, 'typ'=>'e'}">Přidat schránku</a></p>
-    
-    {if count($n_email)>0}
+<p><a href="{link novaschranka, 'typ'=>'e'}">Přidat schránku</a></p>
+
+{if count($n_email)>0}
     {foreach $n_email as $index => $email}
-    <div class="detail_blok">
-        <dl>
-            <dt></dt>
-            <dd>
-                {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id'=>'e'.$index}">
-                {$email['ucet']}
-            </a>{/access}
-            </dd>
-        </dl>
-        <dl>
-            <dt>Server:</dt>
-            <dd>{$email['protokol']} - {$email['server']}:{$email['port']} / {$email['inbox']}</dd>
-        </dl>
-        <dl>
-            <dt>Příjem:</dt>
-            <dd>
-                {if $email['only_signature']==1}
-                    {if $email['qual_signature']==1}
-                    pouze zprávy s ověřeným kvalifikovaným podpisem
+        <div class="detail_blok">
+            <dl>
+                <dt></dt>
+                <dd>
+                    {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id'=>'e'.$index}">
+                        {$email['ucet']}
+                    </a>{/access}
+                </dd>
+            </dl>
+            <dl>
+                <dt>Server:</dt>
+                <dd>{$email['protokol']} - {$email['server']}:{$email['port']} / {$email['inbox']}</dd>
+            </dl>
+            <dl>
+                <dt>Příjem:</dt>
+                <dd>
+                    {if $email['only_signature']==1}
+                        {if $email['qual_signature']==1}
+                            pouze zprávy s ověřeným kvalifikovaným podpisem
+                        {else}
+                            pouze zprávy obsahující e-podpis (jakákoli certifikační autorita)
+                        {/if}
                     {else}
-                    pouze zprávy obsahující e-podpis (jakákoli certifikační autorita)
+                        jakékoli emailové zprávy
                     {/if}
-                {else}
-                jakékoli emailové zprávy
-                {/if}
-            </dd>
-        </dl>
-        <dl>
-            <dt>Podatelna pro příjem této schránky:</dt>
-            <dd>{if empty($email['podatelna'])}kterákoli{else}{=Orgjednotka::getName($email['podatelna'])}{/if}</dd>
-        </dl>
-    </div>
+                </dd>
+            </dl>
+            <dl>
+                <dt>Podatelna pro příjem této schránky:</dt>
+                <dd>{if empty($email['podatelna'])}kterákoli{else}{=Orgjednotka::getName($email['podatelna'])}{/if}</dd>
+            </dl>
+        </div>
     {/foreach}
-    {else}
+{else}
     <div class="prazdno">Nebyly nalezeny žádné účty emailových schránek.</div>
-    {/if}
+{/if}
 
 <h2>Odesílání přes email</h2>
 
-    {if count($n_odeslani)}
+{if count($n_odeslani)}
     {foreach $n_odeslani as $index => $odes}
-    <div class="detail_blok">
-        <dl>
-            <dt></dt>
-            <dd>
-                {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id' => "o$index"}">
-                {$odes['ucet']}
-            </a>{/access}
-            </dd>
-        </dl>
-        <dl>
-            <dt>E-mailová adresa odesilatele:</dt>
-            <dd>{$odes['email']}</dd><br />
-            <dt>Elektronicky podepisovat:</dt>
-            <dd>{$odes['podepisovat'] ? 'ano' : 'ne'}</dd>
-        </dl>
-    </div>
+        <div class="detail_blok">
+            <dl>
+                <dt></dt>
+                <dd>
+                    {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id' => "o$index"}">
+                        {$odes['ucet']}
+                    </a>{/access}
+                </dd>
+            </dl>
+            <dl>
+                <dt>E-mailová adresa odesilatele:</dt>
+                <dd>{$odes['email']}</dd><br />
+                <dt>Elektronicky podepisovat:</dt>
+                <dd>{$odes['podepisovat'] ? 'ano' : 'ne'}</dd>
+            </dl>
+        </div>
     {/foreach}
-    {else}
+{else}
     <div class="prazdno">Nebyly nalezeny žádné účty datových schránek</div>
-    {/if}
+{/if}

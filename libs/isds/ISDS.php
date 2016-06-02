@@ -48,7 +48,7 @@ class ISDS
      * @param string $certfilename  cesta k certifikatu
      * @param string $passphrase    heslo klice certifikatu
      */
-    public function ISDSBox($portalType, $type, $login, $password, $certfilename, $passphrase)
+    public function ISDSBox($portalType, $type, $login, $password, $certfilename = null, $passphrase = null)
     {
         $this->ValidLogin = false;
         $this->NullRetInfo();

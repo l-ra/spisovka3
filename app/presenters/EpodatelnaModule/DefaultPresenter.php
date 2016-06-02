@@ -159,22 +159,21 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         // kontrola ISDS
         $zkontroluj_isds = 1;
-        if (count($config_data['isds']) > 0 && $zkontroluj_isds == 1) {
-            foreach ($config_data['isds'] as $index => $isds_config) {
-                if ($isds_config['aktivni'] != 1)
-                    continue;
-                if ($isds_config['podatelna'] && !OrgJednotka::isInOrg($isds_config['podatelna']))
-                    continue;
-
-                $nalezena_aktivni_schranka = 1;
-                $zprava = $this->downloadISDS($isds_config);
-                echo "$zprava<br />";
+        if (count($config_data['isds']) > 0 && $zkontroluj_isds) {
+            $isds_config = reset($config_data['isds']);
+            if ($isds_config['aktivni'] == 1) {
+                if (!($isds_config['podatelna'] && !OrgJednotka::isInOrg($isds_config['podatelna']))) {
+                    $nalezena_aktivni_schranka = 1;
+                    $zprava = $this->downloadISDS();
+                    echo "$zprava<br />";
+                }
             }
         }
+        
         // kontrola emailu
         $zkontroluj_email = 1;
-        if (count($config_data['email']) > 0 && $zkontroluj_email == 1) {
-            foreach ($config_data['email'] as $index => $email_config) {
+        if (count($config_data['email']) > 0 && $zkontroluj_email) {
+            foreach ($config_data['email'] as $email_config) {
                 if ($email_config['aktivni'] != 1)
                     continue;
                 if ($email_config['podatelna'] && !OrgJednotka::isInOrg($email_config['podatelna']))
@@ -187,7 +186,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 else if ($result > 0) {
                     echo "Z emailové schránky \"" . $email_config['ucet'] . "\" bylo přijato $result nových zpráv.<br />";
                 } else {
-                    echo 'Z emailové schránky "' . $email_config['ucet'] . '" nebyly zjištěny žádné nové zprávy.<br />';
+                    echo 'V emailové schránce "' . $email_config['ucet'] . '" nebyly zjištěny žádné nové zprávy.<br />';
                 }
             }
         }
@@ -304,15 +303,14 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     }
 
     /**
-     * @param array    $ISDS_box
      * @return string  Zprava pro uzivatele
      */
-    protected function downloadISDS($ISDS_box)
+    protected function downloadISDS()
     {
         $isds = new ISDS_Spisovka();
 
         try {
-            $isds->pripojit($ISDS_box);
+            $isds->pripojit();
 
             $od = $this->Epodatelna->getLastISDS();
             $do = time() + 7200;
@@ -442,7 +440,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $zprava['predmet'] = $annotation;
                         $zprava['popis'] = $popis;
                         $zprava['odesilatel'] = $z->dmSender . ', ' . $z->dmSenderAddress;
-                        $zprava['adresat'] = $ISDS_box['ucet'] . ' [' . $ISDS_box['idbox'] . ']';
+                        $zprava['adresat'] = 'Datová schránka';
                         $zprava['prijato_dne'] = new DateTime();
                         $zprava['doruceno_dne'] = new DateTime($z->dmAcceptanceTime);
                         $zprava['user_id'] = $this->user->id;
@@ -526,11 +524,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     }
 
             if ($pocet_novych_zprav)
-                return "Z ISDS schránky \"{$ISDS_box['ucet']}\" bylo přijato $pocet_novych_zprav nových zpráv.";
+                return "Z datové schránky bylo přijato $pocet_novych_zprav nových zpráv.";
 
-            return "Z ISDS schránky \"{$ISDS_box['ucet']}\" nebyly zjištěny žádné nové zprávy.";
+            return "V datové schránce nebyly zjištěny žádné nové zprávy.";
         } catch (Exception $e) {
-            return "Při kontrole schránky \"{$ISDS_box['ucet']}\" došlo k chybě: " . $e->getMessage();
+            return "Při kontrole datové schránky došlo k chybě: " . $e->getMessage();
         }
     }
 

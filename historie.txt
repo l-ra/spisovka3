@@ -40,6 +40,10 @@ Nové funkce:
   a databázové dotazy
 
   V administraci:
+- přihlášení do datové schránky lze nastavit tak, aby každý oprávněný uživatel
+  měl svoje přihlašovací jméno a heslo do datové schránky. Uživatel tyto údaje
+  sám zadá v sekci, která se zobrazí po kliknutí na jméno uživatele v záhlaví
+  stránky.
 - je možné nastavit, zda si uživatelé mohou měnit svoje hesla
 - je možné nastavit, jak se má provést přesměrování po přihlášení, viz nápověda
 - je možné povolit předávání vyřízených dokumentů, viz nápověda

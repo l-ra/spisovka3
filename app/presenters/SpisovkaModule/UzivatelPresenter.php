@@ -334,7 +334,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     public function upravitNotificationsClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        // Ulozi hodnoty a vytvori dalsi verzi
         $data = $button->getForm()->getValues();
 
         Notifications::enableUserNotification(Notifications::RECEIVE_DOCUMENT,
@@ -344,4 +343,32 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $this->redirect('default');
     }
 
+    protected function createComponentIsdsBoxForm()
+    {
+        $form1 = new Spisovka\Form();
+
+        $form1->addText('login', 'Uživatelské jméno:')
+                ->setRequired()
+                ->setValue(UserSettings::get('isds_login'));
+        $form1->addPassword('password', 'Heslo:')
+                ->setRequired();
+
+        $form1->addSubmit('upravit', 'Upravit')
+                ->onClick[] = array($this, 'upravitIsdsBoxClicked');
+        $form1->addSubmit('storno', 'Zrušit')
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
+
+        return $form1;
+    }
+    
+    public function upravitIsdsBoxClicked(Nette\Forms\Controls\SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+        UserSettings::set('isds_login', $data->login);
+        UserSettings::set('isds_password', $data->password);
+        
+        $this->flashMessage('Nastavení bylo upraveno.');
+        $this->redirect('default');
+    }
 }
