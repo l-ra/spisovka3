@@ -61,7 +61,7 @@ class Admin_SupportPresenter extends BasePresenter
         echo "Konfigurace klienta:\n";
         echo "--------------------\n\n";
         $config = GlobalVariables::get('client_config');
-        print_r($config);
+        print_r($this->arrayConvertBool($config));
         echo "\n";
 
         echo "Konfigurace e-podatelny:\n";
@@ -73,7 +73,7 @@ class Admin_SupportPresenter extends BasePresenter
             unset($mailbox->password);
         foreach ($config->odeslani as &$mailbox)
             unset($mailbox->cert_pass);
-        print_r($config);
+        print_r($this->arrayConvertBool($config));
         echo "\n";
         
         echo "Konfigurace systému:\n";
@@ -82,7 +82,7 @@ class Admin_SupportPresenter extends BasePresenter
         unset($config['client_config']);  // toto jsme jiz zobrazili
         unset($config['database']['password']);
         unset($config['ldap']['search_password']);
-        print_r($config);
+        print_r($this->arrayConvertBool($config));
         echo "\n";
 
         echo "\n\n</pre>\n";
@@ -154,4 +154,17 @@ class Admin_SupportPresenter extends BasePresenter
         return array_reverse($text);
     }
 
+    protected function arrayConvertBool($array)
+    {
+        foreach ($array as &$value) {
+            if ($value === false)
+                $value = 'false';
+            else if ($value === true)
+                $value = 'true';
+            else if (is_array($value) || $value instanceof \ArrayAccess)
+                $value = $this->arrayConvertBool($value);
+        }
+        
+        return $array;
+    }
 }
