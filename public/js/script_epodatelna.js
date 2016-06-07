@@ -1,4 +1,4 @@
-/* global BASE_URL, PUBLIC_URL, linkNovySubjekt */
+/* global BASE_URL, PUBLIC_URL, linkNovySubjekt, kopirovatEmailDoPoznamky */
 
 $(function () {
 
@@ -54,7 +54,7 @@ zpravyNovySubjektOk = function (data) {
 
 renderEpodSubjekty = function (subjekt_id) {
 
-    url = BASE_URL + 'epodatelna/subjekty/nacti/' + subjekt_id;
+    var url = BASE_URL + 'epodatelna/subjekty/nacti/' + subjekt_id;
 
     $.get(url, function (subjekt) {
         if ($('#subjekty-table').length == 0) {
@@ -80,10 +80,9 @@ renderEpodSubjekty = function (subjekt_id) {
     return false;
 };
 
-epodSubjektVybran = function (elm, subjekt_id) {
+epodSubjektVybran = function (subjekt_id) {
 
     $('#dialog').dialog('close');
-    elm.href = "javaScript:void(0);"; // IE fix - zabraneni nacteni odkazu
     renderEpodSubjekty(subjekt_id);
 };
 
@@ -95,7 +94,7 @@ zkontrolovatSchranku = function (nacist_nove_zpravy) {
 
     $('#zkontrolovat_status').html('<img src="' + PUBLIC_URL + 'images/spinner.gif" width="14" height="14" /> Kontroluji schránky ...');
 
-    url = BASE_URL + 'epodatelna/default/zkontrolovat-ajax';
+    var url = BASE_URL + 'epodatelna/default/zkontrolovat-ajax';
 
     $.get(url, function (data) {
         $('#zkontrolovat_status').html(data);
@@ -398,7 +397,7 @@ generujZpravu = function (data) {
         }
     });
 
-    evidenceFormHandler = function () {
+    var evidenceFormHandler = function () {
 
         var formdata = 'id=' + id + '&' + $('#h_evidence').serialize();
 

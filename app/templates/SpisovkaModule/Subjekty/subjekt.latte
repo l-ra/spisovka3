@@ -12,7 +12,7 @@
     <td class="meta">
         <strong>
             {if $module == 'Epodatelna' && $presenter->view == 'vyber'}
-                <a href="#" onclick="epodSubjektVybran(this, {$subjekt->id}); return false;">{=Subjekt::displayName($subjekt, 'jmeno_item')}</a>
+                <a href="#" onclick="epodSubjektVybran({$subjekt->id}); return false;">{=Subjekt::displayName($subjekt, 'jmeno_item')}</a>
             {elseif $module == 'Admin'}
                 <a href="{link detail, id => $subjekt->id}" {if $subjekt->stav > 1}style="text-decoration:line-through;"{/if}>{=Subjekt::displayName($subjekt, 'jmeno_item')}</a>
             {else}
