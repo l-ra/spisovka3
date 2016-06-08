@@ -189,7 +189,7 @@ nactiZpravy = function () {
             select: function (event, ui) {
                 $(this).val('');
 
-                subjekt_seznam = '<input type="checkbox" name="subjekt[' + ui.item.id + ']" />';
+                var subjekt_seznam = '<input type="checkbox" name="subjekt[' + ui.item.id + ']" />';
                 subjekt_seznam = subjekt_seznam + ui.item.value + '<br/>';
                 $('#subjekt_seznam_' + $(this).data('id')).append(subjekt_seznam);
 
