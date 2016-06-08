@@ -151,6 +151,8 @@ E-podatelna:
 - hledání subjektu k datové zprávě hledá nejprve podle ID datové schránky.
   Teprve když není nalezen odpovídající subjekt, použije se hledání podle 
   názvu organizace a jména a příjmení.
+- přidána ochrana pro případ, kdy s e-podatelnou pracuje více zaměstnanců, aby
+  jedna zpráva nebyla zaevidována vícekrát
 - vytváření nového subjektu z e-mailu s diakritikou ve jménu odesilatele, který
   nebyl v kódování utf-8, mohlo v minulosti selhat
 - dokument přijatý datovou schránkou a odeslaný e-mailem se mohl tvářit

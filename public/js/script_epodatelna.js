@@ -47,7 +47,7 @@ zpravyNovySubjektOk = function (data) {
 
     var id = data.extra_data;
 
-    var checkbox = '<input type="checkbox" name="subjekt[' + id + '][' + data.id + ']" />';
+    var checkbox = '<input type="checkbox" name="subjekt[' + data.id + ']" />';
     checkbox += data.name + '<br/>';
     $('#subjekt_seznam_' + id).append(checkbox);
 };
@@ -112,6 +112,93 @@ zkontrolovatSchranku = function (nacist_nove_zpravy) {
 
 nactiZpravy = function () {
 
+    var attachHandlers = function () {
+
+        var loadAttachments = function () {
+            var anchor = $(this);
+            $.getJSON(this.href, function (attachments) {
+                var id = anchor.attr('id');
+                id = id.substring(3);
+                var url = BASE_URL + 'epodatelna/prilohy/download/' + id + '?file=';
+                var a = attachments;
+                var s = '';
+
+                for (var i = 0; i < a.length; i++) {
+                    s = s + '<li><a href="' + url + a[i].id + '">' + a[i].name
+                            + '</a>  (' + bytesToSize(a[i].size) + ')</li>';
+                }
+                anchor.replaceWith(s);
+            });
+            return false;
+        };
+
+        var submitHandler = function () {
+
+            var id = $(this).data('id');
+            var formdata = 'id=' + id + '&' + $('#form' + id).serialize();
+
+            $.post($('#h_evidence').data('action'), formdata, function (text) {
+                if (text[0] == "#") {
+                    text = text.substr(3);
+                    alert(text);
+                } else {
+                    text = '<div class="evidence_report">' + text + '</div>';
+                    $('#evidence_show_' + id).html(text);
+                }
+            });
+
+            return false;
+        };
+
+        var formSwitcher = function () {
+
+            var id = $(this).parent().data('id');
+            var value = $(this).val();
+
+            $('#evidence_form_evidovat_' + id).hide();
+            $('#evidence_form_jina_evidence_' + id).hide();
+            $('#evidence_form_odmitnout_' + id).hide();
+
+            if (value == 0) {
+            } else if (value == 1) {
+                $('#evidence_form_evidovat_' + id).show();
+            } else if (value == 2) {
+                $('#evidence_form_jina_evidence_' + id).show();
+            } else if (value == 3) {
+                $('#evidence_form_odmitnout_' + id).show();
+            }
+        };
+
+        $('a.load-attachments').click(loadAttachments);
+
+        $('input[type=submit]').click(submitHandler);
+
+        $("input[name^=volba_evidence]").click(formSwitcher);
+
+        $('.evidence_zprava_toggler').click(function () {
+            var id = $(this).data('id');
+            $('#evidence_zprava_' + id).toggle();
+        });
+
+        $('input[name=subjekt_autocomplete]').autocomplete({
+            minLength: 3,
+            source: BASE_URL + 'subjekty/seznam-ajax',
+            focus: function (event, ui) {
+                return false;
+            },
+            select: function (event, ui) {
+                $(this).val('');
+
+                subjekt_seznam = '<input type="checkbox" name="subjekt[' + ui.item.id + ']" />';
+                subjekt_seznam = subjekt_seznam + ui.item.value + '<br/>';
+                $('#subjekt_seznam_' + $(this).data('id')).append(subjekt_seznam);
+
+                return false;
+            }
+        });
+
+    };
+
     var url = BASE_URL + 'epodatelna/default/nacti-nove-ajax';
     $.getJSON(url, function (zpravy) {
         if (zpravy != '') {
@@ -119,51 +206,20 @@ nactiZpravy = function () {
             for (var i = 0; i < len; i++)
                 generujZpravu(zpravy[i]);
 
-            $('a.load-attachments').click(loadAttachments);
+            attachHandlers();
         }
     });
 };
 
-loadAttachments = function () {
-    var anchor = $(this);
-    $.getJSON(this.href, function (attachments) {
-        var id = anchor.attr('id');
-        id = id.substring(3);
-        var url = BASE_URL + 'epodatelna/prilohy/download/' + id + '?file=';
-        var a = attachments;
-        var s = '';
-
-        for (var i = 0; i < a.length; i++) {
-            s = s + '<li><a href="' + url + a[i].id + '">' + a[i].name
-                    + '</a>  (' + bytesToSize(a[i].size) + ')</li>';
-        }
-        anchor.replaceWith(s);
-    });
-    return false;
-};
-
-function in_array(needle, haystack)
-{
-    var key = '';
-
-    for (key in haystack) {
-        if (haystack[key] == needle) {
-            return true;
-        }
-    }
-    return false;
-}
-;
-
-function bytesToSize(bytes) {
+bytesToSize = function (bytes) {
     var sizes = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     if (bytes == 0)
         return 'n/a';
     var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
     var s = (bytes / Math.pow(1024, i)).toFixed(i > 1 ? 1 : 0);
     return s.replace('.', ',') + ' ' + sizes[i];
-}
-;
+};
+
 
 generujZpravu = function (data) {
 
@@ -177,19 +233,19 @@ generujZpravu = function (data) {
 
         form_odmitnout = '                    <dl>' +
                 '                        <dt></dt>' +
-                '                        <dd><input type="checkbox" name="odmitnout[' + id + ']" /> Poslat upozornění odesilateli?</dd>' +
+                '                        <dd><input type="checkbox" name="odmitnout" /> Poslat upozornění odesilateli?</dd>' +
                 '                    </dl>' +
                 '                    <dl>' +
                 '                        <dt>Email odesílatele:</dt>' +
-                '                        <dd><input type="text" name="zprava_email[' + id + ']" value="' + data['odesilatel'] + '" size="60" /></dd>' +
+                '                        <dd><input type="text" name="zprava_email" value="' + data['odesilatel'] + '" size="60" /></dd>' +
                 '                    </dl>' +
                 '                    <dl>' +
                 '                        <dt>Předmět pro odesílatele:</dt>' +
-                '                        <dd><input type="text" name="zprava_predmet[' + id + ']" value="RE: ' + data['predmet'] + '" size="60" /></dd>' +
+                '                        <dd><input type="text" name="zprava_predmet" value="RE: ' + data['predmet'] + '" size="60" /></dd>' +
                 '                    </dl>' +
                 '                    <dl>' +
                 '                        <dt>Zpráva pro odesilatele:</dt>' +
-                '                        <dd><textarea name="zprava_odmitnuti[' + id + ']" rows="3" cols="60"></textarea></dd>' +
+                '                        <dd><textarea name="zprava_odmitnuti" rows="3" cols="60"></textarea></dd>' +
                 '                    </dl>';
 
     } else if (data['typ'] == "I") {
@@ -214,12 +270,13 @@ generujZpravu = function (data) {
     var subjekt_seznam = '';
     if (typeof data['subjekt']['databaze'] != 'null') {
         for (var key in data['subjekt']['databaze']) {
-            subjekt_seznam = subjekt_seznam + '<input type="checkbox" name="subjekt[' + id + '][' + data['subjekt']['databaze'][key]['id'] + ']" />';
+            subjekt_seznam = subjekt_seznam + '<input type="checkbox" name="subjekt[' + data['subjekt']['databaze'][key]['id'] + ']" />';
             subjekt_seznam = subjekt_seznam + data['subjekt']['databaze'][key]['full_name'] + '<br/>';
         }
     }
 
-    var zprava = '   <div class="evidence_item"> ' +
+    var zprava = '<form id="form' + id + '">' +
+            '   <div class="evidence_item"> ' +
             '       <div class="evidence_item_header">' +
             '           ' + typ_string +
             '           <div class="evidence_item_cas">' +
@@ -232,15 +289,15 @@ generujZpravu = function (data) {
             '           <br class="clear" />' +
             '       </div>' +
             '       <div class="evidence_item_proccess" id="evidence_show_' + id + '">' +
-            '           <div class="evidence_volba">' +
+            '           <div class="evidence_volba" data-id="' + id + '">' +
             '                Volba evidence:<br />' +
-            '                <input type="radio" name="volba_evidence[' + id + ']" value="0" title="Tato zpráva zůstane nezpracována. Bude zpracována později." /> Nedělat nic<br/>' +
-            '                <input type="radio" name="volba_evidence[' + id + ']" value="1" title="Zaeviduje zprávu do spisové služby."/> Evidovat<br/>' +
-            '                <input type="radio" name="volba_evidence[' + id + ']" value="2" title="Zaeviduje zprávu do jiné evidence. Nebude součásti spisové služby."/> Evidovat do jiné evidence<br/>' +
-            '                <input type="radio" name="volba_evidence[' + id + ']" value="3" title="Zpráva bude odmítnuta."/> Odmítnout<br/>' +
+            '                <input type="radio" name="volba_evidence" value="0" title="Tato zpráva zůstane nezpracována. Bude zpracována později." /> Nedělat nic<br/>' +
+            '                <input type="radio" name="volba_evidence" value="1" title="Zaeviduje zprávu do spisové služby."/> Evidovat<br/>' +
+            '                <input type="radio" name="volba_evidence" value="2" title="Zaeviduje zprávu do jiné evidence. Nebude součásti spisové služby."/> Evidovat do jiné evidence<br/>' +
+            '                <input type="radio" name="volba_evidence" value="3" title="Zpráva bude odmítnuta."/> Odmítnout<br/>' +
             '            </div>' +
             '            <div class="evidence_form">' +
-            '                <div class="evidence_zprava_toogle" id="evidence_zprava_toogle_' + id + '">Zobrazit zprávu >></div>' +
+            '                <div class="evidence_zprava_toggler" data-id="' + id + '">Zobrazit zprávu >></div>' +
             '                <div class="evidence_zprava" id="evidence_zprava_' + id + '">' +
             data['popis'] +
             '                </div>' +
@@ -259,7 +316,7 @@ generujZpravu = function (data) {
             '                    <dl>' +
             '                        <dt>Hledat subjekt:</dt>' +
             '                        <dd class="ui-widget">' +
-            '                           <input type="text" name="subjekt_autocomplete[' + id + ']" id="subjekt_autocomplete_' + id + '" size="60" />' +
+            '                           <input type="text" name="subjekt_autocomplete" data-id="' + id + '" size="60" />' +
             '                        </dd>' +
             '                    </dl>' +
             '                    <dl id="subjekt_novy_' + id + '">' +
@@ -269,55 +326,55 @@ generujZpravu = function (data) {
             '                    <span>Zaevidovat do spisové služby.</span>' +
             '                    <dl>' +
             '                        <dt>Věc:</dt>' +
-            '                        <dd><input type="text" name="vec[' + id + ']" value="' + data['predmet'] + '" size="60" /></dd>' +
+            '                        <dd><input type="text" name="nazev" value="' + data['predmet'] + '" size="60" /></dd>' +
             '                    </dl>' +
             '                    <dl>' +
             '                        <dt>Popis:</dt>' +
-            '                        <dd><textarea name="popis[' + id + ']" rows="3" cols="60"></textarea></dd>' +
+            '                        <dd><textarea name="popis" rows="3" cols="60"></textarea></dd>' +
             '                    </dl>' +
             '                    <dl>' +
             '                        <dt>Poznámka:</dt>' +
-            '                        <dd><textarea name="poznamka[' + id + ']" rows="5" cols="60">' + '</textarea></dd>' +
+            '                        <dd><textarea name="poznamka" rows="5" cols="60">' + '</textarea></dd>' +
             '                    </dl>' +
             '                    <dl>' +
             '                        <dt>Předat:</dt>' +
             '                        <dd class="ui-widget">' +
-            '                           <input type="text" name="predat_autocomplete[' + id + ']" id="predat_autocomplete_' + id + '" size="60" />' +
-            '                           <input type="hidden" name="predat[' + id + ']" id="predat_' + id + '" />' +
+            '                           <input type="text" name="predat_autocomplete" id="predat_autocomplete_' + id + '" size="60" />' +
+            '                           <input type="hidden" name="predat" id="predat_' + id + '" />' +
             '                        </dd>' +
             '                    </dl>' +
             '                    <dl>' +
             '                        <dt>Poznámka k předání:</dt>' +
-            '                        <dd><textarea name="predat_poznamka[' + id + ']" rows="3" cols="60"></textarea></dd>' +
+            '                        <dd><textarea name="predani_poznamka" rows="3" cols="60"></textarea></dd>' +
             '                    </dl>' +
             '                    <dl>' +
             '                        <dt></dt>' +
-            '                        <dd><input type="submit" name="evidovat[' + id + ']" value="Zaevidovat tuto zprávu" id="submit_evidovat_' + id + '" /></dd>' +
+            '                        <dd><input type="submit" name="evidovat" value="Zaevidovat tuto zprávu" data-id="' + id + '" /></dd>' +
             '                    </dl>' +
             '                </div>' +
             '                <div id="evidence_form_jina_evidence_' + id + '">' +
             '                    <span>Zaevidovat zprávu do jiné evidence.</span>' +
             '                    <dl>' +
             '                        <dt>Evidence:</dt>' +
-            '                        <dd><textarea name="evidence[' + id + ']" rows="3" cols="60"></textarea></dd>' +
+            '                        <dd><textarea name="evidence" rows="3" cols="60"></textarea></dd>' +
             '                    </dl>' +
             '                    <dl>' +
             '                        <dt></dt>' +
-            '                        <dd><input type="submit" name="evidovat_jinam[' + id + ']" value="Zaevidovat tuto zprávu do jiné evidence" id="submit_evidovat_jinam_' + id + '" /></dd>' +
+            '                        <dd><input type="submit" name="evidovat_jinam" value="Zaevidovat tuto zprávu do jiné evidence" data-id="' + id + '" /></dd>' +
             '                    </dl>' +
             '                </div>' +
             '                <div id="evidence_form_odmitnout_' + id + '">' +
             '                    <span>Odmítnout zprávu.</span>' +
             '                    <dl>' +
             '                        <dt>Důvod odmítnutí:</dt>' +
-            '                        <dd><textarea name="duvod_odmitnuti[' + id + ']" rows="3" cols="60"></textarea></dd>' +
+            '                        <dd><textarea name="duvod_odmitnuti" rows="3" cols="60"></textarea></dd>' +
             '                    </dl>' +
             form_odmitnout +
             '                    <dl>' +
             '                        <dt></dt>' +
             '                        <dd>' +
-            '                           <input type="hidden" name="odmitnout_typ[' + id + ']" value="' + typ + '" />' +
-            '                           <input type="submit" name="odmitnout[' + id + ']" value="Odmítnout tuto zprávu" id="submit_odmitnout_' + id + '" />' +
+            '                           <input type="hidden" name="odmitnout_typ" value="' + typ + '" />' +
+            '                           <input type="submit" name="odmitnout" value="Odmítnout tuto zprávu" data-id="' + id + '" />' +
             '                        </dd>' +
             '                    </dl>' +
             '                </div>' +
@@ -325,11 +382,12 @@ generujZpravu = function (data) {
             '            <br class="clear" />' +
             '        </div>' +
             '        <br class="clear" />' +
-            '    </div>';
+            '    </div>' +
+            '</form>';
 
     $('#h_evidence').append(zprava);
     if (data.typ == 'I' || kopirovatEmailDoPoznamky)
-        $('textarea[name="poznamka[' + id + ']"]').html(data['popis']);
+        $('textarea[name="poznamka"]').html(data['popis']);
 
     $('#predat_autocomplete_' + id).autocomplete({
         minLength: 3,
@@ -342,23 +400,6 @@ generujZpravu = function (data) {
         }
     });
 
-    $('#subjekt_autocomplete_' + id).autocomplete({
-        minLength: 3,
-        source: BASE_URL + 'subjekty/seznam-ajax',
-        focus: function (event, ui) {
-            return false;
-        },
-        select: function (event, ui) {
-            //$('#subjekt_'+id).val(ui.item.id);
-            $('#subjekt_autocomplete_' + id).val('');
-
-            subjekt_seznam = '<input type="checkbox" name="subjekt[' + id + '][' + ui.item.id + ']" />';
-            subjekt_seznam = subjekt_seznam + ui.item.value + '<br/>';
-            $('#subjekt_seznam_' + id).append(subjekt_seznam);
-
-            return false;
-        }
-    });
 
     // $.parseJSON(postdata);
     var postdata = JSON.stringify(data['subjekt']['original']);
@@ -368,56 +409,10 @@ generujZpravu = function (data) {
         return false;
     }).attr('data-postdata', postdata);
 
-    $('#evidence_form_evidovat_' + id).css('display', 'none');
-    $('#evidence_form_jina_evidence_' + id).css('display', 'none');
-    $('#evidence_form_odmitnout_' + id).css('display', 'none');
-    $('#evidence_zprava_' + id).toggle();
-    $('#evidence_zprava_toogle_' + id).click(function () {
-        $('#evidence_zprava_' + id).toggle();
-    });
-
-    $("input[name^=volba_evidence]").click(function () {
-
-        var element_id = $(this).attr('name');
-        var value = $(this).val();
-        //the initial starting point of the substring is based on "myboxes["
-        var id = element_id.substring(15, element_id.length - 1);
-
-        $('#evidence_form_evidovat_' + id).css('display', 'none');
-        $('#evidence_form_jina_evidence_' + id).css('display', 'none');
-        $('#evidence_form_odmitnout_' + id).css('display', 'none');
-
-        if (value == 0) {
-        } else if (value == 1) {
-            $('#evidence_form_evidovat_' + id).css('display', 'block');
-        } else if (value == 2) {
-            $('#evidence_form_jina_evidence_' + id).css('display', 'block');
-        } else if (value == 3) {
-            $('#evidence_form_odmitnout_' + id).css('display', 'block');
-        }
-    });
-
-    var evidenceFormHandler = function () {
-
-        var formdata = 'id=' + id + '&' + $('#h_evidence').serialize();
-
-        $.post($('#h_evidence').attr('action'), formdata, function (text) {
-            if (text[0] == "#") {
-                text = text.substr(3);
-                alert(text);
-            } else {
-                $('#evidence_show_' + id).html(text);
-            }
-        });
-
-        return false;
-    };
-
-    $("#submit_evidovat_" + id).click(evidenceFormHandler);
-
-    // handler je totozny, jak v predeslem pripade
-    $("#submit_evidovat_jinam_" + id).click(evidenceFormHandler);
-
-    $("#submit_odmitnout_" + id).click(evidenceFormHandler);
+    $('#evidence_form_evidovat_' + id).hide();
+    $('#evidence_form_jina_evidence_' + id).hide();
+    $('#evidence_form_odmitnout_' + id).hide();
+    $('#evidence_zprava_' + id).hide();
 
 };
+
