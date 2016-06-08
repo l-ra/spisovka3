@@ -76,7 +76,6 @@ class ISDS_Spisovka extends ISDS
 
     public function informaceDS($idDS = null)
     {
-
         if ($idDS != null) {
             $Results = $this->FindDataBox($idDS, null, null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null,
@@ -98,7 +97,6 @@ class ISDS_Spisovka extends ISDS
 
     public function seznamPrichozichZprav($od = null, $do = null)
     {
-
         if ($od == null)
             $od = time() - (86400 * 90); // od poslednich 90 dni
         if ($do == null)
@@ -117,7 +115,6 @@ class ISDS_Spisovka extends ISDS
 
     function seznamOdeslanychZprav($od = null, $do = null)
     {
-
         if ($od == null)
             $od = time() - (86400 * 90);
         if ($do == null)
@@ -137,7 +134,6 @@ class ISDS_Spisovka extends ISDS
 
     public function prectiZpravu($id_zpravy)
     {
-
         $Message = $this->MessageDownload($id_zpravy);
         if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == "")) {
             return $Message;
@@ -148,7 +144,6 @@ class ISDS_Spisovka extends ISDS
 
     public function odeslatZpravu($zprava, $prilohy)
     {
-
         $this->NullRetInfo();
 
         $this->debug_function('odeslatZpravu');

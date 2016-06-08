@@ -69,8 +69,7 @@ class Storage_Basic extends FileModel
             }
         }
 
-        $filename = Nette\Utils\Strings::webalize($data['filename'], '.');
-        $filepath = $file_dir . "/" . $filename;
+        $filepath = $file_dir . "/" . Nette\Utils\Strings::webalize($data['filename'], '.');
         $filepath = $this->getUniqueFilename($filepath);
 
         if (!file_put_contents($filepath, $source)) {
@@ -79,9 +78,9 @@ class Storage_Basic extends FileModel
         }
 
         $row = array();
-        $row['nazev'] = empty($data['nazev']) ? $filename : $data['nazev'];
+        $row['nazev'] = empty($data['nazev']) ? $data['filename'] : $data['nazev'];
         $row['popis'] = empty($data['popis']) ? '' : $data['popis'];
-        $row['real_name'] = $filename;
+        $row['real_name'] = $data['filename'];
         $row['real_path'] = str_replace(CLIENT_DIR, '', $filepath);
         $row['md5_hash'] = md5_file($filepath);
         $row['size'] = filesize($filepath);

@@ -178,6 +178,7 @@ Spisová služba:
   chybu aplikace
 - max. velikost souboru pro nahrání k dokumentu program v určité konfiguraci 
   serveru zobrazoval nesprávně
+- nahrání souboru k dokumentu neuchovalo přesný původní název souboru
 - při vytváření nového dokumentu nebo odpovědi nyní tlačítko Zrušit smaže 
   rozepsaný dokument, takže uživatel nemusí při příštím vytváření dokumentu
   kliknout na "Vytvořit nový nerozepsaný dokument"
