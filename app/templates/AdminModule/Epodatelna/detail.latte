@@ -34,6 +34,26 @@
                     {/if}
                 </dd>
             </dl>
+            <script type="text/javascript">
+                function typPripojeniChanged(typ) {
+                    if (typ == 0) {
+                        $('input[name=certifikat_file]').parent().parent().hide();
+                        $('input[name=cert_pass]').parent().parent().hide();
+                        $('input[name=login]').parent().parent().show();
+                        $('input[name=password]').parent().parent().show();
+                    } else {
+                            $('input[name=certifikat_file]').parent().parent().show();
+                            $('input[name=cert_pass]').parent().parent().show();
+                            $('input[name=login]').parent().parent().hide();
+                            $('input[name=password]').parent().parent().hide();
+                        }
+                    }
+
+                    $('input[name=typ_pripojeni]').change(function () {
+                        typPripojeniChanged($(this).val());
+                    });
+                    typPripojeniChanged({$Info['typ_pripojeni']});
+            </script>
         {elseif ($FormHesloISDS=='1')}
             <dl>
                 <dt>ID datové schránky:</dt>
@@ -116,23 +136,23 @@
             {control nastavitEmailForm}
             <script type="text/javascript">
 
-                $('#frmnastavitEmailForm-typ').change(function () {
-                    value = $("#frmnastavitEmailForm-typ").val();
-                    port = $("#frmnastavitEmailForm-port");
-                    ssl = value.indexOf('/ssl') >= 0;
+                    $('#frmnastavitEmailForm-typ').change(function () {
+                        value = $("#frmnastavitEmailForm-typ").val();
+                        port = $("#frmnastavitEmailForm-port");
+                        ssl = value.indexOf('/ssl') >= 0;
 
-                    if (value.indexOf('/pop3') >= 0) {
-                        port.val(ssl ? 995 : 110);
-                    } else if (value.indexOf('/imap') >= 0) {
-                        port.val(ssl ? 993 : 143);
-                    }
-                })
-                $('#frmnastavitEmailForm-only_signature').change(function () {
-                    checkbox2 = $("#frmnastavitEmailForm-qual_signature");
-                    checkbox2.prop('disabled', !this.checked);
-                })
+                        if (value.indexOf('/pop3') >= 0) {
+                            port.val(ssl ? 995 : 110);
+                        } else if (value.indexOf('/imap') >= 0) {
+                            port.val(ssl ? 993 : 143);
+                        }
+                    });
+                    $('#frmnastavitEmailForm-only_signature').change(function () {
+                        checkbox2 = $("#frmnastavitEmailForm-qual_signature");
+                        checkbox2.prop('disabled', !this.checked);
+                    });
 
-                $("#frmnastavitEmailForm-qual_signature").prop('disabled', $('#frmnastavitEmailForm-only_signature').prop('checked') == false)
+                    $("#frmnastavitEmailForm-qual_signature").prop('disabled', $('#frmnastavitEmailForm-only_signature').prop('checked') == false)
 
             </script>    
         {else}
