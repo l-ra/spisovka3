@@ -58,38 +58,22 @@ class Install_DefaultPresenter extends BasePresenter
 
         // cURL supprot
         $curl_support = 0;
-        $curl_ssl = 0;
-        $curl_ssl_version = "";
         $curl_version = "";
         if (function_exists('curl_version')) {
             $curl_support = 1;
             $curli = curl_version();
-            if (isset($curli['version'])) {
+            if (isset($curli['version']))
                 $curl_version .= " libcurl " . $curli['version'] . "";
-            }
-            if (isset($curli['host'])) {
+            if (isset($curli['host']))
                 $curl_version .= " (" . $curli['host'] . ")";
-            }
-            if (isset($curli['ssl_version'])) {
-                $curl_ssl = 1;
-                $curl_ssl_version = $curli['ssl_version'];
-            }
+            if (isset($curli['ssl_version']))
+                $curl_version .= "\nSSL implementace: " . $curli['ssl_version'];
         }
 
-        // SOAP support
-        if (class_exists('SoapClient')) {
-            $soap_support = 1;
-        } else {
-            $soap_support = 0;
-        }
-
-        // MAIL support
-        if (function_exists('mail')) {
-            $mail_support = 1;
-        } else {
-            $mail_support = 0;
-        }
-
+        $soap_support = class_exists('SoapClient');
+        $mail_function = function_exists('mail');
+        $openssl_support = function_exists('openssl_pkcs7_verify');
+        
         // IMAP support
         $imap_support = 0;
         $imap_version = "";
@@ -105,12 +89,6 @@ class Install_DefaultPresenter extends BasePresenter
                 $imap_version .= ", Kerberos " . $phpinfo['imap']['Kerberos Support'];
         }
 
-        // OpenSSL support
-        if (function_exists('openssl_pkcs7_verify')) {
-            $openssl_support = 1;
-        } else {
-            $openssl_support = 0;
-        }
 
         // DB test
         try {
@@ -156,10 +134,18 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'Funkce mail()',
                 'required' => FALSE,
-                'passed' => $mail_support,
+                'passed' => $mail_function,
                 'message' => 'Ano',
                 'errorMessage' => 'Funkce mail() je zakázána.',
                 'description' => 'Je potřeba pro odesílání emailových zpráv.',
+            ),
+            array(
+                'title' => 'Nastavení allow_url_fopen',
+                'required' => FALSE,
+                'passed' => ini_get('allow_url_fopen'),
+                'message' => 'Povoleno',
+                'errorMessage' => 'Zakázáno.',
+                'description' => 'Povolte toho PHP nastavení nebo použijte rozšíření cURL.',
             ),
             array(
                 'title' => 'Rozšíření cURL',
@@ -167,24 +153,15 @@ class Install_DefaultPresenter extends BasePresenter
                 'passed' => $curl_support,
                 'message' => $curl_version,
                 'errorMessage' => 'Není zapnuto rozšíření cURL.',
-                'description' => 'Je vyžadováno pro komunikaci se systémy ISDS a ARES.',
-            ),
-            array(
-                'title' => 'Implementace cURL SSL',
-                'required' => FALSE,
-                'passed' => !empty($curl_ssl_version),
-                'message' => $curl_ssl_version,
-                'errorMessage' => ($curl_support == 1) ? 'Není možné použít cURL k zabezpečené komunikaci protokoly SSL/TLS'
-                            : '',
-                'description' => 'Pro komunikaci s ISDS je potřeba šifrovaného spojení.',
+                'description' => 'Aplikace pro komunikaci s jinými servery potřebuje buď knihovnu cURL nebo povolené nastavení "allow_url_fopen".',
             ),
             array(
                 'title' => 'Rozšíření SOAP',
                 'required' => FALSE,
                 'passed' => $soap_support,
                 'message' => 'Ano',
-                'errorMessage' => 'Není zapnuto rozšíření SOAP (SoapClient)',
-                'description' => 'Je potřeba pro komunikaci a práci s ISDS a CzechPoint.',
+                'errorMessage' => 'Není zapnuto rozšíření SOAP.',
+                'description' => 'Je potřeba pro komunikaci s datovou schránkou.',
             ),
             array(
                 'title' => 'Rozšíření OpenSSL',
@@ -192,7 +169,7 @@ class Install_DefaultPresenter extends BasePresenter
                 'passed' => $openssl_support,
                 'message' => 'Ano',
                 'errorMessage' => 'Není zapnuto rozšíření OpenSSL',
-                'description' => 'Je potřeba pro použití e-podatelny.',
+                'description' => 'Je potřeba pro elektronické podpisy u e-mailů a pro datovou schránku.',
             ),
             array(
                 'title' => 'Rozšíření IMAP',

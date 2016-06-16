@@ -32,21 +32,20 @@ class CRLParser extends DERParser
         }
     }
 
-    public function fromX509($cert)
-    {
-
-        if ($res = openssl_x509_read($cert)) {
-            $cert_info = openssl_x509_parse($res);
-            $uri_crl = explode("\n",
-                    str_replace("URI:", "", $cert_info['extensions']['crlDistributionPoints']));
-            $data = $this->sourceCRL($uri_crl[0]);
-            $der = $this->parse($data);
-            return $this->decode($der);
-        } else {
-            new Exception(openssl_error_string());
-            return null;
-        }
-    }
+//    public function fromX509($cert)
+//    {
+//        if ($res = openssl_x509_read($cert)) {
+//            $cert_info = openssl_x509_parse($res);
+//            $uri_crl = explode("\n",
+//                    str_replace("URI:", "", $cert_info['extensions']['crlDistributionPoints']));
+//            $data = $this->sourceCRL($uri_crl[0]);
+//            $der = $this->parse($data);
+//            return $this->decode($der);
+//        } else {
+//            new Exception(openssl_error_string());
+//            return null;
+//        }
+//    }
 
     public function fromUrl($url)
     {

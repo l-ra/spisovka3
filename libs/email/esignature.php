@@ -81,6 +81,13 @@ class esignature
      */
     public function verifySignature($filename)
     {
+        if (!function_exists('openssl_pkcs7_verify')) {
+            return array(
+                'ok' => false,
+                'message' => 'Chybí rozšíření openssl, není možné ověřit podpis.'
+            );
+        }
+
         $cainfo = $this->getCAList();
         $tmp_cert = tempnam(TEMP_DIR, "sender_certificate");
         $res = openssl_pkcs7_verify($filename, 0 /* PKCS7_NOVERIFY */, $tmp_cert, $cainfo);
