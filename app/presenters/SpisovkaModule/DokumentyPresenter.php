@@ -1938,7 +1938,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         try {
             $isds = new ISDS_Spisovka();
-            $isds->pripojit();
 
             $dmEnvelope = array(
                 "dbIDRecipient" => $adresat->id_isds,
@@ -1954,7 +1953,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $id_mess = $isds->odeslatZpravu($dmEnvelope, $prilohy);
             if (!$id_mess) {
-                $this->flashMessage('Chyba ISDS: ' . $isds->error(), 'warning_ext');
+                $this->flashMessage('Chyba ISDS: ' . $isds->GetStatusMessage(), 'warning_ext');
                 return false;
             }
 

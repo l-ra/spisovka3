@@ -38,16 +38,15 @@ class SubjektyPresenter extends BasePresenter
         if (is_null($box))
             exit;
 
-        $isds = new ISDS_Spisovka();
         try {
-            $isds->pripojit();
+            $isds = new ISDS_Spisovka();
             $filtr['dbID'] = $box;
             $prijemci = $isds->FindDataBoxEx($filtr);
             if (isset($prijemci->dbOwnerInfo)) {
                 $info = $prijemci->dbOwnerInfo[0];
                 echo json_encode($info);
             } else {
-                echo json_encode(array("error" => $isds->error()));
+                echo json_encode(array("error" => $isds->GetStatusMessage()));
             }
         } catch (Exception $e) {
             echo json_encode(array("error" => $e->getMessage()));

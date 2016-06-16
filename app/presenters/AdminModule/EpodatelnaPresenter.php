@@ -4,11 +4,12 @@ use Spisovka\Form;
 
 class Admin_EpodatelnaPresenter extends BasePresenter
 {
+
     /**
      *  Klíč do globálního nastavení
      */
     const ISDS_INDIVIDUAL_LOGIN = 'isds_individual_login';
-    
+
     private $info;
 
     public function renderDefault()
@@ -168,8 +169,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $connect_type = array(
             '0' => 'Základní (jménem a heslem)',
-            '1' => 'Spisovka (certifikátem)',
-            '2' => 'Hostovaná spisovka (certifikátem + jménem a heslem)'
+            '1' => 'Systémový certifikát'
         );
 
         $form1 = new Spisovka\Form();
@@ -193,14 +193,13 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $group = $form1->addGroup();
         $group->setOption('container', Nette\Utils\Html::el('div id=isds-form-login-group'));
 
-        $form1->addSelect('typ_pripojeni', 'Typ přihlášení:', $connect_type);
+        $form1->addRadioList('typ_pripojeni', 'Typ přihlášení:', $connect_type);
 
-        $form1->addText('login', 'Přihlašovací jméno od ISDS:', 50, 100);
-        // ->addRule(Nette\Forms\Form::FILLED, 'Přihlašovací jméno musí být vyplněno.');
-        $form1->addPassword('password', 'Přihlašovací heslo ISDS:', 50, 100);
+        $form1->addText('login', 'Uživatelské jméno:', 50, 100);
+        $form1->addPassword('password', 'Heslo:', 50, 100);
 
-        $form1->addUpload('certifikat_file', 'Cesta k certifikátu (formát X.509):');
-        $form1->addText('cert_pass', 'Heslo k klíči certifikátu:', 50, 100);
+        $form1->addUpload('certifikat_file', 'Soubor s certifikátem a klíčem (v PEM kódování):');
+        $form1->addText('cert_pass', 'Heslo k soukromému klíči (pokud je zašifrovaný):', 50, 100);
 
         $form1->addGroup();
         $form1->addSelect('test', 'Režim:',
@@ -218,11 +217,15 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             if ($individual_login)
                 $group->getOption('container')->style('display: none');
             $form1['zpusob_prihlaseni']->setValue((int) $individual_login);
-            
+
             $form1['index']->setValue($index);
             $form1['ucet']->setValue($isds['ucet']);
             $form1['aktivni']->setValue($isds['aktivni']);
-            $form1['typ_pripojeni']->setValue($isds['typ_pripojeni']);
+            try {
+                $form1['typ_pripojeni']->setValue($isds['typ_pripojeni']);
+            } catch (Exception $e) {
+                $e->getMessage();
+            }
             $form1['login']->setValue($isds['login']);
             $form1['cert_pass']->setValue($isds['cert_pass']);
             $form1['test']->setValue($isds['test']);
@@ -304,26 +307,25 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $vlastnik = "";
         $stav = "";
         if (!$individual_login) {
+            // Musime nejprve zadane udaje ulozit! Jinak se mohou zobrazovat zavadejici
+            // chybova hlaseni
+            self::ulozNastaveni($config_data);
+            
             try {
                 $ISDS = new ISDS_Spisovka();
-                if ($ISDS->pripojit()) {
-                    $info = $ISDS->informaceDS();
-                    if (!empty($info)) {
+                $info = $ISDS->GetOwnerInfoFromLogin();
+                if (!empty($info)) {
 
-                        $idbox = $info->dbID;
-                        if (empty($info->firmName)) {
-                            // jmeno prijmeni
-                            $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
-                        } else {
-                            // firma urad
-                            $vlastnik = $info->firmName . " [" . $info->dbType . "]";
-                        }
-                        $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
-                        $stav_hesla = $ISDS->GetPasswordInfo();
+                    $idbox = $info->dbID;
+                    if (empty($info->firmName)) {
+                        // jmeno prijmeni
+                        $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
+                    } else {
+                        // firma urad
+                        $vlastnik = $info->firmName . " [" . $info->dbType . "]";
                     }
-                } else {
-                    $this->flashMessage('Nelze se připojit k ISDS! Chyba: ' . $ISDS->error(),
-                            "warning");
+                    $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
+                    $stav_hesla = $ISDS->GetPasswordInfo();
                 }
             } catch (Exception $e) {
                 $this->flashMessage('Nelze se připojit k ISDS! ' . $e->getMessage(), "warning");
@@ -418,50 +420,42 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $stav = "";
             try {
                 $ISDS = new ISDS_Spisovka();
-                if ($ISDS->pripojit()) {
 
-                    // zmena hesla
-                    if ($ISDS->ChangeISDSPassword($old_pass, $data['password'])) {
-                        //if ( false ) {
+                // zmena hesla
+                if ($ISDS->ChangeISDSPassword($old_pass, $data['password'])) {
+                    //if ( false ) {
 
-                        $info = $ISDS->informaceDS();
-                        if (!empty($info)) {
+                    $info = $ISDS->GetOwnerInfoFromLogin();
+                    if (!empty($info)) {
 
-                            $idbox = $info->dbID;
-                            if (empty($info->firmName)) {
-                                // jmeno prijmeni
-                                $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
-                            } else {
-                                // firma urad
-                                $vlastnik = $info->firmName . " [" . $info->dbType . "]";
-                            }
-                            $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
-                            $stav_hesla = $ISDS->GetPasswordInfo();
+                        $idbox = $info->dbID;
+                        if (empty($info->firmName)) {
+                            // jmeno prijmeni
+                            $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
+                        } else {
+                            // firma urad
+                            $vlastnik = $info->firmName . " [" . $info->dbType . "]";
                         }
-
-                        $config_data['isds'][$index]['password'] = $data['password'];
-                        $config_data['isds'][$index]['idbox'] = $idbox;
-                        $config_data['isds'][$index]['vlastnik'] = $vlastnik;
-                        $config_data['isds'][$index]['stav'] = $stav;
-                        $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla)) ? "(bez omezení)"
-                                    : date("j.n.Y G:i", strtotime($stav_hesla));
-
-                        self::ulozNastaveni($config_data);
-
-                        $this->flashMessage('Heslo k datové schránky bylo úspěšně změněno.');
-                        $this->redirect(':Admin:Epodatelna:detail',
-                                array('id' => ('i' . $data['index'])));
-                    } else {
-                        $this->flashMessage('Heslo k datové schránky se nepodařilo změnit.',
-                                'warning');
-                        $this->flashMessage('Chyba ISDS: ' . $ISDS->error(), 'warning');
-                        //$this->redirect(':Admin:Epodatelna:detail',array('id'=>('i' . $data['index']),'zmenit_heslo_isds'=>'1' ));
+                        $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
+                        $stav_hesla = $ISDS->GetPasswordInfo();
                     }
-                } else {
-                    $this->flashMessage('Nelze se připojit k ISDS! Chyba: ' . $ISDS->error(),
-                            "warning");
+
+                    $config_data['isds'][$index]['password'] = $data['password'];
+                    $config_data['isds'][$index]['idbox'] = $idbox;
+                    $config_data['isds'][$index]['vlastnik'] = $vlastnik;
+                    $config_data['isds'][$index]['stav'] = $stav;
+                    $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla)) ? "(bez omezení)"
+                                : date("j.n.Y G:i", strtotime($stav_hesla));
+
+                    self::ulozNastaveni($config_data);
+
+                    $this->flashMessage('Heslo k datové schránky bylo úspěšně změněno.');
                     $this->redirect(':Admin:Epodatelna:detail',
                             array('id' => ('i' . $data['index'])));
+                } else {
+                    $this->flashMessage('Heslo k datové schránce se nepodařilo změnit.',
+                            'warning');
+                    $this->flashMessage('Chyba ISDS: ' . $ISDS->GetStatusMessage(), 'warning');
                 }
             } catch (Exception $e) {
                 $this->flashMessage('Při pokusu o změnu hesla došlo k chybě: ' . $e->getMessage(),

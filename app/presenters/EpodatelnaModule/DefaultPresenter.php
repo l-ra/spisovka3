@@ -307,10 +307,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
      */
     protected function downloadISDS()
     {
-        $isds = new ISDS_Spisovka();
-
         try {
-            $isds->pripojit();
+            $isds = new ISDS_Spisovka();
 
             $od = $this->Epodatelna->getLastISDS();
             $do = time() + 7200;
@@ -318,78 +316,15 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $UploadFile = $this->storage;
 
             $pocet_novych_zprav = 0;
-            $zpravy = $isds->seznamPrichozichZprav($od, $do);
+            $zpravy = $isds->seznamPrijatychZprav($od, $do);
 
             if ($zpravy)
                 foreach ($zpravy as $z)
                 // kontrola existence v epodatelny
                     if (!$this->Epodatelna->existuje($z->dmID, 'isds')) {
                         // nova zprava, ktera neni nahrana v epodatelne
-                        // [P.L.] - cache neni vubec funkcni, neukladaly se tam vysledky
-                        // $storage = new FileStorage(TEMP_DIR);
-                        // $cache = new Cache($storage); // nebo $cache = Environment::getCache()
-                        // if (isset($cache['zkontrolovat_isds_'.$z->dmID])):
-                        // $mess = $cache['zkontrolovat_isds_'.$z->dmID];
-                        // else:
-
-                        $mess = $isds->prectiZpravu($z->dmID);
-                        // endif;
-                        //echo "<pre>";
-                        /*
-                          dmDm = objekt
-                          dmDm->dmFiles
-                          dmHash = objekt
-                          dmQTimestamp = string
-                          dmDeliveryTime = 2010-05-11T12:24:13.242+02:00
-                          dmAcceptanceTime = 2010-05-11T12:26:53.899+02:00
-                          dmMessageStatus = 6
-                          dmAttachmentSize = 260
-
-                         */
-                        /* foreach( $mess->dmDm->dmFiles->dmFile[0] as $k => $m ) {
-
-                          if ( $k == 'dmEncodedContent' ) continue;
-                          if ( is_object($m) ) {
-                          echo $k ." = objekt\n";
-                          } else {
-                          echo $k ." = ". $m ."\n";
-                          }
-
-
-                          } */
-
-
-
-                        /*
-                          dmID = 342682
-                          dbIDSender = hjyaavk
-                          dmSender = Město Milotice
-                          dmSenderAddress = Kovářská 14/1, 37612 Milotice, CZ
-                          dmSenderType = 10
-                          dmRecipient = Společnost pro výzkum a podporu OpenSource
-                          dmRecipientAddress = 40501 Děčín, CZ
-                          dmAmbiguousRecipient =
-                          dmSenderOrgUnit =
-                          dmSenderOrgUnitNum =
-                          dbIDRecipient = pksakua
-                          dmRecipientOrgUnit =
-                          dmRecipientOrgUnitNum =
-                          dmToHands =
-                          dmAnnotation = Vaše datová zpráva byla přijata
-                          dmRecipientRefNumber = KAV-34/06-ŘKAV/2010
-                          dmSenderRefNumber = AB-44656
-                          dmRecipientIdent = 0.06.00
-                          dmSenderIdent = ZN-161
-                          dmLegalTitleLaw =
-                          dmLegalTitleYear =
-                          dmLegalTitleSect =
-                          dmLegalTitlePar =
-                          dmLegalTitlePoint =
-                          dmPersonalDelivery =
-                          dmAllowSubstDelivery =
-                          dmFiles = objekt
-                         */
-
+                        $mess = $isds->MessageDownload($z->dmID);
+                        
                         $annotation = empty($mess->dmDm->dmAnnotation) ? "(Datová zpráva č. " . $mess->dmDm->dmID . ")"
                                     : $mess->dmDm->dmAnnotation;
 
@@ -445,15 +380,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $zprava['doruceno_dne'] = new DateTime($z->dmAcceptanceTime);
                         $zprava['user_id'] = $this->user->id;
 
-                        /*
-                          dmEncodedContent = obsah
-                          dmMimeType = application/pdf
-                          dmFileMetaType = main
-                          dmFileGuid =
-                          dmUpFileGuid =
-                          dmFileDescr = odpoved_OVM.pdf
-                          dmFormat =
-                         */
                         $prilohy = array();
                         if (isset($mess->dmDm->dmFiles->dmFile)) {
                             foreach ($mess->dmDm->dmFiles->dmFile as $index => $file) {
@@ -679,14 +605,13 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $message = new EpodatelnaMessage($id);
         $zfo = $message->getZfoFile($this->storage);
         if ($zfo) {
-            $isds = new ISDS_Spisovka();
             try {
-                $isds->pripojit();
+                $isds = new ISDS_Spisovka();
                 if ($isds->AuthenticateMessage($zfo)) {
                     $output = "Datová zpráva je platná.";
                 } else {
                     $output = "Datová zpráva není platná!<br />" .
-                            'ISDS zpráva: ' . $isds->error();
+                            'ISDS zpráva: ' . $isds->GetStatusMessage();
                 }
             } catch (Exception $e) {
                 $output = "Nepodařilo se připojit k ISDS schránce!<br />" .

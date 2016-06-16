@@ -2,13 +2,6 @@
 
 class ISDS_Spisovka extends ISDS
 {
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->ssl_verify_peer = Settings::get('isds_ssl_verify_peer', true);
-    }
-
     /* Funkce vrati, zda povolit vice schranek v aplikaci.
       Pripraveno jako potencionalni moznost do budoucna. */
 
@@ -17,9 +10,10 @@ class ISDS_Spisovka extends ISDS
         return Settings::get('isds_allow_more_boxes', false);
     }
 
-    /** Vrati true nebo hodi vyjimku s popisem chyby */
-    public function pripojit()
+    public function __construct()
     {
+        $this->ssl_verify_peer = Settings::get('isds_ssl_verify_peer', true);
+
         $ep_config = (new Spisovka\ConfigEpodatelna())->get();
         $ep_config = $ep_config['isds'];
         $config = current($ep_config);
@@ -35,16 +29,15 @@ class ISDS_Spisovka extends ISDS
             $password = UserSettings::get('isds_password');
             if (!$login || !$password)
                 throw new Exception('Uživatel nemá vyplněny přihlašovací údaje do datové schránky.');
-            
-            $rcISDSBox = $this->ISDSBox($isds_portaltype, 0, $login, $password);
+
+            parent::__construct($isds_portaltype, 0, $login, $password);
         } else if ($config['typ_pripojeni'] == 0) {
             // jmenem a heslem
-            $rcISDSBox = $this->ISDSBox($isds_portaltype, 0, $config['login'],
-                    $config['password']);
+            parent::__construct($isds_portaltype, 0, $config['login'], $config['password']);
         } else if ($config['typ_pripojeni'] == 1) {
             // certifikatem
             if (file_exists($config['certifikat'])) {
-                $rcISDSBox = $this->ISDSBox($isds_portaltype, 1, "", "", $config['certifikat'],
+                parent::__construct($isds_portaltype, 1, "", "", $config['certifikat'],
                         $config['cert_pass']);
             } else {
                 // certifikat nenalezen
@@ -53,8 +46,8 @@ class ISDS_Spisovka extends ISDS
         } else if ($config['typ_pripojeni'] == 2) {
             // certifikatem + jmenem a heslem
             if (file_exists($config['certifikat'])) {
-                $rcISDSBox = $this->ISDSBox($isds_portaltype, 2, $config['login'],
-                        $config['password'], $config['certifikat'], $config['cert_pass']);
+                parent::__construct($isds_portaltype, 2, $config['login'], $config['password'],
+                        $config['certifikat'], $config['cert_pass']);
             } else {
                 // certifikat nenalezen
                 throw new Nette\FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
@@ -62,104 +55,37 @@ class ISDS_Spisovka extends ISDS
         } else
             throw new Exception("Chyba nastavení ISDS! - Nespecifikovaná chyba.");
 
-        if ($rcISDSBox)
-            return true;
-
-        if ($this->ErrorInfo == "Služba ISDS je momentálně nedostupná") {
-            throw new Exception("Server ISDS je dočasně nedostupný.<br />Omlouváme se všem uživatelům datových schránek za dočasné omezení přístupu do systému datových schránek z důvodu plánované údržby systému. Děkujeme za pochopení.");
-        } else if ($this->ErrorInfo == "Neplatné přihlašovací údaje!") {
-            throw new Exception("Neplatné přihlašovací údaje!");
-        } else {
-            throw new Exception("Chyba ISDS: " . $this->error());
-        }
+        return true;
     }
 
-    public function informaceDS($idDS = null)
+    public function seznamPrijatychZprav($od, $do)
     {
-        if ($idDS != null) {
-            $Results = $this->FindDataBox($idDS, null, null, null, null, null, null, null,
-                    null, null, null, null, null, null, null, null, null, null, null, null,
-                    null);
-            if (($this->StatusCode == "0000") && ($this->ErrorInfo == "")) {
-                return $Results->dbOwnerInfo[0];
-            } else {
-                return null;
-            }
-        } else {
-            $Result = $this->GetOwnerInfoFromLogin();
-            if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == "")) {
-                return $Result;
-            } else {
-                return null;
-            }
-        }
-    }
-
-    public function seznamPrichozichZprav($od = null, $do = null)
-    {
-        if ($od == null)
-            $od = time() - (86400 * 90); // od poslednich 90 dni
-        if ($do == null)
-            $do = time();
-        $od = $this->unix2time($od);
-        $do = $this->unix2time($do);
+        $od = date("c", $od);
+        $do = date("c", $do);
 
         $Records = $this->GetListOfReceivedMessages($od, $do, 0, 10000, 1023, null); // 1023
-
-        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == "") && isset($Records->dmRecord)) {
-            return $Records->dmRecord;
-        } else {
-            return null;
-        }
+        return $Records ? $Records->dmRecord : null;
     }
 
-    function seznamOdeslanychZprav($od = null, $do = null)
+    public function seznamOdeslanychZprav($od, $do)
     {
-        if ($od == null)
-            $od = time() - (86400 * 90);
-        if ($do == null)
-            $do = time();
-        $od = $this->unix2time($od);
-        $do = $this->unix2time($do);
+        $od = date("c", $od);
+        $do = date("c", $do);
 
         $Records = $this->GetListOfSentMessages($od, $do, 0, 10000, 1023, null);
-
-        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == "") && isset($Records->dmRecord)) {
-            return $Records->dmRecord;
-            //return $Records;
-        } else {
-            return null;
-        }
-    }
-
-    public function prectiZpravu($id_zpravy)
-    {
-        $Message = $this->MessageDownload($id_zpravy);
-        if (($this->StatusCode == "0000" || $this->StatusCode == "") && ($this->ErrorInfo == "")) {
-            return $Message;
-        } else {
-            return null;
-        }
+        return $Records ? $Records->dmRecord : null;
     }
 
     public function odeslatZpravu($zprava, $prilohy)
     {
-        $this->NullRetInfo();
-
-        $this->debug_function('odeslatZpravu');
-
         // je parametr platny
         if (empty($zprava)) {
-            $this->debug_return('error', 'Prázdný či neplatný parametr!');
-            $this->debug_return('return', false);
             throw new InvalidArgumentException("Prázdný či neplatný parametr!");
         }
 
         // Komu
         $komu = $zprava['dbIDRecipient']; // Identifikace adresata
         if (empty($komu)) {
-            $this->debug_return('error', 'Není k dispozici adresát!');
-            $this->debug_return('return', false);
             throw new InvalidArgumentException("Není k dispozici adresát!");
         }
 
@@ -196,9 +122,12 @@ class ISDS_Spisovka extends ISDS
                         $mime_type = $priloha->mime_type;
                     }
 
-                    // $metatype = FileModel::typPrilohy($priloha->typ);
-                    // $metatype = ( $metatype == 'main' ) ? 'main' : 'enclosure';
-                    $metatype = 'enclosure';
+                    // funkce pro odesílání do registru smluv
+                    if (in_array($priloha->real_name,
+                                    ['zverejneni.xml', 'modifikace.xml', 'pridani_prilohy.xml', 'znepristupneni.xml']))
+                        $metatype = 'main';
+                    else
+                        $metatype = 'enclosure';
 
                     $SentOutFiles->AddFileSpecFromFile(
                             $priloha->tmp_file, $mime_type, $metatype, $priloha->guid, "",
@@ -212,44 +141,18 @@ class ISDS_Spisovka extends ISDS
             $dmFiles = null;
         }
 
-
-        // Sestaveni zpravy
         $MessageCreateInput = array(
             'dmEnvelope' => $dmEnvelope,
             'dmFiles' => $dmFiles
         );
 
-        $this->debug_param('dmEnvelope', $MessageCreateInput['dmEnvelope']);
-        $this->debug_param('dmFiles', $MessageCreateInput['dmFiles']);
+        $MessageCreateOutput = $this->OperationsWS()->CreateMessage($MessageCreateInput);
 
-        try {
-            // odeslani zpravy a ziskani ID zpravy
-            $MessageCreateOutput = $this->OperationsWS()->CreateMessage($MessageCreateInput);
-            $messageStatus = $MessageCreateOutput->dmStatus;
-            $this->StatusCode = $messageStatus->dmStatusCode;
-            $this->StatusMessage = $messageStatus->dmStatusMessage;
-
-            if (isset($MessageCreateOutput->dmID)) {
-                $MessageID = $MessageCreateOutput->dmID;
-                $this->debug_return('return', $MessageID, 1);
-                return $MessageID;
-            } else {
-                $this->debug_return('error', "Datovou zprávu se nepodařilo odeslat");
-                $this->debug_return('return', false, 1);
-                return false;
-            }
-        } catch (Exception $e) {
-            $this->ErrorCode = $e->getCode();
-            $this->ErrorInfo = $e->getMessage();
-            $this->debug_return('error', "Datovou zprávu se nepodařilo odeslat");
-            $this->debug_return('return', false, 1);
-            return false;
+        if (isset($MessageCreateOutput->dmID)) {
+            $MessageID = $MessageCreateOutput->dmID;
+            return $MessageID;
         }
-    }
-
-    private function unix2time($unixtime)
-    {
-        return date("c", $unixtime);
+        return false;
     }
 
     public static function stavDS($dbState)
@@ -345,4 +248,61 @@ class ISDS_Spisovka extends ISDS
         return $ret;
     }
 
+    /**
+     * Vyhledani datove schranky
+     *
+     * dbOwnerInfo = array(
+     *       dbID, dbType, dbState,
+     *       pnFirstName, pnMiddleName, pnLastName, pnLastNameAtBirth,
+     *       ic, firmName,
+     *       biDate, biCity, biCounty, biState,
+     *       adCity, adStreet, adNumberInStreet, adNumberInMunicipality
+     *       adZipCode, adState, nationality,
+     *       email, telNumber
+     * )
+     *
+     * @param array     $filtr      pole obsahujici hodnoty dbOwnerInfo
+     * @return dbResults
+     *
+     */
+    public function FindDataBoxEx($filtr)
+    {
+        $OwnerInfo = array(
+            'dbID' => (!empty($filtr['dbID']) ? $filtr['dbID'] : null),
+            'dbType' => (!empty($filtr['dbType']) ? $filtr['dbType'] : null),
+            'dbState' => (!empty($filtr['dbState']) ? $filtr['dbState'] : null),
+            'ic' => (!empty($filtr['ic']) ? $filtr['ic'] : null),
+            'pnFirstName' => (!empty($filtr['pnFirstName']) ? $filtr['pnFirstName'] : null),
+            'pnMiddleName' => (!empty($filtr['pnMiddleName']) ? $filtr['pnMiddleName'] : null),
+            'pnLastName' => (!empty($filtr['pnLastName']) ? $filtr['pnLastName'] : null),
+            'pnLastNameAtBirth' => (!empty($filtr['pnLastNameAtBirth']) ? $filtr['pnLastNameAtBirth']
+                        : null),
+            'firmName' => (!empty($filtr['firmName']) ? $filtr['firmName'] : null),
+            'biDate' => (!empty($filtr['biDate']) ? $filtr['biDate'] : null),
+            'biCity' => (!empty($filtr['biCity']) ? $filtr['biCity'] : null),
+            'biCounty' => (!empty($filtr['biCounty']) ? $filtr['biCounty'] : null),
+            'biState' => (!empty($filtr['biState']) ? $filtr['biState'] : null),
+            'adCity' => (!empty($filtr['adCity']) ? $filtr['adCity'] : null),
+            'adStreet' => (!empty($filtr['adStreet']) ? $filtr['adStreet'] : null),
+            'adNumberInStreet' => (!empty($filtr['adNumberInStreet']) ? $filtr['adNumberInStreet']
+                        : null),
+            'adNumberInMunicipality' => (!empty($filtr['adNumberInMunicipality']) ? $filtr['adNumberInMunicipality']
+                        : null),
+            'adZipCode' => (!empty($filtr['adZipCode']) ? $filtr['adZipCode'] : null),
+            'adState' => (!empty($filtr['adState']) ? $filtr['adState'] : null),
+            'nationality' => (!empty($filtr['nationality']) ? $filtr['nationality'] : null),
+            'email' => (!empty($filtr['email']) ? $filtr['email'] : null),
+            'telNumber' => (!empty($filtr['telNumber']) ? $filtr['telNumber'] : null)
+        );
+
+        $FindInput = array('dbOwnerInfo' => $OwnerInfo);
+
+        $FindOutput = $this->ManipulationsWS()->FindDataBox($FindInput);
+        if (!empty($FindOutput->dbResults->dbOwnerInfo)) {
+            $FindOutput->dbResults->dbOwnerInfo = $this->PrepareArray($FindOutput->dbResults->dbOwnerInfo);
+            return $FindOutput->dbResults;
+        } else {
+            return null;
+        }
+    }
 }
