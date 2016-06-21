@@ -12,8 +12,12 @@ class ISDS_Spisovka extends ISDS
 
     public function __construct()
     {
+        // nastav parametry tridy ISDS
         $this->ssl_verify_peer = Settings::get('isds_ssl_verify_peer', true);
-
+        $log_level = Settings::get('isds_log_level', 0);
+        if ($log_level)
+            $this->logger = new ISDS_Logger($log_level);
+        
         $ep_config = (new Spisovka\ConfigEpodatelna())->get();
         $ep_config = $ep_config['isds'];
         $config = current($ep_config);
@@ -305,4 +309,5 @@ class ISDS_Spisovka extends ISDS
             return null;
         }
     }
+
 }

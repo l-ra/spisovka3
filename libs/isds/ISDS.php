@@ -12,10 +12,11 @@ class ISDS
     private $portal = 0; // 0 = czebox.cz, 1 = mojedatovaschranka.cz
     private $login_type = 0; // 0 = basic, 1 = systemovy certifikat
     private $soap_params = array();
-    protected $ssl_verify_peer = true;
     private $StatusCode;      // status operace vraceny ISDS
     private $StatusMessage;
-
+    private $operations_WS;
+    protected $ssl_verify_peer = true;
+    protected $logger = null;
 
     /**
      * @param int    $portalType    rezim pristupu k portalu (0 = czebox.cz, 1 = mojedatovaschranka.cz)
@@ -45,7 +46,7 @@ class ISDS
         $sslContext = stream_context_create($contextOptions);
 
         $params = array(
-            'trace' => true,
+            'trace' => false, // mame vlastni tridu pro ladeni
             'exceptions' => true,
             'user_agent' => $this->GetUserAgent(),
             'stream_context' => $sslContext
@@ -71,12 +72,16 @@ class ISDS
      * Web services 
      * ************************************************************************ */
 
-    protected function GetSoapClient($wdsl)
+    protected function GetSoapClient($wsdl)
     {
         $params = $this->soap_params;
-        $params['location'] = $this->GetServiceURL($wdsl);
+        $params['location'] = $this->GetServiceURL($wsdl);
 
-        $client = new SoapClient($this->GetServiceWSDL($wdsl), $params);
+        if ($this->logger)
+            $client = new DebugSoapClient($this->GetServiceWSDL($wsdl), $params, $this->logger);
+        else
+            $client = new SoapClient($this->GetServiceWSDL($wsdl), $params);
+
         return $client;
     }
 
@@ -88,7 +93,9 @@ class ISDS
      */
     protected function OperationsWS()
     {
-        return $this->GetSoapClient('operations');
+        if (!$this->operations_WS)
+            $this->operations_WS = $this->GetSoapClient('operations');
+        return $this->operations_WS;
     }
 
     /**
@@ -952,14 +959,54 @@ class ISDS
 //        return $response;
 //    }
 //
-//    public function userAgent()
-//    {
-//        $app_info = new VersionInformation();
-//        $user_agent = "OSS Spisova sluzba v" . $app_info->version;
-//        return $user_agent;
-//    }
-//
 //}
+
+class DebugSoapClient extends SoapClient
+{
+
+    private $logger;
+
+    public function __construct($wsdl, $options, $logger)
+    {
+        $this->logger = $logger;
+        $out = "SOAP Client: $wsdl\n------------\n";
+        $this->logger->log($out);
+        
+        parent::__construct($wsdl, $options);
+    }
+
+    public function __doRequest($request, $location, $action, $version, $one_way = 0)
+    {
+        $time = date(DATE_ATOM);
+        $out = "\nSOAP Request\n------------\n"
+                . "Time: $time\nLocation: $location\nAction: $action\n";
+        $this->logger->log($out);
+
+        $response = parent::__doRequest($request, $location, $action, $version, $one_way);
+
+        $type = gettype($response);
+        $result = $type;
+        if ($type == 'string')
+            $result .= ", length = " . strlen($response);
+        $out = "Result: $result\n";
+        $this->logger->log($out);
+        
+        $this->logger->log($response, 3);
+        $this->logger->log("\n\n");
+        
+        return $response;
+    }
+
+    public function __call($function_name, $arguments)
+    {
+        $out = "SOAP Call: $function_name\n----------\n";
+        $this->logger->log($out);
+        $this->logger->log(print_r($arguments[0], true), 2);
+        
+        return parent::__soapCall($function_name, $arguments);
+    }
+
+}
 
 /**
  * Trida pouzita pro pridavani souboru do odesilane zpravy

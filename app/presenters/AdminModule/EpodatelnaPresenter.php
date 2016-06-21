@@ -207,6 +207,9 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             '1' => 'Testovací režim (czebox.cz)']
         );
         $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select);
+        $form1->addSelect('log_level', 'Úroveň protokolování:', [
+            'vypnuto', 'stručné', '+ vstupní parametry', '+ odpovědi serveru'
+        ]);
 
         $id = $this->getParameter('id');
         if ($id !== null) {
@@ -230,6 +233,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $form1['cert_pass']->setValue($isds['cert_pass']);
             $form1['test']->setValue($isds['test']);
             $form1['podatelna']->setValue($isds['podatelna']);
+            $form1['log_level']->setValue(Settings::get('isds_log_level', 0));
         }
 
         $form1->addSubmit('upravit', 'Uložit')
@@ -302,7 +306,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $config_data['isds'][$index]['cert_pass'] = $data['cert_pass'];
         $config_data['isds'][$index]['test'] = $data['test'];
         $config_data['isds'][$index]['podatelna'] = $data['podatelna'];
-
+        Settings::set('isds_log_level', intval($data['log_level']));
+        
         $idbox = "";
         $vlastnik = "";
         $stav = "";
