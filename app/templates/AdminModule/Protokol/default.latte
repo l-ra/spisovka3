@@ -1,24 +1,25 @@
 {block title}Transakční protokoly{/block}
-{block content}
-    <div class="navigate">
-    Transakční protokoly
+{define #protokol}                
+<div class="protokol">
+    <div class="icon">
+        <img src="{$publicUrl}images/icons/ciselnik.png" alt="ciselnik.png" title="číselník" width="32" height="32" />
     </div>
+    <div>
+        <div class="link"><a href="{link $view}">{$title}</a></div><br />
+        <div class="desc">{$description}&nbsp;</div>
+    </div>
+</div>    
+{/define}
 
-    <h2>Transakční protokoly</h2>
+{block content}
+<div class="navigate">
+    Transakční protokoly
+</div>
 
-    <table class="ciselnik_seznam">
-        <tr>
-            <td class="icon">
-                <img src="{$publicUrl}images/icons/ciselnik.png" alt="ciselnik.png" title="číselník" width="32" height="32" />
-            </td>
-            <td class="meta">
-                <a href="{link :Admin:Protokol:prihlaseni}">Přístupy uživatelů</a>
-                <div class="popis">
-                    protokol přístupu uživatelů do systému
-                </div>
-            </td>
-        </tr>
+<h2>Transakční protokoly</h2>
 
+{include #protokol, view => 'prihlaseni', title => 'Přístupy uživatelů', 
+description => 'protokol přístupu uživatelů do systému'}
 
-
-    </table>
+{include #protokol, view => 'isds', title => 'Datová schránka', 
+description => 'protokol komunikace s datovou schránkou'}

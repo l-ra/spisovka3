@@ -99,6 +99,20 @@ table.ciselnik_seznam .meta div {
     margin: 5px 0px;
 }
 
+.protokol {
+    margin: 20px;
+}
+.protokol div {
+    display: inline-block;
+}
+.protokol .link {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.protokol .icon {
+    margin-right: 15px;
+}
+
 
 /* ***************************************************************** */
 /* *** USER SYNCH *** */
