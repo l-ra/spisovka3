@@ -44,6 +44,10 @@ Nové funkce:
   měl svoje přihlašovací jméno a heslo do datové schránky. Uživatel tyto údaje
   sám zadá v sekci, která se zobrazí po kliknutí na jméno uživatele v záhlaví
   stránky.
+- opraveno přihlášení do datové schránky certifikátem, nyní je možné použít
+  systémový certifikát (stále ale tato možnost vyžaduje nastavení odborníkem)
+- je možné jednoduše protokolovat komunikaci s datovou schránkou, aniž by bylo
+  potřeba měnit kód aplikace jako v minulosti
 - je možné nastavit, zda si uživatelé mohou měnit svoje hesla
 - je možné nastavit, jak se má provést přesměrování po přihlášení, viz nápověda
 - je možné povolit předávání vyřízených dokumentů, viz nápověda
@@ -78,6 +82,11 @@ Jiné změny:
   e-mailové části e-podatelny. Aplikace zvládá větší velikost e-mailových zpráv
   a zpracování je až několikanásobně rychlejší. (Přesto použití příloh o veli-
   kosti desítek MB nedoporučujeme.)
+- přepsání kódu knihovny pro práci s datovou schránkou. Dříve se aplikace 
+  do datové schránky připojovala dvěmi různými knihovnami, nyní pouze jednou.
+  Daň za toto je téměř nulová možnost jednoduše diagnostikovat příčinu, pokud se
+  připojení do datové schránky nepovede (uživatel dostane pouze zprávu "could
+  not connect to host").
 - zformátování PHP kódu aplikace pro mnohem lepší přehlednost
   (ocení programátoři)
 - nová funkce pro vývojáře pro základní automatické testování aplikace
