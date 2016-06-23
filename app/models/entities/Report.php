@@ -4,7 +4,7 @@
  * @author Pavel Lastovicka
  * @created 02-IX-2014 12:28:36
  */
-class Sestava extends DBEntity
+class Report extends DBEntity
 {
 
     const TBL_NAME = 'sestava';

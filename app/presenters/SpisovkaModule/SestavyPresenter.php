@@ -56,7 +56,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     protected function isUserAllowed()
     {
-        return Sestava::isUserAllowed();
+        return Report::isUserAllowed();
     }
 
     public function renderDefault()
@@ -67,9 +67,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
-        $paginator->itemCount = Sestava::getCount();
+        $paginator->itemCount = Report::getCount();
 
-        $seznam = Sestava::getAll(array('offset' => $paginator->offset,
+        $seznam = Report::getAll(array('offset' => $paginator->offset,
                     'limit' => $paginator->itemsPerPage,
                     'order' => array('typ' => 'DESC', 'nazev')));
         $this->template->sestavy = $seznam;
@@ -96,7 +96,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         $Dokument = new Dokument();
 
-        $sestava = new Sestava($this->getParameter('id'));
+        $sestava = new Report($this->getParameter('id'));
         $this->template->Sestava = $sestava;
 
         $this->template->pdf = $pdf;
@@ -318,7 +318,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function renderUpravit($id)
     {
-        $sestava = new Sestava($id);
+        $sestava = new Report($id);
         $this->template->sestava = $sestava;
 
         if (!$sestava->isModifiable()) {
@@ -527,7 +527,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $sestava_data = $this->handleSubmit($form, $data);
 
         try {
-            Sestava::create($sestava_data);
+            Report::create($sestava_data);
 
             $this->flashMessage('Sestava "' . $sestava_data['nazev'] . '" byla vytvořena.');
             $this->redirect(':Spisovka:Sestavy:default');
@@ -683,7 +683,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $sestava_data = $this->handleSubmit($form, $data);
 
         try {
-            $sestava = new Sestava($id);
+            $sestava = new Report($id);
             $sestava->modify($sestava_data);
             $sestava->save();
 
@@ -704,7 +704,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
 
     public function actionSmazat()
     {
-        $s = new Sestava($this->getParameter('id'));
+        $s = new Report($this->getParameter('id'));
 
         try {
             $s->delete();
