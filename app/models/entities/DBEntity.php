@@ -20,18 +20,13 @@ abstract class DBEntity
     /**
      * @param id    int
      */
-    public function __construct($param)
+    public function __construct($id)
     {
-        if (!is_integer($param))
-            if (!is_string($param) || !ctype_digit($param) || $param == 0)
+        if (!is_integer($id))
+            if (!is_string($id) || !ctype_digit($id) || $id == 0)
                 throw new InvalidArgumentException(__METHOD__ . "() - neplatný parametr");
 
-        $this->id = (int) $param;
-    }
-
-    private function _errorStr($method, $message)
-    {
-        return "$method() - entita $message";
+        $this->id = (int) $id;
     }
 
     protected function _load()

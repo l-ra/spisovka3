@@ -6,6 +6,9 @@ class Workflow extends BaseModel
     protected $name = 'workflow';
     protected $primary = 'id';
 
+    const STAV_VYRIZUJE_SE = 3;
+    const STAV_VYRIZEN_NESPUSTENA = 4;
+    const STAV_VYRIZEN_SPUSTENA = 5;
     const STAV_PREDAN_DO_SPISOVNY = 6;
     const STAV_VE_SPISOVNE = 7;
     const STAV_ZAPUJCEN = 11;

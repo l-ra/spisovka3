@@ -26,6 +26,7 @@ class LogModel extends BaseModel
     const DOK_PREDANI_ZRUSENO = 108;
     const DOK_PREVZETI_ODMITNUTO = 109;
     const DOK_SPISOVNA_VRACEN = 110;
+    const DOK_ZNOVU_OTEVREN = 111;
     const SUBJEKT_VYTVOREN = 21;
     const SUBJEKT_ZMENEN = 22;
     const SUBJEKT_SMAZAN = 23;
@@ -74,6 +75,7 @@ class LogModel extends BaseModel
         '108' => 'Předání zrušeno',
         '109' => 'Převzetí odmítnuto',
         self::DOK_SPISOVNA_VRACEN => 'Dokument vrácen ze spisovny',
+        self::DOK_ZNOVU_OTEVREN => 'Dokument znovu otevřen',
         '21' => 'Vytvořen nový subjekt',
         '22' => 'Subjekt změněn',
         '23' => 'Subjekt smazán',
@@ -105,12 +107,12 @@ class LogModel extends BaseModel
      * Logovani aktivity dokumentu
      */
 
-    public function logDokument($dokument_id, $typ, $poznamka = null)
+    public function logDokument($dokument_id, $event, $poznamka = null)
     {
 
         $row = array();
         $row['dokument_id'] = (int) $dokument_id;
-        $row['typ'] = $typ;
+        $row['typ'] = $event;
         $row['poznamka'] = $poznamka;
 
         $row['user_id'] = self::getUser()->id;

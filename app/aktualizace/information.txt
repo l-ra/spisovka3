@@ -99,3 +99,5 @@ Nový flag "vynutit odhlášení" u uživatelského účtu
 Nastavení provedení upgrade procedury při spuštění programu
 [1200]
 Oprava prohozeného adresáta a odesilatele v databázi u odchozích zpráv
+[1250]
+Nové oprávnění pro otevření uzavřeného dokumentu

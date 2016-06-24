@@ -183,10 +183,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
             if ($isVedouci) {
                 // Uzivatel muze byt vedoucim jenom jednoho utvaru
-                $id = OrgJednotka::dejOrgUzivatele();
+                $org_id = OrgJednotka::dejOrgUzivatele();
                 $povoleneOrgJednotky = array();
-                if ($id)
-                    $povoleneOrgJednotky = OrgJednotka::childOrg($id);
+                if ($org_id)
+                    $povoleneOrgJednotky = OrgJednotka::childOrg($org_id);
 
                 if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky) || in_array(@$dokument->predano->orgjednotka_id,
                                 $povoleneOrgJednotky)) {
@@ -254,6 +254,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $lzePredatVyrizeneDokumenty = Settings::get('spisovka_allow_forward_finished_documents',
                             false);
             $this->template->LzePredatDokument = $this->template->Pridelen && ($dokument->stav_dokumentu <= 3 || $lzePredatVyrizeneDokumenty);
+
+            $doc = new Document($id);
+            $this->template->LzeZnovuOtevrit = $doc->canUserReopen();
 
             $this->template->FormUpravit = $this->template->AccessEdit ? $upravit : null;
 
@@ -2001,7 +2004,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dt_doruceni = strtotime($mess->dmAcceptanceTime);
             $popis .= "Datum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
             if ($dt_doruceni == 0) {
-                $popis .= "Datum a čas doručení : (příjemce zprávu zatím nepřijal)\n"; 
+                $popis .= "Datum a čas doručení : (příjemce zprávu zatím nepřijal)\n";
             } else {
                 $popis .= "Datum a čas doručení : " . date("j.n.Y G:i:s", $dt_doruceni) . "\n";
             }
@@ -2266,6 +2269,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         UserSettings::set('spisovka_dokumenty_seradit', $form_data['seradit']);
         $this->redirect('default');
+    }
+
+    public function actionZnovuOtevrit($id)
+    {
+        try {
+            $doc = new Document($id);
+            $doc->reopen();
+            $this->flashMessage('Dokument byl otevřen.');
+        } catch (Exception $e) {
+            $this->flashMessage($e->getMessage(), 'warning');
+        }
+        $this->redirect('detail', $id);
     }
 
 }

@@ -69,6 +69,7 @@
     {/if}{* $AccessEdit *}
     <a href="{link this, 'udalost' => 1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
     <a href="{link predatDoSpisovny, 'id' => $Dok->id}" n:if="$Dok->stav_dokumentu == 5">Předat do spisovny</a>
+    <a href="{link znovuOtevrit, $Dok->id}" n:if="$LzeZnovuOtevrit">Znovu otevřít</a>
     <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}" n:if="$Zapujcka">Vrátit dokument</a>
 </div>
 
