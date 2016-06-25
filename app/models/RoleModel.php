@@ -3,7 +3,7 @@
 class RoleModel extends TreeModel
 {
 
-    protected $name = 'user_role';
+    protected $name = 'acl_role';
     protected $column_name = 'name';
     protected $column_ordering = 'code';
 

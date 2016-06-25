@@ -555,11 +555,11 @@ if (!isset($_SESSION['S3_orgjednotka'])) {
         if (MIGRACE)
             $S3->query('TRUNCATE TABLE ' . S3_ . 'orgjednotka');
         if (MIGRACE)
-            $S3->query('DELETE FROM ' . S3_ . "user_rule WHERE privilege LIKE 'orgjednotka_%';");
+            $S3->query('DELETE FROM ' . S3_ . "acl_privilege WHERE privilege LIKE 'orgjednotka_%';");
         if (MIGRACE)
-            $S3->query('DELETE FROM ' . S3_ . "user_role WHERE fixed=0;");
+            $S3->query('DELETE FROM ' . S3_ . "acl_role WHERE fixed=0;");
         if (MIGRACE)
-            $S3->query('DELETE FROM ' . S3_ . "user_acl WHERE role_id > 8;"); // cokoli nad id 8, pod jsou fixni role
+            $S3->query('DELETE FROM ' . S3_ . "acl_role_to_privilege WHERE role_id > 8;"); // cokoli nad id 8, pod jsou fixni role
 
         foreach ($S2_org as $S2_o) {
             echo "\n>> " . htmlspecialchars($S2_o->id_orgjednotka . " = " . $S2_o->zkratka . " - " . $S2_o->nazev);
@@ -596,7 +596,7 @@ if (!isset($_SESSION['S3_orgjednotka'])) {
                         // Pridani jednotlivych roli
                         // Pravidlo pro organizacni jednotku
                         $rule_id = null;
-                        $rule_id = $S3->insert(S3_ . 'user_rule',
+                        $rule_id = $S3->insert(S3_ . 'acl_privilege',
                                         array(
                                     'name' => "Oprávnění pro org. jednotku " . $zkraceny_nazev,
                                     'privilege' => "orgjednotka_" . $org_id,
@@ -605,7 +605,7 @@ if (!isset($_SESSION['S3_orgjednotka'])) {
 
                         // Referent
                         $role_id = null;
-                        $role_id = $S3->insert(S3_ . 'user_role',
+                        $role_id = $S3->insert(S3_ . 'acl_role',
                                         array(
                                     'parent_id' => 4,
                                     'code' => "referent_" . $org_id,
@@ -617,10 +617,10 @@ if (!isset($_SESSION['S3_orgjednotka'])) {
                                     'order' => 10
                                 ))->execute(dibi::IDENTIFIER);
                         if ($role_id) {
-                            $S3->insert(S3_ . 'user_acl',
+                            $S3->insert(S3_ . 'acl_role_to_privilege',
                                     array(
                                 'role_id' => $role_id,
-                                'rule_id' => $rule_id,
+                                'privilege_id' => $rule_id,
                                 'allowed' => 'Y',
                             ))->execute();
                             echo "\n   => <span style='color:green'>vytvořena role referent pro org. jednotku $code (id $role_id)</span>";
@@ -628,7 +628,7 @@ if (!isset($_SESSION['S3_orgjednotka'])) {
 
                         // Vedouci
                         $role_id = null;
-                        $role_id = $S3->insert(S3_ . 'user_role',
+                        $role_id = $S3->insert(S3_ . 'acl_role',
                                         array(
                                     'parent_id' => 5,
                                     'code' => "vedouci_" . $org_id,
@@ -640,10 +640,10 @@ if (!isset($_SESSION['S3_orgjednotka'])) {
                                     'order' => 30
                                 ))->execute(dibi::IDENTIFIER);
                         if ($role_id) {
-                            $S3->insert(S3_ . 'user_acl',
+                            $S3->insert(S3_ . 'acl_role_to_privilege',
                                     array(
                                 'role_id' => $role_id,
-                                'rule_id' => $rule_id,
+                                'privilege_id' => $rule_id,
                                 'allowed' => 'Y',
                             ))->execute();
                             echo "\n   => <span style='color:green'>vytvořena role vedoucí pro org. jednotku $code (id $role_id)</span>";
@@ -651,7 +651,7 @@ if (!isset($_SESSION['S3_orgjednotka'])) {
 
                         // Podatelna
                         $role_id = null;
-                        $role_id = $S3->insert(S3_ . 'user_role',
+                        $role_id = $S3->insert(S3_ . 'acl_role',
                                         array(
                                     'parent_id' => 6,
                                     'code' => "podatelna_" . $org_id,
@@ -663,10 +663,10 @@ if (!isset($_SESSION['S3_orgjednotka'])) {
                                     'order' => 20
                                 ))->execute(dibi::IDENTIFIER);
                         if ($role_id) {
-                            $S3->insert(S3_ . 'user_acl',
+                            $S3->insert(S3_ . 'acl_role_to_privilege',
                                     array(
                                 'role_id' => $role_id,
-                                'rule_id' => $rule_id,
+                                'privilege_id' => $rule_id,
                                 'allowed' => 'Y',
                             ))->execute();
                             echo "\n   => <span style='color:green'>vytvořena role podatelna pro org. jednotku $code (id $role_id)</span>";
@@ -701,7 +701,7 @@ if (count($S2_usr) > 0) {
     if (MIGRACE)
         $S3->query('TRUNCATE TABLE ' . S3_ . 'user_to_role');
 
-    $S3_role = $S3->query('SELECT r.id, r.code, r.orgjednotka_id, r1.code AS pcode FROM [:S3:user_role] AS r LEFT JOIN [:S3:user_role] AS r1 ON r1.id=r.parent_id')->fetchAll();
+    $S3_role = $S3->query('SELECT r.id, r.code, r.orgjednotka_id, r1.code AS pcode FROM [:S3:acl_role] AS r LEFT JOIN [:S3:acl_role] AS r1 ON r1.id=r.parent_id')->fetchAll();
     $role = array();
     if (count($S3_role) > 0) {
         foreach ($S3_role as $r) {

@@ -3,7 +3,7 @@
 class AclModel extends BaseModel
 {
 
-    protected $name = 'user_acl';
+    protected $name = 'acl_role_to_privilege';
 
     public function getResources($all = 0)
     {
@@ -35,7 +35,7 @@ class AclModel extends BaseModel
                     ru.privilege as privilege
                     FROM [' . $this->name . '] a
                     JOIN [' . $this->tb_role . '] ro ON (a.role_id = ro.id)
-                    JOIN [' . $this->tb_rule . '] ru ON (a.rule_id = ru.id)
+                    JOIN [' . $this->tb_rule . '] ru ON (a.privilege_id = ru.id)
                     LEFT JOIN [' . $this->tb_resource . '] re ON (ru.resource_id = re.id)
 
                     ORDER BY ro.fixed DESC, a.allowed DESC, ro.code, ru.privilege
@@ -101,7 +101,7 @@ class AclModel extends BaseModel
                 $tmp[$resource_id]['note'] = $pravidlo->resource_note;
             }
 
-            //$tmp[ $resource_id ]['pravidla'][ $pravidlo->rule_id ] = $pravidlo;
+            //$tmp[ $resource_id ]['pravidla'][ $pravidlo->privilege_id ] = $pravidlo;
             $tmp[$resource_id]['pravidla'][$pravidlo->id]['name'] = $pravidlo->name;
             // Pozn.: Sloupec 'note' byl z tabulky odstanen
             $tmp[$resource_id]['pravidla'][$pravidlo->id]['note'] = '';
@@ -136,19 +136,19 @@ class AclModel extends BaseModel
                 re.id resource_id,
 
                 ru.privilege privilege,
-                ru.id rule_id
+                ru.id privilege_id
 
 
                 FROM [' . $this->name . '] a
                 JOIN [' . $this->tb_role . '] ro ON (a.role_id = ro.id)
-                LEFT JOIN [' . $this->tb_rule . '] ru ON (a.rule_id = ru.id)
+                LEFT JOIN [' . $this->tb_rule . '] ru ON (a.privilege_id = ru.id)
                 LEFT JOIN [' . $this->tb_resource . '] re ON (ru.resource_id = re.id)
                 %if', !is_null($role), 'WHERE ro.code=%s', $role,
                         '
                 ORDER BY re.code ASC
         ');
 
-        return $rows->fetchAssoc('rule_id');
+        return $rows->fetchAssoc('privilege_id');
     }
 
     public function insertAcl($data)
@@ -157,7 +157,7 @@ class AclModel extends BaseModel
         DbCache::delete('s3_Permission');
 
         $data['role_id'] = (int) $data['role_id'];
-        $data['rule_id'] = (int) $data['rule_id'];
+        $data['privilege_id'] = (int) $data['privilege_id'];
 
         return dibi::insert($this->name, $data)
                         ->execute();

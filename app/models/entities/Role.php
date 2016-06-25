@@ -8,7 +8,7 @@
 class Role extends TableCachedDBEntity
 {
 
-    const TBL_NAME = 'user_role';
+    const TBL_NAME = 'acl_role';
 
     protected static function _invalidateCache()
     {

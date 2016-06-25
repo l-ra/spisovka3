@@ -290,7 +290,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         if (count($opravneni) > 0) {
             foreach (array_keys($opravneni) as $orid) {
                 $AclModel->deleteAcl(array(
-                    array('rule_id=%i', $orid),
+                    array('privilege_id=%i', $orid),
                     array('role_id=%i', $role_id)
                         )
                 );
@@ -300,7 +300,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         // Pridani novych opravneni
         if (count($data) > 0) {
             foreach ($data as $id => $stav) {
-                $rule_id = (int) substr($id, 4);
+                $privilege_id = (int) substr($id, 4);
 
                 if ($stav['opravneni_allow'] == TRUE) {
                     $allowed = 'Y';
@@ -308,7 +308,7 @@ class Admin_OpravneniPresenter extends BasePresenter
                     $allowed = 'N';
                 }
                 $new = array('role_id' => $role_id,
-                    'rule_id' => $rule_id,
+                    'privilege_id' => $privilege_id,
                     'allowed' => $allowed);
 
                 $AclModel->insertAcl($new);

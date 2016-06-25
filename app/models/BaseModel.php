@@ -8,7 +8,7 @@ abstract class BaseModel extends Nette\Object
     /** Table constant */
     const USER_TABLE = 'user';
     const OSOBA_TABLE = 'osoba';
-    const ROLE_TABLE = 'user_role';
+    const ROLE_TABLE = 'acl_role';
     const USER2ROLE_TABLE = 'user_to_role';
     const ORGJEDNOTKA_TABLE = 'orgjednotka';
 
@@ -34,9 +34,9 @@ abstract class BaseModel extends Nette\Object
     protected $tb_logspis = 'log_spis';
     protected $tb_orgjednotka = 'orgjednotka';
     protected $tb_osoba = 'osoba';
-    protected $tb_resource = 'user_resource';
-    protected $tb_role = 'user_role';
-    protected $tb_rule = 'user_rule';
+    protected $tb_resource = 'acl_resource';
+    protected $tb_role = 'acl_role';
+    protected $tb_rule = 'acl_privilege';
     protected $tb_spis = 'spis';
     protected $tb_spisovy_znak = 'spisovy_znak';
     protected $tb_spousteci_udalost = 'spousteci_udalost';
