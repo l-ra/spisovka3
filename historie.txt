@@ -65,6 +65,9 @@ Nové funkce:
   
 Jiné změny:
 
+- kód pro migraci z verze 2 už nebude udržován. Pokud chcete migraci provést,
+  nainstalujte verzi 3.4.1, proveďte migraci a poté aplikaci aktualizujte
+  na poslední verzi.
 - pro informace o změně konfiguračních souborů viz soubor aktualizace.txt
 - z bezpečnostních důvodů se nyní konfigurace e-podatelny ukládá do databáze
 - konfigurace LDAP autentizace je mírně odlišná
