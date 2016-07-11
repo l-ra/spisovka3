@@ -328,7 +328,7 @@ class Subjekt extends BaseModel
             case 'mesto':
                 return $data->adresa_psc . ' ' . $data->adresa_mesto;
             case 'email':
-                return $d_nazev . ' (' . ( empty($data->email) ? 'nemá email' : $data->email ) . ')';
+                return $d_nazev . ' <' . ( empty($data->email) ? 'nemá email' : $data->email ) . '>';
             case 'isds':
                 return $d_nazev . ' (' . ( empty($data->id_isds) ? 'nemá datovou schránku' : $data->id_isds ) . ')';
             case 'telefon':
