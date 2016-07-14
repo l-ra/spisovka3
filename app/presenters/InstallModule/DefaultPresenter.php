@@ -493,15 +493,11 @@ class Install_DefaultPresenter extends BasePresenter
                     'title' => 'DB databáze',
                     'message' => $db_config->database,
                 ),
-                array(
-                    'title' => 'DB prefix tabulek',
-                    'message' => $db_config->prefix,
-                )
             );
 
             foreach ($sql_queries as $query) {
 
-                $query = str_replace("{tbls3}", $db_config->prefix, $query);
+                $query = str_replace("{tbls3}", '', $query);
                 
                 if ($this->getParameter('install', null)) {
                     // provedeni SQL skriptu

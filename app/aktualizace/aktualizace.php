@@ -84,7 +84,7 @@ ob_end_flush();
 foreach ($clients as $site_path => $site_name) {
 
     flush(); // zobraz výsledek po aktualizaci každého klienta
-    
+
     echo "<div class='update_site'>";
     echo "<h1>$site_name</h1>";
 
@@ -101,9 +101,21 @@ foreach ($clients as $site_path => $site_name) {
 
         $client->connect_to_db();
 
+        if (!$client->check_rename_db_tables()) {
+            echo '<p>';
+            if (!$do_update)
+                echo 'První krok aktualizace bude odstranění případných prefixů z názvů databázových tabulek.';
+            else
+                $client->rename_db_tables();
+
+            echo '</p></div>';
+            continue;
+        }
+
         $client_revision = $client->get_revision_number();
     } catch (Exception $e) {
         error($e->getMessage());
+        echo '</div>';
         continue;  // jdi na dalsiho klienta
     }
 
@@ -113,7 +125,7 @@ foreach ($clients as $site_path => $site_name) {
         error ("Používáte zastaralou verzi databáze MySQL - $mysqli->server_info. Podporovaná je verze 5.5 a vyšší. Aplikace nemusí pracovat správně.");
         echo '<br />';
     }
-    
+
     echo '<dl>';
     echo '    <dt>Poslední zjištěná revize klienta:</dt>';
     echo '    <dd>' . $client_revision . '&nbsp;</dd>';
@@ -129,7 +141,6 @@ foreach ($clients as $site_path => $site_name) {
         if ($rev > $client_revision) {
 
             try {
-
                 // Check skripty se pouzivaly v minulosti, kdy nebylo mozne spolehlive urcit revizi klienta
                 $function_name = "is_installed_{$rev}";
                 if (function_exists($function_name)) {
@@ -208,7 +219,7 @@ foreach ($clients as $site_path => $site_name) {
 
                     echo "<pre>";
                     foreach ($alter_scripts[$rev] as $query) {
-                        $query = str_replace("{tbls3}", $db_config['prefix'], $query);
+                        $query = str_replace("{tbls3}", '', $query);
 
                         if ($do_update) {
                             try {
@@ -219,7 +230,7 @@ foreach ($clients as $site_path => $site_name) {
                                 throw $e;
                             }
                         } else {
-                            $query = str_replace(":PREFIX:", $db_config['prefix'], $query);
+                            $query = str_replace(":PREFIX:", '', $query);
                             echo "$query\n";
                         }
                     }

@@ -27,7 +27,7 @@ class Updates
         }
 
         $revision_a = explode(strpos($filename, '_') !== false ? "_" : ".", $filename);
-        $revision = array_shift( $revision_a );
+        $revision = array_shift($revision_a);
         if (is_numeric($revision)) {
             self::$revisions[$revision] = $revision;
 
@@ -59,7 +59,7 @@ class Updates
 
         return $queries;
     }
-    
+
     public static function find_updates()
     {
         self::$alter_scripts = array();
@@ -97,7 +97,7 @@ class Updates
         $rev = 0;
         $a = array();
         $matches = [];
-        
+
         foreach ($info as $line) {
             if ($line{0} == '[')
                 if (preg_match('/^\[(\d+)\]/', $line, $matches) == 1) {
@@ -187,7 +187,7 @@ class Client_To_Update
                     throw new Exception("Nemohu přečíst konfigurační soubor system.ini");
             }
         }
-        
+
         return $this->db_config;
     }
 
@@ -204,8 +204,9 @@ class Client_To_Update
             $db_config['driver'] = 'mysqli';
         try {
             dibi::connect($db_config);
-            dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];
+            dibi::getSubstitutes()->{'PREFIX'} = null;
         } catch (DibiException $e) {
+            $e->getMessage();
             throw new Exception("Nepodařilo se připojit k databázi. Klienta nelze aktualizovat.");
         }
     }
@@ -215,14 +216,15 @@ class Client_To_Update
         $revision = 0;
 
         try {
-            $result = dibi::query("SELECT [value] FROM %n WHERE [name] = 'db_revision'",
-                            $this->db_config['prefix'] . 'settings');
+            $result = dibi::query("SELECT [value] FROM [settings] WHERE [name] = 'db_revision'");
+
             if (count($result) > 0) {
                 $revision = $result->fetchSingle();
                 return $revision;
             }
         } catch (Exception $e) {
             // V databazi pravdepodobne neexistuje zminena tabulka
+            $e->getMessage();
         }
 
         if (file_exists($this->revision_filename)) {
@@ -236,8 +238,8 @@ class Client_To_Update
     function update_revision_number($revision)
     {
         try {
-            dibi::query('UPDATE %n', $this->db_config['prefix'] . 'settings',
-                    'SET [value] = %i', $revision, "WHERE [name] = 'db_revision'");
+            dibi::query('UPDATE [settings] SET [value] = %i', $revision,
+                    "WHERE [name] = 'db_revision'");
 
             // pokud je cislo revize v databazi, je soubor nadbytecny
             // ingoruj, pokud soubor neexistuje
@@ -247,9 +249,53 @@ class Client_To_Update
         } catch (Exception $e) {
             // V databazi pravdepodobne neexistuje zminena tabulka
             // fall through
+            $e->getMessage();
         }
 
         return file_put_contents($this->revision_filename, $revision);
+    }
+
+    /**
+     * Check if we need to rename database tables
+     * @return boolean   true = rename procedure was already done
+     */
+    public function check_rename_db_tables()
+    {
+        try {
+            $value = dibi::query("SELECT [value] FROM [settings] WHERE [name] = 'db_tables_renamed'")->fetchSingle();
+            return $value === 'true';
+        } catch (Exception $e) {
+            $e->getMessage();
+            return false;
+        }
+    }
+
+    public function rename_db_tables()
+    {
+        $config = $this->get_db_config();
+        $prefix = $config['prefix'];
+        if (empty($prefix))
+            echo "Tabulky aplikace nemají prefix, není potřeba provádět přejmenování.";
+        else {
+            $tables = dibi::getDatabaseInfo()->getTableNames();
+            foreach ($tables as $table)
+                if (strncmp($table, $prefix, strlen($prefix)) !== 0) {
+                    echo "V databázi nalezena tabulka '$table', která nepatří aplikaci! <br />Nelze pokračovat. Zjednejte prosím nápravu.";
+                    return;
+                }
+
+            foreach ($tables as $table) {
+                $new_name = substr($table, strlen($prefix));
+                dibi::query("RENAME TABLE [$table] TO [$new_name]");
+            }
+
+            echo 'Tabulky byly přejmenovány.';
+        }
+        
+        // Úspěch - hotovo nebo nebylo potřeba nic dělat
+        dibi::query("INSERT INTO [settings] VALUES ('db_tables_renamed', 'true')");
+        
+        echo " Spusťte prosím aktualizační skript znovu.";
     }
 
 }

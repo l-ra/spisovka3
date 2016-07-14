@@ -130,9 +130,7 @@ try {
             $panel->register($connection);
         }
 
-        if (!$db_config['prefix'])
-            $db_config['prefix'] = '';  // nahrad pripadnou null hodnotu za prazdny retezec
-        dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];
+        dibi::getSubstitutes()->{'PREFIX'} = null;
     } catch (DibiDriverException $e) {
         echo 'Aplikaci se nepodarilo pripojit do databaze.<br>';
         throw $e;

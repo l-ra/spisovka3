@@ -77,6 +77,8 @@ Jiné změny:
 - skript pro aktualizaci databáze nyní varuje uživatele, pokud verze
   MySQL je starší, než 5.5. Aplikace není na starších verzích databázového
   serveru testována a podporována.
+- aplikaci při upgradu odstraní případný prefix z názvů databázových tabulek.
+  V databázi nesmí být žádné jiné tabulky, než tabulky aktuální verze aplikace.
 - aplikace nyní vyžaduje přepis URL. To není problém u webového serveru Apache.
   Pro Microsoft IIS je nutné ručně přepis URL nakonfigurovat.
 - z důvodu upgrade frameworku, na kterém aplikace běží a kvůli větší čistotě
