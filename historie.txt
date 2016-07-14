@@ -74,6 +74,9 @@ Jiné změny:
 - aplikace je nyní podporována na PHP verze 5.4 až 5.6. Na starém 5.3 nepoběží.
   Doporučujeme 5.5 a vyšší se Zend OPcache pro významné zvýšení rychlosti
   na straně serveru.
+- skript pro aktualizaci databáze nyní varuje uživatele, pokud verze
+  MySQL je starší, než 5.5. Aplikace není na starších verzích databázového
+  serveru testována a podporována.
 - aplikace nyní vyžaduje přepis URL. To není problém u webového serveru Apache.
   Pro Microsoft IIS je nutné ručně přepis URL nakonfigurovat.
 - z důvodu upgrade frameworku, na kterém aplikace běží a kvůli větší čistotě

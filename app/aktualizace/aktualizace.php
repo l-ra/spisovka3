@@ -107,8 +107,13 @@ foreach ($clients as $site_path => $site_name) {
         continue;  // jdi na dalsiho klienta
     }
 
-    // dibi::getProfiler()->setFile(UPDATE_DIR.'log.sql');   nefunkcni, v adresari s db aktualizacemi nelze zapisovat
-
+    $mysqli = dibi::getConnection()->getDriver()->getResource();
+    $version_number = $mysqli->server_version;
+    if ($version_number < 50500) {
+        error ("Používáte zastaralou verzi databáze MySQL - $mysqli->server_info. Podporovaná je verze 5.5 a vyšší. Aplikace nemusí pracovat správně.");
+        echo '<br />';
+    }
+    
     echo '<dl>';
     echo '    <dt>Poslední zjištěná revize klienta:</dt>';
     echo '    <dd>' . $client_revision . '&nbsp;</dd>';

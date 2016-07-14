@@ -199,6 +199,9 @@ class Client_To_Update
     public function connect_to_db()
     {
         $db_config = $this->get_db_config();
+        // aktualizační skript potřebuje mysqli driver
+        if ($db_config['driver'] == 'mysql')
+            $db_config['driver'] = 'mysqli';
         try {
             dibi::connect($db_config);
             dibi::getSubstitutes()->{'PREFIX'} = $db_config['prefix'];
