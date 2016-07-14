@@ -51,28 +51,8 @@ abstract class BaseModel extends Nette\Object
     protected $tb_zpusob_odeslani = 'zpusob_odeslani';
     protected $tb_zpusob_vyrizeni = 'zpusob_vyrizeni';
     
-    protected static function getDbPrefix()
+    public function __construct()
     {
-        static $prefix = null;
-
-        if ($prefix === null)
-            $prefix = GlobalVariables::get('database')->prefix;
-
-        return $prefix;
-    }
-
-    /**
-     * @param type $db_prefix  nutné pro volání z update skriptu, jinak
-     *                          aplikace spadne při volání Environmentu
-     */
-    public function __construct($db_prefix = null)
-    {
-        $prefix = $db_prefix !== null ? $db_prefix : self::getDbPrefix();
-        $this->name = $prefix . $this->name;
-
-        foreach (get_object_vars($this) as $prop => $value)
-            if (substr($prop, 0, 3) == 'tb_')
-                    $this->$prop = $prefix . $value;            
     }
     
     protected static function getUser()
