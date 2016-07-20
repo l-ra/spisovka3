@@ -168,6 +168,9 @@ abstract class DBEntity
             throw new Exception("Smazání entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
 
         dibi::query("DELETE FROM %n WHERE id = {$this->id}", ':PREFIX:' . $this::TBL_NAME);
+        
+        // further attempts to access the entity will result in exception
+        $this->_invalidate();
     }
 
     public function canUserModify()
