@@ -110,8 +110,8 @@
         </dl>
         {/if}
         <dl>
-            <dt>Počet listů / příloh:</dt>
-            <dd>{$Dok->pocet_listu} / {$Dok->pocet_priloh}</dd>
+            <dt>Počet listů / listů příloh:</dt>
+            <dd>{$Dok->pocet_listu} / {$Dok->pocet_listu_priloh}</dd>
         </dl>
     </div>
     
@@ -202,54 +202,17 @@
     </div>
 
     <div class="dokument_blok_sedy">
-        <div class="h2">Vytvořil a vyřídil</div>
-        {if $Dok->typ_dokumentu->smer == 1}
-        {foreach $Dok->workflow as $workflow}
-        {if $workflow->stav_dokumentu==1}
+        <div class="h2">Vlastnictví</div>
         <dl>
-            <dt>Vytvořil:</dt>
+            <dt>Přidělen:</dt>
             <dd>
-            {if empty($workflow->prideleno_id) }
-                organizační jednotce
+                {$Dok->prideleno->jmeno}
                 <br />
-                {$workflow->orgjednotka_info->zkraceny_nazev}
-            {else}
-                {$workflow->prideleno_jmeno}
-                <br />
-                {=@$workflow->orgjednotka_info->zkraceny_nazev}
-            {/if}
+                {if isset($Dok->prideleno->orgjednotka->zkraceny_nazev)}
+                    {$Dok->prideleno->orgjednotka->zkraceny_nazev}
+                {/if}
             </dd>
         </dl>
-        <dl>
-            <dt>Vytvořil dne:</dt>
-            <dd>{$workflow->date|edatetime}</dd>
-        </dl>         
-        {breakIf true}
-        {/if}
-        {/foreach}
-        {/if}        
-        {if !isset($Dok->prideleno)}
-        <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
-        {else}
-        <dl>
-            <dt>Vyřídil:</dt>
-            <dd>
-            {if empty($Dok->prideleno->prideleno_id) }
-                organizační jednotce
-                <br />
-                {$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            {else}
-                {$Dok->prideleno->prideleno_jmeno}
-                <br />
-                {=@$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
-            {/if}
-            </dd>
-        </dl>
-        <dl>
-            <dt>Datum vyřízení:</dt>
-            <dd>{$Dok->datum_vyrizeni|edatetime}</dd>
-        </dl>           
-        {/if}
     </div>
     
     {if $Zapujcka != null}

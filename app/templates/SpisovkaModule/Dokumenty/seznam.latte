@@ -1,0 +1,132 @@
+<div id="dokumenty">
+    {if count($seznam)>0}
+        {default bulkAction = false}
+        {if $bulkAction}
+            {control bulkAction:start}
+        {/if}
+        <table class="seznam">
+            <tr>
+                <th class="akce">&nbsp;</th>
+                <th class="typ">Typ dokumentu</th>
+                <th class="prijato">Přijato</th>
+                <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
+                <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
+                <th class="prideleno">Přidělen / Vyřídil<br />> Předán</th>
+                <th class="stav">Stav</th>
+            </tr>
+            {foreach $seznam as $dok}
+                <tr{if $dok->lhuta_stav==2} class="red"{elseif $dok->lhuta_stav==1} class="yellow"{/if}>
+                    <td class="akce">
+                        {if $bulkAction}
+                            {control bulkAction:checkbox $dok->id}
+                        {/if}
+                    </td>
+                    <td class="typ">
+                        <img src="{$publicUrl}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
+                        {if $dok->epod_typ == 'E'}
+                            <img src="{$publicUrl}images/icons/email.png" alt="přijato emailem" title="přijato nebo odesláno emailem" width="24" height="16" />
+                        {elseif $dok->epod_typ == 'I'}
+                            <img src="{$publicUrl}images/icons/isds.png" alt="přijato datovou schránkou" title="přijato nebo odesláno datovou schránkou" width="24" height="16" />
+                        {/if}
+                    </td>
+                    <td class="prijato" title="{$dok->datum_vzniku|edatetime}">
+                        {$dok->datum_vzniku|edate}
+                    </td>
+                    <td class="cislo_jednaci">
+                        &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
+                                {if empty($dok->cislo_jednaci)}
+                                    (není evidován)
+                                {else}
+                                {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
+                            {/if}
+                        </a></strong>
+                    <div class="small">&nbsp;{$dok->jid}</div>
+                    {if isset($dok->spisy)}
+                        {foreach $dok->spisy as $spis}
+                            <a href="{link :Spisovka:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
+                        {/foreach}
+                    {/if}
+                </td>
+                <td class="vec">
+                    <strong title="{$dok->popis}"><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->id}">
+                            {$dok->nazev}
+                        </a></strong>
+                    <br />
+                    <div class="mezera">
+                        {if count($dok->subjekty)>0}
+
+                            {foreach $dok->subjekty as $subjekt}
+                                {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
+                            {/foreach}
+                        {else}
+                            nejsou přiděleny žádné subjekty!
+                            <br />
+                        {/if}
+                    </div>
+                    {include 'seznam-pocty-priloh.latte', dokument => $dok}
+                </td>
+
+                <td class="prideleno">
+                    {$dok->prideleno->jmeno}<br />
+                    {if !empty($dok->prideleno->orgjednotka->zkraceny_nazev)}
+                        {$dok->prideleno->orgjednotka->zkraceny_nazev}<br />
+                    {/if}
+                    {if $dok->is_forwarded && $dok->forward_user_id}
+                        > {Person::fromUserId($dok->forward_user_id)}<br />
+                    {/if}
+                    {if $dok->is_forwarded && $dok->forward_orgunit_id}
+                        > {OrgUnit::fromId($dok->forward_orgunit_id)->zkraceny_nazev}<br />
+                    {/if}
+                </td>
+
+                <td class="stav {if $dok->lhuta_stav == 2}stav_red{elseif $dok->lhuta_stav == 1}stav_yellow{/if}">
+                    {if $dok->stav_dokumentu == 1}
+                        nový
+                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_VYRIZUJE_SE}
+                        vyřizuje se
+                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA
+                        || $dok->stav_dokumentu == DocumentWorkflow::STAV_VYRIZEN_SPUSTENA}
+                        vyřízen
+                        <br />
+                        <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_PREDAN_DO_SPISOVNY}
+                        vyřízen<br />předán do spisovny
+                        <br />
+                        <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_VE_SPISOVNE}
+                        vyřízen<br />ve spisovně
+                        <br />
+                        <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_ZAPUJCEN}
+                        zapůjčen
+                    {else}
+                        neznámý stav!
+                    {/if}
+                </td>
+            </tr>
+        {/foreach}
+
+    </table>
+    {if $bulkAction}
+        {control bulkAction:end}
+    {/if}
+    {if $presenter->getComponent('vp', false)}
+        {control vp}
+    {/if}
+{else}
+    <div>&nbsp;</div>
+    {if isset($no_items)}
+        {if $no_items==1}
+            <div class="prazdno">Nemáte k dispozici žádné dokumenty.</div>
+        {elseif $no_items==2}
+            <div class="prazdno">Danému filtru neodpovídá žádný dokument.</div>
+        {elseif $no_items==3}
+            <div class="prazdno">Dokumenty odpovídající hledanému výrazu nebyly nalezeny.</div>
+        {elseif $no_items==4}
+            <div class="prazdno">Dokumenty odpovídající daným požadavkům nebyly nalezeny.</div>
+        {/if}
+    {else}
+        <div class="prazdno">Nebyly zjištěny žádné dokumenty.</div>
+    {/if}
+{/if}
+</div>

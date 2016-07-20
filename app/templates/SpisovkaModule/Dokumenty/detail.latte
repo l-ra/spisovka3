@@ -44,13 +44,13 @@
 
 <div class="dokument_blok_menu" n:ifcontent>
     {if $Predan==1 }
-        <a href="{link prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít dokument</a>
+        <a href="{link prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít {$dokument_nebo_spis}</a>
         <a href="{link odmitnoutprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
     {elseif $LzePredatDokument}
-        {if empty($Dok->predano)}
-            <a href="{link Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat dokument</a>
+        {if $Dok->is_forwarded}
+            <a href="{link zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit předání {$dokument_nebo_spis}u</a>
         {else}
-            <a href="{link zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit předání dokumentu</a>
+            <a href="{link Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat {$dokument_nebo_spis}</a>
         {/if}
     {/if}
 
@@ -70,7 +70,7 @@
     <a href="{link this, 'udalost' => 1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
     <a href="{link predatDoSpisovny, 'id' => $Dok->id}" n:if="$Dok->stav_dokumentu == 5">Předat do spisovny</a>
     <a href="{link znovuOtevrit, $Dok->id}" n:if="$LzeZnovuOtevrit">Znovu otevřít</a>
-    <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}" n:if="$Zapujcka">Vrátit dokument</a>
+    <a href="{link :Spisovna:Zapujcky:vratit, $Zapujcka->id, ':Spisovka:Dokumenty:default'}" n:if="$LzeVratit">Vrátit dokument</a>
 </div>
 
 {if ($FormUdalost)}
@@ -125,8 +125,8 @@
             <dl>
                 <dt>{label2 pocet_listu}</dt>
                 <dd>{input pocet_listu} {inputError2 pocet_listu}
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 pocet_priloh} {input pocet_priloh} {inputError2 pocet_priloh}
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 typ_prilohy} {input typ_prilohy}
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 pocet_listu_priloh} {input pocet_listu_priloh} {inputError2 pocet_listu_priloh}
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {label2 nelistinne_prilohy} {input nelistinne_prilohy}
                 </dd>
             </dl>
             <div>
@@ -180,8 +180,8 @@
                 <dt>Poznámka:</dt>
                 <dd>{!$Dok->poznamka|html2br}</dd><br />
             {/if}
-            <dt>Počet listů / příloh / typ přílohy:</dt>
-            <dd>{$Dok->pocet_listu} / {$Dok->pocet_priloh} {if !empty($Dok->typ_prilohy)}/ {$Dok->typ_prilohy}{/if}</dd><br />
+            <dt>Počet listů / listů příloh:</dt>
+            <dd>{$Dok->pocet_listu} / {$Dok->pocet_listu_priloh} {if !empty($Dok->nelistinne_prilohy)}/ {$Dok->nelistinne_prilohy}{/if}</dd><br />
             <dt>Lhůta k vyřízení:</dt>
             <dd>{$Dok->lhuta} dní (do {$Dok->lhuta_do|edate})</dd><br />
             {if $Dok->epodatelna_id}
@@ -251,107 +251,60 @@
 
 <div class="dokument_blok_sedy">
     <div class="h2">Vlastnictví</div>
-    {if $Dok->typ_dokumentu->smer == 1}
-        {foreach $Dok->workflow as $workflow}
-            {if $workflow->stav_dokumentu==1}
-                <dl>
-                    <dt>Vytvořil:</dt>
-                    <dd>
-                        {if empty($workflow->prideleno_id) }
-                            organizační jednotce
-                            <br />
-                            {$workflow->orgjednotka_info->zkraceny_nazev}
-                        {else}
-                            {$workflow->prideleno_jmeno}
-                            <br />
-                            {=@$workflow->orgjednotka_info->zkraceny_nazev}
-                        {/if}
-                    </dd>
-                </dl>
-                <dl>
-                    <dt>Vytvořil dne:</dt>
-                    <dd>{$workflow->date|edatetime}</dd>
-                </dl>        
-                {breakIf true}
+    <dl>
+        <dt>Přidělen:</dt>
+        <dd>
+            {$Dok->prideleno->jmeno}
+            <br />
+            {if isset($Dok->prideleno->orgjednotka->zkraceny_nazev)}
+                {$Dok->prideleno->orgjednotka->zkraceny_nazev}
             {/if}
-        {/foreach}
-    {/if}
-    {if !isset($Dok->prideleno)}
-        <div class="prazdno">K tomuto dokumentu není nikdo přidělen!</div>
-    {else}
-        <dl>
-            <dt>Přidělen:</dt>
-            <dd>
-                {if empty($Dok->prideleno->prideleno_id) }
-                    organizační jednotce
-                    <br />
-                    {$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
-                {else}
-                    {$Dok->prideleno->prideleno_jmeno}
-                    <br />
-                    {=@$Dok->prideleno->orgjednotka_info->zkraceny_nazev}
-                {/if}
-            </dd>
-        </dl>
-        <dl>
-            <dt>Přidělen dne:</dt>
-            <dd>{$Dok->prideleno->date|edatetime}</dd>
-        </dl>
-        <dl n:if="$Dok->prideleno->poznamka">
-            <dt>Poznámka:</dt>
-            <dd>{!$Dok->prideleno->poznamka|escape|nl2br}</dd>
-        </dl>
-    {/if}
+        </dd>
+    </dl>
 
-    {if isset($Dok->predano)}
+    {if $Dok->is_forwarded}
         <dl>
             <dt>Předán:</dt>
             <dd>
-                {if empty($Dok->predano->prideleno_id) }
-                    organizační jednotce
-                    <br />
-                    {$Dok->predano->orgjednotka_info->zkraceny_nazev}
+                {if $Dok->forward_user_id}
+                    {Person::fromUserId($Dok->forward_user_id)}
                 {else}
-                    {$Dok->predano->prideleno_jmeno}
-                    <br />
-                    {=@$Dok->predano->orgjednotka_info->zkraceny_nazev}
+                    organizační jednotce
+                {/if}
+                <br />
+                {if $Dok->forward_orgunit_id}
+                    {OrgUnit::fromId($Dok->forward_orgunit_id)}
                 {/if}
             </dd>
         </dl>
-        <dl>
-            <dt>Předán dne:</dt>
-            <dd>{$Dok->predano->date|edatetime}</dd>
-        </dl>
-        <dl n:if="$Dok->predano->poznamka">
+        <dl n:if="$Dok->forward_note">
             <dt>Poznámka pro příjemce:</dt>
-            <dd>{!$Dok->predano->poznamka|escape|nl2br}</dd>
+            <dd>{!$Dok->forward_note|escape|nl2br}</dd>
         </dl>
     {/if}
 </div>
 
-{if !empty($Zapujcka->id)}
-    <div class="dokument_blok_sedy">
-        <div class="h2">Zápůjčka</div>
-        <dl>
-            <dt>Zapůjčeno:</dt>
-            <dd>
-                {$Zapujcka->person->displayName()}
-            </dd>
-        </dl>
-        <dl>
-            <dt>Důvod zapůjčení:</dt>
-            <dd>{!$Zapujcka->duvod|escape|nl2br}</dd>
-        </dl>
-        <dl>
-            <dt>Datum výpůjčky:</dt>
-            <dd>{$Zapujcka->date_od|edate}</dd>
-        </dl>
-        <dl>
-            <dt>Datum vrácení:</dt>
-            <dd>{$Zapujcka->date_do|edate}</dd>
-        </dl>          
-    </div>
-{/if}    
+<div class="dokument_blok_sedy" n:if="!empty($Zapujcka->id)">
+    <div class="h2">Zápůjčka</div>
+    <dl>
+        <dt>Zapůjčeno:</dt>
+        <dd>
+            {$Zapujcka->person->displayName()}
+        </dd>
+    </dl>
+    <dl>
+        <dt>Důvod zapůjčení:</dt>
+        <dd>{!$Zapujcka->duvod|escape|nl2br}</dd>
+    </dl>
+    <dl>
+        <dt>Datum výpůjčky:</dt>
+        <dd>{$Zapujcka->date_od|edate}</dd>
+    </dl>
+    <dl>
+        <dt>Datum vrácení:</dt>
+        <dd>{$Zapujcka->date_do|edate}</dd>
+    </dl>          
+</div>
 
 <div class="dokument_blok_subjekty">
     <div class="h2">

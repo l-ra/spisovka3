@@ -3,7 +3,10 @@
 class LogModel extends BaseModel
 {
 
-    protected $name = 'log_system';
+    protected $name = 'log_system-neexistuje';
+    protected $tb_logaccess = 'log_access';
+    protected $tb_logdokument = 'log_dokument';
+    protected $tb_logspis = 'log_spis';
 
     const DOK_UNDEFINED = 00;
     const DOK_NOVY = 11;
@@ -109,7 +112,6 @@ class LogModel extends BaseModel
 
     public function logDokument($dokument_id, $event, $poznamka = null)
     {
-
         $row = array();
         $row['dokument_id'] = (int) $dokument_id;
         $row['typ'] = $event;
@@ -119,16 +121,14 @@ class LogModel extends BaseModel
         $row['date'] = new DateTime();
 
         return dibi::insert($this->tb_logdokument, $row)
-                        ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
+                        ->execute(dibi::IDENTIFIER);
     }
 
     public function historieDokumentu($dokument_id, $show_all = true)
     {
         $limit = $show_all ? 500 : 5;
         $res = dibi::query(
-                        'SELECT * FROM %n ld', $this->tb_logdokument, 'LEFT JOIN %n u',
-                        $this->tb_user, 'ON u.id = ld.user_id', 'LEFT JOIN %n o',
-                        $this->tb_osoba, 'ON o.id = u.osoba_id', 'WHERE ld.dokument_id = %i',
+                        'SELECT * FROM %n ld', $this->tb_logdokument, 'WHERE ld.dokument_id = %i',
                         $dokument_id, 'ORDER BY ld.date DESC, ld.id DESC LIMIT %i', $limit
         );
         $rows = $res->fetchAll();
@@ -158,7 +158,6 @@ class LogModel extends BaseModel
      */
     public function logAccess($user_id, $stav, $ip_address)
     {
-
         $row = array();
         $row['user_id'] = $user_id;
         $row['date'] = new DateTime();
@@ -168,17 +167,16 @@ class LogModel extends BaseModel
         $row['stav'] = $stav;
 
         return dibi::insert($this->tb_logaccess, $row)
-                        ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
+                        ->execute(dibi::IDENTIFIER);
     }
 
     public function seznamPristupu($limit = 50, $offset = 0, $user_id = null)
     {
-
         $res = dibi::query(
                         'SELECT * FROM %n la', $this->tb_logaccess, 'LEFT JOIN %n',
-                        $this->tb_user, ' u ON (u.id=la.user_id)', '%if', !is_null($user_id),
+                        $this->tb_user, ' u ON (u.id = la.user_id)', '%if', !is_null($user_id),
                         'WHERE %and',
-                        !is_null($user_id) ? array('la.user_id=%i', $user_id) : array(),
+                        !is_null($user_id) ? array('la.user_id = %i', $user_id) : array(),
                         '%end', 'ORDER BY la.id DESC'
         );
         return $res->fetchAll($offset, $limit);

@@ -7,7 +7,7 @@ class Spisovna_DefaultPresenter extends BasePresenter
     {
         if ($this->user->isAllowed('Spisovna', 'cist_dokumenty'))
             $this->redirect(':Spisovna:Dokumenty:default');
-        if ($this->user->isAllowed('Spisovna_ZapujckyPresenter'))
+        if ($this->user->isAllowed('Zapujcka', 'vytvorit'))
             $this->redirect(':Spisovna:Zapujcky:default');
     }
 

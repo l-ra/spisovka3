@@ -101,3 +101,19 @@ Nastavení provedení upgrade procedury při spuštění programu
 Oprava prohozeného adresáta a odesilatele v databázi u odchozích zpráv
 [1250]
 Nové oprávnění pro otevření uzavřeného dokumentu
+[1270]
+Změna ukládání stavu dokumentu v databázi
+[1272]
+Migrace informací o vlastnictví dokumentu
+[1274]
+Migrace informací o předání dokumentu
+[1276]
+Přejmenování tabulky workflow, již se nepoužívá
+[1280]
+Přejmenování 2 polí dokumentu
+[1290]
+Nová oprávnění pro zápůjčky ve spisovně
+[1300]
+Vytvoření indexu na sloupci zapujcka.stav
+[1310]
+Oprava názvu sloupce "počet příloh" v sestavách

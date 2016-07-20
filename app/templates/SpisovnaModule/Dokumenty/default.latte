@@ -35,7 +35,7 @@
             <th class="prijato">Přijato<br />Vyřízen<br />Skartační rok</th>
             <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
-            <th class="prideleno">Přidělen / Vyřídil</th>
+            <th class="prideleno">Přidělen</th>
             <th class="stav">Spisový znak<br/>Skartační znak / lhůta<br/>Stav</th>
         </tr>
         {foreach $seznam as $dok}
@@ -96,9 +96,9 @@
 
             </td>
             <td class="prideleno">
-                {$dok->prideleno->prideleno_jmeno}
+                {$dok->prideleno->jmeno}
                 <br />
-                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+                {=@$dok->prideleno->orgjednotka->zkraceny_nazev}
             </td>
             <td class="stav">
                 {$dok->spisovy_znak}

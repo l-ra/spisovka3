@@ -6,7 +6,6 @@ class FileModel extends BaseModel
 {
 
     protected $name = 'file';
-    protected $primary = 'id';
 
     public function getInfo($file_id)
     {

@@ -4,7 +4,6 @@ class UserModel extends BaseModel
 {
 
     protected $name = 'user';
-    protected $primary = 'id';
 
     /**
      * Zjisti informace o uzivateli na základe username.
@@ -69,7 +68,7 @@ class UserModel extends BaseModel
                     'user_id' => $user_id,
                     'date_added' => new DateTime()
                 );
-                $User2Role->insert_basic($rowur);
+                $User2Role->insert($rowur);
             }
 
             dibi::commit();

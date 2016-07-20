@@ -75,35 +75,37 @@
     <br />
     <h3>Filtrování</h3>
     <p>
-    Filtr naleznete hned pod nadpisem Seznam Dokumentů. Pokud chcete vybrat jeden z možných filtrů, klepněte na šipku směřující dolů a zobrazí se vám rozbalovací menu s jednotlivými názvy filtrů. Filtrovat dokumenty lze podle několika kriterií:
+    Pokud chcete vybrat jeden z možných filtrů, klepněte na šipku směřující dolů a zobrazí se vám rozbalovací menu s jednotlivými názvy filtrů. Filtrovat dokumenty lze podle několika kritérií:
+    </p>
 
     <dl>
-        <dt>Přidělené</dt>
-        <dd>Zobrazí se všechny přidělené dokumenty k vaší organizační jednotce.</dd>
-    </dl>
-    <dl>
         <dt>K převzetí</dt>
-        <dd>Zobrazí se všechny dokumenty, které jsou určeny k převzetí.</dd>
+        <dd>Zobrazí se dokumenty, které jsou předány vám nebo na vaší organizační jednotku.</dd>
     </dl>
     <dl>
         <dt>Předané</dt>
-        <dd>Zobrazí se všechny dokumenty, které byly předány na jinou organizační jednotku.</dd>
+        <dd>Zobrazí se dokumenty, které jsou ve stavu předání na jiného uživatele či organizační jednotku.</dd>
     </dl>
     <dl>
-        <dt>Nové / nepředané</dt>
-        <dd>Zobrazí se všechny dokumenty, které nebyly dosud předány na jinou organizační jednotku. Jedná se především o nové a nepředané dokumenty.</dd>
+        <dt>Nové</dt>
+        <dd>Zobrazí se dokumenty, které ještě nikdo nezačal vyřizovat.</dd>
     </dl>
     <dl>
-        <dt>K vyřízení</dt>
-        <dd>Zobrazí se všechny dokumenty, které jsou určeny k vyřízení</dd>
+        <dt>Vyřizuje se</dt>
+        <dd>Zobrazí se dokumenty, které jsou ve stavu vyřizování (některý uživatel na nich pracuje).</dd>
     </dl>
     <dl>
         <dt>Vyřízené</dt>
-        <dd>Zobrazí se všechny vyřízené dokumenty. Takové, které ještě nebyly předány do spisovny. Dokumenty, jež se nachází ve spisovně, zde nejsou zobrazeny.</dd>
+        <dd>Zobrazí se vyřízené dokumenty.</dd>
     </dl>
     <dl>
-        <dt>Na kterých jsem kdy pracoval</dt>
-        <dd>Zobrazí se všechny dokumenty, na kterých jste kdy pracovali.</dd>
+        <dt>Všechny</dt>
+        <dd>
+            Zobrazí se všechny dokumenty, které má uživatel právo vidět. Vedoucí s tímto filtrem 
+            uvidí i dokumenty v podřízených organizačních jednotkách.<br />Z technických důvodů 
+            seznam nemusí obsahovat dokumenty k převzetí. Pro zobrazení těchto dokumentů použijte
+            filtr "K převzetí".
+        </dd>
     </dl>
     <dl>
         <dt>Doporučené</dt>
@@ -117,25 +119,16 @@
         <dt>Odeslané</dt>
         <dd>Zobrazí se všechny dokumenty, které jsou již odeslané.</dd>
     </dl>
+    <p>Zaškrtávací pole:</p>
     <dl>
-        <dt>Všechny</dt>
-        <dd>
-            Zobrazí se všechny dokumenty
-            <br />
-            Pracovníci podatelny a spisovny vidí všechny dokumenty bez ohledu na organizační jednotku.
-            <br />
-            Pracovníci sekretariátu vidí všechny dokumenty jak ze své organizační jednotky, tak i ze všech svých podřízených jednotek.
-            <br />
-            Ostatní pracovníci všechny dokumenty pouze ze své organizační jednotky.
-
-            
-        </dd>
+        <dt>Nezobrazovat vyřízené dokumenty</dt>
+        <dd>Volba dává smysl prakticky jen pro filtry výpravny. Pokud zvolíte tuto volbu a zároveň filtr "Všechny", zobrazí se nové + vyřizované dokumenty.</dd>
     </dl>
-
-    U všech kritérií filtru máte možnost zaškrtnout možnost Nezobrazovat vyřízené nebo archivované dokumenty. 
-    <br />
-    Všechny filtry nepracují s uživatelem, ale jsou nastaveny na organizační jednotky, to znamená, že vše, na čem pracujete, mohou vidět i ostatní členové vaší organizační jednotky.    
-    </p>
+    <dl>
+        <dt>Zobrazit jen dokumenty na mé jméno</dt>
+        <dd>Omezí výsledky filtrování pouze na vašeho uživatele.</dd>
+    </dl>
+    <p>Dokumenty, které se už nachází ve spisovně, se zde nezobrazí.</p>
 
     <br /><br /><br />
     <h3>Vyhledávání</h3>

@@ -20,7 +20,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
     
     public function renderSeznam($hledat = null)
     {
-        $Spisy = new Spis();
+        $Spisy = new SpisModel();
         $result = $Spisy->seznamRychly();
         $result->setRowClass(null);
         $this->template->spisy = $result->fetchAll();
@@ -74,7 +74,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->template->FormUpravit = $upravit;
         $spis_id = $id;
         
-        $Spisy = new Spis();
+        $Spisy = new SpisModel();
 
         $spis = $Spisy->getInfo($spis_id);
         $this->template->Spis = $spis;
@@ -107,7 +107,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
             // Exportovani
             $post_data = $this->getHttpRequest()->getPost();
 
-            $Spis = new Spis();
+            $Spis = new SpisModel();
             $args = null;
             if ($post_data['export_co'] == 2) {
                 // pouze aktivni
@@ -178,7 +178,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     public function renderRebuild()
     {
-        $m = new Spis();
+        $m = new SpisModel();
         $m->rebuildIndex();
         $this->flashMessage('Operace proběhla úspěšně.');
         $this->redirect('default');

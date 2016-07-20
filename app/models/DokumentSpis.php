@@ -24,7 +24,7 @@ class DokumentSpis extends BaseModel
         if (!$result)
             return null;
 
-        $Spis = new Spis();
+        $Spis = new SpisModel();
         $spis = $Spis->getInfo($result->spis_id);
         $spis->poradi = $result->poradi;
 
@@ -33,7 +33,6 @@ class DokumentSpis extends BaseModel
 
     public function dokumenty($spis_id)
     {
-
         $param = array();
         $param['where'] = array();
         $param['where'][] = array('spis_id=%i', $spis_id);
@@ -57,7 +56,7 @@ class DokumentSpis extends BaseModel
 
             foreach ($result as $joinDok) {
                 $dok = $Dokument->getInfo($joinDok->dokument_id, '');
-                if (empty($dok->stav_dokumentu))
+                if (empty($dok->stav))
                     continue;
                 $dok->poradi = empty($joinDok->poradi) ? 1 : $joinDok->poradi;
                 $id = $dok->id;
@@ -94,7 +93,7 @@ class DokumentSpis extends BaseModel
 
         $Log = new LogModel();
 
-        $Spis = new Spis();
+        $Spis = new SpisModel();
         $spis_info = $Spis->getInfo($spis_id);
         if ($spis_info->stav != 1)
             throw new Exception('Do spisu, který není otevřený, není možné přidávat dokumenty.');

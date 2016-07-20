@@ -6,7 +6,6 @@ class Subjekt extends BaseModel
 {
 
     protected $name = 'subjekt';
-    protected $primary = 'id';
 
     public function getInfo($subjekt_id)
     {

@@ -6,14 +6,12 @@ class Dokument extends BaseModel
 {
 
     protected $name = 'dokument';
-    protected $primary = 'id';
 
     /**
      * Seznam ID dokumentu
      */
     public function seznam(array $args = array())
     {
-
         if (isset($args['where'])) {
             $where = $args['where'];
         } else {
@@ -43,52 +41,29 @@ class Dokument extends BaseModel
         }
 
         $sql = array(
-            'distinct' => 1,
-            'from' => array($this->tb_workflow => 'wf'),
-            'cols' => array('wf.dokument_id' => 'id'),
+            'from' => array($this->name => 'd'),
+            'cols' => array('id'),
             'where' => $where,
             'where_or' => $where_or,
             'order' => $order,
             'limit' => $limit,
             'offset' => $offset,
-            'leftJoin' => array(
-                'dokument' => array(
-                    'from' => array($this->name => 'd'),
-                    'on' => array('d.id=wf.dokument_id'),
-                    'cols' => null
-                ),
-                'dokspisy' => array(
-                    'from' => array($this->tb_dokspis => 'ds'),
-                    'on' => array('ds.dokument_id=wf.dokument_id'),
-                    'cols' => null
-                ),
-                'spisy' => array(
-                    'from' => array($this->tb_spis => 'spis'),
-                    'on' => array('spis.id=ds.spis_id'),
-                    'cols' => null
-                ),
-                'typ_dokumentu' => array(
-                    'from' => array($this->tb_dokumenttyp => 'dtyp'),
-                    'on' => array('dtyp.id=d.dokument_typ_id'),
-                    'cols' => null
-                )
-            )
+            'leftJoin' => array()
         );
 
-        if (isset($args['leftJoin'])) {
+        if (isset($args['cols']))
+            $sql['cols'] = array_merge($sql['cols'], $args['cols']);
+        if (isset($args['leftJoin']))
             $sql['leftJoin'] = array_merge($sql['leftJoin'], $args['leftJoin']);
-        }
 
         return $this->selectComplex($sql);
     }
 
     /**
      * Seznam ID dokumentu
-     * 
      */
     public function seznamKeSkartaci(array $args = array())
     {
-
         /*
          * Metodika nejdelsiho skartacniho roku:
          * - vypocteme skartacni rok ze tri mist
@@ -130,8 +105,8 @@ class Dokument extends BaseModel
 
         $sql = array(
             'distinct' => 1,
-            'from' => array($this->tb_workflow => 'wf'),
-            'cols' => array('wf.dokument_id', 'wf.dokument_id' => 'id', "MAX(GREATEST(
+            'from' => array($this->name => 'd'),
+            'cols' => array('id', "MAX(GREATEST(
 (CASE WHEN d.skartacni_lhuta > 1900 THEN MAKEDATE(d.skartacni_lhuta,1) ELSE DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR) END),
 (CASE WHEN spis.skartacni_lhuta IS NULL THEN '0000-00-00' WHEN spis.datum_uzavreni IS NULL THEN '0000-00-00' WHEN spis.datum_uzavreni = '0000-00-00 00:00:00' THEN '0000-00-00' WHEN spis.skartacni_lhuta > 1900 THEN MAKEDATE(spis.skartacni_lhuta,1) ELSE DATE_ADD(spis.datum_uzavreni, INTERVAL spis.skartacni_lhuta YEAR) END),
 (CASE WHEN d2.skartacni_lhuta IS NULL THEN '0000-00-00' WHEN d2.datum_spousteci_udalosti IS NULL THEN '0000-00-00' WHEN d2.skartacni_lhuta > 1900 THEN MAKEDATE(d2.skartacni_lhuta,1) ELSE DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR) END)
@@ -142,14 +117,9 @@ class Dokument extends BaseModel
             'limit' => $limit,
             'offset' => $offset,
             'leftJoin' => array(
-                'dokument' => array(
-                    'from' => array($this->name => 'd'),
-                    'on' => array('d.id=wf.dokument_id'),
-                    'cols' => null
-                ),
                 'dokspisy' => array(
                     'from' => array($this->tb_dokspis => 'ds'),
-                    'on' => array('ds.dokument_id=wf.dokument_id'),
+                    'on' => array('ds.dokument_id = d.id'),
                     'cols' => null
                 ),
                 'spisy' => array(
@@ -179,7 +149,7 @@ class Dokument extends BaseModel
             $sql['leftJoin'] = array_merge($sql['leftJoin'], $args['leftJoin']);
         }
 
-        $sql['group'] = 'dokument_id';
+        $sql['group'] = 'd.id';
         $sql['having'] = array('NOW() > skartace');
 
         // return DibiResult
@@ -245,10 +215,10 @@ class Dokument extends BaseModel
 
         switch ($typ) {
             case 'stav':
-                $args['order'] = array('wf.aktivni', 'wf.stav_dokumentu');
+                $args['order'] = array('d.stav');
                 break;
             case 'stav_desc':
-                $args['order'] = array('wf.aktivni', 'wf.stav_dokumentu' => 'DESC');
+                $args['order'] = array('d.stav' => 'DESC');
                 break;
             case 'cj':
                 $args['order'] = array('d.podaci_denik_rok', 'd.podaci_denik_poradi', 'd.poradi');
@@ -299,7 +269,7 @@ class Dokument extends BaseModel
             case 'prideleno':
                 $args['leftJoin']['wf_user'] = array(
                     'from' => array($this->tb_user => 'wf_user'),
-                    'on' => array('wf_user.id = wf.prideleno_id'),
+                    'on' => array('wf_user.id = d.owner_user_id'),
                     'cols' => null
                 );
                 $args['leftJoin']['wf_osoba'] = array(
@@ -312,7 +282,7 @@ class Dokument extends BaseModel
             case 'prideleno_desc':
                 $args['leftJoin']['wf_user'] = array(
                     'from' => array($this->tb_user => 'wf_user'),
-                    'on' => array('wf_user.id = wf.prideleno_id'),
+                    'on' => array('wf_user.id = d.owner_user_id'),
                     'cols' => null
                 );
                 $args['leftJoin']['wf_osoba'] = array(
@@ -427,8 +397,17 @@ class Dokument extends BaseModel
             $args['where'][] = array('d.cislo_jednaci LIKE %s', '%' . $params['cislo_jednaci'] . '%');
 
         // spisova znacka - nazev spisu
-        if (!empty($params['spisova_znacka']))
+        if (!empty($params['spisova_znacka'])) {
+            $args['leftJoin']['dokspisy'] = ['from' => [$this->tb_dokspis => 'ds'],
+                'on' => ['ds.dokument_id = d.id'],
+                'cols' => null
+            ];
+            $args['leftJoin']['spis'] = array(
+                'from' => array($this->tb_spis => 'spis'),
+                'on' => array('spis.id = ds.spis_id'),
+                'cols' => null);
             $args['where'][] = array('spis.nazev LIKE %s', '%' . $params['spisova_znacka'] . '%');
+        }
 
         // typ dokumentu
         if (isset($params['dokument_typ_id'])) {
@@ -511,16 +490,17 @@ class Dokument extends BaseModel
         // pocet listu
         if (isset($params['pocet_listu']))
             $args['where'][] = array('d.pocet_listu = %i', $params['pocet_listu']);
-        if (isset($params['pocet_priloh']))
-            $args['where'][] = array('d.pocet_priloh = %i', $params['pocet_priloh']);
+        if (isset($params['pocet_listu_priloh']))
+            $args['where'][] = array('d.pocet_listu_priloh = %i', $params['pocet_listu_priloh']);
 
         // stav dokumentu
         if (!empty($params['stav_dokumentu'])) {
-            if ($params['stav_dokumentu'] == 4) {
+            if ($params['stav_dokumentu'] == DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA) {
                 // vyrizene - 4,5,6
-                $args['where'][] = array('wf.stav_dokumentu IN (4,5,6) AND wf.aktivni=1 AND wf.stav_osoby=1');
+                $args['where'][] = array('d.stav IN (%i,%i,%i)', DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA,
+                    DocumentWorkflow::STAV_VYRIZEN_SPUSTENA, DocumentWorkflow::STAV_PREDAN_DO_SPISOVNY);
             } else {
-                $args['where'][] = array('wf.stav_dokumentu = %i AND wf.aktivni=1 AND wf.stav_osoby=1', $params['stav_dokumentu']);
+                $args['where'][] = array('d.stav = %i', $params['stav_dokumentu']);
             }
         }
 
@@ -672,12 +652,12 @@ class Dokument extends BaseModel
         }
         if (isset($params['prideleno'])) {
             if (count($params['prideleno']) > 0 && is_array($params['prideleno'])) {
-                $args['where'][] = array('wf.prideleno_id IN %in AND wf.stav_osoby=1 AND wf.aktivni=1', $params['prideleno']);
+                $args['where'][] = array('d.owner_user_id IN %in', $params['prideleno']);
             }
         }
         if (isset($params['predano'])) {
             if (count($params['predano']) > 0 && is_array($params['predano'])) {
-                $args['where'][] = array('wf.prideleno_id IN %in AND wf.stav_osoby=0 AND wf.aktivni=1', $params['predano']);
+                $args['where'][] = array('d.owner_user_id IN %in', $params['predano']);
             }
         }
 
@@ -701,119 +681,68 @@ class Dokument extends BaseModel
 
         if (isset($params['prideleno_org'])) {
             if (count($params['prideleno_org']) > 0 && is_array($params['prideleno_org'])) {
-                $args['where'][] = array('wf.orgjednotka_id IN %in AND wf.stav_osoby=1 AND wf.aktivni=1', $params['prideleno_org']);
+                $args['where'][] = array('d.owner_orgunit_id IN %in', $params['prideleno_org']);
             }
         }
         if (isset($params['predano_org'])) {
             if (count($params['predano_org']) > 0 && is_array($params['predano_org'])) {
-                $args['where'][] = array('wf.orgjednotka_id IN %in AND wf.stav_osoby=0 AND wf.aktivni=1', $params['predano_org']);
+                $args['where'][] = array('d.owner_orgunit_id IN %in', $params['predano_org']);
             }
         }
 
         return $args;
     }
 
-    /* $pouze_dokumenty_na_osobu - uživatelská volba, která je součástí filtru
+    /**
+     * $pouze_dokumenty_na_osobu - uživatelská volba, která je součástí filtru
      */
-
     public function fixedFiltr($nazev, $bez_vyrizenych, $pouze_dokumenty_na_osobu)
     {
-
         $user = self::getUser();
         $user_id = $user->id;
         $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
-        $vyrusit_bezvyrizeni = false;
 
-        $oj_id = OrgJednotka::dejOrgUzivatele();
+        $org_id = OrgJednotka::dejOrgUzivatele();
         $org_jednotka = array();
-        if ($oj_id !== null && $user->isAllowed('Dokument', 'cist_moje_oj'))
-            $org_jednotka[] = $oj_id;
+        if ($isVedouci && $org_id !== null)
+            $org_jednotka = OrgJednotka::childOrg($org_id);
+        else if ($org_id !== null && $user->isAllowed('Dokument', 'cist_moje_oj'))
+            $org_jednotka[] = $org_id;
         $vidi_vsechny_dokumenty = self::uzivatelVidiVsechnyDokumenty();
 
         $args = array();  // priprav navratovou hodnotu
 
         switch ($nazev) {
-
-            case 'pridelene':
-                $a = array(
-                    array('wf.stav_osoby>0'),
-                );
-                break;
-
             case 'kprevzeti':
-                $a = array(
-                    array('wf.stav_osoby=0'),
-                );
-                break;
-
-            case 'nove':
-                $a = array(
-                    array('wf.stav_osoby=1'),
-                    array('wf.stav_dokumentu = 1')
-                );
-
-                // odfiltruj dokumenty, ktere jsou predane
-                $a[] = array('wf.dokument_id NOT IN ( SELECT DISTINCT wf1.dokument_id FROM [' . $this->tb_workflow . '] AS wf1 WHERE wf1.stav_osoby=0 AND wf1.aktivni=1 )');
+                $sql = "d.forward_user_id = $user_id";
+                if (!$pouze_dokumenty_na_osobu && $org_id !== null && $user->isAllowed('Dokument',
+                                'menit_moje_oj'))
+                    $sql .= " OR d.forward_orgunit_id = $org_id";
+                $a = ["d.is_forwarded", $sql];
                 break;
 
             case 'predane':
-                $a = array(
-                    array('wf.stav_osoby=1'),
-                );
+                $a = ['d.is_forwarded'];
+                break;
 
-                $a[] = array('wf.dokument_id IN ( SELECT DISTINCT wf1.dokument_id FROM [' . $this->tb_workflow . '] AS wf1 LEFT JOIN [' . $this->name . '] AS d1 ON (d1.id=wf1.dokument_id) WHERE (wf1.stav_osoby=0) AND (wf1.aktivni=1) AND (d1.stav = 1) )');
+            case 'nove':
+                $a = ['d.stav = ' . DocumentWorkflow::STAV_NOVY];
                 break;
 
             case 'kvyrizeni':
-                $a = array(
-                    array('wf.stav_osoby=1'),
-                    array('wf.stav_dokumentu = 3')
-                );
+                $a = ['d.stav = ' . DocumentWorkflow::STAV_VYRIZUJE_SE];
                 break;
 
             case 'vyrizene':
-                $a = array(
-                    array('wf.stav_osoby=1'),
-                    array('wf.stav_dokumentu = 4 OR wf.stav_dokumentu = 5')
-                );
-                break;
-
-            case 'pracoval':
-                $vyrusit_bezvyrizeni = true;
-                $args = array(
-                    'where' => array(
-                        array('wf.prideleno_id=%i', $user_id),
-                        array('wf.stav_osoby > 0'),
-                        array('wf.stav_osoby < 100'))
-                );
-                break;
-
-            case 'org_pracoval':
-                $vyrusit_bezvyrizeni = true;
-                if (count($org_jednotka) > 0) {
-                    $args = array(
-                        'where' => array(
-                            array('wf.orgjednotka_id IN %in', $org_jednotka),
-                            array('wf.stav_osoby > 0'),
-                            array('wf.stav_osoby < 100'))
-                    );
-                } else {
-                    // Tento filtr ma smysl, jen pokud je uzivatel zarazen do o.j.
-                    // Pokud tomu tak neni, vrat prazdny seznam dokumentu
-                    $args = array(
-                        'where' => array('0')
-                    );
-                }
+                $a = ['d.stav >= ' . DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA];
                 break;
 
             case 'zapujcene':
-                $a = ['wf.stav_dokumentu = ' . Workflow::STAV_ZAPUJCEN];
+                $a = ['d.stav = ' . DocumentWorkflow::STAV_ZAPUJCEN];
                 break;
 
             case 'vse':
-                $a = array();
-                if ($isVedouci && $oj_id !== null)
-                    $org_jednotka = OrgJednotka::childOrg($oj_id);
+                $a = [];
                 break;
 
             case 'doporucene':
@@ -823,23 +752,24 @@ class Dokument extends BaseModel
                 break;
 
             case 'predane_k_odeslani':
-                $podminka = array("dok_odeslani.stav=1");
+                $podminka = array("dok_odeslani.stav = 1");
                 break;
 
             case 'odeslane':
-                $podminka = array("dok_odeslani.stav=2");
+                $podminka = array("dok_odeslani.stav = 2");
                 break;
 
             default:
                 // Neexistujici filtr - zobraz prazdny seznam dokumentu
-                $args = array(
-                    'where' => array(0)
-                );
+                $a = [0];
                 break;
         }
 
 
         switch ($nazev) {
+
+            case 'kprevzeti'; // specialni pripad
+                break;
 
             case 'doporucene':
             case 'predane_k_odeslani':
@@ -847,43 +777,38 @@ class Dokument extends BaseModel
 
                 $args['leftJoin'] = array('zpusob_odeslani' => array(
                         'from' => array($this->tb_dok_odeslani => 'dok_odeslani'),
-                        'on' => array('dok_odeslani.dokument_id=d.id'),
+                        'on' => array('dok_odeslani.dokument_id = d.id'),
                         'cols' => null
                 ));
 
-                $a = array($podminka);
-            // propadni dolu :)
+                $a = [$podminka];
+            // propadni dolu
 
-            case 'pridelene':
-            case 'nove':
-            case 'kprevzeti':
             case 'predane':
+            case 'nove':
             case 'kvyrizeni':
             case 'vyrizene':
             case 'zapujcene':
             case 'vse':
-
-                $a[] = 'wf.aktivni=1';
-
                 if ($pouze_dokumenty_na_osobu)
-                    $a[] = array('wf.prideleno_id=%i', $user_id);
+                    $a[] = array('d.owner_user_id = %i', $user_id);
                 else if ($vidi_vsechny_dokumenty)
                     ;
                 else if (count($org_jednotka) > 1)
-                    $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN %in',
+                    $a[] = array('d.owner_user_id = %i OR d.owner_orgunit_id IN %in',
                         $user_id, $org_jednotka);
                 else if (count($org_jednotka) == 1)
-                    $a[] = array('wf.prideleno_id=%i OR wf.orgjednotka_id = %i',
+                    $a[] = array('d.owner_user_id = %i OR d.owner_orgunit_id = %i',
                         $user_id, $org_jednotka[0]);
                 else
-                    $a[] = array('wf.prideleno_id=%i', $user_id);
-
-                $args['where'] = $a;
+                    $a[] = array('d.owner_user_id = %i', $user_id);
                 break;
         }
 
-        if ($bez_vyrizenych && !$vyrusit_bezvyrizeni)
-            $args['where'][] = 'wf.stav_dokumentu < 4';
+        if ($bez_vyrizenych)
+            $a[] = 'd.stav <= ' . DocumentWorkflow::STAV_VYRIZUJE_SE;
+
+        $args['where'] = $a;
 
         return $args;
     }
@@ -903,7 +828,7 @@ class Dokument extends BaseModel
         $ret = $p ? $this->paramsFiltr($p) : [];
         $display_borrowed = Settings::get('spisovna_display_borrowed_documents');
         if (!$display_borrowed)
-            $ret['where'][] = 'stav_dokumentu != 11';
+            $ret['where'][] = 'd.stav != ' . DocumentWorkflow::STAV_ZAPUJCEN;
 
         return $ret;
     }
@@ -927,34 +852,33 @@ class Dokument extends BaseModel
             else if ($user->isAllowed('Dokument', 'cist_moje_oj'))
                 $org_jednotky = array($org_jednotka_id);
 
-            $args['where'][] = 'wf.aktivni=1 AND wf.stav_osoby=1';
-
             if (count($org_jednotky) > 1)
-                $args['where'][] = array('wf.prideleno_id=%i OR wf.orgjednotka_id IN %in',
+                $args['where'][] = array('d.owner_user_id=%i OR d.owner_orgunit_id IN %in',
                     $user_id, $org_jednotky);
             else if (count($org_jednotky) == 1)
-                $args['where'][] = array('wf.prideleno_id=%i OR wf.orgjednotka_id = %i',
+                $args['where'][] = array('d.owner_user_id=%i OR d.owner_orgunit_id = %i',
                     $user_id, $org_jednotky[0]);
             else
-                $args['where'][] = array('wf.prideleno_id=%i', $user_id);
+                $args['where'][] = array('d.owner_user_id=%i', $user_id);
         }
 
         return $args;
     }
 
-    protected function spisovnaOmezeniOrg($args)
-    {
-        // Pracovník spisovny vidí všechny dokumenty ve spisovně
-        // Jakmile je dokument ve spisovně, přidělení dokumentu na uživatele a org. jednotku ztrácí význam
-        return $args;
-    }
+//    protected function spisovnaOmezeniOrg($args)
+//    {
+//        // Pracovník spisovny vidí všechny dokumenty ve spisovně
+//        // Jakmile je dokument ve spisovně, přidělení dokumentu na uživatele a org. jednotku ztrácí význam
+//        return $args;
+//    }
 
     public function filtrSpisovka($args)
     {
         if (!isset($args['where']))
             $args['where'] = [];
 
-        $args['where'][] = array('d.stav = 1');
+        $args['where'][] = 'd.stav < ' . DocumentWorkflow::STAV_VE_SPISOVNE
+                . ' OR d.stav = ' . DocumentWorkflow::STAV_ZAPUJCEN;
         return $args;
     }
 
@@ -968,9 +892,25 @@ class Dokument extends BaseModel
         if (!isset($args['where']))
             $args['where'] = [];
 
-        $args['where'][] = array('wf.stav_dokumentu IN (7,8,9,10,11) AND wf.aktivni = 1');
+        $args['where'][] = array('d.stav >= ' . DocumentStates::STAV_VE_SPISOVNE);
 
-        return $this->spisovnaOmezeniOrg($args);
+        return $args;
+    }
+
+    /**
+     * Ze seznamu nejsou odfiltrovany dokumenty, na ktere existuje zadost o zapujceni
+     * @param array $args
+     * @return array
+     */
+    public function filtrSpisovnaLzeZapujcit($args)
+    {
+        if (!isset($args['where']))
+            $args['where'] = [];
+
+        $args['where'][] = array('d.stav IN %in',
+            DocumentStates::getSourceStates(DocumentStates::STAV_ZAPUJCEN));
+
+        return $args;
     }
 
     public function filtrSpisovnaPrijem($args)
@@ -978,10 +918,14 @@ class Dokument extends BaseModel
         if (!isset($args['where']))
             $args['where'] = [];
 
+        $args['leftJoin']['dokspisy'] = ['from' => [$this->tb_dokspis => 'ds'],
+            'on' => ['ds.dokument_id = d.id'],
+            'cols' => null
+        ];
         $args['where'][] = array(
-            'wf.stav_dokumentu = 6 AND wf.aktivni = 1 AND ds.spis_id IS NULL');
+            'd.stav = %i AND ds.spis_id IS NULL', DocumentWorkflow::STAV_PREDAN_DO_SPISOVNY);
 
-        return $this->spisovnaOmezeniOrg($args);
+        return $args;
     }
 
     public function filtrSpisovnaKeskartaci($args)
@@ -989,9 +933,9 @@ class Dokument extends BaseModel
         if (!isset($args['where']))
             $args['where'] = [];
 
-        $args['where'][] = array('wf.stav_dokumentu = 7 AND wf.aktivni=1');
+        $args['where'][] = array('d.stav = 7');
 
-        return $this->spisovnaOmezeniOrg($args);
+        return $args;
     }
 
     public function filtrSpisovnaSkartace($args)
@@ -999,9 +943,9 @@ class Dokument extends BaseModel
         if (!isset($args['where']))
             $args['where'] = [];
 
-        $args['where'][] = array('wf.stav_dokumentu = 8 AND wf.aktivni = 1');
+        $args['where'][] = array('d.stav = 8');
 
-        return $this->spisovnaOmezeniOrg($args);
+        return $args;
     }
 
     // $detail - nyní slouží pouze jako parametr pro nahrávání informace o přílohách
@@ -1028,42 +972,6 @@ class Dokument extends BaseModel
                     'from' => array($this->tb_dokumenttyp => 'dtyp'),
                     'on' => array('dtyp.id=dok.dokument_typ_id'),
                     'cols' => array('nazev' => 'typ_nazev', 'popis' => 'typ_popis', 'smer' => 'typ_smer')
-                ),
-                'workflow' => array(
-                    'from' => array($this->tb_workflow => 'wf'),
-                    'on' => array('wf.dokument_id=dok.id'),
-                    'cols' => array('id' => 'workflow_id', 'stav_dokumentu', 'prideleno_id', 'orgjednotka_id',
-                        'stav_osoby', 'date' => 'date_prideleni', 'date_predani', 'poznamka' => 'poznamka_predani', 'aktivni' => 'wf_aktivni')
-                ),
-                'workflow_prideleno' => array(
-                    'from' => array($this->tb_user => 'wf_o2u'),
-                    'on' => array('wf_o2u.id=wf.prideleno_id'),
-                    'cols' => array('osoba_id' => 'prideleno_osoba_id')
-                ),
-                'workflow_prideleno_osoba' => array(
-                    'from' => array($this->tb_osoba => 'wf_prideleno_osoba'),
-                    'on' => array('wf_prideleno_osoba.id=wf_o2u.osoba_id'),
-                    'cols' => array('id' => 'osoba_id',
-                        'prijmeni' => 'osoba_prijmeni', 'jmeno' => 'osoba_jmeno', 'titul_pred' => 'osoba_titul_pred', 'titul_za' => 'osoba_titul_za'
-                    )
-                ),
-                'workflow_orgjednotka' => array(
-                    'from' => array($this->tb_orgjednotka => 'wf_org'),
-                    'on' => array('wf_org.id=wf.orgjednotka_id'),
-                    'cols' => array('id' => 'org_id',
-                        'plny_nazev' => 'org_plny_nazev', 'zkraceny_nazev' => 'org_zkraceny_nazev', 'ciselna_rada' => 'org_ciselna_rada')
-                ),
-                'workflow_user' => array(
-                    'from' => array($this->tb_user => 'wf_o2user'),
-                    'on' => array('wf_o2user.id = wf.user_id'),
-                    'cols' => array('osoba_id' => 'user_osoba_id', 'id' => 'wf_user_id')
-                ),
-                'workflow_user_osoba' => array(
-                    'from' => array($this->tb_osoba => 'wf_user_osoba'),
-                    'on' => array('wf_user_osoba.id=wf_o2user.osoba_id'),
-                    'cols' => array('id' => 'user_osoba_id',
-                        'prijmeni' => 'user_prijmeni', 'jmeno' => 'user_jmeno', 'titul_pred' => 'user_titul_pred', 'titul_za' => 'user_titul_za'
-                    )
                 ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
@@ -1096,204 +1004,130 @@ class Dokument extends BaseModel
 
         $sql['where'] = array(array('dok.id=%i', $dokument_id));
 
-        if (!in_array('workflow', $details))
-            $sql['leftJoin']['workflow']['on'][] = 'wf.aktivni=1';
-
-        $select = $this->selectComplex($sql);
-        $result = $select->fetchAll();
-        if (count($result) > 0) {
-
-            $tmp = array();
-            foreach ($result as $row) {
-                // $id = $row->id; // toto je ID z tabulky dokument, totozny udaj je i v $row->dokument_id
-
-                $workflow = new stdClass();
-                $workflow->id = $row->workflow_id;
-                unset($row->workflow_id);
-                $workflow->stav_dokumentu = $row->stav_dokumentu;
-                unset($row->stav_dokumentu);
-                $workflow->prideleno_id = $row->prideleno_id;
-                unset($row->prideleno_id);
-                if (!empty($workflow->prideleno_id)) {
-                    $workflow->prideleno_jmeno = Osoba::displayName($row);
-                } else {
-                    $workflow->prideleno_jmeno = "";
-                }
-                $workflow->stav_osoby = $row->stav_osoby;
-                unset($row->stav_osoby);
-
-                $workflow->user_id = $row->wf_user_id;
-                unset($row->wf_user_id);
-                if (!empty($workflow->user_id)) {
-                    $workflow->user_jmeno = Osoba::displayName($row, 'user');
-                } else {
-                    $workflow->user_jmeno = "";
-                }
-
-                $workflow->orgjednotka_id = $row->orgjednotka_id;
-                unset($row->orgjednotka_id);
-                if (!empty($workflow->orgjednotka_id)) {
-                    $tmp_org = new stdClass();
-                    $tmp_org->id = $row->org_id;
-                    $tmp_org->plny_nazev = $row->org_plny_nazev;
-                    $tmp_org->zkraceny_nazev = $row->org_zkraceny_nazev;
-                    $tmp_org->ciselna_rada = $row->org_ciselna_rada;
-                    $workflow->orgjednotka_info = $tmp_org;
-                    unset($tmp_org);
-                } else {
-                    $workflow->orgjednotka_info = null;
-                }
-
-                //$workflow->orgjednotka_info = unserialize($row->orgjednotka_info); unset($row->orgjednotka_info);
-                $workflow->date_predani = $row->date_predani;
-                unset($row->date_predani);
-                $workflow->date = $row->date_prideleni;
-                unset($row->date_prideleni);
-                $workflow->poznamka = $row->poznamka_predani;
-                unset($row->poznamka_predani);
-                $workflow->aktivni = $row->wf_aktivni;
-                unset($row->wf_aktivni);
-                $tmp['workflow'][$workflow->id] = $workflow;
-            }
-
-            $spis = null;
-            if (!empty($row->spis_id)) {
-                $spis = new stdClass();
-                $spis->id = $row->spis_id;
-                unset($row->spis_id);
-                $spis->nazev = $row->nazev_spisu;
-                unset($row->nazev_spisu);
-                $spis->popis = $row->popis_spisu;
-                unset($row->popis_spisu);
-                $spis->poradi = $row->poradi_spisu;
-                unset($row->poradi_spisu);
-            }
-
-            $typ = new stdClass();
-            $typ->id = $row->dokument_typ_id;
-            unset($row->dokument_typ_id);
-            $typ->nazev = $row->typ_nazev;
-            unset($row->typ_nazev);
-            $typ->popis = $row->typ_popis;
-            unset($row->typ_popis);
-            $typ->smer = $row->typ_smer;
-            unset($row->typ_smer);
-
-            $dokument = $row;
-
-            if (!isset($dokument->epod_typ))
-                $dokument->epod_typ = ''; // definuj "epod_typ", pokud dokument nebyl vytvořen e-podatelnou
-
-            $dokument->typ_dokumentu = $typ;
-            if (isset($spis)) {
-                $dokument->spis = $spis;
-                // puvodne spisovka pitome umoznovala zaradit dokument do vice spisu najednou
-                // zustava zde kvuli kompatibilite
-                $dokument->spisy = array($spis->id => $spis);
-            }
-            $dokument->workflow = $tmp['workflow'];
-
-            if (in_array('subjekty', $details)) {
-                $DokSubjekty = new DokumentSubjekt();
-                $dokument->subjekty = $DokSubjekty->subjekty($dokument_id);
-            }
-
-            if (in_array('soubory', $details)) {
-                $Dokrilohy = new DokumentPrilohy();
-                $dokument->prilohy = $Dokrilohy->prilohy($dokument_id);
-            }
-
-            if (in_array('odeslani', $details)) {
-                $DokOdeslani = new DokumentOdeslani();
-                $dokument->odeslani = $DokOdeslani->odeslaneZpravy($dokument_id);
-            }
-
-            /* Dulezite: Toto nesmime nastavit na null, protoze
-              funkce isset potom vraci true
-              $dokument->prideleno = null;
-              $dokument->predano = null;
-             */
-            $prideleno = $predano = $stav = 0;
-            if (count($dokument->workflow) > 0) {
-                foreach ($dokument->workflow as $wf)
-                    if ($wf->aktivni == 1) {
-                        // Pridelen
-                        if ($wf->stav_osoby == 1 && $prideleno == 0) {
-                            $dokument->prideleno = $wf;
-                            $prideleno = 1;
-                        }
-                        // Predan
-                        if ($wf->stav_osoby == 0 && $predano == 0) {
-                            $dokument->predano = $wf;
-                            $predano = 1;
-                        }
-                        // Stav
-                        if ($stav <= $wf->stav_dokumentu)
-                            $stav = $wf->stav_dokumentu;
-                    }
-            }
-            $dokument->stav_dokumentu = $stav;
-
-
-            // lhuta
-            $dokument->lhuta_stav = 0;
-            if (!empty($dokument->lhuta)) {
-                $datum_vzniku = strtotime($dokument->datum_vzniku);
-                $dokument->lhuta_do = $datum_vzniku + ($dokument->lhuta * 86400);
-                $rozdil = $dokument->lhuta_do - time();
-
-                if ($rozdil < 0) {
-                    $dokument->lhuta_stav = 2;
-                } else if ($rozdil <= 432000) {
-                    $dokument->lhuta_stav = 1;
-                }
-            } else {
-                $dokument->lhuta_do = 'neurčeno';
-                $dokument->lhuta_stav = 0;
-            }
-            if ($stav > 3) {
-                $dokument->lhuta_stav = 0;
-            }
-
-            if (empty($dokument->datum_spousteci_udalosti) || is_null($dokument->skartacni_lhuta))
-            // V techto pripadech bude zrejme db dotaz vracet nesmyslny vysledek nebo null
-            // Pro jistotu skartacni rok definuj jako nulu
-                $dokument->skartacni_rok = 0;
-
-            // spisovy znak
-            $dokument->spisovy_znak = $row->spisznak_nazev;
-            $dokument->spisovy_znak_popis = $row->spisznak_popis;
-            $dokument->spisovy_znak_skart_znak = $row->spisznak_skartacni_znak;
-            $dokument->spisovy_znak_skart_lhuta = $row->spisznak_skartacni_lhuta;
-            $dokument->spisovy_znak_udalost = $row->spisznak_spousteci_udalost_id;
-            $dokument->spisovy_znak_udalost_nazev = SpisovyZnak::spousteci_udalost($row->spisznak_spousteci_udalost_id,
-                            10);
-            $dokument->spisovy_znak_udalost_stav = '';
-            $dokument->spisovy_znak_udalost_dtext = '';
-
-            $spousteci_udalost = SpisovyZnak::spousteci_udalost($row->spousteci_udalost_id, 8);
-            if (isset($spousteci_udalost->nazev)) {
-                $dokument->spousteci_udalost_nazev = $spousteci_udalost->nazev;
-                $dokument->spousteci_udalost_stav = $spousteci_udalost->stav;
-                $dokument->spousteci_udalost_dtext = $spousteci_udalost->poznamka_k_datumu;
-            } else {
-                $dokument->spousteci_udalost_nazev = '';
-                $dokument->spousteci_udalost_stav = 0;
-                $dokument->spousteci_udalost_dtext = '';
-            }
-
-            if (empty($dokument->nazev)) {
-                $dokument->nazev = "(bez názvu)";
-            }
-
-            if (strpos($dokument->cislo_jednaci, "odpoved_") !== false) {
-                $dokument->cislo_jednaci = "";
-            }
-
-            return $dokument;
-        } else {
+        $result = $this->selectComplex($sql);
+        if (!count($result))
             return null;
+        $dokument = $result->fetch();
+
+        $prideleno = new stdClass();
+        $osoba = Person::fromUserId($dokument->owner_user_id);
+        $prideleno->jmeno = $osoba->displayName();
+        if (isset($dokument->owner_orgunit_id)) {
+            $ou = new OrgUnit($dokument->owner_orgunit_id);
+            $prideleno->orgjednotka = $ou;
         }
+        $dokument->prideleno = $prideleno;
+
+        $spis = null;
+        if (!empty($dokument->spis_id)) {
+            $spis = new stdClass();
+            $spis->id = $dokument->spis_id;
+            unset($dokument->spis_id);
+            $spis->nazev = $dokument->nazev_spisu;
+            unset($dokument->nazev_spisu);
+            $spis->popis = $dokument->popis_spisu;
+            unset($dokument->popis_spisu);
+            $spis->poradi = $dokument->poradi_spisu;
+            unset($dokument->poradi_spisu);
+        }
+        if (isset($spis)) {
+            $dokument->spis = $spis;
+            // puvodne spisovka pitome umoznovala zaradit dokument do vice spisu najednou
+            // zustava zde kvuli kompatibilite
+            $dokument->spisy = array($spis->id => $spis);
+        }
+
+        $typ = new stdClass();
+        $typ->id = $dokument->dokument_typ_id;
+        unset($dokument->dokument_typ_id);
+        $typ->nazev = $dokument->typ_nazev;
+        unset($dokument->typ_nazev);
+        $typ->popis = $dokument->typ_popis;
+        unset($dokument->typ_popis);
+        $typ->smer = $dokument->typ_smer;
+        unset($dokument->typ_smer);
+        $dokument->typ_dokumentu = $typ;
+
+        if (!isset($dokument->epod_typ))
+            $dokument->epod_typ = ''; // definuj "epod_typ", pokud dokument nebyl vytvořen e-podatelnou
+
+
+
+
+
+
+
+
+            
+// refactoring aplikace - prilis mnoho vyskytu k nahrazeni
+        $dokument->stav_dokumentu = $dokument->stav;
+
+        // lhuta
+        $dokument->lhuta_stav = 0;
+        if (!empty($dokument->lhuta)) {
+            $datum_vzniku = strtotime($dokument->datum_vzniku);
+            $dokument->lhuta_do = $datum_vzniku + ($dokument->lhuta * 86400);
+            $rozdil = $dokument->lhuta_do - time();
+
+            if ($rozdil < 0) {
+                $dokument->lhuta_stav = 2;
+            } else if ($rozdil <= 432000) {
+                $dokument->lhuta_stav = 1;
+            }
+        } else {
+            $dokument->lhuta_do = 'neurčeno';
+            $dokument->lhuta_stav = 0;
+        }
+        if ($dokument->stav >= DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA)
+            $dokument->lhuta_stav = 0;
+
+        if (empty($dokument->datum_spousteci_udalosti) || is_null($dokument->skartacni_lhuta))
+        // V techto pripadech bude zrejme db dotaz vracet nesmyslny vysledek nebo null
+        // Pro jistotu skartacni rok definuj jako nulu
+            $dokument->skartacni_rok = 0;
+
+        // spisovy znak
+        $dokument->spisovy_znak = $dokument->spisznak_nazev;
+        $dokument->spisovy_znak_popis = $dokument->spisznak_popis;
+        $dokument->spisovy_znak_skart_znak = $dokument->spisznak_skartacni_znak;
+        $dokument->spisovy_znak_skart_lhuta = $dokument->spisznak_skartacni_lhuta;
+        $dokument->spisovy_znak_udalost = $dokument->spisznak_spousteci_udalost_id;
+        $dokument->spisovy_znak_udalost_nazev = SpisovyZnak::spousteci_udalost($dokument->spisznak_spousteci_udalost_id,
+                        10);
+        $dokument->spisovy_znak_udalost_stav = '';
+        $dokument->spisovy_znak_udalost_dtext = '';
+
+        $spousteci_udalost = SpisovyZnak::spousteci_udalost($dokument->spousteci_udalost_id, 8);
+        if (isset($spousteci_udalost->nazev)) {
+            $dokument->spousteci_udalost_nazev = $spousteci_udalost->nazev;
+            $dokument->spousteci_udalost_stav = $spousteci_udalost->stav;
+            $dokument->spousteci_udalost_dtext = $spousteci_udalost->poznamka_k_datumu;
+        } else {
+            $dokument->spousteci_udalost_nazev = '';
+            $dokument->spousteci_udalost_stav = 0;
+            $dokument->spousteci_udalost_dtext = '';
+        }
+
+        if (strpos($dokument->cislo_jednaci, "odpoved_") !== false)
+            $dokument->cislo_jednaci = "";
+
+        // nacteni extra informaci, pokud je pozadovano
+        if (in_array('subjekty', $details)) {
+            $DokSubjekty = new DokumentSubjekt();
+            $dokument->subjekty = $DokSubjekty->subjekty($dokument_id);
+        }
+
+        if (in_array('soubory', $details)) {
+            $Dokrilohy = new DokumentPrilohy();
+            $dokument->prilohy = $Dokrilohy->prilohy($dokument_id);
+        }
+
+        if (in_array('odeslani', $details)) {
+            $DokOdeslani = new DokumentOdeslani();
+            $dokument->odeslani = $DokOdeslani->odeslaneZpravy($dokument_id);
+        }
+
+        return $dokument;
     }
 
     public function getBasicInfo($dokument_id)
@@ -1344,8 +1178,8 @@ class Dokument extends BaseModel
         if (isset($data['pocet_listu'])) {
             if ($data->pocet_listu === "")
                 $data->pocet_listu = null;
-            if ($data->pocet_priloh === "")
-                $data->pocet_priloh = null;
+            if ($data->pocet_listu_priloh === "")
+                $data->pocet_listu_priloh = null;
         }
         if (isset($data['vyrizeni_pocet_listu'])) {
             if ($data->vyrizeni_pocet_listu === "")
@@ -1360,9 +1194,9 @@ class Dokument extends BaseModel
             $data->skartacni_znak = null;
 
         unset($data['id']);
-        $success = $this->update($data, [['id=%i', $dokument_id]]);
-        if (!$success)
-            return false;
+        $doc = new Document($dokument_id);
+        $doc->modify($data);
+        $doc->save();
 
         $update_row = $this->getInfo($dokument_id);
         return $update_row;
@@ -1406,18 +1240,11 @@ class Dokument extends BaseModel
         if (empty($data['datum_vzniku'])) {
             $data['datum_vzniku'] = null;
         }
-        if (isset($data['pocet_listu'])) {
-            if (empty($data['pocet_listu'])) {
-                $data['pocet_listu'] = 0;
-            } else {
-                $data['pocet_listu'] = (int) $data['pocet_listu'];
-            }
-            if (empty($data['pocet_priloh'])) {
-                $data['pocet_priloh'] = 0;
-            } else {
-                $data['pocet_priloh'] = (int) $data['pocet_priloh'];
-            }
-        }
+        if (isset($data['pocet_listu']) && $data['pocet_listu'] === '')
+            $data['pocet_listu'] = null;
+        if (isset($data['pocet_listu_priloh']) && $data['pocet_listu_priloh'] === '')
+            $data['pocet_listu_priloh'] = null;
+
         if (isset($data['vyrizeni_pocet_listu'])) {
             if (empty($data['vyrizeni_pocet_listu'])) {
                 $data['vyrizeni_pocet_listu'] = 0;
@@ -1434,116 +1261,53 @@ class Dokument extends BaseModel
         if (isset($data['skartacni_lhuta']) && empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0)
             $data['skartacni_lhuta'] = null;
 
+        $user_id = self::getUser()->id;
         $data['date_created'] = new DateTime();
-        $data['user_created'] = self::getUser()->id;
+        $data['user_created'] = $user_id;
         $data['date_modified'] = new DateTime();
-        $data['user_modified'] = self::getUser()->id;
+        $data['user_modified'] = $user_id;
+        $data['owner_user_id'] = $user_id;
+        $org_id = OrgJednotka::dejOrgUzivatele();
+        if ($org_id !== null)
+            $data['owner_orgunit_id'] = $org_id;
 
         $data['stav'] = isset($data['stav']) ? $data['stav'] : 1;
         $data['jid'] = '';
 
-        $dokument_id = $this->insert($data);
+        $document = Document::create($data);
 
         $app_id = GlobalVariables::get('app_id');
-        $jid = "OSS-{$app_id}-ESS-$dokument_id";
-        $this->update(['jid' => $jid], "id = '$dokument_id'");
+        $document->jid = "OSS-{$app_id}-ESS-{$document->id}";
+        $document->save();
 
-        return $dokument_id;
-    }
-
-    public function zmenitStav($data)
-    {
-
-        if (is_array($data)) {
-
-            $dokument_id = $data['id'];
-            unset($data['id']);
-            $data['date_modified'] = new DateTime();
-            $data['user_modified'] = self::getUser()->id;
-
-            $this->update($data, array(array('id=%i', $dokument_id)));
-
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function kontrola($data, $typ = "komplet")
-    {
-
-        $mess = array();
-        if (empty($data->nazev))
-            $mess[] = "Věc dokumentu nemůže být prázdné!";
-        if (empty($data->cislo_jednaci))
-            $mess[] = "Číslo jednací dokumentu nemůže být prázdné!";
-        if (empty($data->datum_vzniku) || $data->datum_vzniku == "0000-00-00 00:00:00")
-            $mess[] = "Datum přijetí/vytvoření nemůže být prázdné!";
-
-        if ($typ == "komplet") {
-
-            //if ( empty($data->datum_vyrizeni) || $data->datum_vyrizeni == "0000-00-00 00:00:00" ) $mess[] = "Datum vyřízení nemůže být prázdné!";
-            if (empty($data->zpusob_vyrizeni_id) || $data->zpusob_vyrizeni_id == 0)
-                $mess[] = "Není zvolen způsob vyřízení dokumentu!";
-            if (empty($data->spisovy_znak_id))
-                $mess[] = "Není zvolen spisový znak!";
-            if (empty($data->skartacni_znak))
-                $mess[] = "Není vyplněn skartační znak!";
-            if ($data->skartacni_lhuta === null)
-                $mess[] = "Není vyplněna skartační lhůta!";
-            if (empty($data->spousteci_udalost_id))
-                $mess[] = "Není zvolena spouštěcí událost!";
-
-            if (count($data->subjekty) == 0) {
-                $mess[] = "Dokument musí obsahovat aspoň jeden subjekt!";
-            }
-
-            /* if ( $data->typ_dokumentu->typ != 0 ) {
-              if ( count($data->prilohy)==0 ) {
-              $mess[] = "Dokument musí obsahovat aspoň jednu přílohu!";
-              }
-              } */
-        }
-
-        if (count($mess) > 0) {
-            return $mess;
-        } else {
-            return null;
-        }
+        return $document->id;
     }
 
     public function odstranit_rozepsane()
     {
-
         $where = array('stav=0',
             array('user_created=%i', self::getUser()->id)
         );
+
+        $DokumentLog = new LogModel();
+        $DokumentSpis = new DokumentSpis();
+        $DokumentSubjekt = new DokumentSubjekt();
+        $DokumentPrilohy = new DokumentPrilohy();
+        $SouvisejiciDokument = new SouvisejiciDokument();
 
         $seznam = $this->seznamKlasicky(array('where' => $where));
         if (count($seznam) > 0) {
             foreach ($seznam as $dokument) {
                 $dokument_id = $dokument->id;
 
-                $DokumentLog = new LogModel();
                 $DokumentLog->deleteDokument($dokument_id);
+                $DokumentSpis->delete([['dokument_id = %i', $dokument_id]]);
+                $DokumentSubjekt->delete([['dokument_id = %i', $dokument_id]]);
+                $DokumentPrilohy->delete([['dokument_id = %i', $dokument_id]]);
+                $SouvisejiciDokument->delete([['dokument_id = %i', $dokument_id]]);
 
-                $DokumentSpis = new DokumentSpis();
-                $DokumentSpis->delete(array(array('dokument_id=%i', $dokument_id)));
-
-                $DokumentSubjekt = new DokumentSubjekt();
-                $DokumentSubjekt->delete(array(array('dokument_id=%i', $dokument_id)));
-
-                $DokumentPrilohy = new DokumentPrilohy();
-                $DokumentPrilohy->delete(array(array('dokument_id=%i', $dokument_id)));
-
-                $SouvisejiciDokument = new SouvisejiciDokument();
-                $SouvisejiciDokument->delete(array(array('dokument_id=%i', $dokument_id)));
-
-
-                $Workflow = new Workflow();
-                $Workflow->delete(array(array('dokument_id=%i', $dokument_id)));
-
-                $this->delete(array('id=%i', $dokument_id));
+                $doc = new Document($dokument_id);
+                $doc->delete();
             }
         }
 

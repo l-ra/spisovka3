@@ -8,7 +8,7 @@
     <div class="dokument_blok_menu">
         {if $Zapujcka->stav == 1 && $Opravnen_schvalit_zapujcku}
         <a href="{link :Spisovna:Zapujcky:schvalit, 'id'=>$Zapujcka->id}">Schválení zápůjčky</a>
-        <a href="{link :Spisovna:Zapujcky:odmitnuti, 'id'=>$Zapujcka->id}">Odmítnutí zápůjčky</a>
+        <a href="{link :Spisovna:Zapujcky:odmitnout, 'id'=>$Zapujcka->id}">Odmítnutí zápůjčky</a>
         {/if}
         {if $Zapujcka->stav == 2}
         <a href="{link :Spisovna:Zapujcky:vratit, 'id'=>$Zapujcka->id}">Vrátit dokument</a>
@@ -22,7 +22,7 @@
         </dl>
         <dl>
             <dt>Zapůjčeno komu:</dt>
-            <dd>{$Zapujcka->person->displayName()}</dd>
+            <dd>{$Zapujcka->person}</dd>
         </dl>        
         <dl>
             <dt>Důvod zapůjčení:</dt>

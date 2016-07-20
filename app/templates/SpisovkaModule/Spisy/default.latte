@@ -52,7 +52,7 @@
             <td>{$spis->orgjednotka_predano}</td>              
             <td>{if isset($SpisoveZnaky[$spis->spisovy_znak_id])}{$SpisoveZnaky[$spis->spisovy_znak_id]->nazev}{/if} </td>
             <td>{$spis->skartacni_znak} / {$spis->skartacni_lhuta}</td>
-            <td>{=Spis::stav($spis->stav)}</td>      
+            <td>{=SpisModel::stav($spis->stav)}</td>      
             {/if}
         </tr>
         {/foreach}

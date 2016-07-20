@@ -86,9 +86,9 @@
                 {include '../../SpisovkaModule/Dokumenty/seznam-pocty-priloh.latte', dokument => $dok}
             </td>
             <td class="prideleno">
-                {$dok->prideleno->prideleno_jmeno}
+                {$dok->prideleno->jmeno}
                 <br />
-                {=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
+                {=@$dok->prideleno->orgjednotka->zkraceny_nazev}
             </td>
             <td class="stav">
                 {$dok->spisovy_znak}

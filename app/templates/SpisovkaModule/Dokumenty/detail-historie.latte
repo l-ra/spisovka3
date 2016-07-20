@@ -9,7 +9,7 @@
             <dt>{$h->date|edatetime}</dt>
             <dd>{!=LogModel::typ($h->typ)}<br />
             {if !empty($h->poznamka)}<span class="normal-font">{$h->poznamka}</span><br />{/if}
-            <span class="normal-font">provedl: {Osoba::displayName($h)}</span>
+            <span class="normal-font">provedl: {Person::fromUserId($h->user_id)}</span>
             </dd>
         </dl>
         {/foreach}

@@ -183,11 +183,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
 
-        $form->addText('pocet_listu', 'Počet listů:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
-                'Počet listů musí být číslo.');
-        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
-                'Počet příloh musí být číslo.');
-
         $zprava = isset($this->template->Zprava) ? $this->template->Zprava : null;
         if ($zprava) {
             $form['nazev']->setValue($zprava->predmet);
@@ -260,8 +255,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $d['cislo_jednaci_odesilatele'] = $data['cislo_jednaci_odesilatele'];
             if (isset($data['pocet_listu']))
                 $d['pocet_listu'] = $data['pocet_listu'];
-            if (isset($data['pocet_priloh']))
-                $d['pocet_priloh'] = $data['pocet_priloh'];
+            if (isset($data['pocet_listu_priloh']))
+                $d['pocet_listu_priloh'] = $data['pocet_listu_priloh'];
             if (isset($data['lhuta']))
                 $d['lhuta'] = $data['lhuta'];
             
@@ -295,8 +290,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $zprava->stav_info = 'Zpráva přidána do spisové služby jako ' . $dokument->jid;
             $zprava->save();
 
-            $Workflow = new Workflow();
-            $Workflow->vytvorit($dokument_id);
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
@@ -308,8 +301,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             if (!empty($predani['user']) || !empty($predani['org'])) {
                 /* Dokument predan */
-                $Workflow->predat($dokument_id, $predani['user'],
-                        $predani['org'], $predani['poznamka']);
+                $doc = new Document($dokument_id);
+                $doc->forward($predani['user'], $predani['org'], $predani['poznamka']);
                 $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
 
                 if (!empty($predani['user'])) {

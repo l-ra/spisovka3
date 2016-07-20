@@ -4,7 +4,6 @@ class Model extends BaseModel
 {
 
     protected $name = '';
-    protected $primary = '';
 
     public function __construct($table)
     {

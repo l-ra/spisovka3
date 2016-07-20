@@ -4,7 +4,6 @@ class CisloJednaci extends BaseModel
 {
 
     protected $name = 'cislo_jednaci';
-    protected $primary = 'id';
     protected $info;
     protected $urad;
     protected $user_account;

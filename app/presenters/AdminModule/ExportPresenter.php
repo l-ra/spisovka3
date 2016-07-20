@@ -102,8 +102,8 @@ class Admin_ExportPresenter extends BasePresenter
 
         $nazev_spisu = isset($d->spis) ? $d->spis->nazev : '';
 
-        $uzivatel = isset($d->prideleno) ? $d->prideleno->user_jmeno : '';
-        $user_id = isset($d->prideleno) ? $d->prideleno->user_id : '';
+        $uzivatel = Person::fromUserId($d->owner_user_id)->displayName();
+        $user_id = $d->owner_user_id;
         $login = $user_id ? $this->users[$user_id]->username : '';
         
         $skartacni_rok = $d->skartacni_rok ? $d->skartacni_rok : '';

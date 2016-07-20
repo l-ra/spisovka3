@@ -33,7 +33,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
     
     public function _renderSeznam($hledat, $prijem)
     {
-        $Spisy = new Spis();
+        $Spisy = new SpisModel();
 
         $filter = [];
         if (!empty($hledat))
@@ -59,7 +59,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $pdf = $this->getParameter('pdfprint');
         if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
-            $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
@@ -105,7 +104,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     public function bulkAction($action, $spisy)
     {
-        $Spis = new Spis();
+        $Spis = new SpisModel();
         switch ($action) {
             /* Predani vybranych spisu do spisovny  */
             case 'prevzit_spisovna':
@@ -123,17 +122,17 @@ class Spisovna_SpisyPresenter extends BasePresenter
                 }
                 if ($count_ok > 0)
                     $this->flashMessage(sprintf("Úspěšně jste přijal $count_ok %s do spisovny.",
-                            Spis::cislovat($count_ok)));
+                            SpisModel::cislovat($count_ok)));
                 if ($count_failed > 0)
                     $this->flashMessage(sprintf("$count_failed %s se nepodařilo přijmout do spisovny.",
-                            Spis::cislovat($count_failed)), 'warning');
+                            SpisModel::cislovat($count_failed)), 'warning');
                 break;
                 
             case 'vratit':
-                $workflow = new Workflow();
                 $all_ok = true;
                 foreach ($spisy as $spis_id) {
-                    $ok = $workflow->vratitSpisZeSpisovny($spis_id);
+                    $spis = new Spis($spis_id);
+                    $ok = $spis->returnFromSpisovna();
                     if (!$ok)
                         $all_ok = false;
                 }
@@ -149,7 +148,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
     public function renderDetail($id)
     {
         // Info o spisu
-        $Spisy = new Spis();
+        $Spisy = new SpisModel();
         $spis_id = $id;
         $this->template->Spis = $spis = $Spisy->getInfo($spis_id, true);
 
@@ -163,7 +162,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
             }
 
             $user = $this->user;
-            $user_id = $user->id;
             $pridelen = $predan = $accessview = false;
             $formUpravit = null;
 
@@ -178,12 +176,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                 $accessview = true;
             }
 
-            if ($user->isInRole('superadmin')) {
-                $accessview = 1;
-                $pridelen = 1;
-            }
-
-            if (count($spis->workflow) > 0) {
+            /* if (count($spis->workflow) > 0) {
                 $wf_orgjednotka_prideleno = $spis->orgjednotka_id;
                 $wf_orgjednotka_predano = $spis->orgjednotka_id_predano;
                 $org_cache = array();
@@ -219,7 +212,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                         break;
                     }
                 }
-            }
+            } */
 
             $this->template->Pridelen = $pridelen;
             if ($pridelen) {
@@ -260,13 +253,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
             // spis neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');
         }
-
-        // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParameter('print');
-        $pdf = $this->getParameter('pdfprint');
-        if ($tisk || $pdf) {
-            $this->setView('printdetail');
-        }
     }
 
     protected function createComponentUpravitForm()
@@ -301,7 +287,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $Spisy = new Spis();
+        $Spisy = new SpisModel();
 
         $spis_id = $data['id'];
         unset($data['id']);
@@ -359,7 +345,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     public function renderStrom()
     {
-        $Spisy = new Spis();
+        $Spisy = new SpisModel();
         $filter = $Spisy->spisovna();
         $result = $Spisy->seznamRychly($filter);
         $result->setRowClass(null);

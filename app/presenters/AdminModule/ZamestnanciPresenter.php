@@ -426,7 +426,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                 ->setValue($user_id);
 
         $c = $form1->addSelect('orgjednotka_id', 'Organizační jednotka:', $select);
-        if (isset($this->template->Accounts)) {
+        if (isset($this->template->Accounts) && $user_id !== null) {
             $user = $this->template->Accounts[$user_id];
             $c->setValue($user->orgjednotka_id);
         }

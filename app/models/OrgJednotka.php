@@ -84,10 +84,6 @@ class OrgJednotka extends TreeModel
 
     public function deleteAllOrg()
     {
-
-        $Workflow = new Workflow();
-        $Workflow->update(array('orgjednotka_id' => null), array('orgjednotka_id IS NOT NULL'));
-
         $CJ = new CisloJednaci();
         $CJ->update(array('orgjednotka_id' => null), array('orgjednotka_id IS NOT NULL'));
 

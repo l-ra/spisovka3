@@ -16,142 +16,136 @@
         </dl>
         {input2 cislo_jednaci_odesilatele}
         {input2 poznamka}
-        <dl>
-            <dt>{label2 pocet_listu}</dt>
-            <dd>{input pocet_listu} {inputError2 pocet_listu}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {label2 pocet_priloh} {input pocet_priloh} {inputError2 pocet_priloh}</dd>
-            </dl>
-        </div>
+    </div>
 
-        <div class="dokument_blok_sedy">
-            <div>Předání / vyřízení</div>
-            {input2 lhuta}
-            {input2 predani_poznamka}
+    <div class="dokument_blok_sedy">
+        <div>Předání / vyřízení</div>
+        {input2 lhuta}
+        {input2 predani_poznamka}
+        <dl>
+            <dt>Předat:</dt>
+            <dd>
+                <input type="text" name="predano_autocomplete" id="predat_autocomplete" size="40" />
+                &nbsp;&nbsp;&nbsp;
+                <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>$user->id, 'novy'=>1}" id="dialog-uzivatel">Vyhledat ze seznamu</a>
+            </dd>
+        </dl>
+        <div id="predano"></div>
+    </div>
+
+    <div class="dokument_blok_subjekty">
+        <div class="h2">
+            Odesílatel zprávy
+        </div>
+        <table class="seznam">
+            <tr>
+                <td class="icon">
+                    <img src="{$publicUrl}images/subjekt/ovm.png" alt="obrazek" title="obrazek" width="32" height="32" />
+                </td>
+                {if $Zprava->typ == 'E'}
+                    <td class="meta">
+                        {$Zprava->odesilatel}
+                    </td>
+                {else}
+                    <td class="meta">
+                        <strong>
+                            {if !empty($Subjekt['message']->nazev_subjektu)}{$Subjekt['message']->nazev_subjektu}<br />{/if}
+                            {if !empty($Subjekt['message']->prijmeni)}{$Subjekt['message']->prijmeni}<br />{/if}
+                            &nbsp;
+                        </strong>
+                        <div class="info">
+                            <span>{if !empty($Subjekt['message']->type)}{$Subjekt['message']->type} - {=Subjekt::typ_subjektu($Subjekt['message']->type)}{/if}&nbsp;</span>
+                            <br />
+                            {=Subjekt::displayName($Subjekt['message'],'adresa')}
+                        </div>
+                    </td>
+                    <td class="meta_plus">
+                        <div class="info">
+                            <dl>
+                                <dt>isds:</dt>
+                                <dd>{if !empty($Subjekt['message']->id_isds)}{$Subjekt['message']->id_isds}{/if}</dd>
+                            </dl>
+                        </div>
+                    </td>
+                {/if}
+            </tr>
+        </table>
+
+        <br />
+        <div class="h2">
+            Nalezené shody s odesilatelem zprávy
+        </div>
+        <div class="blok_akce">
             <dl>
-                <dt>Předat:</dt>
+                <dt>Vyhledat subjekt:</dt>
                 <dd>
-                    <input type="text" name="predano_autocomplete" id="predat_autocomplete" size="40" />
-                    &nbsp;&nbsp;&nbsp;
-                    <a href="{link :Spisovka:Uzivatel:vyber, 'id'=>$user->id, 'novy'=>1}" id="dialog-uzivatel">Vyhledat ze seznamu</a>
+                    <input type="text" name="subjekt_autocomplete" id="subjekt_epod_autocomplete" size="60" />
+                    <a class="ajax-dialog" data-title="Seznam subjektů" href="{link Subjekty:vyber}">Seznam</a>
                 </dd>
             </dl>
-            <div id="predano"></div>
+            <dl id="subjekt_novy">
+                <dt></dt>
+                <dd>
+                    <a href={link :Spisovka:Subjekty:novy, f => evidNovySubjektOk} id="epod_evid_novysubjekt_click" data-postdata="{json_encode($Subjekt['message'])}">Vytvořit nový subjekt z odesílatele</a>
+                </dd>
+            </dl>           
 
         </div>
+        <div id="dok-subjekty">
+            {if count($Subjekt['databaze'])>0}
+                <table class="seznam" id="subjekty-table">
+                    <tr>
+                        <td colspan="4">Použít</td>
+                    </tr>
+                    {foreach $Subjekt['databaze'] as $subjekt}
+                        {include '../../SpisovkaModule/Subjekty/subjekt.latte', subjekt => $subjekt, epodatelna_evidence => true}
+                    {/foreach}
+                </table>
+            {else}
+                <div class="prazdno">
+                    Nebyly nalezeny žádné shody s odesílatelem.
+                    <br />
+                    Odesílatel není v databázi nebo se nepodařilo jeho záznam nalézt.
+                </div>
+            {/if}
+        </div>
 
-        <div class="dokument_blok_subjekty">
-            <div class="h2">
-                Odesílatel zprávy
-            </div>
-            <table class="seznam">
-                <tr>
-                    <td class="icon">
-                        <img src="{$publicUrl}images/subjekt/ovm.png" alt="obrazek" title="obrazek" width="32" height="32" />
-                    </td>
-                    {if $Zprava->typ == 'E'}
-                        <td class="meta">
-                            {$Zprava->odesilatel}
-                        </td>
-                    {else}
-                        <td class="meta">
-                            <strong>
-                                {if !empty($Subjekt['message']->nazev_subjektu)}{$Subjekt['message']->nazev_subjektu}<br />{/if}
-                                {if !empty($Subjekt['message']->prijmeni)}{$Subjekt['message']->prijmeni}<br />{/if}
-                                &nbsp;
-                            </strong>
-                            <div class="info">
-                                <span>{if !empty($Subjekt['message']->type)}{$Subjekt['message']->type} - {=Subjekt::typ_subjektu($Subjekt['message']->type)}{/if}&nbsp;</span>
-                                <br />
-                                {=Subjekt::displayName($Subjekt['message'],'adresa')}
-                            </div>
-                        </td>
-                        <td class="meta_plus">
-                            <div class="info">
-                                <dl>
-                                    <dt>isds:</dt>
-                                    <dd>{if !empty($Subjekt['message']->id_isds)}{$Subjekt['message']->id_isds}{/if}</dd>
-                                </dl>
-                            </div>
-                        </td>
-                    {/if}
-                </tr>
-            </table>
+    </div>
 
-            <br />
-            <div class="h2">
-                Nalezené shody s odesilatelem zprávy
-            </div>
-            <div class="blok_akce">
-                <dl>
-                    <dt>Vyhledat subjekt:</dt>
-                    <dd>
-                        <input type="text" name="subjekt_autocomplete" id="subjekt_epod_autocomplete" size="60" />
-                        <a class="ajax-dialog" data-title="Seznam subjektů" href="{link Subjekty:vyber}">Seznam</a>
-                    </dd>
-                </dl>
-                <dl id="subjekt_novy">
-                    <dt></dt>
-                    <dd>
-                        <a href={link :Spisovka:Subjekty:novy, f => evidNovySubjektOk} id="epod_evid_novysubjekt_click" data-postdata="{json_encode($Subjekt['message'])}">Vytvořit nový subjekt z odesílatele</a>
-                    </dd>
-                </dl>           
-
-            </div>
-            <div id="dok-subjekty">
-                {if count($Subjekt['databaze'])>0}
-                    <table class="seznam" id="subjekty-table">
+    <div class="dokument_blok_sedy">
+        <div class="h2">
+            Přílohy
+        </div>
+        <div id="dok-prilohy">
+            {if count($Prilohy)>0}
+                <table class="seznam">
+                    {foreach $Prilohy as $priloha}
                         <tr>
-                            <td colspan="4">Použít</td>
+                            <td class="icon">
+                                {if isset($priloha['mimetype']) && file_exists(APP_DIR ."/../public/images/mimetypes/". Nette\Utils\Strings::webalize($priloha['mimetype']) .".png")}
+                                    <img src="{$publicUrl}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
+                                {else}
+                                    <img src="{$publicUrl}images/mimetypes/application-octet-stream.png" alt="" title="" width="32" height="32" />
+                                {/if}                 
+                            </td>
+                            <td class="meta">
+                                <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>$priloha['id']}">{$priloha['name']}</a>
+                                <div class="info">
+                                    <span>{$priloha['size']|bytes,0}{if isset($priloha['mimetype'])}, {$priloha['mimetype']}{/if}</span>
+                                </div>
+                            </td>
                         </tr>
-                        {foreach $Subjekt['databaze'] as $subjekt}
-                            {include '../../SpisovkaModule/Subjekty/subjekt.latte', subjekt => $subjekt, epodatelna_evidence => true}
-                        {/foreach}
-                    </table>
-                {else}
-                    <div class="prazdno">
-                        Nebyly nalezeny žádné shody s odesílatelem.
-                        <br />
-                        Odesílatel není v databázi nebo se nepodařilo jeho záznam nalézt.
-                    </div>
-                {/if}
-            </div>
-
+                    {/foreach}
+                </table>
+            {else}
+                <div class="prazdno">Zpráva neobsahuje žádné přílohy.</div>
+            {/if}
         </div>
+    </div>
 
-        <div class="dokument_blok_sedy">
-            <div class="h2">
-                Přílohy
-            </div>
-            <div id="dok-prilohy">
-                {if count($Prilohy)>0}
-                    <table class="seznam">
-                        {foreach $Prilohy as $priloha}
-                            <tr>
-                                <td class="icon">
-                                    {if isset($priloha['mimetype']) && file_exists(APP_DIR ."/../public/images/mimetypes/". Nette\Utils\Strings::webalize($priloha['mimetype']) .".png")}
-                                        <img src="{$publicUrl}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
-                                    {else}
-                                        <img src="{$publicUrl}images/mimetypes/application-octet-stream.png" alt="" title="" width="32" height="32" />
-                                    {/if}                 
-                                </td>
-                                <td class="meta">
-                                    <a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>$priloha['id']}">{$priloha['name']}</a>
-                                    <div class="info">
-                                        <span>{$priloha['size']|bytes,0}{if isset($priloha['mimetype'])}, {$priloha['mimetype']}{/if}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        {/foreach}
-                    </table>
-                {else}
-                    <div class="prazdno">Zpráva neobsahuje žádné přílohy.</div>
-                {/if}
-            </div>
-        </div>
-
-        <div class="dokument_blok_submit">
-            {input novy}
-            &nbsp;&nbsp;
-            {input storno}
-        </div>
-        {/form}
+    <div class="dokument_blok_submit">
+        {input novy}
+        &nbsp;&nbsp;
+        {input storno}
+    </div>
+{/form}

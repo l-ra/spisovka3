@@ -8,6 +8,11 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
 
+    protected function isUserAllowed()
+    {
+        return $this->user->isAllowed('Zapujcka', 'vytvorit');
+    }
+
     public function startup()
     {
         $client_config = GlobalVariables::get('client_config');
@@ -44,10 +49,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
             $this->template->no_items = 3; // indikator pri nenalezeni zypujcky pri hledani
         }
 
-        /* $Zapujcka->seradit($args, $seradit);
-          $this->template->seradit = $seradit; */
-
-        if (!$this->user->inheritsFromRole('spisovna') && !$this->user->isInRole('superadmin'))
+        if (!$this->user->isAllowed('Zapujcka', 'schvalit'))
             $args = $Zapujcka->osobni($args);
 
         $result = $Zapujcka->seznam($args);
@@ -58,7 +60,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $pdf = $this->getParameter('pdfprint');
         if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
-            $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
@@ -70,7 +71,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     {
         $BA = new Spisovka\Components\BulkAction();
 
-        if ($this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin')) {
+        if ($this->user->isAllowed('Zapujcka', 'schvalit')) {
             $actions = ['vratit' => 'Vrátit dokumenty',
                 'schvalit' => 'Schválit žádosti',
                 'odmitnout' => 'Odmítnout žádosti'
@@ -123,19 +124,19 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                             'warning');
                 }
                 if ($count_ok > 0 && $count_failed > 0) {
-                    $this->redirect(':Spisovna:Zapujcky:default');
+                    $this->redirect('default');
                 }
                 break;
 
             /* Vraceni vybranych zapujcek  */
             case 'vratit':
                 $count_ok = $count_failed = 0;
-                $dnes = new DateTime();
                 foreach ($selection as $zapujcka_id) {
-                    $stav = $Zapujcka->vraceno($zapujcka_id, $dnes);
-                    if ($stav) {
+                    try {
+                        $Zapujcka->vratit($zapujcka_id);
                         $count_ok++;
-                    } else {
+                    } catch (Exception $e) {
+                        $e->getMessage();
                         $count_failed++;
                     }
                 }
@@ -147,7 +148,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                             'warning');
                 }
                 if ($count_ok > 0 && $count_failed > 0) {
-                    $this->redirect(':Spisovna:Zapujcky:default');
+                    $this->redirect('default');
                 }
                 break;
 
@@ -170,7 +171,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                             'warning');
                 }
                 if ($count_ok > 0 && $count_failed > 0) {
-                    $this->redirect(':Spisovna:Zapujcky:default');
+                    $this->redirect('default');
                 }
                 break;
 
@@ -189,7 +190,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->template->Zapujcka = null;
         $zapujcka = $Zapujcka->getInfo($zapujcka_id);
         if ($zapujcka) {
-            $this->template->Opravnen_schvalit_zapujcku = $this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin');
+            $this->template->Opravnen_schvalit_zapujcku = $this->user->isAllowed('Zapujcka',
+                    'schvalit');
             $this->template->Zapujcka = $zapujcka;
         } else {
             // zapujcka neexistuje nebo se nepodarilo nacist
@@ -197,64 +199,44 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         }
     }
 
-    public function actionSchvalit()
+    public function actionSchvalit($id)
     {
-
-        $zapujcka_id = $this->getParameter('id');
-        if (!empty($zapujcka_id) && is_numeric($zapujcka_id)) {
-            if ($this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin')) {
-
-                $Zapujcka = new Zapujcka();
-                if ($Zapujcka->schvalit($zapujcka_id)) {
-                    $this->flashMessage('Zápůjčka byla schválena.');
-                } else {
-                    $this->flashMessage('Zápůjčku se nepodařilo schválit!.', 'error');
-                }
-            } else {
-                $this->flashMessage('Nemáte oprávnění schválit zápůjčku!.', 'warning');
-            }
-        } else {
-            $this->flashMessage('Zápůjčku nelze schválit! Neplatná zápůjčka.', 'error');
-        }
-        $this->redirect(':Spisovna:Zapujcky:default');
-    }
-
-    public function actionOdmitnout()
-    {
-
-        $zapujcka_id = $this->getParameter('id');
-        if (!empty($zapujcka_id) && is_numeric($zapujcka_id)) {
-            if ($this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin')) {
-
-                $Zapujcka = new Zapujcka();
-                if ($Zapujcka->odmitnout($zapujcka_id)) {
-                    $this->flashMessage('Zápůjčka byla odmítnuta.');
-                } else {
-                    $this->flashMessage('Zápůjčku se nepodařilo odmítnout!.', 'error');
-                }
-            } else {
-                $this->flashMessage('Nemáte oprávnění odmítnout zápůjčku!.', 'warning');
-            }
-        } else {
-            $this->flashMessage('Zápůjčku nelze odmítnout! Neplatná zápůjčka.', 'error');
-        }
-        $this->redirect(':Spisovna:Zapujcky:default');
-    }
-
-    public function actionVratit()
-    {
-        $zapujcka_id = $this->getParameter('id');
+        $zapujcka_id = $id;
         if (!empty($zapujcka_id) && is_numeric($zapujcka_id)) {
             $Zapujcka = new Zapujcka();
-            if ($Zapujcka->vraceno($zapujcka_id, new Datetime())) {
-                $this->flashMessage('Zapůjčený dokument byl vrácen.');
-            } else {
-                $this->flashMessage('Dokument se nepodařilo vrátit!', 'error');
-            }
-        } else {
-            $this->flashMessage('Zápůjčku nelze vrátit! Neplatná zápůjčka.', 'error');
+            if ($Zapujcka->schvalit($zapujcka_id))
+                $this->flashMessage('Zápůjčka byla schválena.');
+            else
+                $this->flashMessage('Zápůjčku se nepodařilo schválit!.', 'error');
+        } else
+            $this->flashMessage('Zápůjčku nelze schválit! Neplatná zápůjčka.', 'error');
+
+        $this->redirect('default');
+    }
+
+    public function actionOdmitnout($id)
+    {
+        $zapujcka_id = $id;
+        $Zapujcka = new Zapujcka();
+        if ($Zapujcka->odmitnout($zapujcka_id))
+            $this->flashMessage('Zápůjčka byla odmítnuta.');
+        else
+            $this->flashMessage('Zápůjčku se nepodařilo odmítnout!.', 'error');
+        $this->redirect('default');
+    }
+
+    public function actionVratit($id, $back = null)
+    {
+        $zapujcka_id = $id;
+        $Zapujcka = new Zapujcka();
+        try {
+            $Zapujcka->vratit($zapujcka_id);
+            $this->flashMessage('Zapůjčený dokument byl vrácen.');
+        } catch (Exception $e) {
+            $this->flashMessage('Dokument se nepodařilo vrátit!', 'error');
+            $this->flashMessage($e->getMessage(), 'error');
         }
-        $this->redirect(':Spisovna:Zapujcky:default');
+        $this->redirect($back ?: 'default');
     }
 
     public function renderNova()
@@ -269,9 +251,8 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $dokument_id = $this->getParameter('dokument_id');
 
         if ($dokument_id) {
-            $Dokument = new Dokument();
             $Zapujcka = new Zapujcka();
-            $zapujcky = $Zapujcka->aktivniSeznam();
+            $zapujcky = $Zapujcka->seznamZapujcenychDokumentu();
 
             if (isset($zapujcky[$dokument_id])) {
                 $dokument_text = '';
@@ -280,18 +261,18 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                         'warning');
                 $this->redirect('default');
             } else {
-                $dokument_info = $Dokument->getInfo($dokument_id);
-                if ($dokument_info->stav_dokumentu > 7) {
+                $doc = new Document($dokument_id);
+                if ($doc->stav >= DocumentStates::STAV_SKARTACNI_RIZENI) {
                     $dokument_text = '';
                     $dokument_id = null;
-                    $this->flashMessage('Vybraný dokument nelze zapůjčit! Dokument prochází nebo již prošel skartačním řízením a je tudíž nedostupný.',
+                    $this->flashMessage('Vybraný dokument nelze zapůjčit! Dokument prochází nebo již prošel skartačním řízením.',
                             'warning');
                     $this->redirect('default');
                 } else {
                     if ($this->typ_evidence != 'priorace') {
-                        $dokument_text = $dokument_info->cislo_jednaci . "" . $this->oddelovac_poradi . "" . $dokument_info->poradi . " - " . $dokument_info->nazev;
+                        $dokument_text = $doc->cislo_jednaci . "" . $this->oddelovac_poradi . "" . $doc->poradi . " - " . $doc->nazev;
                     } else {
-                        $dokument_text = $dokument_info->cislo_jednaci . " - " . $dokument_info->nazev;
+                        $dokument_text = $doc->cislo_jednaci . " - " . $doc->nazev;
                     }
                 }
             }
@@ -305,7 +286,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                 ->setValue($dokument_id)
                 ->setRequired('Musí být vybrán dokument k zapůjčení!');
 
-        $pracovnik_spisovny = $this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin');
+        $pracovnik_spisovny = $this->user->isAllowed('Zapujcka', 'schvalit');
         if ($pracovnik_spisovny) {
             $form->addText('user_text', '', 80);
             $form->addText('user_id', 'Zapůjčeno komu:')
@@ -341,7 +322,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         try {
             $Zapujcka->vytvorit($data);
             $this->flashMessage('Zápůjčka byla vytvořena.');
-            $this->redirect(':Spisovna:Zapujcky:default');
+            $this->redirect('default');
         } catch (DibiException $e) {
             $this->flashMessage('Zápůjčku se nepodařilo vytvořit.', 'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
@@ -352,12 +333,12 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
         $zapujcka_id = $data['id'];
-        $this->redirect(':Spisovna:Zapujcky:detail', array('id' => $zapujcka_id));
+        $this->redirect('detail', array('id' => $zapujcka_id));
     }
 
     public function stornoSeznamClicked()
     {
-        $this->redirect(':Spisovna:Zapujcky:default');
+        $this->redirect('default');
     }
 
     protected function createComponentSearchForm()
@@ -391,8 +372,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     protected function createComponentFiltrForm()
     {
-
-        if ($this->user->inheritsFromRole('spisovna') || $this->user->isInRole('superadmin')) {
+        if ($this->user->isAllowed('Zapujcka', 'schvalit')) {
             $filtr = !is_null($this->filtr) ? $this->filtr : 'vse';
             $select = [
                 'ke_schvaleni' => 'Žádosti čekající na schválení',
@@ -437,41 +417,32 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->redirect('this');
     }
 
-    public function actionSeznamAjax()
+    public function actionSeznamAjax($term)
     {
-        $Dokument = new Dokument();
-
-        // Pripojit aktivni zapujcky
         $Zapujcka = new Zapujcka();
-        $zapujcky = $Zapujcka->aktivniSeznam();
+        $zapujcky = $Zapujcka->seznamZapujcenychDokumentu();
 
-        $term = $this->getParameter('term');
+        $Dokument = new Dokument();
         $args = $term ? $Dokument->hledat($term) : null;
-        $args = $Dokument->filtrSpisovna($args);
+        $args = $Dokument->filtrSpisovnaLzeZapujcit($args);
+        $args['cols'] = ['nazev', 'cislo_jednaci'];
         $result = $Dokument->seznam($args);
         $seznam_dok = $result->fetchAll();
 
-        $seznam = array();
-        if (count($seznam_dok) > 0) {
-            foreach ($seznam_dok as $row) {
-                if (isset($zapujcky[$row->id]))
-                    continue; // je zapujcen
-                $dok = $Dokument->getBasicInfo($row->id);
+        $result = array();
+        if ($seznam_dok)
+            foreach ($seznam_dok as $dok) {
+                if (isset($zapujcky[$dok->id]))
+                    continue; // na dokument již existuje žádanka
 
-                //if ( $dok->stav_dokumentu > 7 ) continue; // vyradime dokumenty po skartacnim rizeni
-
-                $seznam[] = array(
-                    "id" => $dok->id,
+                $result[] = ["id" => $dok->id,
                     "type" => 'item',
-                    "value" => $dok->cislo_jednaci . ' - ' . $dok->nazev,
-                    "nazev" => $dok->cislo_jednaci . " - " . $dok->nazev
-                );
+                    "value" => "$dok->cislo_jednaci - $dok->nazev",
+                    "nazev" => "$dok->cislo_jednaci - $dok->nazev"
+                ];
             }
-        }
 
-        echo json_encode($seznam);
-
-        exit;
+        $this->sendJson($result);
     }
 
 }

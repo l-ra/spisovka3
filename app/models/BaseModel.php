@@ -5,61 +5,40 @@
 abstract class BaseModel extends Nette\Object
 {
 
-    /** Table constant */
-    const USER_TABLE = 'user';
-    const OSOBA_TABLE = 'osoba';
-    const ROLE_TABLE = 'acl_role';
-    const USER2ROLE_TABLE = 'user_to_role';
-    const ORGJEDNOTKA_TABLE = 'orgjednotka';
-
     /** @var string object name */
     protected $name;
 
-    /** @var string primary key name */
-    protected $primary;
+    /** @var bool primary key is an autoincrement column */
+    protected $autoIncrement = true;
 
-    /** @var bool autoincrement? */
-    protected $autoIncrement = TRUE;
-    
-    protected $tb_dok_file = 'dokument_to_file';
+    /** names of commonly used tables */
     protected $tb_dok_odeslani = 'dokument_odeslani';
     protected $tb_dok_subjekt = 'dokument_to_subjekt';
     protected $tb_dokspis = 'dokument_to_spis';
     protected $tb_dokument = 'dokument';
     protected $tb_dokumenttyp = 'dokument_typ';
     protected $tb_epodatelna = 'epodatelna';
-    protected $tb_file = 'file';
-    protected $tb_logaccess = 'log_access';
-    protected $tb_logdokument = 'log_dokument';
-    protected $tb_logspis = 'log_spis';
     protected $tb_orgjednotka = 'orgjednotka';
     protected $tb_osoba = 'osoba';
-    protected $tb_resource = 'acl_resource';
-    protected $tb_role = 'acl_role';
-    protected $tb_rule = 'acl_privilege';
     protected $tb_spis = 'spis';
     protected $tb_spisovy_znak = 'spisovy_znak';
     protected $tb_spousteci_udalost = 'spousteci_udalost';
-    protected $tb_stat = 'stat';
     protected $tb_subjekt = 'subjekt';
     protected $tb_user = 'user';
-    protected $tb_workflow = 'workflow';
-    protected $tb_zapujcka = 'zapujcka';
-    protected $tb_zprava = 'zprava';
-    protected $tb_zprava_osoba = 'zprava_osoba';
     protected $tb_zpusob_doruceni = 'zpusob_doruceni';
     protected $tb_zpusob_odeslani = 'zpusob_odeslani';
     protected $tb_zpusob_vyrizeni = 'zpusob_vyrizeni';
-    
+
     public function __construct()
     {
+        
     }
-    
+
     protected static function getUser()
     {
         return Nette\Environment::getUser();
     }
-    
+
     /**
      * Selects rows from the table in specified order
      * @param array $where
@@ -330,18 +309,8 @@ abstract class BaseModel extends Nette\Object
      */
     public function insert($values)
     {
-        //dibi::insert($this->name, $values)
-        //    ->test();
-
         return dibi::insert($this->name, $values)
-                        ->execute($this->autoIncrement ? dibi::IDENTIFIER : NULL);
-    }
-
-    public function insert_basic($values)
-    {
-
-        return dibi::insert($this->name, $values)
-                        ->execute();
+                        ->execute($this->autoIncrement ? dibi::IDENTIFIER : null);
     }
 
     /**
@@ -355,7 +324,7 @@ abstract class BaseModel extends Nette\Object
         // ochrana pred zmenou cele tabulky kvuli chybe v kodu
         if ($where === null)
             return false;
-        
+
         if (!is_array($where))
             $where = array($where);
         else if (!is_array(current($where)))
@@ -363,7 +332,7 @@ abstract class BaseModel extends Nette\Object
 
 
         dibi::update($this->name, $values)->where($where)
-                        ->execute();
+                ->execute();
         return true;
     }
 

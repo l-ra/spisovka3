@@ -39,6 +39,25 @@ abstract class DBEntity
         $this->_data = $result->fetch();
     }
 
+    /**
+     * Force reload of the entity from database.
+     */
+    protected function _invalidate()
+    {
+        $this->_data = null;
+        $this->_columns_changed = [];
+        $this->_data_changed = false;
+    }
+    
+    /**
+     * Transaction support
+     */
+    protected function _rollback()            
+    {
+        dibi::rollback();
+        $this->_invalidate();
+    }
+    
     protected function _setData(DibiRow $data)
     {
         $this->_data = $data;
@@ -49,11 +68,22 @@ abstract class DBEntity
      */
     public function __get($name)
     {
+        // Nenahrávej data, když potřebujeme pouze ID
+        if ($name == 'id')
+            return $this->id;
+        
         if (!$this->_data)
             $this->_load();
 
         if (array_key_exists($name, $this->_data))
             return $this->_data[$name];
+
+        $method_name = "get" . ucfirst($name);
+        if (method_exists($this, $method_name)) {
+            $reflection = new ReflectionMethod($this, $method_name);
+            if ($reflection->isPublic())
+                return $this->$method_name();
+        }
 
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
@@ -101,8 +131,14 @@ abstract class DBEntity
         return $this->_data;
     }
 
-    public function modify(array $data)
+    /**
+     * @param array $data
+     */
+    public function modify($data)
     {
+        if (!is_array($data) && !($data instanceof ArrayAccess))
+            throw new InvalidArgumentException(__METHOD__ . "() - invalid argument");
+        
         foreach ($data as $key => $value)
             $this->__set($key, $value);
     }
@@ -111,7 +147,7 @@ abstract class DBEntity
     {
         if (!$this->canUserModify())
             throw new Exception("Uložení entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
-        
+
         if ($this->_data_changed) {
             $update_data = [];
             foreach ($this->_columns_changed as $col)
@@ -152,7 +188,8 @@ abstract class DBEntity
         $query = array('SELECT * FROM %n', ':PREFIX:' . static::TBL_NAME);
 
         if (isset($params['where']))
-            array_push($query, is_array($params['where']) ? 'WHERE %and' : 'WHERE', $params['where']);
+            array_push($query, is_array($params['where']) ? 'WHERE %and' : 'WHERE',
+                    $params['where']);
 
         if (isset($params['order']))
             array_push($query, 'ORDER BY %by', $params['order']);
@@ -186,7 +223,7 @@ abstract class DBEntity
         $result = dibi::query($query);
         return $result->fetchSingle();
     }
-    
+
     /**
      * creates an instance and returns it
      * 
@@ -208,4 +245,15 @@ abstract class DBEntity
     {
         return Nette\Environment::getUser();
     }
+
+    /**
+     * Object factory.
+     * @param int $id
+     * @return \static
+     */
+    public static function fromId($id)
+    {
+        return new static($id);
+    }
+
 }

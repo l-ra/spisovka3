@@ -64,20 +64,10 @@
                 {$zapujcka->duvod}
             </td>            
             <td class="prideleno">
-                {=Osoba::displayName($zapujcka)}
-                <br />
-                {=@$zapujcka->prideleno->orgjednotka_info->zkraceny_nazev}
+                {Person::fromUserId($zapujcka->user_id)}
             </td>
             <td class="stav">
-                {if $zapujcka->stav==1}
-                čeká na schválení
-                {elseif $zapujcka->stav==2}
-                zapůjčena
-                {elseif $zapujcka->stav==3}
-                vrácena
-                {elseif $zapujcka->stav==4}
-                odmítnuta
-                {/if}
+                {Zapujcka::stav($zapujcka->stav)}
             </td>
         </tr>
         {/foreach}

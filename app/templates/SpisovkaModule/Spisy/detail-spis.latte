@@ -20,10 +20,10 @@
         {/if}
             <dt>Datum vytvoření:</dt>
             <dd>{$Spis->date_created|edatetime}</dd><br />
-        {if !empty($Spis->datum_uzavreni) && $Spis->stav !== Spis::OTEVREN}
+        {if !empty($Spis->datum_uzavreni) && $Spis->stav !== SpisModel::OTEVREN}
             <dt>Datum uzavření:</dt>
             <dd>{$Spis->datum_uzavreni|edatetime}</dd><br />
         {/if}
             <dt>Stav:</dt>
-            <dd>{=Spis::stav($Spis->stav)}</dd><br />
+            <dd>{=SpisModel::stav($Spis->stav)}</dd><br />
         </dl>

@@ -4,6 +4,9 @@ class AclModel extends BaseModel
 {
 
     protected $name = 'acl_role_to_privilege';
+    protected $tb_resource = 'acl_resource';
+    protected $tb_role = 'acl_role';
+    protected $tb_rule = 'acl_privilege';
 
     public function getResources($all = 0)
     {
@@ -22,7 +25,6 @@ class AclModel extends BaseModel
 
     public function getPermission()
     {
-
         $res = DbCache::get('s3_Permission');
         if ($res !== null)
             return $res;
@@ -48,7 +50,6 @@ class AclModel extends BaseModel
 
     public function hledatPravidlo($data)
     {
-
         $where = array();
         if (isset($data['privilege']))
             $where[] = array('ru.privilege=%s', $data['privilege']);
@@ -125,7 +126,6 @@ class AclModel extends BaseModel
 
     public function seznamOpravneni($role = null)
     {
-
         $rows = dibi::query('
             SELECT
                 a.allowed allowed,
@@ -153,7 +153,6 @@ class AclModel extends BaseModel
 
     public function insertAcl($data)
     {
-
         DbCache::delete('s3_Permission');
 
         $data['role_id'] = (int) $data['role_id'];
@@ -161,26 +160,6 @@ class AclModel extends BaseModel
 
         return dibi::insert($this->name, $data)
                         ->execute();
-    }
-
-    public function insertResource($data)
-    {
-
-        DbCache::delete('s3_Resource_*');
-        DbCache::delete('s3_Resource_code');
-        DbCache::delete('s3_Permission');
-
-        return dibi::insert($this->tb_resource, $data)
-                        ->execute(dibi::IDENTIFIER);
-    }
-
-    public function insertRule($data)
-    {
-
-        DbCache::delete('s3_Permission');
-
-        return dibi::insert($this->tb_rule, $data)
-                        ->execute(dibi::IDENTIFIER);
     }
 
     public function deleteAcl($where)
@@ -200,41 +179,59 @@ class AclModel extends BaseModel
         return dibi::delete($this->name)->where($where)->execute();
     }
 
-    public function deleteResource($where)
-    {
-        if (is_null($where)) {
-            return null;
-        } else if (!is_array($where)) {
-            $where = array($where);
-        } else {
-            if (!is_array(current($where))) {
-                $where = array($where);
-            }
-        }
+//    public function insertResource($data)
+//    {
+//        DbCache::delete('s3_Resource_*');
+//        DbCache::delete('s3_Resource_code');
+//        DbCache::delete('s3_Permission');
+//
+//        return dibi::insert($this->tb_resource, $data)
+//                        ->execute(dibi::IDENTIFIER);
+//    }
+//
+//    public function insertRule($data)
+//    {
+//        DbCache::delete('s3_Permission');
+//
+//        return dibi::insert($this->tb_rule, $data)
+//                        ->execute(dibi::IDENTIFIER);
+//    }
 
-        DbCache::delete('s3_Resource_*');
-        DbCache::delete('s3_Resource_code');
-        DbCache::delete('s3_Permission');
-
-        return dibi::delete($this->tb_resource)->where($where)->execute();
-    }
-
-    public function deleteRule($where)
-    {
-        if (is_null($where)) {
-            return null;
-        } else if (!is_array($where)) {
-            $where = array($where);
-        } else {
-            if (!is_array(current($where))) {
-                $where = array($where);
-            }
-        }
-
-        DbCache::delete('s3_Rule');
-        DbCache::delete('s3_Permission');
-
-        return dibi::delete($this->tb_rule)->where($where)->execute();
-    }
+//    public function deleteResource($where)
+//    {
+//        if (is_null($where)) {
+//            return null;
+//        } else if (!is_array($where)) {
+//            $where = array($where);
+//        } else {
+//            if (!is_array(current($where))) {
+//                $where = array($where);
+//            }
+//        }
+//
+//        DbCache::delete('s3_Resource_*');
+//        DbCache::delete('s3_Resource_code');
+//        DbCache::delete('s3_Permission');
+//
+//        return dibi::delete($this->tb_resource)->where($where)->execute();
+//    }
+//
+//    public function deleteRule($where)
+//    {
+//        if (is_null($where)) {
+//            return null;
+//        } else if (!is_array($where)) {
+//            $where = array($where);
+//        } else {
+//            if (!is_array(current($where))) {
+//                $where = array($where);
+//            }
+//        }
+//
+//        DbCache::delete('s3_Rule');
+//        DbCache::delete('s3_Permission');
+//
+//        return dibi::delete($this->tb_rule)->where($where)->execute();
+//    }
 
 }

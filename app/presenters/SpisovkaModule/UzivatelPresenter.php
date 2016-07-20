@@ -17,10 +17,9 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $user = $this->user;
         $user->logout();
         $this->flashMessage('Byl jste úspěšně odhlášen.');
-        
+
         // Hack - cookie v minulosti kontroloval SSO autentikator. Nyni neni reseno vubec.
         // $this->getHttpResponse()->setCookie('s3_logout', $username, strtotime('10 minute'));        
-
         // P.L. Je-li to mozne, vrat se presne na stranku, kde byl uzivatel, nez kliknul na odhlasit
         // Zpravu o uspesnem odhlaseni nebude mozne v tom pripade zobrazit
         $referer = $this->getHttpRequest()->getHeader('referer');
@@ -43,7 +42,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $this->template->Osoba = $person = $account->getPerson();
         $this->template->Uzivatel = $account;
         $this->template->Org_jednotka = $account->orgjednotka_id !== null ? OrgJednotka::getName($account->orgjednotka_id)
-                        : 'žádná';
+                    : 'žádná';
 
         $Auth1 = $this->context->createService('authenticatorUI');
         $Auth1->setAction('change_password');
@@ -65,7 +64,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
     {
         if (Settings::get('users_can_change_their_data') == false)
             throw new Exception('neoprávněný přístup');
-        
+
         $form = Admin_ZamestnanciPresenter::createOsobaForm();
         $form->addHidden('osoba_id');
 
@@ -242,7 +241,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
             $person = Person::fromUserId($user_id);
             echo '#' . $person->displayName() . '#';
-            
+
             if ($orgjednotka_id !== null) {
                 $org = new OrgUnit($orgjednotka_id);
                 echo $org->zkraceny_nazev;
@@ -250,27 +249,26 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
             $this->terminate();
         } else {
-            $Workflow = new Workflow();
-
             // Predat Spis
-
             $DokSpis = new DokumentSpis();
             $dokumenty = $DokSpis->dokumenty($spis_id);
 
             if (count($dokumenty) > 0) {
-                // obsahuje dokumenty - predame i dokumenty
-                $dokument = current($dokumenty);
-
-                if ($Workflow->predat($dokument->id, $user_id, $orgjednotka_id, $poznamka)) {
-                    $link = $this->link(':Spisovka:Spisy:detail', array('id' => $spis_id));
+                try {
+                    // obsahuje dokumenty - predame i dokumenty
+                    $dokument = current($dokumenty);
+                    $doc = new Document($dokument->id);
+                    $doc->forward($user_id, $orgjednotka_id, $poznamka);
+                    $link = $this->link('Spisy:detail', array('id' => $spis_id));
                     echo '###vybrano###' . $link;
-                    $this->terminate();
-                } else {
-                    $this->forward('vyberspis', array('chyba' => 1, 'spis_id' => $spis_id));
+                } catch (Exception $e) {
+                    $msg = $e->getMessage();
+                    echo nl2br($msg);
                 }
+                $this->terminate();
             } else {
                 // pouze spis
-                $Spis = new Spis;
+                $Spis = new SpisModel;
                 if ($Spis->predatOrg($spis_id, $orgjednotka_id)) {
                     $link = $this->link(':Spisovka:Spisy:detail', array('id' => $spis_id));
                     echo '###vybrano###' . $link;
@@ -303,15 +301,16 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             }
             $this->terminate();
         } else {
-            $Workflow = new Workflow();
-            if ($Workflow->predat($dokument_id, $user_id, $orgjednotka_id, $poznamka)) {
-                $link = $this->link(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+            $doc = new Document($dokument_id);
+            try {
+                $doc->forward($user_id, $orgjednotka_id, $poznamka);
+                $link = $this->link('Dokumenty:detail', array('id' => $dokument_id));
                 echo '###vybrano###' . $link;
-                $this->terminate();
-            } else {
-                // forwarduj pozadavek na novy render dialogu a dej mu informaci, ze ma upozornit uzivatele, ze doslo k chybe
-                $this->forward('vyber', array('chyba' => 1, 'dok_id' => $dokument_id));
+            } catch (Exception $e) {
+                $msg = $e->getMessage();
+                echo nl2br($msg);
             }
+            $this->terminate();
         }
     }
 
@@ -361,14 +360,15 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
         return $form1;
     }
-    
+
     public function upravitIsdsBoxClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
         UserSettings::set('isds_login', $data->login);
         UserSettings::set('isds_password', $data->password);
-        
+
         $this->flashMessage('Nastavení bylo upraveno.');
         $this->redirect('default');
     }
+
 }

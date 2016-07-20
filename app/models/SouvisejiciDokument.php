@@ -4,6 +4,7 @@ class SouvisejiciDokument extends BaseModel
 {
 
     protected $name = 'souvisejici_dokument';
+    protected $autoIncrement = false;
 
     public function souvisejici($dokument_id)
     {
@@ -17,7 +18,7 @@ class SouvisejiciDokument extends BaseModel
         $result = $this->selectComplex($param)->fetchAll();
         if (!count($result))
             return [];
-        
+
         $Dokument = new Dokument();
         foreach ($result as $joinDok) {
             if ($joinDok->spojit_s_id == $dokument_id) {
@@ -50,7 +51,7 @@ class SouvisejiciDokument extends BaseModel
         $row['date_added'] = new DateTime();
         $row['user_id'] = self::getUser()->id;
 
-        return $this->insert_basic($row);
+        return $this->insert($row);
     }
 
     public function odebrat($dokument1_id, $dokument2_id)

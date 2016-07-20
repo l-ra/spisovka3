@@ -10,4 +10,9 @@ class OrgUnit extends CachedDBEntity
 
     const TBL_NAME = 'orgjednotka';
 
+    public function __toString()
+    {
+        return $this->zkraceny_nazev;
+    }
+
 }

@@ -191,10 +191,8 @@ class Spisovka_VyhledatPresenter extends BasePresenter
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
                 ->setValue(@$hledat['pocet_listu']);
-        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$hledat['pocet_priloh']);
-        //$form->addSelect('stav_dokumentu', 'Stav dokumentu:', $stav_dokumentu)
-        //        ->setValue(@$hledat['stav_dokumentu']);
+        $form->addText('pocet_listu_priloh', 'Počet příloh:', 5, 10)
+                ->setValue(@$hledat['pocet_listu_priloh']);
 
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->setValue(@$hledat['lhuta']);

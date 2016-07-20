@@ -8,7 +8,7 @@
         <div id="top_menu">
             {access :Spisovka:Default:}<a href="{link :Spisovka:Default:}">Spisová služba</a>{/access}
             {access :Epodatelna:Default:}<a href="{link :Epodatelna:Default:}">E-podatelna</a>{/access}
-            {if $user->isAllowed('Spisovna', 'cist_dokumenty') || $user->isAllowed('Spisovna_ZapujckyPresenter')}
+            {if $user->isAllowed('Spisovna', 'cist_dokumenty') || $user->isAllowed('Zapujcka', 'vytvorit')}
             <a href="{link :Spisovna:Default:}">Spisovna</a>{/if}
             {access :Admin:Default:}<a href="{link :Admin:Default:}">Administrace</a>{/access}
 {*            {access :Spisovka:Zpravy:}<a href="{link :Spisovka:Zpravy:default}">Zprávy</a>{/access} *}

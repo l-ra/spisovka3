@@ -4,6 +4,7 @@ class DokumentPrilohy extends BaseModel
 {
 
     protected $name = 'dokument_to_file';
+    protected $tb_file = 'file';
 
     // Pouzito v sestavach
     public static function pocet_priloh(array $dokument_ids)
@@ -16,7 +17,6 @@ class DokumentPrilohy extends BaseModel
 
     public function prilohy($dokument_id)
     {
-
         $sql = array(
             'distinct' => null,
             'from' => array($this->name => 'df'),

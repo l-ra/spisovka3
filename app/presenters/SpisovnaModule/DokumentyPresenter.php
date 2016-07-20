@@ -98,16 +98,12 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
-        if ($tisk) {
+        if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
-            $this->setView('print');
-        } elseif ($pdf) {
-            $seznam = $result->fetchAll();
-            $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-            $this->setView('default');
         }
+        $this->setView('default');
 
         if (count($seznam) > 0) {
             $dokument_ids = array();
@@ -132,7 +128,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         // Pripojit aktivni zapujcky
         $Zapujcka = new Zapujcka();
-        $this->template->zapujcky = $Zapujcka->aktivniSeznam();
+        $this->template->zapujcky = $Zapujcka->seznamZapujcenychDokumentu();
     }
 
     public function renderDefault()
@@ -175,7 +171,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         // Nacteni parametru
         $dokument_id = $id;
 
-        $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
+        $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani");
         if ($dokument) {
             // dokument zobrazime
             $this->template->Dok = $dokument;
@@ -221,7 +217,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $pdf = $this->getParameter('pdfprint');
             if ($tisk || $pdf) {
                 $this->template->AccessEdit = false;
-                $this->setView('printdetail');
             }
             
             $Log = new LogModel();
@@ -234,15 +229,12 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
     }
 
-    public function actionKeskartaci()
+    public function actionKeskartaci($id)
     {
-
-        $dokument_id = $this->getParameter('id', null);
         $user = $this->user;
-
-        $Workflow = new Workflow();
+        $doc = new DocumentWorkflow($id);
         if ($user->isAllowed('Spisovna', 'skartacni_navrh')) {
-            if ($Workflow->keskartaci($dokument_id)) {
+            if ($doc->shredProcessing()) {
                 $this->flashMessage('Dokument byl přidán do skartačního řízení.');
             } else {
                 $this->flashMessage('Dokument se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.',
@@ -252,17 +244,16 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->flashMessage('Nemáte oprávnění přidávat dokumenty do skartačního zřízení.',
                     'warning');
         }
-        $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
+        $this->redirect('detail', array('id' => $id));
     }
 
-    public function actionArchivovat()
+    public function actionArchivovat($id)
     {
-        $dokument_id = $this->getParameter('id', null);
         $user = $this->user;
 
-        $Workflow = new Workflow();
+        $workflow = new DocumentWorkflow($id);
         if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
-            if ($Workflow->archivovat($dokument_id)) {
+            if ($workflow->archive()) {
                 $this->flashMessage('Dokument byl archivován.');
             } else {
                 $this->flashMessage('Dokument se nepodařilo zařadit do archivu. Zkuste to znovu.',
@@ -271,17 +262,16 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         } else {
             $this->flashMessage('Nemáte oprávnění provést operaci.', 'warning');
         }
-        $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
+        $this->redirect('detail', array('id' => $id));
     }
 
-    public function actionSkartovat()
+    public function actionSkartovat($id)
     {
-        $dokument_id = $this->getParameter('id', null);
         $user = $this->user;
 
-        $Workflow = new Workflow();
+        $Workflow = new DocumentWorkflow($id);
         if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
-            if ($Workflow->skartovat($dokument_id)) {
+            if ($Workflow->shred()) {
                 $this->flashMessage('Dokument byl skartován.');
             } else {
                 $this->flashMessage('Dokument se nepodařilo skartovat. Zkuste to znovu.',
@@ -290,7 +280,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         } else {
             $this->flashMessage('Nemáte oprávnění provést operaci.', 'warning');
         }
-        $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
+        $this->redirect('detail', array('id' => $id));
     }
 
     public function renderDownload($id, $file)
@@ -566,13 +556,13 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function bulkAction($action, $documents)
     {
-        $Workflow = new Workflow();
         $user = $this->user;
 
         switch ($action) {
             case 'vratit':
                 foreach ($documents as $dokument_id) {
-                    $Workflow->vratitZeSpisovny($dokument_id);
+                    $doc = new DocumentWorkflow($dokument_id);
+                    $doc->returnFromSpisovna();
                 }
                 if (count($documents) == 1)
                     $msg = 'Dokument byl vrácen.';
@@ -582,10 +572,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 break;
 
             /* Prevzeti vybranych dokumentu */
-            case 'prevzit_spisovna':
+            case 'prevzit_spisovna':                
                 $count_ok = $count_failed = 0;
                 foreach ($documents as $dokument_id) {
-                    $stav = $Workflow->prevzitDoSpisovny($dokument_id, true);
+                    $doc = new DocumentWorkflow($dokument_id);
+                    $stav = $doc->receiveIntoSpisovna(true);
                     if ($stav === true) {
                         $count_ok++;
                     } else {
@@ -599,7 +590,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $this->flashMessage('Úspěšně jste přijal ' . $count_ok . ' dokumentů do spisovny.');
                 }
                 if ($count_failed > 0) {
-                    $this->flashMessage($count_failed . ' dokumentů se nepodařilo příjmout do spisovny!',
+                    $this->flashMessage($count_failed . ' dokumentů se nepodařilo přijmout do spisovny!',
                             'warning');
                 }
                 if ($count_ok > 0 && $count_failed > 0) {
@@ -611,12 +602,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $count_ok = $count_failed = 0;
                     if ($user->isAllowed('Spisovna', 'skartacni_navrh')) {
                         foreach ($documents as $dokument_id) {
-                            if ($Workflow->keskartaci($dokument_id, $user->id)) {
-                                //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
+                            $doc = new DocumentWorkflow($dokument_id);
+                            if ($doc->shredProcessing()) {
                                 $count_ok++;
                             } else {
                                 $count_failed++;
-                                //$this->flashMessage('Dokument  se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
                             }
                         }
                         if ($count_ok > 0) {
@@ -642,12 +632,11 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $count_ok = $count_failed = 0;
                     if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
                         foreach ($documents as $dokument_id) {
-                            if ($Workflow->archivovat($dokument_id)) {
-                                //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
+                            $doc = new DocumentWorkflow($dokument_id);
+                            if ($doc->archive()) {
                                 $count_ok++;
                             } else {
                                 $count_failed++;
-                                //$this->flashMessage('Dokument  se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
                             }
                         }
                         if ($count_ok > 0) {
@@ -673,21 +662,17 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $count_ok = $count_failed = 0;
                     if ($user->isAllowed('Spisovna', 'skartacni_rizeni')) {
                         foreach ($documents as $dokument_id) {
-                            if ($Workflow->skartovat($dokument_id)) {
-                                //$this->flashMessage('Dokument byl přidán do skartačního řízení.');
+                            $doc = new DocumentWorkflow($dokument_id);
+                            if ($doc->shred()) {
                                 $count_ok++;
-                            } else {
+                            } else
                                 $count_failed++;
-                                //$this->flashMessage('Dokument  se nepodařilo zařadit do skartačního řízení. Zkuste to znovu.','warning');
-                            }
                         }
-                        if ($count_ok > 0) {
+                        if ($count_ok > 0)
                             $this->flashMessage($count_ok . ' dokumentů bylo úspěšně skartováno.');
-                        }
-                        if ($count_failed > 0) {
+                        if ($count_failed > 0)
                             $this->flashMessage($count_failed . ' dokumentů se nepodařilo skartovat. Zkuste to znovu.',
                                     'warning');
-                        }
                     } else {
                         $this->flashMessage('Nemáte oprávnění rozhodovat o skartačním řízení.',
                                 'warning');

@@ -10,6 +10,9 @@ class UserAccount extends CachedDBEntity
 
     const TBL_NAME = 'user';
 
+    const ROLE_TABLE = 'acl_role';
+    const USER2ROLE_TABLE = 'user_to_role';
+    
     public function __construct($param)
     {
         if ($param instanceof \Nette\Security\User)
@@ -46,8 +49,8 @@ class UserAccount extends CachedDBEntity
     public function getRoles()
     {
         $rows = dibi::fetchAll('SELECT r.*
-                                 FROM [:PREFIX:' . BaseModel::USER2ROLE_TABLE . '] ur
-                                 LEFT JOIN [:PREFIX:' . BaseModel::ROLE_TABLE . '] r ON (r.id = ur.role_id)
+                                 FROM [:PREFIX:' . self::USER2ROLE_TABLE . '] ur
+                                 LEFT JOIN [:PREFIX:' . self::ROLE_TABLE . '] r ON (r.id = ur.role_id)
                                  WHERE ur.user_id = %i', $this->id);
 
         return $rows ? $rows : NULL;

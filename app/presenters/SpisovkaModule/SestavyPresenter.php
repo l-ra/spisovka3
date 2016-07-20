@@ -11,8 +11,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         'subjekty' => 'Odesílatel / adresát',
         'cislo_jednaci_odesilatele' => 'Č.j. odesílatele',
         'pocet_listu' => 'Počet listů',
-        'pocet_priloh' => 'Počet příloh',
-        'pocet_nelistu' => 'Počet nelistů',
+        'pocet_listu_priloh' => 'Počet listů příloh',
+        'pocet_souboru' => 'Počet souborů',
         'nazev' => 'Věc',
         'vyridil' => 'Přidělen / Vyřídil',
         'zpusob_vyrizeni' => 'Způsob vyřízení',
@@ -112,7 +112,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         if (!isset($zobr['zobrazeni_adresa']))
             $zobr['zobrazeni_adresa'] = false;
 
-        $this->template->sloupce = explode(',', $sestava->sloupce);
+        $sloupce = explode(',', $sestava->sloupce);
+        $this->template->sloupce = $sloupce;
         $this->template->zobrazeni = $zobr;
 
         try {
@@ -165,7 +166,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                     $col = 'd.nazev';
                     break;
                 case 'stav':
-                    $col = 'wf.stav_dokumentu';
+                    $col = 'd.stav';
                     break;
                 default:
                     $col = null;
@@ -439,7 +440,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addText('datum_vzniku_cas_do', 'Čas doručení do:', 10, 15);
 //nepouzito v sablone
 //        $form->addText('pocet_listu', 'Počet listů:', 5, 10);
-//        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10);
+//        $form->addText('pocet_listu_priloh', 'Počet příloh:', 5, 10);
         $form->addSelect('stav_dokumentu', 'Stav dokumentu:', $stav_dokumentu);
 
         $form->addTextArea('poznamka', 'Poznámka:', 80, 4);

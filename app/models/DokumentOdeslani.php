@@ -113,7 +113,6 @@ class DokumentOdeslani extends BaseModel
         }
 
         $sql = array(
-            'distinct' => true,
             'from' => array($this->name => 'ds'),
             'cols' => array('dokument_id', 'ds.id' => 'dokodes_id', 'subjekt_id', 'datum_odeslani', 'zpusob_odeslani_id', 'user_id', 'zprava', 'cena', 'hmotnost', 'cislo_faxu', 'stav', 'druh_zasilky', 'ds.poznamka' => 'poznamka_odeslani'),
             'leftJoin' => array(
@@ -155,7 +154,7 @@ class DokumentOdeslani extends BaseModel
             $sql['where'][] = array('ds.zpusob_odeslani_id=3');
         }
 
-        if (is_string($hledani))
+        if (!empty($hledani))
             $sql['where_or'] = array(
                 array('CONCAT(s.nazev_subjektu,s.prijmeni) LIKE %s', '%' . $hledani . '%'),
                 array('osoba.prijmeni LIKE %s', '%' . $hledani . '%'),

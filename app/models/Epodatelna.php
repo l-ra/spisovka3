@@ -5,7 +5,6 @@
 class Epodatelna extends BaseModel
 {
     protected $name = 'epodatelna';
-    protected $primary = 'id';
 
     /**
      * Seznam dokumentu s zivotnim cyklem

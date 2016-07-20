@@ -232,6 +232,10 @@ table.seznam td {
     border-bottom: 1px #e0e0e0 solid;
 }
 
+table.sestava th {
+    font-size: 8pt;
+    padding: 5px 4px;
+}
 
 /* Polozky */
 .prazdno {

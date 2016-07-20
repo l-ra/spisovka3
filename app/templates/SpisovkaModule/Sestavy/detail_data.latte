@@ -9,8 +9,8 @@
 <td {? switch ($sl) {
 	case "smer":
 	case "pocet_listu":
-	case "pocet_priloh":
-	case "pocet_nelistu":
+	case "pocet_listu_priloh":
+	case "pocet_souboru":
 	case "skartacni_znak":
 	case "skartacni_lhuta":
 		echo 'align="center"';
@@ -29,16 +29,8 @@
 	{else}
 	&nbsp;
 	{/if}
-{elseif $sl=='pocet_nelistu'}
-	{$dok->pocet_souboru}
 {elseif $sl=='vyridil'}
-    {if isset($dok->prideleno)}
-	{if empty($dok->prideleno->prideleno_id) }
-	{$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-	{else}
-	{$dok->prideleno->prideleno_jmeno}<br />{=@$dok->prideleno->orgjednotka_info->zkraceny_nazev}
-	{/if}
-    {/if}
+	{$dok->prideleno->jmeno}<br />{if isset($dok->prideleno->orgjednotka)}{$dok->prideleno->orgjednotka->zkraceny_nazev}{/if}
 {elseif $sl=='datum_odeslani'}
 	{if $zobrazeni['zobrazeni_cas']}
 	{$dok->datum_odeslani|edatetime}
@@ -58,11 +50,7 @@
 {elseif $sl=='smer'}
 	{$dok->typ_dokumentu->smer == 1 ? 'V' : 'P'}
 {elseif $sl=='poznamka_predani'}
-	{if !empty($dok->predano->poznamka)}
-	{!$dok->predano->poznamka|escape|nl2br}
-	{else}
-	{!$dok->prideleno->poznamka|escape|nl2br}
-	{/if}
+	{!$dok->forward_note|escape|nl2br}
 {else}
 {$dok->$sl}{/if}</td>
 {/foreach}

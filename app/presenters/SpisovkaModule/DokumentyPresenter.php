@@ -110,7 +110,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $pdf = $this->getParameter('pdfprint');
         if ($tisk || $pdf) {
             $seznam = $result->fetchAll();
-            $this->setView('print');
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
@@ -150,7 +149,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         // Nacteni parametru
         $dokument_id = $id;
 
-        $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani,workflow");
+        $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani");
         if ($dokument) {
             // dokument zobrazime
 
@@ -170,15 +169,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->template->AccessEdit = 0;
             $this->template->AccessView = 0;
 
-            if (count($dokument->workflow) > 0) {
-                // uzivatel na dokumentu nekdy pracoval, tak mu dame moznost aspon nahlizet
-                foreach ($dokument->workflow as $wf) {
-                    if ($wf->prideleno_id == $user_id) {
-                        $this->template->AccessView = 1;
-                    }
-                }
-            }
-
             // P.L.
             $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
             if ($isVedouci) {
@@ -188,15 +178,15 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 if ($org_id)
                     $povoleneOrgJednotky = OrgJednotka::childOrg($org_id);
 
-                if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky) || in_array(@$dokument->predano->orgjednotka_id,
+                if (in_array($dokument->owner_orgunit_id, $povoleneOrgJednotky) || $dokument->is_forwarded && in_array($dokument->forward_orgunit_id,
                                 $povoleneOrgJednotky)) {
                     $this->template->AccessView = 1;
 
                     // vedouci ma pristup k dokumentu, ktery je predan primo na org. jednotku (kdyz chybi konkretni uzivatel)
-                    if ($user->isAllowed('Dokument', 'menit_moje_oj') || isset($dokument->predano) && @$dokument->predano->prideleno_id == null)
+                    if ($user->isAllowed('Dokument', 'menit_moje_oj') || $dokument->is_forwarded && $dokument->forward_user_id == null)
                         $this->template->AccessEdit = 1;
 
-                    if (in_array(@$dokument->prideleno->orgjednotka_id, $povoleneOrgJednotky))
+                    if (in_array($dokument->owner_orgunit_id, $povoleneOrgJednotky))
                         $this->template->Pridelen = 1;
                     else {
                         $this->template->Predan = 1;
@@ -206,46 +196,46 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             // Prideleny nebo predany uzivatel
-            if (@$dokument->prideleno->prideleno_id == $user_id || (OrgJednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) && $user->isAllowed('Dokument',
+            if ($dokument->owner_user_id == $user_id || (OrgJednotka::isInOrg($dokument->owner_orgunit_id) && $user->isAllowed('Dokument',
                             'menit_moje_oj'))) {
                 // prideleny
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
-            } else if (@$dokument->predano->prideleno_id == $user_id || (OrgJednotka::isInOrg(@$dokument->predano->orgjednotka_id) && $user->isAllowed('Dokument',
+            } else if ($dokument->forward_user_id == $user_id || (OrgJednotka::isInOrg($dokument->forward_orgunit_id) && $user->isAllowed('Dokument',
                             'menit_moje_oj'))) {
                 // predany
                 $this->template->AccessEdit = 0;
                 $this->template->AccessView = 1;
                 $this->template->Predan = 1;
-            } else if ($user->isAllowed('Dokument', 'cist_moje_oj') && (OrgJednotka::isInOrg(@$dokument->prideleno->orgjednotka_id) || OrgJednotka::isInOrg(@$dokument->predano->orgjednotka_id))) {
+            } else if ($user->isAllowed('Dokument', 'cist_moje_oj') && (OrgJednotka::isInOrg($dokument->owner_orgunit_id) || OrgJednotka::isInOrg($dokument->forward_orgunit_id))) {
                 $this->template->AccessView = 1;
             }
 
             if ($user->isAllowed('Dokument', 'cist_vse'))
                 $this->template->AccessView = 1;
 
-            // Dokument je vyrizeny nebo v pozdejsim stavu workflow
-            if ($dokument->stav_dokumentu >= 4) {
+            if ($dokument->stav_dokumentu >= DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA)
                 $this->template->AccessEdit = 0;
-            }
 
-            // Dokument je zapujcen
-            if ($dokument->stav_dokumentu == 11) {
+            $this->template->LzeVratit = false;
+            if ($dokument->stav_dokumentu == DocumentWorkflow::STAV_ZAPUJCEN) {
                 $this->template->Pridelen = 0;
                 $this->template->AccessEdit = 0;
                 $Zapujcka = new Zapujcka();
-                $this->template->Zapujcka = $Zapujcka->getFromDokumentId($dokument_id);
-            } else {
-                $this->template->Zapujcka = null;
+                $zapujcka = $Zapujcka->getFromDokumentId($dokument_id);
+                $this->template->Zapujcka = $zapujcka;
+                if (isset($zapujcka->id) && $dokument->owner_user_id == $user->id) {
+                    $this->template->LzeVratit = true;
+                }
             }
 
             // Pokud uzivatel dokument nekomu predal, zakaz docasne praci s dokumentem
-            if ($this->template->Pridelen && !empty($dokument->predano))
+            if ($this->template->Pridelen && $dokument->is_forwarded)
                 $this->template->AccessEdit = 0;
 
             // SuperAdmin - moznost zasahovat do dokumentu
-            if ($this->user->inheritsFromRole('superadmin')) {
+            if ($this->user->isInRole('superadmin')) {
                 $this->template->AccessEdit = 1;
                 $this->template->AccessView = 1;
                 $this->template->Pridelen = 1;
@@ -253,14 +243,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $lzePredatVyrizeneDokumenty = Settings::get('spisovka_allow_forward_finished_documents',
                             false);
-            $this->template->LzePredatDokument = $this->template->Pridelen && ($dokument->stav_dokumentu <= 3 || $lzePredatVyrizeneDokumenty);
+            $this->template->LzePredatDokument = $this->template->Pridelen && ($dokument->stav_dokumentu <= DocumentWorkflow::STAV_VYRIZUJE_SE || $lzePredatVyrizeneDokumenty);
 
-            $doc = new Document($id);
+            $doc = new DocumentWorkflow($id);
             $this->template->LzeZnovuOtevrit = $doc->canUserReopen();
 
             $this->template->FormUpravit = $this->template->AccessEdit ? $upravit : null;
 
-            $this->template->FormUdalost = $udalost && $dokument->stav_dokumentu == 4;
+            $this->template->FormUdalost = $udalost && $dokument->stav_dokumentu == DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA;
 
             $this->template->Typ_evidence = $this->typ_evidence;
             $this->template->SouvisejiciDokumenty = array();
@@ -288,7 +278,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             // Kontrola existence nazvu
             if ($this->template->Pridelen && $this->template->AccessEdit) {
-                if ($dokument->stav_dokumentu >= 2 && !$this->user->inheritsFromRole('podatelna') && (empty($dokument->nazev) || $dokument->nazev == "(bez názvu)" )) {
+                if ($dokument->stav_dokumentu >= DocumentStates::STAV_VYRIZUJE_SE && empty($dokument->nazev)) {
                     $this->template->nutnyNadpis = 1;
                     // vyvolej zobrazeni formulare editace metadat
                     $this->template->FormUpravit = 'metadata';
@@ -305,10 +295,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderDetail($id)
     {
+        $dokument = $this->template->Dok;
+        
         $this->template->dokument_id = $id;
         $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
-
-        $dokument = $this->template->Dok;
+        $this->template->dokument_nebo_spis = isset($dokument->spis) ? 'spis' : 'dokument';
 
         // Kontrola lhuty a skartace
         if ($dokument->lhuta_stav == 2 && $dokument->stav_dokumentu < 4) {
@@ -323,7 +314,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $pdf = $this->getParameter('pdfprint');
         if ($tisk || $pdf) {
             $this->template->AccessEdit = false;
-            $this->setView('printdetail');
         }
 
         $Log = new LogModel();
@@ -355,8 +345,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function bulkAction($action, $documents)
     {
-        $Workflow = new Workflow();
-
         switch ($action) {
             case 'tisk':
                 $this->redirect('this',
@@ -365,11 +353,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             /* Prevzeti vybranych dokumentu */
             case 'prevzit':
-
                 $count_ok = $count_failed = 0;
                 foreach ($documents as $dokument_id) {
-                    if ($Workflow->predany($dokument_id)) {
-                        if ($Workflow->prevzit($dokument_id))
+                    $doc = new Document($dokument_id);
+                    if ($doc->canUserTakeOver()) {
+                        if ($doc->takeOver())
                             $count_ok++;
                         else
                             $count_failed++;
@@ -386,7 +374,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             case 'predat_spisovna':
                 $count_ok = $count_failed = 0;
                 foreach ($documents as $dokument_id) {
-                    $stav = $Workflow->predatDoSpisovny($dokument_id, false);
+                    $doc = new DocumentWorkflow($dokument_id);
+                    $stav = $doc->transferToSpisovna(false);
                     if ($stav === true) {
                         $count_ok++;
                     } else {
@@ -411,8 +400,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function actionPredatDoSpisovny($id)
     {
-        $w = new Workflow();
-        $res = $w->predatDoSpisovny($id, false);
+        $w = new DocumentWorkflow($id);
+        $res = $w->transferToSpisovna(false);
         if ($res === true)
             $this->flashMessage('Dokument byl předán do spisovny.');
         else {
@@ -423,36 +412,24 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect('default');
     }
 
-    public function actionPrevzit()
+    public function actionPrevzit($id)
     {
-        $dokument_id = $this->getParameter('id', null);
-
-        $Workflow = new Workflow();
-        if ($Workflow->predany($dokument_id)) {
-            if ($Workflow->prevzit($dokument_id)) {
-                $this->flashMessage('Úspěšně jste si převzal tento dokument.');
-            } else {
-                $this->flashMessage('Převzetí dokumentu do vlastnictví se nepodařilo. Zkuste to znovu.',
-                        'warning');
-            }
-        } else {
+        $doc = new Document($id);
+        if ($doc->canUserTakeOver()) {
+            $doc->takeOver();
+            $this->flashMessage('Úspěšně jste si převzal tento dokument.');
+        } else
             $this->flashMessage('Nemáte oprávnění k převzetí dokumentu.', 'warning');
-        }
 
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+        $this->redirect('detail', array('id' => $id));
     }
 
-    public function actionZrusitprevzeti()
+    public function actionZrusitprevzeti($id)
     {
-        $dokument_id = $this->getParameter('id', null);
-
-        $Workflow = new Workflow();
-        if ($Workflow->prirazeny($dokument_id)) {
-            if ($Workflow->zrusit_prevzeti($dokument_id)) {
+        $doc = new Document($id);
+        if ($doc->canUserModify()) {
+            if ($doc->cancelForwarding()) {
                 $this->flashMessage('Zrušil jste předání dokumentu.');
-                $Log = new LogModel();
-                $Log->logDokument($dokument_id, LogModel::DOK_PREDANI_ZRUSENO,
-                        "Předání dokumentu bylo zrušeno.");
             } else {
                 $this->flashMessage('Zrušení předání se nepodařilo. Zkuste to znovu.',
                         'warning');
@@ -460,21 +437,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } else {
             $this->flashMessage('Nemáte oprávnění ke zrušení předání dokumentu.', 'warning');
         }
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+        $this->redirect('detail', array('id' => $id));
     }
 
-    public function actionOdmitnoutprevzeti()
+    public function actionOdmitnoutprevzeti($id)
     {
-        $dokument_id = $this->getParameter('id', null);
-
-        $Workflow = new Workflow();
-        if ($Workflow->predany($dokument_id)) {
-            if ($Workflow->zrusit_prevzeti($dokument_id)) {
+        $doc = new Document($id);
+        if ($doc->canUserTakeOver()) {
+            if ($doc->reject()) {
                 $this->flashMessage('Odmítl jste převzetí dokumentu.');
-                $Log = new LogModel();
-                $Log->logDokument($dokument_id, LogModel::DOK_PREVZETI_ODMITNUTO,
-                        "Uživatel odmítnul převzít dokument.");
-                $this->redirect(':Spisovka:Dokumenty:default');
+                $this->redirect('default');
             } else {
                 $this->flashMessage('Odmítnutí převzetí se nepodařilo. Zkuste to znovu.',
                         'warning');
@@ -484,71 +456,50 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'warning');
         }
 
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+        $this->redirect('detail', array('id' => $id));
     }
 
-    public function actionKvyrizeni()
+    public function actionKvyrizeni($id)
     {
-        $dokument_id = $this->getParameter('id', null);
-
-        $Workflow = new Workflow();
-        if ($Workflow->prirazeny($dokument_id)) {
-            if ($Workflow->vyrizuje($dokument_id)) {
-                $Workflow->zrusit_prevzeti($dokument_id);
-
-                $DokumentSpis = new DokumentSpis();
-                $spisy = $DokumentSpis->spisy($dokument_id);
-                if (count($spisy) > 0) {
-                    $Dokument = new Dokument();
-                    foreach ($spisy as $spis) {
-                        $data = array(
-                            "spisovy_znak_id" => $spis->spisovy_znak_id,
-                            "skartacni_znak" => $spis->skartacni_znak,
-                            "skartacni_lhuta" => $spis->skartacni_lhuta,
-                            "spousteci_udalost_id" => $spis->spousteci_udalost_id
-                        );
-                        $Dokument->ulozit($data, $dokument_id);
-                        unset($data);
-                    }
-                }
-
-                $this->flashMessage('Převzal jste tento dokument k vyřízení.');
-            } else {
-                $this->flashMessage('Označení dokumentu k vyřízení se nepodařilo. Zkuste to znovu.',
-                        'warning');
-            }
-        } else {
+        $workflow = new DocumentWorkflow($id);
+        if (!$workflow->canUserModify())
             $this->flashMessage('Nemáte oprávnění označit dokument k vyřízení.', 'warning');
+        else {
+            if ($workflow->markForProcessing())
+                $this->flashMessage('Převzal jste tento dokument k vyřízení.');
+            else
+                $this->flashMessage('Označení dokumentu k vyřízení se nepodařilo.', 'warning');
         }
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+
+        $this->redirect('detail', $id);
     }
 
-    public function actionVyrizeno()
+    public function actionVyrizeno($id)
     {
-        $dokument_id = $this->getParameter('id', null);
+        $dokument_id = $id;
 
-        $Workflow = new Workflow();
-        if ($Workflow->prirazeny($dokument_id)) {
-            $ret = $Workflow->vyridit($dokument_id, $this);
-            if ($ret === "udalost") {
-                // manualni udalost
-                $this->flashMessage('Označil jste tento dokument za vyřízený!');
-                $this->redirect(':Spisovka:Dokumenty:detail',
-                        array('id' => $dokument_id, 'udalost' => 1));
-            } else if ($ret === "neprideleno") {
-                // neprideleno
-                $this->flashMessage('Nemáte oprávnění označit dokument za vyřízený.', 'warning');
-            } else if ($ret === true) {
+        $workflow = new DocumentWorkflow($id);
+        if (!$workflow->canUserModify())
+            $this->flashMessage('Nemáte oprávnění označit dokument za vyřízený.', 'warning');
+        else {
+            $ret = $workflow->close();
+            if ($ret === true) {
                 // automaticka udalost
-                $this->flashMessage('Označil jste tento dokument za vyřízený!');
+                $this->flashMessage('Označil jste tento dokument za vyřízený.');
+            } else if ($ret === "udalost") {
+                // manualni udalost
+                $this->flashMessage('Označil jste tento dokument za vyřízený.');
+                $this->redirect('detail', ['id' => $dokument_id, 'udalost' => 1]);
             } else {
+                foreach ($ret as $message)
+                    $this->flashMessage($message, 'warning');
+
                 $this->flashMessage('Označení dokumentu za vyřízený se nepodařilo. Zkuste to znovu.',
                         'warning');
             }
-        } else {
-            $this->flashMessage('Nemáte oprávnění označit dokument za vyřízený.', 'warning');
         }
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+
+        $this->redirect('detail', $id);
     }
 
     public function renderCjednaci()
@@ -591,7 +542,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $data['podaci_denik_rok'] = $dok2->podaci_denik_rok;
 
             // predpoklad - spis musi existovat, jinak je neco hodne spatne
-            $Spis = new Spis();
+            $Spis = new SpisModel();
             $spis = $Spis->findByName($cislo_jednaci);
             if (!$spis)
                 throw new Exception("chyba integrity dat. Spis '$cislo_jednaci' neexistuje.");
@@ -629,7 +580,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if (!empty($dokument_info['cislo_jednaci_id'])) {
             // throw new Exception("Dokument má již č.j. přiděleno.");
             $this->flashMessage('Dokument má již číslo jednací přiděleno.', 'error');
-            $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+            $this->redirect('detail', array('id' => $dokument_id));
         }
 
         $CJ = new CisloJednaci();
@@ -662,7 +613,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             if ($this->typ_evidence == 'sberny_arch') {
 
-                $Spis = new Spis();
+                $Spis = new SpisModel();
                 $spis = $Spis->findByName($cjednaci->cislo_jednaci);
                 if (!$spis) {
                     // vytvorime spis
@@ -684,7 +635,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
         }
 
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+        $this->redirect('detail', array('id' => $dokument_id));
     }
 
     public function renderNovy()
@@ -693,13 +644,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $cisty = $this->getParameter('cisty', false);
         if ($cisty) {
             $Dokumenty->odstranit_rozepsane();
-            $this->redirect(':Spisovka:Dokumenty:novy');
+            $this->redirect('novy');
         }
 
         $args_rozd = array();
         $args_rozd['where'] = array(
-            array('stav=%i', 0),
-            array('user_created=%i', $this->user->id),
+            array('stav = %i', 0),
+            array('user_created = %i', $this->user->id),
         );
 
         $args_rozd['order'] = array('date_created' => 'DESC');
@@ -713,7 +664,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             // Oprava Task #254
             $dokument = $Dokumenty->getInfo($dokument->id);
 
-            $this->flashMessage('Byl detekován a načten rozepsaný dokument.<p>Pokud chcete založit úplně nový dokument, klikněte na následující odkaz. <a href="' . $this->link(':Spisovka:Dokumenty:novy',
+            $this->flashMessage('Byl detekován a načten rozepsaný dokument.<p>Pokud chcete založit úplně nový dokument, klikněte na následující odkaz. <a href="' . $this->link('novy',
                             array('cisty' => 1)) . '">Vytvořit nový nerozepsaný dokument.</a></p>',
                     'info_ext');
 
@@ -736,7 +687,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument->id);
             }
         } else {
-
             if ($this->user->inheritsFromRole('podatelna')) {
                 $dokument_typ_id = 1;
             } else {
@@ -934,7 +884,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } else {
             $this->template->Dok = null;
             $this->flashMessage('Dokument neexistuje', 'warning');
-            $this->redirect(':Spisovka:Dokumenty:default');
+            $this->redirect('default');
         }
     }
 
@@ -954,19 +904,19 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             } else if ($res == 1) {
                 // not found
                 $this->flashMessage('Požadovaný soubor nenalezen!', 'warning');
-                $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+                $this->redirect('detail', array('id' => $dokument_id));
             } else if ($res == 2) {
                 $this->flashMessage('Chyba při stahování!', 'warning');
-                $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+                $this->redirect('detail', array('id' => $dokument_id));
             } else if ($res == 3) {
                 $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnout zmíněný soubor!',
                         'warning');
-                $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+                $this->redirect('detail', array('id' => $dokument_id));
             }
         } else {
             $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnout cizí soubor!',
                     'warning');
-            $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+            $this->redirect('detail', array('id' => $dokument_id));
         }
     }
 
@@ -1019,7 +969,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->flashMessage("Dokument má příliš mnoho adresátů a není možné jej odeslat. Maximální počet adresátů je $safe_recipient_count.",
                     'warning');
             $this->flashMessage("Limit je ovlivněn PHP nastavením \"max_input_vars\" na serveru.");
-            $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $id));
+            $this->redirect('detail', array('id' => $id));
         }
 
         // Prilohy
@@ -1104,8 +1054,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addHidden('odpoved')
                 ->setValue($this->odpoved === true ? 1 : 0);
 
-        if (isset($dok->nazev) && $dok->nazev == "(bez názvu)")
-            $dok->nazev = "";
         $form->addText('nazev', 'Věc:', 80, 250)
                 ->setValue(@$dok->nazev);
         if (!$this->user->inheritsFromRole('podatelna')) {
@@ -1141,13 +1089,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->setValue(@$dok->cislo_doporuceneho_dopisu);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
-                ->setValue(@$dok->pocet_listu)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
+                ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet listů musí být číslo.');
-        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
-                ->setValue(@$dok->pocet_priloh)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
-                'Počet příloh musí být číslo.');
-        $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50)
-                ->setValue(@$dok->typ_prilohy);
+        $form->addText('pocet_listu_priloh', 'Počet listů příloh:', 5, 10)
+                ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
+                'Počet musí být číslo.');
+        $form->addText('nelistinne_prilohy', 'Počet a druh příloh v nelistinné podobě:', 20, 50);                
 
 
         $form->addSubmit('novy', 'Vytvořit dokument');
@@ -1197,31 +1144,28 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dokument = $Dokument->ulozit($dd, $dokument_id);
 
             if ($dokument) {
-                $Workflow = new Workflow();
-                $Workflow->vytvorit($dokument_id);
-
                 $Log = new LogModel();
                 $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
                 if ($data['odpoved'] == 1) {
                     $this->flashMessage('Odpověď byla vytvořena.');
-                    $this->forward(':Spisovka:Dokumenty:kvyrizeni', array('id' => $dokument_id));
+                    $this->forward('kvyrizeni', array('id' => $dokument_id));
                 } else {
                     $this->flashMessage('Dokument byl vytvořen.');
 
                     if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
                         /* Dokument predan */
-                        $Workflow->predat($dokument_id, $data['predano_user'],
-                                $data['predano_org'], $data['predani_poznamka']);
+                        $doc = new Document($dokument_id);
+                        $doc->forward($data['predano_user'], $data['predano_org'],
+                                $data['predani_poznamka']);
                         $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
                     }
 
                     $name = $button->getName();
                     if ($name == "novy_pridat")
-                        $this->redirect(':Spisovka:Dokumenty:novy');
+                        $this->redirect('novy');
                     else
-                        $this->redirect(':Spisovka:Dokumenty:detail',
-                                array('id' => $dokument_id));
+                        $this->redirect('detail', array('id' => $dokument_id));
                 }
             } else {
                 $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
@@ -1232,7 +1176,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } catch (LogicException $e) {
             $this->flashMessage('Kontrola platnosti selhala:' . $e->getMessage(), 'warning');
             if ($e->getCode() == 2) {
-                $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+                $this->redirect('detail', array('id' => $dokument_id));
             }
         }
     }
@@ -1304,11 +1248,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
                 ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
-                'Počet listů musí být číslo');
-        $form->addText('pocet_priloh', 'Počet příloh:', 5, 10)
+                'Počet listů musí být číslo.');
+        $form->addText('pocet_listu_priloh', 'Počet listů příloh:', 5, 10)
                 ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
-                'Počet příloh musí být číslo');
-        $form->addText('typ_prilohy', 'Typ přílohy:', 20, 50);
+                'Počet musí být číslo.');
+        $form->addText('nelistinne_prilohy', 'Počet a druh příloh v nelistinné podobě:', 20, 50);
 
 
         if (isset($form['dokument_typ_id']))
@@ -1330,8 +1274,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         if (isset($form['poznamka']))
             $form['poznamka']->setDefaultValue($Dok->poznamka);
         $form['pocet_listu']->setDefaultValue($Dok->pocet_listu);
-        $form['pocet_priloh']->setDefaultValue($Dok->pocet_priloh);
-        $form['typ_prilohy']->setDefaultValue($Dok->typ_prilohy);
+        $form['pocet_listu_priloh']->setDefaultValue($Dok->pocet_listu_priloh);
+        $form['nelistinne_prilohy']->setDefaultValue($Dok->nelistinne_prilohy);
 
         $submit = $form->addSubmit('upravit', 'Uložit');
         $submit->onClick[] = array($this, 'upravitMetadataClicked');
@@ -1505,11 +1449,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $dokument_id = $this->getParameter('id');
         $datum = null;
 
-        $Dokumenty = new Dokument();
-        $dokument = $Dokumenty->getInfo($dokument_id);
-
-        $Workflow = new Workflow();
-        if ($Workflow->prirazeny($dokument_id) && $dokument->stav_dokumentu == 4) {
+        $doc = new DocumentWorkflow($dokument_id);
+        if ($doc->canUserModify() && $doc->stav == DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA) {
 
             switch ($data['udalost_typ']) {
                 case 1 :
@@ -1527,7 +1468,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             if (!empty($datum)) {
-                $Workflow->spustitUdalost($dokument_id, $datum);
+                $doc->setStartDate($datum);
                 $this->flashMessage($zprava, 'info');
             }
         } else
@@ -2158,22 +2099,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         // Typ pristupu na organizacni jednotku
         $filtr = !is_null($this->filtr) ? $this->filtr : 'vse';
-        $select = array(
-            'pridelene' => 'Přidělené',
-            'kprevzeti' => 'K převzetí',
-            'predane' => 'Předané',
-            'nove' => 'Nové / nepředané',
+        $select = ['Předávání' => [
+                'kprevzeti' => 'K převzetí',
+                'predane' => 'Předané'],
+            'nove' => 'Nové',
             'kvyrizeni' => 'Vyřizuje se',
             'vyrizene' => 'Vyřízené',
-            'pracoval' => 'Na kterých jsem kdy pracoval',
-            'org_pracoval' => 'Na kterých pracovala moje o.j.',
             'zapujcene' => 'Zapůjčené',
             'vse' => 'Všechny',
-            'Výpravna' => array(
-                'doporucene' => 'Doporučené',
+            'Výpravna' => ['doporucene' => 'Doporučené',
                 'predane_k_odeslani' => 'K odeslání',
-                'odeslane' => 'Odeslané',),
-        );
+                'odeslane' => 'Odeslané',],
+        ];
 
         $filtr_bezvyrizenych = !is_null($this->filtr_bezvyrizenych) ? $this->filtr_bezvyrizenych
                     : false;
@@ -2183,13 +2120,19 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addHidden('hidden')
                 ->setValue(1);
 
-        $control = $form->addSelect('filtr', 'Filtr:', $select)
-                ->setValue($filtr);
+        $control = $form->addSelect('filtr', 'Filtr:', $select);
+        try {
+            $form['filtr']->setValue($filtr);
+        } catch (Exception $ex) {
+            // zmena filtru v aplikaci muze zpusobit neplatnou predvolbu uzivatele
+            $ex->getMessage();
+        }
+
         $control->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
         if ($this->zakaz_filtr)
             $control->setDisabled();
 
-        $form->addCheckbox('bez_vyrizenych', 'Nezobrazovat vyřízené nebo archivované dokumenty')
+        $form->addCheckbox('bez_vyrizenych', 'Nezobrazovat vyřízené dokumenty')
                 ->setValue($filtr_bezvyrizenych)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
 
@@ -2274,7 +2217,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function actionZnovuOtevrit($id)
     {
         try {
-            $doc = new Document($id);
+            $doc = new DocumentWorkflow($id);
             $doc->reopen();
             $this->flashMessage('Dokument byl otevřen.');
         } catch (Exception $e) {

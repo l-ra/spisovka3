@@ -1,6 +1,6 @@
 <?php
 
-class Spis extends TreeModel
+class SpisModel extends TreeModel
 {
 
     const OTEVREN = 1;
@@ -43,14 +43,6 @@ class Spis extends TreeModel
             $row->orgjednotka_predano = null;
         }
 
-        $query = array(
-            "SELECT w.* FROM {$this->tb_dokspis} AS ds INNER JOIN {$this->tb_workflow} AS w"
-            . " ON ds.dokument_id = w.dokument_id WHERE ds.spis_id = %i",
-            $row->id
-        );
-
-        $row->workflow = dibi::query($query)->fetchAll();
-
         return $row;
     }
 
@@ -72,12 +64,12 @@ class Spis extends TreeModel
         $params['leftJoin'] = array(
             'orgjednotka1' => array(
                 'from' => array($this->tb_orgjednotka => 'org1'),
-                'on' => array('org1.id=tb.orgjednotka_id'),
+                'on' => array('org1.id = tb.orgjednotka_id'),
                 'cols' => array('zkraceny_nazev' => 'orgjednotka_prideleno')
             ),
             'orgjednotka2' => array(
                 'from' => array($this->tb_orgjednotka => 'org2'),
-                'on' => array('org2.id=tb.orgjednotka_id_predano'),
+                'on' => array('org2.id = tb.orgjednotka_id_predano'),
                 'cols' => array('zkraceny_nazev' => 'orgjednotka_predano')
             ),
         );
@@ -115,17 +107,7 @@ class Spis extends TreeModel
                     'from' => array($this->tb_dokument => 'd'),
                     'on' => array('d.id=dokspis.dokument_id'),
                     'cols' => array('nazev', 'popis', 'cislo_jednaci', 'jid', 'poradi')
-                ),
-                'workflow' => array(
-                    'from' => array($this->tb_workflow => 'wf'),
-                    'on' => array('wf.dokument_id=d.id AND wf.aktivni=1 AND wf.stav_osoby=1'),
-                    'cols' => array('stav_dokumentu', 'prideleno_id', 'orgjednotka_id')
-                ),
-                'orgwf' => array(
-                    'from' => array($this->tb_orgjednotka => 'orgwf'),
-                    'on' => array('orgwf.id=wf.orgjednotka_id'),
-                    'cols' => array('zkraceny_nazev' => 'orgjednotka_prideleno')
-                ),
+                )
             )
         );
 
@@ -271,7 +253,6 @@ class Spis extends TreeModel
 
     public function zmenitOrg($spis_id, $orgjednotka_id)
     {
-
         if (empty($spis_id))
             return false;
         if (empty($orgjednotka_id))
@@ -291,7 +272,6 @@ class Spis extends TreeModel
 
     public function predatOrg($spis_id, $orgjednotka_id)
     {
-
         if (empty($spis_id))
             return false;
         if (empty($orgjednotka_id))
@@ -300,7 +280,7 @@ class Spis extends TreeModel
         try {
             $this->update(
                     array('orgjednotka_id_predano' => $orgjednotka_id),
-                    array(array('id=%i', $spis_id))
+                    array(array('id = %i', $spis_id))
             );
             return true;
         } catch (Exception $e) {
@@ -355,18 +335,15 @@ class Spis extends TreeModel
         }
 
         // Prenest vsechny dokumenty do spisovny spolu se spisem
-        $DokumentSpis = new DokumentSpis();
-        $dokumenty = $DokumentSpis->dokumenty($spis_id);
+        $spis = new Spis($spis_id);
+        $dokumenty = $spis->getDocuments();
 
         dibi::begin();
         try {
-            if (count($dokumenty) > 0) {
-                $Workflow = new Workflow();
-                foreach ($dokumenty as $dok) {
-                    $stav = $Workflow->predatDoSpisovny($dok->id, true);
-                    if ($stav !== true)
-                        throw new Exception($stav);
-                }
+            foreach ($dokumenty as $dok) {
+                $stav = $dok->transferToSpisovna(true);
+                if ($stav !== true)
+                    throw new Exception($stav);
             }
 
             // Predat do spisovny
@@ -416,10 +393,10 @@ class Spis extends TreeModel
         $DokumentSpis = new DokumentSpis();
         $dokumenty = $DokumentSpis->dokumenty($spis_id);
         if (count($dokumenty) > 0) {
-            $Workflow = new Workflow();
             $errors = '';
             foreach ($dokumenty as $dok) {
-                $stav = $Workflow->prevzitDoSpisovny($dok->id, false);
+                $doc = new DocumentWorkflow($dok->id);
+                $stav = $doc->receiveIntoSpisovna(false);
                 if (is_string($stav))
                     $errors .= $stav . "\n";
             }
@@ -478,7 +455,7 @@ class Spis extends TreeModel
 
         if (count($dokumenty) > 0)
             foreach ($dokumenty as $dok)
-                if ($dok->stav_dokumentu < 5)
+                if ($dok->stav < 5)
                     $mess[] = "Spis \"" . $data->nazev . "\" - Dokument \"" . $dok->cislo_jednaci . "\" není vyřízen.";
 
         return $mess ? : null;
@@ -518,9 +495,7 @@ class Spis extends TreeModel
     // $spis - informace, ktere vratilo getInfo
     public static function zjistiOpravneniUzivatele($spis)
     {
-
         $user = self::getUser();
-        $user_id = $user->id;
         $oj_uzivatele = OrgJednotka::dejOrgUzivatele();
         $Lze_cist = $Lze_menit = $Lze_prevzit = false;
 
@@ -551,39 +526,39 @@ class Spis extends TreeModel
         if ($user->isAllowed('Dokument', 'cist_vse'))
             $Lze_cist = 1;
 
-        if (count($spis->workflow) > 0) {
-            $org_cache = array();
-            foreach ($spis->workflow as $wf) {
+        /* if (count($spis->workflow) > 0) {
+          $org_cache = array();
+          foreach ($spis->workflow as $wf) {
 
-                if (isset($org_cache[$wf->orgjednotka_id])) {
-                    $orgjednotka_expr = $org_cache[$wf->orgjednotka_id];
-                } else {
-                    $orgjednotka_expr = OrgJednotka::isInOrg($wf->orgjednotka_id);
-                    $org_cache[$wf->orgjednotka_id] = $orgjednotka_expr;
-                }
+          if (isset($org_cache[$wf->orgjednotka_id])) {
+          $orgjednotka_expr = $org_cache[$wf->orgjednotka_id];
+          } else {
+          $orgjednotka_expr = OrgJednotka::isInOrg($wf->orgjednotka_id);
+          $org_cache[$wf->orgjednotka_id] = $orgjednotka_expr;
+          }
 
-                if (!$Lze_cist)
-                    if (($wf->prideleno_id == $user_id || $orgjednotka_expr) && $wf->stav_osoby < 100) {
-                        // uzivatel vlastnil nejaky dokument ve spisu v minulosti
-                        $Lze_cist = 1;
-                    }
+          if (!$Lze_cist)
+          if (($wf->prideleno_id == $user_id || $orgjednotka_expr) && $wf->stav_osoby < 100) {
+          // uzivatel vlastnil nejaky dokument ve spisu v minulosti
+          $Lze_cist = 1;
+          }
 
-                if (!$Lze_menit)
-                    if (($wf->prideleno_id == $user_id || $orgjednotka_expr) && ($wf->stav_osoby == 1 && $wf->aktivni == 1 )) {
-                        // uzivatel vlastni nejaky dokument ve spisu ted
-                        $Lze_menit = 1;
-                    }
+          if (!$Lze_menit)
+          if (($wf->prideleno_id == $user_id || $orgjednotka_expr) && ($wf->stav_osoby == 1 && $wf->aktivni == 1 )) {
+          // uzivatel vlastni nejaky dokument ve spisu ted
+          $Lze_menit = 1;
+          }
 
-                if (!$Lze_prevzit)
-                    if (($wf->prideleno_id == $user_id || $orgjednotka_expr) && ($wf->stav_osoby == 0 && $wf->aktivni == 1 )) {
-                        $Lze_prevzit = 1;
-                    }
+          if (!$Lze_prevzit)
+          if (($wf->prideleno_id == $user_id || $orgjednotka_expr) && ($wf->stav_osoby == 0 && $wf->aktivni == 1 )) {
+          $Lze_prevzit = 1;
+          }
 
-                if ($Lze_prevzit && $Lze_menit && $Lze_cist) {
-                    break;
-                }
-            }
-        }
+          if ($Lze_prevzit && $Lze_menit && $Lze_cist) {
+          break;
+          }
+          }
+          } */
 
         // 2 = predan do spisovny
         if ($spis->stav == 2)
