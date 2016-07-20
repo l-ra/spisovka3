@@ -117,3 +117,5 @@ Nová oprávnění pro zápůjčky ve spisovně
 Vytvoření indexu na sloupci zapujcka.stav
 [1310]
 Oprava názvu sloupce "počet příloh" v sestavách
+[1320]
+Oprava složek pro spisy - musí být viditelné pro všechny uživatele

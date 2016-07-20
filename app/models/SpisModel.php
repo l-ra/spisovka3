@@ -170,8 +170,11 @@ class SpisModel extends TreeModel
     {
         $data['date_created'] = new DateTime();
         $data['user_created'] = self::getUser()->id;
-        $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
-
+        if (isset($data['typ']) && $data['typ'] == 'F')
+            $data['orgjednotka_id'] = null; // slozky nemaji vlastnika
+        else
+            $data['orgjednotka_id'] = OrgJednotka::dejOrgUzivatele();
+            
         if (empty($data['parent_id']))
             unset($data['parent_id']);
 

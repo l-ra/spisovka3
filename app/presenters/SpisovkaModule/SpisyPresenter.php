@@ -79,7 +79,10 @@ class SpisyPresenter extends BasePresenter
 
         try {
             $Spisy->vytvorit($data);
-            $this->flashMessage('Spis "' . $data['nazev'] . '"  byl vytvořen.');
+            if (isset($data->typ) && $data->typ == 'F')
+                $this->flashMessage('Složka "' . $data['nazev'] . '"  byla vytvořena.');
+            else
+                $this->flashMessage('Spis "' . $data['nazev'] . '"  byl vytvořen.');
         } catch (Exception $e) {
             $this->flashMessage('Spis "' . $data['nazev'] . '" se nepodařilo vytvořit.',
                     'warning');
