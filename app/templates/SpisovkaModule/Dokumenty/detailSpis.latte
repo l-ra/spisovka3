@@ -14,7 +14,7 @@
         </span>
         {if $AccessEdit && $Typ_evidence != 'sberny_arch' && $presenter->view != 'printdetail'}
             <a id="dok-spis-vyjmout" href="javascript:;" 
-               style="display: {isset($Dok->spis) ? 'initial' : 'none'}"
+               style="display: {isset($Dok->spis) ? 'inline' : 'none'}"
                onclick="return spisVyjmoutDokument();">Vyjmout ze spisu</a>
             <a n:if="$Typ_evidence != 'sberny_arch'" class="ajax-dialog" data-title="Výběr spisu"
                href="{link :Spisovka:Spisy:vyber, 'id'=>$Dok->id}">Vložit do spisu</a>

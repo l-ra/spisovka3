@@ -14,7 +14,7 @@
     display: none;
 }
 .help_content p br, .help_content dl br {
-    display: initial;
+    display: block;
 }
 
 .help_content p {
