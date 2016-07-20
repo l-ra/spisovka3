@@ -297,7 +297,7 @@ abstract class TreeModel extends BaseModel
         }
     }
 
-    /* Vraci: true - uspech
+    /** Vraci: true - uspech
       false - neuspech, selhala kontrola cizího klíče
       Nebo hodí výjimku
 
@@ -307,7 +307,6 @@ abstract class TreeModel extends BaseModel
 
       Je volano nyni pouze z modelu spisoveho znaku.
      */
-
     public function odstranitH($id, $delete_children)
     {
         $info = $this->getInfo($id);

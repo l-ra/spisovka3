@@ -74,9 +74,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->template->FormUpravit = $upravit;
         $spis_id = $id;
         
-        $Spisy = new SpisModel();
-
-        $spis = $Spisy->getInfo($spis_id);
+        $spis = new Spis($id);
         $this->template->Spis = $spis;
 
         $this->template->SpisyNad = null; // $Spisy->seznam_nad($spis_id,1);
@@ -176,11 +174,19 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->redirect('this', array('hledat' => $data['dotaz']));
     }
 
-    public function renderRebuild()
+    public function actionRebuild()
     {
         $m = new SpisModel();
         $m->rebuildIndex();
         $this->flashMessage('Operace proběhla úspěšně.');
-        $this->redirect('default');
+        $this->redirect('seznam');
+    }
+    
+    public function actionSmazat($id)
+    {
+        $spis = new Spis($id);
+        $spis->delete();
+        $this->flashMessage('Složka byla smazána.');
+        $this->redirect('seznam');        
     }
 }

@@ -5,6 +5,16 @@ class Spis extends DBEntity
 
     const TBL_NAME = 'spis';
 
+    public function canUserDelete()
+    {
+        if ($this->typ != 'F')
+            return false;
+
+        $count = dibi::query("SELECT COUNT(*) FROM %n WHERE [parent_id] = %i", self::TBL_NAME,
+                        $this->id)->fetchSingle();
+        return $count === 0;
+    }
+
     public function getDocuments()
     {
         $docs = [];
@@ -12,10 +22,10 @@ class Spis extends DBEntity
         $result = $result->fetchPairs();
         foreach ($result as $id)
             $docs[] = new DocumentWorkflow($id);
-            
+
         return $docs;
     }
-    
+
     public function returnFromSpisovna()
     {
         if ($this->stav != 2)
@@ -42,5 +52,5 @@ class Spis extends DBEntity
             throw $e;
         }
     }
-    
+
 }

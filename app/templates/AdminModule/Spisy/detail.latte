@@ -30,6 +30,7 @@
             </dl>
         {/if}
 
-        <a href="{link :Admin:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit</a>
+        <a href="{link detail, 'id' => $Spis->id, 'upravit' => 'info'}">Upravit</a>
+        <a n:if="$Spis->canUserDelete()" href="{link smazat, $Spis->id}">Smazat</a>
     </div>
 {/if}

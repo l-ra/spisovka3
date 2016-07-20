@@ -13,10 +13,10 @@
             <dt>Spouštěcí událost:</dt>
             <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd><br />
             <dt>Přidělen organizační jednotce:</dt>
-            <dd>{if !empty($Spis->orgjednotka_prideleno)}{$Spis->orgjednotka_prideleno->zkraceny_nazev}{else}(není přidělen k žádné organizační jednotce){/if}</dd><br />
-        {if !empty($Spis->orgjednotka_predano)}
+            <dd>{if $Spis->orgjednotka_id}{=new OrgUnit($Spis->orgjednotka_id)}{else}není přidělen k žádné organizační jednotce{/if}</dd><br />
+        {if $Spis->orgjednotka_id_predano}
             <dt>Předán organizační jednotce:</dt>
-            <dd>{$Spis->orgjednotka_predano->zkraceny_nazev}</dd><br />
+            <dd>{=new OrgUnit($Spis->orgjednotka_id_predano)}</dd><br />
         {/if}
             <dt>Datum vytvoření:</dt>
             <dd>{$Spis->date_created|edatetime}</dd><br />
