@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Spojení mezi dvěma dokumenty jsou obousměrná.
+ */
 class SouvisejiciDokument extends BaseModel
 {
 
@@ -8,50 +11,45 @@ class SouvisejiciDokument extends BaseModel
 
     public function souvisejici($dokument_id)
     {
-
-        $param = array();
-        $param['where_or'] = array();
-        $param['where_or'][] = array('dokument_id=%i', $dokument_id);
-        $param['where_or'][] = array('spojit_s_id=%i', $dokument_id);
-
-        $dokumenty = array();
-        $result = $this->selectComplex($param)->fetchAll();
+        $where = [['dokument_id = %i OR spojit_s_id = %i', $dokument_id, $dokument_id]];
+        $result = $this->select($where)->fetchAll();
         if (!count($result))
             return [];
 
-        $Dokument = new Dokument();
-        foreach ($result as $joinDok) {
-            if ($joinDok->spojit_s_id == $dokument_id) {
-                // zpetne spojeny s
-                $dok = $Dokument->getBasicInfo($joinDok->dokument_id);
-                // spojeni s rozepsanym dokumentem musime ignorovat
-                if ($dok->stav == 0)
-                    continue;
-                $dok->spojeni = 'zpetne_spojen';
-                $dokumenty[$joinDok->dokument_id] = $dok;
-            } else {
-                // spojen s
-                $dok = $Dokument->getBasicInfo($joinDok->spojit_s_id);
-                if ($dok->stav == 0)
-                    continue;
-                $dok->spojeni = 'spojen';
-                $dokumenty[$joinDok->spojit_s_id] = $dok;
-            }
+        $dokumenty = [];
+        foreach ($result as $row) {
+            $linked_doc_id = $row->spojit_s_id == $dokument_id ? $row->dokument_id : $row->spojit_s_id;
+
+            $dok = new Document($linked_doc_id);
+            if ($dok->stav == 0)
+                continue;   // spojeni s rozepsanym dokumentem musime ignorovat - nastava pri odpovedi na dokument
+
+            $dokumenty[$linked_doc_id] = $dok;
         }
 
         return $dokumenty;
     }
 
-    public function spojit($dokument_id, $spojit_s)
+    public function spojit($dokument_id, $dokument2_id)
     {
-        $row = array();
-        $row['dokument_id'] = (int) $dokument_id;
-        $row['spojit_s_id'] = (int) $spojit_s;
-        $row['type'] = 1;
-        $row['date_added'] = new DateTime();
-        $row['user_id'] = self::getUser()->id;
+        $dokument_id = (int) $dokument_id;
+        $dokument2_id = (int) $dokument2_id;
+        if ($dokument_id == $dokument2_id)
+            throw new Exception('Nelze spojit dokument se sebou samým.');
 
-        return $this->insert($row);
+        $row = array();
+        // obvykle se spoje nový dokument se starším, proto jsem zvolil,
+        // aby dokument_id bylo vždy větší než spojit_s_id
+        $row['dokument_id'] = max($dokument_id, $dokument2_id);
+        $row['spojit_s_id'] = min($dokument_id, $dokument2_id);
+        $row['date_added'] = new DateTime(); // nepouzito
+        $row['user_id'] = self::getUser()->id; // nepouzito
+
+        try {
+            $this->insert($row);
+        } catch (Exception $e) {
+            throw new Exception('Dokumenty nebylo možné spojit. Pravděpodobně už byly spojeny předtím.', 0, $e);
+        }
     }
 
     public function odebrat($dokument1_id, $dokument2_id)

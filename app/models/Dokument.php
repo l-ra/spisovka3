@@ -1132,7 +1132,6 @@ class Dokument extends BaseModel
 
     public function getMax()
     {
-
         $result = $this->select(null, array('id' => 'DESC'), null, 1);
         $row = $result->fetch();
         return ($row) ? ($row->id + 1) : 1;
@@ -1140,7 +1139,6 @@ class Dokument extends BaseModel
 
     public function getMaxPoradi($cjednaci)
     {
-
         if (empty($cjednaci))
             return 1;
 

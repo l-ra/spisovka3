@@ -72,7 +72,6 @@ abstract class BaseModel extends Nette\Object
      */
     public function selectComplex($param)
     {
-
         if (isset($param['distinct']))
             $distinct = $param['distinct'];
         if (isset($param['from'])) {
@@ -118,7 +117,6 @@ abstract class BaseModel extends Nette\Object
             $having = $param['having'];
         if (isset($param['group']))
             $group = $param['group'];
-
 
         if (isset($param['leftJoin'])) {
             $leftJoin = array();

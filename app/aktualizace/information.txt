@@ -119,3 +119,5 @@ Vytvoření indexu na sloupci zapujcka.stav
 Oprava názvu sloupce "počet příloh" v sestavách
 [1320]
 Oprava složek pro spisy - musí být viditelné pro všechny uživatele
+[1330]
+Oprava datové struktury spojení dokumentu. Pokud operace selže, bude nutné ručně opravit nekonzistenci v databázi.

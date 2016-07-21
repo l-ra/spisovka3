@@ -3,11 +3,7 @@
     <dd>
         <span id="dok_spojit">
             {foreach $SouvisejiciDokumenty as $s}
-                {if $presenter->view != 'printdetail'}
-                    <a href="{link detail, 'id'=>$s->id}">{$s->cislo_jednaci} ({$s->jid})</a>
-                {else}
-                    {$s->cislo_jednaci} ({$s->jid})
-                {/if}
+                <a href="{link detail, $s->id}">{$s->cislo_jednaci} {if empty($s->cislo_jednaci)}({$s->jid}){/if}</a>
                 
                 <a n:if="$AccessEdit" n:href=":Spisovka:Spojit:odebrat, 'id'=>$Dok->id, 'spojeny'=>$s->id"
                    onclick="return odebratSpojeni(this);">

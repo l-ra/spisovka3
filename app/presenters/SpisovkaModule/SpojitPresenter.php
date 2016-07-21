@@ -46,7 +46,7 @@ class Spisovka_SpojitPresenter extends BasePresenter
             if (is_object($dokument_id))
                 $dokument_id = $dokument_id->id;
 
-            $dok = $Dokument->getBasicInfo($dokument_id);
+            $dok = new Document($dokument_id);
 
             // Tomášovina - kód je použit též u sběrného archu pro zařazení dokumentu do spisu
             if ($this->typ_evidence == "sberny_arch") {
@@ -63,17 +63,10 @@ class Spisovka_SpojitPresenter extends BasePresenter
         $this->sendJson($tmp);
     }
 
-    public function actionVybrano()
+    public function actionVybrano($id, $spojit_s)
     {
-        $dokument_id = $this->getParameter('id', null);
-        $dokument_spojit = $this->getParameter('spojit_s', null);
-
-        $Dokument = new Dokument();
-
-        $dok_in = $Dokument->getBasicInfo($dokument_id);
-        $dok_out = $Dokument->getBasicInfo($dokument_spojit);
-        if (!$dok_in || !$dok_out)
-            throw new Exception('Neplatný parametr');
+        $dokument_id = $id;
+        $dokument_spojit = $spojit_s;
 
         // spojit s dokumentem
         $SouvisejiciDokument = new SouvisejiciDokument();
@@ -82,13 +75,10 @@ class Spisovka_SpojitPresenter extends BasePresenter
         $this->terminate();
     }
 
-    public function actionOdebrat()
+    public function actionOdebrat($id, $spojeny)
     {
-        $dokument1_id = $this->getParameter('id', null);
-        $dokument2_id = $this->getParameter('spojeny', null);
-
         $Souvisejici = new SouvisejiciDokument();
-        $Souvisejici->odebrat($dokument1_id, $dokument2_id);
+        $Souvisejici->odebrat($id, $spojeny);
         
         $this->terminate();
     }
