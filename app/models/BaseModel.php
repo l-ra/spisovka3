@@ -64,10 +64,7 @@ abstract class BaseModel extends Nette\Object
 
     /**
      * Slozitejsi dotaz s moznym spojovanim tabulek
-     * @param array $order
-     * @param array $where
-     * @param array $offset
-     * @param array $limit
+     * @param array $param
      * @return DibiResult
      */
     public function selectComplex($param)
@@ -201,6 +198,7 @@ abstract class BaseModel extends Nette\Object
                             $where_or = $param['leftJoin']['where_or'];
                         }
                     }
+                    
                     $leftJoin[$index] = array('LEFT JOIN %n', $lJoin['from'], 'ON %and', $lJoin['on']);
                 }
             }
@@ -236,69 +234,39 @@ abstract class BaseModel extends Nette\Object
             $cols_string = "`" . $from_index[0] . "`.`*`";
         }
 
-        //Nette\Diagnostics\Debugger::dump($cols);
-        //Nette\Diagnostics\Debugger::dump($cols_string_a);
-
         $query = array('SELECT ' . (isset($distinct) ? 'DISTINCT' : '') . ' %sql', $cols_string);
 
+        array_push($query, 'FROM %n', isset($from) ? $from : $this->name);
 
-        if (isset($from)) {
-            array_push($query, 'FROM %n', $from);
-        } else {
-            array_push($query, 'FROM %n', $this->name);
-        }
-
-        if (isset($leftJoin)) {
+        if (isset($leftJoin))
             foreach ($leftJoin as $lf) {
                 array_push($query, '%sql', $lf);
             }
-        }
 
-        if (isset($where_or)) {
+        if (isset($where_or))
             if (isset($where)) {
                 $where[] = array(array('%or', $where_or));
             } else {
                 array_push($query, 'WHERE %or', $where_or);
             }
-        }
-        if (isset($where)) {
+        
+        if (isset($where))
             array_push($query, 'WHERE %and', $where);
-        }
-        if (isset($group)) {
+        if (isset($group))
             array_push($query, 'GROUP BY %n', $group);
-        }
-        if (isset($having)) {
+        if (isset($having))
             array_push($query, 'HAVING %and', $having);
-        }
-        if (isset($order)) {
+        if (isset($order))
             array_push($query, 'ORDER BY %by', $order);
-        }
-        if (isset($order_sql)) {
+        if (isset($order_sql))
             array_push($query, 'ORDER BY ' . $order_sql);
-        }
-        if (isset($limit)) {
+        if (isset($limit))
             array_push($query, 'LIMIT %i', $limit);
-        }
-        if (isset($offset)) {
+        if (isset($offset))
             array_push($query, 'OFFSET %i', $offset);
-        }
 
-        //Nette\Diagnostics\Debugger::dump($query);
-        //dibi::test($query); exit;
-        // a nyní předáme pole
         return dibi::query($query);
     }
-
-    /* Neni v programu pouzito
-      public function getDataSource($table = null)
-      {
-      if ( !is_null($table) ) {
-      return dibi::dataSource('SELECT * FROM %n', $table);
-      } else {
-      return dibi::dataSource('SELECT * FROM %n', $this->name);
-      }
-
-      } */
 
     /**
      * Inserts a new row
