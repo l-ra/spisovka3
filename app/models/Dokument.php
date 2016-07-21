@@ -1130,17 +1130,6 @@ class Dokument extends BaseModel
         return $dokument;
     }
 
-    public function getBasicInfo($dokument_id)
-    {
-
-        $where = array(array('id=%i', $dokument_id));
-
-        $select = $this->select($where);
-        $result = $select->fetch();
-
-        return $result;
-    }
-
     public function getMax()
     {
 
@@ -1285,26 +1274,14 @@ class Dokument extends BaseModel
 
     public function odstranit_rozepsane()
     {
-        $where = array('stav=0',
-            array('user_created=%i', self::getUser()->id)
+        $where = array('stav = 0',
+            array('user_created = %i', self::getUser()->id)
         );
-
-        $DokumentLog = new LogModel();
-        $DokumentSpis = new DokumentSpis();
-        $DokumentSubjekt = new DokumentSubjekt();
-        $DokumentPrilohy = new DokumentPrilohy();
-        $SouvisejiciDokument = new SouvisejiciDokument();
 
         $seznam = $this->seznamKlasicky(array('where' => $where));
         if (count($seznam) > 0) {
             foreach ($seznam as $dokument) {
                 $dokument_id = $dokument->id;
-
-                $DokumentLog->deleteDokument($dokument_id);
-                $DokumentSpis->delete([['dokument_id = %i', $dokument_id]]);
-                $DokumentSubjekt->delete([['dokument_id = %i', $dokument_id]]);
-                $DokumentPrilohy->delete([['dokument_id = %i', $dokument_id]]);
-                $SouvisejiciDokument->delete([['dokument_id = %i', $dokument_id]]);
 
                 $doc = new Document($dokument_id);
                 $doc->delete();

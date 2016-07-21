@@ -509,24 +509,24 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     }
 
     // tato metoda slouží pouze pro sběrný arch
-    public function actionVlozitdosbernehoarchu()
+    public function actionVlozitdosbernehoarchu($id, $vlozit_do)
     {
         try {
             if ($this->typ_evidence != 'sberny_arch')
                 throw new Exception("operace je platná pouze u typu evidence sběrný arch");
 
-            $dokument_id = (int) $this->getParameter('id', null);
-            $iniciacni_dokument_id = (int) $this->getParameter('vlozit_do', null);
+            $dokument_id = $id;
+            $iniciacni_dokument_id = $vlozit_do;
 
             $Dokument = new Dokument();
 
             // getBasicInfo neháže výjimku, pokud dokument neexistuje
             // nasledujici prikaz pouze overi, ze dokument_id existuje
-            $dok1 = $Dokument->getBasicInfo($dokument_id);
+            new Document($dokument_id);
             // predpoklad - dok2 je iniciacni dokument spisu
-            $dok2 = $Dokument->getBasicInfo($iniciacni_dokument_id);
+            $dok2 = new Document($iniciacni_dokument_id);
 
-            if (!($dok1 && $dok2) || $dok2->poradi != 1)
+            if ($dok2->poradi != 1)
                 throw new Exception("neplatný parametr");
 
             // spojit s dokumentem
