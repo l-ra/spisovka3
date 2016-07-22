@@ -577,8 +577,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $mail->setFromConfig();
             $mail->addTo($data['email']);
             $mail->setSubject($data['predmet']);
-            $zprava = ESSMail::appendSignature($data['zprava'], $this->user);
-            $mail->setBody($zprava);
+            $mail->setBody($data['zprava']);
+            $mail->appendSignature($this->user);
+            
             $mail->send();
 
             if ($ajax) {

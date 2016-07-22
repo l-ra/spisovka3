@@ -3,7 +3,9 @@
 class ESSMail extends Nette\Mail\Message
 {
 
-    // pro kompatibilitu s kodem napsanym pro stare Nette
+    /** 
+     * Pro kompatibilitu s kodem napsanym pro stare Nette
+     */
     public function send()
     {
         // $mailer = new Nette\Mail\SendmailMailer;
@@ -30,40 +32,32 @@ class ESSMail extends Nette\Mail\Message
 
     /**
      * Připojí podpis přihlášené osoby a organizace.
-     * Je voláno pouze při odmítnutí e-mailu v e-podatelně.
-     * @param string $message
-     * @return string
      */
-    public static function appendSignature($message, Spisovka\User $user)
+    public function appendSignature(Spisovka\User $user)
     {
         // Urad
         $client_config = GlobalVariables::get('client_config');
         $urad = $client_config->urad;
 
-        $tmp = $message;
+        $tmp = $this->getBody();
 
         // Podpis
         $tmp .= "\n\n--\n";
         $tmp .= "Zpracoval: " . $user->displayName . "\n\n";
         $tmp .= $urad->nazev . "\n";
-        if (!empty($urad->adresa->ulice)) {
+        if (!empty($urad->adresa->ulice))
             $tmp .= $urad->adresa->ulice . "\n";
-        }
-        if (!( empty($urad->adresa->psc) && empty($urad->adresa->mesto) )) {
+        if (!( empty($urad->adresa->psc) && empty($urad->adresa->mesto) ))
             $tmp .= $urad->adresa->psc . " " . $urad->adresa->mesto . "\n";
-        }
         $tmp .= "\n";
-        if (!empty($urad->kontakt->telefon)) {
+        if (!empty($urad->kontakt->telefon))
             $tmp .= "telefon: " . $urad->kontakt->telefon . " \n";
-        }
-        if (!empty($urad->kontakt->email)) {
+        if (!empty($urad->kontakt->email))
             $tmp .= "email: " . $urad->kontakt->email . " \n";
-        }
-        if (!empty($urad->kontakt->www)) {
+        if (!empty($urad->kontakt->www))
             $tmp .= "url: " . $urad->kontakt->www . " \n";
-        }
 
-        return $tmp;
+        $this->setBody($tmp);
     }
 
 }

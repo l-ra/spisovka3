@@ -10,7 +10,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
      * string(adresa) - testovaci odeslani na danou adresu
      */
 
-    static $test_mode = 0;
+    public static $test_mode = 0;
 
     protected function setHeaderMailer(Nette\Mail\Message $mail)
     {

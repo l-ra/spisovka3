@@ -1813,7 +1813,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $mail->setSubject($data['email_predmet']);
             $mail->setBody($data['email_text']);
-
+            $mail->appendSignature($this->user);
+            
             if (count($prilohy) > 0) {
                 foreach ($prilohy as $p) {
                     $mail->addAttachment($p->tmp_file);

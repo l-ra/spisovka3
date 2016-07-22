@@ -26,6 +26,8 @@ Nové funkce:
 - ve výpravně je možné vytvořit podací arch s dokumenty, které uživatel
   ručně vybere (funkce se použije, pokud pracovník chce odeslat dokumenty
   na poště, ale nemá ještě všechny fyzicky u sebe)
+- při odeslání dokumentu e-mailem se automaticky připojí patička se jménem
+  uživatele a kontaktními informacemi organizace  
 - hierarchii spisů je nyní možné zobrazit jako strom
 - jeden vyřízený dokument je možné snadněji předat do spisovny přímo
   z detailu dokumentu
