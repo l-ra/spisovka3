@@ -197,9 +197,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
                 ->setValue($this->seradit)
                 ->getControlPrototype()->onchange("return document.forms['frm-seraditForm'].submit();");
 
-        $submit = $form->addSubmit('go_seradit', 'Seřadit');
-        $submit->getControlPrototype()->style(array('display' => 'none'));
-
         $form->onSuccess[] = array($this, 'seraditSucceeded');
 
         $renderer = $form->getRenderer();

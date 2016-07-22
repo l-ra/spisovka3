@@ -398,8 +398,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         else
             $form['filtr']->setDisabled();
 
-        $form->addSubmit('go_filtr', 'Filtrovat');
-
         $form->onSuccess[] = array($this, 'filtrClicked');
 
         $renderer = $form->getRenderer();

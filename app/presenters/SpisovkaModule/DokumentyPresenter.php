@@ -2053,7 +2053,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function createComponentSearchForm()
     {
-
         $hledat = !is_null($this->hledat) ? $this->hledat : '';
 
         $form = new Nette\Application\UI\Form();
@@ -2073,7 +2072,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } else {
             $form['dotaz']->getControlPrototype()->title = "Hledat lze dle věci, popisu, čísla jednacího a JID";
         }
-
 
         $form->addSubmit('hledat', 'Hledat')
                 ->onClick[] = array($this, 'hledatSimpleClicked');
@@ -2149,8 +2147,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $control->setValue($filtr_moje)
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
 
-        $form->addSubmit('go_filtr', 'Filtrovat');
-
         $form->onSuccess[] = array($this, 'filtrClicked');
 
         $renderer = $form->getRenderer();
@@ -2175,7 +2171,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function createComponentSeraditForm()
     {
-
         $select = array(
             'stav' => 'stavu dokumentu (vzestupně)',
             'stav_desc' => 'stavu dokumentu (sestupně)',

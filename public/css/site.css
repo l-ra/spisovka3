@@ -801,21 +801,17 @@ table.odeslat-subjekty td.odeslat-subjekty-separator {
 
 
 /* ******************************************************************* */
-/* *** FILTR cONTROL *** */
+/* *** FILTR CONTROL *** */
 #filtr {
     float: left;
     margin-bottom: 15px;
     text-align: left;
 }
-#filtr #frmfiltrForm-filtr {
+#filtr select[name=filtr],
+#seradit select[name=seradit],
+#search input[name=dotaz] {
     border: 1px solid #03406A;
     color: #03406A;
-}
-#filtr #frmfiltrForm-go_filtr {
-    display: none;
-    background: #03406A;
-    border: 1px solid #03406A;
-    color: white; font-weight: bold;
 }
 
 /* ******************************************************************* */
@@ -823,15 +819,6 @@ table.odeslat-subjekty td.odeslat-subjekty-separator {
 #seradit {
     margin: 20px 0px;
     text-align: left;
-}
-#seradit #frmseraditForm-seradit {
-    border: 1px solid #03406A;
-    color: #03406A;
-}
-#seradit #frmseraditForm-go_seradit {
-    background: #03406A;
-    border: 1px solid #03406A;
-    color: white; font-weight: bold;
 }
 
 /* ******************************************************************* */
@@ -845,10 +832,6 @@ table.odeslat-subjekty td.odeslat-subjekty-separator {
     margin: 0px 0px 5px 0px;
 }
 
-#search #frmsearchForm-dotaz {
-    border: 1px solid #03406A;
-    color: #03406A;
-}
 #search #frmsearchForm-hledat {
     background: #03406A;
     border: 1px solid #03406A;

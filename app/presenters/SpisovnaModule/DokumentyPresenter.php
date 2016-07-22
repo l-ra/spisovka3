@@ -460,8 +460,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $form['filtr']->setValue('');
         }
 
-        $form->addSubmit('go_filtr', 'Filtrovat');
-
         $form->onSuccess[] = array($this, 'filtrClicked');
 
         $renderer = $form->getRenderer();
