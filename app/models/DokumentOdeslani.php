@@ -164,12 +164,11 @@ class DokumentOdeslani extends BaseModel
         if (is_array($hledani))
             $sql['where'] = [['ds.id in %in', $hledani]];
 
-        $dokumenty = array();
         $result = $this->selectComplex($sql)->fetchAll();
-
         if (count($result) == 0)
             return null;
 
+        $dokumenty = array();
         foreach ($result as $index => $row) {
             if (is_array($filtr)) {
                 // filtruj podle druhu zasilky
@@ -181,35 +180,37 @@ class DokumentOdeslani extends BaseModel
                     continue;
             }
 
-            $dokumenty[$index] = $row;
-            $dokumenty[$index]->druh_zasilky = unserialize($dokumenty[$index]->druh_zasilky);
+            $druh_zasilky = unserialize($row->druh_zasilky);
+            $row->druh_zasilky = $druh_zasilky;
 
             if ($filtr === "balik") {
-                if (!$dokumenty[$index]->druh_zasilky) {
+                if (!$druh_zasilky) {
                     // nelze detekovat - radeji vyradime
-                    unset($dokumenty[$index]);
-                } else if (!in_array(3, $dokumenty[$index]->druh_zasilky)) {
+                    continue;
+                } else if (!in_array(3, $druh_zasilky)) {
                     // vyradime cokoli co neni balik
-                    unset($dokumenty[$index]);
-                } else if (in_array(1, $dokumenty[$index]->druh_zasilky)) {
+                    continue;
+                } else if (in_array(1, $druh_zasilky)) {
                     // je to sice balik, ale obycejny - vyradime
-                    unset($dokumenty[$index]);
-                } else if (count($dokumenty[$index]->druh_zasilky) < 2) {
+                    continue;
+                } else if (count($druh_zasilky) < 2) {
                     // samotny balik je obycejny balik - vyradime
-                    unset($dokumenty[$index]);
+                    continue;
                 }
             } else if ($filtr === "doporucene") {
-                if (!$dokumenty[$index]->druh_zasilky) {
+                if (!$druh_zasilky) {
                     // nelze detekovat - radeji vyradime
-                    unset($dokumenty[$index]);
-                } else if (in_array(3, $dokumenty[$index]->druh_zasilky)) {
+                    continue;
+                } else if (in_array(3, $druh_zasilky)) {
                     // baliky jsou ze hry
-                    unset($dokumenty[$index]);
-                } else if (!in_array(2, $dokumenty[$index]->druh_zasilky)) {
+                    continue;
+                } else if (!in_array(2, $druh_zasilky)) {
                     // vyradime cokoli co nema v sobe 2 - doporucene
-                    unset($dokumenty[$index]);
+                    continue;
                 }
             }
+
+            $dokumenty[$index] = $row;
         }
 
         // vysledek musi mit indexy 0, 1, 2, ...
