@@ -831,11 +831,11 @@ table.odeslat-subjekty td.odeslat-subjekty-separator {
 #search form {
     margin: 0px 0px 5px 0px;
 }
-
-#search #frmsearchForm-hledat {
+#search input[type=submit] {
     background: #03406A;
     border: 1px solid #03406A;
-    color: white; font-weight: bold;
+    color: white;
+    font-weight: bold;
 }
 #search_advanced {
     margin: 5px 0px;
