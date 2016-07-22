@@ -20,16 +20,16 @@ class Spisovka_SestavyPresenter extends BasePresenter
         'spisovy_znak' => 'Spis. znak',
         'skartacni_znak' => 'Skart. znak',
         'skartacni_lhuta' => 'Skart. lhůta',
-        'zaznam_vyrazeni' => 'Záznam vyřazení',
+        'zaznam_vyrazeni' => 'Záznam vyřazení', // nepoužito
         'popis' => 'Popis',
         'poznamka_predani' => 'Poznámka k předání',
         'prazdny_sloupec' => 'Prázdný sloupec',
     );
-    
+
     protected function pdfExport($content)
     {
         @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-        
+
         $app_info = new VersionInformation();
         $app_name = $app_info->name;
 
@@ -113,6 +113,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $zobr['zobrazeni_adresa'] = false;
 
         $sloupce = explode(',', $sestava->sloupce);
+        if (($key = array_search('zaznam_vyrazeni', $sloupce)) !== false)
+            unset($sloupce[$key]);
         $this->template->sloupce = $sloupce;
         $this->template->zobrazeni = $zobr;
 
@@ -339,7 +341,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     protected function createForm()
     {
         $typ_dokumentu = [0 => 'jakýkoli typ dokumentu'] + TypDokumentu::vsechny();
-        
+
         $typ_doruceni = array(
             '0' => 'všechny',
             '1' => 'pouze doručené přes elektronickou podatelnu',
@@ -411,7 +413,8 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addTextArea('sestava_popis', 'Popis sestavy:', 80, 3);
         $form->addSelect('sestava_typ', 'Lze měnit? :',
                 array('1' => 'upravitelná sestava', '2' => 'pevná sestava'));
-        $form->addCheckbox('sestava_filtr', 'Filtrovat? (zobrazit výběr rozsahu podle pořadového čísla nebo data)');
+        $form->addCheckbox('sestava_filtr',
+                'Filtrovat? (zobrazit výběr rozsahu podle pořadového čísla nebo data)');
 
         $form->addCheckbox('zobrazeni_cas', 'U datumů zobrazit i čas:');
         $form->addCheckbox('zobrazeni_adresa', 'Zobrazit adresy u subjektů:');
@@ -419,7 +422,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addMultiSelect('vybrane_sloupce', 'Vybrané sloupce:', null, 10);
         $form->addMultiSelect('dostupne_sloupce', 'Dostupné sloupce:', self::$sloupce_nazvy, 10);
         $form->onValidate[] = array($this, 'validateVybraneSloupce');
-        
+
         $form->addSelect('razeni1', '1. kritérium:', $order_by);
         $form->addSelect('razeni2', '2. kritérium:', $order_by);
         $form->addSelect('razeni3', '3. kritérium:', $order_by);
@@ -501,12 +504,12 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $submit = $form->isSubmitted();
         if ($submit->name == 'storno')
             return;
-        
+
         $columns = $form['vybrane_sloupce']->getRawValue();
         if (empty($columns))
             $form['vybrane_sloupce']->addError('Vyberte sloupce sestavy.');
     }
-    
+
     protected function createComponentNewForm()
     {
         $form = $this->createForm();

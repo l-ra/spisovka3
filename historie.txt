@@ -226,6 +226,9 @@ Spisová služba:
   čárkou
 - v seznamu sestav byla vidět pouze první stránka, ve výchozím nastavení tedy
   prvních dvacet sestav
+- sloupec sestavy "Záznam vyřazení" byl vždy prázdný, proto se při spuštění 
+  sestavy vynechá. Pro ruční dopsání jakékoli informace můžete použít
+  "prázdný sloupec".
 - pouze u sběrného archu: při tisku seznamu spisů chyběl v čísle jednacím
   oddělovač a pořadové číslo ve spisu
   
