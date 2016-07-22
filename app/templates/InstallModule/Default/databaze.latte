@@ -45,8 +45,7 @@
     {elseif $tabulka_jiz_existuje}
     <div class="failed result">
         <h2>Nelze nahrát tabulky a data do databáze!</h2>
-        <p>V uvedené databázi již existují tabulky určené pro tuto aplikaci. </p>
-        <p>V případě, že chcete ponechat existující tabulky, je potřeba v nastavení změnit prefix tabulek nebo jméno databáze. Jinak bude potřeba uvedené tabulky smazat z databáze.</p>
+        <p>V uvedené databázi již existuje tabulka se stejným jménem, jako používá aplikace. Databáze musí být prázdná.</p>
         <p>V této fázi není možné pokračovat v instalaci. Pro pokračování instalace je potřeba provést nápravu. Po dokončení úprav proveďte <a href="?">novou kontrolu</a>. </p>
     </div>
     {elseif $error}
