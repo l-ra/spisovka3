@@ -209,9 +209,11 @@ Spisová služba:
   to je když uživatel začně vytvářet odpověď a proces nedokončí
 - odebrání přílohy u odpovědi na dokument zaznamenalo výjimku v aplikačním logu
 - typ přílohy dokumentu byl zavádějící, z aplikaci byl odstraněn
+- opravena bezpečnostní chyba, kdy útočník mohl stáhnout soubor (přílohu)
+  z libovolného dokumentu
 - převzetí dokumentu ve spisu za specifických okolností vedlo ke zmizení ostatních 
   dokumentů ve spisu (dokumenty přestaly být v aplikaci vidět)
-- předání a přijetí spisu už nezpůsobí otevření už vyřízených dokumentů ve spisu
+- předání a převzetí spisu už nezpůsobí otevření vyřízených dokumentů ve spisu
 - spis byl dříve vytvářen s výchozím skartačním režimem A/10 nebo S/10. Nyní
   pokud uživatel skartační režim nezadá, zůstane nevyplněn. Je potřeba jej 
   vyplnit až před uzavřením spisu a jeho předáním do spisovny.

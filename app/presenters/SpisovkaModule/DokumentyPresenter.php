@@ -807,34 +807,24 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderDownload($id, $file)
     {
-        $dokument_id = $id;
         $file_id = $file;
 
+        $doc = new Document($id);
+        $perm = $doc->getUserPermissions();
         $DokumentPrilohy = new DokumentPrilohy();
-        $prilohy = $DokumentPrilohy->prilohy($dokument_id);
-        if (array_key_exists($file_id, $prilohy)) {
-
-            $DownloadFile = $this->storage;
-            $res = $DownloadFile->download($file_id);
-            if ($res == 0) {
-                $this->terminate();
-            } else if ($res == 1) {
-                // not found
-                $this->flashMessage('Požadovaný soubor nenalezen!', 'warning');
-                $this->redirect('detail', array('id' => $dokument_id));
-            } else if ($res == 2) {
-                $this->flashMessage('Chyba při stahování!', 'warning');
-                $this->redirect('detail', array('id' => $dokument_id));
-            } else if ($res == 3) {
-                $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnout zmíněný soubor!',
-                        'warning');
-                $this->redirect('detail', array('id' => $dokument_id));
-            }
-        } else {
-            $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnout cizí soubor!',
-                    'warning');
-            $this->redirect('detail', array('id' => $dokument_id));
+        $prilohy = $DokumentPrilohy->prilohy($id);
+        if (!$perm['edit'] || !array_key_exists($file_id, $prilohy)) {
+            $this->flashMessage('Přístup zamítnut.', 'warning');
+            $this->redirect('default');
         }
+
+        $res = $this->storage->download($file_id);
+        if ($res == 0)
+            $this->terminate();
+
+        // not found
+        $this->flashMessage('Požadovaný soubor nenalezen v úložišti.', 'warning');
+        $this->redirect('detail', $id);
     }
 
     public function renderHistorie($id)
@@ -1408,7 +1398,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $odes = $ep['odeslani'];
         $adresa = empty($odes['jmeno']) ? $odes['email'] : "{$odes['jmeno']} <{$odes['email']}>";
         $odesilatele = ['system' => "$adresa [{$odes['ucet']}]"];
-                
+
         $person = Person::fromUserId($this->user->id);
         if (!empty($person->email)) {
             $key = "user#" . Osoba::displayName($person, 'jmeno') . "#" . $person->email;
