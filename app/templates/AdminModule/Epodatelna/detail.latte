@@ -18,19 +18,19 @@
 <div class="detail_blok">
     <div class="detail_hlavicka">Nastavení účtu</div>
     {if $Typ == 'i'}
-        {if ($FormUpravit=='1')}
+        {if $FormUpravit}
             {control nastavitISDSForm}
             <dl>
                 <dt>Certifikát:</dt>
                 <dd>
-                    {if $Info['certifikat_stav']==0}
+                    {if $Info['certifikat_stav'] == 0}
                         Certifikát není nahrán nebo není potřeba.
-                    {elseif $Info['certifikat_stav']==1}
+                    {elseif $Info['certifikat_stav'] == 1}
                         Certifikát je nahrán.
-                    {elseif $Info['certifikat_stav']==2}
+                    {elseif $Info['certifikat_stav'] == 2}
                         Certifikát je nahrán a je platný.
                     {else}
-                        Nelze zjístit stav certifikátu.
+                        Nelze zjistit stav certifikátu.
                     {/if}
                 </dd>
             </dl>
@@ -42,19 +42,19 @@
                         $('input[name=login]').parent().parent().show();
                         $('input[name=password]').parent().parent().show();
                     } else {
-                            $('input[name=certifikat_file]').parent().parent().show();
-                            $('input[name=cert_pass]').parent().parent().show();
-                            $('input[name=login]').parent().parent().hide();
-                            $('input[name=password]').parent().parent().hide();
-                        }
+                        $('input[name=certifikat_file]').parent().parent().show();
+                        $('input[name=cert_pass]').parent().parent().show();
+                        $('input[name=login]').parent().parent().hide();
+                        $('input[name=password]').parent().parent().hide();
                     }
+                }
 
-                    $('input[name=typ_pripojeni]').change(function () {
-                        typPripojeniChanged($(this).val());
-                    });
-                    typPripojeniChanged({$Info['typ_pripojeni']});
+                $('input[name=typ_pripojeni]').change(function () {
+                    typPripojeniChanged($(this).val());
+                });
+                typPripojeniChanged({$Info['typ_pripojeni']});
             </script>
-        {elseif ($FormHesloISDS=='1')}
+        {elseif ($FormHesloISDS)}
             <dl>
                 <dt>ID datové schránky:</dt>
                 <dd>{$Info['idbox']}</dd>
@@ -63,10 +63,6 @@
                 <dt>Vlastník DS:</dt>
                 <dd>{$Info['vlastnik']}</dd>
             </dl>
-            <dl>
-                <dt>Stav DS:</dt>
-                <dd>{$Info['stav']}</dd>
-            </dl>        
             <dl>
                 <dt>Přihlašovací jméno do ISDS:</dt>
                 <dd>{$Info['login']}</dd>
@@ -101,16 +97,8 @@
                     <dd>{$Info['vlastnik']}</dd>
                 </dl>
                 <dl>
-                    <dt>Stav DS:</dt>
-                    <dd>{$Info['stav']}</dd>
-                </dl>
-                <dl>
                     <dt>Přihlašovací jméno do ISDS:</dt>
                     <dd>{$Info['login']}</dd>
-                </dl>
-                <dl>
-                    <dt>Informace o expiraci hesla:</dt>
-                    <dd>{$Info['stav_hesla']}</dd>
                 </dl>
             {/if}
             <dl>
@@ -121,38 +109,40 @@
                 <dt>Podatelna pro příjem:</dt>
                 <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}</dd>
             </dl>
-            <a href="{link detail, 'id' => $Typ.$Index, 'upravit' => 1}">Upravit</a>
+            <a href="{link detail, 'i', 1}">Upravit</a>
             &nbsp;&nbsp;&nbsp;
-            {if $vice_datovych_schranek}
-                <a href="{link smazat, 'id' => $Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
+            {if !Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
+                <a href="{link isdsTest}">Otestovat připojení</a>
                 &nbsp;&nbsp;&nbsp;
             {/if}
-            {if $Info['typ_pripojeni'] == 0 && !Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
-                <a href="{link detail, 'id' => $Typ.$Index, 'zmenit_heslo_isds' => 1}">Změnit heslo k ISDS</a>
-            {/if}
+            {* <a n:if="$vice_datovych_schranek" href="{link smazat, 'id' => $Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
+            &nbsp;&nbsp;&nbsp; *}
+            {* {if $Info['typ_pripojeni'] == 0 && !Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
+                <a href="{link detail, 'id' => 'i', 'zmenit_heslo_isds' => 1}">Změnit heslo k ISDS</a>
+            {/if} *}
         {/if}
     {elseif $Typ == 'e'}
-        {if ($FormUpravit=='1')}
+        {if $FormUpravit}
             {control nastavitEmailForm}
             <script type="text/javascript">
 
-                    $('#frmnastavitEmailForm-typ').change(function () {
-                        value = $("#frmnastavitEmailForm-typ").val();
-                        port = $("#frmnastavitEmailForm-port");
-                        ssl = value.indexOf('/ssl') >= 0;
+                $('#frmnastavitEmailForm-typ').change(function () {
+                    value = $("#frmnastavitEmailForm-typ").val();
+                    port = $("#frmnastavitEmailForm-port");
+                    ssl = value.indexOf('/ssl') >= 0;
 
-                        if (value.indexOf('/pop3') >= 0) {
-                            port.val(ssl ? 995 : 110);
-                        } else if (value.indexOf('/imap') >= 0) {
-                            port.val(ssl ? 993 : 143);
-                        }
-                    });
-                    $('#frmnastavitEmailForm-only_signature').change(function () {
-                        checkbox2 = $("#frmnastavitEmailForm-qual_signature");
-                        checkbox2.prop('disabled', !this.checked);
-                    });
+                    if (value.indexOf('/pop3') >= 0) {
+                        port.val(ssl ? 995 : 110);
+                    } else if (value.indexOf('/imap') >= 0) {
+                        port.val(ssl ? 993 : 143);
+                    }
+                });
+                $('#frmnastavitEmailForm-only_signature').change(function () {
+                    checkbox2 = $("#frmnastavitEmailForm-qual_signature");
+                    checkbox2.prop('disabled', !this.checked);
+                });
 
-                    $("#frmnastavitEmailForm-qual_signature").prop('disabled', $('#frmnastavitEmailForm-only_signature').prop('checked') == false)
+                $("#frmnastavitEmailForm-qual_signature").prop('disabled', $('#frmnastavitEmailForm-only_signature').prop('checked') == false)
 
             </script>    
         {else}
@@ -186,9 +176,9 @@
                 <dt>Podatelna pro příjem této schránky:</dt>
                 <dd>{if empty($Info['podatelna'])}kterákoli{else}{$Info['podatelna']}{/if}</dd>
             </dl>
-            <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+            <a href="{link detail, $Typ.$Index, 1}">Upravit</a>
             &nbsp;&nbsp;&nbsp;
-            <a href="{link :Admin:Epodatelna:smazat, 'id'=>$Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
+            <a href="{link smazat, $Typ.$Index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
         {/if}
     {elseif $Typ == 'o'}
         {if $FormUpravit}
@@ -215,7 +205,7 @@
                     {/if}
                 {/if}
             </dl>
-            <a href="{link :Admin:Epodatelna:detail, 'id'=>$Typ.$Index, 'upravit'=>1}">Upravit</a>
+            <a href="{link this, 'upravit' => 1}">Upravit</a>
         {/if}
     {else}
     {/if}

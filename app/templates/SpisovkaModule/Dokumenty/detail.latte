@@ -43,16 +43,12 @@
 {control print}
 
 <div class="dokument_blok_menu" n:ifcontent>
-    {if $Predan==1 }
-        <a href="{link prevzit, 'id'=>$Dok->id}" id="prevzitdokument">Převzít {$dokument_nebo_spis}</a>
-        <a href="{link odmitnoutprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
-    {elseif $LzePredatDokument}
-        {if $Dok->is_forwarded}
-            <a href="{link zrusitprevzeti, 'id'=>$Dok->id}" id="zrusitprevzetidokument">Zrušit předání {$dokument_nebo_spis}u</a>
-        {else}
-            <a href="{link Uzivatel:vyber, 'dok_id'=>$Dok->id}" id="dialog-uzivatel">Předat {$dokument_nebo_spis}</a>
-        {/if}
+    {if $LzePrevzit}
+        <a href="{link prevzit, $Dok->id}" id="prevzitdokument">Převzít {$dokument_nebo_spis}</a>
+        <a href="{link odmitnoutPrevzeti, $Dok->id}">Odmítnout převzetí</a>
     {/if}
+    <a n:if="$LzeZrusitPredani" href="{link zrusitPredani, $Dok->id}">Zrušit předání {$dokument_nebo_spis}u</a>
+    <a n:if="$LzePredatDokument" href="{link Uzivatel:vyber, 'dok_id' => $Dok->id}" id="dialog-uzivatel">Předat {$dokument_nebo_spis}</a>
 
     {if $AccessEdit}
         <a href="{link detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
@@ -66,11 +62,11 @@
             <a href="{link odeslat , 'id'=>$Dok->id }">Odeslat dokument</a>
             <a href="{link vyrizeno, 'id'=>$Dok->id}" id="vyrizenodokument">Označit dokument za vyřízený</a>
         {/if}
-    {/if}{* $AccessEdit *}
-    <a href="{link this, 'udalost' => 1}" n:if="$Dok->stav_dokumentu == 4">Spouštěcí událost</a>
-    <a href="{link predatDoSpisovny, 'id' => $Dok->id}" n:if="$Dok->stav_dokumentu == 5">Předat do spisovny</a>
-    <a href="{link znovuOtevrit, $Dok->id}" n:if="$LzeZnovuOtevrit">Znovu otevřít</a>
-    <a href="{link :Spisovna:Zapujcky:vratit, $Zapujcka->id, ':Spisovka:Dokumenty:default'}" n:if="$LzeVratit">Vrátit dokument</a>
+    {/if}
+    <a n:if="$Dok->stav_dokumentu == 4" href="{link this, 'udalost' => 1}">Spouštěcí událost</a>
+    <a n:if="$Dok->stav_dokumentu == 5" href="{link predatDoSpisovny, 'id' => $Dok->id}">Předat do spisovny</a>
+    <a n:if="$LzeZnovuOtevrit" href="{link znovuOtevrit, $Dok->id}">Znovu otevřít</a>
+    <a n:if="$LzeVratit" href="{link :Spisovna:Zapujcky:vratit, $Zapujcka->id, ':Spisovka:Dokumenty:default'}">Vrátit dokument</a>
 </div>
 
 {if ($FormUdalost)}
@@ -350,11 +346,7 @@
         </div>
     {/if}
     <div id="dok-prilohy">
-        {if $AccessView}
-            {include '../Prilohy/nacti.latte', prilohy => $Dok->prilohy, dokument_id => $dokument_id}
-        {else}
-            <div class="prazdno">Dokument obsahuje {=count($Dok->prilohy)} příloh. K jejím zobrazení nemáte oprávnění.</div>
-        {/if}
+        {include '../Prilohy/nacti.latte', prilohy => $Dok->prilohy, dokument_id => $dokument_id}
     </div>
 </div>
 

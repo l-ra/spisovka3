@@ -1,137 +1,129 @@
 {var Select2 => true}
 {block title}Seznam spisů{/block}
 {block content}
-    <div class="navigate">
-    <a href="{link :Spisovna:Spisy:default}">Seznam spisů</a> -
+<div class="navigate">
+    <a href="{link default}">Seznam spisů</a> -
     Detail spisu
-    </div>
+</div>
 
-    <h2>{$Spis->nazev}</h2>
+<h2>{$Spis->nazev}</h2>
 
-    {control print}
+{control print}
 
-    <div class="dokument_blok_menu">
-       {if $AccessEdit}
-       <a href="{link :Spisovna:Spisy:detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit skartační režim</a>
-       {/if}
-    </div>    
-    
-        {if ($FormUpravit=='info')}
-    <div class="detail_blok">
+<div class="dokument_blok_menu">
+    <a n:if="$lzeEditovat" href="{link detail, 'id' => $Spis->id, 'upravit' => 1}">Upravit skartační režim</a>
+</div>    
+
+<div class="detail_blok">   
+    {if $lzeEditovat && $presenter->getParameter('upravit')}
         <div class="detail_hlavicka">Info</div>
         {control upravitForm}
-    </div>
-        {else}    
-    <div class="detail_blok">
+    {else}    
         {include '../../SpisovkaModule/Spisy/detail-spis.latte'}
-    </div>
-        {/if}        
+    {/if}        
+</div>
 
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Seznam dokumentů</div>
-    </div>
-        
-    {if $AccessView}        
-    <div id="dokumenty">
+<div class="detail_blok">
+    <div class="detail_hlavicka">Seznam dokumentů</div>
+</div>
+
+<div id="dokumenty">
     {if count($seznam)>0}
-    <table class="seznam">
+        <table class="seznam">
 
-        <tr>
-            <th class="typ">Typ dokumentu</th>
-            <th class="prijato">Přijato<br />Vyřízen</th>
-            <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
-            <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
-            <th class="prideleno">Přidělen</th>
-            <th class="stav">Spisový znak<br/>Skartační znak<br/>Skartační lhůta</th>
-        </tr>
+            <tr>
+                <th class="typ">Typ dokumentu</th>
+                <th class="prijato">Přijato<br />Vyřízen</th>
+                <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
+                <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
+                <th class="prideleno">Přidělen</th>
+                <th class="stav">Spisový znak<br/>Skartační znak<br/>Skartační lhůta</th>
+            </tr>
 
-        {foreach $seznam as $dok}
-        <tr>
-            <td class="typ">
-                <img src="{$publicUrl}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
-                {if $dok->epod_typ == 'E'}
-                <img src="{$publicUrl}images/icons/email.png" alt="přijato emailem" title="přijato emailem" width="24" height="16" />
-                {elseif $dok->epod_typ == 'I'}
-                <img src="{$publicUrl}images/icons/isds.png" alt="přijato datovou schránkou" title="přijato datovou schránkou" width="24" height="16" />
-                {/if}                
-            </td>
-            <td class="prijato">
-                <span title="{$dok->datum_vzniku|edatetime}">{$dok->datum_vzniku|edate}</span>
-                <br />
-                <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
-            </td>
-            <td class="cislo_jednaci">
-                &nbsp;<strong><a href="{link :Spisovna:Dokumenty:detail, 'id'=>$dok->id}">
-                   {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
-                </a></strong>
-                <div class="small">&nbsp;{$dok->jid}</div>
-                {if isset($dok->spisy)}
-                {foreach $dok->spisy as $spis}
-                <a href="{link :Spisovna:Spisy:detail, 'id'=>$spis->id}">{$spis->nazev}</a><br />
-                {/foreach}
-                {/if}
-            </td>
-            <td class="vec">
-                <strong title="{$dok->popis}"><a href="{link :Spisovna:Dokumenty:detail, 'id'=>$dok->id}">
-                    {$dok->nazev}
-                </a></strong>
-                <br />
-                {if count($dok->subjekty)>0}
-                {foreach $dok->subjekty as $subjekt}
-                {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
-                {/foreach}
-                {else}
-                nejsou přiděleny žádné subjekty!<br />
-                {/if}
-                {include '../../SpisovkaModule/Dokumenty/seznam-pocty-priloh.latte', dokument => $dok}
-            </td>
-            <td class="prideleno">
-                {$dok->prideleno->jmeno}
-                <br />
-                {=@$dok->prideleno->orgjednotka->zkraceny_nazev}
-            </td>
-            <td class="stav">
-                {$dok->spisovy_znak}
-                <br />
-                {$dok->skartacni_znak} / {$dok->skartacni_lhuta}
-                <br />
-                {if isset($zapujcky[$dok->id])}
-                zapůjčen
-                {elseif $dok->stav_dokumentu==6}
-                předán do spisovny
-                {elseif $dok->stav_dokumentu==7}
-                vyřízen
-                {elseif $dok->stav_dokumentu==8}
-                ke skartaci
-                {elseif $dok->stav_dokumentu==9}
-                archivován
-                {elseif $dok->stav_dokumentu==10}
-                skartován
-                {elseif $dok->stav_dokumentu==11}
-                zapůjčen
-                {/if}                
-            </td>
-        </tr>
+            {foreach $seznam as $dok}
+                <tr>
+                    <td class="typ">
+                        <img src="{$publicUrl}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
+                        {if $dok->epod_typ == 'E'}
+                            <img src="{$publicUrl}images/icons/email.png" alt="přijato emailem" title="přijato emailem" width="24" height="16" />
+                        {elseif $dok->epod_typ == 'I'}
+                            <img src="{$publicUrl}images/icons/isds.png" alt="přijato datovou schránkou" title="přijato datovou schránkou" width="24" height="16" />
+                        {/if}                
+                    </td>
+                    <td class="prijato">
+                        <span title="{$dok->datum_vzniku|edatetime}">{$dok->datum_vzniku|edate}</span>
+                        <br />
+                        <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
+                    </td>
+                    <td class="cislo_jednaci">
+                        &nbsp;<strong><a href="{link Dokumenty:detail, 'id' => $dok->id}">
+                            {$dok->cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->poradi}{/if}
+                        </a></strong>
+                    <div class="small">&nbsp;{$dok->jid}</div>
+                    {if isset($dok->spisy)}
+                        {foreach $dok->spisy as $spis}
+                            <a href="{link detail, $spis->id}">{$spis->nazev}</a><br />
+                        {/foreach}
+                    {/if}
+                </td>
+                <td class="vec">
+                    <strong title="{$dok->popis}"><a href="{link Dokumenty:detail, 'id'=>$dok->id}">
+                            {$dok->nazev}
+                        </a></strong>
+                    <br />
+                    {if count($dok->subjekty)>0}
+                        {foreach $dok->subjekty as $subjekt}
+                            {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
+                        {/foreach}
+                    {else}
+                        nejsou přiděleny žádné subjekty!<br />
+                    {/if}
+                    {include '../../SpisovkaModule/Dokumenty/seznam-pocty-priloh.latte', dokument => $dok}
+                </td>
+                <td class="prideleno">
+                    {$dok->prideleno->jmeno}
+                    <br />
+                    {=@$dok->prideleno->orgjednotka->zkraceny_nazev}
+                </td>
+                <td class="stav">
+                    {$dok->spisovy_znak}
+                    <br />
+                    {$dok->skartacni_znak} / {$dok->skartacni_lhuta}
+                    <br />
+                    {if isset($zapujcky[$dok->id])}
+                        zapůjčen
+                    {elseif $dok->stav_dokumentu==6}
+                        předán do spisovny
+                    {elseif $dok->stav_dokumentu==7}
+                        vyřízen
+                    {elseif $dok->stav_dokumentu==8}
+                        ke skartaci
+                    {elseif $dok->stav_dokumentu==9}
+                        archivován
+                    {elseif $dok->stav_dokumentu==10}
+                        skartován
+                    {elseif $dok->stav_dokumentu==11}
+                        zapůjčen
+                    {/if}                
+                </td>
+            </tr>
         {/foreach}
 
 
     </table>
-    {else}
-        <div>&nbsp;</div>
-        {if isset($no_items)}
+{else}
+    <div>&nbsp;</div>
+    {if isset($no_items)}
         {if $no_items==1}
-        <div class="prazdno">Nemáte k dispozici žádné dokumenty.</div>
+            <div class="prazdno">Nemáte k dispozici žádné dokumenty.</div>
         {elseif $no_items==2}
-        <div class="prazdno">K danému filtru nemáte k dispozici žádné dokumenty.</div>
+            <div class="prazdno">K danému filtru nemáte k dispozici žádné dokumenty.</div>
         {elseif $no_items==3}
-        <div class="prazdno">Dokument odpovidající hledanému výrazu nebyl nalezen.</div>
+            <div class="prazdno">Dokument odpovidající hledanému výrazu nebyl nalezen.</div>
         {/if}
-        {else}
-    <div class="prazdno">K tomuto spisu nebyly zjištěny žádné dokumenty.</div>
-        {/if}
-    {/if}
-    </div>
-    
     {else}
-    <div class="prazdno">Nemáte oprávnění vidět seznam dokumentů.</div>
-    {/if}    
+        <div class="prazdno">K tomuto spisu nebyly zjištěny žádné dokumenty.</div>
+    {/if}
+{/if}
+</div>
+

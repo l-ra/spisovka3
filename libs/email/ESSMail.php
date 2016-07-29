@@ -19,8 +19,7 @@ class ESSMail extends Nette\Mail\Message
     public function setFromConfig()
     {
         $ep = (new Spisovka\ConfigEpodatelna())->get();
-        $odes = reset($ep['odeslani']);
-        $email = $odes['email'];
+        $email = $ep['odeslani']['email'];
         if ($email)
             try {
                 $this->setFrom($email);                

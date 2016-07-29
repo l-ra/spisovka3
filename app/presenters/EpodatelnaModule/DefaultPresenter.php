@@ -152,31 +152,28 @@ class Epodatelna_DefaultPresenter extends BasePresenter
           $typ = substr($id,0,1);
           $index = substr($id,1); */
 
-        $config_data = (new Spisovka\ConfigEpodatelna())->get();
-        $result = array();
+        $ou = $this->user->getOrgUnit();
+        $ou_id = $ou ? $ou->id : null;
 
+        $config_data = (new Spisovka\ConfigEpodatelna())->get();
         $nalezena_aktivni_schranka = 0;
 
         // kontrola ISDS
-        $zkontroluj_isds = 1;
-        if (count($config_data['isds']) > 0 && $zkontroluj_isds) {
-            $isds_config = reset($config_data['isds']);
-            if ($isds_config['aktivni'] == 1) {
-                if (!($isds_config['podatelna'] && !OrgJednotka::isInOrg($isds_config['podatelna']))) {
-                    $nalezena_aktivni_schranka = 1;
-                    $zprava = $this->downloadISDS();
-                    echo "$zprava<br />";
-                }
+        $isds_config = $config_data['isds'];
+        if ($isds_config['aktivni'] == 1) {
+            if (!$isds_config['podatelna'] || $isds_config['podatelna'] == $ou_id) {
+                $nalezena_aktivni_schranka = 1;
+                $zprava = $this->downloadISDS();
+                echo "$zprava<br />";
             }
         }
-        
+
         // kontrola emailu
-        $zkontroluj_email = 1;
-        if (count($config_data['email']) > 0 && $zkontroluj_email) {
+        if (count($config_data['email']) > 0) {
             foreach ($config_data['email'] as $email_config) {
                 if ($email_config['aktivni'] != 1)
                     continue;
-                if ($email_config['podatelna'] && !OrgJednotka::isInOrg($email_config['podatelna']))
+                if ($email_config['podatelna'] && $email_config['podatelna'] != $ou_id)
                     continue;
 
                 $nalezena_aktivni_schranka = 1;
@@ -324,7 +321,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     if (!$this->Epodatelna->existuje($z->dmID, 'isds')) {
                         // nova zprava, ktera neni nahrana v epodatelne
                         $mess = $isds->MessageDownload($z->dmID);
-                        
+
                         $annotation = empty($mess->dmDm->dmAnnotation) ? "(Datová zpráva č. " . $mess->dmDm->dmID . ")"
                                     : $mess->dmDm->dmAnnotation;
 

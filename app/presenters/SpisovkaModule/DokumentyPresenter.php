@@ -126,7 +126,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             foreach ($seznam as $index => $row) {
                 $dok = $Dokument->getInfo($row->id, '');
-                if (empty($dok->stav_dokumentu)) {
+                if (empty($dok->stav)) {
                     // toto má myslím zajistit, aby se v seznamu nezobrazovaly rozepsané dokumenty
                     unset($seznam[$index]);
                     continue;
@@ -144,168 +144,87 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function actionDetail($id, $upravit = null, $udalost = null)
     {
-        $Dokument = new Dokument();
-
-        // Nacteni parametru
         $dokument_id = $id;
-
-        $dokument = $Dokument->getInfo($dokument_id, "subjekty,soubory,odeslani");
-        if ($dokument) {
-            // dokument zobrazime
-
-            if ($dokument->stav === 0) {
-                $this->flashMessage("Pokoušel jste se zobrazit dokument, který je rozepsaný. V menu zvolte \"Nový dokument\" a vytvoření dokumentu prosím dokončete.",
-                        'warning');
-                $this->redirect('default');
-            }
-
-            $this->template->Dok = $dokument;
-
-            $user = $this->user;
-            $user_id = $user->id;
-
-            $this->template->Pridelen = 0;
-            $this->template->Predan = 0;
-            $this->template->AccessEdit = 0;
-            $this->template->AccessView = 0;
-
-            // P.L.
-            $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
-            if ($isVedouci) {
-                // Uzivatel muze byt vedoucim jenom jednoho utvaru
-                $org_id = OrgJednotka::dejOrgUzivatele();
-                $povoleneOrgJednotky = array();
-                if ($org_id)
-                    $povoleneOrgJednotky = OrgJednotka::childOrg($org_id);
-
-                if (in_array($dokument->owner_orgunit_id, $povoleneOrgJednotky) || $dokument->is_forwarded && in_array($dokument->forward_orgunit_id,
-                                $povoleneOrgJednotky)) {
-                    $this->template->AccessView = 1;
-
-                    // vedouci ma pristup k dokumentu, ktery je predan primo na org. jednotku (kdyz chybi konkretni uzivatel)
-                    if ($user->isAllowed('Dokument', 'menit_moje_oj') || $dokument->is_forwarded && $dokument->forward_user_id == null)
-                        $this->template->AccessEdit = 1;
-
-                    if (in_array($dokument->owner_orgunit_id, $povoleneOrgJednotky))
-                        $this->template->Pridelen = 1;
-                    else {
-                        $this->template->Predan = 1;
-                        $this->template->AccessEdit = 0;
-                    }
-                }
-            }
-
-            // Prideleny nebo predany uzivatel
-            if ($dokument->owner_user_id == $user_id || (OrgJednotka::isInOrg($dokument->owner_orgunit_id) && $user->isAllowed('Dokument',
-                            'menit_moje_oj'))) {
-                // prideleny
-                $this->template->AccessEdit = 1;
-                $this->template->AccessView = 1;
-                $this->template->Pridelen = 1;
-            } else if ($dokument->forward_user_id == $user_id || (OrgJednotka::isInOrg($dokument->forward_orgunit_id) && $user->isAllowed('Dokument',
-                            'menit_moje_oj'))) {
-                // predany
-                $this->template->AccessEdit = 0;
-                $this->template->AccessView = 1;
-                $this->template->Predan = 1;
-            } else if ($user->isAllowed('Dokument', 'cist_moje_oj') && (OrgJednotka::isInOrg($dokument->owner_orgunit_id) || OrgJednotka::isInOrg($dokument->forward_orgunit_id))) {
-                $this->template->AccessView = 1;
-            }
-
-            if ($user->isAllowed('Dokument', 'cist_vse'))
-                $this->template->AccessView = 1;
-
-            if ($dokument->stav_dokumentu >= DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA)
-                $this->template->AccessEdit = 0;
-
-            $this->template->LzeVratit = false;
-            if ($dokument->stav_dokumentu == DocumentWorkflow::STAV_ZAPUJCEN) {
-                $this->template->Pridelen = 0;
-                $this->template->AccessEdit = 0;
-                $Zapujcka = new Zapujcka();
-                $zapujcka = $Zapujcka->getFromDokumentId($dokument_id);
-                $this->template->Zapujcka = $zapujcka;
-                if (isset($zapujcka->id) && $dokument->owner_user_id == $user->id) {
-                    $this->template->LzeVratit = true;
-                }
-            }
-
-            // Pokud uzivatel dokument nekomu predal, zakaz docasne praci s dokumentem
-            if ($this->template->Pridelen && $dokument->is_forwarded)
-                $this->template->AccessEdit = 0;
-
-            // SuperAdmin - moznost zasahovat do dokumentu
-            if ($this->user->isInRole('superadmin')) {
-                $this->template->AccessEdit = 1;
-                $this->template->AccessView = 1;
-                $this->template->Pridelen = 1;
-            }
-
-            $lzePredatVyrizeneDokumenty = Settings::get('spisovka_allow_forward_finished_documents',
-                            false);
-            $this->template->LzePredatDokument = $this->template->Pridelen && ($dokument->stav_dokumentu <= DocumentWorkflow::STAV_VYRIZUJE_SE || $lzePredatVyrizeneDokumenty);
-
-            $doc = new DocumentWorkflow($id);
-            $this->template->LzeZnovuOtevrit = $doc->canUserReopen();
-
-            $this->template->FormUpravit = $this->template->AccessEdit ? $upravit : null;
-
-            $this->template->FormUdalost = $udalost && $dokument->stav_dokumentu == DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA;
-
-            $this->template->Typ_evidence = $this->typ_evidence;
-            $this->template->SouvisejiciDokumenty = array();
-            $this->template->povolitOdpoved = false;
-            $souvisejici_dokumenty = array();
-            if ($this->typ_evidence == 'priorace') {
-                // Nacteni souvisejicicho dokumentu
-                $Souvisejici = new SouvisejiciDokument();
-                $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument_id);
-                if (count($this->template->SouvisejiciDokumenty) > 0) {
-                    foreach ($this->template->SouvisejiciDokumenty as $souvisejici_dok) {
-                        $souvisejici_dokumenty[$souvisejici_dok->id] = $souvisejici_dok->id;
-                    }
-                }
-                if (!empty($dokument->cislo_jednaci) && $dokument->typ_dokumentu->smer == 0) {
-                    $this->template->povolitOdpoved = true;
-                    $stejne_dokumenty = $Dokument->stejne($dokument->cislo_jednaci,
-                            $dokument->id);
-                    if (count($stejne_dokumenty) > 0) {
-                        // nelze jiz vytvorit odpoved - jedno cislo jednaci muze mit maximalne jen 2 JID
-                        $this->template->povolitOdpoved = false;
-                    }
-                }
-            }
-
-            // Kontrola existence nazvu
-            if ($this->template->Pridelen && $this->template->AccessEdit) {
-                if ($dokument->stav_dokumentu >= DocumentStates::STAV_VYRIZUJE_SE && empty($dokument->nazev)) {
-                    $this->template->nutnyNadpis = 1;
-                    // vyvolej zobrazeni formulare editace metadat
-                    $this->template->FormUpravit = 'metadata';
-                }
-            }
-
-            if (!$this->template->AccessView)
-                $this->setView('noaccess');
-        } else {
-            // dokument neexistuje nebo se nepodarilo nacist
-            $this->setView('noexist');
+        $old_model = new Dokument();
+        $dokument = $old_model->getInfo($dokument_id, "subjekty,soubory,odeslani");
+        if (!$dokument) {
+            $this->setView('neexistuje');
+            return;
         }
+        $doc = new DocumentWorkflow($id);
+
+        if ($doc->stav === 0) {
+            $this->flashMessage("Pokoušel jste se zobrazit dokument, který je rozepsaný. V menu zvolte \"Nový dokument\" a vytvoření dokumentu prosím dokončete.",
+                    'warning');
+            $this->redirect('default');
+        }
+
+        $user = $this->user;
+
+        $permissions = $doc->getUserPermissions();
+        $AccessEdit = $permissions['edit'];
+
+        $this->template->LzeVratit = false;
+        if ($doc->stav == DocumentWorkflow::STAV_ZAPUJCEN) {
+            $Zapujcka = new Zapujcka();
+            $zapujcka = $Zapujcka->getFromDokumentId($dokument_id);
+            $this->template->Zapujcka = $zapujcka;
+            if (isset($zapujcka->id) && $doc->owner_user_id == $user->id) {
+                $this->template->LzeVratit = true;
+            }
+        }
+
+        $this->template->FormUpravit = $upravit;
+
+        // Kontrola chybejiciho nazvu dokumentu
+        if (empty($doc->nazev) && $AccessEdit && $doc->stav == DocumentStates::STAV_VYRIZUJE_SE) {
+            $this->template->nutnyNadpis = 1;
+            // vyvolej zobrazeni formulare editace metadat
+            $this->template->FormUpravit = 'metadata';
+        }
+
+        $this->template->SouvisejiciDokumenty = array();
+        $this->template->povolitOdpoved = false;
+        if ($this->typ_evidence == 'priorace') {
+            // Nacteni souvisejicicho dokumentu
+            $Souvisejici = new SouvisejiciDokument();
+            $linkedDocuments = $Souvisejici->souvisejici($dokument_id);
+            $this->template->SouvisejiciDokumenty = $linkedDocuments;
+            if (!empty($doc->cislo_jednaci) && $dokument->typ_dokumentu->smer == 0) {
+                $this->template->povolitOdpoved = true;
+                if ($doc->doesReplyExist()) {
+                    // odpoved jiz existuje - stejné číslo jednací mohou mít maximálně dva dokumenty
+                    $this->template->povolitOdpoved = false;
+                }
+            }
+        }
+
+        $this->template->Dok = $dokument;
+        $this->template->Typ_evidence = $this->typ_evidence;
+        $this->template->FormUdalost = $udalost && $doc->stav == DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA;
+        $this->template->AccessEdit = $AccessEdit;
+        $this->template->LzePrevzit = $permissions['take_over'];
+        $this->template->LzeZrusitPredani = $permissions['cancel_forwarding'];
+        $this->template->LzePredatDokument = $doc->canUserForward();
+        $this->template->LzeZnovuOtevrit = $doc->canUserReopen();
+
+        if (!$permissions['view'])
+            $this->setView('noaccess');
     }
 
     public function renderDetail($id)
     {
         $dokument = $this->template->Dok;
-        
+
         $this->template->dokument_id = $id;
         $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
         $this->template->dokument_nebo_spis = isset($dokument->spis) ? 'spis' : 'dokument';
 
         // Kontrola lhuty a skartace
-        if ($dokument->lhuta_stav == 2 && $dokument->stav_dokumentu < 4) {
+        if ($dokument->lhuta_stav == 2 && $dokument->stav < 4) {
             $this->flashMessage('Vypršela lhůta k vyřízení! Vyřiďte neprodleně tento dokument.',
                     'warning');
-        } else if ($dokument->lhuta_stav == 1 && $dokument->stav_dokumentu < 4) {
+        } else if ($dokument->lhuta_stav == 1 && $dokument->stav < 4) {
             $this->flashMessage('Za pár dní vyprší lhůta k vyřízení! Vyřiďte co nejrychleji tento dokument.');
         }
 
@@ -424,7 +343,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect('detail', array('id' => $id));
     }
 
-    public function actionZrusitprevzeti($id)
+    public function actionZrusitPredani($id)
     {
         $doc = new Document($id);
         if ($doc->canUserModify()) {
@@ -440,7 +359,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect('detail', array('id' => $id));
     }
 
-    public function actionOdmitnoutprevzeti($id)
+    public function actionOdmitnoutPrevzeti($id)
     {
         $doc = new Document($id);
         if ($doc->canUserTakeOver()) {
@@ -848,9 +767,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 if (count($prilohy_old) > 0) {
                     foreach ($prilohy_old as $priloha) {
-                        if ($priloha->typ == 1 || $priloha->typ == 2 || $priloha->typ == 3) {
-                            $DokumentPrilohy->pripojit($dok_odpoved->id, $priloha->id);
-                        }
+                        $DokumentPrilohy->pripojit($dok_odpoved->id, $priloha->id);
                     }
                 }
                 $prilohy_new = $DokumentPrilohy->prilohy($dok_odpoved->id);
@@ -937,7 +854,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         if (!$dokument) {
             // dokument neexistuje nebo se nepodarilo nacist
-            $this->setView('noexist');
+            $this->setView('neexistuje');
             return;
         }
 
@@ -1094,7 +1011,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('pocet_listu_priloh', 'Počet listů příloh:', 5, 10)
                 ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet musí být číslo.');
-        $form->addText('nelistinne_prilohy', 'Počet a druh příloh v nelistinné podobě:', 20, 50);                
+        $form->addText('nelistinne_prilohy', 'Počet a druh příloh v nelistinné podobě:', 20, 50);
 
 
         $form->addSubmit('novy', 'Vytvořit dokument');
@@ -1218,7 +1135,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $povolene_typy_dokumentu = TypDokumentu::dostupneUzivateli();
 
-        $lze_menit_urcita_pole = $Dok->stav_dokumentu == 1 || $this->user->isInRole('superadmin');
+        $lze_menit_urcita_pole = $Dok->stav == 1 || $this->user->isInRole('superadmin');
         if ($lze_menit_urcita_pole && in_array($Dok->typ_dokumentu->id,
                         array_keys($povolene_typy_dokumentu)) && count($povolene_typy_dokumentu) > 1) {
             $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu);
@@ -1325,7 +1242,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $SpisovyZnak = new SpisovyZnak();
         $spousteci_udalost = $SpisovyZnak->spousteci_udalost(null, 1);
 
-        $Dok = @$this->template->Dok;
+        $Dok = $this->template->Dok;
 
         $form = new Spisovka\Form();
 
@@ -1488,19 +1405,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         // odesilatele
         $ep = (new Spisovka\ConfigEpodatelna())->get();
-        $odesilatele = array();
-        if (count($ep['odeslani']) > 0) {
-            foreach ($ep['odeslani'] as $odes_id => $odes) {
-                if (true /* $odes['aktivni'] == 1 */) {
-                    if (empty($odes['jmeno'])) {
-                        $odesilatele['epod' . $odes_id] = $odes['email'] . "[" . $odes['ucet'] . "]";
-                    } else {
-                        $odesilatele['epod' . $odes_id] = $odes['jmeno'] . " <" . $odes['email'] . "> [" . $odes['ucet'] . "]";
-                    }
-                }
-            }
-        }
-
+        $odes = $ep['odeslani'];
+        $adresa = empty($odes['jmeno']) ? $odes['email'] : "{$odes['jmeno']} <{$odes['email']}>";
+        $odesilatele = ['system' => "$adresa [{$odes['ucet']}]"];
+                
         $person = Person::fromUserId($this->user->id);
         if (!empty($person->email)) {
             $key = "user#" . Osoba::displayName($person, 'jmeno') . "#" . $person->email;
@@ -1790,7 +1698,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $mail->setFromConfig();
 
         try {
-            if (strpos($data['email_from'], "user") !== false) {
+            if (strpos($data['email_from'], "user#") !== false) {
                 $a = explode("#", $data['email_from']);
                 $mail->setFrom($a[2], $a[1]);
             }
@@ -1814,7 +1722,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $mail->setSubject($data['email_predmet']);
             $mail->setBody($data['email_text']);
             $mail->appendSignature($this->user);
-            
+
             if (count($prilohy) > 0) {
                 foreach ($prilohy as $p) {
                     $mail->addAttachment($p->tmp_file);

@@ -30,15 +30,13 @@ class SpisModel extends TreeModel
 
     private function spisDetail($row)
     {
-        $OrgJednotka = new OrgJednotka();
-
         if (!empty($row->orgjednotka_id)) {
-            $row->orgjednotka_prideleno = $OrgJednotka->getInfo($row->orgjednotka_id);
+            $row->orgjednotka_prideleno = new OrgUnit($row->orgjednotka_id);
         } else {
             $row->orgjednotka_prideleno = null;
         }
         if (!empty($row->orgjednotka_id_predano)) {
-            $row->orgjednotka_predano = $OrgJednotka->getInfo($row->orgjednotka_id_predano);
+            $row->orgjednotka_predano = new OrgUnit($row->orgjednotka_id_predano);
         } else {
             $row->orgjednotka_predano = null;
         }
@@ -134,7 +132,7 @@ class SpisModel extends TreeModel
         else if ($oj_id === null)
             $filter[] = array("0");
         else {
-            if ($user->isAllowed(NULL, 'is_vedouci'))
+            if ($user->isVedouci())
                 $org_jednotky = OrgJednotka::childOrg($oj_id);
             else
                 $org_jednotky = array($oj_id);
@@ -504,7 +502,7 @@ class SpisModel extends TreeModel
 
         if ($oj_uzivatele === null)
             $org_jednotky = array();
-        else if ($user->isAllowed(NULL, 'is_vedouci'))
+        else if ($user->isVedouci())
             $org_jednotky = OrgJednotka::childOrg($oj_uzivatele);
         else
             $org_jednotky = array($oj_uzivatele);

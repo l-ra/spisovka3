@@ -17,10 +17,8 @@
         </div>
         <div id="top_jmeno">
             <a href="{link :Spisovka:Uzivatel:}"><strong>{$user->displayName}</strong></a><br />
-            {var account = new UserAccount($user->id)}
-            {if $account->orgjednotka_id}
-            {OrgJednotka::getName($account->orgjednotka_id)}<br />
-            {/if}
+            {var org_unit = $user->getOrgUnit()}
+            {if $org_unit}{$org_unit}<br />{/if}
         </div>
     {/if}
     </div>

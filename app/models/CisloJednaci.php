@@ -39,8 +39,7 @@ class CisloJednaci extends BaseModel
         if (empty($orgjednotka_id)) {
             $this->org = null;
         } else {
-            $Org = new OrgJednotka();
-            $this->org = $Org->getInfo($orgjednotka_id);
+            $this->org = new OrgUnit($orgjednotka_id);
         }
 
         $this->pouzij_minuly_rok = isset($this->info->minuly_rok) && $this->info->minuly_rok == 1;
@@ -200,8 +199,7 @@ class CisloJednaci extends BaseModel
             $orgjednotka_id = $row->orgjednotka_id;
             $info['orgjednotka_id'] = $orgjednotka_id;
             if ($orgjednotka_id !== null) {
-                $OrgJednotka = new OrgJednotka();
-                $org_info = $OrgJednotka->getInfo($orgjednotka_id);
+                $org_info = new OrgUnit($orgjednotka_id);
                 $info['org'] = $org_info->ciselna_rada;
             } else {
                 $info['org'] = null;

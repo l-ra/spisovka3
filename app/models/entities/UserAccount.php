@@ -55,4 +55,14 @@ class UserAccount extends CachedDBEntity
 
         return $rows ? $rows : NULL;
     }
+    
+    /**
+     * @return OrgUnit|null
+     */
+    public function getOrgUnit()
+    {
+        $ou_id = $this->orgjednotka_id;        
+        return $ou_id !== null ? new \OrgUnit($ou_id) : null;        
+    }
+    
 }

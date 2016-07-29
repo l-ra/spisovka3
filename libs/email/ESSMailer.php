@@ -37,8 +37,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         $mail_source = $mail->generateMessage();
 
         $config = (new Spisovka\ConfigEpodatelna())->get();
-        // použij první / hlavní účet, pokud by jich v budoucnu mělo být více
-        $config = $config->odeslani[0];        
+        $config = $config->odeslani;        
         if ($config['podepisovat']) {
             $esign = new esignature();
             if (!$esign->setUserCert($config['cert'], $config['cert_pass']))

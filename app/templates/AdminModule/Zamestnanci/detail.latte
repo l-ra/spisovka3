@@ -69,7 +69,7 @@
             {else}
                 <dl>
                     <dt>Organizační jednotka:</dt>
-                    <dd>{$u->orgjednotka_id === null ? 'žádná' : Orgjednotka::getName($u->orgjednotka_id)}</dd>
+                    <dd>{$u->orgjednotka_id === null ? 'žádná' : new OrgUnit($u->orgjednotka_id)}</dd>
                 </dl>
             {/if}
 

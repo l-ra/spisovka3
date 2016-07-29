@@ -41,7 +41,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $account = new UserAccount($user);
         $this->template->Osoba = $person = $account->getPerson();
         $this->template->Uzivatel = $account;
-        $this->template->Org_jednotka = $account->orgjednotka_id !== null ? OrgJednotka::getName($account->orgjednotka_id)
+        $this->template->Org_jednotka = $account->orgjednotka_id !== null ? new OrgUnit($account->orgjednotka_id)
                     : 'žádná';
 
         $Auth1 = $this->context->createService('authenticatorUI');
@@ -233,8 +233,11 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $poznamka = $this->getParameter('poznamka', null);
         $novy = $this->getParameter('novy', 0);
 
-        if ($orgjednotka_id === null)
-            $orgjednotka_id = OrgJednotka::dejOrgUzivatele($user_id);
+        if ($orgjednotka_id === null) {
+            $account = new UserAccount($user_id);
+            $ou = $account->getOrgUnit();
+            $orgjednotka_id = $ou ? $ou->id : null;            
+        }
 
         if ($novy == 1) {
             echo '###predano###' . $spis_id . '#' . $user_id . '#' . $orgjednotka_id . '#' . $poznamka;

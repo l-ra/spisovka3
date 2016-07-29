@@ -242,7 +242,7 @@ abstract class DBEntity
 
     /**
      * Utility function. So getting user is at one place.
-     * @return Nette\Security\User
+     * @return Spisovka\User
      */
     public static function getUser()
     {

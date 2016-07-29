@@ -108,14 +108,44 @@ class ConfigEpodatelna implements IConfig
     protected function upgrade($data)
     {
         $changed = false;
-        if (!isset($data->odeslani[0]->podepisovat)) {
-            $data->odeslani[0]->podepisovat = $data->odeslani[0]->typ_odeslani == 1;
-            unset($data->odeslani[0]->typ_odeslani);
+        
+        // jen jedna datova schranka, nebudeme s ni pracovat jako s polem        
+        if (!isset($data->isds->ucet)) {
+            $i = reset($data->isds);
+            $data->isds = $i;
             $changed = true;
         }
-        if (isset($data->odeslani[0]->aktivni)) {
-            unset($data->odeslani[0]->aktivni);
-            unset($data->odeslani[0]->cert_key);            
+
+        // dtto pro nastaveni odesilani
+        if (count($data->odeslani) == 1) {
+            $o = reset($data->odeslani);
+            $data->odeslani = $o;
+            $changed = true;
+        }
+
+        // nedulezite, nemusime hned ukladat
+        unset($data->isds->stav);
+        unset($data->isds->stav_hesla);
+
+        // oprav boolean hodnoty z konfiguracniho souboru
+        // kvuli bugu v parse_ini_file()
+        $data->isds->aktivni = (bool) $data->isds->aktivni;
+
+        foreach ($data->email as $e) {
+            $e->aktivni = (bool) $e->aktivni;
+            $e->only_signature = (bool) $e->only_signature;
+            $e->qual_signature = (bool) $e->qual_signature;
+        }
+
+        // --------------------------------
+        if (!isset($data->odeslani->podepisovat)) {
+            $data->odeslani->podepisovat = $data->odeslani->typ_odeslani == 1;
+            unset($data->odeslani->typ_odeslani);
+            $changed = true;
+        }
+        if (isset($data->odeslani->aktivni)) {
+            unset($data->odeslani->aktivni);
+            unset($data->odeslani->cert_key);            
             $changed = true;
         }
         

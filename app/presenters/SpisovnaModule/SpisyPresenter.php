@@ -25,12 +25,12 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
         $this->_renderSeznam($hledat, true);
     }
-    
+
     public function renderDefault($hledat)
     {
         $this->_renderSeznam($hledat, false);
     }
-    
+
     public function _renderSeznam($hledat, $prijem)
     {
         $Spisy = new SpisModel();
@@ -50,7 +50,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $filter = $Spisy->spisovna_prijem($filter);
         else
             $filter = $Spisy->spisovna($filter);
-        
+
         $result = $Spisy->seznam(['where' => $filter]);
         $paginator->itemCount = count($result);
 
@@ -122,12 +122,12 @@ class Spisovna_SpisyPresenter extends BasePresenter
                 }
                 if ($count_ok > 0)
                     $this->flashMessage(sprintf("Úspěšně jste přijal $count_ok %s do spisovny.",
-                            SpisModel::cislovat($count_ok)));
+                                    SpisModel::cislovat($count_ok)));
                 if ($count_failed > 0)
                     $this->flashMessage(sprintf("$count_failed %s se nepodařilo přijmout do spisovny.",
-                            SpisModel::cislovat($count_failed)), 'warning');
+                                    SpisModel::cislovat($count_failed)), 'warning');
                 break;
-                
+
             case 'vratit':
                 $all_ok = true;
                 foreach ($spisy as $spis_id) {
@@ -152,107 +152,23 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $spis_id = $id;
         $this->template->Spis = $spis = $Spisy->getInfo($spis_id, true);
 
-        if ($spis) {
-
-            $this->template->SpisZnak_nazev = "";
-            if (!empty($spis->spisovy_znak_id)) {
-                $SpisovyZnak = new SpisovyZnak();
-                $sz = $SpisovyZnak->select(["[id] = $spis->spisovy_znak_id"])->fetch();
-                $this->template->SpisZnak_nazev = $sz->nazev;
-            }
-
-            $user = $this->user;
-            $pridelen = $predan = $accessview = false;
-            $formUpravit = null;
-
-            // prideleno
-            if (OrgJednotka::isInOrg($spis->orgjednotka_id)) {
-                $pridelen = true;
-                $accessview = true;
-            }
-            // predano
-            if (OrgJednotka::isInOrg($spis->orgjednotka_id_predano)) {
-                $predan = true;
-                $accessview = true;
-            }
-
-            /* if (count($spis->workflow) > 0) {
-                $wf_orgjednotka_prideleno = $spis->orgjednotka_id;
-                $wf_orgjednotka_predano = $spis->orgjednotka_id_predano;
-                $org_cache = array();
-                foreach ($spis->workflow as $wf) {
-
-                    if (isset($org_cache[$wf->orgjednotka_id])) {
-                        $orgjednotka_expr = $org_cache[$wf->orgjednotka_id];
-                    } else {
-                        $orgjednotka_expr = OrgJednotka::isInOrg($wf->orgjednotka_id);
-                        $org_cache[$wf->orgjednotka_id] = $orgjednotka_expr;
-                    }
-
-                    if (!$accessview) {
-                        if (($wf->prideleno_id == $user_id || $orgjednotka_expr) && ($wf->stav_osoby < 100 || $wf->stav_osoby != 0)) {
-                            $accessview = 1;
-                        }
-                    }
-
-                    if (!$pridelen) {
-                        if (($wf->prideleno_id == $user_id || $orgjednotka_expr) && ($wf->stav_osoby == 1 && $wf->aktivni == 1 )) {
-                            $pridelen = 1;
-                            $wf_orgjednotka_prideleno = $wf->orgjednotka_id;
-                        }
-                    }
-                    if (!$predan) {
-                        if (($wf->prideleno_id == $user_id || $orgjednotka_expr) && ($wf->stav_osoby == 0 && $wf->aktivni == 1 )) {
-                            $predan = 1;
-                            $wf_orgjednotka_predano = $wf->orgjednotka_id;
-                        }
-                    }
-
-                    if ($predan && $pridelen && $accessview) {
-                        break;
-                    }
-                }
-            } */
-
-            $this->template->Pridelen = $pridelen;
-            if ($pridelen) {
-                $this->template->AccessEdit = 0;
-                $formUpravit = null;
-            }
-            $this->template->Predan = $predan;
-            $this->template->AccessView = $accessview;
-
-            $Orgjednotka = new OrgJednotka();
-            if (empty($spis->orgjednotka_id) && !empty($wf_orgjednotka_prideleno)) {
-                $spis->orgjendotka_id = $wf_orgjednotka_prideleno;
-                $spis->orgjendotka_prideleno = $Orgjednotka->getInfo($wf_orgjednotka_prideleno);
-            }
-            if (empty($spis->orgjednotka_id_predano) && !empty($wf_orgjednotka_predano)) {
-                $spis->orgjendotka_id_predano = $wf_orgjednotka_predano;
-                $spis->orgjendotka_predano = $Orgjednotka->getInfo($wf_orgjednotka_predano);
-            }
-
-            if ($accessview) {
-                $DokumentSpis = new DokumentSpis();
-                $result = $DokumentSpis->dokumenty($spis_id);
-                $this->template->seznam = $result;
-            } else {
-                $this->template->seznam = null;
-            }
-
-            if ($user->isAllowed('Spisovna', 'zmenit_skartacni_rezim')) {
-                $this->template->AccessEdit = 1;
-                $formUpravit = $this->getParameter('upravit', null);
-            } else {
-                $this->template->AccessEdit = 0;
-                $formUpravit = null;
-            }
-
-            $this->template->FormUpravit = $formUpravit;
-        } else {
-            // spis neexistuje nebo se nepodarilo nacist
+        if (!$spis) {
             $this->setView('noexist');
+            return;
         }
+
+        $this->template->SpisZnak_nazev = "";
+        if (!empty($spis->spisovy_znak_id)) {
+            $SpisovyZnak = new SpisovyZnak();
+            $sz = $SpisovyZnak->select(["[id] = $spis->spisovy_znak_id"])->fetch();
+            $this->template->SpisZnak_nazev = $sz->nazev;
+        }
+
+        $DokumentSpis = new DokumentSpis();
+        $result = $DokumentSpis->dokumenty($spis_id);
+        $this->template->seznam = $result;
+
+        $this->template->lzeEditovat = $this->user->isAllowed('Spisovna', 'zmenit_skartacni_rezim');
     }
 
     protected function createComponentUpravitForm()
@@ -351,4 +267,5 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $result->setRowClass(null);
         $this->template->spisy = $result->fetchAll();
     }
+
 }

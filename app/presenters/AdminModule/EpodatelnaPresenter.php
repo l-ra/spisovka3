@@ -18,12 +18,11 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $ep = self::nactiNastaveni();
 
         // ISDS
-        $this->template->n_isds = $ep['isds'];
-        $this->template->vice_datovych_schranek = ISDS_Spisovka::vice_datovych_schranek();
-
+        $this->template->isds = $ep['isds'];
+        // $this->template->vice_datovych_schranek = ISDS_Spisovka::vice_datovych_schranek();
         // Email
         if (count($ep['email']) == 0)
-            $this->template->n_email = null;
+            $this->template->email_config = null;
         else {
             $e_mail = array();
 
@@ -40,11 +39,11 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 $e_mail[$ei] = $email;
             }
 
-            $this->template->n_email = $e_mail;
+            $this->template->email_config = $e_mail;
         }
 
         // Odeslani
-        $this->template->n_odeslani = $ep['odeslani'];
+        $this->template->odes_config = $ep['odeslani'];
     }
 
     public function renderDetail($id, $upravit)
@@ -55,32 +54,19 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $ep = self::nactiNastaveni();
         $ep = $ep->toArray(); // Je nutne kvuli zpusobu modifikace objektu nastaveni
 
-        $id_alter = null;
-        $do = $this->getParameter('do');
-        if ($do) {
-            $id_index = $this->getHttpRequest()->getPost('index');
-            $id_typ = $this->getHttpRequest()->getPost('ep_typ', 'i');
-            $id_alter = $id_typ . $id_index;
-        }
-
-
-        $id = $this->getParameter('id', $id_alter);
         $typ = substr($id, 0, 1);
-        $index = substr($id, 1);
 
         switch ($typ) {
             case 'i':
-                $crt = $ep['isds'][$index]['certifikat'];
-                if (file_exists($crt)) {
-                    $ep['isds'][$index]['certifikat_stav'] = 1;
-                } else {
-                    $ep['isds'][$index]['certifikat_stav'] = 0;
-                }
-
-
-                $this->info = @$ep['isds'][$index];
+                $isds = $ep['isds'];
+                $crt = $isds['certifikat'];
+                $isds['certifikat_stav'] = file_exists($crt) ? 1 : 0;
+                $this->info = $isds;
                 break;
+
             case 'e':
+                $index = substr($id, 1);
+                $this->template->Index = $index;
                 $typ_serveru = array(
                     '' => '',
                     '/pop3/novalidate-cert' => 'POP3',
@@ -91,17 +77,17 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 );
                 @$ep['email'][$index]['protokol'] = $typ_serveru[@$ep['email'][$index]['typ']];
 
-                $this->info = @$ep['email'][$index];
+                $this->info = $ep['email'][$index];
                 break;
 
             case 'o':
-                if (!$ep['odeslani'][$index]['podepisovat'])
+                if (!$ep['odeslani']['podepisovat'])
                     $stav = 'vypnuto';
-                else if (file_exists($ep['odeslani'][$index]['cert'])) {
+                else if (file_exists($ep['odeslani']['cert'])) {
                     $esign = new esignature();
 
-                    $ok = $esign->setUserCert($ep['odeslani'][$index]['cert'],
-                            $ep['odeslani'][$index]['cert_pass']);
+                    $ok = $esign->setUserCert($ep['odeslani']['cert'],
+                            $ep['odeslani']['cert_pass']);
                     $error_message = $esign->getError();
 
                     if ($ok) {
@@ -114,7 +100,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                             } else {
                                 $stav = 'Certifikát je neplatný! Vypršela jeho platnost.';
                             }
-                            $ep['odeslani'][$index]['certifikat']['info'] = $cert_info;
+                            $ep['odeslani']['certifikat']['info'] = $cert_info;
                         }
                     } else {
                         $stav = "Nahraný soubor s certifikátem je neplatný nebo nesouhlasí heslo.\n" . $error_message;
@@ -123,7 +109,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                     $stav = 'Certifikát není nahrán.';
                 }
 
-                $this->info = $ep['odeslani'][$index];
+                $this->info = $ep['odeslani'];
                 $this->info['certifikat']['stav'] = $stav;
                 break;
             default:
@@ -132,26 +118,15 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
 
         if (isset($this->info['podatelna']) && !empty($this->info['podatelna'])) {
-            $this->info['podatelna'] = OrgJednotka::getName($this->info['podatelna']);
+            $this->info['podatelna'] = new OrgUnit($this->info['podatelna']);
         }
 
         $this->template->Info = $this->info;
         $this->template->Typ = $typ;
-        $this->template->Index = $index;
-
 
         // Zmena udaju
-        $this->template->FormUpravit = $this->getParameter('upravit', null);
-        $this->template->FormHesloISDS = $this->getParameter('zmenit_heslo_isds', null);
-
-        if ($do) {
-            $this->template->Index = $this->getHttpRequest()->getPost('index');
-            $this->template->Typ = $this->getHttpRequest()->getPost('ep_typ', 'i');
-
-            if ($do == 'zmenit_heslo_isds') {
-                $this->template->FormHesloISDS = 1;
-            }
-        }
+        $this->template->FormUpravit = $upravit;
+        $this->template->FormHesloISDS = $this->getParameter('zmenit_heslo_isds');
     }
 
     /**
@@ -173,7 +148,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         );
 
         $form1 = new Spisovka\Form();
-        $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue('i');
 
@@ -199,7 +173,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addPassword('password', 'Heslo:', 50, 100);
 
         $form1->addUpload('certifikat_file', 'Soubor s certifikátem a klíčem (v PEM kódování):');
-        $form1->addText('cert_pass', 'Heslo k soukromému klíči (pokud je zašifrovaný):', 50, 100);
+        $form1->addText('cert_pass', 'Heslo k soukromému klíči (pokud je zašifrovaný):', 50,
+                100);
 
         $form1->addGroup();
         $form1->addSelect('test', 'Režim:',
@@ -207,34 +182,30 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             '1' => 'Testovací režim (czebox.cz)']
         );
         $form1->addSelect('podatelna', 'Podatelna pro příjem:', $org_select);
-        $form1->addSelect('log_level', 'Úroveň protokolování:', [
+        $form1->addSelect('log_level', 'Úroveň protokolování:',
+                [
             'vypnuto', 'stručné', '+ vstupní parametry', '+ odpovědi serveru'
         ]);
 
-        $id = $this->getParameter('id');
-        if ($id !== null) {
-            $ep = self::nactiNastaveni();
-            $index = substr($id, 1);
-            $isds = $ep['isds'][$index];
-            $individual_login = Settings::get(self::ISDS_INDIVIDUAL_LOGIN, false);
-            if ($individual_login)
-                $group->getOption('container')->style('display: none');
-            $form1['zpusob_prihlaseni']->setValue((int) $individual_login);
+        $ep = self::nactiNastaveni();
+        $isds = $ep['isds'];
+        $individual_login = Settings::get(self::ISDS_INDIVIDUAL_LOGIN, false);
+        if ($individual_login)
+            $group->getOption('container')->style('display: none');
+        $form1['zpusob_prihlaseni']->setDefaultValue((int) $individual_login);
 
-            $form1['index']->setValue($index);
-            $form1['ucet']->setValue($isds['ucet']);
-            $form1['aktivni']->setValue($isds['aktivni']);
-            try {
-                $form1['typ_pripojeni']->setValue($isds['typ_pripojeni']);
-            } catch (Exception $e) {
-                $e->getMessage();
-            }
-            $form1['login']->setValue($isds['login']);
-            $form1['cert_pass']->setValue($isds['cert_pass']);
-            $form1['test']->setValue($isds['test']);
-            $form1['podatelna']->setValue($isds['podatelna']);
-            $form1['log_level']->setValue(Settings::get('isds_log_level', 0));
+        $form1['ucet']->setDefaultValue($isds['ucet']);
+        $form1['aktivni']->setDefaultValue($isds['aktivni']);
+        try {
+            $form1['typ_pripojeni']->setDefaultValue($isds['typ_pripojeni']);
+        } catch (Exception $e) {
+            $e->getMessage();
         }
+        $form1['login']->setDefaultValue($isds['login']);
+        $form1['cert_pass']->setDefaultValue($isds['cert_pass']);
+        $form1['test']->setDefaultValue($isds['test']);
+        $form1['podatelna']->setDefaultValue($isds['podatelna']);
+        $form1['log_level']->setDefaultValue(Settings::get('isds_log_level', 0));
 
         $form1->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'nastavitISDSClicked');
@@ -252,8 +223,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $index = $data['index'];
-
         $config_data = self::nactiNastaveni();
 
         $data['certifikat'] = "";
@@ -262,7 +231,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $upload = $data['certifikat_file'];
 
             if (is_writeable(CLIENT_DIR . "/configs")) {
-                $fileName = CLIENT_DIR . "/configs/certifikat_isds" . $index . ".crt";
+                $fileName = CLIENT_DIR . "/configs/certifikat_isds.crt";
                 if (!$upload instanceof Nette\Http\FileUpload) {
                     $this->flashMessage('Certifikát se nepodařilo nahrát.', 'warning');
                 } else if ($upload->isOk()) {
@@ -293,29 +262,28 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
         unset($data['certifikat_file']);
 
-        $config_data['isds'][$index]['ucet'] = $data['ucet'];
-        $config_data['isds'][$index]['aktivni'] = $data['aktivni'];
+        $config_data['isds']['ucet'] = $data['ucet'];
+        $config_data['isds']['aktivni'] = $data['aktivni'];
         $individual_login = (bool) $data['zpusob_prihlaseni'];
         Settings::set(self::ISDS_INDIVIDUAL_LOGIN, $individual_login);
-        $config_data['isds'][$index]['typ_pripojeni'] = $data['typ_pripojeni'];
-        $config_data['isds'][$index]['login'] = $data['login'];
+        $config_data['isds']['typ_pripojeni'] = $data['typ_pripojeni'];
+        $config_data['isds']['login'] = $data['login'];
         if (!empty($data['password']))
-            $config_data['isds'][$index]['password'] = $data['password'];
+            $config_data['isds']['password'] = $data['password'];
         if (!empty($data['certifikat']))
-            $config_data['isds'][$index]['certifikat'] = $data['certifikat'];
-        $config_data['isds'][$index]['cert_pass'] = $data['cert_pass'];
-        $config_data['isds'][$index]['test'] = $data['test'];
-        $config_data['isds'][$index]['podatelna'] = $data['podatelna'];
+            $config_data['isds']['certifikat'] = $data['certifikat'];
+        $config_data['isds']['cert_pass'] = $data['cert_pass'];
+        $config_data['isds']['test'] = $data['test'];
+        $config_data['isds']['podatelna'] = $data['podatelna'];
         Settings::set('isds_log_level', intval($data['log_level']));
-        
+
         $idbox = "";
         $vlastnik = "";
-        $stav = "";
         if (!$individual_login) {
             // Musime nejprve zadane udaje ulozit! Jinak se mohou zobrazovat zavadejici
             // chybova hlaseni
             self::ulozNastaveni($config_data);
-            
+
             try {
                 $ISDS = new ISDS_Spisovka();
                 $info = $ISDS->GetOwnerInfoFromLogin();
@@ -329,24 +297,36 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                         // firma urad
                         $vlastnik = $info->firmName . " [" . $info->dbType . "]";
                     }
-                    $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
-                    $stav_hesla = $ISDS->GetPasswordInfo();
                 }
             } catch (Exception $e) {
                 $this->flashMessage('Nelze se připojit k ISDS! ' . $e->getMessage(), "warning");
             }
         }
 
-        $config_data['isds'][$index]['idbox'] = $idbox;
-        $config_data['isds'][$index]['vlastnik'] = $vlastnik;
-        $config_data['isds'][$index]['stav'] = $stav;
-        $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla)) ? "(bez omezení)" : date("j.n.Y G:i",
-                        strtotime($stav_hesla));
+        $config_data['isds']['idbox'] = $idbox;
+        $config_data['isds']['vlastnik'] = $vlastnik;
 
         self::ulozNastaveni($config_data);
 
         $this->flashMessage('Nastavení datové schránky bylo upraveno.');
-        $this->redirect('detail', ['id' => 'i' . $data['index']]);
+        $this->redirect('this', ['upravit' => null]);
+    }
+
+    public function actionIsdsTest()
+    {
+        try {
+            $ISDS = new ISDS_Spisovka();
+            $info = $ISDS->GetOwnerInfoFromLogin();
+            $stav_hesla = $ISDS->GetPasswordInfo();
+            $this->flashMessage(ISDS_Spisovka::stavDS($info->dbState));
+            if ($stav_hesla)
+                $this->flashMessage("Heslo expiruje " . date("j.n.Y G:i",
+                                strtotime($stav_hesla)));
+        } catch (Exception $e) {
+            $this->flashMessage("Připojení se nepodařilo: " . $e->getMessage(), 'warning');
+        }
+
+        $this->redirect('detail', 'i');
     }
 
     function ruleContains($item, $args)
@@ -359,115 +339,114 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         return (strpos($item->value, $args) !== false);
     }
 
-    protected function createComponentZmenitHesloISDSForm()
-    {
-        $id = $this->getParameter('id', null);
-        $index = substr($id, 1);
-
-        $id = $this->getParameter('id', null);
-        $index = substr($id, 1);
-
-        $form = new Spisovka\Form();
-        $form->addHidden('index')
-                ->setValue($index);
-        $form->addHidden('zmenit_heslo_isds')
-                ->setValue(1);
-        $form->addHidden('ep_typ')
-                ->setValue('i');
-
-        $form->addPassword('password', 'Přihlašovací heslo ISDS:', 30, 30)
-                ->addRule(Nette\Forms\Form::FILLED,
-                        'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addRule(Nette\Forms\Form::MIN_LENGTH,
-                        'Heslo do datové schránky musí být minimálně %d znaků dlouhé.', 8)
-                ->addRule(Nette\Forms\Form::MAX_LENGTH,
-                        'Heslo do datové schránky musí být maximálně %d znaků dlouhé.', 32)
-        /* ->addRule([$this, 'ruleNoEqual'], 'Heslo mesmí obsahovat id (login) uživatele, jemuž se heslo mění.',$isds['login'])
-          ->addRule([$this, 'ruleNoEqual'], 'Heslo se nesmí shodovat s původním heslem.',$isds['password'])
-          ->addRule([$this, 'ruleContains'], 'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','qwert')
-          ->addRule([$this, 'ruleContains'], 'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','asdgf')
-          ->addRule([$this, 'ruleContains'], 'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','12345')
-         */;
-
-        $form->addPassword('password_confirm', 'Přihlašovací heslo ještě jednou:', 30, 30)
-                ->addRule(Nette\Forms\Form::FILLED,
-                        'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
-                ->addConditionOn($form["password"], Nette\Forms\Form::FILLED)
-                ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !",
-                        $form["password"]);
-
-        $form->addSubmit('zmenit', 'Změnit heslo')
-                ->onClick[] = array($this, 'zmenitHesloISDSClicked');
-        $form->addSubmit('storno', 'Zrušit')
-                        ->setValidationScope(FALSE)
-                ->onClick[] = array($this, 'stornoClicked');
-
-        return $form;
-    }
-
-    public function zmenitHesloISDSClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-        //echo "<pre>Data: "; print_r($data); echo "</pre>"; exit;
-
-        $chyba = 0;
-
-        $index = $data['index'];
-
-        $config_data = self::nactiNastaveni();
-
-        $old_pass = $config_data['isds'][$index]['password'];
-
-        if ($chyba == 0) {
-
-            $idbox = "";
-            $vlastnik = "";
-            $stav = "";
-            try {
-                $ISDS = new ISDS_Spisovka();
-
-                // zmena hesla
-                if ($ISDS->ChangeISDSPassword($old_pass, $data['password'])) {
-                    //if ( false ) {
-
-                    $info = $ISDS->GetOwnerInfoFromLogin();
-                    if (!empty($info)) {
-
-                        $idbox = $info->dbID;
-                        if (empty($info->firmName)) {
-                            // jmeno prijmeni
-                            $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
-                        } else {
-                            // firma urad
-                            $vlastnik = $info->firmName . " [" . $info->dbType . "]";
-                        }
-                        $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
-                        $stav_hesla = $ISDS->GetPasswordInfo();
-                    }
-
-                    $config_data['isds'][$index]['password'] = $data['password'];
-                    $config_data['isds'][$index]['idbox'] = $idbox;
-                    $config_data['isds'][$index]['vlastnik'] = $vlastnik;
-                    $config_data['isds'][$index]['stav'] = $stav;
-                    $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla)) ? "(bez omezení)"
-                                : date("j.n.Y G:i", strtotime($stav_hesla));
-
-                    self::ulozNastaveni($config_data);
-
-                    $this->flashMessage('Heslo k datové schránky bylo úspěšně změněno.');
-                    $this->redirect(':Admin:Epodatelna:detail',
-                            array('id' => ('i' . $data['index'])));
-                } else {
-                    $this->flashMessage('Heslo k datové schránce se nepodařilo změnit.',
-                            'warning');
-                    $this->flashMessage('Chyba ISDS: ' . $ISDS->GetStatusMessage(), 'warning');
-                }
-            } catch (Exception $e) {
-                $this->flashMessage('Při pokusu o změnu hesla došlo k chybě: ' . $e->getMessage(),
-                        "warning");
-            }
-        }
-    }
+//    protected function createComponentZmenitHesloISDSForm()
+//    {
+//        $id = $this->getParameter('id', null);
+//        $index = substr($id, 1);
+//
+//        $id = $this->getParameter('id', null);
+//        $index = substr($id, 1);
+//
+//        $form = new Spisovka\Form();
+//        $form->addHidden('index')
+//                ->setValue($index);
+//        $form->addHidden('zmenit_heslo_isds')
+//                ->setValue(1);
+//        $form->addHidden('ep_typ')
+//                ->setValue('i');
+//
+//        $form->addPassword('password', 'Přihlašovací heslo ISDS:', 30, 30)
+//                ->addRule(Nette\Forms\Form::FILLED,
+//                        'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+//                ->addRule(Nette\Forms\Form::MIN_LENGTH,
+//                        'Heslo do datové schránky musí být minimálně %d znaků dlouhé.', 8)
+//                ->addRule(Nette\Forms\Form::MAX_LENGTH,
+//                        'Heslo do datové schránky musí být maximálně %d znaků dlouhé.', 32)
+//        /* ->addRule([$this, 'ruleNoEqual'], 'Heslo mesmí obsahovat id (login) uživatele, jemuž se heslo mění.',$isds['login'])
+//          ->addRule([$this, 'ruleNoEqual'], 'Heslo se nesmí shodovat s původním heslem.',$isds['password'])
+//          ->addRule([$this, 'ruleContains'], 'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','qwert')
+//          ->addRule([$this, 'ruleContains'], 'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','asdgf')
+//          ->addRule([$this, 'ruleContains'], 'Heslo nesmí začínat na "qwert", "asdgf", "12345"!','12345')
+//         */;
+//
+//        $form->addPassword('password_confirm', 'Přihlašovací heslo ještě jednou:', 30, 30)
+//                ->addRule(Nette\Forms\Form::FILLED,
+//                        'Heslo musí být vyplněné. Pokud nechcete změnit heslo, klikněte na tlačítko zrušit.')
+//                ->addConditionOn($form["password"], Nette\Forms\Form::FILLED)
+//                ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat !",
+//                        $form["password"]);
+//
+//        $form->addSubmit('zmenit', 'Změnit heslo')
+//                ->onClick[] = array($this, 'zmenitHesloISDSClicked');
+//        $form->addSubmit('storno', 'Zrušit')
+//                        ->setValidationScope(FALSE)
+//                ->onClick[] = array($this, 'stornoClicked');
+//
+//        return $form;
+//    }
+//    public function zmenitHesloISDSClicked(Nette\Forms\Controls\SubmitButton $button)
+//    {
+//        $data = $button->getForm()->getValues();
+//        //echo "<pre>Data: "; print_r($data); echo "</pre>"; exit;
+//
+//        $chyba = 0;
+//
+//        $index = $data['index'];
+//
+//        $config_data = self::nactiNastaveni();
+//
+//        $old_pass = $config_data['isds'][$index]['password'];
+//
+//        if ($chyba == 0) {
+//
+//            $idbox = "";
+//            $vlastnik = "";
+//            $stav = "";
+//            try {
+//                $ISDS = new ISDS_Spisovka();
+//
+//                // zmena hesla
+//                if ($ISDS->ChangeISDSPassword($old_pass, $data['password'])) {
+//                    //if ( false ) {
+//
+//                    $info = $ISDS->GetOwnerInfoFromLogin();
+//                    if (!empty($info)) {
+//
+//                        $idbox = $info->dbID;
+//                        if (empty($info->firmName)) {
+//                            // jmeno prijmeni
+//                            $vlastnik = $info->pnFirstName . " " . $info->pnLastName . " [" . $info->dbType . "]";
+//                        } else {
+//                            // firma urad
+//                            $vlastnik = $info->firmName . " [" . $info->dbType . "]";
+//                        }
+//                        $stav = ISDS_Spisovka::stavDS($info->dbState) . " (kontrolováno dne " . date("j.n.Y G:i") . ")";
+//                        $stav_hesla = $ISDS->GetPasswordInfo();
+//                    }
+//
+//                    $config_data['isds'][$index]['password'] = $data['password'];
+//                    $config_data['isds'][$index]['idbox'] = $idbox;
+//                    $config_data['isds'][$index]['vlastnik'] = $vlastnik;
+//                    $config_data['isds'][$index]['stav'] = $stav;
+//                    $config_data['isds'][$index]['stav_hesla'] = (empty($stav_hesla)) ? "(bez omezení)"
+//                                : date("j.n.Y G:i", strtotime($stav_hesla));
+//
+//                    self::ulozNastaveni($config_data);
+//
+//                    $this->flashMessage('Heslo k datové schránky bylo úspěšně změněno.');
+//                    $this->redirect(':Admin:Epodatelna:detail',
+//                            array('id' => ('i' . $data['index'])));
+//                } else {
+//                    $this->flashMessage('Heslo k datové schránce se nepodařilo změnit.',
+//                            'warning');
+//                    $this->flashMessage('Chyba ISDS: ' . $ISDS->GetStatusMessage(), 'warning');
+//                }
+//            } catch (Exception $e) {
+//                $this->flashMessage('Při pokusu o změnu hesla došlo k chybě: ' . $e->getMessage(),
+//                        "warning");
+//            }
+//        }
+//    }
 
     protected function createComponentNastavitEmailForm()
     {
@@ -577,7 +556,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         $id = $this->getParameter('id');
         $typ = substr($id, 0, 1);
-        $index = substr($id, 1);
 
         $form1 = new Form();
 
@@ -608,16 +586,13 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addText('cert_pass', 'Heslo k souboru:', 50, 100);
         $form1->setCurrentGroup(null);
 
-        $odes = $ep['odeslani'][$index];
-        if ($odes) {
-            $form1['index']->setValue($index);
-            $form1['ucet']->setValue($odes['ucet']);
-            // $form1['aktivni']->setValue($odes['aktivni']);
-            $form1['podepisovat']->setValue($odes['podepisovat']);
-            if (!$odes->podepisovat)
-                $group->getOption('container')->style('display: none');
-            $form1['email']->setValue($odes['email']);
-        }
+        $odes = $ep['odeslani'];
+        $form1['ucet']->setDefaultValue($odes['ucet']);
+        // $form1['aktivni']->setDefaultValue($odes['aktivni']);
+        $form1['podepisovat']->setDefaultValue($odes['podepisovat']);
+        if (!$odes->podepisovat)
+            $group->getOption('container')->style('display: none');
+        $form1['email']->setDefaultValue($odes['email']);
 
         $form1->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'nastavitOdesClicked');
@@ -632,8 +607,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $index = $data['index'];
-
         $config_data = self::nactiNastaveni();
 
         $data['cert'] = "";
@@ -641,11 +614,11 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $upload = $data['cert_file'];
 
         $chyba_pri_uploadu = 0;
-        $fileName = CLIENT_DIR . "/configs/certifikat_email_" . $index . ".crt";
         if (!$upload instanceof Nette\Http\FileUpload) {
             $this->flashMessage('Certifikát se nepodařilo nahrát.', 'warning');
         } else if ($upload->isOk()) {
             try {
+                $fileName = CLIENT_DIR . "/configs/certifikat_email.crt";
                 $upload->move($fileName);
                 $data['cert'] = $fileName;
             } catch (Exception $e) {
@@ -673,42 +646,41 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         if ($chyba_pri_uploadu && !is_writeable(CLIENT_DIR . '/configs'))
             $this->flashMessage('Nemohu zapisovat do adresáře client/configs/.', 'warning');
 
-        $config_data['odeslani'][$index]['ucet'] = $data['ucet'];
-        $config_data['odeslani'][$index]['aktivni'] = true;
-        $config_data['odeslani'][$index]['podepisovat'] = $data['podepisovat'];
-        $config_data['odeslani'][$index]['email'] = $data['email'];
+        $config_data['odeslani']['ucet'] = $data['ucet'];
+        $config_data['odeslani']['aktivni'] = true;
+        $config_data['odeslani']['podepisovat'] = $data['podepisovat'];
+        $config_data['odeslani']['email'] = $data['email'];
 
         if (!empty($data['cert'])) {
-            $config_data['odeslani'][$index]['cert'] = $data['cert'];
+            $config_data['odeslani']['cert'] = $data['cert'];
         }
         // heslo měň, pouze když jej uživatel zadá
         // současné heslo ve formuláři nezobrazuj
         if (!empty($data['cert_pass']))
-            $config_data['odeslani'][$index]['cert_pass'] = $data['cert_pass'];
+            $config_data['odeslani']['cert_pass'] = $data['cert_pass'];
 
         self::ulozNastaveni($config_data);
 
         $this->flashMessage('Nastavení odesílání emailů bylo upraveno.');
-        $this->redirect('detail', array('id' => ('o' . $data['index'])));
+        $this->redirect('this', ['upravit' => null]);
     }
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
-        $this->redirect('detail', ['id' => ($data['ep_typ'] . $data['index'])]);
+        $this->redirect('this', ['upravit' => null]);
     }
 
-    public function actionSmazat()
+    public function actionSmazat($id)
     {
-        $id_schranky = $this->getParameter('id');
+        $id_schranky = $id;
 
         $config_data = self::nactiNastaveni();
 
         $por_cislo = substr($id_schranky, 1);
-        if (substr($id_schranky, 0, 1) == 'i')
-            unset($config_data['isds'][$por_cislo]);
-        else if (substr($id_schranky, 0, 1) == 'e')
+        if (substr($id_schranky, 0, 1) == 'e')
             unset($config_data['email'][$por_cislo]);
+        else
+            throw new InvalidArgumentException();
 
         self::ulozNastaveni($config_data);
         $this->flashMessage('Schránka byla smazána.');
@@ -717,51 +689,26 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     public function actionNovaschranka()
     {
-        $typ = $this->getParameter('typ', 'e');
         $config_data = self::nactiNastaveni();
         $config_data = $config_data->toArray();
 
-        if ($typ == 'i') {
-            $index = 0;
-            foreach ($config_data['isds'] as $i => $val)
-                $index = max($index, $i);
-            $index++;
-
-            $config_data['isds'][$index]['ucet'] = 'Nová datová schránka';
-            $config_data['isds'][$index]['aktivni'] = false;
-            $config_data['isds'][$index]['idbox'] = '';
-            $config_data['isds'][$index]['vlastnik'] = '';
-            $config_data['isds'][$index]['stav'] = '';
-            $config_data['isds'][$index]['typ_pripojeni'] = 0;
-            $config_data['isds'][$index]['login'] = '';
-            $config_data['isds'][$index]['password'] = '';
-            $config_data['isds'][$index]['certifikat'] = '';
-            $config_data['isds'][$index]['cert_pass'] = '';
-            $config_data['isds'][$index]['test'] = 0;
-            $config_data['isds'][$index]['podatelna'] = 0;
-            $config_data['isds'][$index]['stav_hesla'] = '';
-        } else {
-            $index = 0;
-            foreach ($config_data['email'] as $i => $val)
-                $index = max($index, $i);
-            $index++;
-
-            $config_data['email'][$index]['ucet'] = 'Nová emailová schránka';
-            $config_data['email'][$index]['aktivni'] = false;
-            $config_data['email'][$index]['typ'] = "/pop3/ssl/novalidate-cert";
-            $config_data['email'][$index]['server'] = '';
-            $config_data['email'][$index]['port'] = 995;
-            $config_data['email'][$index]['inbox'] = "INBOX";
-            $config_data['email'][$index]['login'] = '';
-            $config_data['email'][$index]['password'] = '';
-            $config_data['email'][$index]['podatelna'] = 0;
-            $config_data['email'][$index]['only_signature'] = '';
-            $config_data['email'][$index]['qual_signature'] = '';
-        }
-
+        $ucet = [];
+        $ucet['ucet'] = 'Nová emailová schránka';
+        $ucet['aktivni'] = false;
+        $ucet['typ'] = "/pop3/ssl/novalidate-cert";
+        $ucet['server'] = '';
+        $ucet['port'] = 995;
+        $ucet['inbox'] = "INBOX";
+        $ucet['login'] = '';
+        $ucet['password'] = '';
+        $ucet['podatelna'] = 0;
+        $ucet['only_signature'] = '';
+        $ucet['qual_signature'] = '';
+        $config_data['email'][] = $ucet;
+      
         self::ulozNastaveni($config_data);
         $this->flashMessage('Schránka přidána.');
-        $this->redirect('detail', array('id' => "$typ$index"));
+        $this->redirect('default');
     }
 
     /**
@@ -770,20 +717,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
      */
     public static function nactiNastaveni()
     {
-        $res = (new Spisovka\ConfigEpodatelna())->get();
-
-        // oprav boolean hodnoty z konfiguracniho souboru
-        // kvuli bugu v parse_ini_file()
-        $i = reset($res->isds);
-        $i->aktivni = (bool) $i->aktivni;
-
-        foreach ($res->email as $e) {
-            $e->aktivni = (bool) $e->aktivni;
-            $e->only_signature = (bool) $e->only_signature;
-            $e->qual_signature = (bool) $e->qual_signature;
-        }
-
-        return $res;
+        $cfg = (new Spisovka\ConfigEpodatelna())->get();
+        return $cfg;
     }
 
     protected static function ulozNastaveni($config_data)

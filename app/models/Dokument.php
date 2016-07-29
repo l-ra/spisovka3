@@ -700,7 +700,7 @@ class Dokument extends BaseModel
     {
         $user = self::getUser();
         $user_id = $user->id;
-        $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
+        $isVedouci = $user->isVedouci();
 
         $org_id = OrgJednotka::dejOrgUzivatele();
         $org_jednotka = array();
@@ -837,7 +837,7 @@ class Dokument extends BaseModel
     {
         $user = self::getUser();
         $user_id = $user->id;
-        $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
+        $isVedouci = $user->isVedouci();
         $vidi_vsechny_dokumenty = self::uzivatelVidiVsechnyDokumenty();
 
         if (!$vidi_vsechny_dokumenty) {
@@ -1050,6 +1050,7 @@ class Dokument extends BaseModel
 
         if (!isset($dokument->epod_typ))
             $dokument->epod_typ = ''; // definuj "epod_typ", pokud dokument nebyl vytvořen e-podatelnou
+
 
 
 
@@ -1298,21 +1299,21 @@ class Dokument extends BaseModel
      * 
      * @param string $cislo_jednaci cislo jednaci dokumentu
      * @param int $dokument_id id dokumentu, ktery se vylouci ze seznamu
-     * @return array seznam dokumentu se stejnym cislem jednacim 
+     * @return boolean 
      */
-    public function stejne($cislo_jednaci, $dokument_id = null)
-    {
-        if (empty($cislo_jednaci))
-            return null;
-
-        if (is_null($dokument_id)) {
-            return $this->select(array(array('cislo_jednaci=%s', $cislo_jednaci)), array('id'))->fetchAll();
-        } else {
-            return $this->select(array(array('cislo_jednaci=%s', $cislo_jednaci),
-                        array('id != %i', $dokument_id)
-                            ), array('id'))->fetchAll();
-        }
-    }
+// Presunuto do entity Document
+//     
+//    public function existujeSeStejnymCJ($cislo_jednaci, $dokument_id)
+//    {
+//        if (empty($cislo_jednaci))
+//            throw new InvalidArgumentException();
+//
+//        $where = [['cislo_jednaci = %s', $cislo_jednaci]];
+//        $where[] = ['id != %i', $dokument_id];
+//
+//        $res = $this->select($where);
+//        return count($res) != 0;
+//    }
 
     public function spojitAgrs($args1, $args2)
     {

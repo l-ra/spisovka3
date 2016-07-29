@@ -18,7 +18,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $this->template->form = $this['searchForm'];
 
         $user = $this->user;
-        $this->template->muzeHledatDlePrideleni = $user->isAllowed(NULL, 'is_vedouci') || $user->isAllowed('Dokument',
+        $this->template->muzeHledatDlePrideleni = $user->isVedouci() || $user->isAllowed('Dokument',
                         'cist_moje_oj') || $user->isAllowed('Dokument', 'cist_vse');
         $this->template->vidiVsechnyDokumenty = $user->isAllowed('Dokument', 'cist_vse');
     }

@@ -172,18 +172,6 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         }
     }
 
-    public function actionTruncate()
-    {
-
-        set_time_limit(600);
-
-        $Org = new OrgJednotka();
-        $Org->deleteAllOrg();
-
-        echo "smazano";
-        exit;
-    }
-
     protected function createComponentSearchForm()
     {
         $hledat = !is_null($this->hledat) ? $this->hledat : '';

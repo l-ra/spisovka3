@@ -19,10 +19,9 @@ class ISDS_Spisovka extends ISDS
             $this->logger = new ISDS_Logger($log_level);
         
         $ep_config = (new Spisovka\ConfigEpodatelna())->get();
-        $ep_config = $ep_config['isds'];
-        $config = current($ep_config);
-        if ($config === false) // existuje nejake nastaveni?
-            throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka.");
+        $config = $ep_config['isds'];
+        /* if ($config === false) // existuje nejake nastaveni?
+            throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka."); */
 
         $isds_portaltype = ($config['test'] == 1) ? 0 : 1;
 
@@ -163,18 +162,17 @@ class ISDS_Spisovka extends ISDS
     {
         $typ = array(
             '0' => 'Nelze zjístit stav datové schránky',
-            '1' => 'DS je přístupná',
-            '2' => 'DS je dočasně znepřístupněná',
-            '3' => 'DS je dosud neaktivní',
-            '4' => 'DS je trvale znepřístupněna',
-            '5' => 'DS je smazána'
+            '1' => 'Datová schránka je přístupná',
+            '2' => 'Datová schránka je dočasně znepřístupněná',
+            '3' => 'Datová schránka je dosud neaktivní',
+            '4' => 'Datová schránka je trvale znepřístupněna',
+            '5' => 'Datová schránka je smazána'
         );
 
-        if (array_key_exists($dbState, $typ)) {
+        if (array_key_exists($dbState, $typ))
             return $typ[$dbState];
-        } else {
-            return null;
-        }
+
+        return null;
     }
 
     public static function typDS($dmType)

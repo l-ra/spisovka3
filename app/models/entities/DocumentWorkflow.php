@@ -310,7 +310,9 @@ class DocumentWorkflow extends DocumentStates
             dibi::begin();
 
             $this->owner_user_id = $user_id;
-            $this->owner_orgunit_id = OrgJednotka::dejOrgUzivatele($user_id);
+            $account = new UserAccount($user_id);
+            $ou = $account->getOrgUnit();
+            $this->owner_orgunit_id = $ou ? $ou->id : null;
             $this->save();
             
             $this->_changeState(self::STAV_ZAPUJCEN);

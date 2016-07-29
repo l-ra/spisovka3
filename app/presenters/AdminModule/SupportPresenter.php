@@ -67,14 +67,11 @@ class Admin_SupportPresenter extends BasePresenter
         echo "Konfigurace e-podatelny:\n";
         echo "------------------------\n\n";
         $config = (new \Spisovka\ConfigEpodatelna)->get();
-        foreach ($config->isds as &$box) {
-            unset($box->password);
-            unset($box->cert_pass);
-        }
+        unset($config->isds->password);
+        unset($config->isds->cert_pass);
         foreach ($config->email as &$mailbox)
             unset($mailbox->password);
-        foreach ($config->odeslani as &$mailbox)
-            unset($mailbox->cert_pass);
+        unset($config->odeslani->cert_pass);
         print_r($this->arrayConvertBool($config));
         echo "\n";
         

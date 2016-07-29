@@ -47,4 +47,17 @@ class User extends \Nette\Security\User
         }
     }
     
+    /**
+     * @return \OrgUnit|null
+     */
+    public function getOrgUnit()
+    {
+        $account = new \UserAccount($this->id);
+        return $account->getOrgUnit();
+    }
+    
+    public function isVedouci()
+    {
+        return $this->isAllowed(NULL, 'is_vedouci');
+    }
 }

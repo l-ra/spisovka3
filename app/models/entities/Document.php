@@ -16,12 +16,12 @@ class Document extends DBEntity
     public function canUserModify()
     {
         $user = self::getUser();
-        $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
+        $ou = $user->getOrgUnit();
 
         switch ($this->stav) {
             case DocumentWorkflow::STAV_VE_SPISOVNE:
-                return $user->isAllowed('Spisovna', 'zmenit_skartacni_rezim')
-                    || $user->isAllowed('Zapujcka', 'schvalit');
+                return $user->isAllowed('Spisovna', 'zmenit_skartacni_rezim') || $user->isAllowed('Zapujcka',
+                                'schvalit');
 
             case DocumentWorkflow::STAV_PREDAN_DO_SPISOVNY:
             case DocumentWorkflow::STAV_SKARTACNI_RIZENI:
@@ -30,38 +30,37 @@ class Document extends DBEntity
                 return false;
         }
 
-        if ($user->isAllowed('Dokument', 'menit_moje_oj') && $orgjednotka_id !== null && $orgjednotka_id === $this->owner_orgunit_id)
+        if ($ou && $user->isAllowed('Dokument', 'menit_moje_oj') && $ou->id === $this->owner_orgunit_id)
             return true;
 
         return $this->owner_user_id == $user->id;
     }
 
     /**
-     * @return bool
+     * @return boolean
+     */
+    public function canUserForward()
+    {
+        $allow_forward_finished_documents = Settings::get('spisovka_allow_forward_finished_documents',
+                        false);
+        return !$this->is_forwarded && ($this->stav <= DocumentWorkflow::STAV_VYRIZUJE_SE || $allow_forward_finished_documents);
+    }
+
+    /**
+     * @return boolean
      */
     public function canUserTakeOver()
     {
         $user = self::getUser();
         $user_id = $user->id;
-        $user_orgunit = OrgJednotka::dejOrgUzivatele();
-        // $isVedouci = $user->isAllowed(NULL, 'is_vedouci');
+        $ou = $user->getOrgUnit();
 
         if (!$this->is_forwarded)
             return false;
 
-        if ($user_orgunit !== null && $user->isAllowed('Dokument', 'menit_moje_oj') && $user_orgunit == $this->forward_orgunit_id)
+        if ($ou && $user->isAllowed('Dokument', 'menit_moje_oj') && $ou->id === $this->forward_orgunit_id)
             return true;
 
-         /* Toto by asi chtelo zmenit, namisto opravneni is_vedouci ma vedouci mit menit_moje_oj
-          * if ($this->forward_user_id === null) {
-            // Dokument predany pouze na org. jednotku
-            if ($isVedouci && $user_orgunit !== null)
-                return $user_orgunit == $this->forward_orgunit_id;
-
-            return false;
-        }
-        */
-        
         return $this->forward_user_id == $user_id;
     }
 
@@ -117,15 +116,22 @@ class Document extends DBEntity
     {
         dibi::begin();
         try {
+            if (!$this->canUserForward())
+                throw new Exception('Dokument není možné předat.');
+
             $Log = new LogModel();
 
             if ($user_id) {
                 $person = Person::fromUserId($user_id);
                 $log = "Dokument předán zaměstnanci $person.";
                 $log_spis = "Spis předán zaměstnanci $person.";
-                if (!$orgjednotka_id)
-                    $orgjednotka_id = OrgJednotka::dejOrgUzivatele($user_id);
-            } else if ($orgjednotka_id) {
+                if ($orgjednotka_id === null) {
+                    $account = new UserAccount($user_id);
+                    $ou = $account->getOrgUnit();
+                    if ($ou)
+                        $orgjednotka_id = $ou->id;
+                }
+            } else if ($orgjednotka_id !== null) {
                 $ou = new OrgUnit($orgjednotka_id);
                 $log = "Dokument předán organizační jednotce $ou.";
                 $log_spis = "Spis předán organizační jednotce $ou.";
@@ -156,7 +162,7 @@ class Document extends DBEntity
             $message .= "\nPředání dokumentu se nepodařilo.";
             if ($this->getSpis())
                 $message .= ' Dokument je ve spisu, možná nejste oprávněn měnit některé dokumenty ve spisu.';
-                
+
             throw new Exception($message, null, $e);
         }
 
@@ -179,7 +185,10 @@ class Document extends DBEntity
             return false;
 
         $user = self::getUser();
-        $user_orgunit = OrgJednotka::dejOrgUzivatele();
+        $user_orgunit = $user->getOrgUnit();
+        if ($user_orgunit)
+            $user_orgunit = $user_orgunit->id;
+
         $log_plus = "";
         if (!$this->forward_user_id)
             $log_plus = " určený organizační jednotce " . new OrgUnit($this->forward_orgunit_id);
@@ -266,4 +275,59 @@ class Document extends DBEntity
             throw $e;
         }
     }
+
+    /** Vrátí základní informaci, co uživatel může s dokumentem provádět.
+     * @return array
+     */
+    public function getUserPermissions()
+    {
+        $user = self::getUser();
+
+        $change_own_unit = $user->isAllowed('Dokument', 'menit_moje_oj');
+        $view_own_unit = $user->isAllowed('Dokument', 'cist_moje_oj');
+        $view_all = $user->isAllowed('Dokument', 'cist_vse');
+
+        // Uzivatel muze byt vedoucim jenom jednoho utvaru
+        $org_unit = $user->getOrgUnit();
+        $permitted_org_units = [];
+        if ($org_unit)
+            $permitted_org_units = $user->isVedouci() ? OrgJednotka::childOrg($org_unit->id) : [$org_unit->id];
+
+        $cancel_forwarding = false;
+        $perm_take_over = false;
+        $perm_edit = $this->owner_user_id == $user->id || $change_own_unit && in_array($this->owner_orgunit_id,
+                        $permitted_org_units);
+        $perm_view = $perm_edit || $view_all || $view_own_unit && in_array($this->owner_orgunit_id,
+                        $permitted_org_units);
+        if ($this->is_forwarded) {
+            $perm_take_over = $this->forward_user_id == $user->id || $change_own_unit && in_array($this->forward_orgunit_id,
+                            $permitted_org_units);
+            $cancel_forwarding = $perm_edit;
+            $perm_view = $perm_view || $perm_take_over || $view_own_unit && in_array($this->forward_orgunit_id,
+                            $permitted_org_units);
+            $perm_edit = false; // Pokud je dokument ve stavu predani, zakaz praci s nim
+        }
+
+        if ($this->stav >= DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA)
+            $perm_edit = false;
+
+        return [
+            'view' => $perm_view,
+            'edit' => $perm_edit,
+            'take_over' => $perm_take_over,
+            'cancel_forwarding' => $cancel_forwarding,
+        ];
+    }
+
+    /**
+     * Existuje odpoved (dokument) na tento dokument?
+     * @return boolean
+     */
+    public function doesReplyExist()
+    {
+        $count = dibi::query("SELECT COUNT(*) FROM %n WHERE [id] != $this->id AND [cislo_jednaci] = %s",
+                        self::TBL_NAME, $this->cislo_jednaci)->fetchSingle();
+        return $count != 0;
+    }
+
 }

@@ -3,57 +3,43 @@
 
 <h2>Datová schránka</h2>
 
-<p n:if="$vice_datovych_schranek"><a href="{link novaschranka, 'typ' => 'i'}">Přidat schránku</a></p>
+{* <p n:if="$vice_datovych_schranek"><a href="{link novaschranka, 'typ' => 'i'}">Přidat schránku</a></p> *}
 
-{if count($n_isds)}
-    {foreach $n_isds as $index => $isds}
-        <div class="detail_blok">
-            <dl>
-                <dt></dt>
-                <dd>
-                    {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id' => 'i'.$index}">
-                        {$isds['ucet']}
-                    </a>{/access}
-                </dd>
-            </dl>
-            {if !Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
-                <dl>
-                    <dt>ID datové schránky:</dt>
-                    <dd>{$isds['idbox']}</dd>
-                </dl>
-                <dl>
-                    <dt>Vlastník DS:</dt>
-                    <dd>{$isds['vlastnik']}</dd>
-                </dl>
-                <dl>
-                    <dt>Stav DS:</dt>
-                    <dd>{$isds['stav']}</dd>
-                </dl>
-            {/if}
-            <dl>
-                <dt>Podatelna pro příjem této DS:</dt>
-                <dd>{if empty($isds['podatelna'])}kterákoli{else}{=Orgjednotka::getName($isds['podatelna'])}{/if}</dd>
-            </dl>
-        </div>
-    {/foreach}
-{else}
-    <div class="prazdno">Nebyly nalezeny žádné účty datových schránek.</div>
-{/if}
+<div class="detail_blok">
+    <dl>
+        <dt></dt>
+        <dd>
+            <a href="{link detail, 'i'}">{$isds['ucet']}</a>
+        </dd>
+    </dl>
+    {if !Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
+        <dl>
+            <dt>ID datové schránky:</dt>
+            <dd>{$isds['idbox']}</dd>
+        </dl>
+        <dl>
+            <dt>Vlastník DS:</dt>
+            <dd>{$isds['vlastnik']}</dd>
+        </dl>
+    {/if}
+    <dl>
+        <dt>Podatelna pro příjem této DS:</dt>
+        <dd>{if empty($isds['podatelna'])}kterákoli{else}{= new OrgUnit($isds['podatelna'])}{/if}</dd>
+    </dl>
+</div>
 
 
 <h2>Emailové schránky</h2>
 
 <p><a href="{link novaschranka, 'typ'=>'e'}">Přidat schránku</a></p>
 
-{if count($n_email)>0}
-    {foreach $n_email as $index => $email}
+{if count($email_config)>0}
+    {foreach $email_config as $index => $email}
         <div class="detail_blok">
             <dl>
                 <dt></dt>
                 <dd>
-                    {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id'=>'e'.$index}">
-                        {$email['ucet']}
-                    </a>{/access}
+                    <a href="{link detail, 'id'=>'e'.$index}">{$email['ucet']}</a>
                 </dd>
             </dl>
             <dl>
@@ -76,7 +62,7 @@
             </dl>
             <dl>
                 <dt>Podatelna pro příjem této schránky:</dt>
-                <dd>{if empty($email['podatelna'])}kterákoli{else}{=Orgjednotka::getName($email['podatelna'])}{/if}</dd>
+                <dd>{if empty($email['podatelna'])}kterákoli{else}{= new OrgUnit($email['podatelna'])}{/if}</dd>
             </dl>
         </div>
     {/foreach}
@@ -86,25 +72,17 @@
 
 <h2>Odesílání přes email</h2>
 
-{if count($n_odeslani)}
-    {foreach $n_odeslani as $index => $odes}
-        <div class="detail_blok">
-            <dl>
-                <dt></dt>
-                <dd>
-                    {access :Admin:Epodatelna:}<a href="{link :Admin:Epodatelna:detail, 'id' => "o$index"}">
-                        {$odes['ucet']}
-                    </a>{/access}
-                </dd>
-            </dl>
-            <dl>
-                <dt>E-mailová adresa odesilatele:</dt>
-                <dd>{$odes['email']}</dd><br />
-                <dt>Elektronicky podepisovat:</dt>
-                <dd>{$odes['podepisovat'] ? 'ano' : 'ne'}</dd>
-            </dl>
-        </div>
-    {/foreach}
-{else}
-    <div class="prazdno">Nebyly nalezeny žádné účty datových schránek</div>
-{/if}
+<div class="detail_blok">
+    <dl>
+        <dt></dt>
+        <dd>
+            <a href="{link detail, 'o'}">{$odes_config['ucet']}</a>
+        </dd>
+    </dl>
+    <dl>
+        <dt>E-mailová adresa odesilatele:</dt>
+        <dd>{$odes_config['email']}</dd><br />
+        <dt>Elektronicky podepisovat:</dt>
+        <dd>{$odes_config['podepisovat'] ? 'ano' : 'ne'}</dd>
+    </dl>
+</div>
