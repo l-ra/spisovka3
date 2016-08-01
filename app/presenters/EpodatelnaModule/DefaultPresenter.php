@@ -541,7 +541,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 if (!$insert['email_signed']) {
                     // email neobsahuje epodpis
                     $insert['stav'] = 100;
-                    $insert['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje elektronický podpis.';
+                    $insert['stav_info'] = 'E-mailová zpráva byla odmítnuta. Neobsahuje elektronický podpis.';
                 } else if ($mailbox['qual_signature'] == true) {
                     // pouze kvalifikovane
                     $tmp_filename = tempnam(TEMP_DIR, 'emailtest');
@@ -552,15 +552,31 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     if (!$result['ok']) {
                         // neobsahuje kvalifikovany epodpis
                         $insert['stav'] = 100;
-                        $insert['stav_info'] = 'Emailová zpráva byla odmítnuta. Neobsahuje kvalifikovaný elektronický podpis';
+                        $insert['stav_info'] = 'E-mailová zpráva byla odmítnuta. Neobsahuje kvalifikovaný elektronický podpis';
                     }
                 }
             }
 
             $epod_id = $this->Epodatelna->insert($insert);
 
-            if ($insert['stav'] == 100)
-                continue; // odmitnout, nepokracovat dale. TODO: odeslat upozorneni odesilateli.
+            if ($insert['stav'] == 100) {
+                try {
+                    $reply_address = !empty($message->reply_toaddress) ? $message->reply_toaddress
+                                : $message->fromaddress;
+                    $mail = new ESSMail;
+                    $mail->setFromConfig();
+                    $mail->addTo($reply_address);
+                    $mail->setSubject("Re: $predmet");
+                    $mail->setBody($insert['stav_info']);
+                    $mail->appendSignature($this->user);
+
+                    $mail->send();
+                } catch (Exception $e) {
+                    // ignoruj pripadnou chybu
+                    $e->getMessage();
+                }
+                continue; // odmitnout, nepokracovat dale.
+            }
 
             $data = array(
                 'filename' => 'ep_email_' . $epod_id . '.eml',

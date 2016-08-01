@@ -8,6 +8,9 @@ Nové funkce:
 
 - u odeslaných zpráv v e-podatelně se nyní zobrazuje jméno uživatele, který
   zprávu odeslal
+- pokud je e-podatelna nastavena, aby odmítala e-maily bez elektronického
+  podpisu, odesilateli se při odmítnutí odešle zpráva s informací o důvodu
+  odmítnutí
 - usnadněn a zrychlen výběr spisu při vkládání dokumentu do spisu
 - sloupce, které se mají v sestavách zobrazit je nyní možné přesně určit,
   včetně jejich pořadí
