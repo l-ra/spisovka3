@@ -137,7 +137,7 @@ class Install_DefaultPresenter extends BasePresenter
                 'passed' => $mail_function,
                 'message' => 'Ano',
                 'errorMessage' => 'Funkce mail() je zakázána.',
-                'description' => 'Je potřeba pro odesílání emailových zpráv.',
+                'description' => 'Je potřeba pro odesílání e-mailových zpráv.',
             ),
             array(
                 'title' => 'Nastavení allow_url_fopen',
@@ -177,7 +177,7 @@ class Install_DefaultPresenter extends BasePresenter
                 'passed' => $imap_support,
                 'message' => $imap_version,
                 'errorMessage' => 'Není zapnuto rozšíření IMAP',
-                'description' => 'Je potřeba pro příjem emailových zpráv.',
+                'description' => 'Je potřeba pro příjem e-mailových zpráv.',
             ),
             array(
                 'title' => 'Rozšíření Fileinfo',
@@ -696,7 +696,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         $form1->addText('telefon', 'Telefon:', 50, 100)
                 ->setValue($Urad->kontakt->telefon);
-        $form1->addText('email', 'Email:', 50, 100)
+        $form1->addText('email', 'E-mail:', 50, 100)
                 ->setValue($Urad->kontakt->email);
         $form1->addText('www', 'URL:', 50, 150)
                 ->setValue($Urad->kontakt->www);
@@ -809,7 +809,7 @@ class Install_DefaultPresenter extends BasePresenter
                         'Alespoň příjmení správce musí být vyplněno.');
         $form1->addText('titul_pred', 'Titul před:', 50, 150);
         $form1->addText('titul_za', 'Titul za:', 50, 150);
-        $form1->addText('email', 'Email:', 50, 150);
+        $form1->addText('email', 'E-mail:', 50, 150);
         $form1->addText('telefon', 'Telefon:', 50, 150);
         $form1->addText('pozice', 'Funkce:', 50, 150);
 

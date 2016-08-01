@@ -98,7 +98,7 @@ zkontrolovatSchranku = function (nacist_nove_zpravy) {
 
     $.get(url, function (data) {
         $('#zkontrolovat_status').html(data);
-        // nacteni novych zprav z database se musi provest az po stazeni vsech zprav z emailove schranky
+        // nacteni novych zprav z database se musi provest az po stazeni vsech zprav z e-mailove schranky
         if (nacist_nove_zpravy)
             nactiZpravy();
         else
@@ -236,7 +236,7 @@ generujZpravu = function (data) {
                 '                        <dd><input type="checkbox" name="odmitnout" /> Poslat upozornění odesilateli?</dd>' +
                 '                    </dl>' +
                 '                    <dl>' +
-                '                        <dt>Email odesílatele:</dt>' +
+                '                        <dt>E-mail odesílatele:</dt>' +
                 '                        <dd><input type="text" name="zprava_email" value="' + data['odesilatel'] + '" size="60" /></dd>' +
                 '                    </dl>' +
                 '                    <dl>' +

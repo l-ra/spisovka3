@@ -181,9 +181,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 if (is_string($result))
                     echo $result . '<br />';
                 else if ($result > 0) {
-                    echo "Z emailové schránky \"" . $email_config['ucet'] . "\" bylo přijato $result nových zpráv.<br />";
+                    echo "Z e-mailové schránky \"" . $email_config['ucet'] . "\" bylo přijato $result nových zpráv.<br />";
                 } else {
-                    echo 'V emailové schránce "' . $email_config['ucet'] . '" nebyly zjištěny žádné nové zprávy.<br />';
+                    echo 'V e-mailové schránce "' . $email_config['ucet'] . '" nebyly zjištěny žádné nové zprávy.<br />';
                 }
             }
         }
@@ -401,7 +401,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                                 'dir' => 'EP-I-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
                                 'typ' => '5',
                                 'popis' => 'Podepsaný originál ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
-                                    //'popis'=>'Emailová zpráva'
                             );
 
                             $signedmess = $isds->SignedMessageDownload($z->dmID);
@@ -410,7 +409,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                                 // ok
                             } else {
                                 $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
-                                // false
                             }
 
                             /* Ulozeni reprezentace zpravy */
@@ -419,7 +417,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                                 'dir' => 'EP-I-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
                                 'typ' => '5',
                                 'popis' => 'Byte-stream reprezentace ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
-                                    //'popis'=>'Emailová zpráva'
                             );
 
                             if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {
@@ -455,7 +452,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
     }
 
-    /** Stáhne nové zprávy z emailové schránky a uloží je do e-podatelny.
+    /** Stáhne nové zprávy z e-mailové schránky a uloží je do e-podatelny.
      * @param array $mailbox
      * @return string|int  počet nových zpráv nebo řetězec s popisem chyby
      */
@@ -466,7 +463,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
         $success = $imap->connect($connection_string, $mailbox['login'], $mailbox['password']);
         if (!$success) {
-            $msg = 'Nepodařilo se připojit k emailové schránce "' . $mailbox['ucet'] . '"!<br />
+            $msg = 'Nepodařilo se připojit k e-mailové schránce "' . $mailbox['ucet'] . '"!<br />
                     IMAP chyba: ' . $imap->error();
             return $msg;
         }
@@ -507,7 +504,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $popis = substr($popis, 0, 10000);
 
             if (empty($message->subject)) {
-                $predmet = "[Bez předmětu] Emailová zpráva";
+                $predmet = "[Bez předmětu] E-mailová zpráva";
                 if (!empty($message->fromaddress))
                     $predmet .= " od $message->fromaddress";
             } else
@@ -582,8 +579,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 'filename' => 'ep_email_' . $epod_id . '.eml',
                 'dir' => 'EP-I-' . sprintf('%06d', $insert['poradi']) . '-' . $insert['rok'],
                 'typ' => '5',
-                'popis' => 'Emailová zpráva z epodatelny ' . $insert['poradi'] . '-' . $insert['rok']
-                    //'popis'=>'Emailová zpráva'
+                'popis' => 'E-mailová zpráva z epodatelny ' . $insert['poradi'] . '-' . $insert['rok']
             );
 
             if ($file = $UploadFile->uploadEpodatelna($raw_message, $data)) {

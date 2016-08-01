@@ -156,7 +156,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                 ->addRule(Form::FILLED, 'Příjmení musí být vyplněno!');
         $form1->addText('titul_pred', 'Titul před:', 50, 150);
         $form1->addText('titul_za', 'Titul za:', 50, 150);
-        $form1->addText('email', 'Email:', 50, 150)
+        $form1->addText('email', 'E-mail:', 50, 150)
                 ->addCondition(Form::FILLED)
                     ->addRule(Form::EMAIL);
         $form1->addText('telefon', 'Telefon:', 50, 150);

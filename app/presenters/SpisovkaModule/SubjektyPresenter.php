@@ -102,7 +102,7 @@ class SubjektyPresenter extends BasePresenter
         $form1->addSelect('adresa_stat', 'Stát:', $stat_select)
                 ->setValue('CZE');
 
-        $form1->addText('email', 'Email:', 50, 250);
+        $form1->addText('email', 'E-mail:', 50, 250);
         $form1->addText('telefon', 'Telefon:', 50, 150);
 
         $description = \Nette\Utils\Html::el('a')

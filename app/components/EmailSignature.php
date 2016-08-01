@@ -34,13 +34,13 @@ class EmailSignature extends \Nette\Application\UI\Control
             $is_signed = $this->checkIfSigned();
 
         if (!$is_signed) {
-            echo "Email není podepsán.";
+            echo "E-mail není podepsán.";
             return;
         }
         
         $filename = $this->message->getEmailFile($this->storage);
         if (!$filename) {
-            echo "Nemohu najít soubor s emailem.";
+            echo "Nemohu najít soubor s e-mailem.";
             return;
         }
         

@@ -166,7 +166,7 @@ class Document extends DBEntity
             throw new Exception($message, null, $e);
         }
 
-        // posli upozorneni emailem
+        // posli upozorneni e-mailem
         try {
             if ($user_id) {
                 Notifications::notifyUser($user_id, Notifications::RECEIVE_DOCUMENT,

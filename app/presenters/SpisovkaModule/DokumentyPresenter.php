@@ -1136,7 +1136,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
         }
 
-        // doručení emailem a DS nastavuje systém, to uživatel nesmí měnit
+        // doručení e-mailem a DS nastavuje systém, to uživatel nesmí měnit
         if ($lze_menit_urcita_pole && $Dok->typ_dokumentu->smer == 0 && !in_array($Dok->zpusob_doruceni_id,
                         [1, 2])) {
             $zpusob_doruceni = Dokument::zpusobDoruceni(2);
@@ -1502,7 +1502,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     // neodesilat - nebudeme delat nic
                     continue;
                 } elseif ($metoda_odeslani == 1) {
-                    // emailem
+                    // e-mailem
                     if (!isset($data['email_from_' . $subjekt_id]))
                     // neposilej mail, kdyz nemame adresu odesilatele
                     // (podformular odeslani mailem neexistuje)
@@ -1520,17 +1520,17 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         if ($zprava = $this->odeslatEmailem($adresat, $data, $prilohy)) {
                             $Log = new LogModel();
                             $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,
-                                    'Dokument odeslán emailem na adresu "' . Subjekt::displayName($adresat,
+                                    'Dokument odeslán e-mailem na adresu "' . Subjekt::displayName($adresat,
                                             'email') . '".');
-                            $this->flashMessage('Zpráva na emailovou adresu "' . Subjekt::displayName($adresat,
+                            $this->flashMessage('Zpráva na e-mailovou adresu "' . Subjekt::displayName($adresat,
                                             'email') . '" byla úspěšně odeslána.');
                             $stav = 2;
                         } else {
                             $Log = new LogModel();
                             $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,
-                                    'Dokument se nepodařilo odeslat emailem na adresu "' . Subjekt::displayName($adresat,
+                                    'Dokument se nepodařilo odeslat e-mailem na adresu "' . Subjekt::displayName($adresat,
                                             'email') . '".');
-                            $this->flashMessage('Zprávu na emailovou adresu "' . Subjekt::displayName($adresat,
+                            $this->flashMessage('Zprávu na e-mailovou adresu "' . Subjekt::displayName($adresat,
                                             'email') . '" se nepodařilo odeslat!', 'warning');
                             $stav = 0;
                             continue;
@@ -1545,7 +1545,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     } else {
                         $this->flashMessage('Subjekt "' . Subjekt::displayName($adresat,
                                         'jmeno')
-                                . '" nemá emailovou adresu. Zprávu tomuto adresátovi nelze poslat přes email!',
+                                . '" nemá e-mailovou adresu. Zprávu tomuto adresátovi nelze poslat přes e-mail!',
                                 'warning');
                         continue;
                     }
@@ -1894,16 +1894,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
                     'typ' => '5',
                     'popis' => 'Podepsaný originál ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
-                        //'popis'=>'Emailová zpráva'
                 );
 
                 $signedmess = $isds->SignedSentMessageDownload($id_mess);
 
-                if ($file_o = $UploadFile->uploadEpodatelna($signedmess, $data)) {
-                    // ok
-                } else {
-                    // $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
-                }
+                $file_o = $UploadFile->uploadEpodatelna($signedmess, $data);
 
                 /* Ulozeni reprezentace zpravy */
                 $data = array(
@@ -1911,7 +1906,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
                     'typ' => '5',
                     'popis' => ' Byte-stream reprezentace ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
-                        //'popis'=>'Emailová zpráva'
                 );
 
                 if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {

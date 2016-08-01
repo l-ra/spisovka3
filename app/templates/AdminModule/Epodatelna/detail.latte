@@ -8,9 +8,9 @@
 {if $Typ == 'i'}
     <h2>{$Info['ucet']} - datová schránka</h2>
 {elseif $Typ == 'e'}
-    <h2>{$Info['ucet']} - emailová schránka</h2>
+    <h2>{$Info['ucet']} - e-mailová schránka</h2>
 {elseif $Typ == 'o'}
-    <h2>{$Info['ucet']} - odesílání přes email</h2>
+    <h2>{$Info['ucet']} - odesílání přes e-mail</h2>
 {else}
     <h2>{$Info['ucet']}</h2>
 {/if}
@@ -168,7 +168,7 @@
                             pouze zprávy obsahující e-podpis (jakákoli certifikační autorita)
                         {/if}
                     {else}
-                        jakékoli emailové zprávy
+                        jakékoli e-mailové zprávy
                     {/if}
                 </dd>
             </dl>
@@ -185,7 +185,7 @@
             {control nastavitOdesForm}
         {else}
             <dl>
-                <dt>Emailová adresa odesilatele:</dt>
+                <dt>E-mailová adresa odesilatele:</dt>
                 <dd>{$Info['email']}</dd><br/>
                 <dt>Elektronicky podepisovat:</dt>
                 <dd>{$Info['podepisovat'] ? 'ano' : 'ne'}</dd><br />

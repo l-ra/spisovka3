@@ -82,7 +82,7 @@ class Subjekt extends BaseModel
                 $sql = array(
                     'cols' => $cols,
                     /* 'order'=> array('nazev_subjektu','prijmeni','jmeno') */
-                    /* P.L. nechapu, proc se zde zabyvat komplikovanym razenim. Subjekt s danou emailovou adresou bude obvykle jeden, ne? */
+                    /* P.L. nechapu, proc se zde zabyvat komplikovanym razenim. Subjekt s danou e-mailovou adresou bude obvykle jeden, ne? */
                     'order_sql' => 'CONCAT(nazev_subjektu,prijmeni,jmeno)',
                     'where' => [['email = %s', $data->email]]
                 );

@@ -103,7 +103,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
             '0' => 'všechny',
             '1' => 'pouze doručené přes elektronickou podatelnu',
             /** Tato informace je nyní v metadatech dokumentu ve zpusobu doruceni
-             * '2' => 'pouze doručené přes email',
+             * '2' => 'pouze doručené přes e-mail',
              * '3' => 'pouze doručené přes datovou schránkou',
              */
             '4' => 'doručené mimo e-podatelnu',
@@ -278,7 +278,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $form->addText('adresa_psc', 'PSČ:', 10, 10)
                 ->setValue(@$hledat['adresa_psc']);
 
-        $form->addText('subjekt_email', 'Email:', 50, 250)
+        $form->addText('subjekt_email', 'E-mail:', 50, 250)
                 ->setValue(@$hledat['subjekt_email']);
         $form->addText('subjekt_telefon', 'Telefon:', 50, 150)
                 ->setValue(@$hledat['subjekt_telefon']);

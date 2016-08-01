@@ -104,7 +104,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         $form1->addText('telefon', 'Telefon:', 50, 100)
                 ->setValue($Urad->kontakt->telefon);
-        $form1->addText('email', 'Email:', 50, 100)
+        $form1->addText('email', 'E-mail:', 50, 100)
                 ->setValue($Urad->kontakt->email);
         $form1->addText('www', 'URL:', 50, 150)
                 ->setValue($Urad->kontakt->www);

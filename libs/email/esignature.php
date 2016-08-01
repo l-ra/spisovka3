@@ -101,9 +101,9 @@ class esignature
             $res = $this->verifyEmailAddress($cert, $filename, $email_cert, $email_real);
             $msg = "Podpis je platný.";
             if ($res === false) {
-                $msg .= " Ale emailová adresa odesilatele neodpovídá adrese v certifikátu.";
+                $msg .= " Ale e-mailová adresa odesilatele neodpovídá adrese v certifikátu.";
             } else if ($res === -1) {
-                $msg .= " Ale z certifikátu se nepodařilo zjistit emailovou adresu.";
+                $msg .= " Ale z certifikátu se nepodařilo zjistit e-mailovou adresu.";
             }
         } else {
             // podpis neprosel overenim
@@ -113,7 +113,7 @@ class esignature
                 // Chyba
                 if (strpos($error_string, "invalid mime type") !== false || strpos($error_string,
                                 "no content type") !== false) {
-                    $msg = "Email není podepsán.";
+                    $msg = "E-mail není podepsán.";
                 } else {
                     $msg = "Při ověřování podpisu došlo k chybě.";
                     if ($error_string)
@@ -229,7 +229,7 @@ class esignature
         if ($ok)
             return $signed_msg;
 
-        throw new Exception('Email se nepodařilo podepsat. SSL: ' . openssl_error_string());
+        throw new Exception('E-mail se nepodařilo podepsat. SSL: ' . openssl_error_string());
     }
 
     /**

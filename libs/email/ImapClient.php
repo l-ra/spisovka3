@@ -77,7 +77,7 @@ class ImapClient
     }
 
     /**
-     * Vraci pocet emailovych zprav ve schrance
+     * Vraci pocet e-mailovych zprav ve schrance
      * @return int
      */
     function count_messages()
@@ -88,7 +88,7 @@ class ImapClient
     }
 
     /**
-     * vraci seznam emailovych zprav
+     * vraci seznam e-mailovych zprav
      * @return array
      */
     function get_all_messages()

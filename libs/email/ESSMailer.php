@@ -41,7 +41,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         if ($config['podepisovat']) {
             $esign = new esignature();
             if (!$esign->setUserCert($config['cert'], $config['cert_pass']))
-                throw new Exception('Email nelze podepsat. Neplatný certifikát!');
+                throw new Exception('E-mail nelze podepsat. Neplatný certifikát!');
            
             $in_parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL,
                     $mail_source, 2);
@@ -73,7 +73,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             $mail_source = $esign->signMessage($mess1, $headers_array);
 
             if (is_null($mail_source))
-                throw new Exception('Email se nepodařilo podepsat.');
+                throw new Exception('E-mail se nepodařilo podepsat.');
 
             $mess_part = explode("\n\n", $mail_source, 2);
             $part_header = explode("\n", $mess_part[0]);
@@ -129,7 +129,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         restore_error_handler();
 
         if (!$res)
-            throw new Exception('Email se nepodařilo odeslat.');
+            throw new Exception('E-mail se nepodařilo odeslat.');
 
         return true;
     }

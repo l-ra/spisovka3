@@ -479,7 +479,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addCheckbox('aktivni', ' aktivní účet?');
         $form1->addSelect('typ', 'Protokol:', $typ_serveru)
                 ->addRule(Nette\Forms\Form::FILLED,
-                        'Vyberte protokol pro připojení k emailové schránce.');
+                        'Vyberte protokol pro připojení k e-mailové schránce.');
         $form1->addText('server', 'Adresa serveru:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED,
                         'Adresa poštovního serveru musí být vyplněna.');
@@ -546,7 +546,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         self::ulozNastaveni($config_data);
 
-        $this->flashMessage('Nastavení emailové schránky bylo upraveno.');
+        $this->flashMessage('Nastavení e-mailové schránky bylo upraveno.');
         $this->redirect('detail', array('id' => ('e' . $data['index'])));
     }
 
@@ -568,7 +568,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addText('ucet', 'Název účtu:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
         // $form1->addCheckbox('aktivni', ' aktivní účet?');
-        $form1->addText('email', 'Emailová adresa odesilatele:', 50, 100)
+        $form1->addText('email', 'E-mailová adresa odesilatele:', 50, 100)
                 ->addCondition(Form::FILLED)
                 ->addRule(Form::EMAIL);
 
@@ -693,7 +693,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $config_data = $config_data->toArray();
 
         $ucet = [];
-        $ucet['ucet'] = 'Nová emailová schránka';
+        $ucet['ucet'] = 'Nová e-mailová schránka';
         $ucet['aktivni'] = false;
         $ucet['typ'] = "/pop3/ssl/novalidate-cert";
         $ucet['server'] = '';

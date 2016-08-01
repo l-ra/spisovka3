@@ -20,7 +20,7 @@ class EmailAvizo {
                 $mail->setSubject("Re: ".$data->predmet." [Zpráva přijata]");
             }
             
-            $zprava = "Váše emailová zpráva byla přijata podatelnou dne ". date("j.n.Y G:i:s") ." a bude předána ke zpracování.";
+            $zprava = "Váše e-mailová zpráva byla přijata podatelnou dne ". date("j.n.Y G:i:s") ." a bude předána ke zpracování.";
             
             $mail->setBodySign($zprava);
         
@@ -34,7 +34,7 @@ class EmailAvizo {
     
     /**
      * Metoda vytvoří email, ale nikam jej neposílá!
-     * @param string $komu - emailová adresa
+     * @param string $komu - e-mailová adresa
      * @param array $data - název emailu?
      * @return boolean
      */
@@ -58,7 +58,7 @@ class EmailAvizo {
                 $mail->setSubject("Re: " . $data['nazev'] . " [Zpráva zaevidována]");
             }
 
-            $zprava = "Vaše emailová zpráva byla zaevidována dne " . date("j.n.Y G:i:s") . " pod číslem " . $data['jid'] . " a bude co nejdříve vyřízena.";
+            $zprava = "Vaše e-mailová zpráva byla zaevidována dne " . date("j.n.Y G:i:s") . " pod číslem " . $data['jid'] . " a bude co nejdříve vyřízena.";
 
             //if ( !empty($data['predano']) ) {
             //    $zprava .= "\n\nPředano: ". $data['predano'];

@@ -357,7 +357,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'filename' => 'emailova_zprava.eml',
                 'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
                 'typ' => '5',
-                'popis' => 'Originální emailová zpráva'
+                'popis' => 'Originální e-mailová zpráva'
             );
 
             if ($filep = $storage->uploadDocument($email_contents, $data)) {
@@ -430,7 +430,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 //                    'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
 //                    'typ' => '5',
 //                    'popis' => 'Podepsaná originální datová zpráva'
-//                        //'popis'=>'Emailová zpráva'
 //                );
 //
 //                if ($filep = $storage->uploadDocument($zfo, $data)) {

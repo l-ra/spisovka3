@@ -199,7 +199,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
                             ->setValue($user['prijmeni']);
                     $cont->addText('jmeno', 'Jméno:')
                             ->setValue($user['jmeno']);
-                    $cont->addText('email', 'Email:')
+                    $cont->addText('email', 'E-mail:')
                             ->setValue($user['email'])
                             ->addCondition(Nette\Forms\Form::FILLED)
                                 ->addRule(Nette\Forms\Form::EMAIL);

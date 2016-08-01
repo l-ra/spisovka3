@@ -13,7 +13,7 @@
             {if $odes->zpusob_odeslani_id == 1}
                 <strong>{=Subjekt::displayName($odes,'email')}</strong>
                 <br />
-                odesláno emailem
+                odesláno e-mailem
             {elseif $odes->zpusob_odeslani_id == 2 && $odes->stav_odeslani == 1}
                 <strong>{=Subjekt::displayName($odes,'isds')}</strong>
                 <br />

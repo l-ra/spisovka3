@@ -52,7 +52,7 @@ class ESSMail extends Nette\Mail\Message
         if (!empty($urad->kontakt->telefon))
             $tmp .= "telefon: " . $urad->kontakt->telefon . " \n";
         if (!empty($urad->kontakt->email))
-            $tmp .= "email: " . $urad->kontakt->email . " \n";
+            $tmp .= "e-mail: " . $urad->kontakt->email . " \n";
         if (!empty($urad->kontakt->www))
             $tmp .= "url: " . $urad->kontakt->www . " \n";
 

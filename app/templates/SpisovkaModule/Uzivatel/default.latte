@@ -12,15 +12,15 @@
             <dd>{=Osoba::displayName($Osoba)}</dd>
         </dl>
         <dl>
-            <dt>email:</dt>
+            <dt>E-mail:</dt>
             <dd>{$Osoba->email}</dd>
         </dl>
         <dl>
-            <dt>telefon:</dt>
+            <dt>Telefon:</dt>
             <dd>{$Osoba->telefon}</dd>
         </dl>
         <dl>
-            <dt>funkce:</dt>
+            <dt>Funkce:</dt>
             <dd>{$Osoba->pozice}</dd>
         </dl>
         <a n:if="Settings::get('users_can_change_their_data')" href="{link this, 'upravit' => 'info'}">Upravit osobní údaje</a>
