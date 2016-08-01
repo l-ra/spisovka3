@@ -189,6 +189,8 @@ E-podatelna:
   hodnota "v listinné podobě".
 - opravena chyba, která bránila elektronickému podepisování odchozích e-mailů
 - v nastavení podepisování se už nezobrazuje heslo k souboru s certifikátem
+- při podepisování odchozích e-mailů, mohla být adresa odesilatele (From)
+  v e-mailu prázdná
 - datová zpráva (.zfo soubor) se už nyní nekopíruje do dokumentu (nevytváří se
   duplikát)
   

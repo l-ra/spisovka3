@@ -68,7 +68,8 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             $mess1 = implode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $in_parts);
 
             $headers_array = $mail->headers;
-            $headers_array['From'] = $mail->getEncodedHeader('From');
+            if (!empty($headers_array['From']))
+                $headers_array['From'] = $mail->getEncodedHeader('From');
 
             $mail_source = $esign->signMessage($mess1, $headers_array);
 
