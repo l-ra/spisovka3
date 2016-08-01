@@ -48,6 +48,10 @@
 :Admin:Nastaveni: { "upravit": "cjednaci" }
 :Admin:Nastaveni: { "upravit": "nastaveni" }
 :Admin:Epodatelna:
+:Admin:Epodatelna:detail { "id": "i" }
+:Admin:Epodatelna:detail { "id": "i", "upravit": 1 }
+:Admin:Epodatelna:detail { "id": "o" }
+:Admin:Epodatelna:detail { "id": "o", "upravit": 1 }
 :Admin:Spisy:seznam
 :Admin:Spisy:novy
 :Admin:Spisy:detail { "id": 52 }
