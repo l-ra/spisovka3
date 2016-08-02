@@ -6,12 +6,6 @@
 {* <p n:if="$vice_datovych_schranek"><a href="{link novaschranka, 'typ' => 'i'}">Přidat schránku</a></p> *}
 
 <div class="detail_blok">
-    <dl>
-        <dt></dt>
-        <dd>
-            <a href="{link detail, 'i'}">{$isds['ucet']}</a>
-        </dd>
-    </dl>
     {if !Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
         <dl>
             <dt>ID datové schránky:</dt>
@@ -26,6 +20,7 @@
         <dt>Podatelna pro příjem této DS:</dt>
         <dd>{if empty($isds['podatelna'])}kterákoli{else}{= new OrgUnit($isds['podatelna'])}{/if}</dd>
     </dl>
+    <a href="{link detail, 'i'}">Upravit</a>    
 </div>
 
 
@@ -37,16 +32,10 @@
     {foreach $email_config as $index => $email}
         <div class="detail_blok">
             <dl>
-                <dt></dt>
-                <dd>
-                    <a href="{link detail, 'id'=>'e'.$index}">{$email['ucet']}</a>
-                </dd>
-            </dl>
-            <dl>
+                <dt>Název:</dt>
+                <dd>{$email['ucet']}</dd><br />
                 <dt>Server:</dt>
-                <dd>{$email['protokol']} - {$email['server']}:{$email['port']} / {$email['inbox']}</dd>
-            </dl>
-            <dl>
+                <dd>{$email['protokol']} - {$email['server']}:{$email['port']} / {$email['inbox']}</dd><br />
                 <dt>Příjem:</dt>
                 <dd>
                     {if $email['only_signature']==1}
@@ -58,12 +47,11 @@
                     {else}
                         všechny e-mailové zprávy
                     {/if}
-                </dd>
-            </dl>
-            <dl>
+                </dd><br />
                 <dt>Podatelna pro příjem této schránky:</dt>
                 <dd>{if empty($email['podatelna'])}kterákoli{else}{= new OrgUnit($email['podatelna'])}{/if}</dd>
             </dl>
+            <a href="{link detail, 'e'.$index}">Upravit</a>
         </div>
     {/foreach}
 {else}
@@ -74,15 +62,10 @@
 
 <div class="detail_blok">
     <dl>
-        <dt></dt>
-        <dd>
-            <a href="{link detail, 'o'}">{$odes_config['ucet']}</a>
-        </dd>
-    </dl>
-    <dl>
         <dt>E-mailová adresa odesilatele:</dt>
         <dd>{$odes_config['email']}</dd><br />
         <dt>Elektronicky podepisovat:</dt>
         <dd>{$odes_config['podepisovat'] ? 'ano' : 'ne'}</dd>
     </dl>
+    <a href="{link detail, 'o'}">Upravit</a>
 </div>

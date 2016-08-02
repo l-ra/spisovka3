@@ -152,8 +152,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 ->setValue('i');
 
         $form1->addGroup();
-        $form1->addText('ucet', 'Název účtu:', 50, 100)
-                ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
         $form1->addCheckbox('aktivni', ' aktivní účet?');
 
         $form1->addRadioList('zpusob_prihlaseni', 'Způsob přihlášení:',
@@ -194,7 +192,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $group->getOption('container')->style('display: none');
         $form1['zpusob_prihlaseni']->setDefaultValue((int) $individual_login);
 
-        $form1['ucet']->setDefaultValue($isds['ucet']);
         $form1['aktivni']->setDefaultValue($isds['aktivni']);
         try {
             $form1['typ_pripojeni']->setDefaultValue($isds['typ_pripojeni']);
@@ -262,7 +259,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
         unset($data['certifikat_file']);
 
-        $config_data['isds']['ucet'] = $data['ucet'];
         $config_data['isds']['aktivni'] = $data['aktivni'];
         $individual_login = (bool) $data['zpusob_prihlaseni'];
         Settings::set(self::ISDS_INDIVIDUAL_LOGIN, $individual_login);
@@ -565,9 +561,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue($typ);
-        $form1->addText('ucet', 'Název účtu:', 50, 100)
-                ->addRule(Nette\Forms\Form::FILLED, 'Název účtu musí být vyplněno.');
-        // $form1->addCheckbox('aktivni', ' aktivní účet?');
+        
         $form1->addText('email', 'E-mailová adresa odesilatele:', 50, 100)
                 ->addCondition(Form::FILLED)
                 ->addRule(Form::EMAIL);
@@ -587,8 +581,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->setCurrentGroup(null);
 
         $odes = $ep['odeslani'];
-        $form1['ucet']->setDefaultValue($odes['ucet']);
-        // $form1['aktivni']->setDefaultValue($odes['aktivni']);
         $form1['podepisovat']->setDefaultValue($odes['podepisovat']);
         if (!$odes->podepisovat)
             $group->getOption('container')->style('display: none');
@@ -646,7 +638,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         if ($chyba_pri_uploadu && !is_writeable(CLIENT_DIR . '/configs'))
             $this->flashMessage('Nemohu zapisovat do adresáře client/configs/.', 'warning');
 
-        $config_data['odeslani']['ucet'] = $data['ucet'];
         $config_data['odeslani']['aktivni'] = true;
         $config_data['odeslani']['podepisovat'] = $data['podepisovat'];
         $config_data['odeslani']['email'] = $data['email'];

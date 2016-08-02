@@ -1397,7 +1397,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $ep = (new Spisovka\ConfigEpodatelna())->get();
         $odes = $ep['odeslani'];
         $adresa = empty($odes['jmeno']) ? $odes['email'] : "{$odes['jmeno']} <{$odes['email']}>";
-        $odesilatele = ['system' => "$adresa [{$odes['ucet']}]"];
+        $odesilatele = ['system' => "$adresa [společná e-mailová adresa]"];
 
         $person = Person::fromUserId($this->user->id);
         if (!empty($person->email)) {

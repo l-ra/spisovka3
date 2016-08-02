@@ -6,13 +6,11 @@
 </div>
 
 {if $Typ == 'i'}
-    <h2>{$Info['ucet']} - datová schránka</h2>
+    <h2>Datová schránka</h2>
 {elseif $Typ == 'e'}
-    <h2>{$Info['ucet']} - e-mailová schránka</h2>
+    <h2>E-mailová schránka {$Info['ucet']}</h2>
 {elseif $Typ == 'o'}
-    <h2>{$Info['ucet']} - odesílání přes e-mail</h2>
-{else}
-    <h2>{$Info['ucet']}</h2>
+    <h2>Odesílání přes e-mail</h2>
 {/if}
 
 <div class="detail_blok">
