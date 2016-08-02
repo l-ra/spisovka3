@@ -623,7 +623,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 "cislo_jednaci_odesilatele" => "",
                 "datum_vzniku" => date('Y-m-d H:i:s'),
                 "lhuta" => "30",
-                "poznamka" => "",
             );
             $dokument_id = $Dokumenty->vytvorit($pred_priprava);
             $dokument = $Dokumenty->getInfo($dokument_id);
