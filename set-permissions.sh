@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 dirs="client/configs client/files/dokumenty client/files/epodatelna client/sessions client/temp log"
 echo Nastavení oprávnění pro adresáře spisovky
 if [[ "$(id -u)" != "0" ]]; then
