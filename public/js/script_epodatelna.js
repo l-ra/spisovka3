@@ -86,17 +86,39 @@ epodSubjektVybran = function (subjekt_id) {
     renderEpodSubjekty(subjekt_id);
 };
 
-zkontrolovatSchranku = function (nacist_nove_zpravy) {
+passwordPrompt = function () {
+    var dialog = $('#password_prompt').dialog({
+        height: 150,
+        width: 230,
+        modal: true,
+        closeOnEscape: false,
+        buttons: {
+            Ok: function () {
+                var password = $('input[type=password]').val();
+                dialog.dialog("close");
+                passwordCallback(password);
+            }
+        }
+    });
+};
+
+zkontrolovatSchranku = function (nacist_nove_zpravy, password) {
 
     // pro jistotu. Ošetři případ, že by byl parametr neuveden.
     if (typeof nacist_nove_zpravy === 'undefined')
         nacist_nove_zpravy = true;
 
+    var postdata = {};
+    if (password) {
+        // alert('Heslo je ' + password);
+        postdata = {password: password};
+    }
+
     $('#zkontrolovat_status').html('<img src="' + PUBLIC_URL + 'images/spinner.gif" width="14" height="14" /> Kontroluji schránky ...');
 
     var url = BASE_URL + 'epodatelna/default/zkontrolovat-ajax';
 
-    $.get(url, function (data) {
+    $.post(url, $.param(postdata), function (data) {
         $('#zkontrolovat_status').html(data);
         // nacteni novych zprav z database se musi provest az po stazeni vsech zprav z e-mailove schranky
         if (nacist_nove_zpravy)

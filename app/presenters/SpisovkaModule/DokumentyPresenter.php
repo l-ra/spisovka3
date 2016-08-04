@@ -858,6 +858,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $this->template->Dok = $dokument;
+        $this->template->VyzadatIsdsHeslo = Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN,
+                        false) && empty(UserSettings::get('isds_password'));
+        
+        $sznacka = "";
+        if (isset($this->template->Dok->spisy) && is_array($this->template->Dok->spisy)) {
+            $sznacka_A = array();
+            foreach ($this->template->Dok->spisy as $spis) {
+                $sznacka_A[] = $spis->nazev;
+            }
+            $sznacka = implode(", ", $sznacka_A);
+        }
+        $this->template->SpisovaZnacka = $sznacka;
     }
 
     public function renderOdeslat($id)
@@ -891,18 +903,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 'odesilani');
 
         $this->template->ZpusobyOdeslani = ZpusobOdeslani::getZpusoby();
-
-        $sznacka = "";
-        if (isset($this->template->Dok->spisy) && is_array($this->template->Dok->spisy)) {
-            $sznacka_A = array();
-            foreach ($this->template->Dok->spisy as $spis) {
-                $sznacka_A[] = $spis->nazev;
-            }
-            $sznacka = implode(", ", $sznacka_A);
-        }
-        $this->template->SpisovaZnacka = $sznacka;
     }
-
+    
     protected function createComponentNovyForm()
     {
         $form = $this->createNovyOrOdpovedForm();
@@ -1444,6 +1446,26 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             ->setDefaultValue($Dok->nazev);
                     $form->addTextArea("email_text_$sid", 'Text zprávy:', 80, 10);
                 }
+
+                // isds
+                if ($this->template->VyzadatIsdsHeslo)
+                    $form->addText("isds_heslo_$sid", 'Heslo do datové schránky:', 20)
+                            ->setRequired();
+
+                $form->addText("isds_predmet_$sid", 'Předmět zprávy:', 80)
+                        ->setRequired()
+                        ->setDefaultValue($Dok->nazev);
+                $form->addText("isds_cjednaci_odes_$sid", 'Číslo jednací odesílatele:', 50)
+                        ->setDefaultValue($Dok->cislo_jednaci);
+                $form->addText("isds_spis_odes_$sid", 'Spisová značka odesílatele:', 50)
+                        ->setDefaultValue($this->template->SpisovaZnacka);
+                $form->addText("isds_cjednaci_adres_$sid", 'Číslo jednací adresáta:', 50)
+                        ->setDefaultValue($Dok->cislo_jednaci_odesilatele);
+                $form->addText("isds_spis_adres_$sid", 'Spisová značka adresáta:', 50);
+                
+                $form->addCheckbox("isds_dvr_$sid", 'Do vlastních rukou?');
+                $form->addCheckbox("isds_fikce_$sid", 'Doručit fikcí?')
+                        ->setDefaultValue(true);
             }
 
         $form->addSubmit('odeslat', 'Předat podatelně či Odeslat')
@@ -1563,18 +1585,20 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         continue;
                     }
 
-                    $data = array(
+                    $isds_data = array(
                         'dokument_id' => $dokument_id,
-                        'isds_predmet' => $post_data['isds_predmet'][$subjekt_id],
-                        'isds_cjednaci_odes' => $post_data['isds_cjednaci_odes'][$subjekt_id],
-                        'isds_spis_odes' => $post_data['isds_spis_odes'][$subjekt_id],
-                        'isds_cjednaci_adres' => $post_data['isds_cjednaci_adres'][$subjekt_id],
-                        'isds_spis_adres' => $post_data['isds_spis_adres'][$subjekt_id],
-                        'isds_dvr' => isset($post_data['isds_dvr'][$subjekt_id]) ? true : false,
-                        'isds_fikce' => isset($post_data['isds_fikce'][$subjekt_id]) ? true : false,
+                        'isds_predmet' => $data['isds_predmet_' . $subjekt_id],
+                        'isds_cjednaci_odes' => $data['isds_cjednaci_odes_' . $subjekt_id],
+                        'isds_spis_odes' => $data['isds_spis_odes_' . $subjekt_id],
+                        'isds_cjednaci_adres' => $data['isds_cjednaci_adres_' . $subjekt_id],
+                        'isds_spis_adres' => $data['isds_spis_adres_' . $subjekt_id],
+                        'isds_dvr' => isset($data['isds_dvr_' . $subjekt_id]) ? true : false,
+                        'isds_fikce' => isset($data['isds_fikce_' . $subjekt_id]) ? true : false,
                     );
+                    if (isset($data['isds_heslo_' . $subjekt_id]))
+                        $isds_data['isds_heslo'] = $data['isds_heslo_' . $subjekt_id];
 
-                    if ($result = $this->odeslatISDS($adresat, $data, $prilohy)) {
+                    if ($result = $this->odeslatISDS($adresat, $isds_data, $prilohy)) {
                         $Log = new LogModel();
                         $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,
                                 'Dokument odeslán datovou zprávou na adresu "' . Subjekt::displayName($adresat,
@@ -1777,9 +1801,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $epod_id = null;
         $zprava = null;
         $popis = null;
+        $password = isset($data['isds_heslo']) ? $data['isds_heslo'] : null;
 
         try {
-            $isds = new ISDS_Spisovka();
+            $isds = new ISDS_Spisovka($password);
 
             $dmEnvelope = array(
                 "dbIDRecipient" => $adresat->id_isds,
@@ -1897,7 +1922,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 $signedmess = $isds->SignedSentMessageDownload($id_mess);
 
-                $file_o = $UploadFile->uploadEpodatelna($signedmess, $data);
+                $UploadFile->uploadEpodatelna($signedmess, $data);
 
                 /* Ulozeni reprezentace zpravy */
                 $data = array(

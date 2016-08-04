@@ -3,17 +3,28 @@
 {/block}
 {block content}
 
-    <h2>Nové příchozí zprávy</h2>
+<h2>Nové příchozí zprávy</h2>
 
-    {control seznamstatu}
+{control seznamstatu}
 
-    <div id="zkontrolovat_status"></div>
-    <script type="text/javascript">
+<div id="zkontrolovat_status"></div>
+<div id="password_prompt">
+    Zadejte heslo do datové schránky:<br />
+    <input name="password" type="password" />
+</div>
+<script type="text/javascript">
+    var linkNovySubjekt = {link :Spisovka:Subjekty:novy, f => zpravyNovySubjektOk};
+    var kopirovatEmailDoPoznamky = {Settings::get('epodatelna_copy_email_into_documents_note')};
+    {if !$RequestIsdsPassword}
         zkontrolovatSchranku({Settings::get('epodatelna_auto_load_new_messages')});
-        var linkNovySubjekt = {link :Spisovka:Subjekty:novy, f => zpravyNovySubjektOk};
-        var kopirovatEmailDoPoznamky = {Settings::get('epodatelna_copy_email_into_documents_note')};
-    </script>
+    {else}
+        var passwordCallback = function($password) {
+            zkontrolovatSchranku({Settings::get('epodatelna_auto_load_new_messages')}, $password);
+        };
+        passwordPrompt();
+    {/if}
+</script>
 
 
-    <div id="h_evidence" data-action="{link Evidence:ajaxHandler}">        
-    </div>
+<div id="h_evidence" data-action="{link Evidence:ajaxHandler}">        
+</div>

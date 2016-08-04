@@ -87,34 +87,16 @@
                         <tr id="odes_{$subjekt->id}_2" class="odes_form">
                             <td class="icon"></td>
                             <td colspan="2">
-                                <dl>
-                                    <dt>Předmět zprávy:</dt>
-                                    <dd><input type="text" name="isds_predmet[{$subjekt->id}]" value="{$Dok->nazev}" size="80" /></dd>
-                                </dl>
-                                <dl>
-                                    <dt>číslo jednací odesílatele:</dt>
-                                    <dd><input type="text" name="isds_cjednaci_odes[{$subjekt->id}]" value="{$Dok->cislo_jednaci}" size="50" /></dd>
-                                </dl>
-                                <dl>
-                                    <dt>Spisová značka odesílatele:</dt>
-                                    <dd><input type="text" name="isds_spis_odes[{$subjekt->id}]" value="{$SpisovaZnacka}" size="50" /></dd>
-                                </dl>
-                                <dl>
-                                    <dt>Číslo jednací adresáta:</dt>
-                                    <dd><input type="text" name="isds_cjednaci_adres[{$subjekt->id}]" value="{$Dok->cislo_jednaci_odesilatele}" size="50" /></dd>
-                                </dl>
-                                <dl>
-                                    <dt>Spisová značka adresáta:</dt>
-                                    <dd><input type="text" name="isds_spis_adres[{$subjekt->id}]" value="" size="50" /></dd>
-                                </dl>
-                                <dl>
-                                    <dt>Do vlastních rukou? :</dt>
-                                    <dd><input type="checkbox" name="isds_dvr[{$subjekt->id}]" /></dd>
-                                </dl>
-                                <dl>
-                                    <dt>Doručit fikcí? :</dt>
-                                    <dd><input type="checkbox" checked="checked" name="isds_fikce[{$subjekt->id}]" /></dd>
-                                </dl>
+                                {if $VyzadatIsdsHeslo}
+                                    {input2 "isds_heslo_$subjekt->id"}                                
+                                {/if}
+                                {input2 "isds_predmet_$subjekt->id"}                                
+                                {input2 "isds_cjednaci_odes_$subjekt->id"}                                
+                                {input2 "isds_spis_odes_$subjekt->id"}                                
+                                {input2 "isds_cjednaci_adres_$subjekt->id"}                                
+                                {input2 "isds_spis_adres_$subjekt->id"}                                
+                                {input2 "isds_dvr_$subjekt->id"}                                
+                                {input2 "isds_fikce_$subjekt->id"}                                
                             </td>
                         </tr>
                         <tr><td colspan="3" class="odeslat-subjekty-separator"></td></tr>

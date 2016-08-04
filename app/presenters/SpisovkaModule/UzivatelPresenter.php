@@ -352,8 +352,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $form1->addText('login', 'Uživatelské jméno:')
                 ->setRequired()
                 ->setValue(UserSettings::get('isds_login'));
-        $form1->addPassword('password', 'Heslo:')
-                ->setRequired();
+        $form1->addPassword('password', 'Heslo:');
 
         $form1->addSubmit('upravit', 'Upravit')
                 ->onClick[] = array($this, 'upravitIsdsBoxClicked');

@@ -10,7 +10,14 @@ class ISDS_Spisovka extends ISDS
         return Settings::get('isds_allow_more_boxes', false);
     }
 
-    public function __construct()
+    /**
+     * 
+     * @param string $password - aplikace si na přání zákazníka nemusí vůbec heslo ukládat
+     * @return boolean
+     * @throws Exception
+     * @throws Nette\FileNotFoundException
+     */
+    public function __construct($password = null)
     {
         // nastav parametry tridy ISDS
         $this->ssl_verify_peer = Settings::get('isds_ssl_verify_peer', true);
@@ -29,10 +36,13 @@ class ISDS_Spisovka extends ISDS
                         false);
         if ($individual_login) {
             $login = UserSettings::get('isds_login');
-            $password = UserSettings::get('isds_password');
-            if (!$login || !$password)
+            if (!$password)
+                $password = UserSettings::get('isds_password');            
+            if (!$login)
                 throw new Exception('Uživatel nemá vyplněny přihlašovací údaje do datové schránky.');
-
+            if (!$password)
+                throw new Exception('Nebylo zadáno heslo do datové schránky.');
+            
             parent::__construct($isds_portaltype, 0, $login, $password);
         } else if ($config['typ_pripojeni'] == 0) {
             // jmenem a heslem

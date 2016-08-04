@@ -140,13 +140,19 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     public function renderZkontrolovat()
     {
         new SeznamStatu($this, 'seznamstatu');
+
+        $config = (new Spisovka\ConfigEpodatelna())->get();
+        $this->template->RequestIsdsPassword = $config['isds']['aktivni'] && Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN,
+                        false) && empty(UserSettings::get('isds_password'));
     }
 
-    // Stáhne zprávy ze všech schránek a dá uživateli vědět výsledek
-
-    public function actionZkontrolovatAjax()
+    /** Stáhne zprávy ze všech schránek a dá uživateli vědět výsledek
+     * 
+     * @param string $password
+     */
+    public function actionZkontrolovatAjax($password = null)
     {
-        @set_time_limit(120); // z moznych dusledku vetsich poctu polozek je nastaven timeout
+        @set_time_limit(120); // je potreba zvysit timeout pro pripad vetsiho mnozstvi zprav
 
         /* $id = $this->getParameter('id',null);
           $typ = substr($id,0,1);
@@ -161,9 +167,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         // kontrola ISDS
         $isds_config = $config_data['isds'];
         if ($isds_config['aktivni'] == 1) {
-            if (!$isds_config['podatelna'] || $isds_config['podatelna'] == $ou_id) {
+            // Kdyz uzivatel zadava pokazde sve heslo do datove schranky ($password != null),
+            // ignoruj omezeni podatelny
+            if ($password || !$isds_config['podatelna'] || $isds_config['podatelna'] == $ou_id) {
                 $nalezena_aktivni_schranka = 1;
-                $zprava = $this->downloadISDS();
+                $zprava = $this->downloadISDS($password);
                 echo "$zprava<br />";
             }
         }
@@ -302,10 +310,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     /**
      * @return string  Zprava pro uzivatele
      */
-    protected function downloadISDS()
+    protected function downloadISDS($password)
     {
         try {
-            $isds = new ISDS_Spisovka();
+            $isds = new ISDS_Spisovka($password);
 
             $od = $this->Epodatelna->getLastISDS();
             $do = time() + 7200;

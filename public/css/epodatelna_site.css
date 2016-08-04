@@ -190,3 +190,10 @@ table.seznam th {
 #h_evidence textarea {
     width: 500px;
 }
+
+#password_prompt {
+    display: none;
+}
+#password_prompt input[type=password] {
+    width: 190px;
+}

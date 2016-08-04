@@ -257,7 +257,6 @@ class DokumentOdeslani extends BaseModel
 
     public function vraceno($id)
     {
-
         if (empty($id)) {
             return null;
         }
