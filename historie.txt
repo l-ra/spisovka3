@@ -50,7 +50,8 @@ Nové funkce:
 - přihlášení do datové schránky lze nastavit tak, aby každý oprávněný uživatel
   měl svoje přihlašovací jméno a heslo do datové schránky. Uživatel tyto údaje
   sám zadá v sekci, která se zobrazí po kliknutí na jméno uživatele v záhlaví
-  stránky.
+  stránky. Navíc je možné heslo do aplikace neukládat a ta potom uživatele
+  požádá o heslo při každém připojení do datové schránky.
 - opraveno přihlášení do datové schránky certifikátem, nyní je možné použít
   systémový certifikát (stále ale tato možnost vyžaduje nastavení odborníkem)
 - je možné jednoduše protokolovat komunikaci s datovou schránkou, aniž by bylo
