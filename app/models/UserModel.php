@@ -80,7 +80,7 @@ class UserModel extends BaseModel
         }
     }
 
-    public function odebratUcet($user_id)
+    public function skrytUcet($user_id)
     {
         if ($user_id == self::getUser()->id) {
             throw new Exception('Nemůžete smazat účet, pod kterým jste přihlášen!');

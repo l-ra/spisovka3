@@ -1,0 +1,73 @@
+
+{block title}Účet zaměstnance{/block}
+
+{block content}
+<div class="navigate">
+    <a href="{link seznam}">Seznam zaměstnanců</a> - <a n:href="detail, $person->id">{$person}</a> - Účet
+</div>
+
+<dl>
+    <dt>Uživatelské jméno:</dt>
+    <dd>{$u->username}</dd>
+</dl>
+{if $presenter->getParameter('edit') == 'password'}
+    {control changePasswordForm}
+{/if}
+{if $presenter->getParameter('edit') == 'auth_type'}
+    {control changeAuthTypeForm}
+{elseif $remote_auth_supported}
+    <dl>
+        <dt>Ověření hesla:</dt>
+        <dd>{$u->external_auth ? 'externí' : 'lokální'} &nbsp;&nbsp;&nbsp;<a href="{link this, 'edit' => 'auth_type'}">Změnit</a></dd>
+    </dl>
+{/if}
+<dl>
+    <dt>Poslední přihlášení:</dt>
+    <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}</dd>
+</dl>
+
+{if $presenter->getParameter('edit') == 'orgunit'}
+    {control oJForm}
+{else}
+    <dl>
+        <dt>Organizační jednotka:</dt>
+        <dd>{$u->orgjednotka_id === null ? 'žádná' : new OrgUnit($u->orgjednotka_id)}&nbsp;&nbsp;&nbsp;
+            <a href="{link this, 'edit' => 'orgunit'}">Změnit</a></dd>
+    </dl>
+{/if}
+
+<dl>
+    <dt>Role:</dt>
+    <dd>
+        {if $presenter->getParameter('edit') == 'roles'}
+            Upozornění: Změna rolí způsobí odhlášení upravovaného uživatele.<br /><br />
+            {form roleForm}
+                {foreach $roles as $r}
+                    {input 'role'.$r->id.'-user_role'} {$r->name}<br />
+                {/foreach}
+                {input add_role} {input role}
+                <br /><br />
+                {input zmenitRole} {input storno}
+            {/form}
+        {else}
+            <div style="display: inline-block">
+                {foreach $roles as $r}
+                    {$r->name}<br />
+                {/foreach}                    
+                <span n:if="!$roles">Tomuto uživateli není přiřazena žádná role.</span>
+            </div>
+            &nbsp;&nbsp;&nbsp;<a href="{link this, 'edit' => 'roles'}">Změnit</a>
+        {/if}
+    </dd>
+</dl>
+<dl>
+    <dt></dt>
+    <dd>
+        {if $u->external_auth != 1}
+            <a href="{link this, 'edit' => 'password'}">Změnit {if $remote_auth_supported}lokální {/if}heslo</a>
+            &nbsp;&nbsp;&nbsp;
+        {/if}                                        
+        <a href="{link smazatUcet, $u->id}" onclick="return confirm('Opravdu chcete smazat tento účet?');">
+            Smazat účet</a>
+    </dd>
+</dl>

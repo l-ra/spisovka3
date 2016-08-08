@@ -48,100 +48,69 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->template->seznam = $seznam;
     }
 
-    public function actionNovy()
+    public function createComponentNewUserForm()
     {
-        $this->template->title = " - Nový zaměstnanec";
+        $person = new Person($this->getParameter('id'));
+        $Auth = $this->context->createService('authenticatorUI');
+        $Auth->setAction('new_user');
+        $Auth->setParams(['osoba_id' => $person->id]);
+        return $Auth;
     }
 
-    public function actionDetail($id)
+    public function createComponentChangePasswordForm()
     {
-        $this->template->title = " - Detail zaměstnance";
-
-        $osoba_id = $id;
-        $this->template->Osoba = $person = new Person($osoba_id);
-
-        // Parametr urcuje, co budeme editovat (jaky zobrazime formular)
-        $this->template->FormUpravit = $this->getParameter('upravit', null);
-        $this->template->UpravitUserId = $this->getParameter('user', null);
-
-        // Zmena roli
-        $this->template->RoleUpravit = $this->getParameter('role', null);
-
-        $accounts = $person->getAccounts();
-        $this->template->Accounts = $accounts;
-
-        // Zmena hesla
-        $this->template->ZmenaHesla = null;
-        $user_id = $this->getParameter('user', null);
-        if ($this->template->FormUpravit == 'heslo') {
-            // Stupidni kontrola parametru. Kdo je opravnen spravou uzivatelu v administraci,
-            // muze menit heslo komukoliv.
-            if (array_key_exists($user_id, $accounts)) {
-                $this->template->ZmenaHesla = (int) $user_id;
-            }
-        }
-
-        $this->template->remote_auth_supported = $this->context->getService('authenticator')->supportsRemoteAuth();
-
+        $a = new UserAccount($this->getParameter('id'));
+        $person = $a->getPerson();
         $Auth = $this->context->createService('authenticatorUI');
         $Auth->setAction('change_password');
-        $Auth->setParams(['osoba_id' => $osoba_id, 'user_id' => $user_id]);
-        $this->addComponent($Auth, 'changePasswordForm');
-
-
-        // Vytvoreni uctu
-        $vytvorit_ucet = $this->getParameter('new_user', null);
-        if (!is_null($vytvorit_ucet)) {
-            $this->template->vytvoritUcet = 1;
-        }
-        $Auth2 = $this->context->createService('authenticatorUI');
-        $Auth2->setAction('new_user');
-        $Auth2->setParams(['osoba_id' => $osoba_id]);
-        $this->addComponent($Auth2, 'newUserForm');
-
-        // Zmena prihlaseni
-        $this->template->ZmenaPrihlaseni = $this->getParameter('upravit', '') == 'typ_auth'
-                    ? (int) $user_id : false;
-        $Auth3 = $this->context->createService('authenticatorUI');
-        $Auth3->setAction('change_auth');
-        $Auth3->setParams(['osoba_id' => $osoba_id, 'user_id' => $user_id]);
-        $this->addComponent($Auth3, 'changeAuthTypeForm');
-
-        // Odebrani uctu
-        $odebrat_ucet = $this->getParameter('odebrat', false);
-        if ($odebrat_ucet) {
-            try {
-                $m = new UserModel();
-                $m->odebratUcet($odebrat_ucet);
-                $this->flashMessage('Účet uživatele byl odebrán.');
-            } catch (Exception $e) {
-                $this->flashMessage($e->getMessage(), 'warning');
-            }
-            $this->redirect('this', array('id' => $osoba_id));
-        }
-
-        if (count($accounts)) {
-            $role = array();
-            foreach ($accounts as $account) {
-                $user_roles = $account->getRoles();
-                $role[$account->id] = $user_roles ?: [];
-            }
-
-            $this->template->Role = $role;
-        } else {
-            $this->template->Role = [];
-        }
+        $Auth->setParams(['osoba_id' => $person->id, 'user_id' => $a->id]);
+        return $Auth;
     }
-
-    public function renderDetail()
+    
+    public function createComponentChangeAuthTypeForm()
     {
+        $a = new UserAccount($this->getParameter('id'));
+        $person = $a->getPerson();
+        $Auth = $this->context->createService('authenticatorUI');
+        $Auth->setAction('change_auth');
+        $Auth->setParams(['osoba_id' => $person->id, 'user_id' => $a->id]);
+        return $Auth;
+    }
+    
+    public function actionSmazatUcet($id)
+    {
+        $a = new UserAccount($id);
+        try {
+            $m = new UserModel();
+            $m->skrytUcet($id);
+            $this->flashMessage('Účet uživatele byl smazán.');
+        } catch (Exception $e) {
+            $this->flashMessage($e->getMessage(), 'warning');
+        }
+        $this->redirect('detail', $a->getPerson()->id);
     }
 
-    public function actionSync()
+    public function renderUcet($id)
+    {
+        $this->template->u = $account = new UserAccount($id);
+        $this->template->person = $account->getPerson();
+        $this->template->remote_auth_supported = $this->context->getService('authenticator')->supportsRemoteAuth();
+
+        $roles = $account->getRoles();
+        $this->template->roles = $roles ? : [];
+    }
+
+    public function renderDetail($id)
+    {
+        $this->template->person = $person = new Person($id);
+        $this->template->accounts = $person->getAccounts();
+    }
+
+    public function createComponentSyncForm()
     {
         $Auth = $this->context->createService('authenticatorUI');
         $Auth->setAction('sync');
-        $this->addComponent($Auth, 'syncForm');
+        return $Auth;
     }
 
     /**
@@ -158,17 +127,17 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $form1->addText('titul_za', 'Titul za:', 50, 150);
         $form1->addText('email', 'E-mail:', 50, 150)
                 ->addCondition(Form::FILLED)
-                    ->addRule(Form::EMAIL);
+                ->addRule(Form::EMAIL);
         $form1->addText('telefon', 'Telefon:', 50, 150);
         $form1->addText('pozice', 'Funkce:', 50, 150);
-        
+
         return $form1;
     }
-    
+
     protected function createComponentNovyForm()
     {
         $form1 = self::createOsobaForm();
-        
+
         $form1->addSubmit('novy', 'Vytvořit')
                 ->onClick[] = array($this, 'vytvoritClicked');
         $form1->addSubmit('storno', 'Zrušit')
@@ -181,11 +150,9 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     protected function createComponentUpravitForm()
     {
         $form = self::createOsobaForm();
-        $form->addHidden('id');
-        
-        $osoba = $this->template->Osoba;
+
+        $osoba = isset($this->template->person) ? $this->template->person : null;
         if ($osoba) {
-            $form['id']->setValue($osoba->id);
             $form['jmeno']->setValue($osoba->jmeno);
             $form['prijmeni']->setValue($osoba->prijmeni);
             $form['titul_pred']->setValue($osoba->titul_pred);
@@ -193,8 +160,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $form['email']->setValue($osoba->email);
             $form['telefon']->setValue($osoba->telefon);
             $form['pozice']->setValue($osoba->pozice);
-        }        
-        
+        }
+
         $form->addSubmit('upravit', 'Upravit')
                 ->onClick[] = array($this, 'upravitClicked');
         $form->addSubmit('storno', 'Zrušit')
@@ -208,8 +175,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         // Ulozi hodnoty a vytvori dalsi verzi
         $data = $button->getForm()->getValues(true);
-        $osoba_id = $data['id'];
-        unset($data['id']);
+        $osoba_id = $this->getParameter('id');
 
         try {
             $osoba = new Person($osoba_id);
@@ -226,10 +192,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        // Ulozi hodnoty a vytvori dalsi verzi
-        $data = $button->getForm()->getValues();
-        $osoba_id = !empty($data['osoba_id']) ? $data['osoba_id'] : $data['id'];
-        $this->redirect('this', array('id' => $osoba_id));
+        $this->redirect('this');
     }
 
     public function stornoSeznamClicked()
@@ -266,27 +229,16 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     protected function createComponentRoleForm()
     {
-        $osoba = $this->template->Osoba;
-
-        $user_id = $this->getHttpRequest()->getPost('user_id', null);
-        if ($user_id === null) {
-            $user_id = $this->getParameter('role', null);
-        }
-
-        $user_role = (new UserAccount($user_id))->getRoles();
+        $user_id = $this->getParameter('id');
+        $roles = (new UserAccount($user_id))->getRoles();
 
         $Role = new RoleModel();
         $role_select = $Role->seznam();
 
         $form1 = new Spisovka\Form();
-        $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->id);
-        $form1->addHidden('user_id')
-                ->setValue($user_id);
 
-        if (isset($user_role)) {
-            foreach ($user_role as $ur) {
-
+        if ($roles) {
+            foreach ($roles as $ur) {
                 if (isset($form1['role' . $ur->id]))
                     continue;
 
@@ -317,8 +269,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $osoba_id = $data['osoba_id'];
-        $user_id = $data['user_id'];
+        $user_id = $this->getParameter('id');
         $add_role = $data['add_role'];
         $add_role_id = $data['role'];
 
@@ -374,9 +325,9 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $account = new UserAccount($user_id);
         $account->force_logout = true;
         $account->save();
-        
+
         $this->flashMessage('Role uživatele byly upraveny.');
-        $this->redirect('this', array('id' => $osoba_id));
+        $this->redirect('this');
     }
 
     protected function createComponentSearchForm()
@@ -417,19 +368,10 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         foreach ($seznam as $org)
             $select[$org->id] = $org->ciselna_rada . ' - ' . $org->zkraceny_nazev;
 
-        $osoba = $this->template->Osoba;
-        $user_id = $this->getParameter('user', null);
-
-        $form1->addHidden('osoba_id')
-                ->setValue(@$osoba->id);
-        $form1->addHidden('id')
-                ->setValue($user_id);
-
         $c = $form1->addSelect('orgjednotka_id', 'Organizační jednotka:', $select);
-        if (isset($this->template->Accounts) && $user_id !== null) {
-            $user = $this->template->Accounts[$user_id];
-            $c->setValue($user->orgjednotka_id);
-        }
+        $a = new UserAccount($this->getParameter('id'));
+        $ou = $a->getOrgUnit();
+        $c->setDefaultValue($ou ? $ou->id : 0);
 
         $form1->addSubmit('upravit', 'Změnit')
                 ->onClick[] = array($this, 'zmenitOJClicked');
@@ -447,12 +389,12 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ($orgjednotka_id === 0)
             $orgjednotka_id = null;
 
-        $a = new UserAccount($data['id']);
+        $a = new UserAccount($this->getParameter('id'));
         $a->orgjednotka_id = $orgjednotka_id;
         $a->save();
         $this->flashMessage('Organizační jednotka byla změněna.');
 
-        $this->redirect('this', array('id' => $data['osoba_id']));
+        $this->redirect('this');
     }
 
 }

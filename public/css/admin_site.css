@@ -169,3 +169,9 @@ table.disk-usage td {
 .align-right {
     text-align: right;
 }
+
+#accounts .account {
+    font-weight: bold;
+    padding-right: 30px;
+    padding-bottom: 5px;
+}
