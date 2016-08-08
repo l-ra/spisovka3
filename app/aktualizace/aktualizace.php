@@ -84,7 +84,8 @@ ob_end_flush();
 foreach ($clients as $site_path => $site_name) {
 
     flush(); // zobraz výsledek po aktualizaci každého klienta
-
+    $start_time = time();
+    
     echo "<div class='update_site'>";
     echo "<h1>$site_name</h1>";
 
@@ -141,6 +142,10 @@ foreach ($clients as $site_path => $site_name) {
         if ($rev > $client_revision) {
 
             try {
+                // Na pomalych pocitacich muze i aktualizace jedne spisovky trvat dost dlouho
+                if (time() - $start_time >= 3)
+                    flush();
+                
                 // Check skripty se pouzivaly v minulosti, kdy nebylo mozne spolehlive urcit revizi klienta
                 $function_name = "is_installed_{$rev}";
                 if (function_exists($function_name)) {
