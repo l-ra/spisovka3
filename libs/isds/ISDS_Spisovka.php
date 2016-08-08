@@ -171,7 +171,7 @@ class ISDS_Spisovka extends ISDS
     public static function stavDS($dbState)
     {
         $typ = array(
-            '0' => 'Nelze zjístit stav datové schránky',
+            '0' => 'Nelze zjistit stav datové schránky',
             '1' => 'Datová schránka je přístupná',
             '2' => 'Datová schránka je dočasně znepřístupněná',
             '3' => 'Datová schránka je dosud neaktivní',
@@ -188,7 +188,7 @@ class ISDS_Spisovka extends ISDS
     public static function typDS($dmType)
     {
         $typ = array(
-            '0' => 'Nelze zjístit typ subjektu datové schránky',
+            '0' => 'Nelze zjistit typ subjektu datové schránky',
             '10' => 'OVM',
             '11' => 'OVM_NOTAR',
             '12' => 'OVM_EXEKUT',
@@ -213,7 +213,7 @@ class ISDS_Spisovka extends ISDS
     public static function stavZpravy($dmMessageStatus)
     {
         $typ = array(
-            '0' => 'Nelze zjístit stav zprávy',
+            '0' => 'Nelze zjistit stav zprávy',
             '1' => 'zpráva byla podána',
             '2' => 'hash datové zprávy včetně všech písemnosti označen časovým razítkem',
             '3' => 'zpráva neprošla AV kontrolou; nakažená písemnost je smazána; konečný stav zprávy',
