@@ -208,20 +208,14 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $isds_subjekt_cache = [];
         $email_subjekt_cache = [];
 
-        //$client_config = Environment::getVariable('client_config');
-        //$vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
-        //$paginator = $vp->getPaginator();
-        //$paginator->itemsPerPage = 2;// isset($client_config->nastaveni->pocet_polozek)?$client_config->nastaveni->pocet_polozek:20;
-
         $args = array(
             'where' => array('(ep.stav = 0 OR ep.stav = 1) AND ep.odchozi = 0')
         );
         $result = $this->Epodatelna->seznam($args);
-        //$paginator->itemCount = count($result);
-        $zpravy = $result->fetchAll(); //$paginator->offset, $paginator->itemsPerPage);
+        $zpravy = $result->fetchAll();
 
         if (!$zpravy)
-            $zpravy = null;
+            $zpravy = [];
         else
             foreach ($zpravy as $zprava) {
 
