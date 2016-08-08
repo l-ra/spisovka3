@@ -6,14 +6,18 @@
     <a href="{link seznam}">Seznam zaměstnanců</a> - <a n:href="detail, $person->id">{$person}</a> - Účet
 </div>
 
-<dl>
-    <dt>Uživatelské jméno:</dt>
-    <dd>{$u->username}</dd>
-</dl>
-{if $presenter->getParameter('edit') == 'password'}
+{if $edit == 'username'}
+    {control changeUsernameForm}
+{else}
+    <dl>
+        <dt>Uživatelské jméno:</dt>
+        <dd>{$u->username}&nbsp;&nbsp;&nbsp;<a n:href="this, edit => username">Změnit</a></dd>
+    </dl>
+{/if}
+{if $edit == 'password'}
     {control changePasswordForm}
 {/if}
-{if $presenter->getParameter('edit') == 'auth_type'}
+{if $edit == 'auth_type'}
     {control changeAuthTypeForm}
 {elseif $remote_auth_supported}
     <dl>
@@ -26,7 +30,7 @@
     <dd>{if $u->last_login}{$u->last_login|edatetime}  z  {$u->last_ip}{/if}</dd>
 </dl>
 
-{if $presenter->getParameter('edit') == 'orgunit'}
+{if $edit == 'orgunit'}
     {control oJForm}
 {else}
     <dl>
@@ -39,7 +43,7 @@
 <dl>
     <dt>Role:</dt>
     <dd>
-        {if $presenter->getParameter('edit') == 'roles'}
+        {if $edit == 'roles'}
             Upozornění: Změna rolí způsobí odhlášení upravovaného uživatele.<br /><br />
             {form roleForm}
                 {foreach $roles as $r}

@@ -48,7 +48,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->template->seznam = $seznam;
     }
 
-    public function createComponentNewUserForm()
+    protected function createComponentNewUserForm()
     {
         $person = new Person($this->getParameter('id'));
         $Auth = $this->context->createService('authenticatorUI');
@@ -57,7 +57,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         return $Auth;
     }
 
-    public function createComponentChangePasswordForm()
+    protected function createComponentChangePasswordForm()
     {
         $a = new UserAccount($this->getParameter('id'));
         $person = $a->getPerson();
@@ -67,7 +67,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         return $Auth;
     }
     
-    public function createComponentChangeAuthTypeForm()
+    protected function createComponentChangeAuthTypeForm()
     {
         $a = new UserAccount($this->getParameter('id'));
         $person = $a->getPerson();
@@ -92,6 +92,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     public function renderUcet($id)
     {
+        $this->template->edit = $this->getParameter('edit');
         $this->template->u = $account = new UserAccount($id);
         $this->template->person = $account->getPerson();
         $this->template->remote_auth_supported = $this->context->getService('authenticator')->supportsRemoteAuth();
@@ -106,7 +107,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->template->accounts = $person->getAccounts();
     }
 
-    public function createComponentSyncForm()
+    protected function createComponentSyncForm()
     {
         $Auth = $this->context->createService('authenticatorUI');
         $Auth->setAction('sync');
@@ -197,7 +198,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     public function stornoSeznamClicked()
     {
-        $this->redirect(':Admin:Zamestnanci:seznam');
+        $this->redirect('seznam');
     }
 
     public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
@@ -397,4 +398,33 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->redirect('this');
     }
 
+    protected function createComponentChangeUsernameForm()
+    {
+        $form = new Spisovka\Form();
+
+        $c = $form->addText('username', 'Uživatelské jméno:', 30)
+                ->setRequired();
+        if (isset($this->template->u))
+            $c->setDefaultValue($this->template->u->username);
+        
+        $form->addSubmit('upravit', 'Změnit')
+                ->onClick[] = array($this, 'zmenitUsernameClicked');
+        $form->addSubmit('storno', 'Zrušit')
+                        ->setValidationScope(FALSE)
+                ->onClick[] = array($this, 'stornoClicked');
+        
+        return $form;
+    }
+    
+    public function zmenitUsernameClicked(Nette\Forms\Controls\SubmitButton $button)
+    {
+        $data = $button->getForm()->getValues();
+        
+        $a = new UserAccount($this->getParameter('id'));
+        $a->username = $data->username;
+        $a->save();
+        
+        $this->flashMessage('Uživatelské jméno bylo změněno.');
+        $this->redirect('this');
+    }
 }

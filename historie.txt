@@ -61,6 +61,8 @@ Nové funkce:
 - je možné povolit předávání vyřízených dokumentů, viz nápověda
 - je možné skrýt zapůjčené dokumenty ve spisovně
 - lze fitrovat subjekty podle stavu
+- uživatelské jméno zaměstnance je nyní možné změnit (vhodné např. pro případ,
+  kdy se zaměstnankyně vdá)
 - je možné vypnout automatické načtení zpráv po kontrole schránek v e-podatelně
 - administrátor má možnost vytvořit protokol s informacemi pro technickou
   podporu
