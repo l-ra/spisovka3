@@ -79,6 +79,11 @@ else
 echo '    </div>
     <div id="content">';
 
+if (version_compare(PHP_VERSION, '5.5.0', '<')) {
+    error ('Aplikace vyžaduje PHP verze 5.5 nebo novější.');
+    die;
+}
+
 ob_end_flush();
 
 foreach ($clients as $site_path => $site_name) {

@@ -5,7 +5,6 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function startup()
     {
-
         if (!defined('APPLICATION_INSTALL') && $this->action != "kontrola")
             $this->setView('instalovano');
 
@@ -18,7 +17,6 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderDefault()
     {
-
         $session = $this->getSession('s3_install');
         unset($session->step);
 
@@ -119,9 +117,9 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'PHP verze',
                 'required' => TRUE,
-                'passed' => version_compare(PHP_VERSION, '5.4.0', '>='),
+                'passed' => version_compare(PHP_VERSION, '5.5.0', '>='),
                 'message' => PHP_VERSION,
-                'description' => 'Používáte starou verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.4 nebo 5.5.',
+                'description' => 'Používáte starou verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.5 nebo 5.6.',
             ),
             array(
                 'title' => 'Databáze',
