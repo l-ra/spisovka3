@@ -299,18 +299,21 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         @ini_set("memory_limit", PDF_MEMORY_LIMIT);
 
-        $content = str_replace("<td", "<td valign='top'", $content);
+        // mPDF obsahuje spoustu chyb a omezení
+        $search = ['<td', '</dd><br />', '<dd></dd>'];
+        $replace = ['<td valign="top"', '</dd>', '<dd>&nbsp;</dd>'];
+        $content = str_replace($search, $replace, $content);
         $content = preg_replace('#<table id="table_top">.*?</table>#s', '', $content);
+        // nechceme v PDF vytvářet nesmyslné hypertextové odkazy
+        $content = preg_replace('#href="[^"]*"#s', '', $content);
 
         $page_format = in_array($this->view, ["detail", "odetail", "printdetail"]) ? 'A4' : 'A4-L';
         // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
         $mpdf = new mPDF('iso-8859-2', $page_format, 9, 'Helvetica');
 
         $app_info = new VersionInformation();
-        $app_name = $app_info->name;
-        $mpdf->SetCreator($app_name);
-        $person_name = $this->user->displayName;
-        $mpdf->SetAuthor($person_name);
+        $mpdf->SetCreator($app_info->name);
+        $mpdf->SetAuthor($this->user->displayName);
 
         $mpdf->defaultheaderfontsize = 10; /* in pts */
         $mpdf->defaultheaderfontstyle = 'B'; /* blank, B, I, or BI */
