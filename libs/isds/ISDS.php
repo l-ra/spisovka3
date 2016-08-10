@@ -41,8 +41,13 @@ class ISDS
                 'ciphers' => 'ALL!EXPORT!EXPORT40!EXPORT56!aNULL!LOW!RC4'
             )
         );
-        $key = version_compare(PHP_VERSION, '5.6.0', '<') ? 'CN_match' : 'peer_name';
-        $contextOptions['ssl'][$key] = $portalType == 1 ? 'mojedatovaschranka.cz' : 'czebox.cz';
+        // Pozor! V PHP 5.6 je nějaký bug a pokud se řídím dokumentací, tak SOAP nefunguje
+        // (server vrátí Bad Request).
+        // option peer_name je rozbitý
+        if (version_compare(PHP_VERSION, '5.6.0', '<')) {
+            $key = 'CN_match';
+            $contextOptions['ssl'][$key] = $portalType == 1 ? 'mojedatovaschranka.cz' : 'czebox.cz';
+        }
         $sslContext = stream_context_create($contextOptions);
 
         $params = array(
@@ -971,7 +976,7 @@ class DebugSoapClient extends SoapClient
         $this->logger = $logger;
         $out = "SOAP Client: $wsdl\n------------\n";
         $this->logger->log($out);
-        
+
         parent::__construct($wsdl, $options);
     }
 
@@ -990,10 +995,10 @@ class DebugSoapClient extends SoapClient
             $result .= ", length = " . strlen($response);
         $out = "Result: $result\n";
         $this->logger->log($out);
-        
+
         $this->logger->log($response, 3);
         $this->logger->log("\n\n");
-        
+
         return $response;
     }
 
@@ -1002,7 +1007,7 @@ class DebugSoapClient extends SoapClient
         $out = "SOAP Call: $function_name\n----------\n";
         $this->logger->log($out);
         $this->logger->log(print_r($arguments[0], true), 2);
-        
+
         return parent::__soapCall($function_name, $arguments);
     }
 
