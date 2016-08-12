@@ -1,9 +1,10 @@
 {block title}Seznam zpráv{/block}
 {block content}
 
-<h2>Seznam {if $original_view == 'prichozi'}příchozích{else}nových{/if} zpráv</h2>
+<h2>Seznam {if $presenter->view == 'prichozi'}příchozích{else}nových{/if} zpráv</h2>
 
     {control print}
+    {control search}
     
     <div id="dokumenty">
     {if count($seznam)>0}
@@ -33,12 +34,12 @@
                 <span title="{$ep->prijato_dne|edatetime}">{$ep->prijato_dne|edate}</span>
             </td>
             <td class="cislo_jednaci">
-                &nbsp;<strong><a href="{link detail, 'id' => $ep->id, 'back' => $original_view}">
+                &nbsp;<strong><a href="{link detail, 'id' => $ep->id, 'back' => $presenter->view}">
                    OSS-EP-I-{$ep->poradi}-{$ep->rok}
                 </a></strong>
             </td>
             <td class="vec">
-                <strong title="{html_entity_decode($ep->popis)}"><a href="{link detail, 'id'=>$ep->id, 'back' => $original_view}">
+                <strong title="{html_entity_decode($ep->popis)}"><a href="{link detail, 'id' => $ep->id, 'back' => $presenter->view}">
                     {$ep->predmet}
                 </a></strong>
                 <br />

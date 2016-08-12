@@ -285,6 +285,12 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         return $c;
     }
 
+    protected function createComponentSearch()
+    {
+        $c = new Spisovka\Components\SearchControl($this);
+        return $c;        
+    }
+    
     protected function shutdown($response)
     {
         if ($this->getParameter('pdfprint') || $this->view == 'pdf' || $this->pdf_output) {

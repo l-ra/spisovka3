@@ -19,18 +19,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         return parent::isUserAllowed();
     }
 
-    public function startup()
-    {
-        parent::startup();
-        $this->template->original_view = $this->view;
-    }
-
     public function renderDefault()
     {
         $this->redirect('nove');
     }
 
-    public function renderNove()
+    public function renderNove($hledat)
     {
         $client_config = GlobalVariables::get('client_config');
         $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
@@ -53,11 +47,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
         $this->template->seznam = $seznam;
-
-        $this->setView('seznam');
     }
 
-    public function renderPrichozi()
+    public function renderPrichozi($hledat)
     {
         $client_config = GlobalVariables::get('client_config');
         $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
@@ -80,8 +72,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
         $this->template->seznam = $seznam;
-
-        $this->setView('seznam');
     }
 
     public function renderOdchozi()
