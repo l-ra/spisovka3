@@ -1,21 +1,12 @@
 {block title}{$Sestava->nazev}{/block}
 {block content}
-{if $presenter->view == 'pdf'}
-    <style type="text/css" media="screen, print">
-        table { 
-            border-spacing: 0;
-            border-collapse: collapse;
-        }
-        td, th { border : 1px solid gray; padding : 3px 2px; }
-    </style>
-{else}
-    <table id="table_top">
-        <tr>
-            <td align="left" valign="top">{$Sestava->nazev}</td>
-            <td align="right" valign="top">{$Urad->nazev}, {$rok}</td>
-        </tr>
-    </table>
-{/if}
+<table id="table_top">
+    <tr>
+        <td align="left" valign="top">{$Sestava->nazev}</td>
+        <td align="right" valign="top">{$Urad->nazev}, {$rok}</td>
+    </tr>
+</table>
+
 {if count($seznam)>0}
     <table class="spisovka sestava">
         {include detail_data.latte}    

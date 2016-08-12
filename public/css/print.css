@@ -25,7 +25,7 @@ td.akce { display: none; }
 th.akce { display: none; }
 
 @media print {
-   thead { display: table-header-group; }
+    thead { display: table-header-group; }
 }
 
 a {

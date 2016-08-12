@@ -303,7 +303,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $search = ['<td', '</dd><br />', '<dd></dd>'];
         $replace = ['<td valign="top"', '</dd>', '<dd>&nbsp;</dd>'];
         $content = str_replace($search, $replace, $content);
-        $content = preg_replace('#<table id="table_top">.*?</table>#s', '', $content);
         // nechceme v PDF vytvářet nesmyslné hypertextové odkazy
         $content = preg_replace('#href="[^"]*"#s', '', $content);
 

@@ -30,25 +30,17 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         @ini_set("memory_limit", PDF_MEMORY_LIMIT);
 
+        $pdf = new mPDF('', 'A4-L', 9, 'Helvetica', 10, 10, 8, 8, 0, 0);
         $app_info = new VersionInformation();
-        $app_name = $app_info->name;
-
-        $pdf = new mPDF('', 'A4-L', 9, 'Helvetica');
-        $pdf->SetCreator($app_name);
-        $person_name = $this->user->displayName;
-        $pdf->SetAuthor($person_name);
+        $pdf->SetCreator($app_info->name);
+        $pdf->SetAuthor($this->user->displayName);
         $pdf->SetTitle('Sestava');
-
-        $pdf->defaultheaderfontsize = 10; /* in pts */
-        $pdf->defaultheaderfontstyle = B; /* blank, B, I, or BI */
-        $pdf->defaultheaderline = 1;  /* 1 to include line below header/above footer */
 
         $pdf->defaultfooterfontsize = 9; /* in pts */
         $pdf->defaultfooterfontstyle = B; /* blank, B, I, or BI */
         $pdf->defaultfooterline = 1;  /* 1 to include line below header/above footer */
 
-        $pdf->SetHeader($this->template->Sestava->nazev . '||' . $this->template->Urad->nazev . ', ' . $this->template->rok);
-        // $pdf->SetFooter("{DATE j.n.Y}/" . $person_name . "||{PAGENO}/{nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
+        // $pdf->SetFooter("{PAGENO} / {nb}"); /* defines footer for Odd and Even Pages - placed at Outer margin */
 
         $pdf->WriteHTML($content);
         $pdf->Output('sestava.pdf', 'I');

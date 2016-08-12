@@ -224,7 +224,10 @@ table.seznam th {
 
 table.spisovka td {
     padding: 5px 5px;
-    border: 1px #e0e0e0 solid;
+    /* Nelze toto specifikovat jednim radkem kvuli chybe v mPDF. */
+    border-width: 1px;
+    border-color: #e0e0e0;
+    border-style: solid;
 }
 table.seznam td {
     padding: 5px 5px;

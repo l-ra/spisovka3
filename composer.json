@@ -16,7 +16,8 @@
         "nette/robot-loader": "2.3.*",
         "nette/security": "2.3.*",
         "nette/utils": "2.3.*",
-        "tracy/tracy": "2.3.*"
+        "tracy/tracy": "2.3.*",
+        "mpdf/mpdf": "~6.1.0"
     },
 	"suggest": {
         "ext-curl": "Komunikace se vzdálenými servery. Datová schránka.",
