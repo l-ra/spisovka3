@@ -283,11 +283,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->sendJson(['ok' => $ok]);
     }
 
-    public function actionDefault()
-    {
-        
-    }
-
     public function renderDefault($hledat = null)
     {
         $Spisy = new SpisModel();

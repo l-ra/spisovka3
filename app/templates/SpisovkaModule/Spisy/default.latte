@@ -4,7 +4,7 @@
     <h2>Seznam spisů</h2>
     <div id="search">
         {control searchForm}
-        <a n:if="$presenter->getParameter('hledat')" n:href="this" style="color:#ff0000;">Zrušit vyhledávání</a>    
+        <a n:if="$presenter->getParameter('hledat')" n:href="default" style="color:#ff0000;">Zrušit vyhledávání</a>    
     </div>
     
     {include 'menu.latte'}
