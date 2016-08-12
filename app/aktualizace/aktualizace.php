@@ -40,6 +40,8 @@ try {
     assert_options(ASSERT_WARNING, 0);
     assert_options(ASSERT_CALLBACK, 'my_assert_handler');
     ini_set('display_errors', 1);
+    if (!ini_get('date.timezone'))
+        ini_set('date.timezone', 'Europe/Prague');
     set_time_limit(0);
 
     define('VENDOR_DIR', dirname(APP_DIR) . '/vendor');
