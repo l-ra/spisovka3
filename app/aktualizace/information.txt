@@ -123,3 +123,5 @@ Oprava složek pro spisy - musí být viditelné pro všechny uživatele
 Oprava datové struktury spojení dokumentu. Pokud operace selže, bude nutné ručně opravit nekonzistenci v databázi.
 [1340]
 Přidání indexu
+[1360]
+Doplnění indexů do tabulky epodatelna
