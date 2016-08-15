@@ -8,6 +8,7 @@ Nové funkce:
 
 - u odeslaných zpráv v e-podatelně se nyní zobrazuje jméno uživatele, který
   zprávu odeslal
+- v e-podatelně je nyní možné vyhledávat dle věci a odesilatele, resp. adresáta
 - pokud je e-podatelna nastavena, aby odmítala e-maily bez elektronického
   podpisu, odesilateli se při odmítnutí odešle zpráva s informací o důvodu
   odmítnutí

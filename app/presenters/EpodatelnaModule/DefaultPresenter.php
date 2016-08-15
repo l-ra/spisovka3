@@ -26,55 +26,20 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderNove($hledat)
     {
-        $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
-        $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
-                    : 20;
-
-        $args = array(
-            'where' => array('ep.stav = 1 AND ep.odchozi = 0')
-        );
-        $result = $this->Epodatelna->seznam($args);
-        $paginator->itemCount = count($result);
-
-        // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParameter('print');
-        $pdf = $this->getParameter('pdfprint');
-        if ($tisk || $pdf) {
-            $seznam = $result->fetchAll();
-        } else {
-            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        }
-        $this->template->seznam = $seznam;
+        $this->renderList($hledat, true, false);
     }
 
     public function renderPrichozi($hledat)
     {
-        $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
-        $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
-                    : 20;
-
-        $args = array(
-            'where' => array('ep.stav >= 1 AND ep.odchozi = 0')
-        );
-        $result = $this->Epodatelna->seznam($args);
-        $paginator->itemCount = count($result);
-
-        // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParameter('print');
-        $pdf = $this->getParameter('pdfprint');
-        if ($tisk || $pdf) {
-            $seznam = $result->fetchAll();
-        } else {
-            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        }
-        $this->template->seznam = $seznam;
+        $this->renderList($hledat, false, false);        
     }
 
-    public function renderOdchozi()
+    public function renderOdchozi($hledat)
+    {
+        $this->renderList($hledat, false, true);        
+    }
+    
+    protected function renderList($hledat, $new, $outgoing)
     {
         $client_config = GlobalVariables::get('client_config');
         $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
@@ -82,10 +47,17 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
 
-        $args = [
-            'where' => ['ep.odchozi = 1'],
-            'order' => ['doruceno_dne' => 'DESC']
-        ];
+        $args = ['where' => []];
+        $args['where'][] = ['odchozi = %i', $outgoing];
+        if ($new)
+            $args['where'][] = 'stav = 1';
+        if ($hledat) {
+            $subject = $outgoing ? 'adresat' : 'odesilatel';
+            $args['where'][] = ["predmet LIKE %s OR $subject LIKE %s", "%$hledat%", "%$hledat%"];
+        }
+        if ($outgoing)
+            $args['order'] = ['doruceno_dne' => 'DESC'];
+  
         $result = $this->Epodatelna->seznam($args);
         $paginator->itemCount = count($result);
 
@@ -97,7 +69,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         } else {
             $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
         }
-
         $this->template->seznam = $seznam;
     }
 
