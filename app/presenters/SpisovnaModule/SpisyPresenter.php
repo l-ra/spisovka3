@@ -3,8 +3,6 @@
 class Spisovna_SpisyPresenter extends BasePresenter
 {
 
-    private $hledat;
-
     protected function isUserAllowed()
     {
         return $this->user->isAllowed('Spisovna', 'cist_dokumenty');
@@ -230,33 +228,6 @@ class Spisovna_SpisyPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
         $spis_id = $data['id'];
         $this->redirect(':Spisovna:Spisy:detail', array('id' => $spis_id));
-    }
-
-    protected function createComponentSearchForm()
-    {
-        $hledat = !is_null($this->hledat) ? $this->hledat : '';
-
-        $form = new Nette\Application\UI\Form();
-        $form->addText('dotaz', 'Hledat:', 20, 100)
-                ->setValue($hledat);
-        $form['dotaz']->getControlPrototype()->title = "Hledat lze dle názvu spisu";
-
-        $form->addSubmit('hledat', 'Hledat')
-                ->onClick[] = array($this, 'hledatSimpleClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
-
-    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-        $this->redirect('this', array('hledat' => $data['dotaz']));
     }
 
     public function renderStrom()

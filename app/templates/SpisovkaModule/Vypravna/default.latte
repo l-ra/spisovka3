@@ -3,32 +3,21 @@
     <h2>Seznam dokumentů k odeslání</h2>
 
     <div id="tisk">
-        <!-- <a href="{link this, 'print' => 1}" title="vytisknout podací arch na doporučené dopisy" target="_blank">
-            <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
-        </a> -->
         <a href="{link this, 'print' => 1}" title="Vytisknout podací arch na doporučené dopisy" target="_blank">
             <img src="{$publicUrl}images/icons/printer.png" alt="application-pdf.png" width="32" height="32" />
         </a>
-        &nbsp;&nbsp;&nbsp;&nbsp;
         <a href="{link this, 'print_balik' => 1}" title="Vytisknout podací arch na balíky" target="_blank">
             <img src="{$publicUrl}images/icons/printer.png" alt="application-pdf.png" width="32" height="32" />
-        </a>          
-        
+        </a>                  
     </div>
     
-    <div id="search">
-        {control searchForm}
-        <div id="search_advanced">
-        {if !empty($zobraz_zrusit_hledani)}<a href="{link :Spisovka:Vypravna:reset, 'reset' => 'hledat'}" style="color:#ff0000;">Zrušit vyhledávání</a>&nbsp;&nbsp;&nbsp;{/if}        
-        </div>
-    </div>    
-    <div style="margin-bottom: 15px">
-        <a href="{link :Spisovka:Vypravna:filtrovat}" onclick="return dialog(this, 'Výběr filtrování');">Filtrovat</a>{if $zobraz_zrusit_filtr}&nbsp;&nbsp;<a href="{link :Spisovka:Vypravna:reset, 'reset' => 'filtr'}" >Zrušit filtr</a>&nbsp;&nbsp;&nbsp;{/if}   
-    </div>
+    {control search}
     
+    <a href="{link filtrovat}" onclick="return dialog(this, 'Výběr filtrování');">Filtrovat</a>
+    {if $zobraz_zrusit_filtr}&nbsp;&nbsp;<a href="{link reset, 'reset' => 'filtr'}" >Zrušit filtr</a>&nbsp;&nbsp;&nbsp;{/if}       
     
-    <div id="seradit" style="margin: 3px 0px;">
-    {control seraditForm}
+    <div id="seradit" style="margin: 15px 0px 3px;">
+        {control seraditForm}
     </div>    
     
     <div id="dokumenty">
@@ -66,7 +55,7 @@
                 <div class="small">&nbsp;{$dok->dok_jid}</div>
             </td>
             <td class="vec">
-                <strong><a href="{link :Spisovka:Vypravna:detail, 'id'=>$dok->dokodes_id}" title="Zobrazit detail záznamu">{=Subjekt::displayName($dok,'jmeno_item')}</a></strong>
+                <strong><a href="{link detail, 'id'=>$dok->dokodes_id}" title="Zobrazit detail záznamu">{=Subjekt::displayName($dok,'jmeno_item')}</a></strong>
                 <div class="mezera">
                 {if $dok->zpusob_odeslani_id == 1 }    
                 {=Subjekt::displayName($dok,'email')}

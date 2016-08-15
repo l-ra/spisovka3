@@ -5,11 +5,7 @@
 <h2>{$title}</h2>
 
 {control print}
-
-<div id="search">
-    {control searchForm}
-    <a n:if="$pouzito_hledani" href="{link this, hledat => null}" style="color:#ff0000;">Zrušit vyhledávání</a>
-</div>
+{control search}
 
 {include 'menu.latte'}
 

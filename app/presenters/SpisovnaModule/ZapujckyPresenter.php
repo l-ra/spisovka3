@@ -4,7 +4,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 {
 
     private $filtr;
-    private $hledat;
     private $typ_evidence = null;
     private $oddelovac_poradi = null;
 
@@ -45,7 +44,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         if (isset($hledat)) {
             // rychle hledani = string
             $args = $Zapujcka->hledat($hledat, $args);
-            $this->hledat = $hledat;
             $this->template->no_items = 3; // indikator pri nenalezeni zypujcky pri hledani
         }
 
@@ -339,35 +337,6 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     public function stornoSeznamClicked()
     {
         $this->redirect('default');
-    }
-
-    protected function createComponentSearchForm()
-    {
-
-        $hledat = !is_null($this->hledat) ? $this->hledat : '';
-
-        $form = new Nette\Application\UI\Form();
-        $form->addText('dotaz', 'Hledat:', 20, 100)
-                ->setValue($hledat);
-        $form['dotaz']->getControlPrototype()->title = "Hledat lze dle věci, popisu, čísla jednacího a JID";
-
-        $form->addSubmit('hledat', 'Hledat')
-                ->onClick[] = array($this, 'hledatSimpleClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
-
-    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $this->redirect('this', array('hledat' => $data['dotaz']));
     }
 
     protected function createComponentFiltrForm()

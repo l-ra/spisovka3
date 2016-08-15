@@ -812,7 +812,7 @@ table.odeslat-subjekty td.odeslat-subjekty-separator {
 }
 #filtr select[name=filtr],
 #seradit select[name=seradit],
-#search input[name=dotaz] {
+#search input[type=text] {
     border: 1px solid #03406A;
     color: #03406A;
 }

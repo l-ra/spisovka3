@@ -6,11 +6,8 @@
 
     <h2>Seznam organizačních jednotek</h2>
 
-    <div id="search">
-        {control searchForm}
-        <a n:if="$presenter->hledat" n:href="seznam" style="color:#ff0000;">Zrušit vyhledávání</a>
-    </div>
-
+    {control search}
+    
     <div class="blok_menu">
         <a href="{link :Admin:Orgjednotky:novy}">Nová organizační jednotka</a>
     </div>

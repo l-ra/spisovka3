@@ -7,8 +7,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     private $typ_evidence = null;
     private $seradit = null;
-    // retezec, ktery uzivatel zadal do vyhledavaciho pole
-    private $jednoduche_hledani = null;
 
     public function startup()
     {
@@ -19,7 +17,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         parent::startup();
     }
 
-    public function renderDefault()
+    public function renderDefault($hledat)
     {
         $this->template->Typ_evidence = $this->typ_evidence;
 
@@ -29,10 +27,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $seradit = UserSettings::get('vypravna_seradit', 'datum');
         // Uloz hodnotu pro pouziti ve formulari razeni
         $this->seradit = $seradit;
-
-        $hledat = UserSettings::get('vypravna_hledat');
-        $this->jednoduche_hledani = $hledat;
-        $this->template->zobraz_zrusit_hledani = !empty($hledat);
 
         $filtr = UserSettings::get('vypravna_filtr');
         $this->template->zobraz_zrusit_filtr = !empty($filtr);
@@ -214,42 +208,10 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->redirect('this');
     }
 
-    protected function createComponentSearchForm()
-    {
-        $hledat = !is_null($this->jednoduche_hledani) ? $this->jednoduche_hledani : '';
-
-        $form = new Nette\Application\UI\Form();
-        $form->addText('dotaz', 'Hledat:', 20, 100)
-                ->setValue($hledat);
-
-        $controlPrototype = $form['dotaz']->getControlPrototype();
-        $controlPrototype->title = "Hledat lze dle adresáta, předávajícího a čísla jednacího";
-
-        $form->addSubmit('hledat', 'Hledat')
-                ->onClick[] = array($this, 'hledatSimpleClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
-
-    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-        UserSettings::set('vypravna_hledat', $data['dotaz']);
-        $this->redirect('this');
-    }
-
     public function actionReset()
     {
         $what = $this->getParameter('reset');
-        if ($what == 'hledat')
-            UserSettings::remove('vypravna_hledat');
-        elseif ($what == 'filtr')
+        if ($what == 'filtr')
             UserSettings::remove('vypravna_filtr');
         $this->redirect('default');
     }

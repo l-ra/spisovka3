@@ -3,9 +3,7 @@
 class Admin_SubjektyPresenter extends SubjektyPresenter
 {
 
-    public $hledat;
-
-    // Nejpreve prepsane metody z parent tridy
+    // Nejprve prepsane metody z parent tridy
 
     protected function createComponentNovyForm()
     {
@@ -63,14 +61,12 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
                     : 20;
 
         // hledani
-        $this->hledat = "";
         $this->template->no_items = 0;
         $args = [];
         if (isset($hledat) && empty($abc)) {
             $args['where'][] = [ "LOWER(CONCAT_WS('', nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)",
                 "%$hledat%"];
 
-            $this->hledat = $hledat;
             $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
         }
 
@@ -232,34 +228,6 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
             $e->getMessage();
             $this->flashMessage('Stav subjektu se nepodařilo změnit.', 'warning');
         }
-    }
-
-    protected function createComponentSearchForm()
-    {
-        $hledat = !is_null($this->hledat) ? $this->hledat : '';
-
-        $form = new Nette\Application\UI\Form();
-        $form->addText('dotaz', 'Hledat:', 20, 100)
-                ->setValue($hledat);
-        $form['dotaz']->getControlPrototype()->title = "Hledat lze názvu subjektu, jména, IČ, emailu, telefonu, ISDS, města, PSČ";
-
-        $form->addSubmit('hledat', 'Hledat')
-                ->onClick[] = array($this, 'hledatSimpleClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
-
-    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $this->redirect('seznam', array('hledat' => $data['dotaz']));
     }
 
     protected function createComponentFilterForm()

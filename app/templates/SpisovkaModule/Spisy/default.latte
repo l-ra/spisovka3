@@ -2,14 +2,11 @@
 {block content}
 
     <h2>Seznam spisů</h2>
-    <div id="search">
-        {control searchForm}
-        <a n:if="$presenter->getParameter('hledat')" n:href="default" style="color:#ff0000;">Zrušit vyhledávání</a>    
-    </div>
+    {control print}
+    {control search}
     
     {include 'menu.latte'}
     
-    {control print}
     <div style="clear: both" />
     
     <div id="dokumenty">

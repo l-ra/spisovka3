@@ -11,11 +11,7 @@
         <a n:if="$presenter->context->hasService('userImport')" href="{link :Admin:Zamestnanci:sync}">Přidat zaměstnance z externího zdroje</a>
     </div>
 
-    <div id="search">
-        {control searchForm}
-        <a n:if="$presenter->hledat" n:href="seznam" style="color:#ff0000;">Zrušit vyhledávání</a>    
-    </div>
-
+    {control search}
     {control abc}
 
     {if count($seznam)>0}

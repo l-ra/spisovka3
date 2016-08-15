@@ -160,6 +160,7 @@ Jiné změny:
   jako transakční protokol). Standardně se zobrazuje několik posledních záznamů
   z historie, ale uživatel má možnost zobrazit historii celou.
 - výpravna nyní zobrazuje v seznamu i datum odeslání
+- hledaný text ve výpravně si nyní aplikace neukládá
 - při zadávání vyřízení dokumentu prohlížeč automaticky posune obrazovku
   na sekci vyřízení
 - přehlednější názvy filtrů zápůjček

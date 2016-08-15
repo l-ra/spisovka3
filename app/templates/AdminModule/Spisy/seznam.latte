@@ -5,15 +5,10 @@
     <div class="navigate">Spisy</div>
     <h2>Seznam spisů</h2>
     
-    {* <div id="search">
-        {control searchForm}
-        <a n:if="$presenter->hledat" n:href="seznam" style="color:#ff0000;">Zrušit vyhledávání</a>    
-    </div> *}
-
     <div class="blok_menu">
-        <a href="{link :Admin:Spisy:novy}">Nový spis</a>
-        <a href="{link :Admin:Spisy:novaSlozka}">Nová složka</a>
-        <a href="{link :Admin:Spisy:export}">Export</a>          
+        <a href="{link novy}">Nový spis</a>
+        <a href="{link novaSlozka}">Nová složka</a>
+        <a href="{link export}">Export</a>          
     </div>
     
     {include '../../SpisovkaModule/Spisy/vyhledat-control.latte', 
@@ -38,7 +33,7 @@
                 {/if}
                 &nbsp;&nbsp;
                 {if $spis->id != 1}
-                <a href="{link :Admin:Spisy:detail, id => $spis->id}">{$spis->nazev}</a>
+                <a href="{link detail, id => $spis->id}">{$spis->nazev}</a>
                 {else}{$spis->nazev}                   
                 {/if}
             </td>

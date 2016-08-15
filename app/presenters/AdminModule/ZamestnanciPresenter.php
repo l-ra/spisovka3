@@ -5,8 +5,6 @@ use Spisovka\Form;
 class Admin_ZamestnanciPresenter extends BasePresenter
 {
 
-    public $hledat;
-
     public function renderSeznam($hledat = null, $abc = null)
     {
         // paginator
@@ -18,7 +16,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                     : 20;
 
         // hledani
-        $this->hledat = "";
         $this->template->no_items = 0;
         $args = [];
         if (isset($hledat)) {
@@ -30,7 +27,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                 )
             );
 
-            $this->hledat = $hledat;
             $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
         }
 
@@ -329,34 +325,6 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         $this->flashMessage('Role uživatele byly upraveny.');
         $this->redirect('this');
-    }
-
-    protected function createComponentSearchForm()
-    {
-        $hledat = !is_null($this->hledat) ? $this->hledat : '';
-
-        $form = new Nette\Application\UI\Form();
-        $form->addText('dotaz', 'Hledat:', 20, 100)
-                ->setValue($hledat);
-        $form['dotaz']->getControlPrototype()->title = "Hledat lze dle jména, emailu, telefonu";
-
-        $form->addSubmit('hledat', 'Hledat')
-                ->onClick[] = array($this, 'hledatSimpleClicked');
-
-        $renderer = $form->getRenderer();
-        $renderer->wrappers['controls']['container'] = null;
-        $renderer->wrappers['pair']['container'] = null;
-        $renderer->wrappers['label']['container'] = null;
-        $renderer->wrappers['control']['container'] = null;
-
-        return $form;
-    }
-
-    public function hledatSimpleClicked(Nette\Forms\Controls\SubmitButton $button)
-    {
-        $data = $button->getForm()->getValues();
-
-        $this->redirect('seznam', array('hledat' => $data['dotaz']));
     }
 
     protected function createComponentOJForm()
