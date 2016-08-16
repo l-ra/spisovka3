@@ -8,7 +8,9 @@ Aktualizace OSS Spisove sluzby v3
 
 1) Migrace z verze 2.1.x
 
-Prejdete na soubor migrace.txt.
+Nainstalujte neprve aplikaci verze 3.4.1. Tam postupujte podle instrukci
+v souboru migrace.txt. Po uspesne migraci dat ze stare aplikace muzete
+aplikaci aktualizovat ze 3.4.1 na nejnovejsi.
 
 
 2) Aktualizace z verze 3.0.1 a novejsi
