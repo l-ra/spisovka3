@@ -415,7 +415,7 @@ CREATE TABLE IF NOT EXISTS `{tbls3}sestava` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 INSERT INTO `{tbls3}sestava` (`id`, `nazev`, `popis`, `parametry`, `sloupce`, `typ`, `filtr`) VALUES
-(1, 'Podací deník', NULL, NULL, NULL, 2, 1);
+(1, 'Podací deník', NULL, NULL, 'smer,cislo_jednaci,spis,datum_vzniku,subjekty,cislo_jednaci_odesilatele,pocet_listu,pocet_listu_priloh,pocet_souboru,nazev,vyridil,zpusob_vyrizeni,datum_odeslani,spisovy_znak,skartacni_znak,skartacni_lhuta,zaznam_vyrazeni', 2, 1);
 
 CREATE TABLE IF NOT EXISTS `{tbls3}souvisejici_dokument` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
