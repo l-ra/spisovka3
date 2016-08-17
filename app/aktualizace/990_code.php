@@ -2,8 +2,8 @@
 
 function revision_990_check()
 {
-    $res = dibi::query("SELECT [id], [jid] FROM [:PREFIX:dokument] WHERE [spisovy_znak_id] IS NOT NULL AND [spisovy_znak_id] NOT IN"
-            . " (SELECT [id] FROM [:PREFIX:spisovy_znak])");
+    $res = dibi::query("SELECT [id], [jid] FROM [dokument] WHERE [spisovy_znak_id] IS NOT NULL AND [spisovy_znak_id] NOT IN"
+            . " (SELECT [id] FROM [spisovy_znak])");
     
     if (count($res)) {
         echo "Nalezena chyba v datech! Je nutné ji ručně opravit.\n";

@@ -151,12 +151,10 @@ class Client_To_Update
 
     private $db_config;
     private $path;   // cesta k adresari klienta v souborovem systemu
-    private $revision_filename;
 
     public function __construct($path_to_client)
     {
         $this->path = $path_to_client;
-        $this->revision_filename = "{$this->path}/configs/_aktualizace";
     }
 
     public function get_db_config()
@@ -213,46 +211,15 @@ class Client_To_Update
 
     function get_revision_number()
     {
-        $revision = 0;
-
-        try {
-            $result = dibi::query("SELECT [value] FROM [settings] WHERE [name] = 'db_revision'");
-
-            if (count($result) > 0) {
-                $revision = $result->fetchSingle();
-                return $revision;
-            }
-        } catch (Exception $e) {
-            // V databazi pravdepodobne neexistuje zminena tabulka
-            $e->getMessage();
-        }
-
-        if (file_exists($this->revision_filename)) {
-            $revision = trim(file_get_contents($this->revision_filename));
-            if (empty($revision))
-                $revision = 0;
-        }
-        return $revision;
+        $result = dibi::query("SELECT [value] FROM [settings] WHERE [name] = 'db_revision'");
+        return $result->fetchSingle();
     }
 
     function update_revision_number($revision)
     {
-        try {
-            dibi::query('UPDATE [settings] SET [value] = %i', $revision,
-                    "WHERE [name] = 'db_revision'");
-
-            // pokud je cislo revize v databazi, je soubor nadbytecny
-            // ingoruj, pokud soubor neexistuje
-            @unlink($this->revision_filename);
-
-            return true;
-        } catch (Exception $e) {
-            // V databazi pravdepodobne neexistuje zminena tabulka
-            // fall through
-            $e->getMessage();
-        }
-
-        return file_put_contents($this->revision_filename, $revision);
+        dibi::query('UPDATE [settings] SET [value] = %i', $revision,
+                "WHERE [name] = 'db_revision'");
+        return true;
     }
 
     /**
@@ -291,10 +258,10 @@ class Client_To_Update
 
             echo 'Tabulky byly přejmenovány.';
         }
-        
+
         // Úspěch - hotovo nebo nebylo potřeba nic dělat
         dibi::query("INSERT INTO [settings] VALUES ('db_tables_renamed', 'true')");
-        
+
         echo " Spusťte prosím aktualizační skript znovu.";
     }
 

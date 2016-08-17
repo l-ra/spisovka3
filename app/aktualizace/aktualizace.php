@@ -55,8 +55,6 @@ try {
 
     define('UPDATE_DIR', APP_DIR . '/aktualizace/');
 
-    require 'is_installed.php';
-
     Updates::init();
 
     $res = Updates::find_updates();
@@ -153,21 +151,6 @@ foreach ($clients as $site_path => $site_name) {
                 if (time() - $start_time >= 3)
                     flush();
                 
-                // Check skripty se pouzivaly v minulosti, kdy nebylo mozne spolehlive urcit revizi klienta
-                $function_name = "is_installed_{$rev}";
-                if (function_exists($function_name)) {
-                    try {
-                        if ($function_name())
-                            continue; // aktualizace byla jiz provedena a pokracuje se dalsi aktualizaci
-                    } catch (Exception $e) {
-                        error("Při provádění kontrolního skriptu došlo k chybě!<br />Popis chyby: " . $e->getCode() . ' - ' . $e->getMessage());
-                        // Je pravděpodobné, že tuto revizi nemá klient nainstalovánu
-                        $found_update = true;
-                        // Ukonči kontrolu revizí a přeskoč na dalšího klienta
-                        break;
-                    }
-                }
-
                 $found_update = true;
 
                 echo "<div class='update_rev'>";

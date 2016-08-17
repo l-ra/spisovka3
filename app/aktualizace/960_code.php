@@ -2,7 +2,7 @@
 
 function revision_960_after()
 {
-    $res = dibi::query("SELECT * FROM [:PREFIX:osoba] WHERE [email] != '' AND [email] IS NOT NULL");
+    $res = dibi::query("SELECT * FROM [osoba] WHERE [email] != '' AND [email] IS NOT NULL");
     $osoby = $res->fetchAll();
     
     $all_ok = true;

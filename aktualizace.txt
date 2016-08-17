@@ -44,6 +44,9 @@ Mohlo by potom dojit ke znefunkcneni cele aplikace.
 
 3) Aktualizace na verzi 3.5
 
+Na verzi 3.5 lze přímo upgradovat z verze 3.3.2 a novější. V případě starší
+verze aplikace proveďte jako mezikrok aktualizaci na 3.4.1.
+
 V této verzi došlo ke změně v konfiguračních souborech aplikace. Soubor
 system.ini se již nepoužívá. Nastavení připojení do databáze je nyní
 v souboru database.neon, který aplikace při prvním spuštění vytvoří. 

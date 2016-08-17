@@ -2,7 +2,7 @@
 
 function revision_810_after()
 {
-    $res = dibi::query('SELECT * FROM [:PREFIX:sestava]');
+    $res = dibi::query('SELECT * FROM [sestava]');
     
     foreach ($res as $sestava) {
         
@@ -60,7 +60,7 @@ function revision_810_after()
         unset($zobr['sloupce_smer_dokumentu']);
         unset($zobr['sloupce_prazdny']);
         
-        $res = dibi::query('UPDATE [:PREFIX:sestava] SET [sloupce] = %s, [zobrazeni_dat] = %s WHERE [id] = %i',
+        $res = dibi::query('UPDATE [sestava] SET [sloupce] = %s, [zobrazeni_dat] = %s WHERE [id] = %i',
                 $sloupce_string, serialize($zobr), $sestava->id);
         
     }
