@@ -1914,7 +1914,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 /* Ulozeni podepsane ISDS zpravy */
                 $data = array(
-                    'filename' => 'ep_isds_' . $epod_id . '.zfo',
+                    'filename' => 'ep-isds-' . $epod_id . '.zfo',
                     'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
                     'typ' => '5',
                     'popis' => 'Podepsaný originál ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
@@ -1926,7 +1926,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 /* Ulozeni reprezentace zpravy */
                 $data = array(
-                    'filename' => 'ep_isds_' . $epod_id . '.bsr',
+                    'filename' => 'ep-isds-' . $epod_id . '.bsr',
                     'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
                     'typ' => '5',
                     'popis' => ' Byte-stream reprezentace ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']

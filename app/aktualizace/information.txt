@@ -125,3 +125,5 @@ Oprava datové struktury spojení dokumentu. Pokud operace selže, bude nutné r
 Přidání indexu
 [1360]
 Doplnění indexů do tabulky epodatelna
+[1380]
+Oprava chybky ve vývojové verzi aplikace
