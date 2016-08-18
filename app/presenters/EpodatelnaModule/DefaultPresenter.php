@@ -229,7 +229,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 } else if ($zprava->typ == 'I') {
                     // Nacteni originalu DS
                     if (!empty($zprava->file_id)) {
-                        $original = self::nactiISDS($this->storage, $zprava->file_id);
+                        $original = $this->storage->download($zprava->file_id, true);
                         $original = unserialize($original);
 
                         // odebrat obsah priloh, aby to neotravovalo
@@ -565,17 +565,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         return $messages_recorded;
     }
 
-    public static function nactiISDS($storage, $file_id)
-    {
-        $res = $storage->download($file_id, 1);
-        return $res;
-    }
-
     public function renderIsdsovereni($id)
     {
         $output = "Nemohu najít soubor s datovou zprávou.";
         $message = new EpodatelnaMessage($id);
-        $zfo = $message->getZfoFile($this->storage);
+        $zfo = $message->getZfoFile($this->storage, false);
         if ($zfo) {
             try {
                 $isds = new ISDS_Spisovka();
@@ -597,22 +591,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     public function actionDownloadDm($id)
     {
         $message = new EpodatelnaMessage($id);
-        $data = $message->getZfoFile($this->storage);
-        if (!$data)
-            $this->terminate();
-
-        $httpResponse = $this->getHttpResponse();
-        $httpResponse->setContentType('application/octet-stream');
-        $httpResponse->setHeader('Content-Length', strlen($data));
-        $httpResponse->setHeader('Content-Description', 'File Transfer');
-        $httpResponse->setHeader('Content-Disposition',
-                'attachment; filename="' . "$id.zfo" . '"');
-        $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
-        $httpResponse->setHeader('Expires', '0');
-        $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
-        $httpResponse->setHeader('Pragma', 'public');
-
-        echo $data;
+        $message->getZfoFile($this->storage, true);
         $this->terminate();
     }
 

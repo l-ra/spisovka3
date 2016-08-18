@@ -47,9 +47,10 @@ class EpodatelnaMessage extends DBEntity
     
     /**
      * @param Storage_Basic $storage
+     * @param boolean $download  Download file or return it?
      * @return string  data
      */
-    public function getZfoFile($storage)
+    public function getZfoFile($storage, $download)
     {
         if ($this->typ != 'I')
             throw new LogicException(__METHOD__);
@@ -59,7 +60,7 @@ class EpodatelnaMessage extends DBEntity
         if (!$file)
             return null;
         
-        $zfo = $storage->download($file->id, 1);
+        $zfo = $storage->download($file->id, !$download);
         return $zfo;        
     }
 }

@@ -118,21 +118,21 @@ class Storage_Basic extends FileModel
 
     /**
      * @param int $file_id   ID do tabulky file
-     * @param int $output  0 - posle soubor na vystup
+     * @param int $return  0 - posle soubor na vystup
      *                     1 - vrati jako retezec
      * @return string|int  
      * @throws Nette\Application\BadRequestException
      */
-    public function download($file_id, $output = 0)
+    public function download($file_id, $return = false)
     {
         $FileModel = new FileModel();
         $file = $FileModel->getInfo($file_id);
 
         $file_path = $this->getFilePath($file);
         if (!file_exists($file_path))
-            return $output == 0 ? 1 : null; // kdyz data vracime primo, nemuzeme vratit 1
+            return !$return ? 1 : null; // kdyz data vracime primo, nemuzeme vratit 1
 
-        if ($output == 1)
+        if ($return)
             return file_get_contents($file_path);
 
         // poslat primo na vystup
