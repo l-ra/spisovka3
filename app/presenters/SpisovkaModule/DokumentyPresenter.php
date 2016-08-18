@@ -812,7 +812,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $perm = $doc->getUserPermissions();
         $DokumentPrilohy = new DokumentPrilohy();
         $prilohy = $DokumentPrilohy->prilohy($id);
-        if (!$perm['edit'] || !array_key_exists($file_id, $prilohy)) {
+        if (!$perm['view'] || !array_key_exists($file_id, $prilohy)) {
             $this->flashMessage('Přístup zamítnut.', 'warning');
             $this->redirect('default');
         }

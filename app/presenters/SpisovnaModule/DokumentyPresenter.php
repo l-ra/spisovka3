@@ -283,36 +283,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $this->redirect('detail', array('id' => $id));
     }
 
-    public function renderDownload($id, $file)
-    {
-        $dokument_id = $id;
-        $file_id = $file;
-
-        $DokumentPrilohy = new DokumentPrilohy();
-        $prilohy = $DokumentPrilohy->prilohy($dokument_id);
-        if (array_key_exists($file_id, $prilohy)) {
-            $res = $this->storage->download($file_id);
-            if ($res == 0) {
-                $this->terminate();
-            } else if ($res == 1) {
-                // not found
-                $this->flashMessage('Požadovaný soubor nenalezen!', 'warning');
-                $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
-            } else if ($res == 2) {
-                $this->flashMessage('Chyba při stahování!', 'warning');
-                $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
-            } else if ($res == 3) {
-                $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnout zmíněný soubor!',
-                        'warning');
-                $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
-            }
-        } else {
-            $this->flashMessage('Neoprávněné stahování! Nemáte povolení stáhnout cizí soubor!',
-                    'warning');
-            $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
-        }
-    }
-
     protected function createComponentVyrizovaniForm()
     {
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');

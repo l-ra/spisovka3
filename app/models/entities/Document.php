@@ -283,6 +283,16 @@ class Document extends DBEntity
     {
         $user = self::getUser();
 
+        if ($this->stav >= DocumentWorkflow::STAV_VE_SPISOVNE && $this->stav != DocumentWorkflow::STAV_ZAPUJCEN) {
+            // V případě spisovny záleží pouze na oprávnění view, ne edit
+            return [
+                'view' => $user->isAllowed('Spisovna', 'cist_dokumenty'),
+                'edit' => false,
+                'take_over' => false,
+                'cancel_forwarding' => false,
+            ];
+        }
+
         $change_own_unit = $user->isAllowed('Dokument', 'menit_moje_oj');
         $view_own_unit = $user->isAllowed('Dokument', 'cist_moje_oj');
         $view_all = $user->isAllowed('Dokument', 'cist_vse');
