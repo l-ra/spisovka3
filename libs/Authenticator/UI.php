@@ -335,6 +335,13 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
     protected function afterLogin()
     {
+        // osetri vynucene odhlaseni, aby uzivatel nebyl okamzite po prihlaseni zase odhlasen
+        $a = new UserAccount($this->presenter->user->id);
+        if ($a->force_logout) {
+            $a->force_logout = false;
+            $a->save();
+        }
+        
         /* Pokus o pridani upozorneni se nezdaril, protoze je problem zobrazit jakoukoli
          * flash zpravu (kvuli pouziti redirectUrl() po prihlaseni)
         // Zkontroluj, zda ma uzivatel predane dokumenty
