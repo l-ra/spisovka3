@@ -107,9 +107,9 @@ class Dokument extends BaseModel
             'distinct' => 1,
             'from' => array($this->name => 'd'),
             'cols' => array('id', "MAX(GREATEST(
-(CASE WHEN d.skartacni_lhuta > 1900 THEN MAKEDATE(d.skartacni_lhuta,1) ELSE DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR) END),
-(CASE WHEN spis.skartacni_lhuta IS NULL THEN '0000-00-00' WHEN spis.datum_uzavreni IS NULL THEN '0000-00-00' WHEN spis.datum_uzavreni = '0000-00-00 00:00:00' THEN '0000-00-00' WHEN spis.skartacni_lhuta > 1900 THEN MAKEDATE(spis.skartacni_lhuta,1) ELSE DATE_ADD(spis.datum_uzavreni, INTERVAL spis.skartacni_lhuta YEAR) END),
-(CASE WHEN d2.skartacni_lhuta IS NULL THEN '0000-00-00' WHEN d2.datum_spousteci_udalosti IS NULL THEN '0000-00-00' WHEN d2.skartacni_lhuta > 1900 THEN MAKEDATE(d2.skartacni_lhuta,1) ELSE DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR) END)
+COALESCE(DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR), '0'),
+COALESCE(DATE_ADD(spis.datum_uzavreni, INTERVAL spis.skartacni_lhuta YEAR), '0'),
+COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR), '0')
 ))%sql" => 'skartace'),
             'where' => $where,
             'where_or' => $where_or,
@@ -933,7 +933,7 @@ class Dokument extends BaseModel
         if (!isset($args['where']))
             $args['where'] = [];
 
-        $args['where'][] = array('d.stav = 7');
+        $args['where'][] = 'd.stav = 7';
 
         return $args;
     }
@@ -961,7 +961,7 @@ class Dokument extends BaseModel
         $sql = array(
             'distinct' => null,
             'from' => array($this->name => 'dok'),
-            'cols' => array('*', 'id' => 'dokument_id', '%sqlCASE WHEN dok.skartacni_lhuta > 1900 THEN dok.skartacni_lhuta ELSE YEAR(dok.datum_spousteci_udalosti)+1+dok.skartacni_lhuta END' => 'skartacni_rok'),
+            'cols' => array('*', 'id' => 'dokument_id', '%sql YEAR(dok.datum_spousteci_udalosti)+1+dok.skartacni_lhuta' => 'skartacni_rok'),
             'leftJoin' => array(
                 'dokspisy' => array(
                     'from' => array($this->tb_dokspis => 'ds'),
@@ -1081,11 +1081,6 @@ class Dokument extends BaseModel
         }
         if ($dokument->stav >= DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA)
             $dokument->lhuta_stav = 0;
-
-        if (empty($dokument->datum_spousteci_udalosti) || is_null($dokument->skartacni_lhuta))
-        // V techto pripadech bude zrejme db dotaz vracet nesmyslny vysledek nebo null
-        // Pro jistotu skartacni rok definuj jako nulu
-            $dokument->skartacni_rok = 0;
 
         // spisovy znak
         $dokument->spisovy_znak = $dokument->spisznak_nazev;
