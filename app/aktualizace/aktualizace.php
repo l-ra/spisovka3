@@ -90,7 +90,7 @@ foreach ($clients as $site_path => $site_name) {
 
     flush(); // zobraz výsledek po aktualizaci každého klienta
     $start_time = time();
-    
+
     echo "<div class='update_site'>";
     echo "<h1>$site_name</h1>";
 
@@ -150,7 +150,7 @@ foreach ($clients as $site_path => $site_name) {
                 // Na pomalych pocitacich muze i aktualizace jedne spisovky trvat dost dlouho
                 if (time() - $start_time >= 3)
                     flush();
-                
+
                 $found_update = true;
 
                 echo "<div class='update_rev'>";
@@ -238,7 +238,12 @@ foreach ($clients as $site_path => $site_name) {
                     if ($do_update) {
                         echo "<div class='update_title'>Provedení PHP skriptu</div>";
                         echo "<pre>";
-                        $function_name();
+                        try {
+                            $function_name();
+                        } catch (Exception $e) {
+                            echo "</pre>";
+                            throw $e;
+                        }
                         echo "</pre>";
                     } else {
                         echo "<div class='update_title'>Bude proveden PHP skript</div>";

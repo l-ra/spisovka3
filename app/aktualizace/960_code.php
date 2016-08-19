@@ -16,6 +16,6 @@ function revision_960_after()
     if ($all_ok)
         echo "Všechny e-mailové adresy zaměstnanců jsou v pořádku.";
     else
-        echo "\nProsíme opravte tyto chyby v e-mailových adresách zaměstnanců.";
+        throw new Exception("Prosíme opravte tyto chyby v e-mailových adresách zaměstnanců.");
     
 }
