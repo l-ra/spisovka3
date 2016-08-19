@@ -11,7 +11,6 @@ class Ciselnik extends Nette\Application\UI\Control
 {
 
     protected $action;
-    
     private $tableName;
     private $cols = array();
     private $orderBy;
@@ -32,24 +31,24 @@ class Ciselnik extends Nette\Application\UI\Control
     {
         $this->enableDelete = false;
     }
-    
-    /* public function setParams($params)
-    {
-        if (empty($this->_params)) {
-            $this->_params = $params;
-        } else {
-            $this->_params = array_merge($this->_params, $params);
-        }
-    }
 
-    public function addParam($name, $value)
-    {
-        if (empty($this->_params)) {
-            $this->_params = array($name => $value);
-        } else {
-            $this->_params[$name] = $value;
-        }
-    } */
+    /* public function setParams($params)
+      {
+      if (empty($this->_params)) {
+      $this->_params = $params;
+      } else {
+      $this->_params = array_merge($this->_params, $params);
+      }
+      }
+
+      public function addParam($name, $value)
+      {
+      if (empty($this->_params)) {
+      $this->_params = array($name => $value);
+      } else {
+      $this->_params[$name] = $value;
+      }
+      } */
 
     public function addColumn($col, $params)
     {
@@ -128,93 +127,38 @@ class Ciselnik extends Nette\Application\UI\Control
                 }
 
                 if ($col_params['form'] == "hidden") {
-                    if ($this->action == 'edit') {
-                        $form->addHidden($col_name)
-                                ->setValue(@$this->data->$col_name);
-                    }
+                    $form->addHidden($col_name);
                 } else if ($col_params['form'] == "textArea") {
-                    if ($this->action == 'edit') {
-                        $form->addTextArea($col_name, $col_params['title'])
-                                ->setValue(@$this->data->$col_name);
-                    } else {
-                        $form->addTextArea($col_name, $col_params['title']);
-                    }
+                    $form->addTextArea($col_name, $col_params['title'], 50, 4);
                 } else if ($col_params['form'] == "password") {
-                    if ($this->action == 'edit') {
-                        $form->addPassword($col_name, $col_params['title'])
-                                ->setValue(@$this->data->$col_name);
-                    } else {
-                        $form->addPassword($col_name, $col_params['title']);
-                    }
+                    $form->addPassword($col_name, $col_params['title']);
                 } else if ($col_params['form'] == "selectStav") {
                     $select = array('0' => 'Neaktivní', '1' => 'Aktivní');
-                    if ($this->action == 'edit') {
-                        $form->addSelect($col_name, $col_params['title'], $select)
-                                ->setValue(@$this->data->$col_name);
-                    } else {
-                        $form->addSelect($col_name, $col_params['title'], $select)
-                                ->setValue(1);
-                    }
+                    $form->addSelect($col_name, $col_params['title'], $select)->setValue(1);
                 } else if ($col_params['form'] == "selectAnoNe") {
                     $select = array('0' => 'NE', '1' => 'ANO');
-                    if ($this->action == 'edit') {
-                        $form->addSelect($col_name, $col_params['title'], $select)
-                                ->setValue(@$this->data->$col_name);
-                    } else {
-                        $form->addSelect($col_name, $col_params['title'], $select)
-                                ->setValue(0);
-                    }
+                    $form->addSelect($col_name, $col_params['title'], $select)->setValue(0);
                 } else if ($col_params['form'] == "checkbox") {
-                    if ($this->action == 'edit') {
-                        $form->addCheckbox($col_name, $col_params['title'])
-                                ->setValue(@$this->data->$col_name);
-                    } else {
-                        $form->addCheckbox($col_name, $col_params['title']);
-                    }
+                    $form->addCheckbox($col_name, $col_params['title']);
                 } else if ($col_params['form'] == "select") {
                     if (isset($col_params['form_select'])) {
-                        if ($this->action == 'edit') {
-                            $form->addSelect($col_name, $col_params['title'],
-                                            $col_params['form_select'])
-                                    ->setValue(@$this->data->$col_name);
-                        } else {
-                            $form->addSelect($col_name, $col_params['title'],
-                                    $col_params['form_select']);
-                        }
-                    } else {
-                        if ($this->action == 'edit') {
-                            $form->addText($col_name, $col_params['title'])
-                                    ->setValue(@$this->data->$col_name);
-                        } else {
-                            $form->addText($col_name, $col_params['title']);
-                        }
-                    }
-                } else if ($col_params['form'] == "radio") {
-                    if (!empty($col_params['form_radio'])) {
-                        if ($this->action == 'edit') {
-                            $form->addRadioList($col_name, $col_params['title'],
-                                            $col_params['form_radio'])
-                                    ->setValue(@$this->data->$col_name);
-                        } else {
-                            $form->addRadioList($col_name, $col_params['title'],
-                                    $col_params['form_radio']);
-                        }
-                    } else {
-                        if ($this->action == 'edit') {
-                            $form->addText($col_name, $col_params['title'])
-                                    ->setValue(@$this->data->$col_name);
-                        } else {
-                            $form->addText($col_name, $col_params['title']);
-                        }
-                    }
-                } else {
-                    if ($this->action == 'edit') {
-                        $form->addText($col_name, $col_params['title'])
-                                ->setValue(@$this->data->$col_name);
+                        $form->addSelect($col_name, $col_params['title'],
+                                $col_params['form_select']);
                     } else {
                         $form->addText($col_name, $col_params['title']);
                     }
+                } else if ($col_params['form'] == "radio") {
+                    if (!empty($col_params['form_radio']))
+                        $form->addRadioList($col_name, $col_params['title'],
+                                $col_params['form_radio']);
+                    else
+                        $form->addText($col_name, $col_params['title']);
+                } else {
+                    $form->addText($col_name, $col_params['title'], 50);
                 }
+
+                if ($this->action == 'edit' && isset($this->data->$col_name))
+                    $form[$col_name]->setValue($this->data->$col_name);
             }
 
             if ($this->action == 'new') {
@@ -236,7 +180,6 @@ class Ciselnik extends Nette\Application\UI\Control
 
         return $form;
     }
-
 
     /**
      * Ciselnik form submit handler.
