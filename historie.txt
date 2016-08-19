@@ -167,6 +167,13 @@ Jiné změny:
 - přehlednější názvy filtrů zápůjček
 - je-li ve spisovně dostupná jediná akce na vybraných záznamech, není nyní nutné
   ji ručně vybírat ze seznamu
+- z důvodu databázové optimalizace byla zkrácena maximální délka následující polí:
+	dokument - poznámka
+	organizační jednotka - poznámka
+	spouštěcí událost - název a poznámka
+	subjekt - poznámka
+	zápůjčka - důvod
+	
   
 Opravy:
 

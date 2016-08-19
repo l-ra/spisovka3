@@ -127,3 +127,5 @@ Přidání indexu
 Doplnění indexů do tabulky epodatelna
 [1380]
 Oprava chybky ve vývojové verzi aplikace
+[1390]
+Zkrácení polí, většinou poznámek
