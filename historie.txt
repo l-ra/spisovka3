@@ -165,6 +165,8 @@ Jiné změny:
 - při zadávání vyřízení dokumentu prohlížeč automaticky posune obrazovku
   na sekci vyřízení
 - přehlednější názvy filtrů zápůjček
+- z důvodu optimalizace filtr dokumentů "všechny" nemusí zahrnovat dokumenty
+  k převzetí
 - je-li ve spisovně dostupná jediná akce na vybraných záznamech, není nyní nutné
   ji ručně vybírat ze seznamu
 - aplikace v minulosti umožňovala zneužít pole "skartační lhůta" pro přímé zapsání
