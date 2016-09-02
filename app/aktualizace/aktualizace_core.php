@@ -51,7 +51,7 @@ class Updates
         foreach ($lines as $line) {
             if (substr($line, 0, 2) === '--')
                 continue;
-            
+
             $line = rtrim($line);
             $query .= $line . "\n";
             if (substr($line, -1) == ';') {
@@ -254,12 +254,19 @@ class Client_To_Update
                     return;
                 }
 
+            $error = false;
             foreach ($tables as $table) {
                 $new_name = substr($table, strlen($prefix));
-                dibi::query("RENAME TABLE [$table] TO [$new_name]");
+                try {
+                    dibi::query("RENAME TABLE [$table] TO [$new_name]");
+                } catch (Exception $e) {
+                    $error = true;
+                }
             }
 
             echo 'Tabulky byly přejmenovány.';
+            if ($error)
+                throw new Exception('Minimálně u jedné tabulky přejmenování selhalo. Je nutná odborná oprava.');
         }
 
         // Úspěch - hotovo nebo nebylo potřeba nic dělat
