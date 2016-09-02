@@ -190,7 +190,7 @@ foreach ($clients as $site_path => $site_name) {
                     }
                 }
 
-                // PRE script - není aktuálně použito. Též chybí ošetření případných chyb
+                // PRE script - použito jen jednou. chybí ošetření případných chyb
                 $function_name = "revision_{$rev}_before";
                 if (function_exists($function_name)) {
                     if ($do_update) {

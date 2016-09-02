@@ -129,3 +129,5 @@ Doplnění indexů do tabulky epodatelna
 Oprava chybky ve vývojové verzi aplikace
 [1390]
 Zkrácení polí, většinou poznámek
+[1410]
+Smazání a nové vytvoření všech integritních omezení
