@@ -49,6 +49,9 @@ class Updates
         $query = '';
         $lines = explode("\n", $data);
         foreach ($lines as $line) {
+            if (substr($line, 0, 2) === '--')
+                continue;
+            
             $line = rtrim($line);
             $query .= $line . "\n";
             if (substr($line, -1) == ';') {
