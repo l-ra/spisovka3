@@ -566,6 +566,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             foreach ($result as $msg)
                 $this->flashMessage($msg, 'warning');
             $this->flashMessage('Spis se nepodařilo předat do spisovny.', 'warning');
+            $this->redirect('detail', $id);
         }
 
         $this->redirect('default');

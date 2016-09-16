@@ -31,6 +31,8 @@ class DocumentStates extends Document
         self::STAV_ZAPUJCEN => [self::STAV_VE_SPISOVNE],
     ];
     private static $transition_conditions = [
+        self::STAV_VYRIZEN_NESPUSTENA => 'condClosed',
+        self::STAV_VYRIZEN_SPUSTENA => 'condClosed',
         self::STAV_PREDAN_DO_SPISOVNY => 'condSpisovnaReceive',
         self::STAV_VE_SPISOVNE => 'condInSpisovna',
         self::STAV_SKARTACNI_RIZENI => 'condSpisovnaShredProcessing',
@@ -105,6 +107,16 @@ class DocumentStates extends Document
         return parent::__set($name, $value);
     }
 
+    private function condClosed($new_state)
+    {
+        // Pri predavani spisu do spisovny je nutne zmenit stav i dokumentu, ktere
+        // uzivatel neni opravnen menit
+        if ($new_state == self::STAV_PREDAN_DO_SPISOVNY && $this->getSpis())
+            return true;
+        
+        return $this->canUserModify();
+    }
+    
     private function condSpisovnaReceive()
     {
         return self::getUser()->isAllowed("Spisovna", "prijem_dokumentu");
