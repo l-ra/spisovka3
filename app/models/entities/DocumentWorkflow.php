@@ -166,15 +166,18 @@ class DocumentWorkflow extends DocumentStates
         if ($this->stav < self::STAV_VYRIZEN_SPUSTENA)
             return $err_msg . ' Není spuštěna skartační lhůta.';
 
-        dibi::begin();
+        if (!$called_from_spis)
+            dibi::begin();
         try {
             $this->_changeState(self::STAV_PREDAN_DO_SPISOVNY);
 
             $Log = new LogModel();
             $Log->logDokument($this->id, LogModel::DOK_SPISOVNA_PREDAN);
-            dibi::commit();
+            if (!$called_from_spis)
+                dibi::commit();
         } catch (Exception $e) {
-            $this->_rollback();
+            if (!$called_from_spis)
+                $this->_rollback();
             throw $e;
         }
 
