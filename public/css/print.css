@@ -16,7 +16,7 @@ div.navigate { display: none; }
 #seradit { display: none; }
 #tisk { display: none; }
 #bulk-action { display: none; }
-.dokument_blok_menu { display: none; }
+.dokument_blok_menu, .blok_menu { display: none; }
 #layout_bottom { display: none; }
 #upozorneni_na_nove_zpravy{ display: none; }
 .paginator { display: none; }
