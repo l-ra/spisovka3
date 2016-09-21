@@ -65,56 +65,59 @@ class SubjektyPresenter extends BasePresenter
         $typ_select = Subjekt::typ_subjektu();
         $stat_select = array("" => "Neuveden") + Subjekt::stat();
 
-        $form1 = new Spisovka\Form();
-        $form1->getElementPrototype()->id('subjekt-vytvorit');
+        $form = new Spisovka\Form();
+        $form->getElementPrototype()->id('subjekt-vytvorit');
 
-        $form1->addSelect('type', 'Typ subjektu:', $typ_select);
-        $form1->addText('nazev_subjektu', 'Název subjektu:', 50, 255);
+        $form->addSelect('type', 'Typ subjektu:', $typ_select);
+        $form->addText('nazev_subjektu', 'Název subjektu:', 50, 255);
         $description = \Nette\Utils\Html::el('a')
                 ->href('#')
                 ->onclick("return aresSubjekt(this);")
                 ->setText('Vyhledat pomocí systému ARES');
-        $form1->addText('ic', 'IČO:', 12, 8)
+        $form->addText('ic', 'IČO:', 12, 8)
                 ->setOption('description', $description)
                 ->addCondition(Spisovka\Form::FILLED)
                 ->addRule(Spisovka\Form::INTEGER);
-        $form1->addText('dic', 'DIČ:', 12, 12);
+        $form->addText('dic', 'DIČ:', 12, 12);
 
-        $form1->addText('jmeno', 'Jméno:', 50, 24);
-        $form1->addText('prostredni_jmeno', 'Prostřední jméno:', 50, 35);
-        $form1->addText('prijmeni', 'Příjmení:', 50, 35);
-        $form1->addText('rodne_jmeno', 'Rodné jméno:', 50, 35);
-        $form1->addText('titul_pred', 'Titul před:', 20, 35);
-        $form1->addText('titul_za', 'Titul za:', 20, 10);
+        $form->addText('jmeno', 'Jméno:', 50, 24);
+        $form->addText('prostredni_jmeno', 'Prostřední jméno:', 50, 35);
+        $form->addText('prijmeni', 'Příjmení:', 50, 35);
+        $form->addText('rodne_jmeno', 'Rodné jméno:', 50, 35);
+        $form->addText('titul_pred', 'Titul před:', 20, 35);
+        $form->addText('titul_za', 'Titul za:', 20, 10);
 
-        $form1->addDatePicker('datum_narozeni', 'Datum narození:');
-        $form1->addText('misto_narozeni', 'Místo narození:', 50, 48);
-        $form1->addText('okres_narozeni', 'Okres narození:', 50, 48);
-        $form1->addText('narodnost', 'Národnost / Stát registrace:', 50, 48);
-        $form1->addSelect('stat_narozeni', 'Stát narození:', $stat_select)
+        $form['nazev_subjektu']->addConditionOn($form['prijmeni'], ~Spisovka\Form::FILLED)
+                ->setRequired('Je nutné vyplnit název subjektu nebo příjmení');
+        
+        $form->addDatePicker('datum_narozeni', 'Datum narození:');
+        $form->addText('misto_narozeni', 'Místo narození:', 50, 48);
+        $form->addText('okres_narozeni', 'Okres narození:', 50, 48);
+        $form->addText('narodnost', 'Národnost / Stát registrace:', 50, 48);
+        $form->addSelect('stat_narozeni', 'Stát narození:', $stat_select)
                 ->setValue('CZE');
 
-        $form1->addText('adresa_ulice', 'Ulice / část obce:', 50, 48);
-        $form1->addText('adresa_cp', 'číslo popisné:', 10, 10);
-        $form1->addText('adresa_co', 'Číslo orientační:', 10, 10);
-        $form1->addText('adresa_mesto', 'Obec:', 50, 48);
-        $form1->addText('adresa_psc', 'PSČ:', 10, 10);
-        $form1->addSelect('adresa_stat', 'Stát:', $stat_select)
+        $form->addText('adresa_ulice', 'Ulice / část obce:', 50, 48);
+        $form->addText('adresa_cp', 'číslo popisné:', 10, 10);
+        $form->addText('adresa_co', 'Číslo orientační:', 10, 10);
+        $form->addText('adresa_mesto', 'Obec:', 50, 48);
+        $form->addText('adresa_psc', 'PSČ:', 10, 10);
+        $form->addSelect('adresa_stat', 'Stát:', $stat_select)
                 ->setValue('CZE');
 
-        $form1->addText('email', 'E-mail:', 50, 250);
-        $form1->addText('telefon', 'Telefon:', 50, 150);
+        $form->addText('email', 'E-mail:', 50, 250);
+        $form->addText('telefon', 'Telefon:', 50, 150);
 
         $description = \Nette\Utils\Html::el('a')
                 ->href('#')
                 ->onclick("return isdsSubjekt(this);")
                 ->setText('Vyhledat pomocí systému ISDS');
-        $form1->addText('id_isds', 'ID datové schránky:', 10, 50)
+        $form->addText('id_isds', 'ID datové schránky:', 10, 50)
                 ->setOption('description', $description);
 
-        $form1->addTextArea('poznamka', 'Poznámka:', 50, 6);
+        $form->addTextArea('poznamka', 'Poznámka:', 50, 6);
 
-        return $form1;
+        return $form;
     }
 
     protected function createComponentNovyForm()
