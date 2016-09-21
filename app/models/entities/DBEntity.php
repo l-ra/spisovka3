@@ -99,6 +99,14 @@ abstract class DBEntity
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
 
+    protected function _attribute_exists($name)
+    {
+        if (!$this->_data)
+            $this->_load();
+        
+        return array_key_exists($name, $this->_data);
+    }
+    
     /**
      * 
      * @param name    string
@@ -149,6 +157,11 @@ abstract class DBEntity
             throw new Exception("Uložení entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
 
         if ($this->_data_changed) {
+            if ($this->_attribute_exists('date_modified'))
+                $this->date_modified = new DateTime();
+            if ($this->_attribute_exists('user_modified'))
+                $this->user_modified = self::getUser()->id;
+            
             $update_data = [];
             foreach ($this->_columns_changed as $col)
                 $update_data[$col] = $this->_data[$col];
