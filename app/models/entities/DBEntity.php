@@ -71,12 +71,11 @@ abstract class DBEntity implements IteratorAggregate
         // Nenahrávej data, když potřebujeme pouze ID
         if ($name == 'id')
             return $this->id;
-        
-        if (!$this->_data)
-            $this->_load();
 
-        if (array_key_exists($name, $this->_data))
-            return $this->_data[$name];
+        $data = $this->getData();
+
+        if (array_key_exists($name, $data))
+            return $data[$name];
 
         $method_name = "get" . ucfirst($name);
         if (method_exists($this, $method_name)) {
@@ -90,21 +89,17 @@ abstract class DBEntity implements IteratorAggregate
 
     public function __isset($name)
     {
-        if (!$this->_data)
-            $this->_load();
+        $data = $this->getData();
 
-        if (array_key_exists($name, $this->_data))
-            return isset($this->_data[$name]);
+        if (array_key_exists($name, $data))
+            return isset($data[$name]);
 
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
 
     protected function _attribute_exists($name)
-    {
-        if (!$this->_data)
-            $this->_load();
-        
-        return array_key_exists($name, $this->_data);
+    {        
+        return array_key_exists($name, $this->getData());
     }
     
     /**
@@ -131,6 +126,10 @@ abstract class DBEntity implements IteratorAggregate
         }
     }
 
+    /**
+     * Returns entity data as array. For reading only!
+     * @return DibiRow
+     */
     public function getData()
     {
         if (!$this->_data)
@@ -277,10 +276,7 @@ abstract class DBEntity implements IteratorAggregate
      * @return \ArrayIterator
      */
     public function getIterator()
-    {
-        if (!$this->_data)
-            $this->_load();
-        
-        return new ArrayIterator($this->_data);
+    {        
+        return new ArrayIterator($this->getData());
     }
 }
