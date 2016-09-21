@@ -256,6 +256,7 @@ Spisová služba:
   "prázdný sloupec".
 - pouze u sběrného archu: při tisku seznamu spisů chyběl v čísle jednacím
   oddělovač a pořadové číslo ve spisu
+- přidání subjektu k dokumentu se nezaznamenávalo vždy do transakčního protokolu
   
 Spisovna:  
 - hledání spisů při příjmu do spisovny bylo nefunkční

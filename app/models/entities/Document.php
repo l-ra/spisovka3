@@ -73,7 +73,10 @@ class Document extends DBEntity
         return $spis_id !== false ? new Spis($spis_id) : null;
     }
 
-    public function getSubjekty()
+    /**
+     * @return Subject[]
+     */
+    public function getSubjects()
     {
         $model = new DokumentSubjekt();
         return $model->subjekty($this->id);

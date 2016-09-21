@@ -7,75 +7,13 @@ class Subjekt extends BaseModel
 
     protected $name = 'subjekt';
 
-    public function getInfo($subjekt_id)
-    {
-        $result = $this->select(array(array('id=%i', $subjekt_id)));
-        if (count($result) == 0)
-            throw new InvalidArgumentException("Subjekt id '$subjekt_id' neexistuje.");
-
-        return $result->fetch();
-    }
-
-    public function ulozit($data, $subjekt_id = null)
-    {
-
-        if (empty($data['datum_narozeni']))
-            $data['datum_narozeni'] = null;
-        if ($data['datum_narozeni'] == "-0001-11-30")
-            $data['datum_narozeni'] = null;
-
-        if (!is_null($subjekt_id)) {
-
-            // ulozit do historie
-            /* $old_data = (array) $this->getInfo($subjekt_id);
-            $old_data['subjekt_id'] = $subjekt_id;
-            $old_data['user_created'] = self::getUser()->id;
-            $old_data['date_created'] = new DateTime();
-            unset($old_data['id'], $old_data['user_modified'], $old_data['date_modified']);
-            $SubjektHistorie = new SubjektHistorie();
-            $SubjektHistorie->insert($old_data); */
-
-            // aktualizovat
-            $data['date_modified'] = new DateTime();
-            $data['user_modified'] = self::getUser()->id;
-            $this->update($data, array(array('id = %i', $subjekt_id)));
-        } else {
-
-            // insert
-            $data['date_created'] = new DateTime();
-            $data['user_created'] = self::getUser()->id;
-            $data['date_modified'] = new DateTime();
-            $data['user_modified'] = self::getUser()->id;
-            $subjekt_id = $this->insert($data);
-        }
-
-        if ($subjekt_id) {
-            return $subjekt_id;
-        } else {
-            return false;
-        }
-    }
-
-    public function zmenitStav($data)
-    {
-
-        $subjekt_id = $data['id'];
-        unset($data['id']);
-        $data['date_modified'] = new DateTime();
-        $data['user_modified'] = self::getUser()->id;
-
-        $this->update($data, array(array('id=%i', $subjekt_id)));
-
-        return true;
-    }
-
     public function hledat($data, $typ, $only_name = false)
     {
         if (is_array($data))
             $data = \Nette\Utils\ArrayHash::from($data);
         $result = array();
         $cols = array('id');
-        
+
         if ($typ == 'email') {
             // hledani podle emailu
             if (!empty($data->email)) {
@@ -332,7 +270,7 @@ class Subjekt extends BaseModel
                 return $d_nazev . ' (' . ( empty($data->id_isds) ? 'nemá datovou schránku' : $data->id_isds ) . ')';
             case 'telefon':
                 return $d_nazev . ' (' . ( empty($data->telefon) ? 'nemá telefon' : $data->telefon ) . ')';
-                
+
             case 'jmeno':
             default:
                 return $d_nazev;
@@ -406,13 +344,11 @@ class Subjekt extends BaseModel
         return $stav == 1 ? $stavy[1] : $stavy[2];
     }
 
-    public function deleteAll()
-    {
-
-        $DokumentSubjekt = new DokumentSubjekt();
-        $DokumentSubjekt->deleteAll();
-
-        parent::deleteAll();
-    }
-
+//    public function deleteAll()
+//    {
+//        $DokumentSubjekt = new DokumentSubjekt();
+//        $DokumentSubjekt->deleteAll();
+//
+//        parent::deleteAll();
+//    }
 }

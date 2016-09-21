@@ -51,7 +51,7 @@ class DokumentSpis extends BaseModel
             }
 
             $DokSubjekty = new DokumentSubjekt();
-            $subjekty = $DokSubjekty->subjekty($dokument_ids);
+            $subjekty = $DokSubjekty->subjekty3($dokument_ids);
             $pocty_souboru = DokumentPrilohy::pocet_priloh($dokument_ids);
 
             foreach ($result as $joinDok) {

@@ -261,7 +261,10 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             
             $model = new Dokument();
             $dokument_id = $model->vytvorit($d);
-            $dokument = $model->getInfo($dokument_id);
+            $document = new Document($dokument_id);
+
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
             // Ulozeni souboru
             if ($zprava->typ == 'E') {
@@ -280,18 +283,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $DokumentSubjekt = new DokumentSubjekt();
                 foreach ($subjekty as $subjekt_id => $subjekt_status)
                     if ($subjekt_status == 'on')
-                        $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'O');
+                        $DokumentSubjekt->pripojit($document, new Subject($subjekt_id), 'O');
             }
 
             // Pridani informaci do epodatelny
             $zprava->dokument_id = $dokument_id;
             $zprava->stav = 10;
-            $zprava->stav_info = 'Zpráva přidána do spisové služby jako ' . $dokument->jid;
+            $zprava->stav_info = 'Zpráva přidána do spisové služby jako ' . $document->jid;
             $zprava->save();
-
-
-            $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
             dibi::commit();
             $document_created = true;
@@ -317,14 +316,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             if ($zprava->typ == 'E') {
                 $email_info = array(
-                    'jid' => $dokument->jid,
+                    'jid' => $document->jid,
                     'nazev' => $zprava->predmet,
                     'predano' => $predano
                 );
                 EmailAvizo::epodatelna_zaevidovana($zprava->odesilatel, $email_info);
             }
 
-            return $dokument;
+            return $document;
             
         } catch (Exception $e) {
             if (!$document_created)

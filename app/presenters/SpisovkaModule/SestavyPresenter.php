@@ -278,7 +278,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 // $start_memory = memory_get_usage();
                 $this->template->subjekty = DokumentSubjekt::subjekty2($dokument_ids);
                 $this->template->d2s = DokumentSubjekt::dejAsociaci($dokument_ids);
-                // Nette\Diagnostics\Debugger::dump("Pamet zabrana nahranim subjektu: " . (memory_get_usage() - $start_memory));
+                // dump("Pamet zabrana nahranim subjektu: " . (memory_get_usage() - $start_memory));
 
                 $pocty_souboru = DokumentPrilohy::pocet_priloh($dokument_ids);
 

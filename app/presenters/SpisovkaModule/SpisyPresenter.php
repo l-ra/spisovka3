@@ -480,7 +480,6 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function renderOdmitnoutprevzeti()
     {
-
         $spis_id = $this->getParameter('id', null);
 
         $Spisy = new SpisModel;

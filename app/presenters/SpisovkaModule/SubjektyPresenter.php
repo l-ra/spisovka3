@@ -29,7 +29,7 @@ class SubjektyPresenter extends BasePresenter
         $data = $ares->get($ic);
         if (is_string($data))
             $data = ['error' => $data];
-        
+
         $this->sendJson($data);
     }
 
@@ -51,7 +51,7 @@ class SubjektyPresenter extends BasePresenter
         } catch (Exception $e) {
             echo json_encode(array("error" => $e->getMessage()));
         }
-        
+
         $this->terminate();
     }
 
@@ -160,47 +160,35 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $this->view = 'form2';
     }
 
-    // Volano pouze pres Ajax
-    public function renderNacti()
+    /** Volano pouze pres Ajax
+     * 
+     * @param int $id  ID dokumentu
+     */
+    public function renderNacti($id)
     {
-        $dokument_id = $this->getParameter('id', null); // tady jako dokument_id
-
-        $DokumentSubjekt = new DokumentSubjekt();
-        $seznam = $DokumentSubjekt->subjekty($dokument_id);
-        $this->template->subjekty = $seznam;
-        $this->template->dokument_id = $dokument_id;
+        $doc = new Document($id);
+        $this->template->subjekty = $doc->getSubjects();
+        $this->template->dokument_id = $id;
     }
 
     // Volano pouze pres Ajax
-    public function actionVybrano()
+    public function actionVybrano($id, $dok_id, $typ = null)
     {
         try {
-            $subjekt_id = $this->getParameter('id', null);
-            $dokument_id = $this->getParameter('dok_id', null);
-            $typ = $this->getParameter('typ', null);
+            $subjekt_id = $id;
+            $dokument_id = $dok_id;
 
-            $Subjekt = new Subjekt();
-            $subjekt = $Subjekt->getInfo($subjekt_id);
-            if ($subjekt) {
+            $subject = new Subject($subjekt_id);
+            // Propojit s dokumentem
+            $DokumentSubjekt = new DokumentSubjekt();
+            $DokumentSubjekt->pripojit(new Document($dokument_id), $subject, $typ);
 
-                // Propojit s dokumentem
-                $DokumentSubjekt = new DokumentSubjekt();
-                $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, $typ);
-
-                $Log = new LogModel();
-                $Log->logDokument($dokument_id, LogModel::SUBJEKT_PRIDAN,
-                        'Přidán subjekt "' . Subjekt::displayName($subjekt, 'jmeno') . '"');
-
-                echo '###vybrano###' . $dokument_id;
-            } else {
-                // chyba            
-                echo 'Zvolený subjekt se nepodařilo načíst.';
-            }
+            echo '###vybrano###' . $dokument_id;
         } catch (Exception $e) {
             echo 'Chyba ' . $e->getCode() . ' - ' . $e->getMessage();
         }
 
-		$this->terminate();
+        $this->terminate();
     }
 
     public function renderOdebrat()
@@ -214,8 +202,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         if ($seznam = $DokumentSubjekt->odebrat($param)) {
 
             $Log = new LogModel();
-            $Subjekt = new Subjekt();
-            $subjekt_info = $Subjekt->getInfo($subjekt_id);
+            $subjekt_info = new Subject($subjekt_id);
             $Log->logDokument($dokument_id, LogModel::SUBJEKT_ODEBRAN,
                     'Odebrán subjekt "' . Subjekt::displayName($subjekt_info, 'jmeno') . '"');
 
@@ -223,7 +210,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         } else {
             $this->flashMessage('Subjekt se nepodařilo odebrat. Zkuste to znovu.', 'warning');
         }
-        $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument_id));
+        $this->redirect('Dokumenty:detail', array('id' => $dokument_id));
     }
 
     public function actionSeznamAjax()
@@ -271,17 +258,9 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         exit;
     }
 
-    public function renderUpravit()
+    public function renderUpravit($id)
     {
-        $subjekt_id = $this->getParameter('id', null);
-        $dokument_id = $this->getParameter('dok_id', null);
-
-        $model = new Subjekt();
-        $subjekt = $subjekt_id === null ? null : $model->getInfo($subjekt_id);
-
-        $this->template->Subjekt = $subjekt;
-        $this->template->dokument_id = $dokument_id;
-        $this->template->FormUpravit = $this->getParameter('upravit', null);
+        $this->template->Subjekt = new Subject($id);
         $this->template->subjektForm = $this['upravitForm'];
     }
 
@@ -312,9 +291,9 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
             $data['adresa_stat'] = null;
 
         try {
-            $Subjekt = new Subjekt();
-            $Subjekt->ulozit($data, $subjekt_id);
-
+            $subject = new Subject($subjekt_id);
+            $subject->modify($data);
+            $subject->save();
             echo "###zmeneno###";
         } catch (Exception $e) {
             echo "Chyba! Subjekt se nepodařilo upravit.<br/>" . $e->getMessage();
@@ -376,18 +355,16 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $payload = ['status' => 'OK', 'extra_data' => $extra_data];
 
         try {
-            $Subjekt = new Subjekt();
             unset($data->dokument_id);
             unset($data->extra_data);
-            $subjekt_id = $Subjekt->ulozit((array) $data);
-
+            $subject = Subject::create((array) $data);
             try {
                 if ($dokument_id) {
                     // byli jsme zavolani z dokumentu modulu spisovka
                     $DokumentSubjekt = new DokumentSubjekt();
-                    $DokumentSubjekt->pripojit($dokument_id, $subjekt_id, 'AO');
+                    $DokumentSubjekt->pripojit(new Document($dokument_id), $subject, 'AO');
                 }
-                $payload['id'] = $subjekt_id;
+                $payload['id'] = $subject->id;
                 $payload['name'] = Subjekt::displayName($data, 'full');
             } catch (Exception $e) {
                 $payload['status'] = "Subjekt byl vytvořen ale nepodařilo se jej připojit k dokumentu.";

@@ -20,14 +20,12 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
     public function vytvoritClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
-
-        $Subjekt = new Subjekt();
+        $data = $button->getForm()->getValues(true);
 
         try {
-            $subjekt_id = $Subjekt->ulozit($data);
+            $subject = Subject::create($data);
             $this->flashMessage('Subjekt  "' . Subjekt::displayName($data, 'jmeno') . '"  byl vytvořen.');
-            $this->redirect('detail', array('id' => $subjekt_id));
+            $this->redirect('detail', $subject->id);
         } catch (DibiException $e) {
             $this->flashMessage('Subjekt "' . Subjekt::displayName($data, 'jmeno') . '" se nepodařilo vytvořit.',
                     'warning');
@@ -87,24 +85,12 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         $this->template->seznam = $seznam;
     }
 
-    public function renderDetail()
+    public function renderDetail($id)
     {
         $this->template->title = " - Detail subjektu";
-
         $this->template->FormUpravit = $this->getParameter('upravit', null);
-
-        $subjekt_id = $this->getParameter('id', null);
-
-        $Subjekt = new Subjekt();
-        $subjekt = $Subjekt->getInfo($subjekt_id);
-        $this->template->Subjekt = $subjekt;
-
+        $this->template->Subjekt = new Subject($id);
         $this->template->subjektForm = $this['upravitForm'];
-    }
-
-    public function renderImport()
-    {
-        
     }
 
     public function renderExport()
@@ -164,13 +150,13 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         if (empty($data['adresa_stat']))
             $data['adresa_stat'] = null;
 
-        $Subjekt = new Subjekt();
-
         try {
-            $Subjekt->ulozit($data, $subjekt_id);
+            $subject = new Subject($subjekt_id);
+            $subject->modify($data);
+            $subject->save();
             $this->flashMessage('Subjekt  "' . Subjekt::displayName($data, 'jmeno') . '"  byl upraven.');
 
-            $this->redirect('detail', array('id' => $subjekt_id));
+            $this->redirect('detail', $subjekt_id);
         } catch (DibiException $e) {
             $this->flashMessage('Subjekt "' . Subjekt::displayName($data, 'jmeno') . '" se nepodařilo upravit.',
                     'warning');
@@ -217,13 +203,14 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     public function zmenitStavClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        $subjekt_id = $data['id'];
-        $Subjekt = new Subjekt();
+        $id = $data['id'];
 
         try {
-            $Subjekt->zmenitStav($data);
+            $subject = new Subject($id);
+            $subject->stav = $data->stav;
+            $subject->save();
             $this->flashMessage('Stav subjektu byl změněn.');
-            $this->redirect('detail', array('id' => $subjekt_id));
+            $this->redirect('detail', $id);
         } catch (DibiException $e) {
             $e->getMessage();
             $this->flashMessage('Stav subjektu se nepodařilo změnit.', 'warning');

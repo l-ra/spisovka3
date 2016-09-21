@@ -112,7 +112,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             }
 
             $DokSubjekty = new DokumentSubjekt();
-            $subjekty = $DokSubjekty->subjekty($dokument_ids);
+            $subjekty = $DokSubjekty->subjekty3($dokument_ids);
             $pocty_souboru = DokumentPrilohy::pocet_priloh($dokument_ids);
 
             foreach ($seznam as $index => $row) {

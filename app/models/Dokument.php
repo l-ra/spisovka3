@@ -951,7 +951,6 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
     // $detail - nyní slouží pouze jako parametr pro nahrávání informace o přílohách
     public function getInfo($dokument_id, $details = null)
     {
-
         if ($details === null)
             $details = "";
         if (!is_string($details))
@@ -959,23 +958,22 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         $details = explode(',', $details);
 
         $sql = array(
-            'distinct' => null,
             'from' => array($this->name => 'dok'),
             'cols' => array('*', 'id' => 'dokument_id', '%sql YEAR(dok.datum_spousteci_udalosti)+1+dok.skartacni_lhuta' => 'skartacni_rok'),
             'leftJoin' => array(
                 'dokspisy' => array(
                     'from' => array($this->tb_dokspis => 'ds'),
-                    'on' => array('ds.dokument_id=dok.id'),
+                    'on' => array('ds.dokument_id = dok.id'),
                     'cols' => array('poradi' => 'poradi_spisu')
                 ),
                 'typ_dokumentu' => array(
                     'from' => array($this->tb_dokumenttyp => 'dtyp'),
-                    'on' => array('dtyp.id=dok.dokument_typ_id'),
+                    'on' => array('dtyp.id = dok.dokument_typ_id'),
                     'cols' => array('nazev' => 'typ_nazev', 'popis' => 'typ_popis', 'smer' => 'typ_smer')
                 ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
-                    'on' => array('spis.id=ds.spis_id'),
+                    'on' => array('spis.id = ds.spis_id'),
                     'cols' => array('id' => 'spis_id', 'nazev' => 'nazev_spisu', 'popis' => 'popis_spisu')
                 ),
                 'epod' => array(
@@ -985,24 +983,24 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 ),
                 'spisovy_znak' => array(
                     'from' => array($this->tb_spisovy_znak => 'spisznak'),
-                    'on' => array('spisznak.id=dok.spisovy_znak_id'),
+                    'on' => array('spisznak.id = dok.spisovy_znak_id'),
                     'cols' => array('id' => 'spisznak_id', 'nazev' => 'spisznak_nazev', 'popis' => 'spisznak_popis', 'skartacni_znak' => 'spisznak_skartacni_znak', 'skartacni_lhuta' => 'spisznak_skartacni_lhuta', 'spousteci_udalost_id' => 'spisznak_spousteci_udalost_id')
                 ),
                 'zpusob_doruceni' => array(
                     'from' => array($this->tb_zpusob_doruceni => 'zdoruceni'),
-                    'on' => array('zdoruceni.id=dok.zpusob_doruceni_id'),
+                    'on' => array('zdoruceni.id = dok.zpusob_doruceni_id'),
                     'cols' => array('nazev' => 'zpusob_doruceni')
                 ),
                 'zpusob_vyrizeni' => array(
                     'from' => array($this->tb_zpusob_vyrizeni => 'zvyrizeni'),
-                    'on' => array('zvyrizeni.id=dok.zpusob_vyrizeni_id'),
+                    'on' => array('zvyrizeni.id = dok.zpusob_vyrizeni_id'),
                     'cols' => array('nazev' => 'zpusob_vyrizeni')
                 ),
             ),
             'order_by' => array('dok.id' => 'DESC')
         );
 
-        $sql['where'] = array(array('dok.id=%i', $dokument_id));
+        $sql['where'] = array(array('dok.id = %i', $dokument_id));
 
         $result = $this->selectComplex($sql);
         if (!count($result))
@@ -1108,10 +1106,9 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             $dokument->cislo_jednaci = "";
 
         // nacteni extra informaci, pokud je pozadovano
-        if (in_array('subjekty', $details)) {
-            $DokSubjekty = new DokumentSubjekt();
-            $dokument->subjekty = $DokSubjekty->subjekty($dokument_id);
-        }
+        $doc = new Document($dokument_id);
+        if (in_array('subjekty', $details))
+            $dokument->subjekty = $doc->getSubjects();
 
         if (in_array('soubory', $details)) {
             $Dokrilohy = new DokumentPrilohy();

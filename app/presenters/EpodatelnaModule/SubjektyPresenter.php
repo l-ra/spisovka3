@@ -4,11 +4,9 @@ class Epodatelna_SubjektyPresenter extends SubjektyPresenter
 {
 
     // Volano pouze pres Ajax
-    public function renderNacti()
+    public function renderNacti($id)
     {
-        $subjekt_id = $this->getParameter('id');
-        $Subjekt = new Subjekt();
-        $this->template->subjekt = $Subjekt->getInfo($subjekt_id);
+        $this->template->subjekt = new Subject($id);
     }
 
 }
