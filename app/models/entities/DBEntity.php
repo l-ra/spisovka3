@@ -4,7 +4,7 @@
  * @author Pavel Lastovicka
  * @created 02-IX-2014 13:06:54
  */
-abstract class DBEntity
+abstract class DBEntity implements IteratorAggregate
 {
 
     const TBL_NAME = 'dbentity';
@@ -272,4 +272,15 @@ abstract class DBEntity
         return new static($id);
     }
 
+    /**
+     * IteratorAggregate interface
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        if (!$this->_data)
+            $this->_load();
+        
+        return new ArrayIterator($this->_data);
+    }
 }
