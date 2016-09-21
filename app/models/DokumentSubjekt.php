@@ -91,7 +91,7 @@ class DokumentSubjekt extends BaseModel
 
         $Log = new LogModel();
         $Log->logDokument($doc->id, LogModel::SUBJEKT_PRIDAN,
-                'Přidán subjekt "' . Subjekt::displayName($subject, 'jmeno') . '"');
+                'Přidán subjekt "' . $subject . '"');
     }
 
     public function zmenit($dokument_id, $subjekt_id, $typ = 'AO')

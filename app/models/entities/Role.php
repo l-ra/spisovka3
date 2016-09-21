@@ -35,7 +35,7 @@ class Role extends TableCachedDBEntity
     {
         if ($this->_data_changed) {
             $m = new RoleModel();
-            $res = $m->upravitH($this->_data, $this->id);
+            $res = $m->upravitH($this->getData(), $this->id);
             self::_invalidateCache();
             return $res;
         }

@@ -22,4 +22,8 @@ class Subject extends DBEntity
         return parent::create($data);
     }
 
+    public function __toString()
+    {
+        return Subjekt::displayName($this->getData());
+    }
 }

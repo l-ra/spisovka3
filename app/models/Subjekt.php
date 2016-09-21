@@ -78,7 +78,7 @@ class Subjekt extends BaseModel
 
         $subjekty = $this->select([['id IN %in', $ids]])->fetchAll();
         foreach ($subjekty as $subjekt) {
-            $subjekt->full_name = Subjekt::displayName($subjekt, 'full');
+            $subjekt->full_name = self::displayName($subjekt, 'full');
         }
 
         if (!$only_name)

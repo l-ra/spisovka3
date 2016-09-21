@@ -24,10 +24,10 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
         try {
             $subject = Subject::create($data);
-            $this->flashMessage('Subjekt  "' . Subjekt::displayName($data, 'jmeno') . '"  byl vytvořen.');
+            $this->flashMessage('Subjekt  "' . $subject . '"  byl vytvořen.');
             $this->redirect('detail', $subject->id);
         } catch (DibiException $e) {
-            $this->flashMessage('Subjekt "' . Subjekt::displayName($data, 'jmeno') . '" se nepodařilo vytvořit.',
+            $this->flashMessage('Subjekt se nepodařilo vytvořit.',
                     'warning');
             $this->flashMessage($e->getMessage(), 'warning');
             $this->redirect('novy');
@@ -150,15 +150,15 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
         if (empty($data['adresa_stat']))
             $data['adresa_stat'] = null;
 
+        $subject = new Subject($subjekt_id);
         try {
-            $subject = new Subject($subjekt_id);
             $subject->modify($data);
             $subject->save();
-            $this->flashMessage('Subjekt  "' . Subjekt::displayName($data, 'jmeno') . '"  byl upraven.');
+            $this->flashMessage('Subjekt  "' . $subject . '"  byl upraven.');
 
             $this->redirect('detail', $subjekt_id);
         } catch (DibiException $e) {
-            $this->flashMessage('Subjekt "' . Subjekt::displayName($data, 'jmeno') . '" se nepodařilo upravit.',
+            $this->flashMessage('Subjekt "' . $subject . '" se nepodařilo upravit.',
                     'warning');
             $this->flashMessage($e->getMessage(), 'warning');
 
