@@ -1716,7 +1716,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $mail->addTo($email);
                 }
             } else {
-                $mail->addTo($adresat->email);
+                $mail->addTo($adresat->email, Subjekt::displayName($adresat));
             }
 
             $mail->setSubject($data['email_predmet']);

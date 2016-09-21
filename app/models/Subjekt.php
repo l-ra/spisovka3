@@ -117,7 +117,7 @@ class Subjekt extends BaseModel
         return ($res) ? $res : NULL;
     }
 
-    public static function displayName($data, $display)
+    public static function displayName($data, $display = 'jmeno')
     {
         if (is_string($data))
             return $data;
