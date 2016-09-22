@@ -17,7 +17,11 @@
 :Spisovka:Sestavy:detail { "id": 1 }
 :Spisovka:Sestavy:upravit { "id": 4 }
 :Spisovka:Sestavy:tisk { "id": 6 }
+:Spisovka:Subjekty:nacti { "id": 1 }
 :Spisovka:Subjekty:novy { "dok_id": 1234 }
+:Spisovka:Subjekty:seznamAjax JsonResponse { "term": "blu" }
+:Spisovka:Subjekty:seznamStatuAjax JsonResponse
+:Spisovka:Subjekty:upravit { "id": 1 }
 :Spisovka:Subjekty:vyber { "dok_id": 1234 }
 :Spisovka:Vypravna:
 :Spisovka:Vypravna:filtrovat
@@ -29,6 +33,7 @@
 :Epodatelna:Default:prichozi
 :Epodatelna:Default:odchozi
 :Epodatelna:Default:zkontrolovatAjax NULL
+:Epodatelna:Subjekty:nacti { "id": 1 }
 :Spisovna:Default: RedirectResponse
 :Spisovna:Dokumenty:
 :Spisovna:Dokumenty:prijem
