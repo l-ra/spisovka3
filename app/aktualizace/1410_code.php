@@ -11,6 +11,14 @@ function revision_1410_before()
         $constraint = $row->CONSTRAINT_NAME;
         dibi::query('ALTER TABLE %n DROP FOREIGN KEY %n', $table, $constraint);
     }
+
+    $res = dibi::query('SELECT TABLE_NAME, INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = %s AND INDEX_NAME LIKE %s',
+                    $db_config['database'], 'fk_%')->fetchAll();
+    foreach ($res as $row) {
+        $table = $row->TABLE_NAME;
+        $index = $row->INDEX_NAME;
+        dibi::query('ALTER TABLE %n DROP KEY %n', $table, $index);
+    }
     
     echo "Integritní omezení byla všechna úspěšně smazána.";
 }
