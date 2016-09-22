@@ -107,6 +107,13 @@ foreach ($clients as $site_path => $site_name) {
 
         $client->connect_to_db();
 
+        $mysqli = dibi::getConnection()->getDriver()->getResource();
+        $version_number = $mysqli->server_version;
+        if ($version_number < 50500) {
+            error ("Používáte zastaralou verzi databáze MySQL - $mysqli->server_info. Podporovaná je verze 5.5 a vyšší. Aplikace nemusí pracovat správně.");
+            echo '<br />';
+        }
+
         if (!$client->check_rename_db_tables()) {
             echo '<p>';
             if (!$do_update)
@@ -123,13 +130,6 @@ foreach ($clients as $site_path => $site_name) {
         error($e->getMessage());
         echo '</div>';
         continue;  // jdi na dalsiho klienta
-    }
-
-    $mysqli = dibi::getConnection()->getDriver()->getResource();
-    $version_number = $mysqli->server_version;
-    if ($version_number < 50500) {
-        error ("Používáte zastaralou verzi databáze MySQL - $mysqli->server_info. Podporovaná je verze 5.5 a vyšší. Aplikace nemusí pracovat správně.");
-        echo '<br />';
     }
 
     echo '<dl>';
