@@ -194,7 +194,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $this->terminate();
     }
 
-    public function renderOdebrat()
+    public function actionOdebrat()
     {
         $subjekt_id = $this->getParameter('id', null);
         $dokument_id = $this->getParameter('dok_id', null);
@@ -203,7 +203,6 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $param = array(array('subjekt_id=%i', $subjekt_id), array('dokument_id=%i', $dokument_id));
 
         if ($seznam = $DokumentSubjekt->odebrat($param)) {
-
             $Log = new LogModel();
             $subject = new Subject($subjekt_id);
             $Log->logDokument($dokument_id, LogModel::SUBJEKT_ODEBRAN,
@@ -216,14 +215,10 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         $this->redirect('Dokumenty:detail', array('id' => $dokument_id));
     }
 
-    public function actionSeznamAjax()
+    public function renderSeznamAjax($term = null)
     {
-
         $Subjekt = new Subjekt();
-
         $seznam = array();
-
-        $term = $this->getParameter('term');
 
         if (!empty($term)) {
             $args = array('where' => array(array("LOWER(CONCAT_WS('', nazev_subjektu,prijmeni,jmeno,ic,adresa_mesto,adresa_ulice,email,telefon,id_isds)) LIKE LOWER(%s)", '%' . $term . '%'),
@@ -243,22 +238,12 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
             }
         }
 
-        echo json_encode($seznam);
-
-        exit;
+        $this->sendJson($seznam);
     }
 
-    public function actionSeznamtypusubjektu()
+    public function renderSeznamStatuAjax()
     {
-        $typy_subjektu = Subjekt::typ_subjektu();
-        echo json_encode($typy_subjektu);
-        exit;
-    }
-
-    public function actionSeznamStatuAjax()
-    {
-        echo json_encode(Subjekt::stat());
-        exit;
+        $this->sendJson(Subjekt::stat());
     }
 
     public function renderUpravit($id)
