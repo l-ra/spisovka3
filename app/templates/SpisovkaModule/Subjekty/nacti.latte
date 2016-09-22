@@ -2,7 +2,7 @@
     {var povolit_zmeny = isset($AccessEdit) ? $AccessEdit : true}
     <table class="seznam">
         {foreach $subjekty as $subjekt}
-            {include 'subjekt.latte', subjekt => $subjekt, akce_odebrat_zmenit => $povolit_zmeny}
+            {include 'subjekt.latte', subjekt => $subjekt, rezim_subjektu => $subjekt->rezim_subjektu, akce_odebrat_zmenit => $povolit_zmeny}
         {/foreach}
     </table>
 {else}

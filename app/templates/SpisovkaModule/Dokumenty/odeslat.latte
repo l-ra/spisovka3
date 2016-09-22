@@ -24,7 +24,7 @@
                         {var $existuje_adresat = 1}
                         {* <tr style="border-top: 2px solid;" class="dokument_blok_sedy"> *}
 
-                        {include '../Subjekty/subjekt.latte', subjekt => $subjekt}
+                        {include '../Subjekty/subjekt.latte', subjekt => $subjekt, rezim_subjektu => $subjekt->rezim_subjektu}
 
                         {if count($Dok->odeslani) > 0}
                             {foreach $Dok->odeslani as $dokodes}

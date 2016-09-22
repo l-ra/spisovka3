@@ -74,7 +74,7 @@ class Document extends DBEntity
     }
 
     /**
-     * @return Subject[]
+     * @return DibiRow[]
      */
     public function getSubjects()
     {
