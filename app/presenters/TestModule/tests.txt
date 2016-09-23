@@ -121,8 +121,11 @@
 :Spisovna:Dokumenty:skartacniNavrh
 :Spisovna:Dokumenty:skartacniRizeni
 :Spisovna:Spisy:
+:Spisovna:Spisy:detail { "id": 17 }
 :Spisovna:Spisy:prijem
 :Spisovna:Spisy:strom
+:Spisovna:Vyhledat:
 :Spisovna:Zapujcky:
 :Spisovna:Zapujcky:detail { "id": 21 }
 :Spisovna:Zapujcky:nova
+:Spisovna:Zapujcky:seznamAjax JsonResponse { "term": "test" }

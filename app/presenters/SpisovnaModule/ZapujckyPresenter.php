@@ -178,15 +178,10 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         }
     }
 
-    public function actionDetail()
+    public function renderDetail($id)
     {
         $Zapujcka = new Zapujcka();
-
-        // Nacteni parametru
-        $zapujcka_id = $this->getParameter('id', null);
-
-        $this->template->Zapujcka = null;
-        $zapujcka = $Zapujcka->getInfo($zapujcka_id);
+        $zapujcka = $Zapujcka->getInfo($id);
         if ($zapujcka) {
             $this->template->Opravnen_schvalit_zapujcku = $this->user->isAllowed('Zapujcka',
                     'schvalit');
@@ -384,7 +379,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         $this->redirect('this');
     }
 
-    public function actionSeznamAjax($term)
+    public function renderSeznamAjax($term)
     {
         $Zapujcka = new Zapujcka();
         $zapujcky = $Zapujcka->seznamZapujcenychDokumentu();
