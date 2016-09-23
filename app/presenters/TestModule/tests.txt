@@ -48,6 +48,7 @@
 :Spisovna:Zapujcky:nova
 :Spisovna:Zapujcky:detail { "id": 21 }
 :Admin:Default:
+:Admin:Default:ostatni
 :Admin:Nastaveni:
 :Admin:Nastaveni: { "upravit": "info" }
 :Admin:Nastaveni: { "upravit": "cjednaci" }
@@ -68,11 +69,14 @@
 :Admin:Zamestnanci:seznam
 :Admin:Zamestnanci:novy
 :Admin:Zamestnanci:detail { "id": 1 }
-:Admin:Zamestnanci:detail { "id": 1, "upravit": "info" }
-:Admin:Zamestnanci:detail { "id": 1, "new_user": 1 }
-:Admin:Zamestnanci:detail { "id": 1, "user": 1, "upravit": "heslo" }
-:Admin:Zamestnanci:detail { "id": 1, "role": 1 }
-:Admin:Zamestnanci:detail { "id": 1, "user": 1, "upravit": "org" }
+:Admin:Zamestnanci:detail { "id": 1, "edit": 1 }
+:Admin:Zamestnanci:detail { "id": 1, "new_account": 1 }
+:Admin:Zamestnanci:ucet { "id": 1 }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "username" }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "auth_type" }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "orgunit" }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "roles" }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "password" }
 :Admin:Orgjednotky:seznam
 :Admin:Orgjednotky:novy
 :Admin:Orgjednotky:detail { "id": 1 }
@@ -85,6 +89,7 @@
 :Admin:Spisznak:novy
 :Admin:Spisznak:detail { "id": 17 }
 :Admin:Spisznak:detail { "id": 17, "upravit": "info" }
+:Admin:Spisznak:export
 :Admin:Ciselniky:
 :Admin:Ciselniky:typdokumentu
 :Admin:Ciselniky:spousteciudalost
@@ -102,6 +107,7 @@
 :Admin:Ciselniky:druhzasilky { "ciselnik_new": 1 }
 :Admin:Protokol:
 :Admin:Protokol:prihlaseni
+:Admin:Protokol:isds
 :Spisovka:Napoveda:
 :Spisovka:Uzivatel:
 :Spisovka:Uzivatel: { "id": 1, "upravit": "info" }

@@ -8,7 +8,7 @@ class Admin_DefaultPresenter extends BasePresenter
 
     }
 
-    public function renderSmazatDbCache()
+    public function actionSmazatDbCache()
     {
         if (!$this->user->isInRole('admin')) {
             $this->redirect('default');
@@ -17,7 +17,7 @@ class Admin_DefaultPresenter extends BasePresenter
         DbCache::clearCache();
 
         $this->flashMessage('Databázová cache byla smazána.');
-        $this->redirect(':Admin:default:ostatni');
+        $this->redirect('ostatni');
     }
     
     public function renderOstatni()

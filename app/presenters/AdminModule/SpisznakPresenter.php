@@ -24,7 +24,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->template->seznam = $seznam;
     }
 
-    public function actionNovy()
+    public function renderNovy()
     {
         $this->template->title = " - Nový spisový znak";
     }
@@ -67,18 +67,8 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->_odebrat(true);
     }
 
-    public function renderNovy()
-    {
-    }
-
-    public function renderImport()
-    {
-        
-    }
-
     public function renderExport()
     {
-
         if ($this->getHttpRequest()->isPost()) {
             // Exportovani
             $post_data = $this->getHttpRequest()->getPost();

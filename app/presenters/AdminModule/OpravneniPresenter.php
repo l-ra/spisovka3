@@ -27,7 +27,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->template->seznam = $seznam;
     }
 
-    public function actionNovy()
+    public function renderNovy()
     {
         $this->template->title = " - Nová role";
     }

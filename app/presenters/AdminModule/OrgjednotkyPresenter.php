@@ -34,14 +34,9 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $this->template->seznam = $seznam;
     }
 
-    public function actionNovy()
+    public function renderNovy()
     {
         $this->template->title = " - Nová organizační jednotka";
-    }
-
-    public function actionDetail()
-    {
-        
     }
 
     public function renderDetail($id)
