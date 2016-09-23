@@ -8,7 +8,7 @@ class Spisovka_NapovedaPresenter extends BasePresenter
         return true;
     }
 
-    public function actionDefault($param1, $param2, $param3)
+    public function renderDefault($param1, $param2, $param3)
     {
         if ($param1 == "obsah") {
             $this->template->helpFile = dirname(APP_DIR) . "/help/hlavni.phtml";

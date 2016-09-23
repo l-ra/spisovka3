@@ -420,10 +420,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect('detail', $id);
     }
 
-    public function renderCjednaci()
+    public function renderCjednaci($id, $evidence = 0)
     {
-        $this->template->dokument_id = $this->getParameter('id', null);
-        $this->template->evidence = $this->getParameter('evidence', 0);
+        $this->template->dokument_id = $id;
+        $this->template->evidence = $evidence;
     }
 
     // tato metoda slouží pouze pro sběrný arch

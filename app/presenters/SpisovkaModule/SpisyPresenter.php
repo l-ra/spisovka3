@@ -413,12 +413,11 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             }
         }
 
-        $this->redirect(':Spisovka:Spisy:detail', array('id' => $spis_id));
+        $this->redirect('detail', array('id' => $spis_id));
     }
 
-    /* Tato operace je povolena pouze, kdyz spis nema zadneho vlastnika */
-
-    public function renderPrivlastnit()
+    /** Tato operace je povolena pouze, kdyz spis nema zadneho vlastnika */
+    public function actionPrivlastnit()
     {
         $spis_id = $this->getParameter('id', null);
 
@@ -438,10 +437,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                     'warning');
         }
 
-        $this->redirect(':Spisovka:Spisy:detail', array('id' => $spis_id));
+        $this->redirect('detail', array('id' => $spis_id));
     }
 
-    public function renderZrusitprevzeti()
+    public function actionZrusitprevzeti()
     {
         $spis_id = $this->getParameter('id', null);
 
@@ -475,10 +474,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             }
         }
 
-        $this->redirect(':Spisovka:Spisy:detail', array('id' => $spis_id));
+        $this->redirect('detail', array('id' => $spis_id));
     }
 
-    public function renderOdmitnoutprevzeti()
+    public function actionOdmitnoutprevzeti()
     {
         $spis_id = $this->getParameter('id', null);
 
@@ -512,7 +511,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             }
         }
 
-        $this->redirect(':Spisovka:spisy:detail', array('id' => $spis_id));
+        $this->redirect('detail', array('id' => $spis_id));
     }
 
     public function createComponentBulkAction()
@@ -624,7 +623,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     {
         // tento nefunkční hack by se měl z programu odstranit
         $this->flashMessage('Funkce byla z programu odstraněna.', 'error');
-        $this->redirect(':Spisovka:Spisy:default');
+        $this->redirect('default');
 
         /*
           $Spisy = new Spis();
@@ -642,7 +641,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
           }
           }
           }
-          $this->redirect(':Spisovka:Spisy:default');
+          $this->redirect('default');
           }
 
           $args = null;

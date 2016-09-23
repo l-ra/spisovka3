@@ -30,7 +30,7 @@
     <div class="detail_blok">
         <div class="detail_hlavicka">Uživatelský účet</div>
         {if $FormUpravit == 'heslo' && Settings::get('users_can_change_their_password', true)}
-        {control auth_change_password}
+            {control changePassword}
         {else}
         <dl>
             <dt>Uživatelské jméno:</dt>

@@ -81,16 +81,25 @@
 :Install:Default:uvod
 :Spisovka:Default: RedirectResponse
 :Spisovka:Dokumenty:
+:Spisovka:Dokumenty:cjednaci { "id": 190 }
 :Spisovka:Dokumenty:detail { "id": 190 }
+:Spisovka:Dokumenty:detailSpojeni { "id": 190 }
+:Spisovka:Dokumenty:historie { "id": 190 }
 :Spisovka:Dokumenty:novy
 :Spisovka:Dokumenty:novy RedirectResponse { "cisty": 1 }
+:Spisovka:Dokumenty:odeslat { "id": 190 }
 :Spisovka:Napoveda:
-:Spisovka:Prilohy:pridat { "id": 1234 }
+:Spisovka:Napoveda: { "param1": "spisovka", "param2": "dokumenty", "param3": "detail" }
+:Spisovka:Prilohy:nacti { "id": 2858 }
+:Spisovka:Prilohy:pridat { "id": 190 }
 :Spisovka:Sestavy:
 :Spisovka:Sestavy:detail { "id": 1 }
+:Spisovka:Sestavy:filtr { "id": 1 }
 :Spisovka:Sestavy:nova
 :Spisovka:Sestavy:tisk { "id": 6 }
 :Spisovka:Sestavy:upravit { "id": 4 }
+:Spisovka:Seznamzmen:
+:Spisovka:Spisznak:detail JsonResponse { "id": 20 }
 :Spisovka:Spisy:
 :Spisovka:Spisy:detail { "id": 8 }
 :Spisovka:Spisy:detail { "id": 8, "upravit": "info" }
@@ -99,20 +108,29 @@
 :Spisovka:Spisy:strom
 :Spisovka:Spisy:strom2
 :Spisovka:Spisy:vyber
+:Spisovka:Spojit:hledat JsonResponse { "q": "podpis" }
+:Spisovka:Spojit:vyber { "id": 190 }
+:Spisovka:Subjekty:isds JsonResponse { "box": "h6jam4z" }
 :Spisovka:Subjekty:nacti { "id": 1 }
 :Spisovka:Subjekty:novy { "dok_id": 1234 }
 :Spisovka:Subjekty:seznamAjax JsonResponse { "term": "blu" }
 :Spisovka:Subjekty:seznamStatuAjax JsonResponse
 :Spisovka:Subjekty:upravit { "id": 1 }
-:Spisovka:Subjekty:vyber { "dok_id": 1234 }
+:Spisovka:Subjekty:vyber { "abc": "pavel" }
 :Spisovka:Uzivatel:
-:Spisovka:Uzivatel: { "id": 1, "upravit": "info" }
-:Spisovka:Uzivatel: { "zmenitheslo": 1 }
+:Spisovka:Uzivatel: { "upravit": "info" }
+:Spisovka:Uzivatel: { "upravit": "heslo" }
+:Spisovka:Uzivatel: { "upravit": "datova_schranka" }
+:Spisovka:Uzivatel: { "upravit": "upozorneni" }
+:Spisovka:Uzivatel:seznamAjax JsonResponse { "term": "Pavel" }
+:Spisovka:Uzivatel:userSeznamAjax JsonResponse { "term": "Pavel" }
 :Spisovka:Uzivatel:vyber { "dok_id": 1234 }
+:Spisovka:Uzivatel:vyberSpis { "spis_id": 2 }
 :Spisovka:Vyhledat:
 :Spisovka:Vypravna:
 :Spisovka:Vypravna:detail { "id": 26 }
 :Spisovka:Vypravna:filtrovat
+:Spisovka:Vypravna:zobrazFax { "id": 82 }
 :Spisovna:Default: RedirectResponse
 :Spisovna:Dokumenty:
 :Spisovna:Dokumenty:detail { "id": 2289 }

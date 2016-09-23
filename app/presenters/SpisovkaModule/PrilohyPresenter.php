@@ -13,14 +13,16 @@ class Spisovka_PrilohyPresenter extends BasePresenter
     {
     }
 
-    public function renderNacti()
+    /**
+     * 
+     * @param int $id  ID dokumentu
+     */
+    public function renderNacti($id)
     {
-        $dokument_id = $this->getParameter('id'); // tady jako dokument_id
-
         $DokumentPrilohy = new DokumentPrilohy();
-        $seznam = $DokumentPrilohy->prilohy($dokument_id);
+        $seznam = $DokumentPrilohy->prilohy($id);
         $this->template->prilohy = $seznam;
-        $this->template->dokument_id = $dokument_id;
+        $this->template->dokument_id = $id;
         $this->template->AccessEdit = true;
     }
 

@@ -44,15 +44,15 @@ class SubjektyPresenter extends BasePresenter
             $prijemci = $isds->FindDataBoxEx($filtr);
             if (isset($prijemci->dbOwnerInfo)) {
                 $info = $prijemci->dbOwnerInfo[0];
-                echo json_encode($info);
+                $payload = $info;
             } else {
-                echo json_encode(array("error" => $isds->GetStatusMessage()));
+                $payload = ["error" => $isds->GetStatusMessage()];
             }
         } catch (Exception $e) {
-            echo json_encode(array("error" => $e->getMessage()));
+            $payload = ["error" => $e->getMessage()];
         }
 
-        $this->terminate();
+        $this->sendJson($payload);
     }
 
     public function renderNovy()

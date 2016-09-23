@@ -3,16 +3,7 @@
 class Spisovka_UzivatelPresenter extends BasePresenter
 {
 
-    public function actionLogin()
-    {
-        $Auth = $this->context->createService('authenticatorUI');
-        $Auth->setAction('login');
-        $this->addComponent($Auth, 'auth');
-
-        $this->template->title = "Přihlásit se";
-    }
-
-    public function renderLogout()
+    public function actionLogout()
     {
         $user = $this->user;
         $user->logout();
@@ -32,10 +23,27 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             $this->redirect('login');
     }
 
-    public function actionDefault($upravit)
+    public function createComponentLogin()
     {
-        // Kterou sekci editovat
-        $this->template->FormUpravit = $upravit;
+        $component = $this->context->createService('authenticatorUI');
+        $component->setAction('login');
+        return $component;
+    }
+
+    public function createComponentChangePassword()
+    {
+        $account = new UserAccount($this->user);
+        $person = $account->getPerson();
+
+        $comp = $this->context->createService('authenticatorUI');
+        $comp->setAction('change_password');
+        $comp->setParams(['osoba_id' => $person->id, 'user_id' => $this->user->id]);
+        return $comp;
+    }
+
+    public function renderDefault($upravit)
+    {
+        $this->template->FormUpravit = $upravit; // Kterou sekci editovat
 
         $user = $this->user;
         $account = new UserAccount($user);
@@ -43,11 +51,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $this->template->Uzivatel = $account;
         $this->template->Org_jednotka = $account->orgjednotka_id !== null ? new OrgUnit($account->orgjednotka_id)
                     : 'žádná';
-
-        $Auth1 = $this->context->createService('authenticatorUI');
-        $Auth1->setAction('change_password');
-        $Auth1->setParams(['osoba_id' => $person->id, 'user_id' => $user->id]);
-        $this->addComponent($Auth1, 'auth_change_password');
 
         $roles = $account->getRoles();
         $this->template->Role = $roles;
@@ -68,17 +71,17 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $form = Admin_ZamestnanciPresenter::createOsobaForm();
         $form->addHidden('osoba_id');
 
-        $osoba = $this->template->Osoba;
-        if ($osoba) {
-            $form['osoba_id']->setValue($osoba->id);
-            $form['jmeno']->setValue($osoba->jmeno);
-            $form['prijmeni']->setValue($osoba->prijmeni);
-            $form['titul_pred']->setValue($osoba->titul_pred);
-            $form['titul_za']->setValue($osoba->titul_za);
-            $form['email']->setValue($osoba->email);
-            $form['telefon']->setValue($osoba->telefon);
-            $form['pozice']->setValue($osoba->pozice);
-        }
+        $account = new UserAccount($this->user);
+        $person = $account->getPerson();
+
+        $form['osoba_id']->setDefaultValue($person->id);
+        $form['jmeno']->setDefaultValue($person->jmeno);
+        $form['prijmeni']->setDefaultValue($person->prijmeni);
+        $form['titul_pred']->setDefaultValue($person->titul_pred);
+        $form['titul_za']->setDefaultValue($person->titul_za);
+        $form['email']->setDefaultValue($person->email);
+        $form['telefon']->setDefaultValue($person->telefon);
+        $form['pozice']->setDefaultValue($person->pozice);
 
         $form->addSubmit('upravit', 'Upravit')
                 ->onClick[] = array($this, 'upravitClicked');
@@ -129,31 +132,29 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $this->template->org_seznam = $oseznam;
     }
 
-    public function renderVyber()
+    public function renderVyber($dok_id)
     {
-        $this->template->dokument_id = $dok_id = $this->getParameter('dok_id', null);
-
         $model = new Dokument();
         $dok = $model->getInfo($dok_id);
         $this->template->dokument_je_ve_spisu = isset($dok->spisy);
+        $this->template->dokument_id = $dok_id;
 
         $this->_renderVyber();
     }
 
-    public function renderVyberspis()
+    public function renderVyberSpis($spis_id)
     {
-        $this->template->spis_id = $spis_id = $this->getParameter('spis_id', null);
+        $this->template->spis_id = $spis_id;
         $this->_renderVyber();
         // Zvazit do budoucna - jednotnou sablonu pro predani dokumentu i spisu
         // $this->setView('vyber');
     }
 
-    // Autocomplete callback
-    // Hleda jak uzivatele, tak org. jednotky
-    public function actionSeznamAjax()
+    /** 
+     * Autocomplete callback. Hleda jak uzivatele, tak org. jednotky.
+     */
+    public function renderSeznamAjax($term)
     {
-        $term = $this->getParameter('term');
-
         $a1 = $this->_ojSeznam($term);
         $a2 = $this->_userSeznam($term);
         foreach ($a1 as &$value)
@@ -161,20 +162,16 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         foreach ($a2 as &$value)
             $value['id'] = 'u' . $value['id'];
 
-        echo json_encode(array_merge($a1, $a2));
-
-        exit;
+        $this->sendJson(array_merge($a1, $a2));
     }
 
-    // Autocomplete callback
-    // Hleda pouze uzivatele, ne org. jednotky
-    // Volano z modulu spisovna
-    public function actionUserSeznamAjax()
+    /** Autocomplete callback
+     * Hleda pouze uzivatele, ne org. jednotky
+     * Volano z modulu spisovna
+     */
+    public function renderUserSeznamAjax($term)
     {
-        $term = $this->getParameter('term');
-
-        echo json_encode($this->_userSeznam($term));
-        exit;
+        $this->sendJson($this->_userSeznam($term));
     }
 
     protected function _ojSeznam($term)
@@ -225,7 +222,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         return $seznam;
     }
 
-    public function renderSpisvybrano()
+    public function actionSpisVybrano()
     {
         $spis_id = $this->getParameter('spis_id', null);
         $user_id = $this->getParameter('user', null);
@@ -236,7 +233,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         if ($orgjednotka_id === null) {
             $account = new UserAccount($user_id);
             $ou = $account->getOrgUnit();
-            $orgjednotka_id = $ou ? $ou->id : null;            
+            $orgjednotka_id = $ou ? $ou->id : null;
         }
 
         if ($novy == 1) {
@@ -278,13 +275,13 @@ class Spisovka_UzivatelPresenter extends BasePresenter
                     $this->terminate();
                 } else {
                     // forwarduj pozadavek na novy render dialogu a dej mu informaci, ze ma upozornit uzivatele, ze doslo k chybe
-                    $this->forward('vyberspis', array('chyba' => 1, 'spis_id' => $spis_id));
+                    $this->forward('vyberSpis', array('chyba' => 1, 'spis_id' => $spis_id));
                 }
             }
         }
     }
 
-    public function renderVybrano()
+    public function actionVybrano()
     {
         $dokument_id = $this->getParameter('dok_id', null);
         $user_id = $this->getParameter('user', null);

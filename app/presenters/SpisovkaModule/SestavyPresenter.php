@@ -712,9 +712,9 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $this->redirect(':Spisovka:Sestavy:default');
     }
 
-    public function renderFiltr()
+    public function renderFiltr($id)
     {
-        $this->template->id = $this->getParameter('id');
+        $this->template->id = $id;
     }
 
     protected function vychoziRazeni()

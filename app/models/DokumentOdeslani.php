@@ -63,7 +63,6 @@ class DokumentOdeslani extends BaseModel
 
     public function get($id)
     {
-
         $sql = array(
             'distinct' => false,
             'from' => array($this->name => 'ds'),
@@ -83,16 +82,15 @@ class DokumentOdeslani extends BaseModel
             'order_by' => array('ds.datum_odeslani', 's.nazev_subjektu', 's.prijmeni', 's.jmeno')
         );
 
-
         $sql['where'] = array(array('ds.id=%i', $id));
 
         $result = $this->selectComplex($sql)->fetch();
         if ($result) {
             $result->druh_zasilky = unserialize($result->druh_zasilky);
             return $result;
-        } else {
-            return null;
-        }
+        } 
+
+        return null;
     }
 
     public function kOdeslani($volba_razeni, $hledani, $filtr = null)

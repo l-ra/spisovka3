@@ -19,7 +19,7 @@
         {foreach $org_seznam as $org}
         <tr>
             <td>
-                <a href="{link :Spisovka:Uzivatel:spisvybrano, 'orgjednotka'=>$org->id, 'spis_id'=>$spis_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
+                <a href="{link spisVybrano, 'orgjednotka'=>$org->id, 'spis_id'=>$spis_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
                    {$org->ciselna_rada}
                 </a>
             </td>
@@ -46,7 +46,7 @@
         {foreach $seznam as $user}
         <tr>
             <td>
-                <a href="{link :Spisovka:Uzivatel:spisvybrano, 'id'=>$user->id, 'user'=>$user->user_id, 'spis_id'=>$spis_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
+                <a href="{link spisVybrano, 'id' => $user->id, 'user' => $user->user_id, 'spis_id' => $spis_id, 'novy' => $novy }" onclick="osobaVybrana(this); return false;">
                    {=Osoba::displayName($user,'full_item')}
                </a>
             </td>

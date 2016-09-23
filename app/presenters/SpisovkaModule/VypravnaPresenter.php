@@ -152,12 +152,9 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         }
     }
 
-    public function actionZobrazfax()
+    public function renderZobrazFax($id)
     {
-
         $DokumentOdeslani = new DokumentOdeslani();
-        $id = $this->getParameter('id');
-
         $dokument = $DokumentOdeslani->get($id);
         if (!$dokument)
             throw new Exception("Záznam o odeslání ID $id neexistuje.");
@@ -166,10 +163,9 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $this->template->isPrint = $this->getParameter('print');
     }
 
-    public function actionDetail($id)
+    public function renderDetail($id)
     {
         $DokumentOdeslani = new DokumentOdeslani();
-
         $odes = $DokumentOdeslani->get($id);
         if (!$odes)
             throw new Exception("Záznam o odeslání ID $id neexistuje.");
@@ -250,35 +246,36 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     protected function createComponentOdeslaniForm()
     {
-        $dokument = $this->template->dokument;
+        $DokumentOdeslani = new DokumentOdeslani();
+        $odes = $DokumentOdeslani->get($this->getParameter('id'));
 
         $form = new Spisovka\Form();
 
         $form->addDatePicker('datum_odeslani', 'Datum odeslání:')
                 ->setRequired()
-                ->setDefaultValue($dokument->datum_odeslani);
+                ->setDefaultValue($odes->datum_odeslani);
 
-        if ($dokument->zpusob_odeslani_id == 3) {
+        if ($odes->zpusob_odeslani_id == 3) {
             $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(),
                     'druh_zasilky');
-            $form['druh_zasilky']->setDefaultValue($dokument->druh_zasilky)
+            $form['druh_zasilky']->setDefaultValue($odes->druh_zasilky)
                     ->setRequired();
             // $test = [5 => 'prvni polozka', 3=>'druha', 2=>'treti'];
             // $form->addComponent(new Nette\Forms\Controls\CheckboxList('Druh zásilky:', $test), 'druhZasilky');
 
             $form->addFloat('cena', 'Cena:', 10)
-                    ->setDefaultValue($dokument->cena)
+                    ->setDefaultValue($odes->cena)
                     ->setOption('description', 'Kč');
             $form->addFloat('hmotnost', 'Hmotnost:', 10)
-                    ->setDefaultValue($dokument->hmotnost)
+                    ->setDefaultValue($odes->hmotnost)
                     ->setOption('description', 'kg');
             $form->addText('poznamka', 'Poznámka:')
-                    ->setDefaultValue($dokument->poznamka);
-        } else if ($dokument->zpusob_odeslani_id == 4) {
+                    ->setDefaultValue($odes->poznamka);
+        } else if ($odes->zpusob_odeslani_id == 4) {
             $form->addText('cislo_faxu', 'Číslo faxu:', 20)
-                    ->setDefaultValue($dokument->cislo_faxu);
+                    ->setDefaultValue($odes->cislo_faxu);
             $form->addTextArea('zprava', 'Zpráva pro příjemce:', 80, 5)
-                    ->setDefaultValue($dokument->zprava);
+                    ->setDefaultValue($odes->zprava);
         }
 
         $form->addSubmit('vypravna_upravit', 'Uložit')

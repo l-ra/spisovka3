@@ -13,14 +13,14 @@ class Spisovka_SpojitPresenter extends BasePresenter
         parent::startup();
     }
 
-    public function renderVyber()
+    public function renderVyber($id)
     {
-        $this->template->dokument_id = $this->getParameter('id');
+        $this->template->dokument_id = $id;
     }
 
-    public function actionHledat()
+    public function renderHledat($q)
     {
-        $query = $this->getParameter('q', null);
+        $query = $q;
 
         $Dokument = new Dokument();
         $args = $Dokument->hledat($query);
