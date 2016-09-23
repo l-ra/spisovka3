@@ -70,7 +70,7 @@ class Install_DefaultPresenter extends BasePresenter
         $soap_support = class_exists('SoapClient');
         $mail_function = function_exists('mail');
         $openssl_support = function_exists('openssl_pkcs7_verify');
-        
+
         // IMAP support
         $imap_support = 0;
         $imap_version = "";
@@ -88,15 +88,11 @@ class Install_DefaultPresenter extends BasePresenter
 
 
         // DB test
-        try {
-            $db_info = GlobalVariables::get('database');
-            dibi::connect($db_info);
-            $database_support = 1;
-            $database_info = $db_info['driver'] . '://' . $db_info['username'] . '@' . $db_info['host'] . '/' . $db_info['database'];
-        } catch (DibiDriverException $e) {
-            $database_support = 0;
-            $database_info = $e->getMessage();
-        }
+        // Nesmíme použít dibi::connect, protože bychom přepsali připojení z bootstrapu!
+        // Testovat zde databázi je nesmysl, protože bez databáze se žádný presenter vůbec nespustí
+        $db_info = GlobalVariables::get('database');
+        $database_connected = true;
+        $database_info = $db_info['driver'] . '://' . $db_info['username'] . '@' . $db_info['host'] . '/' . $db_info['database'];
 
         // Appliaction info
         $app_info = new VersionInformation();
@@ -123,7 +119,7 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'Databáze',
                 'required' => TRUE,
-                'passed' => $database_support,
+                'passed' => $database_connected,
                 'message' => $database_info,
                 'errorMessage' => 'Nelze se připojit k databázi.',
                 'description' => 'Databáze je nutná pro běh aplikace. Zkontrolujte správnost nastavení nebo dostupnost databázového serveru.<br />SQL chyba: ' . $database_info,
@@ -453,15 +449,13 @@ class Install_DefaultPresenter extends BasePresenter
 
         try {
             $db_config = GlobalVariables::get('database');
-            dibi::connect($db_config);
-
             $db_tables = dibi::getDatabaseInfo()->getTableNames();
 
             $sql_template_source = file_get_contents(__DIR__ . '/mysql.sql');
             $sql_queries = explode(";", $sql_template_source);
             array_pop($sql_queries); // prázdný prvek za posledním středníkem
 
-            // pridej SQL prikazy z aktualizaci
+            /* pridej SQL prikazy z aktualizaci */
             Updates::init();
             $res = Updates::find_updates();
             $revisions = $res['revisions'];
@@ -494,7 +488,7 @@ class Install_DefaultPresenter extends BasePresenter
             foreach ($sql_queries as $query) {
 
                 $query = str_replace("{tbls3}", '', $query);
-                
+
                 if ($this->getParameter('install', null)) {
                     // provedeni SQL skriptu
                     $this->template->db_install = 1;
