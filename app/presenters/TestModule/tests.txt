@@ -120,4 +120,9 @@
 :Spisovka:Uzivatel:
 :Spisovka:Uzivatel: { "id": 1, "upravit": "info" }
 :Spisovka:Uzivatel: { "zmenitheslo": 1 }
+:Install:Default:
+:Install:Default:evidence
 :Install:Default:kontrola
+:Install:Default:spravce
+:Install:Default:urad
+:Install:Default:uvod

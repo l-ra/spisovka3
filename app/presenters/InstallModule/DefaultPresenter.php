@@ -19,7 +19,6 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $session = $this->getSession('s3_install');
         unset($session->step);
-
         //$this->redirect('uvod');
     }
 
@@ -441,7 +440,6 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderDatabaze()
     {
-
         $session = $this->getSession('s3_install');
         if (!isset($session->step)) {
             $session->step = array();
@@ -601,7 +599,6 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderKonec()
     {
-
         $session = $this->getSession('s3_install');
 
         $dokonceno = 1;
@@ -637,7 +634,6 @@ class Install_DefaultPresenter extends BasePresenter
         }
 
         if ($dokonceno == 1) {
-
             // $client_config = (new Spisovka\ConfigClient())->get();
             $zerotime = mktime(0, 0, 0, 8, 20, 2008);
             $diff = time() - $zerotime;
@@ -659,8 +655,6 @@ class Install_DefaultPresenter extends BasePresenter
         $this->template->dokonceno = $dokonceno;
         $this->template->errors = $errors;
     }
-
-    /*     * */
 
     protected function createComponentNastaveniUraduForm()
     {
@@ -748,7 +742,6 @@ class Install_DefaultPresenter extends BasePresenter
 
     protected function createComponentNastaveniCJForm()
     {
-
         $client_config = GlobalVariables::get('client_config');
         $CJ = $client_config->cislo_jednaci;
 
@@ -799,7 +792,6 @@ class Install_DefaultPresenter extends BasePresenter
 
     protected function createComponentSpravceForm()
     {
-
         $form1 = new Spisovka\Form();
         $form1->addText('jmeno', 'Jméno:', 50, 150);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
@@ -898,7 +890,6 @@ class Install_DefaultPresenter extends BasePresenter
 
     private function phpinfo_array($return = false)
     {
-
         ob_start();
         phpinfo(-1);
 

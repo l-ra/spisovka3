@@ -158,6 +158,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     break;
                 case "Install":
                     $this->setLayout('install');
+                    $this->template->module_name = 'Instalace';
                     break;
             }
 
