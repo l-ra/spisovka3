@@ -65,7 +65,7 @@
     </dl>
     <dl n:if="$Zprava->typ == 'I'">
         <dt></dt>
-        <dd><a href="{link downloadDm, 'id' => $Zprava->id}">Stáhnout datovou zprávu</a><span id="snippet-isdsovereni"><a class="ajax" href="{link isdsovereni, 'id' => $Zprava->id}">Ověřit lokální kopii datové zprávy</a></span></dd>
+        <dd><a href="{link downloadDm, 'id' => $Zprava->id}">Stáhnout datovou zprávu</a><span id="snippet-isdsovereni"><a class="ajax" href="{link isdsOvereni, 'id' => $Zprava->id}">Ověřit lokální kopii datové zprávy</a></span></dd>
     </dl>
     <dl n:if="$Zprava->typ == 'E'">
         <dt>Elektronický podpis:</dt>

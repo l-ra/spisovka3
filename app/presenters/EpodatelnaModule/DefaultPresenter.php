@@ -565,7 +565,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         return $messages_recorded;
     }
 
-    public function renderIsdsovereni($id)
+    public function renderIsdsOvereni($id)
     {
         $output = "Nemohu najít soubor s datovou zprávou.";
         $message = new EpodatelnaMessage($id);
