@@ -1,5 +1,7 @@
 <?php
 
+use Nette\Caching\Cache;
+
 class DbCache
 {
 
@@ -19,7 +21,7 @@ class DbCache
 
             if ($should_cache) {
                 $context = Nette\Environment::getContext();
-                self::$cache = new Nette\Caching\Cache($context->getByType('Nette\Caching\IStorage'),
+                self::$cache = new Cache($context->getByType('Nette\Caching\IStorage'),
                         'db_cache');
             }
         }
@@ -71,5 +73,3 @@ class DbCache
     }
 
 }
-
-?>
