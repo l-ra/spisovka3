@@ -1,33 +1,64 @@
-:Spisovka:Default: RedirectResponse
-:Spisovka:Dokumenty:
-:Spisovka:Dokumenty:novy
-:Spisovka:Dokumenty:novy RedirectResponse { "cisty": 1 }
-:Spisovka:Dokumenty:detail { "id": 190 }
-:Spisovka:Prilohy:pridat { "id": 1234 }
-:Spisovka:Spisy:
-:Spisovka:Spisy:novy
-:Spisovka:Spisy:novyform
-:Spisovka:Spisy:detail { "id": 8 }
-:Spisovka:Spisy:detail { "id": 8, "upravit": "info" }
-:Spisovka:Spisy:strom
-:Spisovka:Spisy:strom2
-:Spisovka:Spisy:vyber
-:Spisovka:Sestavy:
-:Spisovka:Sestavy:nova
-:Spisovka:Sestavy:detail { "id": 1 }
-:Spisovka:Sestavy:upravit { "id": 4 }
-:Spisovka:Sestavy:tisk { "id": 6 }
-:Spisovka:Subjekty:nacti { "id": 1 }
-:Spisovka:Subjekty:novy { "dok_id": 1234 }
-:Spisovka:Subjekty:seznamAjax JsonResponse { "term": "blu" }
-:Spisovka:Subjekty:seznamStatuAjax JsonResponse
-:Spisovka:Subjekty:upravit { "id": 1 }
-:Spisovka:Subjekty:vyber { "dok_id": 1234 }
-:Spisovka:Vypravna:
-:Spisovka:Vypravna:filtrovat
-:Spisovka:Vypravna:detail { "id": 26 }
-:Spisovka:Vyhledat:
-:Spisovka:Uzivatel:vyber { "dok_id": 1234 }
+:Admin:Ciselniky:
+:Admin:Ciselniky:druhzasilky
+:Admin:Ciselniky:druhzasilky { "ciselnik_new": 1 }
+:Admin:Ciselniky:spousteciudalost
+:Admin:Ciselniky:spousteciudalost { "ciselnik_new": 1 }
+:Admin:Ciselniky:staty
+:Admin:Ciselniky:staty { "ciselnik_new": 1 }
+:Admin:Ciselniky:typdokumentu
+:Admin:Ciselniky:typdokumentu { "ciselnik_new": 1 }
+:Admin:Ciselniky:zpusobdoruceni
+:Admin:Ciselniky:zpusobdoruceni { "ciselnik_new": 1 }
+:Admin:Ciselniky:zpusobodeslani
+:Admin:Ciselniky:zpusobodeslani { "ciselnik_new": 1 }
+:Admin:Ciselniky:zpusobvyrizeni
+:Admin:Ciselniky:zpusobvyrizeni { "ciselnik_new": 1 }
+:Admin:Default:
+:Admin:Default:ostatni
+:Admin:Epodatelna:
+:Admin:Epodatelna:detail { "id": "i" }
+:Admin:Epodatelna:detail { "id": "i", "upravit": 1 }
+:Admin:Epodatelna:detail { "id": "o" }
+:Admin:Epodatelna:detail { "id": "o", "upravit": 1 }
+:Admin:Nastaveni:
+:Admin:Nastaveni: { "upravit": "cjednaci" }
+:Admin:Nastaveni: { "upravit": "info" }
+:Admin:Nastaveni: { "upravit": "nastaveni" }
+:Admin:Opravneni:detail { "id": 1 }
+:Admin:Opravneni:detail { "id": 1, "upravit": "info" }
+:Admin:Opravneni:novy
+:Admin:Opravneni:seznam
+:Admin:Orgjednotky:detail { "id": 1 }
+:Admin:Orgjednotky:detail { "id": 1, "upravit": "info" }
+:Admin:Orgjednotky:novy
+:Admin:Orgjednotky:seznam
+:Admin:Protokol:
+:Admin:Protokol:isds
+:Admin:Protokol:prihlaseni
+:Admin:Spisy:detail { "id": 52 }
+:Admin:Spisy:export
+:Admin:Spisy:novy
+:Admin:Spisy:seznam
+:Admin:Spisznak:detail { "id": 17 }
+:Admin:Spisznak:detail { "id": 17, "upravit": "info" }
+:Admin:Spisznak:export
+:Admin:Spisznak:novy
+:Admin:Spisznak:seznam
+:Admin:Subjekty:detail { "id": 1 }
+:Admin:Subjekty:export
+:Admin:Subjekty:novy
+:Admin:Subjekty:seznam
+:Admin:Zamestnanci:detail { "id": 1 }
+:Admin:Zamestnanci:detail { "id": 1, "edit": 1 }
+:Admin:Zamestnanci:detail { "id": 1, "new_account": 1 }
+:Admin:Zamestnanci:novy
+:Admin:Zamestnanci:seznam
+:Admin:Zamestnanci:ucet { "id": 1 }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "auth_type" }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "orgunit" }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "password" }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "roles" }
+:Admin:Zamestnanci:ucet { "id": 1, "edit": "username" }
 :Epodatelna:Default: RedirectResponse
 :Epodatelna:Default:detail { "id": 1, "back": "prichozi" }
 :Epodatelna:Default:isdsOvereni JsonResponse { "id": 227 }
@@ -42,87 +73,56 @@
 :Epodatelna:Evidence:odmitnout { "id": 227 }
 :Epodatelna:Prilohy:attachments JsonResponse { "id": 227 }
 :Epodatelna:Subjekty:nacti { "id": 1 }
-:Spisovna:Default: RedirectResponse
-:Spisovna:Dokumenty:
-:Spisovna:Dokumenty:prijem
-:Spisovna:Dokumenty:skartacniNavrh
-:Spisovna:Dokumenty:skartacniRizeni
-:Spisovna:Dokumenty:detail { "id": 2289 }
-:Spisovna:Dokumenty:detail { "id": 2289, "upravit": "skart_rezim" }
-:Spisovna:Spisy:
-:Spisovna:Spisy:prijem
-:Spisovna:Spisy:strom
-:Spisovna:Zapujcky:
-:Spisovna:Zapujcky:nova
-:Spisovna:Zapujcky:detail { "id": 21 }
-:Admin:Default:
-:Admin:Default:ostatni
-:Admin:Nastaveni:
-:Admin:Nastaveni: { "upravit": "info" }
-:Admin:Nastaveni: { "upravit": "cjednaci" }
-:Admin:Nastaveni: { "upravit": "nastaveni" }
-:Admin:Epodatelna:
-:Admin:Epodatelna:detail { "id": "i" }
-:Admin:Epodatelna:detail { "id": "i", "upravit": 1 }
-:Admin:Epodatelna:detail { "id": "o" }
-:Admin:Epodatelna:detail { "id": "o", "upravit": 1 }
-:Admin:Spisy:seznam
-:Admin:Spisy:novy
-:Admin:Spisy:detail { "id": 52 }
-:Admin:Spisy:export
-:Admin:Subjekty:seznam
-:Admin:Subjekty:novy
-:Admin:Subjekty:detail { "id": 1 }
-:Admin:Subjekty:export
-:Admin:Zamestnanci:seznam
-:Admin:Zamestnanci:novy
-:Admin:Zamestnanci:detail { "id": 1 }
-:Admin:Zamestnanci:detail { "id": 1, "edit": 1 }
-:Admin:Zamestnanci:detail { "id": 1, "new_account": 1 }
-:Admin:Zamestnanci:ucet { "id": 1 }
-:Admin:Zamestnanci:ucet { "id": 1, "edit": "username" }
-:Admin:Zamestnanci:ucet { "id": 1, "edit": "auth_type" }
-:Admin:Zamestnanci:ucet { "id": 1, "edit": "orgunit" }
-:Admin:Zamestnanci:ucet { "id": 1, "edit": "roles" }
-:Admin:Zamestnanci:ucet { "id": 1, "edit": "password" }
-:Admin:Orgjednotky:seznam
-:Admin:Orgjednotky:novy
-:Admin:Orgjednotky:detail { "id": 1 }
-:Admin:Orgjednotky:detail { "id": 1, "upravit": "info" }
-:Admin:Opravneni:seznam
-:Admin:Opravneni:novy
-:Admin:Opravneni:detail { "id": 1 }
-:Admin:Opravneni:detail { "id": 1, "upravit": "info" }
-:Admin:Spisznak:seznam
-:Admin:Spisznak:novy
-:Admin:Spisznak:detail { "id": 17 }
-:Admin:Spisznak:detail { "id": 17, "upravit": "info" }
-:Admin:Spisznak:export
-:Admin:Ciselniky:
-:Admin:Ciselniky:typdokumentu
-:Admin:Ciselniky:spousteciudalost
-:Admin:Ciselniky:zpusobvyrizeni
-:Admin:Ciselniky:zpusobodeslani
-:Admin:Ciselniky:zpusobdoruceni
-:Admin:Ciselniky:staty
-:Admin:Ciselniky:druhzasilky
-:Admin:Ciselniky:typdokumentu { "ciselnik_new": 1 }
-:Admin:Ciselniky:spousteciudalost { "ciselnik_new": 1 }
-:Admin:Ciselniky:zpusobvyrizeni { "ciselnik_new": 1 }
-:Admin:Ciselniky:zpusobodeslani { "ciselnik_new": 1 }
-:Admin:Ciselniky:zpusobdoruceni { "ciselnik_new": 1 }
-:Admin:Ciselniky:staty { "ciselnik_new": 1 }
-:Admin:Ciselniky:druhzasilky { "ciselnik_new": 1 }
-:Admin:Protokol:
-:Admin:Protokol:prihlaseni
-:Admin:Protokol:isds
-:Spisovka:Napoveda:
-:Spisovka:Uzivatel:
-:Spisovka:Uzivatel: { "id": 1, "upravit": "info" }
-:Spisovka:Uzivatel: { "zmenitheslo": 1 }
 :Install:Default:
 :Install:Default:evidence
 :Install:Default:kontrola
 :Install:Default:spravce
 :Install:Default:urad
 :Install:Default:uvod
+:Spisovka:Default: RedirectResponse
+:Spisovka:Dokumenty:
+:Spisovka:Dokumenty:detail { "id": 190 }
+:Spisovka:Dokumenty:novy
+:Spisovka:Dokumenty:novy RedirectResponse { "cisty": 1 }
+:Spisovka:Napoveda:
+:Spisovka:Prilohy:pridat { "id": 1234 }
+:Spisovka:Sestavy:
+:Spisovka:Sestavy:detail { "id": 1 }
+:Spisovka:Sestavy:nova
+:Spisovka:Sestavy:tisk { "id": 6 }
+:Spisovka:Sestavy:upravit { "id": 4 }
+:Spisovka:Spisy:
+:Spisovka:Spisy:detail { "id": 8 }
+:Spisovka:Spisy:detail { "id": 8, "upravit": "info" }
+:Spisovka:Spisy:novy
+:Spisovka:Spisy:novyform
+:Spisovka:Spisy:strom
+:Spisovka:Spisy:strom2
+:Spisovka:Spisy:vyber
+:Spisovka:Subjekty:nacti { "id": 1 }
+:Spisovka:Subjekty:novy { "dok_id": 1234 }
+:Spisovka:Subjekty:seznamAjax JsonResponse { "term": "blu" }
+:Spisovka:Subjekty:seznamStatuAjax JsonResponse
+:Spisovka:Subjekty:upravit { "id": 1 }
+:Spisovka:Subjekty:vyber { "dok_id": 1234 }
+:Spisovka:Uzivatel:
+:Spisovka:Uzivatel: { "id": 1, "upravit": "info" }
+:Spisovka:Uzivatel: { "zmenitheslo": 1 }
+:Spisovka:Uzivatel:vyber { "dok_id": 1234 }
+:Spisovka:Vyhledat:
+:Spisovka:Vypravna:
+:Spisovka:Vypravna:detail { "id": 26 }
+:Spisovka:Vypravna:filtrovat
+:Spisovna:Default: RedirectResponse
+:Spisovna:Dokumenty:
+:Spisovna:Dokumenty:detail { "id": 2289 }
+:Spisovna:Dokumenty:detail { "id": 2289, "upravit": "skart_rezim" }
+:Spisovna:Dokumenty:prijem
+:Spisovna:Dokumenty:skartacniNavrh
+:Spisovna:Dokumenty:skartacniRizeni
+:Spisovna:Spisy:
+:Spisovna:Spisy:prijem
+:Spisovna:Spisy:strom
+:Spisovna:Zapujcky:
+:Spisovna:Zapujcky:detail { "id": 21 }
+:Spisovna:Zapujcky:nova
