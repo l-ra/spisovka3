@@ -254,6 +254,13 @@ class Client_To_Update
                     return;
                 }
 
+            // Oprava bugu v definici tabulky spis (foreign key v nekterych databazich je, v jinych ne)
+            try {
+                dibi::query("ALTER TABLE %n DROP FOREIGN KEY [spis_ibfk_1]", "{$prefix}spis");
+            } catch (Exception $e) {
+                // ocekava se vyjimka, ignoruj
+            }   
+            
             $error = false;
             foreach ($tables as $table) {
                 $new_name = substr($table, strlen($prefix));
