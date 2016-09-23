@@ -163,7 +163,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->terminate();
     }
 
-    public function actionNactiNoveAjax()
+    public function renderNactiNoveAjax()
     {
         $SubjektModel = new Subjekt();
         $isds_subjekt_cache = [];
@@ -588,7 +588,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->sendJson(['id' => 'snippet-isdsovereni', 'html' => $output]);
     }
 
-    public function actionDownloadDm($id)
+    public function renderDownloadDm($id)
     {
         $message = new EpodatelnaMessage($id);
         $message->getZfoFile($this->storage, true);

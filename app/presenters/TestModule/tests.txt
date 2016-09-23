@@ -29,10 +29,18 @@
 :Spisovka:Vyhledat:
 :Spisovka:Uzivatel:vyber { "dok_id": 1234 }
 :Epodatelna:Default: RedirectResponse
+:Epodatelna:Default:detail { "id": 1, "back": "prichozi" }
+:Epodatelna:Default:isdsOvereni JsonResponse { "id": 227 }
+:Epodatelna:Default:nactiNoveAjax JsonResponse
 :Epodatelna:Default:nove
-:Epodatelna:Default:prichozi
 :Epodatelna:Default:odchozi
+:Epodatelna:Default:odetail { "id": 15 }
+:Epodatelna:Default:prichozi
+:Epodatelna:Default:zkontrolovat
 :Epodatelna:Default:zkontrolovatAjax NULL
+:Epodatelna:Evidence:jiny { "id": 227 }
+:Epodatelna:Evidence:odmitnout { "id": 227 }
+:Epodatelna:Prilohy:attachments JsonResponse { "id": 227 }
 :Epodatelna:Subjekty:nacti { "id": 1 }
 :Spisovna:Default: RedirectResponse
 :Spisovna:Dokumenty:
