@@ -971,21 +971,12 @@ installDatePicker = function () {
     /*
      * DatePicter - volba datumu z kalendare
      */
-    var date = new Date();
-    var year = date.getFullYear();
-    var year_before = year - 15;
-    var year_after = year + 2;
-
     $("input.datepicker").datepicker(
             {
-                /*showOn: 'button',
-                 buttonText: 'Choose',
-                 buttonImage: '/images/icons/1day.png',
-                 buttonImageOnly: true,*/
                 showButtonPanel: true,
                 changeMonth: true,
                 changeYear: true,
-                yearRange: year_before + ':' + year_after,
+                yearRange: '-15:+2',
                 dateFormat: "dd.mm.yy",
                 closeText: "Zrušit",
                 prevText: "Předchozí",
