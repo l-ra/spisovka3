@@ -55,7 +55,7 @@ class Test_DefaultPresenter extends BasePresenter
                 
         ob_end_clean();
 
-        echo "<pre>";
+        $this->htmlHeader();
         echo "Spouštím testy\n\n";
 
         $tests = $this->getTests();
@@ -133,6 +133,28 @@ class Test_DefaultPresenter extends BasePresenter
             @ob_end_clean();
             return 'FAIL  ' . get_class($e) . ' - ' . $e->getMessage();
         }
+    }
+    
+    protected function htmlHeader()
+    {
+        echo <<<EOJ
+            <head>
+            <meta charset="utf-8">
+            <script type='text/javascript'>
+            stop_scrolling = false;
+            
+            function scrollTimer() {
+                window.scrollBy(0, 500);
+                if (stop_scrolling != true)
+                    setTimeout(scrollTimer, 1000);
+            }
+            
+            setTimeout(scrollTimer, 1000);
+            </script>
+            </head>
+            <body onload="stop_scrolling = true">
+            <pre>
+EOJ;
     }
 
 }
