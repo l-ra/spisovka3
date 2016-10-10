@@ -8,7 +8,7 @@ namespace Spisovka;
  * @author Pavel Laštovička
  * 
  * @property-read string $displayName
-*/
+ */
 class User extends \Nette\Security\User
 {
 
@@ -17,7 +17,7 @@ class User extends \Nette\Security\User
         $person = \Person::fromUserId($this->getId());
         return \Osoba::displayName($person);
     }
-    
+
     // Urcuje, zda uzivatel vystupuje pod uvedenou roli
     // Pri kontrole bere v uvahu primo nadrazene role tem, ktere ma uzivatel prirazen
     public function inheritsFromRole($roles)
@@ -46,7 +46,7 @@ class User extends \Nette\Security\User
             return isset($user_roles[$roles]);
         }
     }
-    
+
     /**
      * @return \OrgUnit|null
      */
@@ -55,9 +55,10 @@ class User extends \Nette\Security\User
         $account = new \UserAccount($this->id);
         return $account->getOrgUnit();
     }
-    
+
     public function isVedouci()
     {
         return $this->isAllowed(NULL, 'is_vedouci');
     }
+
 }

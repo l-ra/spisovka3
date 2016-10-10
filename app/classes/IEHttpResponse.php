@@ -10,11 +10,12 @@ namespace Spisovka;
  */
 class IEHttpResponse extends \Nette\Http\Response
 {
-	public function __construct()
-	{
+
+    public function __construct()
+    {
         parent::__construct();
 
         $this->setHeader('X-UA-Compatible', 'IE=edge');
     }
-    
+
 }

@@ -118,7 +118,7 @@ class Ares
             $msg = $e->getMessage();
             if (stripos($msg, 'časový limit') !== false)
                 $msg = 'Registr ARES neodpověděl v časovém limitu.';
-            
+
             return $msg;
         }
 

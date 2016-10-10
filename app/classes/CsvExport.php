@@ -9,8 +9,8 @@
 class CsvExport
 {
 
-    public static function csv($data, $ignore_cols = null, $code = 'UTF-8', $break = '\r\n',
-            $separator = ',', $quote = '"')
+    public static function csv($data, $ignore_cols = null, $code = 'UTF-8', $break = '\r\n', $separator
+    = ',', $quote = '"')
     {
         if (!$data)
             return null;
@@ -56,4 +56,3 @@ class CsvExport
     }
 
 }
-

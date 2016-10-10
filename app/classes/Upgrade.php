@@ -20,9 +20,9 @@ final class Upgrade
         if (!$this->acquireLock()) {
             // pokud nebude fungovat zámek, nastane problém. upgrade se raději neprovede, než
             // riskovat poškození aplikace
-            return; 
+            return;
         }
-        
+
         try {
             $done = Settings::get(self::SETTINGS_TASKS);
             $done = $done ? explode(',', $done) : [];
@@ -45,8 +45,7 @@ final class Upgrade
         Settings::set(self::SETTINGS_NEEDED, false);
         $this->releaseLock();
     }
-    
-    
+
     /**
      * file handle 
      * @var resource   
@@ -72,19 +71,18 @@ final class Upgrade
         unlink($this->lock_filename);
     }
 
-    
     private function upgradeEmailMailbox()
     {
         $storage = Nette\Environment::getService('storage');
         $file_model = new FileModel();
-        
+
         $res = dibi::query("SELECT [file_id] FROM [:PREFIX:epodatelna] WHERE [typ] = 'E' AND [odchozi] = 0");
         $processed = 0;
         foreach ($res as $row)
             if ($row->file_id) {
                 $file = $file_model->getInfo($row->file_id);
                 $filename = $storage->getFilePath($file);
-                
+
                 $handle = fopen($filename, 'r+b');
                 if (!$handle)
                     continue;
@@ -94,7 +92,7 @@ final class Upgrade
                     fclose($handle);
                     continue;
                 }
-                
+
                 rewind($handle);
                 $data = fread($handle, filesize($filename));
                 rewind($handle);
@@ -103,7 +101,7 @@ final class Upgrade
                 fclose($handle);
                 $processed++;
             }
-            
+
         dump(__METHOD__ . "() - $processed e-mails converted");
     }
 

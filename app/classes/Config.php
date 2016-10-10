@@ -4,13 +4,13 @@ namespace Spisovka;
 
 interface IConfig
 {
+
     /**
      * @return Spisovka\ArrayHash
      */
     function get();
-    
+
     function save($data);
-    
 }
 
 class Config implements IConfig
@@ -32,7 +32,7 @@ class Config implements IConfig
         $this->name = $name;
         $this->data = \Spisovka\ArrayHash::from($array);
     }
-    
+
     /**
      * 
      * @return Spisovka\ArrayHash
@@ -45,7 +45,7 @@ class Config implements IConfig
     public function save($data)
     {
         self::_saveCheckParameter($data);
-        
+
         $loader = new \Nette\DI\Config\Loader();
         $loader->save($data, CLIENT_DIR . "/configs/{$this->name}.ini");
     }
@@ -57,8 +57,9 @@ class Config implements IConfig
         else if ($data instanceof \Spisovka\ArrayHash) {
             $data = $data->toArray();
         } else
-            throw new InvalidArgumentException(__METHOD__ . '() - neplatný argument');        
+            throw new InvalidArgumentException(__METHOD__ . '() - neplatný argument');
     }
+
 }
 
 /**
@@ -77,6 +78,7 @@ class ConfigEpodatelnaOld extends Config
     {
         // nedelej nic, nemelo by se vubec volat
     }
+
 }
 
 /**
@@ -84,23 +86,23 @@ class ConfigEpodatelnaOld extends Config
  */
 class ConfigEpodatelna implements IConfig
 {
-    
+
     public function get()
     {
         $data = \Settings::get('epodatelna', null);
         if (!$data)
             throw new Exception(__METHOD__ . '() - v databázi chybí nastavení e-podatelny');
-        
+
         return $this->upgrade(\Spisovka\ArrayHash::from(unserialize($data)));
     }
-    
+
     public function save($data)
     {
         Config::_saveCheckParameter($data);
         \Settings::set('epodatelna', serialize($data));
     }
-    
-    /** 
+
+    /**
      * Aktualizuje strukturu nastavení podle změn v aplikaci.
      * @param \Spisovka\ArrayHash $data
      * @return \Spisovka\ArrayHash
@@ -108,7 +110,7 @@ class ConfigEpodatelna implements IConfig
     protected function upgrade($data)
     {
         $changed = false;
-        
+
         // jen jedna datova schranka, nebudeme s ni pracovat jako s polem        
         if (!isset($data->isds->ucet)) {
             $i = reset($data->isds);
@@ -145,15 +147,16 @@ class ConfigEpodatelna implements IConfig
         }
         if (isset($data->odeslani->aktivni)) {
             unset($data->odeslani->aktivni);
-            unset($data->odeslani->cert_key);            
+            unset($data->odeslani->cert_key);
             $changed = true;
         }
-        
+
         if ($changed)
             $this->save($data);
-        
+
         return $data;
     }
+
 }
 
 class ConfigClient extends Config
@@ -162,15 +165,16 @@ class ConfigClient extends Config
     public function __construct()
     {
         parent::__construct('klient');
-        
+
         if (!in_array($this->data->cislo_jednaci->typ_evidence, ['priorace', 'sberny_arch']))
-            throw new \Exception (__METHOD__ . '() - chybné nastavení typu evidence');
-        
+            throw new \Exception(__METHOD__ . '() - chybné nastavení typu evidence');
+
         // Toto nastaveni nebylo v config.ini při instalaci aplikace
         // Týká se pouze sběrného archu
         if (empty($this->data->cislo_jednaci->oddelovac))
             $this->data->cislo_jednaci->oddelovac = '/';
     }
+
 }
 
 class ConfigDatabase extends Config

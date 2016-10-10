@@ -63,23 +63,23 @@ class LatteMacros
         return $renderer->renderPair($form[$name]);
 
         /* Toto byl muj starsi kod:
-        $label = $form[$name]->getLabel();
-        $control = isset($form[$name]->controlPart) ? $form[$name]->controlPart : $form[$name]->control;
-        
-        $renderer = $form->getRenderer();
-        $tpair = $renderer->wrappers['pair']['container'];
-        $tlabel = $renderer->wrappers['label']['container'];
-        $tcontrol = $renderer->wrappers['control']['container'];
-        $tdesc = $renderer->wrappers['control']['description'];
-        
-        $description = $form[$name]->getOption('description');
-        if (!empty($description))
-            $description = " <$tdesc>$description</$tdesc>";
-        
-        return "<$tpair>
-            <$tlabel>$label</$tlabel>
-            <$tcontrol>$control$description</$tcontrol>
-        </$tpair>"; */
+          $label = $form[$name]->getLabel();
+          $control = isset($form[$name]->controlPart) ? $form[$name]->controlPart : $form[$name]->control;
+
+          $renderer = $form->getRenderer();
+          $tpair = $renderer->wrappers['pair']['container'];
+          $tlabel = $renderer->wrappers['label']['container'];
+          $tcontrol = $renderer->wrappers['control']['container'];
+          $tdesc = $renderer->wrappers['control']['description'];
+
+          $description = $form[$name]->getOption('description');
+          if (!empty($description))
+          $description = " <$tdesc>$description</$tdesc>";
+
+          return "<$tpair>
+          <$tlabel>$label</$tlabel>
+          <$tcontrol>$control$description</$tcontrol>
+          </$tpair>"; */
     }
 
     /**
@@ -100,10 +100,11 @@ class LatteMacros
         // odstran zapouzdrujici element
         return $html->getHtml();
     }
-    
+
     public static function inputError2($form, $name)
     {
         $renderer = $form->getRenderer();
         return $renderer->renderErrors($form[$name]);
     }
+
 }

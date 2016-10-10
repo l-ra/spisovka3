@@ -4,7 +4,7 @@ namespace Spisovka;
 
 class PresenterFactory extends \Nette\Application\PresenterFactory
 {
-    
+
     /**
      * Formats presenter class name from its name.
      * @param  string
@@ -29,4 +29,5 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
         $s = str_replace('Presenter', '', $s);
         return $s;
     }
+
 }

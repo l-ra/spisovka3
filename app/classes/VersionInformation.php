@@ -36,7 +36,7 @@ class VersionInformation
                 return self::$name;
             default:
                 throw new Exception('Chyba v přístupu k verzi aplikace.');
-        }        
+        }
     }
-    
+
 }

@@ -9,7 +9,7 @@ class Authorizator extends Nette\Security\Permission
         // musíme vrátit výchozí (prázdný) authorizator
         if (defined('APPLICATION_INSTALL'))
             return;
-        
+
         // roles
         $this->addAllRoles(Role::getAll());
 
