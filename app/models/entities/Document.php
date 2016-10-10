@@ -108,7 +108,7 @@ class Document extends DBEntity
             if (empty($this->spousteci_udalost_id))
                 $mess[] = "Není zvolena spouštěcí událost!";
 
-            if (count($this->subjekty) == 0)
+            if (count($this->getSubjects()) == 0)
                 $mess[] = "Dokument musí obsahovat aspoň jeden subjekt!";
         }
 
