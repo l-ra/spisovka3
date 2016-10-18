@@ -347,7 +347,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $form1 = new Spisovka\Form();
 
         $form1->addText('login', 'Uživatelské jméno:')
-                ->setRequired()
                 ->setValue(UserSettings::get('isds_login'));
         $form1->addPassword('password', 'Heslo:');
 
