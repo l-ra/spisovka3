@@ -56,7 +56,9 @@ class HttpClient
         $success = ($errno === 0) && (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 200);
         curl_close($ch);
 
-        if ($errno == CURLE_OPERATION_TIMEDOUT)
+        /* u cUrl rozšíření je bordel v názvu konstant */
+        $errno_timeout = defined('CURLE_OPERATION_TIMEDOUTED') ? CURLE_OPERATION_TIMEDOUTED : CURLE_OPERATION_TIMEDOUT;
+        if ($errno == $errno_timeout)
             throw new Exception('Vypršel časový limit pro operaci.');
         else if ($errno)
             throw new Exception('cURL chyba: ' . $errmsg);
