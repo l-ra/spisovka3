@@ -111,8 +111,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     }
 
                     $document = $this->evidovat($evidence);
-                    echo 'Zpráva byla zaevidována ve spisové službě pod číslem <a href="' . $this->link(':Spisovka:Dokumenty:detail',
-                            array("id" => $document['id'])) . '" target="_blank">' . $document['jid'] . '</a>.';
+                    echo 'Zpráva byla zaevidována ve spisové službě pod číslem <a href="'
+                    . $this->link(':Spisovka:Dokumenty:detail', $document->id) . '" target="_blank">' . $document->jid . '</a>.';
                     break;
 
                 case 2: // evidovat v jinem evidenci
@@ -235,13 +235,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $predani = ['user' => isset($data['predano_user']) ? $data['predano_user'] : null,
             'org' => isset($data['predano_org']) ? $data['predano_org'] : null,
             'poznamka' => $data['predani_poznamka']];
-        
+
         $document_created = false;
         try {
             dibi::begin();
 
             $d = [
-                'dokument_typ_id' => isset($data['dokument_typ_id']) ? $data['dokument_typ_id'] : 1,
+                'dokument_typ_id' => isset($data['dokument_typ_id']) ? $data['dokument_typ_id']
+                            : 1,
                 'zpusob_doruceni_id' => $zprava->typ == 'E' ? 1 : 2,
                 'poradi' => 1,
                 'stav' => 1,
@@ -258,7 +259,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $d['pocet_listu_priloh'] = $data['pocet_listu_priloh'];
             if (isset($data['lhuta']))
                 $d['lhuta'] = $data['lhuta'];
-            
+
             $model = new Dokument();
             $dokument_id = $model->vytvorit($d);
             $document = new Document($dokument_id);
@@ -324,7 +325,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
 
             return $document;
-            
         } catch (Exception $e) {
             if (!$document_created)
                 dibi::rollback();
@@ -576,7 +576,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $mail->setSubject($data['predmet']);
             $mail->setBody($data['zprava']);
             $mail->appendSignature($this->user);
-            
+
             $mail->send();
 
             if ($ajax) {
