@@ -38,7 +38,7 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
     public function actionSpustit()
     {
         $this->getHttpResponse()->setContentType('text/plain', 'utf8');
-        ob_end_clean();
+        @ob_end_clean(); // potlac varovani, pokud buffering neni aktivni
 
         // odemkni session soubor, neblokuj ostatni pozadavky
         $this->getSession()->close();
