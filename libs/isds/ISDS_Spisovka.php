@@ -188,7 +188,7 @@ class ISDS_Spisovka extends ISDS
     public static function typDS($dmType)
     {
         $typ = array(
-            '0' => 'Nelze zjistit typ subjektu datové schránky',
+            '0' => '',
             '10' => 'OVM',
             '11' => 'OVM_NOTAR',
             '12' => 'OVM_EXEKUT',
