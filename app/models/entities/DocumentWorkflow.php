@@ -125,8 +125,10 @@ class DocumentWorkflow extends DocumentStates
     public function canUserReopen()
     {
         $user_allowed = $this->getUser()->isAllowed('Dokument', 'znovu_otevrit');
-        return $user_allowed && in_array($this->stav,
-                        [self::STAV_VYRIZEN_NESPUSTENA, self::STAV_VYRIZEN_SPUSTENA]);
+        $modify_ok = $this->canUserModify();
+        $state_ok = in_array($this->stav,
+                [self::STAV_VYRIZEN_NESPUSTENA, self::STAV_VYRIZEN_SPUSTENA]);
+        return $user_allowed && $state_ok && $modify_ok;
     }
 
     public function reopen()
@@ -317,21 +319,20 @@ class DocumentWorkflow extends DocumentStates
             $ou = $account->getOrgUnit();
             $this->owner_orgunit_id = $ou ? $ou->id : null;
             $this->save();
-            
+
             $this->_changeState(self::STAV_ZAPUJCEN);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::ZAPUJCKA_PRIDELENA,
-                    'Dokument byl zapůjčen.');
+            $Log->logDokument($this->id, LogModel::ZAPUJCKA_PRIDELENA, 'Dokument byl zapůjčen.');
 
             dibi::commit();
             return true;
         } catch (Exception $e) {
             $this->_rollback();
             throw $e;
-        }        
+        }
     }
-    
+
     public function returnToSpisovna()
     {
         try {
@@ -348,7 +349,7 @@ class DocumentWorkflow extends DocumentStates
         } catch (Exception $e) {
             $this->_rollback();
             throw $e;
-        }        
-        
+        }
     }
+
 }
