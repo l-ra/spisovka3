@@ -133,3 +133,5 @@ Zkrácení polí, většinou poznámek
 Smazání a nové vytvoření všech integritních omezení a souvisejících indexů.
 Je pravděpodobné, že bude potřeba ručně opravit data v databázi, pokud jsou data nekonzistentní!
 Operace je časově náročná.
+[1420]
+Kontrola a oprava chyby, kdy jeden subjekt mohl být k dokumentu přiřazen vícekrát

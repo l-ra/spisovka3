@@ -257,6 +257,10 @@ Spisová služba:
 - pouze u sběrného archu: při tisku seznamu spisů chyběl v čísle jednacím
   oddělovač a pořadové číslo ve spisu
 - přidání subjektu k dokumentu se nezaznamenávalo vždy do transakčního protokolu
+- aplikace umožnovala připojit tentýž subjekt k dokumentu vícekrát. Uživateli
+  to bylo skryté, ale v databázi mohly existovat duplicitní záznamy. Aktualizace
+  toto opraví, ale je možné, že informace, zda subjekt byl adresát či odesilatel
+  bude nesprávná.
   
 Spisovna:  
 - hledání spisů při příjmu do spisovny bylo nefunkční
