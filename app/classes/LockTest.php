@@ -6,9 +6,13 @@ require 'Lock.php';
 
 echo "Obtaining lock...\n";
 
-$lock = new Spisovka\Lock('test');
+try {
+    $lock = new Spisovka\LockNotBlocking('test');
 
-echo "Sleeping...\n";
-sleep(10);
+    echo "Sleeping...\n";
+    sleep(10);
 
-echo "Done\n";
+    echo "Done\n";
+} catch (\Exception $e) {
+    echo $e->getMessage() . "\n";
+}

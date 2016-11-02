@@ -30,9 +30,14 @@ class Lock
 
         $this->lock = fopen($filename, 'w');
         chmod($filename, 0600);
+        $this->lock();
+    }
+
+    protected function lock()
+    {
         $ok = flock($this->lock, LOCK_EX);
         if (!$ok)
-            throw new Exception("Nepodařilo se získat zámek na souboru $filename.");
+            throw new \Exception("Nepodařilo se získat zámek na souboru $this->filename.");
     }
 
     public function __destruct()
@@ -41,6 +46,32 @@ class Lock
         fclose($this->lock);
         if ($this->delete_file)
             unlink($this->filename);
+    }
+
+}
+
+class LockNotBlocking extends Lock
+{
+
+    protected function lock()
+    {
+        $would_block = null;
+        $ok = flock($this->lock, LOCK_EX | LOCK_NB, $would_block);
+        if (!$ok)            
+            if ($would_block)
+                throw new WouldBlockException();
+            else
+                throw new \Exception("Nepodařilo se získat zámek na souboru $this->filename.");
+    }
+
+}
+
+class WouldBlockException extends \Exception
+{
+
+    public function __construct()
+    {
+        parent::__construct('Operace by blokovala aplikaci.');
     }
 
 }
