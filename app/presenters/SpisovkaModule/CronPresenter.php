@@ -13,28 +13,6 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
         'DiskUsage'
     ];
 
-    /**
-     * file handle 
-     * @var resource   
-     */
-    protected $lock;
-
-    /**
-     *   Ziska zamek. Pripadne chyby funkce ignoruje.
-     */
-    protected function acquireLock()
-    {
-        $filename = TEMP_DIR . '/cron.lock';
-        $this->lock = fopen($filename, 'w');
-        flock($this->lock, LOCK_EX);
-    }
-
-    protected function releaseLock()
-    {
-        flock($this->lock, LOCK_UN);
-        fclose($this->lock);
-    }
-
     public function actionSpustit()
     {
         $this->getHttpResponse()->setContentType('text/plain', 'utf8');
@@ -45,8 +23,9 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
 
         echo "waiting for lock\n";
         flush();
-        $this->acquireLock();
-
+        $lock = new Spisovka\Lock('cron');
+        $lock = $lock;  // potlac varovani IDE
+        
         try {
             $last_run = Settings::get('cron_last_run', 0);
             $now = time();
@@ -57,11 +36,9 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
             } else
                 echo 'nothing to do';
         } catch (Exception $e) {
-            $this->releaseLock();
             throw $e;
         }
 
-        $this->releaseLock();
         $this->terminate();
     }
 

@@ -17,12 +17,9 @@ final class Upgrade
 
     public function perform()
     {
-        if (!$this->acquireLock()) {
-            // pokud nebude fungovat zámek, nastane problém. upgrade se raději neprovede, než
-            // riskovat poškození aplikace
-            return;
-        }
-
+        $lock = new Spisovka\Lock('upgrade');
+        $lock->delete_file = true;
+        
         try {
             $done = Settings::get(self::SETTINGS_TASKS);
             $done = $done ? explode(',', $done) : [];
@@ -38,37 +35,10 @@ final class Upgrade
                 Settings::set(self::SETTINGS_TASKS, implode(',', $done));
             }
         } catch (Exception $e) {
-            $this->releaseLock();
             throw $e;
         }
 
         Settings::set(self::SETTINGS_NEEDED, false);
-        $this->releaseLock();
-    }
-
-    /**
-     * file handle 
-     * @var resource   
-     */
-    protected $lock;
-    protected $lock_filename;
-
-    /**
-     * @return boolean  success
-     */
-    protected function acquireLock()
-    {
-        $filename = TEMP_DIR . '/upgrade.lock';
-        $this->lock_filename = $filename;
-        $this->lock = fopen($filename, 'w');
-        return flock($this->lock, LOCK_EX);
-    }
-
-    protected function releaseLock()
-    {
-        flock($this->lock, LOCK_UN);
-        fclose($this->lock);
-        unlink($this->lock_filename);
     }
 
     private function upgradeEmailMailbox()
