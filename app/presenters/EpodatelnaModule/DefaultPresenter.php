@@ -279,9 +279,16 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     protected function downloadISDS($password)
     {
         try {
+            $last_download_key = 'isds_last_download_time';
             $isds = new ISDS_Spisovka($password);
 
-            $od = $this->Epodatelna->getLastISDS();
+            $od = Settings::get($last_download_key); // novy zpusob od verze 3.5.0
+            if ($od)
+                $od -= 2 * 3600;
+            else {
+                $od = $this->Epodatelna->getLastISDSAcceptanceTime();
+                $od = $od ? $od - 3 * 24 * 3600 : 0; // 3 dny zpet
+            }
             $do = time() + 7200;
 
             $UploadFile = $this->storage;
@@ -380,7 +387,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             $signedmess = $isds->SignedMessageDownload($z->dmID);
 
                             if ($file_o = $UploadFile->uploadEpodatelna($signedmess, $data)) {
-// ok
+                                // ok
                             } else {
                                 $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
                             }
@@ -394,7 +401,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             );
 
                             if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {
-// ok
+                                // ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
                                 $zprava['file_id'] = $file->id;
                                 $this->Epodatelna->update(
@@ -404,18 +411,20 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                                         ), array(array('id=%i', $epod_id))
                                 );
                             } else {
-// toto se nikam neulozi!
+                                // toto se nikam neulozi!
                                 $zprava['stav_info'] = 'Reprezentace zprávy se nepodařilo uložit';
-// false
                             }
                         } else {
-// a toto rovnez ne
+                            // a toto rovnez ne
                             $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
                         }
 
                         $pocet_novych_zprav++;
                         unset($zprava);
                     }
+
+            // po úspěšném dokončení zaznamenej čas stažení zpráv
+            Settings::set($last_download_key, time());
 
             if ($pocet_novych_zprav)
                 return "Z datové schránky bylo přijato $pocet_novych_zprav nových zpráv.";

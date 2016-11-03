@@ -186,13 +186,18 @@ E-podatelna:
 - na stránce stahování zpráv nepracovala funkce "vytvořit nový subjekt z odesilatele"
 - pokud v datové schránce nebyla žádná nová zpráva, aplikace při kontrole
   schránky místo zprávy zobrazila nulu
+- pro stahování zpráv z datové schránky přidána ochrana proti vícenásobnému
+  současnému spuštění. Taktéž zámek na session je hned uvolněn, takže uživatel
+  může pokračovat v práci v jiné záložce, zatímco se zprávy stahují.
+  Též opravena chyba, kdy datové zprávy se mohly "ztratit" (nikdy nestáhnout
+  z datové schránky), pokud proces stahování byl v průběhu přerušen - např. 
+  případ stovek nových datových zpráv od poslední kontroly při hromadném
+  publikování v registru smluv
 - vytváření nového subjektu z datové zprávy automaticky rozdělí adresu
   do jednotlivých políček
 - hledání subjektu k datové zprávě hledá nejprve podle ID datové schránky.
   Teprve když není nalezen odpovídající subjekt, použije se hledání podle 
   názvu organizace a jména a příjmení.
-- přidána ochrana pro případ, kdy s e-podatelnou pracuje více zaměstnanců, aby
-  jedna zpráva nebyla zaevidována vícekrát
 - vytváření nového subjektu z e-mailu s diakritikou ve jménu odesilatele, který
   nebyl v kódování utf-8, mohlo v minulosti selhat
 - dokument přijatý datovou schránkou a odeslaný e-mailem se mohl tvářit

@@ -101,20 +101,17 @@ class Epodatelna extends BaseModel
         return $row ? $row->poradi + 1 : 1;
     }
 
-    public function getLastISDS()
+    public function getLastISDSAcceptanceTime()
     {
         $data = $this->select(array('odchozi = 0 AND typ = \'I\''),
                         array('doruceno_dne' => 'DESC'), 0, 1)->fetch();
         if ($data) {
             $do = strtotime($data->doruceno_dne);
-            if ($do != 0) {
-                return $do - 10800; // posledni - 3 dny
-            } else {
-                return null;
-            }
-        } else {
-            return null;
+            if ($do)
+                return $do;
         }
+        
+        return null;
     }
 
 }
