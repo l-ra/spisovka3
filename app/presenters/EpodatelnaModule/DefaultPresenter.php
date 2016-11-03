@@ -31,14 +31,14 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderPrichozi($hledat)
     {
-        $this->renderList($hledat, false, false);        
+        $this->renderList($hledat, false, false);
     }
 
     public function renderOdchozi($hledat)
     {
-        $this->renderList($hledat, false, true);        
+        $this->renderList($hledat, false, true);
     }
-    
+
     protected function renderList($hledat, $new, $outgoing)
     {
         $client_config = GlobalVariables::get('client_config');
@@ -57,11 +57,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
         if ($outgoing)
             $args['order'] = ['doruceno_dne' => 'DESC'];
-  
+
         $result = $this->Epodatelna->seznam($args);
         $paginator->itemCount = count($result);
 
-        // Volba vystupu - web/tisk/pdf
+// Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
         $pdf = $this->getParameter('pdfprint');
         if ($tisk || $pdf) {
@@ -125,40 +125,51 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $config_data = (new Spisovka\ConfigEpodatelna())->get();
         $nalezena_aktivni_schranka = 0;
 
-        // kontrola ISDS
-        $isds_config = $config_data['isds'];
-        if ($isds_config['aktivni'] == 1) {
-            // Kdyz uzivatel zadava pokazde sve heslo do datove schranky ($password != null),
-            // ignoruj omezeni podatelny
-            if ($password || !$isds_config['podatelna'] || $isds_config['podatelna'] == $ou_id) {
-                $nalezena_aktivni_schranka = 1;
-                $zprava = $this->downloadISDS($password);
-                echo "$zprava<br />";
-            }
-        }
+        try {
+            $lock = new Spisovka\LockNotBlocking('epodatelna');
+            $lock = $lock;
 
-        // kontrola emailu
-        if (count($config_data['email']) > 0) {
-            foreach ($config_data['email'] as $email_config) {
-                if ($email_config['aktivni'] != 1)
-                    continue;
-                if ($email_config['podatelna'] && $email_config['podatelna'] != $ou_id)
-                    continue;
+            // odemkni session soubor, neblokuj ostatni pozadavky
+            $this->getSession()->close();
 
-                $nalezena_aktivni_schranka = 1;
-                $result = $this->downloadEmails($email_config);
-                if (is_string($result))
-                    echo $result . '<br />';
-                else if ($result > 0) {
-                    echo "Z e-mailové schránky \"" . $email_config['ucet'] . "\" bylo přijato $result nových zpráv.<br />";
-                } else {
-                    echo 'V e-mailové schránce "' . $email_config['ucet'] . '" nebyly zjištěny žádné nové zprávy.<br />';
+            // kontrola ISDS
+            $isds_config = $config_data['isds'];
+            if ($isds_config['aktivni'] == 1) {
+                // Kdyz uzivatel zadava pokazde sve heslo do datove schranky ($password != null),
+                // ignoruj omezeni podatelny
+                if ($password || !$isds_config['podatelna'] || $isds_config['podatelna'] == $ou_id) {
+                    $nalezena_aktivni_schranka = 1;
+                    $zprava = $this->downloadISDS($password);
+                    echo "$zprava<br />";
                 }
             }
-        }
 
-        if (!$nalezena_aktivni_schranka)
-            echo 'Žádná schránka není definována nebo nastavena jako aktivní.<br />';
+            // kontrola emailu
+            if (count($config_data['email']) > 0) {
+                foreach ($config_data['email'] as $email_config) {
+                    if ($email_config['aktivni'] != 1)
+                        continue;
+                    if ($email_config['podatelna'] && $email_config['podatelna'] != $ou_id)
+                        continue;
+
+                    $nalezena_aktivni_schranka = 1;
+                    $result = $this->downloadEmails($email_config);
+                    if (is_string($result))
+                        echo $result . '<br />';
+                    else if ($result > 0) {
+                        echo "Z e-mailové schránky \"" . $email_config['ucet'] . "\" bylo přijato $result nových zpráv.<br />";
+                    } else {
+                        echo 'V e-mailové schránce "' . $email_config['ucet'] . '" nebyly zjištěny žádné nové zprávy.<br />';
+                    }
+                }
+            }
+
+            if (!$nalezena_aktivni_schranka)
+                echo 'Žádná schránka není definována nebo nastavena jako aktivní.<br />';
+        } catch (Spisovka\WouldBlockException $e) {
+            $e->getMessage();
+            echo "Stahování zpráv ze schránek právě probíhá. Opakujte operaci později.<br />";
+        }
 
         $this->terminate();
     }
@@ -200,7 +211,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $original = null;
                 $nalezene_subjekty = null;
                 if ($zprava->typ == 'E') {
-                    // Nacteni originalu emailu
+// Nacteni originalu emailu
                     if (!empty($zprava->file_id)) {
                         $sender = $zprava->odesilatel;
                         $matches = [];
@@ -227,12 +238,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];
                     }
                 } else if ($zprava->typ == 'I') {
-                    // Nacteni originalu DS
+// Nacteni originalu DS
                     if (!empty($zprava->file_id)) {
                         $original = $this->storage->download($zprava->file_id, true);
                         $original = unserialize($original);
 
-                        // odebrat obsah priloh, aby to neotravovalo
+// odebrat obsah priloh, aby to neotravovalo
                         unset($original->dmDm->dmFiles);
 
                         $subjekt->id_isds = $original->dmDm->dbIDSender;
@@ -280,9 +291,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
             if ($zpravy)
                 foreach ($zpravy as $z)
-                // kontrola existence v epodatelny
+// kontrola existence v epodatelny
                     if (!$this->Epodatelna->existuje($z->dmID, 'isds')) {
-                        // nova zprava, ktera neni nahrana v epodatelne
+// nova zprava, ktera neni nahrana v epodatelne
                         $mess = $isds->MessageDownload($z->dmID);
 
                         $annotation = empty($mess->dmDm->dmAnnotation) ? "(Datová zpráva č. " . $mess->dmDm->dmID . ")"
@@ -298,9 +309,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $popis .= "Spisová značka příjemce    : " . $mess->dmDm->dmRecipientIdent . "\n"; //  = 0.06.00
                         $popis .= "\n";
                         $popis .= "Do vlastních rukou? : " . (!empty($mess->dmDm->dmPersonalDelivery)
-                                            ? "ano" : "ne") . "\n"; //  =
+                                    ? "ano" : "ne") . "\n"; //  =
                         $popis .= "Doručeno fikcí?     : " . (!empty($mess->dmDm->dmAllowSubstDelivery)
-                                            ? "ano" : "ne") . "\n"; //  =
+                                    ? "ano" : "ne") . "\n"; //  =
                         $popis .= "Zpráva určena pro   : " . $mess->dmDm->dmToHands . "\n"; //  =
                         $popis .= "\n";
                         $popis .= "Odesílatel:\n";
@@ -315,7 +326,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $popis .= "            " . $mess->dmDm->dbIDRecipient . "\n"; //  = pksakua
                         $popis .= "            " . $mess->dmDm->dmRecipient . "\n"; //  = Společnost pro výzkum a podporu OpenSource
                         $popis .= "            " . $mess->dmDm->dmRecipientAddress . "\n"; //  = 40501 Děčín, CZ
-                        //$popis .= "Je příjemce ne-OVM povýšený na OVM: ". $mess->dmDm->dmAmbiguousRecipient ."\n";//  =
+//$popis .= "Je příjemce ne-OVM povýšený na OVM: ". $mess->dmDm->dmAmbiguousRecipient ."\n";//  =
                         if ($mess->dmDm->dmRecipientOrgUnit)
                             $popis .= "            org.jednotka: " . $mess->dmDm->dmRecipientOrgUnit . " [" . $mess->dmDm->dmRecipientOrgUnitNum . "]\n"; //  =
                         $popis .= "\n";
@@ -369,7 +380,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             $signedmess = $isds->SignedMessageDownload($z->dmID);
 
                             if ($file_o = $UploadFile->uploadEpodatelna($signedmess, $data)) {
-                                // ok
+// ok
                             } else {
                                 $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
                             }
@@ -383,7 +394,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             );
 
                             if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {
-                                // ok
+// ok
                                 $zprava['stav_info'] = 'Zpráva byla uložena';
                                 $zprava['file_id'] = $file->id;
                                 $this->Epodatelna->update(
@@ -393,12 +404,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                                         ), array(array('id=%i', $epod_id))
                                 );
                             } else {
-                                // toto se nikam neulozi!
+// toto se nikam neulozi!
                                 $zprava['stav_info'] = 'Reprezentace zprávy se nepodařilo uložit';
-                                // false
+// false
                             }
                         } else {
-                            // a toto rovnez ne
+// a toto rovnez ne
                             $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
                         }
 
@@ -432,7 +443,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
 
         if (!$imap->count_messages()) {
-            //  nejsou žádné zprávy k přijetí
+//  nejsou žádné zprávy k přijetí
             $imap->close();
             return 0;
         }
@@ -444,20 +455,20 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $messages_recorded = 0;
 
         foreach ($messages as $message) {
-            // kontrola existence v epodatelne
-            // chybi-li Message ID, jedna se pravdepodobne o Spam
+// kontrola existence v epodatelne
+// chybi-li Message ID, jedna se pravdepodobne o Spam
             if (!isset($message->message_id) || $this->Epodatelna->existuje($message->message_id,
                             'email'))
                 continue;
 
-            // nova zprava, ktera neni nahrana v epodatelne
-            // Nejprve uvolni pamet predchozi zpravy
+// nova zprava, ktera neni nahrana v epodatelne
+// Nejprve uvolni pamet predchozi zpravy
             $raw_message = null;
 
-            // Nacteni kompletni zpravy
+// Nacteni kompletni zpravy
             $structure = $imap->get_message_structure($message->Msgno);
             $raw_message = $imap->get_raw_message($message->Msgno);
-            // Preved do formatu mailbox, jinak nebude IMAP knihovna fungovat
+// Preved do formatu mailbox, jinak nebude IMAP knihovna fungovat
             $raw_message = "From unknown  Sat Jan  1 00:00:00 2000\r\n" . $raw_message;
 
             $popis = $imap->find_plain_text($message->Msgno, $structure);
@@ -487,30 +498,30 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $insert['doruceno_dne'] = new DateTime(date('Y-m-d H:i:s', $message->udate));
             $insert['user_id'] = $this->user->id;
 
-            // Prilohy zjistujeme pokazde, kdyz je to potreba, aby bylo mozno zmenit/opravit
-            // chovani aplikace
+// Prilohy zjistujeme pokazde, kdyz je to potreba, aby bylo mozno zmenit/opravit
+// chovani aplikace
             $insert['prilohy'] = null;
 
             $insert['stav'] = 0;
             $insert['stav_info'] = '';
             $insert['file_id'] = null;
 
-            // Test na pritomnost digitalniho podpisu
+// Test na pritomnost digitalniho podpisu
             $insert['email_signed'] = $imap->is_signed($structure);
             if ($mailbox['only_signature'] == true) {
                 if (!$insert['email_signed']) {
-                    // email neobsahuje epodpis
+// email neobsahuje epodpis
                     $insert['stav'] = 100;
                     $insert['stav_info'] = 'E-mailová zpráva byla odmítnuta. Neobsahuje elektronický podpis.';
                 } else if ($mailbox['qual_signature'] == true) {
-                    // pouze kvalifikovane
+// pouze kvalifikovane
                     $tmp_filename = tempnam(TEMP_DIR, 'emailtest');
                     file_put_contents($tmp_filename, $raw_message);
                     $esign = new esignature();
                     $result = $esign->verifySignature($tmp_filename);
                     unlink($tmp_filename);
                     if (!$result['ok']) {
-                        // neobsahuje kvalifikovany epodpis
+// neobsahuje kvalifikovany epodpis
                         $insert['stav'] = 100;
                         $insert['stav_info'] = 'E-mailová zpráva byla odmítnuta. Neobsahuje kvalifikovaný elektronický podpis';
                     }
@@ -532,7 +543,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
                     $mail->send();
                 } catch (Exception $e) {
-                    // ignoruj pripadnou chybu
+// ignoruj pripadnou chybu
                     $e->getMessage();
                 }
                 continue; // odmitnout, nepokracovat dale.
