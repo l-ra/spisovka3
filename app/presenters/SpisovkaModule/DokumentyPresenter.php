@@ -657,7 +657,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = ['stav = 0',
             'dokument_typ_id = 2',
-            ['cislo_jednaci = %s', $doc->cislo_jednaci],
+                ['cislo_jednaci = %s', $doc->cislo_jednaci],
             "user_created = {$this->user->id}"
         ];
         $args_rozd['order'] = array('date_created' => 'DESC');
@@ -667,7 +667,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             // odpoved jiz existuje, tak ji nacteme
             $reply = reset($rozdelany_dokument);
             $reply = new Document($reply->id);
-            
+
             $DokumentSpis = new DokumentSpis();
             $DokumentPrilohy = new DokumentPrilohy();
 
@@ -1259,9 +1259,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 //                        ->setRequired('Vyberte platný spisový znak.')
                         ->setValue(@$Dok->skartacni_lhuta)
                 ->controlPrototype->readonly = TRUE;
-        $form->addSelect('spousteci_udalost_id', 'Spouštěcí událost: ', $spousteci_udalost)
-                        ->setValue(empty($Dok->spousteci_udalost_id) ? 3 : @$Dok->spousteci_udalost_id )
-                ->controlPrototype->readonly = TRUE;
+
+        $form->addSelect('spousteci_udalost_id', 'Spouštěcí událost: ', $spousteci_udalost);
+        if (!empty($Dok->spousteci_udalost_id))
+            $form['spousteci_udalost_id']->setDefaultValue($Dok->spousteci_udalost_id);
+        else if (array_key_exists(3, $spousteci_udalost))
+            $form['spousteci_udalost_id']->setDefaultValue(3); // Skartační lhůta začíná plynout po uzavření dokumentu
 
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10)
                 ->setValue(@$Dok->vyrizeni_pocet_listu)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
@@ -1470,7 +1473,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParameter('id');
         $Dokument = new Dokument();
-        $Subjekt = new Subjekt();
         $File = new FileModel();
 
         // nejprve ověř, že dokument existuje

@@ -1146,8 +1146,10 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         if (is_null($data))
             return false;
 
-        // uprava existujiciho dokumentu
-
+        // nula není platná hodnota, databáze by hlásila chybu
+        if (isset($data['spisovy_znak_id']) && $data['spisovy_znak_id'] == 0)
+            $data['spisovy_znak_id'] = null;
+        
         if (isset($data['zpusob_doruceni_id']) && isset($data['dokument_typ_id'])) {
             // zajisti, aby zpusob doruceni se ulozil pouze u prichozich dokumentu
             $typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
