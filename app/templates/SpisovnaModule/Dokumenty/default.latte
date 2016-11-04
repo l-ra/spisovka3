@@ -32,7 +32,7 @@
         <tr>
             <th class="akce">&nbsp;</th>
             <th class="typ">Typ dokumentu</th>
-            <th class="prijato">Přijato<br />Vyřízen<br />Skartační rok</th>
+            <th class="prijato">Přijat<br />Vyřízen<br />Skartační rok</th>
             <th class="cislo_jednaci">Číslo jednací<br />JID<br />Název spisu</th>
             <th class="vec">Věc<br />Adresáti/odesílatelé<br />počet listů a příloh</th>
             <th class="prideleno">Přidělen</th>
@@ -50,9 +50,9 @@
             <td class="typ">
                 <img src="{$publicUrl}images/icons/smer{$dok->typ_dokumentu->smer}.png" alt="{$dok->typ_dokumentu->nazev}" title="{$dok->typ_dokumentu->nazev}" width="16" height="16" />
                 {if $dok->epod_typ == 'E'}
-                <img src="{$publicUrl}images/icons/email.png" alt="přijato e-mailem" title="přijato e-mailem" width="24" height="16" />
+                <img src="{$publicUrl}images/icons/email.png" alt="přijat e-mailem" title="přijat e-mailem" width="24" height="16" />
                 {elseif $dok->epod_typ == 'I'}
-                <img src="{$publicUrl}images/icons/isds.png" alt="přijato datovou schránkou" title="přijato datovou schránkou" width="24" height="16" />
+                <img src="{$publicUrl}images/icons/isds.png" alt="přijat datovou schránkou" title="přijat datovou schránkou" width="24" height="16" />
                 {/if}
             </td>
             <td class="prijato">
