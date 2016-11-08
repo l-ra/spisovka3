@@ -20,10 +20,17 @@ class Admin_ProtokolPresenter extends BasePresenter
         $this->template->seznam = $LogModel->seznamPristupu($limit, $offset, $user_id);
     }
 
-    public function renderIsds()
+    public function renderIsds($delete = false)
     {
-        $data = null;
         $filename = ISDS_Logger::getFilename();
+        if ($delete) {
+            if (is_file($filename))
+                unlink($filename);
+            $this->flashMessage('Protokol byl smazán.');
+            $this->redirect('isds');
+        }
+        
+        $data = null;
         if (is_file($filename))
             $data = file_get_contents($filename);
         if (empty($data))
