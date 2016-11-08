@@ -13,8 +13,25 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     protected function isUserAllowed()
     {
-        if ($this->view == "detail")
-            return true;
+        /**
+         * Ošetři speciální případ, kdy zprávu v e-podatelně může zobrazit
+         * i uživatel, který do e-podatelny jinak nemá přístup.
+         */
+        $msg_id = $this->getParameter('id');
+        $doc_id = $this->getParameter('dok_id');
+        if ($this->view == "detail" && $msg_id && $doc_id) {
+            /**
+             * Zkontroluj, že uživatel nepodvádí, aby nezískal neoprávněný přístup
+             * ke všem zprávám.
+             * Že má právo číst dokument a dokument je spojen se zprávou v e-podatelně.
+             */
+            $doc = new Document($doc_id);
+            $perm = $doc->getUserPermissions();
+            if (!$perm['view'])
+                return false;
+            $msg = EpodatelnaMessage::fromDocument($doc);
+            return $msg_id == $msg->id;
+        }
 
         return parent::isUserAllowed();
     }

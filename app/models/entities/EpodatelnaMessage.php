@@ -63,4 +63,20 @@ class EpodatelnaMessage extends DBEntity
         $zfo = $storage->download($file->id, !$download);
         return $zfo;        
     }
+    
+    /**
+     * Vrátí (příchozí) zprávu, ze které byl dokument vytvořen.
+     * @param Document $doc
+     * @throws Exception
+     */
+    public static function fromDocument(Document $doc)
+    {
+        $res = dibi::query("SELECT [id] FROM %n WHERE [dokument_id] = %i AND NOT [odchozi]",
+                self::TBL_NAME, $doc->id);
+        if (count($res) != 1)
+            throw new Exception("Nemohu nalézt zprávu, ze které byl dokument ID {$doc->id} vytvořen.");
+            
+        $id = $res->fetchSingle();
+        return new static($id);
+    }
 }
