@@ -408,8 +408,8 @@ generujZpravu = function (data) {
             '</form>';
 
     $('#h_evidence').append(zprava);
-    if (data.typ == 'I' || kopirovatEmailDoPoznamky)
-        $('textarea[name="poznamka"]').html(data['popis']);
+    if (data.typ == 'E' && kopirovatEmailDoPoznamky)
+        $('#evidence_form_evidovat_' + id + ' textarea[name="poznamka"]').html(data['popis']);
 
     $('#predat_autocomplete_' + id).autocomplete({
         minLength: 3,
