@@ -1006,7 +1006,11 @@ class DebugSoapClient extends SoapClient
     {
         $out = "SOAP Call: $function_name\n----------\n";
         $this->logger->log($out);
-        $this->logger->log(print_r($arguments[0], true), 2);
+        /**
+         * Nezapisuj binární datovou zprávu u operace AuthenticateMessage
+         */
+        if ($function_name != 'AuthenticateMessage')
+            $this->logger->log(print_r($arguments[0], true), 2);
 
         return parent::__soapCall($function_name, $arguments);
     }
