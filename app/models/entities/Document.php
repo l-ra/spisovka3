@@ -41,9 +41,24 @@ class Document extends DBEntity
      */
     public function canUserForward()
     {
-        $allow_forward_finished_documents = Settings::get('spisovka_allow_forward_finished_documents',
+        switch ($this->stav) {
+            case DocumentStates::STAV_NOVY:
+            case DocumentStates::STAV_VYRIZUJE_SE:
+                $state_condition = true;
+                break;
+            
+            case DocumentStates::STAV_VYRIZEN_NESPUSTENA:
+            case DocumentStates::STAV_VYRIZEN_SPUSTENA:
+                $state_condition = Settings::get('spisovka_allow_forward_finished_documents',
                         false);
-        return !$this->is_forwarded && ($this->stav <= DocumentWorkflow::STAV_VYRIZUJE_SE || $allow_forward_finished_documents);
+                break;
+
+            default:
+                $state_condition = false;
+                break;
+        }
+                
+        return !$this->is_forwarded && $state_condition && $this->canUserModify();
     }
 
     /**
