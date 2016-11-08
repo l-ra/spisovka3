@@ -28,6 +28,9 @@ class Admin_ProtokolPresenter extends BasePresenter
             $data = file_get_contents($filename);
         if (empty($data))
             $data = 'Protokol je prázdný.';
+        
+        // Toto je důležité v případě, kdyby protokol obsahoval binární data
+        $data = htmlSpecialChars($data, ENT_COMPAT, 'ISO-8859-1');
         $this->template->protocol = $data;
     }
 }
