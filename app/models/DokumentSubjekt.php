@@ -4,7 +4,8 @@ class DokumentSubjekt extends BaseModel
 {
 
     protected $name = 'dokument_to_subjekt';
-
+    protected $autoIncrement = false;
+    
     /**
      * @param int $dokument_id
      * @return DibiRow[]
