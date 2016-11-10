@@ -264,8 +264,8 @@ Spisová služba:
 - přidání subjektu k dokumentu se nezaznamenávalo vždy do transakčního protokolu
 - aplikace umožnovala připojit tentýž subjekt k dokumentu vícekrát. Uživateli
   to bylo skryté, ale v databázi mohly existovat duplicitní záznamy. Aktualizace
-  toto opraví, ale je možné, že informace, zda subjekt byl adresát či odesilatel
-  bude nesprávná.
+  toto opraví, ale informace, zda subjekt byl adresát či odesilatel se ztratí
+  (nastaví se "adresát i odesilatel").
   
 Spisovna:  
 - hledání spisů při příjmu do spisovny bylo nefunkční
