@@ -68,7 +68,6 @@
 :Epodatelna:Default:odetail { "id": 15 }
 :Epodatelna:Default:prichozi
 :Epodatelna:Default:zkontrolovat
-:Epodatelna:Default:zkontrolovatAjax NULL
 :Epodatelna:Evidence:jiny { "id": 227 }
 :Epodatelna:Evidence:odmitnout { "id": 227 }
 :Epodatelna:Prilohy:attachments JsonResponse { "id": 227 }
