@@ -108,9 +108,6 @@ try {
         $db_config = $container->parameters['database'];
         GlobalVariables::set('database', Nette\Utils\ArrayHash::from($db_config));
 
-        if (empty($db_config['driver']) || $db_config['driver'] == 'mysql')
-            $db_config['driver'] = 'mysqli';
-
         // oprava chybne konfigurace na hostingu
         // profiler je bez DEBUG modu k nicemu, jen plytva pameti (memory leak)
         if (!$configurator->isDebugMode())
@@ -121,7 +118,7 @@ try {
                 'file' => LOG_DIR . '/mysql_' . KLIENT . '_' . date('Ymd') . '.log');
         }
 
-        $connection = dibi::connect($db_config);
+        $connection = Spisovka\dibi::connect($db_config);
         if ($configurator->isDebugMode()) {
             // false - Neni treba explain SELECT dotazu
             $panel = new Dibi\Bridges\Tracy\Panel(false, DibiEvent::ALL);
@@ -203,6 +200,10 @@ function migrateSystemIni()
     $old_config = $loader->load("$dir/system.ini");
 
     $new_config = [ 'parameters' => [ 'database' => $old_config['common']['database']]];
+    // Pokud uzivatel bude chtit nestandardni mod, bude jej muset zadat do konfiguracniho 
+    // souboru znovu rucne.
+    unset($new_config['parameters']['database']['sqlmode']);
+    
     $loader->save($new_config, "$dir/database.neon");
     @chmod("$dir/database.neon", 0400);
     

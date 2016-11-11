@@ -9,4 +9,5 @@ parameters:
         charset  = utf8
         profiler = false
         cache    = true
-        sqlmode  = STRICT_TRANS_TABLES
+# Zde je možné přepsat výchozí SQL mód aplikace
+#        sqlmode  = ...
