@@ -5,7 +5,7 @@ class DokumentSubjekt extends BaseModel
 
     protected $name = 'dokument_to_subjekt';
     protected $autoIncrement = false;
-    
+
     /**
      * @param int $dokument_id
      * @return DibiRow[]
@@ -55,19 +55,26 @@ class DokumentSubjekt extends BaseModel
         foreach ($result as $row)
             $a[$row->dokument_id][$row->id] = $row;
 
-        return $a;        
+        return $a;
     }
-    
+
     /**
-     *  Vrátí pole subjektů, které jsou připojeny k určeným dokumentům
+     *  Vrátí pole subjektů, které jsou připojeny k určeným dokumentům.
+     *  Voláno ze sestavy.
      * @return DibiRow[]
      */
     public static function subjekty2(array $dokument_ids)
     {
-        return dibi::query("SELECT s.* FROM [:PREFIX:dokument_to_subjekt] ds INNER JOIN [:PREFIX:subjekt] s ON s.id = ds.subjekt_id WHERE dokument_id IN %in GROUP BY s.id",
-                        $dokument_ids)->fetchAssoc('id');
+        $ids = dibi::query("SELECT [subjekt_id] FROM [dokument_to_subjekt] WHERE [dokument_id] IN %in GROUP BY [subjekt_id]",
+                        $dokument_ids)->fetchPairs();
+        return dibi::query("SELECT * FROM [subjekt] WHERE [id] IN %in", $ids)->fetchAssoc('id');
     }
 
+    /**
+     * Voláno ze sestavy.
+     * @param array $dokument_ids
+     * @return array
+     */
     public static function dejAsociaci(array $dokument_ids)
     {
         $dr = dibi::query("SELECT dokument_id, subjekt_id FROM [:PREFIX:dokument_to_subjekt] WHERE dokument_id IN %in ORDER BY date_added",

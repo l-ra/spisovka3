@@ -106,11 +106,7 @@ class Dokument extends BaseModel
         $sql = array(
             'distinct' => 1,
             'from' => array($this->name => 'd'),
-            'cols' => array('id', "MAX(GREATEST(
-COALESCE(DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR), '0'),
-COALESCE(DATE_ADD(spis.datum_uzavreni, INTERVAL spis.skartacni_lhuta YEAR), '0'),
-COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR), '0')
-))%sql" => 'skartace'),
+            'cols' => array('id'),
             'where' => $where,
             'where_or' => $where_or,
             'order' => $order,
@@ -150,7 +146,11 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         }
 
         $sql['group'] = 'd.id';
-        $sql['having'] = array('NOW() > skartace');
+        $sql['having'] = array("NOW() > MAX(GREATEST(
+COALESCE(DATE_ADD(d.datum_spousteci_udalosti, INTERVAL d.skartacni_lhuta YEAR), '0'),
+COALESCE(DATE_ADD(spis.datum_uzavreni, INTERVAL spis.skartacni_lhuta YEAR), '0'),
+COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR), '0')
+))");
 
         // return DibiResult
         return $this->selectComplex($sql);
