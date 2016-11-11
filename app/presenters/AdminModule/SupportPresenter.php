@@ -34,7 +34,7 @@ class Admin_SupportPresenter extends BasePresenter
         $sql_mode = dibi::query('SELECT @@SESSION.sql_mode')->fetchSingle();
         echo "MySQL verze: $db_version\n";
         echo "SQL mód: $sql_mode\n\n";
-        
+
         echo "Nastavení uložená v databázi:\n";
         echo "-----------------------------\n\n";
         $db_settings = Settings::getAll();
@@ -43,7 +43,7 @@ class Admin_SupportPresenter extends BasePresenter
             if ($val === true)
                 $val = 'true';
             if ($val === false)
-                $val = 'false';            
+                $val = 'false';
             printf("%-42s  %s\n", $key, $val);
         }
         echo "\n";
@@ -52,6 +52,12 @@ class Admin_SupportPresenter extends BasePresenter
         echo "--------------------\n\n";
         $user_settings = UserSettings::getAll();
         ksort($user_settings);
+        if (!empty($user_settings['isds_login']))
+            $user_settings['isds_login'] = preg_replace("/./", "*",
+                    $user_settings['isds_login']);
+        if (!empty($user_settings['isds_password']))
+            $user_settings['isds_password'] = preg_replace("/./", "*",
+                    $user_settings['isds_password']);
         foreach ($user_settings as $key => $val) {
             if ($val === true)
                 $val = 'true';
@@ -79,7 +85,7 @@ class Admin_SupportPresenter extends BasePresenter
         unset($config->odeslani->cert_pass);
         print_r($this->arrayConvertBool($config));
         echo "\n";
-        
+
         echo "Konfigurace systému:\n";
         echo "--------------------\n\n";
         $config = $this->context->parameters;
@@ -168,7 +174,8 @@ class Admin_SupportPresenter extends BasePresenter
             else if (is_array($value) || $value instanceof \ArrayAccess)
                 $value = $this->arrayConvertBool($value);
         }
-        
+
         return $array;
     }
+
 }
