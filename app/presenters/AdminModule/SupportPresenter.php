@@ -30,6 +30,11 @@ class Admin_SupportPresenter extends BasePresenter
         $memory_limit = ini_get('memory_limit');
         echo "$memory_limit\n\n";
 
+        $db_version = dibi::query('SELECT VERSION()')->fetchSingle();
+        $sql_mode = dibi::query('SELECT @@SESSION.sql_mode')->fetchSingle();
+        echo "MySQL verze: $db_version\n";
+        echo "SQL mód: $sql_mode\n\n";
+        
         echo "Nastavení uložená v databázi:\n";
         echo "-----------------------------\n\n";
         $db_settings = Settings::getAll();
