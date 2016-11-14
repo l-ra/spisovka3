@@ -2,19 +2,19 @@
 
 class Spisovka_LDAP extends LDAP_Connection
 {
-    protected $params;    
 
+    protected $params;
     protected $attribute_map = ['uid' => 'username',
-                                'samaccountname' => 'username', // Microsoft ActiveDirectory
-                                'sn' => 'prijmeni',
-                                'givenname' => 'jmeno',
-                                'personaltitle' => 'titul_pred', // neni ve standardnim schematu
-                                'mail' => 'email',                                
-                                // atributy nize nemaji pro spisovku vyznam
-                                'title' => 'pozice',
-                                'telephonenumber' => 'telefon'
-                                ];
-            
+        'samaccountname' => 'username', // Microsoft ActiveDirectory
+        'sn' => 'prijmeni',
+        'givenname' => 'jmeno',
+        'personaltitle' => 'titul_pred', // neni ve standardnim schematu
+        'mail' => 'email',
+        // atributy nize nemaji pro spisovku vyznam
+        'title' => 'pozice',
+        'telephonenumber' => 'telefon'
+    ];
+
     public function __construct(array $params)
     {
         parent::__construct();
@@ -27,17 +27,34 @@ class Spisovka_LDAP extends LDAP_Connection
 
     public function verify_user($username, $password)
     {
-        $rdn = str_replace('%username%', $username, $this->params->user_rdn);
-        $rdn .= ",{$this->params->base_dn}";
-
+        $dn = $this->get_user_DN($username);
         try {
-            $this->bind($rdn, $password);
+            $this->bind($dn, $password);
             return true;
         } catch (Exception $e) {
             if ($e->getCode() == 49) // LDAP_INVALID_CREDENTIALS
                 return false;
             throw $e;
         }
+    }
+
+    protected function get_user_DN($username)
+    {
+        if (empty($this->params->user_search)) {
+            $dn = str_replace('%username%', $username, $this->params->user_rdn);
+            $dn .= ",{$this->params->base_dn}";
+            return $dn;
+        }
+
+        if ($this->params->search_dn)
+            $this->bind($this->params->search_dn, $this->params->search_password);
+
+        $search = str_replace('%username%', $username, $this->params->user_search);
+        $result = $this->search($this->params->base_dn, $search, false);
+        if ($result['count'] != 1)
+            return false;
+        
+        return $result[0]['dn'];
     }
 
     public function get_users()
@@ -64,7 +81,7 @@ class Spisovka_LDAP extends LDAP_Connection
             }
         }
 
-        return $user ? : null;
+        return $user ?: null;
     }
 
 }

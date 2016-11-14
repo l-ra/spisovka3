@@ -11,7 +11,9 @@ parameters:
         server = localhost
         port = 389
         base_dn = "ou=people,dc=company,dc=cz"
+# Zadejte user_rdn nebo user_search
         user_rdn = "uid=%%username%%"
+#       user_search = "(samaccountname=%%username%%)"
         search_dn =
         search_password =
         search_filter = "(objectClass=inetOrgPerson)"
