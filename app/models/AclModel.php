@@ -154,29 +154,17 @@ class AclModel extends BaseModel
     public function insertAcl($data)
     {
         DbCache::delete('s3_Permission');
-
-        $data['role_id'] = (int) $data['role_id'];
-        $data['privilege_id'] = (int) $data['privilege_id'];
-
-        return dibi::insert($this->name, $data)
+        dibi::insert($this->name, $data)
                         ->execute();
     }
 
     public function deleteAcl($where)
     {
-        if (is_null($where)) {
+        if (is_null($where))
             return null;
-        } else if (!is_array($where)) {
-            $where = array($where);
-        } else {
-            if (!is_array(current($where))) {
-                $where = array($where);
-            }
-        }
 
         DbCache::delete('s3_Permission');
-
-        return dibi::delete($this->name)->where($where)->execute();
+        dibi::delete($this->name)->where($where)->execute();
     }
 
 //    public function insertResource($data)

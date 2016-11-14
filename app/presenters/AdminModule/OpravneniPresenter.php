@@ -4,12 +4,13 @@ class Admin_OpravneniPresenter extends BasePresenter
 {
 
     protected $authorizator;
-    
+
     public function __construct(\Nette\Security\IAuthorizator $authorizator)
     {
         parent::__construct();
-        $this->authorizator = $authorizator;        
+        $this->authorizator = $authorizator;
     }
+
     public function renderSeznam()
     {
         $this->template->title = " - Seznam rolí";
@@ -203,7 +204,8 @@ class Admin_OpravneniPresenter extends BasePresenter
             $this->flashMessage('Role  "' . $data['name'] . '" byla vytvořena.');
             $this->redirect('detail', ['id' => $role->id]);
         } catch (DibiException $e) {
-            $this->flashMessage('Roli "' . $data['name'] . '" se nepodařilo vytvořit.', 'warning');
+            $this->flashMessage('Roli "' . $data['name'] . '" se nepodařilo vytvořit.',
+                    'warning');
             $this->flashMessage('Chyba - ' . $e->getMessage(), 'warning');
         }
     }
@@ -233,7 +235,7 @@ class Admin_OpravneniPresenter extends BasePresenter
                 $subForm->addCheckbox("opravneni_allow" /* , 'povolit' */)
                         ->setValue((@$opravneni[$rule_id]->allowed == 'Y') ? 1 : 0 );
                 $chk = $subForm->addCheckbox("opravneni_deny" /* , 'zakázat' */)
-                        ->setValue((@$opravneni[$rule_id]->allowed == 'N') ? 1 : 0 );
+                        ->setValue((@$opravneni[$rule_id]->allowed == 'N') ? 1 : 0);
                 // zakaž možnost odepřít oprávnění administátora a vedoucího
                 if ($rule['resource'] == NULL) {
                     $chk->setDisabled();
@@ -275,12 +277,14 @@ class Admin_OpravneniPresenter extends BasePresenter
                 if (($bool == TRUE) && ($stav['opravneni_allow'] == TRUE)) {
                     unset($data[$id]);
                     unset($opravneni[$rule_id]);
-                } else if ($bool == FALSE && isset($stav['opravneni_deny']) && $stav['opravneni_deny'] == TRUE) {
+                } else if ($bool == FALSE && isset($stav['opravneni_deny']) && $stav['opravneni_deny']
+                        == TRUE) {
                     unset($data[$id]);
                     unset($opravneni[$rule_id]);
                 }
             }
-            if ($stav['opravneni_allow'] == FALSE && (!isset($stav['opravneni_deny']) || $stav['opravneni_deny'] == FALSE)) {
+            if ($stav['opravneni_allow'] == FALSE && (!isset($stav['opravneni_deny']) || $stav['opravneni_deny']
+                    == FALSE)) {
                 // Vyradime opravneni, ktera nejsou ani udelena ani odeprena
                 unset($data[$id]);
             }
@@ -289,10 +293,9 @@ class Admin_OpravneniPresenter extends BasePresenter
         // Odebrani zbyvajicich opravneni = oznaceny k odebrani
         if (count($opravneni) > 0) {
             foreach (array_keys($opravneni) as $orid) {
-                $AclModel->deleteAcl(array(
-                    array('privilege_id=%i', $orid),
-                    array('role_id=%i', $role_id)
-                        )
+                $AclModel->deleteAcl([['privilege_id = %i', $orid],
+                        ['role_id = %i', $role_id]
+                        ]
                 );
             }
         }
