@@ -489,8 +489,8 @@ osobaVybrana = function (elm) {
         } else if (data.indexOf('###predano###') != -1) {
             data = data.replace('###predano###', '');
             part = data.split('#');
-            $('#frmnovyForm-predano_user').val(part[1]);
-            $('#frmnovyForm-predano_org').val(part[2]);
+            $('input[name=predano_user]').val(part[1]);
+            $('input[name=predano_org]').val(part[2]);
             $('#predano').html("<dl><dt>Předán:</dt><dd>" + part[3] + "</dd></dl>");
             closeDialog();
         } else {
