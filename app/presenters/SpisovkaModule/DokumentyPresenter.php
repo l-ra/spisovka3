@@ -1049,7 +1049,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $this->flashMessage('Dokument byl vytvořen.');
 
                     if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
-                        /* Dokument predan */
+                        /* Predat dokument. Musime osetrit vstup z formulare! */
+                        if (empty($data['predano_user']))
+                            $data['predano_user'] = null;
+                        if (empty($data['predano_org']))
+                            $data['predano_org'] = null;
                         $doc = new Document($dokument_id);
                         $doc->forward($data['predano_user'], $data['predano_org'],
                                 $data['predani_poznamka']);
