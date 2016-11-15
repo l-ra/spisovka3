@@ -232,8 +232,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $datum_vzniku = $zprava->doruceno_dne;
 
         // predani
-        $predani = ['user' => isset($data['predano_user']) ? $data['predano_user'] : null,
-            'org' => isset($data['predano_org']) ? $data['predano_org'] : null,
+        $predani = ['user' => !empty($data['predano_user']) ? $data['predano_user'] : null,
+            'org' => !empty($data['predano_org']) ? $data['predano_org'] : null,
             'poznamka' => $data['predani_poznamka']];
 
         $document_created = false;
