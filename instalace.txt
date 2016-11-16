@@ -59,11 +59,8 @@ prefix  =               ; prefix tabulek - je mozne nastavit, ale pro prehled-
 
 5. Provedte instalacni proceduru aplikace.
 
-Spustte internetovy prohlizec a zadejte adresu aplikace. Po nacteni stranky
-do adresniho radku pripiste na konec "uvod" (bez uvozovek) a stisknete klavesu
-enter.
-
-Ridte se nyni pokyny uvedenymi na strankach instalace.
+Spustte internetovy prohlizec a zadejte adresu aplikace. 
+Dale se ridte pokyny uvedenymi na strankach instalace.
 
 5a Kontrola serveru na minimalni pozadavky aplikace
 - provede kontrolu na dostupnost komponent a minimalnich pozadavku na provoz

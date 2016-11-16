@@ -19,7 +19,7 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $session = $this->getSession('s3_install');
         unset($session->step);
-        //$this->redirect('uvod');
+        $this->redirect('uvod');
     }
 
     public function renderUvod()
