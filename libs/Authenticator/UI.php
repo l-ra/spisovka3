@@ -175,9 +175,8 @@ class Authenticator_UI extends Nette\Application\UI\Control
                 . " jejich roli.<br /><br /></div><br />";
             }
 
-            $m = new UserModel();
-            $user_seznam = $m->select()->fetchAssoc('username');
-
+            $existing_users = array_flip(UserAccount::getAllUserNames());
+            
             foreach ($seznam as $id => $user) {
 
                 if (!isset($user['jmeno']))
@@ -188,7 +187,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
                 $form->addGroup('');
                 $cont = $form->addContainer("user_$id");
 
-                if (!isset($user_seznam[$user['username']])) {
+                if (!isset($existing_users[$user['username']])) {
                     $cont->addCheckbox('add', 'Přidat');
                     $cont->addText('username', "Uživatelské jméno:")
                             ->addRule(Nette\Forms\Form::FILLED,
@@ -400,13 +399,21 @@ class Authenticator_UI extends Nette\Application\UI\Control
     // Přidá uživatelský účet existující osobě
     public function handleNewUser(Nette\Forms\Controls\SubmitButton $button)
     {
-        $data = $button->getForm()->getValues();
+        $fd = $button->getForm()->getValues(); // form data
 
-        if (!isset($data['osoba_id'])) {
+        if (!isset($fd['osoba_id']))
             $this->presenter->redirect('this');
-        }
 
-        $this->vytvoritUcet($data['osoba_id'], $data);
+        $account_data = [
+            'username' => $fd['username'],
+            'orgjednotka_id' => !empty($fd['orgjednotka_id']) ? $fd['orgjednotka_id'] : null
+        ];
+        if (isset($fd['heslo']))
+            $account_data['password'] = $fd['heslo'];
+        if (isset($fd['external_auth']))
+            $account_data['external_auth'] = $fd['external_auth'];
+
+        $this->createUserAccount($fd['osoba_id'], $account_data, $fd['role']);
 
         $this->presenter->redirect('this');
     }
@@ -441,29 +448,27 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $users_added = 0;
         $users_failed = 0;
 
-        foreach ($data as $user)
-            if (isset($user['add']) && $user['add'] === true) {
+        foreach ($data as $row)
+            if (isset($row['add']) && $row['add'] === true) {
 
-                $osoba = ['jmeno' => $user['jmeno'],
-                    'prijmeni' => $user['prijmeni'],
-                    'email' => $user['email']
+                $person = ['jmeno' => $row['jmeno'],
+                    'prijmeni' => $row['prijmeni'],
+                    'email' => $row['email']
                 ];
+                if (isset($row['titul_pred']))
+                    $person['titul_pred'] = $row['titul_pred'];
+                if (isset($row['telefon']))
+                    $person['telefon'] = $row['telefon'];
+                if (isset($row['pozice']))
+                    $person['pozice'] = $row['pozice'];
 
-                if (isset($user['titul_pred']))
-                    $osoba['titul_pred'] = $user['titul_pred'];
-                if (isset($user['telefon']))
-                    $osoba['telefon'] = $user['telefon'];
-                if (isset($user['pozice']))
-                    $osoba['pozice'] = $user['pozice'];
-
-                $user_data = ['username' => $user['username'],
-                    'heslo' => null,
+                $account_data = [
+                    'username' => $row['username'],
                     'external_auth' => 1,
-                    'role' => $user['role'],
-                    'orgjednotka_id' => $user['orgjednotka_id']
+                    'orgjednotka_id' => !empty($row['orgjednotka_id']) ? $row['orgjednotka_id']
+                        : null
                 ];
-
-                $success = $this->vytvoritUcet($osoba, $user_data);
+                $success = $this->createUserAccount($person, $account_data, $row['role']);
                 if ($success)
                     $users_added++;
                 else
@@ -480,44 +485,43 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
         $this->presenter->redirect('this');
     }
-    
+
     /**
      * Vytvoří uživatelský účet a případně i entitu osoby.
-     * @param int|array $osoba_data id osoby nebo pole
-     * @param array $user_data      data účtu
-     * @param boolean $silent       je true pouze během instalace aplikace
+     * @param int|array $person_data id osoby nebo pole
+     * @param array $account_data   data účtu
+     * @param int $role_id 
      * @return boolean              úspěch operace
      */
-    public function vytvoritUcet($osoba_data, $user_data, $silent = false)
+    public function createUserAccount($person_data, $account_data, $role_id)
     {
-        $osoba_vytvorena = false;
-
         dibi::begin();
         try {
-            if (is_array($osoba_data)) {
-                $osoba_id = Person::create($osoba_data)->id;
-                $osoba_vytvorena = true;
-            } else
-                $osoba_id = $osoba_data;
+            $person_id = is_numeric($person_data) ? $person_data : Person::create($person_data)->id;
+            $account_data['osoba_id'] = $person_id;
+            $account = UserAccount::create($account_data);
 
-            UserModel::pridatUcet($osoba_id, $user_data, false);
+            $User2Role = new User2Role();
+            $row = ['role_id' => $role_id,
+                'user_id' => $account->id,
+                'date_added' => new DateTime()
+            ];
+            $User2Role->insert($row);
 
-            if (!$silent)
-                $this->presenter->flashMessage('Účet uživatele "' . $user_data['username'] . '" byl úspěšně vytvořen.');
+            $this->presenter->flashMessage("Účet uživatele \"$account->username\" byl úspěšně vytvořen.");
 
             dibi::commit();
             return true;
         } catch (Exception $e) {
             dibi::rollback();
-            if (!$silent)
-                if ($e->getCode() == 1062) {
-                    $this->presenter->flashMessage("Uživatelský účet s názvem \"{$user_data['username']}\" již existuje. Zvolte jiný název.",
-                            'warning');
-                } else {
-                    $this->presenter->flashMessage('Účet uživatele se nepodařilo vytvořit.',
-                            'warning');
-                    $this->presenter->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
-                }
+            if ($e->getCode() == 1062) {
+                $this->presenter->flashMessage("Uživatelský účet s názvem \"{$account_data['username']}\" již existuje. Zvolte jiný název.",
+                        'warning');
+            } else {
+                $this->presenter->flashMessage('Účet uživatele se nepodařilo vytvořit.',
+                        'warning');
+                $this->presenter->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
+            }
 
             return false;
         }
@@ -528,9 +532,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $remote_users = $this->userImport ? $this->userImport->getRemoteUsers() : null;
         $users = array();
         if (is_array($remote_users)) {
-            $m = new UserModel();
-            $existing_users = $m->select()->fetchAssoc('username');
-
+            $existing_users = array_flip(UserAccount::getAllUserNames());
             foreach ($remote_users as $user) {
                 $username = $user['username'];
                 if (!isset($existing_users[$username]))

@@ -21,7 +21,7 @@ class Person extends CachedDBEntity
     {
         $user_id = self::getUser()->id;
         if (!$user_id)
-            $user_id = 1;   // pripad instalace aplikace
+            $user_id = null;   // pripad instalace aplikace
 
         $data['date_created'] = new DateTime();
         $data['user_created'] = $user_id;

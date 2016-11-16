@@ -818,24 +818,17 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $data['stav'] = 0;
-        $data['user_created'] = null;
-        $data['date_created'] = new DateTime();
-        $data['user_modified'] = null;
-        $data['date_modified'] = new DateTime();
-
-        $user_data = array(
+        $account_data = [
             'username' => $data['username'],
-            'heslo' => $data['heslo'],
-            'role' => 1
-        );
+            'password' => $data['heslo'],
+        ];
 
         unset($data['username'], $data['heslo'], $data['heslo_potvrzeni']);
         $osoba_data = (array) $data;
-        
+
         $auth = $this->context->createService('authenticatorUI');
-        if (!$auth->vytvoritUcet($osoba_data, $user_data, true)) {
-            $this->flashMessage('Správce se nepodařilo vytvořit.', 'warning');
+        if (!$auth->createUserAccount($osoba_data, $account_data, 1 /* role */)) {
+            // nedelej nic, formular se zobrazi znovu i s chybovou zpravou
         } else {
             $session = $this->getSession('s3_install');
             if (!isset($session->step)) {

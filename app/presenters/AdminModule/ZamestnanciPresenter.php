@@ -75,15 +75,14 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     
     public function actionSmazatUcet($id)
     {
-        $a = new UserAccount($id);
+        $account = new UserAccount($id);
         try {
-            $m = new UserModel();
-            $m->skrytUcet($id);
+            $account->deactivate();            
             $this->flashMessage('Účet uživatele byl smazán.');
         } catch (Exception $e) {
             $this->flashMessage($e->getMessage(), 'warning');
         }
-        $this->redirect('detail', $a->getPerson()->id);
+        $this->redirect('detail', $account->getPerson()->id);
     }
 
     public function renderUcet($id)

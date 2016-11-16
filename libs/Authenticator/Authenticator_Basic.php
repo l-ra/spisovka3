@@ -20,12 +20,9 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
 
     public function authenticate(array $credentials)
     {
-        // vstupy
-        $username = $credentials[self::USERNAME];
-
         // Vyhledani uzivatele
-        $log = new LogModel();
-        $account = UserModel::searchUser($username);
+        $username = $credentials[self::USERNAME];
+        $account = UserAccount::getByName($username);
 
         // Overeni uzivatele
         if (!$account)
@@ -54,6 +51,8 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
             throw new Nette\Security\AuthenticationException(
             "Při ověřování hesla došlo k problému: " . $e->getMessage(), self::FAILURE);
         }
+        
+        $log = new LogModel();
         $ip_address = $this->httpRequest->getRemoteAddress();
         if (!$success) {
             $log->logAccess($account->id, 0, $ip_address);
@@ -84,7 +83,7 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
     protected function verifyLocalPassword($user, $credentials)
     {
         $password = $credentials[self::PASSWORD];
-        $hash_S3 = sha1($user->username . $password);
+        $hash_S3 = UserAccount::computePasswordHash($user->username, $password);
         $hash_S2 = md5(md5($password));
 
         return $user->password === $hash_S3 || $user->password === $hash_S2;
