@@ -827,6 +827,8 @@ class Install_DefaultPresenter extends BasePresenter
         $osoba_data = (array) $data;
 
         $auth = $this->context->createService('authenticatorUI');
+        // Komponentu je nutné připojit k presenteru, neboť volá flashMessage()
+        $this->addComponent($auth, 'auth');
         if (!$auth->createUserAccount($osoba_data, $account_data, 1 /* role */)) {
             // nedelej nic, formular se zobrazi znovu i s chybovou zpravou
         } else {
