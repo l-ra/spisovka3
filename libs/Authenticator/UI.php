@@ -202,7 +202,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
                     $cont->addText('email', 'E-mail:')
                             ->setValue($user['email'])
                             ->addCondition(Nette\Forms\Form::FILLED)
-                                ->addRule(Nette\Forms\Form::EMAIL);
+                            ->addRule(Nette\Forms\Form::EMAIL);
 
                     $this->formAddRoleSelect($cont);
                     $this->formAddOrgSelect($cont);
@@ -324,8 +324,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
             $url = isset($data['backlink']) ? $data['backlink'] : '';
             if (!$redirect_home && !empty($url)) {
                 $this->presenter->redirectUrl($url);
-            }
-            else
+            } else
                 $this->presenter->redirect(':Spisovka:Default:default');
         } catch (Nette\Security\AuthenticationException $e) {
             $this->presenter->flashMessage($e->getMessage(), 'warning');
@@ -341,21 +340,21 @@ class Authenticator_UI extends Nette\Application\UI\Control
             $a->force_logout = false;
             $a->save();
         }
-        
+
         /* Pokus o pridani upozorneni se nezdaril, protoze je problem zobrazit jakoukoli
          * flash zpravu (kvuli pouziti redirectUrl() po prihlaseni)
-        // Zkontroluj, zda ma uzivatel predane dokumenty
-        $Dokument = new Dokument;
-        $args_f = $Dokument->fixedFiltr('kprevzeti', false, false);
-        $args = $Dokument->spisovka($args_f);
-        $result = $Dokument->seznam($args);
+          // Zkontroluj, zda ma uzivatel predane dokumenty
+          $Dokument = new Dokument;
+          $args_f = $Dokument->fixedFiltr('kprevzeti', false, false);
+          $args = $Dokument->spisovka($args_f);
+          $result = $Dokument->seznam($args);
 
-        if (count($result))
-            $this->presenter->flashMessage('Máte dokument(y) k převzetí. Počet dokumentů: ' . count($result), 'info');
-         
-        */
+          if (count($result))
+          $this->presenter->flashMessage('Máte dokument(y) k převzetí. Počet dokumentů: ' . count($result), 'info');
+
+         */
     }
-    
+
     protected function formAddAuthSelect(Nette\Forms\Container $form, $value = null)
     {
         if ($this->authenticator->supportsRemoteAuth()) {
@@ -421,7 +420,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
             $this->presenter->flashMessage('Heslo úspěšně změněno.');
         else
             $this->presenter->flashMessage('Heslo není možné změnit.', 'warning');
-        
+
         $this->presenter->redirect('this', ['upravit' => null]);
     }
 
@@ -432,7 +431,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $ua->external_auth = $data['external_auth'];
         $ua->last_modified = new DateTime();
         $ua->save();
-        
+
         $this->presenter->flashMessage('Nastavení změněno.');
         $this->presenter->redirect('this');
     }
@@ -481,29 +480,35 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
         $this->presenter->redirect('this');
     }
-
-    // Vytvoří uživatelský účet a případně i entitu osoby
-    // $osoba_data - je buď id osoby nebo pole
-    // $silent - je true pouze během instalace aplikace
-    // vrátí boolean - úspěch operace
+    
+    /**
+     * Vytvoří uživatelský účet a případně i entitu osoby.
+     * @param int|array $osoba_data id osoby nebo pole
+     * @param array $user_data      data účtu
+     * @param boolean $silent       je true pouze během instalace aplikace
+     * @return boolean              úspěch operace
+     */
     public function vytvoritUcet($osoba_data, $user_data, $silent = false)
     {
         $osoba_vytvorena = false;
 
+        dibi::begin();
         try {
             if (is_array($osoba_data)) {
-                $osoba_id = Person::create($osoba_data)->id; 
+                $osoba_id = Person::create($osoba_data)->id;
                 $osoba_vytvorena = true;
             } else
                 $osoba_id = $osoba_data;
 
-            UserModel::pridatUcet($osoba_id, $user_data);
+            UserModel::pridatUcet($osoba_id, $user_data, false);
 
             if (!$silent)
                 $this->presenter->flashMessage('Účet uživatele "' . $user_data['username'] . '" byl úspěšně vytvořen.');
 
+            dibi::commit();
             return true;
         } catch (Exception $e) {
+            dibi::rollback();
             if (!$silent)
                 if ($e->getCode() == 1062) {
                     $this->presenter->flashMessage("Uživatelský účet s názvem \"{$user_data['username']}\" již existuje. Zvolte jiný název.",
@@ -513,11 +518,6 @@ class Authenticator_UI extends Nette\Application\UI\Control
                             'warning');
                     $this->presenter->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
                 }
-
-            if ($osoba_vytvorena) {
-                // pokud byl uživatel vytvořen "napůl", odstraň záznam zaměstnance
-                $osoba_model->delete("[id] = $osoba_id");
-            }
 
             return false;
         }

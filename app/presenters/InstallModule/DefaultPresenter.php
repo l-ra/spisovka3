@@ -818,13 +818,10 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        dibi::query("SET sql_mode = ''");
-        dibi::query("SET foreign_key_checks = 0");
-
         $data['stav'] = 0;
-        $data['user_created'] = 1;
+        $data['user_created'] = null;
         $data['date_created'] = new DateTime();
-        $data['user_modified'] = 1;
+        $data['user_modified'] = null;
         $data['date_modified'] = new DateTime();
 
         $user_data = array(
@@ -834,10 +831,10 @@ class Install_DefaultPresenter extends BasePresenter
         );
 
         unset($data['username'], $data['heslo'], $data['heslo_potvrzeni']);
-
+        $osoba_data = (array) $data;
+        
         $auth = $this->context->createService('authenticatorUI');
-
-        if (!$auth->vytvoritUcet((array) $data, $user_data, true)) {
+        if (!$auth->vytvoritUcet($osoba_data, $user_data, true)) {
             $this->flashMessage('Správce se nepodařilo vytvořit.', 'warning');
         } else {
             $session = $this->getSession('s3_install');

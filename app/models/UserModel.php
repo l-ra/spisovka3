@@ -26,8 +26,14 @@ class UserModel extends BaseModel
         return new UserAccount($row->id);
     }
 
-    // TODO: prepsat
-    public static function pridatUcet($osoba_id, $data)
+    /**
+     * @param int     $osoba_id
+     * @param array   $data
+     * @param boolean $use_transaction
+     * @return boolean
+     * @throws Exception
+     */
+    public static function pridatUcet($osoba_id, $data, $use_transaction)
     {
         $insert_data = array(
             'username' => $data['username'],
@@ -45,16 +51,17 @@ class UserModel extends BaseModel
             throw new Exception('UserModel::pridatUcet() - neplatné ID osoby');
 
         try {
-            dibi::begin();
+            if ($use_transaction)
+                dibi::begin();
 
             $rown = array('username' => $insert_data['username'],
                 'password' => isset($insert_data['heslo']) ? sha1($insert_data['username'] . $insert_data['heslo'])
-                            : null,
+                    : null,
                 'date_created' => new DateTime(),
                 'external_auth' => (isset($insert_data['external_auth']) ? $insert_data['external_auth']
-                            : 0),
+                    : 0),
                 'orgjednotka_id' => isset($insert_data['orgjednotka_id']) && !empty($insert_data['orgjednotka_id'])
-                            ? $insert_data['orgjednotka_id'] : NULL,
+                    ? $insert_data['orgjednotka_id'] : NULL,
                 'osoba_id' => $osoba_id,
                 'active' => 1
             );
@@ -71,11 +78,13 @@ class UserModel extends BaseModel
                 $User2Role->insert($rowur);
             }
 
-            dibi::commit();
+            if ($use_transaction)
+                dibi::commit();
 
             return true;
         } catch (Exception $e) {
-            dibi::rollback();
+            if ($use_transaction)
+                dibi::rollback();
             throw $e;
         }
     }
