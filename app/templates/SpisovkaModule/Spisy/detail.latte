@@ -17,9 +17,9 @@
        {/if}
        {if $Lze_prevzit }
        <a href="{link prevzit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis</a>
-       <a href="{link odmitnoutprevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
+       <a href="{link odmitnoutPrevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
        {/if}
-       <a n:if="$Lze_menit && !empty($Spis->orgjednotka_id_predano)" href="{link zrusitprevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Zrušit převzetí spisu</a>
+       <a n:if="$Lze_menit && !empty($Spis->orgjednotka_id_predano)" href="{link zrusitPrevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Zrušit převzetí spisu</a>
        <a n:if="empty($Spis->orgjednotka_id)" href="{link privlastnit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis do vlastnictví</a>
        
        {if $Lze_menit }

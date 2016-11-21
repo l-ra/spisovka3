@@ -440,7 +440,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->redirect('detail', array('id' => $spis_id));
     }
 
-    public function actionZrusitprevzeti()
+    public function actionZrusitPrevzeti()
     {
         $spis_id = $this->getParameter('id', null);
 
@@ -477,7 +477,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $this->redirect('detail', array('id' => $spis_id));
     }
 
-    public function actionOdmitnoutprevzeti()
+    public function actionOdmitnoutPrevzeti()
     {
         $spis_id = $this->getParameter('id', null);
 
