@@ -486,13 +486,15 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
         $DokSpis = new DokumentSpis();
         $dokumenty = $DokSpis->dokumenty($spis_id);
-
+        $ok = false;
+        
         if (count($dokumenty) > 0) {
             // obsahuje dokumenty - predame i dokumenty
             $dokument = current($dokumenty);
             $doc = new Document($dokument->id);
             if ($doc->canUserTakeOver()) {
                 if ($doc->reject()) {
+                    $ok = true;
                     $this->flashMessage('Odmítl jste převzetí spisu.');
                 } else {
                     $this->flashMessage('Odmítnutí převzetí se nepodařilo. Zkuste to znovu.',
@@ -504,6 +506,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         } else {
             $Spis = new SpisModel;
             if ($Spis->zrusitPredani($spis_id)) {
+                $ok = true;
                 $this->flashMessage('Odmítl jste převzetí spisu.');
             } else {
                 $this->flashMessage('Odmítnutí převzetí se nepodařilo. Zkuste to znovu.',
@@ -511,7 +514,10 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             }
         }
 
-        $this->redirect('detail', array('id' => $spis_id));
+        if ($ok)
+            $this->redirect('default');
+        else
+            $this->redirect('detail', array('id' => $spis_id));
     }
 
     public function createComponentBulkAction()
