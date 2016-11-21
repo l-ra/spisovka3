@@ -46,18 +46,18 @@ class Document extends DBEntity
             case DocumentStates::STAV_VYRIZUJE_SE:
                 $state_condition = true;
                 break;
-            
+
             case DocumentStates::STAV_VYRIZEN_NESPUSTENA:
             case DocumentStates::STAV_VYRIZEN_SPUSTENA:
                 $state_condition = Settings::get('spisovka_allow_forward_finished_documents',
-                        false);
+                                false);
                 break;
 
             default:
                 $state_condition = false;
                 break;
         }
-                
+
         return !$this->is_forwarded && $state_condition && $this->canUserModify();
     }
 
@@ -127,7 +127,7 @@ class Document extends DBEntity
                 $mess[] = "Dokument musí obsahovat aspoň jeden subjekt!";
         }
 
-        return $mess ? : null;
+        return $mess ?: null;
     }
 
     public function forward($user_id, $orgjednotka_id, $note = null)
@@ -277,14 +277,8 @@ class Document extends DBEntity
         try {
             $spis = $this->getSpis();
             $docs = $spis ? $spis->getDocuments() : [$this];
-            $what = $spis ? 'spis' : 'dokument';
             foreach ($docs as $doc) {
-                $doc->is_forwarded = false;
-                $doc->save();
-
-                $Log = new LogModel();
-                $Log->logDokument($this->id, LogModel::DOK_PREVZETI_ODMITNUTO,
-                        "Uživatel odmítl převzít $what.");
+                $doc->_rejectInternal((boolean)$spis);
             }
             dibi::commit();
             return true;
@@ -292,6 +286,17 @@ class Document extends DBEntity
             $this->_rollback();
             throw $e;
         }
+    }
+
+    public function _rejectInternal($ve_spisu)
+    {
+        $this->is_forwarded = false;
+        $this->_saveInternal();
+
+        $Log = new LogModel();
+        $what = $ve_spisu ? 'spis' : 'dokument';
+        $Log->logDokument($this->id, LogModel::DOK_PREVZETI_ODMITNUTO,
+                "Uživatel odmítl převzít $what.");
     }
 
     /** Vrátí základní informaci, co uživatel může s dokumentem provádět.

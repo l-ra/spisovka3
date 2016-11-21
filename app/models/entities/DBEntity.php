@@ -97,7 +97,7 @@ abstract class DBEntity implements IteratorAggregate
         throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
 
-    protected function _attribute_exists($name)
+    protected function _attributeExists($name)
     {        
         return array_key_exists($name, $this->getData());
     }
@@ -155,10 +155,19 @@ abstract class DBEntity implements IteratorAggregate
         if (!$this->canUserModify())
             throw new Exception("Uložení entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
 
+        $this->_saveInternal();
+    }
+
+    /**
+     * Bohužel ve vyjímečných případech je nutné entitu změnit, přestože normálně
+     * ji uživatel právo měnit nemá.
+     */
+    protected function _saveInternal()
+    {
         if ($this->_data_changed) {
-            if ($this->_attribute_exists('date_modified'))
+            if ($this->_attributeExists('date_modified'))
                 $this->date_modified = new DateTime();
-            if ($this->_attribute_exists('user_modified'))
+            if ($this->_attributeExists('user_modified'))
                 $this->user_modified = self::getUser()->id;
             
             $update_data = [];
@@ -168,7 +177,7 @@ abstract class DBEntity implements IteratorAggregate
             dibi::update(':PREFIX:' . $this::TBL_NAME, $update_data)->where("id = {$this->id}")->execute();
             $this->_data_changed = false;
             $this->_columns_changed = [];
-        }
+        }        
     }
 
     /**
