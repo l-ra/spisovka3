@@ -33,7 +33,7 @@
                     <td></td>
                 {/if}
             </tr>
-            <tr n:if="isset($requirement->passed) && !$requirement->passed" class="{$class} description">
+            <tr n:if="isset($requirement->description) && isset($requirement->passed) && !$requirement->passed" class="{$class} description">
                 <td colspan="2">{$requirement->description|noescape}</td>
             </tr>
         {/foreach}
@@ -61,8 +61,7 @@
     {else}
         <div class="passed result">
             <h2>Blahopřeji! Konfigurace serveru splňuje minimální požadavky pro použití aplikace.</h2>
-            <p n:if="$warnings">Byly zjištěny nesrovnalosti, které mohou ovlivnit chod aplikace. Podívejte se do detailu a u vyznačených bodů se rozhodněte,
-                zda je daná položka nutná pro běh aplikace nebo ne.</p>
+            <p n:if="$warnings">Byly zjištěny nesrovnalosti, které mohou ovlivnit chod aplikace. Zkontrolujte prosím zvýrazněné body v následujícím výpise.</p>
                 {if !$installed}
                 <p>Můžete pokračovat v instalaci.</p>
                 <p><a href="{link :Install:Default:databaze}">Pokračovat v instalaci</a></p>
