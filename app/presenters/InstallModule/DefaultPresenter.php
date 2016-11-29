@@ -54,10 +54,8 @@ class Install_DefaultPresenter extends BasePresenter
         $phpinfo = $this->phpinfo_array(1);
 
         // cURL supprot
-        $curl_support = 0;
         $curl_version = "";
         if (function_exists('curl_version')) {
-            $curl_support = 1;
             $curli = curl_version();
             if (isset($curli['version']))
                 $curl_version .= " libcurl " . $curli['version'] . "";
@@ -67,16 +65,9 @@ class Install_DefaultPresenter extends BasePresenter
                 $curl_version .= "\nSSL implementace: " . $curli['ssl_version'];
         }
 
-        $soap_support = class_exists('SoapClient');
-        $mail_function = function_exists('mail');
-        $openssl_support = function_exists('openssl_pkcs7_verify');
-
         // IMAP support
-        $imap_support = 0;
         $imap_version = "";
         if (function_exists('imap_open')) {
-            $imap_support = 1;
-
             if (isset($phpinfo['imap']['IMAP c-Client Version']))
                 $imap_version = "IMAP " . $phpinfo['imap']['IMAP c-Client Version'];
 
@@ -127,7 +118,7 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'Funkce mail()',
                 'required' => FALSE,
-                'passed' => $mail_function,
+                'passed' => function_exists('mail'),
                 'message' => 'Ano',
                 'errorMessage' => 'Funkce mail() je zakázána.',
                 'description' => 'Je potřeba pro odesílání e-mailových zpráv.',
@@ -143,34 +134,10 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'Rozšíření cURL',
                 'required' => FALSE,
-                'passed' => $curl_support,
+                'passed' => extension_loaded('curl'),
                 'message' => $curl_version,
                 'errorMessage' => 'Není zapnuto rozšíření cURL.',
                 'description' => 'Aplikace pro komunikaci s jinými servery potřebuje buď knihovnu cURL nebo povolené nastavení "allow_url_fopen".',
-            ),
-            array(
-                'title' => 'Rozšíření SOAP',
-                'required' => FALSE,
-                'passed' => $soap_support,
-                'message' => 'Ano',
-                'errorMessage' => 'Není zapnuto rozšíření SOAP.',
-                'description' => 'Je potřeba pro komunikaci s datovou schránkou.',
-            ),
-            array(
-                'title' => 'Rozšíření OpenSSL',
-                'required' => FALSE,
-                'passed' => $openssl_support,
-                'message' => 'Ano',
-                'errorMessage' => 'Není zapnuto rozšíření OpenSSL',
-                'description' => 'Je potřeba pro elektronické podpisy u e-mailů a pro datovou schránku.',
-            ),
-            array(
-                'title' => 'Rozšíření IMAP',
-                'required' => FALSE,
-                'passed' => $imap_support,
-                'message' => $imap_version,
-                'errorMessage' => 'Není zapnuto rozšíření IMAP',
-                'description' => 'Je potřeba pro příjem e-mailových zpráv.',
             ),
             array(
                 'title' => 'Rozšíření Fileinfo',
@@ -179,6 +146,30 @@ class Install_DefaultPresenter extends BasePresenter
                 'message' => 'Ano',
                 'errorMessage' => 'Ne',
                 'description' => 'Chybí rozšíření Fileinfo. Detekce MIME typů souborů bude omezena, jen podle přípony souboru.',
+            ),
+            array(
+                'title' => 'Rozšíření IMAP',
+                'required' => FALSE,
+                'passed' => extension_loaded('imap'),
+                'message' => $imap_version,
+                'errorMessage' => 'Není zapnuto rozšíření IMAP',
+                'description' => 'Je potřeba pro příjem e-mailových zpráv.',
+            ),
+            array(
+                'title' => 'Rozšíření OpenSSL',
+                'required' => FALSE,
+                'passed' => extension_loaded('openssl'),
+                'message' => 'Ano',
+                'errorMessage' => 'Není zapnuto rozšíření OpenSSL',
+                'description' => 'Je potřeba pro elektronické podpisy u e-mailů a pro datovou schránku.',
+            ),
+            array(
+                'title' => 'Rozšíření SOAP',
+                'required' => FALSE,
+                'passed' => extension_loaded('soap'),
+                'message' => 'Ano',
+                'errorMessage' => 'Není zapnuto rozšíření SOAP.',
+                'description' => 'Je potřeba pro komunikaci s datovou schránkou.',
             ),
             array(
                 'title' => 'Rozšíření ZIP',
