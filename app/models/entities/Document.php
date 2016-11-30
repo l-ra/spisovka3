@@ -97,6 +97,27 @@ class Document extends DBEntity
         return $model->subjekty($this->id);
     }
 
+    public function __get($name)
+    {
+        // pro zpětnou kompatibilitu
+        if ($name != 'lhuta_stav')
+            return parent::__get($name);
+
+        if ($this->stav >= DocumentStates::STAV_VYRIZEN_NESPUSTENA || empty($this->lhuta))
+            return 0;
+
+        $creation_time = strtotime($this->datum_vzniku);
+        $close_until = $creation_time + ($this->lhuta * 86400);
+        $difference = $close_until - time();
+
+        if ($difference < 0)
+            return 2;
+        if ($difference <= 432000)
+            return 1;
+
+        return 0;
+    }
+
     /**
      * Kontrola, zda jsou vyplněny všechny potřebné údaje pro vyřízení / uzavření dokumentu
      * @return array|null
@@ -130,7 +151,7 @@ class Document extends DBEntity
         return $mess ?: null;
     }
 
-    public function forward($user_id, $orgjednotka_id, $note = null)
+    public function forward($user_id, $orgunit_id, $note = null)
     {
         dibi::begin();
         try {
@@ -143,33 +164,43 @@ class Document extends DBEntity
                 $person = Person::fromUserId($user_id);
                 $log = "Dokument předán zaměstnanci $person.";
                 $log_spis = "Spis předán zaměstnanci $person.";
-                if ($orgjednotka_id === null) {
+                if ($orgunit_id === null) {
                     $account = new UserAccount($user_id);
                     $ou = $account->getOrgUnit();
                     if ($ou)
-                        $orgjednotka_id = $ou->id;
+                        $orgunit_id = $ou->id;
                 }
-            } else if ($orgjednotka_id !== null) {
-                $ou = new OrgUnit($orgjednotka_id);
+            } else if ($orgunit_id !== null) {
+                $ou = new OrgUnit($orgunit_id);
                 $log = "Dokument předán organizační jednotce $ou.";
                 $log_spis = "Spis předán organizační jednotce $ou.";
             } else
                 throw new InvalidArgumentException(__METHOD__ . "() - neplatné parametry");
 
             $spis = $this->getSpis();
+            if ($spis && $orgunit_id === null)
+                throw new Exception('Uživatel není zařazen do organizační jednotky, není možné mu předávat spisy.');
+            
             $docs = $spis ? $spis->getDocuments() : [$this];
             foreach ($docs as $doc) {
                 $doc->is_forwarded = true;
                 $doc->forward_user_id = $user_id;
-                $doc->forward_orgunit_id = $orgjednotka_id;
+                $doc->forward_orgunit_id = $orgunit_id;
                 $doc->forward_note = $note;
-                $doc->save();
+                /**
+                 * Je nutné ošetřit případ, kdy dokumenty ve spisu mají různé uživatele.
+                 * Tento problém, který je důsledkem mizerného návrhu aplikace z minulosti 
+                 * jiným způsobem nemůžeme opravit.
+                 */
+                if (count($docs) == 1)
+                    $doc->save();
+                else
+                    $doc->_saveInternal(); // neprováděj kontrolu
 
                 $Log->logDokument($doc->id, LogModel::DOK_PREDAN, $spis ? $log_spis : $log);
             }
             if ($spis) {
-                $Spis = new SpisModel();
-                $Spis->predatOrg($spis->id, $orgjednotka_id);
+                $spis->forward(new OrgUnit($orgunit_id));
                 $Log->logSpis($spis->id, LogModel::SPIS_PREDAN, $log_spis);
             }
 
@@ -199,9 +230,6 @@ class Document extends DBEntity
 
     public function takeOver()
     {
-        if (!$this->canUserTakeOver())
-            return false;
-
         $user = self::getUser();
         $user_orgunit = $user->getOrgUnit();
         if ($user_orgunit)
@@ -219,20 +247,21 @@ class Document extends DBEntity
             $docs = $spis ? $spis->getDocuments() : [$this];
             $what = $spis ? 'spis' : 'dokument';
             foreach ($docs as $doc) {
+                /* @var $doc Document */
+                if (!$doc->canUserTakeOver()) {
+                    $this->_rollback();
+                    return false;
+                }
                 $doc->is_forwarded = false;
                 $doc->owner_user_id = $user->id;
                 $doc->owner_orgunit_id = $user_orgunit;
-                $doc->save();
+                $doc->_saveInternal();
 
-                $Log->logDokument($this->id, LogModel::DOK_PRIJAT,
+                $Log->logDokument($doc->id, LogModel::DOK_PRIJAT,
                         "Zaměstnanec $user->displayName přijal $what $log_plus");
             }
-            if ($spis) {
-                $Spis = new SpisModel();
-                $Spis->zmenitOrg($spis->id, $user_orgunit);
-                $Log->logSpis($spis->id, LogModel::SPIS_PRIJAT,
-                        'Zaměstnanec ' . $user->displayName . ' přijal spis' . $log_plus);
-            }
+            if ($spis)
+                $spis->takeOver();
 
             dibi::commit();
             return true;
@@ -242,6 +271,10 @@ class Document extends DBEntity
         }
     }
 
+    /**
+     * @return boolean
+     * @throws Exception
+     */
     public function cancelForwarding()
     {
         if (!$this->is_forwarded || !$this->canUserModify())
@@ -257,9 +290,13 @@ class Document extends DBEntity
                 $doc->save();
 
                 $Log = new LogModel();
-                $Log->logDokument($this->id, LogModel::DOK_PREDANI_ZRUSENO,
+                $Log->logDokument($doc->id, LogModel::DOK_PREDANI_ZRUSENO,
                         "Předání $what bylo zrušeno.");
             }
+
+            if ($spis)
+                $spis->cancelForwarding();
+
             dibi::commit();
             return true;
         } catch (Exception $e) {
@@ -268,6 +305,10 @@ class Document extends DBEntity
         }
     }
 
+    /**
+     * @return boolean
+     * @throws Exception
+     */
     public function reject()
     {
         if (!$this->canUserTakeOver())
@@ -278,8 +319,12 @@ class Document extends DBEntity
             $spis = $this->getSpis();
             $docs = $spis ? $spis->getDocuments() : [$this];
             foreach ($docs as $doc) {
-                $doc->_rejectInternal((boolean)$spis);
+                $doc->_rejectInternal((boolean) $spis);
             }
+
+            if ($spis)
+                $spis->cancelForwarding();
+
             dibi::commit();
             return true;
         } catch (Exception $e) {
@@ -288,13 +333,13 @@ class Document extends DBEntity
         }
     }
 
-    public function _rejectInternal($ve_spisu)
+    protected function _rejectInternal($inside_spis)
     {
         $this->is_forwarded = false;
         $this->_saveInternal();
 
         $Log = new LogModel();
-        $what = $ve_spisu ? 'spis' : 'dokument';
+        $what = $inside_spis ? 'spis' : 'dokument';
         $Log->logDokument($this->id, LogModel::DOK_PREVZETI_ODMITNUTO,
                 "Uživatel odmítl převzít $what.");
     }
@@ -361,6 +406,64 @@ class Document extends DBEntity
         $count = dibi::query("SELECT COUNT(*) FROM %n WHERE [id] != $this->id AND [cislo_jednaci] = %s",
                         self::TBL_NAME, $this->cislo_jednaci)->fetchSingle();
         return $count != 0;
+    }
+
+    /**
+     * @param Spis $spis
+     * @return \static[]
+     */
+    public static function getDocumentsFromSpis(Spis $spis)
+    {
+        $result = dibi::query("SELECT d.* FROM %n AS d, [dokument_to_spis] AS ds WHERE d.id = ds.dokument_id AND ds.spis_id = $spis->id",
+                        self::TBL_NAME);
+
+        return self::_createObjectsFromDibiResult($result);
+    }
+
+    public function insertIntoSpis(Spis $spis)
+    {
+        if ($spis->stav != Spis::OTEVREN)
+            throw new Nette\InvalidStateException('Do spisu, který není otevřený, není možné vkládat dokumenty.');
+
+        if ($this->getSpis())
+            $this->takeOutFromSpis();
+
+        dibi::begin();
+        try {
+            $row = array();
+            $row['dokument_id'] = $this->id;
+            $row['spis_id'] = $spis->id;
+            dibi::insert('dokument_to_spis', $row)->execute();
+
+            $Log = new LogModel();
+            $Log->logDokument($this->id, LogModel::SPIS_DOK_PRIPOJEN,
+                    'Dokument přidán do spisu "' . $spis->nazev . '"');
+            dibi::commit();
+        } catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
+    }
+
+    public function takeOutFromSpis()
+    {
+        $spis = $this->getSpis();
+        if (!$spis)
+            throw new Nette\InvalidStateException('Dokument není ve spisu.');
+
+        dibi::begin();
+        try {
+            dibi::query("DELETE FROM [dokument_to_spis] WHERE [dokument_id] = %i", $this->id);
+
+            $Log = new LogModel();
+            $Log->logDokument($this->id, LogModel::SPIS_DOK_ODEBRAN,
+                    'Dokument vyjmut ze spisu "' . $spis->nazev . '"');
+
+            dibi::commit();
+        } catch (Exception $e) {
+            dibi::rollback();
+            throw $e;
+        }
     }
 
 }

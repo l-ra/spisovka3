@@ -205,7 +205,25 @@ abstract class DBEntity implements IteratorAggregate
     }
 
     /**
-     * @param params array
+     * @param DibiResult $dr
+     * @return \static[]
+     */
+    protected static function _createObjectsFromDibiResult(DibiResult $dr)
+    {
+        $a = array();
+
+        foreach ($dr as $row) {
+            $o = new static((int) $row->id);
+            $o->_setData($row);
+            $a[$o->id] = $o;
+        }
+
+        return $a;        
+    }
+    
+    /**
+     * @param $params array
+     * @return \static[]
      */
     public static function getAll(array $params = array())
     {
@@ -225,16 +243,8 @@ abstract class DBEntity implements IteratorAggregate
             array_push($query, 'OFFSET %i', $params['offset']);
 
         $resultSet = dibi::query($query);
-
-        $a = array();
-
-        foreach ($resultSet as $row) {
-            $o = new static((int) $row->id);
-            $o->_setData($row);
-            $a[$o->id] = $o;
-        }
-
-        return $a;
+        
+        return self::_createObjectsFromDibiResult($resultSet);
     }
 
     public static function getCount(array $where = array())

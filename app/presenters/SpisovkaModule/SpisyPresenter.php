@@ -247,40 +247,21 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
     {
         $spis_id = $this->getParameter('id', null);
         $dokument_id = $this->getParameter('dok_id', null);
-        $Spisy = new SpisModel();
 
-        $spis = $Spisy->getInfo($spis_id);
-        if (!$spis || !$dokument_id)
-            throw new Exception('Neplatný parametr');
+        $spis = new Spis($spis_id);
+        $doc = new Document($dokument_id);
+        $doc->insertIntoSpis($spis);
 
-        // Propojit s dokumentem
-        $DokumentSpis = new DokumentSpis();
-        $DokumentSpis->pripojit($dokument_id, $spis_id);
-
-        $this->sendJson($spis);
+        $this->sendJson($spis->getData());
     }
 
     // TODO: Zcela chybi kontrola opravneni
-    public function actionVyjmoutDokument()
+    public function actionVyjmoutDokument($dok_id)
     {
-        $ok = false;
-        $dokument_id = $this->getParameter('dok_id', null);
-        $DokumentSpis = new DokumentSpis();
-        $spis = $DokumentSpis->spis($dokument_id);
-
-        if ($spis) {
-            $where = array(array('dokument_id=%i', $dokument_id));
-            $DokumentSpis->odebrat($where);
-
-            $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::SPIS_DOK_ODEBRAN,
-                    'Dokument vyjmut ze spisu "' . $spis->nazev . '"');
-            $Log->logSpis($spis->id, LogModel::SPIS_DOK_ODEBRAN,
-                    'Dokument "' . $dokument_id . '" odebran ze spisu');
-            $ok = true;
-        }
-
-        $this->sendJson(['ok' => $ok]);
+        $document_id = $dok_id;
+        $doc = new Document($document_id);
+        $doc->takeOutFromSpis();
+        $this->sendJson(['ok' => true]);
     }
 
     public function renderDefault($hledat = null)
@@ -326,9 +307,9 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                 if ($predat_do_spisovny)
                     $spis->uroven = 0;
             }
-            $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+            $this->template->pocty_dokumentu = $Spisy->poctyDokumentu($spis_ids);
         } else {
-            $this->template->seznam_dokumentu = array();
+            $this->template->pocty_dokumentu = array();
         }
 
         $this->template->seznam = $seznam;
@@ -340,16 +321,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function renderDetail($id, $upravit)
     {
-        $spis_id = $id;
-        // Info o spisu
-        $Spisy = new SpisModel();
-        $this->template->Spis = $spis = $Spisy->getInfo($spis_id, true);
-
-        if (!$spis) {
-            // spis neexistuje nebo se nepodarilo nacist
-            $this->setView('noexist');
-            return;
-        }
+        $this->template->Spis = $spis = new Spis($id);
 
         $this->template->SpisZnak_nazev = "";
         if (!empty($spis->spisovy_znak_id)) {
@@ -358,10 +330,8 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $this->template->SpisZnak_nazev = $sz->nazev;
         }
 
-        $opravneni = SpisModel::zjistiOpravneniUzivatele($spis);
-        $this->template->Lze_prevzit = $opravneni['lze_prevzit'];
-        $this->template->Lze_cist = $opravneni['lze_cist'];
-        $this->template->Lze_menit = $opravneni['lze_menit'];
+        $opravneni = $spis->getUserPermissions();
+        $this->template->opravneni = $opravneni;
         $this->template->Editovat = $opravneni['lze_menit'] && $upravit == 'info';
 
         if (!$opravneni['lze_cist']) {
@@ -369,155 +339,87 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             return;
         }
 
-        //$client_config = Environment::getVariable('client_config');
-        //$vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
-        //$paginator = $vp->getPaginator();
-        //$paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek)?$client_config->nastaveni->pocet_polozek:20;
-        //$result = $DokumentSpis->dokumenty($spis_id, 1, $paginator);
-
         $DokumentSpis = new DokumentSpis();
-        $this->template->seznam = $opravneni['lze_cist'] ? $DokumentSpis->dokumenty($spis_id) : null;
+        $this->template->seznam = $DokumentSpis->dokumentyVeSpisu($id);
     }
 
-    public function actionPrevzit()
+    public function actionPrevzit($id)
     {
-        $spis_id = $this->getParameter('id', null);
-
-        $Spisy = new SpisModel;
-        $Spisy->getInfo($spis_id);
-
-        $DokSpis = new DokumentSpis();
-        $dokumenty = $DokSpis->dokumenty($spis_id);
-
-        if (count($dokumenty) > 0) {
+        $spis = new Spis($id);
+        $documents = $spis->getDocuments();
+        if ($documents) {
             // obsahuje dokumenty - predame i dokumenty
-            $dokument = current($dokumenty);
-
-            $doc = new Document($dokument->id);
+            $doc = current($documents);
             if ($doc->canUserTakeOver()) {
                 if ($doc->takeOver())
-                    $this->flashMessage('Úspěšně jste si převzal tento spis.');
+                    $this->flashMessage('Úspěšně jste převzal tento spis.');
                 else
                     $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.',
                             'warning');
             } else
                 $this->flashMessage('Nemáte oprávnění k převzetí spisu.', 'warning');
         } else {
-            $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
-
-            if ($Spisy->zmenitOrg($spis_id, $orgjednotka_id)) {
-                $this->flashMessage('Úspěšně jste si převzal tento spis.');
-            } else {
-                $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.',
-                        'warning');
-            }
+            $spis->takeOver();
+            $this->flashMessage('Úspěšně jste převzal tento spis.');
+            /* $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.',
+                        'warning'); */
         }
 
-        $this->redirect('detail', array('id' => $spis_id));
+        $this->redirect('detail', $id);
     }
 
     /** Tato operace je povolena pouze, kdyz spis nema zadneho vlastnika */
-    public function actionPrivlastnit()
+    public function actionPrivlastnit($id)
     {
-        $spis_id = $this->getParameter('id', null);
-
-        $orgjednotka_id = OrgJednotka::dejOrgUzivatele();
-
-        $Spis = new SpisModel;
-        $sp = $Spis->getInfo($spis_id);
-        if (!empty($sp->orgjednotka_id) || !empty($sp->orgjednotka_id_predano))
+        $orgunit = $this->user->getOrgUnit();
+        $spis = new Spis($id);
+        if ($spis->orgjednotka_id !== null || $spis->orgjednotka_id_predano !== null)
             $this->flashMessage('Operace zamítnuta.', 'error');
-        else if (!isset($orgjednotka_id))
+        else if (!$orgunit)
             $this->flashMessage('Nemůžete převzít spis, protože nejste zařazen do organizační jednotky.',
                     'warning');
-        else if ($Spis->zmenitOrg($spis_id, $orgjednotka_id)) {
+        else { 
+            $spis->orgjednotka_id = $orgunit->id;
+            $spis->save();
             $this->flashMessage('Úspěšně jste si převzal tento spis. Pokud spis obsahoval dokumenty, jejich vlastnictví změněno nebylo.');
-        } else {
-            $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.',
-                    'warning');
         }
 
-        $this->redirect('detail', array('id' => $spis_id));
+        $this->redirect('detail', $id);
     }
 
-    public function actionZrusitPrevzeti()
+    public function actionZrusitPredani($id)
     {
-        $spis_id = $this->getParameter('id', null);
+        $spis = new Spis($id);
+        $documents = $spis->getDocuments();
+        if (!$documents)
+            throw new Exception('Spisy, které neobsahují žádný dokument, není možné předávat.');
 
-        $Spisy = new SpisModel;
-        $Spisy->getInfo($spis_id);
-
-        $DokSpis = new DokumentSpis();
-        $dokumenty = $DokSpis->dokumenty($spis_id);
-
-        if (count($dokumenty) > 0) {
-            // obsahuje dokumenty - predame i dokumenty
-            $dokument = current($dokumenty);
-            $doc = new Document($dokument->id);
-            if ($doc->canUserModify()) {
-                if ($doc->cancelForwarding()) {
-                    $this->flashMessage('Zrušil jste převzetí spisu.');
-                } else {
-                    $this->flashMessage('Zrušení převzetí se nepodařilo. Zkuste to znovu.',
-                            'warning');
-                }
-            } else {
-                $this->flashMessage('Nemáte oprávnění ke zrušení převzetí spisu.', 'warning');
-            }
+        $doc = current($documents);
+        if ($doc->cancelForwarding()) {
+            $this->flashMessage('Zrušil jste předání spisu.');
         } else {
-            $Spis = new SpisModel;
-            if ($Spis->zrusitPredani($spis_id)) {
-                $this->flashMessage('Zrušil jste převzetí spisu.');
-            } else {
-                $this->flashMessage('Zrušení převzetí se nepodařilo. Zkuste to znovu.',
-                        'warning');
-            }
+            $this->flashMessage('Nejste oprávněn zrušit předání.', 'warning');
         }
 
-        $this->redirect('detail', array('id' => $spis_id));
+        $this->redirect('detail', $id);
     }
 
-    public function actionOdmitnoutPrevzeti()
+    public function actionOdmitnoutPrevzeti($id)
     {
-        $spis_id = $this->getParameter('id', null);
+        $spis = new Spis($id);
+        $documents = $spis->getDocuments();
+        if (!$documents)
+            throw new Exception('Spisy, které neobsahují žádný dokument, není možné předávat.');
 
-        $Spisy = new SpisModel;
-        $Spisy->getInfo($spis_id);
-
-        $DokSpis = new DokumentSpis();
-        $dokumenty = $DokSpis->dokumenty($spis_id);
-        $ok = false;
-        
-        if (count($dokumenty) > 0) {
-            // obsahuje dokumenty - predame i dokumenty
-            $dokument = current($dokumenty);
-            $doc = new Document($dokument->id);
-            if ($doc->canUserTakeOver()) {
-                if ($doc->reject()) {
-                    $ok = true;
-                    $this->flashMessage('Odmítl jste převzetí spisu.');
-                } else {
-                    $this->flashMessage('Odmítnutí převzetí se nepodařilo. Zkuste to znovu.',
-                            'warning');
-                }
-            } else {
-                $this->flashMessage('Nemáte oprávnění k odmítnutí převzetí spisu.', 'warning');
-            }
-        } else {
-            $Spis = new SpisModel;
-            if ($Spis->zrusitPredani($spis_id)) {
-                $ok = true;
-                $this->flashMessage('Odmítl jste převzetí spisu.');
-            } else {
-                $this->flashMessage('Odmítnutí převzetí se nepodařilo. Zkuste to znovu.',
-                        'warning');
-            }
-        }
-
-        if ($ok)
+        $doc = current($documents);
+        if ($doc->reject()) {
+            $this->flashMessage('Odmítl jste převzetí spisu.');
             $this->redirect('default');
-        else
-            $this->redirect('detail', array('id' => $spis_id));
+        } else {
+            $this->flashMessage('Nejste oprávněn spis převzít nebo převzetí odmítnout.',
+                    'warning');
+            $this->redirect('detail', $id);
+        }
     }
 
     public function createComponentBulkAction()
@@ -540,7 +442,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             case 'predat_spisovna':
                 $count_ok = $count_failed = 0;
                 foreach ($spisy as $spis_id) {
-                    $result = $Spis->predatDoSpisovny($spis_id);
+                    $result = $Spis->transferToSpisovna($spis_id);
                     if ($result === true) {
                         $count_ok++;
                     } else {
@@ -562,13 +464,12 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function actionPredatDoSpisovny($id)
     {
-        $m = new SpisModel;
-        $result = $m->predatDoSpisovny($id);
-        if ($result === true)
+        try {
+            $spis = new Spis($id);
+            $spis->transferToSpisovna($id);
             $this->flashMessage('Spis byl předán do spisovny.');
-        else {
-            foreach ($result as $msg)
-                $this->flashMessage($msg, 'warning');
+        } catch (Exception $e) {
+            $this->flashMessage($e->getMessage(), 'warning');
             $this->flashMessage('Spis se nepodařilo předat do spisovny.', 'warning');
             $this->redirect('detail', $id);
         }
@@ -578,36 +479,28 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function actionOtevrit($id)
     {
-        $m = new SpisModel();
-        if ($m->zmenitStav($id, SpisModel::OTEVREN)) {
+        try {
+            $spis = new Spis($id);
+            $spis->reopen();
             $this->flashMessage('Spis byl otevřen.');
-        } else {
-            $this->flashMessage('Spis se nepodařilo otevřít.', 'error');
+        } catch (\Exception $e) {
+            $this->flashMessage('Spis se nepodařilo otevřít: ' . $e->getMessage(), 'error');
         }
 
-        $this->redirect('detail', ['id' => $id]);
+        $this->redirect('detail', $id);
     }
 
     public function actionUzavrit($id)
     {
-        $m = new SpisModel();
-        $spis = $m->getInfo($id);
-        $kontrola = $m->kontrola($spis);
-        if ($kontrola)
-            $this->flashMessage('Upozornění: Spis nemá vyplněny všechny povinné údaje.',
-                    'warning');
-
-        $stav = $m->zmenitStav($id, SpisModel::UZAVREN);
-        if ($stav === -1) {
-            $this->flashMessage('Spis nelze uzavřít. Jeden nebo více dokumentů nejsou vyřízeny.',
-                    'warning');
-        } else if ($stav) {
+        try {
+            $spis = new Spis($id);
+            $spis->close();
             $this->flashMessage('Spis byl uzavřen.');
-        } else {
-            $this->flashMessage('Spis se nepodařilo uzavřít.', 'error');
+        } catch (\Exception $e) {
+            $this->flashMessage($e->getMessage(), 'error');
         }
 
-        $this->redirect('detail', ['id' => $id]);
+        $this->redirect('detail', $id);
     }
 
     public function vytvoritAjaxClicked(Nette\Application\UI\Form $form, $data)

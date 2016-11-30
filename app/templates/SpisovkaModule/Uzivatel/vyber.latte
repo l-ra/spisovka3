@@ -2,7 +2,7 @@
     <div class="flash_message flash_warning">Zaměstnanci nebo organizační jednotce se nepodařilo předat dokument. Zkuste to znovu.</div>
     {/if}
 
-    <h2>Předat dokument</h2>
+    <h2>Předat {if $dokument_je_ve_spisu}spis{else}dokument{/if}</h2>
     
     <div class="detail_blok" n:if="!$novy">
         {if $dokument_je_ve_spisu}

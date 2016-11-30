@@ -66,9 +66,9 @@ class Spisovna_SpisyPresenter extends BasePresenter
             foreach ($seznam as $spis) {
                 $spis_ids[] = $spis->id;
             }
-            $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+            $this->template->pocty_dokumentu = $Spisy->poctyDokumentu($spis_ids);
         } else {
-            $this->template->seznam_dokumentu = array();
+            $this->template->pocty_dokumentu = array();
         }
 
         $this->template->seznam = $seznam;
@@ -102,19 +102,17 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     public function bulkAction($action, $spisy)
     {
-        $Spis = new SpisModel();
         switch ($action) {
             /* Predani vybranych spisu do spisovny  */
             case 'prevzit_spisovna':
                 $count_ok = $count_failed = 0;
                 foreach ($spisy as $spis_id) {
-                    $stav = $Spis->pripojitDoSpisovny($spis_id);
-                    if ($stav === true) {
+                    try {
+                        $spis = new Spis($spis_id);
+                        $spis->receiveIntoSpisovna();
                         $count_ok++;
-                    } else {
-                        if (is_string($stav)) {
-                            $this->flashMessage($stav, 'warning');
-                        }
+                    } catch (Exception $e) {
+                        $this->flashMessage($e->getMessage(), 'warning');
                         $count_failed++;
                     }
                 }
@@ -129,13 +127,15 @@ class Spisovna_SpisyPresenter extends BasePresenter
             case 'vratit':
                 $all_ok = true;
                 foreach ($spisy as $spis_id) {
-                    $spis = new Spis($spis_id);
-                    $ok = $spis->returnFromSpisovna();
-                    if (!$ok)
-                        $all_ok = false;
+                    try {
+                        $spis = new Spis($spis_id);
+                        $spis->returnFromSpisovna();
+                    } catch (Exception $e) {
+                        $all_ok = false;                        
+                    }
                 }
                 if (count($spisy) == 1)
-                    $msg = $ok ? 'Spis byl vrácen.' : 'Spis se nepodařilo vrátit.';
+                    $msg = $all_ok ? 'Spis byl vrácen.' : 'Spis se nepodařilo vrátit.';
                 else
                     $msg = $all_ok ? 'Spisy byly vráceny.' : 'Některé spisy se nepodařilo vrátit.';
                 $this->flashMessage($msg, $all_ok ? 'info' : 'warning');
@@ -145,10 +145,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
 
     public function renderDetail($id)
     {
-        // Info o spisu
-        $Spisy = new SpisModel();
-        $spis_id = $id;
-        $this->template->Spis = $spis = $Spisy->getInfo($spis_id, true);
+        $this->template->Spis = $spis = new Spis($id);
 
         if (!$spis) {
             $this->setView('noexist');
@@ -163,10 +160,11 @@ class Spisovna_SpisyPresenter extends BasePresenter
         }
 
         $DokumentSpis = new DokumentSpis();
-        $result = $DokumentSpis->dokumenty($spis_id);
+        $result = $DokumentSpis->dokumentyVeSpisu($spis->id);
         $this->template->seznam = $result;
 
-        $this->template->lzeEditovat = $this->user->isAllowed('Spisovna', 'zmenit_skartacni_rezim');
+        $this->template->lzeEditovat = $this->user->isAllowed('Spisovna',
+                'zmenit_skartacni_rezim');
     }
 
     protected function createComponentUpravitForm()

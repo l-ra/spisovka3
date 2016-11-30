@@ -187,15 +187,15 @@ class DocumentWorkflow extends DocumentStates
     }
 
     /**
-     * @param boolean $samostatny  false = voláno při přezetí celého spisu
-     *                             true = voláno při přezetí jednoho dokumentu
+     * @param boolean $independent  false = voláno při přezetí celého spisu
+     *                              true = voláno při přezetí jednoho dokumentu
      * @return boolean|string
      */
-    public function receiveIntoSpisovna($samostatny)
+    public function receiveIntoSpisovna($independent)
     {
         $error_msg = "Dokument $this->jid nelze přijmout do spisovny!";
 
-        if ($samostatny && $this->getSpis())
+        if ($independent && $this->getSpis())
             return "$error_msg Dokument je součástí spisu.";
 
         if ($kontrola = $this->checkComplete())
@@ -207,7 +207,9 @@ class DocumentWorkflow extends DocumentStates
         if ($this->stav < self::STAV_VYRIZEN_SPUSTENA)
             return "$error_msg Není spuštěna událost.";
 
-        dibi::begin();
+        $transaction = $independent;
+        if ($transaction)
+            dibi::begin();
         try {
             $this->_changeState(self::STAV_VE_SPISOVNE);
 
@@ -215,23 +217,25 @@ class DocumentWorkflow extends DocumentStates
             $Log->logDokument($this->id, LogModel::DOK_SPISOVNA_PRIPOJEN,
                     'Dokument přijat do spisovny.');
 
-            dibi::commit();
+            if ($transaction)
+                dibi::commit();
             return true;
         } catch (Exception $e) {
-            $this->_rollback();
+            if ($transaction)
+                $this->_rollback();
             return "Při převzetí dokumentu $this->cislo_jednaci došlo k výjimce: " . $e->getMessage();
         }
     }
 
     /**
      * @param boolean $use_transaction
-     * @return boolean
      * @throws Exception
+     * @throws Nette\InvalidStateException
      */
     public function returnFromSpisovna($use_transaction = true)
     {
         if (!in_array($this->stav, [self::STAV_PREDAN_DO_SPISOVNY, self::STAV_VE_SPISOVNE]))
-            return false;
+            throw new Nette\InvalidStateException();
 
         if ($use_transaction)
             dibi::begin();
@@ -243,7 +247,6 @@ class DocumentWorkflow extends DocumentStates
 
             if ($use_transaction)
                 dibi::commit();
-            return true;
         } catch (Exception $e) {
             if ($use_transaction)
                 $this->_rollback();

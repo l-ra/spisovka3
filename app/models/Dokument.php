@@ -964,7 +964,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 'dokspisy' => array(
                     'from' => array($this->tb_dokspis => 'ds'),
                     'on' => array('ds.dokument_id = dok.id'),
-                    'cols' => array('poradi' => 'poradi_spisu')
+                    'cols' => array()
                 ),
                 'typ_dokumentu' => array(
                     'from' => array($this->tb_dokumenttyp => 'dtyp'),
@@ -1025,8 +1025,6 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             unset($dokument->nazev_spisu);
             $spis->popis = $dokument->popis_spisu;
             unset($dokument->popis_spisu);
-            $spis->poradi = $dokument->poradi_spisu;
-            unset($dokument->poradi_spisu);
         }
         if (isset($spis)) {
             $dokument->spis = $spis;

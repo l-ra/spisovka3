@@ -150,7 +150,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         // $this->setView('vyber');
     }
 
-    /** 
+    /**
      * Autocomplete callback. Hleda jak uzivatele, tak org. jednotky.
      */
     public function renderSeznamAjax($term)
@@ -250,16 +250,14 @@ class Spisovka_UzivatelPresenter extends BasePresenter
             $this->terminate();
         } else {
             // Predat Spis
-            $DokSpis = new DokumentSpis();
-            $dokumenty = $DokSpis->dokumenty($spis_id);
-
-            if (count($dokumenty) > 0) {
+            $spis = new Spis($spis_id);
+            $documents = $spis->getDocuments();
+            if ($documents) {
                 try {
-                    // obsahuje dokumenty - predame i dokumenty
-                    $dokument = current($dokumenty);
-                    $doc = new Document($dokument->id);
+                    // předáním dokumentů se předá i samotný spis
+                    $doc = current($documents);
                     $doc->forward($user_id, $orgjednotka_id, $poznamka);
-                    $link = $this->link('Spisy:detail', array('id' => $spis_id));
+                    $link = $this->link('Spisy:detail', ['id' => $spis_id]);
                     echo '###vybrano###' . $link;
                 } catch (Exception $e) {
                     $msg = $e->getMessage();
@@ -268,15 +266,10 @@ class Spisovka_UzivatelPresenter extends BasePresenter
                 $this->terminate();
             } else {
                 // pouze spis
-                $Spis = new SpisModel;
-                if ($Spis->predatOrg($spis_id, $orgjednotka_id)) {
-                    $link = $this->link(':Spisovka:Spisy:detail', array('id' => $spis_id));
-                    echo '###vybrano###' . $link;
-                    $this->terminate();
-                } else {
-                    // forwarduj pozadavek na novy render dialogu a dej mu informaci, ze ma upozornit uzivatele, ze doslo k chybe
-                    $this->forward('vyberSpis', array('chyba' => 1, 'spis_id' => $spis_id));
-                }
+                $spis->forward(new OrgUnit($orgjednotka_id));
+                $link = $this->link(':Spisovka:Spisy:detail', ['id' => $spis_id]);
+                echo '###vybrano###' . $link;
+                $this->terminate();
             }
         }
     }

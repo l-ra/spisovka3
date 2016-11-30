@@ -465,13 +465,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if (!$spis)
                 throw new Exception("chyba integrity dat. Spis '$cislo_jednaci' neexistuje.");
 
-            $Dokument->update($data, array(array('id=%i', $dokument_id)));
+            $Dokument->update($data, array(array('id = %i', $dokument_id)));
 
             // pripojime
-            $DokumentSpis = new DokumentSpis();
-            $DokumentSpis->pripojit($dokument_id, $spis->id);
+            $spis = new Spis($spis->id);
+            $doc = new Document($dokument_id);
+            $doc->insertIntoSpis($spis);
+            
             // zaznam do logu az nakonec, kdyz jsou vsechny operace uspesne
-
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_UNDEFINED,
                     'Dokument připojen do evidence. Přiděleno číslo jednací: ' . $cislo_jednaci);
@@ -530,26 +531,22 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'Přiděleno číslo jednací: ' . $cjednaci->cislo_jednaci);
 
             if ($this->typ_evidence == 'sberny_arch') {
-
                 $Spis = new SpisModel();
                 $spis = $Spis->findByName($cjednaci->cislo_jednaci);
                 if (!$spis) {
                     // vytvorime spis
-
                     $spis_new = array(
                         'nazev' => $cjednaci->cislo_jednaci,
                         'popis' => '',
                         'typ' => 'S',
                     );
                     $spis_id = $Spis->vytvorit($spis_new);
-                    $spis = $Spis->getInfo($spis_id);
-                }
+                } else
+                    $spis_id = $spis->id;
 
-                // pripojime
-                if ($spis) {
-                    $DokumentSpis = new DokumentSpis();
-                    $DokumentSpis->pripojit($dokument_id, $spis->id);
-                }
+                $doc = new Document($dokument_id);
+                $spis = new Spis($spis_id);
+                $doc->insertIntoSpis($spis);
             }
         }
 
@@ -586,11 +583,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             array('cisty' => 1)) . '">Vytvořit nový nerozepsaný dokument.</a></p>',
                     'info_ext');
 
-            $DokumentSpis = new DokumentSpis();
             $DokumentPrilohy = new DokumentPrilohy();
-
-            $spisy = $DokumentSpis->spisy($dokument->id);
-            $this->template->Spisy = $spisy;
 
             $this->template->Subjekty = $dokument->getSubjects();
 
@@ -668,11 +661,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $reply = reset($rozdelany_dokument);
             $reply = new Document($reply->id);
 
-            $DokumentSpis = new DokumentSpis();
             $DokumentPrilohy = new DokumentPrilohy();
-
-            $spisy = $DokumentSpis->spisy($reply->id);
-            $this->template->Spisy = $spisy;
 
             $this->template->Subjekty = $reply->getSubjects();
 
@@ -724,19 +713,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $odpoved_id = $Dokumenty->vytvorit($pred_priprava);
             $reply = new Document($odpoved_id);
 
-            $DokumentSpis = new DokumentSpis();
             $DokumentSubjekt = new DokumentSubjekt();
             $DokumentPrilohy = new DokumentPrilohy();
-
-            // kopirovani spisu
-            $spisy_old = $DokumentSpis->spisy($document_id);
-            if (count($spisy_old) > 0) {
-                foreach ($spisy_old as $spis) {
-                    $DokumentSpis->pripojit($reply->id, $spis->id);
-                }
-            }
-            $spisy_new = $DokumentSpis->spisy($reply->id);
-            $this->template->Spisy = $spisy_new;
 
             // kopirovani subjektu
             $subjekty_old = $doc->getSubjects();
@@ -1016,10 +994,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         unset($data['datum_vzniku_cas']);
 
         try {
-
             // [P.L.] 2012-04-13   Pridany zakladni kontroly
             // TODO [T.V.] 2012-04-23 - zkontrolovat na novou podobu
-            $result = $Dokument->select(array(array('id=%i', $dokument_id)));
+            $result = $Dokument->select([['id = %i', $dokument_id]]);
             if (count($result) != 1) {
                 throw new LogicException("Rozepsaný dokument ID $dokument_id nenalezen.", 1);
             }

@@ -11,25 +11,27 @@
     {control print}
     
     <div class="dokument_blok_menu" n:ifcontent>
-       {if $Lze_menit }
-       <a href="{link detail, 'id'=>$Spis->id, 'upravit'=>'info'}">Upravit spis</a>
-       <a class="ajax-dialog" data-title="Předat spis organizační jednotce nebo zaměstnanci" href="{link Uzivatel:vyberSpis, 'id' => $user->id, 'spis_id' => $Spis->id}">Předat spis</a>
+       <a n:if="$opravneni['lze_menit']" href="{link detail, 'id' => $Spis->id, 'upravit' => 'info'}">
+           Upravit spis</a>
+       <a n:if="$opravneni['lze_predat']" class="ajax-dialog" data-title="Předat spis organizační jednotce nebo zaměstnanci" href="{link Uzivatel:vyberSpis, 'id' => $user->id, 'spis_id' => $Spis->id}">
+           Předat spis</a>
+       {if $opravneni['lze_prevzit']}
+       <a href="{link prevzit, 'id' => $Spis->id}" id="prevzitdokument">
+           Převzít spis</a>
+       <a href="{link odmitnoutPrevzeti, 'id' => $Spis->id}" id="zrusitprevzetidokument">
+           Odmítnout převzetí</a>
        {/if}
-       {if $Lze_prevzit }
-       <a href="{link prevzit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis</a>
-       <a href="{link odmitnoutPrevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Odmítnout převzetí</a>
-       {/if}
-       <a n:if="$Lze_menit && !empty($Spis->orgjednotka_id_predano)" href="{link zrusitPrevzeti, 'id'=>$Spis->id}" id="zrusitprevzetidokument">Zrušit převzetí spisu</a>
-       <a n:if="empty($Spis->orgjednotka_id)" href="{link privlastnit, 'id'=>$Spis->id}" id="prevzitdokument">Převzít spis do vlastnictví</a>
+       <a n:if="$opravneni['lze_zrusit_predani']" href="{link zrusitPredani, 'id' => $Spis->id}" id="zrusitprevzetidokument">
+           Zrušit předání spisu</a>
+       <a n:if="empty($Spis->orgjednotka_id)" href="{link privlastnit, 'id' => $Spis->id}" id="prevzitdokument">
+           Převzít spis do vlastnictví</a>
        
-       {if $Lze_menit }
-       <a n:if="$Spis->stav == SpisModel::OTEVREN" href="{link uzavrit, 'id' => $Spis->id}"
+       <a n:if="$opravneni['lze_uzavrit']" href="{link uzavrit, 'id' => $Spis->id}"
           {* onclick="return confirm('Opravdu chcete uzavřít tento spis?');" *}>Uzavřít spis</a>
-       <a n:if="$Spis->stav == SpisModel::UZAVREN" href="{link otevrit, 'id' => $Spis->id}"
+       <a n:if="$opravneni['lze_otevrit']" href="{link otevrit, 'id' => $Spis->id}"
           {* onclick="return confirm('Opravdu chcete otevřít tento spis?');" *}>Otevřít spis</a>
-       <a n:if="$Spis->stav == SpisModel::UZAVREN && SpisModel::lzePredatDoSpisovny($Spis->id)"
-          href="{link predatDoSpisovny, 'id' => $Spis->id}">Předat do spisovny</a>
-       {/if}        
+       <a n:if="$opravneni['lze_predat_do_spisovny']" href="{link predatDoSpisovny, 'id' => $Spis->id}">
+           Předat do spisovny</a>
     </div>
     
     {if ($Editovat)}
@@ -47,7 +49,7 @@
         <div class="detail_hlavicka">Seznam dokumentů</div>
     </div>
         
-    {if $Lze_cist}            
+    {if true}            
         {include '../Dokumenty/seznam.latte'}   
     {else}
     <div class="prazdno">Nemáte oprávnění vidět seznam dokumentů.</div>

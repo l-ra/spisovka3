@@ -44,7 +44,7 @@
                 &nbsp;&nbsp;
                 <a href="{link :Spisovka:Spisy:detail, id => $spis->id}">{$spis->nazev}</a>
             </td>
-            <td>{if isset($seznam_dokumentu[$spis->id])}{=count($seznam_dokumentu[$spis->id])}{else}0{/if}</td>
+            <td>{if isset($pocty_dokumentu[$spis->id])}{$pocty_dokumentu[$spis->id]}{else}0{/if}</td>
             <td>{$spis->orgjednotka_prideleno}</td>              
             <td>{$spis->orgjednotka_predano}</td>              
             <td>{if isset($SpisoveZnaky[$spis->spisovy_znak_id])}{$SpisoveZnaky[$spis->spisovy_znak_id]->nazev}{/if} </td>
