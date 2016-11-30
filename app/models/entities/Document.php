@@ -84,8 +84,8 @@ class Document extends DBEntity
      */
     public function getSpis()
     {
-        $spis_id = dibi::query("SELECT [spis_id] FROM [:PREFIX:dokument_to_spis] WHERE [dokument_id] = $this->id")->fetchSingle();
-        return $spis_id !== false ? new Spis($spis_id) : null;
+        $spis_id = $this->spis_id;
+        return $spis_id !== null ? new Spis($spis_id) : null;
     }
 
     /**
@@ -414,8 +414,7 @@ class Document extends DBEntity
      */
     public static function getDocumentsFromSpis(Spis $spis)
     {
-        $result = dibi::query("SELECT d.* FROM %n AS d, [dokument_to_spis] AS ds WHERE d.id = ds.dokument_id AND ds.spis_id = $spis->id",
-                        self::TBL_NAME);
+        $result = dibi::query("SELECT * FROM %n WHERE spis_id = $spis->id", self::TBL_NAME);
 
         return self::_createObjectsFromDibiResult($result);
     }
@@ -430,10 +429,8 @@ class Document extends DBEntity
 
         dibi::begin();
         try {
-            $row = array();
-            $row['dokument_id'] = $this->id;
-            $row['spis_id'] = $spis->id;
-            dibi::insert('dokument_to_spis', $row)->execute();
+            $this->spis_id = $spis->id;
+            $this->save();
 
             $Log = new LogModel();
             $Log->logDokument($this->id, LogModel::SPIS_DOK_PRIPOJEN,
@@ -453,7 +450,8 @@ class Document extends DBEntity
 
         dibi::begin();
         try {
-            dibi::query("DELETE FROM [dokument_to_spis] WHERE [dokument_id] = %i", $this->id);
+            $this->spis_id = null;
+            $this->save();
 
             $Log = new LogModel();
             $Log->logDokument($this->id, LogModel::SPIS_DOK_ODEBRAN,

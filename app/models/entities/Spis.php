@@ -35,7 +35,8 @@ class Spis extends DBEntity
      */
     public function isEmpty()
     {
-        $count = dibi::query("SELECT COUNT(*) FROM [dokument_to_spis] WHERE [spis_id] = $this->id")
+        $count = dibi::query("SELECT COUNT(*) FROM %n WHERE [spis_id] = $this->id",
+                        Document::TBL_NAME)
                 ->fetchSingle();
         return $count === 0;
     }

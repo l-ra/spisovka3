@@ -104,7 +104,6 @@ class Dokument extends BaseModel
         }
 
         $sql = array(
-            'distinct' => 1,
             'from' => array($this->name => 'd'),
             'cols' => array('id'),
             'where' => $where,
@@ -113,29 +112,19 @@ class Dokument extends BaseModel
             'limit' => $limit,
             'offset' => $offset,
             'leftJoin' => array(
-                'dokspisy' => array(
-                    'from' => array($this->tb_dokspis => 'ds'),
-                    'on' => array('ds.dokument_id = d.id'),
-                    'cols' => null
-                ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
-                    'on' => array('spis.id=ds.spis_id'),
-                    'cols' => null
-                ),
-                'dokspis' => array(
-                    'from' => array($this->tb_dokspis => 'sp2'),
-                    'on' => array('sp2.spis_id=spis.id'),
+                    'on' => array('spis.id = d.spis_id'),
                     'cols' => null
                 ),
                 'dokument2' => array(
                     'from' => array($this->tb_dokument => 'd2'),
-                    'on' => array('d2.id=sp2.dokument_id'),
+                    'on' => array('d2.spis_id = spis.id'),
                     'cols' => null
                 ),
                 'typ_dokumentu' => array(
                     'from' => array($this->tb_dokumenttyp => 'dtyp'),
-                    'on' => array('dtyp.id=d.dokument_typ_id'),
+                    'on' => array('dtyp.id = d.dokument_typ_id'),
                     'cols' => null
                 )
             )
@@ -227,10 +216,10 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 $args['order'] = array('d.podaci_denik_rok' => 'DESC', 'd.podaci_denik_poradi' => 'DESC', 'd.poradi' => 'DESC');
                 break;
             case 'jid':
-                $args['order'] = array('d.id', 'd.podaci_denik_rok', 'd.podaci_denik_poradi', 'd.poradi');
+                $args['order'] = array('d.id');
                 break;
             case 'jid_desc':
-                $args['order'] = array('d.id' => 'DESC', 'd.podaci_denik_rok' => 'DESC', 'd.podaci_denik_poradi' => 'DESC', 'd.poradi' => 'DESC');
+                $args['order'] = array('d.id' => 'DESC');
                 break;
             case 'vec':
                 $args['order'] = array('d.nazev');
@@ -398,13 +387,9 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
 
         // spisova znacka - nazev spisu
         if (!empty($params['spisova_znacka'])) {
-            $args['leftJoin']['dokspisy'] = ['from' => [$this->tb_dokspis => 'ds'],
-                'on' => ['ds.dokument_id = d.id'],
-                'cols' => null
-            ];
             $args['leftJoin']['spis'] = array(
                 'from' => array($this->tb_spis => 'spis'),
-                'on' => array('spis.id = ds.spis_id'),
+                'on' => array('spis.id = d.spis_id'),
                 'cols' => null);
             $args['where'][] = array('spis.nazev LIKE %s', '%' . $params['spisova_znacka'] . '%');
         }
@@ -918,12 +903,8 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         if (!isset($args['where']))
             $args['where'] = [];
 
-        $args['leftJoin']['dokspisy'] = ['from' => [$this->tb_dokspis => 'ds'],
-            'on' => ['ds.dokument_id = d.id'],
-            'cols' => null
-        ];
         $args['where'][] = array(
-            'd.stav = %i AND ds.spis_id IS NULL', DocumentWorkflow::STAV_PREDAN_DO_SPISOVNY);
+            'd.stav = %i AND d.spis_id IS NULL', DocumentWorkflow::STAV_PREDAN_DO_SPISOVNY);
 
         return $args;
     }
@@ -961,11 +942,6 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             'from' => array($this->name => 'dok'),
             'cols' => array('*', 'id' => 'dokument_id', '%sql YEAR(dok.datum_spousteci_udalosti)+1+dok.skartacni_lhuta' => 'skartacni_rok'),
             'leftJoin' => array(
-                'dokspisy' => array(
-                    'from' => array($this->tb_dokspis => 'ds'),
-                    'on' => array('ds.dokument_id = dok.id'),
-                    'cols' => array()
-                ),
                 'typ_dokumentu' => array(
                     'from' => array($this->tb_dokumenttyp => 'dtyp'),
                     'on' => array('dtyp.id = dok.dokument_typ_id'),
@@ -973,7 +949,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 ),
                 'spisy' => array(
                     'from' => array($this->tb_spis => 'spis'),
-                    'on' => array('spis.id = ds.spis_id'),
+                    'on' => array('spis.id = dok.spis_id'),
                     'cols' => array('id' => 'spis_id', 'nazev' => 'nazev_spisu', 'popis' => 'popis_spisu')
                 ),
                 'epod' => array(

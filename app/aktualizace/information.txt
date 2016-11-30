@@ -135,3 +135,5 @@ Je pravděpodobné, že bude potřeba ručně opravit data v databázi, pokud js
 Operace je časově náročná.
 [1420]
 Kontrola a oprava chyby, kdy jeden subjekt mohl být k dokumentu přiřazen vícekrát
+[1450]
+Změna přiřazení dokumentů do spisu v databázi.

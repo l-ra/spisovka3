@@ -87,8 +87,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
             $this->template->SpisZnak_nazev = $sz->nazev;
         }
 
-        $DokumentSpis = new DokumentSpis();
-        $result = $DokumentSpis->dokumentyVeSpisu($spis_id);
+        $result = DokumentSpis::dokumentyVeSpisu($spis_id);
         $this->template->seznam = $result;
 
         // Volba vystupu - web/tisk/pdf

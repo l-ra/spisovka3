@@ -57,18 +57,13 @@ class SpisModel extends TreeModel
 
     public function poctyDokumentu(array $spis_ids)
     {
-        $result = dibi::query('SELECT [spis_id], COUNT(*) AS pocet FROM %n' 
-                . ' WHERE [spis_id] IN %in GROUP BY [spis_id]', 
-                'dokument_to_spis', $spis_ids);
+        $result = dibi::query('SELECT [spis_id], COUNT(*) AS pocet FROM %n'
+                        . ' WHERE [spis_id] IN %in GROUP BY [spis_id]', Document::TBL_NAME,
+                        $spis_ids);
         if (!$result)
             return null;
 
-        $result = $result->fetchAll();
-        $pocty = array();
-        foreach ($result as $row) {
-            $pocty[$row->spis_id] = $row->pocet;
-        }
-        return $pocty;
+        return $result->fetchPairs();
     }
 
     private function omezeni_org(array $filter)

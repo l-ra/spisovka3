@@ -339,8 +339,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             return;
         }
 
-        $DokumentSpis = new DokumentSpis();
-        $this->template->seznam = $DokumentSpis->dokumentyVeSpisu($id);
+        $this->template->seznam = DokumentSpis::dokumentyVeSpisu($id);
     }
 
     public function actionPrevzit($id)

@@ -1,10 +1,7 @@
 <?php
 
-class DokumentSpis extends BaseModel
+class DokumentSpis
 {
-
-    protected $name = 'dokument_to_spis';
-    protected $autoIncrement = false;
 
     /**
      * Vrať kromě dokumentů i informace o jejich subjektech a přílohách.
@@ -12,22 +9,22 @@ class DokumentSpis extends BaseModel
      * @param int $spis_id
      * @return array|null
      */
-    public function dokumentyVeSpisu($spis_id)
+    public static function dokumentyVeSpisu($spis_id)
     {
-        $query = $this->select([["spis_id = %i", $spis_id]], ['dokument_id' => 'asc']);
-        $result = $query->fetchAssoc('dokument_id');
+        $result = dibi::query('SELECT [id] FROM %n WHERE [spis_id] = %i ORDER BY [id]',
+                        Document::TBL_NAME, $spis_id);
+        $result = $result->fetchPairs();
         if (!$result)
             return null;
 
         $Dokument = new Dokument();
         $DokSubjekty = new DokumentSubjekt();
-        $dokument_ids = array_keys($result);
-        $subjekty = $DokSubjekty->subjekty3($dokument_ids);
-        $pocty_souboru = DokumentPrilohy::pocet_priloh($dokument_ids);
+        $subjekty = $DokSubjekty->subjekty3($result);
+        $pocty_souboru = DokumentPrilohy::pocet_priloh($result);
 
         $dokumenty = array();
-        foreach ($result as $ds) {
-            $dok = $Dokument->getInfo($ds->dokument_id, '');
+        foreach ($result as $doc_id) {
+            $dok = $Dokument->getInfo($doc_id);
             if (empty($dok->stav))
                 continue;
             $id = $dok->id;

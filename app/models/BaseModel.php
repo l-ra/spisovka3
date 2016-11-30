@@ -14,7 +14,6 @@ abstract class BaseModel extends Nette\Object
     /** names of commonly used tables */
     protected $tb_dok_odeslani = 'dokument_odeslani';
     protected $tb_dok_subjekt = 'dokument_to_subjekt';
-    protected $tb_dokspis = 'dokument_to_spis';
     protected $tb_dokument = 'dokument';
     protected $tb_dokumenttyp = 'dokument_typ';
     protected $tb_epodatelna = 'epodatelna';
