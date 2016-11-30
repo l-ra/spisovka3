@@ -159,8 +159,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $this->template->SpisZnak_nazev = $sz->nazev;
         }
 
-        $result = DokumentSpis::dokumentyVeSpisu($spis->id);
-        $this->template->seznam = $result;
+        $this->template->seznam = $spis->getDocumentsPlus();
 
         $this->template->lzeEditovat = $this->user->isAllowed('Spisovna',
                 'zmenit_skartacni_rezim');

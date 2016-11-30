@@ -15,68 +15,66 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     public function renderDefault()
     {
-        $this->redirect('seznam');        
+        $this->redirect('seznam');
     }
-    
+
     public function renderSeznam($hledat = null)
     {
         $Spisy = new SpisModel();
         $result = $Spisy->seznamRychly();
         $result->setRowClass(null);
         $this->template->spisy = $result->fetchAll();
-        
+
         /*
-        $this->hledat = $hledat;
-        
-        $Spisy = new Spis();
+          $this->hledat = $hledat;
 
-        $args = null;
-        if (!empty($hledat)) {
-            $args = array('where' => array(array("tb.nazev LIKE %s", '%' . $hledat . '%')));
-        }
+          $Spisy = new Spis();
 
-        $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
-        $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
-                    : 20;
+          $args = null;
+          if (!empty($hledat)) {
+          $args = array('where' => array(array("tb.nazev LIKE %s", '%' . $hledat . '%')));
+          }
 
-        $result = $Spisy->seznam($args);
-        $paginator->itemCount = count($result);
+          $client_config = GlobalVariables::get('client_config');
+          $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+          $paginator = $vp->getPaginator();
+          $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
+          : 20;
 
-        // Volba vystupu - web/tisk/pdf
-        $tisk = $this->getParameter('print');
-        $pdf = $this->getParameter('pdfprint');
-        if ($tisk || $pdf) {
-            $seznam = $result->fetchAll();
-            if (count($seznam) > 0) {
-                $spis_ids = array();
-                foreach ($seznam as $spis) {
-                    $spis_ids[] = $spis->id;
-                }
-                $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
-            } else {
-                $this->template->seznam_dokumentu = array();
-            }
-            $this->setView('print');
-        } else {
-            $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
-        }
+          $result = $Spisy->seznam($args);
+          $paginator->itemCount = count($result);
 
-        $this->template->seznam = $seznam;
-        
+          // Volba vystupu - web/tisk/pdf
+          $tisk = $this->getParameter('print');
+          $pdf = $this->getParameter('pdfprint');
+          if ($tisk || $pdf) {
+          $seznam = $result->fetchAll();
+          if (count($seznam) > 0) {
+          $spis_ids = array();
+          foreach ($seznam as $spis) {
+          $spis_ids[] = $spis->id;
+          }
+          $this->template->seznam_dokumentu = $Spisy->seznamDokumentu($spis_ids);
+          } else {
+          $this->template->seznam_dokumentu = array();
+          }
+          $this->setView('print');
+          } else {
+          $seznam = $result->fetchAll($paginator->offset, $paginator->itemsPerPage);
+          }
+
+          $this->template->seznam = $seznam;
+
          * 
          */
     }
 
     public function renderDetail($id, $upravit)
     {
-        $this->template->FormUpravit = $upravit;
-        $spis_id = $id;
-        
         $spis = new Spis($id);
         $this->template->Spis = $spis;
 
+        $this->template->FormUpravit = $upravit;
         $this->template->SpisyNad = null; // $Spisy->seznam_nad($spis_id,1);
         $this->template->SpisyPod = null; //$Spisy->seznam_pod($spis_id,1);
 
@@ -87,8 +85,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
             $this->template->SpisZnak_nazev = $sz->nazev;
         }
 
-        $result = DokumentSpis::dokumentyVeSpisu($spis_id);
-        $this->template->seznam = $result;
+        $this->template->seznam = $spis->getDocumentsPlus();
 
         // Volba vystupu - web/tisk/pdf
         $tisk = $this->getParameter('print');
@@ -180,12 +177,13 @@ class Admin_SpisyPresenter extends SpisyPresenter
         $this->flashMessage('Operace proběhla úspěšně.');
         $this->redirect('seznam');
     }
-    
+
     public function actionSmazat($id)
     {
         $spis = new Spis($id);
         $spis->delete();
         $this->flashMessage('Složka byla smazána.');
-        $this->redirect('seznam');        
+        $this->redirect('seznam');
     }
+
 }

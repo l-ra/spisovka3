@@ -339,7 +339,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             return;
         }
 
-        $this->template->seznam = DokumentSpis::dokumentyVeSpisu($id);
+        $this->template->seznam = $spis->getDocumentsPlus();
     }
 
     public function actionPrevzit($id)
