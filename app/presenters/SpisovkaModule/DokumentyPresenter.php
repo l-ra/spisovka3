@@ -342,6 +342,36 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->redirect('detail', array('id' => $id));
     }
 
+    public function renderPredatVyber($id)
+    {
+        $doc = new Document($id);
+        $this->template->document_is_in_spis = (boolean) $doc->getSpis();
+        $this->template->dokument_id = $id;
+
+        $Zamestnanci = new Osoba();
+        $this->template->user_list = $Zamestnanci->seznamOsobSUcty();
+
+        $OrgJednotky = new OrgJednotka();
+        $this->template->orgunit_list = $OrgJednotky->linearniSeznam();
+        
+        $this->template->called_from_spis = (boolean)$this->getParameter('from_spis');
+    }
+
+    public function actionPredat($id, $user = null, $orgunit = null, $note = null, $from_spis = false)
+    {
+        $doc = new Document($id);
+        try {
+            $doc->forward($user, $orgunit, $note);
+            $this->flashMessage('Předání proběhlo v pořádku.');
+        } catch (Exception $e) {
+            $this->flashMessage($e->getMessage(), 'warning');
+        }
+        if (!$from_spis)
+            $this->redirect('detail', $id);
+        
+        $this->redirect('Spisy:detail', $doc->getSpis()->id);
+    }
+
     public function actionZrusitPredani($id)
     {
         $doc = new Document($id);
@@ -349,8 +379,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ($doc->cancelForwarding()) {
                 $this->flashMessage('Zrušil jste předání dokumentu.');
             } else {
-                $this->flashMessage('Zrušení předání se nepodařilo. Zkuste to znovu.',
-                        'warning');
+                $this->flashMessage('Zrušení předání se nepodařilo.', 'warning');
             }
         } else {
             $this->flashMessage('Nemáte oprávnění ke zrušení předání dokumentu.', 'warning');
@@ -471,7 +500,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $spis = new Spis($spis->id);
             $doc = new Document($dokument_id);
             $doc->insertIntoSpis($spis);
-            
+
             // zaznam do logu az nakonec, kdyz jsou vsechny operace uspesne
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_UNDEFINED,

@@ -116,38 +116,13 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         $this->redirect('default');
     }
 
-    protected function _renderVyber()
+    public function renderVyber()
     {
-        if ($this->getParameter('chyba', null))
-            $this->template->chyba = 1;
-
-        $this->template->novy = $this->getParameter('novy', 0);
-
         $Zamestnanci = new Osoba();
-        $seznam = $Zamestnanci->seznamOsobSUcty();
-        $this->template->seznam = $seznam;
+        $this->template->user_list = $Zamestnanci->seznamOsobSUcty();
 
         $OrgJednotky = new OrgJednotka();
-        $oseznam = $OrgJednotky->linearniSeznam();
-        $this->template->org_seznam = $oseznam;
-    }
-
-    public function renderVyber($dok_id)
-    {
-        $model = new Dokument();
-        $dok = $model->getInfo($dok_id);
-        $this->template->dokument_je_ve_spisu = isset($dok->spisy);
-        $this->template->dokument_id = $dok_id;
-
-        $this->_renderVyber();
-    }
-
-    public function renderVyberSpis($spis_id)
-    {
-        $this->template->spis_id = $spis_id;
-        $this->_renderVyber();
-        // Zvazit do budoucna - jednotnou sablonu pro predani dokumentu i spisu
-        // $this->setView('vyber');
+        $this->template->orgunit_list = $OrgJednotky->linearniSeznam();
     }
 
     /**
@@ -220,91 +195,6 @@ class Spisovka_UzivatelPresenter extends BasePresenter
         }
 
         return $seznam;
-    }
-
-    public function actionSpisVybrano()
-    {
-        $spis_id = $this->getParameter('spis_id', null);
-        $user_id = $this->getParameter('user', null);
-        $orgjednotka_id = $this->getParameter('orgjednotka', null);
-        $poznamka = $this->getParameter('poznamka', null);
-        $novy = $this->getParameter('novy', 0);
-
-        if ($orgjednotka_id === null) {
-            $account = new UserAccount($user_id);
-            $ou = $account->getOrgUnit();
-            $orgjednotka_id = $ou ? $ou->id : null;
-        }
-
-        if ($novy == 1) {
-            echo '###predano###' . $spis_id . '#' . $user_id . '#' . $orgjednotka_id . '#' . $poznamka;
-
-            $person = Person::fromUserId($user_id);
-            echo '#' . $person->displayName() . '#';
-
-            if ($orgjednotka_id !== null) {
-                $org = new OrgUnit($orgjednotka_id);
-                echo $org->zkraceny_nazev;
-            }
-
-            $this->terminate();
-        } else {
-            // Predat Spis
-            $spis = new Spis($spis_id);
-            $documents = $spis->getDocuments();
-            if ($documents) {
-                try {
-                    // předáním dokumentů se předá i samotný spis
-                    $doc = current($documents);
-                    $doc->forward($user_id, $orgjednotka_id, $poznamka);
-                    $link = $this->link('Spisy:detail', ['id' => $spis_id]);
-                    echo '###vybrano###' . $link;
-                } catch (Exception $e) {
-                    $msg = $e->getMessage();
-                    echo nl2br($msg);
-                }
-                $this->terminate();
-            } else {
-                // pouze spis
-                $spis->forward(new OrgUnit($orgjednotka_id));
-                $link = $this->link(':Spisovka:Spisy:detail', ['id' => $spis_id]);
-                echo '###vybrano###' . $link;
-                $this->terminate();
-            }
-        }
-    }
-
-    public function actionVybrano()
-    {
-        $dokument_id = $this->getParameter('dok_id', null);
-        $user_id = $this->getParameter('user', null);
-        $orgjednotka_id = $this->getParameter('orgjednotka', null);
-        $poznamka = $this->getParameter('poznamka', null);
-        $novy = $this->getParameter('novy', 0);
-
-        if ($novy == 1) {
-            echo "###predano###$dokument_id#$user_id#$orgjednotka_id#";
-
-            if ($user_id !== null) {
-                $osoba = Person::fromUserId($user_id);
-                echo $osoba->displayName();
-            } else {
-                $org = new OrgUnit($orgjednotka_id);
-                echo "organizační jednotce<br/>" . $org->zkraceny_nazev;
-            }
-            $this->terminate();
-        } else {
-            $doc = new Document($dokument_id);
-            try {
-                $doc->forward($user_id, $orgjednotka_id, $poznamka);
-                $link = $this->link('Dokumenty:detail', array('id' => $dokument_id));
-                echo '###vybrano###' . $link;
-            } catch (Exception $e) {
-                $msg = $e->getMessage();
-                echo nl2br($msg);
-            }
-            $this->terminate();
-        }
     }
 
     protected function createComponentNotificationsForm()

@@ -1,0 +1,59 @@
+<h2>Předat {if $document_is_in_spis}spis{else}dokument{/if}</h2>
+
+<div class="detail_blok">
+    {if $document_is_in_spis && !$called_from_spis}
+        <div>
+            <strong>Pozor! Předáním tohoto dokumentu předáte všechny dokumenty ve spisu.</strong><br />Pokud chcete předat pouze tento dokument, nejprve jej ze spisu vyjměte.
+        </div>
+        <br />
+    {/if}
+    <form action="#" onsubmit="return false;">
+        Poznámka k předání:<br/>
+        <textarea id="frmpred-poznamka" name="poznamka_predani" rows="4" style="width:100%"></textarea>
+    </form>
+</div>
+
+<div n:if="$orgunit_list" class="detail_blok vyber_predani">
+    <div class="detail_hlavicka">Organizační jednotky</div>
+    <br />
+    <table class="seznam">
+        {foreach $orgunit_list as $org}
+            <tr>
+                <td>
+                    <a href="{link predat, 'id' => $dokument_id, 'orgunit' => $org->id, 'from_spis' => $called_from_spis}">
+                        {$org->ciselna_rada}
+                    </a>
+                </td>
+                <td>
+                    {if !empty($org->plny_nazev)}{$org->plny_nazev}
+                    {else}{$org->zkraceny_nazev}
+                    {/if}                
+                </td>
+            </tr>
+        {/foreach}
+    </table>
+</div>
+<div class="detail_blok vyber_predani">
+    <div class="detail_hlavicka">Zaměstnanci</div>
+    <br />
+    <table class="seznam">
+        {foreach $user_list as $row}
+            <tr>
+                <td>
+                    <a href="{link predat, 'id' => $dokument_id, 'user' => $row->user_id, 'from_spis' => $called_from_spis}">
+                        {= Osoba::displayName($row, 'full_item')}
+                    </a>
+                </td>
+                <td>
+                    {if $row->pocet_uctu > 1}
+                        {$row->username}
+                    {/if}                
+                </td>
+            </tr>
+        {/foreach}
+    </table>
+</div>
+
+<script type="text/javascript">
+    $('.vyber_predani a').click(doplnPoznamkuKPredani);
+</script>

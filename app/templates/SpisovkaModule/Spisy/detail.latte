@@ -13,7 +13,7 @@
     <div class="dokument_blok_menu" n:ifcontent>
        <a n:if="$opravneni['lze_menit']" href="{link detail, 'id' => $Spis->id, 'upravit' => 'info'}">
            Upravit spis</a>
-       <a n:if="$opravneni['lze_predat']" class="ajax-dialog" data-title="Předat spis organizační jednotce nebo zaměstnanci" href="{link Uzivatel:vyberSpis, 'id' => $user->id, 'spis_id' => $Spis->id}">
+       <a n:if="$opravneni['lze_predat']" class="ajax-dialog" data-title="Předat spis organizační jednotce nebo zaměstnanci" href="{link Dokumenty:predatVyber, $dokument_id, 'from_spis' => 1}">
            Předat spis</a>
        {if $opravneni['lze_prevzit']}
        <a href="{link prevzit, 'id' => $Spis->id}" id="prevzitdokument">

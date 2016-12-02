@@ -331,15 +331,16 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         }
 
         $opravneni = $spis->getUserPermissions();
-        $this->template->opravneni = $opravneni;
-        $this->template->Editovat = $opravneni['lze_menit'] && $upravit == 'info';
-
         if (!$opravneni['lze_cist']) {
             $this->setView('noaccess');
             return;
         }
-
-        $this->template->seznam = $spis->getDocumentsPlus();
+        
+        $this->template->opravneni = $opravneni;
+        $this->template->Editovat = $opravneni['lze_menit'] && $upravit == 'info';
+        $this->template->seznam = $seznam = $spis->getDocumentsPlus();
+        if ($opravneni['lze_predat'])
+            $this->template->dokument_id = current($seznam)->id;
     }
 
     public function actionPrevzit($id)

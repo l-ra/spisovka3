@@ -473,31 +473,32 @@ spisVytvoritSubmit = function (form) {
     return false;
 };
 
-osobaVybrana = function (elm) {
+doplnPoznamkuKPredani = function () {
 
-    url = elm.href;
-    poznamka = $('#frmpred-poznamka').val();
-    if (poznamka) {
-        url = url + '&poznamka=' + encodeURI(poznamka);
-    }
+    var note = $('#frmpred-poznamka').val();
+    if (note) {
+        this.href = this.href + '&note=' + encodeURI(note);
+    }    
+};
 
-    $.get(url, function (data) {
-        if (data.indexOf('###vybrano###') != -1) {
-            data = data.replace('###vybrano###', '');
-            closeDialog();
-            location.href = data;
-        } else if (data.indexOf('###predano###') != -1) {
-            data = data.replace('###predano###', '');
-            part = data.split('#');
-            $('input[name=predano_user]').val(part[1]);
-            $('input[name=predano_org]').val(part[2]);
-            $('#predano').html("<dl><dt>Předán:</dt><dd>" + part[3] + "</dd></dl>");
-            closeDialog();
-        } else {
-            $('#dialog').html(data);
-            dialogScrollUp();
-        }
-    });
+/**
+ *  Platí rovněž pro výběr org. jednotky. Použito ve formuláři nového dokumentu.
+ */ 
+osobaVybrana = function () {
+
+    var elm = $(this);
+    var orgunit = elm.data('orgunit');
+    var user = elm.data('user');
+    $('input[name=predano_org]').val(orgunit);
+    $('input[name=predano_user]').val(user);
+    
+    var text = elm.html();
+    if (orgunit)
+        text = 'organizační jednotce ' + text;
+    $('#predano').html("<dl><dt>Předán:</dt><dd>" + text + "</dd></dl>");
+    
+    $('#predat_autocomplete').val('');
+    closeDialog();
 
     return false;
 };

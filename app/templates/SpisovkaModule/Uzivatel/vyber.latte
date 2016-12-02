@@ -1,69 +1,36 @@
-    {if isset($chyba)}
-    <div class="flash_message flash_warning">Zaměstnanci nebo organizační jednotce se nepodařilo předat dokument. Zkuste to znovu.</div>
-    {/if}
 
-    <h2>Předat {if $dokument_je_ve_spisu}spis{else}dokument{/if}</h2>
-    
-    <div class="detail_blok" n:if="!$novy">
-        {if $dokument_je_ve_spisu}
-        <div>
-        <strong>Pozor! Předáním tohoto dokumentu předáte všechny dokumenty ve spisu.</strong><br />Pokud chcete předat pouze tento dokument, nejprve jej ze spisu vyjměte.
-        </div>
-        <br />
-        {/if}
-        <form id="frm-predani" action="#" onsubmit="return false;">
-            Poznámka k předání:<br/>
-            <textarea id="frmpred-poznamka" name="poznamka_predani" rows="4" style="width:100%"></textarea>
-        </form>
-    </div>
-
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Organizační jednotky</div>
-        <br />
-    {if count($org_seznam)>0}
+<div n:if="$orgunit_list" class="detail_blok vyber_predani">
+    <div class="detail_hlavicka">Organizační jednotky</div>
+    <br />
     <table class="seznam">
-        {foreach $org_seznam as $org}
-        <tr>
-            <td>
-                <a href="{link :Spisovka:Uzivatel:vybrano, 'orgjednotka'=>$org->id, 'dok_id'=>$dokument_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
-                   {$org->ciselna_rada}
-                </a>
-            </td>
-            <td>
-                {if !empty($org->plny_nazev)}{$org->plny_nazev}
-                {else}{$org->zkraceny_nazev}
-                {/if}                
-            </td>
-        </tr>
+        {foreach $orgunit_list as $org}
+            <tr>
+                <td>
+                    <a href="javascript:;" data-orgunit="{$org->id}">{$org->ciselna_rada}</a>
+                </td>
+                <td>
+                    {if !empty($org->plny_nazev)}{$org->plny_nazev}
+                    {else}{$org->zkraceny_nazev}{/if}
+                </td>
+            </tr>
         {/foreach}
     </table>
-    {else}
-    <div class="prazdno">Nebyly zjištěny žádné organizační jednotky.</div>
-    {/if}
-    </div>
-
-
-    <div class="detail_blok">
-        <div class="detail_hlavicka">Zaměstnanci</div>
-        <br />
-    {if count($seznam)>0}
+</div>
+<div class="detail_blok vyber_predani">
+    <div class="detail_hlavicka">Zaměstnanci</div>
+    <br />
     <table class="seznam">
-        {foreach $seznam as $user}
-        <tr>
-            <td>
-                <a href="{link :Spisovka:Uzivatel:vybrano, 'id'=>$user->id, 'user'=>$user->user_id, 'dok_id'=>$dokument_id, 'novy'=>$novy }" onclick="osobaVybrana(this); return false;">
-                   {=Osoba::displayName($user,'full_item')}
-               </a>
-            </td>
-            <td>
-                {if $user->pocet_uctu > 1}
-                {$user->username}
-                {/if}                
-            </td>
-        </tr>
+        {foreach $user_list as $row}
+            <tr>
+                <td>
+                    <a href="javascript:;" data-user="{$row->user_id}">{= Osoba::displayName($row, 'full_item')}</a>
+                </td>
+                <td>{if $row->pocet_uctu > 1}{$row->username}{/if}</td>
+            </tr>
         {/foreach}
     </table>
-    {else}
-    <div class="prazdno">Nebyli zjištěni žádní zaměstnanci.</div>
-    {/if}
-    </div>
+</div>
+
+<script type="text/javascript">
+    $('.vyber_predani a').click(osobaVybrana);
+</script>

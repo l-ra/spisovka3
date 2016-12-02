@@ -48,7 +48,7 @@
         <a href="{link odmitnoutPrevzeti, $Dok->id}">Odmítnout převzetí</a>
     {/if}
     <a n:if="$LzeZrusitPredani" href="{link zrusitPredani, $Dok->id}">Zrušit předání {$dokument_nebo_spis}u</a>
-    <a n:if="$LzePredatDokument" href="{link Uzivatel:vyber, 'dok_id' => $Dok->id}" id="dialog-uzivatel">Předat {$dokument_nebo_spis}</a>
+    <a n:if="$LzePredatDokument" href="{link predatVyber, $Dok->id}" id="dialog-uzivatel">Předat {$dokument_nebo_spis}</a>
 
     {if $AccessEdit}
         <a href="{link detail , 'id'=>$Dok->id , 'upravit'=>'metadata'  }">Upravit metadata</a>
