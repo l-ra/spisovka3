@@ -75,7 +75,8 @@
 
 <div class="dokument_blok_sedy">
     <div class="h2">{$Zprava->typ == 'I' ? 'Datová zpráva' : 'Obsah zprávy'}</div>
-    {!$Zprava->popis|html2br}
+    {if $Zprava->typ == 'I'}<pre>{$Zprava->popis}</pre>
+    {else}{!$Zprava->popis|html2br}{/if}
 </div>
 
 <div class="dokument_blok_sedy">
