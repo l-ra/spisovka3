@@ -194,6 +194,9 @@ E-podatelna:
   z datové schránky), pokud proces stahování byl v průběhu přerušen - např. 
   případ stovek nových datových zpráv od poslední kontroly při hromadném
   publikování v registru smluv
+- stahování zpráv z datové schránky nyní pracuje správně i v případě, že je
+  ve schránce datová zpráva do vlastních rukou a uživatel nemá právo zprávy
+  do vlastních rukou číst
 - vytváření nového subjektu z datové zprávy automaticky rozdělí adresu
   do jednotlivých políček
 - hledání subjektu k datové zprávě hledá nejprve podle ID datové schránky.

@@ -225,7 +225,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $subjekt->jmeno = '';
                 $subjekt->prijmeni = '';
 
-                $original = null;
+                $message = null;
                 $nalezene_subjekty = null;
                 if ($zprava->typ == 'E') {
 // Nacteni originalu emailu
@@ -257,25 +257,25 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 } else if ($zprava->typ == 'I') {
 // Nacteni originalu DS
                     if (!empty($zprava->file_id)) {
-                        $original = $this->storage->download($zprava->file_id, true);
-                        $original = unserialize($original);
+                        $message = $this->storage->download($zprava->file_id, true);
+                        $message = unserialize($message);
+                        // $message je odpoved serveru ISDS na operaci DownloadMessage
+                        // zprava samotna je v $message->dmDm;
+                        if (isset($message->dmDm->dbIDSender)) {
+                            $subjekt->id_isds = $message->dmDm->dbIDSender;
+                            $subjekt->nazev_subjektu = $message->dmDm->dmSender;
+                            $subjekt->type = ISDS_Spisovka::typDS($message->dmDm->dmSenderType);
+                            if (isset($message->dmDm->dmSenderAddress)) {
+                                $res = ISDS_Spisovka::parseAddress($message->dmDm->dmSenderAddress);
+                                foreach ($res as $key => $value)
+                                    $subjekt->$key = $value;
+                            }
 
-// odebrat obsah priloh, aby to neotravovalo
-                        unset($original->dmDm->dmFiles);
-
-                        $subjekt->id_isds = $original->dmDm->dbIDSender;
-                        $subjekt->nazev_subjektu = $original->dmDm->dmSender;
-                        $subjekt->type = ISDS_Spisovka::typDS($original->dmDm->dmSenderType);
-                        if (isset($original->dmDm->dmSenderAddress)) {
-                            $res = ISDS_Spisovka::parseAddress($original->dmDm->dmSenderAddress);
-                            foreach ($res as $key => $value)
-                                $subjekt->$key = $value;
+                            if (!isset($isds_subjekt_cache[$subjekt->id_isds]))
+                                $isds_subjekt_cache[$subjekt->id_isds] = $SubjektModel->hledat($subjekt,
+                                        'isds', true);
+                            $nalezene_subjekty = $isds_subjekt_cache[$subjekt->id_isds];
                         }
-
-                        if (!isset($isds_subjekt_cache[$subjekt->id_isds]))
-                            $isds_subjekt_cache[$subjekt->id_isds] = $SubjektModel->hledat($subjekt,
-                                    'isds', true);
-                        $nalezene_subjekty = $isds_subjekt_cache[$subjekt->id_isds];
                     }
                 }
 
@@ -311,14 +311,30 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $UploadFile = $this->storage;
 
             $pocet_novych_zprav = 0;
+            $error_count = 0;
             $zpravy = $isds->seznamPrijatychZprav($od, $do);
 
             if ($zpravy)
                 foreach ($zpravy as $z)
-// kontrola existence v epodatelny
                     if (!$this->Epodatelna->existuje($z->dmID, 'isds')) {
-// nova zprava, ktera neni nahrana v epodatelne
+                        // nova zprava, ktera neni zaznamenana v epodatelne
                         $mess = $isds->MessageDownload($z->dmID);
+                        if (!$mess) {
+                            /* Pravděpodobně zpráva do vlastních rukou a uživatel nemá v datové
+                             * schránce nastaveno oprávnění číst zprávy do v.r.
+                             * Převezmi obálku zprávy ze seznamu zpráv.
+                             */
+                            if (!$z->dmPersonalDelivery) {
+                                $error_count++;
+                                continue;
+                            }
+                            $mess = new stdClass();
+                            $mess->dmDm = $z;
+                            $mess->dmMessageStatus = $z->dmMessageStatus;
+                            $mess->dmDeliveryTime = $z->dmDeliveryTime;
+                            $mess->dmAcceptanceTime = $z->dmAcceptanceTime;
+                            $mess->dmAttachmentSize = $z->dmAttachmentSize;
+                        }
 
                         $annotation = empty($mess->dmDm->dmAnnotation) ? "(Datová zpráva č. " . $mess->dmDm->dmID . ")"
                                     : $mess->dmDm->dmAnnotation;
@@ -327,7 +343,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $popis .= "ID datové zprávy    : " . $mess->dmDm->dmID . "\n"; // = 342682
                         $popis .= "Věc, předmět zprávy : " . $annotation . "\n"; //  = Vaše datová zpráva byla přijata
                         $popis .= "\n";
-                        $popis .= "Číslo jednací odesílatele   : " . $mess->dmDm->dmSenderRefNumber . "\n"; //  = AB-44656
+                        $popis .= "Číslo jednací odesílatele  : " . $mess->dmDm->dmSenderRefNumber . "\n"; //  = AB-44656
                         $popis .= "Spisová značka odesílatele : " . $mess->dmDm->dmSenderIdent . "\n"; //  = ZN-161
                         $popis .= "Číslo jednací příjemce     : " . $mess->dmDm->dmRecipientRefNumber . "\n"; //  = KAV-34/06-ŘKAV/2010
                         $popis .= "Spisová značka příjemce    : " . $mess->dmDm->dmRecipientIdent . "\n"; //  = 0.06.00
@@ -339,10 +355,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $popis .= "Zpráva určena pro   : " . $mess->dmDm->dmToHands . "\n"; //  =
                         $popis .= "\n";
                         $popis .= "Odesílatel:\n";
-                        $popis .= "            " . $mess->dmDm->dbIDSender . "\n"; //  = hjyaavk
+                        $popis .= "            " . $mess->dmDm->dbIDSender . ", typ " . ISDS_Spisovka::typDS($mess->dmDm->dmSenderType) . "\n"; //  = hjyaavk
                         $popis .= "            " . $mess->dmDm->dmSender . "\n"; //  = Město Milotice
                         $popis .= "            " . $mess->dmDm->dmSenderAddress . "\n"; //  = Kovářská 14/1, 37612 Milotice, CZ
-                        $popis .= "            " . $mess->dmDm->dmSenderType . " - " . ISDS_Spisovka::typDS($mess->dmDm->dmSenderType) . "\n"; //  = 10
                         if ($mess->dmDm->dmSenderOrgUnit)
                             $popis .= "            org.jednotka: " . $mess->dmDm->dmSenderOrgUnit . " [" . $mess->dmDm->dmSenderOrgUnitNum . "]\n"; //  =
                         $popis .= "\n";
@@ -354,12 +369,15 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         if ($mess->dmDm->dmRecipientOrgUnit)
                             $popis .= "            org.jednotka: " . $mess->dmDm->dmRecipientOrgUnit . " [" . $mess->dmDm->dmRecipientOrgUnitNum . "]\n"; //  =
                         $popis .= "\n";
-                        $popis .= "Status: " . $mess->dmMessageStatus . " - " . ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) . "\n";
+                        $popis .= "Stav: " . $mess->dmMessageStatus . " - " . ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) . "\n";
                         $dt_dodani = strtotime($mess->dmDeliveryTime);
-                        $dt_doruceni = strtotime($mess->dmAcceptanceTime);
                         $popis .= "Datum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
-                        $popis .= "Datum a čas doručení : " . date("j.n.Y G:i:s", $dt_doruceni) . "\n";
-                        $popis .= "Přibližná velikost všech příloh : " . $mess->dmAttachmentSize . "kB\n";
+                        if ($mess->dmAcceptanceTime)
+                            $dt_doruceni = date("j.n.Y G:i:s", strtotime($mess->dmAcceptanceTime));
+                        else
+                            $dt_doruceni = 'nebyla doručena';
+                        $popis .= "Datum a čas doručení : $dt_doruceni\n";
+                        $popis .= "Přibližná velikost všech příloh : " . $mess->dmAttachmentSize . " kB\n";
 
                         $zprava = array();
                         $zprava['odchozi'] = 0;
@@ -391,50 +409,46 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $zprava['stav'] = 0;
                         $zprava['stav_info'] = '';
 
-                        if ($epod_id = $this->Epodatelna->insert($zprava)) {
+                        $epod_id = $this->Epodatelna->insert($zprava);
 
-                            /* Ulozeni podepsane ISDS zpravy */
-                            $data = array(
-                                'filename' => 'ep-isds-' . $epod_id . '.zfo',
-                                'dir' => 'EP-I-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
-                                'typ' => '5',
-                                'popis' => 'Podepsaný originál ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
-                            );
+                        /* Ulozeni podepsane ISDS zpravy */
+                        $data = array(
+                            'filename' => 'ep-isds-' . $epod_id . '.zfo',
+                            'dir' => 'EP-I-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
+                            'typ' => '5',
+                            'popis' => 'Podepsaný originál ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
+                        );
 
+                        if ($z->dmMessageStatus >= 6) {
                             $signedmess = $isds->SignedMessageDownload($z->dmID);
-
-                            if ($file_o = $UploadFile->uploadEpodatelna($signedmess, $data)) {
-                                // ok
-                            } else {
-                                $zprava['stav_info'] = 'Originál zprávy se nepodařilo uložit';
-                            }
-
-                            /* Ulozeni reprezentace zpravy */
-                            $data = array(
-                                'filename' => 'ep-isds-' . $epod_id . '.bsr',
-                                'dir' => 'EP-I-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
-                                'typ' => '5',
-                                'popis' => 'Byte-stream reprezentace ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
-                            );
-
-                            if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {
-                                // ok
-                                $zprava['stav_info'] = 'Zpráva byla uložena';
-                                $zprava['file_id'] = $file->id;
-                                $this->Epodatelna->update(
-                                        array('stav' => 1,
-                                    'stav_info' => $zprava['stav_info'],
-                                    'file_id' => $file->id,
-                                        ), array(array('id=%i', $epod_id))
-                                );
-                            } else {
-                                // toto se nikam neulozi!
-                                $zprava['stav_info'] = 'Reprezentace zprávy se nepodařilo uložit';
-                            }
-                        } else {
-                            // a toto rovnez ne
-                            $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
+                            $file_signed = $UploadFile->uploadEpodatelna($signedmess, $data);
+                            if (!$file_signed)
+                                $zprava['stav_info'] = 'Podepsanou zprávu se nepodařilo uložit';
                         }
+                        else
+                            $zprava['stav_info'] = 'Nedoručenou zprávu není možné stáhnout';
+                                
+                        /* Ulozeni nepodepsane zpravy */
+                        $data = array(
+                            'filename' => 'ep-isds-' . $epod_id . '.bsr',
+                            'dir' => 'EP-I-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
+                            'typ' => '5',
+                            'popis' => 'Byte-stream reprezentace ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
+                        );
+
+                        $msg = new EpodatelnaMessage($epod_id);
+                        if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {
+                            // ok
+                            if (empty($zprava['stav_info']))
+                                $zprava['stav_info'] = 'Zpráva byla uložena';
+                            $msg->stav = 1;
+                            $msg->file_id = $file->id;
+                            $msg->save();
+                        } else {
+                            $zprava['stav_info'] = 'Reprezentaci zprávy se nepodařilo uložit';
+                        }
+                        $msg->stav_info = $zprava['stav_info'];
+                        $msg->save();
 
                         $pocet_novych_zprav++;
                         unset($zprava);
@@ -443,10 +457,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             // po úspěšném dokončení zaznamenej čas stažení zpráv
             Settings::set($last_download_key, time());
 
+            $error_msg = $error_count ? " Chyba: $error_count zpráv se nepodařilo načíst." : '';
             if ($pocet_novych_zprav)
-                return "Z datové schránky bylo přijato $pocet_novych_zprav nových zpráv.";
+                return "Z datové schránky bylo přijato $pocet_novych_zprav nových zpráv.$error_msg";
 
-            return "V datové schránce nebyly zjištěny žádné nové zprávy.";
+            return "V datové schránce nebyly zjištěny žádné nové zprávy.$error_msg";
         } catch (Exception $e) {
             return "Při kontrole datové schránky došlo k chybě: " . $e->getMessage();
         }
@@ -628,7 +643,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     public function renderDownloadDm($id)
     {
         $message = new EpodatelnaMessage($id);
-        $message->getZfoFile($this->storage, true);
+        $result = $message->getZfoFile($this->storage, true);
+        if ($result === null)
+            echo "Soubor s podepsanou datovou zprávou chybí.";
         $this->terminate();
     }
 

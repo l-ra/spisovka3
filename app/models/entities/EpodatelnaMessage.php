@@ -46,6 +46,20 @@ class EpodatelnaMessage extends DBEntity
     }
     
     /**
+     * @return boolean
+     * @throws LogicException
+     */
+    public function hasZfoFile()
+    {
+        if ($this->typ != 'I')
+            throw new LogicException(__METHOD__);
+        
+        $FileModel = new FileModel();
+        $file = $FileModel->select([["nazev = %s", "ep-isds-{$this->id}.zfo"]])->fetch();
+        return (boolean)$file;
+    }
+    
+    /**
      * @param Storage_Basic $storage
      * @param boolean $download  Download file or return it?
      * @return string  data

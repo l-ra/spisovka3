@@ -76,18 +76,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $zprava = new EpodatelnaMessage($id);
         $this->template->Zprava = $zprava;
-
-        if ($zprava->typ == 'I') {
-            if (!empty($zprava->file_id)) {
-                $original = $this->storage->download($zprava->file_id, true);
-                $original = unserialize($original);
-                // odebrat obsah priloh, aby to neotravovalo
-                unset($original->dmDm->dmFiles);
-                $this->template->original = $original->dmDm;
-            }
-        } else {
-            $this->template->original = null;
-        }
     }
 
     public function actionAjaxHandler()
@@ -591,7 +579,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     {
         $epodatelna_id = $this->getParameter('id', null);
 //        $zprava = @$this->template->Zprava;
-//        $original = @$this->template->original;
 
         $form = new Spisovka\Form();
         $form->addHidden('id')

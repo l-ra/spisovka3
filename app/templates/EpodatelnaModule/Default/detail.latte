@@ -63,7 +63,7 @@
         <dt>Přijato e-podatelnou:</dt>
         <dd>{$Zprava->prijato_dne|edatetime}</dd>
     </dl>
-    <dl n:if="$Zprava->typ == 'I' && $user->isAllowed('Epodatelna_DefaultPresenter')">
+    <dl n:if="$Zprava->typ == 'I' && $Zprava->hasZfoFile() && $user->isAllowed('Epodatelna_DefaultPresenter')">
         <dt></dt>
         <dd><a href="{link downloadDm, 'id' => $Zprava->id}">Stáhnout datovou zprávu</a><span id="snippet-isdsovereni"><a class="ajax" href="{link isdsOvereni, 'id' => $Zprava->id}">Ověřit lokální kopii datové zprávy</a></span></dd>
     </dl>

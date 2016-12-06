@@ -1860,7 +1860,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $popis .= "            " . $mess->dbIDRecipient . "\n"; //  = pksakua
             $popis .= "            " . $mess->dmRecipient . "\n"; //  = Společnost pro výzkum a podporu OpenSource
             $popis .= "            " . $mess->dmRecipientAddress . "\n"; //  = 40501 Děčín, CZ
-            //$popis .= "Je příjemce ne-OVM povýšený na OVM: ". $mess->dmDm->dmAmbiguousRecipient ."\n";
             $popis .= "\n";
             $popis .= "Status: " . $mess->dmMessageStatus . " - " . ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) . "\n";
             $dt_dodani = strtotime($mess->dmDeliveryTime);

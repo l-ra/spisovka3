@@ -305,10 +305,13 @@ class ISDS
         $MessInput = array('dmID' => $MessageID);
 
         $MessageDownloadOutput = $this->OperationsWS()->MessageDownload($MessInput);
-        $ReturnedMessage = $MessageDownloadOutput->dmReturnedMessage;
         $MessageStatus = $MessageDownloadOutput->dmStatus;
         $this->StatusCode = $MessageStatus->dmStatusCode;
         $this->StatusMessage = $MessageStatus->dmStatusMessage;
+        if ($MessageStatus->dmStatusCode !== '0000')
+            return null;
+        
+        $ReturnedMessage = $MessageDownloadOutput->dmReturnedMessage;
         $ReturnedMessage->dmDm->dmFiles->dmFile = $this->PrepareArray($ReturnedMessage->dmDm->dmFiles->dmFile);
         return $ReturnedMessage;
     }
