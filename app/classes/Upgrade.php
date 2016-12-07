@@ -34,11 +34,12 @@ final class Upgrade
                 $done[] = $name;
                 Settings::set(self::SETTINGS_TASKS, implode(',', $done));
             }
+            
+            Settings::set(self::SETTINGS_NEEDED, false);
         } catch (Exception $e) {
             throw $e;
         }
 
-        Settings::set(self::SETTINGS_NEEDED, false);
     }
 
     private function upgradeEmailMailbox()

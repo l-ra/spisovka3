@@ -446,7 +446,7 @@ INSERT INTO `settings` (`name`, `value`) VALUES
 ('epodatelna_copy_email_into_documents_note', 'true'),
 ('notification_enabled_receive_document', 'true'),
 ('spisovna_display_borrowed_documents', 'true'),
-('upgrade_needed', 'true'),
+('upgrade_needed', 'false'),
 ('users_can_change_their_data', 'true');
 
 CREATE TABLE `souvisejici_dokument` (
