@@ -1,7 +1,7 @@
 {block title}Instalace - databáze{/block}
 {block menu}
-<a href="{link :Install:Default:uvod}">Úvod</a> >
-<a href="{link :Install:Default:kontrola}">Kontrola</a> >
+<a href="{link uvod}">Úvod</a> >
+<a href="{link kontrola}">Kontrola</a> >
 <strong>Nahrání databáze</strong> >
 <span>Nastavení klienta</span> >
 <span>Nastavení evidence</span> >
@@ -11,85 +11,76 @@
 {block content}
 <h1>Instalace - Databáze</h1>
 
-<p>V tomto kroku se nejdříve zkontroluje, zda je databáze dostupná a zda již dané tabulky v databázi neexistují. Pokud je vše v pořádku, provedete nahrání potřebných tabulek a dat do databáze.</p>
-
 <div id="kontrola">
-{if isset($db_install)}   
-    {if $error}
-    <div class="failed result">
-        <h2>Při nahrání tabulek do databáze nastala chyba!</h2>
-        <p>V detailu vyhledejte označenou položku a zjistěte příčinu chyby.</p>
-        <p>Máte tyto možnosti:
-            <ul>
-                <li>Označené chyby ručně opravit a <a href="{link :Install:Default:urad}">pokračovat v instalaci</a>. Pouze na vlastní riziko!</li>
-                <li>Odstranit všechny tabulky určené aplikaci a <a href="{link :Install:Default:databaze, 'install'=>'1'}">provést nahrání znovu</a></li>
-                <li>Kontaktovat pověřenou osobu nebo technickou podporu aplikace.</li>
-            </ul>
-        </p>
-        <p>V této fázi není možné pokračovat v instalaci. Pro pokračování instalace je potřeba provést nápravu.</p>
-    </div>
-    {else}
-    <div class="passed result">
-        <h2>Blahopřeji! Nahrání tabulek a dat proběhlo v pořádku.</h2>
-        <p>Můžete pokračovat v instalaci.</p>
-        <p><a href="{link :Install:Default:urad}">Pokračovat v instalaci</a></p>
-    </div>
-    {/if}
-{else}
     {if isset($provedeno)}
-    <div class="passed result">
-        <h2>Tabulky a data jsou již nahrané.</h2>
-        <p>Nahrání tabulek a dat proběhlo v pořádku. Můžete pokračovat v instalaci.</p>
-        <p><a href="{link :Install:Default:urad}">Pokračovat v instalaci</a></p>
-    </div>
-    {elseif $tabulka_jiz_existuje}
-    <div class="failed result">
-        <h2>Nelze nahrát tabulky a data do databáze!</h2>
-        <p>V uvedené databázi již existuje tabulka se stejným jménem, jako používá aplikace. Databáze musí být prázdná.</p>
-        <p>V této fázi není možné pokračovat v instalaci. Pro pokračování instalace je potřeba provést nápravu. Po dokončení úprav proveďte <a href="?">novou kontrolu</a>. </p>
-    </div>
-    {elseif $error}
-    <div class="failed result">
-        <h2>Došlo k výjimce!</h2>
-		<p>Popis chyby: {$error}</p>
-		<p>Pravděpodobně není nastaveno připojení v souboru system.ini.</p>
-    </div>
-    {else}
-    <div class="passed result">
-        <h2>Před kontrola databáze proběhla v pořádku.</h2>
-        <p>Můžete pokračovat v nahrání tabulek do databáze.</p>
-        <p><a href="{link :Install:Default:databaze, 'install'=>'1'}">Nahrát tabulky a data</a></p>
+        <div class="passed result">
+            <h2>Tabulky a data jsou již nahrané.</h2>
+            <p>Tento instalační krok již byl proveden. Můžete pokračovat.</p>
+            <p><a href="{link urad}">Pokračovat v instalaci</a></p>
+        </div>
+    {elseif $presenter->getParameter('install')}   
+        {if $error}
+            <div class="failed result">
+                <h2>Při nahrání tabulek do databáze nastala chyba!</h2>
+                <p>Máte tyto možnosti:
+                <ul>
+                    <li>Smazat ručně databázi, vytvořit novou prázdnou a zkusit <a href="{link this, 'install' => 0}">provést nahrání znovu</a>.</li>
+                    <li>Kontaktovat pověřenou osobu nebo technickou podporu aplikace.</li>
+                </ul>
+                </p>
+                <p>V této fázi není možné pokračovat v instalaci. Pro pokračování instalace je potřeba provést nápravu.</p>
+            </div>
+            <div class="failed result">
+                <p><strong>Text výjimky:</strong> <br />
+                    {$error}<br />
+                    <strong>Dotaz, který chybu vyvolal:</strong><br />
+                    {$query}
+                </p>
+            </div>
+        {else}
+            <div class="passed result">
+                <h2>Blahopřeji! Nahrání tabulek a dat proběhlo v pořádku.</h2>
+                <p>Můžete pokračovat v instalaci.</p>
+                <p><a href="{link urad}">Pokračovat v instalaci</a></p>
+            </div>
+        {/if}
+    {else} {* 1. krok, kontrola *}
+        {if $error}
+            <div class="failed result">
+                <h2>Nelze pokračovat v instalaci</h2>
+                <p>Proveďte nápravu a potom <a n:href="this">opakujte kontrolu</a>.</p>
+            </div>
+        {else}
+            <div class="passed result">
+                <h2>Kontrola databáze proběhla v pořádku.</h2>
+                <p>Můžete pokračovat v nahrání tabulek do databáze.</p>
+                <p><a href="{link this, 'install' => 1}">Nahrát tabulky a data</a></p>
+            </div>
+        {/if}
 
-    </div>
+        <table class="spisovka">
+            {foreach $output as $id => $requirement}
+                {var $class = isset($requirement->passed) ? ($requirement->passed ? 'passed' : ($requirement->required ? 'failed' : 'warning')) : 'info'}
+                <tr id="res{$id}" class="{$class}">
+                    <td class="th">{($requirement->title)}</td>
+
+                    {if (empty($requirement->passed) && isset($requirement->errorMessage))}
+                        <td>{($requirement->errorMessage)}</td>
+                    {elseif (isset($requirement->message))}
+                        <td>{($requirement->message)}</td>
+                    {elseif (isset($requirement->passed))}
+                        <td>{$requirement->passed ? 'Enabled' : 'Disabled'}</td>
+                    {else}
+                        <td></td>
+                    {/if}
+                </tr>
+
+                {if (isset($requirement->passed) && !$requirement->passed)}
+                    <tr class="{$class} description">
+                        <td colspan="2">{$requirement->description|noescape}</td>
+                    </tr>
+                {/if}
+            {/foreach}
+        </table>
     {/if}
-{/if}
-
-
-
-    <h2>Detail kontroly:</h2>
-
-    <table class="spisovka">
-    {foreach $database as $id => $requirement}
-    {var $class = isset($requirement->passed) ? ($requirement->passed ? 'passed' : ($requirement->required ? 'failed' : 'warning')) : 'info'}
-    <tr id="res{$id}" class="{$class}">
-    	<td class="th">{($requirement->title)}</td>
-
-        {if (empty($requirement->passed) && isset($requirement->errorMessage))}
-	<td>{($requirement->errorMessage)}</td>
-	{elseif (isset($requirement->message))}
-	<td>{($requirement->message)}</td>
-	{elseif (isset($requirement->passed))}
-	<td>{$requirement->passed ? 'Enabled' : 'Disabled'}</td>
-	{else}
-	<td></td>
-	{/if}
-    </tr>
-
-    {if (isset($requirement->passed) && !$requirement->passed)}
-    <tr class="{$class} description">
-        <td colspan="2">{$requirement->description|noescape}</td>
-    </tr>
-    {/if}
-
-    {/foreach}
-    </table>
+</div>    

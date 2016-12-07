@@ -434,125 +434,77 @@ class Install_DefaultPresenter extends BasePresenter
         }
     }
 
-    public function renderDatabaze()
+    /**
+     * @param boolean $install   provest pouze kontrolu nebo nahrat data?
+     */
+    public function renderDatabaze($install = false)
     {
         $session = $this->getSession('s3_install');
-        if (!isset($session->step)) {
+        if (!isset($session->step))
             $session->step = array();
-        }
-        if (@$session->step['databaze'] == 1) {
+        if (isset($session->step['databaze']) && $session->step['databaze'] === 1)
             $this->template->provedeno = 1;
-        }
 
-        $this->template->error = false;
-        $this->template->tabulka_jiz_existuje = false;
-
-        try {
+        if (!$install) {
             $db_config = GlobalVariables::get('database');
             $db_tables = dibi::getDatabaseInfo()->getTableNames();
-
-            $sql_template_source = file_get_contents(__DIR__ . '/mysql.sql');
-            $sql_queries = explode(";", $sql_template_source);
-            array_pop($sql_queries); // prázdný prvek za posledním středníkem
+            $output = [
+                    ['title' => 'Ovladač', 'message' => $db_config->driver],
+                    ['title' => 'Server', 'message' => $db_config->host],
+                    ['title' => 'Databázový uživatel', 'message' => $db_config->username],
+                    ['title' => 'Název databáze', 'message' => $db_config->database],
+            ];
+            $output[] = ['title' => 'Je databáze prázdná?',
+                'message' => 'ano',
+                'errorMessage' => 'ne',
+                'description' => 'V databázi již existuje nějaká tabulka. Databáze musí být prázdná.',
+                'required' => true,
+                'passed' => !$db_tables,
+            ];
+            $this->template->error = !empty($db_tables);
+            $this->template->output = $this->paint($output);
+        } else {
+            /* instalace */
+            $this->template->error = false;
+            $install_script = file_get_contents(__DIR__ . '/mysql.sql');
+            $initial_queries = explode(";", $install_script);
+            array_pop($initial_queries); // prázdný prvek za posledním středníkem
 
             /* pridej SQL prikazy z aktualizaci */
             Updates::init();
             $res = Updates::find_updates();
             $revisions = $res['revisions'];
             $alter_scripts = $res['alter_scripts'];
-            foreach ($revisions as $revision)
-                if ($revision >= 680 && isset($alter_scripts[$revision])) {
-                    $sql_queries = array_merge($sql_queries, $alter_scripts[$revision]);
-                }
-            $latest_revision = $revision;
+            array_unshift($revisions, 1);
 
-            $database_a = array(
-                array(
-                    'title' => 'DB driver',
-                    'message' => $db_config->driver
-                ),
-                array(
-                    'title' => 'DB server',
-                    'message' => $db_config->host
-                ),
-                array(
-                    'title' => 'DB přihlašovací jméno',
-                    'message' => $db_config->username,
-                ),
-                array(
-                    'title' => 'DB databáze',
-                    'message' => $db_config->database,
-                ),
-            );
+            foreach ($revisions as $revision) {
+                $latest_revision = $revision;
+                if ($revision == 1)
+                    $queries = $initial_queries;
+                else if ($revision <= 1450)
+                    continue;
+                else if (!isset($alter_scripts[$revision]))
+                    continue;
+                else
+                    $queries = $alter_scripts[$revision];
 
-            foreach ($sql_queries as $query) {
-
-                $query = str_replace("{tbls3}", '', $query);
-
-                if ($this->getParameter('install', null)) {
-                    // provedeni SQL skriptu
-                    $this->template->db_install = 1;
-                    try {
+                $query = ''; // potlac varovani
+                try {
+                    foreach ($queries as $query) {
                         dibi::query($query);
-                    } catch (DibiException $e) {
-                        $this->template->error = true;
-                        $sql_error = $e->getMessage();
-
-                        if (strpos($query, "CREATE TABLE") !== false) {
-                            // $message = "Tabulka byla úspěšně vytvořena";
-                            $error_message = "Tabulku se nepodařilo vytvořit!";
-                        } else if (strpos($query, "INSERT INTO") !== false) {
-                            // $message = "Data do tabulky byla úspěšně nahrána.";
-                            $error_message = "Data do tabulky se nepodařilo nahrát!";
-                        } else if (strpos($query, "ALTER TABLE") !== false) {
-                            // $message = "Struktura tabulky byla úspěšně upravena.";
-                            $error_message = "Tabulku se nepodařilo změnit!";
-                        } else {
-                            // $message = "Databázový příkaz byl úspěšně proveden.";
-                            $error_message = "Databázový příkaz nebyl správně proveden!";
-                        }
-                        $query_parts = explode("`", $query);
-                        $database_a[] = array(
-                            'title' => @$query_parts[1],
-                            'required' => TRUE,
-                            'passed' => false,
-                            'message' => '',
-                            'errorMessage' => $error_message,
-                            'description' => "<p>SQL Chyba: " . $sql_error . " </p><p>QUERY: $query</p>",
-                        );
                     }
-                } else {
-                    // predkontrola
-                    $query_part = explode("`", $query);
-                    if (( strpos($query, "CREATE") !== false ) && isset($query_part[1])) {
-                        if (in_array($query_part[1], $db_tables)) {
-                            $this->template->tabulka_jiz_existuje = true;
-                            $database_a[] = array(
-                                'title' => @$query_part[1],
-                                'required' => TRUE,
-                                'passed' => false,
-                                'message' => ' ',
-                                'errorMessage' => 'Tabulka již v databázi existuje.',
-                                'description' => '',
-                            );
-                        }
-                    }
+                } catch (Exception $e) {
+                    $this->template->error = $e->getMessage();
+                    $this->template->query = $query;
+                    // pri chybe prerus instalaci databaze
+                    break;
                 }
             }
 
-            if ($this->getParameter('install', false)) {
-                $this_installation = new Client_To_Update(CLIENT_DIR);
-                $this_installation->update_revision_number($latest_revision);
-            }
-
-            $database = $this->paint($database_a);
-            $this->template->database = $database;
-
-            if (!($this->template->error) && isset($this->template->db_install)) {
-                @$session->step['databaze'] = 1;
-            }
-        } catch (DibiDriverException $e) {
-            $this->template->error = $e->getMessage();
+            $this_installation = new Client_To_Update(CLIENT_DIR);
+            $this_installation->update_revision_number($latest_revision);
+            if (!$this->template->error)
+                $session->step['databaze'] = 1;
         }
     }
 
