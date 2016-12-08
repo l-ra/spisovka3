@@ -71,11 +71,11 @@
 
     <h2>Detail kontroly:</h2>
 
-    {include #kontroly, requirements => $requirements_ess}
+    {include #kontroly, requirements => $requirements_application}
     
     <h2>Detaily jádra aplikace (Nette Framework)</h2>
     <p>(zobrazí se pouze varování a chyby)</p>
     
-    {include #kontroly, requirements => $requirements, nette => true}
+    {include #kontroly, requirements => $requirements_nette, nette => true}
     
 </div>
