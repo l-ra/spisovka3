@@ -3,6 +3,7 @@ php:
 
 parameters:
     send_survey = true
+    public_url = null
  
     storage_configuration:
         path_documents = files/dokumenty

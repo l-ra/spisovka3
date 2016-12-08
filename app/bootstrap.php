@@ -83,14 +83,14 @@ try {
 
 // zjisti public URL
     $http_request = $container->getByType('Nette\Http\IRequest');
+    $public_url = $container->parameters['public_url'];
     if ($public_url) {
         if ($http_request->isSecured())
         // dynamicky uprav protokol v nastaveni PUBLIC_URL
             $public_url = str_replace('http:', 'https:', $public_url);
     }
-    else {
+    else
         $public_url = $http_request->getUrl()->getBasePath() . 'public/';
-    }
     GlobalVariables::set('publicUrl', $public_url);
 
 

@@ -5,10 +5,6 @@ define('APP_DIR', __DIR__ . "/app");
 // absolute filesystem path to the client files
 define('CLIENT_DIR', __DIR__ . "/client");
 
-// absolute or relative URL to public resources (CSS, Javascript, images)
-// empty = detect automatically
-$public_url = null;
-
 // client identificator
 define('KLIENT', 'klient');
 
