@@ -66,7 +66,7 @@ try {
 
     createIniFiles();
 
-    $cookie_path = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+    $cookie_path = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
 
     $configurator = new Nette\Configurator;
     $configurator

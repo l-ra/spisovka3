@@ -404,13 +404,12 @@ class Install_DefaultPresenter extends BasePresenter
                 'description' => 'Either <code>$_SERVER["REQUEST_URI"]</code> or <code>$_SERVER["ORIG_PATH_INFO"]</code> must be available for resolving request URL.',
             ),
             array(
-                'title' => 'SCRIPT_FILENAME, SCRIPT_NAME, PHP_SELF',
+                'title' => 'SCRIPT_FILENAME, SCRIPT_NAME',
                 'required' => TRUE,
-                'passed' => isset($_SERVER["SCRIPT_FILENAME"], $_SERVER["SCRIPT_NAME"],
-                        $_SERVER["PHP_SELF"]),
+                'passed' => isset($_SERVER["SCRIPT_FILENAME"], $_SERVER["SCRIPT_NAME"]),
                 'message' => 'Present',
                 'errorMessage' => 'Absent',
-                'description' => '<code>$_SERVER["SCRIPT_FILENAME"]</code> and <code>$_SERVER["SCRIPT_NAME"]</code> and <code>$_SERVER["PHP_SELF"]</code> must be available for resolving script file path.',
+                'description' => '<code>$_SERVER["SCRIPT_FILENAME"]</code> and <code>$_SERVER["SCRIPT_NAME"]</code> must be available for resolving script file path.',
             ),
             array(
                 'title' => 'SERVER_ADDR or LOCAL_ADDR',
