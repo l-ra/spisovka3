@@ -1,7 +1,0 @@
-  Options Indexes FollowSymlinks
-  AuthName "Spisova sluzba - Prihlaseni pres SSO"
-  AuthType Basic
-  AuthPAM_Enabled ON
-  require valid-user
-
-ErrorDocument 401 '<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="refresh" content="1;url=../../?alternativelogin=1"><title>Spisová služba - Chyba přihlášení</title><style>body{color:#333;background:white;width:700px;margin:100px auto}h1{font:bold 47px/1.5 sans-serif;margin:.6em 0}p{font:21px/1.5 Georgia,serif;margin:1.5em 0}small{font-size:70%;color:gray}</style></head><body><h1>Chyba SSO prihlaseni</h1><p>Je pozadovano prihlaseni, ktere neprobehlo nebo bylo Vami zruseno.</p><p>Nove prihlaseni provedete obnovenim stranky nebo zavrenim a novym spustenim prohlizece.</p><p>Paklize se nejde prihlasit, kontaktujte sveho spravce.</p><p><a href="../../?alternativelogin=1">Prejit na alternativni prihlasovani</a></p><p><small>401 - Unauthorized / Neopravneny pristup</small></p></body></html>'
