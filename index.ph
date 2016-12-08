@@ -1,9 +1,7 @@
 <?php
 
-// absolute filesystem path to the application root
+// absolute filesystem path to the APP directory
 define('APP_DIR', __DIR__ . "/app");
-// absolute filesystem path to the client files
-define('CLIENT_DIR', __DIR__ . "/client");
 
 // client identificator
 define('KLIENT', 'klient');

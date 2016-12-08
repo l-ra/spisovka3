@@ -3,7 +3,7 @@
 use Tracy\Debugger;
 
 if (!defined('KLIENT')) {
-    echo "<h1>Chyba aplikace. Nebyl zjisten klient!</h1>";
+    echo "<h1>Chyba konfigurace. Nebyla nastavena konstanta KLIENT.</h1>";
     exit;
 }
 
@@ -14,6 +14,11 @@ if (file_exists(APP_DIR . "/configs/servicemode")) {
 
 try {
 
+// Step 0: Determine CLIENT_DIR 
+    $s = $_SERVER['SCRIPT_FILENAME'];
+    $s = str_replace('/index.php', '', $s);
+    define('CLIENT_DIR', is_dir("$s/client") ? "$s/client" : $s);
+    
 // Step 1: Configure automatic loading
     if (!defined('LIBS_DIR'))
         define('LIBS_DIR', dirname(APP_DIR) . '/libs');
