@@ -40,10 +40,10 @@ try {
     $loader = new Nette\Loaders\RobotLoader();
     $loader->addDirectory(APP_DIR);
     $loader->addDirectory(LIBS_DIR);
-    $cacheDir = TEMP_DIR . '/cache';
-    if (!is_dir($cacheDir))
-        mkdir($cacheDir);
-    $loader->setCacheStorage(new Nette\Caching\Storages\FileStorage($cacheDir));
+    $cache_dir = TEMP_DIR . '/cache';
+    if (!is_dir($cache_dir))
+        mkdir($cache_dir);
+    $loader->setCacheStorage(new Nette\Caching\Storages\FileStorage($cache_dir));
     $loader->register();
 
 
@@ -81,17 +81,22 @@ try {
 
     $container = $configurator->createContainer();
 
-// dynamicky uprav protokol v nastaveni PUBLIC_URL
-    $publicUrl = $public_url;
-    $httpRequest = $container->getByType('Nette\Http\IRequest');
-    if ($httpRequest->isSecured())
-        $publicUrl = str_replace('http:', 'https:', $publicUrl);
-    GlobalVariables::set('publicUrl', $publicUrl);
+// zjisti public URL
+    $http_request = $container->getByType('Nette\Http\IRequest');
+    if ($public_url) {
+        if ($http_request->isSecured())
+        // dynamicky uprav protokol v nastaveni PUBLIC_URL
+            $public_url = str_replace('http:', 'https:', $public_url);
+    }
+    else {
+        $public_url = $http_request->getUrl()->getBasePath() . 'public/';
+    }
+    GlobalVariables::set('publicUrl', $public_url);
 
 
 // konfigurace spisovky
     GlobalVariables::set('client_config', (new Spisovka\ConfigClient())->get());
-        
+
     $install_info = @file_get_contents(CLIENT_DIR . '/configs/install');
     if ($install_info === FALSE) {
         define('APPLICATION_INSTALL', 1);
@@ -130,16 +135,15 @@ try {
         echo 'Aplikaci se nepodarilo pripojit do databaze.<br>';
         throw $e;
     }
-    
+
 // 3c) Konfiguruj e-podatelnu - musí být provedeno po připojení do databáze
     if (!defined('APPLICATION_INSTALL'))
         createEpodatelnaConfig();
-    
+
 // Step 4: Setup application router
 // 
     $router = $container->getByType('Nette\Application\IRouter');
-    setupRouting($httpRequest, $router);
-    
+    setupRouting($http_request, $router);
 } catch (Exception $e) {
     echo 'Behem inicializace aplikace doslo k vyjimce. Podrobnejsi informace lze nalezt v aplikacnim logu.<br>'
     . 'Podrobnosti: ' . $e->getMessage();
@@ -154,7 +158,6 @@ if (!defined('APPLICATION_INSTALL')) {
 }
 
 // Step 6: Run the application!
-
 // unset all global variables except PHP superglobals
 $application = $container->getByType('Nette\Application\Application');
 
@@ -165,7 +168,6 @@ foreach ($vars as $var)
 unset($vars, $var);
 
 $application->run();
-
 
 function createIniFiles()
 {
@@ -199,34 +201,34 @@ function migrateSystemIni()
     $loader = new \Nette\DI\Config\Loader();
     $old_config = $loader->load("$dir/system.ini");
 
-    $new_config = [ 'parameters' => [ 'database' => $old_config['common']['database']]];
+    $new_config = ['parameters' => ['database' => $old_config['common']['database']]];
     // Pokud uzivatel bude chtit nestandardni mod, bude jej muset zadat do konfiguracniho 
     // souboru znovu rucne.
     unset($new_config['parameters']['database']['sqlmode']);
-    
+
     $loader->save($new_config, "$dir/database.neon");
     @chmod("$dir/database.neon", 0400);
-    
+
     // Uklid. Prejmenovani pojisti, ze se konfigurace zmigruje jen jednou.
     unlink("$dir/system.in");
     rename("$dir/system.ini", "$dir/system.old");
 }
 
 function createEpodatelnaConfig()
-{    
+{
     // nejprve zkontroluj, zda migrace uz byla provedena
     if (Settings::get('epodatelna'))
         return;
-    
+
     // potom zjisti, zda se jedna o novou instalaci ci nikoliv
     $dir = CLIENT_DIR . '/configs';
     if (!is_file("$dir/epodatelna.ini"))
-        createIniFile("$dir/epodatelna.ini");       
-    
+        createIniFile("$dir/epodatelna.ini");
+
     $config = (new Spisovka\ConfigEpodatelnaOld())->get();
     (new Spisovka\ConfigEpodatelna())->save($config);
 
-    rename("$dir/epodatelna.ini", "$dir/epodatelna.old");    
+    rename("$dir/epodatelna.ini", "$dir/epodatelna.old");
     @chmod("$dir/epodatelna.old", 0400);
 }
 
@@ -239,13 +241,13 @@ function setupPdfExport()
     $mpdf_fontdata_dir = $mpdf_dir . 'ttfontdata/';
     define('_MPDF_TEMP_PATH', $mpdf_tmp_dir);
     define('_MPDF_TTFONTDATAPATH', $mpdf_fontdata_dir);
-    
+
     if (!is_dir($mpdf_dir))
         mkdir($mpdf_dir);
     if (!is_dir($mpdf_tmp_dir))
         mkdir($mpdf_tmp_dir);
     if (!is_dir($mpdf_fontdata_dir))
-        mkdir($mpdf_fontdata_dir);    
+        mkdir($mpdf_fontdata_dir);
 }
 
 function setupRouting(Nette\Http\IRequest $httpRequest, Nette\Application\IRouter $router)
@@ -275,7 +277,7 @@ function setupRouting(Nette\Http\IRequest $httpRequest, Nette\Application\IRoute
         'action' => 'default',
         'id' => NULL,
     ));
-    
+
     $router[] = new Nette\Application\Routers\Route('napoveda/<param1>/<param2>/<param3>',
             array(
         'module' => 'Spisovka',
@@ -352,5 +354,4 @@ function setupRouting(Nette\Http\IRequest $httpRequest, Nette\Application\IRoute
         'action' => 'detail',
         'id' => NULL,
     ));
-    
 }

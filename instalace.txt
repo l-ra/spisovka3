@@ -39,11 +39,9 @@ povoleny. Spravnost tohoho nastaveni overte, aby nebylo mozne se neopravnene
 dostat k citlivym datum.
 
 
-3. V korenovem adresari prejmenujte soubor index.ph na index.php. V souboru
+3. V korenovem adresari zkopirujte soubor index.ph do index.php. V souboru
 index.php zkontrolujte nastaveni. V typicke instalaci pro jednoho klienta
-je jedine nastaveni, ktere je nekdy potreba zadat $public_url.
-
-$public_url = absolutni nebo relativni URL mapujici adresar /public
+neni potreba zadne nastaveni menit.
 
 
 4. V adresari /client/configs/ zkopirujte soubor database.neo do database.neon.

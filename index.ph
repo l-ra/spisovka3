@@ -6,7 +6,8 @@ define('APP_DIR', __DIR__ . "/app");
 define('CLIENT_DIR', __DIR__ . "/client");
 
 // absolute or relative URL to public resources (CSS, Javascript, images)
-$public_url = '/public/';
+// empty = detect automatically
+$public_url = null;
 
 // client identificator
 define('KLIENT', 'klient');
