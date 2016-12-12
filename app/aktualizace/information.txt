@@ -137,3 +137,5 @@ Operace je časově náročná.
 Kontrola a oprava chyby, kdy jeden subjekt mohl být k dokumentu přiřazen vícekrát
 [1450]
 Změna přiřazení dokumentů do spisu v databázi.
+[1460]
+Odstranění sloupce "id" z tabulky acl_role_to_privilege, pokud sloupec existuje.
