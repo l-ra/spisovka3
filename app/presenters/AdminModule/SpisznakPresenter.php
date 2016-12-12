@@ -216,8 +216,10 @@ class Admin_SpisznakPresenter extends BasePresenter
         $form1->addText('popis', 'Popis:', 50, 200);
         $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form1->addText('skartacni_lhuta', 'Skartační lhůta:', 5, 5);
-        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci)
-                ->setValue(3); // Standardni udalost je "Skartační lhůta začíná plynout po uzavření dokumentu."
+        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
+        // Standardni udalost je "Skartační lhůta začíná plynout po uzavření dokumentu."
+        if (array_key_exists(3, $spousteci))
+            $form1['spousteci_udalost_id']->setDefaultValue(3);
         $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
         $form1->addSelect('stav', 'Stav:', SpisovyZnak::stav())
                 ->setDefaultValue(1);
