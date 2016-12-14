@@ -1273,9 +1273,12 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addSelect('spousteci_udalost_id', 'Spouštěcí událost: ', $spousteci_udalost);
         if (!empty($Dok->spousteci_udalost_id))
             $form['spousteci_udalost_id']->setDefaultValue($Dok->spousteci_udalost_id);
-        else if (array_key_exists(3, $spousteci_udalost))
-            $form['spousteci_udalost_id']->setDefaultValue(3); // Skartační lhůta začíná plynout po uzavření dokumentu
-
+        else {
+            $default_event = StartEvent::getDefault();
+            if ($default_event)
+                $form['spousteci_udalost_id']->setDefaultValue($default_event->id);
+        }
+        
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10)
                 ->setValue(@$Dok->vyrizeni_pocet_listu)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet listů musí být číslo');

@@ -39,6 +39,10 @@ class SpisyPresenter extends BasePresenter
     protected function createComponentNovyForm()
     {
         $form = $this->createForm();
+        
+        $default_event = StartEvent::getDefault();
+        if ($default_event)
+            $form['spousteci_udalost_id']->setDefaultValue($default_event->id);
 
         $form->addSubmit('vytvorit', 'Vytvořit');
         $form->addSubmit('storno', 'Zrušit')
@@ -335,7 +339,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $this->setView('noaccess');
             return;
         }
-        
+
         $this->template->opravneni = $opravneni;
         $this->template->Editovat = $opravneni['lze_menit'] && $upravit == 'info';
         $this->template->seznam = $seznam = $spis->getDocumentsPlus();
@@ -362,7 +366,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $spis->takeOver();
             $this->flashMessage('Úspěšně jste převzal tento spis.');
             /* $this->flashMessage('Převzetí spisu do vlastnictví se nepodařilo. Zkuste to znovu.',
-                        'warning'); */
+              'warning'); */
         }
 
         $this->redirect('detail', $id);
@@ -378,7 +382,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         else if (!$orgunit)
             $this->flashMessage('Nemůžete převzít spis, protože nejste zařazen do organizační jednotky.',
                     'warning');
-        else { 
+        else {
             $spis->orgjednotka_id = $orgunit->id;
             $spis->save();
             $this->flashMessage('Úspěšně jste si převzal tento spis. Pokud spis obsahoval dokumenty, jejich vlastnictví změněno nebylo.');
