@@ -210,30 +210,30 @@ class Admin_SpisznakPresenter extends BasePresenter
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
-        $form1 = new Spisovka\Form();
-        $form1->addText('nazev', 'Spisový znak:', 50, 80)
+        $form = new Spisovka\Form();
+        $form->addText('nazev', 'Spisový znak:', 50, 80)
                 ->addRule(Nette\Forms\Form::FILLED, 'Spisový znak musí být vyplněn!');
-        $form1->addText('popis', 'Popis:', 50, 200);
-        $form1->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
-        $form1->addText('skartacni_lhuta', 'Skartační lhůta:', 5, 5);
-        $form1->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
+        $form->addText('popis', 'Popis:', 50, 200);
+        $form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
+        $form->addText('skartacni_lhuta', 'Skartační lhůta:', 5, 5);
+        $form->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
         $default_event = StartEvent::getDefault();
         if ($default_event)
-            $form1['spousteci_udalost_id']->setDefaultValue($default_event->id);
+            $form['spousteci_udalost_id']->setDefaultValue($default_event->id);
         
-        $form1->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
-        $form1->addSelect('stav', 'Stav:', SpisovyZnak::stav())
+        $form->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
+        $form->addSelect('stav', 'Stav:', SpisovyZnak::stav())
                 ->setDefaultValue(1);
 
-        $form1->addSubmit('vytvorit', 'Vytvořit');
-        $form1->addSubmit('vytvorit_a_novy', 'Vytvořit a vložit další');
-        $form1->addSubmit('storno', 'Zrušit')
+        $form->addSubmit('vytvorit', 'Vytvořit');
+        $form->addSubmit('vytvorit_a_novy', 'Vytvořit a vložit další');
+        $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoNovyClicked');
 
-        $form1->onSuccess[] = array($this, 'vytvoritSucceeded');
+        $form->onSuccess[] = array($this, 'vytvoritSucceeded');
 
-        return $form1;
+        return $form;
     }
 
     public function vytvoritSucceeded(Nette\Application\UI\Form $form, $data)
