@@ -303,14 +303,12 @@ class Install_DefaultPresenter extends BasePresenter
                     'P') !== FALSE && strpos(ini_get('variables_order'), 'C') !== FALSE,
             'description' => 'Configuration directive <code>variables_order</code> is missing. Nette Framework requires this to be set.',
         );
-        // po instalaci je session vždy spuštěna, nelze kontrolovat
-        if (defined('APPLICATION_INSTALL')) 
-            $tests[] = array(
-                'title' => 'Session auto-start',
-                'required' => FALSE,
-                'passed' => session_id() === '' && !defined('SID'),
-                'description' => 'Session auto-start is enabled. Nette Framework recommends not to use this directive for security reasons.',
-            );
+        $tests[] = array(
+            'title' => 'Session auto-start',
+            'required' => FALSE,
+            'passed' => ini_get('session.auto_start') === "0",
+            'description' => 'Session auto-start is enabled. Nette Framework recommends not to use this directive for security reasons.',
+        );
         $tests[] = array(
             'title' => 'PCRE with UTF-8 support',
             'required' => TRUE,
