@@ -1,0 +1,6 @@
+
+{foreach $menu as $key => $text}
+    {var active = $key == $presenter->view}
+    <span {if $active}class="hilighted"{/if}>{$text}</span>
+    {if $key != 'konec'}>{/if}
+{/foreach}

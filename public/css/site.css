@@ -128,22 +128,6 @@ form {
     margin: 0px 10px;
 }
 
-#menu strong {
-    color: #00cc00;
-    font-weight: bold;
-    font-size: 12px;
-    text-decoration: none;
-    margin: 0px 10px;
-}
-
-#menu span {
-    color: #dddddd;
-    font-weight: bold;
-    font-size: 12px;
-    text-decoration: none;
-    margin: 0px 10px;
-}
-
 #dialog {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 9pt;

@@ -4,13 +4,7 @@
 {/block}
 {block menu}
 {if !$installed}
-    <a href="{link :Install:Default:uvod}">Úvod</a> >
-    <strong>Kontrola</strong> >
-    <span>Nahrání databáze</span> >
-    <span>Nastavení klienta</span> >
-    <span>Nastavení evidence</span> >
-    <span>Nastavení správce</span> >
-    <span>Konec</span>
+    {include 'menu.latte'}
 {/if}
 {/block}
 {block kontroly}
@@ -64,7 +58,7 @@
             <p n:if="$warnings">Byly zjištěny nesrovnalosti, které mohou ovlivnit chod aplikace. Zkontrolujte prosím zvýrazněné body v následujícím výpise.</p>
                 {if !$installed}
                 <p>Můžete pokračovat v instalaci.</p>
-                <p><a href="{link :Install:Default:databaze}">Pokračovat v instalaci</a></p>
+                <p><a href="{link databaze}">Pokračovat v instalaci</a></p>
             {/if}
         </div>
     {/if}

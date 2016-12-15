@@ -8,39 +8,39 @@ class Install_DefaultPresenter extends BasePresenter
         if (!defined('APPLICATION_INSTALL') && $this->action != "kontrola")
             $this->setView('instalovano');
 
-        $session = $this->getSession('s3_install');
-
         parent::startup();
+    }
 
-        $this->template->step = $session->step;
+    public function beforeRender()
+    {
+        parent::beforeRender();
+
+        $menu = [
+            'uvod' => 'Úvod',
+            'kontrola' => 'Kontrola',
+            'databaze' => 'Nahrání databáze',
+            'urad' => 'Nastavení klienta',
+            'evidence' => 'Nastavení evidence',
+            'spravce' => 'Nastavení správce',
+            'konec' => 'Konec',
+        ];
+        $this->template->menu = $menu;
     }
 
     public function renderDefault()
     {
-        $session = $this->getSession('s3_install');
-        unset($session->step);
         $this->redirect('uvod');
     }
 
     public function renderUvod()
     {
-        $session = $this->getSession('s3_install');
-        if (!isset($session->step)) {
-            $session->step = array();
-        }
+        
     }
 
     public function renderKontrola()
     {
         $installed = !defined('APPLICATION_INSTALL');
         $this->template->installed = $installed;
-        if (!$installed) {
-            $session = $this->getSession('s3_install');
-            if (!isset($session->step)) {
-                $session->step = array();
-            }
-            @$session->step['uvod'] = 1;
-        }
 
         $this->template->errors = FALSE;
         $this->template->warnings = FALSE;
@@ -435,12 +435,6 @@ class Install_DefaultPresenter extends BasePresenter
 
         $this->template->requirements_nette = $this->paint($tests);
         $this->template->requirements_application = $this->paint($requirements_application);
-
-        if (!$installed) {
-            if (!$this->template->errors) {
-                @$session->step['kontrola'] = 1;
-            }
-        }
     }
 
     /**
@@ -448,12 +442,6 @@ class Install_DefaultPresenter extends BasePresenter
      */
     public function renderDatabaze($install = false)
     {
-        $session = $this->getSession('s3_install');
-        if (!isset($session->step))
-            $session->step = array();
-        if (isset($session->step['databaze']) && $session->step['databaze'] === 1)
-            $this->template->provedeno = 1;
-
         if (!$install) {
             $db_config = GlobalVariables::get('database');
             $db_tables = dibi::getDatabaseInfo()->getTableNames();
@@ -512,103 +500,40 @@ class Install_DefaultPresenter extends BasePresenter
 
             $this_installation = new Client_To_Update(CLIENT_DIR);
             $this_installation->update_revision_number($latest_revision);
-            if (!$this->template->error)
-                $session->step['databaze'] = 1;
         }
     }
 
     public function renderUrad()
     {
-        $session = $this->getSession('s3_install');
-        if (!isset($session->step)) {
-            $session->step = array();
-        }
-
         $client_config = (new Spisovka\ConfigClient())->get();
         $this->template->Urad = $client_config->urad;
     }
 
     public function renderEvidence()
     {
-        $session = $this->getSession('s3_install');
-        if (!isset($session->step)) {
-            $session->step = array();
-        }
-        @$session->step['evidence'] = 0;
-
         $client_config = (new Spisovka\ConfigClient())->get();
         $this->template->CisloJednaci = $client_config->cislo_jednaci;
     }
 
     public function renderSpravce()
     {
-        $session = $this->getSession('s3_install');
-        if (!isset($session->step)) {
-            $session->step = array();
-        }
-        if (@$session->step['spravce'] == 1) {
-            $this->flashMessage('Správce již byl vytvořen.', 'warning');
-            $this->template->provedeno = 1;
-        }
+        
     }
 
     public function renderKonec()
     {
-        $session = $this->getSession('s3_install');
-
-        $dokonceno = 1;
-        $errors = array();
-
-        if (!isset($session->step)) {
-            $errors[] = "Nebyly provedeny žádné kroky ke správné instalaci. Proveďte instalaci podle od začátku a postupně!";
-            $dokonceno = 0;
-        }
-        if (@$session->step['kontrola'] != 1) {
-            $errors[] = "Instalace neprošla vstupní kontrolou na minimální požadavky aplikace!";
-            $dokonceno = 0;
-        }
-        if (@$session->step['databaze'] != 1) {
-            $errors[] = "Instalace neprošla procesem nahrání tabulek a dat do databáze!";
-            $dokonceno = 0;
-        }
-        if (@$session->step['urad'] != 1) {
-            $errors[] = "Instalace neprošla procesem uložení informace o úřadu/firmě!";
-            $dokonceno = 0;
-        }
-        if (@$session->step['evidence'] != 1) {
-            $errors[] = "Instalace neprošla procesem nastavení evidence!";
-            $dokonceno = 0;
-        }
-        if (@$session->step['spravce'] != 1) {
-            $errors[] = "Instalace neprošla procesem přidání správce systému!";
-            $dokonceno = 0;
-        }
-
-        if (@$session->step['konec'] == 1) {
-            $dokonceno = 1;
-        }
-
-        if ($dokonceno == 1) {
-            // $client_config = (new Spisovka\ConfigClient())->get();
+        $install_file = CLIENT_DIR . '/configs/install';
+        if (!file_exists($install_file)) {
             $zerotime = mktime(0, 0, 0, 8, 20, 2008);
             $diff = time() - $zerotime;
             $diff = round($diff / 3600);
             $unique_signature = $diff . "#" . time();
 
-            if ($fp = fopen(CLIENT_DIR . '/configs/install', 'wb')) {
-                if (fwrite($fp, $unique_signature, strlen($unique_signature))) {
-                    $dokonceno = 2;
-                    if (!isset($session->step)) {
-                        $session->step = array();
-                    }
-                    @$session->step['konec'] = 1;
-                }
-                @fclose($fp);
+            if ($fp = fopen($install_file, 'wb')) {
+                fwrite($fp, $unique_signature, strlen($unique_signature));
+                fclose($fp);
             }
         }
-
-        $this->template->dokonceno = $dokonceno;
-        $this->template->errors = $errors;
     }
 
     protected function createComponentNastaveniUraduForm()
@@ -680,11 +605,6 @@ class Install_DefaultPresenter extends BasePresenter
         try {
             (new Spisovka\ConfigClient())->save($config_data);
 
-            $session = $this->getSession('s3_install');
-            if (!isset($session->step)) {
-                $session->step = array();
-            }
-            @$session->step['urad'] = 1;
             $this->redirect('evidence');
         } catch (Nette\IOException $e) {
 
@@ -731,11 +651,6 @@ class Install_DefaultPresenter extends BasePresenter
         try {
             (new Spisovka\ConfigClient())->save($config_data);
 
-            $session = $this->getSession('s3_install');
-            if (!isset($session->step)) {
-                $session->step = array();
-            }
-            @$session->step['evidence'] = 1;
             $this->redirect('spravce');
         } catch (Nette\IOException $e) {
             $this->flashMessage('Nastavení evidence se nepodařilo uložit!', 'warning');
@@ -793,12 +708,6 @@ class Install_DefaultPresenter extends BasePresenter
         if (!$auth->createUserAccount($osoba_data, $account_data, 1 /* role */)) {
             // nedelej nic, formular se zobrazi znovu i s chybovou zpravou
         } else {
-            $session = $this->getSession('s3_install');
-            if (!isset($session->step)) {
-                $session->step = array();
-            }
-            @$session->step['spravce'] = 1;
-
             $this->redirect('konec');
         }
     }

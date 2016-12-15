@@ -1,4 +1,16 @@
 
+#menu span {
+    color: #dddddd;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    margin: 0px 10px;
+}
+
+#menu span.hilighted {
+    color: #00cc00;
+}
+
     #kontrola .result {
         font-size: 10pt;
         margin: 1.5em 0;
