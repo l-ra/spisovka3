@@ -19,16 +19,17 @@ class Config implements IConfig
     protected $name;
     protected $data;
 
-    public function __construct($name, $client_dir = null)
+    public function __construct($name, $directory = null)
     {
         if (!in_array($name, array('epodatelna', 'klient', 'database')))
             throw new \InvalidArgumentException(__METHOD__ . "() - neplatný konfigurační soubor '$name'");
 
-        if (!isset($client_dir))
-            $client_dir = CLIENT_DIR;
+        if (!$directory)
+            $directory = CLIENT_DIR . '/configs';
+        $directory = rtrim($directory, '/\\');
         $ext = $name === 'database' ? 'neon' : 'ini';
         $loader = new \Nette\DI\Config\Loader();
-        $array = $loader->load("$client_dir/configs/$name.$ext");
+        $array = $loader->load("$directory/$name.$ext");
         $this->name = $name;
         $this->data = \Spisovka\ArrayHash::from($array);
     }

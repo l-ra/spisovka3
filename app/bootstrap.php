@@ -18,7 +18,7 @@ try {
     $s = $_SERVER['SCRIPT_FILENAME'];
     $s = str_replace('/index.php', '', $s);
     define('CLIENT_DIR', is_dir("$s/client") ? "$s/client" : $s);
-    
+
 // Step 1: Configure automatic loading
     if (!defined('LIBS_DIR'))
         define('LIBS_DIR', dirname(APP_DIR) . '/libs');
@@ -93,8 +93,7 @@ try {
         if ($http_request->isSecured())
         // dynamicky uprav protokol v nastaveni PUBLIC_URL
             $public_url = str_replace('http:', 'https:', $public_url);
-    }
-    else
+    } else
         $public_url = $http_request->getUrl()->getBasePath() . 'public/';
     GlobalVariables::set('publicUrl', $public_url);
 
@@ -225,16 +224,20 @@ function createEpodatelnaConfig()
     if (Settings::get('epodatelna'))
         return;
 
-    // potom zjisti, zda se jedna o novou instalaci ci nikoliv
+    // u nove instalace pouzij preddefinovanou konfiguraci,
+    // pri upgradu epodatelna.ini z adresare klienta
     $dir = CLIENT_DIR . '/configs';
-    if (!is_file("$dir/epodatelna.ini"))
-        createIniFile("$dir/epodatelna.ini");
-
-    $config = (new Spisovka\ConfigEpodatelnaOld())->get();
+    $upgrade = is_file("$dir/epodatelna.ini");
+    if ($upgrade)
+        $config = (new Spisovka\ConfigEpodatelnaOld())->get();
+    else
+        $config = (new Spisovka\Config('epodatelna', APP_DIR . '/configs'))->get();
     (new Spisovka\ConfigEpodatelna())->save($config);
 
-    rename("$dir/epodatelna.ini", "$dir/epodatelna.old");
-    @chmod("$dir/epodatelna.old", 0400);
+    if ($upgrade) {
+        rename("$dir/epodatelna.ini", "$dir/epodatelna.old");
+        @chmod("$dir/epodatelna.old", 0400);
+    }
 }
 
 function setupPdfExport()
