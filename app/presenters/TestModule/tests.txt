@@ -123,8 +123,7 @@
 :Spisovka:Uzivatel: { "upravit": "upozorneni" }
 :Spisovka:Uzivatel:seznamAjax JsonResponse { "term": "Pavel" }
 :Spisovka:Uzivatel:userSeznamAjax JsonResponse { "term": "Pavel" }
-:Spisovka:Uzivatel:vyber { "dok_id": 1234 }
-:Spisovka:Uzivatel:vyberSpis { "spis_id": 2 }
+:Spisovka:Uzivatel:vyber
 :Spisovka:Vyhledat:
 :Spisovka:Vypravna:
 :Spisovka:Vypravna:detail { "id": 26 }
