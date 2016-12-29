@@ -28,7 +28,6 @@ class Role extends TableCachedDBEntity
     {
         parent::delete();
         self::_invalidateCache();
-        DbCache::delete('s3_Permission');
     }
 
     public function save()
