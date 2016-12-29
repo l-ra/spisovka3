@@ -168,7 +168,7 @@ class Client_To_Update
             if ($config) {
                 $this->db_config = $config;
             } else if (is_file("{$this->path}/configs/database.neon")) {
-                $data = (new Spisovka\ConfigDatabase($this->path))->get();
+                $data = (new Spisovka\ConfigDatabase("{$this->path}/configs/"))->get();
                 $this->db_config = $data->parameters->database;
                 $this->db_config->profiler = false;
             } else {
