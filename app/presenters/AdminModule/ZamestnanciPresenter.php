@@ -339,7 +339,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $c = $form1->addSelect('orgjednotka_id', 'Organizační jednotka:', $select);
         $a = new UserAccount($this->getParameter('id'));
         $ou = $a->getOrgUnit();
-        $c->setDefaultValue($ou ? $ou->id : 0);
+        // uživatel může být přiřazen do neaktivní o.j., která nemá položku v select boxu 
+        $c->setDefaultValue($ou && in_array($ou->id, array_keys($select)) ? $ou->id : 0);
 
         $form1->addSubmit('upravit', 'Změnit')
                 ->onClick[] = array($this, 'zmenitOJClicked');
