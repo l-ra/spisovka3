@@ -214,7 +214,7 @@ function migrateSystemIni()
     @chmod("$dir/database.neon", 0400);
 
     // Uklid. Prejmenovani pojisti, ze se konfigurace zmigruje jen jednou.
-    unlink("$dir/system.in");
+    @unlink("$dir/system.in");
     rename("$dir/system.ini", "$dir/system.old");
 }
 
