@@ -442,6 +442,7 @@ CREATE TABLE `settings` (
 
 INSERT INTO `settings` (`name`, `value`) VALUES
 ('db_revision', '1450'),
+('db_tables_renamed', 'true'),
 ('epodatelna_auto_load_new_messages', 'true'),
 ('epodatelna_copy_email_into_documents_note', 'true'),
 ('notification_enabled_receive_document', 'true'),
