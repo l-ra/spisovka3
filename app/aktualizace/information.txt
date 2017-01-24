@@ -129,6 +129,8 @@ Doplnění indexů do tabulky epodatelna
 Oprava chybky ve vývojové verzi aplikace
 [1390]
 Zkrácení polí, většinou poznámek
+[1405]
+Oprava porušené referenční integrity, týká se odkazů na ID uživatele
 [1410]
 Smazání a nové vytvoření všech integritních omezení a souvisejících indexů.
 Je pravděpodobné, že bude potřeba ručně opravit data v databázi, pokud jsou data nekonzistentní!
