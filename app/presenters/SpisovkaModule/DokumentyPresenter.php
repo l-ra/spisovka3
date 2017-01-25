@@ -39,7 +39,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         } else {
             // filtr nezjisten - pouzijeme nejaky
             $filtr = array();
-            $filtr['filtr'] = 'pridelene';
+            $filtr['filtr'] = 'vse';
             $filtr['bez_vyrizenych'] = false;
             $filtr['jen_moje'] = false;
         }
