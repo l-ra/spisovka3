@@ -165,7 +165,7 @@ foreach ($clients as $site_path => $site_name) {
                     echo "<div class='update_info'>{$descriptions[$rev]}</div>";
 
                 // php z nepochopitelnych duvodu hlasi warning, neni-li pouzit @
-                @include_once Updates::$update_dir . $rev . '_code.php';
+                @include_once Updates::get_update_dir() . $rev . '_code.php';
 
                 $function_name = "revision_{$rev}_check";
                 if (function_exists($function_name) && $do_update) {

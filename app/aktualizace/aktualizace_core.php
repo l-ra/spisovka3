@@ -3,15 +3,19 @@
 class Updates
 {
 
-    public static $update_dir;
-    public static $alter_scripts = array();
-    public static $revisions = array();
-    public static $descriptions = array();
-    public static $clients = array();
+    protected static $update_dir;
+    protected static $alter_scripts = array();
+    protected static $revisions = array();
+    protected static $descriptions = array();
 
     public static function init()
     {
         self::$update_dir = APP_DIR . '/aktualizace/';
+    }
+
+    public static function get_update_dir()
+    {
+        return self::$update_dir;
     }
 
     /**
@@ -123,27 +127,20 @@ class Updates
     public static function find_clients()
     {
         $clients = array();
-        // detekuj hosting mojespisovka.cz
-        $hosting = file_exists(dirname(APP_DIR) . "/clients/.htaccess");
-        if ($hosting) {
-            $clients_dir = dirname(APP_DIR) . "/clients";
-            $dh = opendir($clients_dir);
-            if ($dh !== false)
-                while (($filename = readdir($dh)) !== false) {
-                    if ($filename == "." || $filename == ".." || $filename[0] == '@')
-                    // Adresáře začínající na @ jsou speciální adresáře, není tam instalace klienta
-                        continue;
-
-                    if (is_dir("$clients_dir/$filename"))
-                        $clients["$clients_dir/$filename"] = "$filename ($clients_dir/$filename)";
+        if (Hosting::detect()) {
+            $names = file(dirname(APP_DIR) . "/clients/list");
+            if ($names)
+                foreach ($names as $name) {
+                    $name = trim($name);
+                    $client_dir = "/var/www/vhosts/$name.mojespisovka.cz/httpdocs";
+                    $clients[$client_dir] = "$name";                    
                 }
         } else {
             $client_dir = dirname(APP_DIR) . "/client";
-            $clients[$client_dir] = "STANDALONE ($client_dir)";
+            $clients[$client_dir] = "Samostatná instalace - $client_dir";
         }
 
         asort($clients);     // Setrid klienty podle abeceny  
-        self::$clients = $clients;
         return $clients;
     }
 
