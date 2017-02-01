@@ -51,8 +51,6 @@ host = localhost        ; adresa serveru
 username =              ; prihlasovaci jmeno k databazi
 password =              ; prihlasovaci heslo k databazi
 database =              ; jmeno databaze (musi existovat!)
-prefix  =               ; prefix tabulek - je mozne nastavit, ale pro prehled-
-                          nost se doporucuje spise vytvorit prazdnou databazi
 
 
 5. Provedte instalacni proceduru aplikace.
