@@ -53,7 +53,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         $phpinfo = $this->phpinfo_array(1);
 
-        // cURL supprot
+        // cURL support
         $curl_version = "";
         if (function_exists('curl_version')) {
             $curli = curl_version();
@@ -750,7 +750,7 @@ class Install_DefaultPresenter extends BasePresenter
     private function phpinfo_array($return = false)
     {
         ob_start();
-        phpinfo(-1);
+        phpinfo(INFO_MODULES);
 
         $pi = preg_replace(
                 array('#^.*<body>(.*)</body>.*$#ms', '#<h2>PHP License</h2>.*$#ms',
