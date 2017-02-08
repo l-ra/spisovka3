@@ -462,6 +462,7 @@ class Install_DefaultPresenter extends BasePresenter
             $this->template->output = $this->paint($output);
         } else {
             /* instalace */
+            set_time_limit(0); // nutné, na Windows je MySQL velice pomalé
             $this->template->error = false;
             $install_script = file_get_contents(__DIR__ . '/mysql.sql');
             $initial_queries = explode(";", $install_script);
