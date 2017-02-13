@@ -13,7 +13,9 @@ if (file_exists(APP_DIR . "/configs/servicemode")) {
 }
 
 try {
-
+    /**
+     * Nastav konstantu CLIENT_DIR
+     */
     $s = $_SERVER['SCRIPT_FILENAME'];
     $s = str_replace('/index.php', '', $s);
     define('CLIENT_DIR', is_dir("$s/client") ? "$s/client" : $s);
@@ -53,8 +55,6 @@ try {
     $loader->setCacheStorage(new Nette\Caching\Storages\FileStorage($cache_dir));
     $loader->register();
 
-    register_shutdown_function(array('ShutdownHandler', '_handler'));
-
     /**
      *  nastav Nette Debugger 
      */
@@ -65,6 +65,13 @@ try {
     Nette\Bridges\Framework\TracyBridge::initialize();
     Debugger::$maxDepth = 5;
 
+    /**
+     * konfigurace PHP
+     */
+    register_shutdown_function(array('ShutdownHandler', '_handler'));
+    if (function_exists('mb_internal_encoding'))
+        mb_internal_encoding("UTF-8");
+    
     /**
      *  vytvor DI kontejner
      */
