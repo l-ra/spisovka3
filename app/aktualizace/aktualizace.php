@@ -307,7 +307,7 @@ foreach ($clients as $site_path => $site_name) {
 
 function deleteDir($dir, $dir_parent = null)
 {
-    if (substr($dir, strlen($dir) - 1, 1) != '/')
+    if (substr($dir, -1) != '/')
         $dir .= '/';
 
     if (empty($dir) || $dir == "/" || $dir == "." || $dir == "..") {

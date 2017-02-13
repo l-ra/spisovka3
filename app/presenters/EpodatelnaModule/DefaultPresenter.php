@@ -132,10 +132,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     {
         @set_time_limit(120); // je potreba zvysit timeout pro pripad vetsiho mnozstvi zprav
 
-        /* $id = $this->getParameter('id',null);
-          $typ = substr($id,0,1);
-          $index = substr($id,1); */
-
         $ou = $this->user->getOrgUnit();
         $ou_id = $ou ? $ou->id : null;
 
@@ -516,7 +512,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             if (!$popis)
                 $popis = '';
             if (strlen($popis) > 10000)
-                $popis = substr($popis, 0, 10000);
+                $popis = mb_substr($popis, 0, 10000);
 
             if (empty($message->subject)) {
                 $predmet = "[Bez předmětu] E-mailová zpráva";

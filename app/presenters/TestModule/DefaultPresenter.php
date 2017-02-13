@@ -31,7 +31,7 @@ class Test_DefaultPresenter extends BasePresenter
         $input = file(__DIR__ . '/tests.txt');
 
         foreach ($input as $line)
-            if (substr($line, 0, 1) != '#') {
+            if ($line{0} != '#') {
 
                 $matches = [];
                 preg_match('%^([^ ]+)( ([\w]+))?( ({.*))?%', trim($line), $matches);

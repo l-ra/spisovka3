@@ -113,18 +113,15 @@ class DokumentPrilohy extends BaseModel
 
         function _getSize($str)
         {
-
             $c = substr($str, -1);
+            $n = substr($str, 0, -1);
 
             switch (strtoupper($c)) {
                 case 'K':
-                    $n = substr($str, 0, -1);
                     return $n * pow(2, 10);
                 case 'M':
-                    $n = substr($str, 0, -1);
                     return $n * pow(2, 20);
                 case 'G':
-                    $n = substr($str, 0, -1);
                     return $n * pow(2, 30);
             }
 

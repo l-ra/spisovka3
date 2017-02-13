@@ -84,11 +84,11 @@ class Admin_SpecialPresenter extends BasePresenter
             $this->myError('Nepodařilo se přečíst soubor s daty pro import.');
 
         foreach ($a as $line) {
-            $pos = strpos($line, ';');
+            $pos = mb_strpos($line, ';');
             if ($pos === false)
                 continue;
-            $nazev_spisu = trim(substr($line, 0, $pos));
-            $s = trim(substr($line, $pos + 1));
+            $nazev_spisu = trim(mb_substr($line, 0, $pos));
+            $s = trim(mb_substr($line, $pos + 1));
             if ($s{0} == '"') {
                 $s = trim($s, '"');
                 $s = str_replace('""', '"', $s);
