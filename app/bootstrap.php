@@ -14,34 +14,36 @@ if (file_exists(APP_DIR . "/configs/servicemode")) {
 
 try {
 
-// Step 0: Determine CLIENT_DIR 
     $s = $_SERVER['SCRIPT_FILENAME'];
     $s = str_replace('/index.php', '', $s);
     define('CLIENT_DIR', is_dir("$s/client") ? "$s/client" : $s);
 
-// Step 1: Configure automatic loading
+    /**
+     *  Nastav automatické nahrávání pro Composerem instalované balíčky
+     */
     if (!defined('LIBS_DIR'))
         define('LIBS_DIR', dirname(APP_DIR) . '/libs');
     define('VENDOR_DIR', dirname(APP_DIR) . '/vendor');
-
-// prikaz nastavi loading pouze pro balicky instalovane Composerem
     require VENDOR_DIR . '/autoload.php';
 
+    /**
+     * Ověř, že můžeme zapisovat do tmp a sessions adresářů.
+     * U session kontrolujeme standardní umístění, přestože uživatel může
+     * nadefinovat jiný adresář.
+     */
     define('TEMP_DIR', CLIENT_DIR . '/temp');
-
-// check if temp directory is writable
     if (file_put_contents(TEMP_DIR . '/_check', '') === FALSE) {
         throw new Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
     }
 
-// Toto kontroluje standardni umisteni, prestoze uzivatel muze nadefinovat
-// ukladani session do jineho adresare
     $session_dir = CLIENT_DIR . '/sessions';
     if (file_put_contents("$session_dir/_check", '') === FALSE) {
         throw new Exception("Nelze zapisovat do adresare '$session_dir'");
     }
 
-// enable RobotLoader - this allows load all classes automatically
+    /**
+     *  nakonfiguruj Nette RobotLoader
+     */
     $loader = new Nette\Loaders\RobotLoader();
     $loader->addDirectory(APP_DIR);
     $loader->addDirectory(LIBS_DIR);
@@ -51,24 +53,21 @@ try {
     $loader->setCacheStorage(new Nette\Caching\Storages\FileStorage($cache_dir));
     $loader->register();
 
-
-// Step 2: Configure environment
-
     register_shutdown_function(array('ShutdownHandler', '_handler'));
 
-// 2a) enable Nette\Debug for better exception and error visualisation
-
+    /**
+     *  nastav Nette Debugger 
+     */
     define('LOG_DIR', dirname(APP_DIR) . '/log');
-
     if (!defined('DEBUG_ENABLE'))
         define('DEBUG_ENABLE', 0);
     Debugger::enable(DEBUG_ENABLE ? Debugger::DEVELOPMENT : Debugger::PRODUCTION, LOG_DIR);
-// '%logDir%/php_error_'.date('Ym').'.log' - stary nazev souboru s logy
     Nette\Bridges\Framework\TracyBridge::initialize();
     Debugger::$maxDepth = 5;
 
-// 2b) vytvor DI kontejner
-
+    /**
+     *  vytvor DI kontejner
+     */
     createIniFiles();
 
     $cookie_path = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
@@ -86,7 +85,9 @@ try {
 
     $container = $configurator->createContainer();
 
-// zjisti public URL
+    /**
+     *  zjisti public URL
+     */
     $http_request = $container->getByType('Nette\Http\IRequest');
     $public_url = $container->parameters['public_url'];
     if ($public_url) {
@@ -98,7 +99,9 @@ try {
     GlobalVariables::set('publicUrl', $public_url);
 
 
-// konfigurace spisovky
+    /**
+     *  konfigurace spisovky
+     */
     GlobalVariables::set('client_config', (new Spisovka\ConfigClient())->get());
 
     $install_info = @file_get_contents(CLIENT_DIR . '/configs/install');
@@ -112,7 +115,9 @@ try {
 
     setupPdfExport();
 
-// 3b) Load database
+    /**
+     * Připoj se do databáze a v debug módu definuj Tracy panel.
+     */
     try {
         $db_config = $container->parameters['database'];
         GlobalVariables::set('database', Nette\Utils\ArrayHash::from($db_config));
@@ -140,12 +145,15 @@ try {
         throw $e;
     }
 
-// 3c) Konfiguruj e-podatelnu - musí být provedeno po připojení do databáze
+    /**
+     * Konfiguruj e-podatelnu - musí být provedeno po připojení do databáze
+     */
     if (!defined('APPLICATION_INSTALL'))
         createEpodatelnaConfig();
 
-// Step 4: Setup application router
-// 
+    /**
+     *  Nastav routování
+     */
     $router = $container->getByType('Nette\Application\IRouter');
     setupRouting($http_request, $router);
 } catch (Exception $e) {
@@ -154,15 +162,18 @@ try {
     throw $e;
 }
 
-// Step 5: Perform application upgrade if needed
-
+/**
+ *  Je-li potřeba, proveď upgrade aplikace
+ */
 if (!defined('APPLICATION_INSTALL')) {
     $upgrade = new Upgrade();
     $upgrade->check();
 }
 
-// Step 6: Run the application!
-// unset all global variables except PHP superglobals
+/**
+ *  Unset všech globálních proměnných kromě PHP superglobals.
+ *  Spusť aplikaci!
+ */
 $application = $container->getByType('Nette\Application\Application');
 
 $vars = array_keys(get_defined_vars());
@@ -195,10 +206,12 @@ function createIniFile($filename)
     @chmod($filename, $perm);
 }
 
-// Migrace na 3.5.0
-// Prenese se to nejdulezitejsi - prihlasovaci udaje do databaze
-// Ostatni pripadne upravy musi uzivatel provest rucne,
-// konfigurace autentizace se tak jako tak zmenila
+/**
+ *  Migrace na 3.5.0
+ * Prenese se to nejdulezitejsi - prihlasovaci udaje do databaze
+ * Ostatni pripadne upravy musi uzivatel provest rucne,
+ * konfigurace autentizace se tak jako tak zmenila
+ */
 function migrateSystemIni()
 {
     $dir = CLIENT_DIR . '/configs';
@@ -240,9 +253,11 @@ function createEpodatelnaConfig()
     }
 }
 
+/**
+ * bohuzel musime nakonfigurovat PDF export zde, protoze pro nej neexistuje spolecna funkce
+ */
 function setupPdfExport()
 {
-    // bohuzel musime nakonfigurovat PDF export zde, protoze pro nej neexistuje spolecna funkce
     define('PDF_MEMORY_LIMIT', '512M');
     $mpdf_dir = TEMP_DIR . '/mpdf/';
     $mpdf_tmp_dir = $mpdf_dir . 'tmp/';
