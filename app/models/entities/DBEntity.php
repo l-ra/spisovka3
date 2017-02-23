@@ -259,7 +259,7 @@ abstract class DBEntity implements IteratorAggregate
     }
 
     /**
-     * creates an instance and returns it
+     * Creates an instance and returns it
      * 
      * @param   data
      * @returns object
@@ -272,7 +272,7 @@ abstract class DBEntity implements IteratorAggregate
     }
 
     /**
-     * Utility function. So getting user is at one place.
+     * Utility function. So that getting user is at one place.
      * @return Spisovka\User
      */
     public static function getUser()
