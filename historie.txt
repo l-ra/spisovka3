@@ -295,7 +295,8 @@ Administrace:
 - aplikace nyní při zadávání e-mailové adresy kontroluje její formát. Navíc 
   aktualizační skript adresy zkontroluje a chyby vypíše na obrazovku.
 - rozlišeno vytváření a editace spisů a složek pro spisy
-- opraven skript pro migraci ze spisové služby verze 2
+- řazení spisových znaků v seznamu mohlo být chybné. Aplikace při aktualizaci
+  na tuto verzi provede nové vygenerování pomocných dat pro řazení.
 
 === Verze 3.4.1 ================================================================
 

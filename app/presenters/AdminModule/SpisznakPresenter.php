@@ -255,4 +255,12 @@ class Admin_SpisznakPresenter extends BasePresenter
         }
     }
 
+    public function actionRebuild()
+    {
+        $m = new SpisovyZnak();
+        $m->rebuildIndex();
+        $this->flashMessage('Operace proběhla úspěšně.');
+        $this->redirect('seznam');
+    }
+
 }

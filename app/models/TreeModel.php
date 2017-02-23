@@ -141,22 +141,21 @@ abstract class TreeModel extends BaseModel
         dibi::begin();
         try {
             // vlastní $data['sekvence_string'] určuje pouze model spisového znaku
-            $sekvence_string = isset($data['sekvence_string']) ? $data['sekvence_string'] : substr($data[$this->column_ordering],
-                            0, self::ORDERING_MAX_LENGTH);
             unset($data['sekvence_string']);
 
             // Tato pole nemohou být prázdná, ale můžeme je naplnit až po vložení záznamu
             $data['sekvence'] = $data['sekvence_string'] = '?';
-            
+
             $id = $this->insert($data);
 
             // Aktualizuj pomocna pole
             $parent_id = $data['parent_id'];
             $update_data = array();
+            $sekvence_string = $this->generateSekvenceString($data[$this->column_ordering], $id);
             if (!$parent_id) {
                 // is root node
                 $update_data['sekvence'] = $id;
-                $update_data['sekvence_string'] = $sekvence_string . '.' . $id;
+                $update_data['sekvence_string'] = $sekvence_string;
             } else {
                 // is subnode
                 $parent = $this->select([['id=%i', $parent_id]])->fetch();
@@ -164,12 +163,12 @@ abstract class TreeModel extends BaseModel
                     throw new InvalidArgumentException("TreeModel::vlozitH() - záznam ID $parent_id neexistuje.");
 
                 $update_data['sekvence'] = $parent->sekvence . '.' . $id;
-                $update_data['sekvence_string'] = $parent->sekvence_string . '#' . $sekvence_string . '.' . $id;
+                $update_data['sekvence_string'] = $parent->sekvence_string . '#' . $sekvence_string;
             }
-            
+
             $this->update($update_data, ["id = $id"]);
             dibi::commit();
-            
+
             return $id;
         } catch (Exception $e) {
             dibi::rollback();
@@ -179,115 +178,95 @@ abstract class TreeModel extends BaseModel
 
     public function upravitH($data, $id)
     {
-        // 0. control param
         if (empty($id) || !is_numeric($id))
-            throw new InvalidArgumentException('TreeModel::upravitH() - neplatný parameter "id"');
+            throw new InvalidArgumentException(__METHOD__ . '() - neplatný parameter "id"');
 
-        // 1. clasic update
         dibi::begin();
         try {
-            $sekvence_string = isset($data['sekvence_string']) ? $data['sekvence_string'] : substr($data[$this->column_ordering],
-                            0, self::ORDERING_MAX_LENGTH);
-            unset($data['sekvence_string']);
-
             $old_record = $this->select([['id = %i', $id]])->fetch();
-
-            if (isset($data['spisovy_znak_format'])) {
-                $part = explode(".", $old_record->{$this->column_ordering});
-                if (count($part) > 0) {
-                    foreach ($part as $pi => $pn) {
-                        if (is_numeric($pn)) {
-                            $part[$pi] = sprintf("%04d", $pn);
-                        }
-                    }
-                }
-
-                $info_nazev_sekvence = implode(".", $part);
-                unset($data['spisovy_znak_format']);
-            } else {
-                $info_nazev_sekvence = substr($old_record->{$this->column_ordering},
-                        0, self::ORDERING_MAX_LENGTH);
-            }
+            $old_sekvence_string = $this->generateSekvenceString($old_record[$this->column_ordering],
+                    $id);
+            $new_sekvence_string = $this->generateSekvenceString($data[$this->column_ordering],
+                    $id);
 
             if ($data['parent_id'] == 0)
                 $data['parent_id'] = null;
 
-            $this->update($data, array(array('id=%i', $id)));
+            $this->update($data, "id = $id");
 
             // 2. update tree
+            $data_tree = array();
             $parent_id = $data['parent_id'];
-
-            $parent_id_old = $old_record->parent_id;
-            if (empty($parent_id) && empty($parent_id_old)) {
+            $old_parent_id = $old_record->parent_id;
+            if (empty($parent_id) && empty($old_parent_id)) {
                 $parent_id = 999;
-                $parent_id_old = 999;
+                $old_parent_id = 999;
             }
 
-            $data_tree = array();
-
-            if (empty($parent_id) && !empty($parent_id_old)) {
-                // is root node
-
-                $parent_old = $this->select(array(array('id=%i', $parent_id_old)))->fetch();
-                if (!$parent_old) {
+            if (empty($parent_id) && !empty($old_parent_id)) {
+                // the record is now a root node
+                $old_parent = $this->select([['id = %i', $old_parent_id]])->fetch();
+                if (!$old_parent) {
                     dibi::rollback();
-                    throw new InvalidArgumentException("TreeModel::upravitH() - záznam ID $parent_id_old neexistuje.");
+                    throw new InvalidArgumentException(__METHOD__ . "() - záznam ID $old_parent_id neexistuje.");
                 }
 
                 $data_tree['sekvence'] = $id;
-                $data_tree['sekvence_string'] = $sekvence_string . '.' . $id;
-                $this->update($data_tree, array(array('id=%i', $id)));
+                $data_tree['sekvence_string'] = $new_sekvence_string;
+                $this->update($data_tree, array(array('id = %i', $id)));
 
                 // change child nodes
                 $data_node = array();
-                $data_node['sekvence%sql'] = "REPLACE(sekvence,'" . $parent_old->sekvence . '.' . $id . "','" . $id . "')";
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'" . $parent_old->sekvence_string . "#" . $info_nazev_sekvence . "." . $id . "','" . $sekvence_string . "." . $id . "')";
+                $data_node['sekvence%sql'] = "REPLACE(sekvence,'$old_parent->sekvence.$id.','$id.')";
+                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string, '$old_parent->sekvence_string#$old_sekvence_string#', '$new_sekvence_string#')";
 
                 $this->update($data_node,
-                        array(array("sekvence LIKE %s", $parent_old->sekvence . '.' . $id . ".%")));
-            } else if ($parent_id != $parent_id_old && empty($parent_id_old)) {
-                // change parent from root
-                $parent_new = $this->select(array(array('id=%i', $parent_id)))->fetch();
-                if (!$parent_new) {
+                        [["sekvence LIKE %s", "$old_parent->sekvence.$id.%"]]);
+            } else if ($parent_id != $old_parent_id && empty($old_parent_id)) {
+                // the record is no longer a root node
+                $new_parent = $this->select(array(array('id = %i', $parent_id)))->fetch();
+                if (!$new_parent) {
                     dibi::rollback();
-                    throw new InvalidArgumentException("TreeModel::upravitH() - záznam ID $parent_id neexistuje.");
+                    throw new InvalidArgumentException(__METHOD__ . "() - záznam ID $parent_id neexistuje.");
                 }
 
-                $data_tree['sekvence'] = $parent_new->sekvence . '.' . $id;
-                $data_tree['sekvence_string'] = $parent_new->sekvence_string . '#' . $sekvence_string . '.' . $id;
-                $this->update($data_tree, array(array('id=%i', $id)));
+                $data_tree['sekvence'] = "$new_parent->sekvence.$id";
+                $data_tree['sekvence_string'] = "$new_parent->sekvence_string#$new_sekvence_string";
+                $this->update($data_tree, array(array('id = %i', $id)));
 
                 // change child nodes
                 $data_node = array();
-                $data_node['sekvence%sql'] = "REPLACE(sekvence,'" . $id . "','" . $parent_new->sekvence . '.' . $id . "')";
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'" . $info_nazev_sekvence . "." . $id . "','" . $parent_new->sekvence_string . "#" . $sekvence_string . "." . $id . "')";
-                $this->update($data_node, array(array("sekvence LIKE %s", $id . ".%")));
-            } else if ($parent_id != $parent_id_old) {
-                // change parent
-                $parent_old = $this->select(array(array('id=%i', $parent_id_old)))->fetch();
-                $parent_new = $this->select(array(array('id=%i', $parent_id)))->fetch();
-                if (!$parent_new) {
+                $data_node['sekvence%sql'] = "REPLACE(sekvence,'$id.','$new_parent->sekvence.$id.')";
+                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string, '$old_sekvence_string#', '$new_parent->sekvence_string#$new_sekvence_string#')";
+                $this->update($data_node, [["sekvence LIKE %s", "$id.%"]]);
+            } else if ($parent_id != $old_parent_id) {
+                // new parent
+                $old_parent = $this->select(array(array('id = %i', $old_parent_id)))->fetch();
+                $new_parent = $this->select(array(array('id = %i', $parent_id)))->fetch();
+                if (!$new_parent) {
                     dibi::rollback();
-                    throw new InvalidArgumentException("TreeModel::upravitH() - záznam ID $parent_id neexistuje.");
+                    throw new InvalidArgumentException(__METHOD__ . "() - záznam ID $parent_id neexistuje.");
                 }
 
-                $data_tree['sekvence'] = $parent_new->sekvence . '.' . $id;
-                $data_tree['sekvence_string'] = $parent_new->sekvence_string . '#' . $sekvence_string . '.' . $id;
-                $this->update($data_tree, array(array('id=%i', $id)));
+                $data_tree['sekvence'] = "$new_parent->sekvence.$id";
+                $data_tree['sekvence_string'] = "$new_parent->sekvence_string#$new_sekvence_string";
+                $this->update($data_tree, array(array('id = %i', $id)));
 
                 // change child nodes
                 $data_node = array();
-                $data_node['sekvence%sql'] = "REPLACE(sekvence,'" . $parent_old->sekvence . '.' . $id . "','" . $parent_new->sekvence . '.' . $id . "')";
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'" . $parent_old->sekvence_string . "#" . $info_nazev_sekvence . "." . $id . "','" . $parent_new->sekvence_string . "#" . $sekvence_string . "." . $id . "')";
+                $data_node['sekvence%sql'] = "REPLACE(sekvence,'$old_parent->sekvence.$id.','$new_parent->sekvence.$id.')";
+                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string, '$old_parent->sekvence_string#$old_sekvence_string#', '$new_parent->sekvence_string#$new_sekvence_string#')";
                 $this->update($data_node,
-                        array(array("sekvence LIKE %s", $parent_old->sekvence . '.' . $id . ".%")));
+                        [["sekvence LIKE %s", "$old_parent->sekvence.$id.%"]]);
             } else {
-                // nochange parent
-
-                $data_node = array();
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'" . $info_nazev_sekvence . "." . $id . "','" . $sekvence_string . "." . $id . "')";
-                $this->update($data_node,
-                        array(array("sekvence_string LIKE %s", "%" . $info_nazev_sekvence . "." . $id . "%")));
+                // position in tree is unchanged
+                if ($old_sekvence_string != $new_sekvence_string) {
+                    // change child nodes
+                    $data_node = array();
+                    $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string, '#$old_sekvence_string#', '#$new_sekvence_string#')";
+                    $this->update($data_node,
+                            [["sekvence LIKE %s", "$old_record->sekvence.%"]]);
+                }
             }
 
             dibi::commit();
@@ -362,22 +341,15 @@ abstract class TreeModel extends BaseModel
         }
     }
 
-    private function make_string($pass_len = 8)
+    /**
+     * Vygeneruje pole sekvence_string pro jednu úroveň stromu.
+     * @param string $string
+     * @param int $id
+     * @return string 
+     */
+    protected function generateSekvenceString($string, $id)
     {
-        $salt = 'abcdefghijklmnopqrstuvwxyz';
-        $salt = strtoupper($salt);
-        $salt_len = strlen($salt);
-        /* function make_seed()
-          {
-          list($usec, $sec) = explode(' ', microtime());
-          return (float) $sec + ((float) $usec * 100000);
-          } */
-        mt_srand(make_seed());
-        $pass = '';
-        for ($i = 0; $i < $pass_len; $i++) {
-            $pass .= substr($salt, mt_rand() % $salt_len, 1);
-        }
-        return $pass;
+        return mb_substr($string, 0, self::ORDERING_MAX_LENGTH) . '.' . $id;
     }
 
     /**
@@ -392,7 +364,6 @@ abstract class TreeModel extends BaseModel
             dibi::begin();
             $res = dibi::query("SELECT id, parent_id, {$this->column_ordering} AS order_by FROM {$this->name}");
             $data = $res->fetchAssoc('id');
-
             $processed = [];
 
             foreach ($data as $id => &$row) {
@@ -400,7 +371,7 @@ abstract class TreeModel extends BaseModel
                     continue;
                 $processed[$id] = true;
                 $row->sekvence = $id;
-                $row->sekvence_string = substr($row->order_by, 0, self::ORDERING_MAX_LENGTH) . '.' . $id;
+                $row->sekvence_string = $this->generateSekvenceString($row->order_by, $id);
             }
 
             do {
@@ -414,23 +385,27 @@ abstract class TreeModel extends BaseModel
                     $found_one = true;
                     $row->sekvence = $data[$row->parent_id]->sekvence . '.' . $id;
                     $row->sekvence_string = $data[$row->parent_id]->sekvence_string . '#'
-                            . substr($row->order_by, 0, self::ORDERING_MAX_LENGTH) . '.' . $id;
+                            . $this->generateSekvenceString($row->order_by, $id);
                 }
             } while ($found_one);
 
-            foreach ($data as $id => $row) {
+            /**
+             *  $row je teď reference, nelze použít následující!!
+             *  foreach ($data as &$row) ...
+             *  foreach ($data as $row) ...
+             */
+            foreach ($data as $id => &$row) {
                 dibi::query("UPDATE [{$this->name}] SET [sekvence] = %s, [sekvence_string] = %s WHERE [id] = $id",
                         $row->sekvence, $row->sekvence_string);
             }
-            
+
             dibi::commit();
-            
+
             return true;
         } catch (Exception $e) {
             dibi::rollback();
             throw $e;
         }
-
     }
 
 }

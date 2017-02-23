@@ -143,3 +143,5 @@ Změna přiřazení dokumentů do spisu v databázi.
 Odstranění sloupce "id" z tabulky acl_role_to_privilege, pokud sloupec existuje.
 [1490]
 Zvětšení délky pole v protokolu přihlášení, aby se do něj vešla IPv6 adresa.
+[1500]
+Spisové znaky - nové vygenerování pomocných dat pro řazení.

@@ -102,25 +102,12 @@ class SpisovyZnak extends TreeModel
         if (!isset($data['spousteci_udalost_id']))
             $data['spousteci_udalost_id'] = 3;
 
-        $part = explode(".", $data['nazev']);
-        if (count($part) > 0) {
-            foreach ($part as $pi => $pn) {
-                if (is_numeric($pn)) {
-                    $part[$pi] = sprintf("%04d", intval($pn));
-                } else {
-                    $part[$pi] = $pn;
-                }
-            }
-        }
-        $data['sekvence_string'] = implode(".", $part);
-
         $spisznak_id = $this->vlozitH($data);
         return $spisznak_id;
     }
 
     public function upravit($data, $spisznak_id)
     {
-
         $data['date_modified'] = new DateTime();
         $data['user_modified'] = (int) self::getUser()->id;
 
@@ -139,20 +126,26 @@ class SpisovyZnak extends TreeModel
         if (!empty($data['stav']))
             $data['stav'] = (int) $data['stav'];
 
-        $part = explode(".", $data['nazev']);
-        if (count($part) > 0) {
-            foreach ($part as $pi => $pn) {
-                if (is_numeric($pn)) {
-                    $part[$pi] = sprintf("%04d", intval($pn));
-                } else {
-                    $part[$pi] = $pn;
-                }
+        $this->upravitH($data, $spisznak_id);
+    }
+    
+    /**
+     * Vygeneruje pole sekvence_string pro jednu úroveň stromu.
+     * @param string $string
+     * @param int $id
+     * @return string 
+     */
+    protected function generateSekvenceString($string, $id)
+    {
+        $parts = explode(".", $string);
+        if (count($parts) > 0) {
+            foreach ($parts as $pi => $pn) {
+                if (is_numeric($pn))
+                    $parts[$pi] = sprintf("%04d", intval($pn));
             }
         }
-        $data['spisovy_znak_format'] = 1;
-        $data['sekvence_string'] = implode(".", $part);
-
-        $this->upravitH($data, $spisznak_id);
+        
+        return implode(".", $parts);
     }
 
     public function odstranit($spisznak_id, $odebrat_strom)
