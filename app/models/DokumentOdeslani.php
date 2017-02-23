@@ -95,7 +95,6 @@ class DokumentOdeslani extends BaseModel
 
     public function kOdeslani($volba_razeni, $hledani, $filtr = null)
     {
-
         switch ($volba_razeni) {
             case 'datum_desc':
                 $razeni = array('ds.datum_odeslani' => 'DESC', 's.nazev_subjektu', 's.prijmeni', 's.jmeno');
@@ -112,7 +111,7 @@ class DokumentOdeslani extends BaseModel
 
         $sql = array(
             'from' => array($this->name => 'ds'),
-            'cols' => array('dokument_id', 'ds.id' => 'dokodes_id', 'subjekt_id', 'datum_odeslani', 'zpusob_odeslani_id', 'user_id', 'zprava', 'cena', 'hmotnost', 'cislo_faxu', 'stav', 'druh_zasilky', 'ds.poznamka' => 'poznamka_odeslani'),
+            'cols' => array('*', 'ds.id' => 'dokodes_id', 'ds.poznamka' => 'poznamka_odeslani'),
             'leftJoin' => array(
                 'subjekt' => array(
                     'from' => array($this->tb_subjekt => 's'),
@@ -129,27 +128,13 @@ class DokumentOdeslani extends BaseModel
                     'on' => array('dok.id=ds.dokument_id'),
                     'cols' => array('nazev' => 'dok_nazev', 'jid' => 'dok_jid', 'cislo_jednaci' => 'dok_cislo_jednaci', 'poradi' => 'dok_poradi')
                 ),
-                'o2user' => array(
-                    'from' => array($this->tb_user => 'o2user'),
-                    'on' => array('o2user.id = ds.user_id'),
-                    'cols' => array()
-                ),
-                'osoba' => array(
-                    'from' => array($this->tb_osoba => 'osoba'),
-                    'on' => array('osoba.id=o2user.osoba_id'),
-                    'cols' => array(
-                        'prijmeni' => 'user_prijmeni', 'jmeno' => 'user_jmeno', 'titul_pred' => 'user_titul_pred', 'titul_za' => 'user_titul_za'
-                    )
-                ),
             ),
             'order' => $razeni
         );
 
-
-        $sql['where'] = array(array('ds.stav=1'));
-
+        $sql['where'] = array(array('ds.stav = 1'));
         if ($filtr !== null) {
-            $sql['where'][] = array('ds.zpusob_odeslani_id=3');
+            $sql['where'][] = array('ds.zpusob_odeslani_id = 3');
         }
 
         if (!empty($hledani))

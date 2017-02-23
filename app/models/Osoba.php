@@ -36,78 +36,41 @@ class Osoba extends BaseModel
         return $this->seznamOsobSUcty($search);
     }
 
+    /**
+     * @param object|array $data
+     * @param string $display
+     * @return string
+     */
     public static function displayName($data, $display = 'full')
     {
         if (is_string($data))
             return $data;
-        if (is_array($data)) {
-            $tmp = new stdClass();
-            $tmp->jmeno = $data['jmeno'];
-            $tmp->prijmeni = $data['prijmeni'];
-            $tmp->titul_pred = $data['titul_pred'];
-            $tmp->titul_za = $data['titul_za'];
-            $data = $tmp;
-            unset($tmp);
-        }
+        if (is_array($data))
+            $data = (object)$data;
         if (!is_object($data))
             return "";
 
-        if ($data instanceof DibiRow && isset($data->osoba_prijmeni)) {
-            $tmp = new stdClass();
-            $tmp->jmeno = $data->osoba_jmeno;
-            $tmp->prijmeni = $data->osoba_prijmeni;
-            $tmp->titul_pred = $data->osoba_titul_pred;
-            $tmp->titul_za = $data->osoba_titul_za;
-            $data = $tmp;
-            unset($tmp);
-        }
-
-        if ($data instanceof DibiRow && isset($data->user_prijmeni) && $display == 'user') {
-            $tmp = new stdClass();
-            $tmp->jmeno = $data->user_jmeno;
-            $tmp->prijmeni = $data->user_prijmeni;
-            $tmp->titul_pred = $data->user_titul_pred;
-            $tmp->titul_za = $data->user_titul_za;
-            $data = $tmp;
-            unset($tmp);
-        }
-
-        // Sestaveni prvku z jmena
-
-        $titul_pred = "";
-        $titul_pred_item = "";
-        if (isset($data->titul_pred)) {
-            if (!empty($data->titul_pred)) {
-                $titul_pred = $data->titul_pred . " ";
-                $titul_pred_item = ", " . $data->titul_pred;
-            }
+        $titul_pred = $titul_pred_item = "";
+        if (isset($data->titul_pred) && !empty($data->titul_pred)) {
+            $titul_pred = $data->titul_pred . " ";
+            $titul_pred_item = ", " . $data->titul_pred;
         }
 
         $jmeno = "";
-        if (isset($data->jmeno)) {
-            if (!empty($data->jmeno)) {
-                $jmeno = $data->jmeno;
-            }
-        }
+        if (isset($data->jmeno) && !empty($data->jmeno))
+            $jmeno = $data->jmeno;
 
         $prijmeni = "";
-        if (isset($data->prijmeni)) {
-            if (!empty($data->prijmeni)) {
-                $prijmeni = $data->prijmeni;
-            }
-        }
+        if (isset($data->prijmeni) && !empty($data->prijmeni))
+            $prijmeni = $data->prijmeni;
 
         $titul_za = "";
-        if (isset($data->titul_za)) {
-            if (!empty($data->titul_za)) {
-                $titul_za = ', ' . $data->titul_za;
-            }
-        }
+        if (isset($data->titul_za) && !empty($data->titul_za))
+            $titul_za = ', ' . $data->titul_za;
 
         $jmeno_prijmeni = $jmeno ? "$jmeno $prijmeni" : $prijmeni;
         $prijmeni_jmeno = $jmeno ? "$prijmeni $jmeno" : $prijmeni;
 
-        // Sestaveni jmena
         switch ($display) {
             case 'full':
             default:
@@ -116,10 +79,8 @@ class Osoba extends BaseModel
                 return $jmeno_prijmeni;
             case 'full_item':
                 return $prijmeni_jmeno . $titul_pred_item . $titul_za;
-            case 'basic_item':
-                return $prijmeni_jmeno;
-            case 'last_name':
-                return $prijmeni;
+            /* case 'basic_item':
+              return $prijmeni_jmeno; */
         }
     }
 

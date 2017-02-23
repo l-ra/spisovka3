@@ -33,54 +33,50 @@
             <th class="predal">Předal</th>
             <th class="druh-zasilky">Druh zásilky / cena / hmotnost / zpráva</th>
         </tr>
-        {foreach $seznam as $dok}
+        {foreach $seznam as $odes}
         <tr>
             <td class="akce">
-                {control bulkAction:checkbox $dok->dokodes_id}
+                {control bulkAction:checkbox $odes->dokodes_id}
             </td>
             <td class="typ">
-                {$dok->zpusob_odeslani_nazev}
+                {$odes->zpusob_odeslani_nazev}
             </td>
             <td class="datum">
-                {$dok->datum_odeslani|edate}
+                {$odes->datum_odeslani|edate}
             </td>
             <td class="cislo_jednaci">
-                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$dok->dokument_id}" title="Zobrazit detail dokumentu">
-                   {if empty($dok->dok_cislo_jednaci)}
+                &nbsp;<strong><a href="{link :Spisovka:Dokumenty:detail, 'id'=>$odes->dokument_id}" title="Zobrazit detail dokumentu">
+                   {if empty($odes->dok_cislo_jednaci)}
                    (není evidován)
                    {else}
-                   {$dok->dok_cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$dok->dok_poradi}{/if}
+                   {$odes->dok_cislo_jednaci}{if $Typ_evidence=='sberny_arch'}{$Oddelovac_poradi}{$odes->dok_poradi}{/if}
                    {/if}
                 </a></strong>
-                <div class="small">&nbsp;{$dok->dok_jid}</div>
+                <div class="small">&nbsp;{$odes->dok_jid}</div>
             </td>
             <td class="vec">
-                <strong><a href="{link detail, 'id'=>$dok->dokodes_id}" title="Zobrazit detail záznamu">{=Subjekt::displayName($dok,'jmeno_item')}</a></strong>
+                <strong><a href="{link detail, 'id' => $odes->dokodes_id}" title="Zobrazit detail záznamu">{=Subjekt::displayName($odes, 'jmeno_item')}</a></strong>
                 <div class="mezera">
-                {if $dok->zpusob_odeslani_id == 1 }    
-                {=Subjekt::displayName($dok,'email')}
-                {elseif $dok->zpusob_odeslani_id == 2 }    
-                {=Subjekt::displayName($dok,'isds')}
-                {elseif $dok->zpusob_odeslani_id == 4 }    
-                {$dok->cislo_faxu}
+                {if $odes->zpusob_odeslani_id == 4}
+                    {$odes->cislo_faxu}
                 {else}    
-                {=Subjekt::displayName($dok,'adresa')}
+                    {=Subjekt::displayName($odes, 'adresa')}
                 {/if}    
                 </div>
-                {if !empty($dok->poznamka_odeslani)}
-                <br />poznámka: {$dok->poznamka_odeslani}
+                {if !empty($odes->poznamka_odeslani)}
+                    <br />poznámka: {$odes->poznamka_odeslani}
                 {/if}
             </td>
             <td class="predal">
-                {=Osoba::displayName($dok,'user')}
+                {= Person::fromUserId($odes->user_id)}
             </td>
             <td class="druh-zasilky">
-                {if $dok->zpusob_odeslani_id == 3 }    
-                {!=DruhZasilky::vypis($dok->druh_zasilky)}
-                {if !empty($dok->cena)}<br />cena: {$dok->cena} Kč{/if}
-                {if !empty($dok->hmotnost)}<br />hmotnost: {$dok->hmotnost|decPoint} kg{/if}
-                {elseif $dok->zpusob_odeslani_id == 4 }    
-                <a class="ajax-dialog" data-title="Faxová zpráva" href="{link zobrazFax, 'id' => $dok->dokodes_id}" title="Zobrazit zprávu pro příjemce">zobrazit zprávu</a>
+                {if $odes->zpusob_odeslani_id == 3 }    
+                {!=DruhZasilky::vypis($odes->druh_zasilky)}
+                {if !empty($odes->cena)}<br />cena: {$odes->cena} Kč{/if}
+                {if !empty($odes->hmotnost)}<br />hmotnost: {$odes->hmotnost|decPoint} kg{/if}
+                {elseif $odes->zpusob_odeslani_id == 4 }    
+                <a class="ajax-dialog" data-title="Faxová zpráva" href="{link zobrazFax, 'id' => $odes->dokodes_id}" title="Zobrazit zprávu pro příjemce">zobrazit zprávu</a>
                 {/if}                 
                 &nbsp;
             </td>

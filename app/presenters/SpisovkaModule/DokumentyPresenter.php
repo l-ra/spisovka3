@@ -1405,8 +1405,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $person = Person::fromUserId($this->user->id);
         if (!empty($person->email)) {
-            $key = "user#" . Osoba::displayName($person, 'jmeno') . "#" . $person->email;
-            $odesilatele[$key] = Osoba::displayName($person, 'jmeno') . " <" . $person->email . "> [zaměstnanec]";
+            $key = "user#" . Osoba::displayName($person, 'basic') . "#" . $person->email;
+            $odesilatele[$key] = Osoba::displayName($person, 'basic') . " <" . $person->email . "> [zaměstnanec]";
         }
 
         $form = new Spisovka\Form();
