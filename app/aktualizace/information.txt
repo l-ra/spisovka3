@@ -145,3 +145,5 @@ Odstranění sloupce "id" z tabulky acl_role_to_privilege, pokud sloupec existuj
 Zvětšení délky pole v protokolu přihlášení, aby se do něj vešla IPv6 adresa.
 [1500]
 Spisové znaky - nové vygenerování pomocných dat pro řazení.
+[1510]
+Přidání indexů na sloupci sekvence u tabulek spis a spisovy_znak.
