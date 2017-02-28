@@ -1452,8 +1452,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                 // isds
                 if ($this->template->VyzadatIsdsHeslo)
-                    $form->addText("isds_heslo_$sid", 'Heslo do datové schránky:', 20)
-                            ->setRequired();
+                    $form->addPassword("isds_heslo_$sid", 'Heslo do datové schránky:', 20);
 
                 $form->addText("isds_predmet_$sid", 'Předmět zprávy:', 80)
                         ->setRequired()
