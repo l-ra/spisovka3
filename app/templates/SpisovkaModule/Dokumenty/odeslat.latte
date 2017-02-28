@@ -87,16 +87,20 @@
                         <tr id="odes_{$subjekt->id}_2" class="odes_form">
                             <td class="icon"></td>
                             <td colspan="2">
-                                {if $VyzadatIsdsHeslo}
-                                    {input2 "isds_heslo_$subjekt->id"}                                
+                                {if !isset($form["isds_predmet_$subjekt->id"])}
+                                    <span style="color: red">Adresát nemá vyplněno ID datové schránky.</span>
+                                {else}
+                                    {if $VyzadatIsdsHeslo}
+                                        {input2 "isds_heslo_$subjekt->id"}                                
+                                    {/if}
+                                    {input2 "isds_predmet_$subjekt->id"}                                
+                                    {input2 "isds_cjednaci_odes_$subjekt->id"}                                
+                                    {input2 "isds_spis_odes_$subjekt->id"}                                
+                                    {input2 "isds_cjednaci_adres_$subjekt->id"}                                
+                                    {input2 "isds_spis_adres_$subjekt->id"}                                
+                                    {input2 "isds_dvr_$subjekt->id"}                                
+                                    {input2 "isds_fikce_$subjekt->id"}                                
                                 {/if}
-                                {input2 "isds_predmet_$subjekt->id"}                                
-                                {input2 "isds_cjednaci_odes_$subjekt->id"}                                
-                                {input2 "isds_spis_odes_$subjekt->id"}                                
-                                {input2 "isds_cjednaci_adres_$subjekt->id"}                                
-                                {input2 "isds_spis_adres_$subjekt->id"}                                
-                                {input2 "isds_dvr_$subjekt->id"}                                
-                                {input2 "isds_fikce_$subjekt->id"}                                
                             </td>
                         </tr>
                         <tr><td colspan="3" class="odeslat-subjekty-separator"></td></tr>

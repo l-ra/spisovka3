@@ -353,8 +353,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $OrgJednotky = new OrgJednotka();
         $this->template->orgunit_list = $OrgJednotky->linearniSeznam();
-        
-        $this->template->called_from_spis = (boolean)$this->getParameter('from_spis');
+
+        $this->template->called_from_spis = (boolean) $this->getParameter('from_spis');
     }
 
     public function actionPredat($id, $user = null, $orgunit = null, $note = null, $from_spis = false)
@@ -368,7 +368,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
         if (!$from_spis)
             $this->redirect('detail', $id);
-        
+
         $this->redirect('Spisy:detail', $doc->getSpis()->id);
     }
 
@@ -679,7 +679,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $args_rozd = array();
         $args_rozd['where'] = ['stav = 0',
             'dokument_typ_id = 2',
-                ['cislo_jednaci = %s', $doc->cislo_jednaci],
+            ['cislo_jednaci = %s', $doc->cislo_jednaci],
             "user_created = {$this->user->id}"
         ];
         $args_rozd['order'] = array('date_created' => 'DESC');
@@ -1278,7 +1278,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if ($default_event)
                 $form['spousteci_udalost_id']->setDefaultValue($default_event->id);
         }
-        
+
         $form->addText('vyrizeni_pocet_listu', 'Počet listů:', 5, 10)
                 ->setValue(@$Dok->vyrizeni_pocet_listu)->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet listů musí být číslo');
@@ -1451,23 +1451,25 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 }
 
                 // isds
-                if ($this->template->VyzadatIsdsHeslo)
-                    $form->addPassword("isds_heslo_$sid", 'Heslo do datové schránky:', 20);
+                if (!empty($subjekt->id_isds)) {
+                    if ($this->template->VyzadatIsdsHeslo)
+                        $form->addPassword("isds_heslo_$sid", 'Heslo do datové schránky:', 20);
 
-                $form->addText("isds_predmet_$sid", 'Předmět zprávy:', 80)
-                        ->setRequired()
-                        ->setDefaultValue($Dok->nazev);
-                $form->addText("isds_cjednaci_odes_$sid", 'Číslo jednací odesílatele:', 50)
-                        ->setDefaultValue($Dok->cislo_jednaci);
-                $form->addText("isds_spis_odes_$sid", 'Spisová značka odesílatele:', 50)
-                        ->setDefaultValue($this->template->SpisovaZnacka);
-                $form->addText("isds_cjednaci_adres_$sid", 'Číslo jednací adresáta:', 50)
-                        ->setDefaultValue($Dok->cislo_jednaci_odesilatele);
-                $form->addText("isds_spis_adres_$sid", 'Spisová značka adresáta:', 50);
+                    $form->addText("isds_predmet_$sid", 'Předmět zprávy:', 80)
+                            ->setRequired()
+                            ->setDefaultValue($Dok->nazev);
+                    $form->addText("isds_cjednaci_odes_$sid", 'Číslo jednací odesílatele:', 50)
+                            ->setDefaultValue($Dok->cislo_jednaci);
+                    $form->addText("isds_spis_odes_$sid", 'Spisová značka odesílatele:', 50)
+                            ->setDefaultValue($this->template->SpisovaZnacka);
+                    $form->addText("isds_cjednaci_adres_$sid", 'Číslo jednací adresáta:', 50)
+                            ->setDefaultValue($Dok->cislo_jednaci_odesilatele);
+                    $form->addText("isds_spis_adres_$sid", 'Spisová značka adresáta:', 50);
 
-                $form->addCheckbox("isds_dvr_$sid", 'Do vlastních rukou?');
-                $form->addCheckbox("isds_fikce_$sid", 'Doručit fikcí?')
-                        ->setDefaultValue(true);
+                    $form->addCheckbox("isds_dvr_$sid", 'Do vlastních rukou?');
+                    $form->addCheckbox("isds_fikce_$sid", 'Doručit fikcí?')
+                            ->setDefaultValue(true);
+                }
             }
 
         $form->addSubmit('odeslat', 'Předat podatelně či Odeslat')
