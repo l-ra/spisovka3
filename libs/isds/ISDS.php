@@ -162,64 +162,22 @@ class ISDS
     }
 
     /**
-     * Vytvori datovou zpravu a umisti ji do dane schranky. Vrati identifikaci vytvorene zpravy.
-     *
-     * @param <type> $IDRecipient           Identifikace adresata
-     * @param <type> $Annotation            Textova poznamka (vec, predmet, anotace)
-     * @param <type> $AllowSubstDelivery    Nahradni doruceni povoleno/nepovoleno - pouze pro nektere subjekty (napr. soudy)
-     * @param <type> $LegalTitleLaw         Zmocneni - cislo zakona
-     * @param <type> $LegalTitlePar         Zmocneni - odstavec v paragrafu
-     * @param <type> $LegalTitlePoint       Zmocneni - pismeno v odstavci
-     * @param <type> $LegalTitleSect        Zmocneni - paragraf v zakone
-     * @param <type> $LegalTitleYear        Zmocneni - rok vydani zakona
-     * @param <type> $RecipientIdent        Spisova znacka ze strany prijemce, Nepovinne.
-     * @param <type> $RecipientOrgUnit      Organizacni jednotka prijemce slovne, nepovinne, mozne upresneni prijemce pri podani z portalu
-     * @param <type> $RecipientOrgUnitNum   Organizacni jednotka prijemce hodnotou z ciselniku, nepovinne, pokud nechcete urcit zadejte -1
-     * @param <type> $RecipientRefNumber    Cislo jednaci ze strany prijemce, nepovinne
-     * @param <type> $SenderIdent           Spisova znacka ze strany odesilatele
-     * @param <type> $SenderOrgUnit         Organizacni jednotka odesilatele slovne. Nepovinne
-     * @param <type> $SenderOrgUnitNum      Organizacni jednotka odesilatele hodnotou z ciselniku. Nepovinne.
-     * @param <type> $SenderRefNumber       Cislo jednaci ze strany odesilatele. Nepovinne
-     * @param <type> $ToHands               Popis komu je zasilka urcena
-     * @param <type> $PersonalDelivery      Priznak "Do vlastnich rukou" znacici, ze zpravu muze cist pouze adresat nebo osoba s explicitne danym opravnenim
-     * @param <type> $OVM                   Priznak je-li DS odesilana v rezimu OVM
-     * @param <type> $outFiles              Pripojene soubory (pisemnosti)
-     * @return dmID
+     * Wrapper pro funkci CreateMessage
+     * 
+     * @param array $messageCreateInput
+     * @return int|false dmID
      */
-    public function CreateMessage(
-    $IDRecipient, $Annotation, $AllowSubstDelivery, $LegalTitleLaw, $LegalTitlePar, $LegalTitlePoint, $LegalTitleSect, $LegalTitleYear, $RecipientIdent, $RecipientOrgUnit, $RecipientOrgUnitNum, $RecipientRefNumber, $SenderIdent, $SenderOrgUnit, $SenderOrgUnitNum, $SenderRefNumber, $ToHands, $PersonalDelivery, $OVM, $outFiles)
+    public function CreateMessage(array $messageCreateInput)
     {
-        $envelope = array(
-            'dmSenderOrgUnit' => $SenderOrgUnit,
-            'dmSenderOrgUnitNum' => $SenderOrgUnitNum,
-            'dbIDRecipient' => $IDRecipient,
-            'dmRecipientOrgUnit' => $RecipientOrgUnit,
-            'dmRecipientOrgUnitNum' => $RecipientOrgUnitNum,
-            'dmToHands' => $ToHands,
-            'dmAnnotation' => $Annotation,
-            'dmRecipientRefNumber' => $RecipientRefNumber,
-            'dmSenderRefNumber' => $SenderRefNumber,
-            'dmRecipientIdent' => $RecipientIdent,
-            'dmSenderIdent' => $SenderIdent,
-            'dmLegalTitleLaw' => $LegalTitleLaw,
-            'dmLegalTitleYear' => $LegalTitleYear,
-            'dmLegalTitleSect' => $LegalTitleSect,
-            'dmLegalTitlePar' => $LegalTitlePar,
-            'dmLegalTitlePoint' => $LegalTitlePoint,
-            'dmPersonalDelivery' => $PersonalDelivery,
-            'dmAllowSubstDelivery' => $AllowSubstDelivery,
-            'dmOVM' => $OVM);
-
-        $messageCreateInput = array(
-            'dmEnvelope' => $envelope,
-            'dmFiles' => $outFiles->fileInfos());
-
         $messageCreateOutput = $this->OperationsWS()->CreateMessage($messageCreateInput);
-        $messageID = $messageCreateOutput->dmID;
+        
         $messageStatus = $messageCreateOutput->dmStatus;
         $this->StatusCode = $messageStatus->dmStatusCode;
         $this->StatusMessage = $messageStatus->dmStatusMessage;
-        return $messageID;
+        if (isset($messageCreateOutput->dmID))
+            return $messageCreateOutput->dmID;
+        
+        return false;
     }
 
     /**

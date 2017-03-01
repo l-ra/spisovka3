@@ -158,14 +158,8 @@ class ISDS_Spisovka extends ISDS
             'dmEnvelope' => $dmEnvelope,
             'dmFiles' => $dmFiles
         );
-
-        $MessageCreateOutput = $this->OperationsWS()->CreateMessage($MessageCreateInput);
-
-        if (isset($MessageCreateOutput->dmID)) {
-            $MessageID = $MessageCreateOutput->dmID;
-            return $MessageID;
-        }
-        return false;
+        
+        return $this->CreateMessage($MessageCreateInput);
     }
 
     public static function stavDS($dbState)
