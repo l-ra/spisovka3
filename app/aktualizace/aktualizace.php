@@ -54,7 +54,8 @@ try {
     $loader->register();
 
     Updates::init();
-
+    require Updates::get_update_dir() . 'scripts.php';
+    
     $res = Updates::find_updates();
     $revisions = $res['revisions'];
     $alter_scripts = $res['alter_scripts'];
@@ -163,9 +164,6 @@ foreach ($clients as $site_path => $site_name) {
 
                 if (isset($descriptions[$rev]))
                     echo "<div class='update_info'>{$descriptions[$rev]}</div>";
-
-                // php z nepochopitelnych duvodu hlasi warning, neni-li pouzit @
-                @include_once Updates::get_update_dir() . $rev . '_code.php';
 
                 $function_name = "revision_{$rev}_check";
                 if (function_exists($function_name) && $do_update) {
