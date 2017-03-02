@@ -181,6 +181,10 @@ class Document extends DBEntity
             if ($spis && $orgunit_id === null)
                 throw new Exception('Uživatel není zařazen do organizační jednotky, není možné mu předávat spisy.');
             
+            $log_text = $spis ? $log_spis : $log;
+            if (!empty($note))
+                $log_text .= "\nPoznámka k předání: $note";
+            
             $docs = $spis ? $spis->getDocuments() : [$this];
             foreach ($docs as $doc) {
                 $doc->is_forwarded = true;
@@ -197,7 +201,7 @@ class Document extends DBEntity
                 else
                     $doc->_saveInternal(); // neprováděj kontrolu
 
-                $Log->logDokument($doc->id, LogModel::DOK_PREDAN, $spis ? $log_spis : $log);
+                $Log->logDokument($doc->id, LogModel::DOK_PREDAN, $log_text);
             }
             if ($spis) {
                 $spis->forward(new OrgUnit($orgunit_id));

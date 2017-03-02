@@ -243,6 +243,7 @@ Spisová služba:
   z libovolného dokumentu
 - převzetí dokumentu ve spisu za specifických okolností vedlo ke zmizení ostatních 
   dokumentů ve spisu (dokumenty přestaly být v aplikaci vidět)
+- poznámka k převzetí se nyní zapisuje do transakčního protokolu dokumentu
 - předání a převzetí spisu už nezpůsobí otevření vyřízených dokumentů ve spisu
 - spis byl dříve vytvářen s výchozím skartačním režimem A/10 nebo S/10. Nyní
   pokud uživatel skartační režim nezadá, zůstane nevyplněn. Je potřeba jej 
