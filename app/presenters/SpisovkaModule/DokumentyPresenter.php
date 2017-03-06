@@ -1022,67 +1022,74 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $data['datum_vzniku'] = $data['datum_vzniku'] . " " . $data['datum_vzniku_cas'];
         unset($data['datum_vzniku_cas']);
 
+        $doc = new Document($dokument_id);
+        if ($doc->stav != 0) {
+            $this->flashMessage('Kontrola platnosti selhala:' . "Dokument ID $dokument_id je již vytvořen.",
+                    'warning');
+            $this->redirect('detail', $dokument_id);
+        }
+
         try {
-            // [P.L.] 2012-04-13   Pridany zakladni kontroly
-            // TODO [T.V.] 2012-04-23 - zkontrolovat na novou podobu
-            $result = $Dokument->select([['id = %i', $dokument_id]]);
-            if (count($result) != 1) {
-                throw new LogicException("Rozepsaný dokument ID $dokument_id nenalezen.", 1);
-            }
-            $row = $result->fetch();
-            $stav = $row['stav'];
-            if ($stav != 0) {
-                throw new LogicException("Dokument ID $dokument_id je již vytvořen.", 2);
-            }
-            unset($result);
+            dibi::begin();
 
             // Poznamka: c.j. se v pripade noveho dokumentu generuje az na pokyn uzivatele
             // a u odpovedi jsou sloupce c.j. vyplneny uz pri vytvareni odpovedi
-
             $dd = clone $data; // document data
             unset($dd['id'], $dd['odpoved'], $dd['predano_user'], $dd['predano_org'],
                     $dd['predani_poznamka']);
-            $dokument = $Dokument->ulozit($dd, $dokument_id);
+            $Dokument->ulozit($dd, $dokument_id);
 
-            if ($dokument) {
-                $Log = new LogModel();
-                $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
+            $Log = new LogModel();
+            $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
 
-                if ($data['odpoved'] == 1) {
-                    $this->flashMessage('Odpověď byla vytvořena.');
-                    $this->forward('kvyrizeni', array('id' => $dokument_id));
-                } else {
-                    $this->flashMessage('Dokument byl vytvořen.');
-
-                    if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
-                        /* Predat dokument. Musime osetrit vstup z formulare! */
-                        if (empty($data['predano_user']))
-                            $data['predano_user'] = null;
-                        if (empty($data['predano_org']))
-                            $data['predano_org'] = null;
-                        $doc = new Document($dokument_id);
-                        $doc->forward($data['predano_user'], $data['predano_org'],
-                                $data['predani_poznamka']);
-                        $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
-                    }
-
-                    $name = $button->getName();
-                    if ($name == "novy_pridat")
-                        $this->redirect('novy');
-                    else
-                        $this->redirect('detail', array('id' => $dokument_id));
-                }
-            } else {
-                $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
-            }
-        } catch (DibiException $e) {
+            dibi::commit();
+        } catch (Exception $e) {
+            dibi::rollback();
             $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
-            $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
-        } catch (LogicException $e) {
-            $this->flashMessage('Kontrola platnosti selhala:' . $e->getMessage(), 'warning');
-            if ($e->getCode() == 2) {
-                $this->redirect('detail', array('id' => $dokument_id));
+            $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
+            $this->redirect('default');
+        }
+
+        if ($data['odpoved'] == 1) {
+            $this->flashMessage('Odpověď byla vytvořena.');
+
+            // ID dokumentu, na který vytváříme odpověď, je v URL
+            try {
+                $orig_id = $this->getParameter('id');
+                $orig = new Document($orig_id);
+                if ($spis = $orig->getSpis()) {
+                    // zařaď odpověď do stejného spisu
+                    $doc->insertIntoSpis($spis);
+                }
+            } catch (\Exception $e) {
+                $this->flashMessage('Zařazení odpovědi do spisu se nepodařilo.', 'warning');                
             }
+            
+            $this->forward('kvyrizeni', array('id' => $dokument_id));
+        } else {
+            $this->flashMessage('Dokument byl vytvořen.');
+
+            if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
+                /* Predat dokument. Musime osetrit vstup z formulare! */
+                if (empty($data['predano_user']))
+                    $data['predano_user'] = null;
+                if (empty($data['predano_org']))
+                    $data['predano_org'] = null;
+                try {
+                    $doc->forward($data['predano_user'], $data['predano_org'],
+                            $data['predani_poznamka']);
+                    $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
+                } catch (Exception $e) {
+                    $this->flashMessage('Předání dokumentu se nepodařilo.', 'warning');
+                    $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
+                }
+            }
+
+            $name = $button->getName();
+            if ($name == "novy_pridat")
+                $this->redirect('novy');
+            else
+                $this->redirect('detail', array('id' => $dokument_id));
         }
     }
 

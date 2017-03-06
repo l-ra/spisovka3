@@ -1117,9 +1117,6 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
 
     public function ulozit($data, $dokument_id)
     {
-        if (is_null($data))
-            return false;
-
         // nula není platná hodnota, databáze by hlásila chybu
         if (isset($data['spisovy_znak_id']) && $data['spisovy_znak_id'] == 0)
             $data['spisovy_znak_id'] = null;
@@ -1153,9 +1150,6 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         $doc = new Document($dokument_id);
         $doc->modify($data);
         $doc->save();
-
-        $update_row = $this->getInfo($dokument_id);
-        return $update_row;
     }
 
     /**
