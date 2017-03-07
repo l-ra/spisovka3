@@ -54,12 +54,12 @@ try {
     $loader->register();
 
     Updates::init();
-    require Updates::get_update_dir() . 'scripts.php';
     
     $res = Updates::find_updates();
     $revisions = $res['revisions'];
     $alter_scripts = $res['alter_scripts'];
     $descriptions = $res['descriptions'];
+    $hooks = $res['hooks'];
     assert('count($revisions) > 0');
 
     $clients = Updates::find_clients();
@@ -165,11 +165,10 @@ foreach ($clients as $site_path => $site_name) {
                 if (isset($descriptions[$rev]))
                     echo "<div class='update_info'>{$descriptions[$rev]}</div>";
 
-                $function_name = "revision_{$rev}_check";
-                if (function_exists($function_name) && $do_update) {
+                if (isset($hooks[$rev]['check']) && $do_update) {
                     try {
-                        echo "<pre>";
-                        $res = $function_name();
+                        echo "<pre>";                        
+                        $res = call_user_func($hooks[$rev]['check']);
                         echo "</pre>";
                     } catch (Exception $e) {
                         $msg = "Při provádění kontroly došlo k chybě! Aktualizaci není možné provést.<br />Popis chyby: ";
@@ -187,12 +186,11 @@ foreach ($clients as $site_path => $site_name) {
                 }
 
                 // PRE script - použito jen jednou. chybí ošetření případných chyb
-                $function_name = "revision_{$rev}_before";
-                if (function_exists($function_name)) {
+                if (isset($hooks[$rev]['before'])) {
                     if ($do_update) {
                         echo "<div class='update_title'>Provedení PHP skriptu (před aktualizací databáze)</div>";
                         echo "<pre>";
-                        $function_name();
+                        call_user_func($hooks[$rev]['before']);
                         echo "</pre>";
                     } else {
                         echo "<div class='update_title'>Bude proveden PHP skript (před aktualizací databáze)</div>";
@@ -229,13 +227,12 @@ foreach ($clients as $site_path => $site_name) {
                 }
 
                 // AFTER source
-                $function_name = "revision_{$rev}_after";
-                if (function_exists($function_name)) {
+                if (isset($hooks[$rev]['after'])) {
                     if ($do_update) {
                         echo "<div class='update_title'>Provedení PHP skriptu</div>";
                         echo "<pre>";
                         try {
-                            $function_name();
+                            call_user_func($hooks[$rev]['after']);
                         } catch (Exception $e) {
                             echo "</pre>";
                             throw $e;

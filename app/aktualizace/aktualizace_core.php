@@ -7,10 +7,12 @@ class Updates
     protected static $alter_scripts = array();
     protected static $revisions = array();
     protected static $descriptions = array();
+    protected static $hooks = array();
 
     public static function init()
     {
         self::$update_dir = APP_DIR . '/aktualizace/';
+        require self::$update_dir . 'scripts.php';
     }
 
     public static function get_update_dir()
@@ -30,15 +32,13 @@ class Updates
             return;
         }
 
-        $revision_a = explode(strpos($filename, '_') !== false ? "_" : ".", $filename);
-        $revision = array_shift($revision_a);
-        if (is_numeric($revision)) {
-            self::$revisions[$revision] = $revision;
+        $matches = [];
+        if (preg_match('/([0-9]+)\.sql/', $filename, $matches)) {
+            $revision = $matches[1];
+            self::$revisions[] = $revision;
 
-            if (substr($filename, -4) == ".sql") {
-                $sql_source = $contents ? : file_get_contents(self::$update_dir . $filename);
-                self::$alter_scripts[$revision] = self::_parse_sql($sql_source);
-            }
+            $sql_source = $contents ?: file_get_contents(self::$update_dir . $filename);
+            self::$alter_scripts[$revision] = self::_parse_sql($sql_source);
         }
     }
 
@@ -67,6 +67,27 @@ class Updates
         return $queries;
     }
 
+    /**
+     * Find PHP snippets
+     */
+    private static function _find_hooks()
+    {
+        self::$hooks = [];
+        $functions = get_defined_functions();
+        $matches = [];
+        $types = ['check', 'before', 'after'];
+        foreach ($functions['user'] as $func_name) {
+            if (preg_match('/revision_(\d+)_([a-z]+)$/', $func_name, $matches)) {
+                $revision = $matches[1];
+                $type = $matches[2];
+                if (!in_array($type, $types))
+                    continue;
+                self::$revisions[] = $revision;
+                self::$hooks[$revision][$type] = $func_name;
+            }
+        }
+    }
+
     public static function find_updates()
     {
         self::$alter_scripts = array();
@@ -93,10 +114,14 @@ class Updates
 
         closedir($dir_handle);
 
-        ksort(self::$revisions, SORT_NUMERIC); //setridit pole, aby se alter skripty spoustely ve spravnem poradi
+        self::_find_hooks();
+
+        // setridit pole, aby se alter skripty spoustely ve spravnem poradi
+        self::$revisions = array_unique(self::$revisions);
+        sort(self::$revisions, SORT_NUMERIC);
 
         return array('revisions' => self::$revisions, 'alter_scripts' => self::$alter_scripts,
-            'descriptions' => self::$descriptions);
+            'descriptions' => self::$descriptions, 'hooks' => self::$hooks);
     }
 
     protected static function _parse_info_file($info)
@@ -133,7 +158,7 @@ class Updates
                 foreach ($names as $name) {
                     $name = trim($name);
                     $client_dir = "/var/www/vhosts/$name.mojespisovka.cz/httpdocs";
-                    $clients[$client_dir] = "$name";                    
+                    $clients[$client_dir] = "$name";
                 }
         } else {
             $client_dir = dirname(APP_DIR) . "/client";
@@ -253,8 +278,8 @@ class Client_To_Update
                 dibi::query("ALTER TABLE %n DROP FOREIGN KEY [spis_ibfk_1]", "{$prefix}spis");
             } catch (Exception $e) {
                 // ocekava se vyjimka, ignoruj
-            }   
-            
+            }
+
             $error = false;
             foreach ($tables as $table) {
                 $new_name = substr($table, strlen($prefix));
