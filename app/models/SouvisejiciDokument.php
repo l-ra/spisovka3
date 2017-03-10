@@ -54,6 +54,14 @@ class SouvisejiciDokument extends BaseModel
 
     public function odebrat($dokument1_id, $dokument2_id)
     {
+        $doc1 = new Document($dokument1_id);
+        $doc2 = new Document($dokument2_id);
+        
+        if ($doc1->cislo_jednaci && $doc1->cislo_jednaci == $doc2->cislo_jednaci) {
+            // zabran rozpojení mezi odpovědí a původním dokumentem
+            return;
+        }
+        
         // vykasli se na fakt, odkud kam spojeni vede a smaz v databazi oba pripady
         $param1 = [['spojit_s_id = %i', $dokument1_id], ['dokument_id = %i', $dokument2_id]];
         $param2 = [['dokument_id = %i', $dokument1_id], ['spojit_s_id = %i', $dokument2_id]];

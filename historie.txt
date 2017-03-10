@@ -271,6 +271,7 @@ Spisová služba:
   to bylo skryté, ale v databázi mohly existovat duplicitní záznamy. Aktualizace
   toto opraví, ale informace, zda subjekt byl adresát či odesilatel se ztratí
   (nastaví se "adresát i odesilatel").
+- spojení mezi dokumentem a odpovědí na něj nyní nelze odebrat
   
 Spisovna:  
 - hledání spisů při příjmu do spisovny bylo nefunkční
