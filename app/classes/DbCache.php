@@ -16,9 +16,8 @@ class DbCache
         if (!$initialized) {
 
             $initialized = true;
-            $setting = GlobalVariables::get('database')->cache;
-            $should_cache = $setting == 1;
-
+            $db_config = GlobalVariables::get('database');
+            $should_cache = isset($db_config->cache) ? (boolean)$db_config->cache : true;
             if ($should_cache) {
                 $context = Nette\Environment::getContext();
                 self::$cache = new Cache($context->getByType('Nette\Caching\IStorage'),
