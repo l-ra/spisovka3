@@ -74,8 +74,8 @@ class Settings
     protected function _set($key, $value)
     {
         if (!is_scalar($value))
-            throw new Exception (__METHOD__ . '() - $value has to be a scalar');
-        
+            throw new Exception(__METHOD__ . '() - $value has to be a scalar');
+
         if ($value === false)
             $db_value = 'false';
         else if ($value === true)
@@ -85,19 +85,29 @@ class Settings
 
         if ($value === null) {
             unset($this->settings[$key]);
-            dibi::query('DELETE FROM %n', ':PREFIX:' . self::TABLE_NAME,
-                    'WHERE [name] = %s', $key);
+            dibi::query('DELETE FROM %n', ':PREFIX:' . self::TABLE_NAME, 'WHERE [name] = %s',
+                    $key);
         } else if (isset($this->settings[$key])) {
             // Je-li promenna jiz nastavena na stejnou hodnotu, pak nic neprovadej
             if ($this->settings[$key] != $value) {
                 $this->settings[$key] = $value;
-                dibi::query('UPDATE %n', ':PREFIX:' . self::TABLE_NAME,
-                        'SET [value] = %s', $db_value, 'WHERE [name] = %s', $key);
+                dibi::query('UPDATE %n', ':PREFIX:' . self::TABLE_NAME, 'SET [value] = %s',
+                        $db_value, 'WHERE [name] = %s', $key);
             }
         } else {
             $this->settings[$key] = $value;
-            dibi::query('INSERT INTO %n', ':PREFIX:' . self::TABLE_NAME,
-                    '([name], [value]) VALUES (%s, %s)', $key, $db_value);
+            try {
+                dibi::query('INSERT INTO %n', ':PREFIX:' . self::TABLE_NAME,
+                        '([name], [value]) VALUES (%s, %s)', $key, $db_value);
+            } catch (Exception $e) {
+                /**
+                 * Task #787 - ošetři race condition
+                 */
+                if ($e->getCode() != 1062 /* ER_DUP_ENTRY */)
+                    throw $e;
+                dibi::query('UPDATE %n', ':PREFIX:' . self::TABLE_NAME, 'SET [value] = %s',
+                        $db_value, 'WHERE [name] = %s', $key);
+            }
         }
     }
 
