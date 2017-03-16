@@ -21,6 +21,7 @@ final class Upgrade
         $lock->delete_file = true;
         
         try {
+            Settings::reload();
             $done = Settings::get(self::SETTINGS_TASKS);
             $done = $done ? explode(',', $done) : [];
 
