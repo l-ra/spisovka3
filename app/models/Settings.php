@@ -9,7 +9,6 @@ class Settings
 
     protected static function _getInstance()
     {
-
         if (self::$instance === null)
             self::$instance = new self;
         return self::$instance;
@@ -17,38 +16,46 @@ class Settings
 
     public static function get($key, $default = null)
     {
-
         $i = self::_getInstance();
         return $i->_get($key, $default);
     }
 
     public static function set($key, $value)
     {
-
         $i = self::_getInstance();
         $i->_set($key, $value);
     }
 
     public static function remove($key)
     {
-
         $i = self::_getInstance();
         $i->_set($key, null);
     }
 
     public static function getAll()
     {
-
         $i = self::_getInstance();
         return $i->_getAll();
     }
 
+    public static function reload()
+    {
+        $i = self::_getInstance();
+        $i->_load();
+    }
+    
     // ------------------------------------------------------------
 
     protected $settings = array();
 
     protected function __construct()
     {
+        $this->_load();
+    }
+    
+    protected function _load()
+    {
+        $this->settings = [];
         $result = dibi::query('SELECT * FROM %n', ':PREFIX:' . self::TABLE_NAME);
         if (count($result) > 0)
             foreach ($result as $row) {
