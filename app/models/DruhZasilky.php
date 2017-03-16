@@ -19,7 +19,6 @@ class DruhZasilky
 
     public static function vypis($data, $podaci_arch = false)
     {
-
         static $ciselnik = array();
 
         /* Pro tisk podaciho archu odfiltruj polozky, ktere nejsou doplnkovymi sluzbami Ceske Posty
@@ -40,6 +39,8 @@ class DruhZasilky
         $druh_a = array();
         foreach ($data as $druh_zasilky_id) {
             if ($podaci_arch && in_array($druh_zasilky_id, $filtr_arch))
+                continue;
+            if (!isset($ciselnik[$druh_zasilky_id]))
                 continue;
             $druh_a[] = $ciselnik[$druh_zasilky_id]->nazev;
         }

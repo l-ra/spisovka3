@@ -452,9 +452,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                     'on' => array('dok_odeslani.dokument_id=d.id'),
                     'cols' => null
                 );
-                $args['where'][] = array("(d.cislo_doporuceneho_dopisu <> '') OR 
-                                          (dok_odeslani.druh_zasilky LIKE '%i:0;i:2;%' OR dok_odeslani.druh_zasilky LIKE '%i:1;i:2;%')  
-                                         ");
+                $args['where'][] = array("(d.cislo_doporuceneho_dopisu <> '') OR FIND_IN_SET('2', dok_odeslani.druh_zasilky)");
             }
         }
 
@@ -528,14 +526,16 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
 
         // druh zasilky
         if (isset($params['druh_zasilky'])) {
-            $druh_sql = $params['druh_zasilky'];
-            if ($druh_sql) {
+            $druh = $params['druh_zasilky'];
+            if ($druh) {
                 $args['leftJoin']['zpusob_odeslani'] = array(
                     'from' => array($this->tb_dok_odeslani => 'dok_odeslani'),
                     'on' => array('dok_odeslani.dokument_id=d.id'),
                     'cols' => null
                 );
-                $args['where'][] = array('dok_odeslani.druh_zasilky = %s', serialize($druh_sql));
+                foreach ($druh as $value) {
+                    $args['where'][] = array('FIND_IN_SET(%i, dok_odeslani.druh_zasilky)', $value);
+                }
             }
         }
 
@@ -731,8 +731,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 break;
 
             case 'doporucene':
-                $podminka = array("(d.cislo_doporuceneho_dopisu <> '') OR 
-                                             (dok_odeslani.druh_zasilky LIKE '%i:0;i:2;%' OR dok_odeslani.druh_zasilky LIKE '%i:1;i:2;%')"
+                $podminka = array("(d.cislo_doporuceneho_dopisu <> '') OR FIND_IN_SET('2', dok_odeslani.druh_zasilky)"
                 );
                 break;
 
@@ -1031,6 +1030,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
 
 
 
+
             
 // refactoring aplikace - prilis mnoho vyskytu k nahrazeni
         $dokument->stav_dokumentu = $dokument->stav;
@@ -1091,7 +1091,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
 
         if (in_array('odeslani', $details)) {
             $DokOdeslani = new DokumentOdeslani();
-            $dokument->odeslani = $DokOdeslani->odeslaneZpravy($dokument_id);
+            $dokument->odeslani = $DokOdeslani->odeslanyDokument($dokument_id);
         }
 
         return $dokument;
@@ -1120,7 +1120,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         // nula není platná hodnota, databáze by hlásila chybu
         if (isset($data['spisovy_znak_id']) && $data['spisovy_znak_id'] == 0)
             $data['spisovy_znak_id'] = null;
-        
+
         if (isset($data['zpusob_doruceni_id']) && isset($data['dokument_typ_id'])) {
             // zajisti, aby zpusob doruceni se ulozil pouze u prichozich dokumentu
             $typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
@@ -1208,7 +1208,8 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             }
         }
 
-        if (isset($data['skartacni_lhuta']) && empty($data['skartacni_lhuta']) && $data['skartacni_lhuta'] != 0)
+        if (isset($data['skartacni_lhuta']) && empty($data['skartacni_lhuta']) && $data['skartacni_lhuta']
+                != 0)
             $data['skartacni_lhuta'] = null;
 
         $user_id = self::getUser()->id;

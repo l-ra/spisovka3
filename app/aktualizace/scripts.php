@@ -280,3 +280,18 @@ function revision_1500_after()
     $m->rebuildIndex();
     echo "Hotovo.";
 }
+
+function revision_1520_after()
+{
+    $res = dibi::query("SELECT [id], [druh_zasilky] FROM [dokument_odeslani] WHERE [druh_zasilky] IS NOT NULL");
+    if (!$res)
+        return; // empty table
+
+    $res = $res->fetchPairs();
+    foreach ($res as $id => $druh) {
+        $druh = unserialize($druh);
+        sort($druh, SORT_NUMERIC);
+        dibi::query("UPDATE [dokument_odeslani] SET [druh_zasilky] = %s WHERE [id] = $id",
+                implode(',', $druh));
+    }
+}

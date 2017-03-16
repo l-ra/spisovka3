@@ -1645,7 +1645,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $c = "datum_odeslani_postou_" . $subjekt_id;
                     $datum_odeslani = new DateTime($data->$c);
                     $c = "druh_zasilky_" . $subjekt_id;
-                    $druh_zasilky = serialize($data->$c);
+                    $druh_zasilky = implode(',', $data->$c);
                     $c = "cena_zasilky_" . $subjekt_id;
                     $cena = $data->$c;
                     if ($cena === '')

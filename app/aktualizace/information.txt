@@ -147,3 +147,5 @@ Zvětšení délky pole v protokolu přihlášení, aby se do něj vešla IPv6 a
 Spisové znaky - nové vygenerování pomocných dat pro řazení.
 [1510]
 Přidání indexů na sloupci sekvence u tabulek spis a spisovy_znak.
+[1520]
+Změna uložení druhu poštovní zásilky v databázi.

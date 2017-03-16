@@ -253,6 +253,7 @@ Spisová služba:
   vytvoření spisu. Rovněž "datum uzavření" již nezadává uživatel, ale aplikace
   jej nyní nastaví sama.
 - hledání dle způsobu vyřízení nefungovalo
+- opraveno hledání dokumentů dle druhu poštovní zásilky
 - odeslání dokumentu je limitováno počtem adresátů. Program nyní limit kontroluje
   a informuje uživatele. Limit je obvykle zhruba 55 adresátů.
 - v seznamu dokumentů k odeslání se nyní zobrazuje cena a hmotnost zásilky,

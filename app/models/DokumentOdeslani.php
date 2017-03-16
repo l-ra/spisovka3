@@ -14,81 +14,70 @@ class DokumentOdeslani extends BaseModel
         return count($result) ? $result : array();
     }
 
-    public function odeslaneZpravy($dokument_id)
+    /**
+     * Voláno z Dokument::getInfo().
+     * @param int $dokument_id
+     * @return array
+     */
+    public function odeslanyDokument($dokument_id)
     {
-
         $sql = array(
-            'distinct' => null,
-            'from' => array($this->name => 'ds'),
-            'cols' => array('dokument_id', 'subjekt_id', 'datum_odeslani', 'zpusob_odeslani_id', 'user_id', 'zprava', 'cena', 'hmotnost', 'cislo_faxu', 'ds.stav%sql' => 'stav_odeslani', 'druh_zasilky', 'ds.poznamka%sql' => 'poznamka_odeslani'),
+            'from' => array($this->name => 'do'),
+            'cols' => array('dokument_id', 'subjekt_id', 'datum_odeslani', 'zpusob_odeslani_id', 'user_id', 'zprava', 'cena', 'hmotnost', 'cislo_faxu', 'do.stav%sql' => 'stav_odeslani', 'druh_zasilky', 'do.poznamka%sql' => 'poznamka_odeslani'),
             'leftJoin' => array(
                 'subjekt' => array(
                     'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
+                    'on' => array('s.id = do.subjekt_id'),
                     'cols' => array('*')
                 ),
                 'zpusob_odeslani' => array(
                     'from' => array($this->tb_zpusob_odeslani => 'odes'),
-                    'on' => array('odes.id=ds.zpusob_odeslani_id'),
+                    'on' => array('odes.id = do.zpusob_odeslani_id'),
                     'cols' => array('nazev' => 'zpusob_odeslani_nazev')
                 ),
             ),
-            'order_by' => array('ds.datum_odeslani', 's.nazev_subjektu', 's.prijmeni', 's.jmeno')
+            'where' => [['dokument_id = %i', $dokument_id]],
+            'order' => array('do.datum_odeslani', 's.nazev_subjektu', 's.prijmeni', 's.jmeno')
         );
 
-
-        if (is_array($dokument_id)) {
-            $sql['where'] = array(array('dokument_id IN %in', $dokument_id));
-        } else {
-            $sql['where'] = array(array('dokument_id=%i', $dokument_id));
-        }
-
-        $subjekty = array();
         $result = $this->selectComplex($sql)->fetchAll();
-        if (count($result) > 0) {
-            foreach ($result as $subjekt_index => $subjekt) {
-                $subjekty[$subjekt->dokument_id][$subjekt_index] = $subjekt;
-                $subjekty[$subjekt->dokument_id][$subjekt_index]->druh_zasilky = unserialize($subjekty[$subjekt->dokument_id][$subjekt_index]->druh_zasilky);
-            }
-
-            if (!is_array($dokument_id)) {
-                return $subjekty[$dokument_id];
-            } else {
-                return $subjekty;
-            }
-        } else {
+        if (!$result)
             return null;
+
+        foreach ($result as &$row) {
+            if ($row->druh_zasilky)
+                $row->druh_zasilky = explode(',', $row->druh_zasilky);
         }
+
+        return $result;
     }
 
     public function get($id)
     {
         $sql = array(
-            'distinct' => false,
-            'from' => array($this->name => 'ds'),
-            'cols' => array('dokument_id', 'ds.id' => 'dokodes_id', 'subjekt_id', 'datum_odeslani', 'zpusob_odeslani_id', 'user_id', 'zprava', 'cena', 'hmotnost', 'cislo_faxu', 'ds.stav%sql' => 'stav_odeslani', 'druh_zasilky', 'poznamka'),
+            'from' => array($this->name => 'do'),
+            'cols' => array('dokument_id', 'do.id' => 'dokodes_id', 'subjekt_id', 'datum_odeslani', 'zpusob_odeslani_id', 'user_id', 'zprava', 'cena', 'hmotnost', 'cislo_faxu', 'do.stav%sql' => 'stav_odeslani', 'druh_zasilky', 'poznamka'),
             'leftJoin' => array(
                 'zpusob_odeslani' => array(
                     'from' => array($this->tb_zpusob_odeslani => 'odes'),
-                    'on' => array('odes.id=ds.zpusob_odeslani_id'),
+                    'on' => array('odes.id = do.zpusob_odeslani_id'),
                     'cols' => array('nazev' => 'zpusob_odeslani_nazev')
                 ),
                 'dokument' => array(
                     'from' => array($this->tb_dokument => 'dok'),
-                    'on' => array('dok.id=ds.dokument_id'),
+                    'on' => array('dok.id = do.dokument_id'),
                     'cols' => array('nazev' => 'dok_nazev', 'jid' => 'dok_jid', 'cislo_jednaci' => 'dok_cislo_jednaci', 'poradi' => 'dok_poradi')
                 ),
             ),
-            'order_by' => array('ds.datum_odeslani', 's.nazev_subjektu', 's.prijmeni', 's.jmeno')
+            'where' => array(array('do.id = %i', $id)),
+            'order_by' => array('do.datum_odeslani', 's.nazev_subjektu', 's.prijmeni', 's.jmeno')
         );
-
-        $sql['where'] = array(array('ds.id=%i', $id));
 
         $result = $this->selectComplex($sql)->fetch();
         if ($result) {
-            $result->druh_zasilky = unserialize($result->druh_zasilky);
+            $result->druh_zasilky = explode(',', $result->druh_zasilky);
             return $result;
-        } 
+        }
 
         return null;
     }
@@ -97,7 +86,7 @@ class DokumentOdeslani extends BaseModel
     {
         switch ($volba_razeni) {
             case 'datum_desc':
-                $razeni = array('ds.datum_odeslani' => 'DESC', 's.nazev_subjektu', 's.prijmeni', 's.jmeno');
+                $razeni = array('do.datum_odeslani' => 'DESC', 's.nazev_subjektu', 's.prijmeni', 's.jmeno');
                 break;
             case 'cj':
                 $razeni = array('dok_cislo_jednaci');
@@ -106,35 +95,35 @@ class DokumentOdeslani extends BaseModel
                 $razeni = array('dok_cislo_jednaci' => 'DESC');
                 break;
             default:
-                $razeni = array('ds.datum_odeslani', 's.nazev_subjektu', 's.prijmeni', 's.jmeno');
+                $razeni = array('do.datum_odeslani', 's.nazev_subjektu', 's.prijmeni', 's.jmeno');
         }
 
         $sql = array(
-            'from' => array($this->name => 'ds'),
-            'cols' => array('*', 'ds.id' => 'dokodes_id', 'ds.poznamka' => 'poznamka_odeslani'),
+            'from' => array($this->name => 'do'),
+            'cols' => array('*', 'do.id' => 'dokodes_id', 'do.poznamka' => 'poznamka_odeslani'),
             'leftJoin' => array(
                 'subjekt' => array(
                     'from' => array($this->tb_subjekt => 's'),
-                    'on' => array('s.id=ds.subjekt_id'),
+                    'on' => array('s.id=do.subjekt_id'),
                     'cols' => array('*')
                 ),
                 'zpusob_odeslani' => array(
                     'from' => array($this->tb_zpusob_odeslani => 'odes'),
-                    'on' => array('odes.id=ds.zpusob_odeslani_id'),
+                    'on' => array('odes.id=do.zpusob_odeslani_id'),
                     'cols' => array('nazev' => 'zpusob_odeslani_nazev')
                 ),
                 'dokument' => array(
                     'from' => array($this->tb_dokument => 'dok'),
-                    'on' => array('dok.id=ds.dokument_id'),
+                    'on' => array('dok.id=do.dokument_id'),
                     'cols' => array('nazev' => 'dok_nazev', 'jid' => 'dok_jid', 'cislo_jednaci' => 'dok_cislo_jednaci', 'poradi' => 'dok_poradi')
                 ),
             ),
             'order' => $razeni
         );
 
-        $sql['where'] = array(array('ds.stav = 1'));
+        $sql['where'] = array(array('do.stav = 1'));
         if ($filtr !== null) {
-            $sql['where'][] = array('ds.zpusob_odeslani_id = 3');
+            $sql['where'][] = array('do.zpusob_odeslani_id = 3');
         }
 
         if (!empty($hledani))
@@ -145,7 +134,7 @@ class DokumentOdeslani extends BaseModel
             );
 
         if (is_array($hledani))
-            $sql['where'] = [['ds.id in %in', $hledani]];
+            $sql['where'] = [['do.id in %in', $hledani]];
 
         $result = $this->selectComplex($sql)->fetchAll();
         if (count($result) == 0)
@@ -153,18 +142,17 @@ class DokumentOdeslani extends BaseModel
 
         $dokumenty = array();
         foreach ($result as $index => $row) {
+            $druh_zasilky = $row->druh_zasilky = $row->druh_zasilky ? explode(',', $row->druh_zasilky) : [];
+            
             if (is_array($filtr)) {
                 // filtruj podle druhu zasilky
                 $a_result = null;
-                $a_druh_db = unserialize($row->druh_zasilky);
-                if (is_array($a_druh_db))
-                    $a_result = array_intersect($a_druh_db, $filtr);
+                if ($druh_zasilky)
+                    $a_result = array_intersect($druh_zasilky, $filtr);
                 if (empty($a_result))
                     continue;
             }
 
-            $druh_zasilky = unserialize($row->druh_zasilky);
-            $row->druh_zasilky = $druh_zasilky;
 
             if ($filtr === "balik") {
                 if (!$druh_zasilky) {
@@ -205,16 +193,11 @@ class DokumentOdeslani extends BaseModel
 
     public function getDokumentID($id_dok_odes)
     {
-
-        $row = $this->select(array(array('id=%i', $id_dok_odes)))->fetch();
-        if ($row) {
-            return $row->dokument_id;
-        }
-        return null;
+        $row = $this->select([['id = %i', $id_dok_odes]])->fetch();
+        return $row ? $row->dokument_id : null;
     }
 
     /**
-     * 
      * @param int $id
      * @return boolean
      */
@@ -225,7 +208,7 @@ class DokumentOdeslani extends BaseModel
         $info = $this->get($id);
         if (!$info)
             return false;
-        
+
         $row = ['stav' => 2, 'datum_odeslani' => new DateTime()];
 
         $ok = $this->update($row, array(array('id=%i', $id)));
@@ -234,7 +217,7 @@ class DokumentOdeslani extends BaseModel
             $Log->logDokument($info->dokument_id, LogModel::DOK_ODESLAN,
                     "Dokument odeslán " . $info->zpusob_odeslani_nazev);
         }
-        
+
         return $ok;
     }
 
@@ -251,7 +234,7 @@ class DokumentOdeslani extends BaseModel
         $info = $this->get($id);
         if (!$info)
             return null;
-        
+
         $Log = new LogModel();
         $Log->logDokument($info->dokument_id, LogModel::DOK_NEODESLAN,
                 "Dokument nebyl odeslán " . $info->zpusob_odeslani_nazev);

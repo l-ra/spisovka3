@@ -54,12 +54,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
             $seznam = $Dokument->kOdeslani($seradit, $hledat, $filtr);
         }
 
-        /* if ( count($seznam)>0 ) {
-          foreach ($seznam as $subjekt_index => $subjekt) {
-          $seznam[ $subjekt_index ]->druh_zasilky = @unserialize($seznam[ $subjekt_index ]->druh_zasilky);
-          }
-          } */
-
         $this->template->seznam = $seznam;
     }
 
@@ -297,7 +291,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $data = $button->getForm()->getValues();
         $id = $this->getParameter('id');
 
-        $data->druh_zasilky = serialize($data->druh_zasilky);
+        $data->druh_zasilky = implode(',', $data->druh_zasilky);
 
         $DokumentOdeslani = new DokumentOdeslani();
         $DokumentOdeslani->update($data, [["id=%i", $id]]);
