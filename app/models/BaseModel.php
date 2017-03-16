@@ -71,13 +71,13 @@ abstract class BaseModel extends Nette\Object
      */
     public function selectComplex($param)
     {
-        if (isset($param['distinct']))
-            $distinct = $param['distinct'];
+        $distinct = '';
+        if (isset($param['distinct']) && $param['distinct'])
+            $distinct = 'DISTINCT';
         if (isset($param['from'])) {
             if (count($param['from']) > 1) {
                 // vice fromu
             } else {
-
                 $from_key = key($param['from']);
                 if (is_numeric($from_key)) {
                     $from_index[0] = $param['from'][0];
@@ -236,7 +236,7 @@ abstract class BaseModel extends Nette\Object
             $cols_string = "`" . $from_index[0] . "`.`*`";
         }
 
-        $query = array('SELECT ' . (isset($distinct) ? 'DISTINCT' : '') . ' %sql', $cols_string);
+        $query = array("SELECT $distinct %sql", $cols_string);
 
         array_push($query, 'FROM %n', isset($from) ? $from : $this->name);
 

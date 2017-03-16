@@ -18,7 +18,6 @@ class DokumentPrilohy extends BaseModel
     public function prilohy($dokument_id)
     {
         $sql = array(
-            'distinct' => null,
             'from' => array($this->name => 'df'),
             'cols' => array('dokument_id'),
             'leftJoin' => array(
