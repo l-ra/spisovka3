@@ -445,8 +445,8 @@ table.hledani-dokumentu .jid {
     padding: 5px 20px;
 }
 
-.dokument_blok_sedy pre {
-    padding: 5px 20px 0px 20px;
+.dokument_blok_sedy .indent-left {
+    padding: 0px 20px 0px 20px;
     overflow: auto;
 }
 

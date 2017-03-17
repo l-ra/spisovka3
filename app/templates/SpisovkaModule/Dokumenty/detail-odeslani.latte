@@ -1,34 +1,36 @@
-    <div class="dokument_blok_sedy">
-        <div class="h2">Odesílání</div>
-        {foreach $Dok->odeslani as $odes}
+<div class="dokument_blok_sedy">
+    <div class="h2">Odesílání</div>
+    {foreach $Dok->odeslani as $odes}
         <dl>
             <dt>
-            {if $odes->zpusob_odeslani_id <= 2}
-                {$odes->datum_odeslani|edatetime}
-            {else}
-                {$odes->datum_odeslani|edate}
-            {/if}
+                {if $odes->zpusob_odeslani_id <= 2}
+                    {$odes->datum_odeslani|edatetime}
+                {else}
+                    {$odes->datum_odeslani|edate}
+                {/if}
             </dt>
             <dd style="font-weight:normal;">
-            {if $odes->zpusob_odeslani_id == 1}
-                <strong>{=Subjekt::displayName($odes,'email')}</strong>
-                <br />
-                odesláno e-mailem
-            {elseif $odes->zpusob_odeslani_id == 2 && $odes->stav_odeslani == 1}
-                <strong>{=Subjekt::displayName($odes,'isds')}</strong>
-                <br />
-                předán k odeslání datovou schránkou
-            {elseif $odes->zpusob_odeslani_id == 2 && $odes->stav_odeslani == 2}
-                <strong>{=Subjekt::displayName($odes,'isds')}</strong>
-                <br />
-                odesláno datovou schránkou
-            {elseif $odes->zpusob_odeslani_id == 2 && $odes->stav_odeslani == 3}
-                <strong>{=Subjekt::displayName($odes,'isds')}</strong>
-                <br />
-                (vraceno) nebylo odesláno datovou schránkou
-            {elseif $odes->zpusob_odeslani_id == 3}
-                <strong>{=Subjekt::displayName($odes,'plna_adresa')}</strong>
-                <br />                
+                {if $odes->zpusob_odeslani_id == 1}
+                    <strong>{=Subjekt::displayName($odes,'email')}</strong>
+                    <br />
+                    odesláno e-mailem<br />
+                    <a href="#" class="display-email-text">Zobrazit text</a>
+                    <pre style="display: none">{$odes->zprava}</pre>
+                {elseif $odes->zpusob_odeslani_id == 2 && $odes->stav_odeslani == 1}
+                    <strong>{=Subjekt::displayName($odes,'isds')}</strong>
+                    <br />
+                    předán k odeslání datovou schránkou
+                {elseif $odes->zpusob_odeslani_id == 2 && $odes->stav_odeslani == 2}
+                    <strong>{=Subjekt::displayName($odes,'isds')}</strong>
+                    <br />
+                    odesláno datovou schránkou
+                {elseif $odes->zpusob_odeslani_id == 2 && $odes->stav_odeslani == 3}
+                    <strong>{=Subjekt::displayName($odes,'isds')}</strong>
+                    <br />
+                    (vraceno) nebylo odesláno datovou schránkou
+                {elseif $odes->zpusob_odeslani_id == 3}
+                    <strong>{=Subjekt::displayName($odes,'plna_adresa')}</strong>
+                    <br />                
                     {if $odes->stav_odeslani == 1}
                         předán k odeslání poštou
                     {elseif $odes->stav_odeslani == 2}
@@ -39,28 +41,35 @@
                     {if !empty($odes->druh_zasilky)}<br />druh zásilky: {!=DruhZasilky::vypis($odes->druh_zasilky)}{/if}
                     {if !empty($odes->cena)}<br />cena: {$odes->cena} Kč{/if}
                     {if !empty($odes->hmotnost)}<br />hmotnost: {$odes->hmotnost|decPoint} kg{/if}
-                
-            {elseif $odes->zpusob_odeslani_id == 4 && $odes->stav_odeslani == 1}
-                <strong>{=Subjekt::displayName($odes,'telefon')}</strong>
-                <br />
-                předán k odeslání faxem na číslo {$odes->cislo_faxu}
-            {elseif $odes->zpusob_odeslani_id == 4 && $odes->stav_odeslani == 2}
-                <strong>{=Subjekt::displayName($odes,'telefon')}</strong>
-                <br />
-                odesláno faxem na číslo {$odes->cislo_faxu}
-            {elseif $odes->zpusob_odeslani_id == 4 && $odes->stav_odeslani == 3}
-                <strong>{=Subjekt::displayName($odes,'telefon')}</strong>
-                <br />
-                (vraceno) nebylo odesláno faxem na číslo {$odes->cislo_faxu}
-            {else}
-                <strong>{=Subjekt::displayName($odes,'jmeno')}</strong>
-                <br />
-                způsob odeslání: {=ZpusobOdeslani::getName($odes->zpusob_odeslani_id)}
-            {/if}
-            {if $odes->poznamka_odeslani}
-                <br />Poznámka: {$odes->poznamka_odeslani}
-            {/if}
+
+                {elseif $odes->zpusob_odeslani_id == 4 && $odes->stav_odeslani == 1}
+                    <strong>{=Subjekt::displayName($odes,'telefon')}</strong>
+                    <br />
+                    předán k odeslání faxem na číslo {$odes->cislo_faxu}
+                {elseif $odes->zpusob_odeslani_id == 4 && $odes->stav_odeslani == 2}
+                    <strong>{=Subjekt::displayName($odes,'telefon')}</strong>
+                    <br />
+                    odesláno faxem na číslo {$odes->cislo_faxu}
+                {elseif $odes->zpusob_odeslani_id == 4 && $odes->stav_odeslani == 3}
+                    <strong>{=Subjekt::displayName($odes,'telefon')}</strong>
+                    <br />
+                    (vraceno) nebylo odesláno faxem na číslo {$odes->cislo_faxu}
+                {else}
+                    <strong>{=Subjekt::displayName($odes,'jmeno')}</strong>
+                    <br />
+                    způsob odeslání: {=ZpusobOdeslani::getName($odes->zpusob_odeslani_id)}
+                {/if}
+                {if $odes->poznamka_odeslani}
+                    <br />Poznámka: {$odes->poznamka_odeslani}
+                {/if}
             </dd>
         </dl>
-        {/foreach}
-    </div>
+    {/foreach}
+</div>
+
+<script type="text/javascript">
+    $('a.display-email-text').click(function () {
+        $(this).next().toggle();
+        return false;
+    });
+</script>

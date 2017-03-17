@@ -75,8 +75,10 @@
 
 <div class="dokument_blok_sedy">
     <div class="h2">{$Zprava->typ == 'I' ? 'Datová zpráva' : 'Obsah zprávy'}</div>
+    <div class="indent-left">
     {if $Zprava->typ == 'I'}<pre>{$Zprava->popis}</pre>
     {else}{!$Zprava->popis|html2br}{/if}
+    </div>
 </div>
 
 <div class="dokument_blok_sedy">
