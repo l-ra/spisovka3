@@ -4,9 +4,9 @@
     </td>
     <td class="icon">
         {if isset($rezim_subjektu)}
-           <img id="subjekt_ikona_{$subjekt->id}" src="{$publicUrl}images/icons/subjekt_{$rezim_subjektu|lower}.png" alt="{$rezim_subjektu}" title="{$rezim_subjektu}" width="32" height="32" />
+           <img id="subjekt_ikona_{$subjekt->id}" src="{$publicUrl}images/icons/subjekt_{$rezim_subjektu|lower}.png" alt="{$rezim_subjektu}" width="32" height="32" />
         {else}
-           <img src="{$publicUrl}images/subjekt/{if empty($subjekt->type)}fo{else}{$subjekt->type|lower}{/if}.png" alt="{$subjekt->type}" title="{$subjekt->type}" width="32" height="32" />
+           <img src="{$publicUrl}images/subjekt/{Subjekt::img_name($subjekt->type)}.png" alt="{$subjekt->type}" width="32" height="32" />
         {/if}
     </td>
     <td class="meta">
@@ -20,7 +20,7 @@
             {/if}
         </strong>
         <div class="info">
-            <span>{$subjekt->type} - {=Subjekt::typ_subjektu($subjekt->type)}</span><br />            
+            <span>{=Subjekt::typ_subjektu($subjekt->type)}</span><br />            
             <span n:if="isset($rezim_subjektu)">
                 {if $rezim_subjektu == 'O'}
                 odesílatel

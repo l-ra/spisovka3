@@ -181,8 +181,7 @@ class ISDS_Spisovka extends ISDS
 
     public static function typDS($dmType)
     {
-        $typ = array(
-            '0' => '',
+        $typy = array(
             '10' => 'OVM',
             '11' => 'OVM_NOTAR',
             '12' => 'OVM_EXEKUT',
@@ -194,14 +193,11 @@ class ISDS_Spisovka extends ISDS
             '31' => 'PFO_ADVOK',
             '32' => 'PFO_DANPOR',
             '33' => 'PFO_INSSPR',
+            '34' => 'PFO_AUDITOR',
             '40' => 'FO'
         );
 
-        if (array_key_exists($dmType, $typ)) {
-            return $typ[$dmType];
-        } else {
-            return null;
-        }
+        return array_key_exists($dmType, $typy) ? $typy[$dmType] : null;
     }
 
     public static function stavZpravy($dmMessageStatus)

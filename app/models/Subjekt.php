@@ -305,7 +305,6 @@ class Subjekt extends BaseModel
 
     public static function typ_subjektu($kod = null, $select = 0)
     {
-
         $typ = array('' => 'Neuveden / neznámý',
             'OVM' => 'Orgán veřejné moci',
             'FO' => 'Fyzická osoba',
@@ -314,6 +313,7 @@ class Subjekt extends BaseModel
             'PFO_ADVOK' => 'PFO - advokáti',
             'PFO_DANPOR' => 'PFO - daňoví poradci',
             'PFO_INSSPR' => 'PFO - insolvenční správci',
+            'PFO_AUDITOR' => 'PFO - statutární auditor',
             'OVM_NOTAR' => 'OVM - notáři',
             'OVM_EXEKUT' => 'OVM - exekutoři',
             'OVM_REQ' => 'Podřízené OVM vzniklé na základě žádosti (§6 a 7)',
@@ -326,14 +326,30 @@ class Subjekt extends BaseModel
                 $typ[''] = 'jakýkoli typ subjektu';
 
             return $typ;
-        } else {
-            return ( array_key_exists($kod, $typ) ) ? $typ[$kod] : null;
         }
+
+        return array_key_exists($kod, $typ) ? $typ[$kod] : null;
+    }
+
+    /**
+     * Vrátí název souboru s obrázkem odpovídajícím zadanému typu subjektu.
+     * @param string $typ
+     * @return string
+     */
+    public static function img_name($typ)
+    {
+        if (substr($typ, 0, 3) == 'OVM')
+            return 'ovm';
+        if (substr($typ, 0, 3) == 'PFO')
+            return 'pfo';
+        if (substr($typ, 0, 2) == 'PO')
+            return 'po';
+        
+        return 'fo';
     }
 
     public static function stav($stav = null)
     {
-
         $stavy = ['1' => 'aktivní', '2' => 'neaktivní'];
 
         if (is_null($stav))
