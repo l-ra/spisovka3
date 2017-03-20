@@ -836,7 +836,7 @@ function htmlspecialchars(string, quote_style, charset, double_encode) {
 
 zmen_rezim_subjektu = function () {
 
-    var rezim = this.title;
+    var rezim = this.alt;
     if (rezim == 'A')
         rezim = 'O';
     else if (rezim == 'O')
