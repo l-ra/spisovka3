@@ -1115,43 +1115,6 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         return ($row) ? ($row->poradi + 1) : 1;
     }
 
-    public function ulozit($data, $dokument_id)
-    {
-        // nula není platná hodnota, databáze by hlásila chybu
-        if (isset($data['spisovy_znak_id']) && $data['spisovy_znak_id'] == 0)
-            $data['spisovy_znak_id'] = null;
-
-        if (isset($data['zpusob_doruceni_id']) && isset($data['dokument_typ_id'])) {
-            // zajisti, aby zpusob doruceni se ulozil pouze u prichozich dokumentu
-            $typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
-            if ($typy_dokumentu[$data['dokument_typ_id']]['smer'] == 1) //odchozi
-                $data['zpusob_doruceni_id'] = null;
-        }
-
-        if (isset($data['pocet_listu'])) {
-            if ($data->pocet_listu === "")
-                $data->pocet_listu = null;
-            if ($data->pocet_listu_priloh === "")
-                $data->pocet_listu_priloh = null;
-        }
-        if (isset($data['vyrizeni_pocet_listu'])) {
-            if ($data->vyrizeni_pocet_listu === "")
-                $data->vyrizeni_pocet_listu = null;
-            if ($data->vyrizeni_pocet_priloh === "")
-                $data->vyrizeni_pocet_priloh = null;
-        }
-
-        if (array_key_exists('skartacni_lhuta', $data) && $data->skartacni_lhuta === '')
-            $data->skartacni_lhuta = null;
-        if (array_key_exists('skartacni_znak', $data) && $data->skartacni_znak === '')
-            $data->skartacni_znak = null;
-
-        unset($data['id']);
-        $doc = new Document($dokument_id);
-        $doc->modify($data);
-        $doc->save();
-    }
-
     /**
      * 
      * @param type $data

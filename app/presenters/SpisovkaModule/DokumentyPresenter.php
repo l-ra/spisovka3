@@ -1013,8 +1013,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $Dokument = new Dokument();
-
         $dokument_id = $data['id'];
         $data['stav'] = 1;
 
@@ -1037,7 +1035,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dd = clone $data; // document data
             unset($dd['id'], $dd['odpoved'], $dd['predano_user'], $dd['predano_org'],
                     $dd['predani_poznamka']);
-            $Dokument->ulozit($dd, $dokument_id);
+            $doc->modify($dd);
+            $doc->save();
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
@@ -1062,9 +1061,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $doc->insertIntoSpis($spis);
                 }
             } catch (\Exception $e) {
-                $this->flashMessage('Zařazení odpovědi do spisu se nepodařilo.', 'warning');                
+                $this->flashMessage('Zařazení odpovědi do spisu se nepodařilo.', 'warning');
             }
-            
+
             $this->forward('kvyrizeni', array('id' => $dokument_id));
         } else {
             $this->flashMessage('Dokument byl vytvořen.');
@@ -1203,10 +1202,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $Dokument = new Dokument();
-        $dokument_id = $this->getParameter('id');
-        $Dokument->getInfo($dokument_id);
-
         // V aplikaci chybi DateTimePicker
         if (isset($data['datum_vzniku'])) {
             $data['datum_vzniku'] = $data['datum_vzniku'] . " " . $data['datum_vzniku_cas'];
@@ -1214,11 +1209,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         try {
-            $Dokument->ulozit($data, $dokument_id);
+            $id = $this->getParameter('id');
+            $doc = new Document($id);
+            $doc->modify($data);
+            $doc->save();
 
             $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN,
-                    'Upravena metadata dokumentu.');
+            $Log->logDokument($id, LogModel::DOK_ZMENEN, 'Upravena metadata dokumentu.');
 
             $this->flashMessage('Dokument "' . $data->nazev . '"  byl upraven.');
         } catch (Exception $e) {
@@ -1227,7 +1224,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
         }
 
-        $this->redirect('detail', ['id' => $dokument_id]);
+        $this->redirect('detail', ['id' => $id]);
     }
 
     protected function createComponentVyrizovaniForm()
@@ -1308,29 +1305,25 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $dokument_id = $this->getParameter('id');
-
         // uprava casu
         $data['datum_vyrizeni'] = $data['datum_vyrizeni'] . " " . $data['datum_vyrizeni_cas'];
         unset($data['datum_vyrizeni_cas']);
 
-        $Dokument = new Dokument();
-
-        $dok = $Dokument->getInfo($dokument_id);
-
         try {
-            $Dokument->ulozit($data, $dokument_id);
+            $id = $this->getParameter('id');
+            $doc = new Document($id);
+            $doc->modify($data);
+            $doc->save();
 
             $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN, 'Upravena data vyřízení.');
+            $Log->logDokument($id, LogModel::DOK_ZMENEN, 'Upravena data vyřízení.');
 
-            $this->flashMessage('Dokument "' . $dok->cislo_jednaci . '"  byl upraven.');
+            $this->flashMessage('Dokument "' . $doc->cislo_jednaci . '"  byl upraven.');
         } catch (DibiException $e) {
-            $this->flashMessage('Dokument "' . $dok->cislo_jednaci . '" se nepodařilo upravit.',
-                    'warning');
+            $this->flashMessage('Dokument se nepodařilo upravit.', 'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
         }
-        $this->redirect('detail', array('id' => $dokument_id));
+        $this->redirect('detail', array('id' => $id));
     }
 
     protected function createComponentUdalostForm()

@@ -199,8 +199,8 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $this->template->Upravit_param = $this->getParameter('upravit', null);
 
             $uplynula_skart_lhuta = !empty($dokument->skartacni_rok) && date('Y') >= $dokument->skartacni_rok;
-            $this->template->Lze_zaradit_do_skartacniho_rizeni = $uplynula_skart_lhuta && $dokument->stav_dokumentu == 7 && $user->isAllowed('Spisovna',
-                            'skartacni_navrh');
+            $this->template->Lze_zaradit_do_skartacniho_rizeni = $uplynula_skart_lhuta && $dokument->stav_dokumentu
+                    == 7 && $user->isAllowed('Spisovna', 'skartacni_navrh');
 
             $this->template->Lze_provest_skartacni_rizeni = $dokument->stav_dokumentu == 8 && $user->isAllowed('Spisovna',
                             'skartacni_rizeni');
@@ -218,11 +218,10 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             if ($tisk || $pdf) {
                 $this->template->AccessEdit = false;
             }
-            
+
             $Log = new LogModel();
             $historie = $Log->historieDokumentu($dokument_id, $tisk || $pdf);
             $this->template->historie = $historie;
-
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
             $this->setView('noexist');
@@ -321,26 +320,20 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         }
 
         $data = $button->getForm()->getValues();
-
         $dokument_id = $data['id'];
 
-        //Nette\Diagnostics\Debugger::dump($data); exit;
-
-        $Dokument = new Dokument();
-
-        $dok = $Dokument->getInfo($dokument_id);
-
         try {
-            $Dokument->ulozit($data, $dokument_id);
+            $doc = new Document($dokument_id);
+            $doc->modify($data);
+            $doc->save();
 
             $Log = new LogModel();
             $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN, 'Upraven skartační režim.');
 
-            $this->flashMessage('Dokument "' . $dok->cislo_jednaci . '"  byl upraven.');
+            $this->flashMessage('Dokument "' . $doc->cislo_jednaci . '"  byl upraven.');
             $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Dokument "' . $dok->cislo_jednaci . '" se nepodařilo upravit.',
-                    'warning');
+            $this->flashMessage('Dokument se nepodařilo upravit.', 'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
             $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));
         }
@@ -540,7 +533,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 break;
 
             /* Prevzeti vybranych dokumentu */
-            case 'prevzit_spisovna':                
+            case 'prevzit_spisovna':
                 $count_ok = $count_failed = 0;
                 foreach ($documents as $dokument_id) {
                     $doc = new DocumentWorkflow($dokument_id);
