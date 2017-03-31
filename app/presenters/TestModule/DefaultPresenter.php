@@ -2,28 +2,22 @@
 
 class Test_DefaultPresenter extends BasePresenter
 {
+
     /**
      * @var Nette\Application\IPresenterFactory 
      */
     protected $presenterFactory;
-    
+
     public function __construct(Nette\Application\IPresenterFactory $presenterFactory)
     {
         parent::__construct();
         $this->presenterFactory = $presenterFactory;
     }
-        
+
     protected function isUserAllowed()
     {
         $user = $this->user;
         return $user->isInRole('admin') || $user->isInRole('programator');
-    }
-
-    public function renderDefault()
-    {
-        $link = $this->link("run");
-        echo 'Test spustíte <a href="' . $link . '">zde</a>.';
-        $this->terminate();
     }
 
     public function getTests()
@@ -52,7 +46,7 @@ class Test_DefaultPresenter extends BasePresenter
     {
         // avoid sending extra HTTP headers
         BasePresenter::$testMode = true;
-                
+
         ob_end_clean();
 
         $this->htmlHeader();
@@ -88,7 +82,7 @@ class Test_DefaultPresenter extends BasePresenter
     public function runTest($test)
     {
         try {
-            $params = $test['params'] ? : array();
+            $params = $test['params'] ?: array();
             $presenter = ltrim($test['address'], ":");
             if (substr($presenter, -1) === ':')
                 $presenter = rtrim($presenter, ':');
@@ -127,14 +121,14 @@ class Test_DefaultPresenter extends BasePresenter
             // Odstran z nazvu namespace
             if (strpos($classname, '\\') !== false)
                 $classname = substr($classname, strrpos($classname, '\\') + 1);
-            
+
             return $classname;
         } catch (Exception $e) {
             @ob_end_clean();
             return 'FAIL  ' . get_class($e) . ' - ' . $e->getMessage();
         }
     }
-    
+
     protected function htmlHeader()
     {
         echo <<<EOJ
@@ -155,6 +149,102 @@ class Test_DefaultPresenter extends BasePresenter
             <body onload="stop_scrolling = true">
             <pre>
 EOJ;
+    }
+
+    public function actionCreateDocuments($count)
+    {
+        if (!$count) {
+            $this->flashMessage('Nebyl zadán počet dokumentů.', 'warning');
+            $this->redirect('default');
+        }
+
+        $data = [
+            'dokument_typ_id' => 1,
+            'jid' => '12345',
+            'nazev' => 'TEST',
+            'user_created' => $this->user->id,
+            'datum_vzniku' => new \DateTime,
+        ];
+
+        $skartacni_znaky = ['A', 'S', 'V'];
+
+        $res = UserAccount::getAll();
+        $user_ids = [];
+        foreach ($res as $obj) {
+            $user_ids[] = $obj->id;
+        }
+        $user_max = count($user_ids) - 1;
+
+        $res = OrgUnit::getAll();
+        $ou_ids = [];
+        foreach ($res as $obj) {
+            $ou_ids[] = $obj->id;
+        }
+        $ou_max = count($ou_ids) - 1;
+
+        set_time_limit(0);
+
+        for ($i = 0; $i < $count; $i++) {
+            $data['owner_user_id'] = $user_ids[rand(0, $user_max)];
+            $data['owner_orgunit_id'] = $ou_ids[rand(0, $ou_max)];
+            if (rand(1, 10) == 1) {
+                $data['is_forwarded'] = true;
+                $data['forward_user_id'] = $user_ids[rand(0, $user_max)];
+                $data['forward_orgunit_id'] = $ou_ids[rand(0, $ou_max)];
+            } else {
+                $data['is_forwarded'] = false;
+                $data['forward_user_id'] = null;
+                $data['forward_orgunit_id'] = null;
+            }
+
+            $data['datum_vzniku'] = new DateTime("@" . rand(1, 1000000000));
+            $data['cislo_jednaci'] = "CJ-" . rand(1, 10000);
+            $data['skartacni_znak'] = $skartacni_znaky[rand(0, 2)];
+
+            Document::create($data);
+        }
+
+        $this->flashMessage("Bylo vytvořeno $count dokumentů.");
+        $this->redirect('default');
+    }
+
+    public function renderSql()
+    {
+        $params = $this->context->parameters['database'];
+        $mysqli = new mysqli($params['host'], $params['username'], $params['password'],
+                $params['database']);
+        if ($mysqli->connect_errno)
+            throw new Exception('Nepodařilo se připojit do databáze');
+
+        $t1 = microtime(true);
+        $sql = 'SELECT SQL_NO_CACHE `d`.`id` 
+FROM `dokument` AS `d` 
+WHERE (d.owner_user_id = 6 OR d.owner_orgunit_id = 2 OR d.forward_user_id = 6 OR d.forward_orgunit_id = 2)  AND (d.stav < 7 OR
+d.stav = 11)
+order by id desc
+limit 0,200
+';
+
+        dump($sql);
+        if (!$result = $mysqli->real_query($sql))
+            throw new Exception('Provedení dotazu skončilo s chybou');
+
+        $t2 = microtime(true);
+        dump(1000 * ($t2 - $t1));
+
+        if ($result = $mysqli->store_result()) {
+//            while ($row = $result->fetch_row()) {
+//                printf("%s\n", $row[0]);
+//            }
+            dump($result->num_rows . ' řádek');
+            $result->close();
+        }
+
+        $t3 = microtime(true);
+        dump(1000 * ($t3 - $t2));
+        dump(1000 * ($t3 - $t1));
+
+        $mysqli->close();
     }
 
 }

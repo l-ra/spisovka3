@@ -367,7 +367,7 @@ function setupRouting(Nette\Http\IRequest $httpRequest, Nette\Application\IRoute
         'id' => NULL,
     ));
 
-    $router[] = new Nette\Application\Routers\Route('test/<action>', 'Test:Default:');
+    $router[] = new Nette\Application\Routers\Route('test[/<action>]', 'Test:Default:');
 
     $router[] = new Nette\Application\Routers\Route('<presenter>/<action>',
             array(

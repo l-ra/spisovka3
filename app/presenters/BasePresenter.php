@@ -160,6 +160,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     $this->setLayout('install');
                     $this->template->module_name = 'Instalace';
                     break;
+                case "Test":
+                    $this->setLayout('test');
+                    $this->template->module_name = 'Testování';
+                    break;
             }
 
         // [P.L.] Slouží pouze jako pojistka proti případné chybě v šabloně

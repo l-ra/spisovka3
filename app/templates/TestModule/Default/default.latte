@@ -1,0 +1,18 @@
+{* Latte template *}
+
+{block content}
+
+<a n:href="run">Spustit</a> automatické testy.
+<hr />
+<a n:href="createDocuments" class="enter-number">Vytvořit</a> <input type="text" value="100" maxlength="6" size="6"/> dokumentů.
+<hr />
+<a n:href="sql">Měřit čas provedení SQL dotazu.</a>
+
+<script type="text/javascript">
+    $('.enter-number').click(function() {
+        var link = $(this);
+        var count = link.next().val();
+        var href = link.attr('href') + '?count=' + count;
+        link.attr('href', href);
+});
+</script>
