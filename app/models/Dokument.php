@@ -210,10 +210,13 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 $args['order'] = array('d.stav' => 'DESC');
                 break;
             case 'cj':
-                $args['order'] = array('d.podaci_denik_rok', 'd.podaci_denik_poradi', 'd.poradi');
+                // optimalizace SQL, na sloupci cislo_jednaci ted mame index
+                // $args['order'] = array('d.podaci_denik_rok', 'd.podaci_denik_poradi', 'd.poradi');
+                $args['order'] = ['d.cislo_jednaci'];
                 break;
             case 'cj_desc':
-                $args['order'] = array('d.podaci_denik_rok' => 'DESC', 'd.podaci_denik_poradi' => 'DESC', 'd.poradi' => 'DESC');
+                // $args['order'] = array('d.podaci_denik_rok' => 'DESC', 'd.podaci_denik_poradi' => 'DESC', 'd.poradi' => 'DESC');
+                $args['order'] = ['d.cislo_jednaci' => 'DESC'];
                 break;
             case 'jid':
                 $args['order'] = array('d.id');
@@ -228,10 +231,10 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 $args['order'] = array('d.nazev' => 'DESC');
                 break;
             case 'dvzniku':
-                $args['order'] = array('d.datum_vzniku', 'd.podaci_denik_rok', 'd.podaci_denik_poradi');
+                $args['order'] = array('d.datum_vzniku');
                 break;
             case 'dvzniku_desc':
-                $args['order'] = array('d.datum_vzniku' => 'DESC', 'd.podaci_denik_rok' => 'DESC', 'd.podaci_denik_poradi' => 'DESC');
+                $args['order'] = array('d.datum_vzniku' => 'DESC');
                 break;
             case 'skartacni_znak':
                 $args['order'] = array('d.skartacni_znak', 'd.podaci_denik_rok', 'd.podaci_denik_poradi');
