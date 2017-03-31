@@ -443,7 +443,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     protected function createComponentSeraditForm()
     {
-
         $select = array(
             'cj' => 'čísla jednacího (vzestupně)',
             'cj_desc' => 'čísla jednacího (sestupně)',
@@ -451,10 +450,6 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             'jid_desc' => 'JID (sestupně)',
             'dvzniku' => 'data přijetí/vzniku (vzestupně)',
             'dvzniku_desc' => 'data přijetí/vzniku (sestupně)',
-            'vec' => 'věci (vzestupně)',
-            'vec_desc' => 'věci (sestupně)',
-            'prideleno' => 'přidělené osoby (vzestupně)',
-            'prideleno_desc' => 'přidělené osoby (sestupně)',
             'skartacni_znak' => 'skartačního znaku (vzestupně)',
             'skartacni_znak_desc' => 'skartačního znaku (sestupně)',
             'spisovy_znak' => 'spisového znaku (vzestupně)',
@@ -462,7 +457,9 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         );
 
         $seradit = !is_null($this->seradit) ? $this->seradit : null;
-
+        if (!isset($select[$seradit]))
+            $seradit = 'cj_desc';
+        
         $form = new Nette\Application\UI\Form();
         $form->addSelect('seradit', 'Seřadit podle:', $select)
                 ->setValue($seradit)
