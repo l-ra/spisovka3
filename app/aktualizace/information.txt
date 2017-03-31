@@ -149,3 +149,5 @@ Spisové znaky - nové vygenerování pomocných dat pro řazení.
 Přidání indexů na sloupci sekvence u tabulek spis a spisovy_znak.
 [1520]
 Změna uložení druhu poštovní zásilky v databázi.
+[1530]
+Optimalizace uložení, zda je dokument ve stavu předání.

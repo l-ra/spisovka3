@@ -698,15 +698,24 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             $org_jednotka[] = $org_id;
         $vidi_vsechny_dokumenty = self::uzivatelVidiVsechnyDokumenty();
 
+        $vse_zahrnuje_kprevzeti = true;
+
         $args = array();  // priprav navratovou hodnotu
 
         switch ($nazev) {
+            case 'vse':
+                $a = [];
+                if (!$vse_zahrnuje_kprevzeti)
+                    break;
             case 'kprevzeti':
                 $sql = "d.forward_user_id = $user_id";
                 if (!$pouze_dokumenty_na_osobu && $org_id !== null && $user->isAllowed('Dokument',
                                 'menit_moje_oj'))
                     $sql .= " OR d.forward_orgunit_id = $org_id";
-                $a = ["d.is_forwarded", $sql];
+                if ($nazev == 'vse')
+                    $kprevzeti = $sql;
+                else
+                    $a = [$sql];
                 break;
 
             case 'predane':
@@ -727,10 +736,6 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
 
             case 'zapujcene':
                 $a = ['d.stav = ' . DocumentWorkflow::STAV_ZAPUJCEN];
-                break;
-
-            case 'vse':
-                $a = [];
                 break;
 
             case 'doporucene':
@@ -795,9 +800,36 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         if ($bez_vyrizenych)
             $a[] = 'd.stav <= ' . DocumentWorkflow::STAV_VYRIZUJE_SE;
 
-        $args['where'] = $a;
+        if (isset($kprevzeti)) {
+            $a = $this->crunchWhereConditions($a);
+            $cond1 = array_shift($a);
+            $cond2 = $kprevzeti;
+            $new_cond = $cond1 ? "$cond1 OR $cond2" : $cond2;
+            array_unshift($a, $new_cond);
+            $a = [$a];
+        }
 
+        $args['where'] = $a;
         return $args;
+    }
+
+    protected function crunchWhereConditions(array $a)
+    {
+        $s = '';
+        $params = [];
+        foreach ($a as $el) {
+            $s2 = is_array($el) ? $el[0] : $el;
+            if ($s)
+                $s .= ' AND ';
+            $s .= "($s2)";
+            if (is_array($el)) {
+                array_shift($el);
+                $params = array_merge($params, $el);
+            }
+        }
+
+        array_unshift($params, $s);
+        return $params;
     }
 
     public function spisovnaFiltr($params)
@@ -1022,20 +1054,11 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         unset($dokument->typ_smer);
         $dokument->typ_dokumentu = $typ;
 
+        // definuj "epod_typ", pokud dokument nebyl vytvořen e-podatelnou
         if (!isset($dokument->epod_typ))
-            $dokument->epod_typ = ''; // definuj "epod_typ", pokud dokument nebyl vytvořen e-podatelnou
+            $dokument->epod_typ = '';
 
-
-
-
-
-
-
-
-
-
-            
-// refactoring aplikace - prilis mnoho vyskytu k nahrazeni
+        // refactoring aplikace - prilis mnoho vyskytu k nahrazeni
         $dokument->stav_dokumentu = $dokument->stav;
 
         // lhuta

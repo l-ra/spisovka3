@@ -256,7 +256,7 @@ class Document extends DBEntity
                     $this->_rollback();
                     return false;
                 }
-                $doc->is_forwarded = false;
+                $doc->_cancelForwardingInternal();
                 $doc->owner_user_id = $user->id;
                 $doc->owner_orgunit_id = $user_orgunit;
                 $doc->_saveInternal();
@@ -290,7 +290,7 @@ class Document extends DBEntity
             $docs = $spis ? $spis->getDocuments() : [$this];
             $what = $spis ? 'spisu' : 'dokumentu';
             foreach ($docs as $doc) {
-                $doc->is_forwarded = false;
+                $doc->_cancelForwardingInternal();
                 $doc->save();
 
                 $Log = new LogModel();
@@ -339,7 +339,7 @@ class Document extends DBEntity
 
     protected function _rejectInternal($inside_spis)
     {
-        $this->is_forwarded = false;
+        $this->_cancelForwardingInternal();
         $this->_saveInternal();
 
         $Log = new LogModel();
@@ -506,5 +506,12 @@ class Document extends DBEntity
             $data->skartacni_znak = null;
         
         parent::modify($data);
+    }
+    
+    protected function _cancelForwardingInternal()
+    {
+        $this->is_forwarded = false;
+        $this->forward_user_id = null;
+        $this->forward_orgunit_id = null;
     }
 }
