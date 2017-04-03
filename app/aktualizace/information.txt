@@ -151,3 +151,5 @@ Přidání indexů na sloupci sekvence u tabulek spis a spisovy_znak.
 Změna uložení druhu poštovní zásilky v databázi.
 [1530]
 Optimalizace uložení, zda je dokument ve stavu předání.
+[1540]
+Vytvoření nových indexů do tabulky dokument.
