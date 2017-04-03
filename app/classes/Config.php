@@ -174,6 +174,9 @@ class ConfigClient extends Config
         // Týká se pouze sběrného archu
         if (empty($this->data->cislo_jednaci->oddelovac))
             $this->data->cislo_jednaci->oddelovac = '/';
+        
+        if (empty($this->data->nastaveni->pocet_polozek))
+            $this->data->nastaveni->pocet_polozek = 20;
     }
 
 }
