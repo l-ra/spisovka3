@@ -800,11 +800,11 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         if ($bez_vyrizenych)
             $a[] = 'd.stav <= ' . DocumentWorkflow::STAV_VYRIZUJE_SE;
 
-        if (isset($kprevzeti)) {
+        if (isset($kprevzeti) && !empty($a)) {
             $a = $this->crunchWhereConditions($a);
             $cond1 = array_shift($a);
             $cond2 = $kprevzeti;
-            $new_cond = $cond1 ? "$cond1 OR $cond2" : $cond2;
+            $new_cond = "$cond1 OR $cond2";
             array_unshift($a, $new_cond);
             $a = [$a];
         }
