@@ -1534,14 +1534,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                     if (!empty($adresat->email)) {
 
-                        $data = array(
+                        $email_data = array(
                             'dokument_id' => $dokument_id,
                             'email_from' => $data['email_from_' . $subjekt_id],
                             'email_predmet' => $data['email_predmet_' . $subjekt_id],
                             'email_text' => $data['email_text_' . $subjekt_id],
                         );
 
-                        if ($zprava = $this->odeslatEmailem($adresat, $data, $prilohy)) {
+                        if ($zprava = $this->odeslatEmailem($adresat, $email_data, $prilohy)) {
                             $Log = new LogModel();
                             $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,
                                     'Dokument odeslán e-mailem na adresu "' . Subjekt::displayName($adresat,
