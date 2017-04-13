@@ -153,3 +153,5 @@ Změna uložení druhu poštovní zásilky v databázi.
 Optimalizace uložení, zda je dokument ve stavu předání.
 [1540]
 Vytvoření nových indexů do tabulky dokument.
+[1550]
+Oprava rozlišování velkých/malých písmen ve jménu zaměstnance.
