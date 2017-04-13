@@ -19,6 +19,8 @@ class Admin_NastaveniPresenter extends BasePresenter
         [ 'login_redirect_homepage', false, 'Po přihlášení přesměrovat na domovskou stránku'],
         'povolit_predani' =>
         [ 'spisovka_allow_forward_finished_documents', false, 'Povolit předání vyřízeného dokumentu'],
+        'change_creation_date' =>
+        [ 'spisovka_allow_change_creation_date', false, 'Povolit změnu data doručení/vzniku dokumentu'],
         'zobrazit_zapujcene' =>
         [ 'spisovna_display_borrowed_documents', null, 'Zobrazit zapůjčené dokumenty ve spisovně'],
         'automaticky_nacist_zpravy' =>

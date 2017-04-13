@@ -60,6 +60,7 @@ Nové funkce:
 - je možné nastavit, zda si uživatelé mohou měnit svoje hesla
 - je možné nastavit, jak se má provést přesměrování po přihlášení, viz nápověda
 - je možné povolit předávání vyřízených dokumentů, viz nápověda
+- je možné povolit či zakázat měnit čas doručení/vzniku dokumentu po jeho vytvoření
 - je možné skrýt zapůjčené dokumenty ve spisovně
 - lze fitrovat subjekty podle stavu
 - uživatelské jméno zaměstnance je nyní možné změnit (vhodné např. pro případ,

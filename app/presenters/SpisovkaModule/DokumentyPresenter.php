@@ -1135,7 +1135,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu);
         }
 
-        if ($lze_menit_urcita_pole) {
+        if (Settings::get('spisovka_allow_change_creation_date')) {
             $form->addDatePicker('datum_vzniku', 'Datum doručení/vzniku:');
             $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
         }
