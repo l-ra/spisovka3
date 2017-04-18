@@ -25,7 +25,8 @@ Nové funkce:
 - nyní je možné dokument spojit s více dokumenty najednou, jak bylo původně
   v aplikaci zamýšleno
 - oprávněný uživatel (standardně administrátor) může otevřít již vyřízený
-  dokument, pokud není ve spisovně
+  dokument, pokud není ve spisovně. Uživatel též musí mít právo měnit otevíraný
+  dokument.
 - nový filtr pro snadné zobrazení zapůjčených dokumentů  
 - ve výpravně je možné vytvořit podací arch s dokumenty, které uživatel
   ručně vybere (funkce se použije, pokud pracovník chce odeslat dokumenty
@@ -48,6 +49,9 @@ Nové funkce:
   a databázové dotazy
 
   V administraci:
+- přidáno nové oprávnění k dokumentům, nazvané "Změny všech dokumentů".
+  Ve výchozím stavu jej žádná role nemá nastaveno. Administrátor jej musí
+  přidělit ručně.
 - přihlášení do datové schránky lze nastavit tak, aby každý oprávněný uživatel
   měl svoje přihlašovací jméno a heslo do datové schránky. Uživatel tyto údaje
   sám zadá v sekci, která se zobrazí po kliknutí na jméno uživatele v záhlaví

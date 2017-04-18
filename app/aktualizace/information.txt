@@ -155,3 +155,5 @@ Optimalizace uložení, zda je dokument ve stavu předání.
 Vytvoření nových indexů do tabulky dokument.
 [1550]
 Oprava rozlišování velkých/malých písmen ve jménu zaměstnance.
+[1570]
+Nové oprávnění "Změny všech dokumentů".

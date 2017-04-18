@@ -30,6 +30,8 @@ class Document extends DBEntity
                 return false;
         }
 
+        if ($user->isAllowed('Dokument', 'menit_vse'))
+            return true;
         if ($ou && $user->isAllowed('Dokument', 'menit_moje_oj') && $ou->id === $this->owner_orgunit_id)
             return true;
 
@@ -368,6 +370,7 @@ class Document extends DBEntity
         $change_own_unit = $user->isAllowed('Dokument', 'menit_moje_oj');
         $view_own_unit = $user->isAllowed('Dokument', 'cist_moje_oj');
         $view_all = $user->isAllowed('Dokument', 'cist_vse');
+        $edit_all = $user->isAllowed('Dokument', 'menit_vse');
 
         // Uzivatel muze byt vedoucim jenom jednoho utvaru
         $org_unit = $user->getOrgUnit();
@@ -377,7 +380,7 @@ class Document extends DBEntity
 
         $cancel_forwarding = false;
         $perm_take_over = false;
-        $perm_edit = $this->owner_user_id == $user->id || $change_own_unit && in_array($this->owner_orgunit_id,
+        $perm_edit = $edit_all || $this->owner_user_id == $user->id || $change_own_unit && in_array($this->owner_orgunit_id,
                         $permitted_org_units);
         $perm_view = $perm_edit || $view_all || $view_own_unit && in_array($this->owner_orgunit_id,
                         $permitted_org_units);
