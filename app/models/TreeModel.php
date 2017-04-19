@@ -19,7 +19,7 @@ abstract class TreeModel extends BaseModel
 
     public function getInfo($id)
     {
-        $row = $this->select(array(array('id=%i', $id)));
+        $row = $this->select(array(array('id = %i', $id)));
         $result = $row->fetch();
         return $result;
     }
@@ -195,13 +195,11 @@ abstract class TreeModel extends BaseModel
             $this->update($data, "id = $id");
 
             // 2. update tree
-            $data_tree = array();
-            $parent_id = $data['parent_id'];
+            $update1 = $update2 = array();
+            $parent_id = (int) $data['parent_id'];
             $old_parent_id = $old_record->parent_id;
-            if (empty($parent_id) && empty($old_parent_id)) {
-                $parent_id = 999;
-                $old_parent_id = 999;
-            }
+            if (empty($parent_id) && empty($old_parent_id))
+                $parent_id = $old_parent_id = null;
 
             if (empty($parent_id) && !empty($old_parent_id)) {
                 // the record is now a root node
@@ -211,17 +209,16 @@ abstract class TreeModel extends BaseModel
                     throw new InvalidArgumentException(__METHOD__ . "() - záznam ID $old_parent_id neexistuje.");
                 }
 
-                $data_tree['sekvence'] = $id;
-                $data_tree['sekvence_string'] = $new_sekvence_string;
-                $this->update($data_tree, array(array('id = %i', $id)));
+                $update1['sekvence'] = $id;
+                $update1['sekvence_string'] = $new_sekvence_string;
+                $this->update($update1, array(array('id = %i', $id)));
 
                 // change child nodes
-                $data_node = array();
-                $data_node['sekvence%sql'] = "REPLACE(sekvence,'$old_parent->sekvence.$id.','$id.')";
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string, '$old_parent->sekvence_string#$old_sekvence_string#', '$new_sekvence_string#')";
-
-                $this->update($data_node,
-                        [["sekvence LIKE %s", "$old_parent->sekvence.$id.%"]]);
+                $length = strlen("$old_parent->sekvence.");
+                $update2['sekvence%sql'] = "SUBSTR(sekvence, $length + 1)";
+                $length = strlen("$old_parent->sekvence_string#$old_sekvence_string");
+                $update2['sekvence_string%sql'] = "CONCAT('$new_sekvence_string', SUBSTR(sekvence_string, $length + 1))";
+                $this->update($update2, [["sekvence LIKE %s", "$old_parent->sekvence.$id.%"]]);
             } else if ($parent_id != $old_parent_id && empty($old_parent_id)) {
                 // the record is no longer a root node
                 $new_parent = $this->select(array(array('id = %i', $parent_id)))->fetch();
@@ -230,15 +227,16 @@ abstract class TreeModel extends BaseModel
                     throw new InvalidArgumentException(__METHOD__ . "() - záznam ID $parent_id neexistuje.");
                 }
 
-                $data_tree['sekvence'] = "$new_parent->sekvence.$id";
-                $data_tree['sekvence_string'] = "$new_parent->sekvence_string#$new_sekvence_string";
-                $this->update($data_tree, array(array('id = %i', $id)));
+                $update1['sekvence'] = "$new_parent->sekvence.$id";
+                $update1['sekvence_string'] = "$new_parent->sekvence_string#$new_sekvence_string";
+                $this->update($update1, array(array('id = %i', $id)));
 
                 // change child nodes
-                $data_node = array();
-                $data_node['sekvence%sql'] = "REPLACE(sekvence,'$id.','$new_parent->sekvence.$id.')";
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string, '$old_sekvence_string#', '$new_parent->sekvence_string#$new_sekvence_string#')";
-                $this->update($data_node, [["sekvence LIKE %s", "$id.%"]]);
+                $length = strlen($id);
+                $update2['sekvence%sql'] = "CONCAT('$new_parent->sekvence.$id', SUBSTR(sekvence, $length + 1))";
+                $length = strlen($old_sekvence_string);
+                $update2['sekvence_string%sql'] = "CONCAT('$new_parent->sekvence_string#$new_sekvence_string', SUBSTR(sekvence_string, $length + 1))";
+                $this->update($update2, [["sekvence LIKE %s", "$id.%"]]);
             } else if ($parent_id != $old_parent_id) {
                 // new parent
                 $old_parent = $this->select(array(array('id = %i', $old_parent_id)))->fetch();
@@ -248,24 +246,31 @@ abstract class TreeModel extends BaseModel
                     throw new InvalidArgumentException(__METHOD__ . "() - záznam ID $parent_id neexistuje.");
                 }
 
-                $data_tree['sekvence'] = "$new_parent->sekvence.$id";
-                $data_tree['sekvence_string'] = "$new_parent->sekvence_string#$new_sekvence_string";
-                $this->update($data_tree, array(array('id = %i', $id)));
+                $update1['sekvence'] = "$new_parent->sekvence.$id";
+                $update1['sekvence_string'] = "$new_parent->sekvence_string#$new_sekvence_string";
+                $this->update($update1, array(array('id = %i', $id)));
 
                 // change child nodes
-                $data_node = array();
-                $data_node['sekvence%sql'] = "REPLACE(sekvence,'$old_parent->sekvence.$id.','$new_parent->sekvence.$id.')";
-                $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string, '$old_parent->sekvence_string#$old_sekvence_string#', '$new_parent->sekvence_string#$new_sekvence_string#')";
-                $this->update($data_node,
-                        [["sekvence LIKE %s", "$old_parent->sekvence.$id.%"]]);
+                $length = strlen("$old_parent->sekvence.$id");
+                $update2['sekvence%sql'] = "CONCAT('$new_parent->sekvence.$id', SUBSTR(sekvence, $length + 1))";
+                $length = strlen("$old_parent->sekvence_string#$old_sekvence_string");
+                $update2['sekvence_string%sql'] = "CONCAT('$new_parent->sekvence_string#$new_sekvence_string', SUBSTR(sekvence_string, $length + 1))";
+                $this->update($update2, [["sekvence LIKE %s", "$old_parent->sekvence.$id.%"]]);
             } else {
                 // position in tree is unchanged
                 if ($old_sekvence_string != $new_sekvence_string) {
+                    $parent_sekvence_string = '';
+                    if ($parent_id) {
+                        $parent = $this->select("id = $old_parent_id")->fetch();
+                        $parent_sekvence_string = $parent->sekvence_string . '#';
+                    }
+                    $update1['sekvence_string'] = $parent_sekvence_string . $new_sekvence_string;
+                    $this->update($update1, "id = $id");
+
                     // change child nodes
-                    $data_node = array();
-                    $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string, '#$old_sekvence_string#', '#$new_sekvence_string#')";
-                    $this->update($data_node,
-                            [["sekvence LIKE %s", "$old_record->sekvence.%"]]);
+                    $length = strlen("$parent_sekvence_string$old_sekvence_string");
+                    $update2['sekvence_string%sql'] = "CONCAT('$parent_sekvence_string$new_sekvence_string', SUBSTR(sekvence_string, $length + 1))";
+                    $this->update($update2, [["sekvence LIKE %s", "$old_record->sekvence.%"]]);
                 }
             }
 
@@ -293,7 +298,6 @@ abstract class TreeModel extends BaseModel
             return false;
 
         if ($delete_children) {
-
             dibi::begin();
             try {
                 $this->delete(array("sekvence LIKE %s", $info->sekvence . ".%"));
@@ -307,29 +311,25 @@ abstract class TreeModel extends BaseModel
                 throw $e;
             }
         } else {
-
             dibi::begin();
             try {
-                $data_node = array();
-                if (empty($info->parent_id)) {
-                    // parent is root
-                    $data_node['sekvence%sql'] = "REPLACE(sekvence,'" . $info->sekvence . ".','')";
-                    $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'" . $info->sekvence_string . "#','')";
-                } else {
-                    $parent_info = $this->getInfo($info->parent_id);
-                    // change child nodes
-                    $data_node['sekvence%sql'] = "REPLACE(sekvence,'" . $info->sekvence . "','" . $parent_info->sekvence . "')";
-                    $data_node['sekvence_string%sql'] = "REPLACE(sekvence_string,'" . $info->sekvence_string . "','" . $parent_info->sekvence_string . "')";
+                $update = array();
+                $parent_sekvence = $parent_sekvence_string = '';
+                if ($info->parent_id) {
+                    $parent = $this->getInfo($info->parent_id);
+                    $parent_sekvence = $parent->sekvence . '.';
+                    $parent_sekvence_string = $parent->sekvence_string . '#';                    
                 }
-                //Nette\Diagnostics\Debugger::dump($data_node); exit;
+                $length = strlen("{$info->sekvence}.");
+                $update['sekvence%sql'] = "CONCAT('$parent_sekvence', SUBSTR(sekvence, $length + 1))";
+                $length = strlen("{$info->sekvence_string}#");
+                $update['sekvence_string%sql'] = "CONCAT('$parent_sekvence_string', SUBSTR(sekvence_string, $length + 1))";
 
-                $this->update($data_node,
-                        array(array("sekvence LIKE %s", $info->sekvence . ".%")));
+                $this->update($update, [["sekvence LIKE %s", $info->sekvence . ".%"]]);
 
-                $this->update(array('parent_id' => $info->parent_id),
-                        array("parent_id = " . $info->id));
+                $this->update(['parent_id' => $info->parent_id], "parent_id = $info->id");
 
-                $this->delete(array("id=%i", $id));
+                $this->delete([["id = %i", $id]]);
                 dibi::commit();
                 return true;
             } catch (Exception $e) {

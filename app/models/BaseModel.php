@@ -52,8 +52,11 @@ abstract class BaseModel extends Nette\Object
     public function select($where = NULL, $order = NULL, $offset = NULL, $limit = NULL)
     {
         $args = array('SELECT * FROM %n', $this->name);
-        if (isset($where))
+        if (isset($where)) {
+            if (!is_array($where))
+                $where = [$where];
             array_push($args, 'WHERE %and', $where);
+        }
         if (isset($order))
             array_push($args, 'ORDER BY %by', $order);
         if (isset($limit))
