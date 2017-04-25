@@ -77,6 +77,12 @@ class Install_DefaultPresenter extends BasePresenter
                 $imap_version .= ", Kerberos " . $phpinfo['imap']['Kerberos Support'];
         }
 
+        $imap_open_works = false;
+        $test_email = __DIR__ . '/test.eml';
+        if (function_exists('imap_open') && $imap_stream = imap_open($test_email, '', '')) {
+            $imap_open_works = true;
+            imap_close($imap_stream);
+        }
 
         // DB test
         // Nesmíme použít dibi::connect, protože bychom přepsali připojení z bootstrapu!
@@ -157,84 +163,94 @@ class Install_DefaultPresenter extends BasePresenter
                 'passed' => extension_loaded('imap'),
                 'message' => $imap_version,
                 'errorMessage' => 'Chybí. Je potřeba pro příjem e-mailových zpráv.',
-            ),
-            array(
-                'title' => 'Rozšíření OpenSSL',
-                'required' => FALSE,
-                'passed' => extension_loaded('openssl'),
-                'message' => 'Ano',
-                'errorMessage' => 'Chybí. Je potřeba pro elektronické podpisy u e-mailů a pro datovou schránku.',
-            ),
-            array(
-                'title' => 'Rozšíření SOAP',
-                'required' => FALSE,
-                'passed' => extension_loaded('soap'),
-                'message' => 'Ano',
-                'errorMessage' => 'Chybí. Je potřeba pro komunikaci s datovou schránkou.',
-            ),
-            array(
-                'title' => 'Rozšíření ZIP',
-                'required' => TRUE,
-                'passed' => extension_loaded('zip'),
-                'message' => 'Ano',
-                'errorMessage' => 'Chybí. Aplikaci není možné nainstalovat.',
-            ),
-            array(
-                'title' => 'Rozšíření Zlib',
-                'required' => FALSE,
-                'passed' => extension_loaded('zlib'),
-                'message' => 'Ano',
-                'errorMessage' => 'Chybí. Je nutné pro export do PDF.',
-            ),
-            array(
-                'title' => 'Zápis do složky temp',
-                'required' => TRUE,
-                'passed' => is_writable(TEMP_DIR),
-                'message' => 'Povoleno',
-                'errorMessage' => 'Není možné zapisovat do složky s dočasnými soubory.',
-                'description' => 'Povolte zápis do složky /client/temp/',
-            ),
-            array(
-                'title' => 'Zápis do složky configs',
-                'required' => TRUE,
-                'passed' => is_writable(CLIENT_DIR . '/configs/') && is_writable(CLIENT_DIR . '/configs/klient.ini'),
-                'message' => 'Povoleno',
-                'errorMessage' => 'Není možné zapisovat do složky s konfiguračními soubory.',
-                'description' => 'Povolte zápis do složky /client/configs/ a do souboru klient.ini, který se v ní nachází. Tato složka slouží k uložení některých nastavení aplikace.',
-            ),
-            array(
-                'title' => 'Zápis do složky sessions',
-                'required' => TRUE,
-                'passed' => is_writable(CLIENT_DIR . '/sessions/'),
-                'message' => 'Povoleno',
-                'errorMessage' => 'Není možné zapisovat do složky sessions.',
-                'description' => 'Povolte zápis do složky /client/sessions/. Tato složka slouží k ukládání různých stavů aplikace.',
-            ),
-            array(
-                'title' => 'Zápis do složky s protokoly',
-                'required' => FALSE,
-                'passed' => is_writable(LOG_DIR),
-                'message' => 'Povoleno',
-                'errorMessage' => 'Není možné zapisovat do složky s protokoly.',
-                'description' => 'Povolte <code>zápis</code> do složky /log/. Tato složka slouží k ukládání ladicích informací a protokolů o chybách aplikace.',
-            ),
-            array(
-                'title' => 'Zápis do složky dokumentů',
-                'required' => TRUE,
-                'passed' => is_writable(CLIENT_DIR . '/files/dokumenty/'),
-                'message' => 'Povoleno',
-                'errorMessage' => 'Není možné zapisovat do složky dokumentů.',
-                'description' => 'Povolte zápis do složky /client/files/dokumenty/. Tato složka slouží jako úložiště dokumentů.',
-            ),
-            array(
-                'title' => 'Zápis do složky e-podatelny',
-                'required' => TRUE,
-                'passed' => is_writable(CLIENT_DIR . '/files/epodatelna/'),
-                'message' => 'Povoleno',
-                'errorMessage' => 'Není možné zapisovat do složky e-podatelny.',
-                'description' => 'Povolte zápis do složky /client/files/epodatelna/. Tato složka slouží jako úložiště e-podatelny.',
-            ),
+            )
         );
+
+        if (extension_loaded('imap'))
+            $requirements_application[] = array(
+                'title' => 'Rozšíření IMAP umožňuje otevřít lokálně uložené e-maily',
+                'required' => FALSE,
+                'passed' => $imap_open_works,
+                'message' => 'Ano',
+                'errorMessage' => 'Ne. Bude použito náhradní řešení, které je pomalejší.',
+            );
+        $requirements_application[] = array(
+            'title' => 'Rozšíření OpenSSL',
+            'required' => FALSE,
+            'passed' => extension_loaded('openssl'),
+            'message' => 'Ano',
+            'errorMessage' => 'Chybí. Je potřeba pro elektronické podpisy u e-mailů a pro datovou schránku.',
+        );
+        $requirements_application[] = array(
+            'title' => 'Rozšíření SOAP',
+            'required' => FALSE,
+            'passed' => extension_loaded('soap'),
+            'message' => 'Ano',
+            'errorMessage' => 'Chybí. Je potřeba pro komunikaci s datovou schránkou.',
+        );
+        $requirements_application[] = array(
+            'title' => 'Rozšíření ZIP',
+            'required' => TRUE,
+            'passed' => extension_loaded('zip'),
+            'message' => 'Ano',
+            'errorMessage' => 'Chybí. Aplikaci není možné nainstalovat.',
+        );
+        $requirements_application[] = array(
+            'title' => 'Rozšíření Zlib',
+            'required' => FALSE,
+            'passed' => extension_loaded('zlib'),
+            'message' => 'Ano',
+            'errorMessage' => 'Chybí. Je nutné pro export do PDF.',
+        );
+        $requirements_application[] = array(
+            'title' => 'Zápis do složky temp',
+            'required' => TRUE,
+            'passed' => is_writable(TEMP_DIR),
+            'message' => 'Povoleno',
+            'errorMessage' => 'Není možné zapisovat do složky s dočasnými soubory.',
+            'description' => 'Povolte zápis do složky /client/temp/',
+        );
+        $requirements_application[] = array(
+            'title' => 'Zápis do složky configs',
+            'required' => TRUE,
+            'passed' => is_writable(CLIENT_DIR . '/configs/') && is_writable(CLIENT_DIR . '/configs/klient.ini'),
+            'message' => 'Povoleno',
+            'errorMessage' => 'Není možné zapisovat do složky s konfiguračními soubory.',
+            'description' => 'Povolte zápis do složky /client/configs/ a do souboru klient.ini, který se v ní nachází. Tato složka slouží k uložení některých nastavení aplikace.',
+        );
+        $requirements_application[] = array(
+            'title' => 'Zápis do složky sessions',
+            'required' => TRUE,
+            'passed' => is_writable(CLIENT_DIR . '/sessions/'),
+            'message' => 'Povoleno',
+            'errorMessage' => 'Není možné zapisovat do složky sessions.',
+            'description' => 'Povolte zápis do složky /client/sessions/. Tato složka slouží k ukládání různých stavů aplikace.',
+        );
+        $requirements_application[] = array(
+            'title' => 'Zápis do složky s protokoly',
+            'required' => FALSE,
+            'passed' => is_writable(LOG_DIR),
+            'message' => 'Povoleno',
+            'errorMessage' => 'Není možné zapisovat do složky s protokoly.',
+            'description' => 'Povolte <code>zápis</code> do složky /log/. Tato složka slouží k ukládání ladicích informací a protokolů o chybách aplikace.',
+        );
+        $requirements_application[] = array(
+            'title' => 'Zápis do složky dokumentů',
+            'required' => TRUE,
+            'passed' => is_writable(CLIENT_DIR . '/files/dokumenty/'),
+            'message' => 'Povoleno',
+            'errorMessage' => 'Není možné zapisovat do složky dokumentů.',
+            'description' => 'Povolte zápis do složky /client/files/dokumenty/. Tato složka slouží jako úložiště dokumentů.',
+        );
+        $requirements_application[] = array(
+            'title' => 'Zápis do složky e-podatelny',
+            'required' => TRUE,
+            'passed' => is_writable(CLIENT_DIR . '/files/epodatelna/'),
+            'message' => 'Povoleno',
+            'errorMessage' => 'Není možné zapisovat do složky e-podatelny.',
+            'description' => 'Povolte zápis do složky /client/files/epodatelna/. Tato složka slouží jako úložiště e-podatelny.',
+        );
+
 
         /* ------------------------------------------------------------------------
          *  Nette requirements checker
@@ -446,10 +462,10 @@ class Install_DefaultPresenter extends BasePresenter
             $db_config = GlobalVariables::get('database');
             $db_tables = dibi::getDatabaseInfo()->getTableNames();
             $output = [
-                    ['title' => 'Ovladač', 'message' => $db_config->driver],
-                    ['title' => 'Server', 'message' => $db_config->host],
-                    ['title' => 'Databázový uživatel', 'message' => $db_config->username],
-                    ['title' => 'Název databáze', 'message' => $db_config->database],
+                ['title' => 'Ovladač', 'message' => $db_config->driver],
+                ['title' => 'Server', 'message' => $db_config->host],
+                ['title' => 'Databázový uživatel', 'message' => $db_config->username],
+                ['title' => 'Název databáze', 'message' => $db_config->database],
             ];
             $output[] = ['title' => 'Je databáze prázdná?',
                 'message' => 'ano',
