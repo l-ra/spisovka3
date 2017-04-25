@@ -50,26 +50,8 @@ class EpodatelnaPrilohy
      */
     public static function getEmailPart($filename, $part_number)
     {
-        $imap = new ImapClient();
-        $imap->open($filename);
-        $data = $imap->fetch_body_part(1, $part_number);
-        
-        $structure = $imap->get_message_structure(1);
-        $part = $structure;
-        $part_numbers = explode('.', $part_number);
-        foreach ($part_numbers as $pn) {
-            $part = $part->parts[$pn - 1];            
-        }
-        $data = $imap->decode_data($data, $part);
-        $imap->close();
-
-        $filename = $part->dparameters['FILENAME']; // Content-Disposition
-        if (!$filename) {
-            // pri poruseni MIME standardu v e-mailu zkusime jeste tuto moznost
-            $filename = $part->parameters['NAME'];
-        }
-
-        return ['data' => $data, 'file_name' => $filename];
+        $email = new EmailClient($filename);
+        return $email->getPart($part_number);
     }
 
     /**
@@ -91,7 +73,6 @@ class EpodatelnaPrilohy
      */
     public static function getFileList(EpodatelnaMessage $message, $storage)
     {
-        $model = new Epodatelna();
         if ($message->typ == 'I') {
             // vrat, co uz je v databazi, zde nebyly bugy v kodu
             return unserialize($message->prilohy);
@@ -104,22 +85,10 @@ class EpodatelnaPrilohy
         
         $filename = $message->getEmailFile($storage);
         
-        $imap = new ImapClient();
-        $imap->open($filename);
-        $structure = $imap->get_message_structure(1);
-        $attachments = $imap->get_attachments($structure);
-        $imap->close();
-
-        $result = [];
-        foreach ($attachments as $id => $at) {
-            $filename = $at->dparameters['FILENAME'];
-            $size = $at->bytes;
-            if ($at->encoding == ENCBASE64)
-                $size = floor($size * 3 / 4 * 73 / 74);
-            $result[] = ['id' => $id, 'name' => $filename, 'size' => $size];
-        }
-        
-        return $result;
+        $mail = new EmailClient($filename);
+        $attachments = $mail->getAttachments();
+                
+        return $attachments;
     }
 
 }

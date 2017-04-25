@@ -210,7 +210,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function evidovat($data)
     {
-        // dump($data); die;
         $zprava = new EpodatelnaMessage($data['message_id']);
         $this->assertMessageNotProcessed($zprava);
 
@@ -356,11 +355,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $message = new EpodatelnaMessage($epodatelna_id);
         $filename = $message->getEmailFile($storage);
 
-        $imap = new ImapClient();
-        $imap->open($filename);
-        $structure = $imap->get_message_structure(1);
+        $email = new EmailClient($filename);
 
-        $text = $imap->find_plain_text(1, $structure);
+        $text = $email->findPlainText();
         if ($text) {
             $upload_info = array(
                 'filename' => 'zprava.txt',
@@ -372,16 +369,15 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $DokumentFile->pripojit($dokument_id, $uploaded->id);
         }
 
-        $attachments = $imap->get_attachments($structure);
-        foreach ($attachments as $part_number => $attachment) {
+        $attachments = $email->getAttachments();
+        foreach ($attachments as $attachment) {
 
-            $filename = $attachment->dparameters['FILENAME'];
+            $filename = $attachment['name'];
             if ($filename == 'smime.p7s')
                 continue;
-
-            $data = $imap->fetch_body_part(1, $part_number);
-            $data = $imap->decode_data($data, $attachment);
-
+            
+            $data = $email->getPart($attachment['id']);
+            
             // prekopirovani na pozadovane misto
             $upload_info = array(
                 'filename' => $filename,
@@ -396,7 +392,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
         }
 
-        $imap->close();
         return true;
     }
 

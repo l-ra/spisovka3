@@ -67,12 +67,8 @@ class EmailSignature extends \Nette\Application\UI\Control
     {
         $filename = $this->message->getEmailFile($this->storage);
 
-        $imap = new \ImapClient();
-        $imap->open($filename);
-        $structure = $imap->get_message_structure(1);
-        $is_signed = $imap->is_signed($structure);
-        $imap->close();
-        
+        $email = new \EmailClient($filename);
+        $is_signed = $email->isSigned();
         $this->message->email_signed = $is_signed;
         $this->message->save();
         
