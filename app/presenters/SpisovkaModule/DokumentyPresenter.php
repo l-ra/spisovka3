@@ -202,6 +202,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->Typ_evidence = $this->typ_evidence;
         $this->template->FormUdalost = $udalost && $doc->stav == DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA;
         $this->template->AccessEdit = $AccessEdit;
+        $this->template->LzePriraditCj = $permissions['assign_cj'];
         $this->template->LzePrevzit = $permissions['take_over'];
         $this->template->LzeZrusitPredani = $permissions['cancel_forwarding'];
         $this->template->LzePredatDokument = $doc->canUserForward();

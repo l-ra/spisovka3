@@ -140,7 +140,7 @@
             {if empty($Dok->cislo_jednaci)}
                 <dt>Číslo jednací{if $Typ_evidence == 'sberny_arch'} / pořadí{/if}:</dt>
                 <dd>Dokument nemá přiděleno číslo jednací.
-                    {if $AccessEdit}
+                    {if $LzePriraditCj}
                         {if $Typ_evidence == 'sberny_arch'}
                             <br />Zaevidovat do spisové služby: <a href="{link pridelitcj, 'id'=>$Dok->id}">vytvořit nový spis</a>
                             <a class="ajax-dialog" data-title="Vložit do spisu" href="{link cjednaci, 'id'=>$Dok->id}">vložit do existujícího spisu</a>

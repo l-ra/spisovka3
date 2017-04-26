@@ -182,11 +182,11 @@ class Document extends DBEntity
             $spis = $this->getSpis();
             if ($spis && $orgunit_id === null)
                 throw new Exception('Uživatel není zařazen do organizační jednotky, není možné mu předávat spisy.');
-            
+
             $log_text = $spis ? $log_spis : $log;
             if (!empty($note))
                 $log_text .= "\nPoznámka k předání: $note";
-            
+
             $docs = $spis ? $spis->getDocuments() : [$this];
             foreach ($docs as $doc) {
                 $doc->is_forwarded = true;
@@ -384,6 +384,7 @@ class Document extends DBEntity
                         $permitted_org_units);
         $perm_view = $perm_edit || $view_all || $view_own_unit && in_array($this->owner_orgunit_id,
                         $permitted_org_units);
+        $perm_assign_cj = $perm_edit && empty($this->cislo_jednaci);
         if ($this->is_forwarded) {
             $perm_take_over = $this->forward_user_id == $user->id || $change_own_unit && in_array($this->forward_orgunit_id,
                             $permitted_org_units);
@@ -391,6 +392,8 @@ class Document extends DBEntity
             $perm_view = $perm_view || $perm_take_over || $view_own_unit && in_array($this->forward_orgunit_id,
                             $permitted_org_units);
             $perm_edit = false; // Pokud je dokument ve stavu predani, zakaz praci s nim
+            if ($this->owner_user_id != $user->id)
+                $perm_assign_cj = false;
         }
 
         if ($this->stav >= DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA)
@@ -401,6 +404,7 @@ class Document extends DBEntity
             'edit' => $perm_edit,
             'take_over' => $perm_take_over,
             'cancel_forwarding' => $cancel_forwarding,
+            'assign_cj' => $perm_assign_cj
         ];
     }
 
@@ -507,14 +511,15 @@ class Document extends DBEntity
             $data->skartacni_lhuta = null;
         if (array_key_exists('skartacni_znak', $data) && $data->skartacni_znak === '')
             $data->skartacni_znak = null;
-        
+
         parent::modify($data);
     }
-    
+
     protected function _cancelForwardingInternal()
     {
         $this->is_forwarded = false;
         $this->forward_user_id = null;
         $this->forward_orgunit_id = null;
     }
+
 }
