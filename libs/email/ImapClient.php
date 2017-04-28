@@ -44,7 +44,8 @@ class ImapClient
         if (!function_exists('imap_open'))
             throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
 
-        if ($rc = imap_open($filename, '', '')) {
+        // @ - nezapisuj do logu chyby, ke kterým bude docházet na určitých operačních systémech
+        if ($rc = @imap_open($filename, '', '')) {
             $this->stream = $rc;
             return true;
         }
