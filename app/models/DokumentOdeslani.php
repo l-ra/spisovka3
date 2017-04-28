@@ -117,6 +117,16 @@ class DokumentOdeslani extends BaseModel
                     'on' => array('dok.id=do.dokument_id'),
                     'cols' => array('nazev' => 'dok_nazev', 'jid' => 'dok_jid', 'cislo_jednaci' => 'dok_cislo_jednaci', 'poradi' => 'dok_poradi')
                 ),
+                'user' => array(
+                    'from' => array($this->tb_user => 'user'),
+                    'on' => array('user.id = do.user_id'),
+                    'cols' => array()
+                ),
+                'osoba' => array(
+                    'from' => array($this->tb_osoba => 'osoba'),
+                    'on' => array('osoba.id = user.osoba_id'),
+                    'cols' => array()
+                ),
             ),
             'order' => $razeni
         );
@@ -126,7 +136,7 @@ class DokumentOdeslani extends BaseModel
             $sql['where'][] = array('do.zpusob_odeslani_id = 3');
         }
 
-        if (!empty($hledani))
+        if (!empty($hledani) && is_string($hledani))
             $sql['where_or'] = array(
                 array('CONCAT(s.nazev_subjektu,s.prijmeni) LIKE %s', '%' . $hledani . '%'),
                 array('osoba.prijmeni LIKE %s', '%' . $hledani . '%'),
@@ -142,8 +152,9 @@ class DokumentOdeslani extends BaseModel
 
         $dokumenty = array();
         foreach ($result as $index => $row) {
-            $druh_zasilky = $row->druh_zasilky = $row->druh_zasilky ? explode(',', $row->druh_zasilky) : [];
-            
+            $druh_zasilky = $row->druh_zasilky = $row->druh_zasilky ? explode(',',
+                            $row->druh_zasilky) : [];
+
             if (is_array($filtr)) {
                 // filtruj podle druhu zasilky
                 $a_result = null;

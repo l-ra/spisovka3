@@ -126,6 +126,7 @@
 :Spisovka:Uzivatel:vyber
 :Spisovka:Vyhledat:
 :Spisovka:Vypravna:
+:Spisovka:Vypravna: { "hledat": "Pavel" }
 :Spisovka:Vypravna:detail { "id": 26 }
 :Spisovka:Vypravna:filtrovat
 :Spisovka:Vypravna:zobrazFax { "id": 82 }
