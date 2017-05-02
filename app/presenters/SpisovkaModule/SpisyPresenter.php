@@ -39,7 +39,7 @@ class SpisyPresenter extends BasePresenter
     protected function createComponentNovyForm()
     {
         $form = $this->createForm();
-        
+
         $default_event = StartEvent::getDefault();
         if ($default_event)
             $form['spousteci_udalost_id']->setDefaultValue($default_event->id);
@@ -440,19 +440,18 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function bulkAction($action, $spisy)
     {
-        $Spis = new SpisModel();
         switch ($action) {
             /* Predani vybranych spisu do spisovny  */
             case 'predat_spisovna':
                 $count_ok = $count_failed = 0;
                 foreach ($spisy as $spis_id) {
-                    $result = $Spis->transferToSpisovna($spis_id);
-                    if ($result === true) {
+                    $spis = new Spis($spis_id);
+                    try {
+                        $spis->transferToSpisovna();
                         $count_ok++;
-                    } else {
+                    } catch (Exception $e) {
                         $count_failed++;
-                        foreach ($result as $msg)
-                            $this->flashMessage($msg, 'warning');
+                        $this->flashMessage($e->getMessage(), 'warning');
                     }
                 }
 

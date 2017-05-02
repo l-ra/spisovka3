@@ -144,7 +144,7 @@ class Spis extends DBEntity
         if ($this->skartacni_lhuta === null)
             $errors[] = "Skartační lhůta musí být zadána.";
 
-        if ($result)
+        if (isset($result))
             $result = $errors;
         return !$errors;
     }
@@ -158,8 +158,10 @@ class Spis extends DBEntity
         if (!$perm['lze_uzavrit'])
             throw new Exception('Přístup odepřen.');
 
-        if (!$this->checkMandatoryData())
-            throw new Exception('Spis nelze uzavřít, nemá vyplněny všechny povinné údaje.');
+        $errors = [];
+        if (!$this->checkMandatoryData($errors))
+            throw new Exception("Spis nelze uzavřít, nemá vyplněny všechny povinné údaje.\n" . implode(' ',
+                    $errors));
 
         $documents = $this->getDocuments();
         if ($documents)
@@ -273,7 +275,7 @@ class Spis extends DBEntity
             throw $e;
         }
     }
-    
+
     /**
      * Starý kód. Vrať kromě dokumentů i informace o jejich subjektech a přílohách.
      * Použito pro zobrazení detailu spisu.
