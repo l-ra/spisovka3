@@ -243,6 +243,7 @@ class Spis extends DBEntity
 
             $this->stav = self::VE_SPISOVNE;
             $this->save();
+            dibi::commit();
         } catch (Exception $e) {
             $this->_rollback();
             throw $e;
