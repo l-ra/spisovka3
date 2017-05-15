@@ -33,7 +33,7 @@ class EmailClient
 
             $result = [];
             foreach ($attachments as $part_number => $at) {
-                $filename = $at->dparameters['FILENAME'];
+                $filename = $at->dparameters['filename'];
                 $size = $at->bytes;
                 if ($at->encoding == ENCBASE64)
                     $size = floor($size * 3 / 4 * 73 / 74);
@@ -64,10 +64,10 @@ class EmailClient
             }
             $data = $imap->decode_data($data, $part);
 
-            $filename = $part->dparameters['FILENAME']; // Content-Disposition
+            $filename = $part->dparameters['filename']; // Content-Disposition
             if (!$filename) {
                 // pri poruseni MIME standardu v e-mailu zkusime jeste tuto moznost
-                $filename = $part->parameters['NAME'];
+                $filename = $part->parameters['name'];
             }
         } else if ($this->mime_parser) {
             $part = $this->mime_parser->getPart($id);

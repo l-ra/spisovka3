@@ -125,14 +125,14 @@ class ImapClient
         if ($structure->ifparameters) {
             $params = [];
             foreach ($structure->parameters as $p)
-                $params[$p->attribute] = $p->value;
+                $params[strtolower($p->attribute)] = $p->value;
             $structure->parameters = $params;
         }
 
         if ($structure->ifdparameters) {
             $params = [];
             foreach ($structure->dparameters as $p)
-                $params[$p->attribute] = $p->value;
+                $params[strtolower($p->attribute)] = $p->value;
             $structure->dparameters = $params;
         }
 
@@ -222,8 +222,8 @@ class ImapClient
                 break;
         }
 
-        if ($structure->ifparameters && isset($structure->parameters['CHARSET'])) {
-            $charset = $structure->parameters['CHARSET'];
+        if ($structure->ifparameters && isset($structure->parameters['charset'])) {
+            $charset = $structure->parameters['charset'];
             if (strcasecmp($charset, 'default') != 0)
                 $data = @iconv($charset, $this->charset, $data);
         }
@@ -282,7 +282,7 @@ class ImapClient
                 break;
 
             default:
-                if ($structure->ifdisposition && $structure->disposition == 'ATTACHMENT') {                    
+                if ($structure->ifdisposition && $structure->disposition == 'ATTACHMENT') {
                     $result = [$part_id => $structure];
                 }
                 break;
@@ -290,7 +290,7 @@ class ImapClient
 
         return $result;
     }
-    
+
     public function is_signed($structure)
     {
         return $structure->type == TYPEMULTIPART && $structure->subtype == "SIGNED";
