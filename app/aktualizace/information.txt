@@ -130,9 +130,11 @@ Oprava chybky ve vývojové verzi aplikace
 [1390]
 Zkrácení polí, většinou poznámek
 [1405]
-Oprava porušené referenční integrity, týká se odkazů na ID uživatele
+Oprava porušené referenční integrity - neplatné ID uživatele.
 [1406]
-Odstranění porušeného spojení dokumentů.
+Oprava porušené referenční integrity - spojení dokumentů.
+[1407]
+Oprava porušené referenční integrity - neexistující dokumenty ve spisech.
 [1410]
 Smazání a nové vytvoření všech integritních omezení a souvisejících indexů.
 Je pravděpodobné, že bude potřeba ručně opravit data v databázi, pokud jsou data nekonzistentní!
