@@ -131,6 +131,8 @@ Oprava chybky ve vývojové verzi aplikace
 Zkrácení polí, většinou poznámek
 [1405]
 Oprava porušené referenční integrity, týká se odkazů na ID uživatele
+[1406]
+Odstranění porušeného spojení dokumentů.
 [1410]
 Smazání a nové vytvoření všech integritních omezení a souvisejících indexů.
 Je pravděpodobné, že bude potřeba ručně opravit data v databázi, pokud jsou data nekonzistentní!
