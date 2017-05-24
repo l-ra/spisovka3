@@ -34,6 +34,12 @@ class EmailClient
             $result = [];
             foreach ($attachments as $part_number => $at) {
                 $filename = $at->dparameters['filename'];
+                if (strpos($filename, '=?') === 0) {
+                    $a = imap_mime_header_decode($filename);
+                    $filename = $a[0]->text;
+                    $charset = $a[0]->charset;
+                    $filename = iconv($charset, 'utf-8', $filename);
+                }
                 $size = $at->bytes;
                 if ($at->encoding == ENCBASE64)
                     $size = floor($size * 3 / 4 * 73 / 74);
@@ -184,8 +190,11 @@ class MimeParser
 
         if (isset($part['FileDisposition']))
             if ($part['FileDisposition'] == "attachment") {
+                $filename = $part['FileName'];
+                if (!empty($part['FileNameCharacterSet']))
+                    $filename = iconv($part['FileNameCharacterSet'], 'utf-8', $filename);
                 $this->attachments[] = ['id' => $part['BodyPart'],
-                    'name' => $part['FileName'], 'size' => $part['BodyLength']];
+                    'name' => $filename, 'size' => $part['BodyLength']];
             }
     }
 
