@@ -314,11 +314,15 @@ class Subjekt extends BaseModel
             'PFO_DANPOR' => 'PFO - daňoví poradci',
             'PFO_INSSPR' => 'PFO - insolvenční správci',
             'PFO_AUDITOR' => 'PFO - statutární auditor',
-            'OVM_NOTAR' => 'OVM - notáři',
-            'OVM_EXEKUT' => 'OVM - exekutoři',
             'OVM_REQ' => 'Podřízené OVM vzniklé na základě žádosti (§6 a 7)',
-            'PO_ZAK' => 'PO vzniklé ze zákona',
-            'PO_REQ' => 'PO vzniklé na žádost'
+            'PO_REQ' => 'PO vzniklé na žádost',
+            /* ISDS změny 26. 5. 2017 */
+            'OVM_PO' => 'PO zapsána do Rejstříku OVM',
+            'OVM_PFO' => 'PFO zapsána do Rejstříku OVM',
+            'OVM_FO' => 'FO zapsána do Rejstříku OVM',
+            'OVM_NOTAR' => 'zrušeno: OVM - notáři',
+            'OVM_EXEKUT' => 'zrušeno: OVM - exekutoři',
+            'PO_ZAK' => 'zrušeno: PO vzniklé ze zákona',            
         );
 
         if (is_null($kod)) {
