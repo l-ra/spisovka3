@@ -15,18 +15,27 @@
             <dt>Vlastník DS:</dt>
             <dd>{$isds['vlastnik']}</dd>
         </dl>
+        <dl>
+            <dt>Přihlašovací jméno do ISDS:</dt>
+            <dd>{$isds['login']}</dd>
+        </dl>
     {/if}
+    <dl>
+        <dt>Režim:</dt>
+        <dd>{if $isds['test']}Testovací režim{else}Reálný provoz{/if}</dd>
+    </dl>
     <dl>
         <dt>Podatelna pro příjem této DS:</dt>
         <dd>{if empty($isds['podatelna'])}kterákoli{else}{= new OrgUnit($isds['podatelna'])}{/if}</dd>
     </dl>
     <a href="{link detail, 'i'}">Upravit</a>    
+    <a n:if="!Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)" href="{link isdsTest}">Otestovat připojení</a>
 </div>
 
 
 <h2>E-mailové schránky</h2>
 
-<p><a href="{link novaschranka, 'typ'=>'e'}">Přidat schránku</a></p>
+<p><a href="{link novaschranka, 'typ' => 'e'}">Přidat schránku</a></p>
 
 {if count($email_config)>0}
     {foreach $email_config as $index => $email}
@@ -34,8 +43,12 @@
             <dl>
                 <dt>Název:</dt>
                 <dd>{$email['ucet']}</dd><br />
+                <dt>Protokol:</dt>
+                <dd>{$email['protokol']}</dd><br />
                 <dt>Server:</dt>
-                <dd>{$email['protokol']} - {$email['server']}:{$email['port']} / {$email['inbox']}</dd><br />
+                <dd>{$email['server']}:{$email['port']}</dd><br />
+                <dt>Přihlašovací jméno:</dt>
+                <dd>{$email['login']}</dd><br />
                 <dt>Příjem:</dt>
                 <dd>
                     {if $email['only_signature']==1}
@@ -52,20 +65,36 @@
                 <dd>{if empty($email['podatelna'])}kterákoli{else}{= new OrgUnit($email['podatelna'])}{/if}</dd>
             </dl>
             <a href="{link detail, 'e'.$index}">Upravit</a>
+            <a href="{link smazat, 'e'.$index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>
         </div>
     {/foreach}
 {else}
     <div class="prazdno">Nebyly nalezeny žádné účty e-mailových schránek.</div>
 {/if}
 
-<h2>Odesílání přes e-mail</h2>
+<h2>Odesílání e-mailem</h2>
 
 <div class="detail_blok">
     <dl>
         <dt>E-mailová adresa odesilatele:</dt>
-        <dd>{$odes_config['email']}</dd><br />
+        <dd>{$sending['email']}</dd><br />
         <dt>Elektronicky podepisovat:</dt>
-        <dd>{$odes_config['podepisovat'] ? 'ano' : 'ne'}</dd>
+        <dd>{$sending['podepisovat'] ? 'ano' : 'ne'}</dd><br />
+        {if $sending['podepisovat']}
+            <dt>Stav elektronického podepisování:</dt>
+            <dd>{!$sending['signing_state']|escape|nl2br}</dd><br />
+            {if !empty($sending['certificate_info'])}
+                <dt>Informace o certifikátu:</dt>
+                <dd>
+                    {$sending['certificate_info']['email']} <br />
+                    {if !empty($sending['certificate_info']['jmeno'])}{$sending['certificate_info']['jmeno']}<br />{/if}
+                    {if !empty($sending['certificate_info']['organizace'])}{$sending['certificate_info']['organizace']}<br />{/if}
+                    {if !empty($sending['certificate_info']['jednotka'])}{$sending['certificate_info']['jednotka']}<br />{/if}
+                    Platnost: {$sending['certificate_info']['platnost_od']|date} - {$sending['certificate_info']['platnost_do']|date} <br />
+                    CA: {$sending['certificate_info']['CA']}
+                </dd>
+            {/if}
+        {/if}
     </dl>
     <a href="{link detail, 'o'}">Upravit</a>
 </div>

@@ -10,8 +10,6 @@ class Admin_EpodatelnaPresenter extends BasePresenter
      */
     const ISDS_INDIVIDUAL_LOGIN = 'isds_individual_login';
 
-    private $info;
-
     public function renderDefault()
     {
         // Klientske nastaveni
@@ -43,90 +41,43 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         }
 
         // Odeslani
-        $this->template->odes_config = $ep['odeslani'];
+        $sending = $ep['odeslani'];
+        if (!$ep['odeslani']['podepisovat'])
+            $state = 'vypnuto';
+        else if (file_exists($ep['odeslani']['cert'])) {
+            $esign = new esignature();
+            $ok = $esign->setUserCert($ep['odeslani']['cert'], $ep['odeslani']['cert_pass']);
+            if ($ok) {
+                $state = 'Certifikát je nahrán.';
+                $cert_info = $esign->parseCertificate();
+                if (is_array($cert_info)) {
+                    $state = $cert_info['platnost_od'] <= time() && $cert_info['platnost_do'] >= time()
+                                ? 'Certifikát je platný.' : 'Certifikát je neplatný! Vypršela jeho platnost.';
+                    $sending['certificate_info'] = $cert_info;
+                }
+            } else 
+                $state = "Nahraný soubor s certifikátem je neplatný nebo nesouhlasí heslo.\n" . $esign->getError();
+        } else
+            $state = 'Certifikát není nahrán.';
+
+        $sending['signing_state'] = $state;
+        $this->template->sending = $sending;
     }
 
-    public function renderDetail($id, $upravit)
+    public function renderDetail($id)
     {
-        $this->template->vice_datovych_schranek = ISDS_Spisovka::vice_datovych_schranek();
-
-        // Klientske nastaveni
         $ep = self::nactiNastaveni();
-        $ep = $ep->toArray(); // Je nutne kvuli zpusobu modifikace objektu nastaveni
 
         $typ = substr($id, 0, 1);
-
+        $this->template->Typ = $typ;
         switch ($typ) {
             case 'i':
-                $isds = $ep['isds'];
+                $isds = clone $ep['isds'];
                 $crt = $isds['certifikat'];
                 $isds['certifikat_stav'] = file_exists($crt) ? 1 : 0;
-                $this->info = $isds;
-                break;
-
-            case 'e':
-                $index = substr($id, 1);
-                $this->template->Index = $index;
-                $typ_serveru = array(
-                    '' => '',
-                    '/pop3/novalidate-cert' => 'POP3',
-                    '/pop3/ssl/novalidate-cert' => 'POP3-SSL',
-                    '/imap/novalidate-cert' => 'IMAP',
-                    '/imap/ssl/novalidate-cert' => 'IMAP+SSL',
-                    '/nntp' => 'NNTP'
-                );
-                @$ep['email'][$index]['protokol'] = $typ_serveru[@$ep['email'][$index]['typ']];
-
-                $this->info = $ep['email'][$index];
-                break;
-
-            case 'o':
-                if (!$ep['odeslani']['podepisovat'])
-                    $stav = 'vypnuto';
-                else if (file_exists($ep['odeslani']['cert'])) {
-                    $esign = new esignature();
-
-                    $ok = $esign->setUserCert($ep['odeslani']['cert'],
-                            $ep['odeslani']['cert_pass']);
-                    $error_message = $esign->getError();
-
-                    if ($ok) {
-                        $stav = 'Certifikát je nahrán.';
-
-                        $cert_info = $esign->parseCertificate();
-                        if (is_array($cert_info)) {
-                            if (($cert_info['platnost_od'] <= time()) && ($cert_info['platnost_do'] >= time())) {
-                                $stav = 'Certifikát je platný.';
-                            } else {
-                                $stav = 'Certifikát je neplatný! Vypršela jeho platnost.';
-                            }
-                            $ep['odeslani']['certifikat']['info'] = $cert_info;
-                        }
-                    } else {
-                        $stav = "Nahraný soubor s certifikátem je neplatný nebo nesouhlasí heslo.\n" . $error_message;
-                    }
-                } else {
-                    $stav = 'Certifikát není nahrán.';
-                }
-
-                $this->info = $ep['odeslani'];
-                $this->info['certifikat']['stav'] = $stav;
-                break;
-            default:
-                $this->info = null;
+                $this->template->Info = $isds;
                 break;
         }
-
-        if (isset($this->info['podatelna']) && !empty($this->info['podatelna'])) {
-            $this->info['podatelna'] = new OrgUnit($this->info['podatelna']);
-        }
-
-        $this->template->Info = $this->info;
-        $this->template->Typ = $typ;
-
-        // Zmena udaju
-        $this->template->FormUpravit = $upravit;
-        $this->template->FormHesloISDS = $this->getParameter('zmenit_heslo_isds');
     }
 
     /**
@@ -305,7 +256,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         self::ulozNastaveni($config_data);
 
         $this->flashMessage('Nastavení datové schránky bylo upraveno.');
-        $this->redirect('this', ['upravit' => null]);
+        $this->redirect('default');
     }
 
     public function actionIsdsTest()
@@ -322,7 +273,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             $this->flashMessage("Připojení se nepodařilo: " . $e->getMessage(), 'warning');
         }
 
-        $this->redirect('detail', 'i');
+        $this->redirect('default');
     }
 
     function ruleContains($item, $args)
@@ -543,7 +494,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         self::ulozNastaveni($config_data);
 
         $this->flashMessage('Nastavení e-mailové schránky bylo upraveno.');
-        $this->redirect('detail', array('id' => ('e' . $data['index'])));
+        $this->redirect('default');
     }
 
     protected function createComponentNastavitOdesForm()
@@ -561,7 +512,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue($typ);
-        
+
         $form1->addText('email', 'E-mailová adresa odesilatele:', 50, 100)
                 ->addCondition(Form::FILLED)
                 ->addRule(Form::EMAIL);
@@ -652,13 +603,13 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
         self::ulozNastaveni($config_data);
 
-        $this->flashMessage('Nastavení odesílání emailů bylo upraveno.');
-        $this->redirect('this', ['upravit' => null]);
+        $this->flashMessage('Nastavení odesílání e-mailů bylo upraveno.');
+        $this->redirect('default');
     }
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)
     {
-        $this->redirect('this', ['upravit' => null]);
+        $this->redirect('default');
     }
 
     public function actionSmazat($id)
@@ -696,7 +647,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $ucet['only_signature'] = '';
         $ucet['qual_signature'] = '';
         $config_data['email'][] = $ucet;
-      
+
         self::ulozNastaveni($config_data);
         $this->flashMessage('Schránka přidána.');
         $this->redirect('default');
