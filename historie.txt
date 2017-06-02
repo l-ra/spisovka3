@@ -61,6 +61,8 @@ Nové funkce:
   systémový certifikát (stále ale tato možnost vyžaduje nastavení odborníkem)
 - je možné jednoduše protokolovat komunikaci s datovou schránkou, aniž by bylo
   potřeba měnit kód aplikace jako v minulosti
+- v části nastavevení odesílání e-mailem lze zadat adresu, na kterou budou
+  posílány kopie všech posílaných e-mailových zpráv  
 - je možné nastavit, zda si uživatelé mohou měnit svoje hesla
 - je možné nastavit, jak se má provést přesměrování po přihlášení, viz nápověda
 - je možné povolit předávání vyřízených dokumentů, viz nápověda

@@ -516,7 +516,10 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1->addText('email', 'E-mailová adresa odesilatele:', 50, 100)
                 ->addCondition(Form::FILLED)
                 ->addRule(Form::EMAIL);
-
+        $form1->addText('bcc', 'Posílat kopii na:', 50, 100)
+                ->addCondition(Form::FILLED)
+                ->addRule(Form::EMAIL);
+        
         $form1->addCheckbox('podepisovat', 'Elektronicky podepisovat:')
                 ->setHtmlId('odes-form-podepisovat')
                 ->getControlPrototype()->onchange(
@@ -536,6 +539,8 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         if (!$odes->podepisovat)
             $group->getOption('container')->style('display: none');
         $form1['email']->setDefaultValue($odes['email']);
+        if (!empty($odes['bcc']))
+            $form1['bcc']->setDefaultValue($odes['bcc']);
 
         $form1->addSubmit('upravit', 'Uložit')
                 ->onClick[] = array($this, 'nastavitOdesClicked');
@@ -592,6 +597,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $config_data['odeslani']['aktivni'] = true;
         $config_data['odeslani']['podepisovat'] = $data['podepisovat'];
         $config_data['odeslani']['email'] = $data['email'];
+        $config_data['odeslani']['bcc'] = $data['bcc'];
 
         if (!empty($data['cert'])) {
             $config_data['odeslani']['cert'] = $data['cert'];

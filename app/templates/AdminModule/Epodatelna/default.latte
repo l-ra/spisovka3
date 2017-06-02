@@ -77,7 +77,11 @@
 <div class="detail_blok">
     <dl>
         <dt>E-mailová adresa odesilatele:</dt>
-        <dd>{$sending['email']}</dd><br />
+        <dd>{$sending->email}</dd><br />
+        {if !empty($sending->bcc)}
+            <dt>Posílat kopii na:</dt>
+            <dd>{$sending->bcc}</dd><br />
+        {/if}
         <dt>Elektronicky podepisovat:</dt>
         <dd>{$sending['podepisovat'] ? 'ano' : 'ne'}</dd><br />
         {if $sending['podepisovat']}
@@ -90,7 +94,7 @@
                     {if !empty($sending['certificate_info']['jmeno'])}{$sending['certificate_info']['jmeno']}<br />{/if}
                     {if !empty($sending['certificate_info']['organizace'])}{$sending['certificate_info']['organizace']}<br />{/if}
                     {if !empty($sending['certificate_info']['jednotka'])}{$sending['certificate_info']['jednotka']}<br />{/if}
-                    Platnost: {$sending['certificate_info']['platnost_od']|date} - {$sending['certificate_info']['platnost_do']|date} <br />
+                    Platnost: {$sending['certificate_info']['platnost_od']|edate} - {$sending['certificate_info']['platnost_do']|edate} <br />
                     CA: {$sending['certificate_info']['CA']}
                 </dd>
             {/if}

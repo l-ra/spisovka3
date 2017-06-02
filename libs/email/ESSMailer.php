@@ -15,7 +15,8 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
     protected function setHeaderMailer(Nette\Mail\Message $mail)
     {
         $app_info = new VersionInformation();
-        $mail->setHeader('X-Mailer', Nette\Utils\Strings::webalize($app_info->name, '. ', false));
+        $mail->setHeader('X-Mailer',
+                Nette\Utils\Strings::webalize($app_info->name, '. ', false));
     }
 
     /**
@@ -27,22 +28,25 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
     {
         $mail = clone $mail;
 
+        $config = (new Spisovka\ConfigEpodatelna())->get();
+        $config = $config->odeslani;
+
         $test_mode = self::$test_mode;
         $to = is_string($test_mode) ? $test_mode : $mail->getEncodedHeader('To');
         $subject = $mail->getEncodedHeader('Subject');
         $mail->setHeader('Subject', NULL);
         $mail->setHeader('To', NULL);
         $this->setHeaderMailer($mail);
+        if (!empty($config->bcc))
+            $mail->setHeader('Bcc', $config->bcc);
 
         $mail_source = $mail->generateMessage();
 
-        $config = (new Spisovka\ConfigEpodatelna())->get();
-        $config = $config->odeslani;        
         if ($config['podepisovat']) {
             $esign = new esignature();
             if (!$esign->setUserCert($config['cert'], $config['cert_pass']))
                 throw new Exception('E-mail nelze podepsat. Neplatný certifikát!');
-           
+
             $in_parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL,
                     $mail_source, 2);
             $header_parts = explode(Nette\Mail\Message::EOL, $in_parts[0]);
@@ -63,7 +67,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
                     unset($header_parts[$iheader]);
                 }
             }
-            
+
             $in_parts[0] = implode(Nette\Mail\Message::EOL, $header_parts);
             $mess1 = implode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $in_parts);
 
@@ -93,12 +97,12 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
                 $headers .= $key . ": " . $value . Nette\Mail\Message::EOL;
             }
             $body = $mess_part[1];
-        } else {            
+        } else {
             $parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL, $mail_source, 2);
             $headers = $parts[0];
             $body = $parts[1];
         }
-        
+
         if ($test_mode === 1) {
             // test - neodesila se
             // vytvor adresar, pokud neexistuje

@@ -151,7 +151,11 @@ class ConfigEpodatelna implements IConfig
             unset($data->odeslani->cert_key);
             $changed = true;
         }
-
+        if (!isset($data->odeslani->bcc)) {
+            $data->odeslani->bcc = '';
+            $changed = true;
+        }
+        
         if ($changed)
             $this->save($data);
 
