@@ -9,9 +9,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
      *  avoids sending Content-Type header
      */
     static public $testMode = false;
-
     protected $pdf_output = false;
-    
+
     public function getStorage()
     {
         return $this->context->getService('storage');
@@ -26,20 +25,15 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         else {
             $user = $this->user;
 
-            // Je uzivatel prihlasen?
             if (!$user->isLoggedIn()) {
-                if ($user->getLogoutReason() === Nette\Security\User::INACTIVITY) {
+                // Uzivatel neni prihlasen
+                if ($user->getLogoutReason() === Nette\Security\User::INACTIVITY)
                     $this->flashMessage('Uplynula doba neaktivity! Systém vás z bezpečnostních důvodů odhlásil.',
                             'warning');
-                }
-                if (!( $this->name == "Spisovka:Uzivatel" && $this->view == "login" )) {
-                    // asession ID je pouzito jenom u SSO prihlasovani
-                    $asession = $this->getParameter('_asession');
-                    $alternative = $this->getParameter('alternativelogin');
-                    $this->forward(':Spisovka:Uzivatel:login',
-                            array('_asession' => $asession, 'alternativelogin' => $alternative));
-                }
+                if (!($this->name == "Spisovka:Uzivatel" && $this->view == "login"))
+                    $this->forward(':Spisovka:Uzivatel:login');
             } else {
+                // Uzivatel je prihlasen
                 $acc = new UserAccount($user);
                 if ($acc->force_logout) {
                     $user->logout();
@@ -47,21 +41,18 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     $acc->save();
 
                     $this->flashMessage('Byl jste odhlášen administrátorem.', 'warning');
-                    // Presmeruj, chceme pote uzivatel na vychozi/domovske strance
+                    // Presmeruj, chceme pote uzivatele na vychozi/domovske strance
                     $this->redirect(':Spisovka:Uzivatel:login');
                 }
 
-                if ($this->name == "Spisovka:Uzivatel") {
-                    // Tento presenter je vzdy pristupny
-                    if ($this->view == "login")
+                if ($this->name == "Spisovka:Uzivatel" && $this->view == "login") {
                     // Uzivatel je prihlasen - login obrazovka je zbytecna, presmerujeme na uvodni obrazovku
-                    // Oprava mozneho bugu s dvojim prihlasovanim = po prihlaseni se opet zobrazuje login obrazovka
-                        $this->redirect(':Spisovka:Default:default');
+                    // Oprava mozneho problemu, kdy po prihlaseni se opet zobrazuje login formular
+                    $this->redirect(':Spisovka:Default:default');
                 }
-                else if (!$this->isUserAllowed()) {
+                if (!$this->isUserAllowed())
                     // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku
                     $this->forward(':NoAccess:default');
-                }
             }
         }
 
@@ -293,9 +284,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected function createComponentSearch()
     {
         $c = new Spisovka\Components\SearchControl($this);
-        return $c;        
+        return $c;
     }
-    
+
     protected function shutdown($response)
     {
         if ($this->getParameter('pdfprint') || $this->view == 'pdf' || $this->pdf_output) {

@@ -3,6 +3,11 @@
 class Spisovka_SeznamzmenPresenter extends BasePresenter
 {
 
+    protected function isUserAllowed()
+    {
+        return true;
+    }
+    
     public function renderDefault()
     {
         $history_filename = 'historie.txt';

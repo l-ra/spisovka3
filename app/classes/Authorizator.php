@@ -18,18 +18,9 @@ class Authorizator extends Nette\Security\Permission
         foreach ($model->getResources() as $resource)
             $this->addResource($resource->code);
 
-        // permission
+        // permissions
         // Je potřeba toto oprávnění ve výchozím stavu povolit. Uživatel stále bude mít možnost oprávnění explicitně odepřít
         $this->allow(Nette\Security\Permission::ALL, 'Spisovka_ZpravyPresenter');
-
-        // úvodní obrazovka po přihlášení
-        $this->allow(Nette\Security\Permission::ALL, 'Spisovka_DefaultPresenter');
-
-        // přihlášení / odhlášení - neni potreba, tento presenter je vyjmut z kontroly pristupu. viz BasePresenter
-        // $this->allow(Permission::ALL, 'Spisovka_UzivatelPresenter');
-        // Resource, který má být vždy přístupný, nebudeme definovat v databázi, ale zde
-        $this->addResource('Spisovka_SeznamzmenPresenter');
-        $this->allow(Nette\Security\Permission::ALL, 'Spisovka_SeznamzmenPresenter');
 
         foreach ($model->getPermission() as $perm) {
             if (!empty($perm->role) && !empty($perm->resource) && !empty($perm->privilege)) {

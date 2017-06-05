@@ -3,6 +3,11 @@
 class Spisovka_UzivatelPresenter extends BasePresenter
 {
 
+    protected function isUserAllowed()
+    {
+        return true;
+    }
+    
     public function actionLogout()
     {
         $user = $this->user;
