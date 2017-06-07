@@ -236,7 +236,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $Log = new LogModel();
-        $historie = $Log->historieDokumentu($id, $tisk || $pdf);
+        $historie = $Log->getDocumentsHistory($id, $tisk || $pdf);
         $this->template->historie = $historie;
     }
 
@@ -504,7 +504,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             // zaznam do logu az nakonec, kdyz jsou vsechny operace uspesne
             $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::DOK_UNDEFINED,
+            $Log->logDocument($dokument_id, LogModel::DOK_UNDEFINED,
                     'Dokument připojen do evidence. Přiděleno číslo jednací: ' . $cislo_jednaci);
 
             echo '###zaevidovano###' . $this->link('detail', array('id' => $dokument_id));
@@ -557,7 +557,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->flashMessage('Číslo jednací přiděleno.');
 
             $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::DOK_UNDEFINED,
+            $Log->logDocument($dokument_id, LogModel::DOK_UNDEFINED,
                     'Přiděleno číslo jednací: ' . $cjednaci->cislo_jednaci);
 
             if ($this->typ_evidence == 'sberny_arch') {
@@ -824,7 +824,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     public function renderHistorie($id)
     {
         $Log = new LogModel();
-        $historie = $Log->historieDokumentu($id);
+        $historie = $Log->getDocumentsHistory($id);
         $this->template->historie = $historie;
         $this->template->kompletni_historie = true;
         $this->setView('detail-historie');
@@ -1040,7 +1040,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $doc->save();
 
             $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
+            $Log->logDocument($dokument_id, LogModel::DOK_NOVY);
 
             dibi::commit();
         } catch (Exception $e) {
@@ -1216,7 +1216,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $doc->save();
 
             $Log = new LogModel();
-            $Log->logDokument($id, LogModel::DOK_ZMENEN, 'Upravena metadata dokumentu.');
+            $Log->logDocument($id, LogModel::DOK_ZMENEN, 'Upravena metadata dokumentu.');
 
             $this->flashMessage('Dokument "' . $data->nazev . '"  byl upraven.');
         } catch (Exception $e) {
@@ -1317,7 +1317,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $doc->save();
 
             $Log = new LogModel();
-            $Log->logDokument($id, LogModel::DOK_ZMENEN, 'Upravena data vyřízení.');
+            $Log->logDocument($id, LogModel::DOK_ZMENEN, 'Upravena data vyřízení.');
 
             $this->flashMessage('Dokument "' . $doc->cislo_jednaci . '"  byl upraven.');
         } catch (DibiException $e) {
@@ -1544,7 +1544,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                         if ($zprava = $this->odeslatEmailem($adresat, $email_data, $prilohy)) {
                             $Log = new LogModel();
-                            $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,
+                            $Log->logDocument($dokument_id, LogModel::DOK_ODESLAN,
                                     'Dokument odeslán e-mailem na adresu "' . Subjekt::displayName($adresat,
                                             'email') . '".');
                             $this->flashMessage('Zpráva na e-mailovou adresu "' . Subjekt::displayName($adresat,
@@ -1552,7 +1552,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             $stav = 2;
                         } else {
                             $Log = new LogModel();
-                            $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,
+                            $Log->logDocument($dokument_id, LogModel::DOK_NEODESLAN,
                                     'Dokument se nepodařilo odeslat e-mailem na adresu "' . Subjekt::displayName($adresat,
                                             'email') . '".');
                             $this->flashMessage('Zprávu na e-mailovou adresu "' . Subjekt::displayName($adresat,
@@ -1604,7 +1604,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
                     if ($result = $this->odeslatISDS($adresat, $isds_data, $prilohy)) {
                         $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,
+                        $Log->logDocument($dokument_id, LogModel::DOK_ODESLAN,
                                 'Dokument odeslán datovou zprávou na adresu "' . Subjekt::displayName($adresat,
                                         'isds') . '".');
                         $this->flashMessage('Datová zpráva pro "' . Subjekt::displayName($adresat,
@@ -1618,7 +1618,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         }
                     } else {
                         $Log = new LogModel();
-                        $Log->logDokument($dokument_id, LogModel::DOK_NEODESLAN,
+                        $Log->logDocument($dokument_id, LogModel::DOK_NEODESLAN,
                                 'Dokument se nepodařilo odeslat datovou zprávou na adresu "' . Subjekt::displayName($adresat,
                                         'isds') . '".');
                         $this->flashMessage('Datovou zprávu pro "' . Subjekt::displayName($adresat,
@@ -1654,7 +1654,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                                     'plna_adresa') . '".');
 
                     $Log = new LogModel();
-                    $Log->logDokument($dokument_id, LogModel::DOK_PREDODESLAN,
+                    $Log->logDocument($dokument_id, LogModel::DOK_PREDODESLAN,
                             'Dokument předán na podatelnu k odeslání poštou na adresu "' . Subjekt::displayName($adresat,
                                     'plna_adresa') . '".');
                 } else if ($metoda_odeslani == 4) {
@@ -1669,7 +1669,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $this->flashMessage('Dokument předán na podatelnu k odeslání faxem na číslo "' . $cislo_faxu . '".');
 
                     $Log = new LogModel();
-                    $Log->logDokument($dokument_id, LogModel::DOK_PREDODESLAN,
+                    $Log->logDocument($dokument_id, LogModel::DOK_PREDODESLAN,
                             'Dokument předán na podatelnu k odeslání faxem na číslo "' . $cislo_faxu . '".');
                 } else {
                     // jinak - externe (osobne, ...)
@@ -1679,7 +1679,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
 
                     $Log = new LogModel();
-                    $Log->logDokument($dokument_id, LogModel::DOK_ODESLAN,
+                    $Log->logDocument($dokument_id, LogModel::DOK_ODESLAN,
                             'Dokument odeslán způsobem "' . ZpusobOdeslani::getName($metoda_odeslani) . '" adresátovi "' . Subjekt::displayName($adresat,
                                     'jmeno') . '".');
                 }

@@ -203,7 +203,7 @@ class Document extends DBEntity
                 else
                     $doc->_saveInternal(); // neprováděj kontrolu
 
-                $Log->logDokument($doc->id, LogModel::DOK_PREDAN, $log_text);
+                $Log->logDocument($doc->id, LogModel::DOK_PREDAN, $log_text);
             }
             if ($spis) {
                 $spis->forward(new OrgUnit($orgunit_id));
@@ -263,7 +263,7 @@ class Document extends DBEntity
                 $doc->owner_orgunit_id = $user_orgunit;
                 $doc->_saveInternal();
 
-                $Log->logDokument($doc->id, LogModel::DOK_PRIJAT,
+                $Log->logDocument($doc->id, LogModel::DOK_PRIJAT,
                         "Zaměstnanec $user->displayName přijal $what $log_plus");
             }
             if ($spis)
@@ -296,7 +296,7 @@ class Document extends DBEntity
                 $doc->save();
 
                 $Log = new LogModel();
-                $Log->logDokument($doc->id, LogModel::DOK_PREDANI_ZRUSENO,
+                $Log->logDocument($doc->id, LogModel::DOK_PREDANI_ZRUSENO,
                         "Předání $what bylo zrušeno.");
             }
 
@@ -346,7 +346,7 @@ class Document extends DBEntity
 
         $Log = new LogModel();
         $what = $inside_spis ? 'spis' : 'dokument';
-        $Log->logDokument($this->id, LogModel::DOK_PREVZETI_ODMITNUTO,
+        $Log->logDocument($this->id, LogModel::DOK_PREVZETI_ODMITNUTO,
                 "Uživatel odmítl převzít $what.");
     }
 
@@ -444,7 +444,7 @@ class Document extends DBEntity
             $this->save();
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::SPIS_DOK_PRIPOJEN,
+            $Log->logDocument($this->id, LogModel::SPIS_DOK_PRIPOJEN,
                     'Dokument přidán do spisu "' . $spis->nazev . '"');
             dibi::commit();
         } catch (Exception $e) {
@@ -465,7 +465,7 @@ class Document extends DBEntity
             $this->save();
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::SPIS_DOK_ODEBRAN,
+            $Log->logDocument($this->id, LogModel::SPIS_DOK_ODEBRAN,
                     'Dokument vyjmut ze spisu "' . $spis->nazev . '"');
 
             dibi::commit();

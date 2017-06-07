@@ -33,7 +33,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_VYRIZUJE_SE);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_KVYRIZENI,
+            $Log->logDocument($this->id, LogModel::DOK_KVYRIZENI,
                     'Zaměstnanec ' . $user->displayName . ' převzal dokument k vyřízení.');
 
             dibi::commit();
@@ -67,12 +67,12 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState($stav);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_VYRIZEN, 'Dokument označen za vyřízený.');
+            $Log->logDocument($this->id, LogModel::DOK_VYRIZEN, 'Dokument označen za vyřízený.');
 
             if ($automatic_start) {
                 $this->datum_spousteci_udalosti = date('Y-m-d');
                 $this->save();
-                $Log->logDokument($this->id, LogModel::DOK_SPUSTEN,
+                $Log->logDocument($this->id, LogModel::DOK_SPUSTEN,
                         'Začíná plynout skartační lhůta.');
             }
 
@@ -110,7 +110,7 @@ class DocumentWorkflow extends DocumentStates
                 $msg = 'Skartační lhůta začne plynout od ' . $given_date->format('j.n.Y') . '.';
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_SPUSTEN, $msg);
+            $Log->logDocument($this->id, LogModel::DOK_SPUSTEN, $msg);
 
             dibi::commit();
         } catch (Exception $e) {
@@ -141,7 +141,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_VYRIZUJE_SE);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_ZNOVU_OTEVREN);
+            $Log->logDocument($this->id, LogModel::DOK_ZNOVU_OTEVREN);
             dibi::commit();
         } catch (Exception $e) {
             $this->_rollback();
@@ -174,7 +174,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_PREDAN_DO_SPISOVNY);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_SPISOVNA_PREDAN);
+            $Log->logDocument($this->id, LogModel::DOK_SPISOVNA_PREDAN);
             if (!$called_from_spis)
                 dibi::commit();
         } catch (Exception $e) {
@@ -214,7 +214,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_VE_SPISOVNE);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_SPISOVNA_PRIPOJEN,
+            $Log->logDocument($this->id, LogModel::DOK_SPISOVNA_PRIPOJEN,
                     'Dokument přijat do spisovny.');
 
             if ($transaction)
@@ -243,7 +243,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_VYRIZEN_SPUSTENA);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_SPISOVNA_VRACEN);
+            $Log->logDocument($this->id, LogModel::DOK_SPISOVNA_VRACEN);
 
             if ($use_transaction)
                 dibi::commit();
@@ -266,7 +266,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_SKARTACNI_RIZENI);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_KESKARTACI,
+            $Log->logDocument($this->id, LogModel::DOK_KESKARTACI,
                     'Dokument přidán do skartačního řízení.');
 
             dibi::commit();
@@ -284,7 +284,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_ARCHIVOVAN);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_ARCHIVOVAN,
+            $Log->logDocument($this->id, LogModel::DOK_ARCHIVOVAN,
                     'Dokument uložen do archivu.');
 
             dibi::commit();
@@ -302,7 +302,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_SKARTOVAN);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::DOK_SKARTOVAN, 'Dokument byl skartován.');
+            $Log->logDocument($this->id, LogModel::DOK_SKARTOVAN, 'Dokument byl skartován.');
 
             dibi::commit();
             return true;
@@ -326,7 +326,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_ZAPUJCEN);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::ZAPUJCKA_PRIDELENA, 'Dokument byl zapůjčen.');
+            $Log->logDocument($this->id, LogModel::ZAPUJCKA_PRIDELENA, 'Dokument byl zapůjčen.');
 
             dibi::commit();
             return true;
@@ -344,7 +344,7 @@ class DocumentWorkflow extends DocumentStates
             $this->_changeState(self::STAV_VE_SPISOVNE);
 
             $Log = new LogModel();
-            $Log->logDokument($this->id, LogModel::ZAPUJCKA_VRACENA,
+            $Log->logDocument($this->id, LogModel::ZAPUJCKA_VRACENA,
                     'Dokument byl navrácen do spisovny.');
 
             dibi::commit();

@@ -220,7 +220,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             }
 
             $Log = new LogModel();
-            $historie = $Log->historieDokumentu($dokument_id, $tisk || $pdf);
+            $historie = $Log->getDocumentsHistory($dokument_id, $tisk || $pdf);
             $this->template->historie = $historie;
         } else {
             // dokument neexistuje nebo se nepodarilo nacist
@@ -328,7 +328,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
             $doc->save();
 
             $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::DOK_ZMENEN, 'Upraven skartační režim.');
+            $Log->logDocument($dokument_id, LogModel::DOK_ZMENEN, 'Upraven skartační režim.');
 
             $this->flashMessage('Dokument "' . $doc->cislo_jednaci . '"  byl upraven.');
             $this->redirect(':Spisovna:Dokumenty:detail', array('id' => $dokument_id));

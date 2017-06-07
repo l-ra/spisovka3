@@ -205,7 +205,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
         if ($seznam = $DokumentSubjekt->odebrat($param)) {
             $Log = new LogModel();
             $subject = new Subject($subjekt_id);
-            $Log->logDokument($dokument_id, LogModel::SUBJEKT_ODEBRAN,
+            $Log->logDocument($dokument_id, LogModel::SUBJEKT_ODEBRAN,
                     'Odebrán subjekt "' . $subject . '"');
 
             $this->flashMessage('Subjekt byl úspěšně odebrán.');

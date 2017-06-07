@@ -225,7 +225,7 @@ class DokumentOdeslani extends BaseModel
         $ok = $this->update($row, array(array('id=%i', $id)));
         if ($ok) {
             $Log = new LogModel();
-            $Log->logDokument($info->dokument_id, LogModel::DOK_ODESLAN,
+            $Log->logDocument($info->dokument_id, LogModel::DOK_ODESLAN,
                     "Dokument odeslán " . $info->zpusob_odeslani_nazev);
         }
 
@@ -247,7 +247,7 @@ class DokumentOdeslani extends BaseModel
             return null;
 
         $Log = new LogModel();
-        $Log->logDokument($info->dokument_id, LogModel::DOK_NEODESLAN,
+        $Log->logDocument($info->dokument_id, LogModel::DOK_NEODESLAN,
                 "Dokument nebyl odeslán " . $info->zpusob_odeslani_nazev);
 
         return $this->update($row, array(array('id=%i', $id)));

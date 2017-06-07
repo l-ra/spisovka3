@@ -7,7 +7,7 @@
         {foreach $historie as $h}
         <dl>
             <dt>{$h->date|edatetime}</dt>
-            <dd>{!=LogModel::typ($h->typ)}<br />
+            <dd>{!=LogModel::eventToString($h->typ)}<br />
             {if !empty($h->poznamka)}<span class="normal-font">{$h->poznamka|escape|nl2br|noescape}</span><br />{/if}
             <span class="normal-font">provedl: {Person::fromUserId($h->user_id)}</span>
             </dd>

@@ -98,7 +98,7 @@ class DokumentSubjekt extends BaseModel
         $this->insert($row);
 
         $Log = new LogModel();
-        $Log->logDokument($doc->id, LogModel::SUBJEKT_PRIDAN,
+        $Log->logDocument($doc->id, LogModel::SUBJEKT_PRIDAN,
                 'Přidán subjekt "' . $subject . '"');
     }
 

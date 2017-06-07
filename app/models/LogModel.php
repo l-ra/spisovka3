@@ -1,9 +1,8 @@
 <?php
 
-class LogModel extends BaseModel
+class LogModel
 {
 
-    protected $name = 'log_system-neexistuje';
     protected $tb_logaccess = 'log_access';
     protected $tb_logdokument = 'log_dokument';
     protected $tb_logspis = 'log_spis';
@@ -106,14 +105,16 @@ class LogModel extends BaseModel
         '55' => 'Zápůjčka odmítnuta'
     );
 
-    /*     * **********************************************************************
-     * Logovani aktivity dokumentu
+    /**
+     * @param int $document_id
+     * @param int $event
+     * @param string $poznamka
+     * @return int
      */
-
-    public function logDokument($dokument_id, $event, $poznamka = null)
+    public function logDocument($document_id, $event, $poznamka = null)
     {
         $row = array();
-        $row['dokument_id'] = (int) $dokument_id;
+        $row['dokument_id'] = (int) $document_id;
         $row['typ'] = $event;
         $row['poznamka'] = $poznamka;
 
@@ -124,21 +125,31 @@ class LogModel extends BaseModel
                         ->execute(dibi::IDENTIFIER);
     }
 
-    public function historieDokumentu($dokument_id, $show_all = true)
+    public function getDocumentsHistory($document_id, $show_all = true)
     {
         $limit = $show_all ? 500 : 5;
         $res = dibi::query(
-                        'SELECT * FROM %n ld', $this->tb_logdokument, 'WHERE ld.dokument_id = %i',
-                        $dokument_id, 'ORDER BY ld.date DESC, ld.id DESC LIMIT %i', $limit
+                        'SELECT * FROM %n ld', $this->tb_logdokument,
+                        'WHERE ld.dokument_id = %i', $document_id,
+                        'ORDER BY ld.date DESC, ld.id DESC LIMIT %i', $limit
         );
         $rows = $res->fetchAll();
         return array_reverse($rows);
     }
 
-    /*     * **********************************************************************
-     * Logovani aktivity spisu
-     */
+    public function getUsersHistory($user_id, $type)
+    {
+        $res = dibi::query("SELECT * FROM %n WHERE [user_id] = %i AND [typ] = %i"
+                        . " ORDER BY [date] LIMIT 20", $this->tb_logdokument, $user_id, $type);
+        return $res->fetchAll();
+    }
 
+    /**
+     * Logovani aktivity u spisu. Nedokoncene, v aplikaci nepouzito.
+     * @param int $spis_id
+     * @param int $typ
+     * @param string $poznamka
+     */
     public function logSpis($spis_id, $typ, $poznamka = "")
     {
         $row = array();
@@ -153,10 +164,10 @@ class LogModel extends BaseModel
         dibi::insert($this->tb_logspis, $row)->execute();
     }
 
-    /**     * *********************************************************************
-     * Logovani pristupu
+    /**
+     * @param boolean $success Successful login / invalid login attempt (invalid password)
      */
-    public function logAccess($user_id, $stav, $ip_address)
+    public function logLogin($user_id, $success, $ip_address)
     {
         $row = array();
         $row['user_id'] = $user_id;
@@ -164,17 +175,17 @@ class LogModel extends BaseModel
         $row['ip'] = $ip_address;
         $user_agent = filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
         $row['user_agent'] = substr($user_agent, 0, 190);
-        $row['stav'] = $stav;
+        $row['stav'] = $success ? 1 : 0;
 
         return dibi::insert($this->tb_logaccess, $row)
                         ->execute(dibi::IDENTIFIER);
     }
 
-    public function seznamPristupu($limit = 50, $offset = 0, $user_id = null)
+    public function getLoginHistory($limit = 50, $offset = 0, $user_id = null)
     {
         $res = dibi::query(
-                        'SELECT * FROM %n la', $this->tb_logaccess, 'LEFT JOIN %n',
-                        $this->tb_user, ' u ON (u.id = la.user_id)', '%if', !is_null($user_id),
+                        'SELECT * FROM %n la', $this->tb_logaccess, 'LEFT JOIN [user]',
+                        ' u ON (u.id = la.user_id)', '%if', !is_null($user_id),
                         'WHERE %and',
                         !is_null($user_id) ? array('la.user_id = %i', $user_id) : array(),
                         '%end', 'ORDER BY la.id DESC'
@@ -182,20 +193,9 @@ class LogModel extends BaseModel
         return $res->fetchAll($offset, $limit);
     }
 
-    public static function typ($typ)
+    public static function eventToString($event)
     {
-
-        return (isset(self::$typy[$typ])) ? self::$typy[$typ] : "";
-    }
-
-    public function deleteDokument($dokument_id)
-    {
-        return dibi::delete($this->tb_logdokument)->where(array(array('dokument_id=%i', $dokument_id)))->execute();
-    }
-
-    public function deleteAllSpis()
-    {
-        return dibi::query('TRUNCATE [' . $this->tb_logspis . '];');
+        return isset(self::$typy[$event]) ? self::$typy[$event] : "";
     }
 
 }

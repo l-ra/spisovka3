@@ -55,7 +55,7 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
         $log = new LogModel();
         $ip_address = $this->httpRequest->getRemoteAddress();
         if (!$success) {
-            $log->logAccess($account->id, 0, $ip_address);
+            $log->logLogin($account->id, false, $ip_address);
             throw new Nette\Security\AuthenticationException("Neplatné heslo.",
             self::INVALID_CREDENTIAL);
         }
@@ -64,7 +64,7 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
         $account->last_ip = 
         $account->save();
         
-        $log->logAccess($account->id, 1, $ip_address);
+        $log->logLogin($account->id, true, $ip_address);
 
         // Odstraneni hesla v identite
         unset($account->password);

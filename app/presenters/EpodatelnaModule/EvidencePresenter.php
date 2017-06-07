@@ -252,7 +252,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $document = new Document($dokument_id);
 
             $Log = new LogModel();
-            $Log->logDokument($dokument_id, LogModel::DOK_NOVY);
+            $Log->logDocument($dokument_id, LogModel::DOK_NOVY);
 
             // Ulozeni souboru
             if ($zprava->typ == 'E') {
