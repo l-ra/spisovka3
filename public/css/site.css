@@ -7,8 +7,16 @@ body {
     font-size: 9pt;
 }
 
+form {
+    margin: 0px;
+}
+
 img {
     border: 0px;
+}
+
+select {
+    margin-right: 10px;
 }
 
 .small {
@@ -21,10 +29,6 @@ img {
 
 .clear {
     clear: both;
-}
-
-form {
-    margin: 0px;
 }
 
 /* ***************************************************************** */
@@ -796,7 +800,8 @@ table.odeslat-subjekty td.odeslat-subjekty-separator {
 }
 #filtr select[name=filtr],
 #seradit select[name=seradit],
-#search input[type=text] {
+#search input[type=text],
+select.blue {
     border: 1px solid #03406A;
     color: #03406A;
 }
@@ -809,7 +814,7 @@ table.odeslat-subjekty td.odeslat-subjekty-separator {
 }
 
 /* ******************************************************************* */
-/* *** SEARCH cONTROL *** */
+/* *** SEARCH CONTROL *** */
 #search {
     float: right;
     margin-bottom: 15px;

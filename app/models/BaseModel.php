@@ -36,7 +36,7 @@ abstract class BaseModel extends Nette\Object
     /**
      * @return Spisovka\User
      */
-    protected static function getUser()
+    public static function getUser()
     {
         return Nette\Environment::getUser();
     }

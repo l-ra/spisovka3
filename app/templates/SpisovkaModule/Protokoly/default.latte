@@ -1,0 +1,16 @@
+{block content}
+
+{control form}
+{control search}
+
+<p></p>
+<div class="blok_menu">
+    <a n:href="this, od => null">Začátek</a>
+    <a n:href="this, od => end($list)->id" n:if="!empty($list)">Další</a>
+</div>
+<table class="spisovka">
+    <tr><th style="width: 13%">Datum</th><th>Dokument</th><th>Popis</th></tr>
+            {foreach $list as $item}
+        <tr><td>{$item->date|edatetime}</td><td><strong>{$item->cislo_jednaci}</strong><br />{$item->nazev}</td><td>{$item->poznamka}</td></tr>
+            {/foreach}
+</table>

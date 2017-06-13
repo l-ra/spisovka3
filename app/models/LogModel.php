@@ -118,7 +118,7 @@ class LogModel
         $row['typ'] = $event;
         $row['poznamka'] = $poznamka;
 
-        $row['user_id'] = self::getUser()->id;
+        $row['user_id'] = BaseModel::getUser()->id;
         $row['date'] = new DateTime();
 
         return dibi::insert($this->tb_logdokument, $row)
@@ -137,10 +137,37 @@ class LogModel
         return array_reverse($rows);
     }
 
-    public function getUsersHistory($user_id, $type)
+    /**
+     * @param int $user_id
+     * @param int $type
+     * @param boolean $descending
+     * @param int $from  primary key
+     * @return array
+     */
+    public function getUsersHistory($user_id, $type, $descending, $from = null, $date_from = null, $date_to
+    = null)
     {
-        $res = dibi::query("SELECT * FROM %n WHERE [user_id] = %i AND [typ] = %i"
-                        . " ORDER BY [date] LIMIT 20", $this->tb_logdokument, $user_id, $type);
+        $args = ["SELECT l.*, d.[cislo_jednaci], d.[nazev] FROM %n l", $this->tb_logdokument,
+            "JOIN [dokument] d ON d.[id] = l.[dokument_id] WHERE [user_id] = %i AND [typ] = %i",
+            $user_id, $type];
+
+        if ($from) {
+            $comparison = $descending ? '<=' : '>=';
+            array_push($args, "AND l.[id] $comparison %i", $from);
+        }
+
+        if ($date_from)
+            array_push($args, "AND l.[date] >= %d", $date_from);
+        if ($date_to)
+            array_push($args, "AND l.[date] <= %d", $date_to);
+
+        $args[] = "ORDER BY l.[id] " . ($descending ? 'DESC' : 'ASC');
+        
+        $client_config = GlobalVariables::get('client_config');
+        $limit = 2 * $client_config->nastaveni->pocet_polozek;
+        $args[] = "LIMIT $limit";
+
+        $res = dibi::query($args);
         return $res->fetchAll();
     }
 
@@ -157,7 +184,7 @@ class LogModel
         $row['typ'] = $typ;
         $row['poznamka'] = $poznamka;
 
-        $user = self::getUser();
+        $user = BaseModel::getUser();
         $row['user_id'] = $user->id;
         $row['date'] = new DateTime();
 
@@ -185,8 +212,7 @@ class LogModel
     {
         $res = dibi::query(
                         'SELECT * FROM %n la', $this->tb_logaccess, 'LEFT JOIN [user]',
-                        ' u ON (u.id = la.user_id)', '%if', !is_null($user_id),
-                        'WHERE %and',
+                        ' u ON (u.id = la.user_id)', '%if', !is_null($user_id), 'WHERE %and',
                         !is_null($user_id) ? array('la.user_id = %i', $user_id) : array(),
                         '%end', 'ORDER BY la.id DESC'
         );
