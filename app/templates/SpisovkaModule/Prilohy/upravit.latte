@@ -13,10 +13,10 @@
     {control uploadForm}
     <script type="text/javascript">
         $('#frmuploadForm-file').change(function () {
-            var val = $(this).val();
+            var filename = this.files[0].name;
             var sel = $('#frmuploadForm-priloha_nazev');
             if (!sel.val())
-                sel.val(val);
+                sel.val(filename);
         });
     </script>
 {else}    
