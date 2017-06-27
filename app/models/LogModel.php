@@ -147,7 +147,7 @@ class LogModel
     public function getUsersHistory($user_id, $type, $descending, $from = null, $date_from = null, $date_to
     = null)
     {
-        $args = ["SELECT l.*, d.[cislo_jednaci], d.[nazev] FROM %n l", $this->tb_logdokument,
+        $args = ["SELECT l.*, d.[cislo_jednaci], d.[nazev], d.[popis] FROM %n l", $this->tb_logdokument,
             "JOIN [dokument] d ON d.[id] = l.[dokument_id] WHERE [user_id] = %i AND [typ] = %i",
             $user_id, $type];
 

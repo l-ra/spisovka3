@@ -11,6 +11,13 @@
 <table class="spisovka">
     <tr><th style="width: 13%">Datum</th><th>Dokument</th><th>Popis</th></tr>
             {foreach $list as $item}
-        <tr><td>{$item->date|edatetime}</td><td><strong>{$item->cislo_jednaci}</strong><br />{$item->nazev}</td><td>{$item->poznamka}</td></tr>
+        <tr><td>{$item->date|edatetime}</td><td><strong>{$item->cislo_jednaci}</strong><br />{$item->nazev}{if $item->popis}<br /><a href="#" class="display-doc-description">Zobrazit popis</a><pre style="display: none">{$item->popis}</pre>{/if}</td><td>{$item->poznamka}</td></tr>
             {/foreach}
 </table>
+
+<script type="text/javascript">
+    $('a.display-doc-description').click(function () {
+        $(this).next().toggle();
+        return false;
+    });
+</script>
