@@ -32,10 +32,16 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         $config = $config->odeslani;
 
         $test_mode = self::$test_mode;
-        $to = is_string($test_mode) ? $test_mode : $mail->getEncodedHeader('To');
+        if (is_string($test_mode))
+            $to = $test_mode;
+        else
+            $to = implode(',', array_keys($mail->getHeader('To')));        
         $subject = $mail->getEncodedHeader('Subject');
+        // Hlavičky To a Subject vyplní PHP, takže je musíme odstranit z "extra headers" parametru,
+        // aby nebyly v odeslaném e-mailu 2x
         $mail->setHeader('Subject', NULL);
         $mail->setHeader('To', NULL);
+        
         $this->setHeaderMailer($mail);
         if (!empty($config->bcc))
             $mail->setHeader('Bcc', $config->bcc);

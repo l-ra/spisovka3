@@ -1720,18 +1720,16 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $mail->setFrom($a[2], $a[1]);
             }
 
+            // skrytá, nyní uživateli nepoužívaná funkce, kde mail lze
+            // danému subjektu posílat na více adres
             if (strpos($adresat->email, ';') !== false) {
-                $email_parse = explode(';', $adresat->email);
-                foreach ($email_parse as $emp) {
-                    $email = trim($emp);
-                    $mail->addTo($email);
-                }
+                $a = explode(';', $adresat->email);
+                foreach ($a as $el)
+                    $mail->addTo($el);
             } elseif (strpos($adresat->email, ',') !== false) {
-                $email_parse = explode(',', $adresat->email);
-                foreach ($email_parse as $emp) {
-                    $email = trim($emp);
-                    $mail->addTo($email);
-                }
+                $a = explode(',', $adresat->email);
+                foreach ($a as $el)
+                    $mail->addTo($el);
             } else {
                 $mail->addTo($adresat->email, Subjekt::displayName($adresat));
             }
