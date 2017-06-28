@@ -9,6 +9,14 @@ class Document extends DBEntity
 
     const TBL_NAME = 'dokument';
 
+    public static function create(array $data)
+    {
+        if (!self::getUser()->isAllowed('Dokument', 'vytvorit'))
+            throw new Exception('Vytváření nových dokumentů je zakázáno');
+
+        return parent::create($data);
+    }
+
     /**
      * Je uzivatel vlastnikem dokumentu nebo je opravnen jej menit.
      * @return boolean 

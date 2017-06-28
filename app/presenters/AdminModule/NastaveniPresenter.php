@@ -9,6 +9,8 @@ class Admin_NastaveniPresenter extends BasePresenter
     const ST_DESCRIPTION = 2;
 
     static protected $settings = [
+        'document_disable_creation' =>
+        ['document_disable_creation', false, 'Zakázat vytváření nových dokumentů'],
         'force_https' =>
         [ 'router_force_https', false, 'Vynutit zabezpečené připojení protokolem HTTPS'],
         'users_can_change_their_data' =>

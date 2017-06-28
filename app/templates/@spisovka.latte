@@ -5,7 +5,7 @@
 
 {block menu}
     {access :Spisovka:Dokumenty:}<a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a>{/access}
-    {access :Spisovka:Dokumenty:}<a href="{link :Spisovka:Dokumenty:novy}">Nový dokument</a>{/access}
+    {access :Spisovka:Dokumenty:}<a href="{link :Spisovka:Dokumenty:novy}" n:if="$user->isAllowed('Dokument', 'vytvorit')">Nový dokument</a>{/access}
     {access :Spisovka:Spisy:}<a href="{link :Spisovka:Spisy:default}">Spisy</a>{/access}
     {if Report::isUserAllowed()}<a href="{link :Spisovka:Sestavy:default}">Sestavy</a>{/if}
     {access :Spisovka:Vypravna:}<a href="{link :Spisovka:Vypravna:default}">K odeslání</a>{/access}

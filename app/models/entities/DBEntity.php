@@ -48,16 +48,16 @@ abstract class DBEntity implements IteratorAggregate
         $this->_columns_changed = [];
         $this->_data_changed = false;
     }
-    
+
     /**
      * Transaction support
      */
-    protected function _rollback()            
+    protected function _rollback()
     {
         dibi::rollback();
         $this->_invalidate();
     }
-    
+
     protected function _setData(DibiRow $data)
     {
         $this->_data = $data;
@@ -98,10 +98,10 @@ abstract class DBEntity implements IteratorAggregate
     }
 
     protected function _attributeExists($name)
-    {        
+    {
         return array_key_exists($name, $this->getData());
     }
-    
+
     /**
      * 
      * @param name    string
@@ -145,7 +145,7 @@ abstract class DBEntity implements IteratorAggregate
     {
         if (!is_array($data) && !($data instanceof ArrayAccess))
             throw new InvalidArgumentException(__METHOD__ . "() - invalid argument");
-        
+
         foreach ($data as $key => $value)
             $this->__set($key, $value);
     }
@@ -169,7 +169,7 @@ abstract class DBEntity implements IteratorAggregate
                 $this->date_modified = new DateTime();
             if ($this->_attributeExists('user_modified'))
                 $this->user_modified = self::getUser()->id;
-            
+
             $update_data = [];
             foreach ($this->_columns_changed as $col)
                 $update_data[$col] = $this->_data[$col];
@@ -177,7 +177,7 @@ abstract class DBEntity implements IteratorAggregate
             dibi::update(':PREFIX:' . $this::TBL_NAME, $update_data)->where("id = {$this->id}")->execute();
             $this->_data_changed = false;
             $this->_columns_changed = [];
-        }        
+        }
     }
 
     /**
@@ -189,7 +189,7 @@ abstract class DBEntity implements IteratorAggregate
             throw new Exception("Smazání entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
 
         dibi::query("DELETE FROM %n WHERE id = {$this->id}", ':PREFIX:' . $this::TBL_NAME);
-        
+
         // further attempts to access the entity will result in exception
         $this->_invalidate();
     }
@@ -218,9 +218,9 @@ abstract class DBEntity implements IteratorAggregate
             $a[$o->id] = $o;
         }
 
-        return $a;        
+        return $a;
     }
-    
+
     /**
      * @param $params array
      * @return \static[]
@@ -243,7 +243,7 @@ abstract class DBEntity implements IteratorAggregate
             array_push($query, 'OFFSET %i', $params['offset']);
 
         $resultSet = dibi::query($query);
-        
+
         return self::_createObjectsFromDibiResult($resultSet);
     }
 
@@ -265,7 +265,7 @@ abstract class DBEntity implements IteratorAggregate
      * @returns object
      */
     public static function create(array $data)
-    {
+    {        
         $id = dibi::insert(':PREFIX:' . static::TBL_NAME, $data)->execute(dibi::IDENTIFIER);
 
         return new static($id);
@@ -295,7 +295,8 @@ abstract class DBEntity implements IteratorAggregate
      * @return \ArrayIterator
      */
     public function getIterator()
-    {        
+    {
         return new ArrayIterator($this->getData());
     }
+
 }

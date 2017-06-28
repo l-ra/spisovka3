@@ -51,6 +51,10 @@ class Authorizator extends Nette\Security\Permission
                         $perm->resource, $perm->privilege);
             }
         }
+
+        // speciální případ
+        $this->{Settings::get('document_disable_creation') ? 'deny' : 'allow'}(
+                Nette\Security\Permission::ALL, 'Dokument', 'vytvorit');
     }
 
     // Prochazi seznam vsech roli a vklada je ve spravnem poradi

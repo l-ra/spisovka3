@@ -17,7 +17,7 @@
             <span n:if="$Zprava->stav == 100">Důvod odmítnutí: </span>{$Zprava->stav_info}
         {/if}
     {else}
-        <a href="{link :Epodatelna:Evidence:novy, 'id'=>$Zprava->id}">Zaevidovat do spisové služby</a>
+        <a href="{link :Epodatelna:Evidence:novy, 'id'=>$Zprava->id}" n:if="$user->isAllowed('Dokument', 'vytvorit')">Zaevidovat do spisové služby</a>
         <a href="{link :Epodatelna:Evidence:jiny, 'id'=>$Zprava->id}" id="dialog-evidence">Zaevidovat v jiné evidenci</a>
         <a href="{link :Epodatelna:Evidence:odmitnout, 'id'=>$Zprava->id }" id="dialog-odmitnout">Odmítnout</a>
         <!--<a href="{link :Epodatelna:Evidence:odpoved, 'id'=>$Zprava->id }">Odpovědět</a>-->

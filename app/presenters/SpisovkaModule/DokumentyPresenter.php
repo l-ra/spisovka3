@@ -189,7 +189,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $Souvisejici = new SouvisejiciDokument();
             $linkedDocuments = $Souvisejici->souvisejici($dokument_id);
             $this->template->SouvisejiciDokumenty = $linkedDocuments;
-            if (!empty($doc->cislo_jednaci) && $dokument->typ_dokumentu->smer == 0) {
+            if (!empty($doc->cislo_jednaci) && $dokument->typ_dokumentu->smer == 0
+                    && $this->user->isAllowed('Dokument', 'vytvorit')) {
                 $this->template->povolitOdpoved = true;
                 if ($doc->doesReplyExist()) {
                     // odpoved jiz existuje - stejné číslo jednací mohou mít maximálně dva dokumenty
@@ -585,6 +586,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderNovy()
     {
+        if (!$this->user->isAllowed('Dokument', 'vytvorit')) {
+            $this->flashMessage('Vytváření nových dokumentů je zakázáno', 'warning');
+            $this->redirect('default');
+        }
+        
         $Dokumenty = new Dokument();
         $cisty = $this->getParameter('cisty', false);
         if ($cisty) {
@@ -673,6 +679,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function renderOdpoved($id)
     {
+        if (!$this->user->isAllowed('Dokument', 'vytvorit')) {
+            $this->flashMessage('Vytváření nových dokumentů je zakázáno', 'warning');
+            $this->redirect('default');
+        }
+        
         $document_id = $id;
         $doc = new Document($document_id);
         $Dokumenty = new Dokument();
