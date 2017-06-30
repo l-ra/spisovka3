@@ -1,6 +1,8 @@
 <?php
 
-use Nette\Caching\Cache;
+namespace Spisovka;
+
+use Nette;
 
 class DbCache
 {
@@ -20,7 +22,7 @@ class DbCache
             $should_cache = isset($db_config->cache) ? (boolean)$db_config->cache : true;
             if ($should_cache) {
                 $context = Nette\Environment::getContext();
-                self::$cache = new Cache($context->getByType('Nette\Caching\IStorage'),
+                self::$cache = new Nette\Caching\Cache($context->getByType('Nette\Caching\IStorage'),
                         'db_cache');
             }
         }
@@ -51,7 +53,7 @@ class DbCache
         self::init();
         // let Nette itself clear the cache
         if (self::$cache !== null)
-            self::$cache->clean([Cache::ALL => true]);
+            self::$cache->clean([Nette\Caching\Cache::ALL => true]);
 
         /*        $dir = self::getCacheDirectory();
           $ok = true;

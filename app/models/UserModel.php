@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class User2Role extends BaseModel
 {
 

@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Třída pro upozorňování uživatelů
  *
@@ -114,13 +116,13 @@ class Notifications
 
         $template = str_replace('<message>', $message, $template);
 
-        $mail = new ESSMail;
+        $mail = new Mail;
         $mail->setFromConfig();
         $mail->addTo($email, $recipient_name);
         $mail->setSubject($subject);
         $mail->setBody($template);
 
-        $mailer = new ESSMailer();
+        $mailer = new Mailer();
         $mailer->send($mail);
     }
 

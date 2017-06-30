@@ -1,9 +1,13 @@
 <?php
 
-//'main','enclosure','signature','meta'
+namespace Spisovka;
+
+use Nette;
 
 class FileModel extends BaseModel
 {
+
+    //'main','enclosure','signature','meta'
 
     protected $name = 'file';
 
@@ -92,9 +96,9 @@ class FileModel extends BaseModel
             $row['size'] = $data['size'];
         }
 
-        $row['date_created'] = new DateTime();
+        $row['date_created'] = new \DateTime();
         $row['user_created'] = self::getUser()->id;
-        $row['date_modified'] = new DateTime();
+        $row['date_modified'] = new \DateTime();
         $row['user_modified'] = self::getUser()->id;
 
         $row['guid'] = UUID::v4();
@@ -116,7 +120,7 @@ class FileModel extends BaseModel
         $row['nazev'] = $data['nazev'];
         $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
 
-        $row['date_modified'] = new DateTime();
+        $row['date_modified'] = new \DateTime();
         $row['user_modified'] = self::getUser()->id;
 
         if ($this->update($row, array('id=%i', $file_id))) {

@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 // Trida NESMI dedit z BasePresenteru (kvuli autentizaci)
 // 2015-10-26  to uz zrejme neplati, protoze ve spisovce 3.5.0 se session
 // startuje automaticky, ne az pri kontrole prihlaseni
@@ -23,7 +27,7 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
 
         echo "waiting for lock\n";
         flush();
-        $lock = new Spisovka\Lock('cron');
+        $lock = new Lock('cron');
         $lock = $lock;  // potlac varovani IDE
         
         try {

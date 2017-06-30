@@ -1,13 +1,17 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class SubjektyPresenter extends BasePresenter
 {
 
     public function renderVyber($abc = null)
     {
-        new AbcFilter($this, 'abc', $this->getHttpRequest());
+        new Components\AbcFilter($this, 'abc', $this->getHttpRequest());
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -65,7 +69,7 @@ class SubjektyPresenter extends BasePresenter
         $typ_select = Subjekt::typ_subjektu();
         $stat_select = array("" => "Neuveden") + Subjekt::stat();
 
-        $form = new Spisovka\Form();
+        $form = new Form();
         $form->getElementPrototype()->id('subjekt-vytvorit');
 
         $form->addSelect('type', 'Typ subjektu:', $typ_select);
@@ -76,8 +80,8 @@ class SubjektyPresenter extends BasePresenter
                 ->setText('Vyhledat pomocí systému ARES');
         $form->addText('ic', 'IČO:', 12, 8)
                 ->setOption('description', $description)
-                ->addCondition(Spisovka\Form::FILLED)
-                ->addRule(Spisovka\Form::INTEGER);
+                ->addCondition(Form::FILLED)
+                ->addRule(Form::INTEGER);
         $form->addText('dic', 'DIČ:', 12, 12);
 
         $form->addText('jmeno', 'Jméno:', 50, 24);
@@ -87,7 +91,7 @@ class SubjektyPresenter extends BasePresenter
         $form->addText('titul_pred', 'Titul před:', 20, 35);
         $form->addText('titul_za', 'Titul za:', 20, 10);
 
-        $form['nazev_subjektu']->addConditionOn($form['prijmeni'], ~Spisovka\Form::FILLED)
+        $form['nazev_subjektu']->addConditionOn($form['prijmeni'], ~Form::FILLED)
                 ->setRequired('Je nutné vyplnit název subjektu nebo příjmení');
         
         $form->addDatePicker('datum_narozeni', 'Datum narození:');

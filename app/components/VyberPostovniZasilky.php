@@ -32,7 +32,7 @@ class VyberPostovniZasilkyControl extends \Nette\Forms\Controls\BaseControl
 
         $html = '';
         $last_order = 0;
-        foreach (\DruhZasilky::get() as $id => $druh) {
+        foreach (\Spisovka\DruhZasilky::get() as $id => $druh) {
             if (floor($druh->order / 100) > floor($last_order / 100))
                 $html .= '<br />';
             $last_order = $druh->order;

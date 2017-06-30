@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class Ares
 {
 
@@ -17,7 +19,7 @@ class Ares
             return $data;
 
         // P.L. - toto zabrani tomu, aby se do formulare subjektu zapsal retezec "undefined"
-        $result = new stdClass();
+        $result = new \stdClass();
         $result->dic = '';
         $result->ulice = '';
         $result->cislo_popisne = '';

@@ -1,5 +1,10 @@
 <?php
 
+namespace Spisovka;
+
+/**
+ * Třída použitá pro komponentu číselníku v administraci.
+ */
 class Model extends BaseModel
 {
 

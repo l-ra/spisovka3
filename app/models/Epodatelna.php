@@ -1,6 +1,6 @@
 <?php
 
-//netteloader=Epodatelna
+namespace Spisovka;
 
 class Epodatelna extends BaseModel
 {

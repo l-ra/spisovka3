@@ -3,7 +3,7 @@
     <div class="navigate">
     <a href="{link :Admin:Subjekty:seznam}">Seznam subjektů</a> - Detail subjektu
     </div>
-    <h2>{=Subjekt::displayName($Subjekt,'jmeno')}</h2>
+    <h2>{=Spisovka\Subjekt::displayName($Subjekt,'jmeno')}</h2>
 
         {if ($FormUpravit=='info')}
         {include '../../SpisovkaModule/Subjekty/form.latte'}
@@ -12,7 +12,7 @@
         <div class="detail_hlavicka">Info</div>
         <dl>
             <dt>Typ subjektu:</dt>
-            <dd>{$Subjekt->type} - {=Subjekt::typ_subjektu($Subjekt->type)}</dd>
+            <dd>{$Subjekt->type} - {=Spisovka\Subjekt::typ_subjektu($Subjekt->type)}</dd>
         </dl>
 
         {if (strpos($Subjekt->type,'OVM')!==false)||(strpos($Subjekt->type,'PO')!==false)||(strpos($Subjekt->type,'PFO')!==false)  }
@@ -45,7 +45,7 @@
         </dl>
         <dl>
             <dt>Stát narození:</dt>
-            <dd>{$Subjekt->stat_narozeni} - {=Subjekt::stat($Subjekt->stat_narozeni,10)}</dd>
+            <dd>{$Subjekt->stat_narozeni} - {=Spisovka\Subjekt::stat($Subjekt->stat_narozeni,10)}</dd>
         </dl>
         {/if}
     </div>
@@ -53,9 +53,9 @@
         <div class="detail_hlavicka">Kontakt</div>
         <dl>
             <dt>Subjekt:</dt>
-            <dd>{=Subjekt::displayName($Subjekt,'jmeno')}</dd><br />
+            <dd>{=Spisovka\Subjekt::displayName($Subjekt,'jmeno')}</dd><br />
             <dt>Adresa:</dt>
-            <dd>{!=Subjekt::displayName($Subjekt,'formalni_adresa')}</dd><br />
+            <dd>{!=Spisovka\Subjekt::displayName($Subjekt,'formalni_adresa')}</dd><br />
             <dt>E-mail:</dt>
             <dd>{$Subjekt->email}</dd><br />
             <dt>Telefon:</dt>
@@ -81,7 +81,7 @@
         {else}
         <dl>
             <dt></dt>
-            <dd>{=Subjekt::stav($Subjekt->stav)}</dd>
+            <dd>{=Spisovka\Subjekt::stav($Subjekt->stav)}</dd>
         </dl>
         <a href="{link :Admin:Subjekty:detail, 'id'=>$Subjekt->id, 'upravit'=>'stav'}">Změnit stav</a>
         {/if}

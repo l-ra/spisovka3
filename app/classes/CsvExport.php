@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Knihovna pro export dat
  *

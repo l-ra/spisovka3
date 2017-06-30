@@ -14,7 +14,7 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
     public function formatPresenterClass($presenter)
     {
         $s = str_replace(':', '_', $presenter);
-        return "{$s}Presenter";
+        return "Spisovka\\{$s}Presenter";
     }
 
     /**
@@ -27,6 +27,7 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
     {
         $s = str_replace('_', ':', $class);
         $s = str_replace('Presenter', '', $s);
+        $s = str_replace('Spisovka\\', '', $s);
         return $s;
     }
 

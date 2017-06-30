@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class DERParser
 {
 
@@ -269,7 +271,7 @@ class DERParser
 
         if ($tag[0] == "A") {
             // CONTEXT SPECIFIC
-            $tmp = new stdClass();
+            $tmp = new \stdClass();
             $tmp->tag_orig = $tag;
             $tmp->tag = $tag_hex;
             $tmp->tag_name = "CONTEXT SPECIFIC " . intVal($tag_hex);
@@ -277,7 +279,7 @@ class DERParser
             $tmp->class = bindec($class);
         } else if ($tag[0] == "8") {
             // CONTEXT SPECIFIC
-            $tmp = new stdClass();
+            $tmp = new \stdClass();
             $tmp->tag_orig = $tag;
             switch ($tag[1]) {
                 case 1:
@@ -294,7 +296,7 @@ class DERParser
             $tmp->type = 0;
             $tmp->class = bindec($class);
         } else {
-            $tmp = new stdClass();
+            $tmp = new \stdClass();
             $tmp->tag_orig = $tag;
             $tmp->tag = $tag_hex;
             $tmp->tag_name = isset($this->universal_tag[$tag_hex]) ? $this->universal_tag[$tag_hex]

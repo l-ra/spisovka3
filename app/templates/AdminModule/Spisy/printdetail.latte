@@ -25,12 +25,12 @@
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd>
+            <dd>{=Spisovka\SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd>
         </dl>
         <dl>
             <dt>Stav:</dt>
             <dd>
-                {=SpisModel::stav($Spis->stav)}
+                {=Spisovka\SpisModel::stav($Spis->stav)}
             </dd>
         </dl>
     </div>

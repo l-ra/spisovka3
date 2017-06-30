@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Install_DefaultPresenter extends BasePresenter
 {
 
@@ -331,7 +335,7 @@ class Install_DefaultPresenter extends BasePresenter
             'passed' => @preg_match('/pcre/u', 'pcre'),
             'description' => 'PCRE extension must support UTF-8.',
         );
-        $reflection = new ReflectionMethod(__CLASS__, 'iniFlag');
+        $reflection = new \ReflectionMethod(__CLASS__, 'iniFlag');
         $tests[] = array(
             'title' => 'Reflection phpDoc',
             'required' => TRUE,
@@ -522,13 +526,13 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderUrad()
     {
-        $client_config = (new Spisovka\ConfigClient())->get();
+        $client_config = (new ConfigClient())->get();
         $this->template->Urad = $client_config->urad;
     }
 
     public function renderEvidence()
     {
-        $client_config = (new Spisovka\ConfigClient())->get();
+        $client_config = (new ConfigClient())->get();
         $this->template->CisloJednaci = $client_config->cislo_jednaci;
     }
 
@@ -559,7 +563,7 @@ class Install_DefaultPresenter extends BasePresenter
         $Urad = $client_config->urad;
         $stat_select = Subjekt::stat();
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addText('nazev', 'Název:', 50, 100)
                 ->setValue($Urad->nazev)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název úřadu musí být vyplněn.');
@@ -601,7 +605,7 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config_data = (new Spisovka\ConfigClient())->get();
+        $config_data = (new ConfigClient())->get();
 
         $config_data['urad']['nazev'] = $data['nazev'];
         $config_data['urad']['plny_nazev'] = $data['plny_nazev'];
@@ -620,7 +624,7 @@ class Install_DefaultPresenter extends BasePresenter
         $config_data['urad']['kontakt']['www'] = $data['www'];
 
         try {
-            (new Spisovka\ConfigClient())->save($config_data);
+            (new ConfigClient())->save($config_data);
 
             $this->redirect('evidence');
         } catch (Nette\IOException $e) {
@@ -639,7 +643,7 @@ class Install_DefaultPresenter extends BasePresenter
 
         $evidence = array("priorace" => "Priorace", "sberny_arch" => "Sběrný arch");
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addRadioList('typ_evidence', 'Typ evidence:', $evidence)
                 ->setValue($CJ->typ_evidence)
                 ->addRule(Nette\Forms\Form::FILLED, 'Volba evidence musí být vybrána.');
@@ -659,14 +663,14 @@ class Install_DefaultPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        $config_data = (new Spisovka\ConfigClient())->get();
+        $config_data = (new ConfigClient())->get();
 
         $config_data['cislo_jednaci']['maska'] = $data['maska'];
         $config_data['cislo_jednaci']['typ_evidence'] = $data['typ_evidence'];
         $config_data['cislo_jednaci']['pocatek_cisla'] = $data['pocatek_cisla'];
 
         try {
-            (new Spisovka\ConfigClient())->save($config_data);
+            (new ConfigClient())->save($config_data);
 
             $this->redirect('spravce');
         } catch (Nette\IOException $e) {
@@ -679,7 +683,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     protected function createComponentSpravceForm()
     {
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addText('jmeno', 'Jméno:', 50, 150);
         $form1->addText('prijmeni', 'Příjmení:', 50, 150)
                 ->addRule(Nette\Forms\Form::FILLED,

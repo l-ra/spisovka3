@@ -24,7 +24,7 @@
 {elseif $sl=='subjekty'}
 	{if isset($d2s[$dok->id])}
 	{foreach $d2s[$dok->id] as $s_id}
-	{=Subjekt::displayName($subjekty[$s_id], $zobrazeni['zobrazeni_adresa'] ? 'plna_adresa' : 'jmeno')}<br />
+	{=Spisovka\Subjekt::displayName($subjekty[$s_id], $zobrazeni['zobrazeni_adresa'] ? 'plna_adresa' : 'jmeno')}<br />
 	{/foreach}
 	{else}
 	&nbsp;

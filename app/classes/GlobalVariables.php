@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * @author Pavel Laštovička
  */

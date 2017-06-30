@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spis extends DBEntity
 {
 
@@ -52,7 +56,7 @@ class Spis extends DBEntity
      */
     public function getUserPermissions()
     {
-        /* @var $user Spisovka\User */
+        /* @var $user User */
         $user = self::getUser();
         $oj_uzivatele = $user->getOrgUnit();
 
@@ -150,37 +154,37 @@ class Spis extends DBEntity
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function close()
     {
         $perm = $this->getUserPermissions();
         if (!$perm['lze_uzavrit'])
-            throw new Exception('Přístup odepřen.');
+            throw new \Exception('Přístup odepřen.');
 
         $errors = [];
         if (!$this->checkMandatoryData($errors))
-            throw new Exception("Spis nelze uzavřít, nemá vyplněny všechny povinné údaje.\n" . implode(' ',
+            throw new \Exception("Spis nelze uzavřít, nemá vyplněny všechny povinné údaje.\n" . implode(' ',
                     $errors));
 
         $documents = $this->getDocuments();
         if ($documents)
             foreach ($documents as $dok)
                 if ($dok->stav < DocumentStates::STAV_VYRIZEN_NESPUSTENA)
-                    throw new Exception("Spis nelze uzavřít. Dokument \"$dok->cislo_jednaci\" není vyřízen.");
+                    throw new \Exception("Spis nelze uzavřít. Dokument \"$dok->cislo_jednaci\" není vyřízen.");
 
         $this->stav = self::UZAVREN;
         $this->save();
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function reopen()
     {
         $perm = $this->getUserPermissions();
         if (!$perm['lze_otevrit'])
-            throw new Exception('Přístup odepřen.');
+            throw new \Exception('Přístup odepřen.');
 
         $this->stav = self::OTEVREN;
         $this->save();
@@ -188,7 +192,7 @@ class Spis extends DBEntity
 
     /**
      * @throws Nette\InvalidStateException
-     * @throws Exception
+     * @throws \Exception
      */
     public function transferToSpisovna()
     {
@@ -197,7 +201,7 @@ class Spis extends DBEntity
 
         $errors = [];
         if (!$this->checkMandatoryData($errors))
-            throw new Exception(implode(' ', $errors));
+            throw new \Exception(implode(' ', $errors));
 
         $dokumenty = $this->getDocuments();
         dibi::begin();
@@ -205,7 +209,7 @@ class Spis extends DBEntity
             foreach ($dokumenty as $dok) {
                 $stav = $dok->transferToSpisovna(true);
                 if ($stav !== true)
-                    throw new Exception($stav);
+                    throw new \Exception($stav);
             }
 
             $this->stav = self::PREDAN_DO_SPISOVNY;
@@ -219,7 +223,7 @@ class Spis extends DBEntity
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function receiveIntoSpisovna()
     {
@@ -228,7 +232,7 @@ class Spis extends DBEntity
 
         $errors = [];
         if (!$this->checkMandatoryData($errors))
-            throw new Exception(implode(' ', $errors));
+            throw new \Exception(implode(' ', $errors));
 
         dibi::begin();
         try {
@@ -237,7 +241,7 @@ class Spis extends DBEntity
                 foreach ($documents as $doc) {
                     $res = $doc->receiveIntoSpisovna(false);
                     if (is_string($res))
-                        throw new Exception($res);
+                        throw new \Exception($res);
                 }
             }
 
@@ -252,7 +256,7 @@ class Spis extends DBEntity
 
     /**
      * @throws Nette\InvalidStateException
-     * @throws Exception
+     * @throws \Exception
      */
     public function returnFromSpisovna()
     {

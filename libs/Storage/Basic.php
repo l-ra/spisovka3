@@ -1,6 +1,8 @@
 <?php
 
-//netteloader=Storage_Basic
+namespace Spisovka;
+
+use Nette;
 
 class Storage_Basic extends FileModel
 {
@@ -39,7 +41,7 @@ class Storage_Basic extends FileModel
     {
         $row = $this->select(array(array('id=%i', $file_id)))->fetch();
         if (!$row)
-            throw new Exception("Nemohu načíst přílohu ID $file_id.");
+            throw new \Exception("Nemohu načíst přílohu ID $file_id.");
 
         // odstraň záznam z databáze
         $this->delete(array(array('id=%i', $file_id)));

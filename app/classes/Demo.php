@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class Demo
 {
 
@@ -20,5 +22,3 @@ class Demo
     }
 
 }
-
-?>

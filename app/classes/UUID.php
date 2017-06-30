@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class UUID
 {
 
@@ -47,4 +49,3 @@ class UUID
 
 }
 
-?>

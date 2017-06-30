@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 /**
  * AdminModule/presenters/SpecialPresenter.php
  *

@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class DateDiff
 {
 
@@ -11,11 +13,11 @@ class DateDiff
     public $s;
     public $invert;
 
-    public static function diff(DateTime $date1, DateTime $date2 = null, $absolute = false)
+    public static function diff(\DateTime $date1, \DateTime $date2 = null, $absolute = false)
     {
 
         if (is_null($date2)) {
-            $date2 = new DateTime();
+            $date2 = new \DateTime();
         }
 
         if (function_exists('date_diff')) {
@@ -37,8 +39,8 @@ class DateDiff
     public static function add($date1, $interval)
     {
 
-        if (!($date1 instanceof DateTime)) {
-            $date1 = new DateTime($date1);
+        if (!($date1 instanceof \DateTime)) {
+            $date1 = new \DateTime($date1);
         }
 
         $y = $date1->format('Y') + $interval;
@@ -70,7 +72,7 @@ class DateDiff
         return $format;
     }
 
-    public function date_diff(DateTime $date1, DateTime $date2)
+    public function date_diff(\DateTime $date1, \DateTime $date2)
     {
 
         if ($date1 > $date2) {

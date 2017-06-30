@@ -6,7 +6,7 @@ interface IConfig
 {
 
     /**
-     * @return Spisovka\ArrayHash
+     * @return ArrayHash
      */
     function get();
 
@@ -31,12 +31,12 @@ class Config implements IConfig
         $loader = new \Nette\DI\Config\Loader();
         $array = $loader->load("$directory/$name.$ext");
         $this->name = $name;
-        $this->data = \Spisovka\ArrayHash::from($array);
+        $this->data = ArrayHash::from($array);
     }
 
     /**
      * 
-     * @return Spisovka\ArrayHash
+     * @return ArrayHash
      */
     public function get()
     {
@@ -55,10 +55,10 @@ class Config implements IConfig
     {
         if (is_array($data))
             ;
-        else if ($data instanceof \Spisovka\ArrayHash) {
+        else if ($data instanceof ArrayHash) {
             $data = $data->toArray();
         } else
-            throw new InvalidArgumentException(__METHOD__ . '() - neplatný argument');
+            throw new \InvalidArgumentException(__METHOD__ . '() - neplatný argument');
     }
 
 }
@@ -90,23 +90,23 @@ class ConfigEpodatelna implements IConfig
 
     public function get()
     {
-        $data = \Settings::get('epodatelna', null);
+        $data = Settings::get('epodatelna', null);
         if (!$data)
-            throw new Exception(__METHOD__ . '() - v databázi chybí nastavení e-podatelny');
+            throw new \Exception(__METHOD__ . '() - v databázi chybí nastavení e-podatelny');
 
-        return $this->upgrade(\Spisovka\ArrayHash::from(unserialize($data)));
+        return $this->upgrade(ArrayHash::from(unserialize($data)));
     }
 
     public function save($data)
     {
         Config::_saveCheckParameter($data);
-        \Settings::set('epodatelna', serialize($data));
+        Settings::set('epodatelna', serialize($data));
     }
 
     /**
      * Aktualizuje strukturu nastavení podle změn v aplikaci.
-     * @param \Spisovka\ArrayHash $data
-     * @return \Spisovka\ArrayHash
+     * @param ArrayHash $data
+     * @return ArrayHash
      */
     protected function upgrade($data)
     {

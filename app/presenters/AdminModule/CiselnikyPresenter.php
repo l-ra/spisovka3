@@ -1,6 +1,10 @@
 <?php
 
-class CiselnikSpousteciUdalost extends Ciselnik
+namespace Spisovka;
+
+use Nette;
+
+class CiselnikSpousteciUdalost extends Components\Ciselnik
 {
 
     protected function dataChangedHandler()
@@ -25,7 +29,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $this->template->ciselnik_title = "Typ dokumentu";
         $this->template->title = " - " . $this->template->ciselnik_title . " - číselník";
 
-        $ciselnik = new Ciselnik();
+        $ciselnik = new Components\Ciselnik();
         $ciselnik->setTable('dokument_typ');
 
         $ciselnik->addColumn('id', array(
@@ -96,7 +100,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $this->template->ciselnik_title = "Způsob vyřízení";
         $this->template->title = " - " . $this->template->ciselnik_title . " - číselník";
 
-        $ciselnik = new Ciselnik();
+        $ciselnik = new Components\Ciselnik();
         $ciselnik->setTable('zpusob_vyrizeni');
 
         $ciselnik->addColumn('id', array(
@@ -148,7 +152,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $this->template->ciselnik_title = "Způsob odeslání";
         $this->template->title = " - " . $this->template->ciselnik_title . " - číselník";
 
-        $ciselnik = new Ciselnik();
+        $ciselnik = new Components\Ciselnik();
         $ciselnik->setTable('zpusob_odeslani');
         $ciselnik->addColumn('id', array(
             'title' => 'ID',
@@ -199,7 +203,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $this->template->ciselnik_title = "Způsob doručení";
         $this->template->title = " - " . $this->template->ciselnik_title . " - číselník";
 
-        $ciselnik = new Ciselnik();
+        $ciselnik = new Components\Ciselnik();
         $ciselnik->setTable('zpusob_doruceni');
 
         $ciselnik->addColumn('id', array(
@@ -311,7 +315,7 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $this->template->ciselnik_title = "Státy";
         $this->template->title = " - " . $this->template->ciselnik_title . " - číselník";
 
-        $ciselnik = new Ciselnik();
+        $ciselnik = new Components\Ciselnik();
         $ciselnik->setTable('stat');
         $ciselnik->orderBy('nazev');
 

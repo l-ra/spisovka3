@@ -1,6 +1,6 @@
 {block title}Informace o uživateli{/block}
 {block content}
-    <h2>{=Osoba::displayName($Osoba)}</h2>
+    <h2>{=Spisovka\Osoba::displayName($Osoba)}</h2>
 
     <div class="detail_blok">
         <div class="detail_hlavicka">Informace o uživateli</div>
@@ -9,7 +9,7 @@
         {else}
         <dl>
             <dt>Jméno:</dt>
-            <dd>{=Osoba::displayName($Osoba)}</dd>
+            <dd>{=Spisovka\Osoba::displayName($Osoba)}</dd>
         </dl>
         <dl>
             <dt>E-mail:</dt>
@@ -23,13 +23,13 @@
             <dt>Funkce:</dt>
             <dd>{$Osoba->pozice}</dd>
         </dl>
-        <a n:if="Settings::get('users_can_change_their_data')" href="{link this, 'upravit' => 'info'}">Upravit osobní údaje</a>
+        <a n:if="Spisovka\Settings::get('users_can_change_their_data')" href="{link this, 'upravit' => 'info'}">Upravit osobní údaje</a>
         {/if}
     </div>
 
     <div class="detail_blok">
         <div class="detail_hlavicka">Uživatelský účet</div>
-        {if $FormUpravit == 'heslo' && Settings::get('users_can_change_their_password', true)}
+        {if $FormUpravit == 'heslo' && Spisovka\Settings::get('users_can_change_their_password', true)}
             {control changePassword}
         {else}
         <dl>
@@ -56,11 +56,11 @@
                 {/if}
             </dd>
         </dl>
-        <br /><a n:if="Settings::get('users_can_change_their_password', true)" href="{link this, 'upravit' => 'heslo'}">Změnit heslo</a>
+        <br /><a n:if="Spisovka\Settings::get('users_can_change_their_password', true)" href="{link this, 'upravit' => 'heslo'}">Změnit heslo</a>
         {/if}
     </div>
 
-    <div class="detail_blok" n:if="Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)">
+    <div class="detail_blok" n:if="Spisovka\Settings::get(Spisovka\Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)">
         <div class="detail_hlavicka">Datová schránka</div>
         {if $FormUpravit == 'datova_schranka'}
         {control isdsBoxForm}

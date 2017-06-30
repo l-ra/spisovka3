@@ -75,7 +75,7 @@
         <p><strong>Poznámka:</strong> Spouštěcí událost je okamžik rozhodný pro počátek plynutí skartační lhůty. Skartační lhůta se určuje počtem celých roků počítaných od 1. ledna kalendářního roku následujícího po kalendářním roce, v němž nastala spouštěcí událost.</p>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
+            <dd>{=Spisovka\SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
         </dl>
         {control udalostForm}
     </div>
@@ -228,7 +228,7 @@
                     <dt>Skartační lhůta:</dt>
                     <dd class="normal-font"><strong>{$Dok->skartacni_lhuta}</strong> {if $Dok->stav_dokumentu > 4}(rok skartace {$Dok->skartacni_rok}){/if}</dd><br />
                     <dt>Spouštěcí událost:</dt>
-                    <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd><br />
+                    <dd>{=Spisovka\SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd><br />
                     {if $Dok->stav_dokumentu>=5}
                         <dt>Datum spouštěcí události:</dt>
                         <dd>{$Dok->datum_spousteci_udalosti|edate}</dd><br />
@@ -263,13 +263,13 @@
             <dt>Předán:</dt>
             <dd>
                 {if $Dok->forward_user_id}
-                    {Person::fromUserId($Dok->forward_user_id)}
+                    {Spisovka\Person::fromUserId($Dok->forward_user_id)}
                 {else}
                     organizační jednotce
                 {/if}
                 <br />
                 {if $Dok->forward_orgunit_id}
-                    {OrgUnit::fromId($Dok->forward_orgunit_id)}
+                    {Spisovka\OrgUnit::fromId($Dok->forward_orgunit_id)}
                 {/if}
             </dd>
         </dl>

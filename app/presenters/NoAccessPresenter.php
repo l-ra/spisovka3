@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class NoAccessPresenter extends BasePresenter
 {
     public function startup()

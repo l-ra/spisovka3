@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Admin_SpisznakPresenter extends BasePresenter
 {
 
@@ -10,7 +14,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->template->title = " - Seznam spisových znaků";
 
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -140,7 +144,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addHidden('id')
                 ->setValue(@$spisznak->id);
 
@@ -210,7 +214,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $spousteci = SpisovyZnak::spousteci_udalost(null, 1);
         $skar_znak = array('A' => 'A', 'S' => 'S', 'V' => 'V');
 
-        $form = new Spisovka\Form();
+        $form = new Form();
         $form->addText('nazev', 'Spisový znak:', 50, 80)
                 ->addRule(Nette\Forms\Form::FILLED, 'Spisový znak musí být vyplněn!');
         $form->addText('popis', 'Popis:', 50, 200);

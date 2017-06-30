@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka\Components;
+
+use Nette;
+
 /**
  * Ciselnik control.
  *
@@ -52,7 +56,6 @@ class Ciselnik extends Nette\Application\UI\Control
 
     public function addColumn($col, $params)
     {
-
         if (empty($params['title']))
             $params['title'] = $col;
 
@@ -69,8 +72,7 @@ class Ciselnik extends Nette\Application\UI\Control
 
     public function render()
     {
-
-        $model = new Model($this->tableName);
+        $model = new \Spisovka\Model($this->tableName);
 
         if ($this->getParameter('edit')) {
             // form - uprava
@@ -110,19 +112,20 @@ class Ciselnik extends Nette\Application\UI\Control
 
     protected function createComponentForm($name)
     {
-        $form = new Spisovka\Form($this, $name);
+        $form = new \Spisovka\Form($this, $name);
         $form->onSubmit[] = array($this, 'formSubmitHandler');
 
         if (count($this->cols) > 0) {
 
             if ($this->action == 'edit') {
-                $model = new Model($this->tableName);
+                $model = new \Spisovka\Model($this->tableName);
                 $this->data = $model->select([["[id] = ", $this->getParameter('edit')]])->fetch();
             }
 
             foreach ($this->cols as $col_name => $col_params) {
 
-                if (isset($col_params['form']) && ( is_null($col_params['form']) || $col_params['form'] == 'none' )) {
+                if (isset($col_params['form']) && ( is_null($col_params['form']) || $col_params['form']
+                        == 'none' )) {
                     continue; // sloupec se negeneruje
                 }
 

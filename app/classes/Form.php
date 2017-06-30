@@ -47,7 +47,7 @@ class Form extends \Nette\Application\UI\Form
     /**
      * @param string $name
      * @param string $label
-     * @return \Spisovka\Controls\DatePicker
+     * @return Controls\DatePicker
      */
     public function addDatePicker($name, $label)
     {

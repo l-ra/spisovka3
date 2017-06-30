@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovna_DokumentyPresenter extends BasePresenter
 {
 
@@ -26,7 +30,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
     protected function seznam()
     {
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -288,20 +292,20 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
         $Dok = @$this->template->Dok;
 
-        $form = new Spisovka\Form();
+        $form = new Form();
         $form->addHidden('id')
                 ->setValue(@$Dok->id);
 
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 6)
                 ->setValue(@$Dok->ulozeni_dokumentu);
 
-        $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
+        $form->addComponent(new Components\SpisovyZnakComponent(), 'spisovy_znak_id');
         $form->getComponent('spisovy_znak_id')->setValue(@$Dok->spisovy_znak_id);
 
         $form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$Dok->skartacni_znak);
         $form->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
-                ->addRule(Spisovka\Form::INTEGER, 'Skartační lhůta musí být celé číslo.')
+                ->addRule(Form::INTEGER, 'Skartační lhůta musí být celé číslo.')
                 ->setValue(@$Dok->skartacni_lhuta);
 
         $form->addSubmit('upravit', 'Uložit')
@@ -484,7 +488,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
 
     public function createComponentBulkAction()
     {
-        $BA = new Spisovka\Components\BulkAction();
+        $BA = new Components\BulkAction();
 
         $actions = [];
         if (isset($this->template->dokument_view))

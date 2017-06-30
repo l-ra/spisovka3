@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Admin_ProtokolPresenter extends BasePresenter
 {
 

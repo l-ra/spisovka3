@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 /**
  * AdminModule/presenters/SupportPresenter.php
  *
@@ -65,6 +69,8 @@ class Admin_SupportPresenter extends BasePresenter
                 $val = 'false';
             if ($val === null)
                 $val = 'null';
+            if (is_array($val))
+                $val = "Array - " . serialize($val);
             printf("%-37s  %s\n", $key, $val);
         }
         echo "\n";
@@ -77,7 +83,7 @@ class Admin_SupportPresenter extends BasePresenter
 
         echo "Konfigurace e-podatelny:\n";
         echo "------------------------\n\n";
-        $config = (new \Spisovka\ConfigEpodatelna)->get();
+        $config = (new ConfigEpodatelna)->get();
         unset($config->isds->password);
         unset($config->isds->cert_pass);
         foreach ($config->email as &$mailbox)

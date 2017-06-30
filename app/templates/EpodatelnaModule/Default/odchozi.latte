@@ -43,7 +43,7 @@
                 {$ep->adresat}
             </td>
             <td class="prideleno">
-                {Person::fromUserId($ep->user_id)->displayName()}
+                {Spisovka\Person::fromUserId($ep->user_id)->displayName()}
             </td>
         </tr>
         {/foreach}

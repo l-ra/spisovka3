@@ -14,8 +14,8 @@ class User extends \Nette\Security\User
 
     public function getDisplayName()
     {
-        $person = \Person::fromUserId($this->getId());
-        return \Osoba::displayName($person);
+        $person = Person::fromUserId($this->getId());
+        return Osoba::displayName($person);
     }
 
     // Urcuje, zda uzivatel vystupuje pod uvedenou roli
@@ -48,11 +48,11 @@ class User extends \Nette\Security\User
     }
 
     /**
-     * @return \OrgUnit|null
+     * @return OrgUnit|null
      */
     public function getOrgUnit()
     {
-        $account = new \UserAccount($this->id);
+        $account = new UserAccount($this->id);
         return $account->getOrgUnit();
     }
 

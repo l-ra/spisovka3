@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovna_ZapujckyPresenter extends BasePresenter
 {
 
@@ -26,7 +30,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
     public function renderDefault($hledat)
     {
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -67,7 +71,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     public function createComponentBulkAction()
     {
-        $BA = new Spisovka\Components\BulkAction();
+        $BA = new Components\BulkAction();
 
         if ($this->user->isAllowed('Zapujcka', 'schvalit')) {
             $actions = ['vratit' => 'Vrátit dokumenty',
@@ -239,7 +243,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
 
     protected function createComponentNovyForm()
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $dokument_id = $this->getParameter('dokument_id');
 

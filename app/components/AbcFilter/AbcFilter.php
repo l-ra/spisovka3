@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka\Components;
+
+use Nette;
+
 /**
  * ABC filter control.
  * @author Pavel Laštovička

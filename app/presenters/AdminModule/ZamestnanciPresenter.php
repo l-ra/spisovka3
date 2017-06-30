@@ -1,6 +1,8 @@
 <?php
 
-use Spisovka\Form;
+namespace Spisovka;
+
+use Nette;
 
 class Admin_ZamestnanciPresenter extends BasePresenter
 {
@@ -8,9 +10,9 @@ class Admin_ZamestnanciPresenter extends BasePresenter
     public function renderSeznam($hledat = null, $abc = null)
     {
         // paginator
-        new AbcFilter($this, 'abc', $this->getHttpRequest());
+        new Components\AbcFilter($this, 'abc', $this->getHttpRequest());
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -231,7 +233,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $Role = new RoleModel();
         $role_select = $Role->seznam();
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
 
         if ($roles) {
             foreach ($roles as $ur) {
@@ -312,7 +314,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         if ($add_role == TRUE) {
             $rowur = array('role_id' => $add_role_id,
                 'user_id' => $user_id,
-                'date_added' => new DateTime()
+                'date_added' => new \DateTime()
             );
             $UserRole->insert($rowur);
         }
@@ -328,7 +330,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     protected function createComponentOJForm()
     {
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
 
         $m = new OrgJednotka;
         $seznam = $m->linearniSeznam();
@@ -368,7 +370,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
     protected function createComponentChangeUsernameForm()
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $c = $form->addText('username', 'Uživatelské jméno:', 30)
                 ->setRequired();

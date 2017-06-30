@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovna_DefaultPresenter extends BasePresenter
 {
 

@@ -6,21 +6,21 @@
         {if isset($rezim_subjektu)}
            <img id="subjekt_ikona_{$subjekt->id}" src="{$publicUrl}images/icons/subjekt_{$rezim_subjektu|lower}.png" alt="{$rezim_subjektu}" width="32" height="32" />
         {else}
-           <img src="{$publicUrl}images/subjekt/{Subjekt::img_name($subjekt->type)}.png" alt="{$subjekt->type}" width="32" height="32" />
+           <img src="{$publicUrl}images/subjekt/{Spisovka\Subjekt::img_name($subjekt->type)}.png" alt="{$subjekt->type}" width="32" height="32" />
         {/if}
     </td>
     <td class="meta">
         <strong>
             {if $module == 'Epodatelna' && $presenter->view == 'vyber'}
-                <a href="#" onclick="epodSubjektVybran({$subjekt->id}); return false;">{=Subjekt::displayName($subjekt, 'jmeno_item')}</a>
+                <a href="#" onclick="epodSubjektVybran({$subjekt->id}); return false;">{=Spisovka\Subjekt::displayName($subjekt, 'jmeno_item')}</a>
             {elseif $module == 'Admin'}
-                <a href="{link detail, id => $subjekt->id}" {if $subjekt->stav > 1}style="text-decoration:line-through;"{/if}>{=Subjekt::displayName($subjekt, 'jmeno_item')}</a>
+                <a href="{link detail, id => $subjekt->id}" {if $subjekt->stav > 1}style="text-decoration:line-through;"{/if}>{=Spisovka\Subjekt::displayName($subjekt, 'jmeno_item')}</a>
             {else}
-                {=Subjekt::displayName($subjekt, 'jmeno_item')}
+                {=Spisovka\Subjekt::displayName($subjekt, 'jmeno_item')}
             {/if}
         </strong>
         <div class="info">
-            <span>{=Subjekt::typ_subjektu($subjekt->type)}</span><br />            
+            <span>{=Spisovka\Subjekt::typ_subjektu($subjekt->type)}</span><br />            
             <span n:if="isset($rezim_subjektu)">
                 {if $rezim_subjektu == 'O'}
                 odesílatel
@@ -33,7 +33,7 @@
                 {/if}
                 <br />
             </span>
-            {=Subjekt::displayName($subjekt, 'adresa')}
+            {=Spisovka\Subjekt::displayName($subjekt, 'adresa')}
         </div>
         <div class="vyber" n:if="!empty($akce_odebrat_zmenit)">
             <a href="{link :Spisovka:Subjekty:odebrat, 'id' => $subjekt->id, 'dok_id' => $dokument_id}" onclick="return odebratSubjekt(this);">odebrat</a>

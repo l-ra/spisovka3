@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Authorizator extends Nette\Security\Permission
 {
 

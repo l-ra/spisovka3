@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Test_DefaultPresenter extends BasePresenter
 {
 
@@ -197,7 +201,7 @@ EOJ;
                 $data['forward_orgunit_id'] = null;
             }
 
-            $data['datum_vzniku'] = new DateTime("@" . rand(1, 1000000000));
+            $data['datum_vzniku'] = new \DateTime("@" . rand(1, 1000000000));
             $data['cislo_jednaci'] = "CJ-" . rand(1, 10000);
             $data['skartacni_znak'] = $skartacni_znaky[rand(0, 2)];
 
@@ -214,7 +218,7 @@ EOJ;
         $mysqli = new mysqli($params['host'], $params['username'], $params['password'],
                 $params['database']);
         if ($mysqli->connect_errno)
-            throw new Exception('Nepodařilo se připojit do databáze');
+            throw new \Exception('Nepodařilo se připojit do databáze');
 
         $t1 = microtime(true);
         $sql = 'SELECT SQL_NO_CACHE `d`.`id` 
@@ -227,7 +231,7 @@ limit 0,200
 
         dump($sql);
         if (!$result = $mysqli->real_query($sql))
-            throw new Exception('Provedení dotazu skončilo s chybou');
+            throw new \Exception('Provedení dotazu skončilo s chybou');
 
         $t2 = microtime(true);
         dump(1000 * ($t2 - $t1));

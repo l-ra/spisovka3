@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class CisloJednaci extends BaseModel
 {
 
@@ -151,7 +155,7 @@ class CisloJednaci extends BaseModel
             }
         }
 
-        $tmp = new stdClass();
+        $tmp = new \stdClass();
         if ($ulozit == 1) {
             unset($info['user'], $info['prijmeni'], $info['org']);
             $cjednaci_id = $this->insert($info);

@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Epodatelna_PrilohyPresenter extends BasePresenter
 {
 

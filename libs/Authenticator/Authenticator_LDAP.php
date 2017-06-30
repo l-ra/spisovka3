@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Authenticator_LDAP extends Authenticator_Basic
 {
 

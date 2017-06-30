@@ -67,7 +67,7 @@ class ISDS
                 $params['passphrase'] = $passphrase;
                 break;
             default: // neplatny typ
-                throw new InvalidArgumentException();
+                throw new \InvalidArgumentException();
         }
 
         $this->soap_params = $params;
@@ -864,7 +864,7 @@ class ISDS
                 $filename = "db_access.wsdl";
                 break;
             default:
-                throw new InvalidArgumentException();
+                throw new \InvalidArgumentException();
         }
 
         return LIBS_DIR . "/isds/$filename";
@@ -888,7 +888,7 @@ class ISDS
      */
     protected function GetUserAgent()
     {
-        $app_info = new VersionInformation();
+        $app_info = new Spisovka\VersionInformation();
         $user_agent = "OSS Spisova sluzba v" . $app_info->version;
         return $user_agent;
     }

@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Description of Person
  *
@@ -12,7 +14,7 @@ class Person extends CachedDBEntity
 
     public function save()
     {
-        $this->date_modified = new DateTime();
+        $this->date_modified = new \DateTime();
         $this->user_modified = $this->getUser()->id;
         parent::save();
     }
@@ -23,9 +25,9 @@ class Person extends CachedDBEntity
         if (!$user_id)
             $user_id = null;   // pripad instalace aplikace
 
-        $data['date_created'] = new DateTime();
+        $data['date_created'] = new \DateTime();
         $data['user_created'] = $user_id;
-        $data['date_modified'] = new DateTime();
+        $data['date_modified'] = new \DateTime();
         $data['user_modified'] = $user_id;
         $data['stav'] = 0;
 

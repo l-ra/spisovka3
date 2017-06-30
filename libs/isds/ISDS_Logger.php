@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class ISDS_Logger
 {
 
@@ -11,7 +15,7 @@ class ISDS_Logger
         $this->level = $level;
         $this->handle = fopen(self::getFilename(), 'a');
         if (!$this->handle)
-            throw new Exception (__METHOD__ . '() - nemohu otevřít soubor s protokolem');
+            throw new \Exception (__METHOD__ . '() - nemohu otevřít soubor s protokolem');
     }
 
     public function __destruct()

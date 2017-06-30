@@ -62,10 +62,10 @@
                 {$zapujcka->duvod}
             </td>            
             <td class="prideleno">
-                {Person::fromUserId($zapujcka->user_id)}
+                {Spisovka\Person::fromUserId($zapujcka->user_id)}
             </td>
             <td class="stav">
-                {Zapujcka::stav($zapujcka->stav)}
+                {Spisovka\Zapujcka::stav($zapujcka->stav)}
             </td>
         </tr>
         {/foreach}

@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovka_ProtokolyPresenter extends BasePresenter
 {
 
@@ -19,7 +23,7 @@ class Spisovka_ProtokolyPresenter extends BasePresenter
 
     public function createComponentForm()
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
         $items = [LogModel::DOK_NOVY => 'Vytvoření dokumentu',
             LogModel::DOK_PREDAN => 'Předání dokumentu',
             LogModel::DOK_VYRIZEN => 'Vyřízení dokumentu'];
@@ -55,7 +59,7 @@ class Spisovka_ProtokolyPresenter extends BasePresenter
 
     public function createComponentSearch()
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $form->addGroup();
         $from = $this->getParameter('datum_od');
@@ -84,7 +88,7 @@ class Spisovka_ProtokolyPresenter extends BasePresenter
         return $form;
     }
 
-    public function searchSubmitted(Spisovka\Form $form, $data)
+    public function searchSubmitted(Form $form, $data)
     {
         $from = $data->from;
         $to = $data->to;

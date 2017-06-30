@@ -1,6 +1,6 @@
 <?php
 
-//netteloader=Subjekt
+namespace Spisovka;
 
 class Subjekt extends BaseModel
 {

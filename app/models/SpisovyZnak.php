@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class SpisovyZnak extends TreeModel
 {
 
@@ -82,16 +84,16 @@ class SpisovyZnak extends TreeModel
         if ($row)
             return $row;
 
-        throw new InvalidArgumentException("Spisový znak id '$spisznak_id' neexistuje.");
+        throw new \InvalidArgumentException("Spisový znak id '$spisznak_id' neexistuje.");
     }
 
     public function vytvorit($data)
     {
         $data['stav'] = 1;
         $user_id = self::getUser()->id;
-        $data['date_created'] = new DateTime();
+        $data['date_created'] = new \DateTime();
         $data['user_created'] = $user_id;
-        $data['date_modified'] = new DateTime();
+        $data['date_modified'] = new \DateTime();
         $data['user_modified'] = $user_id;
 
         if (empty($data['parent_id']))
@@ -108,7 +110,7 @@ class SpisovyZnak extends TreeModel
 
     public function upravit($data, $spisznak_id)
     {
-        $data['date_modified'] = new DateTime();
+        $data['date_modified'] = new \DateTime();
         $data['user_modified'] = (int) self::getUser()->id;
 
         if (empty($data['spousteci_udalost_id']))

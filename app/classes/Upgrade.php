@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 final class Upgrade
 {
 
@@ -17,7 +19,7 @@ final class Upgrade
 
     public function perform()
     {
-        $lock = new Spisovka\Lock('upgrade');
+        $lock = new Lock('upgrade');
         $lock->delete_file = true;
         
         try {

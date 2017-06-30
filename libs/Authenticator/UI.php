@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Authenticator_UI extends Nette\Application\UI\Control
 {
 
@@ -89,7 +93,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
     protected function createComponentNewUserForm($name)
     {
-        $form = new Spisovka\Form($this, $name);
+        $form = new Form($this, $name);
 
         $form->addHidden('osoba_id');
         if (isset($this->form_params['osoba_id']))
@@ -252,7 +256,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
     protected function createComponentChangePasswordForm($name)
     {
-        $form = new Spisovka\Form($this, $name);
+        $form = new Form($this, $name);
 
         $form->addHidden('osoba_id');
         $form->addHidden('user_id');
@@ -281,7 +285,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
     protected function createComponentChangeAuthTypeForm($name)
     {
-        $form = new Spisovka\Form($this, $name);
+        $form = new Form($this, $name);
 
         $form->addHidden('osoba_id');
         $form->addHidden('user_id');
@@ -436,7 +440,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
         $data = $button->getForm()->getValues();
         $ua = new UserAccount($data['user_id']);
         $ua->external_auth = $data['external_auth'];
-        $ua->last_modified = new DateTime();
+        $ua->last_modified = new \DateTime();
         $ua->save();
 
         $this->presenter->flashMessage('Nastavení změněno.');
@@ -504,7 +508,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
             $User2Role = new User2Role();
             $row = ['role_id' => $role_id,
                 'user_id' => $account->id,
-                'date_added' => new DateTime()
+                'date_added' => new \DateTime()
             ];
             $User2Role->insert($row);
 

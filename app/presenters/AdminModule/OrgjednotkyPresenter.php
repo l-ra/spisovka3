@@ -1,12 +1,16 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Admin_OrgjednotkyPresenter extends BasePresenter
 {
 
     public function renderSeznam($hledat = null)
     {
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -60,7 +64,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $OrgJednotka = new OrgJednotka();
         $org_seznam = $OrgJednotka->selectBox(1, ['exclude_id' => @$org->id]);
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addHidden('id');
                 
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)
@@ -126,7 +130,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         $OrgJednotka = new OrgJednotka();
         $org_seznam = $OrgJednotka->selectBox(1);
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addText('zkraceny_nazev', 'Zkrácený název:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Zkrácený název org. jednotky musí být vyplněno.');
         $form1->addText('plny_nazev', 'Úplný název jednotky:', 50, 200);

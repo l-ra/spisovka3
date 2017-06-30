@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Čtení informací o verzi aplikace.
  *
@@ -35,7 +37,7 @@ class VersionInformation
             case 'name':
                 return self::$name;
             default:
-                throw new Exception('Chyba v přístupu k verzi aplikace.');
+                throw new \Exception('Chyba v přístupu k verzi aplikace.');
         }
     }
 

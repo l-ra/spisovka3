@@ -1,11 +1,15 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class SpisyPresenter extends BasePresenter
 {
 
     /**
      *
-     * @return \Spisovka\Form
+     * @return Form
      */
     protected function createForm()
     {
@@ -17,20 +21,20 @@ class SpisyPresenter extends BasePresenter
         $folders = $m->selectBox(0, $params);
         $folders = [0 => '(hlavní větev)'] + $folders;
 
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $form->addText('nazev', 'Název spisu:', 50, 80)
-                ->addRule(Nette\Forms\Form::FILLED, 'Název spisu musí být vyplněn!');
+                ->addRule(Form::FILLED, 'Název spisu musí být vyplněn!');
         $form->addText('popis', 'Popis:', 50, 200);
         $form->addSelect('parent_id', 'Složka:', $folders);
 
-        $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
+        $form->addComponent(new Components\SpisovyZnakComponent(), 'spisovy_znak_id');
         $form->getComponent('spisovy_znak_id');
 
         $form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak);
         $form->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
-                ->addCondition(Spisovka\Form::FILLED)
-                ->addRule(Spisovka\Form::INTEGER);
+                ->addCondition(Form::FILLED)
+                ->addRule(Form::INTEGER);
         $form->addSelect('spousteci_udalost_id', 'Spouštěcí událost:', $spousteci);
 
         return $form;
@@ -129,11 +133,11 @@ class SpisyPresenter extends BasePresenter
 
     /**
      * @param boolean $upravit - formulář upravit složku nebo nová složka
-     * @return \Spisovka\Form
+     * @return Form
      */
     protected function createFolderForm($upravit)
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $m = new SpisModel();
         $params = ['where' => ["tb.typ = 'F'"]];
@@ -279,7 +283,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         }
 
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -396,7 +400,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $spis = new Spis($id);
         $documents = $spis->getDocuments();
         if (!$documents)
-            throw new Exception('Spisy, které neobsahují žádný dokument, není možné předávat.');
+            throw new \Exception('Spisy, které neobsahují žádný dokument, není možné předávat.');
 
         $doc = current($documents);
         if ($doc->cancelForwarding()) {
@@ -413,7 +417,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
         $spis = new Spis($id);
         $documents = $spis->getDocuments();
         if (!$documents)
-            throw new Exception('Spisy, které neobsahují žádný dokument, není možné předávat.');
+            throw new \Exception('Spisy, které neobsahují žádný dokument, není možné předávat.');
 
         $doc = current($documents);
         if ($doc->reject()) {
@@ -428,7 +432,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
     public function createComponentBulkAction()
     {
-        $BA = new Spisovka\Components\BulkAction();
+        $BA = new Components\BulkAction();
 
         $actions = ['predat_spisovna' => 'předat do spisovny'];
         $BA->setActions($actions);

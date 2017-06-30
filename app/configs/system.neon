@@ -21,9 +21,9 @@ nette:
         xhtml: true
         
 services:
-    authorizator = Authorizator
-    authenticator = Authenticator_Basic
-    authenticatorUI = Authenticator_UI
+    authorizator = Spisovka\Authorizator
+    authenticator = Spisovka\Authenticator_Basic
+    authenticatorUI = Spisovka\Authenticator_UI
 #    userImport = Import_LDAP
 #    ldap = Spisovka_LDAP(%ldap%)
     httpResponse = Spisovka\IEHttpResponse
@@ -31,5 +31,5 @@ services:
         class: Spisovka\PresenterFactory
         arguments:
             - Nette\Bridges\ApplicationDI\PresenterFactoryCallback(..., 0, NULL)
-    storage = Storage_Basic(%storage_configuration%)
+    storage = Spisovka\Storage_Basic(%storage_configuration%)
     user = Spisovka\User

@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class SpisModel extends TreeModel
 {
 
@@ -110,7 +112,7 @@ class SpisModel extends TreeModel
 
     public function vytvorit($data)
     {
-        $data['date_created'] = new DateTime();
+        $data['date_created'] = new \DateTime();
         $data['user_created'] = self::getUser()->id;
         if (isset($data['typ']) && $data['typ'] == 'F')
             $data['orgjednotka_id'] = null; // slozky nemaji vlastnika
@@ -139,7 +141,7 @@ class SpisModel extends TreeModel
 
     public function upravit($data, $spis_id)
     {
-        $data['date_modified'] = new DateTime();
+        $data['date_modified'] = new \DateTime();
         $data['user_modified'] = self::getUser()->id;
 
         if (isset($data['spisovy_znak_id']) && !$data['spisovy_znak_id'])

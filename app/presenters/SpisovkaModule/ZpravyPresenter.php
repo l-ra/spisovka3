@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovka_ZpravyPresenter extends BasePresenter
 {
 
@@ -21,7 +25,7 @@ class Spisovka_ZpravyPresenter extends BasePresenter
     protected function zobrazZpravy($jen_neprectene)
     {
         /* $client_config = Environment::getVariable('client_config');
-          $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+          $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
           $paginator = $vp->getPaginator();
           $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek)?$client_config->nastaveni->pocet_polozek:20;
 

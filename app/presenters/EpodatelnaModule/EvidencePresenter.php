@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Epodatelna_EvidencePresenter extends BasePresenter
 {
 
@@ -14,12 +18,12 @@ class Epodatelna_EvidencePresenter extends BasePresenter
     /**
      * Zajistí, že zpráva je ve stavu "nová". Pro zamezení evidence jedné zprávy vícekrát.
      * @param EpodatelnaMessage $msg
-     * @throws Exception
+     * @throws \Exception
      */
     protected function assertMessageNotProcessed(EpodatelnaMessage $msg)
     {
         if ($msg->stav >= 10)
-            throw new Exception($msg->stav != 100 ? 'Zpráva již je zaevidovaná.' : 'Zpráva již byla odmítnuta.');
+            throw new \Exception($msg->stav != 100 ? 'Zpráva již je zaevidovaná.' : 'Zpráva již byla odmítnuta.');
     }
 
     public function renderNovy($id)
@@ -55,7 +59,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $dm = $this->storage->download($zprava->file_id, true);
             $dm = unserialize($dm);
 
-            $message_subject = new stdClass();
+            $message_subject = new \stdClass();
             $message_subject->id_isds = $dm->dmDm->dbIDSender;
             $message_subject->nazev_subjektu = $dm->dmDm->dmSender;
             $message_subject->type = ISDS_Spisovka::typDS($dm->dmDm->dmSenderType);
@@ -143,7 +147,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function createComponentNovyForm()
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $form->addHidden('predano_user');
         $form->addHidden('predano_org');
@@ -333,7 +337,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         // nahrani originalu
         $info = new EpodatelnaMessage($epodatelna_id);
         if (!$info->file_id)
-            throw new Exception('Chybí originál e-mailu, zprávu nelze evidovat.');
+            throw new \Exception('Chybí originál e-mailu, zprávu nelze evidovat.');
 
         if (false) { // [P.L.] zruseno
             $email_contents = $storage->download($info->file_id, true);
@@ -455,7 +459,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function createComponentJinaEvidenceForm()
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
         $form->addHidden('id')
                 ->setValue($this->getParameter('id'));
         $form->addText('evidence', 'Evidence:', 50, 100)
@@ -505,7 +509,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $mess = "\n\n--------------------\n";
         $mess .= @$zprava->popis;
 
-        $form = new Spisovka\Form();
+        $form = new Form();
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)
@@ -553,7 +557,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $ajax = $this->isAjax();
         // odeslat email odesilateli?
         if ($data['upozornit'] == true) {
-            $mail = new ESSMail;
+            $mail = new Mail;
             $mail->setFromConfig();
             $mail->addTo($data['email']);
             $mail->setSubject($data['predmet']);
@@ -575,7 +579,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $epodatelna_id = $this->getParameter('id', null);
 //        $zprava = @$this->template->Zprava;
 
-        $form = new Spisovka\Form();
+        $form = new Form();
         $form->addHidden('id')
                 ->setValue($epodatelna_id);
         $form->addTextArea('stav_info', 'Důvod odmítnutí:', 80, 6)

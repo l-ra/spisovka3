@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovka_UzivatelPresenter extends BasePresenter
 {
 
@@ -71,7 +75,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
     protected function createComponentUpravitForm()
     {
         if (Settings::get('users_can_change_their_data') == false)
-            throw new Exception('neoprávněný přístup');
+            throw new \Exception('neoprávněný přístup');
 
         $form = Admin_ZamestnanciPresenter::createOsobaForm();
         $form->addHidden('osoba_id');
@@ -204,7 +208,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     protected function createComponentNotificationsForm()
     {
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
 
         $form1->addCheckBox(Notifications::RECEIVE_DOCUMENT,
                         'Poslat e-mail, když mně je předán dokument')
@@ -232,7 +236,7 @@ class Spisovka_UzivatelPresenter extends BasePresenter
 
     protected function createComponentIsdsBoxForm()
     {
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
 
         $form1->addText('login', 'Uživatelské jméno:')
                 ->setValue(UserSettings::get('isds_login'));

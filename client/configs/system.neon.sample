@@ -20,6 +20,6 @@ parameters:
         attribute_map:
 
 services:
-    authenticator = Authenticator_LDAP
-    userImport = Import_LDAP
-    ldap = Spisovka_LDAP(%ldap%)
+    authenticator = Spisovka\Authenticator_LDAP
+    userImport = Spisovka\Import_LDAP
+    ldap = Spisovka\Spisovka_LDAP(%ldap%)

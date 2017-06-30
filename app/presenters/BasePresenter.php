@@ -1,6 +1,8 @@
 <?php
 
-use Nette\Forms\Form;
+namespace Spisovka;
+
+use Nette;
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
@@ -51,7 +53,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
                     $this->redirect(':Spisovka:Default:default');
                 }
                 if (!$this->isUserAllowed())
-                    // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku
+                // Uzivatel je prihlasen, ale nema opravneni zobrazit stranku
                     $this->forward(':NoAccess:default');
             }
         }
@@ -63,7 +65,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function isUserAllowed()
     {
-        return $this->user->isAllowed($this->reflection->name, $this->getAction());
+        return $this->user->isAllowed(str_replace('Spisovka\\', '', $this->reflection->name),
+                        $this->getAction());
     }
 
     protected function afterRender()
@@ -208,7 +211,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         $latte = $template->getLatte();
 
-        $set = new Latte\Macros\MacroSet($latte->getCompiler());
+        $set = new \Latte\Macros\MacroSet($latte->getCompiler());
         $set->addMacro('css', 'echo \Spisovka\LatteMacros::CSS($publicUrl, %node.args);');
         $set->addMacro('js', 'echo \Spisovka\LatteMacros::JavaScript(%node.word, $publicUrl);');
 
@@ -236,7 +239,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         $template = parent::createTemplate($class);
 
-        \Spisovka\LatteFilters::register($template);
+        LatteFilters::register($template);
 
         return $template;
     }
@@ -277,13 +280,13 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function createComponentPrint()
     {
-        $c = new Spisovka\Components\PrintControl();
+        $c = new Components\PrintControl();
         return $c;
     }
 
     protected function createComponentSearch()
     {
-        $c = new Spisovka\Components\SearchControl($this);
+        $c = new Components\SearchControl($this);
         return $c;
     }
 

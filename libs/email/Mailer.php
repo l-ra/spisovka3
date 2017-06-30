@@ -1,9 +1,13 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 /**
  * Sends e-mails via the PHP internal mail() function.
  */
-class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
+class Mailer implements Nette\Mail\IMailer
 {
     /* 0 - normalni odeslani
      * 1 - odeslani do souboru - zadne odeslani emailu
@@ -28,7 +32,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
     {
         $mail = clone $mail;
 
-        $config = (new Spisovka\ConfigEpodatelna())->get();
+        $config = (new ConfigEpodatelna())->get();
         $config = $config->odeslani;
 
         $test_mode = self::$test_mode;
@@ -51,7 +55,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         if ($config['podepisovat']) {
             $esign = new esignature();
             if (!$esign->setUserCert($config['cert'], $config['cert_pass']))
-                throw new Exception('E-mail nelze podepsat. Neplatný certifikát!');
+                throw new \Exception('E-mail nelze podepsat. Neplatný certifikát!');
 
             $in_parts = explode(Nette\Mail\Message::EOL . Nette\Mail\Message::EOL,
                     $mail_source, 2);
@@ -84,7 +88,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
             $mail_source = $esign->signMessage($mess1, $headers_array);
 
             if (is_null($mail_source))
-                throw new Exception('E-mail se nepodařilo podepsat.');
+                throw new \Exception('E-mail se nepodařilo podepsat.');
 
             $mess_part = explode("\n\n", $mail_source, 2);
             $part_header = explode("\n", $mess_part[0]);
@@ -125,7 +129,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
 
         set_error_handler(function($severity, $message) { // zachytávání chyb
             restore_error_handler();
-            throw new Exception("Došlo k problému při odesílání mailu: $message");
+            throw new \Exception("Došlo k problému při odesílání mailu: $message");
         }, E_WARNING);
 
         $linux = strncasecmp(PHP_OS, 'win', 3);
@@ -140,7 +144,7 @@ class ESSMailer extends Nette\Object implements Nette\Mail\IMailer
         restore_error_handler();
 
         if (!$res)
-            throw new Exception('E-mail se nepodařilo odeslat.');
+            throw new \Exception('E-mail se nepodařilo odeslat.');
 
         return true;
     }

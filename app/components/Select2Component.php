@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka\Components;
+
+use Nette;
+
 /**
  * Select2Component - formularovy prvek pro Select2 widget pro opakovane pouziti
  *

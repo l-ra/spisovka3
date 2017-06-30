@@ -23,7 +23,7 @@
         {foreach $user_list as $row}
             <tr>
                 <td>
-                    <a href="javascript:;" data-user="{$row->user_id}">{= Osoba::displayName($row, 'full_item')}</a>
+                    <a href="javascript:;" data-user="{$row->user_id}">{= Spisovka\Osoba::displayName($row, 'full_item')}</a>
                 </td>
                 <td>{if $row->pocet_uctu > 1}{$row->username}{/if}</td>
             </tr>

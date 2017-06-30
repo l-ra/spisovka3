@@ -133,7 +133,7 @@
         {input2 skartacni_lhuta}
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
+            <dd>{=Spisovka\SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
         </dl>
         {if $Dok->stav_dokumentu>=5}
         <dl>
@@ -177,7 +177,7 @@
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
+            <dd>{=Spisovka\SpisovyZnak::spousteci_udalost($Dok->spousteci_udalost_id,10)}</dd>
         </dl>
         {if $Dok->stav_dokumentu>=5}
         <dl>

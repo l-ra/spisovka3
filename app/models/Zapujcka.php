@@ -1,6 +1,6 @@
 <?php
 
-//netteloader=Zapujcka
+namespace Spisovka;
 
 class Zapujcka extends BaseModel
 {
@@ -246,7 +246,7 @@ class Zapujcka extends BaseModel
 
         $user = self::getUser();
         $user_id = $user->id;
-        $data['date_created'] = new DateTime();
+        $data['date_created'] = new \DateTime();
         $data['stav'] = self::STAV_NESCHVALENA;
 
         // pracovnik spisovny pujcuje dokument jinym uzivatelum,
@@ -300,7 +300,7 @@ class Zapujcka extends BaseModel
                 return false;
 
             $z->stav = self::STAV_ODMITNUTA;
-            $z->date_do_skut = new DateTime();
+            $z->date_do_skut = new \DateTime();
             $z->save();
             return true;
         } catch (Exception $e) {
@@ -316,7 +316,7 @@ class Zapujcka extends BaseModel
         $doc->returnToSpisovna();
 
         $z->stav = self::STAV_VRACENA;
-        $z->date_do_skut = new DateTime();
+        $z->date_do_skut = new \DateTime();
         $z->save();
     }
 

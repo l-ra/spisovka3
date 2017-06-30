@@ -7,7 +7,7 @@ class SearchControl extends \Spisovka\Form
 
     const PARAM = 'hledat';
 
-    public function __construct(\BasePresenter $presenter)
+    public function __construct(\Spisovka\BasePresenter $presenter)
     {
         parent::__construct();
 

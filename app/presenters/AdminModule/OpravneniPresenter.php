@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Admin_OpravneniPresenter extends BasePresenter
 {
 
@@ -16,7 +20,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->template->title = " - Seznam rolí";
 
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -90,7 +94,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         }
         $role_select[0] = "(nedědí)";
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addHidden('id')
                 ->setValue(@$role->id);
         $form1->addHidden('fixed')
@@ -173,7 +177,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $role_select = $RoleModel->seznamProDedeni();
         $role_select[0] = "(nedědí)";
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addText('name', 'Název role:', 50, 100)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název role musí být vyplněno!');
         $form1->addText('code', 'Kódové označení role:', 50, 150)
@@ -197,7 +201,7 @@ class Admin_OpravneniPresenter extends BasePresenter
         $data['active'] = 1;
         if (empty($data['parent_id']))
             $data['parent_id'] = null;
-        $data['date_created'] = new DateTime();
+        $data['date_created'] = new \DateTime();
 
         try {
             $role = Role::create($data);
@@ -328,7 +332,7 @@ class Admin_OpravneniPresenter extends BasePresenter
     protected static function lzeMenitRoli($role)
     {
         if (!is_object($role))
-            throw new InvalidArgumentException("Parametr 'role' není objekt.");
+            throw new \InvalidArgumentException("Parametr 'role' není objekt.");
         return in_array($role->code, array("admin", "superadmin")) ? 2 : 1;
     }
 

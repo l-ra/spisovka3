@@ -1,5 +1,10 @@
 <?php
 
+namespace Spisovka\Components;
+
+use Nette;
+
+
 /**
  * Nette Framework Extras
  *

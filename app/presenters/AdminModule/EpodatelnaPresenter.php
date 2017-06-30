@@ -1,6 +1,8 @@
 <?php
 
-use Spisovka\Form;
+namespace Spisovka;
+
+use Nette;
 
 class Admin_EpodatelnaPresenter extends BasePresenter
 {
@@ -98,7 +100,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             '1' => 'Systémový certifikát'
         );
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addHidden('ep_typ')
                 ->setValue('i');
 
@@ -294,7 +296,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 //        $id = $this->getParameter('id', null);
 //        $index = substr($id, 1);
 //
-//        $form = new Spisovka\Form();
+//        $form = new Form();
 //        $form->addHidden('index')
 //                ->setValue($index);
 //        $form->addHidden('zmenit_heslo_isds')
@@ -416,7 +418,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             '/imap/ssl/novalidate-cert' => 'IMAP+SSL',
         );
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addHidden('index');
         $form1->addHidden('ep_typ')
                 ->setValue('e');
@@ -628,7 +630,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         if (substr($id_schranky, 0, 1) == 'e')
             unset($config_data['email'][$por_cislo]);
         else
-            throw new InvalidArgumentException();
+            throw new \InvalidArgumentException();
 
         self::ulozNastaveni($config_data);
         $this->flashMessage('Schránka byla smazána.');
@@ -661,17 +663,17 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 
     /**
      * 
-     * @return Spisovka\ArrayHash
+     * @return ArrayHash
      */
     public static function nactiNastaveni()
     {
-        $cfg = (new Spisovka\ConfigEpodatelna())->get();
+        $cfg = (new ConfigEpodatelna())->get();
         return $cfg;
     }
 
     protected static function ulozNastaveni($config_data)
     {
-        (new Spisovka\ConfigEpodatelna())->save($config_data);
+        (new ConfigEpodatelna())->save($config_data);
     }
 
 }

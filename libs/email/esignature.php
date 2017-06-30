@@ -229,7 +229,7 @@ class esignature
         if ($ok)
             return $signed_msg;
 
-        throw new Exception('E-mail se nepodařilo podepsat. SSL: ' . openssl_error_string());
+        throw new \Exception('E-mail se nepodařilo podepsat. SSL: ' . openssl_error_string());
     }
 
     /**

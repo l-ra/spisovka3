@@ -1,10 +1,14 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 /**
  * @author Pavel Lastovicka
  * @created 02-IX-2014 13:06:54
  */
-abstract class DBEntity implements IteratorAggregate
+abstract class DBEntity implements \IteratorAggregate
 {
 
     const TBL_NAME = 'dbentity';
@@ -24,7 +28,7 @@ abstract class DBEntity implements IteratorAggregate
     {
         if (!is_integer($id))
             if (!is_string($id) || !ctype_digit($id) || $id == 0)
-                throw new InvalidArgumentException(__METHOD__ . "() - neplatný parametr");
+                throw new \InvalidArgumentException(__METHOD__ . "() - neplatný parametr");
 
         $this->id = (int) $id;
     }
@@ -34,7 +38,7 @@ abstract class DBEntity implements IteratorAggregate
         $id = $this->id;
         $result = dibi::query("SELECT * FROM %n WHERE id = $id", ':PREFIX:' . $this::TBL_NAME);
         if (!count($result))
-            throw new Exception(__METHOD__ . "() - entita " . get_class($this) . " ID $id neexistuje");
+            throw new \Exception(__METHOD__ . "() - entita " . get_class($this) . " ID $id neexistuje");
 
         $this->_data = $result->fetch();
     }
@@ -58,7 +62,7 @@ abstract class DBEntity implements IteratorAggregate
         $this->_invalidate();
     }
 
-    protected function _setData(DibiRow $data)
+    protected function _setData(\DibiRow $data)
     {
         $this->_data = $data;
     }
@@ -79,12 +83,12 @@ abstract class DBEntity implements IteratorAggregate
 
         $method_name = "get" . ucfirst($name);
         if (method_exists($this, $method_name)) {
-            $reflection = new ReflectionMethod($this, $method_name);
+            $reflection = new \ReflectionMethod($this, $method_name);
             if ($reflection->isPublic())
                 return $this->$method_name();
         }
 
-        throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
+        throw new \InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
 
     public function __isset($name)
@@ -94,7 +98,7 @@ abstract class DBEntity implements IteratorAggregate
         if (array_key_exists($name, $data))
             return isset($data[$name]);
 
-        throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
+        throw new \InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
     }
 
     protected function _attributeExists($name)
@@ -113,7 +117,7 @@ abstract class DBEntity implements IteratorAggregate
             $this->_load();
 
         if (!array_key_exists($name, $this->_data))
-            throw new InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
+            throw new \InvalidArgumentException(__METHOD__ . "() - atribut '$name' nenalezen");
 
         if (strcasecmp($name, 'id') == 0)
         // simply ignore setting id column by mistake
@@ -128,7 +132,7 @@ abstract class DBEntity implements IteratorAggregate
 
     /**
      * Returns entity data as array. For reading only!
-     * @return DibiRow
+     * @return \DibiRow
      */
     public function getData()
     {
@@ -144,7 +148,7 @@ abstract class DBEntity implements IteratorAggregate
     public function modify($data)
     {
         if (!is_array($data) && !($data instanceof ArrayAccess))
-            throw new InvalidArgumentException(__METHOD__ . "() - invalid argument");
+            throw new \InvalidArgumentException(__METHOD__ . "() - invalid argument");
 
         foreach ($data as $key => $value)
             $this->__set($key, $value);
@@ -153,7 +157,7 @@ abstract class DBEntity implements IteratorAggregate
     public function save()
     {
         if (!$this->canUserModify())
-            throw new Exception("Uložení entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
+            throw new \Exception("Uložení entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
 
         $this->_saveInternal();
     }
@@ -166,7 +170,7 @@ abstract class DBEntity implements IteratorAggregate
     {
         if ($this->_data_changed) {
             if ($this->_attributeExists('date_modified'))
-                $this->date_modified = new DateTime();
+                $this->date_modified = new \DateTime();
             if ($this->_attributeExists('user_modified'))
                 $this->user_modified = self::getUser()->id;
 
@@ -186,7 +190,7 @@ abstract class DBEntity implements IteratorAggregate
     public function delete()
     {
         if (!$this->canUserDelete())
-            throw new Exception("Smazání entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
+            throw new \Exception("Smazání entity " . get_class($this) . " ID $this->id bylo zamítnuto.");
 
         dibi::query("DELETE FROM %n WHERE id = {$this->id}", ':PREFIX:' . $this::TBL_NAME);
 
@@ -205,10 +209,10 @@ abstract class DBEntity implements IteratorAggregate
     }
 
     /**
-     * @param DibiResult $dr
+     * @param \DibiResult $dr
      * @return \static[]
      */
-    protected static function _createObjectsFromDibiResult(DibiResult $dr)
+    protected static function _createObjectsFromDibiResult(\DibiResult $dr)
     {
         $a = array();
 
@@ -273,7 +277,7 @@ abstract class DBEntity implements IteratorAggregate
 
     /**
      * Utility function. So that getting user is at one place.
-     * @return Spisovka\User
+     * @return User
      */
     public static function getUser()
     {
@@ -296,7 +300,7 @@ abstract class DBEntity implements IteratorAggregate
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->getData());
+        return new \ArrayIterator($this->getData());
     }
 
 }

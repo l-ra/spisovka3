@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class OrgJednotka extends TreeModel
 {
 
@@ -46,16 +48,16 @@ class OrgJednotka extends TreeModel
 
         // je nutne ulozenim vynutit smazani polozky v cache
         $o = new OrgUnit($orgjednotka_id);
-        $o->date_modified = new DateTime();
+        $o->date_modified = new \DateTime();
         $o->user_modified = self::getUser()->id;
         $o->save();
     }
 
     public function vytvorit($data)
     {
-        $data['date_created'] = new DateTime();
+        $data['date_created'] = new \DateTime();
         $data['user_created'] = self::getUser()->id;
-        $data['date_modified'] = new DateTime();
+        $data['date_modified'] = new \DateTime();
         $data['user_modified'] = self::getUser()->id;
         $data['stav'] = 1;
 

@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class DokumentPrilohy extends BaseModel
 {
 
@@ -76,7 +80,7 @@ class DokumentPrilohy extends BaseModel
         $row = array();
         $row['dokument_id'] = $dokument_id;
         $row['file_id'] = $file_id;
-        $row['date_added'] = new DateTime();
+        $row['date_added'] = new \DateTime();
         $row['user_id'] = self::getUser()->id;
 
         return $this->insert($row);

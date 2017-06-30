@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class RoleModel extends TreeModel
 {
 
@@ -13,7 +15,7 @@ class RoleModel extends TreeModel
                         "SELECT id  FROM [{$this->name}] WHERE code = 'referent'"
                 )->fetchSingle();
         if (!$role_id)
-            throw new Exception('Role \'pracovník\' neexistuje!');
+            throw new \Exception('Role \'pracovník\' neexistuje!');
         
         return $role_id;
     }

@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovka_VyhledatPresenter extends BasePresenter
 {
 
@@ -155,7 +159,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         unset($hledat['prideleno'], $hledat['predano'], $hledat['prideleno_org'],
                 $hledat['predano_org']);
 
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $form->addHidden('backlink')
                 ->setValue($this->getParameter('zpet', ''));
@@ -221,14 +225,14 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15)
                 ->setValue(@$hledat['datum_odeslani_cas_do']);
 
-        $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
+        $form->addComponent(new Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
         if (isset($hledat['druh_zasilky']))
             $form['druh_zasilky']->setDefaultValue($hledat['druh_zasilky']);
         unset($hledat['druh_zasilky']);
 
         $form->addCheckbox('spisovy_znak_prazdny', 'Spisový znak nevyplněn')
                 ->setValue(@$hledat['spisovy_znak_prazdny']);
-        $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
+        $form->addComponent(new Components\SpisovyZnakComponent(), 'spisovy_znak_id');
         $form->getComponent('spisovy_znak_id')->setValue(@$hledat['spisovy_znak_id'])
         ->controlPrototype->onchange('');
 
@@ -298,7 +302,7 @@ class Spisovka_VyhledatPresenter extends BasePresenter
         return $form;
     }
 
-    public function vyhledatClicked(Spisovka\Form $form, array $data)
+    public function vyhledatClicked(Form $form, array $data)
     {
         $backlink = $data['backlink'];
         unset($data['backlink']);

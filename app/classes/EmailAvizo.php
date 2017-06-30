@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class EmailAvizo
 {
     /*    public static function epodatelna_prijeti($komu, $data)
@@ -9,7 +13,7 @@ class EmailAvizo
       $client_config = GlobalVariables::get('client_config');
       $urad = $client_config->urad;
 
-      $mail = new ESSMail;
+      $mail = new Mail;
       $mail->signed(1);
 
       $mail->addTo($komu);
@@ -27,7 +31,7 @@ class EmailAvizo
       //$mail->send();
       return true;
       } catch (Exception $e) {
-      //throw new InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
+      //throw new Nette\InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
       return false;
       }
       } */
@@ -48,7 +52,7 @@ class EmailAvizo
           // $client_config = GlobalVariables::get('client_config');
           // $urad = $client_config->urad;
 
-          $mail = new ESSMail;
+          $mail = new Mail;
 
           $mail->addTo($komu);
 
@@ -69,7 +73,7 @@ class EmailAvizo
           //$mail->send();
           return true;
           } catch (Exception $e) {
-          //throw new InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
+          //throw new Nette\InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
           return false;
           } */
     }

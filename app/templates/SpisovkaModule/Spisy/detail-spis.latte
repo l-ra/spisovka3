@@ -11,19 +11,19 @@
             <dt>Skartační lhůta:</dt>
             <dd>{$Spis->skartacni_lhuta}</dd><br />
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd><br />
+            <dd>{=Spisovka\SpisovyZnak::spousteci_udalost($Spis->spousteci_udalost_id,10)}</dd><br />
             <dt>Přidělen organizační jednotce:</dt>
-            <dd>{if $Spis->orgjednotka_id}{=new OrgUnit($Spis->orgjednotka_id)}{else}není přidělen k žádné organizační jednotce{/if}</dd><br />
+            <dd>{if $Spis->orgjednotka_id}{=new Spisovka\OrgUnit($Spis->orgjednotka_id)}{else}není přidělen k žádné organizační jednotce{/if}</dd><br />
         {if $Spis->orgjednotka_id_predano}
             <dt>Předán organizační jednotce:</dt>
-            <dd>{=new OrgUnit($Spis->orgjednotka_id_predano)}</dd><br />
+            <dd>{=new Spisovka\OrgUnit($Spis->orgjednotka_id_predano)}</dd><br />
         {/if}
             <dt>Datum vytvoření:</dt>
             <dd>{$Spis->date_created|edatetime}</dd><br />
-        {if !empty($Spis->datum_uzavreni) && $Spis->stav !== SpisModel::OTEVREN}
+        {if !empty($Spis->datum_uzavreni) && $Spis->stav !== Spisovka\SpisModel::OTEVREN}
             <dt>Datum uzavření:</dt>
             <dd>{$Spis->datum_uzavreni|edatetime}</dd><br />
         {/if}
             <dt>Stav:</dt>
-            <dd>{=SpisModel::stav($Spis->stav)}</dd><br />
+            <dd>{=Spisovka\SpisModel::stav($Spis->stav)}</dd><br />
         </dl>

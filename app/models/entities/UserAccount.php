@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Description of UserAccount
  *
@@ -22,7 +24,7 @@ class UserAccount extends CachedDBEntity
 
     public static function create(array $data)
     {
-        $data['date_created'] = new DateTime();
+        $data['date_created'] = new \DateTime();
         $data['active'] = 1;
         if (!empty($data['password']))
             $data['password'] = self::computePasswordHash($data['username'], $data['password']);
@@ -44,7 +46,7 @@ class UserAccount extends CachedDBEntity
         if (empty($password))
             return false;
 
-        $this->last_modified = new DateTime();
+        $this->last_modified = new \DateTime();
         $this->password = self::computePasswordHash($this->username, $password);
         $this->save();
 
@@ -76,7 +78,7 @@ class UserAccount extends CachedDBEntity
     public function getOrgUnit()
     {
         $ou_id = $this->orgjednotka_id;
-        return $ou_id !== null ? new \OrgUnit($ou_id) : null;
+        return $ou_id !== null ? new OrgUnit($ou_id) : null;
     }
 
     /**
@@ -85,7 +87,7 @@ class UserAccount extends CachedDBEntity
     public function deactivate()
     {
         if ($this->id == self::getUser()->id) {
-            throw new Exception('Nemůžete smazat účet, pod kterým jste přihlášen!');
+            throw new \Exception('Nemůžete smazat účet, pod kterým jste přihlášen!');
         }
 
         $this->active = 0;

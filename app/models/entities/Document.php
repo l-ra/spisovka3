@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 /**
  *
  * @author Pavel Laštovička
@@ -12,7 +16,7 @@ class Document extends DBEntity
     public static function create(array $data)
     {
         if (!self::getUser()->isAllowed('Dokument', 'vytvorit'))
-            throw new Exception('Vytváření nových dokumentů je zakázáno');
+            throw new \Exception('Vytváření nových dokumentů je zakázáno');
 
         return parent::create($data);
     }
@@ -166,7 +170,7 @@ class Document extends DBEntity
         dibi::begin();
         try {
             if (!$this->canUserForward())
-                throw new Exception('Dokument není možné předat.');
+                throw new \Exception('Dokument není možné předat.');
 
             $Log = new LogModel();
 
@@ -185,11 +189,11 @@ class Document extends DBEntity
                 $log = "Dokument předán organizační jednotce $ou.";
                 $log_spis = "Spis předán organizační jednotce $ou.";
             } else
-                throw new InvalidArgumentException(__METHOD__ . "() - neplatné parametry");
+                throw new \InvalidArgumentException(__METHOD__ . "() - neplatné parametry");
 
             $spis = $this->getSpis();
             if ($spis && $orgunit_id === null)
-                throw new Exception('Uživatel není zařazen do organizační jednotky, není možné mu předávat spisy.');
+                throw new \Exception('Uživatel není zařazen do organizační jednotky, není možné mu předávat spisy.');
 
             $log_text = $spis ? $log_spis : $log;
             if (!empty($note))
@@ -226,7 +230,7 @@ class Document extends DBEntity
             if ($this->getSpis())
                 $message .= ' Dokument je ve spisu, možná nejste oprávněn měnit některé dokumenty ve spisu.';
 
-            throw new Exception($message, null, $e);
+            throw new \Exception($message, null, $e);
         }
 
         // posli upozorneni e-mailem
@@ -237,7 +241,7 @@ class Document extends DBEntity
                     'reference_number' => $this->cislo_jednaci]);
             }
         } catch (Exception $e) {
-            throw new Exception("Předání proběhlo v pořádku, ale nepodařilo se upozornit příjemce e-mailem: \n"
+            throw new \Exception("Předání proběhlo v pořádku, ale nepodařilo se upozornit příjemce e-mailem: \n"
             . $e->getMessage(), 0, $e);
         }
     }
@@ -287,7 +291,7 @@ class Document extends DBEntity
 
     /**
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      */
     public function cancelForwarding()
     {
@@ -321,7 +325,7 @@ class Document extends DBEntity
 
     /**
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      */
     public function reject()
     {

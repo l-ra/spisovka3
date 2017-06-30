@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class Import_LDAP implements IUserImport
 {
 

@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Epodatelna_DefaultPresenter extends BasePresenter
 {
 
@@ -59,7 +63,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     protected function renderList($hledat, $new, $outgoing)
     {
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -99,7 +103,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->template->back = $this->getParameter('back', 'nove');
 
         if ($zprava->typ == 'E') {
-            $this->addComponent(new Spisovka\Components\EmailSignature($zprava, $this->storage),
+            $this->addComponent(new Components\EmailSignature($zprava, $this->storage),
                     'emailSignature');
         }
 
@@ -117,9 +121,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderZkontrolovat()
     {
-        new SeznamStatu($this, 'seznamstatu');
+        new Components\SeznamStatu($this, 'seznamstatu');
 
-        $config = (new Spisovka\ConfigEpodatelna())->get();
+        $config = (new ConfigEpodatelna())->get();
         $this->template->RequestIsdsPassword = $config['isds']['aktivni'] && Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN,
                         false) && empty(UserSettings::get('isds_password'));
     }
@@ -135,11 +139,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $ou = $this->user->getOrgUnit();
         $ou_id = $ou ? $ou->id : null;
 
-        $config_data = (new Spisovka\ConfigEpodatelna())->get();
+        $config_data = (new ConfigEpodatelna())->get();
         $nalezena_aktivni_schranka = 0;
 
         try {
-            $lock = new Spisovka\LockNotBlocking('epodatelna');
+            $lock = new LockNotBlocking('epodatelna');
             $lock = $lock;
 
             // odemkni session soubor, neblokuj ostatni pozadavky
@@ -179,7 +183,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
             if (!$nalezena_aktivni_schranka)
                 echo 'Žádná schránka není definována nebo nastavena jako aktivní.<br />';
-        } catch (Spisovka\WouldBlockException $e) {
+        } catch (WouldBlockException $e) {
             $e->getMessage();
             echo "Stahování zpráv ze schránek právě probíhá. Opakujte operaci později.<br />";
         }
@@ -212,7 +216,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 else
                     $zprava->prilohy = false;
 
-                $subjekt = new stdClass();
+                $subjekt = new \stdClass();
                 $subjekt->mesto = '';
                 $subjekt->psc = '';
                 $subjekt->ulice = '';
@@ -324,7 +328,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                                 $error_count++;
                                 continue;
                             }
-                            $mess = new stdClass();
+                            $mess = new \stdClass();
                             $mess->dmDm = $z;
                             $mess->dmMessageStatus = $z->dmMessageStatus;
                             $mess->dmDeliveryTime = $z->dmDeliveryTime;
@@ -385,8 +389,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $zprava['popis'] = $popis;
                         $zprava['odesilatel'] = $z->dmSender . ', ' . $z->dmSenderAddress;
                         $zprava['adresat'] = 'Datová schránka';
-                        $zprava['prijato_dne'] = new DateTime();
-                        $zprava['doruceno_dne'] = new DateTime($z->dmAcceptanceTime);
+                        $zprava['prijato_dne'] = new \DateTime();
+                        $zprava['doruceno_dne'] = new \DateTime($z->dmAcceptanceTime);
                         $zprava['user_id'] = $this->user->id;
 
                         $prilohy = array();
@@ -531,8 +535,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $insert['popis'] = $popis;
             $insert['odesilatel'] = $message->fromaddress;
             $insert['adresat'] = $mailbox['ucet']; // označení uživatele pro e-mailovou schránku
-            $insert['prijato_dne'] = new DateTime();
-            $insert['doruceno_dne'] = new DateTime(date('Y-m-d H:i:s', $message->udate));
+            $insert['prijato_dne'] = new \DateTime();
+            $insert['doruceno_dne'] = new \DateTime(date('Y-m-d H:i:s', $message->udate));
             $insert['user_id'] = $this->user->id;
 
 // Prilohy zjistujeme pokazde, kdyz je to potreba, aby bylo mozno zmenit/opravit
@@ -571,7 +575,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 try {
                     $reply_address = !empty($message->reply_toaddress) ? $message->reply_toaddress
                                 : $message->fromaddress;
-                    $mail = new ESSMail;
+                    $mail = new Mail;
                     $mail->setFromConfig();
                     $mail->addTo($reply_address);
                     $mail->setSubject("Re: $predmet");

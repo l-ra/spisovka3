@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class HttpClient
 {
 
@@ -8,7 +10,7 @@ class HttpClient
      * @param string $url
      * @param int $timeout
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public static function get($url, $timeout = 10)
     {
@@ -21,7 +23,7 @@ class HttpClient
         // Následující není hotové.
         // return self::get_socket($url, $timeout);
 
-        throw new Exception(__METHOD__ . '() - Chybí implementace HTTP komunikace.');
+        throw new \Exception(__METHOD__ . '() - Chybí implementace HTTP komunikace.');
     }
 
     private static function get_stream($url, $timeout)
@@ -34,7 +36,7 @@ class HttpClient
             if (stripos($msg, 'timed out') !== false)
                 $msg = 'Vypršel časový limit pro operaci.';
 
-            throw new Exception($msg);
+            throw new \Exception($msg);
         }
 
         return $response;
@@ -43,7 +45,7 @@ class HttpClient
     private static function get_cURL($url, $timeout)
     {
         if (!($ch = curl_init($url)))
-            throw new Exception('Funkce curl_init() neproběhla úspěšně.');
+            throw new \Exception('Funkce curl_init() neproběhla úspěšně.');
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -59,9 +61,9 @@ class HttpClient
         /* u cUrl rozšíření je bordel v názvu konstant */
         $errno_timeout = defined('CURLE_OPERATION_TIMEDOUTED') ? CURLE_OPERATION_TIMEDOUTED : CURLE_OPERATION_TIMEDOUT;
         if ($errno == $errno_timeout)
-            throw new Exception('Vypršel časový limit pro operaci.');
+            throw new \Exception('Vypršel časový limit pro operaci.');
         else if ($errno)
-            throw new Exception('cURL chyba: ' . $errmsg);
+            throw new \Exception('cURL chyba: ' . $errmsg);
 
         return $success ? $response : null;
     }
@@ -72,7 +74,7 @@ class HttpClient
      * @param string $url
      * @param int $timeout
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     private static function get_socket($url, $timeout)
     {
@@ -81,7 +83,7 @@ class HttpClient
         $errno = $errstr = 0;
         $fp = fsockopen($url->host, $ssl ? 443 : 80, $errno, $errstr, $timeout);
         if (!$fp) {
-            throw new Exception($errstr, $errno);
+            throw new \Exception($errstr, $errno);
         }
 
         $out = "GET $url->path HTTP/1.0\r\n";

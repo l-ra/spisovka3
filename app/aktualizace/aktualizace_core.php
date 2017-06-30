@@ -95,12 +95,12 @@ class Updates
 
         $dir_handle = opendir(self::$update_dir);
         if ($dir_handle === FALSE)
-            throw new Exception(__METHOD__ . "() - nemohu otevřít adresář " . self::$update_dir);
+            throw new \Exception(__METHOD__ . "() - nemohu otevřít adresář " . self::$update_dir);
 
         $zip = new ZipArchive;
         $filename = self::$update_dir . 'db_scripts.zip';
         if ($zip->open($filename) !== TRUE)
-            throw new Exception(__METHOD__ . "() - nemohu otevřít soubor $filename.");
+            throw new \Exception(__METHOD__ . "() - nemohu otevřít soubor $filename.");
 
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $stat = $zip->statIndex($i);
@@ -207,7 +207,7 @@ class Client_To_Update
                         "profiler" => false
                     );
                 else
-                    throw new Exception("Nemohu přečíst konfigurační soubor system.ini");
+                    throw new \Exception("Nemohu přečíst konfigurační soubor system.ini");
             }
         }
 
@@ -227,7 +227,7 @@ class Client_To_Update
             dibi::getSubstitutes()->{'PREFIX'} = null;
         } catch (DibiException $e) {
             $e->getMessage();
-            throw new Exception("Nepodařilo se připojit k databázi. Klienta nelze aktualizovat.");
+            throw new \Exception("Nepodařilo se připojit k databázi. Klienta nelze aktualizovat.");
         }
     }
 
@@ -293,7 +293,7 @@ class Client_To_Update
 
             echo 'Tabulky byly přejmenovány.';
             if ($error)
-                throw new Exception('Minimálně u jedné tabulky přejmenování selhalo. Je nutná odborná oprava.');
+                throw new \Exception('Minimálně u jedné tabulky přejmenování selhalo. Je nutná odborná oprava.');
         }
 
         // Úspěch - hotovo nebo nebylo potřeba nic dělat

@@ -1,6 +1,8 @@
 <?php
 
 use Tracy\Debugger;
+use Spisovka\GlobalVariables;
+use Spisovka\Settings;
 
 if (!defined('KLIENT')) {
     echo "<h1>Chyba konfigurace. Nebyla nastavena konstanta KLIENT.</h1>";
@@ -35,12 +37,12 @@ try {
      */
     define('TEMP_DIR', CLIENT_DIR . '/temp');
     if (file_put_contents(TEMP_DIR . '/_check', '') === FALSE) {
-        throw new Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
+        throw new \Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
     }
 
     $session_dir = CLIENT_DIR . '/sessions';
     if (file_put_contents("$session_dir/_check", '') === FALSE) {
-        throw new Exception("Nelze zapisovat do adresare '$session_dir'");
+        throw new \Exception("Nelze zapisovat do adresare '$session_dir'");
     }
 
     /**
@@ -68,7 +70,7 @@ try {
     /**
      * konfigurace PHP
      */
-    register_shutdown_function(array('ShutdownHandler', '_handler'));
+    register_shutdown_function(array('Spisovka\ShutdownHandler', '_handler'));
     if (function_exists('mb_internal_encoding'))
         mb_internal_encoding("UTF-8");
     
@@ -173,7 +175,7 @@ try {
  *  Je-li potřeba, proveď upgrade aplikace
  */
 if (!defined('APPLICATION_INSTALL')) {
-    $upgrade = new Upgrade();
+    $upgrade = new Spisovka\Upgrade();
     $upgrade->check();
 }
 
@@ -207,7 +209,7 @@ function createIniFile($filename)
 
     $template = substr($filename, 0, -1);
     if (!copy($template, $filename))
-        throw new Exception("Nemohu vytvorit soubor $filename.");
+        throw new \Exception("Nemohu vytvorit soubor $filename.");
 
     $perm = 0640;
     @chmod($filename, $perm);

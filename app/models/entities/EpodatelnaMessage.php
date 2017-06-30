@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class EpodatelnaMessage extends DBEntity
 {
 
@@ -13,7 +15,7 @@ class EpodatelnaMessage extends DBEntity
     public function getEmailFile($storage)
     {
         if ($this->typ != 'E')
-            throw new LogicException(__METHOD__);
+            throw new \LogicException(__METHOD__);
         
         if (!$this->file_id)
             return null;
@@ -33,7 +35,7 @@ class EpodatelnaMessage extends DBEntity
     public function getIsdsFile($storage)
     {
         if ($this->typ != 'I')
-            throw new LogicException(__METHOD__);
+            throw new \LogicException(__METHOD__);
 
         if (!$this->file_id)
             return null;
@@ -52,7 +54,7 @@ class EpodatelnaMessage extends DBEntity
     public function hasZfoFile()
     {
         if ($this->typ != 'I')
-            throw new LogicException(__METHOD__);
+            throw new \LogicException(__METHOD__);
         
         $FileModel = new FileModel();
         $file = $FileModel->select([["nazev = %s", "ep-isds-{$this->id}.zfo"]])->fetch();
@@ -67,7 +69,7 @@ class EpodatelnaMessage extends DBEntity
     public function getZfoFile($storage, $download)
     {
         if ($this->typ != 'I')
-            throw new LogicException(__METHOD__);
+            throw new \LogicException(__METHOD__);
         
         $FileModel = new FileModel();
         $file = $FileModel->select([["nazev = %s", "ep-isds-{$this->id}.zfo"]])->fetch();
@@ -81,14 +83,14 @@ class EpodatelnaMessage extends DBEntity
     /**
      * Vrátí (příchozí) zprávu, ze které byl dokument vytvořen.
      * @param Document $doc
-     * @throws Exception
+     * @throws \Exception
      */
     public static function fromDocument(Document $doc)
     {
         $res = dibi::query("SELECT [id] FROM %n WHERE [dokument_id] = %i AND NOT [odchozi]",
                 self::TBL_NAME, $doc->id);
         if (count($res) != 1)
-            throw new Exception("Nemohu nalézt zprávu, ze které byl dokument ID {$doc->id} vytvořen.");
+            throw new \Exception("Nemohu nalézt zprávu, ze které byl dokument ID {$doc->id} vytvořen.");
             
         $id = $res->fetchSingle();
         return new static($id);

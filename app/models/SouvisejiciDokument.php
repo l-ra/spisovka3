@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Spojení mezi dvěma dokumenty jsou obousměrná.
  */
@@ -35,20 +37,20 @@ class SouvisejiciDokument extends BaseModel
         $dokument_id = (int) $dokument_id;
         $dokument2_id = (int) $dokument2_id;
         if ($dokument_id == $dokument2_id)
-            throw new Exception('Nelze spojit dokument se sebou samým.');
+            throw new \Exception('Nelze spojit dokument se sebou samým.');
 
         $row = array();
         // obvykle se spoje nový dokument se starším, proto jsem zvolil,
         // aby dokument_id bylo vždy větší než spojit_s_id
         $row['dokument_id'] = max($dokument_id, $dokument2_id);
         $row['spojit_s_id'] = min($dokument_id, $dokument2_id);
-        $row['date_added'] = new DateTime(); // nepouzito
+        $row['date_added'] = new \DateTime(); // nepouzito
         $row['user_id'] = self::getUser()->id; // nepouzito
 
         try {
             $this->insert($row);
         } catch (Exception $e) {
-            throw new Exception('Dokumenty nebylo možné spojit. Pravděpodobně už byly spojeny předtím.', 0, $e);
+            throw new \Exception('Dokumenty nebylo možné spojit. Pravděpodobně už byly spojeny předtím.', 0, $e);
         }
     }
 

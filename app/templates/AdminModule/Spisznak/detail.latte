@@ -32,11 +32,11 @@
         </dl>
         <dl>
             <dt>Spouštěcí událost:</dt>
-            <dd>{=SpisovyZnak::spousteci_udalost($SpisZnak->spousteci_udalost_id,10)}</dd>
+            <dd>{=Spisovka\SpisovyZnak::spousteci_udalost($SpisZnak->spousteci_udalost_id,10)}</dd>
         </dl>
         <dl>
             <dt>Stav:</dt>
-            <dd>{=SpisovyZnak::stav($SpisZnak->stav)}</dd>
+            <dd>{=Spisovka\SpisovyZnak::stav($SpisZnak->stav)}</dd>
         </dl>
         <a href="{link :Admin:Spisznak:detail, 'id'=>$SpisZnak->id, 'upravit'=>'info'}">Upravit</a>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

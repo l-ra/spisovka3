@@ -1,6 +1,6 @@
 <?php
 
-//netteloader=Dokument,DokumentHistorie
+namespace Spisovka;
 
 class Dokument extends BaseModel
 {
@@ -300,7 +300,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             if (isset($params["{$name}_cas"]) && !empty($params["{$name}_cas"]))
                 $date .= ' ' . $params["{$name}_cas"];
 
-            new DateTime($date);
+            new \DateTime($date);
             $args['where'][] = array("$tableref.$name = %d", $date);
 
             // neni mozne pozadovat presne datum a zaroven rozmezi data
@@ -332,7 +332,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 }
 
                 $args['where'][] = array("$tableref.$name BETWEEN %t AND %t",
-                    new DateTime($date_from), new DateTime($date_to));
+                    new \DateTime($date_from), new \DateTime($date_to));
             }
             else if (isset($params["{$name}_od"])) {
                 $date_from = $params["{$name}_od"];
@@ -340,7 +340,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 if (isset($params["{$name}_cas_od"]))
                     $date_from .= ' ' . $params["{$name}_cas_od"];
 
-                $args['where'][] = array("$tableref.$name >= %t", new DateTime($date_from));
+                $args['where'][] = array("$tableref.$name >= %t", new \DateTime($date_from));
             }
             else if (isset($params["{$name}_do"])) {
                 $date_to = $params["{$name}_do"];
@@ -353,7 +353,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                         $date_to = date("Y-m-d", $stamp + 86400);
                 }
 
-                $args['where'][] = array("$tableref.$name < %t", new DateTime($date_to));
+                $args['where'][] = array("$tableref.$name < %t", new \DateTime($date_to));
             }
         }
     }
@@ -467,10 +467,10 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             $what = 'odeslání';
             $this->_datum_param_to_sql('datum_odeslani', $params, $args);
         } catch (Exception $e) {
-            if (strpos($e->getMessage(), 'DateTime') === false)
+            if (strpos($e->getMessage(), '\DateTime') === false)
                 throw $e;
 
-            throw new Exception("Neplatné kritérium data/času $what dokumentu.");
+            throw new \Exception("Neplatné kritérium data/času $what dokumentu.");
         }
 
         // pocet listu
@@ -969,7 +969,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         if ($details === null)
             $details = "";
         if (!is_string($details))
-            throw new InvalidArgumentException(__METHOD__ . "() - neplatný argument");
+            throw new \InvalidArgumentException(__METHOD__ . "() - neplatný argument");
         $details = explode(',', $details);
 
         $sql = array(
@@ -1017,7 +1017,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             return null;
         $dokument = $result->fetch();
 
-        $prideleno = new stdClass();
+        $prideleno = new \stdClass();
         $osoba = Person::fromUserId($dokument->owner_user_id);
         $prideleno->jmeno = $osoba->displayName();
         if (isset($dokument->owner_orgunit_id)) {
@@ -1028,7 +1028,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
 
         $spis = null;
         if (!empty($dokument->spis_id)) {
-            $spis = new stdClass();
+            $spis = new \stdClass();
             $spis->id = $dokument->spis_id;
             unset($dokument->spis_id);
             $spis->nazev = $dokument->nazev_spisu;
@@ -1043,7 +1043,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             $dokument->spisy = array($spis->id => $spis);
         }
 
-        $typ = new stdClass();
+        $typ = new \stdClass();
         $typ->id = $dokument->dokument_typ_id;
         unset($dokument->dokument_typ_id);
         $typ->nazev = $dokument->typ_nazev;
@@ -1202,9 +1202,9 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             $data['skartacni_lhuta'] = null;
 
         $user_id = self::getUser()->id;
-        $data['date_created'] = new DateTime();
+        $data['date_created'] = new \DateTime();
         $data['user_created'] = $user_id;
-        $data['date_modified'] = new DateTime();
+        $data['date_modified'] = new \DateTime();
         $data['user_modified'] = $user_id;
         $data['owner_user_id'] = $user_id;
         $org_id = OrgJednotka::dejOrgUzivatele();
@@ -1258,7 +1258,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
 //    public function existujeSeStejnymCJ($cislo_jednaci, $dokument_id)
 //    {
 //        if (empty($cislo_jednaci))
-//            throw new InvalidArgumentException();
+//            throw new \InvalidArgumentException();
 //
 //        $where = [['cislo_jednaci = %s', $cislo_jednaci]];
 //        $where[] = ['id != %i', $dokument_id];

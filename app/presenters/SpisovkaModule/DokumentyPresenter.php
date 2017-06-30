@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovka_DokumentyPresenter extends BasePresenter
 {
 
@@ -26,7 +30,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $this->template->Typ_evidence = $this->typ_evidence;
 
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -249,7 +253,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     public function createComponentBulkAction()
     {
-        $BA = new Spisovka\Components\BulkAction();
+        $BA = new Components\BulkAction();
 
         $actions = [
             'prevzit' => 'převzít',
@@ -462,7 +466,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         try {
             if ($this->typ_evidence != 'sberny_arch')
-                throw new Exception("operace je platná pouze u typu evidence sběrný arch");
+                throw new \Exception("operace je platná pouze u typu evidence sběrný arch");
 
             $dokument_id = $id;
             $iniciacni_dokument_id = $vlozit_do;
@@ -476,7 +480,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $dok2 = new Document($iniciacni_dokument_id);
 
             if ($dok2->poradi != 1)
-                throw new Exception("neplatný parametr");
+                throw new \Exception("neplatný parametr");
 
             // spojit s dokumentem
             $poradi = $Dokument->getMaxPoradi($dok2->cislo_jednaci_id);
@@ -494,7 +498,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $Spis = new SpisModel();
             $spis = $Spis->findByName($cislo_jednaci);
             if (!$spis)
-                throw new Exception("chyba integrity dat. Spis '$cislo_jednaci' neexistuje.");
+                throw new \Exception("chyba integrity dat. Spis '$cislo_jednaci' neexistuje.");
 
             $Dokument->update($data, array(array('id = %i', $dokument_id)));
 
@@ -524,11 +528,11 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $Dokument = new Dokument();
         $dokument_info = $Dokument->getInfo($dokument_id);
         if (empty($dokument_info))
-            throw new Exception("Přidělení č.j. - nemohu načíst dokument id $dokument_id.");
+            throw new \Exception("Přidělení č.j. - nemohu načíst dokument id $dokument_id.");
 
         // Je treba zkontrolovat, jestli dokument uz cislo jednaci nema prideleno
         if (!empty($dokument_info['cislo_jednaci_id'])) {
-            // throw new Exception("Dokument má již č.j. přiděleno.");
+            // throw new \Exception("Dokument má již č.j. přiděleno.");
             $this->flashMessage('Dokument má již číslo jednací přiděleno.', 'error');
             $this->redirect('detail', array('id' => $dokument_id));
         }
@@ -962,7 +966,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $zpusob_doruceni = Dokument::zpusobDoruceni(2);
 
-        $form = new Spisovka\Form();
+        $form = new Form();
         $form->addHidden('id')
                 ->setValue($dokument_id);
         $form->addHidden('odpoved')
@@ -980,8 +984,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addSelect('dokument_typ_id', 'Typ dokumentu:', $povolene_typy_dokumentu);
         try {
+            // TODO - problém, pokud je $dok entita a ne pole vrácené metodou getInfo(),
+            // tak pole "typ_dokumentu" není definované a dojde k výjimce
             $form['dokument_typ_id']->setValue(@$dok->typ_dokumentu->id);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $e->getMessage();
             // ignoruj chybu - uživatel má chybně nastavený číselník
         }
@@ -1130,7 +1136,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $Dok = $this->template->Dok;
 
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $form->addText('nazev', 'Věc:', 80, 250);
         if (!$this->user->inheritsFromRole('podatelna'))
@@ -1183,7 +1189,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form['nazev']->setDefaultValue($Dok->nazev);
         $form['popis']->setDefaultValue($Dok->popis);
         if (isset($form['datum_vzniku'])) {
-            $d = new DateTime($Dok->datum_vzniku);
+            $d = new \DateTime($Dok->datum_vzniku);
             $cas = $d->format('H:i:s');
             $form['datum_vzniku']->setDefaultValue($Dok->datum_vzniku);
             $form['datum_vzniku_cas']->setDefaultValue($cas);
@@ -1214,7 +1220,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     {
         $data = $button->getForm()->getValues();
 
-        // V aplikaci chybi DateTimePicker
+        // V aplikaci chybi \DateTimePicker
         if (isset($data['datum_vzniku'])) {
             $data['datum_vzniku'] = $data['datum_vzniku'] . " " . $data['datum_vzniku_cas'];
             unset($data['datum_vzniku_cas']);
@@ -1248,7 +1254,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $Dok = $this->template->Dok;
 
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $form->addSelect('zpusob_vyrizeni_id', 'Způsob vyřízení:', $zpusob_vyrizeni)
                 ->setValue(@$Dok->zpusob_vyrizeni_id);
@@ -1267,7 +1273,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addText('datum_vyrizeni_cas', 'Čas vyřízení:', 10, 15)
                 ->setValue($cas);
 
-        $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
+        $form->addComponent(new Components\SpisovyZnakComponent(), 'spisovy_znak_id');
         $form->getComponent('spisovy_znak_id')
 //                ->setRequired()
                 ->setValue(@$Dok->spisovy_znak_id);
@@ -1340,7 +1346,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function createComponentUdalostForm()
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $options = array(
             '1' => 'Dnešní den',
@@ -1356,8 +1362,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $form->addDatePicker('datum_spousteci_udalosti', 'Datum spouštěcí události:')
                 //->setDisabled() - nelze volat pri zpracovani odeslaneho formulare, vyresil jsem tedy v Javascriptu
                 ->forbidPastDates()
-                ->addConditionOn($form['udalost_typ'], Spisovka\Form::EQUAL, 2)
-                ->addRule(Spisovka\Form::FILLED, 'Nebylo zadáno datum spuštění.');
+                ->addConditionOn($form['udalost_typ'], Form::EQUAL, 2)
+                ->addRule(Form::FILLED, 'Nebylo zadáno datum spuštění.');
 
         $form->addSubmit('ok', 'Potvrdit')
                 ->onClick[] = array($this, 'udalostClicked');
@@ -1403,14 +1409,14 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     /**
      * Vytvoří část formuláře pro odeslání dokumentu. Jedinné, co nyní ošetřuje
      * Nette framework je část odeslání poštou.
-     * @return \Spisovka\Form
+     * @return Form
      */
     protected function createComponentOdeslatForm()
     {
         $Dok = $this->template->Dok;
 
         // odesilatele
-        $ep = (new Spisovka\ConfigEpodatelna())->get();
+        $ep = (new ConfigEpodatelna())->get();
         $odes = $ep['odeslani'];
         $adresa = empty($odes['jmeno']) ? $odes['email'] : "{$odes['jmeno']} <{$odes['email']}>";
         $odesilatele = ['system' => "$adresa [společná e-mailová adresa]"];
@@ -1421,7 +1427,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $odesilatele[$key] = Osoba::displayName($person, 'basic') . " <" . $person->email . "> [zaměstnanec]";
         }
 
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         if (!empty($Dok->subjekty))
             foreach ($Dok->subjekty as $sid => $subjekt) {
@@ -1434,7 +1440,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         ->forbidPastDates();
 
                 // vytvoří novou instanci pro každý subjekt
-                $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(),
+                $form->addComponent(new Controls\VyberPostovniZasilkyControl(),
                         "druh_zasilky_$sid");
                 $form["druh_zasilky_$sid"]->setRequired()
                         ->setDefaultValue([DruhZasilky::OBYCEJNE]);
@@ -1524,7 +1530,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             foreach ($post_data['subjekt'] as $subjekt_id => $metoda_odeslani) {
                 $adresat = new Subject($subjekt_id);
 
-                $datum_odeslani = new DateTime();
+                $datum_odeslani = new \DateTime();
                 $epodatelna_id = null;
                 $zprava_odes = '';
                 $cena = null;
@@ -1648,7 +1654,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 } else if ($metoda_odeslani == 3) {
                     // postou
                     $c = "datum_odeslani_postou_" . $subjekt_id;
-                    $datum_odeslani = new DateTime($data->$c);
+                    $datum_odeslani = new \DateTime($data->$c);
                     $c = "druh_zasilky_" . $subjekt_id;
                     $druh_zasilky = implode(',', $data->$c);
                     $c = "cena_zasilky_" . $subjekt_id;
@@ -1671,7 +1677,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 } else if ($metoda_odeslani == 4) {
                     // faxem
                     $c = "datum_odeslani_faxu_" . $subjekt_id;
-                    $datum_odeslani = new DateTime($data->$c);
+                    $datum_odeslani = new \DateTime($data->$c);
 
                     $cislo_faxu = $data['cislo_faxu_' . $subjekt_id];
                     $zprava_odes = $data['zprava_faxu_' . $subjekt_id];
@@ -1686,7 +1692,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     // jinak - externe (osobne, ...)
 
                     if (isset($post_data['datum_odeslani'][$subjekt_id])) {
-                        $datum_odeslani = new DateTime($post_data['datum_odeslani'][$subjekt_id]);
+                        $datum_odeslani = new \DateTime($post_data['datum_odeslani'][$subjekt_id]);
                     }
 
                     $Log = new LogModel();
@@ -1722,7 +1728,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
     protected function odeslatEmailem($adresat, $data, $prilohy)
     {
-        $mail = new ESSMail;
+        $mail = new Mail;
         $mail->setFromConfig();
 
         try {
@@ -1778,8 +1784,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zprava['adresat'] = $adresat->email;
         $zprava['subjekt_id'] = $adresat->id;
         $zprava['odesilatel'] = '';
-        $zprava['prijato_dne'] = new DateTime();
-        $zprava['doruceno_dne'] = new DateTime();
+        $zprava['prijato_dne'] = new \DateTime();
+        $zprava['doruceno_dne'] = new \DateTime();
         $zprava['user_id'] = $this->user->id;
 
         $zprava_prilohy = array();
@@ -1901,8 +1907,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['adresat'] = $mess->dmRecipient . ', ' . $mess->dmRecipientAddress;
             $zprava['subjekt_id'] = $adresat->id;
             $zprava['odesilatel'] = '';
-            $zprava['prijato_dne'] = new DateTime();
-            $zprava['doruceno_dne'] = new DateTime($mess->dmAcceptanceTime);
+            $zprava['prijato_dne'] = new \DateTime();
+            $zprava['doruceno_dne'] = new \DateTime($mess->dmAcceptanceTime);
             $zprava['user_id'] = $this->user->id;
 
             $aprilohy = array();

@@ -1,6 +1,8 @@
 <?php
 
-//netteloader=BaseModel
+namespace Spisovka;
+
+use Nette;
 
 abstract class BaseModel extends Nette\Object
 {
@@ -34,7 +36,7 @@ abstract class BaseModel extends Nette\Object
     }
 
     /**
-     * @return Spisovka\User
+     * @return User
      */
     public static function getUser()
     {
@@ -343,7 +345,7 @@ abstract class BaseModel extends Nette\Object
         if (is_object($data)) {
             return $data;
         } else if (is_array($data)) {
-            $tmp = new stdClass();
+            $tmp = new \stdClass();
             foreach ($data as $key => $value) {
                 $tmp->$key = $value;
             }

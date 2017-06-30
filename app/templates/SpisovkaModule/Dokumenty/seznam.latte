@@ -56,7 +56,7 @@
                         {if count($dok->subjekty)>0}
 
                             {foreach $dok->subjekty as $subjekt}
-                                {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
+                                {=Spisovka\Subjekt::displayName($subjekt,'plna_adresa')}<br />
                             {/foreach}
                         {else}
                             nejsou přiděleny žádné subjekty!
@@ -72,32 +72,32 @@
                         {$dok->prideleno->orgjednotka->zkraceny_nazev}<br />
                     {/if}
                     {if $dok->is_forwarded && $dok->forward_user_id}
-                        > {Person::fromUserId($dok->forward_user_id)}<br />
+                        > {Spisovka\Person::fromUserId($dok->forward_user_id)}<br />
                     {/if}
                     {if $dok->is_forwarded && $dok->forward_orgunit_id}
-                        > {OrgUnit::fromId($dok->forward_orgunit_id)->zkraceny_nazev}<br />
+                        > {Spisovka\OrgUnit::fromId($dok->forward_orgunit_id)->zkraceny_nazev}<br />
                     {/if}
                 </td>
 
                 <td class="stav {if $dok->lhuta_stav == 2}stav_red{elseif $dok->lhuta_stav == 1}stav_yellow{/if}">
                     {if $dok->stav_dokumentu == 1}
                         nový
-                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_VYRIZUJE_SE}
+                    {elseif $dok->stav_dokumentu == Spisovka\DocumentWorkflow::STAV_VYRIZUJE_SE}
                         vyřizuje se
-                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA
-                        || $dok->stav_dokumentu == DocumentWorkflow::STAV_VYRIZEN_SPUSTENA}
+                    {elseif $dok->stav_dokumentu == Spisovka\DocumentWorkflow::STAV_VYRIZEN_NESPUSTENA
+                        || $dok->stav_dokumentu == Spisovka\DocumentWorkflow::STAV_VYRIZEN_SPUSTENA}
                         vyřízen
                         <br />
                         <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
-                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_PREDAN_DO_SPISOVNY}
+                    {elseif $dok->stav_dokumentu == Spisovka\DocumentWorkflow::STAV_PREDAN_DO_SPISOVNY}
                         vyřízen<br />předán do spisovny
                         <br />
                         <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
-                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_VE_SPISOVNE}
+                    {elseif $dok->stav_dokumentu == Spisovka\DocumentWorkflow::STAV_VE_SPISOVNE}
                         vyřízen<br />ve spisovně
                         <br />
                         <span title="{$dok->datum_vyrizeni|edatetime}">{$dok->datum_vyrizeni|edate}</span>
-                    {elseif $dok->stav_dokumentu == DocumentWorkflow::STAV_ZAPUJCEN}
+                    {elseif $dok->stav_dokumentu == Spisovka\DocumentWorkflow::STAV_ZAPUJCEN}
                         zapůjčen
                     {else}
                         neznámý stav!

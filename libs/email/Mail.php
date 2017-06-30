@@ -1,6 +1,10 @@
 <?php
 
-class ESSMail extends Nette\Mail\Message
+namespace Spisovka;
+
+use Nette;
+
+class Mail extends Nette\Mail\Message
 {
 
     /** 
@@ -8,8 +12,7 @@ class ESSMail extends Nette\Mail\Message
      */
     public function send()
     {
-        // $mailer = new Nette\Mail\SendmailMailer;
-        $mailer = new ESSMailer();
+        $mailer = new Mailer();
         $mailer->send($this);
     }
 
@@ -18,21 +21,21 @@ class ESSMail extends Nette\Mail\Message
      */
     public function setFromConfig()
     {
-        $ep = (new Spisovka\ConfigEpodatelna())->get();
+        $ep = (new ConfigEpodatelna())->get();
         $email = $ep['odeslani']['email'];
         if ($email)
             try {
                 $this->setFrom($email);                
             } catch (Exception $e) {
                 $e->getMessage();
-                throw new Exception("E-mailová adresa pro odesílání \"$email\" je neplatná.");
+                throw new \Exception("E-mailová adresa pro odesílání \"$email\" je neplatná.");
             }
     }
 
     /**
      * Připojí podpis přihlášené osoby a organizace.
      */
-    public function appendSignature(Spisovka\User $user)
+    public function appendSignature(User $user)
     {
         // Urad
         $client_config = GlobalVariables::get('client_config');

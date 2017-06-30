@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * @author Pavel Lastovicka
  * @created 02-IX-2014 12:28:36

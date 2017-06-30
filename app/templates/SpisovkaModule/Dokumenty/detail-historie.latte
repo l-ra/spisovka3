@@ -7,9 +7,9 @@
         {foreach $historie as $h}
         <dl>
             <dt>{$h->date|edatetime}</dt>
-            <dd>{!=LogModel::eventToString($h->typ)}<br />
+            <dd>{!=Spisovka\LogModel::eventToString($h->typ)}<br />
             {if !empty($h->poznamka)}<span class="normal-font">{$h->poznamka|escape|nl2br|noescape}</span><br />{/if}
-            <span class="normal-font">provedl: {Person::fromUserId($h->user_id)}</span>
+            <span class="normal-font">provedl: {Spisovka\Person::fromUserId($h->user_id)}</span>
             </dd>
         </dl>
         {/foreach}

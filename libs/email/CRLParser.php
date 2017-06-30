@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class CRLParser extends DERParser
 {
 
@@ -42,7 +44,7 @@ class CRLParser extends DERParser
 //            $der = $this->parse($data);
 //            return $this->decode($der);
 //        } else {
-//            new Exception(openssl_error_string());
+//            new \Exception(openssl_error_string());
 //            return null;
 //        }
 //    }
@@ -75,7 +77,7 @@ class CRLParser extends DERParser
         if (empty($der))
             return null;
 
-        $info = new stdClass();
+        $info = new \stdClass();
         // $der[0]['data'][0]['data'][XXX]['data']
         // 2 = CA
         // 3 = od
@@ -111,7 +113,7 @@ class CRLParser extends DERParser
         $crl_items = array();
         foreach ($tmp as $item) {
 
-            $crl = new stdClass();
+            $crl = new \stdClass();
             foreach ($item['data'] as $i) {
 
                 if ($i['tag'] == '02') {

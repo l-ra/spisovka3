@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovka_SestavyPresenter extends BasePresenter
 {
 
@@ -55,7 +59,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         $client_config = GlobalVariables::get('client_config');
 
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -185,7 +189,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         if ($d_od) {
             try {
                 $d_od = date("Y-m-d", strtotime($d_od));
-                //$d_od = new DateTime($this->getParameter('d_od',null));
+                //$d_od = new \DateTime($this->getParameter('d_od',null));
             } catch (Exception $e) {
                 $d_od = null;
             }
@@ -193,7 +197,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         if ($d_do) {
             try {
                 $d_do = date("Y-m-d", strtotime($d_do) + 86400);
-                //$d_do = new DateTime($this->getParameter('d_do',null));
+                //$d_do = new \DateTime($this->getParameter('d_do',null));
             } catch (Exception $e) {
                 $d_do = null;
             }
@@ -397,7 +401,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             'vec_desc' => 'věci (sestupně)',
         );
 
-        $form = new Spisovka\Form();
+        $form = new Form();
         $form->elementPrototype->onsubmit('sestavaFormSubmit(this)');
 
         $form->addText('sestava_nazev', 'Název sestavy:', 80, 100)
@@ -452,10 +456,10 @@ class Spisovka_SestavyPresenter extends BasePresenter
         $form->addDatePicker('datum_odeslani_do', 'Datum odeslání do:');
         $form->addText('datum_odeslani_cas_do', 'Čas odeslání do:', 10, 15);
 
-        $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
+        $form->addComponent(new Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
 
         $form->addCheckbox('spisovy_znak_prazdny', 'Spisový znak nevyplněn');
-        $form->addComponent(new SpisovyZnakComponent(), 'spisovy_znak_id');
+        $form->addComponent(new Components\SpisovyZnakComponent(), 'spisovy_znak_id');
         $form['spisovy_znak_id']->controlPrototype->onchange('');
 
         $form->addTextArea('ulozeni_dokumentu', 'Uložení dokumentu:', 80, 4);
@@ -490,7 +494,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         return $form;
     }
 
-    public function validateVybraneSloupce(Spisovka\Form $form)
+    public function validateVybraneSloupce(Form $form)
     {
         // Nette "feature". onValidate se vola, prestoze pouziji setValidationScope()
         $submit = $form->isSubmitted();
@@ -611,7 +615,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
      * @param array $data
      * @return array
      */
-    protected function handleSubmit(Spisovka\Form $form, $data)
+    protected function handleSubmit(Form $form, $data)
     {
         $sestava = array();
         $sestava['nazev'] = $data['sestava_nazev'];

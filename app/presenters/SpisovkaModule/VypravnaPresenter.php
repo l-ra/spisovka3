@@ -1,6 +1,8 @@
 <?php
 
-use Spisovka\Form;
+namespace Spisovka;
+
+use Nette;
 
 class Spisovka_VypravnaPresenter extends BasePresenter
 {
@@ -77,7 +79,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     public function createComponentBulkAction()
     {
-        $BA = new Spisovka\Components\BulkAction();
+        $BA = new Components\BulkAction();
 
         $actions = ['odeslat' => 'odesláno',
             'vratit' => 'vrátit',
@@ -151,7 +153,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $DokumentOdeslani = new DokumentOdeslani();
         $dokument = $DokumentOdeslani->get($id);
         if (!$dokument)
-            throw new Exception("Záznam o odeslání ID $id neexistuje.");
+            throw new \Exception("Záznam o odeslání ID $id neexistuje.");
 
         $this->template->dokument = $dokument;
         $this->template->isPrint = $this->getParameter('print');
@@ -162,7 +164,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $DokumentOdeslani = new DokumentOdeslani();
         $odes = $DokumentOdeslani->get($id);
         if (!$odes)
-            throw new Exception("Záznam o odeslání ID $id neexistuje.");
+            throw new \Exception("Záznam o odeslání ID $id neexistuje.");
 
         $this->template->dokument = $odes;
     }
@@ -208,10 +210,10 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     protected function createComponentFiltrovatForm()
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $filtr = UserSettings::get('vypravna_filtr');
-        $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
+        $form->addComponent(new Controls\VyberPostovniZasilkyControl(), 'druh_zasilky');
         $form['druh_zasilky']->setDefaultValue($filtr);
 
         $form->addSubmit('filtrovat', 'Filtrovat')
@@ -243,14 +245,14 @@ class Spisovka_VypravnaPresenter extends BasePresenter
         $DokumentOdeslani = new DokumentOdeslani();
         $odes = $DokumentOdeslani->get($this->getParameter('id'));
 
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $form->addDatePicker('datum_odeslani', 'Datum odeslání:')
                 ->setRequired()
                 ->setDefaultValue($odes->datum_odeslani);
 
         if ($odes->zpusob_odeslani_id == 3) {
-            $form->addComponent(new Spisovka\Controls\VyberPostovniZasilkyControl(),
+            $form->addComponent(new Controls\VyberPostovniZasilkyControl(),
                     'druh_zasilky');
             $form['druh_zasilky']->setDefaultValue($odes->druh_zasilky)
                     ->setRequired();

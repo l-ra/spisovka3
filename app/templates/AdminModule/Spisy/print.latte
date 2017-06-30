@@ -26,7 +26,7 @@
             <td>{if isset($seznam_dokumentu[$spis->id])}{=count($seznam_dokumentu[$spis->id])}{else}0{/if}</td>
             <td>{if isset($SpisoveZnaky[$spis->spisovy_znak_id])}{$SpisoveZnaky[$spis->spisovy_znak_id]->nazev}{/if} </td>
             <td>{$spis->skartacni_znak} / {$spis->skartacni_lhuta}</td>
-            <td>{=SpisModel::stav($spis->stav)}</td>            
+            <td>{=Spisovka\SpisModel::stav($spis->stav)}</td>            
         </tr>
         {if isset($seznam_dokumentu[$spis->id]) && count($seznam_dokumentu[$spis->id])>0 }
         {foreach $seznam_dokumentu[$spis->id] as $dok}

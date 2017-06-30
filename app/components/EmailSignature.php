@@ -15,7 +15,7 @@ class EmailSignature extends \Nette\Application\UI\Control
     protected $message;
     protected $storage;
 
-    public function __construct(\EpodatelnaMessage $message, $storage)
+    public function __construct(\Spisovka\EpodatelnaMessage $message, $storage)
     {
         parent::__construct();
 
@@ -67,7 +67,7 @@ class EmailSignature extends \Nette\Application\UI\Control
     {
         $filename = $this->message->getEmailFile($this->storage);
 
-        $email = new \EmailClient($filename);
+        $email = new \Spisovka\EmailClient($filename);
         $is_signed = $email->isSigned();
         $this->message->email_signed = $is_signed;
         $this->message->save();

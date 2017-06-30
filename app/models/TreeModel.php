@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 abstract class TreeModel extends BaseModel
 {
 
@@ -130,8 +132,8 @@ abstract class TreeModel extends BaseModel
     /**
      * @param array $data
      * @return int ID vytvoreneho zaznamu
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function vlozitH($data)
     {
@@ -160,7 +162,7 @@ abstract class TreeModel extends BaseModel
                 // is subnode
                 $parent = $this->select([['id=%i', $parent_id]])->fetch();
                 if (!$parent)
-                    throw new InvalidArgumentException("TreeModel::vlozitH() - záznam ID $parent_id neexistuje.");
+                    throw new \InvalidArgumentException("TreeModel::vlozitH() - záznam ID $parent_id neexistuje.");
 
                 $update_data['sekvence'] = $parent->sekvence . '.' . $id;
                 $update_data['sekvence_string'] = $parent->sekvence_string . '#' . $sekvence_string;
@@ -179,7 +181,7 @@ abstract class TreeModel extends BaseModel
     public function upravitH($data, $id)
     {
         if (empty($id) || !is_numeric($id))
-            throw new InvalidArgumentException(__METHOD__ . '() - neplatný parameter "id"');
+            throw new \InvalidArgumentException(__METHOD__ . '() - neplatný parameter "id"');
 
         dibi::begin();
         try {
@@ -206,7 +208,7 @@ abstract class TreeModel extends BaseModel
                 $old_parent = $this->select([['id = %i', $old_parent_id]])->fetch();
                 if (!$old_parent) {
                     dibi::rollback();
-                    throw new InvalidArgumentException(__METHOD__ . "() - záznam ID $old_parent_id neexistuje.");
+                    throw new \InvalidArgumentException(__METHOD__ . "() - záznam ID $old_parent_id neexistuje.");
                 }
 
                 $update1['sekvence'] = $id;
@@ -224,7 +226,7 @@ abstract class TreeModel extends BaseModel
                 $new_parent = $this->select(array(array('id = %i', $parent_id)))->fetch();
                 if (!$new_parent) {
                     dibi::rollback();
-                    throw new InvalidArgumentException(__METHOD__ . "() - záznam ID $parent_id neexistuje.");
+                    throw new \InvalidArgumentException(__METHOD__ . "() - záznam ID $parent_id neexistuje.");
                 }
 
                 $update1['sekvence'] = "$new_parent->sekvence.$id";
@@ -243,7 +245,7 @@ abstract class TreeModel extends BaseModel
                 $new_parent = $this->select(array(array('id = %i', $parent_id)))->fetch();
                 if (!$new_parent) {
                     dibi::rollback();
-                    throw new InvalidArgumentException(__METHOD__ . "() - záznam ID $parent_id neexistuje.");
+                    throw new \InvalidArgumentException(__METHOD__ . "() - záznam ID $parent_id neexistuje.");
                 }
 
                 $update1['sekvence'] = "$new_parent->sekvence.$id";
@@ -356,7 +358,7 @@ abstract class TreeModel extends BaseModel
      * Opraví případné chyby v zobrazení stromu tím, že znovu vytvoří pomocné informace
      * v polích "sekvence" a "sekvence_string".
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      */
     public function rebuildIndex()
     {

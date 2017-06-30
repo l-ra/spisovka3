@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class ZpravaOsoba extends BaseModel 
 {
 

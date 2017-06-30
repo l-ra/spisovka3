@@ -14,12 +14,12 @@
 </div>
 <script type="text/javascript">
     var linkNovySubjekt = {link :Spisovka:Subjekty:novy, f => zpravyNovySubjektOk};
-    var kopirovatEmailDoPoznamky = {Settings::get('epodatelna_copy_email_into_documents_note')};
+    var kopirovatEmailDoPoznamky = {Spisovka\Settings::get('epodatelna_copy_email_into_documents_note')};
     {if !$RequestIsdsPassword}
-        zkontrolovatSchranku({Settings::get('epodatelna_auto_load_new_messages')});
+        zkontrolovatSchranku({Spisovka\Settings::get('epodatelna_auto_load_new_messages')});
     {else}
         var passwordCallback = function($password) {
-            zkontrolovatSchranku({Settings::get('epodatelna_auto_load_new_messages')}, $password);
+            zkontrolovatSchranku({Spisovka\Settings::get('epodatelna_auto_load_new_messages')}, $password);
         };
         passwordPrompt();
     {/if}

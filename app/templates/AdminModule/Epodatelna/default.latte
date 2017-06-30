@@ -6,7 +6,7 @@
 {* <p n:if="$vice_datovych_schranek"><a href="{link novaschranka, 'typ' => 'i'}">Přidat schránku</a></p> *}
 
 <div class="detail_blok">
-    {if !Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
+    {if !Spisovka\Settings::get(Spisovka\Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)}
         <dl>
             <dt>ID datové schránky:</dt>
             <dd>{$isds['idbox']}</dd>
@@ -26,10 +26,10 @@
     </dl>
     <dl>
         <dt>Podatelna pro příjem této DS:</dt>
-        <dd>{if empty($isds['podatelna'])}kterákoli{else}{= new OrgUnit($isds['podatelna'])}{/if}</dd>
+        <dd>{if empty($isds['podatelna'])}kterákoli{else}{= new Spisovka\OrgUnit($isds['podatelna'])}{/if}</dd>
     </dl>
     <a href="{link detail, 'i'}">Upravit</a>    
-    <a n:if="!Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)" href="{link isdsTest}">Otestovat připojení</a>
+    <a n:if="!Spisovka\Settings::get(Spisovka\Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false)" href="{link isdsTest}">Otestovat připojení</a>
 </div>
 
 
@@ -62,7 +62,7 @@
                     {/if}
                 </dd><br />
                 <dt>Podatelna pro příjem této schránky:</dt>
-                <dd>{if empty($email['podatelna'])}kterákoli{else}{= new OrgUnit($email['podatelna'])}{/if}</dd>
+                <dd>{if empty($email['podatelna'])}kterákoli{else}{= new Spisovka\OrgUnit($email['podatelna'])}{/if}</dd>
             </dl>
             <a href="{link detail, 'e'.$index}">Upravit</a>
             <a href="{link smazat, 'e'.$index}" onclick="return confirm('Opravdu chcete smazat tuto schránku?');">Smazat</a>

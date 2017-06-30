@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Admin_SpisyPresenter extends SpisyPresenter
 {
 
@@ -36,7 +40,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
           }
 
           $client_config = GlobalVariables::get('client_config');
-          $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+          $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
           $paginator = $vp->getPaginator();
           $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
           : 20;

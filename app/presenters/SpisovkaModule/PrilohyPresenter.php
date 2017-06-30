@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovka_PrilohyPresenter extends BasePresenter
 {
 
@@ -66,7 +70,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
      */
     protected function createComponentUploadForm()
     {
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         //$form1->getElementPrototype()->id('priloha-upload');
         $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : attachmentUploadCompleted})";
 
@@ -137,7 +141,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $File = new FileModel();
         $file_info = $File->getInfo($this->getParameter('id'));
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         //$form1->getElementPrototype()->id('priloha-upload');
         $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : attachmentUploadCompleted})";
 

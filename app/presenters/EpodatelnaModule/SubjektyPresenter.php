@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class Epodatelna_SubjektyPresenter extends SubjektyPresenter
 {
 

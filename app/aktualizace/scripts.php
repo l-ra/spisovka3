@@ -9,38 +9,38 @@ function revision_660_check()
       $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`nazev`) AS pocet FROM [spisovy_znak] GROUP BY `nazev`) subq WHERE pocet > 1');
 
       if (count($result))
-      throw new Exception('Kontrola integrity dat selhala. Název spisového znaku musí být jedinečný!');
+      throw new \Exception('Kontrola integrity dat selhala. Název spisového znaku musí být jedinečný!');
 
       // --------------------------------------------------------------------
       $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`nazev`) AS pocet FROM [spis] GROUP BY `nazev`) subq WHERE pocet > 1');
 
       if (count($result))
-      throw new Exception('Kontrola integrity dat selhala. Název spisu musí být jedinečný!');
+      throw new \Exception('Kontrola integrity dat selhala. Název spisu musí být jedinečný!');
      */
 
     // --------------------------------------------------------------------    
     $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`code`) AS pocet FROM [user_role] GROUP BY `code`) subq WHERE pocet > 1');
 
     if (count($result))
-        throw new Exception('Kontrola integrity dat selhala. Kód role musí být jedinečný!');
+        throw new \Exception('Kontrola integrity dat selhala. Kód role musí být jedinečný!');
 
     // --------------------------------------------------------------------
     $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`dokument_id`) AS pocet FROM [dokument_to_spis] GROUP BY `dokument_id`) subq WHERE pocet > 1');
 
     if (count($result))
-        throw new Exception('Kontrola integrity dat selhala. Dokument nemůže být zařazen do více spisů!');
+        throw new \Exception('Kontrola integrity dat selhala. Dokument nemůže být zařazen do více spisů!');
 
     // --------------------------------------------------------------------
     $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`user_id`) AS pocet FROM [user_to_role] GROUP BY `user_id`, `role_id`) subq WHERE pocet > 1');
 
     if (count($result))
-        throw new Exception('Kontrola integrity dat selhala. Uživatel nemůže mít určitou roli přiřazenu vícekrát!');
+        throw new \Exception('Kontrola integrity dat selhala. Uživatel nemůže mít určitou roli přiřazenu vícekrát!');
 
     // --------------------------------------------------------------------
     $result = dibi::query('SELECT pocet FROM (SELECT COUNT(`role_id`) AS pocet FROM [user_acl] GROUP BY `role_id`, `rule_id`) subq WHERE pocet > 1');
 
     if (count($result))
-        throw new Exception('Kontrola integrity dat selhala. Uživatel nemůže mít určitou roli přiřazenu vícekrát!');
+        throw new \Exception('Kontrola integrity dat selhala. Uživatel nemůže mít určitou roli přiřazenu vícekrát!');
 }
 
 function revision_660_after()
@@ -65,7 +65,7 @@ function revision_700_check()
     $result = dibi::query("SELECT id FROM [user_role] WHERE [code] = 'referent'");
     $pole = $result->fetch();
     if (!$pole || $pole['id'] != 4)
-        throw new Exception('Role "referent" je chybně definována!');
+        throw new \Exception('Role "referent" je chybně definována!');
 }
 
 function revision_810_after()
@@ -186,7 +186,7 @@ function revision_960_after()
     if ($all_ok)
         echo "Všechny e-mailové adresy zaměstnanců jsou v pořádku.";
     else
-        throw new Exception("Prosíme opravte tyto chyby v e-mailových adresách zaměstnanců.");
+        throw new \Exception("Prosíme opravte tyto chyby v e-mailových adresách zaměstnanců.");
 }
 
 function revision_990_check()

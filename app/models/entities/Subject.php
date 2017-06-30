@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Description of Subject
  *
@@ -16,7 +18,7 @@ class Subject extends DBEntity
      */
     public static function create(array $data)
     {
-        $data['date_created'] = new DateTime();
+        $data['date_created'] = new \DateTime();
         $data['user_created'] = self::getUser()->id;
 
         return parent::create($data);

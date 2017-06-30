@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class DocumentStates extends Document
 {
     /*
@@ -41,19 +43,19 @@ class DocumentStates extends Document
 
     /**
      * @param int $new_state
-     * @throws Exception
+     * @throws \Exception
      */
     protected function _changeState($new_state)
     {
         if ($this->is_forwarded)
-            throw new Exception('Není možné změnit stav dokumentu, pokud je ve stavu předávání.'
+            throw new \Exception('Není možné změnit stav dokumentu, pokud je ve stavu předávání.'
             . ' Nejprve převezměte dokument, případně předání zrušte, pak operaci s dokumentem zopakujte.');
 
         if (!in_array($new_state, $this->getAvailableTransitions()))
-            throw new Exception("Změna stavu dokumentu ze stavu $this->stav do $new_state není povolena.");
+            throw new \Exception("Změna stavu dokumentu ze stavu $this->stav do $new_state není povolena.");
 
         if ($this->_data_changed)
-            throw new Exception(__METHOD__ . '() - objekt má neuložené změny, není možné provést přechod do jiného stavu.');
+            throw new \Exception(__METHOD__ . '() - objekt má neuložené změny, není možné provést přechod do jiného stavu.');
 
         if (isset(self::$transition_conditions[$this->stav])) {
             $method = self::$transition_conditions[$this->stav];
@@ -62,7 +64,7 @@ class DocumentStates extends Document
             $allowed = $this->canUserModify();
 
         if (!$allowed)
-            throw new Exception('Nejste oprávněn měnit stav dokumentu.');
+            throw new \Exception('Nejste oprávněn měnit stav dokumentu.');
 
         dibi::query('UPDATE %n SET [stav] = %i WHERE [id] = ' . $this->id,
                 ':PREFIX:' . $this::TBL_NAME, $new_state);
@@ -72,13 +74,13 @@ class DocumentStates extends Document
 
     /**
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
     public function getAvailableTransitions()
     {
         $state = $this->stav;
         if (!in_array($state, array_keys(self::$transition_table)))
-            throw new Exception(__METHOD__ . '() - invalid state.');
+            throw new \Exception(__METHOD__ . '() - invalid state.');
 
         return self::$transition_table[$state];
     }
@@ -97,12 +99,12 @@ class DocumentStates extends Document
     
     /**
      * Protection against reckless developer
-     * @throws Exception
+     * @throws \Exception
      */
     public function __set($name, $value)
     {
         if ($name == 'stav')
-            throw new Exception(__METHOD__ . '() - stav není možné nastavit přímo.');
+            throw new \Exception(__METHOD__ . '() - stav není možné nastavit přímo.');
 
         return parent::__set($name, $value);
     }

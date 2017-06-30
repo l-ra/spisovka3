@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Admin_SubjektyPresenter extends SubjektyPresenter
 {
 
@@ -51,9 +55,9 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     public function renderSeznam($hledat = null, $abc = null)
     {
         // paginator
-        new AbcFilter($this, 'abc', $this->getHttpRequest());
+        new Components\AbcFilter($this, 'abc', $this->getHttpRequest());
         $client_config = GlobalVariables::get('client_config');
-        $vp = new VisualPaginator($this, 'vp', $this->getHttpRequest());
+        $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
         $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
                     : 20;
@@ -182,7 +186,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
     {
         $stav_select = Subjekt::stav();
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addHidden('id');
         $form1->addSelect('stav', 'Změnit stav na:', $stav_select);
         $form1->addSubmit('zmenit_stav', 'Změnit stav')

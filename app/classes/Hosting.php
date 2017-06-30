@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Detekce služby mojespisovka.cz
  *

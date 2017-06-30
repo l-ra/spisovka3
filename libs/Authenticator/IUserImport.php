@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Description of IUserImport
  *

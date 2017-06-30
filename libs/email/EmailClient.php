@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class EmailClient
 {
 
@@ -78,7 +80,7 @@ class EmailClient
         } else if ($this->mime_parser) {
             $part = $this->mime_parser->getPart($id);
             if (!$part)
-                throw new Exception("Získání části mailu číslo $id selhalo.");
+                throw new \Exception("Získání části mailu číslo $id selhalo.");
             $data = $part['Body'];
             $filename = $part['FileName'];
         }
@@ -138,7 +140,7 @@ class MimeParser
     {
         $this->filename = $filename;
 
-        $this->impl = $mp = new mime_parser_class();
+        $this->impl = $mp = new \mime_parser_class();
         $mp->mbox = 0;
         $mp->decode_bodies = 1;
         $mp->ignore_syntax_errors = 1;
@@ -164,7 +166,7 @@ class MimeParser
         $mp = $this->impl;
         $decoded = null;
         if (!$mp->Decode($parameters, $decoded))
-            throw new Exception('Chyba při dekódování e-mailu: ' . $mp->error . ' na pozici ' . $mp->error_position);
+            throw new \Exception('Chyba při dekódování e-mailu: ' . $mp->error . ' na pozici ' . $mp->error_position);
 
         $this->decoded = $decoded = $decoded[0];
         if ($including_body)

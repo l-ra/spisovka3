@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 /**
  * Entita, kde je kesovana tabulka jako celek
  * (pouze v pripade, ze neni pouzito omezeni WHERE, ORDER BY, LIMIT a OFFSET)

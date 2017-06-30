@@ -10,7 +10,7 @@ class PrintControl extends \Nette\Application\UI\Control
      */
     public function render()
     {
-        $this->template->publicUrl = \GlobalVariables::get('publicUrl');;
+        $this->template->publicUrl = \Spisovka\GlobalVariables::get('publicUrl');;
 
         $this->template->setFile(dirname(__FILE__) . '/template.latte');
         $this->template->render();

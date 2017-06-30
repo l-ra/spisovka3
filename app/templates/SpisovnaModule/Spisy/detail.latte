@@ -73,7 +73,7 @@
                     <br />
                     {if count($dok->subjekty)>0}
                         {foreach $dok->subjekty as $subjekt}
-                            {=Subjekt::displayName($subjekt,'plna_adresa')}<br />
+                            {=Spisovka\Subjekt::displayName($subjekt,'plna_adresa')}<br />
                         {/foreach}
                     {else}
                         nejsou přiděleny žádné subjekty!<br />

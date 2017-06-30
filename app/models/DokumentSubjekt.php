@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class DokumentSubjekt extends BaseModel
 {
 
@@ -92,7 +94,7 @@ class DokumentSubjekt extends BaseModel
         $row['dokument_id'] = $doc->id;
         $row['subjekt_id'] = $subject->id;
         $row['typ'] = $typ;
-        $row['date_added'] = new DateTime();
+        $row['date_added'] = new \DateTime();
         $row['user_id'] = self::getUser()->id;
 
         $this->insert($row);
@@ -109,7 +111,7 @@ class DokumentSubjekt extends BaseModel
         $row['dokument_id'] = $dokument_id;
         $row['subjekt_id'] = $subjekt_id;
         $row['typ'] = $typ;
-        $row['date_added'] = new DateTime();
+        $row['date_added'] = new \DateTime();
         $row['user_id'] = self::getUser()->id;
 
         return $this->update($row,

@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class ImapClient
 {
 
@@ -23,7 +25,7 @@ class ImapClient
     public function connect($mailbox, $user, $password)
     {
         if (!function_exists('imap_open'))
-            throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
+            throw new \InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
 
         if (function_exists('mb_convert_encoding'))
             $mailbox = mb_convert_encoding($mailbox, "UTF7-IMAP", "UTF-8");
@@ -42,7 +44,7 @@ class ImapClient
     public function open($filename)
     {
         if (!function_exists('imap_open'))
-            throw new InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
+            throw new \InvalidArgumentException('Na tomto serveru není přítomna podpora IMAP.');
 
         // @ - nezapisuj do logu chyby, ke kterým bude docházet na určitých operačních systémech
         if ($rc = @imap_open($filename, '', '')) {
@@ -50,7 +52,7 @@ class ImapClient
             return true;
         }
 
-        throw new Exception("Nemohu otevřít soubor s e-mailem: $filename");
+        throw new \Exception("Nemohu otevřít soubor s e-mailem: $filename");
     }
 
     /**

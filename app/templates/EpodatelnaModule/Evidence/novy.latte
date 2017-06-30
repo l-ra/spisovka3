@@ -54,9 +54,9 @@
                             &nbsp;
                         </strong>
                         <div class="info">
-                            <span>{if !empty($Subjekt['message']->type)}{$Subjekt['message']->type} - {=Subjekt::typ_subjektu($Subjekt['message']->type)}{/if}&nbsp;</span>
+                            <span>{if !empty($Subjekt['message']->type)}{$Subjekt['message']->type} - {=Spisovka\Subjekt::typ_subjektu($Subjekt['message']->type)}{/if}&nbsp;</span>
                             <br />
-                            {=Subjekt::displayName($Subjekt['message'],'adresa')}
+                            {=Spisovka\Subjekt::displayName($Subjekt['message'],'adresa')}
                         </div>
                     </td>
                     <td class="meta_plus">

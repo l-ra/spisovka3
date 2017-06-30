@@ -1,6 +1,10 @@
 <?php
 
-class ISDS_Spisovka extends ISDS
+namespace Spisovka;
+
+use Nette;
+
+class ISDS_Spisovka extends \ISDS
 {
     /* Funkce vrati, zda povolit vice schranek v aplikaci.
       Pripraveno jako potencionalni moznost do budoucna. */
@@ -14,7 +18,7 @@ class ISDS_Spisovka extends ISDS
      * 
      * @param string $password - aplikace si na přání zákazníka nemusí vůbec heslo ukládat
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      * @throws Nette\FileNotFoundException
      */
     public function __construct($password = null)
@@ -25,10 +29,10 @@ class ISDS_Spisovka extends ISDS
         if ($log_level)
             $this->logger = new ISDS_Logger($log_level);
         
-        $ep_config = (new Spisovka\ConfigEpodatelna())->get();
+        $ep_config = (new ConfigEpodatelna())->get();
         $config = $ep_config['isds'];
         /* if ($config === false) // existuje nejake nastaveni?
-            throw new InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka."); */
+            throw new \InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka."); */
 
         $isds_portaltype = ($config['test'] == 1) ? 0 : 1;
 
@@ -39,9 +43,9 @@ class ISDS_Spisovka extends ISDS
             if (!$password)
                 $password = UserSettings::get('isds_password');            
             if (!$login)
-                throw new Exception('Uživatel nemá vyplněny přihlašovací údaje do datové schránky.');
+                throw new \Exception('Uživatel nemá vyplněny přihlašovací údaje do datové schránky.');
             if (!$password)
-                throw new Exception('Nebylo zadáno heslo do datové schránky.');
+                throw new \Exception('Nebylo zadáno heslo do datové schránky.');
             
             parent::__construct($isds_portaltype, 0, $login, $password);
         } else if ($config['typ_pripojeni'] == 0) {
@@ -66,7 +70,7 @@ class ISDS_Spisovka extends ISDS
                 throw new Nette\FileNotFoundException("Chyba nastavení ISDS! - Certifikát pro připojení k ISDS nenalezen.");
             }
         } else
-            throw new Exception("Chyba nastavení ISDS! - Nespecifikovaná chyba.");
+            throw new \Exception("Chyba nastavení ISDS! - Nespecifikovaná chyba.");
 
         return true;
     }
@@ -93,13 +97,13 @@ class ISDS_Spisovka extends ISDS
     {
         // je parametr platny
         if (empty($zprava)) {
-            throw new InvalidArgumentException("Prázdný či neplatný parametr!");
+            throw new \InvalidArgumentException("Prázdný či neplatný parametr!");
         }
 
         // Komu
         $komu = $zprava['dbIDRecipient']; // Identifikace adresata
         if (empty($komu)) {
-            throw new InvalidArgumentException("Není k dispozici adresát!");
+            throw new \InvalidArgumentException("Není k dispozici adresát!");
         }
 
         // nacteni zpravy

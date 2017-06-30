@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class DokumentOdeslani extends BaseModel
 {
 
@@ -220,7 +222,7 @@ class DokumentOdeslani extends BaseModel
         if (!$info)
             return false;
 
-        $row = ['stav' => 2, 'datum_odeslani' => new DateTime()];
+        $row = ['stav' => 2, 'datum_odeslani' => new \DateTime()];
 
         $ok = $this->update($row, array(array('id=%i', $id)));
         if ($ok) {
@@ -240,7 +242,7 @@ class DokumentOdeslani extends BaseModel
 
         $row = array();
         $row['stav'] = 3;
-        $row['datum_odeslani'] = new DateTime();
+        $row['datum_odeslani'] = new \DateTime();
 
         $info = $this->get($id);
         if (!$info)
@@ -271,7 +273,7 @@ class DokumentOdeslani extends BaseModel
         if (empty($row['epodatelna_id']))
             $row['epodatelna_id'] = null;
         $row['user_id'] = self::getUser()->id;
-        $row['date_created'] = new DateTime();
+        $row['date_created'] = new \DateTime();
 
 
         return $this->insert($row);

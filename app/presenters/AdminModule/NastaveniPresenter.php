@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Admin_NastaveniPresenter extends BasePresenter
 {
     /* array indices */
@@ -82,7 +86,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $stat_select = Subjekt::stat();
 
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addText('nazev', 'Název:', 50, 100)
                 ->setValue($Urad->nazev)
                 ->addRule(Nette\Forms\Form::FILLED, 'Název úřadu musí být vyplněn.');
@@ -145,7 +149,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $config_data['urad']['kontakt']['email'] = $data['email'];
         $config_data['urad']['kontakt']['www'] = $data['www'];
 
-        (new Spisovka\ConfigClient())->save($config_data);
+        (new ConfigClient())->save($config_data);
 
         $this->flashMessage('Informace o sobě byly upraveny.');
         $this->redirect('this');
@@ -161,7 +165,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $client_config = GlobalVariables::get('client_config');
         $CJ = $client_config->cislo_jednaci;
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addText('maska', 'Maska:', 50, 100)
                 ->setValue($CJ->maska)
                 ->addRule(Nette\Forms\Form::FILLED, 'Maska čísla jednacího musí být vyplněna.');
@@ -208,7 +212,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $min_rok = $data['minuly_rok'] ? 1 : 0;
         $config_data['cislo_jednaci']['minuly_rok'] = $min_rok;
 
-        (new Spisovka\ConfigClient())->save($config_data);
+        (new ConfigClient())->save($config_data);
 
         $this->flashMessage('Nastavení čísla jednacího bylo upraveno.');
         $this->redirect('this');
@@ -219,7 +223,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $client_config = GlobalVariables::get('client_config');
         $nastaveni = $client_config->nastaveni;
 
-        $form1 = new Spisovka\Form();
+        $form1 = new Form();
         $form1->addGroup('Ostatní nastavení');
         $form1->addText('pocet_polozek', 'Počet položek v seznamu:', 10, 10)
                 ->setValue($nastaveni->pocet_polozek)
@@ -263,7 +267,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $config_data = GlobalVariables::get('client_config');
         $config_data['nastaveni']['pocet_polozek'] = $data['pocet_polozek'];
 
-        (new Spisovka\ConfigClient())->save($config_data);
+        (new ConfigClient())->save($config_data);
 
         foreach (self::$settings as $short_name => $set) {
             Settings::set($set[self::ST_DB_NAME], $data[$short_name]);
@@ -279,7 +283,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
     public function createComponentNotificationsForm()
     {
-        $form = new Spisovka\Form();
+        $form = new Form();
 
         $form->addCheckBox(Notifications::RECEIVE_DOCUMENT,
                         'Poslat e-mail při předání dokumentu')
@@ -306,10 +310,10 @@ class Admin_NastaveniPresenter extends BasePresenter
 
     /**
      * Adds a checkbox to the form
-     * @param Spisovka\Form $form
+     * @param Form $form
      * @param string $short_name
      */
-    protected function stCheckBox(Spisovka\Form $form, $short_name)
+    protected function stCheckBox(Form $form, $short_name)
     {
         $s = self::$settings[$short_name];
 

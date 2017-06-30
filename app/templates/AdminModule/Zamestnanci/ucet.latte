@@ -35,7 +35,7 @@
 {else}
     <dl>
         <dt>Organizační jednotka:</dt>
-        <dd>{$u->orgjednotka_id === null ? 'žádná' : new OrgUnit($u->orgjednotka_id)}&nbsp;&nbsp;&nbsp;
+        <dd>{$u->orgjednotka_id === null ? 'žádná' : new Spisovka\OrgUnit($u->orgjednotka_id)}&nbsp;&nbsp;&nbsp;
             <a href="{link this, 'edit' => 'orgunit'}">Změnit</a></dd>
     </dl>
 {/if}

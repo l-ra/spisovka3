@@ -55,12 +55,12 @@
                 <div class="small">&nbsp;{$odes->dok_jid}</div>
             </td>
             <td class="vec">
-                <strong><a href="{link detail, 'id' => $odes->dokodes_id}" title="Zobrazit detail záznamu">{=Subjekt::displayName($odes, 'jmeno_item')}</a></strong>
+                <strong><a href="{link detail, 'id' => $odes->dokodes_id}" title="Zobrazit detail záznamu">{=Spisovka\Subjekt::displayName($odes, 'jmeno_item')}</a></strong>
                 <div class="mezera">
                 {if $odes->zpusob_odeslani_id == 4}
                     {$odes->cislo_faxu}
                 {else}    
-                    {=Subjekt::displayName($odes, 'adresa')}
+                    {=Spisovka\Subjekt::displayName($odes, 'adresa')}
                 {/if}    
                 </div>
                 {if !empty($odes->poznamka_odeslani)}
@@ -68,11 +68,11 @@
                 {/if}
             </td>
             <td class="predal">
-                {= Person::fromUserId($odes->user_id)}
+                {= Spisovka\Person::fromUserId($odes->user_id)}
             </td>
             <td class="druh-zasilky">
                 {if $odes->zpusob_odeslani_id == 3 }    
-                {!=DruhZasilky::vypis($odes->druh_zasilky)}
+                {!=Spisovka\DruhZasilky::vypis($odes->druh_zasilky)}
                 {if !empty($odes->cena)}<br />cena: {$odes->cena} Kč{/if}
                 {if !empty($odes->hmotnost)}<br />hmotnost: {$odes->hmotnost|decPoint} kg{/if}
                 {elseif $odes->zpusob_odeslani_id == 4 }    

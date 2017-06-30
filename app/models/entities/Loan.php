@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class Loan extends DBEntity
 {
 

@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class LogModel
 {
 
@@ -119,7 +121,7 @@ class LogModel
         $row['poznamka'] = $poznamka;
 
         $row['user_id'] = BaseModel::getUser()->id;
-        $row['date'] = new DateTime();
+        $row['date'] = new \DateTime();
 
         return dibi::insert($this->tb_logdokument, $row)
                         ->execute(dibi::IDENTIFIER);
@@ -186,7 +188,7 @@ class LogModel
 
         $user = BaseModel::getUser();
         $row['user_id'] = $user->id;
-        $row['date'] = new DateTime();
+        $row['date'] = new \DateTime();
 
         dibi::insert($this->tb_logspis, $row)->execute();
     }
@@ -198,7 +200,7 @@ class LogModel
     {
         $row = array();
         $row['user_id'] = $user_id;
-        $row['date'] = new DateTime();
+        $row['date'] = new \DateTime();
         $row['ip'] = $ip_address;
         $user_agent = filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
         $row['user_agent'] = substr($user_agent, 0, 190);

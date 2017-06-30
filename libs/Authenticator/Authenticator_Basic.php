@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthenticator
 {
 
@@ -60,7 +64,7 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
             self::INVALID_CREDENTIAL);
         }
 
-        $account->last_login = new DateTime();
+        $account->last_login = new \DateTime();
         $account->last_ip = 
         $account->save();
         

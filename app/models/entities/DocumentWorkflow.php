@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class DocumentWorkflow extends DocumentStates
 {
 
@@ -7,7 +11,7 @@ class DocumentWorkflow extends DocumentStates
      * Prevezme dokument k vyrizeni
      * @param int $dokument_id
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      */
     public function markForProcessing()
     {
@@ -47,7 +51,7 @@ class DocumentWorkflow extends DocumentStates
     /**
      * Oznaci dokument za vyrizeny
      * @return boolean|string
-     * @throws Exception
+     * @throws \Exception
      */
     public function close()
     {
@@ -88,12 +92,12 @@ class DocumentWorkflow extends DocumentStates
     /**
      * Nastaví rozhodný okamžik pro začátek plynutí skartační lhůty.
      * @param string $start_date
-     * @throws Exception 
+     * @throws \Exception 
      */
     public function setStartDate($start_date)
     {
         if ($this->stav != self::STAV_VYRIZEN_NESPUSTENA)
-            throw new LogicException('Neplatný stav dokumentu.');
+            throw new \LogicException('Neplatný stav dokumentu.');
 
         dibi::begin();
         try {
@@ -101,9 +105,9 @@ class DocumentWorkflow extends DocumentStates
             $this->save();
             $this->_changeState(self::STAV_VYRIZEN_SPUSTENA);
 
-            $today = new DateTime();
+            $today = new \DateTime();
             $today->setTime(0, 0);
-            $given_date = new DateTime($start_date);
+            $given_date = new \DateTime($start_date);
             if ($given_date == $today)
                 $msg = 'Začíná plynout skartační lhůta.';
             else
@@ -134,7 +138,7 @@ class DocumentWorkflow extends DocumentStates
     public function reopen()
     {
         if (!$this->canUserReopen())
-            throw new Exception('Otevření dokumentu není možné.');
+            throw new \Exception('Otevření dokumentu není možné.');
 
         dibi::begin();
         try {
@@ -152,7 +156,7 @@ class DocumentWorkflow extends DocumentStates
     /**
      * @param boolean $called_from_spis
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      */
     public function transferToSpisovna($called_from_spis)
     {
@@ -229,7 +233,7 @@ class DocumentWorkflow extends DocumentStates
 
     /**
      * @param boolean $use_transaction
-     * @throws Exception
+     * @throws \Exception
      * @throws Nette\InvalidStateException
      */
     public function returnFromSpisovna($use_transaction = true)
@@ -257,7 +261,7 @@ class DocumentWorkflow extends DocumentStates
     /**
      * Zahrnutí dokumentu do skartačního řízení
      * @return boolean
-     * @throws Exception
+     * @throws \Exception
      */
     public function shredProcessing()
     {

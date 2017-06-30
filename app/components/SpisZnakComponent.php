@@ -1,10 +1,12 @@
 <?php
 
-class SpisovyZnakComponent extends Nette\Forms\Controls\SelectBox
+namespace Spisovka\Components;
+
+class SpisovyZnakComponent extends \Nette\Forms\Controls\SelectBox
 {
     public function __construct()
     {
-        $m = new SpisovyZnak();
+        $m = new \Spisovka\SpisovyZnak();
         $items = $m->selectBox(2);
         parent::__construct('Spisový znak:', $items);
         

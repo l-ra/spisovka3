@@ -1,5 +1,9 @@
 <?php
 
+namespace Spisovka;
+
+use Nette;
+
 class Spisovka_NapovedaPresenter extends BasePresenter
 {
 
@@ -41,7 +45,7 @@ class Spisovka_NapovedaPresenter extends BasePresenter
             }
             unset($file_part[0]);
 
-            $tmp = new stdClass();
+            $tmp = new \stdClass();
             $tmp->path = $file;
             $tmp->name = implode(" - ", $file_part);
 
