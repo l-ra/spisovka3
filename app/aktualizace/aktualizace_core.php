@@ -1,5 +1,7 @@
 <?php
 
+namespace Spisovka;
+
 class Updates
 {
 
@@ -97,7 +99,7 @@ class Updates
         if ($dir_handle === FALSE)
             throw new \Exception(__METHOD__ . "() - nemohu otevřít adresář " . self::$update_dir);
 
-        $zip = new ZipArchive;
+        $zip = new \ZipArchive;
         $filename = self::$update_dir . 'db_scripts.zip';
         if ($zip->open($filename) !== TRUE)
             throw new \Exception(__METHOD__ . "() - nemohu otevřít soubor $filename.");
@@ -190,7 +192,7 @@ class Client_To_Update
             if ($config) {
                 $this->db_config = $config;
             } else if (is_file("{$this->path}/configs/database.neon")) {
-                $data = (new Spisovka\ConfigDatabase("{$this->path}/configs/"))->get();
+                $data = (new ConfigDatabase("{$this->path}/configs/"))->get();
                 $this->db_config = $data->parameters->database;
                 $this->db_config->profiler = false;
             } else {
@@ -223,7 +225,7 @@ class Client_To_Update
     {
         $db_config = $this->get_db_config();
         try {
-            Spisovka\dibi::connect($db_config);
+            dibi::connect($db_config);
             dibi::getSubstitutes()->{'PREFIX'} = null;
         } catch (DibiException $e) {
             $e->getMessage();

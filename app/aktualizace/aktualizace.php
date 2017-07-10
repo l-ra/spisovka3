@@ -23,6 +23,9 @@
 <div id="layout">
 <?php
 
+use Spisovka\Updates;
+use Spisovka\Client_To_Update;
+
 function error($message)
 {
     echo "<div class=\"error\">$message</div>";
