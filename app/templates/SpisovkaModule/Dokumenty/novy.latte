@@ -31,7 +31,7 @@
 
     <div class="navigate">
     <a href="{link :Spisovka:Dokumenty:default}">Seznam dokumentů</a>
-    {if (isset($odpoved_na_dokument) && $odpoved_na_dokument)}
+    {if !empty($odpoved_na_dokument)}
     - Vytvoření odpovědi
     {else}
     - Nový dokument
@@ -78,7 +78,7 @@
         {/if}            
     </div>
 
-    <div n:if="!isset($odpoved_na_dokument)" class="dokument_blok_sedy">
+    <div n:if="!empty($odpoved_na_dokument)" class="dokument_blok_sedy">
         <div class="h2">Předání</div>
         {input2 predani_poznamka}
         <dl>
@@ -134,7 +134,7 @@
 
     <div class="dokument_blok_submit">
         {input novy}&nbsp;&nbsp;
-        {if !isset($odpoved_na_dokument)}{input novy_pridat}&nbsp;&nbsp;{/if}
+        {if empty($odpoved_na_dokument)}{input novy_pridat}&nbsp;&nbsp;{/if}
         {input storno}
     </div>
     {/form}

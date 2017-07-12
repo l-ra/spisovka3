@@ -76,7 +76,6 @@ class DokumentPrilohy extends BaseModel
 
     public function pripojit($dokument_id, $file_id)
     {
-
         $row = array();
         $row['dokument_id'] = $dokument_id;
         $row['file_id'] = $file_id;
@@ -88,7 +87,6 @@ class DokumentPrilohy extends BaseModel
 
     public function deaktivovat($dokument_id, $file_id)
     {
-
         $row = array();
         $row['active'] = 0;
 

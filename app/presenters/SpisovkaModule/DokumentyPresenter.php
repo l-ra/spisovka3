@@ -13,7 +13,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
     private $zakaz_filtr = false;
     private $hledat;
     private $seradit;
-    private $odpoved = false;
     private $typ_evidence = null;
 
     public function startup()
@@ -193,14 +192,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $Souvisejici = new SouvisejiciDokument();
             $linkedDocuments = $Souvisejici->souvisejici($dokument_id);
             $this->template->SouvisejiciDokumenty = $linkedDocuments;
-            if (!empty($doc->cislo_jednaci) && $dokument->typ_dokumentu->smer == 0
-                    && $this->user->isAllowed('Dokument', 'vytvorit')) {
-                $this->template->povolitOdpoved = true;
-                if ($doc->doesReplyExist()) {
-                    // odpoved jiz existuje - stejné číslo jednací mohou mít maximálně dva dokumenty
-                    $this->template->povolitOdpoved = false;
-                }
-            }
+            if (!empty($doc->cislo_jednaci) && $dokument->typ_dokumentu->smer == 0 && $this->user->isAllowed('Dokument',
+                            'vytvorit'))
+                if (!$doc->doesReplyExist())
+                    $this->template->povolitOdpoved = true;
         }
 
         $this->template->Dok = $dokument;
@@ -558,7 +553,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument = $Dokument->update($data, array(array('id=%i', $dokument_id))); //   array('dokument_id'=>0);// $Dokument->ulozit($data);
         if ($dokument) {
-
             $this->flashMessage('Číslo jednací přiděleno.');
 
             $Log = new LogModel();
@@ -594,7 +588,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->flashMessage('Vytváření nových dokumentů je zakázáno', 'warning');
             $this->redirect('default');
         }
-        
+
         $Dokumenty = new Dokument();
         $cisty = $this->getParameter('cisty', false);
         if ($cisty) {
@@ -602,33 +596,29 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->redirect('novy');
         }
 
-        $args_rozd = array();
-        $args_rozd['where'] = array(
-            array('stav = %i', 0),
-            array('user_created = %i', $this->user->id),
-        );
-
-        $args_rozd['order'] = array('date_created' => 'DESC');
-
         $this->template->Typ_evidence = $this->typ_evidence;
 
-        $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
+        $args_rozd = [];
+        $args_rozd['where'] = [
+            'stav = 0',
+            ['user_created = %i', $this->user->id]
+        ];
+        $args_rozd['order'] = ['date_created' => 'DESC'];
 
-        if ($rozdelany_dokument) {
-            $dokument = reset($rozdelany_dokument);
+        $seznam = $Dokumenty->seznamKlasicky($args_rozd);
+        if ($seznam) {
+            $dokument = reset($seznam);
             // Oprava Task #254
             $dokument = new Document($dokument->id);
 
-            $this->flashMessage('Byl detekován a načten rozepsaný dokument.<p>Pokud chcete založit úplně nový dokument, klikněte na následující odkaz. <a href="' . $this->link('novy',
-                            array('cisty' => 1)) . '">Vytvořit nový nerozepsaný dokument.</a></p>',
+            $this->flashMessage('Byl detekován a načten rozepsaný dokument.<p>Pokud chcete založit úplně nový dokument, klikněte na následující odkaz. <a href="'
+                    . $this->link('novy', ['cisty' => 1]) . '">Vytvořit nový nerozepsaný dokument.</a></p>',
                     'info_ext');
-
-            $DokumentPrilohy = new DokumentPrilohy();
 
             $this->template->Subjekty = $dokument->getSubjects();
 
-            $prilohy = $DokumentPrilohy->prilohy($dokument->id);
-            $this->template->Prilohy = $prilohy;
+            $DokumentPrilohy = new DokumentPrilohy();
+            $this->template->Prilohy = $DokumentPrilohy->prilohy($dokument->id);
 
             if ($this->typ_evidence == 'priorace') {
                 // Nacteni souvisejicicho dokumentu
@@ -636,182 +626,42 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($dokument->id);
             }
         } else {
-            if ($this->user->inheritsFromRole('podatelna')) {
-                $dokument_typ_id = 1;
-            } else {
-                $dokument_typ_id = 2;
-            }
-
-            $pred_priprava = array(
-                "nazev" => "",
-                "popis" => "",
-                "stav" => 0,
-                "dokument_typ_id" => $dokument_typ_id,
-                "zpusob_doruceni_id" => null,
-                "zpusob_vyrizeni_id" => null,
-                "spousteci_udalost_id" => null,
-                "cislo_jednaci_odesilatele" => "",
-                "datum_vzniku" => date('Y-m-d H:i:s'),
-                "lhuta" => "30",
-            );
-            $dokument_id = $Dokumenty->vytvorit($pred_priprava);
-            $dokument = $Dokumenty->getInfo($dokument_id);
-
+            $dokument = $Dokumenty->createEmpty($this->user);
             $this->template->Spisy = null;
             $this->template->Subjekty = null;
             $this->template->Prilohy = null;
             $this->template->SouvisejiciDokumenty = null;
         }
 
-        $this->template->Prideleno = $this->user->displayName;
-
         $CJ = new CisloJednaci();
         $this->template->cjednaci = $CJ->generuj();
-
         $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
-
-        if ($dokument) {
-            $this->template->Dok = $dokument;
-            $this->template->dokument_id = $dokument->id;
-        } else {
-            $this->template->Dok = null;
-            $this->flashMessage('Dokument není připraven k vytvoření', 'warning');
-        }
+        $this->template->Prideleno = $this->user->displayName;
+        $this->template->Dok = $dokument;
+        $this->template->dokument_id = $dokument->id;
 
         $this->template->form_name = 'novyForm';
     }
 
-    public function renderOdpoved($id)
+    public function actionVytvoritOdpoved($id)
     {
         if (!$this->user->isAllowed('Dokument', 'vytvorit')) {
             $this->flashMessage('Vytváření nových dokumentů je zakázáno', 'warning');
-            $this->redirect('default');
-        }
-        
-        $document_id = $id;
-        $doc = new Document($document_id);
-        $Dokumenty = new Dokument();
-
-        $args_rozd = array();
-        $args_rozd['where'] = ['stav = 0',
-            'dokument_typ_id = 2',
-            ['cislo_jednaci = %s', $doc->cislo_jednaci],
-            "user_created = {$this->user->id}"
-        ];
-        $args_rozd['order'] = array('date_created' => 'DESC');
-
-        $rozdelany_dokument = $Dokumenty->seznamKlasicky($args_rozd);
-        if ($rozdelany_dokument) {
-            // odpoved jiz existuje, tak ji nacteme
-            $reply = reset($rozdelany_dokument);
-            $reply = new Document($reply->id);
-
-            $DokumentPrilohy = new DokumentPrilohy();
-
-            $this->template->Subjekty = $reply->getSubjects();
-
-            $prilohy = $DokumentPrilohy->prilohy($reply->id);
-            $this->template->Prilohy = $prilohy;
-
-            $this->template->Prideleno = $this->user->displayName;
-
-            $CJ = new CisloJednaci();
-            $this->template->Typ_evidence = $this->typ_evidence;
-            if ($this->typ_evidence == 'priorace') {
-                // Nacteni souvisejicicho dokumentu
-                $Souvisejici = new SouvisejiciDokument();
-                $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($reply->id);
-            } else if ($this->typ_evidence == 'sberny_arch') {
-                // sberny arch
-                //$dok_odpoved->poradi = $dok_odpoved->poradi;
-            }
-
-            $this->template->cjednaci = $CJ->nacti($doc->cislo_jednaci_id);
-
-            $this->template->Dok = $reply;
-        } else {
-            // totozna odpoved neexistuje
-            // nalezeni nejvyssiho cisla poradi v ramci spisu
-            $poradi = $Dokumenty->getMaxPoradi($doc->cislo_jednaci_id);
-
-            $pred_priprava = array(
-                "nazev" => $doc->nazev,
-                "popis" => $doc->popis,
-                "stav" => 0,
-                "dokument_typ_id" => 2,
-                "zpusob_doruceni_id" => null,
-                "cislo_jednaci_id" => $doc->cislo_jednaci_id,
-                "cislo_jednaci" => $doc->cislo_jednaci,
-                "podaci_denik" => $doc->podaci_denik,
-                "podaci_denik_poradi" => $doc->podaci_denik_poradi,
-                "podaci_denik_rok" => $doc->podaci_denik_rok,
-                "poradi" => ($poradi),
-                "cislo_jednaci_odesilatele" => $doc->cislo_jednaci_odesilatele,
-                "datum_vzniku" => date('Y-m-d H:i:s'),
-                "lhuta" => "30",
-                "poznamka" => $doc->poznamka,
-                "spisovy_znak_id" => $doc->spisovy_znak_id,
-                "skartacni_znak" => $doc->skartacni_znak,
-                "skartacni_lhuta" => $doc->skartacni_lhuta,
-                "spousteci_udalost_id" => $doc->spousteci_udalost_id
-            );
-            $odpoved_id = $Dokumenty->vytvorit($pred_priprava);
-            $reply = new Document($odpoved_id);
-
-            $DokumentSubjekt = new DokumentSubjekt();
-            $DokumentPrilohy = new DokumentPrilohy();
-
-            // kopirovani subjektu
-            $subjekty_old = $doc->getSubjects();
-            if (count($subjekty_old) > 0) {
-                foreach ($subjekty_old as $subjekt) {
-                    $rezim = $subjekt->rezim_subjektu;
-                    if ($rezim == 'O')
-                        $rezim = 'A';
-                    else if ($rezim == 'A')
-                        $rezim = 'O';
-                    $DokumentSubjekt->pripojit($reply, new Subject($subjekt->id), $rezim);
-                }
-            }
-            $this->template->Subjekty = $reply->getSubjects();
-
-            // kopirovani prilohy
-            $prilohy_old = $DokumentPrilohy->prilohy($document_id);
-
-            if (count($prilohy_old) > 0) {
-                foreach ($prilohy_old as $priloha) {
-                    $DokumentPrilohy->pripojit($reply->id, $priloha->id);
-                }
-            }
-            $prilohy_new = $DokumentPrilohy->prilohy($reply->id);
-            $this->template->Prilohy = $prilohy_new;
-
-            $this->template->Prideleno = $this->user->displayName;
-
-            $CJ = new CisloJednaci();
-            $this->template->Typ_evidence = $this->typ_evidence;
-            $this->template->SouvisejiciDokumenty = null;
-            if ($this->typ_evidence == 'priorace') {
-                // priorace - Nacteni souvisejicicho dokumentu
-                $Souvisejici = new SouvisejiciDokument();
-                $Souvisejici->spojit($reply->id, $document_id);
-                $this->template->SouvisejiciDokumenty = $Souvisejici->souvisejici($reply->id);
-            } else if ($this->typ_evidence == 'sberny_arch') {
-                // sberny arch
-                //$dok_odpoved->poradi = $dok_odpoved->poradi;
-            }
-
-            $this->template->cjednaci = $CJ->nacti($doc->cislo_jednaci_id);
-            $this->template->Dok = $reply;
+            $this->redirect('detail', $id);
         }
 
-        $this->odpoved = true;
-        $this->template->odpoved_na_dokument = true;
-        $this->template->dokument_id = $this->template->Dok->id;
+        try {
+            $doc = new Document($id);
+            $old_doc_model = new Dokument();
+            $reply = $old_doc_model->createReply($doc);
+        } catch (\Exception $e) {
+            $this->flashMessage('Při vytváření odpovědi na dokument došlo k chybě: ' . $e->getMessage(),
+                    'warning');
+            $this->redirect('detail', $id);
+        }
 
-        $this->template->typy_dokumentu = TypDokumentu::vsechnyJakoTabulku();
-
-        $this->template->form_name = 'odpovedForm';
+        $this->flashMessage('Odpověď byla vytvořena.');
+        $this->redirect('detail', ['id' => $reply->id /* , 'upravit' => 'metadata' */]);
     }
 
     public function renderDownload($id, $file)
@@ -936,64 +786,33 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         return $form;
     }
 
-    protected function createComponentOdpovedForm()
-    {
-        $form = $this->createNovyOrOdpovedForm();
-
-        // Task #443 - Vytváření odpovědi umožňuje chybně typ dokumentu "příchozí"
-        $items = $form['dokument_typ_id']->items;
-        $all_types = TypDokumentu::vsechnyJakoTabulku();
-        foreach (array_keys($items) as $id) {
-            if ($all_types[$id]->smer == 0)
-                unset($items[$id]); // odstraň příchozí typy dokumentu ze seznamu
-        }
-        $form['dokument_typ_id']->setItems($items);
-
-        return $form;
-    }
-
+    /**
+     * Pozůstatek z minulých verzí aplikace, kdy existoval formulář pro vytváření odpovědi
+     * a převážná část byla stejná jako u formuláře nového dokumentu.
+     * @return \Spisovka\Form
+     * @throws \Exception
+     */
     protected function createNovyOrOdpovedForm()
     {
-        $dok = null;
-        if (isset($this->template->Dok)) {
-            $dokument_id = isset($this->template->Dok->id) ? $this->template->Dok->id : 0;
-            $dok = $this->template->Dok;
-        } else {
-            $dokument_id = 0;
-        }
-
         $povolene_typy_dokumentu = TypDokumentu::dostupneUzivateli();
 
         $zpusob_doruceni = Dokument::zpusobDoruceni(2);
 
         $form = new Form();
-        $form->addHidden('id')
-                ->setValue($dokument_id);
-        $form->addHidden('odpoved')
-                ->setValue($this->odpoved === true ? 1 : 0);
+        $form->addHidden('id');
 
-        $form->addText('nazev', 'Věc:', 80, 250)
-                ->setValue(@$dok->nazev);
+        $form->addText('nazev', 'Věc:', 80, 250);
+
         if (!$this->user->inheritsFromRole('podatelna')) {
             $form['nazev']->addRule(Nette\Forms\Form::FILLED,
                     'Název dokumentu (věc) musí být vyplněno!');
         }
 
-        $form->addTextArea('popis', 'Popis:', 80, 3)
-                ->setValue(@$dok->popis);
+        $form->addTextArea('popis', 'Popis:', 80, 3);
 
         $form->addSelect('dokument_typ_id', 'Typ dokumentu:', $povolene_typy_dokumentu);
-        try {
-            // TODO - problém, pokud je $dok entita a ne pole vrácené metodou getInfo(),
-            // tak pole "typ_dokumentu" není definované a dojde k výjimce
-            $form['dokument_typ_id']->setValue(@$dok->typ_dokumentu->id);
-        } catch (\Exception $e) {
-            $e->getMessage();
-            // ignoruj chybu - uživatel má chybně nastavený číselník
-        }
 
-        $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50)
-                ->setValue(@$dok->cislo_jednaci_odesilatele);
+        $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
 
         $datum = date('d.m.Y');
         $cas = date('H:i:s');
@@ -1005,8 +824,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $form->addSelect('zpusob_doruceni_id', 'Způsob doručení:', $zpusob_doruceni);
 
-        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50)
-                ->setValue(@$dok->cislo_doporuceneho_dopisu);
+        $form->addText('cislo_doporuceneho_dopisu', 'Číslo doporučeného dopisu:', 50, 50);
 
         $form->addText('pocet_listu', 'Počet listů:', 5, 10)
                 ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
@@ -1015,6 +833,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 ->addCondition(Nette\Forms\Form::FILLED)->addRule(Nette\Forms\Form::NUMERIC,
                 'Počet musí být číslo.');
         $form->addText('nelistinne_prilohy', 'Počet a druh příloh v nelistinné podobě:', 20, 50);
+
+
+        if (isset($this->template->Dok)) {
+            $dok = $this->template->Dok;
+            $form['id']->setValue($dok->id);
+            $form['nazev']->setValue($dok->nazev);
+            $form['popis']->setValue($dok->popis);
+            $form['cislo_jednaci_odesilatele']->setValue($dok->cislo_jednaci_odesilatele);
+            $form['cislo_doporuceneho_dopisu']->setValue($dok->cislo_doporuceneho_dopisu);
+            if (in_array($dok->dokument_typ_id, $povolene_typy_dokumentu))
+                $form['dokument_typ_id']->setValue($dok->dokument_typ_id);
+        }
 
 
         $form->addSubmit('novy', 'Vytvořit dokument');
@@ -1049,7 +879,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             dibi::begin();
 
             // Poznamka: c.j. se v pripade noveho dokumentu generuje az na pokyn uzivatele
-            // a u odpovedi jsou sloupce c.j. vyplneny uz pri vytvareni odpovedi
             $dd = clone $data; // document data
             unset($dd['id'], $dd['odpoved'], $dd['predano_user'], $dd['predano_org'],
                     $dd['predani_poznamka']);
@@ -1067,47 +896,29 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $this->redirect('default');
         }
 
-        if ($data['odpoved'] == 1) {
-            $this->flashMessage('Odpověď byla vytvořena.');
+        $this->flashMessage('Dokument byl vytvořen.');
 
-            // ID dokumentu, na který vytváříme odpověď, je v URL
+        if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
+            /* Predat dokument. Musime osetrit vstup z formulare! */
+            if (empty($data['predano_user']))
+                $data['predano_user'] = null;
+            if (empty($data['predano_org']))
+                $data['predano_org'] = null;
             try {
-                $orig_id = $this->getParameter('id');
-                $orig = new Document($orig_id);
-                if ($spis = $orig->getSpis()) {
-                    // zařaď odpověď do stejného spisu
-                    $doc->insertIntoSpis($spis);
-                }
-            } catch (\Exception $e) {
-                $this->flashMessage('Zařazení odpovědi do spisu se nepodařilo.', 'warning');
+                $doc->forward($data['predano_user'], $data['predano_org'],
+                        $data['predani_poznamka']);
+                $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
+            } catch (Exception $e) {
+                $this->flashMessage('Předání dokumentu se nepodařilo.', 'warning');
+                $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
             }
-
-            $this->forward('kvyrizeni', array('id' => $dokument_id));
-        } else {
-            $this->flashMessage('Dokument byl vytvořen.');
-
-            if (!empty($data['predano_user']) || !empty($data['predano_org'])) {
-                /* Predat dokument. Musime osetrit vstup z formulare! */
-                if (empty($data['predano_user']))
-                    $data['predano_user'] = null;
-                if (empty($data['predano_org']))
-                    $data['predano_org'] = null;
-                try {
-                    $doc->forward($data['predano_user'], $data['predano_org'],
-                            $data['predani_poznamka']);
-                    $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
-                } catch (Exception $e) {
-                    $this->flashMessage('Předání dokumentu se nepodařilo.', 'warning');
-                    $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
-                }
-            }
-
-            $name = $button->getName();
-            if ($name == "novy_pridat")
-                $this->redirect('novy');
-            else
-                $this->redirect('detail', array('id' => $dokument_id));
         }
+
+        $name = $button->getName();
+        if ($name == "novy_pridat")
+            $this->redirect('novy');
+        else
+            $this->redirect('detail', $dokument_id);
     }
 
     public function stornoClicked(Nette\Forms\Controls\SubmitButton $button)

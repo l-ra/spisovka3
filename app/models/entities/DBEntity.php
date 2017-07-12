@@ -147,7 +147,7 @@ abstract class DBEntity implements \IteratorAggregate
      */
     public function modify($data)
     {
-        if (!is_array($data) && !($data instanceof ArrayAccess))
+        if (!is_array($data) && !($data instanceof \ArrayAccess))
             throw new \InvalidArgumentException(__METHOD__ . "() - invalid argument");
 
         foreach ($data as $key => $value)

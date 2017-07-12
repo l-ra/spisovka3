@@ -252,17 +252,17 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $d['lhuta'] = $data['lhuta'];
 
             $model = new Dokument();
-            $dokument_id = $model->vytvorit($d);
-            $document = new Document($dokument_id);
+            $document = $model->create($d);
+            $doc_id = $document->id;
 
             $Log = new LogModel();
-            $Log->logDocument($dokument_id, LogModel::DOK_NOVY);
+            $Log->logDocument($doc_id, LogModel::DOK_NOVY);
 
             // Ulozeni souboru
             if ($zprava->typ == 'E') {
-                $this->evidujEmailSoubory($zprava->id, $dokument_id);
+                $this->evidujEmailSoubory($zprava->id, $doc_id);
             } else if ($zprava->typ == 'I') {
-                $this->evidujIsdsSoubory($zprava->id, $dokument_id);
+                $this->evidujIsdsSoubory($zprava->id, $doc_id);
             }
 
             // Pripojeni subjektu
@@ -279,7 +279,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
 
             // Pridani informaci do epodatelny
-            $zprava->dokument_id = $dokument_id;
+            $zprava->dokument_id = $doc_id;
             $zprava->stav = 10;
             $zprava->stav_info = 'Zpráva přidána do spisové služby jako ' . $document->jid;
             $zprava->save();
@@ -290,9 +290,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->flashMessage('Dokument byl vytvořen.');
 
             if (!empty($predani['user']) || !empty($predani['org'])) {
-                /* Dokument predan */
-                $doc = new Document($dokument_id);
-                $doc->forward($predani['user'], $predani['org'], $predani['poznamka']);
+                $document->forward($predani['user'], $predani['org'], $predani['poznamka']);
                 $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
 
                 if (!empty($predani['user'])) {

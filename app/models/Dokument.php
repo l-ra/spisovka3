@@ -1130,23 +1130,28 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         return ($row) ? ($row->id + 1) : 1;
     }
 
+    /**
+     * Nalezeni nejvyssiho cisla poradi v ramci sběrného archu. U priorace se používá při vytváření odpovědi.
+     * @param int $cjednaci
+     * @return int vrací maximální pořadí plus 1 nebo 1
+     */
     public function getMaxPoradi($cjednaci)
     {
         if (empty($cjednaci))
             return 1;
 
-        $result = $this->select(array(array('cislo_jednaci_id=%i', $cjednaci)),
-                array('poradi' => 'DESC'), null, 1);
+        $result = $this->select([['cislo_jednaci_id = %i', $cjednaci]], ['poradi' => 'DESC'],
+                null, 1);
         $row = $result->fetch();
-        return ($row) ? ($row->poradi + 1) : 1;
+        return $row ? $row->poradi + 1 : 1;
     }
 
     /**
      * 
-     * @param type $data
-     * @return int ID
+     * @param array $data
+     * @return Document 
      */
-    public function vytvorit($data)
+    public function create($data)
     {
         // [P.L.] 2015-09-17  Tuto vetev kodu uz jsem nemel cas prepsat
         //     ale toto snad nenapacha tolik skody jako byvaly kod
@@ -1220,7 +1225,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         $document->jid = "OSS-{$app_id}-ESS-{$document->id}";
         $document->save();
 
-        return $document->id;
+        return $document;
     }
 
     public function odstranit_rozepsane()
@@ -1357,6 +1362,112 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         // takto to bylo ve starem systemu
         // return ACL::isInRole('admin,podatelna,skartacni_dohled'); 
         return self::getUser()->isAllowed('Dokument', 'cist_vse');
+    }
+
+    /**
+     * @param \Spisovka\User $user
+     * @return \Spisovka\Document
+     */
+    public function createEmpty(User $user)
+    {
+        $dokument_typ_id = $user->inheritsFromRole('podatelna') ? 1 : 2;
+        $priprava = [
+            "nazev" => "",
+            "popis" => "",
+            "stav" => 0,
+            "dokument_typ_id" => $dokument_typ_id,
+            "zpusob_doruceni_id" => null,
+            "zpusob_vyrizeni_id" => null,
+            "spousteci_udalost_id" => null,
+            "cislo_jednaci_odesilatele" => "",
+            "datum_vzniku" => date('Y-m-d H:i:s'),
+            "lhuta" => 30,
+        ];
+
+        return $this->create($priprava);
+    }
+
+    /**
+     * @param \Spisovka\Document $doc  Dokument, na který má být vytvořena odpověď
+     * @return \Spisovka\Document  Odpověď na dokument
+     */
+    public function createReply(Document $doc)
+    {
+        $lock = new Lock('general');
+        $lock = $lock;
+        dibi::begin();
+
+        try {
+            if ($doc->doesReplyExist())
+                throw new \Exception('Odpověď nebylo možné vytvořit, protože již existuje.');
+
+            $attachment_model = new DokumentPrilohy();
+            $subject_model = new DokumentSubjekt();
+            $souvisejici_model = new SouvisejiciDokument();
+
+            $poradi = $this->getMaxPoradi($doc->cislo_jednaci_id);
+
+            $priprava = array(
+                "nazev" => $doc->nazev,
+                "popis" => $doc->popis,
+                "stav" => 1,
+                "dokument_typ_id" => 2,
+                "zpusob_doruceni_id" => null,
+                "cislo_jednaci_id" => $doc->cislo_jednaci_id,
+                "cislo_jednaci" => $doc->cislo_jednaci,
+                "podaci_denik" => $doc->podaci_denik,
+                "podaci_denik_poradi" => $doc->podaci_denik_poradi,
+                "podaci_denik_rok" => $doc->podaci_denik_rok,
+                "poradi" => $poradi,
+                "cislo_jednaci_odesilatele" => $doc->cislo_jednaci_odesilatele,
+                "datum_vzniku" => date('Y-m-d H:i:s'),
+                "lhuta" => 30,
+                "poznamka" => $doc->poznamka,
+                "spisovy_znak_id" => $doc->spisovy_znak_id,
+                "skartacni_znak" => $doc->skartacni_znak,
+                "skartacni_lhuta" => $doc->skartacni_lhuta,
+                "spousteci_udalost_id" => $doc->spousteci_udalost_id
+            );
+            $reply = $this->create($priprava);
+
+            // kopirovani subjektu
+            $subjekty_old = $doc->getSubjects();
+            if ($subjekty_old)
+                foreach ($subjekty_old as $subjekt) {
+                    $rezim = $subjekt->rezim_subjektu;
+                    if ($rezim == 'O')
+                        $rezim = 'A';
+                    else if ($rezim == 'A')
+                        $rezim = 'O';
+                    $subject_model->pripojit($reply, new Subject($subjekt->id), $rezim);
+                }
+
+            // kopirovani priloh
+            $prilohy_old = $attachment_model->prilohy($doc->id);
+            if (count($prilohy_old))
+                foreach ($prilohy_old as $priloha)
+                    $attachment_model->pripojit($reply->id, $priloha->id);
+
+            $client_config = GlobalVariables::get('client_config');
+            if ($client_config->cislo_jednaci->typ_evidence == 'priorace')
+                $souvisejici_model->spojit($reply->id, $doc->id);
+
+            // zařaď odpověď do stejného spisu
+            if ($spis = $doc->getSpis())
+                $reply->insertIntoSpis($spis);
+            
+            // označ odpověď k vyřízení
+            $workflow = new DocumentWorkflow($reply->id);
+            $workflow->markForProcessing();
+            
+            dibi::commit();
+
+            return $reply;
+        } catch (\Exception $e) {
+            dibi::rollback();
+            // lock se odemkne automaticky
+            throw $e;
+        }
     }
 
 }
