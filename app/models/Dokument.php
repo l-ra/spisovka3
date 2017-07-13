@@ -1365,6 +1365,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
     }
 
     /**
+     * Vytvoří čistý rozpracovaný dokument.
      * @param \Spisovka\User $user
      * @return \Spisovka\Document
      */
@@ -1455,11 +1456,15 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             // zařaď odpověď do stejného spisu
             if ($spis = $doc->getSpis())
                 $reply->insertIntoSpis($spis);
-            
+
+            // nezapomenout na zápis do protokolu, označení k vyřízení tam zapíše také
+            $Log = new LogModel();
+            $Log->logDocument($reply->id, LogModel::DOK_NOVY);
+
             // označ odpověď k vyřízení
             $workflow = new DocumentWorkflow($reply->id);
             $workflow->markForProcessing();
-            
+
             dibi::commit();
 
             return $reply;
