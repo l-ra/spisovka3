@@ -2,6 +2,20 @@
  Historie změn OSS Spisové služby v3
 ================================================================================
 
+=== Verze 3.5.1 ================================================================
+
+Nové funkce:
+
+Jiné změny:
+
+  
+Opravy:
+
+- proces vytváření odpovědi na dokument byl změněn do jednoho nedělitelného
+  kroku. To zamezí problémům způsobených chybnou obsluhou aplikace, kdy v minu-
+  losti uživatel omylem místo nového dokumentu mohl vytvořit odpověď na jiný
+  dokument.
+
 === Verze 3.5.0 ================================================================
 
 Nové funkce:
