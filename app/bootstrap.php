@@ -202,6 +202,11 @@ function createIniFiles()
         migrateSystemIni();
 }
 
+/**
+ * Aktuálně použito už jen pro soubor klient.ini.
+ * @param string $filename
+ * @throws \Exception
+ */
 function createIniFile($filename)
 {
     if (file_exists($filename))
@@ -211,7 +216,9 @@ function createIniFile($filename)
     if (!copy($template, $filename))
         throw new \Exception("Nemohu vytvorit soubor $filename.");
 
-    $perm = 0640;
+    // na hostingu potřebujeme občas přistupovat k tomuto souboru vně PHP aplikace, proto je zde
+    // povoleno čtení pro všechny uživatele (vlastníkem souboru je webový server)
+    $perm = 0644;
     @chmod($filename, $perm);
 }
 
