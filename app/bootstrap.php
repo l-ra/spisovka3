@@ -4,17 +4,15 @@ use Tracy\Debugger;
 use Spisovka\GlobalVariables;
 use Spisovka\Settings;
 
-if (!defined('KLIENT')) {
-    echo "<h1>Chyba konfigurace. Nebyla nastavena konstanta KLIENT.</h1>";
-    exit;
-}
-
 if (file_exists(APP_DIR . "/configs/servicemode")) {
     readfile(APP_DIR . "/configs/servicemode");
     exit;
 }
 
 try {
+    // Chybové zprávy v bootstrapu jsou v UTF-8. Nette později nastaví UTF-8 automaticky.
+    @ini_set('default_charset', 'utf-8');
+
     /**
      * Nastav konstantu CLIENT_DIR
      */
@@ -37,12 +35,12 @@ try {
      */
     define('TEMP_DIR', CLIENT_DIR . '/temp');
     if (file_put_contents(TEMP_DIR . '/_check', '') === FALSE) {
-        throw new \Exception("Nelze zapisovat do adresare '" . TEMP_DIR . "'");
+        throw new \Exception("Nelze zapisovat do adresáře '" . TEMP_DIR . "'");
     }
 
     $session_dir = CLIENT_DIR . '/sessions';
     if (file_put_contents("$session_dir/_check", '') === FALSE) {
-        throw new \Exception("Nelze zapisovat do adresare '$session_dir'");
+        throw new \Exception("Nelze zapisovat do adresáře '$session_dir'");
     }
 
     /**
@@ -120,7 +118,7 @@ try {
 
         dibi::getSubstitutes()->{'PREFIX'} = null;
     } catch (DibiDriverException $e) {
-        echo 'Aplikaci se nepodarilo pripojit do databaze.<br>';
+        echo 'Aplikaci se nepodařilo připojit do databáze.<br>';
         throw $e;
     }
 
@@ -141,6 +139,9 @@ try {
     /**
      *  konfigurace spisovky
      */
+    if (!defined('KLIENT'))
+        throw new Exception("Chyba konfigurace. V index.php nebyla nastavena konstanta KLIENT.");
+
     GlobalVariables::set('client_config', (new Spisovka\ConfigClient())->get());
 
     checkInstallationFile();
@@ -165,7 +166,7 @@ try {
         $upgrade->check();
     }
 } catch (Exception $e) {
-    echo 'Behem inicializace aplikace doslo k vyjimce. Podrobnejsi informace lze nalezt v aplikacnim logu.<br>'
+    echo 'Během inicializace aplikace došlo k výjimce. Podrobnější informace lze nalézt v aplikačním logu.<br>'
     . 'Podrobnosti: ' . $e->getMessage();
     throw $e;
 }
@@ -205,7 +206,7 @@ function createIniFile($filename)
 
     $template = substr($filename, 0, -1);
     if (!copy($template, $filename))
-        throw new \Exception("Nemohu vytvorit soubor $filename.");
+        throw new \Exception("Nemohu vytvořit soubor $filename.");
 
     // na hostingu potřebujeme občas přistupovat k tomuto souboru vně PHP aplikace, proto je zde
     // povoleno čtení pro všechny uživatele (vlastníkem souboru je webový server)
