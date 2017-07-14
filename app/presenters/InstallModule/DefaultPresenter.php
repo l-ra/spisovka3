@@ -9,7 +9,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function startup()
     {
-        if (!defined('APPLICATION_INSTALL') && $this->action != "kontrola")
+        if (APPLICATION_INSTALLED && $this->action != "kontrola")
             $this->setView('instalovano');
 
         parent::startup();
@@ -43,8 +43,7 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderKontrola()
     {
-        $installed = !defined('APPLICATION_INSTALL');
-        $this->template->installed = $installed;
+        $this->template->installed = APPLICATION_INSTALLED;
 
         $this->template->errors = FALSE;
         $this->template->warnings = FALSE;
@@ -543,17 +542,13 @@ class Install_DefaultPresenter extends BasePresenter
 
     public function renderKonec()
     {
-        $install_file = CLIENT_DIR . '/configs/install';
-        if (!file_exists($install_file)) {
+        if (!Settings::get('installation_completed')) {
+            Settings::set('installation_completed', true);
+            Settings::set('installation_date', date(DATE_ATOM));
             $zerotime = mktime(0, 0, 0, 8, 20, 2008);
             $diff = time() - $zerotime;
             $diff = round($diff / 3600);
-            $unique_signature = $diff . "#" . time();
-
-            if ($fp = fopen($install_file, 'wb')) {
-                fwrite($fp, $unique_signature, strlen($unique_signature));
-                fclose($fp);
-            }
+            Settings::set('app_id', $diff);
         }
     }
 

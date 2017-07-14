@@ -1221,7 +1221,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
 
         $document = Document::create($data);
 
-        $app_id = GlobalVariables::get('app_id');
+        $app_id = Settings::get('app_id');
         $document->jid = "OSS-{$app_id}-ESS-{$document->id}";
         $document->save();
 

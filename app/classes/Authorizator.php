@@ -11,7 +11,7 @@ class Authorizator extends Nette\Security\Permission
     {
         // Při instalaci aplikace ještě data v databázi neexistují,
         // musíme vrátit výchozí (prázdný) authorizator
-        if (defined('APPLICATION_INSTALL'))
+        if (!APPLICATION_INSTALLED)
             return;
 
         // roles

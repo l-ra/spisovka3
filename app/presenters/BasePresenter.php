@@ -20,7 +20,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     public function startup()
     {
-        if (defined('APPLICATION_INSTALL')) {
+        if (!APPLICATION_INSTALLED) {
             if (strncmp($this->name, 'Install', 7) != 0)
                 $this->redirect(':Install:Default:default');
         }
@@ -120,7 +120,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         /**
          * Nastaveni layoutu podle modulu
          */
-        if ($this->template->module == 'Install' && $this->view == 'kontrola' && !defined('APPLICATION_INSTALL'))
+        if ($this->template->module == 'Install' && $this->view == 'kontrola' && APPLICATION_INSTALLED)
             $this->template->module = 'Admin';   // specialni pripad
 
         if ($this->name == "Spisovka:Uzivatel" && $this->view == "login")

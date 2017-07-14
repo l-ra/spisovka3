@@ -73,7 +73,7 @@ try {
     register_shutdown_function(array('Spisovka\ShutdownHandler', '_handler'));
     if (function_exists('mb_internal_encoding'))
         mb_internal_encoding("UTF-8");
-    
+
     /**
      *  vytvor DI kontejner
      */
@@ -93,36 +93,6 @@ try {
         $configurator->addConfig(CLIENT_DIR . '/configs/system.neon');
 
     $container = $configurator->createContainer();
-
-    /**
-     *  zjisti public URL
-     */
-    $http_request = $container->getByType('Nette\Http\IRequest');
-    $public_url = $container->parameters['public_url'];
-    if ($public_url) {
-        if ($http_request->isSecured())
-        // dynamicky uprav protokol v nastaveni PUBLIC_URL
-            $public_url = str_replace('http:', 'https:', $public_url);
-    } else
-        $public_url = $http_request->getUrl()->getBasePath() . 'public/';
-    GlobalVariables::set('publicUrl', $public_url);
-
-
-    /**
-     *  konfigurace spisovky
-     */
-    GlobalVariables::set('client_config', (new Spisovka\ConfigClient())->get());
-
-    $install_info = @file_get_contents(CLIENT_DIR . '/configs/install');
-    if ($install_info === FALSE) {
-        define('APPLICATION_INSTALL', 1);
-        @ini_set('memory_limit', '128M');
-    } else {
-        $app_id = substr($install_info, 0, strpos($install_info, '#'));
-        GlobalVariables::set('app_id', $app_id);
-    }
-
-    setupPdfExport();
 
     /**
      * Připoj se do databáze a v debug módu definuj Tracy panel.
@@ -155,9 +125,30 @@ try {
     }
 
     /**
-     * Konfiguruj e-podatelnu - musí být provedeno po připojení do databáze
+     *  zjisti public URL
      */
-    if (!defined('APPLICATION_INSTALL'))
+    $http_request = $container->getByType('Nette\Http\IRequest');
+    $public_url = $container->parameters['public_url'];
+    if ($public_url) {
+        if ($http_request->isSecured())
+        // dynamicky uprav protokol v nastaveni PUBLIC_URL
+            $public_url = str_replace('http:', 'https:', $public_url);
+    } else
+        $public_url = $http_request->getUrl()->getBasePath() . 'public/';
+    GlobalVariables::set('publicUrl', $public_url);
+
+
+    /**
+     *  konfigurace spisovky
+     */
+    GlobalVariables::set('client_config', (new Spisovka\ConfigClient())->get());
+
+    checkInstallationFile();
+
+    setupPdfExport();
+
+    // Konfiguruj e-podatelnu - musí být provedeno po vytvoření tabulek v databázi
+    if (APPLICATION_INSTALLED)
         createEpodatelnaConfig();
 
     /**
@@ -165,18 +156,18 @@ try {
      */
     $router = $container->getByType('Nette\Application\IRouter');
     setupRouting($http_request, $router);
+
+    /**
+     *  Je-li potřeba, proveď upgrade aplikace
+     */
+    if (APPLICATION_INSTALLED) {
+        $upgrade = new Spisovka\Upgrade();
+        $upgrade->check();
+    }
 } catch (Exception $e) {
     echo 'Behem inicializace aplikace doslo k vyjimce. Podrobnejsi informace lze nalezt v aplikacnim logu.<br>'
     . 'Podrobnosti: ' . $e->getMessage();
     throw $e;
-}
-
-/**
- *  Je-li potřeba, proveď upgrade aplikace
- */
-if (!defined('APPLICATION_INSTALL')) {
-    $upgrade = new Spisovka\Upgrade();
-    $upgrade->check();
 }
 
 /**
@@ -293,7 +284,7 @@ function setupRouting(Nette\Http\IRequest $httpRequest, Nette\Application\IRoute
 {
     $force_https = false;
     try {
-        // Nasledujici prikaz funguje az pote, co je provedena instalace
+        // Nasledujici prikaz funguje az pote, co je vytvorena db struktura
         $force_https = Settings::get('router_force_https', false);
     } catch (DibiException $e) {
         // ignoruj
@@ -393,4 +384,30 @@ function setupRouting(Nette\Http\IRequest $httpRequest, Nette\Application\IRoute
         'action' => 'detail',
         'id' => NULL,
     ));
+}
+
+function checkInstallationFile()
+{
+    $lock = new Spisovka\Lock('general');
+    $lock = $lock;
+
+    $installation_file = CLIENT_DIR . '/configs/install';
+    if (is_file($installation_file)) {
+        // proved presun informaci
+        Settings::set('installation_completed', true);
+        $s = file_get_contents($installation_file);
+        $app_id = substr($s, 0, strpos($s, '#'));
+        $installation_date = substr($s, strpos($s, '#') + 1);
+        Settings::set('app_id', $app_id);
+        Settings::set('installation_date', date(DATE_ATOM, $installation_date));
+        unlink($installation_file);
+    }
+
+    $installed = false;
+    try {
+        $installed = Settings::get('installation_completed', false);
+    } catch (Exception $ex) {
+        
+    }
+    define('APPLICATION_INSTALLED', $installed);
 }

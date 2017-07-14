@@ -17,7 +17,7 @@ class SurveyAgent
 
         // je to ID instalace, bohuzel neni moc jedinecne
         // pokud jsou dve spisovky instalovany behem hodiny, budou mit stejne toto ID
-        $app_id = GlobalVariables::get('app_id');
+        $app_id = Settings::get('app_id');
 
         $zprava = "id={$app_id}\n" .
                 "zkratka={$klient_info->zkratka}\n" .
