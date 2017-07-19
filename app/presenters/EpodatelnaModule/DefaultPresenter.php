@@ -114,9 +114,25 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
     }
 
-    public function renderOdetail($id)
+    public function renderOdetail($id, $doruceni = false)
     {
         $this->renderDetail($id);
+        
+        // workaround, dokud se nepředělá kód zobrazení metadat datové zprávy
+        // odstraň z výpisu nepravdivé/zavádějící informace
+        $popis = $this->template->Zprava->popis;
+        $this->template->Zprava->popis = preg_replace('/Status.*Přibl/s', 'Přibl', $popis);
+        
+        if ($doruceni)
+            try {
+                $msg = new EpodatelnaMessage($id);
+                $isds = new ISDS_Spisovka();
+                $delivery = $isds->GetDeliveryInfo($msg->isds_id);
+                $this->template->delivery = $delivery;
+            } catch (\Exception $e) {
+                $this->flashMessage('Při zjišťování doručení došlo k chybě.', 'warning');
+                $this->flashMessage($e->getMessage());
+            }
     }
 
     public function renderZkontrolovat()
@@ -373,7 +389,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $dt_dodani = strtotime($mess->dmDeliveryTime);
                         $popis .= "Datum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
                         if ($mess->dmAcceptanceTime)
-                            $dt_doruceni = date("j.n.Y G:i:s", strtotime($mess->dmAcceptanceTime));
+                            $dt_doruceni = date("j.n.Y G:i:s",
+                                    strtotime($mess->dmAcceptanceTime));
                         else
                             $dt_doruceni = 'nebyla doručena';
                         $popis .= "Datum a čas doručení : $dt_doruceni\n";
@@ -424,10 +441,9 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             $file_signed = $UploadFile->uploadEpodatelna($signedmess, $data);
                             if (!$file_signed)
                                 $zprava['stav_info'] = 'Podepsanou zprávu se nepodařilo uložit';
-                        }
-                        else
+                        } else
                             $zprava['stav_info'] = 'Nedoručenou zprávu není možné stáhnout';
-                                
+
                         /* Ulozeni nepodepsane zpravy */
                         $data = array(
                             'filename' => 'ep-isds-' . $epod_id . '.bsr',

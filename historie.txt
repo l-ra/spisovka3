@@ -6,6 +6,9 @@
 
 Nové funkce:
 
+- u odchozích datových zpráv je nyní možné zobrazit informace o dodání/doručení
+
+  
 Jiné změny:
 
   
