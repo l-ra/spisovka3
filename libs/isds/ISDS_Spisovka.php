@@ -210,17 +210,17 @@ class ISDS_Spisovka extends \ISDS
     public static function stavZpravy($dmMessageStatus)
     {
         $typ = array(
-            '0' => 'Nelze zjistit stav zprávy',
+            '0' => 'nelze zjistit stav zprávy',
             '1' => 'zpráva byla podána',
-            '2' => 'hash datové zprávy včetně všech písemnosti označen časovým razítkem',
-            '3' => 'zpráva neprošla AV kontrolou; nakažená písemnost je smazána; konečný stav zprávy',
-            '4' => 'zpráva dodána do ISDS (zapsán čas dodání)',
+            '2' => 'zpráva včetně písemností podepsána podacím časovým razítkem',
+            '3' => 'zpráva neprošla AV kontrolou - zpráva není ani dodána; konečný stav zprávy před smazáním',
+            '4' => 'zpráva dodána do schránky adresáta (zapsán čas dodání), je přístupná adresátovi',
             '5' => 'veřejná zpráva byla doručena fikcí (uplynutím 10 dnů od dodání)',
-            '6' => 'veřejná zpráva byla doručena přihlášením, komerční zpráva pomocí ComfirmDelivery',
-            '7' => 'zpráva byla přečtená (na portále nebo akcí ESS)',
-            '8' => 'zpráva byla označená jako nedoručitelná (DS byla zpětně znepřístupněna)',
-            '9' => 'obsah zprávy byl smazán',
-            '10' => 'zpráva je v Datovém trezoru'
+            '6' => 'osoba (nebo aplikace přihlašující se systémovým certifikátem) oprávněná číst tuto zprávu se přihlásila - dodaná zpráva byla doručena přihlášením',
+            '7' => 'zpráva byla přečtena (na portále nebo akcí ESS)',
+            '8' => 'zpráva byla označena jako nedoručitelná, protože DS adresáta byla zpětně znepřístupněna',
+            '9' => 'obsah zprávy byl smazán, obálka zprávy včetně hashů přesunuta do archivu',
+            '10' => 'zpráva byla přesunuta do Datového trezoru'
         );
 
         if (array_key_exists($dmMessageStatus, $typ)) {
