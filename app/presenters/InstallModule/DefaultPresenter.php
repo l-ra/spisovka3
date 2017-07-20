@@ -636,12 +636,7 @@ class Install_DefaultPresenter extends BasePresenter
         $client_config = GlobalVariables::get('client_config');
         $CJ = $client_config->cislo_jednaci;
 
-        $evidence = array("priorace" => "Priorace", "sberny_arch" => "Sběrný arch");
-
         $form1 = new Form();
-        $form1->addRadioList('typ_evidence', 'Typ evidence:', $evidence)
-                ->setValue($CJ->typ_evidence)
-                ->addRule(Nette\Forms\Form::FILLED, 'Volba evidence musí být vybrána.');
         $form1->addText('maska', 'Maska:', 50, 100)
                 ->setValue($CJ->maska)
                 ->addRule(Nette\Forms\Form::FILLED, 'Maska čísla jednacího musí být vyplněna.');
@@ -661,7 +656,7 @@ class Install_DefaultPresenter extends BasePresenter
         $config_data = (new ConfigClient())->get();
 
         $config_data['cislo_jednaci']['maska'] = $data['maska'];
-        $config_data['cislo_jednaci']['typ_evidence'] = $data['typ_evidence'];
+        $config_data['cislo_jednaci']['typ_evidence'] = 'priorace';
         $config_data['cislo_jednaci']['pocatek_cisla'] = $data['pocatek_cisla'];
 
         try {
