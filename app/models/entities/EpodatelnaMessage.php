@@ -8,6 +8,47 @@ class EpodatelnaMessage extends DBEntity
     const TBL_NAME = 'epodatelna';
 
     /**
+     * @param int $id
+     * @return \self|\Spisovka\IsdsMessage
+     * @throws \Exception
+     */
+    public static function factory($id)
+    {
+        $result = dibi::query('SELECT [typ] FROM %n WHERE [id] = %i', self::TBL_NAME, $id);
+        if (!count($result))
+            throw new \Exception(__METHOD__ . "() - zpráva ID $id neexistuje");
+
+        $typ = $result->fetchSingle();
+        if ($typ == 'E')
+            return new EmailMessage($id);
+        if ($typ == 'I')
+            return new IsdsMessage($id);
+
+        throw new \Exception(__METHOD__ . "() - neplatný typ zprávy ID $id");
+    }
+
+    /**
+     * Vrátí (příchozí) zprávu, ze které byl dokument vytvořen.
+     * @param Document $doc
+     * @throws \Exception
+     */
+    public static function fromDocument(Document $doc)
+    {
+        $res = dibi::query("SELECT [id] FROM %n WHERE [dokument_id] = %i AND NOT [odchozi]",
+                        self::TBL_NAME, $doc->id);
+        if (count($res) != 1)
+            throw new \Exception("Nemohu nalézt zprávu, ze které byl dokument ID {$doc->id} vytvořen.");
+
+        $id = $res->fetchSingle();
+        return self::factory($id);
+    }
+
+}
+
+class EmailMessage extends EpodatelnaMessage
+{
+
+    /**
      *  Vrátí odkaz na soubor s e-mailem.
      * @param Storage_Basic $storage
      * @return string  filename
@@ -16,17 +57,22 @@ class EpodatelnaMessage extends DBEntity
     {
         if ($this->typ != 'E')
             throw new \LogicException(__METHOD__);
-        
+
         if (!$this->file_id)
             return null;
-        
+
         $FileModel = new FileModel();
         $file = $FileModel->getInfo($this->file_id);
         $path = $storage->getFilePath($file);
 
         return $path;
     }
-    
+
+}
+
+class IsdsMessage extends EpodatelnaMessage
+{
+
     /**
      * Vrátí soubor se serializovaným objektem s informacemi o zprávě.
      * @param Storage_Basic $storage
@@ -39,14 +85,14 @@ class EpodatelnaMessage extends DBEntity
 
         if (!$this->file_id)
             return null;
-        
+
         $FileModel = new FileModel();
         $file = $FileModel->getInfo($this->file_id);
         $path = $storage->getFilePath($file);
 
         return $path;
     }
-    
+
     /**
      * @return boolean
      * @throws LogicException
@@ -55,12 +101,12 @@ class EpodatelnaMessage extends DBEntity
     {
         if ($this->typ != 'I')
             throw new \LogicException(__METHOD__);
-        
+
         $FileModel = new FileModel();
         $file = $FileModel->select([["nazev = %s", "ep-isds-{$this->id}.zfo"]])->fetch();
-        return (boolean)$file;
+        return (boolean) $file;
     }
-    
+
     /**
      * @param Storage_Basic $storage
      * @param boolean $download  Download file or return it?
@@ -70,29 +116,23 @@ class EpodatelnaMessage extends DBEntity
     {
         if ($this->typ != 'I')
             throw new \LogicException(__METHOD__);
-        
+
         $FileModel = new FileModel();
         $file = $FileModel->select([["nazev = %s", "ep-isds-{$this->id}.zfo"]])->fetch();
         if (!$file)
             return null;
-        
+
         $zfo = $storage->download($file->id, !$download);
-        return $zfo;        
+        return $zfo;
     }
-    
+
     /**
-     * Vrátí (příchozí) zprávu, ze které byl dokument vytvořen.
-     * @param Document $doc
-     * @throws \Exception
+     * 
+     * @return string  plain text
      */
-    public static function fromDocument(Document $doc)
+    public function formatEnvelope()
     {
-        $res = dibi::query("SELECT [id] FROM %n WHERE [dokument_id] = %i AND NOT [odchozi]",
-                self::TBL_NAME, $doc->id);
-        if (count($res) != 1)
-            throw new \Exception("Nemohu nalézt zprávu, ze které byl dokument ID {$doc->id} vytvořen.");
-            
-        $id = $res->fetchSingle();
-        return new static($id);
+        
     }
+
 }

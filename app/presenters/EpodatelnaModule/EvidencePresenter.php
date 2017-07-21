@@ -28,7 +28,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function renderNovy($id)
     {
-        $zprava = new EpodatelnaMessage($id);
+        $zprava = EpodatelnaMessage::factory($id);
         $this->template->Zprava = $zprava;
 
         try {
@@ -78,7 +78,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function renderOdmitnout($id)
     {
-        $zprava = new EpodatelnaMessage($id);
+        $zprava = EpodatelnaMessage::factory($id);
         $this->template->Zprava = $zprava;
     }
 
@@ -214,7 +214,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function evidovat($data)
     {
-        $zprava = new EpodatelnaMessage($data['message_id']);
+        $zprava = EpodatelnaMessage::factory($data['message_id']);
         $this->assertMessageNotProcessed($zprava);
 
         if (isset($data['datum_vzniku']))
@@ -333,7 +333,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $DokumentFile = new DokumentPrilohy();
 
         // nahrani originalu
-        $info = new EpodatelnaMessage($epodatelna_id);
+        $info = EpodatelnaMessage::factory($epodatelna_id);
         if (!$info->file_id)
             throw new \Exception('Chybí originál e-mailu, zprávu nelze evidovat.');
 
@@ -354,7 +354,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             unset($email_contents);
         }
 
-        $message = new EpodatelnaMessage($epodatelna_id);
+        $message = new EmailMessage($epodatelna_id);
         $filename = $message->getEmailFile($storage);
 
         $email = new EmailClient($filename);
@@ -405,7 +405,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $DokumentFile = new DokumentPrilohy();
 
-//        $message = new EpodatelnaMessage($epodatelna_id);
+//        $message = EpodatelnaMessage::factory($epodatelna_id);
 //        $zfo = $message->getZfoFile($storage);
 //        
 //                $data = array(

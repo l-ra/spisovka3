@@ -10,7 +10,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
     public function actionDownload($id, $file)
     {
         $file_id = $file;
-        $msg = new EpodatelnaMessage($id);
+        $msg = EpodatelnaMessage::factory($id);
 
         if ($msg->typ == 'E') {
             $path = $msg->getEmailFile($this->storage);
@@ -56,7 +56,7 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
     public function renderAttachments($id)
     {
         $model = new EpodatelnaPrilohy();
-        $attachments = $model->getFileList(new EpodatelnaMessage($id), $this->storage);
+        $attachments = $model->getFileList(EpodatelnaMessage::factory($id), $this->storage);
         $this->sendJson($attachments);
     }
 }

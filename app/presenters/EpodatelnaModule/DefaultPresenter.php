@@ -95,7 +95,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderDetail($id)
     {
-        $zprava = new EpodatelnaMessage($id);
+        $zprava = EpodatelnaMessage::factory($id);
 
         $this->template->Zprava = $zprava;
         $this->template->Prilohy = $zprava->file_id ? EpodatelnaPrilohy::getFileList($zprava,
@@ -117,12 +117,12 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     public function renderOdetail($id, $doruceni = false)
     {
         $this->renderDetail($id);
-        
+
         // workaround, dokud se nepředělá kód zobrazení metadat datové zprávy
         // odstraň z výpisu nepravdivé/zavádějící informace
         $popis = $this->template->Zprava->popis;
         $this->template->Zprava->popis = preg_replace('/Status.*Přibl/s', 'Přibl', $popis);
-        
+
         if ($doruceni)
             try {
                 $msg = new EpodatelnaMessage($id);
@@ -636,7 +636,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     public function renderIsdsOvereni($id)
     {
         $output = "Nemohu najít soubor s datovou zprávou.";
-        $message = new EpodatelnaMessage($id);
+        $message = new IsdsMessage($id);
         $zfo = $message->getZfoFile($this->storage, false);
         if ($zfo) {
             try {
@@ -658,7 +658,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderDownloadDm($id)
     {
-        $message = new EpodatelnaMessage($id);
+        $message = new IsdsMessage($id);
         $result = $message->getZfoFile($this->storage, true);
         if ($result === null)
             echo "Soubor s podepsanou datovou zprávou chybí.";

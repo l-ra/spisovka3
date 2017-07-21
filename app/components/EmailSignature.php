@@ -15,7 +15,7 @@ class EmailSignature extends \Nette\Application\UI\Control
     protected $message;
     protected $storage;
 
-    public function __construct(\Spisovka\EpodatelnaMessage $message, $storage)
+    public function __construct(\Spisovka\EmailMessage $message, $storage)
     {
         parent::__construct();
 

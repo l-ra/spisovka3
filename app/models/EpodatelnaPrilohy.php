@@ -64,7 +64,7 @@ class EpodatelnaPrilohy
      */
     public static function getIsdsFiles($epodatelna_id, $storage)
     {
-        $msg = new EpodatelnaMessage($epodatelna_id);
+        $msg = new IsdsMessage($epodatelna_id);
         $path = $msg->getIsdsFile($storage);
         return self::_getIsdsFiles($path);
     }
