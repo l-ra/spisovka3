@@ -1295,6 +1295,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             ->setDefaultValue($Dok->cislo_jednaci_odesilatele);
                     $form->addText("isds_spis_adres_$sid", 'Spisová značka adresáta:', 50);
 
+                    $form->addText("isds_k_rukam_$sid", 'K rukám:', 50);
+                    
                     $form->addCheckbox("isds_dvr_$sid", 'Do vlastních rukou');
                     $form->addCheckbox("isds_zakazat_fikci_$sid", 'Zakázat doručení fikcí')
                             ->setOption('description', 'platí pouze u OVM')
@@ -1425,6 +1427,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         'isds_spis_odes' => $data['isds_spis_odes_' . $subjekt_id],
                         'isds_cjednaci_adres' => $data['isds_cjednaci_adres_' . $subjekt_id],
                         'isds_spis_adres' => $data['isds_spis_adres_' . $subjekt_id],
+                        'isds_k_rukam' => $data['isds_k_rukam_' . $subjekt_id],
                         'isds_dvr' => $data['isds_dvr_' . $subjekt_id],
                         'isds_zakazat_fikci' => $data['isds_zakazat_fikci_' . $subjekt_id],
                     );
@@ -1644,6 +1647,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 "dmPersonalDelivery" => $data['isds_dvr'],
                 "dmAllowSubstDelivery" => !$data['isds_zakazat_fikci'],
             ];
+
+            if (!empty($data['isds_k_rukam']))
+                $envelope['dmToHands'] = $data['isds_k_rukam'];
+            
             if (!empty($data['isds_cjednaci_odes']))
                 $envelope['dmSenderRefNumber'] = $data['isds_cjednaci_odes'];
             if (!empty($data['isds_spis_odes']))
@@ -1659,7 +1666,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 return false;
             }
 
-            sleep(3);
+            sleep(2); // musíme počkat na doručení do schránky adresáta
+            
             $odchozi_zpravy = $isds->seznamOdeslanychZprav(time() - 3600, time() + 3600);
             if (count($odchozi_zpravy) > 0) {
                 foreach ($odchozi_zpravy as $oz) {
