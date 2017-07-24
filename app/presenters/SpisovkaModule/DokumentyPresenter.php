@@ -1430,7 +1430,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     if (isset($data['isds_heslo_' . $subjekt_id]))
                         $isds_data['isds_heslo'] = $data['isds_heslo_' . $subjekt_id];
 
-                    if ($result = $this->odeslatISDS($adresat, $isds_data, $prilohy)) {
+                    if ($epodatelna_id = $this->odeslatISDS($adresat, $isds_data, $prilohy)) {
                         $Log = new LogModel();
                         $Log->logDocument($dokument_id, LogModel::DOK_ODESLAN,
                                 'Dokument odeslán datovou zprávou na adresu "' . Subjekt::displayName($adresat,
@@ -1438,7 +1438,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         $this->flashMessage('Datová zpráva pro "' . Subjekt::displayName($adresat,
                                         'isds') . '" byla úspěšně odeslána do systému ISDS.');
                         $stav = 2;
-                        if (!is_array($result)) {
+                        if (!$epodatelna_id) {
                             $this->flashMessage('Datovou zprávu pro "' . Subjekt::displayName($adresat,
                                             'isds') . '" se nepodařilo uložit do e-podatelny.',
                                     'warning');
@@ -1456,9 +1456,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         continue;
                     }
 
-                    if (isset($result['epodatelna_id'])) {
-                        $epodatelna_id = $result['epodatelna_id'];
-                    }
                     $zprava_odes = null;
                 } else if ($metoda_odeslani == 3) {
                     // postou
@@ -1622,6 +1619,13 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         );
     }
 
+    /**
+     * 
+     * @param type $adresat
+     * @param type $data
+     * @param type $prilohy
+     * @return int|false
+     */
     protected function odeslatISDS($adresat, $data, $prilohy)
     {
         $id_mess = null;
@@ -1639,9 +1643,9 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 "spisovy_znak" => $data['isds_spis_odes'],
                 "vase_cj" => $data['isds_cjednaci_adres'],
                 "vase_sznak" => $data['isds_spis_adres'],
-                "k_rukam" => $data['isds_dvr'],
+                "k_rukam" => null,
                 "anotace" => $data['isds_predmet'],
-                "do_vlastnich" => ($data['isds_dvr'] == true) ? 1 : 0,
+                "do_vlastnich" => $data['isds_dvr'] ? 1 : 0,
                 "doruceni_fikci" => ($data['isds_fikce'] == true) ? 0 : 1
             );
 

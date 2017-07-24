@@ -131,7 +131,7 @@ class ISDS_Spisovka extends \ISDS
         // Nacteni priloh
         if (!empty($prilohy)) {
             if (count($prilohy) > 0) {
-                $SentOutFiles = new ISDSSentOutFiles();
+                $SentOutFiles = new \ISDSSentOutFiles();
                 foreach ($prilohy as $priloha) {
                     if (empty($priloha->mime_type)) {
                         $mime_type = FileModel::mimeType($priloha->tmp_file);
