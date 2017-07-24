@@ -36,7 +36,7 @@
                 </a></strong>
             </td>
             <td>
-                <strong title="{$ep->popis}"><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->id}">
+                <strong {if $ep->typ == 'E'}title="{$ep->popis}"{/if}><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->id}">
                     {$ep->predmet}
                 </a></strong>
                 <br />

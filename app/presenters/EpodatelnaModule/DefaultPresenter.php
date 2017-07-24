@@ -93,46 +93,53 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->template->seznam = $seznam;
     }
 
-    public function renderDetail($id)
+    public function renderDetail($id, $doruceni = false, $back = null, $dok_id = null)
     {
-        $zprava = EpodatelnaMessage::factory($id);
+        $msg = EpodatelnaMessage::factory($id);
 
-        $this->template->Zprava = $zprava;
-        $this->template->Prilohy = $zprava->file_id ? EpodatelnaPrilohy::getFileList($zprava,
+        $this->template->Zprava = $msg;
+        $this->template->Prilohy = $msg->file_id ? EpodatelnaPrilohy::getFileList($msg,
                         $this->storage) : [];
         $this->template->back = $this->getParameter('back', 'nove');
 
-        if ($zprava->typ == 'E') {
-            $this->addComponent(new Components\EmailSignature($zprava, $this->storage),
-                    'emailSignature');
+        if ($msg instanceof IsdsMessage) {
+            $envelope = $msg->formatEnvelope($this->storage);
+            if ($envelope)
+                $this->template->Zprava->popis = $envelope;
+            else if ($msg->odchozi) {
+                // záložní řešení, takto fungovalo zobrazení datové zprávy dříve
+                // odstraň z výpisu nepravdivé/zavádějící informace
+                $popis = $this->template->Zprava->popis;
+                $this->template->Zprava->popis = preg_replace('/Status.*Přibl/s', 'Přibl',
+                        $popis);
+            }
+
+            if ($doruceni)
+                try {
+                    $msg = $this->template->Zprava; // zpráva načtena už v renderDetail()
+                    $isds = new ISDS_Spisovka();
+                    $delivery = $isds->GetDeliveryInfo($msg->isds_id);
+                    $this->template->delivery = $delivery;
+                } catch (\Exception $e) {
+                    $this->flashMessage('Při zjišťování doručení došlo k chybě.', 'warning');
+                    $this->flashMessage($e->getMessage());
+                }
         }
 
+        if ($msg instanceof EmailMessage)
+            $this->addComponent(new Components\EmailSignature($msg, $this->storage),
+                    'emailSignature');
+
         $this->template->Dokument = null;
-        if (!empty($zprava->dokument_id)) {
+        if (!empty($msg->dokument_id)) {
             $Dokument = new Dokument();
-            $this->template->Dokument = $Dokument->getInfo($zprava->dokument_id);
+            $this->template->Dokument = $Dokument->getInfo($msg->dokument_id);
         }
     }
 
     public function renderOdetail($id, $doruceni = false)
     {
-        $this->renderDetail($id);
-
-        // workaround, dokud se nepředělá kód zobrazení metadat datové zprávy
-        // odstraň z výpisu nepravdivé/zavádějící informace
-        $popis = $this->template->Zprava->popis;
-        $this->template->Zprava->popis = preg_replace('/Status.*Přibl/s', 'Přibl', $popis);
-
-        if ($doruceni)
-            try {
-                $msg = new EpodatelnaMessage($id);
-                $isds = new ISDS_Spisovka();
-                $delivery = $isds->GetDeliveryInfo($msg->isds_id);
-                $this->template->delivery = $delivery;
-            } catch (\Exception $e) {
-                $this->flashMessage('Při zjišťování doručení došlo k chybě.', 'warning');
-                $this->flashMessage($e->getMessage());
-            }
+        $this->renderDetail($id, $doruceni);
     }
 
     public function renderZkontrolovat()
@@ -271,7 +278,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];
                     }
                 } else if ($zprava->typ == 'I') {
-// Nacteni originalu DS
+                    $zprava->popis = '';
+                    // Nacteni originalu DS
                     if (!empty($zprava->file_id)) {
                         $message = $this->storage->download($zprava->file_id, true);
                         $message = unserialize($message);
@@ -352,58 +360,14 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             $mess->dmAttachmentSize = $z->dmAttachmentSize;
                         }
 
-                        $annotation = empty($mess->dmDm->dmAnnotation) ? "(Datová zpráva č. " . $mess->dmDm->dmID . ")"
-                                    : $mess->dmDm->dmAnnotation;
-
-                        $popis = '';
-                        $popis .= "ID datové zprávy    : " . $mess->dmDm->dmID . "\n"; // = 342682
-                        $popis .= "Věc, předmět zprávy : " . $annotation . "\n"; //  = Vaše datová zpráva byla přijata
-                        $popis .= "\n";
-                        $popis .= "Číslo jednací odesílatele  : " . $mess->dmDm->dmSenderRefNumber . "\n"; //  = AB-44656
-                        $popis .= "Spisová značka odesílatele : " . $mess->dmDm->dmSenderIdent . "\n"; //  = ZN-161
-                        $popis .= "Číslo jednací příjemce     : " . $mess->dmDm->dmRecipientRefNumber . "\n"; //  = KAV-34/06-ŘKAV/2010
-                        $popis .= "Spisová značka příjemce    : " . $mess->dmDm->dmRecipientIdent . "\n"; //  = 0.06.00
-                        $popis .= "\n";
-                        $popis .= "Do vlastních rukou? : " . (!empty($mess->dmDm->dmPersonalDelivery)
-                                    ? "ano" : "ne") . "\n"; //  =
-                        $popis .= "Doručeno fikcí?     : " . (!empty($mess->dmDm->dmAllowSubstDelivery)
-                                    ? "ano" : "ne") . "\n"; //  =
-                        $popis .= "Zpráva určena pro   : " . $mess->dmDm->dmToHands . "\n"; //  =
-                        $popis .= "\n";
-                        $popis .= "Odesílatel:\n";
-                        $popis .= "            " . $mess->dmDm->dbIDSender . ", typ " . ISDS_Spisovka::typDS($mess->dmDm->dmSenderType) . "\n"; //  = hjyaavk
-                        $popis .= "            " . $mess->dmDm->dmSender . "\n"; //  = Město Milotice
-                        $popis .= "            " . $mess->dmDm->dmSenderAddress . "\n"; //  = Kovářská 14/1, 37612 Milotice, CZ
-                        if ($mess->dmDm->dmSenderOrgUnit)
-                            $popis .= "            org.jednotka: " . $mess->dmDm->dmSenderOrgUnit . " [" . $mess->dmDm->dmSenderOrgUnitNum . "]\n"; //  =
-                        $popis .= "\n";
-                        $popis .= "Příjemce:\n";
-                        $popis .= "            " . $mess->dmDm->dbIDRecipient . "\n"; //  = pksakua
-                        $popis .= "            " . $mess->dmDm->dmRecipient . "\n"; //  = Společnost pro výzkum a podporu OpenSource
-                        $popis .= "            " . $mess->dmDm->dmRecipientAddress . "\n"; //  = 40501 Děčín, CZ
-//$popis .= "Je příjemce ne-OVM povýšený na OVM: ". $mess->dmDm->dmAmbiguousRecipient ."\n";//  =
-                        if ($mess->dmDm->dmRecipientOrgUnit)
-                            $popis .= "            org.jednotka: " . $mess->dmDm->dmRecipientOrgUnit . " [" . $mess->dmDm->dmRecipientOrgUnitNum . "]\n"; //  =
-                        $popis .= "\n";
-                        $popis .= "Stav: " . $mess->dmMessageStatus . " - " . ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) . "\n";
-                        $dt_dodani = strtotime($mess->dmDeliveryTime);
-                        $popis .= "Datum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
-                        if ($mess->dmAcceptanceTime)
-                            $dt_doruceni = date("j.n.Y G:i:s",
-                                    strtotime($mess->dmAcceptanceTime));
-                        else
-                            $dt_doruceni = 'nebyla doručena';
-                        $popis .= "Datum a čas doručení : $dt_doruceni\n";
-                        $popis .= "Přibližná velikost všech příloh : " . $mess->dmAttachmentSize . " kB\n";
-
                         $zprava = array();
                         $zprava['odchozi'] = 0;
                         $zprava['typ'] = 'I';
                         $zprava['poradi'] = $this->Epodatelna->getMax();
                         $zprava['rok'] = date('Y');
                         $zprava['isds_id'] = $z->dmID;
-                        $zprava['predmet'] = $annotation;
-                        $zprava['popis'] = $popis;
+                        $zprava['predmet'] = $mess->dmDm->dmAnnotation;
+                        $zprava['popis'] = null;
                         $zprava['odesilatel'] = $z->dmSender . ', ' . $z->dmSenderAddress;
                         $zprava['adresat'] = 'Datová schránka';
                         $zprava['prijato_dne'] = new \DateTime();
@@ -500,11 +464,10 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
 
         if (!$imap->count_messages()) {
-//  nejsou žádné zprávy k přijetí
+            //  nejsou žádné zprávy k přijetí
             $imap->close();
             return 0;
         }
-
 
         $UploadFile = $this->storage;
 
@@ -512,20 +475,20 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $messages_recorded = 0;
 
         foreach ($messages as $message) {
-// kontrola existence v epodatelne
-// chybi-li Message ID, jedna se pravdepodobne o Spam
+            // kontrola existence v epodatelne
+            // chybi-li Message ID, jedna se pravdepodobne o Spam
             if (!isset($message->message_id) || $this->Epodatelna->existuje($message->message_id,
                             'email'))
                 continue;
 
-// nova zprava, ktera neni nahrana v epodatelne
-// Nejprve uvolni pamet predchozi zpravy
+            // nova zprava, ktera neni nahrana v epodatelne
+            // Nejprve uvolni pamet predchozi zpravy
             $raw_message = null;
 
-// Nacteni kompletni zpravy
+            // Nacteni kompletni zpravy
             $structure = $imap->get_message_structure($message->Msgno);
             $raw_message = $imap->get_raw_message($message->Msgno);
-// Preved do formatu mailbox, jinak nebude IMAP knihovna fungovat
+            // Preved do formatu mailbox, jinak nebude IMAP knihovna fungovat
             $raw_message = "From unknown  Sat Jan  1 00:00:00 2000\r\n" . $raw_message;
 
             $popis = $imap->find_plain_text($message->Msgno, $structure);

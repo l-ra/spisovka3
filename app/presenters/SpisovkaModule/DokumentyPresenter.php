@@ -1459,9 +1459,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     if (isset($result['epodatelna_id'])) {
                         $epodatelna_id = $result['epodatelna_id'];
                     }
-                    if (isset($result['zprava'])) {
-                        $zprava_odes = $result['zprava'];
-                    }
+                    $zprava_odes = null;
                 } else if ($metoda_odeslani == 3) {
                     // postou
                     $c = "datum_odeslani_postou_" . $subjekt_id;
@@ -1630,7 +1628,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $mess = null;
         $epod_id = null;
         $zprava = null;
-        $popis = null;
         $password = isset($data['isds_heslo']) ? $data['isds_heslo'] : null;
 
         try {
@@ -1664,44 +1661,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     }
                 }
             }
-            if (is_null($mess)) {
+            if (is_null($mess))
                 return false;
-            }
-
-            $popis = '';
-            $popis .= "ID datové zprávy    : " . $mess->dmID . "\n"; // = 342682
-            $popis .= "Věc, předmět zprávy : " . $mess->dmAnnotation . "\n"; //  = Vaše datová zpráva byla přijata
-            $popis .= "\n";
-            $popis .= "Číslo jednací odesílatele   : " . $mess->dmSenderRefNumber . "\n"; //  = AB-44656
-            $popis .= "Spisová značka odesílatele : " . $mess->dmSenderIdent . "\n"; //  = ZN-161
-            $popis .= "Číslo jednací příjemce     : " . $mess->dmRecipientRefNumber . "\n"; //  = KAV-34/06-ŘKAV/2010
-            $popis .= "Spisová značka příjemce    : " . $mess->dmRecipientIdent . "\n"; //  = 0.06.00
-            $popis .= "\n";
-            $popis .= "Do vlastních rukou? : " . (!empty($mess->dmPersonalDelivery) ? "ano" : "ne") . "\n"; //  =
-            $popis .= "Doručeno fikcí?     : " . (!empty($mess->dmAllowSubstDelivery) ? "ano" : "ne") . "\n"; //  =
-            $popis .= "Zpráva určena pro   : " . $mess->dmToHands . "\n";
-            $popis .= "\n";
-            $popis .= "Odesílatel:\n";
-            $popis .= "            " . $mess->dbIDSender . "\n"; //  = hjyaavk
-            $popis .= "            " . $mess->dmSender . "\n"; //  = Město Milotice
-            $popis .= "            " . $mess->dmSenderAddress . "\n"; //  = Kovářská 14/1, 37612 Milotice, CZ
-            $popis .= "            " . $mess->dmSenderType . " - " . ISDS_Spisovka::typDS($mess->dmSenderType) . "\n"; //  = 10
-            $popis .= "\n";
-            $popis .= "Příjemce:\n";
-            $popis .= "            " . $mess->dbIDRecipient . "\n"; //  = pksakua
-            $popis .= "            " . $mess->dmRecipient . "\n"; //  = Společnost pro výzkum a podporu OpenSource
-            $popis .= "            " . $mess->dmRecipientAddress . "\n"; //  = 40501 Děčín, CZ
-            $popis .= "\n";
-            $popis .= "Status: " . $mess->dmMessageStatus . " - " . ISDS_Spisovka::stavZpravy($mess->dmMessageStatus) . "\n";
-            $dt_dodani = strtotime($mess->dmDeliveryTime);
-            $dt_doruceni = strtotime($mess->dmAcceptanceTime);
-            $popis .= "Datum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
-            if ($dt_doruceni == 0) {
-                $popis .= "Datum a čas doručení : (příjemce zprávu zatím nepřijal)\n";
-            } else {
-                $popis .= "Datum a čas doručení : " . date("j.n.Y G:i:s", $dt_doruceni) . "\n";
-            }
-            $popis .= "Přibližná velikost všech příloh : " . $mess->dmAttachmentSize . "kB\n";
 
             $UploadFile = $this->storage;
 
@@ -1714,7 +1675,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['rok'] = date('Y');
             $zprava['isds_id'] = $mess->dmID;
             $zprava['predmet'] = empty($mess->dmAnnotation) ? "(Datová zpráva bez předmětu)" : $mess->dmAnnotation;
-            $zprava['popis'] = $popis;
+            $zprava['popis'] = null;
             $zprava['adresat'] = $mess->dmRecipient . ', ' . $mess->dmRecipientAddress;
             $zprava['subjekt_id'] = $adresat->id;
             $zprava['odesilatel'] = '';
@@ -1739,59 +1700,44 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['stav'] = 0;
             $zprava['stav_info'] = '';
 
-            if ($epod_id = $Epodatelna->insert($zprava)) {
+            $epod_id = $Epodatelna->insert($zprava);
 
-                /* Ulozeni podepsane ISDS zpravy */
-                $data = array(
-                    'filename' => 'ep-isds-' . $epod_id . '.zfo',
-                    'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
-                    'typ' => '5',
-                    'popis' => 'Podepsaný originál ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
+            /* Ulozeni podepsane ISDS zpravy */
+            $data = array(
+                'filename' => 'ep-isds-' . $epod_id . '.zfo',
+                'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
+                'typ' => '5',
+                'popis' => 'Podepsaný originál ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
+            );
+
+            $signedmess = $isds->SignedSentMessageDownload($id_mess);
+
+            $UploadFile->uploadEpodatelna($signedmess, $data);
+
+            /* Ulozeni reprezentace zpravy */
+            $data = array(
+                'filename' => 'ep-isds-' . $epod_id . '.bsr',
+                'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
+                'typ' => '5',
+                'popis' => 'Byte-stream reprezentace ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
+            );
+
+            if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {
+                // ok
+                $zprava['stav_info'] = 'Zpráva byla uložena';
+                //$zprava['file_id'] = $file->id ."-". $file_o->id;
+                $zprava['file_id'] = $file->id;
+                $Epodatelna->update(
+                        ['stav' => 1,
+                    'stav_info' => $zprava['stav_info'],
+                    'file_id' => $file->id
+                        ], "id = $epod_id"
                 );
-
-                $signedmess = $isds->SignedSentMessageDownload($id_mess);
-
-                $UploadFile->uploadEpodatelna($signedmess, $data);
-
-                /* Ulozeni reprezentace zpravy */
-                $data = array(
-                    'filename' => 'ep-isds-' . $epod_id . '.bsr',
-                    'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
-                    'typ' => '5',
-                    'popis' => ' Byte-stream reprezentace ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
-                );
-
-                if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {
-                    // ok
-                    $zprava['stav_info'] = 'Zpráva byla uložena';
-                    //$zprava['file_id'] = $file->id ."-". $file_o->id;
-                    $zprava['file_id'] = $file->id;
-                    $Epodatelna->update(
-                            ['stav' => 1,
-                        'stav_info' => $zprava['stav_info'],
-                        'file_id' => $file->id
-                            ], "id = $epod_id"
-                    );
-                } else {
-                    // $zprava['stav_info'] = 'Reprezentace zprávy se nepodařilo uložit';
-                }
-            } else {
-                // $zprava['stav_info'] = 'Zprávu se nepodařilo uložit';
             }
 
-            return array(
-                'epodatelna_id' => $epod_id,
-                'zprava' => $popis
-            );
-        } catch (DibiException $e) {
-            $this->flashMessage('Chyba v DB: ' . $e->getMessage(), 'warning_ext');
-            if (!empty($id_mess))
-                return ['epodatelna_id' => $epod_id,
-                    'zprava' => $popis
-                ];
+            return $epod_id;
         } catch (Exception $e) {
-            // chyba v pripojeni k datove schrance
-            $this->flashMessage('Chyba ISDS: ' . $e->getMessage(), 'warning_ext');
+            $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning_ext');
         }
 
         return false;

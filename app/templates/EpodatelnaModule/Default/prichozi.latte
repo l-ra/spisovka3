@@ -39,7 +39,7 @@
                 </a></strong>
             </td>
             <td class="vec">
-                <strong title="{html_entity_decode($ep->popis)}"><a href="{link detail, 'id' => $ep->id, 'back' => $presenter->view}">
+                <strong {if $ep->typ == 'E'}title="{html_entity_decode($ep->popis)}"{/if}><a href="{link detail, 'id' => $ep->id, 'back' => $presenter->view}">
                     {$ep->predmet}
                 </a></strong>
                 <br />

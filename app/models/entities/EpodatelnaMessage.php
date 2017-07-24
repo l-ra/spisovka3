@@ -127,12 +127,71 @@ class IsdsMessage extends EpodatelnaMessage
     }
 
     /**
-     * 
+     * Zformátuje uloženou obálku zprávy pro zobrazení. Výstup se liší pro příchozí a odchozí zprávu.
+     * @param Storage_Basic $storage
      * @return string  plain text
      */
-    public function formatEnvelope()
+    public function formatEnvelope($storage)
     {
+        $filename = $this->getIsdsFile($storage);
+        $contents = file_get_contents($filename);
+        if (!$contents)
+            return null;
+        $env = unserialize($contents);
+
+        // příchozí a odchozí zprávy jsou nelogicky uloženy bohužel odlišně
+        $status = $env;
+        if (isset($env->dmDm))
+            $env = $env->dmDm;
+
+        $annotation = $env->dmAnnotation;
+        $popis = '';
+        $popis .= "ID datové zprávy    : " . $env->dmID . "\n";
+        $popis .= "Věc, předmět zprávy : " . $annotation . "\n\n";
+
+        if (!empty($env->dmLegalTitleLaw)) {
+            $popis .= "Zmocnění : $env->dmLegalTitleLaw / $env->dmLegalTitleYear § $env->dmLegalTitleSect";
+            if (!empty($env->dmLegalTitlePar))
+                $popis .= " odstavec $env->dmLegalTitlePar";
+            if (!empty($env->dmLegalTitlePoint))
+                $popis .= " písmeno $env->dmLegalTitlePoint";
+            $popis .= "\n\n";
+        }
         
+        $popis .= "Číslo jednací odesilatele  : " . $env->dmSenderRefNumber . "\n";
+        $popis .= "Spisová značka odesilatele : " . $env->dmSenderIdent . "\n";
+        $popis .= "Číslo jednací příjemce     : " . $env->dmRecipientRefNumber . "\n";
+        $popis .= "Spisová značka příjemce    : " . $env->dmRecipientIdent . "\n\n";
+
+        $popis .= "Do vlastních rukou?      : " . (!empty($env->dmPersonalDelivery) ? "ano" : "ne") . "\n";
+        $popis .= "Doručení fikcí povoleno? : " . (!empty($env->dmAllowSubstDelivery) ? "ano" : "ne") . "\n";
+        if (!empty($env->dmToHands))
+            $popis .= "K rukám                  : " . $env->dmToHands . "\n";
+
+        $popis .= "\nOdesílatel:\n";
+        $popis .= "            " . $env->dbIDSender . ", typ " . ISDS_Spisovka::typDS($env->dmSenderType) . "\n";
+        $popis .= "            " . $env->dmSender . "\n";
+        $popis .= "            " . $env->dmSenderAddress . "\n";
+        if ($env->dmSenderOrgUnit)
+            $popis .= "            org.jednotka: " . $env->dmSenderOrgUnit . " [" . $env->dmSenderOrgUnitNum . "]\n";
+
+        $popis .= "\nPříjemce:\n";
+        $popis .= "            " . $env->dbIDRecipient . "\n";
+        $popis .= "            " . $env->dmRecipient . "\n";
+        $popis .= "            " . $env->dmRecipientAddress . "\n";
+        if ($env->dmRecipientOrgUnit)
+            $popis .= "            org.jednotka: " . $env->dmRecipientOrgUnit . " [" . $env->dmRecipientOrgUnitNum . "]\n";
+
+        $dt_dodani = strtotime($status->dmDeliveryTime);
+        $popis .= "\nDatum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
+        if ($status->dmAcceptanceTime)
+            $dt_doruceni = date("j.n.Y G:i:s", strtotime($status->dmAcceptanceTime));
+        else
+            $dt_doruceni = 'neznámý';
+        // dmAttachmentSize obsahuje chybný údaj, pravděpodobně udává velikost po zakódování do base64
+        // $popis .= "Přibližná velikost všech příloh : " . $status->dmAttachmentSize . " kB\n";
+
+        return $popis;
     }
 
 }

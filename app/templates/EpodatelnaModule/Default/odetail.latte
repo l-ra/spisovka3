@@ -7,10 +7,6 @@
 
 {control print}
 
-<div n:if="$Zprava->typ == 'I' && empty($delivery)" class="dokument_blok_menu">
-    <a n:href="this, doruceni => 1">Zkontrolovat doručení</a>
-</div>
-
 <div class="dokument_blok_hlavni">
     <dl>
         <dt>Identifikátor DZ v e-podatelně:</dt>
@@ -47,17 +43,7 @@
     </dl>
 </div>
 
-<div n:if="!empty($delivery)" class="dokument_blok_sedy">
-    <div class="h2">Informace o dodání a doručování zprávy</div>
-    <table><tr><td>Stav zprávy:</td><td>{$delivery->dmMessageStatus} - {=Spisovka\ISDS_Spisovka::stavZpravy($delivery->dmMessageStatus)}</td>
-        <tr><td>Datum dodání:</td><td>{$delivery->dmDeliveryTime|edatetime}</td></tr>
-        <tr><td style="padding-right: 20px">Datum doručení:</td><td> {$delivery->dmAcceptanceTime|edatetime}</td></tr></table><br />
-    <table class="spisovka">
-    {foreach $delivery->dmEvents->dmEvent as $e}
-        <tr><td>{$e->dmEventTime|edatetime}</td><td>{$e->dmEventDescr}</td></tr>
-    {/foreach}
-    </table>
-</div>
+{include 'delivery.latte'}
 
 <div class="dokument_blok_sedy">
     <div class="h2">{$Zprava->typ == 'I' ? 'Datová zpráva' : 'Obsah zprávy'}</div>

@@ -10,7 +10,7 @@
 {control print}
 
 <div class="dokument_blok_menu">
-    {if $Zprava->stav >=10}
+    {if $Zprava->stav >= 10}
         {if $Dokument}
             Zpráva přidána do spisové služby jako <a href="{link :Spisovka:Dokumenty:detail, 'id'=>$Dokument->id}" target="_blank">{$Dokument->jid}</a>
         {else}
@@ -20,7 +20,6 @@
         <a href="{link :Epodatelna:Evidence:novy, 'id'=>$Zprava->id}" n:if="$user->isAllowed('Dokument', 'vytvorit')">Zaevidovat do spisové služby</a>
         <a href="{link :Epodatelna:Evidence:jiny, 'id'=>$Zprava->id}" id="dialog-evidence">Zaevidovat v jiné evidenci</a>
         <a href="{link :Epodatelna:Evidence:odmitnout, 'id'=>$Zprava->id }" id="dialog-odmitnout">Odmítnout</a>
-        <!--<a href="{link :Epodatelna:Evidence:odpoved, 'id'=>$Zprava->id }">Odpovědět</a>-->
     {/if}
 </div>
 
@@ -37,8 +36,6 @@
                 E-mailová zpráva
             {elseif $Zprava->typ == 'I'}
                 Datová zpráva z ISDS
-            {else}
-                Typ nezjištěn
             {/if}
         </dd>
     </dl>
@@ -55,7 +52,7 @@
         <dt>Odesílatel:</dt>
         <dd>{$Zprava->odesilatel}</dd>
     </dl>
-    <dl>
+    <dl n:if="$Zprava->typ == 'E'">
         <dt>Doručeno:</dt>
         <dd>{$Zprava->doruceno_dne|edatetime}</dd>
     </dl>
@@ -73,6 +70,8 @@
     </dl>
 </div>
 
+{include 'delivery.latte'}
+    
 <div class="dokument_blok_sedy">
     <div class="h2">{$Zprava->typ == 'I' ? 'Datová zpráva' : 'Obsah zprávy'}</div>
     <div class="indent-left">
