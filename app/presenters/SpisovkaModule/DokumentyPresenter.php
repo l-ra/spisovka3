@@ -1295,9 +1295,10 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                             ->setDefaultValue($Dok->cislo_jednaci_odesilatele);
                     $form->addText("isds_spis_adres_$sid", 'Spisová značka adresáta:', 50);
 
-                    $form->addCheckbox("isds_dvr_$sid", 'Do vlastních rukou?');
-                    $form->addCheckbox("isds_fikce_$sid", 'Doručit fikcí?')
-                            ->setDefaultValue(true);
+                    $form->addCheckbox("isds_dvr_$sid", 'Do vlastních rukou');
+                    $form->addCheckbox("isds_zakazat_fikci_$sid", 'Zakázat doručení fikcí')
+                            ->setOption('description', 'platí pouze u OVM')
+                            ->setDefaultValue(false);
                 }
             }
 
@@ -1424,8 +1425,8 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                         'isds_spis_odes' => $data['isds_spis_odes_' . $subjekt_id],
                         'isds_cjednaci_adres' => $data['isds_cjednaci_adres_' . $subjekt_id],
                         'isds_spis_adres' => $data['isds_spis_adres_' . $subjekt_id],
-                        'isds_dvr' => isset($data['isds_dvr_' . $subjekt_id]) ? true : false,
-                        'isds_fikce' => isset($data['isds_fikce_' . $subjekt_id]) ? true : false,
+                        'isds_dvr' => $data['isds_dvr_' . $subjekt_id],
+                        'isds_zakazat_fikci' => $data['isds_zakazat_fikci_' . $subjekt_id],
                     );
                     if (isset($data['isds_heslo_' . $subjekt_id]))
                         $isds_data['isds_heslo'] = $data['isds_heslo_' . $subjekt_id];
@@ -1637,19 +1638,22 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         try {
             $isds = new ISDS_Spisovka($password);
 
-            $dmEnvelope = array(
+            $envelope = [
                 "dbIDRecipient" => $adresat->id_isds,
-                "cislo_jednaci" => $data['isds_cjednaci_odes'],
-                "spisovy_znak" => $data['isds_spis_odes'],
-                "vase_cj" => $data['isds_cjednaci_adres'],
-                "vase_sznak" => $data['isds_spis_adres'],
-                "k_rukam" => null,
-                "anotace" => $data['isds_predmet'],
-                "do_vlastnich" => $data['isds_dvr'] ? 1 : 0,
-                "doruceni_fikci" => ($data['isds_fikce'] == true) ? 0 : 1
-            );
-
-            $id_mess = $isds->odeslatZpravu($dmEnvelope, $prilohy);
+                "dmAnnotation" => $data['isds_predmet'],
+                "dmPersonalDelivery" => $data['isds_dvr'],
+                "dmAllowSubstDelivery" => !$data['isds_zakazat_fikci'],
+            ];
+            if (!empty($data['isds_cjednaci_odes']))
+                $envelope['dmSenderRefNumber'] = $data['isds_cjednaci_odes'];
+            if (!empty($data['isds_spis_odes']))
+                $envelope['dmSenderIdent'] = $data['isds_spis_odes'];
+            if (!empty($data['isds_cjednaci_adres']))
+                $envelope['dmRecipientRefNumber'] = $data['isds_cjednaci_adres'];
+            if (!empty($data['isds_spis_adres']))
+                $envelope['dmRecipientIdent'] = $data['isds_spis_adres'];
+            
+            $id_mess = $isds->odeslatZpravu($envelope, $prilohy);
             if (!$id_mess) {
                 $this->flashMessage('Chyba ISDS: ' . $isds->GetStatusMessage(), 'warning_ext');
                 return false;
@@ -1740,7 +1744,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             return $epod_id;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning_ext');
         }
 

@@ -28,11 +28,11 @@ class ISDS_Spisovka extends \ISDS
         $log_level = Settings::get('isds_log_level', 0);
         if ($log_level)
             $this->logger = new ISDS_Logger($log_level);
-        
+
         $ep_config = (new ConfigEpodatelna())->get();
         $config = $ep_config['isds'];
         /* if ($config === false) // existuje nejake nastaveni?
-            throw new \InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka."); */
+          throw new \InvalidArgumentException("ISDS_Spisovka::pripojit() - Není definována datová schránka."); */
 
         $isds_portaltype = ($config['test'] == 1) ? 0 : 1;
 
@@ -41,12 +41,12 @@ class ISDS_Spisovka extends \ISDS
         if ($individual_login) {
             $login = UserSettings::get('isds_login');
             if (!$password)
-                $password = UserSettings::get('isds_password');            
+                $password = UserSettings::get('isds_password');
             if (!$login)
                 throw new \Exception('Uživatel nemá vyplněny přihlašovací údaje do datové schránky.');
             if (!$password)
                 throw new \Exception('Nebylo zadáno heslo do datové schránky.');
-            
+
             parent::__construct($isds_portaltype, 0, $login, $password);
         } else if ($config['typ_pripojeni'] == 0) {
             // jmenem a heslem
@@ -93,76 +93,39 @@ class ISDS_Spisovka extends \ISDS
         return $Records ? $Records->dmRecord : null;
     }
 
-    public function odeslatZpravu($zprava, $prilohy)
+    /**
+     * @param array $envelope
+     * @param array $files
+     * @return int|false  ID datové zprávy
+     * @throws \Exception
+     */
+    public function odeslatZpravu($envelope, $files)
     {
-        // je parametr platny
-        if (empty($zprava)) {
-            throw new \InvalidArgumentException("Prázdný či neplatný parametr!");
+        if (empty($files))
+            throw new \Exception('Nelze odeslat datovou zprávu bez souborů.');
+
+        $SentOutFiles = new \ISDSSentOutFiles();
+        foreach ($files as $file) {
+            $mime_type = $file->mime_type ?: FileModel::mimeType($file->tmp_file);
+
+            // funkce pro odesílání do registru smluv
+            if (in_array($file->real_name,
+                            ['zverejneni.xml', 'modifikace.xml', 'pridani_prilohy.xml', 'znepristupneni.xml']))
+                $metatype = 'main';
+            else
+                $metatype = 'enclosure';
+
+            $SentOutFiles->AddFileSpecFromFile(
+                    $file->tmp_file, $mime_type, $metatype, $file->guid, "", $file->real_name,
+                    "");
         }
-
-        // Komu
-        $komu = $zprava['dbIDRecipient']; // Identifikace adresata
-        if (empty($komu)) {
-            throw new \InvalidArgumentException("Není k dispozici adresát!");
-        }
-
-        // nacteni zpravy
-        $dmEnvelope = array(
-            'dbIDRecipient' => $komu,
-            'dmRecipientOrgUnit' => "",
-            'dmRecipientOrgUnitNum' => -1,
-            'dmRecipientRefNumber' => empty($zprava['vase_cj']) ? null : $zprava['vase_cj'],
-            'dmRecipientIdent' => empty($zprava['vase_sznak']) ? null : $zprava['vase_sznak'],
-            'dmSenderRefNumber' => empty($zprava['cislo_jednaci']) ? null : $zprava['cislo_jednaci'],
-            'dmSenderOrgUnit' => '',
-            'dmSenderOrgUnitNum' => -1,
-            'dmSenderIdent' => empty($zprava['spisovy_znak']) ? null : $zprava['spisovy_znak'],
-            'dmToHands' => empty($zprava['k_rukam']) ? null : $zprava['k_rukam'],
-            'dmAnnotation' => empty($zprava['anotace']) ? null : $zprava['anotace'],
-            'dmLegalTitleLaw' => null,
-            'dmLegalTitleYear' => null,
-            'dmLegalTitleSect' => null,
-            'dmLegalTitlePar' => null,
-            'dmLegalTitlePoint' => null,
-            'dmPersonalDelivery' => null,
-            'dmAllowSubstDelivery' => null
-        );
-
-        // Nacteni priloh
-        if (!empty($prilohy)) {
-            if (count($prilohy) > 0) {
-                $SentOutFiles = new \ISDSSentOutFiles();
-                foreach ($prilohy as $priloha) {
-                    if (empty($priloha->mime_type)) {
-                        $mime_type = FileModel::mimeType($priloha->tmp_file);
-                    } else {
-                        $mime_type = $priloha->mime_type;
-                    }
-
-                    // funkce pro odesílání do registru smluv
-                    if (in_array($priloha->real_name,
-                                    ['zverejneni.xml', 'modifikace.xml', 'pridani_prilohy.xml', 'znepristupneni.xml']))
-                        $metatype = 'main';
-                    else
-                        $metatype = 'enclosure';
-
-                    $SentOutFiles->AddFileSpecFromFile(
-                            $priloha->tmp_file, $mime_type, $metatype, $priloha->guid, "",
-                            $priloha->real_name, "");
-                }
-                $dmFiles = $SentOutFiles->fileInfos();
-            } else {
-                $dmFiles = null;
-            }
-        } else {
-            $dmFiles = null;
-        }
+        $dmFiles = $SentOutFiles->fileInfos();
 
         $MessageCreateInput = array(
-            'dmEnvelope' => $dmEnvelope,
+            'dmEnvelope' => $envelope,
             'dmFiles' => $dmFiles
         );
-        
+
         return $this->CreateMessage($MessageCreateInput);
     }
 
@@ -285,7 +248,7 @@ class ISDS_Spisovka extends \ISDS
             'pnMiddleName' => (!empty($filtr['pnMiddleName']) ? $filtr['pnMiddleName'] : null),
             'pnLastName' => (!empty($filtr['pnLastName']) ? $filtr['pnLastName'] : null),
             'pnLastNameAtBirth' => (!empty($filtr['pnLastNameAtBirth']) ? $filtr['pnLastNameAtBirth']
-                        : null),
+                : null),
             'firmName' => (!empty($filtr['firmName']) ? $filtr['firmName'] : null),
             'biDate' => (!empty($filtr['biDate']) ? $filtr['biDate'] : null),
             'biCity' => (!empty($filtr['biCity']) ? $filtr['biCity'] : null),
@@ -294,9 +257,9 @@ class ISDS_Spisovka extends \ISDS
             'adCity' => (!empty($filtr['adCity']) ? $filtr['adCity'] : null),
             'adStreet' => (!empty($filtr['adStreet']) ? $filtr['adStreet'] : null),
             'adNumberInStreet' => (!empty($filtr['adNumberInStreet']) ? $filtr['adNumberInStreet']
-                        : null),
+                : null),
             'adNumberInMunicipality' => (!empty($filtr['adNumberInMunicipality']) ? $filtr['adNumberInMunicipality']
-                        : null),
+                : null),
             'adZipCode' => (!empty($filtr['adZipCode']) ? $filtr['adZipCode'] : null),
             'adState' => (!empty($filtr['adState']) ? $filtr['adState'] : null),
             'nationality' => (!empty($filtr['nationality']) ? $filtr['nationality'] : null),
