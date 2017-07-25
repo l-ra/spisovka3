@@ -147,4 +147,26 @@
     </div>
 {/form}
 
-<script type="text/javascript">odes_form_reset();</script>
+<script type="text/javascript">
+    odes_form_reset();
+
+    $('form').on('submit', function (e) {
+        var sendIntoIsds = false;
+        $("select[name^=subjekt]").each(function() {
+            if ($(this).val() == 2 /* isds */)
+                sendIntoIsds = true;
+        });
+        
+        var fileSelected = false;
+        $("input[name^=prilohy]").each(function() {
+            if ($(this).is(':checked'))
+                fileSelected = true;
+        });
+        
+        if (sendIntoIsds && !fileSelected) {
+            alert('Zapomněl jste zvolit přílohu.');
+            e.preventDefault();
+        }
+        
+    });
+</script>
