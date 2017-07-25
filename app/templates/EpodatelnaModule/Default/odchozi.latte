@@ -28,7 +28,7 @@
                 {/if}
             </td>
             <td class="prijato">
-                <span title="{$ep->doruceno_dne|edatetime}">{$ep->doruceno_dne|edate}</span>
+                <span>{$ep->odeslano_dne|edatetime}</span>
             </td>
             <td class="cislo_jednaci">
                 &nbsp;<strong><a href="{link :Epodatelna:Default:odetail, 'id'=>$ep->id}">

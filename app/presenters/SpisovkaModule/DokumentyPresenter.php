@@ -1594,8 +1594,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zprava['adresat'] = $adresat->email;
         $zprava['subjekt_id'] = $adresat->id;
         $zprava['odesilatel'] = '';
-        $zprava['prijato_dne'] = new \DateTime();
-        $zprava['doruceno_dne'] = new \DateTime();
+        $zprava['odeslano_dne'] = new \DateTime();
         $zprava['user_id'] = $this->user->id;
 
         $zprava_prilohy = array();
@@ -1695,8 +1694,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['adresat'] = $mess->dmRecipient . ', ' . $mess->dmRecipientAddress;
             $zprava['subjekt_id'] = $adresat->id;
             $zprava['odesilatel'] = '';
-            $zprava['prijato_dne'] = new \DateTime();
-            $zprava['doruceno_dne'] = new \DateTime($mess->dmAcceptanceTime);
+            $zprava['odeslano_dne'] = new \DateTime();
             $zprava['user_id'] = $this->user->id;
 
             $aprilohy = array();

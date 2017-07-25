@@ -77,7 +77,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             $args['where'][] = ["predmet LIKE %s OR $subject LIKE %s", "%$hledat%", "%$hledat%"];
         }
         if ($outgoing)
-            $args['order'] = ['doruceno_dne' => 'DESC'];
+            $args['order'] = ['odeslano_dne' => 'DESC'];
 
         $result = $this->Epodatelna->seznam($args);
         $paginator->itemCount = count($result);
