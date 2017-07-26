@@ -42,7 +42,7 @@
                             <td class="icon"></td>
                             <td colspan="2">
                                 Jak odeslat:
-                                <select name="subjekt[{$subjekt->id}]" onchange="return vyber_odes_form(this, {$subjekt->id});">
+                                <select name="subjekt[{$subjekt->id}]" onchange="return sendMethodChanged(this, {$subjekt->id});">
                                     <option value="0">neodesílat</option>
                                     {foreach $ZpusobyOdeslani as $zpusob}
                                         {if $zpusob['id'] == 2 && !$OpravnenOdeslatDZ}
@@ -148,25 +148,47 @@
 {/form}
 
 <script type="text/javascript">
-    odes_form_reset();
+    sendMethodChanged = function (elm, subjekt_id) {
+
+        var volba = elm.options[elm.selectedIndex].value;
+
+        sendFormHide(subjekt_id);
+
+        $('#odes_' + subjekt_id + '_' + volba).show();
+
+        return false;
+    };
+
+    sendFormHide = function (subjekt_id) {
+
+        if (typeof subjekt_id != "undefined") {
+            $('#odes_' + subjekt_id + '_1').hide();
+            $('#odes_' + subjekt_id + '_2').hide();
+            $('#odes_' + subjekt_id + '_3').hide();
+            $('#odes_' + subjekt_id + '_4').hide();
+        } else {
+            $('.odes_form').hide();
+        }
+    };
+    
+    sendFormHide();
 
     $('form').on('submit', function (e) {
         var sendIntoIsds = false;
-        $("select[name^=subjekt]").each(function() {
+        $("select[name^=subjekt]").each(function () {
             if ($(this).val() == 2 /* isds */)
                 sendIntoIsds = true;
         });
-        
+
         var fileSelected = false;
-        $("input[name^=prilohy]").each(function() {
+        $("input[name^=prilohy]").each(function () {
             if ($(this).is(':checked'))
                 fileSelected = true;
         });
-        
+
         if (sendIntoIsds && !fileSelected) {
             alert('Zapomněl jste zvolit přílohu.');
             e.preventDefault();
         }
-        
     });
 </script>

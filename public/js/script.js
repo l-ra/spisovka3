@@ -1,10 +1,5 @@
 /* global BASE_URL, DOKUMENT_ID, typ_dokumentu_id, smer_typu_dokumentu, Nette */
 
-var stop_timer = 0;
-var url;
-var cache = Array();
-
-
 $(function () {
 
     installDatePicker();
@@ -147,7 +142,7 @@ $(function () {
                 typ_code = 'AO';
             }
 
-            url = BASE_URL + 'subjekty/' + ui.item.id + '/vybrano?dok_id=' + DOKUMENT_ID + '&typ=' + typ_code + '&autocomplete=1';
+            var url = BASE_URL + 'subjekty/' + ui.item.id + '/vybrano?dok_id=' + DOKUMENT_ID + '&typ=' + typ_code + '&autocomplete=1';
 
             $.get(url, function (data) {
                 if (data.indexOf('###vybrano###') != -1) {
@@ -182,14 +177,14 @@ dialog = function (elm, title, url) {
     $('#dialog').html('');
     $('#dialog').dialog('open');
 
-    var postdata = false;
+    var postData = false;
     if (elm) {
         if (!(elm instanceof jQuery))
             elm = $(elm);
 
-        postdata = elm.attr('data-postdata');
-        if (postdata)
-            postdata = $.parseJSON(postdata);
+        postData = elm.attr('data-postdata');
+        if (postData)
+            postData = $.parseJSON(postData);
     }
     if (typeof url == 'undefined')
         url = elm.attr('href');
@@ -198,8 +193,8 @@ dialog = function (elm, title, url) {
     var successFunction = function (data) {
         $('#dialog').html(data);
     };
-    if (postdata)
-        jqXHR = $.post(url, $.param(postdata), successFunction);
+    if (postData)
+        jqXHR = $.post(url, $.param(postData), successFunction);
     else
         jqXHR = $.get(url, successFunction);
 
@@ -399,7 +394,7 @@ subjektVybran = function (elm) {
 
 renderPrilohy = function () {
 
-    url = BASE_URL + 'prilohy/' + DOKUMENT_ID + '/nacti';
+    var url = BASE_URL + 'prilohy/' + DOKUMENT_ID + '/nacti';
 
     $.get(url, function (data) {
         $('#dok-prilohy').html(data);
@@ -410,7 +405,7 @@ renderPrilohy = function () {
 
 renderSubjekty = function () {
 
-    url = BASE_URL + 'subjekty/' + DOKUMENT_ID + '/nacti';
+    var url = BASE_URL + 'subjekty/' + DOKUMENT_ID + '/nacti';
 
     $.get(url, function (data) {
         $('#dok-subjekty').html(data);
@@ -463,8 +458,7 @@ spisVytvoritSubmit = function (form) {
         if (typeof data == 'object') {
             if (data.status == "OK")
                 spisVlozitDokument(data.id);
-        }
-        else {
+        } else {
             $('#dialog').html(data);
             dialogScrollUp();
         }
@@ -478,12 +472,12 @@ doplnPoznamkuKPredani = function () {
     var note = $('#frmpred-poznamka').val();
     if (note) {
         this.href = this.href + '&note=' + encodeURI(note);
-    }    
+    }
 };
 
 /**
  *  Platí rovněž pro výběr org. jednotky. Použito ve formuláři nového dokumentu.
- */ 
+ */
 osobaVybrana = function () {
 
     var elm = $(this);
@@ -491,12 +485,12 @@ osobaVybrana = function () {
     var user = elm.data('user');
     $('input[name=predano_org]').val(orgunit);
     $('input[name=predano_user]').val(user);
-    
+
     var text = elm.html();
     if (orgunit)
         text = 'organizační jednotce ' + text;
     $('#predano').html("<dl><dt>Předán:</dt><dd>" + text + "</dd></dl>");
-    
+
     $('#predat_autocomplete').val('');
     closeDialog();
 
@@ -528,33 +522,6 @@ odebratSubjekt = function (elm) {
     return false;
 };
 
-vyber_odes_form = function (elm, subjekt_id) {
-
-    var volba = elm.options[elm.selectedIndex].value;
-
-    odes_form_reset(subjekt_id);
-
-    $('#odes_' + subjekt_id + '_' + volba).show();
-
-
-    return false;
-
-};
-
-odes_form_reset = function (subjekt_id) {
-
-    if (typeof subjekt_id != "undefined") {
-        $('#odes_' + subjekt_id + '_1').hide();
-        $('#odes_' + subjekt_id + '_2').hide();
-        $('#odes_' + subjekt_id + '_3').hide();
-        $('#odes_' + subjekt_id + '_4').hide();
-    } else {
-        $('.odes_form').hide();
-    }
-
-
-};
-
 function renderVysledekHledaniDokumentu(data, typ) {
 
     var html = "<table class='seznam hledani-dokumentu'>";
@@ -564,8 +531,8 @@ function renderVysledekHledaniDokumentu(data, typ) {
     html = html + "<th>věc</th>";
     html = html + "</tr>";
 
-    dokument_id = document.getElementById('dokumentid').value;
-    evidence = document.getElementById('evidence');
+    var dokument_id = document.getElementById('dokumentid').value;
+    var evidence = document.getElementById('evidence');
     if (evidence == null) {
         evidence = 0;
     } else {
@@ -580,6 +547,7 @@ function renderVysledekHledaniDokumentu(data, typ) {
         var fnc = "spojitDokument(this)";
     }
 
+    var uevidence;
     for (var zaznam in data) {
         if (evidence == 1) {
             uevidence = '&evidence=1';
@@ -587,7 +555,7 @@ function renderVysledekHledaniDokumentu(data, typ) {
             uevidence = '';
         }
 
-        a = '<a href="' + url + data[zaznam]['dokument_id'] + uevidence + '" onclick="' + fnc + '; return false;">';
+        var a = '<a href="' + url + data[zaznam]['dokument_id'] + uevidence + '" onclick="' + fnc + '; return false;">';
         html = html + "<tr>";
         var cj = data[zaznam]['cislo_jednaci'];
         if (cj === null)
@@ -602,30 +570,29 @@ function renderVysledekHledaniDokumentu(data, typ) {
     return html;
 }
 
+var hledejDokumentCache = Array();
+
 hledejDokument = function (input, typ) {
 
     // nacteme hodnotu
     var vyraz = input.value;
-    // vezmeme jen nad tri znaky
     if (vyraz.length < 2)
         return false;
 
     // cache
     var nalezeno = false;
-    for (var index in cache) {
+    for (var index in hledejDokumentCache) {
         if (index == vyraz) {
             nalezeno = true;
-            $('#vysledek').html(renderVysledekHledaniDokumentu(cache[index], typ));
+            $('#vysledek').html(renderVysledekHledaniDokumentu(hledejDokumentCache[index], typ));
             break;
         }
     }
 
-    if (!nalezeno) {
+    if (!nalezeno)
         hledejDokumentAjax(vyraz, typ);
-    }
 
     return false;
-
 };
 
 hledejDokumentAjax = function (vyraz, typ) {
@@ -640,12 +607,10 @@ hledejDokumentAjax = function (vyraz, typ) {
         } else if (data == 'prilis_mnoho') {
             vysledek.html('<div class="prazdno">Daná sekvence obsahuje příliš mnoho záznamů. Zkuste zvolit přesnější sekvenci.</div>');
         } else {
-            cache[vyraz] = data;
+            hledejDokumentCache[vyraz] = data;
             vysledek.html(renderVysledekHledaniDokumentu(data, typ));
         }
     });
-
-    return false;
 };
 
 renderSpojeni = function () {
@@ -681,22 +646,15 @@ pripojitDokument = function (elm) {
         if (data.indexOf('###vybrano###') != -1) {
             data = data.replace('###vybrano###', '');
 
-            part = data.split('#');
-
-            //alert(data +' - '+ part[1]);
-
+            var part = data.split('#');
             $('#dok_cjednaci').html(part[0]);
             document.getElementById('frmnovyForm-poradi').value = part[1];
             document.getElementById('frmnovyForm-odpoved').value = part[2];
-
-            //elm.href = url;
             closeDialog();
         } else if (data.indexOf('###zaevidovano###') != -1) {
             data = data.replace('###zaevidovano###', '');
             window.location = data;
-            //elm.href = url;
             closeDialog();
-
         } else {
             $('#dialog').html(data);
             dialogScrollUp();
@@ -706,15 +664,9 @@ pripojitDokument = function (elm) {
     return false;
 };
 
-
-selectReadOnly = function (select) {
-    select.selectedIndex = 1;
-    return false;
-};
-
 filtrSestavy = function (elm) {
 
-    re = /sestavy\/([0-9]+)\/(.*)/;
+    var re = /sestavy\/([0-9]+)\/(.*)/;
     var matched = re.exec(elm.href);
     var url = BASE_URL + 'sestavy/' + matched[1] + '/filtr/';
     if (matched[2])
@@ -754,87 +706,7 @@ zobrazSestavu = function (elm) {
     return false;
 };
 
-function select_set_value(SelectObject, Value) {
-    for (index = 0;
-            index < SelectObject.length;
-            index++) {
-        if (SelectObject[index].value == Value)
-            SelectObject.selectedIndex = index;
-    }
-}
-
-function htmlspecialchars(string, quote_style, charset, double_encode) {
-    // http://kevin.vanzonneveld.net
-    // +   original by: Mirek Slugen
-    // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // +   bugfixed by: Nathan
-    // +   bugfixed by: Arno
-    // +    revised by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // +    bugfixed by: Brett Zamir (http://brett-zamir.me)
-    // +      input by: Ratheous
-    // +      input by: Mailfaker (http://www.weedem.fr/)
-    // +      reimplemented by: Brett Zamir (http://brett-zamir.me)
-    // +      input by: felix
-    // +    bugfixed by: Brett Zamir (http://brett-zamir.me)
-    // +    bugfixed by: Tomas Vancura (chyba pri prazdnem string ;))
-    // %        note 1: charset argument not supported
-    // *     example 1: htmlspecialchars("<a href='test'>Test</a>", 'ENT_QUOTES');
-    // *     returns 1: '&lt;a href=&#039;test&#039;&gt;Test&lt;/a&gt;'
-    // *     example 2: htmlspecialchars("ab\"c'd", ['ENT_NOQUOTES', 'ENT_QUOTES']);
-    // *     returns 2: 'ab"c&#039;d'
-    // *     example 3: htmlspecialchars("my "&entity;" is still here", null, null, false);
-    // *     returns 3: 'my &quot;&entity;&quot; is still here'
-    var optTemp = 0,
-            i = 0,
-            noquotes = false;
-    if (typeof quote_style === 'undefined' || quote_style === null) {
-        quote_style = 2;
-    }
-
-    if (typeof string == "object")
-        return "";
-
-    string = string.toString();
-    if (double_encode !== false) { // Put this first to avoid double-encoding
-        string = string.replace(/&/g, '&amp;');
-    }
-    string = string.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-    var OPTS = {
-        'ENT_NOQUOTES': 0,
-        'ENT_HTML_QUOTE_SINGLE': 1,
-        'ENT_HTML_QUOTE_DOUBLE': 2,
-        'ENT_COMPAT': 2,
-        'ENT_QUOTES': 3,
-        'ENT_IGNORE': 4
-    };
-    if (quote_style === 0) {
-        noquotes = true;
-    }
-    if (typeof quote_style !== 'number') { // Allow for a single string or an array of string flags
-        quote_style = [].concat(quote_style);
-        for (i = 0; i < quote_style.length; i++) {
-            // Resolve string input to bitwise e.g. 'ENT_IGNORE' becomes 4
-            if (OPTS[quote_style[i]] === 0) {
-                noquotes = true;
-            }
-            else if (OPTS[quote_style[i]]) {
-                optTemp = optTemp | OPTS[quote_style[i]];
-            }
-        }
-        quote_style = optTemp;
-    }
-    if (quote_style & OPTS.ENT_HTML_QUOTE_SINGLE) {
-        string = string.replace(/'/g, '&#039;');
-    }
-    if (!noquotes) {
-        string = string.replace(/"/g, '&quot;');
-    }
-
-    return string;
-}
-
-zmen_rezim_subjektu = function () {
+zmenRezimSubjektu = function () {
 
     var rezim = this.alt;
     if (rezim == 'A')
@@ -882,23 +754,19 @@ initSelect2 = function () {
 
 vybratSpisovyZnak = function (element) {
 
-    // ziskej DOM element <form>
-    var form = $(element).parents('form').first()[0];
+    // najdi formular
+    var form = $(element).parents('form').first();
 
-    var key = form.spisovy_znak_id.selectedIndex;
-    var sz_id = form.spisovy_znak_id.options[key].value;
-    if (sz_id == 0) // položka "vyberte z nabídky"
-        return true;
+    var szId = form.find('[name=spisovy_znak_id]').val();
+    if (szId == 0) // položka "vyberte z nabídky"
+        return;
 
-    var url = BASE_URL + 'spisznak/' + sz_id + '/';
+    var url = BASE_URL + 'spisznak/' + szId + '/';
     $.get(url, function (data) {
-        form.skartacni_znak.value = data.skartacni_znak;
-        form.skartacni_lhuta.value = data.skartacni_lhuta;
-        if (typeof form.spousteci_udalost_id != 'undefined')
-            select_set_value(form.spousteci_udalost_id, data.spousteci_udalost_id);
+        form.find('[name=skartacni_znak]').val(data.skartacni_znak);
+        form.find('[name=skartacni_lhuta]').val(data.skartacni_lhuta);
+        form.find('[name=spousteci_udalost_id]').val(data.spousteci_udalost_id);
     });
-
-    return true;
 };
 
 postFormJ = function (form, callback) {
