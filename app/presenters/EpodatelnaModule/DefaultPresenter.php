@@ -332,8 +332,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             }
             $do = time() + 7200;
 
-            $UploadFile = $this->storage;
-
             $pocet_novych_zprav = 0;
             $error_count = 0;
             $zpravy = $isds->seznamPrijatychZprav($od, $do);
@@ -342,41 +340,38 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 foreach ($zpravy as $z)
                     if (!$this->Epodatelna->existuje($z->dmID, 'isds')) {
                         // nova zprava, ktera neni zaznamenana v epodatelne
-                        $mess = $isds->MessageDownload($z->dmID);
-                        if (!$mess) {
-                            /* Pravděpodobně zpráva do vlastních rukou a uživatel nemá v datové
+                        $complete_msg = $isds->MessageDownload($z->dmID);
+                        if (!$complete_msg) {
+                            /* Pravděpodobně zpráva do vlastních rukou a uživatel, pod kterým
+                             * se spisovka do ISDS připojuje, nemá v datové
                              * schránce nastaveno oprávnění číst zprávy do v.r.
-                             * Převezmi obálku zprávy ze seznamu zpráv.
                              */
                             if (!$z->dmPersonalDelivery) {
                                 $error_count++;
                                 continue;
                             }
-                            $mess = new \stdClass();
-                            $mess->dmDm = $z;
-                            $mess->dmMessageStatus = $z->dmMessageStatus;
-                            $mess->dmDeliveryTime = $z->dmDeliveryTime;
-                            $mess->dmAcceptanceTime = $z->dmAcceptanceTime;
-                            $mess->dmAttachmentSize = $z->dmAttachmentSize;
+                            $complete_msg = new \stdClass();
                         }
 
-                        $zprava = array();
-                        $zprava['odchozi'] = 0;
-                        $zprava['typ'] = 'I';
-                        $zprava['poradi'] = $this->Epodatelna->getMax();
-                        $zprava['rok'] = date('Y');
-                        $zprava['isds_id'] = $z->dmID;
-                        $zprava['predmet'] = $mess->dmDm->dmAnnotation;
-                        $zprava['popis'] = null;
-                        $zprava['odesilatel'] = $z->dmSender . ', ' . $z->dmSenderAddress;
-                        $zprava['adresat'] = 'Datová schránka';
-                        $zprava['prijato_dne'] = new \DateTime();
-                        $zprava['doruceno_dne'] = new \DateTime($z->dmAcceptanceTime);
-                        $zprava['user_id'] = $this->user->id;
-
+                        $new_record = array();
+                        $new_record['odchozi'] = 0;
+                        $new_record['typ'] = 'I';
+                        $new_record['poradi'] = $this->Epodatelna->getMax();
+                        $new_record['rok'] = date('Y');
+                        $new_record['isds_id'] = $z->dmID;
+                        $new_record['predmet'] = $z->dmAnnotation;
+                        $new_record['popis'] = null;
+                        $new_record['odesilatel'] = $z->dmSender . ', ' . $z->dmSenderAddress;
+                        $new_record['adresat'] = 'Datová schránka';
+                        $new_record['prijato_dne'] = new \DateTime();
+                        $new_record['doruceno_dne'] = new \DateTime($z->dmAcceptanceTime);
+                        $new_record['user_id'] = $this->user->id;
+                        unset($z->dmOrdinal);
+                        $new_record['isds_envelope'] = serialize($z);
+                        
                         $prilohy = array();
-                        if (isset($mess->dmDm->dmFiles->dmFile)) {
-                            foreach ($mess->dmDm->dmFiles->dmFile as $index => $file) {
+                        if (isset($complete_msg->dmDm->dmFiles->dmFile)) {
+                            foreach ($complete_msg->dmDm->dmFiles->dmFile as $index => $file) {
                                 $prilohy[] = array(
                                     'name' => $file->dmFileDescr,
                                     'size' => strlen($file->dmEncodedContent),
@@ -385,53 +380,50 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                                 );
                             }
                         }
-                        $zprava['prilohy'] = serialize($prilohy);
+                        $new_record['prilohy'] = serialize($prilohy);
 
-                        $zprava['stav'] = 0;
-                        $zprava['stav_info'] = '';
+                        $new_record['stav'] = 0;
+                        $new_record['stav_info'] = '';
 
-                        $epod_id = $this->Epodatelna->insert($zprava);
-
-                        /* Ulozeni podepsane ISDS zpravy */
-                        $data = array(
+                        $msg = IsdsMessage::create($new_record);
+                        $epod_id = $msg->id;
+                        
+                        /* Ulozeni podepsane ISDS zpravy v ZFO formátu */
+                        $file_data = array(
                             'filename' => 'ep-isds-' . $epod_id . '.zfo',
-                            'dir' => 'EP-I-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
-                            'typ' => '5',
-                            'popis' => 'Podepsaný originál ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
+                            'dir' => 'EP-I-' . sprintf('%06d', $msg->poradi) . '-' . $msg->rok,
+                            'popis' => null
                         );
 
+                        $stav_info = '';
                         if ($z->dmMessageStatus >= 6) {
                             $signedmess = $isds->SignedMessageDownload($z->dmID);
-                            $file_signed = $UploadFile->uploadEpodatelna($signedmess, $data);
+                            $file_signed = $this->storage->uploadEpodatelna($signedmess, $file_data);
                             if (!$file_signed)
-                                $zprava['stav_info'] = 'Podepsanou zprávu se nepodařilo uložit';
+                                $stav_info = 'Podepsanou zprávu se nepodařilo uložit';
                         } else
-                            $zprava['stav_info'] = 'Nedoručenou zprávu není možné stáhnout';
+                            $stav_info = 'Nedoručenou zprávu není možné stáhnout';
 
                         /* Ulozeni nepodepsane zpravy */
-                        $data = array(
+                        $file_data = array(
                             'filename' => 'ep-isds-' . $epod_id . '.bsr',
-                            'dir' => 'EP-I-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
-                            'typ' => '5',
-                            'popis' => 'Byte-stream reprezentace ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
+                            'dir' => 'EP-I-' . sprintf('%06d', $msg->poradi) . '-' . $msg->rok,
+                            'popis' => 'Byte-stream reprezentace ISDS zprávy z epodatelny ' . $msg->poradi . '-' . $msg->rok
                         );
 
-                        $msg = new EpodatelnaMessage($epod_id);
-                        if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {
+                        if ($file = $this->storage->uploadEpodatelna(serialize($complete_msg), $file_data)) {
                             // ok
-                            if (empty($zprava['stav_info']))
-                                $zprava['stav_info'] = 'Zpráva byla uložena';
+                            if (empty($stav_info))
+                                $stav_info = 'Zpráva byla uložena';
                             $msg->stav = 1;
                             $msg->file_id = $file->id;
-                            $msg->save();
                         } else {
-                            $zprava['stav_info'] = 'Reprezentaci zprávy se nepodařilo uložit';
+                            $stav_info = 'Reprezentaci zprávy se nepodařilo uložit';
                         }
-                        $msg->stav_info = $zprava['stav_info'];
+                        $msg->stav_info = $stav_info;
                         $msg->save();
 
                         $pocet_novych_zprav++;
-                        unset($zprava);
                     }
 
             // po úspěšném dokončení zaznamenej čas stažení zpráv

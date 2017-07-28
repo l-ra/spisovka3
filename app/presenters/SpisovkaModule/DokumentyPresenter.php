@@ -1631,10 +1631,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
      */
     protected function odeslatISDS($adresat, $data, $prilohy)
     {
-        $id_mess = null;
-        $mess = null;
-        $epod_id = null;
-        $zprava = null;
         $password = isset($data['isds_heslo']) ? $data['isds_heslo'] : null;
 
         try {
@@ -1667,19 +1663,18 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             sleep(2); // musíme počkat na doručení do schránky adresáta
             
+            $msg = null;
             $odchozi_zpravy = $isds->seznamOdeslanychZprav(time() - 3600, time() + 3600);
             if (count($odchozi_zpravy) > 0) {
                 foreach ($odchozi_zpravy as $oz) {
                     if ($oz->dmID == $id_mess) {
-                        $mess = $oz;
+                        $msg = $oz;
                         break;
                     }
                 }
             }
-            if (is_null($mess))
+            if (!$msg)
                 return false;
-
-            $UploadFile = $this->storage;
 
             $Epodatelna = new Epodatelna();
 
@@ -1688,15 +1683,17 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['typ'] = 'I';
             $zprava['poradi'] = $Epodatelna->getMax(1);
             $zprava['rok'] = date('Y');
-            $zprava['isds_id'] = $mess->dmID;
-            $zprava['predmet'] = empty($mess->dmAnnotation) ? "(Datová zpráva bez předmětu)" : $mess->dmAnnotation;
+            $zprava['isds_id'] = $msg->dmID;
+            $zprava['predmet'] = empty($msg->dmAnnotation) ? "(Datová zpráva bez předmětu)" : $msg->dmAnnotation;
             $zprava['popis'] = null;
-            $zprava['adresat'] = $mess->dmRecipient . ', ' . $mess->dmRecipientAddress;
+            $zprava['adresat'] = $msg->dmRecipient . ', ' . $msg->dmRecipientAddress;
             $zprava['subjekt_id'] = $adresat->id;
             $zprava['odesilatel'] = '';
             $zprava['odeslano_dne'] = new \DateTime();
             $zprava['user_id'] = $this->user->id;
-
+            unset($msg->dmOrdinal);
+            $zprava['isds_envelope'] = serialize($msg);
+                    
             $aprilohy = array();
             if (count($prilohy) > 0) {
                 foreach ($prilohy as $index => $file) {
@@ -1711,43 +1708,21 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['prilohy'] = serialize($aprilohy);
 
             $zprava['dokument_id'] = $data['dokument_id'];
-            $zprava['stav'] = 0;
+            $zprava['stav'] = 1;
             $zprava['stav_info'] = '';
 
             $epod_id = $Epodatelna->insert($zprava);
 
             /* Ulozeni podepsane ISDS zpravy */
-            $data = array(
+            $file_data = array(
                 'filename' => 'ep-isds-' . $epod_id . '.zfo',
                 'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
-                'typ' => '5',
-                'popis' => 'Podepsaný originál ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
+                'popis' => null
             );
 
             $signedmess = $isds->SignedSentMessageDownload($id_mess);
 
-            $UploadFile->uploadEpodatelna($signedmess, $data);
-
-            /* Ulozeni reprezentace zpravy */
-            $data = array(
-                'filename' => 'ep-isds-' . $epod_id . '.bsr',
-                'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
-                'typ' => '5',
-                'popis' => 'Byte-stream reprezentace ISDS zprávy z epodatelny ' . $zprava['poradi'] . '-' . $zprava['rok']
-            );
-
-            if ($file = $UploadFile->uploadEpodatelna(serialize($mess), $data)) {
-                // ok
-                $zprava['stav_info'] = 'Zpráva byla uložena';
-                //$zprava['file_id'] = $file->id ."-". $file_o->id;
-                $zprava['file_id'] = $file->id;
-                $Epodatelna->update(
-                        ['stav' => 1,
-                    'stav_info' => $zprava['stav_info'],
-                    'file_id' => $file->id
-                        ], "id = $epod_id"
-                );
-            }
+            $this->storage->uploadEpodatelna($signedmess, $file_data);
 
             return $epod_id;
         } catch (\Exception $e) {

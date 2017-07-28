@@ -343,7 +343,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $data = array(
                 'filename' => 'emailova_zprava.eml',
                 'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
-                'typ' => '5',
                 'popis' => 'Originální e-mailová zpráva'
             );
 
@@ -385,7 +384,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'filename' => $filename,
                 'nazev' => $filename,
                 'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
-                'typ' => '2',
                 'popis' => ''
             );
 
@@ -430,7 +428,6 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $data = array(
                 'filename' => $file['file_name'],
                 'dir' => date('Y') . '/DOK-' . sprintf('%06d', $dokument_id) . '-' . date('Y'),
-                'typ' => '2',
                 'popis' => ''
             );
 

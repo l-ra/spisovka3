@@ -2,13 +2,18 @@
 
 namespace Spisovka;
 
+use Nette;
+
 final class Upgrade
 {
 
     const SETTINGS_TASKS = 'upgrade_finished_tasks';
     const SETTINGS_NEEDED = 'upgrade_needed';
 
-    static $tasks = ['EmailMailbox' => 'změna souborů s e-maily v e-podatelně do mailbox formátu'];
+    static $tasks = [
+        'EmailMailbox' => 'změna souborů s e-maily v e-podatelně do mailbox formátu',
+        'DMenvelopes' => 'přenos obálek datových zpráv ze souborů do databáze'
+    ];
 
     public function check()
     {
@@ -21,7 +26,7 @@ final class Upgrade
     {
         $lock = new Lock('upgrade');
         $lock->delete_file = true;
-        
+
         try {
             Settings::reload();
             $done = Settings::get(self::SETTINGS_TASKS);
@@ -37,12 +42,11 @@ final class Upgrade
                 $done[] = $name;
                 Settings::set(self::SETTINGS_TASKS, implode(',', $done));
             }
-            
+
             Settings::set(self::SETTINGS_NEEDED, false);
         } catch (Exception $e) {
             throw $e;
         }
-
     }
 
     private function upgradeEmailMailbox()
@@ -77,6 +81,45 @@ final class Upgrade
             }
 
         dump(__METHOD__ . "() - $processed e-mails converted");
+    }
+
+    public function upgradeDMenvelopes()
+    {
+        $storage = Nette\Environment::getService('storage');
+        /* @var $storage Storage_Basic */
+        $messages = IsdsMessage::getAll();
+
+        foreach ($messages as $message) {
+            $filename = $message->getIsdsFile($storage);
+            $contents = file_get_contents($filename);
+            if (!$contents)
+                continue;
+            $data = unserialize($contents);
+            if ($data === false)
+                continue;
+
+            // sjednoť formát dat a odstraň přiložené písemnosti
+            if ($message->odchozi) {
+                unset($data->dmOrdinal);
+                $file_id = $message->file_id;
+                $message->file_id = null; // příprava pro smazání
+            } else {
+                $dm = $data->dmDm;
+                unset($dm->dmFiles);
+                $dm->dmMessageStatus = $data->dmMessageStatus;
+                $dm->dmAttachmentSize = $data->dmAttachmentSize;
+                $dm->dmDeliveryTime = $data->dmDeliveryTime;
+                $dm->dmAcceptanceTime = $data->dmAcceptanceTime;
+                $data = $dm;
+            }
+
+            $message->isds_envelope = serialize($data);
+            $message->save();
+
+            // smaž nyní zbytečný .bsr soubor
+            if ($message->odchozi)
+                $storage->remove($file_id);
+        }
     }
 
 }

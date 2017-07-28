@@ -11,7 +11,6 @@ class Storage_Basic extends FileModel
     private $epodatelna_dir;
     private $httpResponse;
     private $error_message;
-    private $error_code = 0;
 
     public function __construct(array $params, Nette\Http\IResponse $httpResponse)
     {
@@ -37,14 +36,19 @@ class Storage_Basic extends FileModel
         return $this->epodatelna_dir;
     }
 
+    /**
+     * Smaže záznam z databáze a soubor na disku
+     * @param int $file_id
+     * @throws \Exception
+     */
     public function remove($file_id)
     {
-        $row = $this->select(array(array('id=%i', $file_id)))->fetch();
+        $row = $this->select([['id = %i', $file_id]])->fetch();
         if (!$row)
-            throw new \Exception("Nemohu načíst přílohu ID $file_id.");
+            throw new \Exception("Nemohu načíst soubor ID $file_id.");
 
         // odstraň záznam z databáze
-        $this->delete(array(array('id=%i', $file_id)));
+        $this->delete([['id = %i', $file_id]]);
         unlink(CLIENT_DIR . $row['real_path']);
     }
 

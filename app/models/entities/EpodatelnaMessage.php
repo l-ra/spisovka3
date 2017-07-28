@@ -73,6 +73,14 @@ class EmailMessage extends EpodatelnaMessage
 class IsdsMessage extends EpodatelnaMessage
 {
 
+    public static function getAll(array $params = array())
+    {
+        if (!$params)
+            $params = ['where' => "[typ] = 'I'"];
+        
+        return parent::getAll($params);
+    }
+    
     /**
      * Vrátí soubor se serializovaným objektem s informacemi o zprávě.
      * @param Storage_Basic $storage
@@ -133,16 +141,7 @@ class IsdsMessage extends EpodatelnaMessage
      */
     public function formatEnvelope($storage)
     {
-        $filename = $this->getIsdsFile($storage);
-        $contents = file_get_contents($filename);
-        if (!$contents)
-            return null;
-        $env = unserialize($contents);
-
-        // příchozí a odchozí zprávy jsou nelogicky uloženy bohužel odlišně
-        $status = $env;
-        if (isset($env->dmDm))
-            $env = $env->dmDm;
+        $env = unserialize($this->isds_envelope);
 
         $annotation = $env->dmAnnotation;
         $popis = '';
@@ -182,12 +181,9 @@ class IsdsMessage extends EpodatelnaMessage
         if ($env->dmRecipientOrgUnit)
             $popis .= "            org.jednotka: " . $env->dmRecipientOrgUnit . " [" . $env->dmRecipientOrgUnitNum . "]\n";
 
-        $dt_dodani = strtotime($status->dmDeliveryTime);
+        $dt_dodani = strtotime($env->dmDeliveryTime);
         $popis .= "\nDatum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
-        if ($status->dmAcceptanceTime)
-            $dt_doruceni = date("j.n.Y G:i:s", strtotime($status->dmAcceptanceTime));
-        else
-            $dt_doruceni = 'neznámý';
+        
         // dmAttachmentSize obsahuje chybný údaj, pravděpodobně udává velikost po zakódování do base64
         // $popis .= "Přibližná velikost všech příloh : " . $status->dmAttachmentSize . " kB\n";
 
