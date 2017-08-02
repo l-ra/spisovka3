@@ -57,7 +57,7 @@
                 {else}
                     <strong>{=Spisovka\Subjekt::displayName($odes,'jmeno')}</strong>
                     <br />
-                    způsob odeslání: {=ZpusobOdeslani::getName($odes->zpusob_odeslani_id)}
+                    způsob odeslání: {=Spisovka\ZpusobOdeslani::getName($odes->zpusob_odeslani_id)}
                 {/if}
                 {if $odes->poznamka_odeslani}
                     <br />Poznámka: {$odes->poznamka_odeslani}
