@@ -12,7 +12,8 @@ final class Upgrade
 
     static $tasks = [
         'EmailMailbox' => 'změna souborů s e-maily v e-podatelně do mailbox formátu',
-        'DMenvelopes' => 'přenos obálek datových zpráv ze souborů do databáze'
+        'DMenvelopes' => 'přenos obálek datových zpráv ze souborů do databáze',
+        'DMdeliveryTime' => 'oprava data doručení příchozích datových zpráv v seznamu'
     ];
 
     public function check()
@@ -122,4 +123,15 @@ final class Upgrade
         }
     }
 
+    public function upgradeDMdeliveryTime()
+    {
+        $messages = IsdsMessage::getAll(['where' => "[typ] = 'I' AND NOT [odchozi]"]);
+
+        foreach ($messages as $message) {
+            $envelope = unserialize($message->isds_envelope);
+            $date = new \DateTime($envelope->dmDeliveryTime);
+            $message->doruceno_dne = $date;
+            $message->save();            
+        }
+    }
 }

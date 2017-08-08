@@ -14,11 +14,14 @@ Jiné změny:
   
 Opravy:
 
+- v seznamu příchozích zpráv v e-podatelně se nyní zobrazuje a řadí dle 
+  data dodání datové zprávy do schránky, ne data doručení (které v některých
+  případech neodpovídalo skutečnosti)
 - proces vytváření odpovědi na dokument byl změněn do jednoho nedělitelného
   kroku. To zamezí problémům způsobených chybnou obsluhou aplikace, kdy v minu-
   losti uživatel omylem místo nového dokumentu mohl vytvořit odpověď na jiný
   dokument.
-
+  
 === Verze 3.5.0 ================================================================
 
 Nové funkce:
