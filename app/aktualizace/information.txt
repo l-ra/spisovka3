@@ -161,3 +161,5 @@ Vytvoření nových indexů do tabulky dokument.
 Oprava rozlišování velkých/malých písmen ve jménu zaměstnance.
 [1570]
 Nové oprávnění "Změny všech dokumentů".
+[1630]
+Smazání nepoužívané tabulky.
