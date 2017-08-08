@@ -55,19 +55,15 @@ class CisloJednaci extends BaseModel
      */
     public function generuj($ulozit = 0, $info = null)
     {
-
         $maska = $this->info->maska;
         $cislo_jednaci = $maska;
 
         if (is_null($info)) {
             $info = array();
 
-            if (isset($this->info->typ_deniku) && $this->info->typ_deniku == "org") {
-                $info['podaci_denik'] = $this->info->podaci_denik . (!empty($this->org) ? "_" . $this->org->ciselna_rada
-                                    : "");
-            } else {
-                $info['podaci_denik'] = $this->info->podaci_denik;
-            }
+            $info['podaci_denik'] = $this->info->podaci_denik;
+            if ($this->info->typ_deniku == "org" && !empty($this->org))
+                $info['podaci_denik'] .= "_" . $this->org->ciselna_rada;
 
             $info['rok'] = date('Y');
             if ($this->pouzij_minuly_rok)
@@ -226,21 +222,16 @@ class CisloJednaci extends BaseModel
 
     private function max($typ)
     {
-
-        $where = array();
-        $where[] = array('rok=%i', $this->pouzij_minuly_rok ? date('Y') - 1 : date('Y'));
+        $where = [['rok=%i', $this->pouzij_minuly_rok ? date('Y') - 1 : date('Y')]];
 
         $pocatek_cisla = $this->pocatek_cisla;
         $cislo = null;
         switch ($typ) {
             case "poradove_cislo":
-
-                if (isset($this->info->typ_deniku) && $this->info->typ_deniku == "org") {
-                    $where[] = array('podaci_denik=%s', $this->info->podaci_denik . (!empty($this->org)
-                                    ? "_" . $this->org->ciselna_rada : ""));
-                } else {
-                    $where[] = array('podaci_denik=%s', $this->info->podaci_denik);
-                }
+                $s = $this->info->podaci_denik;
+                if ($this->info->typ_deniku == "org" && !empty($this->org))
+                    $s .= "_" . $this->org->ciselna_rada;
+                $where[] = array('podaci_denik = %s', $s);
 
                 $result = $this->select($where, array('poradove_cislo' => 'DESC'), null, 1);
                 $row = $result->fetch();

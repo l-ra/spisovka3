@@ -174,8 +174,10 @@ class ConfigClient extends Config
         if (!in_array($this->data->cislo_jednaci->typ_evidence, ['priorace', 'sberny_arch']))
             throw new \Exception(__METHOD__ . '() - chybné nastavení typu evidence');
 
-        // Toto nastaveni nebylo v config.ini při instalaci aplikace
-        // Týká se pouze sběrného archu
+        // Tato nastavení mohou v klient.ini chybět z důvodu upgrade ze starých verzí
+        if (empty($this->data->cislo_jednaci->typ_deniku))
+            $this->data->cislo_jednaci->typ_deniku = 'urad';
+        
         if (empty($this->data->cislo_jednaci->oddelovac))
             $this->data->cislo_jednaci->oddelovac = '/';
         

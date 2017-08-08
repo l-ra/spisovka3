@@ -177,7 +177,7 @@ class Admin_NastaveniPresenter extends BasePresenter
 
         $form1->addRadioList('typ_deniku', 'Podací deník:',
                         array('urad' => 'společný pro celý úřad', 'org' => 'samostatný pro každou organizační jednotku'))
-                ->setValue(isset($CJ->typ_deniku) ? $CJ->typ_deniku : 'urad' );
+                ->setValue($CJ->typ_deniku);
 
         $CJ = new CisloJednaci;
         $form1->addCheckbox('minuly_rok', 'Evidovat dokumenty do minulého roku')
