@@ -224,7 +224,7 @@ class Ciselnik extends Nette\Application\UI\Control
     {
         try {
 
-            $model = new Model($this->tableName);
+            $model = new \Spisovka\Model($this->tableName);
             $model->insert($values);
             $this->dataChangedHandler();
 
@@ -243,7 +243,7 @@ class Ciselnik extends Nette\Application\UI\Control
     public function handleEdit($values, $id)
     {
         try {
-            $model = new Model($this->tableName);
+            $model = new \Spisovka\Model($this->tableName);
             $model->update($values, [['%and', ['id' => $id]]]);
             $this->dataChangedHandler();
 
@@ -262,7 +262,7 @@ class Ciselnik extends Nette\Application\UI\Control
     public function handleDelete($id)
     {
         try {
-            $model = new Model($this->tableName);
+            $model = new \Spisovka\Model($this->tableName);
             $model->delete([['%and', ['id' => $id]]]);
             $this->dataChangedHandler();
 
