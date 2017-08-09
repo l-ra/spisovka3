@@ -295,3 +295,16 @@ function revision_1520_after()
                 implode(',', $druh));
     }
 }
+
+function revision_1615_after()
+{
+    $names = dibi::query("SELECT [nazev] FROM [file] WHERE [nazev] LIKE 'ep-isds-%.zfo'",
+                    "AND [real_path] LIKE '%EP-O-%'", "GROUP BY [nazev] HAVING COUNT(*) > 1 ")->fetchPairs();
+
+    foreach ($names as $name) {
+        $ids = dibi::query("SELECT [id] FROM [file] WHERE [nazev] = %s ORDER BY [id] ASC",
+                        $name)->fetchPairs();
+        array_shift($ids);
+        dibi::query("DELETE FROM [file] WHERE [id] IN %in", $ids);
+    }
+}
