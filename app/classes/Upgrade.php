@@ -84,7 +84,7 @@ final class Upgrade
         dump(__METHOD__ . "() - $processed e-mails converted");
     }
 
-    public function upgradeDMenvelopes()
+    private function upgradeDMenvelopes()
     {
         $storage = Nette\Environment::getService('storage');
         /* @var $storage Storage_Basic */
@@ -123,7 +123,7 @@ final class Upgrade
         }
     }
 
-    public function upgradeDMdeliveryTime()
+    private function upgradeDMdeliveryTime()
     {
         $messages = IsdsMessage::getAll(['where' => "[typ] = 'I' AND NOT [odchozi]"]);
 
@@ -131,7 +131,8 @@ final class Upgrade
             $envelope = unserialize($message->isds_envelope);
             $date = new \DateTime($envelope->dmDeliveryTime);
             $message->doruceno_dne = $date;
-            $message->save();            
+            $message->save();
         }
     }
+
 }

@@ -102,6 +102,8 @@ class IsdsMessage extends EpodatelnaMessage
     }
 
     /**
+     * Každá datová zpráva má připojen ZFO soubor. Vyjímkou jsou pouze datové zprávy
+     * do vlastních rukou, kdy byla kvůli nedostatečnému oprávnění stažena pouze obálka zprávy.
      * @return boolean
      * @throws LogicException
      */
@@ -110,9 +112,7 @@ class IsdsMessage extends EpodatelnaMessage
         if ($this->typ != 'I')
             throw new \LogicException(__METHOD__);
 
-        $FileModel = new FileModel();
-        $file = $FileModel->select([["nazev = %s", "ep-isds-{$this->id}.zfo"]])->fetch();
-        return (boolean) $file;
+        return !empty($this->zfo_id);
     }
 
     /**
@@ -125,12 +125,10 @@ class IsdsMessage extends EpodatelnaMessage
         if ($this->typ != 'I')
             throw new \LogicException(__METHOD__);
 
-        $FileModel = new FileModel();
-        $file = $FileModel->select([["nazev = %s", "ep-isds-{$this->id}.zfo"]])->fetch();
-        if (!$file)
+        if (!$this->zfo_id)
             return null;
 
-        $zfo = $storage->download($file->id, !$download);
+        $zfo = $storage->download($this->zfo_id, !$download);
         return $zfo;
     }
 

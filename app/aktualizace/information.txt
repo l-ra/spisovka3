@@ -163,5 +163,7 @@ Oprava rozlišování velkých/malých písmen ve jménu zaměstnance.
 Nové oprávnění "Změny všech dokumentů".
 [1615]
 Odstranění duplicitních záznamů z tabulky "file" pro odchozí datové zprávy.
+[1620]
+Oprava vazby mezi zprávou v e-podatelně a ZFO souborem na disku.
 [1630]
 Smazání nepoužívané tabulky.
