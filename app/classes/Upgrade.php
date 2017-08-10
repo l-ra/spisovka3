@@ -123,6 +123,10 @@ final class Upgrade
         }
     }
 
+    /**
+     * Závisí na aktualizačním kroku DMenvelopes, který musí být proveden než se zavolá
+     * tento krok. Proto není možné tento kód přesunout do app/aktualizace/scripts.php.
+     */
     private function upgradeDMdeliveryTime()
     {
         $messages = IsdsMessage::getAll(['where' => "[typ] = 'I' AND NOT [odchozi]"]);
