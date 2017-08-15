@@ -168,7 +168,7 @@ final class Bootstrap
              *  Je-li potřeba, proveď upgrade aplikace
              */
             if (APPLICATION_INSTALLED) {
-                $upgrade = new Spisovka\Upgrade();
+                $upgrade = new Spisovka\Upgrade($container->getService('storage'));
                 $upgrade->check();
             }
         } catch (Exception $e) {

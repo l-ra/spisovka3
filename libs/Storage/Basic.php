@@ -92,7 +92,7 @@ class Storage_Basic extends BaseModel
         $row['md5_hash'] = md5_file($filepath);
         $row['size'] = filesize($filepath);
 
-        $row['mime_type'] = FileModel::mimeType($filepath);
+        $row['mime_type'] = FileModel::getMimeType($filepath);
 
         $row['date_created'] = new \DateTime();
         $row['user_created'] = $user->id;

@@ -13,8 +13,15 @@ final class Upgrade
     static $tasks = [
         'EmailMailbox' => 'změna souborů s e-maily v e-podatelně do mailbox formátu',
         'DMenvelopes' => 'přenos obálek datových zpráv ze souborů do databáze',
-        'DMdeliveryTime' => 'oprava data doručení příchozích datových zpráv v seznamu'
+        'DMdeliveryTime' => 'oprava data doručení příchozích datových zpráv v seznamu',
+        'MimeType' => 'nové vygenerování informací o typu souborů u dokumentů',
     ];
+    private $storage;
+
+    public function __construct(Storage_Basic $storage)
+    {
+        $this->storage = $storage;
+    }
 
     public function check()
     {
@@ -42,8 +49,9 @@ final class Upgrade
                     echo "již proveden\n";
                     continue;
                 }
-                
-                echo "provádím: "; flush();
+
+                echo "provádím: ";
+                flush();
                 $function = 'upgrade' . $name;
                 $this->$function();
 
@@ -57,14 +65,14 @@ final class Upgrade
             echo "Chyba\n";
             throw $e;
         }
-        
+
         echo "\n" . 'Hotovo. <a href="#" onclick="window.location.reload(true);">Klikněte</a> pro spuštění aplikace.';
         die;
     }
 
     private function upgradeEmailMailbox()
     {
-        $storage = Nette\Environment::getService('storage');
+        $storage = $this->storage;
 
         $res = dibi::query("SELECT [file_id] FROM [epodatelna] WHERE [typ] = 'E' AND [odchozi] = 0");
         $processed = 0;
@@ -97,7 +105,7 @@ final class Upgrade
 
     private function upgradeDMenvelopes()
     {
-        $storage = Nette\Environment::getService('storage');
+        $storage = $this->storage;
         /* @var $storage Storage_Basic */
         $messages = IsdsMessage::getAll();
 
@@ -147,6 +155,17 @@ final class Upgrade
             $date = new \DateTime($envelope->dmDeliveryTime);
             $message->doruceno_dne = $date;
             $message->save();
+        }
+    }
+
+    private function upgradeMimeType()
+    {
+        $files = FileRecord::getAll();
+        foreach ($files as $file) {
+            $path = $this->storage->getFilePath($file);
+            $type = FileModel::getMimeType($path);
+            $file->mime_type = $type;
+            $file->save();
         }
     }
 

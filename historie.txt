@@ -11,7 +11,12 @@ Nové funkce:
 Jiné změny:
 
 - aktualizován popis stavů datových zpráv z oficiální dokumentace ISDS
-  
+- PHP rozšíření "fileinfo" je nyní povinné. U instalace na Windows bude možná
+  potřeba toto rozšíření povolit.
+- první spuštění aplikace po upgradu na novou verzi provádí aktualizační kroky.
+  V předešlých verzích aplikace toto probíhalo skrytě, nyní uživatel vidí 
+  průběh aktualizace (také z důvodu, že tento proces může trvat desítky sekund).
+
 Opravy:
 
 - v seznamu příchozích zpráv v e-podatelně se nyní zobrazuje a řadí dle 

@@ -148,10 +148,10 @@ class Install_DefaultPresenter extends BasePresenter
             ),
             array(
                 'title' => 'Rozšíření Fileinfo',
-                'required' => FALSE,
+                'required' => TRUE,
                 'passed' => extension_loaded('fileinfo'),
                 'message' => 'Ano',
-                'errorMessage' => 'Chybí. Detekce MIME typů souborů bude omezena, jen podle přípony souboru.',
+                'errorMessage' => 'Chybí. Je vyžadováno pro zjištění MIME typu souborů.',
             ),
             array(
                 'title' => 'Rozšíření GD',
