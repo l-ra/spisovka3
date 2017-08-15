@@ -346,7 +346,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'popis' => 'Originální e-mailová zpráva'
             );
 
-            if ($filep = $storage->uploadDocument($email_contents, $data)) {
+            if ($filep = $storage->uploadDocument($email_contents, $data, $this->user)) {
                 $DokumentFile->pripojit($dokument_id, $filep->id);
             }
 
@@ -366,7 +366,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'typ' => '1',
                 'popis' => 'Text e-mailové zprávy'
             );
-            if ($uploaded = $storage->uploadDocument($text, $upload_info))
+            if ($uploaded = $storage->uploadDocument($text, $upload_info, $this->user))
                 $DokumentFile->pripojit($dokument_id, $uploaded->id);
         }
 
@@ -387,7 +387,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'popis' => ''
             );
 
-            if ($uploaded = $storage->uploadDocument($data, $upload_info)) {
+            if ($uploaded = $storage->uploadDocument($data, $upload_info, $this->user)) {
                 $DokumentFile->pripojit($dokument_id, $uploaded->id);
             }
         }
@@ -418,7 +418,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'popis' => ''
             );
 
-            if ($filep = $storage->uploadDocument($file['file'], $data))
+            if ($filep = $storage->uploadDocument($file['file'], $data, $this->user))
                 $DokumentFile->pripojit($dokument_id, $filep->id);
         }
 

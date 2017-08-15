@@ -13,6 +13,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     static public $testMode = false;
     protected $pdf_output = false;
 
+    /**
+     * @return Storage_Basic
+     */
     public function getStorage()
     {
         return $this->context->getService('storage');

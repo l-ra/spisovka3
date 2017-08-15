@@ -11,10 +11,12 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
     public function renderPridat()
     {
+        
     }
 
     public function renderUpravit()
     {
+        
     }
 
     /**
@@ -23,9 +25,8 @@ class Spisovka_PrilohyPresenter extends BasePresenter
      */
     public function renderNacti($id)
     {
-        $DokumentPrilohy = new DokumentPrilohy();
-        $seznam = $DokumentPrilohy->prilohy($id);
-        $this->template->prilohy = $seznam;
+        $doc = new Document($id);
+        $this->template->prilohy = $doc->getFiles();
         $this->template->dokument_id = $id;
         $this->template->AccessEdit = true;
     }
@@ -36,17 +37,13 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         $file_id = $this->getParameter('id', null);
         $dokument_id = $this->getParameter('dok_id', null);
 
-        $FileModel = new FileModel();
-        $file_info = $FileModel->getInfo($file_id);
-
+        $file =  new FileRecord($file_id);
         $DokumentPrilohy = new DokumentPrilohy();
-
+        $nazev = $file->nazev; $filename = $file->filename;
+        
         if ($DokumentPrilohy->odebrat($dokument_id, $file_id)) {
-
-            $UploadFile = $this->storage;
-
             try {
-                $UploadFile->remove($file_id);
+                $this->storage->remove($file);
             } catch (Exception $e) {
                 $e->getCode();
                 // Priloha muze byt sdilena mezi dokumentem a odpovedi, tudiz nemusi
@@ -55,9 +52,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
             $Log = new LogModel();
             $Log->logDocument($dokument_id, LogModel::PRILOHA_ODEBRANA,
-                    'Odebrána příloha "' . $file_info->nazev . ' (' . $file_info->real_name . ')"');
-        } else {
-            
+                    "Odebrána příloha \"$nazev\" ($filename)");
         }
 
         $this->terminate();
@@ -109,10 +104,9 @@ class Spisovka_PrilohyPresenter extends BasePresenter
                 if ($DokumentPrilohy->pripojit($dokument_id, $file->id)) {
 
                     $Log = new LogModel();
-                    $FileModel = new FileModel();
-                    $file_info = $FileModel->getInfo($file->id);
+                    $file_info = new FileRecord($file->id);
                     $Log->logDocument($dokument_id, LogModel::PRILOHA_PRIDANA,
-                            'Přidána příloha "' . $file_info->nazev . ' (' . $file_info->real_name . ')"');
+                            'Přidána příloha "' . $file_info->nazev . ' (' . $file_info->filename . ')"');
 
                     echo '###nahrano###';
                     $this->terminate();
@@ -138,29 +132,32 @@ class Spisovka_PrilohyPresenter extends BasePresenter
      */
     protected function createComponentReUploadForm()
     {
-        $File = new FileModel();
-        $file_info = $File->getInfo($this->getParameter('id'));
+        $file_id = $this->getParameter('id');
 
-        $form1 = new Form();
+        $form = new Form();
         //$form1->getElementPrototype()->id('priloha-upload');
-        $form1->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : attachmentUploadCompleted})";
+        $form->getElementPrototype()->onsubmit = "return AIM.submit(this, {'onComplete' : attachmentUploadCompleted})";
 
         $dok_id = $this->getParameter('dok_id');
-        $form1->addHidden('dokument_id');
+        $form->addHidden('dokument_id');
         if ($dok_id)
-            $form1['dokument_id']->setValue($dok_id);
-        $form1->addHidden('file_id')
+            $form['dokument_id']->setValue($dok_id);
+        $form->addHidden('file_id')
                 ->setValue($this->getParameter('id'));
 
-        $form1->addText('priloha_nazev', 'Název přílohy:', 50, 150)
-                ->setValue(@$file_info->nazev);
-        $form1->addTextArea('priloha_popis', 'Popis:', 80, 5)
-                ->setValue(@$file_info->popis);
-        $form1->addUpload('file', 'Soubor:');
-        $form1->addSubmit('upload', 'Nahrát')
+        $form->addText('priloha_nazev', 'Název přílohy:', 50, 150);                
+        $form->addTextArea('priloha_popis', 'Popis:', 80, 5);                
+        $form->addUpload('file', 'Soubor:');
+        $form->addSubmit('upload', 'Nahrát')
                 ->onClick[] = array($this, 'reUploadClicked');
 
-        return $form1;
+        if ($file_id) {
+            $file_info = new FileRecord($file_id);
+            $form['priloha_nazev']->setValue($file_info->nazev);
+            $form['priloha_popis']->setValue($file_info->popis);
+        }
+        
+        return $form;
     }
 
     public function reUploadClicked(Nette\Forms\Controls\SubmitButton $button)
@@ -182,25 +179,20 @@ class Spisovka_PrilohyPresenter extends BasePresenter
 
         if ($upload->error == 0) {
             if ($file = $this->uploadDocumentHttp($data, $data['file'])) {
-                $FileModel = new FileModel();
-                $file_info1 = $FileModel->getInfo($file_id);
-                $file_info2 = $FileModel->getInfo($file->id);
+                $old_record = new FileRecord($file_id);
+                $new_record = new FileRecord($file->id);
 
                 // pripojit k dokumentu
                 $DokumentPrilohy = new DokumentPrilohy();
                 if ($DokumentPrilohy->pripojit($dokument_id, $file->id)) {
-                    // tady by se melo mozna kontrolovat nejake uzivatelske nastaveni, jak se ma reupload prilohy chovat
-                    if (false) {
-                        $DokumentPrilohy->deaktivovat($dokument_id, $file_id); // deaktivujeme puvodni prilohu
-                    } else {
-                        $DokumentPrilohy->odebrat($dokument_id, $file_id);
-                        $this->storage->remove($file_id);
-                    }
+                    $DokumentPrilohy->odebrat($dokument_id, $file_id);
 
                     $Log = new LogModel();
                     $Log->logDocument($dokument_id, LogModel::PRILOHA_ZMENENA,
-                            'Změněna příloha z "' . $file_info1->nazev . ' (' . $file_info1->real_name . ')" na "' . $file_info2->nazev . ' (' . $file_info2->real_name . ')"');
+                            'Změněna příloha z "' . $old_record->nazev . ' (' . $old_record->filename . ')" na "' . $new_record->nazev . ' (' . $new_record->filename . ')"');
 
+                    $this->storage->remove($old_record);
+                    
                     echo '###nahrano###';
                     $this->terminate();
                 } else {
@@ -212,13 +204,13 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             }
         } else {
             // zadny soubor
-            $File = new FileModel();
-            if ($file = $File->upravitMetadata($data, $file_id)) {
-                echo '###zmemeno###';
-                $this->terminate();
-            } else {
-                $this->template->chyba = 3;
-            }
+            $file = new FileRecord($file_id);
+            $file->nazev = $data['nazev'];
+            $file->popis = $data['popis'];
+            $file->save();
+
+            echo '###zmemeno###';
+            $this->terminate();
         }
     }
 
@@ -243,15 +235,16 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             }
             return null;
         }
-        
+
         $data['filename'] = $upload->getName();
         $contents = file_get_contents($upload->getTemporaryFile());
-        
+
         $storage = $this->storage;
-        $row = $storage->uploadDocument($contents, $data);
+        $row = $storage->uploadDocument($contents, $data, $this->user);
         if (!$row)
             $this->error_message = $storage->errorMessage();
-        
+
         return $row;
     }
+
 }

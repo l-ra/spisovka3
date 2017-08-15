@@ -98,8 +98,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $msg = EpodatelnaMessage::factory($id);
 
         $this->template->Zprava = $msg;
-        $this->template->Prilohy = $msg->file_id ? EpodatelnaPrilohy::getFileList($msg,
-                        $this->storage) : [];
+        $this->template->Prilohy = EpodatelnaPrilohy::getFileList($msg, $this->storage);
         $this->template->back = $this->getParameter('back', 'nove');
 
         if ($msg instanceof IsdsMessage) {
@@ -368,7 +367,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $new_record['user_id'] = $this->user->id;
                         unset($z->dmOrdinal);
                         $new_record['isds_envelope'] = serialize($z);
-                        
+
                         $prilohy = array();
                         if (isset($complete_msg->dmDm->dmFiles->dmFile)) {
                             foreach ($complete_msg->dmDm->dmFiles->dmFile as $index => $file) {
@@ -387,7 +386,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
                         $msg = IsdsMessage::create($new_record);
                         $epod_id = $msg->id;
-                        
+
                         /* Ulozeni podepsane ISDS zpravy v ZFO formátu */
                         $file_data = array(
                             'filename' => 'ep-isds-' . $epod_id . '.zfo',
@@ -398,7 +397,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $stav_info = '';
                         if ($z->dmMessageStatus >= 6) {
                             $signedmess = $isds->SignedMessageDownload($z->dmID);
-                            $file_signed = $this->storage->uploadEpodatelna($signedmess, $file_data);
+                            $file_signed = $this->storage->uploadEpodatelna($signedmess,
+                                    $file_data, $this->user);
                             if (!$file_signed)
                                 $stav_info = 'Podepsanou zprávu se nepodařilo uložit';
                         } else
@@ -411,7 +411,8 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             'popis' => 'Byte-stream reprezentace ISDS zprávy z epodatelny ' . $msg->poradi . '-' . $msg->rok
                         );
 
-                        if ($file = $this->storage->uploadEpodatelna(serialize($complete_msg), $file_data)) {
+                        if ($file = $this->storage->uploadEpodatelna(serialize($complete_msg),
+                                $file_data, $this->user)) {
                             // ok
                             if (empty($stav_info))
                                 $stav_info = 'Zpráva byla uložena';
@@ -568,7 +569,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 'popis' => 'E-mailová zpráva z epodatelny ' . $insert['poradi'] . '-' . $insert['rok']
             );
 
-            if ($file = $UploadFile->uploadEpodatelna($raw_message, $data)) {
+            if ($file = $UploadFile->uploadEpodatelna($raw_message, $data, $this->user)) {
                 $update_data = ['stav' => 1,
                     'stav_info' => 'Zpráva byla uložena',
                     'file_id' => $file->id

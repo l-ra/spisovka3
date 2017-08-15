@@ -55,16 +55,12 @@
         Přílohy
     </div>
     <div id="dok-prilohy">
-        {if count($Prilohy)>0}
+        {if count($Prilohy)}
             <table class="seznam">
                 {foreach $Prilohy as $priloha}
                     <tr>
                         <td class="icon">
-                            {if file_exists(APP_DIR ."/../public/images/mimetypes/". Nette\Utils\Strings::webalize($priloha['mimetype']) .".png")}
-                                <img src="{$publicUrl}images/mimetypes/{$priloha['mimetype']|webalize}.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
-                            {else}
-                                <img src="{$publicUrl}images/mimetypes/application-octet-stream.png" alt="{$priloha['mimetype']}" title="{$priloha['mimetype']}" width="32" height="32" />
-                            {/if}                
+                            <img src="{$publicUrl}{Spisovka\FileModel::getIconUrl($priloha['mimetype'])}" alt="" width="32" height="32" />
                         </td>
                         <td class="meta">
                             {if 0}<a href="{link :Epodatelna:Prilohy:download, 'id'=>$Zprava->id, 'file'=>$priloha['id']}">{$priloha['name']}</a>{/if}

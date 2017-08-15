@@ -4,9 +4,8 @@ namespace Spisovka;
 
 use Nette;
 
-class Storage_Basic extends FileModel
+class Storage_Basic extends BaseModel
 {
-
     private $document_dir;
     private $epodatelna_dir;
     private $httpResponse;
@@ -38,21 +37,23 @@ class Storage_Basic extends FileModel
 
     /**
      * Smaže záznam z databáze a soubor na disku
-     * @param int $file_id
+     * @param FileRecord $file
      * @throws \Exception
      */
-    public function remove($file_id)
+    public function remove(FileRecord $file)
     {
-        $row = $this->select([['id = %i', $file_id]])->fetch();
-        if (!$row)
-            throw new \Exception("Nemohu načíst soubor ID $file_id.");
-
-        // odstraň záznam z databáze
-        $this->delete([['id = %i', $file_id]]);
-        unlink(CLIENT_DIR . $row['real_path']);
+        unlink($this->getFilePath($file));
+        $file->delete();
     }
 
-    protected function uploadInt($source, array $data, $directory)
+    /**
+     * @param string $contents  binary data
+     * @param array $data
+     * @param User $user
+     * @param string $directory
+     * @return FileRecord
+     */
+    protected function uploadInt($contents, array $data, User $user, $directory)
     {
         if (isset($data['dir'])) {
             if (!file_exists($directory . "/" . $data['dir'])) {
@@ -78,7 +79,7 @@ class Storage_Basic extends FileModel
         $filepath = $file_dir . "/" . Nette\Utils\Strings::webalize($data['filename'], '.');
         $filepath = $this->getUniqueFilename($filepath);
 
-        if (!file_put_contents($filepath, $source)) {
+        if (!file_put_contents($filepath, $contents)) {
             $this->error_message = 'Obsah není možné uložit do souboru.';
             return null;
         }
@@ -86,39 +87,54 @@ class Storage_Basic extends FileModel
         $row = array();
         $row['nazev'] = empty($data['nazev']) ? $data['filename'] : $data['nazev'];
         $row['popis'] = empty($data['popis']) ? '' : $data['popis'];
-        $row['real_name'] = $data['filename'];
-        $row['real_path'] = str_replace(CLIENT_DIR, '', $filepath);
+        $row['filename'] = $data['filename'];
+        $row['storage_path'] = str_replace(CLIENT_DIR, '', $filepath);
         $row['md5_hash'] = md5_file($filepath);
         $row['size'] = filesize($filepath);
 
-        return $this->vlozit($row);
+        $row['mime_type'] = FileModel::mimeType($filepath);
+
+        $row['date_created'] = new \DateTime();
+        $row['user_created'] = $user->id;
+                
+        $record = FileRecord::create($row);
+        return $record;
     }
 
     /**
      * Voláno při vytváření dokumentu ze zprávy v e-podatelně.
      * @param string $contents
      * @param array $data
+     * @param User $user
      * @return DibiRow
      */
-    public function uploadDocument($contents, array $data)
+    public function uploadDocument($contents, array $data, User $user)
     {
-        return $this->uploadInt($contents, $data, $this->document_dir);
+        return $this->uploadInt($contents, $data, $user, $this->document_dir);
     }
 
     /**
      * Uložení souboru se zprávou v e-podatelně.
      * @param string $contents
      * @param array $data
+     * @param User $user
      * @return DibiRow
      */
-    public function uploadEpodatelna($contents, array $data)
+    public function uploadEpodatelna($contents, array $data, User $user)
     {
-        return $this->uploadInt($contents, $data, $this->epodatelna_dir);
+        return $this->uploadInt($contents, $data, $user, $this->epodatelna_dir);
     }
 
-    public function getFilePath($file)
+    /**
+     * @param int|array $param
+     * @return string
+     */
+    public function getFilePath($param)
     {
-        $file_path = CLIENT_DIR . $file->real_path;
+        if (is_integer($param))
+            $param = new FileRecord($param);
+        
+        $file_path = CLIENT_DIR . $param->storage_path;
         return $file_path;
     }
 
@@ -131,8 +147,7 @@ class Storage_Basic extends FileModel
      */
     public function download($file_id, $return = false)
     {
-        $FileModel = new FileModel();
-        $file = $FileModel->getInfo($file_id);
+        $file = new FileRecord($file_id);
 
         $file_path = $this->getFilePath($file);
         if (!file_exists($file_path))
@@ -143,10 +158,10 @@ class Storage_Basic extends FileModel
 
         // poslat primo na vystup
         $httpResponse = $this->httpResponse;
-        $httpResponse->setContentType($file->mime_type ? : 'application/octetstream');
+        $httpResponse->setContentType($file->mime_type ?: 'application/octetstream');
         $httpResponse->setHeader('Content-Description', 'File Transfer');
         $httpResponse->setHeader('Content-Disposition',
-                'attachment; filename="' . $file->real_name . '"');
+                'attachment; filename="' . $file->filename . '"');
         $httpResponse->setHeader('Content-Transfer-Encoding', 'binary');
         $httpResponse->setHeader('Expires', '0');
         $httpResponse->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');

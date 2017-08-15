@@ -111,6 +111,14 @@ class Document extends DBEntity
         return $model->subjekty($this->id);
     }
 
+    /**
+     * @return FileRecord[]
+     */
+    public function getFiles()
+    {
+        return FileRecord::getDocumentFiles($this);
+    }
+    
     public function __get($name)
     {
         // pro zpětnou kompatibilitu

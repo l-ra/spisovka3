@@ -87,10 +87,10 @@ class Admin_ExportPresenter extends BasePresenter
         $adresat = rtrim($adresat, ',');
 
         $soubory = '';
+        $storage = $this->getStorage();
         if (!empty($d->prilohy))
             foreach ($d->prilohy as $soubor) {
-                // odstran / ktere je na zacatku
-                $path = substr($soubor->real_path, 1);
+                $path = $storage->getFilePath($soubor);
                 $soubory .= "$path,";
             }
         $soubory = rtrim($soubory, ',');

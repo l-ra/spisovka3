@@ -61,9 +61,7 @@ class EmailMessage extends EpodatelnaMessage
         if (!$this->file_id)
             return null;
 
-        $FileModel = new FileModel();
-        $file = $FileModel->getInfo($this->file_id);
-        $path = $storage->getFilePath($file);
+        $path = $storage->getFilePath($this->file_id);
 
         return $path;
     }
@@ -94,9 +92,7 @@ class IsdsMessage extends EpodatelnaMessage
         if (!$this->file_id)
             return null;
 
-        $FileModel = new FileModel();
-        $file = $FileModel->getInfo($this->file_id);
-        $path = $storage->getFilePath($file);
+        $path = $storage->getFilePath($this->file_id);
 
         return $path;
     }

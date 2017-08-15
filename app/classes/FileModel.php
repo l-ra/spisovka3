@@ -4,167 +4,31 @@ namespace Spisovka;
 
 use Nette;
 
-class FileModel extends BaseModel
+/**
+ * TODO přejmenovat třídu
+ */
+class FileModel
 {
 
-    //'main','enclosure','signature','meta'
-
-    protected $name = 'file';
-
-    public function getInfo($file_id)
+    /**
+     * @param string $mime_type
+     * @return string
+     */
+    public static function getIconUrl($mime_type)
     {
-        $result = $this->select(array(array('id=%i', $file_id)));
-        $row = $result->fetch();
+        $mime_type = Nette\Utils\Strings::webalize($mime_type);
+        $filename = APP_DIR . "/../public/images/mimetypes/$mime_type.png";
+        if (!@file_exists($filename))
+            $mime_type = 'application-octet-stream';
 
-        if ($row) {
-
-            $osoba = Person::fromUserId($row->user_created);
-            $row->user_name = Osoba::displayName($osoba);
-            // Ignoruj mime-type ulozeny v databazi (nastaveny pri nahrani prilohy) a zjisti jej pokazde znovu
-            $row->mime_type = FileModel::mimeType($row->real_path);
-            // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
-            $mime_type_webalize = Nette\Utils\Strings::webalize($row->mime_type);
-            $mime_type_icon = APP_DIR . "/../public/images/mimetypes/" . $mime_type_webalize . ".png";
-            if (@file_exists($mime_type_icon)) {
-                $row->mime_type_icon = "images/mimetypes/" . $mime_type_webalize . ".png";
-            } else {
-                $row->mime_type_icon = "images/mimetypes/application-octet-stream.png";
-            }
-
-
-            return $row;
-        } else {
-            return null;
-        }
+        return "images/mimetypes/$mime_type.png";
     }
 
-    public function seznam()
-    {
-
-        $select = $this->select(null, array('nazev'));
-        $rows = $select->fetchAll();
-
-        $tmp = array();
-        foreach ($rows as $file) {
-
-            $osoba = Person::fromUserId($file->user_created);
-            $file->user_name = Osoba::displayName($osoba);
-            // Nahrazeni online mime-type
-            $file->mime_type = FileModel::mimeType($file->real_path);
-            // Osetreni ikony - pokud neexistuje, pak nahradit defaultni
-            $mime_type_webalize = Nette\Utils\Strings::webalize($file->mime_type);
-            $mime_type_icon = APP_DIR . "/../public/images/mimetypes/" . $mime_type_webalize . ".png";
-            if (@file_exists($mime_type_icon)) {
-                $file->mime_type_icon = "images/mimetypes/" . $mime_type_webalize . ".png";
-            } else {
-                $file->mime_type_icon = "images/mimetypes/application-octet-stream.png";
-            }
-
-            $tmp[$file->id] = $file;
-        }
-
-        return ($rows) ? $rows : NULL;
-    }
-
-    public function vlozit($data)
-    {
-        $row = array();
-        $row['nazev'] = $data['nazev'];
-        $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
-        $row['real_name'] = $data['real_name'];
-        $row['real_path'] = $data['real_path'];
-
-        $row['mime_type'] = FileModel::mimeType($row['real_path']);
-
-        if (!isset($data['md5_hash'])) {
-            if (file_exists($data['real_path'])) {
-                $row['md5_hash'] = md5_file($data['real_path']);
-            } else {
-                $row['md5_hash'] = '';
-            }
-        } else {
-            $row['md5_hash'] = $data['md5_hash'];
-        }
-
-        if (!isset($data['size'])) {
-            if (file_exists($data['real_path'])) {
-                $row['size'] = filesize($data['real_path']);
-            } else {
-                $row['size'] = -1;
-            }
-        } else {
-            $row['size'] = $data['size'];
-        }
-
-        $row['date_created'] = new \DateTime();
-        $row['user_created'] = self::getUser()->id;
-        $row['date_modified'] = new \DateTime();
-        $row['user_modified'] = self::getUser()->id;
-
-        $row['guid'] = UUID::v4();
-        $row['stav'] = 1;
-
-        $file_id = $this->insert($row);
-        return $this->getInfo($file_id);
-    }
-
-    public function upravitMetadata($data, $file_id)
-    {
-        $file_info = $this->select(array(array('id=%i', $file_id)))->fetch();
-        if (!$file_info)
-            return false;
-
-        $file_info = $this->obj2array($file_info);
-
-        $row = $file_info;
-        $row['nazev'] = $data['nazev'];
-        $row['popis'] = isset($data['popis']) ? $data['popis'] : '';
-
-        $row['date_modified'] = new \DateTime();
-        $row['user_modified'] = self::getUser()->id;
-
-        if ($this->update($row, array('id=%i', $file_id))) {
-            return $this->getInfo($file_id);
-        } else {
-            return false;
-        }
-    }
-
-    public function deleteAll()
-    {
-        $DokumentPrilohy = new DokumentPrilohy();
-        $DokumentPrilohy->deleteAll();
-
-        parent::deleteAll();
-    }
-
-//    public static function typPrilohy($typ = null, $out = 0)
-//    {
-//        $enum_orig = array('1' => 'main',
-//            '2' => 'enclosure',
-//            '3' => 'signature',
-//            '4' => 'meta',
-//            '5' => 'source'
-//        );
-//        $enum_popis = array('1' => 'hlavní soubor',
-//            '2' => 'příloha',
-//            '3' => 'podpis',
-//            '4' => 'metadata',
-//            '5' => 'zdrojový soubor'
-//        );
-//
-//        if (is_null($typ)) {
-//            return $enum_popis;
-//        }
-//        if ($out == 0) {
-//            return ( array_key_exists($typ, $enum_orig) ) ? $enum_orig[$typ] : null;
-//        } else if ($out == 1) {
-//            return ( array_key_exists($typ, $enum_popis) ) ? $enum_popis[$typ] : null;
-//        } else {
-//            return null;
-//        }
-//    }
-
+    /**
+     * Determine MIME type of given file
+     * @param string $filename  path to tested file
+     * @return string
+     */
     public static function mimeType($filename)
     {
         $mime_types = array(
@@ -723,12 +587,7 @@ class FileModel extends BaseModel
             '323' => 'text/h323',
         );
 
-        // Cesta v databazi se tvari jako absolutni, ale je to pouze relativni cesta
-        // do adresare s daty klienta
-        if (strncmp($filename, '/files/', 7) === 0)
-            $filename = CLIENT_DIR . $filename;
-
-        if (function_exists('finfo_open') && @is_file($filename)) {
+        if (function_exists('finfo_open') && is_file($filename)) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mimetype = finfo_file($finfo, $filename);
             finfo_close($finfo);
@@ -745,7 +604,7 @@ class FileModel extends BaseModel
         if (array_key_exists($ext, $mime_types))
             return $mime_types[$ext];
 
-        // Kdyz vse ostatni selze
+// Kdyz vse ostatni selze
         return 'application/octet-stream';
     }
 

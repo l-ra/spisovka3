@@ -13,7 +13,9 @@ abstract class BaseModel extends Nette\Object
     /** @var bool primary key is an autoincrement column */
     protected $autoIncrement = true;
 
-    /** names of commonly used tables */
+    /** names of commonly used tables
+     *  pozůstatek z doby, kdy tabulky měly prefix, takže název tabulky nebyl konstantní
+     */
     protected $tb_dok_odeslani = 'dokument_odeslani';
     protected $tb_dok_subjekt = 'dokument_to_subjekt';
     protected $tb_dokument = 'dokument';
@@ -30,6 +32,9 @@ abstract class BaseModel extends Nette\Object
     protected $tb_zpusob_odeslani = 'zpusob_odeslani';
     protected $tb_zpusob_vyrizeni = 'zpusob_vyrizeni';
 
+    /**
+     * Někteří potomci volají parent::__construct()
+     */
     public function __construct()
     {
         
@@ -205,7 +210,7 @@ abstract class BaseModel extends Nette\Object
                             $where_or = $param['leftJoin']['where_or'];
                         }
                     }
-                    
+
                     $leftJoin[$index] = array('LEFT JOIN %n', $lJoin['from'], 'ON %and', $lJoin['on']);
                 }
             }
@@ -256,7 +261,7 @@ abstract class BaseModel extends Nette\Object
             } else {
                 array_push($query, 'WHERE %or', $where_or);
             }
-        
+
         if (isset($where))
             array_push($query, 'WHERE %and', $where);
         if (isset($group))
@@ -310,97 +315,21 @@ abstract class BaseModel extends Nette\Object
     }
 
     /**
-     * Delete a row
+     * Delete rows
      * @param array $where
      * @return
      */
     public function delete($where)
     {
-        if (is_null($where)) {
+        if (is_null($where))
             return null;
-        } else if (!is_array($where)) {
+
+        if (!is_array($where)) {
             $where = array($where);
-        } else {
-            if (!is_array(current($where))) {
-                $where = array($where);
-            }
-        }
+        } elseif (!is_array(current($where)))
+            $where = array($where);
 
-        //dibi::delete($this->name)->where($where)->test();
         return dibi::delete($this->name)->where($where)->execute();
-    }
-
-    /**
-     * Delete all rows
-     * @return
-     */
-    public function deleteAll()
-    {
-        return dibi::query('TRUNCATE [' . $this->name . '];');
-    }
-
-    public static function array2obj($data)
-    {
-
-        if (is_object($data)) {
-            return $data;
-        } else if (is_array($data)) {
-            $tmp = new \stdClass();
-            foreach ($data as $key => $value) {
-                $tmp->$key = $value;
-            }
-            return $tmp;
-        } else {
-            return null;
-        }
-    }
-
-    public static function obj2array($data)
-    {
-
-        if (is_array($data)) {
-            return $data;
-        } else if (is_object($data)) {
-            $tmp = array();
-            foreach ($data as $key => $value) {
-                $tmp[$key] = $value;
-            }
-            return $tmp;
-        } else {
-            return null;
-        }
-    }
-
-    public function fetchPart($array, $offset = 0, $limit = null)
-    {
-
-        if (count($array) > 0) {
-
-            if (is_null($limit)) {
-                $client_config = GlobalVariables::get('client_config');
-                $limit = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
-                            : 20;
-            }
-
-            if (count($array) <= $limit) {
-                // pocet je mensi nez minimalni limit
-                return $array;
-            } else {
-                $start = ($offset == 0) ? 0 : ($offset + 1);
-                $stop = $offset + $limit;
-                $inc = 0;
-                foreach (array_keys($array) as $index) {
-                    if ((!(($start <= $inc) && ($inc <= $stop)))) {
-                        unset($array[$index]);
-                    }
-                    $inc++;
-                }
-
-                return $array;
-            }
-        } else {
-            return $array;
-        }
     }
 
 }

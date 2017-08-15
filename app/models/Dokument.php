@@ -1110,10 +1110,8 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
         if (in_array('subjekty', $details))
             $dokument->subjekty = $doc->getSubjects();
 
-        if (in_array('soubory', $details)) {
-            $Dokrilohy = new DokumentPrilohy();
-            $dokument->prilohy = $Dokrilohy->prilohy($dokument_id);
-        }
+        if (in_array('soubory', $details))
+            $dokument->prilohy = $doc->getFiles();
 
         if (in_array('odeslani', $details)) {
             $DokOdeslani = new DokumentOdeslani();
@@ -1444,10 +1442,9 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
                 }
 
             // kopirovani priloh
-            $prilohy_old = $attachment_model->prilohy($doc->id);
-            if (count($prilohy_old))
-                foreach ($prilohy_old as $priloha)
-                    $attachment_model->pripojit($reply->id, $priloha->id);
+            $prilohy_old = $doc->getFiles();
+            foreach ($prilohy_old as $priloha)
+                $attachment_model->pripojit($reply->id, $priloha->id);
 
             $client_config = GlobalVariables::get('client_config');
             if ($client_config->cislo_jednaci->typ_evidence == 'priorace')

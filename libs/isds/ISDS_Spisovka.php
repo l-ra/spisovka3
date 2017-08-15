@@ -95,29 +95,30 @@ class ISDS_Spisovka extends \ISDS
 
     /**
      * @param array $envelope
-     * @param array $files
+     * @param FileRecord[] $files
+     * @param Storage_Basic $storage
      * @return int|false  ID datové zprávy
      * @throws \Exception
      */
-    public function odeslatZpravu($envelope, $files)
+    public function odeslatZpravu($envelope, $files, $storage)
     {
         if (empty($files))
             throw new \Exception('Nelze odeslat datovou zprávu bez souborů.');
 
         $SentOutFiles = new \ISDSSentOutFiles();
         foreach ($files as $file) {
-            $mime_type = $file->mime_type ?: FileModel::mimeType($file->tmp_file);
+            $path = $storage->getFilePath($file);
+            $mime_type = $file->mime_type;
 
             // funkce pro odesílání do registru smluv
-            if (in_array($file->real_name,
+            if (in_array($file->filename,
                             ['zverejneni.xml', 'modifikace.xml', 'pridani_prilohy.xml', 'znepristupneni.xml']))
                 $metatype = 'main';
             else
                 $metatype = 'enclosure';
 
             $SentOutFiles->AddFileSpecFromFile(
-                    $file->tmp_file, $mime_type, $metatype, $file->guid, "", $file->real_name,
-                    "");
+                    $path, $mime_type, $metatype, null, "", $file->filename, "");
         }
         $dmFiles = $SentOutFiles->fileInfos();
 

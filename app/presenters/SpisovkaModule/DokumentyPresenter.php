@@ -616,9 +616,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'info_ext');
 
             $this->template->Subjekty = $dokument->getSubjects();
-
-            $DokumentPrilohy = new DokumentPrilohy();
-            $this->template->Prilohy = $DokumentPrilohy->prilohy($dokument->id);
+            $this->template->Prilohy = $dokument->getFiles();
 
             if ($this->typ_evidence == 'priorace') {
                 // Nacteni souvisejicicho dokumentu
@@ -670,8 +668,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $doc = new Document($id);
         $perm = $doc->getUserPermissions();
-        $DokumentPrilohy = new DokumentPrilohy();
-        $prilohy = $DokumentPrilohy->prilohy($id);
+        $prilohy = $doc->getFiles();
         if (!$perm['view'] || !array_key_exists($file_id, $prilohy)) {
             $this->flashMessage('Přístup zamítnut.', 'warning');
             $this->redirect('default');
@@ -1319,7 +1316,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $dokument_id = $this->getParameter('id');
         $Dokument = new Dokument();
-        $File = new FileModel();
 
         // nejprve ověř, že dokument existuje
         $doc = $Dokument->getInfo($dokument_id);
@@ -1333,8 +1329,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $prilohy = array();
         if (isset($post_data['prilohy']) && count($post_data['prilohy']) > 0) {
             foreach (array_keys($post_data['prilohy']) as $file_id) {
-                $priloha = $File->getInfo($file_id);
-                $priloha->tmp_file = $this->storage->getFilePath($priloha);
+                $priloha = new FileRecord($file_id);
                 $prilohy[$file_id] = $priloha;
             }
         }
@@ -1567,7 +1562,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             if (count($prilohy) > 0) {
                 foreach ($prilohy as $p) {
-                    $mail->addAttachment($p->tmp_file);
+                    $mail->addAttachment($this->storage->getFilePath($p));
                 }
             }
 
@@ -1600,7 +1595,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $zprava_prilohy = array();
         foreach ($prilohy as $pr) {
             $zprava_prilohy[] = array(
-                'name' => $pr->real_name,
+                'name' => $pr->filename,
                 'size' => $pr->size,
                 'mimetype' => $pr->mime_type
             );
@@ -1655,7 +1650,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if (!empty($data['isds_spis_adres']))
                 $envelope['dmRecipientIdent'] = $data['isds_spis_adres'];
             
-            $id_mess = $isds->odeslatZpravu($envelope, $prilohy);
+            $id_mess = $isds->odeslatZpravu($envelope, $prilohy, $this->storage);
             if (!$id_mess) {
                 $this->flashMessage('Chyba ISDS: ' . $isds->GetStatusMessage(), 'warning_ext');
                 return false;
@@ -1698,7 +1693,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             if (count($prilohy) > 0) {
                 foreach ($prilohy as $index => $file) {
                     $aprilohy[] = array(
-                        'name' => $file->real_name,
+                        'name' => $file->filename,
                         'size' => $file->size,
                         'mimetype' => $file->mime_type,
                         'id' => $index
@@ -1722,7 +1717,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $signedmess = $isds->SignedSentMessageDownload($id_mess);
 
-            $this->storage->uploadEpodatelna($signedmess, $file_data);
+            $this->storage->uploadEpodatelna($signedmess, $file_data, $this->user);
 
             return $epod_id;
         } catch (\Exception $e) {
