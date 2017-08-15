@@ -28,26 +28,38 @@ final class Upgrade
         $lock = new Lock('upgrade');
         $lock->delete_file = true;
 
+        ob_end_clean();
+        echo "<pre>Provádím aktualizaci aplikace\n";
         try {
             Settings::reload();
             $done = Settings::get(self::SETTINGS_TASKS);
             $done = $done ? explode(',', $done) : [];
 
-            foreach (array_keys(self::$tasks) as $name) {
-                if (in_array($name, $done))
+            foreach (self::$tasks as $name => $desc) {
+                echo "\nKrok $name - $desc\n";
+                flush();
+                if (in_array($name, $done)) {
+                    echo "již proveden\n";
                     continue;
-
+                }
+                
+                echo "provádím: "; flush();
                 $function = 'upgrade' . $name;
                 $this->$function();
 
                 $done[] = $name;
                 Settings::set(self::SETTINGS_TASKS, implode(',', $done));
+                echo "OK\n";
             }
 
             Settings::set(self::SETTINGS_NEEDED, false);
         } catch (Exception $e) {
+            echo "Chyba\n";
             throw $e;
         }
+        
+        echo "\n" . 'Hotovo. <a href="#" onclick="window.location.reload(true);">Klikněte</a> pro spuštění aplikace.';
+        die;
     }
 
     private function upgradeEmailMailbox()
