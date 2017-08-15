@@ -106,7 +106,7 @@ class Storage_Basic extends BaseModel
      * @param string $contents
      * @param array $data
      * @param User $user
-     * @return DibiRow
+     * @return FileRecord
      */
     public function uploadDocument($contents, array $data, User $user)
     {
@@ -118,7 +118,7 @@ class Storage_Basic extends BaseModel
      * @param string $contents
      * @param array $data
      * @param User $user
-     * @return DibiRow
+     * @return FileRecord
      */
     public function uploadEpodatelna($contents, array $data, User $user)
     {

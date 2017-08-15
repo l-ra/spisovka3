@@ -1706,20 +1706,23 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $zprava['stav'] = 1;
             $zprava['stav_info'] = '';
 
-            $epod_id = $Epodatelna->insert($zprava);
-
+            $isds_msg = IsdsMessage::create($zprava);
+            
             /* Ulozeni podepsane ISDS zpravy */
             $file_data = array(
-                'filename' => 'ep-isds-' . $epod_id . '.zfo',
+                'filename' => 'ep-isds-' . $isds_msg->id . '.zfo',
                 'dir' => 'EP-O-' . sprintf('%06d', $zprava['poradi']) . '-' . $zprava['rok'],
                 'popis' => null
             );
 
             $signedmess = $isds->SignedSentMessageDownload($id_mess);
 
-            $this->storage->uploadEpodatelna($signedmess, $file_data, $this->user);
+            $file = $this->storage->uploadEpodatelna($signedmess, $file_data, $this->user);
 
-            return $epod_id;
+            $isds_msg->zfo_id = $file->id;
+            $isds_msg->save();
+            
+            return $isds_msg->id;
         } catch (\Exception $e) {
             $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning_ext');
         }
