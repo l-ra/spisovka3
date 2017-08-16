@@ -49,9 +49,14 @@ class ImapClient
         // @ - nezapisuj do logu chyby, ke kterým bude docházet na určitých operačních systémech
         if ($rc = @imap_open($filename, '', '')) {
             $this->stream = $rc;
+            imap_errors(); // viz poznámku níže
             return true;
         }
 
+        // je nutné vyčistit záznam chyb/varování, jinak budou vygenerovány
+        // jako PHP Notice při shutdown skriptu
+        imap_errors();
+        
         throw new \Exception("Nemohu otevřít soubor s e-mailem: $filename");
     }
 

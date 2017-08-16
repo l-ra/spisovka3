@@ -82,9 +82,13 @@ class Install_DefaultPresenter extends BasePresenter
 
         $imap_open_works = false;
         $test_email = __DIR__ . '/test.eml';
-        if (function_exists('imap_open') && $imap_stream = imap_open($test_email, '', '')) {
-            $imap_open_works = true;
-            imap_close($imap_stream);
+        if (function_exists('imap_open')) {
+            $imap_stream = imap_open($test_email, '', '');
+            if ($imap_stream) {
+                $imap_open_works = true;
+                imap_close($imap_stream);
+            }
+            imap_errors();
         }
 
         // DB test
