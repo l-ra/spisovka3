@@ -384,6 +384,7 @@ class Document extends DBEntity
                 'edit' => false,
                 'take_over' => false,
                 'cancel_forwarding' => false,
+                'assign_cj' => false
             ];
         }
 
