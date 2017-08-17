@@ -75,6 +75,21 @@ class EpodatelnaPrilohy
      */
     public static function getFileList(EpodatelnaMessage $message, $storage)
     {
+        $list = self::getFileList2($message, $storage);
+        foreach ($list as &$file) {
+            if (!isset($file['mimetype']))
+                $file['mimetype'] = '';
+        }
+        
+        return $list;
+    }
+    
+    /**
+     * @param object $storage
+     * @return array
+     */
+    protected static function getFileList2(EpodatelnaMessage $message, $storage)
+    {
         if ($message->typ == 'I') {
             // vrat, co uz je v databazi, zde nebyly bugy v kodu
             return unserialize($message->prilohy);
