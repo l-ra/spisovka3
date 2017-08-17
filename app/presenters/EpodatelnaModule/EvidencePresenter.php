@@ -84,9 +84,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     public function actionAjaxHandler()
     {
+        $data = $this->getHttpRequest()->getPost();
+        if (!isset($data['id'])) {
+            // ve vzácném případě došlo k prázdnému $data
+            // od uživatele jsem žádné informace nezjistil, takže příčinu nelze zjistit a opravit
+            echo "Chyba prohlížeče - předaná data formuláře jsou prázdná";
+            $this->terminate();
+        }
         try {
-            $data = $this->getHttpRequest()->getPost();
-
             $id = $data['id'];
             switch ($data['volba_evidence']) {
                 case 1: // evidovat
@@ -233,7 +238,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             $d = [
                 'dokument_typ_id' => isset($data['dokument_typ_id']) ? $data['dokument_typ_id']
-                            : 1,
+                    : 1,
                 'zpusob_doruceni_id' => $zprava->typ == 'E' ? 1 : 2,
                 'poradi' => 1,
                 'stav' => 1,
@@ -376,9 +381,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $filename = $attachment['name'];
             if ($filename == 'smime.p7s')
                 continue;
-            
+
             $data = $email->getPart($attachment['id']);
-            
+
             // prekopirovani na pozadovane misto
             $upload_info = array(
                 'filename' => $filename,
