@@ -107,7 +107,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
             $user_list = $this->getPossibleUsers();
             if (!empty($user_list))
                 $user_list = ['' => 'můžete vybrat ze seznamu'] + $user_list;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $user_list = ['' => $e->getMessage()];
         }
 
@@ -164,7 +164,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
         try {
             $seznam = $this->userImport->getRemoteUsers();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo '<div class="prazdno">';
             echo $e->getMessage();
             echo '<p>';
@@ -516,7 +516,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             dibi::rollback();
             if ($e->getCode() == 1062) {
                 $this->presenter->flashMessage("Uživatelský účet s názvem \"{$account_data['username']}\" již existuje. Zvolte jiný název.",

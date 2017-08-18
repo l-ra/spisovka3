@@ -229,7 +229,7 @@ class Ciselnik extends Nette\Application\UI\Control
             $this->dataChangedHandler();
 
             $this->presenter->flashMessage('Záznam byl úspěšně vytvořen.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->presenter->flashMessage('Záznam se nepodařilo vytvořit!', 'error');
             $this->presenter->flashMessage($e->getMessage(), 'error');
         }
@@ -248,7 +248,7 @@ class Ciselnik extends Nette\Application\UI\Control
             $this->dataChangedHandler();
 
             $this->presenter->flashMessage('Záznam byl úspěšně upraven.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->presenter->flashMessage('Záznam se nepodařilo upravit!', 'error');
             $this->presenter->flashMessage($e->getMessage(), 'error');
         }
@@ -267,7 +267,7 @@ class Ciselnik extends Nette\Application\UI\Control
             $this->dataChangedHandler();
 
             $this->presenter->flashMessage('Záznam byl úspěšně odstraněn.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->presenter->flashMessage('Záznam se nepodařilo odstranit!', 'error');
             $this->presenter->flashMessage($e->getMessage(), 'error');
         }

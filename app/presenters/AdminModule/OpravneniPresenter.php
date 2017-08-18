@@ -152,7 +152,7 @@ class Admin_OpravneniPresenter extends BasePresenter
             $role->modify($data);
             $role->save();
             $this->flashMessage('Role  "' . $data['name'] . '"  byla upravena.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Chyba - ' . $e->getMessage(), 'warning');
         }
         $this->redirect('this', array('id' => $role_id));

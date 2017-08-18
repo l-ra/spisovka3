@@ -42,7 +42,7 @@ class DocumentWorkflow extends DocumentStates
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -81,7 +81,7 @@ class DocumentWorkflow extends DocumentStates
             }
 
             dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -117,7 +117,7 @@ class DocumentWorkflow extends DocumentStates
             $Log->logDocument($this->id, LogModel::DOK_SPUSTEN, $msg);
 
             dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -147,7 +147,7 @@ class DocumentWorkflow extends DocumentStates
             $Log = new LogModel();
             $Log->logDocument($this->id, LogModel::DOK_ZNOVU_OTEVREN);
             dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -181,7 +181,7 @@ class DocumentWorkflow extends DocumentStates
             $Log->logDocument($this->id, LogModel::DOK_SPISOVNA_PREDAN);
             if (!$called_from_spis)
                 dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if (!$called_from_spis)
                 $this->_rollback();
             throw $e;
@@ -224,7 +224,7 @@ class DocumentWorkflow extends DocumentStates
             if ($transaction)
                 dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if ($transaction)
                 $this->_rollback();
             return "Při převzetí dokumentu $this->cislo_jednaci došlo k výjimce: " . $e->getMessage();
@@ -251,7 +251,7 @@ class DocumentWorkflow extends DocumentStates
 
             if ($use_transaction)
                 dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if ($use_transaction)
                 $this->_rollback();
             throw $e;
@@ -275,7 +275,7 @@ class DocumentWorkflow extends DocumentStates
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -293,7 +293,7 @@ class DocumentWorkflow extends DocumentStates
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -310,7 +310,7 @@ class DocumentWorkflow extends DocumentStates
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -334,7 +334,7 @@ class DocumentWorkflow extends DocumentStates
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -353,7 +353,7 @@ class DocumentWorkflow extends DocumentStates
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }

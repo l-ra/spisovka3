@@ -127,7 +127,7 @@ class Test_DefaultPresenter extends BasePresenter
                 $classname = substr($classname, strrpos($classname, '\\') + 1);
 
             return $classname;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             @ob_end_clean();
             return 'FAIL  ' . get_class($e) . ' - ' . $e->getMessage();
         }

@@ -514,7 +514,7 @@ class Install_DefaultPresenter extends BasePresenter
                     foreach ($queries as $query) {
                         dibi::query($query);
                     }
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $this->template->error = $e->getMessage();
                     $this->template->query = $query;
                     // pri chybe prerus instalaci databaze

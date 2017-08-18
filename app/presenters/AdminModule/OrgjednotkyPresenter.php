@@ -106,7 +106,7 @@ class Admin_OrgjednotkyPresenter extends BasePresenter
         try {
             $OrgJednotka->ulozit($data, $orgjednotka_id);
             $this->flashMessage('Organizační jednotka  "' . $data['zkraceny_nazev'] . '"  byla upravena.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Organizační jednotku  "' . $data['zkraceny_nazev'] . '" se nepodařilo upravit.', 'warning');
             $this->flashMessage($e->getMessage(), 'warning');
         }

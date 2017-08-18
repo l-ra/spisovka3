@@ -81,7 +81,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         try {
             $account->deactivate();            
             $this->flashMessage('Účet uživatele byl smazán.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage($e->getMessage(), 'warning');
         }
         $this->redirect('detail', $account->getPerson()->id);

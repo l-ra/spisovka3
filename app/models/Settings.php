@@ -108,7 +108,7 @@ class Settings
             try {
                 dibi::query('INSERT INTO %n', ':PREFIX:' . self::TABLE_NAME,
                         '([name], [value]) VALUES (%s, %s)', $key, $db_value);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 /**
                  * Task #787 - ošetři race condition
                  */

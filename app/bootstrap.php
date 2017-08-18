@@ -171,7 +171,7 @@ final class Bootstrap
                 $upgrade = new Spisovka\Upgrade($container->getService('storage'));
                 $upgrade->check();
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo 'Během inicializace aplikace došlo k výjimce. Podrobnější informace lze nalézt v aplikačním logu.<br>'
             . 'Podrobnosti: ' . $e->getMessage();
             throw $e;
@@ -406,7 +406,7 @@ final class Bootstrap
         $installed = false;
         try {
             $installed = Settings::get('installation_completed', false);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             
         }
         define('APPLICATION_INSTALLED', $installed);

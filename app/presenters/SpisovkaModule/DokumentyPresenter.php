@@ -71,7 +71,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     $this->hledat = $hledat;
                     $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
                 }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage($e->getMessage() . " Hledání bylo zrušeno.", 'warning');
             $this->forward(':Spisovka:Vyhledat:reset');
         }
@@ -364,7 +364,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         try {
             $doc->forward($user, $orgunit, $note);
             $this->flashMessage('Předání proběhlo v pořádku.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage($e->getMessage(), 'warning');
         }
         if (!$from_spis)
@@ -508,7 +508,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                     'Dokument připojen do evidence. Přiděleno číslo jednací: ' . $cislo_jednaci);
 
             echo '###zaevidovano###' . $this->link('detail', array('id' => $dokument_id));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo __METHOD__ . "() - " . $e->getMessage();
         }
 
@@ -886,7 +886,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $Log->logDocument($dokument_id, LogModel::DOK_NOVY);
 
             dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             dibi::rollback();
             $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
             $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
@@ -905,7 +905,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
                 $doc->forward($data['predano_user'], $data['predano_org'],
                         $data['predani_poznamka']);
                 $this->flashMessage('Dokument předán zaměstnanci nebo organizační jednotce.');
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->flashMessage('Předání dokumentu se nepodařilo.', 'warning');
                 $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
             }
@@ -1044,7 +1044,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $Log->logDocument($id, LogModel::DOK_ZMENEN, 'Upravena metadata dokumentu.');
 
             $this->flashMessage('Dokument "' . $data->nazev . '"  byl upraven.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Dokument "' . $data->nazev . '" se nepodařilo upravit.',
                     'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
@@ -1567,7 +1567,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             }
 
             $mail->send();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Chyba při odesílání emailu! ' . $e->getMessage(), 'error_ext');
             return false;
         }
@@ -1800,7 +1800,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         $control = $form->addSelect('filtr', 'Filtr:', $select);
         try {
             $form['filtr']->setValue($filtr);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             // zmena filtru v aplikaci muze zpusobit neplatnou predvolbu uzivatele
             $ex->getMessage();
         }
@@ -1894,7 +1894,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             $doc = new DocumentWorkflow($id);
             $doc->reopen();
             $this->flashMessage('Dokument byl otevřen.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage($e->getMessage(), 'warning');
         }
         $this->redirect('detail', $id);

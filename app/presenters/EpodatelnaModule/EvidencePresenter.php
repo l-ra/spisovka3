@@ -33,7 +33,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         try {
             $this->assertMessageNotProcessed($zprava);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage($e->getMessage(), 'warning');
             $this->redirect('Default:detail', $id);
         }
@@ -143,7 +143,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                     echo 'Zpráva byla odmítnuta.';
                     break;
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo "###Operace se nezdařila.\nText výjimky: " . $e->getMessage();
         }
 
@@ -211,7 +211,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $this->redirect(':Spisovka:Dokumenty:detail', array('id' => $dokument->id));
         } catch (Nette\Application\AbortException $e) {
             throw $e;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Dokument se nepodařilo vytvořit.', 'warning');
             $this->flashMessage('CHYBA: ' . $e->getMessage(), 'warning');
         }
@@ -319,7 +319,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             }
 
             return $document;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if (!$document_created)
                 dibi::rollback();
             throw $e;

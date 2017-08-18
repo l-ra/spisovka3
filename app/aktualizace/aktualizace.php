@@ -66,7 +66,7 @@ try {
     assert('count($revisions) > 0');
 
     $clients = Updates::find_clients();
-} catch (Exception $e) {
+} catch (\Exception $e) {
     error($e->getMessage());
     die;
 }
@@ -128,7 +128,7 @@ foreach ($clients as $site_path => $site_name) {
         }
 
         $client_revision = $client->get_revision_number();
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         error($e->getMessage());
         echo '</div>';
         continue;  // jdi na dalsiho klienta
@@ -173,7 +173,7 @@ foreach ($clients as $site_path => $site_name) {
                         echo "<pre>";                        
                         $res = call_user_func($hooks[$rev]['check']);
                         echo "</pre>";
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         $msg = "Při provádění kontroly došlo k chybě! Aktualizaci není možné provést.<br />Popis chyby: ";
                         if ($e->getCode())
                             $msg .= $e->getCode() . ' - ';
@@ -236,7 +236,7 @@ foreach ($clients as $site_path => $site_name) {
                         echo "<pre>";
                         try {
                             call_user_func($hooks[$rev]['after']);
-                        } catch (Exception $e) {
+                        } catch (\Exception $e) {
                             echo "</pre>";
                             throw $e;
                         }
@@ -258,7 +258,7 @@ foreach ($clients as $site_path => $site_name) {
                     $rev_error = true;
                 }
                 break;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 if ($do_update)
                     dibi::rollback();
                 error("Došlo k neočekávané výjimce, ukončuji program.<br />Popis chyby: " . $e->getMessage());

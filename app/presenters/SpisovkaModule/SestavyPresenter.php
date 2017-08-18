@@ -122,7 +122,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                 $parametry = unserialize($sestava->parametry);
                 $args = $Dokument->paramsFiltr($parametry);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage("Sestavu nelze zobrazit: " . $e->getMessage(), 'warning');
             $this->redirect('default');
         }
@@ -190,7 +190,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             try {
                 $d_od = date("Y-m-d", strtotime($d_od));
                 //$d_od = new \DateTime($this->getParameter('d_od',null));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $d_od = null;
             }
         }
@@ -198,7 +198,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             try {
                 $d_do = date("Y-m-d", strtotime($d_do) + 86400);
                 //$d_do = new \DateTime($this->getParameter('d_do',null));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $d_do = null;
             }
         }
@@ -577,7 +577,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
                     // nedelej nic, framework provadi kontrolu parametru lepe
                     // $value = $value ? true : false;
                     $input->setValue($value);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     // ignoruj
                     $e->getMessage();
                 }
@@ -688,7 +688,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
             $sestava->save();
 
             $this->flashMessage("Sestava '$sestava->nazev' byla upravena.");
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage("Sestavu '$sestava_data[nazev]' se nepodařilo upravit.",
                     'warning');
             $this->flashMessage('Popis chyby: ' . $e->getMessage(), 'warning');
@@ -709,7 +709,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
         try {
             $s->delete();
             $this->flashMessage('Sestava byla smazána.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage($e->getMessage(), 'warning');
         }
 

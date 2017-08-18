@@ -286,7 +286,7 @@ class Zapujcka extends BaseModel
             $z->save();
 
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $e->getMessage();
             return false;
         }
@@ -303,7 +303,7 @@ class Zapujcka extends BaseModel
             $z->date_do_skut = new \DateTime();
             $z->save();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $e->getMessage();
             return false;
         }

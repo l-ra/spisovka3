@@ -52,7 +52,7 @@ class SubjektyPresenter extends BasePresenter
             } else {
                 $payload = ["error" => $isds->GetStatusMessage()];
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $payload = ["error" => $e->getMessage()];
         }
 
@@ -191,7 +191,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
             $DokumentSubjekt->pripojit(new Document($dokument_id), $subject, $typ);
 
             echo '###vybrano###' . $dokument_id;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo 'Chyba ' . $e->getCode() . ' - ' . $e->getMessage();
         }
 
@@ -287,7 +287,7 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
             $subject->modify($data);
             $subject->save();
             echo "###zmeneno###";
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo "Chyba! Subjekt se nepodařilo upravit.<br/>" . $e->getMessage();
         }
 
@@ -358,10 +358,10 @@ class Spisovka_SubjektyPresenter extends SubjektyPresenter
                 }
                 $payload['id'] = $subject->id;
                 $payload['name'] = Subjekt::displayName($data, 'full');
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $payload['status'] = "Subjekt byl vytvořen ale nepodařilo se jej připojit k dokumentu.";
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $payload['status'] = "Chyba! Subjekt se nepodařilo vytvořit.\n" . $e->getMessage();
         }
 

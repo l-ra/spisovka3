@@ -116,7 +116,7 @@ class Ares
             $response = HttpClient::get($url, $timeout);
             if (!$response)
                 return 'Registr ARES neodpověděl správně.';
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $msg = $e->getMessage();
             if (stripos($msg, 'časový limit') !== false)
                 $msg = 'Registr ARES neodpověděl v časovém limitu.';

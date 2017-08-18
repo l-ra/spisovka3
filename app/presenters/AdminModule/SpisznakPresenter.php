@@ -187,7 +187,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         try {
             $SpisovyZnak->upravit($data, $spisznak_id);
             $this->flashMessage('Spisový znak  "' . $data['nazev'] . '"  byl upraven.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Spisový znak "' . $data['nazev'] . '" se nepodařilo upravit.',
                     'warning');
             $this->flashMessage($e->getMessage(), 'warning');

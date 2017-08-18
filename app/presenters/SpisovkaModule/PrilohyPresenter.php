@@ -44,7 +44,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
         if ($DokumentPrilohy->odebrat($dokument_id, $file_id)) {
             try {
                 $this->storage->remove($file);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $e->getCode();
                 // Priloha muze byt sdilena mezi dokumentem a odpovedi, tudiz nemusi
                 // byt mozne ji fyzicky smazat
@@ -119,7 +119,7 @@ class Spisovka_PrilohyPresenter extends BasePresenter
             }
         } catch (Nette\Application\AbortException $e) {
             throw $e;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->template->chyba = 2;
             $this->template->error_message = $e->getMessage();
         }

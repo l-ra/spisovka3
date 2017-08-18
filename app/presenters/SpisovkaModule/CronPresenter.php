@@ -39,7 +39,7 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
                 $this->_run();
             } else
                 echo 'nothing to do';
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw $e;
         }
 
@@ -57,7 +57,7 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
                 $result = $this->$function();
                 if ($result !== null)
                     echo $result ? 'OK' : 'error';
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $msg = $e->getMessage();
                 echo 'exception: ' . $msg;
             }

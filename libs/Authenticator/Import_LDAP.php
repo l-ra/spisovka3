@@ -24,7 +24,7 @@ class Import_LDAP implements IUserImport
 
         try {
             return $this->ldap->get_users();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if ($e->getCode() == 32) // no such object
                 return array();
 

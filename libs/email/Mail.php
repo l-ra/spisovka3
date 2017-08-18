@@ -26,7 +26,7 @@ class Mail extends Nette\Mail\Message
         if ($email)
             try {
                 $this->setFrom($email);                
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $e->getMessage();
                 throw new \Exception("E-mailová adresa pro odesílání \"$email\" je neplatná.");
             }

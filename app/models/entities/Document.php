@@ -231,7 +231,7 @@ class Document extends DBEntity
             }
 
             dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             $message = $e->getMessage();
             $message .= "\nPředání dokumentu se nepodařilo.";
@@ -248,7 +248,7 @@ class Document extends DBEntity
                         ['document_name' => $this->nazev,
                     'reference_number' => $this->cislo_jednaci]);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \Exception("Předání proběhlo v pořádku, ale nepodařilo se upozornit příjemce e-mailem: \n"
             . $e->getMessage(), 0, $e);
         }
@@ -291,7 +291,7 @@ class Document extends DBEntity
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -325,7 +325,7 @@ class Document extends DBEntity
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -353,7 +353,7 @@ class Document extends DBEntity
 
             dibi::commit();
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->_rollback();
             throw $e;
         }
@@ -468,7 +468,7 @@ class Document extends DBEntity
             $Log->logDocument($this->id, LogModel::SPIS_DOK_PRIPOJEN,
                     'Dokument přidán do spisu "' . $spis->nazev . '"');
             dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             dibi::rollback();
             throw $e;
         }
@@ -490,7 +490,7 @@ class Document extends DBEntity
                     'Dokument vyjmut ze spisu "' . $spis->nazev . '"');
 
             dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             dibi::rollback();
             throw $e;
         }

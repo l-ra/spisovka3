@@ -172,7 +172,7 @@ abstract class TreeModel extends BaseModel
             dibi::commit();
 
             return $id;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             dibi::rollback();
             throw $e;
         }
@@ -277,7 +277,7 @@ abstract class TreeModel extends BaseModel
             }
 
             dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             dibi::rollback();
             throw $e;
         }
@@ -306,7 +306,7 @@ abstract class TreeModel extends BaseModel
                 $this->delete(array("id=%i", $id));
                 dibi::commit();
                 return true;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 dibi::rollback();
                 if ($e->getCode() == 1451)
                     return false;
@@ -334,7 +334,7 @@ abstract class TreeModel extends BaseModel
                 $this->delete([["id = %i", $id]]);
                 dibi::commit();
                 return true;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 dibi::rollback();
                 if ($e->getCode() == 1451)
                     return false;
@@ -404,7 +404,7 @@ abstract class TreeModel extends BaseModel
             dibi::commit();
 
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             dibi::rollback();
             throw $e;
         }

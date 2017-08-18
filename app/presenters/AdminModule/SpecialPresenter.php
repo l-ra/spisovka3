@@ -60,7 +60,7 @@ class Admin_SpecialPresenter extends BasePresenter
             }
             */
             dibi::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             dibi::rollback();
             throw $e;
         }
@@ -126,7 +126,7 @@ class Admin_SpecialPresenter extends BasePresenter
                 // if (++$counter >= 5)
                 //    break;
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw $e;
         }
 

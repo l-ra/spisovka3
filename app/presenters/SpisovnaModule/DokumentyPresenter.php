@@ -75,7 +75,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                     $this->hledat = $hledat;
                     $this->template->no_items = 3; // indikator pri nenalezeni dokumentu pri hledani
                 }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage($e->getMessage() . " Hledání bylo zrušeno.", 'warning');
             $this->forward(':Spisovna:Vyhledat:reset');
         }
@@ -421,7 +421,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
                 ->getControlPrototype()->onchange("return document.forms['frm-filtrForm'].submit();");
         try {
             $form['filtr']->setValue($this->filtr);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $e->getMessage();
             // stavy "archivován" a "skartován" neplatí na stránce příjmu dokumentů
             $form['filtr']->setValue('');

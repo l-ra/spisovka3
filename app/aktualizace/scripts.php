@@ -48,13 +48,13 @@ function revision_660_after()
     // zkus zmenit db strukturu, ale ignoruj, pokud by databaze hlasila chybu - kdyby zmena nebyla mozna
     try {
         dibi::query('ALTER TABLE `spisovy_znak` ADD UNIQUE KEY `nazev` (`nazev`)');
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         
     }
 
     try {
         dibi::query('ALTER TABLE `spis` ADD UNIQUE KEY `nazev` (`nazev`)');
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         
     }
 }

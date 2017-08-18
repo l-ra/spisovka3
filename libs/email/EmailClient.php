@@ -15,7 +15,7 @@ class EmailClient
         try {
             $this->imap_client = new ImapClient();
             $this->imap_client->open($filename);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $e->getMessage();
             // fallback to emulation
             $this->imap_client = null;

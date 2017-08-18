@@ -35,7 +35,7 @@ class Spisovka_LDAP extends LDAP_Connection
         try {
             $this->bind($dn, $password);
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if ($e->getCode() == 49) // LDAP_INVALID_CREDENTIALS
                 return false;
             throw $e;

@@ -156,7 +156,7 @@ class SpisModel extends TreeModel
         try {
             $this->upravitH($data, $spis_id);
             $Log->logSpis($spis_id, LogModel::SPIS_ZMENEN);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $Log->logSpis($spis_id, LogModel::SPIS_CHYBA,
                     'Hodnoty spisu se nepodarilo upravit.');
             throw $e;

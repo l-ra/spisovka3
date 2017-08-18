@@ -255,7 +255,7 @@ class Client_To_Update
         try {
             $value = dibi::query("SELECT [value] FROM [settings] WHERE [name] = 'db_tables_renamed'")->fetchSingle();
             return $value === 'true';
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $e->getMessage();
             return false;
         }
@@ -278,7 +278,7 @@ class Client_To_Update
             // Oprava bugu v definici tabulky spis (foreign key v nekterych databazich je, v jinych ne)
             try {
                 dibi::query("ALTER TABLE %n DROP FOREIGN KEY [spis_ibfk_1]", "{$prefix}spis");
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // ocekava se vyjimka, ignoruj
             }
 
@@ -287,7 +287,7 @@ class Client_To_Update
                 $new_name = substr($table, strlen($prefix));
                 try {
                     dibi::query("RENAME TABLE [$table] TO [$new_name]");
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $e->getMessage();
                     $error = true;
                 }

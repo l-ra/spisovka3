@@ -72,7 +72,7 @@ class SpisyPresenter extends BasePresenter
             $Spisy = new SpisModel();
             $Spisy->upravit($data, $spis_id);
             $this->flashMessage('Spis  "' . $data['nazev'] . '"  byl upraven.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Spis "' . $data['nazev'] . '" se nepodařilo upravit.',
                     'warning');
             $this->flashMessage($e->getMessage(), 'warning');
@@ -91,7 +91,7 @@ class SpisyPresenter extends BasePresenter
                 $this->flashMessage('Složka "' . $data['nazev'] . '"  byla vytvořena.');
             else
                 $this->flashMessage('Spis "' . $data['nazev'] . '"  byl vytvořen.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Spis "' . $data['nazev'] . '" se nepodařilo vytvořit.',
                     'warning');
             $this->flashMessage($e->getMessage(), 'warning');
@@ -453,7 +453,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
                     try {
                         $spis->transferToSpisovna();
                         $count_ok++;
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         $count_failed++;
                         $this->flashMessage($e->getMessage(), 'warning');
                     }
@@ -475,7 +475,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
             $spis = new Spis($id);
             $spis->transferToSpisovna($id);
             $this->flashMessage('Spis byl předán do spisovny.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage($e->getMessage(), 'warning');
             $this->flashMessage('Spis se nepodařilo předat do spisovny.', 'warning');
             $this->redirect('detail', $id);
@@ -516,7 +516,7 @@ class Spisovka_SpisyPresenter extends SpisyPresenter
 
         try {
             $spis_id = $Spisy->vytvorit($data);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $form->addError("Spis se nepodařilo vytvořit.");
             $form->addError($e->getMessage());
             return;

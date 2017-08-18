@@ -162,7 +162,7 @@ class CRLParser extends DERParser
         try {
             $response = HttpClient::get($url);
             return $response;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $e->getMessage();
             return null;
         }

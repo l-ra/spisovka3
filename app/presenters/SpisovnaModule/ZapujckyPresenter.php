@@ -137,7 +137,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
                     try {
                         $Zapujcka->vratit($zapujcka_id);
                         $count_ok++;
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         $e->getMessage();
                         $count_failed++;
                     }
@@ -229,7 +229,7 @@ class Spisovna_ZapujckyPresenter extends BasePresenter
         try {
             $Zapujcka->vratit($zapujcka_id);
             $this->flashMessage('Zapůjčený dokument byl vrácen.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Dokument se nepodařilo vrátit!', 'error');
             $this->flashMessage($e->getMessage(), 'error');
         }

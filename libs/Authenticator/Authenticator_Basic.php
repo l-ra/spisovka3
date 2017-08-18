@@ -51,7 +51,7 @@ class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthen
         // Overeni hesla
         try {
             $success = $this->verifyPassword($account, $credentials);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new Nette\Security\AuthenticationException(
             "Při ověřování hesla došlo k problému: " . $e->getMessage(), self::FAILURE);
         }

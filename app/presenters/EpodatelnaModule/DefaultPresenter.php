@@ -435,7 +435,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 return "Z datové schránky bylo přijato $pocet_novych_zprav nových zpráv.$error_msg";
 
             return "V datové schránce nebyly zjištěny žádné nové zprávy.$error_msg";
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return "Při kontrole datové schránky došlo k chybě: " . $e->getMessage();
         }
     }
@@ -555,7 +555,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $mail->appendSignature($this->user);
 
                     $mail->send();
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
 // ignoruj pripadnou chybu
                     $e->getMessage();
                 }
@@ -603,7 +603,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $output = "Datová zpráva není platná!<br />" .
                             'ISDS zpráva: ' . $isds->GetStatusMessage();
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $output = "Nepodařilo se připojit k ISDS schránce!<br />" .
                         'chyba: ' . $e->getMessage();
             }

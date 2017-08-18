@@ -49,7 +49,7 @@ class SouvisejiciDokument extends BaseModel
 
         try {
             $this->insert($row);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new \Exception('Dokumenty nebylo možné spojit. Pravděpodobně už byly spojeny předtím.', 0, $e);
         }
     }

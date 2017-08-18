@@ -115,7 +115,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                         $spis = new Spis($spis_id);
                         $spis->receiveIntoSpisovna();
                         $count_ok++;
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         $this->flashMessage($e->getMessage(), 'warning');
                         $count_failed++;
                     }
@@ -134,7 +134,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
                     try {
                         $spis = new Spis($spis_id);
                         $spis->returnFromSpisovna();
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         $all_ok = false;                        
                     }
                 }

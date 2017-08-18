@@ -61,7 +61,7 @@ final class Upgrade
             }
 
             Settings::set(self::SETTINGS_NEEDED, false);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo "Chyba\n";
             throw $e;
         }

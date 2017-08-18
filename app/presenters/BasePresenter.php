@@ -86,7 +86,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         try {
             $enable_xhtml = Settings::get('xhtml', false);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // ošetři výjimku při instalaci aplikace
             $e->getMessage();
             $enable_xhtml = false;

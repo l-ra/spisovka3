@@ -148,7 +148,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         $form1['aktivni']->setDefaultValue($isds['aktivni']);
         try {
             $form1['typ_pripojeni']->setDefaultValue($isds['typ_pripojeni']);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $e->getMessage();
         }
         $form1['login']->setDefaultValue($isds['login']);
@@ -247,7 +247,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                         $vlastnik = $info->firmName . " [" . $info->dbType . "]";
                     }
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->flashMessage('Nelze se připojit k ISDS! ' . $e->getMessage(), "warning");
             }
         }
@@ -271,7 +271,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
             if ($stav_hesla)
                 $this->flashMessage("Heslo expiruje " . date("j.n.Y G:i",
                                 strtotime($stav_hesla)));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->flashMessage("Připojení se nepodařilo: " . $e->getMessage(), 'warning');
         }
 
@@ -390,7 +390,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
 //                            'warning');
 //                    $this->flashMessage('Chyba ISDS: ' . $ISDS->GetStatusMessage(), 'warning');
 //                }
-//            } catch (Exception $e) {
+//            } catch (\Exception $e) {
 //                $this->flashMessage('Při pokusu o změnu hesla došlo k chybě: ' . $e->getMessage(),
 //                        "warning");
 //            }
@@ -571,7 +571,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
                 $fileName = CLIENT_DIR . "/configs/certifikat_email.crt";
                 $upload->move($fileName);
                 $data['cert'] = $fileName;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $e->getMessage();
                 $chyba_pri_uploadu = 1;
                 $this->flashMessage('Certifikát se nepodařilo přenést na cílové místo.',

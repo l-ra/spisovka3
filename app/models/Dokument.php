@@ -466,7 +466,7 @@ COALESCE(DATE_ADD(d2.datum_spousteci_udalosti, INTERVAL d2.skartacni_lhuta YEAR)
             $this->_datum_param_to_sql('datum_vyrizeni', $params, $args);
             $what = 'odeslání';
             $this->_datum_param_to_sql('datum_odeslani', $params, $args);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             if (strpos($e->getMessage(), '\DateTime') === false)
                 throw $e;
 
