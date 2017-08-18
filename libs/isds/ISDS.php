@@ -85,7 +85,7 @@ class ISDS
         if ($this->logger)
             $client = new DebugSoapClient($this->GetServiceWSDL($wsdl), $params, $this->logger);
         else
-            $client = new SoapClient($this->GetServiceWSDL($wsdl), $params);
+            $client = new IsdsSoapClient($this->GetServiceWSDL($wsdl), $params);
 
         return $client;
     }
@@ -927,7 +927,22 @@ class ISDS
 //
 //}
 
-class DebugSoapClient extends SoapClient
+class IsdsSoapClient extends SoapClient
+{
+    public function __doRequest($request, $location, $action, $version, $one_way = 0)
+    {
+        $response = parent::__doRequest($request, $location, $action, $version, $one_way);
+        if (strpos($response, '<!DOCTYPE html')) {
+            $matches = [];
+            preg_match('#<h1>(.*)</h1>#', $response, $matches);
+            throw new \Exception($matches[1]);
+        }
+        
+        return $response;
+    }
+}
+
+class DebugSoapClient extends IsdsSoapClient
 {
 
     private $logger;
