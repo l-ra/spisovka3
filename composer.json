@@ -3,7 +3,8 @@
     "description": "OSS Spisová služba",
     "license": "EUPL-1.1",
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.5.0",
+        "ext-fileinfo": "*",
         "ext-zip": "*",
         "dibi/dibi": "2.*",
         "latte/latte": "2.3.*",
@@ -20,8 +21,7 @@
         "mpdf/mpdf": "~6.1.0"
     },
 	"suggest": {
-        "ext-curl": "Komunikace se vzdálenými servery. Datová schránka.",
-        "ext-fileinfo": "Rozpoznávání typu souborů dle obsahu",
+        "ext-curl": "Komunikace se vzdálenými servery.",
 		"ext-imap": "Příjem e-mailů",
 		"ext-openssl": "E-podatelna",
 		"ext-soap": "Datová schránka"
