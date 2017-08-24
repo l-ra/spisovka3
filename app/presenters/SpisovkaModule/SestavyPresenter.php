@@ -34,7 +34,7 @@ class Spisovka_SestavyPresenter extends BasePresenter
     {
         @ini_set("memory_limit", PDF_MEMORY_LIMIT);
 
-        $pdf = new mPDF('', 'A4-L', 9, 'Helvetica', 10, 10, 8, 8, 0, 0);
+        $pdf = new \mPDF('', 'A4-L', 9, 'Helvetica', 10, 10, 8, 8, 0, 0);
         $app_info = new VersionInformation();
         $pdf->SetCreator($app_info->name);
         $pdf->SetAuthor($this->user->displayName);

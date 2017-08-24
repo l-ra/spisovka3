@@ -66,7 +66,7 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
         // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
         // Dulezite zde jde presne nastaveni okraju formulare
-        $mpdf = new mPDF('iso-8859-2', 'A4', 9, 'Helvetica', 7, 9, 8, 6, 0, 0);
+        $mpdf = new \mPDF('iso-8859-2', 'A4', 9, 'Helvetica', 7, 9, 8, 6, 0, 0);
 
         $app_info = new VersionInformation();
         $mpdf->SetCreator($app_info->name);

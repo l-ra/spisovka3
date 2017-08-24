@@ -316,7 +316,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         $page_format = in_array($this->view, ["detail", "odetail", "printdetail"]) ? 'A4' : 'A4-L';
         // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
-        $mpdf = new mPDF('iso-8859-2', $page_format, 9, 'Helvetica');
+        $mpdf = new \mPDF('iso-8859-2', $page_format, 9, 'Helvetica');
 
         $app_info = new VersionInformation();
         $mpdf->SetCreator($app_info->name);
