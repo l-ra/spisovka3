@@ -16,7 +16,7 @@ use ErrorException;
  */
 class Debugger
 {
-	const VERSION = '2.3.11';
+	const VERSION = '2.3.12';
 
 	/** server modes {@link Debugger::enable()} */
 	const
@@ -238,8 +238,10 @@ class Debugger
 
 		if (!headers_sent()) {
 			$protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
-			$code = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE ') !== FALSE ? 503 : 500;
-			header("$protocol $code", TRUE, $code);
+			$code = isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE ') !== FALSE
+				? '503 Service Unavailable'
+				: '500 Internal Server Error';
+			header("$protocol $code");
 			if (self::isHtmlMode()) {
 				header('Content-Type: text/html; charset=UTF-8');
 			}

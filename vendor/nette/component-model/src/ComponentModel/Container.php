@@ -32,7 +32,7 @@ class Container extends Component implements IContainer
 	 * @param  IComponent
 	 * @param  string
 	 * @param  string
-	 * @return self
+	 * @return static
 	 * @throws Nette\InvalidStateException
 	 */
 	public function addComponent(IComponent $component, $name, $insertBefore = NULL)
@@ -114,6 +114,10 @@ class Container extends Component implements IContainer
 	 */
 	public function getComponent($name, $need = TRUE)
 	{
+		if (isset($this->components[$name])) {
+			return $this->components[$name];
+		}
+
 		if (is_int($name)) {
 			$name = (string) $name;
 

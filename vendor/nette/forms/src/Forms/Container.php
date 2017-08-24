@@ -36,7 +36,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 * Fill-in with default values.
 	 * @param  array|\Traversable  values used to fill the form
 	 * @param  bool     erase other default values?
-	 * @return self
+	 * @return static
 	 */
 	public function setDefaults($values, $erase = FALSE)
 	{
@@ -52,7 +52,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 * Fill-in with values.
 	 * @param  array|\Traversable  values used to fill the form
 	 * @param  bool     erase other controls?
-	 * @return self
+	 * @return static
 	 * @internal
 	 */
 	public function setValues($values, $erase = FALSE)
@@ -169,7 +169,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 
 
 	/**
-	 * @return self
+	 * @return static
 	 */
 	public function setCurrentGroup(ControlGroup $group = NULL)
 	{
@@ -193,7 +193,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 * @param  Nette\ComponentModel\IComponent
 	 * @param  string
 	 * @param  string
-	 * @return self
+	 * @return static
 	 * @throws Nette\InvalidStateException
 	 */
 	public function addComponent(Nette\ComponentModel\IComponent $component, $name, $insertBefore = NULL)
@@ -241,7 +241,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	public function addText($name, $label = NULL, $cols = NULL, $maxLength = NULL)
 	{
 		$control = new Controls\TextInput($label, $maxLength);
-		$control->setAttribute('size', $cols);
+		$control->setHtmlAttribute('size', $cols);
 		return $this[$name] = $control;
 	}
 
@@ -257,8 +257,8 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	public function addPassword($name, $label = NULL, $cols = NULL, $maxLength = NULL)
 	{
 		$control = new Controls\TextInput($label, $maxLength);
-		$control->setAttribute('size', $cols);
-		return $this[$name] = $control->setType('password');
+		$control->setHtmlAttribute('size', $cols);
+		return $this[$name] = $control->setHtmlType('password');
 	}
 
 
@@ -273,7 +273,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	public function addTextArea($name, $label = NULL, $cols = NULL, $rows = NULL)
 	{
 		$control = new Controls\TextArea($label);
-		$control->setAttribute('cols', $cols)->setAttribute('rows', $rows);
+		$control->setHtmlAttribute('cols', $cols)->setHtmlAttribute('rows', $rows);
 		return $this[$name] = $control;
 	}
 
@@ -364,7 +364,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	{
 		$control = new Controls\SelectBox($label, $items);
 		if ($size > 1) {
-			$control->setAttribute('size', (int) $size);
+			$control->setHtmlAttribute('size', (int) $size);
 		}
 		return $this[$name] = $control;
 	}
@@ -382,7 +382,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	{
 		$control = new Controls\MultiSelectBox($label, $items);
 		if ($size > 1) {
-			$control->setAttribute('size', (int) $size);
+			$control->setHtmlAttribute('size', (int) $size);
 		}
 		return $this[$name] = $control;
 	}
@@ -428,7 +428,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	/**
 	 * Adds naming container to the form.
 	 * @param  string  name
-	 * @return Container
+	 * @return self
 	 */
 	public function addContainer($name)
 	{

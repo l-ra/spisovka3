@@ -44,7 +44,7 @@
 			}
 
 			// enables <a class="tracy-toggle" href="#"> or <span data-tracy-ref="#"> toggling
-			if (link = closest(e.target, '.tracy-toggle')) {
+			if (link = closest(e.target, '.tracy-toggle')) { // eslint-disable-line
 				var collapsed = link.classList.contains('tracy-collapsed'),
 					ref = link.getAttribute('data-tracy-ref') || link.getAttribute('href', 2),
 					dest = link;
@@ -82,7 +82,8 @@
 			]);
 
 		} else if (Array.isArray(data)) {
-			return buildStruct([
+			return buildStruct(
+				[
 					createEl('span', {'class': 'tracy-dump-array'}, ['array']),
 					' (' + (data[0] && data.length || '') + ')'
 				],
@@ -111,10 +112,11 @@
 				throw new UnknownEntityException;
 			}
 			parentIds = parentIds || [];
-			recursive = parentIds.indexOf(id) > -1;
+			var recursive = parentIds.indexOf(id) > -1;
 			parentIds.push(id);
 
-			return buildStruct([
+			return buildStruct(
+				[
 					createEl('span', {
 						'class': data.object ? 'tracy-dump-object' : 'tracy-dump-resource',
 						title: object.editor ? 'Declared in file ' + object.editor.file + ' on line ' + object.editor.line : null,

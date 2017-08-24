@@ -34,6 +34,11 @@ body #tracy-debug {
 	text-shadow: none;
 }
 
+#tracy-debug *:before
+#tracy-debug *:after {
+	all: unset;
+}
+
 #tracy-debug b,
 #tracy-debug strong {
 	font-weight: bold;
@@ -98,6 +103,10 @@ body #tracy-debug {
 
 #tracy-debug table .tracy-right {
 	text-align: right;
+}
+
+#tracy-debug svg {
+	display: inline;
 }
 
 

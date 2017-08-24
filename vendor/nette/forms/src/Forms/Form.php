@@ -150,7 +150,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 
 	/**
 	 * Returns self.
-	 * @return self
+	 * @return static
 	 */
 	public function getForm($need = TRUE)
 	{
@@ -161,7 +161,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 	/**
 	 * Sets form's action.
 	 * @param  mixed URI
-	 * @return self
+	 * @return static
 	 */
 	public function setAction($url)
 	{
@@ -183,7 +183,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 	/**
 	 * Sets form's method.
 	 * @param  string get | post
-	 * @return self
+	 * @return static
 	 */
 	public function setMethod($method)
 	{
@@ -292,7 +292,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 
 	/**
 	 * Sets translate adapter.
-	 * @return self
+	 * @return static
 	 */
 	public function setTranslator(Nette\Localization\ITranslator $translator = NULL)
 	{
@@ -349,7 +349,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 
 	/**
 	 * Sets the submittor control.
-	 * @return self
+	 * @return static
 	 * @internal
 	 */
 	public function setSubmittedBy(ISubmitterControl $by = NULL)
@@ -476,7 +476,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 		$maxSize = ini_get('post_max_size');
 		$units = array('k' => 10, 'm' => 20, 'g' => 30);
 		if (isset($units[$ch = strtolower(substr($maxSize, -1))])) {
-			$maxSize <<= $units[$ch];
+			$maxSize = (int) $maxSize << $units[$ch];
 		}
 		if ($maxSize > 0 && $maxSize < $_SERVER['CONTENT_LENGTH']) {
 			$this->addError(sprintf(Validator::$messages[self::MAX_FILE_SIZE], $maxSize));
@@ -553,7 +553,7 @@ class Form extends Container implements Nette\Utils\IHtmlString
 
 	/**
 	 * Sets form renderer.
-	 * @return self
+	 * @return static
 	 */
 	public function setRenderer(IFormRenderer $renderer = NULL)
 	{

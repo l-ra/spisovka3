@@ -137,7 +137,7 @@ class Image extends Nette\Object
 	 * @param  mixed  detected image format
 	 * @throws Nette\NotSupportedException if gd extension is not loaded
 	 * @throws UnknownImageFileException if file not found or file type is not known
-	 * @return self
+	 * @return static
 	 */
 	public static function fromFile($file, & $format = NULL)
 	{
@@ -178,7 +178,7 @@ class Image extends Nette\Object
 	 * Create a new image from the image stream in the string.
 	 * @param  string
 	 * @param  mixed  detected image format
-	 * @return self
+	 * @return static
 	 * @throws ImageException
 	 */
 	public static function fromString($s, & $format = NULL)
@@ -202,7 +202,7 @@ class Image extends Nette\Object
 	 * @param  int
 	 * @param  int
 	 * @param  array
-	 * @return self
+	 * @return static
 	 */
 	public static function fromBlank($width, $height, $color = NULL)
 	{
@@ -262,7 +262,7 @@ class Image extends Nette\Object
 	/**
 	 * Sets image resource.
 	 * @param  resource
-	 * @return self
+	 * @return static
 	 */
 	protected function setImageResource($image)
 	{
@@ -289,7 +289,7 @@ class Image extends Nette\Object
 	 * @param  mixed  width in pixels or percent
 	 * @param  mixed  height in pixels or percent
 	 * @param  int    flags
-	 * @return self
+	 * @return static
 	 */
 	public function resize($width, $height, $flags = self::FIT)
 	{
@@ -334,14 +334,14 @@ class Image extends Nette\Object
 	public static function calculateSize($srcWidth, $srcHeight, $newWidth, $newHeight, $flags = self::FIT)
 	{
 		if (substr($newWidth, -1) === '%') {
-			$newWidth = round($srcWidth / 100 * abs($newWidth));
+			$newWidth = round($srcWidth / 100 * abs(substr($newWidth, 0, -1)));
 			$percents = TRUE;
 		} else {
 			$newWidth = (int) abs($newWidth);
 		}
 
 		if (substr($newHeight, -1) === '%') {
-			$newHeight = round($srcHeight / 100 * abs($newHeight));
+			$newHeight = round($srcHeight / 100 * abs(substr($newHeight, 0, -1)));
 			$flags |= empty($percents) ? 0 : self::STRETCH;
 		} else {
 			$newHeight = (int) abs($newHeight);
@@ -394,7 +394,7 @@ class Image extends Nette\Object
 	 * @param  mixed  y-offset in pixels or percent
 	 * @param  mixed  width in pixels or percent
 	 * @param  mixed  height in pixels or percent
-	 * @return self
+	 * @return static
 	 */
 	public function crop($left, $top, $width, $height)
 	{
@@ -419,16 +419,16 @@ class Image extends Nette\Object
 	public static function calculateCutout($srcWidth, $srcHeight, $left, $top, $newWidth, $newHeight)
 	{
 		if (substr($newWidth, -1) === '%') {
-			$newWidth = round($srcWidth / 100 * $newWidth);
+			$newWidth = round($srcWidth / 100 * substr($newWidth, 0, -1));
 		}
 		if (substr($newHeight, -1) === '%') {
-			$newHeight = round($srcHeight / 100 * $newHeight);
+			$newHeight = round($srcHeight / 100 * substr($newHeight, 0, -1));
 		}
 		if (substr($left, -1) === '%') {
-			$left = round(($srcWidth - $newWidth) / 100 * $left);
+			$left = round(($srcWidth - $newWidth) / 100 * substr($left, 0, -1));
 		}
 		if (substr($top, -1) === '%') {
-			$top = round(($srcHeight - $newHeight) / 100 * $top);
+			$top = round(($srcHeight - $newHeight) / 100 * substr($top, 0, -1));
 		}
 		if ($left < 0) {
 			$newWidth += $left;
@@ -446,7 +446,7 @@ class Image extends Nette\Object
 
 	/**
 	 * Sharpen image.
-	 * @return self
+	 * @return static
 	 */
 	public function sharpen()
 	{
@@ -465,18 +465,18 @@ class Image extends Nette\Object
 	 * @param  mixed  x-coordinate in pixels or percent
 	 * @param  mixed  y-coordinate in pixels or percent
 	 * @param  int  opacity 0..100
-	 * @return self
+	 * @return static
 	 */
 	public function place(Image $image, $left = 0, $top = 0, $opacity = 100)
 	{
 		$opacity = max(0, min(100, (int) $opacity));
 
 		if (substr($left, -1) === '%') {
-			$left = round(($this->getWidth() - $image->getWidth()) / 100 * $left);
+			$left = round(($this->getWidth() - $image->getWidth()) / 100 * substr($left, 0, -1));
 		}
 
 		if (substr($top, -1) === '%') {
-			$top = round(($this->getHeight() - $image->getHeight()) / 100 * $top);
+			$top = round(($this->getHeight() - $image->getHeight()) / 100 * substr($top, 0, -1));
 		}
 
 		if ($opacity === 100) {

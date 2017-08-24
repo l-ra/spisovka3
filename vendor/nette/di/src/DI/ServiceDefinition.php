@@ -15,6 +15,10 @@ use Nette;
  */
 class ServiceDefinition extends Nette\Object
 {
+	const
+		IMPLEMENT_MODE_CREATE = 'create',
+		IMPLEMENT_MODE_GET = 'get';
+
 	/** @var string|NULL  class or interface name */
 	private $class;
 
@@ -40,11 +44,11 @@ class ServiceDefinition extends Nette\Object
 	private $implement;
 
 	/** @var string|NULL  create | get */
-	private $implementType;
+	private $implementMode;
 
 
 	/**
-	 * @return self
+	 * @return static
 	 */
 	public function setClass($class, array $args = array())
 	{
@@ -66,7 +70,7 @@ class ServiceDefinition extends Nette\Object
 
 
 	/**
-	 * @return self
+	 * @return static
 	 */
 	public function setFactory($factory, array $args = array())
 	{
@@ -94,7 +98,7 @@ class ServiceDefinition extends Nette\Object
 
 
 	/**
-	 * @return self
+	 * @return static
 	 */
 	public function setArguments(array $args = array())
 	{
@@ -108,7 +112,7 @@ class ServiceDefinition extends Nette\Object
 
 	/**
 	 * @param  Statement[]
-	 * @return self
+	 * @return static
 	 */
 	public function setSetup(array $setup)
 	{
@@ -132,7 +136,7 @@ class ServiceDefinition extends Nette\Object
 
 
 	/**
-	 * @return self
+	 * @return static
 	 */
 	public function addSetup($entity, array $args = array())
 	{
@@ -142,7 +146,7 @@ class ServiceDefinition extends Nette\Object
 
 
 	/**
-	 * @return self
+	 * @return static
 	 */
 	public function setParameters(array $params)
 	{
@@ -161,7 +165,7 @@ class ServiceDefinition extends Nette\Object
 
 
 	/**
-	 * @return self
+	 * @return static
 	 */
 	public function setTags(array $tags)
 	{
@@ -180,7 +184,7 @@ class ServiceDefinition extends Nette\Object
 
 
 	/**
-	 * @return self
+	 * @return static
 	 */
 	public function addTag($tag, $attr = TRUE)
 	{
@@ -200,7 +204,7 @@ class ServiceDefinition extends Nette\Object
 
 	/**
 	 * @param  bool
-	 * @return self
+	 * @return static
 	 */
 	public function setAutowired($state = TRUE)
 	{
@@ -220,7 +224,7 @@ class ServiceDefinition extends Nette\Object
 
 	/**
 	 * @param  bool
-	 * @return self
+	 * @return static
 	 */
 	public function setDynamic($state = TRUE)
 	{
@@ -240,7 +244,7 @@ class ServiceDefinition extends Nette\Object
 
 	/**
 	 * @param  string
-	 * @return self
+	 * @return static
 	 */
 	public function setImplement($interface)
 	{
@@ -260,14 +264,14 @@ class ServiceDefinition extends Nette\Object
 
 	/**
 	 * @param  string
-	 * @return self
+	 * @return static
 	 */
-	public function setImplementType($type)
+	public function setImplementMode($mode)
 	{
-		if (!in_array($type, array('get', 'create'), TRUE)) {
+		if (!in_array($mode, array(self::IMPLEMENT_MODE_CREATE, self::IMPLEMENT_MODE_GET), TRUE)) {
 			throw new Nette\InvalidArgumentException('Argument must be get|create.');
 		}
-		$this->implementType = $type;
+		$this->implementMode = $mode;
 		return $this;
 	}
 
@@ -275,9 +279,23 @@ class ServiceDefinition extends Nette\Object
 	/**
 	 * @return string|NULL
 	 */
+	public function getImplementMode()
+	{
+		return $this->implementMode;
+	}
+
+
+	/** @deprecated */
+	public function setImplementType($type)
+	{
+		return $this->setImplementMode($type);
+	}
+
+
+	/** @deprecated */
 	public function getImplementType()
 	{
-		return $this->implementType;
+		return $this->implementMode;
 	}
 
 
@@ -297,7 +315,7 @@ class ServiceDefinition extends Nette\Object
 	}
 
 
-	/** @return self */
+	/** @return static */
 	public function setInject($state = TRUE)
 	{
 		//trigger_error(__METHOD__ . '() is deprecated.', E_USER_DEPRECATED);

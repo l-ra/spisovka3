@@ -34,7 +34,7 @@ class RequestFactory extends Nette\Object
 
 	/**
 	 * @param  bool
-	 * @return self
+	 * @return static
 	 */
 	public function setBinary($binary = TRUE)
 	{
@@ -45,7 +45,7 @@ class RequestFactory extends Nette\Object
 
 	/**
 	 * @param  array|string
-	 * @return self
+	 * @return static
 	 */
 	public function setProxy($proxy)
 	{
@@ -137,7 +137,9 @@ class RequestFactory extends Nette\Object
 		$list = array();
 		if (!empty($_FILES)) {
 			foreach ($_FILES as $k => $v) {
-				if (!$this->binary && is_string($k) && (!preg_match($reChars, $k) || preg_last_error())) {
+				if (!is_array($v) || !isset($v['name'], $v['type'], $v['size'], $v['tmp_name'], $v['error'])
+					|| (!$this->binary && is_string($k) && (!preg_match($reChars, $k) || preg_last_error()))
+				) {
 					continue;
 				}
 				$v['@'] = & $files[$k];

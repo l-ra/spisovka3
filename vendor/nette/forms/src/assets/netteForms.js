@@ -24,7 +24,7 @@
 
 'use strict';
 
-var Nette = {};
+var Nette = {version: '2.3'};
 
 /**
  * Attaches a handler to an event for the element.
@@ -139,7 +139,7 @@ Nette.validateControl = function(elem, rules, onlyCheck, value, emptyOptional) {
 			emptyOptional = !Nette.validateRule(elem, ':filled', null, value);
 			continue;
 		} else if (emptyOptional && !rule.condition && rule.op !== ':filled') {
-			return true;
+			continue;
 		}
 
 		curElem = curElem.tagName ? curElem : curElem[0]; // RadioNodeList
@@ -171,8 +171,10 @@ Nette.validateControl = function(elem, rules, onlyCheck, value, emptyOptional) {
 		}
 	}
 
-	if (!onlyCheck && elem.type === 'number' && !elem.validity.valid) {
-		Nette.addError(elem, 'Please enter a valid value.');
+	if (elem.type === 'number' && !elem.validity.valid) {
+		if (!onlyCheck) {
+			Nette.addError(elem, 'Please enter a valid value.');
+		}
 		return false;
 	}
 
@@ -423,7 +425,7 @@ Nette.validators = {
 				return null;
 			}
 		}
-		return Nette.validators.range(elem, [arg, null], val);
+		return arg === null || parseFloat(val) >= arg;
 	},
 
 	max: function(elem, arg, val) {
@@ -434,7 +436,7 @@ Nette.validators = {
 				return null;
 			}
 		}
-		return Nette.validators.range(elem, [null, arg], val);
+		return arg === null || parseFloat(val) <= arg;
 	},
 
 	range: function(elem, arg, val) {

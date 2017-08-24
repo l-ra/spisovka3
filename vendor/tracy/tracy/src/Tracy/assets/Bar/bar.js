@@ -141,7 +141,6 @@
 			+ '<\/script><body id="tracy-debug">'
 		);
 		doc.body.innerHTML = '<div class="tracy-panel tracy-mode-window" id="' + this.id + '">' + this.elem.innerHTML + '<\/div>';
-		var winPanel = win.Tracy.Debug.getPanel(this.id);
 		win.Tracy.Dumper.init();
 		if (this.elem.querySelector('h1')) {
 			doc.title = this.elem.querySelector('h1').innerHTML;
@@ -406,7 +405,7 @@
 	// returns total offset for element
 	function getOffset(elem) {
 		var res = {left: elem.offsetLeft, top: elem.offsetTop};
-		while (elem = elem.offsetParent) {
+		while (elem = elem.offsetParent) { // eslint-disable-line
 			res.left += elem.offsetLeft; res.top += elem.offsetTop;
 		}
 		return res;
