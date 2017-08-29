@@ -530,7 +530,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 // pouze kvalifikovane
                     $tmp_filename = tempnam(TEMP_DIR, 'emailtest');
                     file_put_contents($tmp_filename, $raw_message);
-                    $esign = new esignature();
+                    $esign = new \esignature();
                     $result = $esign->verifySignature($tmp_filename);
                     unlink($tmp_filename);
                     if (!$result['ok']) {

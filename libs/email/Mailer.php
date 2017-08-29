@@ -53,7 +53,7 @@ class Mailer implements Nette\Mail\IMailer
         $mail_source = $mail->generateMessage();
 
         if ($config['podepisovat']) {
-            $esign = new esignature();
+            $esign = new \esignature();
             if (!$esign->setUserCert($config['cert'], $config['cert_pass']))
                 throw new \Exception('E-mail nelze podepsat. Neplatný certifikát!');
 

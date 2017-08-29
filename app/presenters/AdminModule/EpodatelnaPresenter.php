@@ -47,7 +47,7 @@ class Admin_EpodatelnaPresenter extends BasePresenter
         if (!$ep['odeslani']['podepisovat'])
             $state = 'vypnuto';
         else if (file_exists($ep['odeslani']['cert'])) {
-            $esign = new esignature();
+            $esign = new \esignature();
             $ok = $esign->setUserCert($ep['odeslani']['cert'], $ep['odeslani']['cert_pass']);
             if ($ok) {
                 $state = 'Certifikát je nahrán.';
