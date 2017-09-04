@@ -20,7 +20,7 @@
                 {if empty($requirement->passed) && isset($requirement->errorMessage)}
                     <td>{$requirement->errorMessage}</td>
                 {elseif isset($requirement->message)}
-                    <td>{$requirement->message|nl2br|noescape}</td>
+                    <td>{$requirement->message|breaklines}</td>
                 {elseif isset($requirement->passed)}
                     <td>{$requirement->passed ? 'Enabled' : 'Disabled'}</td>
                 {else}

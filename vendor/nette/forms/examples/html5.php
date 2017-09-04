@@ -28,20 +28,17 @@ $form->addText('count', 'Number of results:')
 	->setHtmlType('number')
 	->setDefaultValue(10)
 	->addRule($form::INTEGER, 'Must be numeric value')
-	->addRule($form::RANGE, 'Must be in range from %d to %d', array(1, 100));
+	->addRule($form::RANGE, 'Must be in range from %d to %d', [1, 100]);
 
 $form->addText('precision', 'Precision:')
 	->setHtmlType('range')
 	->setDefaultValue(50)
 	->addRule($form::INTEGER, 'Precision must be numeric value')
-	->addRule($form::RANGE, 'Precision must be in range from %d to %d', array(0, 100));
+	->addRule($form::RANGE, 'Precision must be in range from %d to %d', [0, 100]);
 
-$form->addText('email', 'Send to email:')
-	->setHtmlType('email')
+$form->addEmail('email', 'Send to email:')
 	->setHtmlAttribute('autocomplete', 'off')
 	->setHtmlAttribute('placeholder', 'Optional, but Recommended');
-	->addCondition($form::FILLED) // conditional rule: if is email filled, ...
-		->addRule($form::EMAIL, 'Incorrect email address'); // ... then check email
 
 $form->addSubmit('submit', 'Send');
 

@@ -13,11 +13,12 @@ use Nette\Utils\DateTime;
 
 /**
  * HttpResponse class.
+ *
+ * @property-read array $headers
  */
-class Response extends Nette\Object implements IResponse
+class Response implements IResponse
 {
-	/** @var bool  Send invisible garbage for IE 6? */
-	private static $fixIE = TRUE;
+	use Nette\SmartObject;
 
 	/** @var string The domain in which the cookie will be available */
 	public $cookieDomain = '';
@@ -25,14 +26,17 @@ class Response extends Nette\Object implements IResponse
 	/** @var string The path in which the cookie will be available */
 	public $cookiePath = '/';
 
-	/** @var string Whether the cookie is available only through HTTPS */
-	public $cookieSecure = FALSE;
+	/** @var bool Whether the cookie is available only through HTTPS */
+	public $cookieSecure = false;
 
-	/** @var string Whether the cookie is hidden from client-side */
-	public $cookieHttpOnly = TRUE;
+	/** @var bool Whether the cookie is hidden from client-side */
+	public $cookieHttpOnly = true;
 
 	/** @var bool Whether warn on possible problem with data in output buffer */
-	public $warnOnBuffer = TRUE;
+	public $warnOnBuffer = true;
+
+	/** @var bool  Send invisible garbage for IE 6? */
+	private static $fixIE = true;
 
 	/** @var int HTTP response code */
 	private $code = self::S200_OK;
@@ -40,15 +44,8 @@ class Response extends Nette\Object implements IResponse
 
 	public function __construct()
 	{
-		if (PHP_VERSION_ID >= 50400) {
-			if (is_int($code = http_response_code())) {
-				$this->code = $code;
-			}
-		}
-
-		if (PHP_VERSION_ID >= 50401) { // PHP bug #61106
-			$rm = new \ReflectionMethod('Nette\Http\Helpers::removeDuplicateCookies');
-			header_register_callback($rm->getClosure()); // requires closure due PHP bug #66375
+		if (is_int($code = http_response_code())) {
+			$this->code = $code;
 		}
 	}
 
@@ -56,11 +53,12 @@ class Response extends Nette\Object implements IResponse
 	/**
 	 * Sets HTTP response code.
 	 * @param  int
+	 * @param  string
 	 * @return static
 	 * @throws Nette\InvalidArgumentException  if code is invalid
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
-	public function setCode($code)
+	public function setCode($code, $reason = null)
 	{
 		$code = (int) $code;
 		if ($code < 100 || $code > 599) {
@@ -68,11 +66,19 @@ class Response extends Nette\Object implements IResponse
 		}
 		self::checkHeaders();
 		$this->code = $code;
-		if (PHP_VERSION_ID >= 50400) {
-			http_response_code($code);
-		} else {
+
+		static $hasReason = [ // hardcoded in PHP
+			100, 101,
+			200, 201, 202, 203, 204, 205, 206,
+			300, 301, 302, 303, 304, 305, 307, 308,
+			400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 426, 428, 429, 431,
+			500, 501, 502, 503, 504, 505, 506, 511,
+		];
+		if ($reason || !in_array($code, $hasReason, true)) {
 			$protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
-			header($protocol . ' ' . $code, TRUE, $code);
+			header("$protocol $code " . ($reason ?: 'Unknown status'));
+		} else {
+			http_response_code($code);
 		}
 		return $this;
 	}
@@ -98,12 +104,12 @@ class Response extends Nette\Object implements IResponse
 	public function setHeader($name, $value)
 	{
 		self::checkHeaders();
-		if ($value === NULL) {
+		if ($value === null) {
 			header_remove($name);
 		} elseif (strcasecmp($name, 'Content-Length') === 0 && ini_get('zlib.output_compression')) {
 			// ignore, PHP bug #44164
 		} else {
-			header($name . ': ' . $value, TRUE, $this->code);
+			header($name . ': ' . $value, true, $this->code);
 		}
 		return $this;
 	}
@@ -119,7 +125,7 @@ class Response extends Nette\Object implements IResponse
 	public function addHeader($name, $value)
 	{
 		self::checkHeaders();
-		header($name . ': ' . $value, FALSE, $this->code);
+		header($name . ': ' . $value, false, $this->code);
 		return $this;
 	}
 
@@ -131,7 +137,7 @@ class Response extends Nette\Object implements IResponse
 	 * @return static
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
-	public function setContentType($type, $charset = NULL)
+	public function setContentType($type, $charset = null)
 	{
 		$this->setHeader('Content-Type', $type . ($charset ? '; charset=' . $charset : ''));
 		return $this;
@@ -150,7 +156,7 @@ class Response extends Nette\Object implements IResponse
 		$this->setCode($code);
 		$this->setHeader('Location', $url);
 		if (preg_match('#^https?:|^\s*+[a-z0-9+.-]*+[^:]#i', $url)) {
-			$escapedUrl = htmlSpecialChars($url, ENT_IGNORE | ENT_QUOTES, 'UTF-8');
+			$escapedUrl = htmlspecialchars($url, ENT_IGNORE | ENT_QUOTES, 'UTF-8');
 			echo "<h1>Redirect</h1>\n\n<p><a href=\"$escapedUrl\">Please click here to continue</a>.</p>";
 		}
 	}
@@ -158,13 +164,13 @@ class Response extends Nette\Object implements IResponse
 
 	/**
 	 * Sets the number of seconds before a page cached on a browser expires.
-	 * @param  string|int|\DateTime  time, value 0 means no cache
+	 * @param  string|int|\DateTimeInterface  time, value 0 means "must-revalidate"
 	 * @return static
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
 	public function setExpiration($time)
 	{
-		$this->setHeader('Pragma', NULL);
+		$this->setHeader('Pragma', null);
 		if (!$time) { // no cache
 			$this->setHeader('Cache-Control', 's-maxage=0, max-age=0, must-revalidate');
 			$this->setHeader('Expires', 'Mon, 23 Jan 1978 10:00:00 GMT');
@@ -191,10 +197,10 @@ class Response extends Nette\Object implements IResponse
 	/**
 	 * Returns value of an HTTP header.
 	 * @param  string
-	 * @param  mixed
-	 * @return mixed
+	 * @param  string|null
+	 * @return string|null
 	 */
-	public function getHeader($header, $default = NULL)
+	public function getHeader($header, $default = null)
 	{
 		$header .= ':';
 		$len = strlen($header);
@@ -213,7 +219,7 @@ class Response extends Nette\Object implements IResponse
 	 */
 	public function getHeaders()
 	{
-		$headers = array();
+		$headers = [];
 		foreach (headers_list() as $header) {
 			$a = strpos($header, ':');
 			$headers[substr($header, 0, $a)] = (string) substr($header, $a + 2);
@@ -225,23 +231,21 @@ class Response extends Nette\Object implements IResponse
 	/**
 	 * @deprecated
 	 */
-	public static function date($time = NULL)
+	public static function date($time = null)
 	{
+		trigger_error('Method date() is deprecated, use Nette\Http\Helpers::formatDate() instead.', E_USER_DEPRECATED);
 		return Helpers::formatDate($time);
 	}
 
 
-	/**
-	 * @return void
-	 */
 	public function __destruct()
 	{
-		if (self::$fixIE && isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE ') !== FALSE
-			&& in_array($this->code, array(400, 403, 404, 405, 406, 408, 409, 410, 500, 501, 505), TRUE)
-			&& preg_match('#^text/html(?:;|$)#', $this->getHeader('Content-Type', 'text/html'))
+		if (self::$fixIE && isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE ') !== false
+			&& in_array($this->code, [400, 403, 404, 405, 406, 408, 409, 410, 500, 501, 505], true)
+			&& preg_match('#^text/html(?:;|$)#', $this->getHeader('Content-Type'))
 		) {
 			echo Nette\Utils\Random::generate(2e3, " \t\r\n"); // sends invisible garbage for IE
-			self::$fixIE = FALSE;
+			self::$fixIE = false;
 		}
 	}
 
@@ -250,7 +254,7 @@ class Response extends Nette\Object implements IResponse
 	 * Sends a cookie.
 	 * @param  string name of the cookie
 	 * @param  string value
-	 * @param  string|int|\DateTime  expiration time, value 0 means "until the browser is closed"
+	 * @param  string|int|\DateTimeInterface  expiration time, value 0 means "until the browser is closed"
 	 * @param  string
 	 * @param  string
 	 * @param  bool
@@ -258,17 +262,17 @@ class Response extends Nette\Object implements IResponse
 	 * @return static
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
-	public function setCookie($name, $value, $time, $path = NULL, $domain = NULL, $secure = NULL, $httpOnly = NULL)
+	public function setCookie($name, $value, $time, $path = null, $domain = null, $secure = null, $httpOnly = null)
 	{
 		self::checkHeaders();
 		setcookie(
 			$name,
 			$value,
-			$time ? DateTime::from($time)->format('U') : 0,
-			$path === NULL ? $this->cookiePath : (string) $path,
-			$domain === NULL ? $this->cookieDomain : (string) $domain,
-			$secure === NULL ? $this->cookieSecure : (bool) $secure,
-			$httpOnly === NULL ? $this->cookieHttpOnly : (bool) $httpOnly
+			$time ? (int) DateTime::from($time)->format('U') : 0,
+			$path === null ? $this->cookiePath : (string) $path,
+			$domain === null ? $this->cookieDomain : (string) $domain,
+			$secure === null ? $this->cookieSecure : (bool) $secure,
+			$httpOnly === null ? $this->cookieHttpOnly : (bool) $httpOnly
 		);
 		Helpers::removeDuplicateCookies();
 		return $this;
@@ -284,27 +288,20 @@ class Response extends Nette\Object implements IResponse
 	 * @return void
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
-	public function deleteCookie($name, $path = NULL, $domain = NULL, $secure = NULL)
+	public function deleteCookie($name, $path = null, $domain = null, $secure = null)
 	{
-		$this->setCookie($name, FALSE, 0, $path, $domain, $secure);
-	}
-
-
-	/** @internal @deprecated */
-	public function removeDuplicateCookies()
-	{
-		trigger_error('Use Nette\Http\Helpers::removeDuplicateCookies()', E_USER_WARNING);
+		$this->setCookie($name, false, 0, $path, $domain, $secure);
 	}
 
 
 	private function checkHeaders()
 	{
-		if (headers_sent($file, $line)) {
+		if (PHP_SAPI === 'cli') {
+		} elseif (headers_sent($file, $line)) {
 			throw new Nette\InvalidStateException('Cannot send header after HTTP headers have been sent' . ($file ? " (output started at $file:$line)." : '.'));
 
-		} elseif ($this->warnOnBuffer && ob_get_length() && !array_filter(ob_get_status(TRUE), function ($i) { return !$i['chunk_size']; })) {
-			trigger_error('Possible problem: you are sending a HTTP header while already having some data in output buffer. Try Tracy\OutputDebugger or start session earlier.', E_USER_NOTICE);
+		} elseif ($this->warnOnBuffer && ob_get_length() && !array_filter(ob_get_status(true), function ($i) { return !$i['chunk_size']; })) {
+			trigger_error('Possible problem: you are sending a HTTP header while already having some data in output buffer. Try Tracy\OutputDebugger or start session earlier.');
 		}
 	}
-
 }

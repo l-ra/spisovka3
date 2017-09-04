@@ -4,6 +4,9 @@ namespace Spisovka;
 
 use Nette;
 
+/**
+ * @property Storage_Basic $storage
+ */
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
 
@@ -68,7 +71,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function isUserAllowed()
     {
-        return $this->user->isAllowed(str_replace('Spisovka\\', '', $this->reflection->name),
+        return $this->user->isAllowed(str_replace('Spisovka\\', '', $this->getReflection()->name),
                         $this->getAction());
     }
 

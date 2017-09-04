@@ -19,7 +19,7 @@
                             MD5 hash: {$file->md5_hash}
                         </span>
                     </div>
-                    {if !empty($file->popis)}<div class="popis">{!$file->popis|escape|nl2br}</div>{/if}
+                    {if !empty($file->popis)}<div class="popis">{$file->popis|breaklines}</div>{/if}
                     {if isset($AccessEdit) && $AccessEdit}
                         <div class="vyber">
                             <a href="{link :Spisovka:Prilohy:odebrat, 'id' => $file->id, 'dok_id' => $dokument_id}" onclick="return odebratPrilohu(this);">odebrat</a>

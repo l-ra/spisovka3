@@ -10,6 +10,7 @@ Nové funkce:
   
 Jiné změny:
 
+- upgrade frameworku Nette. Minimální verze PHP je nyní 5.6.
 - aktualizován popis stavů datových zpráv z oficiální dokumentace ISDS
 - PHP rozšíření "fileinfo" je nyní povinné. U instalace na Windows bude možná
   potřeba toto rozšíření povolit.

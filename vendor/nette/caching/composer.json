@@ -14,7 +14,7 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.1",
+		"php": ">=5.4.4",
 		"nette/finder": "~2.2",
 		"nette/utils": "~2.2"
 	},
@@ -22,6 +22,9 @@
 		"nette/tester": "~1.6",
 		"nette/di": "~2.3",
 		"latte/latte": "~2.3.0"
+	},
+	"suggest": {
+		"ext-pdo_sqlite": "to use SQLiteStorage or SQLiteJournal"
 	},
 	"conflict": {
 		"nette/nette": "<2.2"
@@ -32,7 +35,7 @@
 	"minimum-stability": "dev",
 	"extra": {
 		"branch-alias": {
-			"dev-master": "2.3-dev"
+			"dev-master": "2.4-dev"
 		}
 	}
 }

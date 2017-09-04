@@ -1,6 +1,7 @@
 {
 	"name": "nette/utils",
-	"description": "Nette Utility Classes",
+	"description": "🛠 Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong password generating etc.",
+	"keywords": ["nette", "images", "json", "password", "validation", "utility", "string", "array", "core", "slugify", "utf-8", "unicode", "paginator", "datetime"],
 	"homepage": "https://nette.org",
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
@@ -14,10 +15,11 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.1"
+		"php": ">=5.6.0"
 	},
 	"require-dev": {
-		"nette/tester": "~1.0"
+		"nette/tester": "~2.0",
+		"tracy/tracy": "^2.3"
 	},
 	"suggest": {
 		"ext-iconv": "to use Strings::webalize() and toAscii()",
@@ -33,5 +35,10 @@
 	"autoload": {
 		"classmap": ["src/"]
 	},
-	"minimum-stability": "dev"
+	"minimum-stability": "dev",
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.4-dev"
+		}
+	}
 }

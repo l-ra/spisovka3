@@ -66,7 +66,7 @@
     </dl>
     <dl n:if="$Zprava->typ == 'E'">
         <dt>Elektronický podpis:</dt>
-        <dd>{control emailSignature|nl2br}</dd>
+        <dd>{control emailSignature|breaklines}</dd>
     </dl>
 </div>
 
@@ -76,7 +76,7 @@
     <div class="h2">{$Zprava->typ == 'I' ? 'Datová zpráva' : 'Obsah zprávy'}</div>
     <div class="indent-left">
     {if $Zprava->typ == 'I'}<pre>{$Zprava->popis}</pre>
-    {else}{!$Zprava->popis|html2br}{/if}
+    {else}{$Zprava->popis|html2br|breaklines}{/if}
     </div>
 </div>
 

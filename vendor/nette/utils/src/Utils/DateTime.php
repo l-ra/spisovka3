@@ -13,19 +13,21 @@ use Nette;
 /**
  * DateTime.
  */
-class DateTime extends \DateTime
+class DateTime extends \DateTime implements \JsonSerializable
 {
+	use Nette\SmartObject;
+
 	/** minute in seconds */
 	const MINUTE = 60;
 
 	/** hour in seconds */
-	const HOUR = 3600;
+	const HOUR = 60 * self::MINUTE;
 
 	/** day in seconds */
-	const DAY = 86400;
+	const DAY = 24 * self::HOUR;
 
 	/** week in seconds */
-	const WEEK = 604800;
+	const WEEK = 7 * self::DAY;
 
 	/** average month in seconds */
 	const MONTH = 2629800;
@@ -36,24 +38,37 @@ class DateTime extends \DateTime
 
 	/**
 	 * DateTime object factory.
-	 * @param  string|int|\DateTime
+	 * @param  string|int|\DateTimeInterface
 	 * @return static
 	 */
 	public static function from($time)
 	{
-		if ($time instanceof \DateTime || $time instanceof \DateTimeInterface) {
-			return new static($time->format('Y-m-d H:i:s'), $time->getTimezone());
+		if ($time instanceof \DateTimeInterface) {
+			return new static($time->format('Y-m-d H:i:s.u'), $time->getTimezone());
 
 		} elseif (is_numeric($time)) {
 			if ($time <= self::YEAR) {
 				$time += time();
 			}
-			$tmp = new static('@' . $time);
-			return $tmp->setTimeZone(new \DateTimeZone(date_default_timezone_get()));
+			return (new static('@' . $time))->setTimeZone(new \DateTimeZone(date_default_timezone_get()));
 
-		} else { // textual or NULL
+		} else { // textual or null
 			return new static($time);
 		}
+	}
+
+
+	/**
+	 * Creates DateTime object.
+	 * @return static
+	 */
+	public static function fromParts($year, $month, $day, $hour = 0, $minute = 0, $second = 0)
+	{
+		$s = sprintf('%04d-%02d-%02d %02d:%02d:%02.5f', $year, $month, $day, $hour, $minute, $second);
+		if (!checkdate($month, $day, $year) || $hour < 0 || $hour > 23 || $minute < 0 || $minute > 59 || $second < 0 || $second >= 60) {
+			throw new Nette\InvalidArgumentException("Invalid date '$s'");
+		}
+		return new static($s);
 	}
 
 
@@ -103,12 +118,12 @@ class DateTime extends \DateTime
 	 * Returns new DateTime object formatted according to the specified format.
 	 * @param string The format the $time parameter should be in
 	 * @param string String representing the time
-	 * @param string|\DateTimeZone desired timezone (default timezone is used if NULL is passed)
-	 * @return static|FALSE
+	 * @param string|\DateTimeZone desired timezone (default timezone is used if null is passed)
+	 * @return static|false
 	 */
-	public static function createFromFormat($format, $time, $timezone = NULL)
+	public static function createFromFormat($format, $time, $timezone = null)
 	{
-		if ($timezone === NULL) {
+		if ($timezone === null) {
 			$timezone = new \DateTimeZone(date_default_timezone_get());
 
 		} elseif (is_string($timezone)) {
@@ -119,7 +134,16 @@ class DateTime extends \DateTime
 		}
 
 		$date = parent::createFromFormat($format, $time, $timezone);
-		return $date ? static::from($date) : FALSE;
+		return $date ? static::from($date) : false;
 	}
 
+
+	/**
+	 * Returns JSON representation in ISO 8601 (used by JavaScript).
+	 * @return string
+	 */
+	public function jsonSerialize()
+	{
+		return $this->format('c');
+	}
 }

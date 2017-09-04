@@ -17,16 +17,16 @@
                 <img src="{$publicUrl}images/icons/book.png" alt="book.png" width="32" height="32" />
             </td>
             <td class="meta">
-                <a href="{link :Spisovka:Sestavy:detail, id => $sestava->id}" {!$filtr}>{$sestava->nazev}</a>&nbsp;
+                <a href="{link detail, id => $sestava->id}" {$filtr|noescape}>{$sestava->nazev}</a>&nbsp;
                 <div class="info">
                     {$sestava->popis}
                 </div>
             </td>
             <td class="seznam-sestav-pruh-ikon">
-                <a href="{link :Spisovka:Sestavy:tisk, id => $sestava->id}" {!$filtr} title="Zobrazit a vytisknout sestavu">
+                <a href="{link :Spisovka:Sestavy:tisk, id => $sestava->id}" {$filtr|noescape} title="Zobrazit a vytisknout sestavu">
                     <img src="{$publicUrl}images/icons/printer.png" alt="printer.png" width="32" height="32" />
                 </a>
-                <a href="{link :Spisovka:Sestavy:pdf, id => $sestava->id}" {!$filtr} title="Vytisknout sestavu do PDF">
+                <a href="{link :Spisovka:Sestavy:pdf, id => $sestava->id}" {$filtr|noescape} title="Vytisknout sestavu do PDF">
                     <img src="{$publicUrl}images/mimetypes/application-pdf.png" alt="application-pdf.png" width="32" height="32" />
                 </a>
                 <a n:if="$sestava->canUserModify()" href="{link :Spisovka:Sestavy:upravit, id => $sestava->id}" title="Upravit vlastnosti sestavy">

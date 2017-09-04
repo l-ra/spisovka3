@@ -14,8 +14,8 @@
     {js jquery-1.11.1.min}
     {js jquery-ui.min}
     <script type="text/javascript">
-        var BASE_URL = '{!$baseUrl}';
-        var PUBLIC_URL = '{!$publicUrl}';
+        var BASE_URL = {$baseUrl};
+        var PUBLIC_URL = {$publicUrl};
     </script>
     {js script}
     
@@ -54,7 +54,7 @@
     {/if}
 
     <div n:if="count($flashes)>0" id="flash">
-        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext")!==false}{!$flash->message}{else}{$flash->message|escape|nl2br|noescape}{/if}</div>{/foreach}
+        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext") !== false}{$flash->message}{else}{$flash->message|breaklines}{/if}</div>{/foreach}
     </div>
     {if $presenter->name == 'Spisovka:Napoveda'}
         {include #content}
@@ -69,7 +69,7 @@
     <div id="bottom">
         <a href="{link :Spisovka:Seznamzmen:}" title="Zobrazit historii změn"><strong>{(new Spisovka\VersionInformation())->name}</strong></a><br/>
         {if isset($KontrolaNovychVerzi) && !$KontrolaNovychVerzi['je_aktualni']}<span style="color:#880000;"><strong>Je k dispozici nová verze aplikace číslo {$KontrolaNovychVerzi['dostupna_verze']}</strong></span><br />{/if}
-        Na toto dílo se vztahuje licence {!$licence}
+        Na toto dílo se vztahuje licence {$licence}
     </div>
 </div>
 

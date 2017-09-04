@@ -6,7 +6,7 @@
 {foreach $seznam as $dok}
 <tr>
 {foreach $sloupce as $sl}
-<td {? switch ($sl) {
+<td {php switch ($sl) {
 	case "smer":
 	case "pocet_listu":
 	case "pocet_listu_priloh":
@@ -50,7 +50,7 @@
 {elseif $sl=='smer'}
 	{$dok->typ_dokumentu->smer == 1 ? 'V' : 'P'}
 {elseif $sl=='poznamka_predani'}
-	{!$dok->forward_note|escape|nl2br}
+	{$dok->forward_note|breaklines}
 {else}
 {$dok->$sl}{/if}</td>
 {/foreach}

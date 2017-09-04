@@ -4,5 +4,5 @@
         <button onclick="displayHelpPage($(this).data('url'));" data-url="{link :Spisovka:Napoveda:}">Obsah nápovědy</button>
         <p></p>
     {/if}
-    {? require $helpFile}
+    {php require $helpFile}
 </div>

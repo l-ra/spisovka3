@@ -101,7 +101,7 @@ class Admin_SpisyPresenter extends SpisyPresenter
 
     public function renderExport()
     {
-        if ($this->getHttpRequest()->isPost()) {
+        if ($this->getHttpRequest()->isMethod('POST')) {
             // Exportovani
             $post_data = $this->getHttpRequest()->getPost();
 

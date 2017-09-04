@@ -6,7 +6,7 @@
     <link rel="shortcut icon" href="{$publicUrl}favicon.ico" type="image/x-icon" />
     <title>Podací arch</title>
     <style type="text/css" media="screen, print">
-        {? echo include(APP_DIR .'/../public/css/podaci_arch.css')}
+        {file_get_contents(APP_DIR .'/../public/css/podaci_arch.css')|noescape}
     </style>
 </head>
 <body>
@@ -54,7 +54,7 @@
                 </td>
                 <td class="w4 right">{if !empty($seznam[$i]['cena']) && in_array(9, $seznam[$i]['druh_zasilky'])}{=$seznam[$i]['cena']}{/if}</td>
                 <td class="w5 right">{if !empty($seznam[$i]['cena']) && !in_array(9, $seznam[$i]['druh_zasilky'])}{=$seznam[$i]['cena']}{/if}</td>
-                <td class="w6">{!=Spisovka\DruhZasilky::vypis($seznam[$i]['druh_zasilky'], true)}</td>
+                <td class="w6">{Spisovka\DruhZasilky::vypis($seznam[$i]['druh_zasilky'], true)}</td>
             {else}
                 <td class="w3"></td>
                 <td class="w4 right"></td>

@@ -14,8 +14,10 @@ use Tracy;
 /**
  * User panel for Debugger Bar.
  */
-class UserPanel extends Nette\Object implements Tracy\IBarPanel
+class UserPanel implements Tracy\IBarPanel
 {
+	use Nette\SmartObject;
+
 	/** @var Nette\Security\User */
 	private $user;
 
@@ -54,5 +56,4 @@ class UserPanel extends Nette\Object implements Tracy\IBarPanel
 		require __DIR__ . '/templates/UserPanel.panel.phtml';
 		return ob_get_clean();
 	}
-
 }

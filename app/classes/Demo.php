@@ -10,7 +10,7 @@ class Demo
     public static function isDemo()
     {
         if (self::$is_demo === null) {
-            self::$is_demo = (bool) Nette\Environment::getVariable('demo', false);
+            self::$is_demo = (bool) \Nette\Environment::getVariable('demo', false);
         }
 
         return self::$is_demo;

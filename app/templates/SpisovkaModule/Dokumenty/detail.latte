@@ -156,7 +156,7 @@
             <dt>Věc:</dt>
             <dd class="velke_pismo"><u>{$Dok->nazev}</u></dd><br />
             <dt>Popis:</dt>
-            <dd>{!$Dok->popis|escape|nl2br}</dd><br />
+            <dd>{$Dok->popis|breaklines}</dd><br />
             <dt>Datum doručení/vzniku:</dt>
             <dd>{$Dok->datum_vzniku|edatetime}</dd><br />
             {if !empty($Dok->zpusob_doruceni)}
@@ -174,7 +174,7 @@
 
             {if !empty($Dok->poznamka)}
                 <dt>Poznámka:</dt>
-                <dd>{!$Dok->poznamka|html2br}</dd><br />
+                <dd>{$Dok->poznamka|html2br|breaklines}</dd><br />
             {/if}
             <dt>Počet listů / listů příloh:</dt>
             <dd>{$Dok->pocet_listu} / {$Dok->pocet_listu_priloh} {if !empty($Dok->nelistinne_prilohy)}/ {$Dok->nelistinne_prilohy}{/if}</dd><br />
@@ -236,9 +236,9 @@
                     <dt>Počet listů / příloh / typ příloh:</dt>
                     <dd>{$Dok->vyrizeni_pocet_listu} / {$Dok->vyrizeni_pocet_priloh} {if !empty($Dok->vyrizeni_typ_prilohy)}/ {$Dok->vyrizeni_typ_prilohy}{/if}</dd><br />
                     <dt>Uložení dokumentu:</dt>
-                    <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}</dd><br />
+                    <dd>{$Dok->ulozeni_dokumentu|breaklines}</dd><br />
                     <dt>Poznámka k vyřízení:</dt>
-                    <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
+                    <dd>{$Dok->poznamka_vyrizeni|breaklines}</dd>
                 </dl>
             {/if}
         </div>
@@ -275,7 +275,7 @@
         </dl>
         <dl n:if="$Dok->forward_note">
             <dt>Poznámka pro příjemce:</dt>
-            <dd>{!$Dok->forward_note|escape|nl2br}</dd>
+            <dd>{$Dok->forward_note|breaklines}</dd>
         </dl>
     {/if}
 </div>
@@ -290,7 +290,7 @@
     </dl>
     <dl>
         <dt>Důvod zapůjčení:</dt>
-        <dd>{!$Zapujcka->duvod|escape|nl2br}</dd>
+        <dd>{$Zapujcka->duvod|breaklines}</dd>
     </dl>
     <dl>
         <dt>Datum výpůjčky:</dt>

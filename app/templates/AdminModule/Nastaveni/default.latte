@@ -172,7 +172,7 @@
             {foreach $settings as $short_name => $setting}
                 <div class="detail_hlavicka" n:if="$short_name == 'automaticky_nacist_zpravy'">E-podatelna</div>
                 <dt>{$setting[$presenter::ST_DESCRIPTION]}:</dt>
-                <dd>{!$$short_name ? 'ano' : 'ne'}</dd><br />
+                <dd>{$$short_name ? 'ano' : 'ne'}</dd><br />
             {/foreach}
         
             <div class="detail_hlavicka">Odeslání Českou poštou</div>

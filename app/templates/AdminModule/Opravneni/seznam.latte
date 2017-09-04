@@ -17,8 +17,8 @@
         </tr>
         {foreach $seznam as $role}
         <tr>
-            <td>{!=str_repeat("&nbsp;", 5*$role->uroven)}<a href="{link :Admin:Opravneni:detail, 'id'=>$role->id}">{$role->name}</a></td>
-            <td>{!$role->note|replace:'\n','<br />'}</td>
+            <td>{str_repeat("&nbsp;", 5*$role->uroven)|noescape}<a href="{link detail, $role->id}">{$role->name}</a></td>
+            <td>{$role->note|breaklines}</td>
         </tr>
         {/foreach}
     </table>

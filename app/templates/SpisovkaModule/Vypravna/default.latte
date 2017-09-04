@@ -72,7 +72,7 @@
             </td>
             <td class="druh-zasilky">
                 {if $odes->zpusob_odeslani_id == 3 }    
-                {!=Spisovka\DruhZasilky::vypis($odes->druh_zasilky)}
+                {Spisovka\DruhZasilky::vypis($odes->druh_zasilky)}
                 {if !empty($odes->cena)}<br />cena: {$odes->cena} Kč{/if}
                 {if !empty($odes->hmotnost)}<br />hmotnost: {$odes->hmotnost|decPoint} kg{/if}
                 {elseif $odes->zpusob_odeslani_id == 4 }    

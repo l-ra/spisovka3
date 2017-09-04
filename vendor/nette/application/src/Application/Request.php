@@ -13,13 +13,16 @@ use Nette;
 /**
  * Presenter request.
  *
- * @property   array $parameters
- * @property   array $post
- * @property   array $files
- * @property   string|NULL $method
+ * @property string $presenterName
+ * @property array $parameters
+ * @property array $post
+ * @property array $files
+ * @property string|null $method
  */
-class Request extends Nette\Object
+class Request
 {
+	use Nette\SmartObject;
+
 	/** method */
 	const FORWARD = 'FORWARD';
 
@@ -29,11 +32,11 @@ class Request extends Nette\Object
 	/** flag */
 	const RESTORED = 'restored';
 
-	/** @var string|NULL */
+	/** @var string|null */
 	private $method;
 
 	/** @var array */
-	private $flags = array();
+	private $flags = [];
 
 	/** @var string */
 	private $name;
@@ -56,7 +59,7 @@ class Request extends Nette\Object
 	 * @param  array   all uploaded files
 	 * @param  array   flags
 	 */
-	public function __construct($name, $method = NULL, array $params = array(), array $post = array(), array $files = array(), array $flags = array())
+	public function __construct($name, $method = null, array $params = [], array $post = [], array $files = [], array $flags = [])
 	{
 		$this->name = $name;
 		$this->method = $method;
@@ -70,7 +73,7 @@ class Request extends Nette\Object
 	/**
 	 * Sets the presenter name.
 	 * @param  string
-	 * @return self
+	 * @return static
 	 */
 	public function setPresenterName($name)
 	{
@@ -91,7 +94,7 @@ class Request extends Nette\Object
 
 	/**
 	 * Sets variables provided to the presenter.
-	 * @return self
+	 * @return static
 	 */
 	public function setParameters(array $params)
 	{
@@ -117,13 +120,13 @@ class Request extends Nette\Object
 	 */
 	public function getParameter($key)
 	{
-		return isset($this->params[$key]) ? $this->params[$key] : NULL;
+		return isset($this->params[$key]) ? $this->params[$key] : null;
 	}
 
 
 	/**
 	 * Sets variables provided to the presenter via POST.
-	 * @return self
+	 * @return static
 	 */
 	public function setPost(array $params)
 	{
@@ -138,7 +141,7 @@ class Request extends Nette\Object
 	 * @param  string
 	 * @return mixed
 	 */
-	public function getPost($key = NULL)
+	public function getPost($key = null)
 	{
 		if (func_num_args() === 0) {
 			return $this->post;
@@ -147,14 +150,14 @@ class Request extends Nette\Object
 			return $this->post[$key];
 
 		} else {
-			return NULL;
+			return null;
 		}
 	}
 
 
 	/**
 	 * Sets all uploaded files.
-	 * @return self
+	 * @return static
 	 */
 	public function setFiles(array $files)
 	{
@@ -175,8 +178,8 @@ class Request extends Nette\Object
 
 	/**
 	 * Sets the method.
-	 * @param  string|NULL
-	 * @return self
+	 * @param  string|null
+	 * @return static
 	 */
 	public function setMethod($method)
 	{
@@ -187,7 +190,7 @@ class Request extends Nette\Object
 
 	/**
 	 * Returns the method.
-	 * @return string|NULL
+	 * @return string|null
 	 */
 	public function getMethod()
 	{
@@ -207,22 +210,12 @@ class Request extends Nette\Object
 
 
 	/**
-	 * @deprecated
-	 */
-	public function isPost()
-	{
-		trigger_error('Method isPost() is deprecated, use isMethod(\'POST\') instead.', E_USER_DEPRECATED);
-		return strcasecmp($this->method, 'post') === 0;
-	}
-
-
-	/**
 	 * Sets the flag.
 	 * @param  string
 	 * @param  bool
-	 * @return self
+	 * @return static
 	 */
-	public function setFlag($flag, $value = TRUE)
+	public function setFlag($flag, $value = true)
 	{
 		$this->flags[$flag] = (bool) $value;
 		return $this;
@@ -238,5 +231,4 @@ class Request extends Nette\Object
 	{
 		return !empty($this->flags[$flag]);
 	}
-
 }

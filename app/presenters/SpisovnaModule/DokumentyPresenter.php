@@ -305,6 +305,7 @@ class Spisovna_DokumentyPresenter extends BasePresenter
         $form->addSelect('skartacni_znak', 'Skartační znak:', $skar_znak)
                 ->setValue(@$Dok->skartacni_znak);
         $form->addText('skartacni_lhuta', 'Skartační lhůta: ', 5, 5)
+                ->setRequired()
                 ->addRule(Form::INTEGER, 'Skartační lhůta musí být celé číslo.')
                 ->setValue(@$Dok->skartacni_lhuta);
 

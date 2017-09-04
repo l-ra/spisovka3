@@ -6,20 +6,20 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     Vybrané položky:&nbsp;&nbsp;
     <select name="action">
-        {if isset($actions)}{foreach $actions as $action => $title}
-            <option value="{$action}" {if $action == $default_action}selected="selected"{/if}>{$title}</option>
+        {if isset($actions)}{foreach $actions as $action => $_title}
+            <option value="{$action}" {if $action == $default_action}selected="selected"{/if}>{$_title}</option>
         {/foreach}{/if}
     </select>
     <input type="submit" name="bulk_submit" value="Provést" />
 </div>
 </form>
 <script type="text/javascript">
-    $('form#{!$component_name} #bulk-select-all').click(function(){
-        $('form#{!$component_name} input[name^=selection]').prop('checked', true);
+    $('form#{$component_name|noescape} #bulk-select-all').click(function(){
+        $('form#{$component_name|noescape} input[name^=selection]').prop('checked', true);
         return false;
     });
-    $('form#{!$component_name} #bulk-select-none').click(function(){
-        $('form#{!$component_name} input[name^=selection]').prop('checked', false);
+    $('form#{$component_name|noescape} #bulk-select-none').click(function(){
+        $('form#{$component_name|noescape} input[name^=selection]').prop('checked', false);
         return false;
     });
 </script>

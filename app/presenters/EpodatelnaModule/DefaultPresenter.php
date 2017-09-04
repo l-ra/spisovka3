@@ -143,8 +143,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
     public function renderZkontrolovat()
     {
-        new Components\SeznamStatu($this, 'seznamstatu');
-
         $config = (new ConfigEpodatelna())->get();
         $this->template->RequestIsdsPassword = $config['isds']['aktivni'] && Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN,
                         false) && empty(UserSettings::get('isds_password'));

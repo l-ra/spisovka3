@@ -4,7 +4,7 @@ namespace Spisovka;
 
 use Nette;
 
-abstract class BaseModel extends Nette\Object
+abstract class BaseModel
 {
 
     /** @var string object name */

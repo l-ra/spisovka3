@@ -99,8 +99,7 @@ class Admin_SubjektyPresenter extends SubjektyPresenter
 
     public function renderExport()
     {
-
-        if ($this->getHttpRequest()->isPost()) {
+        if ($this->getHttpRequest()->isMethod('POST')) {
             // Exportovani
             $post_data = $this->getHttpRequest()->getPost();
             //Nette\Diagnostics\Debugger::dump($post_data);

@@ -1,7 +1,7 @@
-{if !APPLICATION_INSTALLED}
-{? $no_top_menu = true}
-{/if}
 {extends @layout.latte}
+{if !APPLICATION_INSTALLED}
+{php $no_top_menu = true}
+{/if}
 
 {block header}
     {css install_site}

@@ -255,11 +255,11 @@ class Subjekt extends BaseModel
                     $res .= ', ' . $d_adresa;
                 return $res;
             case 'formalni_adresa':
-                return $d_ulice . '<br />' . $data->adresa_psc . ' ' . $data->adresa_mesto . '<br />' . Subjekt::stat($data->adresa_stat,
-                                10);
+                return "$d_ulice\n$data->adresa_psc $data->adresa_mesto\n"
+                        . Subjekt::stat($data->adresa_stat, 10);
             case 'plna_formalni_adresa':
-                return $d_nazev . '<br />' . $d_ulice . '<br />' . $data->adresa_psc . ' ' . $data->adresa_mesto . '<br />' . Subjekt::stat($data->adresa_stat,
-                                10);
+                return "$d_nazev\n$d_ulice\n$data->adresa_psc $data->adresa_mesto\n"
+                        . Subjekt::stat($data->adresa_stat, 10);
             case 'ulice':
                 return $d_ulice;
             case 'mesto':
@@ -322,7 +322,7 @@ class Subjekt extends BaseModel
             'OVM_FO' => 'FO zapsána do Rejstříku OVM',
             'OVM_NOTAR' => 'zrušeno: OVM - notáři',
             'OVM_EXEKUT' => 'zrušeno: OVM - exekutoři',
-            'PO_ZAK' => 'zrušeno: PO vzniklé ze zákona',            
+            'PO_ZAK' => 'zrušeno: PO vzniklé ze zákona',
         );
 
         if (is_null($kod)) {
@@ -348,7 +348,7 @@ class Subjekt extends BaseModel
             return 'pfo';
         if (substr($typ, 0, 2) == 'PO')
             return 'po';
-        
+
         return 'fo';
     }
 

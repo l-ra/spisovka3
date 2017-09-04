@@ -2,7 +2,10 @@ Nette Component Model
 =====================
 
 [![Downloads this Month](https://img.shields.io/packagist/dm/nette/component-model.svg)](https://packagist.org/packages/nette/component-model)
-[![Build Status](https://travis-ci.org/nette/component-model.svg?branch=v2.2)](https://travis-ci.org/nette/component-model)
+[![Build Status](https://travis-ci.org/nette/component-model.svg?branch=master)](https://travis-ci.org/nette/component-model)
+[![Coverage Status](https://coveralls.io/repos/github/nette/component-model/badge.svg?branch=master)](https://coveralls.io/github/nette/component-model?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/nette/component-model/v/stable)](https://github.com/nette/component-model/releases)
+[![License](https://img.shields.io/badge/license-New%20BSD-blue.svg)](https://github.com/nette/component-model/blob/master/license.md)
 
 Components are the foundation of reusable code. They make your work easier and allow you to profit from community work. Components are wonderful.
 Nette Framework introduces several classes and interfaces for all these types of components.
@@ -47,7 +50,7 @@ class UploadControl extends Nette\Forms\Controls\BaseControl
 {
     public function __construct($label)
     {
-        $this->monitor('Nette\Forms\Form');
+        $this->monitor(Nette\Forms\Form::class);
         // ...
     }
 
@@ -74,15 +77,15 @@ Monitoring and lookup of components or paths using `lookup` is **very precisely 
 Iterating over children
 -----------------------
 
-There is a method `getComponents($deep = FALSE, $type = NULL)` for that. First parameter determines if the components should be looked up in depth (recursively). With `TRUE`, it not only iterates all it's children, but also all chilren of it's children, etc. Second parameter servers as an optional filter by class or interface.
+There is a method `getComponents($deep = false, $type = null)` for that. First parameter determines if the components should be looked up in depth (recursively). With `true`, it not only iterates all it's children, but also all chilren of it's children, etc. Second parameter servers as an optional filter by class or interface.
 
 For example, this is the way how validation of forms is "internally"((this is done by framework itself, you don't have to call it explicitly)) performed:
 
 ```php
-$valid = TRUE;
-foreach ($form->getComponents(TRUE, 'Nette\Forms\IControl') as $control) {
+$valid = true;
+foreach ($form->getComponents(true, Nette\Forms\IControl::class) as $control) {
     if (!$control->getRules()->validate()) {
-        $valid = FALSE;
+        $valid = false;
         break;
     }
 }

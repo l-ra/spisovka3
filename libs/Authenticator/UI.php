@@ -120,16 +120,15 @@ class Authenticator_UI extends Nette\Application\UI\Control
 
         $form->addPassword('heslo', 'Heslo:', 30, 30);
         $form->addPassword('heslo_potvrzeni', 'Heslo znovu:', 30, 30)
-                ->addConditionOn($form["heslo"], Nette\Forms\Form::FILLED)
+                ->setRequired(false)
                 ->addRule(Nette\Forms\Form::EQUAL, "Hesla se musí shodovat!", $form["heslo"]);
 
         $this->formAddRoleSelect($form);
         $this->formAddOrgSelect($form);
 
         if (!$this->authenticator->supportsRemoteAuth()) {
-            $form['heslo']->addRule(Nette\Forms\Form::FILLED, 'Heslo musí být vyplněné.');
-            $form['heslo_potvrzeni']->addRule(Nette\Forms\Form::FILLED,
-                    'Potvrzení hesla musí být vyplněné.');
+            $form['heslo']->setRequired('Heslo musí být vyplněné.');
+            $form['heslo_potvrzeni']->setRequired('Potvrzení hesla musí být vyplněné.');
         } else {
             $form['heslo']->addConditionOn($form["external_auth"], Nette\Forms\Form::NOT_EQUAL,
                             1)
@@ -180,7 +179,7 @@ class Authenticator_UI extends Nette\Application\UI\Control
             }
 
             $existing_users = array_flip(UserAccount::getAllUserNames());
-            
+
             foreach ($seznam as $id => $user) {
 
                 if (!isset($user['jmeno']))

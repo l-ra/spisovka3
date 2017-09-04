@@ -115,9 +115,9 @@ class Install_DefaultPresenter extends BasePresenter
             array(
                 'title' => 'PHP verze',
                 'required' => TRUE,
-                'passed' => version_compare(PHP_VERSION, '5.5.0', '>='),
+                'passed' => version_compare(PHP_VERSION, '5.6.0', '>='),
                 'message' => PHP_VERSION,
-                'description' => 'Používáte starou verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.5 nebo 5.6.',
+                'description' => 'Používáte starou verzi PHP. Aplikace pro správný chod vyžaduje PHP verzi 5.6 nebo novější',
             ),
             array(
                 'title' => 'Databáze',

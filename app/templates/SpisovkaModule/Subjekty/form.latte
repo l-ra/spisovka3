@@ -50,8 +50,8 @@
     
     <script type="text/javascript">
 
-        $('#frm{!$subjektForm->name}-type').change(function () {
-            value = $("#frm{!$subjektForm->name}-type").val();
+        $('#frm{$subjektForm->name}-type').change(function () {
+            value = $("#frm{$subjektForm->name}-type").val();
             //alert(value);
             if ( value.indexOf('PFO')>=0 || value === '' ) {
                 $(".type_fo").show();

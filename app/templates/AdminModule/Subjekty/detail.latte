@@ -55,7 +55,7 @@
             <dt>Subjekt:</dt>
             <dd>{=Spisovka\Subjekt::displayName($Subjekt,'jmeno')}</dd><br />
             <dt>Adresa:</dt>
-            <dd>{!=Spisovka\Subjekt::displayName($Subjekt,'formalni_adresa')}</dd><br />
+            <dd>{Spisovka\Subjekt::displayName($Subjekt,'formalni_adresa')|breaklines}</dd><br />
             <dt>E-mail:</dt>
             <dd>{$Subjekt->email}</dd><br />
             <dt>Telefon:</dt>
@@ -69,7 +69,7 @@
         <div class="detail_hlavicka">Poznámka</div>
         <dl>
             <dt></dt>
-            <dd>{!$Subjekt->poznamka|escape|nl2br}</dd>
+            <dd>{$Subjekt->poznamka|breaklines}</dd>
         </dl>
         {/if}
         <a href="{link :Admin:Subjekty:detail, 'id'=>$Subjekt->id, 'upravit'=>'info'}">Upravit</a>

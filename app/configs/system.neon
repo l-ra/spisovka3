@@ -9,16 +9,15 @@ parameters:
         path_documents = files/dokumenty
         path_epodatelna = files/epodatelna
 
-nette:
-    application:
-        errorPresenter: Error
-    session:
-        name: SpisovkaSessionID
-        savePath: "%clientDir%/sessions"
-        cookiePath: %cookiePath%
-        autoStart: true
-    latte:
-        xhtml: true
+application:
+    errorPresenter: Error
+session:
+    name: SpisovkaSessionID
+    savePath: "%clientDir%/sessions"
+    cookiePath: %cookiePath%
+    autoStart: true
+latte:
+    xhtml: true
         
 services:
     authorizator = Spisovka\Authorizator

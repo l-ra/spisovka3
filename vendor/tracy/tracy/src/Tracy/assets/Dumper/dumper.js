@@ -10,9 +10,9 @@
 
 	Tracy.Dumper = Tracy.Dumper || {};
 
-	Tracy.Dumper.init = function(repository) {
+	Tracy.Dumper.init = function(repository, context) {
 		if (repository) {
-			[].forEach.call(document.querySelectorAll('.tracy-dump[data-tracy-dump]'), function(el) {
+			[].forEach.call((context || document).querySelectorAll('.tracy-dump[data-tracy-dump]'), function(el) {
 				try {
 					el.appendChild(build(JSON.parse(el.getAttribute('data-tracy-dump')), repository, el.classList.contains('tracy-collapsed')));
 					el.classList.remove('tracy-collapsed');
@@ -30,40 +30,16 @@
 		}
 		this.inited = true;
 
-		document.body.addEventListener('click', function(e) {
-			var link;
-
-			// enables <span data-tracy-href=""> & ctrl key
-			if (e.ctrlKey && (link = closest(e.target, '[data-tracy-href]'))) {
-				location.href = link.getAttribute('data-tracy-href');
+		// enables <span data-tracy-href=""> & ctrl key
+		document.documentElement.addEventListener('click', function(e) {
+			var el;
+			if (e.ctrlKey && (el = Tracy.closest(e.target, '[data-tracy-href]'))) {
+				location.href = el.getAttribute('data-tracy-href');
 				return false;
 			}
-
-			if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) {
-				return;
-			}
-
-			// enables <a class="tracy-toggle" href="#"> or <span data-tracy-ref="#"> toggling
-			if (link = closest(e.target, '.tracy-toggle')) { // eslint-disable-line
-				var collapsed = link.classList.contains('tracy-collapsed'),
-					ref = link.getAttribute('data-tracy-ref') || link.getAttribute('href', 2),
-					dest = link;
-
-				if (!ref || ref === '#') {
-					ref = '+';
-				} else if (ref.substr(0, 1) === '#') {
-					dest = document;
-				}
-				ref = ref.match(/(\^\s*([^+\s]*)\s*)?(\+\s*(\S*)\s*)?(.*)/);
-				dest = ref[1] ? closest(dest.parentNode, ref[2]) : dest;
-				dest = ref[3] ? closest(dest.nextElementSibling, ref[4], 'nextElementSibling') : dest;
-				dest = ref[5] ? dest.querySelector(ref[5]) : dest;
-
-				link.classList.toggle('tracy-collapsed', !collapsed);
-				dest.classList.toggle('tracy-collapsed', !collapsed);
-				e.preventDefault();
-			}
 		});
+
+		Tracy.Toggle.init();
 	};
 
 
@@ -72,7 +48,7 @@
 			collapseCount = typeof collapsed === 'undefined' ? COLLAPSE_COUNT_TOP : COLLAPSE_COUNT;
 
 		if (type === 'null' || type === 'string' || type === 'number' || type === 'boolean') {
-			data = type === 'string' ? '"' + data + '"' : (data + '').toUpperCase();
+			data = type === 'string' ? '"' + data + '"' : (data + '');
 			return createEl(null, null, [
 				createEl(
 					'span',
@@ -150,8 +126,8 @@
 		]);
 
 		if (collapsed) {
-			toggle.addEventListener('click', handler = function() {
-				toggle.removeEventListener('click', handler);
+			toggle.addEventListener('tracy-toggle', handler = function() {
+				toggle.removeEventListener('tracy-toggle', handler);
 				createItems(div, items, repository, parentIds);
 			});
 		} else {
@@ -195,15 +171,5 @@
 	};
 
 	var UnknownEntityException = function() {};
-
-
-	// finds closing maching element
-	var closest = function(el, selector, func) {
-		var matches = el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector;
-		while (el && selector && !(el.nodeType === 1 && matches.call(el, selector))) {
-			el = el[func || 'parentNode'];
-		}
-		return el;
-	};
 
 })();

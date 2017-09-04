@@ -13,15 +13,15 @@
             // var id = data.selected;
             {if !empty($on_select)}
                 if (data.node.icon == 'icon-spis' || {$select_folders})
-                    {!$on_select}(data.node.id);
+                    {$on_select|noescape}(data.node.id);
             {/if}
         }).jstree({ 'core' : {
             'animation' : false,
             'multiple' : false,
             'data' : [
         {foreach $spisy as $spis}
-{ id: {!$spis['id']}, parent: {$spis['parent_id'] ?: '#'}, text: {$spis['nazev']},
-icon: {!$spis['typ'] == 'F' ? '"icon-folder"' : '"icon-spis"'}},
+{ id: {$spis['id']}, parent: {$spis['parent_id'] ?: '#'}, text: {$spis['nazev']},
+icon: {$spis['typ'] == 'F' ? 'icon-folder' : 'icon-spis'}},
         {/foreach}
             ]
         } });

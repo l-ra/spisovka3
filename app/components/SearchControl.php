@@ -26,7 +26,7 @@ class SearchControl extends \Spisovka\Form
         $renderer->wrappers['control']['container'] = null;
     }
 
-    public function render()
+    public function render(...$args)
     {
         echo '<div id="search">';
         parent::render();

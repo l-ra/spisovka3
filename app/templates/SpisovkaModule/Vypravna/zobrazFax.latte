@@ -12,7 +12,7 @@
   <body>
 {/if}
 <div>
-{!$dokument->zprava|escape|nl2br}
+{$dokument->zprava|breaklines}
 </div>
 {if $isPrint}
   </body>

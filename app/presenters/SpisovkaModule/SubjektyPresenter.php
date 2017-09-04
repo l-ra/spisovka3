@@ -91,7 +91,7 @@ class SubjektyPresenter extends BasePresenter
         $form->addText('titul_pred', 'Titul před:', 20, 35);
         $form->addText('titul_za', 'Titul za:', 20, 10);
 
-        $form['nazev_subjektu']->addConditionOn($form['prijmeni'], ~Form::FILLED)
+        $form['nazev_subjektu']->addConditionOn($form['prijmeni'], Form::BLANK)
                 ->setRequired('Je nutné vyplnit název subjektu nebo příjmení');
         
         $form->addDatePicker('datum_narozeni', 'Datum narození:');

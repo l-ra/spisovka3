@@ -4,7 +4,7 @@ namespace Spisovka;
 
 use Nette;
 
-class Authenticator_Basic extends Nette\Object implements Nette\Security\IAuthenticator
+class Authenticator_Basic implements Nette\Security\IAuthenticator
 {
 
     /**

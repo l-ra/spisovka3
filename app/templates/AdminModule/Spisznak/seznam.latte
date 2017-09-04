@@ -19,7 +19,7 @@
         {foreach $seznam as $spisznak}
         <tr>
             <td>
-                {!=str_repeat("&nbsp;", 5*$spisznak->uroven)}
+                {str_repeat("&nbsp;", 5*$spisznak->uroven)|noescape}
                 <img src="{$publicUrl}images/icons/spisy.png" alt="Spis" title="Spis" width="16" height="16" />
                 &nbsp;&nbsp;
                 <span {if $spisznak->stav == 0}class="spis_znak_neaktivni"{/if}> 

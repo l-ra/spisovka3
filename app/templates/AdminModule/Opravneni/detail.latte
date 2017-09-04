@@ -20,7 +20,7 @@
         </dl>
         <dl>
             <dt>Popis role:</dt>
-            <dd>{!$Role->note|replace:'\n','<br />'}</dd>
+            <dd>{$Role->note|breaklines}</dd>
         </dl>
         <a href="{link :Admin:Opravneni:detail, 'id'=>$Role->id, 'upravit'=>'info'}">Upravit</a>
         {if $Role->fixed == 0}

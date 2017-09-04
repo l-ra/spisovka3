@@ -227,6 +227,7 @@ class Admin_NastaveniPresenter extends BasePresenter
         $form1->addGroup('Ostatní nastavení');
         $form1->addText('pocet_polozek', 'Počet položek v seznamu:', 10, 10)
                 ->setValue($nastaveni->pocet_polozek)
+                ->setRequired()
                 ->addRule(Nette\Forms\Form::INTEGER, 'Počet položek v seznamu musí být číslo.')
                 ->addRule(Nette\Forms\Form::RANGE,
                         'Počet položek v seznamu musí být v rozsahu od 1 do 500', array(1, 500));

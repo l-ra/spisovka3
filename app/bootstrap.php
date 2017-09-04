@@ -290,8 +290,8 @@ final class Bootstrap
             // ignoruj
         }
 
-        if ($force_https || $httpRequest->isSecured())
-            Nette\Application\Routers\Route::$defaultFlags |= Nette\Application\Routers\Route::SECURED;
+        /* if ($force_https || $httpRequest->isSecured())
+            Nette\Application\Routers\Route::$defaultFlags |= Nette\Application\Routers\Route::SECURED; */
 
         $router[] = new Nette\Application\Routers\Route('index.php',
                 array(

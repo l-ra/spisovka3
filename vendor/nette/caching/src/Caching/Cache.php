@@ -94,7 +94,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 		$data = $this->storage->read($this->generateKey($key));
 		if ($data === NULL && $fallback) {
 			return $this->save($key, function (& $dependencies) use ($fallback) {
-				return call_user_func_array($fallback, array(& $dependencies));
+				return call_user_func_array($fallback, [& $dependencies]);
 			});
 		}
 		return $data;
@@ -126,7 +126,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 		if ($data instanceof Nette\Callback || $data instanceof \Closure) {
 			$this->storage->lock($key);
 			try {
-				$data = call_user_func_array($data, array(& $dependencies));
+				$data = call_user_func_array($data, [& $dependencies]);
 			} catch (\Throwable $e) {
 				$this->storage->remove($key);
 				throw $e;
@@ -139,42 +139,47 @@ class Cache extends Nette\Object implements \ArrayAccess
 		if ($data === NULL) {
 			$this->storage->remove($key);
 		} else {
-			$this->storage->write($key, $data, $this->completeDependencies($dependencies, $data));
+			$this->storage->write($key, $data, $this->completeDependencies($dependencies));
 			return $data;
 		}
 	}
 
 
-	private function completeDependencies($dp, $data)
+	private function completeDependencies($dp)
 	{
 		// convert expire into relative amount of seconds
 		if (isset($dp[self::EXPIRATION])) {
 			$dp[self::EXPIRATION] = Nette\Utils\DateTime::from($dp[self::EXPIRATION])->format('U') - time();
 		}
 
+		// make list from TAGS
+		if (isset($dp[self::TAGS])) {
+			$dp[self::TAGS] = array_values((array) $dp[self::TAGS]);
+		}
+
 		// convert FILES into CALLBACKS
 		if (isset($dp[self::FILES])) {
 			foreach (array_unique((array) $dp[self::FILES]) as $item) {
-				$dp[self::CALLBACKS][] = array(array(__CLASS__, 'checkFile'), $item, @filemtime($item)); // @ - stat may fail
+				$dp[self::CALLBACKS][] = [[__CLASS__, 'checkFile'], $item, @filemtime($item)]; // @ - stat may fail
 			}
 			unset($dp[self::FILES]);
 		}
 
 		// add namespaces to items
 		if (isset($dp[self::ITEMS])) {
-			$dp[self::ITEMS] = array_unique(array_map(array($this, 'generateKey'), (array) $dp[self::ITEMS]));
+			$dp[self::ITEMS] = array_unique(array_map([$this, 'generateKey'], (array) $dp[self::ITEMS]));
 		}
 
 		// convert CONSTS into CALLBACKS
 		if (isset($dp[self::CONSTS])) {
 			foreach (array_unique((array) $dp[self::CONSTS]) as $item) {
-				$dp[self::CALLBACKS][] = array(array(__CLASS__, 'checkConst'), $item, constant($item));
+				$dp[self::CALLBACKS][] = [[__CLASS__, 'checkConst'], $item, constant($item)];
 			}
 			unset($dp[self::CONSTS]);
 		}
 
 		if (!is_array($dp)) {
-			$dp = array();
+			$dp = [];
 		}
 		return $dp;
 	}
@@ -202,7 +207,11 @@ class Cache extends Nette\Object implements \ArrayAccess
 	public function clean(array $conditions = NULL)
 	{
 		$this->key = $this->data = NULL;
-		$this->storage->clean((array) $conditions);
+		$conditions = (array) $conditions;
+		if (isset($conditions[self::TAGS])) {
+			$conditions[self::TAGS] = array_values((array) $conditions[self::TAGS]);
+		}
+		$this->storage->clean($conditions);
 	}
 
 
@@ -231,15 +240,14 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function wrap($function, array $dependencies = NULL)
 	{
-		$cache = $this;
-		return function () use ($cache, $function, $dependencies) {
-			$key = array($function, func_get_args());
+		return function () use ($function, $dependencies) {
+			$key = [$function, func_get_args()];
 			if (is_array($function) && is_object($function[0])) {
 				$key[0][0] = get_class($function[0]);
 			}
-			$data = $cache->load($key);
+			$data = $this->load($key);
 			if ($data === NULL) {
-				$data = $cache->save($key, Callback::invokeArgs($function, $key[1]), $dependencies);
+				$data = $this->save($key, Callback::invokeArgs($function, $key[1]), $dependencies);
 			}
 			return $data;
 		};

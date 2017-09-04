@@ -86,7 +86,7 @@
         <dd>{$sending['podepisovat'] ? 'ano' : 'ne'}</dd><br />
         {if $sending['podepisovat']}
             <dt>Stav elektronického podepisování:</dt>
-            <dd>{!$sending['signing_state']|escape|nl2br}</dd><br />
+            <dd>{$sending['signing_state']|breaklines}</dd><br />
             {if !empty($sending['certificate_info'])}
                 <dt>Informace o certifikátu:</dt>
                 <dd>

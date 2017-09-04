@@ -12,12 +12,12 @@ pripadny hosting vice klientu je potreba se obratit na dodavatele aplikace.
 Predtim, nez zacnete s instalaci, si overte zakladni pozadavky pro spusteni
 aplikace:
 
-Apache 2
-PHP 5.2 a vyssi
-MySQL 5 a vyssi
+Apache 2.2 nebo 2.4
+PHP 5.6 a vyssi
+MySQL 5.5 a vyssi
 povolen .htaccess (AllowOverride All)
 povolen mod_rewrite
-dostupne PHP knihovny iconv, mbstring, curl, open_ssl, soap, mail,
+dostupnost pozadovanych PHP rozsireni se zkontroluje na zacatku instalace
 
 
 1. Nahrejte vsechny soubory uvedene v tomto archivu na server.

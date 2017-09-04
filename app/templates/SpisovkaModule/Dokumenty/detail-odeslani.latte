@@ -38,7 +38,7 @@
                     {elseif $odes->stav_odeslani == 3}
                         (vráceno) nebylo odesláno poštou
                     {/if}
-                    {if !empty($odes->druh_zasilky)}<br />druh zásilky: {!=Spisovka\DruhZasilky::vypis($odes->druh_zasilky)}{/if}
+                    {if !empty($odes->druh_zasilky)}<br />druh zásilky: {Spisovka\DruhZasilky::vypis($odes->druh_zasilky)}{/if}
                     {if !empty($odes->cena)}<br />cena: {$odes->cena} Kč{/if}
                     {if !empty($odes->hmotnost)}<br />hmotnost: {$odes->hmotnost|decPoint} kg{/if}
 

@@ -79,7 +79,7 @@
         </dl>
         <dl>
             <dt>Popis:</dt>
-            <dd>{!$Dok->popis|escape|nl2br}</dd>
+            <dd>{$Dok->popis|breaklines}</dd>
         </dl>
         <dl>
             <dt>Datum doručení/vzniku:</dt>
@@ -106,7 +106,7 @@
         {if !empty($Dok->poznamka)}
         <dl>
             <dt>Poznámka:</dt>
-            <dd>{!$Dok->poznamka|html2br}</dd>
+            <dd>{$Dok->poznamka|html2br}</dd>
         </dl>
         {/if}
         <dl>
@@ -148,7 +148,7 @@
         {input2 ulozeni_dokumentu}
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
+            <dd>{$Dok->poznamka_vyrizeni|breaklines}</dd>
         </dl>        
         <div>
             {input upravit}&nbsp;&nbsp;{input storno}
@@ -191,11 +191,11 @@
         </dl>
         <dl>
             <dt>Uložení dokumentu:</dt>
-            <dd>{!$Dok->ulozeni_dokumentu|escape|nl2br}</dd>
+            <dd>{$Dok->ulozeni_dokumentu|breaklines}</dd>
         </dl>
         <dl>
             <dt>Poznámka k vyřízení:</dt>
-            <dd>{!$Dok->poznamka_vyrizeni|escape|nl2br}</dd>
+            <dd>{$Dok->poznamka_vyrizeni|breaklines}</dd>
         </dl>
         {/if}
         </div>
@@ -226,7 +226,7 @@
         </dl>
         <dl>
             <dt>Důvod zapůjčení:</dt>
-            <dd>{!$Zapujcka->duvod|escape|nl2br}</dd>
+            <dd>{$Zapujcka->duvod|breaklines}</dd>
         </dl>
         <dl>
             <dt>Datum výpůjčky:</dt>

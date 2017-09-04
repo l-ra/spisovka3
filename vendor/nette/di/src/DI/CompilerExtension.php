@@ -13,8 +13,10 @@ use Nette;
 /**
  * Configurator compiling extension.
  */
-abstract class CompilerExtension extends Nette\Object
+abstract class CompilerExtension
 {
+	use Nette\SmartObject;
+
 	/** @var Compiler */
 	protected $compiler;
 
@@ -22,9 +24,12 @@ abstract class CompilerExtension extends Nette\Object
 	protected $name;
 
 	/** @var array */
-	protected $config = array();
+	protected $config = [];
 
 
+	/**
+	 * @return static
+	 */
 	public function setCompiler(Compiler $compiler, $name)
 	{
 		$this->compiler = $compiler;
@@ -33,6 +38,9 @@ abstract class CompilerExtension extends Nette\Object
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function setConfig(array $config)
 	{
 		$this->config = $config;
@@ -58,7 +66,7 @@ abstract class CompilerExtension extends Nette\Object
 	 * @return array
 	 * @throws Nette\InvalidStateException
 	 */
-	public function validateConfig(array $expected, array $config = NULL, $name = NULL)
+	public function validateConfig(array $expected, array $config = null, $name = null)
 	{
 		if (func_num_args() === 1) {
 			return $this->config = $this->validateConfig($expected, $this->config);
@@ -132,5 +140,4 @@ abstract class CompilerExtension extends Nette\Object
 	public function afterCompile(Nette\PhpGenerator\ClassType $class)
 	{
 	}
-
 }

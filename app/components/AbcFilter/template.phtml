@@ -3,7 +3,7 @@
 {if chr($chr) == $current_letter}
 <span class="current">{=chr($chr)}</span>
 {else}
-<a href={plink $presenter->view abc => chr($chr)} {if $js_function}onclick="{!$js_function}(this); return false;"{/if}>{= chr($chr)}</a>
+<a href={plink $presenter->view abc => chr($chr)} {if $js_function}onclick="{$js_function|noescape}(this); return false;"{/if}>{= chr($chr)}</a>
 {/if}
 {/for}
 </div>

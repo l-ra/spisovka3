@@ -45,7 +45,7 @@ class LatteFilters
         $string = preg_replace('#</iframe>#i', "", $string);
         $string = preg_replace('#src=".*?"#i', "[externí zdroj blokováno!]", $string);
 
-        return nl2br($string);
+        return $string;
     }
 
     /**  Filtr pro vlastní formátování datumu, příp. i času
