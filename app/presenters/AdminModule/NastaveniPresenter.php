@@ -15,8 +15,6 @@ class Admin_NastaveniPresenter extends BasePresenter
     static protected $settings = [
         'document_disable_creation' =>
         ['document_disable_creation', false, 'Zakázat vytváření nových dokumentů'],
-        'force_https' =>
-        [ 'router_force_https', false, 'Vynutit zabezpečené připojení protokolem HTTPS'],
         'users_can_change_their_data' =>
         [ 'users_can_change_their_data', null, 'Uživatelé mohou měnit své osobní údaje'],
         'users_can_change_their_password' =>

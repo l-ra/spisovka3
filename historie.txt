@@ -11,6 +11,8 @@ Nové funkce:
 Jiné změny:
 
 - upgrade frameworku Nette. Minimální verze PHP je nyní 5.6.
+- s upgradem Nette souvisí odstranění volby "Vynutit protokol HTTPS". Přesměro-
+  vání na HTTPS se musí nakonfigurovat přímo na webovém serveru.
 - aktualizován popis stavů datových zpráv z oficiální dokumentace ISDS
 - PHP rozšíření "fileinfo" je nyní povinné. U instalace na Windows bude možná
   potřeba toto rozšíření povolit.

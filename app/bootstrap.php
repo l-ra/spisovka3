@@ -282,17 +282,6 @@ final class Bootstrap
 
     private function setupRouting(Nette\Http\IRequest $httpRequest, Nette\Application\IRouter $router)
     {
-        $force_https = false;
-        try {
-            // Nasledujici prikaz funguje az pote, co je vytvorena db struktura
-            $force_https = Settings::get('router_force_https', false);
-        } catch (DibiException $e) {
-            // ignoruj
-        }
-
-        /* if ($force_https || $httpRequest->isSecured())
-            Nette\Application\Routers\Route::$defaultFlags |= Nette\Application\Routers\Route::SECURED; */
-
         $router[] = new Nette\Application\Routers\Route('index.php',
                 array(
             'module' => 'Spisovka',
