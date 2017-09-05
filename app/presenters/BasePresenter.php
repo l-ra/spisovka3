@@ -182,8 +182,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->baseUrl = $this->getHttpRequest()->getUrl()->getBasePath();
         $this->template->publicUrl = GlobalVariables::get('publicUrl');
 
-        $this->template->licence = '<a href="http://joinup.ec.europa.eu/software/page/eupl/licence-eupl">EUPL v.1.1</a>';
-
         /**
          * Informace o Klientovi
          */
