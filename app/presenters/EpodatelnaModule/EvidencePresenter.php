@@ -173,6 +173,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addText('lhuta', 'Lhůta k vyřízení:', 5, 15)
                 ->setValue('30')
                 ->setOption('description', 'dní')
+                ->setRequired()
                 ->addRule(Nette\Forms\Form::NUMERIC, 'Lhůta k vyřízení musí být číslo');
 
         $form->addTextArea('poznamka', 'Poznámka:', 80, 6);
