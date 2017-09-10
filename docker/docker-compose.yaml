@@ -1,0 +1,25 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:5.7.19
+    environment:
+      MYSQL_ROOT_PASSWORD: spisovka
+      MYSQL_DATABASE: spisovka
+      MYSQL_USER: spisovka
+      MYSQL_PASSWORD: spisovka
+    volumes:
+      - db-data:/var/lib/mysql
+  spisovka:
+    image: lra73/spisovka
+    build:
+      context: spisovka
+    ports:
+      - 8033:80
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: spisovka 
+      MYSQL_DB: spisovka
+volumes:
+  db-data:
+    driver: local
